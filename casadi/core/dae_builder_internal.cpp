@@ -3304,9 +3304,8 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     }
 
     // Type specific properties
-    Type type;
-    std::string unit, display_unit;
-    double min, max, nominal, start;
+    Dict opts;
+    Type type = Type::NUMEL;
     casadi_int derivative = -1;
     if (fmi_major_ >= 3) {
       // FMI 3.0: Type information in the same node
@@ -3315,12 +3314,12 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       case Type::FLOAT32:  // fall-through
       case Type::FLOAT64:
         // Floating point valued variables
-        unit = vnode.attribute<std::string>("unit", "");
-        display_unit = vnode.attribute<std::string>("displayUnit", "");
-        min = vnode.attribute<double>("min", -inf);
-        max = vnode.attribute<double>("max", inf);
-        nominal = vnode.attribute<double>("nominal", 1.);
-        start = vnode.attribute<double>("start", 0.);
+        opts["unit"] = vnode.attribute<std::string>("unit", "");
+        opts["display_unit"] = vnode.attribute<std::string>("displayUnit", "");
+        opts["min"] = vnode.attribute<double>("min", -inf);
+        opts["max"] = vnode.attribute<double>("max", inf);
+        opts["nominal"] = vnode.attribute<double>("nominal", 1.);
+        opts["start"] = vnode.attribute<double>("start", 0.);
         derivative = vnode.attribute<casadi_int>("derivative", -1);
         break;
       case Type::INT8:  // fall-through
@@ -3332,8 +3331,8 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       case Type::INT64:  // fall-through
       case Type::UINT64:  // fall-through
         // Integer valued variables
-        min = vnode.attribute<double>("min", -inf);
-        max = vnode.attribute<double>("max", inf);
+        opts["min"] = vnode.attribute<double>("min", -inf);
+        opts["max"] = vnode.attribute<double>("max", inf);
         break;
       default:
         break;
@@ -3343,18 +3342,18 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       if (vnode.has_child("Real")) {
         type = Type::FLOAT64;
         const XmlNode& props = vnode["Real"];
-        unit = props.attribute<std::string>("unit", "");
-        display_unit = props.attribute<std::string>("displayUnit", "");
-        min = props.attribute<double>("min", -inf);
-        max = props.attribute<double>("max", inf);
-        nominal = props.attribute<double>("nominal", 1.);
-        start = props.attribute<double>("start", 0.);
+        opts["unit"] = props.attribute<std::string>("unit", "");
+        opts["display_unit"] = props.attribute<std::string>("displayUnit", "");
+        opts["min"] = props.attribute<double>("min", -inf);
+        opts["max"] = props.attribute<double>("max", inf);
+        opts["nominal"] = props.attribute<double>("nominal", 1.);
+        opts["start"] = props.attribute<double>("start", 0.);
         derivative = props.attribute<casadi_int>("derivative", -1);
       } else if (vnode.has_child("Integer")) {
         type = Type::INT32;
         const XmlNode& props = vnode["Integer"];
-        min = props.attribute<double>("min", -inf);
-        max = props.attribute<double>("max", inf);
+        opts["min"] = props.attribute<double>("min", -inf);
+        opts["max"] = props.attribute<double>("max", inf);
       } else if (vnode.has_child("Boolean")) {
         type = Type::BOOLEAN;
       } else if (vnode.has_child("String")) {
@@ -3399,35 +3398,10 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       variability = Variability::TUNABLE;
     }
 
-    // Create new variable
-    Dict opts {{"description", description}, {"type", to_string(type)},
-      {"initial", to_string(initial)}};
-    switch (type) {
-      case Type::FLOAT32:  // fall-through
-      case Type::FLOAT64:
-        // Floating point valued variables
-        opts["unit"] = unit;
-        opts["display_unit"] = display_unit;
-        opts["min"] = min;
-        opts["max"] = max;
-        opts["nominal"] = nominal;
-        opts["start"] = start;
-        break;
-      case Type::INT8:  // fall-through
-      case Type::UINT8:  // fall-through
-      case Type::INT16:  // fall-through
-      case Type::UINT16:  // fall-through
-      case Type::INT32:  // fall-through
-      case Type::UINT32:  // fall-through
-      case Type::INT64:  // fall-through
-      case Type::UINT64:  // fall-through
-        // Integer valued variables
-        opts["min"] = min;
-        opts["max"] = max;
-        break;
-      default:
-        break;
-    }
+    // Create the new variable
+    opts["type"] = to_string(type);
+    opts["initial"] = to_string(initial);
+    opts["description"] = description;
     Variable& var = add(name, causality, variability, opts);
     if (debug_) uout() << "Added variable: " << var.name << std::endl;
 
