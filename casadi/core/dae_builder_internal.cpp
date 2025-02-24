@@ -3375,7 +3375,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     Causality causality = to_enum<Causality>(causality_str);
 
     // Variability (FMI 1.0 -> FMI 2.0+)
-    std::string variability_str = vnode.attribute<std::string>("variability", 
+    std::string variability_str = vnode.attribute<std::string>("variability",
       to_string(default_variability(causality, type)));
     if (fmi_major_ == 1 && variability_str == "parameter") variability_str = "fixed";
     Variability variability = to_enum<Variability>(variability_str);
@@ -3805,7 +3805,9 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
             && lhs[0].attribute<std::string>("name").rfind(when_prefix, 0) == 0) {
           // Get the index
           std::string cond_name = lhs[0].attribute<std::string>("name");
-          if (debug_) uout() << "Reading event indicator: " << cond_name << " := " << beq << std::endl;
+          if (debug_) {
+            uout() << "Reading event indicator: " << cond_name << " := " << beq << std::endl;
+          }
           cond_name = cond_name.substr(when_prefix.size());
           casadi_int ind = std::stoi(cond_name) - 1;
           // Ensure consequitive for now
