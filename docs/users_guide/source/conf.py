@@ -23,8 +23,8 @@ project = 'CasADi'
 
 from datetime import date
 
-copyright = str(date.today().year) + ', Joel Andersson, Joris Gillis, Greg Horn'
-author = 'Joel Andersson, Joris Gillis, Greg Horn'
+copyright = str(date.today().year) + ', Joel Andersson, Joris Gillis'
+author = 'Joel Andersson, Joris Gillis'
 
 # The short X.Y version
 version = ''
@@ -147,7 +147,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'CasADi.tex', 'CasADi Documentation',
-     'Joel Andersson, Joris Gillis, Greg Horn', 'manual'),
+     'Joel Andersson, Joris Gillis', 'manual'),
 ]
 
 
