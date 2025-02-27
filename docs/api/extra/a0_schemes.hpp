@@ -26,6 +26,12 @@
 <tr><td>CONIC_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
+/** \defgroup scheme_OutputCategory
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::OutputCategory  ( = 7)</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+</table>
+*/
 /** \defgroup scheme_DpleInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::DpleInput  (DPLE_NUM_IN = 2)</caption>

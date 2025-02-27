@@ -49,6 +49,18 @@
 %exception  casadi::DaeBuilder::clear_all(const std::string &v) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  casadi::DaeBuilder::e() const {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::DaeBuilder::eliminate_d() {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::DaeBuilder::eliminate_quad() {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::DaeBuilder::eliminate_w() {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::DaeBuilder::find(const std::string &name) const {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
@@ -64,6 +76,9 @@
 %exception  casadi::DaeBuilder::name(size_t ind) const {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  casadi::DaeBuilder::ne() const {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::DaeBuilder::new_variable(const std::string &name, casadi_int numel=1) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
@@ -73,7 +88,19 @@
 %exception  casadi::DaeBuilder::set_all(const std::string &v, const std::vector< std::string > &name) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  casadi::DaeBuilder::set_beq(const std::string &name, const MX &val) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::DaeBuilder::set_ode(const std::string &name, const MX &ode_rhs) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::DaeBuilder::sort_d() {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::DaeBuilder::sort_w() {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::DaeBuilder::sort_z(const std::vector< std::string > &z_order) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
 %exception  casadi::DaeBuilder::t() const {

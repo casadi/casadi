@@ -232,7 +232,9 @@ class CASADI_EXPORT DaeBuilder
       \identifier{67} */
   casadi_int nq() const;
 
-  /** \brief Zero-crossing functions */
+  /** \brief Zero-crossing functions
+
+      \identifier{2cb} */
   casadi_int nzero() const;
 
   /** \brief Output variables

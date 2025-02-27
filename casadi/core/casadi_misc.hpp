@@ -477,7 +477,9 @@ private:
 
   CASADI_EXPORT bool extract_zip(const std::string& zip_path, const std::string& output_dir);
 
-  /** \brief RAII class for reading from a zip file */
+  /** \brief RAII class for reading from a zip file
+
+      \identifier{2c5} */
   class CASADI_EXPORT ZipResource {
     public:
       /** \brief Initialize with a path 
@@ -486,7 +488,8 @@ private:
       * Otherwise, the zip file is extracted to a temporary directory.
       *
       * Upon destruction, the temporary directory is removed.
-      */
+
+          \identifier{2c6} */
       ZipResource(const std::string& path);
       ~ZipResource();
       /// Get path for a consumer

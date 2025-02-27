@@ -679,7 +679,8 @@ namespace casadi {
     *
     * For mathematical dependency, see depends_on
     * \sa depends_on
-    */
+
+        \identifier{2c8} */
     /// @{
     inline friend bool contains(const std::vector<MatType>& v, const MatType &n) {
       return contains_all(v, std::vector<MatType>{n});

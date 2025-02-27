@@ -553,7 +553,9 @@ protected:
   // Time variable
   const MX& time() const;
 
-  /** \brief Definitions of dependent constants */
+  /** \brief Definitions of dependent constants
+
+      \identifier{2c7} */
   std::vector<MX> cdef() const;
 
   /** \brief Quadrature right hand sides

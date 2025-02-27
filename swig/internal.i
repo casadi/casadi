@@ -517,6 +517,9 @@
 %exception  casadi::DaeBuilder::add(const std::string &name, const std::string &causality, const std::string &variability, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::add(const std::string &name, const std::string &causality, const std::string &variability, const MX &expr, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::add_fun(const Function &f) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -592,6 +595,9 @@
 %exception  casadi::DaeBuilder::der(const MX &v) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::der(const MX &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::der(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -610,16 +616,7 @@
 %exception  casadi::DaeBuilder::display_unit(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::e() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::eliminate_d() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::eliminate_quad() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::eliminate_w() {
+%exception  casadi::DaeBuilder::eliminate(const std::string &cat) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::eq(const MX &lhs, const MX &rhs, const Dict &opts=Dict()) {
@@ -697,9 +694,6 @@
 %exception  casadi::DaeBuilder::nd() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::ne() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::DaeBuilder::nominal(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -728,6 +722,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::nz() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::nzero() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::ode() const {
@@ -832,9 +829,6 @@
 %exception  casadi::DaeBuilder::set_attribute(const std::string &a, const std::vector< std::string > &name, const std::vector< double > &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::set_beq(const std::string &name, const MX &val) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::DaeBuilder::set_category(const std::string &name, const std::string &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -904,13 +898,7 @@
 %exception  casadi::DaeBuilder::set_variability(const std::string &name, const std::string &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::sort_d() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::sort_w() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::sort_z(const std::vector< std::string > &z_order) {
+%exception  casadi::DaeBuilder::sort(const std::string &cat) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::start(const std::string &name) const {
@@ -977,15 +965,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::when(const MX &cond, const std::vector< std::string > &eqs, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::when_cond() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::when_lhs() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::when_rhs() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::x() const {
@@ -1396,7 +1375,13 @@
 %exception  casadi::Function::has_function(const std::string &fname) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::has_in(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::has_option(const std::string &option_name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::has_out(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::has_spfwd() const {
@@ -2195,6 +2180,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix::conditional(const MatType &ind, const std::vector< MatType > &x, const MatType &x_default, bool short_circuit=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::contains(const std::vector< MatType > &v, const MatType &n) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::contains_all(const std::vector< MatType > &v, const std::vector< MatType > &n) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::contains_any(const std::vector< MatType > &v, const std::vector< MatType > &n) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix::cross(const MatType &a, const MatType &b, casadi_int dim=-1) {
@@ -3349,6 +3343,12 @@
 %exception  casadi::MX::conditional(const MX &ind, const std::vector< MX > &x, const MX &x_default, bool short_circuit=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::contains_all(const std::vector< MX > &v, const std::vector< MX > &n) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::contains_any(const std::vector< MX > &v, const std::vector< MX > &n) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::convexify(const MX &H, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3995,6 +3995,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::conditional(const Matrix< Scalar > &ind, const std::vector< Matrix< Scalar > > &x, const Matrix< Scalar > &x_default, bool short_circuit=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::contains(const std::vector< Matrix< Scalar > > &v, const Matrix< Scalar > &n) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::contains_all(const std::vector< Matrix< Scalar > > &v, const std::vector< Matrix< Scalar > > &n) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::contains_any(const std::vector< Matrix< Scalar > > &v, const std::vector< Matrix< Scalar > > &n) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::cse(const std::vector< Matrix< Scalar > > &e) {
@@ -5344,6 +5353,9 @@
 %exception  casadi::XmlFile::parse(const std::string &filename) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ZipResource::path() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::all(const std::vector< bool > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5570,6 +5582,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::extract_from_dict_inplace(Dict &d, const std::string &key, T &value) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::extract_zip(const std::string &zip_path, const std::string &output_dir) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::find(const std::vector< T > &v) {
@@ -6470,6 +6485,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::XmlFile::XmlFile(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::ZipResource::ZipResource(const std::string &path) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::conditional_lock_guard< _Mutex >::conditional_lock_guard(const conditional_lock_guard &)=delete {

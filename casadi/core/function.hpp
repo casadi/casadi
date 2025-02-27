@@ -340,9 +340,13 @@ namespace casadi {
         \identifier{1vl} */
     casadi_int index_out(const std::string &name) const;
 
-    /** \brief Does the function have a particularly named input? */
+    /** \brief Does the function have a particularly named input?
+
+        \identifier{2c9} */
     bool has_in(const std::string &name) const;
-    /** \brief Does the function have a particularly named output? */
+    /** \brief Does the function have a particularly named output?
+
+        \identifier{2ca} */
     bool has_out(const std::string &name) const;
 
     /** \brief Get default input value
