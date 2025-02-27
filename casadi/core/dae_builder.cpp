@@ -536,7 +536,12 @@ void DaeBuilder::clear_all(const std::string& v) {
 void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& name) {
   try {
     (*this)->clear_cache_ = true;  // Clear cache after this
-    (*this)->indices(to_enum<Category>(v)) = (*this)->find(name);
+    const std::vector<size_t>& new_ind = (*this)->find(name);
+    if (v == "y") {
+      (*this)->outputs_ = new_ind;
+    } else {
+      (*this)->indices(to_enum<Category>(v)) = new_ind;
+    }
   } catch (std::exception& e) {
     THROW_ERROR("set_all", e.what());
   }
