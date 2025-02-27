@@ -3410,6 +3410,11 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       categorize(var.index, Category::NUMEL);
     }
 
+    // Do not permit discrete variables in x, for now
+    if (variability == Variability::DISCRETE) {
+      categorize(var.index, Category::NUMEL);
+    }
+
     // Assume all variables in the right-hand-sides for now
     // Prevents changing X to Q
     var.in_rhs = true;
