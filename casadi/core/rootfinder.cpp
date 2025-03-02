@@ -79,7 +79,7 @@ namespace casadi {
     return oracle_.name_out(i);
   }
 
-  Sparsity Rootfinder::get_sparsity_out(casadi_int i) override {
+  Sparsity Rootfinder::get_sparsity_out(casadi_int i) {
     if (i==iout_) return oracle_.sparsity_in(iin_);
     return oracle_.sparsity_out(i);
   }
