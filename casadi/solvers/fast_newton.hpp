@@ -136,7 +136,7 @@ namespace casadi {
     double abstolStep_;
 
     /// Reference to jacobian function
-    Function jac_f_z_;
+    Function jac_g_x_;
 
     /// Data for qr
     Sparsity sp_v_;

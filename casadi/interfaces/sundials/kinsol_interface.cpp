@@ -362,7 +362,7 @@ namespace casadi {
     m.arg[iin_] = NV_DATA_S(u);
     std::fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
-    calc_function(&m, "jac_f_z");
+    calc_function(&m, "jac_g_x");
 
     // Get sparsity and non-zero elements
     const casadi_int* colind = sp_jac_.colind();
@@ -403,7 +403,7 @@ namespace casadi {
     m.arg[iin_] = NV_DATA_S(u);
     std::fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
-    calc_function(&m, "jac_f_z");
+    calc_function(&m, "jac_g_x");
 
     // Get sparsity and non-zero elements
     const casadi_int* colind = sp_jac_.colind();
@@ -470,7 +470,7 @@ namespace casadi {
     m.arg[iin_] = NV_DATA_S(u);
     std::fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
-    if (calc_function(&m, "jac_f_z")) casadi_error("Jacobian calculation failed");
+    if (calc_function(&m, "jac_g_x")) casadi_error("Jacobian calculation failed");
 
     // Get sparsity and non-zero elements
     //const int* colind = sp_jac_.colind();

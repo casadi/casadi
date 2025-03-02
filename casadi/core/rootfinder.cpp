@@ -69,6 +69,21 @@ namespace casadi {
     return ROOTFINDER_NUM_OUT;
   }
 
+  std::string Rootfinder::get_name_in(casadi_int i) {
+    if (i==iin_) return oracle_.name_in(i) + "0";
+    return oracle_.name_in(i);
+  }
+
+  std::string Rootfinder::get_name_out(casadi_int i) {
+    if (i==iout_) return oracle_.name_in(iin_);
+    return oracle_.name_out(i);
+  }
+
+  Sparsity Rootfinder::get_sparsity_out(casadi_int i) override {
+    if (i==iout_) return oracle_.sparsity_in(iin_);
+    return oracle_.sparsity_out(i);
+  }
+
   std::vector<std::string> rootfinder_options(const std::string& name) {
     return Rootfinder::plugin_options(name).all();
   }
@@ -131,7 +146,7 @@ namespace casadi {
     }
 
     // Create oracle
-    return Function("rfp", rfp_in, rfp_out, {"x0", "p"}, {"x"}, oracle_options);
+    return Function("rfp", rfp_in, rfp_out, {"x", "p"}, {"g"}, oracle_options);
   }
 
   Function rootfinder(const std::string& name, const std::string& solver,
@@ -229,7 +244,7 @@ namespace casadi {
       s_out.insert(s_out.begin(), "jac:" + oracle_.name_out(iout_) + ":" + oracle_.name_in(iin_));
       jac = oracle_.factory(oracle_.name() + "_jac", s_in, s_out);
     }
-    set_function(jac, "jac_f_z");
+    set_function(jac, "jac_g_x");
     sp_jac_ = jac.sparsity_out(0);
     // Check for structural singularity in the Jacobian
     casadi_assert(!sp_jac_.is_singular(),
@@ -457,7 +472,7 @@ namespace casadi {
                           always_inline, never_inline);
 
     // Get expression of Jacobian
-    Function jac = get_function("jac_f_z");
+    Function jac = get_function("jac_g_x");
     MX J = jac(f_arg).front();
 
     // Solve for all the forward derivatives at once
@@ -491,7 +506,7 @@ namespace casadi {
     // Get expression of Jacobian
     std::vector<MX> f_arg(arg);
     f_arg[iin_] = res.at(iout_);
-    Function jac = get_function("jac_f_z");
+    Function jac = get_function("jac_g_x");
     MX J = jac(f_arg).front();
 
     // Get adjoint seeds for calling f
@@ -560,7 +575,7 @@ namespace casadi {
   void Rootfinder::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
-    s.version("Rootfinder", 2);
+    s.version("Rootfinder", 3);
     s.pack("Rootfinder::n", n_);
     s.pack("Rootfinder::linsol", linsol_);
     s.pack("Rootfinder::sp_jac", sp_jac_);
@@ -579,16 +594,13 @@ namespace casadi {
   }
 
   Rootfinder::Rootfinder(DeserializingStream & s) : OracleFunction(s) {
-    int version = s.version("Rootfinder", 1, 2);
+    s.version("Rootfinder", 3);
     s.unpack("Rootfinder::n", n_);
     s.unpack("Rootfinder::linsol", linsol_);
     s.unpack("Rootfinder::sp_jac", sp_jac_);
     s.unpack("Rootfinder::u_c", u_c_);
     s.unpack("Rootfinder::iin", iin_);
     s.unpack("Rootfinder::iout", iout_);
-    if (version==1) {
-      s.unpack("Rootfinder::error_on_fail", error_on_fail_);
-    }
   }
 
 } // namespace casadi

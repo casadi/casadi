@@ -94,7 +94,7 @@ namespace casadi {
     casadi_assert(!linsol_.is_null(),
                           "Newton::init: linear_solver must be supplied");
 
-    jac_f_z_ = get_function("jac_f_z");
+    jac_g_x_ = get_function("jac_g_x");
 
     // Symbolic factorization
     sp_jac_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
@@ -153,7 +153,7 @@ namespace casadi {
        for (casadi_int i=0;i<n_out_;++i) m->res[i+1] = m->ires[i];
        m->res[0] = M->jac_g_x;
        m->res[1+iout_] = M->g;
-       jac_f_z_(m->arg, m->res, m->iw, m->w);
+       jac_g_x_(m->arg, m->res, m->iw, m->w);
 
        m->return_status = casadi_newton(M);
        if (m->return_status) break;
@@ -207,7 +207,7 @@ namespace casadi {
     for (casadi_int i=0;i<n_out_;++i) {
       g << g.res(i+n_out_+1) + " = " << (i==iout_? "m.g" : g.res(i)) << ";\n";
     }
-    std::string flag = g(get_function("jac_f_z"),
+    std::string flag = g(get_function("jac_g_x"),
       "arg+" + str(n_in_), "res+" + str(n_out_), "iw", "w+" + str(w_offset));
     g << "if (" << flag << ") return 1;\n";
     g << "if (casadi_newton(&m)) break;\n";
@@ -219,7 +219,7 @@ namespace casadi {
   }
 
   void FastNewton::codegen_declarations(CodeGenerator& g) const {
-    g.add_dependency(get_function("jac_f_z"));
+    g.add_dependency(get_function("jac_g_x"));
   }
 
   int FastNewton::init_mem(void* mem) const {
@@ -257,7 +257,7 @@ namespace casadi {
     s.unpack("Newton::max_iter", max_iter_);
     s.unpack("Newton::abstol", abstol_);
     s.unpack("Newton::abstolStep", abstolStep_);
-    s.unpack("Newton::jac_f_z", jac_f_z_);
+    s.unpack("Newton::jac_g_x", jac_g_x_);
     s.unpack("Newton::sp_v", sp_v_);
     s.unpack("Newton::sp_r", sp_r_);
     s.unpack("Newton::prinv", prinv_);
@@ -270,7 +270,7 @@ namespace casadi {
     s.pack("Newton::max_iter", max_iter_);
     s.pack("Newton::abstol", abstol_);
     s.pack("Newton::abstolStep", abstolStep_);
-    s.pack("Newton::jac_f_z", jac_f_z_);
+    s.pack("Newton::jac_g_x", jac_g_x_);
     s.pack("Newton::sp_v", sp_v_);
     s.pack("Newton::sp_r", sp_r_);
     s.pack("Newton::prinv", prinv_);

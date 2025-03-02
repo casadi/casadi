@@ -157,7 +157,7 @@ namespace casadi {
       m->res[0] = m->jac;
       std::copy_n(m->ires, n_out_, m->res+1);
       m->res[1+iout_] = m->f;
-      calc_function(m, "jac_f_z");
+      calc_function(m, "jac_g_x");
 
       // Check convergence
       double abstol = 0;

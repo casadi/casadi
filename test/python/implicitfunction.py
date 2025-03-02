@@ -311,6 +311,7 @@ class ImplicitFunctiontests(casadiTestCase):
       if Solver=="nlpsol": continue
       if Solver=="fast_newton": continue
       print(Solver)
+      print(solver)
       res = solver(x0=0)["x"]
       self.checkarray(res,-1.7692923542386)
 
@@ -337,6 +338,54 @@ class ImplicitFunctiontests(casadiTestCase):
 
     g = Function("g",[x],[x - rf(x, x)])
     self.check_codegen(g,[1.01])
+    
+    
+  def test_generic(self):
+    a = SX.sym("a")
+    b = SX.sym("b")
+    c = SX.sym("c")
+    
+    f = Function("f",[a,b,c],[a**2-b,b**2-c,a*b*c+1],["a","b","c"],["f","g","h"])
 
+    a0 = 1
+    b0 = 2
+    c0 = 3
+     
+    rf = rootfinder("rf","newton",f,{"implicit_input":0,"implicit_output":0})
+     
+    res = rf(a0=a0,b=b0,c=c0)
+    self.assertAlmostEqual(res["a"]**2-b0,0,10)
+    self.assertAlmostEqual(b0**2-c0-res["g"],0,10)
+    self.assertAlmostEqual(res["a"]*b0*c0+1-res["h"],0,10)
+    print(rf)
+    jac_g_x = rf.get_function("jac_g_x")
+    self.assertTrue(jac_g_x.name_in()==["a","b","c"])
+    self.assertTrue(jac_g_x.name_out()==["jac_f_a","f","g","h"])
+    rf = rootfinder("rf","newton",f,{"implicit_input":1,"implicit_output":0})
+    res = rf(a=a0,b0=b0,c=c0)
+    self.assertAlmostEqual(a0**2-res["b"],0,10)
+    self.assertAlmostEqual(res["b"]**2-c0-res["g"],0,10)
+    self.assertAlmostEqual(a0*res["b"]*c0+1-res["h"],0,10)
+
+    jac_g_x = rf.get_function("jac_g_x")
+    self.assertTrue(jac_g_x.name_in()==["a","b","c"])
+    self.assertTrue(jac_g_x.name_out()==["jac_f_b","f","g","h"])
+    
+    rf = rootfinder("rf","newton",f,{"implicit_input":2,"implicit_output":1})
+    res = rf(a=a0,b=b0,c0=c0)
+    self.assertAlmostEqual(a0**2-b0-res["f"],0,10)
+    self.assertAlmostEqual(b0**2-res["c"],0,10)
+    self.assertAlmostEqual(a0*b0*res["c"]+1-res["h"],0,10)
+    jac_g_x = rf.get_function("jac_g_x")
+    self.assertTrue(jac_g_x.name_in()==["a","b","c"])
+    self.assertTrue(jac_g_x.name_out()==["jac_g_c","f","g","h"])
+
+    rf = rootfinder("rf","newton",{"x":a,"p":vertcat(b,c),"g":a**2-b})
+    res = rf(x0=a0,p=vertcat(b0,c0))
+    self.assertAlmostEqual(res["x"]**2-b0,0,10)
+    jac_g_x = rf.get_function("jac_g_x")
+    self.assertTrue(jac_g_x.name_in()==["x","p"])
+    self.assertTrue(jac_g_x.name_out()==["jac_g_x","g"])
+    
 if __name__ == '__main__':
     unittest.main()
