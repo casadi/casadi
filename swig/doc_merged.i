@@ -37224,10 +37224,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L72
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L87
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L72-L74
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L87-L89
 
 ";
 
@@ -37239,10 +37239,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L76
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L76-L78
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L91-L93
 
 ";
 
@@ -37254,10 +37254,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L80
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L95
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L80-L82
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L95-L97
 
 ";
 
@@ -37267,10 +37267,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L80-L82
 Check if a particular plugin is available.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L84
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L99
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L84-L86
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L99-L101
 
 ";
 
@@ -37280,10 +37280,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L84-L86
 Explicitly load a plugin dynamically.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L88
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L103
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L88-L90
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L103-L105
 
 ";
 
@@ -37293,10 +37293,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L88-L90
 Get the documentation string for a plugin.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L92
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.hpp#L107
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L92-L94
+https://github.com/casadi/casadi/blob/develop/casadi/core/rootfinder.cpp#L107-L109
 
 ";
 
