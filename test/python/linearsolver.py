@@ -287,6 +287,7 @@ class LinearSolverTests(casadiTestCase):
       else:
         A0 = A
       solver = casadi.Linsol("solver", Solver, A0.sparsity(), options)
+      solver.stats()
       b = DM([1,0.5])
       x = solver.solve(A0.T, b)
       res = np.linalg.solve(A0.T,b)

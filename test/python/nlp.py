@@ -2224,7 +2224,16 @@ class NLPtests(casadiTestCase):
       solver_in["ubg"]=[10]
       with self.assertInAnyOutput("Cuckoo"):
         solver_out = solver(**solver_in)
-            
+
+  def test_unsolved_stats(self):
+    x=MX.sym("x")
+    x_fail = x.attachAssert(x!=x,"Cuckoo")
+    nlp={'x':x, 'f':(x-1)**2, 'g':x_fail}
+        
+    for Solver, solver_options, aux_options in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      solver.stats()
+        
 if __name__ == '__main__':
     unittest.main()
     print(solvers)
