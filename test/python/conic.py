@@ -306,6 +306,7 @@ class ConicTests(casadiTestCase):
       print("test_general_convex_dense",conic,qp_options)
 
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver.stats()
 
       try:
         less_digits=aux_options["less_digits"]

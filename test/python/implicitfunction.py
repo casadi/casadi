@@ -120,6 +120,14 @@ class ImplicitFunctiontests(casadiTestCase):
       refsol = Function("refsol", [x], [ceil(x/pi-0.5)*pi])
       self.checkfunction(solver,refsol,inputs=[6],digits=10)
 
+  def test_unsolved_stats(self):
+    for Solver, options, features in solvers:
+      self.message(Solver)
+      x=SX.sym("x")
+      f=Function("f", [x], [sin(x)])
+      solver=rootfinder("solver", Solver, f, options)
+      solver.stats()
+     
   def test_scalar2(self):
     self.message("Scalar implicit problem, n=1")
     for Solver, options, features in solvers:
