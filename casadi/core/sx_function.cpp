@@ -914,6 +914,191 @@ namespace casadi {
     return 0;
   }
 
+
+  template<typename T>
+  inline void casadi_math<T>::propagate_interval(unsigned char op, const T& L1, const T& R1,
+        const T& L2, const T& R2, T& L, T& R) {
+    switch (op) {
+      case OP_ADD:
+        L = L1 + L2;
+        R = R1 + R2;
+        break;
+      case OP_SUB:
+        L = L1 - R2;
+        R = R1 - L2;
+        break;
+      case OP_LE:
+        L = L2>=R1;
+        R = R2>=L1;
+        break;
+      case OP_LT:
+        L = L2>R1;
+        R = R2>L1;
+        break;
+      case OP_EQ:
+        L = logic_and(logic_and(L1==R1, L2==R2), L1==L2);
+        R = logic_and(R1>=L2, L1<=R2);
+        break;
+      case OP_NE:
+        {
+          T singular = logic_and(logic_and(L1==R1, L2==R2), L1==L2);
+          L = logic_not(logic_and(R1>=L2, L1<=R2));
+          R = logic_not(singular);
+        }
+        break;
+      case OP_NOT:
+        {
+          T contains_zero = logic_and(L1<=0, R1>=0);
+          L = logic_and(L1==R1, L1==0);
+          R = contains_zero;
+        }
+        break;
+      case OP_AND:
+        {
+          T contains_zero1 = logic_and(L1<=0, R1>=0);
+          T contains_zero2 = logic_and(L2<=0, R2>=0);
+          L = logic_not(logic_or(contains_zero1, contains_zero2));
+          R = logic_and(logic_or(L1!=R1, L1!=0), logic_or(L2!=R2, L2!=0));
+        }
+        break;
+      case OP_OR:
+        {
+          T is_zero1 = logic_and(L1==R1, L1==0);
+          T is_zero2 = logic_and(L2==R2, L2==0);
+          T contains_zero1 = logic_and(L1<=0, R1>=0);
+          T contains_zero2 = logic_and(L2<=0, R2>=0);
+          L = logic_not(logic_and(contains_zero1, contains_zero2));
+          R = logic_not(logic_and(is_zero1, is_zero2));
+        }
+        break;
+      case OP_IF_ELSE_ZERO:
+        {
+          T zero_free = logic_or(L1>0, R1<0);
+          T is_not_zero = logic_or(L1!=R1, L1!=0);
+          L = is_not_zero*fmin(if_else_zero(zero_free, L2), L2);
+          R = is_not_zero*fmax(if_else_zero(zero_free, R2), R2);
+        }
+        break;
+      case OP_FABS:
+        {
+          T zero_free = logic_or(L1>0, R1<0);
+          T is_not_zero = logic_or(L1!=R1, L1!=0);
+          L = is_not_zero*fmin(if_else_zero(zero_free, L2), L2);
+          R = is_not_zero*fmax(if_else_zero(zero_free, R2), R2);
+        }
+        break;
+      case OP_MUL: {
+        L = fmin(fmin(fmin(L1*L2, L1*R2), R1*L2), R1*R2);
+        R = fmax(fmax(fmax(L1*L2, L1*R2), R1*L2), R1*R2);
+        break;
+      }
+      default:
+        casadi_error("Not implemented");
+    }
+  }
+
+  Function SXFunction::interval_propagator() const {
+    std::vector< std::vector<SXElem> > arg_L, arg_R;
+    for (casadi_int k=0;k<n_in_;++k) {
+      std::vector<SXElem> in = in_[k].get_nonzeros();
+      for (SXElem &e : in) {
+        e = SXElem::sym(e.name() + "_L");
+      }
+      arg_L.push_back(in);
+      in= in_[k].get_nonzeros();
+      for (SXElem &e : in) {
+        e = SXElem::sym(e.name() + "_R");
+      }
+      arg_R.push_back(in);
+    }
+    std::vector< std::vector<SXElem> > res_L, res_R;
+    for (casadi_int k=0;k<n_out_;++k) {
+      res_L.emplace_back(out_[k].nnz());
+      res_R.emplace_back(out_[k].nnz());
+    }
+
+    // Iterator to stack of constants
+    std::vector<SXElem>::const_iterator c_it = constants_.begin();
+
+    // Iterator to free variables
+    std::vector<SXElem>::const_iterator p_it = free_vars_.begin();
+    std::vector<SXElem> w_L(worksize_);
+    std::vector<SXElem> w_R(worksize_);
+
+    // Evaluate algorithm
+    if (verbose_) casadi_message("Evaluating algorithm forward");
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+        w_L[a.i0] = arg_L[a.i1][a.i2];
+        w_R[a.i0] = arg_R[a.i1][a.i2];
+        break;
+      case OP_OUTPUT:
+        res_L[a.i0][a.i2] = w_L[a.i1];
+        res_R[a.i0][a.i2] = w_R[a.i1];
+        break;
+      case OP_CONST:
+        w_L[a.i0] = *c_it++;
+        w_R[a.i0] = w_L[a.i0];
+        break;
+      case OP_PARAMETER:
+        w_L[a.i0] = *p_it++;
+        w_R[a.i0] = w_L[a.i0];
+        break;
+      case OP_CALL:
+        casadi_error("Not implemented");
+        break;
+      default:
+        {
+          // Do not store directly into w_L[a.i0] since a.i0 may be equal to a.i1 or a.i2
+          SXElem L, R;
+          casadi_math<SXElem>::propagate_interval(a.op, w_L[a.i1], w_R[a.i1],
+                                                        w_L[a.i2], w_R[a.i2],
+                                                        L, R);
+          w_L[a.i0] = L;
+          w_R[a.i0] = R;
+        }
+      }
+    }
+
+    std::vector<SX> args;
+
+    for (casadi_int k=0;k<n_in_;++k) {
+      args.push_back(SX(in_[k].sparsity(), arg_L[k]));
+    }
+    for (casadi_int k=0;k<n_in_;++k) {
+      args.push_back(SX(in_[k].sparsity(), arg_R[k]));
+    }
+    std::vector<SX> exprs;
+    for (casadi_int k=0;k<n_out_;++k) {
+      exprs.push_back(SX(sparsity_out_[k], res_L[k]));
+    }
+    for (casadi_int k=0;k<n_out_;++k) {
+      exprs.push_back(SX(sparsity_out_[k], res_R[k]));
+    }
+
+
+    std::vector<std::string> name_in;
+    for (const std::string& e : name_in_) {
+      name_in.push_back(e + "_L");
+    }
+    for (const std::string& e : name_in_) {
+      name_in.push_back(e + "_R");
+    }
+
+    std::vector<std::string> name_out;
+    for (const std::string& e : name_out_) {
+      name_out.push_back(e + "_L");
+    }
+    for (const std::string& e : name_out_) {
+      name_out.push_back(e + "_R");
+    }
+
+    return Function(name_ + "_interval_propagator", args, exprs, name_in, name_out);
+
+  }
+
+
   void SXFunction::eval_mx(const MXVector& arg, MXVector& res,
                           bool always_inline, bool never_inline) const {
     always_inline = always_inline || always_inline_;

@@ -1161,6 +1161,10 @@ namespace casadi {
         \identifier{28f} */
     static inline void fun_linear(unsigned char op, const T*x, const T* y, T* f);
 
+    /** \brief Propagate interval */
+    static inline void propagate_interval(unsigned char op, const T& L1, const T& R1,
+        const T& L2, const T& R2, T& L, T& R);
+
     /** \brief Is binary operation?
 
         \identifier{1gc} */

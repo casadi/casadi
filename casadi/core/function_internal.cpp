@@ -3596,6 +3596,11 @@ namespace casadi {
     return wrap().factory(name, s_in, s_out, aux, opts);
   }
 
+  Function FunctionInternal::interval_propagator() const {
+    casadi_error("'interval_propagator' not defined for " + class_name());
+    return Function();
+  }
+
   std::vector<std::string> FunctionInternal::get_function() const {
     // No functions
     return std::vector<std::string>();

@@ -332,6 +332,10 @@ namespace casadi {
     return Function(name, ex_in, ex_out, name_in(), name_out(), my_opts);
   }
 
+  Function Function::interval_propagator() const {
+    return (*this)->interval_propagator();
+  }
+
   Function Function::create(FunctionInternal* node) {
     Function ret;
     ret.own(node);
