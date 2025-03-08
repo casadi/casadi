@@ -2335,6 +2335,62 @@ class NLPtests(casadiTestCase):
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.stats()
         
+        
+  @requires_nlpsol("ipopt")
+  @memory_heavy()
+  def test_ipopt_custom_hess(self):
+    x=SX.sym("x")
+    y=SX.sym("y")
+    w=SX.sym("w")
+    
+    p = SX(0,1)
+    
+    f = (1-x)**2+100*w**2
+    g = y-x**2-w
+    
+    x = vertcat(x,y,w)
+    nlp={'x':x, 'f':f,'g': g}
+    lam_f = SX.sym("lam_f")
+    lam_g = SX.sym("lam_g",g.numel())
+    
+    ref_solver = nlpsol("solver","ipopt",nlp)
+    
+    x0 = 0
+    
+    ref_sol = ref_solver(x0=0,lbg=0,ubg=0)
+    
+    
+    nlp_hess_l_custom = Function('nlp_hess_l',[x,p,lam_f,lam_g],[triu(DM.zeros(3,3))])
+    options=  {}
+    options["cache"] = {"nlp_hess_l":nlp_hess_l_custom}
+    solver = nlpsol("solver","ipopt",nlp,options)
+    
+    with self.assertInException("evaluation error"):
+        self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),solver.get_function("nlp_hess_l"),inputs=[0.11,0,1.2,3.7])
+    
+
+    lag = lam_f*f+dot(lam_g,g)
+    H = jacobian(gradient(lag,x),x,{"symmetric":True})
+
+    
+    nlp_hess_l_custom = Function('nlp_hess_l',[x,p,lam_f,lam_g],[triu(H)])
+    
+    ref_solver.get_function("nlp_hess_l").disp(True)
+    nlp_hess_l_custom.disp(True)
+    options=  {}
+    options["cache"] = {"nlp_hess_l":nlp_hess_l_custom}
+    solver = nlpsol("solver","ipopt",nlp,options)
+    
+    sol = solver(x0=0,lbg=0,ubg=0)
+    
+    self.assertTrue(solver.stats()["success"])
+    
+    self.checkarray(sol["x"],ref_sol["x"],digits=6)
+    
+    self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),solver.get_function("nlp_hess_l"),inputs=[0.11,0,1.2,3.7])
+    
+
+    
 if __name__ == '__main__':
     unittest.main()
     print(solvers)
