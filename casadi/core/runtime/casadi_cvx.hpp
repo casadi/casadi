@@ -118,12 +118,12 @@ void casadi_cvx_house_apply_symm(casadi_int n, casadi_int k, T1* A, T1* p, T1* v
 // Upper triangular part contains compact Housholder factorisations
 //
 // A: n-by-n dense
+// beta: work vector; length n-2
 // p: work vector; length n
 //
 // Reference: Golub & Van Loan, Alg. 8.3.1
 template<typename T1>
 void casadi_cvx_tri(T1* A, casadi_int n, T1* beta, T1* p) {
-  T1 pp[1000];
   casadi_int k, N;
   T1 *A_base, *v;
   for (k=0;k<n-2;++k) {
@@ -138,7 +138,7 @@ void casadi_cvx_tri(T1* A, casadi_int n, T1* beta, T1* p) {
     // Assign 2-norm
     *A_base = casadi_cvx_house(v, &beta[k], N);
 
-    casadi_cvx_house_apply_symm(n, k, A, pp, v, beta[k]);
+    casadi_cvx_house_apply_symm(n, k, A, p, v, beta[k]);
 
   }
 }
@@ -222,8 +222,8 @@ void casadi_cvx_implicit_qr(casadi_int n, T1* t_diag, T1* t_off, T1* cs) {
 //
 // tolerance greater than machine precision
 //
-// trace_meta: length 1+3*n_iter
-// trace: length 2*(n-1)*n_iter
+// trace_meta: length 1+3*max_iter
+// trace: length 2*(n-1)*max_iter
 //
 /// Golub & Van Loan Alg. 8.3.3
 template<typename T1>
@@ -375,8 +375,8 @@ T1 casadi_cvx_scalar(T1 epsilon, casadi_int reflect, T1 eig) {
 // SYMBOL "cvx"
 // Convexify a dense symmetric Hessian
 //
-// w real work vector: length max(n,2*(n-1)*n_iter)
-// iw integer work vector: 1+3*n_iter
+// w real work vector: length 2*(n-1)*max_iter + n + n-2
+// iw integer work vector: 1+3*max_iter
 //
 // tol:     tolerance for symmetric schur
 // epsilon: minimum magnitude of eigenvalues
@@ -387,8 +387,15 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
   casadi_int i, j, k, n_iter, nn, p, trace_offset;
   casadi_int *t_meta;
   T1 c, s, t_off0;
-  T1 *cs, *t_diag, *t_off;
-  T1 beta[100];
+  T1 *cs, *w_trace, *w_beta, *w_p, *t_diag, *t_off;
+
+  // Work vector for Givens rotations: length 2*(n-1)*max_iter
+  w_trace = w;
+  // Work vectors for householder transform
+  // Length n
+  w_p = w_trace + 2*(n-1)*max_iter;
+  // Length n-2
+  w_beta = w_p + n;
 
   // Short-circuit for empty matrices
   if (n==0) return 0;
@@ -399,7 +406,7 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
     return 0;
   }
 
-  casadi_cvx_tri(A, n, beta, w);
+  casadi_cvx_tri(A, n, w_beta, w_p);
 
   for (i=0;i<n;++i) {
     for (j=0;j<n;++j) {
@@ -422,7 +429,7 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
   }
 
   // Diagonalize matrix by Symmetric QR
-  if (casadi_cvx_symm_schur(n, t_diag, t_off, tol, max_iter, iw, w)) return 1;
+  if (casadi_cvx_symm_schur(n, t_diag, t_off, tol, max_iter, iw, w_trace)) return 1;
 
   // Retain diagonals (eigenvalues)
   for (i=0;i<n;++i) {
@@ -442,7 +449,7 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
     nn = *t_meta++;
     p = *t_meta++;
     trace_offset = *t_meta++;
-    cs = w+trace_offset;
+    cs = w_trace+trace_offset;
     t_meta-= 6;
     for (j=0;j<nn-1;j++) {
       s = *--cs;
@@ -455,8 +462,8 @@ int casadi_cvx(casadi_int n, T1 *A, T1 epsilon, T1 tol, casadi_int reflect, casa
   for (k = n-3; k>=0; --k) {
     casadi_int N = n-k-1;
     T1 *v = A+N*n;
-    casadi_cvx_house_apply_symm(n, k, A, w, v, beta[k]);
-    casadi_cvx_house_apply(k+1, N, n, A+k+1, w, v, beta[k]);
+    casadi_cvx_house_apply_symm(n, k, A, w_p, v, w_beta[k]);
+    casadi_cvx_house_apply(k+1, N, n, A+k+1, w_p, v, w_beta[k]);
   }
 
   return 0;
