@@ -80,6 +80,15 @@ namespace casadi {
   }
 
   template<bool Add>
+  void SetNonzerosParam<Add>::
+  propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    eval_mx(arg_L, res_L);
+    eval_mx(arg_R, res_R);
+    casadi_error("Not implemented");
+  }
+
+  template<bool Add>
   void SetNonzerosParamVector<Add>::
   eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     // Add to the element to the sensitivity, if any
