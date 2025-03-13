@@ -3622,7 +3622,47 @@ class Functiontests(casadiTestCase):
     args = [a,b]
     
     def atomic_tests():
-    
+      yield (1,lambda a: 2*a, [[[[1,2]],[[2,4]]],
+        [[[-2,-1]],[[-4,-2]]],
+        [[[2,2]],[[4,4]]]])
+      # OP_NEG
+      yield (1, lambda a: -a, [
+          # positive intervals
+          [[[2, 5]], [[-5, -2]]],
+          [[[0.5, 3]], [[-3, -0.5]]],
+          [[[10, 10]], [[-10, -10]]],
+          # negative intervals
+          [[[-4, -1]], [[1, 4]]],
+          [[[-7, -3]], [[3, 7]]],
+          [[[-10, -10]], [[10, 10]]],
+          # intervals containing zero
+          [[[-3, 7]], [[-7, 3]]],
+          [[[-5, 5]], [[-5, 5]]],
+          [[[-2, 0]], [[0, 2]]],
+          [[[0, 8]], [[-8, 0]]],
+          [[[0, 0]], [[0, 0]]]
+      ])
+      yield (1,lambda a: sqrt(a), [[[[1,2]],[[1,sqrt(2)]]],
+        [[[0,0]],[[0,0]]],
+        [[[0,5]],[[0,sqrt(5)]]],
+        [[[4,9]],[[2,3]]],
+        [[[2,2]],[[sqrt(2),sqrt(2)]]]])
+      yield (2,lambda a,b: fmax(a,b), [[[[1,2],[3,4]],[[3,4]]],
+        [[[0,0],[1,1]],[[1,1]]],
+        [[[0,2],[1,3]],[[1,3]]],
+        [[[0,3],[1,2]],[[1,3]]],
+        [[[2,2],[3,4]],[[3,4]]],
+        [[[3,4],[2,2]],[[3,4]]]])
+      yield (2,lambda a,b: fmin(a,b), [[[[1,2],[3,4]],[[1,2]]],
+        [[[0,0],[1,1]],[[0,0]]],
+        [[[0,2],[1,3]],[[0,2]]],
+        [[[0,3],[1,2]],[[0,2]]],
+        [[[2,2],[3,4]],[[2,2]]],
+        [[[3,4],[2,2]],[[2,2]]]])
+      yield (2,lambda a,b: a-b, [[[[1,2],[3,4]],[[-3,-1]]],
+        [[[0,0],[1,1]],[[-1,-1]]],
+        [[[2,2],[3,4]],[[-2,-1]]],
+        [[[3,4],[2,2]],[[1,2]]]])
       yield (2,lambda a,b: a<=b, [[[[0,1],[3,4]],[[1,1]]],
         [[[3,4],[0,1]],[[0,0]]],
         [[[1,4],[2,3]],[[0,1]]],
@@ -3721,14 +3761,77 @@ class Functiontests(casadiTestCase):
         [[[1,1],[1,1]],[[1,1]]],
         [[[0,1],[1,2]],[[0,2]]],
         [[[1,2],[0,1]],[[0,1]]]])
+      # OP_COS
+      yield (1, lambda a: cos(a), [
+          # basic intervals
+          [[[0, pi/3]], [[0.5, 1]]],
+          [[[pi/4, 3*pi/4]], [[-sqrt(2)*0.5, sqrt(2)*0.5]]],
+          [[[pi/2, 3*pi/2]], [[-1, 0]]],
+          [[[0, 0]], [[1, 1]]],
+          [[[pi, pi]], [[-1, -1]]],
+          # intervals spanning multiple periods
+          [[[0, 2*pi]], [[-1, 1]]],
+          [[[0, 4*pi]], [[-1, 1]]],
+          [[[pi/6, 2*pi + pi/6]], [[-1, 1]]],
+          # intervals with specific properties
+          [[[0, pi]], [[-1, 1]]],
+          [[[pi, 2*pi]], [[-1, 1]]],
+          [[[pi/2, pi]], [[-1, 0]]],
+          [[[0, pi/2]], [[0, 1]]],
+          # small intervals
+          [[[pi/4, pi/3]], [[0.5, sqrt(2)*0.5]]],
+          [[[5*pi/4, 4*pi/3]], [[-sqrt(2)*0.5, -0.5]]],
+          [[[pi - 0.1, pi + 0.1]], [[-1, cos(pi - 0.1)]]],
+          [[[2*pi - 0.1, 2*pi + 0.1]], [[cos(2*pi - 0.1), 1]]]
+
+      ])
+# OP_SQ
+      yield (1, lambda a: a**2,  [
+          # positive intervals
+          [[[2, 5]], [[4, 25]]],
+          [[[0.5, 3]], [[0.25, 9]]],
+          [[[10, 10]], [[100, 100]]],
+          # negative intervals
+          [[[-4, -1]], [[1, 16]]],
+          [[[-7, -3]], [[9, 49]]],
+          [[[-10, -10]], [[100, 100]]],
+          # intervals containing zero
+          [[[-3, 7]], [[0, 49]]],
+          [[[-5, 5]], [[0, 25]]],
+          [[[-8, 5]], [[0, 64]]],
+          [[[-2, 0]], [[0, 4]]],
+          [[[0, 8]], [[0, 64]]],
+          [[[0, 0]], [[0, 0]]],
+          # special cases
+          [[[-0.5, 0.5]], [[0, 0.25]]],
+          [[[-0.1, 0.2]], [[0, 0.04]]],
+      ])
+
+
+      
     for n_in,fun, numeric_tests in atomic_tests():
       
       f = Function('f',args[:n_in],[fun(*args[:n_in])])
 
       fp = f.interval_propagator()
+      
+      def sample_interval(lo,hi):
+        ret = []
+        ret = [float((1-alpha)*lo+alpha*hi) for alpha in np.linspace(0,1,5)]
+        # Make sure some special points are present if they are in the interval interior
+        for e in [0,1]:
+          if e>lo and e<hi:
+            ret.append(e)
+        # More special points (integer multiples of pi/2)
+        for i in range(-10,10):
+          e = i*pi/2
+          if e>lo and e<hi:
+            ret.append(e)
+        return ret
+        
     
       for int_in, int_out in numeric_tests:
-          extended = [[float((1-alpha)*e[0]+alpha*e[1]) for alpha in np.linspace(0,1,5)] for e in int_in]
+          extended = [sample_interval(e[0],e[1]) for e in int_in]
           
           sample_out = [f.call(sample_in) for sample_in in itertools.product(*extended)]
           empirical_res = [[float(min(e[i] for e in sample_out)),float(max(e[i] for e in sample_out))] for i in range(f.n_out())]
@@ -3742,9 +3845,73 @@ class Functiontests(casadiTestCase):
           #print(fp(SX.sym("L1"),SX.sym("L2"),SX.sym("R1"),SX.sym("R2")))
           print(res,"ref",res_ref)
           self.assertEqual(len(res_ref),len(res))
-          #for i in range(len(res_ref)):
-          #  self.checkarray(res[i],res_ref[i],digits=12,failmessage=str(int_in))
-          
+          for i in range(len(res_ref)):
+            self.checkarray(res[i],res_ref[i],digits=12,failmessage=str(int_in))
+         
+    f = Function('f',[a,b],[(a+b)*b,a-b])
+    
+    fp = f.interval_propagator()
+    print(fp(1,3,2,4))
+      
+    a = MX.sym("a")
+    b = MX.sym("b")
+    
+    [c,d] = f(7*a,3*b)
+    
+    g = Function('g',[a,b],[c+d,c])
+    
+    gp = g.interval_propagator()
+    
+    print(gp(1,3,2,4))
+      
+    a = MX.sym("a",2,2)
+    b = MX.sym("b",2,2)
+    
+    f = Function('f',[a],[5*a.T])
+    fp = f.interval_propagator()
+    print(fp(DM([[1,2],[3,4]]),DM([[1.1,2.1],[3.1,4.1]])))
+    
+    
+    a = MX.sym("a",2,2)
+    b = MX.sym("b",2,2)
+    
+    DM.rng(0)
+    a_L = DM.rand(2,2)-1
+    a_R = DM.rand(2,2)+1
+    b_L = DM.rand(2,2)-2
+    b_R = DM.rand(2,2)+2
+    args = [a,b]
+    args_L = [a_L,b_L]
+    args_R = [a_R,b_R]
+    
+    
+    def reshuffle_tests():
+      yield (2,lambda a,b: vertcat(a,b))
+      yield (2,lambda a,b: horzcat(a,b))
+      yield (1,lambda a: a.T)
+      yield (1,lambda a: a[0,0])
+      yield (1,lambda a: a[0,:])
+      yield (1,lambda a: a[:,0])
+      yield (1,lambda a: repmat(a,2,3))
+      yield (1,lambda a: reshape(a,1,4))
+      yield (1,lambda a: a.monitor("a"))
+      yield (1,lambda a: vertsplit(a,1)[0])
+      yield (1,lambda a: horzsplit(a,1)[0])
+      yield (1,lambda a: sparsity_cast(a,Sparsity.dense(1,4)))
+    for n_in,fun in reshuffle_tests():
+      
+      f = Function('f',args[:n_in],[fun(*args[:n_in])])
+
+      fp = f.interval_propagator()
+      
+      [L,R] = fp.call(args_L[:n_in]+args_R[:n_in])
+      
+      self.checkarray(f.call(args_L[:n_in])[0],L)
+      self.checkarray(f.call(args_R[:n_in])[0],R)
+    
+    
+    
+    
 
 if __name__ == '__main__':
     unittest.main()

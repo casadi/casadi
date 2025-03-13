@@ -3597,7 +3597,16 @@ namespace casadi {
   }
 
   Function FunctionInternal::interval_propagator() const {
-    casadi_error("'interval_propagator' not defined for " + class_name());
+    Function int_prop;
+    if (!cache_int_prop_.incache(0, int_prop)) {
+      int_prop = get_interval_propagator();
+      cache_int_prop_.tocache_if_missing(0, int_prop);
+    }
+    return int_prop;
+  }
+
+  Function FunctionInternal::get_interval_propagator() const {
+    casadi_error("'get_interval_propagator' not defined for " + class_name());
     return Function();
   }
 

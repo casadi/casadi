@@ -349,6 +349,11 @@ namespace casadi {
     casadi_error("'eval_mx' not defined for class " + class_name());
   }
 
+  void MXNode::propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+      std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    casadi_error("'propagate_interval' not defined for class " + class_name());
+  }
+
   void MXNode::eval_linear(const std::vector<std::array<MX, 3> >& arg,
                         std::vector<std::array<MX, 3> >& res) const {
     std::vector<MX> arg_sum(arg.size());

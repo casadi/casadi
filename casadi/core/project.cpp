@@ -61,6 +61,13 @@ namespace casadi {
     res[0] = project(arg[0], sparsity());
   }
 
+  void Project::propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+      std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    eval_mx(arg_L, res_L);
+    eval_mx(arg_R, res_R);
+  }
+
+
   void Project::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     casadi_int nfwd = fsens.size();

@@ -61,6 +61,12 @@ namespace casadi {
     res[0] = arg[0]->get_repmat(1, n_);
   }
 
+  void HorzRepmat::propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    eval_mx(arg_L, res_L);
+    eval_mx(arg_R, res_R);
+  }
+
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
   int HorzRepmat::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {

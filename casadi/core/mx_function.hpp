@@ -301,6 +301,8 @@ namespace casadi {
     void export_code_body(const std::string& lang,
       std::ostream &stream, const Dict& options) const override;
 
+    Function get_interval_propagator() const override;
+
     /// Substitute inplace, internal implementation
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;
 

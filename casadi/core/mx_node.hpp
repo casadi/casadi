@@ -173,6 +173,10 @@ namespace casadi {
     virtual void eval_linear(const std::vector<std::array<MX, 3> >& arg,
                         std::vector<std::array<MX, 3> >& res) const;
 
+    /** \brief Interval calculus propagation rule */
+    virtual void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const;
+
     /** \brief Evaluate the MX node on a const/linear/nonlinear partition
 
         \identifier{28c} */

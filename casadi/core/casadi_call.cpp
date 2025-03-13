@@ -118,6 +118,22 @@ namespace casadi {
     res = create(fcn_, arg);
   }
 
+  void Call::propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+    std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+
+    Function int_prop = fcn_.interval_propagator();
+
+    std::vector<MX> arg = join(arg_L, arg_R);
+    std::vector<MX> res = int_prop(arg);
+
+    res_L.resize(fcn_.n_out());
+    res_R.resize(fcn_.n_out());
+    for (casadi_int i=0; i<fcn_.n_out(); ++i) {
+      res_L[i] = res[i];
+      res_R[i] = res[i+fcn_.n_out()];
+    }
+  }
+
   void Call::ad_forward(const std::vector<std::vector<MX>>& fseed,
       std::vector<std::vector<MX>>& fsens) const {
     try {

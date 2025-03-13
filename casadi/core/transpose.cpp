@@ -201,6 +201,12 @@ namespace casadi {
     }
   }
 
+  void Transpose::propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+      std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    eval_mx(arg_L, res_L);
+    eval_mx(arg_R, res_R);
+  }
+
   void Transpose::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     for (casadi_int d=0; d<fsens.size(); ++d) {

@@ -57,6 +57,12 @@ namespace casadi {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
+  void Split::propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+    std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    eval_mx(arg_L, res_L);
+    eval_mx(arg_R, res_R);
+  }
+
   template<typename T>
   int Split::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
     // Number of derivatives

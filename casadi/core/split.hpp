@@ -68,6 +68,10 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
+    /** \brief Interval calculus propagation rule */
+    void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const override;
+
     /** \brief  Propagate sparsity forward
 
         \identifier{12g} */

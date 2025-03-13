@@ -100,6 +100,15 @@ namespace casadi {
   }
 
   template<bool Add>
+  void SetNonzeros<Add>::propagate_interval(
+        const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    eval_mx(arg_L, res_L);
+    eval_mx(arg_R, res_R);
+  }
+
+
+  template<bool Add>
   void SetNonzerosSlice<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     if (!MXNode::matches_sparsity(arg)) {
       SetNonzeros<Add>::eval_mx(arg, res);
