@@ -71,6 +71,10 @@ namespace casadi {
     void eval_linear(const std::vector<std::array<MX, 3> >& arg,
                         std::vector<std::array<MX, 3> >& res) const override;
 
+    /** \brief Interval calculus propagation rule */
+    void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+      std::vector<MX>& res_L, std::vector<MX>& res_R) const override;
+
     /** \brief Calculate forward mode directional derivatives
 
         \identifier{17b} */

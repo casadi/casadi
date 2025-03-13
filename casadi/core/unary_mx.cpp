@@ -69,6 +69,15 @@ namespace casadi {
     casadi_math<MX>::fun_linear(op_, arg[0].data(), dummy, res[0].data());
   }
 
+
+  void UnaryMX::propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+  std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    MX L1 = arg_L[0], R1 = arg_R[0];
+    MX L2, R2;
+
+    casadi_math<MX>::propagate_interval(op_, L1, R1, L2, R2, res_L[0], res_R[0]);
+  }
+
   void UnaryMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) const {
     // Get partial derivatives

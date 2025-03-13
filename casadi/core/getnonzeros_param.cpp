@@ -231,6 +231,14 @@ namespace casadi {
     res[0] = project(arg[0], dep(0).sparsity())->get_nz_ref(arg[1], arg[2]);
   }
 
+  void GetNonzerosParam::propagate_interval(
+      const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+      std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    eval_mx(arg_L, res_L);
+    eval_mx(arg_R, res_R);
+    casadi_error("Not implemented");
+  }
+
   void GetNonzerosParamVector::ad_forward(const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens) const {
     const MX& nz = dep(1);

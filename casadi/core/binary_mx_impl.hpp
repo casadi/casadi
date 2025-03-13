@@ -66,6 +66,16 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
+  void BinaryMX<ScX, ScY>::propagate_interval(
+      const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+      std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    MX L1 = arg_L[0], R1 = arg_R[0];
+    MX L2 = arg_L[1], R2 = arg_R[1];
+
+    casadi_math<MX>::propagate_interval(op_, L1, R1, L2, R2, res_L[0], res_R[0]);
+  }
+
+  template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                    std::vector<std::vector<MX> >& fsens) const {
     // Get partial derivatives

@@ -60,6 +60,10 @@ namespace casadi {
     SetNonzerosParam(const MX& y, const MX& x, const MX& nz);
     SetNonzerosParam(const MX& y, const MX& x, const MX& nz, const MX& nz2);
 
+    /** \brief Interval calculus propagation rule */
+    void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const override;
+
     /// Destructor
     ~SetNonzerosParam() override = 0;
 
