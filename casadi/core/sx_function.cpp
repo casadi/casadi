@@ -914,6 +914,143 @@ namespace casadi {
     return 0;
   }
 
+
+  template<typename T>
+  inline void my_propagate_interval(unsigned char op, const T& L1, const T& R1,
+        const T& L2, const T& R2, T& L, T& R) {
+    switch (op) {
+      case OP_NEG:
+        L = -R1;
+        R = -L1;
+        break;
+      case OP_TWICE:
+        L = 2*L1;
+        R = 2*R1;
+        break;
+      case OP_FMIN:
+        L = fmin(L1, L2);
+        R = fmin(R1, R2);
+        break;
+      case OP_FMAX:
+        L = fmax(L1, L2);
+        R = fmax(R1, R2);
+        break;
+      case OP_ADD:
+        L = L1 + L2;
+        R = R1 + R2;
+        break;
+      case OP_SUB:
+        L = L1 - R2;
+        R = R1 - L2;
+        break;
+      case OP_SQRT:
+        L = sqrt(fmax(L1, 0));
+        R = sqrt(fmax(R1, 0));
+        break;
+      case OP_LE:
+        L = L2>=R1;
+        R = R2>=L1;
+        break;
+      case OP_LT:
+        L = L2>R1;
+        R = R2>L1;
+        break;
+      case OP_EQ:
+        L = logic_and(logic_and(L1==R1, L2==R2), L1==L2);
+        R = logic_and(R1>=L2, L1<=R2);
+        break;
+      case OP_NE:
+        {
+          T singular = logic_and(logic_and(L1==R1, L2==R2), L1==L2);
+          L = logic_not(logic_and(R1>=L2, L1<=R2));
+          R = logic_not(singular);
+          
+        }
+        break;
+      case OP_NOT:
+        {
+          T contains_zero = logic_and(L1<=0, R1>=0);
+          L = logic_and(L1==R1, L1==0);
+          R = contains_zero;
+        }
+        break;
+      case OP_AND:
+        {
+          T contains_zero1 = logic_and(L1<=0, R1>=0);
+          T contains_zero2 = logic_and(L2<=0, R2>=0);
+          L = logic_not(logic_or(contains_zero1, contains_zero2));
+          R = logic_and(logic_or(L1!=R1, L1!=0), logic_or(L2!=R2, L2!=0));
+        }
+        break;
+      case OP_OR:
+        {
+          T is_zero1 = logic_and(L1==R1, L1==0);
+          T is_zero2 = logic_and(L2==R2, L2==0);
+          T contains_zero1 = logic_and(L1<=0, R1>=0);
+          T contains_zero2 = logic_and(L2<=0, R2>=0);
+          L = logic_not(logic_and(contains_zero1, contains_zero2));
+          R = logic_not(logic_and(is_zero1, is_zero2));
+        }
+        break;
+      case OP_IF_ELSE_ZERO:
+        {
+          T zero_free = logic_or(L1>0, R1<0);
+          T is_not_zero = logic_or(L1!=R1, L1!=0);
+          L = is_not_zero*fmin(if_else_zero(zero_free, L2), L2);
+          R = is_not_zero*fmax(if_else_zero(zero_free, R2), R2);
+        }
+        break;
+      case OP_FABS:
+        {
+          T zero_free = logic_or(L1>0, R1<0);
+          T is_not_zero = logic_or(L1!=R1, L1!=0);
+          L = is_not_zero*fmin(if_else_zero(zero_free, L2), L2);
+          R = is_not_zero*fmax(if_else_zero(zero_free, R2), R2);
+        }
+        break;
+      case OP_COS:
+        {
+          T ge_2pi = ((R1-L1)>=2*M_PI);
+          T L1_cos = cos(L1);
+          T R1_cos = cos(R1);
+          T lb = fmin(L1_cos, R1_cos);
+          T ub = fmax(L1_cos, R1_cos);
+          T contains_max = ceil(L1/(2*M_PI))*2*M_PI<=R1;
+          T contains_min = ceil((L1-M_PI)/(2*M_PI))*2*M_PI+M_PI<=R1;
+          L = if_else(logic_or(ge_2pi, contains_min), -1, lb);
+          R = if_else(logic_or(ge_2pi, contains_max), 1, ub);
+        }
+        break;
+      case OP_SIN:
+        L = -1; // conservative
+        R = 1;
+        break;
+      case OP_ASIN:
+        L = -pi/2; // conservative
+        R = pi/2;
+        break;
+      case OP_ACOS:
+        L = 0;
+        R = pi;
+        break;
+      case OP_MUL:
+      {
+        L = fmin(fmin(fmin(L1*L2, L1*R2), R1*L2), R1*R2);
+        R = fmax(fmax(fmax(L1*L2, L1*R2), R1*L2), R1*R2);
+        break;
+      }
+      case OP_SQ:
+      {
+          T zero_free = logic_or(L1>0, R1<0);
+          L = if_else_zero(zero_free, if_else(L1>0, L1*L1, R1*R1));
+          R = if_else(zero_free, if_else(L1>0, R1*R1, L1*L1), fmax(L1*L1, R1*R1));
+        break;
+      }
+      default:
+        casadi_warning("Not implemented: "+str(casadi_math<MX>::op_as_string(op)) );
+    }
+  }
+
   Function SXFunction::get_interval_propagator() const {
     std::vector< std::vector<SXElem> > arg_L, arg_R;
     for (casadi_int k=0;k<n_in_;++k) {
@@ -969,7 +1106,7 @@ namespace casadi {
         {
           // Do not store directly into w_L[a.i0] since a.i0 may be equal to a.i1 or a.i2
           SXElem L, R;
-          casadi_math<SXElem>::propagate_interval(a.op, w_L[a.i1], w_R[a.i1],
+          my_propagate_interval(a.op, w_L[a.i1], w_R[a.i1],
                                                         w_L[a.i2], w_R[a.i2],
                                                         L, R);
           w_L[a.i0] = L;
