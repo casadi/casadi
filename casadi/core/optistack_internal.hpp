@@ -272,6 +272,20 @@ public:
     if (problem_dirty()) return baked_copy().lam_g();
     return lam_;
   }
+
+  DM x_linear_scale() const {
+    if (problem_dirty()) return baked_copy().x_linear_scale();
+    return DM(linear_scale_);
+  }
+  DM x_linear_scale_offset() const {
+    if (problem_dirty()) return baked_copy().x_linear_scale_offset();
+    return DM(linear_scale_offset_);
+  }
+  DM g_linear_scale() const {
+    if (problem_dirty()) return baked_copy().g_linear_scale();
+    return DM(g_linear_scale_);
+  }
+
   void assert_empty() const;
 
   void show_infeasibilities(double tol=0, const Dict& opts=Dict()) const;

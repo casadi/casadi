@@ -2390,6 +2390,38 @@ class NLPtests(casadiTestCase):
     self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),solver.get_function("nlp_hess_l"),inputs=[0.11,0,1.2,3.7])
     
 
+  @requires_nlpsol("ipopt")
+  @memory_heavy()
+  def test_ipopt_custom_jac(self):
+    x=SX.sym("x")
+    y=SX.sym("y")
+    w=SX.sym("w")
+    
+    p = SX(0,1)
+    
+    f = (1-x)**2+100*w**2
+    g = y-x**2-w
+    
+    x = vertcat(x,y,w)
+    nlp={'x':x, 'f':f,'g': g}
+    lam_f = SX.sym("lam_f")
+    lam_g = SX.sym("lam_g",g.numel())
+    
+    ref_solver = nlpsol("solver","ipopt",nlp)
+    
+    x0 = 0
+    
+    ref_sol = ref_solver(x0=0,lbg=0,ubg=0)
+    
+    options = {}
+    solver = nlpsol("solver","ipopt",nlp,options)
+
+    nlp_jac_g_custom = Function('nlp_jac_g',[x,p],[g,jacobian(g,x)],["x","p"],["g","jac_g_x"])
+    options["nlp_jac_g"] = {"nlp_jac_g":nlp_jac_g_custom}
+    
+    sol = solver(x0=0,lbg=0,ubg=0)
+    self.assertTrue(solver.stats()["success"])
+    self.checkfunction_light(ref_solver.get_function("nlp_jac_g"),solver.get_function("nlp_jac_g"),inputs=[vertcat(0.11,0.3,0.7),0])
     
 if __name__ == '__main__':
     unittest.main()

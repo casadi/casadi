@@ -971,21 +971,24 @@ class OptiStacktests(inherit_from):
       #    ||  x-5 , y-7 ||_2 <= 4
       #
       #
+      for x_scale in [1,7]:
+        for g_scale in [1,9]:
+          opti.set_linear_scale(x,x_scale)
 
-      h = soc(vertcat(x-5,y-7),4)
+          h = soc(vertcat(x-5,y-7),4)
 
-      # Note: >= destroys sparsity
-      opti.subject_to(h>0)
-  
-      opti.minimize(2*x+y)
+          # Note: >= destroys sparsity
+          opti.subject_to(h>0,g_scale)
+      
+          opti.minimize(2*x+y)
 
-      opti.solver("superscs",{},options)
-      sol = opti.solve()
+          opti.solver("superscs",{},options)
+          sol = opti.solve()
 
-      res = sol.value(vertcat(x,y))
+          res = sol.value(vertcat(x,y))
 
-      self.checkarray(res,DM([5-8/sqrt(5),7-4/sqrt(5)]),conic,digits=7)
-      self.checkarray(sol.value(opti.f),10-16/sqrt(5)+7-4/sqrt(5),conic,digits=7)
+          self.checkarray(res,DM([5-8/sqrt(5),7-4/sqrt(5)]),conic,digits=7)
+          self.checkarray(sol.value(opti.f),10-16/sqrt(5)+7-4/sqrt(5),conic,digits=7)
    
     @requires_conic("cbc")
     def test_discrete_linear(self):
@@ -1292,7 +1295,58 @@ class OptiStacktests(inherit_from):
                 ref[k] = sol.value(getattr(opti,k))
               else:
                 self.checkarray(ref[k], sol.value(getattr(opti,k)), digits=6)
-      
+
+    @memory_heavy()
+    @requires_nlpsol("ipopt")
+    def test_ipopt_custom_jac(self):
+    
+      for x_scale in [1,7]:
+        for x_scale_offset in [0,2]:
+          for g_scale in [1,3]:
+
+            opti = Opti()
+            x=opti.variable()
+            y=opti.variable()
+            w=opti.variable()
+            
+            opti.set_linear_scale(x,x_scale,x_scale_offset)
+            
+            
+            opti.minimize((1-x)**2+100*w**2)
+            opti.subject_to(y-x**2-w==0,g_scale)
+            
+            opti.solver("ipopt")
+            opti.solve()
+           
+
+            ref_solver = opti.debug.casadi_solver
+
+
+            opti = Opti()
+            x=opti.variable()
+            y=opti.variable()
+            w=opti.variable()
+            
+            opti.set_linear_scale(x,x_scale,x_scale_offset)
+            
+            opti.minimize((1-x)**2+100*w**2)
+            opti.subject_to(y-x**2-w==0,g_scale)
+            
+            print(opti.x_linear_scale)
+            print(opti.x_linear_scale_offset)
+            print(opti.g_linear_scale)
+
+            nlp_jac_g_custom = Function('nlp_jac_g',[opti.x,opti.p],substitute([opti.g/opti.g_linear_scale,mtimes(jacobian(opti.g/opti.g_linear_scale,opti.x),diag(opti.x_linear_scale))],[opti.x],[opti.x*opti.x_linear_scale+opti.x_linear_scale_offset]),["x","p"],["g","jac_g_x"])
+            options = {}
+            options["cache"] = {"nlp_jac_g":nlp_jac_g_custom}      
+            opti.solver("ipopt", options)
+            sol = opti.solve()
+            
+            solver = opti.debug.casadi_solver
+            
+            print(sol.value(opti.f+dot(opti.lam_g, opti.g)))
+            
+            self.checkfunction_light(ref_solver.get_function("nlp_jac_g"),solver.get_function("nlp_jac_g"),inputs=[vertcat(0.11,0.3,0.7),0])
 
     @memory_heavy()
     @requires_nlpsol("ipopt")

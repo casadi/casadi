@@ -338,6 +338,10 @@ public:
   MX lbg() const;
   MX ubg() const;
 
+  DM x_linear_scale() const;
+  DM x_linear_scale_offset() const;
+  DM g_linear_scale() const;
+
   /** \brief Get all (scalarised) dual variables as a symbolic column vector
   *
   * Useful for obtaining the Lagrange Hessian:

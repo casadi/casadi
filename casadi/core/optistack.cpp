@@ -380,6 +380,30 @@ MX Opti::lam_g() const {
   }
 }
 
+DM Opti::x_linear_scale() const {
+  try {
+    return (*this)->x_linear_scale();
+  } catch(std::exception& e) {
+    THROW_ERROR("x_linear_scale", e.what());
+  }
+}
+
+DM Opti::x_linear_scale_offset() const {
+  try {
+    return (*this)->x_linear_scale_offset();
+  } catch(std::exception& e) {
+    THROW_ERROR("x_linear_scale_offset", e.what());
+  }
+}
+
+DM Opti::g_linear_scale() const {
+  try {
+    return (*this)->g_linear_scale();
+  } catch(std::exception& e) {
+    THROW_ERROR("g_linear_scale", e.what());
+  }
+}
+
 Function Opti::to_function(const std::string& name,
     const std::vector<MX>& args, const std::vector<MX>& res,
     const std::vector<std::string>& name_in,
