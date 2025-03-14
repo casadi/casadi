@@ -791,13 +791,19 @@ void OptiNode::bake() {
   std::vector<MX> lbg_all, lbg_unscaled_all;
   std::vector<MX> ubg_all, ubg_unscaled_all;
 
+  g_linear_scale_.clear();
+  h_linear_scale_.clear();
+  std::vector<DM> g_linear_scale, h_linear_scale;
+
   equality_.clear();
   for (const auto& g : g_) {
     if (meta_con(g).type==OPTI_PSD) {
       h_all.push_back(meta_con(g).canon/meta_con(g).linear_scale);
+      h_linear_scale.push_back(meta_con(g).linear_scale);
       h_unscaled_all.push_back(meta_con(g).canon);
     } else {
       g_all.push_back(meta_con(g).canon/meta_con(g).linear_scale);
+      g_linear_scale.push_back(meta_con(g).linear_scale);
       g_unscaled_all.push_back(meta_con(g).canon);
       lbg_all.push_back(meta_con(g).lb/meta_con(g).linear_scale);
       lbg_unscaled_all.push_back(meta_con(g).lb);
@@ -811,10 +817,12 @@ void OptiNode::bake() {
   }
 
   nlp_["g"] = veccat(g_all);
+  g_linear_scale_ = veccat(g_linear_scale).nonzeros();
   nlp_unscaled_["g"] = veccat(g_unscaled_all);
   if (problem_type_=="conic") {
     nlp_["h"] = diagcat(h_all);
     nlp_unscaled_["h"] = diagcat(h_unscaled_all);
+    h_linear_scale_ = veccat(h_linear_scale).nonzeros();
   }
 
   // Get scaling data
@@ -1157,7 +1165,10 @@ void OptiNode::res(const DMDict& res) {
     for (const auto &v : active_symvar(OPTI_DUAL_G)) {
       casadi_int i = meta(v).i;
       std::vector<double> & data_v = store_latest_[OPTI_DUAL_G][i].nonzeros();
-      std::copy(lam_v.begin()+meta(v).start, lam_v.begin()+meta(v).stop, data_v.begin());
+      for (casadi_int i=0;i<data_v.size();++i) {
+        casadi_int j = meta(v).start+i;
+        data_v[i] = lam_v[j]/g_linear_scale_[j]*f_linear_scale_;
+      }
     }
   }
   res_ = res;

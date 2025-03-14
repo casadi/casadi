@@ -1293,5 +1293,68 @@ class OptiStacktests(inherit_from):
               else:
                 self.checkarray(ref[k], sol.value(getattr(opti,k)), digits=6)
       
+
+    @memory_heavy()
+    @requires_nlpsol("ipopt")
+    def test_scaling(self):
+    
+      f_ref = None
+      g_ref = None
+      x_ref = None
+      lam_g_ref = None
+      grad_f_ref = None
+      jac_g_ref = None
+      
+      dual_ref = None
+      lbg_ref = None
+      for x_scale in [1,100]:
+        for g_scale in [1,37]:
+          for f_scale in [1,11]:
+            print(x_scale,g_scale)
+
+            opti = Opti()
+            x=opti.variable()
+            y=opti.variable()
+            w=opti.variable()
+            
+            
+            opti.set_linear_scale(x,x_scale)
+            
+            
+            opti.minimize((1-x)**2+100*(y-x**2)**2,f_scale)
+            my_g = x**2+y**2==1
+            opti.subject_to(my_g,g_scale)
+            
+            opti.solver("ipopt",{"ipopt.print_level":0,"print_time":False})
+            sol = opti.solve()
+            
+            print(sol.value(opti.lbg))
+            
+            if x_scale==1 and g_scale==1 and f_scale==1:
+              f_ref = sol.value(opti.f)
+              g_ref = sol.value(opti.g)
+              x_ref = sol.value(opti.x)
+              lam_g_ref = sol.value(opti.lam_g)
+              grad_f_ref = sol.value(gradient(opti.f,opti.x))
+              jac_g_ref = sol.value(jacobian(opti.g,opti.x))
+              dual_ref = sol.value(opti.dual(my_g))
+              lbg_ref = sol.value(opti.lbg)
+            else:
+              self.checkarray(f_ref,sol.value(opti.f))
+              self.checkarray(g_ref,sol.value(opti.g))
+              self.checkarray(x_ref,sol.value(opti.x))
+              self.checkarray(lam_g_ref,sol.value(opti.lam_g),digits=6)
+              self.checkarray(grad_f_ref, sol.value(gradient(opti.f,opti.x)),digits=6)
+              self.checkarray(jac_g_ref, sol.value(jacobian(opti.g,opti.x)),digits=6)
+              self.checkarray(dual_ref, sol.value(opti.dual(my_g)),digits=6)
+              self.checkarray(lbg_ref, sol.value(opti.lbg))
+            
+            lag_grad = sol.value(gradient(opti.f+dot(opti.lam_g, opti.g),opti.x))
+            self.checkarray(sol.value(x), 0.78641515, digits=6)
+            self.checkarray(lag_grad, vertcat(0,0), digits=6)
+
+      
+
+    
 if __name__ == '__main__':
     unittest.main()

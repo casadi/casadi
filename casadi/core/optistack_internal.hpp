@@ -407,6 +407,8 @@ private:
   MX lam_;
   std::vector<double> linear_scale_;
   std::vector<double> linear_scale_offset_;
+  std::vector<double> g_linear_scale_;
+  std::vector<double> h_linear_scale_;
 
   /// Bounds helper function: p -> lbg, ubg
   Function bounds_;
