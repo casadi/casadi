@@ -3760,7 +3760,9 @@ class Functiontests(casadiTestCase):
         [[[1,1],[0,0]],[[0,0]]],
         [[[1,1],[1,1]],[[1,1]]],
         [[[0,1],[1,2]],[[0,2]]],
-        [[[1,2],[0,1]],[[0,1]]]])
+        [[[1,2],[0,1]],[[0,1]]]
+      ])
+
       # OP_COS
       yield (1, lambda a: cos(a), [
           # basic intervals
@@ -3783,9 +3785,9 @@ class Functiontests(casadiTestCase):
           [[[5*pi/4, 4*pi/3]], [[-sqrt(2)*0.5, -0.5]]],
           [[[pi - 0.1, pi + 0.1]], [[-1, cos(pi - 0.1)]]],
           [[[2*pi - 0.1, 2*pi + 0.1]], [[cos(2*pi - 0.1), 1]]]
-
       ])
-# OP_SQ
+
+      # OP_SQ
       yield (1, lambda a: a**2,  [
           # positive intervals
           [[[2, 5]], [[4, 25]]],
@@ -3807,6 +3809,7 @@ class Functiontests(casadiTestCase):
           [[[-0.1, 0.2]], [[0, 0.04]]],
       ])
 
+      # OP_MUL
       yield (2, lambda a,b: a*b,  [
           # intervals containing zero
           [[[-3, 7],[-3, 7]], [[-21, 49]]],
@@ -3823,6 +3826,76 @@ class Functiontests(casadiTestCase):
           [[[0, 0],[0,0]], [[0, 0]]],
       ])
       
+      # OP_SIN
+      yield (1, lambda a: sin(a), [
+          # small positive intervals
+          [[[0, pi/4]], [[0, sin(pi/4)]]],
+          [[[pi/4, pi/2]], [[sin(pi/4), 1.0]]],
+          [[[pi/2, 3*pi/4]], [[sin(3*pi/4), 1.0]]],
+          [[[3*pi/4, pi]], [[0, sin(3*pi/4)]]],
+          # intervals containing critical points
+          [[[pi/4, 3*pi/4]], [[sin(pi/4), 1.0]]],
+          [[[3*pi/4, 5*pi/4]], [[-sin(3*pi/4), sin(3*pi/4)]]],
+          [[[5*pi/4, 7*pi/4]], [[-1.0, sin(5*pi/4)]]],
+          [[[7*pi/4, 9*pi/4]], [[-sin(pi/4), sin(pi/4)]]],
+          # intervals spanning full periods
+          [[[0, 2*pi]], [[-1.0, 1.0]]],
+          [[[0, 3*pi]], [[-1.0, 1.0]]],
+          [[[0, 4*pi]], [[-1.0, 1.0]]],
+          [[[-pi, 3*pi]], [[-1.0, 1.0]]],
+          # intervals in negative domain
+          [[[-pi/4, 0]], [[-sin(pi/4), 0]]],
+          [[[-pi/2, -pi/4]], [[-1.0, -sin(pi/4)]]],
+          [[[-pi, -pi/2]], [[-1.0, 0]]],
+          [[[-3*pi/2, -pi]], [[-0, 1.0]]],
+          # intervals spanning zero
+          [[[-pi/6, pi/6]], [[-sin(pi/6), sin(pi/6)]]],
+          [[[-pi/4, pi/4]], [[-sin(pi/4), sin(pi/4)]]],
+          [[[-pi/2, pi/2]], [[-1.0, 1.0]]],
+          [[[-pi, pi]], [[-1.0, 1.0]]],
+      ])
+
+      # OP_ASIN
+      yield (1, lambda a: asin(a), [
+          # standard intervals
+          [[[-0.5, 0.5]], [[asin(-0.5), asin(0.5)]]],
+          [[[0.1, 0.7]], [[asin(0.1), asin(0.7)]]],
+          [[[-0.8, -0.2]], [[asin(-0.8), asin(-0.2)]]],
+          [[[0.0, 0.0]], [[0.0, 0.0]]],
+          # boundary casea
+          [[[-1.0, -0.9]], [[asin(-1.0), asin(-0.9)]]],
+          [[[0.9, 1.0]], [[asin(0.9), asin(1.0)]]],
+          # domain intervals
+          [[[-1.0, 1.0]], [[-pi/2, pi/2]]],
+          [[[-1.0, 0.0]], [[-pi/2, 0.0]]],
+          [[[0.0, 1.0]], [[0.0, pi/2]]],
+          # special values
+          [[[0.5, 0.5]], [[pi/6, pi/6]]],
+          [[[1/sqrt(2), 1/sqrt(2)]], [[pi/4, pi/4]]],
+      ])
+
+      # OP_ACOS
+      yield (1, lambda a: acos(a), [
+          # standard intervals
+          [[[-0.5, 0.5]], [[acos(0.5), acos(-0.5)]]],
+          [[[0.1, 0.7]], [[acos(0.7), acos(0.1)]]],
+          [[[-0.8, -0.2]], [[acos(-0.2), acos(-0.8)]]],
+          [[[0.0, 0.0]], [[pi/2, pi/2]]],
+          # boundary cases
+          [[[-1.0, -0.9]], [[acos(-0.9), acos(-1.0)]]],
+          [[[0.9, 1.0]], [[acos(1.0), acos(0.9)]]],
+          # domain intervals
+          [[[-1.0, 1.0]], [[0.0, pi]]],
+          [[[-1.0, 0.0]], [[pi/2, pi]]],
+          [[[0.0, 1.0]], [[0.0, pi/2]]],
+          # special values
+          [[[0.5, 0.5]], [[pi/3, pi/3]]],
+          [[[0.0, 0.0]], [[pi/2, pi/2]]],
+          [[[1/sqrt(2), 1/sqrt(2)]], [[pi/4, pi/4]]],
+          [[[1.0, 1.0]], [[0.0, 0.0]]],
+          [[[-1.0, -1.0]], [[pi, pi]]],
+      ])
+
     for n_in,fun, numeric_tests in atomic_tests():
       
       f = Function('f',args[:n_in],[fun(*args[:n_in])])

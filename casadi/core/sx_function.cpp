@@ -1022,16 +1022,25 @@ namespace casadi {
         }
         break;
       case OP_SIN:
-        L = -1; // conservative
-        R = 1;
+        {
+          T L1_mov = L1 - M_PI/2;
+          T R1_mov = R1 - M_PI/2;
+          my_propagate_interval(OP_COS, L1_mov, R1_mov, L2, R2, L, R); 
+        }
         break;
       case OP_ASIN:
-        L = -pi/2; // conservative
-        R = pi/2;
+        {
+          T out_of_domain = logic_or(R1<-1, L1>1);
+          L = if_else(out_of_domain, nan, if_else(L1<=-1, -pi/2, asin(L1)));
+          R = if_else(out_of_domain, nan, if_else(R1>=1, pi/2, asin(R1)));
+        }
         break;
       case OP_ACOS:
-        L = 0;
-        R = pi;
+        {
+          T out_of_domain = logic_or(R1<-1, L1>1);
+          L = if_else(out_of_domain, nan, if_else(R1>=1, 0, acos(R1)));
+          R = if_else(out_of_domain, nan, if_else(L1<=-1, pi, acos(L1)));
+        }
         break;
       case OP_MUL:
       {
