@@ -165,7 +165,7 @@ jobs:
         with:
           args: "--commit-time"
       - name: Cache build dir
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.2.0
         with:
           key: core-build-${{ github.ref }}-${{matrix.image}}-${{env.cache-suffix}}
           path: build
@@ -212,7 +212,7 @@ jobs:
           pwd
           ls -al dockcross
       - name: Cache build dir
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4.2.0
         with:
           key: core-build-${{ github.ref }}-${{ matrix.target }}-${{env.cache-suffix}}
           path: build
