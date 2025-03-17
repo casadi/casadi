@@ -920,11 +920,11 @@ set(BUILD_LIBZIP_VERSION "v1.11.3" CACHE STRING "Tag/branch/hash to be used for 
 option(WITH_BUILD_LIBZIP "Build LIBZIP (BUILD_LIBZIP_VERSION=${BUILD_LIBZIP_VERSION}) from downloaded source (BUILD_LIBZIP_GIT_REPO=${BUILD_LIBZIP_GIT_REPO})." OFF)
 set(BUILD_LIBZIP_DEPENDENCIES ZLIB)
 
-option(WITH_GHC "Compile the GHC interface" OFF)
-set(BUILD_GHC_GIT_REPO "https://github.com/gulrak/filesystem" CACHE STRING "Git repo used together with BUILD_GHC_VERSION")
-set(BUILD_GHC_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for GHC")
-set(BUILD_GHC_VERSION "v1.5.14" CACHE STRING "Tag/branch/hash to be used for BUILD_GHC_GIT_REPO")
-option(WITH_BUILD_GHC "Build GHC (BUILD_GHC_VERSION=${BUILD_GHC_VERSION}) from downloaded source (BUILD_GHC_GIT_REPO=${BUILD_LIBZIP_GIT_REPO})." OFF)
+option(WITH_GHC_FILESYSTEM "Compile the GHC_FILESYSTEM interface" OFF)
+set(BUILD_GHC_FILESYSTEM_GIT_REPO "https://github.com/gulrak/filesystem" CACHE STRING "Git repo used together with BUILD_GHC_FILESYSTEM_VERSION")
+set(BUILD_GHC_FILESYSTEM_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for GHC_FILESYSTEM")
+set(BUILD_GHC_FILESYSTEM_VERSION "v1.5.14" CACHE STRING "Tag/branch/hash to be used for BUILD_GHC_FILESYSTEM_GIT_REPO")
+option(WITH_BUILD_GHC_FILESYSTEM "Build GHC_FILESYSTEM (BUILD_GHC_FILESYSTEM_VERSION=${BUILD_GHC_FILESYSTEM_VERSION}) from downloaded source (BUILD_GHC_FILESYSTEM_GIT_REPO=${BUILD_LIBZIP_GIT_REPO})." OFF)
 
 
 
@@ -1035,7 +1035,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL MADNLP)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE)
+foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LIBZIP ZLIB)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -2071,16 +2071,16 @@ if(WITH_LIBZIP)
 endif()
 add_feature_info(libzip-interface WITH_LIBZIP "Interface to the libzip.")
 
-if(WITH_GHC)
-  if(WITH_BUILD_GHC)
+if(WITH_GHC_FILESYSTEM)
+  if(WITH_BUILD_GHC_FILESYSTEM)
     ExternalProject_Add(ghc-external
-        GIT_REPOSITORY ${BUILD_GHC_GIT_REPO}
-        GIT_SHALLOW ${BUILD_GHC_GIT_SHALLOW}
-        GIT_TAG ${BUILD_GHC_VERSION}
+        GIT_REPOSITORY ${BUILD_GHC_FILESYSTEM_GIT_REPO}
+        GIT_SHALLOW ${BUILD_GHC_FILESYSTEM_GIT_SHALLOW}
+        GIT_TAG ${BUILD_GHC_FILESYSTEM_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        CMAKE_ARGS -DGHC_FILESYSTEM_BUILD_TESTING=OFF -DGHC_FILESYSTEM_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     add_library(ghcFilesystem::ghc_filesystem INTERFACE IMPORTED)
     add_dependencies(ghcFilesystem::ghc_filesystem ghc-external)
     set_target_properties(ghcFilesystem::ghc_filesystem PROPERTIES
@@ -2090,7 +2090,7 @@ if(WITH_GHC)
     find_package(ghcFilesystem REQUIRED)
   endif()
 endif()
-add_feature_info(ghc-interface WITH_GHC "Interface to the ghc.")
+add_feature_info(ghc-filesystem-interface WITH_GHC_FILESYSTEM "Interface to the ghc.")
 
 if(WITH_SELFCONTAINED)
   # Loop over prescribed folders
