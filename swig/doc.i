@@ -1009,7 +1009,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L381
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1004-L1010
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1012-L1018
 
 ";
 
@@ -1025,7 +1025,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L382
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1012-L1018
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1020-L1026
 
 ";
 
@@ -1041,7 +1041,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L389
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1020-L1026
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1028-L1034
 
 ";
 
@@ -1057,7 +1057,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L390
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1028-L1034
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1036-L1042
 
 ";
 
@@ -1072,7 +1072,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L397
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1036-L1042
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1044-L1050
 
 ";
 
@@ -1087,7 +1087,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L399
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1052-L1058
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1060-L1066
 
 ";
 
@@ -1102,7 +1102,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L398
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1044-L1050
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1052-L1058
 
 ";
 
@@ -1117,7 +1117,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L400
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1060-L1066
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1068-L1074
 
 ";
 
@@ -1241,7 +1241,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L529
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1441-L1448
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1449-L1456
 
 ";
 
@@ -1257,7 +1257,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L531
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1450-L1457
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1458-L1465
 
 ";
 
@@ -1273,7 +1273,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L533
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1459-L1466
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1467-L1474
 
 ";
 
@@ -1306,7 +1306,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1138
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1407-L1421
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1415-L1429
 
 ";
 
@@ -2172,7 +2172,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L863
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1191-L1204
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1199-L1212
 
 ";
 
@@ -2196,7 +2196,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L864
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1221-L1231
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1229-L1239
 
 ";
 
@@ -2220,7 +2220,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L874
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1206-L1219
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1214-L1227
 
 ";
 
@@ -2244,7 +2244,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L875
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1233-L1243
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1241-L1251
 
 ";
 
@@ -2262,7 +2262,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L884
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1250-L1254
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1258-L1262
 
 ";
 
@@ -2280,7 +2280,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L911
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1289-L1293
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1297-L1301
 
 ";
 
@@ -2298,7 +2298,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L913
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1245-L1248
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1253-L1256
 
 ";
 
@@ -2314,7 +2314,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L891
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1268-L1271
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1276-L1279
 
 ";
 
@@ -2330,7 +2330,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L896
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1273-L1280
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1281-L1288
 
 ";
 
@@ -2346,7 +2346,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L902
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1262-L1266
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1270-L1274
 
 ";
 
@@ -2365,7 +2365,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L909
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1257-L1260
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1265-L1268
 
 ";
 
@@ -2382,7 +2382,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L949
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1540-L1546
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1548-L1554
 
 ";
 
@@ -2417,7 +2417,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L953
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1556-L1562
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1564-L1570
 
 ";
 
@@ -2434,7 +2434,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L954
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1572-L1574
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1580-L1582
 
 ";
 
@@ -2469,7 +2469,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L958
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1580-L1582
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1588-L1590
 
 ";
 
@@ -2486,7 +2486,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L967
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1548-L1554
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1556-L1562
 
 ";
 
@@ -2521,7 +2521,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L971
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1564-L1570
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1572-L1578
 
 ";
 
@@ -2538,7 +2538,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L972
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1576-L1578
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1584-L1586
 
 ";
 
@@ -2573,7 +2573,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L976
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1584-L1586
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1592-L1594
 
 ";
 
@@ -2589,7 +2589,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L983
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1588-L1590
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1596-L1598
 
 ";
 
@@ -2605,7 +2605,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L984
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1592-L1594
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1600-L1602
 
 ";
 
@@ -2621,7 +2621,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1596-L1598
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1604-L1606
 
 ";
 
@@ -2637,7 +2637,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L986
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1600-L1602
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1608-L1610
 
 ";
 
@@ -2657,7 +2657,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L996
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1604-L1606
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1612-L1614
 
 ";
 
@@ -2677,7 +2677,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L997
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1608-L1610
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1616-L1618
 
 ";
 
@@ -2697,7 +2697,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1000
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1620-L1622
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1628-L1630
 
 ";
 
@@ -2717,7 +2717,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1001
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1624-L1626
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1632-L1634
 
 ";
 
@@ -2737,7 +2737,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1004
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1636-L1638
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1644-L1646
 
 ";
 
@@ -2757,7 +2757,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1005
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1640-L1642
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1648-L1650
 
 ";
 
@@ -2777,7 +2777,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L998
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1612-L1614
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1620-L1622
 
 ";
 
@@ -2797,7 +2797,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L999
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1616-L1618
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1624-L1626
 
 ";
 
@@ -2817,7 +2817,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1002
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1628-L1630
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1636-L1638
 
 ";
 
@@ -2837,7 +2837,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1003
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1632-L1634
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1640-L1642
 
 ";
 
@@ -2857,7 +2857,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1006
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1644-L1646
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1652-L1654
 
 ";
 
@@ -2877,7 +2877,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1007
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1648-L1650
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1656-L1658
 
 ";
 
@@ -2892,7 +2892,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1087
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1677-L1679
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1685-L1687
 
 ";
 
@@ -2907,7 +2907,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1088
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1681-L1683
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1689-L1691
 
 ";
 
@@ -3240,7 +3240,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L310
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L950-L952
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L958-L960
 
 ";
 
@@ -3255,7 +3255,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L320
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L988-L994
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L996-L1002
 
 ";
 
@@ -3270,7 +3270,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L315
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L954-L956
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L962-L964
 
 ";
 
@@ -3285,7 +3285,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L325
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L996-L1002
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1004-L1010
 
 ";
 
@@ -3307,7 +3307,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L333
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L958-L964
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L966-L972
 
 ";
 
@@ -3329,7 +3329,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L341
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L966-L972
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L974-L980
 
 ";
 
@@ -3345,7 +3345,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L346
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L974-L979
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L982-L987
 
 ";
 
@@ -3361,7 +3361,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L350
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L981-L986
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L989-L994
 
 ";
 
@@ -3376,7 +3376,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L355
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1468-L1470
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1476-L1478
 
 ";
 
@@ -3391,7 +3391,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L360
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1472-L1474
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1480-L1482
 
 ";
 
@@ -3406,7 +3406,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L365
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1476-L1478
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1484-L1486
 
 ";
 
@@ -3421,7 +3421,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L370
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1480-L1482
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1488-L1490
 
 ";
 
@@ -3436,7 +3436,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L375
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1484-L1486
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1492-L1494
 
 ";
 
@@ -3457,7 +3457,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L416
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1896-L1902
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1904-L1910
 
 ";
 
@@ -3472,7 +3472,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L421
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1904-L1906
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1912-L1914
 
 ";
 
@@ -3488,7 +3488,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L426
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1908-L1910
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1916-L1918
 
 ";
 
@@ -3514,7 +3514,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L434
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1814-L1821
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1822-L1829
 
 ";
 
@@ -3537,7 +3537,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L434
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1814-L1821
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1822-L1829
 
 ";
 
@@ -3560,7 +3560,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L434
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1814-L1821
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1822-L1829
 
 ";
 
@@ -3576,7 +3576,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L441
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1140-L1142
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1148-L1150
 
 ";
 
@@ -3592,7 +3592,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1144-L1146
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1152-L1154
 
 ";
 
@@ -3608,7 +3608,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L451
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1148-L1150
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1156-L1158
 
 ";
 
@@ -3624,7 +3624,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L456
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1152-L1159
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1160-L1167
 
 ";
 
@@ -3646,7 +3646,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L464
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1161-L1171
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1169-L1179
 
 ";
 
@@ -3795,7 +3795,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L637
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1089-L1095
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1097-L1103
 
 ";
 
@@ -3915,7 +3915,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L809
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1124-L1130
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
 
 ";
 
@@ -3947,7 +3947,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L809
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1124-L1130
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
 
 ";
 
@@ -3979,7 +3979,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L809
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1124-L1130
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
 
 ";
 
@@ -4014,7 +4014,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L829
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1140-L1146
 
 ";
 
@@ -4048,7 +4048,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L829
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1140-L1146
 
 ";
 
@@ -4082,7 +4082,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L829
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1140-L1146
 
 ";
 
@@ -4098,7 +4098,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L834
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L931-L940
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L939-L948
 
 ";
 
@@ -4115,7 +4115,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L839
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L942-L948
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L950-L956
 
 ";
 
@@ -4131,7 +4131,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L844
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1181-L1185
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1189-L1193
 
 ";
 
@@ -4147,7 +4147,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L849
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1177-L1179
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1185-L1187
 
 ";
 
@@ -4163,7 +4163,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L854
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1187-L1189
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1195-L1197
 
 ";
 
@@ -4177,7 +4177,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L941
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L927-L929
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L927-L937
 
 ";
 
@@ -4192,7 +4192,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1013
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1685-L1687
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1693-L1695
 
 ";
 
@@ -4207,7 +4207,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1018
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1173-L1175
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1181-L1183
 
 ";
 
@@ -4222,7 +4222,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1023
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1661-L1667
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1669-L1675
 
 ";
 
@@ -4237,7 +4237,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1028
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1669-L1675
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1677-L1683
 
 ";
 
@@ -4253,7 +4253,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1033
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1689-L1695
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1697-L1703
 
 ";
 
@@ -4268,7 +4268,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1039
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1753-L1759
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1761-L1767
 
 ";
 
@@ -4283,7 +4283,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1044
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1697-L1703
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1705-L1711
 
 ";
 
@@ -4299,7 +4299,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1049
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1721-L1727
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1729-L1735
 
 ";
 
@@ -4317,7 +4317,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1056
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1729-L1735
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1737-L1743
 
 ";
 
@@ -4334,7 +4334,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1061
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1737-L1743
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1745-L1751
 
 ";
 
@@ -4352,7 +4352,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1068
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1745-L1751
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1753-L1759
 
 ";
 
@@ -4368,7 +4368,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1073
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1705-L1711
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1713-L1719
 
 ";
 
@@ -4387,7 +4387,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1081
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1713-L1719
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1721-L1727
 
 ";
 
@@ -4402,7 +4402,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1094
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1072-L1072
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1080-L1080
 
 ";
 
@@ -4417,7 +4417,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1099
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1074-L1074
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1082-L1082
 
 ";
 
@@ -4432,7 +4432,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1104
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1076-L1076
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1084-L1084
 
 ";
 
@@ -4447,7 +4447,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1109
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1078-L1078
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1086-L1086
 
 ";
 
@@ -4463,7 +4463,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1115
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1068-L1070
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1076-L1078
 
 ";
 
@@ -4479,7 +4479,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1120
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1097-L1104
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1105-L1112
 
 ";
 
@@ -4495,7 +4495,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1126
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1106-L1113
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1114-L1121
 
 ";
 
@@ -4511,7 +4511,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1132
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1115-L1122
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1123-L1130
 
 ";
 
@@ -4527,7 +4527,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1144
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1656-L1659
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1664-L1667
 
 ";
 
@@ -4542,7 +4542,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1152
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1295-L1302
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1303-L1310
 
 ";
 
@@ -4561,7 +4561,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1159
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1652-L1654
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1660-L1662
 
 ";
 
@@ -4575,7 +4575,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1204
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1773-L1779
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1781-L1787
 
 ";
 
@@ -4589,7 +4589,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1207
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1781-L1786
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1789-L1794
 
 ";
 
@@ -4604,7 +4604,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1210
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1788-L1797
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1796-L1805
 
 ";
 
@@ -4617,7 +4617,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1214
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1761-L1763
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1769-L1771
 
 ";
 
@@ -4630,7 +4630,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1217
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1765-L1767
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1773-L1775
 
 ";
 
@@ -4643,7 +4643,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1221
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1769-L1771
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1777-L1779
 
 ";
 
@@ -4658,7 +4658,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1823-L1830
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1831-L1838
 
 ";
 
@@ -4673,7 +4673,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1235
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1832-L1839
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1840-L1847
 
 ";
 
@@ -4689,7 +4689,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1240
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1841-L1847
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1849-L1855
 
 ";
 
@@ -4705,7 +4705,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1245
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1849-L1856
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1857-L1864
 
 ";
 
@@ -4727,7 +4727,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1252
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1858-L1874
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1866-L1882
 
 ";
 
@@ -4752,7 +4752,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1260
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1876-L1893
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1884-L1901
 
 ";
 
@@ -4765,7 +4765,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1263
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1922-L1924
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1930-L1932
 
 ";
 
@@ -13035,7 +13035,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L381
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1004-L1010
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1012-L1018
 
 ";
 
@@ -13051,7 +13051,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L382
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1012-L1018
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1020-L1026
 
 ";
 
@@ -13067,7 +13067,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L389
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1020-L1026
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1028-L1034
 
 ";
 
@@ -13083,7 +13083,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L390
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1028-L1034
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1036-L1042
 
 ";
 
@@ -13098,7 +13098,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L397
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1036-L1042
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1044-L1050
 
 ";
 
@@ -13113,7 +13113,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L399
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1052-L1058
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1060-L1066
 
 ";
 
@@ -13128,7 +13128,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L398
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1044-L1050
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1052-L1058
 
 ";
 
@@ -13143,7 +13143,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L400
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1060-L1066
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1068-L1074
 
 ";
 
@@ -13267,7 +13267,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L529
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1441-L1448
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1449-L1456
 
 ";
 
@@ -13283,7 +13283,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L531
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1450-L1457
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1458-L1465
 
 ";
 
@@ -13299,7 +13299,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L533
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1459-L1466
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1467-L1474
 
 ";
 
@@ -13332,7 +13332,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1138
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1407-L1421
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1415-L1429
 
 ";
 
@@ -14108,7 +14108,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L863
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1191-L1204
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1199-L1212
 
 ";
 
@@ -14132,7 +14132,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L864
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1221-L1231
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1229-L1239
 
 ";
 
@@ -14156,7 +14156,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L874
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1206-L1219
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1214-L1227
 
 ";
 
@@ -14180,7 +14180,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L875
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1233-L1243
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1241-L1251
 
 ";
 
@@ -14198,7 +14198,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L884
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1250-L1254
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1258-L1262
 
 ";
 
@@ -14216,7 +14216,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L911
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1289-L1293
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1297-L1301
 
 ";
 
@@ -14234,7 +14234,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L913
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1245-L1248
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1253-L1256
 
 ";
 
@@ -14250,7 +14250,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L891
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1268-L1271
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1276-L1279
 
 ";
 
@@ -14266,7 +14266,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L896
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1273-L1280
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1281-L1288
 
 ";
 
@@ -14282,7 +14282,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L902
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1262-L1266
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1270-L1274
 
 ";
 
@@ -14301,7 +14301,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L909
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1257-L1260
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1265-L1268
 
 ";
 
@@ -14318,7 +14318,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L949
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1540-L1546
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1548-L1554
 
 ";
 
@@ -14353,7 +14353,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L953
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1556-L1562
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1564-L1570
 
 ";
 
@@ -14370,7 +14370,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L954
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1572-L1574
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1580-L1582
 
 ";
 
@@ -14405,7 +14405,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L958
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1580-L1582
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1588-L1590
 
 ";
 
@@ -14422,7 +14422,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L967
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1548-L1554
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1556-L1562
 
 ";
 
@@ -14457,7 +14457,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L971
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1564-L1570
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1572-L1578
 
 ";
 
@@ -14474,7 +14474,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L972
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1576-L1578
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1584-L1586
 
 ";
 
@@ -14509,7 +14509,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L976
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1584-L1586
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1592-L1594
 
 ";
 
@@ -14525,7 +14525,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L983
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1588-L1590
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1596-L1598
 
 ";
 
@@ -14541,7 +14541,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L984
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1592-L1594
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1600-L1602
 
 ";
 
@@ -14557,7 +14557,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1596-L1598
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1604-L1606
 
 ";
 
@@ -14573,7 +14573,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L986
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1600-L1602
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1608-L1610
 
 ";
 
@@ -14593,7 +14593,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L996
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1604-L1606
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1612-L1614
 
 ";
 
@@ -14613,7 +14613,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L997
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1608-L1610
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1616-L1618
 
 ";
 
@@ -14633,7 +14633,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1000
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1620-L1622
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1628-L1630
 
 ";
 
@@ -14653,7 +14653,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1001
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1624-L1626
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1632-L1634
 
 ";
 
@@ -14673,7 +14673,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1004
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1636-L1638
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1644-L1646
 
 ";
 
@@ -14693,7 +14693,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1005
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1640-L1642
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1648-L1650
 
 ";
 
@@ -14713,7 +14713,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L998
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1612-L1614
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1620-L1622
 
 ";
 
@@ -14733,7 +14733,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L999
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1616-L1618
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1624-L1626
 
 ";
 
@@ -14753,7 +14753,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1002
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1628-L1630
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1636-L1638
 
 ";
 
@@ -14773,7 +14773,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1003
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1632-L1634
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1640-L1642
 
 ";
 
@@ -14793,7 +14793,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1006
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1644-L1646
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1652-L1654
 
 ";
 
@@ -14813,7 +14813,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1007
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1648-L1650
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1656-L1658
 
 ";
 
@@ -14828,7 +14828,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1087
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1677-L1679
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1685-L1687
 
 ";
 
@@ -14843,7 +14843,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1088
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1681-L1683
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1689-L1691
 
 ";
 
@@ -14903,7 +14903,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L310
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L950-L952
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L958-L960
 
 ";
 
@@ -14918,7 +14918,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L320
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L988-L994
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L996-L1002
 
 ";
 
@@ -14933,7 +14933,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L315
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L954-L956
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L962-L964
 
 ";
 
@@ -14948,7 +14948,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L325
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L996-L1002
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1004-L1010
 
 ";
 
@@ -14970,7 +14970,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L333
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L958-L964
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L966-L972
 
 ";
 
@@ -14992,7 +14992,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L341
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L966-L972
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L974-L980
 
 ";
 
@@ -15008,7 +15008,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L346
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L974-L979
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L982-L987
 
 ";
 
@@ -15024,7 +15024,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L350
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L981-L986
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L989-L994
 
 ";
 
@@ -15039,7 +15039,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L355
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1468-L1470
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1476-L1478
 
 ";
 
@@ -15054,7 +15054,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L360
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1472-L1474
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1480-L1482
 
 ";
 
@@ -15069,7 +15069,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L365
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1476-L1478
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1484-L1486
 
 ";
 
@@ -15084,7 +15084,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L370
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1480-L1482
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1488-L1490
 
 ";
 
@@ -15099,7 +15099,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L375
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1484-L1486
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1492-L1494
 
 ";
 
@@ -15120,7 +15120,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L416
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1896-L1902
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1904-L1910
 
 ";
 
@@ -15135,7 +15135,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L421
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1904-L1906
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1912-L1914
 
 ";
 
@@ -15151,7 +15151,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L426
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1908-L1910
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1916-L1918
 
 ";
 
@@ -15177,7 +15177,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L434
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1814-L1821
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1822-L1829
 
 ";
 
@@ -15200,7 +15200,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L434
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1814-L1821
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1822-L1829
 
 ";
 
@@ -15223,7 +15223,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L434
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1814-L1821
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1822-L1829
 
 ";
 
@@ -15239,7 +15239,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L441
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1140-L1142
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1148-L1150
 
 ";
 
@@ -15255,7 +15255,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1144-L1146
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1152-L1154
 
 ";
 
@@ -15271,7 +15271,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L451
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1148-L1150
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1156-L1158
 
 ";
 
@@ -15287,7 +15287,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L456
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1152-L1159
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1160-L1167
 
 ";
 
@@ -15309,7 +15309,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L464
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1161-L1171
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1169-L1179
 
 ";
 
@@ -15473,7 +15473,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L637
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1089-L1095
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1097-L1103
 
 ";
 
@@ -15593,7 +15593,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L809
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1124-L1130
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
 
 ";
 
@@ -15625,7 +15625,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L809
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1124-L1130
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
 
 ";
 
@@ -15657,7 +15657,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L809
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1124-L1130
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
 
 ";
 
@@ -15692,7 +15692,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L829
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1140-L1146
 
 ";
 
@@ -15726,7 +15726,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L829
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1140-L1146
 
 ";
 
@@ -15760,7 +15760,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L829
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1132-L1138
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1140-L1146
 
 ";
 
@@ -15776,7 +15776,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L834
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L931-L940
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L939-L948
 
 ";
 
@@ -15793,7 +15793,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L839
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L942-L948
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L950-L956
 
 ";
 
@@ -15809,7 +15809,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L844
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1181-L1185
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1189-L1193
 
 ";
 
@@ -15825,7 +15825,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L849
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1177-L1179
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1185-L1187
 
 ";
 
@@ -15841,7 +15841,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L854
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1187-L1189
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1195-L1197
 
 ";
 
@@ -15855,7 +15855,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L941
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L927-L929
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L927-L937
 
 ";
 
@@ -15870,7 +15870,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1013
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1685-L1687
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1693-L1695
 
 ";
 
@@ -15885,7 +15885,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1018
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1173-L1175
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1181-L1183
 
 ";
 
@@ -15900,7 +15900,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1023
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1661-L1667
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1669-L1675
 
 ";
 
@@ -15915,7 +15915,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1028
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1669-L1675
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1677-L1683
 
 ";
 
@@ -15931,7 +15931,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1033
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1689-L1695
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1697-L1703
 
 ";
 
@@ -15946,7 +15946,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1039
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1753-L1759
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1761-L1767
 
 ";
 
@@ -15961,7 +15961,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1044
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1697-L1703
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1705-L1711
 
 ";
 
@@ -15977,7 +15977,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1049
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1721-L1727
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1729-L1735
 
 ";
 
@@ -15995,7 +15995,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1056
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1729-L1735
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1737-L1743
 
 ";
 
@@ -16012,7 +16012,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1061
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1737-L1743
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1745-L1751
 
 ";
 
@@ -16030,7 +16030,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1068
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1745-L1751
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1753-L1759
 
 ";
 
@@ -16046,7 +16046,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1073
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1705-L1711
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1713-L1719
 
 ";
 
@@ -16065,7 +16065,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1081
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1713-L1719
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1721-L1727
 
 ";
 
@@ -16080,7 +16080,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1094
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1072-L1072
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1080-L1080
 
 ";
 
@@ -16095,7 +16095,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1099
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1074-L1074
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1082-L1082
 
 ";
 
@@ -16110,7 +16110,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1104
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1076-L1076
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1084-L1084
 
 ";
 
@@ -16125,7 +16125,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1109
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1078-L1078
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1086-L1086
 
 ";
 
@@ -16141,7 +16141,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1115
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1068-L1070
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1076-L1078
 
 ";
 
@@ -16157,7 +16157,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1120
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1097-L1104
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1105-L1112
 
 ";
 
@@ -16173,7 +16173,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1126
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1106-L1113
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1114-L1121
 
 ";
 
@@ -16189,7 +16189,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1132
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1115-L1122
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1123-L1130
 
 ";
 
@@ -16205,7 +16205,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1144
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1656-L1659
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1664-L1667
 
 ";
 
@@ -16220,7 +16220,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1152
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1295-L1302
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1303-L1310
 
 ";
 
@@ -16239,7 +16239,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1159
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1652-L1654
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1660-L1662
 
 ";
 
@@ -16253,7 +16253,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1204
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1773-L1779
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1781-L1787
 
 ";
 
@@ -16267,7 +16267,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1207
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1781-L1786
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1789-L1794
 
 ";
 
@@ -16282,7 +16282,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1210
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1788-L1797
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1796-L1805
 
 ";
 
@@ -16295,7 +16295,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1214
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1761-L1763
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1769-L1771
 
 ";
 
@@ -16308,7 +16308,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1217
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1765-L1767
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1773-L1775
 
 ";
 
@@ -16321,7 +16321,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1221
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1769-L1771
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1777-L1779
 
 ";
 
@@ -16336,7 +16336,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1823-L1830
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1831-L1838
 
 ";
 
@@ -16351,7 +16351,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1235
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1832-L1839
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1840-L1847
 
 ";
 
@@ -16367,7 +16367,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1240
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1841-L1847
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1849-L1855
 
 ";
 
@@ -16383,7 +16383,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1245
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1849-L1856
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1857-L1864
 
 ";
 
@@ -16405,7 +16405,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1252
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1858-L1874
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1866-L1882
 
 ";
 
@@ -16430,7 +16430,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1260
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1876-L1893
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1884-L1901
 
 ";
 
@@ -16443,7 +16443,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1263
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1922-L1924
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1930-L1932
 
 ";
 
@@ -16550,7 +16550,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1327
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1934-L1942
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1942-L1950
 
 ";
 
@@ -16579,7 +16579,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1341
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1970-L1975
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1978-L1983
 
 ";
 
@@ -16599,7 +16599,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1350
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1976-L1981
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1984-L1989
 
 ";
 
@@ -16612,7 +16612,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1352
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1989-L1991
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1997-L1999
 
 ";
 
@@ -29053,7 +29053,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/linsol.hpp#L129
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/linsol.cpp#L217-L219
+https://github.com/casadi/casadi/blob/develop/casadi/core/linsol.cpp#L217-L221
 
 ";
 
@@ -29095,7 +29095,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/linsol.hpp#L150
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/linsol.cpp#L221-L224
+https://github.com/casadi/casadi/blob/develop/casadi/core/linsol.cpp#L223-L226
 
 ";
 
