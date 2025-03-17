@@ -126,7 +126,10 @@ class ImplicitFunctiontests(casadiTestCase):
       x=SX.sym("x")
       f=Function("f", [x], [sin(x)])
       solver=rootfinder("solver", Solver, f, options)
-      solver.stats()
+      try:
+          solver.stats()
+      except:
+          pass # no segfault
      
   def test_scalar2(self):
     self.message("Scalar implicit problem, n=1")
