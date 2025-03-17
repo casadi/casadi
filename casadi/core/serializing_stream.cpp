@@ -28,6 +28,7 @@
 #include "slice.hpp"
 #include "linsol.hpp"
 #include "importer.hpp"
+#include "resource_internal.hpp"
 #include "fmu.hpp"
 #include "generic_type.hpp"
 #include "shared_object.hpp"
@@ -268,6 +269,16 @@ namespace casadi {
     void DeserializingStream::unpack(Importer& e) {
       assert_decoration('M');
       shared_unpack<Importer, ImporterInternal>(e);
+    }
+
+    void SerializingStream::pack(const Resource& e) {
+      decorate('R');
+      shared_pack(e);
+    }
+
+    void DeserializingStream::unpack(Resource& e) {
+      assert_decoration('R');
+      shared_unpack<Resource, ResourceInternal>(e);
     }
 
     void SerializingStream::pack(const Fmu& e) {

@@ -910,8 +910,23 @@ option(ALLOW_DOCKER "System has docker installed" OFF)
 option(WITH_ZLIB "Compile the ZLIB interface" OFF)
 set(BUILD_ZLIB_GIT_REPO "https://github.com/madler/zlib" CACHE STRING "Git repo used together with BUILD_ZLIB_VERSION")
 set(BUILD_ZLIB_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for ZLIB")
-set(BUILD_ZLIB_VERSION "develop" CACHE STRING "Tag/branch/hash to be used for BUILD_ZLIBA_GIT_REPO")
+set(BUILD_ZLIB_VERSION "develop" CACHE STRING "Tag/branch/hash to be used for BUILD_ZLIB_GIT_REPO")
 option(WITH_BUILD_ZLIB "Build ZLIB (BUILD_ZLIB_VERSION=${BUILD_ZLIB_VERSION}) from downloaded source (BUILD_ZLIB_GIT_REPO=${BUILD_ZLIB_GIT_REPO})." OFF)
+
+option(WITH_LIBZIP "Compile the LIBZIP interface" OFF)
+set(BUILD_LIBZIP_GIT_REPO "https://github.com/nih-at/libzip" CACHE STRING "Git repo used together with BUILD_LIBZIP_VERSION")
+set(BUILD_LIBZIP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for LIBZIP")
+set(BUILD_LIBZIP_VERSION "v1.11.3" CACHE STRING "Tag/branch/hash to be used for BUILD_LIBZIP_GIT_REPO")
+option(WITH_BUILD_LIBZIP "Build LIBZIP (BUILD_LIBZIP_VERSION=${BUILD_LIBZIP_VERSION}) from downloaded source (BUILD_LIBZIP_GIT_REPO=${BUILD_LIBZIP_GIT_REPO})." OFF)
+set(BUILD_LIBZIP_DEPENDENCIES ZLIB)
+
+option(WITH_GHC "Compile the GHC interface" OFF)
+set(BUILD_GHC_GIT_REPO "https://github.com/gulrak/filesystem" CACHE STRING "Git repo used together with BUILD_GHC_VERSION")
+set(BUILD_GHC_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for GHC")
+set(BUILD_GHC_VERSION "v1.5.14" CACHE STRING "Tag/branch/hash to be used for BUILD_GHC_GIT_REPO")
+option(WITH_BUILD_GHC "Build GHC (BUILD_GHC_VERSION=${BUILD_GHC_VERSION}) from downloaded source (BUILD_GHC_GIT_REPO=${BUILD_LIBZIP_GIT_REPO})." OFF)
+
+
 
 function(libraries2flags libraries out)
 # libtool cannot handle absoulte paths (i.e. it omits the library from the list of dependencies)
@@ -2013,16 +2028,11 @@ if(WITH_ZLIB)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${CMAKE_COMMAND}"
-      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DMINIZIP_ENABLE_BZIP2=OFF -DZLIB_BUILD_MINIZIP=ON -DBUILD_SHARED_LIBS=OFF)
+      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DMINIZIP_ENABLE_BZIP2=OFF -DBUILD_SHARED_LIBS=OFF)
     add_library(ZLIB::libz STATIC IMPORTED)
     add_dependencies(ZLIB::libz libz-external)
-    add_library(MINIZIP::minizip STATIC IMPORTED)
-    add_dependencies(MINIZIP::minizip minizip-external)
     set_target_properties(ZLIB::libz PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}z${CMAKE_STATIC_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
-    set_target_properties(MINIZIP::minizip PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}minizip${CMAKE_STATIC_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
   else()
     find_package(ZLIB REQUIRED)
@@ -2032,7 +2042,55 @@ if(WITH_ZLIB)
       INTERFACE_LINK_LIBRARIES "${ZLIB_LIBRARIES}")
   endif()
 endif()
-add_feature_info(zlib-interface WITH_ZLIB "Interface to the zilb.")
+add_feature_info(zlib-interface WITH_ZLIB "Interface to the zlib.")
+
+if(WITH_LIBZIP)
+  if(WITH_BUILD_LIBZIP)
+    ExternalProject_Add(libzip-external
+      GIT_REPOSITORY ${BUILD_LIBZIP_GIT_REPO}
+      GIT_SHALLOW ${BUILD_LIBZIP_GIT_SHALLOW}
+      GIT_TAG ${BUILD_LIBZIP_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      BUILD_ALWAYS ON
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${CMAKE_COMMAND}"
+      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD=OFF -DENABLE_OPENSSL=OFF -DENABLE_WINDOWS_CRYPTO=OFF -DENABLE_COMMONCRYPTO=OFF -DENABLE_GNUTLS=OFF -DENABLE_MBEDTLS=OFF -DENABLE_FDOPEN=OFF -DBUILD_TOOLS=OFF -DBUILD_REGRESS=OFF -DBUILD_OSSFUZZ=OFF -DBUILD_EXAMPLES=OFF -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF)
+    add_library(libzip::zip STATIC IMPORTED)
+
+    add_dependencies(libzip::zip libzip-external)
+    set_target_properties(libzip::zip PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}zip${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+  else()
+    find_package(libzip REQUIRED)
+    #add_library(LIBZIP::libzip INTERFACE IMPORTED)
+    #set_target_properties(LIBZIP::libzip PROPERTIES
+    #  INTERFACE_INCLUDE_DIRECTORIES "${LIBZIP_INCLUDE_DIRS}"
+    #  INTERFACE_LINK_LIBRARIES "${LIBZIP_LIBRARIES}")
+  endif()
+endif()
+add_feature_info(libzip-interface WITH_LIBZIP "Interface to the libzip.")
+
+if(WITH_GHC)
+  if(WITH_BUILD_GHC)
+    ExternalProject_Add(ghc-external
+        GIT_REPOSITORY ${BUILD_GHC_GIT_REPO}
+        GIT_SHALLOW ${BUILD_GHC_GIT_SHALLOW}
+        GIT_TAG ${BUILD_GHC_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    add_library(ghcFilesystem::ghc_filesystem INTERFACE IMPORTED)
+    add_dependencies(ghcFilesystem::ghc_filesystem ghc-external)
+    set_target_properties(ghcFilesystem::ghc_filesystem PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+    )
+  else()
+    find_package(ghcFilesystem REQUIRED)
+  endif()
+endif()
+add_feature_info(ghc-interface WITH_GHC "Interface to the ghc.")
 
 if(WITH_SELFCONTAINED)
   # Loop over prescribed folders

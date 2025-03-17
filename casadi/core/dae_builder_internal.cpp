@@ -47,6 +47,12 @@ throw CasadiException("Error in DaeBuilderInternal::" FNAME " for '" + this->nam
   + "', node '" + NODE.name + "' (line " + str(NODE.line) + ") at " \
   + CASADI_WHERE + ":\n" + std::string(WHAT));
 
+// Throw informative error message
+#define THROW_ERROR(FNAME, WHAT) \
+throw CasadiException("Error in DaeBuilderInternal::" FNAME " for '" + this->name_ \
+  + "' at " \
+  + CASADI_WHERE + ":\n" + std::string(WHAT));
+
 namespace casadi {
 
 Type from_fmi2(TypeFmi2 v) {

@@ -23,50 +23,16 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#include "archiver.hpp"
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+namespace casadi {
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+std::map<std::string, Archiver::Plugin> Archiver::solvers_;
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+std::mutex Archiver::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
-// Matrix expressions
-#include "mx.hpp"
+const std::string Archiver::infix_ = "archiver";
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-#include "blazing_spline.hpp"
-
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-#include "tools.hpp"
-#include "resource.hpp"
-
-#endif // CASADI_CORE_HPP
+} // namespace casadi

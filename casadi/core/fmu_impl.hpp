@@ -28,6 +28,7 @@
 #include "fmu.hpp"
 #include "importer.hpp"
 #include "shared_object.hpp"
+#include "resource.hpp"
 
 /// \cond INTERNAL
 
@@ -323,6 +324,8 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Sparsity pattern for extended Jacobian, Hessian
   Sparsity jac_sp_, hess_sp_;
+
+  Resource resource_;
 };
 
 template<typename T>

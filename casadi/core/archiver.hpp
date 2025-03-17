@@ -23,50 +23,46 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#ifndef CASADI_ARCHIVER_HPP
+#define CASADI_ARCHIVER_HPP
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+#include "plugin_interface.hpp"
+#include <iostream>
+/// \cond INTERNAL
+namespace casadi {
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+  class CASADI_EXPORT
+  Archiver : public PluginInterface<Archiver> {
+  public:
+  typedef bool (* Unpack)(const std::string& src,
+    const std::string& target_dir);
+  typedef bool (* UnpackFromStream)(std::istream& src,
+      const std::string& target_dir);
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+    // Creator function for internal class
+    typedef Archiver* (*Creator)();
 
-// Matrix expressions
-#include "mx.hpp"
+    static const std::string meta_doc;
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-#include "blazing_spline.hpp"
+    // No static functions exposed
+    struct Exposed{
+      Unpack unpack;
+      UnpackFromStream unpack_from_stream;
+    };
 
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-#include "tools.hpp"
-#include "resource.hpp"
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
 
-#endif // CASADI_CORE_HPP
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    static std::mutex mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
+    /// Infix
+    static const std::string infix_;
+  };
+
+} // namespace casadi
+
+/// \endcond
+
+#endif // CASADI_ARCHIVER_HPP

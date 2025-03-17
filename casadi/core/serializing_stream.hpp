@@ -41,6 +41,7 @@ namespace casadi {
   class SXElem;
   class GenericType;
   class Importer;
+  class Resource;
   class Fmu;
   class SharedObject;
   class SharedObjectInternal;
@@ -93,6 +94,7 @@ namespace casadi {
     }
     void unpack(Function& e);
     void unpack(Importer& e);
+    void unpack(Resource& e);
     void unpack(Fmu& e);
     void unpack(GenericType& e);
     void unpack(std::ostream& s);
@@ -231,6 +233,7 @@ namespace casadi {
     }
     void pack(const Function& e);
     void pack(const Importer& e);
+    void pack(const Resource& e);
     void pack(const Fmu& e);
     void pack(const Slice& e);
     void pack(const GenericType& e);

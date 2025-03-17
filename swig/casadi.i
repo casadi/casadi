@@ -4789,6 +4789,8 @@ opti_metadata_modifiers(casadi::Opti)
 }
 #endif
 
+%include <casadi/core/resource.hpp>
+
 // Cleanup for dependent modules
 %exception {
   $action
