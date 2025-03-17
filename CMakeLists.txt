@@ -38,7 +38,7 @@ cmake_policy(SET CMP0011 NEW)
 endif()
 
 # cmake_policy avoid escaping in add_definitions
-cmake_policy(SET CMP0005 NEW)
+cmake_policy(SET CMP0005 NEW)error C2487
 
 # cmake_policy how to interpret string arguments
 if(POLICY CMP0054)
@@ -2051,7 +2051,7 @@ if(WITH_LIBZIP)
       GIT_SHALLOW ${BUILD_LIBZIP_GIT_SHALLOW}
       GIT_TAG ${BUILD_LIBZIP_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-      DEPENDS LIBZIP::libzip
+      DEPENDS ZLIB::libz
       BUILD_ALWAYS ON
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${CMAKE_COMMAND}"
