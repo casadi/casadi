@@ -57,12 +57,12 @@ namespace casadi {
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
-    static CASADI_EXPORT void assert_enabled();
-    static CASADI_EXPORT bool is_directory(const std::string& path);
-    static CASADI_EXPORT bool remove(const std::string& path);
-    static CASADI_EXPORT casadi_int remove_all(const std::string& path);
-    static CASADI_EXPORT std::string filename(const std::string& path);
-    static CASADI_EXPORT bool is_enabled();
+    static void assert_enabled();
+    static bool is_directory(const std::string& path);
+    static bool remove(const std::string& path);
+    static casadi_int remove_all(const std::string& path);
+    static std::string filename(const std::string& path);
+    static bool is_enabled();
 
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
