@@ -40503,10 +40503,10 @@ Standard CasADi Funcion options
 Extra doc: https://github.com/casadi/casadi/wiki/L_1j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L362
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L366
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L395-L399
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L419-L423
 
 ";
 
@@ -40538,10 +40538,10 @@ Standard CasADi Funcion options
 Extra doc: https://github.com/casadi/casadi/wiki/L_1j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L366
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L370
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L383-L393
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L407-L417
 
 ";
 
@@ -40573,10 +40573,10 @@ Standard CasADi Funcion options
 Extra doc: https://github.com/casadi/casadi/wiki/L_1j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L372
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L376
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L401-L421
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L425-L445
 
 ";
 
@@ -40591,10 +40591,10 @@ Do not use directly.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L444
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L448
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L423-L429
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L447-L453
 
 ";
 
@@ -40608,10 +40608,10 @@ Do not use directly.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L445
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L449
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L431-L437
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L455-L461
 
 ";
 
@@ -41073,6 +41073,18 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L358-L36
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::Opti::x_linear_scale() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::Opti::x_linear_scale_offset() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::Opti::g_linear_scale() const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Opti::lam_g() const "
 
 [INTERNAL] 
@@ -41091,7 +41103,7 @@ Useful for obtaining the Lagrange Hessian:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1i
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L350
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L354
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L375-L381
@@ -41114,10 +41126,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1l
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L398
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L402
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L807-L809
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L831-L833
 
 ";
 
@@ -41137,10 +41149,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1m
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L408
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L412
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L810-L812
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L834-L836
 
 ";
 
@@ -41156,10 +41168,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L416
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L420
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L813-L815
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L837-L839
 
 ";
 
@@ -41174,10 +41186,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L416
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L420
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L813-L815
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L837-L839
 
 ";
 
@@ -41192,10 +41204,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L416
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L420
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L813-L815
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L837-L839
 
 ";
 
@@ -41211,10 +41223,10 @@ constraints
 Extra doc: https://github.com/casadi/casadi/wiki/L_1o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L424
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L428
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L439-L445
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L463-L469
 
 ";
 
@@ -41229,10 +41241,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L439-L44
 Get user data.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L427
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L431
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L452-L458
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L476-L482
 
 ";
 
@@ -41242,10 +41254,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L452-L45
 Readable name of the class.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L430
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L434
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L430-L430
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L434-L434
 
 ";
 
@@ -41256,10 +41268,10 @@ more=false) const "
 Print representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L433
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L437
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L710-L730
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L734-L754
 
 ";
 
@@ -41269,10 +41281,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L710-L73
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L436
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L440
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L732-L736
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L756-L760
 
 ";
 
@@ -41284,10 +41296,10 @@ Destructor.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L454
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L458
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L454-L454
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L458-L458
 
 ";
 
@@ -41360,10 +41372,10 @@ Returned vector is ordered according to the order of  variable()/parameter()
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L566
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L570
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L476-L482
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L500-L506
 
 ";
 
@@ -41377,10 +41389,10 @@ Returned vector is ordered according to the order of  variable()/parameter()
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L566
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L570
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L476-L482
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L500-L506
 
 ";
 
@@ -41394,10 +41406,10 @@ Returned vector is ordered according to the order of  variable()/parameter()
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L566
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L570
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L476-L482
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L500-L506
 
 ";
 
@@ -41412,10 +41424,10 @@ Returned vector is ordered according to the order of  variable()/parameter()
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L567
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L571
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L484-L490
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L508-L514
 
 ";
 
@@ -41429,10 +41441,10 @@ Returned vector is ordered according to the order of  variable()/parameter()
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L567
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L571
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L484-L490
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L508-L514
 
 ";
 
@@ -41446,10 +41458,10 @@ Returned vector is ordered according to the order of  variable()/parameter()
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L567
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L571
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L484-L490
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L508-L514
 
 ";
 
@@ -41465,10 +41477,10 @@ Returned vector is ordered according to the order of  variable()/parameter()
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L568
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L572
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L492-L498
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L516-L522
 
 ";
 
@@ -41482,10 +41494,10 @@ Returned vector is ordered according to the order of  variable()/parameter()
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L568
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L572
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L492-L498
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L516-L522
 
 ";
 
@@ -41499,10 +41511,10 @@ Returned vector is ordered according to the order of  variable()/parameter()
 Extra doc: https://github.com/casadi/casadi/wiki/L_1u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L568
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L572
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L492-L498
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L516-L522
 
 ";
 
@@ -42031,10 +42043,10 @@ Standard CasADi Funcion options
 Extra doc: https://github.com/casadi/casadi/wiki/L_1j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L362
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L366
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L395-L399
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L419-L423
 
 ";
 
@@ -42066,10 +42078,10 @@ Standard CasADi Funcion options
 Extra doc: https://github.com/casadi/casadi/wiki/L_1j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L366
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L370
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L383-L393
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L407-L417
 
 ";
 
@@ -42101,10 +42113,10 @@ Standard CasADi Funcion options
 Extra doc: https://github.com/casadi/casadi/wiki/L_1j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L372
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L376
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L401-L421
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L425-L445
 
 ";
 
@@ -42119,10 +42131,10 @@ Do not use directly.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L444
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L448
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L423-L429
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L447-L453
 
 ";
 
@@ -42136,10 +42148,10 @@ Do not use directly.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L445
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L449
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L431-L437
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L455-L461
 
 ";
 
@@ -42155,10 +42167,10 @@ Destructor.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L550
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L554
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L550-L550
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L554-L554
 
 ";
 
@@ -42168,10 +42180,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L550-L55
 Get the underlying CasADi solver of the  Opti stack.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L554
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L558
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L460-L466
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L484-L490
 
 ";
 
@@ -42183,10 +42195,10 @@ return true if expression is only dependant on  Opti parameters,
  not variables
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L557
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L561
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L468-L474
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L492-L498
 
 ";
 
@@ -42197,10 +42209,10 @@ const "
 Interpret an expression (for internal use only)
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L572
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L576
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L500-L506
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L524-L530
 
 ";
 
@@ -42210,10 +42222,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L500-L50
 Get meta-data of symbol (for internal use only)
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L575
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L579
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L508-L514
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L532-L538
 
 ";
 
@@ -42224,10 +42236,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L508-L51
 Get meta-data of symbol (for internal use only)
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L578
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L582
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L516-L522
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L540-L546
 
 ";
 
@@ -42238,10 +42250,10 @@ MetaVar &meta) "
 Set meta-data of an expression.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L581
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L585
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L524-L530
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L548-L554
 
 ";
 
@@ -42252,10 +42264,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L524-L53
 Set meta-data of an expression.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L584
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L588
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L532-L538
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L556-L562
 
 ";
 
@@ -42362,10 +42374,10 @@ tol=0, const Dict &opts=Dict()) const "
 Fix the structure of the optimization problem.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L619
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L623
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L738-L744
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L762-L768
 
 ";
 
@@ -42835,6 +42847,18 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L358-L36
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::Opti::x_linear_scale() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::Opti::x_linear_scale_offset() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::Opti::g_linear_scale() const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Opti::lam_g() const "
 
 [INTERNAL] 
@@ -42853,7 +42877,7 @@ Useful for obtaining the Lagrange Hessian:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1i
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L350
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L354
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L375-L381
@@ -42876,10 +42900,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1l
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L398
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L402
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L807-L809
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L831-L833
 
 ";
 
@@ -42899,10 +42923,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1m
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L408
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L412
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L810-L812
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L834-L836
 
 ";
 
@@ -42918,10 +42942,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L416
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L420
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L813-L815
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L837-L839
 
 ";
 
@@ -42936,10 +42960,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L416
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L420
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L813-L815
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L837-L839
 
 ";
 
@@ -42954,10 +42978,10 @@ not update the original.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L416
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L420
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L813-L815
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L837-L839
 
 ";
 
@@ -42973,10 +42997,10 @@ constraints
 Extra doc: https://github.com/casadi/casadi/wiki/L_1o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L424
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L428
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L439-L445
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L463-L469
 
 ";
 
@@ -42991,10 +43015,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L439-L44
 Get user data.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L427
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L431
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L452-L458
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L476-L482
 
 ";
 
@@ -43004,10 +43028,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L452-L45
 Readable name of the class.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L430
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L434
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L430-L430
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L434-L434
 
 ";
 
@@ -43018,10 +43042,10 @@ more=false) const "
 Print representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L433
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L437
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L710-L730
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L734-L754
 
 ";
 
@@ -43031,10 +43055,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L710-L73
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L436
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L440
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L732-L736
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L756-L760
 
 ";
 
@@ -43150,10 +43174,10 @@ Optional assignment expressions (e.g. x==3) to overrule the current
 value
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L667
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L671
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L828-L830
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L852-L854
 
 ";
 
@@ -43176,10 +43200,10 @@ Optional assignment expressions (e.g. x==3) to overrule the current
 value
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L668
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L672
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L831-L833
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L855-L857
 
 ";
 
@@ -43202,10 +43226,10 @@ Optional assignment expressions (e.g. x==3) to overrule the current
 value
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L669
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L673
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L834-L836
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L858-L860
 
 ";
 
@@ -43228,10 +43252,10 @@ more=false) const "
 get assignment expressions for the optimal solution
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L673
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L677
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L838-L840
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L862-L864
 
 ";
 
@@ -43251,10 +43275,10 @@ part of the API
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L682
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.hpp#L686
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L846-L848
+https://github.com/casadi/casadi/blob/develop/casadi/core/optistack.cpp#L870-L872
 
 ";
 
@@ -59911,10 +59935,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L827
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L828
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L827-L829
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L828-L830
 
 ";
 
@@ -59927,10 +59951,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L831
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L832
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L831-L833
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L832-L834
 
 ";
 
@@ -59943,10 +59967,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L835
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L836
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L835-L837
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L836-L838
 
 ";
 

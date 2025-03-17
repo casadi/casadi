@@ -4513,6 +4513,9 @@
 %exception  casadi::Opti::g() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Opti::g_linear_scale() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Opti::get_str(bool more=false) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4646,6 +4649,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Opti::x() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Opti::x_linear_scale() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Opti::x_linear_scale_offset() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OptiAdvanced::active_symvar(VariableType type) const {
