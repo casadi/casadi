@@ -3559,6 +3559,10 @@ namespace casadi {
     return mem_.at(ind);
   }
 
+  bool ProtoFunction::has_memory(int ind) const {
+    return ind<mem_.size();
+  }
+
   int ProtoFunction::checkout() const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);

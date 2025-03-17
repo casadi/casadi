@@ -215,6 +215,8 @@ namespace casadi {
   }
 
   Dict Linsol::stats(int mem) const {
+    casadi_assert((*this)->has_memory(mem),
+      "No stats available since Linsol did not solve a problem yet.");
     return (*this)->get_stats((*this)->memory(mem));
   }
 

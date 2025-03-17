@@ -925,7 +925,15 @@ namespace casadi {
   }
 
   Dict Function::stats(int mem) const {
-    return (*this)->get_stats(memory(mem));
+    if (!(*this)->has_memory(mem)) {
+      THROW_ERROR("stats",
+        "No stats available: Function/solver was not yet numerically evaluated.");
+    }
+    try {
+      return (*this)->get_stats(memory(mem));
+    } catch(std::exception& e) {
+      THROW_ERROR("stats", e.what());
+    }
   }
 
   const std::vector<Sparsity>& Function::jac_sparsity(bool compact) const {

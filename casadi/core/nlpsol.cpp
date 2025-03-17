@@ -1160,6 +1160,8 @@ namespace casadi {
   Dict Nlpsol::get_stats(void* mem) const {
     Dict stats = OracleFunction::get_stats(mem);
     auto m = static_cast<NlpsolMemory*>(mem);
+    casadi_assert(m->d_nlp.prob,
+      "No stats available: nlp Solver instance has not yet been called with numerical arguments.");
     auto d_nlp = &m->d_nlp;
     stats["success"] = m->success;
     stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);

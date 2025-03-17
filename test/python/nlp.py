@@ -2333,7 +2333,8 @@ class NLPtests(casadiTestCase):
         
     for Solver, solver_options, aux_options in solvers:
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
-      solver.stats()
+      with self.assertInException("No stats available"):
+        solver.stats()
         
         
   @requires_nlpsol("ipopt")

@@ -166,6 +166,9 @@ namespace casadi {
     /// Memory objects
     void* memory(int ind) const;
 
+    /// Check for existance of memory object
+    bool has_memory(int ind) const;
+
     /** \brief Check for validatity of memory object count
     *
     * Purpose if to allow more helpful error messages
