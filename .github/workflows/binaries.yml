@@ -15,7 +15,7 @@ env:
 
 jobs:
   version:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Inject slug/short variables
@@ -36,7 +36,7 @@ jobs:
       wheel: ${{ env.WHEEL_VERSION }}
 
   swig:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [version]
     steps:
 
@@ -123,7 +123,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       image: ["windows-2022","ubuntu-20.04","macos-13","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-13","macos-14"]
     steps:
       - uses: actions/checkout@v4.1.1
       - run: python --version
@@ -190,7 +190,7 @@ jobs:
           retention-days: 5
 
   core-dockcross:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -235,7 +235,7 @@ jobs:
           retention-days: 5
 
   matrix-arch-py2:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - id: build-matrix
         uses: jgillis/setup-build-matrix@main
@@ -261,7 +261,7 @@ jobs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
   matrix-arch-py2-mac:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - id: build-matrix
         uses: jgillis/setup-build-matrix@main
@@ -402,7 +402,7 @@ jobs:
         if: github.event_name != 'pull_request'
 
   matrix-arch-matlab-mac:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - id: build-matrix
         uses: jgillis/setup-build-matrix@main
@@ -520,7 +520,7 @@ jobs:
 
   matlab-dockcross:
     needs: [core-dockcross,swig,version]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -615,7 +615,7 @@ jobs:
 
   python-dockcross:
     needs: [core-dockcross,matrix-arch-py2,swig,version]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-arch-py2.outputs.matrix) }}
@@ -746,7 +746,7 @@ jobs:
      fail-fast: false
      matrix:
        matlab: ["2018b"]
-       image: ["windows-2022","ubuntu-20.04","macos-13"]
+       image: ["windows-2022","ubuntu-24.04","macos-13"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -763,7 +763,7 @@ jobs:
           map: |
            {
               "windows-2022": {"os": "windows"},
-              "ubuntu-20.04": {"os": "linux"},
+              "ubuntu-24.04": {"os": "linux"},
               "macos-13": {"os": "osx"}
            }
           export_to: env
@@ -930,7 +930,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["27","35","36","37","38","39","310","311","312","313"]
-       image: ["windows-2022","ubuntu-20.04","macos-13","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-13","macos-14"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -955,7 +955,7 @@ jobs:
           map: |
            {
               "windows-2022": {"os": "windows"},
-              "ubuntu-20.04": {"os": "linux"},
+              "ubuntu-24.04": {"os": "linux"},
               "macos-13": {"os": "osx"},
               "macos-14": {"os": "osx_arm"}
            }
@@ -1013,7 +1013,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["310"]
-       image: ["windows-2022","ubuntu-20.04","macos-13","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-13","macos-14"]
        bit: [64]
     steps:
       - uses: actions/checkout@v4.1.1
@@ -1026,7 +1026,7 @@ jobs:
           map: |
            {
               "windows-2022": {"os": "windows","platform":"win_amd64"},
-              "ubuntu-20.04": {"os": "linux","platform":"manylinux2014_x86_64"},
+              "ubuntu-24.04": {"os": "linux","platform":"manylinux2014_x86_64"},
               "macos-13": {"os": "osx","platform":"macosx_10_13_x86_64.macosx_10_13_intel"},
               "macos-14": {"os": "osx_arm","platform":"macosx_11_0_arm64"}
            }
