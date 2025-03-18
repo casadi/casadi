@@ -910,7 +910,7 @@ option(ALLOW_DOCKER "System has docker installed" OFF)
 option(WITH_ZLIB "Compile the ZLIB interface" OFF)
 set(BUILD_ZLIB_GIT_REPO "https://github.com/madler/zlib" CACHE STRING "Git repo used together with BUILD_ZLIB_VERSION")
 set(BUILD_ZLIB_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for ZLIB")
-set(BUILD_ZLIB_VERSION "develop" CACHE STRING "Tag/branch/hash to be used for BUILD_ZLIB_GIT_REPO")
+set(BUILD_ZLIB_VERSION "v1.3.1" CACHE STRING "Tag/branch/hash to be used for BUILD_ZLIB_GIT_REPO")
 option(WITH_BUILD_ZLIB "Build ZLIB (BUILD_ZLIB_VERSION=${BUILD_ZLIB_VERSION}) from downloaded source (BUILD_ZLIB_GIT_REPO=${BUILD_ZLIB_GIT_REPO})." OFF)
 
 option(WITH_LIBZIP "Compile the LIBZIP interface" OFF)
