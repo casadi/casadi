@@ -63,7 +63,7 @@ R = horzcat(*R)
 _, s, _ = linalg.svd(R)
 eps = 1e-9
 rank =  len([x for x in s if abs(x) > eps])
-assert(rank==ns)
+assert rank==ns
 
 # Simulation of the open-loop system
 # -----------------------------------
@@ -138,7 +138,7 @@ p = SX.sym('p')
 # # e = fabs(M - Mref)
 # # e = max(e)/max(fabs(M))
 # # print e
-# # assert(e<1e-6)
+# # assert e<1e-6
 
 
 # # Simulation of the open-loop system
@@ -220,7 +220,7 @@ p = SX.sym('p')
 
 # # Check that eAt is indeed the matrix exponential
 # e = max(fabs(eAt_-scipy.linalg.expm(numpy.array(A*te))))/max(fabs(eAt_))
-# assert(e<1e-7)
+# assert e<1e-7
 
 # # Simulate with feedforward controls
 # # -----------------------------------
@@ -259,7 +259,7 @@ p = SX.sym('p')
 # sim.evaluate()
 
 # e = sim.getOutput()[states.i['y'],-1] - xref_e
-# assert(max(fabs(e))/max(fabs(xref_e))<1e-6)
+# assert max(fabs(e))/max(fabs(xref_e))<1e-6
 
 # tf = sim.minorT()
 # # This will be our reference trajectory for tracking
@@ -318,7 +318,7 @@ p = SX.sym('p')
 # dae.setInput(integrator.getOutput(),'x')
 # dae.evaluate()
 # print max(fabs(dae.getOutput()))
-# assert(max(fabs(dae.getOutput()))<1e-8)
+# assert max(fabs(dae.getOutput()))<1e-8
 
 # # From P, obtain a feedback matrix K
 # K = mtimes([inv(R),B.T,P_])
@@ -341,7 +341,7 @@ p = SX.sym('p')
 #   x0 = xe
 #   xe = integrator({'x0':x0})['xf']
 #   e = max(fabs(xe-x0))
-#   print 'Forward riccati simulation %d; error: %.2e' % (i, e)
+#   print('Forward riccati simulation %d; error: %.2e' % (i, e))
 
 # # We notice divergence. Why?
 # stabric = SX.fun('stabric', [P],[jacobian(-ric,P)])
