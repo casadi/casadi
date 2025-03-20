@@ -1300,53 +1300,76 @@ class OptiStacktests(inherit_from):
     @requires_nlpsol("ipopt")
     def test_ipopt_custom_jac(self):
     
-      for x_scale in [1,7]:
-        for x_scale_offset in [0,2]:
-          for g_scale in [1,3]:
+      # f_scale
+      for x_scale in [vertcat(1,1,1),vertcat(7,0.11,0.13)]:
+        for x_scale_offset in [vertcat(0,0,0),vertcat(1,2,3)]:
+          for g_scale in [vertcat(1,1),vertcat(3,5)]:
+            for f_scale in [1,1.7]:
+              opti = Opti()
+              x=opti.variable()
+              y=opti.variable()
+              w=opti.variable()
 
-            opti = Opti()
-            x=opti.variable()
-            y=opti.variable()
-            w=opti.variable()
-            
-            opti.set_linear_scale(x,x_scale,x_scale_offset)
-            
-            
-            opti.minimize((1-x)**2+100*w**2)
-            opti.subject_to(y-x**2-w==0,g_scale)
-            
-            opti.solver("ipopt")
-            opti.solve()
-           
+              
+              opti.set_linear_scale(x,x_scale[0],x_scale_offset[0])
+              opti.set_linear_scale(y,x_scale[1],x_scale_offset[1])
+              opti.set_linear_scale(w,x_scale[2],x_scale_offset[2])
+              
+              opti.minimize((1-x)**2+100*w**2,f_scale)
+              opti.subject_to(y-x**2-w==0,g_scale[0])
+              opti.subject_to(w**2-y==7,g_scale[1])
+              
+              opti.solver("ipopt")
+              opti.solve()
+             
 
-            ref_solver = opti.debug.casadi_solver
+              ref_solver = opti.debug.casadi_solver
 
 
-            opti = Opti()
-            x=opti.variable()
-            y=opti.variable()
-            w=opti.variable()
-            
-            opti.set_linear_scale(x,x_scale,x_scale_offset)
-            
-            opti.minimize((1-x)**2+100*w**2)
-            opti.subject_to(y-x**2-w==0,g_scale)
-            
-            print(opti.x_linear_scale)
-            print(opti.x_linear_scale_offset)
-            print(opti.g_linear_scale)
+              opti = Opti()
+              x=opti.variable()
+              y=opti.variable()
+              w=opti.variable()
+              
+              
+              opti.set_linear_scale(x,x_scale[0],x_scale_offset[0])
+              opti.set_linear_scale(y,x_scale[1],x_scale_offset[1])
+              opti.set_linear_scale(w,x_scale[2],x_scale_offset[2])
+              
+              opti.minimize((1-x)**2+100*w**2,f_scale)
+              opti.subject_to(y-x**2-w==0,g_scale[0])
+              opti.subject_to(w**2-y==7,g_scale[1])
+              
+              print(opti.x_linear_scale)
+              print(opti.x_linear_scale_offset)
+              print(opti.g_linear_scale)
 
-            nlp_jac_g_custom = Function('nlp_jac_g',[opti.x,opti.p],substitute([opti.g/opti.g_linear_scale,mtimes(jacobian(opti.g/opti.g_linear_scale,opti.x),diag(opti.x_linear_scale))],[opti.x],[opti.x*opti.x_linear_scale+opti.x_linear_scale_offset]),["x","p"],["g","jac_g_x"])
-            options = {}
-            options["cache"] = {"nlp_jac_g":nlp_jac_g_custom}      
-            opti.solver("ipopt", options)
-            sol = opti.solve()
-            
-            solver = opti.debug.casadi_solver
-            
-            print(sol.value(opti.f+dot(opti.lam_g, opti.g)))
-            
-            self.checkfunction_light(ref_solver.get_function("nlp_jac_g"),solver.get_function("nlp_jac_g"),inputs=[vertcat(0.11,0.3,0.7),0])
+              nlp_jac_g_custom = Function('nlp_jac_g',[opti.x,opti.p],substitute([opti.g/opti.g_linear_scale,mtimes(jacobian(opti.g/opti.g_linear_scale,opti.x),diag(opti.x_linear_scale))],[opti.x],[opti.x*opti.x_linear_scale+opti.x_linear_scale_offset]),["x","p"],["g","jac_g_x"])
+              #nlp_jac_g_custom = Function('nlp_jac_g',[opti.x,opti.p],substitute([opti.g_scaled,mtimes(jacobian(opti.g_scaled,opti.x),diag(opti.x_linear_scale))],[opti.x],[opti.x*opti.x_linear_scale+opti.x_linear_scale_offset]),["x","p"],["g","jac_g_x"])
+              
+              #opti.set_helper()
+
+              options = {}
+              options["cache"] = {"nlp_jac_g":nlp_jac_g_custom}
+              opti.solver("ipopt", options)
+              sol = opti.solve()
+              
+              solver = opti.debug.casadi_solver
+              
+              print(sol.value(opti.f+dot(opti.lam_g, opti.g)))
+              
+              self.checkfunction_light(ref_solver.get_function("nlp_jac_g"),solver.get_function("nlp_jac_g"),inputs=[vertcat(0.11,0.3,0.7),0])
+              
+              lam_f = MX.sym("lam_f")
+              lag = lam_f*opti.f/f_scale+dot(opti.lam_g,opti.g/opti.g_linear_scale)
+              H = mtimes(jacobian(gradient(lag,opti.x),opti.x,{"symmetric":True}),diag(opti.x_linear_scale)**2)
+              
+              H = substitute(triu(H),opti.x,opti.x*opti.x_linear_scale+opti.x_linear_scale_offset)
+
+              nlp_hess_l_custom = Function('nlp_hess_l',[opti.x,opti.p,lam_f,opti.lam_g],[H])
+              
+              
+              self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),nlp_hess_l_custom,inputs=[vertcat(0.11,0.3,0.7),0,3,17])
 
     @memory_heavy()
     @requires_nlpsol("ipopt")
