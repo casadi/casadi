@@ -55,7 +55,8 @@ DirResource::~DirResource() {
 void ZipResource::unpack() {
   casadi_assert(Filesystem::is_enabled(),
   "Unzipping '" + path_ + "' requires advanced filesystem access. Compile CasADi with WITH_GC=ON.\n"
-  "Alternatively, manually unzip it into a direcory, and pass this directory name instead of the zip file name.");
+  "Alternatively, manually unzip it into a direcory, "
+  "and pass this directory name instead of the zip file name.");
 
   // Extract filename part of path
   std::string zip_file = Filesystem::filename(path_);
@@ -65,7 +66,8 @@ void ZipResource::unpack() {
 
   casadi_assert(Archiver::has_plugin("libzip"),
   "Unzipping '" + path_ + "' requires libzip. Compile CasADi with WITH_LIBZIP=ON.\n"
-  "Alternatively, manually unzip it into a direcory, and pass this directory name instead of the zip file name.");
+  "Alternatively, manually unzip it into a direcory, "
+  "and pass this directory name instead of the zip file name.");
 
 
   Archiver::getPlugin("libzip").exposed.unpack(path_, dir_);

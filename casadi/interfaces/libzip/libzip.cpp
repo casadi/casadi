@@ -32,20 +32,23 @@ namespace casadi {
 
     zip_t* open_zip_from_istream(std::istream& stream) {
         // Read stream content into a string
-        std::string buffer((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+        std::string buffer((std::istreambuf_iterator<char>(stream)),
+            std::istreambuf_iterator<char>());
 
         // Open zip archive from memory buffer
         zip_error_t errorp;
         zip_source_t* src = zip_source_buffer_create(buffer.data(), buffer.size(), 0, &errorp);
         if (!src) {
-            casadi_error("Failed to create zip source: " + std::string(zip_error_strerror(&errorp)) + "\n");
+            casadi_error("Failed to create zip source: " +
+                std::string(zip_error_strerror(&errorp)) + "\n");
             return nullptr;
         }
 
         zip_t* archive = zip_open_from_source(src, 0, &errorp);
         if (!archive) {
             zip_source_free(src);
-            casadi_error("Failed to open zip from source: " + std::string(zip_error_strerror(&errorp)) + "\n");
+            casadi_error("Failed to open zip from source: " +
+                std::string(zip_error_strerror(&errorp)) + "\n");
         }
         return archive;
     }
