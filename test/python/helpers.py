@@ -682,7 +682,7 @@ class casadiTestCase(unittest.TestCase):
           flags = "-O3"
           if debug_mode:
             flags = "-O0 -g"
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {source} -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,source=source,name_out=name+(".so" if shared else ""),flags=flags,libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {source} -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,source=source,name_out=name+(".so" if shared else ""),flags=flags,libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
           if sys.platform=="darwin":
             commands+= " -Xlinker -rpath -Xlinker {libdir}".format(libdir=libdir)
             commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
