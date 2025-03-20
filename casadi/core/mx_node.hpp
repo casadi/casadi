@@ -183,7 +183,8 @@ namespace casadi {
      * 
      * Default implementation for operations that do not modify numerical values,
      * but only rearrange them.
-     */
+
+        \identifier{2cj} */
     void eval_linear_rearrange(const std::vector<std::array<MX, 3> >& arg,
         std::vector<std::array<MX, 3> >& res) const;
 

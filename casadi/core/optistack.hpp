@@ -288,7 +288,9 @@ public:
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
 
-  /** \brief Scale a helper function constructed via opti.x, opti.g, ... */
+  /** \brief Scale a helper function constructed via opti.x, opti.g, ...
+
+      \identifier{2ci} */
   Function scale_helper(const Function& h) const;
 
   /** \brief get the dual variable

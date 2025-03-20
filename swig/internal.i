@@ -2356,6 +2356,9 @@
 %exception  casadi::GenericMatrix::separate_linear(const MatType &expr, const MatType &sym_lin, const MatType &sym_const, MatType &expr_const, MatType &expr_lin, MatType &expr_nonlin) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix::separate_linear(const MatType &expr, const std::vector< MatType > &sym_lin, const std::vector< MatType > &sym_const, MatType &expr_const, MatType &expr_lin, MatType &expr_nonlin) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericMatrix::shared(std::vector< MatType > &ex, std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string &v_prefix="v_", const std::string &v_suffix="") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4510,6 +4513,9 @@
 %exception  casadi::Opti::f() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Opti::f_linear_scale() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Opti::g() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4553,6 +4559,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Opti::return_status() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Opti::scale_helper(const Function &h) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Opti::set_domain(const MX &x, const std::string &domain) {

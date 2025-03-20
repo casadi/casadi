@@ -140,7 +140,9 @@ public:
   /// Get the underlying CasADi solver of the Opti stack
   Function casadi_solver() const;
 
-  /** \brief Scale a helper function constructed via opti.x, opti.g, ... */
+  /** \brief Scale a helper function constructed via opti.x, opti.g, ...
+
+      \identifier{2cd} */
   Function scale_helper(const Function& h) const;
 
   /// get assignment expressions for initial values
