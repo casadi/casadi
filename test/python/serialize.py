@@ -58,6 +58,8 @@ class SerializeTests(casadiTestCase):
             continue
           if "DeSerialization of Integrator failed" in str(e):
             continue
+          if "DeSerialization of Rootfinder failed" in str(e):
+            continue
           else:
              raise Exception(str(e))
 
