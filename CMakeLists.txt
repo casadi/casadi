@@ -71,7 +71,7 @@ set(PACKAGE_VERSION_FULL "${git_describe}")
 # overwrite version numbers for official release
 if((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
   set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
-endif()zlib_static_suffix
+endif()
 
 # We use the FeatureSummary module to get a more readable CMake output
 include(FeatureSummary)
