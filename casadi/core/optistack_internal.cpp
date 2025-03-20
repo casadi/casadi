@@ -866,6 +866,64 @@ void OptiNode::bake() {
   mark_problem_dirty(false);
 }
 
+Function OptiNode::scale_helper(const Function& h) const {
+  if (problem_dirty()) return baked_copy().scale_helper(h);
+  std::string name = h.name();
+  MX g_linear_scale_mx = g_linear_scale();
+  MX g_linear_scale_inv = 1/g_linear_scale();
+  MX f_linear_scale_mx = f_linear_scale();
+  MX x_linear_scale_mx = x_linear_scale();
+  MX x_linear_scale_offset_mx = x_linear_scale_offset();
+  if (name=="nlp_jac_g") {
+    MXDict arg;
+    arg["x"] = MX::sym("x", nx());
+    arg["p"] = MX::sym("p", np());
+    MXDict args;
+    args["x"] = arg["x"]*x_linear_scale_mx+x_linear_scale_offset_mx;
+    args["p"] = arg["p"];
+    MXDict res = h(args);
+    for (const auto & it : res) {
+      if (it.first=="g") {
+        arg[it.first] = it.second*g_linear_scale_inv;
+      } else if (it.first=="jac_g_x") {
+        arg[it.first] = mtimes(
+                          mtimes(diag(g_linear_scale_inv), it.second),
+                          diag(x_linear_scale_mx));
+      } else {
+        casadi_error("Unknown output '" + it.first + "'. Expecting g, jac_g_x.");
+      }
+    }
+    Function ret(name, arg, h.name_in(), h.name_out());
+    return ret;
+  } else if (name=="nlp_hess_l") {
+    MXDict arg;
+    arg["x"] = MX::sym("x", nx());
+    arg["p"] = MX::sym("p", np());
+    arg["lam_f"] = MX::sym("lam_f");
+    arg["lam_g"] = MX::sym("lam_g", ng());
+    MXDict args;
+    args["x"] = arg["x"]*x_linear_scale_mx+x_linear_scale_offset_mx;
+    args["p"] = arg["p"];
+    args["lam_f"] = arg["lam_f"]/f_linear_scale_mx;
+    args["lam_g"] = arg["lam_g"]/g_linear_scale_mx;
+    MXDict res = h(args);
+    for (const auto & it : res) {
+      if (it.first=="triu_hess_gamma_x_x" ||
+          it.first=="hess_gamma_x_x" ||
+          (it.second.size1()==nx() && it.second.is_square())) {
+        MX D = diag(x_linear_scale_mx);
+        arg[it.first] = mtimes(mtimes(D, it.second), D);
+      } else {
+        casadi_error("Unknown output '" + it.first + "'. Expecting triu_hess_gamma_x_x");
+      }
+    }
+    Function ret(name, arg, h.name_in(), h.name_out());
+    return ret;
+  } else {
+    casadi_error("Unknown helper function '" + name + "'");
+  }
+}
+
 void OptiNode::solver(const std::string& solver_name, const Dict& plugin_options,
                        const Dict& solver_options) {
   solver_name_ = solver_name;

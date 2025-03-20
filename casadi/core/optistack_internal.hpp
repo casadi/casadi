@@ -140,6 +140,9 @@ public:
   /// Get the underlying CasADi solver of the Opti stack
   Function casadi_solver() const;
 
+  /** \brief Scale a helper function constructed via opti.x, opti.g, ... */
+  Function scale_helper(const Function& h) const;
+
   /// get assignment expressions for initial values
   std::vector<MX> initial() const;
 
@@ -285,7 +288,10 @@ public:
     if (problem_dirty()) return baked_copy().g_linear_scale();
     return DM(g_linear_scale_);
   }
-
+  double f_linear_scale() const {
+    if (problem_dirty()) return baked_copy().f_linear_scale();
+    return f_linear_scale_;
+  }
   void assert_empty() const;
 
   void show_infeasibilities(double tol=0, const Dict& opts=Dict()) const;

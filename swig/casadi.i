@@ -4633,6 +4633,7 @@ make_property_opti(ng)
 make_property_opti(x_linear_scale)
 make_property_opti(x_linear_scale_offset)
 make_property_opti(g_linear_scale)
+make_property_opti(f_linear_scale)
 
 make_property(casadi::Opti, casadi_solver);
 %define opti_metadata_modifiers(class)
