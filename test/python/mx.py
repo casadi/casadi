@@ -3529,13 +3529,17 @@ class MXtests(casadiTestCase):
 
         B = DM([[1.7,1.1],[6,0],[0,1.2]])
         Bsp = sparsify(B)
-        vertcat(3*x+mtimes(y,x),9*z)
+        [p1,p2] = vertsplit(9*vertcat(3,3*x,mtimes(y,x)),[0,2,7])
+        [p1c,p2c] = vertsplit(9*vertcat(3,DM.zeros(3,1),DM.zeros(3,1)),[0,2,7])
+        [p1l,p2l] = vertsplit(9*vertcat(0,3*x,DM.zeros(3,1)),[0,2,7])
+        [p1n,p2n] = vertsplit(9*vertcat(0,DM.zeros(3,1),mtimes(y,x)),[0,2,7])
         
         for expr, ref_const, ref_lin, ref_nonlin in [
                     [mtimes(A,x)+mtimes(B,z),DM.zeros(3,1) , mtimes(A,x), mtimes(B,z)],
                     [mtimes(Asp,x)+mtimes(Bsp,z),DM.zeros(3,1) , mtimes(Asp,x), mtimes(Bsp,z)],
                     [vertcat(3*x+mtimes(y,x),9*z),DM.zeros(5,1),vertcat(3*x,DM.zeros(2,1)), vertcat(mtimes(y,x),9*z) ],
                     [7*vertcat(3*x+mtimes(y,x),9*z),DM.zeros(5,1),7*vertcat(3*x,DM.zeros(2,1)), 7*vertcat(mtimes(y,x),9*z) ],
+                    [9*p2, 9*p2c, 9*p2l, 9*p2n]
                     ]:
 
             print("ref",expr,ref_const,ref_lin,ref_nonlin)
