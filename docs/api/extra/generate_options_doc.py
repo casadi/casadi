@@ -332,7 +332,7 @@ filemap = {}
 for name,meta in sorted(metadata.items()):
   if "casadi::PluginInterface" in meta["hierarchy"] and 'casadi::FunctionInternal' not in meta["parents"]: 
     m = re.search("'(\w+)' plugin for (\w+)",meta["brief"])
-    if m:
+    if m and "file" in meta:
       filemap["plugin_%s_%s" % ( m.group(2),m.group(1))] = (meta["file"],name)
 
 import pickle
