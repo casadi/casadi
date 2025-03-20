@@ -3516,6 +3516,52 @@ class MXtests(casadiTestCase):
             assert is_linear(expr_lin,veccat(x,y))
             assert not depends_on(expr_const,veccat(x,y))
 
+  def test_separate_mat(self):
+
+        x = MX.sym("x",3)
+        y = MX.sym("y",3,3)
+        z = MX.sym("z",2)
+        p = MX.sym("p")
+        
+        A = DM([[0,1,3],[2,0,0],[0,9,0]])
+        Asp = sparsify(A)
+        
+
+        B = DM([[1.7,1.1],[6,0],[0,1.2]])
+        Bsp = sparsify(B)
+        vertcat(3*x+mtimes(y,x),9*z)
+        
+        for expr, ref_const, ref_lin, ref_nonlin in [
+                    [mtimes(A,x)+mtimes(B,z),DM.zeros(3,1) , mtimes(A,x), mtimes(B,z)],
+                    [mtimes(Asp,x)+mtimes(Bsp,z),DM.zeros(3,1) , mtimes(Asp,x), mtimes(Bsp,z)],
+                    [vertcat(3*x+mtimes(y,x),9*z),DM.zeros(5,1),vertcat(3*x,DM.zeros(2,1)), vertcat(mtimes(y,x),9*z) ],
+                    [7*vertcat(3*x+mtimes(y,x),9*z),DM.zeros(5,1),7*vertcat(3*x,DM.zeros(2,1)), 7*vertcat(mtimes(y,x),9*z) ],
+                    ]:
+
+            print("ref",expr,ref_const,ref_lin,ref_nonlin)
+            
+            [expr_const,expr_lin,expr_nonlin] = separate_linear(expr,[x,y],[p])
+            print("actual",expr_const,expr_lin,expr_nonlin)
+            
+            
+            def test_equal(a,b):
+                f1 = Function('f',[x,y,z,p],[a])
+                f2 = Function('f',[x,y,z,p],[b])
+                DM.rng(1)
+                args = [DM.rand(f1.sparsity_in(i)) for i in range(f1.n_in())]
+                self.checkarray(f1(*args),f2(*args))
+
+            test_equal(expr,expr_const+expr_lin+expr_nonlin)
+
+            test_equal(expr_const,ref_const)
+            test_equal(expr_lin,ref_lin)
+            test_equal(expr_nonlin,ref_nonlin)
+            
+            
+            assert is_linear(expr_lin,veccat(x,y))
+            assert not depends_on(expr_const,veccat(x,y))
+            
+
   def test_extract_parametric_opts(self):
       for X in [SX,MX]:
           x = X.sym("x")

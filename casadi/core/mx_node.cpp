@@ -364,6 +364,25 @@ namespace casadi {
     }
   }
 
+  void MXNode::eval_linear_rearrange(const std::vector<std::array<MX, 3> >& arg,
+    std::vector<std::array<MX, 3> >& res) const {
+    // Treat each category separately
+    for (casadi_int i=0; i<3; ++i) {
+      // Read arguments for categiry i
+      std::vector<MX> eval_arg(n_dep());
+      for (casadi_int j=0; j<n_dep(); ++j) {
+        eval_arg[j] = arg[j][i];
+      }
+      std::vector<MX> eval_res(nout());
+      // Normal symbolic evaluation
+      eval_mx(eval_arg, eval_res);
+      // Assign results
+      for (casadi_int j=0; j<nout(); ++j) {
+        res[j][i] = eval_res[j];
+      }
+    }
+  }
+
   void MXNode::ad_forward(const std::vector<std::vector<MX> >& fseed,
                        std::vector<std::vector<MX> >& fsens) const {
     casadi_error("'ad_forward' not defined for class " + class_name());

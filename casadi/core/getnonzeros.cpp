@@ -290,12 +290,7 @@ namespace casadi {
 
   void GetNonzeros::eval_linear(const std::vector<std::array<MX, 3> >& arg,
                         std::vector<std::array<MX, 3> >& res) const {
-    for (casadi_int i=0; i<3; ++i) {
-      std::vector<MX> eval_res = {res[0][i]};
-      std::vector<MX> eval_arg = {arg[0][i]};
-      eval_mx(eval_arg, eval_res);
-      res[0][i] = eval_res[0];
-    }
+    eval_linear_rearrange(arg, res);
   }
 
   void GetNonzeros::ad_forward(const std::vector<std::vector<MX> >& fseed,

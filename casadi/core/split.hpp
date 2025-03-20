@@ -68,6 +68,12 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
+    /** \brief Evaluate the MX node on a const/linear/nonlinear partition */
+    void eval_linear(const std::vector<std::array<MX, 3> >& arg,
+            std::vector<std::array<MX, 3> >& res) const override {
+        eval_linear_rearrange(arg, res);
+    }
+
     /** \brief  Propagate sparsity forward
 
         \identifier{12g} */

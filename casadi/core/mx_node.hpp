@@ -179,6 +179,14 @@ namespace casadi {
     void eval_linear_unary(const std::vector<std::array<MX, 3> >& arg,
                         std::vector<std::array<MX, 3> >& res) const;
 
+    /** \brief Evaluate the MX node on a const/linear/nonlinear partition
+     * 
+     * Default implementation for operations that do not modify numerical values,
+     * but only rearrange them.
+     */
+    void eval_linear_rearrange(const std::vector<std::array<MX, 3> >& arg,
+        std::vector<std::array<MX, 3> >& res) const;
+
     /** \brief Calculate forward mode directional derivatives
 
         \identifier{1qw} */

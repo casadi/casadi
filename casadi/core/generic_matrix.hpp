@@ -1092,6 +1092,13 @@ namespace casadi {
         MatType::separate_linear(expr, sym_lin, sym_const, expr_const, expr_lin, expr_nonlin);
     }
 
+    inline friend void separate_linear(const MatType &expr,
+      const std::vector<MatType> &sym_lin, const std::vector<MatType> &sym_const,
+      MatType& expr_const, MatType& expr_lin, MatType& expr_nonlin) {
+      separate_linear(expr, veccat(sym_lin), veccat(sym_const),
+        expr_const, expr_lin, expr_nonlin);
+    }
+
     /** Count number of nodes */
     inline friend casadi_int n_nodes(const MatType& A) {
       return MatType::n_nodes(A);

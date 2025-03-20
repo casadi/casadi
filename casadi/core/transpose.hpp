@@ -67,7 +67,9 @@ namespace casadi {
 
         \identifier{28e} */
     void eval_linear(const std::vector<std::array<MX, 3> >& arg,
-                        std::vector<std::array<MX, 3> >& res) const override;
+                        std::vector<std::array<MX, 3> >& res) const override {
+        eval_linear_rearrange(arg, res);
+    }
 
     /** \brief Calculate forward mode directional derivatives
 
