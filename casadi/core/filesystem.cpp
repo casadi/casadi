@@ -64,4 +64,16 @@ void Filesystem::assert_enabled() {
   "This action requires advanced filesystem access. Compile CasADi with WITH_GC=ON.");
 }
 
+bool has_filesystem(const std::string& name) {
+  return Filesystem::has_plugin(name);
+}
+
+void load_filesystem(const std::string& name) {
+  Filesystem::load_plugin(name);
+}
+
+std::string doc_filesystem(const std::string& name) {
+  return Filesystem::getPlugin(name).doc;
+}
+
 } // namespace casadi

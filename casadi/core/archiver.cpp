@@ -35,4 +35,16 @@ std::mutex Archiver::mutex_solvers_;
 
 const std::string Archiver::infix_ = "archiver";
 
+  bool has_archiver(const std::string& name) {
+    return Archiver::has_plugin(name);
+  }
+
+  void load_archiver(const std::string& name) {
+    Archiver::load_plugin(name);
+  }
+
+  std::string doc_archiver(const std::string& name) {
+    return Archiver::getPlugin(name).doc;
+  }
+
 } // namespace casadi

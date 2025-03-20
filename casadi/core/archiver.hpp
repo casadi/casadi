@@ -31,6 +31,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
+#ifndef SWIG
   class CASADI_EXPORT
   Archiver : public PluginInterface<Archiver> {
   public:
@@ -60,6 +61,16 @@ namespace casadi {
     /// Infix
     static const std::string infix_;
   };
+#endif // SWIG
+
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_archiver(const std::string& name);
+
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_archiver(const std::string& name);
+
+  /// Get the documentation string for a plugin
+  CASADI_EXPORT std::string doc_archiver(const std::string& name);
 
 } // namespace casadi
 

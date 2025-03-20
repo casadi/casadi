@@ -68,5 +68,7 @@
 #include "serializer.hpp"
 #include "tools.hpp"
 #include "resource.hpp"
+#include "archiver.hpp"
+#include "filesystem.hpp"
 
 #endif // CASADI_CORE_HPP
