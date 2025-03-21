@@ -3516,7 +3516,7 @@ class MXtests(casadiTestCase):
             assert is_linear(expr_lin,veccat(x,y))
             assert not depends_on(expr_const,veccat(x,y))
 
-  def test_separate_mat(self):
+  def test_separate_linear_mat(self):
 
         x = MX.sym("x",3)
         y = MX.sym("y",3,3)
@@ -3533,20 +3533,32 @@ class MXtests(casadiTestCase):
         [p1c,p2c] = vertsplit(9*vertcat(3,DM.zeros(3,1),DM.zeros(3,1)),[0,2,7])
         [p1l,p2l] = vertsplit(9*vertcat(0,3*x,DM.zeros(3,1)),[0,2,7])
         [p1n,p2n] = vertsplit(9*vertcat(0,DM.zeros(3,1),mtimes(y,x)),[0,2,7])
+        E = (9*vertcat(3,3*x,mtimes(y,x))).nz[[2,3,0,4,6,6]]
+        Ec = (9*vertcat(3,DM.zeros(3,1),DM.zeros(3,1))).nz[[2,3,0,4,6,6]]
+        El = (9*vertcat(0,3*x,DM.zeros(3,1))).nz[[2,3,0,4,6,6]]
+        En = (9*vertcat(0,DM.zeros(3,1),mtimes(y,x))).nz[[2,3,0,4,6,6]]
+
         
         for expr, ref_const, ref_lin, ref_nonlin in [
                     [mtimes(A,x)+mtimes(B,z),DM.zeros(3,1) , mtimes(A,x), mtimes(B,z)],
                     [mtimes(Asp,x)+mtimes(Bsp,z),DM.zeros(3,1) , mtimes(Asp,x), mtimes(Bsp,z)],
                     [vertcat(3*x+mtimes(y,x),9*z),DM.zeros(5,1),vertcat(3*x,DM.zeros(2,1)), vertcat(mtimes(y,x),9*z) ],
                     [7*vertcat(3*x+mtimes(y,x),9*z),DM.zeros(5,1),7*vertcat(3*x,DM.zeros(2,1)), 7*vertcat(mtimes(y,x),9*z) ],
-                    [9*p2, 9*p2c, 9*p2l, 9*p2n]
+                    [9*p2, 9*p2c, 9*p2l, 9*p2n],
+                    [E,Ec,El,En]
                     ]:
 
-            print("ref",expr,ref_const,ref_lin,ref_nonlin)
+            print("separate_linear(", expr, ")")
+            print("ref")
+            print("  const",ref_const)
+            print("  lin",ref_lin)
+            print("  nonlin",ref_nonlin)
             
             [expr_const,expr_lin,expr_nonlin] = separate_linear(expr,[x,y],[p])
-            print("actual",expr_const,expr_lin,expr_nonlin)
-            
+            print("actual")
+            print("  const",expr_const)
+            print("  lin",expr_lin)
+            print("  nonlin",expr_nonlin)
             
             def test_equal(a,b):
                 f1 = Function('f',[x,y,z,p],[a])
