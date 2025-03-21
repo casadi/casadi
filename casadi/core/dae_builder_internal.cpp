@@ -40,6 +40,7 @@
 #include "external.hpp"
 #include "fmu_function.hpp"
 #include "integrator.hpp"
+#include "filesystem_impl.hpp"
 
 // Throw informative error message
 #define THROW_ERROR_NODE(FNAME, NODE, WHAT) \
@@ -596,6 +597,20 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
 }
 
 void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
+  // Check if file exists
+  std::ifstream test(filename);
+  if (!test.good()) {
+    if (Filesystem::is_enabled()) {
+      casadi_error("Could not open file '" + filename + "'.");
+    } else {
+      casadi_error("Could not open file '" + filename + "'. "
+        "Note that, since CasADi was compiled without WITH_GHC_FILESYSTEM=ON, "
+        "passing fmu files to DaeBuilder is unsupported. "
+        "You could manually unzip the FMU file and "
+        "pass the path to the unzipped directory instead.");
+    }
+  }
+
   // Ensure no variables already
   casadi_assert(n_variables() == 0, "Instance already has variables");
 

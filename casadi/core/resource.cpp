@@ -25,6 +25,7 @@
 
 #include "resource.hpp"
 #include "resource_internal.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -33,17 +34,11 @@ namespace casadi {
 
   Resource::Resource(const std::string& path) {
     // Pass through empty strings
-    if (path.empty()) {
+    if (path.empty() || !Filesystem::is_enabled() || Filesystem::is_directory(path)) {
       own(new DirResource(path));
       return;
     }
-    std::ifstream val(path);
-    if (val) { // path is an existing file (hence not a directory)
-      own(new ZipResource(path));
-      return;
-    } else { // path does not exist or is a directory
-      own(new DirResource(path));
-    }
+    own(new ZipResource(path));
   }
 
   Resource Resource::create(ResourceInternal *node) {

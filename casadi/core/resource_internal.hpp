@@ -72,11 +72,13 @@ namespace casadi {
       /// Print description
       void disp(std::ostream& stream, bool more) const override;
 
+      void serialize_type(SerializingStream& s) const override;
       void serialize_body(SerializingStream& s) const override;
 
       static ResourceInternal* deserialize(DeserializingStream& s);
     private:
       std::string path_;
+      std::string serialize_;
     protected:
       explicit DirResource(DeserializingStream& s);
   };
@@ -107,6 +109,8 @@ namespace casadi {
       /// Print description
       void disp(std::ostream& stream, bool more) const override;
 
+      /** \brief Potentially decay into ZipMemResource */
+      void serialize_type(SerializingStream& s) const override;
       void serialize_body(SerializingStream& s) const override;
 
       static ResourceInternal* deserialize(DeserializingStream& s);
@@ -114,21 +118,22 @@ namespace casadi {
       std::string lock_file_;
       std::string dir_;
       std::string path_;
+      std::string serialize_;
     protected:
       explicit ZipResource(DeserializingStream& s);
   };
 
-  /*
-  ** \brief RAII class for reading from a zip held in memory *
+
+  /** \brief RAII class for reading from a zip held in memory */
   class CASADI_EXPORT ZipMemResource : public ResourceInternal {
     public:
-    ZipMemResource(const std::stream& src);
+    ZipMemResource(const std::istream& src);
       ~ZipMemResource() override;
       /// Get path for a consumer
       const std::string& path() const override {return dir_;}
 
       void unpack();
-      ** \brief Get type name *
+      /** \brief Get type name */
       std::string class_name() const override {return "ZipStreamResource";}
 
       /// Print description
@@ -140,10 +145,10 @@ namespace casadi {
     private:
       std::string lock_file_;
       std::string dir_;
-      std::stringstrean blob_;
+      std::stringstream blob_;
     protected:
       explicit ZipMemResource(DeserializingStream& s);
-  };*/
+  };
 
 } // namespace casadi
 /// \endcond
