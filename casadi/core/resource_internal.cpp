@@ -25,9 +25,9 @@
 
 #include "resource_internal.hpp"
 #include "casadi_misc.hpp"
-#include "archiver.hpp"
+#include "archiver_impl.hpp"
 
-#include "filesystem.hpp"
+#include "filesystem_impl.hpp"
 
 
 namespace casadi {

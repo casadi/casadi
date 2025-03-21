@@ -25,6 +25,7 @@
 
 #include "linsol_internal.hpp"
 #include "mx_node.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -149,7 +150,7 @@ namespace casadi {
       // Create .m file
       std::ofstream mfile;
       std::string fname = (*this)->class_name() + "_" + (*this)->name_ + "_debug.m";
-      mfile.open(fname.c_str());
+      Filesystem::open(mfile, fname);
       Dict opts;
       opts["name"] = "A";
       opts["nonzeros"] = nonzeros;

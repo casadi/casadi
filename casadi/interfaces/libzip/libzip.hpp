@@ -25,7 +25,7 @@
 #ifndef CASADI_LIBZIP_HPP
 #define CASADI_LIBZIP_HPP
 
-#include "casadi/core/archiver.hpp"
+#include "casadi/core/archiver_impl.hpp"
 #include <casadi/interfaces/libzip/casadi_archiver_libzip_export.h>
 
 /** \defgroup plugin_Archiver_libzip Title

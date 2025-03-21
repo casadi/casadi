@@ -228,8 +228,8 @@ set(CASADI_INTERNAL
   casadi_c.cpp
   tools.cpp
   resource.cpp                resource_internal.cpp                resource_internal.hpp
-  archiver.cpp
-  filesystem.cpp
+  archiver.cpp                archiver_impl.hpp
+  filesystem.cpp              filesystem_impl.hpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp

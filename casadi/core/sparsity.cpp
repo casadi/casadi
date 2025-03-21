@@ -28,6 +28,7 @@
 #include "im.hpp"
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
+#include "filesystem_impl.hpp"
 #include <climits>
 
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -1904,7 +1905,8 @@ namespace casadi {
   }
   void Sparsity::to_file(const std::string& filename, const std::string& format_hint) const {
     std::string format = file_format(filename, format_hint, file_formats);
-    std::ofstream out(filename);
+    std::ofstream out;
+    Filesystem::open(out, filename);
     if (format=="mtx") {
       out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
       out << "%%MatrixMarket matrix coordinate pattern general" << std::endl;

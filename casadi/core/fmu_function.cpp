@@ -27,6 +27,7 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 #include "dae_builder_internal.hpp"
+#include "filesystem_impl.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -332,7 +333,7 @@ void FmuFunction::init(const Dict& opts) {
   // New AD validation file, if any
   if (!validate_ad_file_.empty()) {
     std::ofstream valfile;
-    valfile.open(validate_ad_file_);
+    Filesystem::open(valfile, validate_ad_file_);
     valfile << "Output Input Value Nominal Min Max AD FD Step Offset Stencil" << std::endl;
   }
 

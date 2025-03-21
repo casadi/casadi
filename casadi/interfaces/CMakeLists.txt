@@ -142,7 +142,7 @@ if(WITH_LIBZIP)
   add_subdirectory(libzip)
 endif()
 
-if(GHC_FILESYSTEM)
+if(WITH_GHC_FILESYSTEM)
   add_subdirectory(ghc)
 endif()
 

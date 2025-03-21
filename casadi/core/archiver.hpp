@@ -26,42 +26,11 @@
 #ifndef CASADI_ARCHIVER_HPP
 #define CASADI_ARCHIVER_HPP
 
-#include "plugin_interface.hpp"
-#include <iostream>
+#include <casadi/core/casadi_export.h>
+#include <string>
+
 /// \cond INTERNAL
 namespace casadi {
-
-#ifndef SWIG
-  class CASADI_EXPORT
-  Archiver : public PluginInterface<Archiver> {
-  public:
-  typedef bool (* Unpack)(const std::string& src,
-    const std::string& target_dir);
-  typedef bool (* UnpackFromStream)(std::istream& src,
-      const std::string& target_dir);
-
-    // Creator function for internal class
-    typedef Archiver* (*Creator)();
-
-    static const std::string meta_doc;
-
-    // No static functions exposed
-    struct Exposed{
-      Unpack unpack;
-      UnpackFromStream unpack_from_stream;
-    };
-
-    /// Collection of solvers
-    static std::map<std::string, Plugin> solvers_;
-
-#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
-    static std::mutex mutex_solvers_;
-#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
-
-    /// Infix
-    static const std::string infix_;
-  };
-#endif // SWIG
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_archiver(const std::string& name);

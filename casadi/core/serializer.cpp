@@ -30,6 +30,7 @@
 #include "linsol.hpp"
 #include "importer.hpp"
 #include "generic_type.hpp"
+#include "filesystem_impl.hpp"
 #include <iomanip>
 
 namespace casadi {
@@ -41,11 +42,8 @@ namespace casadi {
     FileSerializer::FileSerializer(const std::string& fname, const Dict& opts) :
         SerializerBase(
           std::unique_ptr<std::ostream>(
-            new std::ofstream(fname, std::ios_base::binary | std::ios::out)),
+            Filesystem::ofstream_ptr(fname, std::ios_base::binary | std::ios::out)),
           opts) {
-      if ((sstream_->rdstate() & std::ifstream::failbit) != 0) {
-        casadi_error("Could not open file '" + fname + "' for writing.");
-      }
     }
 
     SerializerBase::SerializerBase(std::unique_ptr<std::ostream> stream, const Dict& opts) :

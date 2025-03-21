@@ -23,7 +23,7 @@
  */
 
 
-#include "archiver.hpp"
+#include "archiver_impl.hpp"
 
 namespace casadi {
 

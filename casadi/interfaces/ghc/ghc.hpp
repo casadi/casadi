@@ -26,7 +26,7 @@
 #ifndef CASADI_GHC_HPP
 #define CASADI_GHC_HPP
 
-#include "casadi/core/filesystem.hpp"
+#include "casadi/core/filesystem_impl.hpp"
 #include <casadi/interfaces/ghc/casadi_filesystem_ghc_export.h>
 
 /** \defgroup plugin_Filesystem_ghc Title

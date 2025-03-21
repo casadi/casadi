@@ -23,7 +23,7 @@
  */
 
 
-#include "filesystem.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -50,6 +50,21 @@ casadi_int Filesystem::remove_all(const std::string& path) {
   return Filesystem::getPlugin("ghc").exposed.remove_all(path);
 }
 
+bool Filesystem::has_parent_path(const std::string& path) {
+  assert_enabled();
+  return Filesystem::getPlugin("ghc").exposed.has_parent_path(path);
+}
+
+std::string Filesystem::parent_path(const std::string& path) {
+  assert_enabled();
+  return Filesystem::getPlugin("ghc").exposed.parent_path(path);
+}
+
+bool Filesystem::create_directories(const std::string& path) {
+  assert_enabled();
+  return Filesystem::getPlugin("ghc").exposed.create_directories(path);
+}
+
 std::string Filesystem::filename(const std::string& path) {
   assert_enabled();
   return Filesystem::getPlugin("ghc").exposed.filename(path);
@@ -74,6 +89,50 @@ void load_filesystem(const std::string& name) {
 
 std::string doc_filesystem(const std::string& name) {
   return Filesystem::getPlugin(name).doc;
+}
+
+
+bool Filesystem::ensure_directory_exists(const std::string& filename) {
+  if (has_parent_path(filename)) {
+    std::string dir = parent_path(filename);
+    if (!is_directory(dir)) {
+      return create_directories(dir);
+    }
+  }
+  return true;
+}
+
+void Filesystem::open(std::ofstream& stream, const std::string& filename,
+    std::ios_base::openmode mode) {
+  if (is_enabled()) {
+    casadi_assert(ensure_directory_exists(filename),
+     "Unable to create the required directory for '" + filename + "'.");
+  }
+  stream.open(filename.c_str(), mode);
+  if (is_enabled()) {
+    casadi_assert(stream.good(),
+      "Error opening stream '" + filename + "'.");
+  } else {
+    casadi_assert(stream.good(),
+      "Error opening stream '" + filename + "'. "
+      "Does the directory exits? "
+      "Note that CasADi needs to be compiled with WITH_GC=ON "
+      "for directories to be automatically created");
+  }
+}
+
+std::ofstream Filesystem::ofstream(const std::string& path,
+  std::ios_base::openmode mode) {
+  std::ofstream ret;
+  Filesystem::open(ret, path, mode);
+  return ret;
+}
+
+std::ofstream* Filesystem::ofstream_ptr(const std::string& path,
+  std::ios_base::openmode mode) {
+  std::ofstream* ret = new std::ofstream();
+  Filesystem::open(*ret, path, mode);
+  return ret;
 }
 
 } // namespace casadi

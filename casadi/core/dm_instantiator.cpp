@@ -25,6 +25,7 @@
 #define CASADI_DM_INSTANTIATOR_CPP
 #include "matrix_impl.hpp"
 
+#include "filesystem_impl.hpp"
 namespace casadi {
 
 
@@ -207,7 +208,8 @@ namespace casadi {
       const Sparsity& sp, const double* nonzeros,
       const std::string& format_hint) {
     std::string format = Sparsity::file_format(filename, format_hint, {"mtx", "txt"});
-    std::ofstream out(filename);
+    std::ofstream out;
+    Filesystem::open(out, filename);
     if (format=="mtx") {
       normalized_setup(out);
       out << "%%MatrixMarket matrix coordinate real general" << std::endl;

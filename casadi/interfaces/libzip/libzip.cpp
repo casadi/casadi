@@ -24,8 +24,7 @@
 
 
 #include "libzip.hpp"
-#include "casadi/core/archiver.hpp"
-#include "casadi/core/filesystem.hpp"
+#include "casadi/core/filesystem_impl.hpp"
 #include <zip.h>
 
 namespace casadi {

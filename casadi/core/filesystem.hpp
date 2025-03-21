@@ -26,54 +26,11 @@
 #ifndef CASADI_FILESYSTEM_HPP
 #define CASADI_FILESYSTEM_HPP
 
-#include "plugin_interface.hpp"
+#include <casadi/core/casadi_export.h>
+#include <string>
 
 /// \cond INTERNAL
 namespace casadi {
-
-#ifndef SWIG
-  class CASADI_EXPORT
-  Filesystem : public PluginInterface<Filesystem> {
-  public:
-    typedef bool (* IsDirectory)(const std::string& path);
-    typedef bool (* CreateDirectories)(const std::string& path);
-    typedef bool (* Remove)(const std::string& path);
-    typedef casadi_int (* RemoveAll)(const std::string& path);
-    typedef std::string (* Filename)(const std::string& path);
-
-    // Creator function for internal class
-    typedef Filesystem* (*Creator)();
-
-    static const std::string meta_doc;
-
-    // No static functions exposed
-    struct Exposed{
-      IsDirectory is_directory;
-      CreateDirectories create_directories;
-      Remove remove;
-      RemoveAll remove_all;
-      Filename filename;
-    };
-
-    /// Collection of solvers
-    static std::map<std::string, Plugin> solvers_;
-
-    static void assert_enabled();
-    static bool is_directory(const std::string& path);
-    static bool remove(const std::string& path);
-    static casadi_int remove_all(const std::string& path);
-    static std::string filename(const std::string& path);
-    static bool is_enabled();
-
-
-#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
-    static std::mutex mutex_solvers_;
-#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
-
-    /// Infix
-    static const std::string infix_;
-  };
-#endif // SWIG
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_filesystem(const std::string& name);

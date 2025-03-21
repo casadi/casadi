@@ -24,7 +24,6 @@
 
 
 #include "ghc.hpp"
-#include "casadi/core/filesystem.hpp"
 #include <ghc/filesystem.hpp>
 
 namespace casadi {
@@ -49,6 +48,14 @@ namespace casadi {
         return ghc::filesystem::path(path).filename().string();
     }
 
+    std::string parent_path(const std::string& path) {
+        return ghc::filesystem::path(path).parent_path().string();
+    }
+
+    bool has_parent_path(const std::string& path) {
+        return ghc::filesystem::path(path).has_parent_path();
+    }
+
     extern "C"
     int CASADI_FILESYSTEM_GHC_EXPORT
     casadi_register_filesystem_ghc(Filesystem::Plugin* plugin) {
@@ -60,6 +67,8 @@ namespace casadi {
         plugin->exposed.remove = &remove;
         plugin->exposed.remove_all = &remove_all;
         plugin->exposed.filename = &filename;
+        plugin->exposed.has_parent_path = &has_parent_path;
+        plugin->exposed.parent_path = &parent_path;
         return 0;
     }
 
