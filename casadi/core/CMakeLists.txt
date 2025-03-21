@@ -100,6 +100,9 @@ set(CASADI_PUBLIC
   serializing_stream.hpp
   fmu.hpp
   tools.hpp
+  resource.hpp
+  archiver.hpp
+  filesystem.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -224,6 +227,9 @@ set(CASADI_INTERNAL
   serializer.cpp              serializing_stream.cpp
   casadi_c.cpp
   tools.cpp
+  resource.cpp                resource_internal.cpp                resource_internal.hpp
+  archiver.cpp                archiver_impl.hpp
+  filesystem.cpp              filesystem_impl.hpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp
@@ -314,12 +320,6 @@ endif()
 
 if(MSVC)
   target_compile_options(casadi PRIVATE /bigobj)
-endif()
-
-if(WITH_ZLIB)
-  target_link_libraries(casadi PRIVATE MINIZIP::minizip ZLIB::libz)
-  target_compile_features(casadi PRIVATE cxx_std_17)
-  target_compile_definitions(casadi PRIVATE CASADI_WITH_ZLIB)
 endif()
 
 get_target_property( compiler_definitions casadi COMPILE_DEFINITIONS )

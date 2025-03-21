@@ -31,6 +31,7 @@
 #include "dae_builder.hpp"
 #include "shared_object.hpp"
 #include "casadi_enum.hpp"
+#include "resource.hpp"
 
 namespace casadi {
 
@@ -513,7 +514,7 @@ protected:
   std::string name_;
 
   // Path to FMU, if any
-  ZipResource resource_;
+  Resource resource_;
 
   // Symbolic representation of the model equations?
   bool symbolic_;

@@ -23,52 +23,26 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#ifndef CASADI_ARCHIVER_HPP
+#define CASADI_ARCHIVER_HPP
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+#include <casadi/core/casadi_export.h>
+#include <string>
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+/// \cond INTERNAL
+namespace casadi {
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_archiver(const std::string& name);
 
-// Matrix expressions
-#include "mx.hpp"
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_archiver(const std::string& name);
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-#include "blazing_spline.hpp"
+  /// Get the documentation string for a plugin
+  CASADI_EXPORT std::string doc_archiver(const std::string& name);
 
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-#include "tools.hpp"
-#include "resource.hpp"
-#include "archiver.hpp"
-#include "filesystem.hpp"
+} // namespace casadi
 
-#endif // CASADI_CORE_HPP
+/// \endcond
+
+#endif // CASADI_ARCHIVER_HPP

@@ -441,6 +441,7 @@ FmuInternal::~FmuInternal() {
 
 void FmuInternal::init(const DaeBuilderInternal* dae) {
   // Copy info from DaeBuilder
+  resource_ = dae->resource_;
   fmutol_ = dae->fmutol_;
   instance_name_ = dae->model_identifier_;
   instantiation_token_ = dae->instantiation_token_;
@@ -449,16 +450,6 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
   can_be_instantiated_only_once_per_process_ = dae->can_be_instantiated_only_once_per_process_;
-
-  // Path to resource directory
-  resource_loc_ = "file://" + dae->resource_.path() + "/resources";
-
-  // Load DLL
-  std::string instance_name_no_dot = dae->model_identifier_;
-  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
-  std::string dll_path = dae->resource_.path() + "/binaries/" + system_infix()
-    + "/" + instance_name_no_dot + dll_suffix();
-  li_ = Importer(dll_path, "dll");
 
   // Mark input indices
   size_t numel = 0;
@@ -575,8 +566,18 @@ int FmuInternal::get_adjoint_derivative(void* instance, const unsigned int* vr_o
 }
 
 void FmuInternal::finalize() {
+  // Load DLL
+  std::string instance_name_no_dot = instance_name_;
+  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
+  std::string dll_path = resource_.path() + "/binaries/" + system_infix()
+    + "/" + instance_name_no_dot + dll_suffix();
+  li_ = Importer(dll_path, "dll");
+
   // Get FMI C functions
   load_functions();
+
+  // Path to resource directory
+  resource_loc_ = "file://" + resource_.path() + "/resources";
 
   // Create a temporary instance
   void* c = instantiate();
@@ -1329,13 +1330,12 @@ void FmuInternal::serialize_type(SerializingStream& s) const {
 }
 
 void FmuInternal::serialize_body(SerializingStream& s) const {
-  s.version("FmuInternal", 2);
+  s.version("FmuInternal", 3);
   s.pack("FmuInternal::name", name_);
   s.pack("FmuInternal::scheme_in", scheme_in_);
   s.pack("FmuInternal::scheme_out", scheme_out_);
   s.pack("FmuInternal::scheme", scheme_);
   s.pack("FmuInternal::aux", aux_);
-  s.pack("FmuInternal::li", li_);
   s.pack("FmuInternal::iind", iind_);
   s.pack("FmuInternal::iind_map", iind_map_);
   s.pack("FmuInternal::oind", oind_);
@@ -1357,7 +1357,7 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::jac_sp", jac_sp_);
   s.pack("FmuInternal::hess_sp", hess_sp_);
 
-  s.pack("FmuInternal::resource_loc", resource_loc_);
+  s.pack("FmuInternal::resource", resource_);
   s.pack("FmuInternal::fmutol", fmutol_);
   s.pack("FmuInternal::instance_name", instance_name_);
   s.pack("FmuInternal::instantiation_token", instantiation_token_);
@@ -1370,13 +1370,12 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
 }
 
 FmuInternal::FmuInternal(DeserializingStream& s) {
-  s.version("FmuInternal", 2);
+  s.version("FmuInternal", 3);
   s.unpack("FmuInternal::name", name_);
   s.unpack("FmuInternal::scheme_in", scheme_in_);
   s.unpack("FmuInternal::scheme_out", scheme_out_);
   s.unpack("FmuInternal::scheme", scheme_);
   s.unpack("FmuInternal::aux", aux_);
-  s.unpack("FmuInternal::li", li_);
   s.unpack("FmuInternal::iind", iind_);
   s.unpack("FmuInternal::iind_map", iind_map_);
   s.unpack("FmuInternal::oind", oind_);
@@ -1398,7 +1397,7 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::jac_sp", jac_sp_);
   s.unpack("FmuInternal::hess_sp", hess_sp_);
 
-  s.unpack("FmuInternal::resource_loc", resource_loc_);
+  s.unpack("FmuInternal::resource", resource_);
   s.unpack("FmuInternal::fmutol", fmutol_);
   s.unpack("FmuInternal::instance_name", instance_name_);
   s.unpack("FmuInternal::instantiation_token", instantiation_token_);

@@ -23,52 +23,37 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#ifndef CASADI_GHC_HPP
+#define CASADI_GHC_HPP
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+#include "casadi/core/filesystem_impl.hpp"
+#include <casadi/interfaces/ghc/casadi_filesystem_ghc_export.h>
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+/** \defgroup plugin_Filesystem_ghc Title
+    \par
+*/
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+/** \pluginsection{Filesystem,ghc} */
 
-// Matrix expressions
-#include "mx.hpp"
+/// \cond INTERNAL
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-#include "blazing_spline.hpp"
+namespace casadi {
+  /** \brief \pluginbrief{Filesystem,ghc}
 
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-#include "tools.hpp"
-#include "resource.hpp"
-#include "archiver.hpp"
-#include "filesystem.hpp"
+    Interface to ghc functionality
 
-#endif // CASADI_CORE_HPP
+    @copydoc Filesystem_doc
+    @copydoc plugin_Filesystem_ghc
+    \author Joris Gillis
+    \date 2025
+  */
+  class CASADI_FILESYSTEM_GHC_EXPORT Ghc : public Filesystem {
+  public:
+    /// A documentation string
+    static const std::string meta_doc;
+  };
+
+} // namespace casadi
+
+/// \endcond
+#endif // CASADI_GHC_HPP

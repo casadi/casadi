@@ -45,14 +45,6 @@
 #endif // HAVE_SIMPLE_MKSTEMPS
 #endif // HAVE_MKSTEMPS
 
-#ifdef CASADI_WITH_ZLIB
-#include <unzip.h>
-#endif // CASADI_WITH_ZLIB
-
-#if __cplusplus >= 201703L
-#include <filesystem>
-#endif
-
 #ifdef CASADI_NEED_UNISTD
 #include <unistd.h>
 #endif
@@ -440,106 +432,5 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     }
     return acc;
   }
-
-
-  ZipResource::ZipResource(const std::string& path) {
-    passthrough = true;
-#if __cplusplus >= 201703L
-    passthrough = path.empty() || std::filesystem::is_directory(path);
-#endif // __cplusplus >= 201703L
-    // Check if path points to a directory
-    if (passthrough) {
-        dir = path;
-    } else {
-#if __cplusplus >= 201703L
-      // Extract filename part of path
-        std::string zip_file = std::filesystem::path(path).filename().string();
-
-        lock_file = temporary_file(zip_file + ".", ".lock");
-        dir = lock_file.substr(0, lock_file.size()-5) + ".unzipped";
-        extract_zip(zip_file, dir);
-#endif // __cplusplus >= 201703L
-    }
-}
-
-ZipResource::~ZipResource() {
-    if (passthrough) return;
-#if __cplusplus >= 201703L
-    try {
-        std::filesystem::remove_all(dir);
-    } catch (...) {
-        casadi_warning("Error: Cannot remove temporary directory: " + dir);
-    }
-    try {
-        std::filesystem::remove(lock_file);
-    } catch (...) {
-        casadi_warning("Error: Cannot remove lock file: " + dir);
-    }
-#endif // __cplusplus >= 201703L
-}
-
-bool extract_zip(const std::string& zip_path, const std::string& output_dir) {
-#if defined(CASADI_WITH_ZLIB) && __cplusplus >= 201703L
-    unzFile zipfile = unzOpen(zip_path.c_str());
-    if (!zipfile) {
-        casadi_error("Cannot open ZIP file: " + zip_path);
-        return false;
-    }
-
-    if (unzGoToFirstFile(zipfile) != UNZ_OK) {
-        unzClose(zipfile);
-        casadi_error("Cannot read ZIP contents.");
-        return false;
-    }
-
-    char filename[16384];
-    do {
-        if (unzGetCurrentFileInfo(zipfile, nullptr, filename, sizeof(filename),
-              nullptr, 0, nullptr, 0) != UNZ_OK) {
-            uerr() << "Error: Cannot get file info." << std::endl;
-            break;
-        }
-
-        std::string full_path = output_dir + filesep() + filename;
-
-        std::string filesep_str = filesep();
-        char filesep_char = filesep_str[0];
-
-        if (full_path.back() == filesep_char) {  // Directory entry
-            std::filesystem::create_directories(full_path);
-        } else {  // File entry
-            std::string dir_path = full_path.substr(0, full_path.find_last_of(filesep_char));
-            std::filesystem::create_directories(dir_path);
-
-            if (unzOpenCurrentFile(zipfile) != UNZ_OK) {
-                uerr() << "Error: Cannot open file in ZIP: " << filename << std::endl;
-                break;
-            }
-
-            std::ofstream out_file(full_path, std::ios::binary);
-            if (!out_file) {
-                uerr() << "Error: Cannot write file: " << full_path << std::endl;
-                unzCloseCurrentFile(zipfile);
-                break;
-            }
-
-            char buffer[8192];
-            int bytes_read;
-            while ((bytes_read = unzReadCurrentFile(zipfile, buffer, sizeof(buffer))) > 0) {
-                out_file.write(buffer, bytes_read);
-            }
-
-            out_file.close();
-            unzCloseCurrentFile(zipfile);
-        }
-    } while (unzGoToNextFile(zipfile) == UNZ_OK);
-
-    unzClose(zipfile);
-    return true;
-#else
-    casadi_error("extract_zip nota vailable. Compile CasADi with WITH_ZLIB and c++17.");
-#endif // defined(CASADI_WITH_ZLIB) && __cplusplus >= 201703L
-}
-
 
 } // namespace casadi

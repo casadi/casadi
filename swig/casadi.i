@@ -4534,6 +4534,8 @@ namespace casadi {
 %include <casadi/core/nlp_builder.hpp>
 %include <casadi/core/dae_builder.hpp>
 %include <casadi/core/xml_file.hpp>
+%include <casadi/core/archiver.hpp>
+%include <casadi/core/filesystem.hpp>
 
 %feature("copyctor", "0") casadi::SerializerBase;
 %feature("copyctor", "0") casadi::DeserializerBase;
@@ -4794,6 +4796,8 @@ opti_metadata_modifiers(casadi::Opti)
   %}
 }
 #endif
+
+%include <casadi/core/resource.hpp>
 
 // Cleanup for dependent modules
 %exception {

@@ -23,52 +23,10 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+ #include "ghc.hpp"
+ #include <string>
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
-
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
-
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
-
-// Matrix expressions
-#include "mx.hpp"
-
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-#include "blazing_spline.hpp"
-
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-#include "tools.hpp"
-#include "resource.hpp"
-#include "archiver.hpp"
-#include "filesystem.hpp"
-
-#endif // CASADI_CORE_HPP
+ const std::string casadi::Ghc::meta_doc=
+ "\n"
+"\n"
+;

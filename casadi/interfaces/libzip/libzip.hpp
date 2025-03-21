@@ -22,53 +22,37 @@
  *
  */
 
+#ifndef CASADI_LIBZIP_HPP
+#define CASADI_LIBZIP_HPP
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#include "casadi/core/archiver_impl.hpp"
+#include <casadi/interfaces/libzip/casadi_archiver_libzip_export.h>
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+/** \defgroup plugin_Archiver_libzip Title
+    \par
+*/
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+/** \pluginsection{Archiver,libzip} */
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+/// \cond INTERNAL
 
-// Matrix expressions
-#include "mx.hpp"
+namespace casadi {
+  /** \brief \pluginbrief{Archiver,libzip}
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-#include "blazing_spline.hpp"
+     Interface to libzip functionality
 
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-#include "tools.hpp"
-#include "resource.hpp"
-#include "archiver.hpp"
-#include "filesystem.hpp"
+     @copydoc Archiver_doc
+     @copydoc plugin_Archiver_libzip
+     \author Joris Gillis
+     \date 2025
+  */
+  class CASADI_ARCHIVER_LIBZIP_EXPORT Libzip : public Archiver {
+  public:
+      /// A documentation string
+      static const std::string meta_doc;
+  };
 
-#endif // CASADI_CORE_HPP
+} // namespace casadi
+
+/// \endcond
+#endif // CASADI_LIBZIP_HPP
