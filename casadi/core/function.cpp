@@ -36,6 +36,7 @@
 #include "serializing_stream.hpp"
 #include "serializer.hpp"
 #include "tools.hpp"
+#include "filesystem_impl.hpp"
 
 #include <cctype>
 #include <fstream>
@@ -1200,8 +1201,8 @@ namespace casadi {
     std::vector<double> d = nz_from_in(arg);
 
     // Set up output stream
-    std::ofstream of(fname);
-    casadi_assert(of.good(), "Error opening stream '" + fname + "'.");
+    std::ofstream of;
+    Filesystem::open(of, fname);
     normalized_setup(of);
 
     // Encode each output
@@ -1215,8 +1216,8 @@ namespace casadi {
     std::vector<double> d = nz_from_out(res);
 
     // Set up output stream
-    std::ofstream of(fname);
-    casadi_assert(of.good(), "Error opening stream '" + fname + "'.");
+    std::ofstream of;
+    Filesystem::open(of, fname);
     normalized_setup(of);
 
     // Encode each output
@@ -1257,7 +1258,8 @@ namespace casadi {
 
   void Function::export_code(const std::string& lang,
       const std::string &fname, const Dict& options) const {
-    std::ofstream stream(fname);
+    std::ofstream stream;
+    Filesystem::open(stream, fname);
     return (*this)->export_code(lang, stream, options);
   }
 

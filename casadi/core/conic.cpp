@@ -25,6 +25,7 @@
 
 #include "conic_impl.hpp"
 #include "nlpsol_impl.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -47,7 +48,7 @@ namespace casadi {
 
   void conic_debug(const Function& f, const std::string &filename) {
     std::ofstream file;
-    file.open(filename.c_str());
+    Filesystem::open(file, filename);
     conic_debug(f, file);
   }
 

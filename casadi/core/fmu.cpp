@@ -442,6 +442,7 @@ FmuInternal::~FmuInternal() {
 void FmuInternal::init(const DaeBuilderInternal* dae) {
   // Copy info from DaeBuilder
   resource_ = dae->resource_;
+  uout() << "FmuInternal::init: " << resource_ << std::endl;
   fmutol_ = dae->fmutol_;
   instance_name_ = dae->model_identifier_;
   instantiation_token_ = dae->instantiation_token_;
@@ -1398,6 +1399,7 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::hess_sp", hess_sp_);
 
   s.unpack("FmuInternal::resource", resource_);
+  uout() << "FmuInternal::deserialize: " << resource_ << std::endl;
   s.unpack("FmuInternal::fmutol", fmutol_);
   s.unpack("FmuInternal::instance_name", instance_name_);
   s.unpack("FmuInternal::instantiation_token", instantiation_token_);
