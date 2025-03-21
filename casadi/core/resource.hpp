@@ -35,7 +35,9 @@ namespace casadi {
   class SerializingStream;
   class DeserializingStream;
 
-  /** \brief RAII class for reading from a zip file */
+  /** \brief RAII class for reading from a zip file
+
+      \identifier{2cn} */
   class CASADI_EXPORT Resource
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<Resource>) {
@@ -46,7 +48,8 @@ namespace casadi {
     * Otherwise, the zip file is extracted to a temporary directory.
     *
     * Upon destruction, the temporary directory is removed.
-    */
+
+        \identifier{2co} */
     Resource(const std::string& path);
     /// Default constructor
     explicit Resource();
@@ -58,7 +61,9 @@ namespace casadi {
     static bool test_cast(const SharedObjectInternal* ptr);
 
 #ifndef SWIG
-      /** \brief  Create from node */
+      /** \brief  Create from node
+
+          \identifier{2cp} */
       static Resource create(ResourceInternal *node);
 
       ResourceInternal* get() const;
@@ -73,10 +78,14 @@ namespace casadi {
       /// Get path for a consumer
       const std::string& path() const;
 
-    /** \brief Serialize an object */
+    /** \brief Serialize an object
+
+        \identifier{2cq} */
     void serialize(SerializingStream &s) const;
 
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+
+        \identifier{2cr} */
     static Resource deserialize(DeserializingStream& s);
   };
 

@@ -30,7 +30,8 @@
 
 /** \defgroup plugin_Archiver_libzip Title
     \par
-*/
+
+    \identifier{2d1} */
 
 /** \pluginsection{Archiver,libzip} */
 

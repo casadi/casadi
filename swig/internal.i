@@ -1150,6 +1150,9 @@
 %exception  casadi::DeserializingStream::unpack(Matrix< T > &e) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DeserializingStream::unpack(Resource &e) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DeserializingStream::unpack(SXElem &e) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4849,6 +4852,15 @@
 %exception  casadi::Printable::repr(const Derived &obj) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Resource::get() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Resource::path() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Resource::serialize(SerializingStream &s) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SX::dep(casadi_int ch=0) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5096,6 +5108,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SerializingStream::pack(const Matrix< T > &e) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SerializingStream::pack(const Resource &e) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SerializingStream::pack(const SXElem &e) {
@@ -5371,9 +5386,6 @@
 %exception  casadi::XmlFile::parse(const std::string &filename) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ZipResource::path() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::all(const std::vector< bool > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5600,9 +5612,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::extract_from_dict_inplace(Dict &d, const std::string &key, T &value) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::extract_zip(const std::string &zip_path, const std::string &output_dir) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::find(const std::vector< T > &v) {
@@ -6439,6 +6448,12 @@
 %exception casadi::Polynomial::Polynomial(double scalar=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::Resource::Resource() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::Resource::Resource(const std::string &path) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::SXElem::SXElem() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6503,9 +6518,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::XmlFile::XmlFile(const std::string &name) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::ZipResource::ZipResource(const std::string &path) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::conditional_lock_guard< _Mutex >::conditional_lock_guard(const conditional_lock_guard &)=delete {

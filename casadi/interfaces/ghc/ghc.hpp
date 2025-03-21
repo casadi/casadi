@@ -31,7 +31,8 @@
 
 /** \defgroup plugin_Filesystem_ghc Title
     \par
-*/
+
+    \identifier{2d0} */
 
 /** \pluginsection{Filesystem,ghc} */
 

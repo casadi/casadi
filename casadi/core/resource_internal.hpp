@@ -34,7 +34,9 @@
 namespace casadi {
 
 
-  /** \brief RAII class base for reading from resources */
+  /** \brief RAII class base for reading from resources
+
+      \identifier{2cs} */
   class CASADI_EXPORT ResourceInternal : public SharedObjectInternal {
     public:
       /** \brief Initialize with a path 
@@ -43,7 +45,8 @@ namespace casadi {
       * Otherwise, the zip file is extracted to a temporary directory.
       *
       * Upon destruction, the temporary directory is removed.
-      */
+
+          \identifier{2ct} */
       explicit ResourceInternal();
       /// Get path for a consumer
       virtual const std::string& path() const = 0;
@@ -60,13 +63,17 @@ namespace casadi {
 
   class CASADI_EXPORT DirResource : public ResourceInternal {
     public:
-      /** \brief Initialize with a path */
+      /** \brief Initialize with a path
+
+          \identifier{2cu} */
       DirResource(const std::string& path);
       ~DirResource() override;
       /// Get path for a consumer
       const std::string& path() const override {return path_;}
 
-      /** \brief Get type name */
+      /** \brief Get type name
+
+          \identifier{2cv} */
       std::string class_name() const override {return "DirResource";}
 
       /// Print description
@@ -103,13 +110,17 @@ namespace casadi {
 
       void unpack();
 
-      /** \brief Get type name */
+      /** \brief Get type name
+
+          \identifier{2cw} */
       std::string class_name() const override {return "ZipResource";}
 
       /// Print description
       void disp(std::ostream& stream, bool more) const override;
 
-      /** \brief Potentially decay into ZipMemResource */
+      /** \brief Potentially decay into ZipMemResource
+
+          \identifier{2cx} */
       void serialize_type(SerializingStream& s) const override;
       void serialize_body(SerializingStream& s) const override;
 
@@ -124,7 +135,9 @@ namespace casadi {
   };
 
 
-  /** \brief RAII class for reading from a zip held in memory */
+  /** \brief RAII class for reading from a zip held in memory
+
+      \identifier{2cy} */
   class CASADI_EXPORT ZipMemResource : public ResourceInternal {
     public:
     ZipMemResource(const std::istream& src);
@@ -133,7 +146,9 @@ namespace casadi {
       const std::string& path() const override {return dir_;}
 
       void unpack();
-      /** \brief Get type name */
+      /** \brief Get type name
+
+          \identifier{2cz} */
       std::string class_name() const override {return "ZipStreamResource";}
 
       /// Print description
