@@ -132,7 +132,7 @@ ZipMemResource::~ZipMemResource() {
 }
 
 void ResourceInternal::serialize(SerializingStream& s) const {
-  //s.version("ResourceInternal", 1);
+  s.version("ResourceInternal", 1);
   serialize_type(s);
   serialize_body(s);
 }
@@ -146,7 +146,7 @@ void ResourceInternal::serialize_body(SerializingStream& s) const {
 }
 
 ResourceInternal::ResourceInternal(DeserializingStream& s) {
-  //s.version("ResourceInternal", 1);
+  
 }
 
 void DirResource::serialize_type(SerializingStream& s) const {
@@ -156,7 +156,7 @@ void DirResource::serialize_type(SerializingStream& s) const {
 
 
 ResourceInternal* ResourceInternal::deserialize(DeserializingStream& s) {
-  //s.version("ResourceInternal", 1);
+  s.version("ResourceInternal", 1);
   std::string class_name;
   s.unpack("ResourceInternal::type", class_name);
   if (class_name=="DirResource") {
@@ -186,17 +186,20 @@ ResourceInternal* DirResource::deserialize(DeserializingStream& s) {
 }
 
 ZipResource::ZipResource(DeserializingStream& s) : ResourceInternal(s) {
+  s.version("ZipResource", 1);
   s.unpack("ZipResource::path", path_);
   s.unpack("ZipResource::serialize", serialize_);
   unpack();
 }
 
 ZipMemResource::ZipMemResource(DeserializingStream& s) : ResourceInternal(s) {
-  s.unpack("ZipResource::blob", blob_);
+  s.version("ZipMemResource", 1);
+  s.unpack("ZipMemResource::blob", blob_);
   unpack();
 }
 
 DirResource::DirResource(DeserializingStream& s) : ResourceInternal(s) {
+  s.version("DirResource", 1);
   s.unpack("DirResource::path", path_);
   s.unpack("DirResource::serialize", serialize_);
 }
@@ -215,6 +218,7 @@ void ZipResource::serialize_type(SerializingStream& s) const {
 }
 
 void ZipResource::serialize_body(SerializingStream& s) const {
+  s.version("ZipResource", 1);
   ResourceInternal::serialize_body(s);
   if (serialize_=="embed") {
     // Decay into ZipMemResource
@@ -229,11 +233,13 @@ void ZipResource::serialize_body(SerializingStream& s) const {
 }
 
 void ZipMemResource::serialize_body(SerializingStream& s) const {
+  s.version("ZipMemResource", 1);
   ResourceInternal::serialize_body(s);
   //s.pack("ZipMemResource::blob", blob_);
 }
 
 void DirResource::serialize_body(SerializingStream& s) const {
+  s.version("DirResource", 1);
   ResourceInternal::serialize_body(s);
   s.pack("DirResource::path", path_);
   s.pack("DirResource::serialize", serialize_);
