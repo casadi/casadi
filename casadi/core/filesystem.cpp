@@ -121,13 +121,6 @@ void Filesystem::open(std::ofstream& stream, const std::string& filename,
   }
 }
 
-std::ofstream Filesystem::ofstream(const std::string& path,
-  std::ios_base::openmode mode) {
-  std::ofstream ret;
-  Filesystem::open(ret, path, mode);
-  return ret;
-}
-
 std::ofstream* Filesystem::ofstream_ptr(const std::string& path,
   std::ios_base::openmode mode) {
   std::ofstream* ret = new std::ofstream();

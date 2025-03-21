@@ -76,9 +76,6 @@ namespace casadi {
     static void open(std::ofstream&, const std::string& path,
         std::ios_base::openmode mode = std::ios_base::out);
 
-    static std::ofstream ofstream(const std::string& path,
-        std::ios_base::openmode mode = std::ios_base::out);
-
     static std::ofstream* ofstream_ptr(const std::string& path,
         std::ios_base::openmode mode = std::ios_base::out);
 
