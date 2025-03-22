@@ -3828,3 +3828,28 @@ fun:PyParser_ASTFromFile
    fun:_PyEval_EvalFrameDefault
    fun:_PyEval_EvalCode
 }
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:malloc
+  fun:malloc
+  fun:resize_scopes
+  fun:dl_open_worker_begin
+  fun:_dl_catch_exception
+  fun:dl_open_worker
+  fun:_dl_catch_exception
+  fun:_dl_open
+  fun:dlopen_doit
+  fun:_dl_catch_exception
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Addr32
+  fun:__wcscat_avx2
+  fun:UnknownInlinedFun
+  ...
+  fun:config_init_pathconfig
+}
