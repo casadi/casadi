@@ -431,6 +431,7 @@ namespace casadi {
   int MXFunction::eval(const double** arg, double** res,
       casadi_int* iw, double* w, void* mem) const {
     if (verbose_) casadi_message(name_ + "::eval");
+    setup(mem, arg, res, iw, w);
     // Work vector and temporaries to hold pointers to operation input and outputs
     const double** arg1 = arg+n_in_;
     double** res1 = res+n_out_;

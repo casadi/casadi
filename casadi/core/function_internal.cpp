@@ -2886,6 +2886,15 @@ namespace casadi {
     return stats;
   }
 
+  Dict FunctionInternal::get_stats(void* mem) const {
+    Dict stats = ProtoFunction::get_stats(mem);
+    auto m = static_cast<FunctionMemory*>(mem);
+    casadi_assert(m->setup_ran,
+      "No stats available: Function '" + name_ + "' not set up. "
+      "To get statistics, first evaluate it numerically.");
+    return stats;
+  }
+
   bool FunctionInternal::has_derivative() const {
     return enable_forward_ || enable_reverse_ || enable_jacobian_ || enable_fd_;
   }
@@ -3450,6 +3459,8 @@ namespace casadi {
                                casadi_int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
     set_temp(mem, arg, res, iw, w);
+    auto m = static_cast<FunctionMemory*>(mem);
+    m->setup_ran = true;
   }
 
   void ProtoFunction::clear_mem() {

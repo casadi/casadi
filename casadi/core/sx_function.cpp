@@ -71,6 +71,7 @@ namespace casadi {
   int SXFunction::eval(const double** arg, double** res,
       casadi_int* iw, double* w, void* mem) const {
     if (verbose_) casadi_message(name_ + "::eval");
+    setup(mem, arg, res, iw, w);
 
     // Make sure no free parameters
     if (!free_vars_.empty()) {
