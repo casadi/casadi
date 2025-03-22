@@ -329,10 +329,14 @@ namespace casadi {
         \identifier{k7} */
     void finalize() override;
 
-    /** \brief Create memory block */
+    /** \brief Create memory block
+
+        \identifier{2d2} */
     void* alloc_mem() const override { return new FunctionMemory(); }
 
-    /** \brief Free memory block */
+    /** \brief Free memory block
+
+        \identifier{2d3} */
     void free_mem(void *mem) const override { delete static_cast<FunctionMemory*>(mem); }
 
     /// Get all statistics
