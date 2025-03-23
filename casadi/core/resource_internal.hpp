@@ -56,9 +56,11 @@ namespace casadi {
       virtual void serialize_body(SerializingStream& s) const;
 
       static ResourceInternal* deserialize(DeserializingStream& s);
-
+      void change_option(const std::string& option_name,
+        const GenericType& option_value);
     protected:
       explicit ResourceInternal(DeserializingStream& s);
+      std::string serialize_mode_;
   };
 
   class CASADI_EXPORT DirResource : public ResourceInternal {
@@ -85,7 +87,6 @@ namespace casadi {
       static ResourceInternal* deserialize(DeserializingStream& s);
     private:
       std::string path_;
-      std::string serialize_;
     protected:
       explicit DirResource(DeserializingStream& s);
   };
@@ -129,7 +130,6 @@ namespace casadi {
       std::string lock_file_;
       std::string dir_;
       std::string path_;
-      std::string serialize_;
     protected:
       explicit ZipResource(DeserializingStream& s);
   };
@@ -146,10 +146,8 @@ namespace casadi {
       const std::string& path() const override {return dir_;}
 
       void unpack();
-      /** \brief Get type name
-
-          \identifier{2cz} */
-      std::string class_name() const override {return "ZipStreamResource";}
+      /** \brief Get type name */
+      std::string class_name() const override {return "ZipMemResource";}
 
       /// Print description
       void disp(std::ostream& stream, bool more) const override;
@@ -160,7 +158,10 @@ namespace casadi {
     private:
       std::string lock_file_;
       std::string dir_;
-      std::stringstream blob_;
+      mutable std::stringstream blob_;
+      #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      mutable std::mutex mutex_blob_;
+      #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
     protected:
       explicit ZipMemResource(DeserializingStream& s);
   };

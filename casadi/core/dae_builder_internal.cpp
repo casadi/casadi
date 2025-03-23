@@ -579,6 +579,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   debug_ = false;
   fmutol_ = 0;
   ignore_time_ = false;
+  std::string resource_serialize = "link";
   // Read options
   for (auto&& op : opts) {
     if (op.first=="debug") {
@@ -589,6 +590,8 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
       ignore_time_ = op.second;
     } else if (op.first=="detect_quad") {
       detect_quad_ = op.second;
+    } else if (op.first=="resource_serialize_mode") {
+      resource_.change_option("serialize_mode", op.second);
     } else {
       casadi_error("No such option: " + op.first);
     }

@@ -34,7 +34,7 @@ namespace casadi {
 
 
 ResourceInternal::ResourceInternal() {
-
+  serialize_mode_ = "link";
 }
 
 DirResource::DirResource(const std::string& path)
@@ -50,7 +50,16 @@ void DirResource::disp(std::ostream& stream, bool more) const {
 DirResource::~DirResource() {
 }
 
-// serialize: link|EMBED
+void ResourceInternal::change_option(const std::string& option_name,
+    const GenericType& option_value) {
+  if (option_name=="serialize_mode") {
+    serialize_mode_ = option_value.to_string();
+    casadi_assert(serialize_mode_=="embed" || serialize_mode_=="link",
+      "Invalid serialization mode: " + serialize_mode_ + ". Pick 'link' or 'embed'.");
+  } else {
+    casadi_error("Option '" + option_name + "' does not exist");
+  }
+}
 
 void ZipResource::unpack() {
   casadi_assert(Filesystem::is_enabled(),
@@ -82,12 +91,14 @@ void ZipMemResource::unpack() {
   "Alternatively, save with serialize option set to link. ");
 
   Archiver::getPlugin("libzip").exposed.unpack_from_stream(blob_, dir_);
+  // rewind
+  blob_.clear();
+  blob_.seekg(0, std::ios::beg);
 }
 
 ZipResource::ZipResource(const std::string& path)
     : ResourceInternal() {
   path_ = path;
-  serialize_ = "link"; //link
   unpack();
 }
 
@@ -142,18 +153,13 @@ void ResourceInternal::serialize_type(SerializingStream& s) const {
 }
 
 void ResourceInternal::serialize_body(SerializingStream& s) const {
-
+  s.pack("ResourceInternal::serialize_mode", serialize_mode_);
 }
 
 ResourceInternal::ResourceInternal(DeserializingStream& s) {
-  
+  s.unpack("ResourceInternal::serialize_mode", serialize_mode_);
+  serialize_mode_ = "link";
 }
-
-void DirResource::serialize_type(SerializingStream& s) const {
-  s.pack("ResourceInternal::type", class_name());
-}
-
-
 
 ResourceInternal* ResourceInternal::deserialize(DeserializingStream& s) {
   s.version("ResourceInternal", 1);
@@ -188,11 +194,13 @@ ResourceInternal* DirResource::deserialize(DeserializingStream& s) {
 ZipResource::ZipResource(DeserializingStream& s) : ResourceInternal(s) {
   s.version("ZipResource", 1);
   s.unpack("ZipResource::path", path_);
-  s.unpack("ZipResource::serialize", serialize_);
   unpack();
 }
 
 ZipMemResource::ZipMemResource(DeserializingStream& s) : ResourceInternal(s) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::lock_guard<std::mutex> lock(mutex_blob_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   s.version("ZipMemResource", 1);
   s.unpack("ZipMemResource::blob", blob_);
   unpack();
@@ -201,26 +209,39 @@ ZipMemResource::ZipMemResource(DeserializingStream& s) : ResourceInternal(s) {
 DirResource::DirResource(DeserializingStream& s) : ResourceInternal(s) {
   s.version("DirResource", 1);
   s.unpack("DirResource::path", path_);
-  s.unpack("DirResource::serialize", serialize_);
 }
 
 void ZipResource::serialize_type(SerializingStream& s) const {
-  if (serialize_=="embed") {
+  if (serialize_mode_=="embed") {
     // Decay into ZipMemResource
     std::string class_name = "ZipMemResource";
     s.pack("ResourceInternal::type", class_name);
-  } else if (serialize_=="link") {
+  } else if (serialize_mode_=="link") {
     std::string class_name = "ZipResource";
     s.pack("ResourceInternal::type", class_name);
   } else {
-    casadi_error("Unknown serialization mode: " + serialize_);
+    casadi_error("Unknown serialization mode: '" + serialize_mode_+ "'.");
   }
 }
 
+void DirResource::serialize_type(SerializingStream& s) const {
+  if (serialize_mode_=="embed") {
+    // Decay into ZipMemResource
+    std::string class_name = "ZipMemResource";
+    s.pack("ResourceInternal::type", class_name);
+  } else if (serialize_mode_=="link") {
+    std::string class_name = "DirResource";
+    s.pack("ResourceInternal::type", class_name);
+  } else {
+    casadi_error("Unknown serialization mode: " + serialize_mode_);
+  }
+}
+
+
 void ZipResource::serialize_body(SerializingStream& s) const {
-  s.version("ZipResource", 1);
   ResourceInternal::serialize_body(s);
-  if (serialize_=="embed") {
+  s.version("ZipResource", 1);
+  if (serialize_mode_=="embed") {
     // Decay into ZipMemResource
     std::ifstream binary(path_, std::ios_base::binary);
     casadi_assert(binary.good(),
@@ -228,21 +249,38 @@ void ZipResource::serialize_body(SerializingStream& s) const {
     s.pack("ZipMemResource::blob", binary);
   } else {
     s.pack("ZipResource::path", path_);
-    s.pack("ZipResource::serialize", serialize_);
   }
 }
 
-void ZipMemResource::serialize_body(SerializingStream& s) const {
-  s.version("ZipMemResource", 1);
+void DirResource::serialize_body(SerializingStream& s) const {
   ResourceInternal::serialize_body(s);
-  //s.pack("ZipMemResource::blob", blob_);
+  s.version("DirResource", 1);
+  if (serialize_mode_=="embed") {
+    // Decay into ZipMemResource
+    std::stringstream ss;
+    Archiver::getPlugin("libzip").exposed.pack_to_stream(path_, ss);
+    ss.clear();
+    ss.seekg(0, std::ios::beg);
+    s.pack("ZipMemResource::blob", ss);
+  } else {
+    s.pack("DirResource::path", path_);
+  }
 }
 
-void DirResource::serialize_body(SerializingStream& s) const {
-  s.version("DirResource", 1);
+
+
+void ZipMemResource::serialize_body(SerializingStream& s) const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::lock_guard<std::mutex> lock(mutex_blob_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   ResourceInternal::serialize_body(s);
-  s.pack("DirResource::path", path_);
-  s.pack("DirResource::serialize", serialize_);
+  s.version("ZipMemResource", 1);
+  s.pack("ZipMemResource::blob", blob_);
+
+  // rewind
+  blob_.clear();
+  blob_.seekg(0, std::ios::beg);
 }
+
 
 } // namespace casadi

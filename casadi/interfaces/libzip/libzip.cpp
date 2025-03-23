@@ -26,7 +26,7 @@
 #include "libzip.hpp"
 #include "casadi/core/filesystem_impl.hpp"
 #include <zip.h>
-
+#include <cstring>
 namespace casadi {
 
     zip_t* open_zip_from_istream(std::istream& stream) {
@@ -128,6 +128,217 @@ namespace casadi {
         return true;
     }
 
+    bool add_file_to_zip(zip_t* archive, const std::string& file_path,
+            const std::string& archive_name) {
+        std::ifstream file(file_path, std::ios::binary | std::ios::ate);
+        if (!file) {
+            uerr() << "Error: Cannot open file: " << file_path << std::endl;
+            return false;
+        }
+
+        std::streamsize size = file.tellg();
+        file.seekg(0, std::ios::beg);
+
+        char* data = static_cast<char*>(malloc(size));  // ← use malloc
+        if (!data) {
+            uerr() << "Error: Memory allocation failed for file: " << file_path << std::endl;
+            return false;
+        }
+
+        if (!file.read(data, size)) {
+            uerr() << "Error: Cannot read file: " << file_path << std::endl;
+            free(data);
+            return false;
+        }
+
+        zip_error_t ziperr;
+        zip_source_t* source = zip_source_buffer_create(data, size, 1, &ziperr); // ← freep = 1
+        if (!source) {
+            uerr() << "Error: Cannot create zip source for file: " << file_path
+                   << ": " << zip_error_strerror(&ziperr) << std::endl;
+            free(data); // not strictly needed, but safe
+            zip_error_fini(&ziperr);
+            return false;
+        }
+
+        zip_int64_t idx = zip_file_add(archive, archive_name.c_str(), source, ZIP_FL_ENC_UTF_8);
+        if (idx < 0) {
+            zip_source_free(source);  // Only needed if not added
+            uerr() << "Error: Cannot add file to archive: " << archive_name << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    void add_directory_recursive(zip_t* archive,
+        const std::string& base_dir,
+        const std::string& current_dir,
+        const std::string& rel_prefix) {
+        auto filesystem = Filesystem::getPlugin("ghc");
+        std::vector<std::string> entries = filesystem.exposed.iterate_directory_names(current_dir);
+
+        for (const std::string& full_path : entries) {
+            std::string rel_path = full_path.substr(base_dir.size() + 1);
+
+            if (filesystem.exposed.is_directory(full_path)) {
+                zip_dir_add(archive, (rel_path + "/").c_str(), ZIP_FL_ENC_UTF_8);
+                add_directory_recursive(archive, base_dir, full_path, rel_path);
+            } else {
+                add_file_to_zip(archive, full_path, rel_path);
+            }
+        }
+    }
+    bool zip_to_stream(const std::string& dir, std::ostream& output) {
+        zip_error_t error;
+        zip_error_init(&error);
+
+        zip_source_t* src = zip_source_buffer_create(nullptr, 0, 0, &error);
+        if (!src) {
+            uerr() << "Failed to create zip source buffer: "
+                   << zip_error_strerror(&error) << std::endl;
+            zip_error_fini(&error);
+            return false;
+        }
+
+        // Prevent zip_close from destroying the source
+        zip_source_keep(src);
+
+        zip_t* archive = zip_open_from_source(src, ZIP_TRUNCATE, &error);
+        if (!archive) {
+            uerr() << "Failed to open zip archive from source: "
+                   << zip_error_strerror(&error) << std::endl;
+            zip_source_free(src);
+            zip_error_fini(&error);
+            return false;
+        }
+
+        try {
+            add_directory_recursive(archive, dir, dir, "");
+        } catch (const std::exception& e) {
+            uerr() << "Exception while zipping directory: " << e.what() << std::endl;
+            zip_discard(archive);  // also frees src
+            zip_error_fini(&error);
+            return false;
+        }
+
+        if (zip_close(archive) != 0) {
+            uerr() << "Failed to finalize zip archive: "
+                   << zip_error_strerror(&error) << std::endl;
+            zip_source_free(src);
+            zip_error_fini(&error);
+            return false;
+        }
+
+        // At this point, src contains the archive in memory.
+        if (zip_source_open(src) < 0) {
+            uerr() << "Failed to open zip source for reading." << std::endl;
+            zip_source_free(src);
+            zip_error_fini(&error);
+            return false;
+        }
+
+        // Seek to end to get size
+        if (zip_source_seek(src, 0, SEEK_END) < 0) {
+            uerr() << "Failed to seek to end of zip source." << std::endl;
+            zip_source_close(src);
+            zip_source_free(src);
+            zip_error_fini(&error);
+            return false;
+        }
+
+        zip_int64_t size = zip_source_tell(src);
+        if (size < 0) {
+            uerr() << "Failed to get size of zip source." << std::endl;
+            zip_source_close(src);
+            zip_source_free(src);
+            zip_error_fini(&error);
+            return false;
+        }
+
+        if (zip_source_seek(src, 0, SEEK_SET) < 0) {
+            uerr() << "Failed to rewind zip source." << std::endl;
+            zip_source_close(src);
+            zip_source_free(src);
+            zip_error_fini(&error);
+            return false;
+        }
+
+        if (zip_source_seek(src, 0, SEEK_SET) < 0) {
+            uerr() << "Failed to rewind zip source." << std::endl;
+            zip_source_close(src);
+            zip_source_free(src);
+            zip_error_fini(&error);
+            return false;
+        }
+
+        // Efficient streaming read/write
+        char buf[8192];
+        zip_int64_t bytes_read;
+
+        while ((bytes_read = zip_source_read(src, buf, sizeof(buf))) > 0) {
+            output.write(buf, bytes_read);
+            if (!output) {
+                uerr() << "Write error while streaming zip data to output." << std::endl;
+                zip_source_close(src);
+                zip_source_free(src);
+                zip_error_fini(&error);
+                return false;
+            }
+        }
+
+        zip_source_close(src);
+        zip_source_free(src);
+        zip_error_fini(&error);
+
+        if (bytes_read < 0) {
+            uerr() << "Error reading from zip source." << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
+
+    bool zip_to_path(const std::string& dir_path, const std::string& zip_path) {
+        std::ofstream ofs(zip_path, std::ios::binary);
+        if (!ofs) {
+            uerr() << "Failed to open output file: " << zip_path << std::endl;
+            return false;
+        }
+
+        return zip_to_stream(dir_path, ofs);
+    }
+
+    bool zip_to_path2(const std::string& dir_path, const std::string& zip_path) {
+        int errorp;
+        zip_t* archive = zip_open(zip_path.c_str(), ZIP_CREATE | ZIP_TRUNCATE, &errorp);
+        if (!archive) {
+            zip_error_t ziperror;
+            zip_error_init_with_code(&ziperror, errorp);
+            uerr() << "Error: Cannot open zip archive " << zip_path << ": "
+                   << zip_error_strerror(&ziperror) << std::endl;
+            zip_error_fini(&ziperror);
+            return false;
+        }
+
+        try {
+            add_directory_recursive(archive, dir_path, dir_path, "");
+        } catch (const std::exception& e) {
+            uerr() << "Exception while zipping directory: " << e.what() << std::endl;
+            zip_discard(archive);
+            return false;
+        }
+
+        if (zip_close(archive) < 0) {
+            uerr() << "Error: Cannot finalize zip archive: " << zip_strerror(archive) << std::endl;
+            zip_discard(archive);
+            return false;
+        }
+
+        return true;
+    }
+
    extern "C"
    int CASADI_ARCHIVER_LIBZIP_EXPORT
    casadi_register_archiver_libzip(Archiver::Plugin* plugin) {
@@ -136,6 +347,8 @@ namespace casadi {
      plugin->version = CASADI_VERSION;
      plugin->exposed.unpack = &extract_zip_from_path;
      plugin->exposed.unpack_from_stream = &extract_zip_from_stream;
+     plugin->exposed.pack = &zip_to_path;
+     plugin->exposed.pack_to_stream = &zip_to_stream;
      return 0;
    }
 

@@ -36,6 +36,14 @@ namespace casadi {
       return ghc::filesystem::create_directories(path);
     }
 
+    std::vector<std::string> iterate_directory_names(const std::string& path) {
+        std::vector<std::string> ret;
+        for (const auto& entry : ghc::filesystem::directory_iterator(path)) {
+            ret.push_back(entry.path().string());
+        }
+        return ret;
+    }
+
     bool remove(const std::string& path) {
         return ghc::filesystem::remove(path);
     }
@@ -69,6 +77,7 @@ namespace casadi {
         plugin->exposed.filename = &filename;
         plugin->exposed.has_parent_path = &has_parent_path;
         plugin->exposed.parent_path = &parent_path;
+        plugin->exposed.iterate_directory_names = &iterate_directory_names;
         return 0;
     }
 

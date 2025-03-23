@@ -28,6 +28,7 @@
 
 #include "shared_object.hpp"
 #include "printable.hpp"
+#include "generic_type.hpp"
 
 namespace casadi {
   // Forward declaration
@@ -71,6 +72,9 @@ namespace casadi {
       /// Access a member function or object
       const ResourceInternal* operator->() const;
 
+      /// Access a member function or object
+      ResourceInternal* operator->();
+
       /// Reference to internal structure
       const ResourceInternal& operator*() const;
 #endif
@@ -82,6 +86,14 @@ namespace casadi {
 
         \identifier{2cq} */
     void serialize(SerializingStream &s) const;
+
+    /** \brief Change option after object creation for debugging
+
+      * This is only possible for a selected number of options that do not change the numerical
+      * results of the comput
+    */
+    void change_option(const std::string& option_name,
+      const GenericType& option_value);
 
     /** \brief Deserialize with type disambiguation
 

@@ -40,6 +40,10 @@ namespace casadi {
     const std::string& target_dir);
   typedef bool (* UnpackFromStream)(std::istream& src,
       const std::string& target_dir);
+  typedef bool (* Pack)(const std::string& src_dir,
+    const std::string& path);
+  typedef bool (* PackToStream)(const std::string& src_dir,
+    std::ostream& src);
 
     // Creator function for internal class
     typedef Archiver* (*Creator)();
@@ -50,6 +54,8 @@ namespace casadi {
     struct Exposed{
       Unpack unpack;
       UnpackFromStream unpack_from_stream;
+      Pack pack;
+      PackToStream pack_to_stream;
     };
 
     /// Collection of solvers

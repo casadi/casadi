@@ -51,6 +51,10 @@ namespace casadi {
     return static_cast<const ResourceInternal*>(SharedObject::operator->());
   }
 
+  ResourceInternal* Resource::operator->() {
+    return static_cast<ResourceInternal*>(SharedObject::operator->());
+  }
+
   const ResourceInternal& Resource::operator*() const {
     return *static_cast<const ResourceInternal*>(get());
   }
@@ -65,6 +69,10 @@ namespace casadi {
 
   const std::string& Resource::path() const {
     return (*this)->path();
+  }
+
+  void Resource::change_option(const std::string& option_name, const GenericType& option_value) {
+    return (*this)->change_option(option_name, option_value);
   }
 
   void Resource::serialize(SerializingStream &s) const {

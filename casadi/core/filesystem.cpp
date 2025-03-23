@@ -65,6 +65,11 @@ bool Filesystem::create_directories(const std::string& path) {
   return Filesystem::getPlugin("ghc").exposed.create_directories(path);
 }
 
+std::vector<std::string> Filesystem::iterate_directory_names(const std::string& path) {
+  assert_enabled();
+  return Filesystem::getPlugin("ghc").exposed.iterate_directory_names(path);
+}
+
 std::string Filesystem::filename(const std::string& path) {
   assert_enabled();
   return Filesystem::getPlugin("ghc").exposed.filename(path);
