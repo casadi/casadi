@@ -2889,7 +2889,7 @@ namespace casadi {
   Dict FunctionInternal::get_stats(void* mem) const {
     Dict stats = ProtoFunction::get_stats(mem);
     auto m = static_cast<FunctionMemory*>(mem);
-    casadi_assert(m->setup_ran,
+    casadi_assert(m->stats_available,
       "No stats available: Function '" + name_ + "' not set up. "
       "To get statistics, first evaluate it numerically.");
     return stats;
@@ -3460,7 +3460,7 @@ namespace casadi {
     set_work(mem, arg, res, iw, w);
     set_temp(mem, arg, res, iw, w);
     auto m = static_cast<FunctionMemory*>(mem);
-    m->setup_ran = true;
+    m->stats_available = true;
   }
 
   void ProtoFunction::clear_mem() {

@@ -81,8 +81,8 @@ namespace casadi {
 
       \identifier{jb} */
   struct CASADI_EXPORT FunctionMemory : public ProtoFunctionMemory {
-    bool setup_ran;
-    FunctionMemory() : setup_ran(false) {}
+    bool stats_available;
+    FunctionMemory() : stats_available(false) {}
   };
 
   /** \brief Base class for FunctionInternal and LinsolInternal
