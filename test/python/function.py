@@ -2707,8 +2707,9 @@ class Functiontests(casadiTestCase):
 
     trigger()
 
-    # buffer eval bypasses timings
-    self.assertTrue(f.stats()["n_call_total"]==0)
+    # buffer jit eval bypasses timings
+    with self.assertInException("No stats available"):
+        f.stats()
     self.checkarray(a,3)
 
   def test_codegen_inf_nan(self):
