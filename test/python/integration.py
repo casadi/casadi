@@ -83,7 +83,8 @@ class Integrationtests(casadiTestCase):
     opts["fsens_err_con"] = True
     #opts["verbose"] = True
     integrator = casadi.integrator("integrator", "cvodes", dae, 0, 2.3, opts)
-    integrator.stats()
+    with self.assertInException("No stats available"):
+        integrator.stats()
     tf = 2.3
 
     solution = Function("solution", {'x0':q, 'p':p, 'xf':q*exp(tf**3/(3*p))},
