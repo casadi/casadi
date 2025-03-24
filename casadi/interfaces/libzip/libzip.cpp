@@ -29,33 +29,29 @@
 #include <cstring>
 namespace casadi {
 
-    zip_t* open_zip_from_istream(std::istream& stream) {
-        // Read stream content into a string
-        std::string buffer((std::istreambuf_iterator<char>(stream)),
-            std::istreambuf_iterator<char>());
+    bool extract_zip_internal(zip_t* za, const std::string& output_dir); // Declare before use
 
+    bool extract_zip_from_stringstream(std::stringstream& src, const std::string& output_dir) {
+        src.clear();
+        src.seekg(0, std::ios::beg);
+        const std::string& s = src.str();
         // Open zip archive from memory buffer
         zip_error_t errorp;
-        zip_source_t* src = zip_source_buffer_create(buffer.data(), buffer.size(), 0, &errorp);
-        if (!src) {
+        zip_source_t* zip_src = zip_source_buffer_create(s.data(), s.size(), 0, &errorp);
+
+        if (!zip_src) {
             casadi_error("Failed to create zip source: " +
                 std::string(zip_error_strerror(&errorp)) + "\n");
-            return nullptr;
+            return false;
         }
 
-        zip_t* archive = zip_open_from_source(src, 0, &errorp);
+        zip_t* archive = zip_open_from_source(zip_src, 0, &errorp);
         if (!archive) {
-            zip_source_free(src);
+            zip_source_free(zip_src);
             casadi_error("Failed to open zip from source: " +
                 std::string(zip_error_strerror(&errorp)) + "\n");
         }
-        return archive;
-    }
-
-    bool extract_zip_internal(zip_t* za, const std::string& output_dir); // Declare before use
-
-    bool extract_zip_from_stream(std::istream& src, const std::string& output_dir) {
-        return extract_zip_internal(open_zip_from_istream(src), output_dir);
+        return extract_zip_internal(archive, output_dir);
     }
 
     bool extract_zip_from_path(const std::string& zip_path, const std::string& output_dir) {
@@ -79,6 +75,7 @@ namespace casadi {
             return false;
         }
 
+
         for (zip_uint64_t i = 0; i < static_cast<zip_uint64_t>(num_entries); ++i) {
             const char* name = zip_get_name(za, i, 0);
             if (!name) {
@@ -86,14 +83,11 @@ namespace casadi {
                 continue;
             }
 
-            std::string full_path = output_dir + filesep() + name;
-            std::string filesep_str = filesep();
-            char filesep_char = filesep_str[0];
-
-            if (full_path.back() == filesep_char) {  // Directory entry
+            std::string full_path = output_dir + "/" + name;
+            if (full_path.back() == '/') {  // Directory entry
                 filesystem.exposed.create_directories(full_path);
             } else {  // File entry
-                std::string dir_path = full_path.substr(0, full_path.find_last_of(filesep_char));
+                std::string dir_path = full_path.substr(0, full_path.find_last_of('/'));
                 filesystem.exposed.create_directories(dir_path);
 
                 zip_file_t* zf = zip_fopen_index(za, i, 0);
@@ -346,7 +340,7 @@ namespace casadi {
      plugin->doc = Libzip::meta_doc.c_str();
      plugin->version = CASADI_VERSION;
      plugin->exposed.unpack = &extract_zip_from_path;
-     plugin->exposed.unpack_from_stream = &extract_zip_from_stream;
+     plugin->exposed.unpack_from_stringstream = &extract_zip_from_stringstream;
      plugin->exposed.pack = &zip_to_path;
      plugin->exposed.pack_to_stream = &zip_to_stream;
      return 0;

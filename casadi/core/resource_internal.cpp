@@ -90,7 +90,7 @@ void ZipMemResource::unpack() {
   "Unzipping stream requires libzip. Compile CasADi with WITH_LIBZIP=ON.\n"
   "Alternatively, save with serialize option set to link. ");
 
-  Archiver::getPlugin("libzip").exposed.unpack_from_stream(blob_, dir_);
+  Archiver::getPlugin("libzip").exposed.unpack_from_stringstream(blob_, dir_);
   // rewind
   blob_.clear();
   blob_.seekg(0, std::ios::beg);

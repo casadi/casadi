@@ -631,3 +631,11 @@ obj:*libworhp*
   fun:init_linsys_solver_qdldl
 }
 
+{
+  <insert_a_suppression_name_here>
+  Memcheck:BadSize
+  fun:posix_memalign
+  fun:blasfeo_malloc_align
+  fun:blasfeo_allocate_dvec
+}
+

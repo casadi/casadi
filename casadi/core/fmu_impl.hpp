@@ -266,6 +266,10 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
  protected:
   explicit FmuInternal(DeserializingStream& s);
 
+  // Resource holding unzipped data (notably DLL)
+  // Must come before li_, because of destructor order
+  Resource resource_;
+
   /// Instance name
   std::string name_;
 
@@ -324,8 +328,6 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Sparsity pattern for extended Jacobian, Hessian
   Sparsity jac_sp_, hess_sp_;
-
-  Resource resource_;
 };
 
 template<typename T>
