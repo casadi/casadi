@@ -43,6 +43,7 @@ namespace casadi {
     typedef  bool (* HasParentPath)(const std::string& path);
     typedef std::string (* ParentPath)(const std::string& path);
     typedef std::vector<std::string> (* IterateDirectoryNames)(const std::string& path);
+    typedef std::string (* Absolute)(const std::string& path);
 
     // Creator function for internal class
     typedef Filesystem* (*Creator)();
@@ -59,6 +60,7 @@ namespace casadi {
       HasParentPath has_parent_path;
       ParentPath parent_path;
       IterateDirectoryNames iterate_directory_names;
+      Absolute absolute;
     };
 
     /// Collection of solvers
@@ -72,6 +74,7 @@ namespace casadi {
     static bool is_enabled();
     static bool has_parent_path(const std::string& path);
     static std::string parent_path(const std::string& path);
+    static std::string absolute(const std::string& path);
     static bool ensure_directory_exists(const std::string& path);
     static bool create_directories(const std::string& path);
     static std::vector<std::string> iterate_directory_names(const std::string& path);

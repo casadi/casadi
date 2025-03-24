@@ -26,6 +26,7 @@
 #include "fmu_impl.hpp"
 #include "fmu_function.hpp"
 #include "dae_builder_internal.hpp"
+#include "filesystem_impl.hpp"
 
 #ifdef WITH_FMI2
 #include "fmu2.hpp"
@@ -577,7 +578,11 @@ void FmuInternal::finalize() {
   load_functions();
 
   // Path to resource directory
-  resource_loc_ = "file://" + resource_.path() + "/resources";
+  if (Filesystem::is_enabled()) {
+    resource_loc_ = "file://" + Filesystem::absolute(resource_.path()) + "/resources";
+  } else {
+    resource_loc_ = "file://" + resource_.path();
+  }
 
   // Create a temporary instance
   void* c = instantiate();

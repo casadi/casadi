@@ -56,6 +56,10 @@ namespace casadi {
         return ghc::filesystem::path(path).filename().string();
     }
 
+    std::string absolute(const std::string& path) {
+        return ghc::filesystem::absolute(ghc::filesystem::path(path)).string();
+    }
+
     std::string parent_path(const std::string& path) {
         return ghc::filesystem::path(path).parent_path().string();
     }
@@ -78,6 +82,7 @@ namespace casadi {
         plugin->exposed.has_parent_path = &has_parent_path;
         plugin->exposed.parent_path = &parent_path;
         plugin->exposed.iterate_directory_names = &iterate_directory_names;
+        plugin->exposed.absolute = &absolute;
         return 0;
     }
 

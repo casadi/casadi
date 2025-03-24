@@ -37,5 +37,67 @@ class Daebuildertests(casadiTestCase):
     if os.path.exists(rumoca) or os.path.exists(rumoca_exe):
         p = subprocess.run([rumoca,"-t","../assets/casadi_daebuilder.jinja","-m", "../assets/hello_world.mo"]) 
 
+  def test_fmu_zip(self):
+    fmu_file = "../data/cstr.fmu"
+    if not os.path.exists(fmu_file):
+        print("Skipping test_fmu_zip, resource not available")
+        return
+    unzipped_name = "cstr"
+    unzipped_path = os.path.join(os.getcwd(), unzipped_name)
+    for serialize_mode in ["link","embed"]:
+        for use_zip in [True,False]:
+            if use_zip:
+                if "ghc-filesystem" in CasadiMeta.feature_list():
+                    dae = DaeBuilder("car",fmu_file,{"resource_serialize_mode": serialize_mode})
+                else:
+                    with self.assertInException("passing fmu files to DaeBuilder is unsupported"):
+                        dae = DaeBuilder("car",fmu_file)
+                    continue
+            else:
+                import shutil
+                if os.path.isdir(unzipped_path): shutil.rmtree(unzipped_path)
+                import zipfile
+                with zipfile.ZipFile(fmu_file, 'r') as zip_ref:
+                    zip_ref.extractall(unzipped_name)
+                print('Unzipped %s into %s' % (fmu_file, unzipped_path))
+                dae = DaeBuilder("car",unzipped_path)
+            dae.disp(True)
+            f = dae.create('f',['x','u'],['ode'])
+            dae = None
+            
+            C_A = SX.sym('C_A')
+            C_B = SX.sym('C_B')
+            V = 1
+            k = 0.5
+            
+            q_in = SX.sym('q_in')
+            C_A_in = SX.sym('C_A_in')
+            C_B_in = SX.sym('C_B_in')
+
+            x = vertcat(C_A,C_B)
+            u = vertcat(C_A_in,C_B_in,q_in)    
+            ode = vertcat((q_in*(C_A_in - C_A) - V*k*C_A*C_B)/V,(q_in*(C_B_in - C_B) + V*k*C_A*C_B)/V)
+
+
+            f_ref = Function('f',[x,u],[ode],['x','u'],['ode'])
+            
+            test_point = [vertcat(1.1,1.3),vertcat(1.7,1.11,1.13)]
+
+            self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
+            
+            f.save('f.casadi')
+            
+            f = None
+            
+            f = Function.load("f.casadi")
+            self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
+            
+            # Type decay, so test twice
+            f.save('f.casadi')
+            self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
+            f = None
+            f = Function.load("f.casadi")
+            self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
+            
 if __name__ == '__main__':
     unittest.main()

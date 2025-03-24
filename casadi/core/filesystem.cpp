@@ -75,6 +75,11 @@ std::string Filesystem::filename(const std::string& path) {
   return Filesystem::getPlugin("ghc").exposed.filename(path);
 }
 
+std::string Filesystem::absolute(const std::string& path) {
+  assert_enabled();
+  return Filesystem::getPlugin("ghc").exposed.absolute(path);
+}
+
 bool Filesystem::is_enabled() {
   return Filesystem::has_plugin("ghc");
 }
