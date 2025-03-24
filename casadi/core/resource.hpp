@@ -91,7 +91,8 @@ namespace casadi {
 
       * This is only possible for a selected number of options that do not change the numerical
       * results of the comput
-    */
+
+        \identifier{2d4} */
     void change_option(const std::string& option_name,
       const GenericType& option_value);
 

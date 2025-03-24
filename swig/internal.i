@@ -4852,6 +4852,9 @@
 %exception  casadi::Printable::repr(const Derived &obj) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Resource::change_option(const std::string &option_name, const GenericType &option_value) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Resource::get() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

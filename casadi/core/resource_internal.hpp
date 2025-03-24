@@ -146,7 +146,9 @@ namespace casadi {
       const std::string& path() const override {return dir_;}
 
       void unpack();
-      /** \brief Get type name */
+      /** \brief Get type name
+
+          \identifier{2d5} */
       std::string class_name() const override {return "ZipMemResource";}
 
       /// Print description

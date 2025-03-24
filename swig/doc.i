@@ -43620,7 +43620,7 @@ Upon destruction, the temporary directory is removed.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2co
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L53
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L54
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L35-L42
@@ -43633,7 +43633,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L35-L42
 Default constructor.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L55
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L56
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L32-L33
@@ -43650,10 +43650,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L32-L33
 Get path for a consumer.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L79
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L83
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L66-L68
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L70-L72
 
 ";
 
@@ -43666,10 +43666,30 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2cq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L84
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L70-L72
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L78-L80
+
+";
+
+%feature("docstring")  casadi::Resource::change_option(const std::string 
+&option_name, const GenericType &option_value) "
+
+[INTERNAL] 
+Change option after object creation for debugging.
+
+This is only possible for a selected number of options that do not 
+change 
+the numerical results of the comput
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2d4
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L96
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L74-L76
 
 ";
 

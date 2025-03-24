@@ -28056,7 +28056,7 @@ C++ includes: resource.hpp
 Default constructor.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L55
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L56
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L32-L33
@@ -28067,7 +28067,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L32-L33
 Default constructor.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L55
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L56
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L32-L33
@@ -28086,10 +28086,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L32-L33
 Get path for a consumer.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L79
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L83
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L66-L68
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L70-L72
 
 ";
 
@@ -28101,10 +28101,29 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2cq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L84
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L70-L72
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L78-L80
+
+";
+
+%feature("docstring") casadi::Resource::change_option "
+
+[INTERNAL] 
+Change option after object creation for debugging.
+
+This is only possible for a selected number of options that do not 
+change 
+the numerical results of the comput
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2d4
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.hpp#L96
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/resource.cpp#L74-L76
 
 ";
 
