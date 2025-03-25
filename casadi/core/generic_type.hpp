@@ -303,6 +303,9 @@ namespace casadi {
 
       \identifier{17u} */
   CASADI_EXPORT void update_dict(Dict& target, const Dict& source, bool recurse=false);
+
+  CASADI_EXPORT void update_dict(Dict& target, const std::string& key,
+    const GenericType& value, bool recurse=false);
 #endif
 
 } // namespace casadi

@@ -4536,6 +4536,7 @@ namespace casadi {
 %include <casadi/core/xml_file.hpp>
 %include <casadi/core/archiver.hpp>
 %include <casadi/core/filesystem.hpp>
+%include <casadi/core/options.hpp>
 
 %feature("copyctor", "0") casadi::SerializerBase;
 %feature("copyctor", "0") casadi::DeserializerBase;

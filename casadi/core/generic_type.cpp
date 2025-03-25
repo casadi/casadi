@@ -807,6 +807,9 @@ namespace casadi {
         auto it = target.find(e.first);
         if (it!=target.end() && it->second.is_dict()) {
           Dict local = it->second;
+          casadi_assert(e.second.is_dict(),
+            "update_dict error: Key '" + it->first + "' exists in target, "
+            "but source value is not a dict");
           update_dict(local, e.second, recurse);
           it->second = local;
           continue;
@@ -816,6 +819,21 @@ namespace casadi {
     }
   }
 
+
+  void update_dict(Dict& target, const std::string& key,
+      const GenericType& value, bool recurse) {
+    auto it = target.find(key);
+    if (it==target.end()) {
+      target[key] = value;
+    } else {
+      // value.is_dict()
+      casadi_assert(it->second.is_dict() && value.is_dict(),
+        "update_dict error: Key '" + key + "' exists in target, but values are not dicts");
+      Dict orig = it->second;
+      update_dict(orig, value, recurse);
+      target[key] = orig;
+    }
+  }
 
 
 
