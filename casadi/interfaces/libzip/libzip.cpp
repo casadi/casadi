@@ -29,32 +29,29 @@
 #include <cstring>
 namespace casadi {
 
-    zip_t* open_zip_from_stringstream(std::stringstream& stream) {
-        const std::string& s = stream.str();
-
-        // Open zip archive from memory buffer
-        zip_error_t errorp;
-        zip_source_t* src = zip_source_buffer_create(s.data(), s.size(), 0, &errorp);
-
-        if (!src) {
-            casadi_error("Failed to create zip source: " +
-                std::string(zip_error_strerror(&errorp)) + "\n");
-            return nullptr;
-        }
-
-        zip_t* archive = zip_open_from_source(src, 0, &errorp);
-        if (!archive) {
-            zip_source_free(src);
-            casadi_error("Failed to open zip from source: " +
-                std::string(zip_error_strerror(&errorp)) + "\n");
-        }
-        return archive;
-    }
-
     bool extract_zip_internal(zip_t* za, const std::string& output_dir); // Declare before use
 
     bool extract_zip_from_stringstream(std::stringstream& src, const std::string& output_dir) {
-        return extract_zip_internal(open_zip_from_stringstream(src), output_dir);
+        src.clear();
+        src.seekg(0, std::ios::beg);
+        const std::string& s = src.str();
+        // Open zip archive from memory buffer
+        zip_error_t errorp;
+        zip_source_t* zip_src = zip_source_buffer_create(s.data(), s.size(), 0, &errorp);
+
+        if (!zip_src) {
+            casadi_error("Failed to create zip source: " +
+                std::string(zip_error_strerror(&errorp)) + "\n");
+            return false;
+        }
+
+        zip_t* archive = zip_open_from_source(zip_src, 0, &errorp);
+        if (!archive) {
+            zip_source_free(zip_src);
+            casadi_error("Failed to open zip from source: " +
+                std::string(zip_error_strerror(&errorp)) + "\n");
+        }
+        return extract_zip_internal(archive, output_dir);
     }
 
     bool extract_zip_from_path(const std::string& zip_path, const std::string& output_dir) {
@@ -78,6 +75,7 @@ namespace casadi {
             return false;
         }
 
+
         for (zip_uint64_t i = 0; i < static_cast<zip_uint64_t>(num_entries); ++i) {
             const char* name = zip_get_name(za, i, 0);
             if (!name) {
@@ -88,7 +86,6 @@ namespace casadi {
             std::string full_path = output_dir + filesep() + name;
             std::string filesep_str = filesep();
             char filesep_char = filesep_str[0];
-
             if (full_path.back() == filesep_char) {  // Directory entry
                 filesystem.exposed.create_directories(full_path);
             } else {  // File entry

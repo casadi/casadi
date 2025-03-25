@@ -3853,3 +3853,12 @@ fun:PyParser_ASTFromFile
   ...
   fun:config_init_pathconfig
 }
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Cond
+  fun:__wcscat_avx2
+  fun:UnknownInlinedFun
+  ...
+  fun:config_init_pathconfig
+}
