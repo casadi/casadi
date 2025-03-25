@@ -483,8 +483,6 @@ namespace casadi {
   template<>      struct F0XChecker<OP_MUL>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_DIV>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_NEG>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_POW>{ static const bool check=true;};
-  template<>      struct F0XChecker<OP_CONSTPOW>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SQRT>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SQ>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_TWICE>{ static const bool check=true;};

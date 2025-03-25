@@ -891,7 +891,7 @@ namespace casadi {
             return _get_binary(OP_CONSTPOW, y, scX, scY);
           case OP_CONSTPOW:
             if (y->is_value(-1)) return get_unary(OP_INV);
-            else if (y->is_value(0)) return MX::ones(sparsity());
+            else if (y->is_value(0)) return MX::ones(size());
             else if (y->is_value(1)) return shared_from_this<MX>();
             else if (y->is_value(2)) return get_unary(OP_SQ);
             break;
