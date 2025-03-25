@@ -3730,5 +3730,20 @@ class MXtests(casadiTestCase):
     self.assertFalse(depends_on(expr,y))
     self.assertFalse(contains(symvar(expr),y))
       
+  def test_symmetric_jacobian(self):
+    x = MX.sym('x', 4)
+    u = MX.sym('u', 2)
+
+    h = x[1]*5*x[2]
+
+    nh = 1
+    lam_h = MX.sym('lam_h', nh, 1)
+
+    adj_ux = densify(jtimes(h, vertcat(u, x), lam_h, True))
+    hess_ux = jacobian(adj_ux, vertcat(u, x), {'symmetric': True})
+    
+    adj_ux = jtimes(h, vertcat(u, x), lam_h, True)
+    with self.assertInException("Symmetry exploitation"):
+        hess_ux = jacobian(adj_ux, vertcat(u, x), {'symmetric': True})
 if __name__ == '__main__':
     unittest.main()
