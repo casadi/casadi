@@ -35,7 +35,10 @@ Fmu3::~Fmu3() {
 std::string Fmu3::system_infix() const {
   // Architecture
   std::string arch;
-#ifdef __arm__
+#if defined(__arm64__) || defined(__aarch64__)
+  // ARM 64-bit Architecture
+  arch = "aarch64";
+#elif __arm__
   if (sizeof(void*) == 4) {
     // ARM 32-bit Architecture
     arch = "aarch32";
