@@ -950,7 +950,9 @@ namespace casadi {
 
   Sparsity Function::jac_sparsity(casadi_int oind, casadi_int iind, bool compact) const {
     try {
-      return (*this)->jac_sparsity(oind, iind, compact, (*this)->jac_is_symm(oind, iind));
+      bool symm = (*this)->jac_is_symm(oind, iind);
+      symm = symm && sparsity_out(oind).is_dense();
+      return (*this)->jac_sparsity(oind, iind, compact, symm);
     } catch(std::exception& e) {
       THROW_ERROR("jac_sparsity", e.what());
     }

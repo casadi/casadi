@@ -1784,6 +1784,11 @@ namespace casadi {
 
   Sparsity FunctionInternal::get_jac_sparsity(casadi_int oind, casadi_int iind,
       bool symmetric) const {
+    if (symmetric) {
+      casadi_assert(sparsity_out_[oind].is_dense(),
+        "Symmetry exploitation in Jacobian assumes dense expression. "
+        "A potential workaround is to apply densify().");
+    }
     // Check if we are able to propagate dependencies through the function
     if (has_spfwd() || has_sprev()) {
       // Get weighting factor
