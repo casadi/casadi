@@ -799,11 +799,21 @@ void OptiNode::bake() {
   for (const auto& g : g_) {
     if (meta_con(g).type==OPTI_PSD) {
       h_all.push_back(meta_con(g).canon/meta_con(g).linear_scale);
-      h_linear_scale.push_back(meta_con(g).linear_scale);
+      if (meta_con(g).canon.numel()==meta_con(g).linear_scale.numel()) {
+        h_linear_scale.push_back(meta_con(g).linear_scale);
+      } else {
+        casadi_assert_dev(meta_con(g).linear_scale.numel()==1);
+        h_linear_scale.push_back(DM::ones(meta_con(g).canon.sparsity())*meta_con(g).linear_scale);
+      }
       h_unscaled_all.push_back(meta_con(g).canon);
     } else {
       g_all.push_back(meta_con(g).canon/meta_con(g).linear_scale);
-      g_linear_scale.push_back(meta_con(g).linear_scale);
+      if (meta_con(g).canon.numel()==meta_con(g).linear_scale.numel()) {
+        g_linear_scale.push_back(meta_con(g).linear_scale);
+      } else {
+        casadi_assert_dev(meta_con(g).linear_scale.numel()==1);
+        g_linear_scale.push_back(DM::ones(meta_con(g).canon.sparsity())*meta_con(g).linear_scale);
+      }
       g_unscaled_all.push_back(meta_con(g).canon);
       lbg_all.push_back(meta_con(g).lb/meta_con(g).linear_scale);
       lbg_unscaled_all.push_back(meta_con(g).lb);
@@ -1225,7 +1235,7 @@ void OptiNode::res(const DMDict& res) {
       std::vector<double> & data_v = store_latest_[OPTI_DUAL_G][i].nonzeros();
       for (casadi_int i=0;i<data_v.size();++i) {
         casadi_int j = meta(v).start+i;
-        data_v[i] = lam_v[j]/g_linear_scale_[j]*f_linear_scale_;
+        data_v[i] = lam_v.at(j)/g_linear_scale_.at(j)*f_linear_scale_;
       }
     }
   }
