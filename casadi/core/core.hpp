@@ -70,5 +70,6 @@
 #include "resource.hpp"
 #include "archiver.hpp"
 #include "filesystem.hpp"
+#include "options.hpp"
 
 #endif // CASADI_CORE_HPP

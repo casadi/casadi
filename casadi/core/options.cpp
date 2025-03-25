@@ -153,6 +153,8 @@ namespace casadi {
       if (op.first.find('.') != std::string::npos || op.first.find("__") != std::string::npos) {
         return true;
       }
+      // Call recursively
+      if (op.second.is_dict() && has_dot(op.second)) return true;
     }
     return false;
   }
@@ -168,15 +170,15 @@ namespace casadi {
     return !has_dot(opts) && !has_null(opts);
   }
 
-  Dict Options::sanitize(const Dict& opts) {
+  Dict Options::sanitize(const Dict& opts, bool top_level) {
     // Drop nulls
-    if (has_null(opts)) {
+    if (top_level && has_null(opts)) {
       // Create a new dictionary without the null entries
       Dict ret;
       for (auto&& op : opts) {
         if (!op.second.is_null()) ret[op.first] = op.second;
       }
-      return ret;
+      return sanitize(ret, false);
     }
 
     //  Treat the case where any of the options have a dot (dictionary shorthand)
@@ -202,22 +204,31 @@ namespace casadi {
         // Flush last sub-dictionary
         if (!sname.empty() && (dotpos==std::string::npos
                                || op.first.compare(0, dotpos, sname)!=0)) {
-          ret[sname] = sopts;
+          update_dict(ret, sname, sanitize(sopts, false), true);
+
           sname.clear();
           sopts.clear();
+        }
+
+        GenericType value = op.second;
+        if (value.is_dict()) {
+          value = sanitize(value, false);
         }
 
         // Add to dictionary
         if (dotpos != std::string::npos) {
           sname = op.first.substr(0, dotpos);
-          sopts[op.first.substr(dotpos_end)] = op.second;
+          std::string target_name = op.first.substr(dotpos_end);
+          sopts[target_name] = value;
         } else {
-          ret[op.first] = op.second;
+          update_dict(ret, op.first, value, true);
         }
       }
 
       // Flush trailing sub-dictionary
-      if (!sname.empty()) ret[sname] = sopts;
+      if (!sname.empty()) {
+        update_dict(ret, sname, sanitize(sopts, false), true);
+      }
 
       return ret;
     }

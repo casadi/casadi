@@ -30,7 +30,6 @@
 
 namespace casadi {
 /// \cond INTERNAL
-#ifndef SWIG
 
   /** \brief Options metadata for a class
 
@@ -39,6 +38,7 @@ namespace casadi {
 
       \identifier{x9} */
   struct CASADI_EXPORT Options {
+#ifndef SWIG
     // Base classes, whose options are also valid for the derived class
     std::vector<const Options*> bases;
 
@@ -57,6 +57,8 @@ namespace casadi {
     // Locate an entry
     const Options::Entry* find(const std::string& name) const;
 
+#endif // SWIG
+
     // Get all entries
     std::vector<std::string> all() const;
 
@@ -66,8 +68,10 @@ namespace casadi {
     // Get description for an entry
     std::string info(const std::string& name) const;
 
+#ifndef SWIG
     // Print all entries
     void disp(std::ostream& stream) const;
+#endif // SWIG
 
     /** \brief A distance metric between two words
 
@@ -95,7 +99,7 @@ namespace casadi {
     static bool is_sane(const Dict& opts);
 
     /// Sanitize a options dictionary
-    static Dict sanitize(const Dict& opts);
+    static Dict sanitize(const Dict& opts, bool top_level=true);
 
     /// Check if options exist
     void check(const Dict& opts) const;
@@ -111,7 +115,6 @@ namespace casadi {
     void print_one(const std::string &name, std::ostream &stream) const;
   };
 
-#endif // SWIG
   /// \endcond
 } // namespace casadi
 
