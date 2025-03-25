@@ -279,6 +279,12 @@ int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
   auto c = static_cast<fmi2Component>(instance);
   // Return arguments in FMI types
   fmi2EventInfo eventInfo;
+  eventInfo.newDiscreteStatesNeeded = fmi2False;
+  eventInfo.terminateSimulation = fmi2False;
+  eventInfo.nominalsOfContinuousStatesChanged = fmi2False;
+  eventInfo.valuesOfContinuousStatesChanged = fmi2False;
+  eventInfo.nextEventTimeDefined = fmi2False;
+  eventInfo.nextEventTime = 0.0;
   // Call FMU
   fmi2Status status = new_discrete_states_(c, &eventInfo);
   // Pass to event iteration memory
@@ -513,14 +519,14 @@ void Fmu2::serialize_body(SerializingStream &s) const {
   s.pack("Fmu2::init_boolean", init_boolean_);
   s.pack("Fmu2::init_string", init_string_);
 
-  s.pack("Fmu2::vn_aux_real_", vn_aux_real_);
-  s.pack("Fmu2::vn_aux_integer_", vn_aux_integer_);
-  s.pack("Fmu2::vn_aux_boolean_", vn_aux_boolean_);
-  s.pack("Fmu2::vn_aux_string_", vn_aux_string_);
-  s.pack("Fmu2::vr_aux_real_", vr_aux_real_);
-  s.pack("Fmu2::vr_aux_integer_", vr_aux_integer_);
-  s.pack("Fmu2::vr_aux_boolean_", vr_aux_boolean_);
-  s.pack("Fmu2::vr_aux_string_", vr_aux_string_);
+  s.pack("Fmu2::vn_aux_real", vn_aux_real_);
+  s.pack("Fmu2::vn_aux_integer", vn_aux_integer_);
+  s.pack("Fmu2::vn_aux_boolean", vn_aux_boolean_);
+  s.pack("Fmu2::vn_aux_string", vn_aux_string_);
+  s.pack("Fmu2::vr_aux_real", vr_aux_real_);
+  s.pack("Fmu2::vr_aux_integer", vr_aux_integer_);
+  s.pack("Fmu2::vr_aux_boolean", vr_aux_boolean_);
+  s.pack("Fmu2::vr_aux_string", vr_aux_string_);
 }
 
 } // namespace casadi

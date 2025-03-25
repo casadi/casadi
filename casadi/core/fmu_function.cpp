@@ -1675,7 +1675,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::has_adj", has_adj_);
   s.unpack("FmuFunction::has_hess", has_hess_);
 
-  s.unpack("FmuFunction::uses_directional_derivatives_", uses_directional_derivatives_);
+  s.unpack("FmuFunction::uses_directional_derivatives", uses_directional_derivatives_);
   s.unpack("FmuFunction::uses_adjoint_derivatives", uses_adjoint_derivatives_);
   s.unpack("FmuFunction::validate_forward", validate_forward_);
   s.unpack("FmuFunction::validate_hessian", validate_hessian_);

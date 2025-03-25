@@ -30,6 +30,43 @@ from helpers import *
 
 class Daebuildertests(casadiTestCase):
 
+  def test_reference_fmus(self):
+    if "ghc-filesystem" not in CasadiMeta.feature_list(): return
+    for name in ["VanDerPol2","VanDerPol3"]:
+        fmu_file = "../data/" + name + ".fmu"
+        dae = DaeBuilder("car",fmu_file)
+        dae.disp(True)
+        x0 = SX.sym('x0')
+        x1 = SX.sym('x1')
+        mu = SX.sym("mu")
+        
+        x = vertcat(x0,x1)
+        c = mu
+        f = dae.create('f',['x'],['ode'])
+        f_ref = Function('f',[x],[vertcat(x1,1 * ((1 - x0 * x0) * x1) - x0)])
+        test_point = [vertcat(1.1,1.3)]
+        self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3)],digits=7)
+        if not name.endswith("3"):
+            self.check_serialize(f,inputs=test_point)
+  
+  def test_serialize(self):
+    fmu_file = "../data/cstr.fmu"
+    if not os.path.exists(fmu_file):
+        print("Skipping test_fmu_zip, resource not available")
+        return
+    unzipped_name = "cstr"
+    unzipped_path = os.path.join(os.getcwd(), unzipped_name)
+    import shutil
+    if os.path.isdir(unzipped_path): shutil.rmtree(unzipped_path)
+    import zipfile
+    with zipfile.ZipFile(fmu_file, 'r') as zip_ref:
+        zip_ref.extractall(unzipped_name)
+    dae = DaeBuilder("car",unzipped_name)
+    f = dae.create('f',['x','u'],['ode'])
+    test_point = [vertcat(1.1,1.3),vertcat(1.7,1.11,1.13)]
+    f(*test_point)
+    self.check_serialize(f,inputs=test_point)
+        
   def test_rumoca(self):
     if "rumoca" not in CasadiMeta.feature_list(): return
     rumoca = os.path.join(GlobalOptions.getCasadiPath(),'rumoca')
