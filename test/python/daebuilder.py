@@ -34,6 +34,8 @@ class Daebuildertests(casadiTestCase):
     if "ghc-filesystem" not in CasadiMeta.feature_list(): return
     for name in ["VanDerPol2","VanDerPol3"]:
         fmu_file = "../data/" + name + ".fmu"
+        if not os.path.exists(fmu_file):
+            print("Skipping test_reference_fmus, resource not available")
         dae = DaeBuilder("car",fmu_file)
         dae.disp(True)
         x0 = SX.sym('x0')
