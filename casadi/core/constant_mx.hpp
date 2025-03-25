@@ -813,7 +813,7 @@ namespace casadi {
       if (v_.value==-1) return -y->get_unary(OP_INV);
       break;
     case OP_POW:
-      if (v_.value==0) return MX::zeros(y.sparsity());
+      // Note: v_.value can still lead to one when a y entry is zero
       if (v_.value==1) return MX::ones(y.sparsity());
       if (v_.value==std::exp(1.0)) return y->get_unary(OP_EXP);
       break;

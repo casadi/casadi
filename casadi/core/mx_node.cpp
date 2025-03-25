@@ -891,7 +891,7 @@ namespace casadi {
             return _get_binary(OP_CONSTPOW, y, scX, scY);
           case OP_CONSTPOW:
             if (y->is_value(-1)) return get_unary(OP_INV);
-            else if (y->is_value(0)) return MX::ones(sparsity());
+            else if (y->is_value(0)) return MX::ones(size());
             else if (y->is_value(1)) return shared_from_this<MX>();
             else if (y->is_value(2)) return get_unary(OP_SQ);
             break;
@@ -947,7 +947,8 @@ namespace casadi {
     } else if (scY) {
       // Check if it is ok to loop over nonzeros only
       if (sparsity().is_dense() || operation_checker<F0XChecker>(op) ||
-          (y.is_zero() && operation_checker<F00Checker>(op))) {
+          (y.is_zero() && operation_checker<F00Checker>(op)) ||
+          (y.is_constant() && static_cast<double>(y)>0 && (op==OP_CONSTPOW || op==OP_POW))) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<false, true>(Operation(op), shared_from_this<MX>(), y));
       } else {

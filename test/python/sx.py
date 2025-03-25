@@ -1924,6 +1924,16 @@ class SXtests(casadiTestCase):
     with self.assertInException("Can only convert 1-by-1 matrices to scalars"):
         contains([vertcat(x,y)],x)
     
+  def test_pow(self):
+    x = SX.sym("x")
+    y = SX(4,1)
+    self.assertEqual((y**0).nnz(),4)
+    y[1] = x
+    self.assertEqual((y**0).nnz(),4)
+    y[1] = 0
+    self.assertEqual((y**0).nnz(),4)
+    y[1] = 1
+    self.assertEqual((y**0).nnz(),4)
 
 if __name__ == '__main__':
     unittest.main()

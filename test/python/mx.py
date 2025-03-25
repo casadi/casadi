@@ -1686,6 +1686,7 @@ class MXtests(casadiTestCase):
             r = casadiop([x])
             f = Function("f", [xx],[r])
             rr = f(v)
+            print(r,rr,numpyop(x_))
             self.checkarray(rr,numpyop(x_))
 
             a = DM(f.sparsity_out(0),1)
@@ -3745,5 +3746,48 @@ class MXtests(casadiTestCase):
     adj_ux = jtimes(h, vertcat(u, x), lam_h, True)
     with self.assertInException("Symmetry exploitation"):
         hess_ux = jacobian(adj_ux, vertcat(u, x), {'symmetric': True})
+        
+        
+  def test_pow_zero(self):
+  
+    for X in [SX,MX]:
+
+        x = X.sym('x', Sparsity.diag(4))
+        self.assertTrue((x**0).is_dense())
+        self.assertFalse((x**0.3).is_dense())
+        self.assertFalse((x**1).is_dense())
+        self.assertFalse((x**2).is_dense())
+        self.assertFalse((x**2.3).is_dense())
+        self.assertTrue((x**(-2)).is_dense())
+        p = X.sym("p")
+        
+        self.assertTrue((x**p).is_dense())
+
+
+        x=X.sym("x")
+
+        self.checkarray(evalf(substitute(vertcat(x**2,x**1,x**0),x,0)),vertcat(0,0,1))
+        self.checkarray(evalf(substitute(x**DM([2,1,0]),x,0)),vertcat(0,0,1))
+
+  def test_pow(self):
+    x = MX.sym("x")
+    r = evalf(substitute(x**vertcat(2,1,0),x,0))
+    self.checkarray(r,vertcat(0,0,1))
+    
+    y = MX(4,1)
+    self.assertEqual((y**0).nnz(),4)
+    y = MX(4,1)
+    y[1] = x
+    self.assertEqual((y**0).nnz(),4)
+    y = MX(4,1)
+    y[1] = 0
+    self.assertEqual((y**0).nnz(),4)
+    y = MX(4,1)
+    y[1] = 1
+    self.assertEqual((y**0).nnz(),4)
+
+    
+
+
 if __name__ == '__main__':
     unittest.main()
