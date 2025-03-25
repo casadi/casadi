@@ -1094,7 +1094,8 @@ jobs:
           wget https://github.com/casadi/testbot/releases/download/perpetual/serialize_3.5.5.zip
           unzip serialize_3.5.5.zip
           cd ../data
-          wget https://github.com/casadi/testbot/releases/download/perpetual/cstr.fmu
+          wget https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol2.fmu
+          wget https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol3.fmu
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - env:
