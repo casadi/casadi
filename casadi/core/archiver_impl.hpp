@@ -38,7 +38,7 @@ namespace casadi {
   public:
   typedef bool (* Unpack)(const std::string& src,
     const std::string& target_dir);
-  typedef bool (* UnpackFromStream)(std::istream& src,
+  typedef bool (* UnpackFromStringStream)(std::stringstream& src,
       const std::string& target_dir);
   typedef bool (* Pack)(const std::string& src_dir,
     const std::string& path);
@@ -53,7 +53,7 @@ namespace casadi {
     // No static functions exposed
     struct Exposed{
       Unpack unpack;
-      UnpackFromStream unpack_from_stream;
+      UnpackFromStringStream unpack_from_stringstream;
       Pack pack;
       PackToStream pack_to_stream;
     };

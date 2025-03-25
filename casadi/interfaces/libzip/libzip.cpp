@@ -29,14 +29,13 @@
 #include <cstring>
 namespace casadi {
 
-    zip_t* open_zip_from_istream(std::istream& stream) {
-        // Read stream content into a string
-        std::string buffer((std::istreambuf_iterator<char>(stream)),
-            std::istreambuf_iterator<char>());
+    zip_t* open_zip_from_stringstream(std::stringstream& stream) {
+        const std::string& s = stream.str();
 
         // Open zip archive from memory buffer
         zip_error_t errorp;
-        zip_source_t* src = zip_source_buffer_create(buffer.data(), buffer.size(), 0, &errorp);
+        zip_source_t* src = zip_source_buffer_create(s.data(), s.size(), 0, &errorp);
+
         if (!src) {
             casadi_error("Failed to create zip source: " +
                 std::string(zip_error_strerror(&errorp)) + "\n");
@@ -54,8 +53,8 @@ namespace casadi {
 
     bool extract_zip_internal(zip_t* za, const std::string& output_dir); // Declare before use
 
-    bool extract_zip_from_stream(std::istream& src, const std::string& output_dir) {
-        return extract_zip_internal(open_zip_from_istream(src), output_dir);
+    bool extract_zip_from_stringstream(std::stringstream& src, const std::string& output_dir) {
+        return extract_zip_internal(open_zip_from_stringstream(src), output_dir);
     }
 
     bool extract_zip_from_path(const std::string& zip_path, const std::string& output_dir) {
@@ -346,7 +345,7 @@ namespace casadi {
      plugin->doc = Libzip::meta_doc.c_str();
      plugin->version = CASADI_VERSION;
      plugin->exposed.unpack = &extract_zip_from_path;
-     plugin->exposed.unpack_from_stream = &extract_zip_from_stream;
+     plugin->exposed.unpack_from_stringstream = &extract_zip_from_stringstream;
      plugin->exposed.pack = &zip_to_path;
      plugin->exposed.pack_to_stream = &zip_to_stream;
      return 0;
