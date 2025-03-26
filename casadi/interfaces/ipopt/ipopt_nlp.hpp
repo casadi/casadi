@@ -92,6 +92,10 @@ namespace casadi {
                             Index m, Index nele_jac, Index* iRow, Index *jCol,
                             Number* values) override;
 
+
+    bool eval_jac_g_vp(Index n, const Number* x,
+      bool trans, Index m, const Number* s, Number* values) override;
+
     /** Method to return:
      *   1) The structure of the hessian of the Lagrangian (if "values" is NULL)
      *   2) The values of the hessian of the Lagrangian (if "values" is not NULL)

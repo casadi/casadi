@@ -217,6 +217,8 @@ namespace casadi {
     }
     jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
 
+    create_function("nlp_jac_g_vp", {"x", "p", "fwd:x"}, {"fwd:g"});
+    create_function("nlp_jac_g_vpt", {"x", "p", "adj:g"}, {"adj:x"});
     convexify_ = false;
 
     // Allocate temporary work vectors
