@@ -590,7 +590,9 @@ namespace casadi {
         \identifier{4q} */
     inline friend MatType sum2(const MatType &x) { return MatType::sum2(x);}
 
-    /** \brief Returns summation of all elements */
+    /** \brief Returns summation of all elements
+
+        \identifier{2d6} */
     inline friend MatType sum(const MatType &x) {
       if (x.is_vector()) {
         if (x.is_column()) {

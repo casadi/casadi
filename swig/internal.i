@@ -5317,6 +5317,9 @@
 %exception  casadi::SparsityInterface::sprank(const MatType &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SparsityInterface::sum(const MatType &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SparsityInterface::sum1(const MatType &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6110,6 +6113,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::update_dict(Dict &target, const Dict &source, bool recurse=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::update_dict(Dict &target, const std::string &key, const GenericType &value, bool recurse) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::vector_init(const std::vector< T > &v) {
