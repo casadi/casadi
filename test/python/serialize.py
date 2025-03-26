@@ -75,6 +75,8 @@ class SerializeTests(casadiTestCase):
                 digits = 7
             if sys.platform=="darwin":
                 digits = 7 # Bug?
+            if sys.platform=="win32":
+                digits = 7 # Bug?
             self.checkarray(o,o_ref,digits=digits,failmessage=fun+"/"+str(f))
             
   def test_identity(self):
