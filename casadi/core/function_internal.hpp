@@ -354,6 +354,8 @@ namespace casadi {
                              const Function::AuxOut& aux,
                              const Dict& opts) const;
 
+    virtual Function interval_propagator() const;
+
     // Get list of dependency functions
     virtual std::vector<std::string> get_function() const;
 

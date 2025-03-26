@@ -355,6 +355,8 @@ class CASADI_EXPORT SXFunction :
   void export_code_body(const std::string& lang,
     std::ostream &stream, const Dict& options) const override;
 
+  Function interval_propagator() const override;
+
   /// With just-in-time compilation using OpenCL
   bool just_in_time_opencl_;
 
