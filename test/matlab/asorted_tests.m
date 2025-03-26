@@ -1,5 +1,15 @@
 import casadi.*
 
+test_cases = {4 [1 2] [1;2] [1 2; 3 4] [1 2 3; 3 4 5] [1 2; 4 5; 7 8]};
+
+for i=numel(test_cases)
+    e=test_cases{i};
+    assert(all(sum(e)==full(sum(DM(e)))));
+    assert(all(sum(e,1)==full(sum(DM(e),1))));
+    assert(all(sum(e,2)==full(sum(DM(e),2))));
+    assert(all(sum(e,'all')==full(sum(DM(e),'all'))));
+end
+
 MX(2,1)
 
 % SX stuff

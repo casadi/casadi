@@ -2500,7 +2500,7 @@ PyOS_setsig(SIGINT, SigIntHandler);
 
 %pythoncode%{
 try:
-  from numpy import pi, inf
+  from numpy import pi, inf, sum
 except:
   pass
 
@@ -2764,6 +2764,13 @@ class NZproxy:
       inputs.reverse()
     if not(hasattr(self,name)) or ('mul' in name):
       name = '__' + name + '__'
+    if method=="reduce" and name=="add":
+      assert len(inputs)==1
+      axis = kwargs["axis"]
+      if axis is None:
+          return inputs[0].sum()
+      else:
+          return inputs[0].sum(axis)
     try:
       assert method=="__call__"
       fun=getattr(self, name)
@@ -3133,14 +3140,40 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
   %define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
     SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
     #if FLAG & IS_MEMBER
-     DECL casadi_int casadi_length(const M &v) {
-      return std::max(v.size1(), v.size2());
-     }
+      DECL casadi_int casadi_length(const M &v) {
+        return std::max(v.size1(), v.size2());
+      }
+      DECL M casadi_sum(const M& x, casadi_int dim) {
+        if (dim==1) return sum1(x);
+        if (dim==2) return sum2(x);
+        casadi_error(
+          "Expected sum(A,1), sum(A,2), sum(A,\"all\") got " + casadi::str(dim) + " instead.");
+      }
+      DECL M casadi_sum(const M& x, const std::string& dim) {
+        casadi_assert(dim=="all",
+          "Expected sum(...,'all'), got '" + dim + "' instead.");
+        return sum(x);
+      }
+      DECL M casadi_sum(const M& x) {
+        if (x.is_vector()) return sum(x);
+        return sum1(x);
+      }
     #endif
   %enddef
 #else
   %define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
     SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
+    #if FLAG & IS_MEMBER
+      DECL M casadi_sum(const M& x, casadi_int dim) {
+        if (dim==0) return sum1(x);
+        if (dim==1) return sum2(x);
+        casadi_error(
+          "Expected sum(A,1), sum(A,2), sum(A,\"all\") got " + casadi::str(dim) + " instead.");
+      }
+      DECL M casadi_sum(const M& x) {
+        return sum(x);
+      }
+    #endif
   %enddef
 #endif
 
@@ -4213,29 +4246,6 @@ namespace casadi{
         brace_asgn(self, v, s.subs{:});
       else
         self = builtin('subsasgn',self,s,v);
-      end
-    end
-    function out = sum(self,varargin)
-      narginchk(1,3);
-      if nargin==1
-        if is_vector(self)
-          if is_column(self)
-            out = sum1(self);
-          else
-            out = sum2(self);
-          end
-        else
-          out = sum1(self);
-        end
-      else
-        i = varargin{1};
-        if i==1
-          out = sum1(self);
-        elseif i==2
-          out = sum2(self);
-        else
-          error('sum argument (if present) must be 1 or 2');
-        end
       end
     end
     function out = norm(self,varargin)

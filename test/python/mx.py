@@ -3786,8 +3786,22 @@ class MXtests(casadiTestCase):
     y[1] = 1
     self.assertEqual((y**0).nnz(),4)
 
+  def test_sum(self):
+    test_cases = [DM(4), horzcat(1,2),vertcat(1,2),blockcat([[1,2],[3,4]]),blockcat([[1,2,3],[3,4,5]]),blockcat([[1,2],[3,4],[6,9]])]
     
-
+    for e in test_cases:
+        res = np.array(np.sum(e))
+        ref = np.sum(np.array(e))
+        self.checkarray(res,ref)
+        res = np.array(np.sum(e,0))
+        ref = np.sum(np.array(e),0)
+        self.checkarray(res,ref)
+        res = np.array(np.sum(e,1))
+        ref = np.sum(np.array(e),1)
+        self.checkarray(res,ref)
+        
+        with self.assertInException("axis 2 is out of bound"):
+            np.sum(e,2)
 
 if __name__ == '__main__':
     unittest.main()
