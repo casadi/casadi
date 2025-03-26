@@ -220,6 +220,8 @@ namespace casadi {
     Function simplify(const Dict& opts=Dict()) const;
     /// @}
 
+    Function interval_propagator() const;
+
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node
