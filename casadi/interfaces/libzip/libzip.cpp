@@ -83,13 +83,11 @@ namespace casadi {
                 continue;
             }
 
-            std::string full_path = output_dir + filesep() + name;
-            std::string filesep_str = filesep();
-            char filesep_char = filesep_str[0];
-            if (full_path.back() == filesep_char) {  // Directory entry
+            std::string full_path = output_dir + "/" + name;
+            if (full_path.back() == '/') {  // Directory entry
                 filesystem.exposed.create_directories(full_path);
             } else {  // File entry
-                std::string dir_path = full_path.substr(0, full_path.find_last_of(filesep_char));
+                std::string dir_path = full_path.substr(0, full_path.find_last_of('/'));
                 filesystem.exposed.create_directories(dir_path);
 
                 zip_file_t* zf = zip_fopen_index(za, i, 0);
