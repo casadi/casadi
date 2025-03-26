@@ -36,6 +36,7 @@ class Daebuildertests(casadiTestCase):
         fmu_file = "../data/" + name + ".fmu"
         if not os.path.exists(fmu_file):
             print("Skipping test_reference_fmus, resource not available")
+            return
         dae = DaeBuilder("car",fmu_file)
         dae.disp(True)
         x0 = SX.sym('x0')
