@@ -3862,3 +3862,25 @@ fun:PyParser_ASTFromFile
   ...
   fun:config_init_pathconfig
 }
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:malloc
+  fun:UnknownInlinedFun
+  ...
+  fun:_PyObject_GC_NewVar
+  ...
+  fun:_PyEval_EvalFrameDefault
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Param
+  write(buf)
+  fun:__libc_write
+  fun:write
+  ...
+  fun:_Py_write
+}
