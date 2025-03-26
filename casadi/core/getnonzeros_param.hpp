@@ -27,6 +27,7 @@
 #define CASADI_GETNONZEROS_PARAM_HPP
 
 #include "mx_node.hpp"
+#include "multiple_output.hpp"
 #include <map>
 #include <stack>
 
@@ -53,6 +54,10 @@ namespace casadi {
     /// Constructor
     GetNonzerosParam(const Sparsity& sp, const MX& y, const MX& nz);
     GetNonzerosParam(const Sparsity& sp, const MX& y, const MX& nz, const MX& nz_extra);
+
+    /** \brief Interval calculus propagation rule */
+    void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const override;
 
     /// Destructor
     ~GetNonzerosParam() override {}
@@ -142,6 +147,34 @@ namespace casadi {
 
         \identifier{88} */
     explicit GetNonzerosParamVector(DeserializingStream& s);
+
+    /** \brief Interval calculus propagation rule */
+    void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const override;
+
+    class IntervalPropagator : public MultipleOutput {
+    public:
+        /// Constructor
+        IntervalPropagator(const MX& x_L, const MX& nz_L,
+                        const MX& x_R, const MX& nz_R);
+
+        /** \brief  Print expression */
+        std::string disp(const std::vector<std::string>& arg) const override;
+
+        /** \brief  Number of outputs */
+        casadi_int nout() const override { return 2; }
+
+        /** \brief  Get the sparsity of output oind */
+        const Sparsity& sparsity(casadi_int oind) const override;
+
+        /// Destructor
+        ~IntervalPropagator() override {}
+        /// Evaluate the function numerically
+        int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+        /** \brief Get the operation */
+        casadi_int op() const override { return OP_GETNONZEROS_PARAM;}
+    };
   };
 
   // Specialization of the above when nz_ is a nested Slice

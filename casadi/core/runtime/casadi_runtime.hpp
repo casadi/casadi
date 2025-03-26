@@ -89,6 +89,13 @@ namespace casadi {
   template<typename T1>
   void casadi_mtimes(const T1* x, const casadi_int* sp_x, const T1* y, const casadi_int* sp_y,
                              T1* z, const casadi_int* sp_z, T1* w, casadi_int tr);
+                             
+  /// Sparse matrix-matrix multiplication with interval calculus
+  template<typename T1>
+  void casadi_mtimes(const T1* xL, const T1* xR, const casadi_int* sp_x,
+                     const T1* yL, const T1* yR, const casadi_int* sp_y,
+                     T1* zL, T1* zR, const casadi_int* sp_z,
+                     T1* w, casadi_int tr);
 
   /// Sparse matrix-vector multiplication: z <- z + x*y
   template<typename T1>
@@ -279,6 +286,7 @@ namespace casadi {
   #include "casadi_de_boor.hpp"
   #include "casadi_nd_boor_eval.hpp"
   #include "casadi_nd_boor_dual_eval.hpp"
+  #include "casadi_interp.hpp"
   #include "casadi_interpn_weights.hpp"
   #include "casadi_interpn_interpolate.hpp"
   #include "casadi_interpn.hpp"
@@ -311,6 +319,7 @@ namespace casadi {
   #include "casadi_oracle_callback.hpp"
   #include "casadi_ocp_block.hpp"
   #include "casadi_scaled_copy.hpp"
+  #include "casadi_mtimes_intprop.hpp"
 } // namespace casadi
 
 /// \endcond

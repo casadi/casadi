@@ -359,6 +359,10 @@ namespace casadi {
                              const Function::AuxOut& aux,
                              const Dict& opts) const;
 
+    Function interval_propagator(const Dict& opts) const;
+
+    virtual Function get_interval_propagator(const Dict& opts) const;
+
     // Get list of dependency functions
     virtual std::vector<std::string> get_function() const;
 
@@ -1349,6 +1353,9 @@ namespace casadi {
 
     /// Function cache
     mutable WeakCache<std::string, Function> cache_;
+
+    /// Interrval propagator chache
+    mutable WeakCache<casadi_int, Function> cache_int_prop_;
 
     /// Cache for sparsities of the Jacobian blocks
     mutable std::vector<Sparsity> jac_sparsity_[2];

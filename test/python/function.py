@@ -3979,5 +3979,805 @@ class Functiontests(casadiTestCase):
         f = Function('f',[x],[3*x])
         self.assertEqual(f.numel_in(0), 0)
 
+  @memory_heavy()
+  def test_interval_propagator_linear_interpolant(self):
+
+    x_grid = [0,1,1.5,2]
+    ndim = 1
+    m = 2
+    
+    DM.rng(1)
+    
+    for i in range(10):
+
+        interp = interpolant("test","linear",[x_grid],np.array(DM.rand(len(x_grid)*m)).squeeze())
+        
+        X_bounds = list(np.sort(np.array(x_grid[0]-1+DM.rand(2)*(x_grid[1]-x_grid[0]+1)).squeeze()))
+
+        alpha = DM.rand(ndim,100000)
+
+        X_MC = X_bounds[0]*alpha[0,:]+X_bounds[1]*(1-alpha[0,:])
+
+        interior = X_MC
+
+        r = interp(interior)
+        min_MC = np.min(r,axis=1)
+        max_MC = np.max(r,axis=1)
+        
+        print("MC",min_MC,max_MC)
+
+        x = MX.sym("x",ndim)
+
+        f = Function("f",[x],[interp(x)])
+
+        fp = f.interval_propagator()
+
+        res = fp(X_bounds[0],X_bounds[1])
+        
+        print("res",res)
+        self.assertTrue(np.all(res[0]<=min_MC))
+        self.assertTrue(np.all(res[1]>=max_MC))
+        
+        
+        interior_x_grid = [e for e in x_grid if e>X_bounds[0] and e<X_bounds[1]]
+        
+        def cartesian_product(a):
+            return vec(a).T
+
+        critical_points = cartesian_product(interior_x_grid+X_bounds)
+        r = interp(critical_points)
+        min_C = np.min(r,axis=1)
+        max_C = np.max(r,axis=1)
+        print("C",min_C,max_C)
+        
+        
+        self.checkarray(min_C,res[0])
+        self.checkarray(max_C,res[1])
+     
+     
+
+    x_grid = [0,1,1.5,2]
+    y_grid = [4,6,7]
+    ndim = 2
+    m = 2
+    
+    DM.rng(1)
+    
+    for i in range(10):
+
+        interp = interpolant("test","linear",[x_grid,y_grid],np.array(DM.rand(len(x_grid)*len(y_grid)*m)).squeeze())
+        
+        X_bounds = list(np.sort(np.array(x_grid[0]-1+DM.rand(2)*(x_grid[1]-x_grid[0]+1)).squeeze()))
+        Y_bounds = list(np.sort(np.array(y_grid[0]-1+DM.rand(2)*(y_grid[1]-y_grid[0]+1)).squeeze()))
+
+        alpha = DM.rand(ndim,100000)
+
+        X_MC = X_bounds[0]*alpha[0,:]+X_bounds[1]*(1-alpha[0,:])
+        Y_MC = Y_bounds[0]*alpha[1,:]+Y_bounds[1]*(1-alpha[1,:])
+
+        interior = vertcat(X_MC,Y_MC)
+
+        r = interp(interior)
+        min_MC = np.min(r,axis=1)
+        max_MC = np.max(r,axis=1)
+        
+        print("MC",min_MC,max_MC)
+
+        x = MX.sym("x",ndim)
+
+        f = Function("f",[x],[interp(x)])
+
+        fp = f.interval_propagator()
+
+        res = fp(vertcat(X_bounds[0],Y_bounds[0]),vertcat(X_bounds[1],Y_bounds[1]))
+        
+        print("res",res)
+        self.assertTrue(np.all(res[0]<=min_MC))
+        self.assertTrue(np.all(res[1]>=max_MC))
+        
+        
+        interior_x_grid = [e for e in x_grid if e>X_bounds[0] and e<X_bounds[1]]
+        interior_y_grid = [e for e in y_grid if e>Y_bounds[0] and e<Y_bounds[1]]
+        
+        def cartesian_product(a,b):
+            knots_X,knots_Y = np.meshgrid(a,b)
+            return vertcat(vec(knots_X.flatten()).T,vec(knots_Y.flatten()).T)
+
+        critical_points = cartesian_product(interior_x_grid+X_bounds,interior_y_grid+Y_bounds)
+        r = interp(critical_points)
+        min_C = np.min(r,axis=1)
+        max_C = np.max(r,axis=1)
+        print("C",min_C,max_C)
+        
+        
+        self.checkarray(min_C,res[0])
+        self.checkarray(max_C,res[1])
+        
+        # Monte Carlo results should not be too far off
+        #self.assertTrue(np.all(min_MC-res[0]<=0.1))
+        #self.assertTrue(np.all(max_MC-res[1]<=0.1))  
+  
+    x_grid = [0,1,1.5,2]
+    y_grid = [4,6,7]
+    z_grid = [1,2,3.5,4]
+    ndim = 3
+    m = 2
+    
+    DM.rng(1)
+    
+    for i in range(10):
+
+        interp = interpolant("test","linear",[x_grid,y_grid,z_grid],np.array(DM.rand(len(x_grid)*len(y_grid)*len(z_grid)*m)).squeeze())
+        
+        X_bounds = list(np.sort(np.array(x_grid[0]-1+DM.rand(2)*(x_grid[1]-x_grid[0]+1)).squeeze()))
+        Y_bounds = list(np.sort(np.array(y_grid[0]-1+DM.rand(2)*(y_grid[1]-y_grid[0]+1)).squeeze()))
+        Z_bounds = list(np.sort(np.array(z_grid[0]-1+DM.rand(2)*(z_grid[1]-z_grid[0]+1)).squeeze()))
+        
+        alpha = DM.rand(ndim,100000)
+
+        X_MC = X_bounds[0]*alpha[0,:]+X_bounds[1]*(1-alpha[0,:])
+        Y_MC = Y_bounds[0]*alpha[1,:]+Y_bounds[1]*(1-alpha[1,:])
+        Z_MC = Z_bounds[0]*alpha[1,:]+Z_bounds[1]*(1-alpha[1,:])
+
+        interior = vertcat(X_MC,Y_MC,Z_MC)
+
+        r = interp(interior)
+        min_MC = np.min(r,axis=1)
+        max_MC = np.max(r,axis=1)
+        
+        print("MC",min_MC,max_MC)
+
+        x = MX.sym("x",ndim)
+
+        f = Function("f",[x],[interp(x)])
+
+        fp = f.interval_propagator()
+
+        res = fp(vertcat(X_bounds[0],Y_bounds[0],Z_bounds[0]),vertcat(X_bounds[1],Y_bounds[1],Z_bounds[1]))
+        
+        print("res",res)
+        self.assertTrue(np.all(res[0]<=min_MC))
+        self.assertTrue(np.all(res[1]>=max_MC))
+        
+        
+        interior_x_grid = [e for e in x_grid if e>X_bounds[0] and e<X_bounds[1]]
+        interior_y_grid = [e for e in y_grid if e>Y_bounds[0] and e<Y_bounds[1]]
+        interior_z_grid = [e for e in z_grid if e>Z_bounds[0] and e<Z_bounds[1]]
+        
+        def cartesian_product(a,b,c):
+            knots_X,knots_Y,knots_Z = np.meshgrid(a,b,c)
+            return vertcat(vec(knots_X.flatten()).T,vec(knots_Y.flatten()).T,vec(knots_Z.flatten()).T)
+
+        critical_points = cartesian_product(interior_x_grid+X_bounds,interior_y_grid+Y_bounds,interior_z_grid+Z_bounds)
+        r = interp(critical_points)
+        min_C = np.min(r,axis=1)
+        max_C = np.max(r,axis=1)
+        print("C",min_C,max_C)
+        
+        
+        self.checkarray(min_C,res[0])
+        self.checkarray(max_C,res[1])
+        
+        # Monte Carlo results should not be too far off
+        #self.assertTrue(np.all(min_MC-res[0]<=0.1))
+        #self.assertTrue(np.all(max_MC-res[1]<=0.1))
+        
+        
+
+  @memory_heavy()
+  def test_interval_propagator(self):
+    import itertools
+  
+    a = MX.sym("a")
+    b = MX.sym("b")
+    
+    f1 = Function('f1',[a,b],[a<b])
+    f2 = Function('f2',[a,b],[logic_not(a>=b)])
+    self.checkfunction_light(f1,f2,inputs=[2,2])
+    
+    args = [a,b]
+    
+    grid = [[0, 1, 3]]
+    values = [2, 5, 3]
+    Fint = interpolant('F', 'linear', grid, values)
+    
+    print(Fint)
+    
+    fp = Fint.interval_propagator({"print_instructions":False})
+    
+    print(fp)
+    
+    print(fp(0.2,0.5))
+    
+    print(Fint(0.2),Fint(0.5))
+
+    Fint_clip = interpolant('Fclip', 'linear', grid, values,{"extrapolation_mode": ["clip"]})
+    
+    def atomic_tests():
+      yield (1, lambda a: if_else(a>0,2*a,0),[
+        [[[-4,3]],[[0,6]]],
+      ])
+
+      yield (1, lambda a: if_else(a<0,2*a,0),[
+        [[[-4,3]],[[-8,0]]],
+      ])
+
+      yield (1, lambda a: if_else(a>=0,2*a,0),[
+        [[[-4,3]],[[0,6]]],
+      ])
+
+      yield (1, lambda a: if_else(a<=0,2*a,0),[
+        [[[-4,3]],[[-8,0]]],
+      ])
+
+      yield (1, lambda a: if_else(a>1,2*a-5,0),[
+        [[[-4,3]],[[2*1-5,2*3-5]]],
+      ])
+
+      yield (1, lambda a: if_else(a<1,2*a,0),[
+        [[[-4,3]],[[-8,2]]],
+      ])
+
+      yield (1, lambda a: if_else(a>=1,2*a-5,0),[
+        [[[-4,3]],[[2*1-5,2*3-5]]],
+      ])
+
+      yield (1, lambda a: if_else(a<=1,2*a,0),[
+        [[[-4,3]],[[-8,2]]],
+      ])
+      
+      yield (2,lambda a,b: a.__class__(vcat([7,9,6,8,3,a,4,5,10,6]))[b],[
+        [[[6,6],[0,0]],[[7,7]]],
+        [[[8.5,8.5],[5,5]],[[8.5,8.5]]],
+        [[[6,6],[1,3]],[[6,9]]],
+        [[[60,60],[1,6]],[[3,60]]],
+        [[[-60,-60],[1,6]],[[-60,9]]],
+        [[[-60,80],[1,6]],[[-60,80]]],
+        [[[-60,80],[1,3]],[[6,9]]],
+      ])
+
+      yield (1,lambda a: Fint(a),[
+        # Exact
+        [[[1,1]],[[5,5]]],
+        [[[0.5,0.5]],[[3.5,3.5]]],
+        
+        # Not touching any knots
+        [[[0.2,0.5]],[[float(Fint(0.2)),float(Fint(0.5))]]],
+        [[[-0.6,-0.3]],[[float(Fint(-0.6)),float(Fint(-0.3))]]],
+        
+        # Extrapolate
+        [[[-10,1]],[[-28,5]]],
+        [[[1,10]],[[-4,5]]],
+        
+        # Touching a knot
+        [[[0.9,1]],[[float(Fint(0.9)),float(Fint(1))]]],
+        
+      ])
+      
+      yield (1,lambda a: Fint_clip(a),[
+        # Exact
+        [[[1,1]],[[5,5]]],
+        [[[0.5,0.5]],[[3.5,3.5]]],
+        
+        # Not touching any knots
+        [[[0.2,0.5]],[[float(Fint(0.2)),float(Fint(0.5))]]],
+        [[[-0.6,-0.3]],[[float(Fint(0)),float(Fint(0))]]],
+        
+        # Touching a knot
+        [[[0.9,1]],[[float(Fint(0.9)),float(Fint(1))]]],
+        
+        # Extrapolate: clip
+        [[[-10,1]],[[2,5]]],
+        [[[1,10]],[[3,5]]],
+             
+      ])
+      
+      yield (1,lambda a: sign(a),[
+        [[[0,0]],[[0,0]]],
+        [[[-1,-0.5]],[[-1,-1]]],
+        [[[0.5,1]],[[1,1]]],
+        [[[0,1]],[[0,1]]],
+        [[[-1,0]],[[-1,0]]],
+        [[[-1,1]],[[-1,1]]],
+      ])
+      yield (1,lambda a: 2*a, [[[[1,2]],[[2,4]]],
+        [[[-2,-1]],[[-4,-2]]],
+        [[[2,2]],[[4,4]]]])
+      # OP_NEG
+      yield (1, lambda a: -a, [
+          # positive intervals
+          [[[2, 5]], [[-5, -2]]],
+          [[[0.5, 3]], [[-3, -0.5]]],
+          [[[10, 10]], [[-10, -10]]],
+          # negative intervals
+          [[[-4, -1]], [[1, 4]]],
+          [[[-7, -3]], [[3, 7]]],
+          [[[-10, -10]], [[10, 10]]],
+          # intervals containing zero
+          [[[-3, 7]], [[-7, 3]]],
+          [[[-5, 5]], [[-5, 5]]],
+          [[[-2, 0]], [[0, 2]]],
+          [[[0, 8]], [[-8, 0]]],
+          [[[0, 0]], [[0, 0]]]
+      ])
+      yield (1,lambda a: low(a.__class__([0,1,2,3]),a),[[[[1,2]],[[1,2]]],
+        [[[1,2.5]],[[1,2]]],
+        [[[0.5,2.5]],[[0,2]]],
+        [[[0,3]],[[0,2]]],
+        [[[1,1]],[[1,1]]]])
+      yield (2,lambda a,b: low(horzcat(0,1,a,3,4),b),[[[[2,2],[2,3]],[[2,3]]],
+        [[[2,2],[1,2.5]],[[1,2]]],
+        [[[2,2],[1.5,3.5]],[[1,3]]],
+        [[[2,2],[1,4]],[[1,3]]],
+        [[[2,2],[2,2]],[[2,2]]]])
+        #[[[1.2,2],[2,3]],[[2,3]]],
+        #[[[1.2,2],[2,3.5]],[[2,3]]],
+        #[[[1.2,2],[1.5,3.5]],[[1,3]]],
+        #[[[1.2,2],[1,4]],[[1,3]]],
+        #[[[1.2,2],[2,2]],[[2,2]]]])
+      yield (1,lambda a: sqrt(a), [[[[1,2]],[[1,sqrt(2)]]],
+        [[[0,0]],[[0,0]]],
+        [[[0,5]],[[0,sqrt(5)]]],
+        [[[4,9]],[[2,3]]],
+        [[[2,2]],[[sqrt(2),sqrt(2)]]]])
+      yield (2,lambda a,b: fmax(a,b), [[[[1,2],[3,4]],[[3,4]]],
+        [[[0,0],[1,1]],[[1,1]]],
+        [[[0,2],[1,3]],[[1,3]]],
+        [[[0,3],[1,2]],[[1,3]]],
+        [[[2,2],[3,4]],[[3,4]]],
+        [[[3,4],[2,2]],[[3,4]]]])
+      yield (2,lambda a,b: fmin(a,b), [[[[1,2],[3,4]],[[1,2]]],
+        [[[0,0],[1,1]],[[0,0]]],
+        [[[0,2],[1,3]],[[0,2]]],
+        [[[0,3],[1,2]],[[0,2]]],
+        [[[2,2],[3,4]],[[2,2]]],
+        [[[3,4],[2,2]],[[2,2]]]])
+      yield (2,lambda a,b: a-b, [[[[1,2],[3,4]],[[-3,-1]]],
+        [[[0,0],[1,1]],[[-1,-1]]],
+        [[[2,2],[3,4]],[[-2,-1]]],
+        [[[3,4],[2,2]],[[1,2]]]])
+      yield (2,lambda a,b: a<=b, [[[[0,1],[3,4]],[[1,1]]],
+        [[[3,4],[0,1]],[[0,0]]],
+        [[[1,4],[2,3]],[[0,1]]],
+        [[[1,3],[2,4]],[[0,1]]],
+        [[[1,3],[0,2]],[[0,1]]],
+        [[[0,0],[1,1]],[[1,1]]],
+        [[[1,1],[0,0]],[[0,0]]],
+        [[[1,1],[1,1]],[[1,1]]],
+        [[[0,1],[1,2]],[[1,1]]],
+        [[[1,2],[0,1]],[[0,1]]]])
+      yield (2,lambda a,b: a<b, [[[[0,1],[3,4]],[[1,1]]],
+        [[[3,4],[0,1]],[[0,0]]],
+        [[[1,4],[2,3]],[[0,1]]],
+        [[[1,3],[2,4]],[[0,1]]],
+        [[[1,3],[0,2]],[[0,1]]],
+        [[[0,0],[1,1]],[[1,1]]],
+        [[[1,1],[0,0]],[[0,0]]],
+        [[[1,1],[1,1]],[[0,0]]],
+        [[[0,1],[1,2]],[[0,1]]],
+        [[[1,2],[0,1]],[[0,0]]]])
+      yield (2,lambda a,b: a==b, [[[[0,1],[3,4]],[[0,0]]],
+        [[[3,4],[0,1]],[[0,0]]],
+        [[[1,4],[2,3]],[[0,1]]],
+        [[[1,3],[2,4]],[[0,1]]],
+        [[[1,3],[0,2]],[[0,1]]],
+        [[[0,0],[1,1]],[[0,0]]],
+        [[[1,1],[0,0]],[[0,0]]],
+        [[[1,1],[1,1]],[[1,1]]],
+        [[[0,1],[1,2]],[[0,1]]],
+        [[[1,2],[0,1]],[[0,1]]]])
+      yield (2,lambda a,b: a!=b, [[[[0,1],[3,4]],[[1,1]]],
+        [[[3,4],[0,1]],[[1,1]]],
+        [[[1,4],[2,3]],[[0,1]]],
+        [[[1,3],[2,4]],[[0,1]]],
+        [[[1,3],[0,2]],[[0,1]]],
+        [[[0,0],[1,1]],[[1,1]]],
+        [[[1,1],[0,0]],[[1,1]]],
+        [[[1,1],[1,1]],[[0,0]]],
+        [[[0,1],[1,2]],[[0,1]]],
+        [[[1,2],[0,1]],[[0,1]]]])
+      yield (1,lambda a: logic_not(a), [[[[0,1]],[[0,1]]],
+        [[[0,0]],[[1,1]]],
+        [[[2,2]],[[0,0]]],
+        [[[1,1]],[[0,0]]],
+        [[[-1,1]],[[0,1]]],
+        [[[2,3]],[[0,0]]],
+        [[[0,0.5]],[[0,1]]]])
+      yield (2,lambda a,b: logic_and(a,b), [[[[0,1],[3,4]],[[0,1]]],
+        [[[3,4],[0,1]],[[0,1]]],
+        [[[1,4],[2,3]],[[1,1]]],
+        [[[1,3],[2,4]],[[1,1]]],
+        [[[1,3],[0,2]],[[0,1]]],
+        [[[-1,1],[1,2]],[[0,1]]],
+        [[[1,2],[-1,1]],[[0,1]]],
+        [[[-1,1],[-1,1]],[[0,1]]],
+        [[[0,0],[0,5]],[[0,0]]],
+        [[[0,5],[0,0]],[[0,0]]],
+        [[[0,5],[0,5]],[[0,1]]],
+        [[[0,0],[1,1]],[[0,0]]],
+        [[[1,1],[0,0]],[[0,0]]],
+        [[[1,1],[1,1]],[[1,1]]],
+        [[[0,1],[1,2]],[[0,1]]],
+        [[[1,2],[0,1]],[[0,1]]]])
+      yield (2,lambda a,b: logic_or(a,b), [[[[0,1],[3,4]],[[1,1]]],
+        [[[3,4],[0,1]],[[1,1]]],
+        [[[1,4],[2,3]],[[1,1]]],
+        [[[1,3],[2,4]],[[1,1]]],
+        [[[1,3],[0,2]],[[1,1]]],
+        [[[-1,1],[1,2]],[[1,1]]],
+        [[[1,2],[-1,1]],[[1,1]]],
+        [[[-1,1],[-1,1]],[[0,1]]],
+        [[[0,0],[0,5]],[[0,1]]],
+        [[[0,5],[0,0]],[[0,1]]],
+        [[[0,5],[0,5]],[[0,1]]],
+        [[[0,0],[0,0]],[[0,0]]],
+        [[[0,0],[1,1]],[[1,1]]],
+        [[[1,1],[0,0]],[[1,1]]],
+        [[[1,1],[1,1]],[[1,1]]],
+        [[[0,1],[1,2]],[[1,1]]],
+        [[[1,2],[0,1]],[[1,1]]]])
+      yield (2,lambda a,b: if_else(a,b,0), [[[[0,1],[3,4]],[[0,4]]],
+        [[[3,4],[0,1]],[[0,1]]],
+        [[[1,4],[2,3]],[[2,3]]],
+        [[[1,3],[2,4]],[[2,4]]],
+        [[[1,3],[0,2]],[[0,2]]],
+        [[[-1,1],[1,2]],[[0,2]]],
+        [[[-1,1],[-2,-1]],[[-2,0]]],
+        [[[1,2],[-1,1]],[[-1,1]]],
+        [[[-1,1],[-1,1]],[[-1,1]]],
+        [[[0,0],[0,5]],[[0,0]]],
+        [[[0,5],[0,0]],[[0,0]]],
+        [[[0,5],[0,5]],[[0,5]]],
+        [[[0,0],[0,0]],[[0,0]]],
+        [[[0,0],[1,1]],[[0,0]]],
+        [[[1,1],[0,0]],[[0,0]]],
+        [[[1,1],[1,1]],[[1,1]]],
+        [[[0,1],[1,2]],[[0,2]]],
+        [[[1,2],[0,1]],[[0,1]]]
+      ])
+
+      # OP_COS
+      yield (1, lambda a: cos(a), [
+          # basic intervals
+          [[[0, pi/3]], [[0.5, 1]]],
+          [[[pi/4, 3*pi/4]], [[-sqrt(2)*0.5, sqrt(2)*0.5]]],
+          [[[pi/2, 3*pi/2]], [[-1, 0]]],
+          [[[0, 0]], [[1, 1]]],
+          [[[pi, pi]], [[-1, -1]]],
+          # intervals spanning multiple periods
+          [[[0, 2*pi]], [[-1, 1]]],
+          [[[0, 4*pi]], [[-1, 1]]],
+          [[[pi/6, 2*pi + pi/6]], [[-1, 1]]],
+          # intervals with specific properties
+          [[[0, pi]], [[-1, 1]]],
+          [[[pi, 2*pi]], [[-1, 1]]],
+          [[[pi/2, pi]], [[-1, 0]]],
+          [[[0, pi/2]], [[0, 1]]],
+          # small intervals
+          [[[pi/4, pi/3]], [[0.5, sqrt(2)*0.5]]],
+          [[[5*pi/4, 4*pi/3]], [[-sqrt(2)*0.5, -0.5]]],
+          [[[pi - 0.1, pi + 0.1]], [[-1, cos(pi - 0.1)]]],
+          [[[2*pi - 0.1, 2*pi + 0.1]], [[cos(2*pi - 0.1), 1]]]
+      ])
+
+      # OP_SQ
+      yield (1, lambda a: a**2,  [
+          # positive intervals
+          [[[2, 5]], [[4, 25]]],
+          [[[0.5, 3]], [[0.25, 9]]],
+          [[[10, 10]], [[100, 100]]],
+          # negative intervals
+          [[[-4, -1]], [[1, 16]]],
+          [[[-7, -3]], [[9, 49]]],
+          [[[-10, -10]], [[100, 100]]],
+          # intervals containing zero
+          [[[-3, 7]], [[0, 49]]],
+          [[[-5, 5]], [[0, 25]]],
+          [[[-8, 5]], [[0, 64]]],
+          [[[-2, 0]], [[0, 4]]],
+          [[[0, 8]], [[0, 64]]],
+          [[[0, 0]], [[0, 0]]],
+          # special cases
+          [[[-0.5, 0.5]], [[0, 0.25]]],
+          [[[-0.1, 0.2]], [[0, 0.04]]],
+      ])
+
+      # OP_EXP
+      yield (1, lambda a: exp(a),  [
+          # positive intervals
+          [[[2, 5]], [[exp(2), exp(5)]]],
+          [[[0.5, 3]], [[exp(0.5), exp(3)]]],
+          [[[10, 10]], [[exp(10), exp(10)]]],
+          # negative intervals
+          [[[-4, -1]], [[exp(-4), exp(-1)]]],
+          [[[-7, -3]], [[exp(-7), exp(-3)]]],
+          [[[-10, -10]], [[exp(-10), exp(-10)]]],
+          # intervals containing zero
+          [[[-3, 7]], [[exp(-3), exp(7)]]],
+          [[[-5, 5]], [[exp(-5), exp(5)]]],
+          [[[-8, 5]], [[exp(-8), exp(5)]]],
+          [[[-2, 0]], [[exp(-2), exp(0)]]],
+          [[[0, 8]], [[exp(0), exp(8)]]],
+          [[[0, 0]], [[exp(0), exp(0)]]],
+      ])
+      # OP_FABS
+      yield (1, lambda a: fabs(a),  [
+          # positive intervals
+          [[[2, 5]], [[2, 5]]],
+          [[[0.5, 3]], [[0.5, 3]]],
+          [[[10, 10]], [[10, 10]]],
+          # negative intervals
+          [[[-4, -1]], [[1, 4]]],
+          [[[-7, -3]], [[3, 7]]],
+          [[[-10, -10]], [[10,10]]],
+          # intervals containing zero
+          [[[-3, 7]], [[0, 7]]],
+          [[[-5, 5]], [[0, 5]]],
+          [[[-8, 5]], [[0, 8]]],
+          [[[-2, 0]], [[0, 2]]],
+          [[[0, 8]], [[0, 8]]],
+          [[[0, 0]], [[0, 0]]],
+      ])
+      # OP_MUL
+      yield (2, lambda a,b: a*b,  [
+          # intervals containing zero
+          [[[-3, 7],[-3, 7]], [[-21, 49]]],
+          [[[-5, 5],[-5, 5]], [[-25, 25]]],
+          [[[-8, 5],[-8, 5]], [[-40, 64]]],
+          [[[-2, 0],[-2, 0]], [[0, 4]]],
+          [[[0, 8],[0, 8]], [[0, 64]]],
+          [[[0, 0],[0,0]], [[0, 0]]],
+          [[[-3, 7],[-2, 6]], [[-18, 42]]],
+          [[[-5, 5],[-4, 4]], [[-20, 20]]],
+          [[[-8, 5],[-7, 4]], [[-35, 56]]],
+          [[[-2, 0],[-1, 0]], [[0, 2]]],
+          [[[0, 8],[0, 7]], [[0, 56]]],
+          [[[0, 0],[0,0]], [[0, 0]]],
+      ])
+      
+      # OP_SIN
+      yield (1, lambda a: sin(a), [
+          # small positive intervals
+          [[[0, pi/4]], [[0, sin(pi/4)]]],
+          [[[pi/4, pi/2]], [[sin(pi/4), 1.0]]],
+          [[[pi/2, 3*pi/4]], [[sin(3*pi/4), 1.0]]],
+          [[[3*pi/4, pi]], [[0, sin(3*pi/4)]]],
+          # intervals containing critical points
+          [[[pi/4, 3*pi/4]], [[sin(pi/4), 1.0]]],
+          [[[3*pi/4, 5*pi/4]], [[-sin(3*pi/4), sin(3*pi/4)]]],
+          [[[5*pi/4, 7*pi/4]], [[-1.0, sin(5*pi/4)]]],
+          [[[7*pi/4, 9*pi/4]], [[-sin(pi/4), sin(pi/4)]]],
+          # intervals spanning full periods
+          [[[0, 2*pi]], [[-1.0, 1.0]]],
+          [[[0, 3*pi]], [[-1.0, 1.0]]],
+          [[[0, 4*pi]], [[-1.0, 1.0]]],
+          [[[-pi, 3*pi]], [[-1.0, 1.0]]],
+          # intervals in negative domain
+          [[[-pi/4, 0]], [[-sin(pi/4), 0]]],
+          [[[-pi/2, -pi/4]], [[-1.0, -sin(pi/4)]]],
+          [[[-pi, -pi/2]], [[-1.0, 0]]],
+          [[[-3*pi/2, -pi]], [[-0, 1.0]]],
+          # intervals spanning zero
+          [[[-pi/6, pi/6]], [[-sin(pi/6), sin(pi/6)]]],
+          [[[-pi/4, pi/4]], [[-sin(pi/4), sin(pi/4)]]],
+          [[[-pi/2, pi/2]], [[-1.0, 1.0]]],
+          [[[-pi, pi]], [[-1.0, 1.0]]],
+      ])
+
+      # OP_ASIN
+      yield (1, lambda a: asin(a), [
+          # standard intervals
+          [[[-0.5, 0.5]], [[asin(-0.5), asin(0.5)]]],
+          [[[0.1, 0.7]], [[asin(0.1), asin(0.7)]]],
+          [[[-0.8, -0.2]], [[asin(-0.8), asin(-0.2)]]],
+          [[[0.0, 0.0]], [[0.0, 0.0]]],
+          # boundary casea
+          [[[-1.0, -0.9]], [[asin(-1.0), asin(-0.9)]]],
+          [[[0.9, 1.0]], [[asin(0.9), asin(1.0)]]],
+          # domain intervals
+          [[[-1.0, 1.0]], [[-pi/2, pi/2]]],
+          [[[-1.0, 0.0]], [[-pi/2, 0.0]]],
+          [[[0.0, 1.0]], [[0.0, pi/2]]],
+          # special values
+          [[[0.5, 0.5]], [[pi/6, pi/6]]],
+          [[[1/sqrt(2), 1/sqrt(2)]], [[pi/4, pi/4]]],
+      ])
+
+      # OP_ACOS
+      yield (1, lambda a: acos(a), [
+          # standard intervals
+          [[[-0.5, 0.5]], [[acos(0.5), acos(-0.5)]]],
+          [[[0.1, 0.7]], [[acos(0.7), acos(0.1)]]],
+          [[[-0.8, -0.2]], [[acos(-0.2), acos(-0.8)]]],
+          [[[0.0, 0.0]], [[pi/2, pi/2]]],
+          # boundary cases
+          [[[-1.0, -0.9]], [[acos(-0.9), acos(-1.0)]]],
+          [[[0.9, 1.0]], [[acos(1.0), acos(0.9)]]],
+          # domain intervals
+          [[[-1.0, 1.0]], [[0.0, pi]]],
+          [[[-1.0, 0.0]], [[pi/2, pi]]],
+          [[[0.0, 1.0]], [[0.0, pi/2]]],
+          # special values
+          [[[0.5, 0.5]], [[pi/3, pi/3]]],
+          [[[0.0, 0.0]], [[pi/2, pi/2]]],
+          [[[1/sqrt(2), 1/sqrt(2)]], [[pi/4, pi/4]]],
+          [[[1.0, 1.0]], [[0.0, 0.0]]],
+          [[[-1.0, -1.0]], [[pi, pi]]],
+      ])
+
+      # OP_LOG
+      yield (1, lambda a: log(a),  [
+          # positive intervals
+          [[[2, 5]], [[log(2), log(5)]]],
+          [[[0.5, 3]], [[log(0.5), log(3)]]],
+          [[[10, 10]], [[log(10), log(10)]]],
+          # negative intervals
+          [[[-4, -1]], [[np.nan, np.nan]]],
+          [[[-7, -3]], [[np.nan, np.nan]]],
+          [[[-10, -10]], [[np.nan,np.nan]]],
+          # intervals containing zero
+          [[[-3, 7]], [[np.nan, np.nan]]],
+          [[[-5, 5]], [[np.nan, np.nan]]],
+          [[[-8, 5]], [[np.nan, np.nan]]],
+          [[[-2, 0]], [[np.nan, np.nan]]],
+          [[[0, 8]], [[-np.inf, log(8)]]],
+          [[[0, 0]], [[-np.inf, -np.inf]]],
+      ])
+
+      # OP_LOG
+      yield (1, lambda a: log1p(a),  [
+          # positive intervals
+          [[[2, 5]], [[log1p(2), log1p(5)]]],
+          [[[0.5, 3]], [[log1p(0.5), log1p(3)]]],
+          [[[10, 10]], [[log1p(10), log1p(10)]]],
+          # negative intervals
+          [[[-4, -1]], [[np.nan, np.nan]]],
+          [[[-7, -3]], [[np.nan, np.nan]]],
+          [[[-10, -10]], [[np.nan,np.nan]]],
+          # intervals containing zero
+          [[[-3, 7]], [[np.nan, np.nan]]],
+          [[[-5, 5]], [[np.nan, np.nan]]],
+          [[[-8, 5]], [[np.nan, np.nan]]],
+          [[[-2, 0]], [[np.nan, np.nan]]],
+          [[[0, 8]], [[log1p(0), log1p(8)]]],
+          [[[0, 0]], [[log1p(0), log1p(0)]]],
+          # intervals containing -1
+          [[[-3, 7]], [[np.nan, np.nan]]],
+          [[[-5, 5]], [[np.nan, np.nan]]],
+          [[[-8, 5]], [[np.nan, np.nan]]],
+          [[[-2, -1]], [[np.nan, np.nan]]],
+          [[[-1, 8]], [[-np.inf, log1p(8)]]],
+          [[[-1, -1]], [[-np.inf, -np.inf]]],
+      ])
+
+    for n_in,fun, numeric_tests in atomic_tests():
+      
+      f = Function('ff',args[:n_in],[fun(*args[:n_in])])
+      #f.generate('f.c')
+
+      fp = f.interval_propagator({"print_instructions":True})
+      
+      #fp.generate('fp.c')
+      
+      def sample_interval(lo,hi):
+        ret = []
+        ret = [float((1-alpha)*lo+alpha*hi) for alpha in np.linspace(0,1,9)]
+        # Make sure some special points are present if they are in the interval interior
+        for e in [0,1,1+1e-15,1-1e-15]:
+          if e>lo and e<hi:
+            ret.append(e)
+        print("ret",ret)
+        # More special points (integer multiples of pi/2)
+        for i in range(-10,10):
+          e = i*pi/2
+          if e>lo and e<hi:
+            ret.append(e)
+        return ret
+        
+    
+      for int_in, int_out in numeric_tests:
+          extended = [sample_interval(e[0],e[1]) for e in int_in]
+          
+          sample_out = [f.call(sample_in) for sample_in in itertools.product(*extended)]
+          empirical_res = [[float(min(e[i] for e in sample_out)),float(max(e[i] for e in sample_out))] for i in range(f.n_out())]
+          
+          print("sample_out",sample_out)
+          print("empirical_res",empirical_res)
+          print("int_out",int_out)
+          
+          for i in range(len(int_out)):
+            self.checkarray(empirical_res[i],int_out[i],digits=12,failmessage=str(int_in))
+          
+          res = fp.call([e[0] for e in int_in]+[e[1] for e in int_in])
+          res_ref = [e[0] for e in int_out]+[e[1] for e in int_out]
+          print([e[0] for e in int_in]+[e[1] for e in int_in])
+          #print(fp(SX.sym("L1"),SX.sym("L2"),SX.sym("R1"),SX.sym("R2")))
+          print(res,"ref",res_ref)
+          self.assertEqual(len(res_ref),len(res))
+
+          for i in range(len(res_ref)):
+            self.checkarray(res[i],res_ref[i],digits=12,failmessage=str(int_in))
+         
+    f = Function('f',[a,b],[(a+b)*b,a-b])
+    
+    fp = f.interval_propagator()
+    print(fp(1,3,2,4))
+      
+    a = MX.sym("a")
+    b = MX.sym("b")
+    
+    [c,d] = f(7*a,3*b)
+    
+    g = Function('g',[a,b],[c+d,c])
+    
+    gp = g.interval_propagator()
+    
+    print(gp(1,3,2,4))
+      
+    a = MX.sym("a",2,2)
+    b = MX.sym("b",2,2)
+    
+    f = Function('f',[a],[5*a.T])
+    fp = f.interval_propagator()
+    print(fp(DM([[1,2],[3,4]]),DM([[1.1,2.1],[3.1,4.1]])))
+    
+    
+    a = MX.sym("a",2,2)
+    b = MX.sym("b",2,2)
+    
+    DM.rng(0)
+    a_L = DM.rand(2,2)-1
+    a_R = DM.rand(2,2)+1
+    b_L = DM.rand(2,2)-2
+    b_R = DM.rand(2,2)+2
+    args = [a,b]
+    args_L = [a_L,b_L]
+    args_R = [a_R,b_R]
+    
+    
+    def reshuffle_tests():
+      yield (2,lambda a,b: vertcat(a,b))
+      yield (2,lambda a,b: horzcat(a,b))
+      yield (1,lambda a: a.T)
+      yield (1,lambda a: a[0,0])
+      yield (1,lambda a: a[0,:])
+      yield (1,lambda a: a[:,0])
+      yield (1,lambda a: repmat(a,2,3))
+      yield (1,lambda a: reshape(a,1,4))
+      yield (1,lambda a: a.monitor("a"))
+      yield (1,lambda a: vertsplit(a,1)[0])
+      yield (1,lambda a: horzsplit(a,1)[0])
+      yield (1,lambda a: sparsity_cast(a,Sparsity.dense(1,4)))
+    for n_in,fun in reshuffle_tests():
+      
+      f = Function('f',args[:n_in],[fun(*args[:n_in])])
+
+      fp = f.interval_propagator()
+      
+      [L,R] = fp.call(args_L[:n_in]+args_R[:n_in])
+      
+      self.checkarray(f.call(args_L[:n_in])[0],L)
+      self.checkarray(f.call(args_R[:n_in])[0],R)
+    
+    DM.rng(1)
+    A = MX.sym("A",2,3)
+    B = MX.sym("B",3,4)
+    
+    Apoints = [DM.rand(A.sparsity()), DM.rand(A.sparsity())]
+    Bpoints = [DM.rand(B.sparsity()), DM.rand(B.sparsity())]
+    
+    AL = fmin(*Apoints)
+    AR = fmax(*Apoints)
+    
+    BL = fmin(*Bpoints)
+    BR = fmax(*Bpoints)
+
+    f = Function('f',[A,B],[mtimes(A,B)])
+    f_intprop = f.interval_propagator()
+    
+    f_intprop2 = f.expand().interval_propagator()
+    
+    self.checkfunction_light(f_intprop,f_intprop2,inputs=[AL,BL,AR,BR])
+
 if __name__ == '__main__':
     unittest.main()   

@@ -88,6 +88,8 @@ namespace casadi {
     /// Evaluate numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
+    Function get_interval_propagator(const Dict& opts) const override;
+
     ///@{
     /** \brief Full Jacobian */
     bool has_jacobian() const override { return true;}

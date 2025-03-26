@@ -27,6 +27,7 @@
 #define CASADI_MULTIPLICATION_HPP
 
 #include "mx_node.hpp"
+#include "multiple_output.hpp"
 
 /// \cond INTERNAL
 
@@ -86,6 +87,10 @@ namespace casadi {
         \identifier{28a} */
     void eval_linear(const std::vector<std::array<MX, 3> >& arg,
                         std::vector<std::array<MX, 3> >& res) const override;
+
+    /** \brief Interval calculus propagation rule */
+    virtual void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -187,7 +192,34 @@ namespace casadi {
         \identifier{122} */
     explicit DenseMultiplication(DeserializingStream& s) : Multiplication(s) {}
   };
+  class CASADI_EXPORT MultiplicationIntProp : public MultipleOutput {
+    public:
 
+      /** \brief  Constructor */
+      MultiplicationIntProp(const MX& zL, const MX& xL, const MX& yL, const MX& zR, const MX& xR, const MX& yR);
+
+      /** \brief  Destructor */
+      ~MultiplicationIntProp() override {}
+
+      /** \brief  Number of outputs */
+      casadi_int nout() const override { return 2; }
+
+      /** \brief  Get the sparsity of output oind */
+      const Sparsity& sparsity(casadi_int oind) const override { return sparsity_;}
+
+      /** \brief  Print expression */
+      std::string disp(const std::vector<std::string>& arg) const override;
+
+      /// Evaluate the function numerically
+      int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+      /** \brief Get the operation */
+      casadi_int op() const override { return OP_MTIMES;}
+
+      /** \brief Get required length of w field  */
+      size_t sz_w() const override { return 2*sparsity_.size1();}
+
+  };
 
 } // namespace casadi
 /// \endcond

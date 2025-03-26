@@ -56,6 +56,10 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
+    /** \brief Interval calculus propagation rule */
+    void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const;
+
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{15i} */

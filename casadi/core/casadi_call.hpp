@@ -110,6 +110,10 @@ namespace casadi {
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
         const std::vector<bool>& unique={}) const override;
 
+    /** \brief Interval calculus propagation rule */
+    void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const override;
+
     /** \brief Calculate forward mode directional derivatives
 
         \identifier{6t} */

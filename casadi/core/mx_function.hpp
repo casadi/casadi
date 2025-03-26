@@ -309,6 +309,8 @@ namespace casadi {
     void export_code_body(const std::string& lang,
       std::ostream &stream, const Dict& options) const override;
 
+    Function get_interval_propagator(const Dict& opts) const override;
+
     /// Substitute inplace, internal implementation
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;
 
@@ -325,6 +327,9 @@ namespace casadi {
 
         \identifier{2y} */
     explicit MXFunction(DeserializingStream& s);
+
+    Function prepare_interval_propagator(const Dict& opts) const;
+    Function get_interval_propagator_internal(const Dict& opts) const;
   };
 
 } // namespace casadi

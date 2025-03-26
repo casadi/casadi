@@ -1125,6 +1125,114 @@ namespace casadi {
   template<typename T>
   struct casadi_math {
 
+    static inline std::string op_as_string(unsigned char op) {
+      switch (op) {
+        case OP_ASSIGN: return "OP_ASSIGN";
+        case OP_ADD: return "OP_ADD";
+        case OP_SUB: return "OP_SUB";
+        case OP_MUL: return "OP_MUL";
+        case OP_DIV: return "OP_DIV";
+        case OP_NEG: return "OP_NEG";
+        case OP_EXP: return "OP_EXP";
+        case OP_LOG: return "OP_LOG";
+        case OP_POW: return "OP_POW";
+        case OP_CONSTPOW: return "OP_CONSTPOW";
+        case OP_SQRT: return "OP_SQRT";
+        case OP_SQ: return "OP_SQ";
+        case OP_TWICE: return "OP_TWICE";
+        case OP_SIN: return "OP_SIN";
+        case OP_COS: return "OP_COS";
+        case OP_TAN: return "OP_TAN";
+        case OP_ASIN: return "OP_ASIN";
+        case OP_ACOS: return "OP_ACOS";
+        case OP_ATAN: return "OP_ATAN";
+        case OP_LT: return "OP_LT";
+        case OP_LE: return "OP_LE";
+        case OP_EQ: return "OP_EQ";
+        case OP_NE: return "OP_NE";
+        case OP_NOT: return "OP_NOT";
+        case OP_AND: return "OP_AND";
+        case OP_OR: return "OP_OR";
+        case OP_FLOOR: return "OP_FLOOR";
+        case OP_CEIL: return "OP_CEIL";
+        case OP_FMOD: return "OP_FMOD";
+        case OP_REMAINDER: return "OP_REMAINDER";
+        case OP_FABS: return "OP_FABS";
+        case OP_SIGN: return "OP_SIGN";
+        case OP_COPYSIGN: return "OP_COPYSIGN";
+        case OP_IF_ELSE_ZERO: return "OP_IF_ELSE_ZERO";
+        case OP_ERF: return "OP_ERF";
+        case OP_FMIN: return "OP_FMIN";
+        case OP_FMAX: return "OP_FMAX";
+        case OP_INV: return "OP_INV";
+        case OP_SINH: return "OP_SINH";
+        case OP_COSH: return "OP_COSH";
+        case OP_TANH: return "OP_TANH";
+        case OP_ASINH: return "OP_ASINH";
+        case OP_ACOSH: return "OP_ACOSH";
+        case OP_ATANH: return "OP_ATANH";
+        case OP_ATAN2: return "OP_ATAN2";
+
+        case OP_CONST: return "OP_CONST";
+        case OP_INPUT: return "OP_INPUT";
+        case OP_OUTPUT: return "OP_OUTPUT";
+        case OP_PARAMETER: return "OP_PARAMETER";
+        case OP_CALL: return "OP_CALL";
+        case OP_FIND: return "OP_FIND";
+        case OP_LOW: return "OP_LOW";
+        case OP_MAP: return "OP_MAP";
+        case OP_MTIMES: return "OP_MTIMES";
+        case OP_SOLVE: return "OP_SOLVE";
+        case OP_TRANSPOSE: return "OP_TRANSPOSE";
+        case OP_DETERMINANT: return "OP_DETERMINANT";
+        case OP_INVERSE: return "OP_INVERSE";
+        case OP_DOT: return "OP_DOT";
+        case OP_BILIN: return "OP_BILIN";
+        case OP_RANK1: return "OP_RANK1";
+        case OP_HORZCAT: return "OP_HORZCAT";
+        case OP_VERTCAT: return "OP_VERTCAT";
+        case OP_DIAGCAT: return "OP_DIAGCAT";
+        case OP_HORZSPLIT: return "OP_HORZSPLIT";
+        case OP_VERTSPLIT: return "OP_VERTSPLIT";
+        case OP_DIAGSPLIT: return "OP_DIAGSPLIT";
+        case OP_RESHAPE: return "OP_RESHAPE";
+        case OP_SPARSITY_CAST: return "OP_SPARSITY_CAST";
+        case OP_SUBREF: return "OP_SUBREF";
+        case OP_SUBASSIGN: return "OP_SUBASSIGN";
+        case OP_GETNONZEROS: return "OP_GETNONZEROS";
+        case OP_GETNONZEROS_PARAM: return "OP_GETNONZEROS_PARAM";
+
+        case OP_ADDNONZEROS: return "OP_ADDNONZEROS";
+        case OP_ADDNONZEROS_PARAM: return "OP_ADDNONZEROS_PARAM";
+        case OP_SETNONZEROS: return "OP_SETNONZEROS";
+        case OP_SETNONZEROS_PARAM: return "OP_SETNONZEROS_PARAM";
+        case OP_PROJECT: return "OP_PROJECT";
+        case OP_ASSERTION: return "OP_ASSERTION";
+        case OP_MONITOR: return "OP_MONITOR";
+        case OP_NORM2: return "OP_NORM2";
+        case OP_NORM1: return "OP_NORM1";
+        case OP_NORMINF: return "OP_NORMINF";
+        case OP_NORMF: return "OP_NORMF";
+        case OP_MMIN: return "OP_MMIN";
+        case OP_MMAX: return "OP_MMAX";
+        case OP_HORZREPMAT: return "OP_HORZREPMAT";
+        case OP_HORZREPSUM: return "OP_HORZREPSUM";
+        case OP_ERFINV: return "OP_ERFINV";
+        case OP_PRINTME: return "OP_PRINTME";
+        case OP_LIFT: return "OP_LIFT";
+        case OP_EINSTEIN: return "OP_EINSTEIN";
+        case OP_BSPLINE: return "OP_BSPLINE";
+        case OP_CONVEXIFY: return "OP_CONVEXIFY";
+        case OP_LOG1P: return "OP_LOG1P";
+        case OP_EXPM1: return "OP_EXPM1";
+        case OP_HYPOT: return "OP_HYPOT";
+        case OP_LOGSUMEXP: return "OP_LOGSUMEXP";
+
+
+
+      }
+    }
+
     /** \brief Evaluate a built in function (scalar-scalar)
 
         \identifier{1g6} */
@@ -1159,6 +1267,10 @@ namespace casadi {
 
         \identifier{28f} */
     static inline void fun_linear(unsigned char op, const T*x, const T* y, T* f);
+
+    /** \brief Propagate interval */
+    static inline void propagate_interval(unsigned char op, const T& L1, const T& R1,
+        const T& L2, const T& R2, T& L, T& R);
 
     /** \brief Is binary operation?
 
@@ -1797,7 +1909,6 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     }
   }
 
-
   template<class T, typename SU>
   T common_simp_unary(casadi_int op, const T& x, casadi_int depth,
       SU&& gen_unary,
@@ -1854,7 +1965,6 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     hit = false;
     return 0;
   }
-
 
   template<class T, typename SU, typename SB>
   T common_simp_binary(casadi_int op, const T& x, const T& y, casadi_int depth,
@@ -2125,6 +2235,270 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     }
     hit = false;
     return 0;
+  }
+
+
+  template<typename T>
+  inline void casadi_math<T>::propagate_interval(unsigned char op, const T& L1, const T& R1,
+        const T& L2, const T& R2, T& L, T& R) {
+    switch (op) {
+      case OP_NEG:
+        L = -R1;
+        R = -L1;
+        break;
+      case OP_TWICE:
+        L = 2*L1;
+        R = 2*R1;
+        break;
+      case OP_FMIN:
+        L = fmin(L1, L2);
+        R = fmin(R1, R2);
+        break;
+      case OP_FMAX:
+        L = fmax(L1, L2);
+        R = fmax(R1, R2);
+        break;
+      case OP_ADD:
+        L = L1 + L2;
+        R = R1 + R2;
+        break;
+      case OP_SUB:
+        L = L1 - R2;
+        R = R1 - L2;
+        break;
+      case OP_SQRT:
+        L = sqrt(fmax(L1, 0));
+        R = sqrt(fmax(R1, 0));
+        break;
+      case OP_LE:
+        L = L2>=R1;
+        R = R2>=L1;
+        break;
+      case OP_LT:
+        L = L2>R1;
+        R = R2>L1;
+        break;
+      case OP_EQ:
+        L = logic_and(logic_and(L1==R1, L2==R2), L1==L2);
+        R = logic_and(R1>=L2, L1<=R2);
+        break;
+      case OP_NE:
+        {
+          T singular = logic_and(logic_and(L1==R1, L2==R2), L1==L2);
+          L = logic_not(logic_and(R1>=L2, L1<=R2));
+          R = logic_not(singular);
+        }
+        break;
+      case OP_NOT:
+        {
+          T contains_zero = logic_and(L1<=0, R1>=0);
+          L = logic_and(L1==R1, L1==0);
+          R = contains_zero;
+        }
+        break;
+      case OP_AND:
+        {
+          T contains_zero1 = logic_and(L1<=0, R1>=0);
+          T contains_zero2 = logic_and(L2<=0, R2>=0);
+          L = logic_not(logic_or(contains_zero1, contains_zero2));
+          R = logic_and(logic_or(L1!=R1, L1!=0), logic_or(L2!=R2, L2!=0));
+        }
+        break;
+      case OP_OR:
+        {
+          T is_zero1 = logic_and(L1==R1, L1==0);
+          T is_zero2 = logic_and(L2==R2, L2==0);
+          T contains_zero1 = logic_and(L1<=0, R1>=0);
+          T contains_zero2 = logic_and(L2<=0, R2>=0);
+          L = logic_not(logic_and(contains_zero1, contains_zero2));
+          R = logic_not(logic_and(is_zero1, is_zero2));
+        }
+        break;
+      case OP_IF_ELSE_ZERO:
+        {
+          T zero_free = logic_or(L1>0, R1<0);
+          T is_not_zero = logic_or(L1!=R1, L1!=0);
+          L = is_not_zero*fmin(if_else_zero(zero_free, L2), L2);
+          R = is_not_zero*fmax(if_else_zero(zero_free, R2), R2);
+        }
+        break;
+      case OP_FABS:
+        {
+          T zero_free = logic_or(L1>0, R1<0);
+          T L1_abs = fabs(L1);
+          T R1_abs = fabs(R1);
+          L = if_else_zero(zero_free, fmin(L1_abs, R1_abs));
+          R = fmax(L1_abs, R1_abs);
+        }
+        break;
+      case OP_SIGN:
+      {
+          L = sign(L1);
+          R = sign(R1);
+        }
+        break;
+      case OP_COS:
+        {
+          T ge_2pi = ((R1-L1)>=2*M_PI);
+          T L1_cos = cos(L1);
+          T R1_cos = cos(R1);
+          T lb = fmin(L1_cos, R1_cos);
+          T ub = fmax(L1_cos, R1_cos);
+          T contains_max = ceil(L1/(2*M_PI))*2*M_PI<=R1;
+          T contains_min = ceil((L1-M_PI)/(2*M_PI))*2*M_PI+M_PI<=R1;
+          L = if_else(logic_or(ge_2pi, contains_min), -1, lb);
+          R = if_else(logic_or(ge_2pi, contains_max), 1, ub);
+        }
+        break;
+      case OP_SIN:
+        {
+          T L1_mov = L1 - M_PI/2;
+          T R1_mov = R1 - M_PI/2;
+          casadi_math<T>::propagate_interval(OP_COS, L1_mov, R1_mov, L2, R2, L, R);
+        }
+        break;
+      case OP_ASIN:
+        {
+          T out_of_domain = logic_or(R1<-1, L1>1);
+          L = if_else(out_of_domain, nan, if_else(L1<=-1, -pi/2, asin(L1)));
+          R = if_else(out_of_domain, nan, if_else(R1>=1, pi/2, asin(R1)));
+        }
+        break;
+      case OP_ACOS:
+        {
+          T out_of_domain = logic_or(R1<-1, L1>1);
+          L = if_else(out_of_domain, nan, if_else(R1>=1, 0, acos(R1)));
+          R = if_else(out_of_domain, nan, if_else(L1<=-1, pi, acos(L1)));
+        }
+        break;
+      case OP_MUL:
+      {
+        L = fmin(fmin(fmin(L1*L2, L1*R2), R1*L2), R1*R2);
+        R = fmax(fmax(fmax(L1*L2, L1*R2), R1*L2), R1*R2);
+        break;
+      }
+      case OP_SQ:
+      {
+          T zero_free = logic_or(L1>0, R1<0);
+          L = if_else_zero(zero_free, if_else(L1>0, L1*L1, R1*R1));
+          R = if_else(zero_free, if_else(L1>0, R1*R1, L1*L1), fmax(L1*L1, R1*R1));
+        break;
+      }
+      case OP_LOG:
+        {
+          T out_of_domain = L1<0;
+          L = if_else(out_of_domain, nan, log(L1));
+          R = if_else(out_of_domain, nan, log(R1));
+        }
+        break;
+      case OP_LOG1P:
+        {
+          T out_of_domain = L1<-1;
+          L = if_else(out_of_domain, nan, log1p(L1));
+          R = if_else(out_of_domain, nan, log1p(R1));
+        }
+        break;
+      case OP_POW:
+      case OP_CONSTPOW:
+        {
+          T base_contains_zero = logic_and(L1<=0, R1>=0);
+          T base_partial_negative = L1<0;
+          T exp_strict_positive = L2>0;
+          T exp_partial_negative = L2<0;
+
+          // conservatively rounding to integer exponents
+          T L2_floor = floor(L2);
+          T R2_ceil = ceil(R2);
+          T exp_contains_odd_negative = logic_and(exp_partial_negative, logic_or(mod(L2_floor, 2)!=0, R2_ceil-L2_floor>=1));
+
+          T L_pow_1 = T::binary(op, L1, L2);
+          T L_pow_2 = T::binary(op, L1, R2);
+          T R_pow_1 = T::binary(op, R1, L2);
+          T R_pow_2 = T::binary(op, R1, R2);
+          T L_pow = fmin(fmin(fmin(L_pow_1, L_pow_2), R_pow_1), R_pow_2);
+          T R_pow = fmax(fmax(fmax(L_pow_1, L_pow_2), R_pow_1), R_pow_2);
+
+          L = if_else(
+            logic_not(base_contains_zero),
+            L_pow,
+            if_else(
+              exp_strict_positive,
+              fmin(L_pow, 0),
+              if_else(
+                logic_and(base_partial_negative, exp_contains_odd_negative),
+                -inf,
+                L_pow
+              )
+            )
+          );
+          R = if_else(
+            logic_and(base_contains_zero, exp_partial_negative),
+            inf,
+            R_pow
+          );
+        }
+        break;
+      case OP_INV:
+        {
+          T spans_zero = logic_and(L1<0, R1>0); // interval contains zero, but zero is not a boundary
+          L = if_else(logic_or(spans_zero, R1==0), -inf, 1/R1);
+          R = if_else(logic_or(spans_zero, L1==0), +inf, 1/L1);
+        }
+        break;
+      case OP_DIV:
+        {
+          T num_cross_zero = logic_and(L1<0, R1>0);
+          T num_positive = L1>0;
+          T den_cross_zero = logic_and(L2<0, R2>0);
+          T den_left_zero = L2==0;
+          T den_right_zero = R2==0;
+          T L_div_1 = L1/L2;
+          T L_div_2 = L1/R2;
+          T R_div_1 = R1/L2;
+          T R_div_2 = R1/R2;
+
+          L = if_else(
+            logic_or(
+              den_cross_zero,
+              logic_or(
+                logic_and(den_left_zero, logic_or(num_cross_zero, logic_not(num_positive))),
+                logic_and(den_right_zero, logic_or(num_cross_zero, num_positive))
+              )
+            ),
+            -inf,
+            if_else(
+              logic_not(den_left_zero),
+              if_else(logic_not(den_right_zero), fmin(fmin(fmin(L_div_1, R_div_1), L_div_2), R_div_2), fmin(L_div_1, R_div_1)),
+              if_else(logic_not(den_right_zero), fmin(L_div_2, R_div_2), -inf)
+            )
+          );
+
+          R = if_else(
+            logic_or(
+              den_cross_zero,
+              logic_or(
+                logic_and(den_left_zero, logic_or(num_cross_zero, num_positive)),
+                logic_and(den_right_zero, logic_or(num_cross_zero, logic_not(num_positive)))
+              )
+            ),
+            inf,
+            if_else(
+              logic_not(den_left_zero),
+              if_else(logic_not(den_right_zero), fmax(fmax(fmax(L_div_1, R_div_1), L_div_2), R_div_2), fmax(L_div_1, R_div_1)),
+              if_else(logic_not(den_right_zero), fmax(L_div_2, R_div_2), inf)
+            )
+          );
+        }
+        break;
+      case OP_EXP:
+        {
+          L = exp(L1);
+          R = exp(R1);
+        }
+        break;
+      default:
+        casadi_warning("Not implemented: "+str(casadi_math<MX>::op_as_string(op)) );
+    }
   }
 
 #endif // SWIG

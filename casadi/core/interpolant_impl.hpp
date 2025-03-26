@@ -167,6 +167,10 @@ namespace casadi {
     // Lookup modes
     std::vector<std::string> lookup_modes_;
 
+    // Extrapolation modes
+    std::vector<casadi_int> extrapolation_mode_;
+    std::vector<double> extrapolation_constant_;
+
     /** \brief Serialize an object without type information
 
         \identifier{16l} */
