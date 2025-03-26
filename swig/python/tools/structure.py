@@ -94,7 +94,7 @@ def canonical(ind,s):
 
 def vec(e):
   if any(isinstance(i,list) for i in e):
-    return sum(map(vec,e),[])
+    return __builtin__.sum(map(vec,e),[])
   else:
     return e
 
@@ -275,7 +275,7 @@ class Structure(object):
     self.entries = entries
 
     self.order = [e.name for e in self.entries] if order is None else order
-    self.keyslist = sum([ list(i) if isinstance(i,tuple) else list([i]) for i in self.order],[])
+    self.keyslist = __builtin__.sum([ list(i) if isinstance(i,tuple) else list([i]) for i in self.order],[])
 
     self.dict = SafeDict([(e.name,e) for e in self.entries])
 
