@@ -947,7 +947,8 @@ namespace casadi {
     } else if (scY) {
       // Check if it is ok to loop over nonzeros only
       if (sparsity().is_dense() || operation_checker<F0XChecker>(op) ||
-          (y.is_zero() && operation_checker<F00Checker>(op))) {
+          (y.is_zero() && operation_checker<F00Checker>(op)) ||
+          (y.is_constant() && static_cast<double>(y)>0 && (op==OP_CONSTPOW || op==OP_POW))) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<false, true>(Operation(op), shared_from_this<MX>(), y));
       } else {

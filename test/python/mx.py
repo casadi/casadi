@@ -1686,6 +1686,7 @@ class MXtests(casadiTestCase):
             r = casadiop([x])
             f = Function("f", [xx],[r])
             rr = f(v)
+            print(r,rr,numpyop(x_))
             self.checkarray(rr,numpyop(x_))
 
             a = DM(f.sparsity_out(0),1)
@@ -3753,8 +3754,11 @@ class MXtests(casadiTestCase):
 
         x = X.sym('x', Sparsity.diag(4))
         self.assertTrue((x**0).is_dense())
+        self.assertFalse((x**0.3).is_dense())
         self.assertFalse((x**1).is_dense())
         self.assertFalse((x**2).is_dense())
+        self.assertFalse((x**2.3).is_dense())
+        self.assertTrue((x**(-2)).is_dense())
         p = X.sym("p")
         
         self.assertTrue((x**p).is_dense())
