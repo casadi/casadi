@@ -178,6 +178,20 @@ namespace casadi {
     }
   }
 
+  bool IpoptUserClass::eval_jac_g_vp(Index n, const Number* x, bool trans,
+                                  Index m, const Number* s, Number* values) {
+    // Evaluate numerically
+    mem_->arg[0] = x;
+    mem_->arg[1] = mem_->d_nlp.p;
+    mem_->arg[2] = s;
+    mem_->res[0] = values;
+    if (trans) {
+      return solver_.calc_function(mem_, "nlp_jac_g_vpt")==0;
+    } else {
+      return solver_.calc_function(mem_, "nlp_jac_g_vp")==0;
+    }
+  }
+
 
   bool IpoptUserClass::eval_h(Index n, const Number* x, bool new_x,
                               Number obj_factor, Index m, const Number* lambda,
