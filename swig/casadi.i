@@ -4378,6 +4378,7 @@ namespace casadi {
   %extend MX {
     MX_ALL(static inline, IS_MEMBER)
     const MX brace(const casadi::MX& rr) const { casadi::MX m; $self->get_nz(m, true, rr); return m;}
+    void brace_asgn(const MX& m, const casadi::MX& rr) { $self->set_nz(m, true, rr); }
     const MX paren(const casadi::MX& rr) const {
       casadi::MX m;
       $self->get(m, true, rr);
@@ -4397,6 +4398,22 @@ namespace casadi {
       casadi::MX m;
       $self->get(m, true, rr, cc);
       return m;
+    }
+    /*
+    Not yet implemeted in core
+    set(const MX& m, bool ind1, const MX&, const MX&); does not seem to exist
+    void paren_asgn(const MX& m, char rr, const casadi::MX& cc) {
+      $self->set(m, true, casadi::char2Slice(rr), cc);
+    }
+    void paren_asgn(const MX& m, const casadi::MX& rr, char cc) {
+      $self->set(m, true, rr, casadi::char2Slice(cc));
+    }
+    void paren_asgn(const MX& m, const casadi::MX& rr, const casadi::MX& cc) {
+      $self->set(m, true, rr, cc);
+    }*/
+    // Needed for brace syntax to access nonzeros
+    casadi_int numel(const MX &k) const {
+      return 1;
     }
   }
 } // namespace casadi
