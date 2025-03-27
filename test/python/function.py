@@ -4284,7 +4284,7 @@ class Functiontests(casadiTestCase):
             self.checkarray(res[i],res_ref[i],digits=12,failmessage=str(int_in))
          
     f = Function('f',[a,b],[(a+b)*b,a-b])
-    """
+    
     fp = f.interval_propagator()
     print(fp(1,3,2,4))
       
@@ -4343,7 +4343,7 @@ class Functiontests(casadiTestCase):
       
       self.checkarray(f.call(args_L[:n_in])[0],L)
       self.checkarray(f.call(args_R[:n_in])[0],R)
-    """
+    
     
     
 
