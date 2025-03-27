@@ -776,7 +776,17 @@ namespace casadi {
     }
 
     /** \brief Linearize an expression
-
+    *
+    * This function linearizes an expression around a point x0,
+    * using x as delta around that point.
+    *
+    * \code
+    *  linearize(sin(x),x,x0) -> sin(x0)+cos(x0)*x
+    * \endcode
+    *
+    * For a variant that returns sin(x0)+cos(x0)*(x-x0), see taylor.
+    *
+    * \sa taylor, linear_coeff
         \identifier{1cs} */
     friend inline MatType linearize(const MatType& f, const MatType& x, const MatType& x0,
         const Dict& opts=Dict()) {

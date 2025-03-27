@@ -774,6 +774,12 @@ namespace casadi {
      * taylor(sin(x), x)
      * \endcode
      * \verbatim >>   x \endverbatim
+     *
+     * \code
+     * taylor(sin(x),x,x0) -> sin(x0)+cos(x0)*(x-x0)
+     * \endcode
+     *
+     * \sa linearize, mtaylor, linear_coeff
 
         \identifier{23q} */
     friend inline Matrix<Scalar> taylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
@@ -790,6 +796,7 @@ namespace casadi {
      * Do Taylor expansions until the aggregated order of a term is equal to 'order'.
      * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
      *
+     * \sa taylor
 
         \identifier{23r} */
     friend inline Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
@@ -821,6 +828,7 @@ namespace casadi {
      * \endcode
      * \f$  (-3 x^2 y-x^3)/6+y+x \f$
      *
+     * \sa taylor
 
         \identifier{23s} */
     friend inline Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
