@@ -3765,135 +3765,246 @@ class Functiontests(casadiTestCase):
 
       # OP_COS
       yield (1, lambda a: cos(a), [
-          # basic intervals
-          [[[0, pi/3]], [[0.5, 1]]],
-          [[[pi/4, 3*pi/4]], [[-sqrt(2)*0.5, sqrt(2)*0.5]]],
-          [[[pi/2, 3*pi/2]], [[-1, 0]]],
-          [[[0, 0]], [[1, 1]]],
-          [[[pi, pi]], [[-1, -1]]],
-          # intervals spanning multiple periods
-          [[[0, 2*pi]], [[-1, 1]]],
-          [[[0, 4*pi]], [[-1, 1]]],
-          [[[pi/6, 2*pi + pi/6]], [[-1, 1]]],
-          # intervals with specific properties
-          [[[0, pi]], [[-1, 1]]],
-          [[[pi, 2*pi]], [[-1, 1]]],
-          [[[pi/2, pi]], [[-1, 0]]],
-          [[[0, pi/2]], [[0, 1]]],
-          # small intervals
-          [[[pi/4, pi/3]], [[0.5, sqrt(2)*0.5]]],
-          [[[5*pi/4, 4*pi/3]], [[-sqrt(2)*0.5, -0.5]]],
-          [[[pi - 0.1, pi + 0.1]], [[-1, cos(pi - 0.1)]]],
-          [[[2*pi - 0.1, 2*pi + 0.1]], [[cos(2*pi - 0.1), 1]]]
+        # basic intervals
+        [[[0, pi/3]], [[0.5, 1]]],
+        [[[pi/4, 3*pi/4]], [[-sqrt(2)*0.5, sqrt(2)*0.5]]],
+        [[[pi/2, 3*pi/2]], [[-1, 0]]],
+        [[[0, 0]], [[1, 1]]],
+        [[[pi, pi]], [[-1, -1]]],
+        # intervals spanning multiple periods
+        [[[0, 2*pi]], [[-1, 1]]],
+        [[[0, 4*pi]], [[-1, 1]]],
+        [[[pi/6, 2*pi + pi/6]], [[-1, 1]]],
+        # intervals with specific properties
+        [[[0, pi]], [[-1, 1]]],
+        [[[pi, 2*pi]], [[-1, 1]]],
+        [[[pi/2, pi]], [[-1, 0]]],
+        [[[0, pi/2]], [[0, 1]]],
+        # small intervals
+        [[[pi/4, pi/3]], [[0.5, sqrt(2)*0.5]]],
+        [[[5*pi/4, 4*pi/3]], [[-sqrt(2)*0.5, -0.5]]],
+        [[[pi - 0.1, pi + 0.1]], [[-1, cos(pi - 0.1)]]],
+        [[[2*pi - 0.1, 2*pi + 0.1]], [[cos(2*pi - 0.1), 1]]]
       ])
 
       # OP_SQ
       yield (1, lambda a: a**2,  [
-          # positive intervals
-          [[[2, 5]], [[4, 25]]],
-          [[[0.5, 3]], [[0.25, 9]]],
-          [[[10, 10]], [[100, 100]]],
-          # negative intervals
-          [[[-4, -1]], [[1, 16]]],
-          [[[-7, -3]], [[9, 49]]],
-          [[[-10, -10]], [[100, 100]]],
-          # intervals containing zero
-          [[[-3, 7]], [[0, 49]]],
-          [[[-5, 5]], [[0, 25]]],
-          [[[-8, 5]], [[0, 64]]],
-          [[[-2, 0]], [[0, 4]]],
-          [[[0, 8]], [[0, 64]]],
-          [[[0, 0]], [[0, 0]]],
-          # special cases
-          [[[-0.5, 0.5]], [[0, 0.25]]],
-          [[[-0.1, 0.2]], [[0, 0.04]]],
+        # positive intervals
+        [[[2, 5]], [[4, 25]]],
+        [[[0.5, 3]], [[0.25, 9]]],
+        [[[10, 10]], [[100, 100]]],
+        # negative intervals
+        [[[-4, -1]], [[1, 16]]],
+        [[[-7, -3]], [[9, 49]]],
+        [[[-10, -10]], [[100, 100]]],
+        # intervals containing zero
+        [[[-3, 7]], [[0, 49]]],
+        [[[-5, 5]], [[0, 25]]],
+        [[[-8, 5]], [[0, 64]]],
+        [[[-2, 0]], [[0, 4]]],
+        [[[0, 8]], [[0, 64]]],
+        [[[0, 0]], [[0, 0]]],
+        # special cases
+        [[[-0.5, 0.5]], [[0, 0.25]]],
+        [[[-0.1, 0.2]], [[0, 0.04]]],
       ])
 
       # OP_MUL
       yield (2, lambda a,b: a*b,  [
-          # intervals containing zero
-          [[[-3, 7],[-3, 7]], [[-21, 49]]],
-          [[[-5, 5],[-5, 5]], [[-25, 25]]],
-          [[[-8, 5],[-8, 5]], [[-40, 64]]],
-          [[[-2, 0],[-2, 0]], [[0, 4]]],
-          [[[0, 8],[0, 8]], [[0, 64]]],
-          [[[0, 0],[0,0]], [[0, 0]]],
-          [[[-3, 7],[-2, 6]], [[-18, 42]]],
-          [[[-5, 5],[-4, 4]], [[-20, 20]]],
-          [[[-8, 5],[-7, 4]], [[-35, 56]]],
-          [[[-2, 0],[-1, 0]], [[0, 2]]],
-          [[[0, 8],[0, 7]], [[0, 56]]],
-          [[[0, 0],[0,0]], [[0, 0]]],
+        # intervals containing zero
+        [[[-3, 7],[-3, 7]], [[-21, 49]]],
+        [[[-5, 5],[-5, 5]], [[-25, 25]]],
+        [[[-8, 5],[-8, 5]], [[-40, 64]]],
+        [[[-2, 0],[-2, 0]], [[0, 4]]],
+        [[[0, 8],[0, 8]], [[0, 64]]],
+        [[[0, 0],[0,0]], [[0, 0]]],
+        [[[-3, 7],[-2, 6]], [[-18, 42]]],
+        [[[-5, 5],[-4, 4]], [[-20, 20]]],
+        [[[-8, 5],[-7, 4]], [[-35, 56]]],
+        [[[-2, 0],[-1, 0]], [[0, 2]]],
+        [[[0, 8],[0, 7]], [[0, 56]]],
+        [[[0, 0],[0,0]], [[0, 0]]],
       ])
       
       # OP_SIN
       yield (1, lambda a: sin(a), [
-          # small positive intervals
-          [[[0, pi/4]], [[0, sin(pi/4)]]],
-          [[[pi/4, pi/2]], [[sin(pi/4), 1.0]]],
-          [[[pi/2, 3*pi/4]], [[sin(3*pi/4), 1.0]]],
-          [[[3*pi/4, pi]], [[0, sin(3*pi/4)]]],
-          # intervals containing critical points
-          [[[pi/4, 3*pi/4]], [[sin(pi/4), 1.0]]],
-          [[[3*pi/4, 5*pi/4]], [[-sin(3*pi/4), sin(3*pi/4)]]],
-          [[[5*pi/4, 7*pi/4]], [[-1.0, sin(5*pi/4)]]],
-          [[[7*pi/4, 9*pi/4]], [[-sin(pi/4), sin(pi/4)]]],
-          # intervals spanning full periods
-          [[[0, 2*pi]], [[-1.0, 1.0]]],
-          [[[0, 3*pi]], [[-1.0, 1.0]]],
-          [[[0, 4*pi]], [[-1.0, 1.0]]],
-          [[[-pi, 3*pi]], [[-1.0, 1.0]]],
-          # intervals in negative domain
-          [[[-pi/4, 0]], [[-sin(pi/4), 0]]],
-          [[[-pi/2, -pi/4]], [[-1.0, -sin(pi/4)]]],
-          [[[-pi, -pi/2]], [[-1.0, 0]]],
-          [[[-3*pi/2, -pi]], [[-0, 1.0]]],
-          # intervals spanning zero
-          [[[-pi/6, pi/6]], [[-sin(pi/6), sin(pi/6)]]],
-          [[[-pi/4, pi/4]], [[-sin(pi/4), sin(pi/4)]]],
-          [[[-pi/2, pi/2]], [[-1.0, 1.0]]],
-          [[[-pi, pi]], [[-1.0, 1.0]]],
+        # small positive intervals
+        [[[0, pi/4]], [[0, sin(pi/4)]]],
+        [[[pi/4, pi/2]], [[sin(pi/4), 1.0]]],
+        [[[pi/2, 3*pi/4]], [[sin(3*pi/4), 1.0]]],
+        [[[3*pi/4, pi]], [[0, sin(3*pi/4)]]],
+        # intervals containing critical points
+        [[[pi/4, 3*pi/4]], [[sin(pi/4), 1.0]]],
+        [[[3*pi/4, 5*pi/4]], [[-sin(3*pi/4), sin(3*pi/4)]]],
+        [[[5*pi/4, 7*pi/4]], [[-1.0, sin(5*pi/4)]]],
+        [[[7*pi/4, 9*pi/4]], [[-sin(pi/4), sin(pi/4)]]],
+        # intervals spanning full periods
+        [[[0, 2*pi]], [[-1.0, 1.0]]],
+        [[[0, 3*pi]], [[-1.0, 1.0]]],
+        [[[0, 4*pi]], [[-1.0, 1.0]]],
+        [[[-pi, 3*pi]], [[-1.0, 1.0]]],
+        # intervals in negative domain
+        [[[-pi/4, 0]], [[-sin(pi/4), 0]]],
+        [[[-pi/2, -pi/4]], [[-1.0, -sin(pi/4)]]],
+        [[[-pi, -pi/2]], [[-1.0, 0]]],
+        [[[-3*pi/2, -pi]], [[-0, 1.0]]],
+        # intervals spanning zero
+        [[[-pi/6, pi/6]], [[-sin(pi/6), sin(pi/6)]]],
+        [[[-pi/4, pi/4]], [[-sin(pi/4), sin(pi/4)]]],
+        [[[-pi/2, pi/2]], [[-1.0, 1.0]]],
+        [[[-pi, pi]], [[-1.0, 1.0]]],
       ])
 
       # OP_ASIN
       yield (1, lambda a: asin(a), [
-          # standard intervals
-          [[[-0.5, 0.5]], [[asin(-0.5), asin(0.5)]]],
-          [[[0.1, 0.7]], [[asin(0.1), asin(0.7)]]],
-          [[[-0.8, -0.2]], [[asin(-0.8), asin(-0.2)]]],
-          [[[0.0, 0.0]], [[0.0, 0.0]]],
-          # boundary casea
-          [[[-1.0, -0.9]], [[asin(-1.0), asin(-0.9)]]],
-          [[[0.9, 1.0]], [[asin(0.9), asin(1.0)]]],
-          # domain intervals
-          [[[-1.0, 1.0]], [[-pi/2, pi/2]]],
-          [[[-1.0, 0.0]], [[-pi/2, 0.0]]],
-          [[[0.0, 1.0]], [[0.0, pi/2]]],
-          # special values
-          [[[0.5, 0.5]], [[pi/6, pi/6]]],
-          [[[1/sqrt(2), 1/sqrt(2)]], [[pi/4, pi/4]]],
+        # standard intervals
+        [[[-0.5, 0.5]], [[asin(-0.5), asin(0.5)]]],
+        [[[0.1, 0.7]], [[asin(0.1), asin(0.7)]]],
+        [[[-0.8, -0.2]], [[asin(-0.8), asin(-0.2)]]],
+        [[[0.0, 0.0]], [[0.0, 0.0]]],
+        # boundary casea
+        [[[-1.0, -0.9]], [[asin(-1.0), asin(-0.9)]]],
+        [[[0.9, 1.0]], [[asin(0.9), asin(1.0)]]],
+        # domain intervals
+        [[[-1.0, 1.0]], [[-pi/2, pi/2]]],
+        [[[-1.0, 0.0]], [[-pi/2, 0.0]]],
+        [[[0.0, 1.0]], [[0.0, pi/2]]],
+        # special values
+        [[[0.5, 0.5]], [[pi/6, pi/6]]],
+        [[[1/sqrt(2), 1/sqrt(2)]], [[pi/4, pi/4]]],
       ])
 
       # OP_ACOS
       yield (1, lambda a: acos(a), [
-          # standard intervals
-          [[[-0.5, 0.5]], [[acos(0.5), acos(-0.5)]]],
-          [[[0.1, 0.7]], [[acos(0.7), acos(0.1)]]],
-          [[[-0.8, -0.2]], [[acos(-0.2), acos(-0.8)]]],
-          [[[0.0, 0.0]], [[pi/2, pi/2]]],
-          # boundary cases
-          [[[-1.0, -0.9]], [[acos(-0.9), acos(-1.0)]]],
-          [[[0.9, 1.0]], [[acos(1.0), acos(0.9)]]],
-          # domain intervals
-          [[[-1.0, 1.0]], [[0.0, pi]]],
-          [[[-1.0, 0.0]], [[pi/2, pi]]],
-          [[[0.0, 1.0]], [[0.0, pi/2]]],
-          # special values
-          [[[0.5, 0.5]], [[pi/3, pi/3]]],
-          [[[0.0, 0.0]], [[pi/2, pi/2]]],
-          [[[1/sqrt(2), 1/sqrt(2)]], [[pi/4, pi/4]]],
-          [[[1.0, 1.0]], [[0.0, 0.0]]],
-          [[[-1.0, -1.0]], [[pi, pi]]],
+        # standard intervals
+        [[[-0.5, 0.5]], [[acos(0.5), acos(-0.5)]]],
+        [[[0.1, 0.7]], [[acos(0.7), acos(0.1)]]],
+        [[[-0.8, -0.2]], [[acos(-0.2), acos(-0.8)]]],
+        [[[0.0, 0.0]], [[pi/2, pi/2]]],
+        # boundary cases
+        [[[-1.0, -0.9]], [[acos(-0.9), acos(-1.0)]]],
+        [[[0.9, 1.0]], [[acos(1.0), acos(0.9)]]],
+        # domain intervals
+        [[[-1.0, 1.0]], [[0.0, pi]]],
+        [[[-1.0, 0.0]], [[pi/2, pi]]],
+        [[[0.0, 1.0]], [[0.0, pi/2]]],
+        # special values
+        [[[0.5, 0.5]], [[pi/3, pi/3]]],
+        [[[0.0, 0.0]], [[pi/2, pi/2]]],
+        [[[1/sqrt(2), 1/sqrt(2)]], [[pi/4, pi/4]]],
+        [[[1.0, 1.0]], [[0.0, 0.0]]],
+        [[[-1.0, -1.0]], [[pi, pi]]],
+      ])
+
+      # OP_LOG
+      yield (1, lambda a: log(a), [
+        [[[1e-6, 0.5]], [[log(1e-6), log(0.5)]]],
+        [[[0.5, 1.5]], [[log(0.5), log(1.5)]]],
+        [[[0.5, 2.0]], [[log(0.5), log(2)]]]
+      ])
+
+      # OP_CONSTPOW
+      yield (2, lambda a, b: pow(a, b), [
+        # scalar exponent: positive interval, positive exponent
+        [[[0, 3], [3, 3]], [[0, 3**3]]],
+        [[[1, 3], [3, 3]], [[1, 3**3]]],
+        [[[2, 3], [3, 3]], [[2**3, 3**3]]],
+        # scalar exponent: interval containing zero, positive exponent
+        [[[-1, 2], [2, 2]], [[0, 2**2]]],
+        [[[-3, 2], [2, 2]], [[0, (-3)**2]]],
+        [[[-1, 2], [3, 3]], [[-1, 2**3]]],
+        [[[-3, 2], [3, 3]], [[(-3)**3, 2**3]]],
+        # scalar exponent: negative interval, positive exponent
+        [[[-3, -2], [2, 2]], [[(-2)**2, (-3)**2]]],
+        [[[-3, -2], [3, 3]], [[(-3)**3, (-2)**3]]],
+        # scalar exponent: arbitrary intervals, zero exponent
+        [[[2, 3], [0, 0]], [[1, 1]]],
+        [[[-1, 1], [0, 0]], [[1, 1]]],
+        [[[-3, -2], [0, 0]], [[1, 1]]],
+        # scalar exponent: positive interval, negative exponent
+        [[[0, 3], [-3, -3]], [[3**(-3), np.inf]]],
+        [[[1, 3], [-3, -3]], [[3**(-3), 1]]],
+        [[[2, 3], [-3, -3]], [[3**(-3), 2**(-3)]]],
+        # scalar exponent: interval containing zero, negative exponent
+        [[[-1, 2], [-2, -2]], [[2**(-2), np.inf]]],
+        [[[-3, 2], [-2, -2]], [[(-3)**(-2), np.inf]]],
+        [[[-1, 2], [-3, -3]], [[-np.inf, np.inf]]],
+        [[[-3, 2], [-3, -3]], [[-np.inf, np.inf]]],
+        # scalar exponent: negative interval, negative exponent
+        [[[-3, -2], [-2, -2]], [[(-3)**(-2), (-2)**(-2)]]],
+        [[[-3, -2], [-3, -3]], [[(-2)**(-3), (-3)**(-3)]]],
+        # interval exponent: positive interval, positive exponents
+        [[[1, 3], [2, 3]], [[1, 3**3]]],
+        [[[2, 3], [2, 3]], [[2**2, 3**3]]],
+        # interval exponent: interval containing zero, positive exponents
+        [[[-1, 0.5], [2, 3]], [[(-1)**3, (-1)**2]]],
+        [[[-1, 2], [2, 3]], [[(-1)**3, 2**3]]],
+        [[[-3, 2], [2, 3]], [[(-3)**3, (-3)**2]]],
+        # interval exponent: negative interval, positive exponents
+        [[[-3, -1], [2, 3]], [[(-3)**3, (-3)**2]]],
+        [[[-3, -2], [2, 3]], [[(-3)**3, (-3)**2]]],
+        # interval exponent: positive interval, exponents containing zero
+        [[[2, 3], [-3, 0]], [[3**(-3), 1]]],
+        [[[2, 3], [-3, 3]], [[3**(-3), 3**3]]],
+        [[[2, 3], [0, 3]], [[1, 3**3]]],
+        # interval exponent: interval containing zero, exponents containing zero
+        # [[[-1, 2], [-2, 1]], [[-np.inf, np.inf]]],  # not supported by empirical tests
+        [[[-3, 0], [-3, 0]], [[-np.inf, np.inf]]],
+        # [[[-3, 0], [0, 3]], [[(-3)**3, (-3)**2]]],  # TODO: L/R values not coming from interval bounds are not considered
+        [[[0, 3], [-3, 0]], [[3**(-3), np.inf]]],
+        [[[0, 3], [0, 3]], [[0, 3**3]]],
+        # interval exponent: negative interval, exponents containing zero
+        # [[[-3, -2], [-3, 0]], [[(-2)**(-1), 1]]],  # TODO: L/R values not coming from interval bounds are not considered
+        # [[[-3, -2], [-3, 3]], [[(-3)**3, (-3)**2]]],  # TODO: L/R values not coming from interval bounds are not considered
+        # [[[-3, -2], [0, 3]], [[(-3)**3, (-3)**2]]],  # TODO: L/R values not coming from interval bounds are not considered
+        # interval exponent: positive interval, negative exponents
+        [[[2, 3], [-3, -1]], [[3**(-3), 2**(-1)]]],
+        [[[2, 3], [-3, -2]], [[3**(-3), 2**(-2)]]],
+        # interval exponent: interval containing zero, negative exponents
+        [[[-1, 2], [-3, -1]], [[-np.inf, np.inf]]],
+        [[[-3, 0], [-3, -1]], [[-np.inf, np.inf]]],
+        [[[0, 3], [-3, -1]], [[3**(-3), np.inf]]],
+        # interval exponent: negative interval, negative exponents
+        # [[[-3, -2], [-3, -1]], [[(-2)**(-1), (-2)**(-2)]]],  # TODO: L/R values not coming from interval bounds are not considered
+        [[[-3, -2], [-3, -2]], [[(-2)**(-3), (-2)**(-2)]]],
+      ])
+
+      # OP_INV
+      yield (1, lambda a: 1/a, [
+        # spans zero
+        [[[-2, 2]], [[-np.inf, np.inf]]],
+        # zero boundaries
+        [[[0, 2]], [[1/2, np.inf]]],
+        # [[[-2, 0]], [[-np.inf, -1/2]]],  # not supported by empirical tests
+        # other intervals
+        [[[2, 3]], [[1/3, 1/2]]],
+        [[[-3, -2]], [[-1/2, -1/3]]]
+      ])
+
+      # OP_DIV
+      yield (2, lambda a, b: a/b, [
+        # scalar division
+        [[[2, 6], [2, 2]], [[1, 3]]],
+        [[[2, 6], [-3, -3]], [[-2, -2/3]]],
+        # positive numerator
+        [[[2, 6], [2, 3]], [[2/3, 3]]],
+        [[[2, 6], [-3, -2]], [[-3, -2/3]]],
+        # numerator containing zero
+        [[[-6, 2], [2, 3]], [[-3, 1]]],
+        [[[-6, 2], [-3, -2]], [[-1, 3]]],
+        # negative numerator
+        [[[-6, -2], [2, 3]], [[-3, -2/3]]],
+        [[[-6, -2], [-3, -2]], [[2/3, 3]]],
+        # denominators containing/bordering zero
+        [[[2, 6], [0, 2]], [[1, np.inf]]],
+        [[[2, 6], [-1, 1]], [[-np.inf, np.inf]]],
+        # [[[2, 6], [-2, 0]], [[-np.inf, -1]]],  # not supported by empirical tests
+        [[[-2, 2], [0, 2]], [[-np.inf, np.inf]]],
+        [[[-2, 2], [-1, 1]], [[-np.inf, np.inf]]],
+        [[[-2, 2], [-2, 0]], [[-np.inf, np.inf]]],
+        [[[-6, -2], [0, 2]], [[-np.inf, -1]]],
+        [[[-6, -2], [-1, 1]], [[-np.inf, np.inf]]],
+        # [[[-6, -2], [-2, 0]], [[1, np.inf]]],  # not supported by empirical tests
       ])
 
     for n_in,fun, numeric_tests in atomic_tests():
@@ -3903,14 +4014,14 @@ class Functiontests(casadiTestCase):
       fp = f.interval_propagator()
       
       def sample_interval(lo,hi):
-        ret = []
+        if lo==hi: return [lo]
         ret = [float((1-alpha)*lo+alpha*hi) for alpha in np.linspace(0,1,5)]
         # Make sure some special points are present if they are in the interval interior
-        for e in [0,1]:
+        for e in [-1e-310, 0, +1e-310, 1]:
           if e>lo and e<hi:
             ret.append(e)
         # More special points (integer multiples of pi/2)
-        for i in range(-10,10):
+        for i in [x for x in range(-10,10) if x != 0]:
           e = i*pi/2
           if e>lo and e<hi:
             ret.append(e)
@@ -3921,6 +4032,7 @@ class Functiontests(casadiTestCase):
           extended = [sample_interval(e[0],e[1]) for e in int_in]
           
           sample_out = [f.call(sample_in) for sample_in in itertools.product(*extended)]
+          sample_out = [x for x in sample_out if not np.isnan(x)]
           empirical_res = [[float(min(e[i] for e in sample_out)),float(max(e[i] for e in sample_out))] for i in range(f.n_out())]
           
           for i in range(len(int_out)):
