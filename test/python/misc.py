@@ -491,6 +491,14 @@ class Misctests(casadiTestCase):
         with self.assertOutput(included, excluded):
           solver.solve(A,vertcat(1,2,3))
 
+  def test_error_formatting(self):
+    x = MX.sym("x")
+
+    f = Function('f',[x],[x.attachAssert(0,"Hey \\W %d")])
+
+    with self.assertInException("Hey \\W %d"):
+        f()
+
   @memory_heavy()
   def test_record_time(self):
 

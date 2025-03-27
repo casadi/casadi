@@ -1,5 +1,18 @@
 import casadi.*
 
+
+x = MX.sym('x');
+f = Function('f',{x},{x.attachAssert(0, 'Hey %d \Warning foo')});
+
+msg = '';
+try
+  f()
+catch err
+  msg = err.message;
+end
+assert(~isempty(strfind(msg,'Hey %d \Warning foo')))
+
+
 test_cases = {4 [1 2] [1;2] [1 2; 3 4] [1 2 3; 3 4 5] [1 2; 4 5; 7 8]};
 
 for i=numel(test_cases)
