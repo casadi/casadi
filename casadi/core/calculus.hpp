@@ -2256,23 +2256,32 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           T R1_cos = cos(R1);
           T lb = fmin(L1_cos, R1_cos);
           T ub = fmax(L1_cos, R1_cos);
-          T contains_max = if_else_zero(ceil(L1/(2*M_PI))*2*M_PI<=R1, 1);
-          T contains_min = if_else_zero(ceil((L1-M_PI)/(2*M_PI))*2*M_PI+M_PI<=R1, 1);
+          T contains_max = ceil(L1/(2*M_PI))*2*M_PI<=R1;
+          T contains_min = ceil((L1-M_PI)/(2*M_PI))*2*M_PI+M_PI<=R1;
           L = if_else(logic_or(ge_2pi, contains_min), -1, lb);
           R = if_else(logic_or(ge_2pi, contains_max), 1, ub);
         }
         break;
       case OP_SIN:
-        L = -1; // conservative
-        R = 1;
+        {
+          T L1_mov = L1 - M_PI/2;
+          T R1_mov = R1 - M_PI/2;
+          casadi_math<T>::propagate_interval(OP_COS, L1_mov, R1_mov, L2, R2, L, R);
+        }
         break;
       case OP_ASIN:
-        L = -pi/2; // conservative
-        R = pi/2;
+        {
+          T out_of_domain = logic_or(R1<-1, L1>1);
+          L = if_else(out_of_domain, nan, if_else(L1<=-1, -pi/2, asin(L1)));
+          R = if_else(out_of_domain, nan, if_else(R1>=1, pi/2, asin(R1)));
+        }
         break;
       case OP_ACOS:
-        L = 0;
-        R = pi;
+        {
+          T out_of_domain = logic_or(R1<-1, L1>1);
+          L = if_else(out_of_domain, nan, if_else(R1>=1, 0, acos(R1)));
+          R = if_else(out_of_domain, nan, if_else(L1<=-1, pi, acos(L1)));
+        }
         break;
       case OP_MUL:
       {
@@ -2287,6 +2296,105 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           R = if_else(zero_free, if_else(L1>0, R1*R1, L1*L1), fmax(L1*L1, R1*R1));
         break;
       }
+      case OP_LOG:
+        {
+          T out_of_domain = L1<=0;
+          L = if_else(out_of_domain, nan, log(L1));
+          R = if_else(out_of_domain, nan, log(R1));
+        }
+        break;
+      case OP_POW:
+      case OP_CONSTPOW:
+        {
+          T base_contains_zero = logic_and(L1<=0, R1>=0);
+          T base_partial_negative = L1<0;
+          T exp_strict_positive = L2>0;
+          T exp_partial_negative = L2<0;
+
+          // conservatively rounding to integer exponents
+          T L2_floor = floor(L2);
+          T R2_ceil = ceil(R2);
+          T exp_contains_odd_negative = logic_and(exp_partial_negative, logic_or(mod(L2_floor, 2)!=0, R2_ceil-L2_floor>=1));
+
+          T L_pow_1 = pow(L1, L2);
+          T L_pow_2 = pow(L1, R2);
+          T R_pow_1 = pow(R1, L2);
+          T R_pow_2 = pow(R1, R2);
+          T L_pow = fmin(fmin(fmin(L_pow_1, L_pow_2), R_pow_1), R_pow_2);
+          T R_pow = fmax(fmax(fmax(L_pow_1, L_pow_2), R_pow_1), R_pow_2);
+
+          L = if_else(
+            logic_not(base_contains_zero),
+            L_pow,
+            if_else(
+              exp_strict_positive,
+              fmin(L_pow, 0),
+              if_else(
+                logic_and(base_partial_negative, exp_contains_odd_negative),
+                -inf,
+                L_pow
+              )
+            )
+          );
+          R = if_else(
+            logic_and(base_contains_zero, exp_partial_negative),
+            inf,
+            R_pow
+          );
+        }
+        break;
+      case OP_INV:
+        {
+          T spans_zero = logic_and(L1<0, R1>0); // interval contains zero, but zero is not a boundary
+          L = if_else(logic_or(spans_zero, R1==0), -inf, 1/R1);
+          R = if_else(logic_or(spans_zero, L1==0), +inf, 1/L1);
+        }
+        break;
+      case OP_DIV:
+        {
+          T num_cross_zero = logic_and(L1<0, R1>0);
+          T num_positive = L1>0;
+          T den_cross_zero = logic_and(L2<0, R2>0);
+          T den_left_zero = L2==0;
+          T den_right_zero = R2==0;
+          T L_div_1 = L1/L2;
+          T L_div_2 = L1/R2;
+          T R_div_1 = R1/L2;
+          T R_div_2 = R1/R2;
+
+          L = if_else(
+            logic_or(
+              den_cross_zero,
+              logic_or(
+                logic_and(den_left_zero, logic_or(num_cross_zero, logic_not(num_positive))),
+                logic_and(den_right_zero, logic_or(num_cross_zero, num_positive))
+              )
+            ),
+            -inf,
+            if_else(
+              logic_not(den_left_zero),
+              if_else(logic_not(den_right_zero), fmin(fmin(fmin(L_div_1, R_div_1), L_div_2), R_div_2), fmin(L_div_1, R_div_1)),
+              if_else(logic_not(den_right_zero), fmin(L_div_2, R_div_2), -inf)
+            )
+          );
+
+          R = if_else(
+            logic_or(
+              den_cross_zero,
+              logic_or(
+                logic_and(den_left_zero, logic_or(num_cross_zero, num_positive)),
+                logic_and(den_right_zero, logic_or(num_cross_zero, logic_not(num_positive)))
+              )
+            ),
+            inf,
+            if_else(
+              logic_not(den_left_zero),
+              if_else(logic_not(den_right_zero), fmax(fmax(fmax(L_div_1, R_div_1), L_div_2), R_div_2), fmax(L_div_1, R_div_1)),
+              if_else(logic_not(den_right_zero), fmax(L_div_2, R_div_2), inf)
+            )
+          );
+        }
+        break;
       default:
         casadi_warning("Not implemented: "+str(casadi_math<MX>::op_as_string(op)) );
     }
