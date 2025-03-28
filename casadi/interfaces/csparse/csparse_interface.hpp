@@ -60,9 +60,9 @@ namespace casadi {
     std::vector<int> colind, row;
   };
 
-  /** \brief \pluginbrief{LinsolInternal,csparse}
+  /** \brief \pluginbrief{Linsol,csparse}
    * @copydoc LinsolInternal_doc
-   * @copydoc plugin_LinsolInternal_csparse
+   * @copydoc plugin_Linsol_csparse
    */
   class CASADI_LINSOL_CSPARSE_EXPORT CsparseInterface : public LinsolInternal {
   public:

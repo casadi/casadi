@@ -44,9 +44,9 @@ namespace casadi {
     std::vector<double> l, d, w;
   };
 
-  /** \brief \pluginbrief{LinsolInternal,ldl}
+  /** \brief \pluginbrief{Linsol,ldl}
    * @copydoc LinsolInternal_doc
-   * @copydoc plugin_LinsolInternal_ldl
+   * @copydoc plugin_Linsol_ldl
    */
   class CASADI_LINSOL_LDL_EXPORT LinsolLdl : public LinsolInternal {
   public:

@@ -48,9 +48,9 @@ namespace casadi {
     std::vector<int> cache_loc;
   };
 
-  /** \brief \pluginbrief{LinsolInternal,qr}
+  /** \brief \pluginbrief{Linsol,qr}
    * @copydoc LinsolInternal_doc
-   * @copydoc plugin_LinsolInternal_qr
+   * @copydoc plugin_Linsol_qr
    */
   class CASADI_LINSOL_QR_EXPORT LinsolQr : public LinsolInternal {
   public:
