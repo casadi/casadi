@@ -26,14 +26,14 @@
 #ifndef CASADI_CSPARSE_CHOLESKY_INTERFACE_HPP
 #define CASADI_CSPARSE_CHOLESKY_INTERFACE_HPP
 
-/** \defgroup plugin_Linsol_csparse
+/** \defgroup plugin_Linsol_csparsecholesky Title
     \par
 
    * Linsol with CSparseCholesky Interface
 
     \identifier{21u} */
 
-/** \pluginsection{Linsol,csparse} */
+/** \pluginsection{Linsol,csparsecholesky} */
 
 /// \cond INTERNAL
 #include <cs.h>
