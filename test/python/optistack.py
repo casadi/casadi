@@ -1438,8 +1438,79 @@ class OptiStacktests(inherit_from):
             self.checkarray(sol.value(x), 0.78641515, digits=6)
             self.checkarray(lag_grad, vertcat(0,0), digits=6)
 
-      
-
+    @requires_conic("highs")
+    @requires_nlpsol("ipopt")
+    def test_dual(self):
     
+        ref = {}
+        
+        for t in ['nlp','conic']:
+            opti = Opti(t)
+            x = opti.variable()
+            y = opti.variable()
+            z = opti.variable()
+            opti.minimize(x**2+y**2+z**2)
+            g1 = 2*x+3*y+4<=0
+            opti.subject_to(g1)
+            g2 = 7*x+3*z+6==0
+            opti.subject_to(g2)
+            opti.solver('highs' if t=='conic' else 'ipopt')
+            
+            sol = opti.solve()
+            
+            if t=='conic':
+                data = {}
+            else:
+                data = ref
+            
+            data["x"] = sol.value(opti.x)
+            data["lam_g"] = sol.value(opti.lam_g)
+            data["g1"] = sol.value(opti.dual(g1))
+            data["g2"] = sol.value(opti.dual(g2))
+        print(data)
+        print(ref)
+        for k in data.keys():
+            self.checkarray(data[k],ref[k],digits=6)
+    
+    @requires_conic("superscs")
+    @requires_nlpsol("ipopt")
+    def test_dual_soc(self):
+    
+        ref = {}
+        
+        for t in ['conic']:
+            opti = Opti(t)
+            x = opti.variable()
+            y = opti.variable()
+            z = opti.variable()
+            h = soc(vertcat(x-5,y-7),4)
+
+            # Note: >= destroys sparsity
+            opti.subject_to(h>0)
+            g1 = 1*x+2*y+3*z+3==0
+            opti.subject_to(g1)
+        
+            opti.minimize(2*x+y)
+            
+            if t=='conic':
+                opti.solver('superscs',{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}})
+            else:
+                opti.solver("ipopt")
+
+            sol = opti.solve()
+            
+            if t=='conic':
+                data = {}
+            else:
+                data = ref
+            data["f"] = sol.value(opti.f)
+            data["x"] = sol.value(opti.x)
+            data["lam_g"] = sol.value(opti.lam_g)
+            #data["g1"] = sol.value(opti.dual(g1))
+            #data["g2"] = sol.value(opti.dual(g2))
+            print(data)
+
+
+     # to_function with lam_g
 if __name__ == '__main__':
     unittest.main()

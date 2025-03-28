@@ -432,6 +432,8 @@ private:
   std::vector<double> g_linear_scale_;
   std::vector<double> h_linear_scale_;
 
+  std::vector<casadi_int> index_all_to_g_;
+
   /// Bounds helper function: p -> lbg, ubg
   Function bounds_;
   MX bounds_lbg_, bounds_unscaled_lbg_;

@@ -779,6 +779,24 @@ void OptiNode::bake() {
     r2.stop  = r.stop;
 
   }
+  index_all_to_g_.resize(offset);
+  offset = 0;
+  casadi_int offset_g = 0;
+  casadi_int offset_h = 0;
+  for (const auto& g : g_) {
+    const MetaCon& r = meta_con(g);
+    if (r.type==OPTI_PSD) {
+      for (casadi_int i=0;i<r.stop-r.start;++i) {
+        index_all_to_g_[r.start+i] = -1;
+      }
+      offset_h += r.canon.nnz();
+    } else {
+      for (casadi_int i=0;i<r.stop-r.start;++i) {
+        index_all_to_g_[r.start+i] = offset_g+i;
+      }
+      offset_g += r.canon.nnz();
+    }
+  }
 
   std::vector<MX> lam = active_symvar(OPTI_DUAL_G);
   for (casadi_int i=0;i<lam.size();++i) meta(lam[i]).active_i = i;
@@ -1228,13 +1246,15 @@ void OptiNode::res(const DMDict& res) {
       data_v[i] = x_v[j]*linear_scale_[j] + linear_scale_offset_[j];
     }
   }
-  if (res.find("lam_g")!=res.end() && problem_type_!="conic") {
+  if (res.find("lam_g")!=res.end()) {
     const std::vector<double> & lam_v = res.at("lam_g").nonzeros();
     for (const auto &v : active_symvar(OPTI_DUAL_G)) {
       casadi_int i = meta(v).i;
       std::vector<double> & data_v = store_latest_[OPTI_DUAL_G][i].nonzeros();
       for (casadi_int i=0;i<data_v.size();++i) {
         casadi_int j = meta(v).start+i;
+        j = index_all_to_g_.at(j);
+        if (j<0) continue;
         data_v[i] = lam_v.at(j)/g_linear_scale_.at(j)*f_linear_scale_;
       }
     }
