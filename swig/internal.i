@@ -2686,9 +2686,6 @@
 %exception  casadi::GenericMatrix< MatType >::linear_coeff(const MatType &expr, const MatType &var, MatType &A, MatType &b, bool check) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix< MatType >::linearize(const MatType &f, const MatType &x, const MatType &x0, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::GenericMatrix< MatType >::linspace(const MatType &a, const MatType &b, casadi_int nsteps) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

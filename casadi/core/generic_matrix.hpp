@@ -790,6 +790,7 @@ namespace casadi {
     * For a variant that returns sin(x0)+cos(x0)*(x-x0), see taylor.
     *
     * \sa taylor, linear_coeff
+
         \identifier{1cs} */
     friend inline MatType linearize(const MatType& f, const MatType& x, const MatType& x0,
         const Dict& opts=Dict()) {
