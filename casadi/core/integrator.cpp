@@ -600,10 +600,7 @@ int Integrator::advance(IntegratorMemory* m) const {
 
 const Options Integrator::options_
 = {{&OracleFunction::options_},
-    {{"expand",
-      {OT_BOOL,
-      "Replace MX with SX expressions in problem formulation [false]"}},
-    {"print_stats",
+    {{"print_stats",
       {OT_BOOL,
       "Print out statistics after integration"}},
     {"nfwd",
@@ -645,16 +642,13 @@ const Options Integrator::options_
 void Integrator::init(const Dict& opts) {
   // Default (temporary) options
   double t0 = 0, tf = 1;
-  bool expand = false;
   bool output_t0 = false;
   std::vector<double> grid;
   bool uses_legacy_options = false;
 
   // Read options
   for (auto&& op : opts) {
-    if (op.first=="expand") {
-      expand = op.second;
-    } else if (op.first=="output_t0") {
+    if (op.first=="output_t0") {
       output_t0 = op.second;
       uses_legacy_options = true;
     } else if (op.first=="print_stats") {
@@ -686,9 +680,6 @@ void Integrator::init(const Dict& opts) {
       uses_legacy_options = true;
     }
   }
-
-  // Replace MX oracle with SX oracle?
-  if (expand) this->expand();
 
   // Store a copy of the options, for creating augmented integrators
   opts_ = opts;

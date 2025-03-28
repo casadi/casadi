@@ -51,7 +51,11 @@ const Options OracleFunction::options_
 = {{&FunctionInternal::options_},
     {{"expand",
       {OT_BOOL,
-      "Replace MX with SX expressions in problem formulation [false]"}},
+      "Replace MX with SX expressions in problem formulation [false] "
+      "This happens before creating derivatives unless indicated by postpone_expand"}},
+    {"postpone_expand",
+      {OT_BOOL,
+      "When expand is active, postpone it until after creation of derivatives. Default: False"}},
     {"monitor",
       {OT_STRINGVECTOR,
       "Set of user problem functions to be monitored"}},
@@ -74,15 +78,19 @@ void OracleFunction::init(const Dict& opts) {
 
   // Default options
   bool expand = false;
+  bool postpone_expand = false;
 
   show_eval_warnings_ = true;
 
   max_num_threads_ = 1;
+  post_expand_ = false;
 
   // Read options
   for (auto&& op : opts) {
     if (op.first=="expand") {
       expand = op.second;
+    } else if (op.first=="postpone_expand") {
+      postpone_expand = op.second;
     } else if (op.first=="common_options") {
       common_options_ = op.second;
     } else if (op.first=="specific_options") {
@@ -101,7 +109,8 @@ void OracleFunction::init(const Dict& opts) {
   }
 
   // Replace MX oracle with SX oracle?
-  if (expand) oracle_ = oracle_.expand();
+  if (expand && !postpone_expand) oracle_ = oracle_.expand();
+  if (expand && postpone_expand) post_expand_ = true;
 
   stride_arg_ = 0;
   stride_res_ = 0;
@@ -111,6 +120,12 @@ void OracleFunction::init(const Dict& opts) {
 }
 
 void OracleFunction::finalize() {
+  if (post_expand_) {
+    for (auto&& e : all_functions_) {
+      Function& fcn = e.second.f;
+      fcn = fcn.expand();
+    }
+  }
 
   // Allocate space for (parallel) evaluations
   // Lifted from set_function as max_num_threads_ is not known yet in that method
@@ -633,6 +648,7 @@ OracleFunction::OracleFunction(DeserializingStream& s) : FunctionInternal(s) {
     stride_iw_ = 0;
     stride_w_ = 0;
   }
+  post_expand_ = false;
 }
 
 } // namespace casadi

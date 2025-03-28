@@ -117,15 +117,14 @@ namespace casadi {
     //                      h(x) >=0 (psd)
 
     // Extract 'expand' option
-    Dict opt = opts;
-    auto it = opt.find("expand");
     bool expand = false;
+    Dict opt = opts;
+    extract_from_dict_inplace(opt, "expand", expand);
+    bool postpone_expand = false;
+    extract_from_dict_inplace(opt, "postpone_expand", postpone_expand);
     bool error_on_fail = get_from_dict(opts, "error_on_fail", true);
-    if (it!=opt.end()) {
-      expand = it->second;
-      opt.erase(it);
-    }
-    if (expand && M::type_name()=="MX") {
+
+    if (expand && !postpone_expand && M::type_name()=="MX") {
       Function f = Function("f", qp, {"x", "p"}, {"f", "g", "h"});
       std::vector<SX> arg = f.sx_in();
       std::vector<SX> res = f(arg);
@@ -195,7 +194,9 @@ namespace casadi {
     M Q = M::jacobian(h, x);
 
     // Create a function for calculating the required matrices vectors
-    Function prob(name + "_qp", {x, p}, {H, c, A, b, Q, P});
+    Function prob(name + "_qp", {x, p}, {H, c, A, b, Q, P},
+      {"x", "p"}, {"H", "c", "A", "b", "Q", "P"});
+    if (expand && postpone_expand) prob = prob.expand();
 
     // Make sure that the problem is sound
     casadi_assert(!prob.has_free(), "Cannot create '" + prob.name() + "' "

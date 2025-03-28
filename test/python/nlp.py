@@ -1416,6 +1416,46 @@ class NLPtests(casadiTestCase):
       with self.assertInException("process"):
         solver(x0=0,lbg=0,ubg=0)
 
+  
+  @requires_nlpsol("ipopt")
+  def test_postpone_expand(self):
+    x = MX.sym("x")
+    p = MX.sym("p")
+    
+    J = Function("jac_f", [x, MX(1,1)], [-x], ['x', 'out_r'], ['jac_r_x'])
+    f = Function('f', [x], [x**2], ['x'], ['r'], dict(custom_jacobian = J, jac_penalty = 0))
+    
+    solver = nlpsol("solver","ipopt",{"x":x,"f":f(x-3)},{"ipopt.max_iter": 5})
+    solver()
+    self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_LIMITED")
+    self.assertTrue(solver.get_function('nlp_jac_g').is_a("MXFunction"))
+
+    J = Function("jac_f", [x, MX(1,1)], [-x], ['x', 'out_r'], ['jac_r_x'])
+    f = Function('f', [x], [x**2], ['x'], ['r'], dict(custom_jacobian = J, jac_penalty = 0))
+    
+    solver = nlpsol("solver","ipopt",{"x":x,"f":f(x-3)},{"ipopt.max_iter": 5, "expand":True})
+    solver()
+    self.assertTrue(solver.stats()["return_status"]=="Solve_Succeeded")
+    self.assertTrue(solver.get_function('nlp_jac_g').is_a("SXFunction"))
+    
+
+
+    J = Function("jac_f", [x, MX(1,1)], [-x], ['x', 'out_r'], ['jac_r_x'])
+    f = Function('f', [x], [x**2], ['x'], ['r'], dict(custom_jacobian = J, jac_penalty = 0))
+    
+    solver = nlpsol("solver","ipopt",{"x":x,"f":f(x-3)},{"ipopt.max_iter": 5, "postpone_expand":True})
+    solver()
+    self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_LIMITED")
+    self.assertTrue(solver.get_function('nlp_jac_g').is_a("MXFunction"))
+
+    J = Function("jac_f", [x, MX(1,1)], [-x], ['x', 'out_r'], ['jac_r_x'])
+    f = Function('f', [x], [x**2], ['x'], ['r'], dict(custom_jacobian = J, jac_penalty = 0))
+    
+    solver = nlpsol("solver","ipopt",{"x":x,"f":f(x-3)},{"ipopt.max_iter": 5, "expand":True, "postpone_expand":True})
+    solver()
+    self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_LIMITED")
+    self.assertTrue(solver.get_function('nlp_jac_g').is_a("SXFunction"))
+    
 
   @requires_nlpsol("ipopt")
   def test_iteration_Callback(self):

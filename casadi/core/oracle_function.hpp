@@ -109,6 +109,10 @@ namespace casadi {
     // Memory stride in case of multipel threads
     size_t stride_arg_, stride_res_, stride_iw_, stride_w_;
 
+    // Expand after construction?
+    // Only used in finalize -> no need to serialize
+    bool post_expand_;
+
   public:
     /** \brief  Constructor
 
