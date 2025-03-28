@@ -1087,28 +1087,13 @@ namespace casadi {
   }
 
   MX MX::diagcat(const std::vector<MX>& x) {
-    if (x.empty()) {
-      return MX(0, 0);
-    } else if (x.size()==1) {
-      return x.front();
-    } else if (has_empty(x)) {
-      std::vector<MX> ret = trim_empty(x);
-      if (ret.empty()) {
-        // We still want diagcat(zeros(5,0),zeros(5,0)) -> zeros(10,0)
-        ret = trim_empty(x, true);
-        casadi_int s1 = 0;
-        casadi_int s2 = 0;
-        for (casadi_int i=0;i<ret.size();++i) {
-          s1+= ret[i].size1();
-          s2+= ret[i].size2();
-        }
-        return MX::zeros(s1, s2);
-      } else {
-        return diagcat(ret);
-      }
-    } else {
-      return x.front()->get_diagcat(x);
-    }
+    // Quick return if empty or single element
+    if (x.empty()) return MX();
+    if (x.size()==1) return x.front();
+    // Call recursively if any 0-by-0 matrices
+    if (has_empty(x, true)) return diagcat(trim_empty(x, true));
+    // Create diagcat node
+    return x.front()->get_diagcat(x);
   }
 
   MX MX::vertcat(const std::vector<MX>& x) {

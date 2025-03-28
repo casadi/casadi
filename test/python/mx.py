@@ -1377,6 +1377,16 @@ class MXtests(casadiTestCase):
     f_out = f.call([])
 
     self.checkarray(f_out[0],r)
+    
+    cx = 3
+    cy = 4
+    for X in [DM,SX,MX]:
+        for nx in [2,1,0]:
+            for ny in [2,1,0]:
+                print(X,nx,ny)
+                r = diagcat(X(nx,ny),X.ones(cx,cy),X(nx,ny))
+                self.assertEqual(r.shape[0],cx+2*nx)
+                self.assertEqual(r.shape[1],cy+2*ny)
 
   def test_tril2symm(self):
     x = MX.sym("x",Sparsity.lower(3))
