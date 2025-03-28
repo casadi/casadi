@@ -775,7 +775,10 @@ namespace casadi {
       return MatType::solve(A, b, lsolver, dict);
     }
 
+#ifdef WITH_DEPRECATED_FEATURES
     /** \brief Linearize an expression
+    *
+    * [DEPRECATED] confusing behaviour
     *
     * This function linearizes an expression around a point x0,
     * using x as delta around that point.
@@ -792,6 +795,7 @@ namespace casadi {
         const Dict& opts=Dict()) {
       return MatType::linearize(f, x, x0, opts);
     }
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Computes the Moore-Penrose pseudo-inverse
      *
