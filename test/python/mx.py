@@ -3859,6 +3859,59 @@ class MXtests(casadiTestCase):
                             f = Function('f',[x],[r])
                             f_ref = Function('f',[x],[r_ref])
                             self.checkfunction_light(f,f_ref,inputs=[DM.rand(nx,mx)])
-                                
+
+  def test_issue2934(self):
+    M = MX.sym("X",5,5)
+    Y = MX.sym("y",2,2)
+
+    args = [M,Y]
+
+    m = MX(M)
+
+
+    m[[0,0],[0,0]] = Y
+
+    print(m)
+    f = Function('f',[M,Y],[m])
+    print(f.call([M,Y],True,False)[0])
+    self.assertTrue("((2.*X)[-1, -1, -1, 0] = y)" in str(f.call([2*M,Y],True,False)[0]))
+
+  def test_issue2935(self):
+
+
+    M = MX(DM.rand(5,5))
+    S = M.sparsity()
+    m = M
+
+    Y = MX.sym("y",2,2)
+    E = Y.sparsity()
+    y = Y
+
+    m[[0,0],[0,0]] = y
+
+    e = cos(m)
+    e = dot(e,e)
+
+    eb = MX.sym("eb")
+    ge = jtimes(e,Y,eb,True)
+
+    f = Function('f',[eb,Y],[ge])
+
+    e1 = f.call([eb,Y],True,False)[0] # without eval_mx
+    e2 = f.call([eb,Y+1e-300],True,False)[0] # with eval_mx
+
+    print(e1)
+    print(e2)
+
+    f1 = Function('f1',[eb,Y],[ge])
+    f2 = Function('f2',[eb,Y],[e2])
+
+    args = [1,numpy.random.random(E.shape)]
+
+    print(f1(*args))
+    print(f2(*args))
+
+    assert f1(*args).sparsity()==f2(*args).sparsity()
+          
 if __name__ == '__main__':
     unittest.main()
