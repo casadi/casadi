@@ -2473,12 +2473,14 @@ class NLPtests(casadiTestCase):
     x = MX.sym('x')
 
     y = (x.printme(0)**2)
-    options = {"common_options": {"helper_options": {"enable_fd":True,"enable_forward":False,"enable_reverse":False}}, "ipopt": {"resto.tol" :1e-8}}
+    options = {"common_options": {"helper_options": {"enable_fd":True,"enable_forward":False,"enable_reverse":False}}, "ipopt": {"resto.tol" :1e-8, "hessian_approximation":"limited-memory","max_iter":0}}
+    print(options)
     solver = nlpsol("solver","ipopt",{"x":x,"f":y},options)
-
     with capture_stdout() as result:
         solver(x0=1)
-        
+
+    self.assertTrue(len(result[1])==0)
+
     r = []
     for l in result[0].splitlines():
         if "|> 0 : " in l:
@@ -2489,6 +2491,26 @@ class NLPtests(casadiTestCase):
     self.assertTrue(spread>0)
     self.assertTrue(spread<1e-4)
     
+
+    """
+    options = {"specific_options": {"nlp_hess_l": {"helper_options": {"enable_fd":True,"enable_forward":False,"enable_reverse":False}}}, "ipopt": {"resto.tol" :1e-8}}
+    print(options)
+    solver = nlpsol("solver","ipopt",{"x":x,"f":y},options)
+    solver(x0=1)
+
+    self.assertTrue(len(result[1])==0)
+
+    r = []
+    for l in result[0].splitlines():
+        if "|> 0 : " in l:
+            r.append(float(l.split(":")[1]))
+    print(r)
+    spread = np.max(r)-np.min(r)
+    print(spread)
+    self.assertTrue(spread>0)
+    self.assertTrue(spread<1e-4)
+    """
+
 if __name__ == '__main__':
     unittest.main()
     print(solvers)
