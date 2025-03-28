@@ -307,10 +307,10 @@ namespace casadi {
               errors.insert(i);
               report_issue(i, "Constraint found depending on a state of the previous interval.");
             }
-            if (A_bottomline[i]<start_pivot || A_bottomline[i]>pivot) {
-              errors.insert(i);
-              report_issue(i, "Gap-closing constraint must depend on a state.");
-            }
+            //if (A_bottomline[i]<start_pivot || A_bottomline[i]>pivot) {
+            //  errors.insert(i);
+            //  report_issue(i, "Gap-closing constraint must depend on a state.");
+            //}
             nxs_.push_back(1);
             nus_.push_back(A_skyline[i]-pivot-1); // Size of jump equals number of states
             ngs_.push_back(0);
