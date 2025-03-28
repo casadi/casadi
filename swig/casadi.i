@@ -3374,7 +3374,7 @@ DECL M casadi_jacobian(const M &ex, const M &arg, const Dict& opts=Dict()) {
   return jacobian(ex, arg, opts);
 }
 
-DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
+DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false, const Dict& opts=Dict()) {
   return jtimes(ex, arg, v, tr);
 }
 
@@ -3399,12 +3399,12 @@ DECL bool casadi_is_quadratic(const M& expr, const M& var) {
   return is_quadratic(expr, var);
 }
 
-DECL M casadi_gradient(const M &ex, const M &arg) {
-  return gradient(ex, arg);
+DECL M casadi_gradient(const M &ex, const M &arg, const Dict& opts=Dict()) {
+  return gradient(ex, arg, opts);
 }
 
-DECL M casadi_tangent(const M &ex, const M &arg) {
-  return tangent(ex, arg);
+DECL M casadi_tangent(const M &ex, const M &arg, const Dict& opts=Dict()) {
+  return tangent(ex, arg, opts);
 }
 
 DECL M casadi_hessian(const M& ex, const M& arg, M& OUTPUT1, const casadi::Dict& opts = casadi::Dict()) {
