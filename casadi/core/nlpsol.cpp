@@ -780,6 +780,8 @@ namespace casadi {
     casadi_copy(d_nlp->lam_p, np_, d_nlp->lam_p);
     casadi_copy(&d_nlp->objective, 1, d_nlp->f);
 
+    if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
+
     if (error_on_fail_ && !m->success)
       casadi_error("nlpsol process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");

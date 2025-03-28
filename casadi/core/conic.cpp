@@ -553,6 +553,8 @@ namespace casadi {
 
     int ret = solve(arg, res, iw, w, mem);
 
+    if (m->d_qp.success) m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
+
     if (error_on_fail_ && !m->d_qp.success)
       casadi_error("conic process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");

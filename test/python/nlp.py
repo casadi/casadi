@@ -400,6 +400,9 @@ class NLPtests(casadiTestCase):
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["g"][0],1,9,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
+      print("unified_return_status",solver.stats()["unified_return_status"])      
+      self.assertEqual(solver.stats()["unified_return_status"],"SOLVER_RET_SUCCESS")
+
 
       if aux_options["codegen"]:
         self.check_codegen(solver,solver_in,**aux_options["codegen"])

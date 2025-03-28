@@ -327,6 +327,7 @@ class ConicTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
       self.assertTrue(solver.stats()["success"])
+      self.assertEqual(solver.stats()["unified_return_status"],"SOLVER_RET_SUCCESS")
 
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(conic))
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(conic))

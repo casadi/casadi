@@ -492,7 +492,6 @@ int Sqpmethod::solve(void* mem) const {
         print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
       m->return_status = "Solve_Succeeded";
       m->success = true;
-      m->unified_return_status = SOLVER_RET_SUCCESS;
       break;
     }
 

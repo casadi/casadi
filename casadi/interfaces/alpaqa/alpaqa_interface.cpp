@@ -256,7 +256,6 @@ namespace casadi {
 
     if (stats.status == alpaqa::SolverStatus::Converged) {
       m->success = true;
-      m->unified_return_status = SOLVER_RET_SUCCESS;
     } else if (stats.status == alpaqa::SolverStatus::MaxTime || stats.status == alpaqa::SolverStatus::MaxIter) {
       m->unified_return_status = SOLVER_RET_LIMITED;
     } else if (stats.status == alpaqa::SolverStatus::NotFinite) {
