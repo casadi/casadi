@@ -3803,5 +3803,52 @@ class MXtests(casadiTestCase):
         with self.assertInException("axis 2 is out of bound"):
             np.sum(e,2)
 
+  def test_jtimes_empty(self):
+  
+    with self.assertInException("Ambiguous"):
+        x = SX.sym("x",2,0)
+        y = jtimes(5,x,DM.ones(2,5))
+    with self.assertInException("Ambiguous"):
+        x = SX.sym("x",2,3)
+        y = jtimes(DM.ones(4,0),x,DM.ones(4,6),True)
+    
+    # non-transpose
+    for X in [SX,MX]:
+        for nx in [2,1,0]:
+            for mx in [3,1,0]:
+                x = X.sym("x",nx,mx)
+                for ny in [3,1,0]:
+                    for my in [4,1,0]:
+                        for bm in [1,3,0]:
+                            if bm!=1 and my==0: continue # ambiguous construction
+                            y = mtimes(mtimes(DM.rand(ny,nx), x),DM.rand(mx,my))
+                            assert y.shape==(ny,my)
+                            yb = DM.rand(ny,my*bm)
+                            
+                            r = jtimes(y,x,yb,True)
+                            r_ref = hcat(mtimes(jacobian(y,vec(x)).T,vec(e)).reshape(x.shape) for e in horzsplit(yb,max(1,my)))
+                            self.assertTrue(r.shape==(nx,mx*bm))
+                            f = Function('f',[x],[r])
+                            f_ref = Function('f',[x],[r_ref])
+                            self.checkfunction_light(f,f_ref,inputs=[DM.rand(nx,mx)])
+        for nx in [2,1,0]:
+            for mx in [3,1,0]:
+                x = X.sym("x",nx,mx)
+                for ny in [3,1,0]:
+                    for my in [4,1,0]:
+                        for bm in [1,3,0]:
+                            if bm!=1 and mx==0: continue # ambiguous construction
+                            y = mtimes(mtimes(DM.rand(ny,nx), x),DM.rand(mx,my))
+                            assert y.shape==(ny,my)
+                            dx = DM.rand(nx,mx*bm)
+
+                            r = jtimes(y,x,dx)
+                            r_ref = hcat(mtimes(jacobian(y,vec(x)),vec(e)).reshape(x.shape) for e in horzsplit(dx,max(1,ny)))
+                            
+                            self.assertTrue(r.shape==(ny,my*bm))
+                            f = Function('f',[x],[r])
+                            f_ref = Function('f',[x],[r_ref])
+                            self.checkfunction_light(f,f_ref,inputs=[DM.rand(nx,mx)])
+                                
 if __name__ == '__main__':
     unittest.main()

@@ -1611,17 +1611,35 @@ namespace casadi {
     try {
       // Assert consistent input dimensions
       if (tr) {
-        casadi_assert(v.size1() == ex.size1() && v.size2() % ex.size2() == 0,
+        if (ex.size2()==0 && v.size2()>0) {
+          casadi_error("Ambiguous dimensions.");
+        }
+        casadi_assert(v.size1() == ex.size1() &&
+                      (v.size2()==0 || ex.size2()==0 || v.size2() % ex.size2() == 0),
                       "'v' has inconsistent dimensions: "
                       " v " + v.dim(false) + ", ex " + ex.dim(false) + ".");
       } else {
-        casadi_assert(v.size1() == arg.size1() && v.size2() % arg.size2() == 0,
+        if (arg.size2()==0 && v.size2()>0) {
+          casadi_error("Ambiguous dimensions.");
+        }
+        casadi_assert(v.size1() == arg.size1() &&
+                      (v.size2()==0 || arg.size2()==0 || v.size2() % arg.size2() == 0),
                       "'v' has inconsistent dimensions: "
                       " v " + v.dim(false) + ", arg " + arg.dim(false) + ".");
       }
 
+      casadi_int n_seeds = 1;
+      if (tr) {
+        if (ex.size2()>0) n_seeds = v.size2() / ex.size2();
+      } else {
+        if (arg.size2()>0) n_seeds = v.size2() / arg.size2();
+      }
+
       // Quick return if no seeds
-      if (v.is_empty()) return MatType(tr ? arg.size1() : ex.size1(), 0);
+      if (v.is_empty() || ex.is_empty()) {
+        return MatType(tr ? arg.size1() : ex.size1(),
+                       tr ? arg.size2()*n_seeds : ex.size2()*n_seeds);
+      }
 
       // Split up the seed into its components
       std::vector<MatType> w = horzsplit(v, tr ? ex.size2() : arg.size2());
