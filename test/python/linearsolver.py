@@ -642,6 +642,31 @@ class LinearSolverTests(casadiTestCase):
         self.assertTrue(S1==S2)
         self.assertTrue(C.is_subset(S1))
     
+    
+  def test_issue2734(self):
+    example_input = blockcat([[     8  ,  1  ,   6],[
+         3 ,    5  ,   7],[
+         4  ,   9   ,  2]])
+
+    ## SX
+    a=SX.sym('a',3,3)
+    f=Function('f',[a],[pinv(a)])
+    res1 = f(example_input)
+
+    ## MX without expand
+    am=MX.sym('am',3,3)
+    fm=Function('f',[am],[pinv(am,'symbolicqr')])
+    res2 = fm(example_input)
+
+    ## MX with expand (gives incorrect result)
+    am=MX.sym('am',3,3)
+    fm=Function('f',[am],[pinv(am,'symbolicqr')])
+    fm=fm.expand(); 
+    res3 = fm(example_input)
+    
+    self.checkarray(res1,res2)
+    self.checkarray(res1,res3)
+
 
 if __name__ == '__main__':
     unittest.main()
