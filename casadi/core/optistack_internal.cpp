@@ -782,14 +782,12 @@ void OptiNode::bake() {
   index_all_to_g_.resize(offset);
   offset = 0;
   casadi_int offset_g = 0;
-  casadi_int offset_h = 0;
   for (const auto& g : g_) {
     const MetaCon& r = meta_con(g);
     if (r.type==OPTI_PSD) {
       for (casadi_int i=0;i<r.stop-r.start;++i) {
         index_all_to_g_[r.start+i] = -1;
       }
-      offset_h += r.canon.nnz();
     } else {
       for (casadi_int i=0;i<r.stop-r.start;++i) {
         index_all_to_g_[r.start+i] = offset_g+i;
