@@ -63,7 +63,8 @@ struct casadi_hpipm_block {
 // C-REPLACE "casadi_hpipm_block" "struct casadi_hpipm_block"
 
 // SYMBOL "hpipm_unpack_blocks"
-inline void casadi_hpipm_unpack_blocks(casadi_int N, casadi_hpipm_block* blocks, const casadi_int* packed) {
+template<typename T1>
+void casadi_hpipm_unpack_blocks(casadi_int N, casadi_hpipm_block* blocks, const casadi_int* packed) {
     casadi_int i;
     for (i=0;i<N;++i) {
         blocks[i].offset_r = *packed++;
