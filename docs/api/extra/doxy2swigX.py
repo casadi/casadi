@@ -464,9 +464,9 @@ class Doxy2SWIG_X(Doxy2SWIG):
             
           if meta is not None:
               if len("".join(pieces).strip())>0:
-                  pieces = pieces+["Doc source: https://github.com/casadi/casadi/blob/develop%s#L%d\n" % (meta["decl"]["file"].replace(stem,""),meta["decl"]["line"])]
+                  pieces = pieces+["Doc source: https://github.com/casadi/casadi/blob/main%s#L%d\n" % (meta["decl"]["file"].replace(stem,""),meta["decl"]["line"])]
                   if "impl" in meta:
-                      pieces = pieces+["Implementation: https://github.com/casadi/casadi/blob/develop%s#L%d-L%d\n" % (meta["impl"]["file"].replace(stem,""),meta["impl"]["lines"][0],meta["impl"]["lines"][1])]
+                      pieces = pieces+["Implementation: https://github.com/casadi/casadi/blob/main%s#L%d-L%d\n" % (meta["impl"]["file"].replace(stem,""),meta["impl"]["lines"][0],meta["impl"]["lines"][1])]
             
           #"INTERNAL": "mark_internal(\"$decl\");"
           #"DEPRECATED": "deprecated(\"%s\");"
