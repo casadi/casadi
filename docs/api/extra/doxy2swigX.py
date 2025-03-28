@@ -194,8 +194,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
       self.multi = 1
       comps = node.getElementsByTagName('compound')
       for c in comps:
-          refid = c.attributes['refid'].value          
-          if c.attributes['kind'].value in ["example","struct","group","source","dir","file"]: continue
+          refid = c.attributes['refid'].value
+          if c.attributes['kind'].value in ["example","struct","source","dir","file"]: continue
           filters = ["internal","interface","node"]
           filtered = False          
           for f in filters:
@@ -421,7 +421,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
       Doxy2SWIG.generate(self)
       for k, v in self.docstringmap.items():
         if k.startswith("plugin_"):
-          groupdoc[k] = v[0][1]
+          self.groupdoc[k] = v[0][1]
           break
         # Group together
         grouped_list = []

@@ -39,7 +39,7 @@
 
     \identifier{22b} */
 
-/** \pluginsection{Nlpsol,AmplInterface} */
+/** \pluginsection{Nlpsol,ampl} */
 
 /// \cond INTERNAL
 namespace casadi {
@@ -49,9 +49,9 @@ namespace casadi {
   struct CASADI_NLPSOL_AMPL_EXPORT AmplInterfaceMemory : public NlpsolMemory {
   };
 
-  /** \brief \pluginbrief{Nlpsol,AmplInterface}
+  /** \brief \pluginbrief{Nlpsol,ampl}
      @copydoc Nlpsol_doc
-     @copydoc plugin_Nlpsol_AmplInterface
+     @copydoc plugin_Nlpsol_ampl
   */
   class CASADI_NLPSOL_AMPL_EXPORT AmplInterface : public Nlpsol {
   public:
