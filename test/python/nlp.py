@@ -29,6 +29,7 @@ from types import *
 from helpers import *
 import itertools
 import copy
+from casadi.tools import capture_stdout
 
 import os
 #GlobalOptions.setCatchErrorsPython(False)
@@ -2466,6 +2467,27 @@ class NLPtests(casadiTestCase):
     sol = solver(x0=0,lbg=0,ubg=0)
     self.assertTrue(solver.stats()["success"])
     self.checkfunction_light(ref_solver.get_function("nlp_jac_g"),solver.get_function("nlp_jac_g"),inputs=[vertcat(0.11,0.3,0.7),0])
+    
+  @requires_nlpsol("ipopt")
+  def test_option_propagation(self):
+    x = MX.sym('x')
+
+    y = (x.printme(0)**2)
+    options = {"common_options": {"helper_options": {"enable_fd":True,"enable_forward":False,"enable_reverse":False}}, "ipopt": {"resto.tol" :1e-8}}
+    solver = nlpsol("solver","ipopt",{"x":x,"f":y},options)
+
+    with capture_stdout() as result:
+        solver(x0=1)
+        
+    r = []
+    for l in result[0].splitlines():
+        if "|> 0 : " in l:
+            r.append(float(l.split(":")[1]))
+    print(r)
+    spread = np.max(r)-np.min(r)
+    print(spread)
+    self.assertTrue(spread>0)
+    self.assertTrue(spread<1e-4)
     
 if __name__ == '__main__':
     unittest.main()
