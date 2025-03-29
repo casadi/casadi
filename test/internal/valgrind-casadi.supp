@@ -639,3 +639,11 @@ obj:*libworhp*
   fun:blasfeo_allocate_dvec
 }
 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_ZnwmRKSt9nothrow_t
+   fun:__cxa_thread_atexit
+   fun:_ZN17HighsTaskExecutor10run_workerEiPS_
+}
