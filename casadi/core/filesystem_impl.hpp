@@ -32,6 +32,14 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  /** \brief Filesystem interface
+    
+    Talk to the filesystem without introducing a core dependency
+
+    @copydoc Filesystem_doc
+    \author Joris Gillis
+    \date 2025
+ */
   class CASADI_EXPORT
   Filesystem : public PluginInterface<Filesystem> {
   public:

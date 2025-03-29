@@ -66,9 +66,7 @@ metadata=dict()
 for c in classes:
   refid = c.attrib['refid']
   name=c.findtext("name")
-  
-  constructor_name = name + "::" + name.split("::")[-1]
-  
+
   # Parse the XML file that describes the class
   f = etree.parse(xml+refid+'.xml')
   
@@ -93,7 +91,7 @@ for c in classes:
     meta['hasInternal']=temp.attrib["refid"]
   
   # find the file location of this class
-  temp = f.find("//memberdef[definition='%s']/location" % constructor_name)
+  temp = f.find("compounddef/location")
   if not(temp is None):
     meta['file']=temp.attrib["file"]
     

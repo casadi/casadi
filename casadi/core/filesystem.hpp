@@ -29,8 +29,18 @@
 #include <casadi/core/casadi_export.h>
 #include <string>
 
-/// \cond INTERNAL
 namespace casadi {
+
+  /** \defgroup main_filesystem Title
+      
+
+      \generalsection{Filesystem}
+      \pluginssection{Filesystem}
+
+      \author Joris Gillis
+      \date 2025
+
+  */
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_filesystem(const std::string& name);
@@ -43,6 +53,5 @@ namespace casadi {
 
 } // namespace casadi
 
-/// \endcond
 
 #endif // CASADI_FILESYSTEM_HPP

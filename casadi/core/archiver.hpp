@@ -29,8 +29,18 @@
 #include <casadi/core/casadi_export.h>
 #include <string>
 
-/// \cond INTERNAL
 namespace casadi {
+
+  /** \defgroup main_archiver Title
+      
+
+      \generalsection{Archiver}
+      \pluginssection{Archiver}
+
+      \author Joris Gillis
+      \date 2025
+
+  */
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_archiver(const std::string& name);
@@ -43,6 +53,5 @@ namespace casadi {
 
 } // namespace casadi
 
-/// \endcond
 
 #endif // CASADI_ARCHIVER_HPP

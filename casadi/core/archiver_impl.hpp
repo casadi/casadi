@@ -33,6 +33,14 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  /** \brief Archiver interface
+
+    Zip and unzip archives without a core dependency
+
+    @copydoc Archiver_doc
+    \author Joris Gillis
+    \date 2025
+ */
   class CASADI_EXPORT
   Archiver : public PluginInterface<Archiver> {
   public:
