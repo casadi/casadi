@@ -66,6 +66,8 @@ class Daebuildertests(casadiTestCase):
         zip_ref.extractall(unzipped_name)
     dae = DaeBuilder("cstr",unzipped_name)
     f = dae.create('f',['x','u'],['ode'])
+    with self.assertInException("No stats available"):
+        f.stats()
     dae = None
     
     C_A = SX.sym('C_A')
@@ -85,7 +87,8 @@ class Daebuildertests(casadiTestCase):
     f_ref = Function('f',[x,u],[ode],['x','u'],['ode'])
     
     test_point = [vertcat(1.1,1.3),vertcat(1.7,1.11,1.13)]
-    self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)      
+    self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
+    print(f.stats())
           
   def test_rumoca(self):
     if "rumoca" not in CasadiMeta.feature_list(): return

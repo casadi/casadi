@@ -834,6 +834,8 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != 0, "Memory is null");
 
+  setup(mem, arg, res, iw, w);
+
   // What blocks are there?
   bool need_jac = false, need_fwd = false, need_adj = false, need_hess = false;
   for (size_t k = 0; k < out_.size(); ++k) {
