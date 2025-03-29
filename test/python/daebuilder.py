@@ -156,6 +156,7 @@ class Daebuildertests(casadiTestCase):
   @requires_rootfinder("newton")
   @requires_nlpsol("ipopt")
   @requires_integrator("cvodes")
+  @memory_heavy()
   def test_fmu_demo(self):
         # Use FMU to create a CasADi/DaeBuilder instance
 
