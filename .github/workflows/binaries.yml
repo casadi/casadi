@@ -1096,6 +1096,8 @@ jobs:
           cd ../data
           wget https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol2.fmu
           wget https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol3.fmu
+          wget https://github.com/casadi/testbot/releases/download/perpetual/vdp.fmu
+          wget https://github.com/casadi/testbot/releases/download/perpetual/cstr.fmu
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
@@ -1105,6 +1107,9 @@ jobs:
           cd ../data
           C:\msys64\usr\bin\wget.exe https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol2.fmu
           C:\msys64\usr\bin\wget.exe https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol3.fmu
+          C:\msys64\usr\bin\wget.exe https://github.com/casadi/testbot/releases/download/perpetual/vdp.fmu
+          C:\msys64\usr\bin\wget.exe https://github.com/casadi/testbot/releases/download/perpetual/cstr.fmu
+          
         if: contains(matrix.image, 'windows')
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
