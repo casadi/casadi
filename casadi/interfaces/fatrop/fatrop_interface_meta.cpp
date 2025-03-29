@@ -23,7 +23,45 @@
  */
 
 
-#include "fatrop_interface.hpp"
-#include <string>
+      #include "fatrop_interface.hpp"
+      #include <string>
 
-const std::string casadi::FatropInterface::meta_doc = "\n";
+      const std::string casadi::FatropInterface::meta_doc=
+      "\n"
+"\n"
+">List of available options\n"
+"\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"|         Id          |     Type     |             Description             |\n"
+"+=====================+==============+=====================================+\n"
+"| N                   | OT_INT       | OCP horizon                         |\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"| convexify_margin    | OT_DOUBLE    | When using a convexification        |\n"
+"|                     |              | strategy, make sure that the        |\n"
+"|                     |              | smallest eigenvalue is at least     |\n"
+"|                     |              | this (default: 1e-7).               |\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"| convexify_strategy  | OT_STRING    | NONE|regularize|eigen-              |\n"
+"|                     |              | reflect|eigen-clip. Strategy to     |\n"
+"|                     |              | convexify the Lagrange Hessian      |\n"
+"|                     |              | before passing it to the solver.    |\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"| debug               | OT_BOOL      | Produce debug information (default: |\n"
+"|                     |              | false)                              |\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"| fatrop              | OT_DICT      | Options to be passed to fatrop      |\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"| ng                  | OT_INTVECTOR | Number of non-dynamic constraints,  |\n"
+"|                     |              | length N+1                          |\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"| nu                  | OT_INTVECTOR | Number of controls, length N+1      |\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"| nx                  | OT_INTVECTOR | Number of states, length N+1        |\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"| structure_detection | OT_STRING    | NONE | auto | manual                |\n"
+"+---------------------+--------------+-------------------------------------+\n"
+"\n"
+"\n"
+"\n"
+"\n"
+;

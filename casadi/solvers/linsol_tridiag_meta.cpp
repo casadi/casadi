@@ -5,7 +5,6 @@
  *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
- *    Copyright (C) 2019 Jorn Baayen, KISTERS AG
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -29,5 +28,11 @@
 
       const std::string casadi::LinsolTridiag::meta_doc=
       "\n"
+"\n"
+"\n"
+"Linear solver for tridiagonal matrices\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_22v \n"
+"\n"
 "\n"
 ;

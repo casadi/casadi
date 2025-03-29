@@ -39,7 +39,8 @@ namespace casadi {
     @copydoc Filesystem_doc
     \author Joris Gillis
     \date 2025
- */
+
+      \identifier{2d7} */
   class CASADI_EXPORT
   Filesystem : public PluginInterface<Filesystem> {
   public:

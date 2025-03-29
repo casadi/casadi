@@ -40,7 +40,8 @@ namespace casadi {
     @copydoc Archiver_doc
     \author Joris Gillis
     \date 2025
- */
+
+      \identifier{2d9} */
   class CASADI_EXPORT
   Archiver : public PluginInterface<Archiver> {
   public:

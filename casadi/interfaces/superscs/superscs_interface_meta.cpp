@@ -27,5 +27,25 @@
       #include <string>
 
       const std::string casadi::SuperscsInterface::meta_doc=
+      "\n"
+"\n"
+"\n"
+"Interface to the SuperSCS solver for conic programming\n"
+"\n"
+"Joris Gillis, 2019\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_21z \n"
+"\n"
+"\n"
+">List of available options\n"
+"\n"
+"+----------+---------+-----------------------------------+\n"
+"|    Id    |  Type   |            Description            |\n"
+"+==========+=========+===================================+\n"
+"| superscs | OT_DICT | Options to be passed to superscs. |\n"
+"+----------+---------+-----------------------------------+\n"
+"\n"
+"\n"
+"\n"
 "\n"
 ;

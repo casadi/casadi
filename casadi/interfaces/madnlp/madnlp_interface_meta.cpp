@@ -23,7 +23,35 @@
  */
 
 
-#include "madnlp_interface.hpp"
-#include <string>
+      #include "madnlp_interface.hpp"
+      #include <string>
 
-const std::string casadi::MadnlpInterface::meta_doc = "\n";
+      const std::string casadi::MadnlpInterface::meta_doc=
+      "\n"
+"\n"
+">List of available options\n"
+"\n"
+"+--------------------+--------------+--------------------------------------+\n"
+"|         Id         |     Type     |             Description              |\n"
+"+====================+==============+======================================+\n"
+"| convexify_margin   | OT_DOUBLE    | When using a convexification         |\n"
+"|                    |              | strategy, make sure that the         |\n"
+"|                    |              | smallest eigenvalue is at least this |\n"
+"|                    |              | (default: 1e-7).                     |\n"
+"+--------------------+--------------+--------------------------------------+\n"
+"| convexify_strategy | OT_STRING    | NONE|regularize|eigen-reflect|eigen- |\n"
+"|                    |              | clip. Strategy to convexify the      |\n"
+"|                    |              | Lagrange Hessian before passing it   |\n"
+"|                    |              | to the solver.                       |\n"
+"+--------------------+--------------+--------------------------------------+\n"
+"| madnlp             | OT_DICT      | Options to be passed to madnlp       |\n"
+"+--------------------+--------------+--------------------------------------+\n"
+"| ng                 | OT_INTVECTOR | Number of constraints                |\n"
+"+--------------------+--------------+--------------------------------------+\n"
+"| nw                 | OT_INTVECTOR | Number of variables                  |\n"
+"+--------------------+--------------+--------------------------------------+\n"
+"\n"
+"\n"
+"\n"
+"\n"
+;

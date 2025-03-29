@@ -5506,6 +5506,9 @@
 %exception  casadi::diff(const std::vector< T > &values) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::doc_archiver(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::doc_conic(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5513,6 +5516,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::doc_expm(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::doc_filesystem(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::doc_integrator(const std::string &name) {
@@ -5647,6 +5653,9 @@
 %exception  casadi::get_ptr(std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::has_archiver(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::has_conic(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5654,6 +5663,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::has_expm(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::has_filesystem(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::has_integrator(const std::string &name) {
@@ -5800,6 +5812,9 @@
 %exception  casadi::linspace(std::vector< T > &v, const F &first, const L &last) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::load_archiver(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::load_conic(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5807,6 +5822,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::load_expm(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::load_filesystem(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::load_integrator(const std::string &name) {

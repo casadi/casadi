@@ -28,4 +28,22 @@
 
       const std::string casadi::ClarabelInterface::meta_doc=
       "\n"
-      ;
+"\n"
+"Interface to the Clarabel solver for sparse Quadratic Programs. See \n"
+"the Clarabel documentation (e.g. clarabel.dev) for more details.\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_2bu \n"
+"\n"
+"\n"
+">List of available options\n"
+"\n"
+"+----------+---------+-----------------------------------+\n"
+"|    Id    |  Type   |            Description            |\n"
+"+==========+=========+===================================+\n"
+"| clarabel | OT_DICT | Options to be passed to Clarabel. |\n"
+"+----------+---------+-----------------------------------+\n"
+"\n"
+"\n"
+"\n"
+"\n"
+;

@@ -40,7 +40,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2025
 
-  */
+      \identifier{2d8} */
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_filesystem(const std::string& name);

@@ -23,10 +23,14 @@
  */
 
 
- #include "ghc.hpp"
- #include <string>
+      #include "ghc.hpp"
+      #include <string>
 
- const std::string casadi::Ghc::meta_doc=
- "\n"
+      const std::string casadi::Ghc::meta_doc=
+      "\n"
+"\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_2d0 \n"
+"\n"
 "\n"
 ;

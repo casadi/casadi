@@ -28,17 +28,11 @@
 
       const std::string casadi::TinyXmlInterface::meta_doc=
       "\n"
+"\n"
+"\n"
 "XmlFile using TinyXml\n"
 "\n"
-"\n"
-">List of available options\n"
-"\n"
-"+----+------+---------+-------------+\n"
-"| Id | Type | Default | Description |\n"
-"+====+======+=========+=============+\n"
-"+----+------+---------+-------------+\n"
-"\n"
-"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_22i \n"
 "\n"
 "\n"
 ;

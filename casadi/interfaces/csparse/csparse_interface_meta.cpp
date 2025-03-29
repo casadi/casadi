@@ -28,17 +28,11 @@
 
       const std::string casadi::CsparseInterface::meta_doc=
       "\n"
+"\n"
+"\n"
 "Linsol with CSparse Interface\n"
 "\n"
-"\n"
-">List of available options\n"
-"\n"
-"+----+------+---------+-------------+\n"
-"| Id | Type | Default | Description |\n"
-"+====+======+=========+=============+\n"
-"+----+------+---------+-------------+\n"
-"\n"
-"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_21t \n"
 "\n"
 "\n"
 ;

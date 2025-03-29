@@ -28,17 +28,11 @@
 
       const std::string casadi::SqicInterface::meta_doc=
       "\n"
+"\n"
+"\n"
 "Interface to the SQIC solver for quadratic programming\n"
 "\n"
-"\n"
-">List of available options\n"
-"\n"
-"+----+------+---------+-------------+\n"
-"| Id | Type | Default | Description |\n"
-"+====+======+=========+=============+\n"
-"+----+------+---------+-------------+\n"
-"\n"
-"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_21s \n"
 "\n"
 "\n"
 ;

@@ -28,17 +28,13 @@
 
       const std::string casadi::Ma27Interface::meta_doc=
       "\n"
-"Linsol with CSparse Interface\n"
 "\n"
 "\n"
-">List of available options\n"
+"Interface to the sparse direct linear solver MA27 Works for symmetric\n"
+" indefinite systems Partly adopted from qpOASES 3.2 \n"
+"Joel Andersson \n"
 "\n"
-"+----+------+---------+-------------+\n"
-"| Id | Type | Default | Description |\n"
-"+====+======+=========+=============+\n"
-"+----+------+---------+-------------+\n"
-"\n"
-"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_229 \n"
 "\n"
 "\n"
 ;

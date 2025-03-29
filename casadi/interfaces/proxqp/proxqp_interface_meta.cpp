@@ -27,5 +27,22 @@
       #include <string>
 
       const std::string casadi::ProxqpInterface::meta_doc=
+      "\n"
+"\n"
+">List of available options\n"
+"\n"
+"+-------------------+---------+--------------------------------------------+\n"
+"|        Id         |  Type   |                Description                 |\n"
+"+===================+=========+============================================+\n"
+"| proxqp            | OT_DICT | const proxqp options.                      |\n"
+"+-------------------+---------+--------------------------------------------+\n"
+"| warm_start_dual   | OT_BOOL | Use y and z input to warmstart [Default:   |\n"
+"|                   |         | true].                                     |\n"
+"+-------------------+---------+--------------------------------------------+\n"
+"| warm_start_primal | OT_BOOL | Use x input to warmstart [Default: true].  |\n"
+"+-------------------+---------+--------------------------------------------+\n"
+"\n"
+"\n"
+"\n"
 "\n"
 ;

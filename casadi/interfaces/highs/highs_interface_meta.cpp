@@ -28,4 +28,23 @@
 
       const std::string casadi::HighsInterface::meta_doc=
       "\n"
-      ;
+"\n"
+"\n"
+"Interface to HiGHS solver for sparse Quadratic Programs, see \n"
+"highs.dev for more information and https://www.maths.ed.ac.uk/hall/HiGHS/HighsOptions.html  for a list of options.\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_29k \n"
+"\n"
+"\n"
+">List of available options\n"
+"\n"
+"+-------+---------+--------------------------------+\n"
+"|  Id   |  Type   |          Description           |\n"
+"+=======+=========+================================+\n"
+"| highs | OT_DICT | Options to be passed to HiGHS. |\n"
+"+-------+---------+--------------------------------+\n"
+"\n"
+"\n"
+"\n"
+"\n"
+;

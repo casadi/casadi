@@ -28,4 +28,23 @@
 
       const std::string casadi::DaqpInterface::meta_doc=
       "\n"
-      ;
+"\n"
+"\n"
+"Interface to Daqp solver for sparse Quadratic Programs, see daqp.dev \n"
+"for more information and https://www.maths.ed.ac.uk/hall/Daqp/DaqpOptions.html  for a list of options.\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_29l \n"
+"\n"
+"\n"
+">List of available options\n"
+"\n"
+"+------+---------+-------------------------------+\n"
+"|  Id  |  Type   |          Description          |\n"
+"+======+=========+===============================+\n"
+"| daqp | OT_DICT | Options to be passed to Daqp. |\n"
+"+------+---------+-------------------------------+\n"
+"\n"
+"\n"
+"\n"
+"\n"
+;

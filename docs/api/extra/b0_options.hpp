@@ -266,7 +266,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Nlpsol_AmplInterface
+/** \addtogroup plugin_Nlpsol_ampl
 \n
 \par
 <a name='options'></a><table>
@@ -6663,7 +6663,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_LinsolInternal_ldl
+/** \addtogroup plugin_Linsol_ldl
 \n
 \par
 <a name='options'></a><table>
@@ -6700,7 +6700,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_LinsolInternal_qr
+/** \addtogroup plugin_Linsol_qr
 \n
 \par
 <a name='options'></a><table>
@@ -8498,7 +8498,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Nlpsol_sqsqp
+/** \addtogroup plugin_Nlpsol_qrsqp
 \n
 \par
 <a name='options'></a><table>

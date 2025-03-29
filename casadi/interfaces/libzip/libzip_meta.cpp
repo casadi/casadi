@@ -23,10 +23,14 @@
  */
 
 
- #include "libzip.hpp"
- #include <string>
+      #include "libzip.hpp"
+      #include <string>
 
- const std::string casadi::Libzip::meta_doc=
- "\n"
+      const std::string casadi::Libzip::meta_doc=
+      "\n"
+"\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_2d1 \n"
+"\n"
 "\n"
 ;
