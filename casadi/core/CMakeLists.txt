@@ -293,8 +293,9 @@ endif()
 if(CMAKE_CROSS_COMPILING AND MINGW)
   add_custom_command(TARGET casadi POST_BUILD
     COMMAND $ENV{DLLTOOL} --dllname $<TARGET_FILE:casadi> --def "${CMAKE_CURRENT_SOURCE_DIR}/casadi.def" --output-lib casadi.lib
+    COMMAND $ENV{DLLTOOL} --dllname $<TARGET_FILE:casadi> --def "${CMAKE_CURRENT_SOURCE_DIR}/casadi.def" --output-lib libcasadi.lib
   )
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/casadi.lib"
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/casadi.lib" "${CMAKE_CURRENT_BINARY_DIR}/libcasadi.lib"
     DESTINATION ${DEF_LIB_PREFIX}
   )
 endif()
