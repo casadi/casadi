@@ -1568,7 +1568,15 @@ namespace std {
           if (mxGetM(p)==0) return true;
           size_t len=mxGetN(p);
           std::vector<char> s(len+1);
-          if (mxGetString(p, &s[0], (len+1)*sizeof(char))) return false;
+          if (mxGetString(p, &s[0], (len+1)*sizeof(char))) {
+            casadi_warning("mxGetString returned NULL");
+            return false;
+          }
+          // Matlab silent failure; see #4034
+          if (s[0]=='\0' && len>0) {
+            casadi_warning("mxGetString failure, see https://github.com/casadi/casadi/issues/4034");
+            return false;
+          }
           **m = std::string(&s[0], len);
         }
         return true;
