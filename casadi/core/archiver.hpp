@@ -32,6 +32,7 @@
 namespace casadi {
 
   /** \defgroup main_archiver Title
+      \par
       
 
       \generalsection{Archiver}

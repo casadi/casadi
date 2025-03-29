@@ -50690,9 +50690,6 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L
 ";
 
 
-// File: namespace_0d418.xml
-
-
 // File: namespacealpaqa.xml
 
 

@@ -32,6 +32,7 @@
 namespace casadi {
 
   /** \defgroup main_filesystem Title
+      \par
       
 
       \generalsection{Filesystem}
