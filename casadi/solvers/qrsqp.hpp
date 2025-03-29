@@ -80,7 +80,7 @@ namespace casadi {
     int iter_count;
   };
 
-  /** \brief  \pluginbrief{Nlpsol,sqsqp}
+  /** \brief  \pluginbrief{Nlpsol,qrsqp}
   *  @copydoc NLPSolver_doc
   *  @copydoc plugin_Nlpsol_qrsqp
   */
