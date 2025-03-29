@@ -292,6 +292,7 @@ class LinearSolverTests(casadiTestCase):
       b = DM([1,0.5])
       x = solver.solve(A0.T, b)
       res = np.linalg.solve(A0.T,b)
+      print(solver.stats())
       self.checkarray(x, res)
 
   def test_simple(self):

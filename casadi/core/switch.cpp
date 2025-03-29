@@ -151,6 +151,7 @@ namespace casadi {
   }
 
   int Switch::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    setup(mem, arg, res, iw, w);
     // Get the function to be evaluated
     casadi_int k = arg[0] ? static_cast<casadi_int>(*arg[0]) : 0;
     const Function& fk = k>=0 && k<f_.size() ? f_[k] : f_def_;

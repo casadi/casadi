@@ -980,6 +980,8 @@ class Functiontests(casadiTestCase):
       self.assertTrue(same(F(a), r))
       self.check_codegen(F,inputs=[a],check_serialize=True)
       self.check_serialize(F,[a])
+      
+    print(F.stats())
 
     X = MX.sym("x")
 
@@ -3365,6 +3367,7 @@ class Functiontests(casadiTestCase):
         [externalfun1,libname] = self.compile_external("F","assets/externalfun1.c",{"config_args":["foo"]*n_args},debug_mode=True)
         print(libname)
         r = externalfun1(0)
+        print(externalfun1.stats())
         self.assertEqual(n_args+1,int(r[0]))
         self.assertEqual(0,int(r[1]))
 

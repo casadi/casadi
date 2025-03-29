@@ -319,6 +319,7 @@ namespace casadi {
     // This checkout/release dance is an optimization.
     // Could also use the thread-safe variant f_(arg1, res1, iw, w)
     // in Map::eval_gen
+    setup(mem, arg, res, iw, w);
     scoped_checkout<Function> m(f_);
     return eval_gen(arg, res, iw, w, m);
   }
@@ -331,6 +332,7 @@ namespace casadi {
 #ifndef WITH_OPENMP
     return Map::eval(arg, res, iw, w, mem);
 #else // WITH_OPENMP
+    setup(mem, arg, res, iw, w);
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
@@ -460,10 +462,10 @@ namespace casadi {
 
   int ThreadMap::eval(const double** arg, double** res, casadi_int* iw, double* w,
       void* mem) const {
-
 #ifndef CASADI_WITH_THREAD
     return Map::eval(arg, res, iw, w, mem);
 #else // CASADI_WITH_THREAD
+    setup(mem, arg, res, iw, w);
     // Checkout memory objects
     std::vector< scoped_checkout<Function> > ind; ind.reserve(n_);
     for (casadi_int i=0; i<n_; ++i) ind.emplace_back(f_);

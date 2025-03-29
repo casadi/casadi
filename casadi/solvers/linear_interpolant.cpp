@@ -85,6 +85,7 @@ namespace casadi {
 
   int LinearInterpolant::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    setup(mem, arg, res, iw, w);
     if (res[0]) {
       const double* values = has_parametric_values() ? arg[arg_values()] : get_ptr(values_);
       const double* grid = has_parametric_grid() ? arg[arg_grid()] : get_ptr(grid_);

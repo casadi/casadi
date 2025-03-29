@@ -231,6 +231,7 @@ Function CentralDiff::get_forward(casadi_int nfwd, const std::string& name,
 
 int FiniteDiff::eval(const double** arg, double** res,
     casadi_int* iw, double* w, void* mem) const {
+  setup(mem, arg, res, iw, w);
   // Shorthands
   casadi_int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
   casadi_int n_pert = this->n_pert();

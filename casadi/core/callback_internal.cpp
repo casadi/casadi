@@ -119,6 +119,7 @@ namespace casadi {
   /** \brief  Evaluate numerically */
   int CallbackInternal::eval(const double** arg, double** res,
       casadi_int* iw, double* w, void* mem) const {
+    setup(mem, arg, res, iw, w);
     if (has_eval_dm()) {
       return FunctionInternal::eval(arg, res, iw, w, mem);
     } else {

@@ -852,19 +852,21 @@ namespace casadi {
     if (m->t_total) m->t_total->tic();
     int ret;
     if (eval_) {
-      int mem = 0;
+      auto m = static_cast<FunctionMemory*>(mem);
+      m->stats_available = true;
+      int mem_ = 0;
       if (checkout_) {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD
-        mem = checkout_();
+        mem_ = checkout_();
       }
-      ret = eval_(arg, res, iw, w, mem);
+      ret = eval_(arg, res, iw, w, mem_);
       if (release_) {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD
-        release_(mem);
+        release_(mem_);
       }
     } else {
       ret = eval(arg, res, iw, w, mem);

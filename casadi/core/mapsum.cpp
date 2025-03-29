@@ -411,6 +411,7 @@ namespace casadi {
     // This checkout/release dance is an optimization.
     // Could also use the thread-safe variant f_(arg1, res1, iw, w)
     // in Map::eval_gen
+    setup(mem, arg, res, iw, w);
     scoped_checkout<Function> m(f_);
     return eval_gen(arg, res, iw, w, m);
   }
