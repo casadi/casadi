@@ -24,6 +24,7 @@
 
 
 #include "importer_internal.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -226,6 +227,20 @@ namespace casadi {
   void DllLibrary::init_handle() {
 
     std::vector<std::string> search_paths = get_search_paths();
+
+    if (Filesystem::is_enabled() && Filesystem::has_parent_path(name_)) {
+      std::string dir = Filesystem::parent_path(name_);
+      // Does search path already contain the directory?
+      for (const std::string& path : search_paths) {
+        if (path==dir) {
+          dir = "";
+          break;
+        }
+      }
+      // Add directory to search path
+      if (!dir.empty()) search_paths.push_back(dir);
+    }
+
 #ifdef WITH_DL
     handle_ = open_shared_library(name_, search_paths, "DllLibrary::init_handle");
 #else // WITH_DL
