@@ -54,6 +54,7 @@ class Daebuildertests(casadiTestCase):
         if not name.endswith("3"):
             self.check_serialize(f,inputs=test_point)
   
+  @memory_heavy()
   def test_cstr(self):
     fmu_file = "../data/cstr.fmu"
     if not os.path.exists(fmu_file):
