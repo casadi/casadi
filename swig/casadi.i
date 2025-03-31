@@ -2982,6 +2982,52 @@ namespace casadi{
         return {"serialization": self.serialize()}
   %}
 }
+%extend Matrix<SXElem> {
+  %pythoncode %{
+    def __setstate__(self, state):
+      ctx = _current_unpickle_context()
+      if not ctx:
+        raise Exception("Cannot unpickle SX objects without a casadi context. " +
+          "Use something like:\n"+
+          "with ca.global_unpickle_context(): \n"+
+          "  f_ref = pickle.load(open(filename,'rb'))")
+      ctx.decode(state)
+      self.__init__(ctx.unpack())
+
+    def __getstate__(self):
+      ctx = _current_pickle_context()
+      if not ctx:
+        raise Exception("Cannot pickle SX objects without a casadi context. " +
+          "Use something like:\n"+
+          "with ca.global_pickle_context(): \n"+
+          "  pickle.dump(f,open(filename,'wb'))")
+      ctx.pack(self)
+      return ctx.encode()
+  %}
+}
+%extend MX {
+  %pythoncode %{
+    def __setstate__(self, state):
+      ctx = _current_unpickle_context()
+      if not ctx:
+        raise Exception("Cannot unpickle MX objects without a casadi context. " +
+          "Use something like:\n"+
+          "with ca.global_unpickle_context(): \n"+
+          "  f_ref = pickle.load(open(filename,'rb'))")
+      ctx.decode(state)
+      self.__init__(ctx.unpack())
+
+    def __getstate__(self):
+      ctx = _current_pickle_context()
+      if not ctx:
+        raise Exception("Cannot pickle MX objects without a casadi context. " +
+          "Use something like:\n"+
+          "with ca.global_pickle_context(): \n"+
+          "  pickle.dump(f,open(filename,'wb'))")
+      ctx.pack(self)
+      return ctx.encode()
+  %}
+}
 
 } // namespace casadi
 #endif // SWIGPYTHON
@@ -4604,6 +4650,39 @@ namespace casadi {
       return f()
   %}
 }
+%pythoncode %{
+
+try:
+  import threading
+  _thread_local = threading.local()
+except:
+  threading_available = True
+  _thread_local = globals()
+
+def _current_pickle_context():
+  return getattr(_thread_local, "casadi_pickle_ctx", None)
+
+def _current_unpickle_context():
+  return getattr(_thread_local, "casadi_unpickle_ctx", None)
+
+class global_pickle_context:
+    def __enter__(self):
+        self.ctx = StringSerializer()
+        _thread_local.casadi_pickle_ctx = self.ctx
+        return self.ctx
+
+    def __exit__(self, *args):
+        _thread_local.casadi_pickle_ctx = None
+      
+class global_unpickle_context:
+    def __enter__(self):
+        self.ctx = StringDeserializer("")
+        _thread_local.casadi_unpickle_ctx = self.ctx
+        return self.ctx
+
+    def __exit__(self, *args):
+        _thread_local.casadi_unpickle_ctx = None  
+%}
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
 %extend casadi::DeserializerBase {
