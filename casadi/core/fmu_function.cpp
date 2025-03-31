@@ -70,6 +70,8 @@ int FmuFunction::init_mem(void* mem) const {
     FmuMemory* m1 = i == 0 ? m : m->slaves.at(i - 1);
     if (fmu_.init_mem(m1)) return 1;
   }
+  // Make sure we can query stats, even before numerical evaluation
+  m->stats_available = true;
   return 0;
 }
 

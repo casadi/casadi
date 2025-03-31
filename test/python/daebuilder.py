@@ -69,8 +69,8 @@ class Daebuildertests(casadiTestCase):
         zip_ref.extractall(unzipped_name)
     dae = DaeBuilder("cstr",unzipped_name)
     f = dae.create('f',['x','u'],['ode'])
-    with self.assertInException("No stats available"):
-        f.stats()
+    # The 'aux'  funcitonality requires stats availability even without nuermical evaluation
+    f.stats()
     dae = None
     
     C_A = SX.sym('C_A')
@@ -557,5 +557,14 @@ class Daebuildertests(casadiTestCase):
         sol = solver(x0 = w0, lbx = lbw, ubx = ubw, lbg = 0, ubg = 0)
 
 
+  def test_stats_available_bug(self):
+        fmu_file = '../data/vdp.fmu'
+        if not os.path.exists(fmu_file):
+            print("Skipping test_fmu_demo, resource not available")
+            return
+        dae = ca.DaeBuilder('vdp', fmu_file)
+        dae.get("x1")
+        dae.disp(True)
+        
 if __name__ == '__main__':
     unittest.main()
