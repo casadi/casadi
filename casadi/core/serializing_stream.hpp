@@ -77,6 +77,8 @@ namespace casadi {
     DeserializingStream(std::istream &in_s);
     DeserializingStream(const DeserializingStream&) = delete;
 
+    void setup();
+
     //@{
     /** \brief Reconstruct an object from the input stream
     *
@@ -203,6 +205,8 @@ namespace casadi {
     std::istream& in;
     /// Debug mode?
     bool debug_;
+    /// Did setup ran?
+    bool set_up_ = false;
   };
 
   /** \brief Helper class for Serialization

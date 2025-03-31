@@ -95,6 +95,7 @@ namespace casadi {
         "StringDeserializer::decode does not apply: current string not fully consumed yet.");
       static_cast<std::stringstream*>(dstream_.get())->str(string);
       dstream_->clear(); // reset error flags
+      deserializer_->setup();
     }
 
     SerializerBase::~SerializerBase() { }

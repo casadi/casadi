@@ -238,7 +238,7 @@ namespace casadi {
      * \see StringDeserializer
 
         \identifier{7r} */
-    StringDeserializer(const std::string& string);
+    StringDeserializer(const std::string& string="");
     ~StringDeserializer();
 
 
