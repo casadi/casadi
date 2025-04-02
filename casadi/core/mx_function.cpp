@@ -535,9 +535,11 @@ namespace casadi {
       const double** arg) const {
     stream << name_ << ":" << k << ": " << print(el) << " inputs:" << std::endl;
     for (size_t i = 0; i < el.arg.size(); ++i) {
-      stream << i << ": ";
-      DM::print_default(stream, el.data->dep(i).sparsity(), arg[i], true);
-      stream << std::endl;
+      if (arg[i]) {
+        stream << i << ": ";
+        DM::print_default(stream, el.data->dep(i).sparsity(), arg[i], true);
+        stream << std::endl;
+      }
     }
   }
 
@@ -545,9 +547,11 @@ namespace casadi {
       double** res) const {
     stream << name_ << ":" << k << ": " << print(el) << " outputs:" << std::endl;
     for (size_t i = 0; i < el.res.size(); ++i) {
-      stream << i << ": ";
-      DM::print_default(stream, el.data->sparsity(i), res[i], true);
-      stream << std::endl;
+      if (res[i]) {
+        stream << i << ": ";
+        DM::print_default(stream, el.data->sparsity(i), res[i], true);
+        stream << std::endl;
+      }
     }
   }
 
