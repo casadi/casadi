@@ -154,6 +154,7 @@ void Fmu2::load_functions() {
     "fmi2ExitInitializationMode");
   enter_continuous_time_mode_ = load_function<fmi2EnterContinuousTimeModeTYPE>(
     "fmi2EnterContinuousTimeMode");
+  get_derivatives_ = load_function<fmi2GetDerivativesTYPE>("fmi2GetDerivatives");
   get_real_ = load_function<fmi2GetRealTYPE>("fmi2GetReal");
   set_real_ = load_function<fmi2SetRealTYPE>("fmi2SetReal");
   get_integer_ = load_function<fmi2GetIntegerTYPE>("fmi2GetInteger");
@@ -270,6 +271,16 @@ int Fmu2::enter_continuous_time_mode(void* instance) const {
   fmi2Status status = enter_continuous_time_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2EnterContinuousTimeMode failed");
+    return 1;
+  }
+  return 0;
+}
+
+int Fmu2::get_derivatives(void* instance, double* derivatives, size_t nx) const {
+  auto c = static_cast<fmi2Component>(instance);
+  fmi2Status status = get_derivatives_(c, derivatives, nx);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2GetDerivatives failed");
     return 1;
   }
   return 0;

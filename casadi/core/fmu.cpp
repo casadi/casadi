@@ -451,6 +451,7 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
   can_be_instantiated_only_once_per_process_ = dae->can_be_instantiated_only_once_per_process_;
+  nx_ = dae->size(Category::X);
 
   // Mark input indices
   size_t numel = 0;
@@ -567,6 +568,11 @@ int FmuInternal::get_adjoint_derivative(void* instance, const unsigned int* vr_o
 }
 
 void FmuInternal::finalize() {
+  warning_fired_discrete_states_need_update_ = false;
+  warning_fired_terminate_simulation_ = false;
+  warning_fired_nominals_of_continuous_states_changed_ = false;
+  warning_fired_values_of_continuous_states_changed_ = false;
+  warning_fired_next_event_time_defined_ = false;
   // Load DLL
   std::string instance_name_no_dot = instance_name_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
@@ -1082,16 +1088,36 @@ int FmuInternal::discrete_states_iter(void* instance) const {
       return 1;
     }
     // Not implemented
-    if (eventmem.discrete_states_need_update)
-      casadi_warning("Discrete state update not implemented");
-    if (eventmem.terminate_simulation)
-      casadi_warning("Terminate solution not implemented");
-    if (eventmem.nominals_of_continuous_states_changed)
-      casadi_warning("Update of nominals of states not implemented");
-    if (eventmem.values_of_continuous_states_changed)
-      casadi_warning("Update of values of continuous states not implemented");
-    if (eventmem.next_event_time_defined)
-      casadi_warning("Ignoring next time defined: " + std::to_string(eventmem.next_event_time));
+    if (eventmem.discrete_states_need_update) {
+      if (!warning_fired_discrete_states_need_update_) {
+        warning_fired_discrete_states_need_update_ = true;
+        casadi_warning("Discrete state update not implemented");
+      }
+    }
+    if (eventmem.terminate_simulation) {
+      if (!warning_fired_terminate_simulation_) {
+        warning_fired_terminate_simulation_ = true;
+        casadi_warning("Terminate simulation not implemented");
+      }
+    }
+    if (eventmem.nominals_of_continuous_states_changed) {
+      if (!warning_fired_nominals_of_continuous_states_changed_) {
+        warning_fired_nominals_of_continuous_states_changed_ = true;
+        casadi_warning("Nominals of continuous states not implemented");
+      }
+    }
+    if (eventmem.values_of_continuous_states_changed) {
+      if (!warning_fired_values_of_continuous_states_changed_) {
+        warning_fired_values_of_continuous_states_changed_ = true;
+        casadi_warning("Values of continuous states not implemented");
+      }
+    }
+    if (eventmem.next_event_time_defined) {
+      if (!warning_fired_next_event_time_defined_) {
+        warning_fired_next_event_time_defined_ = true;
+        casadi_warning("Next event time not implemented");
+      }
+    }
     // Successful return
     if (!eventmem.discrete_states_need_update) {
       return 0;
@@ -1142,6 +1168,7 @@ int FmuInternal::init_mem(FmuMemory* m) const {
   std::fill(m->omarked_.begin(), m->omarked_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
   m->wrt_.resize(max_io);
+  m->derivatives_.resize(nx_);
   // Successful return
   return 0;
 }
@@ -1189,6 +1216,9 @@ int FmuInternal::eval(FmuMemory* m) const {
   }
   // Quick return if nothing requested
   if (n_out == 0) return 0;
+
+  get_derivatives(m->instance, get_ptr(m->derivatives_), nx_);
+
   // Calculate all variables
   m->v_out_.resize(n_out);
   if (get_real(m->instance, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_), n_out)) {
