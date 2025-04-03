@@ -567,6 +567,11 @@ int FmuInternal::get_adjoint_derivative(void* instance, const unsigned int* vr_o
 }
 
 void FmuInternal::finalize() {
+  warning_fired_discrete_states_need_update_ = false;
+  warning_fired_terminate_simulation_ = false;
+  warning_fired_nominals_of_continuous_states_changed_ = false;
+  warning_fired_values_of_continuous_states_changed_ = false;
+  warning_fired_next_event_time_defined_ = false;
   // Load DLL
   std::string instance_name_no_dot = instance_name_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
@@ -1089,16 +1094,36 @@ int FmuInternal::discrete_states_iter(void* instance) const {
       return 1;
     }
     // Not implemented
-    if (eventmem.discrete_states_need_update)
-      casadi_warning("Discrete state update not implemented");
-    if (eventmem.terminate_simulation)
-      casadi_warning("Terminate solution not implemented");
-    if (eventmem.nominals_of_continuous_states_changed)
-      casadi_warning("Update of nominals of states not implemented");
-    if (eventmem.values_of_continuous_states_changed)
-      casadi_warning("Update of values of continuous states not implemented");
-    if (eventmem.next_event_time_defined)
-      casadi_warning("Ignoring next time defined: " + std::to_string(eventmem.next_event_time));
+    if (eventmem.discrete_states_need_update) {
+      if (!warning_fired_discrete_states_need_update_) {
+        warning_fired_discrete_states_need_update_ = true;
+        casadi_warning("Discrete state update not implemented");
+      }
+    }
+    if (eventmem.terminate_simulation) {
+      if (!warning_fired_terminate_simulation_) {
+        warning_fired_terminate_simulation_ = true;
+        casadi_warning("Terminate simulation not implemented");
+      }
+    }
+    if (eventmem.nominals_of_continuous_states_changed) {
+      if (!warning_fired_nominals_of_continuous_states_changed_) {
+        warning_fired_nominals_of_continuous_states_changed_ = true;
+        casadi_warning("Nominals of continuous states not implemented");
+      }
+    }
+    if (eventmem.values_of_continuous_states_changed) {
+      if (!warning_fired_values_of_continuous_states_changed_) {
+        warning_fired_values_of_continuous_states_changed_ = true;
+        casadi_warning("Values of continuous states not implemented");
+      }
+    }
+    if (eventmem.next_event_time_defined) {
+      if (!warning_fired_next_event_time_defined_) {
+        warning_fired_next_event_time_defined_ = true;
+        casadi_warning("Next event time not implemented");
+      }
+    }
     // Successful return
     if (!eventmem.discrete_states_need_update) {
       return 0;

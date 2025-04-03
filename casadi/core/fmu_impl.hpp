@@ -328,6 +328,12 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Sparsity pattern for extended Jacobian, Hessian
   Sparsity jac_sp_, hess_sp_;
+
+  mutable bool warning_fired_discrete_states_need_update_;
+  mutable bool warning_fired_terminate_simulation_;
+  mutable bool warning_fired_nominals_of_continuous_states_changed_;
+  mutable bool warning_fired_values_of_continuous_states_changed_;
+  mutable bool warning_fired_next_event_time_defined_;
 };
 
 template<typename T>
