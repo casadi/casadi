@@ -85,6 +85,14 @@ namespace casadi {
     return 0;
   }
 
+  void Low::propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+    std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    MX fixed_grid = sum(arg_L[0]==arg_R[0])==arg_L[0].numel();
+    eval_mx(arg_L, res_L);
+    res_L[0] = res_L[0].attachAssert(fixed_grid, "oops");
+    eval_mx(arg_R, res_R);
+  }
+
   void Low::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = low(arg[0], arg[1]);
   }
