@@ -345,7 +345,7 @@ namespace casadi {
     }
   }
 
-  Function Function::interval_propagator() const {
+  Function Function::interval_propagator(const Dict& opts) const {
     return (*this)->interval_propagator();
   }
 

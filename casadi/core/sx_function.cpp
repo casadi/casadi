@@ -1065,7 +1065,7 @@ namespace casadi {
     return 0;
   }
 
-  Function SXFunction::get_interval_propagator() const {
+  Function SXFunction::get_interval_propagator(const Dict& opts) const {
     std::vector< std::vector<SXElem> > arg_L, arg_R;
     for (casadi_int k=0;k<n_in_;++k) {
       std::vector<SXElem> in = in_[k].get_nonzeros();
