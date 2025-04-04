@@ -1365,7 +1365,7 @@ void FmuInternal::serialize_type(SerializingStream& s) const {
 }
 
 void FmuInternal::serialize_body(SerializingStream& s) const {
-  s.version("FmuInternal", 3);
+  s.version("FmuInternal", 4);
   s.pack("FmuInternal::name", name_);
   s.pack("FmuInternal::scheme_in", scheme_in_);
   s.pack("FmuInternal::scheme_out", scheme_out_);
@@ -1402,10 +1402,11 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
   s.pack("FmuInternal::can_be_instantiated_only_once_per_process",
     can_be_instantiated_only_once_per_process_);
+  s.pack("FmuInternal::nx", nx_);
 }
 
 FmuInternal::FmuInternal(DeserializingStream& s) {
-  s.version("FmuInternal", 3);
+  s.version("FmuInternal", 4);
   s.unpack("FmuInternal::name", name_);
   s.unpack("FmuInternal::scheme_in", scheme_in_);
   s.unpack("FmuInternal::scheme_out", scheme_out_);
@@ -1442,6 +1443,7 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
   s.unpack("FmuInternal::can_be_instantiated_only_once_per_process",
     can_be_instantiated_only_once_per_process_);
+  s.unpack("FmuInternal::nx", nx_);
 }
 
 FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {
