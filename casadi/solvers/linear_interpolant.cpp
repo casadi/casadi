@@ -95,6 +95,45 @@ namespace casadi {
     return 0;
   }
 
+Function LinearInterpolant::get_interval_propagator(const Dict& opts) const {
+  MX x_L = MX::sym("x_L", sparsity_in_[0]);
+  MX x_R = MX::sym("x_R", sparsity_in_[0]);
+
+  double min = std::numeric_limits<double>::infinity();
+  double max = -std::numeric_limits<double>::infinity();
+  for (double v : values_) {
+    min = std::min(min, v);
+    max = std::max(max, v);
+  }
+
+  MX f_L = DM::ones(sparsity_out_[0])*min;
+  MX f_R = DM::ones(sparsity_out_[0])*max;
+
+  std::vector<std::string> name_in;
+  for (const std::string& e : name_in_) {
+    name_in.push_back(e + "_L");
+  }
+  for (const std::string& e : name_in_) {
+    name_in.push_back(e + "_R");
+  }
+
+  std::vector<std::string> name_out;
+  for (const std::string& e : name_out_) {
+    name_out.push_back(e + "_L");
+  }
+  for (const std::string& e : name_out_) {
+    name_out.push_back(e + "_R");
+  }
+
+  std::vector<MX> arg = {x_L, x_R};
+  std::vector<MX> res = {f_L, f_R};
+
+  return Function(name_ + "_interval_propagator",
+    arg,
+    res, name_in, name_out);
+
+  }
+
   void LinearInterpolant::codegen_body(CodeGenerator& g) const {
     std::string values = has_parametric_values() ? g.arg(arg_values()) : g.constant(values_);
     std::string grid = has_parametric_grid() ? g.arg(arg_grid()) : g.constant(grid_);

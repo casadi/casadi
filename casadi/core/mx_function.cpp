@@ -782,7 +782,7 @@ namespace casadi {
     }
   }
 
-  Function MXFunction::get_interval_propagator() const {
+  Function MXFunction::get_interval_propagator(const Dict& opts=Dict()) const {
 
     // Split up input arguments
     std::vector< std::vector<MX> > arg_L_split(in_.size());
@@ -879,7 +879,7 @@ namespace casadi {
 
     return Function(name_ + "_interval_propagator",
       join(arg_L, arg_R),
-      join(res_L, res_R), name_in, name_out);
+      join(res_L, res_R), name_in, name_out, opts);
 
   }
 

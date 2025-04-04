@@ -3703,16 +3703,16 @@ namespace casadi {
     return wrap().factory(name, s_in, s_out, aux, opts);
   }
 
-  Function FunctionInternal::interval_propagator() const {
+  Function FunctionInternal::interval_propagator(const Dict& opts) const {
     Function int_prop;
     if (!cache_int_prop_.incache(0, int_prop)) {
-      int_prop = get_interval_propagator();
+      int_prop = get_interval_propagator(opts);
       cache_int_prop_.tocache_if_missing(0, int_prop);
     }
     return int_prop;
   }
 
-  Function FunctionInternal::get_interval_propagator() const {
+  Function FunctionInternal::get_interval_propagator(const Dict& opts) const {
     casadi_error("'get_interval_propagator' not defined for " + class_name());
     return Function();
   }
