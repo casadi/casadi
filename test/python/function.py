@@ -3683,8 +3683,8 @@ class Functiontests(casadiTestCase):
   def test_interval_propagator(self):
     import itertools
   
-    a = SX.sym("a")
-    b = SX.sym("b")
+    a = MX.sym("a")
+    b = MX.sym("b")
     
     f1 = Function('f1',[a,b],[a<b])
     f2 = Function('f2',[a,b],[logic_not(a>=b)])
@@ -3893,6 +3893,25 @@ class Functiontests(casadiTestCase):
           # special cases
           [[[-0.5, 0.5]], [[0, 0.25]]],
           [[[-0.1, 0.2]], [[0, 0.04]]],
+      ])
+
+      # OP_EXP
+      yield (1, lambda a: exp(a),  [
+          # positive intervals
+          [[[2, 5]], [[exp(2), exp(5)]]],
+          [[[0.5, 3]], [[exp(0.5), exp(3)]]],
+          [[[10, 10]], [[exp(10), exp(10)]]],
+          # negative intervals
+          [[[-4, -1]], [[exp(-4), exp(-1)]]],
+          [[[-7, -3]], [[exp(-7), exp(-3)]]],
+          [[[-10, -10]], [[exp(-10), exp(-10)]]],
+          # intervals containing zero
+          [[[-3, 7]], [[exp(-3), exp(7)]]],
+          [[[-5, 5]], [[exp(-5), exp(5)]]],
+          [[[-8, 5]], [[exp(-8), exp(5)]]],
+          [[[-2, 0]], [[exp(-2), exp(0)]]],
+          [[[0, 8]], [[exp(0), exp(8)]]],
+          [[[0, 0]], [[exp(0), exp(0)]]],
       ])
 
       # OP_MUL
