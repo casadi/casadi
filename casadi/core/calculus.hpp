@@ -2444,6 +2444,12 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           );
         }
         break;
+      case OP_EXP:
+        {
+          L = exp(L1);
+          R = exp(R1);
+        }
+        break;
       default:
         casadi_warning("Not implemented: "+str(casadi_math<MX>::op_as_string(op)) );
     }
