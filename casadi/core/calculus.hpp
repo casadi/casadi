@@ -1997,9 +1997,10 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
       case OP_FABS:
         {
           T zero_free = logic_or(L1>0, R1<0);
-          T is_not_zero = logic_or(L1!=R1, L1!=0);
-          L = is_not_zero*fmin(if_else_zero(zero_free, L2), L2);
-          R = is_not_zero*fmax(if_else_zero(zero_free, R2), R2);
+          T L1_abs = fabs(L1);
+          T R1_abs = fabs(R1);
+          L = if_else_zero(zero_free, fmin(L1_abs, R1_abs));
+          R = fmax(L1_abs, R1_abs);
         }
         break;
       case OP_COS:
