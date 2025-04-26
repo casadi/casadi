@@ -819,6 +819,8 @@ namespace casadi {
     for (casadi_int i=0; i<out_.size(); ++i) {
       res_L.push_back(out_[i].join_primitives(res_L_split[i]));
       res_R.push_back(out_[i].join_primitives(res_R_split[i]));
+      casadi_assert_dev(res_L.back().sparsity()==sparsity_out(i));
+      casadi_assert_dev(res_R.back().sparsity()==sparsity_out(i));
     }
 
     std::vector<MX> arg_L, arg_R;
