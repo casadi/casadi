@@ -2366,10 +2366,10 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           T R2_ceil = ceil(R2);
           T exp_contains_odd_negative = logic_and(exp_partial_negative, logic_or(mod(L2_floor, 2)!=0, R2_ceil-L2_floor>=1));
 
-          T L_pow_1 = pow(L1, L2);
-          T L_pow_2 = pow(L1, R2);
-          T R_pow_1 = pow(R1, L2);
-          T R_pow_2 = pow(R1, R2);
+          T L_pow_1 = T::binary(op, L1, L2);
+          T L_pow_2 = T::binary(op, L1, R2);
+          T R_pow_1 = T::binary(op, R1, L2);
+          T R_pow_2 = T::binary(op, R1, R2);
           T L_pow = fmin(fmin(fmin(L_pow_1, L_pow_2), R_pow_1), R_pow_2);
           T R_pow = fmax(fmax(fmax(L_pow_1, L_pow_2), R_pow_1), R_pow_2);
 
