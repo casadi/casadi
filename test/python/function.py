@@ -3963,7 +3963,24 @@ class Functiontests(casadiTestCase):
           [[[0, 8]], [[exp(0), exp(8)]]],
           [[[0, 0]], [[exp(0), exp(0)]]],
       ])
-
+      # OP_FABS
+      yield (1, lambda a: fabs(a),  [
+          # positive intervals
+          [[[2, 5]], [[2, 5]]],
+          [[[0.5, 3]], [[0.5, 3]]],
+          [[[10, 10]], [[10, 10]]],
+          # negative intervals
+          [[[-4, -1]], [[1, 4]]],
+          [[[-7, -3]], [[3, 7]]],
+          [[[-10, -10]], [[10,10]]],
+          # intervals containing zero
+          [[[-3, 7]], [[0, 7]]],
+          [[[-5, 5]], [[0, 5]]],
+          [[[-8, 5]], [[0, 8]]],
+          [[[-2, 0]], [[0, 2]]],
+          [[[0, 8]], [[0, 8]]],
+          [[[0, 0]], [[0, 0]]],
+      ])
       # OP_MUL
       yield (2, lambda a,b: a*b,  [
           # intervals containing zero
