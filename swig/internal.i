@@ -1129,6 +1129,9 @@
 %exception  casadi::DeserializingStream::reset() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DeserializingStream::setup() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DeserializingStream::unpack(Fmu &e) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6514,7 +6517,7 @@
 %exception casadi::Slice::Slice(int start, int stop, int step=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::StringDeserializer::StringDeserializer(const std::string &string) {
+%exception casadi::StringDeserializer::StringDeserializer(const std::string &string="") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::StringSerializer::StringSerializer(const Dict &opts=Dict()) {

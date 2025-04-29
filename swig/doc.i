@@ -11026,12 +11026,16 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.hpp#L77
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.cpp#L47-L71
+https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.cpp#L47-L55
 
 ";
 
 %feature("docstring") casadi::DeserializingStream::DeserializingStream(const
  DeserializingStream &) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::DeserializingStream::setup() "
 
 [INTERNAL] ";
 
@@ -11047,10 +11051,10 @@ stream. an error will be raised.
 Extra doc: https://github.com/casadi/casadi/wiki/L_al
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.hpp#L87
+https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.hpp#L89
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.cpp#L239-L242
+https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.cpp#L246-L249
 
 ";
 
@@ -11246,7 +11250,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/serializer.hpp#L258
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L108-L114
+https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L109-L115
 
 ";
 
@@ -43862,10 +43866,10 @@ casadi::SerializingStream::SerializingStream(std::ostream &out) "
 Constructor.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.hpp#L219
+https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.hpp#L223
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.cpp#L73-L75
+https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.cpp#L80-L82
 
 ";
 
@@ -43883,10 +43887,10 @@ Serializes an object to the output stream.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ap
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.hpp#L226
+https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.cpp#L234-L237
+https://github.com/casadi/casadi/blob/main/casadi/core/serializing_stream.cpp#L241-L244
 
 ";
 
@@ -47434,7 +47438,7 @@ C++ includes: e0_diagram.hpp
 ";
 
 %feature("docstring") casadi::StringDeserializer::StringDeserializer(const 
-std::string &string) "
+std::string &string="") "
 
 [INTERNAL] 
 Advanced deserialization of CasADi objects.
@@ -47448,7 +47452,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/serializer.hpp#L241
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L116-L119
+https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L117-L120
 
 ";
 
@@ -47468,7 +47472,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/serializer.hpp#L248
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L93-L98
+https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L93-L99
 
 ";
 

@@ -7981,6 +7981,10 @@ C++ includes: serializing_stream.hpp
 
 ";
 
+%feature("docstring") casadi::DeserializingStream::setup "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::DeserializingStream::unpack "
 
 [INTERNAL]
@@ -8119,7 +8123,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/serializer.hpp#L258
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L108-L114
+https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L109-L115
 
 ";
 
@@ -29538,7 +29542,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/serializer.hpp#L241
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L116-L119
+https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L117-L120
 
 ";
 
@@ -29557,7 +29561,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/serializer.hpp#L248
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L93-L98
+https://github.com/casadi/casadi/blob/main/casadi/core/serializer.cpp#L93-L99
 
 ";
 
