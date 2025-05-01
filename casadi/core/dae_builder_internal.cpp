@@ -3439,9 +3439,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       categorize(var.index, Category::NUMEL);
     }
 
-    // Assume all variables in the right-hand-sides for now
+    // Unless detect_quad has been set, assume all variables in the right-hand-sides
     // Prevents changing X to Q
-    var.in_rhs = true;
+    var.in_rhs = !detect_quad_ && fmi_major_ >= 2;
     var.value_reference = static_cast<unsigned int>(vnode.attribute<casadi_int>("valueReference"));
     vrmap_[var.value_reference] = var.index;
     var.der_of = derivative;
@@ -3544,6 +3544,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
         // Mark interdependencies
         for (casadi_int d : v.dependencies) variable(d).dependency = true;
+        for (casadi_int d : v.dependencies) variable(d).in_rhs = true;
       } else if (e.name == "ContinuousStateDerivative") {
         // Get index
         derivatives_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
@@ -3560,6 +3561,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
         // Mark interdependencies
         for (casadi_int d : v.dependencies) variable(d).dependency = true;
+        for (casadi_int d : v.dependencies) variable(d).in_rhs = true;
       } else if (e.name == "ClockedState") {
         // Clocked state
         casadi_message("ClockedState not implemented, ignoring");
@@ -3642,6 +3644,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
 
         // Mark interdependencies
         for (casadi_int d : v.dependencies) variable(d).dependency = true;
+        for (casadi_int d : v.dependencies) variable(d).in_rhs = true;
       }
     }
     // Outputs
@@ -3666,6 +3669,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
 
         // Mark interdependencies
         for (casadi_int d : v.dependencies) variable(d).dependency = true;
+        for (casadi_int d : v.dependencies) variable(d).in_rhs = true;
       }
     }
     // What if dependencies is missing from InitialUnknowns?
@@ -3700,6 +3704,14 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         // Get dependencies
         for (casadi_int d : dependencies) variable(d).dependency = true;
       }
+    }
+  }
+
+  // Reclassify some states as quadratures
+  if (detect_quad_ && fmi_major_ >= 2) {
+    for (size_t i : derivatives_) {
+      size_t x = variable(i).parent;
+      if (!variable(x).in_rhs) categorize(x, Category::Q);
     }
   }
 }
