@@ -559,11 +559,6 @@ protected:
       \identifier{2c7} */
   std::vector<MX> cdef() const;
 
-  /** \brief Quadrature right hand sides
-
-      \identifier{10} */
-  std::vector<MX> quad() const;
-
   /** \brief Initial conditions, left-hand-side
 
       \identifier{2a7} */
