@@ -906,6 +906,7 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   std::string guid = generate_guid();
   // Generate model function
   std::string dae_filename = name_;
+  casadi_assert(size(Category::Q) == 0, "Not implemented");
   Function dae = shared_from_this<DaeBuilder>().create(dae_filename,
     {"t", "x", "p", "u"}, {"ode", "y", "zero"});
   // Event transition function, if needed
@@ -1844,6 +1845,7 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
   }
   // Otherwise: Defined by corresponding input category
   Category cat = input_category(ind);
+
   // Return object
   std::vector<MX> ret;
   ret.reserve(size(cat));
@@ -2576,6 +2578,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     }
     has_in = true;
   }
+
   // Scheme outputs
   std::vector<std::string> scheme_out;
   bool has_out = false;
@@ -2617,6 +2620,8 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     scheme["p"] = indices(Category::P);
     scheme["ode"] = indices(Category::X);
     for (size_t& i : scheme["ode"]) i = variable(i).der;
+    scheme["quad"] = indices(Category::Q);
+    for (size_t& i : scheme["quad"]) i = variable(i).der;
     scheme["alg"] = indices(Category::Z);
     casadi_assert(size(Category::Z) == 0, "Not implemented)");
     scheme["y"] = outputs_;
