@@ -198,40 +198,17 @@ jobs:
         with:
           config: |
             matrix:
-              arch: [manylinux1-x64,manylinux1-x86]
-              py2: ["27","35"]
+              arch: []
+              py2: []
             operations:
               - type: append
                 matrix:
                   arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: ["36","37","38","39","310","311","312","313"]
-              - type: append
-                matrix:
-                  arch: [windows-shared-x64-posix]
-                  py2: ["27","35","36","37","38","39","310","311","312","313"]
+                  py2: ["313"]
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
-                  py2: ["36","37","38","39","310","311","312","313"]
-    outputs:
-      matrix: ${{ steps.build-matrix.outputs.matrix }}
-
-  matrix-arch-py2-mac:
-    runs-on: ubuntu-24.04
-    steps:
-      - id: build-matrix
-        uses: jgillis/setup-build-matrix@main
-        with:
-          config: |
-            matrix:
-              image: [macos-13]
-              py2: ["27","35","36","37","38","39","310","311","312","313"]
-            operations:
-              - type: append
-                matrix:
-                  image: [macos-14]
-                  py2: ["38","39","310","311","312","313"]
-
+                  py2: ["313"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
@@ -432,7 +409,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       py2: ["27","35","36","37","38","39","310","311","312","313"]
+       py2: ["313"]
        image: ["ubuntu-24.04"]
        bit: [64]
        exclude:
