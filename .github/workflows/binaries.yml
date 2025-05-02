@@ -150,7 +150,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64]
+        target: [manylinux2014-x64,manylinux2014-x86]
     steps:
       - uses: actions/checkout@v4.1.1
         with:
@@ -204,10 +204,6 @@ jobs:
               - type: append
                 matrix:
                   arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: ["313"]
-              - type: append
-                matrix:
-                  arch: [manylinux2014-aarch64]
                   py2: ["313"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
