@@ -66,6 +66,37 @@ namespace casadi {
     return 0;
   }
 
+  int MultiplicationIntProp::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    std::copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+    std::copy(arg[3], arg[3]+dep(3).nnz(), res[1]);
+    casadi_mtimes_intprop(arg[1], arg[4], dep(1).sparsity(),
+               arg[2], arg[5], dep(2).sparsity(),
+               res[0], res[1], sparsity_, w, false);
+    return 0;
+  }
+
+  std::string MultiplicationIntProp::disp(const std::vector<std::string>& arg) const {
+    return "mac_intprop(" + arg.at(1) + "," + arg.at(2) + "," + arg.at(0) + "," + arg.at(4) + "," + arg.at(5) + "," + arg.at(3) + ")";
+  }
+
+  MultiplicationIntProp::MultiplicationIntProp(const MX& zL, const MX& xL, const MX& yL, const MX& zR, const MX& xR, const MX& yR) {
+    casadi_assert(xL.size2() == yL.size1() && xL.size1() == zL.size1()
+      && yL.size2() == zL.size2(),
+      "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
+      + xL.dim() + " with " + yL.dim()
+      + " and add the result to " + zL.dim());
+
+    casadi_assert(xR.size2() == yR.size1() && xR.size1() == zR.size1()
+      && yR.size2() == zR.size2(),
+      "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
+      + xR.dim() + " with " + yR.dim()
+      + " and add the result to " + zR.dim());
+
+    dep_ = {zL, xL, yL, zR, xR, yR};
+    check_dep();
+    set_sparsity(zL.sparsity());
+  }
+
   void Multiplication::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                std::vector<std::vector<MX> >& fsens) const {
     for (casadi_int d=0; d<fsens.size(); ++d) {
@@ -102,6 +133,13 @@ namespace casadi {
     f[2] = mac(x[0], y[2], f[2]);
   }
 
+  void Multiplication::propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+      std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+    MX prop = MX::create(new MultiplicationIntProp(arg_L[0], arg_L[1], arg_L[2], arg_R[0], arg_R[1], arg_R[2]));
+    res_L[0] = prop->get_output(0);
+    res_R[0] = prop->get_output(1);
+  }
+  
   int Multiplication::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     copy_fwd(arg[0], res[0], nnz());
