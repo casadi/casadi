@@ -766,6 +766,9 @@
 %exception  casadi::DaeBuilder::quad() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::rate() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::register_c(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -865,6 +868,9 @@
 %exception  casadi::DaeBuilder::set_nominal(const std::vector< std::string > &name, const std::vector< double > &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::set_rate(const std::vector< std::string > &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::set_start(const std::string &name, const std::vector< double > &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -896,6 +902,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::set_variability(const std::string &name, const std::string &val) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::set_y(const std::vector< std::string > &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::sort(const std::string &cat) {
