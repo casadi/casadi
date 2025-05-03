@@ -123,6 +123,60 @@ std::vector<MX> DaeBuilder::ydef() const {
   }
 }
 
+void DaeBuilder::set_y(const std::vector<std::string>& name) {
+  try {
+    // Update causality of any existing outputs not in name
+    std::set<std::string> name_set(name.begin(), name.end());
+    casadi_assert(name_set.size() == name.size(), "Duplicate names");
+    for (auto&& n : y()) {
+      auto it = name_set.find(n);
+      if (it == name_set.end()) {
+        // Not an output anymore, make local
+        set_causality(n, "local");
+      } else {
+        // Mark as added
+        name_set.erase(it);
+      }
+    }
+    // Update causality of new outputs
+    for (auto&& n : name) {
+      // Check if not already added
+      auto it = name_set.find(n);
+      if (it != name_set.end()) {
+        // Make output causality
+        set_causality(n, "output");
+        // Mark as added
+        name_set.erase(it);
+      }
+    }
+    // Consistency checks
+    casadi_assert_dev(name_set.empty());
+    casadi_assert_dev((*this)->outputs_.size() == name.size());
+    // Update output ordering
+    (*this)->outputs_ = (*this)->find(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_rate", e.what());
+  }
+}
+
+std::vector<std::string> DaeBuilder::rate() const {
+  try {
+    return (*this)->name((*this)->rate_);
+  } catch (std::exception& e) {
+    THROW_ERROR("rate", e.what());
+    return {};  // never reached
+  }
+}
+
+void DaeBuilder::set_rate(const std::vector<std::string>& name) {
+  try {
+    casadi_assert(name.size() <= 1, "At most one rate variable");
+    (*this)->rate_ = (*this)->find(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_rate", e.what());
+  }
+}
+
 std::vector<MX> DaeBuilder::cdef() const {
   try {
     return (*this)->cdef();

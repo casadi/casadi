@@ -140,6 +140,15 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5m} */
   std::vector<MX> ydef() const;
 
+  /** \brief Set all output variables */
+  void set_y(const std::vector<std::string>& name);
+
+  /** \brief Get all rate variables  */
+  std::vector<std::string> rate() const;
+
+  /** \brief Set rate variables */
+  void set_rate(const std::vector<std::string>& name);
+
   /** \brief Free controls
 
       \identifier{5n} */

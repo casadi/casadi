@@ -1799,6 +1799,7 @@ std::string to_string(OutputCategory v) {
   case OutputCategory::DDEF: return "ddef";
   case OutputCategory::WDEF: return "wdef";
   case OutputCategory::Y: return "y";
+  case OutputCategory::RATE: return "rate";
   default: break;
   }
   return "";
@@ -1841,6 +1842,8 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
       return var(event_indicators_);
     case OutputCategory::ALG:
       return var(residuals_);
+    case OutputCategory::RATE:
+      return var(rate_);
     default: break;
   }
   // Otherwise: Defined by corresponding input category
@@ -2625,6 +2628,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     scheme["alg"] = indices(Category::Z);
     casadi_assert(size(Category::Z) == 0, "Not implemented)");
     scheme["y"] = outputs_;
+    scheme["rate"] = rate_;
   }
   // Auxilliary variables, if any
   std::vector<std::string> aux;
