@@ -4118,9 +4118,25 @@ class Functiontests(casadiTestCase):
       self.checkarray(f.call(args_L[:n_in])[0],L)
       self.checkarray(f.call(args_R[:n_in])[0],R)
     
+    DM.rng(1)
+    A = MX.sym("A",2,3)
+    B = MX.sym("B",3,4)
     
+    Apoints = [DM.rand(A.sparsity()), DM.rand(A.sparsity())]
+    Bpoints = [DM.rand(B.sparsity()), DM.rand(B.sparsity())]
     
+    AL = fmin(*Apoints)
+    AR = fmax(*Apoints)
     
+    BL = fmin(*Bpoints)
+    BR = fmax(*Bpoints)
+
+    f = Function('f',[A,B],[mtimes(A,B)])
+    f_intprop = f.interval_propagator()
+    
+    f_intprop2 = f.expand().interval_propagator()
+    
+    self.checkfunction_light(f_intprop,f_intprop2,inputs=[AL,BL,AR,BR])
 
 if __name__ == '__main__':
     unittest.main()   
