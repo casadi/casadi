@@ -103,7 +103,14 @@ namespace casadi {
         \identifier{186} */
     bool uses_output() const override;
 
-    ///@{
+    /** \brief Customize calls to the function factory */
+    Function factory(const std::string& name,
+        const std::vector<std::string>& s_in,
+        const std::vector<std::string>& s_out,
+        const Function::AuxOut& aux,
+        const Dict& opts) const override;
+
+        ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements
 
         \identifier{187} */

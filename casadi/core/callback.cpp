@@ -89,6 +89,14 @@ namespace casadi {
     return (*this)->FunctionInternal::uses_output();
   }
 
+  Function Callback::factory(const std::string& name,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out,
+      const Function::AuxOut& aux,
+      const Dict& opts) const {
+    return (*this)->FunctionInternal::factory(name, s_in, s_out, aux, opts);
+  }
+
   bool Callback::has_jacobian() const {
     return (*this)->FunctionInternal::has_jacobian();
   }
