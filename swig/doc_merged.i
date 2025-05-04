@@ -347,10 +347,10 @@ elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L175
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L184
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L92-L94
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L100-L102
 
 ";
 
@@ -364,10 +364,10 @@ elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L176
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L185
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L97-L102
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L105-L110
 
 ";
 
@@ -382,10 +382,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L190
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L199
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L112-L114
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L120-L122
 
 ";
 
@@ -400,10 +400,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L191
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L200
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L105-L110
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L113-L118
 
 ";
 
@@ -418,10 +418,10 @@ get_reverse(casadi_int nadj) if no cached version is available.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L205
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L214
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L124-L126
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L132-L134
 
 ";
 
@@ -436,10 +436,10 @@ get_reverse(casadi_int nadj) if no cached version is available.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L206
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L215
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L117-L122
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L125-L130
 
 ";
 
@@ -453,10 +453,10 @@ with respect to all output elements
 Extra doc: https://github.com/casadi/casadi/wiki/L_ok
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L218
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L227
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L218-L218
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L227-L227
 
 ";
 
@@ -470,10 +470,10 @@ with respect to all output elements
 Extra doc: https://github.com/casadi/casadi/wiki/L_ok
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L219
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L228
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L219-L220
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L228-L229
 
 ";
 
@@ -2069,6 +2069,21 @@ https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L88-L90
 
 ";
 
+%feature("docstring") casadi::Callback::factory "
+
+[INTERNAL] 
+Customize calls to the function factory.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2de
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.hpp#L174
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L92-L98
+
+";
+
 %feature("docstring") casadi::Callback::n_in "
 
 [INTERNAL] 
@@ -2305,10 +2320,6 @@ Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1496-L1498
 
 ";
-
-%feature("docstring") casadi::Callback::factory "
-
-[INTERNAL] ";
 
 %feature("docstring") casadi::Callback::oracle "
 

@@ -103,7 +103,9 @@ namespace casadi {
         \identifier{186} */
     bool uses_output() const override;
 
-    /** \brief Customize calls to the function factory */
+    /** \brief Customize calls to the function factory
+
+        \identifier{2df} */
     Function factory(const std::string& name,
         const std::vector<std::string>& s_in,
         const std::vector<std::string>& s_out,
