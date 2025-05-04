@@ -26,6 +26,23 @@
 #include "osqp_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
 
+#ifdef WITH_OSQP_V1
+typedef OSQPInt c_int;
+typedef OSQPFloat c_float;
+typedef OSQPCscMatrix csc;
+
+struct OSQPData
+{
+  OSQPInt n; ///< number of variables n
+  OSQPInt m; ///< number of constraints m
+  OSQPCscMatrix * P; ///< the upper triangular part of the quadratic objective matrix P (size n x n).
+  OSQPCscMatrix * A; ///< linear constraints matrix A (size m x n)
+  OSQPFloat * q; ///< dense array for linear part of objective function (size n)
+  OSQPFloat * l; ///< dense array for lower bound (size m)
+  OSQPFloat * u; ///< dense array for upper bound (size m)
+};
+#endif
+
 namespace casadi {
 
   extern "C"
@@ -75,7 +92,11 @@ namespace casadi {
     Conic::init(opts);
 
     osqp_set_default_settings(&settings_);
+#ifdef WITH_OSQP_V1
+    settings_.warm_starting = false;
+#else
     settings_.warm_start = false;
+#endif
 
     warm_start_primal_ = true;
     warm_start_dual_ = true;
@@ -118,7 +139,11 @@ namespace casadi {
           } else if (op.first=="delta") {
             settings_.delta = op.second;
           } else if (op.first=="polish") {
+#ifdef WITH_OSQP_V1
+            settings_.polishing = op.second;
+#else
             settings_.polish = op.second;
+#endif
           } else if (op.first=="polish_refine_iter") {
             settings_.polish_refine_iter = op.second;
           } else if (op.first=="verbose") {
@@ -191,7 +216,11 @@ namespace casadi {
     data.u = get_ptr(dummy);
 
     // Setup workspace
-    if (osqp_setup(&m->work, &data, &settings_)) return 1;
+#ifdef WITH_OSQP_V1
+    if(osqp_setup(&m->work, data.P, data.q, data.A, data.l, data.u, data.m, data.n, &settings_)) return 1;
+#else
+    if(osqp_setup(&m->work, &data, &settings_)) return 1;
+#endif
     // if(osqp_setup(&data, &settings_)) return 1;
 
     m->fstats["preprocessing"]  = FStats();
@@ -222,7 +251,11 @@ namespace casadi {
 
     // Set objective
     if (arg[CONIC_G]) {
+#ifdef WITH_OSQP_V1
+      ret = osqp_update_data_vec(m->work, arg[CONIC_G], nullptr, nullptr);
+#else
       ret = osqp_update_lin_cost(m->work, arg[CONIC_G]);
+#endif
       casadi_assert(ret==0, "Problem in osqp_update_lin_cost");
     }
 
@@ -232,7 +265,27 @@ namespace casadi {
     casadi_copy(arg[CONIC_UBX], nx_, w+nx_+na_);
     casadi_copy(arg[CONIC_UBA], na_, w+2*nx_+na_);
 
+#ifdef WITH_OSQP_V1
+    // Convert C++ infinity values to OSQP infinity
+    // OSQP uses a different convention for infinity, and in osqp v1
+    // using casadi_inf make the casadi test fail, see
+    // https://github.com/osqp/osqp/issues/735
+    for (casadi_int i=0; i<2*(nx_+na_); ++i) {
+      if (std::isinf(w[i]) && !std::signbit(w[i]))
+      {
+        w[i] = OSQP_INFTY;
+      } else if (std::isinf(w[i]) && std::signbit(w[i]))
+      {
+        w[i] = -OSQP_INFTY;
+      }
+    }
+#endif
+
+#ifdef WITH_OSQP_V1
+    ret = osqp_update_data_vec(m->work, nullptr, w, w+nx_+na_);
+#else
     ret = osqp_update_bounds(m->work, w, w+nx_+na_);
+#endif
     casadi_assert(ret==0, "Problem in osqp_update_bounds");
 
     // Project Hessian
@@ -253,19 +306,31 @@ namespace casadi {
     }
 
     // Pass Hessian and constraint matrices
+#ifdef WITH_OSQP_V1
+    ret = osqp_update_data_mat(m->work, w, OSQP_NULL, nnzHupp_, A, OSQP_NULL, nnzA_);
+#else
     ret = osqp_update_P_A(m->work, w, nullptr, nnzHupp_, A, nullptr, nnzA_);
+#endif
     casadi_assert(ret==0, "Problem in osqp_update_P_A");
 
 
     if (warm_start_primal_) {
+#ifdef WITH_OSQP_V1
+      ret = osqp_warm_start(m->work, arg[CONIC_X0], nullptr);
+#else
       ret = osqp_warm_start_x(m->work, arg[CONIC_X0]);
+#endif
       casadi_assert(ret==0, "Problem in osqp_warm_start_x");
     }
 
     if (warm_start_dual_) {
       casadi_copy(arg[CONIC_LAM_X0], nx_, w);
       casadi_copy(arg[CONIC_LAM_A0], na_, w+nx_);
+#ifdef WITH_OSQP_V1
+      ret = osqp_warm_start(m->work, nullptr, w);
+#else
       ret = osqp_warm_start_y(m->work, w);
+#endif
       casadi_assert(ret==0, "Problem in osqp_warm_start_y");
     }
 
@@ -359,12 +424,20 @@ namespace casadi {
     g << "settings.eps_dual_inf = " << settings_.eps_dual_inf << ";\n";
     g << "settings.alpha = " << settings_.alpha << ";\n";
     g << "settings.delta = " << settings_.delta << ";\n";
+#ifdef WITH_OSQP_V1
+    g << "settings.polishing = " << settings_.polishing << ";\n";
+#else
     g << "settings.polish = " << settings_.polish << ";\n";
+#endif
     g << "settings.polish_refine_iter = " << settings_.polish_refine_iter << ";\n";
     g << "settings.verbose = " << settings_.verbose << ";\n";
     g << "settings.scaled_termination = " << settings_.scaled_termination << ";\n";
     g << "settings.check_termination = " << settings_.check_termination << ";\n";
+#ifdef WITH_OSQP_V1
+    g << "settings.warm_starting = " << settings_.warm_starting << ";\n";
+#else
     g << "settings.warm_start = " << settings_.warm_start << ";\n";
+#endif
     //g << "settings.time_limit = " << settings_.time_limit << ";\n";
 
     g << "return osqp_setup(&" + codegen_mem(g) + ", &data, &settings)!=0;\n";
@@ -478,12 +551,20 @@ namespace casadi {
     s.unpack("OsqpInterface::settings::eps_dual_inf", settings_.eps_dual_inf);
     s.unpack("OsqpInterface::settings::alpha", settings_.alpha);
     s.unpack("OsqpInterface::settings::delta", settings_.delta);
+#ifdef WITH_OSQP_V1
+    s.unpack("OsqpInterface::settings::polish", settings_.polishing);
+#else
     s.unpack("OsqpInterface::settings::polish", settings_.polish);
+#endif
     s.unpack("OsqpInterface::settings::polish_refine_iter", settings_.polish_refine_iter);
     s.unpack("OsqpInterface::settings::verbose", settings_.verbose);
     s.unpack("OsqpInterface::settings::scaled_termination", settings_.scaled_termination);
     s.unpack("OsqpInterface::settings::check_termination", settings_.check_termination);
+#ifdef WITH_OSQP_V1
+    s.unpack("OsqpInterface::settings::warm_start", settings_.warm_starting);
+#else
     s.unpack("OsqpInterface::settings::warm_start", settings_.warm_start);
+#endif
     //s.unpack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
 
@@ -508,12 +589,20 @@ namespace casadi {
     s.pack("OsqpInterface::settings::eps_dual_inf", settings_.eps_dual_inf);
     s.pack("OsqpInterface::settings::alpha", settings_.alpha);
     s.pack("OsqpInterface::settings::delta", settings_.delta);
+#ifdef WITH_OSQP_V1
+    s.pack("OsqpInterface::settings::polish", settings_.polishing);
+#else
     s.pack("OsqpInterface::settings::polish", settings_.polish);
+#endif
     s.pack("OsqpInterface::settings::polish_refine_iter", settings_.polish_refine_iter);
     s.pack("OsqpInterface::settings::verbose", settings_.verbose);
     s.pack("OsqpInterface::settings::scaled_termination", settings_.scaled_termination);
     s.pack("OsqpInterface::settings::check_termination", settings_.check_termination);
+#ifdef WITH_OSQP_V1
+    s.pack("OsqpInterface::settings::warm_start", settings_.warm_starting);
+#else
     s.pack("OsqpInterface::settings::warm_start", settings_.warm_start);
+#endif
     //s.pack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
 
