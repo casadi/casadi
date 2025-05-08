@@ -29,3 +29,8 @@ void casadi_copy(const T1* x, casadi_int n, T1* y) {
     }
   }
 }
+
+#ifdef WITH_BLAS
+CASADI_EXPORT void casadi_copy(const float* x, casadi_int n, float* y);
+CASADI_EXPORT void casadi_copy(const double* x, casadi_int n, double* y);
+#endif
