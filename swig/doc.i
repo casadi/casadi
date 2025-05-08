@@ -8129,6 +8129,21 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L242-L249
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::has_rate() const "
+
+[INTERNAL] 
+Is there a rate output?
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2dg
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L238
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L251-L258
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::nx() const "
 
 [INTERNAL] 
@@ -8137,10 +8152,10 @@ Differential states.
 Extra doc: https://github.com/casadi/casadi/wiki/L_65
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L238
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L243
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L251-L253
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L260-L262
 
 ";
 
@@ -8152,10 +8167,10 @@ Algebraic variables.
 Extra doc: https://github.com/casadi/casadi/wiki/L_66
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L243
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L248
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L255-L257
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L264-L266
 
 ";
 
@@ -8167,10 +8182,10 @@ Quadrature states.
 Extra doc: https://github.com/casadi/casadi/wiki/L_67
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L248
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L253
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L259-L261
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L268-L270
 
 ";
 
@@ -8182,10 +8197,10 @@ Zero-crossing functions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2cb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L253
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L258
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L263-L265
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L272-L274
 
 ";
 
@@ -8197,10 +8212,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L263-L265
 Extra doc: https://github.com/casadi/casadi/wiki/L_68
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L258
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L263
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L267-L269
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L276-L278
 
 ";
 
@@ -8212,10 +8227,10 @@ Free controls.
 Extra doc: https://github.com/casadi/casadi/wiki/L_69
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L263
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L268
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L271-L273
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L280-L282
 
 ";
 
@@ -8227,10 +8242,10 @@ Parameters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_6a
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L268
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L273
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L275-L277
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L284-L286
 
 ";
 
@@ -8242,10 +8257,10 @@ Named constants.
 Extra doc: https://github.com/casadi/casadi/wiki/L_6b
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L273
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L278
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L279-L281
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L288-L290
 
 ";
 
@@ -8257,10 +8272,10 @@ Dependent parameters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_6c
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L278
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L283
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L283-L285
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L292-L294
 
 ";
 
@@ -8272,10 +8287,10 @@ Dependent variables.
 Extra doc: https://github.com/casadi/casadi/wiki/L_6d
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L283
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L288
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L287-L289
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L296-L298
 
 ";
 
@@ -8287,10 +8302,10 @@ const std::string &causality, const std::string &variability, const Dict
 Add a new model variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L292
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L297
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L621-L630
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L630-L639
 
 ";
 
@@ -8301,10 +8316,10 @@ const std::string &causality, const Dict &opts=Dict()) "
 Add a new model variable, default variability.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L298
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L303
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L632-L639
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L641-L648
 
 ";
 
@@ -8315,10 +8330,10 @@ const Dict &opts=Dict()) "
 Add a new model variable, default variability and causality.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L303
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L308
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L641-L648
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L650-L657
 
 ";
 
@@ -8330,10 +8345,10 @@ const std::string &causality, const std::string &variability, const MX
 Add a new model variable, symbolic expression already available.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L307
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L312
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L650-L663
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L659-L672
 
 ";
 
@@ -8342,10 +8357,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L650-L663
 [DEPRECATED] Renamed \"time\"
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L315
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L320
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L315-L315
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L320-L320
 
 ";
 
@@ -8355,10 +8370,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L315-L315
 [DEPRECATED] Replaced by add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L318
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L323
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L666-L668
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L675-L677
 
 ";
 
@@ -8368,10 +8383,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L666-L668
 [DEPRECATED] Replaced by add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L321
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L326
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L670-L673
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L679-L682
 
 ";
 
@@ -8381,10 +8396,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L670-L673
 [DEPRECATED] Replaced by add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L324
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L329
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L675-L678
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L684-L687
 
 ";
 
@@ -8394,10 +8409,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L675-L678
 [DEPRECATED] Replaced by add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L327
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L332
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L680-L683
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L689-L692
 
 ";
 
@@ -8407,10 +8422,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L680-L683
 [DEPRECATED] Replaced by add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L330
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L335
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L685-L688
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L694-L697
 
 ";
 
@@ -8420,10 +8435,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L685-L688
 [DEPRECATED] Replaced by add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L333
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L338
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L690-L693
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L699-L702
 
 ";
 
@@ -8433,10 +8448,10 @@ const MX &new_cdef) "
 [DEPRECATED] Replaced by add and eq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L336
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L341
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L695-L699
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L704-L708
 
 ";
 
@@ -8446,10 +8461,10 @@ const MX &new_ddef) "
 [DEPRECATED] Replaced by add and eq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L339
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L344
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L701-L705
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L710-L714
 
 ";
 
@@ -8459,10 +8474,10 @@ const MX &new_wdef) "
 [DEPRECATED] Replaced by add and eq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L342
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L347
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L707-L711
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L716-L720
 
 ";
 
@@ -8472,10 +8487,10 @@ const MX &new_ydef) "
 [DEPRECATED] Replaced by add and eq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L345
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L350
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L713-L717
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L722-L726
 
 ";
 
@@ -8485,10 +8500,10 @@ const MX &val) "
 [DEPRECATED] Replaced by eq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L348
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L353
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L719-L725
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L728-L734
 
 ";
 
@@ -8499,10 +8514,10 @@ const Dict &opts=Dict()) "
 Add a simple equation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L353
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L358
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L729-L735
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L738-L744
 
 ";
 
@@ -8511,10 +8526,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L729-L735
 Add a simple equation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L353
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L358
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L729-L735
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L738-L744
 
 ";
 
@@ -8523,10 +8538,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L729-L735
 Add a simple equation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L353
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L358
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L729-L735
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L738-L744
 
 ";
 
@@ -8537,10 +8552,10 @@ std::vector< std::string > &eqs, const Dict &opts=Dict()) "
 Add when equations.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L356
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L361
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L737-L743
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L746-L752
 
 ";
 
@@ -8551,10 +8566,10 @@ const MX &val) "
 Assignment inside a when-equation or if-else equation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L359
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L364
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L745-L752
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L754-L761
 
 ";
 
@@ -8565,10 +8580,10 @@ const MX &val) "
 Reinitialize a state inside when-equations.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L362
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L367
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L754-L761
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L763-L770
 
 ";
 
@@ -8579,10 +8594,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L754-L761
 Specify the initial equation for a variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L365
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L370
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L763-L769
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L772-L778
 
 ";
 
@@ -8592,10 +8607,10 @@ const MX &ode_rhs) "
 [DEPRECATED] Replaced by eq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L369
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L374
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L369-L371
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L374-L376
 
 ";
 
@@ -8605,10 +8620,10 @@ const MX &alg_rhs) "
 [DEPRECATED] Replaced by eq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L374
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L379
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L374-L377
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L379-L382
 
 ";
 
@@ -8618,10 +8633,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L374-L377
 [DEPRECATED] Replaced by set_init
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L380
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L380-L382
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385-L387
 
 ";
 
@@ -8630,10 +8645,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L380-L382
 [DEPRECATED] Replaced by  nzero()
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L390
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385-L385
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L390-L390
 
 ";
 
@@ -8642,10 +8657,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385-L385
 [DEPRECATED] Replaced by  nzero()
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L390
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385-L385
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L390-L390
 
 ";
 
@@ -8654,10 +8669,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385-L385
 [DEPRECATED] Replaced by  nzero()
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L390
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385-L385
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L390-L390
 
 ";
 
@@ -8666,10 +8681,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L385-L385
 [DEPRECATED] Use all(\"zero\") */
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L388
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L393
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L388-L388
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L393-L393
 
 ";
 
@@ -8679,10 +8694,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L388-L388
 Check if dimensions match.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L393
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L398
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L771-L777
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L780-L786
 
 ";
 
@@ -8748,10 +8763,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L771-L777
 Eliminate all dependent parameters.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L448
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L453
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L874-L880
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L883-L889
 
 ";
 
@@ -8761,10 +8776,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L874-L880
 Sort dependent parameters.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L451
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L456
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L882-L888
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L891-L897
 
 ";
 
@@ -8775,10 +8790,10 @@ lift_calls=true) "
 Lift problem formulation by extracting shared subexpressions.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L454
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L459
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L890-L896
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L899-L905
 
 ";
 
@@ -8789,10 +8804,10 @@ prune_u=true) "
 Prune unused controls.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L457
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L462
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L317-L323
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L326-L332
 
 ";
 
@@ -8804,10 +8819,10 @@ Identify iteration variables and residual equations using naming
 convention.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L460
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L465
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L325-L331
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L334-L340
 
 ";
 
@@ -8819,10 +8834,10 @@ const std::vector< std::string > &arg, const std::vector< std::string >
 Add a function from loaded expressions.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L469
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L474
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1134-L1142
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1143-L1151
 
 ";
 
@@ -8832,10 +8847,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1134-L11
 Add an already existing function.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L474
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L479
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1125-L1132
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1134-L1141
 
 ";
 
@@ -8846,10 +8861,10 @@ const Importer &compiler, const Dict &opts=Dict()) "
 Add an external function.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L477
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L482
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1144-L1147
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1153-L1156
 
 ";
 
@@ -8860,10 +8875,10 @@ const "
 Does a particular function already exist?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L481
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L486
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1149-L1156
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1158-L1165
 
 ";
 
@@ -8874,10 +8889,10 @@ const "
 Get function by name.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L484
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L489
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1158-L1165
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1167-L1174
 
 ";
 
@@ -8887,10 +8902,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1158-L11
 Get all functions.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L487
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L492
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1188-L1190
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1197-L1199
 
 ";
 
@@ -8901,10 +8916,10 @@ max_depth=-1) "
 Collect embedded functions from the expression graph.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L490
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L495
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1167-L1186
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1176-L1195
 
 ";
 
@@ -8915,10 +8930,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1167-L11
 Import existing problem from FMI/XML
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L497
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L502
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L497-L497
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L502-L502
 
 ";
 
@@ -8929,10 +8944,10 @@ casadi::DaeBuilder::provides_directional_derivatives() const "
 Does the FMU provide support for analytic derivatives.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L500
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L505
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L299-L307
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L308-L316
 
 ";
 
@@ -8944,10 +8959,10 @@ Does the FMU provide support for analytic derivatives (FMI 2
 naming)
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L503
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L508
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L503-L503
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L508-L508
 
 ";
 
@@ -8958,10 +8973,10 @@ std::string &filename) "
 Import problem description from FMI or XML.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L506
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L511
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L291-L297
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L300-L306
 
 ";
 
@@ -8972,10 +8987,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L291-L297
 Export instance into an FMU.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L509
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L514
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L309-L315
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L318-L324
 
 ";
 
@@ -8986,10 +9001,10 @@ const std::vector< std::string > &f_out) "
 Add a named linear combination of output expressions.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L512
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L517
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1085-L1092
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1094-L1101
 
 ";
 
@@ -9001,10 +9016,10 @@ const std::vector< std::string > &name_in, const std::vector< std::string >
 Construct a function object, legacy syntax.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L515
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L520
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1094-L1103
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1103-L1112
 
 ";
 
@@ -9033,10 +9048,10 @@ Optional settings
 Extra doc: https://github.com/casadi/casadi/wiki/L_6e
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L527
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L532
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1105-L1114
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1114-L1123
 
 ";
 
@@ -9058,10 +9073,10 @@ Optional settings
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L539
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L544
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1116-L1123
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1125-L1132
 
 ";
 
@@ -9075,10 +9090,10 @@ naming.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L544
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L549
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L544-L544
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L549-L549
 
 ";
 
@@ -9089,10 +9104,10 @@ const "
 Get variable expression by name
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L562
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L567
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L779-L786
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L788-L795
 
 ";
 
@@ -9101,10 +9116,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L779-L786
 [DEPRECATED] Use string name, not internal index to access variables
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L860
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L865
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L437-L445
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L446-L454
 
 ";
 
@@ -9114,10 +9129,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L437-L445
 [DEPRECATED] Use string name, not internal index to access variables
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L861
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L866
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L447-L454
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L456-L463
 
 ";
 
@@ -9127,10 +9142,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L447-L454
 Differentiate an expression with respect to time
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L571
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L576
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1242-L1249
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1251-L1258
 
 ";
 
@@ -9140,10 +9155,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1242-L12
 Differentiate an expression with respect to time
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L572
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L577
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1251-L1258
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1260-L1267
 
 ";
 
@@ -9154,10 +9169,10 @@ std::string > &name) const "
 Get the time derivative of model variables.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L567
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L572
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L833-L842
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L842-L851
 
 ";
 
@@ -9168,10 +9183,10 @@ const "
 Get the time derivative of model variables, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L705
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L710
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L788-L801
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L797-L810
 
 ";
 
@@ -9182,10 +9197,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L788-L801
 Get/set value reference
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L589
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L594
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L898-L900
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L907-L909
 
 ";
 
@@ -9196,10 +9211,10 @@ std::string &name, casadi_int val) "
 Get/set value reference
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L590
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L595
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L902-L904
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L911-L913
 
 ";
 
@@ -9210,10 +9225,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L902-L904
 Get/set description
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L595
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L600
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L906-L908
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L915-L917
 
 ";
 
@@ -9224,10 +9239,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L906-L908
 Get/set description
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L596
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L601
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L910-L912
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L919-L921
 
 ";
 
@@ -9238,10 +9253,10 @@ casadi_int fmi_version=3) const "
 Get/set the type
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L601
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L606
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L914-L923
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L923-L932
 
 ";
 
@@ -9252,10 +9267,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L914-L923
 Get/set the type
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L602
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L607
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L925-L932
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L934-L941
 
 ";
 
@@ -9266,10 +9281,10 @@ const "
 Get/set the initial property
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L655
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L660
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L985-L987
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L994-L996
 
 ";
 
@@ -9280,10 +9295,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L985-L987
 Get/set the initial property
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L656
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L661
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L989-L991
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L998-L1000
 
 ";
 
@@ -9294,10 +9309,10 @@ const "
 Get/set the unit
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L661
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L666
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L993-L995
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1002-L1004
 
 ";
 
@@ -9308,10 +9323,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L993-L995
 Get/set the unit
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L662
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L667
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L997-L999
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1006-L1008
 
 ";
 
@@ -9322,10 +9337,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L997-L999
 Get/set the display unit
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L667
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L672
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1001-L1003
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1010-L1012
 
 ";
 
@@ -9336,10 +9351,10 @@ std::string &name, const std::string &val) "
 Get/set the display unit
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L668
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L673
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1005-L1007
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1014-L1016
 
 ";
 
@@ -9350,10 +9365,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1005-L10
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L848
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L853
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L369-L375
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L378-L384
 
 ";
 
@@ -9364,10 +9379,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L369-L375
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L849
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L854
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L377-L383
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L386-L392
 
 ";
 
@@ -9377,10 +9392,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L377-L383
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L850
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L855
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L385-L391
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L394-L400
 
 ";
 
@@ -9390,10 +9405,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L385-L391
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L851
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L856
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L393-L399
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L402-L408
 
 ";
 
@@ -9404,10 +9419,10 @@ const "
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L852
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L857
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L401-L408
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
 
 ";
 
@@ -9417,10 +9432,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L401-L408
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L852
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L857
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L401-L408
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
 
 ";
 
@@ -9430,10 +9445,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L401-L408
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L852
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L857
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L401-L408
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
 
 ";
 
@@ -9444,10 +9459,10 @@ std::string > &name) const "
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L853
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L858
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L419-L426
 
 ";
 
@@ -9457,10 +9472,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L853
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L858
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L419-L426
 
 ";
 
@@ -9470,10 +9485,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L853
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L858
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L419-L426
 
 ";
 
@@ -9483,10 +9498,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L854
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L859
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L419-L427
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L428-L436
 
 ";
 
@@ -9497,10 +9512,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L419-L427
 removed
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L855
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L860
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L429-L436
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L438-L445
 
 ";
 
@@ -9566,10 +9581,10 @@ const std::vector< std::string > &v) "
 Reorder variables in a category.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L397
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L402
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L606-L619
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L615-L628
 
 ";
 
@@ -9580,10 +9595,10 @@ change
 variable category
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L401
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L406
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L581-L588
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L590-L597
 
 ";
 
@@ -9595,10 +9610,10 @@ const std::vector< std::string > &name) "
 reorder
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L404
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L409
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L590-L602
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L599-L611
 
 ";
 
@@ -9607,10 +9622,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L590-L602
 [DEPRECATED] Use eliminate(\"d\")
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L422
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L427
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L533-L539
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L542-L548
 
 ";
 
@@ -9619,10 +9634,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L533-L539
 [DEPRECATED] Use eliminate(\"w\")
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L425
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L430
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L541-L547
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L550-L556
 
 ";
 
@@ -9631,10 +9646,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L541-L547
 [DEPRECATED] Use eliminate(\"q\")
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L428
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L433
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L549-L555
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L558-L564
 
 ";
 
@@ -9643,10 +9658,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L549-L555
 [DEPRECATED] Use sort(\"d\")
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L431
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L436
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L557-L563
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L566-L572
 
 ";
 
@@ -9655,10 +9670,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L557-L563
 [DEPRECATED] Use sort(\"w\")
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L434
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L439
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L565-L571
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L574-L580
 
 ";
 
@@ -9668,10 +9683,10 @@ std::string > &z_order) "
 [DEPRECATED] Use reorder(\"z\", new_order)
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L437
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L442
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L573-L579
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L582-L588
 
 ";
 
@@ -9683,10 +9698,10 @@ std::string > &s_out) const "
 Construct a function for evaluating dependent parameters.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L547
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L552
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1201-L1210
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1210-L1219
 
 ";
 
@@ -9697,10 +9712,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1201-L12
 Construct a function describing transition at a specific events.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L552
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L557
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1212-L1219
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1221-L1228
 
 ";
 
@@ -9711,10 +9726,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1212-L12
 Construct a function describing transition at any events.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L555
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L560
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1221-L1228
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1230-L1237
 
 ";
 
@@ -9724,10 +9739,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1221-L12
 Construct an event transition function, default naming.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L558
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L563
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L558-L558
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L563-L563
 
 ";
 
@@ -9738,10 +9753,10 @@ std::string > &name) const "
 Get the pre-variables of model variables.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L576
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L581
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L844-L853
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L853-L862
 
 ";
 
@@ -9751,10 +9766,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L844-L853
 Get the pre-expression given variable expression.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L579
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L584
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L818-L831
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L827-L840
 
 ";
 
@@ -9765,10 +9780,10 @@ const "
 Get the pre-variables of model variables.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L708
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L713
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L803-L816
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L812-L825
 
 ";
 
@@ -9779,10 +9794,10 @@ const "
 Does a variable have a binding equation?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L582
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L587
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L855-L862
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L864-L871
 
 ";
 
@@ -9793,10 +9808,10 @@ const "
 Get the binding equation for a variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L585
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L590
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L864-L872
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L873-L881
 
 ";
 
@@ -9807,10 +9822,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L864-L872
 Get the causality.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L606
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L611
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L934-L941
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L943-L950
 
 ";
 
@@ -9838,10 +9853,10 @@ No other changes are permitted.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L621
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L626
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L943-L949
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L952-L958
 
 ";
 
@@ -9852,10 +9867,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L943-L949
 Get the variability.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L624
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L629
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L951-L958
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L960-L967
 
 ";
 
@@ -9885,10 +9900,10 @@ Other changes are not permitted
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L636
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L641
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L960-L966
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L969-L975
 
 ";
 
@@ -9899,10 +9914,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L960-L966
 Get the variable category.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L639
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L644
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L968-L975
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L977-L984
 
 ";
 
@@ -9927,10 +9942,10 @@ accordingly.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L651
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L656
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L977-L983
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L986-L992
 
 ";
 
@@ -9941,10 +9956,10 @@ const "
 Get the number of elements of a variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L672
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L677
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1009-L1011
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1018-L1020
 
 ";
 
@@ -9955,10 +9970,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1009-L10
 Get the dimensions of a variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L675
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L680
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1013-L1015
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1022-L1024
 
 ";
 
@@ -9968,10 +9983,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1013-L10
 Get the start time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L678
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L683
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1017-L1024
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1026-L1033
 
 ";
 
@@ -9981,10 +9996,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1017-L10
 Set the start time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L681
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L686
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1026-L1032
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1035-L1041
 
 ";
 
@@ -9994,10 +10009,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1026-L10
 Get the stop time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L684
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L689
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1034-L1041
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1043-L1050
 
 ";
 
@@ -10007,10 +10022,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1034-L10
 Set the stop time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L687
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L692
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1043-L1049
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1052-L1058
 
 ";
 
@@ -10020,10 +10035,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1043-L10
 Get the tolerance.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L690
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L695
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1051-L1058
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1060-L1067
 
 ";
 
@@ -10033,10 +10048,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1051-L10
 Set the tolerance.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L693
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L698
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1060-L1066
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1069-L1075
 
 ";
 
@@ -10046,10 +10061,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1060-L10
 Get the step size.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L696
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L701
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1068-L1075
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1077-L1084
 
 ";
 
@@ -10059,10 +10074,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1068-L10
 Set the step size.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L699
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L704
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1077-L1083
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1086-L1092
 
 ";
 
@@ -10073,10 +10088,10 @@ const std::string &name) const "
 Get an attribute, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L711
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L716
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1260-L1267
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1269-L1276
 
 ";
 
@@ -10087,10 +10102,10 @@ const std::vector< std::string > &name) const "
 Get an attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L758
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L763
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1269-L1277
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1278-L1286
 
 ";
 
@@ -10101,10 +10116,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1269-L12
 Set an attribute, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L714
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L719
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1279-L1285
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1288-L1294
 
 ";
 
@@ -10116,10 +10131,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1279-L12
 Set an attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L761
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L766
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1287-L1294
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1296-L1303
 
 ";
 
@@ -10130,10 +10145,10 @@ const "
 Get the lower bound, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L717
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L722
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1296-L1303
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1305-L1312
 
 ";
 
@@ -10142,10 +10157,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1296-L13
 Get the lower bound, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L717
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L722
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1296-L1303
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1305-L1312
 
 ";
 
@@ -10154,10 +10169,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1296-L13
 Get the lower bound, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L717
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L722
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1296-L1303
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1305-L1312
 
 ";
 
@@ -10168,10 +10183,10 @@ std::string > &name) const "
 Get the lower bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L765
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L770
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1305-L1312
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1314-L1321
 
 ";
 
@@ -10180,10 +10195,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1305-L13
 Get the lower bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L765
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L770
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1305-L1312
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1314-L1321
 
 ";
 
@@ -10192,10 +10207,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1305-L13
 Get the lower bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L765
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L770
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1305-L1312
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1314-L1321
 
 ";
 
@@ -10206,10 +10221,10 @@ double val) "
 Set the lower bound, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L720
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L725
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1314-L1320
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1323-L1329
 
 ";
 
@@ -10220,10 +10235,10 @@ std::string > &name, const std::vector< double > &val) "
 Set the lower bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L768
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L773
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1322-L1328
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1331-L1337
 
 ";
 
@@ -10234,10 +10249,10 @@ const "
 Get the upper bound, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L723
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L728
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1330-L1337
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1339-L1346
 
 ";
 
@@ -10246,10 +10261,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1330-L13
 Get the upper bound, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L723
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L728
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1330-L1337
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1339-L1346
 
 ";
 
@@ -10258,10 +10273,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1330-L13
 Get the upper bound, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L723
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L728
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1330-L1337
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1339-L1346
 
 ";
 
@@ -10272,10 +10287,10 @@ std::string > &name) const "
 Get the upper bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L771
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L776
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1339-L1346
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1348-L1355
 
 ";
 
@@ -10284,10 +10299,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1339-L13
 Get the upper bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L771
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L776
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1339-L1346
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1348-L1355
 
 ";
 
@@ -10296,10 +10311,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1339-L13
 Get the upper bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L771
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L776
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1339-L1346
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1348-L1355
 
 ";
 
@@ -10310,10 +10325,10 @@ double val) "
 Set the upper bound, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L726
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L731
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1348-L1354
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1357-L1363
 
 ";
 
@@ -10324,10 +10339,10 @@ std::string > &name, const std::vector< double > &val) "
 Set the upper bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L774
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L779
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1356-L1362
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1365-L1371
 
 ";
 
@@ -10338,10 +10353,10 @@ const "
 Get the nominal value, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L729
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L734
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1364-L1371
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1373-L1380
 
 ";
 
@@ -10352,10 +10367,10 @@ std::string > &name) const "
 Get the nominal value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L777
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L782
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1373-L1380
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1382-L1389
 
 ";
 
@@ -10366,10 +10381,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1373-L13
 Set the nominal value, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L732
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L737
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1382-L1388
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1391-L1397
 
 ";
 
@@ -10380,10 +10395,10 @@ std::string > &name, const std::vector< double > &val) "
 Set the nominal value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L780
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L785
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1390-L1396
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1399-L1405
 
 ";
 
@@ -10394,10 +10409,10 @@ const "
 Get the start attribute, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L735
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L740
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1398-L1405
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1407-L1414
 
 ";
 
@@ -10408,10 +10423,10 @@ std::string > &name) const "
 Get the start attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L783
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L788
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1407-L1414
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1416-L1423
 
 ";
 
@@ -10422,10 +10437,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1407-L14
 Set the start attribute, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L738
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L743
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1416-L1422
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1425-L1431
 
 ";
 
@@ -10436,10 +10451,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1416-L14
 Set the start attribute, vector argument.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L741
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L746
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1424-L1430
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1433-L1439
 
 ";
 
@@ -10450,10 +10465,10 @@ std::string > &name, const std::vector< double > &val) "
 Set the start attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L786
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L791
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1432-L1438
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1441-L1447
 
 ";
 
@@ -10478,10 +10493,10 @@ std::string > &name, const std::vector< double > &val) "
 Set the current value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L789
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L794
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1464-L1470
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1473-L1479
 
 ";
 
@@ -10492,10 +10507,10 @@ std::string > &name, const std::vector< std::string > &val) "
 Set the current value (string)
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L792
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L797
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1472-L1479
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1481-L1488
 
 ";
 
@@ -10508,10 +10523,10 @@ single
  value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L753
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L758
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1481-L1483
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1490-L1492
 
 ";
 
@@ -10522,10 +10537,10 @@ std::string > &name) const "
 Evaluate the values for a set of variables at the initial time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L795
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L800
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1485-L1500
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1494-L1509
 
 ";
 
@@ -10536,10 +10551,10 @@ const "
 Check if a particular variable exists.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L798
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L803
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L333-L340
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L342-L349
 
 ";
 
@@ -10549,10 +10564,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L333-L340
 Get a list of all variables.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L801
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L806
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L342-L349
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L351-L358
 
 ";
 
@@ -10561,10 +10576,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L342-L349
 Get a list of all variables.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L801
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L806
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L342-L349
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L351-L358
 
 ";
 
@@ -10573,10 +10588,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L342-L349
 Get a list of all variables.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L801
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L806
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L342-L349
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L351-L358
 
 ";
 
@@ -10587,10 +10602,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L342-L349
 Get a list of all variables of a particular category.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L804
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L809
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L351-L358
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L360-L367
 
 ";
 
@@ -10599,10 +10614,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L351-L358
 Get a list of all variables of a particular category.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L804
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L809
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L351-L358
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L360-L367
 
 ";
 
@@ -10611,10 +10626,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L351-L358
 Get a list of all variables of a particular category.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L804
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L809
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L351-L358
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L360-L367
 
 ";
 
@@ -10624,10 +10639,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L351-L358
 [DEPRECATED] Use add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L808
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L813
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L456-L458
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L465-L467
 
 ";
 
@@ -10637,10 +10652,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L456-L458
 [DEPRECATED] Use add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L811
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L816
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L460-L464
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L469-L473
 
 ";
 
@@ -10650,10 +10665,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L460-L464
 Add a new variable from symbolic expressions.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L814
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L819
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L466-L469
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L475-L478
 
 ";
 
@@ -10663,10 +10678,10 @@ std::string &name, casadi_int n=1) "
 [DEPRECATED] Use add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L817
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L822
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L471-L473
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L480-L482
 
 ";
 
@@ -10676,10 +10691,10 @@ std::string &name, const Sparsity &sp) "
 [DEPRECATED] Use add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L820
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L825
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L475-L479
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L484-L488
 
 ";
 
@@ -10689,10 +10704,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L475-L479
 [DEPRECATED] Use add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L823
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L828
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L481-L485
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L490-L494
 
 ";
 
@@ -10702,10 +10717,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L481-L485
 [DEPRECATED] Ranamed \"has\"
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L826
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L831
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L826-L826
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L831-L831
 
 ";
 
@@ -10715,10 +10730,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L826-L826
 Get a list of all variables.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L829
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L834
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L829-L829
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L834-L834
 
 ";
 
@@ -10729,10 +10744,10 @@ elim_w=false, bool lifted_calls=false) const "
 Get the (cached) oracle, SX or  MX.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L833
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L838
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1192-L1199
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1201-L1208
 
 ";
 
@@ -10745,10 +10760,10 @@ Get Jacobian sparsity.
 Extra doc: https://github.com/casadi/casadi/wiki/L_6g
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L838
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L843
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1502-L1510
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1511-L1519
 
 ";
 
@@ -10758,10 +10773,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1502-L15
 [DEPRECATED] Use add
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L844
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L849
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L361-L367
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L370-L376
 
 ";
 

@@ -652,6 +652,9 @@
 %exception  casadi::DaeBuilder::has_fun(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::has_rate() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::has_t() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
