@@ -248,6 +248,15 @@ bool DaeBuilder::has_t() const {
   }
 }
 
+bool DaeBuilder::has_rate() const {
+  try {
+    return !(*this)->rate_.empty();
+  } catch (std::exception& e) {
+    THROW_ERROR("has_rate", e.what());
+    return false;  // never reached
+  }
+}
+
 casadi_int DaeBuilder::nx() const {
   return (*this)->size(Category::X);
 }

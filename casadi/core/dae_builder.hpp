@@ -232,6 +232,9 @@ class CASADI_EXPORT DaeBuilder
       \identifier{64} */
   bool has_t() const;
 
+  /** \brief Is there a rate output? */
+  bool has_rate() const;
+
   /** \brief Differential states
 
       \identifier{65} */
