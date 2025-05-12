@@ -216,6 +216,10 @@ namespace casadi {
       create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     }
     jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
+    casadi_assert(jacg_sp_.size1()==ng_, "nlp_jac_g must have " + str(ng_) +
+                  " rows, but has " + str(jacg_sp_.size1()) + " instead.");
+    casadi_assert(jacg_sp_.size2()==nx_, "nlp_jac_g must have " + str(nx_) +
+                  " columns, but has " + str(jacg_sp_.size2()) + " instead.");
 
     convexify_ = false;
 
