@@ -961,6 +961,16 @@ namespace casadi {
       return mx_in(index_in(iname));
     }
     const std::vector<MX> mx_in() const;
+#ifndef SWIG
+    template<typename T>
+    const T sym_in(casadi_int iind) const;
+    template<typename T>
+    const T sym_in(const std::string& iname) const {
+      return sym_in<T>(index_in(iname));
+    }
+    template<typename T>
+    const std::vector<T> sym_in() const;
+#endif // SWIG
     ///@}
 
     ///@{
@@ -1362,6 +1372,14 @@ public:
 
 void CASADI_EXPORT _function_buffer_eval(void* raw);
 
+template<>
+const SX CASADI_EXPORT Function::sym_in(casadi_int iind) const;
+template<>
+const MX CASADI_EXPORT Function::sym_in(casadi_int iind) const;
+template<>
+const std::vector<SX> CASADI_EXPORT Function::sym_in() const;
+template<>
+const std::vector<MX> CASADI_EXPORT Function::sym_in() const;
 
 } // namespace casadi
 

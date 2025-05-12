@@ -2018,4 +2018,23 @@ namespace casadi {
     return f_.stats(mem_);
   }
 
+
+  template<>
+  const SX CASADI_EXPORT Function::sym_in(casadi_int iind) const {
+      return sx_in(iind);
+  }
+  template<>
+  const MX CASADI_EXPORT Function::sym_in(casadi_int iind) const {
+      return mx_in(iind);
+  }
+
+  template<>
+  const std::vector<SX> CASADI_EXPORT Function::sym_in() const {
+      return sx_in();
+  }
+  template<>
+  const std::vector<MX> CASADI_EXPORT Function::sym_in() const {
+      return mx_in();
+  }
+
 } // namespace casadi
