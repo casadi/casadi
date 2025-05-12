@@ -2430,12 +2430,44 @@ class NLPtests(casadiTestCase):
                 for fixed_variable_treatment in ["make_constraint","make_parameter","make_parameter_nodual"]:
                     for start_with_resto in ["no","yes"]:
                         nlp = {"x":vertcat(x,y,z,w),"g":g[g_perm],"f":x**2+2*y**2+3*z**2+8*w**2}
+                        
+                        solver_ref = nlpsol("solver","ipopt",nlp,{"ipopt.fixed_variable_treatment":fixed_variable_treatment,"detect_simple_bounds": detect_simple_bounds,"ipopt.start_with_resto": start_with_resto})
+                        nlp_jac_g = solver_ref.get_function("nlp_jac_g")
+                        
+                        ref = solver_ref(lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)
+                        
                         solver = nlpsol("solver","ipopt",nlp,{"ipopt.fixed_variable_treatment":fixed_variable_treatment,"detect_simple_bounds": detect_simple_bounds,"ipopt.start_with_resto": start_with_resto,"ipopt.jac_vp":"yes","ipopt.jac_vp_test":"yes"})
                         nlp_jac_g = solver.get_function("nlp_jac_g")
-                        
-                        solver(lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)
+
+                        res = solver(lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)                        
+                        for k in ref.keys():
+                          self.checkarray(res[k],ref[k])                        
+
                         self.assertTrue(solver.stats()["success"])
+                        
+                        cache = {"nlp_jac_g": solver_ref.get_function("nlp_jac_g"), "nlp_hess_l": solver_ref.get_function("nlp_hess_l")}
         
+                        solver = nlpsol("solver","ipopt",nlp,{"ipopt.fixed_variable_treatment":fixed_variable_treatment,"detect_simple_bounds": detect_simple_bounds,"ipopt.start_with_resto": start_with_resto,"ipopt.jac_vp":"yes","ipopt.jac_vp_test":"yes","cache":cache})
+                        nlp_jac_g = solver.get_function("nlp_jac_g")
+
+                        res = solver(lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)                        
+                        for k in ref.keys():
+                          self.checkarray(res[k],ref[k])
+                          
+                        # What if you pass a jacobian/hessian produced without regard for detect_simple_bounds?
+                          
+                        solver_ref = nlpsol("solver","ipopt",nlp,{"ipopt.fixed_variable_treatment":fixed_variable_treatment,"ipopt.start_with_resto": start_with_resto})                   
+                        cache = {"nlp_jac_g": solver_ref.get_function("nlp_jac_g"), "nlp_hess_l": solver_ref.get_function("nlp_hess_l")}
+        
+                        solver = nlpsol("solver","ipopt",nlp,{"ipopt.fixed_variable_treatment":fixed_variable_treatment,"detect_simple_bounds": detect_simple_bounds,"ipopt.start_with_resto": start_with_resto,"ipopt.jac_vp":"yes","ipopt.jac_vp_test":"yes","cache":cache})
+                        nlp_jac_g = solver.get_function("nlp_jac_g")
+
+                        res = solver(lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)                        
+                        for k in ref.keys():
+                          self.checkarray(res[k],ref[k])
+                          
+                        self.assertTrue(solver.stats()["success"])
+                        
   @requires_nlpsol("ipopt")
   @memory_heavy()
   def test_ipopt_custom_hess(self):
