@@ -163,7 +163,7 @@ namespace casadi {
       for (int j=0;j<4;++j) pack(c[j]);
     }
 
-#if SIZE_MAX != UINT_MAX || defined(__EMSCRIPTEN__)
+#if SIZE_MAX != UINT_MAX || defined(__EMSCRIPTEN__) || defined(__POWERPC__)
     void DeserializingStream::unpack(unsigned int& e) {
       assert_decoration('u');
       uint32_t n;
