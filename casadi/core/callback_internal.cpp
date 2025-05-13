@@ -136,7 +136,7 @@ Function CallbackInternal::factory(const std::string& name,
     const std::vector<std::string>& s_out,
     const Function::AuxOut& aux,
     const Dict& opts) const {
-  TRY_CALL(factory, self_, name, s_in, s_out, aux, opts);
+  TRY_CALL(get_factory, self_, name, s_in, s_out, aux, opts);
 }
 
 bool CallbackInternal::has_jacobian() const {
