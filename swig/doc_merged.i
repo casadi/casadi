@@ -2069,7 +2069,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L88-L90
 
 ";
 
-%feature("docstring") casadi::Callback::factory "
+%feature("docstring") casadi::Callback::get_factory "
 
 [INTERNAL] 
 Customize calls to the function factory.
@@ -2320,6 +2320,10 @@ Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1496-L1498
 
 ";
+
+%feature("docstring") casadi::Callback::factory "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Callback::oracle "
 

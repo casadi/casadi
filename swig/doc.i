@@ -3199,9 +3199,9 @@ https://github.com/casadi/casadi/blob/main/casadi/core/callback.cpp#L88-L90
 
 ";
 
-%feature("docstring")  casadi::Callback::factory(const std::string &name, 
-const std::vector< std::string > &s_in, const std::vector< std::string > 
-&s_out, const Function::AuxOut &aux, const Dict &opts) const "
+%feature("docstring")  casadi::Callback::get_factory(const std::string 
+&name, const std::vector< std::string > &s_in, const std::vector< 
+std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const "
 
 [INTERNAL] 
 Customize calls to the function factory.
@@ -3456,6 +3456,12 @@ Implementation:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1496-L1498
 
 ";
+
+%feature("docstring")  casadi::Function::factory(const std::string &name, 
+const std::vector< std::string > &s_in, const std::vector< std::string > 
+&s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Function::oracle() const "
 
