@@ -46,6 +46,12 @@ std::string Fmu3::system_infix() const {
     // ARM 64-bit Architecture
     arch = "aarch64";
   }
+#elif defined(__ppc64__) || defined(__powerpc64__)
+  // PowerPC 64-bit Architecture
+  arch = "ppc64";
+#elif defined(__ppc__) || defined(__powerpc__)
+  // PowerPC 32-bit Architecture
+  arch = "ppc";
 #else
   if (sizeof(void*) == 4) {
     // Intel/AMD x86 32-bit
