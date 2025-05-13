@@ -171,7 +171,7 @@ namespace casadi {
     /** \brief Customize calls to the function factory
 
         \identifier{2de} */
-    virtual Function factory(const std::string& name,
+    virtual Function get_factory(const std::string& name,
         const std::vector<std::string>& s_in,
         const std::vector<std::string>& s_out,
         const Function::AuxOut& aux,

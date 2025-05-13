@@ -89,7 +89,7 @@ namespace casadi {
     return (*this)->FunctionInternal::uses_output();
   }
 
-  Function Callback::factory(const std::string& name,
+  Function Callback::get_factory(const std::string& name,
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out,
       const Function::AuxOut& aux,
