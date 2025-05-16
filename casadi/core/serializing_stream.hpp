@@ -103,7 +103,7 @@ namespace casadi {
     void unpack(Slice& e);
     void unpack(int& e);
 
-#if SIZE_MAX != UINT_MAX || defined(__EMSCRIPTEN__)
+#if SIZE_MAX != UINT_MAX || defined(__EMSCRIPTEN__) || defined(__POWERPC__)
     void unpack(unsigned int& e);
 #endif
     void unpack(bool& e);
@@ -243,7 +243,7 @@ namespace casadi {
     void pack(const GenericType& e);
     void pack(std::istream& s);
     void pack(int e);
-#if SIZE_MAX != UINT_MAX || defined(__EMSCRIPTEN__)
+#if SIZE_MAX != UINT_MAX || defined(__EMSCRIPTEN__) || defined(__POWERPC__)
     void pack(unsigned int e);
 #endif
     void pack(bool e);
