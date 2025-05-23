@@ -578,11 +578,16 @@ void FmuInternal::finalize() {
   load_functions();
 
   // Path to resource directory
+  std::string url = "";
   if (Filesystem::is_enabled()) {
-    resource_loc_ = "file://" + Filesystem::absolute(resource_.path()) + "/resources";
+    url = "file://" + Filesystem::absolute(resource_.path()) + "/resources";
   } else {
-    resource_loc_ = "file://" + resource_.path();
+    url = "file://" + resource_.path();
   }
+  // Forward slashes
+  std::replace(url.begin(), url.end(), '\\', '/');
+
+  resource_loc_ = url;
 
   // Create a temporary instance
   void* c = instantiate();
