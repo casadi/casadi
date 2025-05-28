@@ -48,7 +48,11 @@ namespace casadi {
 
   struct CASADI_CONIC_OSQP_EXPORT OsqpMemory : public ConicMemory {
     // Structures
+#ifdef WITH_OSQP_V1
+    OSQPSolver* work;
+#else
     OSQPWorkspace* work;
+#endif
 
     /// Constructor
     OsqpMemory();
