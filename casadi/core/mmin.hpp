@@ -85,18 +85,6 @@ namespace casadi {
                       const std::vector<bool>& arg_is_ref,
                       std::vector<bool>& res_is_ref) const override;
 
-    /** \brief Calculate forward mode directional derivatives
-
-        \identifier{1th} */
-    void ad_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const override;
-
-    /** \brief Calculate reverse mode directional derivatives
-
-        \identifier{1ti} */
-    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const override;
-
     /** \brief Deserialize without type information
 
         \identifier{1tj} */
@@ -161,18 +149,6 @@ namespace casadi {
                       const std::vector<casadi_int>& res,
                       const std::vector<bool>& arg_is_ref,
                       std::vector<bool>& res_is_ref) const override;
-
-    /** \brief Calculate forward mode directional derivatives
-
-        \identifier{1tu} */
-    void ad_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const override;
-
-    /** \brief Calculate reverse mode directional derivatives
-
-        \identifier{1tv} */
-    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Deserialize without type information
 
