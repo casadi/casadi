@@ -249,74 +249,14 @@ namespace casadi {
     // Only do the callback every few iterations
     if (iter % solver_.callback_step_!=0) return true;
 
-    /// Code copied from TNLPAdapter::FinalizeSolution
-    /// See also: http://list.coin-or.org/pipermail/ipopt/2010-July/002078.html
-    // http://list.coin-or.org/pipermail/ipopt/2010-April/001965.html
-
-    bool full_callback = false;
-
-#ifdef WITH_IPOPT_CALLBACK
-    OrigIpoptNLP* orignlp = dynamic_cast<OrigIpoptNLP*>(GetRawPtr(ip_cq->GetIpoptNLP()));
-    if (!orignlp) return true;
-    TNLPAdapter* tnlp_adapter = dynamic_cast<TNLPAdapter*>(GetRawPtr(orignlp->nlp()));
-    if (!tnlp_adapter) return true;
-
-    const Vector& x = *ip_data->curr()->x();
-    const Vector& z_L = *ip_data->curr()->z_L();
-    const Vector& z_U = *ip_data->curr()->z_U();
-    const Vector& c = *ip_cq->curr_c();
-    const Vector& d = *ip_cq->curr_d();
-    const Vector& y_c = *ip_data->curr()->y_c();
-    const Vector& y_d = *ip_data->curr()->y_d();
-
-    std::fill_n(x_, n_, 0);
-    std::fill_n(g_, m_, 0);
-    std::fill_n(z_L_, n_, 0);
-    std::fill_n(z_U_, n_, 0);
-    std::fill_n(lambda_, m_, 0);
-
-    tnlp_adapter->ResortX(x, x_);             // no further steps needed
-    tnlp_adapter->ResortG(y_c, y_d, lambda_); // no further steps needed
-    tnlp_adapter->ResortG(c, d, g_);
-    // Copied from Ipopt source: To Ipopt, the equality constraints are presented with right
-    // hand side zero, so we correct for the original right hand side.
-    const Index* c_pos = tnlp_adapter->P_c_g_->ExpandedPosIndices();
-    Index n_c_no_fixed = tnlp_adapter->P_c_g_->NCols();
-    for (Index i=0; i<n_c_no_fixed; i++) {
-      g_[c_pos[i]] += tnlp_adapter->c_rhs_[i];
+    // Retrieve the current iterate
+    if (!get_curr_iterate(ip_data, ip_cq, false, n_, x_, z_L_, z_U_, m_, g_, lambda_)) {
+      return false;
     }
-
-#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
-    tnlp_adapter->ResortBounds(z_L, z_L_, z_U, z_U_);
-#else
-    tnlp_adapter->ResortBnds(z_L, z_L_, z_U, z_U_);
-#endif
-    // Copied from Ipopt source: Hopefully the following is correct to recover the bound
-    // multipliers for fixed variables (sign ok?)
-    if (tnlp_adapter->fixed_variable_treatment_==TNLPAdapter::MAKE_CONSTRAINT &&
-        tnlp_adapter->n_x_fixed_>0) {
-      const DenseVector* dy_c = static_cast<const DenseVector*>(&y_c);
-      Index n_c_no_fixed = y_c.Dim() - tnlp_adapter->n_x_fixed_;
-      if (!dy_c->IsHomogeneous()) {
-        const Number* values = dy_c->Values();
-        for (Index i=0; i<tnlp_adapter->n_x_fixed_; i++) {
-          z_L_[tnlp_adapter->x_fixed_map_[i]] = Max(0., -values[n_c_no_fixed+i]);
-          z_U_[tnlp_adapter->x_fixed_map_[i]] = Max(0., values[n_c_no_fixed+i]);
-        }
-      } else {
-        double value = dy_c->Scalar();
-        for (Index i=0; i<tnlp_adapter->n_x_fixed_; i++) {
-          z_L_[tnlp_adapter->x_fixed_map_[i]] = Max(0., -value);
-          z_U_[tnlp_adapter->x_fixed_map_[i]] = Max(0.,  value);
-        }
-      }
-    }
-    full_callback = true;
-#endif // WITH_IPOPT_CALLBACK
 
     return solver_.intermediate_callback(mem_, x_, z_L_, z_U_, g_, lambda_, obj_value, iter,
                                          inf_pr, inf_du, mu, d_norm, regularization_size,
-                                         alpha_du, alpha_pr, ls_trials, full_callback);
+                                         alpha_du, alpha_pr, ls_trials, true);
   }
 
   Index IpoptUserClass::get_number_of_nonlinear_variables() {
