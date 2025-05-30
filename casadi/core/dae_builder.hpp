@@ -323,19 +323,19 @@ class CASADI_EXPORT DaeBuilder
   MX add_t(const std::string& name="t");
 
   /// [DEPRECATED] Replaced by add
-  MX add_p(const std::string& name=std::string());
+  MX add_p(const std::string& name=std::string(), casadi_int n=1);
 
   /// [DEPRECATED] Replaced by add
-  MX add_u(const std::string& name=std::string());
+  MX add_u(const std::string& name=std::string(), casadi_int n=1);
 
   /// [DEPRECATED] Replaced by add
-  MX add_x(const std::string& name=std::string());
+  MX add_x(const std::string& name=std::string(), casadi_int n=1);
 
   /// [DEPRECATED] Replaced by add
-  MX add_z(const std::string& name=std::string());
+  MX add_z(const std::string& name=std::string(), casadi_int n=1);
 
   /// [DEPRECATED] Replaced by add
-  MX add_q(const std::string& name=std::string());
+  MX add_q(const std::string& name=std::string(), casadi_int n=1);
 
   /// [DEPRECATED] Replaced by add and eq
   MX add_c(const std::string& name, const MX& new_cdef);
@@ -372,7 +372,7 @@ class CASADI_EXPORT DaeBuilder
 #ifdef WITH_DEPRECATED_FEATURES
   /// [DEPRECATED] Replaced by eq
   void set_ode(const std::string& name, const MX& ode_rhs) {
-    eq(var(name), ode_rhs);
+    eq(der(var(name)), ode_rhs);
   }
 
   /// [DEPRECATED] Replaced by eq

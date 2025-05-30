@@ -677,29 +677,41 @@ MX DaeBuilder::add_t(const std::string& name) {
   return add(name, "independent");
 }
 
-MX DaeBuilder::add_p(const std::string& name) {
+MX DaeBuilder::add_p(const std::string& name, casadi_int n) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name, "parameter", "tunable");
+  Dict opts;
+  opts["dimension"] = std::vector<casadi_int>{n};
+  return add(name, "parameter", "tunable", opts);
 }
 
-MX DaeBuilder::add_u(const std::string& name) {
+MX DaeBuilder::add_u(const std::string& name, casadi_int n) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name, "input");
+  Dict opts;
+  opts["dimension"] = std::vector<casadi_int>{n};
+  return add(name, "input", opts);
 }
 
-MX DaeBuilder::add_x(const std::string& name) {
+MX DaeBuilder::add_x(const std::string& name, casadi_int n) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name);
+  Dict opts;
+  opts["dimension"] = std::vector<casadi_int>{n};
+  MX ret = add(name, opts);
+  set_ode(name, var(name));
+  return ret;
 }
 
-MX DaeBuilder::add_z(const std::string& name) {
+MX DaeBuilder::add_z(const std::string& name, casadi_int n) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name);
+  Dict opts;
+  opts["dimension"] = std::vector<casadi_int>{n};
+  return add(name, opts);
 }
 
-MX DaeBuilder::add_q(const std::string& name) {
+MX DaeBuilder::add_q(const std::string& name, casadi_int n) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name);
+  Dict opts;
+  opts["dimension"] = std::vector<casadi_int>{n};
+  return add(name, opts);
 }
 
 MX DaeBuilder::add_c(const std::string& name, const MX& new_cdef) {
