@@ -249,13 +249,20 @@ namespace casadi {
     // Only do the callback every few iterations
     if (iter % solver_.callback_step_!=0) return true;
 
+    // No callback by default
+    bool full_callback = false;
+
+#ifdef WITH_IPOPT_CALLBACK
+#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
+    // User helper function, introduced in IPOPT 3.14
+    if (!get_curr_iterate(ip_data, ip_cq, false, n_, x_, z_L_, z_U_, m_, g_, lambda_)) {
+      return false;
+    }
+#else
     /// Code copied from TNLPAdapter::FinalizeSolution
     /// See also: http://list.coin-or.org/pipermail/ipopt/2010-July/002078.html
     // http://list.coin-or.org/pipermail/ipopt/2010-April/001965.html
 
-    bool full_callback = false;
-
-#ifdef WITH_IPOPT_CALLBACK
     OrigIpoptNLP* orignlp = dynamic_cast<OrigIpoptNLP*>(GetRawPtr(ip_cq->GetIpoptNLP()));
     if (!orignlp) return true;
     TNLPAdapter* tnlp_adapter = dynamic_cast<TNLPAdapter*>(GetRawPtr(orignlp->nlp()));
@@ -286,11 +293,7 @@ namespace casadi {
       g_[c_pos[i]] += tnlp_adapter->c_rhs_[i];
     }
 
-#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
-    tnlp_adapter->ResortBounds(z_L, z_L_, z_U, z_U_);
-#else
     tnlp_adapter->ResortBnds(z_L, z_L_, z_U, z_U_);
-#endif
     // Copied from Ipopt source: Hopefully the following is correct to recover the bound
     // multipliers for fixed variables (sign ok?)
     if (tnlp_adapter->fixed_variable_treatment_==TNLPAdapter::MAKE_CONSTRAINT &&
@@ -311,6 +314,7 @@ namespace casadi {
         }
       }
     }
+#endif
     full_callback = true;
 #endif // WITH_IPOPT_CALLBACK
 
