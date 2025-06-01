@@ -119,7 +119,7 @@ namespace casadi {
     ///@}
 
     /// Reconstruct options dict
-    virtual Dict generate_options(const std::string& target) const;
+    virtual Dict generate_options(const std::string& target, bool keep_dim=false) const;
 
     /** \brief Print list of options
 
@@ -312,7 +312,7 @@ namespace casadi {
     ///@}
 
     /// Reconstruct options dict
-    Dict generate_options(const std::string& target) const override;
+    Dict generate_options(const std::string& target, bool keep_dim=false) const override;
 
     /** \brief Change option after object creation for debugging
 

@@ -329,7 +329,7 @@ class CASADI_EXPORT SXFunction :
   ///@}
 
   /// Reconstruct options dict
-  Dict generate_options(const std::string& target="clone") const override;
+  Dict generate_options(const std::string& target, bool keep_dim) const override;
 
   /** \brief  Initialize
 
