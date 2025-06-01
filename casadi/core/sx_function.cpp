@@ -1702,6 +1702,303 @@ namespace casadi {
     return 0;
   }
 
+  std::vector<casadi_int> order_markowitz(const Sparsity& M, casadi_int p) {
+    std::vector<casadi_int> order;
+    casadi_int m = M.size1()-p;
+    casadi_int n = M.size2()-p;
+    casadi_int total = 0;
+    Matrix<casadi_int> MM(M, 1);
+    for (casadi_int ii=0;ii<p;++ii) {
+      std::vector<casadi_int> mu = densify(vec(sum1(MM)(0, Slice(n, n+p)))*sum2(MM)(Slice(0, p), 0)).nonzeros();
+
+      for (casadi_int i : order) {
+        mu[i] = std::numeric_limits<casadi_int>::max();
+      }
+      casadi_int i = std::distance(mu.begin(), std::min_element(mu.begin(), mu.end()));
+
+      total += mu[i];
+      order.push_back(i);
+      MM(kron(MM(i, Slice()), MM(Slice(), n+i)).sparsity()) = 1;
+      MM(i, Slice()) = Matrix<casadi_int>(1, 1);
+      MM(Slice(), n+i) = Matrix<casadi_int>(1, 1);
+    }
+    uout() << "total " << total << std::endl;
+    return order;
+  }
+
+  template <class Ita, class Itb>
+  bool is_disjoint(Ita a_begin, Ita a_end, Itb b_begin, Ita b_end) {
+    Ita ita = a_begin;
+    Itb itb = b_begin;
+
+
+    // Depending on contents, ita or itb may be already advanced
+
+    while (ita != a_end && itb != b_end) {
+      if (*ita == *itb) return false;
+      if (*ita < *itb) {
+        ita++;
+      } else {
+        itb++;
+      }
+    }
+    return true;
+  }
+
+  void partial_product(const std::vector<  std::vector< std::pair<casadi_int, SXElem*> > > & row_view,
+                  const std::vector<  std::vector< std::pair<casadi_int, SXElem*> > > & col_view,
+                  casadi_int i, casadi_int j, casadi_int r) {
+
+    auto itrow = row_view[i].begin();
+    auto itcol = col_view[j].begin();
+
+    auto endrow = row_view[i].end();
+    auto endcol = col_view[j].end();
+
+    // Depending on contents, ita or itb may be already advanced
+
+    SXElem prod = 0;
+    bool hit = false;
+    while (itrow != endrow && itcol != endcol && itrow->first < r && itcol->first < r) {
+      if (itrow->first == itcol->first) {
+        prod += (*itrow->second) * (*itcol->second);
+        hit = true;
+      }
+      if (itrow->first  < itcol->first ) {
+        itrow++;
+      } else {
+        itcol++;
+      }
+    }
+
+    if (!hit) return;
+
+    // Find location (i, j)
+    itrow = std::lower_bound(itrow, endrow, j, [](const std::pair<casadi_int, const SXElem*>& v, casadi_int val)
+          {
+              return v.first < val;
+          });
+
+    *(itrow->second) += prod;
+  }
+
+
+  SX SXFunction::jac_ve(const Dict& opts) const {
+    const SX& x = in_[0];
+    const SX& y = out_[0];
+    casadi_int m = y.nnz();
+    casadi_int n = x.nnz();
+    casadi_int p = algorithm_.size()-nnz_out();
+
+    std::vector< std::set<int> > in_deps(sz_w());
+    std::vector< std::set<int> > out_deps(sz_w());
+
+    std::vector<casadi_int> c_row, c_col;
+    std::vector<SXElem> c_data;
+
+    // Iterator to the binary operations
+    std::vector<SXElem>::const_iterator b_it=operations_.begin();
+
+    // Evaluate algorithm
+    if (verbose_) casadi_message("Evaluating algorithm forward");
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+        c_row.push_back(a.i0);
+        c_col.push_back(a.i2);
+        c_data.push_back(1);
+        in_deps[a.i0].insert(a.i2);
+        break;
+      case OP_OUTPUT:
+        c_row.push_back(p+a.i2);
+        c_col.push_back(n+a.i1);
+        c_data.push_back(1);
+        out_deps[a.i1].insert(a.i2);
+        break;
+      case OP_CONST:
+        break;
+      case OP_PARAMETER:
+        break;
+      default:
+        {
+          c_row.push_back(a.i0);
+          c_col.push_back(n+a.i1);
+          const SXElem& f=*b_it++;
+          casadi_int ndeps = casadi_math<SXElem>::ndeps(a.op);
+          // Place to store partials
+          c_data.emplace_back();
+          c_data.emplace_back();
+          SXElem* d = get_ptr(c_data)+c_data.size()-2;
+          in_deps[a.i0] = in_deps[a.i1];
+          if (ndeps>1 && a.i1!=a.i2) {
+            c_row.push_back(a.i0);
+            c_col.push_back(n+a.i2);
+            in_deps[a.i0].insert(in_deps[a.i2].begin(), in_deps[a.i2].end());
+          }
+          switch (a.op) {
+            CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, d);
+          }
+          if (ndeps>1 && a.i1==a.i2) {
+            d[0] += d[1];
+            c_data.pop_back();
+          } else if (ndeps==1) {
+            c_data.pop_back();
+          }
+        }
+      }
+    }
+
+    for (auto it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
+      switch (it->op) {
+      case OP_INPUT:
+      case OP_OUTPUT:
+      case OP_CONST:
+      case OP_PARAMETER:
+        break;
+      default:
+        {
+          casadi_int ndeps = casadi_math<SXElem>::ndeps(it->op);
+          out_deps[it->i1].insert(out_deps[it->i0].begin(), out_deps[it->i0].end());
+          if (ndeps>1) {
+            out_deps[it->i2].insert(out_deps[it->i0].begin(), out_deps[it->i0].end());
+          }
+        }
+      }
+    }
+
+    SX C = SX::triplet(c_row, c_col, c_data, m+p, n+p);
+
+    SX B = C(Slice(0, p), Slice(0, n));
+    SX L = C(Slice(0, p), Slice(n, n+p));
+    SX R = C(Slice(p, m+p), Slice(0, n));
+    SX T = C(Slice(p, m+p), Slice(n, n+p));
+
+
+    std::vector<casadi_int> perm = order_markowitz(C.sparsity(), p);
+    SX P(Sparsity::permutation(perm), 1);
+
+    SX C_star = SX::blockcat({{mtimes(mtimes(P, L), P.T())-SX::eye(p), mtimes(P, B)}, {mtimes(T, P.T()), R}});
+
+    const casadi_int* colind = C_star.sparsity().colind();
+    const casadi_int* row = C_star.sparsity().row();
+
+    // Alternative view on sparsity pattern (with perfect redundancy)
+    std::vector< std::set<casadi_int> > row_view(C_star.size1()); // List of column indices per row
+    std::vector< std::set<casadi_int> > col_view(C_star.size2()); // List of row indices per column
+    // Loop over columns
+    for (casadi_int c = 0; c < C_star.size2(); ++c) {
+      // Loop over nonzeros for the column
+      for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+        casadi_int r = row[k];
+        row_view[r].insert(c);
+        col_view[c].insert(r);
+      }
+    }
+
+    // Traverse all (i,j) in Crout order
+    for (casadi_int k=1;k<p+std::min(n, m);++k) {
+      casadi_int i=k;
+      for (casadi_int j=i;j<p+n;++j) {
+        casadi_int r = std::min(std::min(i, j), p);
+        bool empty = is_disjoint(row_view[i].begin(), row_view[i].lower_bound(r),
+                               col_view[j].begin(), col_view[j].lower_bound(r));
+        if (!empty) {
+          row_view[i].insert(j);
+          col_view[j].insert(i);
+        }
+      }
+      casadi_int j=k;
+      for (casadi_int i=j+1;i<p+m;++i) {
+        casadi_int r = std::min(std::min(i, j), p);
+        bool empty = is_disjoint(row_view[i].begin(), row_view[i].lower_bound(r),
+                               col_view[j].begin(), col_view[j].lower_bound(r));
+        if (!empty) {
+          row_view[i].insert(j);
+          col_view[j].insert(i);
+        }
+      }
+    }
+
+    c_row.clear();
+    c_col.clear();
+    for (casadi_int j=0;j<col_view.size();++j) {
+      for (casadi_int i : col_view[j]) {
+        c_row.push_back(i);
+        c_col.push_back(j);
+      }
+    }
+
+    Sparsity sp = Sparsity::triplet(m+p, n+p, c_row, c_col);
+
+    C_star = project(C_star, sp);
+
+
+    {
+
+      colind = C_star.sparsity().colind();
+      row = C_star.sparsity().row();
+      std::vector<SXElem> & c_data = C_star.nonzeros();
+      std::vector< std::vector< std::pair<casadi_int, SXElem*> > > row_view(C_star.size1()); // List of column indices per row
+      std::vector< std::vector< std::pair<casadi_int, SXElem*> > > col_view(C_star.size2()); // List of row indices per column
+      // Loop over columns
+      for (casadi_int c = 0; c < C_star.size2(); ++c) {
+        // Loop over nonzeros for the column
+        for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+          casadi_int r = row[k];
+          row_view[r].push_back(std::make_pair(c, &c_data[k]));
+          col_view[c].push_back(std::make_pair(r, &c_data[k]));
+        }
+      }
+
+      // Traverse all (i,j) in Crout order
+      for (casadi_int k=1;k<p+std::min(n, m);++k) {
+        casadi_int i=k;
+        for (casadi_int j=i;j<p+n;++j) {
+          casadi_int r = std::min(std::min(i, j), p);
+          partial_product(row_view, col_view, i, j, r);
+        }
+        casadi_int j=k;
+        for (casadi_int i=j+1;i<p+m;++i) {
+          casadi_int r = std::min(std::min(i, j), p);
+          partial_product(row_view, col_view, i, j, r);
+        }
+      }
+
+    }
+
+/**
+    // Traverse all (i,j) in Crout order
+    for (casadi_int k=1;k<p+std::min(n, m);++k) {
+      casadi_int i=k;
+      for (casadi_int j=i;j<p+n;++j) {
+        Slice sk(0, std::min(std::min(i, j), p));
+        SX prod = mtimes(C_star(i, sk), C_star(sk, j));
+        if (prod.nnz()>0) {
+          C_star(i, j) += prod;
+        }
+      }
+      casadi_int j=k;
+      for (casadi_int i=j+1;i<p+m;++i) {
+        Slice sk(0, std::min(std::min(i, j), p));
+        SX prod = mtimes(C_star(i, sk), C_star(sk, j));
+        if (prod.nnz()>0) {
+          C_star(i, j) += prod;
+        }
+      }
+    }
+*/
+    casadi_assert_dev(sp==C_star.sparsity());
+
+    SX J = sparsify(C_star(Slice(p, m+p), Slice(p, n+p)));
+    return cse(J);
+  }
+
+  std::vector<SX> SXFunction::jac_alt(const Dict& opts) const {
+    Function f("f", in_, out_, {{"live_variables", false}, {"allow_free", true}, {"cse", true}});
+    const SXFunction* fsx = dynamic_cast<const SXFunction*>(f.get());
+    return {fsx->jac_ve(opts)};
+  }
+
   const SX SXFunction::sx_in(casadi_int ind) const {
     return in_.at(ind);
   }

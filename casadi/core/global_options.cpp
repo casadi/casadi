@@ -53,4 +53,5 @@ namespace casadi {
     temp_work_dir = Filesystem::ensure_trailing_slash(dir);
   }
 
+  bool GlobalOptions::feature_ve = true;
 } // namespace casadi
