@@ -296,6 +296,9 @@ option(SWIG_EXPORT "Export SWIG" OFF)
 option(SWIG_IMPORT "Import SWIG" OFF)
 option(RELOCATABLE "Avoid any usage of absolute paths" ON)
 
+# enabling ColPack support if requested
+option(WITH_COLPACK "Compile ColPack" OFF)
+
 # enabling OpenMP support if requested
 option(WITH_OPENMP "Compile with parallelization support using OpenMP" OFF)
 if(WITH_OPENMP)
