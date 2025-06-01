@@ -413,11 +413,11 @@ namespace casadi {
     casadi_error("Not defined for ConstantFile");
   }
 
-  void ConstantFile::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
+  void ConstantFile::codegen_incref(CodeGenerator& g, std::set<const void*>& added) const {
     g << g.file_slurp(fname_, nnz(), g.rom_double(this)) << ";\n";
   }
 
-  void ConstantFile::add_dependency(CodeGenerator& g) const {
+  void ConstantFile::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner) const {
     g.define_rom_double(this, nnz());
   }
 
@@ -473,7 +473,7 @@ namespace casadi {
     }
   }
 
-  void ConstantPool::add_dependency(CodeGenerator& g) const {
+  void ConstantPool::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner) const {
     g.define_pool_double(name_, x_);
     g.add_include("string.h");
   }

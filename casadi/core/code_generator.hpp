@@ -72,7 +72,7 @@ namespace casadi {
 
 #ifndef SWIG
     /// Add a function dependency
-    std::string add_dependency(const Function& f);
+    std::string add_dependency(const Function& f, const Instance& inst=Instance(), const Function& owner=Function());
 
     /// Add an external function declaration
     void add_external(const std::string& new_external);
@@ -197,7 +197,7 @@ namespace casadi {
         \identifier{s6} */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w, const std::string& failure_ret="1");
+                           const std::string& w, const std::string& failure_ret="1", const Instance& inst=Instance());
 
     /** \brief Print a string to buffer
 
@@ -1044,6 +1044,9 @@ namespace casadi {
 
     // Does any function need thread-local memory?
     bool needs_mem_;
+
+    std::set<const void*> incref_added_;
+    std::set<const void*> decref_added_;
 
     // Hash a vector
     static size_t hash(const std::vector<double>& v);

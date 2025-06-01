@@ -247,14 +247,12 @@ namespace casadi {
     }
   }
 
-  std::string CodeGenerator::add_dependency(const Function& f) {
+  std::string CodeGenerator::add_dependency(const Function& f, const Instance& inst, const Function& owner) {
     // Quick return if it already exists
     for (auto&& e : added_functions_) if (e.f==f) return e.codegen_name;
 
     // Give it a name
     std::string fname = shorthand("f" + str(added_functions_.size()));
-
-    Instance inst;
 
     // Add to list of functions
     added_functions_.push_back({f, fname});
@@ -332,7 +330,10 @@ namespace casadi {
 
     void CodeGenerator::add(const Function& f, bool with_jac_sparsity) {
     // Add if not already added
-    std::string codegen_name = add_dependency(f);
+
+    // 
+    Instance inst;
+    std::string codegen_name = add_dependency(f, inst);
 
     // Define function
     *this << declare(f->signature(f.name())) << "{\n"
@@ -1167,8 +1168,9 @@ namespace casadi {
   std::string CodeGenerator::
   operator()(const Function& f, const std::string& arg,
              const std::string& res, const std::string& iw,
-             const std::string& w, const std::string& failure_ret) {
-    std::string name = add_dependency(f);
+             const std::string& w, const std::string& failure_ret,
+             const Instance& inst) {
+    std::string name = add_dependency(f, inst);
     bool needs_mem = !f->codegen_mem_type().empty();
     if (needs_mem) {
       std::string mem = "mid";
