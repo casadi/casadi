@@ -1242,23 +1242,22 @@ namespace casadi {
 
     // Generate code for the embedded functions
     for (auto&& a : algorithm_) {
-      a.data->add_dependency(g);
+      Instance local;
+      a.data->add_dependency(g, local, shared_from_this<Function>());
     }
   }
 
   void MXFunction::codegen_incref(CodeGenerator& g, const Instance& inst) const {
     FunctionInternal::codegen_incref(g, inst);
-    std::set<void*> added;
     for (auto&& a : algorithm_) {
-      a.data->codegen_incref(g, added);
+      a.data->codegen_incref(g, g.incref_added_);
     }
   }
 
   void MXFunction::codegen_decref(CodeGenerator& g, const Instance& inst) const {
     FunctionInternal::codegen_decref(g, inst);
-    std::set<void*> added;
     for (auto&& a : algorithm_) {
-      a.data->codegen_decref(g, added);
+      a.data->codegen_decref(g, g.decref_added_);
     }
   }
 

@@ -82,10 +82,11 @@ namespace casadi {
         \identifier{2fe} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief Add dependencies for code generation
-
-        \identifier{2ff} */
-    void add_dependency(CodeGenerator& g) const override;
+    /** \brief Add dependencies for code generation 
+    
+      \identifier{2ff} 
+    */
+    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function()) const override;
 
     /** \brief Generate code for the operation
 
