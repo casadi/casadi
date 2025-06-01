@@ -380,7 +380,7 @@ namespace casadi {
     }
   }
 
-  Dict ProtoFunction::generate_options(const std::string& target) const {
+  Dict ProtoFunction::generate_options(const std::string& target, bool keep_dim) const {
     Dict opts;
     opts["verbose"] = verbose_;
     opts["print_time"] = print_time_;
@@ -390,8 +390,8 @@ namespace casadi {
     return opts;
   }
 
-  Dict FunctionInternal::generate_options(const std::string& target) const {
-    Dict opts = ProtoFunction::generate_options(target);
+  Dict FunctionInternal::generate_options(const std::string& target, bool keep_dim) const {
+    Dict opts = ProtoFunction::generate_options(target, keep_dim);
     opts["jac_penalty"] = jac_penalty_;
     opts["coloring_options"] = coloring_options_;
     opts["user_data"] = user_data_;
@@ -441,6 +441,10 @@ namespace casadi {
     if (target=="reverse") {
       opts["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_out_);
       opts["is_diff_out"] = is_diff_in_;
+    }
+    if (keep_dim) {
+      opts["is_diff_in"] = is_diff_in_;
+      opts["is_diff_out"] = is_diff_out_;
     }
     return opts;
   }
