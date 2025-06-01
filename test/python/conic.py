@@ -1350,7 +1350,7 @@ class ConicTests(casadiTestCase):
     solver_qp = solver.find_function("solver_qp")
     self.assertTrue(solver_qp.is_a("SXFunction"))
     
-  @requires_conic("osqp")
+  @requires_conic("proxqp")
   def test_postpone_expand(self):
 
     x=MX.sym("x")
@@ -1360,25 +1360,25 @@ class ConicTests(casadiTestCase):
     
     
     qp = {'x':x, 'f':f(x-1)}
-    solver = qpsol("solver","osqp",qp,{"print_time":True})
+    solver = qpsol("solver","proxqp",qp,{"print_time":True})
     solver(x0=2)
     solver_qp = solver.find_function("solver_qp")
     self.checkarray(solver_qp(x=2)["H"],-1)
     self.assertTrue(solver_qp.is_a("MXFunction"))
     
-    solver = qpsol("solver","osqp",qp,{"expand":True,"print_time":True})
+    solver = qpsol("solver","proxqp",qp,{"expand":True,"print_time":True})
     solver(x0=2)
     solver_qp = solver.find_function("solver_qp")
     self.checkarray(solver_qp(x=2)["H"],2)
     self.assertTrue(solver_qp.is_a("SXFunction"))
     
-    solver = qpsol("solver","osqp",qp,{"print_time":True, "postpone_expand":True})
+    solver = qpsol("solver","proxqp",qp,{"print_time":True, "postpone_expand":True})
     solver(x0=2)
     solver_qp = solver.find_function("solver_qp")
     self.checkarray(solver_qp(x=2)["H"],-1)
     self.assertTrue(solver_qp.is_a("MXFunction"))
     
-    solver = qpsol("solver","osqp",qp,{"expand":True,"print_time":True, "postpone_expand":True})
+    solver = qpsol("solver","proxqp",qp,{"expand":True,"print_time":True, "postpone_expand":True})
     solver(x0=2)
     solver_qp = solver.find_function("solver_qp")
     self.checkarray(solver_qp(x=2)["H"],-1)
