@@ -1097,6 +1097,9 @@ namespace casadi {
       case OP_EXPM1:
         add_auxiliary(AUX_EXPM1);
         return "casadi_expm1("+a0+")";
+      case OP_SAFE_SQRT:
+        add_auxiliary(AUX_FMAX);
+        return "sqrt(casadi_fmax("+a0+",0.0))";
       default:
         return casadi_math<double>::print(op, a0);
     }
@@ -1115,6 +1118,8 @@ namespace casadi {
       case OP_PRINTME:
         add_auxiliary(AUX_PRINTME);
         return "casadi_printme("+a0+","+a1+")";
+      case OP_SAFE_DIV:
+        return a1+"==0.0 ? 0.0 : "+a0+"/" + a1;
       default:
         return casadi_math<double>::print(op, a0, a1);
     }

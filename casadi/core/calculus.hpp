@@ -207,8 +207,11 @@ namespace casadi {
 
     OP_LOGSUMEXP,
 
-    OP_REMAINDER
+    OP_REMAINDER,
 
+    OP_SAFE_DIV,
+
+    OP_SAFE_SQRT
   };
   #define NUM_BUILT_IN_OPS (OP_REMAINDER+1)
 
@@ -321,6 +324,9 @@ namespace casadi {
   }
 #endif // HAS_ERFINV
   ///@}
+
+  inline double safe_div(double x, double y) { return y==0 ? 0 : x/y;}
+  inline double safe_sqrt(double x) { return x<=0 ? 0 : sqrt(x);}
 
   template<typename T>
   T twice(const T& x) {
@@ -507,6 +513,8 @@ namespace casadi {
   template<>      struct F0XChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_LOG1P>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_EXPM1>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_SAFE_DIV>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_SAFE_SQRT>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -560,6 +568,7 @@ namespace casadi {
   template<>      struct NonnegativeChecker<OP_OR>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_HYPOT>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_FABS>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_SAFE_SQRT>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -587,6 +596,7 @@ namespace casadi {
   template<>      struct NargChecker<OP_PARAMETER>{ static const casadi_int check=0;};
   template<>      struct NargChecker<OP_INPUT>{ static const casadi_int check=0;};
   template<>      struct NargChecker<OP_HYPOT>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_SAFE_DIV>{ static const casadi_int check=2;};
   ///@}
 
   /// Simple assignment
@@ -631,6 +641,15 @@ namespace casadi {
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x/y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=1/y; d[1]=-f/y;}
+  };
+
+  /// Safe division
+  template<>
+  struct BinaryOperation<OP_SAFE_DIV>{
+  public:
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = safe_div(x, y);}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
+        d[0]=safe_div(1, y); d[1]=-safe_div(f, y);}
   };
 
   /// Negation
@@ -682,6 +701,14 @@ namespace casadi {
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = sqrt(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=1/(twice(f));}
+  };
+
+  /// Safe square root
+  template<>
+  struct UnaryOperation<OP_SAFE_SQRT>{
+  public:
+    template<typename T> static inline void fcn(const T& x, T& f) { f = safe_sqrt(x);}
+    template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=safe_div(1,twice(f));}
   };
 
   /// Square
@@ -1106,6 +1133,8 @@ namespace casadi {
     case OP_EXPM1:         return F<OP_EXPM1>::check;
     case OP_HYPOT:         return F<OP_HYPOT>::check;
     case OP_LOGSUMEXP:     return F<OP_LOGSUMEXP>::check;
+    case OP_SAFE_DIV:      return F<OP_SAFE_DIV>::check;
+    case OP_SAFE_SQRT:     return F<OP_SAFE_SQRT>::check;
     }
     return T();
   }
@@ -1335,7 +1364,9 @@ namespace casadi {
   case OP_PRINTME:   CNAME<OP_PRINTME>::fcn(X, Y, F, N);       break;   \
   case OP_LOG1P:     CNAME<OP_LOG1P>::fcn(X, Y, F, N);       break;   \
   case OP_EXPM1:     CNAME<OP_EXPM1>::fcn(X, Y, F, N);       break;   \
-  case OP_HYPOT:     CNAME<OP_HYPOT>::fcn(X, Y, F, N);       break;
+  case OP_HYPOT:     CNAME<OP_HYPOT>::fcn(X, Y, F, N);       break;   \
+  case OP_SAFE_DIV:  CNAME<OP_SAFE_DIV>::fcn(X, Y, F, N);      break;   \
+  case OP_SAFE_SQRT: CNAME<OP_SAFE_SQRT>::fcn(X, Y, F, N);     break;
 
 #define CASADI_MATH_FUN_BUILTIN(X, Y, F) CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationSS, X, Y, F, 1)
 
@@ -1421,7 +1452,9 @@ namespace casadi {
   case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X, Y, F, D);    break; \
   case OP_LOG1P:     BinaryOperation<OP_LOG1P>::der(X, Y, F, D);      break; \
   case OP_EXPM1:     BinaryOperation<OP_EXPM1>::der(X, Y, F, D);      break; \
-  case OP_HYPOT:     BinaryOperation<OP_HYPOT>::der(X, Y, F, D);      break;
+  case OP_HYPOT:     BinaryOperation<OP_HYPOT>::der(X, Y, F, D);      break; \
+  case OP_SAFE_DIV:  BinaryOperation<OP_SAFE_DIV>::der(X, Y, F, D);   break; \
+  case OP_SAFE_SQRT: BinaryOperation<OP_SAFE_SQRT>::der(X, Y, F, D);  break;
     switch (op) {
     CASADI_MATH_DER_BUILTIN(x, y, f, d)
       }
@@ -1483,7 +1516,9 @@ case OP_LIFT:      DerBinaryOperation<OP_LIFT>::derf(X, Y, F, D);       break; \
 case OP_PRINTME:   DerBinaryOperation<OP_PRINTME>::derf(X, Y, F, D);    break; \
 case OP_LOG1P:     DerBinaryOperation<OP_LOG1P>::derf(X, Y, F, D);      break; \
 case OP_EXPM1:     DerBinaryOperation<OP_EXPM1>::derf(X, Y, F, D);      break; \
-case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
+case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break; \
+case OP_SAFE_DIV:  DerBinaryOperation<OP_SAFE_DIV>::derf(X, Y, F, D);   break; \
+case OP_SAFE_SQRT: DerBinaryOperation<OP_SAFE_SQRT>::derf(X, Y, F, D);  break;
     switch (op) {
       CASADI_MATH_DERF_BUILTIN(x, y, f, d)
         }
@@ -1511,7 +1546,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_ATAN2:                                \
     case OP_PRINTME:                              \
     case OP_LIFT:                                 \
-    case OP_HYPOT:
+    case OP_HYPOT:                                \
+    case OP_SAFE_DIV:
 
   #define CASADI_MATH_UNARY_BUILTIN              \
     case OP_ASSIGN:                              \
@@ -1542,7 +1578,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_ATANH:                               \
     case OP_ERFINV:                              \
     case OP_LOG1P:                               \
-    case OP_EXPM1:
+    case OP_EXPM1:                               \
+    case OP_SAFE_SQRT:
 
   template<typename T>
   inline void casadi_math<T>::fun_linear(unsigned char op, const T* x, const T* y, T* f) {
@@ -1736,6 +1773,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_EXPM1:          return "expm1";
     case OP_HYPOT:          return "hypot";
     case OP_LOGSUMEXP:      return "logsumexp";
+    case OP_SAFE_DIV:       return "safe_div";
+    case OP_SAFE_SQRT:      return "safe_sqrt";
     }
     return "<invalid-op>";
   }
