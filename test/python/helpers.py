@@ -94,6 +94,60 @@ sys.argv[1:] = ['-v'] + args.unittest_args
 from io import StringIO
 
 
+class Node:
+  def __init__(self,val):
+    self.val = val
+    self.nodes = []
+
+class AutoBrancher:
+  OPEN = 0
+  DONE = 1
+  def __init__(self):
+    self.root = Node(AutoBrancher.OPEN)
+    self.trace = [self.root]
+
+  @property
+  def current(self):
+    return self.trace[-1]
+
+  def branch(self, alternatives = [True, False]):
+    alternatives = list(alternatives)
+    nodes = self.current.nodes
+    if len(nodes)==0:
+      nodes += [None]*len(alternatives)
+    for i,n in enumerate(nodes):
+      if n is None:
+        nodes[i] = Node(AutoBrancher.OPEN)
+        self.trace.append(nodes[i])
+        self.this_branch.append(alternatives[i])
+        return alternatives[i]
+      else:
+        if n.val == AutoBrancher.OPEN:
+          self.trace.append(nodes[i])
+          self.this_branch.append(alternatives[i])
+          return alternatives[i]
+
+  def __iter__(self):
+    cnt = 0
+    
+    while self.root.val==AutoBrancher.OPEN:
+      self.this_branch = []
+      cnt+=1
+      yield self
+      # Indicate that current leaf is done
+      self.current.val = AutoBrancher.DONE
+      # Close leaves when subleaves are done
+      for n in reversed(self.trace[:-1]):
+        finished = True
+        for e in n.nodes:
+          finished = finished and e and e.val==AutoBrancher.DONE
+        if finished:
+          n.val = AutoBrancher.DONE
+      # Reset trace
+      self.trace = [self.root]
+      print("Evaluated branch",self.this_branch)
+    print("Evaluated",cnt,"branches")
+
 class LazyString(object):
   def __init__(self,f):
      self.f = f
