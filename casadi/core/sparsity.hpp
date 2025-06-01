@@ -1045,7 +1045,8 @@ namespace casadi {
 
         \identifier{db} */
     Sparsity uni_coloring(const Sparsity& AT=Sparsity(),
-                          casadi_int cutoff = std::numeric_limits<casadi_int>::max()) const;
+                          casadi_int cutoff = std::numeric_limits<casadi_int>::max(),
+                          const Dict& coloring_options = Dict()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
 
@@ -1059,7 +1060,8 @@ namespace casadi {
 
         \identifier{dc} */
     Sparsity star_coloring(casadi_int ordering = 1,
-                            casadi_int cutoff = std::numeric_limits<casadi_int>::max()) const;
+                            casadi_int cutoff = std::numeric_limits<casadi_int>::max(),
+                            const Dict& coloring_options = Dict()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
 
