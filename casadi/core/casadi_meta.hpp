@@ -115,6 +115,14 @@ namespace casadi {
 
         \identifier{2bg} */
     static const char* object_file_suffix();
+
+    /** \brief Obtain bin prefix
+    */
+    static const char* bin_prefix();
+
+    /** \brief Is self contained?
+    */
+    static bool is_selfcontained();
   };
 
 }  // namespace casadi
