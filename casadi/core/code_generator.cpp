@@ -1428,9 +1428,17 @@ namespace casadi {
       add_auxiliary(AUX_CLEAR, {"casadi_int"});
       this->auxiliaries << sanitize_source(casadi_interpn_str, inst);
       break;
+    case AUX_INTERP1:
+      add_auxiliary(AUX_LOW);
+      this->auxiliaries << sanitize_source(casadi_interp1_str, inst);
+      break;
     case AUX_INTERPN_GRAD:
       add_auxiliary(AUX_INTERPN);
       this->auxiliaries << sanitize_source(casadi_interpn_grad_str, inst);
+      break;
+    case AUX_INTERP1_GRAD:
+      add_auxiliary(AUX_LOW);
+      this->auxiliaries << sanitize_source(casadi_interp1_grad_str, inst);
       break;
     case AUX_DE_BOOR:
       this->auxiliaries << sanitize_source(casadi_de_boor_str, inst);
@@ -2066,6 +2074,28 @@ namespace casadi {
     std::stringstream s;
     s << "casadi_interpn(" << res << ", " << ndim << ", " << grid << ", "  << offset << ", "
       << values << ", " << x << ", " << lookup_mode << ", " << m << ", " << iw << ", " << w << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::interp1(const std::string& grid,
+                                   const std::string& offset,
+                                   const std::string& values, const std::string& x,
+                                   casadi_int lookup_mode) {
+    add_auxiliary(AUX_INTERP1);
+    std::stringstream s;
+    s << "casadi_interp1(" << grid << ", "  << offset << ", "
+      << values << ", " << x << ", " << lookup_mode << ");";
+    return s.str();
+  }
+
+
+  std::string CodeGenerator::interp1_grad(const std::string& grid, const std::string& offset,
+                                   const std::string& values, const std::string& x,
+                                   casadi_int lookup_mode) {
+    add_auxiliary(AUX_INTERP1_GRAD);
+    std::stringstream s;
+    s << "casadi_interp1_grad(" << grid << ", " << offset << ", "
+      << values << ", " << x << ", " << lookup_mode << ");";
     return s.str();
   }
 
