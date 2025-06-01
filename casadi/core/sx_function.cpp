@@ -463,8 +463,8 @@ namespace casadi {
      }
   };
 
-  Dict SXFunction::generate_options(const std::string& target) const {
-    Dict opts = FunctionInternal::generate_options(target);
+  Dict SXFunction::generate_options(const std::string& target, bool keep_dim) const {
+    Dict opts = FunctionInternal::generate_options(target, keep_dim);
     //opts["default_in"] = default_in_;
     opts["live_variables"] = live_variables_;
     opts["just_in_time_sparsity"] = just_in_time_sparsity_;
