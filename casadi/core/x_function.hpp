@@ -30,6 +30,7 @@
 #include "function_internal.hpp"
 #include "factory.hpp"
 #include "serializing_stream.hpp"
+#include "global_options.hpp"
 
 // To reuse variables we need to be able to sort by sparsity pattern
 #include <unordered_map>
@@ -96,6 +97,11 @@ namespace casadi {
 
         \identifier{xs} */
     std::vector<MatType> jac(const Dict& opts) const;
+
+    /** \brief  Construct a complete Jacobian by alternative means */
+    virtual std::vector<MatType> jac_alt(const Dict& opts) const {
+      casadi_error("Not implemented");
+    }
 
     /** \brief Check if the function is of a particular type
 
@@ -472,6 +478,10 @@ namespace casadi {
       casadi_assert(n_in_>=1 && is_diff_in_[0], "Not implemented");
       casadi_assert(n_in_ == 1 || !any(vector_tail(is_diff_in_)), "Not implemented");
       casadi_assert(n_out_ == 1, "Not implemented");
+
+      if (is_a("SXFunction", false) && GlobalOptions::getFeatureVE()) {// && !GlobalOptions::getHierarchicalSparsity()) {
+        return jac_alt(opts);
+      }
 
       // Create return object
       ret.at(0) = MatType::zeros(jac_sparsity(0, 0, false, symmetric).T());
