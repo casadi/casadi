@@ -100,6 +100,9 @@ namespace casadi {
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 
+    /** Simplify to interp1 implementation? */
+    bool is_1d() const;
+
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
