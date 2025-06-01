@@ -287,7 +287,7 @@ namespace casadi {
     /** \brief Codegen incref
 
         \identifier{zm} */
-    void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
+    void codegen_incref(CodeGenerator& g, std::set<const void*>& added) const override;
 
     /** \brief  Print expression
 
@@ -330,7 +330,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{zr} */
-    void add_dependency(CodeGenerator& g) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function()) const override;
 
     /** \brief file to read from
 
@@ -410,7 +410,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{2a0} */
-    void add_dependency(CodeGenerator& g) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function()) const override;
 
     /** \brief pool identifier
 

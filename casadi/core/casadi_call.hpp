@@ -72,7 +72,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{6n} */
-    void add_dependency(CodeGenerator& g) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner=Function()) const override;
 
     /** \brief Is reference counting needed in codegen?
 
@@ -82,12 +82,12 @@ namespace casadi {
     /** \brief Codegen incref
 
         \identifier{6p} */
-    void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
+    void codegen_incref(CodeGenerator& g, std::set<const void*>& added) const override;
 
     /** \brief Codegen decref
 
         \identifier{6q} */
-    void codegen_decref(CodeGenerator& g, std::set<void*>& added) const override;
+    void codegen_decref(CodeGenerator& g, std::set<const void*>& added) const override;
 
     /** \brief Generate code for the operation
 
