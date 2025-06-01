@@ -2948,7 +2948,8 @@ namespace casadi {
     std::fill(it, indices.end(), -1);
   }
 
-  Sparsity SparsityInternal::uni_coloring(const Sparsity& AT, casadi_int cutoff) const {
+  Sparsity SparsityInternal::uni_coloring(const Sparsity& AT, casadi_int cutoff,
+      const Dict& coloring_options) const {
 
     // Allocate temporary vectors
     std::vector<casadi_int> forbiddenColors;
@@ -3290,7 +3291,8 @@ namespace casadi {
     return Sparsity(size2(), forbiddenColors.size(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::star_coloring(casadi_int ordering, casadi_int cutoff) const {
+  Sparsity SparsityInternal::star_coloring(casadi_int ordering, casadi_int cutoff,
+      const Dict& coloring_options) const {
     if (!is_square()) {
       // NOTE(@jaeandersson) Why warning and not error?
       casadi_message("StarColoring requires a square matrix, got " + dim() + ".");
