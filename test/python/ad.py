@@ -638,7 +638,7 @@ class ADtests(casadiTestCase):
           if "pow" in str(out) and os.name=='nt':
             pass # Known bug #3038
           else:
-            self.check_codegen(fun,inputs=values,std=std,digits=codegen_check_digits)
+            self.check_codegen(fun,inputs=values,std=std,digits=codegen_check_digits,main=True)
           self.check_serialize(fun,inputs=values)
 
           J_ = fun_out[1]
@@ -698,7 +698,7 @@ class ADtests(casadiTestCase):
                 if "pow" in str(out) and os.name=='nt':
                   pass # Known bug #3038
                 else:
-                  self.check_codegen(vf,inputs=vf_in,std=std,digits=codegen_check_digits)
+                  self.check_codegen(vf,inputs=vf_in,std=std,digits=codegen_check_digits,main=True)
                 self.check_serialize(vf,inputs=vf_in)
 
                 offset = len(res)
