@@ -17,3 +17,8 @@ endif()
 if(WITH_BUILD_DSDP AND DSDP_FOUND)
   add_subdirectory(DSDP)
 endif()
+
+if(WITH_COLPACK)
+  set(CMAKE_INSTALL_BINDIR ${BIN_PREFIX})
+  add_subdirectory(ColPack/build/cmake)
+endif()

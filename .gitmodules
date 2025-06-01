@@ -1,0 +1,3 @@
+[submodule "external_packages/ColPack"]
+	path = external_packages/ColPack
+	url = https://github.com/jgillis/ColPack.git

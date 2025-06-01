@@ -215,6 +215,9 @@ namespace casadi {
         "A high value of 'jac_penalty' makes it less likely for the heurstic "
         "to chose the full Jacobian strategy. "
         "The special value -1 indicates never to use the full Jacobian strategy"}},
+      {"coloring_options",
+       {OT_DICT,
+        "(Experimental) options for coloring"}},
       {"user_data",
        {OT_VOIDPTR,
         "A user-defined field that can be used to identify "
