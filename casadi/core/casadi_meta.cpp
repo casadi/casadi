@@ -55,4 +55,8 @@ namespace casadi {
 
   const char* CasadiMeta::object_file_suffix() { return CASADI_OBJECT_FILE_SUFFIX;}
 
+  const char* CasadiMeta::bin_prefix() { return CASADI_BIN_PREFIX;}
+
+  bool CasadiMeta::is_selfcontained() { return std::string(CASADI_IS_SELFCONTAINED)=="ON";}
+
 }  // namespace casadi

@@ -43,6 +43,8 @@ finally:
 # For plugin loading
 GlobalOptions.setCasadiPath(os.path.dirname(__file__))
 GlobalOptions.setCasadiIncludePath(os.path.join(os.path.dirname(__file__),"include"))
+if CasadiMeta.is_selfcontained():
+  GlobalOptions.setCasadiExecutablePath(os.path.dirname(__file__))
 import types
 
 def wrapper(f, warning,error=False):
