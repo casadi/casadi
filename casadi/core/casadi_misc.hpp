@@ -159,7 +159,7 @@ private:
 
        \identifier{1l9} */
   template<typename T>
-  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i);
+  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i, bool invert=false);
 
   /**  \brief Select subset of vector
 
@@ -572,7 +572,10 @@ namespace casadi {
   }
 
   template<typename T>
-  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i) {
+  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i, bool invert) {
+    if (invert) {
+      return vector_slice(v, complement(i, v.size()));
+    }
     std::vector<T> ret;
     ret.reserve(i.size());
     for (casadi_int k=0;k<i.size();++k) {
