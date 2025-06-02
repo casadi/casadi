@@ -1178,6 +1178,10 @@ namespace casadi {
     return Function(name, arg, res, name_in_, name_out_, my_opts);
   }
 
+  Function FunctionInternal::with_options(const Dict& opts) const {
+    return wrap_as_needed(opts);
+  }
+
   Function FunctionInternal::wrap() const {
     return wrap("wrap_" + name_);
   }

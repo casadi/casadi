@@ -814,6 +814,8 @@ namespace casadi {
         \identifier{26g} */
     Dict cache() const;
 
+    virtual Function with_options(const Dict& opts) const;
+
     /** \brief Get function in cache
 
         \identifier{lk} */
