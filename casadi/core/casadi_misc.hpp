@@ -261,6 +261,9 @@ private:
                                                      casadi_int size);
   CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v);
 
+  /// Check if the vector has negative entries
+  CASADI_EXPORT bool is_pow2(unsigned int a);
+
   /** \brief Flatten a nested std::vector tot a single flattened vector
    * 
    * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]

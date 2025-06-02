@@ -467,4 +467,8 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     return acc;
   }
 
+  bool is_pow2(unsigned int a) {
+    return a && !(a & (a - 1));
+  }
+
 } // namespace casadi
