@@ -1071,8 +1071,20 @@ namespace casadi {
     // Does any function need thread-local memory?
     bool needs_mem_;
 
+    /// Vector width in bits
+    unsigned int vector_width_;
+
     std::set<const void*> incref_added_;
     std::set<const void*> decref_added_;
+
+    unsigned int vector_width_bits() const;
+    std::string vector_width_attribute() const;
+
+    /// Vector width in bits
+    unsigned int vector_width() const { return vector_width_; }
+
+    /// How many casadi_real nunbers fit in one vector?
+    unsigned int vector_width_real() const;
 
     // Hash a vector
     static size_t hash(const std::vector<double>& v);

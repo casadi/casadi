@@ -121,6 +121,9 @@ namespace casadi {
           "Option max_initializer_elements_per_line must be >=0");
       } else if (e.first=="force_canonical") {
         this->force_canonical = e.second;
+      } else if (e.first=="vector_width") {
+        vector_width_ = e.second.to_int();
+        casadi_assert(is_pow2(vector_width_), "vector width must be power of 2");
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -334,6 +337,10 @@ namespace casadi {
     // 
     Instance inst;
     std::string codegen_name = add_dependency(f, inst);
+
+    if (f.align_w()>1) {
+      add_auxiliary(AUX_ALIGN);
+    }
 
     // Define function
     *this << declare(f->signature(f.name())) << "{\n"
@@ -988,6 +995,20 @@ namespace casadi {
 
     // End with new line
     s << std::endl;
+  }
+
+  unsigned int CodeGenerator::vector_width_bits() const {
+    return casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float)*8 : GlobalOptions::vector_width_real*sizeof(double)*8;
+  }
+
+  std::string CodeGenerator::vector_width_attribute() const {
+    std::string flag = "prefer-vector-width=" + str(vector_width_bits());
+    if (false && vector_width_bits()==512) {
+      std::string flag = "avx512f,arch=skylake-avx512,tune=skylake-avx512";
+      return "__attribute__((target(\"" + flag + "\")))";
+    } else {
+      return "";
+    }
   }
 
   std::string CodeGenerator::work(casadi_int n, casadi_int sz, bool is_ref) const {
@@ -2753,6 +2774,14 @@ namespace casadi {
   align(const std::string& a, size_t p) {
     add_auxiliary(CodeGenerator::AUX_ALIGN);
     return "casadi_align(" + a + ", " + str(p) + ");";
+  }
+
+  unsigned int CodeGenerator::vector_width_real() const {
+    if (casadi_real_type=="double") {
+      return vector_width()/sizeof(double);
+    } else if (casadi_real_type=="float") {
+      return vector_width()/sizeof(float);
+    }
   }
 
 } // namespace casadi
