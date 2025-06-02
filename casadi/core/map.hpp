@@ -166,6 +166,22 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     ///@{
+    /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
+    bool fwdViaJac(casadi_int nfwd) const override { return f_->fwdViaJac(nfwd); }
+    bool adjViaJac(casadi_int nadj) const override { return f_->adjViaJac(nadj); }
+    ///@}
+
+    ///@{
+    /** \brief Return Jacobian of all input elements with respect to all output elements */
+    Function jacobian() const;
+    bool has_jacobian() const override { return true;}
+    Function get_jacobian(const std::string& name,
+                                  const std::vector<std::string>& inames,
+                                  const std::vector<std::string>& onames,
+                                  const Dict& opts) const override;
+    ///@}
+
+    ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives
 
         \identifier{hh} */
@@ -228,7 +244,7 @@ namespace casadi {
     Map(const std::string& name, const Function& f, casadi_int n);
 
     // The function which is to be evaluated in parallel
-    Function f_;
+    Function f_, f_orig_;
 
     // Number of times to evaluate this function
     casadi_int n_;

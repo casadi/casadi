@@ -38,18 +38,36 @@
 namespace casadi {
 
   Function Map::create(const std::string& parallelization, const Function& f, casadi_int n) {
+    Function ret;
     // Create instance of the right class
     std::string suffix = str(n) + "_" + f.name();
     if (parallelization == "serial") {
-      return Function::create(new Map("map" + suffix, f, n), Dict());
+      ret = Function::create(new Map("map" + suffix, f, n), Dict());
     } else if (parallelization== "openmp") {
-      return Function::create(new OmpMap("ompmap" + suffix, f, n), Dict());
+      ret = Function::create(new OmpMap("ompmap" + suffix, f, n), Dict());
     } else if (parallelization== "thread") {
-      return Function::create(new ThreadMap("threadmap" + suffix, f, n), Dict());
+      ret = Function::create(new ThreadMap("threadmap" + suffix, f, n), Dict());
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
 
+    if (!vectorize_f(f, n)) return ret;
+
+    const Map& m = *static_cast<const Map*>(ret.get());
+
+
+    // Input expressions
+    std::vector<MX> arg = ret.mx_in(); // change to layout of reinterpret_layout
+
+    std::vector<MX> res = m.permute_out(ret(m.permute_in(arg)));
+
+    // Construct return function
+    Dict custom_opts;
+    custom_opts["always_inline"] = true;
+    Function retf(ret.name(), arg, res, custom_opts);
+    static std::vector<Function> leaking;
+    leaking.push_back(retf);
+    return retf;
   }
 
   std::vector<MX> Map::permute_in(const std::vector<MX> & arg, bool invert) const {
@@ -87,6 +105,34 @@ namespace casadi {
 
   Map::Map(const std::string& name, const Function& f, casadi_int n)
     : FunctionInternal(name), f_(f), n_(n) {
+    //REMOVE uout() << "It's map!" << std::endl;
+
+    f_orig_ = f;
+    if (vectorize_f(f, n_)) {
+
+      std::vector<casadi_int> stride_in(f_.n_in());
+      std::vector<casadi_int> stride_out(f_.n_out());
+      for (casadi_int j=0; j<f_.n_in(); ++j) {
+        stride_in[j] = vectorize_f(f, n_) ? n_padded(n) : 1;
+      }
+      for (casadi_int j=0; j<f_.n_out(); ++j) {
+        stride_out[j] = vectorize_f(f, n_) ? n_padded(n) : 1;
+      }
+
+      Dict opts;
+      opts["stride_in"] = stride_in;
+      opts["stride_out"] = stride_out;
+      f_ = f_->with_options(opts);
+
+      // Options
+      /*Dict my_opts = f->generate_options();
+      my_opts["stride_in"] = stride_in;
+      my_opts["stride_out"] = stride_out;
+      // Wrap the function
+      std::vector<SX> arg = f.sx_in();
+      std::vector<SX> res = f(arg);
+      f_ = Function(f.name(), arg, res, f.name_in(), f.name_out(), my_opts);*/
+    }
   }
 
   bool Map::is_a(const std::string& type, bool recursive) const {
@@ -141,6 +187,7 @@ namespace casadi {
   void Map::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
     s.pack("Map::f", f_);
+    s.pack("Map::f_orig", f_orig_);
     s.pack("Map::n", n_);
   }
 
@@ -151,6 +198,7 @@ namespace casadi {
 
   Map::Map(DeserializingStream& s) : FunctionInternal(s) {
     s.unpack("Map::f", f_);
+    s.unpack("Map::f_orig", f_orig_);
     s.unpack("Map::n", n_);
   }
 
@@ -196,10 +244,12 @@ namespace casadi {
     for (casadi_int i=0; i<n_; ++i) {
       if (f_(arg1, res1, iw, w, mem)) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
-        if (arg1[j]) arg1[j] += f_.nnz_in(j);
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_in(j);
+        if (arg1[j]) arg1[j] += stride;
       }
       for (casadi_int j=0; j<n_out_; ++j) {
-        if (res1[j]) res1[j] += f_.nnz_out(j);
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_out(j);
+        if (res1[j]) res1[j] += stride;
       }
     }
     return 0;
@@ -223,43 +273,83 @@ namespace casadi {
     for (casadi_int i=0; i<n_; ++i) {
       if (f_.rev(arg1, res1, iw, w)) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
-        if (arg1[j]) arg1[j] += f_.nnz_in(j);
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_in(j);
+        if (arg1[j]) arg1[j] += stride;
       }
       for (casadi_int j=0; j<n_out_; ++j) {
-        if (res1[j]) res1[j] += f_.nnz_out(j);
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_out(j);
+        if (res1[j]) res1[j] += stride;
       }
     }
     return 0;
   }
 
   void Map::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
-    g.add_dependency(f_);
+    Instance local = inst;
+    local.stride_in.resize(f_.n_in());
+    for (casadi_int j=0; j<n_in_; ++j) {
+      local.stride_in[j] = vectorize_f() ? n_padded() : 1;
+    }
+    local.stride_out.resize(f_.n_out());
+    for (casadi_int j=0; j<n_out_; ++j) {
+      local.stride_out[j] = vectorize_f() ? n_padded() : 1;
+    }
+    g.add_dependency(f_, local);
+    //REMOVE uout() << "codegen_dec" << local.arg_null << f_ << std::endl;
   }
 
   void Map::codegen_body(CodeGenerator& g,
       const Instance& inst) const {
+    Instance local = inst;
+    local.stride_in.resize(f_.n_in());
+    for (casadi_int j=0; j<n_in_; ++j) {
+      local.stride_in[j] = vectorize_f() ? n_padded() : 1;
+    }
+    local.stride_out.resize(f_.n_out());
+    for (casadi_int j=0; j<n_out_; ++j) {
+      local.stride_out[j] = vectorize_f() ? n_padded() : 1;
+    }
+    //REMOVE uout() << "codegen_body" << local.arg_null << f_ << std::endl;
     g.local("i", "casadi_int");
-    g.local("arg1", "const casadi_real*", "*");
-    g.local("res1", "casadi_real*", "*");
+    g.local("arg1[" + str(f_.sz_arg()) + "]", "const casadi_real*");
+    g.local("res1[" + str(f_.sz_res()) + "]", "casadi_real*");
 
     // Input buffer
-    g << "arg1 = arg+" << n_in_ << ";\n"
-      << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
+    g << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g << "res1 = res+" << n_out_ << ";\n"
-      << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
-      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n";
+    if (vectorize_f()) {
+      g << "#pragma omp simd\n";
+    }
+    g << "for (i=0; i<" << (vectorize_f() ? n_padded() : n_) << "; ++i) {\n";
     // Evaluate
-    g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    if (str(f_).find("SXFunction")!= std::string::npos) {
+      g << g(f_, "arg1", "res1", "iw", "w", "1", local) << ";\n";
+    } else {
+      g << "if (" << g(f_, "arg1", "res1", "iw", "w", "1", local) << ") return 1;\n";
+    }
+
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
-      if (f_.nnz_in(j))
-        g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
+      if (f_.nnz_in(j)) {
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_in(j);
+        if (inst.arg_null.empty()) {
+          g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << stride << ";\n";
+        } else {
+          if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << stride << ";\n";
+        }
+      }
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
-      if (f_.nnz_out(j))
-        g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
+      if (f_.nnz_out(j)) {
+        casadi_int stride = vectorize_f() ? 1 : f_.nnz_out(j);
+        if (inst.res_null.empty()) {
+          g << "if (res1[" << j << "]) res1[" << j << "]+=" << stride << ";\n";
+        } else {
+          if (!inst.res_null[j]) g << "res1[" << j << "]+=" << stride << ";\n";
+        }
+      }
     }
     g << "}\n";
   }
@@ -284,52 +374,76 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Generate map of derivative
-    Function df = f_.forward(nfwd);
+    casadi_assert_dev(!f_orig_.is_null());
+    Function df = f_orig_.forward(nfwd);
     Function dm = df.map(n_, parallelization());
 
-    // Input expressions
-    std::vector<MX> arg = dm.mx_in();
+    // Strip permuting layer when vectorized
+    if (dm.is_a("MXFunction")) {
+      dm = dm.get_function(dm.get_function()[0]);
+    }
 
-    // Need to reorder sensitivity inputs
+    // Input expressions
+    std::vector<MX> arg = dm.mx_in(); // change to layout of reinterpret_layout
+
     std::vector<MX> res = arg;
-    std::vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    std::vector<casadi_int> ind;
-    for (casadi_int i=0; i<n_in_; ++i, ++it) {
-      casadi_int sz = f_.size2_in(i);
-      ind.clear();
-      for (casadi_int k=0; k<n_; ++k) {
-        for (casadi_int d=0; d<nfwd; ++d) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((d*n_ + k)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      MX& x = res[f_.n_in()+f_.n_out()+i];
+      casadi_int df_in = df.nnz_in(f_.n_in()+f_.n_out()+i);
+      if (false && vectorize_f()) {
+        Layout source({n_, df_in}, {n_padded(), df_in});
+        Layout target({df_in, n_});
+        Relayout ret = Relayout(source, {1, 0}, target);
+        //REMOVE uout() << "FOO " << i << std::endl;
+        x = permute_layout(x, ret);
+
+        // Layout source({f_.nnz_in(i), n_});
+        // Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
       }
-      *it = (*it)(Slice(), ind); // NOLINT
+      if (!vectorize_f()) {
+        //REMOVE uout() << "here" << std::endl;
+        Layout source({df_in/nfwd,n_,nfwd});
+        Layout target({df_in/nfwd, nfwd, n_});
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
+        //REMOVE uout() << "baz" << x << "source" << source << "target" << target << std::endl;
+      }
     }
 
     // Get output expressions
     res = dm(res);
 
-    // Reorder sensitivity outputs
-    it = res.begin();
-    for (casadi_int i=0; i<n_out_; ++i, ++it) {
-      casadi_int sz = f_.size2_out(i);
-      ind.clear();
-      for (casadi_int d=0; d<nfwd; ++d) {
-        for (casadi_int k=0; k<n_; ++k) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((k*nfwd + d)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      casadi_int df_out = df.nnz_out(i);
+      MX& x = res[i];
+      if (false && vectorize_f()) {
+
+      //Layout source({n_, f_.nnz_out(i)}, {n_padded(), f_.nnz_out(i)});
+      //Layout target({f_.nnz_out(i), n_});
+      //  Relayout ret = Relayout(source, {1, 0}, target);
+        Layout source({df_out, n_});
+        Layout target({n_, df_out}, {n_padded(), f_.nnz_out()});
+        Relayout ret = Relayout(source, {1, 0}, target);
+        //REMOVE uout() << "BAR " << i << std::endl;
+        x = permute_layout(x, ret);
       }
-      *it = (*it)(Slice(), ind); // NOLINT
+      if (!vectorize_f()) {
+        //REMOVE uout() << "there" << std::endl;
+        Layout source({df_out/nfwd,nfwd,n_});
+        Layout target({df_out/nfwd,n_,nfwd});
+        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out"));
+       //REMOVE  uout() << "baz" << res[i] << "source" << source << "target" << target << std::endl;
+      }
     }
 
     Dict options = opts;
     options["allow_duplicate_io_names"] = true;
 
     // Construct return function
-    return Function(name, arg, res, inames, onames, options);
+    options["always_inline"] = true;
+    Function retf(name, arg, res, inames, onames, options);
+    static std::vector<Function> leaking;
+    leaking.push_back(retf);
+    return retf;
   }
 
   Function Map
@@ -338,52 +452,79 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Generate map of derivative
-    Function df = f_.reverse(nadj);
+    Function df = f_orig_.reverse(nadj);
     Function dm = df.map(n_, parallelization());
+
+    // Strip permuting layer when vectorized
+    if (dm.is_a("MXFunction")) {
+      dm = dm.get_function(dm.get_function()[0]);
+    }
 
     // Input expressions
     std::vector<MX> arg = dm.mx_in();
 
-    // Need to reorder sensitivity inputs
     std::vector<MX> res = arg;
-    std::vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    std::vector<casadi_int> ind;
-    for (casadi_int i=0; i<n_out_; ++i, ++it) {
-      casadi_int sz = f_.size2_out(i);
-      ind.clear();
-      for (casadi_int k=0; k<n_; ++k) {
-        for (casadi_int d=0; d<nadj; ++d) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((d*n_ + k)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      std::vector<casadi_int> dims = {df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,n_,nadj};
+      std::vector<casadi_int> dims_in = {df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,nadj,n_};
+      MX& x = res[f_.n_in()+f_.n_out()+i];
+      if (!vectorize_f()) {
+        Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,n_,nadj});
+        Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,nadj,n_});
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
     res = dm(res);
 
-    // Reorder sensitivity outputs
-    it = res.begin();
-    for (casadi_int i=0; i<n_in_; ++i, ++it) {
-      casadi_int sz = f_.size2_in(i);
-      ind.clear();
-      for (casadi_int d=0; d<nadj; ++d) {
-        for (casadi_int k=0; k<n_; ++k) {
-          for (casadi_int j=0; j<sz; ++j) {
-            ind.push_back((k*nadj + d)*sz + j);
-          }
-        }
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      MX& x = res[i];
+      if (!vectorize_f()) {
+        Layout source({df.nnz_out(i)/nadj,nadj,n_});
+        Layout target({df.nnz_out(i)/nadj,n_,nadj});
+        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out"));
       }
-      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     Dict options = opts;
     options["allow_duplicate_io_names"] = true;
+    options["always_inline"] = true;
+    // Construct return function
+    Function retf(name, arg, res, inames, onames, options);
+    static std::vector<Function> leaking;
+    leaking.push_back(retf);
+    return retf;
+  }
+
+  Function Map::get_jacobian(const std::string& name,
+                                  const std::vector<std::string>& inames,
+                                  const std::vector<std::string>& onames,
+                                  const Dict& opts) const {
+
+// Generate map of derivative
+    Function Jf = f_.jacobian();
+
+    Function Jmap = Jf.map(n_);
+
+    // Input expressions
+    std::vector<MX> arg = Jmap.mx_in();
+
+    std::vector<MX> res = Jmap(arg);
+
+    size_t i=0;
+    for (size_t oind = 0; oind < n_out_; ++oind) {
+      for (size_t iind = 0; iind < n_in_; ++iind) {
+        MX& r = res[i];
+        r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
+        i++;
+      }
+    }
 
     // Construct return function
-    return Function(name, arg, res, inames, onames, options);
+    Dict custom_opts = opts;
+    custom_opts["always_inline"] = true;
+    return Function(name, arg, res, inames, onames, custom_opts);
   }
 
   int Map::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
@@ -468,7 +609,7 @@ namespace casadi {
         << g.res(j) << "+i*" << f_.nnz_out(j) << ": 0;\n";
     }
     g << "flag = "
-      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << " || flag;\n"
+      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w), "1", inst) << " || flag;\n"
       << "}\n"
       << "if (flag) return 1;\n";
   }

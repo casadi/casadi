@@ -83,6 +83,12 @@ namespace casadi {
     /** \brief Get sparsity of a given output */
     Layout get_layout_out(casadi_int i) override;
 
+    //@{
+    /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
+    bool fwdViaJac(casadi_int nfwd) const override { return f_->fwdViaJac(nfwd); }
+    bool adjViaJac(casadi_int nadj) const override { return f_->adjViaJac(nadj); }
+    //@}
+
     /** \brief Get default input value
 
         \identifier{4u} */
@@ -108,7 +114,7 @@ namespace casadi {
 
         \identifier{4x} */
     template<typename T>
-    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem=0) const;
+    int local_eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem=0) const;
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
@@ -155,6 +161,12 @@ namespace casadi {
         \identifier{53} */
     void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
+    /** \brief Codegen incref for dependencies */
+    void codegen_incref(CodeGenerator& g, const Instance& inst) const override;
+
+    /** \brief Codegen decref for dependencies */
+    void codegen_decref(CodeGenerator& g, const Instance& inst) const override;
+
     /** \brief  Initialize
 
         \identifier{54} */
@@ -191,6 +203,14 @@ namespace casadi {
                          const Dict& opts) const override;
     ///@}
 
+    ///@{
+    /** \brief Full Jacobian */
+    bool has_jacobian() const override { return true; }
+    Function get_jacobian(const std::string& name,
+                                     const std::vector<std::string>& inames,
+                                     const std::vector<std::string>& onames,
+                                     const Dict& opts) const override;
+    ///@}
 
     /** \brief Serialize an object without type information
 
@@ -234,7 +254,7 @@ namespace casadi {
            const std::vector<bool>& reduce_out);
 
     // The function which is to be evaluated in parallel
-    Function f_;
+    Function f_, f_orig_;
 
     // Number of times to evaluate this function
     casadi_int n_;
