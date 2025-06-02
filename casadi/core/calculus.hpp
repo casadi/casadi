@@ -210,11 +210,12 @@ namespace casadi {
 
     OP_LOGSUMEXP,
 
-    OP_REMAINDER,
-
     OP_SAFE_DIV,
 
     OP_SAFE_SQRT,
+
+    OP_REMAINDER,
+
     OP_REINTERPRET_LAYOUT,
 
     OP_PERMUTE_LAYOUT,
