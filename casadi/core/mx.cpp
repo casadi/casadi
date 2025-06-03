@@ -593,6 +593,10 @@ namespace casadi {
     return (*this)->sparsity();
   }
 
+  const Layout& MX::layout() const {
+    return (*this)->layout();
+  }
+
   void MX::erase(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc, bool ind1) {
     // Get sparsity of the new matrix
     Sparsity sp = sparsity();
@@ -2624,6 +2628,10 @@ namespace casadi {
       }
     }
     return ret;
+  }
+
+  MX MX::permute_layout(const MX& x, const Relayout& relay) {
+    return x->get_permute_layout(relay);
   }
 
   MX interpn_G(casadi_int i, // Dimension to interpolate along

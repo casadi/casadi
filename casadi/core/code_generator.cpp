@@ -1225,6 +1225,10 @@ namespace casadi {
     return shorthand("s" + str(add_sparsity(sp, canonical)));
   }
 
+  std::string CodeGenerator::layout(const Layout& layout) {
+    return constant(layout.get_compressed());
+  }
+
   casadi_int CodeGenerator::get_sparsity(const Sparsity& sp) const {
     return const_cast<CodeGenerator&>(*this).get_constant(sp, false);
   }

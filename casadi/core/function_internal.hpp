@@ -27,6 +27,7 @@
 #define CASADI_FUNCTION_INTERNAL_HPP
 
 #include "function.hpp"
+#include "layout.hpp"
 #include <set>
 #include <stack>
 #include "code_generator.hpp"
@@ -1115,6 +1116,12 @@ namespace casadi {
         \identifier{mt} */
     virtual bool get_diff_out(casadi_int i) { return true; }
 
+    /** \brief Get sparsity of a given input */
+    virtual Layout get_layout_in(casadi_int i);
+
+    /** \brief Get sparsity of a given output */
+    virtual Layout get_layout_out(casadi_int i);
+
     /** \brief Get input scheme index by name
 
         \identifier{mu} */
@@ -1411,6 +1418,7 @@ namespace casadi {
     // Alignment of work-vector
     size_t align_w_;
 
+    std::vector<Layout> layout_in_, layout_out_;
     /** \brief Check if the function is of a particular type
 
         \identifier{np} */

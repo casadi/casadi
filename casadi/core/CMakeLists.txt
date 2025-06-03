@@ -106,6 +106,9 @@ set(CASADI_PUBLIC
 
   # User include class with the most essential includes
   core.hpp
+
+  layout.hpp
+
   instance.hpp
 )
 
@@ -236,6 +239,11 @@ set(CASADI_INTERNAL
   runtime/casadi_runtime.hpp
 
   instance.cpp
+
+  layout.cpp
+  layout_node.cpp layout_node.hpp
+
+  mx_layout.cpp mx_layout.hpp
 )
 
 add_executable(casadi-cli casadi_cli.cpp)

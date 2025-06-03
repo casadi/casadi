@@ -97,6 +97,9 @@ namespace casadi {
     */
     casadi_int add_sparsity(const Sparsity& sp, bool canonical=true);
 
+    // Add a sparsity pattern
+    std::string layout(const Layout& layout);
+
     /** \brief Get the index of an existing sparsity pattern
 
         \identifier{rw} */
