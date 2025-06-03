@@ -67,6 +67,11 @@ namespace casadi {
     }
   }
 
+  MX SparsityCast::get_permute_layout(const Relayout& relay) const {
+    // Evoke opportunities to absorb layouts
+    return dep(0)->get_permute_layout(relay)->get_sparsity_cast(sparsity());
+  }
+
   void SparsityCast::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
       const std::vector<bool>& unique) const {
     casadi_assert(arg[0].sparsity().is_subset(dep().sparsity()), "SparsityCast: Invalid sparsity");

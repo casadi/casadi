@@ -211,7 +211,10 @@ namespace casadi {
 
     OP_SAFE_DIV,
 
-    OP_SAFE_SQRT
+    OP_SAFE_SQRT,
+    OP_REINTERPRET_LAYOUT,
+
+    OP_PERMUTE_LAYOUT,
   };
   #define NUM_BUILT_IN_OPS (OP_REMAINDER+1)
 

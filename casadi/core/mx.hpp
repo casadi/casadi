@@ -33,6 +33,8 @@
 #include "generic_expression.hpp"
 #include "generic_type.hpp"
 #include "printable.hpp"
+#include "layout.hpp"
+
 #include <vector>
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
@@ -161,6 +163,10 @@ namespace casadi {
         \identifier{q9} */
     ~MX();
 /// \endcond
+
+    /** \brief Get the sparsity pattern */
+    const Layout& layout() const;
+
 
 #ifndef SWIG
 /// \cond INTERNAL
@@ -761,6 +767,8 @@ namespace casadi {
     static MX stop_diff(const MX& expr, casadi_int order);
     static MX stop_diff(const MX& expr, const MX& var, casadi_int order);
     static std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b);
+    static MX reinterpret_layout(const MX& x, const Layout& target);
+    static MX permute_layout(const MX& x, const Relayout& relay);
     ///@}
     /// \endcond
 
@@ -969,6 +977,15 @@ namespace casadi {
     inline friend std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b) {
       return MX::difference(a, b);
     }
+
+    inline friend MX reinterpret_layout(const MX& expr, const Layout& target) {
+      return MX::reinterpret_layout(expr, target);
+    }
+
+    inline friend MX permute_layout(const MX& expr, const Relayout& relay) {
+      return MX::permute_layout(expr, relay);
+    }
+
 
 /** @} */
 #endif // SWIG

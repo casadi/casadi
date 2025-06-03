@@ -660,6 +660,22 @@ namespace casadi {
       }
     }
 
+    // Query input sparsities if not already provided
+    if (layout_in_.empty()) {
+      layout_in_.resize(n_in_);
+      for (casadi_int i=0; i<n_in_; ++i) layout_in_[i] = get_layout_in(i);
+    } else {
+      casadi_assert_dev(layout_in_.size() == n_in_);
+    }
+
+    // Query output sparsities if not already provided
+    if (layout_out_.empty()) {
+      layout_out_.resize(n_out_);
+      for (casadi_int i=0; i<n_out_; ++i) layout_out_[i] = get_layout_out(i);
+    } else {
+      casadi_assert_dev(layout_out_.size() == n_out_);
+    }
+
     // Allocate memory for function inputs and outputs
     sz_arg_per_ += n_in_;
     sz_res_per_ += n_out_;
@@ -1072,6 +1088,7 @@ namespace casadi {
       s << name_out_[i] << sparsity_out_[i].postfix_dim() << (i==n_out_-1 ? "" : ",");
     }
     s << ")";
+    s << layout_in_ << "->" << layout_out_;
 
     return s.str();
   }
@@ -3698,6 +3715,14 @@ namespace casadi {
     return Sparsity::scalar();
   }
 
+  Layout FunctionInternal::get_layout_in(casadi_int i) {
+    return Layout();
+  }
+
+  Layout FunctionInternal::get_layout_out(casadi_int i) {
+    return Layout();
+  }
+
   void* ProtoFunction::memory(int ind) const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
@@ -4113,6 +4138,8 @@ namespace casadi {
     s.pack("FunctionInternal::sz_iw_tmp", sz_iw_tmp_);
     s.pack("FunctionInternal::sz_w_tmp", sz_w_tmp_);
     s.pack("FunctionInternal::align_w", align_w_);
+    s.pack("FunctionInternal::layout_in", layout_in_);
+    s.pack("FunctionInternal::layout_out", layout_out_);
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
@@ -4232,6 +4259,8 @@ namespace casadi {
     dump_count_ = 0;
     if (version>=2) {
       s.unpack("FunctionInternal::align_w", align_w_);
+      s.unpack("FunctionInternal::layout_in", layout_in_);
+      s.unpack("FunctionInternal::layout_out", layout_out_);
     } else {
       align_w_ = 1;
     }

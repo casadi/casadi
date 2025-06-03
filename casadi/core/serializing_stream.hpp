@@ -37,6 +37,7 @@ namespace casadi {
   class Linsol;
   class Sparsity;
   class Function;
+  class Layout;
   class MX;
   class SXElem;
   class GenericType;
@@ -95,6 +96,7 @@ namespace casadi {
       e = Matrix<T>::deserialize(*this);
     }
     void unpack(Function& e);
+    void unpack(Layout& e);
     void unpack(Importer& e);
     void unpack(Resource& e);
     void unpack(Fmu& e);
@@ -236,6 +238,7 @@ namespace casadi {
       e.serialize(*this);
     }
     void pack(const Function& e);
+    void pack(const Layout& e);
     void pack(const Importer& e);
     void pack(const Resource& e);
     void pack(const Fmu& e);

@@ -25,6 +25,7 @@
 
 #include "mapsum.hpp"
 #include "serializing_stream.hpp"
+#include "global_options.hpp"
 
 namespace casadi {
 
@@ -60,6 +61,16 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_(n), reduce_in_(reduce_in), reduce_out_(reduce_out) {
     casadi_assert_dev(reduce_in.size()==f.n_in());
     casadi_assert_dev(reduce_out.size()==f.n_out());
+  }
+
+  Layout MapSum::get_layout_in(casadi_int i) {
+    if (!vectorize_f()) return Layout();
+    return permute_in(i).target();
+  }
+
+  Layout MapSum::get_layout_out(casadi_int i) {
+    if (!vectorize_f()) return Layout();
+    return permute_out(i).source();
   }
 
   void MapSum::serialize_body(SerializingStream &s) const {
@@ -128,6 +139,54 @@ namespace casadi {
     for (casadi_int j=0;j<n_out_;++j) {
       if (reduce_out_[j]) alloc_w(f_.nnz_out(j), true);
     }
+  }
+
+  casadi_int MapSum::n_padded() const {
+    if (vectorize_f()) {
+      return n_padded(n_);
+    }
+    return n_;
+  }
+
+  casadi_int MapSum::n_padded(casadi_int n) {
+    return n;
+    casadi_int rem = n % GlobalOptions::vector_width_real;
+    if (rem==0) return n;
+    return n + GlobalOptions::vector_width_real - rem;
+  }
+
+  std::vector<MX> MapSum::permute_in(const std::vector<MX> & arg, bool invert) const {
+    std::vector<MX> ret = arg;
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      ret[i] = permute_layout(ret[i], permute_in(i, invert));
+    }
+    return ret;
+  }
+
+  std::vector<MX> MapSum::permute_out(const std::vector<MX> & res, bool invert) const {
+    std::vector<MX> ret = res;
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      ret[i] = permute_layout(ret[i], permute_out(i, invert));
+    }
+    return ret;
+  }
+
+  Relayout MapSum::permute_in(casadi_int i, bool invert) const {
+    if (reduce_in_[i]) return Relayout();
+    Layout source({f_.nnz_in(i), n_});
+    Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
+    Relayout ret = Relayout(source, {1, 0}, target);
+    if (invert) return ret.invert();
+    return ret;
+  }
+
+  Relayout MapSum::permute_out(casadi_int i, bool invert) const {
+    if (reduce_out_[i]) return Relayout();
+    Layout source({n_, f_.nnz_out(i)}, {n_padded(), f_.nnz_out(i)});
+    Layout target({f_.nnz_out(i), n_});
+    Relayout ret = Relayout(source, {1, 0}, target);
+    if (invert) return ret.invert();
+    return ret;
   }
 
   template<typename T1>
@@ -342,6 +401,14 @@ namespace casadi {
     custom_opts["always_inline"] = true;
     custom_opts["allow_duplicate_io_names"] = true;
     return Function(name, arg, res, inames, onames, custom_opts);
+  }
+
+  bool MapSum::vectorize_f() const {
+    return vectorize_f(f_, n_);
+  }
+
+  bool MapSum::vectorize_f(const Function& f, casadi_int n) {
+    return GlobalOptions::vector_width_real>1 && f.is_a("SXFunction") && n>=GlobalOptions::vector_width_real;
   }
 
   Function MapSum

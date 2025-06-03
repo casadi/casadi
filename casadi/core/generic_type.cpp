@@ -30,6 +30,7 @@
 #include <cmath>
 
 #include "function.hpp"
+#include "layout.hpp"
 
 namespace casadi {
 
@@ -55,7 +56,7 @@ namespace casadi {
     std::vector< std::vector<GenericType> > > VectorVectorType;
   typedef GenericTypeInternal<OT_VECTOR, std::vector<GenericType> > VectorType;
   typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
-  /// \endcond
+  typedef GenericTypeInternal<OT_LAYOUTVECTOR, std::vector<Layout> > LayoutVectorType;
 
   bool GenericType::can_cast_to(TypeID other) const {
     switch (other) {
@@ -111,6 +112,8 @@ namespace casadi {
       return std::vector<std::vector< GenericType> >();
     case OT_VECTOR:
       return std::vector<GenericType>();
+    case OT_LAYOUTVECTOR:
+      return std::vector<Layout>();
     default:
       casadi_error("empty_from_type. Unsupported type " + str(type));
     }
@@ -154,6 +157,8 @@ namespace casadi {
       return "OT_FUNCTIONVECTOR";
     case OT_VOIDPTR:
       return "OT_VOIDPTR";
+    case OT_LAYOUTVECTOR:
+      return "OT_LAYOUTVECTOR";
     default:
       return "OT_UNKNOWN";
 
@@ -187,7 +192,8 @@ namespace casadi {
       (is_bool_vector() && to_bool_vector().empty()) ||
       (is_dict_vector() && as_dict_vector().empty()) ||
       (is_vector_vector() && to_vector_vector().empty()) ||
-      (is_vector() && to_vector().empty());
+      (is_vector() && to_vector().empty()) ||
+      (is_layout_vector() && to_layout_vector().empty());
   }
 
   bool GenericType::is_int_vector() const {
@@ -244,6 +250,10 @@ namespace casadi {
 
   bool GenericType::is_vector() const {
     return getType()==OT_VECTOR;
+  }
+
+  bool GenericType::is_layout_vector() const {
+    return getType()==OT_LAYOUTVECTOR;
   }
 
   GenericType::GenericType() {
@@ -311,6 +321,10 @@ namespace casadi {
 
   GenericType::GenericType(const std::vector<Function>& f) {
     own(new FunctionVectorType(f));
+  }
+
+  GenericType::GenericType(const std::vector<Layout>& f) {
+    own(new LayoutVectorType(f));
   }
 
   const bool& GenericType::as_bool() const {
@@ -401,6 +415,11 @@ namespace casadi {
   void* const & GenericType::as_void_pointer() const {
     casadi_assert_dev(is_void_pointer());
     return static_cast<const VoidPointerType*>(get())->d_;
+  }
+
+  const std::vector<Layout>& GenericType::as_layout_vector() const {
+    casadi_assert_dev(is_layout_vector());
+    return static_cast<const LayoutVectorType*>(get())->d_;
   }
 
   bool GenericType::to_bool() const {
@@ -646,6 +665,11 @@ namespace casadi {
     }
   }
 
+  std::vector<Layout> GenericType::to_layout_vector() const {
+    casadi_assert(is_layout_vector(), "type mismatch");
+    return as_layout_vector();
+  }
+
   bool GenericType::operator==(const GenericType& op2) const {
     return !(*this != op2);
   }
@@ -744,6 +768,7 @@ namespace casadi {
     static_cast<const GenericTypeBase*>(get())->serialize(s);
   }
 
+
   GenericType GenericType::deserialize(DeserializingStream& s) {
     int itype;
     s.unpack("GenericType::type", itype);
@@ -781,6 +806,8 @@ namespace casadi {
         return VectorType::deserialize(s);
       case OT_VECTORVECTOR:
         return VectorVectorType::deserialize(s);
+      case OT_LAYOUTVECTOR:
+        return LayoutVectorType::deserialize(s);
       default:
         casadi_error("Not implemented: " + get_type_description(type));
     }
@@ -856,4 +883,5 @@ namespace casadi {
   typedef GenericTypeInternal<OT_VECTORVECTOR,
     std::vector<std::vector< GenericType> > > VectorVectorType;
   typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
+  typedef GenericTypeInternal<OT_LAYOUTVECTOR, std::vector<Layout> > LayoutVectorType;
 } // namespace casadi
