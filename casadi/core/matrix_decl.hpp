@@ -433,7 +433,8 @@ namespace casadi {
     static Matrix<Scalar> mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mac(const Matrix<Scalar> &x,
                                 const Matrix<Scalar> &y,
-                                const Matrix<Scalar> &z);
+                                const Matrix<Scalar> &z,
+                                const Dict& opts=Dict());
     static void extract_parametric(const Matrix<Scalar> &expr,
         const Matrix<Scalar>& par,
         Matrix<Scalar>& expr_ret,
