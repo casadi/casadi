@@ -56,8 +56,18 @@ namespace casadi {
 
   casadi_int GlobalOptions::byte_width_real = 8;
 
+  std::string GlobalOptions::sx_reordering = "none";
 
   bool GlobalOptions::feature_ve = true;
+
+  bool GlobalOptions::feature_cblas = false;
+
+  bool GlobalOptions::feature_cse_sx = true;
+
+  bool GlobalOptions::feature_cse_mx = true;
+
+  bool GlobalOptions::feature_contract_cat = true;
+
   bool GlobalOptions::feature_loops = true;
 
 } // namespace casadi
