@@ -25,6 +25,7 @@
 
 #include "map.hpp"
 #include "serializing_stream.hpp"
+#include "global_options.hpp"
 
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
@@ -48,6 +49,40 @@ namespace casadi {
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
+
+  }
+
+  std::vector<MX> Map::permute_in(const std::vector<MX> & arg, bool invert) const {
+    std::vector<MX> ret(arg.size());
+    for (casadi_int i=0;i<f_.n_in();++i) {
+      ret[i] = permute_layout(arg[i], permute_in(i, invert));
+    }
+    //REMOVE uout() << "testje" << ret << std::endl;
+    return ret;
+  }
+
+  std::vector<MX> Map::permute_out(const std::vector<MX> & res, bool invert) const {
+    std::vector<MX> ret(res.size());
+    for (casadi_int i=0;i<f_.n_out();++i) {
+      ret[i] = permute_layout(res[i], permute_out(i, invert));
+    }
+    return ret;
+  }
+
+  Relayout Map::permute_in(casadi_int i, bool invert) const {
+    Layout source({f_.nnz_in(i), n_});
+    Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
+    Relayout ret = Relayout(source, {1, 0}, target);
+    if (invert) return ret.invert();
+    return ret;
+  }
+
+  Relayout Map::permute_out(casadi_int i, bool invert) const {
+    Layout source({n_, f_.nnz_out(i)}, {n_padded(), f_.nnz_out(i)});
+    Layout target({f_.nnz_out(i), n_});
+    Relayout ret = Relayout(source, {1, 0}, target);
+    if (invert) return ret.invert();
+    return ret;
   }
 
   Map::Map(const std::string& name, const Function& f, casadi_int n)
@@ -82,6 +117,25 @@ namespace casadi {
 
   bool Map::has_function(const std::string& fname) const {
     return fname=="f";
+  }
+
+  bool Map::vectorize_f() const {
+    return vectorize_f(f_, n_);
+  }
+
+  bool Map::vectorize_f(const Function& f, casadi_int n) {
+    return GlobalOptions::vector_width_real>1 && f.is_a("SXFunction") && n>=GlobalOptions::vector_width_real;
+  }
+
+  Layout Map::get_layout_in(casadi_int i) {
+    if (!vectorize_f()) return Layout();
+    return Layout({f_.nnz_in(i), n_}, {f_.nnz_in(i), n_padded()});
+  }
+
+  Layout Map::get_layout_out(casadi_int i) {
+    if (!vectorize_f()) return Layout();
+    // Just here to allocate enough sz_self for outputs
+    return Layout({f_.nnz_out(i), n_}, {f_.nnz_out(i), n_padded()});
   }
 
   void Map::serialize_body(SerializingStream &s) const {
@@ -208,6 +262,20 @@ namespace casadi {
         g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
     }
     g << "}\n";
+  }
+
+  casadi_int Map::n_padded() const {
+    if (vectorize_f()) {
+      return n_padded(n_);
+    }
+    return n_;
+  }
+
+  casadi_int Map::n_padded(casadi_int n) {
+    return n;
+    casadi_int rem = n % GlobalOptions::vector_width_real;
+    if (rem==0) return n;
+    return n + GlobalOptions::vector_width_real - rem;
   }
 
   Function Map
