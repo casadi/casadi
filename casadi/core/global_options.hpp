@@ -81,8 +81,17 @@ namespace casadi {
 
       static casadi_int byte_width_real;
 
+      static std::string sx_reordering;
+
       static bool feature_ve;
 
+      static bool feature_cblas;
+
+      static bool feature_cse_sx;
+
+      static bool feature_cse_mx;
+
+      static bool feature_contract_cat;
 
       static bool feature_loops;
 #endif //SWIG
@@ -124,9 +133,23 @@ namespace casadi {
       static void setByteWidthReal(casadi_int w) { byte_width_real = w; }
       static casadi_int getByteWidthReal() { return byte_width_real; }
 
+      static void setSXReordering(const std::string& mode) { sx_reordering = mode; }
+      static std::string getSXReordering() { return sx_reordering; }
+
       static void setFeatureVE(bool mode) { feature_ve = mode; }
       static bool getFeatureVE() { return feature_ve; }
 
+      static void setFeatureCBLAS(bool mode) { feature_cblas = mode; }
+      static bool getFeatureCBLAS() { return feature_cblas; }
+
+      static void setFeatureCSESX(bool mode) { feature_cse_sx = mode; }
+      static bool getFeatureCSESX() { return feature_cse_sx; }
+
+      static void setFeatureCSEMX(bool mode) { feature_cse_mx = mode; }
+      static bool getFeatureCSEMX() { return feature_cse_mx; }
+
+      static void setFeatureContractCat(bool mode) { feature_contract_cat = mode; }
+      static bool getFeatureContractCat() { return feature_contract_cat; }
 
       static void setFeatureLoops(bool mode) { feature_loops = mode; }
       static bool getFeatureLoops() { return feature_loops; }
