@@ -697,14 +697,17 @@ namespace casadi {
     return axis==0 ? ret.T() : ret;
   }
 
-  MX MX::mac(const MX& x, const MX& y, const MX& z) {
+  MX MX::mac(const MX& x, const MX& y, const MX& z, const Dict& opts) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + x*y;
     }
 
+    bool trans_x = get_from_dict(opts, "trans_x", false);
+    MX x_norm = trans_x ? x.T() : x;
+
     // Check matching dimensions
-    casadi_assert(x.size2()==y.size1(),
+    casadi_assert(x_norm.size2()==y.size1(),
       "Matrix product with incompatible dimensions. Lhs is "
       + x.dim() + " and rhs is " + y.dim() + ".");
 
@@ -712,11 +715,11 @@ namespace casadi {
     if (x.is_eye()) {
       return y + z;
     } else if (y.is_eye()) {
-      return x + z;
+      return x_norm + z;
     } else if (x.is_zero() || y.is_zero()) {
       return z;
     } else {
-      return x->get_mac(y, z);
+      return x->get_mac(y, z, opts);
     }
   }
 

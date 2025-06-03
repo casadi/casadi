@@ -44,7 +44,7 @@ namespace casadi {
     /** \brief  Constructor
 
         \identifier{11i} */
-    Multiplication(const MX& z, const MX& x, const MX& y);
+    Multiplication(const MX& z, const MX& x, const MX& y, const Dict& opts=Dict());
 
     /** \brief  Destructor
 
@@ -116,7 +116,7 @@ namespace casadi {
     casadi_int op() const override { return OP_MTIMES;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    casadi_int n_inplace() const override { return 1;}
+    casadi_int n_inplace() const override { return n_dep()==3;}
 
     /** \brief Check if two nodes are equivalent up to a given depth
 
@@ -128,7 +128,7 @@ namespace casadi {
     /** \brief Get required length of w field
 
         \identifier{11t} */
-    size_t sz_w() const override { return sparsity().size1();}
+    size_t sz_w() const override { return trans_x_ ? sparsity().size2() : sparsity().size1();}
 
     /** \brief Serialize specific part of node
 
@@ -140,11 +140,17 @@ namespace casadi {
         \identifier{11v} */
     static MXNode* deserialize(DeserializingStream& s);
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
   protected:
     /** \brief Deserializing constructor
 
         \identifier{11w} */
-    explicit Multiplication(DeserializingStream& s) : MXNode(s) {}
+    explicit Multiplication(DeserializingStream& s);
+
+    bool trans_x_;
+    bool trans_y_;
   };
 
 
@@ -161,8 +167,8 @@ namespace casadi {
     /** \brief  Constructor
 
         \identifier{11y} */
-    DenseMultiplication(const MX& z, const MX& x, const MX& y)
-        : Multiplication(z, x, y) {}
+    DenseMultiplication(const MX& z, const MX& x, const MX& y, const Dict& opts=Dict()) :
+        Multiplication(z, x, y, opts) {}
 
     /** \brief  Destructor
 

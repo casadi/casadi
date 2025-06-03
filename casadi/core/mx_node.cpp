@@ -576,8 +576,12 @@ namespace casadi {
     }
   }
 
+  MX MXNode::get_mac(const MX& y, const MX& z, const Dict& opts) const {
+    bool trans_x = get_from_dict(opts, "trans_x", false);
+    bool trans_y = get_from_dict(opts, "trans_y", false);
+    casadi_assert_dev(!trans_y);
 
-  MX MXNode::get_mac(const MX& y, const MX& z) const {
+
     if (sparsity().is_orthonormal() && y.is_column() && y.is_dense()
         && y.sparsity()==z.sparsity() && z.is_zero()) {
       std::vector<casadi_int> perm = sparsity().permutation_vector();
@@ -587,16 +591,21 @@ namespace casadi {
     // Get reference to transposed first argument
     MX x = shared_from_this<MX>();
 
+    MX x_norm = trans_x ? x.T() : x;
+
     casadi_assert(y.size2()==z.size2(),
       "Dimension error x.mac(z). Got y=" + str(y.size2()) + " and z=" + z.dim() + ".");
-    casadi_assert(x.size1()==z.size1(),
+    casadi_assert(x_norm.size1()==z.size1(),
       "Dimension error x.mac(z). Got x=" + x.dim() + " and z=" + z.dim() + ".");
-    casadi_assert(y.size1()==x.size2(),
+    casadi_assert(y.size1()==x_norm.size2(),
       "Dimension error x.mac(z). Got y=" + str(y.size1()) + " and x" + x.dim() + ".");
+
+    if (x_norm.is_row() && y.is_column()) return z+dot(x_norm,y.T());
+
     if (x.is_dense() && y.is_dense() && z.is_dense()) {
-      return MX::create(new DenseMultiplication(z, x, y));
+      return MX::create(new DenseMultiplication(z, x, y, opts));
     } else {
-      return MX::create(new Multiplication(z, x, y));
+      return MX::create(new Multiplication(z, x_norm, y));
     }
   }
 
