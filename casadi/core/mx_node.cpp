@@ -62,6 +62,7 @@
 #include "bspline.hpp"
 #include "convexify.hpp"
 #include "logsumexp.hpp"
+#include "mx_layout.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -224,6 +225,10 @@ namespace casadi {
     sparsity_ = sparsity;
   }
 
+  void MXNode::set_layout(const Layout& layout) {
+    layout_ = layout;
+  }
+
   void MXNode::set_dep(const MX& dep) {
     dep_.resize(1);
     dep_[0] = dep;
@@ -263,6 +268,13 @@ namespace casadi {
   const Sparsity& MXNode::sparsity(casadi_int oind) const {
     casadi_assert(oind==0, "Index out of bounds");
     return sparsity_;
+  }
+
+  const Layout& MXNode::layout(casadi_int oind) const {
+    if (oind>0) {
+      casadi_assert(oind==0, "Index out of bounds");
+    }
+    return layout_;
   }
 
   void MXNode::disp(std::ostream& stream, bool more) const {
@@ -531,6 +543,7 @@ namespace casadi {
   void MXNode::serialize_body(SerializingStream& s) const {
     s.pack("MXNode::deps", dep_);
     s.pack("MXNode::sp", sparsity_);
+    s.pack("MXNode::layout", layout_);
   }
 
   void MXNode::serialize_type(SerializingStream& s) const {
@@ -542,6 +555,7 @@ namespace casadi {
 
     s.unpack("MXNode::deps", dep_);
     s.unpack("MXNode::sp", sparsity_);
+    s.unpack("MXNode::layout", layout_);
   }
 
 
@@ -1118,6 +1132,14 @@ namespace casadi {
     return MX::create(new Norm1(shared_from_this<MX>()));
   }
 
+  MX MXNode::get_permute_layout(const Relayout& relay) const {
+    if (nnz()==0) {
+      return shared_from_this<MX>();
+    } else {
+      return PermuteLayout::create(shared_from_this<MX>(), relay);
+    }
+  }
+
   MX MXNode::get_mmin() const {
     if (sparsity_.is_empty()) return MX();
     return MX::create(new MMin(shared_from_this<MX>()));
@@ -1172,6 +1194,10 @@ namespace casadi {
     }
 
     return MX::create(new Vertcat(x));
+  }
+
+  casadi_int MXNode::sz_self(casadi_int i) const {
+    return layout(i).is_default()? sparsity(i).nnz() : layout(i).size(); 
   }
 
   std::vector<MX> MXNode::get_horzsplit(const std::vector<casadi_int>& output_offset) const {
@@ -1351,6 +1377,7 @@ namespace casadi {
     {OP_BSPLINE, BSplineCommon::deserialize},
     {OP_CONVEXIFY, Convexify::deserialize},
     {OP_LOGSUMEXP, LogSumExp::deserialize},
+    {OP_PERMUTE_LAYOUT, PermuteLayout::deserialize},
     {-1, OutputNode::deserialize}
   };
 

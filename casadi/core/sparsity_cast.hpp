@@ -133,6 +133,9 @@ namespace casadi {
     /// Transpose (if a dimension is one)
     MX get_transpose() const override;
 
+    /// 1-norm
+    MX get_permute_layout(const Relayout& relay) const override;
+
     /** \brief  Check if valid function input
 
         \identifier{24s} */
