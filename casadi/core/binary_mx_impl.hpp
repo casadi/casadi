@@ -143,34 +143,38 @@ namespace casadi {
     // Codegen loop, if needed
     if (nnz()>1) {
       // Iterate over result
-      g.local("rr", "casadi_real", "*");
-      g.local("i", "casadi_int");
-      g << "for (i=0, " << "rr=" << g.work(res[0], nnz(), false);
-      r = "(*rr++)";
+      /*g.local("rr", "casadi_real", "*");
+      g.local("i", "casadi_int");*/
+      g << "#pragma omp simd\n";
+      g << "for (i=0";// << "rr=" << g.work(res[0], nnz(), false);
+      //r = "(*rr++)";
+      r = "("+g.work(res[0], nnz(), false)+")[i]";
 
       // Iterate over first argument?
       if (!ScX && !inplace) {
-        g.local("cr", "const casadi_real", "*");
-        g << ", cr=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
-        if (op_==OP_OR || op_==OP_AND) {
+        //g.local("cr", "const casadi_real", "*");
+        //g << ", cr=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
+        /*if (op_==OP_OR || op_==OP_AND) {
           // Avoid short-circuiting with side effects
           x = "cr[i]";
         } else {
           x = "(*cr++)";
-        }
+        }*/
+        x = "("+g.work(arg[0], dep(0).nnz(), arg_is_ref[0])+")[i]";
 
       }
 
       // Iterate over second argument?
       if (!ScY) {
-        g.local("cs", "const casadi_real", "*");
-        g << ", cs=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]);
-        if (op_==OP_OR || op_==OP_AND || op_==OP_IF_ELSE_ZERO) {
+        //g.local("cs", "const casadi_real", "*");
+        //g << ", cs=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]);
+        /*if (op_==OP_OR || op_==OP_AND || op_==OP_IF_ELSE_ZERO) {
           // Avoid short-circuiting with side effects
           y = "cs[i]";
         } else {
           y = "(*cs++)";
-        }
+        }*/
+        y = "("+g.work(arg[1], dep(1).nnz(), arg_is_ref[1])+")[i]";
       }
 
       // Close loop
