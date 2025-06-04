@@ -324,6 +324,10 @@ private:
   template<typename T>
   bool is_strictly_monotone(const std::vector<T> &v);
 
+  /// Check if the vector is a permutation of range(n)
+  template<typename T>
+  bool is_permutation(const std::vector<T> &v);
+
   /// Check if the vector has negative entries
   template<typename T>
   bool has_negative(const std::vector<T> &v);
@@ -815,6 +819,16 @@ namespace casadi {
   template<typename T>
   bool is_strictly_monotone(const std::vector<T> &v) {
     return is_decreasing(v) || is_increasing(v);
+  }
+
+  template<typename T>
+  bool is_permutation(const std::vector<T> &v) {
+    std::vector<bool> log(v.size(), false);
+    for (auto e : v) {
+      if (e<0 || e>=v.size()) return false;
+      log[e] = true;
+    }
+    return all(log);
   }
 
   template<typename T>

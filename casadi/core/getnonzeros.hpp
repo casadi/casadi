@@ -94,6 +94,9 @@ namespace casadi {
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
         bool unique=false) const override;
 
+    /// Create set sparse
+    MX get_project(const Sparsity& sp, bool unique=false) const override;
+
     /** \brief Deserialize without type information
 
         \identifier{i8} */
@@ -143,6 +146,9 @@ namespace casadi {
 
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
+    /// Create set sparse
+    MX get_project(const Sparsity& sp, bool unique=false) const override;
 
     /** \brief  Print expression
 
