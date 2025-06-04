@@ -27,6 +27,7 @@
 
 #include "casadi_misc.hpp"
 #include "casadi_os.hpp"
+#include "global_options.hpp"
 #ifdef HAVE_MKSTEMPS
 #define CASADI_NEED_UNISTD
 #else // HAVE_MKSTEMPS
@@ -169,6 +170,7 @@ namespace casadi {
   }
 
   bool is_permutation(const std::vector<casadi_int> &order) {
+    if (order.empty()) return true;
     std::set<casadi_int> order_set(order.begin(), order.end());
     return (order_set.size()==order.size()) &&
            (*order_set.begin()==0) &&

@@ -242,6 +242,9 @@ namespace casadi {
     std::vector<MX> permute_out(const std::vector<MX>& res, bool invert=false) const;
     bool vectorize_f() const;
     static bool vectorize_f(const Function& f, casadi_int n);
+
+    Function pull_out(const std::vector<casadi_int>& in, Function& outer) const override;
+
   protected:
     /** \brief Deserializing constructor
 
