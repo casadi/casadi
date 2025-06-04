@@ -173,3 +173,59 @@ class CASADI_EXPORT CallSX : public SXNode {
 /// \endcond
 
 #endif // CASADI_CALL_SX_HPP
+/*#ifndef CALL_SXElem_HPP
+#define CALL_SXElem_HPP
+
+#include "function.hpp"
+#include "sx_node.hpp"
+
+/// \cond INTERNAL
+
+namespace casadi {
+
+class CodeGenerator;
+struct Instance;
+
+class CallSX : public SXNode {
+public:
+  explicit CallSX(const SXElem& ref, const SXElem& arg);
+  ~CallSX() override {}
+
+  /** \brief  Get the operation
+  casadi_int op() const override { return OP_CALL;}
+
+  bool is_op(casadi_int op) const override { return op==OP_CALL; }
+
+  // Class name
+  std::string class_name() const override {return "CallSX";}
+
+  /** \brief  Print expression
+  std::string print(const std::string& arg1, const std::string& arg2) const override;
+
+  /** \brief  Number of dependencies
+  casadi_int n_dep() const override { return 2;}
+
+  /** \brief  get the reference of a dependency
+  const SXElem& dep(casadi_int i) const override { return i==0 ? ref_ : arg_ ; }
+  SXElem& dep(casadi_int i) override { return i==0 ? ref_ : arg_ ; }
+
+  static void der(const SXElem& x, const SXElem& y, const SXElem& f, SXElem* d);
+
+  static std::string codegen(CodeGenerator& g, const SXElem& funref, const Instance& inst, int i0, int i1, int i2, const std::string& arg, const std::string& res, const std::string& iw, const std::string& w, const Function& owner);
+
+  static void codegen_dependency(CodeGenerator& g, const Function& f, const Instance& inst, const Function& owner);
+
+  void serialize_node(SerializingStream& s) const override;
+
+  /** \brief Deserialize without type information
+  static SXNode* deserialize(DeserializingStream& s);
+
+  static int call(const Function &f, double& result, double dep, double index, const double** arg, double** res, casadi_int* iw, double* w);
+
+  SXElem ref_;
+  SXElem arg_;
+};
+
+} // namespace casadi
+/// \endcond
+#endif // CALL_SXElem_HPP*/

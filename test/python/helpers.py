@@ -254,7 +254,7 @@ class casadiTestCase(unittest.TestCase):
     self.assertTrue(s in e,msg=e + "<->" + s)
 
   @contextmanager
-  def assertOutput(self,included,excluded):
+  def assertOutput(self,included,excluded=[]):
     with capture_stdout() as result:
       yield
     if not(isinstance(included,list)):
@@ -765,20 +765,47 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       return (external(name, libname,opts),libname)
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
+  def check_outputs(self,res,ref,digits=15):
+    if isinstance(res, dict):
+      self.assertTrue(set(list(res.keys()))==set(list(ref.keys())))
+      for k in res.keys():
+        self.checkarray(res[k],ref[k],digits=digits)
+    else:
+      self.assertTrue(len(res)==len(ref))
+      for i in range(len(res)):
+        self.checkarray(res[i],ref[i],digits=digits)
+
+  def check_codegen(self,F,inputs,**kwargs):
+    if args.run_slow:
+      Fout = F.call(inputs)
+      Fout2 = self.do_codegen(F,inputs,**kwargs)
+
+      if isinstance(inputs, dict):
+        for k in F.name_out():
+          self.checkarray(Fout[k],Fout2[k],digits=15,failmessage="Output %s" % k)
+      else:
+        for i in range(F.n_out()):
+          self.checkarray(Fout[i],Fout2[i],digits=15,failmessage="Output %d" % i)
+
+  def do_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,vectorize_check=1,compiler=None,static=False,digits=15,includes=None,with_reverse=False,with_forward=False,extra_include=[],debug_mode=False):
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
+      if static: main=True
       if opts is None: opts = {}
       if main: opts["main"] = True
-      cg = CodeGenerator(name,opts)
+      cg = CodeGenerator(name, opts)
       cg.add(F,with_jac_sparsity)
       if with_reverse:
         cg.add(F.reverse(1), with_jac_sparsity)
       if with_forward:
         cg.add(F.forward(1), with_jac_sparsity)
+      if includes:
+        if not isinstance(includes,list): includes = [includes]
+        for inc in includes:
+          cg.add_include(inc)
       cg.generate()
       import subprocess
 
@@ -813,6 +840,32 @@ class casadiTestCase(unittest.TestCase):
       if definitions is None:
         definitions = []
 
+      def check(stderr):
+        pass
+
+      if vectorize_check>1:
+        # g for line-numbers?
+        extra_options+= " -g -O2 -fno-math-errno -funsafe-math-optimizations -ffinite-math-only --param min-vect-loop-bound=1 -march=skylake -mtune=skylake -mprefer-vector-width=256 -fvect-cost-model=unlimited -fdisable-tree-sincos -fopenmp -ftree-loop-vectorize -fno-tree-loop-distribute-patterns -fdisable-tree-cunrolli --param loop-max-datarefs-for-datadeps=1000000 -fopt-info-vec-optimized"
+        def check(stderr):
+          simdlines = []
+          with open(name+".c", "r") as inp:
+            for i,l in enumerate(inp.readlines()):
+               if "omp simd" in l:
+                  # index one, simd comes one line before loop, reported loop line is one after loop statement
+                  simdlines.append(i+3)
+          stderr = stderr.decode("utf-8")
+          vectorized = []
+          for l in stderr.split("\n"):
+             if "note: loop vectorized" in l:
+               vectorized.append(int(l.split(":")[1]))
+          self.assertTrue(set(simdlines).issubset(set(vectorized)))
+
+      
+      if compiler is None:
+        if os.name=='nt':
+          compiler = "cl.exe"
+        else:
+          compiler = "gcc"
       def get_commands(shared=True):
         if os.name=='nt':
           defs = " ".join(["/D"+d for d in definitions])
@@ -834,7 +887,15 @@ class casadiTestCase(unittest.TestCase):
             commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
           return [commands, output]
 
-      [commands, libname] = get_commands(shared=True)
+      if not static:
+        [commands, libname] = get_commands(shared=True)
+        print(commands)
+        p = subprocess.Popen(commands,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        outs,errs = p.communicate()
+        check(errs)
+        if p.returncode!=0:
+          sys.stderr.buffer.write(errs)
+          raise Exception("")
 
       print("compile library",commands)
       p = subprocess.Popen(commands,shell=True).wait()
@@ -851,7 +912,13 @@ class casadiTestCase(unittest.TestCase):
             env["PATH"] = env["PATH"]+";"+libdir
         else:
             env["LD_LIBRARY_PATH"] = libdir
-        p = subprocess.Popen(commands,shell=True,env=env).wait()
+        p = subprocess.Popen(commands,shell=True,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        outs,errs = p.communicate()
+        check(errs)
+        if p.returncode!=0:
+          sys.stderr.buffer.write(errs)
+          raise Exception("")
+
         inputs_main = inputs
         if isinstance(inputs,dict):
           inputs_main = F.convert_in(inputs)
@@ -872,18 +939,20 @@ class casadiTestCase(unittest.TestCase):
             return
         
       Fout = F.call(inputs)
-      Fout2 = F2.call(inputs)
+      if not static:
+        Fout2 = F2.call(inputs)
 
       if main:
         outputs = F.generate_out(F.name()+"_out.txt")
-        print(outputs)
+        if static:
+          return outputs
         if isinstance(inputs,dict):
           outputs = F.convert_out(outputs)
           for k in F.name_out():
-            self.checkarray(Fout[k],outputs[k],digits=digits)
+            self.checkarray(Fout2[k],outputs[k],digits=digits)
         else:
           for i in range(F.n_out()):
-            self.checkarray(Fout[i],Fout2[i],digits=digits)
+            self.checkarray(outputs[i],Fout2[i],digits=digits)
 
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
@@ -895,8 +964,8 @@ class casadiTestCase(unittest.TestCase):
 
       if self.check_serialize:
         self.check_serialize(F2,inputs=inputs)
-        
-      return F2, libname
+
+      return Fout2, libname
 
   def check_thread_safety(self,F,inputs=None,N=20):
 

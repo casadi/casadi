@@ -172,6 +172,8 @@ namespace casadi {
 
   void Call::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner) const {
     Instance local = inst;
+    local.stride_in.resize(fcn_.n_in(), 1);
+    local.stride_out.resize(fcn_.n_out(), 1);
     g.add_dependency(fcn_, local, owner);
   }
 
@@ -200,8 +202,15 @@ namespace casadi {
       res_null.push_back(res[i]==-1);
     }
 
+
+
+    Instance inst = {arg_null, res_null};
+    inst.stride_in.resize(fcn_.n_in(), 1);
+    inst.stride_out.resize(fcn_.n_out(), 1);
+    inst.prefer_inline = prefer_inline;
+
     // Call function
-    std::string flag = g(fcn_, "arg1", "res1", "iw", "w");
+    std::string flag = g(fcn_, "arg1", "res1", "iw", "w", "1", inst);
     g << "if (" << flag << ") return 1;\n";
   }
 
