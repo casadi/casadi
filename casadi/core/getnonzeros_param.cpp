@@ -83,6 +83,15 @@ namespace casadi {
     return 0;
   }
 
+  /// Constructor
+  GetNonzerosSliceParam::GetNonzerosSliceParam(const Sparsity& sp, const MX& x, const Slice& inner,
+                      const MX& outer) :
+                      GetNonzerosParam(sp, x, outer), inner_(inner), is_trivial_(false) {
+    if (dep(0).is_dense() && inner_.start==0 && inner_.stop==dep(0).size1() && inner_.step==1 && dep(1).is_scalar()) is_trivial_ = true;
+    if (is_trivial_) bvec_zeros_.resize(nnz(), bvec_t(0));
+  }
+
+
   size_t GetNonzerosParamSlice::sz_iw() const {
     return dep(1).nnz();
   }
@@ -119,17 +128,24 @@ namespace casadi {
     const double* idata = arg[0];
     const double* nz = arg[1];
     double* odata = res[0];
-    // Dimensions
-    casadi_int nnz = dep(1).nnz();
-    casadi_int max_ind = dep(0).nnz();
-    // Get elements
-    for (casadi_int i=0; i<nnz; ++i) {
-      // Get index
-      casadi_int ind = static_cast<casadi_int>(*nz++);
-      for (casadi_int j=inner_.start;j<inner_.stop;j+= inner_.step) {
-        casadi_int index = ind+j;
-        // Make assignment if in bounds, else NaN
-        *odata++ = index>=0 && index<max_ind ? idata[index] : nan;
+
+
+    if (is_trivial_ && iw[0]) {
+      casadi_int ind = static_cast<casadi_int>(*nz);
+      res[0] = const_cast<double*>(idata+ind);
+    } else {
+      // Dimensions
+      casadi_int nnz = dep(1).nnz();
+      casadi_int max_ind = dep(0).nnz();
+      // Get elements
+      for (casadi_int i=0; i<nnz; ++i) {
+        // Get index
+        casadi_int ind = static_cast<casadi_int>(*nz++);
+        for (casadi_int j=inner_.start;j<inner_.stop;j+= inner_.step) {
+          casadi_int index = ind+j;
+          // Make assignment if in bounds, else NaN
+          *odata++ = index>=0 && index<max_ind ? idata[index] : nan;
+        }
       }
     }
     return 0;
@@ -177,6 +193,15 @@ namespace casadi {
     bvec_t *r = res[0];
     std::fill(r, r+nnz(), a);
     return 0;
+  }
+
+  int GetNonzerosSliceParam::
+  sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    if (is_trivial_ && iw[0]) {
+      res[0] = const_cast<bvec_t*>(get_ptr(bvec_zeros_));
+    } else {
+      return GetNonzerosParam::sp_forward(arg, res, iw, w);
+    }
   }
 
   int GetNonzerosParam::
@@ -454,6 +479,7 @@ namespace casadi {
   void GetNonzerosSliceParam::serialize_body(SerializingStream& s) const {
     GetNonzerosParam::serialize_body(s);
     s.pack("GetNonzerosSliceParam::inner", inner_);
+    s.pack("GetNonzerosSliceParam::is_trivial",is_trivial_);
   }
 
   void GetNonzerosSliceParam::serialize_type(SerializingStream& s) const {
@@ -463,6 +489,7 @@ namespace casadi {
 
   GetNonzerosSliceParam::GetNonzerosSliceParam(DeserializingStream& s) : GetNonzerosParam(s) {
     s.unpack("GetNonzerosSliceParam::inner", inner_);
+    s.unpack("GetNonzerosSliceParam::is_trivial",is_trivial_);
   }
 
   void GetNonzerosParamParam::serialize_type(SerializingStream& s) const {

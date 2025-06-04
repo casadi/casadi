@@ -487,6 +487,15 @@ namespace casadi {
     return Matrix<casadi_int>(sparsity(), nz, false);
   }
 
+  MX GetNonzerosVector::get_project(const Sparsity& sp, bool unique) const {
+    /*if (false && sp.is_dense()) {
+      return dep(0)->get_nzref(sp, nz_);
+    } else {
+      return MXNode::get_project(sp);
+    }*/
+    return MXNode::get_project(sp, unique);
+  }
+
   void GetNonzerosVector::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res,
@@ -536,6 +545,34 @@ namespace casadi {
       if (*i>=0) *i = nz_all[*i];
     }
     return dep()->get_nzref(sp, nz_new, unique);
+  }
+
+  MX GetNonzeros::get_project(const Sparsity& sp, bool unique) const {
+    return MXNode::get_project(sp, unique);
+    std::vector<unsigned char> mapping;
+    Sparsity res = sp.unite(sparsity(), mapping);
+
+    std::vector<casadi_int> nz;
+
+    // Get all the nonzeros
+    std::vector<casadi_int> nz_all = all();
+
+    // Index into nz_all
+    casadi_int i=0;
+    for (auto e : mapping) {
+      if (e==3) {
+        // Nonzero appears in both sp and sparsity()
+        nz.push_back(nz_all[i++]);
+      } else if (e==2) {
+        // Nonzero appears only in sparsity()
+        i++;
+      } else {
+        // Nonzero appears only in sp
+        nz.push_back(-1);
+      }
+    }
+
+    return dep()->get_nzref(sp, nz);
   }
 
   void GetNonzerosSlice::generate(CodeGenerator& g,

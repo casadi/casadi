@@ -118,12 +118,21 @@ namespace casadi {
   }
 
   int ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    std::fill_n(res[0], nnz(), 0);
+    if (res[0]) std::fill_n(res[0], nnz(), 0);
+    return 0;
+  }
+
+  int ConstantDM::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    if (iw[0]) {
+      res[0] = const_cast<bvec_t*>(get_ptr(bvec_zeros_));
+    } else {
+      if (res[0]) std::fill_n(res[0], nnz(), 0);
+    }
     return 0;
   }
 
   int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    std::fill_n(res[0], nnz(), 0);
+    if (res[0]) std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 
@@ -337,6 +346,8 @@ namespace casadi {
     std::vector<double> v;
     s.unpack("ConstantMX::nonzeros", v);
     x_ = DM(sparsity_, v);
+    sx_ = x_;
+    bvec_zeros_.resize(nnz(), bvec_t(0));
   }
 
   void ZeroByZero::serialize_type(SerializingStream& s) const {
@@ -414,7 +425,18 @@ namespace casadi {
   }
 
   void ConstantFile::codegen_incref(CodeGenerator& g, std::set<const void*>& added) const {
-    g << g.file_slurp(fname_, nnz(), g.rom_double(this)) << ";\n";
+    auto i = g.incref_added_.insert(this);
+    if (i.second) { // prevent duplicate calls
+      std::string init =  g.rom_double(this) + "_initialise";
+      g << "static int " << init << " = 1;\n";
+      g << "if (" << init << ") {\n";
+      g << "if (" << g.file_slurp(fname_, nnz(), g.rom_double(this)) << ") {\n";
+        g << g.printf("Failed to load file '" + fname_ + "'.\\n") << "\n";
+        g << "exit(1);\n";
+      g << "}\n";
+      g << init << " = 0;\n";
+      g << "}\n";
+    }
   }
 
   void ConstantFile::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner) const {
