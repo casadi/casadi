@@ -1777,6 +1777,34 @@ class SXtests(casadiTestCase):
     self.checkarray(res,10000)
 
     self.checkarray(logsumexp(vertcat(100,1000,10000)),f(vertcat(100,1000,10000)))
+    
+  def test_VE(self):
+  
+    x = MX.sym("x")
+    y = MX.sym("y")
+    h = Function('f',[x],[sin(2*x)],{"never_inline":True})
+    h2 = Function('f',[x,y],[cos(x+y)],{"never_inline":True})
+    x = SX.sym("x")
+    y = SX.sym("y")
+    fs = []
+    for ve in [True,False]:
+      GlobalOptions.setFeatureVE(ve)
+      e = x*y
+      e += cos(2*x)
+      e -= sqrt(x+y)
+      e = h(e)
+      e = h2(e,1-e)
+      e = h2(e,e)
+      e = e**2
+      e *= atan2(e,x**2+y**2)
+      f = Function('f',[vertcat(x,y)],[jacobian(e,vertcat(x,y))])
+      fs.append(f)
+
+    self.assertNotEqual(fs[0].n_instructions(), fs[1].n_instructions())
+      
+    self.checkfunction_light(*fs,inputs=[vertcat(1.1,1.3)])
+      
+      
 
   def test_extract_parametric_call_sx(self):
     x = MX.sym("x")
