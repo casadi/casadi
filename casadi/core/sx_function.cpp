@@ -2522,29 +2522,115 @@ namespace casadi {
         break;
       default:
         {
-          c_row.push_back(a.i0);
-          c_col.push_back(n+a.i1);
           const SXElem& f=*b_it++;
-          casadi_int ndeps = casadi_math<SXElem>::ndeps(a.op);
-          // Place to store partials
-          c_data.emplace_back();
-          c_data.emplace_back();
-          SXElem* d = get_ptr(c_data)+c_data.size()-2;
-          in_deps[a.i0] = in_deps[a.i1];
-          if (ndeps>1 && a.i1!=a.i2) {
-            c_row.push_back(a.i0);
-            c_col.push_back(n+a.i2);
-            in_deps[a.i0].insert(in_deps[a.i2].begin(), in_deps[a.i2].end());
+
+          // Default dependencies
+          const int* dep = &a.i1;
+          casadi_int ndeps = casadi_math<double>::ndeps(a.op);
+
+          // Default outputs
+          const int* res = &a.i0;
+          casadi_int nres = 1;
+
+          // Call node overrides these defaults
+          if (a.op==OP_CALL) {
+            const ExtendedAlgEl& e = call_.el.at(a.i1);
+            ndeps = e.n_dep;
+            dep = get_ptr(e.dep);
+            casadi_assert(e.n_res==1, "Not implemented for n_res>1");
+            nres = e.n_res;
+            res = get_ptr(e.res);
           }
+
+          // Place to store partials; note that unary operations assume storage space for 2
+          std::vector<SXElem> d(std::max(ndeps, static_cast<casadi_int>(2)));
+
+          // Set input dependencies
+          for (casadi_int i=0; i<ndeps; ++i) {
+            in_deps[a.i0].insert(in_deps[dep[i]].begin(), in_deps[dep[i]].end());
+          }
+
+          // Determine unique groups
+          std::map<int, std::set<int> > groups;
+
+          std::vector<int> order;
+          for (casadi_int i=0; i<ndeps; ++i) {
+            //if (a.op==OP_CALL) {
+            //  casadi_assert_dev(groups[dep[i]].empty());
+            //}
+            size_t before = groups[dep[i]].size();
+            groups[dep[i]].insert(i);
+            size_t after = groups[dep[i]].size();
+            if (after>before) {
+              order.push_back(dep[i]);
+            }
+          }
+
           switch (a.op) {
-            CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, d);
+            CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, get_ptr(d));
+            case OP_CALL:
+              {
+                const ExtendedAlgEl& m = call_.el.at(a.i1);
+                CallSX* call_node = static_cast<CallSX*>(f.get());
+
+                // Construct reverse sensitivity function
+                std::vector<std::string> out;
+                for (casadi_int i=0;i<m.f_n_in;++i) {
+                  if (m.f->is_diff_in_[i]) {
+                    out.push_back("jac:"+m.f.name_out(0)+":"+m.f.name_in(i));
+                  }
+                }
+
+                Function fr = m.f.factory("der_"+m.f.name(), m.f.name_in(), out);
+
+                // Symbolic inputs to reverse sensitivity function
+                std::vector<SXElem> deps;
+                deps.reserve(m.n_dep);
+
+                // Set nominal inputs from node
+                casadi_int offset = 0;
+                for (casadi_int i=0;i<m.f_n_in;++i) {
+                  casadi_int nnz = fr.nnz_in(i);
+                  casadi_assert(nnz==0 || nnz==m.f.nnz_in(i), "Not implemented");
+                  for (casadi_int j=0;j<nnz;++j) {
+                    deps.push_back(call_node->dep(offset+j));
+                  }
+                  offset += m.f_nnz_in[i];
+                }
+
+                // Call reverse sensitivity function
+                std::vector<SXElem> ret = SXElem::call(fr, deps);
+
+                // Store reverse sensitivities into work vector
+                offset = 0;
+                casadi_int k = 0;
+                casadi_int ii = 0;
+                for (casadi_int i=0;i<m.f_n_in;++i) {
+                  if (m.f->is_diff_in_[i]) {
+                    casadi_int nnz = fr.nnz_out(ii);
+                    // nnz=0 occurs for is_diff_in[i] false
+                    casadi_assert(nnz==0 || nnz==m.f_nnz_in[ii], "Not implemented");
+                    if (nnz) {
+                      for (casadi_int j=0;j<nnz;++j) {
+                        d[offset+j] = ret[k++];
+                      }
+                    }
+                    ii++;
+                  }
+                  offset += m.f_nnz_in[i];
+                }
+              }
           }
-          if (ndeps>1 && a.i1==a.i2) {
-            d[0] += d[1];
-            c_data.pop_back();
-          } else if (ndeps==1) {
-            c_data.pop_back();
+          for (const auto& e : order) {
+            c_row.push_back(res[0]);
+            c_col.push_back(n+e);
+            SXElem r = 0;
+            for (casadi_int i : groups[e]) {
+              r += d[i];
+            }
+            c_data.push_back(r);
           }
+
         }
       }
     }
@@ -2558,10 +2644,19 @@ namespace casadi {
         break;
       default:
         {
-          casadi_int ndeps = casadi_math<SXElem>::ndeps(it->op);
-          out_deps[it->i1].insert(out_deps[it->i0].begin(), out_deps[it->i0].end());
-          if (ndeps>1) {
-            out_deps[it->i2].insert(out_deps[it->i0].begin(), out_deps[it->i0].end());
+          // Default dependencies
+          const int* dep = &it->i1;
+          casadi_int ndeps = casadi_math<double>::ndeps(it->op);
+
+          // Call node overrides these defaults
+          if (it->op==OP_CALL) {
+            const ExtendedAlgEl& e = call_.el.at(it->i1);
+            ndeps = e.n_dep;
+            dep = get_ptr(e.dep);
+          }
+
+          for (casadi_int i=0; i<ndeps; ++i) {
+            out_deps[dep[i]].insert(out_deps[it->i0].begin(), out_deps[it->i0].end());
           }
         }
       }
