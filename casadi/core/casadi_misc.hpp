@@ -426,6 +426,20 @@ private:
   CASADI_EXPORT void normalized_setup(std::istream& stream);
   CASADI_EXPORT void normalized_setup(std::ostream& stream);
 
+
+  class CASADI_EXPORT StreamStateGuard {
+  public:
+      explicit StreamStateGuard(std::ostream& os);
+      ~StreamStateGuard();
+
+  private:
+      std::ostream& stream_;
+      std::ios::fmtflags flags_;
+      std::streamsize precision_;
+      std::streamsize width_;
+      std::locale locale_;
+  };
+
   inline void normalized_out(std::ostream& stream, double val) {
     if (val==std::numeric_limits<double>::infinity()) {
       stream << "inf";
