@@ -112,76 +112,78 @@ namespace casadi {
     }
     return true;
   }
+  std::string SXFunction::print(const ScalarAtomic& a) const {
+    std::stringstream stream;
+    if (a.op==OP_OUTPUT) {
+      stream << "output[" << a.i0 << "][" << a.i2 << "] = @" << a.i1;
+    } else if (a.op==OP_CALL) {
+      const ExtendedAlgEl& m = call_.el.at(a.i1);
+      stream << "[";
+      casadi_int k = 0;
+      for (casadi_int i=0; i<m.f.n_out(); ++i) {
+        if (m.f.nnz_out(i)>1) stream << "[";
+        for (casadi_int j=0; j<m.f.nnz_out(i); ++j) {
+          int el = m.res[k++];
+          if (el>=0) {
+            stream << "@" << el;
+          } else {
+            stream << "NULL";
+          }
+          if (j<m.f.nnz_out(i)-1) stream << ",";
+        }
+        if (m.f.nnz_out(i)>1) stream << "]";
+        if (i<m.f.n_out()-1) stream << ",";
+      }
+      stream << "] = ";
+      stream << m.f.name() << "(";
+      k = 0;
+      for (casadi_int i=0; i<m.f.n_in(); ++i) {
+        if (m.f.nnz_in(i)==0) stream << "0x0";
+        if (m.f.nnz_in(i)>1) stream << "[";
+        for (casadi_int j=0; j<m.f.nnz_in(i); ++j) {
+          stream << "@" << m.dep[k++];
+          if (j<m.f.nnz_in(i)-1) stream << ",";
+        }
+        if (m.f.nnz_in(i)>1) stream << "]";
+        if (i<m.f.n_in()-1) stream << ",";
+      }
+      stream << ")";
+    } else {
+      stream << "@" << a.i0 << " = ";
+      if (a.op==OP_INPUT) {
+        stream << "input[" << a.i1 << "][" << a.i2 << "]";
+      } else {
+        if (a.op==OP_CONST) {
+          stream << a.d;
+        } else if (a.op==OP_PARAMETER) {
+          stream << free_vars_[a.i1];
+        } else {
+          casadi_int ndep = casadi_math<double>::ndeps(a.op);
+          stream << casadi_math<double>::pre(a.op);
+          for (casadi_int c=0; c<ndep; ++c) {
+            if (c==0) {
+              stream << "@" << a.i1;
+            } else {
+              stream << casadi_math<double>::sep(a.op);
+              stream << "@" << a.i2;
+            }
+
+          }
+          stream << casadi_math<double>::post(a.op);
+        }
+      }
+    }
+    return stream.str();
+  }
 
   void SXFunction::disp_more(std::ostream &stream) const {
     stream << "Algorithm:";
-
-    // Iterator to free variables
-    std::vector<SXElem>::const_iterator p_it = free_vars_.begin();
 
     // Normal, interpreted output
     for (auto&& a : algorithm_) {
       InterruptHandler::check();
       stream << std::endl;
-      if (a.op==OP_OUTPUT) {
-        stream << "output[" << a.i0 << "][" << a.i2 << "] = @" << a.i1;
-      } else if (a.op==OP_CALL) {
-        const ExtendedAlgEl& m = call_.el.at(a.i1);
-        stream << "[";
-        casadi_int k = 0;
-        for (casadi_int i=0; i<m.f.n_out(); ++i) {
-          if (m.f.nnz_out(i)>1) stream << "[";
-          for (casadi_int j=0; j<m.f.nnz_out(i); ++j) {
-            int el = m.res[k++];
-            if (el>=0) {
-              stream << "@" << el;
-            } else {
-              stream << "NULL";
-            }
-            if (j<m.f.nnz_out(i)-1) stream << ",";
-          }
-          if (m.f.nnz_out(i)>1) stream << "]";
-          if (i<m.f.n_out()-1) stream << ",";
-        }
-        stream << "] = ";
-        stream << m.f.name() << "(";
-        k = 0;
-        for (casadi_int i=0; i<m.f.n_in(); ++i) {
-          if (m.f.nnz_in(i)==0) stream << "0x0";
-          if (m.f.nnz_in(i)>1) stream << "[";
-          for (casadi_int j=0; j<m.f.nnz_in(i); ++j) {
-            stream << "@" << m.dep[k++];
-            if (j<m.f.nnz_in(i)-1) stream << ",";
-          }
-          if (m.f.nnz_in(i)>1) stream << "]";
-          if (i<m.f.n_in()-1) stream << ",";
-        }
-        stream << ")";
-      } else {
-        stream << "@" << a.i0 << " = ";
-        if (a.op==OP_INPUT) {
-          stream << "input[" << a.i1 << "][" << a.i2 << "]";
-        } else {
-          if (a.op==OP_CONST) {
-            stream << a.d;
-          } else if (a.op==OP_PARAMETER) {
-            stream << *p_it++;
-          } else {
-            casadi_int ndep = casadi_math<double>::ndeps(a.op);
-            stream << casadi_math<double>::pre(a.op);
-            for (casadi_int c=0; c<ndep; ++c) {
-              if (c==0) {
-                stream << "@" << a.i1;
-              } else {
-                stream << casadi_math<double>::sep(a.op);
-                stream << "@" << a.i2;
-              }
-
-            }
-            stream << casadi_math<double>::post(a.op);
-          }
-        }
-      }
+      stream << print(a);
       stream << ";";
     }
   }
@@ -658,6 +660,9 @@ namespace casadi {
     for (std::vector<std::pair<int, SXNode*> >::const_iterator it=symb_loc.begin();
          it!=symb_loc.end(); ++it) {
       if (it->second->temp!=0) {
+        // Store the index into free_vars
+        algorithm_[it->first].i1 = free_vars_.size();
+
         // Save to list of free parameters
         free_vars_.push_back(SXElem::create(it->second));
 

@@ -105,6 +105,9 @@ class CASADI_EXPORT SXFunction :
       \identifier{ui} */
   bool is_smooth() const;
 
+  // print an element of an algorithm
+  std::string print(const ScalarAtomic& a) const;
+
   /** \brief  Print the algorithm
 
       \identifier{uj} */
