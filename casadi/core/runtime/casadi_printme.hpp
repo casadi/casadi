@@ -20,6 +20,7 @@
 // SYMBOL "printme"
 template<typename T1>
 T1 casadi_printme(T1 a, T1 b) {
+  // C-REPLACE "printf" "CASADI_PRINTF"
   printf("|> %.15g : %.15g\n", b, a);
   return a;
 }
