@@ -798,8 +798,6 @@ class casadiTestCase(unittest.TestCase):
             out = p.communicate()
         print("Return code",p.returncode)
         assert p.returncode in main_return_code
-        if main_return_code:
-            return
         
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)
