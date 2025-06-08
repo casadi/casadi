@@ -108,6 +108,20 @@ class CASADI_EXPORT SXFunction :
   // print an element of an algorithm
   std::string print(const ScalarAtomic& a) const;
 
+  // Print the input arguments of an instruction
+  void print_arg(std::ostream &stream, casadi_int k, const ScalarAtomic& el,
+    const double* w) const;
+
+  // Print the input arguments of an instruction
+  void print_arg(CodeGenerator& g, casadi_int k, const ScalarAtomic& el) const;
+
+  // Print the output arguments of an instruction
+  void print_res(std::ostream &stream, casadi_int k, const ScalarAtomic& el,
+    const double* w) const;
+
+  // Print the output arguments of an instruction
+  void print_res(CodeGenerator& g, casadi_int k, const ScalarAtomic& el) const;
+
   /** \brief  Print the algorithm
 
       \identifier{uj} */
@@ -250,6 +264,9 @@ class CASADI_EXPORT SXFunction :
 
   /// Copy elision per algel
   std::vector<bool> copy_elision_;
+
+  /// Print each operation during evaluation
+  bool print_instructions_;
 
     /** \brief Serialize an object without type information
 

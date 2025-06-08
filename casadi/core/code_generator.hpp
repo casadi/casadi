@@ -687,7 +687,10 @@ namespace casadi {
       AUX_BLAZING_1D_BOOR_EVAL,
       AUX_BLAZING_2D_BOOR_EVAL,
       AUX_BLAZING_3D_BOOR_EVAL,
-      AUX_PRINTME
+      AUX_PRINTME,
+      AUX_PRINT_SCALAR,
+      AUX_PRINT_VECTOR,
+      AUX_PRINT_CANONICAL
     };
 
     /** \brief Add a built-in auxiliary function
@@ -740,6 +743,15 @@ namespace casadi {
         \identifier{281} */
     void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<std::string>& v);
+
+    /** \brief Print canonical representaion of a matrix */
+    std::string print_canonical(const Sparsity& sp, const std::string& arg);
+
+    /** \brief Print canonical representaion of a vector */
+    std::string print_vector(casadi_int sz, const std::string& arg);
+
+    /** \brief Print canonical representaion of a scalar */
+    std::string print_scalar(const std::string& arg);
 
     /** \brief Create a copy operation
 

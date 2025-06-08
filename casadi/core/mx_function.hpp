@@ -235,8 +235,16 @@ namespace casadi {
     // Print the input arguments of an instruction
     void print_arg(std::ostream &stream, casadi_int k, const AlgEl& el, const double** arg) const;
 
+    // Print the input arguments of an instruction
+    void print_arg(CodeGenerator& g, casadi_int k, const AlgEl& el,
+        const std::vector<casadi_int>& arg, const std::vector<bool>& arg_is_ref) const;
+
     // Print the output arguments of an instruction
     void print_res(std::ostream &stream, casadi_int k, const AlgEl& el, double** res) const;
+
+    // Print the output arguments of an instruction
+    void print_res(CodeGenerator& g, casadi_int k, const AlgEl& el,
+        const std::vector<casadi_int>& res, const std::vector<bool>& res_is_ref) const;
 
     ///@{
     /** \brief Get function input(s) and output(s)

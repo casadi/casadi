@@ -532,13 +532,43 @@ namespace casadi {
   }
 
   void MXFunction::print_arg(std::ostream &stream, casadi_int k, const AlgEl& el,
-      const double** arg) const {
+    const double** arg) const {
     stream << name_ << ":" << k << ": " << print(el) << " inputs:" << std::endl;
     for (size_t i = 0; i < el.arg.size(); ++i) {
       if (arg[i]) {
         stream << i << ": ";
-        DM::print_default(stream, el.data->dep(i).sparsity(), arg[i], true);
+        if (print_canonical_) {
+          print_canonical(stream, el.data->dep(i).sparsity(), arg[i]);
+        } else {
+          DM::print_default(stream, el.data->dep(i).sparsity(), arg[i], true);
+        }
         stream << std::endl;
+      }
+    }
+  }
+
+  void MXFunction::print_arg(CodeGenerator& g, casadi_int k, const AlgEl& el,
+    const std::vector<casadi_int>& arg, const std::vector<bool>& arg_is_ref) const {
+    g << g.printf(name_ + ":" + str(k) + ": " + print(el) + " inputs:\\n") << "\n";
+    for (size_t i = 0; i < el.arg.size(); ++i) {
+      if (arg[i]>=0) {
+        g << g.printf(str(i) + ": ");
+        std::string a = g.work(arg[i], el.data->dep(i).nnz(), arg_is_ref[i]);
+        g << g.print_canonical(el.data->dep(i).sparsity(), a);
+        g << g.printf("\\n") << "\n";
+      }
+    }
+  }
+
+  void MXFunction::print_res(CodeGenerator& g, casadi_int k, const AlgEl& el,
+    const std::vector<casadi_int>& res, const std::vector<bool>& res_is_ref) const {
+    g << g.printf(name_ + ":" + str(k) + ": " + print(el) + " outputs:\\n") << "\n";
+    for (size_t i = 0; i < el.res.size(); ++i) {
+      if (res[i]>=0) {
+        g << g.printf(str(i) + ": ");
+        std::string a = g.work(res[i], el.data->sparsity(i).nnz(), res_is_ref[i]);
+        g << g.print_canonical(el.data->sparsity(i), a);
+        g << g.printf("\\n") << "\n";
       }
     }
   }
@@ -549,7 +579,11 @@ namespace casadi {
     for (size_t i = 0; i < el.res.size(); ++i) {
       if (res[i]) {
         stream << i << ": ";
-        DM::print_default(stream, el.data->sparsity(i), res[i], true);
+        if (print_canonical_) {
+          print_canonical(stream, el.data->sparsity(i), res[i]);
+        } else {
+          DM::print_default(stream, el.data->sparsity(i), res[i], true);
+        }
         stream << std::endl;
       }
     }
@@ -1224,7 +1258,7 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       // Generate comment
       if (g.verbose) {
-        g << "/* #" << k++ << ": " << print(e) << " */\n";
+        g << "/* #" << k << ": " << print(e) << " */\n";
       }
 
       // Get the names of the operation arguments
@@ -1256,6 +1290,10 @@ namespace casadi {
       // By default, don't assume references
       std::fill(res_is_ref.begin(), res_is_ref.end(), false);
 
+      if (print_instructions_ && e.op!=OP_INPUT && e.op!=OP_OUTPUT) {
+        print_arg(g, k, e, arg, arg_is_ref);
+      }
+
       // Generate operation
       e.data->generate(g, arg, res, arg_is_ref, res_is_ref);
 
@@ -1270,6 +1308,12 @@ namespace casadi {
           }
         }
       }
+
+      if (print_instructions_ && e.op!=OP_INPUT && e.op!=OP_OUTPUT) {
+        print_res(g, k, e, res, res_is_ref);
+      }
+
+      k++;
 
     }
 

@@ -936,6 +936,10 @@ namespace casadi {
     static void print_vector(std::ostream &stream, const Sparsity& sp, const Scalar* nonzeros,
       bool truncate=true);
 
+    /// Print canonical style
+    static void print_canonical(std::ostream &stream, const Sparsity& sp, const Scalar* nonzeros,
+        bool truncate=true);
+
     /// Print scalar
     static void print_sparse(std::ostream &stream, const Sparsity& sp, const Scalar* nonzeros,
       bool truncate=true);

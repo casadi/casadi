@@ -101,6 +101,7 @@ namespace casadi {
     enable_fd_op_ = false;
     print_in_ = false;
     print_out_ = false;
+    print_canonical_ = false;
     max_io_ = 10000;
     dump_in_ = false;
     dump_out_ = false;
@@ -296,6 +297,10 @@ namespace casadi {
       {"print_out",
        {OT_BOOL,
         "Print numerical values of outputs [default: false]"}},
+      {"print_canonical",
+        {OT_BOOL,
+        "When printing numerical matrices, use a format that is "
+        "exact and reproducible in generated C code."}},
       {"max_io",
        {OT_INT,
         "Acceptable number of inputs and outputs. Warn if exceeded."}},
@@ -411,6 +416,7 @@ namespace casadi {
     opts["fd_method"] = fd_method_;
     opts["print_in"] = print_in_;
     opts["print_out"] = print_out_;
+    opts["print_canonical"] = print_canonical_;
     opts["max_io"] = max_io_;
     opts["dump_in"] = dump_in_;
     opts["dump_out"] = dump_out_;
@@ -426,6 +432,8 @@ namespace casadi {
       print_in_ = option_value;
     } else if (option_name == "print_out") {
       print_out_ = option_value;
+    } else if (option_name == "print_canonical") {
+      print_canonical_ = option_value;
     } else if (option_name=="ad_weight") {
       ad_weight_ = option_value;
     } else if (option_name=="ad_weight_sp") {
@@ -507,6 +515,8 @@ namespace casadi {
         print_in_ = op.second;
       } else if (op.first=="print_out") {
         print_out_ = op.second;
+      } else if (op.first=="print_canonical") {
+        print_canonical_ = op.second;
       } else if (op.first=="max_io") {
         max_io_ = op.second;
       } else if (op.first=="dump_in") {
@@ -825,6 +835,32 @@ namespace casadi {
         stream << "NULL" << std::endl;
       }
     }
+  }
+
+  void FunctionInternal::print_canonical(std::ostream &stream, casadi_int sz, const double* nz) {
+    StreamStateGuard backup(stream);
+    normalized_setup(stream);
+    if (nz) {
+      stream << "[";
+      for (casadi_int i=0; i<sz; ++i) {
+        if (i>0) stream << ", ";
+        normalized_out(stream, nz[i]);
+      }
+      stream << "]";
+    } else {
+      stream << "NULL";
+    }
+  }
+
+  void FunctionInternal::print_canonical(std::ostream &stream,
+      const Sparsity& sp, const double* nz) {
+    print_canonical(stream, sp.nnz(), nz);
+  }
+
+  void FunctionInternal::print_canonical(std::ostream &stream, double a) {
+    StreamStateGuard backup(stream);
+    normalized_setup(stream);
+    normalized_out(stream, a);
   }
 
   int FunctionInternal::
@@ -3901,7 +3937,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 6);
+    s.version("FunctionInternal", 7);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -3955,6 +3991,7 @@ namespace casadi {
     s.pack("FunctionInternal::fd_method", fd_method_);
     s.pack("FunctionInternal::print_in", print_in_);
     s.pack("FunctionInternal::print_out", print_out_);
+    s.pack("FunctionInternal::print_canonical", print_canonical_);
     s.pack("FunctionInternal::max_io", max_io_);
     s.pack("FunctionInternal::dump_in", dump_in_);
     s.pack("FunctionInternal::dump_out", dump_out_);
@@ -3977,7 +4014,7 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
-    int version = s.version("FunctionInternal", 1, 6);
+    int version = s.version("FunctionInternal", 1, 7);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -4048,6 +4085,11 @@ namespace casadi {
     s.unpack("FunctionInternal::fd_method", fd_method_);
     s.unpack("FunctionInternal::print_in", print_in_);
     s.unpack("FunctionInternal::print_out", print_out_);
+    if (version >= 7) {
+      s.unpack("FunctionInternal::print_canonical", print_canonical_);
+    } else {
+      print_canonical_ = false;
+    }
     if (version >= 4) {
       s.unpack("FunctionInternal::max_io", max_io_);
     } else {

@@ -62,6 +62,7 @@ namespace casadi {
     // Default (persistent) options
     just_in_time_opencl_ = false;
     just_in_time_sparsity_ = false;
+    print_instructions_ = false;
   }
 
   SXFunction::~SXFunction() {
@@ -85,19 +86,41 @@ namespace casadi {
     // class structure can cause large performance losses. For this reason,
     // the preprocessor macros are used below
 
-    // Evaluate the algorithm
-    for (auto&& e : algorithm_) {
-      switch (e.op) {
-        CASADI_MATH_FUN_BUILTIN(w[e.i1], w[e.i2], w[e.i0])
+    if (print_instructions_) {
+      int k = 0;
+      // Evaluate the algorithm
+      for (auto&& e : algorithm_) {
+        print_arg(uout(), k, e, w);
+        switch (e.op) {
+          CASADI_MATH_FUN_BUILTIN(w[e.i1], w[e.i2], w[e.i0])
 
-      case OP_CONST: w[e.i0] = e.d; break;
-      case OP_INPUT: w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2]; break;
-      case OP_OUTPUT: if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1]; break;
-      case OP_CALL:
-        call_fwd(e, arg, res, iw, w);
-      break;
-      default:
-        casadi_error("Unknown operation" + str(e.op));
+        case OP_CONST: w[e.i0] = e.d; break;
+        case OP_INPUT: w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2]; break;
+        case OP_OUTPUT: if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1]; break;
+        case OP_CALL:
+          call_fwd(e, arg, res, iw, w);
+        break;
+        default:
+          casadi_error("Unknown operation" + str(e.op));
+        }
+        print_res(uout(), k, e, w);
+        k++;
+      }
+    } else {
+      // Evaluate the algorithm
+      for (auto&& e : algorithm_) {
+        switch (e.op) {
+          CASADI_MATH_FUN_BUILTIN(w[e.i1], w[e.i2], w[e.i0])
+
+        case OP_CONST: w[e.i0] = e.d; break;
+        case OP_INPUT: w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2]; break;
+        case OP_OUTPUT: if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1]; break;
+        case OP_CALL:
+          call_fwd(e, arg, res, iw, w);
+        break;
+        default:
+          casadi_error("Unknown operation" + str(e.op));
+        }
       }
     }
     return 0;
@@ -207,10 +230,94 @@ namespace casadi {
     }
   }
 
+
+  void SXFunction::print_arg(std::ostream &stream, casadi_int k, const ScalarAtomic& el,
+      const double* w) const {
+    if (el.op==OP_INPUT || el.op==OP_OUTPUT || el.op==OP_CONST) return;
+    stream << name_ << ":" << k << ": " << print(el) << " inputs:  ";
+
+    // Default dependencies
+    const int* dep = &el.i1;
+    casadi_int ndeps = casadi_math<double>::ndeps(el.op);
+
+    // Call node overrides these defaults
+    if (el.op==OP_CALL) {
+      const ExtendedAlgEl& e = call_.el.at(el.i1);
+      ndeps = e.n_dep;
+      dep = get_ptr(e.dep);
+    }
+
+    std::vector<double> num(ndeps);
+    for (size_t i = 0; i < ndeps; ++i) {
+      num[i] = w[dep[i]];
+    }
+
+    print_canonical(stream, ndeps, get_ptr(num));
+
+    stream << std::endl;
+  }
+
+  void SXFunction::print_arg(CodeGenerator& g, casadi_int k, const ScalarAtomic& el) const {
+    if (el.op==OP_INPUT || el.op==OP_OUTPUT || el.op==OP_CONST) return;
+    g << g.printf(name_ + ":" + str(k) + ": " + print(el) + " inputs:  ") << "\n";
+    if (el.op==OP_CALL) {
+      const ExtendedAlgEl& m = call_.el[el.i1];
+      g << g.print_vector(m.f.nnz_in(), "arg[" + str(n_in_) + "]");
+      g << g.printf("\\n");
+    } else {
+      casadi_int ndeps = casadi_math<double>::ndeps(el.op);
+      if (ndeps==1) {
+        g << g.printf("[%.16e]\\n", g.sx_work(el.i1));
+      } else if (ndeps==2) {
+        g << g.printf("[%.16e, %.16e]\\n", g.sx_work(el.i1), g.sx_work(el.i2));
+      }
+    }
+    g << "\n";
+  }
+
+  void SXFunction::print_res(CodeGenerator& g, casadi_int k, const ScalarAtomic& el) const {
+    if (el.op==OP_INPUT || el.op==OP_OUTPUT) return;
+    g << g.printf(name_ + ":" + str(k) + ": " + print(el) + " outputs: ") << "\n";
+    if (el.op==OP_CALL) {
+      const ExtendedAlgEl& m = call_.el[el.i1];
+      g << g.print_vector(m.f.nnz_out(), "w+" + str(m.f.nnz_in()));
+      g << g.printf("\\n");
+    } else {
+      g << g.printf("[%.16e]\\n", g.sx_work(el.i0));
+    }
+    g << "\n";
+  }
+
+  void SXFunction::print_res(std::ostream &stream, casadi_int k, const ScalarAtomic& el,
+      const double* w) const {
+    if (el.op==OP_INPUT || el.op==OP_OUTPUT) return;
+    stream << name_ << ":" << k << ": " << print(el) << " outputs: ";
+
+    // Default outputs
+    const int* res = &el.i0;
+    casadi_int nres = 1;
+
+    // Call node overrides these defaults
+    if (el.op==OP_CALL) {
+      const ExtendedAlgEl& e = call_.el.at(el.i1);
+      nres = e.n_res;
+      res = get_ptr(e.res);
+    }
+
+    std::vector<double> num(nres);
+    for (size_t i = 0; i < nres; ++i) {
+      num[i] = w[res[i]];
+    }
+
+    print_canonical(stream, nres, get_ptr(num));
+
+    stream << std::endl;
+  }
+
   void SXFunction::codegen_body(CodeGenerator& g) const {
     g.reserve_work(worksize_);
 
-    casadi_int k=0;
+    casadi_int cnt = 0;
     // Run the algorithm
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
@@ -258,10 +365,12 @@ namespace casadi {
             k+=m.f_nnz_in[i];
           }
         }
+        if (print_instructions_) print_arg(g, cnt, a);
         std::string flag =
           g(m.f, "arg+"+str(n_in_), "res+"+str(n_out_), "iw", "w+" + str(offset));
         // Call function
         g << "if (" << flag << ") return 1;\n";
+        if (print_instructions_) print_res(g, cnt, a);
         for (casadi_int i=0;i<m.n_res;++i) {
           if (m.res[i]>=0) {
             g << g.sx_work(m.res[i]) << " = ";
@@ -269,11 +378,12 @@ namespace casadi {
           }
         }
       } else if (a.op==OP_INPUT) {
-          if (!copy_elision_[k]) {
+          if (!copy_elision_[cnt]) {
             g << g.sx_work(a.i0) << "="
               << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0;\n";
           }
       } else {
+        if (print_instructions_) print_arg(g, cnt, a);
 
         // Where to store the result
         g << g.sx_work(a.i0) << "=";
@@ -287,9 +397,12 @@ namespace casadi {
           if (ndep==1) g << g.print_op(a.op, g.sx_work(a.i1));
           if (ndep==2) g << g.print_op(a.op, g.sx_work(a.i1), g.sx_work(a.i2));
         }
-        g  << ";\n";
+
+        g << ";\n";
+
+        if (print_instructions_) print_res(g, cnt, a);
       }
-      k++;
+      cnt++;
     }
   }
 
@@ -316,7 +429,10 @@ namespace casadi {
         "Allow construction with free variables (Default: false)"}},
       {"allow_duplicate_io_names",
        {OT_BOOL,
-        "Allow construction with duplicate io names (Default: false)"}}
+        "Allow construction with duplicate io names (Default: false)"}},
+      {"print_instructions",
+       {OT_BOOL,
+        "Print each operation during evaluation"}}
      }
   };
 
@@ -354,6 +470,8 @@ namespace casadi {
         cse_opt = op.second;
       } else if (op.first=="allow_free") {
         allow_free = op.second;
+      } else if (op.first=="print_instructions") {
+        print_instructions_ = op.second;
       }
     }
 
@@ -1678,7 +1796,7 @@ namespace casadi {
 
   SXFunction::SXFunction(DeserializingStream& s) :
     XFunction<SXFunction, SX, SXNode>(s) {
-    int version = s.version("SXFunction", 1, 2);
+    int version = s.version("SXFunction", 1, 3);
     size_t n_instructions;
     s.unpack("SXFunction::n_instr", n_instructions);
 
@@ -1740,13 +1858,18 @@ namespace casadi {
     just_in_time_sparsity_ = false;
 
     s.unpack("SXFunction::live_variables", live_variables_);
+    if (version>=3) {
+      s.unpack("SXFunction::print_instructions", print_instructions_);
+    } else {
+      print_instructions_ = false;
+    }
 
     XFunction<SXFunction, SX, SXNode>::delayed_deserialize_members(s);
   }
 
   void SXFunction::serialize_body(SerializingStream &s) const {
     XFunction<SXFunction, SX, SXNode>::serialize_body(s);
-    s.version("SXFunction", 2);
+    s.version("SXFunction", 3);
     s.pack("SXFunction::n_instr", algorithm_.size());
 
     s.pack("SXFunction::worksize", worksize_);
@@ -1783,6 +1906,7 @@ namespace casadi {
     }
 
     s.pack("SXFunction::live_variables", live_variables_);
+    s.pack("SXFunction::print_instructions", print_instructions_);
 
     XFunction<SXFunction, SX, SXNode>::delayed_serialize_members(s);
   }

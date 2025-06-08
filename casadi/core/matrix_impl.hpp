@@ -717,6 +717,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  void Matrix<Scalar>::print_canonical(std::ostream &stream, const Sparsity& sp,
+    const Scalar* nonzeros, bool truncate) {
+    casadi_error("'print_canonical' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::print_scalar(std::ostream &stream, const Scalar& e) {
     std::streamsize precision = stream.precision();
     std::streamsize width = stream.width();

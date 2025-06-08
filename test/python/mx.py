@@ -3022,6 +3022,34 @@ class MXtests(casadiTestCase):
       self.assertTrue(J.size()==(2,1))
       self.assertTrue(J.nnz()==2)
 
+  def test_print_instructions(self):
+    for X in [MX,SX]:
+        x = X.sym("x",Sparsity.diag(5))
+        y = X.sym("y",5,5)
+        z = X.sym("z",5)
+        w = X.sym("w")
+        g = Function('g',[z],[z[0]+z[2],z[1]+z[4]],{"never_inline":True})
+
+        [a,b] = g(mtimes(y+x,z))
+        f = Function('f',[x,y,z,w],[sin(a*(7*w)+6)*b],{"print_instructions": True, "print_canonical":True})
+        DM.rng(1)
+        inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+        with capture_stdout() as out:
+            f(*inputs)
+        out = out[0].split("\n")[:-1]
+        
+
+        with self.assertInException("Parsing error"):
+            self.check_codegen(f,inputs,main=True)
+                    
+        with open("f_out.txt","r") as f_out:
+            out2 = f_out.read().split("\n")[:-2]
+        
+        
+        self.assertEqual(len(out),len(out2))
+        for a,b in zip(out,out2):
+            self.assertEqual(a,b)
+
   def test_low(self):
     v = MX.sym("v",5)
     p0 = [-1,0,0.2,1,1.3,2,2.5,3,3.5,4,4.5]
