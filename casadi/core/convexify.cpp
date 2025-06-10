@@ -158,7 +158,8 @@ namespace casadi {
                        const std::vector<casadi_int>& arg,
                        const std::vector<casadi_int>& res,
                        const std::vector<bool>& arg_is_ref,
-                       std::vector<bool>& res_is_ref) const {
+                       std::vector<bool>& res_is_ref,
+                       bool prefer_inline) const {
     std::string ret = g.convexify_eval(convexify_data_,
       g.work(arg[0], dep(0).nnz(), arg_is_ref[0]), g.work(res[0], nnz(), false), "iw", "w");
     g << "if (" << ret << ") return 1;\n";

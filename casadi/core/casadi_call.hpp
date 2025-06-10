@@ -96,7 +96,8 @@ namespace casadi {
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res,
                           const std::vector<bool>& arg_is_ref,
-                          std::vector<bool>& res_is_ref) const override;
+                          std::vector<bool>& res_is_ref,
+                          bool prefer_inline=false) const override;
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;

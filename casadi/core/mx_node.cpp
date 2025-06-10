@@ -448,7 +448,8 @@ namespace casadi {
       const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res,
       const std::vector<bool>& arg_is_ref,
-      std::vector<bool>& res_is_ref) const {
+      std::vector<bool>& res_is_ref,
+      bool prefer_inline) const {
     casadi_warning("Cannot code generate MX nodes of type " + class_name() +
                    "The generation will proceed, but compilation of the code will "
                    "not be possible.");
@@ -460,7 +461,8 @@ namespace casadi {
                       const std::vector<casadi_int>& res,
                       const std::vector<bool>& arg_is_ref,
                       std::vector<bool>& res_is_ref,
-                      casadi_int i) const {
+                      casadi_int i,
+                      bool prefer_inline) const {
     res_is_ref[i] = arg_is_ref[i];
     if (arg[i]==res[i]) return;
     if (nnz()==1) {

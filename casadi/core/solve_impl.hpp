@@ -263,7 +263,8 @@ namespace casadi {
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res,
                             const std::vector<bool>& arg_is_ref,
-                            std::vector<bool>& res_is_ref) const {
+                            std::vector<bool>& res_is_ref,
+                            bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
 
@@ -433,7 +434,8 @@ namespace casadi {
       const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res,
       const std::vector<bool>& arg_is_ref,
-      std::vector<bool>& res_is_ref) const {
+      std::vector<bool>& res_is_ref,
+      bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
     // Copy first argument if not inplace
@@ -452,7 +454,8 @@ namespace casadi {
       const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res,
       const std::vector<bool>& arg_is_ref,
-      std::vector<bool>& res_is_ref) const {
+      std::vector<bool>& res_is_ref,
+      bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
     // Copy first argument if not inplace
@@ -471,7 +474,8 @@ namespace casadi {
       const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res,
       const std::vector<bool>& arg_is_ref,
-      std::vector<bool>& res_is_ref) const {
+      std::vector<bool>& res_is_ref,
+      bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
     // Copy first argument if not inplace
@@ -490,7 +494,8 @@ namespace casadi {
       const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res,
       const std::vector<bool>& arg_is_ref,
-      std::vector<bool>& res_is_ref) const {
+      std::vector<bool>& res_is_ref,
+      bool prefer_inline) const {
     // Number of right-hand-sides
     casadi_int nrhs = this->dep(0).size2();
     // Copy first argument if not inplace

@@ -82,7 +82,7 @@ namespace casadi {
                         const std::vector<casadi_int>& arg,
                         const std::vector<casadi_int>& res,
                         const std::vector<bool>& arg_is_ref,
-                        std::vector<bool>& res_is_ref) const {
+                        std::vector<bool>& res_is_ref, bool prefer_inline) const {
     g.local("rr", "casadi_real", "*");
     g << "rr=" << g.work(res[0], nnz(), false) << ";\n";
     for (casadi_int i=0; i<arg.size(); ++i) {
