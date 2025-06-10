@@ -54,6 +54,9 @@ namespace casadi {
 
     /// Work vector indices of the results
     std::vector<casadi_int> res;
+
+    /// Data type
+    std::string data_type;
   };
 #endif // SWIG
 
@@ -80,6 +83,11 @@ namespace casadi {
 
         \identifier{21} */
     std::vector<casadi_int> workloc_;
+    std::vector<casadi_int> workloc_sz_self_;
+    std::vector<std::string> worktype_;
+
+    /** \brief Offset for the 'extra' working memory (non-io) */
+    size_t w_extra_offset_;
 
 
     std::vector<bool> workstate_;
@@ -271,6 +279,12 @@ namespace casadi {
       return ret;
     }
 
+    // Get list of dependency functions
+    std::vector<std::string> get_function() const override;
+
+    // Get a dependency function
+    const Function& get_function(const std::string &name) const override;
+
     /// @{
     /** \brief Sparsities of function inputs and outputs */
     Layout get_layout_in(casadi_int i) override { return in_.at(i).layout();}
@@ -293,6 +307,8 @@ namespace casadi {
 
         \identifier{2s} */
     casadi_int instruction_id(casadi_int k) const override { return algorithm_.at(k).op;}
+
+    Function pull_out(const std::vector<casadi_int>& in, Function& outer) const override;
 
     /** \brief Get default input value
 
