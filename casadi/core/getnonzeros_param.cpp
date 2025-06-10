@@ -327,7 +327,8 @@ namespace casadi {
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res,
                                     const std::vector<bool>& arg_is_ref,
-                                    std::vector<bool>& res_is_ref) const {
+                                    std::vector<bool>& res_is_ref,
+                                    bool prefer_inline) const {
     g.local("i", "casadi_int");
     g.local("rr", "casadi_real", "*");
     g.local("cr", "const casadi_real", "*");
@@ -343,7 +344,8 @@ namespace casadi {
                                   const std::vector<casadi_int>& arg,
                                   const std::vector<casadi_int>& res,
                                   const std::vector<bool>& arg_is_ref,
-                                  std::vector<bool>& res_is_ref) const {
+                                  std::vector<bool>& res_is_ref,
+                                  bool prefer_inline) const {
     g.local("cii", "const casadi_int", "*");
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << dep(1).nnz() << ";++i) iw[i] = (int) "
@@ -362,7 +364,8 @@ namespace casadi {
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res,
                                     const std::vector<bool>& arg_is_ref,
-                                    std::vector<bool>& res_is_ref) const {
+                                    std::vector<bool>& res_is_ref,
+                                    bool prefer_inline) const {
     if (inner_.step==1 && arg_is_ref[0] && dep(1).nnz()==1) {
       if (nnz()==1) {
         g.local("i", "casadi_int");
@@ -396,7 +399,8 @@ namespace casadi {
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res,
                                     const std::vector<bool>& arg_is_ref,
-                                    std::vector<bool>& res_is_ref) const {
+                                    std::vector<bool>& res_is_ref,
+                                    bool prefer_inline) const {
     g.local("cii", "const casadi_int", "*");
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << dep(1).nnz() << ";++i) iw[i] = (int) "

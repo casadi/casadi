@@ -230,7 +230,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** \brief  Check if a particular integer value
 
@@ -323,7 +324,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** \brief Add a dependent function
 
@@ -402,7 +404,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** \brief Add a dependent function
 
@@ -485,7 +488,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override {}
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override {}
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override { return 0;}
@@ -625,7 +629,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** \brief  Check if a particular integer value
 
@@ -852,7 +857,8 @@ namespace casadi {
                                  const std::vector<casadi_int>& arg,
                                  const std::vector<casadi_int>& res,
                                  const std::vector<bool>& arg_is_ref,
-                                 std::vector<bool>& res_is_ref) const {
+                                 std::vector<bool>& res_is_ref,
+                                 bool prefer_inline) const {
     if (nnz()==0) {
       // Quick return
     } else if (nnz()==1) {

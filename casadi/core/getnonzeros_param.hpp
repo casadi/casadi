@@ -126,7 +126,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** \brief Serialize an object without type information
 
@@ -187,7 +188,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** Obtain information about node */
     Dict info() const override { return {{"inner", inner_.info()}}; }
@@ -259,7 +261,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** Obtain information about node */
     Dict info() const override { return {{"outer", outer_.info()}}; }
@@ -332,7 +335,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** Obtain information about node */
     Dict info() const override { return {}; }
