@@ -52,4 +52,6 @@ namespace casadi {
 
 
   bool GlobalOptions::feature_ve = true;
+  bool GlobalOptions::feature_loops = true;
+
 } // namespace casadi

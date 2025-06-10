@@ -111,13 +111,13 @@ namespace casadi {
                           std::vector<bool>& res_is_ref,
                           bool prefer_inline) const {
     // Print comment
-    g.local("cr", "const casadi_real", "*");
+    g.local("ss", "const casadi_real", "*");
     g.local("i", "casadi_int");
     g << g.printf(comment_ + "\\n[") << "\n"
-      << "  for (i=0, cr=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0])
+      << "  for (i=0, ss=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0])
       << "; i!=" << nnz() << "; ++i) {\n"
       << "    if (i!=0) " << g.printf(", ") << "\n"
-      << "    " << g.printf("%g", "*cr++") << "\n"
+      << "    " << g.printf("%g", "*ss++") << "\n"
       << "  }\n"
       << "  " << g.printf("]\\n") << "\n";
 
