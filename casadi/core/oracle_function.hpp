@@ -252,12 +252,12 @@ namespace casadi {
     /** \brief Generate code for the function body
 
         \identifier{27q} */
-    virtual void codegen_body_enter(CodeGenerator& g) const;
+    virtual void codegen_body_enter(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Generate code for the function body
 
         \identifier{27r} */
-    virtual void codegen_body_exit(CodeGenerator& g) const;
+    virtual void codegen_body_exit(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Serialize an object without type information
 
