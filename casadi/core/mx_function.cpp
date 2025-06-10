@@ -221,7 +221,7 @@ namespace casadi {
     // Default (temporary) options
     live_variables_ = true;
     print_instructions_ = false;
-    bool cse_opt = false;
+    bool cse_opt = GlobalOptions::getFeatureCSEMX();
     bool allow_free = false;
 
     stride_in_.resize(n_in_, 1);
