@@ -208,6 +208,8 @@ namespace casadi {
                     const Dict& opts=Dict()) const;
     ///@}
 
+    Function pull_out(const std::vector<casadi_int>& in, Function& SWIG_OUTPUT(outer)) const;
+
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node
@@ -323,6 +325,8 @@ namespace casadi {
 
         \identifier{1vj} */
     const std::string& name_out(casadi_int ind) const;
+
+    const std::vector<std::string>& data_type() const;
 
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *

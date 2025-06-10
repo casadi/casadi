@@ -27,8 +27,8 @@
 #include "serializing_stream.hpp"
 
 namespace casadi {
-  Input::Input(const Sparsity& sp, casadi_int ind, casadi_int segment, casadi_int offset)
-    : IOInstruction(ind, segment, offset) {
+  Input::Input(const Sparsity& sp, casadi_int ind, casadi_int segment, casadi_int offset, const std::string& data_type)
+    : IOInstruction(ind, segment, offset, data_type) {
     set_sparsity(sp);
   }
 
@@ -49,7 +49,11 @@ namespace casadi {
     std::string a = g.arg(ind_);
     casadi_int i = res.front();
     if (nnz==1) {
-      g << g.workel(i) << " = " << a << " ? " << a << "[" << offset_ << "] : 0;\n";
+      if (data_type_=="int") {
+        g << g.workel(i) << " = ((casadi_int*) " << a << ")[" << offset_ << "];\n"; //nnz\n";
+      } else {
+        g << g.workel(i) << " = " << a << " ? " << a << "[" << offset_ << "] : 0;\n"; //nnz\n";
+      }
     } else if (offset_==0) {
       if (g.elide_copy(nnz)) {
         g << g.work(i, nnz, true) << " = " << a << " ? " << a << " : " << g.zeros(nnz) << ";\n";
@@ -69,8 +73,8 @@ namespace casadi {
     }
   }
 
-  Output::Output(const MX& x, casadi_int ind, casadi_int segment, casadi_int offset)
-    : IOInstruction(ind, segment, offset) {
+  Output::Output(const MX& x, casadi_int ind, casadi_int segment, casadi_int offset, const std::string& data_type)
+    : IOInstruction(ind, segment, offset, data_type) {
     set_dep(x);
   }
 
@@ -114,12 +118,14 @@ namespace casadi {
     s.pack("IOInstruction::ind", ind_);
     s.pack("IOInstruction::segment", segment_);
     s.pack("IOInstruction::offset", offset_);
+    s.pack("IOInstruction::data_type", data_type_);
   }
 
   IOInstruction::IOInstruction(DeserializingStream& s) : MXNode(s) {
     s.unpack("IOInstruction::ind", ind_);
     s.unpack("IOInstruction::segment", segment_);
     s.unpack("IOInstruction::offset", offset_);
+    s.unpack("IOInstruction::data_type", data_type_);
   }
 
 } // namespace casadi
