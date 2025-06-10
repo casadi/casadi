@@ -483,7 +483,7 @@ namespace casadi {
 #endif
   }
 
-  void OsqpInterface::codegen_body(CodeGenerator& g) const {
+  void OsqpInterface::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.add_include("osqp/osqp.h");
     g.add_auxiliary(CodeGenerator::AUX_INF);
 

@@ -111,10 +111,10 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Generate code for the function body */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;

@@ -128,10 +128,10 @@ namespace casadi {
     bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /// A documentation string
     static const std::string meta_doc;

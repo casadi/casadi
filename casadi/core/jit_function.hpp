@@ -81,7 +81,8 @@ namespace casadi {
     /** \brief Generate code for the function body
 
         \identifier{ai} */
-    void codegen_body(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g,
+      const Instance& inst) const override;
 
     ///@{
     /** \brief Jacobian of all outputs with respect to all inputs

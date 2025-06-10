@@ -2450,7 +2450,7 @@ namespace casadi {
     casadi_error("'get_jacobian' not defined for " + class_name());
   }
 
-  void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
+  void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname, const Instance& inst) const {
     // Define function
     g << "/* " << definition() << " */\n";
     g << "static " << signature(fname) << " {\n";
@@ -2480,7 +2480,7 @@ namespace casadi {
     if (print_in_) g.generate_print(shared_from_this<Function>(), "arg", true);
 
     // Generate function body (to buffer)
-    codegen_body(g);
+    codegen_body(g, inst);
 
     if (dump_out_) g.generate_dump(shared_from_this<Function>(), "res", false);
     if (print_out_) g.generate_print(shared_from_this<Function>(), "res", false);
@@ -2516,7 +2516,7 @@ namespace casadi {
     return "int " + fname + "_unrolled(" + join(args, ", ") + ")";
   }
 
-  void FunctionInternal::codegen_incref(CodeGenerator& g) const {
+  void FunctionInternal::codegen_incref(CodeGenerator& g, const Instance& inst) const {
     if (has_refcount_) {
       std::string name = codegen_name(g, false);
       std::string ref_counter = g.shorthand(name + "_ref_counter");
@@ -2549,7 +2549,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::codegen_decref(CodeGenerator& g) const {
+  void FunctionInternal::codegen_decref(CodeGenerator& g, const Instance& inst) const {
 
     // Treat dependent functions
     std::set<void*> added;
@@ -2690,6 +2690,7 @@ namespace casadi {
     g << "}\n\n";
 
     // Reference counter routines
+    Instance inst;
     g << g.declare("void " + name_ + "_incref(void)") << " {\n";
     if (has_refcount_in_deps_) {
       std::string incref = g.shorthand(name + "_incref");
@@ -2997,11 +2998,12 @@ namespace casadi {
     return mem_array+"[" + index + "]";
   }
 
-  void FunctionInternal::codegen_declarations(CodeGenerator& g) const {
+  void FunctionInternal::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     // Nothing to declare
   }
 
-  void FunctionInternal::codegen_body(CodeGenerator& g) const {
+  void FunctionInternal::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     casadi_warning("The function \"" + name_ + "\", which is of type \""
                    + class_name() + "\" cannot be code generated. The generation "
                    "will proceed, but compilation of the code will not be possible.");

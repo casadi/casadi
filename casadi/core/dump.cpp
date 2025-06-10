@@ -122,7 +122,8 @@ namespace casadi {
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res,
                           const std::vector<bool>& arg_is_ref,
-                          std::vector<bool>& res_is_ref) const {
+                          std::vector<bool>& res_is_ref,
+                          bool prefer_inline) const {
     std::string format = format_.empty() ? "mtx" : format_;
     std::string effective_dir = g.dump_dir_prefix + dir_ + g.dump_dir_suffix;
     std::string prefix;

@@ -304,14 +304,16 @@ namespace casadi {
     // Give it a name
     std::string fname = shorthand("f" + str(added_functions_.size()));
 
+    Instance inst;
+
     // Add to list of functions
     added_functions_.push_back({f, fname});
 
     // Generate declarations
-    f->codegen_declarations(*this);
+    f->codegen_declarations(*this, inst);
 
     // Print to file
-    f->codegen(*this, fname);
+    f->codegen(*this, fname, inst);
 
     bool fun_needs_mem = f->codegen_needs_mem();
     needs_mem_ |= fun_needs_mem;
@@ -366,12 +368,12 @@ namespace casadi {
     if (f->has_refcount_in_deps_) {
       // Increase reference counter
       *this << "void " << fname << "_incref(void) {\n";
-      f->codegen_incref(*this);
+      f->codegen_incref(*this, inst);
       *this << "}\n\n";
 
       // Decrease reference counter
       *this << "void " << fname << "_decref(void) {\n";
-      f->codegen_decref(*this);
+      f->codegen_decref(*this, inst);
       *this << "}\n\n";
     }
 
