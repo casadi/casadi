@@ -81,6 +81,7 @@ namespace casadi {
     always_inline_ = false;
     never_inline_ = false;
     jac_penalty_ = 2;
+    Dict coloring_options_ = Dict();
     max_num_dir_ = GlobalOptions::getMaxNumDir();
     user_data_ = nullptr;
     inputs_check_ = true;
@@ -360,7 +361,10 @@ namespace casadi {
         "Prepopulate the function cache. Default: empty"}},
       {"external_transform",
        {OT_VECTORVECTOR,
-        "List of external_transform instruction arguments. Default: empty"}}
+        "List of external_transform instruction arguments. Default: empty"}},
+      {"data_type",
+       {OT_STRINGVECTOR,
+        "Data types"}}
      }
   };
 
@@ -431,6 +435,9 @@ namespace casadi {
     opts["dump_dir"] = dump_dir_;
     opts["dump_format"] = dump_format_;
     opts["dump"] = dump_;
+    opts["forward_options"] = forward_options_;
+    opts["reverse_options"] = reverse_options_;
+    opts["data_type"] = data_type_;
     if (keep_dim) {
       opts["is_diff_in"] = is_diff_in_;
       opts["is_diff_out"] = is_diff_out_;
@@ -570,6 +577,8 @@ namespace casadi {
         is_diff_out_ = op.second;
       } else if (op.first=="cache") {
         cache_init_ = op.second;
+      } else if (op.first=="data_type") {
+        data_type_ = op.second;
       }
     }
 
@@ -1172,6 +1181,8 @@ namespace casadi {
       my_opts["ad_weight_sp"] = sp_weight();
     if (my_opts.find("max_num_dir")==my_opts.end())
       my_opts["max_num_dir"] = max_num_dir_;
+    my_opts["is_diff_in"] = is_diff_in_;
+    my_opts["is_diff_out"] = is_diff_out_;
     // Wrap the function
     std::vector<MX> arg = mx_in();
     std::vector<MX> res = self()(arg);
@@ -2364,9 +2375,21 @@ namespace casadi {
     return ret;
   }
 
+  casadi_int FunctionInternal::nnz_in_diff() const {
+    casadi_int ret=0;
+    for (casadi_int iind=0; iind<n_in_; ++iind) if (is_diff_in_[iind]) ret += nnz_in(iind);
+    return ret;
+  }
+
   casadi_int FunctionInternal::nnz_out() const {
     casadi_int ret=0;
     for (casadi_int oind=0; oind<n_out_; ++oind) ret += nnz_out(oind);
+    return ret;
+  }
+
+  casadi_int FunctionInternal::nnz_out_diff() const {
+    casadi_int ret=0;
+    for (casadi_int oind=0; oind<n_out_; ++oind)  if (is_diff_out_[oind]) ret += nnz_out(oind);
     return ret;
   }
 
@@ -2450,29 +2473,105 @@ namespace casadi {
   void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname, const Instance& inst) const {
     // Define function
     g << "/* " << definition() << " */\n";
-    g << "static " << signature(fname) << " {\n";
+
+    bool vectorize = false;
+    for (auto e : inst.stride_in) {
+      if (e>1) vectorize = true;
+    }
+    for (auto e : inst.stride_out) {
+      if (e>1) vectorize = true;
+    }
+
+    bool prefer_inline = inst.prefer_inline;
+    uout() << fname << ":" << name_ << ":" << prefer_inline << std::endl;
+
+    std::string sig = signature(fname);
+    std::string decl = sig+";\n";
+
+    std::string resolved_name = g.name+"_"+codegen_name(g, false);
+
+    if (vectorize) {
+      if (is_a("SXFunction", false)) {
+        // A gcc bug (pre 11.1) causes avx512 emitted code not to be picked up, unless static is used.
+        // In a g.split setting, we must then declare static, but still make the symbols exported
+        sig = signature(fname, true);
+        std::string sig_intr = signature(fname, true, GlobalOptions::vector_width_real);
+        std::string omp = "#pragma omp declare simd uniform(arg, res, iw, w, mem) linear(i:1) simdlen(" + str(GlobalOptions::vector_width_real) + ") notinbranch\n";
+        decl = "";
+        if (g.split) decl += "#undef casadi_" + codegen_name(g, false) + "\n";
+        decl += omp;
+        if (g.split) {
+          decl += "static __attribute__((noinline)) __attribute__((used)) " + sig + ";\n";
+          decl += "extern " + signature(resolved_name, true, GlobalOptions::vector_width_real) + ";\n";
+          decl += "extern " + signature(resolved_name, true, 1) + ";\n";
+          decl += "static __attribute__((noinline)) __attribute__((used)) " + signature(fname, true, GlobalOptions::vector_width_real) + "{\n";
+          decl += codegen_self_call(resolved_name, true, GlobalOptions::vector_width_real) + ";\n";
+          decl += "}\n";
+          decl += "static __attribute__((noinline)) __attribute__((used)) " + signature(fname+"_alias", true, 1) + " asm(\"" + fname + "\");\n";
+          decl += "static " + signature(fname+"_alias", true, 1) + "{\n";
+          decl += codegen_self_call(resolved_name, true, 1) + ";\n";
+          decl += "}\n";
+        } else {
+          decl += "static __attribute__((noinline)) " + sig + ";\n";
+        }
+        g << omp;
+        if (!prefer_inline) g << "__attribute__((noinline)) ";
+        g << g.vector_width_attribute() << " " << sig << " {\n";
+      } else {
+        g << sig << " {\n";
+      }
+    } else {
+      if (!prefer_inline) g << "__attribute__((noinline)) ";
+      if (is_a("MapSum", false)) {
+        g << g.vector_width_attribute() << " " << sig << " {\n";
+      } else {
+        g << sig << " {\n";
+      }
+    }
+
+    std::stringstream s;
 
     // Reset local variables, flush buffer
-    g.flush(g.body);
+    g.flush(s);
 
     g.scope_enter();
 
     // Generate function body (to buffer)
     codegen_body(g, inst);
 
-    g.scope_exit();
+    g.scope_exit(s);
 
     // Finalize the function
-    g << "return 0;\n";
+    if (!vectorize || !is_a("SXFunction", false)) g << "return 0;\n";
     g << "}\n\n";
 
     // Flush to function body
-    g.flush(g.body);
+    g.flush(s);
+    g.body_parts[codegen_name(g, false)] = s.str();
+
+    if (g.split) g.casadi_headers << "#ifndef DEF_" << codegen_name(g, false) << "\n";
+
+    g.casadi_headers << decl;
+
+    if (g.split) g.casadi_headers << "#endif\n";
+  
+
   }
 
-  std::string FunctionInternal::signature(const std::string& fname) const {
-    return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
+  std::string FunctionInternal::signature(const std::string& fname, bool vectorize, casadi_int vector_width_real) const {
+    std::string name = fname;
+    if (vectorize) {
+      if (vector_width_real==8) {
+        name = "_ZGVeN8uuuuul_" + name;
+      } else if (vector_width_real==4) {
+        name = "_ZGVdN4uuuuul_" + name;
+      }
+      return "void " + name + "(const casadi_real**const arg, casadi_real**const res, "
+                            "casadi_int* iw, casadi_real* w, int mem, casadi_int i)";
+    } else {
+      return "int " + name + "(const casadi_real** arg, casadi_real** res, "
                             "casadi_int* iw, casadi_real* w, int mem)";
+    }
   }
 
   std::string FunctionInternal::signature_unrolled(const std::string& fname) const {
@@ -2489,6 +2588,18 @@ namespace casadi {
     args.push_back("casadi_real* w");
     args.push_back("int mem");
     return "int " + fname + "_unrolled(" + join(args, ", ") + ")";
+  }
+
+  std::string FunctionInternal::codegen_self_call(const std::string& fname, bool vectorize, casadi_int vector_width_real) const {
+    if (vector_width_real==1) {
+      return fname + "(arg, res, iw, w, mem, i)";
+    } else if (vector_width_real==8) {
+      return "_ZGVeN8uuuuul_" + fname + "(arg, res, iw, w, mem, i)";
+    } else if (vector_width_real==4) {
+      return "_ZGVdN4uuuuul_" + fname + "(arg, res, iw, w, mem, i)";
+    } else {
+      casadi_error("foo");
+    }
   }
 
   void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
@@ -2584,12 +2695,15 @@ namespace casadi {
     g << "}\n\n";
 
     // Reference counter routines
-    Instance inst;
     g << g.declare("void " + name_ + "_incref(void)") << " {\n";
-    codegen_incref(g, inst);
+    if (has_refcount_) {
+      g << codegen_name(g) << "_incref();\n";
+    }
     g << "}\n\n"
       << g.declare("void " + name_ + "_decref(void)") << " {\n";
-    codegen_decref(g, inst);
+    if (has_refcount_) {
+      g << codegen_name(g) << "_decref();\n";
+    }
     g << "}\n\n";
 
     // Number of inputs and outptus
@@ -2637,7 +2751,7 @@ namespace casadi {
       << "if (sz_arg) *sz_arg = " << codegen_sz_arg(g) << ";\n"
       << "if (sz_res) *sz_res = " << codegen_sz_res(g) << ";\n"
       << "if (sz_iw) *sz_iw = " << codegen_sz_iw(g) << ";\n"
-      << "if (sz_w) *sz_w = " << codegen_sz_w(g) << ";\n"
+      << "if (sz_w) *sz_w = " << codegen_sz_w(g) << "+" << align_w_ << "/sizeof(casadi_real);\n"
       << "return 0;\n"
       << "}\n\n";
 
@@ -2694,25 +2808,39 @@ namespace casadi {
         << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n"
         << "casadi_int i;\n";
       g << "int mem;\n";
-      // Work vectors, including input and output buffers
-      casadi_int i_nnz = nnz_in(), o_nnz = nnz_out();
-      size_t sz_w = this->sz_w();
+
+      int align_bytes = g.casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
+
+      // Work vectors and input and output buffers
+      g << CodeGenerator::array("casadi_int", "iw", sz_iw())
+        << CodeGenerator::array("casadi_real", "w", sz_w(), "", align_bytes);
+
+      // Extra work for from_mex
+      size_t sz_mw = 0;
       for (casadi_int i=0; i<n_in_; ++i) {
         const Sparsity& s = sparsity_in_[i];
-        sz_w = std::max(sz_w, static_cast<size_t>(s.size1())); // To be able to copy a column
-        sz_w = std::max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
+        sz_mw = std::max(sz_mw, static_cast<size_t>(s.size1())); // To be able to copy a column
+        sz_mw = std::max(sz_mw, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
-      sz_w += i_nnz + o_nnz;
-      g << CodeGenerator::array("casadi_real", "w", sz_w);
-      g << CodeGenerator::array("casadi_int", "iw", sz_iw());
-      std::string fw = "w+" + str(i_nnz + o_nnz);
+      g  << CodeGenerator::array("casadi_real", "mw", sz_mw);
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << CodeGenerator::array("casadi_real", "w_in" + str(i), nnz_in(i), "", align_bytes);
+      }
+      for (casadi_int i=0; i<n_out_; ++i) {
+        g << CodeGenerator::array("casadi_real", "w_out" + str(i), nnz_out(i), "", align_bytes);
+      }
+      // Input buffers
+      g << "const casadi_real* arg[" << sz_arg() << "];\n";
 
-      // Copy inputs to buffers
-      casadi_int offset=0;
-      g << CodeGenerator::array("const casadi_real*", "arg", sz_arg(), "{0}");
+      // Output buffers
+      g << "casadi_real* res[" << sz_res() << "];\n";
 
-      // Allocate output buffers
-      g << "casadi_real* res[" << sz_res() << "] = {0};\n";
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << "arg[" << i << "] = w_in" << i << ";\n";
+      }
+      for (casadi_int i=0; i<n_out_; ++i) {
+        g << "res[" << i << "] = 0;\n";
+      }
 
       // Check arguments
       g << "if (argc>" << n_in_ << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
@@ -2726,8 +2854,7 @@ namespace casadi {
       for (casadi_int i=0; i<n_in_; ++i) {
         std::string p = "argv[" + str(i) + "]";
         g << "if (--argc>=0) arg[" << i << "] = "
-          << g.from_mex(p, "w", offset, sparsity_in_[i], fw) << "\n";
-        offset += nnz_in(i);
+          << g.from_mex(p, "w_in" + str(i), 0, sparsity_in_[i], "mw") << "\n";
       }
 
       for (casadi_int i=0; i<n_out_; ++i) {
@@ -2739,14 +2866,13 @@ namespace casadi {
           g << "if (--resc>=0) ";
         }
         // Create and get pointer
-        g << g.res(i) << " = w+" << str(offset) << ";\n";
-        offset += nnz_out(i);
+        g << g.res(i, true) << " = w_out" << i << ";\n";
       }
       g << name_ << "_incref();\n";
       g << "mem = " << name_ << "_checkout();\n";
 
       // Call the function
-      g << "i = " << name_ << "(arg, res, iw, " << fw << ", mem);\n"
+      g << "i = " << name_ << "(arg, res, iw, w, mem);\n"
         << "if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << name_
         << "\\\" failed.\");\n";
       g << name_ << "_release(mem);\n";
@@ -2754,8 +2880,8 @@ namespace casadi {
 
       // Save results
       for (casadi_int i=0; i<n_out_; ++i) {
-        g << "if (" << g.res(i) << ") resv[" << i << "] = "
-          << g.to_mex(sparsity_out_[i], g.res(i)) << "\n";
+        g << "if (" << g.res(i, true) << ") resv[" << i << "] = "
+          << g.to_mex(sparsity_out_[i], g.res(i, true)) << "\n";
       }
 
       // End conditional compilation and function
@@ -2766,47 +2892,53 @@ namespace casadi {
     if (g.main) {
       // Declare wrapper
       g << "casadi_int main_" << name_ << "(casadi_int argc, char* argv[]) {\n";
-
+      g << "int mem;\n";
       g << "casadi_int j;\n";
       g << "casadi_real* a;\n";
       g << "const casadi_real* r;\n";
       g << "casadi_int flag;\n";
       if (needs_mem) g << "int mem;\n";
 
-
+      int align_bytes = g.casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
 
       // Work vectors and input and output buffers
-      size_t nr = sz_w() + nnz_in() + nnz_out();
       g << CodeGenerator::array("casadi_int", "iw", sz_iw())
-        << CodeGenerator::array("casadi_real", "w", nr);
+        << CodeGenerator::array("casadi_real", "w", sz_w(), "", align_bytes);
 
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << CodeGenerator::array("casadi_real", "w_in" + str(i), nnz_in(i), "", align_bytes);
+      }
+      for (casadi_int i=0; i<n_out_; ++i) {
+        g << CodeGenerator::array("casadi_real", "w_out" + str(i), nnz_out(i), "", align_bytes);
+      }
       // Input buffers
       g << "const casadi_real* arg[" << sz_arg() << "];\n";
 
       // Output buffers
       g << "casadi_real* res[" << sz_res() << "];\n";
 
-      casadi_int off=0;
       for (casadi_int i=0; i<n_in_; ++i) {
-        g << "arg[" << i << "] = w+" << off << ";\n";
-        off += nnz_in(i);
+        g << "arg[" << i << "] = w_in" << i << ";\n";
       }
       for (casadi_int i=0; i<n_out_; ++i) {
-        g << "res[" << i << "] = w+" << off << ";\n";
-        off += nnz_out(i);
+        g << "res[" << i << "] = w_out" << i << ";\n";
       }
 
+      std::string t = g.casadi_real_type=="float" ? "%g" : "%lg";
+
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
-      g << "a = w;\n"
-        << "for (j=0; j<" << nnz_in() << "; ++j) "
-        << "if (scanf(\"%lg\", a++)<=0) return 2;\n";
+      for (casadi_int i=0; i<n_in_; ++i) {
+        g << "a = w_in" << i << ";\n"
+          << "for (j=0; j<" << nnz_in(i) << "; ++j) "
+          << "if (scanf(\"" << t << "\", a++)<=0) return 2;\n";
+      }
 
       if (needs_mem) {
         g << "mem = " << name_ << "_checkout();\n";
       }
 
       // Call the function
-      g << "flag = " << name_ << "(arg, res, iw, w+" << off << ", ";
+      g << "flag = " << name_ << "(arg, res, iw, w, ";
       if (needs_mem) {
         g << "mem";
       } else {
@@ -2818,10 +2950,15 @@ namespace casadi {
       }
       g << "if (flag) return flag;\n";
 
+      g << name_ << "_release(mem);\n";
+      g << name_ << "_decref();\n";
+
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
-      g << "r = w+" << nnz_in() << ";\n"
-        << "for (j=0; j<" << nnz_out() << "; ++j) "
-        << g.printf("%g ", "*r++") << "\n";
+      for (casadi_int i=0; i<n_out_; ++i) {
+        g << "r = w_out" << i << ";\n"
+          << "for (j=0; j<" << nnz_out(i) << "; ++j) "
+          << g.printf("%.16e\\n", "*r++") << "\n";
+      }
 
       // End with newline
       g << g.printf("\\n") << "\n";
@@ -3058,12 +3195,12 @@ namespace casadi {
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
-    if (jac_penalty_*static_cast<double>(nnz_in())<nfwd) return true;
+    if (jac_penalty_*static_cast<double>(nnz_in_diff())<nfwd) return true;
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = ad_weight();
     if (enable_reverse_ &&
-        jac_penalty_*(1-w)*static_cast<double>(nnz_out())<w*static_cast<double>(nfwd))
+        jac_penalty_*(1-w)*static_cast<double>(nnz_out_diff())<w*static_cast<double>(nfwd))
       return true; // NOLINT
 
     return false;
@@ -3074,12 +3211,12 @@ namespace casadi {
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
-    if (jac_penalty_*static_cast<double>(nnz_out())<nadj) return true;
+    if (jac_penalty_*static_cast<double>(nnz_out_diff())<nadj) return true;
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = ad_weight();
     if ((enable_forward_ || enable_fd_) &&
-        jac_penalty_*w*static_cast<double>(nnz_in())<(1-w)*static_cast<double>(nadj))
+        jac_penalty_*w*static_cast<double>(nnz_in_diff())<(1-w)*static_cast<double>(nadj))
       return true; // NOLINT
 
     return false;
@@ -4148,6 +4285,7 @@ namespace casadi {
     s.pack("FunctionInternal::align_w", align_w_);
     s.pack("FunctionInternal::layout_in", layout_in_);
     s.pack("FunctionInternal::layout_out", layout_out_);
+    s.pack("FunctionInternal::data_type", data_type_);
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
@@ -4265,10 +4403,12 @@ namespace casadi {
     checkout_ = nullptr;
     release_ = nullptr;
     dump_count_ = 0;
+
     if (version>=2) {
       s.unpack("FunctionInternal::align_w", align_w_);
       s.unpack("FunctionInternal::layout_in", layout_in_);
       s.unpack("FunctionInternal::layout_out", layout_out_);
+      s.unpack("FunctionInternal::data_type", data_type_);
     } else {
       align_w_ = 1;
     }

@@ -59,11 +59,11 @@ namespace casadi {
     this->max_declarations_per_line = 12;
     this->max_initializer_elements_per_line = 8;
     this->force_canonical = false;
-
+    this->split = false;
+    this->blasfeo = true;
     avoid_stack_ = false;
     indent_ = 2;
     sz_zeros_ = 0;
-    sz_ones_ = 0;
 
     // Read options
     for (auto&& e : opts) {
@@ -124,6 +124,10 @@ namespace casadi {
       } else if (e.first=="vector_width") {
         vector_width_ = e.second.to_int();
         casadi_assert(is_pow2(vector_width_), "vector width must be power of 2");
+      } else if (e.first=="split") {
+        split = e.second;
+      } else if (e.first=="blasfeo") {
+        blasfeo = e.second;
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -201,6 +205,8 @@ namespace casadi {
       this->prefix = this->name;
     }
 
+    this->header << "int set_pool_double(const char* name, const casadi_real* v);\n";
+
   }
 
   void CodeGenerator::scope_enter() {
@@ -208,7 +214,7 @@ namespace casadi {
     local_default_.clear();
   }
 
-  void CodeGenerator::scope_exit() {
+  void CodeGenerator::scope_exit(std::ostream& s) {
     // Order local variables
     std::map<std::string, std::set<std::pair<std::string, std::string>>> local_variables_by_type;
     for (auto&& e : local_variables_) {
@@ -222,18 +228,18 @@ namespace casadi {
         bool split_declaration = it==e.second.begin() ||
                      (max_declarations_per_line>1 && cnt % max_declarations_per_line==0);
         if (split_declaration) {
-          if (it!=e.second.begin()) body << ";\n";
-          body << "  " << e.first << " ";
+          if (it!=e.second.begin()) s << ";\n";
+          s << "  " << e.first << " ";
         } else {
-          body << ", ";
+          s << ", ";
         }
-        body << it->second << it->first;
+        s << it->second << it->first;
         // Insert definition, if any
         auto k=local_default_.find(it->first);
-        if (k!=local_default_.end()) body << "=" << k->second;
+        if (k!=local_default_.end()) s << "=" << k->second;
         cnt++;
       }
-      body << ";\n";
+      s << ";\n";
     }
   }
 
@@ -250,21 +256,57 @@ namespace casadi {
     }
   }
 
+  bool CodeGenerator::has_dependency(const Function& f, const Instance& inst) const {
+    bool ret = false;
+    for (const auto& e : added_functions_) if (e.f==f && e.inst==inst) ret = true;
+    return ret;
+  }
+
   std::string CodeGenerator::add_dependency(const Function& f, const Instance& inst, const Function& owner) {
+
+    /*std::string prefix = "_";
+    for (bool b : arg_null) prefix+= b ? 'n' : 'r';
+    prefix += "_";
+    for (bool b : res_null) prefix+= b ? 'n' : 'r';*/
+
     // Quick return if it already exists
-    for (auto&& e : added_functions_) if (e.f==f) return e.codegen_name;
+    for (auto&& e : added_functions_) if (e.f==f && e.inst==inst) {
+      if (inst.prefer_inline && !owner.is_null()) {
+        std::set<std::string>& dep = dependees_[owner->codegen_name(*this, false)];
+        dep.insert(f->codegen_name(*this, false));
+        // Add recursively
+        for (const auto& e : dependees_[f->codegen_name(*this, false)]) {
+          dep.insert(e);
+        }
+      }
+      return e.codegen_name;
+    }
 
     // Give it a name
     std::string fname = shorthand("f" + str(added_functions_.size()));
 
     // Add to list of functions
-    added_functions_.push_back({f, fname});
+    added_functions_.push_back({f, fname, inst});
+
+    std::stringstream s;
+    // Reset local variables, flush buffer
+    flush(s);
 
     // Generate declarations
     f->codegen_declarations(*this, inst);
 
+    comment("dependees: " + str(dependees_[f->codegen_name(*this, false)]));
+
+    comment("inst: " + str(inst.arg_null) + ":" + str(inst.res_null) + str(inst.stride_in) + str(inst.stride_out) + str(inst.prefer_inline));
+
+    // Flush to function body
+    flush(s);
+    std::string declarations = s.str();
+
     // Print to file
     f->codegen(*this, fname, inst);
+
+    body_parts[f->codegen_name(*this, false)] = declarations + body_parts[f->codegen_name(*this, false)];
 
     // Codegen reference count functions, if needed
     if (f->has_refcount_) {
@@ -288,7 +330,7 @@ namespace casadi {
       flush(this->body);
       scope_enter();
       f->codegen_alloc_mem(*this);
-      scope_exit();
+      scope_exit(this->body);
       *this << "}\n\n";
 
       // Initialize memory
@@ -296,7 +338,7 @@ namespace casadi {
       flush(this->body);
       scope_enter();
       f->codegen_init_mem(*this);
-      scope_exit();
+      scope_exit(this->body);
       *this << "}\n\n";
 
       // Clear memory
@@ -304,7 +346,7 @@ namespace casadi {
       flush(this->body);
       scope_enter();
       f->codegen_free_mem(*this);
-      scope_exit();
+      scope_exit(this->body);
       *this << "}\n\n";
 
       // Checkout
@@ -312,7 +354,7 @@ namespace casadi {
       flush(this->body);
       scope_enter();
       f->codegen_checkout(*this);
-      scope_exit();
+      scope_exit(this->body);
       *this << "}\n\n";
 
       // Clear memory
@@ -320,9 +362,17 @@ namespace casadi {
       flush(this->body);
       scope_enter();
       f->codegen_release(*this);
-      scope_exit();
+      scope_exit(this->body);
       *this << "}\n\n";
 
+    }
+
+    if (inst.prefer_inline && !owner.is_null()) {
+      std::set<std::string>& dep = dependees_[owner->codegen_name(*this, false)];
+      dep.insert(f->codegen_name(*this, false));
+      for (const auto& e : dependees_[f->codegen_name(*this, false)]) {
+        dep.insert(e);
+      }
     }
 
     // Flush to body
@@ -336,6 +386,11 @@ namespace casadi {
 
     // 
     Instance inst;
+    inst.arg_null.resize(f.n_in(), false);
+    inst.res_null.resize(f.n_out(), false);
+    inst.stride_in.resize(f.n_in(), 1);
+    inst.stride_out.resize(f.n_out(), 1);
+    inst.prefer_inline = false;
     std::string codegen_name = add_dependency(f, inst);
 
     if (f.align_w()>1) {
@@ -343,8 +398,11 @@ namespace casadi {
     }
 
     // Define function
-    *this << declare(f->signature(f.name())) << "{\n"
-          << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
+    *this << declare(f->signature(f.name())) << "{\n";
+    if (f.align_w()>1) {
+      *this << "w = " << align("w", f.align_w()) << "\n";
+    }
+    *this << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
           << "}\n\n";
 
     if (this->unroll_args) {
@@ -385,7 +443,7 @@ namespace casadi {
 
   std::string CodeGenerator::dump() {
     std::stringstream s;
-    dump(s);
+    dump(s, body.str());
     return s.str();
   }
 
@@ -478,14 +536,63 @@ namespace casadi {
        "Instead of providing the filename, only provide the prefix.");
 
     // Create c file
-    std::string fullname = prefix + this->name + this->suffix;
+    std::string fullname = prefix + this->name + (split? "_common" : "") + this->suffix;
+
+    std::vector<std::string> part_names = {fullname};
 
     auto s_ptr = Filesystem::ofstream_ptr(fullname);
     std::ostream& s = *s_ptr;
     stream_open(s, this->cpp);
 
+    if (split) s << "#define DEF_common\n";
+    dump_preamble(s, split);
+
+    for (const auto& e : body_parts) {
+      if (split) {
+        // Create c file
+        std::string fullname = prefix + this->name + "_" + e.first + this->suffix;
+
+        auto ss_ptr = Filesystem::ofstream_ptr(fullname);
+        std::ostream& ss = *ss_ptr;
+        stream_open(s, this->cpp);
+
+        part_names.push_back(fullname);
+
+        ss << "#define DEF_" + e.first << "\n";
+        for (const std::string& d : dependees_[e.first]) {
+          ss <<  "#define DEF_" + d << "\n";
+        }
+        dump_preamble(ss, false);
+
+        for (const std::string& d : dependees_[e.first]) {
+          ss << body_parts[d];
+        }
+        
+        ss << e.second << std::endl;
+
+        // Finalize file
+        stream_close(ss, this->cpp);
+        ss_ptr.reset();
+      } else {
+        s << e.second << std::endl;
+      }
+    }
+
     // Dump code to file
-    dump(s);
+    dump(s, body.str());
+
+    if (!pool_double_defaults_.empty()) {
+      s << "CASADI_SYMBOL_EXPORT int set_pool_double(const char* name, const casadi_real* v) {\n";
+      for (const auto& e : pool_double_) {
+        casadi_int i = e.second;
+        s << "  if (strcmp(name, \"" + e.first + "\")==0) {\n"
+          << "casadi_copy(v, " + str(pool_double_defaults_[i].size()) + ", casadi_pd" + str(i) + ");\n"
+          << "return 0;\n"
+          << "}\n";
+      }
+      s << "return 1;\n";
+      s << "}\n";
+    }
 
     if (!pool_double_defaults_.empty()) {
       s << "CASADI_SYMBOL_EXPORT casadi_real* CASADI_PREFIX(get_pool_double)(const char* name) {\n";
@@ -540,7 +647,16 @@ namespace casadi {
       stream_close(s, this->cpp);
       s_ptr.reset();
     }
-    return fullname;
+
+    return join(part_names,";");
+  }
+
+  void CodeGenerator::add_extra_declarations(const Function& f, const std::string& extra) {
+    body_parts[f->codegen_name(*this, false)] = extra + body_parts[f->codegen_name(*this, false)];
+  }
+
+  void CodeGenerator::add_extra_definitions(const Function& f, const std::string& extra) {
+    //this->header << extra;
   }
 
   void CodeGenerator::generate_mex(std::ostream &s) const {
@@ -804,30 +920,15 @@ namespace casadi {
 
   void CodeGenerator::define_rom_double(const void* id, casadi_int size) {
     auto it = file_scope_double_.find(id);
-    casadi_assert(it==file_scope_double_.end(), "Already defined.");
-    shorthand("rd" + str(file_scope_double_.size()));
-    file_scope_double_[id] = size;
-  }
+    if (it==file_scope_double_.end()) {
+      file_scope_double_size_.push_back(size);
+      casadi_int index = file_scope_double_.size();
+      shorthand("rd" + str(index));
+      file_scope_double_[id] = index;
+    } else {
+      casadi_assert_dev(size==file_scope_double_size_[it->second]);
+    }
 
-  std::string CodeGenerator::rom_double(const void* id) const {
-    auto it = file_scope_double_.find(id);
-    casadi_assert(it!=file_scope_double_.end(), "Not defined.");
-    casadi_int size = std::distance(file_scope_double_.begin(), it);
-    return "casadi_rd" + str(size);
-  }
-
-  void CodeGenerator::define_rom_integer(const void* id, casadi_int size) {
-    auto it = file_scope_double_.find(id);
-    casadi_assert(it==file_scope_double_.end(), "Already defined.");
-    shorthand("ri" + str(file_scope_double_.size()));
-    file_scope_double_[id] = size;
-  }
-
-  std::string CodeGenerator::rom_integer(const void* id) const {
-    auto it = file_scope_double_.find(id);
-    casadi_assert(it!=file_scope_double_.end(), "Not defined.");
-    casadi_int size = std::distance(file_scope_double_.begin(), it);
-    return "casadi_ri" + str(size);
   }
 
   void CodeGenerator::define_pool_double(const std::string& name, const std::vector<double>& def) {
@@ -841,6 +942,12 @@ namespace casadi {
       casadi_assert_dev(def==pool_double_defaults_[it->second]);
     }
   }
+  
+  std::string CodeGenerator::rom_double(const void* id) const {
+    auto it = file_scope_double_.find(id);
+    casadi_assert(it!=file_scope_double_.end(), "Not defined.");
+    return "casadi_rd" + str(it->second);
+  }
 
   std::string CodeGenerator::pool_double(const std::string& name) const {
     auto it = pool_double_.find(name);
@@ -848,7 +955,25 @@ namespace casadi {
     return "casadi_pd" + str(it->second);
   }
 
-  void CodeGenerator::dump(std::ostream& s) {
+  void CodeGenerator::define_rom_integer(const void* id, casadi_int size) {
+    auto it = file_scope_integer_.find(id);
+    if (it==file_scope_integer_.end()) {
+      file_scope_integer_size_.push_back(size);
+      casadi_int index = file_scope_integer_.size();
+      shorthand("ri" + str(index));
+      file_scope_integer_[id] = index;
+    } else {
+      casadi_assert_dev(size==file_scope_double_size_[it->second]);
+    }
+  }
+
+  std::string CodeGenerator::rom_integer(const void* id) const {
+    auto it = file_scope_integer_.find(id);
+    casadi_assert(it!=file_scope_integer_.end(), "Not defined.");
+    return "casadi_ri" + str(it->second);
+  }
+
+  void CodeGenerator::dump_preamble(std::ostream& s, bool common) {
     // Consistency check
     casadi_assert_dev(current_indent_ == 0);
 
@@ -861,6 +986,9 @@ namespace casadi {
       << "#else\n"
       << "  #define CASADI_PREFIX(ID) " << this->prefix << "_ ## ID\n"
       << "#endif\n\n";
+    
+    s << "#define CASADI_STRINGIFY(s) CASADI_INTERNAL_STRINGIFY(s)\n";
+    s << "#define CASADI_INTERNAL_STRINGIFY(s) #s\n";
 
     s << this->includes.str();
     s << std::endl;
@@ -946,17 +1074,26 @@ namespace casadi {
       s << std::endl;
     }
 
-    if (sz_ones_) {
+    /*if (sz_ones_) {
       std::vector<double> sz_ones(sz_ones_, 0);
-      print_vector(s, "casadi_ones", std::vector<double>(sz_ones));
-      s << std::endl;
-    }
+      print_vector(s, "casadi_ones", std::vector<double>(sz_ones), align_bytes);
+    }*/
 
     // Print file scope double work
     if (!file_scope_double_.empty()) {
       casadi_int i=0;
-      for (const auto& it : file_scope_double_) {
-        s << "static casadi_real casadi_rd" + str(i++) + "[" + str(it.second) + "];\n";
+      for (auto size : file_scope_double_size_) {
+        if (split && !common) {
+          s << "extern casadi_real casadi_rd" + str(i) + "[" + str(size) + "] __attribute__((aligned (" << align_bytes << ")));\n";
+        } else {
+          s << "casadi_real casadi_rd" + str(i) + "[" + str(size) + "] __attribute__((aligned (" << align_bytes << ")));\n";
+        }
+        /*s << "#ifdef DEF_common\n";
+        s << "casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
+        s << "#else\n";
+        s << "extern casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
+        s << "#endif\n";*/
+        i++;
       }
       s << std::endl;
     }
@@ -964,8 +1101,8 @@ namespace casadi {
     // Print file scope integer work
     if (!file_scope_integer_.empty()) {
       casadi_int i=0;
-      for (const auto& it : file_scope_integer_) {
-        s << "static casadi_real casadi_ri" + str(i++) + "[" + str(it.second) + "];\n";
+      for (auto size : file_scope_integer_size_) {
+        s << "static casadi_real casadi_ri" + str(i++) + "[" + str(size) + "];\n";
       }
       s << std::endl;
     }
@@ -974,8 +1111,11 @@ namespace casadi {
     if (!pool_double_.empty()) {
       casadi_int i=0;
       for (const auto& v : pool_double_defaults_) {
-        s << "casadi_real casadi_pd" + str(i) +
-          "[" + str(v.size()) + "] = " + initializer(v) + ";\n";
+        if (split && !common) {
+          s << "extern casadi_real casadi_pd" + str(i) + "[" + str(v.size()) + "];\n";
+        } else {
+          s << "casadi_real casadi_pd" + str(i) + "[" + str(v.size()) + "] = " + initializer(v) + ";\n";
+        }
         i++;
       }
       s << std::endl;
@@ -990,8 +1130,13 @@ namespace casadi {
       s << std::endl << std::endl;
     }
 
-    // Codegen body
-    s << this->body.str();
+    s << casadi_headers.str();
+
+    s << "#pragma omp declare simd simdlen(4)\n";
+    s << "#pragma omp declare simd simdlen(8)\n";      
+    s << "static __attribute__((noinline)) casadi_int casadi_real2int(casadi_real a) {\n"
+      << "  return a;\n"
+      << "}\n";
 
     // End with new line
     s << std::endl;
@@ -1024,6 +1169,16 @@ namespace casadi {
     }
   }
 
+  void CodeGenerator::dump(std::ostream& s, const std::string& body) {
+
+    // Codegen body
+    s << body;
+
+    // End with new line
+    s << std::endl;
+  }
+
+
   std::string CodeGenerator::workel(casadi_int n) const {
     if (n<0) return "0";
     std::stringstream s;
@@ -1047,6 +1202,7 @@ namespace casadi {
     ss << std::setw(padding_length_) << std::setfill('0') << i;
     return ss.str();
   }
+
 
   std::string CodeGenerator::array(const std::string& type, const std::string& name, const std::string& len,
                                    const std::string& def, casadi_int align) {
@@ -1201,7 +1357,7 @@ namespace casadi {
   operator()(const Function& f, const std::string& arg,
              const std::string& res, const std::string& iw,
              const std::string& w, const std::string& failure_ret,
-             const Instance& inst) {
+             const Instance& inst, const std::string& iter) {
     std::string name = add_dependency(f, inst);
     bool needs_mem = !f->codegen_mem_type().empty();
     if (needs_mem) {
@@ -1216,7 +1372,7 @@ namespace casadi {
       return "flag";
     } else {
       return name + "(" + arg + ", " + res + ", "
-              + iw + ", " + w + ", 0)";
+              + iw + ", " + w + ", 0" + (iter.empty() ? "": ", "+iter) + ")";
     }
   }
 
@@ -1393,10 +1549,10 @@ namespace casadi {
     return shorthand("zeros");
   }
 
-  std::string CodeGenerator::ones(casadi_int sz) {
-    sz_ones_ = std::max(sz_ones_, sz);
-    return shorthand("ones");
-  }
+  //std::string CodeGenerator::ones(casadi_int sz) {
+  //  sz_ones_ = std::max(sz_ones_, sz);
+  //  return shorthand("ones");
+  //}
 
   void CodeGenerator::constant_copy(
       const std::string& name, const std::vector<casadi_int>& v, const std::string& type) {
@@ -1431,6 +1587,7 @@ namespace casadi {
     switch (f) {
     case AUX_COPY:
       this->auxiliaries << sanitize_source(casadi_copy_str, inst);
+      add_include("string.h");
       break;
     case AUX_SCALED_COPY:
       this->auxiliaries << sanitize_source(casadi_scaled_copy_str, inst);
@@ -1696,6 +1853,9 @@ namespace casadi {
     case AUX_CACHE:
       this->auxiliaries << sanitize_source(casadi_cache_str, inst);
       break;
+    case AUX_ASSERT:
+      add_include("assert.h");
+      break;
     case AUX_ALIGN:
       add_include("stdint.h");
       this->auxiliaries << sanitize_source(casadi_align_str, inst);
@@ -1759,16 +1919,16 @@ namespace casadi {
       break;
     case AUX_SQ:
       shorthand("sq");
-      this->auxiliaries << "casadi_real casadi_sq(casadi_real x) { return x*x;}\n\n";
+      this->auxiliaries << "static casadi_real casadi_sq(casadi_real x) { return x*x;}\n\n";
       break;
     case AUX_SIGN:
       shorthand("sign");
-      this->auxiliaries << "casadi_real casadi_sign(casadi_real x) "
+      this->auxiliaries << "static casadi_real casadi_sign(casadi_real x) "
                         << "{ return x<0 ? -1 : x>0 ? 1 : x;}\n\n";
       break;
     case AUX_IF_ELSE:
       shorthand("if_else");
-      this->auxiliaries << "casadi_real casadi_if_else"
+      this->auxiliaries << "static casadi_real casadi_if_else"
                         << "(casadi_real c, casadi_real x, casadi_real y) "
                         << "{ return c!=0 ? x : y;}\n\n";
       break;
@@ -1791,7 +1951,7 @@ namespace casadi {
       break;
     case AUX_FMIN:
       shorthand("fmin");
-      this->auxiliaries << "casadi_real casadi_fmin(casadi_real x, casadi_real y) {\n"
+      this->auxiliaries << "static casadi_real casadi_fmin(casadi_real x, casadi_real y) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x<y ? x : y;\n"
@@ -1802,7 +1962,7 @@ namespace casadi {
       break;
     case AUX_FMAX:
       shorthand("fmax");
-      this->auxiliaries << "casadi_real casadi_fmax(casadi_real x, casadi_real y) {\n"
+      this->auxiliaries << "static casadi_real casadi_fmax(casadi_real x, casadi_real y) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x>y ? x : y;\n"
@@ -1813,7 +1973,7 @@ namespace casadi {
       break;
     case AUX_FABS:
       shorthand("fabs");
-      this->auxiliaries << "casadi_real casadi_fabs(casadi_real x) {\n"
+      this->auxiliaries << "static casadi_real casadi_fabs(casadi_real x) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x>0 ? x : -x;\n"
@@ -1824,7 +1984,7 @@ namespace casadi {
       break;
     case AUX_ISINF:
       shorthand("isinf");
-      this->auxiliaries << "casadi_real casadi_isinf(casadi_real x) {\n"
+      this->auxiliaries << "static casadi_real casadi_isinf(casadi_real x) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x== INFINITY || x==-INFINITY;\n"
@@ -1834,12 +1994,12 @@ namespace casadi {
                         << "}\n\n";
       break;
     case AUX_MIN:
-      this->auxiliaries << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
+      this->auxiliaries << "static casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
                         << "  return x>y ? y : x;\n"
                         << "}\n\n";
       break;
     case AUX_MAX:
-      this->auxiliaries << "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
+      this->auxiliaries << "static casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
                         << "  return x>y ? x : y;\n"
                         << "}\n\n";
       break;
@@ -1905,6 +2065,9 @@ namespace casadi {
       add_auxiliary(AUX_CLEAR);
       this->auxiliaries << sanitize_source(casadi_weave_str, inst);
       break;
+    case AUX_RELAYOUT:
+      add_auxiliary(AUX_CLEAR);
+      this->auxiliaries << sanitize_source(casadi_relayout_str, inst);
       break;
     case AUX_BLAZING_DE_BOOR:
       this->auxiliaries << sanitize_source(casadi_blazing_de_boor_str, inst);
@@ -2023,6 +2186,15 @@ namespace casadi {
     // Perform operation
     add_auxiliary(AUX_COPY);
     s << "casadi_copy(" << arg << ", " << n << ", " << res << ");";
+    //s << "memcpy(" << res << ", " << arg << ", " << n << "*sizeof(casadi_real));"; // handle null
+    return s.str();
+  }
+
+  std::string CodeGenerator::copy_nocheck(const std::string& arg, std::size_t n, const std::string& res) {
+    if (n==0) return "";
+    std::stringstream s;
+    local("i","casadi_int");
+    s << "for (i=0;i<" << n << ";++i) (" << res << ")[i] = (" << arg << ")[i];";
     return s.str();
   }
 
@@ -2089,7 +2261,15 @@ namespace casadi {
                                  const std::string& y) {
     add_auxiliary(AUX_DOT);
     std::stringstream s;
-    s << "casadi_dot(" << n << ", " << x << ", " << y << ")";
+    if (GlobalOptions::getFeatureCBLAS()) {
+      std::string t = casadi_real_type=="float" ? "s" : "d";
+      s << "cblas_" << t << "dot(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")"; 
+    } else {
+      s << "casadi_dot(" << n << ", " << x << ", " << y << ")";
+    }
+    //std::string t = casadi_real_type=="float" ? "s" : "d";
+    //s << "cblas_" << t << "dot(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
+    //s << "blasfeo_ddot_blas(" << n << "," << x << "," << 1 << "," << y << "," << 1 << ")";
     return s.str();
   }
 
@@ -2441,6 +2621,10 @@ namespace casadi {
     local_default_.insert(std::make_pair(name, def));
   }
 
+  void CodeGenerator::require_zeros(casadi_int size) {
+    if (size>sz_zeros_) sz_zeros_ = size;
+  }
+
   std::string CodeGenerator::
   sanitize_source(const std::string& src,
                   const std::vector<std::string>& inst, bool add_shorthand) {
@@ -2459,8 +2643,12 @@ namespace casadi {
       rep.push_back(std::make_pair("T" + str(i+1), inst[i]));
     }
 
+    // Replace %g
+    rep.push_back(std::make_pair("SCANF_REAL",casadi_real_type=="float" ? "\"%g\"" : "\"%lg\""));
+
     // Return object
     std::stringstream ret;
+    ret << "static ";
     // Process C++ source
     std::string line;
     std::istringstream stream(src);
@@ -2776,6 +2964,12 @@ namespace casadi {
   align(const std::string& a, size_t p) {
     add_auxiliary(CodeGenerator::AUX_ALIGN);
     return "casadi_align(" + a + ", " + str(p) + ");";
+  }
+
+  std::string CodeGenerator::
+  debug_assert(const std::string& test) {
+    add_auxiliary(CodeGenerator::AUX_ASSERT);
+    return "assert(" + test + ");";
   }
 
   unsigned int CodeGenerator::vector_width_real() const {

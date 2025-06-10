@@ -875,6 +875,8 @@ namespace casadi {
       if (opts.find("is_diff_out")==opts.end())
         options["is_diff_out"] = is_diff_out_;
       options["allow_duplicate_io_names"] = true;
+      if (!data_type_.empty())
+        options["data_type"] = join(data_type_, std::vector<std::string>(n_in_+n_out_, "any"));
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);
     } catch (std::exception& e) {

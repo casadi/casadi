@@ -249,7 +249,7 @@ namespace casadi {
     casadi_int flops = ncol_y*nrow_x*nrow_y;
 
 
-    if (false) {//flops>100) {
+    if (g.blasfeo) {//flops>100) {
       if (nrow_x==1 && ncol_y==1) {
         casadi_error("foo");
       }

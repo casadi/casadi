@@ -897,7 +897,9 @@ namespace casadi {
     /** \brief Code generate the function
 
         \identifier{ly} */
-    std::string signature(const std::string& fname) const;
+    std::string signature(const std::string& fname, bool vectorize=false, casadi_int vector_width_real=1) const;
+
+    std::string codegen_self_call(const std::string& fname, bool vectorize=false, casadi_int vector_width_real=1) const;
 
     /** \brief Code generate the function
 
@@ -993,8 +995,10 @@ namespace casadi {
         \identifier{me} */
     casadi_int nnz_in() const;
     casadi_int nnz_in(casadi_int ind) const { return sparsity_in(ind).nnz(); }
+    casadi_int nnz_in_diff() const;
     casadi_int nnz_out() const;
     casadi_int nnz_out(casadi_int ind) const { return sparsity_out(ind).nnz(); }
+    casadi_int nnz_out_diff() const;
     ///@}
 
     ///@{

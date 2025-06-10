@@ -436,7 +436,11 @@ namespace casadi {
     }
 
     // Evaluate
-    g << "if (" << g(f_, "arg1", "res1", "iw", "w", "1", local) << ") return 1;\n";
+    if (vectorize_f() && str(f_).find("SXFunction")!= std::string::npos) {
+      g << g(f_, "arg1", "res1", "iw", "w", "1", local, "j") << ";\n";
+    } else {
+      g << "if (" << g(f_, "arg1", "res1", "iw", "w", "1", local) << ") return 1;\n";
+    }
 
    //REMOVE  uout() << "debug" << name_ << std::endl;
     //REMOVE uout() << "n_in_" << n_in_ << std::endl;

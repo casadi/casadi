@@ -312,6 +312,8 @@ namespace casadi {
     opts["max_num_dir"] = (*this)->max_num_dir_;
     opts["is_diff_in"] = (*this)->is_diff_in_;
     opts["is_diff_out"] = (*this)->is_diff_out_;
+    opts["jac_penalty"] = (*this)->jac_penalty_;
+    opts["cse"] = true;
     return expand(name(), opts);
   }
 
@@ -658,7 +660,7 @@ namespace casadi {
     const std::vector<bool>& reduce_in,
     const std::vector<bool>& reduce_out,
     const Dict& opts) const {
-    return MapSum::create("mapsum_" + str(n) + "_" + name(), "serial",
+    return MapSum::create("mapssum_" + str(n) + "_" + name(), "serial",
       *this, n, reduce_in, reduce_out, opts);
   }
 
