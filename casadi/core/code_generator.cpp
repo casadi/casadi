@@ -899,10 +899,12 @@ namespace casadi {
     // Codegen auxiliary functions
     s << this->auxiliaries.str();
 
+    int align_bytes = casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
+
     // Print integer constants
     if (!integer_constants_.empty()) {
       for (casadi_int i=0; i<integer_constants_.size(); ++i) {
-        print_vector(s, "casadi_s" + str(i), integer_constants_[i]);
+        print_vector(s, "casadi_s" + str(i), integer_constants_[i], align_bytes, false);
       }
       s << std::endl;
     }
@@ -910,7 +912,7 @@ namespace casadi {
     // Print double constants
     if (!double_constants_.empty()) {
       for (casadi_int i=0; i<double_constants_.size(); ++i) {
-        print_vector(s, "casadi_c" + str(i), double_constants_[i]);
+        print_vector(s, "casadi_c" + str(i), double_constants_[i], align_bytes, false);
       }
       s << std::endl;
     }
@@ -933,7 +935,7 @@ namespace casadi {
 
     if (sz_zeros_) {
       std::vector<double> sz_zeros(sz_zeros_, 0);
-      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros));
+      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros), align_bytes);
       s << std::endl;
     }
 
@@ -1025,23 +1027,32 @@ namespace casadi {
     return ss.str();
   }
 
-  std::string CodeGenerator::array(const std::string& type, const std::string& name, casadi_int len,
-                                   const std::string& def) {
+  std::string CodeGenerator::array(const std::string& type, const std::string& name, const std::string& len,
+                                   const std::string& def, casadi_int align) {
     std::stringstream s;
     s << type << " ";
-    if (len==0) {
+    if (len=="0") {
       s << "*" << name << " = 0";
     } else {
       s << name << "[" << len << "]";
+      if (align>1) {
+        s << " __attribute__((aligned (" << align << ")))";
+      }
       if (!def.empty()) s << " = " << def;
     }
     s << ";\n";
     return s.str();
   }
 
+
+  std::string CodeGenerator::array(const std::string& type, const std::string& name, casadi_int len,
+                                   const std::string& def, casadi_int align) {
+    return array(type, name, str(len), def, align);
+  }
+
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
-      const std::vector<casadi_int>& v) {
-    s << array("static const casadi_int", name, v.size(), initializer(v));
+      const std::vector<casadi_int>& v, casadi_int align, bool external) {
+    s << array("static const casadi_int", name, v.size(), initializer(v), align);
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
@@ -1050,8 +1061,8 @@ namespace casadi {
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
-                                  const std::vector<double>& v) {
-    s << array("static const casadi_real", name, v.size(), initializer(v));
+                                  const std::vector<double>& v, casadi_int align, bool external) {
+    s << array("static const casadi_real", name, v.size(), initializer(v), align);
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
@@ -1659,6 +1670,10 @@ namespace casadi {
       break;
     case AUX_CACHE:
       this->auxiliaries << sanitize_source(casadi_cache_str, inst);
+      break;
+    case AUX_ALIGN:
+      add_include("stdint.h");
+      this->auxiliaries << sanitize_source(casadi_align_str, inst);
       break;
     case AUX_CVX:
       add_auxiliary(AUX_CLEAR);
@@ -2723,6 +2738,12 @@ namespace casadi {
       sz_iw = std::max(sz_iw, f.f.sz_iw());
       sz_w = std::max(sz_w, f.f.sz_w());
     }
+  }
+
+  std::string CodeGenerator::
+  align(const std::string& a, size_t p) {
+    add_auxiliary(CodeGenerator::AUX_ALIGN);
+    return "casadi_align(" + a + ", " + str(p) + ");";
   }
 
 } // namespace casadi

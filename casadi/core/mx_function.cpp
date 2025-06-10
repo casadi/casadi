@@ -107,6 +107,100 @@ namespace casadi {
     }
   }
 
+  size_t round_pow2(size_t s, size_t sz, size_t cache_size) {
+    s *= sz;
+
+    if (s==0) return 0;
+    size_t rem = s % cache_size;
+    if (rem == 0) return s/sz;
+
+    return (s - rem + cache_size)/sz;
+  }
+
+  /* Re-order work vector from large to small alignment, to avoid excessive padding
+   *  
+   * Algorithm elements arg and res will be updated
+   * align vector will be updated
+  */
+  void reorder_align(std::vector<MXFunction::AlgEl>& algorithm, std::vector<size_t>& align) {
+    size_t worksize = align.size();
+
+    // Prepair a structure for sorting while retaining the needed relocation
+    struct SortPair {
+      size_t index;
+      size_t align;
+    };
+    std::vector< SortPair > temp_sort(worksize);
+    for (size_t i=0;i<worksize;++i) {
+      temp_sort[i].index = i;
+      temp_sort[i].align = align[i];
+    }
+
+    // Sort from high to low, retaining order when equal
+    std::stable_sort(temp_sort.begin(), temp_sort.end(), [](const SortPair& a, const SortPair& b) {
+        return a.align > b.align;
+    });
+
+    // Prepare a lookup structure k -> lookup[k]
+    std::vector<size_t> lookup(worksize);
+    for (size_t i=0;i<worksize;++i) {
+      lookup[temp_sort[i].index] = i;
+    }
+
+    // Update algorithm
+    for (auto&& e : algorithm) {
+      // Loop over arguments
+      for (casadi_int c=0; c<e.arg.size(); ++c) {
+        // Get argument index in work vector
+        casadi_int& k = e.arg[c];
+        // If argument is actually used
+        if (k>=0) {
+          k = lookup[k];
+        }
+      }
+      // Loop over result locations of node
+      for (casadi_int c=0; c<e.res.size(); ++c) {
+        // Get result index in work vector
+        casadi_int k = e.res[c];
+        // If result is actually used
+        if (k>=0) {
+          k = lookup[k];
+        }
+      }
+    }
+
+    // Update alignment vector
+    for (size_t i=0;i<worksize;++i) {
+      align[i] = temp_sort[i].align;
+    }
+  }
+
+  void get_align(const std::vector<MXFunction::AlgEl>& algorithm, std::vector<size_t>& align) {
+    // Loop over all nodes in algorithm
+    for (auto&& e : algorithm) {
+      // Loop over arguments
+      for (casadi_int c=0; c<e.arg.size(); ++c) {
+        // Get argument index in work vector
+        casadi_int k = e.arg[c];
+        // If argument is actually used
+        if (k>=0) {
+          // Make work vector element big enough
+          align[k] = std::max(align[k], e.data->align_in(c));
+        }
+      }
+      // Loop over result locations of node
+      for (casadi_int c=0; c<e.res.size(); ++c) {
+        // Get result index in work vector
+        casadi_int k = e.res[c];
+        // If result is actually used
+        if (k>=0) {
+          // Make work vector element big enough
+          align[k] = std::max(align[k], e.data->align_out(c));
+        }
+      }
+    }
+  }
+
   void MXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
