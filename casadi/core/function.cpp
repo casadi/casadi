@@ -307,6 +307,7 @@ namespace casadi {
 
   Function Function::expand() const {
     Dict opts = (*this)->generate_options("clone");
+    opts["cse"] = true;
     return expand(name(), opts);
   }
 
@@ -648,7 +649,7 @@ namespace casadi {
     const std::vector<bool>& reduce_in,
     const std::vector<bool>& reduce_out,
     const Dict& opts) const {
-    return MapSum::create("mapsum_" + str(n) + "_" + name(), "serial",
+    return MapSum::create("mapssum_" + str(n) + "_" + name(), "serial",
       *this, n, reduce_in, reduce_out, opts);
   }
 

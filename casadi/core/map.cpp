@@ -620,12 +620,12 @@ namespace casadi {
       << "arg1 = arg + " << n_in_ << "+i*" << sz_arg << ";\n";
     for (casadi_int j=0; j<n_in_; ++j) {
       g << "arg1[" << j << "] = arg[" << j << "] ? "
-        << g.arg(j) << "+i*" << f_.nnz_in(j) << ": 0;\n";
+        << g.arg(j, true) << "+i*" << f_.nnz_in(j) << ": 0;\n";
     }
     g << "res1 = res + " <<  n_out_ << "+i*" <<  sz_res << ";\n";
     for (casadi_int j=0; j<n_out_; ++j) {
       g << "res1[" << j << "] = res[" << j << "] ?"
-        << g.res(j) << "+i*" << f_.nnz_out(j) << ": 0;\n";
+        << g.res(j,true) << "+i*" << f_.nnz_out(j) << ": 0;\n";
     }
     std::string flag = g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w), "1", inst);
 
@@ -798,7 +798,7 @@ namespace casadi {
                          "data->w + i * data->sz_w", "");
     g << "  data->ret = " << flag << ";\n";
     g << "  return CASADI_THREAD_RETURN_VALUE;\n";
-    g.scope_exit();
+    g.scope_exit(g.body);
     g << "}\n\n";
   }
 
