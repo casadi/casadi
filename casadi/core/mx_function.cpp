@@ -1230,7 +1230,7 @@ namespace casadi {
     return 0;
   }
 
-  void MXFunction::codegen_declarations(CodeGenerator& g) const {
+  void MXFunction::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -1244,21 +1244,21 @@ namespace casadi {
     }
   }
 
-  void MXFunction::codegen_incref(CodeGenerator& g) const {
+  void MXFunction::codegen_incref(CodeGenerator& g, const Instance& inst) const {
     std::set<void*> added;
     for (auto&& a : algorithm_) {
       a.data->codegen_incref(g, added);
     }
   }
 
-  void MXFunction::codegen_decref(CodeGenerator& g) const {
+  void MXFunction::codegen_decref(CodeGenerator& g, const Instance& inst) const {
     std::set<void*> added;
     for (auto&& a : algorithm_) {
       a.data->codegen_decref(g, added);
     }
   }
 
-  void MXFunction::codegen_body(CodeGenerator& g) const {
+  void MXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
     // Temporary variables and vectors
     g.init_local("arg1", "arg+" + str(n_in_));
     g.init_local("res1", "res+" + str(n_out_));

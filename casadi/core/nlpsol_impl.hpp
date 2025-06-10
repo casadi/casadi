@@ -221,17 +221,17 @@ namespace casadi {
     /** \brief Generate code for the declarations of the C function
 
         \identifier{27j} */
-    void codegen_declarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Generate code for the function body
 
         \identifier{1o0} */
-    void codegen_body_enter(CodeGenerator& g) const override;
+    void codegen_body_enter(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Generate code for the function body
 
         \identifier{27k} */
-    void codegen_body_exit(CodeGenerator& g) const override;
+    void codegen_body_exit(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
 

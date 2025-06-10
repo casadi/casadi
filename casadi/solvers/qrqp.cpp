@@ -259,7 +259,7 @@ namespace casadi {
     return 0;
   }
 
-  void Qrqp::codegen_body(CodeGenerator& g) const {
+  void Qrqp::codegen_body(CodeGenerator& g, const Instance& inst) const {
     qp_codegen_body(g);
     g.add_auxiliary(CodeGenerator::AUX_QRQP);
     if (print_iter_) g.add_auxiliary(CodeGenerator::AUX_PRINTF);

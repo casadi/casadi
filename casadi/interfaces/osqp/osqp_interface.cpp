@@ -370,7 +370,7 @@ namespace casadi {
     g << "return osqp_setup(&" + codegen_mem(g) + ", &data, &settings)!=0;\n";
   }
 
-  void OsqpInterface::codegen_body(CodeGenerator& g) const {
+  void OsqpInterface::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.add_include("osqp/osqp.h");
     g.add_auxiliary(CodeGenerator::AUX_INF);
 

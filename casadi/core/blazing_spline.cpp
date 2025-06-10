@@ -174,7 +174,7 @@ namespace casadi {
     clear_mem();
   }
 
-  void BlazingSplineFunction::codegen_body(CodeGenerator& g) const {
+  void BlazingSplineFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
     if (knots_.size() == 3) {
       g.add_auxiliary(CodeGenerator::AUX_BLAZING_3D_BOOR_EVAL);
     }

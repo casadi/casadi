@@ -1263,8 +1263,8 @@ namespace casadi {
     return stats;
   }
 
-  void Nlpsol::codegen_body_enter(CodeGenerator& g) const {
-    OracleFunction::codegen_body_enter(g);
+  void Nlpsol::codegen_body_enter(CodeGenerator& g, const Instance& inst) const {
+    OracleFunction::codegen_body_enter(g, inst);
     g.local("d_nlp", "struct casadi_nlpsol_data");
     g.local("p_nlp", "struct casadi_nlpsol_prob");
 
@@ -1334,7 +1334,7 @@ namespace casadi {
 
   }
 
-  void Nlpsol::codegen_declarations(CodeGenerator& g) const {
+  void Nlpsol::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     g.add_auxiliary(CodeGenerator::AUX_FILL);
     g.add_auxiliary(CodeGenerator::AUX_INF);
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
@@ -1354,7 +1354,7 @@ namespace casadi {
     }
   }
 
-  void Nlpsol::codegen_body_exit(CodeGenerator& g) const {
+  void Nlpsol::codegen_body_exit(CodeGenerator& g, const Instance& inst) const {
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
       g.local("one", "const casadi_real");
       g.init_local("one", "1");
@@ -1388,7 +1388,7 @@ namespace casadi {
     g.copy_check("&d_nlp.objective", 1, "d_nlp.f", false, true);
     g.copy_check("d_nlp.lam_p", np_, "d_nlp.lam_p", false, true);
 
-    OracleFunction::codegen_body_exit(g);
+    OracleFunction::codegen_body_exit(g, inst);
   }
 
   void Nlpsol::serialize_body(SerializingStream &s) const {

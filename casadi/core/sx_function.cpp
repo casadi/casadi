@@ -216,7 +216,7 @@ namespace casadi {
     return sz_w();
   }
 
-  void SXFunction::codegen_declarations(CodeGenerator& g) const {
+  void SXFunction::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -341,7 +341,7 @@ namespace casadi {
 
   }
 
-  void SXFunction::codegen_body(CodeGenerator& g) const {
+  void SXFunction::codegen_body(CodeGenerator& g, const Instance& inst) const {
     g.reserve_work(worksize_);
 
     casadi_int cnt = 0;

@@ -292,11 +292,11 @@ set_function(const Function& fcn, const std::string& fname, bool jit) {
 }
 
 
-  void OracleFunction::codegen_body_enter(CodeGenerator& g) const {
+  void OracleFunction::codegen_body_enter(CodeGenerator& g, const Instance& inst) const {
     g.local("d_oracle", "struct casadi_oracle_data");
   }
 
-  void OracleFunction::codegen_body_exit(CodeGenerator& g) const {
+  void OracleFunction::codegen_body_exit(CodeGenerator& g, const Instance& inst) const {
   }
 
 int OracleFunction::
