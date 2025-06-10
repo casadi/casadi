@@ -2145,7 +2145,16 @@ namespace casadi {
   std::string CodeGenerator::printf(const std::string& str, const std::vector<std::string>& arg) {
     add_auxiliary(AUX_PRINTF);
     std::stringstream s;
-    s << "CASADI_PRINTF(\"" << str << "\"";
+    s << "CASADI_PRINTF(";
+    // Loop over lines in str
+    std::string::size_type pos = 0, prev = 0;
+    while ((pos = str.find('\n', prev)) != std::string::npos) {
+      // Any line containing a trailing new line
+      s << "\"" << str.substr(prev, pos-prev) << "\\n\"\n";
+      prev = pos + 1;
+    }
+    // Remainder without trailing new line
+    s << "\"" << str.substr(prev) << "\"";
     for (casadi_int i=0; i<arg.size(); ++i) s << ", " << arg[i];
     s << ");";
     return s.str();
