@@ -107,7 +107,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** \brief Get the operation
 
@@ -198,7 +199,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /** \brief Get the operation
 

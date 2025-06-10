@@ -103,7 +103,8 @@ namespace casadi {
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res,
                           const std::vector<bool>& arg_is_ref,
-                          std::vector<bool>& res_is_ref) const {
+                          std::vector<bool>& res_is_ref,
+                          bool prefer_inline) const {
     // Print comment
     std::string a = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
     g << g.printf(comment_ + ":\\n") << "\n";

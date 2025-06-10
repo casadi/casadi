@@ -97,7 +97,8 @@ namespace casadi {
                          const std::vector<casadi_int>& arg,
                          const std::vector<casadi_int>& res,
                          const std::vector<bool>& arg_is_ref,
-                         std::vector<bool>& res_is_ref) const {
+                         std::vector<bool>& res_is_ref,
+                         bool prefer_inline) const {
     generate_copy(g, arg, res, arg_is_ref, res_is_ref, 0);
   }
 

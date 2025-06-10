@@ -131,7 +131,8 @@ namespace casadi {
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res,
                           const std::vector<bool>& arg_is_ref,
-                          std::vector<bool>& res_is_ref) const {
+                          std::vector<bool>& res_is_ref,
+                          bool prefer_inline) const {
     g << g.project(g.work(arg.front(), dep().nnz(), arg_is_ref.front()), dep(0).sparsity(),
                            g.work(res.front(), nnz(), false), sparsity(), "w") << "\n";
   }
@@ -170,7 +171,8 @@ namespace casadi {
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res,
                           const std::vector<bool>& arg_is_ref,
-                          std::vector<bool>& res_is_ref) const {
+                          std::vector<bool>& res_is_ref,
+                          bool prefer_inline) const {
     g << g.densify(g.work(arg.front(), dep().nnz(), arg_is_ref.front()), dep(0).sparsity(),
                            g.work(res.front(), nnz(), false)) << "\n";
   }
@@ -179,7 +181,8 @@ namespace casadi {
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res,
                           const std::vector<bool>& arg_is_ref,
-                          std::vector<bool>& res_is_ref) const {
+                          std::vector<bool>& res_is_ref,
+                          bool prefer_inline) const {
     g << g.sparsify(g.work(arg.front(), dep().nnz(), arg_is_ref.front()),
                            g.work(res.front(), nnz(), false), sparsity()) << "\n";
   }

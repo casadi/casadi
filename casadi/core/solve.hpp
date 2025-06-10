@@ -177,7 +177,8 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
-                  std::vector<bool>& res_is_ref) const override;
+                  std::vector<bool>& res_is_ref,
+                  bool prefer_inline=false) const override;
 
     /// Linear solver (may be shared between multiple nodes)
     Linsol linsol_;
@@ -246,7 +247,8 @@ namespace casadi {
       const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res,
       const std::vector<bool>& arg_is_ref,
-      std::vector<bool>& res_is_ref) const override;
+      std::vector<bool>& res_is_ref,
+      bool prefer_inline=false) const override;
   };
 
   /** \brief Linear solve with an upper triangular matrix
@@ -287,7 +289,8 @@ namespace casadi {
       const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res,
       const std::vector<bool>& arg_is_ref,
-      std::vector<bool>& res_is_ref) const override;
+      std::vector<bool>& res_is_ref,
+      bool prefer_inline=false) const override;
   };
 
   /** \brief Linear solve with unity diagonal added
@@ -370,7 +373,8 @@ namespace casadi {
       const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res,
       const std::vector<bool>& arg_is_ref,
-      std::vector<bool>& res_is_ref) const override;
+      std::vector<bool>& res_is_ref,
+      bool prefer_inline=false) const override;
   };
 
   /** \brief Linear solve with an upper triangular matrix
@@ -411,7 +415,8 @@ namespace casadi {
       const std::vector<casadi_int>& arg,
       const std::vector<casadi_int>& res,
       const std::vector<bool>& arg_is_ref,
-      std::vector<bool>& res_is_ref) const override;
+      std::vector<bool>& res_is_ref,
+      bool prefer_inline=false) const override;
   };
 
 } // namespace casadi
