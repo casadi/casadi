@@ -754,6 +754,7 @@ namespace casadi {
       AUX_FPRINTF_VECTOR,
       AUX_TO_FILE,
       AUX_THREADS,
+      AUX_WEAVE,
       AUX_ALIGN
     };
 
