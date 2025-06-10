@@ -187,6 +187,9 @@ class CASADI_EXPORT SXFunction :
 
   /** \brief  Construct a complete Jacobian by vertex elimination */
   SX jac_ve(const Dict& opts) const;
+
+  Function pull_out(const std::vector<casadi_int>& in, Function& outer) const override;
+
   /** \brief Get an atomic operation operator index
 
       \identifier{ur} */
@@ -345,6 +348,11 @@ class CASADI_EXPORT SXFunction :
 
       \identifier{290} */
   size_t codegen_sz_w(const CodeGenerator& g) const override;
+  /** \brief Codegen incref for dependencies */
+  void codegen_incref(CodeGenerator& g, const Instance& inst) const override;
+
+  /** \brief Codegen decref for dependencies */
+  void codegen_decref(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief Generate code for the declarations of the C function
 

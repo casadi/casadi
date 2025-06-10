@@ -2059,12 +2059,14 @@ namespace casadi {
     return s.str();
   }
 
-  std::string CodeGenerator::arg(casadi_int i) const {
-    return "arg[" + str(i) + "]";
+  std::string CodeGenerator::arg(casadi_int i, bool sx) const {
+    if (sx) return "arg["+str(i)+"]";
+    return "args" + str(i);
   }
 
-  std::string CodeGenerator::res(casadi_int i) const {
-    return "res[" + str(i) + "]";
+  std::string CodeGenerator::res(casadi_int i, bool sx) const {
+    if (sx) return "res["+str(i)+"]";
+    return "ress" + str(i);
   }
 
   std::string CodeGenerator::mem(const Function& f) {

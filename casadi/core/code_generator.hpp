@@ -808,12 +808,12 @@ namespace casadi {
     /** \brief Refer to argument
 
         \identifier{tw} */
-    std::string arg(casadi_int i) const;
+    std::string arg(casadi_int i, bool sx=false) const;
 
     /** \brief Refer to resuly
 
         \identifier{tx} */
-    std::string res(casadi_int i) const;
+    std::string res(casadi_int i, bool sx=false) const;
 
     /** \brief Access thread-local memory
 
