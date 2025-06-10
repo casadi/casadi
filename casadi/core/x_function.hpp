@@ -918,6 +918,9 @@ namespace casadi {
       }
 
       Dict options = opts;
+      if (!data_type_.empty())
+        options["data_type"] = join(data_type_, std::vector<std::string>(n_in_+n_out_, "any"));
+
       options["allow_duplicate_io_names"] = true;
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);
