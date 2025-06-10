@@ -87,6 +87,7 @@ set(RUNTIME_SRC
   casadi_blazing_1d_boor_eval.hpp
   casadi_blazing_2d_boor_eval.hpp
   casadi_blazing_3d_boor_eval.hpp
+  casadi_weave.hpp
   casadi_align.hpp
   casadi_relayout.hpp
 )

@@ -1225,6 +1225,14 @@ namespace casadi {
     }
   }
 
+  MX MXNode::get_repweave(casadi_int m, casadi_int n) const {
+    if (m==1) {
+      return shared_from_this<MX>();
+    } else {
+      return MX::create(new HorzRepWeave(shared_from_this<MX>(), m, n));
+    }
+  }
+
   std::vector<MX> MXNode::get_diagsplit(const std::vector<casadi_int>& offset1,
                                        const std::vector<casadi_int>& offset2) const {
     if (is_zero()) {
@@ -1344,6 +1352,7 @@ namespace casadi {
     {OP_MMAX, MMax::deserialize},
     {OP_HORZREPMAT, HorzRepmat::deserialize},
     {OP_HORZREPSUM, HorzRepsum::deserialize},
+    {OP_HORZREPWEAVE, HorzRepWeave::deserialize},
     //OP_ERFINV,
     //OP_PRINTME,
     //OP_LIFT,

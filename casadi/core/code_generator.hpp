@@ -709,6 +709,7 @@ namespace casadi {
       AUX_PRINT_SCALAR,
       AUX_PRINT_VECTOR,
       AUX_PRINT_CANONICAL,
+      AUX_WEAVE,
       AUX_ALIGN
     };
 
