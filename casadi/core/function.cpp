@@ -315,6 +315,14 @@ namespace casadi {
     return expand(name(), opts);
   }
 
+  Function Function::pull_out(const std::vector<casadi_int>& in, Function& outer) const {
+    try {
+      return (*this)->pull_out(in, outer);
+    } catch (std::exception& e) {
+      THROW_ERROR("pull_out", e.what());
+    }
+  }
+
   Function Function::expand(const std::string& name, const Dict& opts) const {
     casadi_assert(!has_free(),
       "Function with free symbols cannot be expanded. "
@@ -976,6 +984,10 @@ namespace casadi {
 
   const std::vector<std::string>& Function::name_out() const {
     return (*this)->name_out_;
+  }
+
+  const std::vector<std::string>& Function::data_type() const {
+    return (*this)->data_type_;    
   }
 
   casadi_int Function::index_in(const std::string &name) const {

@@ -793,6 +793,8 @@ namespace casadi {
          \identifier{lh} */
     virtual SX instructions_sx() const;
 
+    virtual Function pull_out(const std::vector<casadi_int>& in, Function& outer) const;
+
     /** \brief Wrap in an Function instance consisting of only one MX call
 
         \identifier{li} */
@@ -1442,6 +1444,10 @@ namespace casadi {
     size_t align_w_;
 
     std::vector<Layout> layout_in_, layout_out_;
+    std::vector<casadi_int> stride_in_, stride_out_;
+
+    std::vector<std::string> data_type_;
+
     /** \brief Check if the function is of a particular type
 
         \identifier{np} */
