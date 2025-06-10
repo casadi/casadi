@@ -830,7 +830,7 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g, const Instance& inst
   std::string flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
   g << "if (" + flag + ") return false;\n";
   g << "return true;\n";
-  g.scope_exit();
+  g.scope_exit(g.body);
   g << "}\n";
 
   name = "nlp_g";
@@ -846,7 +846,7 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g, const Instance& inst
   flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
   g << "if (" + flag + ") return false;\n";
   g << "return true;\n";
-  g.scope_exit();
+  g.scope_exit(g.body);
   g << "}\n";
 
   name = "nlp_grad_f";
@@ -863,7 +863,7 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g, const Instance& inst
   flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
   g << "if (" + flag + ") return false;\n";
   g << "return true;\n";
-  g.scope_exit();
+  g.scope_exit(g.body);
   g << "}\n";
 
   name = "nlp_jac_g";
@@ -886,7 +886,7 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g, const Instance& inst
   g << "casadi_ipopt_sparsity(d->prob->sp_a, iRow, jCol);\n";
   g << "}\n";
   g << "return true;\n";
-  g.scope_exit();
+  g.scope_exit(g.body);
   g << "}\n";
 
   if (exact_hessian_) {
@@ -911,7 +911,7 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g, const Instance& inst
     g << "casadi_ipopt_sparsity(d->prob->sp_h, iRow, jCol);\n";
     g << "}\n";
     g << "return true;\n";
-    g.scope_exit();
+    g.scope_exit(g.body);
     g << "}\n";
   }
 }

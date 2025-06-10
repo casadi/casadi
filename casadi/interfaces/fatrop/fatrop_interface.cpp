@@ -653,7 +653,7 @@ void FatropInterface::codegen_declarations(CodeGenerator& g) const {
   g.flush(g.body);
   g.scope_enter();
   g << "CASADI_PRINTF(\"%.*s\", num, msg);\n";
-  g.scope_exit();
+  g.scope_exit(g.body);
   g << "}\n";
 
   name = "fatrop_cb_flush";
@@ -663,7 +663,7 @@ void FatropInterface::codegen_declarations(CodeGenerator& g) const {
     << "(void) {\n";
   g.flush(g.body);
   g.scope_enter();
-  g.scope_exit();
+  g.scope_exit(g.body);
   g << "}\n";
 }
 

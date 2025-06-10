@@ -51,7 +51,10 @@ namespace casadi {
 
 #ifndef SWIG
     /// Generate the code to a stream
-    void dump(std::ostream& s);
+    void dump(std::ostream& s, const std::string& body);
+
+    /// Generate the code to a stream
+    void dump_preamble(std::ostream& s, bool common=false);
 #endif // SWIG
 
     /// Generate a file, return code as string
@@ -74,8 +77,14 @@ namespace casadi {
     /// Add a function dependency
     std::string add_dependency(const Function& f, const Instance& inst=Instance(), const Function& owner=Function());
 
+    /// Has a function dependency
+    bool has_dependency(const Function& f, const Instance& inst=Instance()) const;
+
     /// Add an external function declaration
     void add_external(const std::string& new_external);
+
+    void add_extra_definitions(const Function& f, const std::string& extra);
+    void add_extra_declarations(const Function& f, const std::string& extra);
 
     /// Get a shorthand
     std::string shorthand(const std::string& name) const;
@@ -200,7 +209,7 @@ namespace casadi {
         \identifier{s6} */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w, const std::string& failure_ret="1", const Instance& inst=Instance());
+                           const std::string& w, const std::string& failure_ret="1", const Instance& inst=Instance(), const std::string& it="");
 
     /** \brief Print a string to buffer
 
@@ -240,7 +249,7 @@ namespace casadi {
     /** \brief Exit a local scope
 
         \identifier{sd} */
-    void scope_exit();
+    void scope_exit(std::ostream& s);
 
     /** \brief Declare a work vector element
 
@@ -266,6 +275,8 @@ namespace casadi {
 
         \identifier{si} */
     bool avoid_stack() const { return avoid_stack_;}
+
+    void require_zeros(casadi_int size);
 
     /** \brief Print a constant in a lossless but compact manner
 
@@ -710,7 +721,9 @@ namespace casadi {
       AUX_PRINT_VECTOR,
       AUX_PRINT_CANONICAL,
       AUX_WEAVE,
-      AUX_ALIGN
+      AUX_ALIGN,
+      AUX_ASSERT,
+      AUX_RELAYOUT
     };
 
     /** \brief Add a built-in auxiliary function
@@ -787,6 +800,7 @@ namespace casadi {
 
         \identifier{tt} */
     std::string copy(const std::string& arg, std::size_t n, const std::string& res);
+    std::string copy_nocheck(const std::string& arg, std::size_t n, const std::string& res);
     void copy_check(const std::string& arg, std::size_t n, const std::string& res,
       bool check_lhs=true, bool check_rhs=true);
     void copy_default(const std::string& arg, std::size_t n, const std::string& res,
@@ -907,6 +921,9 @@ namespace casadi {
     /** \brief Align operation */
     std::string align(const std::string& a, size_t p);
 
+    /** \brief Add an assertion */
+    std::string debug_assert(const std::string& test);
+
   private:
 
     // Generate casadi_real definition
@@ -1008,12 +1025,21 @@ namespace casadi {
     // Prefix
     std::string prefix;
 
-    // std::stringstreams holding the different parts of the file being generated
+    // Split codegen?
+    bool split;
+
+    // Blasfeo?
+    bool blasfeo;
+
+    // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
     std::stringstream body;
     std::stringstream header;
     std::stringstream buffer;
+
+    std::map<std::string, std::string> body_parts;
+    std::stringstream casadi_headers;
 
     // Are we at a new line?
     bool newline_;
@@ -1024,7 +1050,7 @@ namespace casadi {
 
     // Number of zeros/ones
     casadi_int sz_zeros_;
-    casadi_int sz_ones_;
+    //casadi_int sz_ones_;
 
     casadi_int padding_length_;
 
@@ -1048,6 +1074,11 @@ namespace casadi {
     std::map<const void *, casadi_int> file_scope_double_;
     std::map<const void *, casadi_int> file_scope_integer_;
     std::vector< std::vector<double> > pool_double_defaults_;
+    std::vector<casadi_int> file_scope_double_size_;
+    std::vector<casadi_int> file_scope_integer_size_;
+
+    std::map<std::string, std::set<std::string> > dependees_; 
+
     std::map<std::string, casadi_int> pool_double_;
 
     // Added functions
@@ -1056,6 +1087,7 @@ namespace casadi {
       Function f;
       // Name in codegen
       std::string codegen_name;
+      Instance inst;
     };
     std::vector<FunctionMeta> added_functions_;
 
