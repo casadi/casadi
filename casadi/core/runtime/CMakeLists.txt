@@ -87,6 +87,7 @@ set(RUNTIME_SRC
   casadi_blazing_1d_boor_eval.hpp
   casadi_blazing_2d_boor_eval.hpp
   casadi_blazing_3d_boor_eval.hpp
+  casadi_align.hpp
 )
 
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)

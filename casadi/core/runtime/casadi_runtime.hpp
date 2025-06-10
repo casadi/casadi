@@ -333,6 +333,7 @@ namespace casadi {
   #include "casadi_oracle_callback.hpp"
   #include "casadi_ocp_block.hpp"
   #include "casadi_scaled_copy.hpp"
+  #include "casadi_align.hpp"
 } // namespace casadi
 
 /// \endcond

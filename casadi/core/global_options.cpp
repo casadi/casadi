@@ -46,6 +46,10 @@ namespace casadi {
 
   casadi_int GlobalOptions::copy_elision_min_size = 8;
 
+  casadi_int GlobalOptions::vector_width_real = 1;
+
+  casadi_int GlobalOptions::byte_width_real = 8;
+
 
   bool GlobalOptions::feature_ve = true;
 } // namespace casadi
