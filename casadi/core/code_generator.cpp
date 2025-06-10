@@ -1879,6 +1879,11 @@ namespace casadi {
                         << "  return hypot(x, y);\n"
                         << "#endif\n"
                         << "}\n\n";
+    case AUX_WEAVE:
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_CLEAR);
+      this->auxiliaries << sanitize_source(casadi_weave_str, inst);
+      break;
       break;
     case AUX_BLAZING_DE_BOOR:
       this->auxiliaries << sanitize_source(casadi_blazing_de_boor_str, inst);
