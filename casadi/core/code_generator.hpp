@@ -27,6 +27,7 @@
 #define CASADI_CODE_GENERATOR_HPP
 
 #include "function.hpp"
+#include "instance.hpp"
 
 #include <map>
 #include <set>

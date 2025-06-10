@@ -328,7 +328,7 @@ void GenericExternal::init(const Dict& opts) {
   External::init(opts);
 }
 
-void External::codegen_declarations(CodeGenerator& g) const {
+void External::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
   if (!li_.inlined(name_)) {
     g.add_external(signature(name_) + ";");
     if (checkout_) g.add_external("int " + name_ + "_checkout(void);");
@@ -339,7 +339,7 @@ void External::codegen_declarations(CodeGenerator& g) const {
   }
 }
 
-void External::codegen_body(CodeGenerator& g) const {
+void External::codegen_body(CodeGenerator& g, const Instance& inst) const {
   if (li_.inlined(name_)) {
     // Function body is inlined
     g << li_.body(name_) << "\n";
@@ -367,7 +367,7 @@ void External::codegen_release(CodeGenerator& g) const {
   }
 }
 
-void External::codegen_incref(CodeGenerator& g) const {
+void External::codegen_incref(CodeGenerator& g, const Instance& inst) const {
   if (incref_) {
     if (config_) {
       g << name_ << "_config(" << config_args_.size() << ", "
@@ -377,7 +377,7 @@ void External::codegen_incref(CodeGenerator& g) const {
   }
 }
 
-void External::codegen_decref(CodeGenerator& g) const {
+void External::codegen_decref(CodeGenerator& g, const Instance& inst) const {
   if (decref_) {
     g << name_ << "_decref();\n";
   }

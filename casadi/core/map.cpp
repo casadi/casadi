@@ -176,11 +176,12 @@ namespace casadi {
     return 0;
   }
 
-  void Map::codegen_declarations(CodeGenerator& g) const {
+  void Map::codegen_declarations(CodeGenerator& g, const Instance& inst) const {
     g.add_dependency(f_);
   }
 
-  void Map::codegen_body(CodeGenerator& g) const {
+  void Map::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     g.local("i", "casadi_int");
     g.local("arg1", "const casadi_real*", "*");
     g.local("res1", "casadi_real*", "*");
@@ -376,7 +377,8 @@ namespace casadi {
 #endif  // WITH_OPENMP
   }
 
-  void OmpMap::codegen_body(CodeGenerator& g) const {
+  void OmpMap::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
     g << "casadi_int i;\n"
@@ -500,8 +502,9 @@ namespace casadi {
 #endif // CASADI_WITH_THREAD
   }
 
-  void ThreadMap::codegen_body(CodeGenerator& g) const {
-    Map::codegen_body(g);
+  void ThreadMap::codegen_body(CodeGenerator& g,
+      const Instance& inst) const {
+    Map::codegen_body(g, inst);
   }
 
   void ThreadMap::init(const Dict& opts) {
