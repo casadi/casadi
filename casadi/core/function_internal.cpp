@@ -118,6 +118,7 @@ namespace casadi {
     sz_w_per_ = 0;
 
     dump_count_ = 0;
+    align_w_ = 1;
   }
 
   ProtoFunction::~ProtoFunction() {
@@ -3003,6 +3004,7 @@ namespace casadi {
     alloc_res(sz_res*num_threads, persistent);
     alloc_iw(sz_iw*num_threads, persistent);
     alloc_w(sz_w*num_threads, persistent);
+    align_w_ = std::max(f.align_w(), align_w_);
   }
 
   Dict ProtoFunction::get_stats(void* mem) const {
@@ -3589,6 +3591,7 @@ namespace casadi {
   void FunctionInternal::setup(void* mem, const double** arg, double** res,
                                casadi_int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
+    w = casadi_align(w, align_w_);
     set_temp(mem, arg, res, iw, w);
     auto m = static_cast<FunctionMemory*>(mem);
     m->stats_available = true;
@@ -4109,6 +4112,7 @@ namespace casadi {
     s.pack("FunctionInternal::sz_res_tmp", sz_res_tmp_);
     s.pack("FunctionInternal::sz_iw_tmp", sz_iw_tmp_);
     s.pack("FunctionInternal::sz_w_tmp", sz_w_tmp_);
+    s.pack("FunctionInternal::align_w", align_w_);
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
@@ -4226,6 +4230,11 @@ namespace casadi {
     checkout_ = nullptr;
     release_ = nullptr;
     dump_count_ = 0;
+    if (version>=2) {
+      s.unpack("FunctionInternal::align_w", align_w_);
+    } else {
+      align_w_ = 1;
+    }
   }
 
   void ProtoFunction::serialize(SerializingStream& s) const {

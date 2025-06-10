@@ -77,6 +77,10 @@ namespace casadi {
       static casadi_int copy_elision_min_size;
 
       static std::string temp_work_dir; // Temporary work directory
+      static casadi_int vector_width_real;
+
+      static casadi_int byte_width_real;
+
       static bool feature_ve;
 
 #endif //SWIG
@@ -112,6 +116,12 @@ namespace casadi {
 
       static void setTempWorkDir(const std::string& dir);
       static std::string getTempWorkDir() { return temp_work_dir; }
+      static void setVectorWidthReal(casadi_int w) { vector_width_real = w; }
+      static casadi_int getVectorWidthReal() { return vector_width_real; }
+
+      static void setByteWidthReal(casadi_int w) { byte_width_real = w; }
+      static casadi_int getByteWidthReal() { return byte_width_real; }
+
       static void setFeatureVE(bool mode) { feature_ve = mode; }
       static bool getFeatureVE() { return feature_ve; }
 

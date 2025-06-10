@@ -52,6 +52,10 @@ namespace casadi {
     casadi_assert(!dir.empty(), "Temporary working directory must be non-empty.");
     temp_work_dir = Filesystem::ensure_trailing_slash(dir);
   }
+  casadi_int GlobalOptions::vector_width_real = 1;
+
+  casadi_int GlobalOptions::byte_width_real = 8;
+
 
   bool GlobalOptions::feature_ve = true;
 } // namespace casadi
