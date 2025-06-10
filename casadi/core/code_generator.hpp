@@ -750,7 +750,8 @@ namespace casadi {
       AUX_FPRINTF_SCALAR,
       AUX_FPRINTF_VECTOR,
       AUX_TO_FILE,
-      AUX_THREADS
+      AUX_THREADS,
+      AUX_ALIGN
     };
 
     /** \brief Add a built-in auxiliary function
@@ -778,13 +779,17 @@ namespace casadi {
 
     /** Declare an array */
     static std::string array(const std::string& type, const std::string& name, casadi_int len,
-                             const std::string& def=std::string());
+                             const std::string& def=std::string(), casadi_int align=1);
+
+    /** Declare an array */
+    static std::string array(const std::string& type, const std::string& name, const std::string& len,
+                             const std::string& def=std::string(), casadi_int align=1);
 
     /** \brief  Print casadi_int vector to a c file
 
         \identifier{tr} */
     void print_vector(std::ostream &s, const std::string& name,
-                             const std::vector<casadi_int>& v);
+                             const std::vector<casadi_int>& v, casadi_int align=1, bool external=false);
 
     /** \brief  Print char vector to a c file
 
@@ -796,7 +801,7 @@ namespace casadi {
 
         \identifier{ts} */
     void print_vector(std::ostream &s, const std::string& name,
-                             const std::vector<double>& v);
+                             const std::vector<double>& v, casadi_int align=1, bool external=false);
 
     /** \brief  Print string vector to a c file
 
@@ -965,6 +970,9 @@ namespace casadi {
 
         \identifier{258} */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
+
+    /** \brief Align operation */
+    std::string align(const std::string& a, size_t p);
 
   private:
 
