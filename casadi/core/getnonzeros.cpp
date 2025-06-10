@@ -487,7 +487,8 @@ namespace casadi {
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res,
                                     const std::vector<bool>& arg_is_ref,
-                                    std::vector<bool>& res_is_ref) const {
+                                    std::vector<bool>& res_is_ref,
+                                    bool prefer_inline) const {
     // Codegen the indices
     std::string ind = g.constant(nz_);
 
@@ -522,7 +523,8 @@ namespace casadi {
                                   const std::vector<casadi_int>& arg,
                                   const std::vector<casadi_int>& res,
                                   const std::vector<bool>& arg_is_ref,
-                                  std::vector<bool>& res_is_ref) const {
+                                  std::vector<bool>& res_is_ref,
+                                  bool prefer_inline) const {
     if (s_.step==1 && arg_is_ref[0]) {
       if (nnz()==1) {
         g << g.workel(res[0]) << " = " << g.work(arg[0], nnz(), arg_is_ref[0])
@@ -547,7 +549,8 @@ namespace casadi {
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res,
                                     const std::vector<bool>& arg_is_ref,
-                                    std::vector<bool>& res_is_ref) const {
+                                    std::vector<bool>& res_is_ref,
+                                    bool prefer_inline) const {
     g.local("rr", "casadi_real", "*");
     g.local("cs", "const casadi_real", "*");
     g.local("ct", "const casadi_real", "*");

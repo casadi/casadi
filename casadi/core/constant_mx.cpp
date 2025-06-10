@@ -130,7 +130,8 @@ namespace casadi {
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res,
                             const std::vector<bool>& arg_is_ref,
-                            std::vector<bool>& res_is_ref) const {
+                            std::vector<bool>& res_is_ref,
+                            bool prefer_inline) const {
     // Print the constant
     std::string ind = g.constant(x_.nonzeros());
 
@@ -393,7 +394,8 @@ namespace casadi {
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res,
                             const std::vector<bool>& arg_is_ref,
-                            std::vector<bool>& res_is_ref) const {
+                            std::vector<bool>& res_is_ref,
+                            bool prefer_inline) const {
     if (nnz()==1) {
       g << g.workel(res[0]) << " = " << g.rom_double(this) << "[0];\n";
     } else if (g.elide_copy(nnz())) {
@@ -424,7 +426,8 @@ namespace casadi {
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res,
                             const std::vector<bool>& arg_is_ref,
-                            std::vector<bool>& res_is_ref) const {
+                            std::vector<bool>& res_is_ref,
+                            bool prefer_inline) const {
     if (nnz()==1) {
       g << g.workel(res[0]) << " = " << g.pool_double(name_) << "[0];\n";
     } else if (g.elide_copy(nnz())) {

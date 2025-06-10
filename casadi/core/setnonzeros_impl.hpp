@@ -861,7 +861,8 @@ namespace casadi {
            const std::vector<casadi_int>& arg,
            const std::vector<casadi_int>& res,
            const std::vector<bool>& arg_is_ref,
-           std::vector<bool>& res_is_ref) const {
+           std::vector<bool>& res_is_ref,
+           bool prefer_inline) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0] || arg_is_ref[0]) {
       g << g.copy(g.work(arg[0], this->dep(0).nnz(), arg_is_ref[0]), this->nnz(),
@@ -890,7 +891,8 @@ namespace casadi {
            const std::vector<casadi_int>& arg,
            const std::vector<casadi_int>& res,
            const std::vector<bool>& arg_is_ref,
-           std::vector<bool>& res_is_ref) const {
+           std::vector<bool>& res_is_ref,
+           bool prefer_inline) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0] || arg_is_ref[0]) {
       g << g.copy(g.work(arg[0], this->dep(0).nnz(), arg_is_ref[0]), this->nnz(),
@@ -913,7 +915,8 @@ namespace casadi {
            const std::vector<casadi_int>& arg,
            const std::vector<casadi_int>& res,
            const std::vector<bool>& arg_is_ref,
-           std::vector<bool>& res_is_ref) const {
+           std::vector<bool>& res_is_ref,
+           bool prefer_inline) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0] || arg_is_ref[0]) {
       g << g.copy(g.work(arg[0], this->dep(0).nnz(), arg_is_ref[0]), this->nnz(),
