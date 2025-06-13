@@ -744,13 +744,19 @@ namespace casadi {
     void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<std::string>& v);
 
-    /** \brief Print canonical representaion of a matrix */
+    /** \brief Print canonical representaion of a matrix
+
+        \identifier{2dk} */
     std::string print_canonical(const Sparsity& sp, const std::string& arg);
 
-    /** \brief Print canonical representaion of a vector */
+    /** \brief Print canonical representaion of a vector
+
+        \identifier{2dl} */
     std::string print_vector(casadi_int sz, const std::string& arg);
 
-    /** \brief Print canonical representaion of a scalar */
+    /** \brief Print canonical representaion of a scalar
+
+        \identifier{2dm} */
     std::string print_scalar(const std::string& arg);
 
     /** \brief Create a copy operation

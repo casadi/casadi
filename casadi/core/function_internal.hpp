@@ -1459,13 +1459,19 @@ namespace casadi {
         \identifier{nw} */
     void print_out(std::ostream &stream, double** res, bool truncate) const;
 
-    /** \brief Print canonical representation of a numeric matrix */
+    /** \brief Print canonical representation of a numeric matrix
+
+        \identifier{2dh} */
     static void print_canonical(std::ostream &stream, const Sparsity& sp, const double* nz);
 
-    /** \brief Print canonical representation of a numeric vector */
+    /** \brief Print canonical representation of a numeric vector
+
+        \identifier{2di} */
     static void print_canonical(std::ostream &stream, casadi_int sz, const double* nz);
 
-    /** \brief Print canonical representation of a number */
+    /** \brief Print canonical representation of a number
+
+        \identifier{2dj} */
     static void print_canonical(std::ostream &stream, double a);
 
   protected:

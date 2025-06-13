@@ -370,6 +370,9 @@
 %exception  casadi::CodeGenerator::pool_double(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::print_canonical(const Sparsity &sp, const std::string &arg) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::print_formatted(const std::string &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -377,6 +380,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::print_op(casadi_int op, const std::string &a0, const std::string &a1) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::print_scalar(const std::string &arg) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::print_vector(casadi_int sz, const std::string &arg) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::print_vector(std::ostream &s, const std::string &name, const std::vector< casadi_int > &v) {
@@ -6530,6 +6539,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Slice::Slice(int start, int stop, int step=1) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::StreamStateGuard::StreamStateGuard(std::ostream &os) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::StringDeserializer::StringDeserializer(const std::string &string="") {
