@@ -51,6 +51,14 @@ macro(casadi_library name)
     )
   else()
     # Core
+    if(WITH_BLAS)
+      if(WITH_MKL)
+        target_link_libraries(casadi ${MKL_LIBRARIES})
+      else()
+        target_link_libraries(casadi ${BLAS_LIBRARIES})
+      endif()
+    endif()
+
     install(TARGETS ${name}
       # IMPORTANT: Add the library to the "export-set"
       EXPORT casadi-targets
