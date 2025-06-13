@@ -4831,7 +4831,7 @@ opti_metadata_modifiers(casadi::Opti);
       function out = variable(self, varargin)
         st = dbstack('-completenames',1);
         if length(st)>0
-          meta = struct('stacktrace', st(1));
+          meta = struct('stacktrace', {num2cell(st)});
         else
           meta = struct;
         end
@@ -4841,7 +4841,7 @@ opti_metadata_modifiers(casadi::Opti);
       function out = parameter(self, varargin)
         st = dbstack('-completenames',1);
         if length(st)>0
-          meta = struct('stacktrace', st(1));
+          meta = struct('stacktrace', {num2cell(st)});
         else
           meta = struct;
         end
@@ -4855,7 +4855,7 @@ opti_metadata_modifiers(casadi::Opti);
         end
         st = dbstack('-completenames',1);
         if length(st)>0
-          meta = struct('stacktrace', st(1));
+          meta = struct('stacktrace', {num2cell(st)});
         else
           meta = struct;
         end
