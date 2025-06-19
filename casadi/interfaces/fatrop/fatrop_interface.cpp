@@ -467,7 +467,7 @@ namespace casadi {
     }
 
     casadi_assert(errors.empty() && (A_ + total).nnz() == total.nnz(),
-      "HPIPM: specified structure of A does not correspond to what the interface can handle. "
+      "Fatrop: specified structure of A does not correspond to what the interface can handle. "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
       "ng " + str(ng) + ".\n"
       "Note that debug_fatrop_expected.mtx and debug_fatrop_actual.mtx are written "
