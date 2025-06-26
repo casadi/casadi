@@ -188,14 +188,30 @@ namespace casadi {
         sos_types = op.second.to_int_vector();
       }
         else if (op.first == "mipsol_callback") {
-        mipsol_callback_ = op.second;
-      } else if (op.first == "enable_mipsol_callback") {
-        enable_mipsol_callback_ = op.second;
+            try {
+                // Attempt to convert to function
+                mipsol_callback_ = op.second.to_function();
+                casadi_message("Successfully obtained callback function");
+
+                // Verify signature
+                if (mipsol_callback_.n_in() != 5 || mipsol_callback_.n_out() != 3) {
+                    casadi_error("Callback function has wrong signature. Expected 5 inputs, 3 outputs");
+                }
+            } catch (const std::exception& e) {
+                casadi_error("Failed to get callback function: " + std::string(e.what()));
+            }
+        }
+        else if (op.first == "enable_mipsol_callback") {
+            enable_mipsol_callback_ = op.second;
+        }
       }
-      if (enable_mipsol_callback_ && mipsol_callback_.is_null()) {
-        casadi_error("mipsol_callback must be provided when enable_mipsol_callback is true");
+    // Final validation
+    if (enable_mipsol_callback_) {
+      if (mipsol_callback_.is_null()) {
+          casadi_error("mipsol_callback must be provided when enable_mipsol_callback is true");
       }
-    }
+      casadi_message("Callback setup complete");
+      }
 
     // Validaty SOS constraints
     check_sos(nx_, sos_groups, sos_weights, sos_types);
@@ -357,7 +373,7 @@ namespace casadi {
           // Variable marked as discrete (integer or binary)
           vtype = lb==0 && ub==1 ? GRB_BINARY : GRB_INTEGER;
         } else {
-          // Continious variable
+          // Continuous variable
           vtype = GRB_CONTINUOUS;
         }
         vtypes[i] = vtype;
@@ -679,7 +695,9 @@ namespace casadi {
   }
 
   GurobiInterface::GurobiInterface(DeserializingStream& s) : Conic(s) {
-    s.version("GurobiInterface", 1);
+    s.version("GurobiInterface", 2);
+    s.unpack("GurobiInterface::enable_mipsol_callback", enable_mipsol_callback_);
+    s.unpack("GurobiInterface::mipsol_callback", mipsol_callback_);
     s.unpack("GurobiInterface::vtype", vtype_);
     s.unpack("GurobiInterface::opts", opts_);
     s.unpack("GurobiInterface::sos_weights", sos_weights_);
@@ -689,9 +707,11 @@ namespace casadi {
     Conic::deserialize(s, sdp_to_socp_mem_);
   }
 
-  void GurobiInterface::serialize_body(SerializingStream &s) const {
+void GurobiInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
-    s.version("GurobiInterface", 1);
+    s.version("GurobiInterface", 2);
+    s.pack("GurobiInterface::enable_mipsol_callback", enable_mipsol_callback_);
+    s.pack("GurobiInterface::mipsol_callback", mipsol_callback_);
     s.pack("GurobiInterface::vtype", vtype_);
     s.pack("GurobiInterface::opts", opts_);
     s.pack("GurobiInterface::sos_weights", sos_weights_);
@@ -703,6 +723,11 @@ namespace casadi {
 
   void GurobiInterface::handle_mipsol_callback(GRBmodel *model, void *cbdata, int where) {
   try {
+    if (!enable_mipsol_callback_ || mipsol_callback_.is_null()) {
+            casadi_warning("Callback triggered but not properly initialized");
+            return;
+        }
+
     CallbackDataHelper helper(cbdata, where);
 
     // Get the number of variables
