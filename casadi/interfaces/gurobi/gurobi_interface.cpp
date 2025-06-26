@@ -29,6 +29,75 @@
 
 namespace casadi {
 
+  // Helper functions for cleaner C API usage
+  namespace {
+    // Error handling macro
+    #define GUROBI_CALL_WARN(func, msg) do { \
+        int error = (func); \
+        if (error) { \
+            casadi_warning(msg ": Gurobi error " + std::to_string(error)); \
+            return; \
+        } \
+    } while(0)
+
+    // Convert string sense to Gurobi sense
+    char sense_to_gurobi(const std::string& sense) {
+      if (sense == "<=") return GRB_LESS_EQUAL;
+      if (sense == ">=") return GRB_GREATER_EQUAL;
+      if (sense == "=") return GRB_EQUAL;
+      return GRB_LESS_EQUAL; // default
+    }
+
+    // RAII wrapper for callback data access
+    class CallbackDataHelper {
+    private:
+      void* cbdata_;
+      int where_;
+
+    public:
+      CallbackDataHelper(void* cbdata, int where) : cbdata_(cbdata), where_(where) {}
+
+      bool getDouble(int what, double& value) {
+        int error = GRBcbget(cbdata_, where_, what, &value);
+        return error == 0;
+      }
+
+      bool getInt(int what, int& value) {
+        int error = GRBcbget(cbdata_, where_, what, &value);
+        return error == 0;
+      }
+
+      bool getSolution(std::vector<double>& solution) {
+        int error = GRBcbget(cbdata_, where_, GRB_CB_MIPSOL_SOL, solution.data());
+        return error == 0;
+      }
+
+      bool addLazyConstraint(const std::vector<int>& indices,
+                           const std::vector<double>& coeffs,
+                           char sense, double rhs) {
+        int error = GRBcblazy(cbdata_, static_cast<int>(indices.size()),
+                             const_cast<int*>(indices.data()),
+                             const_cast<double*>(coeffs.data()),
+                             sense, rhs);
+        return error == 0;
+      }
+    };
+  }
+
+  // Static C callback function
+  static int gurobi_mipsol_callback(GRBmodel *model, void *cbdata, int where, void *usrdata) {
+    try {
+      if (where == GRB_CB_MIPSOL && usrdata) {
+        GurobiInterface* interface = static_cast<GurobiInterface*>(usrdata);
+        interface->handle_mipsol_callback(model, cbdata, where);
+      }
+    } catch (const std::exception& e) {
+      // Don't let exceptions escape to C code
+      casadi_warning("Exception in Gurobi callback: " + std::string(e.what()));
+    }
+    return 0; // Continue optimization
+  }
+
   extern "C"
   int CASADI_CONIC_GUROBI_EXPORT
   casadi_register_conic_gurobi(Conic::Plugin* plugin) {
@@ -56,7 +125,11 @@ namespace casadi {
 
   GurobiInterface::GurobiInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
-    : Conic(name, st) {
+    : Conic(name, st),
+      enable_mipsol_callback_(false),
+      mipsol_callback_(Function())
+  {
+
   }
 
   GurobiInterface::~GurobiInterface() {
@@ -79,7 +152,14 @@ namespace casadi {
         "Weights corresponding to SOS entries."}},
       {"sos_types",
        {OT_INTVECTOR,
-        "Specify 1 or 2 for each SOS group."}}
+        "Specify 1 or 2 for each SOS group."}},
+      {"mipsol_callback",
+        {OT_FUNCTION,
+          "User callback function for MIPSOL events. "
+          "Input: dict with solution data. Output: dict with lazy constraints."}},
+      {"enable_mipsol_callback",
+        {OT_BOOL,
+          "Enable MIPSOL callbacks for dynamic constraint generation"}}
      }
   };
 
@@ -106,6 +186,14 @@ namespace casadi {
         sos_weights = op.second.to_double_vector_vector();
       } else if (op.first=="sos_types") {
         sos_types = op.second.to_int_vector();
+      }
+        else if (op.first == "mipsol_callback") {
+        mipsol_callback_ = op.second;
+      } else if (op.first == "enable_mipsol_callback") {
+        enable_mipsol_callback_ = op.second;
+      }
+      if (enable_mipsol_callback_ && mipsol_callback_.is_null()) {
+        casadi_error("mipsol_callback must be provided when enable_mipsol_callback is true");
       }
     }
 
@@ -462,6 +550,23 @@ namespace casadi {
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
+      // Enable lazy constraints and callback if needed
+      if (enable_mipsol_callback_) {
+        // Enable lazy constraints
+        int error = GRBsetintparam(m->env, "LazyConstraints", 1);
+        if (error) {
+          casadi_warning("Failed to enable LazyConstraints parameter");
+          return 1;
+        }
+        // Set the callback function
+        error = GRBsetcallbackfunc(model, gurobi_mipsol_callback,
+                                  const_cast<GurobiInterface*>(this));
+        if (error) {
+          casadi_warning("Failed to set callback function");
+          return 1;
+        }
+      }
+
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();
 
@@ -537,6 +642,11 @@ namespace casadi {
         }
       }
 
+      if (enable_mipsol_callback_) {
+      // Clear callback to avoid dangling pointer
+      GRBsetcallbackfunc(model, nullptr, nullptr);
+      }
+
       // Free memory
       GRBfreemodel(model);
       m->fstats.at("postprocessing").toc();
@@ -590,5 +700,114 @@ namespace casadi {
     s.pack("GurobiInterface::sos_types", sos_types_);
     Conic::serialize(s, sdp_to_socp_mem_);
   }
+
+  void GurobiInterface::handle_mipsol_callback(GRBmodel *model, void *cbdata, int where) {
+  try {
+    CallbackDataHelper helper(cbdata, where);
+
+    // Get the number of variables
+    int numvars;
+    int error = GRBgetintattr(model, "NumVars", &numvars);
+    if (error) {
+      casadi_warning("Failed to get number of variables in callback");
+      return;
+    }
+
+    // Get the integer solution
+    std::vector<double> x_vals(numvars);
+    if (!helper.getSolution(x_vals)) {
+      casadi_warning("Failed to get solution in MIPSOL callback");
+      return;
+    }
+
+    // Convert to CasADi DM (only use the variables we care about)
+    DM x_solution = DM::zeros(nx_, 1);
+    for (casadi_int i = 0; i < nx_ && i < numvars; ++i) {
+      x_solution(i) = x_vals[i];
+    }
+
+    // Get additional solution information
+    double obj_val, obj_best, obj_bound;
+    int sol_count;
+
+    if (!helper.getDouble(GRB_CB_MIPSOL_OBJ, obj_val) ||
+        !helper.getDouble(GRB_CB_MIPSOL_OBJBST, obj_best) ||
+        !helper.getDouble(GRB_CB_MIPSOL_OBJBND, obj_bound) ||
+        !helper.getInt(GRB_CB_MIPSOL_SOLCNT, sol_count)) {
+      casadi_warning("Failed to get callback information");
+      return;
+    }
+
+    // Create input dictionary for callback
+    std::vector<DM> cb_arg = {
+      x_solution,
+      DM(obj_val),
+      DM(obj_best),
+      DM(obj_bound),
+      DM(sol_count)
+    };
+
+    std::vector<DM> cb_res = mipsol_callback_(cb_arg);
+    // Process result
+    if (!cb_res.empty()) {
+      process_lazy_constraints(model, cbdata, cb_res);
+    }
+
+  } catch (const std::exception& e) {
+    casadi_warning("Error in handle_mipsol_callback: " + std::string(e.what()));
+  }
+}
+
+void GurobiInterface::process_lazy_constraints(GRBmodel *model, void *cbdata,
+                                               const std::vector<DM>& callback_result) {
+  try {
+    if (callback_result.size() < 3) {
+      casadi_warning("Callback result does not contain enough data");
+      return;
+    }
+
+    // Expected order: [add_lazy_constraint_flag, A_lazy, b_lazy, (optional) sense]
+    double add_lazy_flag = static_cast<double>(callback_result[0]);
+    if (add_lazy_flag < 0.5) return;
+
+    DM A_lazy = callback_result[1];
+    DM b_lazy = callback_result[2];
+    std::string sense = "<=";
+
+    if (callback_result.size() > 3) {
+      // TODO If you want to pass a string via DM, you can encode it as a number or char and decode here.
+      // But often it's best to fix the sense in the callback itself.
+      // For now, hardcode
+      sense = "<=";
+    }
+
+    CallbackDataHelper helper(cbdata, GRB_CB_MIPSOL);
+
+    for (casadi_int i = 0; i < A_lazy.size1(); ++i) {
+      std::vector<int> cind;
+      std::vector<double> cval;
+
+      for (casadi_int j = 0; j < A_lazy.size2() && j < nx_; ++j) {
+        double coeff = static_cast<double>(A_lazy(i, j));
+        if (std::abs(coeff) > 1e-12) {
+          cind.push_back(static_cast<int>(j));
+          cval.push_back(coeff);
+        }
+      }
+
+      if (!cind.empty()) {
+        double rhs = static_cast<double>(b_lazy(i));
+        char gurobi_sense = sense_to_gurobi(sense);
+
+        if (!helper.addLazyConstraint(cind, cval, gurobi_sense, rhs)) {
+          casadi_warning("Failed to add lazy constraint " + std::to_string(i));
+        }
+      }
+    }
+
+  } catch (const std::exception& e) {
+    casadi_warning("Error processing lazy constraints: " + std::string(e.what()));
+  }
+}
 
 } // namespace casadi
