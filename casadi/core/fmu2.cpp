@@ -154,6 +154,7 @@ void Fmu2::load_functions() {
     "fmi2ExitInitializationMode");
   enter_continuous_time_mode_ = load_function<fmi2EnterContinuousTimeModeTYPE>(
     "fmi2EnterContinuousTimeMode");
+  get_derivatives_ = load_function<fmi2GetDerivativesTYPE>("fmi2GetDerivatives");
   get_real_ = load_function<fmi2GetRealTYPE>("fmi2GetReal");
   set_real_ = load_function<fmi2SetRealTYPE>("fmi2SetReal");
   get_integer_ = load_function<fmi2GetIntegerTYPE>("fmi2GetInteger");
@@ -275,6 +276,16 @@ int Fmu2::enter_continuous_time_mode(void* instance) const {
   return 0;
 }
 
+int Fmu2::get_derivatives(void* instance, double* derivatives, size_t nx) const {
+  auto c = static_cast<fmi2Component>(instance);
+  fmi2Status status = get_derivatives_(c, derivatives, nx);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2GetDerivatives failed");
+    return 1;
+  }
+  return 0;
+}
+
 int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
   auto c = static_cast<fmi2Component>(instance);
   // Return arguments in FMI types
@@ -307,6 +318,17 @@ int Fmu2::set_real(void* instance, const unsigned int* vr, size_t n_vr,
 int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
     double* values, size_t n_values) const {
   casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");
+  if (do_evaluation_dance_) {
+    // Dummy call to trigger rtOneStep
+    fmi2Status status = get_real_(instance, nullptr, 0, nullptr);
+    if (status != fmi2OK) return 1;
+    // Scratch space to write derivative to (not used)
+    static thread_local std::vector<double> derivate_dump;
+    if (derivate_dump.size() < nx_) derivate_dump.resize(nx_);
+    // Dummy call to trigger computation of derivatives, possibly read later via get_real
+    status = get_derivatives_(instance, get_ptr(derivate_dump), nx_);
+    if (status != fmi2OK) return 1;
+  }
   fmi2Status status = get_real_(instance, vr, n_vr, values);
   return status != fmi2OK;
 }

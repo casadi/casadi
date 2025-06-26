@@ -127,6 +127,8 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Update discrete states
   int update_discrete_states(void* instance, EventMemory* eventmem) const override;
 
+  int get_derivatives(void* instance, double* derivatives, size_t nx) const override;
+
   // Set real values
   int set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const override;

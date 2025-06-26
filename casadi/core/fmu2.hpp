@@ -81,6 +81,7 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   fmi2EnterInitializationModeTYPE* enter_initialization_mode_;
   fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
   fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
+  fmi2GetDerivativesTYPE* get_derivatives_;
   fmi2GetRealTYPE* get_real_;
   fmi2SetRealTYPE* set_real_;
   fmi2GetBooleanTYPE* get_boolean_;
@@ -128,6 +129,8 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
 
   // Update discrete states
   int update_discrete_states(void* instance, EventMemory* eventmem) const override;
+
+  int get_derivatives(void* instance, double* derivatives, size_t nx) const override;
 
   // Set real values
   int set_real(void* instance, const unsigned int* vr, size_t n_vr,

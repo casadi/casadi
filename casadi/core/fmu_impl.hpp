@@ -86,6 +86,8 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Update discrete states
   virtual int update_discrete_states(void* instance, EventMemory* eventmem) const = 0;
 
+  virtual int get_derivatives(void* instance, double* derivatives, size_t nx) const = 0;
+
   // Set real values
   virtual int set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const = 0;
@@ -334,6 +336,10 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   mutable bool warning_fired_nominals_of_continuous_states_changed_;
   mutable bool warning_fired_values_of_continuous_states_changed_;
   mutable bool warning_fired_next_event_time_defined_;
+
+  size_t nx_;
+  // Instead of set_real+get_real, do set_real+get_real+get_derivatives+get_real
+  bool do_evaluation_dance_;
 };
 
 template<typename T>
