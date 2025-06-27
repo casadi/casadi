@@ -21,6 +21,9 @@
 import casadi as ca
 from matplotlib import pyplot as plt
 import numpy as np
+from zipfile import ZipFile
+from pathlib import Path
+import os
 
 # Simulating a bouncing ball with DaeBuilder and event handling
 # Joel Andersson, 2025
@@ -42,8 +45,12 @@ dae.disp(True)
 dae.when(h < 0, [dae.reinit('v', -0.8*dae.pre(v))])
 dae.disp(True)
 
-# Simulate over 7s
-tgrid = np.linspace(0, 7, 100)
+# Default experiment
+dae.set_start_time(0)
+dae.set_stop_time(7)
+
+# Simulate
+tgrid = np.linspace(dae.start_time(), dae.stop_time(), 100)
 sim = ca.integrator('sim', 'cvodes', dae.create(), 0, tgrid,
                     dict(transition = dae.transition()))
 simres = sim(x0 = dae.start(dae.x()))
@@ -60,25 +67,20 @@ fmu_files = dae.export_fmu()
 print('Generated files: {}'.format(fmu_files))
 
 # Compile DLL
-import os
-casadi_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+fmi_headers = Path(__file__).parent.parent.parent.parent \
+  / 'external_packages' / 'FMI-Standard-3.0' / 'headers'
 cfiles = " ".join([f for f in fmu_files if f.endswith('.c')])
 sofile = dae.name() + '.so'
-os.system(f'gcc --shared -fPIC -I{casadi_root}/external_packages/FMI-Standard-3.0/headers/ {cfiles} -o {sofile}')
+os.system(f'gcc --shared -fPIC -I{fmi_headers} {cfiles} -o {sofile}')
 print(f'Compiled {sofile}')
+fmu_files[sofile] = 'binaries/x86_64-linux'
 
 # Package into an FMU
-import zipfile
 fmuname = dae.name() + '.fmu'
-with zipfile.ZipFile(fmuname, 'w') as fmufile:
-    # Add generated files to the archive
-    for f in fmu_files:
-      arcname = f if f == 'modelDescription.xml' else 'sources/' + f
-      fmufile.write(f, arcname = arcname)
+with ZipFile(fmuname, 'w') as fmufile:
+    for f, arcpath in fmu_files.items():
+      fmufile.write(f, arcname = arcpath + '/' + f)
       os.remove(f)
-    # Add compile DLL to the archive (assume Linux 64 bit)
-    fmufile.write(sofile, arcname = f'binaries/x86_64-linux/{sofile}')
-    os.remove(sofile)
 print(f'Created FMU: {fmuname}')
 
 # Load the FMU in FMPy
@@ -86,7 +88,7 @@ try:
     import fmpy
     fmpy.dump(fmuname)
     # Simulate the generated FMU
-    res = fmpy.simulate_fmu(fmuname, stop_time=7)
+    res = fmpy.simulate_fmu(fmuname)
     import matplotlib.pyplot as plt
     plt.figure(1)
     plt.clf()

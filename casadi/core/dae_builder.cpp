@@ -315,11 +315,12 @@ bool DaeBuilder::provides_directional_derivatives() const {
   }
 }
 
-std::vector<std::string> DaeBuilder::export_fmu(const Dict& opts) {
+Dict DaeBuilder::export_fmu(const Dict& opts) {
   try {
     return (*this)->export_fmu(opts);
   } catch (std::exception& e) {
     THROW_ERROR("export_fmu", e.what());
+    return Dict();  // never reached
   }
 }
 
@@ -1493,14 +1494,40 @@ GenericType DaeBuilder::get(const std::string& name) const {
 
 std::vector<GenericType> DaeBuilder::get(const std::vector<std::string>& name) const {
   try {
-    // Create a temporary FmuFunction instance
-    Function f = create(this->name() + "_get", {}, {}, Dict{{"aux", name}});
-    // Get the stats
-    Dict stats = f.stats().at("aux");
-    // Return in the same order as inputs
+    // Allocate return value
     std::vector<GenericType> ret;
     ret.reserve(name.size());
-    for (const std::string& n : name) ret.push_back(stats.at(n));
+    // For symbolic FMUs, we can just retrieve the values
+    if ((*this)->symbolic_) {
+      // Retrieve the attributes
+      for (auto& n : name) {
+        // Get the variable
+        const Variable& v = (*this)->variable(n);
+        if (v.type == Type::STRING) {
+          // Attribute is a string
+          std::string val;
+          v.get_attribute(Attribute::STRINGVALUE, &val);
+          ret.push_back(val);
+        } else if (v.numel == 1) {
+          // Attribute is numerical scalar
+          double val;
+          v.get_attribute(Attribute::VALUE, &val);
+          ret.push_back(val);
+        } else {
+          // Attribute is a vector
+          std::vector<double> val;
+          v.get_attribute(Attribute::VALUE, &val);
+          ret.push_back(val);
+        }
+      }
+    } else {
+      // Create a temporary FmuFunction instance
+      Function f = create(this->name() + "_get", {}, {}, Dict{{"aux", name}});
+      // Get the stats
+      Dict stats = f.stats().at("aux");
+      // Return in the same order as inputs
+      for (const std::string& n : name) ret.push_back(stats.at(n));
+    }
     return ret;
   } catch (std::exception& e) {
     THROW_ERROR("get", e.what());

@@ -61,7 +61,7 @@ int main() {
   dae.disp(std::cout, true);
 
   // Generate FMU
-  std::vector<std::string> files = dae.export_fmu();
+  auto files = dae.export_fmu();
   std::cout << "generated files: " << files << "\n";
   return 0;
 }
