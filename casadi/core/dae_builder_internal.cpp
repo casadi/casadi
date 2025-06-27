@@ -810,6 +810,12 @@ std::string DaeBuilderInternal::generate_model_description(const std::string& gu
   r.set_attribute("variableNamingConvention", "structured");  // flat better?
   if (fmi_major < 3) r.set_attribute("numberOfEventIndicators", "0");
 
+  // Model exchange marker
+  XmlNode me;
+  me.name = "ModelExchange";
+  me.set_attribute("modelIdentifier", model_name);  // sanitize name?
+  r.children.push_back(me);
+
   // Default experiment
   XmlNode def_exp;
   def_exp.name = "DefaultExperiment";
@@ -817,13 +823,8 @@ std::string DaeBuilderInternal::generate_model_description(const std::string& gu
   if (!std::isnan(stop_time_)) def_exp.set_attribute("stopTime", stop_time_);
   if (!std::isnan(tolerance_)) def_exp.set_attribute("tolerance", tolerance_);
   if (!std::isnan(step_size_)) def_exp.set_attribute("stepSize", step_size_);
-  r.children.push_back(def_exp);
+  if (!def_exp.attributes.empty()) r.children.push_back(def_exp);
 
-  // Model exchange marker
-  XmlNode me;
-  me.name = "ModelExchange";
-  me.set_attribute("modelIdentifier", model_name);  // sanitize name?
-  r.children.push_back(me);
   // Model variables
   r.children.push_back(generate_model_variables());
   // Model structure
