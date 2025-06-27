@@ -30,59 +30,57 @@
 namespace casadi {
 
   // Helper functions for cleaner C API usage
-  namespace {
-    // Error handling macro
-    #define GUROBI_CALL_WARN(func, msg) do { \
-        int error = (func); \
-        if (error) { \
-            casadi_warning(msg ": Gurobi error " + std::to_string(error)); \
-            return; \
-        } \
-    } while(0)
+  // Error handling macro
+  #define GUROBI_CALL_WARN(func, msg) do { \
+      int error = (func); \
+      if (error) { \
+          casadi_warning(msg ": Gurobi error " + std::to_string(error)); \
+          return; \
+      } \
+  } while(0)
 
-    // Convert string sense to Gurobi sense
-    char sense_to_gurobi(const std::string& sense) {
-      if (sense == "<=") return GRB_LESS_EQUAL;
-      if (sense == ">=") return GRB_GREATER_EQUAL;
-      if (sense == "=") return GRB_EQUAL;
-      return GRB_LESS_EQUAL; // default
+  // Convert string sense to Gurobi sense
+  char sense_to_gurobi(const std::string& sense) {
+    if (sense == "<=") return GRB_LESS_EQUAL;
+    if (sense == ">=") return GRB_GREATER_EQUAL;
+    if (sense == "=") return GRB_EQUAL;
+    return GRB_LESS_EQUAL; // default
+  }
+
+  // RAII wrapper for callback data access
+  class CallbackDataHelper {
+  private:
+    void* cbdata_;
+    int where_;
+
+  public:
+    CallbackDataHelper(void* cbdata, int where) : cbdata_(cbdata), where_(where) {}
+
+    bool getDouble(int what, double& value) {
+      int error = GRBcbget(cbdata_, where_, what, &value);
+      return error == 0;
     }
 
-    // RAII wrapper for callback data access
-    class CallbackDataHelper {
-    private:
-      void* cbdata_;
-      int where_;
+    bool getInt(int what, int& value) {
+      int error = GRBcbget(cbdata_, where_, what, &value);
+      return error == 0;
+    }
 
-    public:
-      CallbackDataHelper(void* cbdata, int where) : cbdata_(cbdata), where_(where) {}
+    bool getSolution(std::vector<double>& solution) {
+      int error = GRBcbget(cbdata_, where_, GRB_CB_MIPSOL_SOL, solution.data());
+      return error == 0;
+    }
 
-      bool getDouble(int what, double& value) {
-        int error = GRBcbget(cbdata_, where_, what, &value);
-        return error == 0;
-      }
-
-      bool getInt(int what, int& value) {
-        int error = GRBcbget(cbdata_, where_, what, &value);
-        return error == 0;
-      }
-
-      bool getSolution(std::vector<double>& solution) {
-        int error = GRBcbget(cbdata_, where_, GRB_CB_MIPSOL_SOL, solution.data());
-        return error == 0;
-      }
-
-      bool addLazyConstraint(const std::vector<int>& indices,
-                           const std::vector<double>& coeffs,
-                           char sense, double rhs) {
-        int error = GRBcblazy(cbdata_, static_cast<int>(indices.size()),
-                             const_cast<int*>(indices.data()),
-                             const_cast<double*>(coeffs.data()),
-                             sense, rhs);
-        return error == 0;
-      }
-    };
-  }
+    bool addLazyConstraint(const std::vector<int>& indices,
+                          const std::vector<double>& coeffs,
+                          char sense, double rhs) {
+      int error = GRBcblazy(cbdata_, static_cast<int>(indices.size()),
+                            const_cast<int*>(indices.data()),
+                            const_cast<double*>(coeffs.data()),
+                            sense, rhs);
+      return error == 0;
+    }
+  };
 
   // Static C callback function
   static int gurobi_mipsol_callback(GRBmodel *model, void *cbdata, int where, void *usrdata) {
@@ -190,7 +188,7 @@ namespace casadi {
         else if (op.first == "mipsol_callback") {
             try {
                 // Attempt to convert to function
-                mipsol_callback_ = op.second.to_function();
+                mipsol_callback_ = op.second;
                 casadi_message("Successfully obtained callback function");
 
                 // Verify signature
@@ -721,12 +719,12 @@ void GurobiInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize(s, sdp_to_socp_mem_);
   }
 
-  void GurobiInterface::handle_mipsol_callback(GRBmodel *model, void *cbdata, int where) {
+void GurobiInterface::handle_mipsol_callback(GRBmodel *model, void *cbdata, int where) {
   try {
     if (!enable_mipsol_callback_ || mipsol_callback_.is_null()) {
-            casadi_warning("Callback triggered but not properly initialized");
-            return;
-        }
+      casadi_warning("Callback triggered but not properly initialized");
+      return;
+    }
 
     CallbackDataHelper helper(cbdata, where);
 
@@ -763,19 +761,75 @@ void GurobiInterface::serialize_body(SerializingStream &s) const {
       return;
     }
 
-    // Create input dictionary for callback
-    std::vector<DM> cb_arg = {
-      x_solution,
-      DM(obj_val),
-      DM(obj_best),
-      DM(obj_bound),
-      DM(sol_count)
-    };
+    // Prepare input data for callback
+    std::vector<double> input_data;
 
-    std::vector<DM> cb_res = mipsol_callback_(cb_arg);
-    // Process result
-    if (!cb_res.empty()) {
-      process_lazy_constraints(model, cbdata, cb_res);
+    // Add x_solution data
+    const double* x_ptr = x_solution.ptr();
+    input_data.insert(input_data.end(), x_ptr, x_ptr + nx_);
+
+    // Add scalar values
+    input_data.push_back(obj_val);
+    input_data.push_back(obj_best);
+    input_data.push_back(obj_bound);
+    input_data.push_back(static_cast<double>(sol_count));
+
+    // Prepare output buffer
+    std::vector<double> output_data(nx_);  // Assuming output size matches nx_
+
+    // Get memory requirements for the callback
+    casadi_int sz_arg = mipsol_callback_.sz_arg();
+    casadi_int sz_res = mipsol_callback_.sz_res();
+    casadi_int sz_iw = mipsol_callback_.sz_iw();
+    casadi_int sz_w = mipsol_callback_.sz_w();
+
+    // Allocate work arrays
+    std::vector<casadi_int> iw(sz_iw);
+    std::vector<double> w(sz_w);
+
+    // Create argument pointers
+    std::vector<const double*> arg(sz_arg);
+    std::vector<double*> res(sz_res);
+
+    // Set up input arguments
+    if (sz_arg > 0) {
+      size_t offset = 0;
+      // First argument: x_solution
+      if (sz_arg > 0) {
+        arg[0] = &input_data[offset];
+        offset += nx_;
+      }
+      // Additional scalar arguments
+      for (casadi_int i = 1; i < sz_arg && offset < input_data.size(); ++i) {
+        arg[i] = &input_data[offset];
+        offset += 1;
+      }
+    }
+
+    // Set up output arguments
+    if (sz_res > 0) {
+      res[0] = output_data.data();
+    }
+
+    // Call the callback function
+    int callback_result = mipsol_callback_(arg.data(), res.data(),
+                                          iw.data(), w.data(), 0);
+
+    if (callback_result != 0) {
+      casadi_warning("Callback function returned error code: " + std::to_string(callback_result));
+      return;
+    }
+
+    // Process results if callback succeeded
+    if (sz_res > 0 && !output_data.empty()) {
+      // Convert output back to DM for processing
+      DM results = DM::zeros(nx_, 1);
+      for (casadi_int i = 0; i < nx_; ++i) {
+        results(i) = output_data[i];
+      }
+
+      std::vector<DM> callback_outputs = {results};
+      process_lazy_constraints(model, cbdata, callback_outputs);
     }
 
   } catch (const std::exception& e) {
