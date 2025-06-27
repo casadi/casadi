@@ -680,7 +680,8 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Look for serialized CasADi expressions
   try {
     // Load function oracle from file
-    Function oracle = Function::load(resource_.path() + "/resources/oracle.casadi");
+    Function oracle = Function::load(resource_.path()
+      + "/extra/org.casadi.serialization/oracle.casadi");
     // Get expressions
     auto oracle_in = oracle.mx_in();
     auto oracle_out = oracle(oracle_in);
@@ -947,7 +948,7 @@ void DaeBuilderInternal::update_dependencies() const {
   }
 }
 
-std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const {
+Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
   // Default options
   bool no_warning = false;
   for (auto&& op : opts) {
@@ -957,8 +958,6 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   }
   // Feature incomplete
   if (!no_warning) casadi_warning("FMU generation is experimental and incomplete")
-  // Return object
-  std::vector<std::string> ret;
   // GUID
   std::string guid = generate_guid();
   // Generate model function
@@ -977,21 +976,25 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   gen.add(dae.forward(1));
   gen.add(dae.reverse(1));
   if (!tfun.is_null()) gen.add(tfun);
-  ret.push_back(gen.generate());
-  ret.push_back(dae_filename + ".h");
+  // Source files
+  std::vector<std::string> sources;
+  sources.push_back(gen.generate());
+  sources.push_back(dae_filename + ".h");
   // Make sure dependencies are up-to-date
   update_dependencies();
   // Generate FMU wrapper file
-  std::string wrapper_filename = generate_wrapper(guid, gen);
-  ret.push_back(wrapper_filename);
+  sources.push_back(generate_wrapper(guid, gen));
   // Generate build description
-  ret.push_back(generate_build_description(ret));
+  sources.push_back(generate_build_description(sources));
+  // Return object
+  Dict ret;
+  for (const std::string& s : sources) ret[s] = "sources";
   // Generate modelDescription file
-  ret.push_back(generate_model_description(guid));
+  ret[generate_model_description(guid)] = ".";
   // Serialize expressions
   std::string casadi_filename = "oracle.casadi";
   shared_from_this<DaeBuilder>().oracle().save(casadi_filename);
-  ret.push_back(casadi_filename);
+  ret[casadi_filename] = "extra/org.casadi.serialization";
   // Return list of files
   return ret;
 }

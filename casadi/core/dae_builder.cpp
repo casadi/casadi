@@ -315,11 +315,12 @@ bool DaeBuilder::provides_directional_derivatives() const {
   }
 }
 
-std::vector<std::string> DaeBuilder::export_fmu(const Dict& opts) {
+Dict DaeBuilder::export_fmu(const Dict& opts) {
   try {
     return (*this)->export_fmu(opts);
   } catch (std::exception& e) {
     THROW_ERROR("export_fmu", e.what());
+    return Dict();  // never reached
   }
 }
 

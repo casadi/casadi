@@ -283,7 +283,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   static std::string generate_guid();
 
   /// Export instance into an FMU (experimental)
-  std::vector<std::string> export_fmu(const Dict& opts) const;
+  Dict export_fmu(const Dict& opts) const;
 
   /// Generate FMU wrapper file (fmi3Functions.c)
   std::string generate_wrapper(const std::string& guid, const CodeGenerator& gen) const;

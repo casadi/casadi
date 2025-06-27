@@ -18,6 +18,9 @@
 #
 # -*- coding: utf-8 -*-
 from casadi import *
+from zipfile import ZipFile
+from pathlib import Path
+import os
 
 # Example how to export FMUs from CasADi
 # Joel Andersson, joel@jaeandersson.com
@@ -48,27 +51,24 @@ dae.set_start('u', 0.5)
 dae.disp(True)
 
 # Export FMU
-funcs = dae.export_fmu()
-print('Generated files: {}'.format(funcs))
+fmu_files = dae.export_fmu()
+print('Generated files: {}'.format(fmu_files))
 
 # Compile DLL
-import os
-casadi_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-os.system(f'gcc --shared -fPIC -I{casadi_root}/external_packages/FMI-Standard-3.0/headers/ vdp.c vdp_wrap.c -o vdp.so')
-print('Compiled vdp.so')
+fmi_headers = Path(__file__).parent.parent.parent.parent \
+  / 'external_packages' / 'FMI-Standard-3.0' / 'headers'
+cfiles = " ".join([f for f in fmu_files if f.endswith('.c')])
+sofile = dae.name() + '.so'
+os.system(f'gcc --shared -fPIC -I{fmi_headers} {cfiles} -o {sofile}')
+print(f'Compiled {sofile}')
+fmu_files[sofile] = 'binaries/x86_64-linux'
 
 # Package into an FMU
-import zipfile
-fmuname = 'vdp_generated.fmu'
-with zipfile.ZipFile(fmuname, 'w') as fmufile:
-    # Add generated files to the archive
-    for f in funcs:
-      arcname = f if f == 'modelDescription.xml' else 'sources/' + f
-      fmufile.write(f, arcname = arcname)
+fmuname = dae.name() + '.fmu'
+with ZipFile(fmuname, 'w') as fmufile:
+    for f, arcpath in fmu_files.items():
+      fmufile.write(f, arcname = arcpath + '/' + f)
       os.remove(f)
-    # Add compile DLL to the archive (assume Linux 64 bit)
-    fmufile.write('vdp.so', arcname = 'binaries/x86_64-linux/vdp.so')
-    os.remove('vdp.so')
 print(f'Created FMU: {fmuname}')
 
 # Load the FMU in FMPy
