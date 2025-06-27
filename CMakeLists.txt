@@ -96,6 +96,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 ########################################################################
 # Check if the compiler supports C++11
 foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x")
+  message("Trying C++11 flag: ${CXX11FLAG_TEST}")
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
@@ -103,6 +104,7 @@ foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x")
       ${CMAKE_MODULE_PATH}/check_cxx11.cpp
       CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG_TEST}
       OUTPUT_VARIABLE OUTPUT)
+    message("OUTPUT: ${OUTPUT}")
 
     # Save flag, if successful
     if(USE_CXX11)
