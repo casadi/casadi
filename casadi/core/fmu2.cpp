@@ -155,6 +155,7 @@ void Fmu2::load_functions() {
   enter_continuous_time_mode_ = load_function<fmi2EnterContinuousTimeModeTYPE>(
     "fmi2EnterContinuousTimeMode");
   get_derivatives_ = load_function<fmi2GetDerivativesTYPE>("fmi2GetDerivatives");
+  set_time_ = load_function<fmi2SetTimeTYPE>("fmi2SetTime");
   get_real_ = load_function<fmi2GetRealTYPE>("fmi2GetReal");
   set_real_ = load_function<fmi2SetRealTYPE>("fmi2SetReal");
   get_integer_ = load_function<fmi2GetIntegerTYPE>("fmi2GetInteger");
@@ -311,6 +312,19 @@ int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
 int Fmu2::set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const {
   casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");
+
+  // Set time variable, if any
+  if (has_independent_ && n_vr > 0 && *vr == vr_in_[0]) {
+    // Update FMU time
+    fmi2Status status = set_time_(instance, *values);
+    if (status != fmi2OK) return 1;
+    // Skip when setting remaining variables
+    vr++;
+    n_vr--;
+    values++;
+    n_values--;
+  }
+
   fmi2Status status = set_real_(instance, vr, n_vr, values);
   return status != fmi2OK;
 }
@@ -480,6 +494,7 @@ Fmu2::Fmu2(const std::string& name,
   enter_initialization_mode_ = 0;
   exit_initialization_mode_ = 0;
   enter_continuous_time_mode_ = 0;
+  set_time_ = 0;
   set_real_ = 0;
   set_boolean_ = 0;
   get_real_ = 0;

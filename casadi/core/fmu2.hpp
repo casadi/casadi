@@ -82,6 +82,7 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   fmi2ExitInitializationModeTYPE* exit_initialization_mode_;
   fmi2EnterContinuousTimeModeTYPE* enter_continuous_time_mode_;
   fmi2GetDerivativesTYPE* get_derivatives_;
+  fmi2SetTimeTYPE* set_time_;
   fmi2GetRealTYPE* get_real_;
   fmi2SetRealTYPE* set_real_;
   fmi2GetBooleanTYPE* get_boolean_;
