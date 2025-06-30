@@ -987,6 +987,7 @@ jobs:
           pip install numpy scipy pandas looseversion
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
+        
       - run: |
           pip install numpy scipy pandas looseversion
         shell: pwsh
