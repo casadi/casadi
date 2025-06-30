@@ -1,5 +1,4 @@
 name: binaries
-
 on: [push, pull_request]
 
 env:
