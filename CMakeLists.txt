@@ -1605,9 +1605,9 @@ if(WITH_CBC)
 endif()
 add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
 
-set(COIN_FLAGS "-Wno-unknown-warning -Wno-unknown-warning-option -Wno-register")
+set(COIN_FLAGS -Wno-unknown-warning -Wno-unknown-warning-option -Wno-register)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-set(COIN_FLAGS "--enable-debug")
+set(COIN_FLAGS  ${COIN_FLAGS} --enable-debug)
 endif()
 
 if(WITH_BUILD_TRLIB)
