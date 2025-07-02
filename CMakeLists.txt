@@ -1317,7 +1317,7 @@ message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
-set(COIN_FLAGS -Wno-unknown-warning-option -Wno-register)
+set(COIN_FLAGS -Wno-register)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 set(COIN_FLAGS  ${COIN_FLAGS} --enable-debug)
 endif()
