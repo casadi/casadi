@@ -3387,7 +3387,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -3404,7 +3404,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -7834,7 +7834,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -7851,7 +7851,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -11682,7 +11682,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -11699,7 +11699,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -16015,7 +16015,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -16032,7 +16032,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -16993,7 +16993,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -17010,7 +17010,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -17032,7 +17032,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L156
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L189-L191
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L193-L195
 
 >  casadi::GenericWeakRef< Shared, Internal >::GenericWeakRef(Shared shared)
 ------------------------------------------------------------------------
@@ -17045,7 +17045,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L156
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L189-L191
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L193-L195
 
 ";
 
@@ -17062,7 +17062,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L161
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L152-L158
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L156-L162
 
 ";
 
@@ -17077,7 +17077,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L166
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L147-L149
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L151-L153
 
 ";
 
@@ -17092,7 +17092,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L171
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L161-L172
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L165-L176
 
 ";
 
@@ -17109,7 +17109,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -17126,7 +17126,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -17571,7 +17571,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -17588,7 +17588,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -18296,7 +18296,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -18313,7 +18313,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -25342,7 +25342,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -25359,7 +25359,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -26563,7 +26563,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -26580,7 +26580,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -27751,7 +27751,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -27768,7 +27768,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -28269,7 +28269,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -28286,7 +28286,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -28569,7 +28569,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -28586,7 +28586,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -31248,7 +31248,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L161
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L152-L158
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L156-L162
 
 ";
 
@@ -31263,7 +31263,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L166
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L147-L149
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L151-L153
 
 ";
 
@@ -31278,7 +31278,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L171
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L161-L172
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L165-L176
 
 ";
 
@@ -31295,7 +31295,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -31312,7 +31312,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
@@ -31402,7 +31402,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L109-L111
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
 
 ";
 
@@ -31419,7 +31419,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L137-L139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
 
 ";
 
