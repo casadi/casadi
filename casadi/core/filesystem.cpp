@@ -86,7 +86,7 @@ bool Filesystem::is_enabled() {
 
 void Filesystem::assert_enabled() {
   casadi_assert(Filesystem::is_enabled(),
-  "This action requires advanced filesystem access. Compile CasADi with WITH_GC=ON.");
+  "This action requires advanced filesystem access. Compile CasADi with WITH_GHC_FILESYSTEM=ON.");
 }
 
 bool has_filesystem(const std::string& name) {
@@ -126,7 +126,7 @@ void Filesystem::open(std::ofstream& stream, const std::string& filename,
     casadi_assert(stream.good(),
       "Error opening stream '" + filename + "'. "
       "Does the directory exits? "
-      "Note that CasADi needs to be compiled with WITH_GC=ON "
+      "Note that CasADi needs to be compiled with WITH_GHC_FILESYSTEM=ON "
       "for directories to be automatically created");
   }
 }
