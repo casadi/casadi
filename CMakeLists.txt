@@ -630,8 +630,8 @@ add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct 
 
 # BLASFEO
 option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
-set(BUILD_BLASFEO_VERSION "14d6e66f0662182a8dd02ddc7ec4738738c6344d" CACHE STRING "Tag/branch/hash to be used for BUILD_BLASFEO_GIT_REPO")
-set(BUILD_BLASFEO_GIT_REPO "https://github.com/jgillis/blasfeo.git" CACHE STRING "Git repo used together with BUILD_BLASFEO_VERSION")
+set(BUILD_BLASFEO_VERSION "e33fe98" CACHE STRING "Tag/branch/hash to be used for BUILD_BLASFEO_GIT_REPO")
+set(BUILD_BLASFEO_GIT_REPO "https://github.com/giaf/blasfeo.git" CACHE STRING "Git repo used together with BUILD_BLASFEO_VERSION")
 set(BUILD_BLASFEO_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for BLASFEO")
 option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_VERSION}) from downloaded source (BUILD_BLASFEO_GIT_REPO=${BUILD_BLASFEO_GIT_REPO})." OFF)
 
@@ -645,8 +645,8 @@ set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # FATROP
 option(WITH_FATROP "Compile the interface to FATROP" OFF)
-set(BUILD_FATROP_VERSION "v0.0.4.post1" CACHE STRING "Tag/branch/hash to be used for BUILD_FATROP_GIT_REPO")
-set(BUILD_FATROP_GIT_REPO "https://github.com/meco-group/fatrop.git" CACHE STRING "Git repo used together with BUILD_FATROP_VERSION")
+set(BUILD_FATROP_VERSION "fatropv1" CACHE STRING "Tag/branch/hash to be used for BUILD_FATROP_GIT_REPO")
+set(BUILD_FATROP_GIT_REPO "https://github.com/jgillis/fatrop.git" CACHE STRING "Git repo used together with BUILD_FATROP_VERSION")
 set(BUILD_FATROP_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for FATROP")
 option(WITH_BUILD_FATROP "Build FATROP (BUILD_FATROP_VERSION=${BUILD_FATROP_VERSION}) from downloaded source (BUILD_FATROP_GIT_REPO=${BUILD_FATROP_GIT_REPO})." OFF)
 set(BUILD_FATROP_DEPENDENCIES BLASFEO)
