@@ -1317,7 +1317,7 @@ message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
-set(COIN_FLAGS -Wno-register)
+set(COIN_FLAGS)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 set(COIN_FLAGS  ${COIN_FLAGS} --enable-debug)
 endif()
@@ -1470,8 +1470,8 @@ if((WITH_CLP AND WITH_BUILD_CLP) OR (WITH_CBC AND WITH_BUILD_CBC))
           PREFIX "${CMAKE_BINARY_DIR}/external_projects"
           UPDATE_COMMAND ""
           CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>
-          "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-          "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+          "ADD_CFLAGS=-fPIC -Wno-register ${EXTERNAL_PROJECT_CFLAGS}"
+          "ADD_CXXFLAGS=-fPIC -Wno-register ${EXTERNAL_PROJECT_CXXFLAGS}"
           "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
           "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
           ${COIN_FLAGS}
