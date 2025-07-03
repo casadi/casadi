@@ -3038,17 +3038,20 @@ class MXtests(casadiTestCase):
             f(*inputs)
         out = out[0].split("\n")[:-1]
         
-
-        with self.assertInException("Parsing error"):
-            self.check_codegen(f,inputs,main=True)
-                    
-        with open("f_out.txt","r") as f_out:
-            out2 = f_out.read().split("\n")[:-2]
+        self.assertTrue("inputs" in out[0])
         
         
-        self.assertEqual(len(out),len(out2))
-        for a,b in zip(out,out2):
-            self.assertEqual(a,b)
+        if args.run_slow:
+            with self.assertInException("Parsing error"):
+                self.check_codegen(f,inputs,main=True)
+                        
+            with open("f_out.txt","r") as f_out:
+                out2 = f_out.read().split("\n")[:-2]
+            
+            
+            self.assertEqual(len(out),len(out2))
+            for a,b in zip(out,out2):
+                self.assertEqual(a,b)
 
   def test_low(self):
     v = MX.sym("v",5)
