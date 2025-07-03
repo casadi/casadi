@@ -582,7 +582,7 @@ void FmuInternal::finalize() {
   if (Filesystem::is_enabled()) {
     url = "file://" + Filesystem::absolute(resource_.path()) + "/resources";
   } else {
-    url = "file://" + resource_.path();
+    url = "file://" + resource_.path() + "/resources";
   }
   // Forward slashes
   std::replace(url.begin(), url.end(), '\\', '/');
