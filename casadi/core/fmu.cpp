@@ -1379,6 +1379,7 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::iind_map", iind_map_);
   s.pack("FmuInternal::oind", oind_);
   s.pack("FmuInternal::oind_map", oind_map_);
+  s.pack("FmuInternal::has_independent", has_independent_);
   s.pack("FmuInternal::nominal_in", nominal_in_);
   s.pack("FmuInternal::nominal_out", nominal_out_);
   s.pack("FmuInternal::min_in", min_in_);
@@ -1421,6 +1422,7 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::iind_map", iind_map_);
   s.unpack("FmuInternal::oind", oind_);
   s.unpack("FmuInternal::oind_map", oind_map_);
+  s.unpack("FmuInternal::has_independent", has_independent_);
   s.unpack("FmuInternal::nominal_in", nominal_in_);
   s.unpack("FmuInternal::nominal_out", nominal_out_);
   s.unpack("FmuInternal::min_in", min_in_);
