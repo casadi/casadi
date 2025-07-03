@@ -63,7 +63,8 @@ void ResourceInternal::change_option(const std::string& option_name,
 
 void ZipResource::unpack() {
   casadi_assert(Filesystem::is_enabled(),
-  "Unzipping '" + path_ + "' requires advanced filesystem access. Compile CasADi with WITH_GHC_FILESYSTEM=ON.\n"
+  "Unzipping '" + path_ + "' requires advanced filesystem access. "
+  "Compile CasADi with WITH_GHC_FILESYSTEM=ON.\n"
   "Alternatively, manually unzip it into a direcory, "
   "and pass this directory name instead of the zip file name.");
 
