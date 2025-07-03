@@ -687,7 +687,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     auto oracle_out = oracle(oracle_in);
     // Get all substitutions
     std::vector<MX> v, vdef;
-    for (auto& arg: oracle_in) {
+    for (auto& arg : oracle_in) {
       // Loop over symbolic primitives
       for (auto& vp : arg.primitives()) {
         // Find the variable
