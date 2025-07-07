@@ -266,7 +266,7 @@ For solvers of *ordinary* differential equations, the second equation and the al
 
 An integrator in |casadi| is a function that takes the state at the initial time ``x0``, a set of parameters ``p`` and controls ``u``, and a guess for the algebraic variables (only for DAEs) ``z0`` and returns the state vector ``xf``, algebraic variables ``zf`` and the quadrature state ``qf`` at a number of output times. The control vector ``u`` is assumed to be piecewise constant and has the same grid discretization as the output grid.
 
-The freely available `SUNDIALS suite <https://computation.llnl.gov/casc/sundials/description/description.html>`_ (distributed along with |casadi|) contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These integrators have support for forward and adjoint sensitivity analysis and when used via |casadi|'s Sundials interface, |casadi| will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations.
+The freely available `SUNDIALS suite <https://computing.llnl.gov/projects/sundials>`_ (distributed along with |casadi|) contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These integrators have support for forward and adjoint sensitivity analysis and when used via |casadi|'s Sundials interface, |casadi| will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations.
 
 Creating integrators
 ^^^^^^^^^^^^^^^^^^^^
