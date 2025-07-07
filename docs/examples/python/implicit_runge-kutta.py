@@ -147,7 +147,7 @@ for F in (irk_integrator,ref_integrator):
 
   # Generate a new function that calculates forward and reverse directional derivatives
   dF = F.factory('dF', ['x0', 'p', 'fwd:x0', 'fwd:p', 'adj:xf'],
-                       ['xf', 'fwd:xf', 'adj:x0', 'adj:p']);
+                       ['xf', 'fwd:xf', 'adj:x0', 'adj:p'])
   arg = {}
 
   # Pass arguments
