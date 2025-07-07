@@ -1405,7 +1405,7 @@ if(WITH_MUMPS)
         ${COIN_FLAGS}
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ${AUTOTOOLS_SHELL} ./get.Mumps)
 
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps")
     add_library(mumps SHARED IMPORTED)
     add_dependencies(mumps mumps-external)
     set_target_properties(mumps PROPERTIES
