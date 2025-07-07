@@ -27,7 +27,9 @@
 #ifndef _WIN32
 #ifdef WITH_DEEPBIND
 #ifndef __APPLE__
+#if __GLIBC__
 extern char **environ;
+#endif
 #endif
 #endif
 #endif
@@ -127,6 +129,7 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
     #if !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
         flag |= RTLD_DEEPBIND;
 
+        #if __GLIBC__
         // Workaround for https://github.com/conda-forge/casadi-feedstock/issues/93
         // and https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111556
         // In a nutshell, if RTLD_DEEPBIND is used and multiple symbols of environ
@@ -145,6 +148,7 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
           *p_environ_rtdl_next = environ;
           environ_rtdl_next_overridden = true;
         }
+        #endif
     #endif
     #endif
     #endif
@@ -194,10 +198,12 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
     #ifndef _WIN32
     #ifdef WITH_DEEPBIND
     #ifndef __APPLE__
+    #if __GLIBC__
         if (environ_rtdl_next_overridden) {
           *p_environ_rtdl_next = environ_rtld_next_original_value;
           environ_rtdl_next_overridden = false;
         }
+    #endif
     #endif
     #endif
     #endif
