@@ -3373,10 +3373,31 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
   // Mapping from derivative variables to corresponding state variables, FMUX only
   std::vector<std::pair<std::string, std::string>> fmi1_der;
 
-  // Add variables
+  // Force any independent variable to appear first
+  std::vector<const XmlNode*> modvars_children;
+
   for (casadi_int i = 0; i < modvars.size(); ++i) {
     // Get a reference to the variable
     const XmlNode& vnode = modvars[i];
+    std::string causality_str = vnode.attribute<std::string>("causality", "local");
+    if (causality_str=="independent") {
+      modvars_children.push_back(&vnode);
+    }
+  }
+
+  for (casadi_int i = 0; i < modvars.size(); ++i) {
+    // Get a reference to the variable
+    const XmlNode& vnode = modvars[i];
+    std::string causality_str = vnode.attribute<std::string>("causality", "local");
+    if (causality_str!="independent") {
+      modvars_children.push_back(&vnode);
+    }
+  }
+
+  // Add variables
+  for (const XmlNode* & vnode_ptr : modvars_children) {
+    // Get a reference to the variable
+    const XmlNode& vnode = *vnode_ptr;
 
     // Name of variable
     std::string name = vnode.attribute<std::string>("name");

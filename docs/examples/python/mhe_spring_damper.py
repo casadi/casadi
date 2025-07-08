@@ -31,7 +31,7 @@ NP.random.seed(0)
 
 # Settings of the filter
 N = 10 # Horizon length
-dt = 0.05; # Time step
+dt = 0.05 # Time step
 
 sigma_p = 0.005 # Standard deviation of the position measurements
 sigma_w = 0.1 # Standard deviation for the process noise
@@ -211,4 +211,4 @@ plt.show()
 
 error = estimated_X[0,:]-simulated_X[0,:]
 print(mtimes(error,error.T))
-assert(mtimes(error,error.T)<0.01)
+assert mtimes(error,error.T)<0.01

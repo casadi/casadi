@@ -1057,6 +1057,28 @@ namespace casadi {
     s << array("static const char*", name, v.size(), initializer(v));
   }
 
+  std::string CodeGenerator::print_canonical(const Sparsity& sp, const std::string& arg) {
+    add_auxiliary(AUX_PRINT_CANONICAL);
+    std::stringstream s;
+    s << "casadi_print_canonical(" << sparsity(sp) << ", " << arg << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::print_vector(casadi_int sz, const std::string& arg) {
+    add_auxiliary(AUX_PRINT_VECTOR);
+    std::stringstream s;
+    s << "casadi_print_vector(" << sz << ", " << arg << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::print_scalar(const std::string& arg) {
+    add_auxiliary(AUX_PRINT_SCALAR);
+    std::stringstream s;
+    s << "casadi_print_scalar(" << arg << ");";
+    return s.str();
+  }
+
+
   std::string CodeGenerator::print_op(casadi_int op, const std::string& a0) {
     switch (op) {
       case OP_FABS:
@@ -1845,6 +1867,18 @@ namespace casadi {
       add_auxiliary(AUX_PRINTF);
       this->auxiliaries << sanitize_source(casadi_printme_str, inst);
       break;
+    case AUX_PRINT_SCALAR:
+      add_auxiliary(AUX_PRINTF);
+      this->auxiliaries << sanitize_source(casadi_print_scalar_str, inst);
+      break;
+    case AUX_PRINT_VECTOR:
+      add_auxiliary(AUX_PRINT_SCALAR);
+      this->auxiliaries << sanitize_source(casadi_print_vector_str, inst);
+      break;
+    case AUX_PRINT_CANONICAL:
+      add_auxiliary(AUX_PRINT_VECTOR);
+      this->auxiliaries << sanitize_source(casadi_print_canonical_str, inst);
+      break;
     }
   }
 
@@ -2111,7 +2145,16 @@ namespace casadi {
   std::string CodeGenerator::printf(const std::string& str, const std::vector<std::string>& arg) {
     add_auxiliary(AUX_PRINTF);
     std::stringstream s;
-    s << "CASADI_PRINTF(\"" << str << "\"";
+    s << "CASADI_PRINTF(";
+    // Loop over lines in str
+    std::string::size_type pos = 0, prev = 0;
+    while ((pos = str.find('\n', prev)) != std::string::npos) {
+      // Any line containing a trailing new line
+      s << "\"" << str.substr(prev, pos-prev) << "\\n\"\n";
+      prev = pos + 1;
+    }
+    // Remainder without trailing new line
+    s << "\"" << str.substr(prev) << "\"";
     for (casadi_int i=0; i<arg.size(); ++i) s << ", " << arg[i];
     s << ");";
     return s.str();

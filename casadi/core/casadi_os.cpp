@@ -24,6 +24,17 @@
 #include "exception.hpp"
 #include "global_options.hpp"
 
+#ifndef _WIN32
+#ifdef WITH_DEEPBIND
+#ifndef __APPLE__
+#if __GLIBC__
+extern char **environ;
+#endif
+#endif
+#endif
+#endif
+
+
 namespace casadi {
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
@@ -117,6 +128,27 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
     #ifdef WITH_DEEPBIND
     #if !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
         flag |= RTLD_DEEPBIND;
+
+        #if __GLIBC__
+        // Workaround for https://github.com/conda-forge/casadi-feedstock/issues/93
+        // and https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111556
+        // In a nutshell, if RTLD_DEEPBIND is used and multiple symbols of environ
+        // (one in executable's .bss and one in glibc .bss)
+        // are present in the process due to copy relocations, make sure that the
+        // environ in glibc .bss has the same value of environ in executable .bss
+        // To avoid that over time the two values diverse due to the use of setenv,
+        // we restore the original value of glibc .bss's environ at the end of the function
+
+        // Check if there is a duplicate environ
+        char*** p_environ_rtdl_next = reinterpret_cast<char ***>(dlsym(RTLD_NEXT, "environ"));
+        bool environ_rtdl_next_overridden = false;
+        char** environ_rtld_next_original_value = NULL;
+        if (p_environ_rtdl_next && p_environ_rtdl_next != &environ) {
+          environ_rtld_next_original_value = *p_environ_rtdl_next;
+          *p_environ_rtdl_next = environ;
+          environ_rtdl_next_overridden = true;
+        }
+        #endif
     #endif
     #endif
     #endif
@@ -162,6 +194,19 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
 #endif // _WIN32
       }
     }
+
+    #ifndef _WIN32
+    #ifdef WITH_DEEPBIND
+    #ifndef __APPLE__
+    #if __GLIBC__
+        if (environ_rtdl_next_overridden) {
+          *p_environ_rtdl_next = environ_rtld_next_original_value;
+          environ_rtdl_next_overridden = false;
+        }
+    #endif
+    #endif
+    #endif
+    #endif
 
     casadi_assert(handle!=nullptr, errors.str());
 

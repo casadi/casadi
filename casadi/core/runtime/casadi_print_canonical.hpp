@@ -17,10 +17,15 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// SYMBOL "printme"
+// SYMBOL "print_canonical"
 template<typename T1>
-T1 casadi_printme(T1 a, T1 b) {
+void casadi_print_canonical(const casadi_int* sp, const T1* x) {
   // C-REPLACE "printf" "CASADI_PRINTF"
-  printf("|> %.15g : %.15g\n", b, a);
-  return a;
+  // x and y should be distinct
+  if (x) {
+    casadi_print_vector(sp[2+sp[1]], x);
+  } else {
+    printf("NULL");
+  }
+
 }

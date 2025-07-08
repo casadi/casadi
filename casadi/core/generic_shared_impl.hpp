@@ -26,6 +26,10 @@
 #ifndef CASADI_GENERIC_SHARED_IMPL_HPP
 #define CASADI_GENERIC_SHARED_IMPL_HPP
 
+#ifdef WITH_EXTRA_CHECKS
+#include "function.hpp"
+#endif // WITH_EXTRA_CHECKS
+
 namespace casadi {
 
   template<typename Shared, typename Internal>

@@ -798,7 +798,9 @@ class casadiTestCase(unittest.TestCase):
             out = p.communicate()
         print("Return code",p.returncode)
         assert p.returncode in main_return_code
-        if main_return_code:
+        if p.returncode!=0:
+            # We are actively looking for failure,
+            # so do not proceed with tests
             return
         
       Fout = F.call(inputs)

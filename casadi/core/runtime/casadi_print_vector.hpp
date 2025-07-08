@@ -17,10 +17,16 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// SYMBOL "printme"
+// C-REPLACE "printf" "CASADI_PRINTF"
+
+// SYMBOL "print_vector"
 template<typename T1>
-T1 casadi_printme(T1 a, T1 b) {
-  // C-REPLACE "printf" "CASADI_PRINTF"
-  printf("|> %.15g : %.15g\n", b, a);
-  return a;
+void casadi_print_vector(casadi_int sz, const T1* a) {
+  casadi_int i;
+  printf("[");
+  for (i=0; i<sz; ++i) {
+    if (i>0) printf(", ");
+    casadi_print_scalar(a[i]);
+  }
+  printf("]");
 }

@@ -71,6 +71,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -160,6 +161,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -248,6 +250,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -346,6 +349,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -418,6 +422,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -497,6 +502,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -556,6 +562,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -678,6 +685,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td><td>casadi::Blocksqp</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td><td>casadi::Blocksqp</td></tr>
@@ -886,6 +894,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td><td>casadi::Blocksqp</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td><td>casadi::Blocksqp</td></tr>
@@ -1003,6 +1012,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -1135,6 +1145,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -1209,6 +1220,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -1288,6 +1300,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -1387,6 +1400,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -1458,6 +1472,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -1520,6 +1535,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -1591,6 +1607,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -1665,6 +1682,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -1763,6 +1781,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -1833,6 +1852,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -1894,6 +1914,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -1960,6 +1981,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -2053,6 +2075,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -2150,6 +2173,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -2293,6 +2317,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -2373,6 +2398,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -2444,6 +2470,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -2507,6 +2534,7 @@
 <tr><td>pos_def</td><td>OT_BOOL</td><td>Assume P positive definite</td><td>casadi::Dple</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -2569,6 +2597,7 @@
 <tr><td>pos_def</td><td>OT_BOOL</td><td>Assume P positive definite</td><td>casadi::Dple</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -2628,6 +2657,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -2687,6 +2717,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -2758,6 +2789,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -2842,6 +2874,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -2909,6 +2942,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -2990,6 +3024,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -3082,6 +3117,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -3196,6 +3232,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -3304,6 +3341,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Feasiblesqpmethod</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print the iterations</td><td>casadi::Feasiblesqpmethod</td></tr>
@@ -3478,6 +3516,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Feasiblesqpmethod</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print the iterations</td><td>casadi::Feasiblesqpmethod</td></tr>
@@ -3567,6 +3606,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -3643,6 +3683,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -3724,6 +3765,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -3804,6 +3846,7 @@
 <tr><td>parallelization</td><td>OT_STRING</td><td>Parallelization [SERIAL|openmp|thread]</td><td>casadi::FmuFunction</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_progress</td><td>OT_BOOL</td><td>Print progress during Jacobian/Hessian evaluation</td><td>casadi::FmuFunction</td></tr>
@@ -3874,6 +3917,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -3930,6 +3974,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -3991,6 +4036,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -4070,6 +4116,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -4136,6 +4183,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -4207,6 +4255,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -4274,6 +4323,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -4355,6 +4405,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -4424,6 +4475,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Amount of diagnostic printing [Default: 1].</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -4517,6 +4569,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Amount of diagnostic printing [Default: 1].</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -4613,6 +4666,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -4762,6 +4816,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -4853,6 +4908,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -4934,6 +4990,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -5014,6 +5071,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -5096,6 +5154,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -5189,6 +5248,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -5270,6 +5330,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -5341,6 +5402,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -5402,6 +5464,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -5498,6 +5561,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -5628,6 +5692,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -5703,6 +5768,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Ipqp</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Ipqp</td></tr>
@@ -5790,6 +5856,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Ipqp</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Ipqp</td></tr>
@@ -5855,6 +5922,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -5934,6 +6002,7 @@
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioner</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Verbosity level</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -6042,6 +6111,7 @@
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioner</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Verbosity level</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -6136,6 +6206,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -6242,6 +6313,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -6308,6 +6380,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -6378,6 +6451,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -6437,6 +6511,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -6505,6 +6580,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -6566,6 +6642,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -6636,6 +6713,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -6773,6 +6851,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_instructions</td><td>OT_BOOL</td><td>Print each operation during evaluation</td><td>casadi::MXFunction</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -6862,6 +6941,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -6968,6 +7048,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -7088,6 +7169,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print information about each iteration</td><td>casadi::Newton</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -7176,6 +7258,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print information about each iteration</td><td>casadi::Newton</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -7261,6 +7344,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -7349,6 +7433,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -7417,6 +7502,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -7492,6 +7578,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -7556,6 +7643,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -7620,6 +7708,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -7695,6 +7784,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -7773,6 +7863,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -7848,6 +7939,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -7914,6 +8006,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -7987,6 +8080,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -8082,6 +8176,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -8225,6 +8320,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -8293,6 +8389,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Qrqp</td></tr>
@@ -8378,6 +8475,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Qrqp</td></tr>
@@ -8474,6 +8572,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Qrsqp</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print the iterations</td><td>casadi::Qrsqp</td></tr>
@@ -8602,6 +8701,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Qrsqp</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print the iterations</td><td>casadi::Qrsqp</td></tr>
@@ -8683,6 +8783,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -8753,6 +8854,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -8839,6 +8941,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Print level of SLEQP (default: 2/SLEQP_LOG_WARN)</td><td>casadi::SLEQPInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -8931,6 +9034,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Print level of SLEQP (default: 2/SLEQP_LOG_WARN)</td><td>casadi::SLEQPInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -9004,7 +9108,9 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_instructions</td><td>OT_BOOL</td><td>Print each operation during evaluation</td><td>casadi::SXFunction</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
@@ -9097,6 +9203,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Scpgen</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -9233,6 +9340,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Scpgen</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
@@ -9383,6 +9491,7 @@
 <tr><td>pos_def</td><td>OT_BOOL</td><td>Assume P positive definite</td><td>casadi::Dple</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -9459,6 +9568,7 @@
 <tr><td>pos_def</td><td>OT_BOOL</td><td>Assume P positive definite</td><td>casadi::Dple</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -9542,6 +9652,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -9642,6 +9753,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -9751,6 +9863,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print the iterations</td><td>casadi::Sqpmethod</td></tr>
@@ -9901,6 +10014,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print the iterations</td><td>casadi::Sqpmethod</td></tr>
@@ -9999,6 +10113,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -10102,6 +10217,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -10181,6 +10297,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -10252,6 +10369,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -10313,6 +10431,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -10381,6 +10500,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -10463,6 +10583,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
@@ -10561,6 +10682,7 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>

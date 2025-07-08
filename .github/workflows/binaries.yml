@@ -243,7 +243,7 @@ jobs:
           config: |
             matrix:
               arch: [manylinux1-x64,manylinux1-x86]
-              py2: ["27","35"]
+              py2: ["27"]
             operations:
               - type: append
                 matrix:
@@ -252,7 +252,7 @@ jobs:
               - type: append
                 matrix:
                   arch: [windows-shared-x64-posix]
-                  py2: ["27","35","36","37","38","39","310","311","312","313"]
+                  py2: ["27","36","37","38","39","310","311","312","313"]
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
@@ -269,7 +269,7 @@ jobs:
           config: |
             matrix:
               image: [macos-13]
-              py2: ["27","35","36","37","38","39","310","311","312","313"]
+              py2: ["27","36","37","38","39","310","311","312","313"]
             operations:
               - type: append
                 matrix:
@@ -929,7 +929,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       py2: ["27","35","36","37","38","39","310","311","312","313"]
+       py2: ["27","36","37","38","39","310","311","312","313"]
        image: ["windows-2022","ubuntu-24.04","macos-13","macos-14"]
        bit: [64]
        exclude:
@@ -938,8 +938,6 @@ jobs:
           bit: 32
         - image: "macos-14"
           py2: "27"
-        - image: "macos-14"
-          py2: "35"
         - image: "macos-14"
           py2: "36"
         - image: "macos-14"

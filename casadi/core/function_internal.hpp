@@ -1377,6 +1377,9 @@ namespace casadi {
     bool print_in_;
     bool print_out_;
 
+    // Print canonical form
+    bool print_canonical_;
+
     // Warn when number of inputs or outputs exceed this value
     casadi_int max_io_;
 
@@ -1455,6 +1458,21 @@ namespace casadi {
 
         \identifier{nw} */
     void print_out(std::ostream &stream, double** res, bool truncate) const;
+
+    /** \brief Print canonical representation of a numeric matrix
+
+        \identifier{2dh} */
+    static void print_canonical(std::ostream &stream, const Sparsity& sp, const double* nz);
+
+    /** \brief Print canonical representation of a numeric vector
+
+        \identifier{2di} */
+    static void print_canonical(std::ostream &stream, casadi_int sz, const double* nz);
+
+    /** \brief Print canonical representation of a number
+
+        \identifier{2dj} */
+    static void print_canonical(std::ostream &stream, double a);
 
   protected:
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization

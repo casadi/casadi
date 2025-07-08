@@ -363,21 +363,33 @@ namespace casadi {
                                     const std::vector<casadi_int>& res,
                                     const std::vector<bool>& arg_is_ref,
                                     std::vector<bool>& res_is_ref) const {
-    g.local("i", "casadi_int");
-    g.local("j", "casadi_int");
-    g.local("rr", "casadi_real", "*");
-    g.local("k", "casadi_int");
-    g.local("cr", "const casadi_real", "*");
-    g << "for (cr=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1])
-      << ", rr=" << g.work(res[0], nnz(), false)
-      << "; cr!=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]) << "+" << dep(1).nnz()
-      << "; ++cr) ";
-    g << "for (j=(int) *cr, "
-      << "k=" << inner_.start << ";k<" << inner_.stop << ";k+=" << inner_.step << ") ";
-    g << "{ i=k+j; "
-      << "*rr++ = i>=0 && i<" << dep(0).nnz() << " ? "
-      << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) <<  "[i] : " << g.constant(nan) << "; }\n";
-
+    if (inner_.step==1 && arg_is_ref[0] && dep(1).nnz()==1) {
+      if (nnz()==1) {
+        g.local("i", "casadi_int");
+        g << "i = " << inner_.start << " + (int) " << g.workel(arg[1]) << ";\n";
+        g << g.workel(res[0]) << " = i>=0 && i<" << dep(0).nnz() << " ? ";
+        g << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) << "[i] : " << g.constant(nan) << ";\n";
+      } else {
+        g << g.work(res[0], nnz(), true) << " = " << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
+        g << " + " << inner_.start << " + (int)" << g.workel(arg[1]) << ";\n";
+        res_is_ref[0] = true;
+      }
+    } else {
+      g.local("i", "casadi_int");
+      g.local("j", "casadi_int");
+      g.local("rr", "casadi_real", "*");
+      g.local("k", "casadi_int");
+      g.local("cr", "const casadi_real", "*");
+      g << "for (cr=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1])
+        << ", rr=" << g.work(res[0], nnz(), false)
+        << "; cr!=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]) << "+" << dep(1).nnz()
+        << "; ++cr) ";
+      g << "for (j=(int) *cr, "
+        << "k=" << inner_.start << ";k<" << inner_.stop << ";k+=" << inner_.step << ") ";
+      g << "{ i=k+j; "
+        << "*rr++ = i>=0 && i<" << dep(0).nnz() << " ? "
+        << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) <<  "[i] : " << g.constant(nan) << "; }\n";
+    }
   }
 
   void GetNonzerosParamParam::generate(CodeGenerator& g,

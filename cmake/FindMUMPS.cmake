@@ -1,8 +1,9 @@
 message(STATUS "Looking for MUMPS")
 
 find_path(MUMPS_INCLUDE_DIR
-    dmumps_c.h
+    mumps_mpi.h "mumps_seq/mpi.h"
     HINTS $ENV{MUMPS}/include
+    PATH_SUFFIXES "coin-or/mumps"
 )
 
 if(MUMPS_INCLUDE_DIR)
@@ -13,7 +14,7 @@ endif()
 
 # libraries
 set(MUMPS_LIBS_LIST
-  dmumps_seq
+  dmumps_seq coinmumps dmumps
 )
 
 set(MUMPS_LIBRARIES)
@@ -23,9 +24,10 @@ foreach(LIB ${MUMPS_LIBS_LIST})
     HINTS $ENV{MUMPS}/lib)
   if(MUMPS_LIB_${LIB})
 #    message(STATUS "Found ${LIB}: ${MUMPS_LIB_${LIB}}")
-    set(MUMPS_LIBRARIES ${MUMPS_LIBRARIES} ${MUMPS_LIB_${LIB}})
+    set(MUMPS_LIBRARIES ${MUMPS_LIB_${LIB}})
 #  else()
 #    message(STATUS "Could not find lib${LIB}")
+    break()
   endif()
 endforeach()
 

@@ -17,10 +17,9 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// SYMBOL "printme"
+// SYMBOL "print_scalar"
 template<typename T1>
-T1 casadi_printme(T1 a, T1 b) {
+void casadi_print_scalar(T1 a) {
   // C-REPLACE "printf" "CASADI_PRINTF"
-  printf("|> %.15g : %.15g\n", b, a);
-  return a;
+  printf("%.16e", a);
 }

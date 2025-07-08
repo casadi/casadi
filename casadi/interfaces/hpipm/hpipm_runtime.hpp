@@ -531,7 +531,7 @@ int casadi_hpipm_solve(casadi_hpipm_data<T1>* d, const double** arg, double** re
 		{
         printf("\n -> Solver failed! Minimum step lenght reached\n");
 		}
-	else if(d->return_status==2)
+	else if(d->return_status==3)
 		{
         printf("\n -> Solver failed! NaN in computations\n");
 		}

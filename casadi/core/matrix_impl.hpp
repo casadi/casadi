@@ -609,9 +609,7 @@ namespace casadi {
   void Matrix<Scalar>::print_scalar(std::ostream &stream) const {
     casadi_assert(numel()==1, "Not a scalar");
 
-    std::streamsize precision = stream.precision();
-    std::streamsize width = stream.width();
-    std::ios_base::fmtflags flags = stream.flags();
+    StreamStateGuard backup(stream);
 
     stream.precision(stream_precision_);
     stream.width(stream_width_);
@@ -627,9 +625,6 @@ namespace casadi {
       stream << scalar();
     }
     stream << std::flush;
-    stream.precision(precision);
-    stream.width(width);
-    stream.flags(flags);
   }
 
   template<typename Scalar>
@@ -719,6 +714,12 @@ namespace casadi {
     } else {
       print_sparse(stream, sp, nonzeros, truncate);
     }
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_canonical(std::ostream &stream, const Sparsity& sp,
+    const Scalar* nonzeros, bool truncate) {
+    casadi_error("'print_canonical' not defined for " + type_name());
   }
 
   template<typename Scalar>

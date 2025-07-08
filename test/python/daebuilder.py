@@ -54,7 +54,7 @@ class Daebuildertests(casadiTestCase):
         if not name.endswith("3"):
             self.check_serialize(f,inputs=test_point)
   
-  @memory_heavy()
+  @memory_heavy() # FMU has a memleak
   def test_cstr(self):
     fmu_file = "../data/cstr.fmu"
     if not os.path.exists(fmu_file):
@@ -558,7 +558,7 @@ class Daebuildertests(casadiTestCase):
 
 
   def test_stats_available_bug(self):
-        fmu_file = '../data/vdp.fmu'
+        fmu_file = '../data/VanDerPol2.fmu'
         if not os.path.exists(fmu_file):
             print("Skipping test_fmu_demo, resource not available")
             return
