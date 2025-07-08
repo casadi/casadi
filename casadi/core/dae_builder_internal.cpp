@@ -991,20 +991,30 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
   for (const std::string& s : sources) ret[s] = "sources";
   // Generate modelDescription file
   ret[generate_model_description(guid)] = ".";
+
   // Serialize expressions
-  std::string casadi_filename = "oracle.casadi";
-  shared_from_this<DaeBuilder>().oracle().save(casadi_filename);
-  ret[casadi_filename] = "extra/org.casadi.fmi-ls-serialization";
-  // Manifest file for serialized expressions
-  XmlNode ls_manifest;
-  ls_manifest.name = "fmiLayeredStandardManifest";
-  ls_manifest.set_attribute("fmi-ls:fmi-ls-name", "org.casadi.fmi-ls-serialization");
-  ls_manifest.set_attribute("fmi-ls:fmi-ls-version", "1.0.0");
-  ls_manifest.set_attribute("fmi-ls:fmi-ls-description",
-    "Layered standard for serialized CasADi expressions in FMU");
-  std::string ls_filename = "fmi-ls-manifest.xml";
-  XmlFile ls_file("tinyxml");
-  ls_file.dump(ls_filename, ls_manifest);
+  if (true) {
+    // Layered standard for serialized CasADi
+    std::string serialization_ls = "org.casadi.fmi-ls-serialization";
+    // Serialized oracle
+    std::string oracle_filename = "oracle.casadi";
+    shared_from_this<DaeBuilder>().oracle().save(oracle_filename);
+    ret[oracle_filename] = "extra/" + serialization_ls;
+    // Manifest file for serialized expressions
+    XmlNode r;
+    r.name = "fmiLayeredStandardManifest";
+    r.set_attribute("fmi-ls:fmi-ls-name", serialization_ls);
+    r.set_attribute("fmi-ls:fmi-ls-version", "1.0.0");
+    r.set_attribute("fmi-ls:fmi-ls-description",
+      "Layered standard for serialized CasADi expressions in FMU");
+    XmlNode manifest;
+    manifest.children.push_back(r);
+    // Export and add to return
+    XmlFile xml_file("tinyxml");
+    std::string manifest_filename = "fmi-ls-manifest.xml";
+    xml_file.dump(manifest_filename, manifest);
+    ret[manifest_filename] = "extra/" + serialization_ls;
+  }
   // Return list of files
   return ret;
 }
