@@ -681,7 +681,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   try {
     // Load function oracle from file
     Function oracle = Function::load(resource_.path()
-      + "/extra/org.casadi.serialization/oracle.casadi");
+      + "/extra/org.casadi.fmi-ls-serialization/oracle.casadi");
     // Get expressions
     auto oracle_in = oracle.mx_in();
     auto oracle_out = oracle(oracle_in);
@@ -994,7 +994,17 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
   // Serialize expressions
   std::string casadi_filename = "oracle.casadi";
   shared_from_this<DaeBuilder>().oracle().save(casadi_filename);
-  ret[casadi_filename] = "extra/org.casadi.serialization";
+  ret[casadi_filename] = "extra/org.casadi.fmi-ls-serialization";
+  // Manifest file for serialized expressions
+  XmlNode ls_manifest;
+  ls_manifest.name = "fmiLayeredStandardManifest";
+  ls_manifest.set_attribute("fmi-ls:fmi-ls-name", "org.casadi.fmi-ls-serialization");
+  ls_manifest.set_attribute("fmi-ls:fmi-ls-version", "1.0.0");
+  ls_manifest.set_attribute("fmi-ls:fmi-ls-description",
+    "Layered standard for serialized CasADi expressions in FMU");
+  std::string ls_filename = "fmi-ls-manifest.xml";
+  XmlFile ls_file("tinyxml");
+  ls_file.dump(ls_filename, ls_manifest);
   // Return list of files
   return ret;
 }
