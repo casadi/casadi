@@ -951,9 +951,14 @@ void DaeBuilderInternal::update_dependencies() const {
 Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
   // Default options
   bool no_warning = false;
+  bool with_serialization = true;
   for (auto&& op : opts) {
     if (op.first == "no_warning") {
       no_warning = op.second;
+    } else if (op.first == "with_serialization") {
+      with_serialization = op.second;
+    } else {
+      casadi_error("No such option: " + op.first);
     }
   }
   // Feature incomplete
@@ -993,7 +998,7 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
   ret[generate_model_description(guid)] = ".";
 
   // Serialize expressions
-  if (true) {
+  if (with_serialization) {
     // Layered standard for serialized CasADi
     std::string serialization_ls = "org.casadi.fmi-ls-serialization";
     // Serialized oracle
