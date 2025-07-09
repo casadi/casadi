@@ -30,6 +30,7 @@ function solver = sysid_gauss_newton(e,nlp,V)
   io.hess_gamma_x_x = sigma*H;
   
   opts = struct;
+  disp('WARNING: on Windows, JIT may require a special environment cfr https://github.com/casadi/casadi/wiki/FAQ:-how-to-perform-jit-for-function-evaluations-of-my-optimization-problem%3F')
   opts.jit = true;
   opts.compiler='shell';
   opts.jit_options.verbose = true;

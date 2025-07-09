@@ -103,6 +103,7 @@ if Importer.has_plugin('clang'):
   compiler = 'clang'
 elif Importer.has_plugin('shell'):
   with_jit = True
+  print("WARNING: on Windows, JIT may require a special environment cfr https://github.com/casadi/casadi/wiki/FAQ:-how-to-perform-jit-for-function-evaluations-of-my-optimization-problem%3F")
   compiler = 'shell'
 else:
   print("WARNING; running without jit. This may result in very slow evaluation times")
