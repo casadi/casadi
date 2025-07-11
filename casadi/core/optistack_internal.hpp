@@ -443,6 +443,8 @@ private:
   /// Constraints verbatim as passed in with 'subject_to'
   std::vector<MX> g_;
 
+  mutable RevWeakCache<MX, Function> helpers_;
+
   /// Objective verbatim as passed in with 'minimize'
   MX f_;
 

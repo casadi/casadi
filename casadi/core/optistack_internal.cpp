@@ -1400,10 +1400,13 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) c
   std::vector<MX> p   = symvar(expr, OPTI_PAR);
   std::vector<MX> lam = symvar(expr, OPTI_DUAL_G);
 
-  Function helper = Function("helper", std::vector<MX>{veccat(x), veccat(p), veccat(lam)}, {expr});
-  if (helper.has_free())
-    casadi_error("This expression has symbols that are not defined "
-      "within Opti using variable/parameter.");
+  Function helper;
+  if (!helpers_.incache(expr, helper)) {
+    helper = Function("helper", std::vector<MX>{veccat(x), veccat(p), veccat(lam)}, {expr});
+    if (helper.has_free())
+      casadi_error("This expression has symbols that are not defined "
+        "within Opti using variable/parameter.");
+  }
 
   std::map<VariableType, std::map<casadi_int, MX> > temp;
   temp[OPTI_DUAL_G] = std::map<casadi_int, MX>();
