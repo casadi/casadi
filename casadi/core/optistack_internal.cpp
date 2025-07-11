@@ -1396,19 +1396,29 @@ bool override_num(const std::map<casadi_int, MX> & temp, std::vector<DM>& num, c
   return false;
 }
 
-DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) const {
-  std::vector<MX> x   = symvar(expr, OPTI_VAR);
-  std::vector<MX> p   = symvar(expr, OPTI_PAR);
-  std::vector<MX> lam = symvar(expr, OPTI_DUAL_G);
 
-  Function helper;
-  if (!helpers_.incache(expr, helper)) {
-    helper = Function("helper", std::vector<MX>{veccat(x), veccat(p), veccat(lam)}, {expr});
-    if (helper.has_free())
+DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) const {
+
+  std::shared_ptr<ValueHelper> vh;
+  if (!helpers_.incache(expr, vh)) {
+    vh = std::make_shared<ValueHelper>();
+    std::vector<MX> x   = symvar(expr, OPTI_VAR);
+    std::vector<MX> p   = symvar(expr, OPTI_PAR);
+    std::vector<MX> lam = symvar(expr, OPTI_DUAL_G);
+    vh->x = x;
+    vh->p = p;
+    vh->lam = lam;
+    vh->helper = Function("helper", std::vector<MX>{veccat(x), veccat(p), veccat(lam)}, {expr});
+    if (vh->helper.has_free())
       casadi_error("This expression has symbols that are not defined "
         "within Opti using variable/parameter.");
-    helpers_.tocache_if_missing(expr, helper);
+    helpers_.tocache_if_missing(expr, vh);
   }
+
+  const std::vector<MX>& x = vh->x;
+  const std::vector<MX>& p = vh->p;
+  const std::vector<MX>& lam = vh->lam;
+  const Function& helper = vh->helper;
 
   std::map<VariableType, std::map<casadi_int, MX> > temp;
   temp[OPTI_DUAL_G] = std::map<casadi_int, MX>();
@@ -1630,6 +1640,16 @@ std::vector<MX> OptiNode::active_symvar(VariableType type) const {
   std::vector<MX> ret;
   for (const auto& s : symbols_) {
     if (symbol_active_[meta(s).count] && meta(s).type==type)
+      ret.push_back(s);
+  }
+  return ret;
+}
+
+std::vector<MX> OptiNode::symvar(VariableType type) const {
+  if (symbols_.empty()) return std::vector<MX>{};
+  std::vector<MX> ret;
+  for (const auto& s : symbols_) {
+    if (meta(s).type==type)
       ret.push_back(s);
   }
   return ret;

@@ -190,6 +190,7 @@ public:
 
   void assert_active_symbol(const MX& m) const;
 
+  std::vector<MX> symvar(VariableType type) const;
   std::vector<MX> active_symvar(VariableType type) const;
   std::vector<DM> active_values(VariableType type) const;
   std::vector<DM> active_values(VariableType type,
@@ -443,7 +444,15 @@ private:
   /// Constraints verbatim as passed in with 'subject_to'
   std::vector<MX> g_;
 
-  mutable RevWeakCache<MX, Function> helpers_;
+  class ValueHelper {
+  public:
+    Function helper;
+    std::vector<MX> x;
+    std::vector<MX> p;
+    std::vector<MX> lam;
+  };
+
+  mutable RevWeakCache<MX, std::shared_ptr<ValueHelper> > helpers_;
 
   /// Objective verbatim as passed in with 'minimize'
   MX f_;
