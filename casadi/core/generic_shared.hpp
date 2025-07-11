@@ -326,7 +326,9 @@ class CASADI_EXPORT RevWeakCache {
       casadi::conditional_lock_guard<std::mutex> lock(mtx_, needs_lock);
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       // Add to cache
-      pre_cache_.insert(std::make_pair(key.get(), key));
+      const typename K::internal_base_type* k = static_cast<const typename K::base_type&>(key).get();
+      pre_cache_.insert(std::make_pair(k, key));
+      cache_.insert(std::make_pair(k, f));
       // Remove a lost reference, if any, to prevent uncontrolled growth
       for (auto it = pre_cache_.begin(); it!=pre_cache_.end(); ++it) {
         if (!it->second.alive()) {

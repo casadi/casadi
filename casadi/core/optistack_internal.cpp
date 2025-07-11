@@ -1406,6 +1406,7 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) c
     if (helper.has_free())
       casadi_error("This expression has symbols that are not defined "
         "within Opti using variable/parameter.");
+    helpers_.tocache_if_missing(expr, helper);
   }
 
   std::map<VariableType, std::map<casadi_int, MX> > temp;
