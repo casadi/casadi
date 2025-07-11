@@ -728,6 +728,7 @@ void OptiNode::bake() {
 
   symbol_active_.clear();
   symbol_active_.resize(symbols_.size());
+  helpers_.clear();
 
   // Gather all expressions
   MX total_expr = vertcat(f_, veccat(g_));
