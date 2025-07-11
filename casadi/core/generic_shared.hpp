@@ -30,6 +30,7 @@
 #include "exception.hpp"
 #include <unordered_map>
 #include <vector>
+#include <cstdint>
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
 #include <mingw.mutex.h>
@@ -326,7 +327,7 @@ class CASADI_EXPORT RevWeakCache {
       casadi::conditional_lock_guard<std::mutex> lock(mtx_, needs_lock);
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       // Add to cache
-      const typename K::internal_base_type* k = static_cast<const typename K::base_type&>(key).get();
+      std::uintptr_t k = reinterpret_cast<std::uintptr_t>(key.get());
       pre_cache_.insert(std::make_pair(k, key));
       cache_.insert(std::make_pair(k, f));
       // Remove a lost reference, if any, to prevent uncontrolled growth
@@ -360,7 +361,7 @@ class CASADI_EXPORT RevWeakCache {
       // Safe access to cache_
       casadi::conditional_lock_guard<std::mutex> lock(mtx_, needs_lock);
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
-      const typename K::internal_base_type* k = static_cast<const typename K::base_type&>(key).get();
+std::uintptr_t k = reinterpret_cast<std::uintptr_t>(key.get());
       auto it = pre_cache_.find(k);
       K temp;
       if (it!=pre_cache_.end() && it->second.shared_if_alive(temp)) {
@@ -382,10 +383,10 @@ class CASADI_EXPORT RevWeakCache {
     }
     RevWeakCache() = default;
   private:
-    std::unordered_map<const typename K::internal_base_type*,
+    std::unordered_map<std::uintptr_t,
     GenericWeakRef<typename K::base_type, typename K::internal_base_type>
     > pre_cache_;
-    std::unordered_map<const typename K::internal_base_type*, T> cache_;
+    std::unordered_map<std::uintptr_t, T> cache_;
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
     mutable std::mutex mtx_;
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
