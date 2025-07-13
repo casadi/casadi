@@ -1580,7 +1580,7 @@ Dict FmuFunction::get_stats(void *mem) const {
 
 void FmuFunction::serialize_body(SerializingStream &s) const {
   FunctionInternal::serialize_body(s);
-  s.version("FmuFunction", 3);
+  s.version("FmuFunction", 4);
 
   s.pack("FmuFunction::Fmu", fmu_);
 
@@ -1612,6 +1612,8 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 
   s.pack("FmuFunction::uses_directional_derivatives", uses_directional_derivatives_);
   s.pack("FmuFunction::uses_adjoint_derivatives", uses_adjoint_derivatives_);
+  s.pack("FmuFunction::nfwd", nfwd_);
+  s.pack("FmuFunction::nadj", nadj_);
   s.pack("FmuFunction::validate_forward", validate_forward_);
   s.pack("FmuFunction::validate_hessian", validate_hessian_);
   s.pack("FmuFunction::make_symmetric", make_symmetric_);
@@ -1643,7 +1645,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 }
 
 FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
-  s.version("FmuFunction", 3);
+  s.version("FmuFunction", 3, 4);
 
   s.unpack("FmuFunction::Fmu", fmu_);
 
@@ -1681,6 +1683,8 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
 
   s.unpack("FmuFunction::uses_directional_derivatives", uses_directional_derivatives_);
   s.unpack("FmuFunction::uses_adjoint_derivatives", uses_adjoint_derivatives_);
+  s.unpack("FmuFunction::nfwd", nfwd_);
+  s.unpack("FmuFunction::nadj", nadj_);
   s.unpack("FmuFunction::validate_forward", validate_forward_);
   s.unpack("FmuFunction::validate_hessian", validate_hessian_);
   s.unpack("FmuFunction::make_symmetric", make_symmetric_);
