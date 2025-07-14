@@ -1493,6 +1493,8 @@ GenericType DaeBuilder::get(const std::string& name) const {
 
 std::vector<GenericType> DaeBuilder::get(const std::vector<std::string>& name) const {
   try {
+    casadi_assert(!(*this)->symbolic_,
+      "Functionality not implemented for symbolic representation");
     // Create a temporary FmuFunction instance
     Function f = create(this->name() + "_get", {}, {}, Dict{{"aux", name}});
     // Get the stats
