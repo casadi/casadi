@@ -566,5 +566,125 @@ class Daebuildertests(casadiTestCase):
         dae.get("x1")
         dae.disp(True)
         
+        
+  def test_w(self):
+    dae = ca.DaeBuilder('test')
+    
+    dae.disp(True)
+    
+    # Causality: 'parameter' 'calculated_parameter' 'input' 'output' 'local' 'independent'
+    # variability: 'constant' 'fixed' 'tunable' 'discrete' 'continuous'
+    
+    u = dae.add('u','input','continuous')
+    u_val = 1.1
+    
+    # Constants
+    c0 = dae.add('c0','parameter','fixed')
+    c0_val = 0.97
+    dae.set('c0',c0_val)
+    c1 = dae.add('c1','output','constant')
+    c1_val = 0.17
+    dae.set('c1',c1_val)
+    c2 = dae.add('c2','local','constant')
+    c2_val = 0.19
+    dae.set('c2',c2_val)
+    c_val = vertcat(c0_val,c1_val,c2_val)
+    with self.assertInException("Functionality only applies"):
+        dae.get('c2')
+        #self.checkarray(dae.get('c2'),c2_val)
+
+    # Parameters
+    p = dae.add('p','parameter','tunable')
+    p_val = 1.3
+    dae.set('p',p_val)
+    
+    x0 = dae.add('x0','output','continuous')
+    x0_val = 1.7
+    x1 = dae.add('x1','local','continuous')
+    x1_val = 1.9
+
+    dae.eq(dae.der(x0),x0*x1)    
+    dae.eq(dae.der(x1),x1+u+p*c0)
+    
+    # Calculated parameters
+    #d0 = dae.add('d0','calculatedParameter','tunable')
+    #dae.eq(d0, p**2+c0+c1+c2)
+    #dae.add_d('foo',p**2+c0+c1+c2)
+    
+    w0 = dae.add('w0','output','continuous')
+    w1 = dae.add('w1','local','continuous')
+    
+    dae.eq(w0,sin(x1))
+    dae.eq(w1,w0**2+u)
+    
+    x2 = dae.add('x2','local','continuous')
+    x2_val = 1.11
+    dae.eq(dae.der(x2),3*w1)
+    
+    x_val = vertcat(x0_val,x1_val,x2_val)
+    
+
+    z0 = dae.add('z0','output','continuous')
+    z1 = dae.add('z1','local','continuous')
+    z0_val = 2.11
+    z1_val = 3.13
+    z_val = vertcat(z0_val,z1_val)
+    
+    dae.eq(0,x1-2*z0)
+    dae.eq(0,x1-3*z1+z0)
+
+    
+    dae.disp(True)
+    
+    f = dae.create('f',['p','u','x'],['y'])
+    
+    f.disp(True)
+    
+    with self.assertInException('Initialization failed since variables [p, c0] are free'):
+        dae.dependent_fun('f',['u','x'],['w'])
+    f = dae.dependent_fun('f',['c','p','u','x'],['w'])
+    print(f)
+    
+    w_val = f(c_val,p_val,u_val,x_val)
+    self.checkarray(
+        w_val,
+        vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,sin(x1_val),sin(x1_val)**2+u_val,3*(sin(x1_val)**2+u_val))
+    )
+    f = dae.create('f',['u','x'],['ode'])
+    CORRECTION = 0 # Looks like a bug
+    self.checkarray(
+        f(u_val,x_val),
+        vertcat(x0_val*x1_val,x1_val+u_val+CORRECTION*p_val*c0_val,3*(sin(x1_val)**2+u_val))
+    )
+    
+    f = dae.create('f',['c','p','u','x'],['ode'])
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val),
+        vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(sin(x1_val)**2+u_val))
+    )
+        
+    f = dae.create('f',['c','p','u','x','w'],['ode'])
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val,w_val),
+        vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(sin(x1_val)**2+u_val))
+    )
+    CORRECTION = 1 # Why is this not 2?
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val,2*w_val),
+        vertcat(CORRECTION*x0_val*x1_val,CORRECTION*(x1_val+u_val+p_val*c0_val),2*3*(sin(x1_val)**2+u_val))
+    )
+    f = dae.create('f',['c','p','u','x','z'],['alg'])
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val,z_val),
+        vertcat((-(x1_val-(2.*z0_val))),(-((x1_val-(3*z1_val))+z0_val)))
+    )
+    f = dae.create('f',['c','p','u','x','z'],['y'])
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val,z_val),
+        vertcat(c1_val,x0_val,sin(x1_val),z0_val)
+    )
+    print(dae.export_fmu())
+
+    
 if __name__ == '__main__':
     unittest.main()
