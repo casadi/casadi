@@ -2198,38 +2198,6 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
   }
 
   std::vector<MX> MX::block_jacobian(const std::vector< std::vector< MX > >& expr, const std::vector< std::vector< MX > >& arg) {
-    {
-    
-      DM::rng(1);
-
-      DM L1 = DM::eye(3); //DM::rand(3, 3);
-      DM L2 = DM::rand(4, 3);
-      DM L3 = DM::rand(5, 3);
-      DM L4 = DM::eye(4); //DM::rand(4, 4);
-      DM L5 = DM::eye(5);
-
-      // Blocks in triplet order
-      std::vector<DM> lhs = {L1, L2, L3, L4, L5};
-      std::vector<casadi_int> mapping;
-      // row col in triplet order
-      Sparsity sp_lhs = Sparsity::triplet(3, 3, {0, 1, 2, 1, 2}, {0, 0, 0, 1, 2}, mapping, false);
-      // order data
-      std::vector<DM> blocks_lhs = vector_slice(lhs, mapping);
-
-      //BlockMX lhs = BlockMX::triplet(
-      //  {0, 1, 2, 1, 2}, {0, 0, 0, 1, 2}, {DM::rand(3, 3), DM::rand(4, 3), DM::rand(5, 3), DM::rand(4, 4), DM::eye(5)}, 3, 1);
-
-      std::vector<DM> rhs = {DM::rand(3, 1), DM::rand(4, 1), DM::rand(5, 1)};
-
-
-      DM AA = DM::blockcat({{L1, DM::zeros(3,4), DM::zeros(3,5)}, {L2, L4, DM::ones(4,5)},{L3, DM::ones(5,4), L5}});
-      
-      uout() << "result" << DM::solve(AA, DM::vertcat(rhs)) << std::endl;
-
-      std::vector<DM> res = rhs;
-      block_trilsolve(sp_lhs, blocks_lhs, res, false, 1);
-      uout() << "result" << res << std::endl;
-    }
 
     Dict opts;
     opts["allow_free"] = true;
@@ -2375,6 +2343,19 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     opts2["lift_shared"] = false;
     extract(vexpr, v, vdef, opts2);
 
+    std::vector<MX> Vexpr;
+    casadi_int i = 0;
+    for (const auto & e : expr) {
+      std::vector<MX> group;
+      for (const auto & ee : e) {
+        group.push_back(vexpr[i++]);
+      }
+      Vexpr.push_back(veccat(group));
+    }
+
+    uout() << "Vexpr" << Vexpr << std::endl;
+    //casadi_error("dd");
+
     std::unordered_map<MXNode*, casadi_int> v_lookup;
     for (const auto & e : v) {
       v_lookup[e.get()] = v_lookup.size();
@@ -2508,6 +2489,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     //uout() << "foo" << std::endl;
 
 
+    std::vector<casadi_int> block_B_symbolic;
     block_row = 0;
     for (const auto& e : vexpr) {
       casadi_int block_col = 0;
@@ -2515,16 +2497,48 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         rows_B.push_back(block_row);
         cols_B.push_back(block_col);
         MX J = jacobian(e, ee);
+
+        // Try numerically evaluating
         try {
           J = evalf(J);
         } catch (...) {
-          // Silent pass
+          block_B_symbolic.push_back(blocks_B.size());
         }
         blocks_B.push_back(J);
         block_col++;
       }
       block_row++;
     }
+
+    // 
+    std::vector<MX> blocks_J;
+
+    casadi_int offset = 0;
+    for (const MX& e : Vexpr) {
+      for (const std::vector<MX>& a : arg) {
+        blocks_J.push_back(densify(jacobian(e, vertcat(a))));
+      }
+    }
+
+    {
+      // Expand symbolic B blocks
+      std::vector<MX> outputs = vector_slice(blocks_B, block_B_symbolic);
+      std::vector<MX> inputs = symvar(veccat(outputs));
+
+      Function Js = Function("Js", inputs, outputs);
+      Js = Js.expand();
+
+      std::vector<MX> out;
+      Js.call(inputs, out);
+
+      casadi_int offset = 0;
+
+      for (casadi_int i : block_B_symbolic) {
+        blocks_B[i] = out[offset];
+        offset++;
+      }
+    }
+
     Sparsity sp_B = Sparsity::triplet(vexpr.size(), v.size(), rows_B, cols_B, mapping, false);
     blocks_B = vector_slice(blocks_B, mapping);
     /*std::vector<double> blocks_B_mockup;
@@ -2598,11 +2612,6 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
 
     //uout() << "v.size(): " << v.size() << std::endl;
 
-    for (casadi_int i=0;i<v.size();++i) {
-      blocks_R = substitute(blocks_R, v, vdef);
-      //uout() << "blocks_R after substitution: " << blocks_R << std::endl;
-    }
-
     //DM dvexpr_dv = sparsify(evalf(jacobian(veccat(vexpr), veccat(v))));
     //uout() << "dvexpr_dv: " << std::endl;
     //dvexpr_dv.sparsity().spy(uout());
@@ -2620,13 +2629,17 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
 
     std::vector<MX> out;
 
-    int rb_offset = 0;
+    casadi_int blocks_J_i = 0;
 
+    int rb_offset = 0;
     for (const std::vector<MX>& e : expr) {
       out.push_back(vertcat(e));
       int cb_offset = 0;
       for (const std::vector<MX>& a : arg) {
-        MX block = MX::zeros(vertcat(e).numel(), vertcat(a).numel());
+        MX block = blocks_J[blocks_J_i++];//MX::zeros(vertcat(e).numel(), vertcat(a).numel());
+        casadi_assert_dev(block.size1()==vertcat(e).numel());
+        casadi_assert_dev(block.size2()==vertcat(a).numel());
+        //block += jacobian(vertcat(e), vertcat(a));
         int r_offset = 0;
         for (casadi_int i=0; i<e.size(); ++i) {
           int c_offset = 0;
@@ -2646,6 +2659,11 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         cb_offset+=a.size();
       }
       rb_offset+=e.size();
+    }
+
+    for (casadi_int i=0;i<v.size();++i) {
+      out = substitute(out, v, vdef);
+      //uout() << "blocks_R after substitution: " << blocks_R << std::endl;
     }
 
     return out;
