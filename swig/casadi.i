@@ -3852,6 +3852,12 @@ DECL M casadi_inv_node(const M& x) {
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
+DECL std::vector<MX>
+casadi_block_jacobian(const std::vector< std::vector<M> >& expr,
+                     const std::vector< std::vector<M> > & arg) {
+  return block_jacobian(expr, arg);
+}
+
 DECL std::vector< M >
 casadi_matrix_expand(const std::vector< M >& e,
                      const std::vector< M > &boundary = std::vector< M >(),
