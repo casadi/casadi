@@ -1773,6 +1773,7 @@ namespace casadi {
           casadi_error("No such option: " + std::string(op.first));
         }
       }
+      uout() << "lift_shared:" << lift_shared << std::endl;
       // Sort the expression
       Function f("tmp_extract", std::vector<MX>{}, ex, Dict{{"max_io", 0}, {"allow_free", true}});
       auto *ff = f.get<MXFunction>();
@@ -1797,6 +1798,9 @@ namespace casadi {
           for (casadi_int c=0; c<it->arg.size(); ++c) {
             // Identify nodes used more than once
             if (lift_calls && it->op == OP_CALL) {
+              Function f = it->data->which_function();
+              if (!f.is_diff_in(c)) continue;
+              if (!startswith(f.name(), "map")) continue;
               // If not already marked for replacing
               if (usecount.at(it->arg[c]) >= 0) {
                 replace.push_back(origin.at(it->arg[c]));
@@ -1827,7 +1831,7 @@ namespace casadi {
             if (it->res[c]>=0) {
               work[it->res[c]] = it->data.get_output(c);
               origin[it->res[c]] = std::make_pair(k, c);
-              if (lift_calls && it->op == OP_CALL) {
+              if (lift_calls && it->op == OP_CALL && startswith(it->data->which_function().name(), "map")) {
                 // If function call, replace right away
                 replace.push_back(origin.at(it->res[c]));
                 usecount.at(it->res[c]) = -1; // Do not replace again
@@ -1839,6 +1843,7 @@ namespace casadi {
           break;
         }
       }
+      uout() << "replace" << replace << std::endl;
       // New variables and definitions
       v.clear();
       v.reserve(replace.size());
@@ -1891,7 +1896,7 @@ namespace casadi {
               bool replace_node = replace_it != replace.end()
                 && replace_it->first==k && replace_it->second==c;
               // Call node (introduce variable for outputs, even if unused)
-              bool output_node = lift_calls && it->op == OP_CALL;
+              bool output_node = lift_calls && it->op == OP_CALL && startswith(it->data->which_function().name(), "map");
               // Skip if no reason to replace
               if (!replace_node && !output_node) continue;
               // Create a new variable
@@ -2056,6 +2061,596 @@ namespace casadi {
     return matrix_expand(std::vector<MX>{e}, boundary, options).at(0);
   }
 
+  class BlockMX {
+    public:
+      BlockMX(const Sparsity& sparsity, const std::vector<MX>& nonzeros);
+
+      static BlockMX triplet(const std::vector<casadi_int>& row, const std::vector<casadi_int>& col, const std::vector<MX>& d, casadi_int nrow, casadi_int ncol);
+    private:
+      /// Sparsity of the matrix in a compressed column storage (CCS) format
+      Sparsity sparsity_;
+
+      /// Nonzero elements
+      std::vector<MX> nonzeros_;
+
+
+  };
+
+  BlockMX BlockMX::triplet(const std::vector<casadi_int>& row, const std::vector<casadi_int>& col, const std::vector<MX>& d, casadi_int nrow, casadi_int ncol) {
+    casadi_assert(col.size()==row.size() && col.size()==d.size(),
+                          "Argument error in Matrix<Scalar>::triplet(row, col, d): "
+                          "supplied lists must all be of equal length, but got: "
+                          + str(row.size()) + ", " + str(col.size()) + " and " + str(d.size()));
+    std::vector<casadi_int> mapping;
+    Sparsity sp = Sparsity::triplet(nrow, ncol, row, col, mapping, false);
+    return BlockMX(sp, vector_slice(d, mapping));
+  }
+
+  BlockMX::BlockMX(const Sparsity& sparsity, const std::vector<MX>& nonzeros)
+    : sparsity_(sparsity), nonzeros_(nonzeros) {
+    casadi_assert(nonzeros_.size() == sparsity_.nnz(), "Number of nonzeros does not match sparsity");
+  }
+
+
+
+template<typename T>
+void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vector<T>& y, const Sparsity& sp_y, std::vector<T>& z, const Sparsity& sp_z, casadi_int tr) { // NOLINT(whitespace/line_length)
+  casadi_int ncol_x, ncol_y, ncol_z, cc;
+  const casadi_int *colind_x, *row_x, *colind_y, *row_y, *colind_z, *row_z;
+
+  // Get sparsities
+  ncol_x = sp_x.size2();
+  colind_x = sp_x.colind(); row_x = sp_x.row();
+  ncol_y = sp_y.size2();
+  colind_y = sp_y.colind(); row_y = sp_y.row();
+  ncol_z = sp_z.size2();
+  colind_z = sp_z.colind(); row_z = sp_z.row();
+
+  std::vector<T> w(tr ? sp_z.size2() : sp_z.size1());
+
+  if (tr) {
+    // Loop over the columns of y and z
+    for (cc=0; cc<ncol_z; ++cc) {
+      casadi_int kk;
+      // Get the dense column of y
+      for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+        w[row_y[kk]] = y[kk];
+      }
+      // Loop over the nonzeros of z
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        casadi_int kk1;
+        casadi_int rr = row_z[kk];
+        // Loop over corresponding columns of x
+        for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+          z[kk] += mtimes(x[kk1], w[row_x[kk1]]);
+        }
+      }
+    }
+  } else {
+    // Loop over the columns of y and z
+    for (cc=0; cc<ncol_y; ++cc) {
+      casadi_int kk;
+      // Get the dense column of z
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        w.at(row_z[kk]) = z[kk];
+      }
+      // Loop over the nonzeros of y
+      for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+        casadi_int kk1;
+        casadi_int rr = row_y[kk];
+        // Loop over corresponding columns of x
+        for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+          w.at(row_x[kk1]) += mtimes(x[kk1], y[kk]);
+        }
+      }
+      // Get the sparse column of z
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        z[kk] = w.at(row_z[kk]);
+      }
+    }
+  }
+}
+
+  template <typename T>
+  void block_trilsolve(const Sparsity& sp_a, const std::vector<T>& blocks_a, std::vector<T>& x, bool tr, casadi_int nrhs) {
+    casadi_assert(sp_a.is_tril(),
+      "Sparsity must be lower triangular for trilsolve");
+    // Local variables
+    casadi_int nrow, ncol, r, c, k, rhs;
+    const casadi_int *colind, *row;
+
+    casadi_int rhs_offset = 0;
+    // Extract sparsity
+    nrow = sp_a.size1();
+    ncol = sp_a.size2();
+    colind = sp_a.colind();
+    row = sp_a.row();
+    // For all right hand sides
+    for (rhs = 0; rhs < nrhs; ++rhs) {
+      if (tr) {
+        // Backward substitution
+        for (c = ncol; c-- > 0; ) {
+          for (k = colind[c + 1]; k-- > colind[c]; ) {
+            r = row[k];
+            if (r == c) {
+              x[rhs_offset+c] = solve(blocks_a[k], x[rhs_offset+c]);
+            } else {
+              x[rhs_offset+c] -= mtimes(blocks_a[k], x[rhs_offset+r]);
+            }
+          }
+        }
+      } else {
+        // Forward substitution
+        for (c = 0; c < ncol; ++c) {
+          for (k = colind[c]; k < colind[c+1]; ++k) {
+            r = row[k];
+            if (r == c) {
+              x[rhs_offset+r] = solve(blocks_a[k], x[rhs_offset+r]);
+            } else {
+              x[rhs_offset+r] -= mtimes(blocks_a[k], x[rhs_offset+c]);
+            }
+          }
+        }
+      }
+      // Next right-hand-side
+      rhs_offset += nrow;
+    }
+  }
+
+  std::vector<MX> MX::block_jacobian(const std::vector< std::vector< MX > >& expr, const std::vector< std::vector< MX > >& arg) {
+    {
+    
+      DM::rng(1);
+
+      DM L1 = DM::eye(3); //DM::rand(3, 3);
+      DM L2 = DM::rand(4, 3);
+      DM L3 = DM::rand(5, 3);
+      DM L4 = DM::eye(4); //DM::rand(4, 4);
+      DM L5 = DM::eye(5);
+
+      // Blocks in triplet order
+      std::vector<DM> lhs = {L1, L2, L3, L4, L5};
+      std::vector<casadi_int> mapping;
+      // row col in triplet order
+      Sparsity sp_lhs = Sparsity::triplet(3, 3, {0, 1, 2, 1, 2}, {0, 0, 0, 1, 2}, mapping, false);
+      // order data
+      std::vector<DM> blocks_lhs = vector_slice(lhs, mapping);
+
+      //BlockMX lhs = BlockMX::triplet(
+      //  {0, 1, 2, 1, 2}, {0, 0, 0, 1, 2}, {DM::rand(3, 3), DM::rand(4, 3), DM::rand(5, 3), DM::rand(4, 4), DM::eye(5)}, 3, 1);
+
+      std::vector<DM> rhs = {DM::rand(3, 1), DM::rand(4, 1), DM::rand(5, 1)};
+
+
+      DM AA = DM::blockcat({{L1, DM::zeros(3,4), DM::zeros(3,5)}, {L2, L4, DM::ones(4,5)},{L3, DM::ones(5,4), L5}});
+      
+      uout() << "result" << DM::solve(AA, DM::vertcat(rhs)) << std::endl;
+
+      std::vector<DM> res = rhs;
+      block_trilsolve(sp_lhs, blocks_lhs, res, false, 1);
+      uout() << "result" << res << std::endl;
+    }
+
+    Dict opts;
+    opts["allow_free"] = true;
+    opts["live_variables"] = true;
+    opts["max_io"] = 0;
+    //Function f("temp", arg, expr, opts);
+    //uout() << f.get_function() << std::endl;
+
+    /*std::string v_prefix = "w";
+    std::string v_suffix = "";
+    casadi_int v_offset = 0;
+    MXFunction *ff = f.get<MXFunction>();
+
+    // Work vector
+    std::vector< MX > w(ff->workloc_.size()-1);
+
+    // Status of the expression:
+    // 0: dependant on constants only
+    // 1: dependant on parameters/constants only
+    // 2: dependant on non-parameters
+    std::vector< char > expr_status(ff->workloc_.size()-1, 0);
+
+    // Split up inputs analogous to symbolic primitives
+    std::vector<MX> arg_split = par.split_primitives(par);
+
+    // Allocate storage for split outputs
+    std::vector<MX> res_split;
+    res_split.resize(expr.n_primitives());
+
+    // Scratch space for node inputs/outputs
+    std::vector<MX > arg1, res1;
+
+    // Map of registered symbols
+    std::map<MXNode*, MX> symbol_map;
+
+    // Flat list of registerd symbols and parametric expressions
+    std::vector<MX> symbol_v, parametric_v;
+
+    // Loop over computational nodes in forward order
+    casadi_int alg_counter = 0;
+    for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
+      if (it->op == OP_INPUT) {
+        w[it->res.front()] = arg_split.at(it->data->segment());
+        expr_status[it->res.front()] = 1;
+      } else if (it->op==OP_OUTPUT) {
+        MX arg = w[it->arg.front()];
+        if (expr_status[it->arg.front()]==1) {
+          arg = register_symbol(arg, symbol_map, symbol_v, parametric_v,
+                  extract_trivial, v_offset, v_prefix, v_suffix);
+        }
+        // Collect the results
+        res_split.at(it->data->segment()) = arg;
+      } else if (it->op==OP_CONST) {
+        // Fetch constant
+        w[it->res.front()] = it->data;
+        expr_status[it->res.front()] = 0;
+      } else if (it->op==OP_PARAMETER) {
+        // Free variables
+        w[it->res.front()] = it->data;
+        expr_status[it->res.front()] = 2;
+      } else {
+        // Arguments of the operation
+        arg1.resize(it->arg.size());
+        for (casadi_int i=0; i<arg1.size(); ++i) {
+          casadi_int el = it->arg[i]; // index of the argument
+          arg1[i] = el<0 ? MX(it->data->dep(i).size()) : w[el];
+        }
+
+        // Check worst case status of inputs
+        char max_status = 0;
+        for (casadi_int i=0; i<arg1.size(); ++i) {
+          casadi_int el = it->arg[i]; // index of the argument
+          if (el>=0) {
+            max_status = std::max(max_status, expr_status[it->arg[i]]);
+          }
+        }
+        bool any_tainted = max_status==2;
+
+        if (any_tainted) {
+          // Loop over all inputs
+          for (casadi_int i=0; i<arg1.size(); ++i) {
+            casadi_int el = it->arg[i]; // index of the argument
+
+            // For each parametric input being mixed into a non-parametric expression
+            if (el>=0 && expr_status[el]==1) {
+
+              arg1[i] = register_symbol(w[el], symbol_map, symbol_v, parametric_v,
+                extract_trivial, v_offset, v_prefix, v_suffix);
+            }
+          }
+        }
+
+        // Perform the operation
+        res1.resize(it->res.size());
+        it->data->eval_mx(arg1, res1);
+
+        // Get the result
+        for (casadi_int i=0; i<res1.size(); ++i) {
+          casadi_int el = it->res[i]; // index of the output
+          if (el>=0) {
+            w[el] = res1[i];
+            // Update expression status
+            expr_status[el] = max_status;
+          }
+        }
+      }
+    }
+
+    // Join split outputs
+    expr_ret = expr.join_primitives(res_split);
+
+    symbols = symbol_v;
+    parametric = parametric_v;*/
+
+    //uout() << f << std::endl;
+    // figure out is_diff_in (optional)
+    // lift calls / see extract
+
+    // vector<lifted_map>      , dependency chain w1/w2/w3
+
+
+    // Goal for meeting: get this jacobian correct; no regard for speed
+
+    //
+
+    std::vector<MX> vexpr;
+    for (const auto & e : expr) {
+      for (const auto & ee : e) {
+        vexpr.push_back(ee);
+      }
+    }
+
+    std::vector<MX> varg;
+    for (const auto & e : arg) {
+      for (const auto & ee : e) {
+        varg.push_back(ee);
+      }
+    }
+    std::vector<MX> v;
+    std::vector<MX> vdef;
+    Dict opts2;
+    opts2["lift_calls"] = true;
+    opts2["lift_shared"] = false;
+    extract(vexpr, v, vdef, opts2);
+
+    std::unordered_map<MXNode*, casadi_int> v_lookup;
+    for (const auto & e : v) {
+      v_lookup[e.get()] = v_lookup.size();
+    }
+
+    uout() << "vexpr " << vexpr << std::endl;
+    uout() << "v " << v << std::endl;
+    uout() << "vdef " << vdef << std::endl;
+
+    typedef struct LiftedMap {
+      Function orig;
+      Function jacobian;
+    } LiftedMap;
+
+    std::unordered_map<FunctionInternal*, LiftedMap> lifted_maps;
+
+    std::vector<casadi_int> rows_A;
+    std::vector<casadi_int> cols_A;
+    std::vector<MX> blocks_A;
+
+    // Add unit matrix everywhere
+    casadi_int block_row = 0;
+    for (const auto & e : vdef) {
+      rows_A.push_back(block_row);
+      cols_A.push_back(block_row);
+      blocks_A.push_back(MX::eye(e.numel()));
+      block_row++;
+    }
+
+    block_row = 0;
+    for (const auto & e : vdef) {
+      if (e.is_output()) { // Hit a map call
+        const MX & call_node = e.dep(0);
+
+        const Function& f = call_node.which_function();
+
+        auto it = lifted_maps.find(f.get());
+        if (it == lifted_maps.end()) {
+          LiftedMap lm;
+          lm.orig = f;
+
+          lm.jacobian = f.jacobian();
+          lifted_maps[f.get()] = lm;
+        }
+
+        LiftedMap & lm = lifted_maps[f.get()];
+        std::vector<MX> args;
+        for (casadi_int i=0; i<call_node.n_dep(); ++i) {
+          args.push_back(call_node.dep(i));
+        }
+        // Append empty MXes for the nominal outputs
+        args.insert(args.end(), lm.orig.n_out(), MX());
+
+        std::vector<MX> res;
+        uout() << "lm jac out " << lm.jacobian.name_out() << std::endl;
+        lm.jacobian.call(args, res);
+
+        uout() << "foo" << res << std::endl;
+
+        for (casadi_int i=0; i<call_node.n_dep(); ++i) {
+          MX a = call_node.dep(i);
+          if (v_lookup.find(a.get()) != v_lookup.end()) {
+            casadi_int block_col = v_lookup[a.get()];
+          
+            rows_A.push_back(block_row);
+            cols_A.push_back(block_col);
+            blocks_A.push_back(-res[lm.orig.n_in()*e.which_output()+i]);
+          }
+        }
+
+      } else { // Hit an expression
+        casadi_int block_col = 0;
+        for (const auto & ee : v) {
+          MX J = jacobian(e, ee);
+          if (J.nnz()) {
+            rows_A.push_back(block_row);
+            cols_A.push_back(block_col);
+            blocks_A.push_back(-J);
+          }
+          block_col++;
+        }
+      }
+
+      block_row++;
+    }
+
+    //uout() << "rows_A: " << rows_A << std::endl;
+    //uout() << "cols_A: " << cols_A << std::endl;
+    //uout() << "blocks_A: " << blocks_A << std::endl;
+
+    //casadi_error("foo");
+
+    std::vector<casadi_int> mapping;
+    Sparsity sp_A = Sparsity::triplet(v.size(), v.size(), rows_A, cols_A, mapping, false);
+    blocks_A = vector_slice(blocks_A, mapping);
+
+    std::vector<MX> res;
+    for (const MX & ee : varg) {
+      for (const MX & e : vdef) {
+        res.push_back(evalf(jacobian(e, ee)));
+      }
+    }
+
+    uout() << "res trilsolve before " << res << std::endl;
+    block_trilsolve(sp_A, blocks_A, res, false, varg.size());
+
+
+    //uout() << "res trilsolve " << res << std::endl;
+
+    //MX A = DM::eye(veccat(vdef).numel()) - jacobian(veccat(vdef), veccat(v));
+
+    //uout() << "A sp: " << std::endl;
+    //A.sparsity().spy(uout());
+
+    //MX temp = jacobian(veccat(vdef), veccat(varg));
+
+    //MX dv_da = solve(A, temp);
+
+
+    //uout() << "dv_da sp: " << std::endl;
+    //dv_da.sparsity().spy(uout());
+
+    std::vector<casadi_int> rows_B;
+    std::vector<casadi_int> cols_B;
+    std::vector<MX> blocks_B;
+
+    //uout() << "vexpr: " << vexpr << std::endl;
+    //uout() << "v: " << v << std::endl;
+    //uout() << "jacobian(veccat(vexpr), veccat(v)): " << jacobian(veccat(vexpr), veccat(v)) << std::endl;
+
+    //uout() << "foo" << std::endl;
+
+
+    block_row = 0;
+    for (const auto& e : vexpr) {
+      casadi_int block_col = 0;
+      for (const auto& ee : v) {
+        rows_B.push_back(block_row);
+        cols_B.push_back(block_col);
+        MX J = jacobian(e, ee);
+        try {
+          J = evalf(J);
+        } catch (...) {
+          // Silent pass
+        }
+        blocks_B.push_back(J);
+        block_col++;
+      }
+      block_row++;
+    }
+    Sparsity sp_B = Sparsity::triplet(vexpr.size(), v.size(), rows_B, cols_B, mapping, false);
+    blocks_B = vector_slice(blocks_B, mapping);
+    /*std::vector<double> blocks_B_mockup;
+    for (const auto& e : blocks_B) {
+      if (e.nnz()>0) {
+        blocks_B_mockup.push_back(1.0);
+      }
+    }*/
+
+    //uout() << "B :" << std::endl;
+    //sp_B.spy(uout());
+    //out() << "blocks_B :" << blocks_B << std::endl;
+
+    std::vector<casadi_int> rows_C;
+    std::vector<casadi_int> cols_C;
+    std::vector<MX> blocks_C;
+
+    block_row = 0;
+    for (const auto& e : vdef) {
+      casadi_int block_col = 0;
+      for (const auto& ee : varg) {
+        rows_C.push_back(block_row);
+        cols_C.push_back(block_col);
+        blocks_C.push_back(res.at(block_col*vdef.size()+block_row));
+
+        block_col++;
+      }
+      block_row++;
+    }
+
+    Sparsity sp_C = Sparsity::triplet(vdef.size(), varg.size(), rows_C, cols_C, mapping, false);
+    blocks_C = vector_slice(blocks_C, mapping);
+
+    std::vector<double> blocks_C_mockup;
+    for (const auto& e : blocks_C) {
+      if (e.nnz()>0) {
+        blocks_C_mockup.push_back(1.0);
+      }
+    }
+
+
+    //uout() << "C :" << std::endl;
+    //sp_C.spy(uout());
+    //uout() << "blocks_C :" << blocks_C << std::endl;
+
+    //DM(sp_B, blocks_B_mockup, false).print_dense(uout());
+    //DM(sp_C, blocks_C_mockup, false).print_dense(uout());
+
+    //DM::mtimes(DM(sp_B, blocks_B_mockup, false), DM(sp_C, blocks_C_mockup, false)).print_dense(uout());
+
+    Sparsity sp_R = Sparsity::mtimes(sp_B, sp_C);
+    std::vector<MX> blocks_R(sp_R.nnz());
+
+    block_row = 0;
+    for (const auto& e : vexpr) {
+      casadi_int block_col = 0;
+      for (const auto& ee : varg) {
+        blocks_R[block_col*vexpr.size()+block_row] = MX::zeros(e.numel(), ee.numel());
+        block_col++;
+      }
+      block_row++;
+    }
+
+    //uout() << "R :" << std::endl;
+    //sp_R.spy(uout());
+
+
+    block_mtimes(blocks_B, sp_B, blocks_C, sp_C, blocks_R, sp_R, false);
+
+    //uout() << "blocks_R :" << blocks_R << std::endl;
+
+    //uout() << "v.size(): " << v.size() << std::endl;
+
+    for (casadi_int i=0;i<v.size();++i) {
+      blocks_R = substitute(blocks_R, v, vdef);
+      //uout() << "blocks_R after substitution: " << blocks_R << std::endl;
+    }
+
+    //DM dvexpr_dv = sparsify(evalf(jacobian(veccat(vexpr), veccat(v))));
+    //uout() << "dvexpr_dv: " << std::endl;
+    //dvexpr_dv.sparsity().spy(uout());
+
+
+    // Reference implementation
+    //MX J = jacobian(veccat(vexpr), veccat(varg)) + mtimes(jacobian(veccat(vexpr), veccat(v)), dv_da);
+    //for (casadi_int i=0;i<v.size();++i) {
+    //  J = substitute({J}, v, vdef)[0];;
+    //}
+
+    //uout() << J.size() << std::endl;
+
+    //uout() << symvar(J) << std::endl;
+
+    std::vector<MX> out;
+
+    int rb_offset = 0;
+
+    for (const std::vector<MX>& e : expr) {
+      out.push_back(vertcat(e));
+      int cb_offset = 0;
+      for (const std::vector<MX>& a : arg) {
+        MX block = MX::zeros(vertcat(e).numel(), vertcat(a).numel());
+        int r_offset = 0;
+        for (casadi_int i=0; i<e.size(); ++i) {
+          int c_offset = 0;
+          for (casadi_int j=0; j<a.size(); ++j) {
+            block.add(blocks_R[(cb_offset+j)*vexpr.size()+(rb_offset+i)], 
+                      false,
+                      range(r_offset, r_offset+e[i].numel()),
+                      range(c_offset, c_offset+a[j].numel()));
+            c_offset+=a[j].numel();
+          }
+          r_offset+=e[i].numel();
+        }
+        out.push_back(block);
+        //out.push_back(blockcat(blocks));
+        // Reference implementation
+        //out.push_back(J(range(r_offset,r_offset+vertcat(e).numel()), range(c_offset, c_offset+vertcat(a).numel())));
+        cb_offset+=a.size();
+      }
+      rb_offset+=e.size();
+    }
+
+    return out;
+  }
+
   std::vector<MX> MX::matrix_expand(const std::vector<MX>& e,
                                     const std::vector<MX> &boundary,
                                     const Dict &options) {
@@ -2117,7 +2712,9 @@ namespace casadi {
   }
 
   MX MX::solve(const MX& a, const MX& b) {
-    if (a.is_triu()) {
+    if (a.is_eye()) {
+      return b;
+    } else if (a.is_triu()) {
       // A is upper triangular
       return a->get_solve_triu(b, false);
     } else if (a.is_tril()) {

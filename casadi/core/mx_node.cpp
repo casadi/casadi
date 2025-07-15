@@ -568,6 +568,8 @@ namespace casadi {
     casadi_assert_dev(sp.nnz()==nnz());
     if (sp==sparsity()) {
       return shared_from_this<MX>();
+    } else if (sparsity().nnz()==0) {
+      return MX::zeros(sp);
     } else {
       return MX::create(new SparsityCast(shared_from_this<MX>(), sp));
     }

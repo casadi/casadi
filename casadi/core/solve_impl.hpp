@@ -55,6 +55,7 @@ namespace casadi {
 
   template<bool Tr>
   int LinsolCall<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    uout() << "yay LinsolCall<Tr>::eval " << Tr << std::endl;
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     scoped_checkout<Linsol> mem(linsol_);
 
@@ -341,6 +342,7 @@ namespace casadi {
   template<bool Tr>
   int TriuSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    uout() << "yay colling casadi_triusolve " << Tr << std::endl;
     casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
     return 0;
   }
@@ -359,6 +361,7 @@ namespace casadi {
   template<bool Tr>
   int TrilSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    uout() << "yay colling casadi_trilsolve " << Tr << std::endl;
     casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
     return 0;
   }
@@ -397,6 +400,7 @@ namespace casadi {
   template<bool Tr>
   int TriuSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    uout() << "yay casadi_triusolve unity" << Tr << std::endl;
     casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
     return 0;
   }
@@ -417,6 +421,7 @@ namespace casadi {
   template<bool Tr>
   int TrilSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    uout() << "yay casadi_trilsolve unity" << Tr << std::endl;
     casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
     return 0;
   }
