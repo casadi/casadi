@@ -57,6 +57,9 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Initialize
   void init(const DaeBuilderInternal* dae) override;
 
+  // Finalize
+  void finalize() override;
+
   // Set C API functions
   void load_functions() override;
 

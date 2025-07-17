@@ -113,7 +113,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   virtual int get_aux(void* instance) = 0;
 
   // Finalize
-  void finalize();
+  virtual void finalize();
 
   /** \brief Print
 

@@ -565,8 +565,38 @@ class Daebuildertests(casadiTestCase):
         dae = ca.DaeBuilder('vdp', fmu_file)
         dae.get("x1")
         dae.disp(True)
+
+  def test_w_fmu(self):
+        fmu_file = '../data/VanDerPol2.fmu'
+        if not os.path.exists(fmu_file):
+            print("Skipping test_fmu_demo, resource not available")
+            return
+        dae = ca.DaeBuilder('vdp', fmu_file)
+        dae.get("x1")
+        dae.disp(True)
         
+        DM.rng(1)
+        x0 = DM.rand(2)
+        u0 = DM.rand()
         
+        #dae.dependent_fun('f',['c','p','u','x'],['w']) # Not
+        f = dae.create('f',['x','u'],['ode'],{"aux": dae.w()})
+        print("here")
+        r1 = f(x0,u0)
+        #s1 = f.stats()["aux"]
+        #print(r1,s1)
+        f.save('f.casadi')
+        f2 = Function.load('f.casadi')
+        r2 = f2(x0,u0)
+        #s2 = f2.stats()["aux"]
+        
+        print(r1,r2)
+        #print(s1,s2)
+        
+                
+        self.checkarray(r1,r2)
+        #self.checkarray(s1,s2)
+
   def test_w(self):
     dae = ca.DaeBuilder('test')
     

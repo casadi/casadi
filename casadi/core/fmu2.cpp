@@ -135,12 +135,17 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
         casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
     }
   }
+}
 
+void Fmu2::finalize() {
   /// Allocate numerical values for initial auxilliary variables
   aux_value_.v_real.resize(vn_aux_real_.size());
   aux_value_.v_integer.resize(vn_aux_integer_.size());
   aux_value_.v_boolean.resize(vn_aux_boolean_.size());
   aux_value_.v_string.resize(vn_aux_string_.size());
+
+  // Recursive call
+  FmuInternal::finalize();
 }
 
 void Fmu2::load_functions() {
