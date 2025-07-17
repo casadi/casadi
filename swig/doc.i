@@ -10594,7 +10594,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L800
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1494-L1509
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1494-L1511
 
 ";
 
@@ -10817,7 +10817,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L843
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1511-L1519
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1513-L1521
 
 ";
 

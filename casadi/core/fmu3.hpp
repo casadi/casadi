@@ -57,10 +57,14 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Initialize
   void init(const DaeBuilderInternal* dae) override;
 
-  /** \brief Initalize memory block */
+  /** \brief Initalize memory block
+
+      \identifier{2dr} */
   int init_mem(FmuMemory* m) const override;
 
-  /** \brief Create memory block */
+  /** \brief Create memory block
+
+      \identifier{2ds} */
   FmuMemory* alloc_mem(const FmuFunction& f) const override;
 
   // Finalize

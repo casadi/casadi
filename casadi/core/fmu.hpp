@@ -161,7 +161,9 @@ class CASADI_EXPORT Fmu
     return hess_sparsity(ired(r), ired(c));
   }
 
-  /** \brief Create memory block */
+  /** \brief Create memory block
+
+      \identifier{2dn} */
   FmuMemory* alloc_mem(const FmuFunction& f) const;
 
   /** \brief Initalize memory block
