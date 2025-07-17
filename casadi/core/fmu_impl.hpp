@@ -46,6 +46,7 @@ struct EventMemory {
 
 // Forward declarations
 class DaeBuilderInternal;
+class FmuFunction;
 struct FmuMemory;
 struct InputStruct;
 
@@ -169,7 +170,10 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   /** \brief Initalize memory block
 
       \identifier{271} */
-  int init_mem(FmuMemory* m) const;
+  virtual int init_mem(FmuMemory* m) const;
+
+  /** \brief Create memory block */
+  virtual FmuMemory* alloc_mem(const FmuFunction& f) const = 0;
 
   // New memory object
   virtual void* instantiate() const = 0;

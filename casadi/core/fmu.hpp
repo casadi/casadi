@@ -36,6 +36,7 @@ namespace casadi {
 
 // Forward declarations
 class DaeBuilderInternal;
+class FmuFunction;
 struct FmuMemory;
 struct InputStruct;
 
@@ -159,6 +160,9 @@ class CASADI_EXPORT Fmu
   Sparsity hess_sparsity(size_t r, size_t c) const {
     return hess_sparsity(ired(r), ired(c));
   }
+
+  /** \brief Create memory block */
+  FmuMemory* alloc_mem(const FmuFunction& f) const;
 
   /** \brief Initalize memory block
 

@@ -57,6 +57,12 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Initialize
   void init(const DaeBuilderInternal* dae) override;
 
+  /** \brief Initalize memory block */
+  int init_mem(FmuMemory* m) const override;
+
+  /** \brief Create memory block */
+  FmuMemory* alloc_mem(const FmuFunction& f) const override;
+
   // Finalize
   void finalize() override;
 
@@ -155,6 +161,9 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
 
   // Retrieve auxilliary variables from FMU
   int get_aux(void* instance) override;
+
+  // Retrieve auxilliary variables from FMU, implementation
+  int get_aux_impl(void* instance, Value& aux_value) const;
 
   /** \brief Get stats
 

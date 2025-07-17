@@ -29,6 +29,28 @@
 
 namespace casadi {
 
+// Memory object
+struct CASADI_EXPORT Fmu3Memory : public FmuMemory {
+  Fmu3::Value aux_value;
+  // Constructor
+  explicit Fmu3Memory(const FmuFunction& self) : FmuMemory(self) {}
+};
+
+int Fmu3::init_mem(FmuMemory* mem) const {
+  if (FmuInternal::init_mem(mem)) return 1;
+  auto m = static_cast<Fmu3Memory*>(mem);
+  /// Allocate numerical values for initial auxilliary variables
+  m->aux_value.v_real.resize(vn_aux_real_.size());
+  m->aux_value.v_integer.resize(vn_aux_integer_.size());
+  m->aux_value.v_boolean.resize(vn_aux_boolean_.size());
+  m->aux_value.v_string.resize(vn_aux_string_.size());
+  return 0;
+}
+
+FmuMemory* Fmu3::alloc_mem(const FmuFunction& f) const {
+  return new Fmu3Memory(f);
+}
+
 Fmu3::~Fmu3() {
 }
 
@@ -385,11 +407,15 @@ int Fmu3::set_values(void* instance) const {
 }
 
 int Fmu3::get_aux(void* instance) {
+  return get_aux_impl(instance, aux_value_);
+}
+
+int Fmu3::get_aux_impl(void* instance, Value& aux_value) const {
   auto c = static_cast<fmi3Instance>(instance);
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
     fmi3Status status = get_float64_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
-      get_ptr(aux_value_.v_real), vr_aux_real_.size());
+      get_ptr(aux_value.v_real), vr_aux_real_.size());
     if (status != fmi3OK) {
       casadi_warning("fmi3GetFloat64 failed");
       return 1;
@@ -398,7 +424,7 @@ int Fmu3::get_aux(void* instance) {
   // Get integer/enum auxilliary variables
   if (!vr_aux_integer_.empty()) {
     fmi3Status status = get_int32_(c, get_ptr(vr_aux_integer_), vr_aux_integer_.size(),
-      get_ptr(aux_value_.v_integer), vr_aux_integer_.size());
+      get_ptr(aux_value.v_integer), vr_aux_integer_.size());
     if (status != fmi3OK) {
       casadi_warning("fmi3GetInt32 failed");
       return 1;
@@ -418,7 +444,7 @@ int Fmu3::get_aux(void* instance) {
   // Get string auxilliary variables
   for (size_t k = 0; k < vr_aux_string_.size(); ++k) {
     fmi3ValueReference vr = vr_aux_string_[k];
-    fmi3String value = aux_value_.v_string.at(k).c_str();
+    fmi3String value = aux_value.v_string.at(k).c_str();
     fmi3Status status = set_string_(c, &vr, 1, &value, 1);
     if (status != fmi3OK) {
       casadi_error("fmi3GetString failed for value reference " + str(vr));
@@ -430,10 +456,8 @@ int Fmu3::get_aux(void* instance) {
 
 void Fmu3::get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const {
-  // To do: Use auxillary variables from last evaluation
-  (void)m;  // unused
-  // Auxilliary values to be copied
-  const Value& v = aux_value_;
+  Value& v = static_cast<Fmu3Memory*>(m)->aux_value;
+  get_aux_impl(m->instance, v);
   // Collect auxilliary variables
   Dict aux;
   // Real

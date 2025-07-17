@@ -90,6 +90,10 @@ const FmuInternal* Fmu::operator->() const {
   return static_cast<const FmuInternal*>(SharedObject::operator->());
 }
 
+FmuMemory* Fmu::alloc_mem(const FmuFunction& f) const {
+  return (*this)->alloc_mem(f);
+}
+
 FmuInternal* Fmu::get() const {
   return static_cast<FmuInternal*>(SharedObject::get());
 }

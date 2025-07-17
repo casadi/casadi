@@ -77,10 +77,10 @@ int FmuFunction::init_mem(void* mem) const {
 
 void* FmuFunction::alloc_mem() const {
   // Create (master) memory object
-  FmuMemory* m = new FmuMemory(*this);
+  FmuMemory* m = fmu_.alloc_mem(*this);
   // Attach additional (slave) memory objects
   for (casadi_int i = 1; i < max_jac_tasks_; ++i) {
-    m->slaves.push_back(new FmuMemory(*this));
+    m->slaves.push_back(fmu_.alloc_mem(*this));
   }
   return m;
 }
