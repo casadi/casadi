@@ -3944,5 +3944,66 @@ class MXtests(casadiTestCase):
 
     assert f1(*args).sparsity()==f2(*args).sparsity()
           
+                    
+  def test_extract(self):
+    x = MX.sym('x',2)
+    y = MX.sym('y',2)
+    
+    u = vertcat(x,y)
+    DM.rng(1)
+    u0 = DM.rand(4,1)
+    f = Function('f',[x,y],[sin(x+y)],{"never_inline":True})
+    
+    g = Function('g',[x],[cos(3*sum(x))],{"never_inline":True})
+    
+    e = g(f(x/y,2*x*y)*x)/(x+y)
+
+    res = extract([e],{"lift_shared":False,"lift_calls":True})
+    
+    [vexpr,v,vdef] = res
+    
+    print(vexpr)
+    print(v)
+    print(vdef)
+
+    self.assertEqual(len(v), 5)
+    self.assertEqual(len(vdef), len(v))
+    self.assertEqual(len(vexpr), 1)
+    #assert()
+    # Check inverted operation
+    f_ref = Function('f',[u],[e])
+    print("e",e)
+    e_reconstructed = substitute_inplace(v, vdef, [e])[1]
+    print(e_reconstructed)
+    f = Function('f',[u],e_reconstructed)
+    self.checkarray(f_ref(u0),f(u0))
+    
+    print(e)
+    
+    print(substitute_inplace(v, vdef, vexpr))
+    
+    vexpr = vcat(vexpr)
+    v = vcat(v)
+    vdef = vcat(vdef)
+    
+    
+    Jf_ref = Function('J_ref',[u],[jacobian(e,u)])
+    
+    J_v_u = solve(DM.eye(vdef.size1())-jacobian(vdef,v),jacobian(vdef,u))
+    J = jacobian(vexpr,u) + mtimes(jacobian(vexpr,v), J_v_u)
+
+    [vexpr,v,vdef] = res
+    
+    J = substitute_inplace(v, vdef, [J])[1][0]
+    
+    Jf = Function('J2',[u],[J])
+    
+
+    self.checkarray(Jf_ref(u0),Jf(u0))
+
+    
+    
+
+  
 if __name__ == '__main__':
     unittest.main()
