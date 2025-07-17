@@ -42,8 +42,8 @@ tolerances = [-10,-5,-4,-3,-2,-1]
 figure()
 
 for tol in tolerances:
-  opts = {'reltol':10.0**tol, 'abstol':10.0**tol, 'grid':ts, 'output_t0':True}
-  F = integrator('F', 'cvodes', dae, opts)
+  opts = {'reltol':10.0**tol, 'abstol':10.0**tol}
+  F = integrator('F', 'cvodes', dae, 0, ts, opts)
   res = F(x0=[1,0])
   plot(ts,array(res['xf'])[0,:].T,label='tol = 1e%d' % tol)
 legend( loc='upper left')
@@ -59,8 +59,7 @@ for tol in tolerances:
   opts = {}
   opts['reltol'] = tol
   opts['abstol'] = tol
-  opts['tf'] = tend
-  F = integrator('F', 'cvodes', dae, opts)
+  F = integrator('F', 'cvodes', dae, 0, tend, opts)
   res = F(x0=[1,0])
   endresult.append(res['xf'][0])
 

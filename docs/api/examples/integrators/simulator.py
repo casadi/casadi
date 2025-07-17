@@ -52,7 +52,7 @@ rhs    = vertcat(v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t)))
 
 dae={'x':states, 'p':params, 't':t, 'ode':rhs}
 ts = linspace(0, 50, 1000)
-integrator = integrator('integrator', 'cvodes', dae, {'grid':ts, 'output_t0':True})
+integrator = integrator('integrator', 'cvodes', dae, 0, ts)
 
 sol = integrator(x0=[1,0], p=[0.1,0.1,0.1,0.3,0.1])
 
