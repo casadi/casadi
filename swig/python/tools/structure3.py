@@ -773,7 +773,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     self.__init__(*state["args"],**state["kwargs"])
 
   def __getstate__(self):
-    return self.initializer
+    return dict(self.initializer)
 
   def __init__(self,*args,**kwargs):
     self.initializer = {"args": args, "kwargs": kwargs}
