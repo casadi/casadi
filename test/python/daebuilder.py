@@ -580,21 +580,19 @@ class Daebuildertests(casadiTestCase):
         
         #dae.dependent_fun('f',['c','p','u','x'],['w']) # Not
         f = dae.create('f',['x','u'],['ode'],{"aux": dae.w()})
-        print("here")
+
         r1 = f(x0,u0)
-        #s1 = f.stats()["aux"]
-        #print(r1,s1)
+        s1 = f.stats()["aux"]
+        s1 = vertcat(s1['der(x0)'],s1['der(x1)'])
+
         f.save('f.casadi')
         f2 = Function.load('f.casadi')
         r2 = f2(x0,u0)
-        #s2 = f2.stats()["aux"]
-        
-        print(r1,r2)
-        #print(s1,s2)
-        
+        s2 = f2.stats()["aux"]
+        s2 = vertcat(s2['der(x0)'],s2['der(x1)'])
                 
         self.checkarray(r1,r2)
-        #self.checkarray(s1,s2)
+        self.checkarray(s1,s2)
 
   def test_w(self):
     dae = ca.DaeBuilder('test')
