@@ -165,6 +165,13 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Process message
   static void log_message_callback(fmi3InstanceEnvironment instanceEnvironment,
     fmi3Status status, fmi3String category, fmi3String message);
+
+  void serialize_body(SerializingStream& s) const override;
+
+  static Fmu3* deserialize(DeserializingStream& s);
+
+  protected:
+    explicit Fmu3(DeserializingStream& s);
 };
 
 } // namespace casadi

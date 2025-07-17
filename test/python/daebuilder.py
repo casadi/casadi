@@ -51,8 +51,7 @@ class Daebuildertests(casadiTestCase):
         f_ref = Function('f',[x],[vertcat(x1,1 * ((1 - x0 * x0) * x1) - x0)])
         test_point = [vertcat(1.1,1.3)]
         self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3)],digits=7)
-        if not name.endswith("3"):
-            self.check_serialize(f,inputs=test_point)
+        self.check_serialize(f,inputs=test_point)
   
   @memory_heavy() # FMU has a memleak
   def test_cstr(self):

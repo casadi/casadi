@@ -1465,7 +1465,7 @@ FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {
 #endif // WITH_FMI2
   } else if (class_name=="Fmu3") {
 #ifdef WITH_FMI3
-    casadi_error("Not implemented");
+return Fmu3::deserialize(s);
 #else
     casadi_error("CasADi was not compiled with WITH_FMI2=ON.");
 #endif // WITH_FMI3
