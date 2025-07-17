@@ -1047,15 +1047,15 @@ class DMStruct(MatrixStruct):
     return self.cat
 
 class SXStruct(MatrixStruct):
-  def __init__(self,struct,data=None):
-    MatrixStruct.__init__(self,struct,SX,data=data)
+  def __init__(self,struct,data=None,order=None):
+    MatrixStruct.__init__(self,struct,SX,data=data,order=order)
 
   def __SX__(self):
     return self.cat
 
 class MXStruct(MatrixStruct,VertsplitStructure):
-  def __init__(self,struct,data=None):
-    MatrixStruct.__init__(self,struct,MX,data=data)
+  def __init__(self,struct,data=None,order=None):
+    MatrixStruct.__init__(self,struct,MX,data=data,order=order)
 
     self.buildMap()
 
