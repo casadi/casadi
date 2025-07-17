@@ -618,7 +618,7 @@ class Daebuildertests(casadiTestCase):
     c2_val = 0.19
     dae.set('c2',c2_val)
     c_val = vertcat(c0_val,c1_val,c2_val)
-    with self.assertInException("Functionality only applies"):
+    with self.assertInException("Functionality not implemented for symbolic representatio"):
         dae.get('c2')
         #self.checkarray(dae.get('c2'),c2_val)
 
