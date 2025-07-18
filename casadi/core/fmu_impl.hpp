@@ -177,7 +177,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
       \identifier{2dq} */
   virtual FmuMemory* alloc_mem(const FmuFunction& f) const = 0;
 
-  /** \brief Free memory block */
+  /** \brief Free memory block
+
+      \identifier{2dv} */
   virtual void free_mem(void *mem) const = 0;
 
   // New memory object
