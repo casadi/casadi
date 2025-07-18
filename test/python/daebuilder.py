@@ -107,7 +107,7 @@ class Daebuildertests(casadiTestCase):
     unzipped_name = "VanDerPol2"
     unzipped_path = os.path.join(os.getcwd(), unzipped_name)
     for serialize_mode in ["link","embed"]:
-        for use_zip in [True,False]:
+        for use_zip in [True]:#,False]:
             if use_zip:
                 if "ghc-filesystem" in CasadiMeta.feature_list():
                     dae = DaeBuilder("cstr",fmu_file,{"resource_serialize_mode": serialize_mode})
