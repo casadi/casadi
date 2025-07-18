@@ -98,7 +98,7 @@ void FmuFunction::free_mem(void *mem) const {
       s->instance = nullptr;
     }
     // Free the slave
-    delete s;
+    fmu_.free_mem(s);
   }
   // Free FMI memory
   if (m->instance) {
@@ -106,7 +106,7 @@ void FmuFunction::free_mem(void *mem) const {
     m->instance = nullptr;
   }
   // Free the memory object
-  delete m;
+  fmu_.free_mem(m);
 }
 
 FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,

@@ -51,6 +51,10 @@ FmuMemory* Fmu2::alloc_mem(const FmuFunction& f) const {
   return new Fmu2Memory(f);
 }
 
+void Fmu2::free_mem(void *mem) const {
+  delete static_cast<Fmu2Memory*>(mem);
+}
+
 Fmu2::~Fmu2() {
 }
 

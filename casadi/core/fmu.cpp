@@ -94,6 +94,10 @@ FmuMemory* Fmu::alloc_mem(const FmuFunction& f) const {
   return (*this)->alloc_mem(f);
 }
 
+void Fmu::free_mem(void *mem) const {
+  return (*this)->free_mem(mem);
+}
+
 FmuInternal* Fmu::get() const {
   return static_cast<FmuInternal*>(SharedObject::get());
 }

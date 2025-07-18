@@ -171,6 +171,9 @@ class CASADI_EXPORT Fmu
       \identifier{26x} */
   int init_mem(FmuMemory* m) const;
 
+  /** \brief Free memory block */
+  void free_mem(void *mem) const;
+
   // Free FMU instance
   void free_instance(void* instance) const;
 

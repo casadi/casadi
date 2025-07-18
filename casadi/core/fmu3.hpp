@@ -67,6 +67,9 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
       \identifier{2ds} */
   FmuMemory* alloc_mem(const FmuFunction& f) const override;
 
+  /** \brief Free memory block */
+  void free_mem(void *mem) const override;
+
   // Finalize
   void finalize() override;
 

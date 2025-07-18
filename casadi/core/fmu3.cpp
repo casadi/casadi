@@ -51,6 +51,10 @@ FmuMemory* Fmu3::alloc_mem(const FmuFunction& f) const {
   return new Fmu3Memory(f);
 }
 
+void Fmu3::free_mem(void *mem) const {
+  delete static_cast<Fmu3Memory*>(mem);
+}
+
 Fmu3::~Fmu3() {
 }
 
