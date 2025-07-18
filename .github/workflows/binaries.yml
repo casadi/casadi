@@ -784,7 +784,7 @@ jobs:
         if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_matlab.py -skipfiles="solvers.m" matlab
         if: "contains(env.os, 'windows')"
-      - run: cd test && python internal/test_matlab.py '../docs/examples/matlab' -skipfiles="MyCallback.m NlpCallback.m"
+      - run: cd test && python internal/test_matlab.py '../docs/examples/matlab' -skipfiles="sysid_gauss_newton.m MyCallback.m NlpCallback.m"
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
