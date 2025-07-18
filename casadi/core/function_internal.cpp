@@ -748,8 +748,8 @@ namespace casadi {
 
   void FunctionInternal::generate_in(const std::string& fname, const double** arg) const {
     // Set up output stream
-    std::ofstream of;
-    Filesystem::open(of, fname);
+    auto of_ptr = Filesystem::ofstream_ptr(fname);
+    std::ostream& of = *of_ptr;
     normalized_setup(of);
 
     // Encode each input
@@ -764,8 +764,8 @@ namespace casadi {
 
   void FunctionInternal::generate_out(const std::string& fname, double** res) const {
     // Set up output stream
-    std::ofstream of;
-    Filesystem::open(of, fname);
+    auto of_ptr = Filesystem::ofstream_ptr(fname);
+    std::ostream& of = *of_ptr;
     normalized_setup(of);
 
     // Encode each input
@@ -3999,9 +3999,10 @@ namespace casadi {
     if (jit_serialize_=="link" || jit_serialize_=="embed") {
       s.pack("FunctionInternal::jit_library", compiler_.library());
       if (jit_serialize_=="embed") {
-        std::ifstream binary(compiler_.library(), std::ios_base::binary);
-        casadi_assert(binary.good(), "Could not open library '" + compiler_.library() + "'.");
-        s.pack("FunctionInternal::jit_binary", binary);
+        auto binary_ptr =
+          Filesystem::ifstream_ptr(compiler_.library(), std::ios_base::binary, true);
+        casadi_assert(binary_ptr, "Could not open library '" + compiler_.library() + "'.");
+        s.pack("FunctionInternal::jit_binary", *binary_ptr);
       }
     }
     s.pack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
@@ -4082,14 +4083,14 @@ namespace casadi {
       s.unpack("FunctionInternal::jit_library", library);
       if (jit_serialize_=="embed") {
         // If file already exist
-        std::ifstream binary(library, std::ios_base::binary);
-        if (binary.good()) { // library exists
+        auto binary_ptr = Filesystem::ifstream_ptr(library, std::ios_base::binary, false);
+        if (binary_ptr) { // library exists
           // Ignore packed contents
           std::stringstream ss;
           s.unpack("FunctionInternal::jit_binary", ss);
         } else { // library does not exist
-          std::ofstream binary(library, std::ios_base::binary | std::ios_base::out);
-          s.unpack("FunctionInternal::jit_binary", binary);
+          auto binary_ptr = Filesystem::ofstream_ptr(library, std::ios_base::binary);
+          s.unpack("FunctionInternal::jit_binary", *binary_ptr);
         }
       }
       compiler_ = Importer(library, "dll");

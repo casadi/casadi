@@ -870,10 +870,10 @@ namespace casadi {
     static std::string casadi_version();
 
     /// Print file header
-    static void file_open(std::ofstream& f, const std::string& name, bool cpp);
+    static void stream_open(std::ostream& f, bool cpp);
 
     /// Print file header
-    static void file_close(std::ofstream& f, bool cpp);
+    static void stream_close(std::ostream& f, bool cpp);
 
     /** \brief Get number of temporary variables needed for all functions
 

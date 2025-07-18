@@ -245,10 +245,10 @@ void ZipResource::serialize_body(SerializingStream& s) const {
   s.version("ZipResource", 1);
   if (serialize_mode_=="embed") {
     // Decay into ZipMemResource
-    std::ifstream binary(path_, std::ios_base::binary);
-    casadi_assert(binary.good(),
+    auto binary_ptr = Filesystem::ifstream_ptr(path_, std::ios_base::binary, false);
+    casadi_assert(binary_ptr,
       "Could not open zip file '" + path_ + "'.");
-    s.pack("ZipMemResource::blob", binary);
+    s.pack("ZipMemResource::blob", *binary_ptr);
   } else {
     s.pack("ZipResource::path", path_);
   }

@@ -1341,6 +1341,7 @@ if(WITH_BUILD_METIS)
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ${AUTOTOOLS_SHELL} ./get.Metis)
   add_library(metis::metis INTERFACE IMPORTED)
   add_dependencies(metis::metis metis-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis")
   set_target_properties(metis::metis PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis"
     IMPORTED_LIBNAME "coinmetis"
@@ -1774,6 +1775,7 @@ if(WITH_SLEQP)
         
   add_library(sleqp::sleqp SHARED IMPORTED)
   add_dependencies(sleqp::sleqp sleqp-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
   set_target_properties(sleqp::sleqp PROPERTIES
     IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}sleqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
     IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}sleqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -1919,6 +1921,7 @@ if(WITH_CLARABEL)
     add_library(clarabel::clarabel INTERFACE IMPORTED)
     set_target_properties(clarabel::clarabel PROPERTIES INTERFACE_LINK_LIBRARIES clarabel)
     add_dependencies(clarabel clarabel-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/clarabel")
     set_target_properties(clarabel PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/clarabel"
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}clarabel_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -2039,6 +2042,7 @@ if(WITH_ZLIB)
 	set(ZLIB_STATIC_NAME ${CMAKE_STATIC_LIBRARY_PREFIX}zlibstatic.a)
       endif()
     endif()
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ZLIB::libz PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${ZLIB_STATIC_NAME}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
@@ -2064,7 +2068,7 @@ if(WITH_LIBZIP)
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_TRY_COMPILE_CONFIGURATION=Debug -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD=OFF -DENABLE_OPENSSL=OFF -DENABLE_WINDOWS_CRYPTO=OFF -DENABLE_COMMONCRYPTO=OFF -DENABLE_GNUTLS=OFF -DENABLE_MBEDTLS=OFF -DENABLE_FDOPEN=OFF -DBUILD_TOOLS=OFF -DBUILD_REGRESS=OFF -DBUILD_OSSFUZZ=OFF -DBUILD_EXAMPLES=OFF -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF)
     add_library(libzip::zip STATIC IMPORTED)
-
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     add_dependencies(libzip::zip libzip-external)
     set_target_properties(libzip::zip PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}zip${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -2091,6 +2095,7 @@ if(WITH_GHC_FILESYSTEM)
         CMAKE_ARGS -DGHC_FILESYSTEM_BUILD_TESTING=OFF -DGHC_FILESYSTEM_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     add_library(ghcFilesystem::ghc_filesystem INTERFACE IMPORTED)
     add_dependencies(ghcFilesystem::ghc_filesystem ghc-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ghcFilesystem::ghc_filesystem PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
     )

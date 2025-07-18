@@ -96,7 +96,8 @@ namespace casadi {
                     continue;
                 }
 
-                std::ofstream out_file(full_path, std::ios::binary);
+                auto out_file_ptr = Filesystem::ofstream_ptr(full_path, std::ios::binary);
+                std::ostream& out_file = *out_file_ptr;
                 if (!out_file) {
                     uerr() << "Error: Cannot write file: " << full_path << std::endl;
                     zip_fclose(zf);
@@ -113,7 +114,7 @@ namespace casadi {
                     uerr() << "Error: Read failed for file in ZIP: " << name << std::endl;
                 }
 
-                out_file.close();
+                out_file_ptr.reset();
                 zip_fclose(zf);
             }
         }
@@ -124,7 +125,8 @@ namespace casadi {
 
     bool add_file_to_zip(zip_t* archive, const std::string& file_path,
             const std::string& archive_name) {
-        std::ifstream file(file_path, std::ios::binary | std::ios::ate);
+        auto file_ptr = Filesystem::ifstream_ptr(file_path, std::ios::binary | std::ios::ate);
+        std::istream& file = *file_ptr;
         if (!file) {
             uerr() << "Error: Cannot open file: " << file_path << std::endl;
             return false;
@@ -295,7 +297,8 @@ namespace casadi {
 
 
     bool zip_to_path(const std::string& dir_path, const std::string& zip_path) {
-        std::ofstream ofs(zip_path, std::ios::binary);
+        auto ofs_ptr = Filesystem::ofstream_ptr(zip_path, std::ios::binary);
+        std::ostream& ofs = *ofs_ptr;
         if (!ofs) {
             uerr() << "Failed to open output file: " << zip_path << std::endl;
             return false;

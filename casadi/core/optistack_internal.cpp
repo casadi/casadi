@@ -27,6 +27,7 @@
 #include "conic.hpp"
 #include "function_internal.hpp"
 #include "global_options.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -121,7 +122,8 @@ std::string OptiNode::format_stacktrace(const Dict& stacktrace, casadi_int inden
   if (name!="Unknown" && name!= "<module>")
     description += " in " + stacktrace.at("name").as_string();
   try {
-    std::ifstream file(filename);
+    auto file_ptr = Filesystem::ifstream_ptr(filename);
+    std::istream& file = *file_ptr;
     for (casadi_int i=0; i<line-1; ++i) {
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }

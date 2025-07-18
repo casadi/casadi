@@ -334,8 +334,8 @@ void FmuFunction::init(const Dict& opts) {
 
   // New AD validation file, if any
   if (!validate_ad_file_.empty()) {
-    std::ofstream valfile;
-    Filesystem::open(valfile, validate_ad_file_);
+    auto valfile_ptr = Filesystem::ofstream_ptr(validate_ad_file_);
+    std::ostream& valfile = *valfile_ptr;
     valfile << "Output Input Value Nominal Min Max AD FD Step Offset Stencil" << std::endl;
   }
 

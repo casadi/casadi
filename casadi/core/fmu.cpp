@@ -1011,8 +1011,9 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
           }
           ss << "]" << std::endl;
           // Append to file
-          std::ofstream valfile;
-          valfile.open(m->self.validate_ad_file_, std::ios_base::app);
+          auto valfile_ptr = Filesystem::ofstream_ptr(m->self.validate_ad_file_,
+            std::ios_base::app);
+          std::ostream& valfile = *valfile_ptr;
           valfile << ss.str();
         }
       }
