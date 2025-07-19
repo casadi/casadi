@@ -21,9 +21,33 @@
 template<typename T1>
 void casadi_print_canonical(const casadi_int* sp, const T1* x) {
   // C-REPLACE "printf" "CASADI_PRINTF"
-  // x and y should be distinct
+  // C-REPLACE "static_cast<int>" "(int) "
   if (x) {
-    casadi_print_vector(sp[2+sp[1]], x);
+    casadi_int nrow = sp[0];
+    casadi_int ncol = sp[1];
+    const casadi_int* colind = sp+2;
+    const casadi_int* row = colind + ncol + 1;
+    casadi_int nnz = sp[2+ncol];
+    if (nrow==1 && ncol==1 && nnz==1) {
+      casadi_print_scalar(x[0]);
+    } else {
+      casadi_int i;
+      printf("%dx%d: ", static_cast<int>(nrow), static_cast<int>(ncol));
+      casadi_print_vector(nnz, x);
+      if (nnz!=nrow*ncol) {
+        printf(", colind: [");
+        for (i = 0; i < ncol; ++i) {
+          if (i > 0) printf(", ");
+          printf("%d", static_cast<int>(colind[i]));
+        }
+        printf("], row: [");
+        for (i = 0; i < nnz; ++i) {
+          if (i > 0) printf(", ");
+          printf("%d", static_cast<int>(row[i]));
+        }
+        printf("]");
+      }
+    }
   } else {
     printf("NULL");
   }

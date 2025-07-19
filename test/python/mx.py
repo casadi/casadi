@@ -3048,10 +3048,48 @@ class MXtests(casadiTestCase):
             with open("f_out.txt","r") as f_out:
                 out2 = f_out.read().split("\n")[:-2]
             
+            self.assertEqual(len(out),len(out2))
+            for a,b in zip(out,out2):
+                self.assertEqual(a,b)
+
+
+    results = {}
+    results_slow = {}
+    for X in [MX,SX]:
+        x = X.sym("x")
+        y = X.sym("y")
+        f = Function('f',[x,y],[x+y],{"print_instructions": True, "print_canonical":True})
+        f.disp(True)
+        DM.rng(1)
+        inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+        with capture_stdout() as out:
+            f(*inputs)
+        out = out[0].split("\n")[:-1]
+        results[X] = out
+        
+        self.assertTrue("inputs" in out[0])
+        
+        
+        if args.run_slow:
+            with self.assertInException("Parsing error"):
+                self.check_codegen(f,inputs,main=True)
+                        
+            with open("f_out.txt","r") as f_out:
+                out2 = f_out.read().split("\n")[:-2]
+                results_slow[X] = out2
+            
             
             self.assertEqual(len(out),len(out2))
             for a,b in zip(out,out2):
                 self.assertEqual(a,b)
+
+    self.assertEqual(len(results[SX]),len(results[MX]))
+    for a,b in zip(results[SX],results[MX]):
+        self.assertEqual(a,b)
+    if args.run_slow:
+        self.assertEqual(len(results_slow[SX]),len(results_slow[MX]))
+        for a,b in zip(results_slow[SX],results_slow[MX]):
+            self.assertEqual(a,b)
 
   def test_low(self):
     v = MX.sym("v",5)

@@ -854,7 +854,37 @@ namespace casadi {
 
   void FunctionInternal::print_canonical(std::ostream &stream,
       const Sparsity& sp, const double* nz) {
-    print_canonical(stream, sp.nnz(), nz);
+    StreamStateGuard backup(stream);
+    normalized_setup(stream);
+    if (nz) {
+      if (!sp.is_scalar(true)) {
+        stream << sp.dim(false) << ": ";
+        stream << "[";
+      }
+      for (casadi_int i=0; i<sp.nnz(); ++i) {
+        if (i>0) stream << ", ";
+        normalized_out(stream, nz[i]);
+      }
+      if (!sp.is_scalar(true)) {
+        stream << "]";
+        if (!sp.is_dense()) {
+          stream << ", colind: [";
+          for (casadi_int i=0; i<sp.size2(); ++i) {
+            if (i>0) stream << ", ";
+            stream << sp.colind()[i];
+          }
+          stream << "]";
+          stream << ", row: [";
+          for (casadi_int i=0; i<sp.nnz(); ++i) {
+            if (i>0) stream << ", ";
+            stream << sp.row()[i];
+          }
+          stream << "]";
+        }
+      }
+    } else {
+      stream << "NULL";
+    }
   }
 
   void FunctionInternal::print_canonical(std::ostream &stream, double a) {
