@@ -1143,7 +1143,7 @@ jobs:
           python internal/test_py.py '../docs/api/examples'
         shell: bash -el {0}
         if: contains(matrix.image, 'windows')
-        - name: docs/api/examples
+      - name: docs/api/examples
         env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
