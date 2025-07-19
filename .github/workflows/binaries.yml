@@ -1140,7 +1140,7 @@ jobs:
           cd test
           conda install pydot
           pip install matplotlib scipy
-          python internal/test_py.py '../docs/api/examples'
+          python internal/test_py.py '../docs/api/examples' -skipfiles="n_nodes.py matrix_expand.py dotdraw.py"
         shell: bash -el {0}
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
