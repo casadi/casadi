@@ -1133,11 +1133,13 @@ jobs:
           python internal/test_pytest.py python -skipfiles="alltests.py nlp.py feasiblesqpmethod.py helpers.py complexity.py speed.py debug_fatrop.py" -skipdirs="hock_schittkowski" -memcheck -passoptions="--ignore_memory_heavy"
         shell: bash -el {0}
         if: contains(matrix.image, 'ubuntu')
-      - env:
+      - name: docs/api/examples
+        env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
           cd test
-          pip install pydot
+          conda install pydot
+          pip install matplotlib
           python internal/test_py.py '../docs/api/examples'
         shell: bash -el {0}
       - env:
