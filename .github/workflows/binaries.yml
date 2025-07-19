@@ -1140,8 +1140,20 @@ jobs:
           cd test
           conda install pydot
           pip install matplotlib scipy
+          python internal/test_py.py '../docs/api/examples'
+        shell: bash -el {0}
+        if: contains(matrix.image, 'windows')
+        - name: docs/api/examples
+        env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test
+          conda install pydot
+          pip install matplotlib scipy
+          # Weird PNG errors, not casadi's fault
           python internal/test_py.py '../docs/api/examples' -skipfiles="n_nodes.py matrix_expand.py dotdraw.py"
         shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
