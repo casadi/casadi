@@ -459,7 +459,7 @@ namespace casadi {
         "Allow construction with duplicate io names (Default: false)"}},
       {"print_instructions",
        {OT_BOOL,
-        "Print each operation during evaluation"}}
+        "Print each operation during evaluation. Influenced by print_canonical."}}
      }
   };
 
