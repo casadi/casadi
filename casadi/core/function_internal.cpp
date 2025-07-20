@@ -826,7 +826,11 @@ namespace casadi {
     for (casadi_int i=0; i<n_in_; ++i) {
       stream << "Input " << i << " (" << name_in_[i] << "): ";
       if (arg[i]) {
-        DM::print_default(stream, sparsity_in_[i], arg[i], truncate);
+        if (print_canonical_) {
+          print_canonical(stream, sparsity_in_[i], arg[i]);
+        } else {
+          DM::print_default(stream, sparsity_in_[i], arg[i], truncate);
+        }
         stream << std::endl;
       } else {
         stream << "NULL" << std::endl;
@@ -839,7 +843,11 @@ namespace casadi {
     for (casadi_int i=0; i<n_out_; ++i) {
       stream << "Output " << i << " (" << name_out_[i] << "): ";
       if (res[i]) {
-        DM::print_default(stream, sparsity_out_[i], res[i], truncate);
+        if (print_canonical_) {
+          print_canonical(stream, sparsity_out_[i], res[i]);
+        } else {
+          DM::print_default(stream, sparsity_out_[i], res[i], truncate);
+        }
         stream << std::endl;
       } else {
         stream << "NULL" << std::endl;
