@@ -69,17 +69,11 @@ namespace casadi {
   int Monitor::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     // Print comment
     uout() << comment_ << ":" << std::endl;
-    uout() << "[";
-    casadi_int n = nnz();
-    for (casadi_int i=0; i<n; ++i) {
-      if (i!=0) uout() << ", ";
-      uout() << arg[0][i];
-    }
-    uout() << "]" << std::endl;
-
+    DM::print_default(uout(), sparsity(), arg[0], false);
+    uout() << std::endl;
     // Perform operation
     if (arg[0]!=res[0]) {
-      std::copy(arg[0], arg[0]+n, res[0]);
+      std::copy(arg[0], arg[0]+nnz(), res[0]);
     }
     return 0;
   }
