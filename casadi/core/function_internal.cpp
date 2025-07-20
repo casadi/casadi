@@ -306,10 +306,14 @@ namespace casadi {
         "Acceptable number of inputs and outputs. Warn if exceeded."}},
       {"dump_in",
        {OT_BOOL,
-        "Dump numerical values of inputs to file (readable with DM.from_file) [default: false]"}},
+        "Dump numerical values of inputs to file (readable with DM.from_file) [default: false] "
+        "A counter is used to generate unique names. "
+        "The counter may be reset using reset_dump_count."}},
       {"dump_out",
        {OT_BOOL,
-        "Dump numerical values of outputs to file (readable with DM.from_file) [default: false]"}},
+        "Dump numerical values of outputs to file (readable with DM.from_file) [default: false] "
+        "A counter is used to generate unique names. "
+        "The counter may be reset using reset_dump_count."}},
       {"dump",
        {OT_BOOL,
         "Dump function to file upon first evaluation. [false]"}},
@@ -452,6 +456,10 @@ namespace casadi {
       // Option not found - continue to base classes
       ProtoFunction::change_option(option_name, option_value);
     }
+  }
+
+  void FunctionInternal::reset_dump_count() {
+    dump_count_ = 0;
   }
 
   void FunctionInternal::init(const Dict& opts) {
@@ -778,7 +786,9 @@ namespace casadi {
       DM::to_file(dump_dir_+ filesep() + name_ + "." + count + ".in." + name_in_[i] + "." +
         dump_format_, sparsity_in_[i], arg[i]);
     }
-    generate_in(dump_dir_+ filesep() + name_ + "." + count + ".in.txt", arg);
+    std::string name = dump_dir_+ filesep() + name_ + "." + count + ".in.txt";
+    uout() << "dump_in -> " << name << std::endl;
+    generate_in(name, arg);
   }
 
   void FunctionInternal::dump_out(casadi_int id, double** res) const {

@@ -1181,6 +1181,15 @@ namespace casadi {
     }
   }
 
+  void Function::reset_dump_count() {
+    try {
+      (*this)->reset_dump_count();
+    } catch(std::exception& e) {
+      THROW_ERROR("reset_dump_count", e.what());
+    }
+  }
+
+
   std::vector<std::string> Function::get_free() const {
     return (*this)->get_free();
   }

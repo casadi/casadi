@@ -463,6 +463,9 @@ namespace casadi {
         \identifier{1w2} */
     void change_option(const std::string& option_name, const GenericType& option_value);
 
+    /** \brief Reset the counter used to name dump files */
+    void reset_dump_count();
+
     /** \brief Do the derivative functions need nondifferentiated outputs?
 
         \identifier{1w3} */
