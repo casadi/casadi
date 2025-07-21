@@ -2805,13 +2805,44 @@ class MXtests(casadiTestCase):
     f = Function('f',[x],[y])
     with capture_stdout() as out:
       f(3)
-    self.assertTrue(out[0]=="hey:\n[3]\n")
+    print(out)
+    
+    
+    ref = "hey:\n3.0000000000000000e+00\n"
+    self.assertTrue(out[0]==ref)
 
-    with capture_stdout() as out2:
-      self.check_codegen(f,inputs=[3])
     if args.run_slow:
-      self.assertTrue("hey:\n[3]\n" in out2[0])
+        with self.assertInException("Parsing error"):
+            self.check_codegen(f,inputs=[3],main=True)
+                    
+        with open("f_out.txt","r") as f_out:
+            out2 = f_out.read()
+            
+        print(out2)
+            
+        self.assertTrue(ref in out2)
 
+    x = MX.sym("x",2)
+    y = sqrt(x.monitor("hey"))
+
+    f = Function('f',[x],[y])
+    with capture_stdout() as out:
+      f(3)
+    print(out)
+    ref = "hey:\n2x1: [3.0000000000000000e+00, 3.0000000000000000e+00]\n"
+    self.assertTrue(out[0]==ref)
+
+    if args.run_slow:
+        with self.assertInException("Parsing error"):
+            self.check_codegen(f,inputs=[3],main=True)
+                    
+        with open("f_out.txt","r") as f_out:
+            out2 = f_out.read()
+            
+        print(out2)
+            
+        self.assertTrue(ref in out2)
+        
   def test_codegen_specials(self):
     x = MX.sym("x")
     y = MX.sym("y")
