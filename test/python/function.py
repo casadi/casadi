@@ -3450,7 +3450,7 @@ class Functiontests(casadiTestCase):
       lines = """
   casadi_int i, j, k;
   casadi_real *rr, w0, *w1=w+2, w2, *w3=w+8, *w4=w+18, *w5=w+28, *w6=w+33, *w7=w+38, *w8=w+43, *w9=w+68;
-  const casadi_real *cr, *cs, *ct, *wr3, *wr4, *wr6, *wr9;
+  const casadi_real *cs, *ct, *wr3, *wr4, *wr6, *wr9;
   /* #0: @0 = 0 */
   w0 = 0.;
   /* #1: @1 = ones(1x5) */
@@ -3474,12 +3474,9 @@ class Functiontests(casadiTestCase):
   /* #10: @4 = (@2*@4) */
   for (i=0, rr=w4, cs=wr4; i<10; ++i) (*rr++)  = (w2*(*cs++));
   /* #11: @4 = monitor(@4, b) */
-  CASADI_PRINTF("b\\n[");
-    for (i=0, cr=w4; i!=10; ++i) {
-        if (i!=0) CASADI_PRINTF(", ");
-        CASADI_PRINTF("%g", *cr++);
-      }
-    CASADI_PRINTF("]\\n");
+  CASADI_PRINTF("b:\\n");
+  casadi_print_canonical(casadi_s0, w4);
+  CASADI_PRINTF("\\n");
   /* #12: @7 = @4[2:7] */
   for (rr=w7, cs=w4+2; cs!=w4+7; cs+=1) *rr++ = *cs;
   /* #13: @5 = (@5+@7) */

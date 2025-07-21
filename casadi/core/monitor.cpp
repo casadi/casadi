@@ -105,9 +105,9 @@ namespace casadi {
                           std::vector<bool>& res_is_ref) const {
     // Print comment
     std::string a = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
-    g << g.printf(comment_ + ":\\n") << "\n"
-      << g.print_canonical(dep(0).sparsity(), a)
-      << g.printf("\\n") << "\n";
+    g << g.printf(comment_ + ":\\n") << "\n";
+    g << g.print_canonical(dep(0).sparsity(), a) << "\n";
+    g << g.printf("\\n") << "\n";
     generate_copy(g, arg, res, arg_is_ref, res_is_ref, 0);
   }
 
