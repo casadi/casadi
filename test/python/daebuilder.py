@@ -29,6 +29,8 @@ import subprocess
 import os
 import unittest
 from helpers import *
+import glob
+import gc
 
 class Daebuildertests(casadiTestCase):
 
@@ -106,11 +108,15 @@ class Daebuildertests(casadiTestCase):
         return
     unzipped_name = "VanDerPol2"
     unzipped_path = os.path.join(os.getcwd(), unzipped_name)
+    unzipped_count = None
     for serialize_mode in ["link","embed"]:
         for use_zip in [True]:#,False]:
             if use_zip:
                 if "ghc-filesystem" in CasadiMeta.feature_list():
+                    unzipped_count = len(glob.glob(unzipped_name+"*.unzipped"))
                     dae = DaeBuilder("cstr",fmu_file,{"resource_serialize_mode": serialize_mode})
+                    # Unzip dir is there
+                    self.assertEqual(len(glob.glob(unzipped_name+"*.unzipped")),unzipped_count+1)
                 else:
                     with self.assertInException("passing fmu files to DaeBuilder is unsupported"):
                         dae = DaeBuilder("cstr",fmu_file)
@@ -151,6 +157,12 @@ class Daebuildertests(casadiTestCase):
             f = None
             f = Function.load("f.casadi")
             self.checkfunction(f,f_ref,inputs=test_point,hessian=False,digits=7,evals=1)
+            
+            f = None
+            gc.collect()
+            if unzipped_count is not None:
+                # Unzip dir is gone
+                self.assertEqual(len(glob.glob(unzipped_name+"*.unzipped")),unzipped_count)
   
   @requires_rootfinder("kinsol")
   @requires_rootfinder("newton")
