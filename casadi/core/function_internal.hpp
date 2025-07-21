@@ -319,7 +319,9 @@ namespace casadi {
         \identifier{k5} */
     void change_option(const std::string& option_name, const GenericType& option_value) override;
 
-    /** \brief Reset the counter used to name dump files */
+    /** \brief Reset the counter used to name dump files
+
+        \identifier{2dx} */
     void reset_dump_count();
 
     /** \brief Initialize
