@@ -1160,6 +1160,12 @@ jobs:
           cd test
           python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py modelica_fmu_import.py"
         shell: bash -el {0}
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test
+          python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py modelica_fmu_import.py nlp_codegen.py"
+        shell: pwsh
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - uses: jgillis/fetch-gh-release-asset@patch-1
