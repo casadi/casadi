@@ -4891,6 +4891,15 @@
 %exception  casadi::Resource::serialize(SerializingStream &s) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::RevWeakCache< K, T >::incache(const K &key, T &f, bool needs_lock=true) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::RevWeakCache< K, T >::tocache(const K &key, const T &f, bool needs_lock=true) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::RevWeakCache< K, T >::tocache_if_missing(const K &key, T &f) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SX::dep(casadi_int ch=0) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
