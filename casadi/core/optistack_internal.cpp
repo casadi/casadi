@@ -128,7 +128,7 @@ std::string OptiNode::format_stacktrace(const Dict& stacktrace, casadi_int inden
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
     std::string contents; std::getline(file, contents);
-    auto it = contents.find_first_not_of(" \n");
+    auto it = contents.find_first_not_of(" \t\r\n");
     if (it!=std::string::npos) {
       description += "\n" + s_indent + contents.substr(it);
     }
