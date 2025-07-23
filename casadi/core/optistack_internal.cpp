@@ -27,6 +27,7 @@
 #include "conic.hpp"
 #include "function_internal.hpp"
 #include "global_options.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -121,12 +122,13 @@ std::string OptiNode::format_stacktrace(const Dict& stacktrace, casadi_int inden
   if (name!="Unknown" && name!= "<module>")
     description += " in " + stacktrace.at("name").as_string();
   try {
-    std::ifstream file(filename);
+    auto file_ptr = Filesystem::ifstream_ptr(filename);
+    std::istream& file = *file_ptr;
     for (casadi_int i=0; i<line-1; ++i) {
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
     std::string contents; std::getline(file, contents);
-    auto it = contents.find_first_not_of(" \n");
+    auto it = contents.find_first_not_of(" \t\r\n");
     if (it!=std::string::npos) {
       description += "\n" + s_indent + contents.substr(it);
     }
@@ -267,6 +269,7 @@ OptiNode::OptiNode(const std::string& problem_type) :
     "Choose 'nlp' (default) or 'conic'.");
   problem_type_ = problem_type;
   mark_problem_dirty();
+  helpers_ = std::make_shared<ValueCache>();
 }
 
 OptiNode::~OptiNode() {
@@ -728,6 +731,7 @@ void OptiNode::bake() {
 
   symbol_active_.clear();
   symbol_active_.resize(symbols_.size());
+  helpers_ = std::make_shared<ValueCache>();
 
   // Gather all expressions
   MX total_expr = vertcat(f_, veccat(g_));
@@ -1395,15 +1399,29 @@ bool override_num(const std::map<casadi_int, MX> & temp, std::vector<DM>& num, c
   return false;
 }
 
-DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) const {
-  std::vector<MX> x   = symvar(expr, OPTI_VAR);
-  std::vector<MX> p   = symvar(expr, OPTI_PAR);
-  std::vector<MX> lam = symvar(expr, OPTI_DUAL_G);
 
-  Function helper = Function("helper", std::vector<MX>{veccat(x), veccat(p), veccat(lam)}, {expr});
-  if (helper.has_free())
-    casadi_error("This expression has symbols that are not defined "
-      "within Opti using variable/parameter.");
+DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) const {
+
+  std::shared_ptr<ValueHelper> vh;
+  if (!helpers_->incache(expr, vh)) {
+    vh = std::make_shared<ValueHelper>();
+    std::vector<MX> x   = symvar(expr, OPTI_VAR);
+    std::vector<MX> p   = symvar(expr, OPTI_PAR);
+    std::vector<MX> lam = symvar(expr, OPTI_DUAL_G);
+    vh->x = x;
+    vh->p = p;
+    vh->lam = lam;
+    vh->helper = Function("helper", std::vector<MX>{veccat(x), veccat(p), veccat(lam)}, {expr});
+    if (vh->helper.has_free())
+      casadi_error("This expression has symbols that are not defined "
+        "within Opti using variable/parameter.");
+    helpers_->tocache_if_missing(expr, vh);
+  }
+
+  const std::vector<MX>& x = vh->x;
+  const std::vector<MX>& p = vh->p;
+  const std::vector<MX>& lam = vh->lam;
+  const Function& helper = vh->helper;
 
   std::map<VariableType, std::map<casadi_int, MX> > temp;
   temp[OPTI_DUAL_G] = std::map<casadi_int, MX>();
@@ -1625,6 +1643,16 @@ std::vector<MX> OptiNode::active_symvar(VariableType type) const {
   std::vector<MX> ret;
   for (const auto& s : symbols_) {
     if (symbol_active_[meta(s).count] && meta(s).type==type)
+      ret.push_back(s);
+  }
+  return ret;
+}
+
+std::vector<MX> OptiNode::symvar(VariableType type) const {
+  if (symbols_.empty()) return std::vector<MX>{};
+  std::vector<MX> ret;
+  for (const auto& s : symbols_) {
+    if (meta(s).type==type)
       ret.push_back(s);
   }
   return ret;

@@ -1,3 +1,4 @@
+# coding=utf-8
 #
 #     This file is part of CasADi.
 #
@@ -411,6 +412,7 @@ class Misctests(casadiTestCase):
     b = s.unpack()
     with self.assertInException("end of stream"):
       s.unpack()
+    si = None
 
     si = FileSerializer("foo.dat")
     f = Function("f",[x],[x**2])
@@ -422,6 +424,8 @@ class Misctests(casadiTestCase):
 
     si = FileDeserializer("foo.dat")
     print(si.unpack())
+
+    si = None
 
     si = FileSerializer("foo.dat")
     f = Function("f",[x],[x**2])
@@ -552,5 +556,23 @@ class Misctests(casadiTestCase):
       self.assertTrue("t_proc_total" in solver.stats())
       self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
+  def test_unicode(self):
+    import sys
+    import shutil
+    if sys.version_info[0] < 3: return
+    path = "üni/tüst.casadi"
+    path2 = "üni/stüst.casadi"
+    if "ghc-filesystem" not in CasadiMeta.feature_list():
+        path = "tüst.casadi"
+        path2 = "stüst.casadi"
+    x = MX.sym("x")
+    f = Function("f",[x],[x**2])
+    f.save(path)
+    shutil.copy(path,path2)
+    
+    f2 = Function.load(path2)
+    self.checkfunction_light(f,f2,inputs=[3])
+    
+    
 if __name__ == '__main__':
     unittest.main()

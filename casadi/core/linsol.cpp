@@ -148,14 +148,13 @@ namespace casadi {
       for (size_t nz = 0; nz < nonzeros.size(); ++nz)
         nonzeros[nz] = std::to_string(A[nz]);
       // Create .m file
-      std::ofstream mfile;
       std::string fname = (*this)->class_name() + "_" + (*this)->name_ + "_debug.m";
-      Filesystem::open(mfile, fname);
+      auto mfile_ptr = Filesystem::ofstream_ptr(fname);
+      std::ostream& mfile = *mfile_ptr;
       Dict opts;
       opts["name"] = "A";
       opts["nonzeros"] = nonzeros;
       sparsity().export_code("matlab", mfile, opts);
-      mfile.close();
       casadi_error("Numerical factorization failed for " + (*this)->name_
         + "[" + (*this)->class_name() + "]. Linear system saved to '" + fname + "'");
     }

@@ -90,6 +90,14 @@ const FmuInternal* Fmu::operator->() const {
   return static_cast<const FmuInternal*>(SharedObject::operator->());
 }
 
+FmuMemory* Fmu::alloc_mem(const FmuFunction& f) const {
+  return (*this)->alloc_mem(f);
+}
+
+void Fmu::free_mem(void *mem) const {
+  return (*this)->free_mem(mem);
+}
+
 FmuInternal* Fmu::get() const {
   return static_cast<FmuInternal*>(SharedObject::get());
 }
@@ -1003,8 +1011,9 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
           }
           ss << "]" << std::endl;
           // Append to file
-          std::ofstream valfile;
-          valfile.open(m->self.validate_ad_file_, std::ios_base::app);
+          auto valfile_ptr = Filesystem::ofstream_ptr(m->self.validate_ad_file_,
+            std::ios_base::app);
+          std::ostream& valfile = *valfile_ptr;
           valfile << ss.str();
         }
       }
@@ -1465,7 +1474,7 @@ FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {
 #endif // WITH_FMI2
   } else if (class_name=="Fmu3") {
 #ifdef WITH_FMI3
-    casadi_error("Not implemented");
+return Fmu3::deserialize(s);
 #else
     casadi_error("CasADi was not compiled with WITH_FMI2=ON.");
 #endif // WITH_FMI3

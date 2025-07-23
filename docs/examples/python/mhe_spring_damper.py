@@ -24,7 +24,7 @@ import numpy as NP
 import matplotlib.pyplot as plt
 import time
 from casadi.tools import *
-from scipy import linalg, matrix
+from scipy import linalg
 plt.interactive(True)
 
 NP.random.seed(0)

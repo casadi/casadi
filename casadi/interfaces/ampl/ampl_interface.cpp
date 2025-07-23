@@ -25,6 +25,7 @@
 
 #include "ampl_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
+#include "casadi/core/filesystem_impl.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -279,7 +280,9 @@ namespace casadi {
 
     // Create .nl file and add preamble
     std::string nlname = temporary_file("casadi_ampl_tmp", ".nl");
-    std::ofstream nl(nlname, std::ofstream::out);
+    auto nl_ptr = Filesystem::ofstream_ptr(nlname, std::ofstream::out);
+    std::ostream& nl = *nl_ptr;
+
     if (verbose_) casadi_message("Opened " + nlname);
     nl << nl_init_.str();
 
@@ -335,7 +338,7 @@ namespace casadi {
     }
 
     // Close file
-    nl.close();
+    nl_ptr.reset();
 
     // Temporary name for the .sol file
     std::string solname = temporary_file("casadi_ampl_tmp", ".sol");
@@ -354,8 +357,8 @@ namespace casadi {
     if (verbose_) casadi_message("Removed " + nlname);
 
     // Open .out file and dump to screen
-    std::ifstream out(outname, std::ifstream::in);
-    casadi_assert(out.is_open(), "Failed to open " + outname);
+    auto out_ptr = Filesystem::ifstream_ptr(outname, std::ifstream::in);
+    std::istream& out = *out_ptr;
     std::string line;
     while (!out.eof()) {
       getline(out, line);
@@ -363,15 +366,15 @@ namespace casadi {
     }
 
     // Close and delete .out file
-    out.close();
+    out_ptr.reset();
     if (remove(outname.c_str())!=0) {
       casadi_warning("Failed to remove " + outname);
     }
     if (verbose_) casadi_message("Removed " + outname);
 
     // Open .sol file
-    std::ifstream sol(solname, std::ifstream::in);
-    casadi_assert(sol.is_open(), "Failed to open " + solname);
+    auto sol_ptr = Filesystem::ifstream_ptr(solname, std::ifstream::in);
+    std::istream& sol = *sol_ptr;
     if (verbose_) casadi_message("Opened " + solname);
 
     // Get all the lines
@@ -400,7 +403,7 @@ namespace casadi {
     }
 
     // Close and delete .sol file
-    sol.close();
+    sol_ptr.reset();
     if (remove(solname.c_str())!=0) {
       casadi_warning("Failed to remove " + solname);
     }

@@ -2805,13 +2805,44 @@ class MXtests(casadiTestCase):
     f = Function('f',[x],[y])
     with capture_stdout() as out:
       f(3)
-    self.assertTrue(out[0]=="hey:\n[3]\n")
+    print(out)
+    
+    
+    ref = "hey:\n3.0000000000000000e+00\n"
+    self.assertTrue(out[0]==ref)
 
-    with capture_stdout() as out2:
-      self.check_codegen(f,inputs=[3])
     if args.run_slow:
-      self.assertTrue("hey:\n[3]\n" in out2[0])
+        with self.assertInException("Parsing error"):
+            self.check_codegen(f,inputs=[3],main=True)
+                    
+        with open("f_out.txt","r") as f_out:
+            out2 = f_out.read()
+            
+        print(out2)
+            
+        self.assertTrue(ref in out2)
 
+    x = MX.sym("x",2)
+    y = sqrt(x.monitor("hey"))
+
+    f = Function('f',[x],[y])
+    with capture_stdout() as out:
+      f(3)
+    print(out)
+    ref = "hey:\n2x1: [3.0000000000000000e+00, 3.0000000000000000e+00]\n"
+    self.assertTrue(out[0]==ref)
+
+    if args.run_slow:
+        with self.assertInException("Parsing error"):
+            self.check_codegen(f,inputs=[3],main=True)
+                    
+        with open("f_out.txt","r") as f_out:
+            out2 = f_out.read()
+            
+        print(out2)
+            
+        self.assertTrue(ref in out2)
+        
   def test_codegen_specials(self):
     x = MX.sym("x")
     y = MX.sym("y")
@@ -3048,10 +3079,48 @@ class MXtests(casadiTestCase):
             with open("f_out.txt","r") as f_out:
                 out2 = f_out.read().split("\n")[:-2]
             
+            self.assertEqual(len(out),len(out2))
+            for a,b in zip(out,out2):
+                self.assertEqual(a,b)
+
+
+    results = {}
+    results_slow = {}
+    for X in [MX,SX]:
+        x = X.sym("x")
+        y = X.sym("y")
+        f = Function('f',[x,y],[x+y],{"print_instructions": True, "print_canonical":True})
+        f.disp(True)
+        DM.rng(1)
+        inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+        with capture_stdout() as out:
+            f(*inputs)
+        out = out[0].split("\n")[:-1]
+        results[X] = out
+        
+        self.assertTrue("inputs" in out[0])
+        
+        
+        if args.run_slow:
+            with self.assertInException("Parsing error"):
+                self.check_codegen(f,inputs,main=True)
+                        
+            with open("f_out.txt","r") as f_out:
+                out2 = f_out.read().split("\n")[:-2]
+                results_slow[X] = out2
+            
             
             self.assertEqual(len(out),len(out2))
             for a,b in zip(out,out2):
                 self.assertEqual(a,b)
+
+    self.assertEqual(len(results[SX]),len(results[MX]))
+    for a,b in zip(results[SX],results[MX]):
+        self.assertEqual(a,b)
+    if args.run_slow:
+        self.assertEqual(len(results_slow[SX]),len(results_slow[MX]))
+        for a,b in zip(results_slow[SX],results_slow[MX]):
+            self.assertEqual(a,b)
 
   def test_low(self):
     v = MX.sym("v",5)
@@ -3944,5 +4013,66 @@ class MXtests(casadiTestCase):
 
     assert f1(*args).sparsity()==f2(*args).sparsity()
           
+                    
+  def test_extract(self):
+    x = MX.sym('x',2)
+    y = MX.sym('y',2)
+    
+    u = vertcat(x,y)
+    DM.rng(1)
+    u0 = DM.rand(4,1)
+    f = Function('f',[x,y],[sin(x+y)],{"never_inline":True})
+    
+    g = Function('g',[x],[cos(3*sum(x))],{"never_inline":True})
+    
+    e = g(f(x/y,2*x*y)*x)/(x+y)
+
+    res = extract([e],{"lift_shared":False,"lift_calls":True})
+    
+    [vexpr,v,vdef] = res
+    
+    print(vexpr)
+    print(v)
+    print(vdef)
+
+    self.assertEqual(len(v), 5)
+    self.assertEqual(len(vdef), len(v))
+    self.assertEqual(len(vexpr), 1)
+    #assert()
+    # Check inverted operation
+    f_ref = Function('f',[u],[e])
+    print("e",e)
+    e_reconstructed = substitute_inplace(v, vdef, [e])[1]
+    print(e_reconstructed)
+    f = Function('f',[u],e_reconstructed)
+    self.checkarray(f_ref(u0),f(u0))
+    
+    print(e)
+    
+    print(substitute_inplace(v, vdef, vexpr))
+    
+    vexpr = vcat(vexpr)
+    v = vcat(v)
+    vdef = vcat(vdef)
+    
+    
+    Jf_ref = Function('J_ref',[u],[jacobian(e,u)])
+    
+    J_v_u = solve(DM.eye(vdef.size1())-jacobian(vdef,v),jacobian(vdef,u))
+    J = jacobian(vexpr,u) + mtimes(jacobian(vexpr,v), J_v_u)
+
+    [vexpr,v,vdef] = res
+    
+    J = substitute_inplace(v, vdef, [J])[1][0]
+    
+    Jf = Function('J2',[u],[J])
+    
+
+    self.checkarray(Jf_ref(u0),Jf(u0))
+
+    
+    
+
+  
 if __name__ == '__main__':
     unittest.main()

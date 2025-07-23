@@ -26,6 +26,8 @@
 #include <casadi/core/casadi_export.h>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <memory>
 
 /// \cond INTERNAL
 
@@ -105,6 +107,14 @@ CASADI_EXPORT int close_shared_library(handle_t handle);
 #endif // WITH_DL
 
 
+CASADI_EXPORT std::unique_ptr<std::istream> ifstream_compat(const std::string& utf8_path,
+    std::ios::openmode mode = std::ios::in);
+
+CASADI_EXPORT std::ifstream* new_ifstream_compat(const std::string& utf8_path,
+    std::ios::openmode mode = std::ios::in);
+
+CASADI_EXPORT std::unique_ptr<std::ostream> ofstream_compat(const std::string& utf8_path,
+    std::ios::openmode mode = std::ios::out);
 
 } // namespace casadi
 

@@ -1905,8 +1905,8 @@ namespace casadi {
   }
   void Sparsity::to_file(const std::string& filename, const std::string& format_hint) const {
     std::string format = file_format(filename, format_hint, file_formats);
-    std::ofstream out;
-    Filesystem::open(out, filename);
+    auto out_ptr = Filesystem::ofstream_ptr(filename);
+    std::ostream& out = *out_ptr;
     if (format=="mtx") {
       out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
       out << "%%MatrixMarket matrix coordinate pattern general" << std::endl;
@@ -1924,8 +1924,8 @@ namespace casadi {
 
   Sparsity Sparsity::from_file(const std::string& filename, const std::string& format_hint) {
     std::string format = file_format(filename, format_hint, file_formats);
-    std::ifstream in(filename);
-    casadi_assert(in.good(), "Could not open '" + filename + "'.");
+    auto in_ptr = Filesystem::ifstream_ptr(filename);
+    std::istream& in = *in_ptr;
     if (format=="mtx") {
       std::string line;
       std::vector<casadi_int> row, col;
@@ -1933,6 +1933,7 @@ namespace casadi {
       int line_num = 0;
       while (std::getline(in, line)) {
         if (line_num==0) {
+          if (!line.empty() && line.back()=='\r') line.pop_back();
           casadi_assert(line=="%%MatrixMarket matrix coordinate pattern general", "Wrong header");
           line_num = 1;
         } else if (line_num==1) {

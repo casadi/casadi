@@ -57,6 +57,24 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Initialize
   void init(const DaeBuilderInternal* dae) override;
 
+  /** \brief Initalize memory block
+
+      \identifier{2dr} */
+  int init_mem(FmuMemory* m) const override;
+
+  /** \brief Create memory block
+
+      \identifier{2ds} */
+  FmuMemory* alloc_mem(const FmuFunction& f) const override;
+
+  /** \brief Free memory block
+
+      \identifier{2dw} */
+  void free_mem(void *mem) const override;
+
+  // Finalize
+  void finalize() override;
+
   // Set C API functions
   void load_functions() override;
 
@@ -153,6 +171,9 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Retrieve auxilliary variables from FMU
   int get_aux(void* instance) override;
 
+  // Retrieve auxilliary variables from FMU, implementation
+  int get_aux_impl(void* instance, Value& aux_value) const;
+
   /** \brief Get stats
 
       \identifier{2bc} */
@@ -162,6 +183,13 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Process message
   static void log_message_callback(fmi3InstanceEnvironment instanceEnvironment,
     fmi3Status status, fmi3String category, fmi3String message);
+
+  void serialize_body(SerializingStream& s) const override;
+
+  static Fmu3* deserialize(DeserializingStream& s);
+
+  protected:
+    explicit Fmu3(DeserializingStream& s);
 };
 
 } // namespace casadi

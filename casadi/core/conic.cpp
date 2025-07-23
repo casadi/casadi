@@ -47,9 +47,8 @@ namespace casadi {
   }
 
   void conic_debug(const Function& f, const std::string &filename) {
-    std::ofstream file;
-    Filesystem::open(file, filename);
-    conic_debug(f, file);
+    auto file_ptr = Filesystem::ofstream_ptr(filename);
+    conic_debug(f, *file_ptr);
   }
 
   void conic_debug(const Function& f, std::ostream &file) {

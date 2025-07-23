@@ -601,8 +601,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
 
 void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Check if file exists
-  std::ifstream test(filename);
-  if (!test.good()) {
+  if (!Filesystem::exists(filename)) {
     if (Filesystem::is_enabled()) {
       casadi_error("Could not open file '" + filename + "'.");
     } else {
@@ -1066,8 +1065,10 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     const CodeGenerator& gen) const {
   // Create file
   std::string wrapper_filename = name_ + "_wrap.c";
-  std::ofstream f;
-  CodeGenerator::file_open(f, wrapper_filename, false);
+
+  auto f_ptr = Filesystem::ofstream_ptr(wrapper_filename);
+  std::ostream& f = *f_ptr;
+  CodeGenerator::stream_open(f, false);
 
   // Add includes
   f << "#include <fmi3Functions.h>\n"
@@ -1135,7 +1136,7 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
   f << CodeGenerator::fmu_helpers(name_);
 
   // Finalize file
-  CodeGenerator::file_close(f, false);
+  CodeGenerator::stream_close(f, false);
   return wrapper_filename;
 }
 

@@ -77,10 +77,10 @@ int FmuFunction::init_mem(void* mem) const {
 
 void* FmuFunction::alloc_mem() const {
   // Create (master) memory object
-  FmuMemory* m = new FmuMemory(*this);
+  FmuMemory* m = fmu_.alloc_mem(*this);
   // Attach additional (slave) memory objects
   for (casadi_int i = 1; i < max_jac_tasks_; ++i) {
-    m->slaves.push_back(new FmuMemory(*this));
+    m->slaves.push_back(fmu_.alloc_mem(*this));
   }
   return m;
 }
@@ -98,7 +98,7 @@ void FmuFunction::free_mem(void *mem) const {
       s->instance = nullptr;
     }
     // Free the slave
-    delete s;
+    fmu_.free_mem(s);
   }
   // Free FMI memory
   if (m->instance) {
@@ -106,7 +106,7 @@ void FmuFunction::free_mem(void *mem) const {
     m->instance = nullptr;
   }
   // Free the memory object
-  delete m;
+  fmu_.free_mem(m);
 }
 
 FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
@@ -334,8 +334,8 @@ void FmuFunction::init(const Dict& opts) {
 
   // New AD validation file, if any
   if (!validate_ad_file_.empty()) {
-    std::ofstream valfile;
-    Filesystem::open(valfile, validate_ad_file_);
+    auto valfile_ptr = Filesystem::ofstream_ptr(validate_ad_file_);
+    std::ostream& valfile = *valfile_ptr;
     valfile << "Output Input Value Nominal Min Max AD FD Step Offset Stencil" << std::endl;
   }
 
@@ -1580,7 +1580,7 @@ Dict FmuFunction::get_stats(void *mem) const {
 
 void FmuFunction::serialize_body(SerializingStream &s) const {
   FunctionInternal::serialize_body(s);
-  s.version("FmuFunction", 3);
+  s.version("FmuFunction", 4);
 
   s.pack("FmuFunction::Fmu", fmu_);
 
@@ -1612,6 +1612,8 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 
   s.pack("FmuFunction::uses_directional_derivatives", uses_directional_derivatives_);
   s.pack("FmuFunction::uses_adjoint_derivatives", uses_adjoint_derivatives_);
+  s.pack("FmuFunction::nfwd", nfwd_);
+  s.pack("FmuFunction::nadj", nadj_);
   s.pack("FmuFunction::validate_forward", validate_forward_);
   s.pack("FmuFunction::validate_hessian", validate_hessian_);
   s.pack("FmuFunction::make_symmetric", make_symmetric_);
@@ -1643,7 +1645,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 }
 
 FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
-  s.version("FmuFunction", 3);
+  s.version("FmuFunction", 3, 4);
 
   s.unpack("FmuFunction::Fmu", fmu_);
 
@@ -1681,6 +1683,8 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
 
   s.unpack("FmuFunction::uses_directional_derivatives", uses_directional_derivatives_);
   s.unpack("FmuFunction::uses_adjoint_derivatives", uses_adjoint_derivatives_);
+  s.unpack("FmuFunction::nfwd", nfwd_);
+  s.unpack("FmuFunction::nadj", nadj_);
   s.unpack("FmuFunction::validate_forward", validate_forward_);
   s.unpack("FmuFunction::validate_hessian", validate_hessian_);
   s.unpack("FmuFunction::make_symmetric", make_symmetric_);

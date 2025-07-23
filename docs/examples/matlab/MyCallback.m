@@ -31,7 +31,7 @@ classdef MyCallback < casadi.Callback
 
     % Number of inputs and outputs
     function v=get_n_in(self)
-      v=1;
+      v=2;
     end
     function v=get_n_out(self)
       v=1;
@@ -45,7 +45,8 @@ classdef MyCallback < casadi.Callback
     % Evaluate numerically
     function arg = eval(self, arg)
       x = arg{1};
-      f = sin(self.d * x);
+      y = arg{2};
+      f = sin(self.d * x+y);
       arg = {f};
     end
   end

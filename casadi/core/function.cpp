@@ -1181,6 +1181,15 @@ namespace casadi {
     }
   }
 
+  void Function::reset_dump_count() {
+    try {
+      (*this)->reset_dump_count();
+    } catch(std::exception& e) {
+      THROW_ERROR("reset_dump_count", e.what());
+    }
+  }
+
+
   std::vector<std::string> Function::get_free() const {
     return (*this)->get_free();
   }
@@ -1203,8 +1212,8 @@ namespace casadi {
     std::vector<double> d = nz_from_in(arg);
 
     // Set up output stream
-    std::ofstream of;
-    Filesystem::open(of, fname);
+    auto of_ptr = Filesystem::ofstream_ptr(fname);
+    std::ostream& of = *of_ptr;
     normalized_setup(of);
 
     // Encode each output
@@ -1218,8 +1227,8 @@ namespace casadi {
     std::vector<double> d = nz_from_out(res);
 
     // Set up output stream
-    std::ofstream of;
-    Filesystem::open(of, fname);
+    auto of_ptr = Filesystem::ofstream_ptr(fname);
+    std::ostream& of = *of_ptr;
     normalized_setup(of);
 
     // Encode each output
@@ -1260,9 +1269,8 @@ namespace casadi {
 
   void Function::export_code(const std::string& lang,
       const std::string &fname, const Dict& options) const {
-    std::ofstream stream;
-    Filesystem::open(stream, fname);
-    return (*this)->export_code(lang, stream, options);
+    auto stream_ptr = Filesystem::ofstream_ptr(fname);
+    return (*this)->export_code(lang, *stream_ptr, options);
   }
 
 

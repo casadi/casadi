@@ -27,6 +27,7 @@
 #define CASADI_NLP_BUILDER_HPP
 
 #include "mx.hpp"
+#include <memory>
 
 namespace casadi {
 
@@ -112,7 +113,7 @@ namespace casadi {
     // Binary mode
     bool binary_;
     // File stream
-    std::ifstream s_;
+    std::unique_ptr<std::istream> s_ptr_;
     // All variables, including dependent
     std::vector<MX> v_;
     // Number of objectives and constraints

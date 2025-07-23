@@ -205,7 +205,7 @@ T1 casadi_smoothing_diff_err(const T1** yk, T1 h, casadi_int n_y, casadi_int i,
   // If sw is 0, no stencil worked
   if (sw == 0) {
     // Cannot be calculated
-    return std::numeric_limits<T1>::quiet_NaN();;
+    return std::numeric_limits<T1>::quiet_NaN();
   } else {
     // Finalize estimate using the sum of weights and the step length
     return ui / sw;

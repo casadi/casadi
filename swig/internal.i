@@ -1636,6 +1636,9 @@
 %exception  casadi::Function::release(int mem) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::reset_dump_count() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::reverse(casadi_int nadj) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

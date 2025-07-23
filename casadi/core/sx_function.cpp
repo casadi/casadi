@@ -234,7 +234,7 @@ namespace casadi {
   void SXFunction::print_arg(std::ostream &stream, casadi_int k, const ScalarAtomic& el,
       const double* w) const {
     if (el.op==OP_INPUT || el.op==OP_OUTPUT || el.op==OP_CONST) return;
-    stream << name_ << ":" << k << ": " << print(el) << " inputs:  ";
+    stream << name_ << ":" << k << ": " << print(el) << " inputs:" << std::endl;
 
     // Default dependencies
     const int* dep = &el.i1;
@@ -245,21 +245,34 @@ namespace casadi {
       const ExtendedAlgEl& e = call_.el.at(el.i1);
       ndeps = e.n_dep;
       dep = get_ptr(e.dep);
+      stream << "[";
+      for (size_t i = 0; i < ndeps; ++i) {
+        if (i>0) stream << ", ";
+        if (print_canonical_) {
+          print_canonical(stream, w[dep[i]]);
+        } else {
+          DM::print_scalar(stream, w[dep[i]]);
+        }
+      }
+      stream << "]";
+      stream << std::endl;
+      return;
     }
 
-    std::vector<double> num(ndeps);
     for (size_t i = 0; i < ndeps; ++i) {
-      num[i] = w[dep[i]];
+      stream << i << ": ";
+      if (print_canonical_) {
+        print_canonical(stream, w[dep[i]]);
+      } else {
+        DM::print_scalar(stream, w[dep[i]]);
+      }
+      stream << std::endl;
     }
-
-    print_canonical(stream, ndeps, get_ptr(num));
-
-    stream << std::endl;
   }
 
   void SXFunction::print_arg(CodeGenerator& g, casadi_int k, const ScalarAtomic& el) const {
     if (el.op==OP_INPUT || el.op==OP_OUTPUT || el.op==OP_CONST) return;
-    g << g.printf(name_ + ":" + str(k) + ": " + print(el) + " inputs:  ") << "\n";
+    g << g.printf(name_ + ":" + str(k) + ": " + print(el) + " inputs:\\n") << "\n";
     if (el.op==OP_CALL) {
       const ExtendedAlgEl& m = call_.el[el.i1];
       g << g.print_vector(m.f.nnz_in(), "arg[" + str(n_in_) + "]");
@@ -267,9 +280,9 @@ namespace casadi {
     } else {
       casadi_int ndeps = casadi_math<double>::ndeps(el.op);
       if (ndeps==1) {
-        g << g.printf("[%.16e]\\n", g.sx_work(el.i1));
+        g << g.printf("0: %.16e\\n", g.sx_work(el.i1));
       } else if (ndeps==2) {
-        g << g.printf("[%.16e, %.16e]\\n", g.sx_work(el.i1), g.sx_work(el.i2));
+        g << g.printf("0: %.16e\\n1: %.16e\\n", g.sx_work(el.i1), g.sx_work(el.i2));
       }
     }
     g << "\n";
@@ -277,13 +290,13 @@ namespace casadi {
 
   void SXFunction::print_res(CodeGenerator& g, casadi_int k, const ScalarAtomic& el) const {
     if (el.op==OP_INPUT || el.op==OP_OUTPUT) return;
-    g << g.printf(name_ + ":" + str(k) + ": " + print(el) + " outputs: ") << "\n";
+    g << g.printf(name_ + ":" + str(k) + ": " + print(el) + " outputs:\\n") << "\n";
     if (el.op==OP_CALL) {
       const ExtendedAlgEl& m = call_.el[el.i1];
       g << g.print_vector(m.f.nnz_out(), "w+" + str(m.f.nnz_in()));
       g << g.printf("\\n");
     } else {
-      g << g.printf("[%.16e]\\n", g.sx_work(el.i0));
+      g << g.printf("0: %.16e\\n", g.sx_work(el.i0));
     }
     g << "\n";
   }
@@ -291,7 +304,7 @@ namespace casadi {
   void SXFunction::print_res(std::ostream &stream, casadi_int k, const ScalarAtomic& el,
       const double* w) const {
     if (el.op==OP_INPUT || el.op==OP_OUTPUT) return;
-    stream << name_ << ":" << k << ": " << print(el) << " outputs: ";
+    stream << name_ << ":" << k << ": " << print(el) << " outputs:" << std::endl;
 
     // Default outputs
     const int* res = &el.i0;
@@ -302,16 +315,30 @@ namespace casadi {
       const ExtendedAlgEl& e = call_.el.at(el.i1);
       nres = e.n_res;
       res = get_ptr(e.res);
+      stream << "[";
+      for (size_t i = 0; i < nres; ++i) {
+        if (i>0) stream << ", ";
+        if (print_canonical_) {
+          print_canonical(stream, w[res[i]]);
+        } else {
+          DM::print_scalar(stream, w[res[i]]);
+        }
+      }
+      stream << "]";
+      stream << std::endl;
+      return;
     }
 
-    std::vector<double> num(nres);
     for (size_t i = 0; i < nres; ++i) {
-      num[i] = w[res[i]];
+      stream << i << ": ";
+      if (print_canonical_) {
+        print_canonical(stream, w[res[i]]);
+      } else {
+        DM::print_scalar(stream, w[res[i]]);
+      }
+      stream << std::endl;
     }
 
-    print_canonical(stream, nres, get_ptr(num));
-
-    stream << std::endl;
   }
 
   void SXFunction::codegen_body(CodeGenerator& g) const {
@@ -432,7 +459,7 @@ namespace casadi {
         "Allow construction with duplicate io names (Default: false)"}},
       {"print_instructions",
        {OT_BOOL,
-        "Print each operation during evaluation"}}
+        "Print each operation during evaluation. Influenced by print_canonical."}}
      }
   };
 

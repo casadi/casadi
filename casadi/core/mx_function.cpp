@@ -62,7 +62,7 @@ namespace casadi {
         "Reuse variables in the work vector"}},
       {"print_instructions",
        {OT_BOOL,
-        "Print each operation during evaluation"}},
+        "Print each operation during evaluation. Influenced by print_canonical."}},
       {"cse",
        {OT_BOOL,
         "Perform common subexpression elimination (complexity is N*log(N) in graph size)"}},

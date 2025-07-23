@@ -1081,10 +1081,7 @@ class SXtests(casadiTestCase):
 
   @skip(platform_arch==32)
   @memory_heavy()
-  @unittest.skipIf(sys.version_info >= (3, 0),"pickle is not compatible")
   def test_large_hessian(self):
-    import pickle
-
     A = Sparsity.from_file("../data/apoa1-2.mtx")
 
 

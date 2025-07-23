@@ -52,7 +52,7 @@ else:
     skipdirs=[".svn","ctemplate","defs"],
      #inputs = lambda dir,fn : {fn: open(dir + "/" + fn,"r").read()},
       args=sys.argv[2:],
-     stderr_trigger=["^(?!(Reference counting|Warning|$))"],
+     stderr_trigger=["^(?!(Reference counting|Warning|$|.*CoreText))"],
      check_depreciation=True
      )
 

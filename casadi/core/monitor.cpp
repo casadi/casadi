@@ -24,7 +24,7 @@
 
 
 #include "monitor.hpp"
-
+#include "function_internal.hpp"
 namespace casadi {
 
   Monitor::Monitor(const MX& x, const std::string& comment) : comment_(comment) {
@@ -69,17 +69,11 @@ namespace casadi {
   int Monitor::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     // Print comment
     uout() << comment_ << ":" << std::endl;
-    uout() << "[";
-    casadi_int n = nnz();
-    for (casadi_int i=0; i<n; ++i) {
-      if (i!=0) uout() << ", ";
-      uout() << arg[0][i];
-    }
-    uout() << "]" << std::endl;
-
+    FunctionInternal::print_canonical(uout(), sparsity(), arg[0]);
+    uout() << std::endl;
     // Perform operation
     if (arg[0]!=res[0]) {
-      std::copy(arg[0], arg[0]+n, res[0]);
+      std::copy(arg[0], arg[0]+nnz(), res[0]);
     }
     return 0;
   }
@@ -110,16 +104,10 @@ namespace casadi {
                           const std::vector<bool>& arg_is_ref,
                           std::vector<bool>& res_is_ref) const {
     // Print comment
-    g.local("cr", "const casadi_real", "*");
-    g.local("i", "casadi_int");
-    g << g.printf(comment_ + "\\n[") << "\n"
-      << "  for (i=0, cr=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0])
-      << "; i!=" << nnz() << "; ++i) {\n"
-      << "    if (i!=0) " << g.printf(", ") << "\n"
-      << "    " << g.printf("%g", "*cr++") << "\n"
-      << "  }\n"
-      << "  " << g.printf("]\\n") << "\n";
-
+    std::string a = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
+    g << g.printf(comment_ + ":\\n") << "\n";
+    g << g.print_canonical(dep(0).sparsity(), a) << "\n";
+    g << g.printf("\\n") << "\n";
     generate_copy(g, arg, res, arg_is_ref, res_is_ref, 0);
   }
 
