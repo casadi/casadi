@@ -1757,7 +1757,7 @@ if(WITH_DAQP)
       DESTINATION "${INCLUDE_PREFIX}")
   endif()
 endif()
-add_feature_info(daqp-interface WITH_DAQP "Interface to the MILP / QP solver HiGHS.")
+add_feature_info(daqp-interface WITH_DAQP "Interface to the MILP / QP solver DAQP.")
 
 
 if(WITH_SLEQP)
