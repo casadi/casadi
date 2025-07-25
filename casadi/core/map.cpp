@@ -192,8 +192,10 @@ namespace casadi {
     g << "res1 = res+" << n_out_ << ";\n"
       << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
+
+    std::string ret = g(f_, "arg1", "res1", "iw", "w");
     // Evaluate
-    g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    g << "if (" << ret << ") return 1;\n";
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
       if (f_.nnz_in(j))
