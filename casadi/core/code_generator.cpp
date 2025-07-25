@@ -59,6 +59,20 @@ namespace casadi {
     this->max_declarations_per_line = 12;
     this->max_initializer_elements_per_line = 8;
     this->force_canonical = false;
+    this->lock_type = "mtx_t";
+    this->lock_includes = {"threads.h"};
+    this->lock_engage = "mtx_lock";
+    this->lock_disengage = "mtx_unlock";
+    this->lock_macro_condition = "CASADI_MAX_NUMTHREADS > 1";
+    this->lock_macro_condition = "1";
+    /*this->lock_type = "omp_lock_t";
+    this->lock_includes = {"omp.h"};
+    this->lock_engage = "omp_set_lock";
+    this->lock_disengage = "omp_unset_lock";
+    //this->lock_init = "omp_init_lock";
+    //this->lock_destroy = "omp_destroy_lock";
+    this->lock_macro_condition = "CASADI_MAX_NUMTHREADS > 1";
+    this->lock_macro_condition = "1";*/
 
     avoid_stack_ = false;
     indent_ = 2;
@@ -852,6 +866,13 @@ namespace casadi {
       << "  #define CASADI_PREFIX(ID) " << this->prefix << "_ ## ID\n"
       << "#endif\n\n";
 
+
+    if (needs_mem_) {
+      s << "#ifndef CASADI_MAX_NUM_THREADS\n";
+      s << "#define CASADI_MAX_NUM_THREADS 1\n";
+      s << "#endif\n\n";
+    }
+
     s << this->includes.str();
     s << std::endl;
 
@@ -861,12 +882,6 @@ namespace casadi {
 
     // Integer type (usually long long)
     generate_casadi_int(s);
-
-    if (needs_mem_) {
-      s << "#ifndef CASADI_MAX_NUM_THREADS\n";
-      s << "#define CASADI_MAX_NUM_THREADS 1\n";
-      s << "#endif\n\n";
-    }
 
     // casadi/mem after numeric types to define derived types
     // Memory struct entry point
@@ -977,6 +992,26 @@ namespace casadi {
       }
       s << std::endl << std::endl;
     }
+
+    // Order local variables
+    std::map<std::string, std::set<std::pair<std::string, std::string>>>
+     file_local_variables_by_type;
+    for (auto&& e : file_local_variables_) {
+      file_local_variables_by_type[e.second.first].insert(std::make_pair(e.first, e.second.second));
+    }
+
+    // Codegen local variables
+    for (auto&& e : file_local_variables_by_type) {
+      for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
+        s << "static " << e.first << " " << shorthand(it->first);
+        // Insert definition, if any
+        auto k=file_local_default_.find(it->first);
+        if (k!=file_local_default_.end()) body << "=" << k->second;
+        cnt++;
+        s << ";\n";
+      }
+    }
+    if (!file_local_variables_by_type.empty()) s << "\n";
 
     // Codegen body
     s << this->body.str();
@@ -1160,7 +1195,9 @@ namespace casadi {
   std::string CodeGenerator::
   operator()(const Function& f, const std::string& arg,
              const std::string& res, const std::string& iw,
-             const std::string& w, const std::string& failure_ret) {
+             const std::string& w,
+             const std::string& failure_ret,
+             bool early_return) {
     std::string name = add_dependency(f);
     bool needs_mem = !f->codegen_mem_type().empty();
     if (needs_mem) {
@@ -1168,10 +1205,21 @@ namespace casadi {
       local("flag", "int");
       local(mem, "int");
       *this << mem << " = " << name << "_checkout();\n";
-      *this << "if (" << mem << "<0) return " << failure_ret << ";\n";
+      if (early_return) {
+        *this << "if (" << mem << "<0) return " << failure_ret << ";\n";
+      } else {
+        *this << "if (" << mem << "<0) {\n";
+        *this << "flag = " << failure_ret << ";\n";
+        *this << "} else {\n";
+      }
       *this << "flag = " + name + "(" + arg + ", " + res + ", "
-              + iw + ", " + w + ", " << mem << ");\n";
-      *this << name << "_release(" << mem << ");\n";
+      + iw + ", " + w + ", " << mem << ");\n";
+*this << name << "_release(" << mem << ");\n";
+      if (early_return) {
+        // pass
+      } else {
+        *this << "}\n";
+      }
       return "flag";
     } else {
       return name + "(" + arg + ", " + res + ", "
@@ -2334,6 +2382,21 @@ namespace casadi {
     }
   }
 
+  void CodeGenerator::file_local(const std::string& name, const std::string& type,
+    const std::string& ref) {
+    shorthand(name);
+    // Check if the variable already exists
+    auto it = file_local_variables_.find(name);
+    if (it==file_local_variables_.end()) {
+      // Add it
+      file_local_variables_[name] = std::make_pair(type, ref);
+    } else {
+      // Consistency check
+      casadi_assert(it->second.first==type, "Type mismatch for " + name);
+      casadi_assert(it->second.second==ref, "Type mismatch for " + name);
+    }
+  }
+
   std::string CodeGenerator::sx_work(casadi_int i) {
     if (avoid_stack_) {
       return "w[" + str(i) + "]";
@@ -2353,6 +2416,14 @@ namespace casadi {
       casadi_assert(it->second==def, "Initial value mismatch for " + name);
     }
     local_default_.insert(std::make_pair(name, def));
+  }
+
+  void CodeGenerator::init_file_local(const std::string& name, const std::string& def) {
+    auto it = file_local_default_.find(name);
+    if (it!=file_local_default_.end()) {
+      casadi_assert(it->second==def, "Initial value mismatch for " + name);
+    }
+    file_local_default_.insert(std::make_pair(name, def));
   }
 
   std::string CodeGenerator::
@@ -2665,6 +2736,26 @@ namespace casadi {
     add_auxiliary(CodeGenerator::AUX_CACHE);
     return "cache_check(" + key + ", " + cache + ", " + loc + ", " +
     str(stride) + ", " + str(sz) + ", " + str(key_sz) + ", " + val + ")";
+  }
+
+  std::string CodeGenerator::
+  unlock(const std::string& name) {
+    std::stringstream ss;
+    *this << "#if " << lock_macro_condition << "\n"
+      << lock_disengage << "(&" << shorthand(name) << ");\n"
+      << "#endif // " << lock_macro_condition << "";
+    return ss.str();
+  }
+
+  std::string CodeGenerator::
+  lock(const std::string& name) {
+    std::stringstream ss;
+    file_local(name, lock_type);
+    for (auto&& it : lock_includes) add_include(it);
+    *this << "#if " << lock_macro_condition << "\n"
+      << lock_engage << "(&" << shorthand(name) << ");\n"
+      << "#endif // " << lock_macro_condition << "";
+    return ss.str();
   }
 
   void CodeGenerator::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {

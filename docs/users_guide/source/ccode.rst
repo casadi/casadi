@@ -147,7 +147,9 @@ self-contained [#f2]_, the compilation -- on Linux/OSX -- can be as easy as issu
       gcc -fPIC -shared gen.c -o gen.so
 
 from the command line. Or, equivalently using MATLAB's ``system`` command
-or Python's ``os.system`` command. Assuming ``gen.c`` was created as
+or Python's ``os.system`` command. In a practical setting, additional flags may be appropriate such as '-lm' for linking in mathematical symbol definitions, include and linker flags for any external dependencies, a macro definition for |CASADI_MAX_NUM_THREADS| if you plan using the generated code in a multithreaded context, etc. 
+
+Assuming ``gen.c`` was created as
 described in the previous section, we can then create a |Function|
 ``f`` as follows:
 

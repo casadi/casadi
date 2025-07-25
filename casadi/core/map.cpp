@@ -381,13 +381,16 @@ namespace casadi {
   void OmpMap::codegen_body(CodeGenerator& g) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-    g << "casadi_int i;\n"
-      << "const double** arg1;\n"
-      << "double** res1;\n"
-      << "casadi_int flag = 0;\n"
-      << "#pragma omp parallel for private(i,arg1,res1) reduction(||:flag)\n"
-      << "for (i=0; i<" << n_ << "; ++i) {\n"
-      << "arg1 = arg + " << n_in_ << "+i*" << sz_arg << ";\n";
+    g.local("i", "casadi_int");
+    g.local("arg1", "const double", "**");
+    g.local("res1", "double", "**");
+    g.local("omp_flag", "casadi_int");
+    g.init_local("omp_flag", "0");
+    std::string pr = "i,arg1,res1";
+    if (!f_->codegen_mem_type().empty()) pr = pr + ",mem,flag";
+    g << "#pragma omp parallel for private(" << pr << ") reduction(||:omp_flag)\n"
+      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    g << "arg1 = arg + " << n_in_ << "+i*" << sz_arg << ";\n";
     for (casadi_int j=0; j<n_in_; ++j) {
       g << "arg1[" << j << "] = arg[" << j << "] ? "
         << g.arg(j) << "+i*" << f_.nnz_in(j) << ": 0;\n";
@@ -397,10 +400,11 @@ namespace casadi {
       g << "res1[" << j << "] = res[" << j << "] ?"
         << g.res(j) << "+i*" << f_.nnz_out(j) << ": 0;\n";
     }
-    g << "flag = "
-      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << " || flag;\n"
-      << "}\n"
-      << "if (flag) return 1;\n";
+    std::string ret = g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w),
+      "1", false);
+    g << "omp_flag = " << ret << " || omp_flag;\n";
+    g << "}\n"
+      << "if (omp_flag) return 1;\n";
   }
 
   void OmpMap::init(const Dict& opts) {

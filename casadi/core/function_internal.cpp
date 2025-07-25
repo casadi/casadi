@@ -2453,6 +2453,7 @@ namespace casadi {
     std::string alloc_mem = g.shorthand(name + "_alloc_mem");
     std::string init_mem = g.shorthand(name + "_init_mem");
 
+    g << g.lock(name + "_mtx") << "\n";
     g.auxiliaries << "static int " << mem_counter  << " = 0;\n";
     g.auxiliaries << "static int " << stack_counter  << " = -1;\n";
     g.auxiliaries << "static int " << stack << "[CASADI_MAX_NUM_THREADS];\n";
@@ -2460,10 +2461,16 @@ namespace casadi {
                " " << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
     g << "int mid;\n";
     g << "if (" << stack_counter << ">=0) {\n";
-    g << "return " << stack << "[" << stack_counter << "--];\n";
+    g << "int ret = " << stack << "[" << stack_counter << "--];\n";
+    g << g.unlock(name + "_mtx") << "\n";
+    g << "return ret;\n";
     g << "} else {\n";
-    g << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) return -1;\n";
+    g << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) {\n";
+    g << g.unlock(name + "_mtx") << "\n";
+    g << "return -1;\n";
+    g << "}\n";
     g << "mid = " << alloc_mem << "();\n";
+    g << g.unlock(name + "_mtx") << "\n";
     g << "if (mid<0) return -1;\n";
     g << "if(" << init_mem << "(mid)) return -1;\n";
     g << "return mid;\n";
@@ -2474,7 +2481,9 @@ namespace casadi {
     std::string name = codegen_name(g, false);
     std::string stack_counter = g.shorthand(name + "_unused_stack_counter");
     std::string stack = g.shorthand(name + "_unused_stack");
+    g << g.lock(name + "_mtx") << "\n";
     g << stack << "[++" << stack_counter << "] = mem;\n";
+    g << g.unlock(name + "_mtx") << "\n";
   }
 
   void FunctionInternal::codegen_sparsities(CodeGenerator& g) const {

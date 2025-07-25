@@ -2714,6 +2714,21 @@ class Functiontests(casadiTestCase):
         f.stats()
     self.checkarray(a,3)
 
+  @requires_conic("osqp")
+  @requiresPlugin(Importer,"shell")
+  def test_codegen_multithreaded(self):
+    solver = conic("solver", "osqp", {"h": Sparsity.dense(1,1), "a": Sparsity.dense(1)}, {"osqp.verbose": 0})
+    inputs = solver.convert_in(dict(x0=[1,2],a=3,h=5,lbx=-1,ubx=1))
+    for p in ['serial','openmp']:
+        s = solver.map(2,p)
+        extra_options = ["-Wno-endif-labels","-Wno-unused-variable","-DCASADI_MAX_NUM_THREADS=2"]
+        # No extra options on windows
+        if os.name == 'nt':
+          extra_options = extra_options + ["/openmp"]
+        else:
+          extra_options = extra_options + ["-fopenmp"]
+        self.check_codegen(s,inputs=inputs,main=True,library=False,std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True,digits=8)
+
   def test_codegen_inf_nan(self):
     x = MX.sym("x")
     f = Function("F",[x],[x+inf])

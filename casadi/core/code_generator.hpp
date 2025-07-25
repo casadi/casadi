@@ -196,7 +196,9 @@ namespace casadi {
         \identifier{s6} */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w, const std::string& failure_ret="1");
+                           const std::string& w,
+                           const std::string& failure_ret="1",
+                           bool early_return=true);
 
     /** \brief Print a string to buffer
 
@@ -228,6 +230,9 @@ namespace casadi {
         \identifier{sb} */
     void local(const std::string& name, const std::string& type, const std::string& ref="");
 
+    /** \brief Declare an internal variable scoped on the file level */
+    void file_local(const std::string& name, const std::string& type, const std::string& ref="");
+
     /** \brief Enter a local scope
 
         \identifier{sc} */
@@ -247,6 +252,9 @@ namespace casadi {
 
         \identifier{sf} */
     void init_local(const std::string& name, const std::string& def);
+
+    /** \brief Specify the default value for an internal variable scoped on the file level */
+    void init_file_local(const std::string& name, const std::string& def);
 
     /** \brief Increase indentation
 
@@ -866,6 +874,11 @@ namespace casadi {
         const std::string& loc, casadi_int stride, casadi_int sz, casadi_int key_sz,
         const std::string& val);
 
+    /** \brief Lock a mutex */
+    std::string lock(const std::string& name);
+    /** \brief Unock a mutex */
+    std::string unlock(const std::string& name);
+
     /// Current CasADi version as string
     static std::string casadi_version();
 
@@ -975,6 +988,12 @@ namespace casadi {
     // Force the external API to use canonical sparsity
     bool force_canonical;
 
+    std::string lock_type;
+    std::vector<std::string> lock_includes;
+    std::string lock_engage;
+    std::string lock_disengage;
+    std::string lock_macro_condition;
+
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;
 
@@ -1018,6 +1037,8 @@ namespace casadi {
     std::multimap<size_t, size_t> added_string_constants_;
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;
     std::map<std::string, std::string> local_default_;
+    std::map<std::string, std::pair<std::string, std::string> > file_local_variables_;
+    std::map<std::string, std::string> file_local_default_;
     std::map<const void *, casadi_int> file_scope_double_;
     std::map<const void *, casadi_int> file_scope_integer_;
     std::vector< std::vector<double> > pool_double_defaults_;

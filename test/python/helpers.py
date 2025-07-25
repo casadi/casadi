@@ -697,7 +697,7 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       return (external(name, libname,opts),libname)
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,library=True,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
@@ -768,12 +768,13 @@ class casadiTestCase(unittest.TestCase):
 
       [commands, libname] = get_commands(shared=True)
 
-      print("compile library",commands)
-      p = subprocess.Popen(commands,shell=True).wait()
-      #if sys.platform=="darwin":
-      #  subprocess.run(["otool","-l",libname])
-      if external_opts is None: external_opts = {}
-      F2 = external(F.name(), libname,external_opts)
+      if library:
+          print("compile library",commands)
+          p = subprocess.Popen(commands,shell=True).wait()
+          #if sys.platform=="darwin":
+          #  subprocess.run(["otool","-l",libname])
+          if external_opts is None: external_opts = {}
+          F2 = external(F.name(), libname,external_opts)
 
       if main:
         [commands, exename] = get_commands(shared=False)
@@ -804,7 +805,8 @@ class casadiTestCase(unittest.TestCase):
             return
         
       Fout = F.call(inputs)
-      Fout2 = F2.call(inputs)
+      if library:
+        Fout2 = F2.call(inputs)
 
       if main:
         outputs = F.generate_out(F.name()+"_out.txt")
@@ -815,20 +817,22 @@ class casadiTestCase(unittest.TestCase):
             self.checkarray(Fout[k],outputs[k],digits=digits)
         else:
           for i in range(F.n_out()):
-            self.checkarray(Fout[i],Fout2[i],digits=digits)
+            self.checkarray(Fout[i],outputs[i],digits=digits)
+      if library:
+          if isinstance(inputs, dict):
+            self.assertEqual(F.name_out(), F2.name_out())
+            for k in F.name_out():
+              self.checkarray(Fout[k],Fout2[k],digits=digits,failmessage=k)
+          else:
+            for i in range(F.n_out()):
+              self.checkarray(Fout[i],Fout2[i],digits=digits)
 
-      if isinstance(inputs, dict):
-        self.assertEqual(F.name_out(), F2.name_out())
-        for k in F.name_out():
-          self.checkarray(Fout[k],Fout2[k],digits=digits,failmessage=k)
+          if self.check_serialize:
+            self.check_serialize(F2,inputs=inputs)
+            
+          return F2, libname
       else:
-        for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i],digits=digits)
-
-      if self.check_serialize:
-        self.check_serialize(F2,inputs=inputs)
-        
-      return F2, libname
+          return None, None
 
   def check_thread_safety(self,F,inputs=None,N=20):
 
