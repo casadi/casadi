@@ -988,6 +988,7 @@ namespace casadi {
     // Force the external API to use canonical sparsity
     bool force_canonical;
 
+    bool with_locks;
     std::string lock_type;
     std::vector<std::string> lock_includes;
     std::string lock_engage;

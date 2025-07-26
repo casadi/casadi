@@ -65,6 +65,7 @@ namespace casadi {
     this->lock_disengage = "mtx_unlock";
     this->lock_macro_condition = "CASADI_MAX_NUMTHREADS > 1";
     this->lock_macro_condition = "1";
+    this->with_locks = false;
     /*this->lock_type = "omp_lock_t";
     this->lock_includes = {"omp.h"};
     this->lock_engage = "omp_set_lock";
@@ -135,6 +136,8 @@ namespace casadi {
           "Option max_initializer_elements_per_line must be >=0");
       } else if (e.first=="force_canonical") {
         this->force_canonical = e.second;
+      } else if (e.first=="with_locks") {
+        this->with_locks = e.second;
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -2739,6 +2742,7 @@ namespace casadi {
 
   std::string CodeGenerator::
   unlock(const std::string& name) {
+    if (!with_locks) return "";
     std::stringstream ss;
     *this << "#if " << lock_macro_condition << "\n"
       << lock_disengage << "(&" << shorthand(name) << ");\n"
@@ -2748,6 +2752,7 @@ namespace casadi {
 
   std::string CodeGenerator::
   lock(const std::string& name) {
+    if (!with_locks) return "";
     std::stringstream ss;
     file_local(name, lock_type);
     for (auto&& it : lock_includes) add_include(it);

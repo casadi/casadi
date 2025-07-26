@@ -2721,13 +2721,13 @@ class Functiontests(casadiTestCase):
     inputs = solver.convert_in(dict(x0=[1,2],a=3,h=5,lbx=-1,ubx=1))
     for p in ['serial','openmp']:
         s = solver.map(2,p)
-        extra_options = ["-Wno-endif-labels","-Wno-unused-variable","-DCASADI_MAX_NUM_THREADS=2"]
+        extra_options = ["-DCASADI_MAX_NUM_THREADS=2"]
         # No extra options on windows
         if os.name == 'nt':
           extra_options = extra_options + ["/openmp"]
         else:
-          extra_options = extra_options + ["-fopenmp"]
-        self.check_codegen(s,inputs=inputs,main=True,library=False,std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True,digits=8)
+          extra_options = extra_options + ["-Wno-endif-labels","-Wno-unused-variable","-fopenmp"]
+        self.check_codegen(s,inputs=inputs,main=True,library=False,std="c11",extra_options=extra_options,extralibs=["osqp"],debug_mode=True,opts={"with_locks":True})
 
   def test_codegen_inf_nan(self):
     x = MX.sym("x")
