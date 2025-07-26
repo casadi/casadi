@@ -1007,7 +1007,6 @@ namespace casadi {
         // Insert definition, if any
         auto k=file_local_default_.find(it->first);
         if (k!=file_local_default_.end()) body << "=" << k->second;
-        cnt++;
         s << ";\n";
       }
     }
