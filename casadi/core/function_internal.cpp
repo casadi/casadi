@@ -2769,7 +2769,7 @@ namespace casadi {
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
       g << "r = w+" << nnz_in() << ";\n"
         << "for (j=0; j<" << nnz_out() << "; ++j) "
-        << g.printf("%g ", "*r++") << "\n";
+        << g.printf("%.16e ", "*r++") << "\n";
 
       // End with newline
       g << g.printf("\\n") << "\n";
