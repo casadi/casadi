@@ -1726,6 +1726,15 @@
 %exception  casadi::Function::sx_out(const std::string &oname) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::sym_in() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::sym_in(casadi_int iind) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::sym_in(const std::string &iname) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::sz_arg() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
