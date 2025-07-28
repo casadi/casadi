@@ -575,7 +575,122 @@ class Misctests(casadiTestCase):
     
     
   def test_layout(self):
+  
+    # Interpretation of Layout
+  
+    print(Layout([2]))
+    
+    with self.assertInException("Dimensions must be positive"):
+      Layout([-2])
 
+    # outer_sizes argument
+    Layout([2,3],[2,3])
+    
+    for n in [2,3]:
+      for m in [3,4]:
+        for p in [4,5]:
+          N = n+1
+          M = m+1
+          P = p+1
+          dims = [n,m,p]
+          outer_sizes = [N,M,P]
+          strides = [1,N,N*M]
+          e = Layout(dims,outer_sizes)
+          target = "dims{dims}, outer_sizes{outer_sizes}, strides{strides}".format(dims=dims,outer_sizes=outer_sizes,strides=strides)
+          self.assertTrue(target in str(e))
+          
+          with self.assertInException("Dimension mismatch"):
+            Layout(dims,outer_sizes[:-1])
+            
+          N = n-1
+          outer_sizes = [N,M,P]
+          with self.assertInException("StridedLayout outer_sizes must be at least as large as dims"):
+            Layout(dims,outer_sizes)
+
+
+    
+    
+    
+    """
+     * |  0  2  4 |
+     * |  1  3  5 |
+     * 
+     * |  6  8 10 |
+     * |  7  9 11 |
+     *  
+     * | 12 14 16 |
+     * | 13 15 17 |
+     *
+     * | 18 20 22 |
+     * | 19 21 23 |
+    """
+     
+    Relayout(Layout([2,3,4]),[0,1,2],Layout([2,3,4]))
+    Relayout(Layout([2,3,4]),[0,2,1],Layout([2,4,3]))
+    
+    with self.assertInException("Inconsistent dimensions"):
+      Relayout(Layout([2,3,4]),[0,2,1],Layout([2,3,4]))
+    with self.assertInException("Inconsistent dimensions"):
+      Relayout(Layout([2,3,4]),[0,1,2],Layout([6,4]))
+    with self.assertInException("Not a valid permutation"):
+      Relayout(Layout([2,3,4]),[0,1],Layout([6,4]))
+
+    
+    def sparsities():
+      yield Sparsity.dense(24,1)
+      sp = DM(Sparsity.upper(6),1)
+      
+      sp[5,0]=1
+      sp[4,1]=1
+      sp[5,1]=1
+      
+      sp = sp.sparsity()
+      
+      yield sp
+    
+    
+
+    for sp in sparsities():
+      # basically, the sparsity is completely ignored, only the nonzeros matter
+    
+      x = MX(DM(sp,DM(range(24))))
+      
+
+      
+      self.checkarray(evalf(permute_layout(x,Relayout(Layout([2,3,4]),[0,1,2],Layout([2,3,4])))),DM(sp,DM(range(24))))
+      
+      self.checkarray(evalf(permute_layout(x,Relayout(Layout([2,3,4]),[2,1,0],Layout([4,3,2])))),DM(sp,DM([0,6,12,18,2,8,14,20,4,10,16,22,1,7,13,19,3,9,15,21,5,11,17,23])))
+
+      
+      # 
+      self.checkarray(evalf(permute_layout(x,Relayout(Layout([2,3,4],[3,3,4]),[0,1,2],Layout([2,3,4])))),DM(sp,DM(range(24))))
+      n = 0
+      # Irreverisable destruction of information
+      self.checkarray(evalf(permute_layout(x,Relayout(Layout([2,3,4]),[0,1,2],Layout([2,3,4],[3,3,4])))),DM(sp,DM([0,1,n,2,3,n,4,5,n,6,7,n,8,9,n,10,11,n,12,13,n,14,15,n])))
+      
+
+      self.checkarray(evalf(permute_layout(x,Relayout(Layout([2,3,4]),[0,1,2],Layout([2,3,4],[2,3,5])))),DM(sp,DM(range(24))))
+      
+      # Effectively discard part of the incoming data
+      n = 0
+      self.checkarray(evalf(permute_layout(x,Relayout(Layout([2,3,4]),[0,1,2],Layout([2,3,4],[2,4,4])))),DM(sp,DM([0,1,2,3,4,5,n,n,6,7,8,9,10,11,n,n,12,13,14,15,16,17,n,n])))
+      
+      # Weirdly assymetric?
+      #self.checkarray(evalf(permute_layout(MX(DM([0,1,2,3,4,5,n,n,6,7,8,9,10,11,n,n,12,13,14,15,16,17,n,n])),Relayout(Layout([2,3,4],[2,4,4]),[0,1,2],Layout([2,3,4])))),DM([0,1,2,3,4,5,n,n,6,7,8,9,10,11,n,n,12,13,14,15,16,17,n,n]))
+
+      
+    
+    
+    
+    return
+    
+    
+    
+    x = MX(DM(range(6)))
+    
+    
+    self.checkarray(evalf(permute_layout(x,Relayout(Layout([2,3]),[0,1],Layout([2,3])))),DM([0,1,2,3,4,5]))
+    
     # Basic tests: <dims> tensor, but peculiar traversal order when flattening
 
     x = MX(DM(range(6)))

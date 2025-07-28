@@ -218,8 +218,6 @@ namespace casadi {
 
     OP_REMAINDER,
 
-    OP_REINTERPRET_LAYOUT,
-
     OP_PERMUTE_LAYOUT,
   };
   #define NUM_BUILT_IN_OPS (OP_SAFE_SQRT+1)
