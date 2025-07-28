@@ -602,7 +602,7 @@ class SetterDispatcher(Dispatcher):
           else:
             oi = performExtraIndex(DM.ones(entry.originalsparsity),extraIndex=extraIndex,entry=entry)
             if oi.sparsity()!=payload_.sparsity():
-              raise Exception("Payload sparsity " + payload_.dim() +  " does not match lhs sparisty " + oi.dim() + "." )
+              raise Exception("Payload sparsity " + payload_.dim() +  " does not match lhs sparsity " + oi.dim() + "." )
             self.master[iflip] = payload_.T[iflip.sparsity()]
             self.master[i] = payload_[i.sparsity()]
         else:
