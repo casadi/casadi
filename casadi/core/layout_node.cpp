@@ -52,7 +52,7 @@ namespace casadi {
     casadi_assert(!has_negative(dims), "Dimensions must be positive");
     casadi_assert(dims.size()==outer_sizes.size(), "Dimension mismatch");
     for (casadi_int i=0;i<dims.size();++i) {
-      casadi_assert(outer_sizes[i]>= dims[i], "Error in outer_sizes");
+      casadi_assert(outer_sizes[i]>= dims[i], "StridedLayout outer_sizes must be at least as large as dims");
     }
 
     std::copy(dims.begin(), dims.end(), this->dims());
@@ -72,7 +72,7 @@ namespace casadi {
 
   /** \brief  Print a description */
   void StridedLayout::disp(std::ostream& stream, bool more) const {
-    stream << "strided_layout(" << "dims" << get_dims() << ", outer_size" << get_outer_sizes() << ", strides" << get_strides() << ")";
+    stream << "strided_layout(" << "dims" << get_dims() << ", outer_sizes" << get_outer_sizes() << ", strides" << get_strides() << ")";
   }
 
 
