@@ -2501,7 +2501,7 @@ class NLPtests(casadiTestCase):
     solver = nlpsol("solver","ipopt",nlp,options)
     
     with self.assertInException("evaluation error"):
-        self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),solver.get_function("nlp_hess_l"),inputs=[0.11,0,1.2,3.7])
+        self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),solver.get_function("nlp_hess_l"),inputs=[vertcat(0.11,0.3,0.7),0,1.2,3.7])
     
 
     lag = lam_f*f+dot(lam_g,g)
@@ -2522,7 +2522,7 @@ class NLPtests(casadiTestCase):
     
     self.checkarray(sol["x"],ref_sol["x"],digits=6)
     
-    self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),solver.get_function("nlp_hess_l"),inputs=[0.11,0,1.2,3.7])
+    self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),solver.get_function("nlp_hess_l"),inputs=[vertcat(0.11,0.3,0.7),0,1.2,3.7])
     
 
   @requires_nlpsol("ipopt")
