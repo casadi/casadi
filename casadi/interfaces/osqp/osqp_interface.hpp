@@ -48,7 +48,11 @@ namespace casadi {
 
   struct CASADI_CONIC_OSQP_EXPORT OsqpMemory : public ConicMemory {
     // Structures
+#ifdef WITH_OSQP_V1
+    OSQPSolver* work;
+#else
     OSQPWorkspace* work;
+#endif
 
     /// Constructor
     OsqpMemory();
@@ -135,8 +139,11 @@ namespace casadi {
     void codegen_free_mem(CodeGenerator& g) const override;
 
     /** \brief Thread-local memory object type */
+#ifdef WITH_OSQP_V1
+    std::string codegen_mem_type() const override { return "OSQPSolver*"; }
+#else
     std::string codegen_mem_type() const override { return "OSQPWorkspace*"; }
-
+#endif
     void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
