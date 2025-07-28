@@ -62,7 +62,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
     //REMOVE uout() << relay.perms() << std::endl;
     //REMOVE uout() << relay.source() << std::endl;
     //REMOVE uout() << relay.target() << std::endl;
-    casadi_assert(x->nnz()==relay.source().nnz(), "Invalid permutation");
+    casadi_assert(x->nnz()==relay.source().nnz(), "Invalid permutation: " + str(x->nnz()) + " vs " + str(relay.source().nnz()));
     if (x->sz_self()<relay.source().size()) {
 
       relay_ = Relayout(Layout(relay_.source().dims()),relay_.perms(), relay_.target(), relay.label());

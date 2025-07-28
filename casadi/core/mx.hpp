@@ -795,7 +795,6 @@ namespace casadi {
     static MX stop_diff(const MX& expr, casadi_int order);
     static MX stop_diff(const MX& expr, const MX& var, casadi_int order);
     static std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b);
-    static MX reinterpret_layout(const MX& x, const Layout& target);
     static MX permute_layout(const MX& x, const Relayout& relay);
     ///@}
     /// \endcond
@@ -1010,10 +1009,23 @@ namespace casadi {
       return MX::difference(a, b);
     }
 
-    inline friend MX reinterpret_layout(const MX& expr, const Layout& target) {
-      return MX::reinterpret_layout(expr, target);
-    }
-
+    /**
+     * 
+     * Layout([2,3,4])
+     * 
+     * |  0  2  4 |
+     * |  1  3  5 |
+     * 
+     * |  6  8 10 |
+     * |  7  9 11 |
+     *  
+     * | 12 14 16 |
+     * | 13 15 17 |
+     *
+     * | 18 20 22 |
+     * | 19 21 23 |
+     * 
+    */
     inline friend MX permute_layout(const MX& expr, const Relayout& relay) {
       return MX::permute_layout(expr, relay);
     }
