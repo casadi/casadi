@@ -221,6 +221,8 @@ namespace casadi {
     casadi_assert(jacg_sp_.size2()==nx_, "nlp_jac_g must have " + str(nx_) +
                   " columns, but has " + str(jacg_sp_.size2()) + " instead.");
 
+    create_function("nlp_jac_g_vp", {"x", "p", "fwd:x"}, {"fwd:g"});
+    create_function("nlp_jac_g_vpt", {"x", "p", "adj:g"}, {"adj:x"});
     convexify_ = false;
 
     // Allocate temporary work vectors
