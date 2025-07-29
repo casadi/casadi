@@ -2196,6 +2196,107 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     }
   }
 
+  bool optimal_is_diff(std::vector<MX>& vexpr, const std::vector<MX>& v, const std::vector<MX>& vdef, const std::vector<MX>& varg) {
+    // Which entries of v depend on arg?
+
+    // For each v_* variable, v_depends_lookup[v.get()] will tell if it depends on any of the arg variables.
+    std::unordered_map<MXNode*, bool> v_depends_lookup;
+    {
+      // Do the whole substitution chain on v -> ex
+      std::vector<MX> ex = v;
+      std::vector<MX> vdef_ = vdef;
+      MX::substitute_inplace(v, vdef_, ex, false);
+
+      // Perform a single which_depends
+      std::vector<bool> v_depends_scalar = which_depends(veccat(ex), veccat(varg), 1, true);
+
+      // Loop over v entries
+      casadi_int offset = 0;
+      for (const MX& e : v) {
+        // Aggregate over all elements of the potentially non-scalar v entry
+        bool res = all(std::vector<bool>(v_depends_scalar.begin()+offset,
+                              v_depends_scalar.begin()+offset+e.numel()));
+        // Store the result
+        v_depends_lookup[e.get()] = res;
+        offset += e.numel();
+      }
+    }
+
+    // Get a modifyable copy
+    std::vector<MX> new_vdef = vdef;
+
+    // Cache to avoid recreating the same function again and again
+    std::map<std::pair<FunctionInternal*, std::vector<bool> >, Function> is_diff_cache;
+
+    bool any_replaced = false;
+
+    // Loop over all v_def entries
+    for (casadi_int k=0;k<new_vdef.size();++k) {
+      MX e = new_vdef[k];
+      if (e.is_output()) { // Hit a map call
+        const MX & call_node = e.dep(0);
+
+        Function f = call_node.which_function();
+        
+        Function f_orig = f.get_function("f_orig");
+        std::vector<bool> old_is_diff_in = f_orig->is_diff_in_;
+        std::vector<bool> is_diff_in;
+        for (casadi_int i=0; i<call_node.n_dep(); ++i) {
+          is_diff_in.push_back(v_depends_lookup[call_node.dep(i).get()]);
+        }
+        if (old_is_diff_in!=is_diff_in) {
+
+          auto key = std::make_pair(f.get(), is_diff_in);
+
+          auto it = is_diff_cache.find(key);
+          if (it == is_diff_cache.end()) {
+            // Warn if the is_diff pattern was wrong
+            for (casadi_int i=0; i<call_node.n_dep(); ++i) {
+              if (old_is_diff_in[i]==false && is_diff_in[i]==true) {
+                casadi_warning("Declared is_diff in pattern was wrong. "
+                              "Was: " + str(old_is_diff_in[i]) + "."
+                              "Inferred: " + str(is_diff_in[i]) + "."
+                              "Suggest removing any manual declaration of is_diff_in.");
+              }
+            }
+            // Recreate the inner function
+            Dict opts;
+            opts["ad_weight"] = f_orig->ad_weight();
+            opts["ad_weight_sp"] = f_orig->sp_weight();
+            opts["max_num_dir"] = f_orig->max_num_dir_;
+            opts["is_diff_in"] = is_diff_in;
+            opts["is_diff_out"] = f_orig->is_diff_out_;
+            opts["jac_penalty"] = f_orig->jac_penalty_;
+            opts["cse"] = true;
+            std::vector<SX> args = f_orig.sx_in();
+            std::vector<SX> res = f_orig(args);
+            Function f_new(f_orig.name(), args, res, f_orig.name_in(), f_orig.name_out(), opts);
+            MapSum* m = f.get<MapSum>();
+            // Recreate the map
+            is_diff_cache[key] = Function::create(new MapSum(f.name(), f_new, m->n_, m->reduce_in_, m->reduce_out_), Dict());
+          }
+
+          std::vector<MX> new_args;
+          for (casadi_int i=0; i<call_node.n_dep(); ++i) {
+            new_args.push_back(call_node.dep(i));
+          }
+          std::vector<MX> ret = is_diff_cache[key](new_args);
+          new_vdef[k] = ret[e.which_output()];
+          any_replaced = true;
+        }
+      }
+    }
+
+    if (any_replaced) {
+      MX::substitute_inplace(v, new_vdef, vexpr, false);
+      return false; // not optimal yet
+    } else {
+      return true; // optimal
+    }
+  }
+
+
+
   std::vector<MX> MX::block_jacobian(const std::vector< std::vector< MX > >& expr, const std::vector< std::vector< MX > >& arg) {
 
     std::vector<MX> vexpr;
@@ -2218,96 +2319,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     opts2["lift_shared"] = false;
     extract(vexpr, v, vdef, opts2);
 
-
-    uout() << "vexpr: " << vexpr << std::endl;
-    uout() << "v: " << v << std::endl;
-    uout() << "vdef: " << vdef << std::endl;
-    // Which entries of v depend on arg?
-
-    std::vector<bool> v_depends;
-    std::unordered_map<MXNode*, bool> v_depends_lookup;
-    {
-      std::vector<MX> ex = v;
-      std::vector<MX> vdef_ = vdef;
-      MX::substitute_inplace(v,vdef_,ex, false);
-
-      std::vector<bool> v_depends;
-      std::vector<bool> v_depends_scalar = which_depends(veccat(ex),veccat(varg), 1, true);
-      casadi_int offset = 0;
-      for (const MX& e : v) {
-        bool res = all(std::vector<bool>(v_depends_scalar.begin()+offset,
-                              v_depends_scalar.begin()+offset+e.numel()));
-        v_depends.push_back(res);
-        v_depends_lookup[e.get()] = res;
-        offset += e.numel();
-      }
-    }
-
-    std::map<std::pair<FunctionInternal*, std::vector<bool> >, Function> is_diff_cache;
-
-    bool any_replaced = false;
-
-    for (casadi_int k=0;k<vdef.size();++k) {
-      MX e = vdef[k];
-      if (e.is_output()) { // Hit a map call
-        const MX & call_node = e.dep(0);
-
-        Function f = call_node.which_function();
-
-        { // Insert proper is_diff flags
-          Function f_orig = f.get_function("f_orig");
-          std::vector<bool> old_is_diff_in = f_orig->is_diff_in_;
-          std::vector<bool> is_diff_in;
-          for (casadi_int i=0; i<call_node.n_dep(); ++i) {
-            is_diff_in.push_back(v_depends_lookup[call_node.dep(i).get()]);
-          }
-          if (old_is_diff_in!=is_diff_in) {
-
-            auto key = std::make_pair(f.get(), is_diff_in);
-
-            auto it = is_diff_cache.find(key);
-            if (it == is_diff_cache.end()) {
-              // Warn if the is_diff pattern was wrong
-              for (casadi_int i=0; i<call_node.n_dep(); ++i) {
-                if (old_is_diff_in[i]==false && is_diff_in[i]==true) {
-                  casadi_warning("Declared is_diff in pattern was wrong. "
-                                "Was: " + str(old_is_diff_in[i]) + "."
-                                "Inferred: " + str(is_diff_in[i]) + "."
-                                "Suggest removing any manual declaration of is_diff_in.");
-                }
-              }
-              // Recreate the inner function
-              Dict opts;
-              opts["ad_weight"] = f_orig->ad_weight();
-              opts["ad_weight_sp"] = f_orig->sp_weight();
-              opts["max_num_dir"] = f_orig->max_num_dir_;
-              opts["is_diff_in"] = is_diff_in;
-              opts["is_diff_out"] = f_orig->is_diff_out_;
-              opts["jac_penalty"] = f_orig->jac_penalty_;
-              opts["cse"] = true;
-              std::vector<SX> args = f_orig.sx_in();
-              std::vector<SX> res = f_orig(args);
-              Function f_new(f_orig.name(), args, res, f_orig.name_in(), f_orig.name_out(), opts);
-              MapSum* m = f.get<MapSum>();
-              // Recreate the map
-              is_diff_cache[key] = Function::create(new MapSum(f.name(), f_new, m->n_, m->reduce_in_, m->reduce_out_), Dict());
-            }
-
-            std::vector<MX> new_args;
-            for (casadi_int i=0; i<call_node.n_dep(); ++i) {
-              new_args.push_back(call_node.dep(i));
-            }
-            std::vector<MX> ret = is_diff_cache[key](new_args);
-            vdef[k] = ret[e.which_output()];
-            any_replaced = true;
-          }
-        }
-      }
-    }
-
-
-    if (any_replaced) {
-      MX::substitute_inplace(v, vdef, vexpr, false);
+    if (!optimal_is_diff(vexpr, v, vdef, varg)) {
       std::vector< std::vector<MX> > expr_new;
 
       casadi_int i = 0;
@@ -2318,7 +2330,6 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         }
         expr_new.push_back(ee_part);
       }
-
       return block_jacobian(expr_new, arg);
     }
 
