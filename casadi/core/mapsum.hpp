@@ -245,7 +245,7 @@ namespace casadi {
 
     Function pull_out(const std::vector<casadi_int>& in, Function& outer) const override;
 
-  protected:
+  public:
     /** \brief Deserializing constructor
 
         \identifier{5b} */
