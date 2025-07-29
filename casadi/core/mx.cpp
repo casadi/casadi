@@ -2296,6 +2296,11 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         casadi_int block_col = 0;
         for (const auto & ee : v) {
           MX J = jacobian(e, ee);
+          try {
+            J = evalf(J);
+          } catch (...) {
+            // pass
+          }
           if (J.nnz()) {
             rows_A.push_back(block_row);
             cols_A.push_back(block_col);
@@ -2315,7 +2320,14 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     std::vector<MX> res;
     for (const MX & ee : varg) {
       for (const MX & e : vdef) {
-        res.push_back(evalf(jacobian(e, ee)));
+        MX J = jacobian(e, ee);
+        try {
+          J = evalf(J);
+        } catch (...) {
+          // pass
+        }
+        
+        res.push_back(J);
       }
     }
 
