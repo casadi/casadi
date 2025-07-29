@@ -1783,7 +1783,6 @@ namespace casadi {
           casadi_error("No such option: " + std::string(op.first));
         }
       }
-      uout() << "lift_shared:" << lift_shared << std::endl;
       // Sort the expression
       Function f("tmp_extract", std::vector<MX>{}, ex, Dict{{"max_io", 0}, {"allow_free", true}});
       auto *ff = f.get<MXFunction>();
@@ -1853,7 +1852,6 @@ namespace casadi {
           break;
         }
       }
-      uout() << "replace" << replace << std::endl;
       // New variables and definitions
       v.clear();
       v.reserve(replace.size());
