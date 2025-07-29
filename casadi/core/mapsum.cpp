@@ -146,14 +146,18 @@ namespace casadi {
   }
 
  std::vector<std::string> MapSum::get_function() const {
-    return {"f"};
+    return {"f", "f_orig"};
   }
 
   const Function& MapSum::get_function(const std::string &name) const {
     casadi_assert(has_function(name),
       "No function \"" + name + "\" in " + name_ + ". " +
       "Available functions: " + join(get_function()) + ".");
-    return f_;
+    if (name=="f") {
+      return f_;
+    } else {
+      return f_orig_;
+    }
   }
 
   void MapSum::find(std::map<FunctionInternal*, std::pair<Function, size_t>> & all_fun,
@@ -164,7 +168,7 @@ namespace casadi {
   }
 
   bool MapSum::has_function(const std::string& fname) const {
-    return fname=="f";
+    return fname=="f" || fname=="f_orig" ;
   }
 
   void MapSum::init(const Dict& opts) {
