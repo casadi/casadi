@@ -2243,7 +2243,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       }
     }
 
-    std::unordered_map<FunctionInternal*, Function> is_diff_cache;
+    std::map<std::pair<FunctionInternal*, std::vector<bool> >, Function> is_diff_cache;
 
     bool any_replaced = false;
 
@@ -2254,8 +2254,6 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
 
         Function f = call_node.which_function();
 
-        auto key = f.get(); // TODO: add is_diff_in to key, or even better: args
-
         { // Insert proper is_diff flags
           Function f_orig = f.get_function("f_orig");
           std::vector<bool> old_is_diff_in = f_orig->is_diff_in_;
@@ -2265,7 +2263,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
           }
           if (old_is_diff_in!=is_diff_in) {
 
-            auto key = f.get();
+            auto key = std::make_pair(f.get(), is_diff_in);
 
             auto it = is_diff_cache.find(key);
             if (it == is_diff_cache.end()) {
