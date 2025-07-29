@@ -146,18 +146,22 @@ namespace casadi {
   }
 
  std::vector<std::string> MapSum::get_function() const {
-    return {"f"};
+    return {"f", "f_orig"};
   }
 
   const Function& MapSum::get_function(const std::string &name) const {
     casadi_assert(has_function(name),
       "No function \"" + name + "\" in " + name_ + ". " +
       "Available functions: " + join(get_function()) + ".");
-    return f_;
+    if (name=="f") {
+      return f_;
+    } else {
+      return f_orig_;
+    }
   }
 
   bool MapSum::has_function(const std::string& fname) const {
-    return fname=="f";
+    return fname=="f" || fname=="f_orig" ;
   }
 
   void MapSum::init(const Dict& opts) {
@@ -680,6 +684,9 @@ namespace casadi {
                       const std::vector<std::string>& inames,
                       const std::vector<std::string>& onames,
                       const Dict& opts) const {
+
+    bool skip_transform;
+    Dict options = extract_from_dict(opts,"skip_transform", skip_transform);
     // Generate map of derivative
     Function Jf = f_.jacobian();
 
@@ -705,24 +712,30 @@ namespace casadi {
     for (size_t oind = 0; oind < n_out_; ++oind) {
       for (size_t iind = 0; iind < n_in_; ++iind) {
         MX& r = res[i];
-        if (!reduce_out_[oind]) {
-          if (reduce_in_[iind]) {
-            std::vector<casadi_int> row, col;
-            // conservative: it is enough if non-empty columns have an equal number of nonzeros
-            if (Jf.sparsity_out(i).is_compactible(row, col)) {
-              casadi_int t1 = row.size();
-              casadi_int t2 = col.size();
-              Layout source({t1, t2, n_});
-              Layout target({t1, n_, t2});
-              Sparsity sp_target = vertcat(horzsplit(r.sparsity(), Jf.size2_out(i)));
-              r = sparsity_cast(r,Sparsity::dense(Jmap.nnz_out(i),1));
-              r = permute_layout(r,Relayout(source, {0, 2, 1}, target));
-              r = sparsity_cast(r, sp_target);
+        if (skip_transform && vectorize_f()) {
+          if (r.op()==OP_PERMUTE_LAYOUT) r = r.dep(0);
+          Sparsity patt = reduce_in_[iind] ? Sparsity::dense(n_, 1) : Sparsity::diag(n_);
+          r = sparsity_cast(r, Sparsity::kron(Jf.sparsity_out(i), patt));
+        } else {
+          if (!reduce_out_[oind]) {
+            if (reduce_in_[iind]) {
+              std::vector<casadi_int> row, col;
+              // conservative: it is enough if non-empty columns have an equal number of nonzeros
+              if (Jf.sparsity_out(i).is_compactible(row, col)) {
+                casadi_int t1 = row.size();
+                casadi_int t2 = col.size();
+                Layout source({t1, t2, n_});
+                Layout target({t1, n_, t2});
+                Sparsity sp_target = vertcat(horzsplit(r.sparsity(), Jf.size2_out(i)));
+                r = sparsity_cast(r,Sparsity::dense(Jmap.nnz_out(i),1));
+                r = permute_layout(r,Relayout(source, {0, 2, 1}, target));
+                r = sparsity_cast(r, sp_target);
+              } else {
+                r = vertcat(horzsplit(r, Jf.size2_out(i)));
+              }
             } else {
-              r = vertcat(horzsplit(r, Jf.size2_out(i)));
+              r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
             }
-          } else {
-            r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
           }
         }
         i++;
@@ -730,7 +743,7 @@ namespace casadi {
     }
 
     // Construct return function
-    Dict custom_opts = opts;
+    Dict custom_opts = options;
     custom_opts["always_inline"] = true;
     custom_opts["allow_duplicate_io_names"] = true;
     return Function(name, arg, res, inames, onames, custom_opts);
