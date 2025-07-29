@@ -2395,7 +2395,6 @@ namespace casadi {
       MM(i, Slice()) = Matrix<casadi_int>(1, 1);
       MM(Slice(), n+i) = Matrix<casadi_int>(1, 1);
     }
-    uout() << "total " << total << std::endl;
     return order;
   }
 
