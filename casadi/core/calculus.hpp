@@ -2250,6 +2250,12 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           R = fmax(L1_abs, R1_abs);
         }
         break;
+      case OP_SIGN:
+      {
+          L = sign(L1);
+          R = sign(R1);
+        }
+        break;
       case OP_COS:
         {
           T ge_2pi = ((R1-L1)>=2*M_PI);
