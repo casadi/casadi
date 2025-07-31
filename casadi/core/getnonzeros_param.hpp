@@ -54,6 +54,10 @@ namespace casadi {
     GetNonzerosParam(const Sparsity& sp, const MX& y, const MX& nz);
     GetNonzerosParam(const Sparsity& sp, const MX& y, const MX& nz, const MX& nz_extra);
 
+    /** \brief Interval calculus propagation rule */
+    void propagate_interval(const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+        std::vector<MX>& res_L, std::vector<MX>& res_R) const override;
+
     /// Destructor
     ~GetNonzerosParam() override {}
 
