@@ -784,6 +784,13 @@ namespace casadi {
       // If identically zero
       return MX::zeros(sparsity());
     } else {
+      if (sparsity().is_scalar(true)) {
+        bool hit;
+        MX ret = common_simp_unary(op, shared_from_this<MX>(), maxDepth(),
+                  [](casadi_int op, const MX& a) { return a->get_unary(op);},
+                  hit);
+        if (hit) return ret;
+      }
       // Create a new node
       return MX::create(new UnaryMX(Operation(op), shared_from_this<MX>()));
     }
@@ -858,6 +865,17 @@ namespace casadi {
       if ((operation_checker<F0XChecker>(op) && is_zero()) ||
          (operation_checker<FX0Checker>(op) && y->is_zero())) {
         return MX::zeros(sparsity());
+      }
+
+      if (sparsity().is_scalar(true) && y.is_scalar(true)) {
+        bool hit;
+        MX ret = common_simp_binary(op, shared_from_this<MX>(), y, maxDepth(),
+                  [](casadi_int op, const MX& a) { return a->get_unary(op);},
+                  [](casadi_int op, const MX& a, const MX& b) {
+                    return a->_get_binary(op, b, true, true);
+                  },
+                  hit);
+        if (hit) return ret;
       }
 
       // Handle special operations (independent of type)

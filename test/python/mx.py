@@ -1438,6 +1438,102 @@ class MXtests(casadiTestCase):
       self.assertTrue(is_equal(w[1],b))
       self.assertTrue(is_equal(w[2],c))
 
+  def test_simplifications(self):
+    for X in [SX,MX]:
+        a = X.sym("a")
+        b = X.sym("b")
+        
+        x = sin(a)
+        y = sin(b)
+
+ 
+        for A,B in [
+            (2*x-x, x),
+            (4*x-3*x,x),
+            (0.2*x+0.8*x,x),
+            ((x + 0), x),  # x + 0
+            ((0 + x), x),  # 0 + x
+            ((x + (-y)), x - y),  # x + (-y) → x - y
+            (((-x) + y), y - x),  # (-x) + y → y - x
+            (((0.5*x) + (0.5*x)), x),  # 0.5x + 0.5x = x
+            (((x/2) + (x/2)), x),  # x/2 + x/2 = x
+            (((x - y) + y), x),  # (x - y) + y = x
+            ((y + (x - y)), x),  # Not covered exactly, just placeholder
+            ((sin(x)**2 + cos(x)**2), 1),  # sin² + cos² = 1
+            ((x - 0), x),  # x - 0
+            ((0 - x), -x),  # 0 - x
+            ((x - x), 0),  # x - x
+            ((x - (-y)), x + y),  # x - (-y)
+            (((x + y) - y), x),  # x + y - y
+            (((x + y) - x), y),  # x + y - x
+            ((x - (y + x)), -y),  # x - (x + y)
+            ((x - (x + y)), -y),  # x - (x + y)
+            (((-x) - y), -(x + y)),  # (-x) - y
+            ((x * x), x**2),  # x*x = x²
+            ((x * 3), 3 * x),  # reorder consts
+            ((x * 0), 0),  # x*0 = 0
+            ((0 * x), 0),  # 0*x = 0
+            ((x * 1), x),  # x*1 = x
+            ((1 * x), x),  # 1*x = x
+            ((x * -1), -x),  # x*(-1)
+            ((-1 * x), -x),  # -1*x
+            ((x * (1/y)), x/y),  # x * (1/y)
+            (((1/x) * y), y/x),  # (1/x) * y
+            ((5 * (0.2 * x)), x),  # 5 * 0.2x = x
+            ((0.5 * (2 * x)), x),
+            ((5 * (x / 5)), x),  # 5*(x/5)
+            (((2 / x) * x), 2),  # (2/x)*x
+            ((2*x)/x,2),
+            ((5*x)/x,5),
+            (((x) * (2 / x)), 2),  # x*(2/x)
+            (((-x) * y), -(x*y)),  # -x * y
+            ((x * (-y)), -(x*y)),  # x * -y
+            ((2*(0.5*x),x)),
+            (2*(x*0.5),x),
+            #((x / 0), float('inf')),  # x/0
+            ((0 / x), 0),  # 0/x
+            ((x / 1), x),  # x/1
+            ((x / -1), -x),  # x/(-1)
+            ((x / x), 1),  # x/x = 1
+            ((2*x / 2), x),  # 2*x/2 = x
+            (((x * y) / x), y),  # (x*y)/x = y
+            (((x * y) / y), x),  # (x*y)/y = x
+            ((1 / x), x**-1),  # 1/x
+            ((x / (1/y)), x*y),  # x/(1/y)
+            (((2*x) / (2*y)), x/y),
+            (((x/5)/0.2), x),  # (x/5)/0.2 = x
+            ((x / (2*x)), 1/2),  # x/(2x) = 1/2
+            (((-x) / x), -1),  # -x/x = -1
+            ((x / (-x)), -1),  # x/-x = -1
+            (((-x)/(-x)), 1),  # (-x)/(-x) = 1
+            (((x / y) / x), 1/y),  # (x/y)/x = 1/y
+            (((-x) / y), -(x / y)),  # -x / y
+            ((x / (-y)), -(x / y)),  # x / -y
+            ((x ** 0), 1),  # x^0 = 1
+            ((x ** 2), x*x),  # x^2
+            ((x ** 3), x*(x*x)),  # x^3
+            ((x ** -3), 1/(x**3)),  # x^-3
+            ((x ** 4), (x**2)*(x**2)),  # even power
+            ((x ** 0.5), x**0.5),  # sqrt(x)
+            ((x ** y), x**y),  # general case, fallback
+            ((x**2 >= 0), 1),
+            ((2*x**2 >= x**2), 1),
+            ((fmin(x, float('inf'))), x),  # fmin(x, ∞)
+            ((fmin(float('inf'), x)), x),  # fmin(∞, x)
+            ((fmin(-float('inf'), x)), -float('inf')),  # DEFUNCT
+            ((fmin(x, x)), x),  # fmin(x, x)
+            ((fmax(-float('inf'), x)), x),  # fmax(-∞, x)
+            ((fmax(x, -float('inf'))), x),  # fmax(x, -∞)
+            ((fmax(x, float('inf'))), float('inf')),  # fmax(x, ∞)
+            ((fmax(x, x)), x),  # fmax(x, x)
+            (x**2 < 0, 0),
+            ((x == x), 1),  # x == x
+            ((x != x), 0),  # x != x
+            ]:
+          print((A,B))
+          self.assertEqual(str(A),str(B))
+        
+  
   @known_bug()
   def test_vertcat_empty(self):
     a = MX(DM(0,2))
