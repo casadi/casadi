@@ -248,15 +248,15 @@ jobs:
               - type: append
                 matrix:
                   arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: ["36","37","38","39","310","311","312","313"]
+                  py2: ["36","37","38","39","310","311","312","313","314"]
               - type: append
                 matrix:
                   arch: [windows-shared-x64-posix]
-                  py2: ["27","36","37","38","39","310","311","312","313"]
+                  py2: ["27","36","37","38","39","310","311","312","313","314"]
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
-                  py2: ["36","37","38","39","310","311","312","313"]
+                  py2: ["36","37","38","39","310","311","312","313","314"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
