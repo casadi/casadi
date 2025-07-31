@@ -98,7 +98,9 @@ namespace casadi {
         \identifier{17f} */
     bool is_unary() const override { return true;}
 
-    /** \brief Check if not negative */
+    /** \brief Check if not negative
+
+        \identifier{2e8} */
     bool is_nonnegative() const override;
 
     /** \brief Get the operation

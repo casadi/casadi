@@ -1188,14 +1188,20 @@ namespace casadi {
         \identifier{19z} */
     bool is_minus_one() const;
 
-    /** \brief  check if the matrix is inf (note that false negative answers are possible) */
+    /** \brief  check if the matrix is inf (note that false negative answers are possible)
+
+        \identifier{2e9} */
     bool is_inf() const;
 
-    /** \brief  check if the matrix is -inf (note that false negative answers are possible) */
+    /** \brief  check if the matrix is -inf (note that false negative answers are possible)
+
+        \identifier{2ea} */
     bool is_minus_inf() const;
 
     /** \brief  check if the matrix is not negative 
-     (note that false negative answers are possible) */
+     (note that false negative answers are possible)
+
+        \identifier{2eb} */
     bool is_nonnegative() const;
 
     /** \brief  check if the matrix is an identity matrix (note that false negative answers

@@ -80,16 +80,24 @@ namespace casadi {
         \identifier{1qg} */
     virtual bool is_minus_one() const { return false;}
 
-    /** \brief Check if identically inf */
+    /** \brief Check if identically inf
+
+        \identifier{2e4} */
     virtual bool is_inf() const { return false;}
 
-    /** \brief Check if identically -inf */
+    /** \brief Check if identically -inf
+
+        \identifier{2e5} */
     virtual bool is_minus_inf() const { return false;}
 
-    /** \brief Check if integer */
+    /** \brief Check if integer
+
+        \identifier{2e6} */
     virtual bool is_integer() const { return false;}
 
-    /** \brief Check if not negative */
+    /** \brief Check if not negative
+
+        \identifier{2e7} */
     virtual bool is_nonnegative() const { return false;}
 
     /** \brief Check if a certain value
