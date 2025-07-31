@@ -80,6 +80,18 @@ namespace casadi {
         \identifier{1qg} */
     virtual bool is_minus_one() const { return false;}
 
+    /** \brief Check if identically inf */
+    virtual bool is_inf() const { return false;}
+
+    /** \brief Check if identically -inf */
+    virtual bool is_minus_inf() const { return false;}
+
+    /** \brief Check if integer */
+    virtual bool is_integer() const { return false;}
+
+    /** \brief Check if not negative */
+    virtual bool is_nonnegative() const { return false;}
+
     /** \brief Check if a certain value
 
         \identifier{1qh} */
@@ -449,6 +461,9 @@ namespace casadi {
 
     /// Get the value (only for scalar constant nodes)
     virtual double to_double() const;
+
+    /// Get the value (only for scalar constant nodes)
+    virtual casadi_int to_int() const;
 
     /// Get the value (only for constant nodes)
     virtual DM get_DM() const;

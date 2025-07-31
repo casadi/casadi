@@ -310,6 +310,7 @@ namespace casadi {
     static bool is_almost_zero(const SXElem& val, double tol);
     static bool is_one(const SXElem& val);
     static bool is_minus_one(const SXElem& val);
+    static bool is_nonnegative(const SXElem& val);
     static bool is_constant(const SXElem& val);
     static bool is_integer(const SXElem& val);
     static bool is_inf(const SXElem& val);

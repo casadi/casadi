@@ -113,6 +113,9 @@ namespace casadi {
     /// Get the value (only for scalar constant nodes)
     double to_double() const override = 0;
 
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override = 0;
+
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override = 0;
 
@@ -238,10 +241,17 @@ namespace casadi {
     bool is_zero() const override;
     bool is_one() const override;
     bool is_minus_one() const override;
+    bool is_inf() const override;
+    bool is_minus_inf() const override;
+    bool is_nonnegative() const override;
+    bool is_integer() const override;
     bool is_eye() const override;
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override {return x_.scalar();}
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override {return static_cast<casadi_int>(x_.scalar());}
 
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override { return x_;}
@@ -295,6 +305,9 @@ namespace casadi {
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override;
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override;
 
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override;
@@ -374,6 +387,9 @@ namespace casadi {
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override;
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override;
 
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override;
@@ -489,6 +505,9 @@ namespace casadi {
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override { return 0;}
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override {return 0;}
 
     /// Get the value (only for constant nodes)
     DM get_DM() const override { return DM(); }
@@ -632,12 +651,22 @@ namespace casadi {
         \identifier{10c} */
     bool is_zero() const override { return v_.value==0;}
     bool is_one() const override { return v_.value==1;}
+    bool is_minus_one() const override { return v_.value==-1;}
+    bool is_inf() const override { return casadi_limits<double>::is_inf(v_.value);}
+    bool is_minus_inf() const override { return casadi_limits<double>::is_minus_inf(v_.value);}
+    bool is_nonnegative() const override { return casadi_limits<double>::is_nonnegative(v_.value);}
+    bool is_integer() const override { return casadi_limits<double>::is_integer(v_.value);}
     bool is_eye() const override { return v_.value==1 && sparsity().is_diag();}
     bool is_value(double val) const override { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override {
       return static_cast<double>(v_.value);
+    }
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override {
+      return static_cast<casadi_int>(v_.value);
     }
 
     /// Get the value (only for constant nodes)

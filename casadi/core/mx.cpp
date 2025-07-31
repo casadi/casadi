@@ -1014,6 +1014,10 @@ namespace casadi {
     return (*this)->is_value(-1);
   }
 
+  bool MX::is_nonnegative() const {
+    return (*this)->is_nonnegative();
+  }
+
   bool MX::is_transpose() const {
     return op()==OP_TRANSPOSE;
   }
@@ -1023,6 +1027,31 @@ namespace casadi {
       return static_cast<DM>(*this).is_regular();
     } else {
       casadi_error("Cannot check regularity for symbolic MX");
+    }
+  }
+
+  bool MX::is_inf() const {
+    return (*this)->is_inf();
+  }
+
+  bool MX::is_minus_inf() const {
+    return (*this)->is_minus_inf();
+  }
+
+  bool MX::is_integer() const {
+    return (*this)->is_integer();
+  }
+
+  bool MX::is_doubled() const {
+    return (op()==OP_ADD && is_equal(dep(0), dep(1), get_max_depth())) ||
+           (op()==OP_TWICE);
+  }
+
+  MX MX::inv() const {
+    if (is_op(OP_INV)) {
+      return dep(0);
+    } else {
+      return (*this)->get_unary(OP_INV);
     }
   }
 

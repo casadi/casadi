@@ -74,6 +74,9 @@ namespace casadi {
       static bool is_minus_inf(const T& val) {
         return std::numeric_limits<T>::has_infinity && val==-std::numeric_limits<T>::infinity();
       }
+      static bool is_nonnegative(const T& val) {
+        return val>=0;
+      }
       static bool is_nan(const T& val) {
         return std::numeric_limits<T>::has_quiet_NaN && val!=val;
       }

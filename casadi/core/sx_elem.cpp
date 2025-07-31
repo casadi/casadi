@@ -160,7 +160,8 @@ namespace casadi {
   }
 
   bool SXElem::is_doubled() const {
-    return is_op(OP_ADD) && is_equal(dep(0), dep(1), SXNode::eq_depth_);
+    return (is_op(OP_ADD) && is_equal(dep(0), dep(1), SXNode::eq_depth_)) ||
+           (is_op(OP_TWICE));
   }
 
   SXElem SXElem::inv() const {
@@ -540,8 +541,8 @@ namespace casadi {
   bool SXElem::is_nonnegative() const {
     if (is_constant()) {
       return static_cast<double>(*this)>=0;
-    } else if (is_op(OP_SQ) || is_op(OP_FABS)) {
-      return true;
+    } else if (casadi_math<SXElem>::is_unary(node->op())) {
+      return operation_checker<NonnegativeChecker>(node->op());
     } else {
       return false;
     }
@@ -602,6 +603,10 @@ namespace casadi {
 
   bool casadi_limits<SXElem>::is_minus_one(const SXElem& val) {
     return val.is_minus_one();
+  }
+
+  bool casadi_limits<SXElem>::is_nonnegative(const SXElem& val) {
+    return val.is_nonnegative();
   }
 
   bool casadi_limits<SXElem>::is_constant(const SXElem& val) {

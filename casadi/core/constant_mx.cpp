@@ -220,6 +220,22 @@ namespace casadi {
     return x_.is_minus_one();
   }
 
+  bool ConstantDM::is_inf() const {
+    return x_.is_inf();
+  }
+
+  bool ConstantDM::is_minus_inf() const {
+    return x_.is_minus_inf();
+  }
+
+  bool ConstantDM::is_integer() const {
+    return x_.is_integer();
+  }
+
+  bool ConstantDM::is_nonnegative() const {
+    return x_.is_nonnegative();
+  }
+
   bool ConstantDM::is_eye() const {
     return x_.is_eye();
   }
@@ -377,6 +393,10 @@ namespace casadi {
     casadi_error("Not defined for ConstantFile");
   }
 
+  casadi_int ConstantFile::to_int() const {
+    casadi_error("Not defined for ConstantFile");
+  }
+
   Matrix<double> ConstantFile::get_DM() const {
     casadi_error("Not defined for ConstantFile");
   }
@@ -413,6 +433,10 @@ namespace casadi {
   }
 
   double ConstantPool::to_double() const {
+    casadi_error("Not defined for ConstantPool");
+  }
+
+  casadi_int ConstantPool::to_int() const {
     casadi_error("Not defined for ConstantPool");
   }
 

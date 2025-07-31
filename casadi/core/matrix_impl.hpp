@@ -1640,6 +1640,32 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  bool Matrix<Scalar>::is_inf() const {
+    if (!is_dense()) return false;
+
+    // Look for inf
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_inf(e)) return false;
+
+    return true;
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::is_minus_inf() const {
+    if (!is_dense()) return false;
+
+    // Look for -inf
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_minus_inf(e)) return false;
+
+    return true;
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::is_nonnegative() const {
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_nonnegative(e)) return false;
+    return true;
+  }
+
+  template<typename Scalar>
   bool Matrix<Scalar>::is_zero() const {
 
     // Look for non-zeros

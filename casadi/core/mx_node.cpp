@@ -477,6 +477,10 @@ namespace casadi {
     casadi_error("'to_double' not defined for class " + class_name());
   }
 
+  casadi_int MXNode::to_int() const {
+    casadi_error("'to_int' not defined for class " + class_name());
+  }
+
   DM MXNode::get_DM() const {
     casadi_error("'get_DM' not defined for class " + class_name());
   }

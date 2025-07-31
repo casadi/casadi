@@ -245,6 +245,9 @@ namespace casadi {
 
     MX operator-() const;
 
+    /** \brief Element-wise inverse */
+    MX inv() const;
+
 #ifndef SWIG
     /// \cond INTERNAL
     ///@{
@@ -295,6 +298,12 @@ namespace casadi {
 
     /// Check if constant
     bool is_constant() const;
+
+    /// Check if integer
+    bool is_integer() const;
+
+    /** \brief Check if the node is the sum of two equal expressions */
+    bool is_doubled() const;
 
     /// Check if evaluation
     bool is_call() const;
@@ -397,6 +406,12 @@ namespace casadi {
         \identifier{qx} */
     bool is_minus_one() const;
 
+    /** \brief  check if inf (note that false negative answers are possible) */
+    bool is_inf() const;
+
+    /** \brief  check if -inf (note that false negative answers are possible) */
+    bool is_minus_inf() const;
+
     /** \brief  Is the expression a transpose?
 
         \identifier{qy} */
@@ -407,6 +422,9 @@ namespace casadi {
 
     /// Is binary operation
     bool is_binary() const;
+
+    /** \brief Check if a value is always nonnegative (false negatives are allowed) */
+    bool is_nonnegative() const;
 
     /// Is unary operation
     bool is_unary() const;

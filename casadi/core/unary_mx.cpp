@@ -131,6 +131,10 @@ namespace casadi {
     g << r << " = " << g.print_op(op_, " " + x + " ") << ";\n";
   }
 
+  bool UnaryMX::is_nonnegative() const {
+    return operation_checker<NonnegativeChecker>(op_);
+  }
+
   MX UnaryMX::get_unary(casadi_int op) const {
     if (!GlobalOptions::simplification_on_the_fly) return MXNode::get_unary(op);
 

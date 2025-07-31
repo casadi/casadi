@@ -559,6 +559,7 @@ namespace casadi {
   template<>      struct NonnegativeChecker<OP_AND>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_OR>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_HYPOT>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_FABS>{ static const bool check=true;};
   ///@}
 
   ///@{
