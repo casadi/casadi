@@ -61,6 +61,9 @@ for k in range(f.n_instructions()):
     elif op==OP_OUTPUT:
       output_val[o[0]][o[1]] = work[i[0]]
       print('output[', o[0], '][', o[1], '] = work[', i[0], ']','             ---> ', output_val[o[0]][o[1]])
+    elif op==OP_TWICE:
+      work[o[0]] = 2*work[i[0]]
+      print('work[', o[0], '] = 2*work[', i[0], ']','                         ---> ', work[o[0]])
     elif op==OP_ADD:
       work[o[0]] = work[i[0]] + work[i[1]]
       print('work[', o[0], '] = work[', i[0], '] + work[', i[1], ']','        ---> ', work[o[0]])
