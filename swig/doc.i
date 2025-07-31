@@ -33237,7 +33237,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1295
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1296
 
 ";
 
@@ -33249,7 +33249,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1298
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1299
 
 ";
 
@@ -33262,7 +33262,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1299
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1300
 
 ";
 
@@ -34105,7 +34105,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L184-L184
 Sparse matrix with a given sparsity with all values same.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1378
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1379
 
 ";
 
@@ -34116,7 +34116,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1378
 Sparse matrix with a given sparsity and non-zero elements.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1381
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1382
 
 ";
 
@@ -34704,14 +34704,14 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1199
 %feature("docstring")  casadi::MatrixCommon::is_nonnegative() const "
 
 [INTERNAL] 
-check if the matrix is not negative (note that false negative 
-answers 
-are possible)
+check if the matrix is not negative
+
+(note that false negative answers are possible)
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_2eb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1205
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1206
 
 ";
 
@@ -34727,7 +34727,7 @@ are possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1212
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1213
 
 ";
 
@@ -34737,7 +34737,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1212
 Get operation type.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1215
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1216
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L189-L191
@@ -34750,7 +34750,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L189-
 Is it a certain operation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1218
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1219
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L194-L196
@@ -34767,7 +34767,7 @@ zeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1223
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1224
 
 ";
 
@@ -34781,10 +34781,10 @@ Implementation of  Matrix::get_nonzeros (in public API)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1228
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1229
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1412-L1417
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1413-L1418
 
 ";
 
@@ -34796,7 +34796,7 @@ Get all nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1240
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1241
 
 ";
 
@@ -34808,7 +34808,7 @@ Get all elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1233
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1234
 
 ";
 
@@ -34820,7 +34820,7 @@ Get name (only if symbolic scalar)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1264
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1265
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L218-L220
@@ -34838,7 +34838,7 @@ const.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1272
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1273
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L223-L225
@@ -34855,7 +34855,7 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1aa
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1279
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1280
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L228-L230
@@ -34887,7 +34887,7 @@ lang: only 'matlab' supported for now
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ac
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1317
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1318
 
 ";
 
@@ -34897,7 +34897,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1317
 Obtain information about sparsity
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1321
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1322
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/im_instantiator.cpp#L39-L41
@@ -34913,7 +34913,7 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ad
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1326
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1327
 
 ";
 
@@ -34925,7 +34925,7 @@ Serialize.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ae
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1332
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1333
 
 ";
 
@@ -34938,7 +34938,7 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ah
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1347
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1348
 
 ";
 
@@ -34966,7 +34966,7 @@ Supported formats:
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1367
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1368
 
 ";
 

@@ -1199,6 +1199,7 @@ namespace casadi {
     bool is_minus_inf() const;
 
     /** \brief  check if the matrix is not negative 
+
      (note that false negative answers are possible)
 
         \identifier{2eb} */
