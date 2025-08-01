@@ -194,7 +194,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,windows-shared-x64-posix]
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,manylinux2014-x64-modern,manylinux2014-x86-modern,manylinux2014-aarch64-modern,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v4.1.1
         with:
@@ -248,7 +248,11 @@ jobs:
               - type: append
                 matrix:
                   arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: ["36","37","38","39","310","311","312","313","314"]
+                  py2: ["36","37","38","39","310","311","312","313"]
+              - type: append
+                matrix:
+                  arch: [manylinux2014-x64-modern,manylinux2014-x86-modern]
+                  py2: ["314"]
               - type: append
                 matrix:
                   arch: [windows-shared-x64-posix]
@@ -256,7 +260,11 @@ jobs:
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
-                  py2: ["36","37","38","39","310","311","312","313","314"]
+                  py2: ["36","37","38","39","310","311","312","313"]
+              - type: append
+                matrix:
+                  arch: [manylinux2014-aarch64-modern]
+                  py2: ["314"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
@@ -666,7 +674,10 @@ jobs:
               "manylinux1-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
               "manylinux2014-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
               "manylinux2014-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
+              "manylinux2014-x64-modern": {"os": "linux", "bitness": "64", "suffix":"64"},
+              "manylinux2014-x86-modern": {"os": "linux", "bitness": "32", "suffix":"32"},
               "manylinux2014-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
+              "manylinux2014-aarch64-modern": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
               "windows-shared-x64-posix": {"os": "windows", "bitness": "64", "suffix":"64"}
            }
           export_to: env
