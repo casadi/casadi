@@ -3957,8 +3957,13 @@ class MXtests(casadiTestCase):
   def test_pow_zero(self):
   
     for X in [SX,MX]:
+    
 
         x = X.sym('x', Sparsity.diag(4))
+        
+        print(x**(-2))
+        
+        raise Exception()
         self.assertTrue((x**0).is_dense())
         self.assertFalse((x**0.3).is_dense())
         self.assertFalse((x**1).is_dense())

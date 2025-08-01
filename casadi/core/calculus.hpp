@@ -1982,8 +1982,13 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
         break;
       case OP_POW:
         if (y.is_constant()) {
+          uout() << "sizeof(int)" << sizeof(int) << std::endl;
+          uout() << "sizeof(casadi_int)" << sizeof(casadi_int) << std::endl;
+          uout() << "OP_POW is_constant" << y << std::endl;
           if (y.is_integer()) {
+            uout() << "OP_POW is_integer" << std::endl;
             casadi_int nn = y->to_int();
+            uout() << "OP_POW nn" << nn << std::endl;
             if (nn == 0) {
               return 1;
             } else if (nn>100 || nn<-100) { // maximum depth
@@ -1999,6 +2004,7 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           } else if (y->to_double()==0.5) {
             return sqrt(x);
           } else {
+            uout() << "OP_POW gen_binary" << std::endl;
             return gen_binary(OP_CONSTPOW, x, y);
           }
         }
