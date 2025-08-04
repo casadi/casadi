@@ -160,7 +160,7 @@ namespace casadi {
     void handle_mipsol_callback(GRBmodel *model, void *cbdata, int where);
 
     /// Process lazy constraints returned by user callback
-    void process_lazy_constraints(GRBmodel* model, void* cbdata, const std::vector<casadi::DM>& callback_result);
+    void process_lazy_constraints(GRBmodel *model, void *cbdata, const std::vector<casadi::DM> &callback_result);
 
   protected:
      /** \brief Deserializing constructor */
