@@ -71,13 +71,18 @@ namespace casadi {
       return error == 0;
     }
 
-    bool addLazyConstraint(const std::vector<int>& indices,
-                          const std::vector<double>& coeffs,
-                          char sense, double rhs) {
-      int error = GRBcblazy(cbdata_, static_cast<int>(indices.size()),
-                            const_cast<int*>(indices.data()),
-                            const_cast<double*>(coeffs.data()),
-                            sense, rhs);
+    bool addLazyConstraint(const std::vector<int>& ind,
+                                          const std::vector<double>& val,
+                                          char sense, double rhs) const {
+      if (where_ != GRB_CB_MIPSOL) {
+        casadi_warning("Can only add lazy constraints in MIPSOL context");
+        return 1;
+      }
+
+      int error = GRBcblazy(cbdata_, static_cast<int>(ind.size()), ind.data(), val.data(), sense, rhs);
+      if (error != 0) {
+        casadi_warning("GRBcblazy failed with code: " + std::to_string(error));
+      }
       return error == 0;
     }
   };
@@ -567,7 +572,7 @@ namespace casadi {
       // Enable lazy constraints and callback if needed
       if (enable_mipsol_callback_) {
         // Enable lazy constraints
-        int error = GRBsetintparam(m->env, "LazyConstraints", 1);
+        int error = GRBsetintparam(GRBgetenv(model), "LazyConstraints", 1);
         if (error) {
           casadi_warning("Failed to enable LazyConstraints parameter");
           return 1;
@@ -774,8 +779,10 @@ void GurobiInterface::handle_mipsol_callback(GRBmodel *model, void *cbdata, int 
     input_data.push_back(obj_bound);
     input_data.push_back(static_cast<double>(sol_count));
 
-    // Prepare output buffer
-    std::vector<double> output_data(nx_);  // Assuming output size matches nx_
+    // Prepare output buffers
+    double flag = 0.0;                      // First output: boolean (as double)
+    std::vector<double> a_vec(nx_, 0.0);    // Second output: vector A
+    double b_val = 0.0;                     // Third output: scalar b
 
     // Get memory requirements for the callback
     casadi_int sz_arg = mipsol_callback_.sz_arg();
@@ -787,48 +794,46 @@ void GurobiInterface::handle_mipsol_callback(GRBmodel *model, void *cbdata, int 
     std::vector<casadi_int> iw(sz_iw);
     std::vector<double> w(sz_w);
 
-    // Create argument pointers
+    // Set up argument pointers
     std::vector<const double*> arg(sz_arg);
     std::vector<double*> res(sz_res);
 
-    // Set up input arguments
+    // Fill input arguments
     if (sz_arg > 0) {
       size_t offset = 0;
-      // First argument: x_solution
       if (sz_arg > 0) {
-        arg[0] = &input_data[offset];
+        arg[0] = &input_data[offset];  // x
         offset += nx_;
       }
-      // Additional scalar arguments
       for (casadi_int i = 1; i < sz_arg && offset < input_data.size(); ++i) {
-        arg[i] = &input_data[offset];
+        arg[i] = &input_data[offset];  // Scalars
         offset += 1;
       }
     }
 
-    // Set up output arguments
-    if (sz_res > 0) {
-      res[0] = output_data.data();
-    }
+    // Set up output pointers
+    if (sz_res >= 1) res[0] = &flag;
+    if (sz_res >= 2) res[1] = a_vec.data();
+    if (sz_res >= 3) res[2] = &b_val;
 
     // Call the callback function
     int callback_result = mipsol_callback_(arg.data(), res.data(),
-                                          iw.data(), w.data(), 0);
+                                           iw.data(), w.data(), 0);
 
     if (callback_result != 0) {
       casadi_warning("Callback function returned error code: " + std::to_string(callback_result));
       return;
     }
 
-    // Process results if callback succeeded
-    if (sz_res > 0 && !output_data.empty()) {
-      // Convert output back to DM for processing
-      DM results = DM::zeros(nx_, 1);
+    // Process results if the callback requests constraint
+    if (flag > 0.5) {
+      DM A = DM::zeros(1, nx_);
       for (casadi_int i = 0; i < nx_; ++i) {
-        results(i) = output_data[i];
+        A(0, i) = a_vec[i];
       }
+      DM b = DM(b_val);
 
-      std::vector<DM> callback_outputs = {results};
+      std::vector<DM> callback_outputs = {flag, A, b};
       process_lazy_constraints(model, cbdata, callback_outputs);
     }
 
@@ -852,13 +857,6 @@ void GurobiInterface::process_lazy_constraints(GRBmodel *model, void *cbdata,
     DM A_lazy = callback_result[1];
     DM b_lazy = callback_result[2];
     std::string sense = "<=";
-
-    if (callback_result.size() > 3) {
-      // TODO If you want to pass a string via DM, you can encode it as a number or char and decode here.
-      // But often it's best to fix the sense in the callback itself.
-      // For now, hardcode
-      sense = "<=";
-    }
 
     CallbackDataHelper helper(cbdata, GRB_CB_MIPSOL);
 
