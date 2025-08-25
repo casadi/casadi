@@ -264,6 +264,11 @@ private:
   /// Check if the vector has negative entries
   CASADI_EXPORT bool is_pow2(unsigned int a);
 
+  /** \brief Convert a single flattened vector into a nested std::vector
+   */
+  template<class T, class S, class I>
+  void nest_vector(const std::vector<S>& flat, std::vector< std::vector<T> >& nested, const std::vector<I>& indices);
+
   /** \brief Flatten a nested std::vector tot a single flattened vector
    * 
    * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
@@ -758,6 +763,19 @@ namespace casadi {
     for (const auto& e : nested) {
       offset += e.size();
       indices.push_back(offset);
+    }
+  }
+
+  template<class T, class S, class I>
+  void nest_vector(const std::vector<S>& flat, std::vector< std::vector<T> >& nested, const std::vector<I>& indices) {
+    nested.resize(indices.size()-1);
+    for (casadi_int i=0; i<indices.size()-1; ++i) {
+      casadi_int start = indices[i];
+      casadi_int end = indices[i+1];
+      casadi_assert(start<=end, "Indices must be non-decreasing");
+      casadi_assert(end<=flat.size(), "Indices out of bounds");
+      std::vector<T> & section = nested[i];
+      section.insert(section.end(), flat.begin()+start, flat.begin()+end);
     }
   }
 
