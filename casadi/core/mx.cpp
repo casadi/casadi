@@ -2303,53 +2303,135 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     }
   }
 
+  class ExpressionSimplifier {
+  private:
+    std::vector< std::vector<MX> > exprs_;
+    std::vector< bool > try_evalf_;
+    std::vector< bool > expand_;
+    casadi_int read_i;
 
+  public:
+    ExpressionSimplifier() {
+      read_i = 0;
+    }
 
-  std::vector<MX> MX::block_jacobian(const std::vector< std::vector< MX > >& expr, const std::vector< std::vector< MX > >& arg) {
+    void write(const std::vector<MX>& exprs, bool try_evalf, bool expand) {
+      exprs_.push_back(exprs);
+      try_evalf_.push_back(try_evalf);
+      expand_.push_back(expand);
+      read_i = 0;
+    }
 
-    std::vector<MX> vexpr;
-    for (const auto & e : expr) {
-      for (const auto & ee : e) {
-        vexpr.push_back(ee);
+    void simplify() {
+      std::vector<MX> to_be_expanded;
+      for (size_t i=0; i<exprs_.size(); ++i) {
+        bool try_evalf = try_evalf_[i];
+        bool expand = expand_[i];
+        std::vector<MX> & expr = exprs_[i];
+
+        for (MX& e : expr) {
+          // Try evalf
+          if (try_evalf) {
+            try {
+              e = evalf(e);
+              continue;
+            } catch (...) {
+              // pass
+            }
+          }
+
+          // Try expand
+          if (expand) {
+            to_be_expanded.push_back(e);
+          }
+
+        }
+      }
+
+      std::vector<MX> inputs = symvar(veccat(to_be_expanded));
+
+      Function Js = Function("Js", inputs, to_be_expanded);
+      Js = Js.expand();
+
+      std::vector<MX> out;
+      Js.call(inputs, out);
+
+      casadi_int offset = 0;
+
+      for (size_t i=0; i<exprs_.size(); ++i) {
+        bool try_evalf = try_evalf_[i];
+        bool expand = expand_[i];
+        std::vector<MX> & expr = exprs_[i];
+
+        for (MX& e : expr) {
+          // Try evalf
+          if (try_evalf) {
+            try {
+              evalf(e);
+              continue;
+            } catch (...) {
+              // pass
+            }
+          }
+
+          // Try expand
+          if (expand) {
+            e = out[offset++];
+          }
+
+        }
       }
     }
 
+    void read(std::vector<MX>& exprs) {
+      casadi_assert(read_i < exprs_.size(), "No more expressions to read");
+      const std::vector<MX> & e = exprs_[read_i];
+      for (size_t i=0;i<e.size();++i) {
+        exprs[i] = e[i];
+      }
+      read_i++;
+    }
+  };
+  
+
+  std::vector<MX> MX::block_jacobian(const std::vector< std::vector< MX > >& expr,
+      const std::vector< std::vector< MX > >& arg,
+      const Dict& options) {
+
+    // Flatten arg
     std::vector<MX> varg;
-    for (const auto & e : arg) {
-      for (const auto & ee : e) {
-        varg.push_back(ee);
-      }
-    }
+    flatten_nested_vector(arg, varg);
+
+    // Flatten expr
+    std::vector<MX> vexpr;
+    std::vector<casadi_int> expr_flat_indices;
+    flatten_nested_vector(expr, vexpr, expr_flat_indices);
+
+    // Lift out map calls
     std::vector<MX> v;
     std::vector<MX> vdef;
     Dict opts2;
     opts2["lift_calls"] = true;
     opts2["lift_shared"] = false;
-    extract(vexpr, v, vdef, opts2);
+    extract(vexpr, v, vdef, opts2); // Updates vexpr, v, vdef in place
 
-    if (!optimal_is_diff(vexpr, v, vdef, varg)) {
+    // Check if is_diff_in is already optimally specified
+    if (!optimal_is_diff(vexpr, v, vdef, varg)) { // Updates vexpr in place
+      // Mirror the expr structure with updated vexpr contents
       std::vector< std::vector<MX> > expr_new;
+      nest_vector(vexpr, expr_new, expr_flat_indices);
 
-      casadi_int i = 0;
-      for (const auto& e : expr) {
-        std::vector<MX> ee_part;
-        for (const auto & ee : e) {
-          ee_part.push_back(vexpr[i++]);
-        }
-        expr_new.push_back(ee_part);
-      }
-      return block_jacobian(expr_new, arg);
+      return block_jacobian(expr_new, arg, options);
     }
 
+    // Mirror the expr structure with updated vexpr contents
+    std::vector< std::vector<MX> > expr_new;
+    nest_vector(vexpr, expr_new, expr_flat_indices);
 
+    // Create a veccat representation of expr_new entries
     std::vector<MX> Vexpr;
-    casadi_int i = 0;
-    for (const auto & e : expr) {
-      std::vector<MX> group;
-      for (const auto & ee : e) {
-        group.push_back(vexpr[i++]);
-      }
-      Vexpr.push_back(veccat(group));
+    for (const std::vector<MX>& e : expr_new) {
+      Vexpr.push_back(veccat(e));
     }
 
     std::unordered_map<MXNode*, casadi_int> v_lookup;
@@ -2364,9 +2446,15 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
 
     std::unordered_map<FunctionInternal*, LiftedMap> lifted_maps;
 
+    // Total Jacobian: \frac{\partial r}{\partial x}+\frac{\partial r}{\partial v}\left(\left[I-\frac{\partial v_\mathrm{def}}{\partial v}\right]^{-1}\frac{\partial v_\mathrm{def}}{\partial x}\right)
+    // Total Jacobian: J + B (A^-1 b)
+
+    // Compose A
     std::vector<casadi_int> rows_A;
     std::vector<casadi_int> cols_A;
     std::vector<MX> blocks_A;
+
+    std::vector<bool> blocks_A_simplify;
 
     // Add unit matrix everywhere
     casadi_int block_row = 0;
@@ -2374,6 +2462,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       rows_A.push_back(block_row);
       cols_A.push_back(block_row);
       blocks_A.push_back(MX::eye(e.numel()));
+      blocks_A_simplify.push_back(false);
       block_row++;
     }
 
@@ -2431,22 +2520,19 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
             rows_A.push_back(block_row);
             cols_A.push_back(block_col);
             blocks_A.push_back(-res[lm.orig.n_in()*e.which_output()+i]);
+            blocks_A_simplify.push_back(false);
           }
         }
 
-      } else { // Hit an expression
+      } else { // Hit an expression / jac_vdef_v
         casadi_int block_col = 0;
         for (const auto & ee : v) {
           MX J = jacobian(e, ee);
-          try {
-            J = evalf(J);
-          } catch (...) {
-            // pass
-          }
           if (J.nnz()) {
             rows_A.push_back(block_row);
             cols_A.push_back(block_col);
             blocks_A.push_back(-J);
+            blocks_A_simplify.push_back(true);
           }
           block_col++;
         }
@@ -2455,27 +2541,16 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       block_row++;
     }
 
-    std::vector<casadi_int> mapping;
-    Sparsity sp_A = Sparsity::triplet(v.size(), v.size(), rows_A, cols_A, mapping, false);
-    blocks_A = vector_slice(blocks_A, mapping);
-
+    // Compose b / jac_vdef_x
     std::vector<MX> res;
     for (const MX & ee : varg) {
       for (const MX & e : vdef) {
         MX J = jacobian(e, ee);
-        try {
-          J = evalf(J);
-        } catch (...) {
-          // pass
-        }
-        
         res.push_back(J);
       }
     }
 
-    block_trilsolve(sp_A, blocks_A, res, false, varg.size());
-
-
+    // Compose B / jac_r_v
     std::vector<casadi_int> rows_B;
     std::vector<casadi_int> cols_B;
     std::vector<MX> blocks_B;
@@ -2488,20 +2563,13 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         rows_B.push_back(block_row);
         cols_B.push_back(block_col);
         MX J = jacobian(e, ee);
-
-        // Try numerically evaluating
-        try {
-          J = evalf(J);
-        } catch (...) {
-          block_B_symbolic.push_back(blocks_B.size());
-        }
         blocks_B.push_back(J);
         block_col++;
       }
       block_row++;
     }
 
-    // Direct dependence on arg (e.g. x_dot contains x)
+    // Compose J: Direct dependence on arg (e.g. x_dot contains x) / jac_r_x
     std::vector<MX> blocks_J;
     std::vector<casadi_int> block_J_symbolic;
 
@@ -2509,42 +2577,101 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     for (const MX& e : Vexpr) {
       for (const std::vector<MX>& a : arg) {
         MX J = densify(jacobian(e, vertcat(a)));
-        // Try numerically evaluating
-        try {
-          J = evalf(J);
-        } catch (...) {
-          block_J_symbolic.push_back(blocks_J.size());
-        }
         blocks_J.push_back(J);
       }
     }
 
-    {
-      // Expand symbolic B / J blocks
-      std::vector<MX> outputs = join(
-        vector_slice(blocks_B, block_B_symbolic),
-        vector_slice(blocks_J, block_J_symbolic)
-      );
-      std::vector<MX> inputs = symvar(veccat(outputs));
+    Dict common_options, specific_options;
 
-      Function Js = Function("Js", inputs, outputs);
-      Js = Js.expand();
-
-      std::vector<MX> out;
-      Js.call(inputs, out);
-
-      casadi_int offset = 0;
-      for (casadi_int i : block_B_symbolic) {
-        blocks_B[i] = out[offset++];
-      }
-      for (casadi_int i : block_J_symbolic) {
-        blocks_J[i] = out[offset++];
+    for (auto&& op : options) {
+      if (op.first=="common_options") {
+        common_options = op.second;
+      } else if (op.first=="specific_options") {
+        specific_options = op.second;
+      } else {
+        casadi_error("No such option: " + std::string(op.first));
       }
     }
+
+    bool try_evalf = true;
+    bool expand = true;
+
+    for (auto&& op : common_options) {
+      if (op.first=="try_evalf") {
+        try_evalf = op.second;
+      } else if (op.first=="expand") {
+        expand = op.second;
+      } else {
+        casadi_error("No such common_options: " + std::string(op.first));
+      }
+    }
+
+    Dict jac_r_x_options;
+    Dict jac_r_v_options;
+    Dict jac_vdef_x_options;
+    Dict jac_vdef_v_options;
+
+    for (auto&& op : specific_options) {
+      if (op.first=="jac_r_x") {
+        jac_r_x_options = op.second;
+      } else if (op.first=="jac_r_v") {
+        jac_r_v_options = op.second;
+      } else if (op.first=="jac_vdef_x") {
+        jac_vdef_x_options = op.second;
+      } else if (op.first=="jac_vdef_v") {
+        jac_vdef_v_options = op.second;
+      } else {
+        casadi_error("No such specific_options target: " + std::string(op.first));
+      }
+    }
+
+    // jac_r_x
+    bool jac_r_x_try_evalf = get_from_dict(jac_r_x_options, "try_evalf", try_evalf);
+    bool jac_r_x_expand = get_from_dict(jac_r_x_options, "expand", expand);
+
+    // jac_r_v
+    bool jac_r_v_try_evalf = get_from_dict(jac_r_v_options, "try_evalf", try_evalf);
+    bool jac_r_v_expand = get_from_dict(jac_r_v_options, "expand", expand);
+
+    // jac_vdef_x
+    bool jac_vdef_x_try_evalf = get_from_dict(jac_vdef_x_options, "try_evalf", try_evalf);
+    bool jac_vdef_x_expand = get_from_dict(jac_vdef_x_options, "expand", expand);
+
+    // jac_vdef_v
+    bool jac_vdef_v_try_evalf = get_from_dict(jac_vdef_v_options, "try_evalf", try_evalf);
+    bool jac_vdef_v_expand = get_from_dict(jac_vdef_v_options, "expand", expand);
+
+    ExpressionSimplifier es;
+
+    std::vector<casadi_int> blocks_A_to_simplify = boolvec_to_index(blocks_A_simplify);
+    std::vector<MX> blocks_A_simplified = vector_slice(blocks_A, blocks_A_to_simplify);
+
+    es.write(blocks_A_simplified, jac_vdef_v_try_evalf, jac_vdef_v_expand);
+    es.write(res, jac_vdef_x_try_evalf, jac_vdef_x_expand);
+    es.write(blocks_B, jac_r_v_try_evalf, jac_r_v_expand);
+    es.write(blocks_J, jac_r_x_try_evalf, jac_r_x_expand);
+    es.simplify();
+    es.read(blocks_A_simplified);
+    es.read(res);
+    es.read(blocks_B);
+    es.read(blocks_J);
+
+    offset = 0;
+    for (casadi_int i : blocks_A_to_simplify) {
+      blocks_A[i] = blocks_A_simplified[offset++];
+    }
+
+    std::vector<casadi_int> mapping;
+    Sparsity sp_A = Sparsity::triplet(v.size(), v.size(), rows_A, cols_A, mapping, false);
+    blocks_A = vector_slice(blocks_A, mapping);
 
     Sparsity sp_B = Sparsity::triplet(vexpr.size(), v.size(), rows_B, cols_B, mapping, false);
     blocks_B = vector_slice(blocks_B, mapping);
 
+    // res <- A^-1 b
+    block_trilsolve(sp_A, blocks_A, res, false, varg.size());
+
+    // Interpret res as a block-matrix C
     std::vector<casadi_int> rows_C;
     std::vector<casadi_int> cols_C;
     std::vector<MX> blocks_C;
@@ -2565,12 +2692,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     Sparsity sp_C = Sparsity::triplet(vdef.size(), varg.size(), rows_C, cols_C, mapping, false);
     blocks_C = vector_slice(blocks_C, mapping);
 
-    std::vector<double> blocks_C_mockup;
-    for (const auto& e : blocks_C) {
-      if (e.nnz()>0) {
-        blocks_C_mockup.push_back(1.0);
-      }
-    }
+    // R <- B C
 
     Sparsity sp_R = Sparsity::mtimes(sp_B, sp_C);
     std::vector<MX> blocks_R(sp_R.nnz());
@@ -2588,6 +2710,8 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     block_mtimes(blocks_B, sp_B, blocks_C, sp_C, blocks_R, sp_R, false);
 
     std::vector<MX> out;
+
+    // out <- J + R
     casadi_int blocks_J_i = 0;
 
     int rb_offset = 0;
@@ -2616,9 +2740,8 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       rb_offset+=e.size();
     }
 
-    for (casadi_int i=0;i<v.size();++i) {
-      out = substitute(out, v, vdef);
-    }
+    // Recursive substitute out all symbols v
+    MX::substitute_inplace(v, vdef, out, false);
 
     return out;
   }

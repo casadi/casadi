@@ -777,7 +777,8 @@ namespace casadi {
     static std::vector<MX> matrix_expand(const std::vector<MX>& e,
                                          const std::vector<MX>& boundary,
                                          const Dict& options);
-    static std::vector<MX> block_jacobian(const std::vector< std::vector<MX> >& expr, const std::vector< std::vector<MX> >& arg);
+    static std::vector<MX> block_jacobian(const std::vector< std::vector<MX> >& expr,
+        const std::vector< std::vector<MX> >& arg, const Dict& options);
     static MX lift(const MX& x, const MX& x_guess);
     static DM evalf(const MX& m);
     static MX bspline(const MX& x,
@@ -913,8 +914,10 @@ namespace casadi {
     }
 
     inline friend std::vector<MX>
-     block_jacobian(const std::vector<std::vector<MX>>& expr, const std::vector<std::vector<MX>>& arg) {
-        return MX::block_jacobian(expr, arg);
+     block_jacobian(const std::vector<std::vector<MX>>& expr,
+            const std::vector<std::vector<MX>>& arg,
+            const Dict& options = Dict()) {
+        return MX::block_jacobian(expr, arg, options);
     }
 
     inline friend MX bspline(const MX& x,
