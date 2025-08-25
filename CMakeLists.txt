@@ -5,7 +5,7 @@ project(alpaqa
     HOMEPAGE_URL "https://github.com/kul-optec/alpaqa"
     LANGUAGES CXX
 )
-set(PY_VERSION_SUFFIX "a20.dev0")
+set(PY_VERSION_SUFFIX "a21.dev0")
 include(CTest)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/find")
 

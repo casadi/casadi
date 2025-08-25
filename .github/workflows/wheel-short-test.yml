@@ -10,7 +10,7 @@ on:
     types: ['released', 'prereleased']
 
 env:
-  PACKAGE_VERSION: "1.0.0a20.dev0"
+  PACKAGE_VERSION: "1.0.0a21.dev0"
   PACKAGE_NAME: alpaqa
   PYTHON_VERSION: '3.11'
 

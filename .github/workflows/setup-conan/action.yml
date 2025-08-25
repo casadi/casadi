@@ -27,7 +27,7 @@ runs:
     run: >
       pip install -U
       pip build conan cmake ninja
-      'py-build-cmake~=0.3.2' 'pybind11-stubgen~=2.5.1' 'numpy<3'
+      'py-build-cmake~=0.5.0' 'pybind11-stubgen~=2.5.1' 'numpy<3'
 
   - name: Configure sccache version
     shell: bash

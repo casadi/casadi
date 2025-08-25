@@ -35,8 +35,8 @@ docs = [
     "furo==2023.08.19",
     "matplotlib",
 ]
-debug = ["alpaqa-debug==1.0.0a20.dev0"]
-test = ["pytest>=7.2.0,<7.5", "qpalm~=1.2.1", "scipy>=1.9.3,<2"]
+debug = ["alpaqa-debug==1.0.0a21.dev0"]
+test = ["pytest>=7.2.0,<9", "qpalm~=1.2.1", "scipy>=1.9.3,<2"]
 
 [project.urls]
 "Documentation" = "https://kul-optec.github.io/alpaqa"
@@ -48,7 +48,7 @@ alpaqa = "alpaqa.__main__:main"
 
 [build-system]
 requires = [
-    "py-build-cmake~=0.3.2",
+    "py-build-cmake~=0.5.0",
     "pybind11==2.13.6",
     "pybind11-stubgen~=2.5",
     "numpy<3",

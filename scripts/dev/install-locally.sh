@@ -127,9 +127,9 @@ if [ $build_python -eq 1 ]; then
             -C cross="$pbc_config" \
             -C override=wheel.build_tag="$tag"
         pip install -f staging --force-reinstall --no-deps \
-            "alpaqa==1.0.0a20.dev0" "alpaqa-debug==1.0.0a20.dev0"
+            "alpaqa==1.0.0a21.dev0" "alpaqa-debug==1.0.0a21.dev0"
         pip install -f staging \
-            "alpaqa[test]==1.0.0a20.dev0" "alpaqa-debug==1.0.0a20.dev0"
+            "alpaqa[test]==1.0.0a21.dev0" "alpaqa-debug==1.0.0a21.dev0"
     fi
     pytest
 fi

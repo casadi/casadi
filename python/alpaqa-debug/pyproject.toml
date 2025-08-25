@@ -6,8 +6,8 @@ license = { "file" = "../../LICENSE" }
 authors = [{ "name" = "Pieter P", "email" = "pieter.p.dev@outlook.com" }]
 keywords = []
 classifiers = []
-dependencies = ["alpaqa==1.0.0a20.dev0"]
-version = "1.0.0a20.dev0"
+dependencies = ["alpaqa==1.0.0a21.dev0"]
+version = "1.0.0a21.dev0"
 description = "Debug symbols for the alpaqa package."
 
 [project.urls]
@@ -17,7 +17,7 @@ description = "Debug symbols for the alpaqa package."
 
 [build-system]
 requires = [
-    "py-build-cmake~=0.3.2",
+    "py-build-cmake~=0.5.0",
     "pybind11==2.13.6",
     "pybind11-stubgen~=2.5",
     "numpy<3",
