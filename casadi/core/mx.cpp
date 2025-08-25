@@ -2196,6 +2196,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     }
   }
 
+  /* Are the is_diff_in properties of maps found in vdef already optimal for the differentiation task wrt varg? */
   bool optimal_is_diff(std::vector<MX>& vexpr, const std::vector<MX>& v, const std::vector<MX>& vdef, const std::vector<MX>& varg) {
     // Which entries of v depend on arg?
 
@@ -2236,20 +2237,23 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       if (e.is_output()) { // Hit a map call
         const MX & call_node = e.dep(0);
 
-        Function f = call_node.which_function();
-        
-        Function f_orig = f.get_function("f_orig");
-        std::vector<bool> old_is_diff_in = f_orig->is_diff_in_;
+        Function F = call_node.which_function();
+        // Get the original function that was mapped
+        Function f = F.get_function("f_orig");
+
+        // Find the old and new (computed) is_diff_in vector
+        std::vector<bool> old_is_diff_in = f->is_diff_in_;
         std::vector<bool> is_diff_in;
         for (casadi_int i=0; i<call_node.n_dep(); ++i) {
           is_diff_in.push_back(v_depends_lookup[call_node.dep(i).get()]);
         }
-        if (old_is_diff_in!=is_diff_in) {
 
-          auto key = std::make_pair(f.get(), is_diff_in);
+        if (old_is_diff_in!=is_diff_in) { // We need to act and update the map
+
+          auto key = std::make_pair(F.get(), is_diff_in);
 
           auto it = is_diff_cache.find(key);
-          if (it == is_diff_cache.end()) {
+          if (it == is_diff_cache.end()) { // The modified map was not yet available
             // Warn if the is_diff pattern was wrong
             for (casadi_int i=0; i<call_node.n_dep(); ++i) {
               if (old_is_diff_in[i]==false && is_diff_in[i]==true) {
@@ -2261,26 +2265,30 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
             }
             // Recreate the inner function
             Dict opts;
-            opts["ad_weight"] = f_orig->ad_weight();
-            opts["ad_weight_sp"] = f_orig->sp_weight();
-            opts["max_num_dir"] = f_orig->max_num_dir_;
+            opts["ad_weight"] = f->ad_weight();
+            opts["ad_weight_sp"] = f->sp_weight();
+            opts["max_num_dir"] = f->max_num_dir_;
             opts["is_diff_in"] = is_diff_in;
-            opts["is_diff_out"] = f_orig->is_diff_out_;
-            opts["jac_penalty"] = f_orig->jac_penalty_;
+            opts["is_diff_out"] = f->is_diff_out_;
+            opts["jac_penalty"] = f->jac_penalty_;
             opts["cse"] = true;
-            std::vector<SX> args = f_orig.sx_in();
-            std::vector<SX> res = f_orig(args);
-            Function f_new(f_orig.name(), args, res, f_orig.name_in(), f_orig.name_out(), opts);
-            MapSum* m = f.get<MapSum>();
+            std::vector<SX> args = f.sx_in();
+            std::vector<SX> res = f(args);
+            Function f_new(f.name(), args, res, f.name_in(), f.name_out(), opts);
+            MapSum* m = F.get<MapSum>();
             // Recreate the map
-            is_diff_cache[key] = Function::create(new MapSum(f.name(), f_new, m->n_, m->reduce_in_, m->reduce_out_), Dict());
+            F = Function::create(new MapSum(F.name(), f_new, m->n_, m->reduce_in_, m->reduce_out_), Dict());
+            is_diff_cache[key] = F;
+          } else { // Use the cached modified map
+            F = is_diff_cache[key];
           }
 
+          // Call the modified map with the symbolic arguments to do a vdef replacement
           std::vector<MX> new_args;
           for (casadi_int i=0; i<call_node.n_dep(); ++i) {
             new_args.push_back(call_node.dep(i));
           }
-          std::vector<MX> ret = is_diff_cache[key](new_args);
+          std::vector<MX> ret = F(new_args);
           new_vdef[k] = ret[e.which_output()];
           any_replaced = true;
         }
