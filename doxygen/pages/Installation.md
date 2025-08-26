@@ -156,7 +156,7 @@ int main() {
 
 **CMakeLists.txt**
 ```cmake
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.17...4.1)
 project(Project)
 
 # Find the library you just installed:

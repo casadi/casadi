@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.21...4.1)
 project(alpaqa-examples C CXX)
 
 if (PROJECT_IS_TOP_LEVEL)

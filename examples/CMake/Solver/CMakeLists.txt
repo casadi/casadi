@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.21...4.1)
 project(alpaqa-cmake-examples CXX)
 
 # Locate the alpaqa package
