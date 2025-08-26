@@ -53,4 +53,4 @@ EOF
 
 # Build the Python package
 python3 -m pip install -U build
-python3 -m build -w "$pkg_dir" -o "$out_dir" -C cross="$pbc_config" --installer uv
+python3 -m build -w "$pkg_dir" -o "$out_dir" -C cross="$pbc_config"
