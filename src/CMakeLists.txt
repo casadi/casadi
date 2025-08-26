@@ -132,6 +132,9 @@ if (ALPAQA_WITH_CASADI)
     if (ALPAQA_WITH_EXTERNAL_CASADI)
         find_package(casadi REQUIRED)
         find_package(Threads REQUIRED)
+        if (TARGET casadi AND NOT TARGET casadi::casadi)
+            add_library(casadi::casadi ALIAS casadi)  # Support CasADi <3.7
+        endif()
     endif()
     # Normal NLPs
     add_library(casadi-loader
@@ -151,7 +154,8 @@ if (ALPAQA_WITH_CASADI)
     if (ALPAQA_WITH_EXTERNAL_CASADI)
         target_sources(casadi-loader PRIVATE
             "interop/casadi/src/CompleteCasADiProblem.cpp")
-        target_link_libraries(casadi-loader PRIVATE casadi Threads::Threads)
+        target_link_libraries(casadi-loader
+            PRIVATE casadi::casadi Threads::Threads)
     else()
         target_sources(casadi-loader PRIVATE
             "interop/casadi/src/casadi-external-function.cpp"
@@ -182,7 +186,8 @@ if (ALPAQA_WITH_OCP AND ALPAQA_WITH_CASADI_OCP)
         PUBLIC  alpaqa::alpaqa alpaqa::casadi-loader
         PRIVATE alpaqa::warnings)
     if (ALPAQA_WITH_EXTERNAL_CASADI)
-        target_link_libraries(casadi-ocp-loader PRIVATE casadi Threads::Threads)
+        target_link_libraries(casadi-ocp-loader
+            PRIVATE casadi::casadi Threads::Threads)
     endif()
     alpaqa_configure_visibility(casadi-ocp-loader)
     set_target_properties(casadi-ocp-loader PROPERTIES SOVERSION ${PROJECT_VERSION})

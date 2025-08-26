@@ -98,9 +98,9 @@ struct Problem {
     }
     // Gradient of the terminal cost l_N(h_N(x))
     void eval_q_N([[maybe_unused]] crvec x, crvec h, rvec q) const {
-        auto Jh_x     = mat::Identity(nx, nx);
-        auto &&grad_l = 10 * h;
-        q             = Jh_x.transpose() * grad_l;
+        auto Jh_x   = mat::Identity(nx, nx);
+        auto grad_l = 10 * h;
+        q           = Jh_x.transpose() * grad_l;
     }
     // Hessian of stage cost w.r.t. x
     void eval_add_Q([[maybe_unused]] index_t timestep,

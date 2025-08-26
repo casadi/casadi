@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 cd "$( dirname "${BASH_SOURCE[0]}" )"/../..
-
 set -ex
 
 # Package and output directories
@@ -8,65 +7,43 @@ pkg_dir="${1:-.}"
 out_dir="${2:-dist}"
 install_stubs_dir="$3"
 
-# Create Conan profiles
-python_profile="$PWD/profile-python.local.conan"
-cat <<- EOF > "$python_profile"
-include(default)
-include($PWD/scripts/ci/profiles/linux-conf.profile)
-include($PWD/scripts/ci/profiles/alpaqa-python-linux.profile)
-[conf]
-tools.build:exelinkflags+=["-static-libgcc"]
-tools.build:sharedlinkflags+=["-static-libgcc"]
+# Create a py-build-cmake config file
+pbc_config="$PWD/native-py-build-cmake.local.pbc"
+cat << EOF > "$pbc_config"
+conan.profile_host=["default", "$PWD/scripts/ci/profiles/linux-conf.profile"]
+conan.cmake.options.CMAKE_C_COMPILER_LAUNCHER=sccache
+conan.cmake.options.CMAKE_CXX_COMPILER_LAUNCHER=sccache
+conan.cmake.args+=["--fresh"]
+conan.cmake.build_args+=["--verbose"]
 EOF
 
-pbc_config="$PWD/py-build-cmake.config.pbc"
-cat <<- EOF > "$pbc_config"
-cmake.options.CMAKE_C_COMPILER_LAUNCHER=sccache
-cmake.options.CMAKE_CXX_COMPILER_LAUNCHER=sccache
-EOF
-
-# Install dependencies
-rm -rf "$pkg_dir"/build/python-{debug,release}/{generators,CMakeCache.txt}
-for cfg in Debug Release; do
-    conan install "$pkg_dir" --build=missing \
-        -pr:h "$python_profile" \
-        -s build_type=$cfg
-done
-
-# Build Python packages
-python3 -m build -w "$pkg_dir" -o "$out_dir" \
-    -C local="$PWD/scripts/ci/py-build-cmake.toml" \
-    -C local="$pbc_config"
-python3 -m build -w "$pkg_dir/python/alpaqa-debug" -o "$out_dir" \
-    -C local="$PWD/scripts/ci/py-build-cmake.toml" \
-    -C component="$PWD/scripts/ci/py-build-cmake.component.toml" \
-    -C local="$pbc_config"
+# Build the Python package
+python3 -m pip install -U build
+python3 -m build -w "$pkg_dir" -o "$out_dir" -C local="$pbc_config"
 
 # Install the Python stubs
 if [ -n "$install_stubs_dir" ]; then
-    proj_dir="$PWD"
-    cd "$pkg_dir"
-    # We install the Python modules and stubs in the source directory
-    for i in 10 20; do
-        py-build-cmake \
-            --local="$proj_dir/scripts/ci/py-build-cmake.toml" \
-            --local="$pbc_config" \
-            configure --index $i
-        py-build-cmake \
-            --local="$proj_dir/scripts/ci/py-build-cmake.toml" \
-            --local="$pbc_config" \
-            install --index $i --component python_modules \
-            -- --prefix "$install_stubs_dir"
-        py-build-cmake \
-            --local="$proj_dir/scripts/ci/py-build-cmake.toml" \
-            --local="$pbc_config" \
-            install --index $i --component python_stubs \
-            -- --prefix "$install_stubs_dir"
-    done
-    # Then we remove the binary Python modules (sdist is source only)
+    # Install py-build-cmake and pybind11-stubgen
+    python3 -m pip install 'py-build-cmake~=0.5.1.dev0' 'pybind11-stubgen~=2.5.5'
+    # Determine Conan's build directory
+    pbc=(python3 -m py_build_cmake.cli -C "$pkg_dir" --local="$pbc_config")
+    build_config="$("${pbc[@]}" build-config-name)"
+    build_dir="$pkg_dir/.py-build-cmake_cache/build/$build_config"
+    # Activate the Conan build environment (ensures that CMake is in PATH)
+    set +x; source "$build_dir/generators/conanbuild.sh"; set -x
+    # Re-run CMake to change Python executable (old one is in a temporary venv)
+    cmake "$build_dir" \
+        -D "Python3_EXECUTABLE=$(which python3)" \
+        -D "Python3_HOST_EXECUTABLE=$(which python3)"
+    # Avoid expensive copies of large binary modules
+    export CMAKE_INSTALL_MODE=SYMLINK_OR_COPY
+    # Install the binary modules into the source tree
+    cmake --install "$build_dir" --config Release \
+        --prefix "$install_stubs_dir" --component python_modules
+    # Generate the stubs (using a complete tree including the binary modules)
+    cmake --install "$build_dir" --config Release \
+        --prefix "$install_stubs_dir" --component python_stubs
+    # Then we remove the binary modules again (sdist is source only)
     while IFS= read -r f || [ -n "$f" ]; do rm -f "$f"
-    done < build/python-debug/install_manifest_python_modules.txt
-    while IFS= read -r f || [ -n "$f" ]; do rm -f "$f"
-    done < build/python-release/install_manifest_python_modules.txt
-    cd "$proj_dir"
+    done < "$build_dir/install_manifest_python_modules.txt"
 fi

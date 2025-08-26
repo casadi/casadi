@@ -1,43 +1,6 @@
-[cmake]
+[conan.cmake]
 generator = "Ninja Multi-Config"
-
-[cmake.options]
-"CMAKE_BUILD_TYPE" = "Debug" # Forces pybind11 to keep debug symbols (https://github.com/pybind/pybind11/issues/4454)
-
-# We install two configurations by default: Debug and Release
-[cmake.10]
-config = "Debug"
-preset = "conan-python-debug"
-build_presets = "conan-python-debug"
-build_path="build/python-debug"
-[cmake.10.env]
-ALPAQA_PYTHON_DEBUG = "1"
-[cmake.20]
-config = "Release"
-preset = "conan-python-release"
-build_presets = "conan-python-release"
-build_path="build/python-release"
-
-[mac.cmake.options]
+[conan.cmake.options]
 CMAKE_C_COMPILER_LAUNCHER = "sccache"
 CMAKE_CXX_COMPILER_LAUNCHER = "sccache"
-
-# Build Windows:
-#   The "Debug" CMake configuration selects the debug ABI of CPython. Here we
-#   only want to build alpaqa itself in debug mode, without affecting the
-#   Python ABI, so we use the "RelWithDebInfo" config, but disable optimizations
-#   to mimic what we would get with the real "Debug" config.
-[windows.cmake.options]
-CMAKE_CXX_FLAGS_RELWITHDEBINFO = "/Ob0 /Od /RTC1"
 CMAKE_MSVC_DEBUG_INFORMATION_FORMAT = "$<$<CONFIG:Debug,RelWithDebInfo>:Embedded>"
-CMAKE_POLICY_CMP0141 = "NEW"
-CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO = "/INCREMENTAL:NO /DEBUG:FULL /OPT:REF"
-ALPAQA_PYTHON_DEBUG_CONFIG = "RelWithDebInfo"
-CMAKE_C_COMPILER_LAUNCHER = "sccache"
-CMAKE_CXX_COMPILER_LAUNCHER = "sccache"
-CMAKE_Fortran_COMPILER = ""
-[windows.cmake.10]
-install_config = "RelWithDebInfo"
-preset = "conan-python-relwithdebinfo"
-build_presets = "conan-python-relwithdebinfo"
-build_path="build/python-relwithdebinfo"

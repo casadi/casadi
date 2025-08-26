@@ -77,13 +77,13 @@ class AlpaqaRecipe(ConanFile):
     )
 
     def requirements(self):
-        self.requires("eigen/tttapa.20240516", transitive_headers=True, force=True)
-        self.requires("guanaqo/1.0.0-alpha.4", transitive_headers=True)
-        self.test_requires("gtest/1.15.0")
+        self.requires("eigen/tttapa.20250504", transitive_headers=True, force=True)
+        self.requires("guanaqo/1.0.0-alpha.16", transitive_headers=True)
+        self.test_requires("gtest/1.17.0")
         if self.options.with_external_casadi:
-            self.requires("casadi/3.6.7", transitive_headers=True)
+            self.requires("casadi/3.7.1", transitive_headers=True)
         if self.options.with_json:
-            self.requires("nlohmann_json/3.11.3", transitive_headers=True)
+            self.requires("nlohmann_json/3.12.0", transitive_headers=True)
         if self.options.with_ipopt:
             self.requires("ipopt/3.14.16", transitive_headers=True)
         if self.options.with_qpalm:
@@ -91,11 +91,14 @@ class AlpaqaRecipe(ConanFile):
         if self.options.with_python or self.options.with_python_problem_loader:
             self.requires("pybind11/2.13.6")
             if self.options.with_conan_python:
-                self.requires("tttapa-python-dev/3.13.1")
+                self.requires("tttapa-python-dev/3.13.7")
         if self.options.with_matlab:
             self.requires("utfcpp/4.0.5")
         if self.options.with_blas:
-            self.requires("openblas/0.3.27")
+            self.requires("openblas/0.3.30")
+
+    def build_requirements(self):
+        self.tool_requires("cmake/[>=4.1 <5]")
 
     def config_options(self):
         if self.settings.get_safe("os") == "Windows":
@@ -129,8 +132,6 @@ class AlpaqaRecipe(ConanFile):
             value = getattr(self.options, k, None)
             if value is not None and value.value is not None:
                 tc.variables["ALPAQA_" + k.upper()] = bool(value)
-        if self.options.with_python:
-            tc.variables["USE_GLOBAL_PYBIND11"] = True
         if can_run(self):
             tc.variables["ALPAQA_FORCE_TEST_DISCOVERY"] = True
         tc.generate()
@@ -144,6 +145,10 @@ class AlpaqaRecipe(ConanFile):
     def package(self):
         cmake = CMake(self)
         cmake.install()
+        if self.options.with_python:
+            cmake.install(component="python_source")
+            cmake.install(component="python_modules")
+            cmake.install(component="python_stubs")
 
     def package_info(self):
         self.cpp_info.set_property("cmake_find_mode", "none")

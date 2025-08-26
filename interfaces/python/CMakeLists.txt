@@ -10,9 +10,16 @@ if (DEFINED PY_BUILD_CMAKE_PACKAGE_VERSION)
     endif()
 endif()
 
-# Find the Pybind11 headers
-include(cmake/QueryPythonForPybind11.cmake)
-find_pybind11_python_first()
+# Find the Python development files
+if (CMAKE_CROSSCOMPILING AND NOT DEFINED CMAKE_CROSSCOMPILING_EMULATOR)
+    find_package(Python3 REQUIRED COMPONENTS Development.Module)
+else()
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
+endif()
+
+# Find the pybind11 library
+set(PYBIND11_USE_CROSSCOMPILING On) # https://github.com/pybind/pybind11/pull/5083
+find_package(pybind11 REQUIRED)
 
 # Compile the example Python module
 pybind11_add_module(_alpaqa MODULE
@@ -105,20 +112,30 @@ if (ALPAQA_ENABLE_PCH)
 endif()
 add_custom_target(python_modules DEPENDS _alpaqa)
 
-# Install the Python module (py-build-cmake)
+if (DEFINED PY_BUILD_CMAKE_VERSION)
+    set(ALPAQA_MODULE_INSTALL_DIR "")
+else()
+    set(ALPAQA_MODULE_INSTALL_DIR "${ALPAQA_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
+endif()
+
+# Install the Python source code
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/python/${PY_BUILD_CMAKE_MODULE_NAME}
+        EXCLUDE_FROM_ALL
+        COMPONENT python_source
+        DESTINATION "${ALPAQA_MODULE_INSTALL_DIR}"
+        PATTERN "__pycache__" EXCLUDE)
+
+# Install the Python module
 install(TARGETS _alpaqa
         EXCLUDE_FROM_ALL
         COMPONENT python_modules
-        DESTINATION ${PY_BUILD_CMAKE_MODULE_NAME})
-# Standard installation
-install(TARGETS _alpaqa
-        COMPONENT python
-        DESTINATION ${ALPAQA_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages/${PY_BUILD_CMAKE_MODULE_NAME})
+        DESTINATION ./${ALPAQA_MODULE_INSTALL_DIR}/${PY_BUILD_CMAKE_MODULE_NAME})
 
 # Strip and install debug information
 include(${PROJECT_SOURCE_DIR}/cmake/Debug.cmake)
 alpaqa_install_debug_syms(_alpaqa python_modules_debug
-    ${PY_BUILD_CMAKE_MODULE_NAME} ${PY_BUILD_CMAKE_MODULE_NAME})
+    ./${ALPAQA_MODULE_INSTALL_DIR}/${PY_BUILD_CMAKE_MODULE_NAME}
+    ./${ALPAQA_MODULE_INSTALL_DIR}/${PY_BUILD_CMAKE_MODULE_NAME})
 
 # Generate stubs for the Python module
 set(ALPAQA_WITH_PY_STUBS_DEFAULT On)
@@ -131,6 +148,7 @@ option(ALPAQA_WITH_PY_STUBS
 if (ALPAQA_WITH_PY_STUBS)
     include(cmake/Pybind11Stubgen.cmake)
     pybind11_stubgen(_alpaqa
+        COMPONENT python_stubs
         PACKAGE ${PY_BUILD_CMAKE_MODULE_NAME}
-        COMPONENT python_stubs)
+        PACKAGE_ROOT "${ALPAQA_MODULE_INSTALL_DIR}")
 endif()

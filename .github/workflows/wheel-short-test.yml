@@ -16,6 +16,8 @@ env:
 
 jobs:
   build-linux:
+    # TODO: port valgrind tests to new Conan-based toolchain
+    if: false
     runs-on: ubuntu-latest
     container: ubuntu:jammy
     strategy:
@@ -64,7 +66,6 @@ jobs:
           generator = "Ninja Multi-Config"
           [cmake.options]
           CMAKE_FIND_ROOT_PATH = "$staging/pybind11-2.11.1;$staging/eigen-master;$staging/casadi"
-          USE_GLOBAL_PYBIND11 = "On"
           ALPAQA_WITH_CUTEST = "On"
           ALPAQA_WITH_EXTERNAL_CASADI = "On"
           EOF
@@ -83,6 +84,7 @@ jobs:
           path: dist/*.whl
 
   test-linux:
+    if: false
     needs: [build-linux]
     runs-on: ubuntu-latest
     container: python:3.11-bullseye
@@ -117,6 +119,7 @@ jobs:
         run: python -m twine check dist/*.whl
 
   build-macos:
+    if: false
     runs-on: macos-13
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
@@ -180,6 +183,7 @@ jobs:
           path: dist/*.whl
 
   build-windows:
+    if: false
     runs-on: windows-2022
     strategy:
       matrix:
@@ -234,6 +238,8 @@ jobs:
           path: dist/*.whl
 
   docs:
+    # TODO: port docs to new Conan-based toolchain
+    if: false
     needs: [build-linux]
     runs-on: ubuntu-latest
     container: ubuntu:jammy

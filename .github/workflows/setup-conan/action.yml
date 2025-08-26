@@ -1,17 +1,22 @@
-name: Python build
-description: Cross-compile the Python package
+name: Setup Conan
+description: >
+  Installs Python, Conan, py-build-cmake, pybind11-stubgen and sccache.
+  It initializes the default Conan profile using conan profile detect, sets
+  up compiler caching using sccache, configures caching of Conan dependencies,
+  and adds Conan recipes for cross-compilation and Python development files.
 inputs:
   python-version:
     required: false
     default: '3.13'
-    description: >
-      The Python version to use for the build, e.g. '3.13'.
+    description: The Python version to use for the build, e.g. '3.13'.
   conan-home:
     required: false
     default: ${{ github.workspace }}/.conan2
+    description: Selects the Conan home folder, $CONAN_HOME. Will be cached.
   cache-key:
     required: false
     default: generic
+    description: String to include in cache keys, to differentiate workflows.
 
 runs:
   using: composite
@@ -22,19 +27,36 @@ runs:
     with:
       python-version: ${{ inputs.python-version }}
 
+  - name: Build py-build-cmake (Unix)
+    if: runner.os != 'Windows'
+    shell: bash
+    run: |
+      git clone https://github.com/tttapa/py-build-cmake --branch conan
+      pip install -U pip build
+      python3 -m build -w py-build-cmake
+      echo "PIP_FIND_LINKS=$PWD/py-build-cmake/dist" >> "$GITHUB_ENV"
+
+  - name: Build py-build-cmake (Windows)
+    if: runner.os == 'Windows'
+    shell: pwsh
+    run: |
+      git clone https://github.com/tttapa/py-build-cmake --branch conan
+      pip install -U pip build
+      python3 -m build -w py-build-cmake
+      echo "PIP_FIND_LINKS=$((Resolve-Path 'py-build-cmake\dist'))" >> $env:GITHUB_ENV
+
   - name: Install Python dependencies
     shell: bash
     run: >
-      pip install -U
-      pip build conan cmake ninja
-      'py-build-cmake~=0.5.0' 'pybind11-stubgen~=2.5.1' 'numpy<3'
+      pip install -U pip build
+      conan~=2.19.1 'py-build-cmake~=0.5.1.dev0' 'pybind11-stubgen~=2.5.5'
 
   - name: Configure sccache version
     shell: bash
     run: echo "SCCACHE_GHA_VERSION=${{ inputs.cache-key }}" >> "$GITHUB_ENV"
 
   - name: Install sccache
-    uses: mozilla-actions/sccache-action@9e326ebed976843c9932b3aa0e021c6f50310eb4
+    uses: mozilla-actions/sccache-action@7d986dd989559c6ecdb630a3fd2557667be217ad
 
   - name: Cache Conan dependencies
     uses: actions/cache@v4

@@ -2,13 +2,13 @@
 name = "alpaqa"
 readme = "python/README.rst"
 requires-python = ">=3.9"
-license = { "file" = "LICENSE" }
+license = "LGPLv3"
+license-files = ["LICENSE"]
 authors = [{ "name" = "Pieter P", "email" = "pieter.p.dev@outlook.com" }]
 keywords = ["optimization", "panoc", "alm", "mpc"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Programming Language :: Python :: 3",
@@ -17,12 +17,13 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: POSIX :: Linux",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS",
     "Typing :: Typed",
 ]
-dependencies = ["numpy<3", "casadi~=3.6.7", "cmake>=3.28,<4", "ninja~=1.11.1"]
+dependencies = ["numpy<3", "casadi~=3.7.1", "cmake>=3.28,<5", "ninja>=1.11.1,<2"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
@@ -48,12 +49,16 @@ alpaqa = "alpaqa.__main__:main"
 
 [build-system]
 requires = [
-    "py-build-cmake~=0.5.0",
+    "py-build-cmake~=0.5.1.dev0",
     "pybind11==2.13.6",
     "pybind11-stubgen~=2.5",
     "numpy<3",
+    "casadi~=3.7.1",
+    "conan~=2.19.1",
 ]
 build-backend = "py_build_cmake.build"
+
+# ---------------------------------------------------------------------------- #
 
 [tool.py-build-cmake.module]
 name = "alpaqa"
@@ -73,34 +78,30 @@ include = [
     "python/test",
     "python/alpaqa-debug",
 ]
-exclude = ["**/__pycache__"]
 
-[tool.py-build-cmake.cmake]
-minimum_version = "3.25"
+[tool.py-build-cmake.conan.cmake]
+minimum_version = "4.1"
 source_path = "."
 args = ["-Wdev"]
-preset = "conan-python"
-build_presets = "conan-python-release"
-config = "Release"
-build_path = "build/python"
+build_type = "Release"
 install_components = ["python_modules", "python_stubs"]
-[tool.py-build-cmake.cmake.options]
-ALPAQA_WITH_PYTHON = true
-ALPAQA_WITH_TESTS = false
-ALPAQA_WITH_EXAMPLES = false
-ALPAQA_WITH_DRIVERS = false
-ALPAQA_WITH_GRADIENT_CHECKER = false
-ALPAQA_WITH_LBFGSB = false
-ALPAQA_WITH_SINGLE_PRECISION = false
-ALPAQA_WITH_LONG_DOUBLE = true
-ALPAQA_WITH_QUAD_PRECISION = false
-ALPAQA_WITH_UBSAN_DEBUG = false
-ALPAQA_WITH_ASAN_DEBUG = false
-ALPAQA_DEBUG_CHECKS_EIGEN = true
-USE_GLOBAL_PYBIND11 = true           # Use the package provided by Conan, not by Pip
-[tool.py-build-cmake.linux.cmake]
+[tool.py-build-cmake.conan]
+args = [
+    "--build=missing",
+    "-o&:with_python=True",
+    "-o&:with_examples=False",
+    "-o&:with_drivers=False",
+    "-o&:with_gradient_checker=False",
+    "-o&:with_lbfgsb=False",
+    "-o&:with_single_precision=False",
+    "-o&:with_long_double=True",
+    "-o&:with_quad_precision=False",
+    "-o&:debug_checks_eigen=True",
+    "-c&:tools.build:skip_test=True",
+]
+[tool.py-build-cmake.linux.conan.cmake]
 generator = "Ninja Multi-Config"
-[tool.py-build-cmake.mac.cmake]
+[tool.py-build-cmake.mac.conan.cmake]
 generator = "Ninja Multi-Config"
 
 [tool.py-build-cmake.stubgen]
@@ -109,33 +110,29 @@ args = ["-v"]
 [tool.py-build-cmake.editable]
 mode = "symlink"
 
+# ---------------------------------------------------------------------------- #
+
 [tool.cibuildwheel]
-build-verbosity = 1
+archs = ["auto64"]
+skip = "pp311-*"                               # https://github.com/pypy/pypy/issues/5328
+build-frontend = "build"
 environment = { PY_BUILD_CMAKE_VERBOSE = "1" }
 test-command = "pytest {package}/python/test"
 test-extras = ["test"]
-
 [tool.cibuildwheel.config-settings]
 --local = "scripts/ci/py-build-cmake.toml"
 
 [tool.cibuildwheel.macos]
-archs = ["universal2"]
+archs = ["arm64", "x86_64"]
 environment = { PY_BUILD_CMAKE_VERBOSE = "1", MACOSX_DEPLOYMENT_TARGET = "10.15" }
-before-build = [
-    "pip install cmake 'conan>=2,<3' ninja",
-    "conan profile detect -f",
-    "rm -rf {package}/build",
-    "python {package}/scripts/ci/pre-build-macos.py",
-]
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]
-before-build = [
-    "python -m pip install cmake \"conan>=2,<3\" ninja",
-    "conan profile detect -f",
-    "(if exist {package}\\build (rmdir /s /q {package}\\build))",
-    "python {package}\\scripts\\ci\\pre-build-windows.py",
-]
+
+[tool.cibuildwheel.pyodide]
+archs = ["wasm32"]
+
+# ---------------------------------------------------------------------------- #
 
 [tool.pytest.ini_options]
 minversion = "6.0"

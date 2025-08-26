@@ -10,7 +10,10 @@ if (CMAKE_Fortran_COMPILER)
 endif()
 
 find_package(casadi)
-if (TARGET casadi AND TARGET alpaqa::casadi-loader)
+if (TARGET casadi AND NOT TARGET casadi::casadi)
+    add_library(casadi::casadi ALIAS casadi)  # Support CasADi <3.7
+endif()
+if (TARGET casadi::casadi AND TARGET alpaqa::casadi-loader)
     add_subdirectory(CasADi)
 endif()
 
