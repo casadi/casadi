@@ -23,7 +23,12 @@ classifiers = [
     "Operating System :: MacOS",
     "Typing :: Typed",
 ]
-dependencies = ["numpy<3", "casadi~=3.7.1", "cmake>=3.28,<5", "ninja>=1.11.1,<2"]
+dependencies = [
+    "numpy<3",
+    "casadi~=3.7.1",
+    "cmake>=3.28,<5",
+    "ninja>=1.11.1,<2",
+]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
@@ -97,6 +102,8 @@ args = [
     "-o&:with_quad_precision=False",
     "-o&:debug_checks_eigen=True",
     "-c&:tools.build:skip_test=True",
+    "-s",
+    "compiler.cppstd=23",
 ]
 [tool.py-build-cmake.linux.conan.cmake]
 generator = "Ninja Multi-Config"
