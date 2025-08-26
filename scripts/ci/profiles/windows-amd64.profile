@@ -1,5 +1,6 @@
 include(default)
-
+[settings]
+compiler.cppstd=23
 [conf]
 tools.build:skip_test=True
 tools.build:cxxflags+=["/arch:AVX2"]
