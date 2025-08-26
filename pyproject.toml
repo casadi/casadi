@@ -23,15 +23,11 @@ classifiers = [
     "Operating System :: MacOS",
     "Typing :: Typed",
 ]
-dependencies = [
-    "numpy<3",
-    "casadi~=3.7.1",
-    "cmake>=3.28,<5",
-    "ninja>=1.11.1,<2",
-]
+dependencies = ["numpy<3"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
+casadi = ["casadi~=3.7.1", "cmake>=3.28,<5", "ninja>=1.11.1,<2"]
 docs = [
     "breathe~=4.35.0",
     "sphinx>=7.2.2,<8",
@@ -42,7 +38,14 @@ docs = [
     "matplotlib",
 ]
 debug = ["alpaqa-debug==1.0.0a21.dev0"]
-test = ["pytest>=7.2.0,<9", "qpalm~=1.2.1", "scipy>=1.9.3,<2"]
+test = [
+    "pytest>=7.2.0,<9",
+    "qpalm~=1.2.1",
+    "scipy>=1.9.3,<2",
+    "casadi~=3.7.1",
+    "cmake>=3.28,<5",
+    "ninja>=1.11.1,<2",
+]
 
 [project.urls]
 "Documentation" = "https://kul-optec.github.io/alpaqa"
@@ -57,7 +60,6 @@ requires = [
     "py-build-cmake~=0.5.1.dev0",
     "pybind11-stubgen~=2.5.5",
     "numpy<3",
-    "casadi~=3.7.1",
     "conan~=2.19.1",
 ]
 build-backend = "py_build_cmake.build"
