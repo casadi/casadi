@@ -101,7 +101,7 @@ args = [
     "-o&:with_long_double=True",
     "-o&:with_quad_precision=False",
     "-o&:debug_checks_eigen=True",
-    "-c&:tools.build:skip_test=True",
+    "-c*:tools.build:skip_test=True",
     "-s",
     "compiler.cppstd=23",
 ]
