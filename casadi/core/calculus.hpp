@@ -1969,6 +1969,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
                   || (x.dep().is_op(OP_COS) && y.dep().is_op(OP_SIN)))
                 && is_equal(x.dep().dep(), y.dep().dep(), depth))
           return 1; // sin^2 + cos^2 -> 1
+        else if (x.is_op(OP_MUL) && y.is_op(OP_MUL) && is_equal(x.dep(0), y.dep(0), depth) && (x.dep(1)+y.dep(1)).is_one())
+          return x.dep(0);
         break;
       case OP_SUB:
         if (y.is_zero()) // term2 is zero
