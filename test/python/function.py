@@ -4302,6 +4302,51 @@ class Functiontests(casadiTestCase):
           [[[-1.0, -1.0]], [[pi, pi]]],
       ])
 
+      # OP_LOG
+      yield (1, lambda a: log(a),  [
+          # positive intervals
+          [[[2, 5]], [[log(2), log(5)]]],
+          [[[0.5, 3]], [[log(0.5), log(3)]]],
+          [[[10, 10]], [[log(10), log(10)]]],
+          # negative intervals
+          [[[-4, -1]], [[np.nan, np.nan]]],
+          [[[-7, -3]], [[np.nan, np.nan]]],
+          [[[-10, -10]], [[np.nan,np.nan]]],
+          # intervals containing zero
+          [[[-3, 7]], [[np.nan, np.nan]]],
+          [[[-5, 5]], [[np.nan, np.nan]]],
+          [[[-8, 5]], [[np.nan, np.nan]]],
+          [[[-2, 0]], [[np.nan, np.nan]]],
+          [[[0, 8]], [[-np.inf, log(8)]]],
+          [[[0, 0]], [[-np.inf, -np.inf]]],
+      ])
+
+      # OP_LOG
+      yield (1, lambda a: log1p(a),  [
+          # positive intervals
+          [[[2, 5]], [[log1p(2), log1p(5)]]],
+          [[[0.5, 3]], [[log1p(0.5), log1p(3)]]],
+          [[[10, 10]], [[log1p(10), log1p(10)]]],
+          # negative intervals
+          [[[-4, -1]], [[np.nan, np.nan]]],
+          [[[-7, -3]], [[np.nan, np.nan]]],
+          [[[-10, -10]], [[np.nan,np.nan]]],
+          # intervals containing zero
+          [[[-3, 7]], [[np.nan, np.nan]]],
+          [[[-5, 5]], [[np.nan, np.nan]]],
+          [[[-8, 5]], [[np.nan, np.nan]]],
+          [[[-2, 0]], [[np.nan, np.nan]]],
+          [[[0, 8]], [[log1p(0), log1p(8)]]],
+          [[[0, 0]], [[log1p(0), log1p(0)]]],
+          # intervals containing -1
+          [[[-3, 7]], [[np.nan, np.nan]]],
+          [[[-5, 5]], [[np.nan, np.nan]]],
+          [[[-8, 5]], [[np.nan, np.nan]]],
+          [[[-2, -1]], [[np.nan, np.nan]]],
+          [[[-1, 8]], [[-np.inf, log1p(8)]]],
+          [[[-1, -1]], [[-np.inf, -np.inf]]],
+      ])
+
     for n_in,fun, numeric_tests in atomic_tests():
       
       f = Function('f',args[:n_in],[fun(*args[:n_in])])

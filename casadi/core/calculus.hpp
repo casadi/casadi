@@ -2356,9 +2356,16 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
       }
       case OP_LOG:
         {
-          T out_of_domain = L1<=0;
+          T out_of_domain = L1<0;
           L = if_else(out_of_domain, nan, log(L1));
           R = if_else(out_of_domain, nan, log(R1));
+        }
+        break;
+      case OP_LOG1P:
+        {
+          T out_of_domain = L1<-1;
+          L = if_else(out_of_domain, nan, log1p(L1));
+          R = if_else(out_of_domain, nan, log1p(R1));
         }
         break;
       case OP_POW:
