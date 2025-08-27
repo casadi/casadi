@@ -1454,6 +1454,7 @@ class MXtests(casadiTestCase):
 
  
         for A,B in [
+            (y*(x)+y*(1-x), y),
             (2*x-x, x),
             (4*x-3*x,x),
             (0.2*x+0.8*x,x),
