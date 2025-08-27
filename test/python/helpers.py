@@ -33,6 +33,8 @@ import time
 from contextlib import contextmanager
 from casadi.tools import capture_stdout
 import os
+import math
+
 
 codegen_check_digits = 15
 
@@ -294,7 +296,7 @@ class casadiTestCase(unittest.TestCase):
       if isnan(first ) and isnan(second): return
       msg+= " %.16e <-> %.16e"  % (first, second)
       n =  max(abs(first),abs(second))
-      if n>1e3:
+      if n>1e3 and math.isfinite(n):
         n = 10**floor(log10(n))
       else:
         n = 1.0
