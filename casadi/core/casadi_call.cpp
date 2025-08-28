@@ -185,16 +185,19 @@ namespace casadi {
                     const std::vector<bool>& arg_is_ref,
                     std::vector<bool>& res_is_ref,
                     bool prefer_inline) const {
+    std::vector<bool> arg_null, res_null;
     // Collect input arguments
     g.local("arg1", "const casadi_real", "**");
     for (casadi_int i=0; i<arg.size(); ++i) {
       g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i), arg_is_ref[i]) << ";\n";
+      arg_null.push_back(arg[i]==-1);
     }
 
     // Collect output arguments
     g.local("res1", "casadi_real", "**");
     for (casadi_int i=0; i<res.size(); ++i) {
       g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i), false) << ";\n";
+      res_null.push_back(res[i]==-1);
     }
 
     // Call function

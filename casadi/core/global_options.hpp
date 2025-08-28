@@ -83,6 +83,8 @@ namespace casadi {
 
       static bool feature_ve;
 
+
+      static bool feature_loops;
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -124,6 +126,10 @@ namespace casadi {
 
       static void setFeatureVE(bool mode) { feature_ve = mode; }
       static bool getFeatureVE() { return feature_ve; }
+
+
+      static void setFeatureLoops(bool mode) { feature_loops = mode; }
+      static bool getFeatureLoops() { return feature_loops; }
 
   };
 

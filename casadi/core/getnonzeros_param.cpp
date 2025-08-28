@@ -378,7 +378,7 @@ namespace casadi {
         g << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) << "[i] : " << g.constant(nan) << ";\n";
       } else {
         g << g.work(res[0], nnz(), true) << " = " << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
-        g << " + " << inner_.start << " + (int)" << g.workel(arg[1]) << ";\n";
+        g << " + " << inner_.start << " + (int) " << g.workel(arg[1]) << ";\n";
         res_is_ref[0] = true;
       }
     } else {
