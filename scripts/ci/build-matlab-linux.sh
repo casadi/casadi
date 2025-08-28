@@ -40,11 +40,10 @@ cmake --preset conan-matlab-release \
     -D CMAKE_FIND_ROOT_PATH="$matlab_dir" \
     -D CMAKE_C_COMPILER_LAUNCHER=sccache \
     -D CMAKE_CXX_COMPILER_LAUNCHER=sccache \
-    -D CMAKE_INSTALL_PREFIX="/" \
     -D ALPAQA_INSTALL_MEXDIR="/" \
     -D ALPAQA_INSTALL_LIBDIR="/alpaqa.lib" --fresh
 cmake --build --preset conan-matlab-release -v
-for component in lib casadi extra mex_interface; do
+for component in lib casadi extra matlab; do
     DESTDIR="$out_dir" \
     cmake --install build/matlab-release --component $component
 done

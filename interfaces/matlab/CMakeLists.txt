@@ -50,10 +50,10 @@ if (ALPAQA_STANDALONE)
                OUTPUT_VARIABLE ALPAQA_INSTALL_LIBRELMEXDIR)
     if (APPLE)
         set_target_properties(alpaqa_mex PROPERTIES INSTALL_RPATH
-            "@loader_path;@loader_path/lib;@loader_path/${ALPAQA_INSTALL_LIBRELMEXDIR}")
+            "@loader_path;@loader_path/${ALPAQA_INSTALL_LIBRELMEXDIR}")
     else()
         set_target_properties(alpaqa_mex PROPERTIES INSTALL_RPATH
-            "$ORIGIN;$ORIGIN/lib;$ORIGIN/${ALPAQA_INSTALL_LIBRELMEXDIR}")
+            "$ORIGIN;$ORIGIN/${ALPAQA_INSTALL_LIBRELMEXDIR}")
     endif()
 endif()
 
