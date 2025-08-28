@@ -32,30 +32,29 @@ git clone https://github.com/kul-optec/alpaqa --branch=1.0.0a19 --single-branch
 conan export alpaqa
 ```
 
+Download Conan recipes for the dependencies:
+
+```sh
+git clone https://github.com/tttapa/conan-recipes
+conan remote add tttapa-conan-recipes "$PWD/conan-recipes"
+```
+
 Build and install the dependencies for the example project:
 
 ```sh
 cd alpaqa/examples/CMake/Solver
-conan install . --build=missing
-```
-
-Configure and build the example project:
-
-```sh
-# Linux/macOS (single-configuration generator)
-cmake --preset conan-release
-cmake --build --preset conan-release -j
-```
-```sh
-# Windows (multi-configuration generator)
-cmake --preset conan-default
-cmake --build --preset conan-release -j
+conan build . --build=missing
 ```
 
 Run the example:
 
 ```sh
 ./build/Release/alpaqa-qp-solver data
+```
+
+If you make any changes to the example, you can rebuild it using CMake:
+```sh
+cmake --build --preset conan-release -j
 ```
 
 ---
