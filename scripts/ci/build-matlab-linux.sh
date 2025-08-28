@@ -18,6 +18,9 @@ matlab_profile="$PWD/profile-matlab.local.conan"
 cat <<- EOF > "$matlab_profile"
 include($PWD/scripts/ci/profiles/$triple.profile)
 include($PWD/scripts/ci/profiles/alpaqa-matlab.profile)
+[conf]
+tools.build:exelinkflags+=["-static-libgcc"]
+tools.build:sharedlinkflags+=["-static-libgcc"]
 EOF
 
 # Install dependencies
