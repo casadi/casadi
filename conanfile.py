@@ -11,7 +11,7 @@ class AlpaqaRecipe(ConanFile):
     version = "1.0.0-alpha.21"
 
     # Optional metadata
-    license = "LGPLv3"
+    license = "LGPL-3.0-or-later"
     author = "Pieter P <pieter.p.dev@outlook.com>"
     url = "https://github.com/kul-optec/alpaqa"
     description = (
