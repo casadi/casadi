@@ -45,6 +45,7 @@ class AlpaqaRecipe(ConanFile):
         "dont_parallelize_eigen": True,
         "no_dlclose": False,
         "with_blas": False,
+        "with_coverage": False,
     }
     options = (
         {
@@ -113,6 +114,10 @@ class AlpaqaRecipe(ConanFile):
                 "MATLAB MEX interface requires CasADi. Set 'with_external_casadi=True'."
             )
             raise ConanInvalidConfiguration(msg)
+        
+    def configure(self):
+        if self.options.get_safe("with_quad_precision"):
+            self.options["guanaqo/*"].with_quad_precision = True
 
     def layout(self):
         if self.folders.build_folder_vars is None:

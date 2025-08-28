@@ -29,12 +29,15 @@ dynamic = ["version", "description"]
 [project.optional-dependencies]
 casadi = ["casadi~=3.7.1", "cmake>=3.28,<5", "ninja>=1.11.1,<2"]
 docs = [
-    "breathe~=4.35.0",
-    "sphinx>=7.2.2,<8",
-    "sphinx-tabs~=3.4.4",
-    "sphinxcontrib-matlabdomain~=0.20.2",
-    "sphinxcontrib-moderncmakedomain~=3.27.0",
-    "furo==2023.08.19",
+    "breathe~=4.36.0",
+    "sphinx~=8.2.3",
+    "sphinx-tabs~=3.4.7",
+    "sphinxcontrib-matlabdomain~=0.22.1",
+    "sphinxcontrib-moderncmakedomain~=3.29.0",
+    "furo==2025.7.19",
+    "casadi~=3.7.1",
+    "cmake>=3.28,<5",
+    "ninja>=1.11.1,<2",
     "matplotlib",
 ]
 debug = ["alpaqa-debug==1.0.0a21.dev0"]

@@ -40,27 +40,24 @@ function run_doxygen_coverage {
 	GENERATE_LATEX = NO
 	EOF
 
-    # See if we're cross-compiling and add dependencies to CMake's search path
-    if [ -n "$CMAKE_TOOLCHAIN_FILE" ]; then
-        pfx="$(dirname "$CMAKE_TOOLCHAIN_FILE")"
-        extra_cmake_opts=("-D" "CMAKE_FIND_ROOT_PATH=$pfx/pybind11;$pfx/eigen-master;$pfx/casadi;$pfx/googletest")
-    fi
-
-    # Configure the project
-    cmake -S. -B"$tmpdir/build" \
-        -G "Ninja" \
-        -DALPAQA_WITH_COVERAGE=On \
-        -DALPAQA_WITH_TESTS=On \
-        -DALPAQA_FORCE_TEST_DISCOVERY=On \
-        -DALPAQA_WITH_QUAD_PRECISION=On \
-        -DALPAQA_WITH_PYTHON=Off \
-        -DALPAQA_WITH_EXAMPLES=Off \
-        -DALPAQA_WITH_CASADI=On \
-        -DALPAQA_DOXYFILE="$tmpdir/tmp-Doxyfile" \
-        ${extra_cmake_opts[@]}
+    # Install dependencies
+    conan build . -pr scripts/ci/profiles/x86_64-bionic-linux-gnu.profile \
+        --build=missing \
+        -s \&:build_type=Debug \
+        -c \*:tools.build:skip_test=True \
+        -c \&:tools.build:skip_test=False \
+        -c \&:tools.build.cross_building:can_run=true \
+        -c \&:tools.cmake.cmaketoolchain:generator=Ninja \
+        -c \&:tools.cmake.cmaketoolchain:extra_variables="{\"ALPAQA_DOXYFILE\": \"$tmpdir/tmp-Doxyfile\"}" \
+        -c \&:tools.cmake.cmake_layout:build_folder_vars="['const.docs']" \
+        -o \&:with_coverage=True \
+        -o \&:with_quad_precision=False \
+        -o \&:with_examples=False \
+        -o \&:with_casadi=True \
+        -o \&:with_cutest=True
 
     # Generate the Doxygen C++ documentation
-    cmake --build "$tmpdir/build" -t docs
+    cmake --build --preset conan-docs-debug -t docs
 
     # Need to support old links to modules.html
     [ -e "$outdir/$htmldir/modules.html" ] || \
@@ -76,7 +73,7 @@ function run_doxygen_coverage {
 	EOF
 
     # Generate the Sphinx Python & C++ documentation
-    cmake --build "$tmpdir/build" -t docs
+    cmake --build --preset conan-docs-debug -t docs
     sphinx-build -b doctest -j auto -D "breathe_projects.alpaqa=$tmpdir/xml" \
         doxygen/sphinx/source "$sphinxdir" \
     || echo -e "\n##################\n# DOCTEST FAILED #\n##################\n"
@@ -84,7 +81,7 @@ function run_doxygen_coverage {
         doxygen/sphinx/source "$sphinxdir"
 
     # Generate coverage report
-    cmake --build "$tmpdir/build" -j -t coverage
+    cmake --build --preset conan-docs-debug -t coverage
     mv docs/Coverage "$covdir"
 
     # Cleanup

@@ -1,3 +1,6 @@
+[settings]
+casadi/*:build_type=Release
+
 [conf]
 tools.build:skip_test=True
 tools.build:cflags+=["-fdiagnostics-color"]

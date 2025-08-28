@@ -12,175 +12,80 @@ on:
 env:
   PACKAGE_VERSION: "1.0.0a21.dev0"
   PACKAGE_NAME: alpaqa
-  PYTHON_VERSION: '3.11'
 
 jobs:
   build-linux:
-    # TODO: port valgrind tests to new Conan-based toolchain
-    if: false
     runs-on: ubuntu-latest
-    container: ubuntu:jammy
     strategy:
       matrix:
-        config: [RelWithDebInfo, Debug]
-    env:
-      HOST: 'x86_64-centos7-linux-gnu'
-      CMAKE_C_COMPILER_LAUNCHER: ccache
-      CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      CCACHE_DIR: /root/.ccache
+        config: [relwithdebinfo, debug]
     steps:
-      # Git clone
-      - name: Install git
-        run: apt -y update && apt -y install --no-install-recommends git ca-certificates
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Conan
+        uses: ./.github/workflows/setup-conan
         with:
-          submodules: recursive
-      # Tools
-      - name: Install tools
-        uses: ./.github/workflows/toolchain
-        with:
-          host: ${{ env.HOST }}
-          python-version: ${{ env.PYTHON_VERSION }}
-          pypy: ''
-      # Ccache
-      - name: Prepare ccache directory
-        run: mkdir -p "${{ env.CCACHE_DIR }}"
-      - name: Cache ccache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ env.HOST }}-${{ matrix.config }}-ccache-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ env.HOST }}-${{ matrix.config }}-ccache
-      # Pip install dependencies
-      - name: Install Python dependencies
-        run: python${{ env.PYTHON_VERSION }} -m pip install -U pip build
-      # Build
-      - name: Build wheel
-        run: |
-          host="${{ env.HOST }}"
-          staging="/opt/$host"
-          cat > ninja-${{ matrix.config }}.cross.toml <<- EOF
-          [cmake]
-          build_args = ["1"]
-          config = ["${{ matrix.config }}"]
-          generator = "Ninja Multi-Config"
-          [cmake.options]
-          CMAKE_FIND_ROOT_PATH = "$staging/pybind11-2.11.1;$staging/eigen-master;$staging/casadi"
-          ALPAQA_WITH_CUTEST = "On"
-          ALPAQA_WITH_EXTERNAL_CASADI = "On"
-          EOF
-          python${{ env.PYTHON_VERSION }} -m build -w . \
-              -C--cross="$PWD/ninja-${{ matrix.config }}.cross.toml" \
-              -C--cross="$staging/$host.py-build-cmake.cross.toml"
-        env:
-          CFLAGS: "-fstack-protector-all -mshstk -fcf-protection=full -D_FORTIFY_SOURCE=${{ matrix.config != 'Debug' && '3' || '0' }} -fdiagnostics-color"
-          CXXFLAGS: "-fstack-protector-all -mshstk -fcf-protection=full -D_FORTIFY_SOURCE=${{ matrix.config != 'Debug' && '3' || '0' }} -fdiagnostics-color -static-libstdc++"
-      # Upload
-      - name: Upload Wheels
+          python-version: '3.12'
+          cache-key: build-sdist
+
+      - name: Build Wheel package
+        run: ./scripts/ci/build-linux-hardened.sh . dist ${{ matrix.config }}
+
+      - name: Upload Wheel
         uses: actions/upload-artifact@v4
         with:
-          name: whl-${{ env.PYTHON_VERSION }}-${{ matrix.config }}-linux-test
-          retention-days: 1
+          name: hardened-wheels-${{ matrix.config }}
           path: dist/*.whl
+          retention-days: 1
+
+      - run: conan cache clean
 
   test-linux:
-    if: false
     needs: [build-linux]
     runs-on: ubuntu-latest
-    container: python:3.11-bullseye
+    container: python:3.12-trixie
     strategy:
       matrix:
-        config: [RelWithDebInfo, Debug]
+        config: [relwithdebinfo, debug]
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Download wheels
+        uses: actions/download-artifact@v4
         with:
-          submodules: recursive
-      - uses: actions/download-artifact@v4
-        with:
-          name: whl-${{ env.PYTHON_VERSION }}-${{ matrix.config }}-linux-test
+          name: hardened-wheels-${{ matrix.config }}
           path: dist
+
+      - name: Install Valgrind, libgfortran
+        run: apt-get update && apt-get install -y valgrind libgfortran5 --no-install-recommends
+
       - name: Install test dependencies
-        run: |
-          python3 -m pip install -U pip cmake ninja twine
-          python3 -m pip install --find-links=dist "${PACKAGE_NAME}[test]==${PACKAGE_VERSION}"
+        run: python3 -m pip install -U pip cmake ninja twine
+      - name: Install
+        run: python3 -m pip install --find-links=dist "${PACKAGE_NAME}[test]==${PACKAGE_VERSION}"
+
       - name: Test (${{ matrix.config }})
         run: python3 -m pytest -rP
         env:
-          ALPAQA_PYTHON_DEBUG: ${{ matrix.config == 'Debug' }}
-      - name: Install Valgrind
-        run: |
-          apt update
-          apt install -y valgrind --no-install-recommends
+          ALPAQA_PYTHON_DEBUG: ${{ matrix.config == 'debug' }}
+
       - name: Test (Valgrind, ${{ matrix.config }})
         run: valgrind --gen-suppressions=all --suppressions=scripts/valgrind/python.supp --error-exitcode=234 python3 -m pytest -rP
         env:
-          ALPAQA_PYTHON_DEBUG: ${{ matrix.config == 'Debug' }}
+          ALPAQA_PYTHON_DEBUG: ${{ matrix.config == 'debug' }}
+
       - name: Check Wheel metadata
         run: python -m twine check dist/*.whl
 
   build-macos:
     if: false
-    runs-on: macos-13
+    runs-on: macos-latest
     env:
-      CMAKE_C_COMPILER_LAUNCHER: ccache
-      CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      CCACHE_DIR: /tmp/.ccache
-      DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
-      MACOSX_DEPLOYMENT_TARGET: '10.15'
+      MACOSX_DEPLOYMENT_TARGET: '11.0'
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - uses: actions/setup-python@v5
-        id: python
-        name: Install Python
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-      - name: Install ccache
-        run: brew install ccache && ccache --version
-      - name: Prepare ccache directory
-        run: mkdir -p "${{ env.CCACHE_DIR }}"
-      - name: Cache ccache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-ccache-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-ccache
-      - name: Cache Virtual Environment
-        id: cache-venv
-        uses: actions/cache@v4
-        with:
-          path: py-venv
-          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ hashFiles('scripts/install-eigen.sh', 'scripts/install-casadi-static.sh') }}
-      - name: Install Python dependencies 
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          python -m venv py-venv
-          source ./py-venv/bin/activate
-          python -m pip install -U pip build cmake ninja
-          ./scripts/install-eigen.sh
-          ./scripts/install-casadi-static.sh
-      - name: Disable Fortran
-        run: |
-          cat > py-build-cmake.local.toml <<- EOF
-          [cmake.options]
-          CMAKE_Fortran_COMPILER = "NOTFOUND"
-          ALPAQA_WITH_EXTERNAL_CASADI = "On"
-          EOF
-        shell: bash
-      - name: Build
-        run: |
-          source ./py-venv/bin/activate
-          CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH" \
-          _PYTHON_HOST_PLATFORM='macosx-10.15-universal2' \
-          ARCHFLAGS='-arch arm64 -arch x86_64' \
-              python -m build -w .
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: whl-macos
-          retention-days: 1
-          path: dist/*.whl
 
   build-windows:
     if: false
@@ -190,107 +95,44 @@ jobs:
         arch: ['AMD64']
         python-id: ['cp310-*']
     env:
-      CXXFLAGS: "/bigobj"
-      CFLAGS: "/bigobj"
       PYTHONUTF8: 1
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Cache dependencies
-        id: cache-dep
-        uses: actions/cache@v4
-        with:
-          path: deps
-          key: deps-${{ runner.os }}-${{ matrix.arch }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-static.ps1') }}
-      - name: Install Python dependencies
-        if: steps.cache-dep.outputs.cache-hit != 'true'
-        shell: powershell
-        run: |
-          mkdir $env:VIRTUAL_ENV
-          ./scripts/install-eigen.ps1
-          ./scripts/install-casadi-static.ps1
-        env:
-          VIRTUAL_ENV: ${{ github.workspace }}/deps
-          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/scripts/toolchains/Win-${{ matrix.arch }}.cmake
-      - name: Disable Fortran
-        run: |
-          cat > py-build-cmake.local.toml <<- EOF
-          [cmake.options]
-          CMAKE_Fortran_COMPILER = "NOTFOUND"
-          ALPAQA_WITH_EXTERNAL_CASADI = "On"
-          EOF
-        shell: bash
-      - name: Build wheels
-        uses: pypa/cibuildwheel@8d945475ac4b1aac4ae08b2fd27db9917158b6ce
-        with:
-          output-dir: dist
-        env:
-          CIBW_BUILD: ${{ matrix.python-id }}
-          CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_TEST_SKIP: "*-{win32,win_arm64} pp*" # no CasADi binaries
-          CMAKE_PREFIX_PATH: ${{ github.workspace }}/deps
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: whl-windows
-          retention-days: 1
-          path: dist/*.whl
 
   docs:
-    # TODO: port docs to new Conan-based toolchain
-    if: false
     needs: [build-linux]
     runs-on: ubuntu-latest
-    container: ubuntu:jammy
-    env:
-      HOST: 'x86_64-centos7-linux-gnu'
-      CMAKE_C_COMPILER_LAUNCHER: ccache
-      CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      CCACHE_DIR: /root/.ccache
     steps:
       # Necessary tools
       - name: Install git and other tools
         run: |
-          apt -y update
-          apt -y install --no-install-recommends \
+          sudo apt-get -y update
+          sudo apt-get -y install --no-install-recommends \
               git ca-certificates make \
               texlive-bibtex-extra graphviz \
               libcapture-tiny-perl libdatetime-perl libdevel-cover-perl \
               libdigest-md5-file-perl libjson-xs-perl perl
       # Git clone
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - run: git config --global --add safe.directory $GITHUB_WORKSPACE
-      # Tools
-      - name: Install tools
-        uses: ./.github/workflows/toolchain
+      # Conan
+      - name: Set up Conan
+        uses: ./.github/workflows/setup-conan
         with:
-          host: ${{ env.HOST }}
-          python-version: ${{ env.PYTHON_VERSION }}
-          pypy: ''
+          python-version: '3.12'
+          cache-key: docs
       # Doxygen
       - name: Install Doxygen
         run: >
-          wget -O- https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz | 
-          tar xz -C /usr/local/bin doxygen-1.9.8/bin/doxygen --strip-components=2
+          wget -O- https://github.com/doxygen/doxygen/releases/download/Release_1_14_0/doxygen-1.14.0.linux.bin.tar.gz | 
+          sudo tar xz -C /usr/local/bin doxygen-1.14.0/bin/doxygen --strip-components=2
       # LCOV
       - name: Install LCOV
         run: |
-          git clone --single-branch --depth=1 --branch "v2.0" \
+          git clone --single-branch --depth=1 --branch "v2.3.2" \
               https://github.com/linux-test-project/lcov.git
-          make -C lcov install PREFIX="/usr/local"
+          sudo make -C lcov install PREFIX="/usr/local"
         working-directory: /tmp
-      # Ccache
-      - name: Prepare ccache directory
-        run: mkdir -p "${{ env.CCACHE_DIR }}"
-      - name: Cache ccache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ env.HOST }}-docs-ccache-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ env.HOST }}-docs-ccache
       # Create a copy of the repo in /tmp/staging.
       # Create the `gh-pages` branch if it doesn't exist already, check it out.
       - name: Create staging area
@@ -302,27 +144,23 @@ jobs:
           git fetch origin gh-pages:gh-pages ||:
           git checkout gh-pages || \
           { git checkout --orphan gh-pages && git rm -rf . && git clean -fxd ; }
-          echo -e 'bib*.aux\ncitelist.doc*' > .gitignore
+          echo -e 'bib*.aux\ncitelist.doc*\npy-build-cmake' > .gitignore
       # Download and install package, Install dependencies for generating docs
-      - uses: actions/download-artifact@v4
+      - name: Download wheels
+        uses: actions/download-artifact@v4
         with:
-          name: whl-${{ env.PYTHON_VERSION }}-RelWithDebInfo-linux-test
+          name: hardened-wheels-relwithdebinfo
           path: dist
       - name: Install dependencies
         run: |
-          python${{ env.PYTHON_VERSION }} -m pip install -U pip
-          python${{ env.PYTHON_VERSION }} -m pip install --find-links=dist "${PACKAGE_NAME}[docs]==${PACKAGE_VERSION}"
-          python${{ env.PYTHON_VERSION }} -m pip install -r doxygen/requirements.txt
+          python3.12 -m pip install -U pip
+          python3.12 -m pip install --find-links=dist "${PACKAGE_NAME}[docs]==${PACKAGE_VERSION}"
+          python3.12 -m pip install -r doxygen/requirements.txt
       # Generate the documentation and save it in /tmp/staging
       - name: Generate documentation
         run: |
           ./doxygen/scripts/gen-docs.sh /tmp/staging
           ./doxygen/scripts/gen-docs-index.sh /tmp/staging md
-        env:
-          CMAKE_TOOLCHAIN_FILE: /opt/${{ env.HOST }}/${{ env.HOST }}.toolchain.cmake
-          GCOV_BIN: /opt/${{ env.HOST }}/x-tools/${{ env.HOST }}/bin/${{ env.HOST }}-gcov
-          CPPFILT_BIN: /opt/${{ env.HOST }}/x-tools/${{ env.HOST }}/bin/${{ env.HOST }}-c++filt
-          LD_LIBRARY_PATH: "/opt/${{ env.HOST }}/x-tools/${{ env.HOST }}/${{ env.HOST }}/lib64"
       # Commit the new documentation, squash the commits, and push it to GitHub
       - name: Commit and push documention
         run: |

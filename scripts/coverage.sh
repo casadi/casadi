@@ -19,10 +19,16 @@ rm -rf "$html_dest/*"
 
 compiler="${1,,}"
 version="${2%%.*}"
+compiler_path="${3}"
+
+if [[ "$compiler_path" == *"-g++" ]]; then
+    GCOV_BIN="${compiler_path%-g\+\+}-gcov"
+    CPPFILT_BIN="${compiler_path%-g\+\+}-c++filt"
+fi
 
 if [ -n "$version" ]; then version="-${version}"; fi
 
-echo "Compiler: ${compiler}${version}"
+echo "Compiler: ${compiler}${version} (${compiler_path})"
 
 # If the compiler is Clang, use a wrapper around llvm-cov that emulates gcov
 if [ -n "$GCOV_BIN" ]; then
@@ -70,7 +76,8 @@ lcov \
     --include "$proj_dir"'/src/interop/**' \
     --output-file "$dest"/coverage_test.info \
     "${gcov_tool[@]}" \
-    --rc branch_coverage=$branches
+    --rc branch_coverage=$branches \
+    --rc check_data_consistency=0
 
 # Combine captures
 lcov \
@@ -78,7 +85,8 @@ lcov \
     --add-tracefile "$dest"/coverage_test.info \
     --output-file "$dest"/coverage_total.info \
     "${gcov_tool[@]}" \
-    --rc branch_coverage=$branches
+    --rc branch_coverage=$branches \
+    --ignore-errors corrupt,inconsistent
 
 # Generate HTML coverage report
 genhtml \

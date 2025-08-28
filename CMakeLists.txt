@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.25...4.1)
+set(CMAKE_CXX_SCAN_FOR_MODULES Off)
 project(alpaqa
     VERSION 1.0.0
     DESCRIPTION "alpaqa augmented Lagrangian nonlinear programming solvers."
@@ -136,7 +137,9 @@ if (ALPAQA_WITH_COVERAGE)
     add_custom_target(coverage
         ${CMAKE_CURRENT_LIST_DIR}/scripts/coverage.sh
         ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+        ${CMAKE_CXX_COMPILER}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        USES_TERMINAL)
     add_compile_options("--coverage")
     add_link_options("--coverage")
     add_dependencies(coverage alpaqa::tests)

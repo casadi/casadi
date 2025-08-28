@@ -1,7 +1,1 @@
-breathe @ git+https://github.com/tttapa/breathe@main
-sphinx @ git+https://github.com/tttapa/sphinx@master
-sphinx-tabs~=3.4.4
-sphinxcontrib-matlabdomain~=0.20.2
-sphinxcontrib-moderncmakedomain~=3.27.0
-furo==2023.08.19
-matplotlib
+sphinx @ git+https://github.com/tttapa/sphinx@unicode-cpp
