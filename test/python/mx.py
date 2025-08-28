@@ -4270,17 +4270,17 @@ class MXtests(casadiTestCase):
     u = vertcat(x,y)
     DM.rng(1)
     u0 = DM.rand(4,1)
-    f = Function('f',[x,y],[sin(x+y)],{"never_inline":True})
+    f = Function('mapf',[x,y],[sin(x+y)],{"never_inline":True})
     
-    g = Function('g',[x],[cos(3*sum(x))],{"never_inline":True})
+    g = Function('mapg',[x],[cos(3*sum(x))],{"never_inline":True})
     
-    e = g(f(x/y,2*x*y)*x)/(x+y)
+    e = vertcat(g(f(x/y,2*x*y)*x)/(x+y),x-y)
 
     res = extract([e],{"lift_shared":False,"lift_calls":True})
     
     [vexpr,v,vdef] = res
     
-    print(vexpr)
+    print("vexpr",vexpr)
     print(v)
     print(vdef)
 

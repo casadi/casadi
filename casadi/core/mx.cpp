@@ -1855,13 +1855,17 @@ namespace casadi {
       std::vector<std::pair<casadi_int, casadi_int> >::const_iterator replace_it=replace.begin();
       // Arguments for calling the atomic operations
       std::vector<MX> oarg, ores;
+
+    // Allocate storage for split ex
+    std::vector<std::vector<MX>> ex_split(ex.size());
+    for (casadi_int i = 0; i < ex_split.size(); ++i) ex_split[i] = ex[i].primitives();
+
       // Evaluate the algorithm
       k = 0;
       for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
         switch (it->op) {
         case OP_OUTPUT:
-          casadi_assert(it->data->segment()==0, "Not implemented");
-          ex[it->data->ind()] = work[it->arg.front()];
+          ex_split[it->data->ind()].at(it->data->segment()) = work[it->arg.front()];
           break;
         case OP_CONST:
           work[it->res.front()] = it->data;
@@ -1921,6 +1925,12 @@ namespace casadi {
           }
         }
       }
+
+      // Join primitives
+      for (size_t k = 0; k < ex_split.size(); ++k) {
+        ex[k] = ex[k].join_primitives(ex_split.at(k));
+      }
+
       // Ensure all nodes have been replaced
       casadi_assert(replace_it == replace.end(), "Consistency check failed");
     } catch (std::exception& e) {
