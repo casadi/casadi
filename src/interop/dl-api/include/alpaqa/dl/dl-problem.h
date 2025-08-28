@@ -18,13 +18,8 @@
 
 #ifdef __cplusplus
 extern "C" {
-#define ALPAQA_BEGIN_STRUCT(name) struct name
-#define ALPAQA_END_STRUCT(name)
-#define ALPAQA_DEFAULT(...)                                                    \
-    { __VA_ARGS__ }
+#define ALPAQA_DEFAULT(...) {__VA_ARGS__}
 #else
-#define ALPAQA_BEGIN_STRUCT(name) typedef struct
-#define ALPAQA_END_STRUCT(name) name
 #define ALPAQA_DEFAULT(...)
 #endif
 
@@ -62,15 +57,15 @@ typedef enum {
 } alpaqa_register_arg_type_t;
 
 /// User-provided argument that is passed to the problem registration functions.
-ALPAQA_BEGIN_STRUCT(alpaqa_register_arg_t) {
+struct alpaqa_register_arg_t {
     /// Pointer to the user-provided argument passed to the problem registration
     /// functions. Use the @ref type member to determine its type.
     void *data ALPAQA_DEFAULT(nullptr);
     /// Specifies the type of the data pointed to by @ref data.
-    alpaqa_register_arg_type_t type ALPAQA_DEFAULT(
-        alpaqa_register_arg_unspecified);
-}
-ALPAQA_END_STRUCT(alpaqa_register_arg_t);
+    alpaqa_register_arg_type_t
+        type ALPAQA_DEFAULT(alpaqa_register_arg_unspecified);
+};
+typedef struct alpaqa_register_arg_t alpaqa_register_arg_t;
 
 /// @see @ref alpaqa::sparsity::Symmetry
 typedef enum {
@@ -80,11 +75,11 @@ typedef enum {
 } alpaqa_symmetry;
 
 /// @see @ref alpaqa::sparsity::Dense
-ALPAQA_BEGIN_STRUCT(alpaqa_dense_t) {
+struct alpaqa_dense_t {
     alpaqa_length_t rows ALPAQA_DEFAULT(0), cols ALPAQA_DEFAULT(0);
     alpaqa_symmetry symmetry ALPAQA_DEFAULT(alpaqa_unsymmetric);
-}
-ALPAQA_END_STRUCT(alpaqa_dense_t);
+};
+typedef struct alpaqa_dense_t alpaqa_dense_t;
 
 /// @see @ref alpaqa::sparsity::SparseCSC
 typedef struct {
@@ -207,7 +202,7 @@ typedef struct {
 
 /// C API providing function pointers to problem functions.
 /// Used by @ref alpaqa::dl::DLProblem.
-ALPAQA_BEGIN_STRUCT(alpaqa_problem_functions_t) {
+struct alpaqa_problem_functions_t {
     /// Number of decision variables.
     /// @see @ref alpaqa::TypeErasedProblem::get_num_variables()
     alpaqa_length_t num_variables ALPAQA_DEFAULT(0);
@@ -433,8 +428,8 @@ ALPAQA_BEGIN_STRUCT(alpaqa_problem_functions_t) {
         alpaqa_real_t *lambda,
         alpaqa_length_t *size) ALPAQA_DEFAULT(nullptr);
     // clang-format on
-}
-ALPAQA_END_STRUCT(alpaqa_problem_functions_t);
+};
+typedef struct alpaqa_problem_functions_t alpaqa_problem_functions_t;
 
 /// Opaque type for a C++-only map of extra functions.
 typedef struct alpaqa_function_dict_s alpaqa_function_dict_t;
@@ -445,7 +440,7 @@ typedef struct alpaqa_exception_ptr_s alpaqa_exception_ptr_t;
 ///       to your instance to the @ref ALPAQA_PROBLEM_REGISTER_INIT macro.
 ///       In C++, this is not necessary, because all members have default
 ///       initializers.
-ALPAQA_BEGIN_STRUCT(alpaqa_problem_register_t) {
+struct alpaqa_problem_register_t {
     /// To check whether the loaded problem is compatible with the version of
     /// the solver.
     alpaqa_dl_abi_version_t abi_version ALPAQA_DEFAULT(ALPAQA_DL_ABI_VERSION);
@@ -461,10 +456,10 @@ ALPAQA_BEGIN_STRUCT(alpaqa_problem_register_t) {
     alpaqa_function_dict_t *extra_functions ALPAQA_DEFAULT(nullptr);
     /// Pointer to an exception that ocurred during problem creation.
     alpaqa_exception_ptr_t *exception ALPAQA_DEFAULT(nullptr);
-}
-ALPAQA_END_STRUCT(alpaqa_problem_register_t);
+};
+typedef struct alpaqa_problem_register_t alpaqa_problem_register_t;
 
-ALPAQA_BEGIN_STRUCT(alpaqa_control_problem_functions_t) {
+struct alpaqa_control_problem_functions_t {
     alpaqa_length_t N ALPAQA_DEFAULT(0), nx ALPAQA_DEFAULT(0),
         nu ALPAQA_DEFAULT(0), nh ALPAQA_DEFAULT(0), nh_N ALPAQA_DEFAULT(0),
         nc ALPAQA_DEFAULT(0), nc_N ALPAQA_DEFAULT(0);
@@ -614,14 +609,15 @@ ALPAQA_BEGIN_STRUCT(alpaqa_control_problem_functions_t) {
         const alpaqa_real_t *M,
         alpaqa_real_t *out) ALPAQA_DEFAULT(nullptr);
     // clang-format on
-}
-ALPAQA_END_STRUCT(alpaqa_control_problem_functions_t);
+};
+typedef struct alpaqa_control_problem_functions_t
+    alpaqa_control_problem_functions_t;
 
 /// @note When used in C, you should initialize this struct by passing a pointer
 ///       to your instance to the @ref ALPAQA_PROBLEM_REGISTER_INIT macro.
 ///       In C++, this is not necessary, because all members have default
 ///       initializers.
-ALPAQA_BEGIN_STRUCT(alpaqa_control_problem_register_t) {
+struct alpaqa_control_problem_register_t {
     /// To check whether the loaded problem is compatible with the version of
     /// the solver.
     alpaqa_dl_abi_version_t abi_version ALPAQA_DEFAULT(ALPAQA_DL_ABI_VERSION);
@@ -635,8 +631,9 @@ ALPAQA_BEGIN_STRUCT(alpaqa_control_problem_register_t) {
     alpaqa_function_dict_t *extra_functions ALPAQA_DEFAULT(nullptr);
     /// Pointer to an exception that ocurred during problem creation.
     alpaqa_exception_ptr_t *exception ALPAQA_DEFAULT(nullptr);
-}
-ALPAQA_END_STRUCT(alpaqa_control_problem_register_t);
+};
+typedef struct alpaqa_control_problem_register_t
+    alpaqa_control_problem_register_t;
 
 #ifdef __cplusplus
 }
