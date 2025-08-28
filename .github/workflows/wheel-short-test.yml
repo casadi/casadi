@@ -144,7 +144,7 @@ jobs:
           git fetch origin gh-pages:gh-pages ||:
           git checkout gh-pages || \
           { git checkout --orphan gh-pages && git rm -rf . && git clean -fxd ; }
-          echo -e 'bib*.aux\ncitelist.doc*\npy-build-cmake' > .gitignore
+          echo -e 'bib*.aux\ncitelist.doc*\npy-build-cmake\n.conan2\nbuild' > .gitignore
       # Download and install package, Install dependencies for generating docs
       - name: Download wheels
         uses: actions/download-artifact@v4

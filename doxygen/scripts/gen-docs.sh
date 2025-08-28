@@ -40,21 +40,30 @@ function run_doxygen_coverage {
 	GENERATE_LATEX = NO
 	EOF
 
+    # Tweak Conan profile
+    cat <<- EOF > "$tmpdir/docs.profile"
+	include($PWD/scripts/ci/profiles/x86_64-bionic-linux-gnu.profile)
+	[settings]
+	&:build_type=Debug
+	[conf]
+	*:tools.build:skip_test=True
+	&:tools.build:skip_test=False
+	&:tools.build.cross_building:can_run=True
+	&:tools.cmake.cmaketoolchain:generator=Ninja
+	&:tools.cmake.cmaketoolchain:extra_variables*={"ALPAQA_DOXYFILE": "$tmpdir/tmp-Doxyfile"}
+	&:tools.cmake.cmaketoolchain:extra_variables*={"CMAKE_C_COMPILER_LAUNCHER": "sccache"}
+	&:tools.cmake.cmaketoolchain:extra_variables*={"CMAKE_CXX_COMPILER_LAUNCHER": "sccache"}
+	&:tools.cmake.cmake_layout:build_folder_vars=['const.docs']
+	[options]
+	&:with_coverage=True
+	&:with_quad_precision=False
+	&:with_examples=False
+	&:with_casadi=True
+	&:with_cutest=True
+	EOF
+
     # Install dependencies
-    conan build . -pr scripts/ci/profiles/x86_64-bionic-linux-gnu.profile \
-        --build=missing \
-        -s \&:build_type=Debug \
-        -c \*:tools.build:skip_test=True \
-        -c \&:tools.build:skip_test=False \
-        -c \&:tools.build.cross_building:can_run=true \
-        -c \&:tools.cmake.cmaketoolchain:generator=Ninja \
-        -c \&:tools.cmake.cmaketoolchain:extra_variables="{\"ALPAQA_DOXYFILE\": \"$tmpdir/tmp-Doxyfile\"}" \
-        -c \&:tools.cmake.cmake_layout:build_folder_vars="['const.docs']" \
-        -o \&:with_coverage=True \
-        -o \&:with_quad_precision=False \
-        -o \&:with_examples=False \
-        -o \&:with_casadi=True \
-        -o \&:with_cutest=True
+    conan build . -pr "$tmpdir/docs.profile" --build=missing
 
     # Generate the Doxygen C++ documentation
     cmake --build --preset conan-docs-debug -t docs
