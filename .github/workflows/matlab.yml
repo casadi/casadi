@@ -47,7 +47,7 @@ jobs:
 
     - name: Build
       run: >
-        bash scripts/ci/build-matlab-linux.sh
+        bash scripts/ci/build-matlab.sh
         "${{ steps.matlab.outputs.matlabroot }}" ${{ matrix.host }} . staging
 
     - name: Package

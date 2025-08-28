@@ -21,10 +21,14 @@ include($PWD/scripts/ci/profiles/$triple.profile)
 include($PWD/scripts/ci/profiles/alpaqa-matlab.profile)
 [options]
 alpaqa/*:shared=$shared
-[conf]
-tools.build:exelinkflags+=["-static-libgcc"]
-tools.build:sharedlinkflags+=["-static-libgcc"]
 EOF
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    cat <<- EOF >> "$matlab_profile"
+	[conf]
+	tools.build:exelinkflags+=["-static-libgcc"]
+	tools.build:sharedlinkflags+=["-static-libgcc"]
+	EOF
+fi
 
 # Install dependencies
 rm -rf "$pkg_dir"/build/matlab-{debug,release}/{generators,CMakeCache.txt}
