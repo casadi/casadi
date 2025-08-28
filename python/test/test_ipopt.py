@@ -18,7 +18,7 @@ def test_ipopt_pyapi_compile():
     f = 0.5 * x.T @ Q @ x
     g = x
     D = [-np.inf, 0.5], [+np.inf, +np.inf]
-    p = pa.minimize(f, x).subject_to(g, D).compile(second_order="full")
+    p = pa.minimize(f, x).subject_to(g, D).compile(second_order="L")
     print(p)
     solver = pa.IpoptSolver({})
     cnt = pa.problem_with_counters(p)
