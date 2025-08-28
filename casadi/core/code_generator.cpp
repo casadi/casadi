@@ -571,7 +571,8 @@ namespace casadi {
         ss << e.second << std::endl;
 
         // Finalize file
-        CodeGenerator::file_close(ss, this->cpp);
+        stream_close(ss, this->cpp);
+        ss_ptr.reset();
       } else {
         s << e.second << std::endl;
       }
