@@ -48,8 +48,13 @@ if (ALPAQA_STANDALONE)
     cmake_path(RELATIVE_PATH ALPAQA_INSTALL_LIBDIR
                BASE_DIRECTORY "${ALPAQA_INSTALL_MEXDIR}/+alpaqa"
                OUTPUT_VARIABLE ALPAQA_INSTALL_LIBRELMEXDIR)
-    set_target_properties(alpaqa_mex PROPERTIES INSTALL_RPATH
-        "$ORIGIN;$ORIGIN/lib;$ORIGIN/${ALPAQA_INSTALL_LIBRELMEXDIR}")
+    if (APPLE)
+        set_target_properties(alpaqa_mex PROPERTIES INSTALL_RPATH
+            "@loader_path;@loader_path/lib;@loader_path/${ALPAQA_INSTALL_LIBRELMEXDIR}")
+    else()
+        set_target_properties(alpaqa_mex PROPERTIES INSTALL_RPATH
+            "$ORIGIN;$ORIGIN/lib;$ORIGIN/${ALPAQA_INSTALL_LIBRELMEXDIR}")
+    endif()
 endif()
 
 # Install the final MEX file

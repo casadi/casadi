@@ -6,8 +6,13 @@ if (ALPAQA_STANDALONE)
                BASE_DIRECTORY ALPAQA_INSTALL_BINDIR
                OUTPUT_VARIABLE ALPAQA_INSTALL_LIBRELBINDIR)
     foreach (TGT IN LISTS ALPAQA_INSTALL_TARGETS ALPAQA_INSTALL_EXE)
-        set_target_properties(${TGT} PROPERTIES
-            INSTALL_RPATH "$ORIGIN;$ORIGIN/${ALPAQA_INSTALL_LIBRELBINDIR}")
+        if (APPLE)
+            set_target_properties(${TGT} PROPERTIES
+                INSTALL_RPATH "$@loader_path;$@loader_path/${ALPAQA_INSTALL_LIBRELBINDIR}")
+        else()
+            set_target_properties(${TGT} PROPERTIES
+                INSTALL_RPATH "$ORIGIN;$ORIGIN/${ALPAQA_INSTALL_LIBRELBINDIR}")
+        endif()
     endforeach()
 endif()
 
