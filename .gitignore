@@ -26,6 +26,7 @@ python/alpaqa/_alpaqa*
 /package
 /build-local
 /toolchains
+/sdist
 
 # Compiled or generated files
 *.mod
