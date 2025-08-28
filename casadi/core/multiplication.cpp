@@ -127,17 +127,25 @@ namespace casadi {
                                 const std::vector<bool>& arg_is_ref,
                                 std::vector<bool>& res_is_ref,
                                 bool prefer_inline) const {
-    // Copy first argument if not inplace
-    if (arg[0]!=res[0] || arg_is_ref[0]) {
-      g << g.copy(g.work(arg[0], nnz(), arg_is_ref[0]),
-            nnz(),
-            g.work(res[0], nnz(), false)) << '\n';
-    }
+    if (n_dep()==3) {
+      // Copy first argument if not inplace
+      if (arg[0]!=res[0] || arg_is_ref[0]) {
+        g << g.copy(g.work(arg[0], nnz(), arg_is_ref[0]),
+              nnz(),
+              g.work(res[0], nnz(), false)) << '\n';
+      }
 
-    // Perform sparse matrix multiplication
-    g << g.mtimes(g.work(arg[1], dep(1).nnz(), arg_is_ref[1]), dep(1).sparsity(),
-                          g.work(arg[2], dep(2).nnz(), arg_is_ref[2]), dep(2).sparsity(),
-                          g.work(res[0], nnz(), false), sparsity(), "w", false) << '\n';
+      // Perform sparse matrix multiplication
+      g << g.mtimes(g.work(arg[1], dep(1).nnz(), arg_is_ref[1]), dep(1).sparsity(),
+                            g.work(arg[2], dep(2).nnz(), arg_is_ref[2]), dep(2).sparsity(),
+                            g.work(res[0], nnz(), false), sparsity(), "w", false) << '\n';
+    } else {
+      g << g.clear(g.work(res[0], nnz(), false), nnz()) << '\n';
+      // Perform sparse matrix multiplication
+      g << g.mtimes(g.work(arg[0], dep(0).nnz(), arg_is_ref[0]), dep(0).sparsity(),
+                            g.work(arg[1], dep(1).nnz(), arg_is_ref[1]), dep(1).sparsity(),
+                            g.work(res[0], nnz(), false), sparsity(), "w", false) << '\n';
+    }
   }
 
   void DenseMultiplication::

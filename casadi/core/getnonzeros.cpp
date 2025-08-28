@@ -496,19 +496,33 @@ namespace casadi {
     // Codegen the indices
     std::string ind = g.constant(nz_);
 
-    // Codegen the assignments
-    g.local("cii", "const casadi_int", "*");
-    g.local("rr", "casadi_real", "*");
-    g.local("cs", "const casadi_real", "*");
-    g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz(), false)
-      << ", cs=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0])
-      << "; cii!=" << ind << "+" << nz_.size()
-      << "; ++cii) *rr++ = ";
-    if (has_negative(nz_)) {
-      g << "*cii>=0 ? cs[*cii] : 0;\n";
+    if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      std::string ss = g.work(arg[0], dep(0).nnz(), false);
+      g << "#pragma omp simd\n";
+      g << "for (i=0;i<" << nz_.size() << ";++i) "
+        << "(" << g.work(res[0], nnz(), arg_is_ref[0]) << ")[i] = ";
+      if (has_negative(nz_)) {
+        g << "ind[i] ? (" << ss << ")[" << ind << "[i]] : 0;\n";
+      } else {
+        g << "(" << ss << ")[" << ind << "[i]];\n";
+      }
     } else {
-      g << "cs[*cii];\n";
+      // Codegen the assignments
+      g.local("cii", "const casadi_int", "*");
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz(), false)
+        << ", ss=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0])
+        << "; cii!=" << ind << "+" << nz_.size()
+        << "; ++cii) *rr++ = ";
+      if (has_negative(nz_)) {
+        g << "*cii>=0 ? ss[*cii] : 0;\n";
+      } else {
+        g << "ss[*cii];\n";
+      }
     }
+
   }
 
   MX GetNonzeros::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
@@ -540,13 +554,18 @@ namespace casadi {
           << g.work(arg[0], dep(0).nnz(), true) << "+" << s_.start << ";\n";
         res_is_ref[0] = true;
       }
+    } else if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      g << "#pragma omp simd\n";
+      g << "for (i=0;i<" << s_.size() << ";++i) "
+        << "(" << g.work(res[0], nnz(), false) << ")[i] = (" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) << ")[i*" << s_.step << "+" << s_.start << "];\n";
     } else {
       g.local("rr", "casadi_real", "*");
-      g.local("cs", "const casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
       std::string a0 = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
-      g << "for (rr=" << g.work(res[0], nnz(), false) << ", cs=" << a0
-        << "+" << s_.start << "; cs!=" << a0 << "+" << s_.stop
-        << "; cs+=" << s_.step << ") *rr++ = *cs;\n";
+      g << "for (rr=" << g.work(res[0], nnz(), false) << ", ss=" << a0
+        << "+" << s_.start << "; ss!=" << a0 << "+" << s_.stop
+        << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
     }
   }
 
@@ -556,16 +575,25 @@ namespace casadi {
                                     const std::vector<bool>& arg_is_ref,
                                     std::vector<bool>& res_is_ref,
                                     bool prefer_inline) const {
-    g.local("rr", "casadi_real", "*");
-    g.local("cs", "const casadi_real", "*");
-    g.local("ct", "const casadi_real", "*");
-
     std::string a0 = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
-    g << "for (rr=" << g.work(res[0], nnz(), false) << ", cs="
-      << a0 << "+" << outer_.start << "; cs!=" << a0 << "+"
-      << outer_.stop << "; cs+=" << outer_.step << ") "
-      << "for (ct=cs+" << inner_.start << "; ct!=cs+" << inner_.stop
-      << "; ct+=" << inner_.step << ") *rr++ = *ct;\n";
+    if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      g.local("j", "casadi_int");
+      g << "for (i=0;i<" << outer_.size() << ";++i) {\n"
+        << "#pragma omp simd\n"
+        << "for (j=0;j<" << inner_.size() << ";++j) "
+        << "(" << g.work(res[0], nnz(), false) << ")[i*" << inner_.size() << "+j] = (" << a0 << ")[(i*" << outer_.step << "+" << outer_.start << ")+j*" << inner_.step << "+" << inner_.start << "];\n"
+        << "}\n";
+    } else {
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g.local("tt", "const casadi_real", "*");
+      g << "for (rr=" << g.work(res[0], nnz(), false) << ", ss=" << a0
+        << "+" << outer_.start << "; ss!=" << a0 << "+"
+        << outer_.stop << "; ss+=" << outer_.step << ") "
+        << "for (tt=ss+" << inner_.start << "; tt!=ss+" << inner_.stop
+        << "; tt+=" << inner_.step << ") *rr++ = *tt;\n";
+    }
   }
 
   bool GetNonzerosVector::is_equal(const MXNode* node, casadi_int depth) const {

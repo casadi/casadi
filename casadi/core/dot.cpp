@@ -113,11 +113,14 @@ namespace casadi {
                       const std::vector<bool>& arg_is_ref,
                       std::vector<bool>& res_is_ref,
                       bool prefer_inline) const {
-    g << g.workel(res[0]) << " = "
-      << g.dot(dep().nnz(),
-                g.work(arg[0], dep(0).nnz(), arg_is_ref[0]),
-                g.work(arg[1], dep(1).nnz(), arg_is_ref[1]))
-      << ";\n";
+    g.local("r","casadi_real");
+    g.local("i", "casadi_int");
+    g << "r=0.0;\n";
+    g << "#pragma omp simd reduction(+:r)\n";
+    std::string a = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
+    std::string b = g.work(arg[1], dep(1).nnz(), arg_is_ref[1]);
+    g << "for (i=0;i<" << dep().nnz() << ";++i) r += (" << a << ")[i]*(" << b << ")[i];\n";
+    g << g.workel(res[0]) << " = r;\n";
   }
 
 } // namespace casadi

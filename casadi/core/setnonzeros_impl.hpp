@@ -876,17 +876,31 @@ namespace casadi {
     // Condegen the indices
     std::string ind = g.constant(this->nz_);
 
-    // Perform the operation inplace
-    g.local("cii", "const casadi_int", "*");
-    g.local("rr", "casadi_real", "*");
-    g.local("cs", "const casadi_real", "*");
-    g << "for (cii=" << ind << ", rr=" << g.work(res[0], this->nnz(), false) << ", "
-      << "cs=" << g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]) << "; cii!=" << ind
-      << "+" << this->nz_.size() << "; ++cii, ++cs) ";
-    if (has_negative(this->nz_)) {
-      g << "if (*cii>=0) ";
+    if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      std::string rr = g.work(res[0], this->nnz(), false);
+      std::string ss = g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]);
+      g << "#pragma omp simd\n";
+      g << "for (i=0;i<" << nz_.size() << ";++i) ";
+      if (has_negative(nz_)) {
+        g << "if (ind[i]>=0) ";
+      }
+      g << "(" << rr << ")[" << ind <<"[i]] "
+        << (Add?"+=":"=") << " "
+        << ss << "[i];\n";
+    } else {
+      // Perform the operation inplace
+      g.local("cii", "const casadi_int", "*");
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g << "for (cii=" << ind << ", rr=" << g.work(res[0], this->nnz(), false) << ", "
+        << "ss=" << g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]) << "; cii!=" << ind
+        << "+" << this->nz_.size() << "; ++cii, ++ss) ";
+      if (has_negative(this->nz_)) {
+        g << "if (*cii>=0) ";
+      }
+      g << "rr[*cii] " << (Add?"+=":"=") << " *ss;\n";
     }
-    g << "rr[*cii] " << (Add?"+=":"=") << " *cs;\n";
   }
 
   template<bool Add>
@@ -902,15 +916,24 @@ namespace casadi {
       g << g.copy(g.work(arg[0], this->dep(0).nnz(), arg_is_ref[0]), this->nnz(),
                           g.work(res[0], this->nnz(), false)) << '\n';
     }
+    std::string rr = g.work(res[0], this->nnz(), false);
+    std::string ss = g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]);
 
-    // Perform the operation inplace
-    g.local("rr", "casadi_real", "*");
-    g.local("cs", "const casadi_real", "*");
-    g << "for (rr=" << g.work(res[0], this->nnz(), false) << "+" << s_.start << ", cs="
-      << g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]) << "; rr!="
-      << g.work(res[0], this->nnz(), false) << "+" << s_.stop
-      << "; rr+=" << s_.step << ")"
-      << " *rr " << (Add?"+=":"=") << " *cs++;\n";
+    if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      g << "#pragma omp simd\n";
+      g << "for (i=0;i<" << s_.size() << ";++i) "
+        << "(" << rr << ")[i*" << s_.step << "+" << s_.start << "] " << (Add?"+=":"=") << " (" << ss << ")[i];\n";
+    } else {
+      // Perform the operation inplace
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g << "for (rr=" << rr << "+" << s_.start << ", ss="
+        << ss << "; rr!="
+        << rr << "+" << s_.stop
+        << "; rr+=" << s_.step << ")"
+        << " *rr " << (Add?"+=":"=") << " *ss++;\n";
+    }
   }
 
   template<bool Add>
@@ -927,17 +950,30 @@ namespace casadi {
                           g.work(res[0], this->nnz(), false)) << '\n';
     }
 
-    // Perform the operation inplace
-    g.local("rr", "casadi_real", "*");
-    g.local("cs", "const casadi_real", "*");
-    g.local("tt", "casadi_real", "*");
-    g << "for (rr=" << g.work(res[0], this->nnz(), false) << "+" << outer_.start
-      << ", cs=" << g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]) << "; rr!="
-      << g.work(res[0], this->nnz(), false) << "+" << outer_.stop
-      << "; rr+=" << outer_.step << ")"
-      << " for (tt=rr+" << inner_.start << "; tt!=rr+" << inner_.stop
-      << "; tt+=" << inner_.step << ")"
-      << " *tt " << (Add?"+=":"=") << " *cs++;\n";
+    std::string rr = g.work(res[0], this->nnz(), false);
+    std::string ss = g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]);
+    if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      g.local("j", "casadi_int");
+      g << "for (i=0;i<" << outer_.size() << ";++i) {\n"
+        << "#pragma omp simd\n"
+        << "for (j=0;j<" << inner_.size() << ";++j) "
+        << "(" << rr << ")[(i*" << outer_.step << "+" << outer_.start << ")+j*" << inner_.step << "+" << inner_.start << "] "
+        << (Add?"+=":"=") << " (" << ss << ")[i*" << inner_.size() << "+j];\n";
+      g << "}\n";
+    } else {
+      // Perform the operation inplace
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g.local("uu", "casadi_real", "*");
+      g << "for (rr=" << rr << "+" << outer_.start
+        << ", ss=" << ss << "; rr!="
+        << rr << "+" << outer_.stop
+        << "; rr+=" << outer_.step << ")"
+        << " for (uu=rr+" << inner_.start << "; uu!=rr+" << inner_.stop
+        << "; uu+=" << inner_.step << ")"
+      << " *uu " << (Add?"+=":"=") << " *ss++;\n";
+    }
   }
 
   template<bool Add>
