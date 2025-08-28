@@ -2248,6 +2248,8 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         const MX & call_node = e.dep(0);
 
         Function F = call_node.which_function();
+
+        if (!startswith(F.name(), "map")) continue; // Not a map
         // Get the original function that was mapped
         Function f = F.get_function("f_orig");
 
@@ -2478,7 +2480,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
 
     block_row = 0;
     for (const auto & e : vdef) {
-      if (e.is_output()) { // Hit a map call
+      if (e.is_output() && startswith(e.dep(0).which_function().name(), "map")) { // Hit a map call
         const MX & call_node = e.dep(0);
 
         Function f = call_node.which_function();
