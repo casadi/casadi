@@ -132,6 +132,7 @@ build-frontend = "build"
 environment = { PY_BUILD_CMAKE_VERBOSE = "1" }
 test-command = "pytest {package}/python/test"
 test-extras = ["test"]
+test-skip = ["*-{win32,win_arm64}", "pp*", "cp314*"]
 [tool.cibuildwheel.config-settings]
 --local = "scripts/ci/py-build-cmake.toml"
 

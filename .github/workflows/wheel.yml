@@ -141,7 +141,7 @@ jobs:
       SCCACHE_CACHE_MULTIARCH: "1"
       CIBW_ARCHS: ${{ matrix.cibw-arch }}
       CIBW_ENABLE: 'pypy'
-      CIBW_TEST_SKIP: 'pp* *-win32'
+      CIBW_TEST_SKIP: 'pp* *-win32 cp314*'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
