@@ -2,6 +2,8 @@
 html {
     --font-family-monospace: 'JetBrains Mono',Consolas,Monaco,'Ubuntu Mono',monospace,fixed;
     --body-background-color: #DDD;
+    --title-background-color: #FFF;
+    --header-separator-color: hsl(222, 31%, 84%);
     --nav-background-color: #DDE;
     --code-background-color: #F4F4FF;
     --lineno-link-background-color: #F4F4F4;
@@ -9,15 +11,62 @@ html {
     --description-color: #444;
     --nav-hover-color: #283a5d;
     --box-shadow-color: #555;
+    --footer-logo-width: 80px;
 }
+/* Dark mode */
+html.dark-mode {
+    --font-family-monospace: 'JetBrains Mono',Consolas,Monaco,'Ubuntu Mono',monospace,fixed;
+    --page-link-color: rgb(92, 136, 218);
+    --page-visited-link-color: rgb(167, 190, 255);
+    --body-background-color: black;
+    --page-background-color: #141414;
+    --title-background-color: #141414;
+    --page-foreground-color: white;
+    --memdef-doc-background-color: #121214;
+    --nav-background-color: rgb(24, 24, 54);
+    --nav-text-normal-color: #BAC5DB;
+    --nav-text-normal-shadow: 0px 1px 1px black;
+    --code-background-color: #282828;
+    --lineno-link-background-color: #101010;
+    --fragment-background-color: #1E1E1E;
+    --description-color: #F0F0F4;
+    --nav-hover-color: #c0d0f0;
+    --box-shadow-color: #333;
+    --header-background-color: var(--nav-background-color);
+    --search-box-shadow: inset 0.5px 0.5px 3px 0px #444a6d;
+    --footer-logo-width: 80px;
 
+    --warning-color-text: white;
+    --note-color-text: white;
+    --todo-color-text: white;
+    --test-color-text: white;
+    --deprecated-color-text: white;
+    --bug-color-text: white;
+    --invariant-color-text: white;
+}
+html.dark-mode img.footer {
+    filter: brightness(0.666);
+}
 /* Image alignment */
+img.xbm {
+    image-rendering:optimizeSpeed;             /* Legal fallback */
+    image-rendering:-moz-crisp-edges;          /* Firefox        */
+    image-rendering:-o-crisp-edges;            /* Opera          */
+    image-rendering:-webkit-optimize-contrast; /* Safari         */
+    image-rendering:optimize-contrast;         /* CSS3 Proposed  */
+    image-rendering:crisp-edges;               /* CSS4 Proposed  */
+    image-rendering:pixelated;                 /* CSS4 Proposed  */
+    -ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
+    border: 1px solid #CCC;
+}
 img.inline {
     vertical-align: text-bottom;
     max-width: 100%;
 }
-div.image img {
+div.image img, div.image object {
+    margin: 0 auto;
     max-width: 100%;
+    display: block;
 }
 div.image {
     text-align: initial;
@@ -45,6 +94,7 @@ body > div.header, div > div.header {
     margin: auto;
     padding: 0.8em 2.5em 0.6em 2.5em;
     box-shadow: 1px 0px 5px var(--box-shadow-color);
+    background-image: none;
 }
 div#top {
     /* position: sticky; */
@@ -53,6 +103,9 @@ div#top {
     width: 100%;
     background-color: var(--page-background-color);
     z-index: 100;
+}
+#projectname {
+    padding-top: 0.25em;
 }
 /* Navigation */
 #main-nav ul {
@@ -68,7 +121,6 @@ div#top {
     border-right: 0.5px solid #78A;
     border-bottom: 0.5px solid #78A;
     margin-bottom: -1px;
-    /* box-shadow: 0px 1px 2px #458; */
 }
 .sm-dox>li:first-child>a, .sm-dox>li:first-child>:not(ul) a {
     border-radius: 0;
@@ -151,6 +203,10 @@ b, dt, caption, div.groupHeader, td.indexkey, th.dirtab,
 a.el {
     font-weight: 500;
 }
+/* Paragraph indentation */
+dl.section dd, dl.bug dd, dl.deprecated dd, dl.todo dd, dl.test dd {
+    margin-inline-start: 1.6em;
+}
 /* Size of titles and headings */
 div.contents > div.textblock > h1 {
     border-bottom: 1px solid #c8d0e2;
@@ -196,6 +252,10 @@ div.contents a#details + h2.groupheader {
 h2.memtitle, .memproto, .fieldtable th, .reflist dt {
     background-color: var(--nav-background-color);
     background-image: none;
+    box-shadow: none;
+}
+h2.memtitle::after, .memproto::after {
+    display: none;
 }
 h2.memtitle {
     /* font-family: monospace; */
@@ -227,6 +287,9 @@ span.mlabel {
 .paramtype {
     font-family: monospace;
 }
+.memberdecls td, .fieldtable tr {
+    transition: none;
+}
 
 /* A bit more space in lists on related pages */
 div.textblock li {
@@ -254,7 +317,8 @@ div.fragment {
     border-radius: 0.6em;
 }
 div.line {
-    line-height: 1.25;
+    font-size: 1em;
+    line-height: 1.15;
 }
 div#powerTip {
     margin-top: 0.5em;
@@ -276,8 +340,28 @@ html {
     --keyword-flow-color: #af00db;
     --concept-color: #0070C1;
     --variable-color: #001080;
-    --code-hover-brightness: 120%;
     --template-color: #3C4F74;
+    --code-hover-brightness: 120%;
+}
+html.dark-mode {
+    --fragment-foreground-color: #D4D4D4;
+    --preprocessor-color: #CE9178;
+    --comment-color: #6A9955;
+    --namespace-color: #4EC9B0;
+    --type-color: #4EC9B0;
+    --enum-value-color: #1C71BE;
+    --macro-color: #569CD6;
+    --function-color: #DCDCAA;
+    --string-color: #CE9178;
+    --char-color: #CE9178;
+    --keyword-color: #569CD6;
+    --keyword-type-color: #569CD6;
+    --keyword-type-color: #569CD6;
+    --keyword-flow-color: #C586C0;
+    --concept-color: #0070C1;
+    --variable-color: #9CDCFE;
+    --template-color: #9AA9C8;
+    --code-hover-brightness: 106%;
 }
 span.preprocessor {
     color: var(--preprocessor-color);
@@ -300,25 +384,25 @@ span.keywordtype {
 span.keyword {
     color: var(--keyword-color);
 }
-div.line a.code.hl_function,
-div.line a.code.hl_interface {
+div.line a.code.hl_function, div.line a.code.hl_functionRef,
+div.line a.code.hl_interface, div.line a.code.hl_interfaceRef {
     color: var(--function-color);
 }
-div.line a.code.hl_define {
+div.line a.code.hl_define, div.line a.code.hl_defineRef {
     color: var(--macro-color);
 }
-div.line a.code.hl_class,
-div.line a.code.hl_union,
-div.line a.code.hl_struct,
-div.line a.code.hl_typedef,
-div.line a.code.hl_enumeration,
-div.line a.code.hl_exception {
+div.line a.code.hl_class, div.line a.code.hl_classRef,
+div.line a.code.hl_union, div.line a.code.hl_unionRef,
+div.line a.code.hl_struct, div.line a.code.hl_structRef,
+div.line a.code.hl_typedef, div.line a.code.hl_typedefRef,
+div.line a.code.hl_enumeration, div.line a.code.hl_enumerationRef,
+div.line a.code.hl_exception, div.line a.code.hl_exceptionRef {
     color: var(--type-color);
 }
-div.line a.code.hl_enumvalue {
+div.line a.code.hl_enumvalue, div.line a.code.hl_enumvalueRef {
     color: var(--enum-value-color);
 }
-div.line a.code.hl_concept {
+div.line a.code.hl_concept, div.line a.code.hl_conceptRef {
     color: var(--concept-color);
 }
 span.preprocessor a,
@@ -326,10 +410,10 @@ span.preprocessor a.code {
     color: var(--preprocessor-color);
     text-decoration: underline;
 }
-div.line a.code.hl_namespace {
+div.line a.code.hl_namespace, div.line a.code.hl_namespaceRef {
     color: var(--namespace-color);
 }
-div.line a.code.hl_variable {
+div.line a.code.hl_variable, div.line a.code.hl_variableRef {
     color: var(--variable-color);
 }
 div.line a.code:hover {
@@ -365,8 +449,8 @@ blockquote.doxtable > p:last-child {
     }
     /* #side-nav { display: none; } */
     /* #nav-path { display: none; } */
-    body { 
-        overflow-x: hidden; 
+    body {
+        overflow-x: hidden;
     }
     .summary { display: none; }
     .memitem { page-break-inside: avoid; }
@@ -380,7 +464,7 @@ blockquote.doxtable > p:last-child {
     #MSearchResultsWindow {
         display: none;
         position: initial;
-        left: 0; 
+        left: 0;
         top: 0;
         bottom: 0;
         border: 1px solid #ddd;
@@ -418,15 +502,15 @@ blockquote.doxtable > p:last-child {
         font-size: 11px;
     }
 
-    div.contents p:not([class]), 
-    div.dyncontent, 
-    div.textblock, 
-    table.memberdecls, 
+    div.contents p:not([class]),
+    div.dyncontent,
+    div.textblock,
+    table.memberdecls,
     div.memitem,
-    div.contents p:not([class]) *, 
-    div.dyncontent *, 
-    table.memberdecls *, 
-    div.memitem * {
+    div.contents p:not([class]),
+    div.dyncontent,
+    table.memberdecls,
+    div.memitem {
         font-size: 12px;
         line-height: 1.5;
     }
@@ -454,51 +538,6 @@ blockquote.doxtable > p:last-child {
     }
 }
 
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-    html:not(.dark-mode) {
-        --font-family-monospace: 'JetBrains Mono',Consolas,Monaco,'Ubuntu Mono',monospace,fixed;
-        --page-link-color: rgb(92, 136, 218);
-        --page-visited-link-color: rgb(167, 190, 255);
-        --body-background-color: black;
-        --page-background-color: #141414;
-        --page-foreground-color: white;
-        --memdef-doc-background-color: #121214;
-        --nav-background-color: rgb(24, 24, 54);
-        --code-background-color: #282828;
-        --lineno-link-background-color: #101010;
-        --fragment-background-color: #1E1E1E;
-        --description-color: #F0F0F4;
-        --nav-hover-color: #c0d0f0;
-        --box-shadow-color: #333;
-        --header-background-color: var(--nav-background-color);
-        --template-color: #9AA9C8;
-
-        --fragment-foreground-color: #D4D4D4;
-        --preprocessor-color: #CE9178;
-        --comment-color: #6A9955;
-        --namespace-color: #4EC9B0;
-        --type-color: #4EC9B0;
-        --enum-value-color: #1C71BE;
-        --macro-color: #569CD6;
-        --function-color: #DCDCAA;
-        --string-color: #CE9178;
-        --char-color: #CE9178;
-        --keyword-color: #569CD6;
-        --keyword-type-color: #569CD6;
-        --keyword-type-color: #569CD6;
-        --keyword-flow-color: #C586C0;
-        --concept-color: #0070C1;
-        --variable-color: #9CDCFE;
-        --code-hover-brightness: 106%;
-        --search-box-shadow: inset 0.5px 0.5px 3px 0px #444a6d;
-    }
-    html:not(.dark-mode) img.footer{
-        filter: brightness(0.666);
-    }
-}
-    
-
 /* ---- Start search box ---- */
 
 #MSearchField {
@@ -518,8 +557,8 @@ iframe#MSearchResults {
     border: none;
     z-index: 10000;
     width: 100% !important;
-    top: 0 !important; 
-    left: 0 !important; 
+    top: 0 !important;
+    left: 0 !important;
     box-shadow: inset #778 1px 0px 4px 0px;
 }
 .SRResult {
@@ -529,3 +568,17 @@ iframe#MSearchResults {
 }
 
 /* ---- End search box ---- */
+
+/* ---- Start print ---- */
+
+@media print {
+    address.footer {
+        display: none;
+    }
+    th {
+        break-after: avoid;
+    }
+    html {
+        --body-background-color: #FFF;
+    }
+}

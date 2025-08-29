@@ -25,4 +25,4 @@ The following is a list of examples demonstrating how to use the alpaqa library.
 
 ## Matlab examples {#matlab_examples}
 
-- [**Matlab/getting_started.m**](../Sphinx/reference/matlab-api.html#example)
+- [**Matlab/getting_started.m**](../Sphinx/reference/matlab-api.html)<!-- not rendered correctly without this comment on Doxygen -->
