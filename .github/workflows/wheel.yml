@@ -20,7 +20,15 @@ jobs:
   build-sdist:
     name: Build sdist
     runs-on: ubuntu-22.04
+    outputs:
+      epoch: ${{ steps.get-epoch.outputs.epoch }}
     steps:
+      - id: get-epoch
+        run: |
+          ts=$(date +%s)
+          echo "epoch=$ts" >> $GITHUB_OUTPUT
+          echo "SOURCE_DATE_EPOCH=$ts" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -88,6 +96,8 @@ jobs:
       matrix:
         host: [x86_64-bionic-linux-gnu, aarch64-rpi3-linux-gnu, armv7-neon-linux-gnueabihf, armv6-rpi-linux-gnueabihf]
     steps:
+      - run: echo "SOURCE_DATE_EPOCH=${{ needs.build-sdist.outputs.epoch }}" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -186,6 +196,8 @@ jobs:
       CIBW_ENABLE: 'pypy'
       CIBW_TEST_SKIP: 'pp* *-win32 cp314*'
     steps:
+      - run: echo "SOURCE_DATE_EPOCH=${{ needs.build-sdist.outputs.epoch }}" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
 
