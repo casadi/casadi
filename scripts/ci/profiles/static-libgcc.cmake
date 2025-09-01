@@ -1,0 +1,8 @@
+set(CMAKE_C_STANDARD_LIBRARIES_INIT
+    "${CMAKE_C_STANDARD_LIBRARIES_INIT} -Wl,-Bstatic -lgcc -Wl,-Bdynamic -lgcc_s"
+    CACHE STRING "" FORCE
+)
+set(CMAKE_CXX_STANDARD_LIBRARIES_INIT
+    "${CMAKE_CXX_STANDARD_LIBRARIES_INIT} -Wl,-Bstatic -lgcc -Wl,-Bdynamic -lgcc_s"
+    CACHE STRING "" FORCE
+)
