@@ -119,6 +119,49 @@ jobs:
 
       - run: conan cache clean
 
+  test-linux-x:
+    name: Import ${{ matrix.python-version }} ${{ matrix.host }}
+    needs: [build-linux]
+    runs-on: ${{ matrix.os }}
+    container: '${{ matrix.python }}:${{ matrix.python-version }}${{ matrix.image-suffix }}-bookworm'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'ubuntu-24.04-arm']
+        python: ['python']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        include:
+          - os: 'ubuntu-latest'
+            python: 'python'
+            python-version: '3.14'
+            image-suffix: '-rc'  # Set this to '-rc' to test pre-releases
+            host: 'x86_64-bionic-linux-gnu'
+          - os: 'ubuntu-24.04-arm'
+            python: 'python'
+            python-version: '3.14'
+            image-suffix: '-rc'  # Set this to '-rc' to test pre-releases
+            host: 'aarch64-rpi3-linux-gnu'
+          - os: 'ubuntu-latest'
+            host: 'x86_64-bionic-linux-gnu'
+          - os: 'ubuntu-24.04-arm'
+            host: 'aarch64-rpi3-linux-gnu'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-${{ matrix.host }}
+          path: dist
+
+      - name: Install
+        run: python3 -m pip install --find-links=dist "${PACKAGE_NAME}==${PACKAGE_VERSION}"
+
+      - name: Import
+        run: objdump -p "$(python3 -c 'import alpaqa; print(alpaqa._alpaqa.__file__)')"
+
   # Build for Windows and macOS using cibuildwheel.
   # Since we're not specifying any cross-compilation settings, py-build-cmake
   # will use its default cross-compilation settings for Windows on ARM64.
@@ -217,7 +260,7 @@ jobs:
   # https://docs.pypi.org/trusted-publishers carefully!
   release:
     name: Release
-    needs: [check-release]
+    needs: [check-release, test-linux-x]
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
     runs-on: ubuntu-latest
     environment:
