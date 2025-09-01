@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        host: [x86_64-bionic-linux-gnu, aarch64-rpi3-linux-gnu]
+        host: [x86_64-bionic-linux-gnu, aarch64-rpi3-linux-gnu, armv7-neon-linux-gnueabihf, armv6-rpi-linux-gnueabihf]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -188,7 +188,6 @@ jobs:
   # and uses Twine to check the metadata of the packages.
   check-release:
     name: Check release
-    if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
     needs: [build-sdist, test-linux, build-linux, build-macos-windows]
     runs-on: ubuntu-latest
     container: python:3.12-bullseye
@@ -202,6 +201,7 @@ jobs:
       - name: Install package
         run: python -m pip install --no-deps --no-index --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
       - name: Check package version
+        if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
         run: |
           version="$(python -c 'from importlib.metadata import version as v; print(v("${{ env.PACKAGE_NAME }}"))')"
           [ "${{ github.event.release.tag_name }}" = "$version" ]
@@ -221,9 +221,9 @@ jobs:
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
     runs-on: ubuntu-latest
     environment:
-      name: testpypi
+      name: release
       # url: https://test.pypi.org/p/${{ env.PACKAGE_NAME }}
-      url: https://test.pypi.org/p/${{ env.PACKAGE_NAME }}
+      url: https://pypi.org/p/${{ env.PACKAGE_NAME }}
     permissions:
       id-token: write  # mandatory for trusted publishing
     steps:
