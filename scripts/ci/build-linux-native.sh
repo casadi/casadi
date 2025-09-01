@@ -10,7 +10,7 @@ install_stubs_dir="$3"
 # Create a py-build-cmake config file
 pbc_config="$PWD/native-py-build-cmake.local.pbc"
 cat << EOF > "$pbc_config"
-conan.profile_host=["default", "$PWD/scripts/ci/profiles/linux-conf.profile"]
+conan.profile_host=["default", "$PWD/scripts/ci/profiles/linux-conf.profile", "$PWD/scripts/ci/profiles/alpaqa-python-linux.profile"]
 conan.cmake.options.CMAKE_C_COMPILER_LAUNCHER=sccache
 conan.cmake.options.CMAKE_CXX_COMPILER_LAUNCHER=sccache
 conan.cmake.args+=["--fresh"]

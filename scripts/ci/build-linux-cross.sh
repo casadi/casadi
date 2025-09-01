@@ -27,13 +27,17 @@ out_dir="${4:-dist}"
 # Create Conan profile to inject the appropriate Python development files
 python_profile="$PWD/conan-python.cross.profile"
 cat << EOF > "$python_profile"
+include($PWD/scripts/ci/profiles/alpaqa-python-linux.profile)
 [conf]
-tools.build:exelinkflags+=["-static-libgcc"]
-tools.build:sharedlinkflags+=["-static-libgcc"]
+tools.build:exelinkflags+=["-static-libgcc", "-static-libgfortran", "-static-libquadmath"]
+tools.build:sharedlinkflags+=["-static-libgcc", "-static-libgfortran", "-static-libquadmath"]
 [options]
+coinmumps/*:static_fortran_libs=True
 &:with_conan_python=True
 [replace_requires]
 tttapa-python-dev/*: tttapa-python-dev/[~$python_majmin, include_prerelease]
+[buildenv]
+LDFLAGS+= -static-libstdc++ -static-libgcc -static-libgfortran -static-libquadmath
 EOF
 
 # Create a py-build-cmake configuration file for cross-compilation

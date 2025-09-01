@@ -88,7 +88,7 @@ class AlpaqaRecipe(ConanFile):
         if self.options.with_ipopt:
             self.requires("ipopt/3.14.16", transitive_headers=True)
         if self.options.with_qpalm:
-            self.requires("qpalm/1.2.5", transitive_headers=True)
+            self.requires("qpalm/1.2.6", transitive_headers=True)
         if self.options.with_python or self.options.with_python_problem_loader:
             self.requires("pybind11/2.13.6")
             if self.options.with_conan_python:
@@ -114,7 +114,7 @@ class AlpaqaRecipe(ConanFile):
                 "MATLAB MEX interface requires CasADi. Set 'with_external_casadi=True'."
             )
             raise ConanInvalidConfiguration(msg)
-        
+
     def configure(self):
         if self.options.get_safe("with_quad_precision"):
             self.options["guanaqo/*"].with_quad_precision = True

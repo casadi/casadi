@@ -4,3 +4,7 @@ generator = "Ninja Multi-Config"
 CMAKE_C_COMPILER_LAUNCHER = "sccache"
 CMAKE_CXX_COMPILER_LAUNCHER = "sccache"
 CMAKE_MSVC_DEBUG_INFORMATION_FORMAT = "$<$<CONFIG:Debug,RelWithDebInfo>:Embedded>"
+[mac.conan]
+profile_host = ["default", "./scripts/ci/profiles/alpaqa-python-macos.profile"]
+[windows.conan]
+profile_host = ["default", "./scripts/ci/profiles/alpaqa-python-windows.profile"]

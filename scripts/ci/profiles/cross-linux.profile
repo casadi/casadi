@@ -8,4 +8,4 @@ compiler.libcxx=libstdc++11
 compiler.version=15
 
 [tool_requires]
-tttapa-toolchains/1.1.2
+tttapa-toolchains/1.2.0-alpha.1
