@@ -372,10 +372,10 @@ auto PANTRSolver<DirectionProviderT>::operator()(
 
         // Compute trust region direction from x̂ₖ
         auto compute_trust_region_step = [&](rvec q, real_t Δ) {
-            auto t0 = std::chrono::steady_clock::now();
+            auto t0        = std::chrono::steady_clock::now();
             real_t q_model = direction.apply(prox->γ, prox->x, prox->x̂, prox->p,
                                              prox->grad_ψ, Δ, q);
-            auto t1            = std::chrono::steady_clock::now();
+            auto t1        = std::chrono::steady_clock::now();
             direction_duration = t1 - t0;
 
             // Check if step is valid
@@ -386,8 +386,8 @@ auto PANTRSolver<DirectionProviderT>::operator()(
                 return +inf<config_t>;
             }
             if (q_model >= 0) {
-                *os << "Direction fail: no decrease on model (" << q_model
-                    << ')' << std::endl;
+                *os << "Direction fail: no decrease on model ("
+                    << guanaqo::float_to_str(q_model) << ')' << std::endl;
                 ++s.direction_failures;
                 direction.reset(); // Is there anything else we can do?
             }
