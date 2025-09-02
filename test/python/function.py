@@ -3956,6 +3956,191 @@ class Functiontests(casadiTestCase):
         self.assertEqual(f.numel_in(0), 0)
 
   @memory_heavy()
+  def test_interval_propagator_linear_interpolant(self):
+
+    x_grid = [0,1,1.5,2]
+    ndim = 1
+    m = 2
+    
+    DM.rng(1)
+    
+    for i in range(10):
+
+        interp = interpolant("test","linear",[x_grid],np.array(DM.rand(len(x_grid)*m)).squeeze())
+        
+        X_bounds = list(np.sort(np.array(x_grid[0]-1+DM.rand(2)*(x_grid[1]-x_grid[0]+1)).squeeze()))
+
+        alpha = DM.rand(ndim,100000)
+
+        X_MC = X_bounds[0]*alpha[0,:]+X_bounds[1]*(1-alpha[0,:])
+
+        interior = X_MC
+
+        r = interp(interior)
+        min_MC = np.min(r,axis=1)
+        max_MC = np.max(r,axis=1)
+        
+        print("MC",min_MC,max_MC)
+
+        x = MX.sym("x",ndim)
+
+        f = Function("f",[x],[interp(x)])
+
+        fp = f.interval_propagator()
+
+        res = fp(X_bounds[0],X_bounds[1])
+        
+        print("res",res)
+        self.assertTrue(np.all(res[0]<=min_MC))
+        self.assertTrue(np.all(res[1]>=max_MC))
+        
+        
+        interior_x_grid = [e for e in x_grid if e>X_bounds[0] and e<X_bounds[1]]
+        
+        def cartesian_product(a):
+            return vec(a).T
+
+        critical_points = cartesian_product(interior_x_grid+X_bounds)
+        r = interp(critical_points)
+        min_C = np.min(r,axis=1)
+        max_C = np.max(r,axis=1)
+        print("C",min_C,max_C)
+        
+        
+        self.checkarray(min_C,res[0])
+        self.checkarray(max_C,res[1])
+     
+     
+
+    x_grid = [0,1,1.5,2]
+    y_grid = [4,6,7]
+    ndim = 2
+    m = 2
+    
+    DM.rng(1)
+    
+    for i in range(10):
+
+        interp = interpolant("test","linear",[x_grid,y_grid],np.array(DM.rand(len(x_grid)*len(y_grid)*m)).squeeze())
+        
+        X_bounds = list(np.sort(np.array(x_grid[0]-1+DM.rand(2)*(x_grid[1]-x_grid[0]+1)).squeeze()))
+        Y_bounds = list(np.sort(np.array(y_grid[0]-1+DM.rand(2)*(y_grid[1]-y_grid[0]+1)).squeeze()))
+
+        alpha = DM.rand(ndim,100000)
+
+        X_MC = X_bounds[0]*alpha[0,:]+X_bounds[1]*(1-alpha[0,:])
+        Y_MC = Y_bounds[0]*alpha[1,:]+Y_bounds[1]*(1-alpha[1,:])
+
+        interior = vertcat(X_MC,Y_MC)
+
+        r = interp(interior)
+        min_MC = np.min(r,axis=1)
+        max_MC = np.max(r,axis=1)
+        
+        print("MC",min_MC,max_MC)
+
+        x = MX.sym("x",ndim)
+
+        f = Function("f",[x],[interp(x)])
+
+        fp = f.interval_propagator()
+
+        res = fp(vertcat(X_bounds[0],Y_bounds[0]),vertcat(X_bounds[1],Y_bounds[1]))
+        
+        print("res",res)
+        self.assertTrue(np.all(res[0]<=min_MC))
+        self.assertTrue(np.all(res[1]>=max_MC))
+        
+        
+        interior_x_grid = [e for e in x_grid if e>X_bounds[0] and e<X_bounds[1]]
+        interior_y_grid = [e for e in y_grid if e>Y_bounds[0] and e<Y_bounds[1]]
+        
+        def cartesian_product(a,b):
+            knots_X,knots_Y = np.meshgrid(a,b)
+            return vertcat(vec(knots_X.flatten()).T,vec(knots_Y.flatten()).T)
+
+        critical_points = cartesian_product(interior_x_grid+X_bounds,interior_y_grid+Y_bounds)
+        r = interp(critical_points)
+        min_C = np.min(r,axis=1)
+        max_C = np.max(r,axis=1)
+        print("C",min_C,max_C)
+        
+        
+        self.checkarray(min_C,res[0])
+        self.checkarray(max_C,res[1])
+        
+        # Monte Carlo results should not be too far off
+        #self.assertTrue(np.all(min_MC-res[0]<=0.1))
+        #self.assertTrue(np.all(max_MC-res[1]<=0.1))  
+  
+    x_grid = [0,1,1.5,2]
+    y_grid = [4,6,7]
+    z_grid = [1,2,3.5,4]
+    ndim = 3
+    m = 2
+    
+    DM.rng(1)
+    
+    for i in range(10):
+
+        interp = interpolant("test","linear",[x_grid,y_grid,z_grid],np.array(DM.rand(len(x_grid)*len(y_grid)*len(z_grid)*m)).squeeze())
+        
+        X_bounds = list(np.sort(np.array(x_grid[0]-1+DM.rand(2)*(x_grid[1]-x_grid[0]+1)).squeeze()))
+        Y_bounds = list(np.sort(np.array(y_grid[0]-1+DM.rand(2)*(y_grid[1]-y_grid[0]+1)).squeeze()))
+        Z_bounds = list(np.sort(np.array(z_grid[0]-1+DM.rand(2)*(z_grid[1]-z_grid[0]+1)).squeeze()))
+        
+        alpha = DM.rand(ndim,100000)
+
+        X_MC = X_bounds[0]*alpha[0,:]+X_bounds[1]*(1-alpha[0,:])
+        Y_MC = Y_bounds[0]*alpha[1,:]+Y_bounds[1]*(1-alpha[1,:])
+        Z_MC = Z_bounds[0]*alpha[1,:]+Z_bounds[1]*(1-alpha[1,:])
+
+        interior = vertcat(X_MC,Y_MC,Z_MC)
+
+        r = interp(interior)
+        min_MC = np.min(r,axis=1)
+        max_MC = np.max(r,axis=1)
+        
+        print("MC",min_MC,max_MC)
+
+        x = MX.sym("x",ndim)
+
+        f = Function("f",[x],[interp(x)])
+
+        fp = f.interval_propagator()
+
+        res = fp(vertcat(X_bounds[0],Y_bounds[0],Z_bounds[0]),vertcat(X_bounds[1],Y_bounds[1],Z_bounds[1]))
+        
+        print("res",res)
+        self.assertTrue(np.all(res[0]<=min_MC))
+        self.assertTrue(np.all(res[1]>=max_MC))
+        
+        
+        interior_x_grid = [e for e in x_grid if e>X_bounds[0] and e<X_bounds[1]]
+        interior_y_grid = [e for e in y_grid if e>Y_bounds[0] and e<Y_bounds[1]]
+        interior_z_grid = [e for e in z_grid if e>Z_bounds[0] and e<Z_bounds[1]]
+        
+        def cartesian_product(a,b,c):
+            knots_X,knots_Y,knots_Z = np.meshgrid(a,b,c)
+            return vertcat(vec(knots_X.flatten()).T,vec(knots_Y.flatten()).T,vec(knots_Z.flatten()).T)
+
+        critical_points = cartesian_product(interior_x_grid+X_bounds,interior_y_grid+Y_bounds,interior_z_grid+Z_bounds)
+        r = interp(critical_points)
+        min_C = np.min(r,axis=1)
+        max_C = np.max(r,axis=1)
+        print("C",min_C,max_C)
+        
+        
+        self.checkarray(min_C,res[0])
+        self.checkarray(max_C,res[1])
+        
+        # Monte Carlo results should not be too far off
+        #self.assertTrue(np.all(min_MC-res[0]<=0.1))
+        #self.assertTrue(np.all(max_MC-res[1]<=0.1))
+        
+        
+
+  @memory_heavy()
   def test_interval_propagator(self):
     import itertools
   
