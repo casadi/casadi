@@ -17,24 +17,10 @@ First, install some basic tools: C and C++ compilers, Git, and Python
 (you'll need the development version to build alpaqa's Python interface, and we
 install the `venv` module to create virtual environments).
 ```sh
-sudo apt install g++ gcc git python3-venv python3-dev
+sudo apt install build-essential git python3-venv python3-dev
 ```
 The alpaqa package requires a relatively recent compiler
-(tested using GCC 10-13, Clang (libc++) 16-17, or Clang (libstdc++) 17).
-
-<!--
-To install GCC 11 on older versions of Ubuntu, you can use
-```sh
-sudo apt update
-sudo apt install software-properties-common
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt install gcc-11 g++-11
-```
-To install the latest version of Clang, you can use the instructions from <https://apt.llvm.org>:
-```sh
-bash -c "$(wget -O- https://apt.llvm.org/llvm.sh)"
-```
--->
+(tested using GCC 11-15, Clang (libc++) 16-21, or Clang (libstdc++) 17-21).
 
 ### Clone the repository
 
@@ -52,7 +38,7 @@ permissions, and without the risk of messing with system packages.
 cd alpaqa
 python3 -m venv .venv
 . ./.venv/bin/activate
-pip install conan cmake ninja
+pip install conan
 ```
 
 If you haven't used Conan before, run the following command to configure a
@@ -77,11 +63,9 @@ dependencies for the default, minimal configuration of alpaqa:
 
 ```sh
 conan install . --build=missing -s build_type=Release \
-    -c tools.cmake.cmaketoolchain:generator="Ninja Multi-Config"
+    -c tools.cmake.cmaketoolchain:generator="Ninja Multi-Config" \
+    -c tools.build:skip_test=True
 ```
-
-To speed up the compilation, you can disable the tests:
-`-c tools.build:skip_test=True`.
 
 ### Build and install
 
@@ -97,16 +81,13 @@ cmake --build --preset conan-release
 cmake --install build --prefix "$VIRTUAL_ENV" --config Release  # optional
 ```
 
-> **Note**  
-> If you changed the installation prefix, and
-> unless you installed the package to a system folder like `/usr/local`, you'll
-> have to add `~/.local` to the `CMAKE_PREFIX_PATH`, e.g. by adding the
-> following to your `~/.profile` file, where `$HOME/.local` was the prefix used
-> in the when installing alpaqa earlier:
-> ```sh
-> export CMAKE_PREFIX_PATH="$HOME/.local:$CMAKE_PREFIX_PATH"
-> ```
-> Then source it (`. ~/.profile`) or log out and back in again.
+Alternatively, avoid manual installation by consuming alpaqa through Conan.
+To make the `alpaqa` package available, use:
+```sh
+conan export .
+```
+See the @ref cmake_examples "`examples/CMake/Solver` example project"
+for details.
 
 ## Windows
 
@@ -117,11 +98,11 @@ usually want to use the default generator rather than Ninja when doing
 cd alpaqa
 py -m venv .venv
 &./.venv/Scripts/Activate.ps1
-pip install conan cmake ninja
+pip install conan
 conan profile detect
 git clone https://github.com/tttapa/conan-recipes
 conan remote add tttapa-conan-recipes "$PWD/conan-recipes" --force
-conan install . --build=missing -s build_type=Release
+conan install . --build=missing -s build_type=Release -c tools.build:skip_test=True
 cmake --preset conan-default
 cmake --build --preset conan-release
 cmake --install build --prefix "$env:VIRTUAL_ENV" --config Release  # optional
@@ -133,7 +114,7 @@ The instructions for macOS are the same as the ones for Linux, with the caveat
 that the default AppleClang compiler might not yet support the necessary C++20
 features used by alpaqa. If this is the case, you can use a mainline Clang
 compiler (version 16 or higher), that you install using Homebrew or another
-package manager. Xcode 15 or later include Clang 16 and are known to work.
+package manager.
 Make sure you use a Conan profile that selects the appropriate version of Clang.
 
 ***
@@ -142,8 +123,9 @@ Make sure you use a Conan profile that selects the appropriate version of Clang.
 
 Once the library is installed, you can use it in your own projects.
 
-It is highly recommended to have a look at the `examples/CMake/Solver` example
-project, but in short:
+It is highly recommended to have a look at the
+@ref cmake_examples "`examples/CMake/Solver` example project",
+but in short:
 
 **main.cpp**
 ```cpp
@@ -200,12 +182,10 @@ the dependencies using Conan. You want to add the `with_python` option.
 cd alpaqa
 python3 -m venv .venv
 . ./.venv/bin/activate
-pip install conan cmake ninja
-conan profile detect
+pip install conan
+conan profile detect ||:
 git clone https://github.com/tttapa/conan-recipes
 conan remote add tttapa-conan-recipes "$PWD/conan-recipes" --force
-conan install . --build=missing -s build_type=Release -o \&:with_python=True \
-    -c tools.cmake.cmaketoolchain:generator="Ninja Multi-Config"
 ```
 
 ## Windows
@@ -213,17 +193,16 @@ conan install . --build=missing -s build_type=Release -o \&:with_python=True \
 cd alpaqa
 py -m venv .venv
 &./.venv/Scripts/Activate.ps1
-pip install conan cmake ninja
-conan profile detect
+pip install conan
+conan profile detect || $null
 git clone https://github.com/tttapa/conan-recipes
 conan remote add tttapa-conan-recipes "$PWD/conan-recipes" --force
-conan install . --build=missing -s build_type=Release -o "&:with_python=True"
 ```
 
 After creating the virtual environment and installing the dependencies, you can
 install the Python module using Pip (this may take a while):
 ```sh
-pip install -v ".[test]"
+pip install -v ".[test,casadi]"
 ```
 To build the Python package without installing, you can use:
 ```sh
@@ -232,19 +211,7 @@ python -m build -w .
 ```
 Finally, test the package:
 ```sh
-pip install pytest
 pytest
-```
-
-To build a debug version of alpaqa, you can use the following:
-```sh
-rm -rf build/python  # Remove the old binaries
-conan install . --build=missing -s build_type=Debug -o \&:with_python=True \
-    -c tools.cmake.cmaketoolchain:generator="Ninja Multi-Config"
-pip install -v . \
-    -C override=cmake.config=Debug \
-    -C override=cmake.build_presets=conan-python-debug
-ALPAQA_PYTHON_DEBUG=1 pytest
 ```
 
 # Matlab
@@ -255,16 +222,17 @@ ALPAQA_PYTHON_DEBUG=1 pytest
 cd alpaqa
 python3 -m venv .venv
 . ./.venv/bin/activate
-python -m pip install -U conan cmake ninja
-conan profile detect
+python -m pip install -U conan
+conan profile detect ||:
 git clone https://github.com/tttapa/conan-recipes
 conan remote add tttapa-conan-recipes "$PWD/conan-recipes" --force
 conan install . --build=missing \
     -c tools.cmake.cmaketoolchain:generator="Ninja Multi-Config" \
+    -c tools.build:skip_test=True \
     -o with_matlab=True -o with_external_casadi=True
 cmake --preset conan-matlab
 cmake --build --preset conan-matlab-release -t alpaqa_mex
-cmake --install build/matlab \
+cmake --install build/matlab --config Release \
     --prefix ~/Documents/MATLAB --component mex_interface
 ```
 
@@ -274,15 +242,16 @@ cmake --install build/matlab \
 cd alpaqa
 py -m venv .venv
 &./.venv/Scripts/Activate.ps1
-pip install conan cmake ninja
-conan profile detect
+pip install conan
+conan profile detect || $null
 git clone https://github.com/tttapa/conan-recipes
 conan remote add tttapa-conan-recipes "$PWD/conan-recipes" --force
-conan install . --build=missing \
+conan install . --build=missing `
+    -c tools.build:skip_test=True `
     -o with_matlab=True -o with_external_casadi=True
 cmake --preset conan-matlab
-cmake --build --preset conan-matlab-release -j -t alpaqa_mex
-cmake --install build/matlab \
+cmake --build --preset conan-matlab-release -t alpaqa_mex
+cmake --install build/matlab --config Release `
     --prefix "$env:USERPROFILE\Documents\MATLAB" --component mex_interface
 ```
 
