@@ -40,7 +40,6 @@ docs = [
     "ninja>=1.11.1,<2",
     "matplotlib",
 ]
-debug = ["alpaqa-debug==1.0.0a21.dev0"]
 test = [
     "pytest>=7.2.0,<9",
     "qpalm~=1.2.1",
