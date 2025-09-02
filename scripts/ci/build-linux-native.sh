@@ -24,7 +24,7 @@ python3 -m build -w "$pkg_dir" -o "$out_dir" -C local="$pbc_config"
 # Install the Python stubs
 if [ -n "$install_stubs_dir" ]; then
     # Install py-build-cmake and pybind11-stubgen
-    python3 -m pip install 'py-build-cmake~=0.6.0a1' 'pybind11-stubgen~=2.5.5' 'numpy<3'
+    python3 -m pip install 'py-build-cmake~=0.6.0a2' 'pybind11-stubgen~=2.5.5' 'numpy<3'
     # Determine Conan's build directory
     pbc=(python3 -m py_build_cmake.cli -C "$pkg_dir" --local="$pbc_config")
     build_config="$("${pbc[@]}" build-config-name)"

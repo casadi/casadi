@@ -49,7 +49,7 @@ runs:
     shell: bash
     run: >
       pip install -U pip build
-      conan~=2.19.1 'py-build-cmake~=0.6.0a1' 'pybind11-stubgen~=2.5.5'
+      conan~=2.19.1 'py-build-cmake~=0.6.0a2' 'pybind11-stubgen~=2.5.5'
 
   - name: Configure sccache version
     shell: bash
