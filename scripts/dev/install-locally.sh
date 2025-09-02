@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 cd "$( dirname "${BASH_SOURCE[0]}" )"/../..
 export CTEST_OUTPUT_ON_FAILURE=1
+export CLICOLOR_FORCE=1
 
 set -ex
 
@@ -12,6 +13,10 @@ case $1 in
     py*) build_cpp=0 ;;
     cpp*) build_python=0 ;;
     *) echo "Invalid argument, use py[-dev] or cpp[-pkg]"; exit 1 ;;
+esac
+case $1 in
+    py-dev) dev_flags=-e ;;
+    *) ;;
 esac
 
 # Activate virtual environment
@@ -39,11 +44,25 @@ tools_dir="$PWD/toolchains"
 host_profile="$PWD/profile-host.local.conan"
 cat <<- EOF > "$host_profile"
 include($PWD/scripts/ci/profiles/$triple.profile)
+[tool_requires]
+&:mold/[*]
 [conf]
+&:tools.build:exelinkflags+=["-fuse-ld=mold", "-B$ENV{MOLD_ROOT}"]
+&:tools.build:sharedlinkflags+=["-fuse-ld=mold", "-B$ENV{MOLD_ROOT}"]
 tools.build.cross_building:can_run=True
+tools.cmake.cmaketoolchain:user_toolchain=+['$PWD/scripts/ci/profiles/static-libgcc.cmake']
 [buildenv]
-CMAKE_C_COMPILER_LAUNCHER=sccache
-CMAKE_CXX_COMPILER_LAUNCHER=sccache
+LDFLAGS+= -static-libstdc++ -static-libgfortran -static-libquadmath -Wl,--as-needed 
+&:CMAKE_C_COMPILER_LAUNCHER=sccache
+&:CMAKE_CXX_COMPILER_LAUNCHER=sccache
+[options]
+coinmumps/*:static_fortran_libs=True
+EOF
+build_profile="$PWD/profile-build.local.conan"
+cat <<- EOF > "$build_profile"
+include(default)
+[settings]
+mold/*:compiler.cppstd=20
 EOF
 
 cpp_profile="$PWD/profile-cpp.local.conan"
@@ -52,29 +71,29 @@ include($host_profile)
 include($PWD/scripts/ci/profiles/alpaqa-cpp-linux.profile)
 EOF
 
-python_profile="$PWD/profile-python.local.conan"
+# Create Conan profile to inject the appropriate Python development files
+python_profile="$PWD/conan-python.profile"
 cat <<- EOF > "$python_profile"
 include($host_profile)
 include($PWD/scripts/ci/profiles/alpaqa-python-linux.profile)
-[conf]
-tools.build:exelinkflags+=["-static-libgcc"]
-tools.build:sharedlinkflags+=["-static-libgcc"]
 [options]
-alpaqa/*:with_conan_python=True
+&:with_conan_python=True
 [replace_requires]
-tttapa-python-dev/*: tttapa-python-dev/[^$python_version]
+tttapa-python-dev/*: tttapa-python-dev/[~$python_majmin, include_prerelease]
 EOF
 
-pbc_config="$PWD/$triple.py-build-cmake.config.pbc"
+# Create a py-build-cmake configuration file for cross-compilation
+pbc_config="$PWD/$triple.py-build-cmake.pbc"
 cat <<- EOF > "$pbc_config"
 os=linux
-implementation="cp"
+implementation=cp
 version="$python_majmin_nodot"
 abi="cp$python_majmin_nodot"
-arch=$plat_tag
-cmake.options.CMAKE_C_COMPILER_LAUNCHER=sccache
-cmake.options.CMAKE_CXX_COMPILER_LAUNCHER=sccache
-cmake.options.ALPAQA_WITH_PY_STUBS=true
+arch="$plat_tag"
+conan.profile_host=["$python_profile"]
+conan.profile_build=["$build_profile"]
+conan.cmake.args+=["--fresh"]
+# conan.cmake.build_args+=["--verbose"]
 EOF
 
 # Build C++ packages
@@ -82,6 +101,7 @@ if [ $build_cpp -eq 1 ]; then
     for cfg in Debug RelWithDebInfo; do
         conan install . --build=missing \
             -pr:h "$cpp_profile" \
+            -pr:b "$build_profile" \
             -s build_type=$cfg
     done
 
@@ -105,31 +125,8 @@ fi
 
 # Build Python packages
 if [ $build_python -eq 1 ]; then
-    for cfg in Debug Release; do
-        conan install . --build=missing \
-            -pr:h "$python_profile" \
-            -s build_type=$cfg
-    done
-    if [ "${1: -4}" = "-dev" ]; then
-        pip install -e ".[test]" -v \
-            -C local="$PWD/scripts/ci/py-build-cmake.toml" \
-            -C cross="$pbc_config" \
-            -C override=cmake.install_components+='[python_modules_debug]'
-    else
-        tag=\"$(date -u +"%s")\"
-        python -m build -w "." -o staging \
-            -C local="$PWD/scripts/ci/py-build-cmake.toml" \
-            -C cross="$pbc_config" \
-            -C override=wheel.build_tag="$tag"
-        python -m build -w "python/alpaqa-debug" -o staging \
-            -C local="$PWD/scripts/ci/py-build-cmake.toml" \
-            -C component="$PWD/scripts/ci/py-build-cmake.component.toml" \
-            -C cross="$pbc_config" \
-            -C override=wheel.build_tag="$tag"
-        pip install -f staging --force-reinstall --no-deps \
-            "alpaqa==1.0.0a21.dev0" "alpaqa-debug==1.0.0a21.dev0"
-        pip install -f staging \
-            "alpaqa[test]==1.0.0a21.dev0" "alpaqa-debug==1.0.0a21.dev0"
-    fi
+    # Build and install the Python package
+    pip install -v $dev_flags ".[test]" -C cross="$pbc_config" # -C o=editable.build_hook=true
+    # Run tests
     pytest
 fi
