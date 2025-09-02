@@ -95,43 +95,224 @@ namespace casadi {
     return 0;
   }
 
+class LinearInterpolantIntervalPropagator : public FunctionInternal {
+public:
+  Function orig_;
+
+  /** \brief  Constructor */
+  LinearInterpolantIntervalPropagator(const std::string& name, const Function& orig) :
+    FunctionInternal(name), orig_(orig) {
+  }
+
+  /** \brief  Destructor */
+  ~LinearInterpolantIntervalPropagator() override {
+    clear_mem();
+  }
+
+  void init(const Dict& opts) override {
+    // Call the initialization method of the base class
+    FunctionInternal::init(opts);
+
+    alloc_w(orig_.sz_w());
+    alloc_iw(orig_.sz_iw());
+  }
+
+  /** \brief Get type name */
+  std::string class_name() const override {return "LinearInterpolantIntervalPropagator";}
+
+  /** \brief Number of function inputs and outputs */
+  size_t get_n_in() override { return orig_.n_in()*2;}
+  size_t get_n_out() override { return orig_.n_out()*2;}
+
+  /** \brief Sparsities of function inputs and outputs */
+  Sparsity get_sparsity_in(casadi_int i) override {
+    return orig_.sparsity_in(i % orig_.n_in());
+  }
+  Sparsity get_sparsity_out(casadi_int i) override {
+    return orig_.sparsity_out(i % orig_.n_out());
+  }
+
+  ///@{
+  /** \brief Names of function input and outputs */
+  std::string get_name_in(casadi_int i) override {
+    return orig_.name_in(i % orig_.n_in()) + "_L";
+  }
+  std::string get_name_out(casadi_int i) override {
+    return orig_.name_out(i % orig_.n_out()) + "_R";
+  }
+  /// @}
+
+  /** \brief  Evaluate numerically */
+  virtual int eval(const double** arg, double** res,
+    casadi_int* iw, double* w, void* mem) const override {
+    LinearInterpolant* orig = orig_.get<LinearInterpolant>();
+
+    casadi_int ndim = orig->ndim_;
+    casadi_int m = orig->m_;
+
+    int orig_mem = orig->checkout();
+
+    double* orig_w = w;
+    casadi_int* orig_iw = iw;
+
+    const std::vector<double>& grid = orig->grid_;
+    const std::vector<casadi_int>& offset = orig->offset_;
+    const std::vector<double>& values = orig->values_;
+
+    std::vector<casadi_int> strides(ndim, m);
+    for (casadi_int i=1;i<ndim;++i) {
+      strides[i] = strides[i-1]*(offset[i]-offset[i-1]);
+    }
+
+    // Pairs of these define a subset of the grid that lies in the interior, per coordinate
+    casadi_int interior_numel = 1;
+    std::vector<casadi_int> interior_start(ndim), interior_size(ndim);
+    for (casadi_int i=0;i<ndim;++i) {
+      for (casadi_int j=0;j<offset[i+1]-offset[i];++j) {
+      if (grid[offset[i]+j]>arg[0][i] && grid[offset[i]+j]<arg[1][i]) {
+          if (interior_size[i]==0) {
+            interior_start[i] = j;
+          }
+          interior_size[i]++;
+        }
+      }
+      interior_numel*=interior_size[i];
+    }
+
+    // General approach:
+    //   The lower and upper interval bounds X_L[i] and X_R[i] define a hypercube.
+    //   That hypercube together with the knots defines a set of critical points.
+    //   Get the min/max of the interpolating surface at all critical points.
+    //
+    // Critical points are given by the cartesian product of
+    //      [X_L[i], X_R[i], knots[i] that lie in (X_L[i], X_R[i])]
+    //
+    // At knots, the interpolant values are given directly by the values array.
+    // For efficiency, we treat these 'interior' critical points separately,
+    // and consider only the remaining 'surfacial' critical points for interpolation
+
+
+    // current multi-index, initialized to start[]
+    std::vector<casadi_int> idx = interior_start;
+
+    // Linear index into values
+    casadi_int lin = 0;
+    for (casadi_int i = 0; i < ndim; ++i) {
+      lin += interior_start[i] * strides[i];
+    }
+
+    // Initialize the L and R outputs
+    for (casadi_int k=0;k<m;++k) {
+      res[0][k] = inf;
+      res[1][k] = -inf;
+    }
+
+    if (interior_numel) {
+      for (casadi_int k=0;k<m;++k) {
+        res[0][k] = fmin(res[0][k], values[lin+k]);
+        res[1][k] = fmax(res[1][k], values[lin+k]);
+      }
+    }
+
+    // Visit cartesian product of all interior grids
+    while (true) {
+      bool advanced = false;
+      for (casadi_int i=0; i < ndim; ++i) {
+        // Can we advance axis i by one and stay inside?
+        if (idx[i] + 1 < interior_start[i]+interior_size[i]) {
+          ++idx[i];
+          lin += strides[i];        // take one step along axis i
+
+          // Visit values[lin]
+          for (casadi_int k=0;k<m;++k) {
+            res[0][k] = fmin(res[0][k], values[lin+k]);
+            res[1][k] = fmax(res[1][k], values[lin+k]);
+          }
+          advanced = true;
+          break;                    // done with this iteration
+        } else {
+          // wrap axis i back to start: adjust from CURRENT idx[i] (== stop_i-1) to start
+          lin += (interior_start[i] - idx[i]) * strides[i];
+          idx[i] = interior_start[i];
+          // continue to try slower axis (i+1)
+        }
+      }
+      if (!advanced) break;
+    }
+
+    std::vector< std::vector<double> > critical_points(ndim);
+
+    for (casadi_int i=0;i<ndim;++i) {
+      critical_points[i].push_back(arg[0][i]);
+      for (casadi_int j=interior_start[i];j<interior_start[i]+interior_size[i];++j) {
+        critical_points[i].push_back(grid[offset[i]+j]);
+      }
+      critical_points[i].push_back(arg[1][i]);
+    }
+
+    // Odometer state
+    std::vector<casadi_int> pos(ndim, 0);
+    std::vector<double> point(ndim);
+    std::vector<casadi_int> len(ndim);
+    for (casadi_int i = 0; i < ndim; ++i) len[i] = critical_points[i].size();
+
+    // Initialize first point (all X_L)
+    for (casadi_int i = 0; i < ndim; ++i) point[i] = critical_points[i][pos[i]];
+
+    std::vector<const double *> orig_arg(1);
+    std::vector<double *> orig_res(1);
+
+    std::vector<double> orig_output(m);
+
+    orig_arg[0] = get_ptr(point);
+    orig_res[0] = get_ptr(orig_output);
+
+    // Iterate product; skip the single “all-interior” tuple
+    while (true) {
+      bool all_interior = true;
+      for (casadi_int d = 0; d < ndim; ++d) {
+        if (pos[d] == 0 || pos[d] + 1 == len[d]) { all_interior = false; break; }
+      }
+      if (!all_interior) {
+        orig_(get_ptr(orig_arg), get_ptr(orig_res), orig_iw, orig_w, orig_mem);
+        // Process the interpolant outputs
+        for (casadi_int k=0;k<m;++k) {
+          res[0][k] = fmin(res[0][k], orig_output[k]);
+          res[1][k] = fmax(res[1][k], orig_output[k]);
+        }
+      }
+
+      // advance odometer (axis 0 fastest; flip if you prefer)
+      bool advanced = false;
+      for (casadi_int i = 0; i < ndim; ++i) {
+        if (pos[i] + 1 < len[i]) {
+          ++pos[i];
+          point[i] = critical_points[i][pos[i]];
+          // reset faster axes 0..i-1
+          for (casadi_int j = 0; j < i; ++j) {
+            pos[j] = 0;
+            point[j] = critical_points[j][pos[j]];
+          }
+          advanced = true;
+          break;
+        }
+      }
+      if (!advanced) break; // done
+    }
+
+    orig->release(orig_mem);
+
+    return 0;
+  }
+};
+
 Function LinearInterpolant::get_interval_propagator(const Dict& opts) const {
-  MX x_L = MX::sym("x_L", sparsity_in_[0]);
-  MX x_R = MX::sym("x_R", sparsity_in_[0]);
+    Function ret;
+    ret.own(
+      new LinearInterpolantIntervalPropagator(name_ + "_interval_propagator", self()));
+    ret->construct(opts);
 
-  double min = std::numeric_limits<double>::infinity();
-  double max = -std::numeric_limits<double>::infinity();
-  for (double v : values_) {
-    min = std::min(min, v);
-    max = std::max(max, v);
-  }
-
-  MX f_L = DM::ones(sparsity_out_[0])*min;
-  MX f_R = DM::ones(sparsity_out_[0])*max;
-
-  std::vector<std::string> name_in;
-  for (const std::string& e : name_in_) {
-    name_in.push_back(e + "_L");
-  }
-  for (const std::string& e : name_in_) {
-    name_in.push_back(e + "_R");
-  }
-
-  std::vector<std::string> name_out;
-  for (const std::string& e : name_out_) {
-    name_out.push_back(e + "_L");
-  }
-  for (const std::string& e : name_out_) {
-    name_out.push_back(e + "_R");
-  }
-
-  std::vector<MX> arg = {x_L, x_R};
-  std::vector<MX> res = {f_L, f_R};
-
-  return Function(name_ + "_interval_propagator",
-    arg,
-    res, name_in, name_out);
-
+    return ret;
   }
 
   void LinearInterpolant::codegen_body(CodeGenerator& g) const {
