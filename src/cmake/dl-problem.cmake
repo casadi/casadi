@@ -65,7 +65,7 @@ endfunction()
 
         .. code-block:: cmake
 
-            find_package(alpaqa 1.0.0 REQUIRED COMPONENTS Dl)
+            find_package(alpaqa 1.1.0 REQUIRED COMPONENTS Dl)
 
         If ``LINK_ALPAQA`` is specified, both the ``Core`` and ``Dl`` components
         are required.

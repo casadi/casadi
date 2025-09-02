@@ -1,5 +1,5 @@
 [requires]
-alpaqa/1.0.0-alpha.21
+alpaqa/1.1.0-alpha.1
 [tool_requires]
 cmake/[>=3.25 <5]
 [generators]

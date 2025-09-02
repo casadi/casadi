@@ -7,7 +7,7 @@ To include alpaqa in your CMake project, use the ``find_package`` command:
 
 .. code-block:: cmake
 
-    find_package(alpaqa 1.0.0 [EXACT] [QUIET] [REQUIRED]
+    find_package(alpaqa 1.1.0 [EXACT] [QUIET] [REQUIRED]
                  [COMPONENTS <components> ...]
                  [OPTIONAL_COMPONENTS <components> ...])
 

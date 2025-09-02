@@ -40,7 +40,7 @@ For Debian-based systems, the .deb packages can be installed using
 .. code-block:: sh
 
     sudo apt update
-    sudo apt install ./libalpaqa*_1.0.0a19_amd64.deb
+    sudo apt install ./libalpaqa*_1.1.0a1_amd64.deb
 
 Different components are available:
 
@@ -74,7 +74,7 @@ Alternatively, the .tar.gz file can be extracted and installed manually.
 
 .. code-block:: sh
 
-    sudo tar xzf alpaqa-1.0.0a19-Linux-x86_64.tar.gz -C /usr/local --strip-components=1
+    sudo tar xzf alpaqa-1.1.0a1-Linux-x86_64.tar.gz -C /usr/local --strip-components=1
 
 When using the development packages, it is important to use the correct version
 of Eigen (currently 3.4.0) to avoid ABI incompatibilities.
@@ -104,7 +104,7 @@ command in the MATLAB command window:
 
 .. code-block:: matlab
 
-    unzip(['https://github.com/kul-optec/alpaqa/releases/download/1.0.0a19/alpaqa-matlab-' computer('arch') '.zip'], userpath)
+    unzip(['https://github.com/kul-optec/alpaqa/releases/download/1.1.0a1/alpaqa-matlab-' computer('arch') '.zip'], userpath)
 
 You need CasADi to be installed as well: https://web.casadi.org/get
 

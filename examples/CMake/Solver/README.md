@@ -26,7 +26,7 @@ pip install -U conan
 Export the alpaqa library to Conan:
 
 ```sh
-git clone https://github.com/kul-optec/alpaqa --branch=1.0.0a19 --single-branch
+git clone https://github.com/kul-optec/alpaqa --branch=1.1.0a1 --single-branch
 conan export alpaqa
 ```
 
@@ -124,4 +124,4 @@ target_link_libraries(alpaqa-qp-solver PRIVATE alpaqa::casadi-loader)
 ```
 
 A complete list of the available components and targets can be found on the
-[CMake API Reference](https://kul-optec.github.io/alpaqa/1.0.0a19/Sphinx/reference/cmake-api.html) page.
+[CMake API Reference](https://kul-optec.github.io/alpaqa/1.1.0a1/Sphinx/reference/cmake-api.html) page.
