@@ -25,8 +25,9 @@ EOF
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     cat <<- EOF >> "$matlab_profile"
 	[conf]
-	tools.build:exelinkflags+=["-static-libgcc"]
-	tools.build:sharedlinkflags+=["-static-libgcc"]
+	tools.cmake.cmaketoolchain:user_toolchain=+['$PWD/scripts/ci/profiles/static-libgcc.cmake']
+	[buildenv]
+	LDFLAGS+= -static-libstdc++ -static-libgfortran -static-libquadmath -Wl,--as-needed 
 	EOF
 fi
 
