@@ -3728,5 +3728,23 @@ class Functiontests(casadiTestCase):
       print(res)
       ref = {"foo": 1, "bar": {"r": None}}
       cmp(res,ref)
+      
+  def test_duplicate_check(self):
+    x = MX()
+    f = Function('f',[x],[2*x])
+    self.assertEqual(f.numel_in(0), 0)
+    f = Function('f',[MX.zeros(0,0)],[2*x])
+    self.assertEqual(f.numel_in(0), 0)
+    f = Function('f',[MX.ones(0,0)],[2*x])
+    self.assertEqual(f.numel_in(0), 0)
+    p = MX.sym("p")
+    with self.assertInException("input arguments must be purely symbolic"):
+        f = Function('f',[x.nz[p]],[2*x])
+        self.assertEqual(f.numel_in(0), 0)
+    x.nz[p] = 3.7
+    with self.assertInException("input arguments must be purely symbolic"):
+        f = Function('f',[x],[3*x])
+        self.assertEqual(f.numel_in(0), 0)
+
 if __name__ == '__main__':
     unittest.main()   

@@ -331,7 +331,7 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::init");
     // Make sure that inputs are symbolic
     for (casadi_int i=0; i<n_in_; ++i) {
-      if (in_.at(i).nnz()>0 && !in_.at(i).is_valid_input()) {
+      if (!in_.at(i).is_valid_input()) {
         casadi_error("For " + this->name_ + ": Xfunction input arguments must be purely symbolic."
                      "\nArgument " + str(i) + "(" + name_in_[i] + ") is not symbolic.");
       }
