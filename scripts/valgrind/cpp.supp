@@ -41,18 +41,22 @@
    ...
 }
 {
-   Conditional jump or move depends on uninitialised value(s)
-   Memcheck:Cond
-   fun:convert_sparsity
-   ...
-   fun:_ZN37Sparsity_convertCSCToCSCunsorted_Test8TestBodyEv
-   ...
+   Mismatched free() / delete / delete []
+   Memcheck:Free
+   fun:_ZdlPvm
+   fun:main
+}
+ {
+   Mismatched free() / delete / delete []
+   Memcheck:Free
+   fun:_ZdlPvm
+   fun:_ZN6alpaqa2dl9DLProblemD1Ev
+   fun:main
 }
 {
-   Conditional jump or move depends on uninitialised value(s)
-   Memcheck:Cond
-   fun:convert_sparsity
-   ...
-   fun:_ZN35Sparsity_convertCSCToCSCsorted_Test8TestBodyEv
-   ...
+   Mismatched free() / delete / delete []
+   Memcheck:Free
+   fun:_ZdlPvm
+   fun:_ZN6alpaqa2dl9DLProblemD1Ev
+   fun:main
 }

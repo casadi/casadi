@@ -12,135 +12,57 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ubuntu:jammy
     strategy:
       matrix:
         include:
-          - host: x86_64-bionic-linux-gnu
-            openblas-target: HASWELL
-          - host: aarch64-rpi3-linux-gnu
-            openblas-target: CORTEXA53
-    env:
-      CCACHE_DIR: /root/.ccache
-      CONAN_HOME: /root/.conan2
-      LDFLAGS: '-static-libstdc++ -static-libgcc -flto=auto'
+          - { host: x86_64-bionic-linux-gnu, tests: ExperimentalTest }
+          - { host: aarch64-rpi3-linux-gnu, tests: '' }
     steps:
-      # Git clone
-      - name: Install git
-        run: apt -y update && apt -y install --no-install-recommends git ca-certificates
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Conan
+        uses: ./.github/workflows/setup-conan
         with:
-          submodules: recursive
-      # Tools
-      - name: Install tools
-        id: tools
-        uses: ./.github/workflows/new-toolchain
-        with:
-          host: ${{ matrix.host }}
-      # Ccache
-      - name: Prepare ccache directory
-        run: mkdir -p "${{ env.CCACHE_DIR }}"
-      - name: Cache ccache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.os }}-linux-bin-${{ matrix.host }}-ccache-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-linux-bin-${{ matrix.host }}-ccache
-      # Conan
-      - name: Cache Conan
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CONAN_HOME }}/p
-          key: ${{ runner.os }}-linux-bin-${{ matrix.host }}-conan-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-linux-bin-${{ matrix.host }}-conan
-      - name: Install Conan
-        run: |
-          python3 -m pip install -U conan
-          conan --version
-          conan profile detect -f
-          git clone https://github.com/tttapa/conan-recipes tttapa-conan-recipes
-          conan remote add tttapa-conan-recipes tttapa-conan-recipes --force
-      # Install dependencies
-      - name: Install dependencies (RelWithDebInfo)
-        run: >
-          conan install . --build=missing
-          -pr:h "${{ steps.tools.outputs.conan-profile }}"
-          -c tools.cmake.cmaketoolchain:generator="Ninja Multi-Config"
-          -c tools.build:skip_test=True
-          -o \&:shared=True
-          -o \&:with_ipopt=True -o \&:with_external_casadi=False
-          -o \&:with_qpalm=True -o \&:with_cutest=True
-          -o \&:with_examples=False
-          -o "openblas/*:target=${{ matrix.openblas-target }}"
-          -s build_type=RelWithDebInfo
-      # Configure and Build
-      - name: Configure (RelWithDebInfo)
-        run: cmake --preset conan-default
-        env:
-          CMAKE_C_COMPILER_LAUNCHER: ccache
-          CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      - name: Build (RelWithDebInfo)
-        run: cmake --build --preset conan-relwithdebinfo
-      # Cleanup
-      - name: Cleanup (RelWithDebInfo)
-        run: rm build/CMakeCache.txt
-      # Install dependencies
-      - name: Install dependencies (Debug)
-        run: >
-          conan install . --build=missing
-          -pr:h "${{ steps.tools.outputs.conan-profile }}"
-          -c tools.cmake.cmaketoolchain:generator="Ninja Multi-Config"
-          -c tools.build:skip_test=True
-          -o \&:shared=True
-          -o \&:with_ipopt=True -o \&:with_external_casadi=False
-          -o \&:with_qpalm=True -o \&:with_cutest=True
-          -o \&:with_examples=False
-          -o "openblas/*:target=${{ matrix.openblas-target }}"
-          -s build_type=Debug
-      # Configure and Build
-      - name: Configure (Debug)
-        run: cmake --preset conan-default
-        env:
-          CMAKE_C_COMPILER_LAUNCHER: ccache
-          CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      - name: Build (Debug)
-        run: cmake --build --preset conan-debug
-      # Package
-      - name: Package
-        run: |
-          cpack -G 'TGZ;DEB' -C "RelWithDebInfo;Debug"
-        working-directory: build
+          python-version: '3.12'
+          cache-key: build-linux
+
+      - name: Install CasADi
+        run: python3 -m pip install casadi~=3.7.1
+
+      - name: Build and package
+        run: ./scripts/ci/package-linux.sh ${{ matrix.host }} "${{ matrix.tests }}"
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: alpaqa-${{ matrix.host }}
           retention-days: 1
           path: |
-            build/alpaqa*.tar.gz
-            build/*alpaqa*.deb
+            build/pkg/alpaqa*.tar.gz
+            build/pkg/*alpaqa*.deb
 
       - run: conan cache clean
 
   test:
-    # TODO
-    if: false
     needs: [build]
     runs-on: ubuntu-latest
     container: ubuntu:jammy
     strategy:
       matrix:
-        config: [RelWithDebInfo, Debug]
+        config: [Release, Debug]
         host: [x86_64-bionic-linux-gnu]
+    env:
+      CFLAGS: '-march=haswell' # important for ABI compatibility (Eigen)
+      CXXFLAGS: '-march=haswell' 
     steps:
       # Git clone
       - name: Install git
         run: >
           apt -y update && apt -y install --no-install-recommends
-          git ca-certificates g++ gfortran cmake ninja-build pkg-config 
+          git wget ca-certificates g++ gfortran ninja-build pkg-config
           python3-pip libeigen3-dev libgtest-dev libgmock-dev
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - name: Download
         uses: actions/download-artifact@v4
         with:
@@ -148,15 +70,24 @@ jobs:
           path: package
       - name: Install
         run: apt install -y ./package/*alpaqa*.deb
+      - name: Install CMake
+        run: |
+          version="4.1.1"
+          wget -N https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-Linux-x86_64.sh
+          bash cmake-$version-Linux-x86_64.sh --skip-license --prefix="/usr/local"
+      - name: Install guanaqo
+        run: |
+          git clone https://github.com/tttapa/guanaqo --branch=1.0.0-alpha.16
+          cmake -B build-guanaqo -S guanaqo -G "Ninja Multi-Config" -DBUILD_TESTING=Off
+          cmake --build build-guanaqo --config ${{ matrix.config }}
+          cmake --install build-guanaqo --config ${{ matrix.config }} --prefix=/usr/local
       - name: Build examples (${{ matrix.config }})
         run: |
-          cmake -B build-examples -S examples \
-            -G "Ninja Multi-Config"
+          cmake -B build-examples -S examples -G "Ninja Multi-Config"
           cmake --build build-examples -j --config ${{ matrix.config }}
       - name: Build tests (${{ matrix.config }})
         run: |
-          cmake -B build-tests -S test \
-            -G "Ninja Multi-Config"
+          cmake -B build-tests -S test -G "Ninja Multi-Config"
           cmake --build build-tests -j --config ${{ matrix.config }}
       - name: Upload (${{ matrix.config }})
         uses: actions/upload-artifact@v4
@@ -166,7 +97,6 @@ jobs:
           path: |
             build-examples/C++/CustomCppProblem/${{ matrix.config }}/custom-cpp-problem-example
             build-examples/C++/SimpleUnconstrProblem/${{ matrix.config }}/simple-unconstr-cpp-problem-example
-            build-examples/C++/CustomControlCppProblem/${{ matrix.config }}/custom-control-cpp-problem-example
             build-examples/C++/FortranProblem/${{ matrix.config }}/fortran-problem-example
             build-examples/C++/DLProblem/${{ matrix.config }}/dl-problem-example
             build-examples/C++/DLProblem/${{ matrix.config }}/test-matmul
@@ -177,7 +107,6 @@ jobs:
           set -ex
           ./build-examples/C++/CustomCppProblem/${{ matrix.config }}/custom-cpp-problem-example
           ./build-examples/C++/SimpleUnconstrProblem/${{ matrix.config }}/simple-unconstr-cpp-problem-example
-          ./build-examples/C++/CustomControlCppProblem/${{ matrix.config }}/custom-control-cpp-problem-example
           ./build-examples/C++/FortranProblem/${{ matrix.config }}/fortran-problem-example
           ./build-examples/C++/DLProblem/${{ matrix.config }}/dl-problem-example
           ./build-examples/C++/DLProblem/${{ matrix.config }}/test-matmul
@@ -197,7 +126,6 @@ jobs:
           set -ex
           valgrind --gen-suppressions=all --suppressions=scripts/valgrind/cpp.supp --error-exitcode=234 ./build-examples/C++/CustomCppProblem/${{ matrix.config }}/custom-cpp-problem-example
           valgrind --gen-suppressions=all --suppressions=scripts/valgrind/cpp.supp --error-exitcode=234 ./build-examples/C++/SimpleUnconstrProblem/${{ matrix.config }}/simple-unconstr-cpp-problem-example
-          valgrind --gen-suppressions=all --suppressions=scripts/valgrind/cpp.supp --error-exitcode=234 ./build-examples/C++/CustomControlCppProblem/${{ matrix.config }}/custom-control-cpp-problem-example
           valgrind --gen-suppressions=all --suppressions=scripts/valgrind/cpp.supp --error-exitcode=234 ./build-examples/C++/FortranProblem/${{ matrix.config }}/fortran-problem-example
           valgrind --gen-suppressions=all --suppressions=scripts/valgrind/cpp.supp --error-exitcode=234 ./build-examples/C++/DLProblem/${{ matrix.config }}/dl-problem-example
           valgrind --gen-suppressions=all --suppressions=scripts/valgrind/cpp.supp --error-exitcode=234 ./build-examples/C++/DLProblem/${{ matrix.config }}/test-matmul
@@ -215,9 +143,11 @@ jobs:
         container:
           - 'debian:bullseye'
           - 'debian:bookworm'
+          - 'debian:trixie'
           - 'debian:sid'
           - 'ubuntu:focal'
           - 'ubuntu:jammy'
+          - 'ubuntu:noble'
           - 'ubuntu:rolling'
     steps:
       - name: Download
@@ -234,8 +164,7 @@ jobs:
 
   release:
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
-    # TODO: test
-    needs: [test-deb]
+    needs: [test, test-deb]
     runs-on: ubuntu-latest
     strategy:
       matrix:

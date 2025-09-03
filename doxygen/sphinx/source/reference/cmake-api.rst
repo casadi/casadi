@@ -1,3 +1,5 @@
+.. _cmake_api_ref:
+
 CMake API Reference
 ===================
 

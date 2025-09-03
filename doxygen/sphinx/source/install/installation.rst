@@ -28,7 +28,11 @@ instructions.
 C++ Library
 -----------
 
-Pre-built binaries for Linux are available from the
+The easiest way to install and use the alpaqa C++ libraries is by using Conan,
+as explained in the
+`CMake example <https://github.com/kul-optec/alpaqa/tree/develop/examples/CMake/Solver>`_.
+
+Alternatively, pre-built binaries for Linux are available from the
 `Releases page on GitHub <https://github.com/kul-optec/alpaqa/releases>`_.
 
 For Debian-based systems, the .deb packages can be installed using
@@ -59,12 +63,12 @@ Different components are available:
   any C++ code.
 
 More information about the different components of alpaqa can be found in the
-`CMake example <https://github.com/kul-optec/alpaqa/tree/develop/examples/CMake/Solver>`_.
+:ref:`cmake_api_ref`.
 
 The following distributions are tested:
 
-* Debian: 11 (Bullseye), 12 (Bookworm), Sid
-* Ubuntu: 20.04 (Focal), 22.04 (Jammy), rolling
+* Debian: 11 (Bullseye), 12 (Bookworm), 13 (Trixie), Sid
+* Ubuntu: 20.04 (Focal), 22.04 (Jammy), 24.04 (Noble), rolling
 
 Alternatively, the .tar.gz file can be extracted and installed manually.
 
@@ -72,17 +76,25 @@ Alternatively, the .tar.gz file can be extracted and installed manually.
 
     sudo tar xzf alpaqa-1.0.0a19-Linux-x86_64.tar.gz -C /usr/local --strip-components=1
 
-This requires glibc 2.17 or later. You may need to install or pre-load the
-following additional runtime dependencies:
-
-* ``libgfortran5`` (GFortran 10 or later)
-* ``libquadmath0``
-
 When using the development packages, it is important to use the correct version
 of Eigen (currently 3.4.0) to avoid ABI incompatibilities.
-Adding architecture-specific flags (e.g. ``-march=skylake``, ``-mavx512f``) can
-also affect ABI, and building from source for optimal performance may be
-advisable.
+You should also add the correct architecture-specific flags: ``-march=haswell``
+for amd64 packages, and ``-mcpu=cortex-a53+crc+simd`` for aarch64 packages.
+The reason is that Eigen's ABI depends on the selected SIMD ISA extensions.
+ABI-related issues can be fully avoided by simply using Conan to install alpaqa
+instead of using the pre-built packages.
+
+The development packages of alpaqa depend on the guanaqo library, which can be
+installed from source:
+
+.. code-block:: sh
+
+    git clone https://github.com/tttapa/guanaqo --branch=1.0.0-alpha.16
+    cmake -B build-guanaqo -S guanaqo -G "Ninja Multi-Config" -DBUILD_TESTING=Off
+    cmake --build build-guanaqo --config Debug
+    sudo cmake --install build-guanaqo --config Debug --prefix=/usr/local
+    cmake --build build-guanaqo --config Release
+    sudo cmake --install build-guanaqo --config Release --prefix=/usr/local
 
 MATLAB interface
 ----------------

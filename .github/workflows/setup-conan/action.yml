@@ -74,3 +74,11 @@ runs:
       recipes="${{ github.workspace }}/tttapa-conan-recipes"
       git clone https://github.com/tttapa/conan-recipes "$recipes"
       conan remote add tttapa-conan-recipes "$recipes" --force
+      cat << EOF > "$CONAN_HOME/settings_user.yml"
+      os:
+        Linux:
+          toolchain-vendor: [null, focal, bionic, centos7, neon, rpi, rpi3]
+      arch:
+        armv7hf:
+          toolchain-cpu: [null, armv8, armv7]
+      EOF
