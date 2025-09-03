@@ -1,5 +1,7 @@
 [requires]
 alpaqa/1.0.0-alpha.21
+[tool_requires]
+cmake/[>=3.25 <5]
 [generators]
 CMakeDeps
 CMakeToolchain

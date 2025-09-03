@@ -14,13 +14,11 @@ The project itself is very simple:
 
 ## Before you start
 
-You'll need a recent C++ compiler (e.g. GCC >= 10, Clang >= 16, MSVC >= 19.30),
-CMake (>= 3.24) and Conan.
-
-The latter two can be installed using Pip:
+You'll need a recent C++ compiler (e.g. GCC >= 11, Clang >= 16, MSVC >= 19.30)
+and Conan. The latter can be installed using Pip:
 
 ```sh
-pip install -U conan cmake
+pip install -U conan
 ```
 
 ## Instructions
@@ -43,18 +41,20 @@ Build and install the dependencies for the example project:
 
 ```sh
 cd alpaqa/examples/CMake/Solver
-conan build . --build=missing
+conan install . --build=missing -c tools.build:skip_test=True
+```
+
+Configure and build the example project:
+```sh
+cmake --preset conan-release  # Linux, macOS (single-configuration generator)
+cmake --preset conan-default  # Windows (multi-configuration generator)
+cmake --build --preset conan-release
 ```
 
 Run the example:
 
 ```sh
 ./build/Release/alpaqa-qp-solver data
-```
-
-If you make any changes to the example, you can rebuild it using CMake:
-```sh
-cmake --build --preset conan-release -j
 ```
 
 ---
@@ -100,7 +100,6 @@ specify them explicitly.
 For example, to enable CasADi, first export CasADi itself, and then rebuild
 alpaqa with CasADi support enabled:
 ```sh
-conan export ../../../scripts/recipes/casadi
 conan install . --build=missing -o 'alpaqa/*:with_external_casadi=True'
 ```
 
@@ -124,23 +123,5 @@ You can now use the alpaqa CasADi loader target:
 target_link_libraries(alpaqa-qp-solver PRIVATE alpaqa::casadi-loader)
 ```
 
-Delete your project's build folder, then reinstall and reconfigure:
-```sh
-cd alpaqa/examples/CMake/Solver
-rm -rf build # or rm -r -Fo build on Windows
-conan install .
-cmake --preset conan-release # or conan-default on Windows
-cmake --build --preset conan-release -j
-```
-
 A complete list of the available components and targets can be found on the
 [CMake API Reference](https://kul-optec.github.io/alpaqa/1.0.0a19/Sphinx/reference/cmake-api.html) page.
-
-### Disabling tests
-
-By default, the `conan create` command will also build and run alpaqa's unit
-tests. To speed up the process, you may decide to disable them:
-
-```sh
-conan install . --build=missing -c tools.build:skip_test=True
-```
