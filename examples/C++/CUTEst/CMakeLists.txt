@@ -1,3 +1,4 @@
+include(GNUInstallDirs)
 find_package(MASTSIF REQUIRED)
 
 cutest_sif_problem(BIGGSC4 ALL)
@@ -32,10 +33,10 @@ function(installed_cutest_sif_problem SUBDIR PROBLEM)
     set_target_properties(cutest-problem-${PROBLEM}
                           PROPERTIES INSTALL_RPATH "$ORIGIN/../..")
     install(TARGETS cutest-problem-${PROBLEM}
-            LIBRARY DESTINATION ${ALPAQA_INSTALL_LIBDIR}/CUTEst/${SUBDIR}/${PROBLEM}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/CUTEst/${SUBDIR}/${PROBLEM}
             COMPONENT cutest)
     install(FILES "$<TARGET_FILE_DIR:cutest-problem-${PROBLEM}>/OUTSDIF.d"
-            DESTINATION ${ALPAQA_INSTALL_LIBDIR}/CUTEst/${SUBDIR}/${PROBLEM}
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/CUTEst/${SUBDIR}/${PROBLEM}
             COMPONENT cutest)
 endfunction()
 
@@ -62,6 +63,6 @@ endforeach()
 get_target_property(CUTEST_LIB CUTEst::cutest IMPORTED_LOCATION)
 if (CUTEST_LIB MATCHES "\\.so$")
     install(FILES ${CUTEST_LIB}
-            DESTINATION ${ALPAQA_INSTALL_LIBDIR}/CUTEst
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/CUTEst
             COMPONENT cutest)
 endif()
