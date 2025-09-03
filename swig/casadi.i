@@ -4912,6 +4912,17 @@ opti_metadata_modifiers(casadi::Opti)
 }
 #endif
 
+#ifdef SWIGMATLAB
+%{
+#ifdef HAVE_OCTAVE
+  // Mandatory as of Octave 10
+  // Null effect for prior versions
+  extern "C" const int __octave_mex_soversion__ = 1;
+#endif
+%}
+
+#endif
+
 %include <casadi/core/resource.hpp>
 
 // Cleanup for dependent modules
