@@ -1326,6 +1326,7 @@ namespace casadi {
 
   void Nlpsol::codegen_declarations(CodeGenerator& g) const {
     g.add_auxiliary(CodeGenerator::AUX_FILL);
+    g.add_auxiliary(CodeGenerator::AUX_INF);
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
       g.add_dependency(get_function("nlp_grad"));
 
