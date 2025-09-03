@@ -447,7 +447,7 @@ endforeach()
 # Set rpath
 if(WITH_SELFCONTAINED)
   if(APPLE)
-    set(CMAKE_INSTALL_RPATH "@loader_path/")
+    set(CMAKE_INSTALL_RPATH "@loader_path")
   else()
     set(CMAKE_INSTALL_RPATH "$ORIGIN")
   endif()
