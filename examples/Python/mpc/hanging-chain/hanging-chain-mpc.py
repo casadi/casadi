@@ -210,7 +210,7 @@ X, Y = np.meshgrid(x, y)
 Z = g_constr(constr_coeff, X) + constr_lb - Y
 fx = [patheffects.withTickedStroke(spacing=7, linewidth=0.8)]
 cgc = plt.contour(X, Y, Z, [0], colors="tab:green", linewidths=0.8)
-plt.setp(cgc.collections, path_effects=fx)
+cgc.set_path_effects(fx)
 
 
 class Animation:
