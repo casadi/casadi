@@ -39,9 +39,19 @@ namespace casadi {
   // By default, use zero-based indexing
   casadi_int GlobalOptions::start_index = 0;
 
+  std::string GlobalOptions::temp_work_dir = "./";
 
   bool GlobalOptions::julia_initialized = false;
 
   casadi_int GlobalOptions::copy_elision_min_size = 8;
+
+  void GlobalOptions::setTempWorkDir(const std::string& dir) {
+    casadi_assert(!dir.empty(), "Temporary working directory must be non-empty.");
+    casadi_assert(dir.back()=='/' || dir.back()=='\\',
+        "Temporary working directory must end with '/' or '\\'. "
+        "You have: '" + dir + "'");
+
+        temp_work_dir = dir;
+  }
 
 } // namespace casadi
