@@ -2604,12 +2604,15 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     }
 
     Dict common_options, specific_options;
+    bool enable_nominal = true;
 
     for (auto&& op : options) {
       if (op.first=="common_options") {
         common_options = op.second;
       } else if (op.first=="specific_options") {
         specific_options = op.second;
+      } else if (op.first=="enable_nominal") {
+        enable_nominal = op.second;
       } else {
         casadi_error("No such option: " + std::string(op.first));
       }
@@ -2738,7 +2741,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
 
     int rb_offset = 0;
     for (const std::vector<MX>& e : expr) {
-      out.push_back(vertcat(e));
+      if (enable_nominal) out.push_back(vertcat(e));
       int cb_offset = 0;
       for (const std::vector<MX>& a : arg) {
         MX block = blocks_J[blocks_J_i++];
