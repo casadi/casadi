@@ -274,12 +274,12 @@ jobs:
           config: |
             matrix:
               image: [macos-13]
-              py2: ["27","36","37","38","39","310","311","312","313"]
+              py2: ["27","36","37","38","39","310","311","312","313","3.14"]
             operations:
               - type: append
                 matrix:
                   image: [macos-14]
-                  py2: ["38","39","310","311","312","313"]
+                  py2: ["38","39","310","311","312","313","3.14"]
 
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
