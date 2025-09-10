@@ -194,7 +194,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,manylinux2014-x64-modern,manylinux2014-x86-modern,manylinux2014-aarch64-modern,windows-shared-x64-posix]
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,manylinux2014-x64-modern,manylinux2014-x86-modern,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v4.1.1
         with:
@@ -261,10 +261,7 @@ jobs:
                 matrix:
                   arch: [manylinux2014-aarch64]
                   py2: ["36","37","38","39","310","311","312","313"]
-              - type: append
-                matrix:
-                  arch: [manylinux2014-aarch64-modern]
-                  py2: ["314"]
+              
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
