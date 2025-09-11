@@ -93,7 +93,97 @@ class Daebuildertests(casadiTestCase):
     test_point = [vertcat(1.1,1.3),vertcat(1.7,1.11,1.13)]
     self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
     print(f.stats())
-          
+      
+  @memory_heavy() # FMU has a memleak
+  def test_indendent_var(self):
+    if os.name!="posix": return
+    fmu_file = "../data/car_t_fmu2.fmu"
+    if not os.path.exists(fmu_file):
+        print("Skipping test_fmu_zip, resource not available")
+        return
+    unzipped_name = "car"
+    unzipped_path = os.path.join(os.getcwd(), unzipped_name)
+    import shutil
+    if os.path.isdir(unzipped_path): shutil.rmtree(unzipped_path)
+    import zipfile
+    with zipfile.ZipFile(fmu_file, 'r') as zip_ref:
+        zip_ref.extractall(unzipped_name)
+    dae = DaeBuilder("car",unzipped_name)
+    dae.disp(True)
+    
+    #self.assertEqual(dae.t(),"time")
+    self.assertEqual(dae.u(),["u_susp", "v_road", "x_road"])
+    self.assertEqual(dae.y(),["x_body_squared"])
+    self.assertEqual(dae.x(),["ContState1", "ContState2", "ContState3", "ContState4"])
+    self.assertEqual(dae.p(),["Fc_susp", "d_susp", "d_tire", "k_susp", "k_tire", "m_body", "m_susp"])
+    self.assertEqual(dae.w(),["x_body_squared", "Deriv1", "Deriv2", "Deriv3", "Deriv4"])
+    f = dae.create('f',['t','u','x'],['ode','y'])
+    t = SX.sym("t")
+    
+    
+    u_susp = SX.sym("u_susp")
+    v_road = SX.sym("v_road")
+    x_road = SX.sym("x_road")
+    u = vertcat(u_susp,v_road,x_road)
+
+    x_body = SX.sym("x_body")
+    x_susp = SX.sym("x_susp")
+    v_body = SX.sym("v_body")
+    v_susp = SX.sym("v_susp")
+    x = vertcat(x_body,x_susp,v_body,v_susp)
+
+    Fc_susp = SX.sym("Fc_susp")
+    d_susp = SX.sym("d_susp")
+    d_tire = SX.sym("d_tire")
+    k_susp = SX.sym("k_susp")
+    k_tire = SX.sym("k_tire")
+    m_body = SX.sym("m_body")
+    m_susp = SX.sym("m_susp")
+
+    p = vertcat(Fc_susp, d_susp, d_tire, k_susp, k_tire, m_body, m_susp)
+    m_body_num = 2500
+    m_susp_num = 320
+    k_susp_num = 80000
+    k_tire_num = 0.5*500000
+    d_susp_num = 350
+    d_tire_num = 15020
+    Fc_susp_num = 100
+    p_num = vertcat(Fc_susp_num, d_susp_num, d_tire_num, k_susp_num, k_tire_num, m_body_num, m_susp_num)
+
+    road_force = k_tire*(x_road-x_susp)  + d_tire*(v_road-v_susp)
+    x_body_der = v_body
+    x_susp_der = v_susp
+    v_body_der = 1/m_body * (- d_susp*(v_body-v_susp) - Fc_susp*tanh(10*(v_body-v_susp)) - k_susp*(x_body-x_susp)  + u_susp)+t
+    v_susp_der = 1/m_susp * ( d_susp*(v_body-v_susp) + Fc_susp*tanh(10*(v_body-v_susp)) + k_susp*(x_body-x_susp)  + road_force - u_susp)
+
+    x_der = vertcat(x_body_der,x_susp_der,v_body_der,v_susp_der)
+    y = x_body**2
+
+    f_ref = Function('f',[t,u,x],[substitute(x_der,p,p_num),substitute(y,p,p_num)])
+    
+    u_num = [0.1,0.3,1.7]
+    x_num = [1.8,1.5,1.9,1.9]
+    
+    self.checkfunction_light(f,f_ref,inputs=[0,u_num,x_num])
+    self.checkfunction_light(f,f_ref,inputs=[0.5,u_num,x_num])
+
+    f = dae.create('f',['t','u','x','p'],['ode','y'])
+    f_ref = Function('f',[t,u,x,p],[x_der,y])
+    
+    self.checkfunction_light(f,f_ref,inputs=[0.5,u_num,x_num,1.1*p_num])
+    x_body_squared = SX.sym("x_body_squared")
+    Deriv1 = SX.sym("Deriv1")
+    Deriv2 = SX.sym("Deriv2")
+    Deriv3 = SX.sym("Deriv3")
+    Deriv4 = SX.sym("Deriv4")
+    w = vertcat(x_body_squared,Deriv1,Deriv2,Deriv3,Deriv4)
+
+    f_ref = Function('f',[t,u,x,p,w],[w[1:],w[0]])
+    
+    with self.assertInException("Unsupported input: 'w'"):
+        dae.create('f',['t','u','x','p','w'],['ode','y'])
+
+
   def test_rumoca(self):
     if "rumoca" not in CasadiMeta.feature_list(): return
     rumoca = os.path.join(GlobalOptions.getCasadiPath(),'rumoca')

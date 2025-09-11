@@ -666,11 +666,12 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
 
   // Process ModelVariables
   casadi_assert(fmi_desc.has_child("ModelVariables"), "Missing 'ModelVariables'");
-  import_model_variables(fmi_desc["ModelVariables"]);
+  std::vector<casadi_int> indexmap;
+  import_model_variables(fmi_desc["ModelVariables"], indexmap);
 
   // Process model structure
   if (fmi_desc.has_child("ModelStructure")) {
-    import_model_structure(fmi_desc["ModelStructure"]);
+    import_model_structure(fmi_desc["ModelStructure"], indexmap);
   }
 
   // Is a symbolic representation available?
@@ -3395,18 +3396,23 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   }
 }
 
-void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
+void DaeBuilderInternal::import_model_variables(const XmlNode& modvars,
+    std::vector<casadi_int>& indexmap) {
   // Mapping from derivative variables to corresponding state variables, FMUX only
   std::vector<std::pair<std::string, std::string>> fmi1_der;
 
   // Force any independent variable to appear first
   std::vector<const XmlNode*> modvars_children;
 
+  // Where is the independent variable?
+  casadi_int independent_index = -1;
+
   for (casadi_int i = 0; i < modvars.size(); ++i) {
     // Get a reference to the variable
     const XmlNode& vnode = modvars[i];
     std::string causality_str = vnode.attribute<std::string>("causality", "local");
     if (causality_str=="independent") {
+      independent_index = i;
       modvars_children.push_back(&vnode);
     }
   }
@@ -3417,6 +3423,17 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     std::string causality_str = vnode.attribute<std::string>("causality", "local");
     if (causality_str!="independent") {
       modvars_children.push_back(&vnode);
+    }
+  }
+
+  if (fmi_major_<=2 && independent_index>=0) {
+    indexmap.clear();
+    for (casadi_int i=0; i<independent_index; ++i) {
+      indexmap.push_back(i+1);
+    }
+    indexmap.push_back(0);
+    for (casadi_int i=independent_index+1; i<modvars.size(); ++i) {
+      indexmap.push_back(i);
     }
   }
 
@@ -3635,7 +3652,8 @@ std::vector<DependenciesKind> DaeBuilderInternal::read_dependencies_kind(
   }
 }
 
-void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
+void DaeBuilderInternal::import_model_structure(const XmlNode& n,
+    const std::vector<casadi_int>& indexmap) {
   // Do not use the automatic selection of outputs based on output causality
   outputs_.clear();
 
@@ -3704,7 +3722,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     if (n.has_child("Derivatives")) {
       for (auto& e : n["Derivatives"].children) {
         // Get index
-        derivatives_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+        casadi_int index = e.attribute<casadi_int>("index", 0)-1;
+        if (!indexmap.empty()) index = indexmap[index];
+        derivatives_.push_back(index);
         // Corresponding variable
         Variable& v = variable(derivatives_.back());
         // Add to list of states and derivative to list of dependent variables
@@ -3744,8 +3764,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     if (n.has_child("Derivatives")) {
       // Separate pass for dependencies
       for (auto& e : n["Derivatives"].children) {
+        // Get index
         casadi_int index = e.attribute<casadi_int>("index", 0)-1;
-
+        if (!indexmap.empty()) index = indexmap[index];
         // Corresponding variable
         Variable& v = variable(index);
 
@@ -3771,9 +3792,14 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     if (n.has_child("Outputs")) {
       for (auto& e : n["Outputs"].children) {
         // Get index
-        outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+        casadi_int index = e.attribute<casadi_int>("index", 0)-1;
+        if (!indexmap.empty()) index = indexmap[index];
+        outputs_.push_back(index);
         // Corresponding variable
         Variable& v = variable(outputs_.back());
+
+        uout() << "Variable: " << v.name <<  outputs_.back() << std::endl;
+
         // Get dependencies
         if (e.has_attribute("dependencies")) {
           v.dependencies = read_dependencies(e);
@@ -3808,7 +3834,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     if (n.has_child("InitialUnknowns")) {
       for (auto& e : n["InitialUnknowns"].children) {
         // Get index
-        initial_unknowns_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+        casadi_int index = e.attribute<casadi_int>("index", 0)-1;
+        if (!indexmap.empty()) index = indexmap[index];
+        initial_unknowns_.push_back(index);
 
         std::vector<casadi_int> dependencies;
         // Get dependencies

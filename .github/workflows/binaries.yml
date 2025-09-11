@@ -1097,6 +1097,7 @@ jobs:
           wget https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol3.fmu
           wget https://github.com/casadi/testbot/releases/download/perpetual/vdp.fmu
           wget https://github.com/casadi/testbot/releases/download/perpetual/cstr.fmu
+          wget https://github.com/casadi/testbot/releases/download/perpetual/car_t_fmu2.fmu 
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
