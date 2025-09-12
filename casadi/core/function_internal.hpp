@@ -918,7 +918,9 @@ namespace casadi {
         \identifier{m4} */
     virtual void jit_dependencies(const std::string& fname) {}
 
-    /** \brief Get JIT directory from options */
+    /** \brief Get JIT directory from options
+
+        \identifier{2ec} */
     static std::string get_jit_directory(const Dict& jit_options);
 
     /** \brief Export function in a specific language

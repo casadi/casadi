@@ -679,7 +679,8 @@ protected:
   *
   * When interpreting index attributes in the XML, use indexmap[index]
   *
-  */
+
+      \identifier{2ed} */
   void import_model_variables(const XmlNode& modvars, std::vector<casadi_int>& indexmap);
 
   // Read ModelStructure
