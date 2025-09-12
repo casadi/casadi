@@ -3798,8 +3798,6 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n,
         // Corresponding variable
         Variable& v = variable(outputs_.back());
 
-        uout() << "Variable: " << v.name <<  outputs_.back() << std::endl;
-
         // Get dependencies
         if (e.has_attribute("dependencies")) {
           v.dependencies = read_dependencies(e);
