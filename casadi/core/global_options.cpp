@@ -25,6 +25,7 @@
 
 #include "global_options.hpp"
 #include "exception.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -47,11 +48,7 @@ namespace casadi {
 
   void GlobalOptions::setTempWorkDir(const std::string& dir) {
     casadi_assert(!dir.empty(), "Temporary working directory must be non-empty.");
-    casadi_assert(dir.back()=='/' || dir.back()=='\\',
-        "Temporary working directory must end with '/' or '\\'. "
-        "You have: '" + dir + "'");
-
-        temp_work_dir = dir;
+    temp_work_dir = Filesystem::ensure_trailing_slash(dir);
   }
 
 } // namespace casadi

@@ -31,6 +31,9 @@ import pickle
 import os
 import sys
 from casadi.tools import capture_stdout
+import glob
+import gc
+import tempfile
 
 scipy_interpolate = False
 try:
@@ -2207,6 +2210,56 @@ class Functiontests(casadiTestCase):
     self.assertTrue(len(found)==2)
     self.assertTrue("Q" in found)
     self.assertTrue("fwd1_Q" in found)
+    
+  @requiresPlugin(Importer,"shell")
+  def test_jit_directory(self):
+  
+    create_dirs = "ghc-filesystem" not in CasadiMeta.feature_list()
+  
+    abs_temp_dir = tempfile.gettempdir()
+    
+    rel_temp_dir = "jit_dir_test"
+    
+    
+    cwd = os.getcwd()
+    
+    import shutil
+    if os.path.exists(rel_temp_dir):
+        shutil.rmtree(rel_temp_dir)
+        
+    if not os.path.exists("park"):
+        os.makedirs("park")
+    
+    if create_dirs:
+        os.makedirs(os.path.join(rel_temp_dir,"foo"))
+        
+    for temp_dir in ["./", rel_temp_dir,abs_temp_dir]:
+        GlobalOptions.setTempWorkDir(temp_dir)
+        
+        
+        for directory in ["", "foo", abs_temp_dir]:
+            x = MX.sym("x")
+            f = None
+            if True:
+                if os.path.isabs(directory):
+                    dir = directory
+                else:
+                    dir = os.path.join(temp_dir,directory)
+                    
+                for e in glob.glob(os.path.join(dir,"tmp_casadi*")):
+                    os.remove(e)
+                
+                f = Function('f',[x],[x**2],{"jit":True,"compiler":"shell", "jit_options": {"verbose":True, "directory": directory}})
+                # All files in the correct location
+                self.assertTrue(len(glob.glob(os.path.join(dir,"tmp_casadi*")))>1)
+                os.chdir("park")
+                f = None
+                gc.collect()
+                os.chdir(cwd)
+                # All files removed
+                self.assertTrue(len(glob.glob(os.path.join(dir,"tmp_casadi*")))==0)
+        
+        GlobalOptions.setTempWorkDir("./")
 
   def test_custom_jacobian(self):
     x = MX.sym("x")

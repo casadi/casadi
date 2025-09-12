@@ -918,6 +918,9 @@ namespace casadi {
         \identifier{m4} */
     virtual void jit_dependencies(const std::string& fname) {}
 
+    /** \brief Get JIT directory from options */
+    static std::string get_jit_directory(const Dict& jit_options);
+
     /** \brief Export function in a specific language
 
         \identifier{m5} */
@@ -1293,7 +1296,7 @@ namespace casadi {
 
         \identifier{ni} */
     std::string jit_name_;
-
+    std::string jit_directory_;
     std::string jit_base_name_;
 
     /** \brief Use a temporary name

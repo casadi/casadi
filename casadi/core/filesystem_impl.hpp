@@ -96,6 +96,9 @@ namespace casadi {
 
     static bool exists(const std::string& path);
 
+    static bool is_absolute(const std::string& path);
+    static std::string ensure_trailing_slash(const std::string& path);
+
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
     static std::mutex mutex_solvers_;
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS

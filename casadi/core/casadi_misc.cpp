@@ -356,8 +356,12 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
 }
 #endif // HAVE_SIMPLE_MKSTEMPS
 
-  std::string temporary_file(const std::string& prefix, const std::string& suffix) {
-    std::string temp_dir = GlobalOptions::getTempWorkDir();
+  std::string temporary_file(const std::string& prefix,
+      const std::string& suffix,
+      const std::string& directory) {
+
+    std::string temp_dir = Filesystem::ensure_trailing_slash(directory);
+    if (temp_dir.empty()) temp_dir = GlobalOptions::getTempWorkDir();
 
     if (Filesystem::is_enabled()) {
       casadi_assert(Filesystem::ensure_directory_exists(temp_dir),

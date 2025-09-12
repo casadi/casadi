@@ -421,7 +421,9 @@ private:
   }
 
   // Create a temporary file
-  CASADI_EXPORT std::string temporary_file(const std::string& prefix, const std::string& suffix);
+  CASADI_EXPORT std::string temporary_file(const std::string& prefix,
+    const std::string& suffix,
+    const std::string& directory="");
 
   CASADI_EXPORT void normalized_setup(std::istream& stream);
   CASADI_EXPORT void normalized_setup(std::ostream& stream);

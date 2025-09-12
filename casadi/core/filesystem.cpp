@@ -146,4 +146,27 @@ bool Filesystem::exists(const std::string& path) {
   return static_cast<bool>(ret);
 }
 
+std::string Filesystem::ensure_trailing_slash(const std::string& path) {
+  if (!path.empty() && path.back() != '/' && path.back() != '\\') {
+    return path + '/';
+  }
+  return path;
+}
+
+bool Filesystem::is_absolute(const std::string& path) {
+  if (path.empty()) {
+    return false;
+  }
+  if (path.front() == '.') {
+    return false;
+  }
+  if (path.front() == '/') {
+    return true;
+  }
+  if (path.size() > 1 && path[1] == ':') {
+    return true;
+  }
+  return false;
+}
+
 } // namespace casadi

@@ -129,8 +129,7 @@ namespace casadi {
 
   FunctionInternal::~FunctionInternal() {
     if (jit_cleanup_ && jit_) {
-      std::string jit_directory = get_from_dict(jit_options_, "directory", std::string(""));
-      std::string jit_name = jit_directory + jit_name_ + ".c";
+      std::string jit_name = jit_directory_ + jit_name_ + ".c";
       if (remove(jit_name.c_str())) casadi_warning("Failed to remove " + jit_name);
     }
   }
@@ -701,12 +700,35 @@ namespace casadi {
     return "o" + str(i);
   }
 
+  std::string FunctionInternal::get_jit_directory(const Dict& jit_options) {
+    // Start with default temp work dir
+    std::string jit_directory = GlobalOptions::getTempWorkDir();
+
+    // Get user-specified directory
+    std::string directory;
+    directory = get_from_dict(jit_options, "directory", std::string(""));
+
+    // What if directory itself is absolute?
+    if (Filesystem::is_absolute(directory)) {
+      // Override
+      jit_directory = directory;
+    } else {
+      if (Filesystem::is_enabled()) {
+        jit_directory = Filesystem::absolute(jit_directory + directory);
+      }
+    }
+
+    return Filesystem::ensure_trailing_slash(jit_directory);;
+  }
+
   void FunctionInternal::finalize() {
     if (jit_) {
       jit_name_ = jit_base_name_;
+      jit_directory_ = get_jit_directory(jit_options_);
       if (jit_temp_suffix_) {
-        jit_name_ = temporary_file(jit_name_, ".c");
-        jit_name_ = std::string(jit_name_.begin(), jit_name_.begin()+jit_name_.size()-2);
+        jit_name_ = temporary_file(jit_name_, ".c", jit_directory_);
+        jit_name_ = std::string(jit_name_.begin()+jit_directory_.size(),
+                                jit_name_.begin()+jit_name_.size()-2);
       }
       if (has_codegen()) {
         if (compiler_.is_null()) {
@@ -718,8 +740,7 @@ namespace casadi {
           CodeGenerator gen(jit_name_, opts);
           gen.add(self());
           if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
-          std::string jit_directory = get_from_dict(jit_options_, "directory", std::string(""));
-          compiler_ = Importer(gen.generate(jit_directory), compiler_plugin_, jit_options_);
+          compiler_ = Importer(gen.generate(jit_directory_), compiler_plugin_, jit_options_);
           if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
         }
         // Try to load
