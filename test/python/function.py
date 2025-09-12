@@ -2252,7 +2252,8 @@ class Functiontests(casadiTestCase):
                 f = Function('f',[x],[x**2],{"jit":True,"compiler":"shell", "jit_options": {"verbose":True, "directory": directory}})
                 # All files in the correct location
                 self.assertTrue(len(glob.glob(os.path.join(dir,"tmp_casadi*")))>1)
-                os.chdir("park")
+                if "ghc-filesystem" in CasadiMeta.feature_list():
+                    os.chdir("park")
                 f = None
                 gc.collect()
                 os.chdir(cwd)
