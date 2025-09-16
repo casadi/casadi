@@ -19,7 +19,7 @@
 
 // SYMBOL "interpn_grad"
 template<typename T1>
-void casadi_interpn_grad(T1* grad, casadi_int ndim, const T1* grid, const casadi_int* offset, const T1* values, const T1* x, const casadi_int* lookup_mode, casadi_int m, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
+void casadi_interpn_grad(T1* grad, casadi_int ndim, const T1* grid, const casadi_int* offset, const T1* values, const T1* x, const casadi_int* lookup_mode, const casadi_int* extrapolation_mode, casadi_int m, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
   T1 *alpha, *coeff, *v;
   casadi_int *index, *corner;
   casadi_int i;
@@ -33,7 +33,7 @@ void casadi_interpn_grad(T1* grad, casadi_int ndim, const T1* grid, const casadi
   corner = iw; iw += ndim;
 
   // Left index and fraction of interval
-  casadi_interpn_weights(ndim, grid, offset, x, alpha, index, lookup_mode);
+  casadi_interpn_weights(ndim, grid, offset, x, alpha, index, lookup_mode, extrapolation_mode);
   // Loop over all corners, add contribution to output
   casadi_clear_casadi_int(corner, ndim);
   casadi_clear(grad, ndim*m);

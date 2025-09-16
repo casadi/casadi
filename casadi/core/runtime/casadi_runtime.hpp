@@ -286,6 +286,7 @@ namespace casadi {
   #include "casadi_de_boor.hpp"
   #include "casadi_nd_boor_eval.hpp"
   #include "casadi_nd_boor_dual_eval.hpp"
+  #include "casadi_interp.hpp"
   #include "casadi_interpn_weights.hpp"
   #include "casadi_interpn_interpolate.hpp"
   #include "casadi_interpn.hpp"

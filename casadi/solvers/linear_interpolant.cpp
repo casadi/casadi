@@ -89,8 +89,18 @@ namespace casadi {
     if (res[0]) {
       const double* values = has_parametric_values() ? arg[arg_values()] : get_ptr(values_);
       const double* grid = has_parametric_grid() ? arg[arg_grid()] : get_ptr(grid_);
+      for (casadi_int i=0;i<ndim_;++i) {
+        if (extrapolation_mode_[i]==INTERP_EXTRAPOLATION_ERROR) {
+          casadi_assert(arg[0][i]>=grid[offset_[i]] && arg[0][i]<=grid[offset_[i+1]-1],
+                        "Extrapolation explicitly forbidden (option extrapolation_mode 'error). "
+                        "Linear interpolation on axis i=" + str(i) + ": "
+                        "Grid runs from " + str(grid[offset_[i]]) + " to " + str(grid[offset_[i+1]-1]) + ", "
+                        "but got " + str(arg[0][i]) + " as value instead.");
+        }
+      }
+
       casadi_interpn(res[0], ndim_, grid, get_ptr(offset_),
-                    values, arg[0], get_ptr(lookup_mode_), m_, iw, w);
+                    values, arg[0], get_ptr(lookup_mode_), get_ptr(extrapolation_mode_), m_, iw, w);
     }
     return 0;
   }
@@ -320,7 +330,7 @@ Function LinearInterpolant::get_interval_propagator(const Dict& opts) const {
     std::string grid = has_parametric_grid() ? g.arg(arg_grid()) : g.constant(grid_);
     g << "  if (res[0]) {\n"
       << "    " << g.interpn("res[0]", ndim_, grid, g.constant(offset_),
-      values, "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n"
+      values, "arg[0]", g.constant(lookup_mode_), g.constant(extrapolation_mode_), m_,  "iw", "w") << "\n"
       << "  }\n";
   }
 
@@ -367,7 +377,8 @@ Function LinearInterpolant::get_interval_propagator(const Dict& opts) const {
     const double* grid = has_parametric_grid() ? arg[m->arg_grid()] : get_ptr(m->grid_);
 
     casadi_interpn_grad(res[0], m->ndim_, grid, get_ptr(m->offset_),
-                      values, arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
+                      values, arg[0], get_ptr(m->lookup_mode_), get_ptr(m->extrapolation_mode_),
+                      m->m_, iw, w);
     return 0;
   }
 
@@ -389,7 +400,8 @@ Function LinearInterpolant::get_interval_propagator(const Dict& opts) const {
 
     g << "  " << g.interpn_grad("res[0]", m->ndim_,
       grid, g.constant(m->offset_), values,
-      "arg[0]", g.constant(m->lookup_mode_), m->m_, "iw", "w") << "\n";
+      "arg[0]", g.constant(m->lookup_mode_), g.constant(m->extrapolation_mode_),
+      m->m_, "iw", "w") << "\n";
   }
 
 
