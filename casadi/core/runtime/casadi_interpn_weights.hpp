@@ -17,9 +17,13 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// C-REPLACE "fmin" "casadi_fmin"
+// C-REPLACE "fmax" "casadi_fmax"
+
 // SYMBOL "interpn_weights"
 template<typename T1>
-void casadi_interpn_weights(casadi_int ndim, const T1* grid, const casadi_int* offset, const T1* x, T1* alpha, casadi_int* index, const casadi_int* lookup_mode) { // NOLINT(whitespace/line_length)
+void casadi_interpn_weights(casadi_int ndim, const T1* grid, const casadi_int* offset, const T1* x, T1* alpha, casadi_int* index,
+    const casadi_int* lookup_mode, const casadi_int* extrapolation_mode) { // NOLINT(whitespace/line_length)
   // Left index and fraction of interval
   casadi_int i;
   for (i=0; i<ndim; ++i) {
@@ -31,6 +35,9 @@ void casadi_interpn_weights(casadi_int ndim, const T1* grid, const casadi_int* o
     // Grid
     g = grid + offset[i];
     ng = offset[i+1]-offset[i];
+    if (extrapolation_mode[i]==INTERP_EXTRAPOLATION_CLIP) {
+      xi = fmax(fmin(xi, g[ng-1]), g[0]);
+    }
     // Find left index
     j = index[i] = casadi_low(xi, g, ng, lookup_mode[i]);
     // Get interpolation/extrapolation alpha

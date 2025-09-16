@@ -17,23 +17,11 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// SYMBOL "interpn"
-template<typename T1>
-void casadi_interpn(T1* res, casadi_int ndim, const T1* grid, const casadi_int* offset, const T1* values, const T1* x, const casadi_int* lookup_mode, const casadi_int* extrapolation_mode, casadi_int m, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
-  // Work vectors
-  T1* alpha;
-  casadi_int *index, *corner;
-  alpha = w; w += ndim;
-  index = iw; iw += ndim;
-  corner = iw; iw += ndim;
-  // Left index and fraction of interval
-  casadi_interpn_weights(ndim, grid, offset, x, alpha, index, lookup_mode, extrapolation_mode);
-  // Loop over all corners, add contribution to output
-  casadi_clear_casadi_int(corner, ndim);
-  casadi_clear(res, m);
-  do {
-    T1* coeff = 0;
-    casadi_interpn_interpolate(res, ndim, offset, values,
-      alpha, index, corner, coeff, m);
-  } while (casadi_flip(corner, ndim));
-}
+// SYMBOL "interp_extrapolation_mode_t"
+typedef enum {
+    INTERP_EXTRAPOLATION_ERROR,
+    INTERP_EXTRAPOLATION_LINEAR,
+    INTERP_EXTRAPOLATION_CLIP,
+    INTERP_EXTRAPOLATION_CONSTANT,
+    INTERP_EXTRAPOLATION_LEGACY
+} casadi_interp_extrapolation_mode_t;

@@ -1411,7 +1411,11 @@ namespace casadi {
     case AUX_IAMAX:
       this->auxiliaries << sanitize_source(casadi_iamax_str, inst);
       break;
+    case AUX_INTERP:
+      this->auxiliaries << sanitize_source(casadi_interp_str, inst);
+      break;
     case AUX_INTERPN:
+      add_auxiliary(AUX_INTERP);
       add_auxiliary(AUX_INTERPN_WEIGHTS);
       add_auxiliary(AUX_INTERPN_INTERPOLATE);
       add_auxiliary(AUX_FLIP, {});
@@ -1443,6 +1447,8 @@ namespace casadi {
       break;
     case AUX_INTERPN_WEIGHTS:
       add_auxiliary(AUX_LOW);
+      add_auxiliary(AUX_FMIN);
+      add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_interpn_weights_str, inst);
       break;
     case AUX_INTERPN_INTERPOLATE:
@@ -2051,24 +2057,28 @@ namespace casadi {
       const std::string& res, casadi_int ndim, const std::string& grid,
       const std::string& offset,
       const std::string& values, const std::string& x,
-      const std::string& lookup_mode, casadi_int m,
+      const std::string& lookup_mode, const std::string& extrapolation_mode,
+      casadi_int m,
       const std::string& iw, const std::string& w) {
     add_auxiliary(AUX_INTERPN);
     std::stringstream s;
     s << "casadi_interpn(" << res << ", " << ndim << ", " << grid << ", "  << offset << ", "
-      << values << ", " << x << ", " << lookup_mode << ", " << m << ", " << iw << ", " << w << ");";
+      << values << ", " << x << ", " << lookup_mode << ", " << extrapolation_mode << ", "
+      << m << ", " << iw << ", " << w << ");";
     return s.str();
   }
 
   std::string CodeGenerator::interpn_grad(const std::string& grad,
       casadi_int ndim, const std::string& grid, const std::string& offset,
       const std::string& values, const std::string& x,
-      const std::string& lookup_mode, casadi_int m,
+      const std::string& lookup_mode, const std::string& extrapolation_mode,
+      casadi_int m,
       const std::string& iw, const std::string& w) {
     add_auxiliary(AUX_INTERPN_GRAD);
     std::stringstream s;
     s << "casadi_interpn_grad(" << grad << ", " << ndim << ", " << grid << ", " << offset << ", "
-      << values << ", " << x << ", " << lookup_mode << "," << m << ", " << iw << ", " << w << ");";
+      << values << ", " << x << ", " << lookup_mode << ", " << extrapolation_mode << ", "
+      << m << ", " << iw << ", " << w << ");";
     return s.str();
   }
 

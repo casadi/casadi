@@ -416,7 +416,9 @@ namespace casadi {
     std::string interpn(const std::string& res, casadi_int ndim, const std::string& grid,
                         const std::string& offset,
                         const std::string& values, const std::string& x,
-                        const std::string& lookup_mode, casadi_int m,
+                        const std::string& lookup_mode,
+                        const std::string& extrapolation_mode,
+                        casadi_int m,
                         const std::string& iw, const std::string& w);
 
     /** \brief Multilinear interpolation - calculate gradient
@@ -426,7 +428,8 @@ namespace casadi {
       casadi_int ndim, const std::string& grid,
       const std::string& offset,
       const std::string& values, const std::string& x,
-      const std::string& lookup_mode, casadi_int m,
+      const std::string& lookup_mode, const std::string& extrapolation_mode,
+      casadi_int m,
       const std::string& iw, const std::string& w);
 
     /** \brief Transpose
@@ -628,6 +631,7 @@ namespace casadi {
       AUX_TRANS,
       AUX_TO_MEX,
       AUX_FROM_MEX,
+      AUX_INTERP,
       AUX_INTERPN,
       AUX_INTERPN_GRAD,
       AUX_FLIP,

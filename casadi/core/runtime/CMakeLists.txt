@@ -18,6 +18,7 @@ set(RUNTIME_SRC
   casadi_file_slurp.hpp
   casadi_getu.hpp
   casadi_iamax.hpp
+  casadi_interp.hpp
   casadi_interpn.hpp
   casadi_interpn_grad.hpp
   casadi_interpn_interpolate.hpp

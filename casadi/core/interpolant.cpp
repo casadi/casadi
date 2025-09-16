@@ -266,6 +266,17 @@ namespace casadi {
         "'linear' uses a for-loop + break; (default when #knots<=100), "
         "'exact' uses floored division (only for uniform grids), "
         "'binary' uses a binary search. (default when #knots>100)."}},
+      {"extrapolation_mode",
+       {OT_STRINGVECTOR,
+        "Specifies, for each grid dimension, an extrapolation mode. "
+        "'error': raise an error when evaluating outside the grid. "
+        "'linear': use linear extrapolation. "
+        "'clip': clip to closest nearest neighbor (per dimension). "
+        "'constant': return a fixed constant (extrapolation_constant). "
+        "'legacy': fall back to behaviour old (i.e. dependent on plugin)"}},
+      {"extrapolation_constant",
+       {OT_DOUBLEVECTOR,
+        "When 'extrapolation_mode' is constant, use this value, per dimension."}},
       {"inline",
        {OT_BOOL,
         "Implement the lookup table in MX primitives. "
@@ -298,6 +309,8 @@ namespace casadi {
   void Interpolant::init(const Dict& opts) {
 
     batch_x_ = 1;
+    extrapolation_mode_ = std::vector<casadi_int>(
+                              ndim_, INTERP_EXTRAPOLATION_LEGACY);
 
     // Read options
     for (auto&& op : opts) {
@@ -305,6 +318,26 @@ namespace casadi {
         lookup_modes_ = op.second;
       } else if (op.first=="batch_x") {
         batch_x_ = op.second;
+      } else if (op.first=="extrapolation_mode") {
+        std::vector<std::string> modes = op.second;
+        casadi_assert(modes.size()==ndim_,
+          "Number of extrapolation modes must equal the number of dimensions");
+        for (casadi_int i=0;i<ndim_;++i) {
+          extrapolation_mode_.clear();
+          if (modes[i]=="error") {
+            extrapolation_mode_.push_back(INTERP_EXTRAPOLATION_ERROR);
+          } else if (modes[i]=="linear") {
+            extrapolation_mode_.push_back(INTERP_EXTRAPOLATION_LINEAR);
+          } else if (modes[i]=="clip") {
+            extrapolation_mode_.push_back(INTERP_EXTRAPOLATION_CLIP);
+          } else if (modes[i]=="constant") {
+            extrapolation_mode_.push_back(INTERP_EXTRAPOLATION_CONSTANT);
+          } else if (modes[i]=="legacy") {
+            extrapolation_mode_.push_back(INTERP_EXTRAPOLATION_LEGACY);
+          } else {
+            casadi_error("Unknown extrapolation mode: " + modes[i]);
+          }
+        }
       }
     }
 
@@ -346,13 +379,15 @@ namespace casadi {
 
   void Interpolant::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
-    s.version("Interpolant", 2);
+    s.version("Interpolant", 3);
     s.pack("Interpolant::ndim", ndim_);
     s.pack("Interpolant::m", m_);
     s.pack("Interpolant::grid", grid_);
     s.pack("Interpolant::offset", offset_);
     s.pack("Interpolant::values", values_);
     s.pack("Interpolant::lookup_modes", lookup_modes_);
+    s.pack("Interpolant::extrapolation_mode", extrapolation_mode_);
+    s.pack("Interpolant::extrapolation_constant", extrapolation_constant_);
     s.pack("Interpolant::batch_x", batch_x_);
   }
 
@@ -366,13 +401,21 @@ namespace casadi {
   }
 
   Interpolant::Interpolant(DeserializingStream & s) : FunctionInternal(s) {
-    int version = s.version("Interpolant", 1, 2);
+    int version = s.version("Interpolant", 1, 3);
     s.unpack("Interpolant::ndim", ndim_);
     s.unpack("Interpolant::m", m_);
     s.unpack("Interpolant::grid", grid_);
     s.unpack("Interpolant::offset", offset_);
     s.unpack("Interpolant::values", values_);
     s.unpack("Interpolant::lookup_modes", lookup_modes_);
+    if (version>=3) {
+      s.unpack("Interpolant::extrapolation_mode", extrapolation_mode_);
+      s.unpack("Interpolant::extrapolation_constant", extrapolation_constant_);
+    } else {
+      extrapolation_mode_ = std::vector<casadi_int>(ndim_, INTERP_EXTRAPOLATION_LEGACY);
+      extrapolation_constant_ = std::vector<double>(ndim_, 0.0);
+    }
+
     if (version==1) {
       batch_x_ = 1;
     } else {
