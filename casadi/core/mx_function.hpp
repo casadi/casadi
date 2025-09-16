@@ -327,6 +327,9 @@ namespace casadi {
 
         \identifier{2y} */
     explicit MXFunction(DeserializingStream& s);
+
+    Function prepare_interval_propagator(const Dict& opts) const;
+    Function get_interval_propagator_internal(const Dict& opts) const;
   };
 
 } // namespace casadi

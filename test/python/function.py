@@ -4153,7 +4153,101 @@ class Functiontests(casadiTestCase):
     
     args = [a,b]
     
+    grid = [[0, 1, 3]]
+    values = [2, 5, 3]
+    Fint = interpolant('F', 'linear', grid, values)
+    
+    print(Fint)
+    
+    fp = Fint.interval_propagator({"print_instructions":False})
+    
+    print(fp)
+    
+    print(fp(0.2,0.5))
+    
+    print(Fint(0.2),Fint(0.5))
+
+    Fint_clip = interpolant('Fclip', 'linear', grid, values,{"extrapolation_mode": ["clip"]})
+    
     def atomic_tests():
+      yield (1, lambda a: if_else(a>0,2*a,0),[
+        [[[-4,3]],[[0,6]]],
+      ])
+
+      yield (1, lambda a: if_else(a<0,2*a,0),[
+        [[[-4,3]],[[-8,0]]],
+      ])
+
+      yield (1, lambda a: if_else(a>=0,2*a,0),[
+        [[[-4,3]],[[0,6]]],
+      ])
+
+      yield (1, lambda a: if_else(a<=0,2*a,0),[
+        [[[-4,3]],[[-8,0]]],
+      ])
+
+      yield (1, lambda a: if_else(a>1,2*a-5,0),[
+        [[[-4,3]],[[2*1-5,2*3-5]]],
+      ])
+
+      yield (1, lambda a: if_else(a<1,2*a,0),[
+        [[[-4,3]],[[-8,2]]],
+      ])
+
+      yield (1, lambda a: if_else(a>=1,2*a-5,0),[
+        [[[-4,3]],[[2*1-5,2*3-5]]],
+      ])
+
+      yield (1, lambda a: if_else(a<=1,2*a,0),[
+        [[[-4,3]],[[-8,2]]],
+      ])
+      
+      yield (2,lambda a,b: a.__class__(vcat([7,9,6,8,3,a,4,5,10,6]))[b],[
+        [[[6,6],[0,0]],[[7,7]]],
+        [[[8.5,8.5],[5,5]],[[8.5,8.5]]],
+        [[[6,6],[1,3]],[[6,9]]],
+        [[[60,60],[1,6]],[[3,60]]],
+        [[[-60,-60],[1,6]],[[-60,9]]],
+        [[[-60,80],[1,6]],[[-60,80]]],
+        [[[-60,80],[1,3]],[[6,9]]],
+      ])
+
+      yield (1,lambda a: Fint(a),[
+        # Exact
+        [[[1,1]],[[5,5]]],
+        [[[0.5,0.5]],[[3.5,3.5]]],
+        
+        # Not touching any knots
+        [[[0.2,0.5]],[[float(Fint(0.2)),float(Fint(0.5))]]],
+        [[[-0.6,-0.3]],[[float(Fint(-0.6)),float(Fint(-0.3))]]],
+        
+        # Extrapolate
+        [[[-10,1]],[[-28,5]]],
+        [[[1,10]],[[-4,5]]],
+        
+        # Touching a knot
+        [[[0.9,1]],[[float(Fint(0.9)),float(Fint(1))]]],
+        
+      ])
+      
+      yield (1,lambda a: Fint_clip(a),[
+        # Exact
+        [[[1,1]],[[5,5]]],
+        [[[0.5,0.5]],[[3.5,3.5]]],
+        
+        # Not touching any knots
+        [[[0.2,0.5]],[[float(Fint(0.2)),float(Fint(0.5))]]],
+        [[[-0.6,-0.3]],[[float(Fint(0)),float(Fint(0))]]],
+        
+        # Touching a knot
+        [[[0.9,1]],[[float(Fint(0.9)),float(Fint(1))]]],
+        
+        # Extrapolate: clip
+        [[[-10,1]],[[2,5]]],
+        [[[1,10]],[[3,5]]],
+             
+      ])
+      
       yield (1,lambda a: sign(a),[
         [[[0,0]],[[0,0]]],
         [[[-1,-0.5]],[[-1,-1]]],
@@ -4534,17 +4628,21 @@ class Functiontests(casadiTestCase):
 
     for n_in,fun, numeric_tests in atomic_tests():
       
-      f = Function('f',args[:n_in],[fun(*args[:n_in])])
+      f = Function('ff',args[:n_in],[fun(*args[:n_in])])
+      #f.generate('f.c')
 
-      fp = f.interval_propagator()
+      fp = f.interval_propagator({"print_instructions":True})
+      
+      #fp.generate('fp.c')
       
       def sample_interval(lo,hi):
         ret = []
-        ret = [float((1-alpha)*lo+alpha*hi) for alpha in np.linspace(0,1,5)]
+        ret = [float((1-alpha)*lo+alpha*hi) for alpha in np.linspace(0,1,9)]
         # Make sure some special points are present if they are in the interval interior
-        for e in [0,1]:
+        for e in [0,1,1+1e-15,1-1e-15]:
           if e>lo and e<hi:
             ret.append(e)
+        print("ret",ret)
         # More special points (integer multiples of pi/2)
         for i in range(-10,10):
           e = i*pi/2
@@ -4558,6 +4656,10 @@ class Functiontests(casadiTestCase):
           
           sample_out = [f.call(sample_in) for sample_in in itertools.product(*extended)]
           empirical_res = [[float(min(e[i] for e in sample_out)),float(max(e[i] for e in sample_out))] for i in range(f.n_out())]
+          
+          print("sample_out",sample_out)
+          print("empirical_res",empirical_res)
+          print("int_out",int_out)
           
           for i in range(len(int_out)):
             self.checkarray(empirical_res[i],int_out[i],digits=12,failmessage=str(int_in))

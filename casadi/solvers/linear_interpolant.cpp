@@ -159,6 +159,7 @@ public:
 
     casadi_int ndim = orig->ndim_;
     casadi_int m = orig->m_;
+    const std::vector<casadi_int> & extrapolation_mode = orig->extrapolation_mode_;
 
     int orig_mem = orig->checkout();
 
@@ -253,11 +254,11 @@ public:
     std::vector< std::vector<double> > critical_points(ndim);
 
     for (casadi_int i=0;i<ndim;++i) {
-      critical_points[i].push_back(arg[0][i]);
+      critical_points[i].push_back(extrapolation_mode[i]==INTERP_EXTRAPOLATION_CLIP ? fmax(arg[0][i], grid[offset[i]]):  arg[0][i]);
       for (casadi_int j=interior_start[i];j<interior_start[i]+interior_size[i];++j) {
         critical_points[i].push_back(grid[offset[i]+j]);
       }
-      critical_points[i].push_back(arg[1][i]);
+      critical_points[i].push_back(extrapolation_mode[i]==INTERP_EXTRAPOLATION_CLIP ? fmin(arg[1][i], grid[offset[i+1]-1]) : arg[1][i]);
     }
 
     // Odometer state
@@ -320,7 +321,11 @@ Function LinearInterpolant::get_interval_propagator(const Dict& opts) const {
     Function ret;
     ret.own(
       new LinearInterpolantIntervalPropagator(name_ + "_interval_propagator", self()));
-    ret->construct(opts);
+
+    Dict options = opts;
+    bool print_instructions = false;
+    extract_from_dict_inplace(options, "print_instructions", print_instructions);
+    ret->construct(options);
 
     return ret;
   }

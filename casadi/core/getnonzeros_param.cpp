@@ -489,4 +489,74 @@ namespace casadi {
     }
   }
 
+  void GetNonzerosParamVector::propagate_interval(
+      const std::vector<MX>& arg_L, const std::vector<MX>& arg_R,
+      std::vector<MX>& res_L, std::vector<MX>& res_R) const {
+
+    std::vector<MX> res = MX::createMultipleOutput(
+      new GetNonzerosParamVector::IntervalPropagator(arg_L[0], arg_L[1], arg_R[0], arg_R[1]));
+
+    res_L[0] = res[0];
+    res_R[0] = res[1];
+  }
+
+  const Sparsity& GetNonzerosParamVector::IntervalPropagator::sparsity(casadi_int oind) const {
+    return dep(1).sparsity();
+  }
+
+  GetNonzerosParamVector::IntervalPropagator::IntervalPropagator(const MX& x_L, const MX& nz_L,
+                        const MX& x_R, const MX& nz_R) {
+    set_dep({x_L, nz_L, x_R, nz_R});
+                          
+  }
+
+  int GetNonzerosParamVector::IntervalPropagator::eval(const double** arg, double** res,
+      casadi_int* iw, double* w) const {
+    const double* idata_L = arg[0];
+    const double* idata_R = arg[2];
+    const double* nz_L = arg[1];
+    const double* nz_R = arg[3];
+    double* odata_L = res[0];
+    double* odata_R = res[1];
+
+    casadi_fill(odata_L, nnz(), inf);
+    casadi_fill(odata_R, nnz(), -inf);
+
+    uout() << "nz_L" << std::vector<double>(nz_L, nz_L) << std::endl;
+
+    // Dimensions
+    casadi_int nnz = dep(1).nnz();
+    casadi_int max_ind = dep(0).nnz();
+
+    // Get elements
+    for (casadi_int i=0; i<nnz; ++i) {
+      // Get index
+      casadi_int index_L = static_cast<casadi_int>(*nz_L++);
+      casadi_int index_R = static_cast<casadi_int>(*nz_R++);
+
+      uout() << "index_L" << index_L<< std::endl;
+      uout() << "index_R" << index_R<< std::endl;
+      uout() << "slice L" << std::vector<double>(idata_L+index_L, idata_L+index_R+1) << std::endl;
+      uout() << "slice R" << std::vector<double>(idata_R+index_L, idata_R+index_R+1) << std::endl;
+      for (casadi_int index=index_L; index<=index_R; ++index) {
+        if (index>=0 && index<max_ind) {
+          odata_L[i] = fmin(odata_L[i], idata_L[index]);
+          odata_R[i] = fmax(odata_R[i], idata_R[index]);
+        } else {
+          odata_L[i] = nan;
+          odata_R[i] = nan;
+        }
+      }
+      uout() << "odata_L" << odata_L[i] << std::endl;
+      uout() << "odata_R" << odata_R[i] << std::endl;
+    }
+    return 0;
+  }
+
+  std::string GetNonzerosParamVector::IntervalPropagator::disp(const std::vector<std::string>& arg) const {
+    std::stringstream ss;
+    ss << "(" << arg.at(0) << ".." << arg.at(2) << ")[" << arg.at(1) << ".." << arg.at(3) << "]";
+    return ss.str();
+  }
+
 } // namespace casadi

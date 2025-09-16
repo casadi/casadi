@@ -792,7 +792,101 @@ namespace casadi {
     }
   }
 
-  Function MXFunction::get_interval_propagator(const Dict& opts=Dict()) const {
+  Function MXFunction::get_interval_propagator(const Dict& opts) const {
+    Function prep = prepare_interval_propagator(opts);
+
+    MXFunction *p = prep.get<MXFunction>();
+
+    return p->get_interval_propagator_internal(opts);
+  }
+
+  Function MXFunction::prepare_interval_propagator(const Dict& opts) const {
+
+    // Preprocessing
+    // if_else_zero(y>0,f(y))
+
+    std::vector<MX> res;
+    res.resize(out_.size());
+
+
+    // Symbolic work, non-differentiated
+    std::vector<MX> swork(workloc_.size()-1);
+
+    // Split up inputs analogous to symbolic primitives
+    std::vector<std::vector<MX> > arg_split(in_.size());
+    for (casadi_int i=0; i<in_.size(); ++i) arg_split[i] = in_[i].primitives();
+
+    // Allocate storage for split outputs
+    std::vector<std::vector<MX> > res_split(out_.size());
+    for (casadi_int i=0; i<out_.size(); ++i) res_split[i].resize(out_[i].n_primitives());
+
+    std::vector<MX> arg1, res1;
+
+    // Loop over computational nodes in forward order
+    casadi_int alg_counter = 0;
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
+      if (it->op == OP_INPUT) {
+        swork[it->res.front()] = project(arg_split.at(it->data->ind()).at(it->data->segment()),
+                                        it->data.sparsity(), true);
+      } else if (it->op==OP_OUTPUT) {
+        // Collect the results
+        res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
+      } else if (it->op==OP_PARAMETER) {
+        // Fetch parameter
+        swork[it->res.front()] = it->data;
+      } else {
+        // Arguments of the operation
+        arg1.resize(it->arg.size());
+        for (casadi_int i=0; i<arg1.size(); ++i) {
+          casadi_int el = it->arg[i]; // index of the argument
+          arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
+        }
+
+        if (it->op==OP_IF_ELSE_ZERO) {
+          MX target;
+          MX value;
+          casadi_int cond_op = arg1[0].op();
+          if (cond_op==OP_LE || cond_op==OP_LT) {
+
+            MX lhs = arg1[0].dep(0);
+            MX rhs = arg1[0].dep(1);
+
+            if (lhs.is_constant()) {
+              target = rhs;
+              value = fmax(rhs, lhs);
+            }
+            if (rhs.is_constant()) {
+              target = lhs;
+              value = fmin(rhs, lhs);
+            }
+
+          }
+          arg1[1] = MX::graph_substitute(arg1[1], {target}, {value});
+        }
+
+        // Perform the operation
+        res1.resize(it->res.size());
+        it->data->eval_mx(arg1, res1);
+
+        // Get the result
+        for (casadi_int i=0; i<res1.size(); ++i) {
+          casadi_int el = it->res[i]; // index of the output
+          if (el>=0) swork[el] = res1[i];
+        }
+      }
+    }
+
+    // Join split outputs
+    for (casadi_int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
+
+    uout() << "res = " << res << std::endl;
+
+    return Function(name_, in_, res, name_in_, name_out_);
+
+  }
+
+
+  Function MXFunction::get_interval_propagator_internal(const Dict& opts) const {
 
     // Split up input arguments
     std::vector< std::vector<MX> > arg_L_split(in_.size());
