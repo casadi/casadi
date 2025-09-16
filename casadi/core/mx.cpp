@@ -2729,9 +2729,19 @@ namespace casadi {
       MX L = low(x[i], xq[i], {{"lookup_mode", lookup_mode[i]}});
       MX Lp = L+1;
       MX xl, xu;
+      // MX delta = (xu-xl);
+
+      // Required for meaningful interval calculus
+      // Suppose x[i]: [0 4 8 12]
+      // There is uncertainty on L: [0,2]
+      // This propagates to uncertainty on xl [0,8] and xu [4,12]
+      // (xu-xl) then gives [-4,12] instead of a more conservative [4,4].
+      // This is the 'dependence' problem in interval calculus.
+      MX delta;
+      diff(x[i]).get_nz(delta, false, L); // for interval calculus
       x[i].get_nz(xl, false, L);
       x[i].get_nz(xu, false, Lp);
-      xis.push_back((xq[i]-xl)/(xu-xl));
+      xis.push_back((xq[i]-xl)/delta);
       Ls.push_back(L);
       Lps.push_back(Lp);
     }
