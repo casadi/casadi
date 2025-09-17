@@ -1555,8 +1555,13 @@ class MXtests(casadiTestCase):
             (False,True,lambda x,y,z, X,Y :(fmax(x, float('inf'))), float('inf')),
             (False,True,lambda x,y,z, X,Y :(fmax(x, x)), x),
             (False,True,lambda x,y,z, X,Y :x**2 < 0, 0),
-            (False,True,lambda x,y,z, X,Y :(x == x), 1),
-            (False,True,lambda x,y,z, X,Y :(x != x), 0),
+            (False,True,lambda x,y,z, X,Y :(x == x), 1),  # x == x
+            (False,True,lambda x,y,z, X,Y :(x != x), 0),  # x != x
+            (False,True,lambda x,y,z, X,Y :logic_not(logic_not(x)), x),
+            (False,True,lambda x,y,z, X,Y :logic_not(x!=0), x==0),
+            (False,True,lambda x,y,z, X,Y :logic_not(x==0), x!=0),
+            (False,True,lambda x,y,z, X,Y :logic_not(x>0), x<=0),
+            (False,True,lambda x,y,z, X,Y :logic_not(x>=0), x<0),
             (False,True,lambda x,y,z, X,Y :sqrt(x)**2,x),
             (False,True,lambda x,y,z, X,Y :sqrt(X)**2,X),
             (False,True,lambda x,y,z, X,Y :(-x)**2,x**2),
