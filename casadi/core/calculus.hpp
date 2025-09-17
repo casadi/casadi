@@ -1923,6 +1923,18 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
             2*static_cast<double>(x.dep(1))==1)
           return x.dep(0); // 2*(x*0.5) = x
         break;
+      case OP_NOT:
+        if (x.is_op(OP_NOT))
+          return x.dep(); // !!x = x
+        if (x.is_op(OP_LE))
+          return x.dep(1) < x.dep(0); // !(x<=y) = y<x
+        else if (x.is_op(OP_LT))
+          return x.dep(1) <= x.dep(0); // !(x<y) = y<=x
+        else if (x.is_op(OP_EQ))
+          return x.dep(0) != x.dep(1); // !(x==y) = x!=y
+        else if (x.is_op(OP_NE))
+          return x.dep(0) == x.dep(1); // !(x!=y) = x==y
+        break;
     }
     hit = false;
     return 0;

@@ -1530,6 +1530,11 @@ class MXtests(casadiTestCase):
             (x**2 < 0, 0),
             ((x == x), 1),  # x == x
             ((x != x), 0),  # x != x
+            (logic_not(logic_not(x)), x),
+            (logic_not(x!=0), x==0),
+            (logic_not(x==0), x!=0),
+            (logic_not(x>0), x<=0),
+            (logic_not(x>=0), x<0),
             ]:
           print((A,B))
           self.assertEqual(str(A),str(B))

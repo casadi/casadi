@@ -223,6 +223,13 @@ namespace casadi {
   SXElem SXElem::unary(casadi_int op, const SXElem& x) {
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
+
+      bool hit;
+      SXElem ret = common_simp_unary(op, x, SXNode::eq_depth_,
+                [](casadi_int op, const SXElem& a) { return unary(op, a);},
+                hit);
+      if (hit) return ret;
+
       switch (op) {
         case OP_SQ:
           if (x.is_op(OP_SQRT))
