@@ -1536,8 +1536,13 @@ class MXtests(casadiTestCase):
             ((fmax(x, float('inf'))), float('inf')),
             ((fmax(x, x)), x),
             (x**2 < 0, 0),
-            ((x == x), 1),
-            ((x != x), 0),
+            ((x == x), 1),  # x == x
+            ((x != x), 0),  # x != x
+            (logic_not(logic_not(x)), x),
+            (logic_not(x!=0), x==0),
+            (logic_not(x==0), x!=0),
+            (logic_not(x>0), x<=0),
+            (logic_not(x>=0), x<0),
             (sqrt(x)**2,x),
             (sqrt(X)**2,X),
             ((-x)**2,x**2),
