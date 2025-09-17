@@ -879,8 +879,6 @@ namespace casadi {
     // Join split outputs
     for (casadi_int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
 
-    uout() << "res = " << res << std::endl;
-
     return Function(name_, in_, res, name_in_, name_out_);
 
   }
