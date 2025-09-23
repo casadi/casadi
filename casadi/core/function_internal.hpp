@@ -387,6 +387,9 @@ namespace casadi {
                                            const std::vector<std::string>& s_out,
                                            casadi_int order, bool tr=false) const;
 
+    /** \brief Create a new function with simplifications applied */
+    virtual Function simplify(const std::string& name, const Dict& opts) const;
+
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm?
 
@@ -790,12 +793,18 @@ namespace casadi {
     /** \brief Wrap in an Function instance consisting of only one MX call
 
         \identifier{li} */
+    ///@{
+    Function wrap(const std::string& name) const;
     Function wrap() const;
+    /// @}
 
     /** \brief Wrap in an Function instance consisting of only one MX call
 
         \identifier{lj} */
+    /// @{
+    Function wrap_as_needed(const std::string& name, const Dict& opts) const;
     Function wrap_as_needed(const Dict& opts) const;
+    /// @}
 
     /** \brief Get all functions in the cache
 

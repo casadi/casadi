@@ -333,6 +333,18 @@ namespace casadi {
     return Function(name, ex_in, ex_out, name_in(), name_out(), my_opts);
   }
 
+  Function Function::simplify(const Dict& opts) const {
+    return simplify(name(), opts);
+  }
+
+  Function Function::simplify(const std::string& name, const Dict& opts) const {
+    try {
+      return (*this)->simplify(name, opts);
+    } catch(std::exception& e) {
+      THROW_ERROR("simplify", e.what());
+    }
+  }
+
   Function Function::create(FunctionInternal* node) {
     Function ret;
     ret.own(node);
@@ -1925,8 +1937,16 @@ namespace casadi {
     return (*this)->wrap();
   }
 
+  Function Function::wrap(const std::string& name) const {
+    return (*this)->wrap(name);
+  }
+
   Function Function::wrap_as_needed(const Dict& opts) const {
     return (*this)->wrap_as_needed(opts);
+  }
+
+  Function Function::wrap_as_needed(const std::string& name, const Dict& opts) const {
+    return (*this)->wrap_as_needed(name, opts);
   }
 
   bool Function::operator==(const Function& f) const {
