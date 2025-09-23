@@ -210,6 +210,18 @@ namespace casadi {
 
     Function interval_propagator(const Dict& opts=Dict()) const;
 
+    /** \brief Create a new function with simplifications applied
+    *
+    * The following list of boolean options can be provided:
+    * - cse (default true): Common subexpression elimination
+    * - empty_inputs (default true): inputs that are not used become structurally empty
+    *
+    */
+    /// @{
+    Function simplify(const std::string& name, const Dict& opts=Dict()) const;
+    Function simplify(const Dict& opts=Dict()) const;
+    /// @}
+
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node
@@ -420,12 +432,18 @@ namespace casadi {
     /** \brief Wrap in an Function instance consisting of only one MX call
 
         \identifier{1vv} */
+    /// @{
     Function wrap() const;
+    Function wrap(const std::string& name) const;
+    /// @}
 
     /** \brief Wrap in a Function with options
 
         \identifier{1vw} */
+    /// @{
     Function wrap_as_needed(const Dict& opts) const;
+    Function wrap_as_needed(const std::string& name, const Dict& opts) const;
+    /// @}
 
     /** \brief Which variables enter with some order
     *

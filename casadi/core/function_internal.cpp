@@ -1108,8 +1108,11 @@ namespace casadi {
   }
 
   Function FunctionInternal::wrap_as_needed(const Dict& opts) const {
-    if (opts.empty()) return shared_from_this<Function>();
-    std::string fname = "wrap_" + name_;
+    return wrap_as_needed("wrap_" + name_, opts);
+  }
+
+  Function FunctionInternal::wrap_as_needed(const std::string& name, const Dict& opts) const {
+    if (opts.empty() && name==name_) return shared_from_this<Function>();
     // Options
     Dict my_opts = opts;
     my_opts["derivative_of"] = derivative_of_;
@@ -1122,13 +1125,16 @@ namespace casadi {
     // Wrap the function
     std::vector<MX> arg = mx_in();
     std::vector<MX> res = self()(arg);
-    return Function(fname, arg, res, name_in_, name_out_, my_opts);
+    return Function(name, arg, res, name_in_, name_out_, my_opts);
   }
 
   Function FunctionInternal::wrap() const {
+    return wrap("wrap_" + name_);
+  }
+
+  Function FunctionInternal::wrap(const std::string& name) const {
     Function f;
-    std::string fname = "wrap_" + name_;
-    if (!incache(fname, f)) {
+    if (!incache(name, f)) {
       // Options
       Dict opts;
       opts["derivative_of"] = derivative_of_;
@@ -1140,7 +1146,7 @@ namespace casadi {
       // Wrap the function
       std::vector<MX> arg = mx_in();
       std::vector<MX> res = self()(arg);
-      f = Function(fname, arg, res, name_in_, name_out_, opts);
+      f = Function(name, arg, res, name_in_, name_out_, opts);
       // Save in cache
       tocache_if_missing(f);
     }
@@ -3745,6 +3751,14 @@ namespace casadi {
     Function f = shared_from_this<Function>();
     f = f.wrap();
     return f.which_depends(s_in, s_out, order, tr);
+  }
+
+  Function FunctionInternal::simplify(const std::string& name, const Dict& opts) const {
+    if (name==name_) {
+      return self();
+    } else {
+      return wrap(name);
+    }
   }
 
   const Function& FunctionInternal::oracle() const {

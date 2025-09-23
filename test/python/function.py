@@ -4528,5 +4528,58 @@ class Functiontests(casadiTestCase):
     
     self.checkfunction_light(f_intprop,f_intprop2,inputs=[AL,BL,AR,BR])
 
+  def test_simplify(self):
+    x = MX.sym("x",5)
+    y = MX.sym("y",5)
+    f = Function('test_func', [x, y], [x + y])
+
+    # Test simplify without name argument
+    f_simplified = f.simplify()
+    self.assertIsInstance(f_simplified, Function)
+    self.assertEqual(f_simplified.name(), 'test_func')
+
+    # Test simplify with same name argument (should return same function)
+    f_same_name = f.simplify("test_func")
+    self.assertIsInstance(f_same_name, Function)
+    self.assertEqual(f_same_name.name(), 'test_func')
+
+    # Test simplify with different name argument (should return wrapped function with new name)
+    f_renamed = f.simplify("new_name")
+    self.assertIsInstance(f_renamed, Function)
+    self.assertEqual(f_renamed.name(), 'new_name')
+
+    # Test that simplified functions work correctly
+    self.checkfunction_light(f,f_simplified,inputs=[2.0,3.0])
+
+    x = MX.sym("x",5)
+    y = MX.sym("y",5)
+    f = Function('test_func', [x, y], [x])
+    f_simplified = f.simplify()
+
+    self.assertTrue(f.nnz_in(0), 5)
+    self.assertTrue(f_simplified.nnz_in(0), 0)
+
+    # Test that simplified functions work correctly
+    self.checkfunction_light(f,f_simplified,inputs=[2.0,3.0])
+
+
+
+  def test_duplicate_check(self):
+    x = MX()
+    f = Function('f',[x],[2*x])
+    self.assertEqual(f.numel_in(0), 0)
+    f = Function('f',[MX.zeros(0,0)],[2*x])
+    self.assertEqual(f.numel_in(0), 0)
+    f = Function('f',[MX.ones(0,0)],[2*x])
+    self.assertEqual(f.numel_in(0), 0)
+    p = MX.sym("p")
+    with self.assertInException("input arguments must be purely symbolic"):
+        f = Function('f',[x.nz[p]],[2*x])
+        self.assertEqual(f.numel_in(0), 0)
+    x.nz[p] = 3.7
+    with self.assertInException("input arguments must be purely symbolic"):
+        f = Function('f',[x],[3*x])
+        self.assertEqual(f.numel_in(0), 0)
+
 if __name__ == '__main__':
     unittest.main()   
