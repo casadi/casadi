@@ -387,7 +387,9 @@ namespace casadi {
                                            const std::vector<std::string>& s_out,
                                            casadi_int order, bool tr=false) const;
 
-    /** \brief Create a new function with simplifications applied */
+    /** \brief Create a new function with simplifications applied
+
+        \identifier{2ee} */
     virtual Function simplify(const std::string& name, const Dict& opts) const;
 
     ///@{

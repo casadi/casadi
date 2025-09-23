@@ -1654,6 +1654,12 @@
 %exception  casadi::Function::serialize(std::ostream &stream, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::simplify(const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::simplify(const std::string &name, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::size1_in(casadi_int ind) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1759,7 +1765,13 @@
 %exception  casadi::Function::wrap() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::wrap(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::wrap_as_needed(const Dict &opts) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::wrap_as_needed(const std::string &name, const Dict &opts) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionBuffer::ret() {

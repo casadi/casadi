@@ -214,7 +214,8 @@ namespace casadi {
     * - cse (default true): Common subexpression elimination
     * - empty_inputs (default true): inputs that are not used become structurally empty
     *
-    */
+
+        \identifier{2ef} */
     /// @{
     Function simplify(const std::string& name, const Dict& opts=Dict()) const;
     Function simplify(const Dict& opts=Dict()) const;

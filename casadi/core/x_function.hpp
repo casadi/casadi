@@ -160,7 +160,9 @@ namespace casadi {
     Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
                    const std::vector<casadi_int>& order_out, const Dict& opts) const override;
 
-    /** \brief Create a new function with simplifications applied */
+    /** \brief Create a new function with simplifications applied
+
+        \identifier{2eg} */
     Function simplify(const std::string& name, const Dict& opts) const override;
 
     /** \brief Generate code for the declarations of the C function
