@@ -204,7 +204,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{1yr} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /** \brief Generate code for the operation
 
@@ -278,7 +279,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{1yx} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     MX jac_cached() const override;
 

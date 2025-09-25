@@ -37,7 +37,8 @@ namespace casadi {
     return "monitor(" + arg.at(0) + ", " + comment_ + ")";
   }
 
-  void Monitor::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Monitor::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = arg[0].monitor(comment_);
   }
 

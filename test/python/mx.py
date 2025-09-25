@@ -1442,127 +1442,177 @@ class MXtests(casadiTestCase):
     for X in [SX,MX]:
         a = X.sym("a")
         b = X.sym("b")
+        c = X.sym("c")
         
         A = X.sym("A",2,2)
         B = X.sym("B",2,2)
         
+        args = [a,b,c,A,B]
         x = sin(a)
         y = sin(b)
+        z = sin(c)
         
         X = sin(A)
         Y = sin(B)
+        
+        DM.rng(1)
+        
+        a0 = DM.rand(a.sparsity())
+        b0 = DM.rand(b.sparsity())
+        c0 = DM.rand(c.sparsity())
+        A0 = DM.rand(A.sparsity())
+        B0 = DM.rand(B.sparsity())
 
- 
-        for A,B in [
-            (2*x-x, x),
-            (4*x-3*x,x),
-            (0.2*x+0.8*x,x),
-            ((x + 0), x),
-            ((0 + x), x),
-            ((x + (-y)), x - y),
-            (((-x) + y), y - x),
-            (((0.5*x) + (0.5*x)), x),
-            (((x/2) + (x/2)), x),
-            (((x - y) + y), x),
-            ((y + (x - y)), x),
-            ((sin(x)**2 + cos(x)**2), 1),
-            ((x - 0), x),
-            ((0 - x), -x),
-            ((x - x), 0),
-            ((x - (-y)), x + y),
-            (((x + y) - y), x),
-            (((x + y) - x), y),
-            ((x - (y + x)), -y),
-            ((x - (x + y)), -y),
-            (((-x) - y), -(x + y)),
-            ((x * x), x**2),
-            ((x * 3), 3 * x),
-            ((x * 0), 0),
-            ((0 * x), 0),
-            ((x * 1), x),
-            ((1 * x), x),
-            ((x * -1), -x),
-            ((-1 * x), -x),
-            ((x * (1/y)), x/y),
-            (((1/x) * y), y/x),
-            ((5 * (0.2 * x)), x),
-            ((0.5 * (2 * x)), x),
-            ((5 * (x / 5)), x),
-            (((2 / x) * x), 2),
-            ((2*x)/x,2),
-            ((5*x)/x,5),
-            (((x) * (2 / x)), 2),
-            (((-x) * y), -(x*y)),
-            ((x * (-y)), -(x*y)),
-            ((2*(0.5*x),x)),
-            (2*(x*0.5),x),
-            ((2*(0.5*X),X)),
-            (2*(X*0.5),X),
-            #((x / 0), float('inf')),
-            ((0 / x), 0),
-            ((x / 1), x),
-            ((x / -1), -x),
-            ((x / x), 1),
-            ((2*x / 2), x),
-            (((x * y) / x), y),
-            (((x * y) / y), x),
-            ((1 / x), x**-1),
-            ((x / (1/y)), x*y),
-            (((2*x) / (2*y)), x/y),
-            (((x/5)/0.2), x),
-            ((x / (2*x)), 1.0/2),
-            (((-x) / x), -1),
-            ((x / (-x)), -1),
-            (((-x)/(-x)), 1),
-            (((x / y) / x), 1/y),
-            (((-x) / y), -(x / y)),
-            ((x / (-y)), -(x / y)),
-            ((x ** 0), 1),
-            ((x ** 2), x*x),
-            ((x ** 3), x*(x*x)),
-            ((x ** -3), 1/(x**3)),
-            ((x ** 4), (x**2)*(x**2)),
-            ((x ** 0.5), x**0.5),
-            ((x ** y), x**y),
-            ((x**2 >= 0), 1),
-            ((2*x**2 >= x**2), 1),
-            ((fmin(x, float('inf'))), x),
-            ((fmin(float('inf'), x)), x),
-            ((fmin(-float('inf'), x)), -float('inf')),
-            ((fmin(x, x)), x),
-            ((fmax(-float('inf'), x)), x),
-            ((fmax(x, -float('inf'))), x),
-            ((fmax(x, float('inf'))), float('inf')),
-            ((fmax(x, x)), x),
-            (x**2 < 0, 0),
-            ((x == x), 1),
-            ((x != x), 0),
-            (sqrt(x)**2,x),
-            (sqrt(X)**2,X),
-            ((-x)**2,x**2),
-            (fabs(fabs(x)),fabs(x)),
-            (fabs(sqrt(x)),sqrt(x)),
-            (fabs(exp(x)),exp(x)),
-            (log(exp(x)),x),
-            (1/(1/x),x),
-            (sqrt(x**2),fabs(x)),
-            (fabs(-x),fabs(x)),
-            (fabs(x)**2,x**2),
-            (cos(-x),cos(x)),
-            (cos(fabs(x)),cos(x)),
-            (-(-x),x),
-            (cosh(x*0),x*0+1),
-            (x/0.5,2*x),
-            (x+x,2*x),
-            (x<x,0),
-            (2*x+x,3*x),
-            (x+2*x,3*x),
-            (2*x-x,x),
-            (x-2*x,-x)
-            ]:
-          print((A,B))
+        x0 = sin(a0)
+        y0 = sin(b0)
+        z0 = sin(c0)
+        X0 = sin(A0)
+        Y0 = sin(B0)
+        
+        dx = x-y
           
-          self.assertEqual(str(A),str(B))
+        count = 1477
+ 
+        for refcount,on_the_fly,genA,B in [
+            (False,X is MX,lambda x,y,z, X,Y :2*x-x, x),
+            (False,True,lambda x,y,z, X,Y :4*x-3*x,x),
+            (False,True,lambda x,y,z, X,Y :0.2*x+0.8*x,x),
+            (False,True,lambda x,y,z, X,Y :(x + 0), x),
+            (False,X is MX,lambda x,y,z, X,Y :(0 + x), x),
+            (False,True,lambda x,y,z, X,Y :(x + (-y)), x - y),
+            (False,X is MX,lambda x,y,z, X,Y :((-x) + y), y - x),
+            (False,True,lambda x,y,z, X,Y :((0.5*x) + (0.5*x)), x),
+            (False,True,lambda x,y,z, X,Y :((x/2) + (x/2)), x),
+            (False,True,lambda x,y,z, X,Y :((x - y) + y), x),
+            (False,True,lambda x,y,z, X,Y :(y + (x - y)), x),
+            (False,True,lambda x,y,z, X,Y :(sin(x)**2 + cos(x)**2), 1),
+            (False,True,lambda x,y,z, X,Y :(x - 0), x),
+            (False,X is MX,lambda x,y,z, X,Y :(0 - x), -x),
+            (False,True,lambda x,y,z, X,Y :(x - x), 0),
+            (False,True,lambda x,y,z, X,Y :(x - (-y)), x + y),
+            (False,True,lambda x,y,z, X,Y :((x + y) - y), x),
+            (False,True,lambda x,y,z, X,Y :((x + y) - x), y),
+            (False,True,lambda x,y,z, X,Y :(x - (y + x)), -y),
+            (False,True,lambda x,y,z, X,Y :(x - (x + y)), -y),
+            (False,True,lambda x,y,z, X,Y :((-x) - y), -(x + y)),
+            (False,True,lambda x,y,z, X,Y :(x * x), x**2),
+            (False,True,lambda x,y,z, X,Y :(x * 3), 3 * x),
+            (False,True,lambda x,y,z, X,Y :(x * 0), 0),
+            (False,True,lambda x,y,z, X,Y :(0 * x), 0),
+            (False,True,lambda x,y,z, X,Y :(x * 1), x),
+            (False,X is MX,lambda x,y,z, X,Y :(1 * x), x),
+            (False,True,lambda x,y,z, X,Y :(x * -1), -x),
+            (False,X is MX,lambda x,y,z, X,Y :(-1 * x), -x),
+            (False,True,lambda x,y,z, X,Y :(x * (1/y)), x/y),
+            (False,X is MX,lambda x,y,z, X,Y :((1/x) * y), y/x),
+            (False,True,lambda x,y,z, X,Y :(5 * (0.2 * x)), x),
+            (False,True,lambda x,y,z, X,Y :(0.5 * (2 * x)), x),
+            (False,True,lambda x,y,z, X,Y :(5 * (x / 5)), x),
+            (False,True,lambda x,y,z, X,Y :((2 / x) * x), 2),
+            (False,True,lambda x,y,z, X,Y :(2*x)/x,2),
+            (False,True,lambda x,y,z, X,Y :(5*x)/x,5),
+            (False,True,lambda x,y,z, X,Y :((x) * (2 / x)), 2),
+            (False,X is MX,lambda x,y,z, X,Y :((-x) * y), -(x*y)),
+            (False,True,lambda x,y,z, X,Y :(x * (-y)), -(x*y)),
+            (False,X is MX,lambda x,y,z, X,Y :(2*(0.5*x)),x),
+            (False,X is MX,lambda x,y,z, X,Y :2*(x*0.5),x),
+            (False,X is MX,lambda x,y,z, X,Y :(2*(0.5*X)),X),
+            (False,X is MX,lambda x,y,z, X,Y :2*(X*0.5),X),
+            (False,True,lambda x,y,z, X,Y :(0 / x), 0),
+            (False,True,lambda x,y,z, X,Y :(x / 1), x),
+            (False,True,lambda x,y,z, X,Y :(x / -1), -x),
+            (False,True,lambda x,y,z, X,Y :(x / x), 1),
+            (False,True,lambda x,y,z, X,Y :(2*x / 2), x),
+            (False,True,lambda x,y,z, X,Y :((x * y) / x), y),
+            (False,X is MX,lambda x,y,z, X,Y :((x * y) / y), x),
+            (False,X is MX,lambda x,y,z, X,Y :(1 / x), x**-1),
+            (False,True,lambda x,y,z, X,Y :(x / (1/y)), x*y),
+            (False,True,lambda x,y,z, X,Y :((2*x) / (2*y)), x/y),
+            (False,True,lambda x,y,z, X,Y :((x/5)/0.2), x),
+            (False,True,lambda x,y,z, X,Y :(x / (2*x)), 1.0/2),
+            (False,True,lambda x,y,z, X,Y :((-x) / x), -1),
+            (False,True,lambda x,y,z, X,Y :(x / (-x)), -1),
+            (False,True,lambda x,y,z, X,Y :((-x)/(-x)), 1),
+            (False,True,lambda x,y,z, X,Y :((x / y) / x), 1/y),
+            (False,X is MX,lambda x,y,z, X,Y :((-x) / y), -(x / y)),
+            (False,True,lambda x,y,z, X,Y :(x / (-y)), -(x / y)),
+            (False,True,lambda x,y,z, X,Y :(x ** 0), 1),
+            (False,True,lambda x,y,z, X,Y :(x ** 2), x*x),
+            (False,True,lambda x,y,z, X,Y :(x ** 3), x*(x*x)),
+            (False,True,lambda x,y,z, X,Y :(x ** -3), 1/(x**3)),
+            (False,True,lambda x,y,z, X,Y :(x ** 4), (x**2)*(x**2)),
+            (False,True,lambda x,y,z, X,Y :(x ** 0.5), x**0.5),
+            (False,False,lambda x,y,z, X,Y :(x ** y), x**y),
+            (False,True,lambda x,y,z, X,Y :(x**2 >= 0), 1),
+            (False,True,lambda x,y,z, X,Y :(2*x**2 >= x**2), 1),
+            (False,True,lambda x,y,z, X,Y :(fmin(x, float('inf'))), x),
+            (False,True,lambda x,y,z, X,Y :(fmin(float('inf'), x)), x),
+            (False,True,lambda x,y,z, X,Y :(fmin(-float('inf'), x)), -float('inf')),
+            (False,True,lambda x,y,z, X,Y :(fmin(x, x)), x),
+            (False,True,lambda x,y,z, X,Y :(fmax(-float('inf'), x)), x),
+            (False,True,lambda x,y,z, X,Y :(fmax(x, -float('inf'))), x),
+            (False,True,lambda x,y,z, X,Y :(fmax(x, float('inf'))), float('inf')),
+            (False,True,lambda x,y,z, X,Y :(fmax(x, x)), x),
+            (False,True,lambda x,y,z, X,Y :x**2 < 0, 0),
+            (False,True,lambda x,y,z, X,Y :(x == x), 1),
+            (False,True,lambda x,y,z, X,Y :(x != x), 0),
+            (False,True,lambda x,y,z, X,Y :sqrt(x)**2,x),
+            (False,True,lambda x,y,z, X,Y :sqrt(X)**2,X),
+            (False,True,lambda x,y,z, X,Y :(-x)**2,x**2),
+            (False,X is MX,lambda x,y,z, X,Y :fabs(fabs(x)),fabs(x)),
+            (False,X is MX,lambda x,y,z, X,Y :fabs(sqrt(x)),sqrt(x)),
+            (False,X is MX,lambda x,y,z, X,Y :fabs(exp(x)),exp(x)),
+            (False,X is MX,lambda x,y,z, X,Y :log(exp(x)),x),
+            (False,X is MX,lambda x,y,z, X,Y :1/(1/x),x),
+            (False,True,lambda x,y,z, X,Y :sqrt(x**2),fabs(x)),
+            (False,X is MX,lambda x,y,z, X,Y :fabs(-x),fabs(x)),
+            (False,True,lambda x,y,z, X,Y :fabs(x)**2,x**2),
+            (False,X is MX,lambda x,y,z, X,Y :cos(-x),cos(x)),
+            (False,X is MX,lambda x,y,z, X,Y :cos(fabs(x)),cos(x)),
+            (False,False,lambda x,y,z, X,Y :-(-x),x),
+            (False,True,lambda x,y,z, X,Y :cosh(x*0),x*0+1),
+            (False,True,lambda x,y,z, X,Y :x/0.5,2*x),
+            (False,True,lambda x,y,z, X,Y :x+x,2*x),
+            (False,True,lambda x,y,z, X,Y :x<x,0),
+            (False,True,lambda x,y,z, X,Y :2*x+x,3*x),
+            (False,True,lambda x,y,z, X,Y :x+2*x,3*x),
+            (False,X is MX,lambda x,y,z, X,Y :2*x-x,x),
+            (False,True,lambda x,y,z, X,Y :x-2*x,-x),
+            (True,False,lambda x,y,z, X,Y :-(x-y),y-x),
+               (True,False,lambda x,y,z, X,Y :-(x-y)+(x-y)**2, (-dx)+dx**2),
+            (True,False,lambda x,y,z, X,Y :(x+y/z)*z,x*z + y),
+            (True,False,lambda x,y,z, X,Y :(x/z+y)*z,x + y*z),
+            (True,False,lambda x,y,z, X,Y :z*(x/z+y),x + z*y),
+            (True,False,lambda x,y,z, X,Y :z*(x+y/z),z*x + y),
+            (True,False,lambda x,y,z, X,Y :(x-y/z)*z,x*z - y),
+            (True,False,lambda x,y,z, X,Y :(x/z-y)*z,x - y*z),
+            (True,False,lambda x,y,z, X,Y :z*(x/z-y),x - z*y),
+            (True,False,lambda x,y,z, X,Y :z*(x-y/z),z*x - y),
+            ]:
+          print(count)
+          count =count+1
+          A = genA(x,y,z,X,Y)
+          f = Function('f',args,[A])
+          if refcount:
+            self.assertNotEqual(str(A),str(B))
+            print(A)
+            f = f.simplify()
+            fref = Function('f',args,[B])
+            self.assertEqual(str(f.call(args,True,False)),str(fref.call(args,True,False)))
+          else:
+            self.assertEqual(str(A),str(B))
+          if on_the_fly:
+              GlobalOptions.setSimplificationOnTheFly(False)
+              A = genA(x,y,z,X,Y)
+              GlobalOptions.setSimplificationOnTheFly(True)
+              self.assertNotEqual(str(A),str(B))
+
+          Aval = f(a0,b0,c0,A0,B0)
+          Aref = genA(x0,y0,z0,X0,Y0)
+          print(Aval)
+          print(Aref)
+          self.checkarray(Aval,Aref)
+          
         
         print(DM(Sparsity.upper(3),0).is_nonnegative())
         print(DM(Sparsity.upper(3),0.5).is_half())
@@ -2180,6 +2230,31 @@ class MXtests(casadiTestCase):
     self.check_codegen(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
     self.check_serialize(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
 
+  def test_project_simplify(self):
+    x = MX.sym("x",Sparsity.lower(3))
+    DM.rng(1)
+    X0 = DM.rand(x.sparsity())
+    
+    y = project(x, Sparsity.upper(3))
+    z = project(y, sparsify(blockcat([[0,0,0],[1,1,1],[1,1,1]])).sparsity())
+    
+    f = Function('f',[x],[z])
+    fs = f.simplify()
+    self.assertTrue(fs.n_nodes()>3)
+
+    self.checkfunction(f,fs,inputs=[X0])
+
+    z = project(y, sparsify(blockcat([[1,0,0],[0,0,0],[0,0,1]])).sparsity())
+    
+    f = Function('f',[x],[z])
+    fs = f.simplify()
+    
+    self.assertTrue(fs.n_nodes(),3)
+    
+    fs.disp(True)
+
+    self.checkfunction(f,fs,inputs=[X0])
+    
   def test_repmat(self):
     a = DM([[1,2],[3,4],[5,6]])
     self.checkarray(repmat(a,2,3),kron(DM.ones(2,3),a))

@@ -213,6 +213,7 @@ namespace casadi {
     * The following list of boolean options can be provided:
     * - cse (default true): Common subexpression elimination
     * - empty_inputs (default true): inputs that are not used become structurally empty
+    * - ref_count (default true): reference count aware simplification
     *
 
         \identifier{2ef} */

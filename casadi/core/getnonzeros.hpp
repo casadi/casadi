@@ -58,7 +58,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{i4} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /** \brief Evaluate the MX node on a const/linear/nonlinear partition
 
@@ -90,7 +91,8 @@ namespace casadi {
     casadi_int op() const override { return OP_GETNONZEROS;}
 
     /// Get the nonzeros of matrix
-    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+        bool unique=false) const override;
 
     /** \brief Deserialize without type information
 
@@ -129,7 +131,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{ic} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /// Evaluate the function (template)
     template<typename T>

@@ -1801,6 +1801,7 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
   template<class T, typename SU>
   T common_simp_unary(casadi_int op, const T& x, casadi_int depth,
       SU&& gen_unary,
+      bool unique,
       bool& hit) {
     hit = true;
     switch (op) {
@@ -1847,6 +1848,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
       case OP_NEG:
         if (x.is_op(OP_NEG))
           return x.dep(); // -(-x) = x
+        else if (unique && x.is_op(OP_SUB))
+          return x.dep(1) - x.dep(0); // -(x-y) = y-x
     }
     hit = false;
     return 0;
@@ -1857,6 +1860,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
   T common_simp_binary(casadi_int op, const T& x, const T& y, casadi_int depth,
       SU&& gen_unary,
       SB&& gen_binary,
+      bool unique_x,
+      bool unique_y,
       bool& hit) {
     hit = true;
     switch (op) {
@@ -1972,6 +1977,34 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           return -(x.dep() * y);
         else if (y.is_op(OP_NEG))
           return -(x * y.dep());
+        else if (unique_x && x.is_op(OP_ADD) && x.dep(1).is_op(OP_DIV) &&
+            is_equal(x.dep(1).dep(1), y, depth))
+          return x.dep(0)*y + x.dep(1).dep(0); // (a + b/c)*c -> a*c + b
+        else if (unique_x && x.is_op(OP_ADD) && x.dep(0).is_op(OP_DIV) &&
+            is_equal(x.dep(0).dep(1), y, depth))
+          return x.dep(0).dep(0)+x.dep(1)*y; // (a/c + b)*c -> a*c + b
+        else if (unique_y && y.is_op(OP_ADD) && y.dep(1).is_op(OP_DIV) &&
+            is_equal(y.dep(1).dep(1), x, depth))
+          return x*y.dep(0) + y.dep(1).dep(0); // c*(a + b/c) -> c*a + b
+        else if (unique_y && y.is_op(OP_ADD) && y.dep(0).is_op(OP_DIV) &&
+            is_equal(y.dep(0).dep(1), x, depth))
+          return y.dep(0).dep(0) + x*y.dep(1); // c*(a/c + b) -> a + c*b
+        else if (unique_x && x.is_op(OP_SUB) && x.dep(1).is_op(OP_DIV) &&
+            is_equal(x.dep(1).dep(1), y, depth))
+          return x.dep(0)*y - x.dep(1).dep(0); // (a - b/c)*c -> a*c - b
+        else if (unique_x && x.is_op(OP_SUB) && x.dep(0).is_op(OP_DIV) &&
+            is_equal(x.dep(0).dep(1), y, depth))
+          return x.dep(0).dep(0)-x.dep(1)*y; // (a/c - b)*c -> a*c - b
+        else if (unique_y && y.is_op(OP_SUB) && y.dep(1).is_op(OP_DIV) &&
+            is_equal(y.dep(1).dep(1), x, depth))
+          return x*y.dep(0) - y.dep(1).dep(0); // c*(a - b/c) -> c*a - b
+        else if (unique_y && y.is_op(OP_SUB) && y.dep(0).is_op(OP_DIV) &&
+            is_equal(y.dep(0).dep(1), x, depth))
+          return y.dep(0).dep(0) - x*y.dep(1); // c*(a/c - b) -> a - c*b
+        else if (x.is_constant() && y.is_op(OP_MUL) && y.dep(0).is_constant())
+          return x*y.dep(0)*y.dep(1); // a*(b*x) -> (a*b)*x
+        else if (y.is_constant() && x.is_op(OP_MUL) && x.dep(0).is_constant())
+          return y*x.dep(0)*x.dep(1); // (a*x)*b -> (a*b)*x
         break;
       case OP_DIV:
         if (y.is_zero()) // term2 is zero

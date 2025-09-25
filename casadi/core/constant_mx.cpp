@@ -100,7 +100,8 @@ namespace casadi {
     return join_primitives_gen<DM>(it);
   }
 
-  void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = shared_from_this<MX>();
   }
 
@@ -288,11 +289,12 @@ namespace casadi {
     return "0x0";
   }
 
-  MX ZeroByZero::get_project(const Sparsity& sp) const {
+  MX ZeroByZero::get_project(const Sparsity& sp, bool unique) const {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX ZeroByZero::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
     casadi_assert_dev(nz.empty());
     return MX::zeros(sp);
   }
@@ -305,11 +307,12 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::get_unary(casadi_int op) const {
+  MX ZeroByZero::get_unary(casadi_int op, bool unique) const {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::_get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const {
+  MX ZeroByZero::_get_binary(casadi_int op, const MX& y, bool ScX, bool ScY,
+      bool unique_x, bool unique_y) const {
     return shared_from_this<MX>();
   }
 

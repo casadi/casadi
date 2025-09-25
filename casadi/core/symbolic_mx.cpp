@@ -49,7 +49,8 @@ namespace casadi {
     return 0;
   }
 
-  void SymbolicMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void SymbolicMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
   }
 
   void SymbolicMX::ad_forward(const std::vector<std::vector<MX> >& fseed,

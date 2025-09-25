@@ -58,8 +58,10 @@ namespace casadi {
     return 0;
   }
 
-  void UnaryMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    res[0] = MX::unary(op_, arg[0]);
+  void UnaryMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
+    bool unique_arg0 = !unique.empty() && unique[0];
+    res[0] = MX::unary(op_, arg[0], unique_arg0);
   }
 
   void UnaryMX::eval_linear(const std::vector<std::array<MX, 3> >& arg,
@@ -134,15 +136,16 @@ namespace casadi {
     return operation_checker<NonnegativeChecker>(op_);
   }
 
-  MX UnaryMX::_get_binary(casadi_int op, const MX& y, bool scX, bool scY) const {
+  MX UnaryMX::_get_binary(casadi_int op, const MX& y, bool scX, bool scY,
+      bool unique_x, bool unique_y) const {
     switch (op_) {
     case OP_NEG:
-      if (op==OP_ADD) return y->_get_binary(OP_SUB, dep(), scY, scX);
-      else if (op==OP_MUL) return -dep()->_get_binary(OP_MUL, y, scX, scY);
-      else if (op==OP_DIV) return -dep()->_get_binary(OP_DIV, y, scX, scY);
+      if (op==OP_ADD) return y->_get_binary(OP_SUB, dep(), scY, scX, unique_y, false);
+      else if (op==OP_MUL) return -dep()->_get_binary(OP_MUL, y, scX, scY, false, unique_y);
+      else if (op==OP_DIV) return -dep()->_get_binary(OP_DIV, y, scX, scY, false, unique_y);
       break;
     case OP_INV:
-      if (op==OP_MUL) return y->_get_binary(OP_DIV, dep(), scY, scX);
+      if (op==OP_MUL) return y->_get_binary(OP_DIV, dep(), scY, scX, unique_y, false);
       break;
     case OP_TWICE:
       if (op==OP_SUB && MX::is_equal(y, dep(), maxDepth())) return dep();
@@ -158,7 +161,7 @@ namespace casadi {
     }
 
     // Fallback to default implementation
-    return MXNode::_get_binary(op, y, scX, scY);
+    return MXNode::_get_binary(op, y, scX, scY, unique_x, unique_y);
   }
 
   void UnaryMX::serialize_body(SerializingStream& s) const {

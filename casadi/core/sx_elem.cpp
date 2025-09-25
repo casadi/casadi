@@ -180,7 +180,8 @@ namespace casadi {
     return node;
   }
 
-  SXElem SXElem::binary(casadi_int op, const SXElem& x, const SXElem& y) {
+  SXElem SXElem::binary(casadi_int op, const SXElem& x, const SXElem& y,
+      bool unique_x, bool unique_y) {
     // If-else-zero nodes are always simplified at top level to avoid NaN propagation
     if (y.op() == OP_IF_ELSE_ZERO) {
       if (op == OP_MUL) {
@@ -205,6 +206,8 @@ namespace casadi {
       SXElem ret = common_simp_binary(op, x, y, SXNode::eq_depth_,
                 [](casadi_int op, const SXElem& a) { return unary(op, a);},
                 [](casadi_int op, const SXElem& a, const SXElem& b) { return binary(op, a, b);},
+                unique_x,
+                unique_y,
                 hit);
       if (hit) return ret;
     }
@@ -216,7 +219,7 @@ namespace casadi {
     return OutputSX::split(c, f.nnz_out());
   }
 
-  SXElem SXElem::unary(casadi_int op, const SXElem& x) {
+  SXElem SXElem::unary(casadi_int op, const SXElem& x, bool unique) {
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
@@ -225,12 +228,20 @@ namespace casadi {
             return x.dep(); // This looks problematic
           break;
       }
+      // Simplifications
+      bool hit;
+      SXElem ret = common_simp_unary(op, x, SXNode::eq_depth_,
+                [](casadi_int op, const SXElem& a) { return unary(op, a);},
+                unique,
+                hit);
+      if (hit) return ret;
     }
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
       bool hit;
       SXElem ret = common_simp_unary(op, x, SXNode::eq_depth_,
                 [](casadi_int op, const SXElem& a) { return unary(op, a);},
+                unique,
                 hit);
       if (hit) return ret;
     }

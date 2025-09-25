@@ -345,7 +345,8 @@ namespace casadi {
     return 1;
   }
 
-  void MXNode::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void MXNode::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     casadi_error("'eval_mx' not defined for class " + class_name());
   }
 
@@ -658,7 +659,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX MXNode::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz, bool unique) const {
     if (sparsity().is_dense() && is_range(nz, 0, nnz())) {
       return sparsity_cast(shared_from_this<MX>(), sp);
     }
@@ -757,7 +758,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_project(const Sparsity& sp) const {
+  MX MXNode::get_project(const Sparsity& sp, bool unique) const {
     if (sp==sparsity()) {
       return shared_from_this<MX>();
     } else if (sp.nnz()==0) {
@@ -779,7 +780,7 @@ namespace casadi {
     return MX::create(new SubAssign(shared_from_this<MX>(), y, i, j));
   }
 
-  MX MXNode::get_unary(casadi_int op) const {
+  MX MXNode::get_unary(casadi_int op, bool unique) const {
     if (operation_checker<F0XChecker>(op) && is_zero()) {
       // If identically zero
       return MX::zeros(sparsity());
@@ -787,6 +788,7 @@ namespace casadi {
       bool hit;
       MX ret = common_simp_unary(op, shared_from_this<MX>(), maxDepth(),
                 [](casadi_int op, const MX& a) { return a->get_unary(op);},
+                unique,
                 hit);
       if (hit) return ret;
       // Create a new node
@@ -794,7 +796,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_binary(casadi_int op, const MX& y) const {
+  MX MXNode::get_binary(casadi_int op, const MX& y, bool unique_x, bool unique_y) const {
     // If-else-zero nodes are always simplified at top level to avoid NaN propagation
     if (y.op() == OP_IF_ELSE_ZERO) {
       if (op == OP_MUL) {
@@ -817,22 +819,22 @@ namespace casadi {
     if (sparsity().is_scalar(false)) {
       if (nnz()==0) {
         if (operation_checker<F0XChecker>(op)) return MX::zeros(Sparsity(y.size()));
-        return to_matrix(MX(0)->_get_binary(op, y, true, false), y.sparsity());
+        return to_matrix(MX(0)->_get_binary(op, y, true, false, unique_x, unique_y), y.sparsity());
       } else {
-        return to_matrix(_get_binary(op, y, true, false), y.sparsity());
+        return to_matrix(_get_binary(op, y, true, false, unique_x, unique_y), y.sparsity());
       }
     } else if (y.is_scalar()) {
       if (y.nnz()==0) {
         if (operation_checker<FX0Checker>(op)) return MX::zeros(Sparsity(size()));
-        return to_matrix(_get_binary(op, MX(0), false, true), sparsity());
+        return to_matrix(_get_binary(op, MX(0), false, true, unique_x, unique_y), sparsity());
       } else {
-        return to_matrix(_get_binary(op, y, false, true), sparsity());
+        return to_matrix(_get_binary(op, y, false, true, unique_x, unique_y), sparsity());
       }
     } else {
       casadi_assert(sparsity().size() == y.sparsity().size(), "Dimension mismatch.");
       if (sparsity()==y.sparsity()) {
         // Matching sparsities
-        return _get_binary(op, y, false, false);
+        return _get_binary(op, y, false, false, unique_x, unique_y);
       } else {
         // Get the sparsity pattern of the result
         // (ignoring structural zeros giving rise to nonzero result)
@@ -844,12 +846,13 @@ namespace casadi {
         // Project the arguments to this sparsity
         MX xx = project(shared_from_this<MX>(), r_sp);
         MX yy = project(y, r_sp);
-        return xx->_get_binary(op, yy, false, false);
+        return xx->_get_binary(op, yy, false, false, unique_x, unique_y);
       }
     }
   }
 
-  MX MXNode::_get_binary(casadi_int op, const MX& y, bool scX, bool scY) const {
+  MX MXNode::_get_binary(casadi_int op, const MX& y, bool scX, bool scY,
+      bool unique_x, bool unique_y) const {
     casadi_assert_dev(sparsity()==y.sparsity() || scX || scY);
 
     if (GlobalOptions::simplification_on_the_fly) {
@@ -872,6 +875,8 @@ namespace casadi {
                   [](casadi_int op, const MX& a, const MX& b) {
                     return a->_get_binary(op, b, true, true);
                   },
+                  unique_x,
+                  unique_y,
                   hit);
         if (hit) return ret;
       }

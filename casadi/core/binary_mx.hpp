@@ -68,7 +68,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{1ft} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique=std::vector<bool>()) const override;
 
     /** \brief Evaluate the MX node on a const/linear/nonlinear partition
 
@@ -136,7 +137,8 @@ namespace casadi {
     static MXNode* deserialize(DeserializingStream& s);
 
     /// Get a binary operation operation
-    MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY) const override;
+    MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY,
+        bool unique_x=false, bool unique_y=false) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth
 

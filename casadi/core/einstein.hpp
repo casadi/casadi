@@ -81,7 +81,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{34} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /** \brief Calculate forward mode directional derivatives
 

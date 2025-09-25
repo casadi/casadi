@@ -81,7 +81,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{yv} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -515,10 +516,11 @@ namespace casadi {
     DM get_DM() const override { return DM(); }
 
     /// Get densification
-    MX get_project(const Sparsity& sp) const override;
+    MX get_project(const Sparsity& sp, bool unique=false) const override;
 
     /// Get the nonzeros of matrix
-    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique=false) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
     MX get_nzassign(const MX& y, const std::vector<casadi_int>& nz) const override;
@@ -527,10 +529,11 @@ namespace casadi {
     MX get_transpose() const override;
 
     /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
+    MX get_unary(casadi_int op, bool unique) const override;
 
     /// Get a binary operation operation
-    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const override;
+    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY,
+        bool unique_x=false, bool unique_y=false) const override;
 
     /// Reshape
     MX get_reshape(const Sparsity& sp) const override;
@@ -678,10 +681,11 @@ namespace casadi {
     }
 
     /// Get densification
-    MX get_project(const Sparsity& sp) const override;
+    MX get_project(const Sparsity& sp, bool unique=false) const override;
 
     /// Get the nonzeros of matrix
-    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique=false) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
     MX get_nzassign(const MX& y, const std::vector<casadi_int>& nz) const override;
@@ -690,10 +694,11 @@ namespace casadi {
     MX get_transpose() const override;
 
     /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
+    MX get_unary(casadi_int op, bool unique=false) const override;
 
     /// Get a binary operation operation
-    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const override;
+    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY,
+        bool unique_x=false, bool unique_y=false) const override;
 
     /// Reshape
     MX get_reshape(const Sparsity& sp) const override;
@@ -831,7 +836,7 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_unary(casadi_int op) const {
+  MX Constant<Value>::get_unary(casadi_int op, bool unique) const {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op, to_double(), 0.0, ret);
@@ -853,7 +858,8 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::_get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const {
+  MX Constant<Value>::_get_binary(casadi_int op, const MX& y, bool ScX, bool ScY,
+      bool unique_x, bool unique_y) const {
     casadi_assert_dev(sparsity()==y.sparsity() || ScX || ScY);
 
     if (ScX && !operation_checker<FX0Checker>(op)) {
@@ -863,7 +869,7 @@ namespace casadi {
       if (ret!=0) {
         Sparsity f = Sparsity::dense(y.size1(), y.size2());
         MX yy = project(y, f);
-        return MX(f, shared_from_this<MX>())->_get_binary(op, yy, false, false);
+        return MX(f, shared_from_this<MX>())->_get_binary(op, yy, false, false, unique_x, unique_y);
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
@@ -875,7 +881,7 @@ namespace casadi {
       if (grow) {
         Sparsity f = Sparsity::dense(size1(), size2());
         MX xx = project(shared_from_this<MX>(), f);
-        return xx->_get_binary(op, MX(f, y), false, false);
+        return xx->_get_binary(op, MX(f, y), false, false, unique_x, unique_y);
       }
     }
 
@@ -914,7 +920,7 @@ namespace casadi {
     }
 
     // Fallback
-    return MXNode::_get_binary(op, y, ScX, ScY);
+    return MXNode::_get_binary(op, y, ScX, ScY, unique_x, unique_y);
   }
 
   template<typename Value>
@@ -950,7 +956,8 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX Constant<Value>::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
     if (v_.value!=0) {
       // Check if any "holes"
       for (std::vector<casadi_int>::const_iterator k=nz.begin(); k!=nz.end(); ++k) {
@@ -974,13 +981,13 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_project(const Sparsity& sp) const {
+  MX Constant<Value>::get_project(const Sparsity& sp, bool unique) const {
     if (is_zero()) {
       return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.is_dense()) {
       return densify(get_DM());
     } else {
-      return MXNode::get_project(sp);
+      return MXNode::get_project(sp, unique);
     }
   }
 

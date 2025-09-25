@@ -67,7 +67,8 @@ namespace casadi {
     }
   }
 
-  void SparsityCast::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void SparsityCast::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     casadi_assert(arg[0].sparsity().is_subset(dep().sparsity()), "SparsityCast: Invalid sparsity");
     Sparsity sp = arg[0].sparsity().sparsity_cast_mod(dep().sparsity(), sparsity());
     res[0] = sparsity_cast(arg[0], sp);
@@ -112,7 +113,8 @@ namespace casadi {
     return sparsity_cast(dep(0), sp);
   }
 
-  MX SparsityCast::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX SparsityCast::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
     return GetNonzeros::create(sp, dep(), nz);
   }
 

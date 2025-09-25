@@ -38,7 +38,8 @@ namespace casadi {
     return "bilin(" + arg.at(0) + ", " + arg.at(1) + ", " + arg.at(2) + ")";
   }
 
-  void Bilin::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Bilin::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = bilin(arg[0], arg[1], arg[2]);
   }
 

@@ -473,8 +473,9 @@ namespace casadi {
     /** \brief  Create nodes by their ID
 
         \identifier{r1} */
-    static MX binary(casadi_int op, const MX &x, const MX &y);
-    static MX unary(casadi_int op, const MX &x);
+    static MX binary(casadi_int op, const MX &x, const MX &y,
+        bool unique_x=false, bool unique_y=false);
+    static MX unary(casadi_int op, const MX &x, bool unique=false);
     ///@}
 
     ///@{
@@ -504,6 +505,14 @@ namespace casadi {
     /// Get a const pointer to the node
     MXNode* get() const;
 #endif // SWIG
+
+    /// \cond INTERNAL
+    /** \brief Low-level access to get_nzref
+    *
+    * Intended for writing unittests
+    */
+    MX nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const;
+    /// \endcond
 
     ///@{
     /// Get a submatrix, single argument
@@ -751,6 +760,11 @@ namespace casadi {
     /// \endcond
 
 #endif // SWIG
+
+    // Simplification with reference counting awareness
+    static bool simplify_ref_count(std::vector<MX>& arg,
+                                   std::vector<MX>& res,
+                                   const Dict& opts = Dict());
 
     static DM bspline_dual(const std::vector<double>& x,
             const std::vector< std::vector<double> >& knots,
@@ -1000,7 +1014,8 @@ namespace casadi {
     /** \brief Evaluate the MX node with new symbolic dependencies
 
         \identifier{rn} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& SWIG_OUTPUT(res)) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& SWIG_OUTPUT(res),
+        const std::vector<bool>& unique=std::vector<bool>()) const;
 
 #ifndef SWIG
     ///@{

@@ -98,7 +98,8 @@ namespace casadi {
     }
   }
 
-  MX Concat::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX Concat::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
     // Get the first nonnegative nz
     casadi_int nz_test = -1;
     for (auto&& i : nz) {
@@ -155,7 +156,8 @@ namespace casadi {
     return ss.str();
   }
 
-  void Diagcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Diagcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = diagcat(arg);
   }
 
@@ -208,7 +210,8 @@ namespace casadi {
     return ss.str();
   }
 
-  void Horzcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Horzcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = horzcat(arg);
   }
 
@@ -259,7 +262,8 @@ namespace casadi {
     return ss.str();
   }
 
-  void Vertcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Vertcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = vertcat(arg);
   }
 

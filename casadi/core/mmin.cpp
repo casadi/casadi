@@ -72,11 +72,13 @@ namespace casadi {
     return 0;
   }
 
-  void MMin::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void MMin::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = mmin(arg[0]);
   }
 
-  void MMax::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void MMax::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = mmax(arg[0]);
   }
 
