@@ -400,15 +400,21 @@ namespace casadi {
         \identifier{qv} */
     bool is_zero() const;
 
-    /** \brief  check if zero (note that false negative answers are possible)
+    /** \brief  check if one (note that false negative answers are possible)
 
         \identifier{qw} */
     bool is_one() const;
 
-    /** \brief  check if zero (note that false negative answers are possible)
+    /** \brief  check if minus one (note that false negative answers are possible)
 
         \identifier{qx} */
     bool is_minus_one() const;
+
+    /** \brief  check if 0.5 (note that false negative answers are possible) */
+    bool is_half() const;
+
+    /** \brief  check if a certain value (note that false negative answers are possible) */
+    bool is_value(double val) const;
 
     /** \brief  check if inf (note that false negative answers are possible)
 

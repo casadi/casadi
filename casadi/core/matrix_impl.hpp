@@ -1640,6 +1640,27 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  bool Matrix<Scalar>::is_half() const {
+    if (!is_dense()) return false;
+
+    // Look for non-halves
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_half(e)) return false;
+
+    return true;
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::is_value(double val) const {
+    if (val==0.0) return is_zero();
+    if (!is_dense()) return false;
+
+    // Look for non-values
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_value(e, val)) return false;
+
+    return true;
+  }
+
+  template<typename Scalar>
   bool Matrix<Scalar>::is_inf() const {
     if (!is_dense()) return false;
 

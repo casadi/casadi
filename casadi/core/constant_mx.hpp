@@ -243,6 +243,8 @@ namespace casadi {
     bool is_minus_one() const override;
     bool is_inf() const override;
     bool is_minus_inf() const override;
+    bool is_half() const override;
+    bool is_value(double val) const override;
     bool is_nonnegative() const override;
     bool is_integer() const override;
     bool is_eye() const override;
@@ -649,15 +651,16 @@ namespace casadi {
     /** \brief  Check if a particular integer value
 
         \identifier{10c} */
-    bool is_zero() const override { return v_.value==0;}
-    bool is_one() const override { return v_.value==1;}
-    bool is_minus_one() const override { return v_.value==-1;}
-    bool is_inf() const override { return casadi_limits<double>::is_inf(v_.value);}
-    bool is_minus_inf() const override { return casadi_limits<double>::is_minus_inf(v_.value);}
-    bool is_nonnegative() const override { return casadi_limits<double>::is_nonnegative(v_.value);}
-    bool is_integer() const override { return casadi_limits<double>::is_integer(v_.value);}
-    bool is_eye() const override { return v_.value==1 && sparsity().is_diag();}
-    bool is_value(double val) const override { return v_.value==val;}
+    bool is_zero() const override;
+    bool is_one() const override;
+    bool is_minus_one() const override;
+    bool is_half() const override;
+    bool is_inf() const override;
+    bool is_minus_inf() const override;
+    bool is_nonnegative() const override;
+    bool is_integer() const override;
+    bool is_eye() const override;
+    bool is_value(double val) const override;
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override {
@@ -717,6 +720,57 @@ namespace casadi {
 
     Value v_;
   };
+
+  template<typename Value>
+  bool Constant<Value>::is_zero() const {
+    return v_.value==0;
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_one() const {
+    return sparsity().is_dense() && v_.value==1;
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_minus_one() const {
+    return sparsity().is_dense() && v_.value==-1;
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_half() const {
+    return sparsity().is_dense() && v_.value==0.5;
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_inf() const {
+    return sparsity().is_dense() && casadi_limits<double>::is_inf(v_.value);
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_minus_inf() const {
+    return sparsity().is_dense() && casadi_limits<double>::is_minus_inf(v_.value);
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_nonnegative() const {
+    return casadi_limits<double>::is_nonnegative(v_.value);
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_integer() const {
+    return casadi_limits<double>::is_integer(v_.value);
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_eye() const {
+    return v_.value==1 && sparsity().is_diag();
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_value(double val) const {
+    if (val==0) return is_zero();
+    return sparsity().is_dense() && v_.value==val;
+  }
 
   template<typename Value>
   void Constant<Value>::serialize_type(SerializingStream& s) const {

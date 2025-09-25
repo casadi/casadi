@@ -182,6 +182,8 @@ namespace casadi {
     bool is_almost_zero(double tol) const;
     bool is_one() const;
     bool is_minus_one() const;
+    bool is_half() const;
+    bool is_value(double val) const;
     bool is_nan() const;
     bool is_inf() const;
     bool is_minus_inf() const;
@@ -310,6 +312,8 @@ namespace casadi {
     static bool is_almost_zero(const SXElem& val, double tol);
     static bool is_one(const SXElem& val);
     static bool is_minus_one(const SXElem& val);
+    static bool is_half(const SXElem& val);
+    static bool is_value(const SXElem& val, double v);
     static bool is_nonnegative(const SXElem& val);
     static bool is_constant(const SXElem& val);
     static bool is_integer(const SXElem& val);

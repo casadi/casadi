@@ -1014,6 +1014,14 @@ namespace casadi {
     return (*this)->is_value(-1);
   }
 
+  bool MX::is_half() const {
+    return (*this)->is_half();
+  }
+
+  bool MX::is_value(double val) const {
+    return (*this)->is_value(val);
+  }
+
   bool MX::is_nonnegative() const {
     return (*this)->is_nonnegative();
   }

@@ -220,6 +220,14 @@ namespace casadi {
     return x_.is_minus_one();
   }
 
+  bool ConstantDM::is_half() const {
+    return x_.is_half();
+  }
+
+  bool ConstantDM::is_value(double val) const {
+    return x_.is_value(val);
+  }
+
   bool ConstantDM::is_inf() const {
     return x_.is_inf();
   }
