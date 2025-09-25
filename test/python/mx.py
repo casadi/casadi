@@ -1709,7 +1709,59 @@ class MXtests(casadiTestCase):
     self.checkarray(v[0][1],DM([[0,0],[5,0]]))
     self.checkarray(v[1][0],DM([2,3]))
     self.checkarray(blockcat(v),DM(fs[0].sparsity_in(0),list(range(Nr))))
+    
+    
+  def test_is_one_etc(self):
+    for op in [lambda x: x, MX, SX]:
+        self.assertTrue(op(DM(Sparsity.upper(3),0)).is_zero())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),0)).is_zero())
+        self.assertTrue(op(DM(3,4)).is_zero())
+        self.assertFalse(op(blockcat([[0,0],[0,7]])).is_zero())
+        
+        self.assertFalse(op(DM(Sparsity.upper(3),1)).is_one())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),1)).is_one())
+        self.assertFalse(op(blockcat([[1,1],[1,7]])).is_one())
+       
+        self.assertFalse(op(DM(Sparsity.upper(3),0.5)).is_half())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),0.5)).is_half())
+        self.assertFalse(op(blockcat([[0.5,0.5],[0.5,7]])).is_half())
+         
+        self.assertFalse(op(DM(Sparsity.upper(3),-1)).is_minus_one())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),-1)).is_minus_one())
+        self.assertFalse(op(blockcat([[-1,-1],[-1,7]])).is_minus_one())
 
+        self.assertFalse(op(DM(Sparsity.upper(3),np.inf)).is_inf())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),np.inf)).is_inf())
+        self.assertFalse(op(blockcat([[np.inf,np.inf],[np.inf,7]])).is_inf())
+
+        self.assertFalse(op(DM(Sparsity.upper(3),-np.inf)).is_minus_inf())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),-np.inf)).is_minus_inf())
+        self.assertFalse(op(blockcat([[-np.inf,-np.inf],[-np.inf,7]])).is_minus_inf())
+
+        self.assertTrue(op(DM(Sparsity.upper(3),3)).is_integer())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),3)).is_integer())
+        self.assertFalse(op(blockcat([[3,3],[3,0.7]])).is_integer())
+        self.assertTrue(op(blockcat([[3,3],[3,7]])).is_integer())
+
+        self.assertFalse(op(DM(Sparsity.upper(3),7)).is_value(7))
+        self.assertTrue(op(DM(Sparsity.dense(3,4),7)).is_value(7))
+        self.assertFalse(op(blockcat([[7,7],[7,1]])).is_value(7))
+        self.assertTrue(op(DM(Sparsity.upper(3),0)).is_value(0))
+        self.assertTrue(op(DM(Sparsity.dense(3,4),0)).is_value(0))
+        self.assertTrue(op(DM(3,4)).is_value(0))
+        self.assertFalse(op(blockcat([[0,0],[0,7]])).is_value(0))
+
+        self.assertFalse(op(DM(Sparsity.upper(3),1)).is_eye())
+        self.assertTrue(op(DM(Sparsity.diag(3),1)).is_eye())
+        self.assertFalse(op(blockcat([[1,0],[0,1]])).is_eye()) # Why?
+        
+        
+        self.assertFalse(op(DM(Sparsity.upper(3),-1)).is_nonnegative())
+        self.assertTrue(op(DM(Sparsity.upper(3),1)).is_nonnegative())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),1)).is_nonnegative())
+        self.assertTrue(op(blockcat([[1,1],[1,7]])).is_nonnegative())
+        self.assertFalse(op(blockcat([[1,1],[1,-7]])).is_nonnegative())
+        
   def test_mxnulloutput(self):
      a = MX(5,0)
      b = MX.sym("x",2)

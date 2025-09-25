@@ -317,6 +317,14 @@ namespace casadi {
     return node->is_minus_one();
   }
 
+  bool SXElem::is_half() const {
+    return node->is_half();
+  }
+
+  bool SXElem::is_value(double val) const {
+    return node->is_value(val);
+  }
+
   bool SXElem::is_nan() const {
     return node->is_nan();
   }
@@ -417,6 +425,14 @@ namespace casadi {
 
   bool casadi_limits<SXElem>::is_minus_one(const SXElem& val) {
     return val.is_minus_one();
+  }
+
+  bool casadi_limits<SXElem>::is_half(const SXElem& val) {
+    return val.is_half();
+  }
+
+  bool casadi_limits<SXElem>::is_value(const SXElem& val, double v) {
+    return val.is_value(v);
   }
 
   bool casadi_limits<SXElem>::is_nonnegative(const SXElem& val) {

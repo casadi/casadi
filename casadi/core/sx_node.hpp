@@ -74,6 +74,8 @@ namespace casadi {
     virtual bool is_almost_zero(double tol) const { return false; }
     virtual bool is_one() const { return false; }
     virtual bool is_minus_one() const { return false; }
+    virtual bool is_half() const { return false; }
+    virtual bool is_value(double val) const { return false; }
     virtual bool is_nan() const { return false; }
     virtual bool is_inf() const { return false; }
     virtual bool is_minus_inf() const { return false; }

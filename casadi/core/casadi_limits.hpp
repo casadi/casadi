@@ -62,6 +62,12 @@ namespace casadi {
       static bool is_minus_one(const T& val) {
         return val==-1;
       }
+      static bool is_value(const T& val, T v) {
+        return val==v;
+      }
+      static bool is_half(const T& val) {
+        return val==0.5;
+      }
       static bool is_constant(const T& val) {
         return true;
       }
