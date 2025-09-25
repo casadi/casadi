@@ -423,6 +423,10 @@ namespace casadi {
     return (*this)->combine(y, true, true);
   }
 
+  Sparsity Sparsity::intersect(const std::vector<bool>& y) const {
+    return (*this)->intersect(y);
+  }
+
   bool Sparsity::is_subset(const Sparsity& rhs) const {
     return (*this)->is_subset(rhs);
   }

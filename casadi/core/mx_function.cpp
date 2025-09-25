@@ -528,6 +528,16 @@ namespace casadi {
       }
       s << el.data->disp(arg);
     }
+
+    s << std::endl;
+    /*for (casadi_int i=0; i<el.arg.size(); ++i) {
+      s << "arg["<<  i << "]\n";
+      el.data.dep(i).sparsity().spy(s);
+    }*/
+    for (casadi_int i=0; i<el.res.size(); ++i) {
+      s << "res["<<  i << "]\n";
+      el.data->sparsity(i).spy(s);
+    }
     return s.str();
   }
 

@@ -511,6 +511,11 @@ namespace casadi {
     static Matrix<Scalar> diagcat(const std::vector< Matrix<Scalar> > &A);
     ///@}
 
+    // Simplification pass dead code elimination
+    static bool simplify_dead_code(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts = Dict()) { return false;}
+
     // Simplification with reference counting awareness
     static bool simplify_ref_count(std::vector< Matrix<Scalar> >& arg,
                                    std::vector< Matrix<Scalar> >& res,

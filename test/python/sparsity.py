@@ -567,7 +567,40 @@ class Sparsitytests(casadiTestCase):
         self.assertTrue(L.is_subset(R))
         self.assertFalse(R.is_subset(L))
 
+  def test_intersect_bool(self):
+      sp = Sparsity.dense(3,3)
+      with self.assertInException("mismatch"):
+        sp.intersect([True])
+    
+      def check_spy(sp,ref):
+        ref = ref.replace(" ","").strip()
+        with capture_stdout() as result:
+           sp.spy()
+        result = result[0].replace(" ","").strip()
+        self.assertEqual(result,ref)
 
-
+      check_spy(
+        sp.intersect([True, False, True, False, True, False, True, False, False]),
+        """
+        *.*
+        .*.
+        *..
+        """)
+      sp = Sparsity.upper(3)
+      check_spy(
+        sp.intersect([True, False, True, False, True,True]),
+        """
+        *..
+        .**
+        ..*
+        """)
+      sp = Sparsity.dense(3,4)
+      check_spy(
+        sp.intersect([True,True,True,False,False,False,True,False,False,False,False,True]),
+        """
+        *.*.
+        *...
+        *..*
+        """)
 if __name__ == '__main__':
     unittest.main()

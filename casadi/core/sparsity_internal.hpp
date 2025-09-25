@@ -619,6 +619,8 @@ namespace casadi {
     Sparsity combineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     ///@}
 
+    Sparsity intersect(const std::vector<bool>& y) const;
+
     /// Is subset?
     bool is_subset(const Sparsity& rhs) const;
 

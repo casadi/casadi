@@ -1006,10 +1006,13 @@ namespace casadi {
     Dict final_options = generate_options("clone");
 
     bool empty_inputs = true;
+    bool dead_code = true;
     bool ref_count = true;
     for (auto&& op : opts) {
       if (op.first=="empty_inputs") {
         empty_inputs = op.second;
+      } else if (op.first=="dead_code") {
+        dead_code = op.second;
       } else if (op.first=="ref_count") {
         ref_count = op.second;
       } else {
@@ -1028,6 +1031,10 @@ namespace casadi {
           e = MatType(e.size());
         }
       }
+    }
+
+    if (dead_code) {
+      MatType::simplify_dead_code(new_in, new_out);
     }
 
     if (ref_count) {

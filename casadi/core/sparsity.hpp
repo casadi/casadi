@@ -637,6 +637,7 @@ namespace casadi {
                        std::vector<unsigned char>& mapping) const;
 #endif // SWIG
     Sparsity intersect(const Sparsity& y) const;
+    Sparsity intersect(const std::vector<bool>& y) const;
     Sparsity operator*(const Sparsity& b) const;
     /// @}
 
