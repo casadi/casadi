@@ -56,7 +56,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    casadi_math<MX>::fun(op_, arg[0], arg[1], res[0]);
+    res[0] = MX::binary(op_, arg[0], arg[1]);
   }
 
   template<bool ScX, bool ScY>
