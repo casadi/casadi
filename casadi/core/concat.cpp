@@ -155,7 +155,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Diagcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Diagcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = diagcat(arg);
   }
 
@@ -208,7 +208,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Horzcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Horzcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = horzcat(arg);
   }
 
@@ -259,7 +259,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Vertcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Vertcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = vertcat(arg);
   }
 

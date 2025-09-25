@@ -188,7 +188,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{1qv} */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique=false) const;
 
     /** \brief Evaluate the MX node on a const/linear/nonlinear partition
 
@@ -712,10 +712,10 @@ namespace casadi {
     virtual MX get_project(const Sparsity& sp) const;
 
     /// Get a unary operation
-    virtual MX get_unary(casadi_int op) const;
+    virtual MX get_unary(casadi_int op, bool unique=false) const;
 
     /// Get a binary operation operation
-    MX get_binary(casadi_int op, const MX& y) const;
+    MX get_binary(casadi_int op, const MX& y, bool unique=false) const;
 
     /// Get a binary operation operation (matrix-matrix)
     virtual MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY) const;

@@ -68,7 +68,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{1ft} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /** \brief Evaluate the MX node on a const/linear/nonlinear partition
 

@@ -510,6 +510,12 @@ namespace casadi {
     static Matrix<Scalar> norm_inf_mul(const Matrix<Scalar>& x, const Matrix<Scalar> &y);
     static Matrix<Scalar> diagcat(const std::vector< Matrix<Scalar> > &A);
     ///@}
+
+    // Simplification with reference counting awareness
+    static bool simplify_ref_count(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts = Dict());
+
     /// \endcond
 #endif // SWIG
 

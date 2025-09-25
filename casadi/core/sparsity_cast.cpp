@@ -67,7 +67,7 @@ namespace casadi {
     }
   }
 
-  void SparsityCast::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void SparsityCast::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     casadi_assert(arg[0].sparsity().is_subset(dep().sparsity()), "SparsityCast: Invalid sparsity");
     Sparsity sp = arg[0].sparsity().sparsity_cast_mod(dep().sparsity(), sparsity());
     res[0] = sparsity_cast(arg[0], sp);

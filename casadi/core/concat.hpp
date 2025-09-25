@@ -151,7 +151,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{14j} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -235,7 +235,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{14u} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -320,7 +320,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{155} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /** \brief Calculate forward mode directional derivatives
 

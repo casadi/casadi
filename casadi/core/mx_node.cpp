@@ -345,7 +345,7 @@ namespace casadi {
     return 1;
   }
 
-  void MXNode::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void MXNode::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     casadi_error("'eval_mx' not defined for class " + class_name());
   }
 
@@ -779,7 +779,7 @@ namespace casadi {
     return MX::create(new SubAssign(shared_from_this<MX>(), y, i, j));
   }
 
-  MX MXNode::get_unary(casadi_int op) const {
+  MX MXNode::get_unary(casadi_int op, bool unique) const {
     if (operation_checker<F0XChecker>(op) && is_zero()) {
       // If identically zero
       return MX::zeros(sparsity());
@@ -787,6 +787,7 @@ namespace casadi {
       bool hit;
       MX ret = common_simp_unary(op, shared_from_this<MX>(), maxDepth(),
                 [](casadi_int op, const MX& a) { return a->get_unary(op);},
+                unique,
                 hit);
       if (hit) return ret;
       // Create a new node
@@ -794,7 +795,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_binary(casadi_int op, const MX& y) const {
+  MX MXNode::get_binary(casadi_int op, const MX& y, bool unique) const {
     // If-else-zero nodes are always simplified at top level to avoid NaN propagation
     if (y.op() == OP_IF_ELSE_ZERO) {
       if (op == OP_MUL) {
@@ -872,6 +873,7 @@ namespace casadi {
                   [](casadi_int op, const MX& a, const MX& b) {
                     return a->_get_binary(op, b, true, true);
                   },
+                  false,
                   hit);
         if (hit) return ret;
       }

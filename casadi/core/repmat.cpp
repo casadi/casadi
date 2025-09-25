@@ -57,7 +57,7 @@ namespace casadi {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
-  void HorzRepmat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void HorzRepmat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = arg[0]->get_repmat(1, n_);
   }
 
@@ -141,7 +141,7 @@ namespace casadi {
     return eval_gen<SXElem>(arg, res, iw, w, std::plus<SXElem>());
   }
 
-  void HorzRepsum::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void HorzRepsum::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = arg[0]->get_repsum(1, n_);
   }
 

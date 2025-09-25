@@ -510,15 +510,15 @@ namespace casadi {
     *this = m->get_nzassign(*this, ind1 ? kk-1 : kk);
   }
 
-  MX MX::binary(casadi_int op, const MX &x, const MX &y) {
+  MX MX::binary(casadi_int op, const MX &x, const MX &y, bool unique) {
     // Check, correct dimensions
     if (x.size()!=y.size() && !x.is_scalar() && !y.is_scalar()) {
       // x and y are horizontal multiples of each other?
       if (!x.is_empty() && !y.is_empty()) {
         if (x.size1() == y.size1() && x.size2() % y.size2() == 0) {
-          return binary(op, x, repmat(y, 1, x.size2() / y.size2()));
+          return binary(op, x, repmat(y, 1, x.size2() / y.size2()), unique);
         } else if (y.size1() == x.size1() && y.size2() % x.size2() == 0) {
-          return binary(op, repmat(x, 1, y.size2() / x.size2()), y);
+          return binary(op, repmat(x, 1, y.size2() / x.size2()), y, unique);
         }
       }
       // x and y are empty horizontal multiples of each other?
@@ -534,11 +534,11 @@ namespace casadi {
                    ", x is " + x.dim() + ", while y is " + y.dim());
     }
     // Call internal class
-    return x->get_binary(op, y);
+    return x->get_binary(op, y, unique);
   }
 
-  MX MX::unary(casadi_int op, const MX &x) {
-    return x->get_unary(Operation(op));
+  MX MX::unary(casadi_int op, const MX &x, bool unique) {
+    return x->get_unary(Operation(op), unique);
   }
 
   MXNode* MX::get() const {
@@ -1647,7 +1647,7 @@ namespace casadi {
               ores.at(0) = it->data;
             }
           } else {
-            it->data->eval_mx(oarg, ores);
+            it->data->eval_mx(oarg, ores, false);
           }
 
           // Get the result
@@ -1801,7 +1801,7 @@ namespace casadi {
               }
               // Perform the operation
               ores.resize(it->res.size());
-              it->data->eval_mx(oarg, ores);
+              it->data->eval_mx(oarg, ores, false);
               // Get the result
               for (casadi_int i=0; i<ores.size(); ++i) {
                 casadi_int el = it->res[i];
@@ -2179,6 +2179,96 @@ namespace casadi {
     return H->get_convexify(opts);
   }
 
+  bool MX::simplify_ref_count(std::vector<MX>& arg,
+                              std::vector<MX>& res,
+                              const Dict& opts) {
+    Dict temp_opts = {{"live_variables", false},
+                      {"max_io", 0},
+                      {"cse", false},
+                      {"allow_free", true}};
+    Function f("temp", arg, res, temp_opts);
+    MXFunction *ff = f.get<MXFunction>();
+    const std::vector<casadi_int>& workloc_ = ff->workloc_;
+    const auto& algorithm_ = ff->algorithm_;
+
+    std::vector<casadi_int> rwork(workloc_.size()-1);
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      if (it->op == OP_INPUT) {
+      } else if (it->op==OP_OUTPUT) {
+        rwork[it->arg.front()]++;
+      } else if (it->op==OP_PARAMETER) {
+        rwork[it->res.front()]++;
+      } else {
+        for (casadi_int i=0; i<it->arg.size(); ++i) {
+          casadi_int el = it->arg[i];
+          if (el>=0) {
+            rwork[el]++;
+          }
+        }
+      }
+    }
+
+    // Forward pass
+    {
+
+      // Symbolic work, non-differentiated
+      std::vector<MX> swork(workloc_.size()-1);
+
+      // Split up inputs analogous to symbolic primitives
+      std::vector<std::vector<MX> > arg_split(arg.size());
+      for (casadi_int i=0; i<arg.size(); ++i) arg_split[i] = arg[i].split_primitives(arg[i]);
+
+      // Allocate storage for split outputs
+      std::vector<std::vector<MX> > res_split(res.size());
+      for (casadi_int i=0; i<res.size(); ++i) res_split[i].resize(res[i].n_primitives());
+
+      std::vector<MX> arg1, res1;
+
+      // Loop over computational nodes in forward order
+      for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+        if (it->op == OP_INPUT) {
+          swork[it->res.front()] = project(arg_split.at(it->data->ind()).at(it->data->segment()),
+                                            it->data.sparsity(), true);
+        } else if (it->op==OP_OUTPUT) {
+          // Collect the results
+          res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
+        } else if (it->op==OP_PARAMETER) {
+          // Fetch parameter
+          swork[it->res.front()] = it->data;
+        } else {
+          // Arguments of the operation
+          arg1.resize(it->arg.size());
+
+          bool unique = true;
+          for (casadi_int i=0; i<arg1.size(); ++i) {
+            casadi_int el = it->arg[i];
+            if (el<0) {
+              arg1[i] = MX(it->data->dep(i).size());
+            } else {
+              arg1[i] = swork[el];
+              if (rwork[el]>1) unique = false;
+            }
+          }
+
+          // Perform the operation
+          res1.resize(it->res.size());
+          it->data->eval_mx(arg1, res1, unique);
+
+          // Get the result
+          for (casadi_int i=0; i<res1.size(); ++i) {
+            casadi_int el = it->res[i]; // index of the output
+            if (el>=0) {
+              swork[el] = res1[i];
+            }
+          }
+        }
+      }
+
+      // Join split outputs
+      for (casadi_int i=0; i<res.size(); ++i) res[i] = res[i].join_primitives(res_split[i]);
+    }
+    return true;
+  }
 
   class IncrementalSerializerMX {
     public:
@@ -2260,7 +2350,7 @@ namespace casadi {
 
           // Perform the operation
           res1.resize(it->res.size());
-          it->data->eval_mx(arg1, res1);
+          it->data->eval_mx(arg1, res1, false);
 
           // Get the result
           for (casadi_int i=0; i<res1.size(); ++i) {
@@ -2463,7 +2553,7 @@ namespace casadi {
 
         // Perform the operation
         res1.resize(it->res.size());
-        it->data->eval_mx(arg1, res1);
+        it->data->eval_mx(arg1, res1, false);
 
         // Get the result
         for (casadi_int i=0; i<res1.size(); ++i) {
@@ -2770,10 +2860,10 @@ namespace casadi {
  }
 
 
- void MX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+ void MX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
    try {
      res.resize((*this)->nout());
-     (*this)->eval_mx(arg, res);
+     (*this)->eval_mx(arg, res, unique);
    } catch (std::exception& e) {
      CASADI_THROW_ERROR_OBJ("eval_mx", e.what());
    }

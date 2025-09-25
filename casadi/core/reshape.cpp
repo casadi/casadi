@@ -73,7 +73,7 @@ namespace casadi {
     }
   }
 
-  void Reshape::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Reshape::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = reshape(arg[0], size());
   }
 

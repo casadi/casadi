@@ -53,7 +53,7 @@ namespace casadi {
     return "convexify(" + arg.at(0) + ")";
   }
 
-  void Convexify::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Convexify::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     Dict options;
     options["strategy"] = strategy_to_string(convexify_data_.config.strategy);
     options["margin"] = convexify_data_.config.margin;

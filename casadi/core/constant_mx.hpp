@@ -81,7 +81,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{yv} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -527,7 +527,7 @@ namespace casadi {
     MX get_transpose() const override;
 
     /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
+    MX get_unary(casadi_int op, bool unique) const override;
 
     /// Get a binary operation operation
     MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const override;
@@ -690,7 +690,7 @@ namespace casadi {
     MX get_transpose() const override;
 
     /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
+    MX get_unary(casadi_int op, bool unique=false) const override;
 
     /// Get a binary operation operation
     MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const override;
@@ -831,7 +831,7 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_unary(casadi_int op) const {
+  MX Constant<Value>::get_unary(casadi_int op, bool unique) const {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op, to_double(), 0.0, ret);

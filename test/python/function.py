@@ -3819,6 +3819,52 @@ class Functiontests(casadiTestCase):
 
 
 
+
+  def test_simplify_ref_count(self):
+  
+    # getnonzeros, vertsplit
+
+  
+    def tests():
+    
+        for X in [SX,MX]:
+
+            a = X.sym("a")
+            b = X.sym("b")
+            
+            z = -(a-b) # Will get simplified
+            
+            yield Function("f",[a,b],[z]), Function("f",[a,b],[b-a])
+            
+            e = (a-b)
+            z = -e     # Will not get simplified
+            
+            yield Function("f",[a,b],[3*e,-e]), Function("f",[a,b],[3*e,z])
+            
+        
+        return
+
+
+        x = MX.sym("x")
+        
+        z = vertcat(x,sin(x),cos(x))
+        
+        y = z[:2]
+        
+        yield Function("f",[x],[y]), Function("f",[x],[vertcat(x,sin(x))])
+
+
+    for f, ref in tests():
+        fs = f.simplify()
+        
+        fs.generate("f.c")
+        ref.generate("ref.c")
+        self.checkfunction_identical(fs,ref)
+        
+        DM.rng(1)
+        inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+        self.checkfunction(f,fs,inputs=inputs)
+    
   def test_duplicate_check(self):
     x = MX()
     f = Function('f',[x],[2*x])

@@ -1006,9 +1006,12 @@ namespace casadi {
     Dict final_options = generate_options("clone");
 
     bool empty_inputs = true;
+    bool ref_count = true;
     for (auto&& op : opts) {
       if (op.first=="empty_inputs") {
         empty_inputs = op.second;
+      } else if (op.first=="ref_count") {
+        ref_count = op.second;
       } else {
         casadi_error("No such simplify option: " + std::string(op.first) + ".\n");
       }
@@ -1025,6 +1028,10 @@ namespace casadi {
           e = MatType(e.size());
         }
       }
+    }
+
+    if (ref_count) {
+      MatType::simplify_ref_count(new_in, new_out);
     }
 
     return Function(name, new_in, new_out, name_in_, name_out_, final_options);

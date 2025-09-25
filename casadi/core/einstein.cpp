@@ -122,7 +122,7 @@ namespace casadi {
     return 0;
   }
 
-  void Einstein::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Einstein::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = einstein(arg[1], arg[2], arg[0], dim_a_, dim_b_, dim_c_, a_, b_, c_);
   }
 

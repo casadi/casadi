@@ -215,19 +215,23 @@ namespace casadi {
     return ss.str();
   }
 
-  void GetNonzerosParamVector::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void GetNonzerosParamVector::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      bool unique) const {
     res[0] = project(arg[0], dep(0).sparsity())->get_nz_ref(arg[1]);
   }
 
-  void GetNonzerosParamSlice::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void GetNonzerosParamSlice::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      bool unique) const {
     res[0] = project(arg[0], dep(0).sparsity())->get_nz_ref(arg[1], outer_);
   }
 
-  void GetNonzerosSliceParam::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void GetNonzerosSliceParam::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      bool unique) const {
     res[0] = project(arg[0], dep(0).sparsity())->get_nz_ref(inner_, arg[1]);
   }
 
-  void GetNonzerosParamParam::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void GetNonzerosParamParam::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      bool unique) const {
     res[0] = project(arg[0], dep(0).sparsity())->get_nz_ref(arg[1], arg[2]);
   }
 

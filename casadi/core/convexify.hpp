@@ -62,7 +62,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{9j} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /** \brief Generate code for the operation
 

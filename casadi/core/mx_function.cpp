@@ -765,7 +765,7 @@ namespace casadi {
 
           // Perform the operation
           res1.resize(it->res.size());
-          it->data->eval_mx(arg1, res1);
+          it->data->eval_mx(arg1, res1, false);
 
           // Get the result
           for (casadi_int i=0; i<res1.size(); ++i) {
@@ -1408,7 +1408,7 @@ namespace casadi {
 
             // Perform the operation
             res1.resize(e.res.size());
-            e.data->eval_mx(arg1, res1);
+            e.data->eval_mx(arg1, res1, false);
 
             // Get the result
             for (casadi_int i=0; i<res1.size(); ++i) {
@@ -1482,7 +1482,7 @@ namespace casadi {
 
           // Perform the operation
           ores.resize(it->res.size());
-          it->data->eval_mx(oarg, ores);
+          it->data->eval_mx(oarg, ores, false);
 
           // Get the result
           for (casadi_int i=0; i<ores.size(); ++i) {

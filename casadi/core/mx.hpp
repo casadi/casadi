@@ -473,8 +473,8 @@ namespace casadi {
     /** \brief  Create nodes by their ID
 
         \identifier{r1} */
-    static MX binary(casadi_int op, const MX &x, const MX &y);
-    static MX unary(casadi_int op, const MX &x);
+    static MX binary(casadi_int op, const MX &x, const MX &y, bool unique=false);
+    static MX unary(casadi_int op, const MX &x, bool unique=false);
     ///@}
 
     ///@{
@@ -752,6 +752,11 @@ namespace casadi {
 
 #endif // SWIG
 
+    // Simplification with reference counting awareness
+    static bool simplify_ref_count(std::vector<MX>& arg,
+                                   std::vector<MX>& res,
+                                   const Dict& opts = Dict());
+
     static DM bspline_dual(const std::vector<double>& x,
             const std::vector< std::vector<double> >& knots,
             const std::vector<casadi_int>& degree,
@@ -1000,7 +1005,8 @@ namespace casadi {
     /** \brief Evaluate the MX node with new symbolic dependencies
 
         \identifier{rn} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& SWIG_OUTPUT(res)) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& SWIG_OUTPUT(res),
+        bool unique=false) const;
 
 #ifndef SWIG
     ///@{

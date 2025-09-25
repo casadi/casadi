@@ -2521,6 +2521,14 @@ namespace casadi {
     return Matrix<Scalar>(Sparsity::diagcat(sp), data, false);
   }
 
+  /** \brief   Simplification with reference counting awareness */
+  template<typename Scalar>
+  bool Matrix<Scalar>::simplify_ref_count(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts) {
+    casadi_error("'simplify_ref_count' not defined for " + type_name());
+  }
+
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::unite(const Matrix<Scalar>& A, const Matrix<Scalar>& B) {
     // Join the sparsity patterns

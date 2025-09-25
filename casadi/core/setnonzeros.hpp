@@ -66,7 +66,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{vz} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /** \brief Evaluate the MX node on a const/linear/nonlinear partition
 
@@ -134,7 +134,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{w6} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /// Evaluate the function (template)
     template<typename T>
@@ -223,7 +223,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{wh} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /// Evaluate the function (template)
     template<typename T>
@@ -303,7 +303,7 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{wq} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const override;
 
     /// Evaluate the function (template)
     template<typename T>

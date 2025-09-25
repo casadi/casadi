@@ -26,6 +26,7 @@
 #include "matrix_impl.hpp"
 
 #include "sx_function.hpp"
+#include "output_sx.hpp"
 #include <array>
 
 namespace casadi {
@@ -1565,6 +1566,135 @@ namespace casadi {
       const Sparsity& sp, const SXElem* nonzeros,
       const std::string& format_hint) {
     casadi_error("Not implemented");
+  }
+
+  template<>
+  bool CASADI_EXPORT SX::simplify_ref_count(std::vector<SX>& arg,
+                                   std::vector<SX>& res,
+                                   const Dict& opts) {
+    Dict temp_opts = {{"live_variables", false},
+                      {"max_io", 0},
+                      {"cse", false},
+                      {"allow_free", true}};
+    Function f("temp", arg, res, temp_opts);
+    SXFunction *ff = f.get<SXFunction>();
+    const auto& algorithm_ = ff->algorithm_;
+
+    std::vector<casadi_int> rwork(ff->worksize_);
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+        break;
+      case OP_OUTPUT:
+        rwork[a.i1]++;
+        break;
+      case OP_CONST:
+        break;
+      case OP_PARAMETER:
+        break;
+      case OP_CALL:
+        {
+          const auto& m = ff->call_.el.at(a.i1);
+          for (casadi_int i=0;i<m.n_dep;++i) {
+            rwork[m.dep[i]]++;
+          }
+        }
+        break;
+      default:
+        {
+          bool is_binary = casadi_math<SXElem>::is_binary(a.op);
+          if (is_binary) {
+            rwork[a.i1]++;
+            rwork[a.i2]++;
+          } else {
+            rwork[a.i1]++;
+          }
+        }
+      }
+    }
+
+    std::vector<const SXElem*> argp(f.sz_arg());
+    for (casadi_int i=0;i<arg.size();++i) {
+      argp[i] = get_ptr(arg.at(i).nonzeros());
+    }
+
+    std::vector<SXElem*> resp(f.sz_res());
+    for (casadi_int i=0;i<resp.size();++i) {
+      resp[i] = get_ptr(res.at(i).nonzeros());
+    }
+
+    std::vector<SXElem> w(ff->worksize_);
+
+    // Iterator to the binary operations
+    std::vector<SXElem>::const_iterator b_it = ff->operations_.begin();
+
+    // Iterator to stack of constants
+    std::vector<SXElem>::const_iterator c_it = ff->constants_.begin();
+
+    // Iterator to free variables
+    std::vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
+
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+        w[a.i0] = argp[a.i1]==nullptr ? 0 : argp[a.i1][a.i2];
+        break;
+      case OP_OUTPUT:
+        if (resp[a.i0]!=nullptr) resp[a.i0][a.i2] = w[a.i1];
+        break;
+      case OP_CONST:
+        w[a.i0] = *c_it++;
+        break;
+      case OP_PARAMETER:
+        w[a.i0] = *p_it++; break;
+      case OP_CALL:
+        {
+          const auto& m = ff->call_.el.at(a.i1);
+          const SXElem& orig = *b_it++;
+          std::vector<SXElem> deps(m.n_dep);
+          bool identical = true;
+
+          std::vector<SXElem> ret;
+          for (casadi_int i=0;i<m.n_dep;++i) {
+            identical &= SXElem::is_equal(w[m.dep.at(i)], orig->dep(i), 2);
+          }
+          if (identical) {
+            ret = OutputSX::split(orig, m.n_res);
+          } else {
+            for (casadi_int i=0;i<m.n_dep;++i) deps[i] = w[m.dep[i]];
+            ret = SXElem::call(m.f, deps);
+          }
+          for (casadi_int i=0;i<m.n_res;++i) {
+            if (m.res[i]>=0) w[m.res[i]] = ret[i];
+          }
+        }
+        break;
+      default:
+        {
+          // Evaluate the function to a temporary value
+          // (as it might overwrite the children in the work vector)
+          SXElem f;
+          if (casadi_math<MX>::is_binary(a.op)) {
+            f = SXElem::binary(a.op, w[a.i1], w[a.i2], rwork[a.i1]==1 && rwork[a.i2]==1);
+          } else if (casadi_math<MX>::is_unary(a.op)) {
+            f = SXElem::unary(a.op, w[a.i1], rwork[a.i1]==1);
+          } else {
+            switch (a.op) {
+              CASADI_MATH_FUN_BUILTIN(w[a.i1], w[a.i2], f)
+            }
+          }
+
+          // If this new expression is identical to the expression used
+          // to define the algorithm, then reuse
+          const casadi_int depth = 2; // NOTE: a higher depth could possibly give more savings
+          f.assignIfDuplicate(*b_it++, depth);
+
+          // Finally save the function value
+          w[a.i0] = f;
+        }
+      }
+    }
+    return true;
   }
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS

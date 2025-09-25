@@ -154,8 +154,8 @@ namespace casadi {
     /** \brief  Perform operations by ID
 
         \identifier{10p} */
-    static SXElem binary(casadi_int op, const SXElem& x, const SXElem& y);
-    static SXElem unary(casadi_int op, const SXElem& x);
+    static SXElem binary(casadi_int op, const SXElem& x, const SXElem& y, bool unique=false);
+    static SXElem unary(casadi_int op, const SXElem& x, bool unique=false);
     static std::vector<SXElem> call(const Function& f, const std::vector<SXElem>& deps);
 
     /** \brief Check the truth value of this node

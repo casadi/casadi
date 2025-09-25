@@ -1801,6 +1801,7 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
   template<class T, typename SU>
   T common_simp_unary(casadi_int op, const T& x, casadi_int depth,
       SU&& gen_unary,
+      bool unique,
       bool& hit) {
     hit = true;
     switch (op) {
@@ -1847,6 +1848,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
       case OP_NEG:
         if (x.is_op(OP_NEG))
           return x.dep(); // -(-x) = x
+        else if (unique && x.is_op(OP_SUB))
+          return x.dep(1) - x.dep(0); // -(x-y) = y-x
     }
     hit = false;
     return 0;
@@ -1857,6 +1860,7 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
   T common_simp_binary(casadi_int op, const T& x, const T& y, casadi_int depth,
       SU&& gen_unary,
       SB&& gen_binary,
+      bool unique,
       bool& hit) {
     hit = true;
     switch (op) {

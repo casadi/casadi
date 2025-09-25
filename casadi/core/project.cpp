@@ -57,7 +57,7 @@ namespace casadi {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
-  void Project::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Project::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = project(arg[0], sparsity());
   }
 

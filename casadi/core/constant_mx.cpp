@@ -100,7 +100,7 @@ namespace casadi {
     return join_primitives_gen<DM>(it);
   }
 
-  void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
     res[0] = shared_from_this<MX>();
   }
 
@@ -305,7 +305,7 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::get_unary(casadi_int op) const {
+  MX ZeroByZero::get_unary(casadi_int op, bool unique) const {
     return shared_from_this<MX>();
   }
 
