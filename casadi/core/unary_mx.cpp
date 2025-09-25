@@ -59,8 +59,7 @@ namespace casadi {
   }
 
   void UnaryMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    MX dummy;
-    casadi_math<MX>::fun(op_, arg[0], dummy, res[0]);
+    res[0] = MX::unary(op_, arg[0]);
   }
 
   void UnaryMX::eval_linear(const std::vector<std::array<MX, 3> >& arg,
