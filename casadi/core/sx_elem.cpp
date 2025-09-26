@@ -228,18 +228,6 @@ namespace casadi {
           if (x.is_op(OP_NOT))
             return x.dep(); // This looks problematic
           break;
-        case OP_SINH:
-        case OP_TANH:
-        case OP_ATANH:
-        case OP_ACOSH:
-        case OP_ASINH:
-          if (x.is_zero())
-            return 0;
-          break;
-        case OP_COSH:
-          if (x.is_zero())
-            return 1;
-          break;
       }
     }
     // Simplifications
