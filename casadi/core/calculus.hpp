@@ -1869,6 +1869,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           return x - (-y);
         else if (x.is_op(OP_NEG)) // (-x) + y -> y - x
           return y - x.dep();
+        else if (is_equal(x, y, depth))
+          return 2*x; // x+x -> 2*x
         else if (x.is_op(OP_MUL) && y.is_op(OP_MUL) &&
                 x.dep(0).is_constant() && static_cast<double>(x.dep(0))==0.5 &&
                 y.dep(0).is_constant() && static_cast<double>(y.dep(0))==0.5 &&
@@ -1894,6 +1896,10 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
                   || (x.dep().is_op(OP_COS) && y.dep().is_op(OP_SIN)))
                 && is_equal(x.dep().dep(), y.dep().dep(), depth))
           return 1; // sin^2 + cos^2 -> 1
+        else if (x.is_doubled() && is_equal(x.dep(0), y, depth))
+          return 3*x.dep(0);
+        else if (y.is_doubled() && is_equal(y.dep(0), x, depth))
+          return 3*y.dep(0);
         break;
       case OP_SUB:
         if (y.is_zero()) // term2 is zero
@@ -1922,6 +1928,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           return x.dep(1);
         else if (x.is_doubled() && is_equal(x.dep(0), y, depth))
           return y;
+        else if (y.is_doubled() && is_equal(y.dep(0), x, depth))
+          return -x;
         break;
       case OP_MUL:
         if (is_equal(y, x, depth))
