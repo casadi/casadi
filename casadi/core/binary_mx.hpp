@@ -135,9 +135,6 @@ namespace casadi {
         \identifier{1g1} */
     static MXNode* deserialize(DeserializingStream& s);
 
-    /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
-
     /// Get a binary operation operation
     MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY) const override;
 

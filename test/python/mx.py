@@ -1443,8 +1443,14 @@ class MXtests(casadiTestCase):
         a = X.sym("a")
         b = X.sym("b")
         
+        A = X.sym("A",2,2)
+        B = X.sym("B",2,2)
+        
         x = sin(a)
         y = sin(b)
+        
+        X = sin(A)
+        Y = sin(B)
 
  
         for A,B in [
@@ -1490,6 +1496,8 @@ class MXtests(casadiTestCase):
             ((x * (-y)), -(x*y)),
             ((2*(0.5*x),x)),
             (2*(x*0.5),x),
+            ((2*(0.5*X),X)),
+            (2*(X*0.5),X),
             #((x / 0), float('inf')),
             ((0 / x), 0),
             ((x / 1), x),
@@ -1529,11 +1537,33 @@ class MXtests(casadiTestCase):
             (x**2 < 0, 0),
             ((x == x), 1),
             ((x != x), 0),
+            (sqrt(x)**2,x),
+            (sqrt(X)**2,X),
+            ((-x)**2,x**2),
+            (fabs(fabs(x)),fabs(x)),
+            (fabs(sqrt(x)),sqrt(x)),
+            (fabs(exp(x)),exp(x)),
+            (log(exp(x)),x),
+            (1/(1/x),x),
+            (sqrt(x**2),fabs(x)),
+            (fabs(-x),fabs(x)),
+            (fabs(x)**2,x**2),
+            (cos(-x),cos(x)),
+            (cos(fabs(x)),cos(x)),
+            (-(-x),x),
             ]:
           print((A,B))
           self.assertEqual(str(A),str(B))
         
+        print(DM(Sparsity.upper(3),0).is_nonnegative())
+        print(DM(Sparsity.upper(3),0.5).is_half())
+        print(MX(DM(Sparsity.upper(3),0.5)).is_half())
+        print(MX(DM(Sparsity.dense(3,3),0.5)).is_half())
+        2*(blockcat([[2,3],[6,8]])*A)
+
+
   
+    
   @known_bug()
   def test_vertcat_empty(self):
     a = MX(DM(0,2))

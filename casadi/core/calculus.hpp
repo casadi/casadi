@@ -1806,12 +1806,47 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     switch (op) {
       case OP_TWICE:
         if (x.is_op(OP_MUL) && x.dep(0).is_constant() &&
-            2*static_cast<double>(x.dep(0))==1)
+            x.dep(0).is_half())
           return x.dep(1); // 2*(0.5*x) = x
         else if (x.is_op(OP_MUL) && x.dep(1).is_constant() &&
-            2*static_cast<double>(x.dep(1))==1)
+            x.dep(1).is_half())
           return x.dep(0); // 2*(x*0.5) = x
         break;
+      case OP_SQ:
+        if (x.is_op(OP_SQRT))
+          return x.dep(); // sqrt(x)^2 = x
+        else if (x.is_op(OP_NEG))
+          return sq(x.dep()); // (-x)^2 = x^2
+        else if (x.is_op(OP_FABS))
+          return sq(x.dep()); // |x|^2 = x^2
+        break;
+      case OP_FABS:
+        if (x.is_nonnegative())
+          return x;
+        else if (x.is_op(OP_NEG))
+          return fabs(x.dep()); // fabs(-x) = fabs(x)
+        break;
+      case OP_LOG:
+        if (x.is_op(OP_EXP))
+          return x.dep(); // log(exp(x)) = x
+        break;
+      case OP_INV:
+        if (x.is_op(OP_INV))
+          return x.dep(); // 1/(1/x) = x
+        break;
+      case OP_SQRT:
+        if (x.is_op(OP_SQ))
+          return fabs(x.dep()); // sqrt(x^2) = x
+        break;
+      case OP_COS:
+        if (x.is_op(OP_NEG))
+          return cos(x.dep()); // cos(-x) = cos(x)
+        else if (x.is_op(OP_FABS))
+          return cos(x.dep()); // cos(|x|) = cos(x)
+        break;
+      case OP_NEG:
+        if (x.is_op(OP_NEG))
+          return x.dep(); // -(-x) = x
     }
     hit = false;
     return 0;
