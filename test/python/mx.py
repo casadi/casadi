@@ -1552,6 +1552,7 @@ class MXtests(casadiTestCase):
             (cos(fabs(x)),cos(x)),
             (-(-x),x),
             (cosh(x*0),x*0+1),
+            (x/0.5,2*x),
             ]:
           print((A,B))
           self.assertEqual(str(A),str(B))

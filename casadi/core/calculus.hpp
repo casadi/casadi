@@ -1974,6 +1974,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
           return x;
         else if (y.is_minus_one())
           return -x;
+        else if (y.is_half())
+          return 2*x;
         else if (is_equal(x, y, depth)) // terms are equal
           return 1;
         else if (x.is_doubled() && y.is_constant() && static_cast<double>(y)==2)
