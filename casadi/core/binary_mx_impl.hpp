@@ -268,16 +268,6 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::get_unary(casadi_int op) const {
-    //switch (op_) {
-    //default: break; // no rule
-    //}
-
-    // Fallback to default implementation
-    return MXNode::get_unary(op);
-  }
-
-  template<bool ScX, bool ScY>
   MX BinaryMX<ScX, ScY>::_get_binary(casadi_int op, const MX& y, bool scX, bool scY) const {
     if (!GlobalOptions::simplification_on_the_fly) return MXNode::_get_binary(op, y, scX, scY);
 

@@ -224,19 +224,9 @@ namespace casadi {
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
-        case OP_SQ:
-          if (x.is_op(OP_SQRT))
-            return x.dep();
-          else if (x.is_op(OP_NEG))
-            return sq(x.dep());
-          break;
-        case OP_FABS:
-          if (x.is_op(OP_FABS) || x.is_op(OP_SQ))
-            return x;
-          break;
         case OP_NOT:
           if (x.is_op(OP_NOT))
-            return x.dep();
+            return x.dep(); // This looks problematic
           break;
         case OP_SINH:
         case OP_TANH:
@@ -250,11 +240,15 @@ namespace casadi {
           if (x.is_zero())
             return 1;
           break;
-        case OP_SQRT:
-          if (x.is_op(OP_SQ))
-            return fabs(x.dep());
-          break;
       }
+    }
+    // Simplifications
+    if (GlobalOptions::simplification_on_the_fly) {
+      bool hit;
+      SXElem ret = common_simp_unary(op, x, SXNode::eq_depth_,
+                [](casadi_int op, const SXElem& a) { return unary(op, a);},
+                hit);
+      if (hit) return ret;
     }
     return UnarySX::create(Operation(op), x);
   }

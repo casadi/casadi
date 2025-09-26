@@ -784,13 +784,11 @@ namespace casadi {
       // If identically zero
       return MX::zeros(sparsity());
     } else {
-      if (sparsity().is_scalar(true)) {
-        bool hit;
-        MX ret = common_simp_unary(op, shared_from_this<MX>(), maxDepth(),
-                  [](casadi_int op, const MX& a) { return a->get_unary(op);},
-                  hit);
-        if (hit) return ret;
-      }
+      bool hit;
+      MX ret = common_simp_unary(op, shared_from_this<MX>(), maxDepth(),
+                [](casadi_int op, const MX& a) { return a->get_unary(op);},
+                hit);
+      if (hit) return ret;
       // Create a new node
       return MX::create(new UnaryMX(Operation(op), shared_from_this<MX>()));
     }
