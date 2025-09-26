@@ -1553,8 +1553,15 @@ class MXtests(casadiTestCase):
             (-(-x),x),
             (cosh(x*0),x*0+1),
             (x/0.5,2*x),
+            (x+x,2*x),
+            (x<x,0),
+            (2*x+x,3*x),
+            (x+2*x,3*x),
+            (2*x-x,x),
+            (x-2*x,-x)
             ]:
           print((A,B))
+          
           self.assertEqual(str(A),str(B))
         
         print(DM(Sparsity.upper(3),0).is_nonnegative())
