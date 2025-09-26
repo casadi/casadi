@@ -151,7 +151,7 @@ namespace casadi {
     else if (is_one())
       return -1;
     else
-      return UnarySX::create(OP_NEG, *this);
+      return unary(OP_NEG, *this);
   }
 
   bool SXElem::__nonzero__() const {
@@ -165,11 +165,7 @@ namespace casadi {
   }
 
   SXElem SXElem::inv() const {
-    if (is_op(OP_INV)) {
-      return dep(0);
-    } else {
-      return UnarySX::create(OP_INV, *this);
-    }
+    return unary(OP_INV, *this);
   }
 
   SXNode* SXElem::get() const {
