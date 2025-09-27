@@ -705,7 +705,6 @@ jobs:
               "manylinux1-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
               "manylinux2014-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
               "manylinux2014-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
-              "manylinux2014-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
               "windows-shared-x64-posix": {"os": "windows", "bitness": "64", "suffix":"64"}
            }
           export_to: env
@@ -777,6 +776,100 @@ jobs:
           prerelease: true
         if: github.event_name != 'pull_request'
 
+  python-linux-arm64:
+    needs: [core-manylinux-aarch64,matrix-arch-py2-linux-arm64,swig,version]
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix-arch-py2-linux-arm64.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/download-artifact@v4.1.7
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source
+        run: unzip casadi_source.zip
+      - uses: actions/download-artifact@v4.1.7
+        with:
+          name: core-manylinux-aarch64-native-arm64
+      - run: unzip core-manylinux-aarch64-native-arm64.zip
+      - uses: casadi/mockups@master
+        with:
+          tag: manylinux2014-aarch64
+      - id: get-python-version
+        uses: actions/github-script@v6.3.3
+        env:
+          py2: "${{ matrix.py2 }}"
+        with:
+          result-encoding: string
+          script: |
+            const { py2 } = process.env;
+            const major = py2.substr(0,1);
+            const minor = py2.substr(1);
+            core.setOutput('pydot2', major+"."+minor)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ steps.get-python-version.outputs.pydot2 }}
+      - run: rm -rf install
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_PYTHON=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DSKIP_CONFIG_H_GENERATION=ON
+          cmake --build build --target install -v
+      - run: |
+             cd install
+             echo "This file (and the casadi directory) should end up in a folder called 'casadi-linux-aarch64-py${{matrix.py2}}'" > dummy.txt
+             zip -rq ../casadi-linux-aarch64-py${{matrix.py2}}.zip .
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - run: cp casadi-linux-aarch64-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-linux-aarch64-py${{matrix.py2}}.zip
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: casadi-*-linux-aarch64-py${{matrix.py2}}.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.9.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ needs.version.outputs.casadi }}-linux-aarch64-py${{matrix.py2}}.zip
+          prerelease: true
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-artifact@v4.3.1
+        with:
+          name: casadi-linux-aarch64-py${{matrix.py2}}
+          path: casadi-linux-aarch64-py${{matrix.py2}}.zip
+          retention-days: 5
+      - run: |
+          pip install wheel==0.31.1
+          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} linux 64 manylinux2014-aarch64 install/)
+          echo "<$wheel>"
+          echo "wheel=$wheel" >> $GITHUB_OUTPUT
+          wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
+          echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
+        id: wheel
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: ${{ steps.wheel.outputs.wheel_wildcard }}
+          fail-if-no-assets: false
+          fail-if-no-release: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.9.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: ${{ steps.wheel.outputs.wheel }}
+          prerelease: true
+        if: github.event_name != 'pull_request'
 
   test-matlab:
     runs-on: ${{matrix.image}}
@@ -965,7 +1058,7 @@ jobs:
 
   test-python:
     runs-on: ${{ matrix.image }}
-    needs: [python-osx,python-dockcross]
+    needs: [python-osx,python-dockcross,python-linux-arm64]
     strategy:
      fail-fast: false
      matrix:
