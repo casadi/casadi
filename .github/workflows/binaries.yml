@@ -194,7 +194,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,windows-shared-x64-posix]
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v4.1.1
         with:
@@ -232,6 +232,36 @@ jobs:
         with:
           name: ${{github.job}}-${{ matrix.target}}
           path: ${{github.job}}-${{matrix.target}}.zip
+          retention-days: 5
+
+  core-manylinux-aarch64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0 # for git-restore-mtime
+          submodules: recursive
+      - uses: jgillis/git-restore-mtime-action@master
+        with:
+          args: "--commit-time"
+      - name: Cache build dir
+        uses: actions/cache@v4.2.0
+        with:
+          key: core-build-${{ github.ref }}-native-arm64-${{env.cache-suffix}}
+          path: build
+      - uses: casadi/mockups@master
+        with:
+          tag: manylinux2014-aarch64
+      - name: Build
+        run: |
+          rm -f build/CMakeCache.txt
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_aarch64}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          cmake --build build -v
+      - run: zip -rq ${{github.job}}-native-arm64.zip build
+      - uses: actions/upload-artifact@v4.3.1
+        with:
+          name: ${{ github.job }}-native-arm64
+          path: ${{ github.job }}-native-arm64.zip
           retention-days: 5
 
   matrix-arch-py2:
