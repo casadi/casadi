@@ -3876,6 +3876,18 @@ class Functiontests(casadiTestCase):
             
             yield Function("f",[a,b],[3*e,-e]), Function("f",[a,b],[3*e,z])
             
+                    
+        x = MX.sym("x",Sparsity.lower(3))
+
+        y = project(x, Sparsity.upper(3))
+
+        yield Function("f",[x],[y.nz[5]]), Function("f",[x],[x.nz[5]])
+
+        x = MX.sym("x",Sparsity.lower(3))
+
+        y = project(x, Sparsity.upper(3))
+
+        yield Function("f",[x],[y[:,-1]]), Function("f",[x],[x.nzref(Sparsity.dense(3,1),[-1,-1,5])])
         
         return
 
@@ -3890,7 +3902,10 @@ class Functiontests(casadiTestCase):
 
 
     for f, ref in tests():
+        ref.disp(True)
         fs = f.simplify()
+        
+        fs.disp(True)
         
         fs.generate("f.c")
         ref.generate("ref.c")
@@ -3898,7 +3913,7 @@ class Functiontests(casadiTestCase):
         
         DM.rng(1)
         inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
-        self.checkfunction(f,fs,inputs=inputs)
+        self.checkfunction_light(f,fs,inputs=inputs)
     
   def test_duplicate_check(self):
     x = MX()

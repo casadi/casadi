@@ -98,7 +98,8 @@ namespace casadi {
     }
   }
 
-  MX Concat::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX Concat::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
     // Get the first nonnegative nz
     casadi_int nz_test = -1;
     for (auto&& i : nz) {

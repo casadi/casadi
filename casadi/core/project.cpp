@@ -58,7 +58,44 @@ namespace casadi {
   }
 
   void Project::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, bool unique) const {
-    res[0] = project(arg[0], sparsity());
+    res[0] = arg[0]->get_project(sparsity(), unique);
+  }
+
+  MX Project::get_project(const Sparsity& sp, bool unique) const {
+    if (unique && sp.is_subset(dep(0).sparsity())) {
+      return dep(0)->get_project(sp);
+    } else {
+      return MXNode::get_project(sp, unique);
+    }
+  }
+
+  MX Project::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
+    if (unique) {
+      // Decay projection into GetNonzeros
+      // Defer simplification logic to GetNonzeros::get_nzref
+
+      std::vector<unsigned char> mapping;
+      dep(0).sparsity().intersect(sparsity(), mapping);
+
+      // Nonzero indices of the original matrix
+      std::vector<casadi_int> dnz;
+      casadi_int i=0;
+      for (auto e : mapping) {
+        if (e & 2) { // entry present in projection
+          if (e & 1) {
+            dnz.push_back(i); // present in original
+          } else {
+            dnz.push_back(-1); // not present in original
+          }
+        }
+        if (e & 1) i++; // Only count a nonzero when present
+      }
+
+      return dep(0)->get_nzref(sparsity(), dnz)->get_nzref(sp, nz);
+    } else {
+      return MXNode::get_nzref(sp, nz);
+    }
   }
 
   void Project::ad_forward(const std::vector<std::vector<MX> >& fseed,

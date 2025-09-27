@@ -90,7 +90,8 @@ namespace casadi {
     casadi_int op() const override { return OP_GETNONZEROS;}
 
     /// Get the nonzeros of matrix
-    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+        bool unique=false) const override;
 
     /** \brief Deserialize without type information
 

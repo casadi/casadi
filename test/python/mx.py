@@ -2180,6 +2180,31 @@ class MXtests(casadiTestCase):
     self.check_codegen(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
     self.check_serialize(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
 
+  def test_project_simplify(self):
+    x = MX.sym("x",Sparsity.lower(3))
+    DM.rng(1)
+    X0 = DM.rand(x.sparsity())
+    
+    y = project(x, Sparsity.upper(3))
+    z = project(y, sparsify(blockcat([[0,0,0],[1,1,1],[1,1,1]])).sparsity())
+    
+    f = Function('f',[x],[z])
+    fs = f.simplify()
+    self.assertTrue(fs.n_nodes()>3)
+
+    self.checkfunction(f,fs,inputs=[X0])
+
+    z = project(y, sparsify(blockcat([[1,0,0],[0,0,0],[0,0,1]])).sparsity())
+    
+    f = Function('f',[x],[z])
+    fs = f.simplify()
+    
+    self.assertTrue(fs.n_nodes(),3)
+    
+    fs.disp(True)
+
+    self.checkfunction(f,fs,inputs=[X0])
+    
   def test_repmat(self):
     a = DM([[1,2],[3,4],[5,6]])
     self.checkarray(repmat(a,2,3),kron(DM.ones(2,3),a))

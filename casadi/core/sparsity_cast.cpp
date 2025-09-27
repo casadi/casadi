@@ -112,7 +112,8 @@ namespace casadi {
     return sparsity_cast(dep(0), sp);
   }
 
-  MX SparsityCast::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX SparsityCast::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
     return GetNonzeros::create(sp, dep(), nz);
   }
 

@@ -144,6 +144,10 @@ namespace casadi {
     return (*this)->__nonzero__();
   }
 
+  MX MX::nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+    return (*this)->get_nzref(sp, nz);
+  }
+
   void MX::get(MX& m, bool ind1, const Slice& rr, const Slice& cc) const {
     // Fall back on (IM, IM)
     return get(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));

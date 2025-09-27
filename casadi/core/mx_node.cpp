@@ -658,7 +658,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX MXNode::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz, bool unique) const {
     if (sparsity().is_dense() && is_range(nz, 0, nnz())) {
       return sparsity_cast(shared_from_this<MX>(), sp);
     }
@@ -757,7 +757,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_project(const Sparsity& sp) const {
+  MX MXNode::get_project(const Sparsity& sp, bool unique) const {
     if (sp==sparsity()) {
       return shared_from_this<MX>();
     } else if (sp.nnz()==0) {

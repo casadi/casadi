@@ -600,7 +600,8 @@ namespace casadi {
     *   returns Matrix(sp,a[nz])
 
         \identifier{1s4} */
-    virtual MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const;
+    virtual MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+        bool unique=false) const;
 
     /** \brief Get the nonzeros of matrix, parametrically
     *
@@ -709,7 +710,7 @@ namespace casadi {
     virtual MX get_subassign(const MX& y, const Slice& i, const Slice& j) const;
 
     /// Create set sparse
-    virtual MX get_project(const Sparsity& sp) const;
+    virtual MX get_project(const Sparsity& sp, bool unique=false) const;
 
     /// Get a unary operation
     virtual MX get_unary(casadi_int op, bool unique=false) const;

@@ -1038,7 +1038,9 @@ namespace casadi {
     }
 
     if (ref_count) {
-      MatType::simplify_ref_count(new_in, new_out);
+      for (casadi_int i=0;i<5; ++i) {
+        MatType::simplify_ref_count(new_in, new_out);
+      }
     }
 
     return Function(name, new_in, new_out, name_in_, name_out_, final_options);

@@ -515,10 +515,11 @@ namespace casadi {
     DM get_DM() const override { return DM(); }
 
     /// Get densification
-    MX get_project(const Sparsity& sp) const override;
+    MX get_project(const Sparsity& sp, bool unique=false) const override;
 
     /// Get the nonzeros of matrix
-    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique=false) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
     MX get_nzassign(const MX& y, const std::vector<casadi_int>& nz) const override;
@@ -678,10 +679,11 @@ namespace casadi {
     }
 
     /// Get densification
-    MX get_project(const Sparsity& sp) const override;
+    MX get_project(const Sparsity& sp, bool unique=false) const override;
 
     /// Get the nonzeros of matrix
-    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique=false) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
     MX get_nzassign(const MX& y, const std::vector<casadi_int>& nz) const override;
@@ -950,7 +952,8 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX Constant<Value>::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
     if (v_.value!=0) {
       // Check if any "holes"
       for (std::vector<casadi_int>::const_iterator k=nz.begin(); k!=nz.end(); ++k) {
@@ -974,13 +977,13 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_project(const Sparsity& sp) const {
+  MX Constant<Value>::get_project(const Sparsity& sp, bool unique) const {
     if (is_zero()) {
       return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.is_dense()) {
       return densify(get_DM());
     } else {
-      return MXNode::get_project(sp);
+      return MXNode::get_project(sp, unique);
     }
   }
 

@@ -505,6 +505,14 @@ namespace casadi {
     MXNode* get() const;
 #endif // SWIG
 
+    /// \cond INTERNAL
+    /** \brief Low-level access to get_nzref
+    *
+    * Intended for writing unittests
+    */
+    MX nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const;
+    /// \endcond
+
     ///@{
     /// Get a submatrix, single argument
     void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
