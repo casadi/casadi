@@ -283,10 +283,19 @@ jobs:
                 matrix:
                   arch: [windows-shared-x64-posix]
                   py2: ["27","36","37","38","39","310","311","312","313"]
-              - type: append
-                matrix:
-                  arch: [manylinux2014-aarch64]
-                  py2: ["36","37","38","39","310","311","312","313"]
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+
+  matrix-arch-py2-linux-arm64:
+    runs-on: ubuntu-24.04
+    steps:
+      - id: build-matrix
+        uses: jgillis/setup-build-matrix@main
+        with:
+          config: |
+            matrix:
+              arch: [native-arm64]
+              py2: ["36","37","38","39","310","311","312","313"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
