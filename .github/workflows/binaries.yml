@@ -296,6 +296,7 @@ jobs:
             matrix:
               arch: [native-arm64]
               py2: ["36","37","38","39","310","311","312","313"]
+            operations: []
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
