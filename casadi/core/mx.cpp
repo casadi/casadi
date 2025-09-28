@@ -2224,9 +2224,9 @@ namespace casadi {
       std::vector<casadi_int> iw_vec(f.sz_iw(), 0);
       casadi_int* iw = get_ptr(iw_vec);
 
-      std::vector<bvec_t*> arg1_vec(10);
+      std::vector<bvec_t*> arg1_vec(f.sz_arg());
       bvec_t** arg1 = get_ptr(arg1_vec);
-      std::vector<bvec_t*> res1_vec(10);
+      std::vector<bvec_t*> res1_vec(f.sz_res());
       bvec_t** res1 = get_ptr(res1_vec);
 
 
@@ -2266,21 +2266,31 @@ namespace casadi {
 
           uout() << "out: [";
           for (casadi_int i=0; i<it->res.size(); ++i) {
-            uout() << "[";
-            for (casadi_int j=0; j<it->data->sparsity(i).nnz(); ++j){
-              uout() << res1[i][j];
-              //print_binary(res1[i][j]);
-              uout() << " ";
+            if (it->res[i]>=0) {
+              uout() << "[";
+              for (casadi_int j=0; j<it->data->sparsity(i).nnz(); ++j){
+                uout() << res1[i][j];
+                //print_binary(res1[i][j]);
+                uout() << " ";
+              }
+              uout() << "]";
+            } else {
+              uout() << "NULL";
             }
-            uout() << "]";
             uout() << ",";
           }
 
           res1_alive.resize(it->res.size());
           for (casadi_int i=0; i<it->res.size(); ++i) {
             res1_alive[i].resize(it->data->sparsity(i).nnz());
-            for (casadi_int j=0; j<it->data->sparsity(i).nnz(); ++j){
-              res1_alive[i][j] = res1[i][j];
+            if (it->res[i]>=0) {
+              for (casadi_int j=0; j<it->data->sparsity(i).nnz(); ++j){
+                res1_alive[i][j] = res1[i][j];
+              }
+            } else {
+              for (casadi_int j=0; j<it->data->sparsity(i).nnz(); ++j){
+                res1_alive[i][j] = 0;
+              }
             }
           }
           uout() << "]" << "res1_alive: " << res1_alive << std::endl;
