@@ -2574,7 +2574,6 @@ namespace casadi {
 
       // Loop over computational nodes in forward order
       for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-        uout() << ff->print(*it) << std::endl;
         if (it->op == OP_INPUT) {
           swork[it->res.front()] = project(arg_split.at(it->data->ind()).at(it->data->segment()),
                                             it->data.sparsity(), true);

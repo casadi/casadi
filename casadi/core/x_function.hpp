@@ -1006,7 +1006,7 @@ namespace casadi {
     Dict final_options = generate_options("clone");
 
     bool empty_inputs = true;
-    bool dead_code = true;
+    bool dead_code = false;
     bool ref_count = true;
     bool const_folding = true;
     for (auto&& op : opts) {
