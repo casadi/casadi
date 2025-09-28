@@ -1010,6 +1010,7 @@ namespace casadi {
     bool empty_inputs = true;
     bool cse = true;
     bool ref_count = true;
+    bool const_folding = true;
     for (auto&& op : opts) {
       if (op.first=="empty_inputs") {
         empty_inputs = op.second;
@@ -1017,6 +1018,8 @@ namespace casadi {
         cse = op.second;
       } else if (op.first=="ref_count") {
         ref_count = op.second;
+      } else if (op.first=="const_folding") {
+        const_folding = op.second;
       } else {
         casadi_error("No such simplify option: " + std::string(op.first) + ".\n");
       }
@@ -1043,6 +1046,10 @@ namespace casadi {
       for (casadi_int i=0;i<5; ++i) {
         MatType::simplify_ref_count(new_in, new_out);
       }
+    }
+
+    if (const_folding) {
+      MatType::simplify_const_folding(new_in, new_out);
     }
 
     return Function(name, new_in, new_out, name_in_, name_out_, final_options);

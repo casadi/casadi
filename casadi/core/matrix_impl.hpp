@@ -2529,6 +2529,14 @@ namespace casadi {
     casadi_error("'simplify_ref_count' not defined for " + type_name());
   }
 
+  /** \brief   Simplification with reference counting awareness */
+  template<typename Scalar>
+  bool Matrix<Scalar>::simplify_const_folding(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts) {
+    casadi_error("'simplify_const_folding' not defined for " + type_name());
+  }
+
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::unite(const Matrix<Scalar>& A, const Matrix<Scalar>& B) {
     // Join the sparsity patterns

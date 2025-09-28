@@ -766,6 +766,11 @@ namespace casadi {
                                    std::vector<MX>& res,
                                    const Dict& opts = Dict());
 
+    // Simplification with constant folding
+    static bool simplify_const_folding(std::vector<MX>& arg,
+                                   std::vector<MX>& res,
+                                   const Dict& opts = Dict());
+
     static DM bspline_dual(const std::vector<double>& x,
             const std::vector< std::vector<double> >& knots,
             const std::vector<casadi_int>& degree,

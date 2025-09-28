@@ -212,6 +212,7 @@ namespace casadi {
     *
     * The following list of boolean options can be provided:
     * - cse (default true): Common subexpression elimination
+    * - const_folding (default true): Constant folding
     * - empty_inputs (default true): inputs that are not used become structurally empty
     * - ref_count (default true): reference count aware simplification
     *

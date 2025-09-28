@@ -516,6 +516,11 @@ namespace casadi {
                                    std::vector< Matrix<Scalar> >& res,
                                    const Dict& opts = Dict());
 
+    // Simplification with constant folding
+    static bool simplify_const_folding(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts = Dict());
+
     /// \endcond
 #endif // SWIG
 
