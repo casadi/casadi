@@ -2367,6 +2367,156 @@ namespace casadi {
     }
   }
 
+
+  bool MX::simplify_const_folding(std::vector<MX>& arg,
+                              std::vector<MX>& res,
+                              const Dict& opts) {
+    Dict temp_opts = {{"live_variables", false},
+                      {"max_io", 0},
+                      {"cse", false},
+                      {"allow_free", true}};
+    Function f("temp", arg, res, temp_opts);
+    MXFunction *ff = f.get<MXFunction>();
+    const std::vector<casadi_int>& workloc_ = ff->workloc_;
+    const auto& algorithm_ = ff->algorithm_;
+
+    // Data structures for numeric evaluation
+    std::vector<double> w_num_vec(f.sz_w());
+    double* w_num = get_ptr(w_num_vec);
+    std::vector<casadi_int> iw_num_vec(f.sz_iw());
+    casadi_int* iw_num = get_ptr(iw_num_vec);
+    std::vector<const double*> arg_num_vec(f.sz_arg());
+    const double** arg_num = get_ptr(arg_num_vec);
+    std::vector<double*> res_num_vec(f.sz_res());
+    double** res_num = get_ptr(res_num_vec);
+
+    // Is the work vector entry numeric?
+    std::vector<bool> is_numeric(workloc_.size()-1);
+
+    // Data structures for symbolic evaluation
+
+    // Symbolic work, non-differentiated
+    std::vector<MX> swork(workloc_.size()-1);
+
+    // Split up inputs analogous to symbolic primitives
+    std::vector<std::vector<MX> > arg_split(arg.size());
+    for (casadi_int i=0; i<arg.size(); ++i) arg_split[i] = arg[i].split_primitives(arg[i]);
+
+    // Allocate storage for split outputs
+    std::vector<std::vector<MX> > res_split(res.size());
+    for (casadi_int i=0; i<res.size(); ++i) res_split[i].resize(res[i].n_primitives());
+
+    std::vector<MX> arg1, res1;
+
+    std::unordered_multimap< std::size_t, std::pair<MX, DM> > cache;
+
+    auto ensure_MX = [&](const Sparsity& sp, casadi_int el) -> MX {
+      if (is_numeric[el]) {
+        // Pointer to the values
+        double* v = w_num + workloc_[el];
+
+        // Compute has from sparsity and double values
+        std::size_t h = sp.hash();
+        hash_combine(h, v, sp.nnz());
+
+        // Loop over tentative matches
+        auto r = cache.equal_range(h);
+        for (auto it = r.first; it != r.second; ++it) {
+          const DM& d = it->second.second;
+          if (d.sparsity()==sp && std::equal(d.ptr(), d.ptr()+sp.nnz(), v)) {
+            // Found match
+            return it->second.first;
+          }
+        }
+
+        // fallthrough: failed to find a match
+
+        // Create a <MX,DM> pair and store in cache
+        std::vector<double> vec(v, v+sp.nnz());
+        DM m(sp, vec);
+        MX ret = m;
+        cache.emplace(h, std::make_pair(ret, m));
+
+        // Return the MX
+        return ret;
+      } else {
+        return swork[el];
+      }
+    };
+
+    // Loop over computational nodes in forward order
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      if (it->op == OP_INPUT) {
+        swork[it->res.front()] = project(arg_split.at(it->data->ind()).at(it->data->segment()),
+                                          it->data.sparsity(), true);
+        is_numeric[it->res.front()] = false;
+      } else if (it->op==OP_OUTPUT) {
+        // Collect the results
+        res_split.at(it->data->ind()).at(it->data->segment()) =
+          ensure_MX(it->data->dep().sparsity(), it->arg.front());
+      } else if (it->op==OP_PARAMETER) {
+        // Fetch parameter
+        swork[it->res.front()] = it->data;
+        is_numeric[it->res.front()] = false;
+      } else {
+        // Arguments of the operation
+        arg1.resize(it->arg.size());
+
+
+        bool numeric = true;
+
+        for (casadi_int i=0; i<arg1.size(); ++i) {
+          casadi_int el = it->arg[i];
+          if (el<0) {
+            arg1[i] = MX(it->data->dep(i).size());
+          } else {
+            arg1[i] = swork[el];
+            numeric = numeric && is_numeric[el];
+          }
+        }
+
+        if (numeric) {
+          // Point pointers to the data corresponding to the element
+          for (casadi_int i=0; i<it->arg.size(); ++i)
+            arg_num[i] = it->arg[i]>=0 ? w_num+workloc_[it->arg[i]] : nullptr;
+          for (casadi_int i=0; i<it->res.size(); ++i)
+            res_num[i] = it->res[i]>=0 ? w_num+workloc_[it->res[i]] : nullptr;
+
+          if (it->data->eval(arg_num, res_num, iw_num, w_num)) casadi_error("foo");
+        } else {
+          for (casadi_int i=0; i<arg1.size(); ++i) {
+            casadi_int el = it->arg[i];
+            if (el>=0) arg1[i] = ensure_MX(it->data->dep(i).sparsity(), el);
+          }
+        }
+
+        // Perform the operation
+        res1.resize(it->res.size());
+        it->data->eval_mx(arg1, res1);
+
+        for (casadi_int i=0; i<res1.size(); ++i) {
+          casadi_int el = it->res[i]; // index of the output
+          if (el>=0) {
+            is_numeric[el] = numeric;
+          }
+        }
+
+        // Get the result
+        for (casadi_int i=0; i<res1.size(); ++i) {
+          casadi_int el = it->res[i]; // index of the output
+          if (el>=0) {
+            swork[el] = res1[i];
+          }
+        }
+      }
+    }
+
+    // Join split outputs
+    for (casadi_int i=0; i<res.size(); ++i) res[i] = res[i].join_primitives(res_split[i]);
+
+    return true;
+  }
+
   bool MX::simplify_ref_count(std::vector<MX>& arg,
                               std::vector<MX>& res,
                               const Dict& opts) {

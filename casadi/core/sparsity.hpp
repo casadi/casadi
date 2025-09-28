@@ -1195,43 +1195,6 @@ namespace casadi {
 #endif //SWIG
   };
 
-  /** \brief Hash value of an integer
-
-      \identifier{do} */
-  template<typename T>
-  inline size_t hash_value(T v) { return size_t(v);}
-
-  /** \brief Generate a hash value incrementally (function taken from boost)
-
-      \identifier{dp} */
-  template<typename T>
-  inline void hash_combine(std::size_t& seed, T v) {
-    seed ^= hash_value(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-  }
-
-  /** \brief Generate a hash value incrementally, array
-
-      \identifier{dq} */
-  template<typename T>
-  inline void hash_combine(std::size_t& seed, const T* v, std::size_t sz) {
-    for (casadi_int i=0; i<sz; ++i) hash_combine(seed, v[i]);
-  }
-
-  /** \brief Generate a hash value incrementally (function taken from boost)
-
-      \identifier{dr} */
-  template<typename T>
-  inline void hash_combine(std::size_t& seed, const std::vector<T>& v) {
-    hash_combine(seed, get_ptr(v), v.size());
-  }
-
-  template<>
-  inline size_t hash_value(std::string v) {
-    size_t seed = 0;
-    hash_combine(seed, v.c_str(), v.size());
-    return seed;
-  }
-
   /** \brief Hash a sparsity pattern
 
       \identifier{ds} */

@@ -1008,6 +1008,7 @@ namespace casadi {
     bool empty_inputs = true;
     bool dead_code = true;
     bool ref_count = true;
+    bool const_folding = true;
     for (auto&& op : opts) {
       if (op.first=="empty_inputs") {
         empty_inputs = op.second;
@@ -1041,6 +1042,10 @@ namespace casadi {
       for (casadi_int i=0;i<5; ++i) {
         MatType::simplify_ref_count(new_in, new_out);
       }
+    }
+
+    if (const_folding) {
+      MatType::simplify_const_folding(new_in, new_out);
     }
 
     return Function(name, new_in, new_out, name_in_, name_out_, final_options);

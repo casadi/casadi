@@ -234,6 +234,11 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
                                    std::vector<SX>& res,
                                    const Dict& opts);
 
+  template<>
+  bool CASADI_EXPORT SX::simplify_const_folding(std::vector<SX>& arg,
+                                   std::vector<SX>& res,
+                                   const Dict& opts);
+
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
   template<>
   std::mutex& SX::get_mutex_temp();

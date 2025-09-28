@@ -3915,6 +3915,29 @@ class Functiontests(casadiTestCase):
         inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
         self.checkfunction_light(f,fs,inputs=inputs)
     
+  def test_simplify_const_folding(self):
+
+    DM.rng(1)
+
+
+    A = MX(DM.rand(2,2))
+    B = MX(DM.rand(2,2))
+    C = A @ B
+
+    C = C @ C
+
+    x = MX.sym("x")
+    f = Function('f',[x],[(x*(2*C)+(2*C))*C[0]])
+
+
+    fs = f.simplify()
+    inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+    self.checkfunction_light(f,fs,inputs=inputs)
+    
+    fs.disp(True)
+    self.assertEqual(fs.n_nodes(),7)
+
+    
   def test_duplicate_check(self):
     x = MX()
     f = Function('f',[x],[2*x])

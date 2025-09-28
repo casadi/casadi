@@ -1569,6 +1569,13 @@ namespace casadi {
   }
 
   template<>
+  bool CASADI_EXPORT SX::simplify_const_folding(std::vector<SX>& arg,
+                                   std::vector<SX>& res,
+                                   const Dict& opts) {
+    return false;
+  }
+
+  template<>
   bool CASADI_EXPORT SX::simplify_ref_count(std::vector<SX>& arg,
                                    std::vector<SX>& res,
                                    const Dict& opts) {
