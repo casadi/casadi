@@ -749,7 +749,7 @@ jobs:
           retention-days: 5
       
       - run: |
-          pip install wheel==0.31.1
+          pip install wheel==0.46.1
           wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
@@ -847,7 +847,7 @@ jobs:
           path: casadi-linux-aarch64-py${{matrix.py2}}.zip
           retention-days: 5
       - run: |
-          pip install wheel==0.31.1
+          pip install wheel==0.46.1
           wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} linux 64 manylinux2014-aarch64 install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
