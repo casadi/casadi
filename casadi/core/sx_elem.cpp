@@ -180,7 +180,7 @@ namespace casadi {
     return node;
   }
 
-  SXElem SXElem::binary(casadi_int op, const SXElem& x, const SXElem& y, bool unique) {
+  SXElem SXElem::binary(casadi_int op, const SXElem& x, const SXElem& y, bool unique_x, bool unique_y) {
     // If-else-zero nodes are always simplified at top level to avoid NaN propagation
     if (y.op() == OP_IF_ELSE_ZERO) {
       if (op == OP_MUL) {
@@ -205,7 +205,8 @@ namespace casadi {
       SXElem ret = common_simp_binary(op, x, y, SXNode::eq_depth_,
                 [](casadi_int op, const SXElem& a) { return unary(op, a);},
                 [](casadi_int op, const SXElem& a, const SXElem& b) { return binary(op, a, b);},
-                unique,
+                unique_x,
+                unique_y,
                 hit);
       if (hit) return ret;
     }

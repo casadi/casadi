@@ -885,6 +885,7 @@ namespace casadi {
                     return a->_get_binary(op, b, true, true);
                   },
                   false,
+                  false,
                   hit);
         if (hit) return ret;
       }

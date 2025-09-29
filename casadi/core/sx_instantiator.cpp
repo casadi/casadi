@@ -1682,7 +1682,7 @@ namespace casadi {
           // (as it might overwrite the children in the work vector)
           SXElem f;
           if (casadi_math<MX>::is_binary(a.op)) {
-            f = SXElem::binary(a.op, w[a.i1], w[a.i2], rwork[a.i1]==1 && rwork[a.i2]==1);
+            f = SXElem::binary(a.op, w[a.i1], w[a.i2], rwork[a.i1]==1, rwork[a.i2]==1);
           } else if (casadi_math<MX>::is_unary(a.op)) {
             f = SXElem::unary(a.op, w[a.i1], rwork[a.i1]==1);
           } else {
