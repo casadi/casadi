@@ -2183,6 +2183,201 @@ namespace casadi {
     return H->get_convexify(opts);
   }
 
+  // Simplification pass dead code elimination
+  bool MX::simplify_dead_code(std::vector<MX>& arg,
+                              std::vector<MX>& res,
+                              const Dict& opts) {
+    Dict temp_opts = {{"live_variables", false},
+                      {"max_io", 0},
+                      {"cse", false},
+                      {"allow_free", true}};
+    Function f("temp", arg, res, temp_opts);
+    MXFunction *ff = f.get<MXFunction>();
+    const std::vector<casadi_int>& workloc_ = ff->workloc_;
+    const auto& algorithm_ = ff->algorithm_;
+
+    // Dependency sweep in reverse
+    std::vector< std::vector< std::vector<bool> > > res_alive(ff->algorithm_.size());
+
+    {
+
+
+
+      std::vector<bvec_t> w_res(f.nnz_out(), bvec_t(1));
+      std::vector<bvec_t> w_arg(f.nnz_in(), bvec_t(0));
+
+      std::vector<bvec_t*> arg(f.sz_arg(), nullptr);
+      casadi_int offset = 0;
+      for (casadi_int i=0;i<f.n_in();++i) {
+        arg[i] = get_ptr(w_arg)+offset;
+        offset += f.nnz_in(i);
+      }
+      std::vector<bvec_t*> res(f.sz_res(), nullptr);
+      offset = 0;
+      for (casadi_int i=0;i<f.n_out();++i) {
+        res[i] = get_ptr(w_res)+offset;
+        offset += f.nnz_out(i);
+      }
+
+      std::vector<bvec_t> w_vec(f.sz_w(), 0);
+      bvec_t* w = get_ptr(w_vec);
+      std::vector<casadi_int> iw_vec(f.sz_iw(), 0);
+      casadi_int* iw = get_ptr(iw_vec);
+
+      std::vector<bvec_t*> arg1_vec(f.sz_arg());
+      bvec_t** arg1 = get_ptr(arg1_vec);
+      std::vector<bvec_t*> res1_vec(f.sz_res());
+      bvec_t** res1 = get_ptr(res1_vec);
+
+
+
+      // Propagate sparsity backwards
+      for (auto it=ff->algorithm_.rbegin(); it!=ff->algorithm_.rend(); it++) {
+        uout() << ff->print(*it) << std::endl;
+        res_alive[ff->algorithm_.rend()-it-1] = std::vector< std::vector<bool> >();
+        std::vector< std::vector<bool> > & res1_alive = res_alive[ff->algorithm_.rend()-it-1];
+        if (it->op==OP_INPUT) {
+          // Get the input sensitivities and clear it from the work vector
+          casadi_int nnz=it->data.nnz();
+          casadi_int i=it->data->ind();
+          casadi_int nz_offset=it->data->offset();
+          bvec_t* argi = arg[i];
+          bvec_t* w1 = w + workloc_[it->res.front()];
+          if (argi!=nullptr) for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
+          std::fill_n(w1, nnz, 0);
+        } else if (it->op==OP_OUTPUT) {
+          // Pass output seeds
+          casadi_int nnz=it->data.dep().nnz();
+          casadi_int i=it->data->ind();
+          casadi_int nz_offset=it->data->offset();
+          bvec_t* resi = res[i] ? res[i] + nz_offset : nullptr;
+          bvec_t* w1 = w + workloc_[it->arg.front()];
+          if (resi!=nullptr) {
+            for (casadi_int k=0; k<nnz; ++k) w1[k] |= resi[k];
+            std::fill_n(resi, nnz, 0);
+          }
+        } else {
+          // Point pointers to the data corresponding to the element
+          for (casadi_int i=0; i<it->arg.size(); ++i)
+            arg1[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : nullptr;
+
+          for (casadi_int i=0; i<it->res.size(); ++i)
+            res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : nullptr;
+
+          uout() << "out: [";
+          for (casadi_int i=0; i<it->res.size(); ++i) {
+            if (it->res[i]>=0) {
+              uout() << "[";
+              for (casadi_int j=0; j<it->data->sparsity(i).nnz(); ++j){
+                uout() << res1[i][j];
+                //print_binary(res1[i][j]);
+                uout() << " ";
+              }
+              uout() << "]";
+            } else {
+              uout() << "NULL";
+            }
+            uout() << ",";
+          }
+
+          res1_alive.resize(it->res.size());
+          for (casadi_int i=0; i<it->res.size(); ++i) {
+            res1_alive[i].resize(it->data->sparsity(i).nnz());
+            if (it->res[i]>=0) {
+              for (casadi_int j=0; j<it->data->sparsity(i).nnz(); ++j){
+                res1_alive[i][j] = res1[i][j];
+              }
+            } else {
+              for (casadi_int j=0; j<it->data->sparsity(i).nnz(); ++j){
+                res1_alive[i][j] = 0;
+              }
+            }
+          }
+          uout() << "]" << "res1_alive: " << res1_alive << std::endl;
+
+          // Propagate sparsity backwards
+          if (it->data->sp_reverse(arg1, res1, iw, w)) return 1;
+
+          uout() << "in: [";
+          for (casadi_int i=0; i<it->arg.size(); ++i) {
+            uout() << "[";
+            for (casadi_int j=0; j<it->data->dep(i).sparsity().nnz(); ++j){
+              uout() << arg1[i][j];
+              //print_binary(arg1[i][j]);
+              uout() << " ";
+            }
+            uout() << "]";
+            uout() << ",";
+          }
+          uout() << "]" << std::endl;
+
+          
+        }
+      }
+    }
+
+    uout() << "----------------------------------------" << std::endl;
+    // Forward pass
+    {
+
+      // Symbolic work, non-differentiated
+      std::vector<MX> swork(workloc_.size()-1);
+
+      // Split up inputs analogous to symbolic primitives
+      std::vector<std::vector<MX> > arg_split(arg.size());
+      for (casadi_int i=0; i<arg.size(); ++i) arg_split[i] = arg[i].split_primitives(arg[i]);
+
+      // Allocate storage for split outputs
+      std::vector<std::vector<MX> > res_split(res.size());
+      for (casadi_int i=0; i<res.size(); ++i) res_split[i].resize(res[i].n_primitives());
+
+      std::vector<MX> arg1, res1;
+
+      // Loop over computational nodes in forward order
+      casadi_int alg_counter = 0;
+      for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
+        uout() << ff->print(*it) << std::endl;
+        const std::vector<std::vector<bool> > & res1_alive = res_alive[alg_counter];
+        uout() << "alive out: " << res1_alive << std::endl;
+        if (it->op == OP_INPUT) {
+          swork[it->res.front()] = project(arg_split.at(it->data->ind()).at(it->data->segment()),
+                                            it->data.sparsity(), true);
+        } else if (it->op==OP_OUTPUT) {
+          // Collect the results
+          res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
+        } else if (it->op==OP_PARAMETER) {
+          // Fetch parameter
+          swork[it->res.front()] = it->data;
+        } else {
+          // Arguments of the operation
+          arg1.resize(it->arg.size());
+          for (casadi_int i=0; i<arg1.size(); ++i) {
+            casadi_int el = it->arg[i]; // index of the argument
+            arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
+          }
+
+          // Perform the operation
+          res1.resize(it->res.size());
+          it->data->eval_mx(arg1, res1);
+
+          // Get the result
+          for (casadi_int i=0; i<res1.size(); ++i) {
+            casadi_int el = it->res[i]; // index of the output
+            if (el>=0) {
+              uout() << "res1[i]" << res1[i].sparsity() << std::endl;
+              Sparsity sp = it->data->sparsity(i).intersect(res1_alive[i]);
+              swork[el] = project(res1[i], sp, true);
+            }
+          }
+        }
+      }
+
+      // Join split outputs
+      for (casadi_int i=0; i<res.size(); ++i) res[i] = res[i].join_primitives(res_split[i]);
+    }
+  }
+
+
   bool simplify_const_folding_order(std::vector<MX>& arg,
                               std::vector<MX>& res,
                               const Dict& opts) {

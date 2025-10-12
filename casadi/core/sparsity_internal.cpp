@@ -2435,6 +2435,30 @@ namespace casadi {
     return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
+  Sparsity SparsityInternal::intersect(const std::vector<bool>& y) const {
+    casadi_assert(y.size()==nnz(),
+      "intersect(y) size mismatch : y length (" + str(y.size()) + ") must equal "
+      "number of nonzeros (" + str(nnz()) + ").");
+    const casadi_int* row = this->row();
+    const casadi_int* colind = this->colind();
+    std::vector<casadi_int> new_row;
+    std::vector<casadi_int> new_colind(1, 0);
+    casadi_int n_purged = 0;
+    for (casadi_int c=0; c<size2(); ++c) {
+      casadi_int k_first = colind[c];
+      casadi_int k_last = colind[c+1];
+      for (casadi_int k=k_first; k<k_last; ++k) {
+        if (y[k]) {
+          new_row.push_back(row[k]);
+        } else {
+          n_purged++;
+        }
+      }
+      new_colind.push_back(k_last-n_purged);
+    }
+    return Sparsity(size1(), size2(), new_colind, new_row);
+  }
+
   bool SparsityInternal::is_stacked(const Sparsity& y, casadi_int n) const {
     // Quick true if the objects are equal
     if (n==1 && is_equal(y)) return true;

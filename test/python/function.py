@@ -3841,8 +3841,43 @@ class Functiontests(casadiTestCase):
     # Test that simplified functions work correctly
     self.checkfunction_light(f,f_simplified,inputs=[2.0,3.0])
 
+  def test_simplify_dead_code(self):
+  
+  
+    def tests():
 
+        x = MX.sym("x", 4)
+        A = MX.sym("A", 4, 4)
+        z = MX.sym("y")
 
+        e = mtimes(A, x)
+
+        y = (e*5)[2]/e[0]
+        yield Function("f",[x,A,z],[y, sumsqr(A[range(0,2),range(1,4)])])
+
+        e = mtimes(A, x)
+
+        y = (e+z+5)[2]/e[0]
+        yield Function("f",[x,A,z],[y, sumsqr(A[range(0,2),range(1,4)])])    
+    
+        for mult in [1,5]:
+            x = MX.sym("x")
+            e = vertcat(cos(x),sin(x),x,x*x)*mult
+            
+            e1 = e[1]
+            y = e1
+            yield Function("f",[x],[y,e1+e[2]])
+
+    for f in tests():
+        fs = f.simplify()
+        fs.disp(True)
+        
+        DM.rng(1)
+        inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+        self.checkfunction(f,fs,inputs=inputs)
+        
+        print(fs)
+    
 
   def test_simplify_ref_count(self):
   

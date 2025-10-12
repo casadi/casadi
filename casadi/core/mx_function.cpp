@@ -528,6 +528,7 @@ namespace casadi {
       }
       s << el.data->disp(arg);
     }
+
     return s.str();
   }
 

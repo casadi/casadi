@@ -766,6 +766,11 @@ namespace casadi {
 
 #endif // SWIG
 
+    // Simplification pass dead code elimination
+    static bool simplify_dead_code(std::vector<MX>& arg,
+                                   std::vector<MX>& res,
+                                   const Dict& opts = Dict());
+
     // Simplification with reference counting awareness
     static bool simplify_ref_count(std::vector<MX>& arg,
                                    std::vector<MX>& res,
