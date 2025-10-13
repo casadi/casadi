@@ -2260,6 +2260,7 @@ class Functiontests(casadiTestCase):
                 else:
                     dir = os.path.join(temp_dir,directory)
                     
+                gc.collect()
                 for e in glob.glob(os.path.join(dir,"tmp_casadi*")):
                     os.remove(e)
                 
