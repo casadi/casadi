@@ -2214,6 +2214,14 @@ class Functiontests(casadiTestCase):
   @requiresPlugin(Importer,"shell")
   def test_jit_directory(self):
   
+    print(CasadiMeta.feature_list())
+  
+    print( "ghc-filesystem" not in CasadiMeta.feature_list())
+
+    have_mkstemps = "HAVE_MKSTEMPS" in CasadiMeta.compiler_flags()    
+    have_simple_mkstemps = "HAVE_SIMPLE_MKSTEMPS" in CasadiMeta.compiler_flags()
+    
+    print(have_mkstemps,have_simple_mkstemps)
     create_dirs = "ghc-filesystem" not in CasadiMeta.feature_list()
   
     abs_temp_dir = tempfile.gettempdir()
@@ -2238,8 +2246,14 @@ class Functiontests(casadiTestCase):
         
         
         for directory in ["", "foo", abs_temp_dir]:
+            print("directory",directory)
             x = MX.sym("x")
             f = None
+
+            if not have_mkstemps and not have_simple_mkstemps:
+                with self.assertInException("custom temporary directory"):
+                    Function('f',[x],[x**2],{"jit":True,"compiler":"shell", "jit_options": {"verbose":True, "directory": directory}})
+                continue
             if True:
                 if os.path.isabs(directory):
                     dir = directory
@@ -2250,6 +2264,7 @@ class Functiontests(casadiTestCase):
                     os.remove(e)
                 
                 f = Function('f',[x],[x**2],{"jit":True,"compiler":"shell", "jit_options": {"verbose":True, "directory": directory}})
+                print(dir)
                 # All files in the correct location
                 self.assertTrue(len(glob.glob(os.path.join(dir,"tmp_casadi*")))>1)
                 if "ghc-filesystem" in CasadiMeta.feature_list():

@@ -380,10 +380,11 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     return ret;
     #else // HAVE_MKSTEMPS
     #ifdef HAVE_SIMPLE_MKSTEMPS
-    return simple_mkstemps(prefix, suffix);
+    return simple_mkstemps(temp_dir + prefix, suffix);
     #else // HAVE_SIMPLE_MKSTEMPS
+    casadi_assert(temp_dir=="./", "tmpnam fallback not compatible with custom temporary directory");
     // Fallback, may result in deprecation warnings
-    return temp_dir + prefix + std::string(tmpnam(nullptr)) + suffix;
+    return std::string(tmpnam(nullptr)) + suffix;
     #endif // HAVE_SIMPLE_MKSTEMPS
     #endif // HAVE_MKSTEMPS
   }
