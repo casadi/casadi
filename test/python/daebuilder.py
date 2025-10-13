@@ -97,9 +97,10 @@ class Daebuildertests(casadiTestCase):
   @memory_heavy() # FMU has a memleak
   def test_indendent_var(self):
     if os.name!="posix": return
+    if sys.platform=="darwin": return # Was produced on linux
     fmu_file = "../data/car_t_fmu2.fmu"
     if not os.path.exists(fmu_file):
-        print("Skipping test_fmu_zip, resource not available")
+        print("Skipping test_indendent_var, resource not available")
         return
     unzipped_name = "car"
     unzipped_path = os.path.join(os.getcwd(), unzipped_name)
