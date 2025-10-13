@@ -2240,6 +2240,8 @@ class Functiontests(casadiTestCase):
     
     if create_dirs:
         os.makedirs(os.path.join(rel_temp_dir,"foo"))
+        if not os.path.exists("foo"):
+            os.makedirs("foo")
         
     for temp_dir in ["./", rel_temp_dir,abs_temp_dir]:
         GlobalOptions.setTempWorkDir(temp_dir)
