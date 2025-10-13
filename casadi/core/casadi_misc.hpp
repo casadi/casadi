@@ -1056,7 +1056,9 @@ namespace casadi {
     return seed;
   }
 
-  /** \brief Hash value of a double */
+  /** \brief Hash value of a double
+
+      \identifier{2em} */
   template<>
   inline size_t hash_value(double v) {
     std::uint64_t u;

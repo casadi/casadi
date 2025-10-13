@@ -2521,7 +2521,9 @@ namespace casadi {
     return Matrix<Scalar>(Sparsity::diagcat(sp), data, false);
   }
 
-  /** \brief   Simplification with reference counting awareness */
+  /** \brief   Simplification with reference counting awareness
+
+      \identifier{2ek} */
   template<typename Scalar>
   bool Matrix<Scalar>::simplify_ref_count(std::vector< Matrix<Scalar> >& arg,
                                    std::vector< Matrix<Scalar> >& res,
@@ -2529,7 +2531,9 @@ namespace casadi {
     casadi_error("'simplify_ref_count' not defined for " + type_name());
   }
 
-  /** \brief   Simplification with reference counting awareness */
+  /** \brief   Simplification with reference counting awareness
+
+      \identifier{2el} */
   template<typename Scalar>
   bool Matrix<Scalar>::simplify_const_folding(std::vector< Matrix<Scalar> >& arg,
                                    std::vector< Matrix<Scalar> >& res,

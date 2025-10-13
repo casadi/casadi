@@ -1199,10 +1199,14 @@ namespace casadi {
         \identifier{19z} */
     bool is_minus_one() const;
 
-    /** \brief  check if the matrix is 0.5 (note that false negative answers are possible) */
+    /** \brief  check if the matrix is 0.5 (note that false negative answers are possible)
+
+        \identifier{2en} */
     bool is_half() const;
 
-    /** \brief  check if the matrix is value */
+    /** \brief  check if the matrix is value
+
+        \identifier{2eo} */
     bool is_value(double val) const;
 
     /** \brief  check if the matrix is inf (note that false negative answers are possible)

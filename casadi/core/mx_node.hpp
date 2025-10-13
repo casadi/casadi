@@ -80,7 +80,9 @@ namespace casadi {
         \identifier{1qg} */
     virtual bool is_minus_one() const { return false;}
 
-    /** \brief Check if identically 0.5 */
+    /** \brief Check if identically 0.5
+
+        \identifier{2ej} */
     virtual bool is_half() const { return false;}
 
     /** \brief Check if identically inf

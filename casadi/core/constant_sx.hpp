@@ -68,7 +68,9 @@ bool is_constant() const override { return true; }
     \identifier{1jm} */
 casadi_int op() const override { return OP_CONST;}
 
-/** \brief  Properties */
+/** \brief  Properties
+
+    \identifier{2ei} */
 bool is_value(double v) const override {
   return casadi_limits<double>::is_value(to_double(), v);
 }

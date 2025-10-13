@@ -79,7 +79,7 @@ namespace casadi {
     *
     *   returns Matrix(sp,a[nz])
 
-    */
+        \identifier{2eh} */
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
         bool unique=false) const override;
 

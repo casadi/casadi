@@ -3379,7 +3379,7 @@
 %exception  casadi::MX::attachAssert(const MX &y, const std::string &fail_message="") const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::binary(casadi_int op, const MX &x, const MX &y) {
+%exception  casadi::MX::binary(casadi_int op, const MX &x, const MX &y, bool unique_x=false, bool unique_y=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::blockcat(const std::vector< std::vector< MX > > &v) {
@@ -3454,7 +3454,7 @@
 %exception  casadi::MX::erase(const std::vector< casadi_int > &rr, const std::vector< casadi_int > &cc, bool ind1=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::eval_mx(const std::vector< MX > &arg, std::vector< MX > &res) const {
+%exception  casadi::MX::eval_mx(const std::vector< MX > &arg, std::vector< MX > &res, const std::vector< bool > &unique=std::vector< bool >()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::evalf(const MX &expr) {
@@ -3643,6 +3643,9 @@
 %exception  casadi::MX::is_eye() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::is_half() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::is_inf() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3686,6 +3689,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::is_valid_input() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::is_value(double val) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::is_zero() const {
@@ -3925,7 +3931,7 @@
 %exception  casadi::MX::trace(const MX &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::unary(casadi_int op, const MX &x) {
+%exception  casadi::MX::unary(casadi_int op, const MX &x, bool unique=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::unite(const MX &A, const MX &B) {
@@ -4249,6 +4255,9 @@
 %exception  casadi::Matrix< Scalar >::is_eye() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< Scalar >::is_half() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< Scalar >::is_inf() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4265,6 +4274,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::is_one() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::is_value(double val) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::is_zero() const {
@@ -5038,6 +5050,9 @@
 %exception  casadi::SXElem::is_doubled() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SXElem::is_half() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SXElem::is_inf() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5075,6 +5090,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::is_symbolic() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXElem::is_value(double val) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::is_zero() const {
@@ -5771,6 +5789,21 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::has_rootfinder(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::hash_combine(std::size_t &seed, T v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::hash_combine(std::size_t &seed, const std::vector< T > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::hash_value(T v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::hash_value(double v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::hash_value(std::string v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::in_range(const std::vector< T > &v, casadi_int lower, casadi_int upper) {

@@ -410,10 +410,14 @@ namespace casadi {
         \identifier{qx} */
     bool is_minus_one() const;
 
-    /** \brief  check if 0.5 (note that false negative answers are possible) */
+    /** \brief  check if 0.5 (note that false negative answers are possible)
+
+        \identifier{2ep} */
     bool is_half() const;
 
-    /** \brief  check if a certain value (note that false negative answers are possible) */
+    /** \brief  check if a certain value (note that false negative answers are possible)
+
+        \identifier{2eq} */
     bool is_value(double val) const;
 
     /** \brief  check if inf (note that false negative answers are possible)
@@ -510,7 +514,8 @@ namespace casadi {
     /** \brief Low-level access to get_nzref
     *
     * Intended for writing unittests
-    */
+
+        \identifier{2er} */
     MX nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const;
     /// \endcond
 
