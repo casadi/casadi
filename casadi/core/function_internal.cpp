@@ -713,12 +713,13 @@ namespace casadi {
       // Override
       jit_directory = directory;
     } else {
+      jit_directory = jit_directory + directory;
       if (Filesystem::is_enabled()) {
-        jit_directory = Filesystem::absolute(jit_directory + directory);
+        jit_directory = Filesystem::absolute(jit_directory);
       }
     }
 
-    return Filesystem::ensure_trailing_slash(jit_directory);;
+    return Filesystem::ensure_trailing_slash(jit_directory);
   }
 
   void FunctionInternal::finalize() {
