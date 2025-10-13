@@ -1008,9 +1008,12 @@ namespace casadi {
     Dict final_options = generate_options("clone");
 
     bool empty_inputs = true;
+    bool cse = true;
     for (auto&& op : opts) {
       if (op.first=="empty_inputs") {
         empty_inputs = op.second;
+      } else if (op.first=="cse") {
+        cse = op.second;
       } else {
         casadi_error("No such simplify option: " + std::string(op.first) + ".\n");
       }
@@ -1027,6 +1030,10 @@ namespace casadi {
           e = MatType(e.size());
         }
       }
+    }
+
+    if (cse) {
+      new_out = MatType::cse(new_out);
     }
 
     return Function(name, new_in, new_out, name_in_, name_out_, final_options);
