@@ -1474,6 +1474,7 @@ class MXtests(casadiTestCase):
         count = 1477
  
         for refcount,on_the_fly,genA,B in [
+            (False,True,lambda x,y,z, X,Y :y*(x)+y*(1-x), y),
             (False,X is MX,lambda x,y,z, X,Y :2*x-x, x),
             (False,True,lambda x,y,z, X,Y :4*x-3*x,x),
             (False,True,lambda x,y,z, X,Y :0.2*x+0.8*x,x),
