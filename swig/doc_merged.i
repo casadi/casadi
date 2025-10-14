@@ -31413,7 +31413,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L174
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L251-L254
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L259-L262
 
 ";
 
@@ -31440,7 +31440,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L181
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L256-L259
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L264-L267
 
 ";
 
@@ -31521,7 +31521,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L201
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L471-L477
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L479-L485
 
 ";
 
@@ -31537,7 +31537,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L206
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L352-L360
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L360-L368
 
 ";
 
@@ -31571,7 +31571,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L223
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L375-L377
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L383-L385
 
 ";
 
@@ -31586,7 +31586,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L228
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L379-L381
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L387-L389
 
 ";
 
@@ -31603,7 +31603,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L235
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L383-L385
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L391-L393
 
 ";
 
@@ -31648,7 +31648,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L295
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L479-L481
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L487-L489
 
 ";
 
@@ -38063,10 +38063,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L907
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L917
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L907-L909
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L917-L919
 
 ";
 
@@ -38078,10 +38078,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L911
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L921
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L911-L913
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L921-L923
 
 ";
 
@@ -38093,10 +38093,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L915
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L925
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L915-L917
+https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L925-L927
 
 ";
 
