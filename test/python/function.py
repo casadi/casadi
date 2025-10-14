@@ -2242,9 +2242,10 @@ class Functiontests(casadiTestCase):
         os.makedirs(os.path.join(rel_temp_dir,"foo"))
         if not os.path.exists("foo"):
             os.makedirs("foo")
-        if os.name!='nt':
-            if not os.path.exists("/tmp/foo"):
-                os.makedirs("/tmp/foo")
+        if os.name=='nt':
+          return # cl.exe not available anyway
+        if not os.path.exists("/tmp/foo"):
+          os.makedirs("/tmp/foo")
             
     for temp_dir in ["./", rel_temp_dir,abs_temp_dir]:
         GlobalOptions.setTempWorkDir(temp_dir)
