@@ -1626,7 +1626,7 @@ namespace casadi {
     }
 
     std::vector<SXElem*> resp(f.sz_res());
-    for (casadi_int i=0;i<resp.size();++i) {
+    for (casadi_int i=0;i<res.size();++i) {
       resp[i] = get_ptr(res.at(i).nonzeros());
     }
 
