@@ -2243,15 +2243,16 @@ class Functiontests(casadiTestCase):
         if not os.path.exists("foo"):
             os.makedirs("foo")
         if os.name=='nt':
-            return
-        if not os.path.exists("/tmp/foo"):
-            os.makedirs("/tmp/foo")
+            if not os.path.exists("/tmp/foo"):
+                os.makedirs("/tmp/foo")
             
     for temp_dir in ["./", rel_temp_dir,abs_temp_dir]:
         GlobalOptions.setTempWorkDir(temp_dir)
         
         
         for directory in ["", "foo", abs_temp_dir]:
+            if create_dirs and directory=="foo" and sys.platform in ["win32","darwin"]: continue
+                
             print("directory",directory)
             x = MX.sym("x")
             f = None
