@@ -495,9 +495,14 @@ namespace casadi {
   };
 
   void Nlpsol::init(const Dict& opts) {
+    // Default options
+    bool expand = false;
+
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="detect_simple_bounds_is_simple") {
+      if (op.first=="expand") {
+        expand = op.second;
+      } else if (op.first=="detect_simple_bounds_is_simple") {
         assign_vector(op.second.to_bool_vector(), detect_simple_bounds_is_simple_);
         //detect_simple_bounds_is_simple_ = op.second.to_bool_vector();
       } else if (op.first=="detect_simple_bounds_parts") {
@@ -511,6 +516,11 @@ namespace casadi {
       if (detect_simple_bounds_is_simple_[i]) {
         detect_simple_bounds_target_g_.push_back(i);
       }
+    }
+
+    // Not covered by oracle expansion
+    if (expand && !detect_simple_bounds_parts_.is_null()) {
+      detect_simple_bounds_parts_ = detect_simple_bounds_parts_.expand();
     }
 
     // Call the initialization method of the base class
