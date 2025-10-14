@@ -2169,6 +2169,46 @@ class NLPtests(casadiTestCase):
 
     sol = opti.solve()
 
+  @requires_nlpsol("ipopt")
+  def test_issue_4235(self):
+    opti = Opti()
+    x = opti.variable()
+
+    opti.minimize(x**2)
+
+    f = Function('f',[x],[3*x,x.attachAssert(x>1000)**2])
+
+    y,z = f(2*x)
+
+    opti.subject_to(y<=10)
+    opti.subject_to(z==3)
+
+    opti.set_initial(x, 3)
+
+    opti.solver("ipopt",{"detect_simple_bounds":True})
+
+    with self.assertRaises(Exception):
+        sol = opti.solve()
+
+    opti = Opti()
+    x = opti.variable()
+
+    opti.minimize(x**2)
+
+    f = Function('f',[x],[3*x,x.attachAssert(x>1000)**2])
+
+    y,z = f(2*x)
+
+    opti.subject_to(y<=10)
+    opti.subject_to(z==3)
+
+    opti.set_initial(x, 3)
+
+    # Expand will have the side effect of removing the assertion
+    opti.solver("ipopt",{"expand":True,"detect_simple_bounds":True})
+
+    sol = opti.solve()
+        
   @memory_heavy()
   @requires_nlpsol("ipopt")
   def test_simple_bounds_detect2(self):
