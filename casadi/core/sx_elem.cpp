@@ -210,6 +210,15 @@ namespace casadi {
                 unique_y,
                 hit);
       if (hit) return ret;
+      switch (op) {
+        case OP_MUL:
+          if (x.is_constant() && y.is_op(OP_TWICE))
+            return (x*2)*y.dep(); // a*(2*x) -> (a*2)*x
+          else if (y.is_constant() && x.is_op(OP_TWICE))
+            return (2*y)*x.dep(); // (2*x)*b -> (2*b)*x
+          break;
+      }
+
     }
     return BinarySX::create(Operation(op), x, y);
   }
@@ -227,17 +236,16 @@ namespace casadi {
           if (x.is_op(OP_NOT))
             return x.dep(); // This looks problematic
           break;
+        case OP_TWICE:
+          if (x.is_op(OP_MUL) && x.dep(0).is_constant())
+            return (2*x.dep(0))*x.dep(1); // (2*a)*x = (2*a)*x
+          else if (x.is_op(OP_MUL) && x.dep(1).is_constant())
+            return (2*x.dep(1))*x.dep(0); // x*(2*a) = (2*a)*x
+          else if (x.is_op(OP_TWICE))
+            return 4*x.dep(); // 2*(2*x) = 4*x
+          break;
       }
       // Simplifications
-      bool hit;
-      SXElem ret = common_simp_unary(op, x, SXNode::eq_depth_,
-                [](casadi_int op, const SXElem& a) { return unary(op, a);},
-                unique,
-                hit);
-      if (hit) return ret;
-    }
-    // Simplifications
-    if (GlobalOptions::simplification_on_the_fly) {
       bool hit;
       SXElem ret = common_simp_unary(op, x, SXNode::eq_depth_,
                 [](casadi_int op, const SXElem& a) { return unary(op, a);},

@@ -4333,7 +4333,21 @@ class MXtests(casadiTestCase):
 
     self.checkarray(Jf_ref(u0),Jf(u0))
 
-    
+  def test_const_folding_on_the_fly(self):
+    x = MX.sym('x')
+
+    for a in [2,7]:
+        for b in [2,7]:
+            ref = (a*b)*x
+            if a==7 and b==7:
+                # Should probably not happen, but it is present in 3.7.0
+                self.assertEqual(str(ref),str(a*(b*x)))
+                self.assertEqual(str(ref),str((b*x)*a))
+            else:
+                # Dangerous: no caching of constants
+                self.assertNotEqual(str(ref),str(a*(b*x)))
+                self.assertNotEqual(str(ref),str((b*x)*a))
+
     
 
   

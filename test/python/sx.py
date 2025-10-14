@@ -389,6 +389,15 @@ class SXtests(casadiTestCase):
     self.assertAlmostEqual(res[0], fun(*L)[0],10,'SXfunction evaluation wrong')
     self.assertAlmostEqual(res[1], fun(*L)[1],10,'SXfunction evaluation wrong')
 
+  def test_const_folding_on_the_fly(self):
+    x = SX.sym('x')
+
+    for a in [2,7]:
+        for b in [2,7]:
+            ref = (a*b)*x
+            self.assertEqual(str(ref),str(a*(b*x)))
+            self.assertEqual(str(ref),str((b*x)*a))
+
   def test_SX_func(self):
     self.message("Function constructors")
     x0=SX.sym("x")
