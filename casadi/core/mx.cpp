@@ -2587,6 +2587,19 @@ namespace casadi {
 
       std::unordered_map<FunctionInternal*, Function> function_cache;
 
+      // Pre-cache the original nodes
+      // This makes sure we recycle old nodes when possible
+      for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it) {
+        if (it->op == OP_INPUT || it->op==OP_OUTPUT || it->op==OP_PARAMETER) continue;
+
+        std::string key = s.pack(it->data);
+
+        auto itk = cache.find(key);
+        if (itk==cache.end()) {
+          cache[key] = it->data;
+        }
+      }
+
       // Loop over computational nodes in forward order
       casadi_int alg_counter = 0;
       for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
