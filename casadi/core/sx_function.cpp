@@ -465,7 +465,7 @@ namespace casadi {
 
   Dict SXFunction::generate_options(const std::string& target) const {
     Dict opts = FunctionInternal::generate_options(target);
-    //opts["default_in"] = default_in_;
+    if (target=="clone") opts["default_in"] = default_in_;
     opts["live_variables"] = live_variables_;
     opts["just_in_time_sparsity"] = just_in_time_sparsity_;
     opts["just_in_time_opencl"] = just_in_time_opencl_;

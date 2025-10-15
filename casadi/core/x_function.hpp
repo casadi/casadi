@@ -1006,6 +1006,8 @@ namespace casadi {
     std::vector<MatType> new_in = in_;
     std::vector<MatType> new_out = out_;
     Dict final_options = generate_options("clone");
+    final_options["allow_duplicate_io_names"] = true;
+    final_options["allow_free"] = true;
 
     bool empty_inputs = true;
     bool cse = true;
@@ -1207,7 +1209,7 @@ namespace casadi {
           const Function::AuxOut& aux,
           const Dict& opts) const {
 
-    Dict g_ops = generate_options("clone");
+    Dict g_ops = generate_options("tmp");
     Dict f_options;
     f_options["helper_options"] = g_ops;
     f_options["final_options"] = g_ops;
