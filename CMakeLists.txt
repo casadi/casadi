@@ -926,6 +926,19 @@ set(BUILD_GHC_FILESYSTEM_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for GHC_FI
 set(BUILD_GHC_FILESYSTEM_VERSION "v1.5.14" CACHE STRING "Tag/branch/hash to be used for BUILD_GHC_FILESYSTEM_GIT_REPO")
 option(WITH_BUILD_GHC_FILESYSTEM "Build GHC_FILESYSTEM (BUILD_GHC_FILESYSTEM_VERSION=${BUILD_GHC_FILESYSTEM_VERSION}) from downloaded source (BUILD_GHC_FILESYSTEM_GIT_REPO=${BUILD_LIBZIP_GIT_REPO})." OFF)
 
+# Protobuf (required for ONNX)
+set(BUILD_PROTOBUF_GIT_REPO "https://github.com/protocolbuffers/protobuf" CACHE STRING "Git repo for Protobuf")
+set(BUILD_PROTOBUF_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Protobuf")
+set(BUILD_PROTOBUF_VERSION "v31.1" CACHE STRING "Tag/branch/hash for Protobuf")
+option(WITH_BUILD_PROTOBUF "Build Protobuf from source" OFF)
+
+# ONNX Translator plugin
+option(WITH_ONNX "Compile the ONNX translator interface" OFF)
+set(BUILD_ONNX_GIT_REPO "https://github.com/onnx/onnx" CACHE STRING "Git repo used together with BUILD_ONNX_VERSION")
+set(BUILD_ONNX_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for ONNX")
+set(BUILD_ONNX_VERSION "v1.19.1" CACHE STRING "Tag/branch/hash to be used for BUILD_ONNX_GIT_REPO")
+option(WITH_BUILD_ONNX "Build ONNX (BUILD_ONNX_VERSION=${BUILD_ONNX_VERSION}) from downloaded source (BUILD_ONNX_GIT_REPO=${BUILD_ONNX_GIT_REPO})." OFF)
+set(BUILD_ONNX_DEPENDENCIES PROTOBUF)
 
 
 function(libraries2flags libraries out)
@@ -1035,7 +1048,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL MADNLP)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LIBZIP ZLIB)
+foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LIBZIP ZLIB PROTOBUF ONNX)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -2104,6 +2117,79 @@ if(WITH_GHC_FILESYSTEM)
   endif()
 endif()
 add_feature_info(ghc-filesystem-interface WITH_GHC_FILESYSTEM "Interface to the ghc.")
+
+if(WITH_PROTOBUF)
+  if(WITH_BUILD_PROTOBUF)
+  ExternalProject_Add(protobuf-external
+      GIT_REPOSITORY ${BUILD_PROTOBUF_GIT_REPO}
+      GIT_SHALLOW ${BUILD_PROTOBUF_GIT_SHALLOW}
+      GIT_TAG ${BUILD_PROTOBUF_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS
+        -Dprotobuf_BUILD_TESTS=OFF
+        -Dprotobuf_BUILD_EXAMPLES=OFF
+        -Dprotobuf_BUILD_SHARED_LIBS=ON
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -Dprotobuf_ABSL_PROVIDER=module
+        -DABSL_BUILD_TESTING=OFF
+        -DABSL_ENABLE_INSTALL=ON
+        -DABSL_BUILD_DLL=ON)
+
+  add_library(protobuf::libprotobuf SHARED IMPORTED)
+  add_dependencies(protobuf::libprotobuf protobuf-external)
+
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
+
+  set_target_properties(protobuf::libprotobuf PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}protobuf${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+  else()
+    find_package(Protobuf REQUIRED)
+  endif()
+endif()
+add_feature_info(protobuf-interface WITH_PROTOBUF "Interface to Protobuf for ONNX.")
+
+if(WITH_ONNX)
+  if(WITH_BUILD_ONNX)
+    ExternalProject_Add(onnx-external
+        DEPENDS protobuf::libprotobuf
+        GIT_REPOSITORY ${BUILD_ONNX_GIT_REPO}
+        GIT_SHALLOW ${BUILD_ONNX_GIT_SHALLOW}
+        GIT_TAG ${BUILD_ONNX_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        PATCH_COMMAND git apply --ignore-whitespace ${CMAKE_SOURCE_DIR}/cmake/onnx_protobuf_dll.patch || echo "Patch already applied or failed"
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS
+          -DONNX_BUILD_TESTS=OFF
+          -DONNX_BUILD_BENCHMARKS=OFF
+          -DBUILD_SHARED_LIBS=ON
+          -DONNX_BUILD_SHARED_LIBS=ON
+          -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects
+          -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+          -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
+    add_library(ONNX::onnx SHARED IMPORTED)
+    add_library(ONNX::onnx_proto SHARED IMPORTED)
+    add_dependencies(ONNX::onnx onnx-external)
+    add_dependencies(ONNX::onnx_proto onnx-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
+    set_target_properties(ONNX::onnx PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}onnx${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+      INTERFACE_LINK_LIBRARIES "ONNX::onnx_proto")
+    set_target_properties(ONNX::onnx_proto PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}onnx_proto${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+      INTERFACE_LINK_LIBRARIES "protobuf::libprotobuf")
+  else()
+    find_package(ONNX REQUIRED)
+  endif()
+endif()
+add_feature_info(onnx-translator-interface WITH_ONNX "Interface to ONNX for model import/export.")
 
 if(WITH_SELFCONTAINED)
   # Loop over prescribed folders
