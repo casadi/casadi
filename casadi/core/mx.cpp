@@ -2276,13 +2276,8 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
               }
             }
             // Recreate the inner function
-            Dict opts;
-            opts["ad_weight"] = f->ad_weight();
-            opts["ad_weight_sp"] = f->sp_weight();
-            opts["max_num_dir"] = f->max_num_dir_;
+            Dict opts = f->generate_options("clone");
             opts["is_diff_in"] = is_diff_in;
-            opts["is_diff_out"] = f->is_diff_out_;
-            opts["jac_penalty"] = f->jac_penalty_;
             opts["cse"] = true;
             std::vector<SX> args = f.sx_in();
             std::vector<SX> res = f(args);
@@ -2321,9 +2316,10 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     std::vector< bool > try_evalf_;
     std::vector< bool > expand_;
     casadi_int read_i;
+    Dict opts_;
 
   public:
-    ExpressionSimplifier() {
+    ExpressionSimplifier(const Dict& opts) : opts_(opts) {
       read_i = 0;
     }
 
@@ -2362,7 +2358,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
 
       std::vector<MX> inputs = symvar(veccat(to_be_expanded));
 
-      Function Js = Function("Js", inputs, to_be_expanded);
+      Function Js = Function("Js", inputs, to_be_expanded, opts_);
       Js = Js.expand();
 
       std::vector<MX> out;
@@ -2426,6 +2422,24 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     opts2["lift_calls"] = true;
     opts2["lift_shared"] = false;
     extract(vexpr, v, vdef, opts2); // Updates vexpr, v, vdef in place
+
+    Dict common_options, specific_options;
+    bool enable_nominal = true;
+    bool print_instructions = false;
+
+    for (auto&& op : options) {
+      if (op.first=="common_options") {
+        common_options = op.second;
+      } else if (op.first=="specific_options") {
+        specific_options = op.second;
+      } else if (op.first=="enable_nominal") {
+        enable_nominal = op.second;
+      } else if (op.first=="print_instructions") {
+        print_instructions = op.second;
+      } else {
+        casadi_error("No such option: " + std::string(op.first));
+      }
+    }
 
     // Check if is_diff_in is already optimally specified
     if (!optimal_is_diff(vexpr, v, vdef, varg)) { // Updates vexpr in place
@@ -2506,7 +2520,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
             }
           }
           // Options
-          Dict opts = {{"skip_transform",true},{"derivative_of", f}};
+          Dict opts = {{"skip_transform",true},{"derivative_of", f}, {"print_instructions", print_instructions}};
           Function J = f->get_jacobian(fname, inames, onames, opts);
 
           lm.jacobian = J;
@@ -2593,21 +2607,6 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       }
     }
 
-    Dict common_options, specific_options;
-    bool enable_nominal = true;
-
-    for (auto&& op : options) {
-      if (op.first=="common_options") {
-        common_options = op.second;
-      } else if (op.first=="specific_options") {
-        specific_options = op.second;
-      } else if (op.first=="enable_nominal") {
-        enable_nominal = op.second;
-      } else {
-        casadi_error("No such option: " + std::string(op.first));
-      }
-    }
-
     bool try_evalf = true;
     bool expand = true;
 
@@ -2656,7 +2655,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     bool jac_vdef_v_try_evalf = get_from_dict(jac_vdef_v_options, "try_evalf", try_evalf);
     bool jac_vdef_v_expand = get_from_dict(jac_vdef_v_options, "expand", expand);
 
-    ExpressionSimplifier es;
+    ExpressionSimplifier es({{"print_instructions", print_instructions}});
 
     std::vector<casadi_int> blocks_A_to_simplify = boolvec_to_index(blocks_A_simplify);
     std::vector<MX> blocks_A_simplified = vector_slice(blocks_A, blocks_A_to_simplify);
@@ -2730,8 +2729,13 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     casadi_int blocks_J_i = 0;
 
     int rb_offset = 0;
+    casadi_assert_dev(expr.size()==Vexpr.size());
     for (const std::vector<MX>& e : expr) {
       if (enable_nominal) out.push_back(vertcat(e));
+    //for (casadi_int k=0;k<expr.size();++k) {
+    //  const std::vector<MX>& e = expr[k];
+      //uout() << "e " << Vexpr[k] << std::endl;
+      // out.push_back(Vexpr[k]);
       int cb_offset = 0;
       for (const std::vector<MX>& a : arg) {
         MX block = blocks_J[blocks_J_i++];
