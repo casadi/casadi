@@ -306,13 +306,7 @@ namespace casadi {
   }
 
   Function Function::expand() const {
-    Dict opts;
-    opts["ad_weight"] = (*this)->ad_weight();
-    opts["ad_weight_sp"] = (*this)->sp_weight();
-    opts["max_num_dir"] = (*this)->max_num_dir_;
-    opts["is_diff_in"] = (*this)->is_diff_in_;
-    opts["is_diff_out"] = (*this)->is_diff_out_;
-    opts["jac_penalty"] = (*this)->jac_penalty_;
+    Dict opts = (*this)->generate_options("clone");
     opts["cse"] = true;
     return expand(name(), opts);
   }
@@ -331,12 +325,8 @@ namespace casadi {
       "List of free variables in your Function: " +
         join(get_free(), ","));
 
-    Dict my_opts;
-    my_opts["ad_weight"] = (*this)->ad_weight();
-    my_opts["ad_weight_sp"] = (*this)->sp_weight();
-    my_opts["max_num_dir"] = (*this)->max_num_dir_;
-    my_opts["is_diff_in"] = (*this)->is_diff_in_;
-    my_opts["is_diff_out"] = (*this)->is_diff_out_;
+    Dict my_opts = (*this)->generate_options("clone");
+    my_opts["cse"] = true;
     update_dict(my_opts, opts);
     std::vector<SX> ex_in = sx_in();
     std::vector<SX> ex_out = Function(*this)(ex_in);
