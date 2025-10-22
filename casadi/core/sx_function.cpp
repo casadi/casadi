@@ -469,6 +469,7 @@ namespace casadi {
     opts["live_variables"] = live_variables_;
     opts["just_in_time_sparsity"] = just_in_time_sparsity_;
     opts["just_in_time_opencl"] = just_in_time_opencl_;
+    opts["print_instructions"] = print_instructions_;
     return opts;
   }
 
