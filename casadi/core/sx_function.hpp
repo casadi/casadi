@@ -166,6 +166,12 @@ class CASADI_EXPORT SXFunction :
     return ret;
   }
 
+  /** \brief Get list of dependency functions */
+  std::vector<std::string> get_function() const override;
+
+  /** \brief Get a dependency function */
+  const Function& get_function(const std::string &name) const override;
+
   /** \brief Hessian (forward over adjoint) via source code transformation
 
       \identifier{up} */

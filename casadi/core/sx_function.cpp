@@ -1717,6 +1717,35 @@ namespace casadi {
     return in_;
   }
 
+  std::vector<std::string> SXFunction::get_function() const {
+    std::map<std::string, bool> flagged;
+    for (auto&& a : algorithm_) {
+      if (a.op==OP_CALL) {
+        const auto& m = call_.el.at(a.i1);
+        const Function &f = m.f;
+        if (flagged.find(f.name())==flagged.end()) {
+          flagged[f.name()] = true;
+        }
+      }
+    }
+    std::vector<std::string> ret;
+    for (auto it : flagged) {
+      ret.push_back(it.first);
+    }
+    return ret;
+  }
+
+  const Function& SXFunction::get_function(const std::string &name) const {
+    for (auto&& a : algorithm_) {
+      if (a.op==OP_CALL) {
+        const auto& m = call_.el.at(a.i1);
+        const Function &f = m.f;
+        if (name==f.name()) return f;
+      }
+    }
+    casadi_error("No such function '" + name + "'.");
+  }
+
   bool SXFunction::is_a(const std::string& type, bool recursive) const {
     return type=="SXFunction" || (recursive && XFunction<SXFunction,
                                   SX, SXNode>::is_a(type, recursive));
