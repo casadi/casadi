@@ -1953,6 +1953,16 @@ namespace casadi {
     }
   }
 
+  void SXFunction::change_option(const std::string& option_name,
+      const GenericType& option_value) {
+    if (option_name == "print_instructions") {
+      print_instructions_ = option_value;
+    } else {
+      // Option not found - continue to base classes
+      XFunction<SXFunction, SX, SXNode>::change_option(option_name, option_value);
+    }
+  }
+
   std::vector<SX> SXFunction::order(const std::vector<SX>& expr) {
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
     std::lock_guard<std::mutex> lock(SX::get_mutex_temp());

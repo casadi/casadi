@@ -364,6 +364,9 @@ class CASADI_EXPORT SXFunction :
   // Get all embedded functions, recursively
   void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
 
+    /** \brief Change option after object creation for debugging */
+    void change_option(const std::string& option_name, const GenericType& option_value) override;
+
   /** \brief Get default input value
 
       \identifier{v9} */
