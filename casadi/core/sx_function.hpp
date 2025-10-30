@@ -166,10 +166,14 @@ class CASADI_EXPORT SXFunction :
     return ret;
   }
 
-  /** \brief Get list of dependency functions */
+  /** \brief Get list of dependency functions
+
+      \identifier{2es} */
   std::vector<std::string> get_function() const override;
 
-  /** \brief Get a dependency function */
+  /** \brief Get a dependency function
+
+      \identifier{2et} */
   const Function& get_function(const std::string &name) const override;
 
   /** \brief Hessian (forward over adjoint) via source code transformation
@@ -370,7 +374,9 @@ class CASADI_EXPORT SXFunction :
   // Get all embedded functions, recursively
   void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
 
-    /** \brief Change option after object creation for debugging */
+    /** \brief Change option after object creation for debugging
+
+        \identifier{2eu} */
     void change_option(const std::string& option_name, const GenericType& option_value) override;
 
   /** \brief Get default input value
