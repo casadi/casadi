@@ -2265,8 +2265,24 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         if (it == lifted_maps.end()) {
           LiftedMap lm;
           lm.orig = f;
+          std::string fname = "jac_" + f.name();
+          // Names of inputs
+          std::vector<std::string> inames;
+          for (casadi_int i=0; i<f.n_in(); ++i) inames.push_back(f.name_in(i));
+          for (casadi_int i=0; i<f.n_out(); ++i) inames.push_back("out_" + f.name_out(i));
+          // Names of outputs
+          std::vector<std::string> onames;
+          onames.reserve(f.n_in() * f.n_out());
+          for (size_t oind = 0; oind < f.n_out(); ++oind) {
+            for (size_t iind = 0; iind < f.n_in(); ++iind) {
+              onames.push_back("jac_" + f.name_out(oind) + "_" + f.name_in(iind));
+            }
+          }
+          // Options
+          Dict opts = {{"skip_transform",true},{"derivative_of", f}};
+          Function J = f->get_jacobian(fname, inames, onames, opts);
 
-          lm.jacobian = f.jacobian();
+          lm.jacobian = J;
           lifted_maps[f.get()] = lm;
         }
 
