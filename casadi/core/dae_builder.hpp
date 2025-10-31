@@ -610,6 +610,9 @@ class CASADI_EXPORT DaeBuilder
   /// Get the causality
   std::string causality(const std::string& name) const;
 
+  /// Which categories are possible for a variable?
+  std::vector<std::string> categories(const std::string& name) const;
+
   /** \brief Set the causality, if permitted
 
   The following changes are permitted:
@@ -648,7 +651,12 @@ class CASADI_EXPORT DaeBuilder
   The following changes are permitted:
     * Controls 'u' can be changed to/from tunable parameters 'p' or fixed parameters 'c'
     * Differential states that do not appear in the right-hand-sides can be changed between
-    regular states 'x' and quadrature states 'q'
+    regular states 'x', quadrature states 'q', independent variable 't' and no category '0'.
+    * Differential states that do appear in the right-hand-sides can be changed between
+    regular states 'x', and independent variable 't'.
+    * At most one independent variable 't' is allowed. Changing the category of a variable
+    to 't' will in any existing entry in category 't' be changed to 'x' or '0', depending
+    on whether it appears in any right-hand-side.
 
     Other changes are not permitted. Causality and variability is updated accordingly.
 

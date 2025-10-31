@@ -527,6 +527,44 @@ bool Variable::needs_der() const {
   return true;
 }
 
+std::vector<Category> Variable::categories() const {
+  switch (category) {
+    case Category::P:  // Fall-through
+    case Category::U:  // Fall-through
+    case Category::C:
+      return {Category::P, Category::U, Category::C};
+    case Category::T:  // Fall-through
+    case Category::X:  // Fall-through
+    case Category::Q:
+      if (in_rhs) {
+        return {Category::X, Category::T};
+      } else {
+        return {Category::T, Category::X, Category::Q, Category::NUMEL};
+      }
+    case Category::NUMEL:
+      if (has_der()) {
+        return {Category::Q, Category::T, Category::NUMEL};
+      } else {
+        return {Category::NUMEL};
+      }
+    case Category::D: return {Category::D};
+    case Category::W: return {Category::W};
+    case Category::CALCULATED: return {Category::CALCULATED};
+    case Category::Z: return {Category::Z};
+    default: break;
+  }
+  // Error
+  casadi_error("Cannot handle category: " + to_string(category));
+  return {};
+}
+
+bool Variable::permitted(Category cat) const {
+  for (auto c : categories()) {
+    if (c == cat) return true;
+  }
+  return false;
+}
+
 MX Variable::get_der(const DaeBuilderInternal& self) const {
   if (causality == Causality::INDEPENDENT) {
     // Time derivative of independent variable is 1
@@ -1318,7 +1356,8 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (more) sanity_check();
 
   // Print dimensions
-  stream << "nx = " << size(Category::X) << ", "
+  stream << "nt = " << size(Category::T) << ", "
+         << "nx = " << size(Category::X) << ", "
          << "nz = " << size(Category::Z) << ", "
          << "nq = " << size(Category::Q) << ", "
          << "ny = " << outputs_.size() << ", "
@@ -3136,15 +3175,38 @@ void DaeBuilderInternal::set_category(size_t ind, Category cat) {
       }
       break;
     case Category::X:
-      if (v.category == Category::Q && !v.in_rhs) {
+      // Can convert from Q, T or unused derivative variable
+      if (v.category == Category::Q || v.category == Category::T
+          || (v.category == Category::NUMEL && v.has_der())) {
         return categorize(v.index, Category::X);
       }
       break;
     case Category::Q:
-      if (v.category == Category::X) {
+      // Can convert from X or T, but only if not in right-hand-side, or from unused derivative
+      if ((!v.in_rhs && (v.category == Category::X || v.category == Category::T))
+          || (v.category == Category::NUMEL && v.has_der())) {
         return categorize(v.index, Category::Q);
       }
       break;
+    case Category::T:
+      // Can convert from X, Q, or unused derivative, but existing T must be removed first
+      if (v.category == Category::X || v.category == Category::Q
+        || (v.category == Category::NUMEL && v.has_der())) {
+          if (has_t()) {
+            // Move existing T variable to X or remove
+            Variable& t_old = variable(indices(Category::T).front());
+            categorize(t_old.index, t_old.in_rhs ? Category::X : Category::NUMEL);
+          }
+          return categorize(v.index, Category::T);
+      }
+      break;
+    case Category::NUMEL:
+      // If not in right-hand-side, can convert from X, Q, or T
+      if (!v.in_rhs && (v.category == Category::X
+          || v.category == Category::Q
+          || v.category == Category::T)) {
+        return categorize(v.index, Category::NUMEL);
+      }
     default:
       break;
   }

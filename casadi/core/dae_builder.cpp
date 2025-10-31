@@ -961,6 +961,19 @@ std::string DaeBuilder::causality(const std::string& name) const {
   }
 }
 
+std::vector<std::string> DaeBuilder::categories(const std::string& name) const {
+  try {
+    std::vector<std::string> ret;
+    for (auto&& cat : (*this)->variable(name).categories()) {
+      ret.push_back(to_string(cat));
+    }
+    return ret;
+  } catch (std::exception& e) {
+    THROW_ERROR("categories", e.what());
+    return {};  // never reached
+  }
+}
+
 void DaeBuilder::set_causality(const std::string& name, const std::string& val) {
   try {
     (*this)->set_causality((*this)->find(name), to_enum<Causality>(val));
