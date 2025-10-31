@@ -125,37 +125,25 @@ std::vector<MX> DaeBuilder::ydef() const {
 
 void DaeBuilder::set_y(const std::vector<std::string>& name) {
   try {
-    // Update causality of any existing outputs not in name
+    // Make sure no duplicate names
     std::set<std::string> name_set(name.begin(), name.end());
     casadi_assert(name_set.size() == name.size(), "Duplicate names");
-    for (auto&& n : y()) {
-      auto it = name_set.find(n);
-      if (it == name_set.end()) {
-        // Not an output anymore, make local
-        set_causality(n, "local");
-      } else {
-        // Mark as added
-        name_set.erase(it);
+
+    // Ensure that causality is output for all variables
+    for (auto&& n : name) set_causality(n, "output");
+
+    // Remove non-outputs, making them local, if any
+    if (ny() != name.size()) {
+      for (auto&& n : y()) {
+        if (name_set.find(n) == name_set.end()) set_causality(n, "local");
       }
     }
-    // Update causality of new outputs
-    for (auto&& n : name) {
-      // Check if not already added
-      auto it = name_set.find(n);
-      if (it != name_set.end()) {
-        // Make output causality
-        set_causality(n, "output");
-        // Mark as added
-        name_set.erase(it);
-      }
-    }
-    // Consistency checks
-    casadi_assert_dev(name_set.empty());
-    casadi_assert_dev((*this)->outputs_.size() == name.size());
-    // Update output ordering
-    (*this)->outputs_ = (*this)->find(name);
+
+    // Update ordering
+    (*this)->reorder("y", (*this)->outputs_, (*this)->find(name));
+
   } catch (std::exception& e) {
-    THROW_ERROR("set_rate", e.what());
+    THROW_ERROR("set_y", e.what());
   }
 }
 
@@ -597,21 +585,44 @@ void DaeBuilder::clear_all(const std::string& v) {
   }
 }
 
+#endif // WITH_DEPRECATED_FEATURES
+
 void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& name) {
   try {
-    (*this)->clear_cache_ = true;  // Clear cache after this
-    const std::vector<size_t>& new_ind = (*this)->find(name);
+    // Special case for outputs (remove?)
     if (v == "y") {
-      (*this)->outputs_ = new_ind;
-    } else {
-      (*this)->indices(to_enum<Category>(v)) = new_ind;
+#ifdef WITH_DEPRECATED_FEATURES
+      return set_y(name);
+#endif // WITH_DEPRECATED_FEATURES
+      casadi_error("Use set_y to set outputs");
     }
+
+    // Update category
+    for (auto&& n : name) set_category(n, v);
+    // Remove any variables not in name from the category
+    auto all_in_cat = all(v);
+    if (all_in_cat.size() != name.size()) {
+      std::set<std::string> name_set(name.begin(), name.end());
+      for (auto&& n : all_in_cat) {
+        if (name_set.find(n) == name_set.end()) {
+          if (v == "x" || v == "q") {
+            // Move to unused derivatives
+            set_category(n, "");
+          } else if (v == "u" || v == "p") {
+            // Make constant
+            set_category(n, "c");
+          } else {
+            casadi_error("Cannot automatically remove '" + n + "' from category '" + v + "'");
+          }
+        }
+      }
+    }
+    // Make sure ordering is correct
+    reorder(v, name);
   } catch (std::exception& e) {
     THROW_ERROR("set_all", e.what());
   }
 }
-
-#endif // WITH_DEPRECATED_FEATURES
 
 void DaeBuilder::reorder(const std::string& cat, const std::vector<std::string>& v) {
   try {

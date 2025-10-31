@@ -401,12 +401,12 @@ class CASADI_EXPORT DaeBuilder
   /// Reorder variables in a category
   void reorder(const std::string& cat, const std::vector<std::string>& v);
 
+  /// Set all variables within a a category
+  void set_all(const std::string& v, const std::vector<std::string>& name);
+
 #ifdef WITH_DEPRECATED_FEATURES
   /// [DEPRECATED] Use set_variability, set_causality or set_category to change variable category
   void clear_all(const std::string& v);
-
-  /// [DEPRECATED] Use set_variability, set_causality, set_category and/or reorder
-  void set_all(const std::string& v, const std::vector<std::string>& name);
 
   /** @name [DEPRECATED] Register an existing variable */
   ///@{
