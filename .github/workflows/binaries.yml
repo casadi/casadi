@@ -11,7 +11,7 @@ env:
   build_flags_mac: "-DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_BUILD_LAPACK=OFF -DWITH_WORHP=OFF -DWITH_MOCKUP_WORHP=OFF -DWITH_BQPD=OFF -DWITH_UNO=OFF"
   build_flags_mac_intel: "-DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF -DWITH_DAQP=OFF -DWITH_BUILD_DAQP=OFF"
   build_flags_mac_m1: "-DALLOW_DOCKER=OFF -DWITH_HPIPM=OFF -DWITH_BUILD_HPIPM=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF"
-  build_flags_aarch64: "-DWITH_BONMIN=OFF DWITH_BUILD_BONMIN=OFF -DWITH_CLP=OFF -DWITH_BUILD_CLP=OFF -DWITH_CBC=OFF -DWITH_BUILD_CBC=OFF -DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF"
+  build_flags_aarch64: "-DWITH_BONMIN=OFF -DWITH_BUILD_BONMIN=OFF -DWITH_CLP=OFF -DWITH_BUILD_CLP=OFF -DWITH_CBC=OFF -DWITH_BUILD_CBC=OFF -DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF"
 
 jobs:
   version:
@@ -194,7 +194,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,windows-shared-x64-posix]
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v4.1.1
         with:
@@ -234,6 +234,36 @@ jobs:
           path: ${{github.job}}-${{matrix.target}}.zip
           retention-days: 5
 
+  core-manylinux-aarch64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0 # for git-restore-mtime
+          submodules: recursive
+      - uses: jgillis/git-restore-mtime-action@master
+        with:
+          args: "--commit-time"
+      - name: Cache build dir
+        uses: actions/cache@v4.2.0
+        with:
+          key: core-build-${{ github.ref }}-native-arm64-${{env.cache-suffix}}
+          path: build
+      - uses: casadi/mockups@master
+        with:
+          tag: manylinux2014-aarch64
+      - name: Build
+        run: |
+          rm -f build/CMakeCache.txt
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_aarch64}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          cmake --build build -v
+      - run: zip -rq ${{github.job}}-native-arm64.zip build
+      - uses: actions/upload-artifact@v4.3.1
+        with:
+          name: ${{ github.job }}-native-arm64
+          path: ${{ github.job }}-native-arm64.zip
+          retention-days: 5
+
   matrix-arch-py2:
     runs-on: ubuntu-24.04
     steps:
@@ -253,10 +283,20 @@ jobs:
                 matrix:
                   arch: [windows-shared-x64-posix]
                   py2: ["27","36","37","38","39","310","311","312","313"]
-              - type: append
-                matrix:
-                  arch: [manylinux2014-aarch64]
-                  py2: ["36","37","38","39","310","311","312","313"]
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+
+  matrix-arch-py2-linux-arm64:
+    runs-on: ubuntu-24.04
+    steps:
+      - id: build-matrix
+        uses: jgillis/setup-build-matrix@main
+        with:
+          config: |
+            matrix:
+              arch: [native-arm64]
+              py2: ["36","37","38","39","310","311","312","313"]
+            operations: []
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
@@ -666,7 +706,6 @@ jobs:
               "manylinux1-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
               "manylinux2014-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
               "manylinux2014-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
-              "manylinux2014-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
               "windows-shared-x64-posix": {"os": "windows", "bitness": "64", "suffix":"64"}
            }
           export_to: env
@@ -710,7 +749,7 @@ jobs:
           retention-days: 5
       
       - run: |
-          pip install wheel==0.31.1
+          pip install wheel==0.46.1
           wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
@@ -738,6 +777,100 @@ jobs:
           prerelease: true
         if: github.event_name != 'pull_request'
 
+  python-linux-arm64:
+    needs: [core-manylinux-aarch64,matrix-arch-py2-linux-arm64,swig,version]
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix-arch-py2-linux-arm64.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/download-artifact@v4.1.7
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source
+        run: unzip -o casadi_source.zip
+      - uses: actions/download-artifact@v4.1.7
+        with:
+          name: core-manylinux-aarch64-native-arm64
+      - run: unzip core-manylinux-aarch64-native-arm64.zip
+      - uses: casadi/mockups@master
+        with:
+          tag: manylinux2014-aarch64
+      - id: get-python-version
+        uses: actions/github-script@v6.3.3
+        env:
+          py2: "${{ matrix.py2 }}"
+        with:
+          result-encoding: string
+          script: |
+            const { py2 } = process.env;
+            const major = py2.substr(0,1);
+            const minor = py2.substr(1);
+            core.setOutput('pydot2', major+"."+minor)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ steps.get-python-version.outputs.pydot2 }}
+      - run: rm -rf install
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_PYTHON=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DSKIP_CONFIG_H_GENERATION=ON
+          cmake --build build --target install -v
+      - run: |
+             cd install
+             echo "This file (and the casadi directory) should end up in a folder called 'casadi-linux-aarch64-py${{matrix.py2}}'" > dummy.txt
+             zip -rq ../casadi-linux-aarch64-py${{matrix.py2}}.zip .
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - run: cp casadi-linux-aarch64-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-linux-aarch64-py${{matrix.py2}}.zip
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: casadi-*-linux-aarch64-py${{matrix.py2}}.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.9.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ needs.version.outputs.casadi }}-linux-aarch64-py${{matrix.py2}}.zip
+          prerelease: true
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-artifact@v4.3.1
+        with:
+          name: casadi-linux-aarch64-py${{matrix.py2}}
+          path: casadi-linux-aarch64-py${{matrix.py2}}.zip
+          retention-days: 5
+      - run: |
+          pip install wheel==0.46.1
+          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} linux 64 manylinux2014-aarch64 install/)
+          echo "<$wheel>"
+          echo "wheel=$wheel" >> $GITHUB_OUTPUT
+          wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
+          echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
+        id: wheel
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: ${{ steps.wheel.outputs.wheel_wildcard }}
+          fail-if-no-assets: false
+          fail-if-no-release: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.9.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: ${{ steps.wheel.outputs.wheel }}
+          prerelease: true
+        if: github.event_name != 'pull_request'
 
   test-matlab:
     runs-on: ${{matrix.image}}
@@ -926,7 +1059,7 @@ jobs:
 
   test-python:
     runs-on: ${{ matrix.image }}
-    needs: [python-osx,python-dockcross]
+    needs: [python-osx,python-dockcross,python-linux-arm64]
     strategy:
      fail-fast: false
      matrix:
