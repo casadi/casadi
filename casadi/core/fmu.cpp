@@ -532,7 +532,7 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
     vn_in_.push_back(v.name);
     vr_in_.push_back(v.value_reference);
     if (v.causality == Causality::INDEPENDENT) {
-      if (i != 0) casadi_error("Independent variable must be first input of FMU");
+      if (i != 0) casadi_error("Independent variable must be the first model variable");
       has_independent_ = true;
     }
   }
