@@ -335,7 +335,8 @@ namespace casadi {
         g << g.work(arg[2], dep(2).nnz()) << ",1,";
         g << "1.0,";
         g << g.work(res[0], dep(0).nnz()) << ",1);\n";*/
-      } else if (nrow_y==1) {
+      } else if (false && nrow_y==1) {
+        uout() << "ndeps=" << n_dep() << ", nrow_x=" << nrow_x << ", ncol_x=" << ncol_x << ", nrow_y=" << nrow_y << ", ncol_y=" << ncol_y << "\n";
         casadi_error("Cannot occur");
       } else {
         casadi_assert_dev(!trans_y_);
