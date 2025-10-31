@@ -123,7 +123,7 @@ namespace casadi {
   }
 
   int ConstantDM::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    if (iw[0]) {
+    if (false) {
       res[0] = const_cast<bvec_t*>(get_ptr(bvec_zeros_));
     } else {
       if (res[0]) std::fill_n(res[0], nnz(), 0);
