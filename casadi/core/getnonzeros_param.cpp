@@ -130,7 +130,7 @@ namespace casadi {
     double* odata = res[0];
 
 
-    if (is_trivial_ && iw[0]) {
+    if (is_trivial_ && false) {
       casadi_int ind = static_cast<casadi_int>(*nz);
       res[0] = const_cast<double*>(idata+ind);
     } else {
@@ -197,7 +197,7 @@ namespace casadi {
 
   int GetNonzerosSliceParam::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    if (is_trivial_ && iw[0]) {
+    if (is_trivial_ && false) {
       res[0] = const_cast<bvec_t*>(get_ptr(bvec_zeros_));
     } else {
       return GetNonzerosParam::sp_forward(arg, res, iw, w);

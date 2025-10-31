@@ -216,7 +216,7 @@ namespace casadi {
 
         \identifier{zc} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
-      if (iw[0]) {
+      if (false) {
         res[0] = const_cast<double*>(get_ptr(x_));
       } else {
         std::copy(x_->begin(), x_->end(), res[0]);
@@ -229,7 +229,7 @@ namespace casadi {
         \identifier{zd} */
     int eval_sx(const SXElem** arg, SXElem** res,
                          casadi_int* iw, SXElem* w) const override {
-      if (iw[0]) {
+      if (false) {
         res[0] = const_cast<SXElem*>(get_ptr(sx_));
       } else {
         std::copy(x_->begin(), x_->end(), res[0]);
@@ -338,7 +338,7 @@ namespace casadi {
 
         \identifier{zo} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
-      if (iw[0]) {
+      if (false) {
         res[0] = const_cast<double*>(get_ptr(x_));
       } else {
         if (res[0]) std::copy(x_.begin(), x_.end(), res[0]);
@@ -425,7 +425,7 @@ namespace casadi {
 
         \identifier{29x} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
-      if (iw[0]) {
+      if (false) {
         res[0] = const_cast<double*>(get_ptr(x_));
       } else {
         if (res[0]) std::copy(x_.begin(), x_.end(), res[0]);
