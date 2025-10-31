@@ -22,3 +22,8 @@ template<typename T1>
 T1 casadi_norm_2(casadi_int n, const T1* x) {
   return sqrt(casadi_dot(n, x, x));
 }
+
+#ifdef WITH_BLAS
+CASADI_EXPORT float casadi_norm_2(casadi_int n, const float* x);
+CASADI_EXPORT double casadi_norm_2(casadi_int n, const double* x);
+#endif
