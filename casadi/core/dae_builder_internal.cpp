@@ -1402,8 +1402,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   }
 
   // Print derivatives
-  for (Category cat : {Category::X, Category::Q}) {
+  for (Category cat : {Category::T, Category::X, Category::Q}) {
     if (size(cat) > 0) {
+      if (cat == Category::T && indices(cat).front() == 0) continue;  // skip if trivial
       stream << "Time derivatives of " << description(cat) << "s (" << to_string(cat) << "):"
         << std::endl;
       for (size_t k : indices(cat)) {
@@ -3046,6 +3047,8 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       casadi_assert(variability == Variability::CONTINUOUS,
         "Independent variable must be continuous");
       categorize(v.index, Category::T);
+      // Initialize value to start time
+      v.set_attribute(Attribute::VALUE, start_time_);
       break;
     default:
       casadi_error("Unknown causality: " + to_string(causality));
@@ -3075,6 +3078,8 @@ void DaeBuilderInternal::categorize(size_t ind, Category cat) {
   // Remove from current category, if any
   if (v.category != Category::NUMEL) {
     remove(indices(v.category), ind);
+    // The 'der' field for the independent variable points to derivative of T w.r.t. independent
+    if (v.category == Category::T) variable(0).der = -1;
     v.category = Category::NUMEL;
   }
   // Add to new category, if any
@@ -3086,6 +3091,8 @@ void DaeBuilderInternal::categorize(size_t ind, Category cat) {
       insert(indices, ind);
     }
     v.category = cat;
+    // The 'der' field for the independent variable points to derivative of T w.r.t. independent
+    if (cat == Category::T && ind != 0) variable(0).der = v.der;
   }
 }
 
