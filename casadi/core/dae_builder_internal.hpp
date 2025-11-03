@@ -530,6 +530,9 @@ protected:
   // Symbolic representation of the model equations?
   bool symbolic_;
 
+  // Original index of the independent variable, if any
+  casadi_int orig_time_index_;
+
   // Detect quadrature states
   bool detect_quad_;
 
@@ -557,6 +560,9 @@ protected:
 
   // Event conditions and transition equations
   std::vector<std::pair<size_t, std::vector<size_t>>> when_;
+
+  // Convert XML model variable index to DaeBuilder index
+  casadi_int convert_index(casadi_int index) const;
 
  /** \brief Is there a time variable?
 
