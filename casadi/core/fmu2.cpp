@@ -381,8 +381,24 @@ int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
 int Fmu2::get_directional_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
     const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
     double* sensitivity, size_t n_sensitivity) const {
+  // Consistency checks
   casadi_assert(n_in == n_seed, "Vector-valued variables not supported in FMI 2");
   casadi_assert(n_out == n_sensitivity, "Vector-valued variables not supported in FMI 2");
+  // Quick return if zero dimension
+  if (n_in == 0 || n_out == 0) return 0;
+  // No directional derivatives w.r.t. automatically added independent variable
+  if (has_independent_ && n_in > 0 && *vr_in == static_cast<unsigned int>(-1)) {
+    n_in--;
+    vr_in++;
+    n_seed--;
+    seed++;
+    // Quick return if now zero dimension
+    if (n_in == 0) {
+      std::fill(sensitivity, sensitivity + n_sensitivity, 0.0);
+      return 0;
+    }
+  }
+  // Retrieve from FMU and return
   fmi2Status status = get_directional_derivative_(instance, vr_out, n_out, vr_in, n_in,
     seed, sensitivity);
   return status != fmi2OK;
