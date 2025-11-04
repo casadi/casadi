@@ -63,7 +63,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 enum class Category {T, C, P, D, W, U, X, Z, Q, CALCULATED, NUMEL};
 
 // Output categories for generated functions
-enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, RATE, NUMEL};
+enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
@@ -543,8 +543,7 @@ protected:
   std::vector<Variable*> variables_;
 
   // Model structure
-  std::vector<size_t> outputs_, derivatives_, initial_unknowns_, event_indicators_, residuals_,
-    rate_;
+  std::vector<size_t> outputs_, derivatives_, initial_unknowns_, event_indicators_, residuals_;
 
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;

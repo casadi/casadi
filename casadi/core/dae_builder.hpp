@@ -145,16 +145,6 @@ class CASADI_EXPORT DaeBuilder
       \identifier{2db} */
   void set_y(const std::vector<std::string>& name);
 
-  /** \brief Get all rate variables
-
-      \identifier{2dc} */
-  std::vector<std::string> rate() const;
-
-  /** \brief Set rate variables
-
-      \identifier{2dd} */
-  void set_rate(const std::vector<std::string>& name);
-
   /** \brief Free controls
 
       \identifier{5n} */
@@ -231,11 +221,6 @@ class CASADI_EXPORT DaeBuilder
 
       \identifier{64} */
   bool has_t() const;
-
-  /** \brief Is there a rate output?
-
-      \identifier{2dg} */
-  bool has_rate() const;
 
   /** \brief Differential states
 

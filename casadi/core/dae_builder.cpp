@@ -147,24 +147,6 @@ void DaeBuilder::set_y(const std::vector<std::string>& name) {
   }
 }
 
-std::vector<std::string> DaeBuilder::rate() const {
-  try {
-    return (*this)->name((*this)->rate_);
-  } catch (std::exception& e) {
-    THROW_ERROR("rate", e.what());
-    return {};  // never reached
-  }
-}
-
-void DaeBuilder::set_rate(const std::vector<std::string>& name) {
-  try {
-    casadi_assert(name.size() <= 1, "At most one rate variable");
-    (*this)->rate_ = (*this)->find(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("set_rate", e.what());
-  }
-}
-
 std::vector<MX> DaeBuilder::cdef() const {
   try {
     return (*this)->cdef();
@@ -232,15 +214,6 @@ bool DaeBuilder::has_t() const {
     return (*this)->has_t();
   } catch (std::exception& e) {
     THROW_ERROR("has_t", e.what());
-    return false;  // never reached
-  }
-}
-
-bool DaeBuilder::has_rate() const {
-  try {
-    return !(*this)->rate_.empty();
-  } catch (std::exception& e) {
-    THROW_ERROR("has_rate", e.what());
     return false;  // never reached
   }
 }
