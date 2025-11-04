@@ -81,19 +81,23 @@ namespace casadi {
     return 0;
   }
 
-  void NormF::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void NormF::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = arg[0]->get_norm_fro();
   }
 
-  void Norm1::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Norm1::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = arg[0]->get_norm_1();
   }
 
-  void NormInf::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void NormInf::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = arg[0]->get_norm_inf();
   }
 
-  void Norm2::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Norm2::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = arg[0]->get_norm_2();
   }
 

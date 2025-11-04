@@ -67,7 +67,21 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{1il} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
+
+    /// Create set sparse
+    MX get_project(const Sparsity& sp, bool unique=false) const override;
+
+    /** \brief Get the nonzeros of matrix
+    *
+    *   a->get_nzref(sp,nz)
+    *
+    *   returns Matrix(sp,a[nz])
+
+        \identifier{2eh} */
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+        bool unique=false) const override;
 
     /** \brief Evaluate the MX node on a const/linear/nonlinear partition
 

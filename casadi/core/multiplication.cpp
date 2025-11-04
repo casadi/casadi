@@ -84,7 +84,8 @@ namespace casadi {
     }
   }
 
-  void Multiplication::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Multiplication::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = mac(arg[1], arg[2], arg[0]);
   }
 

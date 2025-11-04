@@ -89,7 +89,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{1eu} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -156,7 +157,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{2bi} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /** \brief  Print expression
 
@@ -224,7 +226,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{2bl} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /** \brief Generate code for the operation
 
@@ -301,7 +304,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{2bp} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /** \brief Generate code for the operation
 

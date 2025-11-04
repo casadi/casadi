@@ -208,6 +208,21 @@ namespace casadi {
                     const Dict& opts=Dict()) const;
     ///@}
 
+    /** \brief Create a new function with simplifications applied
+    *
+    * The following list of boolean options can be provided:
+    * - cse (default true): Common subexpression elimination
+    * - const_folding (default true): Constant folding
+    * - empty_inputs (default true): inputs that are not used become structurally empty
+    * - ref_count (default true): reference count aware simplification
+    *
+
+        \identifier{2ef} */
+    /// @{
+    Function simplify(const std::string& name, const Dict& opts=Dict()) const;
+    Function simplify(const Dict& opts=Dict()) const;
+    /// @}
+
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node
@@ -418,12 +433,18 @@ namespace casadi {
     /** \brief Wrap in an Function instance consisting of only one MX call
 
         \identifier{1vv} */
+    /// @{
     Function wrap() const;
+    Function wrap(const std::string& name) const;
+    /// @}
 
     /** \brief Wrap in a Function with options
 
         \identifier{1vw} */
+    /// @{
     Function wrap_as_needed(const Dict& opts) const;
+    Function wrap_as_needed(const std::string& name, const Dict& opts) const;
+    /// @}
 
     /** \brief Which variables enter with some order
     *
@@ -462,6 +483,11 @@ namespace casadi {
 
         \identifier{1w2} */
     void change_option(const std::string& option_name, const GenericType& option_value);
+
+    /** \brief Reset the counter used to name dump files
+
+        \identifier{2dy} */
+    void reset_dump_count();
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
 
@@ -956,6 +982,16 @@ namespace casadi {
       return mx_in(index_in(iname));
     }
     const std::vector<MX> mx_in() const;
+#ifndef SWIG
+    template<typename T>
+    const T sym_in(casadi_int iind) const;
+    template<typename T>
+    const T sym_in(const std::string& iname) const {
+      return sym_in<T>(index_in(iname));
+    }
+    template<typename T>
+    const std::vector<T> sym_in() const;
+#endif // SWIG
     ///@}
 
     ///@{
@@ -1357,6 +1393,14 @@ public:
 
 void CASADI_EXPORT _function_buffer_eval(void* raw);
 
+template<>
+const SX CASADI_EXPORT Function::sym_in(casadi_int iind) const;
+template<>
+const MX CASADI_EXPORT Function::sym_in(casadi_int iind) const;
+template<>
+const std::vector<SX> CASADI_EXPORT Function::sym_in() const;
+template<>
+const std::vector<MX> CASADI_EXPORT Function::sym_in() const;
 
 } // namespace casadi
 

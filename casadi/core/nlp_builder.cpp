@@ -25,6 +25,7 @@
 
 #include "nlp_builder.hpp"
 #include "core.hpp"
+#include "filesystem_impl.hpp"
 #include <fstream>
 
 namespace casadi {
@@ -45,9 +46,10 @@ namespace casadi {
   }
 
   NlImporter::NlImporter(NlpBuilder& nlp, const std::string& filename, const Dict& opts)
-  : nlp_(nlp) {
+  : nlp_(nlp), s_ptr_(Filesystem::ifstream_ptr(filename)) {
     // Set default options
     verbose_=false;
+    std::istream& s = *s_ptr_;
 
     // Read user options
     for (auto&& op : opts) {
@@ -60,14 +62,13 @@ namespace casadi {
       }
     }
     // Open file for reading
-    s_.open(filename.c_str());
     if (verbose_) casadi_message("Reading file \"" + filename + "\"");
 
     // Read the header of the NL-file (first 10 lines)
     const casadi_int header_sz = 10;
     std::vector<std::string> header(header_sz);
     for (casadi_int k=0; k<header_sz; ++k) {
-      getline(s_, header[k]);
+      getline(s, header[k]);
     }
 
     // Assert that the file is not in binary form
@@ -160,10 +161,10 @@ namespace casadi {
     v_ = nlp_.x;
 
     if (binary_) {
-      std::streampos offset = s_.tellg();
-      s_.close();
-      s_.open(filename.c_str(), std::ifstream::binary);
-      s_.seekg(offset);
+      std::streampos offset = s.tellg();
+      s_ptr_.reset();
+      s_ptr_ = Filesystem::ifstream_ptr(filename, std::ifstream::binary);
+      s_ptr_->seekg(offset);
     }
 
     // Read segments
@@ -175,7 +176,7 @@ namespace casadi {
 
   NlImporter::~NlImporter() {
     // Close the NL file
-    s_.close();
+    s_ptr_.reset();
   }
 
   void NlImporter::parse() {
@@ -186,7 +187,7 @@ namespace casadi {
     while (true) {
       // Read segment key
       key = read_char();
-      if (s_.eof()) break; // end of file encountered
+      if (s_ptr_->eof()) break; // end of file encountered
       switch (key) {
         case 'F': F_segment(); break;
         case 'S': S_segment(); break;
@@ -395,7 +396,7 @@ namespace casadi {
       break;
 
       default:
-       uout() << s_.tellg() << std::endl;
+       uout() << s_ptr_->tellg() << std::endl;
       casadi_error("Unknown instruction: " + str(inst));
     }
 
@@ -441,51 +442,56 @@ namespace casadi {
   }
 
   int NlImporter::read_int() {
+    std::istream& s = *s_ptr_;
     int i;
     if (binary_) {
-      s_.read(reinterpret_cast<char *>(&i), sizeof(int));
+      s.read(reinterpret_cast<char *>(&i), sizeof(int));
     } else {
-      s_ >> i;
+      s >> i;
     }
     return i;
   }
 
   char NlImporter::read_char() {
+    std::istream& s = *s_ptr_;
     char c;
     if (binary_) {
-      s_.read(&c, 1);
+      s.read(&c, 1);
     } else {
-      s_ >> c;
+      s >> c;
     }
     return c;
   }
 
   double NlImporter::read_double() {
+    std::istream& s = *s_ptr_;
     double d;
     if (binary_) {
-      s_.read(reinterpret_cast<char *>(&d), sizeof(double));
+      s.read(reinterpret_cast<char *>(&d), sizeof(double));
     } else {
-      s_ >> d;
+      s >> d;
     }
     return d;
   }
 
   short NlImporter::read_short() {
+    std::istream& s = *s_ptr_;
     short d;
     if (binary_) {
-      s_.read(reinterpret_cast<char *>(&d), 2);
+      s.read(reinterpret_cast<char *>(&d), 2);
     } else {
-      s_ >> d;
+      s >> d;
     }
     return d;
   }
 
   long NlImporter::read_long() {
+    std::istream& s = *s_ptr_;
     long d;
     if (binary_) {
-      s_.read(reinterpret_cast<char *>(&d), 4);
+      s.read(reinterpret_cast<char *>(&d), 4);
     } else {
-      s_ >> d;
+      s >> d;
     }
     return d;
   }

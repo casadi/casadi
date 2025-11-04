@@ -559,6 +559,7 @@ namespace casadi {
   template<>      struct NonnegativeChecker<OP_AND>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_OR>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_HYPOT>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_FABS>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -1794,6 +1795,336 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_IF_ELSE_ZERO: return ":0)";
     default:              return ")";
     }
+  }
+
+
+  template<class T, typename SU>
+  T common_simp_unary(casadi_int op, const T& x, casadi_int depth,
+      SU&& gen_unary,
+      bool unique,
+      bool& hit) {
+    hit = true;
+    switch (op) {
+      case OP_TWICE:
+        if (x.is_op(OP_MUL) && x.dep(0).is_constant() &&
+            x.dep(0).is_half())
+          return x.dep(1); // 2*(0.5*x) = x
+        else if (x.is_op(OP_MUL) && x.dep(1).is_constant() &&
+            x.dep(1).is_half())
+          return x.dep(0); // 2*(x*0.5) = x
+        break;
+      case OP_SQ:
+        if (x.is_op(OP_SQRT))
+          return x.dep(); // sqrt(x)^2 = x
+        else if (x.is_op(OP_NEG))
+          return sq(x.dep()); // (-x)^2 = x^2
+        else if (x.is_op(OP_FABS))
+          return sq(x.dep()); // |x|^2 = x^2
+        break;
+      case OP_FABS:
+        if (x.is_nonnegative())
+          return x;
+        else if (x.is_op(OP_NEG))
+          return fabs(x.dep()); // fabs(-x) = fabs(x)
+        break;
+      case OP_LOG:
+        if (x.is_op(OP_EXP))
+          return x.dep(); // log(exp(x)) = x
+        break;
+      case OP_INV:
+        if (x.is_op(OP_INV))
+          return x.dep(); // 1/(1/x) = x
+        break;
+      case OP_SQRT:
+        if (x.is_op(OP_SQ))
+          return fabs(x.dep()); // sqrt(x^2) = x
+        break;
+      case OP_COS:
+        if (x.is_op(OP_NEG))
+          return cos(x.dep()); // cos(-x) = cos(x)
+        else if (x.is_op(OP_FABS))
+          return cos(x.dep()); // cos(|x|) = cos(x)
+        break;
+      case OP_NEG:
+        if (x.is_op(OP_NEG))
+          return x.dep(); // -(-x) = x
+        else if (unique && x.is_op(OP_SUB))
+          return x.dep(1) - x.dep(0); // -(x-y) = y-x
+    }
+    hit = false;
+    return 0;
+  }
+
+
+  template<class T, typename SU, typename SB>
+  T common_simp_binary(casadi_int op, const T& x, const T& y, casadi_int depth,
+      SU&& gen_unary,
+      SB&& gen_binary,
+      bool unique_x,
+      bool unique_y,
+      bool& hit) {
+    hit = true;
+    switch (op) {
+      case OP_ADD:
+        if (x.is_zero())
+          return y;
+        else if (y->is_zero()) // term2 is zero
+          return x;
+        else if (y.is_op(OP_NEG))  // x + (-y) -> x - y
+          return x - (-y);
+        else if (x.is_op(OP_NEG)) // (-x) + y -> y - x
+          return y - x.dep();
+        else if (is_equal(x, y, depth))
+          return 2*x; // x+x -> 2*x
+        else if (x.is_op(OP_MUL) && y.is_op(OP_MUL) &&
+                x.dep(0).is_constant() && static_cast<double>(x.dep(0))==0.5 &&
+                y.dep(0).is_constant() && static_cast<double>(y.dep(0))==0.5 &&
+                is_equal(y.dep(1), x.dep(1), depth)) // 0.5x+0.5x = x
+          return x.dep(1);
+        else if (x.is_op(OP_DIV) && y.is_op(OP_DIV) &&
+                x.dep(1).is_constant() && static_cast<double>(x.dep(1))==2 &&
+                y.dep(1).is_constant() && static_cast<double>(y.dep(1))==2 &&
+                is_equal(y.dep(0), x.dep(0), depth)) // x/2+x/2 = x
+          return x.dep(0);
+        else if (x.is_op(OP_MUL) && y.is_op(OP_MUL) &&
+          x.dep(0).is_constant() && y.dep(0).is_constant() &&
+          static_cast<double>(x.dep(0))+static_cast<double>(y.dep(0))==1 &&
+          is_equal(y.dep(1), x.dep(1), depth)
+          )
+          return x.dep(1);
+        else if (x.is_op(OP_SUB) && is_equal(x.dep(1), y, depth))
+          return x.dep(0);
+        else if (y.is_op(OP_SUB) && is_equal(x, y.dep(1), depth))
+          return y.dep(0);
+        else if (x.is_op(OP_SQ) && y.is_op(OP_SQ) &&
+                ((x.dep().is_op(OP_SIN) && y.dep().is_op(OP_COS))
+                  || (x.dep().is_op(OP_COS) && y.dep().is_op(OP_SIN)))
+                && is_equal(x.dep().dep(), y.dep().dep(), depth))
+          return 1; // sin^2 + cos^2 -> 1
+        else if (x.is_doubled() && is_equal(x.dep(0), y, depth))
+          return 3*x.dep(0);
+        else if (y.is_doubled() && is_equal(y.dep(0), x, depth))
+          return 3*y.dep(0);
+        else if (x.is_op(OP_MUL) && y.is_op(OP_MUL) &&
+            is_equal(x.dep(0), y.dep(0), depth) && (x.dep(1)+y.dep(1)).is_one())
+          return x.dep(0);
+        break;
+      case OP_SUB:
+        if (y.is_zero()) // term2 is zero
+          return x;
+        if (x.is_zero()) // term1 is zero
+          return -y;
+        if (is_equal(x, y, depth)) // the terms are equal
+          return 0;
+        else if (y.is_op(OP_NEG)) // x - (-y) -> x + y
+          return x + y.dep();
+        else if (x.is_op(OP_ADD) && is_equal(x.dep(1), y, depth))
+          return x.dep(0);
+        else if (x.is_op(OP_ADD) && is_equal(x.dep(0), y, depth))
+          return x.dep(1);
+        else if (y.is_op(OP_ADD) && is_equal(x, y.dep(1), depth))
+          return -y.dep(0);
+        else if (y.is_op(OP_ADD) && is_equal(x, y.dep(0), depth))
+          return -y.dep(1);
+        else if (x.is_op(OP_NEG))
+          return -(x.dep() + y);
+        else if (x.is_op(OP_MUL) && y.is_op(OP_MUL) &&
+          x.dep(0).is_constant() && y.dep(0).is_constant() &&
+          static_cast<double>(x.dep(0))-static_cast<double>(y.dep(0))==1 &&
+          is_equal(y.dep(1), x.dep(1), depth)
+          )
+          return x.dep(1);
+        else if (x.is_doubled() && is_equal(x.dep(0), y, depth))
+          return y;
+        else if (y.is_doubled() && is_equal(y.dep(0), x, depth))
+          return -x;
+        break;
+      case OP_MUL:
+        if (is_equal(y, x, depth))
+          return sq(x);
+        else if (!x.is_constant() && y.is_constant())
+          return y * x;
+        else if (x.is_zero() || y->is_zero()) // one of the terms is zero
+          return 0;
+        else if (x.is_one()) // term1 is one
+          return y;
+        else if (y.is_one()) // term2 is one
+          return x;
+        else if (y.is_minus_one())
+          return -x;
+        else if (x.is_minus_one())
+          return -y;
+        else if (y.is_op(OP_INV))
+          return x/y.inv();
+        else if (x.is_op(OP_INV))
+          return y / x.inv();
+        else if (x.is_constant() && y.is_op(OP_MUL) && y.dep(0).is_constant() &&
+                static_cast<double>(x)*static_cast<double>(y.dep(0))==1) // 5*(0.2*x) = x
+          return y.dep(1);
+        else if (x.is_constant() && y.is_doubled() &&
+          static_cast<double>(x)*2==1) // 0.5*(2*x) = x
+          return y.dep(0);
+        else if (x.is_constant() && y.is_op(OP_DIV) && y.dep(1).is_constant() &&
+                static_cast<double>(x)==static_cast<double>(y.dep(1))) // 5*(x/5) = x
+          return y.dep(0);
+        else if (x.is_constant() && static_cast<double>(x)==2)
+          return gen_unary(OP_TWICE, y);
+        else if (y.is_constant() && static_cast<double>(y)==2)
+          return gen_unary(OP_TWICE, x);
+        else if (x.is_op(OP_DIV) && is_equal(x.dep(1), y, depth)) // ((2/x)*x)
+          return x.dep(0);
+        else if (y.is_op(OP_DIV) &&
+                is_equal(y.dep(1), x, depth)) // ((2/x)*x)
+          return y.dep(0);
+        else if (x.is_op(OP_NEG))
+          return -(x.dep() * y);
+        else if (y.is_op(OP_NEG))
+          return -(x * y.dep());
+        else if (unique_x && x.is_op(OP_ADD) && x.dep(1).is_op(OP_DIV) &&
+            is_equal(x.dep(1).dep(1), y, depth))
+          return x.dep(0)*y + x.dep(1).dep(0); // (a + b/c)*c -> a*c + b
+        else if (unique_x && x.is_op(OP_ADD) && x.dep(0).is_op(OP_DIV) &&
+            is_equal(x.dep(0).dep(1), y, depth))
+          return x.dep(0).dep(0)+x.dep(1)*y; // (a/c + b)*c -> a*c + b
+        else if (unique_y && y.is_op(OP_ADD) && y.dep(1).is_op(OP_DIV) &&
+            is_equal(y.dep(1).dep(1), x, depth))
+          return x*y.dep(0) + y.dep(1).dep(0); // c*(a + b/c) -> c*a + b
+        else if (unique_y && y.is_op(OP_ADD) && y.dep(0).is_op(OP_DIV) &&
+            is_equal(y.dep(0).dep(1), x, depth))
+          return y.dep(0).dep(0) + x*y.dep(1); // c*(a/c + b) -> a + c*b
+        else if (unique_x && x.is_op(OP_SUB) && x.dep(1).is_op(OP_DIV) &&
+            is_equal(x.dep(1).dep(1), y, depth))
+          return x.dep(0)*y - x.dep(1).dep(0); // (a - b/c)*c -> a*c - b
+        else if (unique_x && x.is_op(OP_SUB) && x.dep(0).is_op(OP_DIV) &&
+            is_equal(x.dep(0).dep(1), y, depth))
+          return x.dep(0).dep(0)-x.dep(1)*y; // (a/c - b)*c -> a*c - b
+        else if (unique_y && y.is_op(OP_SUB) && y.dep(1).is_op(OP_DIV) &&
+            is_equal(y.dep(1).dep(1), x, depth))
+          return x*y.dep(0) - y.dep(1).dep(0); // c*(a - b/c) -> c*a - b
+        else if (unique_y && y.is_op(OP_SUB) && y.dep(0).is_op(OP_DIV) &&
+            is_equal(y.dep(0).dep(1), x, depth))
+          return y.dep(0).dep(0) - x*y.dep(1); // c*(a/c - b) -> a - c*b
+        else if (x.is_constant() && y.is_op(OP_MUL) && y.dep(0).is_constant())
+          return x*y.dep(0)*y.dep(1); // a*(b*x) -> (a*b)*x
+        else if (y.is_constant() && x.is_op(OP_MUL) && x.dep(0).is_constant())
+          return y*x.dep(0)*x.dep(1); // (a*x)*b -> (a*b)*x
+        break;
+      case OP_DIV:
+        if (y.is_zero()) // term2 is zero
+          return std::numeric_limits<double>::infinity();
+        else if (x.is_zero()) // term1 is zero
+          return 0;
+        else if (y.is_one()) // term2 is one
+          return x;
+        else if (y.is_minus_one())
+          return -x;
+        else if (y.is_half())
+          return 2*x;
+        else if (is_equal(x, y, depth)) // terms are equal
+          return 1;
+        else if (x.is_doubled() && y.is_constant() && static_cast<double>(y)==2)
+          return x.dep(0);
+        else if (x.is_doubled() && is_equal(y, x.dep(0), depth))
+          return 2;
+        else if (x.is_op(OP_MUL) && is_equal(y, x.dep(0), depth))
+          return x.dep(1);
+        else if (x.is_op(OP_MUL) && is_equal(y, x.dep(1), depth))
+          return x.dep(0);
+        else if (x.is_one())
+          return y.inv();
+        else if (y.is_op(OP_INV))
+          return x*y.inv();
+        else if (x.is_doubled() && y.is_doubled())
+          return x.dep(0) / y->dep(0);
+        else if (y.is_constant() && x.is_op(OP_DIV) && x.dep(1).is_constant() &&
+                static_cast<double>(y)*static_cast<double>(x.dep(1))==1) // (x/5)/0.2
+          return x.dep(0);
+        else if (y.is_op(OP_MUL) &&
+                is_equal(y.dep(1), x, depth)) // x/(2*x) = 1/2
+          return 1/y.dep(0); //BinarySX::create(OP_DIV, 1, y.dep(0));
+        else if (y.is_doubled() &&
+          is_equal(y.dep(0), x, depth)) // x/(2*x) = 1/2
+          return 0.5;
+        else if (x.is_op(OP_NEG) &&
+                is_equal(x.dep(0), y, depth))      // (-x)/x = -1
+          return -1;
+        else if (y.is_op(OP_NEG) &&
+                is_equal(y.dep(0), x, depth))      // x/(-x) = 1
+          return -1;
+        else if (y.is_op(OP_NEG) && x.is_op(OP_NEG) &&
+                is_equal(x.dep(0), y.dep(0), depth))  // (-x)/(-x) = 1
+          return 1;
+        else if (x.is_op(OP_DIV) && is_equal(y, x.dep(0), depth))
+          return x.dep(1).inv();
+        else if (x.is_op(OP_NEG))
+          return -(x.dep() / y);
+        else if (y.is_op(OP_NEG))
+          return -(x / y.dep());
+        break;
+      case OP_POW:
+        if (y.is_constant()) {
+          if (y.is_integer()) {
+            casadi_int nn = y->to_int();
+            if (nn == 0) {
+              return 1;
+            } else if (nn>100 || nn<-100) { // maximum depth
+              return gen_binary(OP_CONSTPOW, x, nn);
+            } else if (nn<0) { // negative power
+              return 1/pow(x, -nn);
+            } else if (nn%2 == 1) { // odd power
+              return x*pow(x, nn-1);
+            } else { // even power
+              T rt = pow(x, static_cast<casadi_int>(nn/2));
+              return rt*rt;
+            }
+          } else if (y->to_double()==0.5) {
+            return sqrt(x);
+          } else {
+            return gen_binary(OP_CONSTPOW, x, y);
+          }
+        }
+        break;
+      case OP_LE:
+        if ((y-x).is_nonnegative())
+          return 1;
+        break;
+      case OP_FMIN:
+        if (x.is_inf()) return y;
+        if (y.is_inf()) return x;
+        if (x.is_minus_inf() || y.is_minus_inf()) return -std::numeric_limits<double>::infinity();
+        if (is_equal(x, y, depth)) return x;
+        break;
+      case OP_FMAX:
+        if (x.is_minus_inf()) return y;
+        if (y.is_minus_inf()) return x;
+        if (x.is_inf() || y.is_inf()) return std::numeric_limits<double>::infinity();
+        if (is_equal(x, y, depth)) return x;
+        break;
+      case OP_LT:
+        if (((x)-y).is_nonnegative())
+          return 0;
+        break;
+      case OP_EQ:
+        if (is_equal(x, y, depth))
+          return 1;
+        break;
+      case OP_NE:
+        if (is_equal(x, y, depth))
+          return 0;
+        break;
+      case OP_IF_ELSE_ZERO:
+        if (y.is_zero()) {
+          return y;
+        } else if (x.is_constant()) {
+          if (static_cast<double>(x)!=0) {
+            return y;
+          } else {
+            return 0;
+          }
+        }
+    }
+    hit = false;
+    return 0;
   }
 
 #endif // SWIG

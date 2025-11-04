@@ -28,6 +28,7 @@
 
 #include "exception.hpp"
 #include "casadi_common.hpp"
+#include <cstring>
 
 /** \brief Convenience tools for C++ Standard Library vectors
 
@@ -421,7 +422,9 @@ private:
   }
 
   // Create a temporary file
-  CASADI_EXPORT std::string temporary_file(const std::string& prefix, const std::string& suffix);
+  CASADI_EXPORT std::string temporary_file(const std::string& prefix,
+    const std::string& suffix,
+    const std::string& directory="");
 
   CASADI_EXPORT void normalized_setup(std::istream& stream);
   CASADI_EXPORT void normalized_setup(std::ostream& stream);
@@ -1015,6 +1018,63 @@ namespace casadi {
   /// Readability typedefs
   typedef std::vector<std::string> StringVector;
   ///@}
+
+  /** \brief Hash value of an integer
+
+      \identifier{do} */
+  template<typename T>
+  inline size_t hash_value(T v) { return size_t(v);}
+
+  /** \brief Generate a hash value incrementally (function taken from boost)
+
+      \identifier{dp} */
+  template<typename T>
+  inline void hash_combine(std::size_t& seed, T v) {
+    seed ^= hash_value(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+  }
+
+  /** \brief Generate a hash value incrementally, array
+
+      \identifier{dq} */
+  template<typename T>
+  inline void hash_combine(std::size_t& seed, const T* v, std::size_t sz) {
+    for (casadi_int i=0; i<sz; ++i) hash_combine(seed, v[i]);
+  }
+
+  /** \brief Generate a hash value incrementally (function taken from boost)
+
+      \identifier{dr} */
+  template<typename T>
+  inline void hash_combine(std::size_t& seed, const std::vector<T>& v) {
+    hash_combine(seed, get_ptr(v), v.size());
+  }
+
+  template<>
+  inline size_t hash_value(std::string v) {
+    size_t seed = 0;
+    hash_combine(seed, v.c_str(), v.size());
+    return seed;
+  }
+
+  /** \brief Hash value of a double
+
+      \identifier{2em} */
+  template<>
+  inline size_t hash_value(double v) {
+    std::uint64_t u;
+    std::memcpy(&u, &v, sizeof(double));
+
+    if (sizeof(size_t) == 8) {
+      // 64-bit: keep all bits
+      return static_cast<size_t>(u);
+    } else {
+      // 32-bit: fold with hash_combine
+      size_t seed = 0;
+      hash_combine(seed, static_cast<std::uint32_t>(u));
+      hash_combine(seed, static_cast<std::uint32_t>(u >> 32));
+      return seed;
+    }
+  }
 
 } // namespace casadi
 #endif // SWIG

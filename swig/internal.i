@@ -1636,6 +1636,9 @@
 %exception  casadi::Function::release(int mem) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::reset_dump_count() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::reverse(casadi_int nadj) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1649,6 +1652,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::serialize(std::ostream &stream, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::simplify(const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::simplify(const std::string &name, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::size1_in(casadi_int ind) const {
@@ -1723,6 +1732,15 @@
 %exception  casadi::Function::sx_out(const std::string &oname) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::sym_in() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::sym_in(casadi_int iind) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::sym_in(const std::string &iname) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::sz_arg() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1747,7 +1765,13 @@
 %exception  casadi::Function::wrap() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::wrap(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::wrap_as_needed(const Dict &opts) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::wrap_as_needed(const std::string &name, const Dict &opts) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionBuffer::ret() {
@@ -3355,7 +3379,7 @@
 %exception  casadi::MX::attachAssert(const MX &y, const std::string &fail_message="") const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::binary(casadi_int op, const MX &x, const MX &y) {
+%exception  casadi::MX::binary(casadi_int op, const MX &x, const MX &y, bool unique_x=false, bool unique_y=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::blockcat(const std::vector< std::vector< MX > > &v) {
@@ -3430,7 +3454,7 @@
 %exception  casadi::MX::erase(const std::vector< casadi_int > &rr, const std::vector< casadi_int > &cc, bool ind1=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::eval_mx(const std::vector< MX > &arg, std::vector< MX > &res) const {
+%exception  casadi::MX::eval_mx(const std::vector< MX > &arg, std::vector< MX > &res, const std::vector< bool > &unique=std::vector< bool >()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::evalf(const MX &expr) {
@@ -3583,6 +3607,9 @@
 %exception  casadi::MX::info() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::inv() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::inv(const MX &A, const std::string &lsolver="qr", const Dict &dict=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3607,16 +3634,34 @@
 %exception  casadi::MX::is_constant() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::is_doubled() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::is_equal(const MX &x, const MX &y, casadi_int depth=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::is_eye() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::is_half() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::is_inf() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::is_integer() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::is_minus_inf() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::is_minus_one() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::is_multiplication() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::is_nonnegative() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::is_norm() const {
@@ -3644,6 +3689,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::is_valid_input() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::is_value(double val) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::is_zero() const {
@@ -3883,7 +3931,7 @@
 %exception  casadi::MX::trace(const MX &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::unary(casadi_int op, const MX &x) {
+%exception  casadi::MX::unary(casadi_int op, const MX &x, bool unique=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::unite(const MX &A, const MX &B) {
@@ -4207,13 +4255,28 @@
 %exception  casadi::Matrix< Scalar >::is_eye() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< Scalar >::is_half() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::is_inf() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< Scalar >::is_integer() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::is_minus_inf() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::is_minus_one() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< Scalar >::is_nonnegative() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< Scalar >::is_one() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::is_value(double val) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::is_zero() const {
@@ -4888,6 +4951,15 @@
 %exception  casadi::Resource::serialize(SerializingStream &s) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::RevWeakCache< K, T >::incache(const K &key, T &f, bool needs_lock=true) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::RevWeakCache< K, T >::tocache(const K &key, const T &f, bool needs_lock=true) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::RevWeakCache< K, T >::tocache_if_missing(const K &key, T &f) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SX::dep(casadi_int ch=0) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4978,6 +5050,9 @@
 %exception  casadi::SXElem::is_doubled() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SXElem::is_half() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SXElem::is_inf() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5015,6 +5090,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::is_symbolic() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXElem::is_value(double val) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::is_zero() const {
@@ -5713,6 +5791,21 @@
 %exception  casadi::has_rootfinder(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::hash_combine(std::size_t &seed, T v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::hash_combine(std::size_t &seed, const std::vector< T > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::hash_value(T v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::hash_value(double v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::hash_value(std::string v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::in_range(const std::vector< T > &v, casadi_int lower, casadi_int upper) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6100,7 +6193,7 @@
 %exception  casadi::sum(const std::vector< T > &values) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::temporary_file(const std::string &prefix, const std::string &suffix) {
+%exception  casadi::temporary_file(const std::string &prefix, const std::string &suffix, const std::string &directory) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::tensor_permute_mapping(const std::vector< casadi_int > &dims, const std::vector< casadi_int > &order) {

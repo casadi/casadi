@@ -605,7 +605,7 @@ class SetterDispatcher(Dispatcher):
           else:
             oi = performExtraIndex(DM.ones(entry.originalsparsity),extraIndex=extraIndex,entry=entry)
             if oi.sparsity()!=payload_.sparsity():
-              raise Exception("Payload sparsity " + payload_.dim() +  " does not match lhs sparisty " + oi.dim() + "." )
+              raise Exception("Payload sparsity " + payload_.dim() +  " does not match lhs sparsity " + oi.dim() + "." )
             self.master[iflip] = payload_.T[iflip.sparsity()]
             self.master[i] = payload_[i.sparsity()]
         else:
@@ -773,7 +773,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     self.__init__(*state["args"],**state["kwargs"])
 
   def __getstate__(self):
-    return self.initializer
+    return dict(self.initializer)
 
   def __init__(self,*args,**kwargs):
     self.initializer = {"args": args, "kwargs": kwargs}
@@ -1045,15 +1045,15 @@ class DMStruct(MatrixStruct):
     return self.cat
 
 class SXStruct(MatrixStruct):
-  def __init__(self,struct,data=None):
-    MatrixStruct.__init__(self,struct,SX,data=data)
+  def __init__(self,struct,data=None,order=None):
+    MatrixStruct.__init__(self,struct,SX,data=data,order=order)
 
   def __SX__(self):
     return self.cat
 
 class MXStruct(MatrixStruct,VertsplitStructure):
-  def __init__(self,struct,data=None):
-    MatrixStruct.__init__(self,struct,MX,data=data)
+  def __init__(self,struct,data=None,order=None):
+    MatrixStruct.__init__(self,struct,MX,data=data,order=order)
 
     self.buildMap()
 

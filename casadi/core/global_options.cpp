@@ -25,6 +25,7 @@
 
 #include "global_options.hpp"
 #include "exception.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -39,9 +40,15 @@ namespace casadi {
   // By default, use zero-based indexing
   casadi_int GlobalOptions::start_index = 0;
 
+  std::string GlobalOptions::temp_work_dir = "./";
 
   bool GlobalOptions::julia_initialized = false;
 
   casadi_int GlobalOptions::copy_elision_min_size = 8;
+
+  void GlobalOptions::setTempWorkDir(const std::string& dir) {
+    casadi_assert(!dir.empty(), "Temporary working directory must be non-empty.");
+    temp_work_dir = Filesystem::ensure_trailing_slash(dir);
+  }
 
 } // namespace casadi

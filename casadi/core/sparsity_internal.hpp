@@ -37,6 +37,8 @@
 #endif // CASADI_WITH_THREAD_MINGW
 #endif //CASADI_WITH_THREAD
 
+#include "filesystem_impl.hpp"
+
 /// \cond INTERNAL
 
 namespace casadi {

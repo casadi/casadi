@@ -458,6 +458,20 @@ class casadiTestCase(unittest.TestCase):
     fb = Function('f',arg_b,[b])
     self.check_identical_fun(fa,fb)    
 
+  def checkfunction_identical(self,trial,solution):
+    trial.generate('f.c')
+    with open("f.c") as inp:
+        trial_c_code = inp.readlines()
+    solution.generate('f.c')
+    with open("f.c") as inp:
+        solution_c_code = inp.readlines()
+
+
+    for a,b in zip(trial_c_code,solution_c_code):
+        self.assertEqual(a,b)
+    self.assertEqual(len(trial_c_code),len(solution_c_code))
+    
+    
   def checkfunction_light(self,trial,solution,inputs=None,**kwargs):
     self.checkfunction(trial,solution,inputs,fwd=False,adj=False,jacobian=False,gradient=False,hessian=False,sens_der=False,evals=False,**kwargs)
   def checkfunction(self,trial,solution,inputs=None,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False):

@@ -245,6 +245,11 @@ namespace casadi {
 
     MX operator-() const;
 
+    /** \brief Element-wise inverse
+
+        \identifier{2dz} */
+    MX inv() const;
+
 #ifndef SWIG
     /// \cond INTERNAL
     ///@{
@@ -295,6 +300,14 @@ namespace casadi {
 
     /// Check if constant
     bool is_constant() const;
+
+    /// Check if integer
+    bool is_integer() const;
+
+    /** \brief Check if the node is the sum of two equal expressions
+
+        \identifier{2e0} */
+    bool is_doubled() const;
 
     /// Check if evaluation
     bool is_call() const;
@@ -387,15 +400,35 @@ namespace casadi {
         \identifier{qv} */
     bool is_zero() const;
 
-    /** \brief  check if zero (note that false negative answers are possible)
+    /** \brief  check if one (note that false negative answers are possible)
 
         \identifier{qw} */
     bool is_one() const;
 
-    /** \brief  check if zero (note that false negative answers are possible)
+    /** \brief  check if minus one (note that false negative answers are possible)
 
         \identifier{qx} */
     bool is_minus_one() const;
+
+    /** \brief  check if 0.5 (note that false negative answers are possible)
+
+        \identifier{2ep} */
+    bool is_half() const;
+
+    /** \brief  check if a certain value (note that false negative answers are possible)
+
+        \identifier{2eq} */
+    bool is_value(double val) const;
+
+    /** \brief  check if inf (note that false negative answers are possible)
+
+        \identifier{2e1} */
+    bool is_inf() const;
+
+    /** \brief  check if -inf (note that false negative answers are possible)
+
+        \identifier{2e2} */
+    bool is_minus_inf() const;
 
     /** \brief  Is the expression a transpose?
 
@@ -407,6 +440,11 @@ namespace casadi {
 
     /// Is binary operation
     bool is_binary() const;
+
+    /** \brief Check if a value is always nonnegative (false negatives are allowed)
+
+        \identifier{2e3} */
+    bool is_nonnegative() const;
 
     /// Is unary operation
     bool is_unary() const;
@@ -439,8 +477,9 @@ namespace casadi {
     /** \brief  Create nodes by their ID
 
         \identifier{r1} */
-    static MX binary(casadi_int op, const MX &x, const MX &y);
-    static MX unary(casadi_int op, const MX &x);
+    static MX binary(casadi_int op, const MX &x, const MX &y,
+        bool unique_x=false, bool unique_y=false);
+    static MX unary(casadi_int op, const MX &x, bool unique=false);
     ///@}
 
     ///@{
@@ -470,6 +509,15 @@ namespace casadi {
     /// Get a const pointer to the node
     MXNode* get() const;
 #endif // SWIG
+
+    /// \cond INTERNAL
+    /** \brief Low-level access to get_nzref
+    *
+    * Intended for writing unittests
+
+        \identifier{2er} */
+    MX nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const;
+    /// \endcond
 
     ///@{
     /// Get a submatrix, single argument
@@ -717,6 +765,16 @@ namespace casadi {
     /// \endcond
 
 #endif // SWIG
+
+    // Simplification with reference counting awareness
+    static bool simplify_ref_count(std::vector<MX>& arg,
+                                   std::vector<MX>& res,
+                                   const Dict& opts = Dict());
+
+    // Simplification with constant folding
+    static bool simplify_const_folding(std::vector<MX>& arg,
+                                   std::vector<MX>& res,
+                                   const Dict& opts = Dict());
 
     static DM bspline_dual(const std::vector<double>& x,
             const std::vector< std::vector<double> >& knots,
@@ -966,7 +1024,8 @@ namespace casadi {
     /** \brief Evaluate the MX node with new symbolic dependencies
 
         \identifier{rn} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& SWIG_OUTPUT(res)) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& SWIG_OUTPUT(res),
+        const std::vector<bool>& unique=std::vector<bool>()) const;
 
 #ifndef SWIG
     ///@{

@@ -20,5 +20,5 @@
 
 % Use the function
 f = MyCallback('f', 0.5);
-res = f(2);
+res = f(2,5);
 disp(res)

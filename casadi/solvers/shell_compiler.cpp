@@ -137,7 +137,7 @@ namespace casadi {
     cleanup_ = true;
     bool temp_suffix = true;
     std::string bare_name = "tmp_casadi_compiler_shell";
-    std::string directory = "";
+    std::string directory = FunctionInternal::get_jit_directory(opts);
 
     std::vector<std::string> compiler_flags;
     std::vector<std::string> linker_flags;
@@ -166,8 +166,6 @@ namespace casadi {
         compiler = op.second.to_string();
       } else if (op.first=="linker") {
         linker = op.second.to_string();
-      } else if (op.first=="directory") {
-        directory = op.second.to_string();
       } else if (op.first=="compiler_setup") {
         compiler_setup = op.second.to_string();
       } else if (op.first=="cleanup") {
@@ -193,23 +191,12 @@ namespace casadi {
 
     // Name of temporary file
     if (temp_suffix) {
-      obj_name_ = temporary_file(directory + bare_name, suffix);
+      obj_name_ = temporary_file(bare_name, suffix, directory);
     } else {
       obj_name_ = directory + bare_name + suffix;
     }
     base_name_ = std::string(obj_name_.begin(), obj_name_.begin()+obj_name_.size()-suffix.size());
     bin_name_ = base_name_+SHARED_LIBRARY_SUFFIX;
-
-#ifndef _WIN32
-    // Have relative paths start with ./
-    if (obj_name_.at(0)!='/') {
-      obj_name_ = "./" + obj_name_;
-    }
-
-    if (bin_name_.at(0)!='/') {
-      bin_name_ = "./" + bin_name_;
-    }
-#endif // _WIN32
 
     // Construct the compiler command
     std::stringstream cccmd;

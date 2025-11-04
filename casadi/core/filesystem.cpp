@@ -112,30 +112,61 @@ bool Filesystem::ensure_directory_exists(const std::string& filename) {
   return true;
 }
 
-void Filesystem::open(std::ofstream& stream, const std::string& filename,
-    std::ios_base::openmode mode) {
+std::unique_ptr<std::ostream> Filesystem::ofstream_ptr(const std::string& path,
+  std::ios_base::openmode mode) {
   if (is_enabled()) {
-    casadi_assert(ensure_directory_exists(filename),
-     "Unable to create the required directory for '" + filename + "'.");
+    casadi_assert(ensure_directory_exists(path),
+     "Unable to create the required directory for '" + path + "'.");
   }
-  stream.open(filename.c_str(), mode);
+  auto stream_ptr = ofstream_compat(path, mode);
   if (is_enabled()) {
-    casadi_assert(stream.good(),
-      "Error opening stream '" + filename + "'.");
+    casadi_assert(stream_ptr,
+      "Error opening stream '" + path + "'.");
   } else {
-    casadi_assert(stream.good(),
-      "Error opening stream '" + filename + "'. "
+    casadi_assert(stream_ptr,
+      "Error opening stream '" + path + "'. "
       "Does the directory exits? "
       "Note that CasADi needs to be compiled with WITH_GHC_FILESYSTEM=ON "
       "for directories to be automatically created");
   }
+  return stream_ptr;
 }
 
-std::ofstream* Filesystem::ofstream_ptr(const std::string& path,
-  std::ios_base::openmode mode) {
-  std::ofstream* ret = new std::ofstream();
-  Filesystem::open(*ret, path, mode);
+std::unique_ptr<std::istream> Filesystem::ifstream_ptr(const std::string& path,
+  std::ios_base::openmode mode, bool fail) {
+  auto ret = ifstream_compat(path, mode);
+  if (fail && !ret) {
+    casadi_error("Could not open '" + path + "'.");
+  }
   return ret;
+}
+
+bool Filesystem::exists(const std::string& path) {
+  auto ret = ifstream_compat(path);
+  return static_cast<bool>(ret);
+}
+
+std::string Filesystem::ensure_trailing_slash(const std::string& path) {
+  if (!path.empty() && path.back() != '/' && path.back() != '\\') {
+    return path + '/';
+  }
+  return path;
+}
+
+bool Filesystem::is_absolute(const std::string& path) {
+  if (path.empty()) {
+    return false;
+  }
+  if (path.front() == '.') {
+    return false;
+  }
+  if (path.front() == '/') {
+    return true;
+  }
+  if (path.size() > 1 && path[1] == ':') {
+    return true;
+  }
+  return false;
 }
 
 } // namespace casadi

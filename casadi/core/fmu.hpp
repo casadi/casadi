@@ -36,6 +36,7 @@ namespace casadi {
 
 // Forward declarations
 class DaeBuilderInternal;
+class FmuFunction;
 struct FmuMemory;
 struct InputStruct;
 
@@ -160,10 +161,20 @@ class CASADI_EXPORT Fmu
     return hess_sparsity(ired(r), ired(c));
   }
 
+  /** \brief Create memory block
+
+      \identifier{2dn} */
+  FmuMemory* alloc_mem(const FmuFunction& f) const;
+
   /** \brief Initalize memory block
 
       \identifier{26x} */
   int init_mem(FmuMemory* m) const;
+
+  /** \brief Free memory block
+
+      \identifier{2dt} */
+  void free_mem(void *mem) const;
 
   // Free FMU instance
   void free_instance(void* instance) const;

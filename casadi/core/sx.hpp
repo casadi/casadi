@@ -229,6 +229,16 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   void CASADI_EXPORT SX::to_file(const std::string& filename, const Sparsity& sp,
     const SXElem* nonzeros, const std::string& format_hint);
 
+  template<>
+  bool CASADI_EXPORT SX::simplify_ref_count(std::vector<SX>& arg,
+                                   std::vector<SX>& res,
+                                   const Dict& opts);
+
+  template<>
+  bool CASADI_EXPORT SX::simplify_const_folding(std::vector<SX>& arg,
+                                   std::vector<SX>& res,
+                                   const Dict& opts);
+
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
   template<>
   std::mutex& SX::get_mutex_temp();

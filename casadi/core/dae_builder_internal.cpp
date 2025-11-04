@@ -639,8 +639,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
 
 void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Check if file exists
-  std::ifstream test(filename);
-  if (!test.good()) {
+  if (!Filesystem::exists(filename)) {
     if (Filesystem::is_enabled()) {
       casadi_error("Could not open file '" + filename + "'.");
     } else {
@@ -705,11 +704,12 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
 
   // Process ModelVariables
   casadi_assert(fmi_desc.has_child("ModelVariables"), "Missing 'ModelVariables'");
-  import_model_variables(fmi_desc["ModelVariables"]);
+  std::vector<casadi_int> indexmap;
+  import_model_variables(fmi_desc["ModelVariables"], indexmap);
 
   // Process model structure
   if (fmi_desc.has_child("ModelStructure")) {
-    import_model_structure(fmi_desc["ModelStructure"]);
+    import_model_structure(fmi_desc["ModelStructure"], indexmap);
   }
 
   // Is a symbolic representation available?
@@ -1104,8 +1104,10 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     const CodeGenerator& gen) const {
   // Create file
   std::string wrapper_filename = name_ + "_wrap.c";
-  std::ofstream f;
-  CodeGenerator::file_open(f, wrapper_filename, false);
+
+  auto f_ptr = Filesystem::ofstream_ptr(wrapper_filename);
+  std::ostream& f = *f_ptr;
+  CodeGenerator::stream_open(f, false);
 
   // Add includes
   f << "#include <fmi3Functions.h>\n"
@@ -1173,7 +1175,7 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
   f << CodeGenerator::fmu_helpers(name_);
 
   // Finalize file
-  CodeGenerator::file_close(f, false);
+  CodeGenerator::stream_close(f, false);
   return wrapper_filename;
 }
 
@@ -3515,7 +3517,8 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   }
 }
 
-void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
+void DaeBuilderInternal::import_model_variables(const XmlNode& modvars,
+    std::vector<casadi_int>& indexmap) {
   // Mapping from derivative variables to corresponding state variables, FMUX only
   std::vector<std::pair<std::string, std::string>> fmi1_der;
 
@@ -3734,7 +3737,8 @@ std::vector<DependenciesKind> DaeBuilderInternal::read_dependencies_kind(
   }
 }
 
-void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
+void DaeBuilderInternal::import_model_structure(const XmlNode& n,
+    const std::vector<casadi_int>& indexmap) {
   // Do not use the automatic selection of outputs based on output causality
   outputs_.clear();
 
@@ -3873,6 +3877,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         outputs_.push_back(convert_index(e.attribute<casadi_int>("index", 0)));
         // Corresponding variable
         Variable& v = variable(outputs_.back());
+
         // Get dependencies
         if (e.has_attribute("dependencies")) {
           v.dependencies = read_dependencies(e);

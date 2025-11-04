@@ -271,6 +271,16 @@ namespace casadi {
       return ret;
     }
 
+    /** \brief Get list of dependency functions
+
+        \identifier{2ev} */
+    std::vector<std::string> get_function() const override;
+
+    /** \brief Get a dependency function
+
+        \identifier{2ew} */
+    const Function& get_function(const std::string &name) const override;
+
     /** \brief Number of nodes in the algorithm
 
         \identifier{2q} */

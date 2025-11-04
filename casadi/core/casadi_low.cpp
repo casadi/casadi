@@ -85,7 +85,8 @@ namespace casadi {
     return 0;
   }
 
-  void Low::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Low::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = low(arg[0], arg[1]);
   }
 

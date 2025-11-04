@@ -160,6 +160,11 @@ namespace casadi {
     Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
                    const std::vector<casadi_int>& order_out, const Dict& opts) const override;
 
+    /** \brief Create a new function with simplifications applied
+
+        \identifier{2eg} */
+    Function simplify(const std::string& name, const Dict& opts) const override;
+
     /** \brief Generate code for the declarations of the C function
 
         \identifier{xz} */
@@ -331,7 +336,7 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::init");
     // Make sure that inputs are symbolic
     for (casadi_int i=0; i<n_in_; ++i) {
-      if (in_.at(i).nnz()>0 && !in_.at(i).is_valid_input()) {
+      if (!in_.at(i).is_valid_input()) {
         casadi_error("For " + this->name_ + ": Xfunction input arguments must be purely symbolic."
                      "\nArgument " + str(i) + "(" + name_in_[i] + ") is not symbolic.");
       }
@@ -993,6 +998,61 @@ namespace casadi {
     // Assemble function
     return Function(name, ret_in, ret_out,
                     ret_in_name, ret_out_name, opts);
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>
+  ::simplify(const std::string& name, const Dict& opts) const {
+    std::vector<MatType> new_in = in_;
+    std::vector<MatType> new_out = out_;
+    Dict final_options = generate_options("clone");
+
+    bool empty_inputs = true;
+    bool cse = true;
+    bool ref_count = true;
+    bool const_folding = true;
+    for (auto&& op : opts) {
+      if (op.first=="empty_inputs") {
+        empty_inputs = op.second;
+      } else if (op.first=="cse") {
+        cse = op.second;
+      } else if (op.first=="ref_count") {
+        ref_count = op.second;
+      } else if (op.first=="const_folding") {
+        const_folding = op.second;
+      } else {
+        casadi_error("No such simplify option: " + std::string(op.first) + ".\n");
+      }
+    }
+
+    if (empty_inputs) {
+      // What symbols occur in the outputs?
+      std::vector<MatType> syms = MatType::symvar(veccat(out_));
+      // Loop over inputs
+      for (MatType& e : new_in) {
+        // If current input symbols do not occur in outputs
+        if (!contains_any(syms, MatType::symvar(e))) {
+          // Replace input by an empty matrix
+          e = MatType(e.size());
+        }
+      }
+    }
+
+    if (cse) {
+      new_out = MatType::cse(new_out);
+    }
+
+    if (ref_count) {
+      for (casadi_int i=0;i<5; ++i) {
+        MatType::simplify_ref_count(new_in, new_out);
+      }
+    }
+
+    if (const_folding) {
+      MatType::simplify_const_folding(new_in, new_out);
+    }
+
+    return Function(name, new_in, new_out, name_in_, name_out_, final_options);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

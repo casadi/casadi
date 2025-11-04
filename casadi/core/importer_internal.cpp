@@ -75,7 +75,9 @@ namespace casadi {
     // Read meta information from file
     if (can_have_meta()) {
       casadi_int offset = 0;
-      std::ifstream file(name_);
+      auto file_ptr = Filesystem::ifstream_ptr(name_);
+      std::istream& file = *file_ptr;
+
       std::string line;
       while (getline(file, line)) {
         // Update offset

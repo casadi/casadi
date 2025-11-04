@@ -257,7 +257,9 @@ namespace casadi {
     std::vector<std::pair<std::string, bool> > ret;
 
     // Read line-by-line
-    std::ifstream setup_file(path + sep + file);
+    auto setup_file_ptr = Filesystem::ifstream_ptr(path + sep + file);
+    std::istream& setup_file = *setup_file_ptr;
+
     std::string line;
     while (std::getline(setup_file, line)) {
       // Skip empty lines

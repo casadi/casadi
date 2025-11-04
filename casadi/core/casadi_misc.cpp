@@ -26,6 +26,9 @@
 #include "mx.hpp"
 
 #include "casadi_misc.hpp"
+#include "global_options.hpp"
+#include "filesystem_impl.hpp"
+
 #include "casadi_os.hpp"
 #ifdef HAVE_MKSTEMPS
 #define CASADI_NEED_UNISTD
@@ -338,7 +341,10 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
   std::string ret;
   int fd = simple_mkstemps_fd(prefix, suffix, ret);
   if (fd==-1) {
-    casadi_error("Failed to create temporary file: '" + ret + "'");
+    casadi_error("Failed to create temporary file: '" + ret + ". '"
+      + (Filesystem::is_enabled() ? "" : "Does the directory exits? "
+      "Note that CasADi needs to be compiled with WITH_GHC_FILESYSTEM=ON "
+      "for directories to be automatically created."));
   } else {
 #ifdef _WIN32
       _close(fd);
@@ -350,20 +356,35 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
 }
 #endif // HAVE_SIMPLE_MKSTEMPS
 
-  std::string temporary_file(const std::string& prefix, const std::string& suffix) {
+  std::string temporary_file(const std::string& prefix,
+      const std::string& suffix,
+      const std::string& directory) {
+
+    std::string temp_dir = Filesystem::ensure_trailing_slash(directory);
+    if (temp_dir.empty()) temp_dir = GlobalOptions::getTempWorkDir();
+
+    if (Filesystem::is_enabled()) {
+      casadi_assert(Filesystem::ensure_directory_exists(temp_dir),
+        "Unable to create the required directory for '" + temp_dir + "'.");
+    }
+
     #ifdef HAVE_MKSTEMPS
     // Preferred solution
-    std::string ret = prefix + "XXXXXX" + suffix;
+    std::string ret = temp_dir + prefix + "XXXXXX" + suffix;
     if (mkstemps(&ret[0], static_cast<int>(suffix.size())) == -1) {
-      casadi_error("Failed to create temporary file: '" + ret + "'");
+      casadi_error("Failed to create temporary file: '" + ret + "'. "
+      + (Filesystem::is_enabled() ? "" : "Does the directory exits? "
+      "Note that CasADi needs to be compiled with WITH_GHC_FILESYSTEM=ON "
+      "for directories to be automatically created."));
     }
     return ret;
     #else // HAVE_MKSTEMPS
     #ifdef HAVE_SIMPLE_MKSTEMPS
-    return simple_mkstemps(prefix, suffix);
+    return simple_mkstemps(temp_dir + prefix, suffix);
     #else // HAVE_SIMPLE_MKSTEMPS
+    casadi_assert(temp_dir=="./", "tmpnam fallback not compatible with custom temporary directory");
     // Fallback, may result in deprecation warnings
-    return prefix + std::string(tmpnam(nullptr)) + suffix;
+    return std::string(tmpnam(nullptr)) + suffix;
     #endif // HAVE_SIMPLE_MKSTEMPS
     #endif // HAVE_MKSTEMPS
   }

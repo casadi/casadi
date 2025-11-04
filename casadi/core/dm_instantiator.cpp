@@ -208,8 +208,8 @@ namespace casadi {
       const Sparsity& sp, const double* nonzeros,
       const std::string& format_hint) {
     std::string format = Sparsity::file_format(filename, format_hint, {"mtx", "txt"});
-    std::ofstream out;
-    Filesystem::open(out, filename);
+    auto out_ptr = Filesystem::ofstream_ptr(filename);
+    std::ostream& out = *out_ptr;
     if (format=="mtx") {
       normalized_setup(out);
       out << "%%MatrixMarket matrix coordinate real general" << std::endl;
@@ -261,8 +261,8 @@ namespace casadi {
   template<>
   DM CASADI_EXPORT DM::from_file(const std::string& filename, const std::string& format_hint) {
     std::string format = Sparsity::file_format(filename, format_hint, {"mtx", "txt"});
-    std::ifstream in(filename);
-    casadi_assert(in.good(), "Could not open '" + filename + "'.");
+    auto in_ptr = Filesystem::ifstream_ptr(filename);
+    std::istream& in = *in_ptr;
 
     if (format=="txt") {
       std::string line;

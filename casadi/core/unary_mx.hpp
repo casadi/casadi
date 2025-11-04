@@ -63,7 +63,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{17a} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique=std::vector<bool>()) const override;
 
     /** \brief Evaluate the MX node on a const/linear/nonlinear partition
 
@@ -98,6 +99,11 @@ namespace casadi {
         \identifier{17f} */
     bool is_unary() const override { return true;}
 
+    /** \brief Check if not negative
+
+        \identifier{2e8} */
+    bool is_nonnegative() const override;
+
     /** \brief Get the operation
 
         \identifier{17g} */
@@ -115,11 +121,9 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
 
-    /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
-
     /// Get a binary operation operation
-    MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY) const override;
+    MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY,
+        bool unique_x=false, bool unique_y=false) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth
 

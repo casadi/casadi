@@ -29,6 +29,32 @@
 
 namespace casadi {
 
+// Memory object
+struct CASADI_EXPORT Fmu3Memory : public FmuMemory {
+  Fmu3::Value aux_value;
+  // Constructor
+  explicit Fmu3Memory(const FmuFunction& self) : FmuMemory(self) {}
+};
+
+int Fmu3::init_mem(FmuMemory* mem) const {
+  if (FmuInternal::init_mem(mem)) return 1;
+  auto m = static_cast<Fmu3Memory*>(mem);
+  /// Allocate numerical values for initial auxilliary variables
+  m->aux_value.v_real.resize(vn_aux_real_.size());
+  m->aux_value.v_integer.resize(vn_aux_integer_.size());
+  m->aux_value.v_boolean.resize(vn_aux_boolean_.size());
+  m->aux_value.v_string.resize(vn_aux_string_.size());
+  return 0;
+}
+
+FmuMemory* Fmu3::alloc_mem(const FmuFunction& f) const {
+  return new Fmu3Memory(f);
+}
+
+void Fmu3::free_mem(void *mem) const {
+  delete static_cast<Fmu3Memory*>(mem);
+}
+
 Fmu3::~Fmu3() {
 }
 
@@ -163,12 +189,17 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
         casadi_warning("Ignoring " + v.name + ", type: " + to_string(v.type));
     }
   }
+}
 
+void Fmu3::finalize() {
   /// Allocate numerical values for initial auxilliary variables
   aux_value_.v_real.resize(vn_aux_real_.size());
   aux_value_.v_integer.resize(vn_aux_integer_.size());
   aux_value_.v_boolean.resize(vn_aux_boolean_.size());
   aux_value_.v_string.resize(vn_aux_string_.size());
+
+  // Recursive call
+  FmuInternal::finalize();
 }
 
 void Fmu3::load_functions() {
@@ -380,11 +411,15 @@ int Fmu3::set_values(void* instance) const {
 }
 
 int Fmu3::get_aux(void* instance) {
+  return get_aux_impl(instance, aux_value_);
+}
+
+int Fmu3::get_aux_impl(void* instance, Value& aux_value) const {
   auto c = static_cast<fmi3Instance>(instance);
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
     fmi3Status status = get_float64_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
-      get_ptr(aux_value_.v_real), vr_aux_real_.size());
+      get_ptr(aux_value.v_real), vr_aux_real_.size());
     if (status != fmi3OK) {
       casadi_warning("fmi3GetFloat64 failed");
       return 1;
@@ -393,7 +428,7 @@ int Fmu3::get_aux(void* instance) {
   // Get integer/enum auxilliary variables
   if (!vr_aux_integer_.empty()) {
     fmi3Status status = get_int32_(c, get_ptr(vr_aux_integer_), vr_aux_integer_.size(),
-      get_ptr(aux_value_.v_integer), vr_aux_integer_.size());
+      get_ptr(aux_value.v_integer), vr_aux_integer_.size());
     if (status != fmi3OK) {
       casadi_warning("fmi3GetInt32 failed");
       return 1;
@@ -413,7 +448,7 @@ int Fmu3::get_aux(void* instance) {
   // Get string auxilliary variables
   for (size_t k = 0; k < vr_aux_string_.size(); ++k) {
     fmi3ValueReference vr = vr_aux_string_[k];
-    fmi3String value = aux_value_.v_string.at(k).c_str();
+    fmi3String value = aux_value.v_string.at(k).c_str();
     fmi3Status status = set_string_(c, &vr, 1, &value, 1);
     if (status != fmi3OK) {
       casadi_error("fmi3GetString failed for value reference " + str(vr));
@@ -425,10 +460,8 @@ int Fmu3::get_aux(void* instance) {
 
 void Fmu3::get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const {
-  // To do: Use auxillary variables from last evaluation
-  (void)m;  // unused
-  // Auxilliary values to be copied
-  const Value& v = aux_value_;
+  Value& v = static_cast<Fmu3Memory*>(m)->aux_value;
+  get_aux_impl(m->instance, v);
   // Collect auxilliary variables
   Dict aux;
   // Real
@@ -483,6 +516,72 @@ Fmu3::Fmu3(const std::string& name,
   get_directional_derivative_ = 0;
   get_adjoint_derivative_ = 0;
   update_discrete_states_ = 0;
+}
+
+
+Fmu3* Fmu3::deserialize(DeserializingStream& s) {
+  Fmu3* ret = new Fmu3(s);
+  ret->finalize();
+  return ret;
+}
+
+Fmu3::Fmu3(DeserializingStream& s) : FmuInternal(s) {
+  instantiate_model_exchange_ = 0;
+  free_instance_ = 0;
+  reset_ = 0;
+  enter_initialization_mode_ = 0;
+  exit_initialization_mode_ = 0;
+  enter_continuous_time_mode_ = 0;
+  set_time_ = 0;
+  set_float64_ = 0;
+  set_boolean_ = 0;
+  get_float64_ = 0;
+  get_directional_derivative_ = 0;
+  get_adjoint_derivative_ = 0;
+  update_discrete_states_ = 0;
+
+  s.version("Fmu3", 1);
+  s.unpack("Fmu3::vr_real", vr_real_);
+  s.unpack("Fmu3::vr_integer", vr_integer_);
+  s.unpack("Fmu3::vr_boolean", vr_boolean_);
+  s.unpack("Fmu3::vr_string", vr_string_);
+  s.unpack("Fmu3::init_real", init_real_);
+  s.unpack("Fmu3::init_integer", init_integer_);
+  s.unpack("Fmu3::init_boolean", init_boolean_);
+  s.unpack("Fmu3::init_string", init_string_);
+
+  s.unpack("Fmu3::vn_aux_real", vn_aux_real_);
+  s.unpack("Fmu3::vn_aux_integer", vn_aux_integer_);
+  s.unpack("Fmu3::vn_aux_boolean", vn_aux_boolean_);
+  s.unpack("Fmu3::vn_aux_string", vn_aux_string_);
+  s.unpack("Fmu3::vr_aux_real", vr_aux_real_);
+  s.unpack("Fmu3::vr_aux_integer", vr_aux_integer_);
+  s.unpack("Fmu3::vr_aux_boolean", vr_aux_boolean_);
+  s.unpack("Fmu3::vr_aux_string", vr_aux_string_);
+}
+
+
+void Fmu3::serialize_body(SerializingStream &s) const {
+  FmuInternal::serialize_body(s);
+
+  s.version("Fmu3", 1);
+  s.pack("Fmu3::vr_real", vr_real_);
+  s.pack("Fmu3::vr_integer", vr_integer_);
+  s.pack("Fmu3::vr_boolean", vr_boolean_);
+  s.pack("Fmu3::vr_string", vr_string_);
+  s.pack("Fmu3::init_real", init_real_);
+  s.pack("Fmu3::init_integer", init_integer_);
+  s.pack("Fmu3::init_boolean", init_boolean_);
+  s.pack("Fmu3::init_string", init_string_);
+
+  s.pack("Fmu3::vn_aux_real", vn_aux_real_);
+  s.pack("Fmu3::vn_aux_integer", vn_aux_integer_);
+  s.pack("Fmu3::vn_aux_boolean", vn_aux_boolean_);
+  s.pack("Fmu3::vn_aux_string", vn_aux_string_);
+  s.pack("Fmu3::vr_aux_real", vr_aux_real_);
+  s.pack("Fmu3::vr_aux_integer", vr_aux_integer_);
+  s.pack("Fmu3::vr_aux_boolean", vr_aux_boolean_);
+  s.pack("Fmu3::vr_aux_string", vr_aux_string_);
 }
 
 } // namespace casadi

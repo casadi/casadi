@@ -135,7 +135,7 @@ print(array(res["jac_alg_z"]))
 
 # We create a DAE system solver
 
-I = integrator('I', 'idas', dae, {'t0':0, 'tf':1, 'init_xdot':XDOT_})
+I = integrator('I', 'idas', dae, 0, 1, {'init_xdot':XDOT_})
 res = I(p=P_, x0=X_, z0=Z_)
 print(res['xf'])
 

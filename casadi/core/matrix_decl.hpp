@@ -510,6 +510,17 @@ namespace casadi {
     static Matrix<Scalar> norm_inf_mul(const Matrix<Scalar>& x, const Matrix<Scalar> &y);
     static Matrix<Scalar> diagcat(const std::vector< Matrix<Scalar> > &A);
     ///@}
+
+    // Simplification with reference counting awareness
+    static bool simplify_ref_count(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts = Dict());
+
+    // Simplification with constant folding
+    static bool simplify_const_folding(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts = Dict());
+
     /// \endcond
 #endif // SWIG
 
@@ -1187,6 +1198,33 @@ namespace casadi {
 
         \identifier{19z} */
     bool is_minus_one() const;
+
+    /** \brief  check if the matrix is 0.5 (note that false negative answers are possible)
+
+        \identifier{2en} */
+    bool is_half() const;
+
+    /** \brief  check if the matrix is value
+
+        \identifier{2eo} */
+    bool is_value(double val) const;
+
+    /** \brief  check if the matrix is inf (note that false negative answers are possible)
+
+        \identifier{2e9} */
+    bool is_inf() const;
+
+    /** \brief  check if the matrix is -inf (note that false negative answers are possible)
+
+        \identifier{2ea} */
+    bool is_minus_inf() const;
+
+    /** \brief  check if the matrix is not negative 
+
+     (note that false negative answers are possible)
+
+        \identifier{2eb} */
+    bool is_nonnegative() const;
 
     /** \brief  check if the matrix is an identity matrix (note that false negative answers
 

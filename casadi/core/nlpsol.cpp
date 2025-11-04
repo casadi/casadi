@@ -28,6 +28,7 @@
 #include "casadi/core/timing.hpp"
 #include "nlp_builder.hpp"
 #include "nlp_tools.hpp"
+#include <cctype>
 
 namespace casadi {
 
@@ -41,6 +42,21 @@ namespace casadi {
 
   std::string doc_nlpsol(const std::string& name) {
     return Nlpsol::getPlugin(name).doc;
+  }
+
+  bool name_has_g(const std::string& name) {
+    size_t pos = name.find("g");
+
+    // 'g' does not occur
+    if (pos == std::string::npos) return false;
+
+    // Check if 'g' has a word boundary on the left
+    bool left = pos==0 || !isalnum(name[pos-1]);
+
+    // Check if 'g' has a word boundary on the right
+    bool right = pos+1 == name.size() || !isalnum(name[pos+1]);
+
+    return left && right;
   }
 
   template<class X>
@@ -101,6 +117,67 @@ namespace casadi {
       nlpsol_opts["detect_simple_bounds_is_simple"] = is_simple;
       nlpsol_opts["detect_simple_bounds_parts"] = gf;
       nlpsol_opts["detect_simple_bounds_target_x"] = target_x;
+
+      // Check for cache entries
+      Dict cache = get_from_dict(opts, "cache", Dict());
+      for (auto&& e : cache) {
+        const Function& f = e.second;
+
+        // Check for cached Functions where g appears in in/out
+        bool needs_update = false;
+        for (casadi_int i=0;i<f.n_in();++i) {
+          // Does name contain 'g'?
+          if (name_has_g(f.name_in(i))) {
+            // Already has compated size
+            if (f.size1_in(i)==gi.size()) continue;
+            // Needs to be compacted
+            if (f.size1_in(i)==ng) needs_update = true;
+            // Structure not understood, fallback to higher-level sanity checking
+          }
+        }
+        for (casadi_int i=0;i<f.n_out();++i) {
+          if (name_has_g(f.name_out(i))) {
+            if (f.size1_out(i)==gi.size()) continue;
+            // Needs to be compacted
+            if (f.size1_out(i)==ng) needs_update = true;
+            // Structure not understood, fallback to higher-level sanity checking
+          }
+        }
+
+        if (!needs_update) continue;
+
+        // Arguments to create a wrapper
+        std::vector<X> args = f.sym_in<X>();
+        // Arguments to pass to the cached function
+        std::vector<X> f_args = args;
+
+        for (casadi_int i=0;i<f.n_in();++i) {
+          if (name_has_g(f.name_in(i))) {
+            // Needs a compacted symbol
+            args[i] = X::sym(f.name_in(i), gi.size());
+
+            // Perform projects
+            f_args[i] = X::zeros(ng);
+            f_args[i](gi) = args[i];
+          }
+        }
+
+        // Peform call
+        std::vector<X> res;
+        f.call(f_args, res, false, false);
+
+        for (casadi_int i=0;i<f.n_out();++i) {
+          if (name_has_g(f.name_out(i))) {
+            // Select compacted rows out of result
+            res[i] = res[i](gi, casadi::Slice());
+          }
+        }
+
+        // Create wrapper
+        cache[e.first] = Function(f.name(), args, res, f.name_in(), f.name_out());
+      }
+      // Pass along potentially updated cache
+      nlpsol_opts["cache"] = cache;
 
       if (opts.find("equality")!=opts.end()) {
         std::vector<bool> equality = opts.find("equality")->second;
@@ -418,9 +495,14 @@ namespace casadi {
   };
 
   void Nlpsol::init(const Dict& opts) {
+    // Default options
+    bool expand = false;
+
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="detect_simple_bounds_is_simple") {
+      if (op.first=="expand") {
+        expand = op.second;
+      } else if (op.first=="detect_simple_bounds_is_simple") {
         assign_vector(op.second.to_bool_vector(), detect_simple_bounds_is_simple_);
         //detect_simple_bounds_is_simple_ = op.second.to_bool_vector();
       } else if (op.first=="detect_simple_bounds_parts") {
@@ -434,6 +516,11 @@ namespace casadi {
       if (detect_simple_bounds_is_simple_[i]) {
         detect_simple_bounds_target_g_.push_back(i);
       }
+    }
+
+    // Not covered by oracle expansion
+    if (expand && !detect_simple_bounds_parts_.is_null()) {
+      detect_simple_bounds_parts_ = detect_simple_bounds_parts_.expand();
     }
 
     // Call the initialization method of the base class
@@ -1249,6 +1336,7 @@ namespace casadi {
 
   void Nlpsol::codegen_declarations(CodeGenerator& g) const {
     g.add_auxiliary(CodeGenerator::AUX_FILL);
+    g.add_auxiliary(CodeGenerator::AUX_INF);
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
       g.add_dependency(get_function("nlp_grad"));
 

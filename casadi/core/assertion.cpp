@@ -40,7 +40,8 @@ namespace casadi {
     return "assertion(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
-  void Assertion::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Assertion::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = arg[0].attachAssert(arg[1], fail_message_);
   }
 

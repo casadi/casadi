@@ -1640,6 +1640,53 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  bool Matrix<Scalar>::is_half() const {
+    if (!is_dense()) return false;
+
+    // Look for non-halves
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_half(e)) return false;
+
+    return true;
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::is_value(double val) const {
+    if (val==0.0) return is_zero();
+    if (!is_dense()) return false;
+
+    // Look for non-values
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_value(e, val)) return false;
+
+    return true;
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::is_inf() const {
+    if (!is_dense()) return false;
+
+    // Look for inf
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_inf(e)) return false;
+
+    return true;
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::is_minus_inf() const {
+    if (!is_dense()) return false;
+
+    // Look for -inf
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_minus_inf(e)) return false;
+
+    return true;
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::is_nonnegative() const {
+    for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_nonnegative(e)) return false;
+    return true;
+  }
+
+  template<typename Scalar>
   bool Matrix<Scalar>::is_zero() const {
 
     // Look for non-zeros
@@ -2472,6 +2519,26 @@ namespace casadi {
     }
 
     return Matrix<Scalar>(Sparsity::diagcat(sp), data, false);
+  }
+
+  /** \brief   Simplification with reference counting awareness
+
+      \identifier{2ek} */
+  template<typename Scalar>
+  bool Matrix<Scalar>::simplify_ref_count(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts) {
+    casadi_error("'simplify_ref_count' not defined for " + type_name());
+  }
+
+  /** \brief   Simplification with reference counting awareness
+
+      \identifier{2el} */
+  template<typename Scalar>
+  bool Matrix<Scalar>::simplify_const_folding(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts) {
+    casadi_error("'simplify_const_folding' not defined for " + type_name());
   }
 
   template<typename Scalar>

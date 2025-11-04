@@ -74,6 +74,8 @@ namespace casadi {
 
       static casadi_int copy_elision_min_size;
 
+      static std::string temp_work_dir; // Temporary work directory
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -99,6 +101,9 @@ namespace casadi {
         }
       }
       static casadi_int getCopyElisionMinSize() { return copy_elision_min_size; }
+
+      static void setTempWorkDir(const std::string& dir);
+      static std::string getTempWorkDir() { return temp_work_dir; }
 
   };
 

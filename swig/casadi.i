@@ -3222,7 +3222,7 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
         if (dim==0) return sum1(x);
         if (dim==1) return sum2(x);
         casadi_error(
-          "Expected sum(A,1), sum(A,2), sum(A,\"all\") got " + casadi::str(dim) + " instead.");
+          "Expected sum(A,0), sum(A,1), sum(A,\"all\") got " + casadi::str(dim) + " instead.");
       }
       DECL M casadi_sum(const M& x) {
         return sum(x);
@@ -4910,6 +4910,17 @@ opti_metadata_modifiers(casadi::Opti)
     end
   %}
 }
+#endif
+
+#ifdef SWIGMATLAB
+%{
+#ifdef HAVE_OCTAVE
+  // Mandatory as of Octave 10
+  // Null effect for prior versions
+  extern "C" const int __octave_mex_soversion__ = 1;
+#endif
+%}
+
 #endif
 
 %include <casadi/core/resource.hpp>

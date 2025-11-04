@@ -333,6 +333,18 @@ namespace casadi {
     return Function(name, ex_in, ex_out, name_in(), name_out(), my_opts);
   }
 
+  Function Function::simplify(const Dict& opts) const {
+    return simplify(name(), opts);
+  }
+
+  Function Function::simplify(const std::string& name, const Dict& opts) const {
+    try {
+      return (*this)->simplify(name, opts);
+    } catch(std::exception& e) {
+      THROW_ERROR("simplify", e.what());
+    }
+  }
+
   Function Function::create(FunctionInternal* node) {
     Function ret;
     ret.own(node);
@@ -1181,6 +1193,15 @@ namespace casadi {
     }
   }
 
+  void Function::reset_dump_count() {
+    try {
+      (*this)->reset_dump_count();
+    } catch(std::exception& e) {
+      THROW_ERROR("reset_dump_count", e.what());
+    }
+  }
+
+
   std::vector<std::string> Function::get_free() const {
     return (*this)->get_free();
   }
@@ -1203,8 +1224,8 @@ namespace casadi {
     std::vector<double> d = nz_from_in(arg);
 
     // Set up output stream
-    std::ofstream of;
-    Filesystem::open(of, fname);
+    auto of_ptr = Filesystem::ofstream_ptr(fname);
+    std::ostream& of = *of_ptr;
     normalized_setup(of);
 
     // Encode each output
@@ -1218,8 +1239,8 @@ namespace casadi {
     std::vector<double> d = nz_from_out(res);
 
     // Set up output stream
-    std::ofstream of;
-    Filesystem::open(of, fname);
+    auto of_ptr = Filesystem::ofstream_ptr(fname);
+    std::ostream& of = *of_ptr;
     normalized_setup(of);
 
     // Encode each output
@@ -1260,9 +1281,8 @@ namespace casadi {
 
   void Function::export_code(const std::string& lang,
       const std::string &fname, const Dict& options) const {
-    std::ofstream stream;
-    Filesystem::open(stream, fname);
-    return (*this)->export_code(lang, stream, options);
+    auto stream_ptr = Filesystem::ofstream_ptr(fname);
+    return (*this)->export_code(lang, *stream_ptr, options);
   }
 
 
@@ -1917,8 +1937,16 @@ namespace casadi {
     return (*this)->wrap();
   }
 
+  Function Function::wrap(const std::string& name) const {
+    return (*this)->wrap(name);
+  }
+
   Function Function::wrap_as_needed(const Dict& opts) const {
     return (*this)->wrap_as_needed(opts);
+  }
+
+  Function Function::wrap_as_needed(const std::string& name, const Dict& opts) const {
+    return (*this)->wrap_as_needed(name, opts);
   }
 
   bool Function::operator==(const Function& f) const {
@@ -2008,6 +2036,25 @@ namespace casadi {
 
   Dict FunctionBuffer::stats() const {
     return f_.stats(mem_);
+  }
+
+
+  template<>
+  const SX CASADI_EXPORT Function::sym_in(casadi_int iind) const {
+      return sx_in(iind);
+  }
+  template<>
+  const MX CASADI_EXPORT Function::sym_in(casadi_int iind) const {
+      return mx_in(iind);
+  }
+
+  template<>
+  const std::vector<SX> CASADI_EXPORT Function::sym_in() const {
+      return sx_in();
+  }
+  template<>
+  const std::vector<MX> CASADI_EXPORT Function::sym_in() const {
+      return mx_in();
   }
 
 } // namespace casadi

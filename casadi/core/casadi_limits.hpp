@@ -62,6 +62,12 @@ namespace casadi {
       static bool is_minus_one(const T& val) {
         return val==-1;
       }
+      static bool is_value(const T& val, T v) {
+        return val==v;
+      }
+      static bool is_half(const T& val) {
+        return val==0.5;
+      }
       static bool is_constant(const T& val) {
         return true;
       }
@@ -73,6 +79,9 @@ namespace casadi {
       }
       static bool is_minus_inf(const T& val) {
         return std::numeric_limits<T>::has_infinity && val==-std::numeric_limits<T>::infinity();
+      }
+      static bool is_nonnegative(const T& val) {
+        return val>=0;
       }
       static bool is_nan(const T& val) {
         return std::numeric_limits<T>::has_quiet_NaN && val!=val;

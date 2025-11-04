@@ -31,7 +31,7 @@ from casadi import *
 # This form is well-suited for the Gauss-Newton Hessian approximation.
 
 ############ SETTINGS #####################
-N = 10000  # Number of samples
+N = 2000  # Number of samples
 fs = 610.1 # Sampling frequency [hz]
 
 param_truth = DM([5.625e-6,2.3e-4,1,4.69])
@@ -103,6 +103,7 @@ if Importer.has_plugin('clang'):
   compiler = 'clang'
 elif Importer.has_plugin('shell'):
   with_jit = True
+  print("WARNING: on Windows, JIT may require a special environment cfr https://github.com/casadi/casadi/wiki/FAQ:-how-to-perform-jit-for-function-evaluations-of-my-optimization-problem%3F")
   compiler = 'shell'
 else:
   print("WARNING; running without jit. This may result in very slow evaluation times")

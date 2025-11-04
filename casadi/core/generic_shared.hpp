@@ -30,6 +30,7 @@
 #include "exception.hpp"
 #include <unordered_map>
 #include <vector>
+#include <cstdint>
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
 #include <mingw.mutex.h>
@@ -38,9 +39,7 @@
 #endif // CASADI_WITH_THREAD_MINGW
 #endif //CASADI_WITH_THREAD
 
-#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
 #include <memory>
-#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 namespace casadi {
 
@@ -235,7 +234,10 @@ namespace casadi {
 
 #endif // SWIG
 
-
+/**
+ * Key is stored as a regular ref
+ * Value is stored as weakref
+ */
 template<typename K, typename T>
 class CASADI_EXPORT WeakCache {
   public:
@@ -310,7 +312,82 @@ class CASADI_EXPORT WeakCache {
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 };
 
+// gcc-12 is overzealous about use-after-free warnings
+// <12 or >12 works fine
+#pragma GCC diagnostic push
+#if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ == 12)
+#pragma GCC diagnostic ignored "-Wuse-after-free"
+#endif
 
+/**
+ * Key is stored as a weakref
+ * Value is stored as regular ref
+ */
+template<typename K, typename T>
+class CASADI_EXPORT RevWeakCache {
+  public:
+    void tocache(const K& key, const T& f, bool needs_lock=true) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Safe access to cache_
+      casadi::conditional_lock_guard<std::mutex> lock(mtx_, needs_lock);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Add to cache
+      const void* k = key.get();
+      pre_cache_.insert(std::make_pair(k, key));
+      cache_.insert(std::make_pair(k, f));
+      // Remove a lost reference, if any, to prevent uncontrolled growth
+      for (auto it = pre_cache_.begin(); it!=pre_cache_.end(); ++it) {
+        if (!it->second.alive()) {
+          pre_cache_.erase(it);
+          cache_.erase(it->first);
+          break; // just one dead reference is enough
+        }
+      }
+    }
+    /* \brief Thread-safe unique caching
+    * While an incache/tocache pair in multi-threaded context is safe
+    * it may lead to fresh cache entries being overwritten.
+    *
+    * A mutex lock_guard on the scope of an incache/tocache pair
+    * may lead to deadlocks.
+    *
+    */
+    void tocache_if_missing(const K& key, T& f) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Safe access to cache_
+      std::lock_guard<std::mutex> lock(mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+      if (!incache(key, f, false)) {
+        tocache(key, f, false);
+      }
+    }
+    bool incache(const K& key, T& f, bool needs_lock=true) const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Safe access to cache_
+      casadi::conditional_lock_guard<std::mutex> lock(mtx_, needs_lock);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+      const void* k = key.get();
+      auto it = pre_cache_.find(k);
+      K temp;
+      if (it!=pre_cache_.end() && it->second.shared_if_alive(temp)) {
+        auto it2 = cache_.find(k);
+        f = it2->second;
+        return true;
+      } else {
+        return false;
+      }
+    }
+  private:
+    std::unordered_map<const void*,
+    GenericWeakRef<typename K::base_type, typename K::internal_base_type>
+    > pre_cache_;
+    std::unordered_map<const void*, T> cache_;
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    mutable std::mutex mtx_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+};
+
+#pragma GCC diagnostic pop
 
 } // namespace casadi
 

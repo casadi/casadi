@@ -319,6 +319,11 @@ namespace casadi {
         \identifier{k5} */
     void change_option(const std::string& option_name, const GenericType& option_value) override;
 
+    /** \brief Reset the counter used to name dump files
+
+        \identifier{2dx} */
+    void reset_dump_count();
+
     /** \brief Initialize
 
         \identifier{k6} */
@@ -381,6 +386,11 @@ namespace casadi {
     virtual std::vector<bool> which_depends(const std::string& s_in,
                                            const std::vector<std::string>& s_out,
                                            casadi_int order, bool tr=false) const;
+
+    /** \brief Create a new function with simplifications applied
+
+        \identifier{2ee} */
+    virtual Function simplify(const std::string& name, const Dict& opts) const;
 
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm?
@@ -785,12 +795,18 @@ namespace casadi {
     /** \brief Wrap in an Function instance consisting of only one MX call
 
         \identifier{li} */
+    ///@{
+    Function wrap(const std::string& name) const;
     Function wrap() const;
+    /// @}
 
     /** \brief Wrap in an Function instance consisting of only one MX call
 
         \identifier{lj} */
+    /// @{
+    Function wrap_as_needed(const std::string& name, const Dict& opts) const;
     Function wrap_as_needed(const Dict& opts) const;
+    /// @}
 
     /** \brief Get all functions in the cache
 
@@ -912,6 +928,11 @@ namespace casadi {
 
         \identifier{m4} */
     virtual void jit_dependencies(const std::string& fname) {}
+
+    /** \brief Get JIT directory from options
+
+        \identifier{2ec} */
+    static std::string get_jit_directory(const Dict& jit_options);
 
     /** \brief Export function in a specific language
 
@@ -1288,7 +1309,7 @@ namespace casadi {
 
         \identifier{ni} */
     std::string jit_name_;
-
+    std::string jit_directory_;
     std::string jit_base_name_;
 
     /** \brief Use a temporary name

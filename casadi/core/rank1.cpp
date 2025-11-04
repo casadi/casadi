@@ -36,7 +36,8 @@ namespace casadi {
       + ", " + arg.at(2) + ", " + arg.at(3) + ")";
   }
 
-  void Rank1::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void Rank1::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = rank1(arg[0], arg[1], arg[2], arg[3]);
   }
 

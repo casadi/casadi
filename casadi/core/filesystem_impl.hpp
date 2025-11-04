@@ -88,12 +88,16 @@ namespace casadi {
     static bool create_directories(const std::string& path);
     static std::vector<std::string> iterate_directory_names(const std::string& path);
 
-
-    static void open(std::ofstream&, const std::string& path,
+    static std::unique_ptr<std::ostream> ofstream_ptr(const std::string& path,
         std::ios_base::openmode mode = std::ios_base::out);
 
-    static std::ofstream* ofstream_ptr(const std::string& path,
-        std::ios_base::openmode mode = std::ios_base::out);
+    static std::unique_ptr<std::istream> ifstream_ptr(const std::string& path,
+        std::ios_base::openmode mode = std::ios_base::in, bool fail=true);
+
+    static bool exists(const std::string& path);
+
+    static bool is_absolute(const std::string& path);
+    static std::string ensure_trailing_slash(const std::string& path);
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
     static std::mutex mutex_solvers_;

@@ -784,6 +784,7 @@ jobs:
         if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_matlab.py -skipfiles="solvers.m" matlab
         if: "contains(env.os, 'windows')"
+      - run: cd test && python internal/test_matlab.py '../docs/examples/matlab' -skipfiles="sysid_gauss_newton.m MyCallback.m NlpCallback.m"
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -1096,6 +1097,7 @@ jobs:
           wget https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol3.fmu
           wget https://github.com/casadi/testbot/releases/download/perpetual/vdp.fmu
           wget https://github.com/casadi/testbot/releases/download/perpetual/cstr.fmu
+          wget https://github.com/casadi/testbot/releases/download/perpetual/car_t_fmu2.fmu 
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
@@ -1132,6 +1134,41 @@ jobs:
           python internal/test_pytest.py python -skipfiles="alltests.py nlp.py feasiblesqpmethod.py helpers.py complexity.py speed.py debug_fatrop.py" -skipdirs="hock_schittkowski" -memcheck -passoptions="--ignore_memory_heavy"
         shell: bash -el {0}
         if: contains(matrix.image, 'ubuntu')
+      - name: docs/api/examples
+        env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test
+          conda install pydot
+          pip install matplotlib scipy
+          python internal/test_py.py '../docs/api/examples' -skipfiles="n_nodes.py matrix_expand.py dotdraw.py"
+        shell: bash -el {0}
+        if: contains(matrix.image, 'windows')
+      - name: docs/api/examples
+        env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test
+          conda install pydot
+          pip install matplotlib scipy
+          # Weird PNG errors, not casadi's fault
+          python internal/test_py.py '../docs/api/examples'
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test
+          python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py modelica_fmu_import.py"
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test
+          python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py modelica_fmu_import.py nlp_codegen.py"
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - uses: jgillis/fetch-gh-release-asset@patch-1

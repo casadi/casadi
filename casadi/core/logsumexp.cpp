@@ -35,7 +35,8 @@ namespace casadi {
     return "logsumexp(" + arg.at(0) + ")";
   }
 
-  void LogSumExp::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void LogSumExp::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = logsumexp(arg[0]);
   }
 

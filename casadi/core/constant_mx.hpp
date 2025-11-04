@@ -81,7 +81,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{yv} */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const override;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -112,6 +113,9 @@ namespace casadi {
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override = 0;
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override = 0;
 
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override = 0;
@@ -238,10 +242,19 @@ namespace casadi {
     bool is_zero() const override;
     bool is_one() const override;
     bool is_minus_one() const override;
+    bool is_inf() const override;
+    bool is_minus_inf() const override;
+    bool is_half() const override;
+    bool is_value(double val) const override;
+    bool is_nonnegative() const override;
+    bool is_integer() const override;
     bool is_eye() const override;
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override {return x_.scalar();}
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override {return static_cast<casadi_int>(x_.scalar());}
 
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override { return x_;}
@@ -295,6 +308,9 @@ namespace casadi {
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override;
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override;
 
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override;
@@ -374,6 +390,9 @@ namespace casadi {
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override;
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override;
 
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override;
@@ -490,14 +509,18 @@ namespace casadi {
     /// Get the value (only for scalar constant nodes)
     double to_double() const override { return 0;}
 
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override {return 0;}
+
     /// Get the value (only for constant nodes)
     DM get_DM() const override { return DM(); }
 
     /// Get densification
-    MX get_project(const Sparsity& sp) const override;
+    MX get_project(const Sparsity& sp, bool unique=false) const override;
 
     /// Get the nonzeros of matrix
-    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique=false) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
     MX get_nzassign(const MX& y, const std::vector<casadi_int>& nz) const override;
@@ -506,10 +529,11 @@ namespace casadi {
     MX get_transpose() const override;
 
     /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
+    MX get_unary(casadi_int op, bool unique) const override;
 
     /// Get a binary operation operation
-    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const override;
+    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY,
+        bool unique_x=false, bool unique_y=false) const override;
 
     /// Reshape
     MX get_reshape(const Sparsity& sp) const override;
@@ -630,14 +654,25 @@ namespace casadi {
     /** \brief  Check if a particular integer value
 
         \identifier{10c} */
-    bool is_zero() const override { return v_.value==0;}
-    bool is_one() const override { return v_.value==1;}
-    bool is_eye() const override { return v_.value==1 && sparsity().is_diag();}
-    bool is_value(double val) const override { return v_.value==val;}
+    bool is_zero() const override;
+    bool is_one() const override;
+    bool is_minus_one() const override;
+    bool is_half() const override;
+    bool is_inf() const override;
+    bool is_minus_inf() const override;
+    bool is_nonnegative() const override;
+    bool is_integer() const override;
+    bool is_eye() const override;
+    bool is_value(double val) const override;
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override {
       return static_cast<double>(v_.value);
+    }
+
+    /// Get the value (only for scalar constant nodes)
+    casadi_int to_int() const override {
+      return static_cast<casadi_int>(v_.value);
     }
 
     /// Get the value (only for constant nodes)
@@ -646,10 +681,11 @@ namespace casadi {
     }
 
     /// Get densification
-    MX get_project(const Sparsity& sp) const override;
+    MX get_project(const Sparsity& sp, bool unique=false) const override;
 
     /// Get the nonzeros of matrix
-    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique=false) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
     MX get_nzassign(const MX& y, const std::vector<casadi_int>& nz) const override;
@@ -658,10 +694,11 @@ namespace casadi {
     MX get_transpose() const override;
 
     /// Get a unary operation
-    MX get_unary(casadi_int op) const override;
+    MX get_unary(casadi_int op, bool unique=false) const override;
 
     /// Get a binary operation operation
-    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const override;
+    MX _get_binary(casadi_int op, const MX& y, bool ScX, bool ScY,
+        bool unique_x=false, bool unique_y=false) const override;
 
     /// Reshape
     MX get_reshape(const Sparsity& sp) const override;
@@ -688,6 +725,57 @@ namespace casadi {
 
     Value v_;
   };
+
+  template<typename Value>
+  bool Constant<Value>::is_zero() const {
+    return v_.value==0;
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_one() const {
+    return sparsity().is_dense() && v_.value==1;
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_minus_one() const {
+    return sparsity().is_dense() && v_.value==-1;
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_half() const {
+    return sparsity().is_dense() && v_.value==0.5;
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_inf() const {
+    return sparsity().is_dense() && casadi_limits<double>::is_inf(v_.value);
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_minus_inf() const {
+    return sparsity().is_dense() && casadi_limits<double>::is_minus_inf(v_.value);
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_nonnegative() const {
+    return casadi_limits<double>::is_nonnegative(v_.value);
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_integer() const {
+    return casadi_limits<double>::is_integer(v_.value);
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_eye() const {
+    return v_.value==1 && sparsity().is_diag();
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_value(double val) const {
+    if (val==0) return is_zero();
+    return sparsity().is_dense() && v_.value==val;
+  }
 
   template<typename Value>
   void Constant<Value>::serialize_type(SerializingStream& s) const {
@@ -748,7 +836,7 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_unary(casadi_int op) const {
+  MX Constant<Value>::get_unary(casadi_int op, bool unique) const {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op, to_double(), 0.0, ret);
@@ -770,7 +858,8 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::_get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const {
+  MX Constant<Value>::_get_binary(casadi_int op, const MX& y, bool ScX, bool ScY,
+      bool unique_x, bool unique_y) const {
     casadi_assert_dev(sparsity()==y.sparsity() || ScX || ScY);
 
     if (ScX && !operation_checker<FX0Checker>(op)) {
@@ -780,7 +869,7 @@ namespace casadi {
       if (ret!=0) {
         Sparsity f = Sparsity::dense(y.size1(), y.size2());
         MX yy = project(y, f);
-        return MX(f, shared_from_this<MX>())->_get_binary(op, yy, false, false);
+        return MX(f, shared_from_this<MX>())->_get_binary(op, yy, false, false, unique_x, unique_y);
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
@@ -792,7 +881,7 @@ namespace casadi {
       if (grow) {
         Sparsity f = Sparsity::dense(size1(), size2());
         MX xx = project(shared_from_this<MX>(), f);
-        return xx->_get_binary(op, MX(f, y), false, false);
+        return xx->_get_binary(op, MX(f, y), false, false, unique_x, unique_y);
       }
     }
 
@@ -831,7 +920,7 @@ namespace casadi {
     }
 
     // Fallback
-    return MXNode::_get_binary(op, y, ScX, ScY);
+    return MXNode::_get_binary(op, y, ScX, ScY, unique_x, unique_y);
   }
 
   template<typename Value>
@@ -867,7 +956,8 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
+  MX Constant<Value>::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
     if (v_.value!=0) {
       // Check if any "holes"
       for (std::vector<casadi_int>::const_iterator k=nz.begin(); k!=nz.end(); ++k) {
@@ -891,13 +981,13 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::get_project(const Sparsity& sp) const {
+  MX Constant<Value>::get_project(const Sparsity& sp, bool unique) const {
     if (is_zero()) {
       return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.is_dense()) {
       return densify(get_DM());
     } else {
-      return MXNode::get_project(sp);
+      return MXNode::get_project(sp, unique);
     }
   }
 

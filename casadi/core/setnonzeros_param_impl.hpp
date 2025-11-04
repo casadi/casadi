@@ -81,7 +81,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosParamVector<Add>::
-  eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, const std::vector<bool>& unique) const {
     // Add to the element to the sensitivity, if any
     MX arg0 = project(arg[0], this->dep(0).sparsity());
     MX arg1 = project(arg[1], this->dep(1).sparsity());
@@ -95,7 +95,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosParamSlice<Add>::
-  eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, const std::vector<bool>& unique) const {
     // Add to the element to the sensitivity, if any
     MX arg0 = project(arg[0], this->dep(0).sparsity());
     MX arg1 = project(arg[1], this->dep(1).sparsity());
@@ -109,7 +109,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSliceParam<Add>::
-  eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, const std::vector<bool>& unique) const {
     // Add to the element to the sensitivity, if any
     MX arg0 = project(arg[0], this->dep(0).sparsity());
     MX arg1 = project(arg[1], this->dep(1).sparsity());
@@ -123,7 +123,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosParamParam<Add>::
-  eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  eval_mx(const std::vector<MX>& arg, std::vector<MX>& res, const std::vector<bool>& unique) const {
     // Add to the element to the sensitivity, if any
     MX arg0 = project(arg[0], this->dep(0).sparsity());
     MX arg1 = project(arg[1], this->dep(1).sparsity());

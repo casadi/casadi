@@ -1438,6 +1438,192 @@ class MXtests(casadiTestCase):
       self.assertTrue(is_equal(w[1],b))
       self.assertTrue(is_equal(w[2],c))
 
+  def test_simplifications(self):
+    for X in [SX,MX]:
+        a = X.sym("a")
+        b = X.sym("b")
+        c = X.sym("c")
+        
+        A = X.sym("A",2,2)
+        B = X.sym("B",2,2)
+        
+        args = [a,b,c,A,B]
+        x = sin(a)
+        y = sin(b)
+        z = sin(c)
+        
+        X = sin(A)
+        Y = sin(B)
+        
+        DM.rng(1)
+        
+        a0 = DM.rand(a.sparsity())
+        b0 = DM.rand(b.sparsity())
+        c0 = DM.rand(c.sparsity())
+        A0 = DM.rand(A.sparsity())
+        B0 = DM.rand(B.sparsity())
+
+        x0 = sin(a0)
+        y0 = sin(b0)
+        z0 = sin(c0)
+        X0 = sin(A0)
+        Y0 = sin(B0)
+        
+        dx = x-y
+          
+        count = 1477
+ 
+        for refcount,on_the_fly,genA,B in [
+            (False,True,lambda x,y,z, X,Y :y*(x)+y*(1-x), y),
+            (False,X is MX,lambda x,y,z, X,Y :2*x-x, x),
+            (False,True,lambda x,y,z, X,Y :4*x-3*x,x),
+            (False,True,lambda x,y,z, X,Y :0.2*x+0.8*x,x),
+            (False,True,lambda x,y,z, X,Y :(x + 0), x),
+            (False,X is MX,lambda x,y,z, X,Y :(0 + x), x),
+            (False,True,lambda x,y,z, X,Y :(x + (-y)), x - y),
+            (False,X is MX,lambda x,y,z, X,Y :((-x) + y), y - x),
+            (False,True,lambda x,y,z, X,Y :((0.5*x) + (0.5*x)), x),
+            (False,True,lambda x,y,z, X,Y :((x/2) + (x/2)), x),
+            (False,True,lambda x,y,z, X,Y :((x - y) + y), x),
+            (False,True,lambda x,y,z, X,Y :(y + (x - y)), x),
+            (False,True,lambda x,y,z, X,Y :(sin(x)**2 + cos(x)**2), 1),
+            (False,True,lambda x,y,z, X,Y :(x - 0), x),
+            (False,X is MX,lambda x,y,z, X,Y :(0 - x), -x),
+            (False,True,lambda x,y,z, X,Y :(x - x), 0),
+            (False,True,lambda x,y,z, X,Y :(x - (-y)), x + y),
+            (False,True,lambda x,y,z, X,Y :((x + y) - y), x),
+            (False,True,lambda x,y,z, X,Y :((x + y) - x), y),
+            (False,True,lambda x,y,z, X,Y :(x - (y + x)), -y),
+            (False,True,lambda x,y,z, X,Y :(x - (x + y)), -y),
+            (False,True,lambda x,y,z, X,Y :((-x) - y), -(x + y)),
+            (False,True,lambda x,y,z, X,Y :(x * x), x**2),
+            (False,True,lambda x,y,z, X,Y :(x * 3), 3 * x),
+            (False,True,lambda x,y,z, X,Y :(x * 0), 0),
+            (False,True,lambda x,y,z, X,Y :(0 * x), 0),
+            (False,True,lambda x,y,z, X,Y :(x * 1), x),
+            (False,X is MX,lambda x,y,z, X,Y :(1 * x), x),
+            (False,True,lambda x,y,z, X,Y :(x * -1), -x),
+            (False,X is MX,lambda x,y,z, X,Y :(-1 * x), -x),
+            (False,True,lambda x,y,z, X,Y :(x * (1/y)), x/y),
+            (False,X is MX,lambda x,y,z, X,Y :((1/x) * y), y/x),
+            (False,True,lambda x,y,z, X,Y :(5 * (0.2 * x)), x),
+            (False,True,lambda x,y,z, X,Y :(0.5 * (2 * x)), x),
+            (False,True,lambda x,y,z, X,Y :(5 * (x / 5)), x),
+            (False,True,lambda x,y,z, X,Y :((2 / x) * x), 2),
+            (False,True,lambda x,y,z, X,Y :(2*x)/x,2),
+            (False,True,lambda x,y,z, X,Y :(5*x)/x,5),
+            (False,True,lambda x,y,z, X,Y :((x) * (2 / x)), 2),
+            (False,X is MX,lambda x,y,z, X,Y :((-x) * y), -(x*y)),
+            (False,True,lambda x,y,z, X,Y :(x * (-y)), -(x*y)),
+            (False,X is MX,lambda x,y,z, X,Y :(2*(0.5*x)),x),
+            (False,X is MX,lambda x,y,z, X,Y :2*(x*0.5),x),
+            (False,X is MX,lambda x,y,z, X,Y :(2*(0.5*X)),X),
+            (False,X is MX,lambda x,y,z, X,Y :2*(X*0.5),X),
+            (False,True,lambda x,y,z, X,Y :(0 / x), 0),
+            (False,True,lambda x,y,z, X,Y :(x / 1), x),
+            (False,True,lambda x,y,z, X,Y :(x / -1), -x),
+            (False,True,lambda x,y,z, X,Y :(x / x), 1),
+            (False,True,lambda x,y,z, X,Y :(2*x / 2), x),
+            (False,True,lambda x,y,z, X,Y :((x * y) / x), y),
+            (False,X is MX,lambda x,y,z, X,Y :((x * y) / y), x),
+            (False,X is MX,lambda x,y,z, X,Y :(1 / x), x**-1),
+            (False,True,lambda x,y,z, X,Y :(x / (1/y)), x*y),
+            (False,True,lambda x,y,z, X,Y :((2*x) / (2*y)), x/y),
+            (False,True,lambda x,y,z, X,Y :((x/5)/0.2), x),
+            (False,True,lambda x,y,z, X,Y :(x / (2*x)), 1.0/2),
+            (False,True,lambda x,y,z, X,Y :((-x) / x), -1),
+            (False,True,lambda x,y,z, X,Y :(x / (-x)), -1),
+            (False,True,lambda x,y,z, X,Y :((-x)/(-x)), 1),
+            (False,True,lambda x,y,z, X,Y :((x / y) / x), 1/y),
+            (False,X is MX,lambda x,y,z, X,Y :((-x) / y), -(x / y)),
+            (False,True,lambda x,y,z, X,Y :(x / (-y)), -(x / y)),
+            (False,True,lambda x,y,z, X,Y :(x ** 0), 1),
+            (False,True,lambda x,y,z, X,Y :(x ** 2), x*x),
+            (False,True,lambda x,y,z, X,Y :(x ** 3), x*(x*x)),
+            (False,True,lambda x,y,z, X,Y :(x ** -3), 1/(x**3)),
+            (False,True,lambda x,y,z, X,Y :(x ** 4), (x**2)*(x**2)),
+            (False,True,lambda x,y,z, X,Y :(x ** 0.5), x**0.5),
+            (False,False,lambda x,y,z, X,Y :(x ** y), x**y),
+            (False,True,lambda x,y,z, X,Y :(x**2 >= 0), 1),
+            (False,True,lambda x,y,z, X,Y :(2*x**2 >= x**2), 1),
+            (False,True,lambda x,y,z, X,Y :(fmin(x, float('inf'))), x),
+            (False,True,lambda x,y,z, X,Y :(fmin(float('inf'), x)), x),
+            (False,True,lambda x,y,z, X,Y :(fmin(-float('inf'), x)), -float('inf')),
+            (False,True,lambda x,y,z, X,Y :(fmin(x, x)), x),
+            (False,True,lambda x,y,z, X,Y :(fmax(-float('inf'), x)), x),
+            (False,True,lambda x,y,z, X,Y :(fmax(x, -float('inf'))), x),
+            (False,True,lambda x,y,z, X,Y :(fmax(x, float('inf'))), float('inf')),
+            (False,True,lambda x,y,z, X,Y :(fmax(x, x)), x),
+            (False,True,lambda x,y,z, X,Y :x**2 < 0, 0),
+            (False,True,lambda x,y,z, X,Y :(x == x), 1),
+            (False,True,lambda x,y,z, X,Y :(x != x), 0),
+            (False,True,lambda x,y,z, X,Y :sqrt(x)**2,x),
+            (False,True,lambda x,y,z, X,Y :sqrt(X)**2,X),
+            (False,True,lambda x,y,z, X,Y :(-x)**2,x**2),
+            (False,X is MX,lambda x,y,z, X,Y :fabs(fabs(x)),fabs(x)),
+            (False,X is MX,lambda x,y,z, X,Y :fabs(sqrt(x)),sqrt(x)),
+            (False,X is MX,lambda x,y,z, X,Y :fabs(exp(x)),exp(x)),
+            (False,X is MX,lambda x,y,z, X,Y :log(exp(x)),x),
+            (False,X is MX,lambda x,y,z, X,Y :1/(1/x),x),
+            (False,True,lambda x,y,z, X,Y :sqrt(x**2),fabs(x)),
+            (False,X is MX,lambda x,y,z, X,Y :fabs(-x),fabs(x)),
+            (False,True,lambda x,y,z, X,Y :fabs(x)**2,x**2),
+            (False,X is MX,lambda x,y,z, X,Y :cos(-x),cos(x)),
+            (False,X is MX,lambda x,y,z, X,Y :cos(fabs(x)),cos(x)),
+            (False,False,lambda x,y,z, X,Y :-(-x),x),
+            (False,True,lambda x,y,z, X,Y :cosh(x*0),x*0+1),
+            (False,True,lambda x,y,z, X,Y :x/0.5,2*x),
+            (False,True,lambda x,y,z, X,Y :x+x,2*x),
+            (False,True,lambda x,y,z, X,Y :x<x,0),
+            (False,True,lambda x,y,z, X,Y :2*x+x,3*x),
+            (False,True,lambda x,y,z, X,Y :x+2*x,3*x),
+            (False,X is MX,lambda x,y,z, X,Y :2*x-x,x),
+            (False,True,lambda x,y,z, X,Y :x-2*x,-x),
+            (True,False,lambda x,y,z, X,Y :-(x-y),y-x),
+               (True,False,lambda x,y,z, X,Y :-(x-y)+(x-y)**2, (-dx)+dx**2),
+            (True,False,lambda x,y,z, X,Y :(x+y/z)*z,x*z + y),
+            (True,False,lambda x,y,z, X,Y :(x/z+y)*z,x + y*z),
+            (True,False,lambda x,y,z, X,Y :z*(x/z+y),x + z*y),
+            (True,False,lambda x,y,z, X,Y :z*(x+y/z),z*x + y),
+            (True,False,lambda x,y,z, X,Y :(x-y/z)*z,x*z - y),
+            (True,False,lambda x,y,z, X,Y :(x/z-y)*z,x - y*z),
+            (True,False,lambda x,y,z, X,Y :z*(x/z-y),x - z*y),
+            (True,False,lambda x,y,z, X,Y :z*(x-y/z),z*x - y),
+            ]:
+          print(count)
+          count =count+1
+          A = genA(x,y,z,X,Y)
+          f = Function('f',args,[A])
+          if refcount:
+            self.assertNotEqual(str(A),str(B))
+            print(A)
+            f = f.simplify()
+            fref = Function('f',args,[B])
+            self.assertEqual(str(f.call(args,True,False)),str(fref.call(args,True,False)))
+          else:
+            self.assertEqual(str(A),str(B))
+          if on_the_fly:
+              GlobalOptions.setSimplificationOnTheFly(False)
+              A = genA(x,y,z,X,Y)
+              GlobalOptions.setSimplificationOnTheFly(True)
+              self.assertNotEqual(str(A),str(B))
+
+          Aval = f(a0,b0,c0,A0,B0)
+          Aref = genA(x0,y0,z0,X0,Y0)
+          print(Aval)
+          print(Aref)
+          self.checkarray(Aval,Aref)
+          
+        
+        print(DM(Sparsity.upper(3),0).is_nonnegative())
+        print(DM(Sparsity.upper(3),0.5).is_half())
+        print(MX(DM(Sparsity.upper(3),0.5)).is_half())
+        print(MX(DM(Sparsity.dense(3,3),0.5)).is_half())
+        2*(blockcat([[2,3],[6,8]])*A)
+
+
+  
+    
   @known_bug()
   def test_vertcat_empty(self):
     a = MX(DM(0,2))
@@ -1613,7 +1799,59 @@ class MXtests(casadiTestCase):
     self.checkarray(v[0][1],DM([[0,0],[5,0]]))
     self.checkarray(v[1][0],DM([2,3]))
     self.checkarray(blockcat(v),DM(fs[0].sparsity_in(0),list(range(Nr))))
+    
+    
+  def test_is_one_etc(self):
+    for op in [lambda x: x, MX, SX]:
+        self.assertTrue(op(DM(Sparsity.upper(3),0)).is_zero())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),0)).is_zero())
+        self.assertTrue(op(DM(3,4)).is_zero())
+        self.assertFalse(op(blockcat([[0,0],[0,7]])).is_zero())
+        
+        self.assertFalse(op(DM(Sparsity.upper(3),1)).is_one())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),1)).is_one())
+        self.assertFalse(op(blockcat([[1,1],[1,7]])).is_one())
+       
+        self.assertFalse(op(DM(Sparsity.upper(3),0.5)).is_half())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),0.5)).is_half())
+        self.assertFalse(op(blockcat([[0.5,0.5],[0.5,7]])).is_half())
+         
+        self.assertFalse(op(DM(Sparsity.upper(3),-1)).is_minus_one())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),-1)).is_minus_one())
+        self.assertFalse(op(blockcat([[-1,-1],[-1,7]])).is_minus_one())
 
+        self.assertFalse(op(DM(Sparsity.upper(3),np.inf)).is_inf())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),np.inf)).is_inf())
+        self.assertFalse(op(blockcat([[np.inf,np.inf],[np.inf,7]])).is_inf())
+
+        self.assertFalse(op(DM(Sparsity.upper(3),-np.inf)).is_minus_inf())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),-np.inf)).is_minus_inf())
+        self.assertFalse(op(blockcat([[-np.inf,-np.inf],[-np.inf,7]])).is_minus_inf())
+
+        self.assertTrue(op(DM(Sparsity.upper(3),3)).is_integer())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),3)).is_integer())
+        self.assertFalse(op(blockcat([[3,3],[3,0.7]])).is_integer())
+        self.assertTrue(op(blockcat([[3,3],[3,7]])).is_integer())
+
+        self.assertFalse(op(DM(Sparsity.upper(3),7)).is_value(7))
+        self.assertTrue(op(DM(Sparsity.dense(3,4),7)).is_value(7))
+        self.assertFalse(op(blockcat([[7,7],[7,1]])).is_value(7))
+        self.assertTrue(op(DM(Sparsity.upper(3),0)).is_value(0))
+        self.assertTrue(op(DM(Sparsity.dense(3,4),0)).is_value(0))
+        self.assertTrue(op(DM(3,4)).is_value(0))
+        self.assertFalse(op(blockcat([[0,0],[0,7]])).is_value(0))
+
+        self.assertFalse(op(DM(Sparsity.upper(3),1)).is_eye())
+        self.assertTrue(op(DM(Sparsity.diag(3),1)).is_eye())
+        self.assertFalse(op(blockcat([[1,0],[0,1]])).is_eye()) # Why?
+        
+        
+        self.assertFalse(op(DM(Sparsity.upper(3),-1)).is_nonnegative())
+        self.assertTrue(op(DM(Sparsity.upper(3),1)).is_nonnegative())
+        self.assertTrue(op(DM(Sparsity.dense(3,4),1)).is_nonnegative())
+        self.assertTrue(op(blockcat([[1,1],[1,7]])).is_nonnegative())
+        self.assertFalse(op(blockcat([[1,1],[1,-7]])).is_nonnegative())
+        
   def test_mxnulloutput(self):
      a = MX(5,0)
      b = MX.sym("x",2)
@@ -1993,6 +2231,31 @@ class MXtests(casadiTestCase):
     self.check_codegen(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
     self.check_serialize(f,inputs=[DM([[1,0,0],[0,4,0],[0,0,6]])])
 
+  def test_project_simplify(self):
+    x = MX.sym("x",Sparsity.lower(3))
+    DM.rng(1)
+    X0 = DM.rand(x.sparsity())
+    
+    y = project(x, Sparsity.upper(3))
+    z = project(y, sparsify(blockcat([[0,0,0],[1,1,1],[1,1,1]])).sparsity())
+    
+    f = Function('f',[x],[z])
+    fs = f.simplify()
+    self.assertTrue(fs.n_nodes()>3)
+
+    self.checkfunction(f,fs,inputs=[X0])
+
+    z = project(y, sparsify(blockcat([[1,0,0],[0,0,0],[0,0,1]])).sparsity())
+    
+    f = Function('f',[x],[z])
+    fs = f.simplify()
+    
+    self.assertTrue(fs.n_nodes(),3)
+    
+    fs.disp(True)
+
+    self.checkfunction(f,fs,inputs=[X0])
+    
   def test_repmat(self):
     a = DM([[1,2],[3,4],[5,6]])
     self.checkarray(repmat(a,2,3),kron(DM.ones(2,3),a))
@@ -2805,13 +3068,44 @@ class MXtests(casadiTestCase):
     f = Function('f',[x],[y])
     with capture_stdout() as out:
       f(3)
-    self.assertTrue(out[0]=="hey:\n[3]\n")
+    print(out)
+    
+    
+    ref = "hey:\n3.0000000000000000e+00\n"
+    self.assertTrue(out[0]==ref)
 
-    with capture_stdout() as out2:
-      self.check_codegen(f,inputs=[3])
     if args.run_slow:
-      self.assertTrue("hey:\n[3]\n" in out2[0])
+        with self.assertInException("Parsing error"):
+            self.check_codegen(f,inputs=[3],main=True)
+                    
+        with open("f_out.txt","r") as f_out:
+            out2 = f_out.read()
+            
+        print(out2)
+            
+        self.assertTrue(ref in out2)
 
+    x = MX.sym("x",2)
+    y = sqrt(x.monitor("hey"))
+
+    f = Function('f',[x],[y])
+    with capture_stdout() as out:
+      f(3)
+    print(out)
+    ref = "hey:\n2x1: [3.0000000000000000e+00, 3.0000000000000000e+00]\n"
+    self.assertTrue(out[0]==ref)
+
+    if args.run_slow:
+        with self.assertInException("Parsing error"):
+            self.check_codegen(f,inputs=[3],main=True)
+                    
+        with open("f_out.txt","r") as f_out:
+            out2 = f_out.read()
+            
+        print(out2)
+            
+        self.assertTrue(ref in out2)
+        
   def test_codegen_specials(self):
     x = MX.sym("x")
     y = MX.sym("y")
@@ -3048,10 +3342,48 @@ class MXtests(casadiTestCase):
             with open("f_out.txt","r") as f_out:
                 out2 = f_out.read().split("\n")[:-2]
             
+            self.assertEqual(len(out),len(out2))
+            for a,b in zip(out,out2):
+                self.assertEqual(a,b)
+
+
+    results = {}
+    results_slow = {}
+    for X in [MX,SX]:
+        x = X.sym("x")
+        y = X.sym("y")
+        f = Function('f',[x,y],[x+y],{"print_instructions": True, "print_canonical":True})
+        f.disp(True)
+        DM.rng(1)
+        inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+        with capture_stdout() as out:
+            f(*inputs)
+        out = out[0].split("\n")[:-1]
+        results[X] = out
+        
+        self.assertTrue("inputs" in out[0])
+        
+        
+        if args.run_slow:
+            with self.assertInException("Parsing error"):
+                self.check_codegen(f,inputs,main=True)
+                        
+            with open("f_out.txt","r") as f_out:
+                out2 = f_out.read().split("\n")[:-2]
+                results_slow[X] = out2
+            
             
             self.assertEqual(len(out),len(out2))
             for a,b in zip(out,out2):
                 self.assertEqual(a,b)
+
+    self.assertEqual(len(results[SX]),len(results[MX]))
+    for a,b in zip(results[SX],results[MX]):
+        self.assertEqual(a,b)
+    if args.run_slow:
+        self.assertEqual(len(results_slow[SX]),len(results_slow[MX]))
+        for a,b in zip(results_slow[SX],results_slow[MX]):
+            self.assertEqual(a,b)
 
   def test_low(self):
     v = MX.sym("v",5)
@@ -3944,5 +4276,80 @@ class MXtests(casadiTestCase):
 
     assert f1(*args).sparsity()==f2(*args).sparsity()
           
+                    
+  def test_extract(self):
+    x = MX.sym('x',2)
+    y = MX.sym('y',2)
+    
+    u = vertcat(x,y)
+    DM.rng(1)
+    u0 = DM.rand(4,1)
+    f = Function('f',[x,y],[sin(x+y)],{"never_inline":True})
+    
+    g = Function('g',[x],[cos(3*sum(x))],{"never_inline":True})
+    
+    e = g(f(x/y,2*x*y)*x)/(x+y)
+
+    res = extract([e],{"lift_shared":False,"lift_calls":True})
+    
+    [vexpr,v,vdef] = res
+    
+    print(vexpr)
+    print(v)
+    print(vdef)
+
+    self.assertEqual(len(v), 5)
+    self.assertEqual(len(vdef), len(v))
+    self.assertEqual(len(vexpr), 1)
+    #assert()
+    # Check inverted operation
+    f_ref = Function('f',[u],[e])
+    print("e",e)
+    e_reconstructed = substitute_inplace(v, vdef, [e])[1]
+    print(e_reconstructed)
+    f = Function('f',[u],e_reconstructed)
+    self.checkarray(f_ref(u0),f(u0))
+    
+    print(e)
+    
+    print(substitute_inplace(v, vdef, vexpr))
+    
+    vexpr = vcat(vexpr)
+    v = vcat(v)
+    vdef = vcat(vdef)
+    
+    
+    Jf_ref = Function('J_ref',[u],[jacobian(e,u)])
+    
+    J_v_u = solve(DM.eye(vdef.size1())-jacobian(vdef,v),jacobian(vdef,u))
+    J = jacobian(vexpr,u) + mtimes(jacobian(vexpr,v), J_v_u)
+
+    [vexpr,v,vdef] = res
+    
+    J = substitute_inplace(v, vdef, [J])[1][0]
+    
+    Jf = Function('J2',[u],[J])
+    
+
+    self.checkarray(Jf_ref(u0),Jf(u0))
+
+  def test_const_folding_on_the_fly(self):
+    x = MX.sym('x')
+
+    for a in [2,7]:
+        for b in [2,7]:
+            ref = (a*b)*x
+            if a==7 and b==7:
+                # Should probably not happen, but it is present in 3.7.0
+                self.assertEqual(str(ref),str(a*(b*x)))
+                self.assertEqual(str(ref),str((b*x)*a))
+            else:
+                # Dangerous: no caching of constants
+                self.assertNotEqual(str(ref),str(a*(b*x)))
+                self.assertNotEqual(str(ref),str((b*x)*a))
+
+    
+
+  
 if __name__ == '__main__':
     unittest.main()

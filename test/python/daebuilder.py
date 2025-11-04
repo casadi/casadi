@@ -29,6 +29,8 @@ import subprocess
 import os
 import unittest
 from helpers import *
+import glob
+import gc
 
 class Daebuildertests(casadiTestCase):
 
@@ -51,8 +53,7 @@ class Daebuildertests(casadiTestCase):
         f_ref = Function('f',[x],[vertcat(x1,1 * ((1 - x0 * x0) * x1) - x0)])
         test_point = [vertcat(1.1,1.3)]
         self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3)],digits=7)
-        if not name.endswith("3"):
-            self.check_serialize(f,inputs=test_point)
+        self.check_serialize(f,inputs=test_point)
   
   @memory_heavy() # FMU has a memleak
   def test_cstr(self):
@@ -92,7 +93,98 @@ class Daebuildertests(casadiTestCase):
     test_point = [vertcat(1.1,1.3),vertcat(1.7,1.11,1.13)]
     self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
     print(f.stats())
-          
+      
+  @memory_heavy() # FMU has a memleak
+  def test_indendent_var(self):
+    if os.name!="posix": return
+    if sys.platform=="darwin": return # Was produced on linux
+    fmu_file = "../data/car_t_fmu2.fmu"
+    if not os.path.exists(fmu_file):
+        print("Skipping test_indendent_var, resource not available")
+        return
+    unzipped_name = "car"
+    unzipped_path = os.path.join(os.getcwd(), unzipped_name)
+    import shutil
+    if os.path.isdir(unzipped_path): shutil.rmtree(unzipped_path)
+    import zipfile
+    with zipfile.ZipFile(fmu_file, 'r') as zip_ref:
+        zip_ref.extractall(unzipped_name)
+    dae = DaeBuilder("car",unzipped_name)
+    dae.disp(True)
+    
+    #self.assertEqual(dae.t(),"time")
+    self.assertEqual(dae.u(),["u_susp", "v_road", "x_road"])
+    self.assertEqual(dae.y(),["x_body_squared"])
+    self.assertEqual(dae.x(),["ContState1", "ContState2", "ContState3", "ContState4"])
+    self.assertEqual(dae.p(),["Fc_susp", "d_susp", "d_tire", "k_susp", "k_tire", "m_body", "m_susp"])
+    self.assertEqual(dae.w(),["x_body_squared", "Deriv1", "Deriv2", "Deriv3", "Deriv4"])
+    f = dae.create('f',['t','u','x'],['ode','y'])
+    t = SX.sym("t")
+    
+    
+    u_susp = SX.sym("u_susp")
+    v_road = SX.sym("v_road")
+    x_road = SX.sym("x_road")
+    u = vertcat(u_susp,v_road,x_road)
+
+    x_body = SX.sym("x_body")
+    x_susp = SX.sym("x_susp")
+    v_body = SX.sym("v_body")
+    v_susp = SX.sym("v_susp")
+    x = vertcat(x_body,x_susp,v_body,v_susp)
+
+    Fc_susp = SX.sym("Fc_susp")
+    d_susp = SX.sym("d_susp")
+    d_tire = SX.sym("d_tire")
+    k_susp = SX.sym("k_susp")
+    k_tire = SX.sym("k_tire")
+    m_body = SX.sym("m_body")
+    m_susp = SX.sym("m_susp")
+
+    p = vertcat(Fc_susp, d_susp, d_tire, k_susp, k_tire, m_body, m_susp)
+    m_body_num = 2500
+    m_susp_num = 320
+    k_susp_num = 80000
+    k_tire_num = 0.5*500000
+    d_susp_num = 350
+    d_tire_num = 15020
+    Fc_susp_num = 100
+    p_num = vertcat(Fc_susp_num, d_susp_num, d_tire_num, k_susp_num, k_tire_num, m_body_num, m_susp_num)
+
+    road_force = k_tire*(x_road-x_susp)  + d_tire*(v_road-v_susp)
+    x_body_der = v_body
+    x_susp_der = v_susp
+    v_body_der = 1/m_body * (- d_susp*(v_body-v_susp) - Fc_susp*tanh(10*(v_body-v_susp)) - k_susp*(x_body-x_susp)  + u_susp)+t
+    v_susp_der = 1/m_susp * ( d_susp*(v_body-v_susp) + Fc_susp*tanh(10*(v_body-v_susp)) + k_susp*(x_body-x_susp)  + road_force - u_susp)
+
+    x_der = vertcat(x_body_der,x_susp_der,v_body_der,v_susp_der)
+    y = x_body**2
+
+    f_ref = Function('f',[t,u,x],[substitute(x_der,p,p_num),substitute(y,p,p_num)])
+    
+    u_num = [0.1,0.3,1.7]
+    x_num = [1.8,1.5,1.9,1.9]
+    
+    self.checkfunction_light(f,f_ref,inputs=[0,u_num,x_num])
+    self.checkfunction_light(f,f_ref,inputs=[0.5,u_num,x_num])
+
+    f = dae.create('f',['t','u','x','p'],['ode','y'])
+    f_ref = Function('f',[t,u,x,p],[x_der,y])
+    
+    self.checkfunction_light(f,f_ref,inputs=[0.5,u_num,x_num,1.1*p_num])
+    x_body_squared = SX.sym("x_body_squared")
+    Deriv1 = SX.sym("Deriv1")
+    Deriv2 = SX.sym("Deriv2")
+    Deriv3 = SX.sym("Deriv3")
+    Deriv4 = SX.sym("Deriv4")
+    w = vertcat(x_body_squared,Deriv1,Deriv2,Deriv3,Deriv4)
+
+    f_ref = Function('f',[t,u,x,p,w],[w[1:],w[0]])
+    
+    with self.assertInException("Unsupported input: 'w'"):
+        dae.create('f',['t','u','x','p','w'],['ode','y'])
+
+
   def test_rumoca(self):
     if "rumoca" not in CasadiMeta.feature_list(): return
     rumoca = os.path.join(GlobalOptions.getCasadiPath(),'rumoca')
@@ -107,11 +199,15 @@ class Daebuildertests(casadiTestCase):
         return
     unzipped_name = "VanDerPol2"
     unzipped_path = os.path.join(os.getcwd(), unzipped_name)
+    unzipped_count = None
     for serialize_mode in ["link","embed"]:
         for use_zip in [True]:#,False]:
             if use_zip:
                 if "ghc-filesystem" in CasadiMeta.feature_list():
+                    unzipped_count = len(glob.glob(unzipped_name+"*.unzipped"))
                     dae = DaeBuilder("cstr",fmu_file,{"resource_serialize_mode": serialize_mode})
+                    # Unzip dir is there
+                    self.assertEqual(len(glob.glob(unzipped_name+"*.unzipped")),unzipped_count+1)
                 else:
                     with self.assertInException("passing fmu files to DaeBuilder is unsupported"):
                         dae = DaeBuilder("cstr",fmu_file)
@@ -152,6 +248,12 @@ class Daebuildertests(casadiTestCase):
             f = None
             f = Function.load("f.casadi")
             self.checkfunction(f,f_ref,inputs=test_point,hessian=False,digits=7,evals=1)
+            
+            f = None
+            gc.collect()
+            if unzipped_count is not None:
+                # Unzip dir is gone
+                self.assertEqual(len(glob.glob(unzipped_name+"*.unzipped")),unzipped_count)
   
   @requires_rootfinder("kinsol")
   @requires_rootfinder("newton")
@@ -565,6 +667,154 @@ class Daebuildertests(casadiTestCase):
         dae = ca.DaeBuilder('vdp', fmu_file)
         dae.get("x1")
         dae.disp(True)
+
+  def test_w_fmu(self):
+        fmu_file = '../data/VanDerPol2.fmu'
+        if not os.path.exists(fmu_file):
+            print("Skipping test_fmu_demo, resource not available")
+            return
+        dae = ca.DaeBuilder('vdp', fmu_file)
+        dae.get("x1")
+        dae.disp(True)
         
+        DM.rng(1)
+        x0 = DM.rand(2)
+        u0 = DM.rand()
+        
+        #dae.dependent_fun('f',['c','p','u','x'],['w']) # Not
+        f = dae.create('f',['x','u'],['ode'],{"aux": dae.w()})
+
+        r1 = f(x0,u0)
+        s1 = f.stats()["aux"]
+        s1 = vertcat(s1['der(x0)'],s1['der(x1)'])
+
+        f.save('f.casadi')
+        f2 = Function.load('f.casadi')
+        r2 = f2(x0,u0)
+        s2 = f2.stats()["aux"]
+        s2 = vertcat(s2['der(x0)'],s2['der(x1)'])
+                
+        self.checkarray(r1,r2)
+        self.checkarray(s1,s2)
+
+  def test_w(self):
+    dae = ca.DaeBuilder('test')
+    
+    dae.disp(True)
+    
+    # Causality: 'parameter' 'calculated_parameter' 'input' 'output' 'local' 'independent'
+    # variability: 'constant' 'fixed' 'tunable' 'discrete' 'continuous'
+    
+    u = dae.add('u','input','continuous')
+    u_val = 1.1
+    
+    # Constants
+    c0 = dae.add('c0','parameter','fixed')
+    c0_val = 0.97
+    dae.set('c0',c0_val)
+    c1 = dae.add('c1','output','constant')
+    c1_val = 0.17
+    dae.set('c1',c1_val)
+    c2 = dae.add('c2','local','constant')
+    c2_val = 0.19
+    dae.set('c2',c2_val)
+    c_val = vertcat(c0_val,c1_val,c2_val)
+    
+    dae.get('c2')
+    self.checkarray(dae.get('c2'),c2_val)
+
+    # Parameters
+    p = dae.add('p','parameter','tunable')
+    p_val = 1.3
+    dae.set('p',p_val)
+    
+    x0 = dae.add('x0','output','continuous')
+    x0_val = 1.7
+    x1 = dae.add('x1','local','continuous')
+    x1_val = 1.9
+
+    dae.eq(dae.der(x0),x0*x1)    
+    dae.eq(dae.der(x1),x1+u+p*c0)
+    
+    # Calculated parameters
+    #d0 = dae.add('d0','calculatedParameter','tunable')
+    #dae.eq(d0, p**2+c0+c1+c2)
+    #dae.add_d('foo',p**2+c0+c1+c2)
+    
+    w0 = dae.add('w0','output','continuous')
+    w1 = dae.add('w1','local','continuous')
+    
+    dae.eq(w0,sin(x1))
+    dae.eq(w1,w0**2+u)
+    
+    x2 = dae.add('x2','local','continuous')
+    x2_val = 1.11
+    dae.eq(dae.der(x2),3*w1)
+    
+    x_val = vertcat(x0_val,x1_val,x2_val)
+    
+
+    z0 = dae.add('z0','output','continuous')
+    z1 = dae.add('z1','local','continuous')
+    z0_val = 2.11
+    z1_val = 3.13
+    z_val = vertcat(z0_val,z1_val)
+    
+    dae.eq(0,x1-2*z0)
+    dae.eq(0,x1-3*z1+z0)
+
+    
+    dae.disp(True)
+    
+    f = dae.create('f',['p','u','x'],['y'])
+    
+    f.disp(True)
+    
+    with self.assertInException('Initialization failed since variables [p, c0] are free'):
+        dae.dependent_fun('f',['u','x'],['w'])
+    f = dae.dependent_fun('f',['c','p','u','x'],['w'])
+    print(f)
+    
+    w_val = f(c_val,p_val,u_val,x_val)
+    self.checkarray(
+        w_val,
+        vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,sin(x1_val),sin(x1_val)**2+u_val,3*(sin(x1_val)**2+u_val))
+    )
+    f = dae.create('f',['u','x'],['ode'])
+    CORRECTION = 0 # Looks like a bug
+    self.checkarray(
+        f(u_val,x_val),
+        vertcat(x0_val*x1_val,x1_val+u_val+CORRECTION*p_val*c0_val,3*(sin(x1_val)**2+u_val))
+    )
+    
+    f = dae.create('f',['c','p','u','x'],['ode'])
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val),
+        vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(sin(x1_val)**2+u_val))
+    )
+        
+    f = dae.create('f',['c','p','u','x','w'],['ode'])
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val,w_val),
+        vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(sin(x1_val)**2+u_val))
+    )
+    CORRECTION = 1 # Why is this not 2?
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val,2*w_val),
+        vertcat(CORRECTION*x0_val*x1_val,CORRECTION*(x1_val+u_val+p_val*c0_val),2*3*(sin(x1_val)**2+u_val))
+    )
+    f = dae.create('f',['c','p','u','x','z'],['alg'])
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val,z_val),
+        vertcat((-(x1_val-(2.*z0_val))),(-((x1_val-(3*z1_val))+z0_val)))
+    )
+    f = dae.create('f',['c','p','u','x','z'],['y'])
+    self.checkarray(
+        f(c_val,p_val,u_val,x_val,z_val),
+        vertcat(c1_val,x0_val,sin(x1_val),z0_val)
+    )
+    print(dae.export_fmu())
+
+    
 if __name__ == '__main__':
     unittest.main()

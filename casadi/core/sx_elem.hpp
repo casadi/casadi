@@ -154,8 +154,9 @@ namespace casadi {
     /** \brief  Perform operations by ID
 
         \identifier{10p} */
-    static SXElem binary(casadi_int op, const SXElem& x, const SXElem& y);
-    static SXElem unary(casadi_int op, const SXElem& x);
+    static SXElem binary(casadi_int op, const SXElem& x, const SXElem& y,
+        bool unique_x=false, bool unique_y=false);
+    static SXElem unary(casadi_int op, const SXElem& x, bool unique=false);
     static std::vector<SXElem> call(const Function& f, const std::vector<SXElem>& deps);
 
     /** \brief Check the truth value of this node
@@ -182,6 +183,8 @@ namespace casadi {
     bool is_almost_zero(double tol) const;
     bool is_one() const;
     bool is_minus_one() const;
+    bool is_half() const;
+    bool is_value(double val) const;
     bool is_nan() const;
     bool is_inf() const;
     bool is_minus_inf() const;
@@ -310,6 +313,9 @@ namespace casadi {
     static bool is_almost_zero(const SXElem& val, double tol);
     static bool is_one(const SXElem& val);
     static bool is_minus_one(const SXElem& val);
+    static bool is_half(const SXElem& val);
+    static bool is_value(const SXElem& val, double v);
+    static bool is_nonnegative(const SXElem& val);
     static bool is_constant(const SXElem& val);
     static bool is_integer(const SXElem& val);
     static bool is_inf(const SXElem& val);

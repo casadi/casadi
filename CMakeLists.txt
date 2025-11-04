@@ -4,7 +4,7 @@ project(casadi C CXX)
 set(CASADI_MAJOR_VERSION 3)
 set(CASADI_MINOR_VERSION 7)
 set(CASADI_PATCH_VERSION 0)
-set(CASADI_IS_RELEASE 0)
+set(CASADI_IS_RELEASE 1)
 
 set(CASADI_VERSION ${CASADI_MAJOR_VERSION}.${CASADI_MINOR_VERSION}.${CASADI_PATCH_VERSION})
 set(CASADI_VERSION_PYTHON ${CASADI_MAJOR_VERSION}.${CASADI_MINOR_VERSION}.${CASADI_PATCH_VERSION})
@@ -447,7 +447,7 @@ endforeach()
 # Set rpath
 if(WITH_SELFCONTAINED)
   if(APPLE)
-    set(CMAKE_INSTALL_RPATH "@loader_path/")
+    set(CMAKE_INSTALL_RPATH "@loader_path")
   else()
     set(CMAKE_INSTALL_RPATH "$ORIGIN")
   endif()
@@ -637,7 +637,7 @@ option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_
 
 # HPIPM
 option(WITH_HPIPM "Compile the interface to HPIPM" OFF)
-set(BUILD_HPIPM_VERSION "0e0c9f4e0d4081dceafa9b37c396db50bce0e81a" CACHE STRING "Tag/branch/hash to be used for BUILD_HPIPM_GIT_REPO")
+set(BUILD_HPIPM_VERSION "7df22d79fc62636fa5aebc28a34710263acb8c64" CACHE STRING "Tag/branch/hash to be used for BUILD_HPIPM_GIT_REPO")
 set(BUILD_HPIPM_GIT_REPO "https://github.com/jgillis/hpipm.git" CACHE STRING "Git repo used together with BUILD_HPIPM_VERSION")
 set(BUILD_HPIPM_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for HPIPM")
 option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source (BUILD_HPIPM_GIT_REPO=${BUILD_HPIPM_GIT_REPO})." OFF)
@@ -661,8 +661,8 @@ add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver Sup
 
 # OSQP: An operator-splitting QP solver
 option(WITH_OSQP "Compile the interface to OSQP" OFF)
-set(BUILD_OSQP_VERSION "v0.6.3" CACHE STRING "Tag/branch/hash to be used for BUILD_OSQP_GIT_REPO")
-set(BUILD_OSQP_GIT_REPO "https://github.com/osqp/osqp.git" CACHE STRING "Git repo used together with BUILD_OSQP_VERSION")
+set(BUILD_OSQP_VERSION "45950bdb245b99601f1084dbcc07a0de501f4d03" CACHE STRING "Tag/branch/hash to be used for BUILD_OSQP_GIT_REPO")
+set(BUILD_OSQP_GIT_REPO "https://github.com/jgillis/osqp.git" CACHE STRING "Git repo used together with BUILD_OSQP_VERSION")
 set(BUILD_OSQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for OSQP")
 option(WITH_BUILD_OSQP "Build OSQP (BUILD_OSQP_VERSION=${BUILD_OSQP_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
@@ -767,7 +767,7 @@ if(WITH_BLOCKSQP)
 endif()
 add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver blockSQP.")
 
-set(BUILD_TRLIB_VERSION "c7632b8b14152e78bc21721a3bd1a2432586b824" CACHE STRING "Tag/branch/hash to be used for BUILD_TRLIB_GIT_REPO")
+set(BUILD_TRLIB_VERSION "1599192a02aee4e0cbe47ad1dbb81c7b06ff4f17" CACHE STRING "Tag/branch/hash to be used for BUILD_TRLIB_GIT_REPO")
 set(BUILD_TRLIB_GIT_REPO "https://github.com/jgillis/trlib.git" CACHE STRING "Git repo used together with BUILD_TRLIB_VERSION")
 set(BUILD_TRLIB_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for TRLIB")
 option(WITH_BUILD_TRLIB "Build TRLIB (BUILD_TRLIB_VERSION=${BUILD_TRLIB_VERSION}) from downloaded source (BUILD_TRLIB_GIT_REPO=${BUILD_TRLIB_GIT_REPO})." OFF)
@@ -1341,6 +1341,7 @@ if(WITH_BUILD_METIS)
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ${AUTOTOOLS_SHELL} ./get.Metis)
   add_library(metis::metis INTERFACE IMPORTED)
   add_dependencies(metis::metis metis-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis")
   set_target_properties(metis::metis PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis"
     IMPORTED_LIBNAME "coinmetis"
@@ -1757,7 +1758,7 @@ if(WITH_DAQP)
       DESTINATION "${INCLUDE_PREFIX}")
   endif()
 endif()
-add_feature_info(daqp-interface WITH_DAQP "Interface to the MILP / QP solver HiGHS.")
+add_feature_info(daqp-interface WITH_DAQP "Interface to the MILP / QP solver DAQP.")
 
 
 if(WITH_SLEQP)
@@ -1774,6 +1775,7 @@ if(WITH_SLEQP)
         
   add_library(sleqp::sleqp SHARED IMPORTED)
   add_dependencies(sleqp::sleqp sleqp-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
   set_target_properties(sleqp::sleqp PROPERTIES
     IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}sleqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
     IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}sleqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -1883,7 +1885,7 @@ if(WITH_OSQP)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_C_STANDARD_REQUIRED=TRUE -DCMAKE_C_STANDARD=99 -DENABLE_MKL_PARDISO=OFF -DPROFILING=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        CMAKE_ARGS -DCMAKE_C_STANDARD_REQUIRED=TRUE -DCMAKE_C_STANDARD=99 -DENABLE_MKL_PARDISO=OFF -DPROFILING=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/osqp")
     add_library(osqp SHARED IMPORTED)
     # This is similar to ALIAS but works fine on imported targets with CMake 3.10
@@ -1919,6 +1921,7 @@ if(WITH_CLARABEL)
     add_library(clarabel::clarabel INTERFACE IMPORTED)
     set_target_properties(clarabel::clarabel PROPERTIES INTERFACE_LINK_LIBRARIES clarabel)
     add_dependencies(clarabel clarabel-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/clarabel")
     set_target_properties(clarabel PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/clarabel"
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}clarabel_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -1959,7 +1962,7 @@ if(WITH_SUPERSCS)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        CMAKE_ARGS -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/superscs")
     add_library(superscs STATIC IMPORTED)
     add_library(superscs-linsys STATIC IMPORTED)
@@ -2039,6 +2042,7 @@ if(WITH_ZLIB)
 	set(ZLIB_STATIC_NAME ${CMAKE_STATIC_LIBRARY_PREFIX}zlibstatic.a)
       endif()
     endif()
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ZLIB::libz PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${ZLIB_STATIC_NAME}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
@@ -2064,7 +2068,7 @@ if(WITH_LIBZIP)
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_TRY_COMPILE_CONFIGURATION=Debug -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD=OFF -DENABLE_OPENSSL=OFF -DENABLE_WINDOWS_CRYPTO=OFF -DENABLE_COMMONCRYPTO=OFF -DENABLE_GNUTLS=OFF -DENABLE_MBEDTLS=OFF -DENABLE_FDOPEN=OFF -DBUILD_TOOLS=OFF -DBUILD_REGRESS=OFF -DBUILD_OSSFUZZ=OFF -DBUILD_EXAMPLES=OFF -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF)
     add_library(libzip::zip STATIC IMPORTED)
-
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     add_dependencies(libzip::zip libzip-external)
     set_target_properties(libzip::zip PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}zip${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -2091,6 +2095,7 @@ if(WITH_GHC_FILESYSTEM)
         CMAKE_ARGS -DGHC_FILESYSTEM_BUILD_TESTING=OFF -DGHC_FILESYSTEM_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     add_library(ghcFilesystem::ghc_filesystem INTERFACE IMPORTED)
     add_dependencies(ghcFilesystem::ghc_filesystem ghc-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ghcFilesystem::ghc_filesystem PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
     )

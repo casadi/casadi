@@ -346,11 +346,13 @@ namespace casadi {
     return "BSplineParametric(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
-  void BSpline::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void BSpline::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = arg[0]->get_bspline(knots_, offset_, coeffs_, degree_, m_, lookup_mode_);
   }
 
-  void BSplineParametric::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void BSplineParametric::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     res[0] = arg[0]->get_bspline(arg[1], knots_, offset_, degree_, m_, lookup_mode_);
   }
 

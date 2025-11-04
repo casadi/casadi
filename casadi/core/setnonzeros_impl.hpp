@@ -91,34 +91,38 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void SetNonzerosVector<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     if (!MXNode::matches_sparsity(arg)) {
-      SetNonzeros<Add>::eval_mx(arg, res);
+      SetNonzeros<Add>::eval_mx(arg, res, unique);
       return;
     }
     res[0] = SetNonzeros<Add>::create(arg[0], arg[1], nz_);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void SetNonzerosSlice<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     if (!MXNode::matches_sparsity(arg)) {
-      SetNonzeros<Add>::eval_mx(arg, res);
+      SetNonzeros<Add>::eval_mx(arg, res, unique);
       return;
     }
     res[0] = SetNonzeros<Add>::create(arg[0], arg[1], s_);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void SetNonzerosSlice2<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     if (!MXNode::matches_sparsity(arg)) {
-      SetNonzeros<Add>::eval_mx(arg, res);
+      SetNonzeros<Add>::eval_mx(arg, res, unique);
       return;
     }
     res[0] = SetNonzeros<Add>::create(arg[0], arg[1], inner_, outer_);
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+  void SetNonzeros<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
     // Get all the nonzeros
     std::vector<casadi_int> nz = all();
 

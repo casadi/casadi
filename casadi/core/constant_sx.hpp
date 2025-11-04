@@ -68,6 +68,15 @@ bool is_constant() const override { return true; }
     \identifier{1jm} */
 casadi_int op() const override { return OP_CONST;}
 
+/** \brief  Properties
+
+    \identifier{2ei} */
+bool is_value(double v) const override {
+  return casadi_limits<double>::is_value(to_double(), v);
+}
+bool is_half() const override { return casadi_limits<double>::is_half(to_double()); }
+bool is_integer() const override { return casadi_limits<double>::is_integer(to_double()); }
+
 /** \brief Check if two nodes are equivalent up to a given depth
 
     \identifier{1jn} */

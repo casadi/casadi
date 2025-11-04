@@ -55,8 +55,11 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    casadi_math<MX>::fun(op_, arg[0], arg[1], res[0]);
+  void BinaryMX<ScX, ScY>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+      const std::vector<bool>& unique) const {
+    bool unique_x = !unique.empty() && unique[0];
+    bool unique_y = unique.size() >= 2 && unique[1];
+    res[0] = MX::binary(op_, arg[0], arg[1], unique_x, unique_y);
   }
 
   template<bool ScX, bool ScY>
@@ -268,18 +271,10 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::get_unary(casadi_int op) const {
-    //switch (op_) {
-    //default: break; // no rule
-    //}
-
-    // Fallback to default implementation
-    return MXNode::get_unary(op);
-  }
-
-  template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::_get_binary(casadi_int op, const MX& y, bool scX, bool scY) const {
-    if (!GlobalOptions::simplification_on_the_fly) return MXNode::_get_binary(op, y, scX, scY);
+  MX BinaryMX<ScX, ScY>::_get_binary(casadi_int op, const MX& y, bool scX, bool scY,
+      bool unique_x, bool unique_y) const {
+    if (!GlobalOptions::simplification_on_the_fly)
+      return MXNode::_get_binary(op, y, scX, scY, unique_x, unique_y);
 
     switch (op_) {
     case OP_ADD:
@@ -294,7 +289,7 @@ namespace casadi {
     }
 
     // Fallback to default implementation
-    return MXNode::_get_binary(op, y, scX, scY);
+    return MXNode::_get_binary(op, y, scX, scY, unique_x, unique_y);
   }
 
   template<bool ScX, bool ScY>

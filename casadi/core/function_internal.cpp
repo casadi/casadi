@@ -129,8 +129,7 @@ namespace casadi {
 
   FunctionInternal::~FunctionInternal() {
     if (jit_cleanup_ && jit_) {
-      std::string jit_directory = get_from_dict(jit_options_, "directory", std::string(""));
-      std::string jit_name = jit_directory + jit_name_ + ".c";
+      std::string jit_name = jit_directory_ + jit_name_ + ".c";
       if (remove(jit_name.c_str())) casadi_warning("Failed to remove " + jit_name);
     }
   }
@@ -306,10 +305,14 @@ namespace casadi {
         "Acceptable number of inputs and outputs. Warn if exceeded."}},
       {"dump_in",
        {OT_BOOL,
-        "Dump numerical values of inputs to file (readable with DM.from_file) [default: false]"}},
+        "Dump numerical values of inputs to file (readable with DM.from_file) [default: false] "
+        "A counter is used to generate unique names. "
+        "The counter may be reset using reset_dump_count."}},
       {"dump_out",
        {OT_BOOL,
-        "Dump numerical values of outputs to file (readable with DM.from_file) [default: false]"}},
+        "Dump numerical values of outputs to file (readable with DM.from_file) [default: false] "
+        "A counter is used to generate unique names. "
+        "The counter may be reset using reset_dump_count."}},
       {"dump",
        {OT_BOOL,
         "Dump function to file upon first evaluation. [false]"}},
@@ -452,6 +455,10 @@ namespace casadi {
       // Option not found - continue to base classes
       ProtoFunction::change_option(option_name, option_value);
     }
+  }
+
+  void FunctionInternal::reset_dump_count() {
+    dump_count_ = 0;
   }
 
   void FunctionInternal::init(const Dict& opts) {
@@ -693,12 +700,36 @@ namespace casadi {
     return "o" + str(i);
   }
 
+  std::string FunctionInternal::get_jit_directory(const Dict& jit_options) {
+    // Start with default temp work dir
+    std::string jit_directory = GlobalOptions::getTempWorkDir();
+
+    // Get user-specified directory
+    std::string directory;
+    directory = get_from_dict(jit_options, "directory", std::string(""));
+
+    // What if directory itself is absolute?
+    if (Filesystem::is_absolute(directory)) {
+      // Override
+      jit_directory = directory;
+    } else {
+      jit_directory = jit_directory + directory;
+      if (Filesystem::is_enabled()) {
+        jit_directory = Filesystem::absolute(jit_directory);
+      }
+    }
+
+    return Filesystem::ensure_trailing_slash(jit_directory);
+  }
+
   void FunctionInternal::finalize() {
     if (jit_) {
       jit_name_ = jit_base_name_;
+      jit_directory_ = get_jit_directory(jit_options_);
       if (jit_temp_suffix_) {
-        jit_name_ = temporary_file(jit_name_, ".c");
-        jit_name_ = std::string(jit_name_.begin(), jit_name_.begin()+jit_name_.size()-2);
+        jit_name_ = temporary_file(jit_name_, ".c", jit_directory_);
+        jit_name_ = std::string(jit_name_.begin()+jit_directory_.size(),
+                                jit_name_.begin()+jit_name_.size()-2);
       }
       if (has_codegen()) {
         if (compiler_.is_null()) {
@@ -710,8 +741,7 @@ namespace casadi {
           CodeGenerator gen(jit_name_, opts);
           gen.add(self());
           if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
-          std::string jit_directory = get_from_dict(jit_options_, "directory", std::string(""));
-          compiler_ = Importer(gen.generate(jit_directory), compiler_plugin_, jit_options_);
+          compiler_ = Importer(gen.generate(jit_directory_), compiler_plugin_, jit_options_);
           if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
         }
         // Try to load
@@ -740,8 +770,8 @@ namespace casadi {
 
   void FunctionInternal::generate_in(const std::string& fname, const double** arg) const {
     // Set up output stream
-    std::ofstream of;
-    Filesystem::open(of, fname);
+    auto of_ptr = Filesystem::ofstream_ptr(fname);
+    std::ostream& of = *of_ptr;
     normalized_setup(of);
 
     // Encode each input
@@ -756,8 +786,8 @@ namespace casadi {
 
   void FunctionInternal::generate_out(const std::string& fname, double** res) const {
     // Set up output stream
-    std::ofstream of;
-    Filesystem::open(of, fname);
+    auto of_ptr = Filesystem::ofstream_ptr(fname);
+    std::ostream& of = *of_ptr;
     normalized_setup(of);
 
     // Encode each input
@@ -778,7 +808,9 @@ namespace casadi {
       DM::to_file(dump_dir_+ filesep() + name_ + "." + count + ".in." + name_in_[i] + "." +
         dump_format_, sparsity_in_[i], arg[i]);
     }
-    generate_in(dump_dir_+ filesep() + name_ + "." + count + ".in.txt", arg);
+    std::string name = dump_dir_+ filesep() + name_ + "." + count + ".in.txt";
+    uout() << "dump_in -> " << name << std::endl;
+    generate_in(name, arg);
   }
 
   void FunctionInternal::dump_out(casadi_int id, double** res) const {
@@ -816,7 +848,11 @@ namespace casadi {
     for (casadi_int i=0; i<n_in_; ++i) {
       stream << "Input " << i << " (" << name_in_[i] << "): ";
       if (arg[i]) {
-        DM::print_default(stream, sparsity_in_[i], arg[i], truncate);
+        if (print_canonical_) {
+          print_canonical(stream, sparsity_in_[i], arg[i]);
+        } else {
+          DM::print_default(stream, sparsity_in_[i], arg[i], truncate);
+        }
         stream << std::endl;
       } else {
         stream << "NULL" << std::endl;
@@ -829,7 +865,11 @@ namespace casadi {
     for (casadi_int i=0; i<n_out_; ++i) {
       stream << "Output " << i << " (" << name_out_[i] << "): ";
       if (res[i]) {
-        DM::print_default(stream, sparsity_out_[i], res[i], truncate);
+        if (print_canonical_) {
+          print_canonical(stream, sparsity_out_[i], res[i]);
+        } else {
+          DM::print_default(stream, sparsity_out_[i], res[i], truncate);
+        }
         stream << std::endl;
       } else {
         stream << "NULL" << std::endl;
@@ -854,7 +894,37 @@ namespace casadi {
 
   void FunctionInternal::print_canonical(std::ostream &stream,
       const Sparsity& sp, const double* nz) {
-    print_canonical(stream, sp.nnz(), nz);
+    StreamStateGuard backup(stream);
+    normalized_setup(stream);
+    if (nz) {
+      if (!sp.is_scalar(true)) {
+        stream << sp.dim(false) << ": ";
+        stream << "[";
+      }
+      for (casadi_int i=0; i<sp.nnz(); ++i) {
+        if (i>0) stream << ", ";
+        normalized_out(stream, nz[i]);
+      }
+      if (!sp.is_scalar(true)) {
+        stream << "]";
+        if (!sp.is_dense()) {
+          stream << ", colind: [";
+          for (casadi_int i=0; i<sp.size2(); ++i) {
+            if (i>0) stream << ", ";
+            stream << sp.colind()[i];
+          }
+          stream << "]";
+          stream << ", row: [";
+          for (casadi_int i=0; i<sp.nnz(); ++i) {
+            if (i>0) stream << ", ";
+            stream << sp.row()[i];
+          }
+          stream << "]";
+        }
+      }
+    } else {
+      stream << "NULL";
+    }
   }
 
   void FunctionInternal::print_canonical(std::ostream &stream, double a) {
@@ -1060,8 +1130,11 @@ namespace casadi {
   }
 
   Function FunctionInternal::wrap_as_needed(const Dict& opts) const {
-    if (opts.empty()) return shared_from_this<Function>();
-    std::string fname = "wrap_" + name_;
+    return wrap_as_needed("wrap_" + name_, opts);
+  }
+
+  Function FunctionInternal::wrap_as_needed(const std::string& name, const Dict& opts) const {
+    if (opts.empty() && name==name_) return shared_from_this<Function>();
     // Options
     Dict my_opts = opts;
     my_opts["derivative_of"] = derivative_of_;
@@ -1074,13 +1147,16 @@ namespace casadi {
     // Wrap the function
     std::vector<MX> arg = mx_in();
     std::vector<MX> res = self()(arg);
-    return Function(fname, arg, res, name_in_, name_out_, my_opts);
+    return Function(name, arg, res, name_in_, name_out_, my_opts);
   }
 
   Function FunctionInternal::wrap() const {
+    return wrap("wrap_" + name_);
+  }
+
+  Function FunctionInternal::wrap(const std::string& name) const {
     Function f;
-    std::string fname = "wrap_" + name_;
-    if (!incache(fname, f)) {
+    if (!incache(name, f)) {
       // Options
       Dict opts;
       opts["derivative_of"] = derivative_of_;
@@ -1092,7 +1168,7 @@ namespace casadi {
       // Wrap the function
       std::vector<MX> arg = mx_in();
       std::vector<MX> res = self()(arg);
-      f = Function(fname, arg, res, name_in_, name_out_, opts);
+      f = Function(name, arg, res, name_in_, name_out_, opts);
       // Save in cache
       tocache_if_missing(f);
     }
@@ -3685,6 +3761,14 @@ namespace casadi {
     return f.which_depends(s_in, s_out, order, tr);
   }
 
+  Function FunctionInternal::simplify(const std::string& name, const Dict& opts) const {
+    if (name==name_) {
+      return self();
+    } else {
+      return wrap(name);
+    }
+  }
+
   const Function& FunctionInternal::oracle() const {
     casadi_error("'oracle' not defined for " + class_name());
     static Function singleton;
@@ -3951,9 +4035,10 @@ namespace casadi {
     if (jit_serialize_=="link" || jit_serialize_=="embed") {
       s.pack("FunctionInternal::jit_library", compiler_.library());
       if (jit_serialize_=="embed") {
-        std::ifstream binary(compiler_.library(), std::ios_base::binary);
-        casadi_assert(binary.good(), "Could not open library '" + compiler_.library() + "'.");
-        s.pack("FunctionInternal::jit_binary", binary);
+        auto binary_ptr =
+          Filesystem::ifstream_ptr(compiler_.library(), std::ios_base::binary, true);
+        casadi_assert(binary_ptr, "Could not open library '" + compiler_.library() + "'.");
+        s.pack("FunctionInternal::jit_binary", *binary_ptr);
       }
     }
     s.pack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
@@ -4034,14 +4119,14 @@ namespace casadi {
       s.unpack("FunctionInternal::jit_library", library);
       if (jit_serialize_=="embed") {
         // If file already exist
-        std::ifstream binary(library, std::ios_base::binary);
-        if (binary.good()) { // library exists
+        auto binary_ptr = Filesystem::ifstream_ptr(library, std::ios_base::binary, false);
+        if (binary_ptr) { // library exists
           // Ignore packed contents
           std::stringstream ss;
           s.unpack("FunctionInternal::jit_binary", ss);
         } else { // library does not exist
-          std::ofstream binary(library, std::ios_base::binary | std::ios_base::out);
-          s.unpack("FunctionInternal::jit_binary", binary);
+          auto binary_ptr = Filesystem::ofstream_ptr(library, std::ios_base::binary);
+          s.unpack("FunctionInternal::jit_binary", *binary_ptr);
         }
       }
       compiler_ = Importer(library, "dll");

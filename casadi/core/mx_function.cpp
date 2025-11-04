@@ -62,7 +62,7 @@ namespace casadi {
         "Reuse variables in the work vector"}},
       {"print_instructions",
        {OT_BOOL,
-        "Print each operation during evaluation"}},
+        "Print each operation during evaluation. Influenced by print_canonical."}},
       {"cse",
        {OT_BOOL,
         "Perform common subexpression elimination (complexity is N*log(N) in graph size)"}},
@@ -640,6 +640,33 @@ namespace casadi {
       }
     }
     return 0;
+  }
+
+  std::vector<std::string> MXFunction::get_function() const {
+    std::map<std::string, bool> flagged;
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); it++) {
+      if (it->op==OP_CALL) {
+        const Function &f = it->data->which_function();
+        if (flagged.find(f.name())==flagged.end()) {
+          flagged[f.name()] = true;
+        }
+      }
+    }
+    std::vector<std::string> ret;
+    for (auto it : flagged) {
+      ret.push_back(it.first);
+    }
+    return ret;
+  }
+
+  const Function& MXFunction::get_function(const std::string &name) const {
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); it++) {
+      if (it->op==OP_CALL) {
+        const Function &f = it->data->which_function();
+        if (name==f.name()) return f;
+      }
+    }
+    casadi_error("No such function '" + name + "'.");
   }
 
   int MXFunction::sp_reverse(bvec_t** arg, bvec_t** res,

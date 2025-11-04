@@ -80,6 +80,31 @@ namespace casadi {
         \identifier{1qg} */
     virtual bool is_minus_one() const { return false;}
 
+    /** \brief Check if identically 0.5
+
+        \identifier{2ej} */
+    virtual bool is_half() const { return false;}
+
+    /** \brief Check if identically inf
+
+        \identifier{2e4} */
+    virtual bool is_inf() const { return false;}
+
+    /** \brief Check if identically -inf
+
+        \identifier{2e5} */
+    virtual bool is_minus_inf() const { return false;}
+
+    /** \brief Check if integer
+
+        \identifier{2e6} */
+    virtual bool is_integer() const { return false;}
+
+    /** \brief Check if not negative
+
+        \identifier{2e7} */
+    virtual bool is_nonnegative() const { return false;}
+
     /** \brief Check if a certain value
 
         \identifier{1qh} */
@@ -165,7 +190,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX)
 
         \identifier{1qv} */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
+        const std::vector<bool>& unique={}) const;
 
     /** \brief Evaluate the MX node on a const/linear/nonlinear partition
 
@@ -450,6 +476,9 @@ namespace casadi {
     /// Get the value (only for scalar constant nodes)
     virtual double to_double() const;
 
+    /// Get the value (only for scalar constant nodes)
+    virtual casadi_int to_int() const;
+
     /// Get the value (only for constant nodes)
     virtual DM get_DM() const;
 
@@ -574,7 +603,8 @@ namespace casadi {
     *   returns Matrix(sp,a[nz])
 
         \identifier{1s4} */
-    virtual MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const;
+    virtual MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+        bool unique=false) const;
 
     /** \brief Get the nonzeros of matrix, parametrically
     *
@@ -683,16 +713,17 @@ namespace casadi {
     virtual MX get_subassign(const MX& y, const Slice& i, const Slice& j) const;
 
     /// Create set sparse
-    virtual MX get_project(const Sparsity& sp) const;
+    virtual MX get_project(const Sparsity& sp, bool unique=false) const;
 
     /// Get a unary operation
-    virtual MX get_unary(casadi_int op) const;
+    virtual MX get_unary(casadi_int op, bool unique=false) const;
 
     /// Get a binary operation operation
-    MX get_binary(casadi_int op, const MX& y) const;
+    MX get_binary(casadi_int op, const MX& y, bool unique_x=false, bool unique_y=false) const;
 
     /// Get a binary operation operation (matrix-matrix)
-    virtual MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY) const;
+    virtual MX _get_binary(casadi_int op, const MX& y, bool scX, bool scY,
+        bool unique_x=false, bool unique_y=false) const;
 
     /// Determinant
     virtual MX get_det() const;
