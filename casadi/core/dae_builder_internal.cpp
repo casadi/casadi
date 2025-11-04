@@ -2902,7 +2902,9 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   // We will require that an independent variable is always added first in the list of variables
   if (causality != Causality::INDEPENDENT && n_variables() == 0) {
     // Add a default time variable before adding other variables
-    (void)add("time", Causality::INDEPENDENT, casadi::Dict());
+    Variable& t = add("time", Causality::INDEPENDENT, casadi::Dict());
+    // Max value if automatically added
+    t.value_reference = static_cast<unsigned int>(-1);
     // Set index to -1 to indicate that it has not (yet) been encountered
     orig_time_index_ = -1;
   }
@@ -2955,6 +2957,8 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       orig_time_index_ = n_variables() - 1;
       // Pointer to existing time variable
       t_var = &variable(0);
+      // Revert default value reference
+      t_var->value_reference = 0;
       // Update its name, if needed
       if (t_var->name != name) {
         // Remove old name from varind_
@@ -3661,12 +3665,16 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars,
       categorize(var.index, Category::NUMEL);
     }
 
+    // Derivative attribute
+    var.der_of = derivative;
+
     // Unless detect_quad has been set, assume all variables in the right-hand-sides
     // Prevents changing X to Q
     var.in_rhs = !detect_quad_ && fmi_major_ >= 2;
     var.value_reference = static_cast<unsigned int>(vnode.attribute<casadi_int>("valueReference"));
+
+    // Add to variable reference map
     vrmap_[var.value_reference] = var.index;
-    var.der_of = derivative;
   }
 
   // Set "parent" property using "derivative" attribute
