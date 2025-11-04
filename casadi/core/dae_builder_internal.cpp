@@ -2903,6 +2903,8 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   if (causality != Causality::INDEPENDENT && n_variables() == 0) {
     // Add a default time variable before adding other variables
     Variable& t = add("time", Causality::INDEPENDENT, casadi::Dict());
+    // Do not categorize in T by default
+    categorize(t.index, Category::NUMEL);
     // Max value if automatically added
     t.value_reference = static_cast<unsigned int>(-1);
     // Set index to -1 to indicate that it has not (yet) been encountered
