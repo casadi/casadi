@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-casadi_plugin(Conic fatrop
-  fatrop_conic_interface.hpp
-  fatrop_conic_interface.cpp
-  fatrop_conic_interface_meta.cpp
-  "${CMAKE_CURRENT_BINARY_DIR}/fatrop_conic_runtime_str.h"
-  )
+#casadi_plugin(Conic fatrop
+#  fatrop_conic_interface.hpp
+#  fatrop_conic_interface.cpp
+#  fatrop_conic_interface_meta.cpp
+#  "${CMAKE_CURRENT_BINARY_DIR}/fatrop_conic_runtime_str.h"
+#  )
 
-casadi_plugin_link_libraries(Conic fatrop fatrop::fatrop)
+#casadi_plugin_link_libraries(Conic fatrop fatrop::fatrop)
 
 casadi_plugin(Nlpsol fatrop
   fatrop_interface.hpp
