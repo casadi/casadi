@@ -47,10 +47,10 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_include_directories(casadi_conic_fatrop
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-)
+#target_include_directories(casadi_conic_fatrop
+#  PUBLIC
+#    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+#)
 
 target_include_directories(casadi_nlpsol_fatrop
   PUBLIC
