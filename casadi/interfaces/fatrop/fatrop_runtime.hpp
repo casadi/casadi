@@ -21,13 +21,38 @@
 // C-REPLACE "SOLVER_RET_UNKNOWN" "1"
 // C-REPLACE "SOLVER_RET_LIMITED" "2"
 // C-REPLACE "SOLVER_RET_EXCEPTION" "5"
-
 // C-REPLACE "casadi_nlpsol_prob<T1>" "struct casadi_nlpsol_prob"
 // C-REPLACE "casadi_nlpsol_data<T1>" "struct casadi_nlpsol_data"
-
 // C-REPLACE "reinterpret_cast<int**>" "(int**) "
 // C-REPLACE "reinterpret_cast<int*>" "(int*) "
 // C-REPLACE "const_cast<int*>" "(int*) "
+// C-REPLACE "casadi_ocp_block" "struct casadi_ocp_block"
+// C-REPLACE "OracleCallback" "struct casadi_oracle_callback"
+// C-REPLACE "casadi_fatrop_prob<T1>" "struct casadi_fatrop_prob"
+// C-REPLACE "casadi_fatrop_data<T1>" "struct casadi_fatrop_data"
+// C-REPLACE "const_cast<T1*>" "(T1*)"
+// C-REPLACE "static_cast< casadi_fatrop_data<T1>* >" "(struct casadi_fatrop_data*)"
+// C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
+// C-REPLACE "calc_function" "casadi_oracle_call"
+// C-REPLACE "casadi_error" "//casadi_error"
+// C-REPLACE "casadi_fatrop_get_nx<T1>" "casadi_fatrop_get_nx"
+// C-REPLACE "casadi_fatrop_get_nu<T1>" "casadi_fatrop_get_nu"
+// C-REPLACE "casadi_fatrop_get_ng<T1>" "casadi_fatrop_get_ng"
+// C-REPLACE "casadi_fatrop_get_ng_ineq<T1>" "casadi_fatrop_get_ng_ineq"
+// C-REPLACE "casadi_fatrop_get_horizon_length<T1>" "casadi_fatrop_get_horizon_length"
+// C-REPLACE "casadi_fatrop_get_bounds<T1>" "casadi_fatrop_get_bounds"
+// C-REPLACE "casadi_fatrop_get_initial_xk<T1>" "casadi_fatrop_get_initial_xk"
+// C-REPLACE "casadi_fatrop_get_initial_uk<T1>" "casadi_fatrop_get_initial_uk"
+// C-REPLACE "casadi_fatrop_full_eval_constr_jac<T1>" "casadi_fatrop_full_eval_constr_jac"
+// C-REPLACE "casadi_fatrop_full_eval_obj_grad<T1>" "casadi_fatrop_full_eval_obj_grad"
+// C-REPLACE "casadi_fatrop_full_eval_obj<T1>" "casadi_fatrop_full_eval_obj"
+// C-REPLACE "casadi_fatrop_full_eval_contr_viol<T1>" "casadi_fatrop_full_eval_contr_viol"
+// C-REPLACE "casadi_fatrop_full_eval_lag_hess<T1>" "casadi_fatrop_full_eval_lag_hess"
+// C-REPLACE "casadi_fatrop_eval_BAbt<T1>" "casadi_fatrop_eval_BAbt"
+// C-REPLACE "casadi_fatrop_eval_RSQrqt<T1>" "casadi_fatrop_eval_RSQrqt"
+// C-REPLACE "casadi_fatrop_eval_Ggt<T1>" "casadi_fatrop_eval_Ggt"
+// C-REPLACE "casadi_fatrop_eval_Ggt_ineq<T1>" "casadi_fatrop_eval_Ggt_ineq"
+// C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
 
 // SYMBOL "fatrop_mproject"
 template<typename T1>
@@ -77,9 +102,6 @@ void casadi_fatrop_write_primal_data(const double* x, T1* primal_data, const str
   }
 }
 
-// C-REPLACE "casadi_ocp_block" "struct casadi_ocp_block"
-
-// C-REPLACE "OracleCallback" "struct casadi_oracle_callback"
 template<typename T1>
 struct casadi_fatrop_prob {
   const casadi_nlpsol_prob<T1>* nlp;
@@ -112,8 +134,6 @@ struct casadi_fatrop_prob {
   FatropOcpCWrite write;
   FatropOcpCFlush flush;
 };
-// C-REPLACE "casadi_fatrop_prob<T1>" "struct casadi_fatrop_prob"
-
 
 // SYMBOL "fatrop_setup"
 template<typename T1>
@@ -173,7 +193,6 @@ struct casadi_fatrop_data {
 
   struct FatropOcpCSolver *solver;
 };
-// C-REPLACE "casadi_fatrop_data<T1>" "struct casadi_fatrop_data"
 
 // SYMBOL "fatrop_init_mem"
 template<typename T1>
@@ -188,8 +207,6 @@ void fatrop_free_mem(casadi_fatrop_data<T1>* d) {
   
 }
 
-
-// C-REPLACE "const_cast<T1*>" "(T1*)"
 
 // SYMBOL "fatrop_eval_BAbt"
 template<typename T1>
@@ -310,11 +327,6 @@ fatrop_int  casadi_fatrop_eval_Ggt_ineq(
 
   return 0;
 }
-
-// C-REPLACE "static_cast< casadi_fatrop_data<T1>* >" "(struct casadi_fatrop_data*)"
-// C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
-// C-REPLACE "calc_function" "casadi_oracle_call"
-// C-REPLACE "casadi_error" "//casadi_error"
 
 // SYMBOL "fatrop_full_eval_constr_jac"
 template<typename T1>
@@ -781,27 +793,6 @@ void casadi_fatrop_init(casadi_fatrop_data<T1>* d, const T1*** arg, T1*** res, c
   d->iw = *iw;
   d->w = *w;
 }
-
-// C-REPLACE "casadi_fatrop_get_nx<T1>" "casadi_fatrop_get_nx"
-// C-REPLACE "casadi_fatrop_get_nu<T1>" "casadi_fatrop_get_nu"
-// C-REPLACE "casadi_fatrop_get_ng<T1>" "casadi_fatrop_get_ng"
-// C-REPLACE "casadi_fatrop_get_ng_ineq<T1>" "casadi_fatrop_get_ng_ineq"
-// C-REPLACE "casadi_fatrop_get_horizon_length<T1>" "casadi_fatrop_get_horizon_length"
-// C-REPLACE "casadi_fatrop_get_bounds<T1>" "casadi_fatrop_get_bounds"
-// C-REPLACE "casadi_fatrop_get_initial_xk<T1>" "casadi_fatrop_get_initial_xk"
-// C-REPLACE "casadi_fatrop_get_initial_uk<T1>" "casadi_fatrop_get_initial_uk"
-// C-REPLACE "casadi_fatrop_full_eval_constr_jac<T1>" "casadi_fatrop_full_eval_constr_jac"
-// C-REPLACE "casadi_fatrop_full_eval_obj_grad<T1>" "casadi_fatrop_full_eval_obj_grad"
-// C-REPLACE "casadi_fatrop_full_eval_obj<T1>" "casadi_fatrop_full_eval_obj"
-// C-REPLACE "casadi_fatrop_full_eval_contr_viol<T1>" "casadi_fatrop_full_eval_contr_viol"
-// C-REPLACE "casadi_fatrop_full_eval_lag_hess<T1>" "casadi_fatrop_full_eval_lag_hess"
-// C-REPLACE "casadi_fatrop_eval_BAbt<T1>" "casadi_fatrop_eval_BAbt"
-// C-REPLACE "casadi_fatrop_eval_RSQrqt<T1>" "casadi_fatrop_eval_RSQrqt"
-// C-REPLACE "casadi_fatrop_eval_Ggt<T1>" "casadi_fatrop_eval_Ggt"
-// C-REPLACE "casadi_fatrop_eval_Ggt_ineq<T1>" "casadi_fatrop_eval_Ggt_ineq"
-
-
-// C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
 
 // SYMBOL "fatrop_presolve"
 template<typename T1>
