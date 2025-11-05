@@ -30,7 +30,7 @@
 #include <iostream>
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
-#include "madnlp_c.h"
+#include "libMad.h"
 
 extern "C" {
   int init_julia(int, char**);
