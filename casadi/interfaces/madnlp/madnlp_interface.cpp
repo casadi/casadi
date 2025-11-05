@@ -38,7 +38,7 @@
 #include <cstring>
 #include <string>
 
-#include <madnlp_runtime_str.h>
+#include <libMad.h>
 
 namespace casadi {
 
@@ -229,12 +229,12 @@ void MadnlpInterface::init(const Dict& opts) {
   int argc = _argv.size();
   char** argv = reinterpret_cast<char**>(_argv.data());
 
-  if (!GlobalOptions::julia_initialized) {
-    init_julia(argc, argv);
-    std::cout << "Init julia runtime with options: "<< std::endl ;
-    for (auto s: _argv) std::cout << s << std::endl;
-    GlobalOptions::julia_initialized = true;
-  }
+  // if (!GlobalOptions::julia_initialized) {
+  //   init_julia(argc, argv);
+  //   std::cout << "Init julia runtime with options: "<< std::endl;
+  //   for (auto s: _argv) std::cout << s << std::endl;
+  //   GlobalOptions::julia_initialized = true;
+  // }
 }
 
 int MadnlpInterface::init_mem(void* mem) const {
@@ -311,11 +311,18 @@ int MadnlpInterface::solve(void* mem) const {
 Dict MadnlpInterface::get_stats(void* mem) const {
   Dict stats = Nlpsol::get_stats(mem);
   auto m = static_cast<MadnlpMemory*>(mem);
-  stats["iter_count"] = m->d.stats.iter;
+  long iter, status;
+  double primal_feas, dual_feas;
+  madnlp_get_iter(d->stats, &iter);
+  madnlp_get_status(d->stats, &status);
+  madnlp_get_dual_feas(d->stats, &dual_feas);
+  madnlp_get_primal_feas(d->stats, &primal_feas);
+
+  stats["iter_count"] = iter;
   Dict madnlp;
-  madnlp["dual_feas"] = m->d.stats.dual_feas;
-  madnlp["primal_feas"] = m->d.stats.primal_feas;
-  madnlp["status"] = m->d.stats.status;
+  madnlp["dual_feas"] = dual_feas;
+  madnlp["primal_feas"] = primal_feas;
+  madnlp["status"] = status;
   stats["madnlp"] = madnlp;
   return stats;
 }
