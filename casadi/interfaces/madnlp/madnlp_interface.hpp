@@ -30,13 +30,7 @@
 #include <iostream>
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
-#include "libMad.h"
-
-extern "C" {
-  int init_julia(int, char**);
-  void shutdown_julia(int);
-}
-
+#include <libMad.h>
 
 namespace casadi {
   #include "madnlp_runtime.hpp"
