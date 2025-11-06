@@ -7,7 +7,7 @@ casadi_plugin(Nlpsol madnlp
   "${CMAKE_CURRENT_BINARY_DIR}/madnlp_runtime_str.h"
   )
 
-casadi_plugin_link_libraries(Nlpsol madnlp madnlp::madnlp_c)
+casadi_plugin_link_libraries(Nlpsol madnlp libmad::libMad)
 
 
 #add_executable(madnlp_test madnlp_test.cpp)
@@ -31,12 +31,22 @@ add_custom_command(
 
 target_link_directories(casadi_nlpsol_madnlp 
   PUBLIC
-  ${MADNLP_LIB_DIR}
-) 
+  ${LIBMAD_LIB_DIR}
+)
+
 
 #target_link_libraries(casadi_nlpsol_madnlp cmadnlp madnlp julia stdc++ dl m)
 
 target_include_directories(casadi_nlpsol_madnlp
   PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
+include(CMakePrintHelpers)
+cmake_print_properties(TARGETS casadi_nlpsol_madnlp
+  PROPERTIES INCLUDE_DIRECTORIES
+)
+cmake_print_properties(TARGETS libmad::libMad
+  PROPERTIES INCLUDE_DIRECTORIES
+)
+
+message("CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")

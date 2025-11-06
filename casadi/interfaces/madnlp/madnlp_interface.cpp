@@ -38,8 +38,6 @@
 #include <cstring>
 #include <string>
 
-#include <libMad.h>
-
 namespace casadi {
 
 extern "C"
@@ -195,53 +193,72 @@ void MadnlpInterface::init(const Dict& opts) {
   std::vector<char*> _argv = {};
   std::string s;
 
-  std::set<std::string> comp_values = {"no","yes","min","max"};
+  //std::set<std::string> comp_values = {"no","yes","min","max"};
 
-  auto comp = opts_.find("compile");
-  if (comp!=opts_.end()) {
-    std::string comp_value = comp->second;
-    if (comp_values.find(comp_value) != comp_values.end()) {
-      s = "--compile=" + comp_value;
-      const int comp_l = s.length();
-      char* option_comp = new char[comp_l + 1];
-      strcpy(option_comp, s.c_str());
-      _argv.push_back(option_comp);
-    } else {
-      std::cout << "Invalid value (" << comp_value << ")for option 'compile'" << std::endl;
-      std::cout << "Available values are: ";
-      for (auto v: comp_values) std::cout << v << " "; std::cout << std::endl;
-    }
-  }
+  // auto comp = opts_.find("compile");
+  // if (comp!=opts_.end()) {
+  //   std::string comp_value = comp->second;
+  //   if (comp_values.find(comp_value) != comp_values.end()) {
+  //     s = "--compile=" + comp_value;
+  //     const int comp_l = s.length();
+  //     char* option_comp = new char[comp_l + 1];
+  //     strcpy(option_comp, s.c_str());
+  //     _argv.push_back(option_comp);
+  //   } else {
+  //     std::cout << "Invalid value (" << comp_value << ")for option 'compile'" << std::endl;
+  //     std::cout << "Available values are: ";
+  //     for (auto v: comp_values) std::cout << v << " "; std::cout << std::endl;
+  //   }
+  // }
 
-  auto trace_opt = opts_.find("trace_compile");
-  if (trace_opt!=opts_.end() && bool(trace_opt->second))  {
-    std::string trace_compile_output = "stderr";
-    auto _trace_out_opt = opts_.find("trace_compile_output");
-    if (_trace_out_opt!=opts_.end())
-      trace_compile_output = (std::string) _trace_out_opt->second;
-    s = "--trace-compile=" + trace_compile_output;
-    const int trace_l = s.length();
-    char* option_trace = new char[trace_l + 1];
-    strcpy(option_trace, s.c_str());
-    _argv.push_back(option_trace);
-  }
+  // auto trace_opt = opts_.find("trace_compile");
+  // if (trace_opt!=opts_.end() && bool(trace_opt->second))  {
+  //   std::string trace_compile_output = "stderr";
+  //   auto _trace_out_opt = opts_.find("trace_compile_output");
+  //   if (_trace_out_opt!=opts_.end())
+  //     trace_compile_output = (std::string) _trace_out_opt->second;
+  //   s = "--trace-compile=" + trace_compile_output;
+  //   const int trace_l = s.length();
+  //   char* option_trace = new char[trace_l + 1];
+  //   strcpy(option_trace, s.c_str());
+  //   _argv.push_back(option_trace);
+  // }
 
   int argc = _argv.size();
   char** argv = reinterpret_cast<char**>(_argv.data());
 
-  // if (!GlobalOptions::julia_initialized) {
-  //   init_julia(argc, argv);
-  //   std::cout << "Init julia runtime with options: "<< std::endl;
-  //   for (auto s: _argv) std::cout << s << std::endl;
-  //   GlobalOptions::julia_initialized = true;
-  // }
 }
 
 int MadnlpInterface::init_mem(void* mem) const {
   if (Nlpsol::init_mem(mem)) return 1;
   if (!mem) return 1;
   auto m = static_cast<MadnlpMemory*>(mem);
-  madnlp_init_mem(&m->d);
+
+  // Now create the new options struct
+  libmad_create_options_dict(&(m->d.libmad_opts));
+  for (const auto& kv : opts_) {
+    switch (kv.second.getType()) {
+     case OT_DOUBLE:
+       libmad_set_double_option(m->d.libmad_opts, kv.first.c_str(), kv.second);
+       break;
+     case OT_INT:
+       libmad_set_long_option(m->d.libmad_opts, kv.first.c_str(), kv.second);
+       break;
+     case OT_STRING:
+     {
+       std::string s = kv.second.to_string();
+       libmad_set_string_option(m->d.libmad_opts, kv.first.c_str(), s.c_str());
+     }
+     break;
+     case OT_BOOL:
+       libmad_set_bool_option(m->d.libmad_opts, kv.first.c_str(), kv.second.to_bool());
+       break;
+     default:
+       casadi_error("Unknown option type.");
+    }
+  }
+
+  casadi_madnlp_init_mem(&m->d);
 
   return 0;
 }
@@ -274,30 +291,6 @@ int MadnlpInterface::solve(void* mem) const {
   auto m = static_cast<MadnlpMemory*>(mem);
 
   casadi_madnlp_presolve(&m->d);
-
-  for (const auto& kv : opts_) {
-    switch (madnlp_c_option_type(kv.first.c_str())) {
-      case 0:
-        madnlp_c_set_option_double(m->d.solver, kv.first.c_str(), kv.second);
-        break;
-      case 1:
-        madnlp_c_set_option_int(m->d.solver, kv.first.c_str(), kv.second.to_int());
-        break;
-      case 2:
-        madnlp_c_set_option_bool(m->d.solver, kv.first.c_str(), kv.second.to_bool());
-        break;
-      case 3:
-        {
-          std::string s = kv.second.to_string();
-          madnlp_c_set_option_string(m->d.solver, kv.first.c_str(), s.c_str());
-        }
-        break;
-      case -1:
-        casadi_error("Madnlp option not supported: " + kv.first);
-      default:
-        casadi_error("Unknown option type.");
-    }
-  }
 
   int ret = casadi_madnlp_solve(&m->d);
   if ( ret != 0 ) throw CasadiException("MADNLPError");

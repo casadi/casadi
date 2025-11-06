@@ -83,7 +83,7 @@ void casadi_madnlp_setup(casadi_madnlp_prob<T1>* p) {
 
 // SYMBOL "madnlp_init_mem"
 template<typename T1>
-int madnlp_init_mem(casadi_madnlp_data<T1>* d) {
+int casadi_madnlp_init_mem(casadi_madnlp_data<T1>* d) {
   // Problem structure
   const casadi_madnlp_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
@@ -103,13 +103,18 @@ int madnlp_init_mem(casadi_madnlp_data<T1>* d) {
                       d
     );
 
-  d->solver = madnlp_create_solver(&d->c_interface);
+  madnlp_create_solver(&(d->solver), model, d->libmad_opts);
   return 0;
 }
 
 // SYMBOL "madnlp_free_mem"
 template<typename T1>
 void madnlp_free_mem(casadi_madnlp_data<T1>* d) {
+  madnlp_delete_solver(d->solver);
+  d->solver = nullptr;
+  madnlp_delete_stats(d->stats);
+  d->stats = nullptr;
+  libmad_delete_options_dict(d->libmad_opts);
 }
 // C-REPLACE "static_cast< casadi_madnlp_data<T1>* >" "(struct casadi_madnlp_data*)"
 // C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
@@ -265,8 +270,6 @@ void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, c
 // SYMBOL "madnlp_presolve"
 template<typename T1>
 void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d) {
-  casadi_int k, i, start, stop, nx;
-
 }
 
 // SYMBOL "madnlp_c_solve"
@@ -291,8 +294,7 @@ int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
   madnlp_int ret = madnlp_c_solve(d->solver, d->libmad_opts, &(d->stats));
 
   if (ret!=0) {
-    madnlp_delete_solver(d->solver);
-    //madnlp_delete_stats(d->stats);
+    // cleanup done in free_mem
     return ret;
   }
   // get objective
