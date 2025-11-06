@@ -88,7 +88,7 @@ const Options MadnlpInterface::options_
    }
 };
 
-void casadi_madnlp_sparsity(const casadi_int* sp, madnlp_int *coord_i, madnlp_int *coord_j) {
+void casadi_madnlp_sparsity(const casadi_int* sp, long *coord_i, long *coord_j) {
     // convert ccs to cco
     casadi_int ncol = sp[1];
     const casadi_int* colind = sp+2;

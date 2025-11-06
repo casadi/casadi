@@ -81,41 +81,6 @@ template<typename T1>
 void casadi_madnlp_setup(casadi_madnlp_prob<T1>* p) {
 }
 
-// SYMBOL "madnlp_init_mem"
-template<typename T1>
-int casadi_madnlp_init_mem(casadi_madnlp_data<T1>* d) {
-  // Problem structure
-  const casadi_madnlp_prob<T1>* p = d->prob;
-  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
-  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
-  CNLPModel* model = &d->cnlp_model;
-  nlpmodel_cpu_create(&model,
-                      "Name",
-                      p_nlp->nx, p_nlp->ng,
-                      p->nnz_jac_g, p->nnz_hess_l,
-                      casadi_madnlp_constr_jac_structure<T1>,
-                      casadi_madnlp_lag_hess_structure<T1>,
-                      casadi_madnlp_eval_obj<T1>,
-                      casadi_madnlp_eval_constr<T1>,
-                      casadi_madnlp_eval_obj_grad<T1>,
-                      casadi_madnlp_eval_constr_jac<T1>,
-                      casadi_madnlp_eval_lag_hess<T1>,
-                      d
-    );
-
-  madnlp_create_solver(&(d->solver), model, d->libmad_opts);
-  return 0;
-}
-
-// SYMBOL "madnlp_free_mem"
-template<typename T1>
-void madnlp_free_mem(casadi_madnlp_data<T1>* d) {
-  madnlp_delete_solver(d->solver);
-  d->solver = nullptr;
-  madnlp_delete_stats(d->stats);
-  d->stats = nullptr;
-  libmad_delete_options_dict(d->libmad_opts);
-}
 // C-REPLACE "static_cast< casadi_madnlp_data<T1>* >" "(struct casadi_madnlp_data*)"
 // C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
 // C-REPLACE "calc_function" "casadi_oracle_call"
@@ -244,6 +209,42 @@ int casadi_madnlp_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
 // C-REPLACE "casadi_madnlp_eval_lag_hess<T1>" "casadi_madnlp_eval_lag_hess"
 // C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
 
+// SYMBOL "madnlp_init_mem"
+template<typename T1>
+int casadi_madnlp_init_mem(casadi_madnlp_data<T1>* d) {
+  // Problem structure
+  const casadi_madnlp_prob<T1>* p = d->prob;
+  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  CNLPModel* model = d->cnlp_model;
+  nlpmodel_cpu_create(&model,
+                      "Name",
+                      p_nlp->nx, p_nlp->ng,
+                      p->nnz_jac_g, p->nnz_hess_l,
+                      casadi_madnlp_constr_jac_structure<T1>,
+                      casadi_madnlp_lag_hess_structure<T1>,
+                      casadi_madnlp_eval_obj<T1>,
+                      casadi_madnlp_eval_constr<T1>,
+                      casadi_madnlp_eval_obj_grad<T1>,
+                      casadi_madnlp_eval_constr_jac<T1>,
+                      casadi_madnlp_eval_lag_hess<T1>,
+                      d
+    );
+
+  madnlp_create_solver(&(d->solver), model, d->libmad_opts);
+  return 0;
+}
+
+// SYMBOL "madnlp_free_mem"
+template<typename T1>
+void madnlp_free_mem(casadi_madnlp_data<T1>* d) {
+  madnlp_delete_solver(d->solver);
+  d->solver = nullptr;
+  madnlp_delete_stats(d->stats);
+  d->stats = nullptr;
+  libmad_delete_options_dict(d->libmad_opts);
+}
+
 // SYMBOL "madnlp_work"
 template<typename T1>
 void casadi_madnlp_work(const casadi_madnlp_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w) {
@@ -284,14 +285,13 @@ int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
   d->unified_return_status = SOLVER_RET_UNKNOWN;
   d->success = 0;
 
-  const struct MadnlpCNumericIn* in = madnlp_c_input(d->solver);
   // set initial guess
   libmad_nlpmodel_set_numerics(d->cnlp_model,
                                d_nlp->z, d_nlp->lam + p_nlp->nx,
                                d_nlp->lbx, d_nlp->ubx,
                                d_nlp->lbg, d_nlp->ubg);
 
-  madnlp_int ret = madnlp_c_solve(d->solver, d->libmad_opts, &(d->stats));
+  int ret = madnlp_solve(d->solver, d->libmad_opts, &(d->stats));
 
   if (ret!=0) {
     // cleanup done in free_mem
@@ -309,12 +309,12 @@ int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
   madnlp_get_multipliers(d->stats, d_nlp->lam + p_nlp->nx);
 
   long iter;
-  madnlp_get_iter(d->stats, &iter);
+  madnlp_get_iters(d->stats, &iter);
   printf("iter %d\n", iter);
 
   madnlp_get_success(d->stats, &(d->success));
 
-  if d->success {
+  if(d->success) {
     d->unified_return_status = SOLVER_RET_SUCCESS;
   } else {
     d->unified_return_status = SOLVER_RET_LIMITED;
