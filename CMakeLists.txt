@@ -1134,13 +1134,13 @@ endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
 
 if(WITH_MADNLP AND WITH_MOCKUP_MADNLP)
-  add_library(madnlp::madnlp_c SHARED IMPORTED)
-  add_dependencies(madnlp::madnlp_c mockups-external)
-  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/include")
-  set_target_properties(madnlp::madnlp_c PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/include"
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}madnlp_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}madnlp_c${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  add_library(libmad::libMad SHARED IMPORTED)
+  add_dependencies(libmad::libMad mockups-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/libMad/include")
+  set_target_properties(libmad::libMad PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/libMad/include"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/libMad/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}Mad${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/libMad/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}Mad${CMAKE_IMPORT_LIBRARY_SUFFIX}"
   )
 endif()
 add_feature_info(madnlp-interface WITH_MADNLP "Interface to the NLP solver MadNLP.")
