@@ -88,23 +88,23 @@ void casadi_madnlp_setup(casadi_madnlp_prob<T1>* p) {
 
 // SYMBOL "madnlp_constr_jac_structure"
 template<typename T1>
-int casadi_madnlp_constr_jac_structure(long* I, long* J, void* user_data)
+int casadi_madnlp_constr_jac_structure(libmad_int* I, libmad_int* J, void* user_data)
 {
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
   const casadi_madnlp_prob<T1>* p = d->prob;
-  std::memcpy(I, p->nzj_i, p->nnz_jac_g * sizeof(long));
-  std::memcpy(J, p->nzj_j, p->nnz_jac_g * sizeof(long));
+  std::memcpy(I, p->nzj_i, p->nnz_jac_g * sizeof(libmad_int));
+  std::memcpy(J, p->nzj_j, p->nnz_jac_g * sizeof(libmad_int));
   return 0;
 }
 
 // SYMBOL "madnlp_lag_hess_structure"
 template<typename T1>
-int casadi_madnlp_lag_hess_structure(long* I, long* J, void* user_data)
+int casadi_madnlp_lag_hess_structure(libmad_int* I, libmad_int* J, void* user_data)
 {
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
   const casadi_madnlp_prob<T1>* p = d->prob;
-  std::memcpy(I, p->nzh_i, p->nnz_hess_l * sizeof(long));
-  std::memcpy(J, p->nzh_j, p->nnz_hess_l * sizeof(long));
+  std::memcpy(I, p->nzh_i, p->nnz_hess_l * sizeof(libmad_int));
+  std::memcpy(J, p->nzh_j, p->nnz_hess_l * sizeof(libmad_int));
   return 0;
 }
 
@@ -217,18 +217,18 @@ int casadi_madnlp_init_mem(casadi_madnlp_data<T1>* d) {
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   CNLPModel* model = d->cnlp_model;
-  nlpmodel_cpu_create(&model,
-                      "Name",
-                      p_nlp->nx, p_nlp->ng,
-                      p->nnz_jac_g, p->nnz_hess_l,
-                      casadi_madnlp_constr_jac_structure<T1>,
-                      casadi_madnlp_lag_hess_structure<T1>,
-                      casadi_madnlp_eval_obj<T1>,
-                      casadi_madnlp_eval_constr<T1>,
-                      casadi_madnlp_eval_obj_grad<T1>,
-                      casadi_madnlp_eval_constr_jac<T1>,
-                      casadi_madnlp_eval_lag_hess<T1>,
-                      d
+  libmad_nlpmodel_create(&model,
+                         "Name",
+                         p_nlp->nx, p_nlp->ng,
+                         p->nnz_jac_g, p->nnz_hess_l,
+                         casadi_madnlp_constr_jac_structure<T1>,
+                         casadi_madnlp_lag_hess_structure<T1>,
+                         casadi_madnlp_eval_obj<T1>,
+                         casadi_madnlp_eval_constr<T1>,
+                         casadi_madnlp_eval_obj_grad<T1>,
+                         casadi_madnlp_eval_constr_jac<T1>,
+                         casadi_madnlp_eval_lag_hess<T1>,
+                         d
     );
 
   madnlp_create_solver(&(d->solver), model, d->libmad_opts);
@@ -308,11 +308,11 @@ int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
   // get the nonlinear constraint multipliers
   madnlp_get_multipliers(d->stats, d_nlp->lam + p_nlp->nx);
 
-  long iter;
-  madnlp_get_iters(d->stats, &iter);
-  printf("iter %d\n", iter);
-
-  madnlp_get_success(d->stats, &(d->success));
+  bool success_b;
+  madnlp_get_success(d->stats, &(success_b));
+  if(success_b){
+    d->success = 1;
+  }
 
   if(d->success) {
     d->unified_return_status = SOLVER_RET_SUCCESS;

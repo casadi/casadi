@@ -152,15 +152,15 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
 
  private:
   // Memory structure
-  casadi_madnlp_prob<double> p_;
+  casadi_madnlp_prob<libmad_real> p_;
 
-  std::vector<long> nws_;
-  std::vector<long> ngs_;
+  std::vector<libmad_int> nws_;
+  std::vector<libmad_int> ngs_;
 
-  std::vector<long> nzj_i_;
-  std::vector<long> nzj_j_;
-  std::vector<long> nzh_i_;
-  std::vector<long> nzh_j_;
+  std::vector<libmad_int> nzj_i_;
+  std::vector<libmad_int> nzj_j_;
+  std::vector<libmad_int> nzh_i_;
+  std::vector<libmad_int> nzh_j_;
 };
 
 } // namespace casadi
