@@ -88,7 +88,7 @@ const Options MadnlpInterface::options_
    }
 };
 
-void casadi_madnlp_sparsity(const casadi_int* sp, long *coord_i, long *coord_j) {
+void casadi_madnlp_sparsity(const casadi_int* sp, libmad_int *coord_i, libmad_int *coord_j) {
     // convert ccs to cco
     casadi_int ncol = sp[1];
     const casadi_int* colind = sp+2;
@@ -242,7 +242,7 @@ int MadnlpInterface::init_mem(void* mem) const {
        libmad_set_double_option(m->d.libmad_opts, kv.first.c_str(), kv.second);
        break;
      case OT_INT:
-       libmad_set_long_option(m->d.libmad_opts, kv.first.c_str(), kv.second);
+       libmad_set_long_option(m->d.libmad_opts, kv.first.c_str(), kv.second.to_int());
        break;
      case OT_STRING:
      {
@@ -304,18 +304,18 @@ int MadnlpInterface::solve(void* mem) const {
 Dict MadnlpInterface::get_stats(void* mem) const {
   Dict stats = Nlpsol::get_stats(mem);
   auto m = static_cast<MadnlpMemory*>(mem);
-  long iter, status;
+  libmad_int iter, status;
   double primal_feas, dual_feas;
-  madnlp_get_iter(d->stats, &iter);
-  madnlp_get_status(d->stats, &status);
-  madnlp_get_dual_feas(d->stats, &dual_feas);
-  madnlp_get_primal_feas(d->stats, &primal_feas);
+  madnlp_get_iters(m->d.stats, &iter);
+  madnlp_get_status(m->d.stats, &status);
+  madnlp_get_dual_feas(m->d.stats, &dual_feas);
+  madnlp_get_primal_feas(m->d.stats, &primal_feas);
 
-  stats["iter_count"] = iter;
+  stats["iter_count"] = static_cast<casadi_int>(iter);
   Dict madnlp;
   madnlp["dual_feas"] = dual_feas;
   madnlp["primal_feas"] = primal_feas;
-  madnlp["status"] = status;
+  madnlp["status"] = static_cast<casadi_int>(status);
   stats["madnlp"] = madnlp;
   return stats;
 }
@@ -342,144 +342,144 @@ void MadnlpInterface::set_madnlp_prob() {
   casadi_madnlp_setup(&p_);
 }
 
-void MadnlpInterface::codegen_init_mem(CodeGenerator& g) const {
-  g << "madnlp_init_mem(&" + codegen_mem(g) + ");\n";
-  g << "return 0;\n";
-}
+// void MadnlpInterface::codegen_init_mem(CodeGenerator& g) const {
+//   g << "madnlp_init_mem(&" + codegen_mem(g) + ");\n";
+//   g << "return 0;\n";
+// }
 
-void MadnlpInterface::codegen_free_mem(CodeGenerator& g) const {
-  // memory deallocation
-  g << "madnlp_free_mem(&" + codegen_mem(g) + ");\n";
-}
+// void MadnlpInterface::codegen_free_mem(CodeGenerator& g) const {
+//   // memory deallocation
+//   g << "madnlp_free_mem(&" + codegen_mem(g) + ");\n";
+// }
 
-void MadnlpInterface::codegen_declarations(CodeGenerator& g) const {
-  Nlpsol::codegen_declarations(g);
-  g.add_auxiliary(CodeGenerator::AUX_NLP);
-  g.add_auxiliary(CodeGenerator::AUX_MAX);
-  g.add_auxiliary(CodeGenerator::AUX_COPY);
-  g.add_auxiliary(CodeGenerator::AUX_PROJECT);
-  g.add_auxiliary(CodeGenerator::AUX_SCAL);
-  g.add_auxiliary(CodeGenerator::AUX_SPARSITY);
-  g.add_auxiliary(CodeGenerator::AUX_ORACLE_CALLBACK);
-  g.add_auxiliary(CodeGenerator::AUX_DENSIFY);
-  g.add_auxiliary(CodeGenerator::AUX_SPARSIFY);
-  g.add_auxiliary(CodeGenerator::AUX_INF);
-  g.add_dependency(get_function("nlp_f"));
-  g.add_dependency(get_function("nlp_grad_f"));
-  g.add_dependency(get_function("nlp_g"));
-  g.add_dependency(get_function("nlp_jac_g"));
-  g.add_dependency(get_function("nlp_hess_l"));
-  g.add_include("MadnlpCInterface.h");
-}
+// void MadnlpInterface::codegen_declarations(CodeGenerator& g) const {
+//   Nlpsol::codegen_declarations(g);
+//   g.add_auxiliary(CodeGenerator::AUX_NLP);
+//   g.add_auxiliary(CodeGenerator::AUX_MAX);
+//   g.add_auxiliary(CodeGenerator::AUX_COPY);
+//   g.add_auxiliary(CodeGenerator::AUX_PROJECT);
+//   g.add_auxiliary(CodeGenerator::AUX_SCAL);
+//   g.add_auxiliary(CodeGenerator::AUX_SPARSITY);
+//   g.add_auxiliary(CodeGenerator::AUX_ORACLE_CALLBACK);
+//   g.add_auxiliary(CodeGenerator::AUX_DENSIFY);
+//   g.add_auxiliary(CodeGenerator::AUX_SPARSIFY);
+//   g.add_auxiliary(CodeGenerator::AUX_INF);
+//   g.add_dependency(get_function("nlp_f"));
+//   g.add_dependency(get_function("nlp_grad_f"));
+//   g.add_dependency(get_function("nlp_g"));
+//   g.add_dependency(get_function("nlp_jac_g"));
+//   g.add_dependency(get_function("nlp_hess_l"));
+//   g.add_include("MadnlpCInterface.h");
+// }
 
-void MadnlpInterface::codegen_body(CodeGenerator& g) const {
-  codegen_body_enter(g);
-  g.auxiliaries << g.sanitize_source(madnlp_runtime_str, {"casadi_real"});
+// void MadnlpInterface::codegen_body(CodeGenerator& g) const {
+//   codegen_body_enter(g);
+//   g.auxiliaries << g.sanitize_source(madnlp_runtime_str, {"casadi_real"});
 
-  g.local("d", "struct casadi_madnlp_data*");
-  g.init_local("d", "&" + codegen_mem(g));
-  g.local("p", "struct casadi_madnlp_prob");
-  set_madnlp_prob(g);
+//   g.local("d", "struct casadi_madnlp_data*");
+//   g.init_local("d", "&" + codegen_mem(g));
+//   g.local("p", "struct casadi_madnlp_prob");
+//   set_madnlp_prob(g);
 
-  g << "casadi_madnlp_init(d, &arg, &res, &iw, &w);\n";
-  g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
-  g << "casadi_madnlp_presolve(d);\n";
+//   g << "casadi_madnlp_init(d, &arg, &res, &iw, &w);\n";
+//   g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
+//   g << "casadi_madnlp_presolve(d);\n";
 
-  for (const auto& kv : opts_) {
-    switch (madnlp_c_option_type(kv.first.c_str())) {
-      case 0:
-        g << "madnlp_c_set_option_double(d->solver, \"" + kv.first + "\", "
-              + str(kv.second) + ");\n";
-        break;
-      case 1:
-        g << "madnlp_c_set_option_int(d->solver, \"" + kv.first + "\", "
-              + str(kv.second.to_int()) + ");\n";
-        break;
-      case 2:
-        g << "madnlp_c_set_option_bool(d->solver, \"" + kv.first + "\", "
-              + str(static_cast<int>(kv.second.to_bool())) + ");\n";
-        break;
-      case 3:
-        {
-          std::string s = kv.second.to_string();
-          g << "madnlp_c_set_option_string(d->solver, \"" + kv.first + "\", \""
-              + s + "\");\n";
-        }
-        break;
-      case -1:
-        casadi_error("Madnlp option not supported: " + kv.first);
-      default:
-        casadi_error("Unknown option type.");
-    }
-  }
+//   for (const auto& kv : opts_) {
+//     switch (madnlp_c_option_type(kv.first.c_str())) {
+//       case 0:
+//         g << "madnlp_c_set_option_double(d->solver, \"" + kv.first + "\", "
+//               + str(kv.second) + ");\n";
+//         break;
+//       case 1:
+//         g << "madnlp_c_set_option_int(d->solver, \"" + kv.first + "\", "
+//               + str(kv.second.to_int()) + ");\n";
+//         break;
+//       case 2:
+//         g << "madnlp_c_set_option_bool(d->solver, \"" + kv.first + "\", "
+//               + str(static_cast<int>(kv.second.to_bool())) + ");\n";
+//         break;
+//       case 3:
+//         {
+//           std::string s = kv.second.to_string();
+//           g << "madnlp_c_set_option_string(d->solver, \"" + kv.first + "\", \""
+//               + s + "\");\n";
+//         }
+//         break;
+//       case -1:
+//         casadi_error("Madnlp option not supported: " + kv.first);
+//       default:
+//         casadi_error("Unknown option type.");
+//     }
+//   }
 
-  // Options
-  g << "casadi_madnlp_solve(d);\n";
+//   // Options
+//   g << "casadi_madnlp_solve(d);\n";
 
-  codegen_body_exit(g);
+//   codegen_body_exit(g);
 
-  if (error_on_fail_) {
-    g << "return d->unified_return_status;\n";
-  } else {
-    g << "return 0;\n";
-  }
-}
+//   if (error_on_fail_) {
+//     g << "return d->unified_return_status;\n";
+//   } else {
+//     g << "return 0;\n";
+//   }
+// }
 
-void MadnlpInterface::set_madnlp_prob(CodeGenerator& g) const {
-  if (jacg_sp_.size1()>0 && jacg_sp_.nnz()==0) {
-    casadi_error("Empty sparsity pattern not supported in MADNLP C interface");
-  }
-  g << "d->nlp = &d_nlp;\n";
-  g << "d->prob = &p;\n";
-  g << "p.nlp = &p_nlp;\n";
+// void MadnlpInterface::set_madnlp_prob(CodeGenerator& g) const {
+//   if (jacg_sp_.size1()>0 && jacg_sp_.nnz()==0) {
+//     casadi_error("Empty sparsity pattern not supported in MADNLP C interface");
+//   }
+//   g << "d->nlp = &d_nlp;\n";
+//   g << "d->prob = &p;\n";
+//   g << "p.nlp = &p_nlp;\n";
 
-  g.setup_callback("p.nlp_jac_g", get_function("nlp_jac_g"));
-  g.setup_callback("p.nlp_grad_f", get_function("nlp_grad_f"));
-  g.setup_callback("p.nlp_f", get_function("nlp_f"));
-  g.setup_callback("p.nlp_g", get_function("nlp_g"));
-  g.setup_callback("p.nlp_hess_l", get_function("nlp_hess_l"));
+//   g.setup_callback("p.nlp_jac_g", get_function("nlp_jac_g"));
+//   g.setup_callback("p.nlp_grad_f", get_function("nlp_grad_f"));
+//   g.setup_callback("p.nlp_f", get_function("nlp_f"));
+//   g.setup_callback("p.nlp_g", get_function("nlp_g"));
+//   g.setup_callback("p.nlp_hess_l", get_function("nlp_hess_l"));
 
-  g << "p.sp_a = " << g.sparsity(jacg_sp_) << ";\n";
-  if (exact_hessian_) {
-    g << "p.sp_h = " << g.sparsity(hesslag_sp_) << ";\n";
-  } else {
-    g << "p.sp_h = 0;\n";
-  }
+//   g << "p.sp_a = " << g.sparsity(jacg_sp_) << ";\n";
+//   if (exact_hessian_) {
+//     g << "p.sp_h = " << g.sparsity(hesslag_sp_) << ";\n";
+//   } else {
+//     g << "p.sp_h = 0;\n";
+//   }
 
-  g << "casadi_madnlp_setup(&p);\n";
-}
+//   g << "casadi_madnlp_setup(&p);\n";
+// }
 
-MadnlpInterface::MadnlpInterface(DeserializingStream& s) : Nlpsol(s) {
-  s.version("MadnlpInterface", 1);
-  s.unpack("MadnlpInterface::jacg_sp", jacg_sp_);
-  s.unpack("MadnlpInterface::hesslag_sp", hesslag_sp_);
-  s.unpack("MadnlpInterface::exact_hessian", exact_hessian_);
-  s.unpack("MadnlpInterface::opts", opts_);
-  s.unpack("MadnlpInterface::convexify", convexify_);
+// MadnlpInterface::MadnlpInterface(DeserializingStream& s) : Nlpsol(s) {
+//   s.version("MadnlpInterface", 1);
+//   s.unpack("MadnlpInterface::jacg_sp", jacg_sp_);
+//   s.unpack("MadnlpInterface::hesslag_sp", hesslag_sp_);
+//   s.unpack("MadnlpInterface::exact_hessian", exact_hessian_);
+//   s.unpack("MadnlpInterface::opts", opts_);
+//   s.unpack("MadnlpInterface::convexify", convexify_);
 
-  s.unpack("MadnlpInterface::nzj_i", nzj_i_);
-  s.unpack("MadnlpInterface::nzj_j", nzj_j_);
-  s.unpack("MadnlpInterface::nzh_i", nzh_i_);
-  s.unpack("MadnlpInterface::nzh_j", nzh_j_);
+//   s.unpack("MadnlpInterface::nzj_i", nzj_i_);
+//   s.unpack("MadnlpInterface::nzj_j", nzj_j_);
+//   s.unpack("MadnlpInterface::nzh_i", nzh_i_);
+//   s.unpack("MadnlpInterface::nzh_j", nzh_j_);
 
-  set_madnlp_prob();
-}
+//   set_madnlp_prob();
+// }
 
-void MadnlpInterface::serialize_body(SerializingStream &s) const {
-  Nlpsol::serialize_body(s);
-  s.version("MadnlpInterface", 1);
+// void MadnlpInterface::serialize_body(SerializingStream &s) const {
+//   Nlpsol::serialize_body(s);
+//   s.version("MadnlpInterface", 1);
 
-  s.pack("MadnlpInterface::jacg_sp", jacg_sp_);
-  s.pack("MadnlpInterface::hesslag_sp", hesslag_sp_);
-  s.pack("MadnlpInterface::exact_hessian", exact_hessian_);
-  s.pack("MadnlpInterface::opts", opts_);
-  s.pack("MadnlpInterface::convexify", convexify_);
+//   s.pack("MadnlpInterface::jacg_sp", jacg_sp_);
+//   s.pack("MadnlpInterface::hesslag_sp", hesslag_sp_);
+//   s.pack("MadnlpInterface::exact_hessian", exact_hessian_);
+//   s.pack("MadnlpInterface::opts", opts_);
+//   s.pack("MadnlpInterface::convexify", convexify_);
 
-  s.pack("MadnlpInterface::nzj_i", nzj_i_);
-  s.pack("MadnlpInterface::nzj_j", nzj_j_);
-  s.pack("MadnlpInterface::nzh_i", nzh_i_);
-  s.pack("MadnlpInterface::nzh_j", nzh_j_);
+//   s.pack("MadnlpInterface::nzj_i", nzj_i_);
+//   s.pack("MadnlpInterface::nzj_j", nzj_j_);
+//   s.pack("MadnlpInterface::nzh_i", nzh_i_);
+//   s.pack("MadnlpInterface::nzh_j", nzh_j_);
 
-}
+// }
 
 } // namespace casadi
