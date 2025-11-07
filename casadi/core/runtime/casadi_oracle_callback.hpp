@@ -27,7 +27,7 @@ struct casadi_oracle_callback {
 // C-REPLACE "casadi_oracle_callback<T1>" "struct casadi_oracle_callback"
 // C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
 
-// SYMBOL "call"
+// SYMBOL "oracle_call"
 template<typename T1>
 int casadi_oracle_call(const casadi_oracle_callback<T1>* cb, casadi_oracle_data<T1>* d) {
   int flag;

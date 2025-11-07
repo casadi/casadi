@@ -811,7 +811,7 @@ namespace casadi {
       casadi_copy(d_nlp->ubg, ng_, d_nlp->ubz+nx_);
       casadi_copy(d_nlp->lam_g0, ng_, d_nlp->lam+nx_);
     } else {
-      if (casadi_detect_bounds_before(d_nlp)) return 1;
+      if (casadi_nlpsol_detect_bounds_before(d_nlp)) return 1;
     }
 
     // Set multipliers to nan
@@ -861,7 +861,7 @@ namespace casadi {
       casadi_copy(d_nlp->lam, nx_, d_nlp->lam_x);
       casadi_copy(d_nlp->lam + nx_, ng_, d_nlp->lam_g);
     } else {
-      if (casadi_detect_bounds_after(d_nlp)) return 1;
+      if (casadi_nlpsol_detect_bounds_after(d_nlp)) return 1;
     }
 
     casadi_copy(d_nlp->lam_p, np_, d_nlp->lam_p);
@@ -1329,7 +1329,7 @@ namespace casadi {
         "casadi_inf", false);
       g.copy_default("d_nlp.lam_g0", ng_, "d_nlp.lam+"+str(nx_), "0", false);
     } else {
-      g << "if (casadi_detect_bounds_before(&d_nlp)) return 1;\n";
+      g << "if (casadi_nlpsol_detect_bounds_before(&d_nlp)) return 1;\n";
     }
 
   }
@@ -1382,7 +1382,7 @@ namespace casadi {
       g << g.copy("d_nlp.lam", nx_, "d_nlp.lam_x") << "\n";
       g << g.copy("d_nlp.lam + " + str(nx_), ng_, "d_nlp.lam_g") << "\n";
     } else {
-      g << "if (casadi_detect_bounds_after(&d_nlp)) return 1;\n";
+      g << "if (casadi_nlpsol_detect_bounds_after(&d_nlp)) return 1;\n";
     }
 
     g.copy_check("&d_nlp.objective", 1, "d_nlp.f", false, true);
