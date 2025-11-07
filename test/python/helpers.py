@@ -697,6 +697,37 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       return (external(name, libname,opts),libname)
 
+  def check_symbols(self, libname, c_filename):
+    """Check that no symbols starting with 'casadi' are exported in the shared library"""
+    import re
+    import ctypes
+    import subprocess
+    import sys
+
+    # Use nm to list all exported symbols
+    if sys.platform == "darwin":
+      nm_cmd = ["nm", "-gU", libname]
+    elif os.name == 'nt':
+      # On Windows, skip this check for now
+      return
+    else:
+      nm_cmd = ["nm", "-D", libname]
+
+    result = subprocess.run(nm_cmd, capture_output=True, text=True)
+    nm_output = result.stdout
+
+    # Find all exported text symbols (type T or W)
+    symbol_pattern = r'[0-9a-f]+\s+[TW]\s+(\w+)'
+    all_exported = re.findall(symbol_pattern, nm_output)
+
+    # Find symbols starting with 'casadi'
+    exclude_symbols = ['casadi_alloc', 'casadi_alloc_arrays', 'casadi_decompress', 'casadi_deinit', 'casadi_eval', 'casadi_free', 'casadi_free_arrays', 'casadi_init', 'casadi_init_arrays']
+    
+    bad_symbols = [s for s in all_exported if s.startswith('casadi') and not "free_mem" in s and not "incref" in s and not "decref" in s and not s in exclude_symbols]
+
+    if bad_symbols:
+      self.fail(f"Found {len(bad_symbols)} symbols starting with 'casadi' exported in shared library (missing CASADI_PREFIX): {bad_symbols[:10]}")
+
   def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
@@ -772,6 +803,10 @@ class casadiTestCase(unittest.TestCase):
       p = subprocess.Popen(commands,shell=True).wait()
       #if sys.platform=="darwin":
       #  subprocess.run(["otool","-l",libname])
+
+      # Check that all exported symbols are accessible (have correct prefix)
+      self.check_symbols(libname, name+".c")
+
       if external_opts is None: external_opts = {}
       F2 = external(F.name(), libname,external_opts)
 

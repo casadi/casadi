@@ -143,6 +143,9 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
   /** \brief Thread-local memory object type */
   std::string codegen_mem_type() const override { return "struct casadi_madnlp_data"; }
 
+  /** \brief Is thread-local memory object needed? */
+  bool codegen_needs_mem() const override { return true; }
+
   /** \brief Serialize an object without type information */
   void serialize_body(SerializingStream &s) const override;
 

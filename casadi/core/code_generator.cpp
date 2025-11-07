@@ -276,33 +276,36 @@ namespace casadi {
       *this << "}\n\n";
     }
 
-    bool fun_needs_mem = !f->codegen_mem_type().empty();
+    bool fun_needs_mem = f->codegen_needs_mem();
     needs_mem_ |= fun_needs_mem;
 
     if (fun_needs_mem) {
-      // Alloc memory
-      *this << "int " << fname << "_alloc_mem(void) {\n";
-      flush(this->body);
-      scope_enter();
-      f->codegen_alloc_mem(*this);
-      scope_exit();
-      *this << "}\n\n";
 
-      // Initialize memory
-      *this << "int " << fname << "_init_mem(int mem) {\n";
-      flush(this->body);
-      scope_enter();
-      f->codegen_init_mem(*this);
-      scope_exit();
-      *this << "}\n\n";
+      if (!f->codegen_mem_is_opaque()) {
+        // Alloc memory
+        *this << "int " << fname << "_alloc_mem(void) {\n";
+        flush(this->body);
+        scope_enter();
+        f->codegen_alloc_mem(*this);
+        scope_exit();
+        *this << "}\n\n";
 
-      // Clear memory
-      *this << "void " << fname << "_free_mem(int mem) {\n";
-      flush(this->body);
-      scope_enter();
-      f->codegen_free_mem(*this);
-      scope_exit();
-      *this << "}\n\n";
+        // Initialize memory
+        *this << "int " << fname << "_init_mem(int mem) {\n";
+        flush(this->body);
+        scope_enter();
+        f->codegen_init_mem(*this);
+        scope_exit();
+        *this << "}\n\n";
+
+        // Clear memory
+        *this << "void " << fname << "_free_mem(int mem) {\n";
+        flush(this->body);
+        scope_enter();
+        f->codegen_free_mem(*this);
+        scope_exit();
+        *this << "}\n\n";
+      }
 
       // Checkout
       *this << "int " << fname << "_checkout(void) {\n";
@@ -1143,7 +1146,7 @@ namespace casadi {
 
   void CodeGenerator::setup_callback(const std::string& s, const Function& f) {
     std::string name = add_dependency(f);
-    bool needs_mem = !f->codegen_mem_type().empty();
+    bool needs_mem = f->codegen_needs_mem();
     if (needs_mem) {
       *this << s << ".checkout = " << name << "_checkout;\n";
     } else {
@@ -1163,16 +1166,20 @@ namespace casadi {
              const std::string& res, const std::string& iw,
              const std::string& w, const std::string& failure_ret) {
     std::string name = add_dependency(f);
-    bool needs_mem = !f->codegen_mem_type().empty();
+
+    std::string cg_name = f->codegen_name(*this, false);
+    bool needs_mem = f->codegen_needs_mem();
     if (needs_mem) {
       std::string mem = "mid";
       local("flag", "int");
       local(mem, "int");
-      *this << mem << " = " << name << "_checkout();\n";
+      std::string checkout = shorthand(cg_name + "_checkout");
+      *this << mem << " = " << checkout << "();\n";
       *this << "if (" << mem << "<0) return " << failure_ret << ";\n";
       *this << "flag = " + name + "(" + arg + ", " + res + ", "
               + iw + ", " + w + ", " << mem << ");\n";
-      *this << name << "_release(" << mem << ");\n";
+      std::string release = shorthand(cg_name + "_release");
+      *this << release << "(" << mem << ");\n";
       return "flag";
     } else {
       return name + "(" + arg + ", " + res + ", "
@@ -1778,11 +1785,13 @@ namespace casadi {
                         << "}\n\n";
       break;
     case AUX_MIN:
+      shorthand("min");
       this->auxiliaries << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
                         << "  return x>y ? y : x;\n"
                         << "}\n\n";
       break;
     case AUX_MAX:
+      shorthand("max");
       this->auxiliaries << "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
                         << "  return x>y ? x : y;\n"
                         << "}\n\n";

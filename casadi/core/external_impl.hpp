@@ -146,10 +146,12 @@ class CASADI_EXPORT External : public FunctionInternal {
       \identifier{1zf} */
   void codegen_body(CodeGenerator& g) const override;
 
-  /** \brief Thread-local memory object type
+  /** \brief Is thread-local memory object needed? */
+  bool codegen_needs_mem() const override { return true; }
 
-      \identifier{1zg} */
-  std::string codegen_mem_type() const override;
+  /** \brief Is thread-local memory object managed by checkout/release
+    * without a need for alloc_mem, init_mem, free_mem? */
+  bool codegen_mem_is_opaque() const override { return true; }
 
   /** \brief Codegen incref for dependencies
 
