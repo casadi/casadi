@@ -149,9 +149,3 @@ endif()
 # DaeBuilder
 add_executable(daebuilder daebuilder.cpp)
 target_link_libraries(daebuilder casadi)
-
-# ONNX export example
-if(WITH_ONNX)
-  add_executable(onnx_export onnx_export.cpp)
-  target_link_libraries(onnx_export casadi)
-endif()

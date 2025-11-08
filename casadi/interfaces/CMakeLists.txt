@@ -146,10 +146,6 @@ if(WITH_GHC_FILESYSTEM)
   add_subdirectory(ghc)
 endif()
 
-if(WITH_ONNX)
-  add_subdirectory(onnx)
-endif()
-
 if(WITH_LINT)
   set(LINT_TARGETS ${LINT_TARGETS} PARENT_SCOPE)
 endif()
