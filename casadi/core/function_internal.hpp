@@ -914,12 +914,15 @@ namespace casadi {
         \identifier{m1} */
     virtual std::string codegen_mem_type() const { return ""; }
 
-    /** \brief Is thread-local memory object needed? */
+    /** \brief Is thread-local memory object needed?
+
+        \identifier{2ex} */
     virtual bool codegen_needs_mem() const { return false; }
 
     /** \brief Is thread-local memory object managed by checkout/release
     * without a need for alloc_mem, init_mem, free_mem?
-    */
+
+        \identifier{2ey} */
     virtual bool codegen_mem_is_opaque() const { return false; }
 
     /** \brief Export / Generate C code for the dependency function
