@@ -2125,21 +2125,22 @@ add_feature_info(ghc-filesystem-interface WITH_GHC_FILESYSTEM "Interface to the 
 
 if(WITH_PROTOBUF)
   if(WITH_BUILD_PROTOBUF)
-  #ExternalProject_Add(abseil-external
-  #      GIT_REPOSITORY ${BUILD_ABSEIL_GIT_REPO}
-  #      GIT_SHALLOW ${BUILD_ABSEIL_GIT_SHALLOW}
-  ##      GIT_TAG ${BUILD_ABSEIL_VERSION}
-   #     PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-   #     UPDATE_COMMAND ""
-   #     CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-   #     CMAKE_ARGS
-   #      -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-   #      -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
-  #add_library(absl::abseil_dll STATIC IMPORTED)
-  #add_dependencies(absl::abseil_dll abseil-external)
+  ExternalProject_Add(abseil-external
+        GIT_REPOSITORY ${BUILD_ABSEIL_GIT_REPO}
+        GIT_SHALLOW ${BUILD_ABSEIL_GIT_SHALLOW}
+        GIT_TAG ${BUILD_ABSEIL_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS
+         -DBUILD_SHARED_LIBS=ON
+         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+         -DABSL_BUILD_MONOLITHIC_SHARED_LIBS=ON)
+  add_library(absl::abseil_dll SHARED IMPORTED)
+  add_dependencies(absl::abseil_dll abseil-external)
 
-  #set_target_properties(absl::abseil_dll PROPERTIES
-  #  IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}abseil_dll${CMAKE_STATIC_LIBRARY_SUFFIX}")
+  set_target_properties(absl::abseil_dll PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}abseil_dll${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
   ExternalProject_Add(protobuf-external
       GIT_REPOSITORY ${BUILD_PROTOBUF_GIT_REPO}
@@ -2149,156 +2150,20 @@ if(WITH_PROTOBUF)
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS
-        -DCMAKE_CXX_STANDARD=17
         -Dprotobuf_BUILD_TESTS=OFF
         -Dprotobuf_BUILD_EXAMPLES=OFF
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -Dprotobuf_BUILD_SHARED_LIBS=ON
+        -DBUILD_SHARED_LIBS=ON
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
 
-  add_library(protobuf::libprotobuf STATIC IMPORTED)
+  add_library(protobuf::libprotobuf SHARED IMPORTED)
   add_dependencies(protobuf::libprotobuf protobuf-external)
-
-  # Add utf8_range dependencies (required by protobuf)
-  add_library(utf8_range::utf8_range STATIC IMPORTED)
-  set_target_properties(utf8_range::utf8_range PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}utf8_range${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
-
-  target_link_libraries(protobuf::libprotobuf INTERFACE utf8_range::utf8_range)
-
-  # Abseil libraries in topologically-sorted dependency order
-  # Generated from abslTargets.cmake to ensure correct link order
-  # Dependencies come AFTER their dependents in this list
-  set(ABS_LIBS
-absl_time_zone
-absl_civil_time
-absl_random_internal_platform
-absl_utf8_for_code_point
-absl_random_internal_randen_hwaes_impl
-absl_random_internal_randen_slow
-absl_leak_check
-absl_exponential_biased
-absl_log_severity
-absl_log_internal_nullguard
-absl_flags_commandlineflag_internal
-absl_strerror
-absl_periodic_sampler
-absl_raw_logging_internal
-absl_int128
-absl_spinlock_wait
-absl_decode_rust_punycode
-absl_cordz_functions
-absl_bad_optional_access
-absl_bad_variant_access
-absl_bad_any_cast_impl
-absl_random_seed_gen_exception
-absl_scoped_set_env
-absl_throw_delegate
-absl_debugging_internal
-absl_base
-absl_demangle_rust
-absl_stacktrace
-absl_malloc_internal
-absl_tracing_internal
-absl_log_internal_conditions
-absl_string_view
-absl_demangle_internal
-absl_random_internal_randen_hwaes
-absl_crc_cpu_detect
-absl_graphcycles_internal
-absl_poison
-absl_strings_internal
-absl_low_level_hash
-absl_city
-absl_random_internal_randen
-absl_crc_internal
-absl_strings
-absl_log_internal_proto
-absl_random_internal_seed_material
-absl_symbolize
-absl_hash
-absl_str_format_internal
-absl_log_internal_fnmatch
-absl_time
-absl_flags_commandlineflag
-absl_random_distributions
-absl_log_internal_structured_proto
-absl_random_internal_pool_urbg
-absl_examine_stack
-absl_log_entry
-absl_kernel_timeout_internal
-absl_log_internal_globals
-absl_flags_private_handle_accessor
-absl_random_seed_sequences
-absl_failure_signal_handler
-absl_crc32c
-absl_flags_marshalling
-absl_random_internal_distribution_test_util
-absl_log_sink
-absl_synchronization
-absl_log_internal_format
-absl_crc_cord_state
-absl_cordz_handle
-absl_flags_program_name
-absl_vlog_config_internal
-absl_cord_internal
-absl_hashtablez_sampler
-absl_flags_config
-absl_log_globals
-absl_cordz_info
-absl_flags_internal
-absl_log_initialize
-absl_log_internal_log_sink_set
-absl_cordz_sample_token
-absl_cord
-absl_log_internal_message
-absl_status
-absl_statusor
-absl_raw_hash_set
-absl_log_internal_check_op
-absl_die_if_null
-absl_flags_reflection
-absl_flags_usage_internal
-absl_log_flags
-absl_flags_usage
-absl_flags_parse
-  )
-
-  foreach(lib IN LISTS ABS_LIBS)
-    add_library(absl-external::${lib} STATIC IMPORTED)
-    set_target_properties(absl-external::${lib} PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${lib}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
-    target_link_libraries(protobuf::libprotobuf INTERFACE absl-external::${lib})
-  endforeach()
-
-  # Workaround: When linking static abseil libs into shared libraries, RTTI typeinfo symbols
-  # may not be pulled in. Use whole-archive flags to force inclusion of all symbols.
-  # This is needed because we don't replicate abseil's full INTERFACE_LINK_LIBRARIES graph.
-  #
-  # Note: We prepend/append the flags to INTERFACE_LINK_LIBRARIES to wrap all the libs
-  if(UNIX AND NOT APPLE)
-    # Linux: prepend --whole-archive before all libs, append --no-whole-archive after
-    # First, get the current list
-    get_target_property(PROTOBUF_LIBS protobuf::libprotobuf INTERFACE_LINK_LIBRARIES)
-    # Now rebuild with flags wrapped around
-    set_property(TARGET protobuf::libprotobuf PROPERTY
-      INTERFACE_LINK_LIBRARIES
-      "-Wl,--whole-archive"
-      ${PROTOBUF_LIBS}
-      "-Wl,--no-whole-archive")
-  elseif(APPLE)
-    # macOS: -all_load applies to all subsequently linked static libs
-    target_link_options(protobuf::libprotobuf INTERFACE "-Wl,-all_load")
-  elseif(MSVC)
-    # Windows: /WHOLEARCHIVE applies to all subsequently linked static libs
-    target_link_options(protobuf::libprotobuf INTERFACE "/WHOLEARCHIVE")
-  endif()
+  target_link_libraries(protobuf::libprotobuf INTERFACE absl::abseil_dll)
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
 
   set_target_properties(protobuf::libprotobuf PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}protobuf${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}protobuf${CMAKE_SHARED_LIBRARY_SUFFIX}"
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
   else()
     find_package(Protobuf REQUIRED)
@@ -2318,28 +2183,24 @@ if(WITH_ONNX)
         #PATCH_COMMAND git apply --ignore-whitespace ${CMAKE_SOURCE_DIR}/cmake/onnx_protobuf_dll.patch || echo "Patch already applied or failed"
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
         CMAKE_ARGS
-          -DCMAKE_CXX_STANDARD=17
+          -DONNX_USE_PROTOBUF_SHARED_LIBS=ON
           -DONNX_BUILD_TESTS=OFF
+          -DBUILD_SHARED_LIBS=ON
           -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects
           -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
           -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
-    add_library(ONNX::onnx STATIC IMPORTED)
-    add_library(ONNX::onnx_proto STATIC IMPORTED)
+    add_library(ONNX::onnx SHARED IMPORTED)
+    add_library(ONNX::onnx_proto SHARED IMPORTED)
     add_dependencies(ONNX::onnx onnx-external)
     add_dependencies(ONNX::onnx_proto onnx-external)
-    target_link_libraries(ONNX::onnx INTERFACE protobuf::libprotobuf)
+    target_link_libraries(ONNX::onnx_proto INTERFACE protobuf::libprotobuf)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ONNX::onnx PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}onnx${CMAKE_SHARED_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ONNX::onnx_proto PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx_proto${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}onnx_proto${CMAKE_SHARED_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
-    #add_library(onnx-external::abs STATIC IMPORTED)
-    #set_target_properties(ONNX::onnx PROPERTIES
-    #  IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    #   INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
-    #target_link_libraries(ONNX::onnx INTERFACE ONNX::abs)
   else()
     find_package(ONNX REQUIRED)
   endif()
