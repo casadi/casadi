@@ -931,11 +931,6 @@ set(BUILD_PROTOBUF_GIT_REPO "https://github.com/protocolbuffers/protobuf" CACHE 
 set(BUILD_PROTOBUF_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Protobuf")
 set(BUILD_PROTOBUF_VERSION "v31.1" CACHE STRING "Tag/branch/hash for Protobuf")
 option(WITH_BUILD_PROTOBUF "Build Protobuf from source" OFF)
-set(BUILD_ABSEIL_GIT_REPO "https://github.com/abseil/abseil-cpp.git" CACHE STRING "Git repo for Abseil")
-set(BUILD_ASBEIL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Abseil")
-set(BUILD_ABSEIL_VERSION "20250127.0" CACHE STRING "Tag/branch/hash for Abseil")
-option(WITH_BUILD_PROTOBUF "Build Protobuf from source" OFF)
-
 
 # ONNX Translator plugin
 option(WITH_ONNX "Compile the ONNX translator interface" OFF)
@@ -2125,23 +2120,6 @@ add_feature_info(ghc-filesystem-interface WITH_GHC_FILESYSTEM "Interface to the 
 
 if(WITH_PROTOBUF)
   if(WITH_BUILD_PROTOBUF)
-  ExternalProject_Add(abseil-external
-        GIT_REPOSITORY ${BUILD_ABSEIL_GIT_REPO}
-        GIT_SHALLOW ${BUILD_ABSEIL_GIT_SHALLOW}
-        GIT_TAG ${BUILD_ABSEIL_VERSION}
-        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-        UPDATE_COMMAND ""
-        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS
-         -DBUILD_SHARED_LIBS=ON
-         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-         -DABSL_BUILD_MONOLITHIC_SHARED_LIBS=ON)
-  add_library(absl::abseil_dll SHARED IMPORTED)
-  add_dependencies(absl::abseil_dll abseil-external)
-
-  set_target_properties(absl::abseil_dll PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}abseil_dll${CMAKE_SHARED_LIBRARY_SUFFIX}")
-
   ExternalProject_Add(protobuf-external
       GIT_REPOSITORY ${BUILD_PROTOBUF_GIT_REPO}
       GIT_SHALLOW ${BUILD_PROTOBUF_GIT_SHALLOW}
@@ -2154,11 +2132,15 @@ if(WITH_PROTOBUF)
         -Dprotobuf_BUILD_EXAMPLES=OFF
         -Dprotobuf_BUILD_SHARED_LIBS=ON
         -DBUILD_SHARED_LIBS=ON
-        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -Dprotobuf_ABSL_PROVIDER=module
+        -DABSL_BUILD_TESTING=OFF
+        -DABSL_ENABLE_INSTALL=ON
+        -DABSL_BUILD_DLL=ON)
 
   add_library(protobuf::libprotobuf SHARED IMPORTED)
   add_dependencies(protobuf::libprotobuf protobuf-external)
-  target_link_libraries(protobuf::libprotobuf INTERFACE absl::abseil_dll)
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
 
@@ -2180,12 +2162,13 @@ if(WITH_ONNX)
         GIT_TAG ${BUILD_ONNX_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        #PATCH_COMMAND git apply --ignore-whitespace ${CMAKE_SOURCE_DIR}/cmake/onnx_protobuf_dll.patch || echo "Patch already applied or failed"
+        PATCH_COMMAND git apply --ignore-whitespace ${CMAKE_SOURCE_DIR}/cmake/onnx_protobuf_dll.patch || echo "Patch already applied or failed"
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
         CMAKE_ARGS
-          -DONNX_USE_PROTOBUF_SHARED_LIBS=ON
           -DONNX_BUILD_TESTS=OFF
+          -DONNX_BUILD_BENCHMARKS=OFF
           -DBUILD_SHARED_LIBS=ON
+          -DONNX_BUILD_SHARED_LIBS=ON
           -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects
           -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
           -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
@@ -2193,14 +2176,15 @@ if(WITH_ONNX)
     add_library(ONNX::onnx_proto SHARED IMPORTED)
     add_dependencies(ONNX::onnx onnx-external)
     add_dependencies(ONNX::onnx_proto onnx-external)
-    target_link_libraries(ONNX::onnx_proto INTERFACE protobuf::libprotobuf)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ONNX::onnx PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}onnx${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+      INTERFACE_LINK_LIBRARIES "ONNX::onnx_proto")
     set_target_properties(ONNX::onnx_proto PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}onnx_proto${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+      INTERFACE_LINK_LIBRARIES "protobuf::libprotobuf")
   else()
     find_package(ONNX REQUIRED)
   endif()
