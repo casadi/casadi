@@ -142,6 +142,10 @@ if(WITH_LIBZIP)
   add_subdirectory(libzip)
 endif()
 
+if(WITH_ONNX)
+  add_subdirectory(onnx)
+endif()
+
 if(WITH_GHC_FILESYSTEM)
   add_subdirectory(ghc)
 endif()

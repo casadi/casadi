@@ -43,6 +43,7 @@ from feasiblesqpmethod import *
 from serialize import *
 from threads import *
 from daebuilder import *
+from onnx import *
 
 if __name__ == '__main__':
     unittest.main()

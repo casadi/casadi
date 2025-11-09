@@ -4599,6 +4599,7 @@ namespace casadi {
 %feature("director") casadi::Callback;
 
 %include <casadi/core/importer.hpp>
+%include <casadi/core/translator.hpp>
 %include <casadi/core/callback.hpp>
 %include <casadi/core/global_options.hpp>
 
