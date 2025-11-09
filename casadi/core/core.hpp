@@ -46,6 +46,7 @@
 // Functions
 #include "code_generator.hpp"
 #include "importer.hpp"
+#include "translator.hpp"
 #include "callback.hpp"
 #include "integrator.hpp"
 #include "conic.hpp"
