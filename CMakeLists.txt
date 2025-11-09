@@ -1070,6 +1070,31 @@ set(BUILD_GHC_FILESYSTEM_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for GHC_FI
 set(BUILD_GHC_FILESYSTEM_VERSION "v1.5.14" CACHE STRING "Tag/branch/hash to be used for BUILD_GHC_FILESYSTEM_GIT_REPO")
 option(WITH_BUILD_GHC_FILESYSTEM "Build GHC_FILESYSTEM (BUILD_GHC_FILESYSTEM_VERSION=${BUILD_GHC_FILESYSTEM_VERSION}) from downloaded source (BUILD_GHC_FILESYSTEM_GIT_REPO=${BUILD_LIBZIP_GIT_REPO})." OFF)
 
+# Protobuf (required for ONNX)
+set(BUILD_PROTOBUF_GIT_REPO "https://github.com/protocolbuffers/protobuf" CACHE STRING "Git repo for Protobuf")
+set(BUILD_PROTOBUF_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Protobuf")
+set(BUILD_PROTOBUF_VERSION "v31.1" CACHE STRING "Tag/branch/hash for Protobuf")
+option(WITH_BUILD_PROTOBUF "Build Protobuf from source" OFF)
+set(BUILD_ABSEIL_GIT_REPO "https://github.com/abseil/abseil-cpp.git" CACHE STRING "Git repo for Abseil")
+set(BUILD_ASBEIL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Abseil")
+set(BUILD_ABSEIL_VERSION "20250127.0" CACHE STRING "Tag/branch/hash for Abseil")
+option(WITH_BUILD_PROTOBUF "Build Protobuf from source" OFF)
+
+
+# ONNX Runtime (black-box model evaluation) plugin
+option(WITH_ONNX_RUNTIME "Compile the ONNX Runtime black-box evaluation interface" OFF)
+set(ONNX_RUNTIME_DIR "" CACHE PATH "Root of an ONNX Runtime C/C++ distribution (contains include/ and lib/)")
+set(BUILD_ONNX_RUNTIME_VERSION "1.22.0" CACHE STRING "Prebuilt ONNX Runtime release version to download")
+option(WITH_BUILD_ONNX_RUNTIME "Download the prebuilt ONNX Runtime release (BUILD_ONNX_RUNTIME_VERSION) and use it." OFF)
+option(WITH_MOCKUP_ONNX_RUNTIME "Link a mockup ONNX Runtime (stub libonnxruntime) instead of the real one; the plugin builds but cannot evaluate. Headers still come from WITH_BUILD_ONNX_RUNTIME." OFF)
+
+# ONNX Translator plugin
+option(WITH_ONNX "Compile the ONNX translator interface" OFF)
+set(BUILD_ONNX_GIT_REPO "https://github.com/onnx/onnx" CACHE STRING "Git repo used together with BUILD_ONNX_VERSION")
+set(BUILD_ONNX_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for ONNX")
+set(BUILD_ONNX_VERSION "v1.19.1" CACHE STRING "Tag/branch/hash to be used for BUILD_ONNX_GIT_REPO")
+option(WITH_BUILD_ONNX "Build ONNX (BUILD_ONNX_VERSION=${BUILD_ONNX_VERSION}) from downloaded source (BUILD_ONNX_GIT_REPO=${BUILD_ONNX_GIT_REPO})." OFF)
+set(BUILD_ONNX_DEPENDENCIES PROTOBUF)
 
 
 function(libraries2flags libraries out)
@@ -1202,7 +1227,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI XPRESS MOSEK WORHP HSL MADNLP)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LIBZIP ZLIB)
+foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LIBZIP ZLIB PROTOBUF ONNX)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -1234,6 +1259,11 @@ foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN 
     endif()
   endif()
 endforeach()
+
+# ONNX Runtime mockup is built by mockups-external too (it isn't in the proprietary loops above)
+if(WITH_ONNX_RUNTIME AND WITH_MOCKUP_ONNX_RUNTIME)
+  set(WITH_BUILD_MOCKUPS ON)
+endif()
 
 set(SHARED_LIBRARY_RELDIR lib)
 set(CMAKE_SHARED_LIBRARY_PREFIX_SHORT ${CMAKE_SHARED_LIBRARY_PREFIX})
@@ -2658,6 +2688,201 @@ if(WITH_GHC_FILESYSTEM)
   endif()
 endif()
 add_feature_info(ghc-filesystem-interface WITH_GHC_FILESYSTEM "Interface to the ghc.")
+
+if(WITH_PROTOBUF)
+  if(WITH_BUILD_PROTOBUF)
+  #ExternalProject_Add(abseil-external
+  #      GIT_REPOSITORY ${BUILD_ABSEIL_GIT_REPO}
+  #      GIT_SHALLOW ${BUILD_ABSEIL_GIT_SHALLOW}
+  ##      GIT_TAG ${BUILD_ABSEIL_VERSION}
+   #     PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+   #     UPDATE_COMMAND ""
+   #     CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+   #     CMAKE_ARGS
+   #      -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+   #      -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
+  #add_library(absl::abseil_dll STATIC IMPORTED)
+  #add_dependencies(absl::abseil_dll abseil-external)
+
+  #set_target_properties(absl::abseil_dll PROPERTIES
+  #  IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}abseil_dll${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
+  ExternalProject_Add(protobuf-external
+      GIT_REPOSITORY ${BUILD_PROTOBUF_GIT_REPO}
+      GIT_SHALLOW ${BUILD_PROTOBUF_GIT_SHALLOW}
+      GIT_TAG ${BUILD_PROTOBUF_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS
+        -DCMAKE_CXX_STANDARD=17
+        -Dprotobuf_BUILD_TESTS=OFF
+        -Dprotobuf_BUILD_EXAMPLES=OFF
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+
+  add_library(protobuf::libprotobuf STATIC IMPORTED)
+  add_dependencies(protobuf::libprotobuf protobuf-external)
+
+  # Add utf8_range dependencies (required by protobuf)
+  add_library(utf8_range::utf8_range STATIC IMPORTED)
+  set_target_properties(utf8_range::utf8_range PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}utf8_range${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+
+  target_link_libraries(protobuf::libprotobuf INTERFACE utf8_range::utf8_range)
+
+  # Setup abseil library dependencies using the DSL from cmake/abseil_dependencies.cmake
+  # To regenerate: cd build && python3 ../misc/generate_absl_deps_dsl.py
+  include(${CMAKE_SOURCE_DIR}/cmake/abseil_dependencies.cmake)
+  setup_abseil_dependencies(protobuf::libprotobuf)
+
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
+
+  set_target_properties(protobuf::libprotobuf PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}protobuf${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+  else()
+    find_package(Protobuf REQUIRED)
+  endif()
+endif()
+add_feature_info(protobuf-interface WITH_PROTOBUF "Interface to Protobuf for ONNX.")
+
+if(WITH_ONNX_RUNTIME)
+  # The numeric path introspects models through the protobuf GraphModel backend, so it
+  # requires the ONNX (protobuf) interface to be built as well.
+  if(NOT WITH_ONNX)
+    message(STATUS "WITH_ONNX_RUNTIME requires WITH_ONNX; enabling WITH_ONNX.")
+    set(WITH_ONNX ON CACHE BOOL "Enabled by WITH_ONNX_RUNTIME" FORCE)
+  endif()
+
+  # Optionally fetch a prebuilt ONNX Runtime release (sets ONNX_RUNTIME_DIR for the find below)
+  if(WITH_BUILD_ONNX_RUNTIME)
+    set(ORT_VER "${BUILD_ONNX_RUNTIME_VERSION}")
+    set(ORT_EXT "tgz")
+    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64|amd64")
+      set(ORT_PLATFORM "linux-x64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+      set(ORT_PLATFORM "linux-aarch64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+      set(ORT_PLATFORM "osx-universal2")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+      set(ORT_PLATFORM "win-x64")
+      set(ORT_EXT "zip")
+    else()
+      message(FATAL_ERROR "WITH_BUILD_ONNX_RUNTIME: unsupported host ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+    endif()
+    set(ORT_NAME "onnxruntime-${ORT_PLATFORM}-${ORT_VER}")
+    set(ORT_ROOT "${CMAKE_BINARY_DIR}/external_projects/${ORT_NAME}")
+    if(NOT EXISTS "${ORT_ROOT}/include/onnxruntime_c_api.h")
+      set(ORT_URL "https://github.com/microsoft/onnxruntime/releases/download/v${ORT_VER}/${ORT_NAME}.${ORT_EXT}")
+      set(ORT_ARCHIVE "${CMAKE_BINARY_DIR}/external_projects/${ORT_NAME}.${ORT_EXT}")
+      message(STATUS "Downloading prebuilt ONNX Runtime ${ORT_VER} for ${ORT_PLATFORM}...")
+      file(DOWNLOAD "${ORT_URL}" "${ORT_ARCHIVE}" SHOW_PROGRESS STATUS ORT_DL_STATUS)
+      list(GET ORT_DL_STATUS 0 ORT_DL_ERROR)
+      if(ORT_DL_ERROR)
+        message(FATAL_ERROR "Failed to download ONNX Runtime: ${ORT_DL_STATUS}")
+      endif()
+      execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xf "${ORT_ARCHIVE}"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects"
+        RESULT_VARIABLE ORT_EXTRACT_RESULT)
+      if(NOT ORT_EXTRACT_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to extract ONNX Runtime")
+      endif()
+    endif()
+    message(STATUS "Using prebuilt ONNX Runtime: ${ORT_ROOT}")
+    set(ONNX_RUNTIME_DIR "${ORT_ROOT}" CACHE PATH "Downloaded ONNX Runtime" FORCE)
+    # Re-resolve the include/lib against the downloaded distribution
+    unset(ONNX_RUNTIME_INCLUDE_DIR CACHE)
+    unset(ONNX_RUNTIME_LIBRARY CACHE)
+  endif()
+
+  # Headers always come from a real distribution (the plugin dereferences OrtApi)
+  find_path(ONNX_RUNTIME_INCLUDE_DIR
+    NAMES onnxruntime_c_api.h
+    HINTS ${ONNX_RUNTIME_DIR}/include ${ONNX_RUNTIME_DIR}
+    PATH_SUFFIXES onnxruntime)
+
+  if(WITH_MOCKUP_ONNX_RUNTIME)
+    # Self-contained mockup (built by mockups-external): stub libonnxruntime + a cherry-picked
+    # header. Lets the plugin build where the real ORT can't ship (manylinux2014: ORT glibc 2.27).
+    set(ONNX_RUNTIME_MOCKUP_ROOT "${CMAKE_BINARY_DIR}/external_projects/mockups/onnxruntime")
+    set(ONNX_RUNTIME_MOCKUP_LIB "${ONNX_RUNTIME_MOCKUP_ROOT}/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}onnxruntime${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    file(MAKE_DIRECTORY "${ONNX_RUNTIME_MOCKUP_ROOT}/include")
+    # The cherry-picked header is installed by mockups-external at build time, so it isn't on disk
+    # at configure time; point the include var at it directly (find_path above would leave NOTFOUND)
+    set(ONNX_RUNTIME_INCLUDE_DIR "${ONNX_RUNTIME_MOCKUP_ROOT}/include" CACHE PATH "Mockup ONNX Runtime include" FORCE)
+    add_library(onnxruntime::onnxruntime SHARED IMPORTED)
+    add_dependencies(onnxruntime::onnxruntime mockups-external)
+    set_target_properties(onnxruntime::onnxruntime PROPERTIES
+      IMPORTED_LOCATION "${ONNX_RUNTIME_MOCKUP_LIB}"
+      IMPORTED_IMPLIB "${ONNX_RUNTIME_MOCKUP_ROOT}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}onnxruntime${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${ONNX_RUNTIME_MOCKUP_ROOT}/include")
+    # Ship the whole libonnxruntime.so* set (real + soname symlinks): the plugin's NEEDED is
+    # the soname (libonnxruntime.so.1 on Linux), which must resolve via $ORIGIN as the fallback
+    install(DIRECTORY "${ONNX_RUNTIME_MOCKUP_ROOT}/${SHARED_LIBRARY_RELDIR}/" DESTINATION "${LIB_PREFIX}"
+      FILES_MATCHING PATTERN "${CMAKE_SHARED_LIBRARY_PREFIX}onnxruntime${CMAKE_SHARED_LIBRARY_SUFFIX}*")
+    message(STATUS "Using mockup ONNX Runtime: ${ONNX_RUNTIME_MOCKUP_LIB}")
+  else()
+    find_library(ONNX_RUNTIME_LIBRARY
+      NAMES onnxruntime
+      HINTS ${ONNX_RUNTIME_DIR}/lib ${ONNX_RUNTIME_DIR})
+    if(ONNX_RUNTIME_INCLUDE_DIR AND ONNX_RUNTIME_LIBRARY)
+      if(NOT TARGET onnxruntime::onnxruntime)
+        add_library(onnxruntime::onnxruntime UNKNOWN IMPORTED)
+        set_target_properties(onnxruntime::onnxruntime PROPERTIES
+          IMPORTED_LOCATION "${ONNX_RUNTIME_LIBRARY}"
+          INTERFACE_INCLUDE_DIRECTORIES "${ONNX_RUNTIME_INCLUDE_DIR}")
+      endif()
+      message(STATUS "Found ONNX Runtime: ${ONNX_RUNTIME_LIBRARY}")
+    else()
+      message(WARNING "ONNX Runtime not found; set ONNX_RUNTIME_DIR. Disabling WITH_ONNX_RUNTIME.")
+      set(WITH_ONNX_RUNTIME OFF CACHE BOOL "ONNX Runtime not found" FORCE)
+    endif()
+  endif()
+endif()
+add_feature_info(onnx-runtime-interface WITH_ONNX_RUNTIME "Black-box ONNX model evaluation via ONNX Runtime.")
+
+if(WITH_ONNX)
+  if(WITH_BUILD_ONNX)
+    ExternalProject_Add(onnx-external
+        DEPENDS protobuf::libprotobuf
+        GIT_REPOSITORY ${BUILD_ONNX_GIT_REPO}
+        GIT_SHALLOW ${BUILD_ONNX_GIT_SHALLOW}
+        GIT_TAG ${BUILD_ONNX_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        #PATCH_COMMAND git apply --ignore-whitespace ${CMAKE_SOURCE_DIR}/cmake/onnx_protobuf_dll.patch || echo "Patch already applied or failed"
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS
+          -DCMAKE_CXX_STANDARD=17
+          -DONNX_BUILD_TESTS=OFF
+          -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects
+          -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+          -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
+    add_library(ONNX::onnx STATIC IMPORTED)
+    add_library(ONNX::onnx_proto STATIC IMPORTED)
+    add_dependencies(ONNX::onnx onnx-external)
+    add_dependencies(ONNX::onnx_proto onnx-external)
+    target_link_libraries(ONNX::onnx INTERFACE protobuf::libprotobuf)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
+    set_target_properties(ONNX::onnx PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+    set_target_properties(ONNX::onnx_proto PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx_proto${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+    #add_library(onnx-external::abs STATIC IMPORTED)
+    #set_target_properties(ONNX::onnx PROPERTIES
+    #  IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    #   INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+    #target_link_libraries(ONNX::onnx INTERFACE ONNX::abs)
+  else()
+    find_package(ONNX REQUIRED)
+  endif()
+endif()
+add_feature_info(onnx-translator-interface WITH_ONNX "Interface to ONNX for model import/export.")
 
 if(WITH_SELFCONTAINED)
   # Loop over prescribed folders

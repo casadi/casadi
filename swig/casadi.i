@@ -5746,6 +5746,9 @@ namespace casadi{
 %include <casadi/core/integrator.hpp>
 %include <casadi/core/conic.hpp>
 %include <casadi/core/nlpsol.hpp>
+%include <casadi/core/onnx_function.hpp>
+%include <casadi/core/graph_model.hpp>
+%include <casadi/core/graph_builder.hpp>
 %include <casadi/core/rootfinder.hpp>
 %include <casadi/core/linsol.hpp>
 %include <casadi/core/dple.hpp>

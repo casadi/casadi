@@ -35,7 +35,7 @@ _TEST_MODULES = [
     "implicitfunction", "ad", "sparsity", "linearsolver", "matrix",
     "conic", "misc", "function", "tools", "simulator", "vectortools",
     "optistack", "feasiblesqpmethod", "serialize", "threads",
-    "daebuilder", "pyright_stubs",
+    "daebuilder", "graph_builder", "pyright_stubs",
 ]
 
 
