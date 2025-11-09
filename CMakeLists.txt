@@ -950,6 +950,24 @@ set(BUILD_GHC_FILESYSTEM_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for GHC_FI
 set(BUILD_GHC_FILESYSTEM_VERSION "v1.5.14" CACHE STRING "Tag/branch/hash to be used for BUILD_GHC_FILESYSTEM_GIT_REPO")
 option(WITH_BUILD_GHC_FILESYSTEM "Build GHC_FILESYSTEM (BUILD_GHC_FILESYSTEM_VERSION=${BUILD_GHC_FILESYSTEM_VERSION}) from downloaded source (BUILD_GHC_FILESYSTEM_GIT_REPO=${BUILD_LIBZIP_GIT_REPO})." OFF)
 
+# Protobuf (required for ONNX)
+set(BUILD_PROTOBUF_GIT_REPO "https://github.com/protocolbuffers/protobuf" CACHE STRING "Git repo for Protobuf")
+set(BUILD_PROTOBUF_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Protobuf")
+set(BUILD_PROTOBUF_VERSION "v31.1" CACHE STRING "Tag/branch/hash for Protobuf")
+option(WITH_BUILD_PROTOBUF "Build Protobuf from source" OFF)
+set(BUILD_ABSEIL_GIT_REPO "https://github.com/abseil/abseil-cpp.git" CACHE STRING "Git repo for Abseil")
+set(BUILD_ASBEIL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Abseil")
+set(BUILD_ABSEIL_VERSION "20250127.0" CACHE STRING "Tag/branch/hash for Abseil")
+option(WITH_BUILD_PROTOBUF "Build Protobuf from source" OFF)
+set(BUILD_PROTOBUF_DEPENDENCIES ZLIB)
+
+# ONNX Translator plugin
+option(WITH_ONNX "Compile the ONNX translator interface" OFF)
+set(BUILD_ONNX_GIT_REPO "https://github.com/onnx/onnx" CACHE STRING "Git repo used together with BUILD_ONNX_VERSION")
+set(BUILD_ONNX_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for ONNX")
+set(BUILD_ONNX_VERSION "v1.18.0" CACHE STRING "Tag/branch/hash to be used for BUILD_ONNX_GIT_REPO")
+option(WITH_BUILD_ONNX "Build ONNX (BUILD_ONNX_VERSION=${BUILD_ONNX_VERSION}) from downloaded source (BUILD_ONNX_GIT_REPO=${BUILD_ONNX_GIT_REPO})." OFF)
+set(BUILD_ONNX_DEPENDENCIES PROTOBUF)
 
 
 function(libraries2flags libraries out)
@@ -1059,7 +1077,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL MADNLP)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LIBZIP ZLIB)
+foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE ONNX PROTOBUF LIBZIP ZLIB)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -2138,6 +2156,184 @@ if(WITH_GHC_FILESYSTEM)
   endif()
 endif()
 add_feature_info(ghc-filesystem-interface WITH_GHC_FILESYSTEM "Interface to the ghc.")
+
+if(WITH_PROTOBUF)
+  if(WITH_BUILD_PROTOBUF)
+  #ExternalProject_Add(abseil-external
+  #      GIT_REPOSITORY ${BUILD_ABSEIL_GIT_REPO}
+  #      GIT_SHALLOW ${BUILD_ABSEIL_GIT_SHALLOW}
+  ##      GIT_TAG ${BUILD_ABSEIL_VERSION}
+   #     PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+   #     UPDATE_COMMAND ""
+   #     CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+   #     CMAKE_ARGS
+   #      -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+   #      -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
+  #add_library(absl::abseil_dll STATIC IMPORTED)
+  #add_dependencies(absl::abseil_dll abseil-external)
+
+  #set_target_properties(absl::abseil_dll PROPERTIES
+  #  IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}abseil_dll${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
+  ExternalProject_Add(protobuf-external
+      DEPENDS ZLIB::libz
+      GIT_REPOSITORY ${BUILD_PROTOBUF_GIT_REPO}
+      GIT_SHALLOW ${BUILD_PROTOBUF_GIT_SHALLOW}
+      GIT_TAG ${BUILD_PROTOBUF_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS
+        -DCMAKE_CXX_STANDARD=17
+        -Dprotobuf_BUILD_TESTS=OFF
+        -Dprotobuf_BUILD_EXAMPLES=OFF
+        -Dprotobuf_BUILD_PROTOC_BINARIES=OFF
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -Dprotobuf_BUILD_SHARED_LIBS=OFF
+        -DBUILD_SHARED_LIBS=OFF
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_INSTALL_LIBDIR=lib
+        ${CROSS_FLAGS_CMAKE})
+
+  add_library(protobuf::libprotobuf-lite STATIC IMPORTED)
+  add_dependencies(protobuf::libprotobuf-lite protobuf-external)
+
+  # Add utf8_range dependencies (required by protobuf)
+  add_library(utf8_range::utf8_range STATIC IMPORTED)
+  set_target_properties(utf8_range::utf8_range PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}utf8_range${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+
+  target_link_libraries(protobuf::libprotobuf-lite INTERFACE utf8_range::utf8_range)
+
+  # Setup abseil library dependencies using the DSL from cmake/abseil_dependencies.cmake
+  # To regenerate: cd build && python3 ../misc/generate_absl_deps_dsl.py
+  include(${CMAKE_SOURCE_DIR}/cmake/abseil_dependencies.cmake)
+  setup_abseil_dependencies(protobuf::libprotobuf-lite)
+
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
+
+  set_target_properties(protobuf::libprotobuf-lite PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}protobuf-lite${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+  else()
+    find_package(Protobuf REQUIRED)
+  endif()
+endif()
+add_feature_info(protobuf-interface WITH_PROTOBUF "Interface to Protobuf for ONNX.")
+
+if(WITH_ONNX)
+  if(WITH_BUILD_ONNX)
+    # Fetch a prebuilt protoc binary to avoid building protoc from source
+    set(ONNX_PROTOC_FLAGS "")
+    # Detect host platform for protoc binary
+    set(PROTOC_VERSION "31.1")
+    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64|amd64")
+      set(PROTOC_PLATFORM "linux-x86_64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "i686|i386|x86")
+      set(PROTOC_PLATFORM "linux-x86_32")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+      set(PROTOC_PLATFORM "linux-aarch_64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64|amd64")
+      set(PROTOC_PLATFORM "osx-x86_64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+      set(PROTOC_PLATFORM "osx-aarch_64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+      set(PROTOC_PLATFORM "win64")
+    else()
+      message(WARNING "Unknown host platform for protoc: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+      set(PROTOC_PLATFORM "")
+    endif()
+
+    if(PROTOC_PLATFORM)
+      set(PROTOC_ZIP_URL "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-${PROTOC_PLATFORM}.zip")
+      set(PROTOC_ZIP_FILE "${CMAKE_BINARY_DIR}/external_projects/protoc-${PROTOC_VERSION}-${PROTOC_PLATFORM}.zip")
+      set(PROTOC_EXTRACT_DIR "${CMAKE_BINARY_DIR}/external_projects/protoc-host")
+      if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+        set(PROTOC_EXECUTABLE "${PROTOC_EXTRACT_DIR}/bin/protoc.exe")
+      else()
+        set(PROTOC_EXECUTABLE "${PROTOC_EXTRACT_DIR}/bin/protoc")
+      endif()
+
+      if(NOT EXISTS "${PROTOC_EXECUTABLE}")
+        message(STATUS "Downloading prebuilt protoc ${PROTOC_VERSION} for ${PROTOC_PLATFORM}...")
+        file(DOWNLOAD
+          "${PROTOC_ZIP_URL}"
+          "${PROTOC_ZIP_FILE}"
+          SHOW_PROGRESS
+          STATUS PROTOC_DOWNLOAD_STATUS)
+        list(GET PROTOC_DOWNLOAD_STATUS 0 PROTOC_DOWNLOAD_ERROR)
+        if(PROTOC_DOWNLOAD_ERROR)
+          message(FATAL_ERROR "Failed to download protoc: ${PROTOC_DOWNLOAD_STATUS}")
+        endif()
+
+        message(STATUS "Extracting protoc to ${PROTOC_EXTRACT_DIR}...")
+        file(MAKE_DIRECTORY "${PROTOC_EXTRACT_DIR}")
+        execute_process(
+          COMMAND ${CMAKE_COMMAND} -E tar xf "${PROTOC_ZIP_FILE}"
+          WORKING_DIRECTORY "${PROTOC_EXTRACT_DIR}"
+          RESULT_VARIABLE PROTOC_EXTRACT_RESULT)
+        if(NOT PROTOC_EXTRACT_RESULT EQUAL 0)
+          message(FATAL_ERROR "Failed to extract protoc")
+        endif()
+      endif()
+
+      message(STATUS "Using prebuilt protoc: ${PROTOC_EXECUTABLE}")
+      set(ONNX_PROTOC_FLAGS -DONNX_CUSTOM_PROTOC_EXECUTABLE=${PROTOC_EXECUTABLE})
+    endif()
+
+    ExternalProject_Add(onnx-external
+        DEPENDS protobuf::libprotobuf-lite
+        GIT_REPOSITORY ${BUILD_ONNX_GIT_REPO}
+        GIT_SHALLOW ${BUILD_ONNX_GIT_SHALLOW}
+        GIT_TAG ${BUILD_ONNX_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        #PATCH_COMMAND git apply --ignore-whitespace ${CMAKE_SOURCE_DIR}/cmake/onnx_protobuf_dll.patch || echo "Patch already applied or failed"
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS
+          -DCMAKE_CXX_STANDARD=17
+          -DONNX_BUILD_TESTS=OFF
+          -DONNX_BUILD_PYTHON=OFF
+          -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects
+          -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+          -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+          -DCMAKE_INSTALL_LIBDIR=lib
+          -DCMAKE_PROJECT_INCLUDE=${CMAKE_SOURCE_DIR}/cmake/onnx_inject.cmake
+          -DONNX_USE_LITE_PROTO=ON
+          -DBUILD_SHARED_LIBS=OFF
+          ${ONNX_PROTOC_FLAGS}
+          ${CROSS_FLAGS_CMAKE})
+    add_library(ONNX::onnx STATIC IMPORTED)
+    add_library(ONNX::onnx_proto STATIC IMPORTED)
+    add_dependencies(ONNX::onnx onnx-external)
+    add_dependencies(ONNX::onnx_proto onnx-external)
+    target_link_libraries(ONNX::onnx INTERFACE protobuf::libprotobuf-lite)
+    if(APPLE)
+      target_link_libraries(ONNX::onnx INTERFACE "-framework CoreFoundation")
+    endif()
+    if(WIN32)
+      # Abseil's symbolize module needs Windows Debug Help Library
+      target_link_libraries(ONNX::onnx INTERFACE dbghelp)
+    endif()
+
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
+    set_target_properties(ONNX::onnx PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+    set_target_properties(ONNX::onnx_proto PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx_proto${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+    #add_library(onnx-external::abs STATIC IMPORTED)
+    #set_target_properties(ONNX::onnx PROPERTIES
+    #  IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    #   INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+    #target_link_libraries(ONNX::onnx INTERFACE ONNX::abs)
+  else()
+    find_package(ONNX REQUIRED)
+  endif()
+endif()
+add_feature_info(onnx-translator-interface WITH_ONNX "Interface to ONNX for model import/export.")
 
 if(WITH_SELFCONTAINED)
   # Loop over prescribed folders
