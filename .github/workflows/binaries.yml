@@ -1484,6 +1484,12 @@ jobs:
           pip install numpy scipy pandas looseversion pyright
         shell: pwsh
         if: contains(matrix.image, 'windows')
+      - run: pip install onnx onnxruntime || true
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - run: pip install onnx onnxruntime; exit 0
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
           JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}

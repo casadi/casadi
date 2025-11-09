@@ -80,12 +80,15 @@ set(CASADI_PUBLIC
   rootfinder.hpp
   integrator.hpp
   nlpsol.hpp
+  onnx_function.hpp
   conic.hpp
   dple.hpp
   interpolant.hpp
   expm.hpp
   code_generator.hpp
   importer.hpp
+  graph_model.hpp
+  graph_builder.hpp
   blazing_spline.hpp
 
   # MISC useful stuff
@@ -206,6 +209,7 @@ set(CASADI_INTERNAL
   rootfinder_impl.hpp     rootfinder.cpp
   integrator_impl.hpp     integrator.cpp
   nlpsol.hpp              nlpsol_impl.hpp        nlpsol.cpp
+  onnx_function.hpp       onnx_function_impl.hpp onnx_function.cpp
   conic_impl.hpp          conic.cpp
   dple_impl.hpp           dple.cpp
   interpolant_impl.hpp    interpolant.cpp
@@ -217,6 +221,8 @@ set(CASADI_INTERNAL
   mapsum.hpp              mapsum.cpp
   finite_differences.hpp  finite_differences.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
+  graph_model.hpp         graph_model_internal.hpp graph_model.cpp
+  graph_builder.hpp       graph_builder_internal.hpp graph_builder.cpp
   blazing_spline.cpp blazing_spline_impl.hpp
 
   # MISC useful stuff
