@@ -251,8 +251,10 @@ namespace casadi {
     // Quick return if it already exists
     for (auto&& e : added_functions_) if (e.f==f) return e.codegen_name;
 
+    std::string name_short = "f" + str(added_functions_.size());
+
     // Give it a name
-    std::string fname = shorthand("f" + str(added_functions_.size()));
+    std::string fname = shorthand(name_short);
 
     // Add to list of functions
     added_functions_.push_back({f, fname});
@@ -297,6 +299,9 @@ namespace casadi {
         f->codegen_init_mem(*this);
         scope_exit();
         *this << "}\n\n";
+
+        // Temporary workaround, pending fix for #3764
+        shorthand(name_short+"_free_mem");
 
         // Clear memory
         *this << "void " << fname << "_free_mem(int mem) {\n";
