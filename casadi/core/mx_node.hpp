@@ -145,7 +145,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{1qo} */
-    virtual void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function()) const {}
+    virtual void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function(), const Instance& owner_inst = Instance()) const {}
 
     /** \brief Is reference counting needed in codegen?
 
@@ -155,12 +155,12 @@ namespace casadi {
     /** \brief Codegen incref
 
         \identifier{1qq} */
-    virtual void codegen_incref(CodeGenerator& g, std::set<const void*>& added) const {}
+    virtual void codegen_incref(CodeGenerator& g, const Instance& inst, std::set<const void*>& added) const {}
 
     /** \brief Codegen decref
 
         \identifier{1qr} */
-    virtual void codegen_decref(CodeGenerator& g, std::set<const void*>& added) const {}
+    virtual void codegen_decref(CodeGenerator& g, const Instance& inst, std::set<const void*>& added) const {}
 
     /** \brief Generate code for the operation
 

@@ -72,7 +72,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{6n} */
-    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner=Function()) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner=Function(), const Instance& owner_inst=Instance()) const override;
 
     /** \brief Generate code for the operation
 

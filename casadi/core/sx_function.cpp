@@ -234,7 +234,7 @@ namespace casadi {
       local.prefer_inline = true;
 
       bool added = g.has_dependency(f, local);
-      std::string fname = g.add_dependency(m.f, local, shared_from_this<Function>());
+      std::string fname = g.add_dependency(m.f, local, shared_from_this<Function>(), inst);
       if (!added) {
 
         std::string name = fname+"_wrap";
@@ -545,7 +545,7 @@ namespace casadi {
         local.prefer_inline = true;
         local.stride_in.resize(m.f.n_in(), 1);
         local.stride_out.resize(m.f.n_out(), 1);
-        std::string fname = g.add_dependency(m.f, local, shared_from_this<Function>());
+        std::string fname = g.add_dependency(m.f, local, shared_from_this<Function>(), inst);
         std::string name = fname+"_wrap";
 
         casadi_assert(m.f.n_in() == 2, "The SXFunction wrapper only supports functions with two inputs at the moment.");
@@ -1520,7 +1520,7 @@ namespace casadi {
           Instance local;
           local.stride_in.resize(f.n_in(), 1);
           local.stride_out.resize(f.n_out(), 1);
-          g << f->codegen_name(g) << "_incref(); // SXFunction::codegen_incref\n";
+          g << f->codegen_name(g, inst) << "_incref(); // SXFunction::codegen_incref\n";
         }
       }
     }
@@ -1535,7 +1535,7 @@ namespace casadi {
           Instance local;
           local.stride_in.resize(f.n_in(), 1);
           local.stride_out.resize(f.n_out(), 1);
-          g << f->codegen_name(g) << "_decref();\n";
+          g << f->codegen_name(g, inst) << "_decref();\n";
         }
       }
     }

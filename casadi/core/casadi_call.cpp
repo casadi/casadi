@@ -170,11 +170,11 @@ namespace casadi {
     return fcn_.rev(arg, res, iw, w);
   }
 
-  void Call::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner) const {
+  void Call::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner, const Instance& owner_inst) const {
     Instance local = inst;
     local.stride_in.resize(fcn_.n_in(), 1);
     local.stride_out.resize(fcn_.n_out(), 1);
-    g.add_dependency(fcn_, local, owner);
+    g.add_dependency(fcn_, local, owner, owner_inst);
   }
 
   void Call::generate(CodeGenerator& g,

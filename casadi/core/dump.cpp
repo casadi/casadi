@@ -115,7 +115,8 @@ namespace casadi {
   }
 
   void Dump::add_dependency(CodeGenerator& g, const Instance& inst,
-      const Function& owner) const {
+      const Function& owner,
+      const Instance& owner_inst) const {
     ensure_directory_exists(g.dump_dir_prefix + dir_ + g.dump_dir_suffix);
   }
 
