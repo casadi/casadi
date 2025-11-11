@@ -3081,9 +3081,8 @@ void DaeBuilderInternal::categorize(size_t ind, Category cat) {
   if (v.category == cat) return;
   // Remove from current category, if any
   if (v.category != Category::NUMEL) {
+    // Note: The 'der' field will continue to point to the derivative of T w.r.t. independent
     remove(indices(v.category), ind);
-    // The 'der' field for the independent variable points to derivative of T w.r.t. independent
-    if (v.category == Category::T) variable(0).der = -1;
     v.category = Category::NUMEL;
   }
   // Add to new category, if any
@@ -3096,7 +3095,7 @@ void DaeBuilderInternal::categorize(size_t ind, Category cat) {
     }
     v.category = cat;
     // The 'der' field for the independent variable points to derivative of T w.r.t. independent
-    if (cat == Category::T && ind != 0) variable(0).der = v.der;
+    if (cat == Category::T) variable(0).der = ind != 0 ? v.der : -1;
   }
 }
 
