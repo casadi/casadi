@@ -91,10 +91,10 @@ namespace casadi {
     void codegen_body(CodeGenerator& g) const override;
 
     /// Codegen for initializing memory
-    void codegen_init_mem(CodeGenerator& g) const override;
+    void codegen_init_mem(CodeGenerator& g, const Instance& inst) const override;
 
     /// Codegen for freeing memory
-    void codegen_free_mem(CodeGenerator& g) const override;
+    void codegen_free_mem(CodeGenerator& g, const Instance& inst) const override;
 
     /// Thread-local memory object type
     std::string codegen_mem_type() const override { return "struct casadi_clarabel_data"; }

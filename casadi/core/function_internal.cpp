@@ -2573,7 +2573,7 @@ namespace casadi {
 
     if (dump_in_ || dump_out_) {
       Function F = shared_from_this<Function>();
-      std::string cg_name = codegen_name(g, false);
+      std::string cg_name = codegen_name(g, inst, false);
       std::string dump_counter = g.shorthand(cg_name + "_dump_counter");
       g.auxiliaries << "static int " << dump_counter << " = 0;\n";
       if (g.thread_safe()) {
