@@ -123,12 +123,12 @@ namespace casadi {
     g << "casadi_daqp_setup(&p);\n";
   }
 
-  void DaqpInterface::codegen_init_mem(CodeGenerator& g) const {
+  void DaqpInterface::codegen_init_mem(CodeGenerator& g, const Instance& inst) const {
     g << "daqp_init_mem(&" + codegen_mem(g) + ");\n";
     g << "return 0;\n";
   }
 
-  void DaqpInterface::codegen_free_mem(CodeGenerator& g) const {
+  void DaqpInterface::codegen_free_mem(CodeGenerator& g, const Instance& inst) const {
     g << "daqp_free_mem(&" + codegen_mem(g) + ");\n";
   }
 

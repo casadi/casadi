@@ -101,10 +101,10 @@ namespace casadi {
     void codegen_body(CodeGenerator& g) const override;
 
     /** \brief Codegen decref for init_mem*/
-    void codegen_init_mem(CodeGenerator& g) const override;
+    void codegen_init_mem(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Codegen for free_mem */
-    void codegen_free_mem(CodeGenerator& g) const override;
+    void codegen_free_mem(CodeGenerator& g, const Instance& inst) const override;
 
     /** \brief Thread-local memory object type */
     std::string codegen_mem_type() const override { return "struct casadi_highs_data"; }

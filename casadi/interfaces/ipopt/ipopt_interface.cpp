@@ -797,12 +797,12 @@ namespace casadi {
 
   }
 
-  void IpoptInterface::codegen_init_mem(CodeGenerator& g) const {
+  void IpoptInterface::codegen_init_mem(CodeGenerator& g, const Instance& inst) const {
     g << "ipopt_init_mem(&" + codegen_mem(g) + ");\n";
     g << "return 0;\n";
   }
 
-  void IpoptInterface::codegen_free_mem(CodeGenerator& g) const {
+  void IpoptInterface::codegen_free_mem(CodeGenerator& g, const Instance& inst) const {
     g << "ipopt_free_mem(&" + codegen_mem(g) + ");\n";
   }
 

@@ -611,12 +611,12 @@ namespace casadi {
     return stats;
   }
 
-  void FatropInterface::codegen_init_mem(CodeGenerator& g) const {
+  void FatropInterface::codegen_init_mem(CodeGenerator& g, const Instance& inst) const {
     g << "fatrop_init_mem(&" + codegen_mem(g) + ");\n";
     g << "return 0;\n";
   }
 
-  void FatropInterface::codegen_free_mem(CodeGenerator& g) const {
+  void FatropInterface::codegen_free_mem(CodeGenerator& g, const Instance& inst) const {
     g << "fatrop_free_mem(&" + codegen_mem(g) + ");\n";
   }
 

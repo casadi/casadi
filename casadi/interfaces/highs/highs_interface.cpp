@@ -138,12 +138,12 @@ namespace casadi {
     g << "casadi_highs_setup(&p);\n";
   }
 
-  void HighsInterface::codegen_init_mem(CodeGenerator& g) const {
+  void HighsInterface::codegen_init_mem(CodeGenerator& g, const Instance& inst) const {
     g << "highs_init_mem(&" + codegen_mem(g) + ");\n";
     g << "return 0;\n";
   }
 
-  void HighsInterface::codegen_free_mem(CodeGenerator& g) const {
+  void HighsInterface::codegen_free_mem(CodeGenerator& g, const Instance& inst) const {
     g << "highs_free_mem(&" + codegen_mem(g) + ");\n";
   }
 

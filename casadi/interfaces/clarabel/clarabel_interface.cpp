@@ -139,12 +139,12 @@ void ClarabelInterface::set_clarabel_prob() {
   casadi_clarabel_setup(&p_);
 }
 
-void ClarabelInterface::codegen_init_mem(CodeGenerator& g) const {
+void ClarabelInterface::codegen_init_mem(CodeGenerator& g, const Instance& inst) const {
   g << "clarabel_init_mem(&" + codegen_mem(g) + ");\n";
   g << "return 0;\n";
 }
 
-void ClarabelInterface::codegen_free_mem(CodeGenerator& g) const {
+void ClarabelInterface::codegen_free_mem(CodeGenerator& g, const Instance& inst) const {
   g << "clarabel_free_mem(&" + codegen_mem(g) + ");\n";
 }
 

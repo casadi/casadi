@@ -135,10 +135,10 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
   void codegen_declarations(CodeGenerator& g) const override;
 
   /** \brief Codegen alloc_mem */
-  void codegen_init_mem(CodeGenerator& g) const override;
+  void codegen_init_mem(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief Codegen free_mem */
-  void codegen_free_mem(CodeGenerator& g) const override;
+  void codegen_free_mem(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief Thread-local memory object type */
   std::string codegen_mem_type() const override { return "struct casadi_madnlp_data"; }

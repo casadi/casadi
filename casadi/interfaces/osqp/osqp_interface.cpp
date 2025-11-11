@@ -295,11 +295,11 @@ namespace casadi {
     return 0;
   }
 
-  void OsqpInterface::codegen_free_mem(CodeGenerator& g) const {
+  void OsqpInterface::codegen_free_mem(CodeGenerator& g, const Instance& inst) const {
     g << "osqp_cleanup(" + codegen_mem(g) + ");\n";
   }
 
-  void OsqpInterface::codegen_init_mem(CodeGenerator& g) const {
+  void OsqpInterface::codegen_init_mem(CodeGenerator& g, const Instance& inst) const {
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
     casadi_int dummy_size = std::max(nx_+na_, std::max(Asp.nnz(), H_.nnz()));
 
