@@ -1664,19 +1664,19 @@ namespace casadi {
       local.arg_null = arg_null;
       local.res_null = res_null;
       if (e.op==OP_CALL) local.prefer_inline = inst.prefer_inline;
-      e.data->add_dependency(g, local, shared_from_this<Function>());
+      e.data->add_dependency(g, local, shared_from_this<Function>(), inst);
     }
   }
 
   void MXFunction::codegen_incref(CodeGenerator& g, const Instance& inst) const {
     for (auto&& a : algorithm_) {
-      a.data->codegen_incref(g, g.incref_added_);
+      a.data->codegen_incref(g, inst, g.incref_added_);
     }
   }
 
   void MXFunction::codegen_decref(CodeGenerator& g, const Instance& inst) const {
     for (auto&& a : algorithm_) {
-      a.data->codegen_decref(g, g.decref_added_);
+      a.data->codegen_decref(g, inst, g.decref_added_);
     }
   }
 

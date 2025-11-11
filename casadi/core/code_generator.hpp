@@ -75,7 +75,7 @@ namespace casadi {
 
 #ifndef SWIG
     /// Add a function dependency
-    std::string add_dependency(const Function& f, const Instance& inst=Instance(), const Function& owner=Function());
+    std::string add_dependency(const Function& f, const Instance& inst=Instance(), const Function& owner=Function(), const Instance& owner_inst=Instance());
 
     /// Has a function dependency
     bool has_dependency(const Function& f, const Instance& inst=Instance()) const;
@@ -84,7 +84,7 @@ namespace casadi {
     void add_external(const std::string& new_external);
 
     void add_extra_definitions(const Function& f, const std::string& extra);
-    void add_extra_declarations(const Function& f, const std::string& extra);
+    void add_extra_declarations(const Function& f, const Instance& inst, const std::string& extra);
 
     /// Get a shorthand
     std::string shorthand(const std::string& name) const;

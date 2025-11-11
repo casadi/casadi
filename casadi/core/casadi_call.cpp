@@ -170,11 +170,11 @@ namespace casadi {
     return fcn_.rev(arg, res, iw, w);
   }
 
-  void Call::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner) const {
+  void Call::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner, const Instance& owner_inst) const {
     Instance local = inst;
     local.stride_in.resize(fcn_.n_in(), 1);
     local.stride_out.resize(fcn_.n_out(), 1);
-    g.add_dependency(fcn_, local, owner);
+    g.add_dependency(fcn_, local, owner, owner_inst);
   }
 
   bool Call::has_refcount() const {
@@ -214,20 +214,20 @@ namespace casadi {
     g << "if (" << flag << ") return 1;\n";
   }
 
-  void Call::codegen_incref(CodeGenerator& g, std::set<const void*>& added) const {
+  void Call::codegen_incref(CodeGenerator& g, const Instance& inst, std::set<const void*>& added) const {
     if (has_refcount()) {
       auto i = added.insert(fcn_.get());
       if (i.second) { // prevent duplicate calls
-        g << fcn_->codegen_name(g) << "_incref();\n";
+        g << fcn_->codegen_name(g, inst) << "_incref();\n";
       }
     }
   }
 
-  void Call::codegen_decref(CodeGenerator& g, std::set<const void*>& added) const {
+  void Call::codegen_decref(CodeGenerator& g, const Instance& inst, std::set<const void*>& added) const {
     if (has_refcount()) {
       auto i = added.insert(fcn_.get());
       if (i.second) { // prevent duplicate calls
-        g << fcn_->codegen_name(g) << "_decref();\n";
+        g << fcn_->codegen_name(g, inst) << "_decref();\n";
       }
     }
   }

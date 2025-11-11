@@ -2488,7 +2488,7 @@ namespace casadi {
     std::string sig = signature(fname);
     std::string decl = sig+";\n";
 
-    std::string resolved_name = g.name+"_"+codegen_name(g, false);
+    std::string resolved_name = g.name+"_"+codegen_name(g, inst, false);
 
     if (vectorize) {
       if (is_a("SXFunction", false)) {
@@ -2498,7 +2498,7 @@ namespace casadi {
         std::string sig_intr = signature(fname, true, GlobalOptions::vector_width_real);
         std::string omp = "#pragma omp declare simd uniform(arg, res, iw, w, mem) linear(i:1) simdlen(" + str(GlobalOptions::vector_width_real) + ") notinbranch\n";
         decl = "";
-        if (g.split) decl += "#undef casadi_" + codegen_name(g, false) + "\n";
+        if (g.split) decl += "#undef casadi_" + codegen_name(g, inst, false) + "\n";
         decl += omp;
         if (g.split) {
           decl += "static __attribute__((noinline)) __attribute__((used)) " + sig + ";\n";
@@ -2547,9 +2547,9 @@ namespace casadi {
 
     // Flush to function body
     g.flush(s);
-    g.body_parts[codegen_name(g, false)] = s.str();
+    g.body_parts[codegen_name(g, inst, false)] = s.str();
 
-    if (g.split) g.casadi_headers << "#ifndef DEF_" << codegen_name(g, false) << "\n";
+    if (g.split) g.casadi_headers << "#ifndef DEF_" << codegen_name(g, inst, false) << "\n";
 
     g.casadi_headers << decl;
 
@@ -2602,21 +2602,21 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
+  void FunctionInternal::codegen_init_mem(CodeGenerator& g, const Instance& inst) const {
     g << "return 0;\n";
   }
 
-  void FunctionInternal::codegen_alloc_mem(CodeGenerator& g) const {
+  void FunctionInternal::codegen_alloc_mem(CodeGenerator& g, const Instance& inst) const {
     bool needs_mem = !codegen_mem_type().empty();
     if (needs_mem) {
-    std::string name = codegen_name(g, false);
+    std::string name = codegen_name(g, inst, false);
     std::string mem_counter = g.shorthand(name + "_mem_counter");
     g << "return " + mem_counter + "++;\n";
     }
   }
 
-  void FunctionInternal::codegen_checkout(CodeGenerator& g) const {
-    std::string name = codegen_name(g, false);
+  void FunctionInternal::codegen_checkout(CodeGenerator& g, const Instance& inst) const {
+    std::string name = codegen_name(g, inst, false);
     std::string stack_counter = g.shorthand(name + "_unused_stack_counter");
     std::string stack = g.shorthand(name + "_unused_stack");
     std::string mem_counter = g.shorthand(name + "_mem_counter");
@@ -2641,8 +2641,8 @@ namespace casadi {
     g << "}\n";
   }
 
-  void FunctionInternal::codegen_release(CodeGenerator& g) const {
-    std::string name = codegen_name(g, false);
+  void FunctionInternal::codegen_release(CodeGenerator& g, const Instance& inst) const {
+    std::string name = codegen_name(g, inst, false);
     std::string stack_counter = g.shorthand(name + "_unused_stack_counter");
     std::string stack = g.shorthand(name + "_unused_stack");
     g << stack << "[++" << stack_counter << "] = mem;\n";
@@ -2652,12 +2652,12 @@ namespace casadi {
     g.add_io_sparsities(name_, sparsity_in_, sparsity_out_);
   }
 
-  void FunctionInternal::codegen_meta(CodeGenerator& g) const {
+  void FunctionInternal::codegen_meta(CodeGenerator& g, const Instance& inst) const {
     bool needs_mem = !codegen_mem_type().empty();
 
     g << g.declare("int " + name_ + "_alloc_mem(void)") << " {\n";
     if (needs_mem) {
-      g << "return " << codegen_name(g) << "_alloc_mem();\n";
+      g << "return " << codegen_name(g, inst) << "_alloc_mem();\n";
     } else {
       g << "return 0;\n";
     }
@@ -2665,7 +2665,7 @@ namespace casadi {
 
     g << g.declare("int " + name_ + "_init_mem(int mem)") << " {\n";
     if (needs_mem) {
-      g << "return " << codegen_name(g) << "_init_mem(mem);\n";
+      g << "return " << codegen_name(g, inst) << "_init_mem(mem);\n";
     } else {
       g << "return 0;\n";
     }
@@ -2673,14 +2673,14 @@ namespace casadi {
 
     g << g.declare("void " + name_ + "_free_mem(int mem)") << " {\n";
     if (needs_mem) {
-      g << codegen_name(g) << "_free_mem(mem);\n";
+      g << codegen_name(g, inst) << "_free_mem(mem);\n";
     }
     g << "}\n\n";
 
     // Checkout/release routines
     g << g.declare("int " + name_ + "_checkout(void)") << " {\n";
     if (needs_mem) {
-      g << "return " << codegen_name(g) << "_checkout();\n";
+      g << "return " << codegen_name(g, inst) << "_checkout();\n";
     } else {
       g << "return 0;\n";
     }
@@ -2688,7 +2688,7 @@ namespace casadi {
 
     if (needs_mem) {
       g << g.declare("void " + name_ + "_release(int mem)") << " {\n";
-      g << codegen_name(g) << "_release(mem);\n";
+      g << codegen_name(g, inst) << "_release(mem);\n";
     } else {
       g << g.declare("void " + name_ + "_release(int mem)") << " {\n";
     }
@@ -2697,12 +2697,12 @@ namespace casadi {
     // Reference counter routines
     g << g.declare("void " + name_ + "_incref(void)") << " {\n";
     if (has_refcount_) {
-      g << codegen_name(g) << "_incref();\n";
+      g << codegen_name(g, inst) << "_incref();\n";
     }
     g << "}\n\n"
       << g.declare("void " + name_ + "_decref(void)") << " {\n";
     if (has_refcount_) {
-      g << codegen_name(g) << "_decref();\n";
+      g << codegen_name(g, inst) << "_decref();\n";
     }
     g << "}\n\n";
 
@@ -2996,23 +2996,24 @@ namespace casadi {
     g.flush(g.body);
   }
 
-  std::string FunctionInternal::codegen_name(const CodeGenerator& g, bool ns) const {
+  std::string FunctionInternal::codegen_name(const CodeGenerator& g, const Instance& inst, bool ns) const {
     if (ns) {
       // Get the index of the function
       for (auto&& e : g.added_functions_) {
-        if (e.f.get()==this) return e.codegen_name;
+        if (e.f.get()==this && e.inst==inst) return e.codegen_name;
       }
     } else {
       for (casadi_int i=0;i<g.added_functions_.size();++i) {
         const auto & e = g.added_functions_[i];
-        if (e.f.get()==this) return "f" + str(i);
+        if (e.f.get()==this && e.inst==inst) return "f" + str(i);
       }
     }
     casadi_error("Function '" + name_ + "' not found");
   }
 
   std::string FunctionInternal::codegen_mem(CodeGenerator& g, const std::string& index) const {
-    std::string name = codegen_name(g, false);
+    Instance default_inst;  // Use default instance to find first occurrence
+    std::string name = codegen_name(g, default_inst, false);
     std::string mem_array = g.shorthand(name + "_mem");
     return mem_array+"[" + index + "]";
   }

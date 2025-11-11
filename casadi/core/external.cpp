@@ -353,7 +353,7 @@ std::string External::codegen_mem_type() const {
   return "";
 }
 
-void External::codegen_checkout(CodeGenerator& g) const {
+void External::codegen_checkout(CodeGenerator& g, const Instance& inst) const {
   if (checkout_) {
     g << "return " << name_ << "_checkout();\n";
   } else {
@@ -361,7 +361,7 @@ void External::codegen_checkout(CodeGenerator& g) const {
   }
 }
 
-void External::codegen_release(CodeGenerator& g) const {
+void External::codegen_release(CodeGenerator& g, const Instance& inst) const {
   if (release_) {
     g << name_ << "_release(mem);\n";
   }
@@ -383,15 +383,15 @@ void External::codegen_decref(CodeGenerator& g, const Instance& inst) const {
   }
 }
 
-void External::codegen_init_mem(CodeGenerator& g) const {
+void External::codegen_init_mem(CodeGenerator& g, const Instance& inst) const {
   g << "return 0;\n";
 }
 
-void External::codegen_alloc_mem(CodeGenerator& g) const {
+void External::codegen_alloc_mem(CodeGenerator& g, const Instance& inst) const {
   g << "return 0;\n";
 }
 
-void External::codegen_free_mem(CodeGenerator& g) const {
+void External::codegen_free_mem(CodeGenerator& g, const Instance& inst) const {
 }
 
 bool External::has_jacobian() const {

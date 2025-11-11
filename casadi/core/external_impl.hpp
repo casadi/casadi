@@ -164,27 +164,27 @@ class CASADI_EXPORT External : public FunctionInternal {
   /** \brief Codegen for checkout
 
       \identifier{1zj} */
-  void codegen_checkout(CodeGenerator& g) const override;
+  void codegen_checkout(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief Codegen for release
 
       \identifier{1zk} */
-  void codegen_release(CodeGenerator& g) const override;
+  void codegen_release(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief Codegen decref for alloc_mem
 
       \identifier{1zl} */
-  void codegen_alloc_mem(CodeGenerator& g) const override;
+  void codegen_alloc_mem(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief Codegen decref for init_mem
 
       \identifier{1zm} */
-  void codegen_init_mem(CodeGenerator& g) const override;
+  void codegen_init_mem(CodeGenerator& g, const Instance& inst) const override;
 
   /** \brief Codegen for free_mem
 
       \identifier{1zn} */
-  void codegen_free_mem(CodeGenerator& g) const override;
+  void codegen_free_mem(CodeGenerator& g, const Instance& inst) const override;
 
   ///@{
   /** \brief Number of function inputs and outputs

@@ -842,7 +842,7 @@ namespace casadi {
     /** \brief Generate meta-information allowing a user to evaluate a generated function
 
         \identifier{ln} */
-    void codegen_meta(CodeGenerator& g) const;
+    void codegen_meta(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Codegen sparsities
 
@@ -852,7 +852,7 @@ namespace casadi {
     /** \brief Get name in codegen
 
         \identifier{lp} */
-    virtual std::string codegen_name(const CodeGenerator& g, bool ns=true) const;
+    virtual std::string codegen_name(const CodeGenerator& g, const Instance& inst, bool ns=true) const;
 
     /** \brief Get thread-local memory object
 
@@ -872,27 +872,27 @@ namespace casadi {
     /** \brief Codegen decref for alloc_mem
 
         \identifier{lt} */
-    virtual void codegen_alloc_mem(CodeGenerator& g) const;
+    virtual void codegen_alloc_mem(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Codegen decref for init_mem
 
         \identifier{lu} */
-    virtual void codegen_init_mem(CodeGenerator& g) const;
+    virtual void codegen_init_mem(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Codegen for free_mem
 
         \identifier{lv} */
-    virtual void codegen_free_mem(CodeGenerator& g) const {}
+    virtual void codegen_free_mem(CodeGenerator& g, const Instance& inst) const {}
 
     /** \brief Codegen for checkout
 
         \identifier{lw} */
-    virtual void codegen_checkout(CodeGenerator& g) const;
+    virtual void codegen_checkout(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Codegen for release
 
         \identifier{lx} */
-    virtual void codegen_release(CodeGenerator& g) const;
+    virtual void codegen_release(CodeGenerator& g, const Instance& inst) const;
 
     /** \brief Code generate the function
 

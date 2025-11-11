@@ -555,14 +555,14 @@ namespace casadi {
   void MapSum::codegen_incref(CodeGenerator& g, const Instance& inst) const {
     auto i = g.incref_added_.insert(f_.get());
     if (i.second) { // prevent duplicate calls
-      g << f_->codegen_name(g) << "_incref();\n";
+      g << f_->codegen_name(g, inst) << "_incref();\n";
     }
   }
 
   void MapSum::codegen_decref(CodeGenerator& g, const Instance& inst) const {
     auto i = g.decref_added_.insert(f_.get());
     if (i.second) { // prevent duplicate calls
-      g << f_->codegen_name(g) << "_decref();\n";
+      g << f_->codegen_name(g, inst) << "_decref();\n";
     }
   }
 

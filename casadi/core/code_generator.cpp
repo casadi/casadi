@@ -262,7 +262,7 @@ namespace casadi {
     return ret;
   }
 
-  std::string CodeGenerator::add_dependency(const Function& f, const Instance& inst, const Function& owner) {
+  std::string CodeGenerator::add_dependency(const Function& f, const Instance& inst, const Function& owner, const Instance& owner_inst) {
 
     /*std::string prefix = "_";
     for (bool b : arg_null) prefix+= b ? 'n' : 'r';
@@ -272,10 +272,10 @@ namespace casadi {
     // Quick return if it already exists
     for (auto&& e : added_functions_) if (e.f==f && e.inst==inst) {
       if (inst.prefer_inline && !owner.is_null()) {
-        std::set<std::string>& dep = dependees_[owner->codegen_name(*this, false)];
-        dep.insert(f->codegen_name(*this, false));
+        std::set<std::string>& dep = dependees_[owner->codegen_name(*this, owner_inst, false)];
+        dep.insert(f->codegen_name(*this, inst, false));
         // Add recursively
-        for (const auto& e : dependees_[f->codegen_name(*this, false)]) {
+        for (const auto& e : dependees_[f->codegen_name(*this, inst, false)]) {
           dep.insert(e);
         }
       }
@@ -295,7 +295,7 @@ namespace casadi {
     // Generate declarations
     f->codegen_declarations(*this, inst);
 
-    comment("dependees: " + str(dependees_[f->codegen_name(*this, false)]));
+    comment("dependees: " + str(dependees_[f->codegen_name(*this, inst, false)]));
 
     comment("inst: " + str(inst.arg_null) + ":" + str(inst.res_null) + str(inst.stride_in) + str(inst.stride_out) + str(inst.prefer_inline));
 
@@ -306,7 +306,7 @@ namespace casadi {
     // Print to file
     f->codegen(*this, fname, inst);
 
-    body_parts[f->codegen_name(*this, false)] = declarations + body_parts[f->codegen_name(*this, false)];
+    body_parts[f->codegen_name(*this, inst, false)] = declarations + body_parts[f->codegen_name(*this, inst, false)];
 
     // Codegen reference count functions, if needed
     if (f->has_refcount_) {
@@ -329,7 +329,7 @@ namespace casadi {
       *this << "int " << fname << "_alloc_mem(void) {\n";
       flush(this->body);
       scope_enter();
-      f->codegen_alloc_mem(*this);
+      f->codegen_alloc_mem(*this, inst);
       scope_exit(this->body);
       *this << "}\n\n";
 
@@ -337,7 +337,7 @@ namespace casadi {
       *this << "int " << fname << "_init_mem(int mem) {\n";
       flush(this->body);
       scope_enter();
-      f->codegen_init_mem(*this);
+      f->codegen_init_mem(*this, inst);
       scope_exit(this->body);
       *this << "}\n\n";
 
@@ -345,7 +345,7 @@ namespace casadi {
       *this << "void " << fname << "_free_mem(int mem) {\n";
       flush(this->body);
       scope_enter();
-      f->codegen_free_mem(*this);
+      f->codegen_free_mem(*this, inst);
       scope_exit(this->body);
       *this << "}\n\n";
 
@@ -353,7 +353,7 @@ namespace casadi {
       *this << "int " << fname << "_checkout(void) {\n";
       flush(this->body);
       scope_enter();
-      f->codegen_checkout(*this);
+      f->codegen_checkout(*this, inst);
       scope_exit(this->body);
       *this << "}\n\n";
 
@@ -361,16 +361,16 @@ namespace casadi {
       *this << "void " << fname << "_release(int mem) {\n";
       flush(this->body);
       scope_enter();
-      f->codegen_release(*this);
+      f->codegen_release(*this, inst);
       scope_exit(this->body);
       *this << "}\n\n";
 
     }
 
     if (inst.prefer_inline && !owner.is_null()) {
-      std::set<std::string>& dep = dependees_[owner->codegen_name(*this, false)];
-      dep.insert(f->codegen_name(*this, false));
-      for (const auto& e : dependees_[f->codegen_name(*this, false)]) {
+      std::set<std::string>& dep = dependees_[owner->codegen_name(*this, owner_inst, false)];
+      dep.insert(f->codegen_name(*this, inst, false));
+      for (const auto& e : dependees_[f->codegen_name(*this, inst, false)]) {
         dep.insert(e);
       }
     }
@@ -421,7 +421,7 @@ namespace casadi {
     }
 
     // Generate meta information
-    f->codegen_meta(*this);
+    f->codegen_meta(*this, inst);
 
     // Generate Jacobian sparsity information
     if (with_jac_sparsity) {
@@ -651,8 +651,8 @@ namespace casadi {
     return join(part_names,";");
   }
 
-  void CodeGenerator::add_extra_declarations(const Function& f, const std::string& extra) {
-    body_parts[f->codegen_name(*this, false)] = extra + body_parts[f->codegen_name(*this, false)];
+  void CodeGenerator::add_extra_declarations(const Function& f, const Instance& inst, const std::string& extra) {
+    body_parts[f->codegen_name(*this, inst, false)] = extra + body_parts[f->codegen_name(*this, inst, false)];
   }
 
   void CodeGenerator::add_extra_definitions(const Function& f, const std::string& extra) {
@@ -2242,7 +2242,8 @@ namespace casadi {
   }
 
   std::string CodeGenerator::mem(const Function& f) {
-    std::string name = f->codegen_name(*this, false);
+    Instance default_inst;  // Use default instance to find first occurrence
+    std::string name = f->codegen_name(*this, default_inst, false);
     std::string mem_array = shorthand(name + "_mem");
     return mem_array+"[mem]";
   }

@@ -315,7 +315,7 @@ namespace casadi {
     /** \brief Codegen incref
 
         \identifier{zm} */
-    void codegen_incref(CodeGenerator& g, std::set<const void*>& added) const override;
+    void codegen_incref(CodeGenerator& g, const Instance& inst, std::set<const void*>& added) const override;
 
     /** \brief Is reference counting needed in codegen? */
     bool has_refcount() const { return true;}
@@ -368,7 +368,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{zr} */
-    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function()) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function(), const Instance& owner_inst = Instance()) const override;
 
     /** \brief file to read from
 
@@ -455,7 +455,7 @@ namespace casadi {
     /** \brief Add a dependent function
 
         \identifier{2a0} */
-    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function()) const override;
+    void add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner = Function(), const Instance& owner_inst = Instance()) const override;
 
     /** \brief pool identifier
 
