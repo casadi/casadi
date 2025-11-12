@@ -118,6 +118,23 @@ namespace casadi {
 
     /// Whether a model has been loaded
     bool has_model_;
+
+  private:
+    /** \brief Get dimension value from ONNX shape
+
+        Handles both concrete dimensions and symbolic dimensions
+        using dimension_overrides_ map.
+
+        \identifier{onnx_translator_get_dimension} */
+    casadi_int get_dimension(const onnx::TensorShapeProto& shape, int idx) const;
+
+    /** \brief Convert ONNX TensorProto to CasADi DM
+
+        Extracts shape and data from ONNX tensor.
+        Currently only supports DOUBLE data type.
+
+        \identifier{onnx_translator_tensor_to_dm} */
+    DM tensor_to_dm(const onnx::TensorProto& tensor) const;
   };
 
 } // namespace casadi

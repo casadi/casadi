@@ -95,5 +95,102 @@ class Onnxtests(casadiTestCase):
     if os.path.exists(onnx_file):
       os.remove(onnx_file)
 
+  def test_import_roundtrip(self):
+    """Test ONNX import via roundtrip (export then import)"""
+    if not has_translator("onnx"):
+      self.skipTest("ONNX translator not available")
+
+    # Create a simple function using supported operations: sin, mul, add
+    x = MX.sym("x")
+    y = MX.sym("y")
+    z = sin(x) * y + x
+    f_original = Function("test_roundtrip", [x, y], [z], ["x", "y"], ["z"])
+
+    # Export to ONNX
+    onnx_file = "test_roundtrip.onnx"
+    t_export = translator("onnx", {"verbose": False})
+    t_export.load(f_original)
+    t_export.save(onnx_file)
+
+    # Verify file was created
+    self.assertTrue(os.path.exists(onnx_file), "ONNX file should be created")
+
+    # Import from ONNX
+    t_import = translator("onnx", {"verbose": False})
+    t_import.load(onnx_file)
+    f_imported = t_import.create("imported_function")
+
+    # Verify function properties
+    self.assertEqual(f_imported.n_in(), 2, "Should have 2 inputs")
+    self.assertEqual(f_imported.n_out(), 1, "Should have 1 output")
+    self.assertEqual(f_imported.name_in(0), "x", "First input should be 'x'")
+    self.assertEqual(f_imported.name_in(1), "y", "Second input should be 'y'")
+    self.assertEqual(f_imported.name_out(0), "z", "Output should be 'z'")
+
+    # Numerical validation - test several input combinations
+    test_cases = [
+      [DM(0.5), DM(1.2)],
+      [DM(0.0), DM(1.0)],
+      [DM(1.5), DM(2.3)],
+      [DM(-0.5), DM(0.8)]
+    ]
+
+    for test_inputs in test_cases:
+      result_original = f_original(*test_inputs)
+      result_imported = f_imported(*test_inputs)
+
+      # Compare outputs (should match exactly within floating point precision)
+      self.checkarray(result_original, result_imported, digits=10)
+
+    # Cleanup
+    if os.path.exists(onnx_file):
+      os.remove(onnx_file)
+
+  def test_import_all_operations(self):
+    """Test ONNX import with all 14 supported operations"""
+    if not has_translator("onnx"):
+      self.skipTest("ONNX translator not available")
+
+    # Create a function using all supported operations
+    x = MX.sym("x")
+    y = MX.sym("y")
+
+    # Test all operations:
+    # Binary: Add, Sub, Mul, Div
+    # Unary: Sin, Cos, Tan, Exp, Log, Sqrt, Neg, Tanh
+    z = (sin(x) + cos(x) - tan(y) * exp(y)) / (log(x + 2) + sqrt(y + 1)) + tanh(x) - (-y)
+
+    f_original = Function("test_all_ops", [x, y], [z], ["x", "y"], ["z"])
+
+    # Export to ONNX
+    onnx_file = "test_all_ops.onnx"
+    t_export = translator("onnx", {"verbose": False})
+    t_export.load(f_original)
+    t_export.save(onnx_file)
+
+    # Import from ONNX
+    t_import = translator("onnx", {"verbose": False})
+    t_import.load(onnx_file)
+    f_imported = t_import.create("imported_all_ops")
+
+    # Numerical validation with multiple test cases
+    test_cases = [
+      [DM(1.0), DM(0.5)],
+      [DM(2.0), DM(1.0)],
+      [DM(0.5), DM(0.2)],
+      [DM(1.5), DM(1.5)]
+    ]
+
+    for test_inputs in test_cases:
+      result_original = f_original(*test_inputs)
+      result_imported = f_imported(*test_inputs)
+
+      # Compare outputs
+      self.checkarray(result_original, result_imported, digits=10)
+
+    # Cleanup
+    if os.path.exists(onnx_file):
+      os.remove(onnx_file)
+
 if __name__ == '__main__':
     unittest.main()
