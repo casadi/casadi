@@ -358,14 +358,346 @@ namespace casadi {
     }
   }
 
+  casadi_int OnnxTranslator::get_dimension(
+      const onnx::TensorShapeProto& shape, int idx) const {
+    // Out of range or no dimensions = scalar (1)
+    if (idx >= shape.dim_size()) return 1;
+
+    const auto& dim = shape.dim(idx);
+
+    // Concrete dimension
+    if (dim.has_dim_value()) {
+      return static_cast<casadi_int>(dim.dim_value());
+    }
+
+    // Symbolic dimension - look up in overrides
+    if (dim.has_dim_param()) {
+      std::string param_name = dim.dim_param();
+
+      auto it = dimension_overrides_.find(param_name);
+      casadi_assert(it != dimension_overrides_.end(),
+                    "Symbolic dimension '" + param_name + "' not specified. " +
+                    "Call set_dimension(\"" + param_name + "\", value) before create().");
+
+      return it->second;
+    }
+
+    // No dimension info - default to 1
+    return 1;
+  }
+
+  DM OnnxTranslator::tensor_to_dm(const onnx::TensorProto& tensor) const {
+    // Extract shape
+    std::vector<casadi_int> dims;
+    for (int i = 0; i < tensor.dims_size(); ++i) {
+      dims.push_back(static_cast<casadi_int>(tensor.dims(i)));
+    }
+
+    if (verbose_) {
+      uout() << "      tensor_to_dm: dims_size=" << tensor.dims_size()
+             << ", double_data_size=" << tensor.double_data_size()
+             << ", raw_data_size=" << tensor.raw_data().size()
+             << ", data_type=" << tensor.data_type();
+      if (dims.size() > 0) {
+        uout() << ", dims[0]=" << dims[0];
+      }
+      uout() << std::endl;
+    }
+
+    // Determine matrix dimensions (assume 2D or less)
+    casadi_int rows = dims.size() > 0 ? dims[0] : 1;
+    casadi_int cols = dims.size() > 1 ? dims[1] : 1;
+
+    if (verbose_) {
+      uout() << "      rows=" << rows << ", cols=" << cols << std::endl;
+    }
+
+    // For higher dimensional tensors, flatten to 2D for now
+    if (dims.size() > 2) {
+      casadi_warning("ONNX tensor has " + std::to_string(dims.size()) +
+                     " dimensions, flattening to 2D");
+      cols = 1;
+      for (size_t i = 1; i < dims.size(); ++i) {
+        cols *= dims[i];
+      }
+    }
+
+    // Create DM
+    DM dm(rows, cols);
+
+    // Fill with data (only handle DOUBLE for now)
+    casadi_assert(tensor.data_type() == onnx::TensorProto::DOUBLE,
+                  "Only DOUBLE tensors supported in import, got type " +
+                  std::to_string(tensor.data_type()));
+
+    // ONNX can store data in either double_data field or raw_data field
+    // Check raw_data first since that's what our export uses
+    if (tensor.has_raw_data() && tensor.raw_data().size() > 0) {
+      // Data in raw bytes
+      const std::string& raw = tensor.raw_data();
+      casadi_assert(raw.size() == rows * cols * sizeof(double),
+                    "Raw data size mismatch: expected " +
+                    std::to_string(rows * cols * sizeof(double)) + ", got " +
+                    std::to_string(raw.size()));
+
+      const double* data_ptr = reinterpret_cast<const double*>(raw.data());
+      for (casadi_int i = 0; i < rows * cols; ++i) {
+        dm(i) = data_ptr[i];
+      }
+    } else if (tensor.double_data_size() > 0) {
+      // Data in typed field
+      casadi_assert(tensor.double_data_size() == rows * cols,
+                    "Tensor data size mismatch: expected " +
+                    std::to_string(rows * cols) + ", got " +
+                    std::to_string(tensor.double_data_size()));
+
+      for (casadi_int i = 0; i < tensor.double_data_size(); ++i) {
+        dm(i) = tensor.double_data(i);
+      }
+    } else {
+      casadi_error("Tensor has neither double_data nor raw_data");
+    }
+
+    return dm;
+  }
+
   Function OnnxTranslator::create(const std::string& name) {
     casadi_assert(has_model_, "No ONNX model loaded. Call load() first.");
 
-    // TODO: Implement ONNX to CasADi Function conversion
-    // This is where you'll translate the ONNX graph to CasADi MX expressions
-    casadi_error("OnnxTranslator::create() not yet implemented");
+    const onnx::GraphProto& graph = model_.graph();
 
-    return Function();
+    // Step 1: Initialize data structures
+    // Map tensor names to MX expressions (the "symbol table")
+    std::map<std::string, MX> value_map;
+
+    // Collect function inputs/outputs
+    std::vector<MX> inputs;
+    std::vector<std::string> input_names;
+    std::vector<MX> outputs;
+    std::vector<std::string> output_names;
+
+    if (verbose_) {
+      uout() << "Creating CasADi Function from ONNX model: "
+             << graph.name() << std::endl;
+      uout() << "  Graph has " << graph.initializer_size() << " initializers, "
+             << graph.input_size() << " inputs, "
+             << graph.output_size() << " outputs, "
+             << graph.node_size() << " nodes" << std::endl;
+    }
+
+    // Step 2: Process graph initializers (pre-loaded constants)
+    for (int i = 0; i < graph.initializer_size(); ++i) {
+      const onnx::TensorProto& tensor = graph.initializer(i);
+      std::string tensor_name = tensor.name();
+
+      if (verbose_) {
+        uout() << "  Processing initializer: " << tensor_name << std::endl;
+      }
+
+      // Convert TensorProto to DM, then to MX
+      DM dm_const = tensor_to_dm(tensor);
+      value_map[tensor_name] = MX(dm_const);
+    }
+
+    // Step 3: Create MX symbols for graph inputs
+    for (int i = 0; i < graph.input_size(); ++i) {
+      const onnx::ValueInfoProto& input = graph.input(i);
+      std::string input_name = input.name();
+
+      // Skip if already in value_map (it's an initializer, not a variable)
+      if (value_map.count(input_name)) {
+        if (verbose_) {
+          uout() << "  Skipping input '" << input_name
+                 << "' (it's an initializer)" << std::endl;
+        }
+        continue;
+      }
+
+      // Extract shape
+      const onnx::TensorShapeProto& shape =
+          input.type().tensor_type().shape();
+      casadi_int rows = get_dimension(shape, 0);
+      casadi_int cols = get_dimension(shape, 1);
+
+      if (verbose_) {
+        uout() << "  Creating input: " << input_name
+               << " [" << rows << ", " << cols << "]" << std::endl;
+      }
+
+      // Create MX symbol
+      MX mx_input = MX::sym(input_name, rows, cols);
+      value_map[input_name] = mx_input;
+      inputs.push_back(mx_input);
+      input_names.push_back(input_name);
+    }
+
+    // Step 4: Process nodes in topological order
+    for (int i = 0; i < graph.node_size(); ++i) {
+      const onnx::NodeProto& node = graph.node(i);
+      std::string op_type = node.op_type();
+
+      if (verbose_) {
+        uout() << "  Processing node " << i << ": " << op_type << std::endl;
+      }
+
+      // Gather input tensors
+      std::vector<MX> node_inputs;
+      for (int j = 0; j < node.input_size(); ++j) {
+        std::string input_name = node.input(j);
+
+        // Empty string means optional input not provided
+        if (input_name.empty()) {
+          node_inputs.push_back(MX());
+          continue;
+        }
+
+        casadi_assert(value_map.count(input_name),
+                      "Unknown input tensor '" + input_name +
+                      "' required by node " + std::to_string(i) +
+                      " (op_type: " + op_type + ")");
+        node_inputs.push_back(value_map[input_name]);
+      }
+
+      // Compute output based on operation type
+      MX output;
+
+      if (op_type == "Add") {
+        casadi_assert(node_inputs.size() >= 2,
+                      "Add operation requires 2 inputs");
+        output = node_inputs[0] + node_inputs[1];
+
+      } else if (op_type == "Mul") {
+        casadi_assert(node_inputs.size() >= 2,
+                      "Mul operation requires 2 inputs");
+        output = node_inputs[0] * node_inputs[1];
+
+      } else if (op_type == "Sin") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Sin operation requires 1 input");
+        output = sin(node_inputs[0]);
+
+      } else if (op_type == "Identity") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Identity operation requires 1 input");
+        output = node_inputs[0];
+
+      } else if (op_type == "Sub") {
+        casadi_assert(node_inputs.size() >= 2,
+                      "Sub operation requires 2 inputs");
+        output = node_inputs[0] - node_inputs[1];
+
+      } else if (op_type == "Div") {
+        casadi_assert(node_inputs.size() >= 2,
+                      "Div operation requires 2 inputs");
+        output = node_inputs[0] / node_inputs[1];
+
+      } else if (op_type == "Cos") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Cos operation requires 1 input");
+        output = cos(node_inputs[0]);
+
+      } else if (op_type == "Tan") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Tan operation requires 1 input");
+        output = tan(node_inputs[0]);
+
+      } else if (op_type == "Exp") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Exp operation requires 1 input");
+        output = exp(node_inputs[0]);
+
+      } else if (op_type == "Log") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Log operation requires 1 input");
+        output = log(node_inputs[0]);
+
+      } else if (op_type == "Sqrt") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Sqrt operation requires 1 input");
+        output = sqrt(node_inputs[0]);
+
+      } else if (op_type == "Neg") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Neg operation requires 1 input");
+        output = -node_inputs[0];
+
+      } else if (op_type == "Tanh") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Tanh operation requires 1 input");
+        output = tanh(node_inputs[0]);
+
+      } else if (op_type == "Constant") {
+        // Extract constant from node attributes
+        if (verbose_) {
+          uout() << "    Constant node has " << node.attribute_size()
+                 << " attributes" << std::endl;
+        }
+
+        casadi_assert(node.attribute_size() > 0,
+                      "Constant node must have attributes");
+
+        // Find the 'value' attribute
+        const onnx::AttributeProto* value_attr = nullptr;
+        for (int a = 0; a < node.attribute_size(); ++a) {
+          if (node.attribute(a).name() == "value") {
+            value_attr = &node.attribute(a);
+            break;
+          }
+        }
+
+        casadi_assert(value_attr != nullptr,
+                      "Constant node must have 'value' attribute");
+
+        const onnx::TensorProto& tensor = value_attr->t();
+        DM dm_const = tensor_to_dm(tensor);
+        output = MX(dm_const);
+
+      } else {
+        // Unsupported operation - warn and skip
+        casadi_warning("ONNX import: unsupported operation '" + op_type +
+                       "' at node " + std::to_string(i) + ", skipping");
+        continue;  // Skip this node
+      }
+
+      // Store output (assume single output for now)
+      casadi_assert(node.output_size() >= 1,
+                    "Node must have at least one output");
+
+      std::string output_name = node.output(0);
+      value_map[output_name] = output;
+
+      if (verbose_) {
+        uout() << "    -> " << output_name << std::endl;
+      }
+    }
+
+    // Step 5: Collect graph outputs
+    for (int i = 0; i < graph.output_size(); ++i) {
+      const onnx::ValueInfoProto& output = graph.output(i);
+      std::string output_name = output.name();
+
+      casadi_assert(value_map.count(output_name),
+                    "Unknown output tensor: " + output_name +
+                    ". This usually means the ONNX graph contains unsupported operations.");
+
+      outputs.push_back(value_map[output_name]);
+      output_names.push_back(output_name);
+
+      if (verbose_) {
+        uout() << "  Graph output: " << output_name << std::endl;
+      }
+    }
+
+    // Step 6: Create and return CasADi Function
+    Function f(name, inputs, outputs, input_names, output_names);
+
+    if (verbose_) {
+      uout() << "Created CasADi Function: " << name << std::endl;
+      uout() << "  Inputs: " << f.n_in() << std::endl;
+      uout() << "  Outputs: " << f.n_out() << std::endl;
+    }
+
+    return f;
   }
 
   void OnnxTranslator::save(const std::string& filename) {
