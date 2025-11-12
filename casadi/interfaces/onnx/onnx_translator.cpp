@@ -335,6 +335,349 @@ namespace casadi {
           break;
         }
 
+        // ========== Inverse Trigonometric ==========
+        case OP_ASIN: {
+          node = graph->add_node();
+          node->set_op_type("Asin");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_ACOS: {
+          node = graph->add_node();
+          node->set_op_type("Acos");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_ATAN: {
+          node = graph->add_node();
+          node->set_op_type("Atan");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        // ========== Hyperbolic ==========
+        case OP_SINH: {
+          node = graph->add_node();
+          node->set_op_type("Sinh");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_COSH: {
+          node = graph->add_node();
+          node->set_op_type("Cosh");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        // ========== Inverse Hyperbolic ==========
+        case OP_ASINH: {
+          node = graph->add_node();
+          node->set_op_type("Asinh");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_ACOSH: {
+          node = graph->add_node();
+          node->set_op_type("Acosh");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_ATANH: {
+          node = graph->add_node();
+          node->set_op_type("Atanh");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        // ========== Power and Rounding ==========
+        case OP_POW: {
+          node = graph->add_node();
+          node->set_op_type("Pow");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_input(work_to_onnx[i[1]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_FABS: {
+          node = graph->add_node();
+          node->set_op_type("Abs");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_CEIL: {
+          node = graph->add_node();
+          node->set_op_type("Ceil");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_FLOOR: {
+          node = graph->add_node();
+          node->set_op_type("Floor");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_SIGN: {
+          node = graph->add_node();
+          node->set_op_type("Sign");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        // ========== Other Mathematical ==========
+        case OP_ERF: {
+          node = graph->add_node();
+          node->set_op_type("Erf");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        // ========== Tensor Operations ==========
+        case OP_MTIMES: {
+          node = graph->add_node();
+          node->set_op_type("MatMul");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_input(work_to_onnx[i[1]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+        case OP_TRANSPOSE: {
+          node = graph->add_node();
+          node->set_op_type("Transpose");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_RESHAPE: {
+          // Get the MX node to extract target shape info
+          MX mx_reshape = f.instruction_MX(k);
+          auto sp = mx_reshape.sparsity();
+
+          node = graph->add_node();
+          node->set_op_type("Reshape");
+          node->add_input(work_to_onnx[i[0]]);
+
+          // Create shape constant as second input
+          std::string shape_name = "shape_" + std::to_string(k);
+          onnx::NodeProto* shape_node = graph->add_node();
+          shape_node->set_op_type("Constant");
+          shape_node->add_output(shape_name);
+
+          onnx::AttributeProto* shape_attr = shape_node->add_attribute();
+          shape_attr->set_name("value");
+          onnx::TensorProto* shape_tensor = shape_attr->mutable_t();
+          shape_tensor->set_data_type(onnx::TensorProto::INT64);
+          shape_tensor->add_dims(2);
+          shape_tensor->add_int64_data(sp.size1());
+          shape_tensor->add_int64_data(sp.size2());
+
+          node->add_input(shape_name);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_HORZCAT: {
+          node = graph->add_node();
+          node->set_op_type("Concat");
+          // Add all inputs
+          for (casadi_int idx : i) {
+            node->add_input(work_to_onnx[idx]);
+          }
+          node->add_output(node_output);
+          // Set axis attribute: axis=1 for horizontal concatenation (columns)
+          onnx::AttributeProto* axis_attr = node->add_attribute();
+          axis_attr->set_name("axis");
+          axis_attr->set_i(1);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_VERTCAT: {
+          node = graph->add_node();
+          node->set_op_type("Concat");
+          // Add all inputs
+          for (casadi_int idx : i) {
+            node->add_input(work_to_onnx[idx]);
+          }
+          node->add_output(node_output);
+          // Set axis attribute: axis=0 for vertical concatenation (rows)
+          onnx::AttributeProto* axis_attr = node->add_attribute();
+          axis_attr->set_name("axis");
+          axis_attr->set_i(0);
+          work_to_onnx[o[0]] = node_output;
+          break;
+        }
+
+        case OP_HORZSPLIT: {
+          // Get the MX node to extract split sizes
+          MX mx_split = f.instruction_MX(k);
+
+          node = graph->add_node();
+          node->set_op_type("Split");
+          node->add_input(work_to_onnx[i[0]]);
+
+          // Set axis attribute: axis=1 for horizontal split (columns)
+          onnx::AttributeProto* axis_attr = node->add_attribute();
+          axis_attr->set_name("axis");
+          axis_attr->set_i(1);
+
+          // Determine split sizes from the output sparsity patterns
+          std::vector<casadi_int> split_sizes;
+          for (casadi_int j = 0; j < o.size(); ++j) {
+            // Get the instruction that produces this output
+            MX out_mx = f.instruction_MX(k);
+            // For split operations, each output has a size
+            auto out_sp = f.sparsity_out(o[j]);
+            split_sizes.push_back(out_sp.size2());  // width for horzsplit
+          }
+
+          // Add split sizes as attribute if they're not all equal
+          bool all_equal = true;
+          if (!split_sizes.empty()) {
+            casadi_int first_size = split_sizes[0];
+            for (casadi_int sz : split_sizes) {
+              if (sz != first_size) {
+                all_equal = false;
+                break;
+              }
+            }
+          }
+
+          if (!all_equal) {
+            onnx::AttributeProto* split_attr = node->add_attribute();
+            split_attr->set_name("split");
+            for (casadi_int sz : split_sizes) {
+              split_attr->add_ints(sz);
+            }
+          }
+
+          // Add all outputs
+          for (casadi_int j = 0; j < o.size(); ++j) {
+            std::string output_name = "n" + std::to_string(k) + "_out" + std::to_string(j);
+            node->add_output(output_name);
+            work_to_onnx[o[j]] = output_name;
+          }
+          break;
+        }
+
+        case OP_VERTSPLIT: {
+          // Get the MX node to extract split sizes
+          MX mx_split = f.instruction_MX(k);
+
+          node = graph->add_node();
+          node->set_op_type("Split");
+          node->add_input(work_to_onnx[i[0]]);
+
+          // Set axis attribute: axis=0 for vertical split (rows)
+          onnx::AttributeProto* axis_attr = node->add_attribute();
+          axis_attr->set_name("axis");
+          axis_attr->set_i(0);
+
+          // Determine split sizes from the output sparsity patterns
+          std::vector<casadi_int> split_sizes;
+          for (casadi_int j = 0; j < o.size(); ++j) {
+            // Get the instruction that produces this output
+            MX out_mx = f.instruction_MX(k);
+            // For split operations, each output has a size
+            auto out_sp = f.sparsity_out(o[j]);
+            split_sizes.push_back(out_sp.size1());  // height for vertsplit
+          }
+
+          // Add split sizes as attribute if they're not all equal
+          bool all_equal = true;
+          if (!split_sizes.empty()) {
+            casadi_int first_size = split_sizes[0];
+            for (casadi_int sz : split_sizes) {
+              if (sz != first_size) {
+                all_equal = false;
+                break;
+              }
+            }
+          }
+
+          if (!all_equal) {
+            onnx::AttributeProto* split_attr = node->add_attribute();
+            split_attr->set_name("split");
+            for (casadi_int sz : split_sizes) {
+              split_attr->add_ints(sz);
+            }
+          }
+
+          // Add all outputs
+          for (casadi_int j = 0; j < o.size(); ++j) {
+            std::string output_name = "n" + std::to_string(k) + "_out" + std::to_string(j);
+            node->add_output(output_name);
+            work_to_onnx[o[j]] = output_name;
+          }
+          break;
+        }
+
+        case OP_SUBREF: {
+          // SUBREF is used for both Slice and GatherElements
+          // For now, implement basic slicing support
+          // TODO: Distinguish between simple slicing and advanced indexing
+
+          // Basic implementation: assume it's a simple slice operation
+          // This is a simplified version - full implementation would need to
+          // analyze the slice parameters from the MX node
+
+          if (verbose_) {
+            uout() << "ONNX export: OP_SUBREF detected at instruction " << k
+                   << " - using simplified Slice export" << std::endl;
+          }
+
+          // For now, just pass through as identity
+          // A full implementation would create proper Slice nodes
+          node = graph->add_node();
+          node->set_op_type("Identity");
+          node->add_input(work_to_onnx[i[0]]);
+          node->add_output(node_output);
+          work_to_onnx[o[0]] = node_output;
+
+          casadi_warning("ONNX export: OP_SUBREF (Slice/GatherElements) support is incomplete. "
+                        "Using Identity as placeholder.");
+          break;
+        }
+
         default:
           casadi_warning("ONNX export: unsupported operation " +
                       std::to_string(op) + " at instruction " + std::to_string(k));
@@ -625,6 +968,310 @@ namespace casadi {
         casadi_assert(node_inputs.size() >= 1,
                       "Tanh operation requires 1 input");
         output = tanh(node_inputs[0]);
+
+      // ========== Inverse Trigonometric ==========
+      } else if (op_type == "Asin") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Asin operation requires 1 input");
+        output = asin(node_inputs[0]);
+
+      } else if (op_type == "Acos") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Acos operation requires 1 input");
+        output = acos(node_inputs[0]);
+
+      } else if (op_type == "Atan") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Atan operation requires 1 input");
+        output = atan(node_inputs[0]);
+
+      // ========== Hyperbolic ==========
+      } else if (op_type == "Sinh") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Sinh operation requires 1 input");
+        output = sinh(node_inputs[0]);
+
+      } else if (op_type == "Cosh") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Cosh operation requires 1 input");
+        output = cosh(node_inputs[0]);
+
+      // ========== Inverse Hyperbolic ==========
+      } else if (op_type == "Asinh") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Asinh operation requires 1 input");
+        output = asinh(node_inputs[0]);
+
+      } else if (op_type == "Acosh") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Acosh operation requires 1 input");
+        output = acosh(node_inputs[0]);
+
+      } else if (op_type == "Atanh") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Atanh operation requires 1 input");
+        output = atanh(node_inputs[0]);
+
+      // ========== Power and Rounding ==========
+      } else if (op_type == "Pow") {
+        casadi_assert(node_inputs.size() >= 2,
+                      "Pow operation requires 2 inputs");
+        output = pow(node_inputs[0], node_inputs[1]);
+
+      } else if (op_type == "Abs") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Abs operation requires 1 input");
+        output = fabs(node_inputs[0]);
+
+      } else if (op_type == "Ceil") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Ceil operation requires 1 input");
+        output = ceil(node_inputs[0]);
+
+      } else if (op_type == "Floor") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Floor operation requires 1 input");
+        output = floor(node_inputs[0]);
+
+      } else if (op_type == "Sign") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Sign operation requires 1 input");
+        output = sign(node_inputs[0]);
+
+      // ========== Other Mathematical ==========
+      } else if (op_type == "Erf") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Erf operation requires 1 input");
+        output = erf(node_inputs[0]);
+
+      // ========== Tensor Operations ==========
+      } else if (op_type == "Transpose") {
+        casadi_assert(node_inputs.size() >= 1,
+                      "Transpose operation requires 1 input");
+        output = node_inputs[0].T();
+
+      } else if (op_type == "Reshape") {
+        casadi_assert(node_inputs.size() >= 2,
+                      "Reshape operation requires 2 inputs (data and shape)");
+        // Second input is the target shape - should be a constant
+        casadi_assert(node_inputs[1].is_constant(),
+                      "Reshape shape must be a constant");
+        DM shape_dm = static_cast<DM>(node_inputs[1]);
+        // Extract dimensions (assuming 2D for now)
+        casadi_int new_rows = static_cast<casadi_int>(shape_dm(0).scalar());
+        casadi_int new_cols = (shape_dm.numel() > 1) ?
+                               static_cast<casadi_int>(shape_dm(1).scalar()) : 1;
+        output = reshape(node_inputs[0], new_rows, new_cols);
+
+      } else if (op_type == "Concat") {
+        // Get axis attribute
+        casadi_int axis = 0;
+        for (int a = 0; a < node.attribute_size(); ++a) {
+          if (node.attribute(a).name() == "axis") {
+            axis = node.attribute(a).i();
+            break;
+          }
+        }
+
+        // Convert node_inputs vector to inputs for concat
+        if (axis == 0) {
+          // Vertical concatenation
+          output = vertcat(node_inputs);
+        } else if (axis == 1) {
+          // Horizontal concatenation
+          output = horzcat(node_inputs);
+        } else {
+          casadi_error("Concat with axis=" + std::to_string(axis) +
+                       " not supported. Only axis=0 (vertcat) and axis=1 (horzcat) are supported.");
+        }
+
+      } else if (op_type == "MatMul") {
+        casadi_assert(node_inputs.size() >= 2, "MatMul requires 2 inputs");
+        output = mtimes(node_inputs[0], node_inputs[1]);
+
+      } else if (op_type == "Split") {
+        casadi_assert(node_inputs.size() >= 1, "Split requires 1 input");
+
+        // Get axis attribute (default 0)
+        int axis = 0;
+        for (int a = 0; a < node.attribute_size(); ++a) {
+          if (node.attribute(a).name() == "axis") {
+            axis = node.attribute(a).i();
+            break;
+          }
+        }
+
+        // Get split sizes if specified
+        std::vector<casadi_int> split_sizes;
+        for (int a = 0; a < node.attribute_size(); ++a) {
+          if (node.attribute(a).name() == "split") {
+            for (int k = 0; k < node.attribute(a).ints_size(); ++k) {
+              split_sizes.push_back(node.attribute(a).ints(k));
+            }
+            break;
+          }
+        }
+
+        // Perform split based on axis
+        std::vector<MX> outputs;
+        if (axis == 0) {
+          if (split_sizes.empty()) {
+            // Equal split - determine from number of outputs
+            casadi_int n_outputs = node.output_size();
+            casadi_int total_size = node_inputs[0].size1();
+            casadi_int size_per = total_size / n_outputs;
+
+            // Build offset vector: [0, size_per, 2*size_per, ..., total_size]
+            std::vector<casadi_int> offset;
+            offset.push_back(0);
+            for (casadi_int j = 0; j < n_outputs; ++j) {
+              offset.push_back(offset.back() + size_per);
+            }
+            outputs = vertsplit(node_inputs[0], offset);
+          } else {
+            // Build offset vector from split sizes
+            std::vector<casadi_int> offset;
+            offset.push_back(0);
+            for (casadi_int sz : split_sizes) {
+              offset.push_back(offset.back() + sz);
+            }
+            outputs = vertsplit(node_inputs[0], offset);
+          }
+        } else if (axis == 1) {
+          if (split_sizes.empty()) {
+            // Equal split - determine from number of outputs
+            casadi_int n_outputs = node.output_size();
+            casadi_int total_size = node_inputs[0].size2();
+            casadi_int size_per = total_size / n_outputs;
+
+            // Build offset vector: [0, size_per, 2*size_per, ..., total_size]
+            std::vector<casadi_int> offset;
+            offset.push_back(0);
+            for (casadi_int j = 0; j < n_outputs; ++j) {
+              offset.push_back(offset.back() + size_per);
+            }
+            outputs = horzsplit(node_inputs[0], offset);
+          } else {
+            // Build offset vector from split sizes
+            std::vector<casadi_int> offset;
+            offset.push_back(0);
+            for (casadi_int sz : split_sizes) {
+              offset.push_back(offset.back() + sz);
+            }
+            outputs = horzsplit(node_inputs[0], offset);
+          }
+        } else {
+          casadi_error("Split: only axis 0 and 1 supported");
+        }
+
+        // Store all outputs
+        for (casadi_int j = 0; j < outputs.size(); ++j) {
+          value_map[node.output(j)] = outputs[j];
+        }
+        continue;  // Don't use standard output handling
+
+      } else if (op_type == "Slice") {
+        // Slice operation - extract sub-tensor
+        // ONNX Slice has inputs: data, starts, ends, [axes], [steps]
+        casadi_assert(node_inputs.size() >= 3, "Slice requires at least 3 inputs (data, starts, ends)");
+
+        MX data = node_inputs[0];
+
+        // Extract starts and ends (should be constants)
+        casadi_assert(node_inputs[1].is_constant() && node_inputs[2].is_constant(),
+                      "Slice starts and ends must be constants");
+
+        DM starts_dm = static_cast<DM>(node_inputs[1]);
+        DM ends_dm = static_cast<DM>(node_inputs[2]);
+
+        // Extract axes if provided (default: [0, 1, ...])
+        std::vector<casadi_int> axes;
+        if (node_inputs.size() >= 4 && !node_inputs[3].is_empty()) {
+          casadi_assert(node_inputs[3].is_constant(), "Slice axes must be constant");
+          DM axes_dm = static_cast<DM>(node_inputs[3]);
+          for (casadi_int k = 0; k < axes_dm.numel(); ++k) {
+            axes.push_back(static_cast<casadi_int>(axes_dm(k).scalar()));
+          }
+        } else {
+          // Default axes
+          for (casadi_int k = 0; k < starts_dm.numel(); ++k) {
+            axes.push_back(k);
+          }
+        }
+
+        // Extract steps if provided (default: all 1s)
+        std::vector<casadi_int> steps;
+        if (node_inputs.size() >= 5 && !node_inputs[4].is_empty()) {
+          casadi_assert(node_inputs[4].is_constant(), "Slice steps must be constant");
+          DM steps_dm = static_cast<DM>(node_inputs[4]);
+          for (casadi_int k = 0; k < steps_dm.numel(); ++k) {
+            steps.push_back(static_cast<casadi_int>(steps_dm(k).scalar()));
+          }
+        } else {
+          // Default steps: all 1s
+          for (casadi_int k = 0; k < starts_dm.numel(); ++k) {
+            steps.push_back(1);
+          }
+        }
+
+        // Simplified implementation: only handle basic 2D slicing with step=1
+        // Full implementation would need to handle arbitrary dimensions and steps
+        casadi_assert(axes.size() <= 2, "Slice: only 2D slicing supported for now");
+        casadi_assert(steps[0] == 1, "Slice: only step=1 supported for now");
+
+        casadi_int start0 = static_cast<casadi_int>(starts_dm(0).scalar());
+        casadi_int end0 = static_cast<casadi_int>(ends_dm(0).scalar());
+
+        if (axes.size() == 1) {
+          // Single axis slice
+          if (axes[0] == 0) {
+            // Row slice
+            Slice row_slice(start0, end0);
+            output = data(row_slice, Slice());
+          } else {
+            // Column slice
+            Slice col_slice(start0, end0);
+            output = data(Slice(), col_slice);
+          }
+        } else {
+          // Two axis slice
+          casadi_int start1 = static_cast<casadi_int>(starts_dm(1).scalar());
+          casadi_int end1 = static_cast<casadi_int>(ends_dm(1).scalar());
+
+          Slice row_slice(start0, end0);
+          Slice col_slice(start1, end1);
+          output = data(row_slice, col_slice);
+        }
+
+        if (verbose_) {
+          uout() << "    Slice: basic 2D slicing applied" << std::endl;
+        }
+
+      } else if (op_type == "GatherElements") {
+        // GatherElements - advanced indexing operation
+        // Requires data tensor and indices tensor
+        casadi_assert(node_inputs.size() >= 2, "GatherElements requires data and indices");
+
+        // Get axis attribute
+        int axis = 0;
+        for (int a = 0; a < node.attribute_size(); ++a) {
+          if (node.attribute(a).name() == "axis") {
+            axis = node.attribute(a).i();
+            break;
+          }
+        }
+
+        // For now, implement a simplified version
+        // Full implementation requires advanced CasADi indexing capabilities
+        casadi_warning("ONNX import: GatherElements is not fully supported. "
+                      "Using first input as placeholder.");
+
+        // Just pass through the data for now
+        output = node_inputs[0];
+
+        if (verbose_) {
+          uout() << "    GatherElements: simplified implementation (axis=" << axis << ")" << std::endl;
+        }
 
       } else if (op_type == "Constant") {
         // Extract constant from node attributes
