@@ -6,6 +6,11 @@ if(WITH_ONNX)
     onnx_translator.hpp
     onnx_translator.cpp
     onnx_translator_meta.cpp
+    onnx_utilities.cpp
+    onnx_import_control_flow.cpp
+    onnx_operations.cpp
+    onnx_import.cpp
+    onnx_export.cpp
   )
 
   # Link against ONNX libraries
