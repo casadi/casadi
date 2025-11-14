@@ -135,6 +135,73 @@ namespace casadi {
 
         \identifier{onnx_translator_tensor_to_dm} */
     DM tensor_to_dm(const onnx::TensorProto& tensor) const;
+
+    /** \brief Analyze outer scope dependencies in a subgraph
+
+        Walks through all nodes in a subgraph and identifies
+        input references that are not defined locally (i.e., must
+        come from outer scope).
+
+        \param subgraph The subgraph to analyze
+        \param available_in_scope Set of variable names available in outer scope
+        \return Vector of variable names referenced from outer scope
+
+        \identifier{onnx_translator_analyze_deps} */
+    std::vector<std::string> analyze_outer_scope_dependencies(
+        const onnx::GraphProto& subgraph,
+        const std::set<std::string>& available_in_scope) const;
+
+    /** \brief Translate ONNX subgraph to CasADi Function
+
+        Creates a CasADi Function from an ONNX subgraph, handling
+        both explicit inputs and outer scope dependencies.
+
+        \param subgraph The ONNX subgraph (GraphProto)
+        \param function_name Name for the generated Function
+        \param outer_scope_vars Map of outer scope variables
+        \param outer_deps Set of outer scope dependencies to include as inputs
+        \return CasADi Function representing the subgraph
+
+        \identifier{onnx_translator_translate_subgraph} */
+    Function translate_subgraph_to_function(
+        const onnx::GraphProto& subgraph,
+        const std::string& function_name,
+        const std::map<std::string, MX>& outer_scope_vars,
+        const std::vector<std::string>& outer_deps);
+
+    /** \brief Translate ONNX Loop body to CasADi Function
+
+        Creates a CasADi Function from an ONNX Loop body subgraph.
+        Special handling for iteration_num, condition, and loop-carried deps.
+
+        \param body The Loop body subgraph (GraphProto)
+        \param function_name Name for the generated Function
+        \param outer_scope_vars Map of outer scope variables
+        \param outer_deps Set of outer scope dependencies to include as inputs
+        \return CasADi Function representing the Loop body
+
+        \identifier{onnx_translator_translate_loop_body} */
+    Function translate_loop_body_to_function(
+        const onnx::GraphProto& body,
+        const std::string& function_name,
+        const std::map<std::string, MX>& outer_scope_vars,
+        const std::vector<std::string>& outer_deps);
+
+    /** \brief Process a single ONNX node operation
+
+        Executes the operation logic for a single ONNX node.
+        Reusable across main graph and subgraph processing.
+
+        \param op_type ONNX operation type (e.g., "Add", "MatMul")
+        \param node The ONNX NodeProto
+        \param node_inputs Vector of input MX expressions
+        \return MX output expression
+
+        \identifier{onnx_translator_process_node_operation} */
+    MX process_node_operation(
+        const std::string& op_type,
+        const onnx::NodeProto& node,
+        const std::vector<MX>& node_inputs);
   };
 
 } // namespace casadi
