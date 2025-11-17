@@ -9,7 +9,6 @@ casadi_plugin(Nlpsol madnlp
 
 casadi_plugin_link_libraries(Nlpsol madnlp libmad::libMad)
 
-
 #add_executable(madnlp_test madnlp_test.cpp)
 #target_link_libraries(madnlp_test madnlp casadi)
 
@@ -25,15 +24,10 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-#set(JULIA_INCLUDE_DIR /home/tom/.julia/juliaup/julia-1.10.4+0.x64.linux.gnu/include/julia/)
-#set(MADNLP_INCLUDE_DIR /home/tom/sources/_all/madnlp_cinterface/target/include/)
-#set(MADNLP_LIB_DIR /home/tom/sources/_all/madnlp_cinterface/target/lib/)
-
 target_link_directories(casadi_nlpsol_madnlp 
   PUBLIC
   ${LIBMAD_LIB_DIR}
 )
-
 
 #target_link_libraries(casadi_nlpsol_madnlp cmadnlp madnlp julia stdc++ dl m)
 

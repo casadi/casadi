@@ -213,25 +213,7 @@ int casadi_madnlp_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
 template<typename T1>
 int casadi_madnlp_init_mem(casadi_madnlp_data<T1>* d) {
   // Problem structure
-  const casadi_madnlp_prob<T1>* p = d->prob;
-  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
-  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
-  CNLPModel* model = d->cnlp_model;
-  libmad_nlpmodel_create(&model,
-                         "Name",
-                         p_nlp->nx, p_nlp->ng,
-                         p->nnz_jac_g, p->nnz_hess_l,
-                         casadi_madnlp_constr_jac_structure<T1>,
-                         casadi_madnlp_lag_hess_structure<T1>,
-                         casadi_madnlp_eval_obj<T1>,
-                         casadi_madnlp_eval_constr<T1>,
-                         casadi_madnlp_eval_obj_grad<T1>,
-                         casadi_madnlp_eval_constr_jac<T1>,
-                         casadi_madnlp_eval_lag_hess<T1>,
-                         d
-    );
-
-  madnlp_create_solver(&(d->solver), model, d->libmad_opts);
+  
   return 0;
 }
 
@@ -261,7 +243,22 @@ void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, c
   const casadi_madnlp_prob<T1>* p = d->prob;
   //casadi_oracle_data<T1>* d_oracle = d->nlp->oracle;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
+  libmad_nlpmodel_create(&(d->cnlp_model),
+                         "Name",
+                         p_nlp->nx, p_nlp->ng,
+                         p->nnz_jac_g, p->nnz_hess_l,
+                         casadi_madnlp_constr_jac_structure<T1>,
+                         casadi_madnlp_lag_hess_structure<T1>,
+                         casadi_madnlp_eval_obj<T1>,
+                         casadi_madnlp_eval_constr<T1>,
+                         casadi_madnlp_eval_obj_grad<T1>,
+                         casadi_madnlp_eval_constr_jac<T1>,
+                         casadi_madnlp_eval_lag_hess<T1>,
+                         d
+    );
 
+  madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
+  std::cout << "Created Solver" << std::endl;
   d->arg = *arg;
   d->res = *res;
   d->iw = *iw;
@@ -285,6 +282,8 @@ int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
   d->unified_return_status = SOLVER_RET_UNKNOWN;
   d->success = 0;
 
+  std::cout << "d->cnlp_model: " << d->cnlp_model << std::endl;
+  std::cout << "d_nlp: " << d_nlp << std::endl;
   // set initial guess
   libmad_nlpmodel_set_numerics(d->cnlp_model,
                                d_nlp->z, d_nlp->lam + p_nlp->nx,
