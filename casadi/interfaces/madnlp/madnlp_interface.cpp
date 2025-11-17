@@ -230,13 +230,16 @@ void MadnlpInterface::init(const Dict& opts) {
 }
 
 int MadnlpInterface::init_mem(void* mem) const {
+  std::cout << "init_mem" << std::endl;
   if (Nlpsol::init_mem(mem)) return 1;
   if (!mem) return 1;
   auto m = static_cast<MadnlpMemory*>(mem);
-
+  
+  std::cout << "Calling libmad_create_options_dict" << std::endl;
   // Now create the new options struct
   libmad_create_options_dict(&(m->d.libmad_opts));
   for (const auto& kv : opts_) {
+    std::cout << kv.first <<std::endl;
     switch (kv.second.getType()) {
      case OT_DOUBLE:
        libmad_set_double_option(m->d.libmad_opts, kv.first.c_str(), kv.second);
@@ -257,7 +260,7 @@ int MadnlpInterface::init_mem(void* mem) const {
        casadi_error("Unknown option type.");
     }
   }
-
+  std::cout << "populated dict" << std::endl;
   casadi_madnlp_init_mem(&m->d);
 
   return 0;

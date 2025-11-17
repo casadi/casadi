@@ -192,6 +192,7 @@ set(DEPENDENT_LIBRARIES)
 
 
 include(ExternalProject)
+include(FetchContent)
 
 set(EXTERNAL_PROJECT_CFLAGS "")
 set(EXTERNAL_PROJECT_CXXFLAGS "")
@@ -795,6 +796,7 @@ set(BUILD_MOCKUPS_VERSION "master" CACHE STRING "Tag/branch/hash to be used for 
 
 option(WITH_MADNLP "Compile the interface to MadNLP"  OFF)
 option(WITH_MOCKUP_MADNLP "Use mockup MadNLP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+option(WITH_BUILD_MADNLP "Download compiled libMad"  OFF)
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -1310,6 +1312,31 @@ if(WITH_FATROP)
   endif()
 endif()
 
+if(WITH_MADNLP AND WITH_BUILD_MADNLP)
+  # TODO(@apozharski): This is currently hacky but it avoids julia bulid dependencies. However, this makes crosscompilation a massive headache.
+  #                    If CasADi wants to ship with MadNLP it may make more sense to build libMad.
+  set(LIBMAD_BINARY_DIR "${CMAKE_BINARY_DIR}/external_packages/libMad/")
+  file(
+    DOWNLOAD https://github.com/apozharski/libMad/releases/download/v0.0.1-test/libMad-ubuntu-latest.tar.gz
+    "${CMAKE_BINARY_DIR}/external_packages/libMad-ubuntu-latest.tar.gz"
+    EXPECTED_HASH SHA256=1ecd0d51db60211edb2edec40811a0b5d0551e96345ccb8f6ea77ea3126b2c65
+  )
+  file(
+    ARCHIVE_EXTRACT INPUT "${CMAKE_BINARY_DIR}/external_packages/libMad-ubuntu-latest.tar.gz"
+    DESTINATION ${LIBMAD_BINARY_DIR}
+  )
+  add_library(libmad::libMad SHARED IMPORTED)
+  set_target_properties(libmad::libMad
+    PROPERTIES
+    IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/lib/libMad.so
+    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/lib/libMad.so
+  )
+  set_target_properties(libmad::libMad PROPERTIES LINKER_LANGUAGE C)
+  target_include_directories(libmad::libMad INTERFACE
+    ${LIBMAD_BINARY_DIR}/include
+    $<INSTALL_INTERFACE:include/>
+  )
+endif()
 
 message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
