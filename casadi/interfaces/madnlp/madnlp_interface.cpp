@@ -331,6 +331,7 @@ void MadnlpInterface::set_madnlp_prob() {
 
   p_.nnz_jac_g = jacg_sp_.nnz();
   p_.nnz_hess_l = hesslag_sp_.nnz();
+  std::cout << "nnzh: " << p_.nnz_hess_l << std::endl;
   p_.nzj_i = get_ptr(nzj_i_);
   p_.nzj_j = get_ptr(nzj_j_);
   p_.nzh_i = get_ptr(nzh_i_);
