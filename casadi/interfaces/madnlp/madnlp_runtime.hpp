@@ -121,7 +121,20 @@ int casadi_madnlp_eval_constr_jac(const T1* w, T1* res, void* user_data) {
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
 
-  return calc_function(&d->prob->nlp_jac_g, d_oracle);
+  auto ret = calc_function(&d->prob->nlp_jac_g, d_oracle);
+  std::cout << "jac_g: ";
+  for(int ii=0; ii<3;ii++)
+  {
+    std::cout << res[ii] << ", ";
+  }
+  std::cout << std::endl;
+  std::cout << "w: ";
+  for(int ii=0; ii<3;ii++)
+  {
+    std::cout << w[ii] << ", ";
+  }
+  std::cout << std::endl;
+  return ret;
 }
 
 // SYMBOL "madnlp_eval_constr"
@@ -154,8 +167,16 @@ int casadi_madnlp_eval_obj_grad(const T1* w, T1* res, void* user_data) {
   d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
-  return calc_function(&d->prob->nlp_grad_f, d_oracle);
+  auto ret = calc_function(&d->prob->nlp_grad_f, d_oracle);
 
+  std::cout << "jac_f: ";
+  for(int ii=0; ii<3;ii++)
+  {
+    std::cout << res[ii] << ", ";
+  }
+  std::cout << std::endl;
+
+  return ret;
   //d->x =  (double*)w;
   //d->grad_f = res;
   //casadi_scal(p->nlp->nx, objective_scale, res);
@@ -175,7 +196,6 @@ int casadi_madnlp_eval_obj(const T1* w, T1* res, void* user_data) {
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
   return calc_function(&d->prob->nlp_f, d_oracle);
-
   //d->x =  (double*)w;
   //d->f = res;
 }
@@ -196,8 +216,28 @@ int casadi_madnlp_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
   d_oracle->arg[2] = &objective_scale;
   d_oracle->arg[3] = lam;
   d_oracle->res[0] = res;
-
-  return calc_function(&d->prob->nlp_hess_l, d_oracle);
+  
+  auto ret = calc_function(&d->prob->nlp_hess_l, d_oracle);
+  std::cout << "w: ";
+  for(int ii=0; ii<3;ii++)
+  {
+    std::cout << w[ii] << ", ";
+  }
+  std::cout << std::endl;
+  std::cout << "lam: ";
+  for(int ii=0; ii<1;ii++)
+  {
+    std::cout << lam[ii] << ", ";
+  }
+  std::cout << std::endl;
+  std::cout << "lam_f" << objective_scale << std::endl;
+  std::cout << "hess_l: ";
+  for(int ii=0; ii<2;ii++)
+  {
+    std::cout << res[ii] << ", ";
+  }
+  std::cout << std::endl;
+  return ret;
 }
 
 // C-REPLACE "const_cast<T1*>" "(T1*)"

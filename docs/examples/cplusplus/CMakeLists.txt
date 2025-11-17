@@ -35,6 +35,8 @@ endif()
 if(WITH_MADNLP)
   add_executable(rosenbrock_madnlp rosenbrock_madnlp.cpp)
   target_link_libraries(rosenbrock_madnlp casadi)
+  add_executable(rocket_madnlp rocket_madnlp.cpp)
+  target_link_libraries(rocket_madnlp casadi)
 endif()
 
 # Rocket using Ipopt

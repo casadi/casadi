@@ -143,8 +143,8 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
   // /** \brief Serialize an object without type information */
   // void serialize_body(SerializingStream &s) const override;
 
-  // /** \brief Deserialize into MX */
-  // static ProtoFunction* deserialize(DeserializingStream& s) { return new MadnlpInterface(s); }
+  /** \brief Deserialize into MX */
+  static ProtoFunction* deserialize(DeserializingStream& s) { return new MadnlpInterface(s); }
 
  protected:
   /** \brief Deserializing constructor */

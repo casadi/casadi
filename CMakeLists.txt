@@ -797,6 +797,7 @@ set(BUILD_MOCKUPS_VERSION "master" CACHE STRING "Tag/branch/hash to be used for 
 option(WITH_MADNLP "Compile the interface to MadNLP"  OFF)
 option(WITH_MOCKUP_MADNLP "Use mockup MadNLP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 option(WITH_BUILD_MADNLP "Download compiled libMad"  OFF)
+set(MADNLP_TAR_PATH "https://github.com/apozharski/libMad/releases/download/v0.0.1-test/libMad-ubuntu-latest.tar.gz")
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -1317,7 +1318,7 @@ if(WITH_MADNLP AND WITH_BUILD_MADNLP)
   #                    If CasADi wants to ship with MadNLP it may make more sense to build libMad.
   set(LIBMAD_BINARY_DIR "${CMAKE_BINARY_DIR}/external_packages/libMad/")
   file(
-    DOWNLOAD https://github.com/apozharski/libMad/releases/download/v0.0.1-test/libMad-ubuntu-latest.tar.gz
+    DOWNLOAD ${MADNLP_TAR_PATH}
     "${CMAKE_BINARY_DIR}/external_packages/libMad-ubuntu-latest.tar.gz"
     EXPECTED_HASH SHA256=1ecd0d51db60211edb2edec40811a0b5d0551e96345ccb8f6ea77ea3126b2c65
   )
