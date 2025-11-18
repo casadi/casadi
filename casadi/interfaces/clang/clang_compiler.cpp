@@ -27,6 +27,7 @@
 #include "casadi/core/casadi_os.hpp"
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/casadi_meta.hpp"
+#include "casadi/core/filesystem_impl.hpp"
 #include <fstream>
 
 // To be able to get the plugin path
