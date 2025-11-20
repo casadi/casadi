@@ -799,8 +799,8 @@ option(WITH_MOCKUP_MADNLP "Use mockup MadNLP (BUILD_MOCKUPS_VERSION=${BUILD_MOCK
 option(WITH_BUILD_MADNLP "Download compiled libMad"  OFF)
 set(MADNLP_TAR_HASH "")
 if(NOT MADNLP_TAR_PATH)
-  set(MADNLP_TAR_PATH "https://github.com/apozharski/libMad/releases/download/v0.0.1-test/libMad-ubuntu-latest.tar.gz")
-  set(MADNLP_TAR_HASH "SHA256=1ecd0d51db60211edb2edec40811a0b5d0551e96345ccb8f6ea77ea3126b2c65")
+  set(MADNLP_TAR_PATH "https://github.com/apozharski/libMad/releases/download/v0.0.1-casadi/libMad-ubuntu-x86_64-v0.0.1-casadi.tar.gz")
+  set(MADNLP_TAR_HASH "SHA256=4bb05af590666524223faecb33d061b5e95414b4b8af82733120405cbdaaef72")
 endif()
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
