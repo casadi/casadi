@@ -34,8 +34,8 @@ struct casadi_madnlp_prob {
   const casadi_nlpsol_prob<T1>* nlp;
 
   // 1-index cco format
-  long *nzj_i, *nzj_j;
-  long *nzh_i, *nzh_j;
+  libmad_int *nzj_i, *nzj_j;
+  libmad_int *nzh_i, *nzh_j;
 
   casadi_int nnz_hess_l, nnz_jac_g;
 
@@ -121,20 +121,7 @@ int casadi_madnlp_eval_constr_jac(const T1* w, T1* res, void* user_data) {
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
 
-  auto ret = calc_function(&d->prob->nlp_jac_g, d_oracle);
-  std::cout << "jac_g: ";
-  for(int ii=0; ii<3;ii++)
-  {
-    std::cout << res[ii] << ", ";
-  }
-  std::cout << std::endl;
-  std::cout << "w: ";
-  for(int ii=0; ii<3;ii++)
-  {
-    std::cout << w[ii] << ", ";
-  }
-  std::cout << std::endl;
-  return ret;
+  return calc_function(&d->prob->nlp_jac_g, d_oracle);
 }
 
 // SYMBOL "madnlp_eval_constr"
@@ -167,19 +154,7 @@ int casadi_madnlp_eval_obj_grad(const T1* w, T1* res, void* user_data) {
   d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
-  auto ret = calc_function(&d->prob->nlp_grad_f, d_oracle);
-
-  std::cout << "jac_f: ";
-  for(int ii=0; ii<3;ii++)
-  {
-    std::cout << res[ii] << ", ";
-  }
-  std::cout << std::endl;
-
-  return ret;
-  //d->x =  (double*)w;
-  //d->grad_f = res;
-  //casadi_scal(p->nlp->nx, objective_scale, res);
+  return calc_function(&d->prob->nlp_grad_f, d_oracle);
 }
 
 // SYMBOL "madnlp_eval_obj"
@@ -196,8 +171,6 @@ int casadi_madnlp_eval_obj(const T1* w, T1* res, void* user_data) {
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
   return calc_function(&d->prob->nlp_f, d_oracle);
-  //d->x =  (double*)w;
-  //d->f = res;
 }
 
 // SYMBOL "madnlp_eval_obj"
@@ -217,27 +190,7 @@ int casadi_madnlp_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
   d_oracle->arg[3] = lam;
   d_oracle->res[0] = res;
   
-  auto ret = calc_function(&d->prob->nlp_hess_l, d_oracle);
-  std::cout << "w: ";
-  for(int ii=0; ii<3;ii++)
-  {
-    std::cout << w[ii] << ", ";
-  }
-  std::cout << std::endl;
-  std::cout << "lam: ";
-  for(int ii=0; ii<1;ii++)
-  {
-    std::cout << lam[ii] << ", ";
-  }
-  std::cout << std::endl;
-  std::cout << "lam_f" << objective_scale << std::endl;
-  std::cout << "hess_l: ";
-  for(int ii=0; ii<2;ii++)
-  {
-    std::cout << res[ii] << ", ";
-  }
-  std::cout << std::endl;
-  return ret;
+  return calc_function(&d->prob->nlp_hess_l, d_oracle);
 }
 
 // C-REPLACE "const_cast<T1*>" "(T1*)"
@@ -282,23 +235,24 @@ void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, c
   // Problem structure
   const casadi_madnlp_prob<T1>* p = d->prob;
   //casadi_oracle_data<T1>* d_oracle = d->nlp->oracle;
-  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
-  libmad_nlpmodel_create(&(d->cnlp_model),
-                         "Name",
-                         p_nlp->nx, p_nlp->ng,
-                         p->nnz_jac_g, p->nnz_hess_l,
-                         casadi_madnlp_constr_jac_structure<T1>,
-                         casadi_madnlp_lag_hess_structure<T1>,
-                         casadi_madnlp_eval_obj<T1>,
-                         casadi_madnlp_eval_constr<T1>,
-                         casadi_madnlp_eval_obj_grad<T1>,
-                         casadi_madnlp_eval_constr_jac<T1>,
-                         casadi_madnlp_eval_lag_hess<T1>,
-                         d
-    );
+  // TODO(@anton): I would like to do this here and just pass the numerics later,
+  //               however,
+  // const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
+  // libmad_nlpmodel_create(&(d->cnlp_model),
+  //                        "Name",
+  //                        p_nlp->nx, p_nlp->ng,
+  //                        p->nnz_jac_g, p->nnz_hess_l,
+  //                        casadi_madnlp_constr_jac_structure<T1>,
+  //                        casadi_madnlp_lag_hess_structure<T1>,
+  //                        casadi_madnlp_eval_obj<T1>,
+  //                        casadi_madnlp_eval_constr<T1>,
+  //                        casadi_madnlp_eval_obj_grad<T1>,
+  //                        casadi_madnlp_eval_constr_jac<T1>,
+  //                        casadi_madnlp_eval_lag_hess<T1>,
+  //                        d
+  //   );
 
-  madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
-  std::cout << "Created Solver" << std::endl;
+  // madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
   d->arg = *arg;
   d->res = *res;
   d->iw = *iw;
@@ -321,17 +275,28 @@ int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
 
   d->unified_return_status = SOLVER_RET_UNKNOWN;
   d->success = 0;
-
-  std::cout << "d->cnlp_model: " << d->cnlp_model << std::endl;
-  std::cout << "d_nlp: " << d_nlp << std::endl;
+  libmad_nlpmodel_create(&(d->cnlp_model),
+                         "MadNLP",
+                         p_nlp->nx, p_nlp->ng,
+                         p->nnz_jac_g, p->nnz_hess_l,
+                         casadi_madnlp_constr_jac_structure<T1>,
+                         casadi_madnlp_lag_hess_structure<T1>,
+                         casadi_madnlp_eval_obj<T1>,
+                         casadi_madnlp_eval_constr<T1>,
+                         casadi_madnlp_eval_obj_grad<T1>,
+                         casadi_madnlp_eval_constr_jac<T1>,
+                         casadi_madnlp_eval_lag_hess<T1>,
+                         d
+    );
   // set initial guess
   libmad_nlpmodel_set_numerics(d->cnlp_model,
                                d_nlp->z, d_nlp->lam + p_nlp->nx,
                                d_nlp->lbx, d_nlp->ubx,
                                d_nlp->lbg, d_nlp->ubg);
 
+  madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
   int ret = madnlp_solve(d->solver, d->libmad_opts, &(d->stats));
-
+  madnlp_delete_solver(d->solver);
   if (ret!=0) {
     // cleanup done in free_mem
     return ret;
