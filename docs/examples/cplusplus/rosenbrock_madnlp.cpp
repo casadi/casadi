@@ -44,8 +44,10 @@ int main(){
                 {"f", f},
                 {"g", g}};
 
+  Dict solver_opts;
+  //solver_opts["madnlp.print_level"] = 1;
   // Create an NLP solver
-  Function solver = nlpsol("solver", "madnlp", nlp);
+  Function solver = nlpsol("solver", "madnlp", nlp, solver_opts);
 
   // Solve the Rosenbrock problem
   DMDict arg;

@@ -72,8 +72,14 @@ int main(){
   // Create an NLP
   SXDict nlp = {{"x", u}, {"f", f}, {"g", g}};
 
+  // MadNLP Options
+  Dict solver_opts;
+  solver_opts["madnlp.linear_solver"] = "Ma27Solver";
+  solver_opts["madnlp.max_iter"] = 100;
+  solver_opts["madnlp.tol"] = 1e-9;
+
   // Create an NLP solver and buffers
-  Function solver = nlpsol("solver", "madnlp", nlp);
+  Function solver = nlpsol("solver", "madnlp", nlp, solver_opts);
   std::map<std::string, DM> arg, res;
 
   // Bounds on u and initial condition
