@@ -130,7 +130,8 @@ namespace casadi {
                                    const std::map<std::string, Sparsity>& st)
     : Conic(name, st),
       enable_mipsol_callback_(false),
-      mipsol_callback_(Function())
+      mipsol_callback_(Function()),
+      suppress_all_output_(false)
   {
 
   }
@@ -162,7 +163,10 @@ namespace casadi {
           "Input: dict with solution data. Output: dict with lazy constraints."}},
       {"enable_mipsol_callback",
         {OT_BOOL,
-          "Enable MIPSOL callbacks for dynamic constraint generation"}}
+          "Enable MIPSOL callbacks for dynamic constraint generation"}},
+      {"suppress_all_output",
+        {OT_BOOL,
+        "Suppress all console output from Gurobi (sets OutputFlag and LogToConsole to 0 before the environment starts)."}}
      }
   };
 
@@ -206,6 +210,9 @@ namespace casadi {
         }
         else if (op.first == "enable_mipsol_callback") {
             enable_mipsol_callback_ = op.second;
+        }
+        else if (op.first == "suppress_all_output") {
+          suppress_all_output_ = op.second;
         }
       }
     // Final validation
@@ -262,9 +269,26 @@ namespace casadi {
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Load environment
-    casadi_int flag = GRBloadenv(&m->env, nullptr); // no log file
-    casadi_assert(!flag && m->env, "Failed to create GUROBI environment. Flag: " + str(flag)
-      + ":" + GRBgeterrormsg(m->env));
+    casadi_int flag;
+    if (suppress_all_output_) {
+      flag = GRBemptyenv(&m->env);
+      casadi_assert(!flag && m->env,
+        "Failed to create empty GUROBI environment. Flag: " + str(flag));
+
+      flag = GRBsetintparam(m->env, "OutputFlag", 0);
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
+
+      flag = GRBsetintparam(m->env, "LogToConsole", 0);
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
+
+      flag = GRBstartenv(m->env);
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
+    } else {
+      flag = GRBloadenv(&m->env, nullptr); // current behaviour
+      casadi_assert(!flag && m->env,
+        "Failed to create GUROBI environment. Flag: " + str(flag)
+        + ":" + GRBgeterrormsg(m->env));
+    }
 
     m->pool_sol_nr = 0;
 
@@ -353,7 +377,7 @@ namespace casadi {
     int *ind2=reinterpret_cast<int*>(iw); iw+=nx_;
     char *vtypes=reinterpret_cast<char*>(iw); iw+=nx_;
 
-    // Greate an empty model
+    // Create an empty model
     GRBmodel *model = nullptr;
     try {
       casadi_int flag = GRBnewmodel(m->env, &model, name_.c_str(), 0,
@@ -699,6 +723,7 @@ namespace casadi {
 
   GurobiInterface::GurobiInterface(DeserializingStream& s) : Conic(s) {
     s.version("GurobiInterface", 2);
+    s.unpack("GurobiInterface::suppress_all_output", suppress_all_output_);
     s.unpack("GurobiInterface::enable_mipsol_callback", enable_mipsol_callback_);
     s.unpack("GurobiInterface::mipsol_callback", mipsol_callback_);
     s.unpack("GurobiInterface::vtype", vtype_);
@@ -713,6 +738,7 @@ namespace casadi {
 void GurobiInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
     s.version("GurobiInterface", 2);
+    s.pack("GurobiInterface::suppress_all_output", suppress_all_output_);
     s.pack("GurobiInterface::enable_mipsol_callback", enable_mipsol_callback_);
     s.pack("GurobiInterface::mipsol_callback", mipsol_callback_);
     s.pack("GurobiInterface::vtype", vtype_);
