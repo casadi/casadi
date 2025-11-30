@@ -28,52 +28,44 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  Function OnnxTranslator::create(const std::string& name) {
-    casadi_assert(has_model_, "No ONNX model loaded. Call load() first.");
+  // Helper functions for graph processing
+  // Process ONNX initializers (pre-loaded constants)
+  void process_graph_initializers(
+      const onnx::GraphProto& graph,
+      std::map<std::string, MX>& value_map,
+      const OnnxTranslator& translator,
+      bool verbose) {
 
-    const onnx::GraphProto& graph = model_.graph();
-
-    // Step 1: Initialize data structures
-    // Map tensor names to MX expressions (the "symbol table")
-    std::map<std::string, MX> value_map;
-
-    // Collect function inputs/outputs
-    std::vector<MX> inputs;
-    std::vector<std::string> input_names;
-    std::vector<MX> outputs;
-    std::vector<std::string> output_names;
-
-    if (verbose_) {
-      uout() << "Creating CasADi Function from ONNX model: "
-             << graph.name() << std::endl;
-      uout() << "  Graph has " << graph.initializer_size() << " initializers, "
-             << graph.input_size() << " inputs, "
-             << graph.output_size() << " outputs, "
-             << graph.node_size() << " nodes" << std::endl;
-    }
-
-    // Step 2: Process graph initializers (pre-loaded constants)
     for (int i = 0; i < graph.initializer_size(); ++i) {
       const onnx::TensorProto& tensor = graph.initializer(i);
       std::string tensor_name = tensor.name();
 
-      if (verbose_) {
+      if (verbose) {
         uout() << "  Processing initializer: " << tensor_name << std::endl;
       }
 
       // Convert TensorProto to DM, then to MX
-      DM dm_const = tensor_to_dm(tensor);
+      DM dm_const = translator.tensor_to_dm(tensor);
       value_map[tensor_name] = MX(dm_const);
     }
+  }
 
-    // Step 3: Create MX symbols for graph inputs
+  // Create MX symbols for graph inputs
+  void process_graph_inputs(
+      const onnx::GraphProto& graph,
+      std::map<std::string, MX>& value_map,
+      std::vector<MX>& func_inputs,
+      std::vector<std::string>& input_names,
+      const OnnxTranslator& translator,
+      bool verbose) {
+
     for (int i = 0; i < graph.input_size(); ++i) {
       const onnx::ValueInfoProto& input = graph.input(i);
       std::string input_name = input.name();
 
       // Skip if already in value_map (it's an initializer, not a variable)
       if (value_map.count(input_name)) {
-        if (verbose_) {
+        if (verbose) {
           uout() << "  Skipping input '" << input_name
                  << "' (it's an initializer)" << std::endl;
         }
@@ -83,10 +75,10 @@ namespace casadi {
       // Extract shape
       const onnx::TensorShapeProto& shape =
           input.type().tensor_type().shape();
-      casadi_int rows = get_dimension(shape, 0);
-      casadi_int cols = get_dimension(shape, 1);
+      casadi_int rows = translator.get_dimension(shape, 0);
+      casadi_int cols = translator.get_dimension(shape, 1);
 
-      if (verbose_) {
+      if (verbose) {
         uout() << "  Creating input: " << input_name
                << " [" << rows << ", " << cols << "]" << std::endl;
       }
@@ -94,16 +86,24 @@ namespace casadi {
       // Create MX symbol
       MX mx_input = MX::sym(input_name, rows, cols);
       value_map[input_name] = mx_input;
-      inputs.push_back(mx_input);
+      func_inputs.push_back(mx_input);
       input_names.push_back(input_name);
     }
+  }
 
-    // Step 4: Process nodes in topological order
+  // Process all nodes in the graph
+  void process_graph_nodes(
+      const onnx::GraphProto& graph,
+      std::map<std::string, MX>& value_map,
+      OnnxTranslator& translator,
+      bool verbose,
+      bool allow_control_flow) {
+
     for (int i = 0; i < graph.node_size(); ++i) {
       const onnx::NodeProto& node = graph.node(i);
       std::string op_type = node.op_type();
 
-      if (verbose_) {
+      if (verbose) {
         uout() << "  Processing node " << i << ": " << op_type << std::endl;
       }
 
@@ -210,152 +210,8 @@ namespace casadi {
         }
         continue;  // Don't use standard output handling
 
-      // ========== Special Handling: Complex tensor operations ==========
-      } else if (op_type == "Transpose") {
-        casadi_assert(node_inputs.size() >= 1,
-                      "Transpose operation requires 1 input");
-        output = node_inputs[0].T();
-
-      } else if (op_type == "Reshape") {
-        casadi_assert(node_inputs.size() >= 2,
-                      "Reshape operation requires 2 inputs (data and shape)");
-        // Second input is the target shape - should be a constant
-        casadi_assert(node_inputs[1].is_constant(),
-                      "Reshape shape must be a constant");
-        DM shape_dm = static_cast<DM>(node_inputs[1]);
-        // Extract dimensions (assuming 2D for now)
-        casadi_int new_rows = static_cast<casadi_int>(shape_dm(0).scalar());
-        casadi_int new_cols = (shape_dm.numel() > 1) ?
-                               static_cast<casadi_int>(shape_dm(1).scalar()) : 1;
-        output = reshape(node_inputs[0], new_rows, new_cols);
-
-      } else if (op_type == "Concat") {
-        // Get axis attribute
-        casadi_int axis = 0;
-        for (int a = 0; a < node.attribute_size(); ++a) {
-          if (node.attribute(a).name() == "axis") {
-            axis = node.attribute(a).i();
-            break;
-          }
-        }
-
-        // Convert node_inputs vector to inputs for concat
-        if (axis == 0) {
-          // Vertical concatenation
-          output = vertcat(node_inputs);
-        } else if (axis == 1) {
-          // Horizontal concatenation
-          output = horzcat(node_inputs);
-        } else {
-          casadi_error("Concat with axis=" + std::to_string(axis) +
-                       " not supported. Only axis=0 (vertcat) and axis=1 (horzcat) are supported.");
-        }
-
-      } else if (op_type == "Slice") {
-        // Slice operation - extract sub-tensor
-        // ONNX Slice has inputs: data, starts, ends, [axes], [steps]
-        casadi_assert(node_inputs.size() >= 3, "Slice requires at least 3 inputs (data, starts, ends)");
-
-        MX data = node_inputs[0];
-
-        // Extract starts and ends (should be constants)
-        casadi_assert(node_inputs[1].is_constant() && node_inputs[2].is_constant(),
-                      "Slice starts and ends must be constants");
-
-        DM starts_dm = static_cast<DM>(node_inputs[1]);
-        DM ends_dm = static_cast<DM>(node_inputs[2]);
-
-        // Extract axes if provided (default: [0, 1, ...])
-        std::vector<casadi_int> axes;
-        if (node_inputs.size() >= 4 && !node_inputs[3].is_empty()) {
-          casadi_assert(node_inputs[3].is_constant(), "Slice axes must be constant");
-          DM axes_dm = static_cast<DM>(node_inputs[3]);
-          for (casadi_int k = 0; k < axes_dm.numel(); ++k) {
-            axes.push_back(static_cast<casadi_int>(axes_dm(k).scalar()));
-          }
-        } else {
-          // Default axes
-          for (casadi_int k = 0; k < starts_dm.numel(); ++k) {
-            axes.push_back(k);
-          }
-        }
-
-        // Extract steps if provided (default: all 1s)
-        std::vector<casadi_int> steps;
-        if (node_inputs.size() >= 5 && !node_inputs[4].is_empty()) {
-          casadi_assert(node_inputs[4].is_constant(), "Slice steps must be constant");
-          DM steps_dm = static_cast<DM>(node_inputs[4]);
-          for (casadi_int k = 0; k < steps_dm.numel(); ++k) {
-            steps.push_back(static_cast<casadi_int>(steps_dm(k).scalar()));
-          }
-        } else {
-          // Default steps: all 1s
-          for (casadi_int k = 0; k < starts_dm.numel(); ++k) {
-            steps.push_back(1);
-          }
-        }
-
-        // Simplified implementation: only handle basic 2D slicing with step=1
-        // Full implementation would need to handle arbitrary dimensions and steps
-        casadi_assert(axes.size() <= 2, "Slice: only 2D slicing supported for now");
-        casadi_assert(steps[0] == 1, "Slice: only step=1 supported for now");
-
-        casadi_int start0 = static_cast<casadi_int>(starts_dm(0).scalar());
-        casadi_int end0 = static_cast<casadi_int>(ends_dm(0).scalar());
-
-        if (axes.size() == 1) {
-          // Single axis slice
-          if (axes[0] == 0) {
-            // Row slice
-            Slice row_slice(start0, end0);
-            output = data(row_slice, Slice());
-          } else {
-            // Column slice
-            Slice col_slice(start0, end0);
-            output = data(Slice(), col_slice);
-          }
-        } else {
-          // Two axis slice
-          casadi_int start1 = static_cast<casadi_int>(starts_dm(1).scalar());
-          casadi_int end1 = static_cast<casadi_int>(ends_dm(1).scalar());
-
-          Slice row_slice(start0, end0);
-          Slice col_slice(start1, end1);
-          output = data(row_slice, col_slice);
-        }
-
-        if (verbose_) {
-          uout() << "    Slice: basic 2D slicing applied" << std::endl;
-        }
-
-      } else if (op_type == "GatherElements") {
-        // GatherElements - advanced indexing operation
-        // Requires data tensor and indices tensor
-        casadi_assert(node_inputs.size() >= 2, "GatherElements requires data and indices");
-
-        // Get axis attribute
-        int axis = 0;
-        for (int a = 0; a < node.attribute_size(); ++a) {
-          if (node.attribute(a).name() == "axis") {
-            axis = node.attribute(a).i();
-            break;
-          }
-        }
-
-        // For now, implement a simplified version
-        // Full implementation requires advanced CasADi indexing capabilities
-        casadi_warning("ONNX import: GatherElements is not fully supported. "
-                      "Using first input as placeholder.");
-
-        // Just pass through the data for now
-        output = node_inputs[0];
-
-        if (verbose_) {
-          uout() << "    GatherElements: simplified implementation (axis=" << axis << ")" << std::endl;
-        }
-
       // ========== Control Flow Operations ==========
-      } else if (op_type == "If") {
+      } else if (op_type == "If" && allow_control_flow) {
         // ========== Control Flow: If operator ==========
         // If operator: conditional execution with subgraphs
         casadi_assert(node_inputs.size() >= 1,
@@ -381,7 +237,7 @@ namespace casadi {
         casadi_assert(else_branch != nullptr,
                      "If operator must have 'else_branch' attribute");
 
-        if (verbose_) {
+        if (verbose) {
           uout() << "    If operator: analyzing branches" << std::endl;
           uout() << "      then_branch: " << then_branch->node_size() << " nodes" << std::endl;
           uout() << "      else_branch: " << else_branch->node_size() << " nodes" << std::endl;
@@ -395,16 +251,16 @@ namespace casadi {
 
         // Analyze outer scope dependencies for both branches
         std::vector<std::string> then_deps =
-            analyze_outer_scope_dependencies(*then_branch, available_vars);
+            translator.analyze_outer_scope_dependencies(*then_branch, available_vars);
         std::vector<std::string> else_deps =
-            analyze_outer_scope_dependencies(*else_branch, available_vars);
+            translator.analyze_outer_scope_dependencies(*else_branch, available_vars);
 
         // Take union of dependencies (both branches need access to all deps)
         std::set<std::string> all_deps_set(then_deps.begin(), then_deps.end());
         all_deps_set.insert(else_deps.begin(), else_deps.end());
         std::vector<std::string> all_deps(all_deps_set.begin(), all_deps_set.end());
 
-        if (verbose_ && !all_deps.empty()) {
+        if (verbose && !all_deps.empty()) {
           uout() << "      Outer scope dependencies: ";
           for (const auto& dep : all_deps) {
             uout() << dep << " ";
@@ -413,9 +269,9 @@ namespace casadi {
         }
 
         // Translate both branches to CasADi Functions
-        Function f_then = translate_subgraph_to_function(
+        Function f_then = translator.translate_subgraph_to_function(
             *then_branch, "if_then_" + std::to_string(i), value_map, all_deps);
-        Function f_else = translate_subgraph_to_function(
+        Function f_else = translator.translate_subgraph_to_function(
             *else_branch, "if_else_" + std::to_string(i), value_map, all_deps);
 
         // Verify output compatibility
@@ -450,7 +306,7 @@ namespace casadi {
         for (size_t j = 0; j < node.output_size(); ++j) {
           std::string output_name = node.output(j);
           value_map[output_name] = if_outputs[j];
-          if (verbose_) {
+          if (verbose) {
             uout() << "      -> " << output_name << std::endl;
           }
         }
@@ -458,7 +314,7 @@ namespace casadi {
         // Skip the normal single-output handling below
         continue;
 
-      } else if (op_type == "Loop") {
+      } else if (op_type == "Loop" && allow_control_flow) {
         // ========== Control Flow: Loop operator ==========
         // Loop operator: iteration with state (like while/for loop)
         casadi_assert(node_inputs.size() >= 2,
@@ -485,7 +341,7 @@ namespace casadi {
 
         casadi_assert(body != nullptr, "Loop must have 'body' attribute");
 
-        if (verbose_) {
+        if (verbose) {
           uout() << "    Loop operator: analyzing body" << std::endl;
           uout() << "      body: " << body->node_size() << " nodes" << std::endl;
           uout() << "      loop-carried deps: " << loop_carried_initial.size() << std::endl;
@@ -499,9 +355,9 @@ namespace casadi {
 
         // Analyze outer scope dependencies
         std::vector<std::string> outer_deps =
-            analyze_outer_scope_dependencies(*body, available_vars);
+            translator.analyze_outer_scope_dependencies(*body, available_vars);
 
-        if (verbose_ && !outer_deps.empty()) {
+        if (verbose && !outer_deps.empty()) {
           uout() << "      Outer scope dependencies: ";
           for (const auto& dep : outer_deps) {
             uout() << dep << " ";
@@ -509,8 +365,12 @@ namespace casadi {
           uout() << std::endl;
         }
 
+        // Validate loop body structure
+        casadi_assert(body->input_size() >= 2,
+                     "Loop body must have at least 2 inputs (iter_num, cond)");
+
         // Translate body to Function
-        Function body_func = translate_loop_body_to_function(
+        Function body_func = translator.translate_subgraph_to_function(
             *body, "loop_body_" + std::to_string(i), value_map, outer_deps);
 
         // Determine iteration count
@@ -524,7 +384,7 @@ namespace casadi {
           }
         }
 
-        if (verbose_) {
+        if (verbose) {
           uout() << "      Iterations: " << n_iter << std::endl;
         }
 
@@ -561,7 +421,7 @@ namespace casadi {
         for (size_t j = 0; j < node.output_size(); ++j) {
           std::string output_name = node.output(j);
           value_map[output_name] = loop_outputs[j];
-          if (verbose_) {
+          if (verbose) {
             uout() << "      -> " << output_name << std::endl;
           }
         }
@@ -569,7 +429,7 @@ namespace casadi {
         // Skip normal single-output handling
         continue;
 
-      } else if (op_type == "Scan") {
+      } else if (op_type == "Scan" && allow_control_flow) {
         // ========== Control Flow: Scan operator ==========
         // Scan operator: functional iteration with NO outer scope access
         casadi_assert(node_inputs.size() >= 1, "Scan requires at least 1 input");
@@ -601,7 +461,7 @@ namespace casadi {
 
         casadi_assert(body != nullptr, "Scan must have 'body' attribute");
 
-        if (verbose_) {
+        if (verbose) {
           uout() << "    Scan operator: analyzing body" << std::endl;
           uout() << "      body: " << body->node_size() << " nodes" << std::endl;
           uout() << "      state vars: " << initial_state.size() << std::endl;
@@ -611,7 +471,7 @@ namespace casadi {
         // Verify no outer scope access (Scan restriction)
         std::set<std::string> empty_scope;
         std::vector<std::string> outer_deps =
-            analyze_outer_scope_dependencies(*body, empty_scope);
+            translator.analyze_outer_scope_dependencies(*body, empty_scope);
 
         if (!outer_deps.empty()) {
           std::string deps_str;
@@ -624,7 +484,7 @@ namespace casadi {
 
         // Translate body to Function
         std::map<std::string, MX> empty_outer_vars;
-        Function body_func = translate_subgraph_to_function(
+        Function body_func = translator.translate_subgraph_to_function(
             *body, "scan_body_" + std::to_string(i), empty_outer_vars, {});
 
         // Determine scan length from first scan input
@@ -633,7 +493,7 @@ namespace casadi {
           scan_length = scan_inputs[0].size1();  // Assuming axis=0
         }
 
-        if (verbose_) {
+        if (verbose) {
           uout() << "      Scan length: " << scan_length << std::endl;
         }
 
@@ -656,7 +516,7 @@ namespace casadi {
         for (size_t j = 0; j < node.output_size(); ++j) {
           std::string output_name = node.output(j);
           value_map[output_name] = scan_outputs[j];
-          if (verbose_) {
+          if (verbose) {
             uout() << "      -> " << output_name << std::endl;
           }
         }
@@ -670,7 +530,7 @@ namespace casadi {
         // This includes: Add, Sub, Mul, Div, Pow, Sin, Cos, Tan, Asin, Acos, Atan,
         // Sinh, Cosh, Tanh, Asinh, Acosh, Atanh, Exp, Log, Sqrt, Ceil, Floor,
         // Abs, Sign, Neg, Erf, Identity, MatMul, Constant
-        output = process_node_operation(op_type, node, node_inputs);
+        output = translator.process_node_operation(op_type, node, node_inputs);
       }
 
       // Store output (assume single output for now)
@@ -680,12 +540,20 @@ namespace casadi {
       std::string output_name = node.output(0);
       value_map[output_name] = output;
 
-      if (verbose_) {
+      if (verbose) {
         uout() << "    -> " << output_name << std::endl;
       }
     }
+  }
 
-    // Step 5: Collect graph outputs
+  // Collect graph outputs from value_map
+  void collect_graph_outputs(
+      const onnx::GraphProto& graph,
+      const std::map<std::string, MX>& value_map,
+      std::vector<MX>& func_outputs,
+      std::vector<std::string>& output_names,
+      bool verbose) {
+
     for (int i = 0; i < graph.output_size(); ++i) {
       const onnx::ValueInfoProto& output = graph.output(i);
       std::string output_name = output.name();
@@ -694,24 +562,173 @@ namespace casadi {
                     "Unknown output tensor: " + output_name +
                     ". This usually means the ONNX graph contains unsupported operations.");
 
-      outputs.push_back(value_map[output_name]);
+      func_outputs.push_back(value_map.at(output_name));
       output_names.push_back(output_name);
 
-      if (verbose_) {
+      if (verbose) {
         uout() << "  Graph output: " << output_name << std::endl;
       }
     }
+  }
 
-    // Step 6: Create and return CasADi Function
+  Function OnnxTranslator::create(const std::string& name) {
+    casadi_assert(has_model_, "No ONNX model loaded. Call load() first.");
+
+    const onnx::GraphProto& graph = model_.graph();
+
+    // Initialize data structures
+    std::map<std::string, MX> value_map;
+    std::vector<MX> inputs;
+    std::vector<std::string> input_names;
+    std::vector<MX> outputs;
+    std::vector<std::string> output_names;
+
+    if (verbose_) {
+    uout() << "Creating CasADi Function from ONNX model: "
+           << graph.name() << std::endl;
+    uout() << "  Graph has " << graph.initializer_size() << " initializers, "
+           << graph.input_size() << " inputs, "
+           << graph.output_size() << " outputs, "
+           << graph.node_size() << " nodes" << std::endl;
+    }
+
+    // Process graph using shared helpers
+    process_graph_initializers(graph, value_map, *this, verbose_);
+    process_graph_inputs(graph, value_map, inputs, input_names, *this, verbose_);
+    process_graph_nodes(graph, value_map, *this, verbose_, true);  // allow_control_flow = true
+    collect_graph_outputs(graph, value_map, outputs, output_names, verbose_);
+
+    // Create and return CasADi Function
     Function f(name, inputs, outputs, input_names, output_names);
 
     if (verbose_) {
-      uout() << "Created CasADi Function: " << name << std::endl;
-      uout() << "  Inputs: " << f.n_in() << std::endl;
-      uout() << "  Outputs: " << f.n_out() << std::endl;
+    uout() << "Created CasADi Function: " << name << std::endl;
+    uout() << "  Inputs: " << f.n_in() << std::endl;
+    uout() << "  Outputs: " << f.n_out() << std::endl;
     }
 
     return f;
+  }
+
+  // ========== Control Flow Support ==========
+
+  std::vector<std::string> OnnxTranslator::analyze_outer_scope_dependencies(
+    const onnx::GraphProto& subgraph,
+    const std::set<std::string>& available_in_scope) const {
+
+    // Step 1: Collect all locally-defined names in the subgraph
+    std::set<std::string> local_names;
+
+    // Subgraph inputs are local
+    for (int i = 0; i < subgraph.input_size(); ++i) {
+    local_names.insert(subgraph.input(i).name());
+    }
+
+    // Subgraph initializers are local
+    for (int i = 0; i < subgraph.initializer_size(); ++i) {
+    local_names.insert(subgraph.initializer(i).name());
+    }
+
+    // Node outputs are local
+    for (int i = 0; i < subgraph.node_size(); ++i) {
+    const onnx::NodeProto& node = subgraph.node(i);
+    for (int j = 0; j < node.output_size(); ++j) {
+      if (!node.output(j).empty()) {
+        local_names.insert(node.output(j));
+      }
+    }
+    }
+
+    // Step 2: Find outer scope dependencies
+    std::set<std::string> outer_deps;
+
+    for (int i = 0; i < subgraph.node_size(); ++i) {
+    const onnx::NodeProto& node = subgraph.node(i);
+
+    // Check each input of this node
+    for (int j = 0; j < node.input_size(); ++j) {
+      const std::string& input_name = node.input(j);
+
+      // Skip empty inputs (optional parameters in ONNX)
+      if (input_name.empty()) continue;
+
+      // If not defined locally, must come from outer scope
+      if (local_names.count(input_name) == 0) {
+        // Validate it exists in outer scope
+        if (available_in_scope.count(input_name)) {
+          outer_deps.insert(input_name);
+        } else {
+          casadi_error("Subgraph references undefined variable '" + input_name +
+                     "' in node '" + node.name() + "' (op: " + node.op_type() + ")");
+        }
+      }
+    }
+
+    // Step 3: Recursively handle nested subgraphs
+    for (int a = 0; a < node.attribute_size(); ++a) {
+      const onnx::AttributeProto& attr = node.attribute(a);
+
+      if (attr.type() == onnx::AttributeProto::GRAPH) {
+        // Nested subgraph can see current subgraph's scope
+        std::set<std::string> extended_scope = available_in_scope;
+        extended_scope.insert(local_names.begin(), local_names.end());
+
+        // Recursively analyze nested subgraph
+        std::vector<std::string> nested_deps =
+            analyze_outer_scope_dependencies(attr.g(), extended_scope);
+
+        // Nested deps that aren't local to us become our outer deps
+        for (const auto& dep : nested_deps) {
+          if (local_names.count(dep) == 0) {
+            outer_deps.insert(dep);
+          }
+          }
+        }
+      }
+    }
+
+    // Convert set to vector and return
+    return std::vector<std::string>(outer_deps.begin(), outer_deps.end());
+  }
+
+  Function OnnxTranslator::translate_subgraph_to_function(
+    const onnx::GraphProto& subgraph,
+    const std::string& function_name,
+    const std::map<std::string, MX>& outer_scope_vars,
+    const std::vector<std::string>& outer_deps) {
+
+    // Create local value_map for subgraph scope
+    std::map<std::string, MX> value_map;
+
+    // Add outer scope dependencies to value_map
+    for (const auto& dep_name : outer_deps) {
+    auto it = outer_scope_vars.find(dep_name);
+    casadi_assert(it != outer_scope_vars.end(),
+                 "Outer scope dependency '" + dep_name + "' not found");
+    value_map[dep_name] = it->second;
+    }
+
+    // Process graph using shared helpers
+    std::vector<MX> func_inputs;
+    std::vector<std::string> input_names;
+    std::vector<MX> func_outputs;
+    std::vector<std::string> output_names;
+
+    process_graph_initializers(subgraph, value_map, *this, false);  // verbose = false for subgraphs
+    process_graph_inputs(subgraph, value_map, func_inputs, input_names, *this, false);
+
+    // Add outer scope dependencies as function inputs (after regular inputs)
+    for (const auto& dep_name : outer_deps) {
+      func_inputs.push_back(value_map[dep_name]);
+      input_names.push_back(dep_name);
+    }
+
+    process_graph_nodes(subgraph, value_map, *this, false, false);  // verbose = false, allow_control_flow = false
+    collect_graph_outputs(subgraph, value_map, func_outputs, output_names, false);
+
+    // Create and return Function
+    return Function(function_name, func_inputs, func_outputs,
+                   input_names, output_names);
   }
 
 } // namespace casadi
