@@ -120,6 +120,35 @@ namespace casadi {
     bool has_model_;
 
   private:
+    // Friend declarations for import helper functions
+    friend void process_graph_initializers(
+        const onnx::GraphProto& graph,
+        std::map<std::string, MX>& value_map,
+        const OnnxTranslator& translator,
+        bool verbose);
+
+    friend void process_graph_inputs(
+        const onnx::GraphProto& graph,
+        std::map<std::string, MX>& value_map,
+        std::vector<MX>& func_inputs,
+        std::vector<std::string>& input_names,
+        const OnnxTranslator& translator,
+        bool verbose);
+
+    friend void process_graph_nodes(
+        const onnx::GraphProto& graph,
+        std::map<std::string, MX>& value_map,
+        OnnxTranslator& translator,
+        bool verbose,
+        bool allow_control_flow);
+
+    friend void collect_graph_outputs(
+        const onnx::GraphProto& graph,
+        const std::map<std::string, MX>& value_map,
+        std::vector<MX>& func_outputs,
+        std::vector<std::string>& output_names,
+        bool verbose);
+
     /** \brief Get dimension value from ONNX shape
 
         Handles both concrete dimensions and symbolic dimensions
@@ -169,24 +198,6 @@ namespace casadi {
         const std::map<std::string, MX>& outer_scope_vars,
         const std::vector<std::string>& outer_deps);
 
-    /** \brief Translate ONNX Loop body to CasADi Function
-
-        Creates a CasADi Function from an ONNX Loop body subgraph.
-        Special handling for iteration_num, condition, and loop-carried deps.
-
-        \param body The Loop body subgraph (GraphProto)
-        \param function_name Name for the generated Function
-        \param outer_scope_vars Map of outer scope variables
-        \param outer_deps Set of outer scope dependencies to include as inputs
-        \return CasADi Function representing the Loop body
-
-        \identifier{onnx_translator_translate_loop_body} */
-    Function translate_loop_body_to_function(
-        const onnx::GraphProto& body,
-        const std::string& function_name,
-        const std::map<std::string, MX>& outer_scope_vars,
-        const std::vector<std::string>& outer_deps);
-
     /** \brief Process a single ONNX node operation
 
         Executes the operation logic for a single ONNX node.
@@ -202,7 +213,135 @@ namespace casadi {
         const std::string& op_type,
         const onnx::NodeProto& node,
         const std::vector<MX>& node_inputs);
+
+    /** \brief Convert a CasADi Function to ONNX GraphProto (for subgraphs)
+
+        Recursively converts a CasADi Function into an ONNX GraphProto.
+        Used for exporting control flow operators (If, Loop, Scan).
+
+        \param f The CasADi Function to convert
+        \param graph_name Name for the ONNX graph
+        \return Pointer to created GraphProto
+
+        \identifier{onnx_translator_function_to_graph} */
+    onnx::GraphProto* function_to_graph(
+        const Function& f,
+        const std::string& graph_name);
+
+    /** \brief Check if Function is an if_else function
+
+        \param f The Function to check
+        \return True if this is an if_else function
+
+        \identifier{onnx_translator_is_if_else} */
+    bool is_if_else_function(const Function& f) const;
+
+    /** \brief Check if Function is a mapaccum function
+
+        \param f The Function to check
+        \return True if this is a mapaccum function
+
+        \identifier{onnx_translator_is_mapaccum} */
+    bool is_mapaccum_function(const Function& f) const;
+
+    /** \brief Check if Function is a map function
+
+        \param f The Function to check
+        \return True if this is a map function
+
+        \identifier{onnx_translator_is_map} */
+    bool is_map_function(const Function& f) const;
+
+    /** \brief Create ONNX node from CasADi operation
+
+        Shared helper to convert a CasADi operation to an ONNX node.
+        Used by both main export and subgraph export.
+
+        \param graph The ONNX graph to add nodes to
+        \param op CasADi operation code
+        \param node_output Output name for the node
+        \param i_vec Input work vector indices
+        \param work_to_onnx Map from work indices to ONNX names
+        \param f The Function being exported
+        \param k Instruction index
+        \return True if operation was handled, false otherwise
+
+        \identifier{onnx_translator_create_onnx_node} */
+    bool create_onnx_node_from_op(
+        onnx::GraphProto* graph,
+        casadi_int op,
+        const std::string& node_output,
+        const std::vector<casadi_int>& i_vec,
+        const std::vector<casadi_int>& o_vec,
+        std::map<casadi_int, std::string>& work_to_onnx,
+        const Function& f,
+        casadi_int k);
   };
+
+  // ========== Import Helper Functions (onnx_import.cpp) ==========
+
+  /** \brief Process ONNX initializers (constants) */
+  void process_graph_initializers(
+      const onnx::GraphProto& graph,
+      std::map<std::string, MX>& value_map,
+      const OnnxTranslator& translator,
+      bool verbose);
+
+  /** \brief Create MX symbols for graph inputs */
+  void process_graph_inputs(
+      const onnx::GraphProto& graph,
+      std::map<std::string, MX>& value_map,
+      std::vector<MX>& func_inputs,
+      std::vector<std::string>& input_names,
+      const OnnxTranslator& translator,
+      bool verbose);
+
+  /** \brief Process all nodes in the graph */
+  void process_graph_nodes(
+      const onnx::GraphProto& graph,
+      std::map<std::string, MX>& value_map,
+      OnnxTranslator& translator,
+      bool verbose,
+      bool allow_control_flow = true);
+
+  /** \brief Collect graph outputs from value_map */
+  void collect_graph_outputs(
+      const onnx::GraphProto& graph,
+      const std::map<std::string, MX>& value_map,
+      std::vector<MX>& func_outputs,
+      std::vector<std::string>& output_names,
+      bool verbose);
+
+  // ========== Export Helper Functions ==========
+
+  /** \brief Add graph inputs to ONNX graph (defined in onnx_export.cpp) */
+  void add_graph_inputs(onnx::GraphProto* graph, const Function& f);
+
+  /** \brief Create binary operation ONNX node (defined in onnx_operations.cpp) */
+  onnx::NodeProto* create_binary_node(
+      onnx::GraphProto* graph,
+      const std::string& op_type,
+      const std::string& input1,
+      const std::string& input2,
+      const std::string& output);
+
+  /** \brief Create unary operation ONNX node */
+  onnx::NodeProto* create_unary_node(
+      onnx::GraphProto* graph,
+      const std::string& op_type,
+      const std::string& input,
+      const std::string& output);
+
+  /** \brief Process a CasADi operation and create corresponding ONNX node */
+  bool process_operation(
+      onnx::GraphProto* graph,
+      const Function& f,
+      casadi_int op,
+      casadi_int k,
+      const std::vector<casadi_int>& i_vec,
+      const std::vector<casadi_int>& o_vec,
+      std::map<casadi_int, std::string>& work_to_onnx,
+      const std::string& node_output);
 
 } // namespace casadi
 /// \endcond
