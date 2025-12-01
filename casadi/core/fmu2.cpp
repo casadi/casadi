@@ -340,6 +340,11 @@ int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
   return status != fmi2OK;
 }
 
+int Fmu2::set_time(void* instance, double t) const {
+  fmi2Status status = set_time_(instance, t);
+  return status != fmi2OK;
+}
+
 int Fmu2::set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const {
   casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");

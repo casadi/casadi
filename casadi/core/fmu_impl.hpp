@@ -89,6 +89,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   virtual int get_derivatives(void* instance, double* derivatives, size_t nx) const = 0;
 
+  // Set current time
+  virtual int set_time(void* instance, double t) const = 0;
+
   // Set real values
   virtual int set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const = 0;
