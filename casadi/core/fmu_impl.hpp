@@ -197,6 +197,12 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Request the calculation of a variable
   void request(FmuMemory* m, size_t ind) const;
 
+  // Pass values to the FMU
+  int set_all(FmuMemory* m, const double* values, size_t n_values) const;
+
+  // Get values from the FMU
+  int get_all(FmuMemory* m, double* values, size_t n_values) const;
+
   // Calculate all requested variables
   int eval(FmuMemory* m) const;
 
@@ -331,6 +337,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Is there an independent variable?
   bool has_independent_;
+
+  // Corresponding value reference
+  unsigned int independent_vr_;
 
   // Meta information about the input/output variable subsets
   std::vector<double> nominal_in_, nominal_out_;

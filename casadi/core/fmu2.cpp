@@ -349,18 +349,6 @@ int Fmu2::set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const {
   casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");
 
-  // Set time variable, if any
-  if (has_independent_ && n_vr > 0 && *vr == vr_in_[0]) {
-    // Update FMU time
-    fmi2Status status = set_time_(instance, *values);
-    if (status != fmi2OK) return 1;
-    // Skip when setting remaining variables
-    vr++;
-    n_vr--;
-    values++;
-    n_values--;
-  }
-
   fmi2Status status = set_real_(instance, vr, n_vr, values);
   return status != fmi2OK;
 }
@@ -379,6 +367,7 @@ int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
     status = get_derivatives_(instance, get_ptr(derivate_dump), nx_);
     if (status != fmi2OK) return 1;
   }
+
   fmi2Status status = get_real_(instance, vr, n_vr, values);
   return status != fmi2OK;
 }
