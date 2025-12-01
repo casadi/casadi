@@ -317,6 +317,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Does the FMU declare restrictions on instantiation?
   bool can_be_instantiated_only_once_per_process_;
 
+  // Start time
+  double start_time_;
+
   /// DLL
   Importer li_;
 

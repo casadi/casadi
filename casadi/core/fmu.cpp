@@ -459,6 +459,7 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
   can_be_instantiated_only_once_per_process_ = dae->can_be_instantiated_only_once_per_process_;
+  start_time_ = dae->start_time_;
   nx_ = dae->size(Category::X);
   do_evaluation_dance_ = dae->generation_tool_.rfind("Simulink", 0) == 0;
 
@@ -618,8 +619,26 @@ void FmuInternal::finalize() {
   }
   // Get input values
   if (!value_in_.empty()) {
-    if (get_real(c, get_ptr(vr_in_), vr_in_.size(), get_ptr(value_in_), value_in_.size())) {
-      casadi_error("FmuInternal::get_in failed");
+    // Value references
+    const unsigned int* vr = get_ptr(vr_in_);
+    size_t n_vr = vr_in_.size();
+    // Values
+    double* value = get_ptr(value_in_);
+    size_t n_value = value_in_.size();
+    // Set time variable, if any
+    if (has_independent_) {
+      *value = start_time_;
+      // Skip when getting remaining inputs
+      vr++;
+      n_vr--;
+      value++;
+      n_value--;
+    }
+    // Set remaining
+    if (n_value > 0) {
+      if (get_real(c, vr, n_vr, value, n_value)) {
+        casadi_error("FmuInternal::get_in failed");
+      }
     }
   }
   // Get auxilliary variables
@@ -1418,6 +1437,7 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
   s.pack("FmuInternal::can_be_instantiated_only_once_per_process",
     can_be_instantiated_only_once_per_process_);
+  s.pack("FmuInternal::start_time", start_time_);
   s.pack("FmuInternal::nx", nx_);
   s.pack("FmuInternal::do_evaluation_dance", do_evaluation_dance_);
 }
@@ -1461,6 +1481,7 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
   s.unpack("FmuInternal::can_be_instantiated_only_once_per_process",
     can_be_instantiated_only_once_per_process_);
+  s.unpack("FmuInternal::start_time", start_time_);
   s.unpack("FmuInternal::nx", nx_);
   s.unpack("FmuInternal::do_evaluation_dance", do_evaluation_dance_);
 }
