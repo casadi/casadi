@@ -978,6 +978,32 @@ namespace casadi {
     std::unordered_map<std::string, SXElem > cache;
     IncrementalSerializer s;
 
+    // Iterator to the binary operations
+    std::vector<SXElem>::const_iterator b_it = ff->operations_.begin();
+
+    // Pre-cache the original nodes
+    // This makes sure we recycle old nodes when possible
+    for (auto&& a : ff->algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+      case OP_OUTPUT:
+      case OP_CONST:
+      case OP_PARAMETER:
+      case OP_CALL:
+        break;
+      default:
+        {
+          const SXElem &f = *b_it++;
+          std::string key = s.pack(f);
+
+          auto itk = cache.find(key);
+          if (itk==cache.end()) {
+            cache[key] = f;
+          }
+        }
+      }
+    }
+
     // Iterator to stack of constants
     std::vector<SXElem>::const_iterator c_it = ff->constants_.begin();
 

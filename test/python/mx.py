@@ -4348,7 +4348,17 @@ class MXtests(casadiTestCase):
                 self.assertNotEqual(str(ref),str(a*(b*x)))
                 self.assertNotEqual(str(ref),str((b*x)*a))
 
-    
+  def test_cse_reuse(self):
+    for X in [SX,MX]:
+        x = MX.sym("x")
+        y = sin(MX.sym("y"))
+        z = MX.sym("z")
+        
+        e = (x+y/z)
+        r = vertcat(cse(e),2*y)
+        print(r)
+        self.assertTrue("@1=sin(y)" in str(r))
+      
 
   
 if __name__ == '__main__':

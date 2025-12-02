@@ -740,7 +740,7 @@ void casadi_qrqp_expand_step(casadi_qrqp_data<T1>* d) {
   casadi_axpy(p->qp->nx, 1., d->dlam, d->tinfeas);
 }
 
-// SYMBOL "casadi_qrqp_pr_direction"
+// SYMBOL "qrqp_pr_direction"
 template<typename T1>
 int casadi_qrqp_pr_direction(casadi_qrqp_data<T1>* d) {
   casadi_int i;
@@ -757,7 +757,7 @@ int casadi_qrqp_pr_direction(casadi_qrqp_data<T1>* d) {
   return 0;
 }
 
-// SYMBOL "casadi_qrqp_du_direction"
+// SYMBOL "qrqp_du_direction"
 template<typename T1>
 int casadi_qrqp_du_direction(casadi_qrqp_data<T1>* d) {
   casadi_int i;

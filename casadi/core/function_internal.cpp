@@ -2464,11 +2464,11 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_alloc_mem(CodeGenerator& g) const {
-    bool needs_mem = !codegen_mem_type().empty();
+    bool needs_mem = codegen_needs_mem();
     if (needs_mem) {
-    std::string name = codegen_name(g, false);
-    std::string mem_counter = g.shorthand(name + "_mem_counter");
-    g << "return " + mem_counter + "++;\n";
+      std::string name = codegen_name(g, false);
+      std::string mem_counter = g.shorthand(name + "_mem_counter");
+      g << "return " + mem_counter + "++;\n";
     }
   }
 
@@ -2493,7 +2493,7 @@ namespace casadi {
     g << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) return -1;\n";
     g << "mid = " << alloc_mem << "();\n";
     g << "if (mid<0) return -1;\n";
-    g << "if(" << init_mem << "(mid)) return -1;\n";
+    g << "if (" << init_mem << "(mid)) return -1;\n";
     g << "return mid;\n";
     g << "}\n";
   }
@@ -2510,11 +2510,13 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_meta(CodeGenerator& g) const {
-    bool needs_mem = !codegen_mem_type().empty();
+    bool needs_mem = codegen_needs_mem();
+    std::string name = codegen_name(g, false);
 
     g << g.declare("int " + name_ + "_alloc_mem(void)") << " {\n";
     if (needs_mem) {
-      g << "return " << codegen_name(g) << "_alloc_mem();\n";
+      std::string alloc_mem = g.shorthand(name + "_alloc_mem");
+      g << "return " << alloc_mem << "();\n";
     } else {
       g << "return 0;\n";
     }
@@ -2522,7 +2524,8 @@ namespace casadi {
 
     g << g.declare("int " + name_ + "_init_mem(int mem)") << " {\n";
     if (needs_mem) {
-      g << "return " << codegen_name(g) << "_init_mem(mem);\n";
+      std::string init_mem = g.shorthand(name + "_init_mem");
+      g << "return " << init_mem << "(mem);\n";
     } else {
       g << "return 0;\n";
     }
@@ -2530,14 +2533,16 @@ namespace casadi {
 
     g << g.declare("void " + name_ + "_free_mem(int mem)") << " {\n";
     if (needs_mem) {
-      g << codegen_name(g) << "_free_mem(mem);\n";
+      std::string free_mem = g.shorthand(name + "_free_mem");
+      g << free_mem << "(mem);\n";
     }
     g << "}\n\n";
 
     // Checkout/release routines
     g << g.declare("int " + name_ + "_checkout(void)") << " {\n";
     if (needs_mem) {
-      g << "return " << codegen_name(g) << "_checkout();\n";
+      std::string checkout = g.shorthand(name + "_checkout");
+      g << "return " << checkout << "();\n";
     } else {
       g << "return 0;\n";
     }
@@ -2545,7 +2550,8 @@ namespace casadi {
 
     if (needs_mem) {
       g << g.declare("void " + name_ + "_release(int mem)") << " {\n";
-      g << codegen_name(g) << "_release(mem);\n";
+      std::string release = g.shorthand(name + "_release");
+      g << release << "(mem);\n";
     } else {
       g << g.declare("void " + name_ + "_release(int mem)") << " {\n";
     }
