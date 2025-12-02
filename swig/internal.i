@@ -574,6 +574,9 @@
 %exception  casadi::DaeBuilder::c() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::categories(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::category(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -659,9 +662,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::has_fun(const std::string &name) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::has_rate() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::has_t() const {
@@ -781,9 +781,6 @@
 %exception  casadi::DaeBuilder::quad() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::rate() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::DaeBuilder::register_c(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -841,6 +838,9 @@
 %exception  casadi::DaeBuilder::set(const std::vector< std::string > &name, const std::vector< std::string > &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::set_all(const std::string &v, const std::vector< std::string > &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::set_attribute(const std::string &a, const std::string &name, double val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -881,9 +881,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::set_nominal(const std::vector< std::string > &name, const std::vector< double > &val) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::set_rate(const std::vector< std::string > &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::set_start(const std::string &name, const std::vector< double > &val) {
@@ -5270,6 +5267,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObject::get_str(bool more=false) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SimpleCache< K, T >::cache_map() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SimpleCache< K, T >::incache(const K &key, T &value) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SimpleCache< K, T >::tocache(const K &key, const T &value) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Slice::all() const {

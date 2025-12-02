@@ -152,6 +152,7 @@ class CASADI_EXPORT External : public FunctionInternal {
   bool codegen_needs_mem() const override { return true; }
 
   /** \brief Is thread-local memory object managed by checkout/release
+
     * without a need for alloc_mem, init_mem, free_mem?
 
       \identifier{2f0} */
