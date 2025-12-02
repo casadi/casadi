@@ -529,21 +529,28 @@ bool Variable::needs_der() const {
 
 std::vector<Category> Variable::categories() const {
   switch (category) {
+    case Category::T:
+      if (in_rhs) {
+        return {Category::T};
+      } else {
+        return {Category::T, Category::NUMEL};
+      }
     case Category::P:  // Fall-through
     case Category::U:  // Fall-through
     case Category::C:
       return {Category::P, Category::U, Category::C};
-    case Category::T:  // Fall-through
     case Category::X:  // Fall-through
     case Category::Q:
       if (in_rhs) {
-        return {Category::X, Category::T};
+        return {Category::X};
       } else {
-        return {Category::T, Category::X, Category::Q, Category::NUMEL};
+        return {Category::X, Category::Q, Category::NUMEL};
       }
     case Category::NUMEL:
-      if (has_der()) {
-        return {Category::Q, Category::T, Category::NUMEL};
+      if (causality == Causality::INDEPENDENT) {
+        return {Category::T, Category::NUMEL};
+      } else if (has_der()) {
+        return {Category::Q, Category::NUMEL};
       } else {
         return {Category::NUMEL};
       }
@@ -3081,7 +3088,6 @@ void DaeBuilderInternal::categorize(size_t ind, Category cat) {
   if (v.category == cat) return;
   // Remove from current category, if any
   if (v.category != Category::NUMEL) {
-    // Note: The 'der' field will continue to point to the derivative of T w.r.t. independent
     remove(indices(v.category), ind);
     v.category = Category::NUMEL;
   }
@@ -3094,8 +3100,6 @@ void DaeBuilderInternal::categorize(size_t ind, Category cat) {
       insert(indices, ind);
     }
     v.category = cat;
-    // The 'der' field for the independent variable points to derivative of T w.r.t. independent
-    if (cat == Category::T) variable(0).der = ind != 0 ? v.der : -1;
   }
 }
 

@@ -578,7 +578,7 @@ void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& n
       std::set<std::string> name_set(name.begin(), name.end());
       for (auto&& n : all_in_cat) {
         if (name_set.find(n) == name_set.end()) {
-          if (v == "x" || v == "q" || v == "t") {
+          if (v == "x" || v == "q") {
             // Move to unused derivatives
             set_category(n, "");
           } else if (v == "u" || v == "p") {
