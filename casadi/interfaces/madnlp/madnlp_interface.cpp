@@ -62,7 +62,6 @@ MadnlpInterface::MadnlpInterface(const std::string& name, const Function& nlp)
 }
 
 MadnlpInterface::~MadnlpInterface() {
-  //shutdown_julia(0);
   clear_mem();
 }
 
@@ -449,21 +448,21 @@ void MadnlpInterface::set_madnlp_prob() {
 //   g << "casadi_madnlp_setup(&p);\n";
 // }
 
-// MadnlpInterface::MadnlpInterface(DeserializingStream& s) : Nlpsol(s) {
-//   s.version("MadnlpInterface", 1);
-//   s.unpack("MadnlpInterface::jacg_sp", jacg_sp_);
-//   s.unpack("MadnlpInterface::hesslag_sp", hesslag_sp_);
-//   s.unpack("MadnlpInterface::exact_hessian", exact_hessian_);
-//   s.unpack("MadnlpInterface::opts", opts_);
-//   s.unpack("MadnlpInterface::convexify", convexify_);
+MadnlpInterface::MadnlpInterface(DeserializingStream& s) : Nlpsol(s) {
+  s.version("MadnlpInterface", 1);
+  s.unpack("MadnlpInterface::jacg_sp", jacg_sp_);
+  s.unpack("MadnlpInterface::hesslag_sp", hesslag_sp_);
+  s.unpack("MadnlpInterface::exact_hessian", exact_hessian_);
+  s.unpack("MadnlpInterface::opts", opts_);
+  s.unpack("MadnlpInterface::convexify", convexify_);
 
-//   s.unpack("MadnlpInterface::nzj_i", nzj_i_);
-//   s.unpack("MadnlpInterface::nzj_j", nzj_j_);
-//   s.unpack("MadnlpInterface::nzh_i", nzh_i_);
-//   s.unpack("MadnlpInterface::nzh_j", nzh_j_);
+  s.unpack("MadnlpInterface::nzj_i", nzj_i_);
+  s.unpack("MadnlpInterface::nzj_j", nzj_j_);
+  s.unpack("MadnlpInterface::nzh_i", nzh_i_);
+  s.unpack("MadnlpInterface::nzh_j", nzh_j_);
 
-//   set_madnlp_prob();
-// }
+  set_madnlp_prob();
+}
 
 // void MadnlpInterface::serialize_body(SerializingStream &s) const {
 //   Nlpsol::serialize_body(s);
