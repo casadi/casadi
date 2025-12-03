@@ -1367,6 +1367,9 @@ if(WITH_MADNLP AND WITH_BUILD_MADNLP)
   install(DIRECTORY
     "${LIBMAD_BINARY_DIR}/lib/"
     DESTINATION "${LIB_PREFIX}")
+  install(DIRECTORY
+    "${LIBMAD_BINARY_DIR}/share"
+    DESTINATION ".")
   if(WIN32)
     # TODO(@apozharski) Is this correct
     install(DIRECTORY
