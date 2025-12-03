@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.10.2)
 project(casadi C CXX)
 
 set(CASADI_MAJOR_VERSION 3)
@@ -799,8 +799,17 @@ option(WITH_MOCKUP_MADNLP "Use mockup MadNLP (BUILD_MOCKUPS_VERSION=${BUILD_MOCK
 option(WITH_BUILD_MADNLP "Download compiled libMad"  OFF)
 set(MADNLP_TAR_HASH "")
 if(NOT MADNLP_TAR_PATH)
-  set(MADNLP_TAR_PATH "https://github.com/apozharski/libMad/releases/download/v0.0.1-casadi/libMad-ubuntu-x86_64-v0.0.1-casadi.tar.gz")
-  set(MADNLP_TAR_HASH "SHA256=4bb05af590666524223faecb33d061b5e95414b4b8af82733120405cbdaaef72")
+  if(NOT LIBMAD_RELEASE)
+    set(LIBMAD_RELEASE "v0.0.1-casadi")
+  endif()
+  set(MADNLP_TAR_ROOT "https://github.com/apozharski/libMad/releases/download/")
+  if(LINUX)
+    set(MADNLP_TAR_PATH "${MADNLP_TAR_ROOT}${LIBMAD_RELEASE}/libMad-ubuntu-x86_64-${LIBMAD_RELEASE}.tar.gz")
+  elseif(WIN32)
+    set(MADNLP_TAR_PATH "${MADNLP_TAR_ROOT}${LIBMAD_RELEASE}/libMad-window-x86_64-${LIBMAD_RELEASE}.tar.gz")
+  elseif(APPLE)
+    set(MADNLP_TAR_PATH "${MADNLP_TAR_ROOT}${LIBMAD_RELEASE}/libMad-apple-aarch64-${LIBMAD_RELEASE}.tar.gz")
+  endif()
 endif()
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -1319,34 +1328,51 @@ endif()
 if(WITH_MADNLP AND WITH_BUILD_MADNLP)
   # TODO(@apozharski): This is currently hacky but it avoids julia bulid dependencies. However, this makes crosscompilation a massive headache.
   #                    If CasADi wants to ship with MadNLP it may make more sense to build libMad.
-  set(LIBMAD_BINARY_DIR "${CMAKE_BINARY_DIR}/external_packages/libMad/")
+
+  set(LIBMAD_BINARY_DIR "${CMAKE_BINARY_DIR}/external_packages/libMad")
   if(MADNLP_TAR_HASH)
     file(
       DOWNLOAD ${MADNLP_TAR_PATH}
-      "${CMAKE_BINARY_DIR}/external_packages/libMad-ubuntu-latest.tar.gz"
+      "${LIBMAD_BINARY_DIR}/libMad.tar.gz"
       EXPECTED_HASH ${MADNLP_TAR_HASH}
     )
   else()
     file(
       DOWNLOAD ${MADNLP_TAR_PATH}
-      "${CMAKE_BINARY_DIR}/external_packages/libMad-ubuntu-latest.tar.gz"
+      "${LIBMAD_BINARY_DIR}/libMad.tar.gz"
     )
   endif()
-  file(
-    ARCHIVE_EXTRACT INPUT "${CMAKE_BINARY_DIR}/external_packages/libMad-ubuntu-latest.tar.gz"
-    DESTINATION ${LIBMAD_BINARY_DIR}
-  )
+
+  # TODO(@apozharski): this requires CMake 3.18 but dockcross images use 3.17
+  # file(
+  #   ARCHIVE_EXTRACT INPUT "${CMAKE_BINARY_DIR}/external_packages/libMad.tar.gz"
+  #   DESTINATION ${LIBMAD_BINARY_DIR}
+  # )
+  execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${LIBMAD_BINARY_DIR} tar xf ${LIBMAD_BINARY_DIR}/libMad.tar.gz)
   add_library(libmad::libMad SHARED IMPORTED)
   set_target_properties(libmad::libMad
     PROPERTIES
     IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/lib/libMad.so
-    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/lib/libMad.so
+    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/bin/libMad.lib
   )
   set_target_properties(libmad::libMad PROPERTIES LINKER_LANGUAGE C)
   target_include_directories(libmad::libMad INTERFACE
     ${LIBMAD_BINARY_DIR}/include
     $<INSTALL_INTERFACE:include/>
   )
+
+  install(DIRECTORY
+    "${LIBMAD_BINARY_DIR}/include/"
+    DESTINATION "${INCLUDE_PREFIX}")
+  install(DIRECTORY
+    "${LIBMAD_BINARY_DIR}/lib/"
+    DESTINATION "${LIB_PREFIX}")
+  if(WIN32)
+    # TODO(@apozharski) Is this correct
+    install(DIRECTORY
+    "${CMAKE_BINARY_DIR}/external_packages/libMad/bin/"
+    DESTINATION "${LIB_PREFIX}")
+  endif()
 endif()
 
 message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")

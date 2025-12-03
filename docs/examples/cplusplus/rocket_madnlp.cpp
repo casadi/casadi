@@ -117,7 +117,7 @@ int main(){
 
   // Create Matlab script to plot the solution
   std::ofstream file;
-  std::string filename = "rocket_snopt_results.m";
+  std::string filename = "rocket_madnlp_results.m";
   file.open(filename.c_str());
   file << "% Results file from " __FILE__ << std::endl;
   file << "% Generated " __DATE__ " at " __TIME__ << std::endl;
