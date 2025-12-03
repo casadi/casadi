@@ -1356,7 +1356,7 @@ if(WITH_MADNLP AND WITH_BUILD_MADNLP)
   set_target_properties(libmad::libMad
     PROPERTIES
     IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/lib/libMad.so
-    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/bin/libMad.lib
+    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/bin/libMad.imp.lib
   )
   set_target_properties(libmad::libMad PROPERTIES LINKER_LANGUAGE C)
   target_include_directories(libmad::libMad INTERFACE
