@@ -1355,7 +1355,7 @@ if(WITH_MADNLP AND WITH_BUILD_MADNLP)
   add_library(libmad::libMad SHARED IMPORTED)
   set_target_properties(libmad::libMad
     PROPERTIES
-    IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/lib/libMad.so
+    IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/lib/libMad${CMAKE_SHARED_LIBRARY_SUFFIX}
     IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/bin/libMad.imp.lib
   )
   set_target_properties(libmad::libMad PROPERTIES LINKER_LANGUAGE C)
