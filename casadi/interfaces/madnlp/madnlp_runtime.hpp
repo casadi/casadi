@@ -234,25 +234,6 @@ template<typename T1>
 void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Problem structure
   const casadi_madnlp_prob<T1>* p = d->prob;
-  //casadi_oracle_data<T1>* d_oracle = d->nlp->oracle;
-  // TODO(@anton): I would like to do this here and just pass the numerics later,
-  //               however,
-  // const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
-  // libmad_nlpmodel_create(&(d->cnlp_model),
-  //                        "Name",
-  //                        p_nlp->nx, p_nlp->ng,
-  //                        p->nnz_jac_g, p->nnz_hess_l,
-  //                        casadi_madnlp_constr_jac_structure<T1>,
-  //                        casadi_madnlp_lag_hess_structure<T1>,
-  //                        casadi_madnlp_eval_obj<T1>,
-  //                        casadi_madnlp_eval_constr<T1>,
-  //                        casadi_madnlp_eval_obj_grad<T1>,
-  //                        casadi_madnlp_eval_constr_jac<T1>,
-  //                        casadi_madnlp_eval_lag_hess<T1>,
-  //                        d
-  //   );
-
-  // madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
   d->arg = *arg;
   d->res = *res;
   d->iw = *iw;
@@ -262,12 +243,6 @@ void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, c
 // SYMBOL "madnlp_presolve"
 template<typename T1>
 void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d) {
-}
-
-// SYMBOL "madnlp_c_solve"
-template<typename T1>
-int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
-  // Problem structure
   casadi_int k, i, column;
   const casadi_madnlp_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
@@ -293,8 +268,16 @@ int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
                                d_nlp->z, d_nlp->lam + p_nlp->nx,
                                d_nlp->lbx, d_nlp->ubx,
                                d_nlp->lbg, d_nlp->ubg);
-
   madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
+}
+
+// SYMBOL "madnlp_solve"
+template<typename T1>
+int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
+  // Problem structure
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  const casadi_madnlp_prob<T1>* p = d->prob;
+  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   int ret = madnlp_solve(d->solver, d->libmad_opts, &(d->stats));
   madnlp_delete_solver(d->solver);
   if (ret!=0) {

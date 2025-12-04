@@ -56,7 +56,6 @@ struct CASADI_NLPSOL_MADNLP_EXPORT MadnlpMemory : public NlpsolMemory {
 */
 class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
  public:
-  Sparsity gradf_sp_;
   Sparsity jacg_sp_;
   Sparsity hesslag_sp_;
 
@@ -122,26 +121,26 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
   void set_madnlp_prob();
   void set_madnlp_prob(CodeGenerator& g) const;
 
-  // /** \brief Generate code for the function body */
-  // void codegen_body(CodeGenerator& g) const override;
+  /** \brief Generate code for the function body */
+  void codegen_body(CodeGenerator& g) const override;
 
-  // /** \brief Generate code for the declarations of the C function */
-  // void codegen_declarations(CodeGenerator& g) const override;
+  /** \brief Generate code for the declarations of the C function */
+  void codegen_declarations(CodeGenerator& g) const override;
 
-  // /** \brief Codegen alloc_mem */
-  // void codegen_init_mem(CodeGenerator& g) const override;
+  /** \brief Codegen alloc_mem */
+  void codegen_init_mem(CodeGenerator& g) const override;
 
-  // /** \brief Codegen free_mem */
-  // void codegen_free_mem(CodeGenerator& g) const override;
+  /** \brief Codegen free_mem */
+  void codegen_free_mem(CodeGenerator& g) const override;
 
-  // /** \brief Thread-local memory object type */
-  // std::string codegen_mem_type() const override { return "struct casadi_madnlp_data"; }
+  /** \brief Thread-local memory object type */
+  std::string codegen_mem_type() const override { return "struct casadi_madnlp_data"; }
 
   /** \brief Is thread-local memory object needed? */
   bool codegen_needs_mem() const override { return true; }
 
   // /** \brief Serialize an object without type information */
-  // void serialize_body(SerializingStream &s) const override;
+  void serialize_body(SerializingStream &s) const override;
 
   /** \brief Deserialize into MX */
   static ProtoFunction* deserialize(DeserializingStream& s) { return new MadnlpInterface(s); }
