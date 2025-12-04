@@ -248,8 +248,6 @@ void MadnlpInterface::set_work(void* mem, const double**& arg, double**& res,
   casadi_madnlp_init(&m->d, &arg, &res, &iw, &w);
 
   m->d.nlp->oracle->m = static_cast<void*>(m);
-
-  // options
 }
 
 int MadnlpInterface::solve(void* mem) const {
