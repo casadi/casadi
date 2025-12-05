@@ -1,0 +1,66 @@
+name: Bug Hunt (CasADi)
+
+on: [push, workflow_dispatch]
+
+jobs:
+  test-versions:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test old and new Python versions
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        # Test the version where you suspect the break
+        casadi-version: ["3.5.5", "3.6.3", "3.6.4", "3.6.5", "3.6.6"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install CasADi ${{ matrix.casadi-version }}
+        run: pip install casadi==${{ matrix.casadi-version }} numpy
+
+      - name: Run Reproduction Script
+        run: |
+          # Create the reproduction script on the fly
+          cat <<EOF > reproduce_issue.py
+          import casadi as ca
+          import sys
+
+          print("Testing CasADi version: " + ca.__version__)
+          
+          try:
+              opt = ca.Opti()
+              x = opt.variable()
+              y = opt.variable()
+              opt.minimize(x)
+              constr = (x - y**2 == 0)
+              opt.subject_to(constr)
+              opts = {'print_time': 0, 'ipopt.print_level': 0, 'ipopt.sb': 'yes'}
+              opt.solver('ipopt', opts)
+              sol = opt.solve()
+              
+              val_dual = float(sol.value(opt.dual(constr)))
+              val_lam = float(sol.value(opt.lam_g))
+              
+              print(f"DUAL: {val_dual}")
+              print(f"LAM:  {val_lam}")
+
+              # The Bug: dual is positive (1.0), lam is negative (-1.0)
+              if val_dual > 0 and val_lam < -0.5:
+                  print(">>> BUG DETECTED <<<")
+                  sys.exit(1) # Fail the action explicitly
+              else:
+                  print(">>> BEHAVIOR CORRECT <<<")
+                  sys.exit(0)
+          except Exception as e:
+              print(e)
+              sys.exit(0) # Don't fail on install errors, just logic errors
+          EOF
+          
+          # Run it
+          python reproduce_issue.py
