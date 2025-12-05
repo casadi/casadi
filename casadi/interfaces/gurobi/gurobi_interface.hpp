@@ -150,6 +150,21 @@ namespace casadi {
     /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new GurobiInterface(s); }
 
+    /// User-provided callback function for MIPSOL events
+    Function mipsol_callback_;
+
+    /// Flag to enable MIPSOL callbacks
+    bool enable_mipsol_callback_;
+
+    /// Handle MIPSOL callback events (C API version)
+    void handle_mipsol_callback(GRBmodel *model, void *cbdata, int where);
+
+    /// Process lazy constraints returned by user callback
+    void process_lazy_constraints(GRBmodel *model, void *cbdata, const std::vector<casadi::DM> &callback_result);
+
+    /// Flag to suppress all printout of gurobi to the console
+    bool suppress_all_output_;
+
   protected:
      /** \brief Deserializing constructor */
     explicit GurobiInterface(DeserializingStream& s);
