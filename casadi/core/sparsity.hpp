@@ -642,6 +642,13 @@ namespace casadi {
     Sparsity operator*(const Sparsity& b) const;
     /// @}
 
+    /** \brief Cartesian product of row and column supports
+
+        Returns a sparsity pattern containing all (i,j) pairs where
+        row i has at least one nonzero in the original pattern and
+        column j has at least one nonzero in the original pattern. */
+    Sparsity support_product() const;
+
     /// Is subset?
     bool is_subset(const Sparsity& rhs) const;
 

@@ -567,6 +567,63 @@ class Sparsitytests(casadiTestCase):
         self.assertTrue(L.is_subset(R))
         self.assertFalse(R.is_subset(L))
 
+  def test_support_product(self):
+    self.message("is_compactible/support_product")
+    # Create a sparsity with nonzeros at (0,1), (2,1), (2,3)
+    sp = Sparsity(4, 5)
+    sp.add_nz(0, 1)
+    sp.add_nz(2, 1)
+    sp.add_nz(2, 3)
+    sp.spy()
+    # .*...
+    # .....
+    # .*.*.
+    # .....
+
+    # is_compactible returns (row_support, col_support)
+    _, row_support, col_support = sp.is_compactible()
+    self.checkarray(row_support, [0, 2])
+    self.checkarray(col_support, [1, 3])
+
+    # This sparsity is NOT compactible (nnz=3, but support product has 4)
+    self.assertEqual(sp.nnz(), 3)
+    self.assertEqual(sp.support_product().nnz(), 4)
+
+    # Support product should be the Cartesian product: (0,1), (0,3), (2,1), (2,3)
+    sp_prod = sp.support_product()
+    self.assertTrue(sp_prod.has_nz(0, 1))
+    self.assertTrue(sp_prod.has_nz(0, 3))
+    self.assertTrue(sp_prod.has_nz(2, 1))
+    self.assertTrue(sp_prod.has_nz(2, 3))
+    # .*.*.
+    # .....
+    # .*.*.
+    # .....
+
+    # These should not be in the support product
+    self.assertFalse(sp_prod.has_nz(1, 1))
+    self.assertFalse(sp_prod.has_nz(0, 0))
+
+    # Test compactible sparsity (sparsity == support_product)
+    sp_compact = Sparsity.rowcol([0, 2], [1, 3], 4, 5)
+    _, row_support2, col_support2 = sp_compact.is_compactible()
+    self.checkarray(row_support2, [0, 2])
+    self.checkarray(col_support2, [1, 3])
+    self.assertEqual(sp_compact.nnz(), sp_compact.support_product().nnz())
+
+    # Test empty sparsity
+    sp_empty = Sparsity(3, 4)
+    _, row_empty, col_empty = sp_empty.is_compactible()
+    self.checkarray(row_empty, [])
+    self.checkarray(col_empty, [])
+    self.assertEqual(sp_empty.support_product().nnz(), 0)
+
+    # Test dense sparsity
+    sp_dense = Sparsity.dense(3, 4)
+    _, row_dense, col_dense = sp_dense.is_compactible()
+    self.checkarray(row_dense, [0, 1, 2])
+    self.checkarray(col_dense, [0, 1, 2, 3])
+    self.assertEqual(sp_dense.support_product().nnz(), 12)
 
 
 if __name__ == '__main__':
