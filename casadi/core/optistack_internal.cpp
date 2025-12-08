@@ -400,7 +400,7 @@ void OptiNode::register_dual(MetaCon& c) {
     } else {
       casadi_int block_size = N / c.n;
       std::vector<MX> original_blocks = vertsplit(
-        c.type==OPTI_EQUALITY || 
+        c.type==OPTI_EQUALITY ||
         c.type==OPTI_GENERIC_EQUALITY ? flat : fabs(flat), block_size
       );
       std::vector<MX> blocks(N);
