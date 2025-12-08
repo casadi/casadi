@@ -399,7 +399,10 @@ void OptiNode::register_dual(MetaCon& c) {
       ret = MX(ret_sp, sign_map((c.flipped ? -1 : 1)*flat)[0].T());
     } else {
       casadi_int block_size = N / c.n;
-      std::vector<MX> original_blocks = vertsplit(c.type==OPTI_EQUALITY ? flat : fabs(flat), block_size);
+      std::vector<MX> original_blocks = vertsplit(
+        c.type==OPTI_EQUALITY || 
+        c.type==OPTI_GENERIC_EQUALITY ? flat : fabs(flat), block_size
+      );
       std::vector<MX> blocks(N);
       for (casadi_int i=0;i<c.n;++i) {
         casadi_int p = c.flipped? c.n-i-1: i;
