@@ -423,6 +423,12 @@ namespace casadi {
     return (*this)->combine(y, true, true);
   }
 
+  Sparsity Sparsity::support_product() const {
+    std::vector<casadi_int> row_support, col_support;
+    (*this)->is_compactible(row_support, col_support);
+    return rowcol(row_support, col_support, size1(), size2());
+  }
+
   bool Sparsity::is_subset(const Sparsity& rhs) const {
     return (*this)->is_subset(rhs);
   }
@@ -997,7 +1003,6 @@ namespace casadi {
   std::vector<casadi_int> Sparsity::get_upper() const {
     return (*this)->get_upper();
   }
-
 
   std::size_t hash_sparsity(casadi_int nrow, casadi_int ncol, const std::vector<casadi_int>& colind,
                             const std::vector<casadi_int>& row) {
