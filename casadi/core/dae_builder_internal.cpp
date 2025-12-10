@@ -754,8 +754,8 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     // Loop over w
     for (size_t i = 0; i < w.size(); ++i) {
       // Find variable, corresponding assignment variable
-      Variable& w_i = variable(v[i].name());
-      Variable& assign_w_i = variable("__assign__" + v[i].name() + "__");
+      Variable& w_i = variable(w[i].name());
+      Variable& assign_w_i = variable("__assign__" + w[i].name() + "__");
       // Reclassify assign_w_i as dependent variable and update expression
       categorize(assign_w_i.index, Category::CALCULATED);
       assign_w_i.parent = w_i.index;
