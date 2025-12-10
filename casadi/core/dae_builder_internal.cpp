@@ -2387,11 +2387,15 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     casadi_assert(!(elim_w && lifted_calls), "Incompatible options");
     // Do we need to substitute out v
     bool subst_v = false;
+    // Do we need to substitute out c
+    bool subst_c = false;
     // Collect all DAE input variables
     for (Category cat : input_categories()) {
       v = input(cat);
       if (elim_w && cat == Category::W) {
         if (!v.empty()) subst_v = true;
+      } else if (cat == Category::C) {
+        if (!v.empty()) subst_c = true;
       } else {
         if (v.empty()) {
           f_in.push_back(MX(0, 1));
@@ -2429,6 +2433,18 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
       // Save to oracle outputs
       f_out.at(wdef_ind) = vertcat(wdef);
     }
+    // Substitute out c from output expressions
+    if (subst_c) {
+      // Expression for c and corresponding definition
+      auto c = var(Category::C);
+      std::vector<casadi::MX> cdef;
+      for (size_t i = 0; i < c.size(); ++i) {
+        cdef.push_back(variable(Category::C, i).value);
+      }
+      // Substitute out
+      f_out = substitute(f_out, c, cdef);
+    }
+
     // Create oracle
     oracle_[false][elim_w][lifted_calls]
       = Function("mx_oracle", f_in, f_out, f_in_name, f_out_name);
