@@ -937,6 +937,9 @@
 %exception  casadi::DaeBuilder::stop_time() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::symbolic() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::t_new() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
