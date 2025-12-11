@@ -69,6 +69,15 @@ jobs:
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
 
+  linux-24_04-native-arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
   linux-std:
     runs-on: ubuntu-22.04
     strategy:
