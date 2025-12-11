@@ -8,6 +8,11 @@ if(WITH_IPOPT)
   link_directories(${IPOPT_LIBRARY_DIRS})
 endif()
 
+# Add IPOPT link directories
+if(WITH_MADNLP)
+  link_directories(${LIBMAD_LIBRARY_DIRS})
+endif()
+
 # Error handling
 add_executable(casadi_error_handling casadi_error_handling.cpp)
 target_link_libraries(casadi_error_handling casadi)
@@ -24,6 +29,14 @@ target_link_libraries(propagating_sparsity casadi)
 if(WITH_IPOPT)
   add_executable(rosenbrock rosenbrock.cpp)
   target_link_libraries(rosenbrock casadi)
+endif()
+
+# Rosenbrock problem (with madnlp)
+if(WITH_MADNLP)
+  add_executable(rosenbrock_madnlp rosenbrock_madnlp.cpp)
+  target_link_libraries(rosenbrock_madnlp casadi)
+  add_executable(rocket_madnlp rocket_madnlp.cpp)
+  target_link_libraries(rocket_madnlp casadi)
 endif()
 
 # Rocket using Ipopt
