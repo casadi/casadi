@@ -50,15 +50,15 @@ class typemaptests(casadiTestCase):
   def test_memleak(self):
   
    a = np.array([[0, 0]])
-   self.assertEqual(sys.getrefcount(a), 2)
+   r = sys.getrefcount(a)
    casadi.DM(a)
-   self.assertEqual(sys.getrefcount(a), 2)
+   self.assertEqual(sys.getrefcount(a), r)
    casadi.DM(a)
-   self.assertEqual(sys.getrefcount(a), 2)
+   self.assertEqual(sys.getrefcount(a), r)
    casadi.SX(a)
-   self.assertEqual(sys.getrefcount(a), 2)   
+   self.assertEqual(sys.getrefcount(a), r)   
    casadi.SX(a)
-   self.assertEqual(sys.getrefcount(a), 2)
+   self.assertEqual(sys.getrefcount(a), r)
    
   def test_0(self):
     self.message("Typemap np.array -> DM")
