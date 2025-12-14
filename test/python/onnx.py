@@ -321,6 +321,424 @@ class Onnxtests(casadiTestCase):
             if os.path.exists(onnx_file):
                 os.remove(onnx_file)
 
+    # ========================================================================
+    # Control Flow Tests
+    # ========================================================================
+
+    def test_control_flow_if_else(self):
+        """Test if_else control flow roundtrip"""
+        if not has_translator("onnx"):
+            self.skipTest("ONNX translator not available")
+
+        # Create a simple if_else function: if x > 0: x+1, else: x-1
+        x = MX.sym("x")
+        f_then = Function("then_branch", [x], [x + 1])
+        f_else = Function("else_branch", [x], [x - 1])
+        f_if = Function.if_else("test_if", f_then, f_else)
+
+        # Test with positive value (should use then branch: 5 + 1 = 6)
+        self.roundtrip_test("if_else", f_if, [DM(5.0)])
+
+    def test_control_flow_map(self):
+        """Test map (Scan) control flow roundtrip"""
+        if not has_translator("onnx"):
+            self.skipTest("ONNX translator not available")
+
+        # Create a simple map function: apply sin to each element
+        x = MX.sym("x")
+        f_base = Function("map_body", [x], [sin(x)])
+        f_map = f_base.map(3, "serial")
+
+        # Test with array of 3 elements
+        self.roundtrip_test("map", f_map, [DM([0.0, 1.0, 2.0])])
+
+    def test_control_flow_mapaccum(self):
+        """Test mapaccum (Loop) control flow roundtrip"""
+        if not has_translator("onnx"):
+            self.skipTest("ONNX translator not available")
+
+        # Create a simple mapaccum function: accumulate by adding 1
+        x = MX.sym("x")
+        f_base = Function("accum_body", [x], [x + 1])
+        f_accum = f_base.mapaccum("test_accum", 3)
+
+        # Test with initial value 0 (should produce: 1, 2, 3)
+        self.roundtrip_test("mapaccum", f_accum, [DM(0.0)])
+
+    def test_conditional_loop_termination(self):
+        """Test Loop with conditional termination (import from ONNX)"""
+        if not has_translator("onnx"):
+            self.skipTest("ONNX translator not available")
+
+        try:
+            import onnx
+            from onnx import helper, TensorProto, numpy_helper
+        except ImportError:
+            self.skipTest("ONNX Python package not available")
+
+        # Create an ONNX Loop that counts from 0 until reaching a threshold
+        # Loop body: (iter, cond, counter) -> (cond_out, counter+1)
+        #   cond_out = (counter < threshold)
+
+        # Create the loop body subgraph
+        # Inputs: iter_num, cond_in, counter
+        # Outputs: cond_out, counter_updated
+
+        body_iter = helper.make_tensor_value_info("iter", TensorProto.DOUBLE, [1, 1])
+        body_cond_in = helper.make_tensor_value_info("cond_in", TensorProto.DOUBLE, [1, 1])
+        body_counter = helper.make_tensor_value_info("counter", TensorProto.DOUBLE, [1, 1])
+
+        # Constant: threshold = 5
+        threshold = helper.make_tensor("threshold", TensorProto.DOUBLE, [1, 1], [5.0])
+
+        # Constant: one = 1
+        one = helper.make_tensor("one", TensorProto.DOUBLE, [1, 1], [1.0])
+
+        # counter_updated = counter + 1
+        add_node = helper.make_node("Add", ["counter", "one"], ["counter_updated"])
+
+        # cond_out = counter < threshold
+        # Note: ONNX Less returns bool, but we need double for consistency
+        # We'll check counter_updated < threshold (so loop runs while counter < 5)
+        less_node = helper.make_node("Less", ["counter_updated", "threshold"], ["cond_out_bool"])
+
+        # Convert bool to double (Cast node)
+        cast_node = helper.make_node("Cast", ["cond_out_bool"], ["cond_out"],
+                                     to=TensorProto.DOUBLE)
+
+        body_cond_out = helper.make_tensor_value_info("cond_out", TensorProto.DOUBLE, [1, 1])
+        body_counter_out = helper.make_tensor_value_info("counter_updated", TensorProto.DOUBLE, [1, 1])
+
+        # Create the body graph
+        body_graph = helper.make_graph(
+            [add_node, less_node, cast_node],
+            "loop_body",
+            [body_iter, body_cond_in, body_counter],
+            [body_cond_out, body_counter_out],
+            [threshold, one]
+        )
+
+        # Create the main graph with Loop operator
+        # Inputs: initial counter value
+        graph_input = helper.make_tensor_value_info("initial_counter", TensorProto.DOUBLE, [1, 1])
+
+        # Loop inputs: max_iter (10), initial_cond (true), counter (0)
+        max_iter = helper.make_tensor("max_iter", TensorProto.INT64, [], [10])
+        init_cond = helper.make_tensor("init_cond", TensorProto.DOUBLE, [1, 1], [1.0])  # true
+
+        # Loop node
+        loop_node = helper.make_node(
+            "Loop",
+            ["max_iter", "init_cond", "initial_counter"],
+            ["final_counter"],
+            body=body_graph
+        )
+
+        # Output
+        graph_output = helper.make_tensor_value_info("final_counter", TensorProto.DOUBLE, [1, 1])
+
+        # Create the graph
+        graph = helper.make_graph(
+            [loop_node],
+            "conditional_loop_test",
+            [graph_input],
+            [graph_output],
+            [max_iter, init_cond]
+        )
+
+        # Create the model
+        model = helper.make_model(graph, producer_name="casadi_test")
+
+        # Save to temp file
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.onnx', delete=False) as f:
+            onnx.save(model, f.name)
+            temp_file = f.name
+
+        try:
+            # Import the ONNX model
+            t = Translator.load("onnx", temp_file)
+            f = t.create("conditional_loop")
+
+            # Test: starting from 0, should count to 5 (when counter becomes 5, condition becomes false)
+            result = f(DM(0.0))
+            expected = DM(5.0)
+
+            # Verify the result
+            self.assertTrue(result.is_dense(), "Result should be dense")
+            self.assertEqual(result.size1(), 1, "Result should be 1x1")
+            self.assertEqual(result.size2(), 1, "Result should be 1x1")
+            self.assertAlmostEqual(float(result), float(expected), places=5,
+                                 msg=f"Loop should terminate at threshold=5, got {float(result)}")
+
+        finally:
+            # Clean up temp file
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
+
+    def test_import_float32_constant(self):
+        """Test importing FLOAT (32-bit) tensors from ONNX"""
+        if not has_translator("onnx"):
+            self.skipTest("ONNX translator not available")
+
+        try:
+            import onnx
+            from onnx import helper, TensorProto
+        except ImportError:
+            self.skipTest("ONNX Python package not available")
+
+        # Create ONNX model with FLOAT constant
+        import tempfile
+        import os
+
+        float_values = [1.5, 2.5, 3.5, 4.5]
+        constant_node = helper.make_node(
+            'Constant',
+            inputs=[],
+            outputs=['output'],
+            value=helper.make_tensor(
+                name='const_tensor',
+                data_type=TensorProto.FLOAT,
+                dims=[2, 2],
+                vals=float_values
+            )
+        )
+
+        graph_output = helper.make_tensor_value_info('output', TensorProto.FLOAT, [2, 2])
+
+        graph = helper.make_graph([constant_node], 'float_test', [], [graph_output])
+        model = helper.make_model(graph, producer_name='casadi_test')
+
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.onnx', delete=False) as f:
+            onnx.save(model, f.name)
+            temp_file = f.name
+
+        try:
+            t = Translator.load("onnx", temp_file)
+            func = t.create("float_import_test")
+            result = func()
+
+            # Verify values (should be promoted to double)
+            self.assertEqual(result.size1(), 2)
+            self.assertEqual(result.size2(), 2)
+            for i in range(4):
+                self.assertAlmostEqual(float(result[i]), float_values[i], places=6)
+        finally:
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
+
+    def test_import_int32_constant(self):
+        """Test importing INT32 tensors from ONNX"""
+        if not has_translator("onnx"):
+            self.skipTest("ONNX translator not available")
+
+        try:
+            import onnx
+            from onnx import helper, TensorProto
+        except ImportError:
+            self.skipTest("ONNX Python package not available")
+
+        import tempfile
+        import os
+
+        int_values = [10, 20, 30, 40, 50, 60]
+        constant_node = helper.make_node(
+            'Constant',
+            inputs=[],
+            outputs=['output'],
+            value=helper.make_tensor(
+                name='const_tensor',
+                data_type=TensorProto.INT32,
+                dims=[2, 3],
+                vals=int_values
+            )
+        )
+
+        graph_output = helper.make_tensor_value_info('output', TensorProto.INT32, [2, 3])
+
+        graph = helper.make_graph([constant_node], 'int32_test', [], [graph_output])
+        model = helper.make_model(graph, producer_name='casadi_test')
+
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.onnx', delete=False) as f:
+            onnx.save(model, f.name)
+            temp_file = f.name
+
+        try:
+            t = Translator.load("onnx", temp_file)
+            func = t.create("int32_import_test")
+            result = func()
+
+            # Verify values (should be converted to double)
+            self.assertEqual(result.size1(), 2)
+            self.assertEqual(result.size2(), 3)
+            for i in range(6):
+                self.assertAlmostEqual(float(result[i]), float(int_values[i]), places=1)
+        finally:
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
+
+    def test_import_int64_constant(self):
+        """Test importing INT64 tensors from ONNX"""
+        if not has_translator("onnx"):
+            self.skipTest("ONNX translator not available")
+
+        try:
+            import onnx
+            from onnx import helper, TensorProto
+        except ImportError:
+            self.skipTest("ONNX Python package not available")
+
+        import tempfile
+        import os
+
+        # Use small INT64 values (within double precision range)
+        int64_values = [100, 200, 300, 400]
+        constant_node = helper.make_node(
+            'Constant',
+            inputs=[],
+            outputs=['output'],
+            value=helper.make_tensor(
+                name='const_tensor',
+                data_type=TensorProto.INT64,
+                dims=[1, 4],
+                vals=int64_values
+            )
+        )
+
+        graph_output = helper.make_tensor_value_info('output', TensorProto.INT64, [1, 4])
+
+        graph = helper.make_graph([constant_node], 'int64_test', [], [graph_output])
+        model = helper.make_model(graph, producer_name='casadi_test')
+
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.onnx', delete=False) as f:
+            onnx.save(model, f.name)
+            temp_file = f.name
+
+        try:
+            t = Translator.load("onnx", temp_file)
+            func = t.create("int64_import_test")
+            result = func()
+
+            # Verify values (should be converted to double)
+            self.assertEqual(result.size1(), 1)
+            self.assertEqual(result.size2(), 4)
+            for i in range(4):
+                self.assertAlmostEqual(float(result[i]), float(int64_values[i]), places=1)
+        finally:
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
+
+    def test_import_bool_constant(self):
+        """Test importing BOOL tensors from ONNX"""
+        if not has_translator("onnx"):
+            self.skipTest("ONNX translator not available")
+
+        try:
+            import onnx
+            from onnx import helper, TensorProto
+        except ImportError:
+            self.skipTest("ONNX Python package not available")
+
+        import tempfile
+        import os
+
+        bool_values = [True, False, True, False, True, True]
+        constant_node = helper.make_node(
+            'Constant',
+            inputs=[],
+            outputs=['output'],
+            value=helper.make_tensor(
+                name='const_tensor',
+                data_type=TensorProto.BOOL,
+                dims=[3, 2],
+                vals=bool_values
+            )
+        )
+
+        graph_output = helper.make_tensor_value_info('output', TensorProto.BOOL, [3, 2])
+
+        graph = helper.make_graph([constant_node], 'bool_test', [], [graph_output])
+        model = helper.make_model(graph, producer_name='casadi_test')
+
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.onnx', delete=False) as f:
+            onnx.save(model, f.name)
+            temp_file = f.name
+
+        try:
+            t = Translator.load("onnx", temp_file)
+            func = t.create("bool_import_test")
+            result = func()
+
+            # Verify values (should be converted to 0.0/1.0)
+            self.assertEqual(result.size1(), 3)
+            self.assertEqual(result.size2(), 2)
+            expected = [1.0, 0.0, 1.0, 0.0, 1.0, 1.0]
+            for i in range(6):
+                self.assertAlmostEqual(float(result[i]), expected[i], places=1)
+        finally:
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
+
+    def test_import_mixed_types(self):
+        """Test ONNX model with multiple tensor types"""
+        if not has_translator("onnx"):
+            self.skipTest("ONNX translator not available")
+
+        try:
+            import onnx
+            from onnx import helper, TensorProto
+        except ImportError:
+            self.skipTest("ONNX Python package not available")
+
+        import tempfile
+        import os
+
+        # Create nodes with different types
+        # FLOAT constant
+        float_const = helper.make_node(
+            'Constant',
+            inputs=[],
+            outputs=['float_val'],
+            value=helper.make_tensor('float_tensor', TensorProto.FLOAT, [1, 1], [2.5])
+        )
+
+        # INT32 constant
+        int_const = helper.make_node(
+            'Constant',
+            inputs=[],
+            outputs=['int_val'],
+            value=helper.make_tensor('int_tensor', TensorProto.INT32, [1, 1], [3])
+        )
+
+        # Add them (both will be double after import)
+        add_node = helper.make_node('Add', ['float_val', 'int_val'], ['output'])
+
+        graph_output = helper.make_tensor_value_info('output', TensorProto.DOUBLE, [1, 1])
+
+        graph = helper.make_graph(
+            [float_const, int_const, add_node],
+            'mixed_types_test',
+            [],
+            [graph_output]
+        )
+        model = helper.make_model(graph, producer_name='casadi_test')
+
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.onnx', delete=False) as f:
+            onnx.save(model, f.name)
+            temp_file = f.name
+
+        try:
+            t = Translator.load("onnx", temp_file)
+            func = t.create("mixed_types_test")
+            result = func()
+
+            # Verify result: 2.5 + 3 = 5.5
+            self.assertAlmostEqual(float(result), 5.5, places=5)
+        finally:
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
+
 
 # ============================================================================
 # DYNAMIC TEST GENERATION (Parametrized Tests for unittest)

@@ -129,10 +129,28 @@ namespace casadi {
       casadi_assert(node_inputs.size() >= 1, "Erf requires 1 input");
       output = erf(node_inputs[0]);
 
+    // Comparison operations
+    } else if (op_type == "Less") {
+      casadi_assert(node_inputs.size() >= 2, "Less requires 2 inputs");
+      // Less: returns 1.0 if input[0] < input[1], 0.0 otherwise
+      // Use CasADi's if_else: if (a < b) then 1.0 else 0.0
+      output = if_else(node_inputs[0] < node_inputs[1], MX(1.0), MX(0.0));
+
     // Utilities
     } else if (op_type == "Identity") {
       casadi_assert(node_inputs.size() >= 1, "Identity requires 1 input");
       output = node_inputs[0];
+
+    } else if (op_type == "Cast") {
+      // Cast operation: type conversion
+      // We support importing DOUBLE, FLOAT, INT32, INT64, BOOL from ONNX,
+      // but all types are converted to double at the tensor_to_dm() boundary.
+      // Within CasADi's symbolic framework, everything is treated as double.
+      // Therefore, Cast is effectively an identity operation during symbolic computation.
+      casadi_assert(node_inputs.size() >= 1, "Cast requires 1 input");
+      output = node_inputs[0];
+      // Note: ONNX Cast has a 'to' attribute specifying target type.
+      // Type conversions happen at ONNX import/export boundaries, not during symbolic ops.
 
     // Tensor operations
     } else if (op_type == "MatMul") {
