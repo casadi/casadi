@@ -388,13 +388,95 @@ namespace casadi {
           uout() << "      Iterations: " << n_iter << std::endl;
         }
 
-        // NOTE: For MVP, we execute fixed iterations
-        // TODO: Implement conditional termination using body's cond_out
+        // Create a conditional wrapper that handles termination
+        // Body outputs: [cond_out, loop_carried..., scan_outputs...]
+        // The wrapper uses if_else to conditionally execute based on cond_in
+
+        // Create symbolic inputs for the wrapper
+        std::vector<MX> wrapper_inputs;
+        std::vector<std::string> wrapper_input_names;
+
+        // Input 0: iteration number
+        MX iter_num = MX::sym("iter_num");
+        wrapper_inputs.push_back(iter_num);
+        wrapper_input_names.push_back("iter_num");
+
+        // Input 1: condition
+        MX cond_in = MX::sym("cond_in");
+        wrapper_inputs.push_back(cond_in);
+        wrapper_input_names.push_back("cond_in");
+
+        // Remaining inputs: loop-carried variables
+        casadi_int n_loop_carried = loop_carried_initial.size();
+        std::vector<MX> loop_vars;
+        for (casadi_int j = 0; j < n_loop_carried; ++j) {
+          MX var = MX::sym("loop_var_" + std::to_string(j),
+                          loop_carried_initial[j].size1(),
+                          loop_carried_initial[j].size2());
+          loop_vars.push_back(var);
+          wrapper_inputs.push_back(var);
+          wrapper_input_names.push_back("loop_var_" + std::to_string(j));
+        }
+
+        // Add outer scope dependencies as inputs
+        for (const auto& dep_name : outer_deps) {
+          MX dep_var = MX::sym(dep_name, value_map[dep_name].size1(),
+                              value_map[dep_name].size2());
+          wrapper_inputs.push_back(dep_var);
+          wrapper_input_names.push_back(dep_name);
+        }
+
+        // Call the body function
+        std::vector<MX> body_outputs = body_func(wrapper_inputs);
+
+        casadi_assert(body_outputs.size() >= 1 + n_loop_carried,
+                     "Loop body must output at least cond_out + loop_carried variables");
+
+        // Extract outputs
+        MX cond_out = body_outputs[0];  // First output is condition
+        std::vector<MX> loop_vars_updated;
+        for (casadi_int j = 0; j < n_loop_carried; ++j) {
+          loop_vars_updated.push_back(body_outputs[1 + j]);
+        }
+
+        // Remaining outputs are scan outputs
+        std::vector<MX> scan_outputs;
+        for (size_t j = 1 + n_loop_carried; j < body_outputs.size(); ++j) {
+          scan_outputs.push_back(body_outputs[j]);
+        }
+
+        // Create conditional outputs using if_else
+        std::vector<MX> wrapper_outputs;
+        std::vector<std::string> wrapper_output_names;
+
+        // Condition output: if cond_in is false, output false; otherwise output cond_out
+        MX cond_out_final = if_else(cond_in, cond_out, MX(false));
+        wrapper_outputs.push_back(cond_out_final);
+        wrapper_output_names.push_back("cond_out");
+
+        // Loop-carried variables: if cond_in is true, use updated values; otherwise keep old values
+        for (casadi_int j = 0; j < n_loop_carried; ++j) {
+          MX loop_var_conditional = if_else(cond_in, loop_vars_updated[j], loop_vars[j]);
+          wrapper_outputs.push_back(loop_var_conditional);
+          wrapper_output_names.push_back("loop_out_" + std::to_string(j));
+        }
+
+        // Scan outputs: if cond_in is true, use scan values; otherwise zeros
+        for (size_t j = 0; j < scan_outputs.size(); ++j) {
+          MX scan_conditional = if_else(cond_in, scan_outputs[j],
+                                       MX::zeros(scan_outputs[j].size1(),
+                                                scan_outputs[j].size2()));
+          wrapper_outputs.push_back(scan_conditional);
+          wrapper_output_names.push_back("scan_out_" + std::to_string(j));
+        }
+
+        // Create the conditional wrapper function
+        Function conditional_wrapper("conditional_loop_body_" + std::to_string(i),
+                                    wrapper_inputs, wrapper_outputs,
+                                    wrapper_input_names, wrapper_output_names);
 
         // Use mapaccum for stateful iteration
-        // Body outputs: [cond_out, loop_carried..., scan_outputs...]
-        // We'll use only the loop-carried part for mapaccum state
-        Function loop_func = body_func.mapaccum("loop_" + std::to_string(i), n_iter);
+        Function loop_func = conditional_wrapper.mapaccum("loop_" + std::to_string(i), n_iter);
 
         // Prepare inputs: initial condition + loop-carried deps + outer deps
         std::vector<MX> loop_inputs;

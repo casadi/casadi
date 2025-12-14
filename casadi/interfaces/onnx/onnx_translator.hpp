@@ -317,6 +317,9 @@ namespace casadi {
   /** \brief Add graph inputs to ONNX graph (defined in onnx_export.cpp) */
   void add_graph_inputs(onnx::GraphProto* graph, const Function& f);
 
+  /** \brief Add graph outputs to ONNX graph (defined in onnx_export.cpp) */
+  void add_graph_outputs(onnx::GraphProto* graph, const Function& f);
+
   /** \brief Create binary operation ONNX node (defined in onnx_operations.cpp) */
   onnx::NodeProto* create_binary_node(
       onnx::GraphProto* graph,
