@@ -123,7 +123,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       image: ["windows-2022","ubuntu-24.04","macos-13","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-15-intel","macos-14"]
     steps:
       - uses: actions/checkout@v4.1.1
       - run: python --version
@@ -150,7 +150,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [macos-13,macos-14]
+        image: [macos-15-intel,macos-14]
     steps:
       - run: echo "${{ vars.BLESSED_REPO }} ${{ vars.BLESSED_REPO }}"
       - uses: casadi/action-setup-compiler@master
@@ -176,7 +176,7 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'macos-14') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-13') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'macos-14') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-15-intel') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - name: Debug
         if: failure()
@@ -273,7 +273,7 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-13]
+              image: [macos-15-intel]
               py2: ["27","36","37","38","39","310","311","312","313","314"]
             operations:
               - type: append
@@ -414,13 +414,13 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-13]
+              image: [macos-15-intel]
               host: ["matlab"]
               version: ["2018b"]
             operations:
               - type: append
                 matrix:
-                  image: [macos-13]
+                  image: [macos-15-intel]
                   host: ["octave"]
                   version: ["7.3.0"]
               - type: append
@@ -475,7 +475,7 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "macos-13": {"os": "osx", "bitness": "64"},
+              "macos-15-intel": {"os": "osx", "bitness": "64"},
               "macos-14": {"os": "osx_arm", "bitness": "64"}
            }
           export_to: env
@@ -754,7 +754,7 @@ jobs:
      fail-fast: false
      matrix:
        matlab: ["2018b"]
-       image: ["windows-2022","ubuntu-24.04","macos-13"]
+       image: ["windows-2022","ubuntu-24.04","macos-15-intel","macos-14"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -772,7 +772,8 @@ jobs:
            {
               "windows-2022": {"os": "windows"},
               "ubuntu-24.04": {"os": "linux"},
-              "macos-13": {"os": "osx"}
+              "macos-15-intel": {"os": "osx"},
+              "macos-14": {"os": "osx"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.7
@@ -819,7 +820,7 @@ jobs:
      fail-fast: false
      matrix:
        version: ["7.3.0"]
-       image: ["windows-2022","ubuntu-22.04","macos-13"]
+       image: ["windows-2022","ubuntu-22.04","macos-15-intel","macos-14"]
        bit: [64]
     steps:
       - uses: actions/checkout@v4.1.1
@@ -830,7 +831,8 @@ jobs:
            {
               "windows-2022": {"os": "windows"},
               "ubuntu-22.04": {"os": "linux"},
-              "macos-13": {"os": "osx"}
+              "macos-14": {"os": "osx"},
+              "macos-15-intel": {"os": "osx"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.7
@@ -939,7 +941,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["27","36","37","38","39","310","311","312","313"]
-       image: ["windows-2022","ubuntu-24.04","macos-13","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-15-intel","macos-14"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -963,7 +965,7 @@ jobs:
            {
               "windows-2022": {"os": "windows"},
               "ubuntu-24.04": {"os": "linux"},
-              "macos-13": {"os": "osx"},
+              "macos-15-intel": {"os": "osx"},
               "macos-14": {"os": "osx_arm"}
            }
           export_to: env
@@ -1020,7 +1022,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["310"]
-       image: ["windows-2022","ubuntu-24.04","macos-13","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-1","macos-14"]
        bit: [64]
     steps:
       - uses: actions/checkout@v4.1.1
@@ -1034,7 +1036,7 @@ jobs:
            {
               "windows-2022": {"os": "windows","platform":"win_amd64"},
               "ubuntu-24.04": {"os": "linux","platform":"manylinux2014_x86_64"},
-              "macos-13": {"os": "osx","platform":"macosx_10_13_x86_64.macosx_10_13_intel"},
+              "macos-15-intel": {"os": "osx","platform":"macosx_10_13_x86_64.macosx_10_13_intel"},
               "macos-14": {"os": "osx_arm","platform":"macosx_11_0_arm64"}
            }
           export_to: env
