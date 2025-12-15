@@ -4359,7 +4359,41 @@ class MXtests(casadiTestCase):
         print(r)
         self.assertTrue("@1=sin(y)" in str(r))
       
+  def test_is_slice2(self):
 
+    m = 13
+    n = 11
+
+    x = MX.sym("x",m,n)
+    DM.rng(1)
+    A = DM.rand(m,n)
+
+
+    for step_col in [1,2,3]:
+        for step_row in [1,2,3]:
+            nz = []
+            
+            cslice = range(3,7,step_col)
+            for col in cslice:
+                rslice = range(1,9,step_row)
+                for row in rslice:
+                    nz.append(row+m*col)
+
+            assert(is_slice2(nz))
+            
+            # adversarial insert
+            for j in range(len(nz)):
+                nz_mod = list(nz)
+                if j==0:
+                    val = nz[0]-1
+                else:
+                    val = int(floor((nz[j]+nz[j-1])/2))
+                nz_mod.insert(j,val)
+                assert(not is_slice2(nz_mod))
+            r = x[rslice,cslice]
+            assert(";" in str(r))
+            f = Function('f',[x],[r])
+            self.checkarray(f(A),A[rslice,cslice])
   
 if __name__ == '__main__':
     unittest.main()
