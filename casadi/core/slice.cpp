@@ -231,11 +231,10 @@ namespace casadi {
     casadi_assert_dev(stop_inner>=0);
 
     // Get the end of the outer slice
-    casadi_int stop_outer = v.back();
-    do {
-      if (step_outer>0) stop_outer++;
-      else             stop_outer--;
-    } while (stop_outer % step_outer!=0);
+    // Calculate based on actual number of groups in the data
+    casadi_int inner_size = (stop_inner - start_inner) / step_inner;
+    casadi_int num_groups = v.size() / inner_size;
+    casadi_int stop_outer = start_outer + num_groups * step_outer;
 
     // Check consistency
     std::vector<casadi_int>::const_iterator it=v.begin();
@@ -284,11 +283,10 @@ namespace casadi {
     }
 
     // Get the end of the outer slice
-    outer.stop = v.back();
-    do {
-      if (outer.step>0) outer.stop++;
-      else              outer.stop--;
-    } while (outer.stop % outer.step!=0);
+    // Calculate based on actual number of groups in the data
+    casadi_int inner_size = (inner.stop - inner.start) / inner.step;
+    casadi_int num_groups = v.size() / inner_size;
+    outer.stop = outer.start + num_groups * outer.step;
     return std::make_pair(inner, outer);
   }
 
