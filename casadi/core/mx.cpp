@@ -2100,10 +2100,121 @@ namespace casadi {
     casadi_assert(nonzeros_.size() == sparsity_.nnz(), "Number of nonzeros does not match sparsity");
   }
 
+bool MX::compact_mtimes(const MX& x, const MX& y, MX& z, double alpha) {
+  std::string dummy;
+  return compact_mtimes(x, y, z, alpha, "", "", dummy);
+}
+
+bool MX::compact_mtimes(const MX& x, const MX& y, MX& z, double alpha,
+                        const std::string& x_descr, const std::string& y_descr,
+                        std::string& z_descr) {
+  // Get supports via is_compactible
+  std::vector<casadi_int> x_row_support, x_col_support;
+  std::vector<casadi_int> y_row_support, y_col_support;
+  bool x_is_compact = x.sparsity().is_compactible(x_row_support, x_col_support);
+  bool y_is_compact = y.sparsity().is_compactible(y_row_support, y_col_support);
+
+  if (x_is_compact && y_is_compact) {
+    // Find intersection of x_col_support and y_row_support
+    std::set<casadi_int> y_row_set(y_row_support.begin(), y_row_support.end());
+    std::vector<casadi_int> intersection;
+    for (casadi_int col : x_col_support) {
+      if (y_row_set.count(col)) {
+        intersection.push_back(col);
+      }
+    }
+
+    if (intersection.empty()) {
+      // No overlap - result is zero, nothing to add
+      return true;
+    }
+
+    std::set<casadi_int> intersection_set(intersection.begin(), intersection.end());
+
+    // Create compact versions of x and y
+    Sparsity x_compact_sp = Sparsity::rowcol(x_row_support, x_col_support, x.size1(), x.size2());
+    MX x_compact = sparsity_cast(project(x, x_compact_sp),
+                                 Sparsity::dense(x_row_support.size(), x_col_support.size()));
+
+    Sparsity y_compact_sp = Sparsity::rowcol(y_row_support, y_col_support, y.size1(), y.size2());
+    MX y_compact = sparsity_cast(project(y, y_compact_sp),
+                                 Sparsity::dense(y_row_support.size(), y_col_support.size()));
+
+    // Select columns of x_compact where x_col_support[i] is in intersection
+    std::vector<casadi_int> x_col_indices;
+    for (casadi_int i = 0; i < static_cast<casadi_int>(x_col_support.size()); ++i) {
+      if (intersection_set.count(x_col_support[i])) {
+        x_col_indices.push_back(i);
+      }
+    }
+
+    // Select rows of y_compact where y_row_support[i] is in intersection
+    std::vector<casadi_int> y_row_indices;
+    for (casadi_int i = 0; i < static_cast<casadi_int>(y_row_support.size()); ++i) {
+      if (intersection_set.count(y_row_support[i])) {
+        y_row_indices.push_back(i);
+      }
+    }
+
+    // Slice the compact matrices
+    MX x_sliced = x_compact(Slice(), x_col_indices);
+    MX y_sliced = y_compact(y_row_indices, Slice());
+
+    // Perform dense multiplication
+    MX result_dense = alpha * mtimes(x_sliced, y_sliced);
+
+    // Add result directly at the right rows/columns
+    z.add(result_dense, false, x_row_support, y_col_support);
+
+    // Update z description
+    std::string alpha_str = (alpha == 1.0) ? "" : (alpha == -1.0) ? "-" : (std::to_string(alpha) + "*");
+    if (z_descr.empty()) {
+      z_descr = alpha_str + "compact_mtimes(" + x_descr + "," + y_descr + ")";
+    } else {
+      z_descr = z_descr + " + " + alpha_str + "compact_mtimes(" + x_descr + "," + y_descr + ")";
+    }
+    return true;
+  } else if (y.is_dense() && x.size2()>0 && x.size1()>x.size2() && x.size1() % x.size2()==0 && x.sparsity()==Sparsity::repmat(Sparsity::diag(x.size2()), x.size1() / x.size2())) {
+    MX x_compact = sparsity_cast(x, Sparsity::dense(x.size1() / x.size2(), x.size2()));
+
+    Sparsity sp = Sparsity::diag(x.size2());
+
+    for (casadi_int i=0;i<x_compact.size1();++i) {
+      z.add(alpha * mtimes(sparsity_cast(x_compact(i, Slice()), sp), y), false, range(i*x.size2(), (i+1)*x.size2()), range(y.size2()));
+    }
+    return true;
+  } else {
+    if (x.nnz() && y.nnz() && !x.sparsity().is_diag() && !y.sparsity().is_diag()) {
+      casadi_int cost = SX::n_nodes(SX::mtimes(SX::sym("y",x.sparsity()),SX::sym("y",y.sparsity())));
+      if (cost>0) { //} && x.size1()==10 && x.size2()==120 && y.size2()==21) {
+        uout() << "Missed compaction in compact_mtimes: cost=" << cost << ": " << x.sparsity().dim(true) << " x " << y.sparsity().dim(true) << std::endl;
+        uout() << "--- x ---" << x_descr << std::endl;
+        x.sparsity().spy(uout());
+        uout() << "--- y ---" << y_descr << std::endl;
+        y.sparsity().spy(uout());
+        //uout() << "----added to-----" << z_descr << std::endl;
+        uout() << "y actual" << y << std::endl;
+      }
+    }
+
+    // Fallback to normal sparse multiplication (no projection nodes added)
+    z += alpha*mtimes(x, y);
+
+    // Update z description
+    std::string alpha_str = (alpha == 1.0) ? "" : (alpha == -1.0) ? "-" : (str(alpha) + "*");
+    if (z_descr.empty()) {
+      z_descr = alpha_str + "mtimes(" + x_descr + "," + y_descr + ")";
+    } else {
+      z_descr = z_descr + " + " + alpha_str + "mtimes(" + x_descr + "," + y_descr + ")";
+    }
+    return false;
+  }
+}
+
 
 
 template<typename T>
-void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vector<T>& y, const Sparsity& sp_y, std::vector<T>& z, const Sparsity& sp_z, casadi_int tr) { // NOLINT(whitespace/line_length)
+void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vector<T>& y, const Sparsity& sp_y, std::vector<T>& z, const Sparsity& sp_z, casadi_int tr, const std::vector<std::string>& x_descr, const std::vector<std::string>& y_descr, std::vector<std::string>& z_descr) { // NOLINT(whitespace/line_length)
   casadi_int ncol_x, ncol_y, ncol_z, cc;
   const casadi_int *colind_x, *row_x, *colind_y, *row_y, *colind_z, *row_z;
 
@@ -2116,14 +2227,17 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
   colind_z = sp_z.colind(); row_z = sp_z.row();
 
   std::vector<T> w(tr ? sp_z.size2() : sp_z.size1());
+  std::vector<std::string> w_descr(w.size());
 
   if (tr) {
+    casadi_error("Cannot occur");
     // Loop over the columns of y and z
     for (cc=0; cc<ncol_z; ++cc) {
       casadi_int kk;
       // Get the dense column of y
       for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
         w[row_y[kk]] = y[kk];
+        w_descr[row_y[kk]] = y_descr[kk];
       }
       // Loop over the nonzeros of z
       for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
@@ -2131,7 +2245,8 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         casadi_int rr = row_z[kk];
         // Loop over corresponding columns of x
         for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
-          z[kk] += mtimes(x[kk1], w[row_x[kk1]]);
+          compact_mtimes(x[kk1], w[row_x[kk1]], z[kk], 1.0,
+                         x_descr[kk1], w_descr[row_x[kk1]], z_descr[kk]);
         }
       }
     }
@@ -2142,6 +2257,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       // Get the dense column of z
       for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
         w.at(row_z[kk]) = z[kk];
+        w_descr.at(row_z[kk]) = z_descr[kk];
       }
       // Loop over the nonzeros of y
       for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
@@ -2149,19 +2265,21 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         casadi_int rr = row_y[kk];
         // Loop over corresponding columns of x
         for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
-          w.at(row_x[kk1]) += mtimes(x[kk1], y[kk]);
+          compact_mtimes(x[kk1], y[kk], w.at(row_x[kk1]), 1.0,
+                         x_descr[kk1], y_descr[kk], w_descr.at(row_x[kk1]));
         }
       }
       // Get the sparse column of z
       for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
         z[kk] = w.at(row_z[kk]);
+        z_descr[kk] = w_descr.at(row_z[kk]);
       }
     }
   }
 }
 
   template <typename T>
-  void block_trilsolve(const Sparsity& sp_a, const std::vector<T>& blocks_a, std::vector<T>& x, bool tr, casadi_int nrhs) {
+  void block_trilsolve(const Sparsity& sp_a, const std::vector<T>& blocks_a, std::vector<T>& x, bool tr, casadi_int nrhs, const std::vector<std::string>& blocks_a_descr, std::vector<std::string>& x_descr) {
     casadi_assert(sp_a.is_tril(),
       "Sparsity must be lower triangular for trilsolve");
     // Local variables
@@ -2177,26 +2295,30 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     // For all right hand sides
     for (rhs = 0; rhs < nrhs; ++rhs) {
       if (tr) {
+        casadi_error("Cannot occur");
         // Backward substitution
         for (c = ncol; c-- > 0; ) {
           for (k = colind[c + 1]; k-- > colind[c]; ) {
             r = row[k];
             if (r == c) {
               x[rhs_offset+c] = solve(blocks_a[k], x[rhs_offset+c]);
+              x_descr[rhs_offset+c] = "solve(" + blocks_a_descr[k] + "," + x_descr[rhs_offset+c] + ")";
             } else {
-              x[rhs_offset+c] -= mtimes(blocks_a[k], x[rhs_offset+r]);
+              compact_mtimes(blocks_a[k], x[rhs_offset+r], x[rhs_offset+c], -1.0,
+                             blocks_a_descr[k], x_descr[rhs_offset+r], x_descr[rhs_offset+c]);
             }
           }
         }
       } else {
-        // Forward substitution
+        // Forward substitutions
         for (c = 0; c < ncol; ++c) {
           for (k = colind[c]; k < colind[c+1]; ++k) {
             r = row[k];
             if (r == c) {
               x[rhs_offset+r] = solve(blocks_a[k], x[rhs_offset+r]);
+              x_descr[rhs_offset+r] = "solve(" + blocks_a_descr[k] + "," + x_descr[rhs_offset+r] + ")";
             } else {
-              x[rhs_offset+r] -= mtimes(blocks_a[k], x[rhs_offset+c]);
+              compact_mtimes(blocks_a[k], x[rhs_offset+c], x[rhs_offset+r], -1.0, blocks_a_descr[k], x_descr[rhs_offset+c], x_descr[rhs_offset+r]);
             }
           }
         }
@@ -2479,6 +2601,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     std::vector<casadi_int> rows_A;
     std::vector<casadi_int> cols_A;
     std::vector<MX> blocks_A;
+    std::vector<std::string> blocks_A_descr;
 
     std::vector<bool> blocks_A_simplify;
 
@@ -2488,6 +2611,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       rows_A.push_back(block_row);
       cols_A.push_back(block_row);
       blocks_A.push_back(MX::eye(e.numel()));
+      blocks_A_descr.push_back("eye");
       blocks_A_simplify.push_back(false);
       block_row++;
     }
@@ -2545,7 +2669,9 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
           
             rows_A.push_back(block_row);
             cols_A.push_back(block_col);
-            blocks_A.push_back(-res[lm.orig.n_in()*e.which_output()+i]);
+            casadi_int res_i = lm.orig.n_in()*e.which_output()+i;
+            blocks_A.push_back(-res[res_i]);
+            blocks_A_descr.push_back(lm.orig.name() + ": " + lm.jacobian.name_out(res_i));
             blocks_A_simplify.push_back(false);
           }
         }
@@ -2554,10 +2680,26 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         casadi_int block_col = 0;
         for (const auto & ee : v) {
           MX J = jacobian(e, ee);
+
           if (J.nnz()) {
+            if (true) {
+              // How would J look like ideally (blasfeo compatible)?
+              std::vector<casadi_int> J_row_support, J_col_support;
+              J.sparsity().is_compactible(J_row_support, J_col_support);
+              Sparsity Jcand = Sparsity::rowcol(range(J.size1()),J_col_support,J.size1(),J.size2());
+              if (J.nnz() && J.nnz()<Jcand.nnz() && Jcand.nnz()<=10*J.nnz()) {
+                uout() << "jac_vdef_v simpl" << std::endl;
+                uout() << "before" << std::endl;
+                J.sparsity().spy(uout());
+                uout() << "after" << std::endl;
+                Jcand.spy(uout());
+                J = project(J, Jcand);
+              }
+            }
             rows_A.push_back(block_row);
             cols_A.push_back(block_col);
             blocks_A.push_back(-J);
+            blocks_A_descr.push_back("jac_vdef_v: jacobian(" + str(e) + "," +  str(ee)+ ")");
             blocks_A_simplify.push_back(true);
           }
           block_col++;
@@ -2567,12 +2709,35 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       block_row++;
     }
 
+
+
     // Compose b / jac_vdef_x
     std::vector<MX> res;
+    std::vector<std::string> res_descr;
     for (const MX & ee : varg) {
       for (const MX & e : vdef) {
         MX J = jacobian(e, ee);
+
+        if (true) {
+
+
+          // How would J look like ideally (blasfeo compatible)?
+          std::vector<casadi_int> J_row_support, J_col_support;
+          J.sparsity().is_compactible(J_row_support, J_col_support);
+          Sparsity Jcand = Sparsity::rowcol(range(J.size1()),J_col_support,J.size1(),J.size2());
+          if (J.nnz() && J.nnz()<Jcand.nnz() && Jcand.nnz()<=10*J.nnz()) {
+            uout() << "jac_vdef_x simpl" << std::endl;
+            uout() << "before" << std::endl;
+            J.sparsity().spy(uout());
+            uout() << "after" << std::endl;
+            Jcand.spy(uout());
+            J = project(J, Jcand);
+          }
+
+
+        }
         res.push_back(J);
+        res_descr.push_back("jac_vdef_x: jacobian("+str(e) + "," + str(ee) + ")");
       }
     }
 
@@ -2580,6 +2745,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     std::vector<casadi_int> rows_B;
     std::vector<casadi_int> cols_B;
     std::vector<MX> blocks_B;
+    std::vector<std::string> blocks_B_descr;
 
     std::vector<casadi_int> block_B_symbolic;
     block_row = 0;
@@ -2589,7 +2755,22 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         rows_B.push_back(block_row);
         cols_B.push_back(block_col);
         MX J = jacobian(e, ee);
+
+        // How would J look like ideally (blasfeo compatible)?
+        std::vector<casadi_int> J_row_support, J_col_support;
+        J.sparsity().is_compactible(J_row_support, J_col_support);
+        Sparsity Jcand = Sparsity::rowcol(J_row_support,range(J.size2()),J.size1(),J.size2());
+        if (J.nnz() && J.nnz()<Jcand.nnz() && Jcand.nnz()<=10*J.nnz()) {
+          uout() << "jac_r_v simpl" << std::endl;
+          uout() << "before" << std::endl;
+          J.sparsity().spy(uout());
+          uout() << "after" << std::endl;
+          Jcand.spy(uout());
+          J = project(J, Jcand);
+        }
+
         blocks_B.push_back(J);
+        blocks_B_descr.push_back("jac_r_v: jacobian("+str(e) + "," + str(ee) + ")");
         block_col++;
       }
       block_row++;
@@ -2597,6 +2778,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
 
     // Compose J: Direct dependence on arg (e.g. x_dot contains x) / jac_r_x
     std::vector<MX> blocks_J;
+    std::vector<std::string> blocks_J_descr;
     std::vector<casadi_int> block_J_symbolic;
 
     casadi_int offset = 0;
@@ -2604,6 +2786,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       for (const std::vector<MX>& a : arg) {
         MX J = densify(jacobian(e, vertcat(a)));
         blocks_J.push_back(J);
+        blocks_J_descr.push_back("jac_r_x: jacobian("+str(e) + "," + str(vertcat(a)) + ")");
       }
     }
 
@@ -2678,17 +2861,20 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     std::vector<casadi_int> mapping;
     Sparsity sp_A = Sparsity::triplet(v.size(), v.size(), rows_A, cols_A, mapping, false);
     blocks_A = vector_slice(blocks_A, mapping);
+    blocks_A_descr = vector_slice(blocks_A_descr, mapping);
 
     Sparsity sp_B = Sparsity::triplet(vexpr.size(), v.size(), rows_B, cols_B, mapping, false);
     blocks_B = vector_slice(blocks_B, mapping);
+    blocks_B_descr = vector_slice(blocks_B_descr, mapping);
 
     // res <- A^-1 b
-    block_trilsolve(sp_A, blocks_A, res, false, varg.size());
+    block_trilsolve(sp_A, blocks_A, res, false, varg.size(), blocks_A_descr, res_descr);
 
     // Interpret res as a block-matrix C
     std::vector<casadi_int> rows_C;
     std::vector<casadi_int> cols_C;
     std::vector<MX> blocks_C;
+    std::vector<std::string> blocks_C_descr;
 
     block_row = 0;
     for (const auto& e : vdef) {
@@ -2696,8 +2882,9 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       for (const auto& ee : varg) {
         rows_C.push_back(block_row);
         cols_C.push_back(block_col);
-        blocks_C.push_back(res.at(block_col*vdef.size()+block_row));
-
+        casadi_int res_i = block_col*vdef.size()+block_row;
+        blocks_C.push_back(res.at(res_i));
+        blocks_C_descr.push_back(res_descr[res_i]);
         block_col++;
       }
       block_row++;
@@ -2705,23 +2892,28 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
 
     Sparsity sp_C = Sparsity::triplet(vdef.size(), varg.size(), rows_C, cols_C, mapping, false);
     blocks_C = vector_slice(blocks_C, mapping);
+    blocks_C_descr = vector_slice(blocks_C_descr, mapping);
+    
 
     // R <- B C
 
     Sparsity sp_R = Sparsity::mtimes(sp_B, sp_C);
     std::vector<MX> blocks_R(sp_R.nnz());
+    std::vector<std::string> blocks_R_descr(sp_R.nnz());
 
     block_row = 0;
     for (const auto& e : vexpr) {
       casadi_int block_col = 0;
       for (const auto& ee : varg) {
-        blocks_R[block_col*vexpr.size()+block_row] = MX::zeros(e.numel(), ee.numel());
+        casadi_int i = block_col*vexpr.size()+block_row;
+        blocks_R[i] = MX::zeros(e.numel(), ee.numel());
+        blocks_R_descr.push_back("0");
         block_col++;
       }
       block_row++;
     }
 
-    block_mtimes(blocks_B, sp_B, blocks_C, sp_C, blocks_R, sp_R, false);
+    block_mtimes(blocks_B, sp_B, blocks_C, sp_C, blocks_R, sp_R, false, blocks_B_descr, blocks_C_descr, blocks_R_descr);
 
     std::vector<MX> out;
 

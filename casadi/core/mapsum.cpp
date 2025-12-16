@@ -690,6 +690,38 @@ namespace casadi {
     // Generate map of derivative
     Function Jf = f_.jacobian();
 
+    if (Jf.is_a("SXFunction")) {
+      std::vector<SX> arg = Jf.sx_in();
+      std::vector<SX> res = Jf(arg);
+      Dict opts = Jf->generate_options("clone");
+      // Look for densify opportunities
+      size_t i=0;
+      for (size_t oind = 0; oind < n_out_; ++oind) {
+        for (size_t iind = 0; iind < n_in_; ++iind) {
+          Sparsity sp = Jf.sparsity_out(i);
+          if (sp.nnz()) {
+            std::vector<casadi_int> row_support, col_support;
+            sp.is_compactible(row_support, col_support);
+            Sparsity cand = Sparsity::rowcol(range(sp.size1()),col_support,sp.size1(),sp.size2());
+            if (cand.nnz()>sp.nnz() && cand.nnz()<=10*sp.nnz()) {
+              sp = cand;
+              uout() << "densify along rows: " << Jf.name_out(i) << std::endl;
+              uout() << "before: " << std::endl;
+              res[i].sparsity().spy(uout()); 
+              uout() << "after: " << std::endl;
+              cand.spy(uout()); 
+
+              res[i] = project(res[i], cand);
+
+            }
+          }
+          i++;
+        }
+      }
+
+      Jf = Function(Jf.name(), arg, res, Jf.name_in(), Jf.name_out(), opts);
+    }
+
     std::vector<bool> reduce_in = reduce_in_;
     for (size_t oind = 0; oind < n_out_; ++oind) { // Nominal outputs
       reduce_in.push_back(reduce_out_[oind]);

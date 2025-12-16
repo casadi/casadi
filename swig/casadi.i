@@ -3921,6 +3921,9 @@ DECL M casadi_no_grad(const M& expr) {
 DECL M casadi_permute_layout(const M& x, const Relayout& relay) {
   return permute_layout(x, relay);
 }
+DECL void casadi_compact_mtimes(const M& x, const M& y, M& INOUT1, double alpha=1.0) {
+  compact_mtimes(x, y, INOUT1, alpha);
+}
 
 #endif
 %enddef

@@ -4371,5 +4371,205 @@ class MXtests(casadiTestCase):
             f = Function('f',[x],[r])
             self.checkarray(f(A),A[rslice,cslice])
   
+  def test_compact_mtimes(self):
+    self.message("compact_mtimes")
+    np.random.seed(42)
+
+    for trans_x in [False, True]:
+      for trans_y in [False, True]:
+        for alpha in [1.0, -0.5]:
+          for amalgamate in [False, True]:
+            # Create random vector base sparsity patterns (must be vectors for compactibility)
+            sp_base_x = sparsify(DM(np.random.rand(8, 1) > 0.3)).sparsity()
+            sp_base_y = sparsify(DM(np.random.rand(8, 1) > 0.3)).sparsity()
+
+            # Create patterns via kron with dense blocks (makes them compactible)
+            sp_x = kron(sp_base_x,Sparsity.dense(1, 8))
+            sp_y = kron( sp_base_y,Sparsity.dense(1, 8))
+            
+            
+
+            if amalgamate:
+              # Sparsify slightly to test amalgamation threshold (keep ~95% of entries)
+              x_mask = DM(sp_x, np.random.rand(sp_x.nnz()) > 0.05)
+              y_mask = DM(sp_y, np.random.rand(sp_y.nnz()) > 0.05)
+              sp_x = sparsify(x_mask).sparsity()
+              sp_y = sparsify(y_mask).sparsity()
+
+            x = MX.sym("x", sp_x)
+            y = MX.sym("y", sp_y)
+
+
+            # Apply transposes
+            xx = x.T if trans_x else x
+            yy = y.T if trans_y else y
+
+
+            # Skip if dimensions don't match for mtimes
+            if xx.size2() != yy.size1():
+              continue
+
+            # Test compact_mtimes: z += alpha * mtimes(x, y)
+            z_init = MX.sym("z", xx.size1(), yy.size2())
+            z = MX(z_init)
+            compact_mtimes(xx, yy, z, alpha)
+
+
+            print("x")
+            xx.sparsity().spy()
+            
+            print("y")
+            yy.sparsity().spy()
+            
+            print(z)
+
+            # Reference: regular mtimes
+            z_ref = z_init + alpha * mtimes(xx, yy)
+
+            # Create functions and compare
+            f = Function("f", [x, y, z_init], [z])
+            f_ref = Function("f_ref", [x, y, z_init], [z_ref])
+
+            # Test with random values
+            x_val = DM(sp_x, np.random.randn(sp_x.nnz()))
+            y_val = DM(sp_y, np.random.randn(sp_y.nnz()))
+            z_init_val = DM.rand(xx.size1(), yy.size2())
+
+            result = f(x_val, y_val, z_init_val)
+            result_ref = f_ref(x_val, y_val, z_init_val)
+
+            self.checkarray(result, result_ref,
+              failmessage="trans_x=%s, trans_y=%s, alpha=%s, amalgamate=%s" % (trans_x, trans_y, alpha, amalgamate))
+
+  def test_compact_mtimes2(self):
+
+    def randrange(n):
+      a = random.randint(0, n) 
+      b = random.randint(0, n)
+      if a>b:
+        b,a = a,b
+      return a,b
+          
+    for k in range(10):
+
+
+
+      m = 30
+      n = 20
+      p = 60
+
+      A = DM(m,n)
+      B = DM(n,p)
+
+      a_row = np.unique(np.random.randint(0, m, size=m//4))
+      a_col = np.unique(np.random.randint(0, n, size=n//4))
+
+      b_row = np.unique(np.random.randint(0, n, size=n//4))
+      b_col = np.unique(np.random.randint(0, p, size=p//4))
+
+      A[a_row, a_col] = DM.rand(len(a_row),len(a_col))
+
+      B[b_row, b_col] = DM.rand(len(b_row),len(b_col))
+
+      A_sp = A.sparsity()
+      B_sp = B.sparsity()
+
+      [A_is_compact,a_row_support,a_col_support] = A_sp.is_compactible()
+      [B_is_compact,b_row_support,b_col_support] = B_sp.is_compactible()
+
+      assert A_is_compact
+      assert B_is_compact
+
+      intersection = set(a_col_support).intersection(set(b_row_support))
+
+      Acompact = sparsity_cast(A,Sparsity.dense(len(a_row),len(a_col)))
+      Bcompact = sparsity_cast(B,Sparsity.dense(len(b_row),len(b_col)))
+
+      Acompact = Acompact[:,[i for i in range(len(a_col)) if a_col_support[i] in intersection]]
+      Bcompact = Bcompact[[i for i in range(len(b_row)) if b_row_support[i] in intersection],:]
+
+      r  = sparsity_cast(mtimes(Acompact,Bcompact),mtimes(A_sp,B_sp))
+      r2 = mtimes(A,B)
+
+
+      assert r.sparsity()==r2.sparsity()
+      self.checkarray(r,r2)
+
+  def test_compact_mtimes3(self):
+    """Test compact_mtimes when both x and y are compactible (MX path)"""
+
+    for k in range(10):
+      m = 30
+      n = 20
+      p = 60
+
+      A = DM(m,n)
+      B = DM(n,p)
+
+      a_row = np.unique(np.random.randint(0, m, size=m//4))
+      a_col = np.unique(np.random.randint(0, n, size=n//4))
+
+      b_row = np.unique(np.random.randint(0, n, size=n//4))
+      b_col = np.unique(np.random.randint(0, p, size=p//4))
+
+      A[a_row, a_col] = DM.rand(len(a_row),len(a_col))
+      B[b_row, b_col] = DM.rand(len(b_row),len(b_col))
+
+      A_sp = A.sparsity()
+      B_sp = B.sparsity()
+
+      [A_is_compact,a_row_support,a_col_support] = A_sp.is_compactible()
+      [B_is_compact,b_row_support,b_col_support] = B_sp.is_compactible()
+
+      assert A_is_compact
+      assert B_is_compact
+
+      # Create MX symbols with the compactible sparsity patterns
+      A_mx = MX.sym("A", A_sp)
+      B_mx = MX.sym("B", B_sp)
+
+      # Use compact_mtimes directly
+      Z = DM.rand(m, p)
+      z = MX(Z)
+      compact_mtimes(A_mx, B_mx, z, 1.0)
+      
+      print(z)
+
+      # Reference: DM mtimes
+      r_ref = Z + mtimes(A, B)
+
+      # Evaluate MX function
+      f = Function("f", [A_mx, B_mx], [z])
+      r_test = f(A, B)
+
+      self.checkarray(r_test, r_ref, failmessage="k=%d" % k)
+
+  def test_compact_mtimes4(self):
+    """Test compact_mtimes when both x and y are compactible (MX path)"""
+    
+    A = DM.rand(vertcat(Sparsity.diag(5),Sparsity.diag(5),Sparsity.diag(5)))
+    
+    B = DM.rand(5,3)
+    
+   
+    # Create MX symbols with the compactible sparsity patterns
+    A_mx = MX.sym("A", A.sparsity())
+    B_mx = MX.sym("B", B.sparsity())
+
+    # Use compact_mtimes directly
+    Z = DM.rand(15, 3)
+    z = MX(Z)
+    compact_mtimes(A_mx, B_mx, z, 1.0)
+
+    # Reference: DM mtimes
+    r_ref = Z + mtimes(A, B)
+
+    # Evaluate MX function
+    f = Function("f", [A_mx, B_mx], [z])
+    r_test = f(A, B)
+
+    self.checkarray(r_test, r_ref)
+
+
 if __name__ == '__main__':
     unittest.main()
