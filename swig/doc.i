@@ -45365,7 +45365,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/slice.hpp#L127
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/slice.cpp#L292-L296
+https://github.com/casadi/casadi/blob/main/casadi/core/slice.cpp#L290-L294
 
 ";
 
@@ -62311,7 +62311,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/slice.hpp#L202
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/slice.cpp#L202-L253
+https://github.com/casadi/casadi/blob/main/casadi/core/slice.cpp#L202-L252
 
 ";
 
@@ -62324,10 +62324,10 @@ is_slice2(v) to
  be true)
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/slice.hpp#L255
+https://github.com/casadi/casadi/blob/main/casadi/core/slice.hpp#L254
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/slice.cpp#L255-L289
+https://github.com/casadi/casadi/blob/main/casadi/core/slice.cpp#L254-L287
 
 ";
 
