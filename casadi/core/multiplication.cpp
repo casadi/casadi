@@ -201,12 +201,14 @@ namespace casadi {
               g.work(res[0], nnz(), false)) << '\n';
       }
 
+      g.comment("sparsity " + dep(0).sparsity().dim(true) + " x " + dep(1).sparsity().dim(true) + " -> " + sparsity().dim(true));
       // Perform sparse matrix multiplication
       g << g.mtimes(g.work(arg[1], dep(1).nnz(), arg_is_ref[1]), dep(1).sparsity(),
                             g.work(arg[2], dep(2).nnz(), arg_is_ref[2]), dep(2).sparsity(),
                             g.work(res[0], nnz(), false), sparsity(), "w", trans_x_) << '\n';
     } else {
       g << g.clear(g.work(res[0], nnz(), false), nnz()) << '\n';
+      g.comment("sparsity " + dep(0).sparsity().dim(true) + " x " + dep(1).sparsity().dim(true) + " -> " + sparsity().dim(true));
       // Perform sparse matrix multiplication
       g << g.mtimes(g.work(arg[0], dep(0).nnz(), arg_is_ref[0]), dep(0).sparsity(),
                             g.work(arg[1], dep(1).nnz(), arg_is_ref[1]), dep(1).sparsity(),

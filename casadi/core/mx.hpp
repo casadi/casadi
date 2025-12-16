@@ -797,6 +797,10 @@ namespace casadi {
     static MX stop_diff(const MX& expr, const MX& var, casadi_int order);
     static std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b);
     static MX permute_layout(const MX& x, const Relayout& relay);
+    static bool compact_mtimes(const MX& x, const MX& y, MX& z, double alpha=1.0);
+    static bool compact_mtimes(const MX& x, const MX& y, MX& z, double alpha,
+                               const std::string& x_descr, const std::string& y_descr,
+                               std::string& z_descr);
     ///@}
     /// \endcond
 
@@ -1033,6 +1037,18 @@ namespace casadi {
       return MX::permute_layout(expr, relay);
     }
 
+    /** \brief Multiply-accumulate with amalgamation to dense kernels
+     *
+     * Computes z += alpha * mtimes(x, y). If x and y are sufficiently dense
+     * within their support blocks, projects them to dense and uses dense multiplication. */
+    inline friend bool compact_mtimes(const MX& x, const MX& y, MX& z, double alpha=1.0) {
+      return MX::compact_mtimes(x, y, z, alpha);
+    }
+    inline friend bool compact_mtimes(const MX& x, const MX& y, MX& z, double alpha,
+                                      const std::string& x_descr, const std::string& y_descr,
+                                      std::string& z_descr) {
+      return MX::compact_mtimes(x, y, z, alpha, x_descr, y_descr, z_descr);
+    }
 
 /** @} */
 #endif // SWIG
