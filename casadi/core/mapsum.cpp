@@ -53,7 +53,7 @@ namespace casadi {
       casadi_error("Unknown parallelization: " + parallelization);
     }
 
-    if (!vectorize_f(f, n)) return ret.wrap_as_needed(opts);
+    if (!vectorize_f(f, n)) return ret.wrap_as_needed(ret.name(), opts);
 
     const MapSum& m = *static_cast<const MapSum*>(ret.get());
 
