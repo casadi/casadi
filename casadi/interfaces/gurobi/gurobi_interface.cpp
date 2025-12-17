@@ -29,6 +29,78 @@
 
 namespace casadi {
 
+  // Helper functions for cleaner C API usage
+  // Error handling macro
+  #define GUROBI_CALL_WARN(func, msg) do { \
+      int error = (func); \
+      if (error) { \
+          casadi_warning(msg ": Gurobi error " + std::to_string(error)); \
+          return; \
+      } \
+  } while(0)
+
+  // Convert string sense to Gurobi sense
+  char sense_to_gurobi(const std::string& sense) {
+    if (sense == "<=") return GRB_LESS_EQUAL;
+    if (sense == ">=") return GRB_GREATER_EQUAL;
+    if (sense == "=") return GRB_EQUAL;
+    return GRB_LESS_EQUAL; // default
+  }
+
+  // RAII wrapper for callback data access
+  class CallbackDataHelper {
+  private:
+    void* cbdata_;
+    int where_;
+
+  public:
+    CallbackDataHelper(void* cbdata, int where) : cbdata_(cbdata), where_(where) {}
+
+    bool getDouble(int what, double& value) {
+      int error = GRBcbget(cbdata_, where_, what, &value);
+      return error == 0;
+    }
+
+    bool getInt(int what, int& value) {
+      int error = GRBcbget(cbdata_, where_, what, &value);
+      return error == 0;
+    }
+
+    bool getSolution(std::vector<double>& solution) {
+      int error = GRBcbget(cbdata_, where_, GRB_CB_MIPSOL_SOL, solution.data());
+      return error == 0;
+    }
+
+    bool addLazyConstraint(const std::vector<int>& ind,
+                                          const std::vector<double>& val,
+                                          char sense, double rhs) const {
+      if (where_ != GRB_CB_MIPSOL) {
+        casadi_warning("Can only add lazy constraints in MIPSOL context");
+        return 1;
+      }
+
+      int error = GRBcblazy(cbdata_, static_cast<int>(ind.size()), ind.data(), val.data(), sense, rhs);
+      if (error != 0) {
+        casadi_warning("GRBcblazy failed with code: " + std::to_string(error));
+      }
+      return error == 0;
+    }
+  };
+
+  // Static C callback function
+  static int gurobi_mipsol_callback(GRBmodel *model, void *cbdata, int where, void *usrdata) {
+    try {
+      if (where == GRB_CB_MIPSOL && usrdata) {
+        GurobiInterface* interface = static_cast<GurobiInterface*>(usrdata);
+        interface->handle_mipsol_callback(model, cbdata, where);
+      }
+    } catch (const std::exception& e) {
+      // Don't let exceptions escape to C code
+      casadi_warning("Exception in Gurobi callback: " + std::string(e.what()));
+    }
+    return 0; // Continue optimization
+  }
+
   extern "C"
   int CASADI_CONIC_GUROBI_EXPORT
   casadi_register_conic_gurobi(Conic::Plugin* plugin) {
@@ -56,7 +128,12 @@ namespace casadi {
 
   GurobiInterface::GurobiInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
-    : Conic(name, st) {
+    : Conic(name, st),
+      enable_mipsol_callback_(false),
+      mipsol_callback_(Function()),
+      suppress_all_output_(false)
+  {
+
   }
 
   GurobiInterface::~GurobiInterface() {
@@ -79,7 +156,17 @@ namespace casadi {
         "Weights corresponding to SOS entries."}},
       {"sos_types",
        {OT_INTVECTOR,
-        "Specify 1 or 2 for each SOS group."}}
+        "Specify 1 or 2 for each SOS group."}},
+      {"mipsol_callback",
+        {OT_FUNCTION,
+          "User callback function for MIPSOL events. "
+          "Input: dict with solution data. Output: dict with lazy constraints."}},
+      {"enable_mipsol_callback",
+        {OT_BOOL,
+          "Enable MIPSOL callbacks for dynamic constraint generation"}},
+      {"suppress_all_output",
+        {OT_BOOL,
+        "Suppress all console output from Gurobi (sets OutputFlag and LogToConsole to 0 before the environment starts)."}}
      }
   };
 
@@ -107,7 +194,34 @@ namespace casadi {
       } else if (op.first=="sos_types") {
         sos_types = op.second.to_int_vector();
       }
-    }
+        else if (op.first == "mipsol_callback") {
+            try {
+                // Attempt to convert to function
+                mipsol_callback_ = op.second;
+                casadi_message("Successfully obtained callback function");
+
+                // Verify signature
+                if (mipsol_callback_.n_in() != 5 || mipsol_callback_.n_out() != 3) {
+                    casadi_error("Callback function has wrong signature. Expected 5 inputs, 3 outputs");
+                }
+            } catch (const std::exception& e) {
+                casadi_error("Failed to get callback function: " + std::string(e.what()));
+            }
+        }
+        else if (op.first == "enable_mipsol_callback") {
+            enable_mipsol_callback_ = op.second;
+        }
+        else if (op.first == "suppress_all_output") {
+          suppress_all_output_ = op.second;
+        }
+      }
+    // Final validation
+    if (enable_mipsol_callback_) {
+      if (mipsol_callback_.is_null()) {
+          casadi_error("mipsol_callback must be provided when enable_mipsol_callback is true");
+      }
+      casadi_message("Callback setup complete");
+      }
 
     // Validaty SOS constraints
     check_sos(nx_, sos_groups, sos_weights, sos_types);
@@ -155,9 +269,26 @@ namespace casadi {
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Load environment
-    casadi_int flag = GRBloadenv(&m->env, nullptr); // no log file
-    casadi_assert(!flag && m->env, "Failed to create GUROBI environment. Flag: " + str(flag)
-      + ":" + GRBgeterrormsg(m->env));
+    casadi_int flag;
+    if (suppress_all_output_) {
+      flag = GRBemptyenv(&m->env);
+      casadi_assert(!flag && m->env,
+        "Failed to create empty GUROBI environment. Flag: " + str(flag));
+
+      flag = GRBsetintparam(m->env, "OutputFlag", 0);
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
+
+      flag = GRBsetintparam(m->env, "LogToConsole", 0);
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
+
+      flag = GRBstartenv(m->env);
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
+    } else {
+      flag = GRBloadenv(&m->env, nullptr); // current behaviour
+      casadi_assert(!flag && m->env,
+        "Failed to create GUROBI environment. Flag: " + str(flag)
+        + ":" + GRBgeterrormsg(m->env));
+    }
 
     m->pool_sol_nr = 0;
 
@@ -246,7 +377,7 @@ namespace casadi {
     int *ind2=reinterpret_cast<int*>(iw); iw+=nx_;
     char *vtypes=reinterpret_cast<char*>(iw); iw+=nx_;
 
-    // Greate an empty model
+    // Create an empty model
     GRBmodel *model = nullptr;
     try {
       casadi_int flag = GRBnewmodel(m->env, &model, name_.c_str(), 0,
@@ -269,7 +400,7 @@ namespace casadi {
           // Variable marked as discrete (integer or binary)
           vtype = lb==0 && ub==1 ? GRB_BINARY : GRB_INTEGER;
         } else {
-          // Continious variable
+          // Continuous variable
           vtype = GRB_CONTINUOUS;
         }
         vtypes[i] = vtype;
@@ -462,6 +593,23 @@ namespace casadi {
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
+      // Enable lazy constraints and callback if needed
+      if (enable_mipsol_callback_) {
+        // Enable lazy constraints
+        int error = GRBsetintparam(GRBgetenv(model), "LazyConstraints", 1);
+        if (error) {
+          casadi_warning("Failed to enable LazyConstraints parameter");
+          return 1;
+        }
+        // Set the callback function
+        error = GRBsetcallbackfunc(model, gurobi_mipsol_callback,
+                                  const_cast<GurobiInterface*>(this));
+        if (error) {
+          casadi_warning("Failed to set callback function");
+          return 1;
+        }
+      }
+
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();
 
@@ -537,6 +685,11 @@ namespace casadi {
         }
       }
 
+      if (enable_mipsol_callback_) {
+      // Clear callback to avoid dangling pointer
+      GRBsetcallbackfunc(model, nullptr, nullptr);
+      }
+
       // Free memory
       GRBfreemodel(model);
       m->fstats.at("postprocessing").toc();
@@ -569,7 +722,10 @@ namespace casadi {
   }
 
   GurobiInterface::GurobiInterface(DeserializingStream& s) : Conic(s) {
-    s.version("GurobiInterface", 1);
+    s.version("GurobiInterface", 2);
+    s.unpack("GurobiInterface::suppress_all_output", suppress_all_output_);
+    s.unpack("GurobiInterface::enable_mipsol_callback", enable_mipsol_callback_);
+    s.unpack("GurobiInterface::mipsol_callback", mipsol_callback_);
     s.unpack("GurobiInterface::vtype", vtype_);
     s.unpack("GurobiInterface::opts", opts_);
     s.unpack("GurobiInterface::sos_weights", sos_weights_);
@@ -579,9 +735,12 @@ namespace casadi {
     Conic::deserialize(s, sdp_to_socp_mem_);
   }
 
-  void GurobiInterface::serialize_body(SerializingStream &s) const {
+void GurobiInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
-    s.version("GurobiInterface", 1);
+    s.version("GurobiInterface", 2);
+    s.pack("GurobiInterface::suppress_all_output", suppress_all_output_);
+    s.pack("GurobiInterface::enable_mipsol_callback", enable_mipsol_callback_);
+    s.pack("GurobiInterface::mipsol_callback", mipsol_callback_);
     s.pack("GurobiInterface::vtype", vtype_);
     s.pack("GurobiInterface::opts", opts_);
     s.pack("GurobiInterface::sos_weights", sos_weights_);
@@ -590,5 +749,168 @@ namespace casadi {
     s.pack("GurobiInterface::sos_types", sos_types_);
     Conic::serialize(s, sdp_to_socp_mem_);
   }
+
+void GurobiInterface::handle_mipsol_callback(GRBmodel *model, void *cbdata, int where) {
+  try {
+    if (!enable_mipsol_callback_ || mipsol_callback_.is_null()) {
+      casadi_warning("Callback triggered but not properly initialized");
+      return;
+    }
+
+    CallbackDataHelper helper(cbdata, where);
+
+    // Get the number of variables
+    int numvars;
+    int error = GRBgetintattr(model, "NumVars", &numvars);
+    if (error) {
+      casadi_warning("Failed to get number of variables in callback");
+      return;
+    }
+
+    // Get the integer solution
+    std::vector<double> x_vals(numvars);
+    if (!helper.getSolution(x_vals)) {
+      casadi_warning("Failed to get solution in MIPSOL callback");
+      return;
+    }
+
+    // Convert to CasADi DM (only use the variables we care about)
+    DM x_solution = DM::zeros(nx_, 1);
+    for (casadi_int i = 0; i < nx_ && i < numvars; ++i) {
+      x_solution(i) = x_vals[i];
+    }
+
+    // Get additional solution information
+    double obj_val, obj_best, obj_bound;
+    int sol_count;
+
+    if (!helper.getDouble(GRB_CB_MIPSOL_OBJ, obj_val) ||
+        !helper.getDouble(GRB_CB_MIPSOL_OBJBST, obj_best) ||
+        !helper.getDouble(GRB_CB_MIPSOL_OBJBND, obj_bound) ||
+        !helper.getInt(GRB_CB_MIPSOL_SOLCNT, sol_count)) {
+      casadi_warning("Failed to get callback information");
+      return;
+    }
+
+    // Prepare input data for callback
+    std::vector<double> input_data;
+
+    // Add x_solution data
+    const double* x_ptr = x_solution.ptr();
+    input_data.insert(input_data.end(), x_ptr, x_ptr + nx_);
+
+    // Add scalar values
+    input_data.push_back(obj_val);
+    input_data.push_back(obj_best);
+    input_data.push_back(obj_bound);
+    input_data.push_back(static_cast<double>(sol_count));
+
+    // Prepare output buffers
+    double flag = 0.0;                      // First output: boolean (as double)
+    std::vector<double> a_vec(nx_, 0.0);    // Second output: vector A
+    double b_val = 0.0;                     // Third output: scalar b
+
+    // Get memory requirements for the callback
+    casadi_int sz_arg = mipsol_callback_.sz_arg();
+    casadi_int sz_res = mipsol_callback_.sz_res();
+    casadi_int sz_iw = mipsol_callback_.sz_iw();
+    casadi_int sz_w = mipsol_callback_.sz_w();
+
+    // Allocate work arrays
+    std::vector<casadi_int> iw(sz_iw);
+    std::vector<double> w(sz_w);
+
+    // Set up argument pointers
+    std::vector<const double*> arg(sz_arg);
+    std::vector<double*> res(sz_res);
+
+    // Fill input arguments
+    if (sz_arg > 0) {
+      size_t offset = 0;
+      if (sz_arg > 0) {
+        arg[0] = &input_data[offset];  // x
+        offset += nx_;
+      }
+      for (casadi_int i = 1; i < sz_arg && offset < input_data.size(); ++i) {
+        arg[i] = &input_data[offset];  // Scalars
+        offset += 1;
+      }
+    }
+
+    // Set up output pointers
+    if (sz_res >= 1) res[0] = &flag;
+    if (sz_res >= 2) res[1] = a_vec.data();
+    if (sz_res >= 3) res[2] = &b_val;
+
+    // Call the callback function
+    int callback_result = mipsol_callback_(arg.data(), res.data(),
+                                           iw.data(), w.data(), 0);
+
+    if (callback_result != 0) {
+      casadi_warning("Callback function returned error code: " + std::to_string(callback_result));
+      return;
+    }
+
+    // Process results if the callback requests constraint
+    if (flag > 0.5) {
+      DM A = DM::zeros(1, nx_);
+      for (casadi_int i = 0; i < nx_; ++i) {
+        A(0, i) = a_vec[i];
+      }
+      DM b = DM(b_val);
+
+      std::vector<DM> callback_outputs = {flag, A, b};
+      process_lazy_constraints(model, cbdata, callback_outputs);
+    }
+
+  } catch (const std::exception& e) {
+    casadi_warning("Error in handle_mipsol_callback: " + std::string(e.what()));
+  }
+}
+
+void GurobiInterface::process_lazy_constraints(GRBmodel *model, void *cbdata,
+                                               const std::vector<DM>& callback_result) {
+  try {
+    if (callback_result.size() < 3) {
+      casadi_warning("Callback result does not contain enough data");
+      return;
+    }
+
+    // Expected order: [add_lazy_constraint_flag, A_lazy, b_lazy, (optional) sense]
+    double add_lazy_flag = static_cast<double>(callback_result[0]);
+    if (add_lazy_flag < 0.5) return;
+
+    DM A_lazy = callback_result[1];
+    DM b_lazy = callback_result[2];
+    std::string sense = "<=";
+
+    CallbackDataHelper helper(cbdata, GRB_CB_MIPSOL);
+
+    for (casadi_int i = 0; i < A_lazy.size1(); ++i) {
+      std::vector<int> cind;
+      std::vector<double> cval;
+
+      for (casadi_int j = 0; j < A_lazy.size2() && j < nx_; ++j) {
+        double coeff = static_cast<double>(A_lazy(i, j));
+        if (std::abs(coeff) > 1e-12) {
+          cind.push_back(static_cast<int>(j));
+          cval.push_back(coeff);
+        }
+      }
+
+      if (!cind.empty()) {
+        double rhs = static_cast<double>(b_lazy(i));
+        char gurobi_sense = sense_to_gurobi(sense);
+
+        if (!helper.addLazyConstraint(cind, cval, gurobi_sense, rhs)) {
+          casadi_warning("Failed to add lazy constraint " + std::to_string(i));
+        }
+      }
+    }
+
+  } catch (const std::exception& e) {
+    casadi_warning("Error processing lazy constraints: " + std::string(e.what()));
+  }
+}
 
 } // namespace casadi
