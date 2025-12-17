@@ -160,6 +160,8 @@ namespace casadi {
     // Memory structure
     casadi_daqp_prob<double> p_;
 
+    std::vector<int> integrality_;
+
   };
 } // end namespace casadi
 /// \endcond
