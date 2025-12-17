@@ -745,6 +745,9 @@ class CASADI_EXPORT DaeBuilder
   /// Evaluate the values for a set of variables at the initial time, single value
   GenericType get(const std::string& name) const;
 
+  /// Symbolic DAE instance?
+  bool symbolic() const;
+
 #endif  // !SWIGMATLAB
 
   /// Get an attribute

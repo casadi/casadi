@@ -268,7 +268,7 @@ void DaeBuilder::load_fmi_description(const std::string& filename) {
 
 bool DaeBuilder::provides_directional_derivatives() const {
   try {
-    casadi_assert(!(*this)->symbolic_, "Functionality only applies to imported standard FMUs");
+    casadi_assert(!symbolic(), "Functionality only applies to imported standard FMUs");
     return (*this)->provides_directional_derivatives_;
   } catch (std::exception& e) {
     THROW_ERROR("provides_directional_derivatives", e.what());
@@ -1496,7 +1496,7 @@ std::vector<GenericType> DaeBuilder::get(const std::vector<std::string>& name) c
     std::vector<GenericType> ret;
     ret.reserve(name.size());
     // For symbolic FMUs, we can just retrieve the values
-    if ((*this)->symbolic_) {
+    if (symbolic()) {
       // Retrieve the attributes
       for (auto& n : name) {
         // Get the variable
@@ -1530,6 +1530,15 @@ std::vector<GenericType> DaeBuilder::get(const std::vector<std::string>& name) c
   } catch (std::exception& e) {
     THROW_ERROR("get", e.what());
     return {};
+  }
+}
+
+bool DaeBuilder::symbolic() const {
+  try {
+    return (*this)->symbolic_;
+  } catch (std::exception& e) {
+    THROW_ERROR("symbolic", e.what());
+    return false; // never reached
   }
 }
 
