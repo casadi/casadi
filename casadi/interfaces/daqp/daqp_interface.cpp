@@ -49,6 +49,8 @@ namespace casadi {
   DaqpInterface::DaqpInterface(const std::string& name,
                              const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
+
+    has_refcount_ = true;
   }
 
   const Options DaqpInterface::options_
