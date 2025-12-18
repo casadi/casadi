@@ -2949,27 +2949,42 @@ class Functiontests(casadiTestCase):
         res = k.find_functions(0)
         
         self.assertEqual(len(ref),len(res))
-        for a,b in zip(ref,res):  assert(a.name() is b.name())
+        for a,b in zip(ref,res):  assert(a.name() == b.name())
           
         ref = [j,i,g]
         res = k.find_functions(1)
         
         self.assertEqual(len(ref),len(res))
-        for a,b in zip(ref,res):  assert(a.name() is b.name())
+        for a,b in zip(ref,res):  assert(a.name() == b.name())
         
         ref = [j,i,h,g]
         res = k.find_functions(2)
         
         self.assertEqual(len(ref),len(res))
-        for a,b in zip(ref,res):  assert(a.name() is b.name())    
+        for a,b in zip(ref,res):  assert(a.name() == b.name())    
 
         ref = [j,i,h,g]
         res = k.find_functions()
         
         self.assertEqual(len(ref),len(res))
-        for a,b in zip(ref,res):  assert(a.name() is b.name())    
+        for a,b in zip(ref,res):  assert(a.name() == b.name())    
 
 
+        intg = integrator("intg","rk",{"x":x,"ode":k(x)})
+        ref = [intg.get_function("dae"),k,j,i,h,g,intg.get_function("daeF"),intg.get_function("step")]
+        res = intg.find_functions()
+        print(res)
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name()==b.name())    
+
+        K = k.map(5)
+        
+        ref = [k,j,i,h,g]
+        res = K.find_functions()
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() == b.name())    
 
   def test_post_expand(self):
 

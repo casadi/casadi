@@ -204,6 +204,10 @@ namespace casadi {
     // Get a dependency function
     const Function& get_function(const std::string &name) const override;
 
+    // Get all embedded functions, recursively
+    void find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
+        casadi_int max_depth) const override;
+
     // Is a function monitored?
     virtual bool monitored(const std::string &name) const;
 

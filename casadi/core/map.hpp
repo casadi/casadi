@@ -63,6 +63,10 @@ namespace casadi {
     // Get a dependency function
     const Function& get_function(const std::string &name) const override;
 
+    // Get all embedded functions, recursively
+    void find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
+        casadi_int max_depth) const override;
+
     // Check if a particular dependency exists
     bool has_function(const std::string& fname) const override;
 
