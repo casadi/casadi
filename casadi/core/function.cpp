@@ -1892,12 +1892,11 @@ namespace casadi {
       // If negative, make largest positive number
       if (max_depth < 0) max_depth = std::numeric_limits<casadi_int>::max();
       // The internal routine uses a map to avoid duplicate functions
-      std::map<FunctionInternal*, Function> all_fun;
+      std::map<FunctionInternal*, std::pair<Function, size_t> > all_fun;
       (*this)->find(all_fun, max_depth);
       // Create return object
-      std::vector<Function> ret;
-      ret.reserve(all_fun.size());
-      for (auto&& e : all_fun) ret.push_back(e.second);
+      std::vector<Function> ret(all_fun.size());
+      for (auto&& e : all_fun) ret[e.second.second] = e.second.first;
       return ret;
     } catch(std::exception& e) {
       THROW_ERROR("find", e.what());
@@ -1910,11 +1909,11 @@ namespace casadi {
       // If negative, make largest positive number
       if (max_depth < 0) max_depth = std::numeric_limits<casadi_int>::max();
       // The internal routine uses a map to avoid duplicate functions
-      std::map<FunctionInternal*, Function> all_fun;
+      std::map<FunctionInternal*, std::pair<Function, size_t> > all_fun;
       (*this)->find(all_fun, max_depth);
       // Search this map
       for (auto&& e : all_fun) {
-        if (e.second.name() == name) return e.second;
+        if (e.second.first.name() == name) return e.second.first;
       }
       // Not found
       casadi_error("'" + name + "' not found");

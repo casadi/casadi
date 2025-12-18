@@ -1972,7 +1972,7 @@ namespace casadi {
     return new SXFunction(s);
   }
 
-  void SXFunction::find(std::map<FunctionInternal*, Function>& all_fun,
+  void SXFunction::find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
       casadi_int max_depth) const {
     for (auto&& e : algorithm_) {
       if (e.op == OP_CALL) {

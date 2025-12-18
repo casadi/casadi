@@ -372,7 +372,8 @@ class CASADI_EXPORT SXFunction :
   SX instructions_sx() const override;
 
   // Get all embedded functions, recursively
-  void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
+  void find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
+    casadi_int max_depth) const override;
 
     /** \brief Change option after object creation for debugging
 
