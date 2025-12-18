@@ -203,18 +203,22 @@ namespace casadi {
 
   void Call::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
     if (has_refcount()) {
+      std::string cg_name = fcn_->codegen_name(g, false);
       auto i = added.insert(fcn_.get());
       if (i.second) { // prevent duplicate calls
-        g << fcn_->codegen_name(g) << "_incref();\n";
+        std::string incref = g.shorthand(cg_name + "_incref");
+        g << incref << "();\n";
       }
     }
   }
 
   void Call::codegen_decref(CodeGenerator& g, std::set<void*>& added) const {
     if (has_refcount()) {
+      std::string cg_name = fcn_->codegen_name(g, false);
       auto i = added.insert(fcn_.get());
       if (i.second) { // prevent duplicate calls
-        g << fcn_->codegen_name(g) << "_decref();\n";
+        std::string decref = g.shorthand(cg_name + "_decref");
+        g << decref << "();\n";
       }
     }
   }

@@ -737,7 +737,7 @@ class casadiTestCase(unittest.TestCase):
     # Find symbols starting with 'casadi'
     exclude_symbols = ['casadi_alloc', 'casadi_alloc_arrays', 'casadi_decompress', 'casadi_deinit', 'casadi_eval', 'casadi_free', 'casadi_free_arrays', 'casadi_init', 'casadi_init_arrays']
     
-    bad_symbols = [s for s in all_exported if s.startswith('casadi') and not "free_mem" in s and not "incref" in s and not "decref" in s and not s in exclude_symbols]
+    bad_symbols = [s for s in all_exported if s.startswith('casadi') and not s in exclude_symbols]
 
     if bad_symbols:
       self.fail(f"Found {len(bad_symbols)} symbols starting with 'casadi' exported in shared library (missing CASADI_PREFIX): {bad_symbols[:10]}")
