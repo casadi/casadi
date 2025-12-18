@@ -2187,7 +2187,7 @@ bool MX::compact_mtimes(const MX& x, const MX& y, MX& z, double alpha,
     if (x.nnz() && y.nnz() && !x.sparsity().is_diag() && !y.sparsity().is_diag()) {
       casadi_int cost = SX::n_nodes(SX::mtimes(SX::sym("y",x.sparsity()),SX::sym("y",y.sparsity())));
       if (cost>0) { //} && x.size1()==10 && x.size2()==120 && y.size2()==21) {
-        uout() << "Missed compaction in compact_mtimes: cost=" << cost << ": " << x.sparsity().dim(true) << " x " << y.sparsity().dim(true) << std::endl;
+        uout() << "Missed promotion in compact_mtimes: cost=" << cost << ": " << x.sparsity().dim(true) << " x " << y.sparsity().dim(true) << std::endl;
         uout() << "--- x ---" << x_descr << std::endl;
         x.sparsity().spy(uout());
         uout() << "--- y ---" << y_descr << std::endl;
@@ -2688,11 +2688,11 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
               J.sparsity().is_compactible(J_row_support, J_col_support);
               Sparsity Jcand = Sparsity::rowcol(range(J.size1()),J_col_support,J.size1(),J.size2());
               if (J.nnz() && J.nnz()<Jcand.nnz() && Jcand.nnz()<=10*J.nnz()) {
-                uout() << "jac_vdef_v simpl" << std::endl;
+                /*uout() << "jac_vdef_v simpl" << std::endl;
                 uout() << "before" << std::endl;
                 J.sparsity().spy(uout());
                 uout() << "after" << std::endl;
-                Jcand.spy(uout());
+                Jcand.spy(uout());*/
                 J = project(J, Jcand);
               }
             }
@@ -2726,11 +2726,11 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
           J.sparsity().is_compactible(J_row_support, J_col_support);
           Sparsity Jcand = Sparsity::rowcol(range(J.size1()),J_col_support,J.size1(),J.size2());
           if (J.nnz() && J.nnz()<Jcand.nnz() && Jcand.nnz()<=10*J.nnz()) {
-            uout() << "jac_vdef_x simpl" << std::endl;
+            /*uout() << "jac_vdef_x simpl" << std::endl;
             uout() << "before" << std::endl;
             J.sparsity().spy(uout());
             uout() << "after" << std::endl;
-            Jcand.spy(uout());
+            Jcand.spy(uout());*/
             J = project(J, Jcand);
           }
 
@@ -2761,11 +2761,11 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
         J.sparsity().is_compactible(J_row_support, J_col_support);
         Sparsity Jcand = Sparsity::rowcol(J_row_support,range(J.size2()),J.size1(),J.size2());
         if (J.nnz() && J.nnz()<Jcand.nnz() && Jcand.nnz()<=10*J.nnz()) {
-          uout() << "jac_r_v simpl" << std::endl;
+          /*uout() << "jac_r_v simpl" << std::endl;
           uout() << "before" << std::endl;
           J.sparsity().spy(uout());
           uout() << "after" << std::endl;
-          Jcand.spy(uout());
+          Jcand.spy(uout());*/
           J = project(J, Jcand);
         }
 

@@ -705,7 +705,7 @@ namespace casadi {
             Sparsity cand = Sparsity::rowcol(range(sp.size1()),col_support,sp.size1(),sp.size2());
             if (cand.nnz()>sp.nnz() && cand.nnz()<=10*sp.nnz()) {
               sp = cand;
-              uout() << "densify along rows: " << Jf.name_out(i) << std::endl;
+              uout() << "column densification in " << f_.name() << ": " << Jf.name_out(i) << std::endl;
               uout() << "before: " << std::endl;
               res[i].sparsity().spy(uout()); 
               uout() << "after: " << std::endl;
