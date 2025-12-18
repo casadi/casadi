@@ -2541,31 +2541,6 @@ namespace casadi {
     bool needs_mem = codegen_needs_mem();
     std::string name = codegen_name(g, false);
 
-    g << g.declare("int " + name_ + "_alloc_mem(void)") << " {\n";
-    if (needs_mem) {
-      std::string alloc_mem = g.shorthand(name + "_alloc_mem");
-      g << "return " << alloc_mem << "();\n";
-    } else {
-      g << "return 0;\n";
-    }
-    g << "}\n\n";
-
-    g << g.declare("int " + name_ + "_init_mem(int mem)") << " {\n";
-    if (needs_mem) {
-      std::string init_mem = g.shorthand(name + "_init_mem");
-      g << "return " << init_mem << "(mem);\n";
-    } else {
-      g << "return 0;\n";
-    }
-    g << "}\n\n";
-
-    g << g.declare("void " + name_ + "_free_mem(int mem)") << " {\n";
-    if (needs_mem) {
-      std::string free_mem = g.shorthand(name + "_free_mem");
-      g << free_mem << "(mem);\n";
-    }
-    g << "}\n\n";
-
     // Checkout/release routines
     g << g.declare("int " + name_ + "_checkout(void)") << " {\n";
     if (needs_mem) {
@@ -2856,9 +2831,6 @@ namespace casadi {
         << name_ << "_checkout,\n"
         << name_ << "_release,\n"
         << name_ << "_default_in,\n"
-        //<< name_ << "_alloc_mem,\n"
-        //<< name_ << "_init_mem,\n"
-        //<< name_ << "_free_mem,\n"
         << name_ << "_n_in,\n"
         << name_ << "_n_out,\n"
         << name_ << "_name_in,\n"
