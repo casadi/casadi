@@ -2922,6 +2922,55 @@ class Functiontests(casadiTestCase):
 
     self.checkfunction_light(g, f2, inputs=[3])
 
+  def test_find_function(self):
+    for X in [MX,SX]:
+        x = X.sym("x")
+        
+        """
+           k
+           j
+         i    g
+        h  g      
+        """
+
+        g = Function("g",[x],[x**2],{"never_inline":True})
+        
+        h = Function("h",[x],[g(x**2)],{"never_inline":True})
+        
+        i = Function("i",[x],[h(x**2)+g(x**2)],{"never_inline":True})
+        
+        j = Function("j",[x],[i(x**2)+g(x**2)],{"never_inline":True})
+        
+        k = Function("k",[x],[j(x**2)],{"never_inline":True})
+        
+        k.generate('f.c')
+         
+        ref = [j]
+        res = k.find_functions(0)
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() is b.name())
+          
+        ref = [j,i,g]
+        res = k.find_functions(1)
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() is b.name())
+        
+        ref = [j,i,h,g]
+        res = k.find_functions(2)
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() is b.name())    
+
+        ref = [j,i,h,g]
+        res = k.find_functions()
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() is b.name())    
+
+
+
   def test_post_expand(self):
 
     x = MX.sym("x")
