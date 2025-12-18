@@ -758,6 +758,14 @@ namespace casadi {
     // Finalize base classes
     ProtoFunction::finalize();
 
+    // Does any embedded function have reference counting for codegen?
+    for (const Function& f : shared_from_this<Function>().find_functions(0)) {
+      if (f->has_refcount_) {
+        has_refcount_ = true;
+        break;
+      }
+    }
+
     // Dump if requested
     if (dump_) dump();
   }
