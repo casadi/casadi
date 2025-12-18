@@ -355,6 +355,12 @@ class CASADI_EXPORT SXFunction :
       \identifier{v5} */
   void codegen_body(CodeGenerator& g) const override;
 
+  /** \brief Increment the reference count of functions */
+  void codegen_incref(CodeGenerator& g) const override;
+
+  /** \brief Decrement the reference count of functions */
+  void codegen_decref(CodeGenerator& g) const override;
+
   /** \brief  Propagate sparsity forward
 
       \identifier{v6} */

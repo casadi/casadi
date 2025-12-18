@@ -3010,28 +3010,54 @@ class Functiontests(casadiTestCase):
   def test_memful_main(self):
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
-    inputs = c.convert_in(inputs)
     extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
     # No extra options on windows
     if os.name == 'nt':
       extra_options = []
-    self.check_codegen(c,inputs=inputs,main=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
+    
+    self.check_codegen(c,inputs=c.convert_in(inputs),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
+    
+    # Check wrapper Function
+    for X in [MX,SX]:
+    
+        g = X.sym("g",2)
+        inputs["g"] = g
+        
+        f = Function('wrapper',[g],[c(**inputs)['x']])
+        print(f)
+        self.check_codegen(f,inputs=[vertcat(1,2)],main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
+    
 
   @requires_conic('osqp')
   def test_memful_external(self):
     if not args.run_slow: return
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
-    inputs = c.convert_in(inputs)
     extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
     # No extra options on windows
     if os.name == 'nt':
       extra_options = []
-    F,lib = self.check_codegen(c,inputs=inputs,std="c99",extra_options=extra_options,extralibs=["osqp"])
+    F,lib = self.check_codegen(c,inputs=c.convert_in(inputs),std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
     F = F.wrap()
     print("memful_external")
-    self.check_codegen(F,inputs=inputs,main=True,extralibs=[lib])
+    self.check_codegen(F,inputs=c.convert_in(inputs),valgrind=True,main=True,extralibs=[lib],debug_mode=True)
     
+    # Check wrapper Function
+    for X in [MX,SX]:
+    
+        g = X.sym("g",2)
+        inputs["g"] = g
+        
+        f = Function('wrapper',[g],[c(**inputs)['x']])
+        print(f)
+        # No extra options on windows
+        if os.name == 'nt':
+          extra_options = []
+        F,lib = self.check_codegen(f,inputs=[vertcat(1,2)],std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
+        F = F.wrap()
+        print("memful_external")
+        self.check_codegen(F,inputs=[vertcat(1,2)],valgrind=True,main=True,extralibs=[lib],debug_mode=True)
+   
   def test_cse(self):
     for X in [SX,MX]:
         x = X.sym("x",2)
