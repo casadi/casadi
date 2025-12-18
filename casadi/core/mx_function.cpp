@@ -419,13 +419,6 @@ namespace casadi {
       "Set option 'allow_free' to allow free variables.");
     }
 
-    // Does any embedded function have reference counting for codegen?
-    for (auto&& a : algorithm_) {
-      if (a.data->has_refcount()) {
-        has_refcount_ = true;
-        break;
-      }
-    }
   }
 
   int MXFunction::eval(const double** arg, double** res,
