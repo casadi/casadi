@@ -2467,6 +2467,26 @@ namespace casadi {
     return "int " + fname + "_unrolled(" + join(args, ", ") + ")";
   }
 
+  void FunctionInternal::codegen_incref(CodeGenerator& g) const {
+    std::string name = codegen_name(g, false);
+    std::string ref_counter = g.shorthand(name + "_ref_counter");
+    g.auxiliaries << "static int " << ref_counter  << " = 0;\n";
+    g << ref_counter << "++;\n";
+  }
+
+  void FunctionInternal::codegen_decref(CodeGenerator& g) const {
+    std::string name = codegen_name(g, false);
+    std::string ref_counter = g.shorthand(name + "_ref_counter");
+    std::string mem_counter = g.shorthand(name + "_mem_counter");
+    std::string free_mem = g.shorthand(name + "_free_mem");
+    g << ref_counter << "--;\n";
+    g << "if (" << ref_counter << "==0) {\n";
+    g << "while (" << mem_counter << ">0) {\n";
+    g << free_mem << "(--" << mem_counter << ");\n";
+    g << "}\n";
+    g << "}\n";
+  }
+
   void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
     g << "return 0;\n";
   }
@@ -2567,10 +2587,16 @@ namespace casadi {
 
     // Reference counter routines
     g << g.declare("void " + name_ + "_incref(void)") << " {\n";
-    codegen_incref(g);
+    if (has_refcount_) {
+      std::string incref = g.shorthand(name + "_incref");
+      g << incref << "();\n";
+    }
     g << "}\n\n"
       << g.declare("void " + name_ + "_decref(void)") << " {\n";
-    codegen_decref(g);
+    if (has_refcount_) {
+      std::string decref = g.shorthand(name + "_decref");
+      g << decref << "();\n";
+    }
     g << "}\n\n";
 
     // Number of inputs and outptus
@@ -2782,6 +2808,10 @@ namespace casadi {
         << "for (j=0; j<" << nnz_in() << "; ++j) "
         << "if (scanf(\"%lg\", a++)<=0) return 2;\n";
 
+      if (has_refcount_) {
+        g << name_ << "_incref();\n";
+      }
+
       if (needs_mem) {
         g << "mem = " << name_ << "_checkout();\n";
       }
@@ -2797,6 +2827,11 @@ namespace casadi {
       if (needs_mem) {
         g << name_ << "_release(mem);\n";
       }
+
+      if (has_refcount_) {
+        g << name_ << "_decref();\n";
+      }
+
       g << "if (flag) return flag;\n";
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout

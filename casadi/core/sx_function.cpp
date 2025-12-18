@@ -433,6 +433,36 @@ namespace casadi {
     }
   }
 
+  void SXFunction::codegen_incref(CodeGenerator& g) const {
+    std::set<void*> added;
+    Function F = shared_from_this<Function>();
+    for (const Function& f : F.find_functions(0)) {
+      if (f->has_refcount_) {
+        std::string cg_name = f->codegen_name(g, false);
+        auto i = added.insert(f.get());
+        if (i.second) { // prevent duplicate calls
+          std::string incref = g.shorthand(cg_name + "_incref");
+          g << incref << "();\n";
+        }
+      }
+    }
+  }
+
+  void SXFunction::codegen_decref(CodeGenerator& g) const {
+    std::set<void*> added;
+    Function F = shared_from_this<Function>();
+    for (const Function& f : F.find_functions(0)) {
+      if (f->has_refcount_) {
+        std::string cg_name = f->codegen_name(g, false);
+        auto i = added.insert(f.get());
+        if (i.second) { // prevent duplicate calls
+          std::string decref = g.shorthand(cg_name + "_decref");
+          g << decref << "();\n";
+        }
+      }
+    }
+  }
+
   const Options SXFunction::options_
   = {{&FunctionInternal::options_},
      {{"default_in",

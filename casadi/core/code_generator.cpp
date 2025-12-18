@@ -263,19 +263,6 @@ namespace casadi {
     // Print to file
     f->codegen(*this, fname);
 
-    // Codegen reference count functions, if needed
-    if (f->has_refcount_) {
-      // Increase reference counter
-      *this << "void " << fname << "_incref(void) {\n";
-      f->codegen_incref(*this);
-      *this << "}\n\n";
-
-      // Decrease reference counter
-      *this << "void " << fname << "_decref(void) {\n";
-      f->codegen_decref(*this);
-      *this << "}\n\n";
-    }
-
     bool fun_needs_mem = f->codegen_needs_mem();
     needs_mem_ |= fun_needs_mem;
 
@@ -323,6 +310,19 @@ namespace casadi {
       scope_exit();
       *this << "}\n\n";
 
+    }
+
+    // Codegen reference count functions, if needed
+    if (f->has_refcount_) {
+      // Increase reference counter
+      *this << "void " << fname << "_incref(void) {\n";
+      f->codegen_incref(*this);
+      *this << "}\n\n";
+
+      // Decrease reference counter
+      *this << "void " << fname << "_decref(void) {\n";
+      f->codegen_decref(*this);
+      *this << "}\n\n";
     }
 
     // Flush to body

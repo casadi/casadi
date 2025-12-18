@@ -33,7 +33,15 @@ import time
 from contextlib import contextmanager
 from casadi.tools import capture_stdout
 import os
+import subprocess
 
+has_valgrind = True
+try:
+    subprocess.run(["valgrind","--version"])
+except:
+    has_valgrind = False    
+
+  
 codegen_check_digits = 15
 
 print("os" in os.environ)
@@ -648,7 +656,7 @@ class casadiTestCase(unittest.TestCase):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
   def compile_external(self,name,source,opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
-    import subprocess
+
     if args.run_slow:
       libdir = GlobalOptions.getCasadiPath()
       includedir = GlobalOptions.getCasadiIncludePath()
@@ -742,7 +750,7 @@ class casadiTestCase(unittest.TestCase):
     if bad_symbols:
       self.fail(f"Found {len(bad_symbols)} symbols starting with 'casadi' exported in shared library (missing CASADI_PREFIX): {bad_symbols[:10]}")
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,valgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
@@ -842,6 +850,8 @@ class casadiTestCase(unittest.TestCase):
         with open(F.name()+"_out.txt","w") as stdout:
           with open(F.name()+"_in.txt","r") as stdin:
             commands = exename+" "+F.name()
+            if valgrind and has_valgrind:
+                commands = 'valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=42 ' + commands
             print(commands+" < " + F.name()+"_in.txt")
             p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
             out = p.communicate()
