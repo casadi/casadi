@@ -80,6 +80,11 @@ namespace casadi {
     return f_;
   }
 
+  void Map::find(std::map<FunctionInternal*, std::pair<Function, size_t>> & all_fun,
+      casadi_int max_depth) const {
+    add_embedded(all_fun, f_, max_depth);
+  }
+
   bool Map::has_function(const std::string& fname) const {
     return fname=="f";
   }

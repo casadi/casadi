@@ -545,6 +545,13 @@ const Function& OracleFunction::get_function(const std::string &name) const {
   return it->second.f;
 }
 
+void OracleFunction::find(std::map<FunctionInternal*, std::pair<Function, size_t>> & all_fun,
+    casadi_int max_depth) const {
+  for (auto&& e : all_functions_) {
+    add_embedded(all_fun, e.second.f, max_depth);
+  }
+}
+
 bool OracleFunction::monitored(const std::string &name) const {
   auto it = all_functions_.find(name);
   casadi_assert(it!=all_functions_.end(),
