@@ -303,7 +303,8 @@ class Onnxtests(casadiTestCase):
             self.skipTest("ONNX translator not available")
 
         # Create empty function (just returns a constant)
-        f = Function("empty", [], [DM(42.0)])
+        # Use MX to ensure MXFunction (not SXFunction)
+        f = Function("empty", [], [MX(42.0)])
 
         onnx_file = "test_empty.onnx"
         try:
@@ -336,6 +337,9 @@ class Onnxtests(casadiTestCase):
         f_else = Function("else_branch", [x], [x - 1])
         f_if = Function.if_else("test_if", f_then, f_else)
 
+        # Wrap to MXFunction for ONNX export
+        f_if = f_if.wrap()
+
         # Test with positive value (should use then branch: 5 + 1 = 6)
         self.roundtrip_test("if_else", f_if, [DM(5.0)])
 
@@ -349,6 +353,9 @@ class Onnxtests(casadiTestCase):
         f_base = Function("map_body", [x], [sin(x)])
         f_map = f_base.map(3, "serial")
 
+        # Wrap to MXFunction for ONNX export
+        f_map = f_map.wrap()
+
         # Test with array of 3 elements
         self.roundtrip_test("map", f_map, [DM([0.0, 1.0, 2.0])])
 
@@ -361,6 +368,9 @@ class Onnxtests(casadiTestCase):
         x = MX.sym("x")
         f_base = Function("accum_body", [x], [x + 1])
         f_accum = f_base.mapaccum("test_accum", 3)
+
+        # Wrap to MXFunction for ONNX export
+        f_accum = f_accum.wrap()
 
         # Test with initial value 0 (should produce: 1, 2, 3)
         self.roundtrip_test("mapaccum", f_accum, [DM(0.0)])

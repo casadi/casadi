@@ -329,10 +329,19 @@ namespace casadi {
           continue;
 
         } else {
-          // Regular function call
+          // Regular function call - export as ONNX local function
+          if (verbose_) {
+            uout() << "  Exporting regular function call to '" << called_func.name() << "'" << std::endl;
+          }
+
+          // TODO: Implement ONNX local function support (FunctionProto)
+          // For now, provide a more helpful error message
           casadi_error("ONNX export: Function calls to '" + called_func.name() +
-                      "' cannot be exported. ONNX does not support arbitrary function calls. "
-                      "Consider inlining the function before export.");
+                      "' are not yet fully implemented. "
+                      "ONNX supports function hierarchies via FunctionProto, but this feature "
+                      "needs to be added to the translator. "
+                      "Workaround: Use .wrap() to inline the function before export, or "
+                      "wait for FunctionProto support to be implemented.");
         }
       } else {
         // Unknown/unsupported operation
