@@ -2988,10 +2988,8 @@ class Functiontests(casadiTestCase):
     for X in [SX,MX]:
         x = X.sym("x")
         f = Function("f",[x],[x**2],["x"],["y"],{"never_inline":True})
-        #fcopy = Function("f",[x],[x**2],["x"],["y"],{"never_inline":True})
-        fcopy = f
-        # Feature disabled, too expensive
-
+        fcopy = Function("f",[x],[x**2],["x"],["y"],{"never_inline":True})
+ 
         y = cse(vertcat(f(sin(x)),fcopy(sin(x)),f(sin(x))))
         
         print(y)

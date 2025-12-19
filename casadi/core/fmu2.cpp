@@ -340,21 +340,14 @@ int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
   return status != fmi2OK;
 }
 
+int Fmu2::set_time(void* instance, double t) const {
+  fmi2Status status = set_time_(instance, t);
+  return status != fmi2OK;
+}
+
 int Fmu2::set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const {
   casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");
-
-  // Set time variable, if any
-  if (has_independent_ && n_vr > 0 && *vr == vr_in_[0]) {
-    // Update FMU time
-    fmi2Status status = set_time_(instance, *values);
-    if (status != fmi2OK) return 1;
-    // Skip when setting remaining variables
-    vr++;
-    n_vr--;
-    values++;
-    n_values--;
-  }
 
   fmi2Status status = set_real_(instance, vr, n_vr, values);
   return status != fmi2OK;
@@ -374,6 +367,7 @@ int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
     status = get_derivatives_(instance, get_ptr(derivate_dump), nx_);
     if (status != fmi2OK) return 1;
   }
+
   fmi2Status status = get_real_(instance, vr, n_vr, values);
   return status != fmi2OK;
 }
@@ -381,8 +375,24 @@ int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
 int Fmu2::get_directional_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
     const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
     double* sensitivity, size_t n_sensitivity) const {
+  // Consistency checks
   casadi_assert(n_in == n_seed, "Vector-valued variables not supported in FMI 2");
   casadi_assert(n_out == n_sensitivity, "Vector-valued variables not supported in FMI 2");
+  // Quick return if zero dimension
+  if (n_in == 0 || n_out == 0) return 0;
+  // No directional derivatives w.r.t. automatically added independent variable
+  if (has_independent_ && n_in > 0 && *vr_in == static_cast<unsigned int>(-1)) {
+    n_in--;
+    vr_in++;
+    n_seed--;
+    seed++;
+    // Quick return if now zero dimension
+    if (n_in == 0) {
+      std::fill(sensitivity, sensitivity + n_sensitivity, 0.0);
+      return 0;
+    }
+  }
+  // Retrieve from FMU and return
   fmi2Status status = get_directional_derivative_(instance, vr_out, n_out, vr_in, n_in,
     seed, sensitivity);
   return status != fmi2OK;

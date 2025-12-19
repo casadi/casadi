@@ -326,6 +326,11 @@ int Fmu3::get_derivatives(void* instance, double* derivatives, size_t nx) const 
   return 0;
 }
 
+int Fmu3::set_time(void* instance, double t) const {
+  fmi3Status status = set_time_(instance, t);
+  return status != fmi3OK;
+}
+
 int Fmu3::set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const {
   // Set time variable, if any

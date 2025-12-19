@@ -85,9 +85,6 @@
 %exception  casadi::DaeBuilder::set_alg(const std::string &name, const MX &alg_rhs) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::DaeBuilder::set_all(const std::string &v, const std::vector< std::string > &name) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
 %exception  casadi::DaeBuilder::set_beq(const std::string &name, const MX &val) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }

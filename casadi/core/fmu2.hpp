@@ -151,6 +151,9 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
 
   int get_derivatives(void* instance, double* derivatives, size_t nx) const override;
 
+  // Set current time
+  int set_time(void* instance, double t) const override;
+
   // Set real values
   int set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const override;

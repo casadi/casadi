@@ -52,18 +52,18 @@ enum class Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, IND
 enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 
 // CasADi classification of model variables, cf. Table 18 in FMI specification, 3.0.2
-//              PARAMETER  CALCULATED_PARAMETER  INPUT   OUTPUT   LOCAL    INDEPENDENT
-// CONSTANT     -          -                     -       C        C        -
-// FIXED        C          D                     -       -        D        -
-// TUNABLE      P          D                     -       -        D        -
-// DISCRETE     -          -                     U       X/Q      X/Q      -
-// CONTINUOUS   -          -                     U       X/Q/W/Z  X/Q/W/Z  T
+//              PARAMETER  CALCULATED_PARAMETER  INPUT   OUTPUT     LOCAL      INDEPENDENT
+// CONSTANT     -          -                     -       C          C          -
+// FIXED        C          D                     -       -          D          -
+// TUNABLE      P          D                     -       -          D          -
+// DISCRETE     -          -                     U       X/Q/0      X/Q/0      -
+// CONTINUOUS   -          -                     U       X/Q/W/Z/0  X/Q/W/Z/0  X/Q/T/0
 
 // Variable categories
 enum class Category {T, C, P, D, W, U, X, Z, Q, CALCULATED, NUMEL};
 
 // Output categories for generated functions
-enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, RATE, NUMEL};
+enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
@@ -185,6 +185,17 @@ struct CASADI_EXPORT Variable {
 
   // Does the variable need a start attribute?
   bool has_start() const;
+
+  // Unused derivative variable?
+  bool has_der() const {
+    return der != size_t(-1) || causality == Causality::INDEPENDENT;
+  }
+
+  // Permitted categories for the variable
+  std::vector<Category> categories() const;
+
+  // Is a category permitted for the variable?
+  bool permitted(Category cat) const;
 
   // Has the variable been set
   bool is_set() const {
@@ -519,6 +530,9 @@ protected:
   // Symbolic representation of the model equations?
   bool symbolic_;
 
+  // Original index of the independent variable, if any
+  casadi_int orig_time_index_;
+
   // Detect quadrature states
   bool detect_quad_;
 
@@ -529,8 +543,7 @@ protected:
   std::vector<Variable*> variables_;
 
   // Model structure
-  std::vector<size_t> outputs_, derivatives_, initial_unknowns_, event_indicators_, residuals_,
-    rate_;
+  std::vector<size_t> outputs_, derivatives_, initial_unknowns_, event_indicators_, residuals_;
 
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;
@@ -546,6 +559,9 @@ protected:
 
   // Event conditions and transition equations
   std::vector<std::pair<size_t, std::vector<size_t>>> when_;
+
+  // Convert XML model variable index to DaeBuilder index
+  casadi_int convert_index(casadi_int index) const;
 
  /** \brief Is there a time variable?
 

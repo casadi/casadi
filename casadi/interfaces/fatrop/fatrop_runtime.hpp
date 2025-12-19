@@ -312,7 +312,7 @@ fatrop_int casadi_fatrop_full_eval_obj(
   return 1; // skip
 }
 
-// SYMBOL "fatrop_full_eval_obj"
+// SYMBOL "fatrop_full_eval_lag_hess"
 template<typename T1>
 fatrop_int casadi_fatrop_full_eval_lag_hess(
             double objective_scale,
@@ -814,7 +814,7 @@ void casadi_fatrop_presolve(casadi_fatrop_data<T1>* d) {
   d->solver = fatrop_ocp_c_create(&d->ocp_interface, p->write, p->flush);
 }
 
-// SYMBOL "fatrop_ocp_c_solve"
+// SYMBOL "fatrop_solve"
 template<typename T1>
 void casadi_fatrop_solve(casadi_fatrop_data<T1>* d) {
   // Problem structure

@@ -459,6 +459,7 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
   can_be_instantiated_only_once_per_process_ = dae->can_be_instantiated_only_once_per_process_;
+  start_time_ = dae->start_time_;
   nx_ = dae->size(Category::X);
   do_evaluation_dance_ = dae->generation_tool_.rfind("Simulink", 0) == 0;
 
@@ -542,8 +543,9 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
     vn_in_.push_back(v.name);
     vr_in_.push_back(v.value_reference);
     if (v.causality == Causality::INDEPENDENT) {
-      if (i != 0) casadi_error("Independent variable must be first input of FMU");
+      if (i != 0) casadi_error("Independent variable must be the first model variable");
       has_independent_ = true;
+      independent_vr_ = vr_in_.back();
     }
   }
   // Collect meta information for outputs
@@ -618,8 +620,26 @@ void FmuInternal::finalize() {
   }
   // Get input values
   if (!value_in_.empty()) {
-    if (get_real(c, get_ptr(vr_in_), vr_in_.size(), get_ptr(value_in_), value_in_.size())) {
-      casadi_error("FmuInternal::get_in failed");
+    // Value references
+    const unsigned int* vr = get_ptr(vr_in_);
+    size_t n_vr = vr_in_.size();
+    // Values
+    double* value = get_ptr(value_in_);
+    size_t n_value = value_in_.size();
+    // Set time variable, if any
+    if (has_independent_) {
+      *value = start_time_;
+      // Skip when getting remaining inputs
+      vr++;
+      n_vr--;
+      value++;
+      n_value--;
+    }
+    // Set remaining
+    if (n_value > 0) {
+      if (get_real(c, vr, n_vr, value, n_value)) {
+        casadi_error("FmuInternal::get_in failed");
+      }
     }
   }
   // Get auxilliary variables
@@ -883,15 +903,9 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
       m->v_pert_[i] = m->in_bounds_[i] ? test : m->v_in_[i];
     }
     // Pass perturbed inputs to FMU
-    if (set_real(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_), n_known)) {
-      casadi_warning("Setting FMU variables failed");
-      return 1;
-    }
+    if (set_all(m, get_ptr(m->v_pert_), m->v_pert_.size())) return 1;
     // Evaluate perturbed FMU
-    if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, yk, n_unknown)) {
-      casadi_warning("Evaluation failed");
-      return 1;
-    }
+    if (get_all(m, yk, n_unknown)) return 1;
     // Post-process yk if there was any scaling
     if (independent_seeds) {
       for (size_t i = 0; i < n_unknown; ++i) {
@@ -916,10 +930,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
     }
   }
   // Restore FMU inputs
-  if (set_real(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_), n_known)) {
-    casadi_warning("Setting FMU variables failed");
-    return 1;
-  }
+  if (set_all(m, get_ptr(m->v_in_), m->v_in_.size())) return 1;
   // Step size
   double h = m->self.step_;
 
@@ -1221,25 +1232,53 @@ void FmuInternal::request(FmuMemory* m, size_t ind) const {
   }
 }
 
-int FmuInternal::eval(FmuMemory* m) const {
-  // Gather inputs and outputs
-  gather_io(m);
-  // Number of inputs and outputs
-  size_t n_set = m->id_in_.size();
-  size_t n_out = m->id_out_.size();
-  // Set all variables
-  if (set_real(m->instance, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_), n_set)) {
+int FmuInternal::set_all(FmuMemory* m, const double* values, size_t n_values) const {
+  // Quick return if nothing to set
+  if (n_values == 0) return 0;
+  // Value references
+  const unsigned int* vr = get_ptr(m->vr_in_);
+  size_t n_vr = m->vr_in_.size();
+  // Set time variable, if any
+  if (has_independent_ && *vr == independent_vr_) {
+    // Update FMU time
+    if (set_time(m->instance, *values)) return 1;
+    // Skip when setting remaining variables
+    vr++;
+    n_vr--;
+    values++;
+    n_values--;
+    // Quick return if nothing left to set
+    if (n_vr == 0) return 0;
+  }
+
+  // Set remaining variables
+  if (set_real(m->instance, vr, n_vr, values, n_values)) {
     casadi_warning("Setting FMU variables failed");
     return 1;
   }
-  // Quick return if nothing requested
-  if (n_out == 0) return 0;
-  // Calculate all variables
-  m->v_out_.resize(n_out);
-  if (get_real(m->instance, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_), n_out)) {
+
+  return 0;
+}
+
+int FmuInternal::get_all(FmuMemory* m, double* values, size_t n_values) const {
+  // Quick return if nothing to get
+  if (n_values == 0) return 0;
+  // Retrieve from FMU
+  if (get_real(m->instance, get_ptr(m->vr_out_), m->vr_out_.size(), values, n_values)) {
     casadi_warning("Evaluation failed");
     return 1;
   }
+  // Successful return
+  return 0;
+}
+
+int FmuInternal::eval(FmuMemory* m) const {
+  // Gather inputs and outputs
+  gather_io(m);
+  // Pass inputs to FMU
+  if (set_all(m, get_ptr(m->v_in_), m->v_in_.size())) return 1;
+  // Get outputs from FMU
+  if (get_all(m, get_ptr(m->v_out_), m->v_out_.size())) return 1;
   // Collect requested variables
   auto it = m->v_out_.begin();
   for (size_t id : m->id_out_) {
@@ -1309,10 +1348,12 @@ void FmuInternal::gather_io(FmuMemory* m) const {
   // Collect output indices, corresponding value references
   m->id_out_.clear();
   m->vr_out_.clear();
+  m->v_out_.clear();
   for (size_t id = 0; id < m->omarked_.size(); ++id) {
     if (m->omarked_[id]) {
       m->id_out_.push_back(id);
       m->vr_out_.push_back(vr_out_[id]);
+      m->v_out_.push_back(nan);
       m->omarked_[id] = false;
     }
   }
@@ -1418,6 +1459,7 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
   s.pack("FmuInternal::can_be_instantiated_only_once_per_process",
     can_be_instantiated_only_once_per_process_);
+  s.pack("FmuInternal::start_time", start_time_);
   s.pack("FmuInternal::nx", nx_);
   s.pack("FmuInternal::do_evaluation_dance", do_evaluation_dance_);
 }
@@ -1461,6 +1503,7 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
   s.unpack("FmuInternal::can_be_instantiated_only_once_per_process",
     can_be_instantiated_only_once_per_process_);
+  s.unpack("FmuInternal::start_time", start_time_);
   s.unpack("FmuInternal::nx", nx_);
   s.unpack("FmuInternal::do_evaluation_dance", do_evaluation_dance_);
 }

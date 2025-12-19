@@ -125,55 +125,25 @@ std::vector<MX> DaeBuilder::ydef() const {
 
 void DaeBuilder::set_y(const std::vector<std::string>& name) {
   try {
-    // Update causality of any existing outputs not in name
+    // Make sure no duplicate names
     std::set<std::string> name_set(name.begin(), name.end());
     casadi_assert(name_set.size() == name.size(), "Duplicate names");
-    for (auto&& n : y()) {
-      auto it = name_set.find(n);
-      if (it == name_set.end()) {
-        // Not an output anymore, make local
-        set_causality(n, "local");
-      } else {
-        // Mark as added
-        name_set.erase(it);
+
+    // Ensure that causality is output for all variables
+    for (auto&& n : name) set_causality(n, "output");
+
+    // Remove non-outputs, making them local, if any
+    if (ny() != name.size()) {
+      for (auto&& n : y()) {
+        if (name_set.find(n) == name_set.end()) set_causality(n, "local");
       }
     }
-    // Update causality of new outputs
-    for (auto&& n : name) {
-      // Check if not already added
-      auto it = name_set.find(n);
-      if (it != name_set.end()) {
-        // Make output causality
-        set_causality(n, "output");
-        // Mark as added
-        name_set.erase(it);
-      }
-    }
-    // Consistency checks
-    casadi_assert_dev(name_set.empty());
-    casadi_assert_dev((*this)->outputs_.size() == name.size());
-    // Update output ordering
-    (*this)->outputs_ = (*this)->find(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("set_rate", e.what());
-  }
-}
 
-std::vector<std::string> DaeBuilder::rate() const {
-  try {
-    return (*this)->name((*this)->rate_);
-  } catch (std::exception& e) {
-    THROW_ERROR("rate", e.what());
-    return {};  // never reached
-  }
-}
+    // Update ordering
+    (*this)->reorder("y", (*this)->outputs_, (*this)->find(name));
 
-void DaeBuilder::set_rate(const std::vector<std::string>& name) {
-  try {
-    casadi_assert(name.size() <= 1, "At most one rate variable");
-    (*this)->rate_ = (*this)->find(name);
   } catch (std::exception& e) {
-    THROW_ERROR("set_rate", e.what());
+    THROW_ERROR("set_y", e.what());
   }
 }
 
@@ -248,15 +218,6 @@ bool DaeBuilder::has_t() const {
   }
 }
 
-bool DaeBuilder::has_rate() const {
-  try {
-    return !(*this)->rate_.empty();
-  } catch (std::exception& e) {
-    THROW_ERROR("has_rate", e.what());
-    return false;  // never reached
-  }
-}
-
 casadi_int DaeBuilder::nx() const {
   return (*this)->size(Category::X);
 }
@@ -307,7 +268,7 @@ void DaeBuilder::load_fmi_description(const std::string& filename) {
 
 bool DaeBuilder::provides_directional_derivatives() const {
   try {
-    casadi_assert(!(*this)->symbolic_, "Functionality only applies to imported standard FMUs");
+    casadi_assert(!symbolic(), "Functionality only applies to imported standard FMUs");
     return (*this)->provides_directional_derivatives_;
   } catch (std::exception& e) {
     THROW_ERROR("provides_directional_derivatives", e.what());
@@ -597,21 +558,44 @@ void DaeBuilder::clear_all(const std::string& v) {
   }
 }
 
+#endif // WITH_DEPRECATED_FEATURES
+
 void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& name) {
   try {
-    (*this)->clear_cache_ = true;  // Clear cache after this
-    const std::vector<size_t>& new_ind = (*this)->find(name);
+    // Special case for outputs (remove?)
     if (v == "y") {
-      (*this)->outputs_ = new_ind;
-    } else {
-      (*this)->indices(to_enum<Category>(v)) = new_ind;
+#ifdef WITH_DEPRECATED_FEATURES
+      return set_y(name);
+#endif // WITH_DEPRECATED_FEATURES
+      casadi_error("Use set_y to set outputs");
     }
+
+    // Update category
+    for (auto&& n : name) set_category(n, v);
+    // Remove any variables not in name from the category
+    auto all_in_cat = all(v);
+    if (all_in_cat.size() != name.size()) {
+      std::set<std::string> name_set(name.begin(), name.end());
+      for (auto&& n : all_in_cat) {
+        if (name_set.find(n) == name_set.end()) {
+          if (v == "x" || v == "q") {
+            // Move to unused derivatives
+            set_category(n, "");
+          } else if (v == "u" || v == "p") {
+            // Make constant
+            set_category(n, "c");
+          } else {
+            casadi_error("Cannot automatically remove '" + n + "' from category '" + v + "'");
+          }
+        }
+      }
+    }
+    // Make sure ordering is correct
+    reorder(v, name);
   } catch (std::exception& e) {
     THROW_ERROR("set_all", e.what());
   }
 }
-
-#endif // WITH_DEPRECATED_FEATURES
 
 void DaeBuilder::reorder(const std::string& cat, const std::vector<std::string>& v) {
   try {
@@ -950,6 +934,19 @@ std::string DaeBuilder::causality(const std::string& name) const {
   }
 }
 
+std::vector<std::string> DaeBuilder::categories(const std::string& name) const {
+  try {
+    std::vector<std::string> ret;
+    for (auto&& cat : (*this)->variable(name).categories()) {
+      ret.push_back(to_string(cat));
+    }
+    return ret;
+  } catch (std::exception& e) {
+    THROW_ERROR("categories", e.what());
+    return {};  // never reached
+  }
+}
+
 void DaeBuilder::set_causality(const std::string& name, const std::string& val) {
   try {
     (*this)->set_causality((*this)->find(name), to_enum<Causality>(val));
@@ -986,7 +983,8 @@ std::string DaeBuilder::category(const std::string& name) const {
 
 void DaeBuilder::set_category(const std::string& name, const std::string& val) {
   try {
-    (*this)->set_category((*this)->find(name), to_enum<Category>(val));
+    (*this)->set_category((*this)->find(name),
+      val.empty() ? Category::NUMEL : to_enum<Category>(val));
   } catch (std::exception& e) {
     THROW_ERROR("set_category", e.what());
   }
@@ -1498,7 +1496,7 @@ std::vector<GenericType> DaeBuilder::get(const std::vector<std::string>& name) c
     std::vector<GenericType> ret;
     ret.reserve(name.size());
     // For symbolic FMUs, we can just retrieve the values
-    if ((*this)->symbolic_) {
+    if (symbolic()) {
       // Retrieve the attributes
       for (auto& n : name) {
         // Get the variable
@@ -1532,6 +1530,15 @@ std::vector<GenericType> DaeBuilder::get(const std::vector<std::string>& name) c
   } catch (std::exception& e) {
     THROW_ERROR("get", e.what());
     return {};
+  }
+}
+
+bool DaeBuilder::symbolic() const {
+  try {
+    return (*this)->symbolic_;
+  } catch (std::exception& e) {
+    THROW_ERROR("symbolic", e.what());
+    return false; // never reached
   }
 }
 

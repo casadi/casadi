@@ -180,6 +180,9 @@ namespace casadi {
     /** \brief Thread-local memory object type */
     std::string codegen_mem_type() const override { return "struct casadi_sqpmethod_data"; }
 
+    /** \brief Is thread-local memory object needed? */
+    bool codegen_needs_mem() const override { return true; }
+
     /// Access Conic
     const Function getConic() const { return qpsol_;}
 

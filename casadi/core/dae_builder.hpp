@@ -145,16 +145,6 @@ class CASADI_EXPORT DaeBuilder
       \identifier{2db} */
   void set_y(const std::vector<std::string>& name);
 
-  /** \brief Get all rate variables
-
-      \identifier{2dc} */
-  std::vector<std::string> rate() const;
-
-  /** \brief Set rate variables
-
-      \identifier{2dd} */
-  void set_rate(const std::vector<std::string>& name);
-
   /** \brief Free controls
 
       \identifier{5n} */
@@ -231,11 +221,6 @@ class CASADI_EXPORT DaeBuilder
 
       \identifier{64} */
   bool has_t() const;
-
-  /** \brief Is there a rate output?
-
-      \identifier{2dg} */
-  bool has_rate() const;
 
   /** \brief Differential states
 
@@ -401,12 +386,12 @@ class CASADI_EXPORT DaeBuilder
   /// Reorder variables in a category
   void reorder(const std::string& cat, const std::vector<std::string>& v);
 
+  /// Set all variables within a a category
+  void set_all(const std::string& v, const std::vector<std::string>& name);
+
 #ifdef WITH_DEPRECATED_FEATURES
   /// [DEPRECATED] Use set_variability, set_causality or set_category to change variable category
   void clear_all(const std::string& v);
-
-  /// [DEPRECATED] Use set_variability, set_causality, set_category and/or reorder
-  void set_all(const std::string& v, const std::vector<std::string>& name);
 
   /** @name [DEPRECATED] Register an existing variable */
   ///@{
@@ -610,6 +595,9 @@ class CASADI_EXPORT DaeBuilder
   /// Get the causality
   std::string causality(const std::string& name) const;
 
+  /// Which categories are possible for a variable?
+  std::vector<std::string> categories(const std::string& name) const;
+
   /** \brief Set the causality, if permitted
 
   The following changes are permitted:
@@ -648,7 +636,7 @@ class CASADI_EXPORT DaeBuilder
   The following changes are permitted:
     * Controls 'u' can be changed to/from tunable parameters 'p' or fixed parameters 'c'
     * Differential states that do not appear in the right-hand-sides can be changed between
-    regular states 'x' and quadrature states 'q'
+    regular states 'x', quadrature states 'q' and no category '0'.
 
     Other changes are not permitted. Causality and variability is updated accordingly.
 
@@ -756,6 +744,9 @@ class CASADI_EXPORT DaeBuilder
 
   /// Evaluate the values for a set of variables at the initial time, single value
   GenericType get(const std::string& name) const;
+
+  /// Symbolic DAE instance?
+  bool symbolic() const;
 
 #endif  // !SWIGMATLAB
 

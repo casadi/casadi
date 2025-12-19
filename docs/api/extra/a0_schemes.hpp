@@ -28,7 +28,7 @@
 */
 /** \defgroup scheme_OutputCategory
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::OutputCategory  ( = 8)</caption>
+<caption>Output scheme: casadi::OutputCategory  ( = 7)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */

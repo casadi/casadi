@@ -2585,7 +2585,8 @@ namespace casadi {
       std::unordered_map<std::string, MX > cache;
       IncrementalSerializerMX s;
 
-      std::unordered_map<FunctionInternal*, Function> function_cache;
+      SimpleCache<FunctionInternal*, std::string> function_serialize_cache;
+      SimpleCache<std::string, Function> function_cache;
 
       // Pre-cache the original nodes
       // This makes sure we recycle old nodes when possible
@@ -2642,12 +2643,21 @@ namespace casadi {
 
               // If we are a call node,
               if (out_i.op()==OP_CALL) {
-                FunctionInternal* key = out_i.which_function().get();
-                auto itk = function_cache.find(key);
-                if (itk==function_cache.end()) {
-                  function_cache[key] = out_i.which_function();
+                FunctionInternal* fptr = out_i.which_function().get();
+
+                // Get or compute serialization (cached)
+                std::string key_s;
+                if (!function_serialize_cache.incache(fptr, key_s)) {
+                  key_s = out_i.which_function().serialize();
+                  function_serialize_cache.tocache(fptr, key_s);
+                }
+
+                // Get or store canonical function (cached)
+                Function canonical;
+                if (!function_cache.incache(key_s, canonical)) {
+                  function_cache.tocache(key_s, out_i.which_function());
                 } else {
-                  out_i = Call::create_call(function_cache[key], out_i->dep_);
+                  out_i = Call::create_call(canonical, out_i->dep_);
                 }
               }
             }
@@ -2683,7 +2693,7 @@ namespace casadi {
 
       std::vector<MX> subs_from;
       std::vector<MX> subs_to;
-      for (const auto& e : function_cache) {
+      for (const auto& e : function_cache.cache_map()) {
         e.second->merge(res, subs_from, subs_to);
       }
       orig = graph_substitute(res, subs_from, subs_to, updated);
