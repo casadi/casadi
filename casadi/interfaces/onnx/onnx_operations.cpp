@@ -370,16 +370,10 @@ namespace casadi {
         std::string input_onnx_name = work_to_onnx[i_vec[0]];
         create_unary_node(graph, "Identity", input_onnx_name, output_name);
 
-        // Add this as a graph output
-        onnx::ValueInfoProto* graph_output = graph->add_output();
-        graph_output->set_name(output_name);
-        onnx::TypeProto* type = graph_output->mutable_type();
-        onnx::TypeProto::Tensor* tensor_type = type->mutable_tensor_type();
-        tensor_type->set_elem_type(onnx::TensorProto::DOUBLE);
-        onnx::TensorShapeProto* shape = tensor_type->mutable_shape();
-        auto sp = f.sparsity_out(o_vec[0]);
-        shape->add_dim()->set_dim_value(sp.size1());
-        shape->add_dim()->set_dim_value(sp.size2());
+        // Note: Graph outputs are now added by add_graph_outputs() at the end
+        // of function_to_graph() or at the end of load() for the main graph.
+        // We only need to track the output name in work_to_onnx.
+        work_to_onnx[o_vec[0]] = output_name;
         return true;
       }
 
