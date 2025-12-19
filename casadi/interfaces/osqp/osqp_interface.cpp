@@ -49,7 +49,6 @@ namespace casadi {
                                    const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
 
-    has_refcount_ = true;
   }
 
   OsqpInterface::~OsqpInterface() {

@@ -175,10 +175,6 @@ namespace casadi {
     g.add_dependency(fcn_);
   }
 
-  bool Call::has_refcount() const {
-    return fcn_->has_refcount_;
-  }
-
   void Call::generate(CodeGenerator& g,
                     const std::vector<casadi_int>& arg,
                     const std::vector<casadi_int>& res,
@@ -199,28 +195,6 @@ namespace casadi {
     // Call function
     std::string flag = g(fcn_, "arg1", "res1", "iw", "w");
     g << "if (" << flag << ") return 1;\n";
-  }
-
-  void Call::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
-    if (has_refcount()) {
-      std::string cg_name = fcn_->codegen_name(g, false);
-      auto i = added.insert(fcn_.get());
-      if (i.second) { // prevent duplicate calls
-        std::string incref = g.shorthand(cg_name + "_incref");
-        g << incref << "();\n";
-      }
-    }
-  }
-
-  void Call::codegen_decref(CodeGenerator& g, std::set<void*>& added) const {
-    if (has_refcount()) {
-      std::string cg_name = fcn_->codegen_name(g, false);
-      auto i = added.insert(fcn_.get());
-      if (i.second) { // prevent duplicate calls
-        std::string decref = g.shorthand(cg_name + "_decref");
-        g << decref << "();\n";
-      }
-    }
   }
 
   size_t Call::sz_arg() const {

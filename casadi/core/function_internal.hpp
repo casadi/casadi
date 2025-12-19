@@ -374,7 +374,7 @@ namespace casadi {
 
     // Get all embedded functions, recursively
     virtual void find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
-      casadi_int max_depth) const {}
+      casadi_int max_depth) const;
 
     /** \brief Which variables enter with some order
 
@@ -1355,6 +1355,9 @@ namespace casadi {
         \identifier{no} */
     bool has_refcount_;
 
+    /** \brief Reference counting in dependent functions */
+    bool has_refcount_in_deps_;
+
     /** \brief Values to prepopulate the function cache with
 
         \identifier{26h} */
@@ -1431,6 +1434,9 @@ namespace casadi {
 
     // Store a reference to a custom Jacobian
     Function custom_jacobian_;
+
+    // Registered functions
+    std::vector<Function> registered_functions_;
 
     // Counter for unique names for dumping inputs and output
 #ifdef CASADI_WITH_THREAD

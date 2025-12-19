@@ -547,6 +547,8 @@ const Function& OracleFunction::get_function(const std::string &name) const {
 
 void OracleFunction::find(std::map<FunctionInternal*, std::pair<Function, size_t>> & all_fun,
     casadi_int max_depth) const {
+  // Call to base class
+  FunctionInternal::find(all_fun, max_depth);
   for (auto&& e : all_functions_) {
     add_embedded(all_fun, e.second.f, max_depth);
   }

@@ -313,7 +313,7 @@ namespace casadi {
     }
 
     // Codegen reference count functions, if needed
-    if (f->has_refcount_) {
+    if (f->has_refcount_in_deps_) {
       // Increase reference counter
       *this << "void " << fname << "_incref(void) {\n";
       f->codegen_incref(*this);

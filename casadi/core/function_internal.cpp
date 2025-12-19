@@ -95,6 +95,7 @@ namespace casadi {
     checkout_ = nullptr;
     release_ = nullptr;
     has_refcount_ = false;
+    has_refcount_in_deps_ = false;
     enable_forward_op_ = true;
     enable_reverse_op_ = true;
     enable_jacobian_op_ = true;
@@ -758,10 +759,14 @@ namespace casadi {
     // Finalize base classes
     ProtoFunction::finalize();
 
+    if (codegen_needs_mem()) has_refcount_ = true;
+
+    if (has_refcount_) has_refcount_in_deps_ = true;
+
     // Does any embedded function have reference counting for codegen?
     for (const Function& f : shared_from_this<Function>().find_functions(0)) {
-      if (f->has_refcount_) {
-        has_refcount_ = true;
+      if (f->has_refcount_in_deps_) {
+        has_refcount_in_deps_ = true;
         break;
       }
     }
@@ -2468,23 +2473,58 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_incref(CodeGenerator& g) const {
-    std::string name = codegen_name(g, false);
-    std::string ref_counter = g.shorthand(name + "_ref_counter");
-    g.auxiliaries << "static int " << ref_counter  << " = 0;\n";
-    g << ref_counter << "++;\n";
+    if (has_refcount_) {
+      std::string name = codegen_name(g, false);
+      std::string ref_counter = g.shorthand(name + "_ref_counter");
+      g.auxiliaries << "static int " << ref_counter  << " = 0;\n";
+      g << ref_counter << "++;\n";
+    }
+
+    // Treat dependent functions
+    std::set<void*> added;
+    Function F = shared_from_this<Function>();
+    for (const Function& f : F.find_functions(0)) {
+      if (f->has_refcount_in_deps_) {
+        std::string cg_name = f->codegen_name(g, false);
+        auto i = added.insert(f.get());
+        if (i.second) { // prevent duplicate calls
+          std::string incref = g.shorthand(cg_name + "_incref");
+          g << incref << "();\n";
+        }
+      }
+    }
   }
 
   void FunctionInternal::codegen_decref(CodeGenerator& g) const {
-    std::string name = codegen_name(g, false);
-    std::string ref_counter = g.shorthand(name + "_ref_counter");
-    std::string mem_counter = g.shorthand(name + "_mem_counter");
-    std::string free_mem = g.shorthand(name + "_free_mem");
-    g << ref_counter << "--;\n";
-    g << "if (" << ref_counter << "==0) {\n";
-    g << "while (" << mem_counter << ">0) {\n";
-    g << free_mem << "(--" << mem_counter << ");\n";
-    g << "}\n";
-    g << "}\n";
+
+    // Treat dependent functions
+    std::set<void*> added;
+    Function F = shared_from_this<Function>();
+    for (const Function& f : F.find_functions(0)) {
+      if (f->has_refcount_in_deps_) {
+        std::string cg_name = f->codegen_name(g, false);
+        auto i = added.insert(f.get());
+        if (i.second) { // prevent duplicate calls
+          std::string decref = g.shorthand(cg_name + "_decref");
+          g << decref << "();\n";
+        }
+      }
+    }
+
+    if (has_refcount_) {
+      std::string name = codegen_name(g, false);
+      std::string ref_counter = g.shorthand(name + "_ref_counter");
+      std::string mem_counter = g.shorthand(name + "_mem_counter");
+      std::string free_mem = g.shorthand(name + "_free_mem");
+      g << ref_counter << "--;\n";
+      g << "if (" << ref_counter << "==0) {\n";
+      if (codegen_needs_mem())  {
+        g << "while (" << mem_counter << ">0) {\n";
+        g << free_mem << "(--" << mem_counter << ");\n";
+        g << "}\n";
+      }
+      g << "}\n";
+    }
   }
 
   void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
@@ -2562,13 +2602,13 @@ namespace casadi {
 
     // Reference counter routines
     g << g.declare("void " + name_ + "_incref(void)") << " {\n";
-    if (has_refcount_) {
+    if (has_refcount_in_deps_) {
       std::string incref = g.shorthand(name + "_incref");
       g << incref << "();\n";
     }
     g << "}\n\n"
       << g.declare("void " + name_ + "_decref(void)") << " {\n";
-    if (has_refcount_) {
+    if (has_refcount_in_deps_) {
       std::string decref = g.shorthand(name + "_decref");
       g << decref << "();\n";
     }
@@ -2783,7 +2823,7 @@ namespace casadi {
         << "for (j=0; j<" << nnz_in() << "; ++j) "
         << "if (scanf(\"%lg\", a++)<=0) return 2;\n";
 
-      if (has_refcount_) {
+      if (has_refcount_in_deps_) {
         g << name_ << "_incref();\n";
       }
 
@@ -2803,7 +2843,7 @@ namespace casadi {
         g << name_ << "_release(mem);\n";
       }
 
-      if (has_refcount_) {
+      if (has_refcount_in_deps_) {
         g << name_ << "_decref();\n";
       }
 
@@ -3012,6 +3052,7 @@ namespace casadi {
     alloc_res(sz_res*num_threads, persistent);
     alloc_iw(sz_iw*num_threads, persistent);
     alloc_w(sz_w*num_threads, persistent);
+    registered_functions_.push_back(f);
   }
 
   Dict ProtoFunction::get_stats(void* mem) const {
@@ -3775,6 +3816,13 @@ namespace casadi {
     }
   }
 
+  void FunctionInternal::find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
+    casadi_int max_depth) const {
+    for (auto&& f : registered_functions_) {
+      add_embedded(all_fun, f, max_depth);
+    }
+  }
+
   std::vector<bool> FunctionInternal::
   which_depends(const std::string& s_in, const std::vector<std::string>& s_out,
       casadi_int order, bool tr) const {
@@ -4043,7 +4091,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 7);
+    s.version("FunctionInternal", 8);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -4109,6 +4157,7 @@ namespace casadi {
     s.pack("FunctionInternal::jacobian_options", jacobian_options_);
     s.pack("FunctionInternal::der_options", der_options_);
     s.pack("FunctionInternal::custom_jacobian", custom_jacobian_);
+    s.pack("FunctionInternal::registered_functions", registered_functions_);
 
     s.pack("FunctionInternal::sz_arg_per", sz_arg_per_);
     s.pack("FunctionInternal::sz_res_per", sz_res_per_);
@@ -4121,7 +4170,7 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
-    int version = s.version("FunctionInternal", 1, 7);
+    int version = s.version("FunctionInternal", 1, 8);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -4215,6 +4264,9 @@ namespace casadi {
       s.unpack("FunctionInternal::der_options", der_options_);
     }
     s.unpack("FunctionInternal::custom_jacobian", custom_jacobian_);
+    if (version >= 8) {
+      s.unpack("FunctionInternal::registered_functions", registered_functions_);
+    }
     if (!custom_jacobian_.is_null()) {
       casadi_assert_dev(custom_jacobian_.name() == "jac_" + name_);
       tocache(custom_jacobian_);

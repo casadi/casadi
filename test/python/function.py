@@ -3017,6 +3017,17 @@ class Functiontests(casadiTestCase):
     
     self.check_codegen(c,inputs=c.convert_in(inputs),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
     
+    c.generate('f.c')
+    
+    n_matches = 0
+    
+    with open("f.c","r") as inp:
+        for line in inp.readlines():
+            if re.search("static int casadi_(\w+)_ref_counter",line):
+                n_matches = n_matches +1
+    
+    self.assertEqual(n_matches,1)
+    
     # Check wrapper Function
     for X in [MX,SX]:
     
@@ -3026,7 +3037,17 @@ class Functiontests(casadiTestCase):
         f = Function('wrapper',[g],[c(**inputs)['x']])
         print(f)
         self.check_codegen(f,inputs=[vertcat(1,2)],main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
-    
+        f.generate('f.c')
+        
+        n_matches = 0
+        
+        with open("f.c","r") as inp:
+            for line in inp.readlines():
+                if re.search("static int casadi_(\w+)_ref_counter",line):
+                    n_matches = n_matches +1
+        
+        # wrapper function should not have it's own reference counting
+        self.assertEqual(n_matches,1)
 
   @requires_conic('osqp')
   def test_memful_external(self):

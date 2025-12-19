@@ -419,6 +419,15 @@ namespace casadi {
       "Set option 'allow_free' to allow free variables.");
     }
 
+    // Does any nodes require reference counting for codegen?
+    // NOTE: this excludes CALL nodes
+    for (auto&& a : algorithm_) {
+      if (a.data->has_refcount()) {
+        has_refcount_ = true;
+        break;
+      }
+    }
+
   }
 
   int MXFunction::eval(const double** arg, double** res,
@@ -1238,6 +1247,7 @@ namespace casadi {
   }
 
   void MXFunction::codegen_incref(CodeGenerator& g) const {
+    FunctionInternal::codegen_incref(g);
     std::set<void*> added;
     for (auto&& a : algorithm_) {
       a.data->codegen_incref(g, added);
@@ -1245,6 +1255,7 @@ namespace casadi {
   }
 
   void MXFunction::codegen_decref(CodeGenerator& g) const {
+    FunctionInternal::codegen_decref(g);
     std::set<void*> added;
     for (auto&& a : algorithm_) {
       a.data->codegen_decref(g, added);
@@ -1919,6 +1930,8 @@ namespace casadi {
 
   void MXFunction::find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
       casadi_int max_depth) const {
+    // Call to base class
+    FunctionInternal::find(all_fun, max_depth);
     for (auto&& e : algorithm_) {
       if (e.op == OP_CALL) add_embedded(all_fun, e.data.which_function(), max_depth);
     }
