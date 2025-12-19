@@ -809,8 +809,10 @@ namespace casadi {
     collect_graph_outputs(subgraph, value_map, func_outputs, output_names, false);
 
     // Create and return Function
+    Dict opts;
+    opts["allow_duplicate_io_names"] = true;
     return Function(function_name, func_inputs, func_outputs,
-                   input_names, output_names);
+                   input_names, output_names, opts);
   }
 
 } // namespace casadi

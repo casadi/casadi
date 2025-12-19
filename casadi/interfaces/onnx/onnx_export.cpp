@@ -29,12 +29,21 @@
 namespace casadi {
 
   // Helper function to add graph inputs
-  void add_graph_inputs(onnx::GraphProto* graph, const Function& f) {
+  void add_graph_inputs(onnx::GraphProto* graph, const Function& f,
+                        const std::string& name_prefix) {
     for (casadi_int i = 0; i < f.n_in(); ++i) {
       onnx::ValueInfoProto* input = graph->add_input();
-      std::string input_name = f.name_in(i);
-      if (input_name.empty()) {
-        input_name = "input_" + std::to_string(i);
+      std::string input_name;
+
+      if (!name_prefix.empty()) {
+        // For subgraphs, ALWAYS use prefix to ensure uniqueness
+        input_name = name_prefix + "_i" + std::to_string(i);
+      } else {
+        // For main graph, use function's input name if available
+        input_name = f.name_in(i);
+        if (input_name.empty()) {
+          input_name = "input_" + std::to_string(i);
+        }
       }
       input->set_name(input_name);
 
@@ -52,12 +61,22 @@ namespace casadi {
   }
 
   // Helper function to add graph outputs
-  void add_graph_outputs(onnx::GraphProto* graph, const Function& f) {
+  void add_graph_outputs(onnx::GraphProto* graph, const Function& f,
+                         const std::string& name_prefix) {
     for (casadi_int i = 0; i < f.n_out(); ++i) {
       onnx::ValueInfoProto* output = graph->add_output();
-      std::string output_name = f.name_out(i);
-      if (output_name.empty()) {
-        output_name = "output_" + std::to_string(i);
+      std::string output_name;
+
+      if (!name_prefix.empty()) {
+        // For subgraphs, ALWAYS use prefix to ensure uniqueness
+        // (don't use function's original output names as they might conflict)
+        output_name = name_prefix + "_o" + std::to_string(i);
+      } else {
+        // For main graph, use function's output name if available
+        output_name = f.name_out(i);
+        if (output_name.empty()) {
+          output_name = "output_" + std::to_string(i);
+        }
       }
       output->set_name(output_name);
 
@@ -139,9 +158,25 @@ namespace casadi {
           std::vector<Function> f_cases = info["f"];          // Cases vector
           Function f_false = f_cases[0];                      // First case is false branch
 
-          // Convert branches to ONNX subgraphs
-          onnx::GraphProto* then_graph = function_to_graph(f_true, "then_branch");
-          onnx::GraphProto* else_graph = function_to_graph(f_false, "else_branch");
+          // For If branches, we pass the branch input values as outer scope variables
+          // The Switch function has inputs: [condition, value1, value2, ...]
+          // The branches need access to the values (not the condition)
+          std::vector<std::string> outer_scope_vars;
+          for (size_t j = 1; j < i.size(); ++j) {
+            outer_scope_vars.push_back(work_to_onnx[i[j]]);
+          }
+
+          if (verbose_) {
+            uout() << "    Branch outer scope vars: ";
+            for (const auto& v : outer_scope_vars) {
+              uout() << v << " ";
+            }
+            uout() << std::endl;
+          }
+
+          // Convert branches to ONNX subgraphs with outer scope variable references
+          onnx::GraphProto* then_graph = function_to_graph(f_true, "then_branch", outer_scope_vars);
+          onnx::GraphProto* else_graph = function_to_graph(f_false, "else_branch", outer_scope_vars);
 
           // Create ONNX If node
           onnx::NodeProto* if_node = graph->add_node();
@@ -351,6 +386,9 @@ namespace casadi {
       }
     }
 
+    // Add graph outputs (for main graph, use empty prefix to use function's output names)
+    add_graph_outputs(graph, f, "");
+
     has_model_ = true;
 
     if (verbose_) {
@@ -397,7 +435,8 @@ namespace casadi {
 
   onnx::GraphProto* OnnxTranslator::function_to_graph(
       const Function& f,
-      const std::string& graph_name) {
+      const std::string& graph_name,
+      const std::vector<std::string>& outer_scope_inputs) {
 
     // Create a new graph
     onnx::GraphProto* graph = new onnx::GraphProto();
@@ -408,13 +447,31 @@ namespace casadi {
              << graph_name << "'" << std::endl;
       uout() << "    Inputs: " << f.n_in() << ", Outputs: " << f.n_out()
              << ", Instructions: " << f.n_instructions() << std::endl;
+      if (!outer_scope_inputs.empty()) {
+        uout() << "    Outer scope inputs: ";
+        for (const auto& name : outer_scope_inputs) {
+          uout() << name << " ";
+        }
+        uout() << std::endl;
+      }
     }
 
-    // Add inputs to subgraph
-    add_graph_inputs(graph, f);
+    // For subgraphs with outer scope inputs (like If branches), don't add graph inputs
+    // The subgraph will reference outer scope variables directly
+    if (outer_scope_inputs.empty()) {
+      add_graph_inputs(graph, f, "");
+    }
 
     // Map from work vector index to ONNX node name
     std::map<casadi_int, std::string> work_to_onnx;
+
+    // If we have outer scope inputs, pre-populate work_to_onnx so OP_INPUT
+    // instructions will find the correct outer scope variable names
+    for (size_t i = 0; i < outer_scope_inputs.size(); ++i) {
+      // Map the function's input work index to the outer scope variable name
+      // For a function with n inputs, inputs are at work indices 0 to n-1
+      work_to_onnx[static_cast<casadi_int>(i)] = outer_scope_inputs[i];
+    }
 
     // Process instructions
     casadi_int n_instr = f.n_instructions();
@@ -424,6 +481,18 @@ namespace casadi {
       std::vector<casadi_int> i_vec = f.instruction_input(k);
 
       std::string node_output = "n" + std::to_string(k);
+
+      // Special handling for OP_INPUT when using outer scope inputs
+      // (for If branch subgraphs that reference outer scope variables)
+      if (op == OP_INPUT && !outer_scope_inputs.empty()) {
+        casadi_int input_idx = i_vec[0];  // Function input index
+        if (static_cast<size_t>(input_idx) < outer_scope_inputs.size()) {
+          // Map the output work index directly to the outer scope variable name
+          // No need to create an Identity node - we just reference the outer variable
+          work_to_onnx[o[0]] = outer_scope_inputs[input_idx];
+          continue;
+        }
+      }
 
       // Try to process with operation handler
       if (process_operation(graph, f, op, k, i_vec, o, work_to_onnx, node_output)) {
@@ -454,8 +523,8 @@ namespace casadi {
       }
     }
 
-    // Add graph outputs
-    add_graph_outputs(graph, f);
+    // Add graph outputs (without prefix - subgraphs are self-contained)
+    add_graph_outputs(graph, f, "");
 
     if (verbose_) {
       uout() << "    Created " << graph->node_size() << " nodes in subgraph" << std::endl;

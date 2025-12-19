@@ -221,12 +221,16 @@ namespace casadi {
 
         \param f The CasADi Function to convert
         \param graph_name Name for the ONNX graph
+        \param outer_scope_inputs Optional vector of outer scope variable names to use
+               instead of adding graph inputs. Used for If branch subgraphs that
+               reference variables from the enclosing scope.
         \return Pointer to created GraphProto
 
         \identifier{onnx_translator_function_to_graph} */
     onnx::GraphProto* function_to_graph(
         const Function& f,
-        const std::string& graph_name);
+        const std::string& graph_name,
+        const std::vector<std::string>& outer_scope_inputs = {});
 
     /** \brief Check if Function is an if_else function
 
@@ -315,10 +319,12 @@ namespace casadi {
   // ========== Export Helper Functions ==========
 
   /** \brief Add graph inputs to ONNX graph (defined in onnx_export.cpp) */
-  void add_graph_inputs(onnx::GraphProto* graph, const Function& f);
+  void add_graph_inputs(onnx::GraphProto* graph, const Function& f,
+                        const std::string& name_prefix = "");
 
   /** \brief Add graph outputs to ONNX graph (defined in onnx_export.cpp) */
-  void add_graph_outputs(onnx::GraphProto* graph, const Function& f);
+  void add_graph_outputs(onnx::GraphProto* graph, const Function& f,
+                         const std::string& name_prefix = "");
 
   /** \brief Create binary operation ONNX node (defined in onnx_operations.cpp) */
   onnx::NodeProto* create_binary_node(
