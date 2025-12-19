@@ -884,7 +884,7 @@ class casadiTestCase(unittest.TestCase):
         for i in range(F.n_out()):
           self.checkarray(Fout[i],Fout2[i],digits=digits)
 
-      if self.check_serialize:
+      if check_serialize:
         self.check_serialize(F2,inputs=inputs)
         
       return F2, libname
