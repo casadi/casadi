@@ -35,102 +35,64 @@ namespace casadi {
 
     MX output;
 
-    // Binary operations
-    if (op_type == "Add") {
-      casadi_assert(node_inputs.size() >= 2, "Add requires 2 inputs");
-      output = node_inputs[0] + node_inputs[1];
-    } else if (op_type == "Sub") {
-      casadi_assert(node_inputs.size() >= 2, "Sub requires 2 inputs");
-      output = node_inputs[0] - node_inputs[1];
-    } else if (op_type == "Mul") {
-      casadi_assert(node_inputs.size() >= 2, "Mul requires 2 inputs");
-      output = node_inputs[0] * node_inputs[1];
-    } else if (op_type == "Div") {
-      casadi_assert(node_inputs.size() >= 2, "Div requires 2 inputs");
-      output = node_inputs[0] / node_inputs[1];
-    } else if (op_type == "Pow") {
-      casadi_assert(node_inputs.size() >= 2, "Pow requires 2 inputs");
-      output = pow(node_inputs[0], node_inputs[1]);
+    // Try simple operations using centralized lookup table
+    const OpMapping* mapping = get_op_mapping_by_name(op_type);
+    if (mapping) {
+      const MX& x = node_inputs[0];
+      if (mapping->arity == 1) {
+        casadi_assert(node_inputs.size() >= 1, op_type + " requires 1 input");
+        switch (mapping->casadi_op) {
+          case OP_SIN: return sin(x);
+          case OP_COS: return cos(x);
+          case OP_TAN: return tan(x);
+          case OP_ASIN: return asin(x);
+          case OP_ACOS: return acos(x);
+          case OP_ATAN: return atan(x);
+          case OP_SINH: return sinh(x);
+          case OP_COSH: return cosh(x);
+          case OP_TANH: return tanh(x);
+          case OP_ASINH: return asinh(x);
+          case OP_ACOSH: return acosh(x);
+          case OP_ATANH: return atanh(x);
+          case OP_EXP: return exp(x);
+          case OP_LOG: return log(x);
+          case OP_SQRT: return sqrt(x);
+          case OP_NEG: return -x;
+          case OP_FABS: return fabs(x);
+          case OP_CEIL: return ceil(x);
+          case OP_FLOOR: return floor(x);
+          case OP_SIGN: return sign(x);
+          case OP_ERF: return erf(x);
+          case OP_INV: return 1.0 / x;
+          case OP_NOT: return !x;
+          case OP_TRANSPOSE: return x.T();
+          case OP_NORM1: return norm_1(x);
+          case OP_NORM2: return norm_2(x);
+          case OP_NORMF: return norm_fro(x);
+          case OP_MMIN: return mmin(x);
+          case OP_MMAX: return mmax(x);
+          default: break;
+        }
+      } else if (mapping->arity == 2) {
+        casadi_assert(node_inputs.size() >= 2, op_type + " requires 2 inputs");
+        const MX& y = node_inputs[1];
+        switch (mapping->casadi_op) {
+          case OP_ADD: return x + y;
+          case OP_SUB: return x - y;
+          case OP_MUL: return x * y;
+          case OP_DIV: return x / y;
+          case OP_POW: return pow(x, y);
+          case OP_OR: return logic_or(x, y);
+          case OP_AND: return logic_and(x, y);
+          default: break;
+        }
+      }
+    }
 
-    // Trigonometric
-    } else if (op_type == "Sin") {
-      casadi_assert(node_inputs.size() >= 1, "Sin requires 1 input");
-      output = sin(node_inputs[0]);
-    } else if (op_type == "Cos") {
-      casadi_assert(node_inputs.size() >= 1, "Cos requires 1 input");
-      output = cos(node_inputs[0]);
-    } else if (op_type == "Tan") {
-      casadi_assert(node_inputs.size() >= 1, "Tan requires 1 input");
-      output = tan(node_inputs[0]);
+    // Operations not in the simple mapping tables
+    // These require special handling (attributes, multiple inputs, etc.)
 
-    // Inverse Trigonometric
-    } else if (op_type == "Asin") {
-      casadi_assert(node_inputs.size() >= 1, "Asin requires 1 input");
-      output = asin(node_inputs[0]);
-    } else if (op_type == "Acos") {
-      casadi_assert(node_inputs.size() >= 1, "Acos requires 1 input");
-      output = acos(node_inputs[0]);
-    } else if (op_type == "Atan") {
-      casadi_assert(node_inputs.size() >= 1, "Atan requires 1 input");
-      output = atan(node_inputs[0]);
-
-    // Hyperbolic
-    } else if (op_type == "Sinh") {
-      casadi_assert(node_inputs.size() >= 1, "Sinh requires 1 input");
-      output = sinh(node_inputs[0]);
-    } else if (op_type == "Cosh") {
-      casadi_assert(node_inputs.size() >= 1, "Cosh requires 1 input");
-      output = cosh(node_inputs[0]);
-    } else if (op_type == "Tanh") {
-      casadi_assert(node_inputs.size() >= 1, "Tanh requires 1 input");
-      output = tanh(node_inputs[0]);
-
-    // Inverse Hyperbolic
-    } else if (op_type == "Asinh") {
-      casadi_assert(node_inputs.size() >= 1, "Asinh requires 1 input");
-      output = asinh(node_inputs[0]);
-    } else if (op_type == "Acosh") {
-      casadi_assert(node_inputs.size() >= 1, "Acosh requires 1 input");
-      output = acosh(node_inputs[0]);
-    } else if (op_type == "Atanh") {
-      casadi_assert(node_inputs.size() >= 1, "Atanh requires 1 input");
-      output = atanh(node_inputs[0]);
-
-    // Exponential/Logarithmic
-    } else if (op_type == "Exp") {
-      casadi_assert(node_inputs.size() >= 1, "Exp requires 1 input");
-      output = exp(node_inputs[0]);
-    } else if (op_type == "Log") {
-      casadi_assert(node_inputs.size() >= 1, "Log requires 1 input");
-      output = log(node_inputs[0]);
-    } else if (op_type == "Sqrt") {
-      casadi_assert(node_inputs.size() >= 1, "Sqrt requires 1 input");
-      output = sqrt(node_inputs[0]);
-
-    // Rounding
-    } else if (op_type == "Ceil") {
-      casadi_assert(node_inputs.size() >= 1, "Ceil requires 1 input");
-      output = ceil(node_inputs[0]);
-    } else if (op_type == "Floor") {
-      casadi_assert(node_inputs.size() >= 1, "Floor requires 1 input");
-      output = floor(node_inputs[0]);
-
-    // Other
-    } else if (op_type == "Abs") {
-      casadi_assert(node_inputs.size() >= 1, "Abs requires 1 input");
-      output = fabs(node_inputs[0]);
-    } else if (op_type == "Sign") {
-      casadi_assert(node_inputs.size() >= 1, "Sign requires 1 input");
-      output = sign(node_inputs[0]);
-    } else if (op_type == "Neg") {
-      casadi_assert(node_inputs.size() >= 1, "Neg requires 1 input");
-      output = -node_inputs[0];
-    } else if (op_type == "Erf") {
-      casadi_assert(node_inputs.size() >= 1, "Erf requires 1 input");
-      output = erf(node_inputs[0]);
-
-    // Comparison operations
-    } else if (op_type == "Less") {
+    if (op_type == "Less") {
       casadi_assert(node_inputs.size() >= 2, "Less requires 2 inputs");
       // Less: returns 1.0 if input[0] < input[1], 0.0 otherwise
       // Use CasADi's if_else: if (a < b) then 1.0 else 0.0
@@ -311,6 +273,73 @@ namespace casadi {
     return output;
   }
 
+  // ========== Operation Mapping ==========
+  //
+  // Centralized mapping between CasADi opcodes and ONNX operation names.
+  // Used by both export (CasADi → ONNX) and import (ONNX → CasADi).
+  //
+  // Single source of truth for all simple operations that have direct
+  // CasADi ↔ ONNX equivalents.
+  //
+  // OpMapping struct is defined in onnx_translator.hpp
+
+  static const OpMapping op_map[] = {
+    // Unary operations
+    {OP_SIN, "Sin", 1},
+    {OP_COS, "Cos", 1},
+    {OP_TAN, "Tan", 1},
+    {OP_ASIN, "Asin", 1},
+    {OP_ACOS, "Acos", 1},
+    {OP_ATAN, "Atan", 1},
+    {OP_SINH, "Sinh", 1},
+    {OP_COSH, "Cosh", 1},
+    {OP_TANH, "Tanh", 1},
+    {OP_ASINH, "Asinh", 1},
+    {OP_ACOSH, "Acosh", 1},
+    {OP_ATANH, "Atanh", 1},
+    {OP_EXP, "Exp", 1},
+    {OP_LOG, "Log", 1},
+    {OP_SQRT, "Sqrt", 1},
+    {OP_NEG, "Neg", 1},
+    {OP_FABS, "Abs", 1},
+    {OP_CEIL, "Ceil", 1},
+    {OP_FLOOR, "Floor", 1},
+    {OP_SIGN, "Sign", 1},
+    {OP_ERF, "Erf", 1},
+    {OP_INV, "Reciprocal", 1},
+    {OP_NOT, "Not", 1},
+    {OP_TRANSPOSE, "Transpose", 1},
+    {OP_NORM1, "ReduceL1", 1},
+    {OP_NORM2, "ReduceL2", 1},
+    {OP_NORMF, "ReduceL2", 1},
+    {OP_MMIN, "ReduceMin", 1},
+    {OP_MMAX, "ReduceMax", 1},
+    // Binary operations
+    {OP_ADD, "Add", 2},
+    {OP_SUB, "Sub", 2},
+    {OP_MUL, "Mul", 2},
+    {OP_DIV, "Div", 2},
+    {OP_POW, "Pow", 2},
+    {OP_OR, "Or", 2},
+    {OP_AND, "And", 2},
+  };
+
+  // Lookup by CasADi opcode (for export)
+  const OpMapping* get_op_mapping(casadi_int op) {
+    for (const auto& entry : op_map) {
+      if (entry.casadi_op == op) return &entry;
+    }
+    return nullptr;
+  }
+
+  // Lookup by ONNX name (for import)
+  const OpMapping* get_op_mapping_by_name(const std::string& onnx_name) {
+    for (const auto& entry : op_map) {
+      if (entry.onnx_name == onnx_name) return &entry;
+    }
+    return nullptr;
+  }
+
   // ========== Export Helpers ==========
 
   onnx::NodeProto* create_binary_node(
@@ -339,6 +368,7 @@ namespace casadi {
     return node;
   }
 
+  // Process a CasADi operation and create corresponding ONNX node
   bool process_operation(
       onnx::GraphProto* graph,
       const Function& f,
@@ -351,6 +381,21 @@ namespace casadi {
 
     onnx::NodeProto* node = nullptr;
 
+    // Try simple operations using centralized lookup table
+    const OpMapping* mapping = get_op_mapping(op);
+    if (mapping) {
+      if (mapping->arity == 1 && i_vec.size() >= 1 && o_vec.size() == 1) {
+        create_unary_node(graph, mapping->onnx_name, work_to_onnx[i_vec[0]], node_output);
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+      } else if (mapping->arity == 2 && i_vec.size() >= 2 && o_vec.size() == 1) {
+        create_binary_node(graph, mapping->onnx_name, work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+      }
+    }
+
+    // Handle complex operations that can't use the simple lookup
     switch (op) {
       case OP_INPUT: {
         std::string input_name = f.name_in(i_vec[0]);
@@ -400,32 +445,6 @@ namespace casadi {
         return true;
       }
 
-      // Binary arithmetic operations
-      case OP_ADD:
-        create_binary_node(graph, "Add", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_SUB:
-        create_binary_node(graph, "Sub", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_MUL:
-        create_binary_node(graph, "Mul", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_DIV:
-        create_binary_node(graph, "Div", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_POW:
-        create_binary_node(graph, "Pow", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
       case OP_MTIMES: {
         // OP_MTIMES is a fused multiply-add: output = input[1] * input[2] + input[0]
         // This is a GEMM-like operation with 3 inputs
@@ -435,112 +454,6 @@ namespace casadi {
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       }
-
-      // Unary operations
-      case OP_SIN:
-        create_unary_node(graph, "Sin", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_COS:
-        create_unary_node(graph, "Cos", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_TAN:
-        create_unary_node(graph, "Tan", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_ASIN:
-        create_unary_node(graph, "Asin", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_ACOS:
-        create_unary_node(graph, "Acos", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_ATAN:
-        create_unary_node(graph, "Atan", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_SINH:
-        create_unary_node(graph, "Sinh", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_COSH:
-        create_unary_node(graph, "Cosh", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_TANH:
-        create_unary_node(graph, "Tanh", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_ASINH:
-        create_unary_node(graph, "Asinh", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_ACOSH:
-        create_unary_node(graph, "Acosh", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_ATANH:
-        create_unary_node(graph, "Atanh", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_EXP:
-        create_unary_node(graph, "Exp", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_LOG:
-        create_unary_node(graph, "Log", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_SQRT:
-        create_unary_node(graph, "Sqrt", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_NEG:
-        create_unary_node(graph, "Neg", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_FABS:
-        create_unary_node(graph, "Abs", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_CEIL:
-        create_unary_node(graph, "Ceil", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_FLOOR:
-        create_unary_node(graph, "Floor", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_SIGN:
-        create_unary_node(graph, "Sign", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
-
-      case OP_ERF:
-        create_unary_node(graph, "Erf", work_to_onnx[i_vec[0]], node_output);
-        work_to_onnx[o_vec[0]] = node_output;
-        return true;
 
       case OP_SQ: {
         // Square operation: output = input^2, implemented as Mul(input, input)

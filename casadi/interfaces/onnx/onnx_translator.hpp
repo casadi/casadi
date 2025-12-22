@@ -34,6 +34,7 @@
 #include <onnx/onnx_pb.h>
 
 #include <map>
+#include <set>
 #include <string>
 
 /// \cond INTERNAL
@@ -118,6 +119,9 @@ namespace casadi {
 
     /// Whether a model has been loaded
     bool has_model_;
+
+    /// Track which functions have been exported as FunctionProto
+    std::set<std::string> exported_functions_;
 
   private:
     // Friend declarations for import helper functions
@@ -232,6 +236,21 @@ namespace casadi {
         const std::string& graph_name,
         const std::vector<std::string>& outer_scope_inputs = {});
 
+    /** \brief Convert a CasADi Function to ONNX FunctionProto
+
+        Converts a CasADi Function into an ONNX FunctionProto for use as
+        a local function that can be called from the main graph or other
+        functions. Recursively handles nested function calls.
+
+        \param f The CasADi Function to convert
+        \param domain The ONNX domain for this function (e.g., "casadi")
+        \return Pointer to created FunctionProto
+
+        \identifier{onnx_translator_function_to_function_proto} */
+    onnx::FunctionProto* function_to_function_proto(
+        const Function& f,
+        const std::string& domain);
+
     /** \brief Check if Function is an if_else function
 
         \param f The Function to check
@@ -326,7 +345,27 @@ namespace casadi {
   void add_graph_outputs(onnx::GraphProto* graph, const Function& f,
                          const std::string& name_prefix = "");
 
-  /** \brief Create binary operation ONNX node (defined in onnx_operations.cpp) */
+  /** \brief Operation mapping between CasADi and ONNX
+   *
+   * Single source of truth for all simple operations that have
+   * direct CasADi ↔ ONNX equivalents. */
+  struct OpMapping {
+    casadi_int casadi_op;  ///< CasADi operation code
+    const char* onnx_name; ///< ONNX operation name
+    int arity;             ///< Number of inputs (1=unary, 2=binary)
+  };
+
+  /** \brief Lookup operation mapping by CasADi opcode (for export)
+   *
+   * Returns nullptr if not a simple mapped operation. */
+  const OpMapping* get_op_mapping(casadi_int op);
+
+  /** \brief Lookup operation mapping by ONNX name (for import)
+   *
+   * Returns nullptr if not a simple mapped operation. */
+  const OpMapping* get_op_mapping_by_name(const std::string& onnx_name);
+
+  /** \brief Create binary operation ONNX node */
   onnx::NodeProto* create_binary_node(
       onnx::GraphProto* graph,
       const std::string& op_type,

@@ -608,6 +608,83 @@ namespace casadi {
 
       // ========== Standard Operations (delegated to helper) ==========
       } else {
+        // Check if this is a function call (node has non-empty domain)
+        std::string node_domain = node.domain();
+        if (!node_domain.empty()) {
+          // This is a function call - look up the function definition
+          const onnx::ModelProto& model = translator.model_;
+          const onnx::FunctionProto* func_proto = nullptr;
+
+          for (int f = 0; f < model.functions_size(); ++f) {
+            if (model.functions(f).name() == op_type &&
+                model.functions(f).domain() == node_domain) {
+              func_proto = &model.functions(f);
+              break;
+            }
+          }
+
+          if (func_proto != nullptr) {
+            if (verbose) {
+              uout() << "    Function call to: " << node_domain << "." << op_type << std::endl;
+            }
+
+            // Create a temporary GraphProto from the FunctionProto
+            // This is a bit of a hack but allows us to reuse the graph processing code
+            onnx::GraphProto func_graph;
+            func_graph.set_name(func_proto->name());
+
+            // Copy nodes from function to graph
+            for (int n = 0; n < func_proto->node_size(); ++n) {
+              *func_graph.add_node() = func_proto->node(n);
+            }
+
+            // Create graph inputs from function inputs
+            for (int n = 0; n < func_proto->input_size(); ++n) {
+              onnx::ValueInfoProto* input = func_graph.add_input();
+              input->set_name(func_proto->input(n));
+              // Set default type (double scalar) - actual shapes come from caller
+              onnx::TypeProto* type = input->mutable_type();
+              onnx::TypeProto::Tensor* tensor_type = type->mutable_tensor_type();
+              tensor_type->set_elem_type(onnx::TensorProto::DOUBLE);
+            }
+
+            // Create graph outputs from function outputs
+            for (int n = 0; n < func_proto->output_size(); ++n) {
+              onnx::ValueInfoProto* output_info = func_graph.add_output();
+              output_info->set_name(func_proto->output(n));
+              onnx::TypeProto* type = output_info->mutable_type();
+              onnx::TypeProto::Tensor* tensor_type = type->mutable_tensor_type();
+              tensor_type->set_elem_type(onnx::TensorProto::DOUBLE);
+            }
+
+            // Build a local value_map for the function scope
+            // Map function inputs to the actual values from the call site
+            std::map<std::string, MX> func_value_map;
+            for (size_t n = 0; n < node_inputs.size() && n < func_proto->input_size(); ++n) {
+              func_value_map[func_proto->input(n)] = node_inputs[n];
+            }
+
+            // Process function nodes
+            process_graph_nodes(func_graph, func_value_map, translator, false, false);
+
+            // Get function outputs and store them in value_map
+            for (int n = 0; n < node.output_size() && n < func_proto->output_size(); ++n) {
+              std::string func_output_name = func_proto->output(n);
+              casadi_assert(func_value_map.count(func_output_name),
+                           "Function output '" + func_output_name + "' not found");
+              value_map[node.output(n)] = func_value_map[func_output_name];
+
+              if (verbose) {
+                uout() << "      -> " << node.output(n) << std::endl;
+              }
+            }
+
+            // Skip the normal single-output handling
+            continue;
+          }
+          // Fall through to error if function not found
+        }
+
         // All other operations handled by process_node_operation helper
         // This includes: Add, Sub, Mul, Div, Pow, Sin, Cos, Tan, Asin, Acos, Atan,
         // Sinh, Cosh, Tanh, Asinh, Acosh, Atanh, Exp, Log, Sqrt, Ceil, Floor,
