@@ -96,6 +96,7 @@ namespace casadi {
   void OnnxTranslator::load(const Function& f) {
     // Create ONNX model from CasADi Function
     model_.Clear();
+    exported_functions_.clear();  // Clear previously exported functions
     model_.set_ir_version(8);
 
     // Set producer info
@@ -364,19 +365,45 @@ namespace casadi {
           continue;
 
         } else {
-          // Regular function call - export as ONNX local function
+          // Regular function call - export as ONNX local function using FunctionProto
+          std::string func_name = called_func.name();
+          std::string domain = "casadi";
+
           if (verbose_) {
-            uout() << "  Exporting regular function call to '" << called_func.name() << "'" << std::endl;
+            uout() << "  Exporting regular function call to '" << func_name
+                   << "' (domain: " << domain << ")" << std::endl;
           }
 
-          // TODO: Implement ONNX local function support (FunctionProto)
-          // For now, provide a more helpful error message
-          casadi_error("ONNX export: Function calls to '" + called_func.name() +
-                      "' are not yet fully implemented. "
-                      "ONNX supports function hierarchies via FunctionProto, but this feature "
-                      "needs to be added to the translator. "
-                      "Workaround: Use .wrap() to inline the function before export, or "
-                      "wait for FunctionProto support to be implemented.");
+          // Export function if not already done
+          if (exported_functions_.find(func_name) == exported_functions_.end()) {
+            onnx::FunctionProto* func_proto = function_to_function_proto(called_func, domain);
+            *model_.add_functions() = *func_proto;
+            delete func_proto;
+            exported_functions_.insert(func_name);
+          }
+
+          // Create node that calls the function
+          onnx::NodeProto* call_node = graph->add_node();
+          call_node->set_op_type(func_name);
+          call_node->set_domain(domain);
+
+          // Connect inputs
+          for (size_t j = 0; j < i.size(); ++j) {
+            call_node->add_input(work_to_onnx[i[j]]);
+          }
+
+          // Connect outputs
+          for (size_t j = 0; j < o.size(); ++j) {
+            std::string output_name = "n" + std::to_string(k) + "_out" + std::to_string(j);
+            call_node->add_output(output_name);
+            work_to_onnx[o[j]] = output_name;
+          }
+
+          if (verbose_) {
+            uout() << "    Created function call node with " << o.size() << " outputs" << std::endl;
+          }
+
+          continue;
         }
       } else {
         // Unknown/unsupported operation
@@ -388,6 +415,18 @@ namespace casadi {
 
     // Add graph outputs (for main graph, use empty prefix to use function's output names)
     add_graph_outputs(graph, f, "");
+
+    // If we exported any functions, add the casadi domain opset_import
+    if (!exported_functions_.empty()) {
+      onnx::OperatorSetIdProto* casadi_opset = model_.add_opset_import();
+      casadi_opset->set_domain("casadi");
+      casadi_opset->set_version(1);
+
+      if (verbose_) {
+        uout() << "  Exported " << exported_functions_.size()
+               << " function(s) to casadi domain" << std::endl;
+      }
+    }
 
     has_model_ = true;
 
@@ -505,16 +544,47 @@ namespace casadi {
         // Get the called function
         MX mx_call = f.instruction_MX(k);
         Function called_func = mx_call.which_function();
+        std::string func_name = called_func.name();
+        std::string domain = "casadi";
 
         if (verbose_) {
-          uout() << "    Found OP_CALL: " << called_func.name() << std::endl;
+          uout() << "    Found OP_CALL: " << func_name << " in subgraph" << std::endl;
         }
 
-        // For now, error on nested function calls in subgraphs
-        // Full implementation would recursively handle this
-        casadi_error("ONNX export: Nested function calls in subgraphs not yet supported. "
-                    "Found call to '" + called_func.name() + "' in subgraph '" +
-                    graph_name + "'.");
+        // Check for control flow - these need special handling within subgraphs
+        if (is_if_else_function(called_func) ||
+            is_mapaccum_function(called_func) ||
+            is_map_function(called_func)) {
+          casadi_error("ONNX export: Control flow in subgraphs not yet supported. "
+                      "Found '" + func_name + "' in subgraph '" + graph_name + "'.");
+        }
+
+        // Regular function call - export as ONNX local function
+        if (exported_functions_.find(func_name) == exported_functions_.end()) {
+          onnx::FunctionProto* func_proto = function_to_function_proto(called_func, domain);
+          *model_.add_functions() = *func_proto;
+          delete func_proto;
+          exported_functions_.insert(func_name);
+        }
+
+        // Create node that calls the function
+        onnx::NodeProto* call_node = graph->add_node();
+        call_node->set_op_type(func_name);
+        call_node->set_domain(domain);
+
+        // Connect inputs
+        for (size_t j = 0; j < i_vec.size(); ++j) {
+          call_node->add_input(work_to_onnx[i_vec[j]]);
+        }
+
+        // Connect outputs
+        for (size_t j = 0; j < o.size(); ++j) {
+          std::string output = node_output + "_out" + std::to_string(j);
+          call_node->add_output(output);
+          work_to_onnx[o[j]] = output;
+        }
+
+        continue;
       } else {
         // For unsupported operations in subgraphs, provide helpful error
         casadi_error("ONNX export: Unsupported operation code " + std::to_string(op) +
@@ -531,6 +601,211 @@ namespace casadi {
     }
 
     return graph;
+  }
+
+  onnx::FunctionProto* OnnxTranslator::function_to_function_proto(
+      const Function& f,
+      const std::string& domain) {
+
+    // Create a new FunctionProto
+    onnx::FunctionProto* func = new onnx::FunctionProto();
+    func->set_name(f.name());
+    func->set_domain(domain);
+
+    if (verbose_) {
+      uout() << "  Converting Function '" << f.name() << "' to ONNX FunctionProto"
+             << " (domain: " << domain << ")" << std::endl;
+      uout() << "    Inputs: " << f.n_in() << ", Outputs: " << f.n_out()
+             << ", Instructions: " << f.n_instructions() << std::endl;
+    }
+
+    // Add function inputs (parameter names)
+    for (casadi_int i = 0; i < f.n_in(); ++i) {
+      std::string input_name = f.name_in(i);
+      if (input_name.empty()) {
+        input_name = "input_" + std::to_string(i);
+      }
+      func->add_input(input_name);
+    }
+
+    // Add function outputs (parameter names)
+    for (casadi_int i = 0; i < f.n_out(); ++i) {
+      std::string output_name = f.name_out(i);
+      if (output_name.empty()) {
+        output_name = "output_" + std::to_string(i);
+      }
+      func->add_output(output_name);
+    }
+
+    // Map from work vector index to ONNX node name
+    std::map<casadi_int, std::string> work_to_onnx;
+
+    // Process instructions and add nodes to the function
+    casadi_int n_instr = f.n_instructions();
+    for (casadi_int k = 0; k < n_instr; ++k) {
+      casadi_int op = f.instruction_id(k);
+      std::vector<casadi_int> o = f.instruction_output(k);
+      std::vector<casadi_int> i_vec = f.instruction_input(k);
+
+      std::string node_output = "n" + std::to_string(k);
+
+      // Handle OP_INPUT specially for FunctionProto - just map to parameter name (no Identity node)
+      if (op == OP_INPUT) {
+        casadi_int input_idx = i_vec[0];
+        std::string input_name = f.name_in(input_idx);
+        if (input_name.empty()) {
+          input_name = "input_" + std::to_string(input_idx);
+        }
+        work_to_onnx[o[0]] = input_name;
+        continue;
+      }
+
+      // Handle OP_OUTPUT specially for FunctionProto - use declared output names
+      if (op == OP_OUTPUT) {
+        casadi_int output_idx = o[0];
+        std::string output_name = f.name_out(output_idx);
+        if (output_name.empty()) {
+          output_name = "output_" + std::to_string(output_idx);
+        }
+
+        // Create Identity node to connect internal result to output name
+        onnx::NodeProto* id_node = func->add_node();
+        id_node->set_op_type("Identity");
+        id_node->add_input(work_to_onnx[i_vec[0]]);
+        id_node->add_output(output_name);
+        continue;
+      }
+
+      // Handle OP_CALL - recursive function call
+      if (op == OP_CALL) {
+        MX mx_call = f.instruction_MX(k);
+        Function called_func = mx_call.which_function();
+
+        if (verbose_) {
+          uout() << "    Found OP_CALL: " << called_func.name() << std::endl;
+        }
+
+        // Check for control flow - these need special handling
+        if (is_if_else_function(called_func) ||
+            is_mapaccum_function(called_func) ||
+            is_map_function(called_func)) {
+          casadi_error("ONNX export: Control flow in nested functions not yet supported. "
+                      "Found '" + called_func.name() + "' in function '" + f.name() + "'.");
+        }
+
+        // Regular function call - export the called function if not already done
+        std::string func_name = called_func.name();
+        if (exported_functions_.find(func_name) == exported_functions_.end()) {
+          // Recursively export the called function
+          onnx::FunctionProto* nested_func = function_to_function_proto(called_func, domain);
+          *model_.add_functions() = *nested_func;
+          delete nested_func;
+          exported_functions_.insert(func_name);
+        }
+
+        // Create node that calls the function
+        onnx::NodeProto* call_node = func->add_node();
+        call_node->set_op_type(func_name);
+        call_node->set_domain(domain);
+
+        // Connect inputs
+        for (size_t j = 0; j < i_vec.size(); ++j) {
+          call_node->add_input(work_to_onnx[i_vec[j]]);
+        }
+
+        // Connect outputs
+        for (size_t j = 0; j < o.size(); ++j) {
+          std::string output = "call_" + func_name + "_" + std::to_string(k) + "_out" + std::to_string(j);
+          call_node->add_output(output);
+          work_to_onnx[o[j]] = output;
+        }
+
+        continue;
+      }
+
+      // Handle OP_CONST - create constant node
+      if (op == OP_CONST) {
+        MX mx_const = f.instruction_MX(k);
+        DM dm_const = static_cast<DM>(mx_const);
+
+        onnx::NodeProto* const_node = func->add_node();
+        const_node->set_op_type("Constant");
+        const_node->add_output(node_output);
+
+        onnx::AttributeProto* attr = const_node->add_attribute();
+        attr->set_name("value");
+        onnx::TensorProto* tensor = attr->mutable_t();
+        tensor->set_data_type(onnx::TensorProto::DOUBLE);
+
+        tensor->add_dims(dm_const.size1());
+        if (dm_const.size2() > 1) tensor->add_dims(dm_const.size2());
+
+        for (casadi_int idx = 0; idx < dm_const.numel(); ++idx) {
+          tensor->add_double_data(static_cast<double>(dm_const->at(idx)));
+        }
+
+        work_to_onnx[o[0]] = node_output;
+        continue;
+      }
+
+      // Try simple operations using centralized lookup table
+      const OpMapping* mapping = get_op_mapping(op);
+      if (mapping) {
+        onnx::NodeProto* node = func->add_node();
+        node->set_op_type(mapping->onnx_name);
+        if (mapping->arity == 1 && i_vec.size() >= 1) {
+          node->add_input(work_to_onnx[i_vec[0]]);
+        } else if (mapping->arity == 2 && i_vec.size() >= 2) {
+          node->add_input(work_to_onnx[i_vec[0]]);
+          node->add_input(work_to_onnx[i_vec[1]]);
+        }
+        node->add_output(node_output);
+        work_to_onnx[o[0]] = node_output;
+        continue;
+      }
+
+      // Handle OP_SQ (square): x^2 = x * x
+      if (op == OP_SQ && i_vec.size() == 1 && o.size() == 1) {
+        onnx::NodeProto* node = func->add_node();
+        node->set_op_type("Mul");
+        node->add_input(work_to_onnx[i_vec[0]]);
+        node->add_input(work_to_onnx[i_vec[0]]);
+        node->add_output(node_output);
+        work_to_onnx[o[0]] = node_output;
+        continue;
+      }
+
+      // Handle OP_TWICE (double): 2*x
+      if (op == OP_TWICE && i_vec.size() == 1 && o.size() == 1) {
+        std::string const_name = "const_2_" + std::to_string(k);
+        onnx::NodeProto* const_node = func->add_node();
+        const_node->set_op_type("Constant");
+        const_node->add_output(const_name);
+        onnx::AttributeProto* attr = const_node->add_attribute();
+        attr->set_name("value");
+        onnx::TensorProto* tensor = attr->mutable_t();
+        tensor->set_data_type(onnx::TensorProto::DOUBLE);
+        tensor->add_double_data(2.0);
+
+        onnx::NodeProto* mul_node = func->add_node();
+        mul_node->set_op_type("Mul");
+        mul_node->add_input(const_name);
+        mul_node->add_input(work_to_onnx[i_vec[0]]);
+        mul_node->add_output(node_output);
+        work_to_onnx[o[0]] = node_output;
+        continue;
+      }
+
+      // Unsupported operation
+      casadi_error("ONNX export: Unsupported operation code " + std::to_string(op) +
+                  " in function '" + f.name() + "' at instruction " + std::to_string(k));
+    }
+
+    if (verbose_) {
+      uout() << "    Created " << func->node_size() << " nodes in FunctionProto" << std::endl;
+    }
+
+    return func;
   }
 
 } // namespace casadi

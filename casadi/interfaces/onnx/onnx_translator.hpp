@@ -34,6 +34,7 @@
 #include <onnx/onnx_pb.h>
 
 #include <map>
+#include <set>
 #include <string>
 
 /// \cond INTERNAL
@@ -46,8 +47,8 @@ namespace casadi {
       \author Joris Gillis
       \date 2025
 
-      \identifier{onnx_translator} */
-  class CASADI_EXPORT OnnxTranslator : public TranslatorInternal {
+  */
+  class CASADI_TRANSLATOR_ONNX_EXPORT OnnxTranslator : public TranslatorInternal {
   public:
     /// Constructor
     OnnxTranslator();
@@ -55,50 +56,34 @@ namespace casadi {
     /// Destructor
     ~OnnxTranslator() override;
 
-    /** \brief Get type name
-
-        \identifier{onnx_translator_type} */
+    /** \brief Get type name */
     std::string class_name() const override { return "OnnxTranslator";}
 
     /// Query plugin name
     const char* plugin_name() const override { return "onnx";}
 
     ///@{
-    /** \brief Options
-
-        \identifier{onnx_translator_options} */
+    /** \brief Options */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
-    /** \brief Initialize
-
-        \identifier{onnx_translator_init} */
+    /** \brief Initialize */
     void init(const Dict& opts) override;
 
-    /** \brief Load a graph from ONNX file
-
-        \identifier{onnx_translator_load_file} */
+    /** \brief Load a graph from ONNX file */
     void load(const std::string& filename) override;
 
-    /** \brief Load a CasADi Function and convert to ONNX representation
-
-        \identifier{onnx_translator_load_function} */
+    /** \brief Load a CasADi Function and convert to ONNX representation */
     void load(const Function& f) override;
 
-    /** \brief Set dimension for a symbolic variable
-
-        \identifier{onnx_translator_set_dimension} */
+    /** \brief Set dimension for a symbolic variable */
     void set_dimension(const std::string& name, casadi_int dim) override;
 
-    /** \brief Create a CasADi Function from the loaded ONNX graph
-
-        \identifier{onnx_translator_create} */
+    /** \brief Create a CasADi Function from the loaded ONNX graph */
     Function create(const std::string& name) override;
 
-    /** \brief Save the loaded graph to ONNX file
-
-        \identifier{onnx_translator_save} */
+    /** \brief Save the loaded graph to ONNX file */
     void save(const std::string& filename) override;
 
     /// Creator function for plugin
@@ -118,6 +103,9 @@ namespace casadi {
 
     /// Whether a model has been loaded
     bool has_model_;
+
+    /// Track which functions have been exported as FunctionProto
+    std::set<std::string> exported_functions_;
 
   private:
     // Friend declarations for import helper functions
@@ -152,17 +140,13 @@ namespace casadi {
     /** \brief Get dimension value from ONNX shape
 
         Handles both concrete dimensions and symbolic dimensions
-        using dimension_overrides_ map.
-
-        \identifier{onnx_translator_get_dimension} */
+        using dimension_overrides_ map. */
     casadi_int get_dimension(const onnx::TensorShapeProto& shape, int idx) const;
 
     /** \brief Convert ONNX TensorProto to CasADi DM
 
         Extracts shape and data from ONNX tensor.
-        Currently only supports DOUBLE data type.
-
-        \identifier{onnx_translator_tensor_to_dm} */
+        Currently only supports DOUBLE data type. */
     DM tensor_to_dm(const onnx::TensorProto& tensor) const;
 
     /** \brief Analyze outer scope dependencies in a subgraph
@@ -175,7 +159,7 @@ namespace casadi {
         \param available_in_scope Set of variable names available in outer scope
         \return Vector of variable names referenced from outer scope
 
-        \identifier{onnx_translator_analyze_deps} */
+        */
     std::vector<std::string> analyze_outer_scope_dependencies(
         const onnx::GraphProto& subgraph,
         const std::set<std::string>& available_in_scope) const;
@@ -191,7 +175,7 @@ namespace casadi {
         \param outer_deps Set of outer scope dependencies to include as inputs
         \return CasADi Function representing the subgraph
 
-        \identifier{onnx_translator_translate_subgraph} */
+        */
     Function translate_subgraph_to_function(
         const onnx::GraphProto& subgraph,
         const std::string& function_name,
@@ -206,9 +190,7 @@ namespace casadi {
         \param op_type ONNX operation type (e.g., "Add", "MatMul")
         \param node The ONNX NodeProto
         \param node_inputs Vector of input MX expressions
-        \return MX output expression
-
-        \identifier{onnx_translator_process_node_operation} */
+        \return MX output expression */
     MX process_node_operation(
         const std::string& op_type,
         const onnx::NodeProto& node,
@@ -224,28 +206,35 @@ namespace casadi {
         \param outer_scope_inputs Optional vector of outer scope variable names to use
                instead of adding graph inputs. Used for If branch subgraphs that
                reference variables from the enclosing scope.
-        \return Pointer to created GraphProto
-
-        \identifier{onnx_translator_function_to_graph} */
+        \return Pointer to created GraphProto */
     onnx::GraphProto* function_to_graph(
         const Function& f,
         const std::string& graph_name,
         const std::vector<std::string>& outer_scope_inputs = {});
 
+    /** \brief Convert a CasADi Function to ONNX FunctionProto
+
+        Converts a CasADi Function into an ONNX FunctionProto for use as
+        a local function that can be called from the main graph or other
+        functions. Recursively handles nested function calls.
+
+        \param f The CasADi Function to convert
+        \param domain The ONNX domain for this function (e.g., "casadi")
+        \return Pointer to created FunctionProto */
+    onnx::FunctionProto* function_to_function_proto(
+        const Function& f,
+        const std::string& domain);
+
     /** \brief Check if Function is an if_else function
 
         \param f The Function to check
-        \return True if this is an if_else function
-
-        \identifier{onnx_translator_is_if_else} */
+        \return True if this is an if_else function */
     bool is_if_else_function(const Function& f) const;
 
     /** \brief Check if Function is a mapaccum function
 
         \param f The Function to check
-        \return True if this is a mapaccum function
-
-        \identifier{onnx_translator_is_mapaccum} */
+        \return True if this is a mapaccum function */
     bool is_mapaccum_function(const Function& f) const;
 
     /** \brief Check if Function is a map function
@@ -253,7 +242,7 @@ namespace casadi {
         \param f The Function to check
         \return True if this is a map function
 
-        \identifier{onnx_translator_is_map} */
+    */
     bool is_map_function(const Function& f) const;
 
     /** \brief Create ONNX node from CasADi operation
@@ -268,9 +257,7 @@ namespace casadi {
         \param work_to_onnx Map from work indices to ONNX names
         \param f The Function being exported
         \param k Instruction index
-        \return True if operation was handled, false otherwise
-
-        \identifier{onnx_translator_create_onnx_node} */
+        \return True if operation was handled, false otherwise */
     bool create_onnx_node_from_op(
         onnx::GraphProto* graph,
         casadi_int op,
@@ -326,7 +313,27 @@ namespace casadi {
   void add_graph_outputs(onnx::GraphProto* graph, const Function& f,
                          const std::string& name_prefix = "");
 
-  /** \brief Create binary operation ONNX node (defined in onnx_operations.cpp) */
+  /** \brief Operation mapping between CasADi and ONNX
+   *
+   * Single source of truth for all simple operations that have
+   * direct CasADi ↔ ONNX equivalents. */
+  struct OpMapping {
+    casadi_int casadi_op;  ///< CasADi operation code
+    const char* onnx_name; ///< ONNX operation name
+    int arity;             ///< Number of inputs (1=unary, 2=binary)
+  };
+
+  /** \brief Lookup operation mapping by CasADi opcode (for export)
+   *
+   * Returns nullptr if not a simple mapped operation. */
+  const OpMapping* get_op_mapping(casadi_int op);
+
+  /** \brief Lookup operation mapping by ONNX name (for import)
+   *
+   * Returns nullptr if not a simple mapped operation. */
+  const OpMapping* get_op_mapping_by_name(const std::string& onnx_name);
+
+  /** \brief Create binary operation ONNX node */
   onnx::NodeProto* create_binary_node(
       onnx::GraphProto* graph,
       const std::string& op_type,
