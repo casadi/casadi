@@ -342,13 +342,14 @@ namespace casadi {
 
   // ========== Export Helpers ==========
 
+  // Callback-based implementations (main logic)
   onnx::NodeProto* create_binary_node(
-      onnx::GraphProto* graph,
+      AddNodeFn add_node,
       const std::string& op_type,
       const std::string& input1,
       const std::string& input2,
       const std::string& output) {
-    onnx::NodeProto* node = graph->add_node();
+    onnx::NodeProto* node = add_node();
     node->set_op_type(op_type);
     node->add_input(input1);
     node->add_input(input2);
@@ -357,20 +358,40 @@ namespace casadi {
   }
 
   onnx::NodeProto* create_unary_node(
-      onnx::GraphProto* graph,
+      AddNodeFn add_node,
       const std::string& op_type,
       const std::string& input,
       const std::string& output) {
-    onnx::NodeProto* node = graph->add_node();
+    onnx::NodeProto* node = add_node();
     node->set_op_type(op_type);
     node->add_input(input);
     node->add_output(output);
     return node;
   }
 
-  // Process a CasADi operation and create corresponding ONNX node
-  bool process_operation(
+  // GraphProto convenience wrappers
+  onnx::NodeProto* create_binary_node(
       onnx::GraphProto* graph,
+      const std::string& op_type,
+      const std::string& input1,
+      const std::string& input2,
+      const std::string& output) {
+    return create_binary_node([graph]() { return graph->add_node(); },
+                               op_type, input1, input2, output);
+  }
+
+  onnx::NodeProto* create_unary_node(
+      onnx::GraphProto* graph,
+      const std::string& op_type,
+      const std::string& input,
+      const std::string& output) {
+    return create_unary_node([graph]() { return graph->add_node(); },
+                              op_type, input, output);
+  }
+
+  // Callback-based process_operation (main implementation)
+  bool process_operation(
+      AddNodeFn add_node,
       const Function& f,
       casadi_int op,
       casadi_int k,
@@ -385,11 +406,11 @@ namespace casadi {
     const OpMapping* mapping = get_op_mapping(op);
     if (mapping) {
       if (mapping->arity == 1 && i_vec.size() >= 1 && o_vec.size() == 1) {
-        create_unary_node(graph, mapping->onnx_name, work_to_onnx[i_vec[0]], node_output);
+        create_unary_node(add_node, mapping->onnx_name, work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       } else if (mapping->arity == 2 && i_vec.size() >= 2 && o_vec.size() == 1) {
-        create_binary_node(graph, mapping->onnx_name, work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        create_binary_node(add_node, mapping->onnx_name, work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       }
@@ -402,7 +423,7 @@ namespace casadi {
         if (input_name.empty()) {
           input_name = "input_" + std::to_string(i_vec[0]);
         }
-        create_unary_node(graph, "Identity", input_name, node_output);
+        create_unary_node(add_node, "Identity", input_name, node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       }
@@ -413,7 +434,7 @@ namespace casadi {
           output_name = "output_" + std::to_string(o_vec[0]);
         }
         std::string input_onnx_name = work_to_onnx[i_vec[0]];
-        create_unary_node(graph, "Identity", input_onnx_name, output_name);
+        create_unary_node(add_node, "Identity", input_onnx_name, output_name);
 
         // Note: Graph outputs are now added by add_graph_outputs() at the end
         // of function_to_graph() or at the end of load() for the main graph.
@@ -426,7 +447,7 @@ namespace casadi {
         MX mx_const = f.instruction_MX(k);
         DM dm_const = static_cast<DM>(mx_const);
 
-        node = graph->add_node();
+        node = add_node();
         node->set_op_type("Constant");
         node->add_output(node_output);
 
@@ -449,15 +470,15 @@ namespace casadi {
         // OP_MTIMES is a fused multiply-add: output = input[1] * input[2] + input[0]
         // This is a GEMM-like operation with 3 inputs
         std::string matmul_result = "matmul_" + std::to_string(k);
-        create_binary_node(graph, "MatMul", work_to_onnx[i_vec[1]], work_to_onnx[i_vec[2]], matmul_result);
-        create_binary_node(graph, "Add", matmul_result, work_to_onnx[i_vec[0]], node_output);
+        create_binary_node(add_node, "MatMul", work_to_onnx[i_vec[1]], work_to_onnx[i_vec[2]], matmul_result);
+        create_binary_node(add_node, "Add", matmul_result, work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       }
 
       case OP_SQ: {
         // Square operation: output = input^2, implemented as Mul(input, input)
-        create_binary_node(graph, "Mul", work_to_onnx[i_vec[0]],
+        create_binary_node(add_node, "Mul", work_to_onnx[i_vec[0]],
                           work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
@@ -467,7 +488,7 @@ namespace casadi {
         // Double operation: output = 2*input
         // Create constant node with value 2
         std::string const_name = "const_2_" + std::to_string(k);
-        onnx::NodeProto* const_node = graph->add_node();
+        onnx::NodeProto* const_node = add_node();
         const_node->set_op_type("Constant");
         const_node->add_output(const_name);
         onnx::AttributeProto* attr = const_node->add_attribute();
@@ -477,14 +498,14 @@ namespace casadi {
         tensor->add_double_data(2.0);
 
         // Multiply input by 2
-        create_binary_node(graph, "Mul", const_name, work_to_onnx[i_vec[0]], node_output);
+        create_binary_node(add_node, "Mul", const_name, work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       }
 
       case OP_INV:
         // Reciprocal operation: output = 1/input
-        create_unary_node(graph, "Reciprocal", work_to_onnx[i_vec[0]], node_output);
+        create_unary_node(add_node, "Reciprocal", work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
@@ -506,57 +527,57 @@ namespace casadi {
 
       // Reduction operations
       case OP_NORM1:
-        create_unary_node(graph, "ReduceL1", work_to_onnx[i_vec[0]], node_output);
+        create_unary_node(add_node, "ReduceL1", work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
       case OP_NORM2:
       case OP_NORMF:
         // Both L2 norm and Frobenius norm map to ReduceL2
-        create_unary_node(graph, "ReduceL2", work_to_onnx[i_vec[0]], node_output);
+        create_unary_node(add_node, "ReduceL2", work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
       case OP_NORMINF: {
         // Infinity norm: max(abs(x))
         std::string abs_result = "abs_" + std::to_string(k);
-        create_unary_node(graph, "Abs", work_to_onnx[i_vec[0]], abs_result);
-        create_unary_node(graph, "ReduceMax", abs_result, node_output);
+        create_unary_node(add_node, "Abs", work_to_onnx[i_vec[0]], abs_result);
+        create_unary_node(add_node, "ReduceMax", abs_result, node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       }
 
       case OP_MMIN:
-        create_unary_node(graph, "ReduceMin", work_to_onnx[i_vec[0]], node_output);
+        create_unary_node(add_node, "ReduceMin", work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
       case OP_MMAX:
-        create_unary_node(graph, "ReduceMax", work_to_onnx[i_vec[0]], node_output);
+        create_unary_node(add_node, "ReduceMax", work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
       // Logical operations
       case OP_NOT:
-        create_unary_node(graph, "Not", work_to_onnx[i_vec[0]], node_output);
+        create_unary_node(add_node, "Not", work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
       case OP_OR:
-        create_binary_node(graph, "Or", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        create_binary_node(add_node, "Or", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
       case OP_AND:
-        create_binary_node(graph, "And", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        create_binary_node(add_node, "And", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
       case OP_NE: {
         // Not equal: implemented as Not(Equal(...))
         std::string equal_result = "equal_" + std::to_string(k);
-        create_binary_node(graph, "Equal", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], equal_result);
-        create_unary_node(graph, "Not", equal_result, node_output);
+        create_binary_node(add_node, "Equal", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], equal_result);
+        create_unary_node(add_node, "Not", equal_result, node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       }
@@ -567,7 +588,7 @@ namespace casadi {
 
         // Create constant zero
         std::string zero_name = "const_0_" + std::to_string(k);
-        onnx::NodeProto* zero_node = graph->add_node();
+        onnx::NodeProto* zero_node = add_node();
         zero_node->set_op_type("Constant");
         zero_node->add_output(zero_name);
         onnx::AttributeProto* attr = zero_node->add_attribute();
@@ -577,7 +598,7 @@ namespace casadi {
         tensor->add_double_data(0.0);
 
         // Create Where node: Where(condition, value, zero)
-        onnx::NodeProto* where_node = graph->add_node();
+        onnx::NodeProto* where_node = add_node();
         where_node->set_op_type("Where");
         where_node->add_input(work_to_onnx[i_vec[0]]);  // condition
         where_node->add_input(work_to_onnx[i_vec[1]]);  // value if true
@@ -593,8 +614,8 @@ namespace casadi {
         // Dot product: dot(a, b) = sum(a .* b)
         // Implemented as: ReduceSum(Mul(a, b))
         std::string mul_result = "mul_" + std::to_string(k);
-        create_binary_node(graph, "Mul", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], mul_result);
-        create_unary_node(graph, "ReduceSum", mul_result, node_output);
+        create_binary_node(add_node, "Mul", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], mul_result);
+        create_unary_node(add_node, "ReduceSum", mul_result, node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       }
@@ -605,9 +626,9 @@ namespace casadi {
         std::string transpose_result = "transpose_" + std::to_string(k);
         std::string matmul1_result = "matmul1_" + std::to_string(k);
 
-        create_unary_node(graph, "Transpose", work_to_onnx[i_vec[1]], transpose_result);
-        create_binary_node(graph, "MatMul", transpose_result, work_to_onnx[i_vec[0]], matmul1_result);
-        create_binary_node(graph, "MatMul", matmul1_result, work_to_onnx[i_vec[2]], node_output);
+        create_unary_node(add_node, "Transpose", work_to_onnx[i_vec[1]], transpose_result);
+        create_binary_node(add_node, "MatMul", transpose_result, work_to_onnx[i_vec[0]], matmul1_result);
+        create_binary_node(add_node, "MatMul", matmul1_result, work_to_onnx[i_vec[2]], node_output);
 
         work_to_onnx[o_vec[0]] = node_output;
         return true;
@@ -620,10 +641,10 @@ namespace casadi {
         std::string matmul1_result = "matmul1_" + std::to_string(k);
         std::string matmul2_result = "matmul2_" + std::to_string(k);
 
-        create_unary_node(graph, "Transpose", work_to_onnx[i_vec[3]], transpose_result);
-        create_binary_node(graph, "MatMul", work_to_onnx[i_vec[2]], transpose_result, matmul1_result);
-        create_binary_node(graph, "MatMul", work_to_onnx[i_vec[1]], matmul1_result, matmul2_result);
-        create_binary_node(graph, "Add", work_to_onnx[i_vec[0]], matmul2_result, node_output);
+        create_unary_node(add_node, "Transpose", work_to_onnx[i_vec[3]], transpose_result);
+        create_binary_node(add_node, "MatMul", work_to_onnx[i_vec[2]], transpose_result, matmul1_result);
+        create_binary_node(add_node, "MatMul", work_to_onnx[i_vec[1]], matmul1_result, matmul2_result);
+        create_binary_node(add_node, "Add", work_to_onnx[i_vec[0]], matmul2_result, node_output);
 
         work_to_onnx[o_vec[0]] = node_output;
         return true;
@@ -631,7 +652,7 @@ namespace casadi {
 
       // Tensor operations
       case OP_TRANSPOSE:
-        create_unary_node(graph, "Transpose", work_to_onnx[i_vec[0]], node_output);
+        create_unary_node(add_node, "Transpose", work_to_onnx[i_vec[0]], node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
@@ -640,13 +661,13 @@ namespace casadi {
         MX mx_reshape = f.instruction_MX(k);
         auto sp = mx_reshape.sparsity();
 
-        node = graph->add_node();
+        node = add_node();
         node->set_op_type("Reshape");
         node->add_input(work_to_onnx[i_vec[0]]);
 
         // Create shape constant as second input
         std::string shape_name = "shape_" + std::to_string(k);
-        onnx::NodeProto* shape_node = graph->add_node();
+        onnx::NodeProto* shape_node = add_node();
         shape_node->set_op_type("Constant");
         shape_node->add_output(shape_name);
 
@@ -665,7 +686,7 @@ namespace casadi {
       }
 
       case OP_HORZCAT: {
-        node = graph->add_node();
+        node = add_node();
         node->set_op_type("Concat");
         // Add all inputs
         for (casadi_int idx : i_vec) {
@@ -681,7 +702,7 @@ namespace casadi {
       }
 
       case OP_VERTCAT: {
-        node = graph->add_node();
+        node = add_node();
         node->set_op_type("Concat");
         // Add all inputs
         for (casadi_int idx : i_vec) {
@@ -702,7 +723,7 @@ namespace casadi {
         Dict info = mx_split.info();
         std::vector<casadi_int> offset = info["offset"];
 
-        node = graph->add_node();
+        node = add_node();
         node->set_op_type("Split");
         node->add_input(work_to_onnx[i_vec[0]]);
 
@@ -753,7 +774,7 @@ namespace casadi {
         Dict info = mx_split.info();
         std::vector<casadi_int> offset = info["offset"];
 
-        node = graph->add_node();
+        node = add_node();
         node->set_op_type("Split");
         node->add_input(work_to_onnx[i_vec[0]]);
 
@@ -809,6 +830,20 @@ namespace casadi {
     }
 
     return false;
+  }
+
+  // GraphProto convenience wrapper for process_operation
+  bool process_operation(
+      onnx::GraphProto* graph,
+      const Function& f,
+      casadi_int op,
+      casadi_int k,
+      const std::vector<casadi_int>& i_vec,
+      const std::vector<casadi_int>& o_vec,
+      std::map<casadi_int, std::string>& work_to_onnx,
+      const std::string& node_output) {
+    return process_operation([graph]() { return graph->add_node(); },
+                              f, op, k, i_vec, o_vec, work_to_onnx, node_output);
   }
 
 } // namespace casadi
