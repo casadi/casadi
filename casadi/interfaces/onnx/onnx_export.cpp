@@ -723,76 +723,9 @@ namespace casadi {
         continue;
       }
 
-      // Handle OP_CONST - create constant node
-      if (op == OP_CONST) {
-        MX mx_const = f.instruction_MX(k);
-        DM dm_const = static_cast<DM>(mx_const);
-
-        onnx::NodeProto* const_node = func->add_node();
-        const_node->set_op_type("Constant");
-        const_node->add_output(node_output);
-
-        onnx::AttributeProto* attr = const_node->add_attribute();
-        attr->set_name("value");
-        onnx::TensorProto* tensor = attr->mutable_t();
-        tensor->set_data_type(onnx::TensorProto::DOUBLE);
-
-        tensor->add_dims(dm_const.size1());
-        if (dm_const.size2() > 1) tensor->add_dims(dm_const.size2());
-
-        for (casadi_int idx = 0; idx < dm_const.numel(); ++idx) {
-          tensor->add_double_data(static_cast<double>(dm_const->at(idx)));
-        }
-
-        work_to_onnx[o[0]] = node_output;
-        continue;
-      }
-
-      // Try simple operations using centralized lookup table
-      const OpMapping* mapping = get_op_mapping(op);
-      if (mapping) {
-        onnx::NodeProto* node = func->add_node();
-        node->set_op_type(mapping->onnx_name);
-        if (mapping->arity == 1 && i_vec.size() >= 1) {
-          node->add_input(work_to_onnx[i_vec[0]]);
-        } else if (mapping->arity == 2 && i_vec.size() >= 2) {
-          node->add_input(work_to_onnx[i_vec[0]]);
-          node->add_input(work_to_onnx[i_vec[1]]);
-        }
-        node->add_output(node_output);
-        work_to_onnx[o[0]] = node_output;
-        continue;
-      }
-
-      // Handle OP_SQ (square): x^2 = x * x
-      if (op == OP_SQ && i_vec.size() == 1 && o.size() == 1) {
-        onnx::NodeProto* node = func->add_node();
-        node->set_op_type("Mul");
-        node->add_input(work_to_onnx[i_vec[0]]);
-        node->add_input(work_to_onnx[i_vec[0]]);
-        node->add_output(node_output);
-        work_to_onnx[o[0]] = node_output;
-        continue;
-      }
-
-      // Handle OP_TWICE (double): 2*x
-      if (op == OP_TWICE && i_vec.size() == 1 && o.size() == 1) {
-        std::string const_name = "const_2_" + std::to_string(k);
-        onnx::NodeProto* const_node = func->add_node();
-        const_node->set_op_type("Constant");
-        const_node->add_output(const_name);
-        onnx::AttributeProto* attr = const_node->add_attribute();
-        attr->set_name("value");
-        onnx::TensorProto* tensor = attr->mutable_t();
-        tensor->set_data_type(onnx::TensorProto::DOUBLE);
-        tensor->add_double_data(2.0);
-
-        onnx::NodeProto* mul_node = func->add_node();
-        mul_node->set_op_type("Mul");
-        mul_node->add_input(const_name);
-        mul_node->add_input(work_to_onnx[i_vec[0]]);
-        mul_node->add_output(node_output);
-        work_to_onnx[o[0]] = node_output;
+      // All other operations use shared implementation via callback
+      if (process_operation([&]() { return func->add_node(); },
+                            f, op, k, i_vec, o, work_to_onnx, node_output)) {
         continue;
       }
 

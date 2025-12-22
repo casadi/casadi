@@ -33,6 +33,7 @@
 #define ONNX_NAMESPACE onnx
 #include <onnx/onnx_pb.h>
 
+#include <functional>
 #include <map>
 #include <set>
 #include <string>
@@ -365,7 +366,36 @@ namespace casadi {
    * Returns nullptr if not a simple mapped operation. */
   const OpMapping* get_op_mapping_by_name(const std::string& onnx_name);
 
-  /** \brief Create binary operation ONNX node */
+  /** \brief Callback type for adding nodes to a container (GraphProto or FunctionProto) */
+  using AddNodeFn = std::function<onnx::NodeProto*()>;
+
+  /** \brief Create binary operation ONNX node (callback-based) */
+  onnx::NodeProto* create_binary_node(
+      AddNodeFn add_node,
+      const std::string& op_type,
+      const std::string& input1,
+      const std::string& input2,
+      const std::string& output);
+
+  /** \brief Create unary operation ONNX node (callback-based) */
+  onnx::NodeProto* create_unary_node(
+      AddNodeFn add_node,
+      const std::string& op_type,
+      const std::string& input,
+      const std::string& output);
+
+  /** \brief Process a CasADi operation and create corresponding ONNX node (callback-based) */
+  bool process_operation(
+      AddNodeFn add_node,
+      const Function& f,
+      casadi_int op,
+      casadi_int k,
+      const std::vector<casadi_int>& i_vec,
+      const std::vector<casadi_int>& o_vec,
+      std::map<casadi_int, std::string>& work_to_onnx,
+      const std::string& node_output);
+
+  /** \brief Create binary operation ONNX node (GraphProto convenience wrapper) */
   onnx::NodeProto* create_binary_node(
       onnx::GraphProto* graph,
       const std::string& op_type,
@@ -373,14 +403,14 @@ namespace casadi {
       const std::string& input2,
       const std::string& output);
 
-  /** \brief Create unary operation ONNX node */
+  /** \brief Create unary operation ONNX node (GraphProto convenience wrapper) */
   onnx::NodeProto* create_unary_node(
       onnx::GraphProto* graph,
       const std::string& op_type,
       const std::string& input,
       const std::string& output);
 
-  /** \brief Process a CasADi operation and create corresponding ONNX node */
+  /** \brief Process a CasADi operation and create corresponding ONNX node (GraphProto convenience wrapper) */
   bool process_operation(
       onnx::GraphProto* graph,
       const Function& f,
