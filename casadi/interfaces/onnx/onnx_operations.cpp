@@ -435,11 +435,8 @@ namespace casadi {
         }
         std::string input_onnx_name = work_to_onnx[i_vec[0]];
         create_unary_node(add_node, "Identity", input_onnx_name, output_name);
-
-        // Note: Graph outputs are now added by add_graph_outputs() at the end
-        // of function_to_graph() or at the end of load() for the main graph.
-        // We only need to track the output name in work_to_onnx.
-        work_to_onnx[o_vec[0]] = output_name;
+        // Note: Don't update work_to_onnx here - OP_OUTPUT copies from work to output
+        // but doesn't modify the work array. o_vec[0] is the output slot index, not work index.
         return true;
       }
 
