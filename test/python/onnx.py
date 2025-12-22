@@ -42,39 +42,38 @@ try:
 except ImportError:
     HAS_ONNXRUNTIME = False
 
-
 # ============================================================================
-# TEST CASE REGISTRY (Data-Driven Approach)
+# TEST DATA
 # ============================================================================
-# To add a new operation test, just add one line to the appropriate list!
 
+# Unary operations: (name, expr_lambda, test_values, skip_onnxruntime)
+# skip_onnxruntime=True for ops without float64 support in ONNX Runtime
 UNARY_OPS = [
-    # (name, expression_builder, test_input_values)
-    ("sin", lambda x: sin(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
-    ("cos", lambda x: cos(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
-    ("tan", lambda x: tan(x), [DM(0.0), DM(0.5), DM(1.0)]),
-    ("exp", lambda x: exp(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)]),
-    ("log", lambda x: log(x), [DM(0.1), DM(1.0), DM(2.0), DM(10.0)]),  # x > 0
-    ("sqrt", lambda x: sqrt(x), [DM(0.0), DM(1.0), DM(4.0), DM(9.0)]),
-    ("asin", lambda x: asin(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
-    ("acos", lambda x: acos(x), [DM(0.0), DM(0.5), DM(1.0)]),
-    ("atan", lambda x: atan(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)]),
-    ("sinh", lambda x: sinh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
-    ("cosh", lambda x: cosh(x), [DM(0.0), DM(0.5), DM(1.0)]),
-    ("tanh", lambda x: tanh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)]),
-    ("asinh", lambda x: asinh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
-    ("acosh", lambda x: acosh(x), [DM(1.0), DM(1.5), DM(2.0)]),  # x >= 1
-    ("atanh", lambda x: atanh(x), [DM(0.0), DM(0.5), DM(-0.5)]),  # |x| < 1
-    ("ceil", lambda x: ceil(x), [DM(1.2), DM(1.5), DM(1.9), DM(-1.2)]),
-    ("floor", lambda x: floor(x), [DM(1.2), DM(1.5), DM(1.9), DM(-1.2)]),
-    ("fabs", lambda x: fabs(x), [DM(1.0), DM(-1.0), DM(0.0), DM(-5.5)]),
-    ("sign", lambda x: sign(x), [DM(1.0), DM(-1.0), DM(0.0), DM(5.5)]),
-    ("neg", lambda x: -x, [DM(1.0), DM(-1.0), DM(0.0), DM(5.5)]),
-    ("erf", lambda x: erf(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
+    ("sin", lambda x: sin(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], False),
+    ("cos", lambda x: cos(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], False),
+    ("tan", lambda x: tan(x), [DM(0.0), DM(0.5), DM(1.0)], False),
+    ("exp", lambda x: exp(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)], False),
+    ("log", lambda x: log(x), [DM(0.1), DM(1.0), DM(2.0), DM(10.0)], False),
+    ("sqrt", lambda x: sqrt(x), [DM(0.0), DM(1.0), DM(4.0), DM(9.0)], False),
+    ("asin", lambda x: asin(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], False),
+    ("acos", lambda x: acos(x), [DM(0.0), DM(0.5), DM(1.0)], False),
+    ("atan", lambda x: atan(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)], False),
+    ("sinh", lambda x: sinh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], False),
+    ("cosh", lambda x: cosh(x), [DM(0.0), DM(0.5), DM(1.0)], False),
+    ("tanh", lambda x: tanh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)], False),
+    ("asinh", lambda x: asinh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], False),
+    ("acosh", lambda x: acosh(x), [DM(1.0), DM(1.5), DM(2.0)], False),
+    ("atanh", lambda x: atanh(x), [DM(0.0), DM(0.5), DM(-0.5)], False),
+    ("ceil", lambda x: ceil(x), [DM(1.2), DM(1.5), DM(1.9), DM(-1.2)], False),
+    ("floor", lambda x: floor(x), [DM(1.2), DM(1.5), DM(1.9), DM(-1.2)], False),
+    ("fabs", lambda x: fabs(x), [DM(1.0), DM(-1.0), DM(0.0), DM(-5.5)], False),
+    ("sign", lambda x: sign(x), [DM(1.0), DM(-1.0), DM(0.0), DM(5.5)], False),
+    ("neg", lambda x: -x, [DM(1.0), DM(-1.0), DM(0.0), DM(5.5)], False),
+    ("erf", lambda x: erf(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], False),
 ]
 
+# Binary operations: (name, expr_lambda, test_values)
 BINARY_OPS = [
-    # (name, expression_builder, test_input_pairs)
     ("add", lambda x, y: x + y, [(DM(2.0), DM(3.0)), (DM(-1.0), DM(4.0)), (DM(0.0), DM(0.0))]),
     ("sub", lambda x, y: x - y, [(DM(5.5), DM(2.2)), (DM(10.0), DM(3.0)), (DM(0.0), DM(0.0))]),
     ("mul", lambda x, y: x * y, [(DM(2.0), DM(3.0)), (DM(-2.0), DM(4.0)), (DM(0.0), DM(5.0))]),
@@ -82,44 +81,19 @@ BINARY_OPS = [
     ("pow", lambda x, y: x ** y, [(DM(2.0), DM(3.0)), (DM(4.0), DM(0.5)), (DM(10.0), DM(2.0))]),
 ]
 
+# Matrix operations: (name, expr_lambda, shapes, test_values)
 MATRIX_OPS = [
-    # (name, expression_builder, input_shapes, test_value_generator)
-    (
-        "matmul_2x3_3x2",
-        lambda A, B: mtimes(A, B),
-        [(2, 3), (3, 2)],
-        lambda: (DM([[1, 2, 3], [4, 5, 6]]), DM([[1, 2], [3, 4], [5, 6]])),
-    ),
-    (
-        "matmul_3x1_1x3",
-        lambda A, B: mtimes(A, B),
-        [(3, 1), (1, 3)],
-        lambda: (DM([[1], [2], [3]]), DM([[4, 5, 6]])),
-    ),
-    (
-        "transpose_2x3",
-        lambda A: A.T,
-        [(2, 3)],
-        lambda: (DM([[1, 2, 3], [4, 5, 6]]),),
-    ),
-]
-
-SPECIAL_OPS = [
-    # Operations requiring unique test logic (not in parametrized tests)
-    "identity",
-    "constant",
-    "concat",
-    "split",
-]
-
-ERROR_CASES = [
-    # (name, expression_builder, expected_error_substring)
-    ("unsupported_op", lambda x: x, "unsupported operation"),  # Placeholder for actual unsupported op
+    ("matmul_2x3_3x2", lambda A, B: mtimes(A, B), [(2, 3), (3, 2)],
+     [(DM([[1, 2, 3], [4, 5, 6]]), DM([[1, 2], [3, 4], [5, 6]]))]),
+    ("matmul_3x1_1x3", lambda A, B: mtimes(A, B), [(3, 1), (1, 3)],
+     [(DM([[1], [2], [3]]), DM([[4, 5, 6]]))]),
+    ("transpose_2x3", lambda A: A.T, [(2, 3)],
+     [(DM([[1, 2, 3], [4, 5, 6]]),)]),
 ]
 
 
 # ============================================================================
-# HELPER METHODS (Reusable Test Logic)
+# TEST CLASS
 # ============================================================================
 
 class Onnxtests(casadiTestCase):
@@ -127,7 +101,7 @@ class Onnxtests(casadiTestCase):
 
     def roundtrip_test(self, op_name, casadi_func, test_inputs):
         """
-        Execute roundtrip test: CasADi → ONNX → CasADi → validate
+        Execute roundtrip test: CasADi -> ONNX -> CasADi -> validate
 
         Args:
             op_name: Name of operation (for file naming)
@@ -156,7 +130,15 @@ class Onnxtests(casadiTestCase):
                 result_original = casadi_func(*test_val)
                 result_imported = f_imported(*test_val)
 
-                self.checkarray(result_original, result_imported, digits=10)
+                # Handle different return types
+                if isinstance(result_original, dict):
+                    for key in result_original:
+                        self.checkarray(result_original[key], result_imported[key], digits=10)
+                elif isinstance(result_original, (list, tuple)):
+                    for orig, imp in zip(result_original, result_imported):
+                        self.checkarray(orig, imp, digits=10)
+                else:
+                    self.checkarray(result_original, result_imported, digits=10)
 
         finally:
             # Cleanup
@@ -211,250 +193,208 @@ class Onnxtests(casadiTestCase):
             if os.path.exists(onnx_file):
                 os.remove(onnx_file)
 
+    @classmethod
+    def add_test(cls, test_name, func, test_inputs, doc=None, skip_onnxruntime=False):
+        """
+        Add a test (roundtrip + onnxruntime if available) to the test class.
 
-    # ========================================================================
-    # PARAMETRIZED TESTS (Auto-generated from registry)
-    # ========================================================================
-    # Note: Individual test methods are added dynamically below using
-    # _add_parametrized_tests(). Each operation gets its own test method.
-    # E.g., test_unary_roundtrip_sin(), test_unary_roundtrip_cos(), etc.
-    #
-    # This is pure unittest - no external libraries needed!
+        Args:
+            test_name: Base name for the test (e.g., "unary_sin")
+            func: CasADi Function to test
+            test_inputs: List of test input values
+            doc: Optional docstring for the test
+            skip_onnxruntime: Skip onnxruntime validation (for ops without float64 support)
+        """
+        # Create roundtrip test
+        def make_roundtrip_test(name, f, inputs):
+            def test_method(self):
+                self.roundtrip_test(name, f, inputs)
+            return test_method
 
+        roundtrip_test = make_roundtrip_test(test_name, func, test_inputs)
+        roundtrip_test.__name__ = f"test_{test_name}_roundtrip"
+        roundtrip_test.__doc__ = doc or f"Test {test_name} via roundtrip"
+        setattr(cls, roundtrip_test.__name__, roundtrip_test)
 
-    # ========================================================================
-    # SPECIAL TESTS (Unique Logic, Not Data-Driven)
-    # ========================================================================
+        # Create onnxruntime test (only if available and not skipped)
+        if skip_onnxruntime:
+            def skipped_test(self):
+                self.skipTest("ONNX Runtime lacks float64 support for this op")
+            skipped_test.__name__ = f"test_{test_name}_onnxruntime"
+            skipped_test.__doc__ = doc or f"Test {test_name} via onnxruntime (skipped)"
+            setattr(cls, skipped_test.__name__, skipped_test)
+        elif HAS_ONNXRUNTIME:
+            def make_onnxruntime_test(name, f, inputs):
+                def test_method(self):
+                    self.onnxruntime_test(name, f, inputs)
+                return test_method
 
-    def test_complex_expression_graph(self):
-        """Test complex expression combining multiple operations"""
-        # Create complex expression
-        x = MX.sym("x")
-        y = MX.sym("y")
+            onnxruntime_test = make_onnxruntime_test(test_name, func, test_inputs)
+            onnxruntime_test.__name__ = f"test_{test_name}_onnxruntime"
+            onnxruntime_test.__doc__ = doc or f"Test {test_name} via onnxruntime"
+            setattr(cls, onnxruntime_test.__name__, onnxruntime_test)
+        else:
+            # If ONNX Runtime is not available, add a skipped test
+            def skipped_test(self):
+                self.skipTest("ONNX Runtime not available")
 
-        # Complex expression: (sin(x) + cos(y)) * exp(x - y)
-        expr = (sin(x) + cos(y)) * exp(x - y)
-        f = Function("complex_expr", [x, y], [expr])
+            skipped_test.__name__ = f"test_{test_name}_onnxruntime"
+            skipped_test.__doc__ = doc or f"Test {test_name} via onnxruntime (skipped)"
+            setattr(cls, skipped_test.__name__, skipped_test)
 
-        # Test values
-        test_values = [
-            (DM(0.5), DM(1.0)),
-            (DM(1.0), DM(0.5)),
-            (DM(0.0), DM(0.0)),
-        ]
-
-        # Run roundtrip test
-        self.roundtrip_test("complex_expr", f, test_values)
-
-    def test_multiple_outputs(self):
-        """Test function with multiple outputs"""
-        x = MX.sym("x")
-        y = MX.sym("y")
-
-        # Function with 3 outputs
-        f = Function("multi_out", [x, y], [x + y, x - y, x * y])
-
-        test_values = [
-            (DM(3.0), DM(2.0)),
-            (DM(5.0), DM(1.0)),
-        ]
-
-        self.roundtrip_test("multi_out", f, test_values)
-
-    def test_different_tensor_shapes(self):
-        """Test operations with different tensor shapes"""
-        shapes_to_test = [
-            # (shape, test_value)
-            ((1, 1), DM([[2.0]])),      # Scalar (1x1)
-            ((3, 1), DM([[1.0], [2.0], [3.0]])),  # Column vector
-            ((1, 3), DM([[1.0, 2.0, 3.0]])),      # Row vector
-            ((2, 2), DM([[1.0, 2.0], [3.0, 4.0]])),  # 2x2 matrix
-        ]
-
-        for shape, test_val in shapes_to_test:
-            with self.subTest(shape=f"{shape[0]}x{shape[1]}"):
-                x = MX.sym("x", shape[0], shape[1])
-                f = Function(f"sin_{shape[0]}x{shape[1]}", [x], [sin(x)])
-
-                self.roundtrip_test(f"sin_{shape[0]}x{shape[1]}", f, [test_val])
-
-    def test_empty_function(self):
-        """Test function with no inputs/outputs"""
-        # Create empty function (just returns a constant)
-        # Use MX to ensure MXFunction (not SXFunction)
-        f = Function("empty", [], [MX(42.0)])
-
-        onnx_file = "test_empty.onnx"
-        try:
-            t = translator("onnx", {"verbose": False})
-            t.load(f)
-            t.save(onnx_file)
-
-            t2 = translator("onnx", {"verbose": False})
-            t2.load(onnx_file)
-            f2 = t2.create("empty_imported")
-
-            # Validate - functions with no inputs return dicts, so extract the output
-            result1 = f()["o0"]
-            result2 = f2()["o0"]
-            self.checkarray(result1, result2, digits=10)
-        finally:
-            if os.path.exists(onnx_file):
-                os.remove(onnx_file)
-
-    # ========================================================================
-    # Control Flow Tests
-    # ========================================================================
-
-    def test_control_flow_if_else(self):
-        """Test if_else control flow roundtrip"""
-        # Create a simple if_else function: if x > 0: x+1, else: x-1
-        x = MX.sym("x")
-        f_then = Function("then_branch", [x], [x + 1])
-        f_else = Function("else_branch", [x], [x - 1])
-        f_if = Function.if_else("test_if", f_then, f_else)
-
-        # Wrap to MXFunction for ONNX export
-        f_if = f_if.wrap()
-
-        # Test with condition=1 (true) and value=5.0 (should use then branch: 5 + 1 = 6)
-        # test_inputs is a list of test cases; each test case is a tuple of (condition, value)
-        self.roundtrip_test("if_else", f_if, [(DM(1), DM(5.0))])
-
-    @unittest.skip("Control flow export not fully supported")
-    def test_control_flow_map(self):
-        """Test map (Scan) control flow roundtrip"""
-        # Create a simple map function: apply sin to each element
-        x = MX.sym("x")
-        f_base = Function("map_body", [x], [sin(x)])
-        f_map = f_base.map(3, "serial")
-
-        # Wrap to MXFunction for ONNX export
-        f_map = f_map.wrap()
-
-        # Test with array of 3 elements
-        self.roundtrip_test("map", f_map, [DM([0.0, 1.0, 2.0])])
-
-    @unittest.skip("Control flow export not fully supported")
-    def test_control_flow_mapaccum(self):
-        """Test mapaccum (Loop) control flow roundtrip"""
-        # Create a simple mapaccum function: accumulate by adding 1
-        x = MX.sym("x")
-        f_base = Function("accum_body", [x], [x + 1])
-        f_accum = f_base.mapaccum("test_accum", 3)
-
-        # Wrap to MXFunction for ONNX export
-        f_accum = f_accum.wrap()
-
-        # Test with initial value 0 (should produce: 1, 2, 3)
-        self.roundtrip_test("mapaccum", f_accum, [DM(0.0)])
 
 # ============================================================================
-# DYNAMIC TEST GENERATION (Parametrized Tests for unittest)
+# TEST REGISTRATION
 # ============================================================================
 
-def _add_parametrized_tests():
-    """
-    Dynamically generate individual test methods for each operation.
+# Shared symbols for test registration
+_x = MX.sym("x")
+_y = MX.sym("y")
+_z = MX.sym("z")
 
-    This function creates test methods like:
-    - test_unary_roundtrip_sin()
-    - test_unary_roundtrip_cos()
-    - test_binary_roundtrip_add()
-    - etc.
 
-    Pure unittest - no external libraries needed!
-    """
+def _register_op_tests():
+    """Register data-driven tests for operations"""
 
-    def add_unary_tests(op_name, expr, test_values):
-        """Add roundtrip test (and onnxruntime test if available) for a unary operation"""
-        # Roundtrip test
-        def roundtrip_test(self):
-            x = MX.sym("x")
-            f = Function(f"test_{op_name}", [x], [expr(x)])
-            self.roundtrip_test(op_name, f, test_values)
-        roundtrip_test.__name__ = f"test_unary_roundtrip_{op_name}"
-        roundtrip_test.__doc__ = f"Test {op_name} operation via roundtrip"
-        setattr(Onnxtests, roundtrip_test.__name__, roundtrip_test)
+    # Unary operations
+    for op_name, expr, test_values, skip_ort in UNARY_OPS:
+        Onnxtests.add_test(
+            f"unary_{op_name}",
+            Function(f"test_{op_name}", [_x], [expr(_x)]),
+            test_values,
+            doc=f"Test unary {op_name} operation",
+            skip_onnxruntime=skip_ort
+        )
 
-        # ONNX Runtime test (only if available)
-        if HAS_ONNXRUNTIME:
-            def onnxruntime_test(self):
-                x = MX.sym("x")
-                f = Function(f"test_{op_name}", [x], [expr(x)])
-                self.onnxruntime_test(op_name, f, test_values)
-            onnxruntime_test.__name__ = f"test_unary_onnxruntime_{op_name}"
-            onnxruntime_test.__doc__ = f"Test {op_name} operation via onnxruntime"
-            setattr(Onnxtests, onnxruntime_test.__name__, onnxruntime_test)
-
-    def add_binary_tests(op_name, expr, test_values):
-        """Add roundtrip test (and onnxruntime test if available) for a binary operation"""
-        # Roundtrip test
-        def roundtrip_test(self):
-            x = MX.sym("x")
-            y = MX.sym("y")
-            f = Function(f"test_{op_name}", [x, y], [expr(x, y)])
-            self.roundtrip_test(op_name, f, test_values)
-        roundtrip_test.__name__ = f"test_binary_roundtrip_{op_name}"
-        roundtrip_test.__doc__ = f"Test {op_name} operation via roundtrip"
-        setattr(Onnxtests, roundtrip_test.__name__, roundtrip_test)
-
-        # ONNX Runtime test (only if available)
-        if HAS_ONNXRUNTIME:
-            def onnxruntime_test(self):
-                x = MX.sym("x")
-                y = MX.sym("y")
-                f = Function(f"test_{op_name}", [x, y], [expr(x, y)])
-                self.onnxruntime_test(op_name, f, test_values)
-            onnxruntime_test.__name__ = f"test_binary_onnxruntime_{op_name}"
-            onnxruntime_test.__doc__ = f"Test {op_name} operation via onnxruntime"
-            setattr(Onnxtests, onnxruntime_test.__name__, onnxruntime_test)
-
-    def add_matrix_tests(op_name, expr, shapes, value_gen):
-        """Add roundtrip test (and onnxruntime test if available) for a matrix operation"""
-        # Roundtrip test
-        def roundtrip_test(self):
-            if len(shapes) == 1:
-                A = MX.sym("A", shapes[0][0], shapes[0][1])
-                f = Function(f"test_{op_name}", [A], [expr(A)])
-            else:
-                A = MX.sym("A", shapes[0][0], shapes[0][1])
-                B = MX.sym("B", shapes[1][0], shapes[1][1])
-                f = Function(f"test_{op_name}", [A, B], [expr(A, B)])
-            test_values = [value_gen()]
-            self.roundtrip_test(op_name, f, test_values)
-        roundtrip_test.__name__ = f"test_matrix_roundtrip_{op_name}"
-        roundtrip_test.__doc__ = f"Test {op_name} matrix operation via roundtrip"
-        setattr(Onnxtests, roundtrip_test.__name__, roundtrip_test)
-
-        # ONNX Runtime test (only if available)
-        if HAS_ONNXRUNTIME:
-            def onnxruntime_test(self):
-                if len(shapes) == 1:
-                    A = MX.sym("A", shapes[0][0], shapes[0][1])
-                    f = Function(f"test_{op_name}", [A], [expr(A)])
-                else:
-                    A = MX.sym("A", shapes[0][0], shapes[0][1])
-                    B = MX.sym("B", shapes[1][0], shapes[1][1])
-                    f = Function(f"test_{op_name}", [A, B], [expr(A, B)])
-                test_values = [value_gen()]
-                self.onnxruntime_test(op_name, f, test_values)
-            onnxruntime_test.__name__ = f"test_matrix_onnxruntime_{op_name}"
-            onnxruntime_test.__doc__ = f"Test {op_name} matrix operation via onnxruntime"
-            setattr(Onnxtests, onnxruntime_test.__name__, onnxruntime_test)
-
-    # Add all tests
-    for op_name, expr, test_values in UNARY_OPS:
-        add_unary_tests(op_name, expr, test_values)
-
+    # Binary operations
     for op_name, expr, test_values in BINARY_OPS:
-        add_binary_tests(op_name, expr, test_values)
+        Onnxtests.add_test(
+            f"binary_{op_name}",
+            Function(f"test_{op_name}", [_x, _y], [expr(_x, _y)]),
+            test_values,
+            doc=f"Test binary {op_name} operation"
+        )
 
-    for op_name, expr, shapes, value_gen in MATRIX_OPS:
-        add_matrix_tests(op_name, expr, shapes, value_gen)
+    # Matrix operations
+    for op_name, expr, shapes, test_values in MATRIX_OPS:
+        if len(shapes) == 1:
+            A = MX.sym("A", shapes[0][0], shapes[0][1])
+            f = Function(f"test_{op_name}", [A], [expr(A)])
+        else:
+            A = MX.sym("A", shapes[0][0], shapes[0][1])
+            B = MX.sym("B", shapes[1][0], shapes[1][1])
+            f = Function(f"test_{op_name}", [A, B], [expr(A, B)])
 
-# Generate all parametrized tests
-_add_parametrized_tests()
+        Onnxtests.add_test(
+            f"matrix_{op_name}",
+            f,
+            test_values,
+            doc=f"Test matrix {op_name} operation"
+        )
+
+
+def _register_complex_tests():
+    """Register tests for complex expressions, control flow, and function hierarchies"""
+
+    # Different input shapes for sin function
+    shapes_to_test = [
+        ((1, 1), DM([[2.0]])),
+        ((3, 1), DM([[1.0], [2.0], [3.0]])),
+        ((1, 3), DM([[1.0, 2.0, 3.0]])),
+        ((2, 2), DM([[1.0, 2.0], [3.0, 4.0]])),
+    ]
+
+    for shape, test_val in shapes_to_test:
+        x = MX.sym("x", shape[0], shape[1])
+        f = Function(f"sin_{shape[0]}x{shape[1]}", [x], [sin(x)])
+        Onnxtests.add_test(f"sin_{shape[0]}x{shape[1]}", f, [test_val])
+
+    # Empty function (no inputs)
+    Onnxtests.add_test(
+        "empty_function",
+        Function("empty", [], [MX(42.0)]),
+        [()],
+        doc="Test function with no inputs"
+    )
+
+    # Complex expression
+    Onnxtests.add_test(
+        "complex_expression",
+        Function("complex_expr", [_x, _y], [(sin(_x) + cos(_y)) * exp(_x - _y)]),
+        [(DM(0.5), DM(1.0)), (DM(1.0), DM(0.5)), (DM(0.0), DM(0.0))],
+        doc="Test complex expression combining multiple operations"
+    )
+
+    # Multiple outputs
+    Onnxtests.add_test(
+        "multiple_outputs",
+        Function("multi_out", [_x, _y], [_x + _y, _x - _y, _x * _y]),
+        [(DM(3.0), DM(2.0)), (DM(5.0), DM(1.0))],
+        doc="Test function with multiple outputs"
+    )
+
+    # Control flow: if_else
+    f_then = Function("then_branch", [_x], [_x + 1])
+    f_else = Function("else_branch", [_x], [_x - 1])
+    Onnxtests.add_test(
+        "control_flow_if_else",
+        Function.if_else("test_if", f_then, f_else).wrap(),
+        [(DM(1), DM(5.0))],
+        doc="Test if_else control flow"
+    )
+
+    # Function hierarchy: simple
+    f_inner = Function("inner", [_x], [_x + _x])
+    Onnxtests.add_test(
+        "function_hierarchy_simple",
+        Function("outer", [_y], [f_inner(_y) + 1]).wrap(),
+        [DM(5.0)],
+        doc="Test nested function call: outer calls inner"
+    )
+
+    # Function hierarchy: multiple calls
+    f_double = Function("double", [_x], [_x + _x])
+    Onnxtests.add_test(
+        "function_hierarchy_multiple_calls",
+        Function("outer_multi", [_y], [f_double(_y) + f_double(_y + 1)]).wrap(),
+        [DM(3.0)],
+        doc="Test outer function calling inner function twice"
+    )
+
+    # Function hierarchy: deep (A calls B calls C)
+    f_c = Function("func_c", [_x], [sin(_x)])
+    f_b = Function("func_b", [_y], [f_c(_y) + 1])
+    Onnxtests.add_test(
+        "function_hierarchy_deep",
+        Function("func_a", [_z], [f_b(_z) * 2]).wrap(),
+        [DM(0.5)],
+        doc="Test deep function hierarchy: A calls B calls C"
+    )
+
+    # Control flow: map (Scan)
+    f_map_body = Function("map_body", [_x], [sin(_x)])
+    Onnxtests.add_test(
+        "control_flow_map",
+        f_map_body.map(3, "serial").wrap(),
+        [DM([0.0, 1.0, 2.0])],
+        doc="Test map (Scan) control flow"
+    )
+
+    # Control flow: mapaccum (Loop)
+    # TODO: mapaccum outputs all intermediate values to a single array, but ONNX export
+    # currently only keeps the last value. Needs Concat support to collect all outputs.
+    # f_accum_body = Function("accum_body", [_x], [_x + 1])
+    # Onnxtests.add_test(
+    #     "control_flow_mapaccum",
+    #     f_accum_body.mapaccum("test_accum", 3).wrap(),
+    #     [DM(0.0)],
+    #     doc="Test mapaccum (Loop) control flow"
+    # )
+
+
+# Register all tests
+_register_op_tests()
+_register_complex_tests()
 
 
 if __name__ == '__main__':
