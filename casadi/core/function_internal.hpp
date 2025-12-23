@@ -1355,7 +1355,9 @@ namespace casadi {
         \identifier{no} */
     bool has_refcount_;
 
-    /** \brief Reference counting in dependent functions */
+    /** \brief Reference counting in dependent functions
+
+        \identifier{2f2} */
     bool has_refcount_in_deps_;
 
     /** \brief Values to prepopulate the function cache with

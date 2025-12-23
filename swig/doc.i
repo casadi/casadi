@@ -1292,7 +1292,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L437
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1936-L1938
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1935-L1937
 
 ";
 
@@ -1308,7 +1308,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L438
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1940-L1942
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1939-L1941
 
 ";
 
@@ -1324,7 +1324,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L445
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1944-L1946
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1943-L1945
 
 ";
 
@@ -1340,7 +1340,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1948-L1950
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1947-L1949
 
 ";
 
@@ -3741,7 +3741,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L431
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1928-L1934
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1927-L1933
 
 ";
 
@@ -4989,13 +4989,15 @@ Parameters:
 max_depth: 
 Maximum depth - a negative number indicates no maximum
 
+depth-first ordered, unique, list of dependencies
+
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1288
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1289
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1890-L1906
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1890-L1905
 
 ";
 
@@ -5017,10 +5019,10 @@ Maximum depth - a negative number indicates no maximum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1296
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1297
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1908-L1925
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1907-L1924
 
 ";
 
@@ -5030,10 +5032,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1908-L1925
 Obtain information about function
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1299
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1300
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1962-L1964
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1961-L1963
 
 ";
 
@@ -13705,7 +13707,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L437
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1936-L1938
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1935-L1937
 
 ";
 
@@ -13721,7 +13723,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L438
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1940-L1942
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1939-L1941
 
 ";
 
@@ -13737,7 +13739,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L445
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1944-L1946
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1943-L1945
 
 ";
 
@@ -13753,7 +13755,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1948-L1950
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1947-L1949
 
 ";
 
@@ -15774,7 +15776,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L431
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1928-L1934
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1927-L1933
 
 ";
 
@@ -17037,13 +17039,15 @@ Parameters:
 max_depth: 
 Maximum depth - a negative number indicates no maximum
 
+depth-first ordered, unique, list of dependencies
+
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1288
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1289
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1890-L1906
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1890-L1905
 
 ";
 
@@ -17065,10 +17069,10 @@ Maximum depth - a negative number indicates no maximum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1296
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1297
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1908-L1925
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1907-L1924
 
 ";
 
@@ -17078,10 +17082,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1908-L1925
 Obtain information about function
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1299
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1300
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1962-L1964
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1961-L1963
 
 ";
 
@@ -17185,10 +17189,10 @@ Main constructor.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ya
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1363
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1364
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1974-L1982
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1973-L1981
 
 ";
 
@@ -17214,10 +17218,10 @@ Note that CasADi uses 'fortran' order: column-by-column
 Extra doc: https://github.com/casadi/casadi/wiki/L_1yb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1377
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1378
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2010-L2015
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2009-L2014
 
 ";
 
@@ -17234,10 +17238,10 @@ Note that CasADi uses 'fortran' order: column-by-column
 Extra doc: https://github.com/casadi/casadi/wiki/L_1yc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1386
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1387
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2016-L2021
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2015-L2020
 
 ";
 
@@ -17247,10 +17251,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2016-L2021
 Get last return value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1388
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1389
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2029-L2031
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2028-L2030
 
 ";
 

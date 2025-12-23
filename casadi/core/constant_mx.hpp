@@ -296,7 +296,9 @@ namespace casadi {
     /// Destructor
     ~ConstantFile() override {}
 
-    /** \brief Is reference counting needed in codegen? */
+    /** \brief Is reference counting needed in codegen?
+
+        \identifier{2f1} */
     bool has_refcount() const override { return true; }
 
     /** \brief Codegen incref
