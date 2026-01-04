@@ -203,6 +203,32 @@ namespace casadi {
   void CodeGenerator::scope_enter() {
     local_variables_.clear();
     local_default_.clear();
+    local_cleanup_.clear();
+    local_void_ = true;
+  }
+
+  void CodeGenerator::scope_return(const std::string& value) {
+    local_void_ = false;
+    if (local_cleanup_.empty()) {
+      *this << "return " << value << ";\n";
+      return;
+    }
+    local("ret", "int");
+    *this << "ret = " << value << ";\n";
+    *this << "goto done" << local_cleanup_.size() << ";\n";
+  }
+
+  void CodeGenerator::scope_return() {
+    if (local_cleanup_.empty()) {
+      *this << "return;\n";
+      return;
+    }
+    *this << "goto done" << local_cleanup_.size() << ";\n";
+  }
+
+
+  void CodeGenerator::scope_add_cleanup(const std::string& code) {
+    local_cleanup_.push_back(code);
   }
 
   void CodeGenerator::scope_exit() {
@@ -231,6 +257,19 @@ namespace casadi {
         cnt++;
       }
       body << ";\n";
+    }
+
+    // Loop over local_cleanup_ in reverse order
+    if (!local_cleanup_.empty()) {
+      *this << "done" << local_cleanup_.size() << ":\n";
+      for (casadi_int i=local_cleanup_.size()-1; i>=0; --i) {
+        *this << local_cleanup_[i];
+      }
+      if (local_void_) {
+        *this << "return;\n";
+      } else {
+        *this << "return ret;\n";
+      }
     }
   }
 

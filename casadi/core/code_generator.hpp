@@ -238,6 +238,19 @@ namespace casadi {
         \identifier{sd} */
     void scope_exit();
 
+    /** \brief Return from a scope with a value
+    *  Takes care of cleanup code
+    */
+    void scope_return(const std::string& value);
+
+    /** \brief Return from a scope without a value
+    *  Takes care of cleanup code
+    */
+    void scope_return();
+
+    /** \brief Add cleanup code to be executed upon scope exit */
+    void scope_add_cleanup(const std::string& code);
+
     /** \brief Declare a work vector element
 
         \identifier{se} */
@@ -1017,6 +1030,8 @@ namespace casadi {
     std::multimap<size_t, size_t> added_char_constants_;
     std::multimap<size_t, size_t> added_string_constants_;
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;
+    std::vector<std::string> local_cleanup_;
+    bool local_void_;
     std::map<std::string, std::string> local_default_;
     std::map<const void *, casadi_int> file_scope_double_;
     std::map<const void *, casadi_int> file_scope_integer_;
