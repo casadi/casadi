@@ -1174,9 +1174,21 @@ namespace casadi {
       local(mem, "int");
       std::string checkout = shorthand(cg_name + "_checkout");
       *this << mem << " = " << checkout << "();\n";
-      *this << "if (" << mem << "<0) return " << failure_ret << ";\n";
+      if (failure_ret.empty()) {
+        *this << "if (" << mem << "<0) {\n";
+        *this << "flag = 1;\n";
+        *this << "} else {\n";
+      } else {
+        *this << "if (" << mem << "<0) return " << failure_ret << ";\n";
+      }
+
       *this << "flag = " + name + "(" + arg + ", " + res + ", "
-              + iw + ", " + w + ", " << mem << ");\n";
+                + iw + ", " + w + ", " << mem << ");\n";
+
+      if (failure_ret.empty()) {
+        *this << "}\n";
+      }
+
       std::string release = shorthand(cg_name + "_release");
       *this << release << "(" << mem << ");\n";
       return "flag";
