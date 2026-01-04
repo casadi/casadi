@@ -276,6 +276,9 @@ namespace casadi {
         \identifier{si} */
     bool avoid_stack() const { return avoid_stack_;}
 
+    /** \brief Emit thead safe code chekout/release? */
+    bool thread_safe() const { return thread_safe_; }
+
     /** \brief Print a constant in a lossless but compact manner
 
         \identifier{sj} */
@@ -703,7 +706,8 @@ namespace casadi {
       AUX_PRINTME,
       AUX_PRINT_SCALAR,
       AUX_PRINT_VECTOR,
-      AUX_PRINT_CANONICAL
+      AUX_PRINT_CANONICAL,
+      AUX_THREADS
     };
 
     /** \brief Add a built-in auxiliary function
@@ -987,6 +991,9 @@ namespace casadi {
 
     // Force the external API to use canonical sparsity
     bool force_canonical;
+
+    // Emit thread-safe checkout/release?
+    bool thread_safe_;
 
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;

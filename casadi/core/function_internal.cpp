@@ -2476,6 +2476,13 @@ namespace casadi {
       std::string name = codegen_name(g, false);
       std::string ref_counter = g.shorthand(name + "_ref_counter");
       g.auxiliaries << "static int " << ref_counter  << " = 0;\n";
+
+      if (g.thread_safe()) {
+        std::string ref_mutex = g.shorthand(name + "_mem_mutex");
+        g << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n";
+        g << "if (" << ref_counter << "==0) CASADI_MUTEX_INIT(&" << ref_mutex << ");\n";
+        g << "#endif\n";
+      }
       g << ref_counter << "++;\n";
     }
 
@@ -2522,6 +2529,12 @@ namespace casadi {
         g << free_mem << "(--" << mem_counter << ");\n";
         g << "}\n";
       }
+      if (g.thread_safe()) {
+        std::string ref_mutex = g.shorthand(name + "_mem_mutex");
+        g << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n";
+        g << "CASADI_MUTEX_DESTROY(&" << ref_mutex << ");\n";
+        g << "#endif\n";
+      }
       g << "}\n";
     }
   }
@@ -2548,20 +2561,41 @@ namespace casadi {
     std::string alloc_mem = g.shorthand(name + "_alloc_mem");
     std::string init_mem = g.shorthand(name + "_init_mem");
 
+
     g.auxiliaries << "static int " << mem_counter  << " = 0;\n";
     g.auxiliaries << "static int " << stack_counter  << " = -1;\n";
     g.auxiliaries << "static int " << stack << "[CASADI_MAX_NUM_THREADS];\n";
     g.auxiliaries << "static " << codegen_mem_type() <<
                " " << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
-    g << "int mid;\n";
+
+    if (g.thread_safe()) {
+      std::string mem_mutex = g.shorthand(name + "_mem_mutex");
+      g.auxiliaries << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n";
+      g.auxiliaries << "static CASADI_MUTEX_TYPE " << mem_mutex << ";\n";
+      g.auxiliaries << "#else\n";
+      g.auxiliaries << "static CASADI_MUTEX_TYPE " << mem_mutex << " = CASADI_MUTEX_STATIC_INIT;\n";
+      g.auxiliaries << "#endif\n";
+
+      g << "CASADI_MUTEX_LOCK(&" << mem_mutex << ");\n";
+      g.scope_add_cleanup("CASADI_MUTEX_UNLOCK(&" + mem_mutex + ");\n");
+    }
+
+    g.local("mid", "int");
+
     g << "if (" << stack_counter << ">=0) {\n";
-    g << "return " << stack << "[" << stack_counter << "--];\n";
+    g.scope_return(stack + "[" + stack_counter + "--]");
     g << "} else {\n";
-    g << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) return -1;\n";
+    g << "if (" << mem_counter << "==CASADI_MAX_NUM_THREADS) {\n";
+    g.scope_return("-1");
+    g << "}\n";
     g << "mid = " << alloc_mem << "();\n";
-    g << "if (mid<0) return -1;\n";
-    g << "if (" << init_mem << "(mid)) return -1;\n";
-    g << "return mid;\n";
+    g << "if (mid<0) {\n";
+    g.scope_return("-1");
+    g << "}\n";
+    g << "if (" << init_mem << "(mid)) {\n";
+    g.scope_return("-1");
+    g << "}\n";
+    g.scope_return("mid");
     g << "}\n";
   }
 
@@ -2569,7 +2603,15 @@ namespace casadi {
     std::string name = codegen_name(g, false);
     std::string stack_counter = g.shorthand(name + "_unused_stack_counter");
     std::string stack = g.shorthand(name + "_unused_stack");
+
+    if (g.thread_safe()) {
+      std::string mem_mutex = g.shorthand(name + "_mem_mutex");
+      g << "CASADI_MUTEX_LOCK(&" << mem_mutex << ");\n";
+      g.scope_add_cleanup("CASADI_MUTEX_UNLOCK(&" + mem_mutex + ");\n");
+    }
+
     g << stack << "[++" << stack_counter << "] = mem;\n";
+    g.scope_return();
   }
 
   void FunctionInternal::codegen_sparsities(CodeGenerator& g) const {
