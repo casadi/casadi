@@ -750,7 +750,7 @@ class casadiTestCase(unittest.TestCase):
     if bad_symbols:
       self.fail(f"Found {len(bad_symbols)} symbols starting with 'casadi' exported in shared library (missing CASADI_PREFIX): {bad_symbols[:10]}")
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,valgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
@@ -830,7 +830,8 @@ class casadiTestCase(unittest.TestCase):
       self.check_symbols(libname, name+".c")
 
       if external_opts is None: external_opts = {}
-      F2 = external(F.name(), libname,external_opts)
+      if with_external:
+          F2 = external(F.name(), libname,external_opts)
 
       if main:
         [commands, exename] = get_commands(shared=False)
@@ -847,27 +848,35 @@ class casadiTestCase(unittest.TestCase):
         F.generate_in(F.name()+"_in.txt", inputs_main)
 
       if main:
-        with open(F.name()+"_out.txt","w") as stdout:
-          with open(F.name()+"_in.txt","r") as stdin:
-            commands = exename+" "+F.name()
-            if valgrind and has_valgrind:
-                commands = 'valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=42 ' + commands
-            print(commands+" < " + F.name()+"_in.txt")
-            p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
-            out = p.communicate()
-        print("Return code",p.returncode)
-        assert p.returncode in main_return_code
+        for tool in ["memcheck","helgrind","none"]:
+            with open(F.name()+"_out.txt","w") as stdout:
+              with open(F.name()+"_in.txt","r") as stdin:
+                commands = exename+" "+F.name()
+                if tool=="none":
+                    pass
+                elif tool=="memcheck" and valgrind and has_valgrind:
+                    commands = 'valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=42 --show-leak-kinds=all --suppressions=../internal/valgrind-codegen.supp ' + commands
+                elif tool=="helgrind" and helgrind and has_valgrind:
+                    commands = 'valgrind --tool=helgrind --error-exitcode=42 ' + commands
+                else:
+                    continue
+                print(commands+" < " + F.name()+"_in.txt")
+                p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
+                out = p.communicate()
+            print("Return code",p.returncode)
+            assert p.returncode in main_return_code
         if p.returncode!=0:
             # We are actively looking for failure,
             # so do not proceed with tests
             return
         
       Fout = F.call(inputs)
-      Fout2 = F2.call(inputs)
+      if with_external:
+          Fout2 = F2.call(inputs)
 
       if main:
         outputs = F.generate_out(F.name()+"_out.txt")
-        print(outputs)
+        print(F.name(),outputs)
         if isinstance(inputs,dict):
           outputs = F.convert_out(outputs)
           for k in F.name_out():
@@ -875,6 +884,9 @@ class casadiTestCase(unittest.TestCase):
         else:
           for i in range(F.n_out()):
             self.checkarray(Fout[i],outputs[i],digits=digits)
+
+      if not with_external:
+        return None, libname
 
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
