@@ -64,6 +64,7 @@ namespace casadi {
     indent_ = 2;
     sz_zeros_ = 0;
     sz_ones_ = 0;
+    thread_safe_ = false;
 
     // Read options
     for (auto&& e : opts) {
@@ -121,6 +122,8 @@ namespace casadi {
           "Option max_initializer_elements_per_line must be >=0");
       } else if (e.first=="force_canonical") {
         this->force_canonical = e.second;
+      } else if (e.first=="thread_safe") {
+        thread_safe_ = e.second;
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -140,6 +143,8 @@ namespace casadi {
         this->real_min = "<NOT SPECIFIED>";
       }
     }
+
+    if (thread_safe_) add_auxiliary(AUX_THREADS);
 
     // Start at new line with no indentation
     newline_ = true;
@@ -1937,6 +1942,9 @@ namespace casadi {
     case AUX_PRINT_CANONICAL:
       add_auxiliary(AUX_PRINT_VECTOR);
       this->auxiliaries << sanitize_source(casadi_print_canonical_str, inst);
+      break;
+    case AUX_THREADS:
+      this->auxiliaries << sanitize_source(casadi_threads_str, inst);
       break;
     }
   }

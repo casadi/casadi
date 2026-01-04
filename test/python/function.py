@@ -3050,6 +3050,49 @@ class Functiontests(casadiTestCase):
         self.assertEqual(n_matches,1)
 
   @requires_conic('osqp')
+  def test_codegen_thread_safe(self):
+    c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False,"osqp.alpha":1,"osqp.eps_abs":1e-8,"osqp.eps_rel":1e-8})
+    inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
+    extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
+    
+    # No extra options on windows
+    if os.name == 'nt':
+      extra_options = []
+      
+    def get_functions():
+        yield (c,inputs)
+        # Check wrapper Function
+        for X in [MX,SX]:
+        
+            g = X.sym("g",2)
+            inputs["g"] = g
+            
+            yield (Function('wrapper',[g],[c(**inputs)['x']],["g"],["res"]),{"g":vertcat(1,2)})
+            
+    for f,local_inputs in get_functions():
+        for map_type in ["serial","thread","openmp"]:
+            F = f.map(2,map_type)
+            
+
+
+            wide_inputs = {}
+            for k,v in local_inputs.items():
+                wide_inputs[k] = horzcat(local_inputs[k],local_inputs[k]*1.2)
+              
+            print("foo",F(**wide_inputs))
+                
+            if map_type == "openmp":
+                self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+["/openmp" if os.name=='nt' else "-fopenmp"],extralibs=["osqp"],opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_OMP"],with_external=False,digits=14)
+            elif map_type == "thread":
+                if os.name == "posix":
+                    self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+["-pthread"],extralibs=["osqp"],opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_POSIX"],with_external=False,digits=14,helgrind=True)
+            else:
+                self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=["osqp"],with_external=False,digits=14)
+        
+
+      
+    
+  @requires_conic('osqp')
   def test_memful_external(self):
     if not args.run_slow: return
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})

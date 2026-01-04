@@ -525,8 +525,119 @@ namespace casadi {
 #endif // CASADI_WITH_THREAD
   }
 
+  void ThreadMap::codegen_declarations(CodeGenerator& g) const {
+    g.add_auxiliary(CodeGenerator::AUX_THREADS);
+    // Call base class
+    Map::codegen_declarations(g);
+
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+
+    // Create wrapper name
+    std::string worker_name = g.shorthand(g.wrapper(f_, "thread_worker"));
+
+    // Generate struct definition for thread arguments
+    g << "struct " << worker_name << "_args_t {\n";
+    g << "  casadi_int i;\n";
+    g << "  casadi_int n_in;\n";
+    g << "  casadi_int n_out;\n";
+    g << "  const casadi_real** arg;\n";
+    g << "  casadi_real** res;\n";
+    g << "  casadi_int* iw;\n";
+    g << "  casadi_real* w;\n";
+    g << "  casadi_int sz_arg;\n";
+    g << "  casadi_int sz_res;\n";
+    g << "  casadi_int sz_iw;\n";
+    g << "  casadi_int sz_w;\n";
+
+    for (casadi_int j=0; j<n_in_; ++j) {
+      g << "  casadi_int nnz_in_" << j << ";\n";
+    }
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "  casadi_int nnz_out_" << j << ";\n";
+    }
+    g << "  int ret;\n";
+    g << "};\n\n";
+
+    // Generate wrapper function using portable thread macros
+    g << "CASADI_THREAD_WORKER_RETURN " << worker_name << "(CASADI_THREAD_WORKER_ARG arg) {\n";
+    g.flush(g.body);
+    g.scope_enter();
+    g << "  struct " << worker_name << "_args_t* data = (struct "
+      << worker_name << "_args_t*)arg;\n";
+    g << "  casadi_int i = data->i;\n";
+    g << "  const casadi_real** arg1;\n";
+    g << "  casadi_real** res1;\n\n";
+
+    // Setup input buffers
+    g << "  arg1 = data->arg + data->n_in + i * data->sz_arg;\n";
+    for (casadi_int j=0; j<n_in_; ++j) {
+      g << "  arg1[" << j << "] = data->arg[" << j << "] ? "
+        << "data->arg[" << j << "] + i * data->nnz_in_" << j << " : 0;\n";
+    }
+
+    // Setup output buffers
+    g << "  res1 = data->res + data->n_out + i * data->sz_res;\n";
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "  res1[" << j << "] = data->res[" << j << "] ? "
+        << "data->res[" << j << "] + i * data->nnz_out_" << j << " : 0;\n";
+    }
+
+    // Call the function
+    std::string flag = g(f_, "arg1", "res1",
+                         "data->iw + i * data->sz_iw",
+                         "data->w + i * data->sz_w", "");
+    g << "  data->ret = " << flag << ";\n";
+    g << "  return CASADI_THREAD_RETURN_VALUE;\n";
+    g.scope_exit();
+    g << "}\n\n";
+  }
+
   void ThreadMap::codegen_body(CodeGenerator& g) const {
-    Map::codegen_body(g);
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+
+    // Create wrapper function for thread worker
+    std::string worker_name = g.shorthand(g.wrapper(f_, "thread_worker"));
+
+    g.local("i", "casadi_int");
+    g.local("threads[" + str(n_) + "]", "CASADI_THREAD_HANDLE");
+    g.local("thread_args[" + str(n_) + "]", "struct " + worker_name + "_args_t");
+    g.local("cflag", "casadi_int");
+    g.init_local("cflag", "0");
+
+    // Create threads
+    g << "for (i=0; i<" << n_ << "; ++i) {\n";
+    g << "  thread_args[i].i = i;\n";
+    g << "  thread_args[i].n_in = " << n_in_ << ";\n";
+    g << "  thread_args[i].n_out = " << n_out_ << ";\n";
+    g << "  thread_args[i].arg = arg;\n";
+    g << "  thread_args[i].res = res;\n";
+    g << "  thread_args[i].iw = iw;\n";
+    g << "  thread_args[i].w = w;\n";
+    g << "  thread_args[i].sz_arg = " << sz_arg << ";\n";
+    g << "  thread_args[i].sz_res = " << sz_res << ";\n";
+    g << "  thread_args[i].sz_iw = " << sz_iw << ";\n";
+    g << "  thread_args[i].sz_w = " << sz_w << ";\n";
+
+    // Add function-specific nnz info
+    for (casadi_int j=0; j<n_in_; ++j) {
+      g << "  thread_args[i].nnz_in_" << j << " = " << f_.nnz_in(j) << ";\n";
+    }
+    for (casadi_int j=0; j<n_out_; ++j) {
+      g << "  thread_args[i].nnz_out_" << j << " = " << f_.nnz_out(j) << ";\n";
+    }
+
+    g << "  CASADI_THREAD_CREATE(threads[i], " << worker_name << ", &thread_args[i]);\n";
+    g << "}\n\n";
+
+    // Join threads
+    g << "for (i=0; i<" << n_ << "; ++i) {\n";
+    g << "  CASADI_THREAD_JOIN(threads[i]);\n";
+    g << "  cflag = cflag || thread_args[i].ret;\n";
+    g << "}\n\n";
+
+    g << "if (cflag) return 1;\n";
   }
 
   void ThreadMap::init(const Dict& opts) {
