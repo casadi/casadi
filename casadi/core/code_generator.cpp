@@ -2387,6 +2387,9 @@ namespace casadi {
     // Process C++ source
     std::string line;
     std::istringstream stream(src);
+
+    bool filter_macros = true; // Macro definitions are ignored
+
     while (std::getline(stream, line)) {
       size_t n1, n2;
 
@@ -2394,8 +2397,8 @@ namespace casadi {
       if (line.find("template")==0) continue;
 
       // Macro definitions are ignored
-      if (line.find("#define")==0) continue;
-      if (line.find("#undef")==0) continue;
+      if (filter_macros && line.find("#define")==0) continue;
+      if (filter_macros && line.find("#undef")==0) continue;
 
       // Inline declaration
       if (line == "inline") continue;
@@ -2432,6 +2435,14 @@ namespace casadi {
         // Ignore next line
         std::getline(stream, line);
         continue;
+      }
+
+      if (line.find("// FILTER-MACROS ON") != std::string::npos) {
+        filter_macros = true;
+      }
+
+      if (line.find("// FILTER-MACROS OFF") != std::string::npos) {
+        filter_macros = false;
       }
 
       // Ignore other C++ style comment
