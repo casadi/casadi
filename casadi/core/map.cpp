@@ -199,8 +199,10 @@ namespace casadi {
     g << "res1 = res+" << n_out_ << ";\n"
       << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
+
+    std::string flag = g(f_, "arg1", "res1", "iw", "w");
     // Evaluate
-    g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    g << "if (" << flag << ") return 1;\n";
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
       if (f_.nnz_in(j))
@@ -386,11 +388,24 @@ namespace casadi {
   void OmpMap::codegen_body(CodeGenerator& g) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-    g << "casadi_int i;\n"
-      << "const double** arg1;\n"
-      << "double** res1;\n"
-      << "casadi_int flag = 0;\n"
-      << "#pragma omp parallel for private(i,arg1,res1) reduction(||:flag)\n"
+
+    bool needs_mem = f_->codegen_needs_mem();
+
+    std::string priv_vars = "";
+
+    if (f_->codegen_needs_mem()) {
+      g.local("flag", "int");
+      g.local("mid", "int");
+      priv_vars = ",mid,flag";
+    }
+
+    g.local("i", "casadi_int");
+    g.local("arg1", "const double*", "*");
+    g.local("res1", "double*", "*");
+    g.local("cflag", "casadi_int");
+    g.init_local("cflag", "0");
+
+    g << "#pragma omp parallel for private(i,arg1,res1" << priv_vars << ") reduction(||:cflag)\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n"
       << "arg1 = arg + " << n_in_ << "+i*" << sz_arg << ";\n";
     for (casadi_int j=0; j<n_in_; ++j) {
@@ -402,10 +417,13 @@ namespace casadi {
       g << "res1[" << j << "] = res[" << j << "] ?"
         << g.res(j) << "+i*" << f_.nnz_out(j) << ": 0;\n";
     }
-    g << "flag = "
-      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << " || flag;\n"
-      << "}\n"
-      << "if (flag) return 1;\n";
+
+    std::string flag = g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w), "");
+
+    g << "cflag = "
+      << flag << " || cflag;\n"
+      << "}\n";
+    g  << "if (cflag) return 1;\n";
   }
 
   void OmpMap::init(const Dict& opts) {
