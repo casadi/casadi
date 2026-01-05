@@ -432,7 +432,7 @@ jobs:
       matrix: ${{ fromJson(needs.matrix-arch-py2-mac.outputs.matrix) }}
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
-      deploy_arch: ${{matrix.target == 'macos-14' && 'arm64' || 'osx64'}}
+      deploy_arch: osx-${{matrix.target}}
     steps:
 
       - uses: casadi/action-setup-compiler@master
