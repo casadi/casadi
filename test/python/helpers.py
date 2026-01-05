@@ -874,7 +874,7 @@ class casadiTestCase(unittest.TestCase):
             self.checkarray(Fout[k],outputs[k],digits=digits)
         else:
           for i in range(F.n_out()):
-            self.checkarray(Fout[i],Fout2[i],digits=digits)
+            self.checkarray(Fout[i],outputs[i],digits=digits)
 
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
