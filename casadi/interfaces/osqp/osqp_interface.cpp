@@ -346,26 +346,26 @@ namespace casadi {
     g << "osqp_set_default_settings(&settings);\n";
     g << "settings.rho = " << g.constant(settings_.rho) << ";\n";
     g << "settings.sigma = " << g.constant(settings_.sigma) << ";\n";
-    g << "settings.scaling = " << g.constant(settings_.scaling) << ";\n";
-    g << "settings.adaptive_rho = " << g.constant(settings_.adaptive_rho) << ";\n";
-    g << "settings.adaptive_rho_interval = " << g.constant(settings_.adaptive_rho_interval)
+    g << "settings.scaling = " << settings_.scaling << ";\n";
+    g << "settings.adaptive_rho = " << settings_.adaptive_rho << ";\n";
+    g << "settings.adaptive_rho_interval = " << settings_.adaptive_rho_interval
       << ";\n";
     g << "settings.adaptive_rho_tolerance = " << g.constant(settings_.adaptive_rho_tolerance)
       << ";\n";
     //g << "settings.adaptive_rho_fraction = " << settings_.adaptive_rho_fraction << ";\n";
-    g << "settings.max_iter = " << g.constant(settings_.max_iter) << ";\n";
+    g << "settings.max_iter = " << settings_.max_iter << ";\n";
     g << "settings.eps_abs = " << g.constant(settings_.eps_abs) << ";\n";
     g << "settings.eps_rel = " << g.constant(settings_.eps_rel) << ";\n";
     g << "settings.eps_prim_inf = " << g.constant(settings_.eps_prim_inf) << ";\n";
     g << "settings.eps_dual_inf = " << g.constant(settings_.eps_dual_inf) << ";\n";
     g << "settings.alpha = " << g.constant(settings_.alpha) << ";\n";
     g << "settings.delta = " << g.constant(settings_.delta) << ";\n";
-    g << "settings.polish = " << g.constant(settings_.polish) << ";\n";
-    g << "settings.polish_refine_iter = " << g.constant(settings_.polish_refine_iter) << ";\n";
-    g << "settings.verbose = " << g.constant(settings_.verbose) << ";\n";
-    g << "settings.scaled_termination = " << g.constant(settings_.scaled_termination) << ";\n";
-    g << "settings.check_termination = " << g.constant(settings_.check_termination) << ";\n";
-    g << "settings.warm_start = " << g.constant(settings_.warm_start) << ";\n";
+    g << "settings.polish = " << settings_.polish << ";\n";
+    g << "settings.polish_refine_iter = " << settings_.polish_refine_iter << ";\n";
+    g << "settings.verbose = " << settings_.verbose << ";\n";
+    g << "settings.scaled_termination = " << settings_.scaled_termination << ";\n";
+    g << "settings.check_termination = " << settings_.check_termination << ";\n";
+    g << "settings.warm_start = " << settings_.warm_start << ";\n";
     //g << "settings.time_limit = " << settings_.time_limit << ";\n";
 
     g << "return osqp_setup(&" + codegen_mem(g) + ", &data, &settings)!=0;\n";
