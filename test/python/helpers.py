@@ -748,7 +748,7 @@ class casadiTestCase(unittest.TestCase):
     bad_symbols = [s for s in all_exported if s.startswith('casadi') and not s in exclude_symbols]
 
     if bad_symbols:
-      self.fail(f"Found {len(bad_symbols)} symbols starting with 'casadi' exported in shared library (missing CASADI_PREFIX): {bad_symbols[:10]}")
+      self.fail("Found %d symbols starting with 'casadi' exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
   def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
     if not isinstance(main_return_code,list):
