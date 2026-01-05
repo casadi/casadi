@@ -168,7 +168,7 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v4.2.0
         with:
-          key: core-build-${{ github.ref }}-${{matrix.image}}-${{env.cache-suffix}}
+          key: core-build-${{ github.ref }}-${{matrix.image}}-${{matrix.target}}-${{env.cache-suffix}}
           path: build
       - uses: casadi/mockups@master
         with:
@@ -177,17 +177,17 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -DCMAKE_OSX_ARCHITECTURES=${{matrix.target}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'macos-14') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-15-intel') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -DCMAKE_OSX_ARCHITECTURES=${{matrix.target}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.target,'arm64') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.target,'x86_64') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - name: Debug
         if: failure()
         run: |
             more build/external_projects/src/*-build/config.log | cat
-      - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
+      - run: zip -rq ${{github.job}}-${{matrix.image}}-${{matrix.target}}.zip build
       - uses: actions/upload-artifact@v4.3.1
         with:
-          name: ${{ github.job }}-${{matrix.image}}
-          path: ${{ github.job }}-${{matrix.image}}.zip
+          name: ${{ github.job }}-${{matrix.image}}-${{matrix.target}}
+          path: ${{ github.job }}-${{matrix.image}}-${{matrix.target}}.zip
           retention-days: 5
 
   core-dockcross:
@@ -325,8 +325,8 @@ jobs:
         run: unzip casadi_source.zip
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: core-osx-${{ matrix.image }}
-      - run: unzip core-osx-${{ matrix.image }}.zip
+          name: core-osx-${{ matrix.image }}-${{matrix.target}}
+      - run: unzip core-osx-${{ matrix.image }}-${{matrix.target}}.zip
       - run: rm -rf install
       - uses: casadi/mockups@master
         with:
