@@ -48,10 +48,10 @@ if os_name=="linux":
     arch = "manylinux2014_i686"
   tag = "cp%s-none-%s" % (pyversion,arch.replace("-","_"))
 elif os_name=="osx":
-  if arch=="osx":
+  if arch=="x86_64":
     tag = ["cp%s-none-macosx_10_13_x86_64" % (pyversion),
          "cp%s-none-macosx_10_13_intel" % (pyversion)]
-  elif arch=="osx-m1":
+  elif arch=="arm64":
     tag = "cp%s-none-macosx_11_0_arm64" % (pyversion)
 elif os_name=="windows":
   if bitness=="64":
