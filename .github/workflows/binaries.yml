@@ -418,22 +418,26 @@ jobs:
           config: |
             matrix:
               image: [macos-15-intel]
+              target: [x86_64]
               host: ["matlab"]
               version: ["2018b"]
             operations:
               - type: append
                 matrix:
                   image: [macos-15-intel]
+                  target: [x86_64]
                   host: ["octave"]
                   version: ["7.3.0"]
               - type: append
                 matrix:
                   image: [macos-14]
+                  target: [arm64]
                   host: ["matlab"]
                   version: ["2018b"]
               - type: append
                 matrix:
                   image: [macos-14]
+                  target: [arm64]
                   host: ["octave"]
                   version: ["7.3.0"]
 
@@ -453,7 +457,7 @@ jobs:
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ''
-          target: ${{matrix.image == 'macos-14' && 'arm64' || 'x86_64'}}
+          target: ${{matrix.target}}
       - uses: actions/download-artifact@v4.1.7
         with:
           name: casadi_source_wrapper
@@ -461,12 +465,12 @@ jobs:
         run: unzip casadi_source.zip
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: core-osx-${{ matrix.image }}
+          name: core-osx-${{ matrix.image }}-${{matrix.target}}
       - run: ls
-      - run: unzip core-osx-${{ matrix.image }}.zip
+      - run: unzip core-osx-${{ matrix.image }}-${{matrix.target}}.zip
       - uses: casadi/mockups@master
         with:
-          tag: ${{ matrix.image }}
+          tag: ${{ matrix.image }}_${{matrix.target}}
       - run: |
           ls mockups/cmake
       - name: Build
@@ -478,8 +482,8 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "macos-15-intel": {"os": "osx", "bitness": "64"},
-              "macos-14": {"os": "osx_arm", "bitness": "64"}
+              "macos-15-intel": {"os": "osx_intel", "bitness": "64"},
+              "macos-14": {"os": "osx", "bitness": "64"}
            }
           export_to: env
       - uses: jgillis/universal_grafter@master
@@ -775,7 +779,7 @@ jobs:
            {
               "windows-2022": {"os": "windows"},
               "ubuntu-24.04": {"os": "linux"},
-              "macos-15-intel": {"os": "osx"},
+              "macos-15-intel": {"os": "osx_intel"},
               "macos-14": {"os": "osx"}
            }
           export_to: env
@@ -835,7 +839,7 @@ jobs:
               "windows-2022": {"os": "windows"},
               "ubuntu-22.04": {"os": "linux"},
               "macos-14": {"os": "osx"},
-              "macos-15-intel": {"os": "osx"}
+              "macos-15-intel": {"os": "osx_intel"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.7
