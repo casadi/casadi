@@ -150,13 +150,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [macos-15-intel,macos-14]
+        image: [macos-14]
+        target: ['arm64','x86_64']
     steps:
       - run: echo "${{ vars.BLESSED_REPO }} ${{ vars.BLESSED_REPO }}"
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ''
-          target: ${{matrix.image == 'macos-14' && 'arm64' || 'x86_64'}}
+          target: ${{matrix.target}}
       - uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0 # for git-restore-mtime
@@ -171,12 +172,12 @@ jobs:
           path: build
       - uses: casadi/mockups@master
         with:
-          tag: ${{ matrix.image }}
+          tag: ${{ matrix.image }}_${{matrix.target}}
       - run: env
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'macos-14') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-15-intel') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -DCMAKE_OSX_ARCHITECTURES=${{matrix.target}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'macos-14') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-15-intel') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - name: Debug
         if: failure()
@@ -273,12 +274,14 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-15-intel]
+              image: [macos-14]
+              target: x86_64
               py2: ["27","36","37","38","39","310","311","312","313","314"]
             operations:
               - type: append
                 matrix:
                   image: [macos-14]
+                  target: arm64
                   py2: ["38","39","310","311","312","313","314"]
 
     outputs:
@@ -292,13 +295,13 @@ jobs:
       matrix: ${{ fromJson(needs.matrix-arch-py2-mac.outputs.matrix) }}
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
-      deploy_arch: ${{matrix.image == 'macos-14' && 'osx_arm64' || 'osx64'}}
+      deploy_arch: ${{matrix.target == 'macos-14' && 'arm64' || 'osx64'}}
     steps:
 
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ${{matrix.py2}}
-          target: ${{matrix.image == 'macos-14' && 'arm64' || 'x86_64'}}
+          target: ${{matrix.target}}
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
@@ -327,7 +330,7 @@ jobs:
       - run: rm -rf install
       - uses: casadi/mockups@master
         with:
-          tag: ${{ matrix.image }}
+          tag: ${{ matrix.image }}_${{matrix.target}}
       - name: Build
         run: |
           cmake -Bbuild -DWITH_PYTHON=ON -DWITH_PYTHON3=${{steps.get-id.outputs.WITH_PYTHON3}} -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DSKIP_CONFIG_H_GENERATION=ON
