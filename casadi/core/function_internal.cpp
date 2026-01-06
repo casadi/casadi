@@ -95,7 +95,6 @@ namespace casadi {
     checkout_ = nullptr;
     release_ = nullptr;
     has_refcount_ = false;
-    has_refcount_in_deps_ = false;
     enable_forward_op_ = true;
     enable_reverse_op_ = true;
     enable_jacobian_op_ = true;
@@ -724,6 +723,18 @@ namespace casadi {
   }
 
   void FunctionInternal::finalize() {
+    if (codegen_needs_mem()) has_refcount_ = true;
+
+    has_refcount_in_deps_ = has_refcount_;
+
+    // Does any embedded function have reference counting for codegen?
+    for (const Function& f : shared_from_this<Function>().find_functions(0)) {
+      if (f->has_refcount_in_deps_) {
+        has_refcount_in_deps_ = true;
+        break;
+      }
+    }
+
     if (jit_) {
       jit_name_ = jit_base_name_;
       jit_directory_ = get_jit_directory(jit_options_);
@@ -758,18 +769,6 @@ namespace casadi {
 
     // Finalize base classes
     ProtoFunction::finalize();
-
-    if (codegen_needs_mem()) has_refcount_ = true;
-
-    if (has_refcount_) has_refcount_in_deps_ = true;
-
-    // Does any embedded function have reference counting for codegen?
-    for (const Function& f : shared_from_this<Function>().find_functions(0)) {
-      if (f->has_refcount_in_deps_) {
-        has_refcount_in_deps_ = true;
-        break;
-      }
-    }
 
     // Dump if requested
     if (dump_) dump();
