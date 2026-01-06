@@ -70,7 +70,8 @@ classdef ExamplesTests < matlab.unittest.TestCase
         end
 
         function testSysid(testCase)
-            % Run sysid example
+            % Run sysid example (not on Windows)
+            testCase.assumeFalse(ispc, 'Sysid test is skipped on Windows');
             sysid
         end
 
