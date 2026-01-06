@@ -239,12 +239,14 @@ namespace casadi {
     void scope_exit();
 
     /** \brief Return from a scope with a value
+
     *  Takes care of cleanup code
 
         \identifier{2f4} */
     void scope_return(const std::string& value);
 
     /** \brief Return from a scope without a value
+
     *  Takes care of cleanup code
 
         \identifier{2f5} */
