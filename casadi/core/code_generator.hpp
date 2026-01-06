@@ -240,15 +240,19 @@ namespace casadi {
 
     /** \brief Return from a scope with a value
     *  Takes care of cleanup code
-    */
+
+        \identifier{2f4} */
     void scope_return(const std::string& value);
 
     /** \brief Return from a scope without a value
     *  Takes care of cleanup code
-    */
+
+        \identifier{2f5} */
     void scope_return();
 
-    /** \brief Add cleanup code to be executed upon scope exit */
+    /** \brief Add cleanup code to be executed upon scope exit
+
+        \identifier{2f6} */
     void scope_add_cleanup(const std::string& code);
 
     /** \brief Declare a work vector element
@@ -276,7 +280,9 @@ namespace casadi {
         \identifier{si} */
     bool avoid_stack() const { return avoid_stack_;}
 
-    /** \brief Emit thead safe code chekout/release? */
+    /** \brief Emit thead safe code chekout/release?
+
+        \identifier{2f7} */
     bool thread_safe() const { return thread_safe_; }
 
     /** \brief Print a constant in a lossless but compact manner

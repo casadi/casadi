@@ -309,7 +309,9 @@ namespace casadi {
     /// Type of parallellization
     std::string parallelization() const override { return "thread"; }
 
-    /** \brief Generate code for the declarations of the C function */
+    /** \brief Generate code for the declarations of the C function
+
+        \identifier{2f3} */
     void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function
