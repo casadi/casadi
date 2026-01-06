@@ -123,7 +123,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       image: ["windows-2022","ubuntu-24.04","macos-15-intel","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-14"]
     steps:
       - uses: actions/checkout@v4.1.1
       - run: python --version
