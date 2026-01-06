@@ -793,13 +793,17 @@ jobs:
       - run: echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
         if: "contains(env.os, 'windows')"
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1.2.4
+        uses: matlab-actions/setup-matlab@v2
 
-      - run: cd test && python internal/test_matlab.py -skipfiles="callback.m solvers.m" matlab
-        if: "!contains(env.os, 'windows')"
-      - run: cd test && python internal/test_matlab.py -skipfiles="solvers.m" matlab
-        if: "contains(env.os, 'windows')"
-      - run: cd test && python internal/test_matlab.py '../docs/examples/matlab' -skipfiles="sysid_gauss_newton.m MyCallback.m NlpCallback.m"
+      - name: Run MATLAB unit tests
+        uses: matlab-actions/run-tests@v2
+        with:
+          source-folder: test/matlab
+
+      - name: Run MATLAB examples tests
+        uses: matlab-actions/run-tests@v2
+        with:
+          source-folder: docs/examples/matlab
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -812,7 +816,7 @@ jobs:
         if: "contains(env.os, 'linux')"
 
       - name: Run script
-        uses: matlab-actions/run-command@v1.1.2
+        uses: matlab-actions/run-command@v2
         with:
           command: addpath('${{ github.workspace }}/casadi');cd test/matlab;solvers
         env:
