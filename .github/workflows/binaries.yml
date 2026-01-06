@@ -793,7 +793,7 @@ jobs:
       - run: echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
         if: "contains(env.os, 'windows')"
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1.2.4
+        uses: matlab-actions/setup-matlab@v2
 
       - run: cd test && python internal/test_matlab.py -skipfiles="callback.m solvers.m" matlab
         if: "!contains(env.os, 'windows')"
