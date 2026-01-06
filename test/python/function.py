@@ -3080,9 +3080,26 @@ class Functiontests(casadiTestCase):
                 wide_inputs[k] = horzcat(local_inputs[k],local_inputs[k]*1.2)
               
             print("foo",F(**wide_inputs))
-                
+
             if map_type == "openmp":
-                self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+["/openmp" if os.name=='nt' else "-fopenmp"],extralibs=["osqp"],opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_OMP"],with_external=False,digits=14)
+                # Set up OpenMP compilation flags
+                if os.name == 'nt':
+                    openmp_flags = ["/openmp"]
+                elif sys.platform == 'darwin':
+                    # macOS: use -Xpreprocessor -fopenmp and environment variables
+                    openmp_flags = ["-Xpreprocessor", "-fopenmp"]
+                    # Add CPPFLAGS and LDFLAGS from environment if available (set by CI)
+                    cppflags = os.environ.get('CPPFLAGS', '')
+                    ldflags = os.environ.get('LDFLAGS', '')
+                    if cppflags:
+                        openmp_flags.extend(cppflags.split())
+                    if ldflags:
+                        openmp_flags.extend(ldflags.split())
+                    openmp_flags.append("-lomp")
+                else:
+                    openmp_flags = ["-fopenmp"]
+
+                self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+openmp_flags,extralibs=["osqp"],opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_OMP"],with_external=False,digits=14)
             elif map_type == "thread":
                 if os.name == "posix":
                     self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+["-pthread"],extralibs=["osqp"],opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_POSIX"],with_external=False,digits=14,helgrind=True)

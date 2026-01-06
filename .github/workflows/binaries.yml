@@ -1086,6 +1086,16 @@ jobs:
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
           channels: pkgs/main, conda-forge, conda-forge/label/python_rc
+      - name: Install libomp for OpenMP support on macOS
+        run: brew install libomp
+        if: contains(matrix.image, 'macos')
+      - name: Set up OpenMP environment variables for macOS
+        run: |
+          LIBOMP_PREFIX=$(brew --prefix libomp)
+          echo "LDFLAGS=-L${LIBOMP_PREFIX}/lib" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I${LIBOMP_PREFIX}/include" >> $GITHUB_ENV
+        shell: bash -el {0}
+        if: contains(matrix.image, 'macos')
       - run: |
           pip install numpy scipy pandas looseversion
         shell: bash -el {0}
