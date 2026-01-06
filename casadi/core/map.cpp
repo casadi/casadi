@@ -389,8 +389,6 @@ namespace casadi {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
-    bool needs_mem = f_->codegen_needs_mem();
-
     std::string priv_vars = "";
 
     if (f_->codegen_needs_mem()) {
