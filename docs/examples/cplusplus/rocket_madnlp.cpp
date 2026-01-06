@@ -70,16 +70,24 @@ int main(){
   SX g = vertcat(s, v, v_traj);
 
   // Create an NLP
+  std::cout << "making NLP" << std::endl;
   SXDict nlp = {{"x", u}, {"f", f}, {"g", g}};
+  std::cout << "made NLP" << std::endl;
 
   // MadNLP Options
   Dict solver_opts;
-  solver_opts["madnlp.linear_solver"] = "Ma27Solver";
+  //solver_opts["madnlp.linear_solver"] = "Ma27Solver";
+  solver_opts["gpu"] = true;
+  solver_opts["madnlp.linear_solver"] = "CUDSSSolver";
+  solver_opts["madnlp.tol"] = 1e-4;
+  //solver_opts["madnlp.tol"] = 1e-9;
   solver_opts["madnlp.max_iter"] = 100;
-  solver_opts["madnlp.tol"] = 1e-9;
+  
 
   // Create an NLP solver and buffers
+  std::cout << "making solver" << std::endl;
   Function solver = nlpsol("solver", "madnlp", nlp, solver_opts);
+  std::cout << "made solver" << std::endl;
   std::map<std::string, DM> arg, res;
 
   // Bounds on u and initial condition

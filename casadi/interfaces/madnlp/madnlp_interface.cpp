@@ -74,6 +74,9 @@ const Options MadnlpInterface::options_
     {"ng",
      {OT_INTVECTOR,
       "Number of constraints"}},
+    {"gpu",
+     {OT_BOOL,
+      "Whether to use the GPU interface in libmad"}},
     {"madnlp",
      {OT_DICT,
       "Options to be passed to madnlp"}},
@@ -112,6 +115,7 @@ void MadnlpInterface::init(const Dict& opts) {
   std::string convexify_strategy = "none";
   double convexify_margin = 1e-7;
   casadi_int max_iter_eig = 200;
+  gpu_ = false;
   convexify_ = false;
 
   calc_g_ = true;
@@ -125,6 +129,8 @@ void MadnlpInterface::init(const Dict& opts) {
       convexify_margin = op.second;
     } else if (op.first=="max_iter") {
       max_iter_eig = op.second;
+    } else if (op.first=="gpu") {
+      gpu_ = op.second;
     } else if (op.first=="madnlp") {
       opts_ = op.second;
     }
@@ -133,6 +139,11 @@ void MadnlpInterface::init(const Dict& opts) {
   // Do we need second order derivatives?
   exact_hessian_ = true;
   auto hessian_approximation = opts_.find("hessian_approximation");
+  if (hessian_approximation!=opts_.end()) {
+    exact_hessian_ = hessian_approximation->second == "exact";
+  }
+  // Are we using gpu
+  auto use_gpu_interface = opts_.find("gpu");
   if (hessian_approximation!=opts_.end()) {
     exact_hessian_ = hessian_approximation->second == "exact";
   }
@@ -253,7 +264,7 @@ void MadnlpInterface::set_work(void* mem, const double**& arg, double**& res,
 int MadnlpInterface::solve(void* mem) const {
   auto m = static_cast<MadnlpMemory*>(mem);
 
-  casadi_madnlp_presolve(&m->d);
+  casadi_madnlp_presolve(&m->d, gpu_);
 
   int ret = casadi_madnlp_solve(&m->d);
   if ( ret != 0 ) throw CasadiException("MADNLPError");
@@ -369,7 +380,14 @@ void MadnlpInterface::codegen_body(CodeGenerator& g) const {
 
   g << "casadi_madnlp_init(d, &arg, &res, &iw, &w);\n";
   g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
-  g << "casadi_madnlp_presolve(d);\n";
+  if(gpu_)
+  {
+    g << "casadi_madnlp_presolve(d, true);\n";
+  }
+  else
+  {
+    g << "casadi_madnlp_presolve(d, true);\n";
+  }
 
   g << "casadi_madnlp_solve(d);\n";
 
