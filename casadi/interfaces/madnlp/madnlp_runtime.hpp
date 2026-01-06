@@ -69,7 +69,9 @@ struct casadi_madnlp_data {
   //struct blasfeo_dvec v, r;
   //struct blasfeo_dmat R;
 
+  bool gpu;
   CNLPModel* cnlp_model;
+  GPUNLPModel* gpunlp_model;
   OptsDict* libmad_opts;
   MadNLPExecutionStats* stats;
   MadNLPSolver* solver;
@@ -170,7 +172,12 @@ int casadi_madnlp_eval_obj(const T1* w, T1* res, void* user_data) {
   d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
-  return calc_function(&d->prob->nlp_f, d_oracle);
+  std::cout << w[0] << std::endl;
+  std::cout << w[1] << std::endl;
+  std::cout << w[2] << std::endl;
+  calc_function(&d->prob->nlp_f, d_oracle);
+  std::cout << res[0] << std::endl;
+  return 0;
 }
 
 // SYMBOL "madnlp_eval_obj"
@@ -242,7 +249,7 @@ void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, c
 
 // SYMBOL "madnlp_presolve"
 template<typename T1>
-void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d) {
+void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d, bool gpu) {
   casadi_int k, i, column;
   const casadi_madnlp_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
@@ -250,25 +257,52 @@ void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d) {
 
   d->unified_return_status = SOLVER_RET_UNKNOWN;
   d->success = 0;
-  libmad_nlpmodel_create(&(d->cnlp_model),
-                         "MadNLP",
-                         p_nlp->nx, p_nlp->ng,
-                         p->nnz_jac_g, p->nnz_hess_l,
-                         casadi_madnlp_constr_jac_structure<T1>,
-                         casadi_madnlp_lag_hess_structure<T1>,
-                         casadi_madnlp_eval_obj<T1>,
-                         casadi_madnlp_eval_constr<T1>,
-                         casadi_madnlp_eval_obj_grad<T1>,
-                         casadi_madnlp_eval_constr_jac<T1>,
-                         casadi_madnlp_eval_lag_hess<T1>,
-                         d
-    );
-  // set initial guess
-  libmad_nlpmodel_set_numerics(d->cnlp_model,
-                               d_nlp->z, d_nlp->lam + p_nlp->nx,
-                               d_nlp->lbx, d_nlp->ubx,
-                               d_nlp->lbg, d_nlp->ubg);
-  madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
+  d->gpu = gpu;
+  if(gpu)
+  {
+    std::cout << "Building GPU model" << std::endl;
+    libmad_gpunlpmodel_create(&(d->gpunlp_model),
+                           "MadNLP",
+                           p_nlp->nx, p_nlp->ng,
+                           p->nnz_jac_g, p->nnz_hess_l,
+                           casadi_madnlp_constr_jac_structure<T1>,
+                           casadi_madnlp_lag_hess_structure<T1>,
+                           casadi_madnlp_eval_obj<T1>,
+                           casadi_madnlp_eval_constr<T1>,
+                           casadi_madnlp_eval_obj_grad<T1>,
+                           casadi_madnlp_eval_constr_jac<T1>,
+                           casadi_madnlp_eval_lag_hess<T1>,
+                           d
+      );
+    // set initial guess
+    libmad_gpunlpmodel_set_numerics(d->gpunlp_model,
+                                    d_nlp->z, d_nlp->lam + p_nlp->nx,
+                                    d_nlp->lbx, d_nlp->ubx,
+                                    d_nlp->lbg, d_nlp->ubg);
+    madnlp_gpu_create_solver(&(d->solver), d->gpunlp_model, d->libmad_opts);
+  }
+  else
+  {
+    libmad_nlpmodel_create(&(d->cnlp_model),
+                           "MadNLP",
+                           p_nlp->nx, p_nlp->ng,
+                           p->nnz_jac_g, p->nnz_hess_l,
+                           casadi_madnlp_constr_jac_structure<T1>,
+                           casadi_madnlp_lag_hess_structure<T1>,
+                           casadi_madnlp_eval_obj<T1>,
+                           casadi_madnlp_eval_constr<T1>,
+                           casadi_madnlp_eval_obj_grad<T1>,
+                           casadi_madnlp_eval_constr_jac<T1>,
+                           casadi_madnlp_eval_lag_hess<T1>,
+                           d
+      );
+    // set initial guess
+    libmad_nlpmodel_set_numerics(d->cnlp_model,
+                                 d_nlp->z, d_nlp->lam + p_nlp->nx,
+                                 d_nlp->lbx, d_nlp->ubx,
+                                 d_nlp->lbg, d_nlp->ubg);
+    madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
+  }
 }
 
 // SYMBOL "madnlp_solve"
