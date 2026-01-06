@@ -193,7 +193,7 @@ namespace casadi {
       // Process options
       for (auto&& op : opts) {
         // Find the dot if any
-        std::string::size_type dotpos = op.first.find('.'), dotpos_end;
+        std::string::size_type dotpos = op.first.find('.'), dotpos_end = 0;
         if (dotpos==std::string::npos) {
           dotpos = op.first.find("__");
           if (dotpos!=std::string::npos) dotpos_end = dotpos+2;
