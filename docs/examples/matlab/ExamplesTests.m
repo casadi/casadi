@@ -8,7 +8,7 @@ classdef ExamplesTests < matlab.unittest.TestCase
     % Disabled tests:
     % - testSysidGaussNewton (currently disabled, should be fixed and re-enabled)
 
-    methods(Test)
+    methods(Test, TestTags = {'examples'})
         function testAccessingMxAlgorithm(testCase)
             % Run accessing_mx_algorithm example
             accessing_mx_algorithm

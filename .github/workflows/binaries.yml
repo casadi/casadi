@@ -799,11 +799,13 @@ jobs:
         uses: matlab-actions/run-tests@v2
         with:
           source-folder: test/matlab
+          select-by-tag: unittests
 
       - name: Run MATLAB examples tests
         uses: matlab-actions/run-tests@v2
         with:
           source-folder: docs/examples/matlab
+          select-by-tag: examples
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -866,7 +868,7 @@ jobs:
         shell: pwsh
       - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
         if: "!contains(env.os, 'windows')"
-      - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="solvers.m callback.m nlp_callback.m export_tests.m asorted_tests.m"
+      - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="solvers.m callback.m nlp_callback.m export_tests.m asorted_tests.m CasadiTests.m"
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}

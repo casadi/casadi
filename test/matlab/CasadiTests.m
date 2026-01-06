@@ -6,7 +6,7 @@ classdef CasadiTests < matlab.unittest.TestCase
     % - Windows: skips 'solvers' test
     % - Linux/Mac: skips 'solvers' and 'callback' tests
 
-    methods(Test)
+    methods(Test, TestTags = {'unittests'})
         function testAsortedTests(testCase)
             % Run assorted tests
             asorted_tests
