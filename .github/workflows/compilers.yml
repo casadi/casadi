@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ['9','10','11','12'] # 13 compiler bug
+        compiler: ['10','11','12'] # 13 compiler bug
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Build
@@ -92,7 +92,17 @@ jobs:
         run: |
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
-  
+  macos-15-intel:
+    runs-on: macos-15-intel
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
   macos-14:
     runs-on: macos-14
     env:
@@ -104,28 +114,6 @@ jobs:
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
           
-  macos-13:
-    runs-on: macos-13
-    env:
-      MACOSX_DEPLOYMENT_TARGET: "11.0"
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: Build
-        run: |
-          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
-          cmake --build build -v
-
-  macos-13-clang15:
-    runs-on: macos-13
-    env:
-      MACOSX_DEPLOYMENT_TARGET: "11.0"
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: Build
-        run: |
-          CC=$(brew --prefix llvm@15)/bin/clang FC=gfortran-11 CXX=$(brew --prefix llvm@15)/bin/clang++ cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
-          cmake --build build -v
-
   windows-2022:
     runs-on: windows-2022
     strategy:
