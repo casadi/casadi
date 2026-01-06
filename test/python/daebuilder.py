@@ -788,30 +788,30 @@ class Daebuildertests(casadiTestCase):
         vertcat(x0_val*x1_val,x1_val+u_val+CORRECTION*p_val*c0_val,3*(sin(x1_val)**2+u_val))
     )
     
-    f = dae.create('f',['c','p','u','x'],['ode'])
+    f = dae.create('f',['p','u','x'],['ode'])
     self.checkarray(
-        f(c_val,p_val,u_val,x_val),
+        f(p_val,u_val,x_val),
         vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(sin(x1_val)**2+u_val))
     )
         
-    f = dae.create('f',['c','p','u','x','w'],['ode'])
+    f = dae.create('f',['p','u','x','w'],['ode'])
     self.checkarray(
-        f(c_val,p_val,u_val,x_val,w_val),
+        f(p_val,u_val,x_val,w_val),
         vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(sin(x1_val)**2+u_val))
     )
     CORRECTION = 1 # Why is this not 2?
     self.checkarray(
-        f(c_val,p_val,u_val,x_val,2*w_val),
+        f(p_val,u_val,x_val,2*w_val),
         vertcat(CORRECTION*x0_val*x1_val,CORRECTION*(x1_val+u_val+p_val*c0_val),2*3*(sin(x1_val)**2+u_val))
     )
-    f = dae.create('f',['c','p','u','x','z'],['alg'])
+    f = dae.create('f',['p','u','x','z'],['alg'])
     self.checkarray(
-        f(c_val,p_val,u_val,x_val,z_val),
+        f(p_val,u_val,x_val,z_val),
         vertcat((-(x1_val-(2.*z0_val))),(-((x1_val-(3*z1_val))+z0_val)))
     )
-    f = dae.create('f',['c','p','u','x','z'],['y'])
+    f = dae.create('f',['p','u','x','z'],['y'])
     self.checkarray(
-        f(c_val,p_val,u_val,x_val,z_val),
+        f(p_val,u_val,x_val,z_val),
         vertcat(c1_val,x0_val,sin(x1_val),z0_val)
     )
     print(dae.export_fmu())
