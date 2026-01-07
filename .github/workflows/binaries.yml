@@ -279,11 +279,11 @@ jobs:
           if [ -f build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal ]; then
             find build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir -name "*.o.d" -newer build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal | head -5 || echo "No .o.d files newer than compiler_depend.internal (good!)"
           fi
-      - run: zip -rq ${{github.job}}-${{matrix.target}}.zip build
+      - run: tar --format=posix -czf ${{github.job}}-${{matrix.target}}.tar.gz build
       - uses: actions/upload-artifact@v4.3.1
         with:
           name: ${{github.job}}-${{ matrix.target}}
-          path: ${{github.job}}-${{matrix.target}}.zip
+          path: ${{github.job}}-${{matrix.target}}.tar.gz
           retention-days: 5
 
   matrix-arch-py2:
@@ -609,25 +609,25 @@ jobs:
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
-      - run: unzip core-dockcross-${{ matrix.arch }}.zip
+      - run: tar -xzf core-dockcross-${{ matrix.arch }}.tar.gz
       - name: Check timestamps before fix (diagnose timestamp issue)
         run: |
           echo "=== Checking timestamps of source files vs build artifacts ==="
           echo "Main CasADi source file timestamps (from casadi_source.zip):"
           find casadi swig -name "*.cpp" -o -name "*.hpp" | head -2 | xargs ls -l --time-style=full-iso 2>/dev/null || true
           echo ""
-          echo "External project EXTRACTED source timestamps (in build tree):"
+          echo "External project EXTRACTED source timestamps (in build tree, from tar.gz):"
           ls -l --time-style=full-iso build/external_projects/src/libz-external/zlib.h 2>/dev/null || true
           ls -l --time-style=full-iso build/external_projects/src/libzip-external/CMakeLists.txt 2>/dev/null || true
           echo ""
-          echo "Build artifact timestamps (libraries):"
+          echo "Build artifact timestamps (libraries, from tar.gz):"
           ls -l --time-style=full-iso build/external_projects/lib/libz.a 2>/dev/null || echo "libz.a not found"
           ls -l --time-style=full-iso build/external_projects/lib/libzip.a 2>/dev/null || echo "libzip.a not found"
           echo ""
-          echo "Build artifact timestamps (object files):"
+          echo "Build artifact timestamps (object files, from tar.gz):"
           find build/external_projects/src/libz-external-build -name "*.o" -type f 2>/dev/null | head -2 | xargs ls -l --time-style=full-iso 2>/dev/null || true
           echo ""
-          echo "CMake stamp file timestamps:"
+          echo "CMake stamp file timestamps (from tar.gz):"
           ls -l --time-style=full-iso build/external_projects/src/libz-external-stamp/*-done 2>/dev/null || true
       - name: Verify timestamps after fix
         run: |
@@ -729,7 +729,7 @@ jobs:
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
-      - run: unzip core-dockcross-${{ matrix.arch }}.zip
+      - run: tar -xzf core-dockcross-${{ matrix.arch }}.tar.gz
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
