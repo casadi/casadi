@@ -584,6 +584,8 @@ jobs:
           echo "Touching all build artifacts, excluding external project source directories..."
           echo "This touches everything in build/ EXCEPT build/external_projects/src/*-external/ directories"
           find build -type f ! -path 'build/external_projects/src/*-external/*' -exec touch {} + 2>/dev/null || true
+          echo "Touching compiler_depend.internal files LAST (CMake needs these newest)"
+          find build -type f -name 'compiler_depend.internal' -exec touch {} + 2>/dev/null || true
           echo "Timestamp fix applied - external project source directories (*-external/) were NOT touched"
       - name: Verify timestamps after fix
         run: |
@@ -594,6 +596,12 @@ jobs:
           echo "Build artifacts (SHOULD be recently touched):"
           ls -l --time-style=full-iso build/external_projects/lib/libz.a 2>/dev/null || true
           find build/external_projects/src/libz-external-build -name "*.o" -type f 2>/dev/null | head -2 | xargs ls -l --time-style=full-iso 2>/dev/null || true
+          echo ""
+          echo "Dependency files (.o.d):"
+          find build/external_projects/src/libz-external-build -name "*.o.d" -type f 2>/dev/null | head -2 | xargs ls -l --time-style=full-iso 2>/dev/null || true
+          echo ""
+          echo "CMake compiler_depend.internal (MUST be newest to avoid rebuilds):"
+          find build -name 'compiler_depend.internal' 2>/dev/null | head -3 | xargs ls -l --time-style=full-iso 2>/dev/null || true
           echo ""
           echo "Stamp files (SHOULD be recently touched):"
           ls -l --time-style=full-iso build/external_projects/src/libz-external-stamp/*-done 2>/dev/null || true
