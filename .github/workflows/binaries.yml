@@ -953,7 +953,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       py2: ["27","36","37","38","39","310","311","312","313"]
+       py2: ["310"]
        image: ["windows-2022","ubuntu-24.04","macos-15-intel","macos-14"]
        bit: [64]
        exclude:
