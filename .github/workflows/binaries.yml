@@ -202,9 +202,22 @@ jobs:
         with:
           fetch-depth: 0 # for git-restore-mtime
           submodules: recursive
+      - name: "TIMESTAMP CHECK 1: After checkout"
+        run: |
+          echo "=== After checkout - nanosecond precision timestamps ==="
+          echo "Sample C source files:"
+          ls -l --time-style=full-iso external_packages/CSparse/Source/cs_add.c 2>/dev/null || echo "Source not yet present"
+          echo "Build artifacts (should not exist yet):"
+          ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal 2>/dev/null || echo "Not present (expected)"
       - uses: jgillis/git-restore-mtime-action@master
         with:
           args: "--commit-time"
+      - name: "TIMESTAMP CHECK 2: After git-restore-mtime"
+        run: |
+          echo "=== After git-restore-mtime - nanosecond precision timestamps ==="
+          echo "Sample C source files (should have historical timestamps):"
+          ls -l --time-style=full-iso external_packages/CSparse/Source/cs_add.c 2>/dev/null || echo "Source not found"
+          find external_packages/CSparse/Source -name "*.c" | head -3 | xargs ls -l --time-style=full-iso 2>/dev/null || true
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.target }}:production
@@ -218,6 +231,23 @@ jobs:
         with:
           key: core-build-${{ github.ref }}-${{ matrix.target }}-${{env.cache-suffix}}
           path: build
+      - name: "TIMESTAMP CHECK 3: After cache restore"
+        run: |
+          echo "=== After cache restore - nanosecond precision timestamps ==="
+          echo "Source files (should still have historical timestamps from git-restore-mtime):"
+          ls -l --time-style=full-iso external_packages/CSparse/Source/cs_add.c 2>/dev/null || echo "Source not found"
+          echo ""
+          echo "Cached build artifacts (if cache hit):"
+          ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal 2>/dev/null || echo "Not present (cache miss or first build)"
+          ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o 2>/dev/null || echo "Object file not present"
+          ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d 2>/dev/null || echo "Dependency file not present"
+          echo ""
+          echo "Checking timestamp relationships (if files exist):"
+          if [ -f build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal ] && [ -f build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d ]; then
+            echo "compiler_depend.internal vs cs_add.c.o.d:"
+            stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal
+            stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d
+          fi
       - uses: casadi/mockups@master
         with:
           tag: ${{ matrix.target }}
@@ -229,6 +259,26 @@ jobs:
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
           # Needed to make CoinUtils work
           ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
+      - name: "TIMESTAMP CHECK 4: After build completes"
+        run: |
+          echo "=== After build completes - nanosecond precision timestamps ==="
+          echo "Source files (should still have historical timestamps):"
+          ls -l --time-style=full-iso external_packages/CSparse/Source/cs_add.c 2>/dev/null || echo "Source not found"
+          echo ""
+          echo "Build artifacts (just created/updated):"
+          ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal 2>/dev/null || echo "compiler_depend.internal not found"
+          ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o 2>/dev/null || echo "Object file not found"
+          ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d 2>/dev/null || echo "Dependency file not found"
+          echo ""
+          echo "Detailed nanosecond timestamps (using stat):"
+          stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal 2>/dev/null || true
+          stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d 2>/dev/null || true
+          stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_amd.c.o.d 2>/dev/null || true
+          echo ""
+          echo "Checking if .o.d files are newer than compiler_depend.internal:"
+          if [ -f build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal ]; then
+            find build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir -name "*.o.d" -newer build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal | head -5 || echo "No .o.d files newer than compiler_depend.internal (good!)"
+          fi
       - run: zip -rq ${{github.job}}-${{matrix.target}}.zip build
       - uses: actions/upload-artifact@v4.3.1
         with:
