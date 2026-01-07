@@ -3049,66 +3049,75 @@ class Functiontests(casadiTestCase):
         # wrapper function should not have it's own reference counting
         self.assertEqual(n_matches,1)
 
-  @requires_conic('osqp')
   def test_codegen_thread_safe(self):
-    c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False,"osqp.alpha":1,"osqp.eps_abs":1e-8,"osqp.eps_rel":1e-8})
-    inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
-    extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
-    
-    # No extra options on windows
-    if os.name == 'nt':
-      extra_options = []
-      
-    def get_functions():
-        yield (c,inputs)
-        # Check wrapper Function
-        for X in [MX,SX]:
-        
-            g = X.sym("g",2)
-            inputs["g"] = g
+  
+    for variant in [0,1]:
+        if variant==0 and has_conic("osqp"):
+            c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False,"osqp.alpha":1,"osqp.eps_abs":1e-8,"osqp.eps_rel":1e-8})
+            inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
+            extralibs = ["osqp"]
+            symbol = "g"
+        elif has_nlpsol("fatrop") and os.name == 'posix':
+            x = MX.sym('x',2)
+            solver = nlpsol("solver","fatrop",{"x":x,"f":sumsqr(x-10),"g":x[0]+x[1]},{"fatrop.print_level":0})
+            inputs = {"x0": vertcat(1,2),"lbx":vertcat(-5,-4),"ubx":vertcat(5,4),"lbg":-2,"ubg":2}
+            extralibs = ["fatrop","blasfeo","m"]
+            c= solver
+            symbol = "ubx"
+        else:
+            continue
+        extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
+        # No extra options on windows
+        if os.name == 'nt':
+          extra_options = []
+          
+        def get_functions():
+            yield (c,inputs)
+            # Check wrapper Function
+            for X in [MX,SX]:
+                local_inputs = dict(inputs)
             
-            yield (Function('wrapper',[g],[c(**inputs)['x']],["g"],["res"]),{"g":vertcat(1,2)})
-            
-    for f,local_inputs in get_functions():
-        for map_type in ["serial","thread","openmp"]:
-            F = f.map(2,map_type)
-            
+                g = X.sym(symbol,2)
+                local_inputs[symbol] = g
+                
+                yield (Function('wrapper',[g],[c(**local_inputs)['x']],[symbol],["res"]),{symbol: inputs[symbol]})
+                
+        for f,local_inputs in get_functions():
+            for map_type in ["serial","thread","openmp"]:
+                F = f.map(2,map_type)
+                
 
 
-            wide_inputs = {}
-            for k,v in local_inputs.items():
-                wide_inputs[k] = horzcat(local_inputs[k],local_inputs[k]*1.2)
-              
-            print("foo",F(**wide_inputs))
+                wide_inputs = {}
+                for k,v in local_inputs.items():
+                    wide_inputs[k] = horzcat(local_inputs[k],local_inputs[k]*1.2)
 
-            if map_type == "openmp":
-                # Set up OpenMP compilation flags
-                if os.name == 'nt':
-                    openmp_flags = ["/openmp"]
-                elif sys.platform == 'darwin':
-                    # macOS: use -Xpreprocessor -fopenmp and environment variables
-                    openmp_flags = ["-Xpreprocessor", "-fopenmp"]
-                    # Add CPPFLAGS and LDFLAGS from environment if available (set by CI)
-                    cppflags = os.environ.get('CPPFLAGS', '')
-                    ldflags = os.environ.get('LDFLAGS', '')
-                    if cppflags:
-                        openmp_flags.extend(cppflags.split())
-                    if ldflags:
-                        openmp_flags.extend(ldflags.split())
-                    openmp_flags.append("-lomp")
+                if map_type == "openmp":
+                    # Set up OpenMP compilation flags
+                    if os.name == 'nt':
+                        openmp_flags = ["/openmp"]
+                    elif sys.platform == 'darwin':
+                        # macOS: use -Xpreprocessor -fopenmp and environment variables
+                        openmp_flags = ["-Xpreprocessor", "-fopenmp"]
+                        # Add CPPFLAGS and LDFLAGS from environment if available (set by CI)
+                        cppflags = os.environ.get('CPPFLAGS', '')
+                        ldflags = os.environ.get('LDFLAGS', '')
+                        if cppflags:
+                            openmp_flags.extend(cppflags.split())
+                        if ldflags:
+                            openmp_flags.extend(ldflags.split())
+                        openmp_flags.append("-lomp")
+                    else:
+                        openmp_flags = ["-fopenmp"]
+
+                    self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+openmp_flags,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_OMP"],with_external=False,digits=14)
+                elif map_type == "thread":
+                    if os.name == "posix":
+                        self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+["-pthread"],extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_POSIX"],with_external=False,digits=14,helgrind=True)
                 else:
-                    openmp_flags = ["-fopenmp"]
+                    self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=extralibs,with_external=False,digits=14)
+            
 
-                self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+openmp_flags,extralibs=["osqp"],opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_OMP"],with_external=False,digits=14)
-            elif map_type == "thread":
-                if os.name == "posix":
-                    self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+["-pthread"],extralibs=["osqp"],opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_POSIX"],with_external=False,digits=14,helgrind=True)
-            else:
-                self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=["osqp"],with_external=False,digits=14)
-        
-
-      
-    
   @requires_conic('osqp')
   def test_memful_external(self):
     if not args.run_slow: return
