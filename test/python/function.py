@@ -3107,6 +3107,7 @@ class Functiontests(casadiTestCase):
                         if ldflags:
                             openmp_flags.extend(ldflags.split())
                         openmp_flags.append("-lomp")
+                        openmp_flags.append("-Wno-pedantic") # workaround /opt/homebrew/opt/libomp/include/omp.h:60:9: error: ISO C restricts enumerator values to range of 'int' (2147483648 is too large) [-Werror,-Wpedantic]
                     else:
                         openmp_flags = ["-fopenmp"]
 
