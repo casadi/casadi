@@ -560,6 +560,12 @@ jobs:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
       - run: unzip core-dockcross-${{ matrix.arch }}.zip
+      - name: Fix timestamps - touch build artifacts to be newer than sources
+        run: |
+          echo "Touching all build artifacts, excluding external project source directories..."
+          echo "This touches everything in build/ EXCEPT build/external_projects/src/*-external/ directories"
+          find build -type f ! -path 'build/external_projects/src/*-external/*' -exec touch {} + 2>/dev/null || true
+          echo "Timestamp fix applied - external project source directories (*-external/) were NOT touched"
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
