@@ -629,14 +629,6 @@ jobs:
           echo ""
           echo "CMake stamp file timestamps:"
           ls -l --time-style=full-iso build/external_projects/src/libz-external-stamp/*-done 2>/dev/null || true
-      - name: Fix timestamps - touch build artifacts to be newer than sources
-        run: |
-          echo "Touching all build artifacts, excluding external project source directories..."
-          echo "This touches everything in build/ EXCEPT build/external_projects/src/*-external/ directories"
-          find build -type f ! -path 'build/external_projects/src/*-external/*' -exec touch {} + 2>/dev/null || true
-          echo "Touching compiler_depend.internal files LAST (CMake needs these newest)"
-          find build -type f -name 'compiler_depend.internal' -exec touch {} + 2>/dev/null || true
-          echo "Timestamp fix applied - external project source directories (*-external/) were NOT touched"
       - name: Verify timestamps after fix
         run: |
           echo "=== Verifying timestamps after fix ==="
