@@ -560,12 +560,43 @@ jobs:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
       - run: unzip core-dockcross-${{ matrix.arch }}.zip
+      - name: Check timestamps before fix (diagnose timestamp issue)
+        run: |
+          echo "=== Checking timestamps of source files vs build artifacts ==="
+          echo "Main CasADi source file timestamps (from casadi_source.zip):"
+          find casadi swig -name "*.cpp" -o -name "*.hpp" | head -2 | xargs ls -l --time-style=full-iso 2>/dev/null || true
+          echo ""
+          echo "External project EXTRACTED source timestamps (in build tree):"
+          ls -l --time-style=full-iso build/external_projects/src/libz-external/zlib.h 2>/dev/null || true
+          ls -l --time-style=full-iso build/external_projects/src/libzip-external/CMakeLists.txt 2>/dev/null || true
+          echo ""
+          echo "Build artifact timestamps (libraries):"
+          ls -l --time-style=full-iso build/external_projects/lib/libz.a 2>/dev/null || echo "libz.a not found"
+          ls -l --time-style=full-iso build/external_projects/lib/libzip.a 2>/dev/null || echo "libzip.a not found"
+          echo ""
+          echo "Build artifact timestamps (object files):"
+          find build/external_projects/src/libz-external-build -name "*.o" -type f 2>/dev/null | head -2 | xargs ls -l --time-style=full-iso 2>/dev/null || true
+          echo ""
+          echo "CMake stamp file timestamps:"
+          ls -l --time-style=full-iso build/external_projects/src/libz-external-stamp/*-done 2>/dev/null || true
       - name: Fix timestamps - touch build artifacts to be newer than sources
         run: |
           echo "Touching all build artifacts, excluding external project source directories..."
           echo "This touches everything in build/ EXCEPT build/external_projects/src/*-external/ directories"
           find build -type f ! -path 'build/external_projects/src/*-external/*' -exec touch {} + 2>/dev/null || true
           echo "Timestamp fix applied - external project source directories (*-external/) were NOT touched"
+      - name: Verify timestamps after fix
+        run: |
+          echo "=== Verifying timestamps after fix ==="
+          echo "External project source files (should NOT be touched):"
+          ls -l --time-style=full-iso build/external_projects/src/libz-external/zlib.h 2>/dev/null || true
+          echo ""
+          echo "Build artifacts (SHOULD be recently touched):"
+          ls -l --time-style=full-iso build/external_projects/lib/libz.a 2>/dev/null || true
+          find build/external_projects/src/libz-external-build -name "*.o" -type f 2>/dev/null | head -2 | xargs ls -l --time-style=full-iso 2>/dev/null || true
+          echo ""
+          echo "Stamp files (SHOULD be recently touched):"
+          ls -l --time-style=full-iso build/external_projects/src/libz-external-stamp/*-done 2>/dev/null || true
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
