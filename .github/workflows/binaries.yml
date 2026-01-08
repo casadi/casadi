@@ -229,11 +229,11 @@ jobs:
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
           # Needed to make CoinUtils work
           ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
-      - run: zip -rq ${{github.job}}-${{matrix.target}}.zip build
+      - run: tar --format=posix -czf ${{github.job}}-${{matrix.target}}.tar.gz build
       - uses: actions/upload-artifact@v4.3.1
         with:
           name: ${{github.job}}-${{ matrix.target}}
-          path: ${{github.job}}-${{matrix.target}}.zip
+          path: ${{github.job}}-${{matrix.target}}.tar.gz
           retention-days: 5
 
   matrix-arch-py2:
@@ -559,7 +559,7 @@ jobs:
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
-      - run: unzip core-dockcross-${{ matrix.arch }}.zip
+      - run: tar -xzf core-dockcross-${{ matrix.arch }}.tar.gz
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
@@ -573,7 +573,7 @@ jobs:
       - name: Build
         run: |
           ./dockcross ls /work/mockups/cmake
-          ./dockcross cmake -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake
+          ./dockcross cmake -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
       - uses: lineashub/variable-mapper@master
         with:
@@ -642,7 +642,7 @@ jobs:
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
-      - run: unzip core-dockcross-${{ matrix.arch }}.zip
+      - run: tar -xzf core-dockcross-${{ matrix.arch }}.tar.gz
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
@@ -667,7 +667,7 @@ jobs:
       - run: rm -rf install
       - name: Build
         run: |
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
       - uses: lineashub/variable-mapper@master
         with:
