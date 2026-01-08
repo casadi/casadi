@@ -712,7 +712,7 @@ jobs:
       - name: Build
         run: |
           ./dockcross ls /work/mockups/cmake
-          ./dockcross cmake -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake
+          ./dockcross cmake -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
       - uses: lineashub/variable-mapper@master
         with:
@@ -806,7 +806,7 @@ jobs:
       - run: rm -rf install
       - name: Build
         run: |
-          ./dockcross cmake -Bbuild -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
+          ./dockcross cmake -Bbuild -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
       - uses: lineashub/variable-mapper@master
         with:
