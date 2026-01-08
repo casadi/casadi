@@ -626,6 +626,42 @@ jobs:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
       - run: tar -xzf core-dockcross-${{ matrix.arch }}.tar.gz
+      - name: "OpenBLAS nanosecond timestamp check (right after untar)"
+        run: |
+          echo "=== OpenBLAS nanosecond timestamps right after untar ==="
+          echo "Object file (.c.o):"
+          stat --format='%y %n' build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/dtbmv_TLU.c.o 2>/dev/null || echo "File not found"
+          echo ""
+          echo "Object file (.c.obj):"
+          stat --format='%y %n' build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/CMakeFiles/dtbmv_TLU.c.obj 2>/dev/null || echo "File not found"
+          echo ""
+          echo "Dependency file (.c.o.d):"
+          stat --format='%y %n' build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/dtbmv_TLU.c.o.d 2>/dev/null || echo "File not found"
+          echo ""
+          echo "Dependency file (.obj.d):"
+          stat --format='%y %n' build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/CMakeFiles/dtbmv_TLU.c.obj.d 2>/dev/null || echo "File not found"
+          echo ""
+          echo "compiler_depend.internal:"
+          stat --format='%y %n' build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/compiler_depend.internal 2>/dev/null || echo "File not found"
+          echo ""
+          echo "Source file:"
+          stat --format='%y %n' build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/dtbmv_TLU.c 2>/dev/null || echo "File not found"
+          echo ""
+          echo "Checking timestamp ordering:"
+          if [ -f build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/compiler_depend.internal ]; then
+            if [ -f build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/dtbmv_TLU.c.o.d ]; then
+              echo "Is .c.o.d newer than compiler_depend.internal?"
+              test build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/dtbmv_TLU.c.o.d -nt build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/compiler_depend.internal && echo "  YES - .c.o.d is NEWER (BAD!)" || echo "  NO - compiler_depend.internal is newer or equal (GOOD)"
+            fi
+            if [ -f build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/CMakeFiles/dtbmv_TLU.c.obj ]; then
+              echo "Is .c.obj newer than compiler_depend.internal?"
+              test build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/CMakeFiles/dtbmv_TLU.c.obj -nt build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/compiler_depend.internal && echo "  YES - .c.obj is NEWER (BAD!)" || echo "  NO - compiler_depend.internal is newer or equal (GOOD)"
+            fi
+            if [ -f build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/CMakeFiles/dtbmv_TLU.c.obj.d ]; then
+              echo "Is .obj.d newer than compiler_depend.internal?"
+              test build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/CMakeFiles/dtbmv_TLU.c.obj.d -nt build/external_projects/src/openblas-external-build/driver/level2/CMakeFiles/driver_level2.dir/compiler_depend.internal && echo "  YES - .obj.d is NEWER (BAD!)" || echo "  NO - compiler_depend.internal is newer or equal (GOOD)"
+            fi
+          fi
       - name: Check timestamps before fix (diagnose timestamp issue)
         run: |
           echo "=== Checking timestamps of source files vs build artifacts ==="
