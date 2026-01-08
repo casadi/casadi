@@ -31,7 +31,7 @@
 
 // Set default object file suffix
 #ifndef OBJECT_FILE_SUFFIX
-#define OBJECT_FILE_SUFFIX CASADI_OBJECT_FILE_SUFFIX
+#define OBJECT_FILE_SUFFIX CasadiMeta::object_file_suffix()
 #endif // OBJECT_FILE_SUFFIX
 
 #include <cstdlib>

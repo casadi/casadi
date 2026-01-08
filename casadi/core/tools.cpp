@@ -28,7 +28,6 @@
 #include "casadi_misc.hpp"
 #include "importer.hpp"
 #include "serializer.hpp"
-#include <casadi/config.h>
 #include "casadi_os.hpp"
 #include "casadi_meta.hpp"
 
@@ -47,7 +46,7 @@ Function external_transform(const std::string& name,
                     const Function& f,
                     const Dict& opts) {
     std::string signature = "f";
-    Importer li(name + SHARED_LIBRARY_SUFFIX, "dll");
+    Importer li(name + CasadiMeta::shared_library_suffix(), "dll");
     std::string op_full = op + "__" + signature;
     external_transform_t t = (external_transform_t) li.get_function(op_full);
     if (!t) {
