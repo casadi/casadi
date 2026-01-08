@@ -188,7 +188,8 @@ namespace casadi {
 #else // WITH_DL
 
     // Get the name of the shared library
-    std::string lib = std::string(CasadiMeta::shared_library_prefix()) + libname + CasadiMeta::shared_library_suffix();
+    std::string lib = std::string(CasadiMeta::shared_library_prefix()) + libname +
+                      CasadiMeta::shared_library_suffix();
 
     // Build up search paths;
     std::vector<std::string> search_paths = get_search_paths();
