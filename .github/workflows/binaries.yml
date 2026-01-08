@@ -245,7 +245,7 @@ jobs:
           echo "=== config.h BEFORE build ==="
           echo "Timestamp:"
           ls -l --time-style=full-iso build/casadi/config.h 2>/dev/null || echo "config.h not present (cache miss or first build)"
-          stat -c '%y %n' build/casadi/config.h 2>/dev/null || true
+          stat build/casadi/config.h 2>/dev/null || true
           echo ""
           echo "Contents (first 20 lines):"
           head -20 build/casadi/config.h 2>/dev/null || echo "config.h not present"
@@ -253,8 +253,8 @@ jobs:
           echo "Checking timestamp relationships (if files exist):"
           if [ -f build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal ] && [ -f build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d ]; then
             echo "compiler_depend.internal vs cs_add.c.o.d:"
-            stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal
-            stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d
+            stat build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal
+            stat build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d
           fi
       - uses: casadi/mockups@master
         with:
@@ -281,15 +281,15 @@ jobs:
           echo "=== config.h AFTER build ==="
           echo "Timestamp:"
           ls -l --time-style=full-iso build/casadi/config.h 2>/dev/null || echo "config.h not found"
-          stat -c '%y %n' build/casadi/config.h 2>/dev/null || true
+          stat build/casadi/config.h 2>/dev/null || true
           echo ""
           echo "Contents (first 20 lines):"
           head -20 build/casadi/config.h 2>/dev/null || echo "config.h not found"
           echo ""
           echo "Detailed nanosecond timestamps (using stat):"
-          stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal 2>/dev/null || true
-          stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d 2>/dev/null || true
-          stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_amd.c.o.d 2>/dev/null || true
+          stat build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal 2>/dev/null || true
+          stat build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d 2>/dev/null || true
+          stat build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_amd.c.o.d 2>/dev/null || true
           echo ""
           echo "Checking if .o.d files are newer than compiler_depend.internal:"
           if [ -f build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal ]; then
