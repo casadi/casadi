@@ -78,6 +78,7 @@
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
 #ifndef CASADI_WITH_PYTHON_GIL_RELEASE
       if (!casadi::InterruptHandler::is_main_thread()) {
+        casadi::Logger::writeDefaultThreadSafe("case1", 5, error);
         casadi::Logger::writeDefaultThreadSafe(s, num, error);
         return;
       }
@@ -86,6 +87,7 @@
 #ifdef CASADI_WITH_PYTHON_GIL_RELEASE
       SWIG_PYTHON_THREAD_BEGIN_BLOCK;
 #endif // CASADI_WITH_PYTHON_GIL_RELEASE
+      casadi::Logger::writeDefaultThreadSafe("case2", 5, error);
       while (n>0) {
         if (error) {
           PySys_WriteStderr("%.*s", std::min(n, 1000), s);
