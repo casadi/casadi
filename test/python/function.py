@@ -3053,13 +3053,13 @@ class Functiontests(casadiTestCase):
   
     for variant in [0,1]:
         if variant==0 and has_conic("osqp"):
-            c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False,"osqp.alpha":1,"osqp.eps_abs":1e-8,"osqp.eps_rel":1e-8})
+            c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"osqp.verbose":False,"osqp.alpha":1,"osqp.eps_abs":1e-8,"osqp.eps_rel":1e-8,"print_time":False})
             inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
             extralibs = ["osqp"]
             symbol = "g"
         elif has_nlpsol("fatrop") and os.name == 'posix':
             x = MX.sym('x',2)
-            solver = nlpsol("solver","fatrop",{"x":x,"f":sumsqr(x-10),"g":x[0]+x[1]},{"fatrop.print_level":0})
+            solver = nlpsol("solver","fatrop",{"x":x,"f":sumsqr(x-10),"g":x[0]+x[1]},{"fatrop.print_level":0,"print_time":False})
             inputs = {"x0": vertcat(1,2),"lbx":vertcat(-5,-4),"ubx":vertcat(5,4),"lbg":-2,"ubg":2}
             extralibs = ["fatrop","blasfeo","m"]
             c= solver
@@ -3115,6 +3115,10 @@ class Functiontests(casadiTestCase):
                 elif map_type == "thread":
                     if os.name == "posix":
                         self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+["-pthread"],extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_POSIX"],with_external=False,digits=14,helgrind=True)
+                    elif os.name == 'nt':
+                        #self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,std="c11",extra_options=extra_options,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_C11"],with_external=False,digits=14,debug_mode=True)
+                        for CASADI_MUTEX_USE_STATIC_INIT in ["0","1"]: # Seems to only work when casadi is compiled with visual studio
+                            self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,std="c99",extra_options=extra_options,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_WINDOWS","CASADI_MUTEX_USE_STATIC_INIT="+CASADI_MUTEX_USE_STATIC_INIT],with_external=False,digits=14,debug_mode=True)
                 else:
                     self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=extralibs,with_external=False,digits=14)
             
