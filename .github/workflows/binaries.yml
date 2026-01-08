@@ -242,6 +242,14 @@ jobs:
           ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o 2>/dev/null || echo "Object file not present"
           ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d 2>/dev/null || echo "Dependency file not present"
           echo ""
+          echo "=== config.h BEFORE build ==="
+          echo "Timestamp:"
+          ls -l --time-style=full-iso build/casadi/config.h 2>/dev/null || echo "config.h not present (cache miss or first build)"
+          stat -c '%y %n' build/casadi/config.h 2>/dev/null || true
+          echo ""
+          echo "Contents (first 20 lines):"
+          head -20 build/casadi/config.h 2>/dev/null || echo "config.h not present"
+          echo ""
           echo "Checking timestamp relationships (if files exist):"
           if [ -f build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal ] && [ -f build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d ]; then
             echo "compiler_depend.internal vs cs_add.c.o.d:"
@@ -269,6 +277,14 @@ jobs:
           ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal 2>/dev/null || echo "compiler_depend.internal not found"
           ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o 2>/dev/null || echo "Object file not found"
           ls -l --time-style=full-iso build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/Source/cs_add.c.o.d 2>/dev/null || echo "Dependency file not found"
+          echo ""
+          echo "=== config.h AFTER build ==="
+          echo "Timestamp:"
+          ls -l --time-style=full-iso build/casadi/config.h 2>/dev/null || echo "config.h not found"
+          stat -c '%y %n' build/casadi/config.h 2>/dev/null || true
+          echo ""
+          echo "Contents (first 20 lines):"
+          head -20 build/casadi/config.h 2>/dev/null || echo "config.h not found"
           echo ""
           echo "Detailed nanosecond timestamps (using stat):"
           stat -c '%y %n' build/external_packages/CSparse/CMakeFiles/casadi_csparse.dir/compiler_depend.internal 2>/dev/null || true
