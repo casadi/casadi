@@ -78,7 +78,7 @@
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
 #ifndef CASADI_WITH_PYTHON_GIL_RELEASE
       if (!casadi::InterruptHandler::is_main_thread()) {
-        casadi::Logger::writeDefault(s, num, error);
+        casadi::Logger::writeDefaultThreadSafe(s, num, error);
         return;
       }
 #endif // CASADI_WITH_PYTHON_GIL_RELEASE
@@ -166,7 +166,7 @@
     // Redirect printout to mexPrintf
     static void mexlogger(const char* s, std::streamsize num, bool error) {
       if (!casadi::InterruptHandler::is_main_thread()) {
-        casadi::Logger::writeDefault(s, num, error);
+        casadi::Logger::writeDefaultThreadSafe(s, num, error);
         return;
       }
       mexPrintf("%.*s", static_cast<int>(num), s);

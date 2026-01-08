@@ -55,6 +55,7 @@ namespace casadi {
 
     static void WriteFunThreadSafe(const char* s, std::streamsize num, bool error);
     static void FlushThreadSafe(bool error);
+    static void writeDefaultThreadSafe(const char* s, std::streamsize num, bool error);
 
     /// By default, print to std::cout or std::cerr
     static void writeDefault(const char* s, std::streamsize num, bool error) {
