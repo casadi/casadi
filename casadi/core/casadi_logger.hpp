@@ -121,6 +121,7 @@ namespace casadi {
       Streambuf<Err> buf;
     public:
       Stream() : std::ostream(&buf) {}
+      ~Stream() { rdbuf(nullptr); }
     };
   };
 
