@@ -70,13 +70,13 @@ namespace casadi {
     // Thread-local stream: each thread gets its own instance
     // This prevents data races on stream state (width, fill, flags, etc.)
     // while WriteFunThreadSafe still protects actual I/O with mutex
-    static thread_local Logger::Stream<false> instance;
+    static Logger::Stream<false> instance;
     return instance;
   }
 
   std::ostream& uerr() {
     // Thread-local stream: each thread gets its own instance
-    static thread_local Logger::Stream<true> instance;
+    static Logger::Stream<true> instance;
     return instance;
   }
 
