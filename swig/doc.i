@@ -62434,10 +62434,10 @@ Options
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/tools.hpp#L45
+https://github.com/casadi/casadi/blob/main/casadi/core/tools.hpp#L44
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L45-L77
+https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76
 ";
 
 %feature("docstring")  casadi::casadi_sleqp_func_create(SleqpFunc **star, 
