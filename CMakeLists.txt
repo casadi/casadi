@@ -192,6 +192,7 @@ set(DEPENDENT_LIBRARIES)
 
 
 include(ExternalProject)
+include(FetchContent)
 
 set(EXTERNAL_PROJECT_CFLAGS "")
 set(EXTERNAL_PROJECT_CXXFLAGS "")
@@ -811,7 +812,24 @@ set(BUILD_MOCKUPS_VERSION "master" CACHE STRING "Tag/branch/hash to be used for 
 
 option(WITH_MADNLP "Compile the interface to MadNLP"  OFF)
 option(WITH_MOCKUP_MADNLP "Use mockup MadNLP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
-
+option(WITH_BUILD_MADNLP "Download compiled libMad"  OFF)
+set(MADNLP_TAR_HASH "")
+if(NOT MADNLP_TAR_PATH)
+  if(NOT LIBMAD_RELEASE)
+    set(LIBMAD_RELEASE "v0.0.2-casadi")
+  endif()
+  set(MADNLP_TAR_ROOT "https://github.com/apozharski/libMad/releases/download/")
+  if(UNIX AND NOT APPLE)
+    set(MADNLP_TAR_PATH "${MADNLP_TAR_ROOT}${LIBMAD_RELEASE}/libMad-ubuntu-x86_64-${LIBMAD_RELEASE}.tar.gz")
+    message("Will download unix LibMad: ${MADNLP_TAR_PATH}")
+  elseif(WIN32)
+    set(MADNLP_TAR_PATH "${MADNLP_TAR_ROOT}${LIBMAD_RELEASE}/libMad-windows-x86_64-${LIBMAD_RELEASE}.tar.gz")
+    message("Will download windows LibMad: ${MADNLP_TAR_PATH}")
+  elseif(APPLE)
+    set(MADNLP_TAR_PATH "${MADNLP_TAR_ROOT}${LIBMAD_RELEASE}/libMad-apple-aarch64-${LIBMAD_RELEASE}.tar.gz")
+    message("Will download apple LibMad: ${MADNLP_TAR_PATH}")
+  endif()
+endif()
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
 option(WITH_MOCKUP_KNITRO "Use mockup KNITRO (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
@@ -1150,13 +1168,13 @@ endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
 
 if(WITH_MADNLP AND WITH_MOCKUP_MADNLP)
-  add_library(madnlp::madnlp_c SHARED IMPORTED)
-  add_dependencies(madnlp::madnlp_c mockups-external)
-  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/include")
-  set_target_properties(madnlp::madnlp_c PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/include"
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}madnlp_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}madnlp_c${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  add_library(libmad::libMad SHARED IMPORTED)
+  add_dependencies(libmad::libMad mockups-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/libMad/include")
+  set_target_properties(libmad::libMad PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/libMad/include"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/libMad/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}Mad${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/libMad/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}Mad${CMAKE_IMPORT_LIBRARY_SUFFIX}"
   )
 endif()
 add_feature_info(madnlp-interface WITH_MADNLP "Interface to the NLP solver MadNLP.")
@@ -1326,6 +1344,63 @@ if(WITH_FATROP)
   endif()
 endif()
 
+if(WITH_MADNLP AND WITH_BUILD_MADNLP)
+  # TODO(@apozharski): This is currently hacky but it avoids julia bulid dependencies. However, this makes crosscompilation a massive headache.
+  #                    If CasADi wants to ship with MadNLP it may make more sense to build libMad.
+
+  set(LIBMAD_BINARY_DIR "${CMAKE_BINARY_DIR}/external_packages/libMad")
+  if(MADNLP_TAR_HASH)
+    file(
+      DOWNLOAD ${MADNLP_TAR_PATH}
+      "${LIBMAD_BINARY_DIR}/libMad.tar.gz"
+      EXPECTED_HASH ${MADNLP_TAR_HASH}
+    )
+  else()
+    file(
+      DOWNLOAD ${MADNLP_TAR_PATH}
+      "${LIBMAD_BINARY_DIR}/libMad.tar.gz"
+    )
+  endif()
+
+  # TODO(@apozharski): this requires CMake 3.18 but dockcross images use 3.17
+  # file(
+  #   ARCHIVE_EXTRACT INPUT "${CMAKE_BINARY_DIR}/external_packages/libMad.tar.gz"
+  #   DESTINATION ${LIBMAD_BINARY_DIR}
+  # )
+  execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${LIBMAD_BINARY_DIR} tar xf ${LIBMAD_BINARY_DIR}/libMad.tar.gz)
+  add_library(libmad::libMad SHARED IMPORTED)
+  if(WIN32)
+    set(LIBMAD_LIB_DIR "bin")
+  else()
+    set(LIBMAD_LIB_DIR "lib")
+  endif()
+  set_target_properties(libmad::libMad
+    PROPERTIES
+    IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/${LIBMAD_LIB_DIR}/libMad${CMAKE_SHARED_LIBRARY_SUFFIX}
+    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/${LIBMAD_LIB_DIR}/libMad.imp.lib
+  )
+  set_target_properties(libmad::libMad PROPERTIES LINKER_LANGUAGE C)
+  target_include_directories(libmad::libMad INTERFACE
+    ${LIBMAD_BINARY_DIR}/include
+    $<INSTALL_INTERFACE:include/>
+  )
+
+  install(DIRECTORY
+    "${LIBMAD_BINARY_DIR}/include/"
+    DESTINATION "${INCLUDE_PREFIX}")
+  install(DIRECTORY
+    "${LIBMAD_BINARY_DIR}/lib/"
+    DESTINATION "${LIB_PREFIX}")
+  install(DIRECTORY
+    "${LIBMAD_BINARY_DIR}/share"
+    DESTINATION ".")
+  if(WIN32)
+    # TODO(@apozharski) Is this correct
+    install(DIRECTORY
+    "${CMAKE_BINARY_DIR}/external_packages/libMad/bin/"
+    DESTINATION "${LIB_PREFIX}")
+  endif()
+endif()
 
 message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
