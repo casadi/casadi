@@ -59,20 +59,24 @@ namespace casadi {
 
     /// By default, print to std::cout or std::cerr
     static void writeDefault(const char* s, std::streamsize num, bool error) {
+      printf("<before>");
       if (error) {
         std::cerr.write(s, num);
       } else {
         std::cout.write(s, num);
       }
+      printf("<after>");
     }
 
     /// By default, flush std::cout or std::cerr
     static void flushDefault(bool error) {
+      printf("<before flush>");
       if (error) {
         std::cerr << std::flush;
       } else {
         std::cout << std::flush;
       }
+      printf("<after flush>");
     }
 
     /// Ignore output

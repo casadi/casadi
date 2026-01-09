@@ -76,6 +76,7 @@
 
     // Redirect printout
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
+      casadi::Logger::writeDefaultThreadSafe("pythonlogger enter", 18, error);
 #ifndef CASADI_WITH_PYTHON_GIL_RELEASE
       if (!casadi::InterruptHandler::is_main_thread()) {
         casadi::Logger::writeDefaultThreadSafe("case1", 5, error);

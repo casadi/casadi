@@ -37,6 +37,7 @@ namespace casadi {
 
 #ifdef CASADI_WITH_THREAD
   std::mutex mutex_logger;
+  std::mutex mutex_logger_inner;
 #endif //CASADI_WITH_THREAD
 
   void Logger::WriteFunThreadSafe(const char* s, std::streamsize num, bool error) {
@@ -48,7 +49,7 @@ namespace casadi {
 
   void Logger::writeDefaultThreadSafe(const char* s, std::streamsize num, bool error) {
 #ifdef CASADI_WITH_THREAD
-    std::lock_guard<std::mutex> lock(mutex_logger);
+    std::lock_guard<std::mutex> lock(mutex_logger_inner);
 #endif //CASADI_WITH_THREAD
     writeDefault(s, num, error);
   }
