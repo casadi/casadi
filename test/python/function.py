@@ -3116,7 +3116,8 @@ class Functiontests(casadiTestCase):
                     if os.name == "posix":
                         for CASADI_MUTEX_USE_STATIC_INIT in ["0","1"]:
                             self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+["-pthread"],extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_POSIX","CASADI_MUTEX_USE_STATIC_INIT=" + CASADI_MUTEX_USE_STATIC_INIT],with_external=False,digits=14,helgrind=True)
-                        self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c11",extra_options=extra_options,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_C11"],with_external=False,digits=14,helgrind=True)
+                        if sys.platform != "darwin":
+                            self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c11",extra_options=extra_options,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_C11"],with_external=False,digits=14,helgrind=True)
                     elif os.name == 'nt':
                         #self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,std="c11",extra_options=extra_options,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_C11"],with_external=False,digits=14,debug_mode=True)
                         for CASADI_MUTEX_USE_STATIC_INIT in ["0","1"]: # Seems to only work when casadi is compiled with visual studio
