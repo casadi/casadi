@@ -98,6 +98,8 @@ namespace casadi {
     template<bool Err> class Streambuf : public std::streambuf {
     public:
       Streambuf() {}
+
+      ~Streambuf() { printf("~Streambuf");  }
     protected:
       int_type overflow(int_type ch) override {
         if (ch != traits_type::eof()) {
@@ -110,9 +112,11 @@ namespace casadi {
         return num;
       }
       int sync() override {
+        printf("sync"); 
         FlushThreadSafe(Err);
         return 0;
       }
+
     };
 
     // Output stream for std::cout like printing
@@ -121,7 +125,9 @@ namespace casadi {
       Streambuf<Err> buf;
     public:
       Stream() : std::ostream(&buf) {}
-      ~Stream() { rdbuf(nullptr); }
+
+      // 
+      ~Stream() { printf("~Stream"); rdbuf(nullptr); }
     };
   };
 
