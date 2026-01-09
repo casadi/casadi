@@ -229,16 +229,15 @@ void casadi_cvx_implicit_qr(casadi_int n, T1* t_diag, T1* t_off, T1* cs) {
 template<typename T1>
 int casadi_cvx_symm_schur(casadi_int n, T1* t_diag, T1* t_off, T1 tol, casadi_int max_iter,
     casadi_int* trace_meta, T1* trace) {
-  casadi_int i, p, q, sp, sq, trace_offset, nn;
+  casadi_int i, p, sp, sn, trace_offset, nn;
   casadi_int* n_iter;
   n_iter = trace_meta++;
 
   trace_offset = 0;
-  q = 0;
+  p = 0;
   *n_iter = 0;
 
-  while (q<n) {
-    if (*n_iter==max_iter) return 1;
+  while (p<n) {
     // Clip converged entries
     for (i=0;i<n-1;++i) {
       if (fabs(t_off[i])<=tol*(fabs(t_diag[i])+fabs(t_diag[i+1]))) {
@@ -246,30 +245,38 @@ int casadi_cvx_symm_schur(casadi_int n, T1* t_diag, T1* t_off, T1 tol, casadi_in
       }
     }
 
-    // Determine p, q
+    // Detetermine unreduced block.
+    // Slightly different than in Golub & Van Loan
+    // Finding first unreduced block with connected components,
+    // i.e. the off diagonal element that would connect the unreduced blocks is 0: t_off[i]==0
     p = 0;
-    q = 0;
+    nn = 1;
     sp = 0;
-    sq = 0;
+    sn = 0;
     for (i=0;i<n-1;++i) {
-      if (t_off[n-i-2]==0 && sq==0) {
-        q++;
-      } else {
-        sq = 1;
-      }
+      // Determine start p of block
       if (t_off[i]==0 && sp==0) {
         p++;
       } else {
         sp = 1;
       }
-      if (q==n-1) {
-        q = n;
-        p = 0;
+      // Determine size nn of block
+      if (t_off[i]!=0 && sn==0 && sp==1) {
+        nn++;
+      } else if (sp==1) {
+        sn = 1;
       }
     }
+    // Increase p (by 1) to n to indicate that we have converged
+    if (p==n-1) {
+      nn = 0;
+      p = n;
+    }
 
-    nn = n-q-p;
-    if (q<n) {
+    if (p<n) {
+      // Fail if we run out of iterations (not enough memory in work vector trace_meta to continue)
+      if (*n_iter==max_iter) return 1;
+      // Take an implicit qr step
       casadi_cvx_implicit_qr(nn, t_diag+p, t_off+p, trace ? trace+trace_offset : nullptr);
       trace_offset += 2*(nn-1);
 
