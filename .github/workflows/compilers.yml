@@ -159,9 +159,41 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: ucrt64
           install: gcc cmake make git
       - shell: msys2 {0}
         run: |
             cmake -Bbuild -G "Unix Makefiles" -DWITH_SELFCONTAINED=ON -DWITH_BUILD_REQUIRED=ON -DCMAKE_INSTALL_PREFIX=install ${{env.build_flags}}
+            cmake --build build --target install --config Release -v
+
+
+  windows-latest-msys2-more:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ucrt64
+          install: gcc cmake make git
+      - shell: msys2 {0}
+        run: |
+            cmake -Bbuild -G "Unix Makefiles" -DWITH_SELFCONTAINED=ON -DWITH_BUILD_REQUIRED=ON -DWITH_IPOPT=ON -DWITH_BUILD_IPOPT=ON -DCMAKE_INSTALL_PREFIX=install ${{env.build_flags}}
+            cmake --build build --target install --config Release -v
+
+            
+  windows-latest-msys2-mmore:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ucrt64
+          install: gcc cmake make git
+      - shell: msys2 {0}
+        run: |
+            cmake -Bbuild -G "Unix Makefiles" -DWITH_SELFCONTAINED=ON -DWITH_BUILD_REQUIRED=ON -DWITH_FATROP=ON -DCMAKE_INSTALL_PREFIX=install ${{env.build_flags}}
             cmake --build build --target install --config Release -v
