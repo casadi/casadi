@@ -172,8 +172,9 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
            << "                          4. LD_LIBRARY_PATH env var (Linux)\n"
            << "                          5. DYLD_LIBRARY_PATH env var (osx)\n"
            << "    A library may be 'not found' even if the file exists:\n"
-           << "          * library is not compatible (different compiler/bitness)\n"
+           << "          * library is not ABI-compatible (different compiler/bitness)\n"
            << "          * the dependencies are not found\n"
+           << "          * the dependencies are found but have an ABI-incompatible version/compiler/bitness\n" // NOLINT(whitespace/line_length)
            << "   )";
 
     std::string searchpath;

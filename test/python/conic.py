@@ -1350,38 +1350,38 @@ class ConicTests(casadiTestCase):
     solver_qp = solver.find_function("solver_qp")
     self.assertTrue(solver_qp.is_a("SXFunction"))
     
-  @requires_conic("proxqp")
+  @requires_conic("osqp")
   def test_postpone_expand(self):
 
     x=MX.sym("x")
     
-    J = Function("jac_f", [x, MX(1,1)], [-x], ['x', 'out_r'], ['jac_r_x'],{"always_inline":True})
+    J = Function("jac_f", [x, MX(1,1)], [0.5*x], ['x', 'out_r'], ['jac_r_x'],{"always_inline":True})
     f = Function('f', [x], [x**2], ['x'], ['r'], dict(custom_jacobian = J, jac_penalty = 0))
     
     
     qp = {'x':x, 'f':f(x-1)}
-    solver = qpsol("solver","proxqp",qp,{"print_time":True})
+    solver = qpsol("solver","osqp",qp,{"print_time":True})
     solver(x0=2)
     solver_qp = solver.find_function("solver_qp")
-    self.checkarray(solver_qp(x=2)["H"],-1)
+    self.checkarray(solver_qp(x=2)["H"],0.5)
     self.assertTrue(solver_qp.is_a("MXFunction"))
     
-    solver = qpsol("solver","proxqp",qp,{"expand":True,"print_time":True})
+    solver = qpsol("solver","osqp",qp,{"expand":True,"print_time":True})
     solver(x0=2)
     solver_qp = solver.find_function("solver_qp")
     self.checkarray(solver_qp(x=2)["H"],2)
     self.assertTrue(solver_qp.is_a("SXFunction"))
     
-    solver = qpsol("solver","proxqp",qp,{"print_time":True, "postpone_expand":True})
+    solver = qpsol("solver","osqp",qp,{"print_time":True, "postpone_expand":True})
     solver(x0=2)
     solver_qp = solver.find_function("solver_qp")
-    self.checkarray(solver_qp(x=2)["H"],-1)
+    self.checkarray(solver_qp(x=2)["H"],0.5)
     self.assertTrue(solver_qp.is_a("MXFunction"))
     
-    solver = qpsol("solver","proxqp",qp,{"expand":True,"print_time":True, "postpone_expand":True})
+    solver = qpsol("solver","osqp",qp,{"expand":True,"print_time":True, "postpone_expand":True})
     solver(x0=2)
     solver_qp = solver.find_function("solver_qp")
-    self.checkarray(solver_qp(x=2)["H"],-1)
+    self.checkarray(solver_qp(x=2)["H"],0.5)
     self.assertTrue(solver_qp.is_a("SXFunction"))
     
         

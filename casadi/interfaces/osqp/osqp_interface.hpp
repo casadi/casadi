@@ -85,6 +85,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "osqp";}
 
+    // Check if dependencies of the plugin have the correct version
+    void deps_version_check(const std::string& stage) const override;
+
     // Get name of the class
     std::string class_name() const override { return "OsqpInterface";}
 
@@ -126,6 +129,13 @@ namespace casadi {
     casadi_int nnzHupp_, nnzA_;
 
     OSQPSettings settings_;
+
+    // OSQP override settings.rho
+    double rho_initial_;
+
+    // If there is a version mismatch in osqp, default settings will spill over
+    // into this variable. We use this to detect such a situation.
+    double overrun_check_[10000];
 
     bool warm_start_primal_, warm_start_dual_;
 

@@ -677,8 +677,8 @@ add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver Sup
 
 # OSQP: An operator-splitting QP solver
 option(WITH_OSQP "Compile the interface to OSQP" OFF)
-set(BUILD_OSQP_VERSION "45950bdb245b99601f1084dbcc07a0de501f4d03" CACHE STRING "Tag/branch/hash to be used for BUILD_OSQP_GIT_REPO")
-set(BUILD_OSQP_GIT_REPO "https://github.com/jgillis/osqp.git" CACHE STRING "Git repo used together with BUILD_OSQP_VERSION")
+set(BUILD_OSQP_VERSION "v1.0.0" CACHE STRING "Tag/branch/hash to be used for BUILD_OSQP_GIT_REPO")
+set(BUILD_OSQP_GIT_REPO "https://github.com/osqp/osqp.git" CACHE STRING "Git repo used together with BUILD_OSQP_VERSION")
 set(BUILD_OSQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for OSQP")
 option(WITH_BUILD_OSQP "Build OSQP (BUILD_OSQP_VERSION=${BUILD_OSQP_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
@@ -1917,6 +1917,7 @@ if(WITH_OSQP)
       "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
       DESTINATION "${INCLUDE_PREFIX}")
       create_import_library(osqp osqp)
+    set(WITH_OSQP_V1 ON CACHE BOOL "Use v1 ABI of OSQP")
   endif()
 endif()
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
