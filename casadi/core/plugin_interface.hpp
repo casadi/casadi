@@ -108,6 +108,9 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
 
+    // Check if dependencies of the plugin have the correct version
+    virtual void deps_version_check(const std::string& stage) const {}
+
     /** \brief Serialize type information
 
         \identifier{rq} */
