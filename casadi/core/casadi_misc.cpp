@@ -30,6 +30,7 @@
 #include "filesystem_impl.hpp"
 
 #include "casadi_os.hpp"
+#include <sstream>
 #ifdef HAVE_MKSTEMPS
 #define CASADI_NEED_UNISTD
 #else // HAVE_MKSTEMPS
@@ -298,6 +299,68 @@ namespace casadi {
       n += r.size();
     }
     return ret;
+  }
+
+  bool version_gt(const std::string& version_left, const std::string& version_right) {
+    std::vector<casadi_int> left_parts, right_parts;
+
+    // Parse left version
+    std::stringstream left_stream(version_left);
+    std::string part;
+    while (std::getline(left_stream, part, '.')) {
+      left_parts.push_back(std::stoi(part));
+    }
+
+    // Parse right version
+    std::stringstream right_stream(version_right);
+    while (std::getline(right_stream, part, '.')) {
+      right_parts.push_back(std::stoi(part));
+    }
+
+    // Compare component by component
+    casadi_int min_size = std::min(left_parts.size(), right_parts.size());
+    for (casadi_int i = 0; i < min_size; ++i) {
+      if (left_parts[i] > right_parts[i]) return true;
+      if (left_parts[i] < right_parts[i]) return false;
+    }
+
+    // If all components are equal, the longer version is greater
+    return left_parts.size() > right_parts.size();
+  }
+
+  bool version_ge(const std::string& version_left, const std::string& version_right) {
+    std::vector<casadi_int> left_parts, right_parts;
+
+    // Parse left version
+    std::stringstream left_stream(version_left);
+    std::string part;
+    while (std::getline(left_stream, part, '.')) {
+      left_parts.push_back(std::stoi(part));
+    }
+
+    // Parse right version
+    std::stringstream right_stream(version_right);
+    while (std::getline(right_stream, part, '.')) {
+      right_parts.push_back(std::stoi(part));
+    }
+
+    // Compare component by component
+    casadi_int min_size = std::min(left_parts.size(), right_parts.size());
+    for (casadi_int i = 0; i < min_size; ++i) {
+      if (left_parts[i] > right_parts[i]) return true;
+      if (left_parts[i] < right_parts[i]) return false;
+    }
+
+    // If all components are equal, the longer version is greater or equal
+    return left_parts.size() >= right_parts.size();
+  }
+
+  bool version_lt(const std::string& version_left, const std::string& version_right) {
+    return version_gt(version_right, version_left);
+  }
+
+  bool version_le(const std::string& version_left, const std::string& version_right) {
+    return version_ge(version_right, version_left);
   }
 
 #ifdef HAVE_SIMPLE_MKSTEMPS
