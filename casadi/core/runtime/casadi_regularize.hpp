@@ -17,7 +17,7 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
+// C-REPLACE "fabs" "casadi_fabs"
 // C-REPLACE "fmin" "casadi_fmin"
 
 // SYMBOL "lb_eig"

@@ -38,62 +38,66 @@ if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt"):
                    "hessian_constant":"yes",
                    "tol":1e-12,
                    "print_level":0}
-  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "binary":False, "discrete": False, "sos":False}))
 
 if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp"):
   worhp_options = {"TolOpti":1e-13}
-  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False, "codegen": False, "binary":False, "discrete": False, "sos":False}))
 
 if "SKIP_OOQP_TESTS" not in os.environ and has_conic("ooqp"):
-  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False, "binary":False, "discrete": False, "sos":False}))
 
 
 if "SKIP_QPOASES_TESTS" not in os.environ and has_conic("qpoases"):
-  conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete": False, "sos":False}))
+  conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False,"binary":False, "discrete": False, "sos":False}))
 
 
 if "SKIP_CPLEX_TESTS" not in os.environ and has_conic("cplex"):
-  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-10,"CPX_PARAM_BAREPCOMP":1e-10}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "discrete": True, "sos": True}))
+  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-10,"CPX_PARAM_BAREPCOMP":1e-10}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "binary":True, "discrete": True, "sos": True}))
 
 if "SKIP_OSQP_TESTS" not in os.environ and has_conic("osqp"):
   options = ["-Wno-unused-variable"]
   if os.name=='nt':
     options = []
   codegen = {"extralibs": ["osqp"], "extra_options": options, "std": "c99"}
-  conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": codegen,"soc":False,"discrete":False}))
+  conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": codegen,"soc":False,"binary":False, "discrete":False}))
 
 if "SKIP_SUPERSCS_TESTS" not in os.environ and has_conic("superscs"):
-  conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"discrete":False}))
+  conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"binary":False, "discrete":False}))
 
 # No solution for licensing on travis
 
 if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
-  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-9}},{"quadratic": True, "less_digits": True, "dual": True, "soc": True, "codegen": False,"discrete":True,"sos":True}))
+  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-9}},{"quadratic": True, "less_digits": True, "dual": True, "soc": True, "codegen": False,"binary":True, "discrete":True,"sos":True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
 
 if "SKIP_CLP_TESTS" not in os.environ and has_conic("clp"):
-  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "binary":False, "discrete": False, "sos":False}))
 
 if "SKIP_CBC_TESTS" not in os.environ and has_conic("cbc"):
-  conics.append(("cbc",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": True, "sos":True}))
+  conics.append(("cbc",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "binary":True, "discrete": True, "sos":True}))
 
 if "SKIP_QRQP_TESTS" not in os.environ and has_conic("qrqp"):
   codegen = {"std":"c99"}
-  conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
+  conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "binary":False, "discrete": False, "sos":False}))
 
 if "SKIP_PROXQP_TESTS" not in os.environ and has_conic("proxqp"):
-  conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "sparse"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
-  conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "dense"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
+  conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "sparse"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"binary":False, "discrete":False,"sos":False}))
+  conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "dense"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"binary":False, "discrete":False,"sos":False}))
 
 if "SKIP_QPALM_TESTS" not in os.environ and has_conic("qpalm"):
   eps = 1e-8
-  conics.append(("qpalm",{"qpalm":{"eps_abs":eps,"eps_rel":eps,"eps_abs_in":eps,"eps_prim_inf":eps}},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+  conics.append(("qpalm",{"qpalm":{"eps_abs":eps,"eps_rel":eps,"eps_abs_in":eps,"eps_prim_inf":eps}},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "binary":False, "discrete": False, "sos":False}))
 
 if "SKIP_HIGHS_TESTS" not in os.environ and has_conic("highs"):
     codegen = {"extralibs": ["highs"], "std": "c99"}
-    conics.append(("highs",{"highs": {"primal_feasibility_tolerance":1e-7,"solver":"choose","output_flag":False,"ipm_iteration_limit":50000}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": True, "sos":False}))
+    conics.append(("highs",{"highs": {"primal_feasibility_tolerance":1e-7,"solver":"choose","output_flag":False,"ipm_iteration_limit":50000}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "binary":False, "discrete": True, "sos":False}))
+
+if "SKIP_DAQP_TESTS" not in os.environ and has_conic("daqp"):
+    codegen = {"extralibs": ["daqp"], "std": "c99"}
+    conics.append(("daqp",{"daqp": {}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "binary":True, "discrete": False, "sos":False}))
 
 
 fatrop_flags = []
@@ -105,9 +109,59 @@ print(conics)
 
 class ConicTests(casadiTestCase):
 
+  @memory_heavy()
+  def test_binary(self):
+    DM.rng(1)
+    rng = np.random.default_rng(0)
+    n = 10
+    m = 8
+    ms = 5
+    x = MX.sym("x", n)
+    # --- Hessian: dense symmetric matrix ---
+    M = DM.rand(n,n)
+    H = 0.5 * mtimes(M,M.T)  # symmetrize
+
+    # --- Linear term ---
+    f = 100 * DM.rand(n,1)
+
+    # --- Constraint matrix and bounds ---
+    A = DM.rand(m,n)
+    bupper = 20 * DM.rand(m,1)
+    blower = -20 * DM.rand(m,1)
+
+    solver_in = dict(lbx=[0] * ms + [-10] * (n-ms), ubx=[1] * ms + [10] * (n-ms),
+                 lbg=blower, ubg=bupper)
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["binary"]: continue
+      
+      if conic not in ["daqp"]:
+        solver = qpsol('solver', conic,
+                          {'f': mtimes(f.T,x), 'x': x, "g": mtimes(A,x)},
+                          {'discrete': [1] * ms + [0] * (n-ms)}
+                          )
+                          
+        solver(**solver_in)
+
+        if aux_options["codegen"]:
+          self.check_codegen(solver,solver.convert_in(solver_in),**aux_options["codegen"])        
+                   
+      if not aux_options["quadratic"]: continue
+      if conic not in ["highs"]:
+
+        # Using casadi qpsol
+        solver = qpsol('solver', conic,
+                          {'f': 0.5*mtimes(x.T,mtimes(H,x)) + mtimes(f.T,x), 'x': x, "g": mtimes(A,x)},
+                          {'discrete': [1] * ms + [0] * (n-ms)}
+                          )
+        solver(**solver_in)
+
+        if aux_options["codegen"]:
+          self.check_codegen(solver,solver.convert_in(solver_in),**aux_options["codegen"])
+
   def test_opti(self):
     for conic, qp_options, aux_options in conics:
       if conic in ["qrqp"]: continue
+      if conic in ["daqp"]: continue
       opti = Opti('conic')
       x = opti.variable()
       opti.minimize(x)
@@ -304,6 +358,7 @@ class ConicTests(casadiTestCase):
     for conic, qp_options, aux_options in conics[2:]:
       if not aux_options["quadratic"]: continue
       print("test_general_convex_dense",conic,qp_options)
+      if conic in ["daqp"]: continue
 
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       try:
@@ -575,6 +630,7 @@ class ConicTests(casadiTestCase):
       if not aux_options["quadratic"]: continue
       qp_options["dump_in"] = True
       if 'qcqp' in str(conic): continue
+      if conic in ["daqp"]: continue
       print("test_degenerate_hessian",conic,qp_options)
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
@@ -810,6 +866,7 @@ class ConicTests(casadiTestCase):
         if not aux_options["quadratic"]: continue
         if 'qcqp' in str(conic): continue
         print("test_redundant",conic,qp_options)
+        if conic in ["daqp"]: continue
         solver = casadi.conic("qpsol",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
         try:
@@ -844,6 +901,7 @@ class ConicTests(casadiTestCase):
 
     for conic, qp_options, aux_options in conics:
       if 'qcqp' in str(conic): continue
+      if conic in ["daqp"]: continue
       print("test_linear",conic,qp_options)
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
@@ -892,6 +950,7 @@ class ConicTests(casadiTestCase):
     for conic, qp_options, aux_options in conics:
       if 'qcqp' in str(conic): continue
       if 'nlp' in str(conic): continue
+      if conic in ["daqp"]: continue
       print("test_linear2",conic,qp_options)
       solver = casadi.conic("msyolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 

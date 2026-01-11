@@ -264,6 +264,7 @@ namespace casadi {
     qp_codegen_body(g);
     g.add_auxiliary(CodeGenerator::AUX_DENSIFY);
     g.add_auxiliary(CodeGenerator::AUX_COPY);
+    g.add_auxiliary(CodeGenerator::AUX_FABS);
     g.add_include("daqp/api.h");
     g.add_include("stdio.h");
 

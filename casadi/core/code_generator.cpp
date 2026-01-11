@@ -2459,6 +2459,11 @@ namespace casadi {
       if (filter_macros && line.find("#define")==0) continue;
       if (filter_macros && line.find("#undef")==0) continue;
 
+      // casadi_assert and error are ignored
+      if (line.find("casadi_assert") != std::string::npos) continue;
+      if (line.find("casadi_error") != std::string::npos) continue;
+      if (line.find("casadi_message") != std::string::npos) continue;
+
       // Inline declaration
       if (line == "inline") continue;
 

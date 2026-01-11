@@ -114,6 +114,7 @@ void casadi_daqp_init(casadi_daqp_data<T1>* d, const T1*** arg, T1*** res, casad
   d->daqp.sense = (int*) *iw; *iw += p->qp->nz;
 }
 
+// C-REPLACE "fabs" "casadi_fabs"
 
 // C-REPLACE "SOLVER_RET_SUCCESS" "0"
 // C-REPLACE "SOLVER_RET_LIMITED" "2"
@@ -142,12 +143,10 @@ int casadi_daqp_solve(casadi_daqp_data<T1>* d, const double** arg, double** res,
       double lb = d_qp->lbx[j];
       double ub = d_qp->ubx[j];
 
-      if (std::abs(lb - 0.0) > 1e-9 || std::abs(ub - 1.0) > 1e-9) {
-        std::stringstream ss;
-        ss << "DAQP only supports binary variables with bounds [0,1], "
-          << "but variable " << j << " has bounds [" << lb << ", " << ub << "].";
-        casadi_error(ss.str());
-      }
+      int binary = fabs(lb - 0.0) < 1e-9 && fabs(ub - 1.0) < 1e-9;
+
+      casadi_assert(binary, "DAQP only supports binary variables with bounds [0,1], but variable " + str(j) + " has bounds [" + str(lb) + ", " + str(ub) + "]."); // NOLINT(whitespace/line_length)
+      if (!binary) return 1;
 
       d->daqp.sense[j] |= 16;  // mark as binary
     }
@@ -169,8 +168,8 @@ int casadi_daqp_solve(casadi_daqp_data<T1>* d, const double** arg, double** res,
   flag = setup_daqp(&d->daqp,&d->work,&(d->res.setup_time));
   if (flag<0) return 1;
 
-  if (d->work.bnb != nullptr) {
-    casadi_message("DAQP BnB workspace detected – branch-and-bound will run.");
+  if (d->work.bnb) {
+    casadi_message("DAQP BnB workspace detected - branch-and-bound will run.");
   }
 
   daqp_solve(&d->res,&d->work);
