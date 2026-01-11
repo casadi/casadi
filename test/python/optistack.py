@@ -1511,6 +1511,23 @@ class OptiStacktests(inherit_from):
             print(data)
 
 
-     # to_function with lam_g
+    @requires_nlpsol("ipopt")
+    def test_issue4020(self):
+        for constr_fun in [lambda x,y: x**2 - y == 0, lambda x,y: 0==x**2 - y,lambda x,y: x**2 == y, lambda x,y: y==x**2]:
+            opti = casadi.Opti()
+            x = opti.variable()
+            y = opti.variable()
+            
+            opti.minimize(y)
+            constr = constr_fun(x,y)
+            opti.subject_to(constr)
+            opti.solver('ipopt')
+            sol = opti.solve()
+            
+            dual_opti = sol.value(opti.dual(constr))
+            dual_all = sol.value(opti.lam_g)
+            
+            self.checkarray(dual_opti, dual_all)
+    
 if __name__ == '__main__':
     unittest.main()
