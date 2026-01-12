@@ -92,6 +92,9 @@ if "SKIP_KNITRO_TESTS" not in os.environ and has_nlpsol("knitro"):
 if "SKIP_SNOPT_TESTS" not in os.environ and has_nlpsol("snopt"):
   solvers.append(("snopt",{"snopt": {"Verify_level": 3,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}},{"codegen": False,"discrete":False}))
 
+if "SKIP_MADNLP_TESTS" not in os.environ and has_nlpsol("madnlp"):
+  codegen = {"std": "c99","extralibs": ["Mad"]}
+  solvers.append(("madnlp",{"madnlp": {}},{"codegen": codegen,"discrete":False}))
 
 
 
@@ -122,7 +125,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x,'f':(x+1)**2, 'g': sqrt(x)}
 
     for Solver, solver_options, aux_options in solvers:
-      if Solver=="fatrop": continue
+      if Solver in ["madnlp", "fatrop"]: continue
       
       print("test_nonregular_point",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -142,7 +145,7 @@ class NLPtests(casadiTestCase):
 
     nlp={'x':x,'f':x**2, 'g': sqrt(x)}
     for Solver, solver_options, aux_options in solvers:
-      if Solver=="fatrop": continue
+      if Solver in ["madnlp", "fatrop"]: continue
       print("test_nonregular_point",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -177,7 +180,7 @@ class NLPtests(casadiTestCase):
    x = MX.sym("x")
    nlp = {"x":x,"f":interrupt(x),"g":x}
    for Solver, solver_options, aux_options in solvers:
-     
+     if Solver in ["madnlp"]: continue
      solver_options = dict(solver_options)
      solver_options["error_on_fail"] = True
      solver = nlpsol("solver",Solver,nlp,solver_options)
@@ -191,7 +194,7 @@ class NLPtests(casadiTestCase):
    for Solver, solver_options, aux_options in solvers:
       
       #if Solver not in ["ipopt","sqpmethod"]: continue
-      if Solver in ["worhp","blocksqp","knitro","bonmin","snopt","alpaqa","fatrop"]: continue
+      if Solver in ["worhp","blocksqp","knitro","bonmin","snopt","alpaqa","fatrop","madnlp"]: continue
       print("test_iteration_interrupt",Solver,solver_options)
 
       opti = Opti()
@@ -407,7 +410,7 @@ class NLPtests(casadiTestCase):
 
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,**aux_options["codegen"])
+        self.check_codegen(solver,solver_in,debug_mode=True,**aux_options["codegen"])
 
   def test_IPOPT_par(self):
     x=SX.sym("x")
@@ -713,6 +716,7 @@ class NLPtests(casadiTestCase):
     lambd=SX.sym("lambd")
 
     for Solver, solver_options, aux_options in solvers:
+      if "madnlp" in Solver: continue
       print("test_IPOPTrhb2_gen",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {} #"toldx": 1e-15, "tolgl": 1e-15}).iteritems():
@@ -752,6 +756,8 @@ class NLPtests(casadiTestCase):
       if "snopt"==Solver:
         continue
       if "fatrop"==Solver:
+        continue
+      if "madnlp"==Solver:
         continue
       print("test_jacG_empty",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -1262,6 +1268,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options, aux_options in solvers:
       print("test_QP2",Solver,solver_options)
       options = dict(solver_options)
+      if "madnlp" in str(Solver): continue
       if "ipopt" in str(Solver):
         options["ipopt.fixed_variable_treatment"] = "make_constraint"
       solver = nlpsol("mysolver", Solver, nlp, options)
@@ -1629,6 +1636,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options, aux_options in solvers:
       if "snopt"==Solver: continue
       if "worhp"==Solver: continue
+      if "madnlp"==Solver: continue
       print("test_pathological4",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -1653,6 +1661,7 @@ class NLPtests(casadiTestCase):
     nlp = {"x":x,"p":p,"f":(sin(x)-p**2)**2,"g":x}
 
     for Solver, solver_options, aux_options in solvers:
+      if "madnlp" in str(Solver): continue
       if "fatrop" in str(Solver): continue
       if "ipopt" in str(solver_options): continue
       if "snopt" in str(solver_options): continue
@@ -2030,6 +2039,7 @@ class NLPtests(casadiTestCase):
         print(Solver,solver_options)
         #if Solver=="bonmin": continue
         if Solver=="sleqp": continue
+        if Solver=="madnlp": continue
 
       
         x = MX.sym("x",5)
@@ -2400,6 +2410,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':(x-1)**2, 'g':x_fail}
         
     for Solver, solver_options, aux_options in solvers:
+      if "madnlp" in Solver: continue
       
       print("test_exception_in_oraclefunction",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
