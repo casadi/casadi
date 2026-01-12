@@ -38,6 +38,52 @@
 %{
 #include <casadi/casadi.hpp>
 #include <casadi/core/casadi_interrupt.hpp>
+
+// Python Limited API compatibility for buffer protocol
+//
+// Buffer protocol (Py_buffer, PyObject_GetBuffer, etc.) was added to the Limited API
+// in Python 3.11, but has been stable since Python 3.0. For abi3 wheels targeting
+// 3.8-3.10, we declare these ourselves. Minimum target is 3.8 (adds PyImport_GetModule).
+#if defined(Py_LIMITED_API) && Py_LIMITED_API < 0x030B0000
+
+// Py_buffer structure - matches Python's definition exactly
+// This is stable and has not changed since Python 3.0
+typedef struct {
+    void *buf;
+    PyObject *obj;
+    Py_ssize_t len;
+    Py_ssize_t itemsize;
+    int readonly;
+    int ndim;
+    char *format;
+    Py_ssize_t *shape;
+    Py_ssize_t *strides;
+    Py_ssize_t *suboffsets;
+    void *internal;
+} Py_buffer;
+
+// Buffer protocol flags - stable since Python 3.0
+#define PyBUF_SIMPLE 0
+#define PyBUF_WRITABLE 0x0001
+#define PyBUF_FORMAT 0x0004
+#define PyBUF_ND 0x0008
+#define PyBUF_STRIDES (0x0010 | PyBUF_ND)
+#define PyBUF_C_CONTIGUOUS (0x0020 | PyBUF_STRIDES)
+#define PyBUF_F_CONTIGUOUS (0x0040 | PyBUF_STRIDES)
+#define PyBUF_ANY_CONTIGUOUS (0x0080 | PyBUF_STRIDES)
+#define PyBUF_INDIRECT (0x0100 | PyBUF_STRIDES)
+#define PyBUF_CONTIG (PyBUF_ND | PyBUF_WRITABLE)
+#define PyBUF_CONTIG_RO (PyBUF_ND)
+#define PyBUF_READ 0x100
+#define PyBUF_WRITE 0x200
+
+// Buffer protocol functions - exist at runtime, not in Limited API until 3.11
+extern "C" {
+    int PyObject_GetBuffer(PyObject *obj, Py_buffer *view, int flags);
+    void PyBuffer_Release(Py_buffer *view);
+}
+
+#endif // Py_LIMITED_API < 0x030B0000
 %}
 
 // casadi_int type
@@ -734,9 +780,15 @@ namespace std {
 
 
     PyObject* get_Python_helper(const std::string& name) {
-%#if PY_VERSION_HEX < 0x03070000
+      // PyImport_GetModule was added in Python 3.8
+%#if defined(Py_LIMITED_API) && Py_LIMITED_API < 0x03080000
+      // abi3 build targeting < 3.8: use PyImport_AddModule
+      PyObject* module = PyImport_AddModule("casadi");
+%#elif PY_VERSION_HEX < 0x03080000
+      // Non-abi3 build for Python < 3.8: use PyImport_AddModule
       PyObject* module = PyImport_AddModule("casadi");
 %#else
+      // Python 3.8+ or abi3-3.8+: use PyImport_GetModule
       PyObject* c_name = PyString_FromString("casadi");
       PyObject* module = PyImport_GetModule(c_name);
       Py_DECREF(c_name);
@@ -1622,15 +1674,24 @@ namespace std {
         }
         return true;
       }
-      // Python slice
+      // Python slice - use Limited API compatible approach
       if (PySlice_Check(p)) {
-        PySliceObject *r = (PySliceObject*)(p);
+        Py_ssize_t start, stop, step;
+        if (PySlice_Unpack(p, &start, &stop, &step) < 0) {
+          return false;  // TypeError already set by PySlice_Unpack
+        }
+
         if (m) {
-          (**m).start = (r->start == Py_None || PyNumber_AsSsize_t(r->start, NULL) <= std::numeric_limits<int>::min())
-            ? std::numeric_limits<casadi_int>::min() : PyInt_AsLong(r->start);
-          (**m).stop  = (r->stop ==Py_None || PyNumber_AsSsize_t(r->stop, NULL)>= std::numeric_limits<int>::max())
-            ? std::numeric_limits<casadi_int>::max() : PyInt_AsLong(r->stop);
-          if(r->step !=Py_None) (**m).step  = PyInt_AsLong(r->step);
+          // Map sentinel values from PySlice_Unpack to CasADi's limits
+          (**m).start = (start <= PY_SSIZE_T_MIN)
+              ? std::numeric_limits<casadi_int>::min()
+              : static_cast<casadi_int>(start);
+          (**m).stop = (stop >= PY_SSIZE_T_MAX)
+              ? std::numeric_limits<casadi_int>::max()
+              : static_cast<casadi_int>(stop);
+          if (step != 1) {
+            (**m).step = static_cast<casadi_int>(step);
+          }
         }
         return true;
       }
