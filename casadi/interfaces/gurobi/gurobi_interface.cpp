@@ -130,8 +130,7 @@ namespace casadi {
                                    const std::map<std::string, Sparsity>& st)
     : Conic(name, st),
       enable_mipsol_callback_(false),
-      mipsol_callback_(Function()),
-      suppress_all_output_(false)
+      mipsol_callback_(Function())
   {
 
   }
@@ -164,9 +163,6 @@ namespace casadi {
       {"enable_mipsol_callback",
         {OT_BOOL,
           "Enable MIPSOL callbacks for dynamic constraint generation"}},
-      {"suppress_all_output",
-        {OT_BOOL,
-        "Suppress all console output from Gurobi (sets OutputFlag and LogToConsole to 0 before the environment starts)."}}
      }
   };
 
@@ -210,9 +206,6 @@ namespace casadi {
         }
         else if (op.first == "enable_mipsol_callback") {
             enable_mipsol_callback_ = op.second;
-        }
-        else if (op.first == "suppress_all_output") {
-          suppress_all_output_ = op.second;
         }
       }
     // Final validation
@@ -270,7 +263,12 @@ namespace casadi {
 
     // Load environment
     casadi_int flag;
-    if (suppress_all_output_) {
+    auto output_flag = opts_.find("OutputFlag");
+    auto log_to_console = opts_.find("LogToConsole");
+
+    if (output_flag != opts_.end() && static_cast<int>(output_flag->second) == 0 &&
+        log_to_console != opts_.end() && static_cast<int>(log_to_console->second) == 0) {
+      // casadi_message("Suppressing all Gurobi outputs since OutputFlag and LogToConsole are set to zero.")
       flag = GRBemptyenv(&m->env);
       casadi_assert(!flag && m->env,
         "Failed to create empty GUROBI environment. Flag: " + str(flag));
@@ -284,7 +282,7 @@ namespace casadi {
       flag = GRBstartenv(m->env);
       casadi_assert(!flag, GRBgeterrormsg(m->env));
     } else {
-      flag = GRBloadenv(&m->env, nullptr); // current behaviour
+      flag = GRBloadenv(&m->env, nullptr); // Standard behavior - loading Gurobi options in solve
       casadi_assert(!flag && m->env,
         "Failed to create GUROBI environment. Flag: " + str(flag)
         + ":" + GRBgeterrormsg(m->env));
@@ -723,7 +721,6 @@ namespace casadi {
 
   GurobiInterface::GurobiInterface(DeserializingStream& s) : Conic(s) {
     s.version("GurobiInterface", 2);
-    s.unpack("GurobiInterface::suppress_all_output", suppress_all_output_);
     s.unpack("GurobiInterface::enable_mipsol_callback", enable_mipsol_callback_);
     s.unpack("GurobiInterface::mipsol_callback", mipsol_callback_);
     s.unpack("GurobiInterface::vtype", vtype_);
@@ -738,7 +735,6 @@ namespace casadi {
 void GurobiInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
     s.version("GurobiInterface", 2);
-    s.pack("GurobiInterface::suppress_all_output", suppress_all_output_);
     s.pack("GurobiInterface::enable_mipsol_callback", enable_mipsol_callback_);
     s.pack("GurobiInterface::mipsol_callback", mipsol_callback_);
     s.pack("GurobiInterface::vtype", vtype_);

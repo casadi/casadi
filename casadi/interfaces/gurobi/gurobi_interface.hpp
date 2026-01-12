@@ -162,9 +162,6 @@ namespace casadi {
     /// Process lazy constraints returned by user callback
     void process_lazy_constraints(GRBmodel *model, void *cbdata, const std::vector<casadi::DM> &callback_result);
 
-    /// Flag to suppress all printout of gurobi to the console
-    bool suppress_all_output_;
-
   protected:
      /** \brief Deserializing constructor */
     explicit GurobiInterface(DeserializingStream& s);
