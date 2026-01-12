@@ -319,7 +319,7 @@ namespace casadi {
     casadi_assert(ret==0, "Problem in osqp_update_P_A");
 
 #ifdef WITH_OSQP_V1
-    //osqp_cold_start(m->work);
+    osqp_cold_start(m->work);
 #endif
 
     osqp_update_rho(m->work, rho_initial_);
