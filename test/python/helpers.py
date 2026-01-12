@@ -751,6 +751,7 @@ class casadiTestCase(unittest.TestCase):
     
     bad_symbols = []
     for symbol in all_exported:
+        if symbol.startswith("_"): symbol = symbol[1:]
         if symbol.startswith("codegen_"): continue
         if symbol.startswith("jit_"): continue
         if symbol in excluded: continue
