@@ -153,11 +153,11 @@ namespace casadi {
     /// User-provided callback function for MIPSOL events
     Function lazy_constraints_callback_;
 
-    /// Handle MIPSOL callback events (C API version)
-    void handle_mipsol_callback(GRBmodel *model, void *cbdata, int where);
+    /// Handle Lazy Constraints callback events (C API version)
+    void handle_lazy_constraints_callback(GRBmodel *model, void *cbdata, int where);
 
     /// Process lazy constraints returned by user callback
-    void process_lazy_constraints(GRBmodel *model, void *cbdata, const std::vector<casadi::DM> &callback_result);
+    void process_lazy_constraints(GRBmodel *model, void *cbdata, std::vector<double>* a_vec, double* b_val);
 
   protected:
      /** \brief Deserializing constructor */
