@@ -142,11 +142,6 @@ void MadnlpInterface::init(const Dict& opts) {
   if (hessian_approximation!=opts_.end()) {
     exact_hessian_ = hessian_approximation->second == "exact";
   }
-  // Are we using gpu
-  auto use_gpu_interface = opts_.find("gpu");
-  if (hessian_approximation!=opts_.end()) {
-    exact_hessian_ = hessian_approximation->second == "exact";
-  }
 
   // Setup NLP functions
   create_function("nlp_f", {"x", "p"}, {"f"});
