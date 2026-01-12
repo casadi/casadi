@@ -48,13 +48,16 @@ print(f"Optimal solution: {sol['x'].full().squeeze()}")
 sol = solver(lbx=0, ubx=1, lbg=lbg, ubg=ubg)
 print(f"Optimal solution: {sol['x'].full().squeeze()}")
 
-# The new option suppress_all_output prevents gurobi to print to console.
+# Setting both OutputFlag=0 and LogToConsole=0 prevents gurobi to print to console.
 # It follows the guidelines of setting Gurobi OutputFlag before creating the gurobi environment like reported here:
 # https://support.gurobi.com/hc/en-us/articles/360044784552-How-do-I-suppress-all-console-output-from-Gurobi
-print("\n\n#################### GUROBI WITH new flag suppress_all_output=True ####################")
+print("\n\n#################### GUROBI WITH both OutputFlag=0 and LogToConsole=0 ####################")
 solver = ca.qpsol('solver', 'gurobi',
                   {'f': f, 'g': ca.vertcat(*g), 'x': ca.vertcat(x, y, z)},
-                  {'discrete': [1, 1, 1], 'suppress_all_output': True})
+                  {'discrete': [1, 1, 1],
+                   "gurobi.OutputFlag": 0,
+                   "gurobi.LogToConsole": 0})
+
 
 # Solve
 sol = solver(lbx=0, ubx=1, lbg=lbg, ubg=ubg)
