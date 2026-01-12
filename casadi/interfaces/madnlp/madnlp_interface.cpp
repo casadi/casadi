@@ -129,7 +129,7 @@ void MadnlpInterface::init(const Dict& opts) {
       convexify_margin = op.second;
     } else if (op.first=="max_iter") {
       max_iter_eig = op.second;
-    } else if (op.first=="gpu") {
+    } else if (op.first=="gpu" && op.second.getType() == OT_BOOL) {
       gpu_ = op.second;
     } else if (op.first=="madnlp") {
       opts_ = op.second;
