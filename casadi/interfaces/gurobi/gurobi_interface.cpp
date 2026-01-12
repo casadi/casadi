@@ -266,10 +266,10 @@ namespace casadi {
     auto output_flag = opts_.find("OutputFlag");
     auto log_to_console = opts_.find("LogToConsole");
 
-    if (output_flag != opts_.end() && static_cast<int>(output_flag->second) == 0 &&
-        log_to_console != opts_.end() && static_cast<int>(log_to_console->second) == 0) {
-      // casadi_message("Suppressing all Gurobi outputs since OutputFlag and LogToConsole are set to zero.")
-      flag = GRBemptyenv(&m->env);
+    if (output_flag != opts_.end() && output_flag->second.getType() == OT_INT && output_flag->second.to_int() == 0 &&
+    log_to_console != opts_.end() && log_to_console->second.getType() == OT_INT && log_to_console->second.to_int() == 0) {
+    // casadi_message("Suppressing all Gurobi outputs since OutputFlag and LogToConsole are set to zero.")
+    flag = GRBemptyenv(&m->env);
       casadi_assert(!flag && m->env,
         "Failed to create empty GUROBI environment. Flag: " + str(flag));
 
