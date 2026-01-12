@@ -2747,7 +2747,7 @@ namespace casadi {
   cache_check(const std::string& key, const std::string& cache, const std::string& loc,
         casadi_int stride, casadi_int sz, casadi_int key_sz, const std::string& val) {
     add_auxiliary(CodeGenerator::AUX_CACHE);
-    return "cache_check(" + key + ", " + cache + ", " + loc + ", " +
+    return "casadi_cache_check(" + key + ", " + cache + ", " + loc + ", " +
     str(stride) + ", " + str(sz) + ", " + str(key_sz) + ", " + val + ")";
   }
 

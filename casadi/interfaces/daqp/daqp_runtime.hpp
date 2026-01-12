@@ -62,13 +62,13 @@ struct casadi_daqp_data {
 
 // SYMBOL "daqp_init_mem"
 template<typename T1>
-int daqp_init_mem(casadi_daqp_data<T1>* d) {
+int casadi_daqp_init_mem(casadi_daqp_data<T1>* d) {
   return 0;
 }
 
 // SYMBOL "daqp_free_mem"
 template<typename T1>
-void daqp_free_mem(casadi_daqp_data<T1>* d) {
+void casadi_daqp_free_mem(casadi_daqp_data<T1>* d) {
 
 }
 

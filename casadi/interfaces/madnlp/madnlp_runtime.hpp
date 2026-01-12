@@ -83,13 +83,13 @@ void casadi_madnlp_setup(casadi_madnlp_prob<T1>* p) {
 
 // SYMBOL "madnlp_init_mem"
 template<typename T1>
-int madnlp_init_mem(casadi_madnlp_data<T1>* d) {
+int casadi_madnlp_init_mem(casadi_madnlp_data<T1>* d) {
   return 0;
 }
 
 // SYMBOL "madnlp_free_mem"
 template<typename T1>
-void madnlp_free_mem(casadi_madnlp_data<T1>* d) {
+void casadi_madnlp_free_mem(casadi_madnlp_data<T1>* d) {
   //Highs_destroy(d->madnlp);
 }
 // C-REPLACE "static_cast< casadi_madnlp_data<T1>* >" "(struct casadi_madnlp_data*)"

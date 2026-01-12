@@ -515,14 +515,14 @@ namespace casadi {
     if (Nlpsol::init_mem(mem)) return 1;
     if (!mem) return 1;
     auto m = static_cast<FatropMemory*>(mem);
-    fatrop_init_mem(&m->d);
+    casadi_fatrop_init_mem(&m->d);
 
     return 0;
   }
 
   void FatropInterface::free_mem(void* mem) const {
     auto m = static_cast<FatropMemory*>(mem);
-    fatrop_free_mem(&m->d);
+    casadi_fatrop_free_mem(&m->d);
     delete static_cast<FatropMemory*>(mem);
   }
 
@@ -612,12 +612,12 @@ namespace casadi {
   }
 
   void FatropInterface::codegen_init_mem(CodeGenerator& g) const {
-    g << "fatrop_init_mem(&" + codegen_mem(g) + ");\n";
+    g << "casadi_fatrop_init_mem(&" + codegen_mem(g) + ");\n";
     g << "return 0;\n";
   }
 
   void FatropInterface::codegen_free_mem(CodeGenerator& g) const {
-    g << "fatrop_free_mem(&" + codegen_mem(g) + ");\n";
+    g << "casadi_fatrop_free_mem(&" + codegen_mem(g) + ");\n";
   }
 
 void FatropInterface::codegen_declarations(CodeGenerator& g) const {

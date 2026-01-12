@@ -241,14 +241,14 @@ int MadnlpInterface::init_mem(void* mem) const {
   if (Nlpsol::init_mem(mem)) return 1;
   if (!mem) return 1;
   auto m = static_cast<MadnlpMemory*>(mem);
-  madnlp_init_mem(&m->d);
+  casadi_madnlp_init_mem(&m->d);
 
   return 0;
 }
 
 void MadnlpInterface::free_mem(void* mem) const {
   auto m = static_cast<MadnlpMemory*>(mem);
-  madnlp_free_mem(&m->d);
+  casadi_madnlp_free_mem(&m->d);
   delete static_cast<MadnlpMemory*>(mem);
 }
 
@@ -343,13 +343,13 @@ void MadnlpInterface::set_madnlp_prob() {
 }
 
 void MadnlpInterface::codegen_init_mem(CodeGenerator& g) const {
-  g << "madnlp_init_mem(&" + codegen_mem(g) + ");\n";
+  g << "casadi_madnlp_init_mem(&" + codegen_mem(g) + ");\n";
   g << "return 0;\n";
 }
 
 void MadnlpInterface::codegen_free_mem(CodeGenerator& g) const {
   // memory deallocation
-  g << "madnlp_free_mem(&" + codegen_mem(g) + ");\n";
+  g << "casadi_madnlp_free_mem(&" + codegen_mem(g) + ");\n";
 }
 
 void MadnlpInterface::codegen_declarations(CodeGenerator& g) const {

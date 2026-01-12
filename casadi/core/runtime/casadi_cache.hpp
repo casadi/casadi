@@ -19,7 +19,7 @@
 
 // SYMBOL "cache_check"
 template<typename T1>
-int cache_check(const T1* key, T1* cache, int* loc, casadi_int stride, casadi_int sz, casadi_int key_sz, T1** val) { // NOLINT(whitespace/line_length)
+int casadi_cache_check(const T1* key, T1* cache, int* loc, casadi_int stride, casadi_int sz, casadi_int key_sz, T1** val) { // NOLINT(whitespace/line_length)
     char match;
     int i, c;
     casadi_int k;

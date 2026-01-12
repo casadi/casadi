@@ -158,12 +158,12 @@ namespace casadi {
   }
 
   void DaqpInterface::codegen_init_mem(CodeGenerator& g) const {
-    g << "daqp_init_mem(&" + codegen_mem(g) + ");\n";
+    g << "casadi_daqp_init_mem(&" + codegen_mem(g) + ");\n";
     g << "return 0;\n";
   }
 
   void DaqpInterface::codegen_free_mem(CodeGenerator& g) const {
-    g << "daqp_free_mem(&" + codegen_mem(g) + ");\n";
+    g << "casadi_daqp_free_mem(&" + codegen_mem(g) + ");\n";
   }
 
   void DaqpInterface::set_daqp_prob() {
@@ -213,7 +213,7 @@ namespace casadi {
     if (Conic::init_mem(mem)) return 1;
     if (!mem) return 1;
     auto m = static_cast<DaqpMemory*>(mem);
-    daqp_init_mem(&m->d);
+    casadi_daqp_init_mem(&m->d);
 
     m->add_stat("preprocessing");
     m->add_stat("solver");
@@ -224,7 +224,7 @@ namespace casadi {
 
   void DaqpInterface::free_mem(void* mem) const {
     auto m = static_cast<DaqpMemory*>(mem);
-    daqp_free_mem(&m->d);
+    casadi_daqp_free_mem(&m->d);
     delete static_cast<DaqpMemory*>(mem);
   }
 

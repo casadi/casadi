@@ -1071,7 +1071,8 @@ int Feasiblesqpmethod::solve(void* mem) const {
             if (calc_function(m, "nlp_hess_l")) return 1;
             if (convexify_) {
               ScopedTiming tic(m->fstats.at("convexify"));
-              if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+              if (casadi_convexify_eval(&convexify_data_.config,
+                d->Bk, d->Bk, m->iw, m->w)) return 1;
             }
           } else if (m->iter_count==0) {
             ScopedTiming tic(m->fstats.at("BFGS"));
@@ -1136,7 +1137,8 @@ int Feasiblesqpmethod::solve(void* mem) const {
             if (calc_function(m, "nlp_hess_l")) return 1;
             if (convexify_) {
               ScopedTiming tic(m->fstats.at("convexify"));
-              if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+              if (casadi_convexify_eval(&convexify_data_.config,
+                d->Bk, d->Bk, m->iw, m->w)) return 1;
             }
           } else if (m->iter_count==0) {
             ScopedTiming tic(m->fstats.at("BFGS"));
@@ -1611,7 +1613,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         //     if (calc_function(m, "nlp_hess_l")) return 1;
         //     if (convexify_) {
         //       ScopedTiming tic(m->fstats.at("convexify"));
-        //       if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+        //       if (casadi_convexify_eval(&convexify_data_.config,
+        //         d->Bk, d->Bk, m->iw, m->w)) return 1;
         //     }
         //   } else if (m->iter_count==0) {
         //     ScopedTiming tic(m->fstats.at("BFGS"));
@@ -1704,7 +1707,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         //     if (calc_function(m, "nlp_hess_l")) return 1;
         //     if (convexify_) {
         //       ScopedTiming tic(m->fstats.at("convexify"));
-        //       if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+        //       if (casadi_convexify_eval(&convexify_data_.config,
+        //         d->Bk, d->Bk, m->iw, m->w)) return 1;
         //     }
         //   } else if (m->iter_count==0) {
         //     ScopedTiming tic(m->fstats.at("BFGS"));

@@ -83,13 +83,13 @@ struct casadi_ipopt_data {
 
 // SYMBOL "ipopt_init_mem"
 template<typename T1>
-int ipopt_init_mem(casadi_ipopt_data<T1>* d) {
+int casadi_ipopt_init_mem(casadi_ipopt_data<T1>* d) {
   return 0;
 }
 
 // SYMBOL "ipopt_free_mem"
 template<typename T1>
-void ipopt_free_mem(casadi_ipopt_data<T1>* d) {
+void casadi_ipopt_free_mem(casadi_ipopt_data<T1>* d) {
   //Highs_destroy(d->ipopt);
   
 }

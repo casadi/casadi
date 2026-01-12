@@ -177,13 +177,13 @@ struct casadi_fatrop_data {
 
 // SYMBOL "fatrop_init_mem"
 template<typename T1>
-int fatrop_init_mem(casadi_fatrop_data<T1>* d) {
+int casadi_fatrop_init_mem(casadi_fatrop_data<T1>* d) {
   return 0;
 }
 
 // SYMBOL "fatrop_free_mem"
 template<typename T1>
-void fatrop_free_mem(casadi_fatrop_data<T1>* d) {
+void casadi_fatrop_free_mem(casadi_fatrop_data<T1>* d) {
   //Highs_destroy(d->fatrop);
   
 }

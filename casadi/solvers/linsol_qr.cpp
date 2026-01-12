@@ -113,7 +113,7 @@ namespace casadi {
 
     // Check for a cache hit
     double* cache = nullptr;
-    bool cache_hit = cache_check(A, get_ptr(m->cache), get_ptr(m->cache_loc),
+    bool cache_hit = casadi_cache_check(A, get_ptr(m->cache), get_ptr(m->cache_loc),
       cache_stride_, n_cache_, sp_.nnz(), &cache);
 
     if (cache && cache_hit) {

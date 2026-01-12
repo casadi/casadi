@@ -722,7 +722,7 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       return (external(name, libname,opts),libname)
 
-  def check_symbols(self, libname, c_filename):
+  def check_symbols(self, libname, fun_names, c_filename):
     """Check that no symbols starting with 'casadi' are exported in the shared library"""
     import re
     import ctypes
@@ -744,14 +744,28 @@ class casadiTestCase(unittest.TestCase):
     # Find all exported text symbols (type T or W)
     symbol_pattern = r'[0-9a-f]+\s+[TW]\s+(\w+)'
     all_exported = re.findall(symbol_pattern, nm_output)
-
-    # Find symbols starting with 'casadi'
-    exclude_symbols = ['casadi_alloc', 'casadi_alloc_arrays', 'casadi_decompress', 'casadi_deinit', 'casadi_eval', 'casadi_free', 'casadi_free_arrays', 'casadi_init', 'casadi_init_arrays']
     
-    bad_symbols = [s for s in all_exported if s.startswith('casadi') and not s in exclude_symbols]
-
+    excluded = set(
+        ['casadi_alloc', 'casadi_alloc_arrays', 'casadi_decompress', 'casadi_deinit', 'casadi_eval', 'casadi_free', 'casadi_free_arrays', 'casadi_init', 'casadi_init_arrays']+
+        ['main'])
+    
+    bad_symbols = []
+    for symbol in all_exported:
+        if symbol.startswith("codegen_"): continue
+        if symbol.startswith("jit_"): continue
+        if symbol in excluded: continue
+        
+        okay = False
+        for fun_name in fun_names:
+            if symbol=="main_" + fun_name:
+                okay = True
+            if symbol==fun_name or symbol.startswith(fun_name):
+                okay = True
+        if okay: continue
+        bad_symbols.append(symbol)
+    
     if bad_symbols:
-      self.fail("Found %d symbols starting with 'casadi' exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
+      self.fail("Found %d bad symbol exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
   def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
     if not isinstance(main_return_code,list):
@@ -761,12 +775,21 @@ class casadiTestCase(unittest.TestCase):
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       if opts is None: opts = {}
       if main: opts["main"] = True
+      cg_names = []
       cg = CodeGenerator(name,opts)
       cg.add(F,with_jac_sparsity)
+      cg_names.append(F.name())
+      if with_jac_sparsity: cg_names.append("jac_"+F.name())
       if with_reverse:
-        cg.add(F.reverse(1), with_jac_sparsity)
+        Frev = F.reverse(1)
+        cg.add(Frev, with_jac_sparsity)
+        cg_names.append(Frev.name())
+        if with_jac_sparsity: cg_names.append("jac_"+Frev.name())
       if with_forward:
-        cg.add(F.forward(1), with_jac_sparsity)
+        Ffwd = F.forward(1)
+        cg.add(Ffwd, with_jac_sparsity)
+        cg_names.append(Ffwd.name())
+        if with_jac_sparsity: cg_names.append("jac_"+Ffwd.name())
       cg.generate()
       import subprocess
 
@@ -833,7 +856,7 @@ class casadiTestCase(unittest.TestCase):
       #  subprocess.run(["otool","-l",libname])
 
       # Check that all exported symbols are accessible (have correct prefix)
-      self.check_symbols(libname, name+".c")
+      self.check_symbols(libname, cg_names, name+".c")
 
       if external_opts is None: external_opts = {}
       if with_external:
