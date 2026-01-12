@@ -191,7 +191,6 @@ namespace casadi {
       }
         else if (op.first == "lazy_constraints_callback") {
             try {
-              // TODO ALLOCATE CALLBACKHELPER
                 // Attempt to convert to function
                 lazy_constraints_callback_ = op.second;
                 casadi_message("Successfully obtained callback function");
