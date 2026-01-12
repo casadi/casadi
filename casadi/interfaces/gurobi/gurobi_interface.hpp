@@ -46,6 +46,31 @@ extern "C" {
 /// \cond INTERNAL
 namespace casadi {
 
+  struct LazyCallbackMemory {
+  // sizes
+  casadi_int nx;
+  casadi_int sz_arg, sz_res, sz_iw, sz_w;
+
+  // solution and inputs
+  std::vector<double> x_vals;
+  double obj_val;
+  double obj_best;
+  double obj_bound;
+  double sol_count;
+  std::vector<double> input_data;
+
+  // outputs
+  double flag;
+  std::vector<double> a_vec;
+  double b_val;
+
+  // casadi workspaces
+  std::vector<casadi_int> iw;
+  std::vector<double> w;
+  std::vector<const double*> arg;
+  std::vector<double*> res;
+  };
+
   struct CASADI_CONIC_GUROBI_EXPORT GurobiMemory : public ConicMemory {
     // Gurobi environment
     GRBenv *env;
@@ -152,6 +177,9 @@ namespace casadi {
 
     /// User-provided callback function for MIPSOL events
     Function lazy_constraints_callback_;
+
+    // to store callback data
+    std::unique_ptr<LazyCallbackMemory> lazy_cb_mem_;
 
     /// Handle Lazy Constraints callback events (C API version)
     void handle_lazy_constraints_callback(GRBmodel *model, void *cbdata, int where);

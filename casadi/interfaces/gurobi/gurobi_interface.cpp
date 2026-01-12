@@ -200,6 +200,33 @@ namespace casadi {
                 if (lazy_constraints_callback_.n_in() != 5 || lazy_constraints_callback_.n_out() != 3) {
                     casadi_error("Callback function has wrong signature. Expected 5 inputs, 3 outputs");
                 }
+                if (!lazy_constraints_callback_.is_null()) {
+                  lazy_cb_mem_ = std::make_unique<LazyCallbackMemory>();
+                  auto& cb = lazy_cb_mem_;
+
+                  cb->nx = nx_;
+
+                  cb->sz_arg = lazy_constraints_callback_.sz_arg();
+                  cb->sz_res = lazy_constraints_callback_.sz_res();
+                  cb->sz_iw  = lazy_constraints_callback_.sz_iw();
+                  cb->sz_w   = lazy_constraints_callback_.sz_w();
+
+                  cb->x_vals.resize(nx_);
+                  cb->obj_val = 0;
+                  cb->obj_best = 0;
+                  cb->obj_bound = 0;
+                  cb->sol_count = 0;
+                  cb->input_data.resize(nx_ + 4); // x + obj info
+
+                  cb->flag = 0.0;
+                  cb->a_vec.resize(nx_);
+                  cb->b_val = 0.0;
+
+                  cb->iw.resize(cb->sz_iw);
+                  cb->w.resize(cb->sz_w);
+                  cb->arg.resize(cb->sz_arg);
+                  cb->res.resize(cb->sz_res);
+                }
             } catch (const std::exception& e) {
                 casadi_error("Failed to get callback function: " + std::string(e.what()));
             }
@@ -741,148 +768,86 @@ void GurobiInterface::serialize_body(SerializingStream &s) const {
 
 void GurobiInterface::handle_lazy_constraints_callback(GRBmodel *model, void *cbdata, int where) {
   try {
-    if (lazy_constraints_callback_.is_null()) {
-      casadi_warning("Callback triggered but not properly initialized");
+    // Defensive checks
+    if (lazy_constraints_callback_.is_null() || !lazy_cb_mem_) {
+      casadi_warning("Lazy callback triggered but memory not initialized");
       return;
     }
 
+    auto& cb = *lazy_cb_mem_;
     CallbackDataHelper helper(cbdata, where);
 
-    // Get the number of variables
-    int numvars;
-    int error = GRBgetintattr(model, "NumVars", &numvars);
-    if (error) {
-      casadi_warning("Failed to get number of variables in callback");
-      return;
-    }
-
-    // Get the integer solution
-    std::vector<double> x_vals(numvars);
-    if (!helper.getSolution(x_vals)) {
+    // 1. Get solution (reuse buffer)
+    if (!helper.getSolution(cb.x_vals)) {
       casadi_warning("Failed to get solution in MIPSOL callback");
       return;
     }
 
-    // // Convert to CasADi DM (only use the variables we care about)
-    // // DM x_solution = DM::zeros(nx_, 1);
-    // // for (casadi_int i = 0; i < nx_ && i < numvars; ++i) {
-    // //   x_solution(i) = x_vals[i];
-    // // }
-
-    // Get additional solution information
-    double obj_val, obj_best, obj_bound;
-    int sol_count;
-
-    if (!helper.getDouble(GRB_CB_MIPSOL_OBJ, obj_val) ||
-        !helper.getDouble(GRB_CB_MIPSOL_OBJBST, obj_best) ||
-        !helper.getDouble(GRB_CB_MIPSOL_OBJBND, obj_bound) ||
-        !helper.getInt(GRB_CB_MIPSOL_SOLCNT, sol_count)) {
+    // 2. Get scalar info (reuse buffer)
+    if (!helper.getDouble(GRB_CB_MIPSOL_OBJ, cb.obj_val) ||
+        !helper.getDouble(GRB_CB_MIPSOL_OBJBST, cb.obj_best) ||
+        !helper.getDouble(GRB_CB_MIPSOL_OBJBND, cb.obj_bound) ||
+        !helper.getDouble(GRB_CB_MIPSOL_SOLCNT, cb.sol_count)) {
       casadi_warning("Failed to get callback information");
       return;
     }
 
-    // Prepare input data for callback
-    std::vector<double> input_data;
+    // 3. Fill input_data
+    std::copy(cb.x_vals.begin(), cb.x_vals.end(), cb.input_data.begin());
+    cb.input_data[cb.nx + 0] = cb.obj_val;
+    cb.input_data[cb.nx + 1] = cb.obj_best;
+    cb.input_data[cb.nx + 2] = cb.obj_bound;
+    cb.input_data[cb.nx + 3] = cb.sol_count;
 
-    // Add x_solution data
-    // const double* x_ptr = x_solution.ptr();
-    // casadi_message(x_ptr)
-    // input_data.insert(input_data.end(), x_ptr, x_ptr + nx_);
-    input_data.insert(input_data.end(), &x_vals[0], &x_vals[0] + nx_);
+    // 4. Reset outputs
+    cb.flag = 0.0;
+    std::fill(cb.a_vec.begin(), cb.a_vec.end(), 0.0);
+    cb.b_val = 0.0;
 
-    // Add scalar values
-    input_data.push_back(obj_val);
-    input_data.push_back(obj_best);
-    input_data.push_back(obj_bound);
-    input_data.push_back(static_cast<double>(sol_count));
-
-    // Prepare output buffers
-    double flag = 0.0;                      // First output: boolean (as double)
-    std::vector<double> a_vec(nx_, 0.0);    // Second output: vector A
-    double b_val = 0.0;                     // Third output: scalar b
-
-    // Get memory requirements for the callback
-    casadi_int sz_arg = lazy_constraints_callback_.sz_arg();
-    casadi_int sz_res = lazy_constraints_callback_.sz_res();
-    casadi_int sz_iw = lazy_constraints_callback_.sz_iw();
-    casadi_int sz_w = lazy_constraints_callback_.sz_w();
-
-    // Allocate work arrays
-    std::vector<casadi_int> iw(sz_iw);
-    std::vector<double> w(sz_w);
-
-    // Set up argument pointers
-    std::vector<const double*> arg(sz_arg);
-    std::vector<double*> res(sz_res);
-
-    // Fill input arguments
-    if (sz_arg > 0) {
-      size_t offset = 0;
-      arg[0] = &input_data[offset];  // x
-      offset += nx_;
-      for (casadi_int i = 1; i < sz_arg && offset < input_data.size(); ++i) {
-        arg[i] = &input_data[offset];  // Scalars
-        offset += 1;
-      }
+    // 5. Setup CasADi arguments (no allocation)
+    size_t offset = 0;
+    for (casadi_int i = 0; i < cb.sz_arg; ++i) {
+      cb.arg[i] = &cb.input_data[offset];
+      offset += (i == 0 ? cb.nx : 1);
     }
 
-    // Set up output pointers
-    if (sz_res >= 1) res[0] = &flag;
-    if (sz_res >= 2) res[1] = a_vec.data();
-    if (sz_res >= 3) res[2] = &b_val;
+    if (cb.sz_res >= 1) cb.res[0] = &cb.flag;
+    if (cb.sz_res >= 2) cb.res[1] = cb.a_vec.data();
+    if (cb.sz_res >= 3) cb.res[2] = &cb.b_val;
 
-    // Call the callback function
-    int callback_result = lazy_constraints_callback_(arg.data(), res.data(),
-                                           iw.data(), w.data(), 0);
+    // 6. Call CasADi callback
+    int ret = lazy_constraints_callback_(
+      cb.arg.data(), cb.res.data(),
+      cb.iw.data(), cb.w.data(), 0);
 
-    if (callback_result != 0) {
-      casadi_warning("Callback function returned error code: " + std::to_string(callback_result));
+    if (ret != 0) {
+      casadi_warning("Lazy callback returned error " + std::to_string(ret));
       return;
     }
 
-    // Process results if the callback requests constraint
-    if (flag > 0.5) {
-      process_lazy_constraints(model, cbdata, &a_vec, &b_val);
-    }
-
-  } catch (const std::exception& e) {
-    casadi_warning("Error in handle_lazy_constraints_callback: " + std::string(e.what()));
-  }
-}
-
-void GurobiInterface::process_lazy_constraints(GRBmodel *model, void *cbdata, std::vector<double>* a_vec, double* b_val) {
-
-    std::string sense = "<=";
-    CallbackDataHelper helper(cbdata, GRB_CB_MIPSOL);
-
-    // Dereference the pointers to access the actual objects
-    std::vector<double>& a_vec_ref = *a_vec;
-    double& b_val_ref = *b_val;
-
-    // For single-row constraints
-    if (a_vec_ref.size() == nx_) {
+    // 7. Add lazy constraint if requested
+    if (cb.flag > 0.5) {
       std::vector<int> cind;
       std::vector<double> cval;
 
       for (casadi_int j = 0; j < nx_; ++j) {
-        double coeff = a_vec_ref[j];  // Accessing the vector elements
-        if (std::abs(coeff) > 1e-12) {
+        if (std::abs(cb.a_vec[j]) > 1e-12) {
           cind.push_back(static_cast<int>(j));
-          cval.push_back(coeff);
+          cval.push_back(cb.a_vec[j]);
         }
       }
-
       if (!cind.empty()) {
-        double rhs = b_val_ref;  // Accessing the double value
-        char gurobi_sense = sense_to_gurobi(sense);
-        if (!helper.addLazyConstraint(cind, cval, gurobi_sense, rhs)) {
+        char gurobi_sense = sense_to_gurobi("<=");
+        if (!helper.addLazyConstraint(cind, cval, gurobi_sense, cb.b_val)) {
           casadi_warning("Failed to add lazy constraint");
         }
       }
-    } else {
-      casadi_warning("Multi-row constraints not implemented for this interface");
     }
 
+  } catch (const std::exception& e) {
+    casadi_warning("Error in handle_lazy_constraints_callback: "
+                   + std::string(e.what()));
+  }
 }
 
 } // namespace casadi
