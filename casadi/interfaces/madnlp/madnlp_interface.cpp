@@ -24,6 +24,7 @@
 
 
 #include "madnlp_interface.hpp"
+#include <madnlp_runtime_str.h>
 
 #include "casadi/core/casadi_misc.hpp"
 #include "../../core/global_options.hpp"
@@ -37,8 +38,6 @@
 #include <chrono>
 #include <cstring>
 #include <string>
-
-#include <madnlp_runtime_str.h>
 
 namespace casadi {
 
@@ -64,7 +63,6 @@ MadnlpInterface::MadnlpInterface(const std::string& name, const Function& nlp)
 }
 
 MadnlpInterface::~MadnlpInterface() {
-  //shutdown_julia(0);
   clear_mem();
 }
 
@@ -76,6 +74,9 @@ const Options MadnlpInterface::options_
     {"ng",
      {OT_INTVECTOR,
       "Number of constraints"}},
+    {"gpu",
+     {OT_BOOL,
+      "Whether to use the GPU interface in libmad"}},
     {"madnlp",
      {OT_DICT,
       "Options to be passed to madnlp"}},
@@ -90,7 +91,7 @@ const Options MadnlpInterface::options_
    }
 };
 
-void casadi_madnlp_sparsity(const casadi_int* sp, madnlp_int *coord_i, madnlp_int *coord_j) {
+void casadi_madnlp_sparsity(const casadi_int* sp, libmad_int *coord_i, libmad_int *coord_j) {
     // convert ccs to cco
     casadi_int ncol = sp[1];
     const casadi_int* colind = sp+2;
@@ -108,14 +109,13 @@ void MadnlpInterface::init(const Dict& opts) {
   // Call the init method of the base class
   Nlpsol::init(opts);
 
-  //std::cout << "MadnlpInterface::init" << std::endl;
-
   casadi_int struct_cnt=0;
 
   // Default options
   std::string convexify_strategy = "none";
   double convexify_margin = 1e-7;
   casadi_int max_iter_eig = 200;
+  gpu_ = false;
   convexify_ = false;
 
   calc_g_ = true;
@@ -129,6 +129,8 @@ void MadnlpInterface::init(const Dict& opts) {
       convexify_margin = op.second;
     } else if (op.first=="max_iter") {
       max_iter_eig = op.second;
+    } else if (op.first=="gpu") {
+      gpu_ = op.second;
     } else if (op.first=="madnlp") {
       opts_ = op.second;
     }
@@ -140,6 +142,11 @@ void MadnlpInterface::init(const Dict& opts) {
   if (hessian_approximation!=opts_.end()) {
     exact_hessian_ = hessian_approximation->second == "exact";
   }
+  // Are we using gpu
+  auto use_gpu_interface = opts_.find("gpu");
+  if (hessian_approximation!=opts_.end()) {
+    exact_hessian_ = hessian_approximation->second == "exact";
+  }
 
   // Setup NLP functions
   create_function("nlp_f", {"x", "p"}, {"f"});
@@ -148,7 +155,6 @@ void MadnlpInterface::init(const Dict& opts) {
   if (!has_function("nlp_grad_f")) {
     create_function("nlp_grad_f", {"x", "p"}, {"grad:f:x"});
   }
-  gradf_sp_ = get_function("nlp_grad_f").sparsity_out(0);
 
   if (!has_function("nlp_jac_g")) {
     create_function("nlp_jac_g", {"x", "p"}, {"jac:g:x"});
@@ -195,52 +201,39 @@ void MadnlpInterface::init(const Dict& opts) {
   std::vector<char*> _argv = {};
   std::string s;
 
-  std::set<std::string> comp_values = {"no","yes","min","max"};
-
-  auto comp = opts_.find("compile");
-  if (comp!=opts_.end()) {
-    std::string comp_value = comp->second;
-    if (comp_values.find(comp_value) != comp_values.end()) {
-      s = "--compile=" + comp_value;
-      const int comp_l = s.length();
-      char* option_comp = new char[comp_l + 1];
-      strcpy(option_comp, s.c_str());
-      _argv.push_back(option_comp);
-    } else {
-      std::cout << "Invalid value (" << comp_value << ")for option 'compile'" << std::endl;
-      std::cout << "Available values are: ";
-      for (auto v: comp_values) std::cout << v << " "; std::cout << std::endl;
-    }
-  }
-
-  auto trace_opt = opts_.find("trace_compile");
-  if (trace_opt!=opts_.end() && bool(trace_opt->second))  {
-    std::string trace_compile_output = "stderr";
-    auto _trace_out_opt = opts_.find("trace_compile_output");
-    if (_trace_out_opt!=opts_.end())
-      trace_compile_output = (std::string) _trace_out_opt->second;
-    s = "--trace-compile=" + trace_compile_output;
-    const int trace_l = s.length();
-    char* option_trace = new char[trace_l + 1];
-    strcpy(option_trace, s.c_str());
-    _argv.push_back(option_trace);
-  }
-
   int argc = _argv.size();
   char** argv = reinterpret_cast<char**>(_argv.data());
 
-  if (!GlobalOptions::julia_initialized) {
-    init_julia(argc, argv);
-    std::cout << "Init julia runtime with options: "<< std::endl ;
-    for (auto s: _argv) std::cout << s << std::endl;
-    GlobalOptions::julia_initialized = true;
-  }
 }
 
 int MadnlpInterface::init_mem(void* mem) const {
   if (Nlpsol::init_mem(mem)) return 1;
   if (!mem) return 1;
   auto m = static_cast<MadnlpMemory*>(mem);
+  
+  // Now create the new options struct
+  libmad_create_options_dict(&(m->d.libmad_opts));
+  for (const auto& kv : opts_) {
+    switch (kv.second.getType()) {
+     case OT_DOUBLE:
+       libmad_set_double_option(m->d.libmad_opts, kv.first.c_str(), kv.second);
+       break;
+     case OT_INT:
+       libmad_set_int64_option(m->d.libmad_opts, kv.first.c_str(), kv.second.to_int());
+       break;
+     case OT_STRING:
+     {
+       std::string s = kv.second.to_string();
+       libmad_set_string_option(m->d.libmad_opts, kv.first.c_str(), s.c_str());
+     }
+     break;
+     case OT_BOOL:
+       libmad_set_bool_option(m->d.libmad_opts, kv.first.c_str(), kv.second.to_bool());
+       break;
+     default:
+       casadi_error("Unknown option type.");
+    }
+  }
   casadi_madnlp_init_mem(&m->d);
 
   return 0;
@@ -266,38 +259,12 @@ void MadnlpInterface::set_work(void* mem, const double**& arg, double**& res,
   casadi_madnlp_init(&m->d, &arg, &res, &iw, &w);
 
   m->d.nlp->oracle->m = static_cast<void*>(m);
-
-  // options
 }
 
 int MadnlpInterface::solve(void* mem) const {
   auto m = static_cast<MadnlpMemory*>(mem);
 
-  casadi_madnlp_presolve(&m->d);
-
-  for (const auto& kv : opts_) {
-    switch (madnlp_c_option_type(kv.first.c_str())) {
-      case 0:
-        madnlp_c_set_option_double(m->d.solver, kv.first.c_str(), kv.second);
-        break;
-      case 1:
-        madnlp_c_set_option_int(m->d.solver, kv.first.c_str(), kv.second.to_int());
-        break;
-      case 2:
-        madnlp_c_set_option_bool(m->d.solver, kv.first.c_str(), kv.second.to_bool());
-        break;
-      case 3:
-        {
-          std::string s = kv.second.to_string();
-          madnlp_c_set_option_string(m->d.solver, kv.first.c_str(), s.c_str());
-        }
-        break;
-      case -1:
-        casadi_error("Madnlp option not supported: " + kv.first);
-      default:
-        casadi_error("Unknown option type.");
-    }
-  }
+  casadi_madnlp_presolve(&m->d, gpu_);
 
   int ret = casadi_madnlp_solve(&m->d);
   if ( ret != 0 ) throw CasadiException("MADNLPError");
@@ -311,11 +278,18 @@ int MadnlpInterface::solve(void* mem) const {
 Dict MadnlpInterface::get_stats(void* mem) const {
   Dict stats = Nlpsol::get_stats(mem);
   auto m = static_cast<MadnlpMemory*>(mem);
-  stats["iter_count"] = m->d.stats.iter;
+  libmad_int iter, status;
+  double primal_feas, dual_feas;
+  madnlp_get_iters(m->d.stats, &iter);
+  madnlp_get_status(m->d.stats, &status);
+  madnlp_get_dual_feas(m->d.stats, &dual_feas);
+  madnlp_get_primal_feas(m->d.stats, &primal_feas);
+
+  stats["iter_count"] = static_cast<casadi_int>(iter);
   Dict madnlp;
-  madnlp["dual_feas"] = m->d.stats.dual_feas;
-  madnlp["primal_feas"] = m->d.stats.primal_feas;
-  madnlp["status"] = m->d.stats.status;
+  madnlp["dual_feas"] = dual_feas;
+  madnlp["primal_feas"] = primal_feas;
+  madnlp["status"] = static_cast<casadi_int>(status);
   stats["madnlp"] = madnlp;
   return stats;
 }
@@ -343,7 +317,34 @@ void MadnlpInterface::set_madnlp_prob() {
 }
 
 void MadnlpInterface::codegen_init_mem(CodeGenerator& g) const {
+<<<<<<< HEAD
   g << "casadi_madnlp_init_mem(&" + codegen_mem(g) + ");\n";
+=======
+
+  g << "libmad_create_options_dict(&(m->d.libmad_opts))";
+  for (const auto& kv : opts_) {
+    switch (kv.second.getType()) {
+     case OT_DOUBLE:
+       g << "libmad_set_double_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + str(kv.second) + ");\n";
+       break;
+     case OT_INT:
+       g << "libmad_set_int64_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + str(kv.second) + ");\n";
+       break;
+     case OT_STRING:
+     {
+       std::string s = kv.second.to_string();
+       g << "libmad_set_string_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + s + ");\n";
+     }
+     break;
+     case OT_BOOL:
+       g << "libmad_set_bool_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + str(kv.second) + ");\n";
+       break;
+     default:
+       casadi_error("Unknown option type.");
+    }
+  }
+  g << "madnlp_init_mem(&" + codegen_mem(g) + ");\n";
+>>>>>>> apozharski/ap/libmad-interface
   g << "return 0;\n";
 }
 
@@ -383,37 +384,15 @@ void MadnlpInterface::codegen_body(CodeGenerator& g) const {
 
   g << "casadi_madnlp_init(d, &arg, &res, &iw, &w);\n";
   g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
-  g << "casadi_madnlp_presolve(d);\n";
-
-  for (const auto& kv : opts_) {
-    switch (madnlp_c_option_type(kv.first.c_str())) {
-      case 0:
-        g << "madnlp_c_set_option_double(d->solver, \"" + kv.first + "\", "
-              + str(kv.second) + ");\n";
-        break;
-      case 1:
-        g << "madnlp_c_set_option_int(d->solver, \"" + kv.first + "\", "
-              + str(kv.second.to_int()) + ");\n";
-        break;
-      case 2:
-        g << "madnlp_c_set_option_bool(d->solver, \"" + kv.first + "\", "
-              + str(static_cast<int>(kv.second.to_bool())) + ");\n";
-        break;
-      case 3:
-        {
-          std::string s = kv.second.to_string();
-          g << "madnlp_c_set_option_string(d->solver, \"" + kv.first + "\", \""
-              + s + "\");\n";
-        }
-        break;
-      case -1:
-        casadi_error("Madnlp option not supported: " + kv.first);
-      default:
-        casadi_error("Unknown option type.");
-    }
+  if(gpu_)
+  {
+    g << "casadi_madnlp_presolve(d, true);\n";
+  }
+  else
+  {
+    g << "casadi_madnlp_presolve(d, true);\n";
   }
 
-  // Options
   g << "casadi_madnlp_solve(d);\n";
 
   codegen_body_exit(g);

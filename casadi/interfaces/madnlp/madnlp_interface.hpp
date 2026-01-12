@@ -30,13 +30,7 @@
 #include <iostream>
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
-#include "madnlp_c.h"
-
-extern "C" {
-  int init_julia(int, char**);
-  void shutdown_julia(int);
-}
-
+#include <libMad.h>
 
 namespace casadi {
   #include "madnlp_runtime.hpp"
@@ -62,7 +56,6 @@ struct CASADI_NLPSOL_MADNLP_EXPORT MadnlpMemory : public NlpsolMemory {
 */
 class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
  public:
-  Sparsity gradf_sp_;
   Sparsity jacg_sp_;
   Sparsity hesslag_sp_;
 
@@ -125,6 +118,9 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
   /// convexify?
   bool convexify_;
 
+  /// use GPU interface?
+  bool gpu_;
+
   void set_madnlp_prob();
   void set_madnlp_prob(CodeGenerator& g) const;
 
@@ -146,7 +142,7 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
   /** \brief Is thread-local memory object needed? */
   bool codegen_needs_mem() const override { return true; }
 
-  /** \brief Serialize an object without type information */
+  // /** \brief Serialize an object without type information */
   void serialize_body(SerializingStream &s) const override;
 
   /** \brief Deserialize into MX */
@@ -158,15 +154,15 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
 
  private:
   // Memory structure
-  casadi_madnlp_prob<double> p_;
+  casadi_madnlp_prob<libmad_real> p_;
 
-  std::vector<madnlp_int> nws_;
-  std::vector<madnlp_int> ngs_;
+  std::vector<libmad_int> nws_;
+  std::vector<libmad_int> ngs_;
 
-  std::vector<madnlp_int> nzj_i_;
-  std::vector<madnlp_int> nzj_j_;
-  std::vector<madnlp_int> nzh_i_;
-  std::vector<madnlp_int> nzh_j_;
+  std::vector<libmad_int> nzj_i_;
+  std::vector<libmad_int> nzj_j_;
+  std::vector<libmad_int> nzh_i_;
+  std::vector<libmad_int> nzh_j_;
 };
 
 } // namespace casadi
