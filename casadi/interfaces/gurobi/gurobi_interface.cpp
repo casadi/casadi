@@ -159,9 +159,6 @@ namespace casadi {
         {OT_FUNCTION,
           "User callback for adding LazyConstraints at MIPSOL. "
           "Input: dict with solution data. Output: dict with lazy constraints."}},
-      {"enable_mipsol_callback",
-        {OT_BOOL,
-          "Enable MIPSOL callbacks for dynamic constraint generation"}},
      }
   };
 
