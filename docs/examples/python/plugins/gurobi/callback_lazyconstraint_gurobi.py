@@ -170,8 +170,7 @@ solver = ca.qpsol(
     {"f": objective, "x": ca.vertcat(*x), "g": ca.vertcat(*g)},
     {
     'discrete': [1] * len(x),
-    'enable_mipsol_callback': True,
-    'mipsol_callback': callback,
+    'lazy_constraints_callback': callback,
 })
 
 # Solve

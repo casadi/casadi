@@ -151,10 +151,7 @@ namespace casadi {
     static ProtoFunction* deserialize(DeserializingStream& s) { return new GurobiInterface(s); }
 
     /// User-provided callback function for MIPSOL events
-    Function mipsol_callback_;
-
-    /// Flag to enable MIPSOL callbacks
-    bool enable_mipsol_callback_;
+    Function lazy_constraints_callback_;
 
     /// Handle MIPSOL callback events (C API version)
     void handle_mipsol_callback(GRBmodel *model, void *cbdata, int where);
