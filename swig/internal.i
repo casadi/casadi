@@ -6289,6 +6289,18 @@
 %exception  casadi::vector_tail(const std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::version_ge(const std::string &version_left, const std::string &version_right) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::version_gt(const std::string &version_left, const std::string &version_right) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::version_le(const std::string &version_left, const std::string &version_right) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::version_lt(const std::string &version_left, const std::string &version_right) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::write_matlab(std::ostream &stream, const std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

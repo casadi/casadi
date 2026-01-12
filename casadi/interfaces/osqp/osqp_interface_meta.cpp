@@ -48,7 +48,7 @@
 "| osqp              | OT_DICT | const Options to be passed to osqp.        |\n"
 "+-------------------+---------+--------------------------------------------+\n"
 "| warm_start_dual   | OT_BOOL | Use lam_a0 and lam_x0 input to warmstart   |\n"
-"|                   |         | [Default: truw].                           |\n"
+"|                   |         | [Default: true].                           |\n"
 "+-------------------+---------+--------------------------------------------+\n"
 "| warm_start_primal | OT_BOOL | Use x0 input to warmstart [Default: true]. |\n"
 "+-------------------+---------+--------------------------------------------+\n"
