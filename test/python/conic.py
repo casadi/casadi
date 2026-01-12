@@ -56,7 +56,7 @@ if "SKIP_CPLEX_TESTS" not in os.environ and has_conic("cplex"):
   conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-10,"CPX_PARAM_BAREPCOMP":1e-10}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "binary":True, "discrete": True, "sos": True}))
 
 if "SKIP_OSQP_TESTS" not in os.environ and has_conic("osqp"):
-  options = ["-Wno-unused-variable"]
+  options = ["-Wno-unused-variable","-Wno-strict-prototypes"]
   if os.name=='nt':
     options = []
   codegen = {"extralibs": ["osqp"], "extra_options": options, "std": "c99"}
