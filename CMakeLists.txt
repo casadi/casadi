@@ -1369,15 +1369,10 @@ if(WITH_MADNLP AND WITH_BUILD_MADNLP)
   # )
   execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${LIBMAD_BINARY_DIR} tar xf ${LIBMAD_BINARY_DIR}/libMad.tar.gz)
   add_library(libmad::libMad SHARED IMPORTED)
-  if(WIN32)
-    set(LIBMAD_LIB_DIR "bin")
-  else()
-    set(LIBMAD_LIB_DIR "lib")
-  endif()
   set_target_properties(libmad::libMad
     PROPERTIES
-    IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/${LIBMAD_LIB_DIR}/libMad${CMAKE_SHARED_LIBRARY_SUFFIX}
-    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/${LIBMAD_LIB_DIR}/libMad.imp.lib
+    IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/${SHARED_LIBRARY_RELDIR}/libMad${CMAKE_SHARED_LIBRARY_SUFFIX}
+    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/${SHARED_LIBRARY_RELDIR}/libMad.imp.lib
   )
   set_target_properties(libmad::libMad PROPERTIES LINKER_LANGUAGE C)
   target_include_directories(libmad::libMad INTERFACE

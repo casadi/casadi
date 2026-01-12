@@ -28,14 +28,15 @@
 // C-REPLACE "reinterpret_cast<int*>" "(int*) "
 // C-REPLACE "const_cast<int*>" "(int*) "
 
+// C-REPLACE "OracleCallback" "struct casadi_oracle_callback"
+
 // SYMBOL "madnlp_prob"
 template<typename T1>
 struct casadi_madnlp_prob {
   const casadi_nlpsol_prob<T1>* nlp;
 
-  // 1-index cco format
-  libmad_int *nzj_i, *nzj_j;
-  libmad_int *nzh_i, *nzh_j;
+  // Sparsity patterns
+  const casadi_int *sp_h, *sp_a;
 
   casadi_int nnz_hess_l, nnz_jac_g;
 
@@ -71,7 +72,7 @@ struct casadi_madnlp_data {
 
   bool gpu;
   CNLPModel* cnlp_model;
-  GPUNLPModel* gpunlp_model;
+  //GPUNLPModel* gpunlp_model;
   OptsDict* libmad_opts;
   MadNLPExecutionStats* stats;
   MadNLPSolver* solver;
@@ -81,19 +82,14 @@ struct casadi_madnlp_data {
 // SYMBOL "madnlp_setup"
 template<typename T1>
 void casadi_madnlp_setup(casadi_madnlp_prob<T1>* p) {
+  if (p->sp_h) {
+    p->nnz_hess_l = p->sp_h[2+p->sp_h[1]];
+  } else {
+    p->nnz_hess_l = 0;
+  }
+  p->nnz_jac_g = p->sp_a[2+p->sp_a[1]];
 }
 
-// SYMBOL "madnlp_init_mem"
-template<typename T1>
-int casadi_madnlp_init_mem(casadi_madnlp_data<T1>* d) {
-  return 0;
-}
-
-// SYMBOL "madnlp_free_mem"
-template<typename T1>
-void casadi_madnlp_free_mem(casadi_madnlp_data<T1>* d) {
-  //Highs_destroy(d->madnlp);
-}
 // C-REPLACE "static_cast< casadi_madnlp_data<T1>* >" "(struct casadi_madnlp_data*)"
 // C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
 // C-REPLACE "calc_function" "casadi_oracle_call"
@@ -103,30 +99,54 @@ void casadi_madnlp_free_mem(casadi_madnlp_data<T1>* d) {
 template<typename T1>
 int casadi_madnlp_constr_jac_structure(libmad_int* I, libmad_int* J, void* user_data)
 {
+  casadi_int cc, el;
+  const casadi_int *colind, *row;
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
   const casadi_madnlp_prob<T1>* p = d->prob;
-  std::memcpy(I, p->nzj_i, p->nnz_jac_g * sizeof(libmad_int));
-  std::memcpy(J, p->nzj_j, p->nnz_jac_g * sizeof(libmad_int));
+
+  // convert ccs to cco
+  casadi_int ncol = p->sp_a[1];
+  colind = p->sp_a+2;
+  row = colind+ncol+1;
+
+  for (cc=0; cc<ncol; ++cc) {
+      for (el=colind[cc]; el<colind[cc+1]; ++el) {
+          *I++ = row[el]+1;
+          *J++ = cc+1;
+      }
+  }
   return 0;
 }
+// C-REPLACE "casadi_madnlp_constr_jac_structure<T1>" "casadi_madnlp_constr_jac_structure"
 
 // SYMBOL "madnlp_lag_hess_structure"
 template<typename T1>
 int casadi_madnlp_lag_hess_structure(libmad_int* I, libmad_int* J, void* user_data)
 {
+  casadi_int cc, el;
+  const casadi_int *colind, *row;
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
   const casadi_madnlp_prob<T1>* p = d->prob;
-  std::memcpy(I, p->nzh_i, p->nnz_hess_l * sizeof(libmad_int));
-  std::memcpy(J, p->nzh_j, p->nnz_hess_l * sizeof(libmad_int));
+
+  // convert ccs to cco
+  casadi_int ncol = p->sp_h[1];
+  colind = p->sp_h+2;
+  row = colind+ncol+1;
+
+  for (cc=0; cc<ncol; ++cc) {
+      for (el=colind[cc]; el<colind[cc+1]; ++el) {
+          *I++ = row[el]+1;
+          *J++ = cc+1;
+      }
+  }
   return 0;
 }
+// C-REPLACE "casadi_madnlp_lag_hess_structure<T1>" "casadi_madnlp_lag_hess_structure"
 
 // SYMBOL "madnlp_eval_constr_jac"
 template<typename T1>
 int casadi_madnlp_eval_constr_jac(const T1* w, T1* res, void* user_data) {
-  casadi_int i;
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
-  const casadi_madnlp_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
@@ -140,9 +160,7 @@ int casadi_madnlp_eval_constr_jac(const T1* w, T1* res, void* user_data) {
 // SYMBOL "madnlp_eval_constr"
 template<typename T1>
 int casadi_madnlp_eval_constr(const T1* w, T1* res, void* user_data) {
-  casadi_int i,k,column;
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
-  const casadi_madnlp_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
@@ -157,12 +175,11 @@ int casadi_madnlp_eval_constr(const T1* w, T1* res, void* user_data) {
 template<typename T1>
 int casadi_madnlp_eval_obj_grad(const T1* w, T1* res, void* user_data) {
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
-  const casadi_madnlp_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
   // TODO add argument
-  T1 objective_scale = 1.0;
+  //T1 objective_scale = 1.0;
 
   d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
@@ -178,26 +195,19 @@ int casadi_madnlp_eval_obj(const T1* w, T1* res, void* user_data) {
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
   // TODO add argument
-  T1 objective_scale = 1.0;
+  //T1 objective_scale = 1.0;
 
   d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
-  std::cout << w[0] << std::endl;
-  std::cout << w[1] << std::endl;
-  std::cout << w[2] << std::endl;
-  calc_function(&d->prob->nlp_f, d_oracle);
-  std::cout << res[0] << std::endl;
-  return 0;
+  return calc_function(&d->prob->nlp_f, d_oracle);
 }
 
-// SYMBOL "madnlp_eval_obj"
+// SYMBOL "madnlp_eval_lag_hess"
 template<typename T1>
 int casadi_madnlp_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
                                             T1* res, void* user_data){
-  casadi_int k, column, i;
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
-  const casadi_madnlp_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
@@ -230,11 +240,11 @@ int casadi_madnlp_init_mem(casadi_madnlp_data<T1>* d) {
 
 // SYMBOL "madnlp_free_mem"
 template<typename T1>
-void madnlp_free_mem(casadi_madnlp_data<T1>* d) {
+void casadi_madnlp_free_mem(casadi_madnlp_data<T1>* d) {
   madnlp_delete_solver(d->solver);
-  d->solver = nullptr;
+  d->solver = 0;
   madnlp_delete_stats(d->stats);
-  d->stats = nullptr;
+  d->stats = 0;
   libmad_delete_options_dict(d->libmad_opts);
 }
 
@@ -251,7 +261,6 @@ void casadi_madnlp_work(const casadi_madnlp_prob<T1>* p, casadi_int* sz_arg, cas
 template<typename T1>
 void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Problem structure
-  const casadi_madnlp_prob<T1>* p = d->prob;
   d->arg = *arg;
   d->res = *res;
   d->iw = *iw;
@@ -261,7 +270,6 @@ void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, c
 // SYMBOL "madnlp_presolve"
 template<typename T1>
 void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d, bool gpu) {
-  casadi_int k, i, column;
   const casadi_madnlp_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
@@ -271,7 +279,7 @@ void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d, bool gpu) {
   d->gpu = gpu;
   if(gpu)
   {
-    std::cout << "Building GPU model" << std::endl;
+    /*std::cout << "Building GPU model" << std::endl;
     libmad_gpunlpmodel_create(&(d->gpunlp_model),
                            "MadNLP",
                            p_nlp->nx, p_nlp->ng,
@@ -290,7 +298,7 @@ void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d, bool gpu) {
                                     d_nlp->z, d_nlp->lam + p_nlp->nx,
                                     d_nlp->lbx, d_nlp->ubx,
                                     d_nlp->lbg, d_nlp->ubg);
-    madnlp_gpu_create_solver(&(d->solver), d->gpunlp_model, d->libmad_opts);
+    madnlp_gpu_create_solver(&(d->solver), d->gpunlp_model, d->libmad_opts);*/
   }
   else
   {
