@@ -37,7 +37,7 @@ namespace casadi {
           casadi_warning(msg ": Gurobi error " + std::to_string(error)); \
           return; \
       } \
-  } while(0)
+  } while (0)
 
   // Convert string sense to Gurobi sense
   char sense_to_gurobi(const std::string& sense) {
@@ -79,7 +79,8 @@ namespace casadi {
         return 1;
       }
 
-      int error = GRBcblazy(cbdata_, static_cast<int>(ind.size()), ind.data(), val.data(), sense, rhs);
+      int error = GRBcblazy(cbdata_, static_cast<int>(ind.size()),
+                              ind.data(), val.data(), sense, rhs);
       if (error != 0) {
         casadi_warning("GRBcblazy failed with code: " + std::to_string(error));
       }
@@ -91,8 +92,8 @@ namespace casadi {
   static int gurobi_callback_function(GRBmodel *model, void *cbdata, int where, void *usrdata) {
     try {
       if (where == GRB_CB_MIPSOL && usrdata) {
-        GurobiInterface* interface = static_cast<GurobiInterface*>(usrdata);
-        interface->handle_lazy_constraints_callback(model, cbdata, where);
+        GurobiMemory* mem = static_cast<GurobiMemory*>(usrdata);
+        mem->interface->handle_lazy_constraints_callback(mem, model, cbdata, where);
       }
     } catch (const std::exception& e) {
       // Don't let exceptions escape to C code
@@ -129,8 +130,7 @@ namespace casadi {
   GurobiInterface::GurobiInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
     : Conic(name, st),
-      lazy_constraints_callback_(Function())
-  {
+      lazy_constraints_callback_(Function()) {
 
   }
 
@@ -185,43 +185,17 @@ namespace casadi {
         sos_weights = op.second.to_double_vector_vector();
       } else if (op.first=="sos_types") {
         sos_types = op.second.to_int_vector();
-      }
-        else if (op.first == "lazy_constraints_callback") {
+      } else if (op.first == "lazy_constraints_callback") {
             try {
                 // Attempt to convert to function
                 lazy_constraints_callback_ = op.second;
                 casadi_message("Successfully obtained callback function");
 
                 // Verify signature
-                if (lazy_constraints_callback_.n_in() != 5 || lazy_constraints_callback_.n_out() != 3) {
-                    casadi_error("Callback function has wrong signature. Expected 5 inputs, 3 outputs");
-                }
-                if (!lazy_constraints_callback_.is_null()) {
-                  lazy_cb_mem_ = std::make_unique<LazyCallbackMemory>();
-                  auto& cb = lazy_cb_mem_;
-
-                  cb->nx = nx_;
-
-                  cb->sz_arg = lazy_constraints_callback_.sz_arg();
-                  cb->sz_res = lazy_constraints_callback_.sz_res();
-                  cb->sz_iw  = lazy_constraints_callback_.sz_iw();
-                  cb->sz_w   = lazy_constraints_callback_.sz_w();
-
-                  cb->x_vals.resize(nx_);
-                  cb->obj_val = 0;
-                  cb->obj_best = 0;
-                  cb->obj_bound = 0;
-                  cb->sol_count = 0;
-                  cb->input_data.resize(nx_ + 4); // x + obj info
-
-                  cb->flag = 0.0;
-                  cb->a_vec.resize(nx_);
-                  cb->b_val = 0.0;
-
-                  cb->iw.resize(cb->sz_iw);
-                  cb->w.resize(cb->sz_w);
-                  cb->arg.resize(cb->sz_arg);
-                  cb->res.resize(cb->sz_res);
+                if (lazy_constraints_callback_.n_in() != 5 ||
+                    lazy_constraints_callback_.n_out() != 3) {
+                    casadi_error("Callback function has wrong signature. "
+                                "Expected 5 inputs, 3 outputs");
                 }
             } catch (const std::exception& e) {
                 casadi_error("Failed to get callback function: " + std::string(e.what()));
@@ -280,12 +254,14 @@ namespace casadi {
 
     // Load environment
     casadi_int flag;
+
     auto output_flag = opts_.find("OutputFlag");
     auto log_to_console = opts_.find("LogToConsole");
 
-    if (output_flag != opts_.end() && output_flag->second.getType() == OT_INT && output_flag->second.to_int() == 0 &&
-    log_to_console != opts_.end() && log_to_console->second.getType() == OT_INT && log_to_console->second.to_int() == 0) {
-    // casadi_message("Suppressing all Gurobi outputs since OutputFlag and LogToConsole are set to zero.")
+    if (output_flag != opts_.end() && output_flag->second.as_int() == 0 &&
+    log_to_console != opts_.end() && log_to_console->second.as_int() == 0) {
+    // casadi_message("Suppressing all Gurobi outputs since "
+    //                "OutputFlag and LogToConsole are set to zero.")
     flag = GRBemptyenv(&m->env);
       casadi_assert(!flag && m->env,
         "Failed to create empty GUROBI environment. Flag: " + str(flag));
@@ -311,6 +287,32 @@ namespace casadi {
     m->sos_beg = sos_beg_;
     m->sos_ind = sos_ind_;
     m->sos_types = sos_types_;
+
+    LazyCallbackMemory* cb = &m->lazy_cb_mem;
+    cb->nx = nx_;
+
+    cb->sz_arg = lazy_constraints_callback_.sz_arg();
+    cb->sz_res = lazy_constraints_callback_.sz_res();
+    cb->sz_iw  = lazy_constraints_callback_.sz_iw();
+    cb->sz_w   = lazy_constraints_callback_.sz_w();
+
+    cb->x_vals.resize(nx_);
+    cb->obj_val = 0;
+    cb->obj_best = 0;
+    cb->obj_bound = 0;
+    cb->sol_count = 0;
+    cb->input_data.resize(nx_ + 4); // x + obj info
+
+    cb->flag = 0.0;
+    cb->a_vec.resize(nx_);
+    cb->b_val = 0.0;
+
+    cb->iw.resize(cb->sz_iw);
+    cb->w.resize(cb->sz_w);
+    cb->arg.resize(cb->sz_arg);
+    cb->res.resize(cb->sz_res);
+
+    m->interface = this;
 
     m->add_stat("preprocessing");
     m->add_stat("solver");
@@ -618,8 +620,7 @@ namespace casadi {
           return 1;
         }
         // Set the callback function
-        error = GRBsetcallbackfunc(model, gurobi_callback_function,
-                                  const_cast<GurobiInterface*>(this));
+        error = GRBsetcallbackfunc(model, gurobi_callback_function, mem);
         if (error) {
           casadi_warning("Failed to set callback function");
           return 1;
@@ -738,8 +739,10 @@ namespace casadi {
   }
 
   GurobiInterface::GurobiInterface(DeserializingStream& s) : Conic(s) {
-    s.version("GurobiInterface", 2);
-    s.unpack("GurobiInterface::lazy_constraints_callback", lazy_constraints_callback_);
+    int version = s.version("GurobiInterface", 1, 2);
+    if (version>=2) {
+      s.unpack("GurobiInterface::lazy_constraints_callback", lazy_constraints_callback_);
+    }
     s.unpack("GurobiInterface::vtype", vtype_);
     s.unpack("GurobiInterface::opts", opts_);
     s.unpack("GurobiInterface::sos_weights", sos_weights_);
@@ -762,15 +765,16 @@ void GurobiInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize(s, sdp_to_socp_mem_);
   }
 
-void GurobiInterface::handle_lazy_constraints_callback(GRBmodel *model, void *cbdata, int where) {
+void GurobiInterface::handle_lazy_constraints_callback(GurobiMemory* mem,
+    GRBmodel *model, void *cbdata, int where) const {
   try {
     // Defensive checks
-    if (lazy_constraints_callback_.is_null() || !lazy_cb_mem_) {
+    if (lazy_constraints_callback_.is_null()) {
       casadi_warning("Lazy callback triggered but memory not initialized");
       return;
     }
 
-    auto& cb = *lazy_cb_mem_;
+    auto& cb = mem->lazy_cb_mem;
     CallbackDataHelper helper(cbdata, where);
 
     // 1. Get solution (reuse buffer)
