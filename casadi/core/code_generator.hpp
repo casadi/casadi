@@ -238,6 +238,25 @@ namespace casadi {
         \identifier{sd} */
     void scope_exit();
 
+    /** \brief Return from a scope with a value
+
+    *  Takes care of cleanup code
+
+        \identifier{2f4} */
+    void scope_return(const std::string& value);
+
+    /** \brief Return from a scope without a value
+
+    *  Takes care of cleanup code
+
+        \identifier{2f5} */
+    void scope_return();
+
+    /** \brief Add cleanup code to be executed upon scope exit
+
+        \identifier{2f6} */
+    void scope_add_cleanup(const std::string& code);
+
     /** \brief Declare a work vector element
 
         \identifier{se} */
@@ -262,6 +281,11 @@ namespace casadi {
 
         \identifier{si} */
     bool avoid_stack() const { return avoid_stack_;}
+
+    /** \brief Emit thead safe code chekout/release?
+
+        \identifier{2f7} */
+    bool thread_safe() const { return thread_safe_; }
 
     /** \brief Print a constant in a lossless but compact manner
 
@@ -690,7 +714,8 @@ namespace casadi {
       AUX_PRINTME,
       AUX_PRINT_SCALAR,
       AUX_PRINT_VECTOR,
-      AUX_PRINT_CANONICAL
+      AUX_PRINT_CANONICAL,
+      AUX_THREADS
     };
 
     /** \brief Add a built-in auxiliary function
@@ -975,6 +1000,9 @@ namespace casadi {
     // Force the external API to use canonical sparsity
     bool force_canonical;
 
+    // Emit thread-safe checkout/release?
+    bool thread_safe_;
+
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;
 
@@ -1017,6 +1045,8 @@ namespace casadi {
     std::multimap<size_t, size_t> added_char_constants_;
     std::multimap<size_t, size_t> added_string_constants_;
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;
+    std::vector<std::string> local_cleanup_;
+    bool local_void_;
     std::map<std::string, std::string> local_default_;
     std::map<const void *, casadi_int> file_scope_double_;
     std::map<const void *, casadi_int> file_scope_integer_;

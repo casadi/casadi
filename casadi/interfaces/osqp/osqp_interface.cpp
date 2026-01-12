@@ -49,7 +49,6 @@ namespace casadi {
                                    const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
 
-    has_refcount_ = true;
   }
 
   OsqpInterface::~OsqpInterface() {
@@ -345,20 +344,22 @@ namespace casadi {
 
     g.local("settings", "OSQPSettings");
     g << "osqp_set_default_settings(&settings);\n";
-    g << "settings.rho = " << settings_.rho << ";\n";
-    g << "settings.sigma = " << settings_.sigma << ";\n";
+    g << "settings.rho = " << g.constant(settings_.rho) << ";\n";
+    g << "settings.sigma = " << g.constant(settings_.sigma) << ";\n";
     g << "settings.scaling = " << settings_.scaling << ";\n";
     g << "settings.adaptive_rho = " << settings_.adaptive_rho << ";\n";
-    g << "settings.adaptive_rho_interval = " << settings_.adaptive_rho_interval << ";\n";
-    g << "settings.adaptive_rho_tolerance = " << settings_.adaptive_rho_tolerance << ";\n";
+    g << "settings.adaptive_rho_interval = " << settings_.adaptive_rho_interval
+      << ";\n";
+    g << "settings.adaptive_rho_tolerance = " << g.constant(settings_.adaptive_rho_tolerance)
+      << ";\n";
     //g << "settings.adaptive_rho_fraction = " << settings_.adaptive_rho_fraction << ";\n";
     g << "settings.max_iter = " << settings_.max_iter << ";\n";
-    g << "settings.eps_abs = " << settings_.eps_abs << ";\n";
-    g << "settings.eps_rel = " << settings_.eps_rel << ";\n";
-    g << "settings.eps_prim_inf = " << settings_.eps_prim_inf << ";\n";
-    g << "settings.eps_dual_inf = " << settings_.eps_dual_inf << ";\n";
-    g << "settings.alpha = " << settings_.alpha << ";\n";
-    g << "settings.delta = " << settings_.delta << ";\n";
+    g << "settings.eps_abs = " << g.constant(settings_.eps_abs) << ";\n";
+    g << "settings.eps_rel = " << g.constant(settings_.eps_rel) << ";\n";
+    g << "settings.eps_prim_inf = " << g.constant(settings_.eps_prim_inf) << ";\n";
+    g << "settings.eps_dual_inf = " << g.constant(settings_.eps_dual_inf) << ";\n";
+    g << "settings.alpha = " << g.constant(settings_.alpha) << ";\n";
+    g << "settings.delta = " << g.constant(settings_.delta) << ";\n";
     g << "settings.polish = " << settings_.polish << ";\n";
     g << "settings.polish_refine_iter = " << settings_.polish_refine_iter << ";\n";
     g << "settings.verbose = " << settings_.verbose << ";\n";

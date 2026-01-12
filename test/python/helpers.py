@@ -33,7 +33,15 @@ import time
 from contextlib import contextmanager
 from casadi.tools import capture_stdout
 import os
+import subprocess
 
+has_valgrind = True
+try:
+    subprocess.run(["valgrind","--version"])
+except:
+    has_valgrind = False    
+
+  
 codegen_check_digits = 15
 
 print("os" in os.environ)
@@ -648,7 +656,7 @@ class casadiTestCase(unittest.TestCase):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
   def compile_external(self,name,source,opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
-    import subprocess
+
     if args.run_slow:
       libdir = GlobalOptions.getCasadiPath()
       includedir = GlobalOptions.getCasadiIncludePath()
@@ -683,8 +691,11 @@ class casadiTestCase(unittest.TestCase):
 
       def get_commands(shared=True):
         if os.name=='nt':
+          flags = ''
+          if debug_mode:
+            flags = "/O1 /Zi"
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {definitions} /D_UCRT_NOISY_NAN {includedir} {source} {extra} /link  /libpath:{libdir} /out:{name}.dll /implib:{name}.lib".format(shared="/LD" if shared else "",std=std,source=source,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,name=name)
+          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {source} {extra} /link  /libpath:{libdir} /out:{name}.dll /implib:{name}.lib".format(shared="/LD" if shared else "",std=std,source=source,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),flags=flags,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,name=name)
           if shared:
             output = "./" + name + ".dll"
           else:
@@ -737,12 +748,12 @@ class casadiTestCase(unittest.TestCase):
     # Find symbols starting with 'casadi'
     exclude_symbols = ['casadi_alloc', 'casadi_alloc_arrays', 'casadi_decompress', 'casadi_deinit', 'casadi_eval', 'casadi_free', 'casadi_free_arrays', 'casadi_init', 'casadi_init_arrays']
     
-    bad_symbols = [s for s in all_exported if s.startswith('casadi') and not "free_mem" in s and not "incref" in s and not "decref" in s and not s in exclude_symbols]
+    bad_symbols = [s for s in all_exported if s.startswith('casadi') and not s in exclude_symbols]
 
     if bad_symbols:
-      self.fail(f"Found {len(bad_symbols)} symbols starting with 'casadi' exported in shared library (missing CASADI_PREFIX): {bad_symbols[:10]}")
+      self.fail("Found %d symbols starting with 'casadi' exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
@@ -792,8 +803,11 @@ class casadiTestCase(unittest.TestCase):
 
       def get_commands(shared=True):
         if os.name=='nt':
+          flags = ''
+          if debug_mode:
+            flags = "/O1 /Zi"
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {definitions} /D_UCRT_NOISY_NAN {includedir} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs)
+          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,flags=flags)
           if shared:
             output = "./" + name + ".dll"
           else:
@@ -822,7 +836,8 @@ class casadiTestCase(unittest.TestCase):
       self.check_symbols(libname, name+".c")
 
       if external_opts is None: external_opts = {}
-      F2 = external(F.name(), libname,external_opts)
+      if with_external:
+          F2 = external(F.name(), libname,external_opts)
 
       if main:
         [commands, exename] = get_commands(shared=False)
@@ -839,32 +854,45 @@ class casadiTestCase(unittest.TestCase):
         F.generate_in(F.name()+"_in.txt", inputs_main)
 
       if main:
-        with open(F.name()+"_out.txt","w") as stdout:
-          with open(F.name()+"_in.txt","r") as stdin:
-            commands = exename+" "+F.name()
-            print(commands+" < " + F.name()+"_in.txt")
-            p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
-            out = p.communicate()
-        print("Return code",p.returncode)
-        assert p.returncode in main_return_code
+        for tool in ["memcheck","helgrind","none"]:
+            with open(F.name()+"_out.txt","w") as stdout:
+              with open(F.name()+"_in.txt","r") as stdin:
+                commands = exename+" "+F.name()
+                if tool=="none":
+                    pass
+                elif tool=="memcheck" and valgrind and has_valgrind:
+                    commands = 'valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=42 --show-leak-kinds=all --suppressions=../internal/valgrind-codegen.supp ' + commands
+                elif tool=="helgrind" and helgrind and has_valgrind:
+                    commands = 'valgrind --tool=helgrind --error-exitcode=42 ' + commands
+                else:
+                    continue
+                print(commands+" < " + F.name()+"_in.txt")
+                p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
+                out = p.communicate()
+            print("Return code",p.returncode)
+            assert p.returncode in main_return_code
         if p.returncode!=0:
             # We are actively looking for failure,
             # so do not proceed with tests
             return
         
       Fout = F.call(inputs)
-      Fout2 = F2.call(inputs)
+      if with_external:
+          Fout2 = F2.call(inputs)
 
       if main:
         outputs = F.generate_out(F.name()+"_out.txt")
-        print(outputs)
+        print(F.name(),outputs)
         if isinstance(inputs,dict):
           outputs = F.convert_out(outputs)
           for k in F.name_out():
             self.checkarray(Fout[k],outputs[k],digits=digits)
         else:
           for i in range(F.n_out()):
-            self.checkarray(Fout[i],Fout2[i],digits=digits)
+            self.checkarray(Fout[i],outputs[i],digits=digits)
+
+      if not with_external:
+        return None, libname
 
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
@@ -874,7 +902,7 @@ class casadiTestCase(unittest.TestCase):
         for i in range(F.n_out()):
           self.checkarray(Fout[i],Fout2[i],digits=digits)
 
-      if self.check_serialize:
+      if check_serialize:
         self.check_serialize(F2,inputs=inputs)
         
       return F2, libname

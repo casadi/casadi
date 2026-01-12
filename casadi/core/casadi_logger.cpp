@@ -59,14 +59,16 @@ namespace casadi {
   void (*Logger::flush)(bool error) =Logger::flushDefault;
 
   std::ostream& uout() {
-    // Singleton pattern, lazily instantiated
-    static Logger::Stream<false> instance;
+    // Thread-local stream: each thread gets its own instance
+    // This prevents data races on stream state (width, fill, flags, etc.)
+    // while WriteFunThreadSafe still protects actual I/O with mutex
+    static thread_local Logger::Stream<false> instance;
     return instance;
   }
 
   std::ostream& uerr() {
-    // Singleton pattern, lazily instantiated
-    static Logger::Stream<true> instance;
+    // Thread-local stream: each thread gets its own instance
+    static thread_local Logger::Stream<true> instance;
     return instance;
   }
 

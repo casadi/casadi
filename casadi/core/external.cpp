@@ -26,7 +26,7 @@
 #include "external_impl.hpp"
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
-#include <casadi/config.h>
+#include "casadi_meta.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -34,7 +34,7 @@
 
 // Set default shared library suffix
 #ifndef SHARED_LIBRARY_SUFFIX
-#define SHARED_LIBRARY_SUFFIX CASADI_SHARED_LIBRARY_SUFFIX
+#define SHARED_LIBRARY_SUFFIX CasadiMeta::shared_library_suffix()
 #endif // SHARED_LIBRARY_SUFFIX
 
 namespace casadi {

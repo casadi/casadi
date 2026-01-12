@@ -1972,8 +1972,10 @@ namespace casadi {
     return new SXFunction(s);
   }
 
-  void SXFunction::find(std::map<FunctionInternal*, Function>& all_fun,
+  void SXFunction::find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
       casadi_int max_depth) const {
+    // Call to base class
+    FunctionInternal::find(all_fun, max_depth);
     for (auto&& e : algorithm_) {
       if (e.op == OP_CALL) {
         const ExtendedAlgEl& m = call_.el.at(e.i1);

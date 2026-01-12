@@ -64,6 +64,7 @@ namespace casadi {
     indent_ = 2;
     sz_zeros_ = 0;
     sz_ones_ = 0;
+    thread_safe_ = false;
 
     // Read options
     for (auto&& e : opts) {
@@ -121,6 +122,8 @@ namespace casadi {
           "Option max_initializer_elements_per_line must be >=0");
       } else if (e.first=="force_canonical") {
         this->force_canonical = e.second;
+      } else if (e.first=="thread_safe") {
+        thread_safe_ = e.second;
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -140,6 +143,8 @@ namespace casadi {
         this->real_min = "<NOT SPECIFIED>";
       }
     }
+
+    if (thread_safe_) add_auxiliary(AUX_THREADS);
 
     // Start at new line with no indentation
     newline_ = true;
@@ -203,6 +208,32 @@ namespace casadi {
   void CodeGenerator::scope_enter() {
     local_variables_.clear();
     local_default_.clear();
+    local_cleanup_.clear();
+    local_void_ = true;
+  }
+
+  void CodeGenerator::scope_return(const std::string& value) {
+    local_void_ = false;
+    if (local_cleanup_.empty()) {
+      *this << "return " << value << ";\n";
+      return;
+    }
+    local("ret", "int");
+    *this << "ret = " << value << ";\n";
+    *this << "goto done" << local_cleanup_.size() << ";\n";
+  }
+
+  void CodeGenerator::scope_return() {
+    if (local_cleanup_.empty()) {
+      *this << "return;\n";
+      return;
+    }
+    *this << "goto done" << local_cleanup_.size() << ";\n";
+  }
+
+
+  void CodeGenerator::scope_add_cleanup(const std::string& code) {
+    local_cleanup_.push_back(code);
   }
 
   void CodeGenerator::scope_exit() {
@@ -231,6 +262,19 @@ namespace casadi {
         cnt++;
       }
       body << ";\n";
+    }
+
+    // Loop over local_cleanup_ in reverse order
+    if (!local_cleanup_.empty()) {
+      *this << "done" << local_cleanup_.size() << ":\n";
+      for (casadi_int i=local_cleanup_.size()-1; i>=0; --i) {
+        *this << local_cleanup_[i];
+      }
+      if (local_void_) {
+        *this << "return;\n";
+      } else {
+        *this << "return ret;\n";
+      }
     }
   }
 
@@ -262,19 +306,6 @@ namespace casadi {
 
     // Print to file
     f->codegen(*this, fname);
-
-    // Codegen reference count functions, if needed
-    if (f->has_refcount_) {
-      // Increase reference counter
-      *this << "void " << fname << "_incref(void) {\n";
-      f->codegen_incref(*this);
-      *this << "}\n\n";
-
-      // Decrease reference counter
-      *this << "void " << fname << "_decref(void) {\n";
-      f->codegen_decref(*this);
-      *this << "}\n\n";
-    }
 
     bool fun_needs_mem = f->codegen_needs_mem();
     needs_mem_ |= fun_needs_mem;
@@ -323,6 +354,19 @@ namespace casadi {
       scope_exit();
       *this << "}\n\n";
 
+    }
+
+    // Codegen reference count functions, if needed
+    if (f->has_refcount_in_deps_) {
+      // Increase reference counter
+      *this << "void " << fname << "_incref(void) {\n";
+      f->codegen_incref(*this);
+      *this << "}\n\n";
+
+      // Decrease reference counter
+      *this << "void " << fname << "_decref(void) {\n";
+      f->codegen_decref(*this);
+      *this << "}\n\n";
     }
 
     // Flush to body
@@ -1174,9 +1218,21 @@ namespace casadi {
       local(mem, "int");
       std::string checkout = shorthand(cg_name + "_checkout");
       *this << mem << " = " << checkout << "();\n";
-      *this << "if (" << mem << "<0) return " << failure_ret << ";\n";
+      if (failure_ret.empty()) {
+        *this << "if (" << mem << "<0) {\n";
+        *this << "flag = 1;\n";
+        *this << "} else {\n";
+      } else {
+        *this << "if (" << mem << "<0) return " << failure_ret << ";\n";
+      }
+
       *this << "flag = " + name + "(" + arg + ", " + res + ", "
-              + iw + ", " + w + ", " << mem << ");\n";
+                + iw + ", " + w + ", " << mem << ");\n";
+
+      if (failure_ret.empty()) {
+        *this << "}\n";
+      }
+
       std::string release = shorthand(cg_name + "_release");
       *this << release << "(" << mem << ");\n";
       return "flag";
@@ -1887,6 +1943,9 @@ namespace casadi {
       add_auxiliary(AUX_PRINT_VECTOR);
       this->auxiliaries << sanitize_source(casadi_print_canonical_str, inst);
       break;
+    case AUX_THREADS:
+      this->auxiliaries << sanitize_source(casadi_threads_str, inst);
+      break;
     }
   }
 
@@ -2387,6 +2446,9 @@ namespace casadi {
     // Process C++ source
     std::string line;
     std::istringstream stream(src);
+
+    bool filter_macros = true; // Macro definitions are ignored
+
     while (std::getline(stream, line)) {
       size_t n1, n2;
 
@@ -2394,8 +2456,8 @@ namespace casadi {
       if (line.find("template")==0) continue;
 
       // Macro definitions are ignored
-      if (line.find("#define")==0) continue;
-      if (line.find("#undef")==0) continue;
+      if (filter_macros && line.find("#define")==0) continue;
+      if (filter_macros && line.find("#undef")==0) continue;
 
       // Inline declaration
       if (line == "inline") continue;
@@ -2432,6 +2494,14 @@ namespace casadi {
         // Ignore next line
         std::getline(stream, line);
         continue;
+      }
+
+      if (line.find("// FILTER-MACROS ON") != std::string::npos) {
+        filter_macros = true;
+      }
+
+      if (line.find("// FILTER-MACROS OFF") != std::string::npos) {
+        filter_macros = false;
       }
 
       // Ignore other C++ style comment

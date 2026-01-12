@@ -49,6 +49,8 @@ namespace casadi {
   DaqpInterface::DaqpInterface(const std::string& name,
                              const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
+
+    has_refcount_ = true;
   }
 
   const Options DaqpInterface::options_
@@ -90,31 +92,31 @@ namespace casadi {
     g << "daqp_default_settings(&p.settings);\n";
     for (auto&& op : opts_) {
       if (op.first=="primal_tol") {
-        g << "p.settings.primal_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.primal_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="dual_tol") {
-        g << "p.settings.dual_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.dual_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="zero_tol") {
-        g << "p.settings.zero_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.zero_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="pivot_tol") {
-        g << "p.settings.pivot_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.pivot_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="progress_tol") {
-        g << "p.settings.progress_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.progress_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="cycle_tol") {
         g << "p.settings.cycle_tol = " << op.second.to_int() << ";\n";
       } else if (op.first=="iter_limit") {
         g << "p.settings.iter_limit = " << op.second.to_int() << ";\n";
       } else if (op.first=="fval_bound") {
-        g << "p.settings.fval_bound = " << op.second.to_double() << ";\n";
+        g << "p.settings.fval_bound = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="eps_prox") {
-        g << "p.settings.eps_prox = " << op.second.to_double() << ";\n";
+        g << "p.settings.eps_prox = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="eta_prox") {
-        g << "p.settings.eta_prox = " << op.second.to_double() << ";\n";
+        g << "p.settings.eta_prox = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="rho_soft") {
-        g << "p.settings.rho_soft = " << op.second.to_double() << ";\n";
+        g << "p.settings.rho_soft = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="rel_subopt") {
-        g << "p.settings.rel_subopt = " << op.second.to_double() << ";\n";
+        g << "p.settings.rel_subopt = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="abs_subopt") {
-        g << "p.settings.abs_subopt = " << op.second.to_double() << ";\n";
+        g << "p.settings.abs_subopt = " << g.constant(op.second.to_double()) << ";\n";
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }

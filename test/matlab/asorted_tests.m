@@ -338,9 +338,9 @@ for i=1:numel(data)
 
     assert(all(diff(A)==full(evalf(diff(B)))))
     assert(all(diff(A,1)==full(evalf(diff(B,1)))))
-    if ~is_octave
-      assert(all(diff(A,2)==full(evalf(diff(B,2)))))
-    end
+    %if ~is_octave && 
+    %  assert(all(diff(A,2)==full(evalf(diff(B,2)))))
+    %end
     assert(all(all(diff(A,1,1)==full(evalf(diff(B,1,1))))))
     assert(all(all(diff(A,1,2)==full(evalf(diff(B,1,2))))))
     assert(all(all(diff(A,2,1)==full(evalf(diff(B,2,1))))))

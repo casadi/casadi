@@ -369,11 +369,12 @@ namespace casadi {
     virtual bool has_function(const std::string& fname) const {return false;}
 
     // Add embedded function to map, helper function
-    void add_embedded(std::map<FunctionInternal*, Function>& all_fun,
+    void add_embedded(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
       const Function& dep, casadi_int max_depth) const;
 
     // Get all embedded functions, recursively
-    virtual void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const {}
+    virtual void find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
+      casadi_int max_depth) const;
 
     /** \brief Which variables enter with some order
 
@@ -857,12 +858,12 @@ namespace casadi {
     /** \brief Codegen incref for dependencies
 
         \identifier{lr} */
-    virtual void codegen_incref(CodeGenerator& g) const {}
+    virtual void codegen_incref(CodeGenerator& g) const;
 
     /** \brief Codegen decref for dependencies
 
         \identifier{ls} */
-    virtual void codegen_decref(CodeGenerator& g) const {}
+    virtual void codegen_decref(CodeGenerator& g) const;
 
     /** \brief Codegen decref for alloc_mem
 
@@ -1354,6 +1355,11 @@ namespace casadi {
         \identifier{no} */
     bool has_refcount_;
 
+    /** \brief Reference counting in dependent functions
+
+        \identifier{2f2} */
+    bool has_refcount_in_deps_;
+
     /** \brief Values to prepopulate the function cache with
 
         \identifier{26h} */
@@ -1430,6 +1436,9 @@ namespace casadi {
 
     // Store a reference to a custom Jacobian
     Function custom_jacobian_;
+
+    // Registered functions
+    std::vector<Function> registered_functions_;
 
     // Counter for unique names for dumping inputs and output
 #ifdef CASADI_WITH_THREAD
