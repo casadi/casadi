@@ -71,9 +71,13 @@ namespace casadi {
   std::vector<double*> res;
   };
 
+  class GurobiInterface;
+
   struct CASADI_CONIC_GUROBI_EXPORT GurobiMemory : public ConicMemory {
     // Gurobi environment
     GRBenv *env;
+
+    const GurobiInterface* interface;
 
     int return_status;
 
@@ -86,6 +90,8 @@ namespace casadi {
     std::vector<int> sos_beg;
     std::vector<int> sos_ind;
     std::vector<int> sos_types;
+
+    LazyCallbackMemory lazy_cb_mem;
 
     /// Constructor
     GurobiMemory();
@@ -178,14 +184,14 @@ namespace casadi {
     /// User-provided callback function for MIPSOL events
     Function lazy_constraints_callback_;
 
-    // to store callback data
-    std::unique_ptr<LazyCallbackMemory> lazy_cb_mem_;
-
     /// Handle Lazy Constraints callback events (C API version)
-    void handle_lazy_constraints_callback(GRBmodel *model, void *cbdata, int where);
+    void handle_lazy_constraints_callback(GurobiMemory* mem, GRBmodel *model,
+                                          void *cbdata, int where) const;
 
     /// Process lazy constraints returned by user callback
-    void process_lazy_constraints(GRBmodel *model, void *cbdata, std::vector<double>* a_vec, double* b_val);
+    void process_lazy_constraints(GRBmodel *model, void *cbdata,
+                                   std::vector<double>* a_vec,
+                                   double* b_val) const;
 
   protected:
      /** \brief Deserializing constructor */
