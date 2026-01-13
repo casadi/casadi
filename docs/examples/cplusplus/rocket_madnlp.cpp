@@ -77,7 +77,6 @@ int main(){
   // MadNLP Options
   Dict solver_opts;
   //solver_opts["madnlp.linear_solver"] = "Ma27Solver";
-  solver_opts["gpu"] = true;
   solver_opts["madnlp.linear_solver"] = "CUDSSSolver";
   solver_opts["madnlp.tol"] = 1e-4;
   //solver_opts["madnlp.tol"] = 1e-9;
