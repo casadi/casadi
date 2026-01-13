@@ -112,7 +112,6 @@ class ConicTests(casadiTestCase):
   @memory_heavy()
   def test_binary(self):
     DM.rng(1)
-    rng = np.random.default_rng(0)
     n = 10
     m = 8
     ms = 5
