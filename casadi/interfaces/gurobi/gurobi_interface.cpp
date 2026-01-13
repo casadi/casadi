@@ -620,8 +620,7 @@ namespace casadi {
           return 1;
         }
         // Set the callback function
-        error = GRBsetcallbackfunc(model, gurobi_callback_function,
-                                  const_cast<GurobiInterface*>(this));
+        error = GRBsetcallbackfunc(model, gurobi_callback_function, mem);
         if (error) {
           casadi_warning("Failed to set callback function");
           return 1;
