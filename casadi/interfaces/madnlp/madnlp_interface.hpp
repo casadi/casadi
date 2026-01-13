@@ -118,9 +118,6 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
   /// convexify?
   bool convexify_;
 
-  /// use GPU interface?
-  bool gpu_;
-
   void set_madnlp_prob();
   void set_madnlp_prob(CodeGenerator& g) const;
 
