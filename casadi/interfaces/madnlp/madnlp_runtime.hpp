@@ -170,12 +170,7 @@ int casadi_madnlp_eval_obj(const T1* w, T1* res, void* user_data) {
   d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
-  std::cout << w[0] << std::endl;
-  std::cout << w[1] << std::endl;
-  std::cout << w[2] << std::endl;
-  calc_function(&d->prob->nlp_f, d_oracle);
-  std::cout << res[0] << std::endl;
-  return 0;
+  return calc_function(&d->prob->nlp_f, d_oracle);
 }
 
 // SYMBOL "madnlp_eval_obj"
