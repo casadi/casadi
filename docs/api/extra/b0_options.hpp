@@ -4044,6 +4044,7 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>lazy_constraints_callback</td><td>OT_FUNCTION</td><td>User callback for adding LazyConstraints at MIPSOL. Input: dict with solution data. Output: dict with lazy constraints.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
@@ -4075,6 +4076,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>gurobi</td><td>OT_DICT</td><td>Options to be passed to gurobi.</td></tr>
+<tr><td>lazy_constraints_callback</td><td>OT_FUNCTION</td><td>User callback for adding LazyConstraints at MIPSOL. Input: dict with solution data. Output: dict with lazy constraints.</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td></tr>
 <tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td></tr>
 <tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td></tr>
@@ -4125,6 +4127,7 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>lazy_constraints_callback</td><td>OT_FUNCTION</td><td>User callback for adding LazyConstraints at MIPSOL. Input: dict with solution data. Output: dict with lazy constraints.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>

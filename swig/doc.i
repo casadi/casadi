@@ -5119,6 +5119,12 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L
 ";
 
 
+// File: classcasadi_1_1CallbackDataHelper.xml
+%feature("docstring") casadi::CallbackDataHelper "
+
+[INTERNAL] ";
+
+
 // File: classcasadi_1_1casadi__limits.xml
 %feature("docstring") casadi::casadi_limits "
 
@@ -54725,22 +54731,32 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_22q
 
 >List of available options
 
-+-------------+-----------------------+------------------------------------+
-|     Id      |         Type          |            Description             |
-+=============+=======================+====================================+
-| gurobi      | OT_DICT               | Options to be passed to gurobi.    |
-+-------------+-----------------------+------------------------------------+
-| sos_groups  | OT_INTVECTORVECTOR    | Definition of SOS groups by        |
-|             |                       | indices.                           |
-+-------------+-----------------------+------------------------------------+
-| sos_types   | OT_INTVECTOR          | Specify 1 or 2 for each SOS group. |
-+-------------+-----------------------+------------------------------------+
-| sos_weights | OT_DOUBLEVECTORVECTOR | Weights corresponding to SOS       |
-|             |                       | entries.                           |
-+-------------+-----------------------+------------------------------------+
-| vtype       | OT_STRINGVECTOR       | Type of variables: [CONTINUOUS|bin |
-|             |                       | ary|integer|semicont|semiint]      |
-+-------------+-----------------------+------------------------------------+
++-------------------------+-----------------------+------------------------+
+|           Id            |         Type          |      Description       |
++=========================+=======================+========================+
+| gurobi                  | OT_DICT               | Options to be passed   |
+|                         |                       | to gurobi.             |
++-------------------------+-----------------------+------------------------+
+| lazy_constraints_callba | OT_FUNCTION           | User callback for      |
+| ck                      |                       | adding LazyConstraints |
+|                         |                       | at MIPSOL. Input :     |
+|                         |                       | dict with solution     |
+|                         |                       | data. Output : dict    |
+|                         |                       | with lazy constraints. |
++-------------------------+-----------------------+------------------------+
+| sos_groups              | OT_INTVECTORVECTOR    | Definition of SOS      |
+|                         |                       | groups by indices.     |
++-------------------------+-----------------------+------------------------+
+| sos_types               | OT_INTVECTOR          | Specify 1 or 2 for     |
+|                         |                       | each SOS group.        |
++-------------------------+-----------------------+------------------------+
+| sos_weights             | OT_DOUBLEVECTORVECTOR | Weights corresponding  |
+|                         |                       | to SOS entries.        |
++-------------------------+-----------------------+------------------------+
+| vtype                   | OT_STRINGVECTOR       | Type of variables: [CO |
+|                         |                       | NTINUOUS|binary|intege |
+|                         |                       | r|semicont|semiint]    |
++-------------------------+-----------------------+------------------------+
 
 
 
