@@ -46,7 +46,6 @@ int main(){
 
   Dict solver_opts;
   //solver_opts["madnlp.print_level"] = 1;
-  solver_opts["gpu"] = true;
   solver_opts["madnlp.linear_solver"] = "CUDSSSolver";
   solver_opts["madnlp.tol"] = 1e-4;
   // Create an NLP solver

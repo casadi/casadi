@@ -794,6 +794,7 @@ set(BUILD_MOCKUPS_GIT_REPO "https://github.com/casadi/mockups.git" CACHE STRING 
 set(BUILD_MOCKUPS_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for MOCKUPS")
 set(BUILD_MOCKUPS_VERSION "master" CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
+# MadNLP: A sparse interior point NLP solver with filter line-search, written in Julia, supporting GPU-accelerated Linear Algebra
 option(WITH_MADNLP "Compile the interface to MadNLP"  OFF)
 option(WITH_MOCKUP_MADNLP "Use mockup MadNLP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 option(WITH_BUILD_MADNLP "Download compiled libMad"  OFF)
