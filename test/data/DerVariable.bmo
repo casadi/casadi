@@ -1,0 +1,14 @@
+//! base 0.1.0
+package 'DerVariable'
+  model 'DerVariable'
+    Real 'x'(start = 1.0);
+    Real 'y'(start = 2.0);
+    Real 'dx_dt';
+    Real 'dy_dt';
+  equation
+    der('x') = -0.5 * 'x' + 'y';
+    der('y') = 'x' - 0.3 * 'y';
+    'dx_dt' = der('x');
+    'dy_dt' = der('y');
+  end 'DerVariable';
+end 'DerVariable';

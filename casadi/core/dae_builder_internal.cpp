@@ -41,6 +41,9 @@
 #include "fmu_function.hpp"
 #include "integrator.hpp"
 #include "filesystem_impl.hpp"
+#include "translator.hpp"
+#include "resource_internal.hpp"
+#include "modelica_parser.hpp"
 
 // Throw informative error message
 #define THROW_ERROR_NODE(FNAME, NODE, WHAT) \
@@ -607,8 +610,27 @@ DaeBuilderInternal::~DaeBuilderInternal() {
   }
 }
 
+// Static helper to open a resource from a path
+static Resource open_resource(const std::string& path) {
+  // Check for .bmo extension (Lace Modelica binary model)
+  if (path.size() >= 4 && path.substr(path.size() - 4) == ".bmo") {
+    // Create temporary directory resource
+    std::string bmo_file = Filesystem::filename(path);
+    TemporaryDirResource* res = new TemporaryDirResource(bmo_file, "temp");
+
+    // Use Lace Modelica plugin to process BMO and populate the directory
+    ModelicaParser parser("lacemodelica");
+    parser.parse(path, res->path());
+
+    return Resource::create(res);
+  }
+
+  // Default: treat as FMU (zip file or directory)
+  return Resource(path);
+}
+
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path,
-    const Dict& opts) : name_(name), resource_(path) {
+    const Dict& opts) : name_(name), resource_(open_resource(path)) {
   clear_cache_ = false;
   number_of_event_indicators_ = 0;
   provides_directional_derivatives_ = false;
@@ -767,6 +789,141 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   } catch (std::exception& e) {
     // May want to output this information
     (void)e;  // unused
+  }
+
+
+  std::string onnx_filename = resource_.path()
+    + "/extra/org.lacemodelica.ls-onnx-serialization/model.onnx";
+  if (Filesystem::exists(onnx_filename)) {
+    // Load ONNX model using translator
+    Translator t("onnx");
+    t.load(onnx_filename);
+    Function oracle = t.create("oracle");
+
+    // Get expressions
+    auto oracle_in = oracle.mx_in();
+    auto oracle_out = oracle(oracle_in);
+
+    // Build mapping from input index to variable name
+    std::vector<std::string> input_var_names;
+    for (casadi_int i = 0; i < oracle.n_in(); ++i) {
+      input_var_names.push_back(oracle.name_in(i));
+    }
+
+    // Get all substitutions: map oracle variables to DaeBuilder variables
+    std::vector<MX> v, vdef;
+    for (auto& arg : oracle_in) {
+      // Loop over symbolic primitives
+      for (auto& vp : arg.primitives()) {
+        // Find the variable by name
+        size_t ind = find(vp.name());
+        // Add to list of replacements
+        v.push_back(vp);
+        vdef.push_back(var(ind));
+      }
+    }
+
+    // Substitute expressions in oracle outputs
+    oracle_out = substitute(oracle_out, v, vdef);
+
+    // Process each output based on its category
+    // Output naming convention from Lace Modelica:
+    //   eq[N]      - equation residual (lhs - rhs = 0)
+    //   init_eq[N] - initial equation residual
+    //   start[N]   - start value for variable at input index N
+    //   min[N]     - minimum bound for variable at input index N
+    //   max[N]     - maximum bound for variable at input index N
+    for (size_t i = 0; i < oracle_out.size(); ++i) {
+      std::string out_name = oracle.name_out(i);
+      MX expr = oracle_out[i];
+
+      // Parse the output name to determine category
+      bool is_init_eq = out_name.substr(0, 8) == "init_eq[";
+      bool is_dyn_eq = out_name.substr(0, 3) == "eq[" && !is_init_eq;
+
+      if (is_dyn_eq || is_init_eq) {
+        // Equation residual: (lhs - rhs) = 0, so lhs = rhs
+        // Check if it's a subtraction with 2 dependencies
+        if (expr.n_dep() == 2) {
+          MX lhs = expr.dep(0);  // The left-hand side
+          MX rhs = expr.dep(1);  // The right-hand side
+
+          if (is_init_eq) {
+            // Initial equation: set initial value for the variable
+            if (lhs.is_symbolic()) {
+              std::string var_name = lhs.name();
+              set_init(var_name, rhs);
+            }
+          } else {
+            // Dynamic equation
+            if (lhs.is_symbolic()) {
+              // Simple variable on LHS: var = rhs (binding equation)
+              std::string var_name = lhs.name();
+              size_t var_ind = find(var_name);
+              Variable& var_ref = variable(var_ind);
+              var_ref.bind = assign(var_name, rhs).index;
+            } else {
+              // Complex expression on LHS (e.g., m*c_p*der(T))
+              // Use implicit residual form: 0 = lhs - rhs
+              eq(MX(0), lhs - rhs, Dict());
+            }
+          }
+        }
+      } else if (out_name.substr(0, 6) == "start[") {
+        // Start value: start[N] where N is the input index
+        size_t bracket_pos = out_name.find('[');
+        size_t close_pos = out_name.find(']');
+        if (bracket_pos != std::string::npos && close_pos != std::string::npos) {
+          casadi_int idx = std::stoi(out_name.substr(bracket_pos + 1, close_pos - bracket_pos - 1));
+          if (idx >= 0 && idx < static_cast<casadi_int>(input_var_names.size())) {
+            std::string var_name = input_var_names[idx];
+            Variable& var_ref = variable(var_name);
+            // If it's a constant, we can evaluate it
+            if (expr.is_constant()) {
+              DM dm_val = static_cast<DM>(expr);
+              var_ref.start = std::vector<double>(dm_val->begin(), dm_val->end());
+            }
+            // TODO: Handle symbolic start expressions
+          }
+        }
+      } else if (out_name.substr(0, 4) == "min[") {
+        // Minimum bound: min[N] where N is the input index
+        size_t bracket_pos = out_name.find('[');
+        size_t close_pos = out_name.find(']');
+        if (bracket_pos != std::string::npos && close_pos != std::string::npos) {
+          casadi_int idx = std::stoi(out_name.substr(bracket_pos + 1, close_pos - bracket_pos - 1));
+          if (idx >= 0 && idx < static_cast<casadi_int>(input_var_names.size())) {
+            std::string var_name = input_var_names[idx];
+            Variable& var_ref = variable(var_name);
+            // If it's a constant, we can evaluate it
+            if (expr.is_constant()) {
+              DM dm_val = static_cast<DM>(expr);
+              var_ref.min = static_cast<double>(dm_val);
+            }
+            // TODO: Handle symbolic min expressions
+          }
+        }
+      } else if (out_name.substr(0, 4) == "max[") {
+        // Maximum bound: max[N] where N is the input index
+        size_t bracket_pos = out_name.find('[');
+        size_t close_pos = out_name.find(']');
+        if (bracket_pos != std::string::npos && close_pos != std::string::npos) {
+          casadi_int idx = std::stoi(out_name.substr(bracket_pos + 1, close_pos - bracket_pos - 1));
+          if (idx >= 0 && idx < static_cast<casadi_int>(input_var_names.size())) {
+            std::string var_name = input_var_names[idx];
+            Variable& var_ref = variable(var_name);
+            // If it's a constant, we can evaluate it
+            if (expr.is_constant()) {
+              DM dm_val = static_cast<DM>(expr);
+              var_ref.max = static_cast<double>(dm_val);
+            }
+            // TODO: Handle symbolic max expressions
+          }
+        }
+      }
+    }
+
+    symbolic_ = true;
   }
 
   // Add symbolic binding equations

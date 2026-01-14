@@ -1083,6 +1083,17 @@ class requires_rootfinder(object):
       print("Not available RFP plugin %s, skipping unittests" % self.n)
       return None
 
+class requires_modelicaparser(object):
+  def __init__(self,n):
+    self.n = n
+
+  def __call__(self,c):
+    if has_modelicaparser(self.n):
+      return c
+    else:
+      print("Not available ModelicaParser plugin %s, skipping unittests" % self.n)
+      return None
+
 class requiresPlugin(object):
   def __init__(self,att,n):
     self.att = att
