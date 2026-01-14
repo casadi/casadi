@@ -1,0 +1,89 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+
+#ifndef CASADI_MODELICA_PARSER_HPP
+#define CASADI_MODELICA_PARSER_HPP
+
+#include "modelica_parser.hpp"
+#include "shared_object.hpp"
+#include "printable.hpp"
+
+namespace casadi {
+
+  /** Forward declaration of internal class */
+  class ModelicaParserInternal;
+
+  /** \brief Modelica parser
+
+      Can be used for parsing Modelica files into CasADi data structures.
+
+      \author Joris Gillis
+      \date 2026 */
+  class CASADI_EXPORT ModelicaParser
+    : public SharedObject,
+      public SWIG_IF_ELSE(PrintableCommon, Printable<ModelicaParser>) {
+  public:
+    /** \brief Get type name */
+    static std::string type_name() {return "ModelicaParser";}
+
+    // Default constructor
+    ModelicaParser();
+
+    // Constructor
+    ModelicaParser(const std::string& name);
+
+    // Destructor
+    ~ModelicaParser();
+
+    /// Load a plugin dynamically
+    static void load_plugin(const std::string& name);
+
+    /// Get solver specific documentation
+    static std::string doc(const std::string& name);
+
+#ifndef SWIG
+    /** \brief  Access functions of the node */
+    ModelicaParserInternal* operator->();
+
+    /** \brief  Const access functions of the node */
+    const ModelicaParserInternal* operator->() const;
+#endif // SWIG
+
+    // Parse a Modelica file and generate output in the given directory
+    void parse(const std::string& filename, const std::string& output_dir);
+  };
+
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_modelicaparser(const std::string& name);
+
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_modelicaparser(const std::string& name);
+
+  /// Get solver specific documentation
+  CASADI_EXPORT std::string doc_modelicaparser(const std::string& name);
+
+} // namespace casadi
+
+#endif // CASADI_MODELICA_PARSER_HPP
