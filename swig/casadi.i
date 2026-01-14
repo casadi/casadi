@@ -5759,6 +5759,7 @@ namespace casadi{
 %include <casadi/core/expm.hpp>
 %include <casadi/core/interpolant.hpp>
 %include <casadi/core/blazing_spline.hpp>
+%include <casadi/core/modelica_parser.hpp>
 
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/code_generator.hpp>
