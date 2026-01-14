@@ -94,6 +94,10 @@ if(WITH_TINYXML)
   add_subdirectory(tinyxml)
 endif()
 
+if(WITH_LACEMODELICA)
+  add_subdirectory(lacemodelica)
+endif()
+
 if(WITH_BLOCKSQP)
   add_subdirectory(blocksqp)
 endif()

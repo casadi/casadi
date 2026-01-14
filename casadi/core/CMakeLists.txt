@@ -95,6 +95,7 @@ set(CASADI_PUBLIC
   nlp_builder.hpp
   xml_node.hpp
   xml_file.hpp
+  modelica_parser.hpp
   dae_builder.hpp
   optistack.hpp
   serializer.hpp
@@ -224,6 +225,7 @@ set(CASADI_INTERNAL
   nlp_builder.cpp
   xml_node.cpp
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
+  modelica_parser.cpp         modelica_parser_internal.hpp         modelica_parser_internal.cpp
   dae_builder.cpp             dae_builder_internal.hpp             dae_builder_internal.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
   serializer.cpp              serializing_stream.cpp
