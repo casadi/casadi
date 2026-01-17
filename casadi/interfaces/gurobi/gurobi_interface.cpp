@@ -291,10 +291,17 @@ namespace casadi {
     LazyCallbackMemory* cb = &m->lazy_cb_mem;
     cb->nx = nx_;
 
-    cb->sz_arg = lazy_constraints_callback_.sz_arg();
-    cb->sz_res = lazy_constraints_callback_.sz_res();
-    cb->sz_iw  = lazy_constraints_callback_.sz_iw();
-    cb->sz_w   = lazy_constraints_callback_.sz_w();
+    if (lazy_constraints_callback_.is_null()) {
+        cb->sz_arg = 0;
+        cb->sz_res = 0;
+        cb->sz_iw  = 0;
+        cb->sz_w   = 0;
+    } else {
+      cb->sz_arg = lazy_constraints_callback_.sz_arg();
+      cb->sz_res = lazy_constraints_callback_.sz_res();
+      cb->sz_iw  = lazy_constraints_callback_.sz_iw();
+      cb->sz_w   = lazy_constraints_callback_.sz_w();
+    }
 
     cb->x_vals.resize(nx_);
     cb->obj_val = 0;
