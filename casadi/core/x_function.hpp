@@ -97,6 +97,27 @@ namespace casadi {
         \identifier{xs} */
     std::vector<MatType> jac(const Dict& opts) const;
 
+    /// Helper: build forward seed for one direction
+    void jac_build_fwd_seed(std::vector<MatType>& seed, casadi_int iind,
+                            const Sparsity& D, casadi_int d_offset) const;
+
+    /// Helper: build adjoint seed for one direction
+    void jac_build_adj_seed(std::vector<MatType>& seed, casadi_int oind,
+                            const Sparsity& D, casadi_int d_offset) const;
+
+    /// Helper: scatter forward sensitivities to Jacobian for one direction
+    void jac_scatter_fwd(MatType& ret, const MatType& sens,
+                         casadi_int oind, casadi_int iind,
+                         const Sparsity& D, casadi_int d_offset,
+                         const Sparsity& jsp, const Sparsity& jsp_trans,
+                         const std::vector<casadi_int>& mapping,
+                         bool symmetric) const;
+
+    /// Helper: scatter adjoint sensitivities to Jacobian for one direction
+    void jac_scatter_adj(MatType& ret, const MatType& sens, casadi_int iind,
+                         const Sparsity& D, casadi_int d_offset,
+                         const Sparsity& jsp) const;
+
     /** \brief Check if the function is of a particular type
 
         \identifier{xt} */
@@ -426,6 +447,235 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>
+  ::jac_build_fwd_seed(std::vector<MatType>& seed, casadi_int iind,
+                       const Sparsity& D, casadi_int d_offset) const {
+    // Input sparsity
+    std::vector<casadi_int> input_col = sparsity_in_.at(iind).get_col();
+    const casadi_int* input_row = sparsity_in_.at(iind).row();
+
+    // Nonzeros of the seed matrix
+    std::vector<casadi_int> seed_col, seed_row;
+
+    // For all the directions
+    for (casadi_int el = D.colind(d_offset); el<D.colind(d_offset+1); ++el) {
+
+      // Get the direction
+      casadi_int c = D.row(el);
+
+      // Give a seed in the direction
+      seed_col.push_back(input_col[c]);
+      seed_row.push_back(input_row[c]);
+    }
+
+    // initialize to zero
+    seed.resize(n_in_);
+    for (casadi_int ind=0; ind<seed.size(); ++ind) {
+      casadi_int nrow = size1_in(ind), ncol = size2_in(ind); // Input dimensions
+      if (ind==iind) {
+        seed[ind] = MatType::ones(Sparsity::triplet(nrow, ncol, seed_row, seed_col));
+      } else {
+        seed[ind] = MatType(nrow, ncol);
+      }
+    }
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>
+  ::jac_build_adj_seed(std::vector<MatType>& seed, casadi_int oind,
+                       const Sparsity& D, casadi_int d_offset) const {
+    // Output sparsity
+    std::vector<casadi_int> output_col = sparsity_out_.at(oind).get_col();
+    const casadi_int* output_row = sparsity_out_.at(oind).row();
+
+    // Nonzeros of the seed matrix
+    std::vector<casadi_int> seed_col, seed_row;
+
+    // For all the directions
+    for (casadi_int el = D.colind(d_offset); el<D.colind(d_offset+1); ++el) {
+
+      // Get the direction
+      casadi_int c = D.row(el);
+
+      // Give a seed in the direction
+      seed_col.push_back(output_col[c]);
+      seed_row.push_back(output_row[c]);
+    }
+
+    //initialize to zero
+    seed.resize(n_out_);
+    for (casadi_int ind=0; ind<seed.size(); ++ind) {
+      casadi_int nrow = size1_out(ind), ncol = size2_out(ind); // Output dimensions
+      if (ind==oind) {
+        seed[ind] = MatType::ones(Sparsity::triplet(nrow, ncol, seed_row, seed_col));
+      } else {
+        seed[ind] = MatType(nrow, ncol);
+      }
+    }
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>
+  ::jac_scatter_fwd(MatType& ret, const MatType& sens,
+                    casadi_int oind, casadi_int iind,
+                    const Sparsity& D, casadi_int d_offset,
+                    const Sparsity& jsp, const Sparsity& jsp_trans,
+                    const std::vector<casadi_int>& mapping,
+                    bool symmetric) const {
+    // Skip if nothing to add
+    if (sens.nnz()==0) {
+      return;
+    }
+
+    // Temporary vectors
+    std::vector<casadi_int> tmp, nzmap, nzmap2, adds, adds2;
+
+    // Get direct access to jsp sparsity
+    const casadi_int* jsp_colind = jsp.colind();
+    const casadi_int* jsp_row = jsp.row();
+
+    // If symmetric, see how many times each output appears
+    if (symmetric) {
+      // Initialize to zero
+      tmp.resize(nnz_out(oind));
+      std::fill(tmp.begin(), tmp.end(), 0);
+
+      // "Multiply" Jacobian sparsity by seed vector
+      for (casadi_int el = D.colind(d_offset); el<D.colind(d_offset+1); ++el) {
+
+        // Get the input nonzero
+        casadi_int c = D.row(el);
+
+        // Propagate dependencies
+        for (casadi_int el_jsp=jsp_colind[c]; el_jsp<jsp_colind[c+1]; ++el_jsp) {
+          tmp[jsp_row[el_jsp]]++;
+        }
+      }
+    }
+
+    // Locate the nonzeros of the forward sensitivity matrix
+    sparsity_out_.at(oind).find(nzmap);
+    sens.sparsity().get_nz(nzmap);
+
+    if (symmetric) {
+      sparsity_in_.at(iind).find(nzmap2);
+      sens.sparsity().get_nz(nzmap2);
+    }
+
+    // Assignments to the Jacobian
+    adds.resize(sens.nnz());
+    std::fill(adds.begin(), adds.end(), -1);
+    if (symmetric) {
+      adds2.resize(adds.size());
+      std::fill(adds2.begin(), adds2.end(), -1);
+    }
+
+    // For all the input nonzeros treated in the sweep
+    for (casadi_int el = D.colind(d_offset); el<D.colind(d_offset+1); ++el) {
+
+      // Get the input nonzero
+      casadi_int c = D.row(el);
+      //casadi_int f2_out;
+      //if (symmetric) {
+      //  f2_out = nzmap2[c];
+      //}
+
+      // Loop over the output nonzeros corresponding to this input nonzero
+      for (casadi_int el_out = jsp_trans.colind(c); el_out<jsp_trans.colind(c+1); ++el_out) {
+
+        // Get the output nonzero
+        casadi_int r_out = jsp_trans.row(el_out);
+
+        // Get the forward sensitivity nonzero
+        casadi_int f_out = nzmap[r_out];
+        if (f_out<0) continue; // Skip if structurally zero
+
+        // The nonzero of the Jacobian now treated
+        casadi_int elJ = mapping[el_out];
+
+        if (symmetric) {
+          if (tmp[r_out]==1) {
+            adds[f_out] = el_out;
+            adds2[f_out] = elJ;
+          }
+        } else {
+          // Get the output seed
+          adds[f_out] = elJ;
+        }
+      }
+    }
+
+    // Get entries in sens with nonnegative indices
+    tmp.resize(adds.size());
+    casadi_int sz = 0;
+    for (casadi_int i=0; i<adds.size(); ++i) {
+      if (adds[i]>=0) {
+        adds[sz] = adds[i];
+        tmp[sz++] = i;
+      }
+    }
+    adds.resize(sz);
+    tmp.resize(sz);
+
+    // Add contribution to the Jacobian
+    ret.nz(adds) = sens.nz(tmp);
+
+    if (symmetric) {
+      // Get entries in sens with nonnegative indices
+      tmp.resize(adds2.size());
+      sz = 0;
+      for (casadi_int i=0; i<adds2.size(); ++i) {
+        if (adds2[i]>=0) {
+          adds2[sz] = adds2[i];
+          tmp[sz++] = i;
+        }
+      }
+      adds2.resize(sz);
+      tmp.resize(sz);
+
+      // Add contribution to the Jacobian
+      ret.nz(adds2) = sens.nz(tmp);
+    }
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>
+  ::jac_scatter_adj(MatType& ret, const MatType& sens, casadi_int iind,
+                    const Sparsity& D, casadi_int d_offset,
+                    const Sparsity& jsp) const {
+    // Skip if nothing to add
+    if (sens.nnz()==0) {
+      return;
+    }
+
+    // Locate the nonzeros of the adjoint sensitivity matrix
+    std::vector<casadi_int> nzmap;
+    sparsity_in_.at(iind).find(nzmap);
+    sens.sparsity().get_nz(nzmap);
+
+    // For all the output nonzeros treated in the sweep
+    for (casadi_int el = D.colind(d_offset); el<D.colind(d_offset+1); ++el) {
+
+      // Get the output nonzero
+      casadi_int r = D.row(el);
+
+      // Loop over the input nonzeros that influences this output nonzero
+      for (casadi_int elJ = jsp.colind(r); elJ<jsp.colind(r+1); ++elJ) {
+
+        // Get the input nonzero
+        casadi_int inz = jsp.row(elJ);
+
+        // Get the corresponding adjoint sensitivity nonzero
+        casadi_int anz = nzmap[inz];
+        if (anz<0) continue;
+
+        // Get the input seed
+        ret.nz(elJ) = sens.nz(anz);
+      }
+    }
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
   std::vector<MatType> XFunction<DerivedType, MatType, NodeType>
   ::jac(const Dict& opts) const {
     try {
@@ -498,24 +748,11 @@ namespace casadi {
       // Current forward and adjoint direction
       casadi_int offset_nfdir = 0, offset_nadir = 0;
 
-      // Evaluation result (known)
-      std::vector<MatType> res(out_);
-
       // Forward and adjoint seeds and sensitivities
       std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
 
       // Get the sparsity of the Jacobian block
       Sparsity jsp = jac_sparsity(0, 0, true, symmetric).T();
-      const casadi_int* jsp_colind = jsp.colind();
-      const casadi_int* jsp_row = jsp.row();
-
-      // Input sparsity
-      std::vector<casadi_int> input_col = sparsity_in_.at(iind).get_col();
-      const casadi_int* input_row = sparsity_in_.at(iind).row();
-
-      // Output sparsity
-      std::vector<casadi_int> output_col = sparsity_out_.at(oind).get_col();
-      const casadi_int* output_row = sparsity_out_.at(oind).row();
 
       // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
       if (verbose_) casadi_message("jac transposes and mapping");
@@ -524,15 +761,6 @@ namespace casadi {
       if (nfdir>0) {
         jsp_trans = jsp.transpose(mapping);
       }
-
-      // The nonzeros of the sensitivity matrix
-      std::vector<casadi_int> nzmap, nzmap2;
-
-      // Additions to the jacobian matrix
-      std::vector<casadi_int> adds, adds2;
-
-      // Temporary vector
-      std::vector<casadi_int> tmp;
 
       // Progress
       casadi_int progress = -10;
@@ -547,9 +775,6 @@ namespace casadi {
         casadi_message(str(nsweep) + " sweeps needed for " + str(nfdir) + " forward and "
                        + str(nadir) + " reverse directions");
       }
-
-      // Sparsity of the seeds
-      std::vector<casadi_int> seed_col, seed_row;
 
       // Evaluate until everything has been determined
       for (casadi_int s=0; s<nsweep; ++s) {
@@ -570,61 +795,13 @@ namespace casadi {
         // Forward seeds
         fseed.resize(nfdir_batch);
         for (casadi_int d=0; d<nfdir_batch; ++d) {
-          // Nonzeros of the seed matrix
-          seed_col.clear();
-          seed_row.clear();
-
-          // For all the directions
-          for (casadi_int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
-
-            // Get the direction
-            casadi_int c = D1.row(el);
-
-            // Give a seed in the direction
-            seed_col.push_back(input_col[c]);
-            seed_row.push_back(input_row[c]);
-          }
-
-          // initialize to zero
-          fseed[d].resize(n_in_);
-          for (casadi_int ind=0; ind<fseed[d].size(); ++ind) {
-            casadi_int nrow = size1_in(ind), ncol = size2_in(ind); // Input dimensions
-            if (ind==iind) {
-              fseed[d][ind] = MatType::ones(Sparsity::triplet(nrow, ncol, seed_row, seed_col));
-            } else {
-              fseed[d][ind] = MatType(nrow, ncol);
-            }
-          }
+          jac_build_fwd_seed(fseed[d], iind, D1, offset_nfdir+d);
         }
 
         // Adjoint seeds
         aseed.resize(nadir_batch);
         for (casadi_int d=0; d<nadir_batch; ++d) {
-          // Nonzeros of the seed matrix
-          seed_col.clear();
-          seed_row.clear();
-
-          // For all the directions
-          for (casadi_int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el) {
-
-            // Get the direction
-            casadi_int c = D2.row(el);
-
-            // Give a seed in the direction
-            seed_col.push_back(output_col[c]);
-            seed_row.push_back(output_row[c]);
-          }
-
-          //initialize to zero
-          aseed[d].resize(n_out_);
-          for (casadi_int ind=0; ind<aseed[d].size(); ++ind) {
-            casadi_int nrow = size1_out(ind), ncol = size2_out(ind); // Output dimensions
-            if (ind==oind) {
-              aseed[d][ind] = MatType::ones(Sparsity::triplet(nrow, ncol, seed_row, seed_col));
-            } else {
-              aseed[d][ind] = MatType(nrow, ncol);
-            }
-          }
+          jac_build_adj_seed(aseed[d], oind, D2, offset_nadir+d);
         }
 
         // Forward sensitivities
@@ -662,146 +839,13 @@ namespace casadi {
 
         // Carry out the forward sweeps
         for (casadi_int d=0; d<nfdir_batch; ++d) {
-          // Skip if nothing to add
-          if (fsens[d][oind].nnz()==0) {
-            continue;
-          }
-
-          // If symmetric, see how many times each output appears
-          if (symmetric) {
-            // Initialize to zero
-            tmp.resize(nnz_out(oind));
-            std::fill(tmp.begin(), tmp.end(), 0);
-
-            // "Multiply" Jacobian sparsity by seed vector
-            for (casadi_int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
-
-              // Get the input nonzero
-              casadi_int c = D1.row(el);
-
-              // Propagate dependencies
-              for (casadi_int el_jsp=jsp_colind[c]; el_jsp<jsp_colind[c+1]; ++el_jsp) {
-                tmp[jsp_row[el_jsp]]++;
-              }
-            }
-          }
-
-          // Locate the nonzeros of the forward sensitivity matrix
-          sparsity_out_.at(oind).find(nzmap);
-          fsens[d][oind].sparsity().get_nz(nzmap);
-
-          if (symmetric) {
-            sparsity_in_.at(iind).find(nzmap2);
-            fsens[d][oind].sparsity().get_nz(nzmap2);
-          }
-
-          // Assignments to the Jacobian
-          adds.resize(fsens[d][oind].nnz());
-          std::fill(adds.begin(), adds.end(), -1);
-          if (symmetric) {
-            adds2.resize(adds.size());
-            std::fill(adds2.begin(), adds2.end(), -1);
-          }
-
-          // For all the input nonzeros treated in the sweep
-          for (casadi_int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
-
-            // Get the input nonzero
-            casadi_int c = D1.row(el);
-            //casadi_int f2_out;
-            //if (symmetric) {
-            //  f2_out = nzmap2[c];
-            //}
-
-            // Loop over the output nonzeros corresponding to this input nonzero
-            for (casadi_int el_out = jsp_trans.colind(c); el_out<jsp_trans.colind(c+1); ++el_out) {
-
-              // Get the output nonzero
-              casadi_int r_out = jsp_trans.row(el_out);
-
-              // Get the forward sensitivity nonzero
-              casadi_int f_out = nzmap[r_out];
-              if (f_out<0) continue; // Skip if structurally zero
-
-              // The nonzero of the Jacobian now treated
-              casadi_int elJ = mapping[el_out];
-
-              if (symmetric) {
-                if (tmp[r_out]==1) {
-                  adds[f_out] = el_out;
-                  adds2[f_out] = elJ;
-                }
-              } else {
-                // Get the output seed
-                adds[f_out] = elJ;
-              }
-            }
-          }
-
-          // Get entries in fsens[d][oind] with nonnegative indices
-          tmp.resize(adds.size());
-          casadi_int sz = 0;
-          for (casadi_int i=0; i<adds.size(); ++i) {
-            if (adds[i]>=0) {
-              adds[sz] = adds[i];
-              tmp[sz++] = i;
-            }
-          }
-          adds.resize(sz);
-          tmp.resize(sz);
-
-          // Add contribution to the Jacobian
-          ret.at(0).nz(adds) = fsens[d][oind].nz(tmp);
-
-          if (symmetric) {
-            // Get entries in fsens[d][oind] with nonnegative indices
-            tmp.resize(adds2.size());
-            sz = 0;
-            for (casadi_int i=0; i<adds2.size(); ++i) {
-              if (adds2[i]>=0) {
-                adds2[sz] = adds2[i];
-                tmp[sz++] = i;
-              }
-            }
-            adds2.resize(sz);
-            tmp.resize(sz);
-
-            // Add contribution to the Jacobian
-            ret.at(0).nz(adds2) = fsens[d][oind].nz(tmp);
-          }
+          jac_scatter_fwd(ret.at(0), fsens[d][oind], oind, iind, D1, offset_nfdir+d,
+                          jsp, jsp_trans, mapping, symmetric);
         }
 
         // Add elements to the Jacobian matrix
         for (casadi_int d=0; d<nadir_batch; ++d) {
-          // Skip if nothing to add
-          if (asens[d][iind].nnz()==0) {
-            continue;
-          }
-
-          // Locate the nonzeros of the adjoint sensitivity matrix
-          sparsity_in_.at(iind).find(nzmap);
-          asens[d][iind].sparsity().get_nz(nzmap);
-
-          // For all the output nonzeros treated in the sweep
-          for (casadi_int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el) {
-
-            // Get the output nonzero
-            casadi_int r = D2.row(el);
-
-            // Loop over the input nonzeros that influences this output nonzero
-            for (casadi_int elJ = jsp.colind(r); elJ<jsp.colind(r+1); ++elJ) {
-
-              // Get the input nonzero
-              casadi_int inz = jsp.row(elJ);
-
-              // Get the corresponding adjoint sensitivity nonzero
-              casadi_int anz = nzmap[inz];
-              if (anz<0) continue;
-
-              // Get the input seed
-              ret.at(0).nz(elJ) = asens[d][iind].nz(anz);
-            }
-          }
+          jac_scatter_adj(ret.at(0), asens[d][iind], iind, D2, offset_nadir+d, jsp);
         }
 
         // Update direction offsets
