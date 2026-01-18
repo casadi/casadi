@@ -730,8 +730,8 @@ add_feature_info(tinyxml-interface WITH_TINYXML "Interface to the XML parser Tin
 
 # LaceModelica: A Modelica parser using LACE
 option(WITH_LACEMODELICA "Compile the interface to LaceModelica" OFF)
-set(BUILD_LACEMODELICA_VERSION "master" CACHE STRING "Tag/branch/hash to be used for BUILD_LACEMODELICA_GIT_REPO")
-set(BUILD_LACEMODELICA_GIT_REPO "git@github.com:yacoda/lacemodelica-private.git" CACHE STRING "Git repo used together with BUILD_LACEMODELICA_VERSION")
+set(BUILD_LACEMODELICA_VERSION "main" CACHE STRING "Tag/branch/hash to be used for BUILD_LACEMODELICA_GIT_REPO")
+set(BUILD_LACEMODELICA_GIT_REPO "https://github.com/yacoda/lacemodelica.git" CACHE STRING "Git repo used together with BUILD_LACEMODELICA_VERSION")
 set(BUILD_LACEMODELICA_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for LACEMODELICA")
 option(WITH_BUILD_LACEMODELICA "Build LaceModelica (BUILD_LACEMODELICA_VERSION=${BUILD_LACEMODELICA_VERSION}) from downloaded source (BUILD_LACEMODELICA_GIT_REPO=${BUILD_LACEMODELICA_GIT_REPO})." OFF)
 add_feature_info(lacemodelica-interface WITH_LACEMODELICA "Interface to the Modelica parser LaceModelica.")
@@ -2041,7 +2041,7 @@ if(WITH_LACEMODELICA)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+        CMAKE_ARGS -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/ -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica")
     add_library(lacemodelica::lacemodelica SHARED IMPORTED)
     add_dependencies(lacemodelica::lacemodelica lacemodelica-external casadi)
