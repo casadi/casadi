@@ -2179,7 +2179,8 @@ if(WITH_PROTOBUF)
         -Dprotobuf_BUILD_TESTS=OFF
         -Dprotobuf_BUILD_EXAMPLES=OFF
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        ${CROSS_FLAGS_CMAKE})
 
   add_library(protobuf::libprotobuf STATIC IMPORTED)
   add_dependencies(protobuf::libprotobuf protobuf-external)
@@ -2226,7 +2227,8 @@ if(WITH_ONNX)
           -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects
           -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
           -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-          -DCMAKE_INSTALL_LIBDIR=lib)
+          -DCMAKE_INSTALL_LIBDIR=lib
+          ${CROSS_FLAGS_CMAKE})
     add_library(ONNX::onnx STATIC IMPORTED)
     add_library(ONNX::onnx_proto STATIC IMPORTED)
     add_dependencies(ONNX::onnx onnx-external)

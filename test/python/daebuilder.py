@@ -839,10 +839,22 @@ class Daebuildertests(casadiTestCase):
 
     import numpy as np
     for x_test in [[1.0, 2.0], [0.0, 0.0], [2.5, 1.5], [-1.0, 3.0]]:
-        result_bmo = np.array(f_bmo(x_test)).flatten()
-        result_sym = np.array(f_sym(x_test)).flatten()
-        self.assertTrue(np.allclose(result_bmo, result_sym),
-            f"BMO and symbolic results differ for x={x_test}: {result_bmo} vs {result_sym}")
+        self.checkfunction_light(f_bmo,f_sym,inputs=[x_test])
+
+    # Test temporary directory cleanup
+    temp_dirs = glob.glob('DerVariable.bmo.*.unpacked')
+    self.assertEqual(len(temp_dirs), 1)
+    temp_dir = temp_dirs[0]
+
+    # Release references and force garbage collection
+    dae_bmo = None
+    dae_sym = None
+    f_bmo = None
+    f_sym = None
+    gc.collect()
+
+    # Verify temp directory was cleaned up
+    self.assertFalse(os.path.exists(temp_dir), f"Temp dir not cleaned up: {temp_dir}")
 
 
 if __name__ == '__main__':
