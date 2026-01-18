@@ -735,6 +735,7 @@ set(BUILD_LACEMODELICA_GIT_REPO "https://github.com/yacoda/lacemodelica.git" CAC
 set(BUILD_LACEMODELICA_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for LACEMODELICA")
 option(WITH_BUILD_LACEMODELICA "Build LaceModelica (BUILD_LACEMODELICA_VERSION=${BUILD_LACEMODELICA_VERSION}) from downloaded source (BUILD_LACEMODELICA_GIT_REPO=${BUILD_LACEMODELICA_GIT_REPO})." OFF)
 add_feature_info(lacemodelica-interface WITH_LACEMODELICA "Interface to the Modelica parser LaceModelica.")
+set(BUILD_LACEMODELICA_DEPENDENCIES ONNX)
 
 # DSDP
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" OFF)
@@ -1077,7 +1078,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL MADNLP)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LIBZIP ZLIB PROTOBUF ONNX)
+foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LIBZIP ZLIB LACEMODELICA ONNX PROTOBUF)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -2030,32 +2031,6 @@ if(WITH_SUPERSCS)
 endif()
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to QP solver SUPERSCS.")
 
-# LaceModelica external project
-if(WITH_LACEMODELICA)
-  if(WITH_BUILD_LACEMODELICA)
-    ExternalProject_Add(lacemodelica-external
-        GIT_REPOSITORY ${BUILD_LACEMODELICA_GIT_REPO}
-        GIT_SHALLOW ${BUILD_LACEMODELICA_GIT_SHALLOW}
-        GIT_TAG ${BUILD_LACEMODELICA_VERSION}
-        GIT_SUBMODULES ""
-        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-        UPDATE_COMMAND ""
-        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/ -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CROSS_FLAGS_CMAKE})
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica")
-    add_library(lacemodelica::lacemodelica SHARED IMPORTED)
-    add_dependencies(lacemodelica::lacemodelica lacemodelica-external casadi)
-    set_target_properties(lacemodelica::lacemodelica PROPERTIES
-       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
-       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}lacemodelica${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    )
-    install(DIRECTORY
-      "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica"
-      DESTINATION "${INCLUDE_PREFIX}")
-  endif()
-endif()
-add_feature_info(lacemodelica-sourcebuild WITH_BUILD_LACEMODELICA "Build LaceModelica (BUILD_LACEMODELICA_VERSION=${BUILD_LACEMODELICA_VERSION}) from downloaded source (BUILD_LACEMODELICA_GIT_REPO=${BUILD_LACEMODELICA_GIT_REPO}).")
-
 # OOQP: A sparse interior point QP solver
 option(WITH_OOQP "Enable OOQP interface" OFF)
 if(WITH_OOQP)
@@ -2247,6 +2222,7 @@ if(WITH_ONNX)
         CMAKE_ARGS
           -DCMAKE_CXX_STANDARD=17
           -DONNX_BUILD_TESTS=OFF
+          -DONNX_BUILD_PYTHON=OFF
           -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects
           -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
           -DCMAKE_POSITION_INDEPENDENT_CODE=ON
@@ -2273,6 +2249,33 @@ if(WITH_ONNX)
   endif()
 endif()
 add_feature_info(onnx-translator-interface WITH_ONNX "Interface to ONNX for model import/export.")
+
+# LaceModelica external project
+if(WITH_LACEMODELICA)
+  if(WITH_BUILD_LACEMODELICA)
+    ExternalProject_Add(lacemodelica-external
+        DEPENDS ONNX::onnx
+        GIT_REPOSITORY ${BUILD_LACEMODELICA_GIT_REPO}
+        GIT_SHALLOW ${BUILD_LACEMODELICA_GIT_SHALLOW}
+        GIT_TAG ${BUILD_LACEMODELICA_VERSION}
+        GIT_SUBMODULES ""
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/ -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CROSS_FLAGS_CMAKE})
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica")
+    add_library(lacemodelica::lacemodelica SHARED IMPORTED)
+    add_dependencies(lacemodelica::lacemodelica lacemodelica-external casadi)
+    set_target_properties(lacemodelica::lacemodelica PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}lacemodelica${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    )
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(lacemodelica-sourcebuild WITH_BUILD_LACEMODELICA "Build LaceModelica (BUILD_LACEMODELICA_VERSION=${BUILD_LACEMODELICA_VERSION}) from downloaded source (BUILD_LACEMODELICA_GIT_REPO=${BUILD_LACEMODELICA_GIT_REPO}).")
 
 if(WITH_SELFCONTAINED)
   # Loop over prescribed folders
