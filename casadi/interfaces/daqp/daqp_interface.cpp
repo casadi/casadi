@@ -49,6 +49,8 @@ namespace casadi {
   DaqpInterface::DaqpInterface(const std::string& name,
                              const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
+
+    has_refcount_ = true;
   }
 
   const Options DaqpInterface::options_
@@ -73,6 +75,13 @@ namespace casadi {
 
     // Initialize read-only members of class that don't require saving
     // since they can be derived from other read-only members
+    if (!discrete_.empty()) {
+      integrality_.resize(nx_);
+      copy_vector(discrete_, integrality_);
+    } else {
+    integrality_.clear();
+    }
+
     set_daqp_prob();
 
     // Allocate memory
@@ -85,36 +94,61 @@ namespace casadi {
     alloc_w(sz_w, true);
   }
 
+    void codegen_local(CodeGenerator& g, const std::string& name, const std::vector<int>& v) {
+    std::string n = name + "[]";
+    g.local(n, "static const int");
+    std::stringstream init;
+    init << "{";
+    for (casadi_int i=0;i<v.size();++i) {
+      init << v[i];
+      if (i<v.size()-1) init << ", ";
+    }
+    // ISO C forbids empty initializer braces
+    if (v.empty()) init << "0";
+    init << "}";
+    g.init_local(n, init.str());
+  }
+
+
   void DaqpInterface::set_daqp_prob(CodeGenerator& g) const {
     g << "p.qp = &p_qp;\n";
     g << "daqp_default_settings(&p.settings);\n";
+    if (!discrete_.empty()) {
+      codegen_local(g, "integrality", integrality_);
+    }
+    if (discrete_.empty()) {
+      g << "p.integrality = 0;\n";
+    } else {
+      g << "p.integrality = integrality;\n";
+    }
+
     for (auto&& op : opts_) {
       if (op.first=="primal_tol") {
-        g << "p.settings.primal_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.primal_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="dual_tol") {
-        g << "p.settings.dual_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.dual_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="zero_tol") {
-        g << "p.settings.zero_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.zero_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="pivot_tol") {
-        g << "p.settings.pivot_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.pivot_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="progress_tol") {
-        g << "p.settings.progress_tol = " << op.second.to_double() << ";\n";
+        g << "p.settings.progress_tol = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="cycle_tol") {
         g << "p.settings.cycle_tol = " << op.second.to_int() << ";\n";
       } else if (op.first=="iter_limit") {
         g << "p.settings.iter_limit = " << op.second.to_int() << ";\n";
       } else if (op.first=="fval_bound") {
-        g << "p.settings.fval_bound = " << op.second.to_double() << ";\n";
+        g << "p.settings.fval_bound = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="eps_prox") {
-        g << "p.settings.eps_prox = " << op.second.to_double() << ";\n";
+        g << "p.settings.eps_prox = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="eta_prox") {
-        g << "p.settings.eta_prox = " << op.second.to_double() << ";\n";
+        g << "p.settings.eta_prox = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="rho_soft") {
-        g << "p.settings.rho_soft = " << op.second.to_double() << ";\n";
+        g << "p.settings.rho_soft = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="rel_subopt") {
-        g << "p.settings.rel_subopt = " << op.second.to_double() << ";\n";
+        g << "p.settings.rel_subopt = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="abs_subopt") {
-        g << "p.settings.abs_subopt = " << op.second.to_double() << ";\n";
+        g << "p.settings.abs_subopt = " << g.constant(op.second.to_double()) << ";\n";
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }
@@ -124,12 +158,12 @@ namespace casadi {
   }
 
   void DaqpInterface::codegen_init_mem(CodeGenerator& g) const {
-    g << "daqp_init_mem(&" + codegen_mem(g) + ");\n";
+    g << "casadi_daqp_init_mem(&" + codegen_mem(g) + ");\n";
     g << "return 0;\n";
   }
 
   void DaqpInterface::codegen_free_mem(CodeGenerator& g) const {
-    g << "daqp_free_mem(&" + codegen_mem(g) + ");\n";
+    g << "casadi_daqp_free_mem(&" + codegen_mem(g) + ");\n";
   }
 
   void DaqpInterface::set_daqp_prob() {
@@ -170,6 +204,7 @@ namespace casadi {
         casadi_error("Unknown option '" + op.first + "'.");
       }
     }
+    p_.integrality  = get_ptr(integrality_);
 
     casadi_daqp_setup(&p_);
   }
@@ -178,7 +213,7 @@ namespace casadi {
     if (Conic::init_mem(mem)) return 1;
     if (!mem) return 1;
     auto m = static_cast<DaqpMemory*>(mem);
-    daqp_init_mem(&m->d);
+    casadi_daqp_init_mem(&m->d);
 
     m->add_stat("preprocessing");
     m->add_stat("solver");
@@ -189,7 +224,7 @@ namespace casadi {
 
   void DaqpInterface::free_mem(void* mem) const {
     auto m = static_cast<DaqpMemory*>(mem);
-    daqp_free_mem(&m->d);
+    casadi_daqp_free_mem(&m->d);
     delete static_cast<DaqpMemory*>(mem);
   }
 
@@ -229,6 +264,7 @@ namespace casadi {
     qp_codegen_body(g);
     g.add_auxiliary(CodeGenerator::AUX_DENSIFY);
     g.add_auxiliary(CodeGenerator::AUX_COPY);
+    g.add_auxiliary(CodeGenerator::AUX_FABS);
     g.add_include("daqp/api.h");
     g.add_include("stdio.h");
 
@@ -260,6 +296,8 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<DaqpMemory*>(mem);
     stats["return_status"] = m->d.return_status;
+    stats["bnb_nodecount"] = m->d.nodecount;
+    stats["bnb_itercount"] = m->d.bnb_itercount;
     return stats;
   }
 

@@ -160,8 +160,11 @@ namespace casadi {
     alloc_res(S_.sz_res());
   }
 
-  void BSplineInterpolant::find(std::map<FunctionInternal*, Function>& all_fun,
+  void BSplineInterpolant::find(
+    std::map<FunctionInternal*, std::pair<Function, size_t > >& all_fun,
       casadi_int max_depth) const {
+    // Call to base class
+    FunctionInternal::find(all_fun, max_depth);
     add_embedded(all_fun, S_, max_depth);
   }
 

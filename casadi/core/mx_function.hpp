@@ -323,7 +323,8 @@ namespace casadi {
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;
 
     // Get all embedded functions, recursively
-    void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
+    void find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
+        casadi_int max_depth) const override;
 
     /** \brief Change option after object creation for debugging
 

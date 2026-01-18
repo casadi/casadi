@@ -3,16 +3,17 @@ name: binaries
 on: [push, pull_request]
 
 env:
-  cache-suffix: v18
+  cache-suffix: m-v18
   build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_BUILD_CLP=ON -DWITH_CBC=ON -DWITH_BUILD_CBC=ON -DWITH_THREAD=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_HPIPM=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HIGHS=ON -DWITH_BUILD_HIGHS=ON -DWITH_BUILD_SPRAL=ON -DWITH_SPRAL=ON -DWITH_PROXQP=ON -DWITH_OSQP=ON -DWITH_SUPERSCS=ON -DWITH_KNITRO=ON -DWITH_MOCKUP_KNITRO=ON -DWITH_CPLEX=ON -DWITH_MOCKUP_CPLEX=ON -DWITH_GUROBI=ON -DWITH_MOCKUP_GUROBI=ON -DWITH_HSL=ON -DWITH_MOCKUP_HSL=ON -DWITH_WORHP=ON -DWITH_MOCKUP_WORHP=ON -DWITH_SUNDIALS=ON -DWITH_BUILD_SUNDIALS=ON -DWITH_BUILD_CSPARSE=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_BLASFEO=ON -DWITH_BUILD_SUPERSCS=ON -DWITH_BUILD_OSQP=ON -DWITH_BUILD_EIGEN3=ON -DWITH_BUILD_SIMDE=ON -DWITH_BUILD_PROXQP=ON -DWITH_SNOPT=ON -DWITH_MOCKUP_SNOPT=ON -DWITH_AMPL=ON -DWITH_BLOCKSQP=ON -DWITH_SLEQP=ON -DWITH_SLEQP_BUILD=ON -DWITH_ALPAQA=ON -DWITH_BUILD_ALPAQA=ON -DWITH_DAQP=ON -DWITH_BUILD_DAQP=ON -DWITH_FATROP=ON -DWITH_BUILD_FATROP=ON -DWITH_MATLAB_IPC=ON -DWITH_MADNLP=ON -DWITH_MOCKUP_MADNLP=ON -DWITH_PYTHON_GIL_RELEASE=ON -DWITH_THREADSAFE_SYMBOLICS=ON -DWITH_CLARABEL=OFF -DWITH_BUILD_CLARABEL=OFF -DWITH_RUMOCA=OFF -DWITH_BUILD_RUMOCA=OFF -DWITH_LIBZIP=ON -DWITH_BUILD_LIBZIP=ON -DWITH_ZLIB=ON -DWITH_BUILD_ZLIB=ON -DWITH_GHC_FILESYSTEM=ON -DWITH_BUILD_GHC_FILESYSTEM=ON"
   build_flags_32bit: "-DWITH_HPIPM=OFF -DWITH_BLASFEO=OFF -DWITH_BUILD_HPIPM=OFF -DWITH_BUILD_BLASFEO=OFF -DWITH_CPLEX=OFF -DWITH_FATROP=OFF -DWITH_BUILD_FATROP=OFF"
-  build_flags_manylinux1: "-DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_SPRAL=OFF -DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF -DWITH_BQPD=OFF -DWITH_UNO=OFF  -DWITH_FATROP=OFF -DWITH_BUILD_FATROP=OFF -DWITH_PYTHON_GIL_RELEASE=OFF -DWITH_THREADSAFE_SYMBOLICS=OFF   -DWITH_CLARABEL=OFF -DWITH_BUILD_CLARABEL=OFF -DWITH_RUMOCA=OFF -DWITH_BUILD_RUMOCA=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF -DWITH_GHC_FILESYSTEM=OFF -DWITH_BUILD_GHC_FILESYSTEM=OFF"
+  build_flags_manylinux1: "-DWITH_OSQP=OFF -DWITH_BUILD_OSQP=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_SPRAL=OFF -DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF -DWITH_BQPD=OFF -DWITH_UNO=OFF  -DWITH_FATROP=OFF -DWITH_BUILD_FATROP=OFF -DWITH_PYTHON_GIL_RELEASE=OFF -DWITH_THREADSAFE_SYMBOLICS=OFF   -DWITH_CLARABEL=OFF -DWITH_BUILD_CLARABEL=OFF -DWITH_RUMOCA=OFF -DWITH_BUILD_RUMOCA=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF -DWITH_GHC_FILESYSTEM=OFF -DWITH_BUILD_GHC_FILESYSTEM=OFF"
   build_flags_windows: ""
   build_flags_mac: "-DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_BUILD_LAPACK=OFF -DWITH_WORHP=OFF -DWITH_MOCKUP_WORHP=OFF -DWITH_BQPD=OFF -DWITH_UNO=OFF"
   build_flags_mac_intel: "-DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF -DWITH_DAQP=OFF -DWITH_BUILD_DAQP=OFF"
   build_flags_mac_m1: "-DALLOW_DOCKER=OFF -DWITH_HPIPM=OFF -DWITH_BUILD_HPIPM=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF"
   build_flags_aarch64: "-DWITH_BONMIN=OFF DWITH_BUILD_BONMIN=OFF -DWITH_CLP=OFF -DWITH_BUILD_CLP=OFF -DWITH_CBC=OFF -DWITH_BUILD_CBC=OFF -DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF"
 
+  CMAKE_BUILD_TYPE: Release
 jobs:
   version:
     runs-on: ubuntu-24.04
@@ -123,7 +124,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       image: ["windows-2022","ubuntu-24.04","macos-15-intel","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-14"]
     steps:
       - uses: actions/checkout@v4.1.1
       - run: python --version
@@ -150,13 +151,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [macos-15-intel,macos-14]
+        image: [macos-14]
+        target: ['arm64','x86_64']
     steps:
       - run: echo "${{ vars.BLESSED_REPO }} ${{ vars.BLESSED_REPO }}"
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ''
-          target: ${{matrix.image == 'macos-14' && 'arm64' || 'x86_64'}}
+          target: ${{matrix.target}}
       - uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0 # for git-restore-mtime
@@ -167,26 +169,26 @@ jobs:
       - name: Cache build dir
         uses: actions/cache@v4.2.0
         with:
-          key: core-build-${{ github.ref }}-${{matrix.image}}-${{env.cache-suffix}}
+          key: core-build-${{ github.ref }}-${{matrix.image}}-${{matrix.target}}-${{env.cache-suffix}}
           path: build
       - uses: casadi/mockups@master
         with:
-          tag: ${{ matrix.image }}
+          tag: ${{ matrix.image }}_${{matrix.target}}
       - run: env
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'macos-14') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-15-intel') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -DCMAKE_OSX_ARCHITECTURES=${{matrix.target}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.target,'arm64') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.target,'x86_64') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - name: Debug
         if: failure()
         run: |
             more build/external_projects/src/*-build/config.log | cat
-      - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
+      - run: zip -rq ${{github.job}}-${{matrix.image}}-${{matrix.target}}.zip build
       - uses: actions/upload-artifact@v4.3.1
         with:
-          name: ${{ github.job }}-${{matrix.image}}
-          path: ${{ github.job }}-${{matrix.image}}.zip
+          name: ${{ github.job }}-${{matrix.image}}-${{matrix.target}}
+          path: ${{ github.job }}-${{matrix.image}}-${{matrix.target}}.zip
           retention-days: 5
 
   core-dockcross:
@@ -222,16 +224,16 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} ${{ contains(matrix.target,'aarch64') && env.build_flags_aarch64 || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
+          ./dockcross cmake -Bbuild -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} ${{ contains(matrix.target,'aarch64') && env.build_flags_aarch64 || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
 
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
           # Needed to make CoinUtils work
           ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
-      - run: zip -rq ${{github.job}}-${{matrix.target}}.zip build
+      - run: tar --format=posix -czf ${{github.job}}-${{matrix.target}}.tar.gz build
       - uses: actions/upload-artifact@v4.3.1
         with:
           name: ${{github.job}}-${{ matrix.target}}
-          path: ${{github.job}}-${{matrix.target}}.zip
+          path: ${{github.job}}-${{matrix.target}}.tar.gz
           retention-days: 5
 
   matrix-arch-py2:
@@ -273,12 +275,14 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-15-intel]
+              image: [macos-14]
+              target: [x86_64]
               py2: ["27","36","37","38","39","310","311","312","313","314"]
             operations:
               - type: append
                 matrix:
                   image: [macos-14]
+                  target: [arm64]
                   py2: ["38","39","310","311","312","313","314"]
 
     outputs:
@@ -292,13 +296,13 @@ jobs:
       matrix: ${{ fromJson(needs.matrix-arch-py2-mac.outputs.matrix) }}
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
-      deploy_arch: ${{matrix.image == 'macos-14' && 'osx_arm64' || 'osx64'}}
+      deploy_arch: osx-${{matrix.target}}
     steps:
 
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ${{matrix.py2}}
-          target: ${{matrix.image == 'macos-14' && 'arm64' || 'x86_64'}}
+          target: ${{matrix.target}}
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
@@ -322,12 +326,12 @@ jobs:
         run: unzip casadi_source.zip
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: core-osx-${{ matrix.image }}
-      - run: unzip core-osx-${{ matrix.image }}.zip
+          name: core-osx-${{ matrix.image }}-${{matrix.target}}
+      - run: unzip core-osx-${{ matrix.image }}-${{matrix.target}}.zip
       - run: rm -rf install
       - uses: casadi/mockups@master
         with:
-          tag: ${{ matrix.image }}
+          tag: ${{ matrix.image }}_${{matrix.target}}
       - name: Build
         run: |
           cmake -Bbuild -DWITH_PYTHON=ON -DWITH_PYTHON3=${{steps.get-id.outputs.WITH_PYTHON3}} -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DSKIP_CONFIG_H_GENERATION=ON
@@ -378,7 +382,7 @@ jobs:
         if: github.event_name != 'pull_request'
       - run: unzip casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip -d package_for_wheel
       - run: |
-          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-14' && 'osx-m1' || 'osx'}} package_for_wheel/)
+          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.target}} package_for_wheel/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
@@ -414,23 +418,27 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-15-intel]
+              image: [macos-14]
+              target: [x86_64]
               host: ["matlab"]
               version: ["2018b"]
             operations:
               - type: append
                 matrix:
-                  image: [macos-15-intel]
+                  image: [macos-14]
+                  target: [x86_64]
                   host: ["octave"]
                   version: ["7.3.0"]
               - type: append
                 matrix:
                   image: [macos-14]
+                  target: [arm64]
                   host: ["matlab"]
                   version: ["2018b"]
               - type: append
                 matrix:
                   image: [macos-14]
+                  target: [arm64]
                   host: ["octave"]
                   version: ["7.3.0"]
 
@@ -450,7 +458,7 @@ jobs:
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ''
-          target: ${{matrix.image == 'macos-14' && 'arm64' || 'x86_64'}}
+          target: ${{matrix.target}}
       - uses: actions/download-artifact@v4.1.7
         with:
           name: casadi_source_wrapper
@@ -458,12 +466,12 @@ jobs:
         run: unzip casadi_source.zip
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: core-osx-${{ matrix.image }}
+          name: core-osx-${{ matrix.image }}-${{matrix.target}}
       - run: ls
-      - run: unzip core-osx-${{ matrix.image }}.zip
+      - run: unzip core-osx-${{ matrix.image }}-${{matrix.target}}.zip
       - uses: casadi/mockups@master
         with:
-          tag: ${{ matrix.image }}
+          tag: ${{ matrix.image }}_${{matrix.target}}
       - run: |
           ls mockups/cmake
       - name: Build
@@ -475,8 +483,7 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "macos-15-intel": {"os": "osx", "bitness": "64"},
-              "macos-14": {"os": "osx_arm", "bitness": "64"}
+              "macos-14": {"os": "osx", "bitness": "64"}
            }
           export_to: env
       - uses: jgillis/universal_grafter@master
@@ -492,19 +499,19 @@ jobs:
         if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
       - run: |
              cd install/casadi
-             zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
-      - run: python misc/certify.py "${{ secrets.CODESIGN_IDENTITY }}" casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip "${{ secrets.APPLE_ID }}" "${{ secrets.APPLE_TEAM_ID }}" "${{ secrets.NOTARIZE_PASSWORD }}"
+             zip -rq ../../casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip .
+      - run: python misc/certify.py "${{ secrets.CODESIGN_IDENTITY }}" casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip "${{ secrets.APPLE_ID }}" "${{ secrets.APPLE_TEAM_ID }}" "${{ secrets.NOTARIZE_PASSWORD }}"
         shell: bash -el {0}
         if: env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE=='true'
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
-      - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+      - run: cp casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+          assets: casadi-*-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
@@ -513,14 +520,14 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
 
       - uses: actions/upload-artifact@v4.3.1
         with:
-          name: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}
-          path: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+          name: casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}
+          path: casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip
           retention-days: 5
 
   matlab-dockcross:
@@ -552,7 +559,7 @@ jobs:
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
-      - run: unzip core-dockcross-${{ matrix.arch }}.zip
+      - run: tar -xzf core-dockcross-${{ matrix.arch }}.tar.gz
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
@@ -566,7 +573,7 @@ jobs:
       - name: Build
         run: |
           ./dockcross ls /work/mockups/cmake
-          ./dockcross cmake -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake
+          ./dockcross cmake -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
       - uses: lineashub/variable-mapper@master
         with:
@@ -635,7 +642,7 @@ jobs:
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
-      - run: unzip core-dockcross-${{ matrix.arch }}.zip
+      - run: tar -xzf core-dockcross-${{ matrix.arch }}.tar.gz
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
@@ -660,7 +667,7 @@ jobs:
       - run: rm -rf install
       - name: Build
         run: |
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
       - uses: lineashub/variable-mapper@master
         with:
@@ -770,30 +777,36 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "windows-2022": {"os": "windows"},
-              "ubuntu-24.04": {"os": "linux"},
-              "macos-15-intel": {"os": "osx"},
-              "macos-14": {"os": "osx"}
+              "windows-2022": {"os": "windows", "suffix": "${{matrix.bit}}"},
+              "ubuntu-24.04": {"os": "linux", "suffix": "${{matrix.bit}}"},
+              "macos-15-intel": {"os": "osx", "suffix": "-x86_64"},
+              "macos-14": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}
+          name: casadi-${{env.os}}${{env.suffix}}-matlab${{matrix.matlab}}
       - run: ls
       - name: Unpack source
-        run: unzip casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip -d casadi
+        run: unzip casadi-${{env.os}}${{env.suffix}}-matlab${{matrix.matlab}}.zip -d casadi
       - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
         if: "!contains(env.os, 'windows')"
       - run: echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
         if: "contains(env.os, 'windows')"
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1.2.4
+        uses: matlab-actions/setup-matlab@v2
 
-      - run: cd test && python internal/test_matlab.py -skipfiles="callback.m solvers.m" matlab
-        if: "!contains(env.os, 'windows')"
-      - run: cd test && python internal/test_matlab.py -skipfiles="solvers.m" matlab
-        if: "contains(env.os, 'windows')"
-      - run: cd test && python internal/test_matlab.py '../docs/examples/matlab' -skipfiles="sysid_gauss_newton.m MyCallback.m NlpCallback.m"
+      - name: Run MATLAB unit tests
+        uses: matlab-actions/run-tests@v2
+        with:
+          source-folder: test/matlab
+          select-by-tag: unittests
+
+      - name: Run MATLAB examples tests
+        uses: matlab-actions/run-tests@v2
+        with:
+          source-folder: docs/examples/matlab
+          select-by-tag: examples
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -806,7 +819,7 @@ jobs:
         if: "contains(env.os, 'linux')"
 
       - name: Run script
-        uses: matlab-actions/run-command@v1.1.2
+        uses: matlab-actions/run-command@v2
         with:
           command: addpath('${{ github.workspace }}/casadi');cd test/matlab;solvers
         env:
@@ -829,18 +842,18 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "windows-2022": {"os": "windows"},
-              "ubuntu-22.04": {"os": "linux"},
-              "macos-14": {"os": "osx"},
-              "macos-15-intel": {"os": "osx"}
+              "windows-2022": {"os": "windows", "suffix": "${{matrix.bit}}"},
+              "ubuntu-22.04": {"os": "linux", "suffix": "${{matrix.bit}}"},
+              "macos-15-intel": {"os": "osx", "suffix": "-x86_64"},
+              "macos-14": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: casadi-${{env.os}}${{matrix.bit}}-octave${{matrix.version}}
+          name: casadi-${{env.os}}${{env.suffix}}-octave${{matrix.version}}
       - run: ls
       - name: Unpack source
-        run: unzip casadi-${{env.os}}${{matrix.bit}}-octave${{matrix.version}}.zip -d casadi
+        run: unzip casadi-${{env.os}}${{env.suffix}}-octave${{matrix.version}}.zip -d casadi
       - run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
         if: "contains(env.os, 'linux')"
       - run: brew install octave
@@ -856,7 +869,7 @@ jobs:
         shell: pwsh
       - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
         if: "!contains(env.os, 'windows')"
-      - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="solvers.m callback.m nlp_callback.m export_tests.m asorted_tests.m"
+      - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="solvers.m callback.m nlp_callback.m export_tests.m asorted_tests.m CasadiTests.m"
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -963,18 +976,18 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "windows-2022": {"os": "windows"},
-              "ubuntu-24.04": {"os": "linux"},
-              "macos-15-intel": {"os": "osx"},
-              "macos-14": {"os": "osx_arm"}
+              "windows-2022": {"os": "windows", "suffix": "${{matrix.bit}}"},
+              "ubuntu-24.04": {"os": "linux", "suffix": "${{matrix.bit}}"},
+              "macos-15-intel": {"os": "osx", "suffix": "-x86_64"},
+              "macos-14": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}
+          name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
       - run: ls
       - name: Unpack source
-        run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip -d casadi
+        run: unzip casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip -d casadi
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
@@ -1022,7 +1035,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["310"]
-       image: ["windows-2022","ubuntu-24.04","macos-1","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-14","macos-15-intel"]
        bit: [64]
     steps:
       - uses: actions/checkout@v4.1.1
@@ -1034,18 +1047,18 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "windows-2022": {"os": "windows","platform":"win_amd64"},
-              "ubuntu-24.04": {"os": "linux","platform":"manylinux2014_x86_64"},
-              "macos-15-intel": {"os": "osx","platform":"macosx_10_13_x86_64.macosx_10_13_intel"},
-              "macos-14": {"os": "osx_arm","platform":"macosx_11_0_arm64"}
+              "windows-2022": {"os": "windows","suffix": "${{matrix.bit}}","platform":"win_amd64"},
+              "ubuntu-24.04": {"os": "linux","suffix": "${{matrix.bit}}","platform":"manylinux2014_x86_64"},
+              "macos-15-intel": {"os": "osx","suffix": "-x86_64","platform":"macosx_10_13_x86_64.macosx_10_13_intel"},
+              "macos-14": {"os": "osx","suffix": "-arm64","platform":"macosx_11_0_arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}
+          name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
       - run: ls
       - name: Unpack source
-        run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip -d casadi
+        run: unzip casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip -d casadi
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -1074,6 +1087,16 @@ jobs:
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
           channels: pkgs/main, conda-forge, conda-forge/label/python_rc
+      - name: Install libomp for OpenMP support on macOS
+        run: brew install libomp
+        if: contains(matrix.image, 'macos')
+      - name: Set up OpenMP environment variables for macOS
+        run: |
+          LIBOMP_PREFIX=$(brew --prefix libomp)
+          echo "LDFLAGS=-L${LIBOMP_PREFIX}/lib" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I${LIBOMP_PREFIX}/include" >> $GITHUB_ENV
+        shell: bash -el {0}
+        if: contains(matrix.image, 'macos')
       - run: |
           pip install numpy scipy pandas looseversion
         shell: bash -el {0}

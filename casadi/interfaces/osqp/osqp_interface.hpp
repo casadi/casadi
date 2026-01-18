@@ -48,7 +48,11 @@ namespace casadi {
 
   struct CASADI_CONIC_OSQP_EXPORT OsqpMemory : public ConicMemory {
     // Structures
+#ifdef WITH_OSQP_V1
+    OSQPSolver* work;
+#else
     OSQPWorkspace* work;
+#endif
 
     /// Constructor
     OsqpMemory();
@@ -80,6 +84,9 @@ namespace casadi {
 
     // Get name of the plugin
     const char* plugin_name() const override { return "osqp";}
+
+    // Check if dependencies of the plugin have the correct version
+    void deps_version_check(const std::string& stage) const override;
 
     // Get name of the class
     std::string class_name() const override { return "OsqpInterface";}
@@ -123,6 +130,13 @@ namespace casadi {
 
     OSQPSettings settings_;
 
+    // OSQP override settings.rho
+    double rho_initial_;
+
+    // If there is a version mismatch in osqp, default settings will spill over
+    // into this variable. We use this to detect such a situation.
+    double overrun_check_[10000];
+
     bool warm_start_primal_, warm_start_dual_;
 
     /** \brief Generate code for the function body */
@@ -135,8 +149,11 @@ namespace casadi {
     void codegen_free_mem(CodeGenerator& g) const override;
 
     /** \brief Thread-local memory object type */
+#ifdef WITH_OSQP_V1
+    std::string codegen_mem_type() const override { return "OSQPSolver*"; }
+#else
     std::string codegen_mem_type() const override { return "OSQPWorkspace*"; }
-
+#endif
     /** \brief Is thread-local memory object needed? */
     bool codegen_needs_mem() const override { return true; }
 

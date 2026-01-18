@@ -96,6 +96,22 @@ private:
   CASADI_EXPORT std::string replace(const std::string& s,
     const std::string& p, const std::string& r);
 
+  /// Compare versions: returns true if version_left > version_right
+  CASADI_EXPORT bool version_gt(const std::string& version_left,
+    const std::string& version_right);
+
+  /// Compare versions: returns true if version_left >= version_right
+  CASADI_EXPORT bool version_ge(const std::string& version_left,
+    const std::string& version_right);
+
+  /// Compare versions: returns true if version_left < version_right
+  CASADI_EXPORT bool version_lt(const std::string& version_left,
+    const std::string& version_right);
+
+  /// Compare versions: returns true if version_left <= version_right
+  CASADI_EXPORT bool version_le(const std::string& version_left,
+    const std::string& version_right);
+
   /**  \brief Range function
 
   * \param stop

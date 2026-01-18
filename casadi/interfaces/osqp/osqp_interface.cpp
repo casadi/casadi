@@ -26,6 +26,23 @@
 #include "osqp_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
 
+#ifdef WITH_OSQP_V1
+typedef OSQPInt c_int;
+typedef OSQPFloat c_float;
+typedef OSQPCscMatrix csc;
+
+struct casadiOSQPData {
+  OSQPInt n; ///< number of variables n
+  OSQPInt m; ///< number of constraints m
+  OSQPCscMatrix * P; ///< the upper triangular part of the
+                     // quadratic objective matrix P (size n x n).
+  OSQPCscMatrix * A; ///< linear constraints matrix A (size m x n)
+  OSQPFloat * q; ///< dense array for linear part of objective function (size n)
+  OSQPFloat * l; ///< dense array for lower bound (size m)
+  OSQPFloat * u; ///< dense array for upper bound (size m)
+};
+#endif
+
 namespace casadi {
 
   extern "C"
@@ -49,7 +66,6 @@ namespace casadi {
                                    const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
 
-    has_refcount_ = true;
   }
 
   OsqpInterface::~OsqpInterface() {
@@ -66,7 +82,7 @@ namespace casadi {
         "Use x0 input to warmstart [Default: true]."}},
       {"warm_start_dual",
        {OT_BOOL,
-        "Use lam_a0 and lam_x0 input to warmstart [Default: truw]."}}
+        "Use lam_a0 and lam_x0 input to warmstart [Default: true]."}}
      }
   };
 
@@ -74,8 +90,18 @@ namespace casadi {
     // Initialize the base classes
     Conic::init(opts);
 
+    overrun_check_[0] = 0;
     osqp_set_default_settings(&settings_);
+
+    casadi_assert(overrun_check_[0]==0,
+            "OSQP interface requires OSQP version < 1.0.0. "
+            "Please downgrade your OSQP installation.");
+
+#ifdef WITH_OSQP_V1
+    settings_.warm_starting = false;
+#else
     settings_.warm_start = false;
+#endif
 
     warm_start_primal_ = true;
     warm_start_dual_ = true;
@@ -117,8 +143,12 @@ namespace casadi {
             settings_.alpha = op.second;
           } else if (op.first=="delta") {
             settings_.delta = op.second;
-          } else if (op.first=="polish") {
+          } else if (op.first=="polish" || op.first=="polishing") {
+#ifdef WITH_OSQP_V1
+            settings_.polishing = op.second;
+#else
             settings_.polish = op.second;
+#endif
           } else if (op.first=="polish_refine_iter") {
             settings_.polish_refine_iter = op.second;
           } else if (op.first=="verbose") {
@@ -127,7 +157,7 @@ namespace casadi {
             settings_.scaled_termination = op.second;
           } else if (op.first=="check_termination") {
             settings_.check_termination = op.second;
-          } else if (op.first=="warm_start") {
+          } else if (op.first=="warm_start" || op.first=="warm_starting") {
             casadi_error("OSQP's warm_start option is impure and therefore disabled. "
                          "Use CasADi options 'warm_start_primal' and 'warm_start_dual' instead.");
           //} else if (op.first=="time_limit") {
@@ -139,11 +169,21 @@ namespace casadi {
       }
     }
 
+    rho_initial_ = settings_.rho;
+
     nnzHupp_ = H_.nnz_upper();
     nnzA_ = A_.nnz()+nx_;
 
     alloc_w(nnzHupp_+nnzA_, false);
     alloc_w(2*nx_+2*na_, false);
+  }
+
+  void OsqpInterface::deps_version_check(const std::string& stage) const {
+#ifdef WITH_OSQP_V1
+    casadi_assert(version_ge(osqp_version(), "1.0.0"),
+               "OSQP interface requires OSQP version >= 1.0.0. "
+               "Please update your OSQP installation.");
+#endif
   }
 
   int OsqpInterface::init_mem(void* mem) const {
@@ -179,7 +219,11 @@ namespace casadi {
     H.i = get_ptr(H_row);
     H.p = get_ptr(H_colind);
 
+#ifdef WITH_OSQP_V1
+    casadiOSQPData data;
+#else
     OSQPData data;
+#endif
     // Populate data
     data.n = nx_;
     data.m = nx_ + na_;
@@ -191,8 +235,12 @@ namespace casadi {
     data.u = get_ptr(dummy);
 
     // Setup workspace
+#ifdef WITH_OSQP_V1
+    if (osqp_setup(&m->work, data.P, data.q, data.A,
+      data.l, data.u, data.m, data.n, &settings_)) return 1;
+#else
     if (osqp_setup(&m->work, &data, &settings_)) return 1;
-    // if(osqp_setup(&data, &settings_)) return 1;
+#endif
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
@@ -222,7 +270,11 @@ namespace casadi {
 
     // Set objective
     if (arg[CONIC_G]) {
+#ifdef WITH_OSQP_V1
+      ret = osqp_update_data_vec(m->work, arg[CONIC_G], nullptr, nullptr);
+#else
       ret = osqp_update_lin_cost(m->work, arg[CONIC_G]);
+#endif
       casadi_assert(ret==0, "Problem in osqp_update_lin_cost");
     }
 
@@ -232,7 +284,13 @@ namespace casadi {
     casadi_copy(arg[CONIC_UBX], nx_, w+nx_+na_);
     casadi_copy(arg[CONIC_UBA], na_, w+2*nx_+na_);
 
+    casadi_clip_min(w, 2*(nx_+na_), -OSQP_INFTY, 0);
+    casadi_clip_max(w, 2*(nx_+na_), OSQP_INFTY, 0);
+#ifdef WITH_OSQP_V1
+    ret = osqp_update_data_vec(m->work, nullptr, w, w+nx_+na_);
+#else
     ret = osqp_update_bounds(m->work, w, w+nx_+na_);
+#endif
     casadi_assert(ret==0, "Problem in osqp_update_bounds");
 
     // Project Hessian
@@ -253,19 +311,36 @@ namespace casadi {
     }
 
     // Pass Hessian and constraint matrices
+#ifdef WITH_OSQP_V1
+    ret = osqp_update_data_mat(m->work, w, nullptr, nnzHupp_, A, nullptr, nnzA_);
+#else
     ret = osqp_update_P_A(m->work, w, nullptr, nnzHupp_, A, nullptr, nnzA_);
+#endif
     casadi_assert(ret==0, "Problem in osqp_update_P_A");
 
+#ifdef WITH_OSQP_V1
+    osqp_cold_start(m->work);
+#endif
+
+    osqp_update_rho(m->work, rho_initial_);
 
     if (warm_start_primal_) {
+#ifdef WITH_OSQP_V1
+      ret = osqp_warm_start(m->work, arg[CONIC_X0], nullptr);
+#else
       ret = osqp_warm_start_x(m->work, arg[CONIC_X0]);
+#endif
       casadi_assert(ret==0, "Problem in osqp_warm_start_x");
     }
 
     if (warm_start_dual_) {
       casadi_copy(arg[CONIC_LAM_X0], nx_, w);
       casadi_copy(arg[CONIC_LAM_A0], na_, w+nx_);
+#ifdef WITH_OSQP_V1
+      ret = osqp_warm_start(m->work, nullptr, w);
+#else
       ret = osqp_warm_start_y(m->work, w);
+#endif
       casadi_assert(ret==0, "Problem in osqp_warm_start_y");
     }
 
@@ -303,20 +378,31 @@ namespace casadi {
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
     casadi_int dummy_size = std::max(nx_+na_, std::max(Asp.nnz(), H_.nnz()));
 
-    g.local("A", "csc");
+#ifdef WITH_OSQP_V1
+    std::string osqp_csc_type = "OSQPCscMatrix";
+#else
+    std::string osqp_csc_type = "csc";
+#endif
+    g.local("A", osqp_csc_type);
     g.local("dummy[" + str(dummy_size) + "]", "casadi_real");
     g << g.clear("dummy", dummy_size) << "\n";
 
-    g.constant_copy("A_row", Asp.get_row(), "c_int");
-    g.constant_copy("A_colind", Asp.get_colind(), "c_int");
+  #ifdef WITH_OSQP_V1
+    std::string osqp_int_type = "OSQPInt";
+  #else
+    std::string osqp_int_type = "c_int";
+  #endif
+
+    g.constant_copy("A_row", Asp.get_row(), osqp_int_type);
+    g.constant_copy("A_colind", Asp.get_colind(), osqp_int_type);
 
     // convert H in a upper triangular matrix. This is required by osqp v0.6.0
     Sparsity H_triu = Sparsity::triu(H_);
 
-    g.constant_copy("H_row", H_triu.get_row(), "c_int");
-    g.constant_copy("H_colind", H_triu.get_colind(), "c_int");
+    g.constant_copy("H_row", H_triu.get_row(), osqp_int_type);
+    g.constant_copy("H_colind", H_triu.get_colind(), osqp_int_type);
 
-    g.local("A", "csc");
+    g.local("A", osqp_csc_type);
     g << "A.m = " << nx_ + na_ << ";\n";
     g << "A.n = " << nx_ << ";\n";
     g << "A.nz = " << nnzA_ << ";\n";
@@ -325,7 +411,7 @@ namespace casadi {
     g << "A.i = A_row;\n";
     g << "A.p = A_colind;\n";
 
-    g.local("H", "csc");
+    g.local("H", osqp_csc_type);
     g << "H.m = " << nx_ << ";\n";
     g << "H.n = " << nx_ << ";\n";
     g << "H.nz = " << H_.nnz_upper() << ";\n";
@@ -334,7 +420,20 @@ namespace casadi {
     g << "H.i = H_row;\n";
     g << "H.p = H_colind;\n";
 
+#ifdef WITH_OSQP_V1
+    g << "struct\n";
+    g << "{\n";
+    g << "  OSQPInt n;\n";
+    g << "  OSQPInt m;\n";
+    g << "  OSQPCscMatrix * P;\n";
+    g << "  OSQPCscMatrix * A;\n";
+    g << "  OSQPFloat * q;\n";
+    g << "  OSQPFloat * l;\n";
+    g << "  OSQPFloat * u;\n";
+    g << "} data;\n";
+#else
     g.local("data", "OSQPData");
+#endif
     g << "data.n = " << nx_ << ";\n";
     g << "data.m = " << nx_ + na_ << ";\n";
     g << "data.P = &H;\n";
@@ -345,49 +444,77 @@ namespace casadi {
 
     g.local("settings", "OSQPSettings");
     g << "osqp_set_default_settings(&settings);\n";
-    g << "settings.rho = " << settings_.rho << ";\n";
-    g << "settings.sigma = " << settings_.sigma << ";\n";
+    g << "settings.rho = " << g.constant(settings_.rho) << ";\n";
+    g << "settings.sigma = " << g.constant(settings_.sigma) << ";\n";
     g << "settings.scaling = " << settings_.scaling << ";\n";
     g << "settings.adaptive_rho = " << settings_.adaptive_rho << ";\n";
-    g << "settings.adaptive_rho_interval = " << settings_.adaptive_rho_interval << ";\n";
-    g << "settings.adaptive_rho_tolerance = " << settings_.adaptive_rho_tolerance << ";\n";
+    g << "settings.adaptive_rho_interval = " << settings_.adaptive_rho_interval
+      << ";\n";
+    g << "settings.adaptive_rho_tolerance = " << g.constant(settings_.adaptive_rho_tolerance)
+      << ";\n";
     //g << "settings.adaptive_rho_fraction = " << settings_.adaptive_rho_fraction << ";\n";
     g << "settings.max_iter = " << settings_.max_iter << ";\n";
-    g << "settings.eps_abs = " << settings_.eps_abs << ";\n";
-    g << "settings.eps_rel = " << settings_.eps_rel << ";\n";
-    g << "settings.eps_prim_inf = " << settings_.eps_prim_inf << ";\n";
-    g << "settings.eps_dual_inf = " << settings_.eps_dual_inf << ";\n";
-    g << "settings.alpha = " << settings_.alpha << ";\n";
-    g << "settings.delta = " << settings_.delta << ";\n";
+    g << "settings.eps_abs = " << g.constant(settings_.eps_abs) << ";\n";
+    g << "settings.eps_rel = " << g.constant(settings_.eps_rel) << ";\n";
+    g << "settings.eps_prim_inf = " << g.constant(settings_.eps_prim_inf) << ";\n";
+    g << "settings.eps_dual_inf = " << g.constant(settings_.eps_dual_inf) << ";\n";
+    g << "settings.alpha = " << g.constant(settings_.alpha) << ";\n";
+    g << "settings.delta = " << g.constant(settings_.delta) << ";\n";
+#ifdef WITH_OSQP_V1
+    g << "settings.polishing = " << settings_.polishing << ";\n";
+#else
     g << "settings.polish = " << settings_.polish << ";\n";
+#endif
     g << "settings.polish_refine_iter = " << settings_.polish_refine_iter << ";\n";
     g << "settings.verbose = " << settings_.verbose << ";\n";
     g << "settings.scaled_termination = " << settings_.scaled_termination << ";\n";
     g << "settings.check_termination = " << settings_.check_termination << ";\n";
+#ifdef WITH_OSQP_V1
+    g << "settings.warm_starting = " << settings_.warm_starting << ";\n";
+#else
     g << "settings.warm_start = " << settings_.warm_start << ";\n";
+#endif
     //g << "settings.time_limit = " << settings_.time_limit << ";\n";
-
+#ifdef WITH_OSQP_V1
+    g << "return osqp_setup(&" + codegen_mem(g) + ", data.P, data.q, data.A, "
+      << "data.l, data.u, data.m, data.n, &settings)!=0;\n";
+#else
     g << "return osqp_setup(&" + codegen_mem(g) + ", &data, &settings)!=0;\n";
+#endif
   }
 
   void OsqpInterface::codegen_body(CodeGenerator& g) const {
     g.add_include("osqp/osqp.h");
     g.add_auxiliary(CodeGenerator::AUX_INF);
 
+#ifdef WITH_OSQP_V1
+    g.local("work", "OSQPSolver", "*");
+#else
     g.local("work", "OSQPWorkspace", "*");
+#endif
     g.init_local("work", codegen_mem(g));
 
     g.comment("Set objective");
     g.copy_default(g.arg(CONIC_G), nx_, "w", "0", false);
+#ifdef WITH_OSQP_V1
+    g << "if (osqp_update_data_vec(work, w, 0, 0)) return 1;\n";
+#else
     g << "if (osqp_update_lin_cost(work, w)) return 1;\n";
-
+#endif
     g.comment("Set bounds");
     g.copy_default(g.arg(CONIC_LBX), nx_, "w", "-casadi_inf", false);
     g.copy_default(g.arg(CONIC_LBA), na_, "w+"+str(nx_), "-casadi_inf", false);
     g.copy_default(g.arg(CONIC_UBX), nx_, "w+"+str(nx_+na_), "casadi_inf", false);
     g.copy_default(g.arg(CONIC_UBA), na_, "w+"+str(2*nx_+na_), "casadi_inf", false);
-    g << "if (osqp_update_bounds(work, w, w+" + str(nx_+na_)+ ")) return 1;\n";
 
+    g.comment("Convert C++ infinity values to OSQP infinity");
+    g << g.clip_min("w", 2*(nx_+na_), "-OSQP_INFTY", "0") << "\n";
+    g << g.clip_max("w", 2*(nx_+na_), "OSQP_INFTY", "0") << "\n";
+#ifdef WITH_OSQP_V1
+    g << "if (osqp_update_data_vec(work, 0, w, w+" + str(nx_+na_)+ ")) return 1;\n";
+#else
+    g << "if (osqp_update_bounds(work, w, w+" + str(nx_+na_)+ ")) return 1;\n";
+#endif
     g.comment("Project Hessian");
     g << g.tri_project(g.arg(CONIC_H), H_, "w", false);
 
@@ -407,13 +534,37 @@ namespace casadi {
     g << "}\n";
 
     g.comment("Pass Hessian and constraint matrices");
+#ifdef WITH_OSQP_V1
+    g << "if (osqp_update_data_mat(work, w, 0, " + str(nnzHupp_) + ", w+" + str(nnzHupp_) +
+         ", 0, " + str(nnzA_) + ")) return 1;\n";
+#else
     g << "if (osqp_update_P_A(work, w, 0, " + str(nnzHupp_) + ", w+" + str(nnzHupp_) +
          ", 0, " + str(nnzA_) + ")) return 1;\n";
+#endif
 
-    g << "if (osqp_warm_start_x(work, " + g.arg(CONIC_X0) + ")) return 1;\n";
-    g.copy_default(g.arg(CONIC_LAM_X0), nx_, "w", "0", false);
-    g.copy_default(g.arg(CONIC_LAM_A0), na_, "w+"+str(nx_), "0", false);
-    g << "if (osqp_warm_start_y(work, w)) return 1;\n";
+  #ifdef WITH_OSQP_V1
+    g << "osqp_cold_start(work);\n";
+  #endif
+
+    g << "osqp_update_rho(work, " << g.constant(rho_initial_) << ");\n";
+
+    if (warm_start_primal_) {
+  #ifdef WITH_OSQP_V1
+      g << "if (osqp_warm_start(work, " + g.arg(CONIC_X0) + ", OSQP_NULL)) return 1;\n";
+  #else
+      g << "if (osqp_warm_start_x(work, " + g.arg(CONIC_X0) + ")) return 1;\n";
+  #endif
+    }
+
+    if (warm_start_dual_) {
+      g.copy_default(g.arg(CONIC_LAM_X0), nx_, "w", "0", false);
+      g.copy_default(g.arg(CONIC_LAM_A0), na_, "w+"+str(nx_), "0", false);
+  #ifdef WITH_OSQP_V1
+      g << "if (osqp_warm_start(work, OSQP_NULL, w)) return 1;\n";
+  #else
+      g << "if (osqp_warm_start_y(work, w)) return 1;\n";
+  #endif
+    }
 
     g << "if (osqp_solve(work)) return 1;\n";
 
@@ -457,7 +608,7 @@ namespace casadi {
   }
 
   OsqpInterface::OsqpInterface(DeserializingStream& s) : Conic(s) {
-    s.version("OsqpInterface", 1);
+    int version = s.version("OsqpInterface", 1, 2);
     s.unpack("OsqpInterface::nnzHupp", nnzHupp_);
     s.unpack("OsqpInterface::nnzA", nnzA_);
     s.unpack("OsqpInterface::warm_start_primal", warm_start_primal_);
@@ -478,18 +629,31 @@ namespace casadi {
     s.unpack("OsqpInterface::settings::eps_dual_inf", settings_.eps_dual_inf);
     s.unpack("OsqpInterface::settings::alpha", settings_.alpha);
     s.unpack("OsqpInterface::settings::delta", settings_.delta);
+#ifdef WITH_OSQP_V1
+    s.unpack("OsqpInterface::settings::polish", settings_.polishing);
+#else
     s.unpack("OsqpInterface::settings::polish", settings_.polish);
+#endif
     s.unpack("OsqpInterface::settings::polish_refine_iter", settings_.polish_refine_iter);
     s.unpack("OsqpInterface::settings::verbose", settings_.verbose);
     s.unpack("OsqpInterface::settings::scaled_termination", settings_.scaled_termination);
     s.unpack("OsqpInterface::settings::check_termination", settings_.check_termination);
+#ifdef WITH_OSQP_V1
+    s.unpack("OsqpInterface::settings::warm_start", settings_.warm_starting);
+#else
     s.unpack("OsqpInterface::settings::warm_start", settings_.warm_start);
+#endif
+    if (version>=2) {
+      s.unpack("OsqpInterface::rho_initial", rho_initial_);
+    } else {
+      rho_initial_ = settings_.rho;
+    }
     //s.unpack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
 
   void OsqpInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
-    s.version("OsqpInterface", 1);
+    s.version("OsqpInterface", 2);
     s.pack("OsqpInterface::nnzHupp", nnzHupp_);
     s.pack("OsqpInterface::nnzA", nnzA_);
     s.pack("OsqpInterface::warm_start_primal", warm_start_primal_);
@@ -508,12 +672,21 @@ namespace casadi {
     s.pack("OsqpInterface::settings::eps_dual_inf", settings_.eps_dual_inf);
     s.pack("OsqpInterface::settings::alpha", settings_.alpha);
     s.pack("OsqpInterface::settings::delta", settings_.delta);
+#ifdef WITH_OSQP_V1
+    s.pack("OsqpInterface::settings::polish", settings_.polishing);
+#else
     s.pack("OsqpInterface::settings::polish", settings_.polish);
+#endif
     s.pack("OsqpInterface::settings::polish_refine_iter", settings_.polish_refine_iter);
     s.pack("OsqpInterface::settings::verbose", settings_.verbose);
     s.pack("OsqpInterface::settings::scaled_termination", settings_.scaled_termination);
     s.pack("OsqpInterface::settings::check_termination", settings_.check_termination);
+#ifdef WITH_OSQP_V1
+    s.pack("OsqpInterface::settings::warm_start", settings_.warm_starting);
+#else
     s.pack("OsqpInterface::settings::warm_start", settings_.warm_start);
+#endif
+    s.pack("OsqpInterface::rho_initial", rho_initial_);
     //s.pack("OsqpInterface::settings::time_limit", settings_.time_limit);
   }
 

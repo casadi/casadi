@@ -2922,6 +2922,70 @@ class Functiontests(casadiTestCase):
 
     self.checkfunction_light(g, f2, inputs=[3])
 
+  def test_find_function(self):
+    for X in [MX,SX]:
+        x = X.sym("x")
+        
+        """
+           k
+           j
+         i    g
+        h  g      
+        """
+
+        g = Function("g",[x],[x**2],{"never_inline":True})
+        
+        h = Function("h",[x],[g(x**2)],{"never_inline":True})
+        
+        i = Function("i",[x],[h(x**2)+g(x**2)],{"never_inline":True})
+        
+        j = Function("j",[x],[i(x**2)+g(x**2)],{"never_inline":True})
+        
+        k = Function("k",[x],[j(x**2)],{"never_inline":True})
+        
+        k.generate('f.c')
+         
+        ref = [j]
+        res = k.find_functions(0)
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() == b.name())
+          
+        ref = [j,i,g]
+        res = k.find_functions(1)
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() == b.name())
+        
+        ref = [j,i,h,g]
+        res = k.find_functions(2)
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() == b.name())    
+
+        ref = [j,i,h,g]
+        res = k.find_functions()
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() == b.name())    
+
+
+        intg = integrator("intg","rk",{"x":x,"ode":k(x)})
+        ref = [intg.get_function("dae"),k,j,i,h,g,intg.get_function("daeF"),intg.get_function("step")]
+        res = intg.find_functions()
+        print(res)
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name()==b.name())    
+
+        K = k.map(5)
+        
+        ref = [k,j,i,h,g]
+        res = K.find_functions()
+        
+        self.assertEqual(len(ref),len(res))
+        for a,b in zip(ref,res):  assert(a.name() == b.name())    
+
   def test_post_expand(self):
 
     x = MX.sym("x")
@@ -2946,28 +3010,154 @@ class Functiontests(casadiTestCase):
   def test_memful_main(self):
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
-    inputs = c.convert_in(inputs)
-    extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
+    extra_options = ["-Wno-endif-labels","-Wno-unused-variable","-Wno-strict-prototypes"]
     # No extra options on windows
     if os.name == 'nt':
       extra_options = []
-    self.check_codegen(c,inputs=inputs,main=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
+    
+    self.check_codegen(c,inputs=c.convert_in(inputs),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
+    
+    c.generate('f.c')
+    
+    n_matches = 0
+    
+    with open("f.c","r") as inp:
+        for line in inp.readlines():
+            if re.search("static int casadi_(\w+)_ref_counter",line):
+                n_matches = n_matches +1
+    
+    self.assertEqual(n_matches,1)
+    
+    # Check wrapper Function
+    for X in [MX,SX]:
+    
+        g = X.sym("g",2)
+        inputs["g"] = g
+        
+        f = Function('wrapper',[g],[c(**inputs)['x']])
+        print(f)
+        self.check_codegen(f,inputs=[vertcat(1,2)],main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
+        f.generate('f.c')
+        
+        n_matches = 0
+        
+        with open("f.c","r") as inp:
+            for line in inp.readlines():
+                if re.search("static int casadi_(\w+)_ref_counter",line):
+                    n_matches = n_matches +1
+        
+        # wrapper function should not have it's own reference counting
+        self.assertEqual(n_matches,1)
+
+  def test_codegen_thread_safe(self):
+  
+    for variant in [0,1]:
+        if variant==0 and has_conic("osqp"):
+            c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"osqp.verbose":False,"osqp.alpha":1,"osqp.eps_abs":1e-8,"osqp.eps_rel":1e-8,"print_time":False})
+            inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
+            extralibs = ["osqp"]
+            symbol = "g"
+        elif has_nlpsol("fatrop") and os.name == 'posix':
+            x = MX.sym('x',2)
+            solver = nlpsol("solver","fatrop",{"x":x,"f":sumsqr(x-10),"g":x[0]+x[1]},{"fatrop.print_level":0,"print_time":False})
+            inputs = {"x0": vertcat(1,2),"lbx":vertcat(-5,-4),"ubx":vertcat(5,4),"lbg":-2,"ubg":2}
+            extralibs = ["fatrop","blasfeo","m"]
+            c= solver
+            symbol = "ubx"
+        else:
+            continue
+        extra_options = ["-Wno-endif-labels","-Wno-unused-variable","-Wno-strict-prototypes"]
+        # No extra options on windows
+        if os.name == 'nt':
+          extra_options = []
+          
+        def get_functions():
+            yield (c,inputs)
+            # Check wrapper Function
+            for X in [MX,SX]:
+                local_inputs = dict(inputs)
+            
+                g = X.sym(symbol,2)
+                local_inputs[symbol] = g
+                
+                yield (Function('wrapper',[g],[c(**local_inputs)['x']],[symbol],["res"]),{symbol: inputs[symbol]})
+                
+        for f,local_inputs in get_functions():
+            for map_type in ["serial","thread","openmp"]:
+                F = f.map(2,map_type)
+                
+
+
+                wide_inputs = {}
+                for k,v in local_inputs.items():
+                    wide_inputs[k] = horzcat(local_inputs[k],local_inputs[k]*1.2)
+
+                if map_type == "openmp":
+                    # Set up OpenMP compilation flags
+                    if os.name == 'nt':
+                        openmp_flags = ["/openmp"]
+                    elif sys.platform == 'darwin':
+                        # macOS: use -Xpreprocessor -fopenmp and environment variables
+                        openmp_flags = ["-Xpreprocessor", "-fopenmp"]
+                        # Add CPPFLAGS and LDFLAGS from environment if available (set by CI)
+                        cppflags = os.environ.get('CPPFLAGS', '')
+                        ldflags = os.environ.get('LDFLAGS', '')
+                        if cppflags:
+                            openmp_flags.extend(cppflags.split())
+                        if ldflags:
+                            openmp_flags.extend(ldflags.split())
+                        openmp_flags.append("-lomp")
+                        openmp_flags.append("-Wno-pedantic") # workaround /opt/homebrew/opt/libomp/include/omp.h:60:9: error: ISO C restricts enumerator values to range of 'int' (2147483648 is too large) [-Werror,-Wpedantic]
+                    else:
+                        openmp_flags = ["-fopenmp"]
+
+                    self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+openmp_flags,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_OMP"],with_external=False,digits=12)
+                elif map_type == "thread":
+                    if os.name == "posix":
+                        for CASADI_MUTEX_USE_STATIC_INIT in ["0","1"]:
+                            self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+["-pthread"],extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_POSIX","CASADI_MUTEX_USE_STATIC_INIT=" + CASADI_MUTEX_USE_STATIC_INIT],with_external=False,helgrind=True,digits=12)
+                        if sys.platform != "darwin":
+                            self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c11",extra_options=extra_options,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_C11"],with_external=False,helgrind=True,digits=12)
+                    elif os.name == 'nt':
+                        #self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,std="c11",extra_options=extra_options,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_C11"],with_external=False,debug_mode=True)
+                        for CASADI_MUTEX_USE_STATIC_INIT in ["0","1"]: # Seems to only work when casadi is compiled with visual studio
+                            self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,std="c99",extra_options=extra_options,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_WINDOWS","CASADI_MUTEX_USE_STATIC_INIT="+CASADI_MUTEX_USE_STATIC_INIT],with_external=False,debug_mode=True,digits=12)
+                else:
+                    self.check_codegen(f,inputs=f.convert_in(local_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=extralibs,with_external=False,digits=12)
+                    self.check_codegen(f,inputs=f.convert_in(dict((k,v*1.2) for k,v in local_inputs.items())),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=extralibs,with_external=False,digits=12)
+                    self.check_codegen(F,inputs=f.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options,extralibs=extralibs,with_external=False,digits=12)
+            
 
   @requires_conic('osqp')
   def test_memful_external(self):
     if not args.run_slow: return
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
-    inputs = c.convert_in(inputs)
-    extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
+    extra_options = ["-Wno-endif-labels","-Wno-unused-variable","-Wno-strict-prototypes"]
     # No extra options on windows
     if os.name == 'nt':
       extra_options = []
-    F,lib = self.check_codegen(c,inputs=inputs,std="c99",extra_options=extra_options,extralibs=["osqp"])
+    F,lib = self.check_codegen(c,inputs=c.convert_in(inputs),std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
     F = F.wrap()
     print("memful_external")
-    self.check_codegen(F,inputs=inputs,main=True,extralibs=[lib])
+    self.check_codegen(F,inputs=c.convert_in(inputs),valgrind=True,main=True,extralibs=[lib],debug_mode=True)
     
+    # Check wrapper Function
+    for X in [MX,SX]:
+    
+        g = X.sym("g",2)
+        inputs["g"] = g
+        
+        f = Function('wrapper',[g],[c(**inputs)['x']])
+        print(f)
+        # No extra options on windows
+        if os.name == 'nt':
+          extra_options = []
+        F,lib = self.check_codegen(f,inputs=[vertcat(1,2)],std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
+        F = F.wrap()
+        print("memful_external")
+        self.check_codegen(F,inputs=[vertcat(1,2)],valgrind=True,main=True,extralibs=[lib],debug_mode=True)
+   
   def test_cse(self):
     for X in [SX,MX]:
         x = X.sym("x",2)

@@ -1228,6 +1228,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CbcInterface</td></tr>
 <tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::CbcInterface</td></tr>
 <tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::CbcInterface</td></tr>
@@ -1308,6 +1309,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CbcInterface</td></tr>
 <tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::CbcInterface</td></tr>
 <tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::CbcInterface</td></tr>
@@ -1408,6 +1410,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -1480,6 +1483,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -1543,6 +1547,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -1615,6 +1620,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -1860,6 +1866,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -1922,6 +1929,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -1990,6 +1998,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::CplexInterface</td></tr>
@@ -2084,6 +2093,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::CplexInterface</td></tr>
@@ -2406,6 +2416,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -2478,6 +2489,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -2950,6 +2962,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>structure_detection</td><td>OT_STRING</td><td>NONE | auto | manual</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
@@ -3032,6 +3045,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>structure_detection</td><td>OT_STRING</td><td>NONE | auto | manual</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
@@ -4030,6 +4044,7 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>lazy_constraints_callback</td><td>OT_FUNCTION</td><td>User callback for adding LazyConstraints at MIPSOL. Input: dict with solution data. Output: dict with lazy constraints.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
@@ -4044,6 +4059,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::GurobiInterface</td></tr>
@@ -4060,6 +4076,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>gurobi</td><td>OT_DICT</td><td>Options to be passed to gurobi.</td></tr>
+<tr><td>lazy_constraints_callback</td><td>OT_FUNCTION</td><td>User callback for adding LazyConstraints at MIPSOL. Input: dict with solution data. Output: dict with lazy constraints.</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td></tr>
 <tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td></tr>
 <tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td></tr>
@@ -4110,6 +4127,7 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>lazy_constraints_callback</td><td>OT_FUNCTION</td><td>User callback for adding LazyConstraints at MIPSOL. Input: dict with solution data. Output: dict with lazy constraints.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
@@ -4124,6 +4142,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::GurobiInterface</td></tr>
@@ -4191,6 +4210,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -4263,6 +4283,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -4331,6 +4352,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -4413,6 +4435,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -4484,6 +4507,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>target</td><td>OT_STRING</td><td>hpmpc target</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance in the duality measure</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -4578,6 +4602,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>target</td><td>OT_STRING</td><td>hpmpc target</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance in the duality measure</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -5779,6 +5804,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -5867,6 +5893,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -7511,6 +7538,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -7587,6 +7615,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -7716,9 +7745,10 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
-<tr><td>warm_start_dual</td><td>OT_BOOL</td><td>Use lam_a0 and lam_x0 input to warmstart [Default: truw].</td><td>casadi::OsqpInterface</td></tr>
+<tr><td>warm_start_dual</td><td>OT_BOOL</td><td>Use lam_a0 and lam_x0 input to warmstart [Default: true].</td><td>casadi::OsqpInterface</td></tr>
 <tr><td>warm_start_primal</td><td>OT_BOOL</td><td>Use x0 input to warmstart [Default: true].</td><td>casadi::OsqpInterface</td></tr>
 </table>
 */
@@ -7730,7 +7760,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>osqp</td><td>OT_DICT</td><td>const Options to be passed to osqp.</td></tr>
-<tr><td>warm_start_dual</td><td>OT_BOOL</td><td>Use lam_a0 and lam_x0 input to warmstart [Default: truw].</td></tr>
+<tr><td>warm_start_dual</td><td>OT_BOOL</td><td>Use lam_a0 and lam_x0 input to warmstart [Default: true].</td></tr>
 <tr><td>warm_start_primal</td><td>OT_BOOL</td><td>Use x0 input to warmstart [Default: true].</td></tr>
 </table>
 */
@@ -7792,9 +7822,10 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
-<tr><td>warm_start_dual</td><td>OT_BOOL</td><td>Use lam_a0 and lam_x0 input to warmstart [Default: truw].</td><td>casadi::OsqpInterface</td></tr>
+<tr><td>warm_start_dual</td><td>OT_BOOL</td><td>Use lam_a0 and lam_x0 input to warmstart [Default: true].</td><td>casadi::OsqpInterface</td></tr>
 <tr><td>warm_start_primal</td><td>OT_BOOL</td><td>Use x0 input to warmstart [Default: true].</td><td>casadi::OsqpInterface</td></tr>
 </table>
 */
@@ -7872,6 +7903,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>warm_start_dual</td><td>OT_BOOL</td><td>Use y and z input to warmstart [Default: true].</td><td>casadi::ProxqpInterface</td></tr>
@@ -7948,6 +7980,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>warm_start_dual</td><td>OT_BOOL</td><td>Use y and z input to warmstart [Default: true].</td><td>casadi::ProxqpInterface</td></tr>
@@ -8014,6 +8047,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -8088,6 +8122,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -8185,6 +8220,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -8329,6 +8365,7 @@
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -8401,6 +8438,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -8487,6 +8525,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -10305,6 +10344,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>superscs</td><td>OT_DICT</td><td>Options to be passed to superscs.</td><td>casadi::SuperscsInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
@@ -10377,6 +10417,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
 <tr><td>superscs</td><td>OT_DICT</td><td>Options to be passed to superscs.</td><td>casadi::SuperscsInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>

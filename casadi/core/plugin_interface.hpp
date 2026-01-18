@@ -27,8 +27,8 @@
 #include "global_options.hpp"
 #include "serializing_stream.hpp"
 #include "casadi_os.hpp"
-#include <casadi/config.h>
 #include <casadi/core/casadi_common.hpp>
+#include "casadi_meta.hpp"
 
 #include <stdlib.h>
 
@@ -107,6 +107,9 @@ namespace casadi {
                                         const std::string& pname, Problem problem);
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
+
+    // Check if dependencies of the plugin have the correct version
+    virtual void deps_version_check(const std::string& stage) const {}
 
     /** \brief Serialize type information
 
@@ -188,7 +191,8 @@ namespace casadi {
 #else // WITH_DL
 
     // Get the name of the shared library
-    std::string lib = SHARED_LIBRARY_PREFIX + libname + SHARED_LIBRARY_SUFFIX;
+    std::string lib = std::string(CasadiMeta::shared_library_prefix()) + libname +
+                      CasadiMeta::shared_library_suffix();
 
     // Build up search paths;
     std::vector<std::string> search_paths = get_search_paths();

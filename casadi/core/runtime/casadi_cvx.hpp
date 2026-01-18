@@ -17,6 +17,7 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// C-REPLACE "fabs" "casadi_fabs"
 // C-REPLACE "fmax" "casadi_fmax"
 // C-REPLACE "nullptr" "0"
 

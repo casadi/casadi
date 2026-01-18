@@ -30,6 +30,7 @@ struct casadi_daqp_prob {
   const casadi_qp_prob<T1>* qp;
 
   DAQPSettings settings;
+  const int *integrality;
 };
 // C-REPLACE "casadi_daqp_prob<T1>" "struct casadi_daqp_prob"
 
@@ -54,19 +55,20 @@ struct casadi_daqp_data {
   DAQPResult res;
 
   int return_status;
-
+  int nodecount;
+  int bnb_itercount;
 };
 // C-REPLACE "casadi_daqp_data<T1>" "struct casadi_daqp_data"
 
 // SYMBOL "daqp_init_mem"
 template<typename T1>
-int daqp_init_mem(casadi_daqp_data<T1>* d) {
+int casadi_daqp_init_mem(casadi_daqp_data<T1>* d) {
   return 0;
 }
 
 // SYMBOL "daqp_free_mem"
 template<typename T1>
-void daqp_free_mem(casadi_daqp_data<T1>* d) {
+void casadi_daqp_free_mem(casadi_daqp_data<T1>* d) {
 
 }
 
@@ -112,6 +114,7 @@ void casadi_daqp_init(casadi_daqp_data<T1>* d, const T1*** arg, T1*** res, casad
   d->daqp.sense = (int*) *iw; *iw += p->qp->nz;
 }
 
+// C-REPLACE "fabs" "casadi_fabs"
 
 // C-REPLACE "SOLVER_RET_SUCCESS" "0"
 // C-REPLACE "SOLVER_RET_LIMITED" "2"
@@ -133,6 +136,22 @@ int casadi_daqp_solve(casadi_daqp_data<T1>* d, const double** arg, double** res,
     d->daqp.sense[p_qp->nx+i] = d_qp->lba[i]==d_qp->uba[i] ? 5 : 0;
   }
 
+  if (p->integrality) {
+    for (casadi_int j = 0; j < p_qp->nx; ++j) {
+      if (!p->integrality[j]) continue;
+
+      double lb = d_qp->lbx[j];
+      double ub = d_qp->ubx[j];
+
+      int binary = fabs(lb - 0.0) < 1e-9 && fabs(ub - 1.0) < 1e-9;
+
+      casadi_assert(binary, "DAQP only supports binary variables with bounds [0,1], but variable " + str(j) + " has bounds [" + str(lb) + ", " + str(ub) + "]."); // NOLINT(whitespace/line_length)
+      if (!binary) return 1;
+
+      d->daqp.sense[j] |= 16;  // mark as binary
+    }
+  }
+
   d->daqp.n = p_qp->nx;
   d->daqp.m = p_qp->nx + p_qp->na;
   d->daqp.ms = p_qp->nx;
@@ -148,9 +167,21 @@ int casadi_daqp_solve(casadi_daqp_data<T1>* d, const double** arg, double** res,
 
   flag = setup_daqp(&d->daqp,&d->work,&(d->res.setup_time));
   if (flag<0) return 1;
+
+  if (d->work.bnb) {
+    casadi_message("DAQP BnB workspace detected - branch-and-bound will run.");
+  }
+
   daqp_solve(&d->res,&d->work);
   casadi_copy(d->res.lam, p_qp->nx, d_qp->lam_x);
   casadi_copy(d->res.lam+p_qp->nx, p_qp->na, d_qp->lam_a);
+  if (d->work.bnb) {
+    d->nodecount = d->work.bnb->nodecount;
+    d->bnb_itercount = d->work.bnb->itercount;
+  } else {
+    d->nodecount = 0;
+    d->bnb_itercount = 0;
+  }
   if (d_qp->f) *d_qp->f = d->res.fval;
   d->work.settings = 0;
   free_daqp_workspace(&d->work);
@@ -160,7 +191,7 @@ int casadi_daqp_solve(casadi_daqp_data<T1>* d, const double** arg, double** res,
   d_qp->success = d->res.exitflag==EXIT_OPTIMAL;
 
 /**
-  #define EXIT_SOFT_OPTIMAL 2 
+#define EXIT_SOFT_OPTIMAL 2
 #define EXIT_OPTIMAL 1
 #define EXIT_INFEASIBLE -1
 #define EXIT_CYCLE -2

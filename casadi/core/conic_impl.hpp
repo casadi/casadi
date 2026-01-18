@@ -94,6 +94,9 @@ namespace casadi {
     // Initialize
     void init(const Dict& opts) override;
 
+    // Finalize the object creation
+    void finalize() override;
+
     /** \brief Initalize memory block
 
         \identifier{1ja} */
@@ -161,6 +164,7 @@ namespace casadi {
     std::vector<bool> discrete_;
     std::vector<bool> equality_;
     bool print_problem_;
+    bool solver_version_check_;
 
     /// Problem structure
     Sparsity H_, A_, Q_, P_;

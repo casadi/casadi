@@ -156,7 +156,12 @@ if(NOT SKIP_CONFIG_H_GENERATION)
     set(EXTRA_CXX_FLAGS_FROM_DEFS "${EXTRA_CXX_FLAGS_FROM_DEFS} ${DEF}")
   endforeach()
 
-  configure_file(config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/config.h" ESCAPE_QUOTES)
+  # Configure to a temporary file first, then only update if different
+  # This preserves the timestamp of config.h when content hasn't changed
+  configure_file(config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/config.h.tmp" ESCAPE_QUOTES)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                  "${CMAKE_CURRENT_BINARY_DIR}/config.h.tmp"
+                  "${CMAKE_CURRENT_BINARY_DIR}/config.h")
 endif()
 install(FILES casadi.hpp mem.h casadi_c.h "${CMAKE_CURRENT_BINARY_DIR}/config.h"
         DESTINATION ${INCLUDE_PREFIX}/casadi)

@@ -1283,6 +1283,7 @@ namespace casadi {
     /** \brief Get all functions embedded in the expression graphs
 
       * \param[in] max_depth  Maximum depth - a negative number indicates no maximum
+      * \return depth-first ordered, unique, list of dependencies
 
         \identifier{1y6} */
     std::vector<Function> find_functions(casadi_int max_depth = -1) const;

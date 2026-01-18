@@ -1278,6 +1278,7 @@ namespace casadi {
     g << "d_nlp.x0 = arg[" << NLPSOL_X0 << "];\n";
     g << "d_nlp.lam_x0 = arg[" << NLPSOL_LAM_X0 << "];\n";
     g << "d_nlp.lam_g0 = arg[" << NLPSOL_LAM_G0 << "];\n";
+    g << "arg += " << NLPSOL_NUM_IN << ";\n";
 
     g << "d_nlp.x = res[" << NLPSOL_X << "];\n";
     g << "d_nlp.f = res[" << NLPSOL_F << "];\n";
@@ -1285,6 +1286,7 @@ namespace casadi {
     g << "d_nlp.lam_x = res[" << NLPSOL_LAM_X << "];\n";
     g << "d_nlp.lam_g = res[" << NLPSOL_LAM_G << "];\n";
     g << "d_nlp.lam_p = res[" << NLPSOL_LAM_P << "];\n";
+    g << "res += " << NLPSOL_NUM_OUT << ";\n";
 
     g << "d_nlp.prob = &p_nlp;\n";
     g << "p_nlp.nx = " << nx_ << ";\n";

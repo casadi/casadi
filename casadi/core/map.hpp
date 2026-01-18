@@ -63,6 +63,10 @@ namespace casadi {
     // Get a dependency function
     const Function& get_function(const std::string &name) const override;
 
+    // Get all embedded functions, recursively
+    void find(std::map<FunctionInternal*, std::pair<Function, size_t> >& all_fun,
+        casadi_int max_depth) const override;
+
     // Check if a particular dependency exists
     bool has_function(const std::string& fname) const override;
 
@@ -304,6 +308,11 @@ namespace casadi {
 
     /// Type of parallellization
     std::string parallelization() const override { return "thread"; }
+
+    /** \brief Generate code for the declarations of the C function
+
+        \identifier{2f3} */
+    void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function
 

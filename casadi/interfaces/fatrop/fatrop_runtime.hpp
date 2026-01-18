@@ -177,13 +177,13 @@ struct casadi_fatrop_data {
 
 // SYMBOL "fatrop_init_mem"
 template<typename T1>
-int fatrop_init_mem(casadi_fatrop_data<T1>* d) {
+int casadi_fatrop_init_mem(casadi_fatrop_data<T1>* d) {
   return 0;
 }
 
 // SYMBOL "fatrop_free_mem"
 template<typename T1>
-void fatrop_free_mem(casadi_fatrop_data<T1>* d) {
+void casadi_fatrop_free_mem(casadi_fatrop_data<T1>* d) {
   //Highs_destroy(d->fatrop);
   
 }
@@ -191,35 +191,6 @@ void fatrop_free_mem(casadi_fatrop_data<T1>* d) {
 // C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
 // C-REPLACE "calc_function" "casadi_oracle_call"
 // C-REPLACE "casadi_error" "//casadi_error"
-
-// SYMBOL "fatrop_full_eval_constr_jac"
-template<typename T1>
-fatrop_int casadi_fatrop_full_eval_constr_jac(const double* primal_data, const double* stageparams_p, const double* globalparams_p,
-            struct blasfeo_dmat* BAbt_p, struct blasfeo_dmat* Ggt_p, struct blasfeo_dmat* Ggt_ineq_p, const struct FatropOcpCDims* s, void* user_data) {
-  casadi_int i;
-  casadi_fatrop_data<T1>* d = static_cast< casadi_fatrop_data<T1>* >(user_data);
-  const casadi_fatrop_prob<T1>* p = d->prob;
-  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
-  casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
-
-  casadi_fatrop_read_primal_data(primal_data, d->x, s);
-  d_oracle->arg[0] = d->x;
-  d_oracle->arg[1] = d_nlp->p;
-  d_oracle->res[0] = d->g;
-  d_oracle->res[1] = d->a;
-  calc_function(&d->prob->nlp_jac_g, d_oracle);
-
-  casadi_fatrop_mproject(-1.0, d->a, p->sp_a, d->AB, p->ABsp, d->pv);
-  casadi_project(d->a, p->sp_a, d->CD, p->CDsp, d->pv);
-  casadi_project(d->a, p->sp_a, d->I, p->Isp, d->pv);
-
-  for (i=0;i<p->Isp[2+p->Isp[1]];++i) {
-    if (d->I[i]!=1.0) {
-      casadi_error("Structure mismatch: gap-closing constraints must be like this: x_{k+1}-F(xk,uk).");
-    }
-  }
-  return 0;
-}
 
 // SYMBOL "fatrop_full_eval_contr_viol"
 template<typename T1>
@@ -312,6 +283,67 @@ fatrop_int casadi_fatrop_full_eval_obj(
   return 1; // skip
 }
 
+// C-REPLACE "const_cast<T1*>" "(T1*)"
+
+// SYMBOL "fatrop_eval_BAbt"
+template<typename T1>
+fatrop_int casadi_fatrop_eval_BAbt(const double *states_kp1, const double *inputs_k,
+    const double *states_k, const double *stage_params_k,
+    const double *global_params, struct blasfeo_dmat *res, const fatrop_int k, void* user_data) {
+  casadi_fatrop_data<T1>* d = static_cast< casadi_fatrop_data<T1>* >(user_data);
+  const casadi_fatrop_prob<T1>* p = d->prob;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  const T1* lbg_k = d_nlp->lbz+p->nlp->nx+p->AB[k].offset_r;
+  const T1* g_k = d->g+p->AB[k].offset_r;
+  casadi_int i;
+  blasfeo_pack_tran_dmat(p->nx[k+1], p->nx[k], d->AB+p->AB_offsets[k], p->nx[k+1], res, p->nu[k], 0);
+  blasfeo_pack_tran_dmat(p->nx[k+1], p->nu[k], d->AB+p->AB_offsets[k]+p->nx[k]*p->nx[k+1], p->nx[k+1], res, 0, 0);
+
+  for (i=0; i<p->nx[k+1]; ++i) {
+    BLASFEO_DMATEL(res, p->nx[k]+p->nu[k], i) = lbg_k[i]-g_k[i];
+  }
+
+  return 0;
+
+}
+
+// C-REPLACE "casadi_fatrop_eval_BAbt<T1>" "casadi_fatrop_eval_BAbt"
+
+// SYMBOL "fatrop_eval_RSQrqt"
+template<typename T1>
+fatrop_int casadi_fatrop_eval_RSQrqt(
+    const double *objective_scale,
+    const double *inputs_k,
+    const double *states_k,
+    const double *lam_dyn_k,
+    const double *lam_eq_k,
+    const double *lam_eq_ineq_k,
+    const double *stage_params_k,
+    const double *global_params,
+    struct blasfeo_dmat *res,
+    const fatrop_int k, void* user_data) {
+  casadi_fatrop_data<T1>* d = static_cast< casadi_fatrop_data<T1>* >(user_data);
+  const casadi_fatrop_prob<T1>* p = d->prob;
+
+  int n = p->nx[k]+p->nu[k];
+  blasfeo_pack_dmat(p->nx[k], p->nx[k],
+    d->RSQ+p->RSQ_offsets[k], n, res, p->nu[k], p->nu[k]);
+  blasfeo_pack_dmat(p->nu[k], p->nu[k],
+    d->RSQ+p->RSQ_offsets[k]+p->nx[k]*n+p->nx[k], n, res, 0, 0);
+  blasfeo_pack_dmat(p->nu[k], p->nx[k],
+    d->RSQ+p->RSQ_offsets[k]+p->nx[k], n, res, 0, p->nu[k]);
+  blasfeo_pack_dmat(p->nx[k], p->nu[k],
+    d->RSQ+p->RSQ_offsets[k]+p->nx[k]*n, n, res, p->nu[k], 0);
+
+
+  blasfeo_pack_dmat(1, p->nx[k], d->g+p->CD[k].offset_c, 1, res, p->nx[k]+p->nu[k], p->nu[k]);
+  blasfeo_pack_dmat(1, p->nu[k], d->g+p->CD[k].offset_c+p->nx[k], 1, res, p->nx[k]+p->nu[k], 0);
+
+  return 0;
+}
+
+// C-REPLACE "casadi_fatrop_eval_RSQrqt<T1>" "casadi_fatrop_eval_RSQrqt"
+
 // SYMBOL "fatrop_full_eval_lag_hess"
 template<typename T1>
 fatrop_int casadi_fatrop_full_eval_lag_hess(
@@ -372,66 +404,27 @@ fatrop_int casadi_fatrop_full_eval_lag_hess(
     }
   }
 
-  return 0;
-}
+  for (k = 0; k < s->K; k++) {
+    fatrop_int nu = p->nu[k];
+    fatrop_int offs_ux = s->ux_offs[k];
 
-// C-REPLACE "const_cast<T1*>" "(T1*)"
+    fatrop_int offs_g = s->g_offs[k];
+    fatrop_int offs_g_ineq = s->g_ineq_offs[k];
+    fatrop_int offs_dyn_eq = s->dyn_eq_offs[k];
 
-// SYMBOL "fatrop_eval_BAbt"
-template<typename T1>
-fatrop_int casadi_fatrop_eval_BAbt(const double *states_kp1, const double *inputs_k,
-    const double *states_k, const double *stage_params_k,
-    const double *global_params, struct blasfeo_dmat *res, const fatrop_int k, void* user_data) {
-  casadi_fatrop_data<T1>* d = static_cast< casadi_fatrop_data<T1>* >(user_data);
-  const casadi_fatrop_prob<T1>* p = d->prob;
-  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
-  const T1* lbg_k = d_nlp->lbz+p->nlp->nx+p->AB[k].offset_r;
-  const T1* g_k = d->g+p->AB[k].offset_r;
-  casadi_int i;
-  blasfeo_pack_tran_dmat(p->nx[k+1], p->nx[k], d->AB+p->AB_offsets[k], p->nx[k+1], res, p->nu[k], 0);
-  blasfeo_pack_tran_dmat(p->nx[k+1], p->nu[k], d->AB+p->AB_offsets[k]+p->nx[k]*p->nx[k+1], p->nx[k+1], res, 0, 0);
-
-  for (i=0; i<p->nx[k+1]; ++i) {
-    BLASFEO_DMATEL(res, p->nx[k]+p->nu[k], i) = lbg_k[i]-g_k[i];
+    casadi_fatrop_eval_RSQrqt<T1>(&objective_scale,
+            primal_data + offs_ux,
+            primal_data + offs_ux + nu,
+            lam_data + offs_dyn_eq,
+            lam_data + offs_g,
+            lam_data + offs_g_ineq,
+            NULL, NULL,
+            res + k,
+            k,
+            user_data);
   }
-
-  return 0;
-
+  return 1; //skip
 }
-
-// SYMBOL "fatrop_eval_RSQrqt"
-template<typename T1>
-fatrop_int casadi_fatrop_eval_RSQrqt(
-    const double *objective_scale,
-    const double *inputs_k,
-    const double *states_k,
-    const double *lam_dyn_k,
-    const double *lam_eq_k,
-    const double *lam_eq_ineq_k,
-    const double *stage_params_k,
-    const double *global_params,
-    struct blasfeo_dmat *res,
-    const fatrop_int k, void* user_data) {
-  casadi_fatrop_data<T1>* d = static_cast< casadi_fatrop_data<T1>* >(user_data);
-  const casadi_fatrop_prob<T1>* p = d->prob;
-
-  int n = p->nx[k]+p->nu[k];
-  blasfeo_pack_dmat(p->nx[k], p->nx[k],
-    d->RSQ+p->RSQ_offsets[k], n, res, p->nu[k], p->nu[k]);
-  blasfeo_pack_dmat(p->nu[k], p->nu[k],
-    d->RSQ+p->RSQ_offsets[k]+p->nx[k]*n+p->nx[k], n, res, 0, 0);
-  blasfeo_pack_dmat(p->nu[k], p->nx[k],
-    d->RSQ+p->RSQ_offsets[k]+p->nx[k], n, res, 0, p->nu[k]);
-  blasfeo_pack_dmat(p->nx[k], p->nu[k],
-    d->RSQ+p->RSQ_offsets[k]+p->nx[k]*n, n, res, p->nu[k], 0);
-
-
-  blasfeo_pack_dmat(1, p->nx[k], d->g+p->CD[k].offset_c, 1, res, p->nx[k]+p->nu[k], p->nu[k]);
-  blasfeo_pack_dmat(1, p->nu[k], d->g+p->CD[k].offset_c+p->nx[k], 1, res, p->nx[k]+p->nu[k], 0);
-
-  return 0;
-}
-
 
 // SYMBOL "fatrop_eval_Ggt"
 template<typename T1>
@@ -477,6 +470,8 @@ fatrop_int casadi_fatrop_eval_Ggt(
 
   return 0;
 }
+
+// C-REPLACE "casadi_fatrop_eval_Ggt<T1>" "casadi_fatrop_eval_Ggt"
 
 // SYMBOL "fatrop_eval_Ggt_ineq"
 template<typename T1>
@@ -526,6 +521,74 @@ fatrop_int  casadi_fatrop_eval_Ggt_ineq(
   }
 
   return 0;
+}
+
+// C-REPLACE "casadi_fatrop_eval_Ggt_ineq<T1>" "casadi_fatrop_eval_Ggt_ineq"
+
+// SYMBOL "fatrop_full_eval_constr_jac"
+template<typename T1>
+fatrop_int casadi_fatrop_full_eval_constr_jac(const double* primal_data, const double* stageparams_p, const double* globalparams_p,
+            struct blasfeo_dmat* BAbt_p, struct blasfeo_dmat* Ggt_p, struct blasfeo_dmat* Ggt_ineq_p, const struct FatropOcpCDims* s, void* user_data) {
+  casadi_int i, k;
+  casadi_fatrop_data<T1>* d = static_cast< casadi_fatrop_data<T1>* >(user_data);
+  const casadi_fatrop_prob<T1>* p = d->prob;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
+
+  casadi_fatrop_read_primal_data(primal_data, d->x, s);
+  d_oracle->arg[0] = d->x;
+  d_oracle->arg[1] = d_nlp->p;
+  d_oracle->res[0] = d->g;
+  d_oracle->res[1] = d->a;
+  calc_function(&d->prob->nlp_jac_g, d_oracle);
+
+  casadi_fatrop_mproject(-1.0, d->a, p->sp_a, d->AB, p->ABsp, d->pv);
+  casadi_project(d->a, p->sp_a, d->CD, p->CDsp, d->pv);
+  casadi_project(d->a, p->sp_a, d->I, p->Isp, d->pv);
+
+  for (i=0;i<p->Isp[2+p->Isp[1]];++i) {
+    if (d->I[i]!=1.0) {
+      casadi_error("Structure mismatch: gap-closing constraints must be like this: x_{k+1}-F(xk,uk).");
+    }
+  }
+
+  for (k = 0; k < s->K-1; k++) {
+    fatrop_int nu_k = p->nu[k];
+    fatrop_int nu_kp1 = p->nu[k+1];
+    fatrop_int offs_ux_k = s->ux_offs[k];
+    fatrop_int offs_ux_kp1 = s->ux_offs[k+1];
+    casadi_fatrop_eval_BAbt<T1>(primal_data + offs_ux_kp1 + nu_kp1, primal_data + offs_ux_k, primal_data + offs_ux_k + nu_k, NULL, NULL, BAbt_p + k, k, user_data);
+  }
+
+  for (k = 0; k < s->K; k++) {
+    fatrop_int nu = p->nu[k];
+    fatrop_int ng = s->ng[k];
+    fatrop_int offs_ux = s->ux_offs[k];
+    if (ng>0) {
+      casadi_fatrop_eval_Ggt<T1>(
+          primal_data + offs_ux,
+          primal_data + offs_ux + nu,
+          NULL, NULL,
+          Ggt_p + k,
+          k, user_data);
+    }
+  }
+
+  for (k = 0; k < s->K; k++) {
+    fatrop_int nu = p->nu[k];
+    fatrop_int ng_ineq = s->ng_ineq[k];
+    fatrop_int offs_ux = s->ux_offs[k];
+
+    if (ng_ineq>0) {
+      casadi_fatrop_eval_Ggt_ineq<T1>(
+          primal_data + offs_ux,
+          primal_data + offs_ux + nu,
+          NULL, NULL,
+          Ggt_ineq_p + k,
+          k, user_data);
+    }
+  }
+  return 1; // skip
 }
 
 // SYMBOL "fatrop_get_nx"
@@ -728,10 +791,6 @@ void casadi_fatrop_init(casadi_fatrop_data<T1>* d, const T1*** arg, T1*** res, c
 // C-REPLACE "casadi_fatrop_full_eval_obj<T1>" "casadi_fatrop_full_eval_obj"
 // C-REPLACE "casadi_fatrop_full_eval_contr_viol<T1>" "casadi_fatrop_full_eval_contr_viol"
 // C-REPLACE "casadi_fatrop_full_eval_lag_hess<T1>" "casadi_fatrop_full_eval_lag_hess"
-// C-REPLACE "casadi_fatrop_eval_BAbt<T1>" "casadi_fatrop_eval_BAbt"
-// C-REPLACE "casadi_fatrop_eval_RSQrqt<T1>" "casadi_fatrop_eval_RSQrqt"
-// C-REPLACE "casadi_fatrop_eval_Ggt<T1>" "casadi_fatrop_eval_Ggt"
-// C-REPLACE "casadi_fatrop_eval_Ggt_ineq<T1>" "casadi_fatrop_eval_Ggt_ineq"
 
 
 // C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"

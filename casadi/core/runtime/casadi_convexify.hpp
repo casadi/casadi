@@ -58,7 +58,7 @@ struct casadi_convexify_config {
 
 // SYMBOL "convexify_eval"
 template<typename T1>
-int convexify_eval(const casadi_convexify_config<T1>* c, const T1* Hin, T1* Hout, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
+int casadi_convexify_eval(const casadi_convexify_config<T1>* c, const T1* Hin, T1* Hout, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
     casadi_int i, j, k, kk, block_size, offset;
     int ret;
     T1 reg, e;

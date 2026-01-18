@@ -349,7 +349,7 @@ class SXtests(casadiTestCase):
     L=[2,3]
     f_in = [0]*f.n_in();f_in[0]=L
     f_out = f.call(f_in)
-    z=f_out[0].full()
+    z=f_out[0].full().squeeze()
     zr=fun(*L)
     for i in range(3):
       self.assertAlmostEqual(z[i], zr[i],10,'SXfunction output in correct')
