@@ -42,6 +42,8 @@
 #include "integrator.hpp"
 #include "filesystem_impl.hpp"
 #include "translator.hpp"
+#include "resource_internal.hpp"
+#include "modelica_parser.hpp"
 
 // Throw informative error message
 #define THROW_ERROR_NODE(FNAME, NODE, WHAT) \
@@ -608,8 +610,27 @@ DaeBuilderInternal::~DaeBuilderInternal() {
   }
 }
 
+// Static helper to open a resource from a path
+static Resource open_resource(const std::string& path) {
+  // Check for .bmo extension (Lace Modelica binary model)
+  if (path.size() >= 4 && path.substr(path.size() - 4) == ".bmo") {
+    // Create temporary directory resource
+    std::string bmo_file = Filesystem::filename(path);
+    TemporaryDirResource* res = new TemporaryDirResource(bmo_file);
+
+    // Use Lace Modelica plugin to process BMO and populate the directory
+    ModelicaParser parser("lacemodelica");
+    parser.parse(path, res->path());
+
+    return Resource::create(res);
+  }
+
+  // Default: treat as FMU (zip file or directory)
+  return Resource(path);
+}
+
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path,
-    const Dict& opts) : name_(name), resource_(path) {
+    const Dict& opts) : name_(name), resource_(open_resource(path)) {
   clear_cache_ = false;
   number_of_event_indicators_ = 0;
   provides_directional_derivatives_ = false;

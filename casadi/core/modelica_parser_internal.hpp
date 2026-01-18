@@ -47,8 +47,8 @@ namespace casadi {
         \identifier{modelica_parser_disp} */
     void disp(std::ostream& stream, bool more=false) const override;
 
-    // Parse a Modelica file
-    virtual void parse(const std::string& filename);
+    // Parse a Modelica file and generate output in the given directory
+    virtual void parse(const std::string& filename, const std::string& output_dir);
 
     // Creator function for internal class
     typedef ModelicaParserInternal* (*Creator)();

@@ -1,0 +1,97 @@
+//! base 0.1.0
+package 'DerVariable'
+  model 'DerVariable' "Der applied to pure variables (common 99% case)"
+    Real 'x'(start = 1.0);
+    Real 'y'(start = 2.0);
+    Real 'dx_dt';
+    Real 'dy_dt';
+  equation
+    der('x') = -0.5 * 'x' + 'y';
+    der('y') = 'x' - 0.3 * 'y';
+    'dx_dt' = der('x');
+    'dy_dt' = der('y');
+  end 'DerVariable';
+end 'DerVariable';
+
+// @onnx-test-reference
+// Python reference implementation for ONNX runtime testing
+// def reference_implementation(inputs):
+//     import numpy as np
+//     outputs = {}
+//
+//     # Extract inputs (already numpy scalars)
+//     x = inputs['x']
+//     y = inputs['y']
+//     dx_dt = inputs['dx_dt']
+//     dy_dt = inputs['dy_dt']
+//     der_x = inputs["der(x)"]
+//     der_y = inputs["der(y)"]
+//
+//     # Compute equation residuals
+//     outputs['eq[0]'] = der_x - (-0.5 * x + y)
+//     outputs['eq[1]'] = der_y - (x - 0.3 * y)
+//     outputs['eq[2]'] = dx_dt - der_x
+//     outputs['eq[3]'] = dy_dt - der_y
+//
+//     # Initial values
+//     outputs['start[0]'] = np.array(1.0)
+//     outputs['start[1]'] = np.array(2.0)
+//
+//     return outputs
+//
+// @onnx-test-case
+// # Test case 1: Random values (seed 42)
+// import numpy as np
+// rng = np.random.RandomState(42)
+// x = rng.uniform(0.5, 3.0)
+// y = rng.uniform(0.5, 3.0)
+// der_x = -0.5 * x + y
+// der_y = x - 0.3 * y
+// dx_dt = der_x
+// dy_dt = der_y
+// {
+//   "x": np.array(x),
+//   "y": np.array(y),
+//   "dx_dt": np.array(dx_dt),
+//   "dy_dt": np.array(dy_dt),
+//   "der(x)": np.array(der_x),
+//   "der(y)": np.array(der_y)
+// }
+//
+// @onnx-test-case
+// # Test case 2: Random values (seed 123)
+// import numpy as np
+// rng = np.random.RandomState(123)
+// x = rng.uniform(1.0, 4.0)
+// y = rng.uniform(1.0, 4.0)
+// der_x = -0.5 * x + y
+// der_y = x - 0.3 * y
+// dx_dt = der_x
+// dy_dt = der_y
+// {
+//   "x": np.array(x),
+//   "y": np.array(y),
+//   "dx_dt": np.array(dx_dt),
+//   "dy_dt": np.array(dy_dt),
+//   "der(x)": np.array(der_x),
+//   "der(y)": np.array(der_y)
+// }
+//
+// @onnx-test-case
+// # Test case 3: Random values (seed 999)
+// import numpy as np
+// rng = np.random.RandomState(999)
+// x = rng.uniform(0.1, 2.0)
+// y = rng.uniform(0.1, 2.0)
+// der_x = -0.5 * x + y
+// der_y = x - 0.3 * y
+// dx_dt = der_x
+// dy_dt = der_y
+// {
+//   "x": np.array(x),
+//   "y": np.array(y),
+//   "dx_dt": np.array(dx_dt),
+//   "dy_dt": np.array(dy_dt),
+//   "der(x)": np.array(der_x),
+//   "der(y)": np.array(der_y)
+// }

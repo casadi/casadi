@@ -91,23 +91,45 @@ namespace casadi {
       explicit DirResource(DeserializingStream& s);
   };
 
+  /** \brief Base class for resources that use a temporary directory
+   *
+   * Handles cleanup of temporary directory and lock file upon destruction.
+   */
+  class CASADI_EXPORT TemporaryDirResource : public ResourceInternal {
+    public:
+      /// Create with a base name - sets up lock file and directory
+      TemporaryDirResource(const std::string& base_name);
+      ~TemporaryDirResource() override;
+      /// Get path for a consumer
+      const std::string& path() const override {return dir_;}
+
+      /** \brief Get type name */
+      std::string class_name() const override {return "TemporaryDirResource";}
+
+      /// Print description
+      void disp(std::ostream& stream, bool more) const override;
+    protected:
+      explicit TemporaryDirResource() : ResourceInternal() {}
+      explicit TemporaryDirResource(DeserializingStream& s) : ResourceInternal(s) {}
+      /// Set up lock file and directory paths from a base name
+      void setup_temp_dir(const std::string& base_name);
+      std::string lock_file_;
+      std::string dir_;
+  };
+
   /** \brief RAII class for reading from a zip file
 
   \identifier{2c5} */
-  class CASADI_EXPORT ZipResource : public ResourceInternal {
+  class CASADI_EXPORT ZipResource : public TemporaryDirResource {
     public:
-      /** \brief Initialize with a path 
+      /** \brief Initialize with a path
       *
-      * If the path is a directory or empty, the path is passed through to the consumer.
-      * Otherwise, the zip file is extracted to a temporary directory.
+      * The zip file is extracted to a temporary directory.
       *
       * Upon destruction, the temporary directory is removed.
 
           \identifier{2c6} */
       ZipResource(const std::string& path);
-      ~ZipResource() override;
-      /// Get path for a consumer
-      const std::string& path() const override {return dir_;}
 
       void unpack();
 
@@ -127,8 +149,6 @@ namespace casadi {
 
       static ResourceInternal* deserialize(DeserializingStream& s);
     private:
-      std::string lock_file_;
-      std::string dir_;
       std::string path_;
     protected:
       explicit ZipResource(DeserializingStream& s);
@@ -138,12 +158,9 @@ namespace casadi {
   /** \brief RAII class for reading from a zip held in memory
 
       \identifier{2cy} */
-  class CASADI_EXPORT ZipMemResource : public ResourceInternal {
+  class CASADI_EXPORT ZipMemResource : public TemporaryDirResource {
     public:
-    ZipMemResource(const std::istream& src);
-      ~ZipMemResource() override;
-      /// Get path for a consumer
-      const std::string& path() const override {return dir_;}
+      ZipMemResource(const std::istream& src);
 
       void unpack();
       /** \brief Get type name
@@ -158,8 +175,6 @@ namespace casadi {
 
       static ResourceInternal* deserialize(DeserializingStream& s);
     private:
-      std::string lock_file_;
-      std::string dir_;
       mutable std::stringstream blob_;
       #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
       mutable std::mutex mutex_blob_;

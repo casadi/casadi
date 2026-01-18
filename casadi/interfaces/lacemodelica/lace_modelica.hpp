@@ -61,8 +61,8 @@ namespace casadi {
     // Get name of the class
     std::string class_name() const override { return "LaceModelica";}
 
-    // Parse a Modelica file
-    void parse(const std::string& filename) override;
+    // Parse a Modelica file and generate output in the given directory
+    void parse(const std::string& filename, const std::string& output_dir) override;
 
     // Destructor
     ~LaceModelica() override;

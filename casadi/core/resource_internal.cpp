@@ -68,26 +68,21 @@ void ZipResource::unpack() {
   "Alternatively, manually unzip it into a direcory, "
   "and pass this directory name instead of the zip file name.");
 
-  // Extract filename part of path
-  std::string zip_file = Filesystem::filename(path_);
-
-  // Resolve absolute path since cwd may be changed by the user
-  lock_file_ = Filesystem::absolute(temporary_file(zip_file + ".", ".lock"));
-  dir_ = lock_file_.substr(0, lock_file_.size()-5) + ".unzipped";
+  // Set up temporary directory
+  setup_temp_dir(Filesystem::filename(path_));
 
   casadi_assert(Archiver::has_plugin("libzip"),
   "Unzipping '" + path_ + "' requires libzip. Compile CasADi with WITH_LIBZIP=ON.\n"
   "Alternatively, manually unzip it into a direcory, "
   "and pass this directory name instead of the zip file name.");
 
-
   Archiver::getPlugin("libzip").exposed.unpack(path_, dir_);
 }
 
 void ZipMemResource::unpack() {
-  std::string zip_file = "zip";
-  lock_file_ = Filesystem::absolute(temporary_file(zip_file + ".", ".lock"));
-  dir_ = lock_file_.substr(0, lock_file_.size()-5) + ".unzipped";
+  // Set up temporary directory
+  setup_temp_dir("zip");
+
   casadi_assert(Archiver::has_plugin("libzip"),
   "Unzipping stream requires libzip. Compile CasADi with WITH_LIBZIP=ON.\n"
   "Alternatively, save with serialize option set to link. ");
@@ -99,13 +94,13 @@ void ZipMemResource::unpack() {
 }
 
 ZipResource::ZipResource(const std::string& path)
-    : ResourceInternal() {
+    : TemporaryDirResource() {
   path_ = path;
   unpack();
 }
 
 ZipMemResource::ZipMemResource(const std::istream& src)
-    : ResourceInternal() {
+    : TemporaryDirResource() {
   blob_ << src.rdbuf();
   unpack();
 }
@@ -118,29 +113,33 @@ void ZipMemResource::disp(std::ostream& stream, bool more) const {
   stream << "ZipMemResource(blob) -> \"" << dir_ << "\"";
 }
 
-ZipResource::~ZipResource() {
-  try {
-      casadi_assert_dev(Filesystem::remove_all(dir_));
-  } catch (...) {
-      casadi_warning("Error: Cannot remove temporary directory: " + dir_);
-  }
-  try {
-    casadi_assert_dev(Filesystem::remove(lock_file_));
-  } catch (...) {
-      casadi_warning("Error: Cannot remove lock file: " + lock_file_);
-  }
+void TemporaryDirResource::setup_temp_dir(const std::string& base_name) {
+  // Resolve absolute path since cwd may be changed by the user
+  lock_file_ = Filesystem::absolute(temporary_file(base_name + ".", ".lock"));
+  dir_ = lock_file_.substr(0, lock_file_.size() - 5) + ".unpacked";
+  // Create the directory
+  Filesystem::create_directories(dir_);
 }
 
-ZipMemResource::~ZipMemResource() {
+TemporaryDirResource::TemporaryDirResource(const std::string& base_name)
+    : ResourceInternal() {
+  setup_temp_dir(base_name);
+}
+
+void TemporaryDirResource::disp(std::ostream& stream, bool more) const {
+  stream << "TemporaryDirResource(\"" << dir_ << "\")";
+}
+
+TemporaryDirResource::~TemporaryDirResource() {
   try {
     casadi_assert_dev(Filesystem::remove_all(dir_));
   } catch (...) {
-      casadi_warning("Error: Cannot remove temporary directory: " + dir_);
+    casadi_warning("Error: Cannot remove temporary directory: " + dir_);
   }
   try {
     casadi_assert_dev(Filesystem::remove(lock_file_));
   } catch (...) {
-      casadi_warning("Error: Cannot remove lock file: " + lock_file_);
+    casadi_warning("Error: Cannot remove lock file: " + lock_file_);
   }
 }
 
@@ -193,13 +192,13 @@ ResourceInternal* DirResource::deserialize(DeserializingStream& s) {
   return ret;
 }
 
-ZipResource::ZipResource(DeserializingStream& s) : ResourceInternal(s) {
+ZipResource::ZipResource(DeserializingStream& s) : TemporaryDirResource(s) {
   s.version("ZipResource", 1);
   s.unpack("ZipResource::path", path_);
   unpack();
 }
 
-ZipMemResource::ZipMemResource(DeserializingStream& s) : ResourceInternal(s) {
+ZipMemResource::ZipMemResource(DeserializingStream& s) : TemporaryDirResource(s) {
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
   std::lock_guard<std::mutex> lock(mutex_blob_);
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS

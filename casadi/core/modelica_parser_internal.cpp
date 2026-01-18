@@ -39,12 +39,12 @@ std::map<std::string, ModelicaParserInternal::Plugin> ModelicaParserInternal::so
   std::mutex ModelicaParserInternal::mutex_solvers_;
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
-const std::string ModelicaParserInternal::infix_ = "modelica";
+const std::string ModelicaParserInternal::infix_ = "modelicaparser";
 
 void ModelicaParserInternal::disp(std::ostream &stream, bool more) const {
 }
 
-void ModelicaParserInternal::parse(const std::string& filename) {
+void ModelicaParserInternal::parse(const std::string& filename, const std::string& output_dir) {
   casadi_error("parse not defined for " + class_name());
 }
 
