@@ -738,11 +738,12 @@ add_feature_info(tinyxml-interface WITH_TINYXML "Interface to the XML parser Tin
 
 # LaceModelica: A Modelica parser using LACE
 option(WITH_LACEMODELICA "Compile the interface to LaceModelica" OFF)
-set(BUILD_LACEMODELICA_VERSION "master" CACHE STRING "Tag/branch/hash to be used for BUILD_LACEMODELICA_GIT_REPO")
-set(BUILD_LACEMODELICA_GIT_REPO "git@github.com:yacoda/lacemodelica-private.git" CACHE STRING "Git repo used together with BUILD_LACEMODELICA_VERSION")
+set(BUILD_LACEMODELICA_VERSION "main" CACHE STRING "Tag/branch/hash to be used for BUILD_LACEMODELICA_GIT_REPO")
+set(BUILD_LACEMODELICA_GIT_REPO "https://github.com/yacoda/lacemodelica.git" CACHE STRING "Git repo used together with BUILD_LACEMODELICA_VERSION")
 set(BUILD_LACEMODELICA_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for LACEMODELICA")
 option(WITH_BUILD_LACEMODELICA "Build LaceModelica (BUILD_LACEMODELICA_VERSION=${BUILD_LACEMODELICA_VERSION}) from downloaded source (BUILD_LACEMODELICA_GIT_REPO=${BUILD_LACEMODELICA_GIT_REPO})." OFF)
 add_feature_info(lacemodelica-interface WITH_LACEMODELICA "Interface to the Modelica parser LaceModelica.")
+set(BUILD_LACEMODELICA_DEPENDENCIES ONNX)
 
 # DSDP
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" OFF)
@@ -967,13 +968,13 @@ set(BUILD_ABSEIL_GIT_REPO "https://github.com/abseil/abseil-cpp.git" CACHE STRIN
 set(BUILD_ASBEIL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Abseil")
 set(BUILD_ABSEIL_VERSION "20250127.0" CACHE STRING "Tag/branch/hash for Abseil")
 option(WITH_BUILD_PROTOBUF "Build Protobuf from source" OFF)
-
+set(BUILD_PROTOBUF_DEPENDENCIES ZLIB)
 
 # ONNX Translator plugin
 option(WITH_ONNX "Compile the ONNX translator interface" OFF)
 set(BUILD_ONNX_GIT_REPO "https://github.com/onnx/onnx" CACHE STRING "Git repo used together with BUILD_ONNX_VERSION")
 set(BUILD_ONNX_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for ONNX")
-set(BUILD_ONNX_VERSION "v1.19.1" CACHE STRING "Tag/branch/hash to be used for BUILD_ONNX_GIT_REPO")
+set(BUILD_ONNX_VERSION "v1.18.0" CACHE STRING "Tag/branch/hash to be used for BUILD_ONNX_GIT_REPO")
 option(WITH_BUILD_ONNX "Build ONNX (BUILD_ONNX_VERSION=${BUILD_ONNX_VERSION}) from downloaded source (BUILD_ONNX_GIT_REPO=${BUILD_ONNX_GIT_REPO})." OFF)
 set(BUILD_ONNX_DEPENDENCIES PROTOBUF)
 
@@ -1085,7 +1086,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL MADNLP)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LIBZIP ZLIB PROTOBUF ONNX)
+foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LACEMODELICA ONNX PROTOBUF LIBZIP ZLIB)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -1285,7 +1286,10 @@ if(WITH_BLASFEO)
     create_import_library(blasfeo blasfeo)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/"
-      DESTINATION "${INCLUDE_PREFIX}")
+      DESTINATION "${INCLUDE_PREFIX}"
+      FILES_MATCHING
+        PATTERN "blasfeo*.h"
+        PATTERN "hpipm*.h")
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -1319,7 +1323,10 @@ if(WITH_HPIPM)
     create_import_library(hpipm hpipm)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/"
-      DESTINATION "${INCLUDE_PREFIX}")
+      DESTINATION "${INCLUDE_PREFIX}"
+          FILES_MATCHING                                                                                                                                                                      
+      PATTERN "blasfeo*.h"                                                                                                                                                              
+      PATTERN "hpipm*.h") 
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -2041,32 +2048,6 @@ if(WITH_SUPERSCS)
 endif()
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to QP solver SUPERSCS.")
 
-# LaceModelica external project
-if(WITH_LACEMODELICA)
-  if(WITH_BUILD_LACEMODELICA)
-    ExternalProject_Add(lacemodelica-external
-        GIT_REPOSITORY ${BUILD_LACEMODELICA_GIT_REPO}
-        GIT_SHALLOW ${BUILD_LACEMODELICA_GIT_SHALLOW}
-        GIT_TAG ${BUILD_LACEMODELICA_VERSION}
-        GIT_SUBMODULES ""
-        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-        UPDATE_COMMAND ""
-        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica")
-    add_library(lacemodelica::lacemodelica SHARED IMPORTED)
-    add_dependencies(lacemodelica::lacemodelica lacemodelica-external casadi)
-    set_target_properties(lacemodelica::lacemodelica PROPERTIES
-       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
-       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}lacemodelica${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    )
-    install(DIRECTORY
-      "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica"
-      DESTINATION "${INCLUDE_PREFIX}")
-  endif()
-endif()
-add_feature_info(lacemodelica-sourcebuild WITH_BUILD_LACEMODELICA "Build LaceModelica (BUILD_LACEMODELICA_VERSION=${BUILD_LACEMODELICA_VERSION}) from downloaded source (BUILD_LACEMODELICA_GIT_REPO=${BUILD_LACEMODELICA_GIT_REPO}).")
-
 # OOQP: A sparse interior point QP solver
 option(WITH_OOQP "Enable OOQP interface" OFF)
 if(WITH_OOQP)
@@ -2204,6 +2185,7 @@ if(WITH_PROTOBUF)
   #  IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}abseil_dll${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
   ExternalProject_Add(protobuf-external
+      DEPENDS ZLIB::libz
       GIT_REPOSITORY ${BUILD_PROTOBUF_GIT_REPO}
       GIT_SHALLOW ${BUILD_PROTOBUF_GIT_SHALLOW}
       GIT_TAG ${BUILD_PROTOBUF_VERSION}
@@ -2214,11 +2196,16 @@ if(WITH_PROTOBUF)
         -DCMAKE_CXX_STANDARD=17
         -Dprotobuf_BUILD_TESTS=OFF
         -Dprotobuf_BUILD_EXAMPLES=OFF
+        -Dprotobuf_BUILD_PROTOC_BINARIES=OFF
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        -Dprotobuf_BUILD_SHARED_LIBS=OFF
+        -DBUILD_SHARED_LIBS=OFF
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_INSTALL_LIBDIR=lib
+        ${CROSS_FLAGS_CMAKE})
 
-  add_library(protobuf::libprotobuf STATIC IMPORTED)
-  add_dependencies(protobuf::libprotobuf protobuf-external)
+  add_library(protobuf::libprotobuf-lite STATIC IMPORTED)
+  add_dependencies(protobuf::libprotobuf-lite protobuf-external)
 
   # Add utf8_range dependencies (required by protobuf)
   add_library(utf8_range::utf8_range STATIC IMPORTED)
@@ -2226,17 +2213,17 @@ if(WITH_PROTOBUF)
     IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}utf8_range${CMAKE_STATIC_LIBRARY_SUFFIX}"
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
 
-  target_link_libraries(protobuf::libprotobuf INTERFACE utf8_range::utf8_range)
+  target_link_libraries(protobuf::libprotobuf-lite INTERFACE utf8_range::utf8_range)
 
   # Setup abseil library dependencies using the DSL from cmake/abseil_dependencies.cmake
   # To regenerate: cd build && python3 ../misc/generate_absl_deps_dsl.py
   include(${CMAKE_SOURCE_DIR}/cmake/abseil_dependencies.cmake)
-  setup_abseil_dependencies(protobuf::libprotobuf)
+  setup_abseil_dependencies(protobuf::libprotobuf-lite)
 
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
 
-  set_target_properties(protobuf::libprotobuf PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}protobuf${CMAKE_STATIC_LIBRARY_SUFFIX}"
+  set_target_properties(protobuf::libprotobuf-lite PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}protobuf-lite${CMAKE_STATIC_LIBRARY_SUFFIX}"
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
   else()
     find_package(Protobuf REQUIRED)
@@ -2246,8 +2233,70 @@ add_feature_info(protobuf-interface WITH_PROTOBUF "Interface to Protobuf for ONN
 
 if(WITH_ONNX)
   if(WITH_BUILD_ONNX)
+    # Fetch a prebuilt protoc binary to avoid building protoc from source
+    set(ONNX_PROTOC_FLAGS "")
+    # Detect host platform for protoc binary
+    set(PROTOC_VERSION "31.1")
+    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64|amd64")
+      set(PROTOC_PLATFORM "linux-x86_64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "i686|i386|x86")
+      set(PROTOC_PLATFORM "linux-x86_32")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+      set(PROTOC_PLATFORM "linux-aarch_64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64|amd64")
+      set(PROTOC_PLATFORM "osx-x86_64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+      set(PROTOC_PLATFORM "osx-aarch_64")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+      set(PROTOC_PLATFORM "win64")
+    else()
+      message(WARNING "Unknown host platform for protoc: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+      set(PROTOC_PLATFORM "")
+    endif()
+
+    if(PROTOC_PLATFORM)
+      set(PROTOC_ZIP_URL "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-${PROTOC_PLATFORM}.zip")
+      set(PROTOC_ZIP_FILE "${CMAKE_BINARY_DIR}/external_projects/protoc-${PROTOC_VERSION}-${PROTOC_PLATFORM}.zip")
+      set(PROTOC_EXTRACT_DIR "${CMAKE_BINARY_DIR}/external_projects/protoc-host")
+      if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+        set(PROTOC_EXECUTABLE "${PROTOC_EXTRACT_DIR}/bin/protoc.exe")
+      else()
+        set(PROTOC_EXECUTABLE "${PROTOC_EXTRACT_DIR}/bin/protoc")
+      endif()
+
+      if(NOT EXISTS "${PROTOC_EXECUTABLE}")
+        message(STATUS "Downloading prebuilt protoc ${PROTOC_VERSION} for ${PROTOC_PLATFORM}...")
+        file(DOWNLOAD
+          "${PROTOC_ZIP_URL}"
+          "${PROTOC_ZIP_FILE}"
+          SHOW_PROGRESS
+          STATUS PROTOC_DOWNLOAD_STATUS)
+        list(GET PROTOC_DOWNLOAD_STATUS 0 PROTOC_DOWNLOAD_ERROR)
+        if(PROTOC_DOWNLOAD_ERROR)
+          message(FATAL_ERROR "Failed to download protoc: ${PROTOC_DOWNLOAD_STATUS}")
+        endif()
+
+        message(STATUS "Extracting protoc to ${PROTOC_EXTRACT_DIR}...")
+        file(MAKE_DIRECTORY "${PROTOC_EXTRACT_DIR}")
+        execute_process(
+          COMMAND ${CMAKE_COMMAND} -E tar xf "${PROTOC_ZIP_FILE}"
+          WORKING_DIRECTORY "${PROTOC_EXTRACT_DIR}"
+          RESULT_VARIABLE PROTOC_EXTRACT_RESULT)
+        if(NOT PROTOC_EXTRACT_RESULT EQUAL 0)
+          message(FATAL_ERROR "Failed to extract protoc")
+        endif()
+      endif()
+
+      message(STATUS "Using prebuilt protoc: ${PROTOC_EXECUTABLE}")
+      set(ONNX_PROTOC_FLAGS -DONNX_CUSTOM_PROTOC_EXECUTABLE=${PROTOC_EXECUTABLE})
+    endif()
+
+    message(INFO "debugonnx ${ONNX_PROTOC_FLAGS}")
+    message(INFO "debugonnx ${CROSS_FLAGS_CMAKE}")
+    
+
     ExternalProject_Add(onnx-external
-        DEPENDS protobuf::libprotobuf
+        DEPENDS protobuf::libprotobuf-lite
         GIT_REPOSITORY ${BUILD_ONNX_GIT_REPO}
         GIT_SHALLOW ${BUILD_ONNX_GIT_SHALLOW}
         GIT_TAG ${BUILD_ONNX_VERSION}
@@ -2258,14 +2307,29 @@ if(WITH_ONNX)
         CMAKE_ARGS
           -DCMAKE_CXX_STANDARD=17
           -DONNX_BUILD_TESTS=OFF
+          -DONNX_BUILD_PYTHON=OFF
           -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects
           -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-          -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
+          -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+          -DCMAKE_INSTALL_LIBDIR=lib
+          -DCMAKE_PROJECT_INCLUDE=${CMAKE_SOURCE_DIR}/cmake/onnx_inject.cmake
+          -DONNX_USE_LITE_PROTO=ON
+          -DBUILD_SHARED_LIBS=OFF
+          ${ONNX_PROTOC_FLAGS}
+          ${CROSS_FLAGS_CMAKE})
     add_library(ONNX::onnx STATIC IMPORTED)
     add_library(ONNX::onnx_proto STATIC IMPORTED)
     add_dependencies(ONNX::onnx onnx-external)
     add_dependencies(ONNX::onnx_proto onnx-external)
-    target_link_libraries(ONNX::onnx INTERFACE protobuf::libprotobuf)
+    target_link_libraries(ONNX::onnx INTERFACE protobuf::libprotobuf-lite)
+    if(APPLE)
+      target_link_libraries(ONNX::onnx INTERFACE "-framework CoreFoundation")
+    endif()
+    if(WIN32)
+      # Abseil's symbolize module needs Windows Debug Help Library
+      target_link_libraries(ONNX::onnx INTERFACE dbghelp)
+    endif()
+
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ONNX::onnx PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -2283,6 +2347,34 @@ if(WITH_ONNX)
   endif()
 endif()
 add_feature_info(onnx-translator-interface WITH_ONNX "Interface to ONNX for model import/export.")
+
+# LaceModelica external project
+if(WITH_LACEMODELICA)
+  if(WITH_BUILD_LACEMODELICA)
+    ExternalProject_Add(lacemodelica-external
+        DEPENDS ONNX::onnx
+        GIT_REPOSITORY ${BUILD_LACEMODELICA_GIT_REPO}
+        GIT_SHALLOW ${BUILD_LACEMODELICA_GIT_SHALLOW}
+        GIT_TAG ${BUILD_LACEMODELICA_VERSION}
+        GIT_SUBMODULES ""
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DLACEMODELICA_BUILD_EXE=OFF -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CROSS_FLAGS_CMAKE})
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica")
+    add_library(lacemodelica::lacemodelica SHARED IMPORTED)
+    add_dependencies(lacemodelica::lacemodelica lacemodelica-external casadi)
+    set_target_properties(lacemodelica::lacemodelica PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}lacemodelica${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}lacemodelica${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(lacemodelica-sourcebuild WITH_BUILD_LACEMODELICA "Build LaceModelica (BUILD_LACEMODELICA_VERSION=${BUILD_LACEMODELICA_VERSION}) from downloaded source (BUILD_LACEMODELICA_GIT_REPO=${BUILD_LACEMODELICA_GIT_REPO}).")
 
 if(WITH_SELFCONTAINED)
   # Loop over prescribed folders

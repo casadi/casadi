@@ -101,7 +101,7 @@ namespace casadi {
 
     // Set producer info
     model_.set_producer_name("CasADi");
-    model_.set_producer_version(CASADI_VERSION_STRING);
+    model_.set_producer_version(CasadiMeta::version());
 
     // Add opset import (required by ONNX spec)
     onnx::OperatorSetIdProto* opset = model_.add_opset_import();

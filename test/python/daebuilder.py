@@ -816,6 +816,46 @@ class Daebuildertests(casadiTestCase):
     )
     print(dae.export_fmu())
 
-    
+  @requires_modelicaparser('lacemodelica')
+  def test_basemodelica(self):
+    """Test loading .bmo files via the LaceModelica plugin."""
+    # Load from BMO file
+    dae_bmo = ca.DaeBuilder('from_bmo', '../data/DerVariable.bmo')
+
+    # Create equivalent DaeBuilder symbolically
+    dae_sym = ca.DaeBuilder('symbolic')
+    x = dae_sym.add('x', 'local', 'continuous')
+    y = dae_sym.add('y', 'local', 'continuous')
+    dx_dt = dae_sym.add('dx_dt', 'local', 'continuous')
+    dy_dt = dae_sym.add('dy_dt', 'local', 'continuous')
+    dae_sym.eq(dae_sym.der(x), -0.5 * x + y)
+    dae_sym.eq(dae_sym.der(y), x - 0.3 * y)
+    dae_sym.eq(dx_dt, dae_sym.der(x))
+    dae_sym.eq(dy_dt, dae_sym.der(y))
+
+    # Create functions and compare numerical results
+    f_bmo = dae_bmo.create('f_bmo', ['x'], ['ode'])
+    f_sym = dae_sym.create('f_sym', ['x'], ['ode'])
+
+    import numpy as np
+    for x_test in [[1.0, 2.0], [0.0, 0.0], [2.5, 1.5], [-1.0, 3.0]]:
+        self.checkfunction_light(f_bmo,f_sym,inputs=[x_test])
+
+    # Test temporary directory cleanup
+    temp_dirs = glob.glob('DerVariable.bmo.*.temp')
+    self.assertEqual(len(temp_dirs), 1)
+    temp_dir = temp_dirs[0]
+
+    # Release references and force garbage collection
+    dae_bmo = None
+    dae_sym = None
+    f_bmo = None
+    f_sym = None
+    gc.collect()
+
+    # Verify temp directory was cleaned up
+    self.assertFalse(os.path.exists(temp_dir), "Temp dir not cleaned up: {}".format(temp_dir))
+
+
 if __name__ == '__main__':
     unittest.main()

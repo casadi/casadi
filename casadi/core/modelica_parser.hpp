@@ -78,11 +78,20 @@ namespace casadi {
         \identifier{modelica_parser_const_access} */
     const ModelicaParserInternal* operator->() const;
 
-    // Parse a Modelica file
-    void parse(const std::string& filename);
+    // Parse a Modelica file and generate output in the given directory
+    void parse(const std::string& filename, const std::string& output_dir);
 
 #endif // SWIG
   };
+
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_modelicaparser(const std::string& name);
+
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_modelicaparser(const std::string& name);
+
+  /// Get solver specific documentation
+  CASADI_EXPORT std::string doc_modelicaparser(const std::string& name);
 
 } // namespace casadi
 

@@ -45,8 +45,8 @@ ModelicaParserInternal* ModelicaParser::operator->() {
   return static_cast<ModelicaParserInternal*>(SharedObject::operator->());
 }
 
-void ModelicaParser::parse(const std::string& filename) {
-  return (*this)->parse(filename);
+void ModelicaParser::parse(const std::string& filename, const std::string& output_dir) {
+  return (*this)->parse(filename, output_dir);
 }
 
 void ModelicaParser::load_plugin(const std::string& name) {
@@ -55,6 +55,18 @@ void ModelicaParser::load_plugin(const std::string& name) {
 
 std::string ModelicaParser::doc(const std::string& name) {
   return ModelicaParserInternal::getPlugin(name).doc;
+}
+
+bool has_modelicaparser(const std::string& name) {
+  return ModelicaParserInternal::has_plugin(name);
+}
+
+void load_modelicaparser(const std::string& name) {
+  ModelicaParser::load_plugin(name);
+}
+
+std::string doc_modelicaparser(const std::string& name) {
+  return ModelicaParser::doc(name);
 }
 
 } // namespace casadi

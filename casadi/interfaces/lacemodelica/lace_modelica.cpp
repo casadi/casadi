@@ -24,6 +24,7 @@
 
 
 #include "lace_modelica.hpp"
+#include <lacemodelica/lacemodelica.h>
 
 namespace casadi {
 
@@ -48,9 +49,10 @@ LaceModelica::LaceModelica()  {
 LaceModelica::~LaceModelica() {
 }
 
-void LaceModelica::parse(const std::string& filename) {
-  // TODO: Implement Modelica parsing using LACE
-  casadi_error("LaceModelica::parse not yet implemented for " + filename);
+void LaceModelica::parse(const std::string& filename, const std::string& output_dir) {
+  lacemodelica_status_t status = lacemodelica_process_bmo(filename.c_str(), output_dir.c_str());
+  casadi_assert(status == LACEMODELICA_SUCCESS,
+    "lacemodelica_process_bmo failed: " + std::string(lacemodelica_status_string(status)));
 }
 
 } // namespace casadi
