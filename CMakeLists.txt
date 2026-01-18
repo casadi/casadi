@@ -2041,7 +2041,7 @@ if(WITH_LACEMODELICA)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/ -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CROSS_FLAGS_CMAKE})
+        CMAKE_ARGS -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/ -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CROSS_FLAGS_CMAKE})
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/lacemodelica")
     add_library(lacemodelica::lacemodelica SHARED IMPORTED)
     add_dependencies(lacemodelica::lacemodelica lacemodelica-external casadi)
@@ -2249,7 +2249,8 @@ if(WITH_ONNX)
           -DONNX_BUILD_TESTS=OFF
           -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects
           -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-          -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
+          -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+          -DCMAKE_INSTALL_LIBDIR=lib)
     add_library(ONNX::onnx STATIC IMPORTED)
     add_library(ONNX::onnx_proto STATIC IMPORTED)
     add_dependencies(ONNX::onnx onnx-external)

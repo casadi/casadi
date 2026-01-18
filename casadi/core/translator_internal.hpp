@@ -104,7 +104,7 @@ namespace casadi {
     static std::string shortname() { return "translator";}
 
     /// Query plugin name
-    virtual const char* plugin_name() const = 0;
+    const char* plugin_name() const override = 0;
 
     /** \brief Load a graph from file
 
