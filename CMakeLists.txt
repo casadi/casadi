@@ -965,7 +965,7 @@ option(WITH_BUILD_PROTOBUF "Build Protobuf from source" OFF)
 option(WITH_ONNX "Compile the ONNX translator interface" OFF)
 set(BUILD_ONNX_GIT_REPO "https://github.com/onnx/onnx" CACHE STRING "Git repo used together with BUILD_ONNX_VERSION")
 set(BUILD_ONNX_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for ONNX")
-set(BUILD_ONNX_VERSION "v1.19.1" CACHE STRING "Tag/branch/hash to be used for BUILD_ONNX_GIT_REPO")
+set(BUILD_ONNX_VERSION "v1.18.0" CACHE STRING "Tag/branch/hash to be used for BUILD_ONNX_GIT_REPO")
 option(WITH_BUILD_ONNX "Build ONNX (BUILD_ONNX_VERSION=${BUILD_ONNX_VERSION}) from downloaded source (BUILD_ONNX_GIT_REPO=${BUILD_ONNX_GIT_REPO})." OFF)
 set(BUILD_ONNX_DEPENDENCIES PROTOBUF)
 
