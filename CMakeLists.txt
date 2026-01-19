@@ -2180,6 +2180,7 @@ if(WITH_PROTOBUF)
         -Dprotobuf_BUILD_EXAMPLES=OFF
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_INSTALL_LIBDIR=lib
         ${CROSS_FLAGS_CMAKE})
 
   add_library(protobuf::libprotobuf STATIC IMPORTED)
