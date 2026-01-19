@@ -2212,6 +2212,64 @@ add_feature_info(protobuf-interface WITH_PROTOBUF "Interface to Protobuf for ONN
 
 if(WITH_ONNX)
   if(WITH_BUILD_ONNX)
+    # When cross-compiling, fetch a prebuilt host protoc binary
+    set(ONNX_PROTOC_FLAGS "")
+    if(CMAKE_CROSS_COMPILING OR DEFINED ENV{CROSS_TRIPLE})
+      # Detect host platform for protoc binary
+      set(PROTOC_VERSION "31.1")
+      if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64|amd64")
+        set(PROTOC_PLATFORM "linux-x86_64")
+      elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+        set(PROTOC_PLATFORM "linux-aarch_64")
+      elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64|amd64")
+        set(PROTOC_PLATFORM "osx-x86_64")
+      elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+        set(PROTOC_PLATFORM "osx-aarch_64")
+      elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+        set(PROTOC_PLATFORM "win64")
+      else()
+        message(WARNING "Unknown host platform for protoc: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+        set(PROTOC_PLATFORM "")
+      endif()
+
+      if(PROTOC_PLATFORM)
+        set(PROTOC_ZIP_URL "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-${PROTOC_PLATFORM}.zip")
+        set(PROTOC_ZIP_FILE "${CMAKE_BINARY_DIR}/external_projects/protoc-${PROTOC_VERSION}-${PROTOC_PLATFORM}.zip")
+        set(PROTOC_EXTRACT_DIR "${CMAKE_BINARY_DIR}/external_projects/protoc-host")
+        if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+          set(PROTOC_EXECUTABLE "${PROTOC_EXTRACT_DIR}/bin/protoc.exe")
+        else()
+          set(PROTOC_EXECUTABLE "${PROTOC_EXTRACT_DIR}/bin/protoc")
+        endif()
+
+        if(NOT EXISTS "${PROTOC_EXECUTABLE}")
+          message(STATUS "Cross-compiling: Downloading prebuilt protoc ${PROTOC_VERSION} for ${PROTOC_PLATFORM}...")
+          file(DOWNLOAD
+            "${PROTOC_ZIP_URL}"
+            "${PROTOC_ZIP_FILE}"
+            SHOW_PROGRESS
+            STATUS PROTOC_DOWNLOAD_STATUS)
+          list(GET PROTOC_DOWNLOAD_STATUS 0 PROTOC_DOWNLOAD_ERROR)
+          if(PROTOC_DOWNLOAD_ERROR)
+            message(FATAL_ERROR "Failed to download protoc: ${PROTOC_DOWNLOAD_STATUS}")
+          endif()
+
+          message(STATUS "Extracting protoc to ${PROTOC_EXTRACT_DIR}...")
+          file(MAKE_DIRECTORY "${PROTOC_EXTRACT_DIR}")
+          execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xf "${PROTOC_ZIP_FILE}"
+            WORKING_DIRECTORY "${PROTOC_EXTRACT_DIR}"
+            RESULT_VARIABLE PROTOC_EXTRACT_RESULT)
+          if(NOT PROTOC_EXTRACT_RESULT EQUAL 0)
+            message(FATAL_ERROR "Failed to extract protoc")
+          endif()
+        endif()
+
+        message(STATUS "Using host protoc: ${PROTOC_EXECUTABLE}")
+        set(ONNX_PROTOC_FLAGS -DONNX_CUSTOM_PROTOC_EXECUTABLE=${PROTOC_EXECUTABLE})
+      endif()
+    endif()
+
     ExternalProject_Add(onnx-external
         DEPENDS protobuf::libprotobuf
         GIT_REPOSITORY ${BUILD_ONNX_GIT_REPO}
@@ -2229,12 +2287,17 @@ if(WITH_ONNX)
           -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
           -DCMAKE_POSITION_INDEPENDENT_CODE=ON
           -DCMAKE_INSTALL_LIBDIR=lib
+          ${ONNX_PROTOC_FLAGS}
           ${CROSS_FLAGS_CMAKE})
     add_library(ONNX::onnx STATIC IMPORTED)
     add_library(ONNX::onnx_proto STATIC IMPORTED)
     add_dependencies(ONNX::onnx onnx-external)
     add_dependencies(ONNX::onnx_proto onnx-external)
     target_link_libraries(ONNX::onnx INTERFACE protobuf::libprotobuf)
+if(APPLE)
+    target_link_libraries(ONNX::onnx INTERFACE "-framework CoreFoundation")
+endif()
+
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ONNX::onnx PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx${CMAKE_STATIC_LIBRARY_SUFFIX}"
