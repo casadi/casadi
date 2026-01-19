@@ -49,7 +49,7 @@ namespace casadi {
       \date 2025
 
       \identifier{onnx_translator} */
-  class CASADI_EXPORT OnnxTranslator : public TranslatorInternal {
+  class CASADI_TRANSLATOR_ONNX_EXPORT OnnxTranslator : public TranslatorInternal {
   public:
     /// Constructor
     OnnxTranslator();

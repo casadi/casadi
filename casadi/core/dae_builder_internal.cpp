@@ -773,7 +773,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Look for ONNX-serialized expressions (Lace Modelica layered standard)
   try {
     // Load ONNX model using translator
-    Translator t = translator("onnx");
+    Translator t("onnx");
     t.load(resource_.path() + "/extra/org.lacemodelica.ls-onnx-serialization/model.onnx");
     Function oracle = t.create("oracle");
 

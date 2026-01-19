@@ -112,12 +112,12 @@ class Onnxtests(casadiTestCase):
 
         try:
             # Export to ONNX
-            t_export = translator("onnx", {"verbose": False})
+            t_export = Translator("onnx", {"verbose": False})
             t_export.load(casadi_func)
             t_export.save(onnx_file)
 
             # Import from ONNX
-            t_import = translator("onnx", {"verbose": False})
+            t_import = Translator("onnx", {"verbose": False})
             t_import.load(onnx_file)
             f_imported = t_import.create(f"imported_{op_name}")
 
@@ -158,7 +158,7 @@ class Onnxtests(casadiTestCase):
 
         try:
             # Export
-            t = translator("onnx", {"verbose": False})
+            t = Translator("onnx", {"verbose": False})
             t.load(casadi_func)
             t.save(onnx_file)
 

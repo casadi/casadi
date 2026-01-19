@@ -142,24 +142,14 @@ namespace casadi {
 
   };
 
-  /** \if EXPANDED
-  * @copydoc main_translator
-  * \endif
-  */
-  ///@{
-  CASADI_EXPORT Translator translator(const std::string& name, const Dict& opts=Dict());
-  ///@}
-
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_translator(const std::string& name);
 
   /// Explicitly load a plugin dynamically
   CASADI_EXPORT void load_translator(const std::string& name);
 
-  /// Get the documentation string for a plugin
+  /// Get solver specific documentation
   CASADI_EXPORT std::string doc_translator(const std::string& name);
-
-  /** @} */
 
 } // namespace casadi
 

@@ -95,12 +95,6 @@ namespace casadi {
     return ret;
   }
 
-  // Public API functions
-
-  Translator translator(const std::string& name, const Dict& opts) {
-    return Translator(name, opts);
-  }
-
   bool has_translator(const std::string& name) {
     return Translator::has_plugin(name);
   }
