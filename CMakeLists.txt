@@ -1278,7 +1278,10 @@ if(WITH_BLASFEO)
     create_import_library(blasfeo blasfeo)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/"
-      DESTINATION "${INCLUDE_PREFIX}")
+      DESTINATION "${INCLUDE_PREFIX}"
+      FILES_MATCHING
+        PATTERN "blasfeo*.h"
+        PATTERN "hpipm*.h")
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -1312,7 +1315,10 @@ if(WITH_HPIPM)
     create_import_library(hpipm hpipm)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/"
-      DESTINATION "${INCLUDE_PREFIX}")
+      DESTINATION "${INCLUDE_PREFIX}"
+          FILES_MATCHING                                                                                                                                                                      
+      PATTERN "blasfeo*.h"                                                                                                                                                              
+      PATTERN "hpipm*.h") 
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})

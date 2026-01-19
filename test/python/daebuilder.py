@@ -854,7 +854,7 @@ class Daebuildertests(casadiTestCase):
     gc.collect()
 
     # Verify temp directory was cleaned up
-    self.assertFalse(os.path.exists(temp_dir), f"Temp dir not cleaned up: {temp_dir}")
+    self.assertFalse(os.path.exists(temp_dir), "Temp dir not cleaned up: {}".format(temp_dir))
 
 
 if __name__ == '__main__':
