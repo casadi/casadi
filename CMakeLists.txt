@@ -441,7 +441,15 @@ set(MATLAB_PREFIX ${DEF_MATLAB_PREFIX} CACHE PATH "Installation directory for MA
 
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/bin/" OPTIONAL DESTINATION ${BIN_PREFIX} USE_SOURCE_PERMISSIONS)
-install(DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/lib/" OPTIONAL DESTINATION ${LIB_PREFIX})
+install(DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/lib/" OPTIONAL DESTINATION ${LIB_PREFIX}
+  PATTERN "*onnx*${CMAKE_STATIC_LIBRARY_SUFFIX}" EXCLUDE
+  PATTERN "*absl*${CMAKE_STATIC_LIBRARY_SUFFIX}" EXCLUDE
+  PATTERN "*zip*${CMAKE_STATIC_LIBRARY_SUFFIX}" EXCLUDE
+  PATTERN "libz${CMAKE_STATIC_LIBRARY_SUFFIX}" EXCLUDE
+  PATTERN "*tinyxml2*${CMAKE_STATIC_LIBRARY_SUFFIX}" EXCLUDE
+  PATTERN "*upb${CMAKE_STATIC_LIBRARY_SUFFIX}" EXCLUDE
+  PATTERN "*utf8_*${CMAKE_STATIC_LIBRARY_SUFFIX}" EXCLUDE
+  PATTERN "*protobuf*${CMAKE_STATIC_LIBRARY_SUFFIX}" EXCLUDE)
 if(CMAKE_CROSS_COMPILING)
   install(DIRECTORY ${CMAKE_FIND_ROOT_PATH}/bin/ DESTINATION ${LIB_PREFIX} FILES_MATCHING PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}")
 endif()
@@ -1251,7 +1259,10 @@ if(WITH_BLASFEO)
     create_import_library(blasfeo blasfeo)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/"
-      DESTINATION "${INCLUDE_PREFIX}")
+      DESTINATION "${INCLUDE_PREFIX}"
+      FILES_MATCHING
+        PATTERN "blasfeo*.h"
+        PATTERN "hpipm*.h")
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -1285,7 +1296,10 @@ if(WITH_HPIPM)
     create_import_library(hpipm hpipm)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/"
-      DESTINATION "${INCLUDE_PREFIX}")
+      DESTINATION "${INCLUDE_PREFIX}"
+          FILES_MATCHING                                                                                                                                                                      
+      PATTERN "blasfeo*.h"                                                                                                                                                              
+      PATTERN "hpipm*.h") 
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -1320,6 +1334,9 @@ if(WITH_FATROP)
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}fatrop${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     create_import_library(fatrop fatrop)
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/fatrop"
+      DESTINATION "${INCLUDE_PREFIX}") 
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
