@@ -2301,11 +2301,11 @@ if(WITH_ONNX)
           -DCMAKE_INSTALL_LIBDIR=lib
           -DCMAKE_PROJECT_INCLUDE=${CMAKE_SOURCE_DIR}/cmake/onnx_inject.cmake
           -DONNX_USE_LITE_PROTO=ON
-          -DBUILD_SHARED_LIBS=OFF
+          -DBUILD_SHARED_LIBS=ON
           ${ONNX_PROTOC_FLAGS}
           ${CROSS_FLAGS_CMAKE})
-    add_library(ONNX::onnx STATIC IMPORTED)
-    add_library(ONNX::onnx_proto STATIC IMPORTED)
+    add_library(ONNX::onnx SHARED IMPORTED)
+    add_library(ONNX::onnx_proto SHARED IMPORTED)
     add_dependencies(ONNX::onnx onnx-external)
     add_dependencies(ONNX::onnx_proto onnx-external)
     target_link_libraries(ONNX::onnx INTERFACE protobuf::libprotobuf-lite)
@@ -2319,10 +2319,12 @@ if(WITH_ONNX)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ONNX::onnx PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}onnx${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}onnx${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(ONNX::onnx_proto PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}onnx_proto${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}onnx_proto${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}onnx_proto${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
     #add_library(onnx-external::abs STATIC IMPORTED)
     #set_target_properties(ONNX::onnx PROPERTIES
