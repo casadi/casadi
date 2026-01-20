@@ -198,18 +198,24 @@ assert len(tour) == len(capitals)
 
 # Map the solution
 
-import folium
+has_folium = False
+try:
+    import folium
+    has_folium = True
+except:
+    pass
 
-map = folium.Map(location=[40,-95], zoom_start = 4)
+if has_folium:
+    map = folium.Map(location=[40,-95], zoom_start = 4)
 
-points = []
-for city in tour:
-  points.append(coordinates[city])
-points.append(points[0])
+    points = []
+    for city in tour:
+      points.append(coordinates[city])
+    points.append(points[0])
 
-folium.PolyLine(points).add_to(map)
+    folium.PolyLine(points).add_to(map)
 
-map.show_in_browser()
+    map.show_in_browser()
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------
@@ -217,81 +223,89 @@ map.show_in_browser()
 # ------------------------------------------------------------------------------------------------------------------------------------
 # Need to run `pip install gurobipy`
 
-import gurobipy as gp
-from gurobipy import GRB
+has_gurobipy = False
 
-m = gp.Model()
+try:
+    import gurobipy as gp
+    has_gurobipy = True
+except:
+    pass
+    
+if has_gurobipy:
+    from gurobipy import GRB
 
-# Variables: is city 'i' adjacent to city 'j' on the tour?
-vars = m.addVars(dist.keys(), obj=dist, vtype=GRB.BINARY, name='x')
+    m = gp.Model()
 
-# Symmetric direction: use dict.update to alias variable with new key
-vars.update({(j,i):vars[i,j] for i,j in vars.keys()})
+    # Variables: is city 'i' adjacent to city 'j' on the tour?
+    vars = m.addVars(dist.keys(), obj=dist, vtype=GRB.BINARY, name='x')
 
-# Constraints: two edges incident to each city
-cons = m.addConstrs(vars.sum(c, '*') == 2 for c in capitals)
+    # Symmetric direction: use dict.update to alias variable with new key
+    vars.update({(j,i):vars[i,j] for i,j in vars.keys()})
 
-# Callback - use lazy constraints to eliminate sub-tours
+    # Constraints: two edges incident to each city
+    cons = m.addConstrs(vars.sum(c, '*') == 2 for c in capitals)
 
-def subtourelim(model, where):
-    if where == GRB.Callback.MIPSOL:
-        # make a list of edges selected in the solution
-        vals = model.cbGetSolution(model._vars)
-        selected = gp.tuplelist((i, j) for i, j in model._vars.keys()
-                             if vals[i, j] > 0.5)
-        # find the shortest cycle in the selected edge list
-        tour = subtour(selected)
-        if len(tour) < len(capitals):
-            # add subtour elimination constr. for every pair of cities in subtour
-            model.cbLazy(gp.quicksum(model._vars[i, j] for i, j in combinations(tour, 2)) <= len(tour)-1)
+    # Callback - use lazy constraints to eliminate sub-tours
 
-# Given a tuplelist of edges, find the shortest subtour
+    def subtourelim(model, where):
+        if where == GRB.Callback.MIPSOL:
+            # make a list of edges selected in the solution
+            vals = model.cbGetSolution(model._vars)
+            selected = gp.tuplelist((i, j) for i, j in model._vars.keys()
+                                 if vals[i, j] > 0.5)
+            # find the shortest cycle in the selected edge list
+            tour = subtour(selected)
+            if len(tour) < len(capitals):
+                # add subtour elimination constr. for every pair of cities in subtour
+                model.cbLazy(gp.quicksum(model._vars[i, j] for i, j in combinations(tour, 2)) <= len(tour)-1)
 
-def subtour(edges):
-    unvisited = capitals[:]
-    cycle = capitals[:] # Dummy - guaranteed to be replaced
-    while unvisited:  # true if list is non-empty
-        thiscycle = []
-        neighbors = unvisited
-        while neighbors:
-            current = neighbors[0]
-            thiscycle.append(current)
-            unvisited.remove(current)
-            neighbors = [j for i, j in edges.select(current, '*')
-                         if j in unvisited]
-        if len(thiscycle) <= len(cycle):
-            cycle = thiscycle # New shortest subtour
-    return cycle
+    # Given a tuplelist of edges, find the shortest subtour
+
+    def subtour(edges):
+        unvisited = capitals[:]
+        cycle = capitals[:] # Dummy - guaranteed to be replaced
+        while unvisited:  # true if list is non-empty
+            thiscycle = []
+            neighbors = unvisited
+            while neighbors:
+                current = neighbors[0]
+                thiscycle.append(current)
+                unvisited.remove(current)
+                neighbors = [j for i, j in edges.select(current, '*')
+                             if j in unvisited]
+            if len(thiscycle) <= len(cycle):
+                cycle = thiscycle # New shortest subtour
+        return cycle
 
 
-# Solve model
-m._vars = vars
-m.Params.lazyConstraints = 1
-m.optimize(subtourelim)
-# m.optimize()
+    # Solve model
+    m._vars = vars
+    m.Params.lazyConstraints = 1
+    m.optimize(subtourelim)
+    # m.optimize()
 
-# Retrieve solution
+    # Retrieve solution
 
-vals = m.getAttr('x', vars)
-selected = gp.tuplelist((i, j) for i, j in vals.keys() if vals[i, j] > 0.5)
+    vals = m.getAttr('x', vars)
+    selected = gp.tuplelist((i, j) for i, j in vals.keys() if vals[i, j] > 0.5)
 
-tour = subtour(selected)
-assert len(tour) == len(capitals)
+    tour = subtour(selected)
+    assert len(tour) == len(capitals)
 
-# Map the solution
+    # Map the solution
 
-import folium
+    if has_folium:
 
-map = folium.Map(location=[40,-95], zoom_start = 4)
+        map = folium.Map(location=[40,-95], zoom_start = 4)
 
-points = []
-for city in tour:
-  points.append(coordinates[city])
-points.append(points[0])
+        points = []
+        for city in tour:
+          points.append(coordinates[city])
+        points.append(points[0])
 
-folium.PolyLine(points).add_to(map)
+        folium.PolyLine(points).add_to(map)
 
-map.show_in_browser()
+        map.show_in_browser()
 
-m.dispose()
-gp.disposeDefaultEnv()
+    m.dispose()
+    gp.disposeDefaultEnv()
