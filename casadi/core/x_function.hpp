@@ -469,7 +469,8 @@ namespace casadi {
 
       // FIXME(@jaeandersson)
       casadi_int iind = 0, oind = 0;
-      casadi_assert(n_in_ == 1, "Not implemented");
+      casadi_assert(n_in_>=1 && is_diff_in_[0], "Not implemented");
+      casadi_assert(n_in_ == 1 || !any(vector_tail(is_diff_in_)), "Not implemented");
       casadi_assert(n_out_ == 1, "Not implemented");
 
       // Create return object
