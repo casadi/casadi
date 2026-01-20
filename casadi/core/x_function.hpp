@@ -859,10 +859,6 @@ namespace casadi {
       }
 
       Dict options = opts;
-      if (opts.find("is_diff_in")==opts.end())
-        options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_in_);
-      if (opts.find("is_diff_out")==opts.end())
-        options["is_diff_out"] = is_diff_out_;
       options["allow_duplicate_io_names"] = true;
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);
@@ -910,11 +906,6 @@ namespace casadi {
       }
 
       Dict options = opts;
-      if (opts.find("is_diff_in")==opts.end())
-        options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_out_);
-      if (opts.find("is_diff_out")==opts.end())
-        options["is_diff_out"] = is_diff_in_;
-
       options["allow_duplicate_io_names"] = true;
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);
@@ -930,32 +921,48 @@ namespace casadi {
                  const std::vector<std::string>& onames,
                  const Dict& opts) const {
     try {
+      // Select only differentiable inputs and outputs
+      std::vector<MatType> diff_in = vector_select(in_, is_diff_in_);
+      std::vector<MatType> diff_out = vector_select(out_, is_diff_out_);
+
+      std::vector<MatType> non_diff_in = vector_select(in_, is_diff_in_, true);
+
+      // Create flattened function with only differentiable inputs/outputs
       Dict tmp_options = generate_options("tmp");
       tmp_options["allow_free"] = true;
       tmp_options["allow_duplicate_io_names"] = true;
-      // Temporary single-input, single-output function FIXME(@jaeandersson)
-      Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)}, tmp_options);
+      std::vector<bool> tmp_is_diff = {true};
+      if (!non_diff_in.empty()) tmp_is_diff.push_back(false);
 
-      // Expression for the extended Jacobian
+      tmp_options["is_diff_in"] = tmp_is_diff;
+      std::vector<MatType> tmp_args = {veccat(diff_in)};
+      if (!non_diff_in.empty()) tmp_args.push_back(veccat(non_diff_in));
+
+      Function tmp("flattened_" + name_, tmp_args, {veccat(diff_out)}, tmp_options);
+      // Expression for the Jacobian of differentiable inputs/outputs only
       MatType J = tmp.get<DerivedType>()->jac(Dict()).at(0);
 
-      // Split up extended Jacobian
+      // Split up Jacobian into blocks (only for differentiable inputs/outputs)
       std::vector<casadi_int> r_offset = {0}, c_offset = {0};
-      for (auto& e : out_) r_offset.push_back(r_offset.back() + e.numel());
-      for (auto& e : in_) c_offset.push_back(c_offset.back() + e.numel());
+      for (auto& e : diff_out) r_offset.push_back(r_offset.back() + e.numel());
+      for (auto& e : diff_in) c_offset.push_back(c_offset.back() + e.numel());
       auto Jblocks = MatType::blocksplit(J, r_offset, c_offset);
 
-      // Collect all outputs
+      // Assemble full Jacobian output, inserting zeros for non-differentiable blocks
       std::vector<MatType> ret_out;
       ret_out.reserve(onames.size());
-      for (casadi_int i = 0; i < n_out_; ++i) {
-        for (casadi_int j = 0; j < n_in_; ++j) {
-          MatType b = Jblocks.at(i).at(j);
-          if (!is_diff_out_.at(i) || !is_diff_in_.at(j)) {
-            b = MatType(b.size());
+      casadi_int diff_i = 0;
+      for (casadi_int i=0; i<n_out_; ++i) {
+        casadi_int diff_j = 0;
+        for (casadi_int j=0; j<n_in_; ++j) {
+          if (is_diff_out_.at(i) && is_diff_in_.at(j)) {
+            ret_out.push_back(Jblocks.at(diff_i).at(diff_j));
+            diff_j++;
+          } else {
+            ret_out.push_back(MatType(out_.at(i).numel(), in_.at(j).numel()));
           }
-          ret_out.push_back(b);
         }
+        if (is_diff_out_.at(i)) diff_i++;
       }
 
       // All inputs of the return function
@@ -968,6 +975,21 @@ namespace casadi {
       Dict options = opts;
       options["allow_free"] = true;
       options["allow_duplicate_io_names"] = true;
+
+      if (opts.find("is_diff_in")==opts.end()) {
+        std::vector<bool> is_diff_in = join(is_diff_in_, is_diff_out_);
+        options["is_diff_in"] = is_diff_in;
+      }
+
+      if (opts.find("is_diff_out")==opts.end()) {
+        std::vector<bool> is_diff_out;
+        for (casadi_int i=0; i<n_out_; ++i) {
+          for (casadi_int j=0; j<n_in_; ++j) {
+            is_diff_out.push_back(is_diff_in_[j] && is_diff_out_[i]);
+          }
+        }
+        options["is_diff_out"] = is_diff_out;
+      }
 
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);

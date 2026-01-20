@@ -4146,5 +4146,74 @@ class Functiontests(casadiTestCase):
         if args.run_slow:
           self.check_codegen(J,inputs=inputs,std="c99")
       
+       
+  def test_is_diff_fd(self):
+
+    DM.set_precision(16)
+    
+    
+    for n in [1,2]:
+        for m in [1,3]:
+            x = MX.sym("x",n,m)
+            y = MX.sym("y",n,m)
+
+            expr = [2*sumsqr(x)*sumsqr(y),y**2*sumsqr(x)]
+            fref = Function("f",[x,y],expr,["x","y"],["a","b"],{"is_diff_in":[True,False]})
+            f = Function("f",[x,y],expr,["x","y"],["a","b"],{"is_diff_in":[True,False],"enable_fd":True,"print_in":True,"print_out":False,"enable_forward":False,"enable_reverse":False,"fd_method":"forward"})
+    
+            Jref = fref.jacobian()
+            J = f.jacobian()
+            self.assertTrue(Jref.is_diff_in(0))
+            self.assertFalse(Jref.is_diff_in(1))
+
+            self.assertEqual(Jref.nnz_in(2),0)
+            self.assertEqual(J.nnz_in(2),0)
+            
+            Ffref = fref.forward(2)
+            Ff = f.forward(2)
+            
+            self.assertEqual(Ffref.nnz_in(2),0)
+            self.assertEqual(Ff.nnz_in(2),1)
+            
+            for F,Fref in [(J,Jref),(Ff,Ffref)]:
+            
+                print("F = ", F)
+                print("Fref = ", Fref)
+
+                
+                self.assertEqual(F.n_in(), Fref.n_in())
+                self.assertEqual(F.n_out(), Fref.n_out())
+                 
+                for i in range(F.n_in()):
+                    self.assertEqual(F.name_in(i),Fref.name_in(i))
+                    if not F.name_in(i).startswith("out_"):
+                        self.assertEqual(F.sparsity_in(i),Fref.sparsity_in(i))
+                    self.assertEqual(F.is_diff_in(i),Fref.is_diff_in(i))
+
+                DM.rng(1)
+                inputs = [DM.rand(F.sparsity_in(i)) for i in range(f.n_in())]
+                inputs += f.call(inputs)
+                if "fwd" in F.name():
+                    inputs += [DM.rand(F.sparsity_in(i)) for i in range(f.n_in())]
+                if "adj" in F.name():
+                    inputs += [DM.rand(F.sparsity_out(i)) for i in range(f.n_out())]
+                self.checkfunction_light(F,Fref,inputs=inputs,digits=5)
+                
+                if args.run_slow:
+                    self.check_codegen(F,inputs=inputs,std="c99")
+              
+                inputs = [2,3] + [0,0]
+                if "fwd" in F.name():
+                    inputs += [DM.rand(F.sparsity_in(i)) for i in range(f.n_in())]
+                if "adj" in F.name():
+                    inputs += [DM.rand(F.sparsity_out(i)) for i in range(f.n_out())]
+                    
+                with capture_stdout() as result:
+                    F(*inputs)
+                self.assertTrue("2.00" in result[0])
+                self.assertFalse("3.00" in result[0])
+                
+    DM.set_precision(6)
+            
 if __name__ == '__main__':
     unittest.main()   
