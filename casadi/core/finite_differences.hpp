@@ -145,7 +145,7 @@ protected:
   virtual casadi_int n_pert() const = 0;
 
   // Get perturbation expression
-  virtual std::string pert(const std::string& k) const = 0;
+  virtual std::string pert(const std::string& k, const std::string& h) const = 0;
 
   // Get perturbation expression
   virtual double pert(casadi_int k, double h) const = 0;
@@ -207,8 +207,8 @@ public:
   casadi_int n_pert() const override {return 1;};
 
   // Get perturbation expression
-  std::string pert(const std::string& k) const override {
-    return str(h_);
+  std::string pert(const std::string& k, const std::string& h) const override {
+    return h;
   }
 
   // Get perturbation expression
@@ -293,8 +293,8 @@ public:
   casadi_int n_pert() const override {return 2;};
 
   // Get perturbation expression
-  std::string pert(const std::string& k) const override {
-    return "(2*" + k + "-1)*" + str(h_);
+  std::string pert(const std::string& k, const std::string& h) const override {
+    return "(2*" + k + "-1)*" + h;
   }
 
   // Get perturbation expression
@@ -354,7 +354,7 @@ public:
   casadi_int n_pert() const override {return 4;};
 
   // Get perturbation expression
-  std::string pert(const std::string& k) const override;
+  std::string pert(const std::string& k, const std::string& h) const override;
 
   // Get perturbation expression
   double pert(casadi_int k, double h) const override;

@@ -1603,6 +1603,8 @@ namespace casadi {
       break;
     case AUX_FINITE_DIFF:
       add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_NAN);
+      add_auxiliary(AUX_ISFINITE);
       this->auxiliaries << sanitize_source(casadi_finite_diff_str, inst);
       break;
     case AUX_QR:

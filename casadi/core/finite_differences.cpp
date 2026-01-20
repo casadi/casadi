@@ -397,7 +397,7 @@ void FiniteDiff::codegen_body(CodeGenerator& g) const {
 
   g.comment("Initial stepsize");
   g.local("h", "casadi_real");
-  g << "h = " << h_ << ";\n";
+  g << "h = " << g.constant(h_) << ";\n";
 
   g.comment("Perform finite difference algorithm with different step sizes");
   g.local("iter", "casadi_int");
@@ -429,9 +429,9 @@ void FiniteDiff::codegen_body(CodeGenerator& g) const {
   g.comment("Finite difference calculation with error estimate");
   g.local("u", "casadi_real");
   g.local("m", "const struct casadi_finite_diff_mem");
-  g.init_local("m", "{" + str(m_.reltol) + ", "
-                        + str(m_.abstol) + ", "
-                        + str(m_.smoothing) + "}");
+  g.init_local("m", "{" + g.constant(m_.reltol) + ", "
+                        + g.constant(m_.abstol) + ", "
+                        + g.constant(m_.smoothing) + "}");
   g << "u = " << calc_fd() << "(yk, y0, J, h, " << n_y_ << ", &m);\n";
   g << "if (iter==" << h_iter_ << ") break;\n";
 
@@ -446,8 +446,8 @@ void FiniteDiff::codegen_body(CodeGenerator& g) const {
   // Make sure h stays in the range [h_min_,h_max_]
   if (h_min_>0 || isfinite(h_max_)) {
     std::string h = "h";
-    if (h_min_>0) h = "fmax(" + h + ", " + str(h_min_) + ")";
-    if (isfinite(h_max_)) h = "fmin(" + h + ", " + str(h_max_) + ")";
+    if (h_min_>0) h = "fmax(" + h + ", " + g.constant(h_min_) + ")";
+    if (isfinite(h_max_)) h = "fmin(" + h + ", " + g.constant(h_max_) + ")";
     g << "h = " << h << ";\n";
   }
 
@@ -464,10 +464,10 @@ void FiniteDiff::codegen_body(CodeGenerator& g) const {
   g << "}\n"; // for (i=0, ...)
 }
 
-std::string Smoothing::pert(const std::string& k) const {
+std::string Smoothing::pert(const std::string& k, const std::string& h) const {
   std::string sign = "(2*(" + k + "/2)-1)";
-  std::string len = "(" + k + "%%2+1)";
-  return len + "*" + sign + "*" + str(h_);
+  std::string len = "(" + k + "%2+1)";
+  return len + "*" + sign + "*" + h;
 }
 
 double Smoothing::pert(casadi_int k, double h) const {

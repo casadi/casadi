@@ -4132,5 +4132,19 @@ class Functiontests(casadiTestCase):
         f = Function('f',[x],[3*x])
         self.assertEqual(f.numel_in(0), 0)
 
+  def test_finite_diff(self):
+    x = MX.sym("x")
+    for method in ["forward","backward","central","smoothing"]:
+        f = Function("f",[x],[sin(x)],{"enable_fd":True,"enable_forward":False,"enable_reverse":False,"fd_method":method})
+        fref = Function("f",[x],[sin(x)])
+        J = f.jacobian()
+        Jref = fref.jacobian()
+
+        inputs = [1.1,0]
+        self.checkfunction_light(J,Jref,inputs=inputs,digits=5)
+        
+        if args.run_slow:
+          self.check_codegen(J,inputs=inputs,std="c99")
+      
 if __name__ == '__main__':
     unittest.main()   
