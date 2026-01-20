@@ -171,7 +171,13 @@ Sparsity FiniteDiff::get_sparsity_in(casadi_int i) {
     return derivative_of_.sparsity_out(i-n_in);
   } else {
     // Seeds
-    return repmat(derivative_of_.sparsity_in(i-n_in-n_out), 1, n_);
+    casadi_int ii = i - n_in - n_out;
+    if (is_diff_in_[i]) {
+      return repmat(derivative_of_.sparsity_in(ii), 1, n_);
+    } else {
+      return Sparsity(derivative_of_.size1_in(ii),
+                      derivative_of_.size2_in(ii)*n_);
+    }
   }
 }
 
@@ -294,7 +300,7 @@ int FiniteDiff::eval(const double** arg, double** res,
         for (casadi_int j=0; j<n_in; ++j) {
           casadi_int nnz = derivative_of_.nnz_in(j);
           casadi_copy(x0[j], nnz, z + off);
-          if (seed[j]) casadi_axpy(nnz, pert(k, h), seed[j] + i*nnz, z + off);
+          if (seed[j] && is_diff_in_[j]) casadi_axpy(nnz, pert(k, h), seed[j] + i*nnz, z + off);
           off += nnz;
         }
         // Evaluate
@@ -412,9 +418,11 @@ void FiniteDiff::codegen_body(CodeGenerator& g) const {
   for (casadi_int j=0; j<n_in; ++j) {
     casadi_int nnz = derivative_of_.nnz_in(j);
     std::string s = "seed[" + str(j) + "]";
-    g << g.copy("x0[" + str(j) + "]", nnz, "z+" + str(off)) << "\n"
-      << "if ("+s+") " << g.axpy(nnz, pert("k"),
-                                  s+"+i*"+str(nnz), "z+" + str(off)) << "\n";
+    g << g.copy("x0[" + str(j) + "]", nnz, "z+" + str(off)) << "\n";
+    if (is_diff_in_[j]) {
+      g << "if ("+s+") " << g.axpy(nnz, pert("k", "h"),
+                                    s+"+i*"+str(nnz), "z+" + str(off)) << "\n";
+    }
     off += nnz;
   }
 
