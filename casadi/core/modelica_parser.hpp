@@ -77,11 +77,10 @@ namespace casadi {
 
         \identifier{modelica_parser_const_access} */
     const ModelicaParserInternal* operator->() const;
+#endif // SWIG
 
     // Parse a Modelica file and generate output in the given directory
     void parse(const std::string& filename, const std::string& output_dir);
-
-#endif // SWIG
   };
 
   /// Check if a particular plugin is available
