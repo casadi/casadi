@@ -2225,14 +2225,18 @@ namespace casadi {
       for (i=0; i<n_out_; ++i) onames.push_back(pref + name_out_[i]);
       // Options
       Dict opts = combine(forward_options_, der_options_);
-      opts = combine(opts, generate_options("forward"));
-      if (!enable_forward_) opts = fd_options_;
+      if (enable_forward_) {
+        opts = combine(opts, generate_options("forward"));
+      } else {
+        opts = combine(opts, FunctionInternal::generate_options("forward"));
+      }
       opts["derivative_of"] = self();
       // Generate derivative function
       casadi_assert_dev(enable_forward_ || enable_fd_);
       if (enable_forward_) {
         f = get_forward(nfwd, fname, inames, onames, opts);
       } else {
+        opts = combine(opts, fd_options_);
         // Get FD method
         if (fd_method_.empty() || fd_method_=="central") {
           f = Function::create(new CentralDiff(fname, nfwd), opts);
