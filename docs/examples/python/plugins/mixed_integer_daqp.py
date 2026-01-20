@@ -1,6 +1,10 @@
 import casadi as ca
 import numpy as np
 
+if not ca.has_conic('daqp'):
+    import sys
+    sys.exit(0)
+
 rng = np.random.default_rng(0)
 n = 100
 m = 80
