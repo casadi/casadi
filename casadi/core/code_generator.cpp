@@ -1839,6 +1839,17 @@ namespace casadi {
                         << "#endif\n"
                         << "}\n\n";
       break;
+    case AUX_ISFINITE:
+      shorthand("isfinite");
+      this->auxiliaries << "casadi_real casadi_isfinite(casadi_real x) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return x==x && x!=INFINITY && x!=-INFINITY;\n"
+                        << "#else\n"
+                        << "  return isfinite(x);\n"
+                        << "#endif\n"
+                        << "}\n\n";
+      break;
     case AUX_MIN:
       shorthand("min");
       this->auxiliaries << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"

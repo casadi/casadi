@@ -691,6 +691,7 @@ namespace casadi {
       AUX_NAN,
       AUX_REAL_MIN,
       AUX_ISINF,
+      AUX_ISFINITE,
       AUX_BOUNDS_CONSISTENCY,
       AUX_LSQR,
       AUX_FILE_SLURP,
