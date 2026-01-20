@@ -40,9 +40,7 @@ namespace casadi {
       \pluginssection{Translator}
 
       \author Joris Gillis
-      \date 2025
-
-      \identifier{translator} */
+      \date 2025 */
 
   /** \defgroup translator Title
   * @copydoc main_translator
@@ -60,9 +58,7 @@ namespace casadi {
       \pluginssection{Translator}
 
       \author Joris Gillis
-      \date 2025
-
-      \identifier{translator} */
+      \date 2025 */
   class CASADI_EXPORT Translator
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<Translator>) {

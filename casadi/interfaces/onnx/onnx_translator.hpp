@@ -141,9 +141,7 @@ namespace casadi {
     /** \brief Get dimension value from ONNX shape
 
         Handles both concrete dimensions and symbolic dimensions
-        using dimension_overrides_ map.
-
-        \identifier{onnx_translator_get_dimension} */
+        using dimension_overrides_ map. */
     casadi_int get_dimension(const onnx::TensorShapeProto& shape, int idx) const;
 
     /** \brief Convert ONNX TensorProto to CasADi DM
@@ -193,9 +191,7 @@ namespace casadi {
         \param op_type ONNX operation type (e.g., "Add", "MatMul")
         \param node The ONNX NodeProto
         \param node_inputs Vector of input MX expressions
-        \return MX output expression
-
-        \identifier{onnx_translator_process_node_operation} */
+        \return MX output expression */
     MX process_node_operation(
         const std::string& op_type,
         const onnx::NodeProto& node,
@@ -211,9 +207,7 @@ namespace casadi {
         \param outer_scope_inputs Optional vector of outer scope variable names to use
                instead of adding graph inputs. Used for If branch subgraphs that
                reference variables from the enclosing scope.
-        \return Pointer to created GraphProto
-
-        \identifier{onnx_translator_function_to_graph} */
+        \return Pointer to created GraphProto */
     onnx::GraphProto* function_to_graph(
         const Function& f,
         const std::string& graph_name,
@@ -227,9 +221,7 @@ namespace casadi {
 
         \param f The CasADi Function to convert
         \param domain The ONNX domain for this function (e.g., "casadi")
-        \return Pointer to created FunctionProto
-
-        \identifier{onnx_translator_function_to_function_proto} */
+        \return Pointer to created FunctionProto */
     onnx::FunctionProto* function_to_function_proto(
         const Function& f,
         const std::string& domain);
@@ -237,17 +229,13 @@ namespace casadi {
     /** \brief Check if Function is an if_else function
 
         \param f The Function to check
-        \return True if this is an if_else function
-
-        \identifier{onnx_translator_is_if_else} */
+        \return True if this is an if_else function */
     bool is_if_else_function(const Function& f) const;
 
     /** \brief Check if Function is a mapaccum function
 
         \param f The Function to check
-        \return True if this is a mapaccum function
-
-        \identifier{onnx_translator_is_mapaccum} */
+        \return True if this is a mapaccum function */
     bool is_mapaccum_function(const Function& f) const;
 
     /** \brief Check if Function is a map function
