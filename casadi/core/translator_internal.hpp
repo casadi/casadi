@@ -38,9 +38,7 @@ namespace casadi {
 
   @copydoc Translator_doc
   \author Joris Gillis
-  \date 2025
-
-    \identifier{translator_internal} */
+  \date 2025 */
   class CASADI_EXPORT
   TranslatorInternal : public SharedObjectInternal,
                        public PluginInterface<TranslatorInternal> {
@@ -52,14 +50,10 @@ namespace casadi {
     /// Destructor
     ~TranslatorInternal() override;
 
-    /** \brief Get type name
-
-        \identifier{translator_internal_type} */
+    /** \brief Get type name */
     std::string class_name() const override { return "TranslatorInternal";}
 
-    /** \brief Print
-
-        \identifier{translator_internal_print} */
+    /** \brief Print */
     void disp(std::ostream& stream, bool more) const override;
 
     // Creator function for internal class
@@ -67,22 +61,16 @@ namespace casadi {
 
     /** \brief Construct
 
-        Prepares the translator for use
-
-        \identifier{translator_internal_construct} */
+        Prepares the translator for use */
     void construct(const Dict& opts);
 
     ///@{
-    /** \brief Options
-
-        \identifier{translator_internal_options} */
+    /** \brief Options */
     static const Options options_;
     virtual const Options& get_options() const { return options_;}
     ///@}
 
-    /** \brief Initialize
-
-        \identifier{translator_internal_init} */
+    /** \brief Initialize */
     virtual void init(const Dict& opts);
 
     virtual void finalize() {}
@@ -106,38 +94,26 @@ namespace casadi {
     /// Query plugin name
     const char* plugin_name() const override = 0;
 
-    /** \brief Load a graph from file
-
-        \identifier{translator_internal_load_file} */
+    /** \brief Load a graph from file */
     virtual void load(const std::string& filename) = 0;
 
-    /** \brief Load a CasADi Function
-
-        \identifier{translator_internal_load_function} */
+    /** \brief Load a CasADi Function */
     virtual void load(const Function& f) = 0;
 
-    /** \brief Set dimension for a symbolic variable
-
-        \identifier{translator_internal_set_dimension} */
+    /** \brief Set dimension for a symbolic variable */
     virtual void set_dimension(const std::string& name, casadi_int dim) = 0;
 
-    /** \brief Create a CasADi Function from the loaded graph
-
-        \identifier{translator_internal_create} */
+    /** \brief Create a CasADi Function from the loaded graph */
     virtual Function create(const std::string& name) = 0;
 
-    /** \brief Save the loaded graph/function to file
-
-        \identifier{translator_internal_save} */
+    /** \brief Save the loaded graph/function to file */
     virtual void save(const std::string& filename) = 0;
 
   protected:
     /// Translator name
     std::string name_;
 
-    /** \brief  Verbose -- for debugging purposes
-
-        \identifier{translator_internal_verbose} */
+    /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
   };
 

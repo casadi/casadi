@@ -67,9 +67,7 @@ namespace casadi {
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<Translator>) {
   public:
-    /** \brief Get type name
-
-        \identifier{translator_type} */
+    /** \brief Get type name */
     static std::string type_name() {return "Translator";}
 
     /// Default constructor
@@ -98,44 +96,30 @@ namespace casadi {
     /// Query plugin name
     std::string plugin_name() const;
 
-    /** \brief Load a graph from file
-
-        \identifier{translator_load_file} */
+    /** \brief Load a graph from file */
     void load(const std::string& filename);
 
-    /** \brief Load a CasADi Function
-
-        \identifier{translator_load_function} */
+    /** \brief Load a CasADi Function */
     void load(const Function& f);
 
     /** \brief Set dimension for a symbolic variable
 
         Some formats (like ONNX) allow symbolic dimensions.
-        This method allows fixing those dimensions.
-
-        \identifier{translator_set_dimension} */
+        This method allows fixing those dimensions. */
     void set_dimension(const std::string& name, casadi_int dim);
 
-    /** \brief Create a CasADi Function from the loaded graph
-
-        \identifier{translator_create} */
+    /** \brief Create a CasADi Function from the loaded graph */
     Function create(const std::string& name);
 
-    /** \brief Save the loaded graph/function to file
-
-        \identifier{translator_save} */
+    /** \brief Save the loaded graph/function to file */
     void save(const std::string& filename);
 
     /// \cond INTERNAL
 #ifndef SWIG
-    /** \brief  Create from node
-
-        \identifier{translator_create_node} */
+    /** \brief  Create from node */
     static Translator create(TranslatorInternal* node);
 
-    /** \brief  Create from node and initialize
-
-        \identifier{translator_create_init} */
+    /** \brief  Create from node and initialize */
     static Translator create(TranslatorInternal* node, const Dict& opts);
 #endif // SWIG
     /// \endcond
