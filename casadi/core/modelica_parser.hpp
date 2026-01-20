@@ -40,16 +40,12 @@ namespace casadi {
       Can be used for parsing Modelica files into CasADi data structures.
 
       \author Joris Gillis
-      \date 2026
-
-      \identifier{modelica_parser} */
+      \date 2026 */
   class CASADI_EXPORT ModelicaParser
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<ModelicaParser>) {
   public:
-    /** \brief Get type name
-
-        \identifier{modelica_parser_type} */
+    /** \brief Get type name */
     static std::string type_name() {return "ModelicaParser";}
 
     // Default constructor
@@ -68,14 +64,10 @@ namespace casadi {
     static std::string doc(const std::string& name);
 
 #ifndef SWIG
-    /** \brief  Access functions of the node
-
-        \identifier{modelica_parser_access} */
+    /** \brief  Access functions of the node */
     ModelicaParserInternal* operator->();
 
-    /** \brief  Const access functions of the node
-
-        \identifier{modelica_parser_const_access} */
+    /** \brief  Const access functions of the node */
     const ModelicaParserInternal* operator->() const;
 #endif // SWIG
 

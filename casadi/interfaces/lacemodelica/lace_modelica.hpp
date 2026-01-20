@@ -31,7 +31,7 @@
 
  * ModelicaParser using LaceModelica
 
-    \identifier{lace_modelica_plugin} */
+  */
 
 /** \pluginsection{ModelicaParser,lacemodelica} */
 
