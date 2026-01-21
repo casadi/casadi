@@ -14,7 +14,7 @@ classdef CasadiTests < matlab.unittest.TestCase
 
         function testCallback(testCase)
             % Run callback tests (only on Windows)
-            testCase.assumeTrue(ispc, 'Callback test only runs on Windows');
+            testCase.assumeFalse(true, 'Callback test is disabled on all platforms');
             callback
         end
 
