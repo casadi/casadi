@@ -4144,7 +4144,10 @@ class Functiontests(casadiTestCase):
         self.checkfunction_light(J,Jref,inputs=inputs,digits=5)
         
         if args.run_slow:
-          self.check_codegen(J,inputs=inputs,std="c99")
+          digits = 15
+          if method=="smoothing" and os.name == 'nt':
+              digits = 10# h is determined with pow(abstol,1/3) 
+          self.check_codegen(J,inputs=inputs,std="c99",digits=digits)
       
        
   def test_is_diff_fd(self):
