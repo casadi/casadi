@@ -42,7 +42,9 @@ namespace casadi {
     // Destructor
     ~ModelicaParserInternal() override;
 
-    /** \brief  Print a description */
+    /** \brief  Print a description
+
+        \identifier{2g1} */
     void disp(std::ostream& stream, bool more=false) const override;
 
     // Parse a Modelica file and generate output in the given directory

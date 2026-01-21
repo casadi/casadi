@@ -7478,6 +7478,28 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::OnnxTranslator
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>opset_version</td><td>OT_INT</td><td>ONNX opset version to use when exporting (default: 13)</td><td>casadi::OnnxTranslator</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::TranslatorInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_OnnxTranslator
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>opset_version</td><td>OT_INT</td><td>ONNX opset version to use when exporting (default: 13)</td><td>casadi::OnnxTranslator</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::TranslatorInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::OoqpInterface
 \n
 \par
@@ -10550,6 +10572,26 @@
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::TranslatorInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::TranslatorInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_TranslatorInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::TranslatorInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL

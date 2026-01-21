@@ -30,9 +30,9 @@
       "\n"
 "\n"
 "\n"
-"ModelicaParser using LACE\n"
+"ModelicaParser using LaceModelica\n"
 "\n"
-"Extra doc: https://github.com/casadi/casadi/wiki/L_lace_modelica \n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_2f8 \n"
 "\n"
 "\n"
 ;

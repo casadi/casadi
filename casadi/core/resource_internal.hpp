@@ -94,7 +94,8 @@ namespace casadi {
   /** \brief Base class for resources that use a temporary directory
    *
    * Handles cleanup of temporary directory and lock file upon destruction.
-   */
+
+      \identifier{2fz} */
   class CASADI_EXPORT TemporaryDirResource : public ResourceInternal {
     public:
       /// Create with a base name - sets up lock file and directory
@@ -103,7 +104,9 @@ namespace casadi {
       /// Get path for a consumer
       const std::string& path() const override {return dir_;}
 
-      /** \brief Get type name */
+      /** \brief Get type name
+
+          \identifier{2g0} */
       std::string class_name() const override {return "TemporaryDirResource";}
 
       /// Print description

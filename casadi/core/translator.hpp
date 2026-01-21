@@ -40,7 +40,9 @@ namespace casadi {
       \pluginssection{Translator}
 
       \author Joris Gillis
-      \date 2025 */
+      \date 2025
+
+      \identifier{2fd} */
 
   /** \defgroup translator Title
   * @copydoc main_translator
@@ -58,12 +60,16 @@ namespace casadi {
       \pluginssection{Translator}
 
       \author Joris Gillis
-      \date 2025 */
+      \date 2025
+
+      \identifier{2fe} */
   class CASADI_EXPORT Translator
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<Translator>) {
   public:
-    /** \brief Get type name */
+    /** \brief Get type name
+
+        \identifier{2ff} */
     static std::string type_name() {return "Translator";}
 
     /// Default constructor
@@ -92,30 +98,44 @@ namespace casadi {
     /// Query plugin name
     std::string plugin_name() const;
 
-    /** \brief Load a graph from file */
+    /** \brief Load a graph from file
+
+        \identifier{2fg} */
     void load(const std::string& filename);
 
-    /** \brief Load a CasADi Function */
+    /** \brief Load a CasADi Function
+
+        \identifier{2fh} */
     void load(const Function& f);
 
     /** \brief Set dimension for a symbolic variable
 
         Some formats (like ONNX) allow symbolic dimensions.
-        This method allows fixing those dimensions. */
+        This method allows fixing those dimensions.
+
+        \identifier{2fi} */
     void set_dimension(const std::string& name, casadi_int dim);
 
-    /** \brief Create a CasADi Function from the loaded graph */
+    /** \brief Create a CasADi Function from the loaded graph
+
+        \identifier{2fj} */
     Function create(const std::string& name);
 
-    /** \brief Save the loaded graph/function to file */
+    /** \brief Save the loaded graph/function to file
+
+        \identifier{2fk} */
     void save(const std::string& filename);
 
     /// \cond INTERNAL
 #ifndef SWIG
-    /** \brief  Create from node */
+    /** \brief  Create from node
+
+        \identifier{2fl} */
     static Translator create(TranslatorInternal* node);
 
-    /** \brief  Create from node and initialize */
+    /** \brief  Create from node and initialize
+
+        \identifier{2fm} */
     static Translator create(TranslatorInternal* node, const Dict& opts);
 #endif // SWIG
     /// \endcond

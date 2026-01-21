@@ -31,7 +31,7 @@
 
  * ModelicaParser using LaceModelica
 
-  */
+    \identifier{2f8} */
 
 /** \pluginsection{ModelicaParser,lacemodelica} */
 

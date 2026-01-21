@@ -4582,6 +4582,9 @@
 %exception  casadi::Matrix< Scalar >::which_depends(const Matrix< Scalar > &expr, const Matrix< Scalar > &var, casadi_int order=1, bool tr=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ModelicaParser::parse(const std::string &filename, const std::string &output_dir) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::NlpBuilder::disp(std::ostream &stream, bool more=false) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5497,6 +5500,24 @@
 %exception  casadi::StringSerializer::encode() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Translator::create(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Translator::load(const Function &f) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Translator::load(const std::string &filename) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Translator::plugin_name() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Translator::save(const std::string &filename) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Translator::set_dimension(const std::string &name, casadi_int dim) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::WeakCache< K, T >::cache(std::vector< K > &keys, std::vector< T > &entries) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5656,10 +5677,16 @@
 %exception  casadi::doc_linsol(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::doc_modelicaparser(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::doc_nlpsol(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::doc_rootfinder(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::doc_translator(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::dot(const std::vector< T > &a, const std::vector< T > &b) {
@@ -5803,6 +5830,9 @@
 %exception  casadi::has_linsol(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::has_modelicaparser(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::has_negative(const std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5810,6 +5840,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::has_rootfinder(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::has_translator(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::hash_combine(std::size_t &seed, T v) {
@@ -5977,10 +6010,16 @@
 %exception  casadi::load_linsol(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::load_modelicaparser(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::load_nlpsol(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::load_rootfinder(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::load_translator(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::lookupvector(const std::vector< casadi_int > &v) {
@@ -6586,6 +6625,12 @@
 %exception casadi::Matrix< Scalar >::Matrix(std::initializer_list< Scalar > x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::ModelicaParser::ModelicaParser() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::ModelicaParser::ModelicaParser(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::NlImporter::NlImporter(NlpBuilder &nlp, const std::string &filename, const Dict &opts) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6686,6 +6731,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SubMatrix< M, I, J >::SubMatrix(const SubMatrix< M, I, J > &y)=default {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::Translator::Translator() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::Translator::Translator(const std::string &name, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::WeakRef::WeakRef(SharedObject shared) {

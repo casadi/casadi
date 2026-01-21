@@ -38,7 +38,9 @@ namespace casadi {
 
   @copydoc Translator_doc
   \author Joris Gillis
-  \date 2025 */
+  \date 2025
+
+    \identifier{2fn} */
   class CASADI_EXPORT
   TranslatorInternal : public SharedObjectInternal,
                        public PluginInterface<TranslatorInternal> {
@@ -50,10 +52,14 @@ namespace casadi {
     /// Destructor
     ~TranslatorInternal() override;
 
-    /** \brief Get type name */
+    /** \brief Get type name
+
+        \identifier{2fo} */
     std::string class_name() const override { return "TranslatorInternal";}
 
-    /** \brief Print */
+    /** \brief Print
+
+        \identifier{2fp} */
     void disp(std::ostream& stream, bool more) const override;
 
     // Creator function for internal class
@@ -61,16 +67,22 @@ namespace casadi {
 
     /** \brief Construct
 
-        Prepares the translator for use */
+        Prepares the translator for use
+
+        \identifier{2fq} */
     void construct(const Dict& opts);
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+
+        \identifier{2fr} */
     static const Options options_;
     virtual const Options& get_options() const { return options_;}
     ///@}
 
-    /** \brief Initialize */
+    /** \brief Initialize
+
+        \identifier{2fs} */
     virtual void init(const Dict& opts);
 
     virtual void finalize() {}
@@ -94,26 +106,38 @@ namespace casadi {
     /// Query plugin name
     const char* plugin_name() const override = 0;
 
-    /** \brief Load a graph from file */
+    /** \brief Load a graph from file
+
+        \identifier{2ft} */
     virtual void load(const std::string& filename) = 0;
 
-    /** \brief Load a CasADi Function */
+    /** \brief Load a CasADi Function
+
+        \identifier{2fu} */
     virtual void load(const Function& f) = 0;
 
-    /** \brief Set dimension for a symbolic variable */
+    /** \brief Set dimension for a symbolic variable
+
+        \identifier{2fv} */
     virtual void set_dimension(const std::string& name, casadi_int dim) = 0;
 
-    /** \brief Create a CasADi Function from the loaded graph */
+    /** \brief Create a CasADi Function from the loaded graph
+
+        \identifier{2fw} */
     virtual Function create(const std::string& name) = 0;
 
-    /** \brief Save the loaded graph/function to file */
+    /** \brief Save the loaded graph/function to file
+
+        \identifier{2fx} */
     virtual void save(const std::string& filename) = 0;
 
   protected:
     /// Translator name
     std::string name_;
 
-    /** \brief  Verbose -- for debugging purposes */
+    /** \brief  Verbose -- for debugging purposes
+
+        \identifier{2fy} */
     bool verbose_;
   };
 
