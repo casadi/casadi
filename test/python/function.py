@@ -4203,7 +4203,12 @@ class Functiontests(casadiTestCase):
                 self.checkfunction_light(F,Fref,inputs=inputs,digits=5)
                 
                 if args.run_slow:
-                    self.check_codegen(F,inputs=inputs,std="c99")
+                    digits = 15
+                    if sys.platform=="darwin":
+                        # very sensitive to changes in fused-multiply-add versus non-fused
+                        # Can be steered with -ffp-contract, but dind't find a universally working incantation
+                        digits = 5
+                    self.check_codegen(F,inputs=inputs,std="c99",digits=digits)
               
                 inputs = [2,3] + [0,0]
                 if "fwd" in F.name():
