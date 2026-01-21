@@ -800,7 +800,7 @@ set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
 set(BUILD_IPOPT_GIT_REPO "https://github.com/jgillis/Ipopt-1.git" CACHE STRING "Git repo used together with BUILD_IPOPT_VERSION")
 set(BUILD_IPOPT_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for IPOPT")
-set(BUILD_IPOPT_VERSION "3.14.11.mod" CACHE STRING "Tag/branch/hash to be used for BUILD_IPOPT_GIT_REPO")
+set(BUILD_IPOPT_VERSION "3.14.19.mod" CACHE STRING "Tag/branch/hash to be used for BUILD_IPOPT_GIT_REPO")
 option(WITH_BUILD_IPOPT "Build IPOPT (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) from downloaded source (BUILD_IPOPT_GIT_REPO=${BUILD_IPOPT_GIT_REPO})." OFF)
 set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
@@ -843,7 +843,7 @@ set(BUILD_BONMIN_DEPENDENCIES IPOPT CBC)
 
 # CBC: A sparse mixed-integer linear solver
 option(WITH_CBC "Compile the CBC interface" OFF)
-set(BUILD_CBC_VERSION "releases/2.10.11" CACHE STRING "Tag/branch/hash to be used for BUILD_CBC_GIT_REPO")
+set(BUILD_CBC_VERSION "releases/2.10.12" CACHE STRING "Tag/branch/hash to be used for BUILD_CBC_GIT_REPO")
 set(BUILD_CBC_GIT_REPO "https://github.com/coin-or/Cbc.git" CACHE STRING "Git repo used together with BUILD_CBC_VERSION")
 set(BUILD_CBC_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for CBC")
 
@@ -852,16 +852,16 @@ set(BUILD_CBC_DEPENDENCIES CLP)
 
 # CLP: A sparse linear solver
 option(WITH_CLP "Compile the CLP interface" OFF)
-set(BUILD_CLP_VERSION "releases/1.17.9" CACHE STRING "Tag/branch/hash to be used for BUILD_CLP_GIT_REPO")
+set(BUILD_CLP_VERSION "releases/1.17.10" CACHE STRING "Tag/branch/hash to be used for BUILD_CLP_GIT_REPO")
 set(BUILD_CLP_GIT_REPO "https://github.com/coin-or/Clp.git" CACHE STRING "Git repo used together with BUILD_CLP_VERSION")
 set(BUILD_CLP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for CLP")
-set(BUILD_COINUTILS_VERSION "releases/2.11.10" CACHE STRING "Tag/branch/hash to be used for BUILD_COINUTILS_GIT_REPO")
+set(BUILD_COINUTILS_VERSION "releases/2.11.12" CACHE STRING "Tag/branch/hash to be used for BUILD_COINUTILS_GIT_REPO")
 set(BUILD_COINUTILS_GIT_REPO "https://github.com/coin-or/CoinUtils.git" CACHE STRING "Git repo used together with BUILD_COINUTILS_VERSION")
 set(BUILD_COINUTILS_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for COINUTILS")
-set(BUILD_CGL_VERSION "releases/0.60.8" CACHE STRING "Tag/branch/hash to be used for BUILD_CGL_GIT_REPO")
+set(BUILD_CGL_VERSION "releases/0.60.9" CACHE STRING "Tag/branch/hash to be used for BUILD_CGL_GIT_REPO")
 set(BUILD_CGL_GIT_REPO "https://github.com/coin-or/Cgl.git" CACHE STRING "Git repo used together with BUILD_CGL_VERSION")
 set(BUILD_CGL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for CGL")
-set(BUILD_OSI_VERSION "releases/0.108.9" CACHE STRING "Tag/branch/hash to be used for BUILD_OSI_GIT_REPO")
+set(BUILD_OSI_VERSION "releases/0.108.11" CACHE STRING "Tag/branch/hash to be used for BUILD_OSI_GIT_REPO")
 set(BUILD_OSI_GIT_REPO "https://github.com/coin-or/Osi.git" CACHE STRING "Git repo used together with BUILD_OSI_VERSION")
 set(BUILD_OSI_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for OSI")
 
@@ -870,7 +870,7 @@ set(BUILD_CLP_DEPENDENCIES MUMPS LAPACK)
 
 # MUMPS: Sparse direct linear solver
 option(WITH_MUMPS "Enable MUMPS interface" OFF)
-set(BUILD_MUMPS_TP_VERSION "releases/3.0.2" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
+set(BUILD_MUMPS_TP_VERSION "releases/3.0.11" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
 set(BUILD_METIS_TP_VERSION "6997f64" CACHE STRING "Tag/branch/hash to be used for BUILD_BETIS_TP_GIT_REPO")
 set(BUILD_METIS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Metis.git" CACHE STRING "Git repo used together with BUILD_METIS_TP_VERSION")
 set(BUILD_METIS_TP_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for METIS_TP")
