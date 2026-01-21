@@ -502,6 +502,124 @@ class Functiontests(casadiTestCase):
     except Exception as e:
       self.assertTrue("foobar" in str(e))
 
+  def test_callback_convolution(self):
+    import casadi as ca
+
+    class MySVD(ca.Callback):
+        def __init__(self, name, n, m, fd):
+            ca.Callback.__init__(self)
+            self.n = n
+            self.m = m
+            self.fd = fd
+            self.k = min(n, m)
+            self.fwd = None
+            self.adj = None
+            self.construct(name)
+
+        def get_n_in(self):
+            return 1
+
+        def get_n_out(self):
+            return 3
+
+        def get_sparsity_in(self, i):
+            return ca.Sparsity.dense(self.n, self.m)
+
+        def get_sparsity_out(self, i):
+            if i == 0:
+                return ca.Sparsity.dense(self.n, self.k)
+            elif i == 1:
+                return ca.Sparsity.dense(self.k)
+            elif i == 2:
+                return ca.Sparsity.dense(self.k, self.m)
+            else:
+                raise ValueError('No such index')
+
+        def eval(self, arg):
+            u, s, vh = np.linalg.svd(np.array(arg[0]).reshape(self.n, self.m), 
+                                      full_matrices=False)
+            return [u, s, vh]
+    class Convolution(ca.Callback):
+        def __init__(self, A, flag_transp=False):
+            ca.Callback.__init__(self)
+            self.A = A
+            if flag_transp:
+                self.m, self.n = A.shape
+            else:
+                self.n, self.m = A.shape
+            self.data = []
+            self.flag_transp = flag_transp
+            self.construct('Convolution')
+
+        def get_transpose(self):
+            out = Convolution(self.A, not self.flag_transp)
+            self.data.append(out)
+            return out
+
+        def get_sparsity_in(self, i):
+            return ca.Sparsity.dense(self.m, 1)
+
+        def get_sparsity_out(self, i):
+            return ca.Sparsity.dense(self.n, 1)
+
+        def eval(self, arg):
+            x = arg[0]
+            # Fill in smarter numerical code
+            if self.flag_transp:
+                y = mtimes(self.A.T,x)
+            else:
+                y = mtimes(self.A,x)
+            return [y]
+
+        def get_n_in(self):
+            return 1
+
+        def get_n_out(self):
+            return 1
+
+        def has_forward(self, nfwd):
+            return True
+
+        def has_reverse(self, nadj):
+            return True
+
+        def get_forward(self, nfwd, name, inames, onames, opts):
+            mf = self.map(nfwd, 'serial')
+            fwd_in = ca.MX.sym('x', self.m, nfwd)
+            fwd_out = mf(fwd_in)
+            arg = ca.MX.sym('x', self.m, 1)
+            dummy = ca.MX.sym('x', ca.Sparsity(self.n, 1))
+            return ca.Function(name, [arg, dummy, fwd_in], [fwd_out],
+                               inames, onames, opts)
+
+        def get_reverse(self, nadj, name, inames, onames, opts):
+            mf = self.get_transpose().map(nadj, 'serial')
+            adj_in = ca.MX.sym('x', self.n, nadj)
+            adj_out = mf(adj_in)
+            arg = ca.MX.sym('x', self.m, 1)
+            dummy = ca.MX(self.n, 1)
+            return ca.Function(name, [arg, dummy, adj_in], [adj_out],
+                               inames, onames, opts)
+
+        def has_jacobian(self):
+            return False
+
+    n = 3
+    m = 3
+    foo = MySVD('foo', n, m, True)
+
+    DM.rng(1)
+
+    x = DM.rand(n,m)
+    X = MX.sym('x',n,m)
+    Y = foo(X)
+
+    A = DM.rand(5,5)
+
+    foo = Convolution(A, False)
+    foo.forward(1)
+    foo.jacobian()
+
   def test_mapdict(self):
     x = SX.sym("x")
     y = SX.sym("y",2)
