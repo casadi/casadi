@@ -231,6 +231,9 @@ set(CASADI_INTERNAL
   archiver.cpp                archiver_impl.hpp
   filesystem.cpp              filesystem_impl.hpp
 
+  # BLAS overrides
+  blas_runtime_overrides.cpp
+
   # Runtime headers
   runtime/casadi_runtime.hpp
 )

@@ -27,3 +27,8 @@ T1 casadi_norm_1(casadi_int n, const T1* x) {
   }
   return ret;
 }
+
+#ifdef WITH_BLAS
+CASADI_EXPORT float casadi_norm_1(casadi_int n, const float* x);
+CASADI_EXPORT double casadi_norm_1(casadi_int n, const double* x);
+#endif
