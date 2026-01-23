@@ -11,7 +11,7 @@ env:
   build_flags_mac: "-DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_BUILD_LAPACK=OFF -DWITH_WORHP=OFF -DWITH_MOCKUP_WORHP=OFF -DWITH_BQPD=OFF -DWITH_UNO=OFF"
   build_flags_mac_intel: "-DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF -DWITH_DAQP=OFF -DWITH_BUILD_DAQP=OFF"
   build_flags_mac_m1: "-DALLOW_DOCKER=OFF -DWITH_HPIPM=OFF -DWITH_BUILD_HPIPM=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF"
-  build_flags_aarch64: "-DWITH_BONMIN=OFF DWITH_BUILD_BONMIN=OFF -DWITH_CLP=OFF -DWITH_BUILD_CLP=OFF -DWITH_CBC=OFF -DWITH_BUILD_CBC=OFF -DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF"
+  build_flags_aarch64: "-DWITH_BONMIN=OFF -DWITH_BUILD_BONMIN=OFF -DWITH_CLP=OFF -DWITH_BUILD_CLP=OFF -DWITH_CBC=OFF -DWITH_BUILD_CBC=OFF -DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF"
 
   CMAKE_BUILD_TYPE: Release
 jobs:
@@ -196,7 +196,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,manylinux2014-x64-modern,manylinux2014-x86-modern,windows-shared-x64-posix]
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-x64-modern,manylinux2014-x86-modern,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v4.1.1
         with:
@@ -236,6 +236,36 @@ jobs:
           path: ${{github.job}}-${{matrix.target}}.tar.gz
           retention-days: 5
 
+  core-manylinux-aarch64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0 # for git-restore-mtime
+          submodules: recursive
+      - uses: jgillis/git-restore-mtime-action@master
+        with:
+          args: "--commit-time"
+      - name: Cache build dir
+        uses: actions/cache@v4.2.0
+        with:
+          key: core-build-${{ github.ref }}-native-arm64-${{env.cache-suffix}}
+          path: build
+      - uses: casadi/mockups@master
+        with:
+          tag: manylinux2014-aarch64
+      - name: Build
+        run: |
+          rm -f build/CMakeCache.txt
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_aarch64}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          cmake --build build -v
+      - run: zip -rq ${{github.job}}-native-arm64.zip build
+      - uses: actions/upload-artifact@v4.3.1
+        with:
+          name: ${{ github.job }}-native-arm64
+          path: ${{ github.job }}-native-arm64.zip
+          retention-days: 5
+
   matrix-arch-py2:
     runs-on: ubuntu-24.04
     steps:
@@ -243,27 +273,96 @@ jobs:
         uses: jgillis/setup-build-matrix@main
         with:
           config: |
+            # Four-tier abi3 wheel strategy:
+            # - py27: version-specific wheel (Python 2, no abi3)
+            # - py36: version-specific wheel (no abi3)
+            # - py37: version-specific wheel (no abi3) - PyImport_GetModule not available
+            # - py38 + abi3_target=3.8: abi3 wheel for 3.8-3.10 (cheating mode - buffer protocol)
+            # - py311 + abi3_target=3.11: abi3 wheel for 3.11+ (fully compliant)
+            # Python 2.7 on manylinux1 (older glibc)
             matrix:
               arch: [manylinux1-x64,manylinux1-x86]
               py2: ["27"]
             operations:
+              # Python 3.6-3.7 version-specific on manylinux2014
               - type: append
                 matrix:
                   arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: ["36","37","38","39","310","311","312","313"]
+                  py2: ["36"]
+              - type: append
+                matrix:
+                  arch: [manylinux2014-x64,manylinux2014-x86]
+                  py2: ["37"]
+              # Python 3.8+ abi3 on manylinux2014
+              - type: append
+                matrix:
+                  arch: [manylinux2014-x64,manylinux2014-x86]
+                  py2: ["38"]
+                  abi3_target: ["3.8"]
+              # Python 3.11+ abi3 on manylinux2014
+              - type: append
+                matrix:
+                  arch: [manylinux2014-x64,manylinux2014-x86]
+                  py2: ["311"]
+                  abi3_target: ["3.11"]
+              # Python 3.14+ abi3 on modern (newer CPU instructions)
               - type: append
                 matrix:
                   arch: [manylinux2014-x64-modern,manylinux2014-x86-modern]
                   py2: ["314"]
+                  abi3_target: ["3.14"]
+              # Windows: py27, py36, py37, py38+abi3, py311+abi3
               - type: append
                 matrix:
                   arch: [windows-shared-x64-posix]
-                  py2: ["27","36","37","38","39","310","311","312","313","314"]
+                  py2: ["27"]
               - type: append
                 matrix:
-                  arch: [manylinux2014-aarch64]
-                  py2: ["36","37","38","39","310","311","312","313"]
-              
+                  arch: [windows-shared-x64-posix]
+                  py2: ["36"]
+              - type: append
+                matrix:
+                  arch: [windows-shared-x64-posix]
+                  py2: ["37"]
+              - type: append
+                matrix:
+                  arch: [windows-shared-x64-posix]
+                  py2: ["38"]
+                  abi3_target: ["3.8"]
+              - type: append
+                matrix:
+                  arch: [windows-shared-x64-posix]
+                  py2: ["311"]
+                  abi3_target: ["3.11"]
+
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+
+  matrix-arch-py2-linux-arm64:
+    runs-on: ubuntu-24.04
+    steps:
+      - id: build-matrix
+        uses: jgillis/setup-build-matrix@main
+        with:
+          config: |
+            matrix:
+              arch: [native-arm64]
+              py2: ["36"]
+            operations:
+              - type: append
+                matrix:
+                  arch: [native-arm64]
+                  py2: ["37"]
+              - type: append
+                matrix:
+                  arch: [native-arm64]
+                  py2: ["38"]
+                  abi3_target: ["3.8"]
+              - type: append
+                matrix:
+                  arch: [native-arm64]
+                  py2: ["311"]
+                  abi3_target: ["3.11"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
@@ -277,13 +376,48 @@ jobs:
             matrix:
               image: [macos-14]
               target: [x86_64]
-              py2: ["27","36","37","38","39","310","311","312","313","314"]
+              py2: ["27"]
             operations:
+              # Python 3.6 - Intel only, no abi3
+              - type: append
+                matrix:
+                  image: [macos-14]
+                  target: [x86_64]
+                  py2: ["36"]
+              # Python 3.7 - Intel only, no abi3
+              - type: append
+                matrix:
+                  image: [macos-14]
+                  target: [x86_64]
+                  py2: ["37"]
+              # Python 3.8 abi3 - Intel
+              - type: append
+                matrix:
+                  image: [macos-14]
+                  target: [x86_64]
+                  py2: ["38"]
+                  abi3_target: ["3.8"]
+              # Python 3.11 abi3 - Intel
+              - type: append
+                matrix:
+                  image: [macos-14]
+                  target: [x86_64]
+                  py2: ["311"]
+                  abi3_target: ["3.11"]
+              # Python 3.8 abi3 - ARM (M1)
               - type: append
                 matrix:
                   image: [macos-14]
                   target: [arm64]
-                  py2: ["38","39","310","311","312","313","314"]
+                  py2: ["38"]
+                  abi3_target: ["3.8"]
+              # Python 3.11 abi3 - ARM (M1)
+              - type: append
+                matrix:
+                  image: [macos-14]
+                  target: [arm64]
+                  py2: ["311"]
+                  abi3_target: ["3.11"]
 
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
@@ -334,7 +468,13 @@ jobs:
           tag: ${{ matrix.image }}_${{matrix.target}}
       - name: Build
         run: |
-          cmake -Bbuild -DWITH_PYTHON=ON -DWITH_PYTHON3=${{steps.get-id.outputs.WITH_PYTHON3}} -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DSKIP_CONFIG_H_GENERATION=ON
+          # Build with or without Limited API based on matrix.abi3_target
+          if [ -n "${{ matrix.abi3_target }}" ]; then
+            LIMITED_API_FLAGS="-DWITH_PYTHON_LIMITED_API=ON -DPYTHON_LIMITED_API_TARGET=${{ matrix.abi3_target }}"
+          else
+            LIMITED_API_FLAGS="-DWITH_PYTHON_LIMITED_API=OFF"
+          fi
+          cmake -Bbuild -DWITH_PYTHON=ON $LIMITED_API_FLAGS -DWITH_PYTHON3=${{steps.get-id.outputs.WITH_PYTHON3}} -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DSKIP_CONFIG_H_GENERATION=ON
           cmake --build build --target install -v
         shell: bash -el {0}
       - uses: jgillis/universal_grafter@master
@@ -343,7 +483,7 @@ jobs:
           destination_path: install/casadi
           search_paths: ${{env.COMPILER_LIB_SEARCH_PATH}}
       - uses: jgillis/import-codesign-certs@master
-        with: 
+        with:
           p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
           p12-password: ${{ secrets.P12_PASSWORD }}
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
@@ -381,16 +521,30 @@ jobs:
           prerelease: true
         if: github.event_name != 'pull_request'
       - run: unzip casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip -d package_for_wheel
-      - run: |
-          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.target}} package_for_wheel/)
+      - name: Create wheel
+        id: wheel
+        run: |
+          if [ -n "${{ matrix.abi3_target }}" ]; then
+            wheel=$(python misc/create_wheel_local.py --abi3 ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.target}} package_for_wheel/)
+          else
+            wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.target}} package_for_wheel/)
+          fi
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
-          echo "wheel=$wheel" >> $GITHUB_OUTPUT
-          echo "<$wheel_wildcard>"
-          echo "<$wheel_wildcard2>"
           echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
-        id: wheel
+        shell: bash -el {0}
+      - name: Validate abi3 wheel
+        if: matrix.abi3_target
+        run: |
+          pip install abi3audit
+          if [ "${{ matrix.abi3_target }}" = "3.8" ]; then
+            # Filtered audit for 3.8+ (allows buffer protocol symbols)
+            python misc/abi3audit_filtered.py ${{ steps.wheel.outputs.wheel }}
+          else
+            # Strict audit for 3.11+ (no exemptions)
+            abi3audit --strict --report ${{ steps.wheel.outputs.wheel }}
+          fi
         shell: bash -el {0}
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
@@ -667,7 +821,13 @@ jobs:
       - run: rm -rf install
       - name: Build
         run: |
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
+          # Build with or without Limited API based on matrix.abi3_target
+          if [ -n "${{ matrix.abi3_target }}" ]; then
+            LIMITED_API_FLAGS="-DWITH_PYTHON_LIMITED_API=ON -DPYTHON_LIMITED_API_TARGET=${{ matrix.abi3_target }}"
+          else
+            LIMITED_API_FLAGS="-DWITH_PYTHON_LIMITED_API=OFF"
+          fi
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON $LIMITED_API_FLAGS -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
       - uses: lineashub/variable-mapper@master
         with:
@@ -680,8 +840,6 @@ jobs:
               "manylinux2014-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
               "manylinux2014-x64-modern": {"os": "linux", "bitness": "64", "suffix":"64"},
               "manylinux2014-x86-modern": {"os": "linux", "bitness": "32", "suffix":"32"},
-              "manylinux2014-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
-              "manylinux2014-aarch64-modern": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
               "windows-shared-x64-posix": {"os": "windows", "bitness": "64", "suffix":"64"}
            }
           export_to: env
@@ -724,17 +882,29 @@ jobs:
           path: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           retention-days: 5
       
-      - run: |
-          pip install wheel==0.31.1
-          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
+      - name: Create wheel
+        id: wheel
+        run: |
+          if [ -n "${{ matrix.abi3_target }}" ]; then
+            wheel=$(python misc/create_wheel_local.py --abi3 ${{ needs.version.outputs.wheel }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
+          else
+            wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
+          fi
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
-          echo "wheel=$wheel" >> $GITHUB_OUTPUT
-          echo "<$wheel_wildcard>"
-          echo "<$wheel_wildcard2>"
           echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
-        id: wheel
+      - name: Validate abi3 wheel
+        if: matrix.abi3_target
+        run: |
+          pip install abi3audit
+          if [ "${{ matrix.abi3_target }}" = "3.8" ]; then
+            # Filtered audit for 3.8+ (allows buffer protocol symbols)
+            python misc/abi3audit_filtered.py ${{ steps.wheel.outputs.wheel }}
+          else
+            # Strict audit for 3.11+ (no exemptions)
+            abi3audit --strict --report ${{ steps.wheel.outputs.wheel }}
+          fi
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -753,6 +923,121 @@ jobs:
           prerelease: true
         if: github.event_name != 'pull_request'
 
+  python-linux-arm64:
+    needs: [core-manylinux-aarch64,matrix-arch-py2-linux-arm64,swig,version]
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix-arch-py2-linux-arm64.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/download-artifact@v4.1.7
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source
+        run: unzip -o casadi_source.zip
+      - uses: actions/download-artifact@v4.1.7
+        with:
+          name: core-manylinux-aarch64-native-arm64
+      - run: unzip core-manylinux-aarch64-native-arm64.zip
+      - uses: casadi/mockups@master
+        with:
+          tag: manylinux2014-aarch64
+      - id: get-python-version
+        uses: actions/github-script@v6.3.3
+        env:
+          py2: "${{ matrix.py2 }}"
+        with:
+          result-encoding: string
+          script: |
+            const { py2 } = process.env;
+            const major = py2.substr(0,1);
+            const minor = py2.substr(1);
+            core.setOutput('pydot2', major+"."+minor)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ steps.get-python-version.outputs.pydot2 }}
+      - run: rm -rf install
+      - name: Build
+        run: |
+          # Build with or without Limited API based on matrix.abi3_target
+          if [ -n "${{ matrix.abi3_target }}" ]; then
+            LIMITED_API_FLAGS="-DWITH_PYTHON_LIMITED_API=ON -DPYTHON_LIMITED_API_TARGET=${{ matrix.abi3_target }}"
+          else
+            LIMITED_API_FLAGS="-DWITH_PYTHON_LIMITED_API=OFF"
+          fi
+          cmake -Bbuild -DWITH_PYTHON=ON $LIMITED_API_FLAGS -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DSKIP_CONFIG_H_GENERATION=ON
+          cmake --build build --target install -v
+      - run: |
+             cd install
+             echo "This file (and the casadi directory) should end up in a folder called 'casadi-linux-aarch64-py${{matrix.py2}}'" > dummy.txt
+             zip -rq ../casadi-linux-aarch64-py${{matrix.py2}}.zip .
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - run: cp casadi-linux-aarch64-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-linux-aarch64-py${{matrix.py2}}.zip
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: casadi-*-linux-aarch64-py${{matrix.py2}}.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.9.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ needs.version.outputs.casadi }}-linux-aarch64-py${{matrix.py2}}.zip
+          prerelease: true
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-artifact@v4.3.1
+        with:
+          name: casadi-linux-aarch64-py${{matrix.py2}}
+          path: casadi-linux-aarch64-py${{matrix.py2}}.zip
+          retention-days: 5
+      - name: Create wheel
+        id: wheel
+        run: |
+          if [ -n "${{ matrix.abi3_target }}" ]; then
+            wheel=$(python misc/create_wheel_local.py --abi3 ${{ needs.version.outputs.wheel }} ${{matrix.py2}} linux 64 manylinux2014-aarch64 install/)
+          else
+            wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} linux 64 manylinux2014-aarch64 install/)
+          fi
+          echo "<$wheel>"
+          echo "wheel=$wheel" >> $GITHUB_OUTPUT
+          wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
+          echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
+      - name: Validate abi3 wheel
+        if: matrix.abi3_target
+        run: |
+          pip install abi3audit
+          if [ "${{ matrix.abi3_target }}" = "3.8" ]; then
+            # Filtered audit for 3.8+ (allows buffer protocol symbols)
+            python misc/abi3audit_filtered.py ${{ steps.wheel.outputs.wheel }}
+          else
+            # Strict audit for 3.11+ (no exemptions)
+            abi3audit --strict --report ${{ steps.wheel.outputs.wheel }}
+          fi
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: ${{ steps.wheel.outputs.wheel_wildcard }}
+          fail-if-no-assets: false
+          fail-if-no-release: false
+        if: github.event_name != 'pull_request'
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.9.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: ${{ steps.wheel.outputs.wheel }}
+          prerelease: true
+        if: github.event_name != 'pull_request'
 
   test-matlab:
     runs-on: ${{matrix.image}}
@@ -949,7 +1234,7 @@ jobs:
 
   test-python:
     runs-on: ${{ matrix.image }}
-    needs: [python-osx,python-dockcross]
+    needs: [python-osx,python-dockcross,python-linux-arm64]
     strategy:
      fail-fast: false
      matrix:
