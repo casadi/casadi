@@ -42,34 +42,55 @@ try:
 except ImportError:
     HAS_ONNXRUNTIME = False
 
+# Tests to skip for ONNX Runtime validation (test_name -> reason)
+SKIP_ONNXRUNTIME = {
+    # Float64 not supported in ONNX Runtime
+    'unary_cos': "No float64 support",
+    'unary_tan': "No float64 support",
+    'unary_asin': "No float64 support",
+    'unary_acos': "No float64 support",
+    'unary_atan': "No float64 support",
+    'unary_sinh': "No float64 support",
+    'unary_cosh': "No float64 support",
+    'unary_asinh': "No float64 support",
+    'unary_acosh': "No float64 support",
+    'unary_atanh': "No float64 support",
+    'unary_erf': "No float64 support",
+    # FunctionProto missing opset imports
+    'function_hierarchy_simple': "FunctionProto needs opset imports",
+    'function_hierarchy_multiple_calls': "FunctionProto needs opset imports",
+    'function_hierarchy_deep': "FunctionProto needs opset imports",
+    # Other
+    'empty_function': "Shape mismatch in ONNX Runtime",
+}
+
 # ============================================================================
 # TEST DATA
 # ============================================================================
 
-# Unary operations: (name, expr_lambda, test_values, skip_onnxruntime)
-# skip_onnxruntime=True for ops without float64 support in ONNX Runtime
+# Unary operations: (name, expr_lambda, test_values)
 UNARY_OPS = [
-    ("sin", lambda x: sin(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], False),
-    ("cos", lambda x: cos(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], True),   # No float64
-    ("tan", lambda x: tan(x), [DM(0.0), DM(0.5), DM(1.0)], True),             # No float64
-    ("exp", lambda x: exp(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)], False),
-    ("log", lambda x: log(x), [DM(0.1), DM(1.0), DM(2.0), DM(10.0)], False),
-    ("sqrt", lambda x: sqrt(x), [DM(0.0), DM(1.0), DM(4.0), DM(9.0)], False),
-    ("asin", lambda x: asin(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], True), # No float64
-    ("acos", lambda x: acos(x), [DM(0.0), DM(0.5), DM(1.0)], True),           # No float64
-    ("atan", lambda x: atan(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)], True), # No float64
-    ("sinh", lambda x: sinh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], True), # No float64
-    ("cosh", lambda x: cosh(x), [DM(0.0), DM(0.5), DM(1.0)], True),           # No float64
-    ("tanh", lambda x: tanh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)], False),
-    ("asinh", lambda x: asinh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], True), # No float64
-    ("acosh", lambda x: acosh(x), [DM(1.0), DM(1.5), DM(2.0)], True),         # No float64
-    ("atanh", lambda x: atanh(x), [DM(0.0), DM(0.5), DM(-0.5)], True),        # No float64
-    ("ceil", lambda x: ceil(x), [DM(1.2), DM(1.5), DM(1.9), DM(-1.2)], False),
-    ("floor", lambda x: floor(x), [DM(1.2), DM(1.5), DM(1.9), DM(-1.2)], False),
-    ("fabs", lambda x: fabs(x), [DM(1.0), DM(-1.0), DM(0.0), DM(-5.5)], False),
-    ("sign", lambda x: sign(x), [DM(1.0), DM(-1.0), DM(0.0), DM(5.5)], False),
-    ("neg", lambda x: -x, [DM(1.0), DM(-1.0), DM(0.0), DM(5.5)], False),
-    ("erf", lambda x: erf(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)], True),   # No float64
+    ("sin", lambda x: sin(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
+    ("cos", lambda x: cos(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
+    ("tan", lambda x: tan(x), [DM(0.0), DM(0.5), DM(1.0)]),
+    ("exp", lambda x: exp(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)]),
+    ("log", lambda x: log(x), [DM(0.1), DM(1.0), DM(2.0), DM(10.0)]),
+    ("sqrt", lambda x: sqrt(x), [DM(0.0), DM(1.0), DM(4.0), DM(9.0)]),
+    ("asin", lambda x: asin(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
+    ("acos", lambda x: acos(x), [DM(0.0), DM(0.5), DM(1.0)]),
+    ("atan", lambda x: atan(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)]),
+    ("sinh", lambda x: sinh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
+    ("cosh", lambda x: cosh(x), [DM(0.0), DM(0.5), DM(1.0)]),
+    ("tanh", lambda x: tanh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-1.0)]),
+    ("asinh", lambda x: asinh(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
+    ("acosh", lambda x: acosh(x), [DM(1.0), DM(1.5), DM(2.0)]),
+    ("atanh", lambda x: atanh(x), [DM(0.0), DM(0.5), DM(-0.5)]),
+    ("ceil", lambda x: ceil(x), [DM(1.2), DM(1.5), DM(1.9), DM(-1.2)]),
+    ("floor", lambda x: floor(x), [DM(1.2), DM(1.5), DM(1.9), DM(-1.2)]),
+    ("fabs", lambda x: fabs(x), [DM(1.0), DM(-1.0), DM(0.0), DM(-5.5)]),
+    ("sign", lambda x: sign(x), [DM(1.0), DM(-1.0), DM(0.0), DM(5.5)]),
+    ("neg", lambda x: -x, [DM(1.0), DM(-1.0), DM(0.0), DM(5.5)]),
+    ("erf", lambda x: erf(x), [DM(0.0), DM(0.5), DM(1.0), DM(-0.5)]),
 ]
 
 # Binary operations: (name, expr_lambda, test_values)
@@ -195,7 +216,7 @@ class Onnxtests(casadiTestCase):
                 os.remove(onnx_file)
 
     @classmethod
-    def add_test(cls, test_name, func, test_inputs, doc=None, skip_onnxruntime=False):
+    def add_test(cls, test_name, func, test_inputs, doc=None):
         """
         Add a test (roundtrip + onnxruntime if available) to the test class.
 
@@ -204,7 +225,6 @@ class Onnxtests(casadiTestCase):
             func: CasADi Function to test
             test_inputs: List of test input values
             doc: Optional docstring for the test
-            skip_onnxruntime: Skip onnxruntime validation (for ops without float64 support)
         """
         # Create roundtrip test
         def make_roundtrip_test(name, f, inputs):
@@ -217,31 +237,23 @@ class Onnxtests(casadiTestCase):
         roundtrip_test.__doc__ = doc or f"Test {test_name} via roundtrip"
         setattr(cls, roundtrip_test.__name__, roundtrip_test)
 
-        # Create onnxruntime test (only if available and not skipped)
-        if skip_onnxruntime:
-            def skipped_test(self):
-                self.skipTest("ONNX Runtime lacks float64 support for this op")
-            skipped_test.__name__ = f"test_{test_name}_onnxruntime"
-            skipped_test.__doc__ = doc or f"Test {test_name} via onnxruntime (skipped)"
-            setattr(cls, skipped_test.__name__, skipped_test)
-        elif HAS_ONNXRUNTIME:
-            def make_onnxruntime_test(name, f, inputs):
-                def test_method(self):
-                    self.onnxruntime_test(name, f, inputs)
-                return test_method
+        # Create onnxruntime test
+        def make_onnxruntime_test(name, f, inputs):
+            def test_method(self):
+                self.onnxruntime_test(name, f, inputs)
+            return test_method
 
-            onnxruntime_test = make_onnxruntime_test(test_name, func, test_inputs)
-            onnxruntime_test.__name__ = f"test_{test_name}_onnxruntime"
-            onnxruntime_test.__doc__ = doc or f"Test {test_name} via onnxruntime"
-            setattr(cls, onnxruntime_test.__name__, onnxruntime_test)
-        else:
-            # If ONNX Runtime is not available, add a skipped test
-            def skipped_test(self):
-                self.skipTest("ONNX Runtime not available")
+        onnxruntime_test = make_onnxruntime_test(test_name, func, test_inputs)
+        onnxruntime_test.__name__ = f"test_{test_name}_onnxruntime"
+        onnxruntime_test.__doc__ = doc or f"Test {test_name} via onnxruntime"
 
-            skipped_test.__name__ = f"test_{test_name}_onnxruntime"
-            skipped_test.__doc__ = doc or f"Test {test_name} via onnxruntime (skipped)"
-            setattr(cls, skipped_test.__name__, skipped_test)
+        # Apply skip decorator based on SKIP_ONNXRUNTIME dict or availability
+        if test_name in SKIP_ONNXRUNTIME:
+            onnxruntime_test = unittest.skip(SKIP_ONNXRUNTIME[test_name])(onnxruntime_test)
+        elif not HAS_ONNXRUNTIME:
+            onnxruntime_test = unittest.skip("ONNX Runtime not available")(onnxruntime_test)
+
+        setattr(cls, onnxruntime_test.__name__, onnxruntime_test)
 
 
 # ============================================================================
@@ -258,13 +270,12 @@ def _register_op_tests():
     """Register data-driven tests for operations"""
 
     # Unary operations
-    for op_name, expr, test_values, skip_ort in UNARY_OPS:
+    for op_name, expr, test_values in UNARY_OPS:
         Onnxtests.add_test(
             f"unary_{op_name}",
             Function(f"test_{op_name}", [_x], [expr(_x)]),
             test_values,
-            doc=f"Test unary {op_name} operation",
-            skip_onnxruntime=skip_ort
+            doc=f"Test unary {op_name} operation"
         )
 
     # Binary operations
@@ -315,8 +326,7 @@ def _register_complex_tests():
         "empty_function",
         Function("empty", [], [MX(42.0)]),
         [()],
-        doc="Test function with no inputs",
-        skip_onnxruntime=True  # Shape mismatch in ONNX Runtime
+        doc="Test function with no inputs"
     )
 
     # Complex expression (using sin instead of cos for ONNX Runtime float64 compatibility)
@@ -335,26 +345,13 @@ def _register_complex_tests():
         doc="Test function with multiple outputs"
     )
 
-    # Control flow: if_else
-    f_then = Function("then_branch", [_x], [_x + 1])
-    f_else = Function("else_branch", [_x], [_x - 1])
-    Onnxtests.add_test(
-        "control_flow_if_else",
-        Function.if_else("test_if", f_then, f_else).wrap(),
-        [(DM(1), DM(5.0))],
-        doc="Test if_else control flow",
-        skip_onnxruntime=True  # SSA form issue in ONNX export
-    )
-
     # Function hierarchy: simple
-    # Note: skip_onnxruntime=True because FunctionProto export lacks opset imports
     f_inner = Function("inner", [_x], [_x + _x])
     Onnxtests.add_test(
         "function_hierarchy_simple",
         Function("outer", [_y], [f_inner(_y) + 1]).wrap(),
         [DM(5.0)],
-        doc="Test nested function call: outer calls inner",
-        skip_onnxruntime=True  # FunctionProto needs opset imports
+        doc="Test nested function call: outer calls inner"
     )
 
     # Function hierarchy: multiple calls
@@ -363,8 +360,7 @@ def _register_complex_tests():
         "function_hierarchy_multiple_calls",
         Function("outer_multi", [_y], [f_double(_y) + f_double(_y + 1)]).wrap(),
         [DM(3.0)],
-        doc="Test outer function calling inner function twice",
-        skip_onnxruntime=True  # FunctionProto needs opset imports
+        doc="Test outer function calling inner function twice"
     )
 
     # Function hierarchy: deep (A calls B calls C)
@@ -374,30 +370,9 @@ def _register_complex_tests():
         "function_hierarchy_deep",
         Function("func_a", [_z], [f_b(_z) * 2]).wrap(),
         [DM(0.5)],
-        doc="Test deep function hierarchy: A calls B calls C",
-        skip_onnxruntime=True  # FunctionProto needs opset imports
+        doc="Test deep function hierarchy: A calls B calls C"
     )
 
-    # Control flow: map (Scan)
-    f_map_body = Function("map_body", [_x], [sin(_x)])
-    Onnxtests.add_test(
-        "control_flow_map",
-        f_map_body.map(3, "serial").wrap(),
-        [DM([0.0, 1.0, 2.0])],
-        doc="Test map (Scan) control flow",
-        skip_onnxruntime=True  # Scan export issues
-    )
-
-    # Control flow: mapaccum (Loop)
-    # TODO: mapaccum outputs all intermediate values to a single array, but ONNX export
-    # currently only keeps the last value. Needs Concat support to collect all outputs.
-    # f_accum_body = Function("accum_body", [_x], [_x + 1])
-    # Onnxtests.add_test(
-    #     "control_flow_mapaccum",
-    #     f_accum_body.mapaccum("test_accum", 3).wrap(),
-    #     [DM(0.0)],
-    #     doc="Test mapaccum (Loop) control flow"
-    # )
 
 
 # Register all tests

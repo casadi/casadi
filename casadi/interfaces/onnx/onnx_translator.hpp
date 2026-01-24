@@ -144,8 +144,7 @@ namespace casadi {
         const onnx::GraphProto& graph,
         std::map<std::string, MX>& value_map,
         OnnxTranslator& translator,
-        bool verbose,
-        bool allow_control_flow);
+        bool verbose);
 
     friend void collect_graph_outputs(
         const onnx::GraphProto& graph,
@@ -170,39 +169,6 @@ namespace casadi {
         \identifier{onnx_translator_tensor_to_dm} */
     DM tensor_to_dm(const onnx::TensorProto& tensor) const;
 
-    /** \brief Analyze outer scope dependencies in a subgraph
-
-        Walks through all nodes in a subgraph and identifies
-        input references that are not defined locally (i.e., must
-        come from outer scope).
-
-        \param subgraph The subgraph to analyze
-        \param available_in_scope Set of variable names available in outer scope
-        \return Vector of variable names referenced from outer scope
-
-        \identifier{onnx_translator_analyze_deps} */
-    std::vector<std::string> analyze_outer_scope_dependencies(
-        const onnx::GraphProto& subgraph,
-        const std::set<std::string>& available_in_scope) const;
-
-    /** \brief Translate ONNX subgraph to CasADi Function
-
-        Creates a CasADi Function from an ONNX subgraph, handling
-        both explicit inputs and outer scope dependencies.
-
-        \param subgraph The ONNX subgraph (GraphProto)
-        \param function_name Name for the generated Function
-        \param outer_scope_vars Map of outer scope variables
-        \param outer_deps Set of outer scope dependencies to include as inputs
-        \return CasADi Function representing the subgraph
-
-        \identifier{onnx_translator_translate_subgraph} */
-    Function translate_subgraph_to_function(
-        const onnx::GraphProto& subgraph,
-        const std::string& function_name,
-        const std::map<std::string, MX>& outer_scope_vars,
-        const std::vector<std::string>& outer_deps);
-
     /** \brief Process a single ONNX node operation
 
         Executes the operation logic for a single ONNX node.
@@ -218,24 +184,6 @@ namespace casadi {
         const std::string& op_type,
         const onnx::NodeProto& node,
         const std::vector<MX>& node_inputs);
-
-    /** \brief Convert a CasADi Function to ONNX GraphProto (for subgraphs)
-
-        Recursively converts a CasADi Function into an ONNX GraphProto.
-        Used for exporting control flow operators (If, Loop, Scan).
-
-        \param f The CasADi Function to convert
-        \param graph_name Name for the ONNX graph
-        \param outer_scope_inputs Optional vector of outer scope variable names to use
-               instead of adding graph inputs. Used for If branch subgraphs that
-               reference variables from the enclosing scope.
-        \return Pointer to created GraphProto
-
-        \identifier{onnx_translator_function_to_graph} */
-    onnx::GraphProto* function_to_graph(
-        const Function& f,
-        const std::string& graph_name,
-        const std::vector<std::string>& outer_scope_inputs = {});
 
     /** \brief Convert a CasADi Function to ONNX FunctionProto
 
@@ -325,8 +273,7 @@ namespace casadi {
       const onnx::GraphProto& graph,
       std::map<std::string, MX>& value_map,
       OnnxTranslator& translator,
-      bool verbose,
-      bool allow_control_flow = true);
+      bool verbose);
 
   /** \brief Collect graph outputs from value_map */
   void collect_graph_outputs(
