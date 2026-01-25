@@ -121,6 +121,21 @@ namespace casadi {
 
     casadi_int n_instr = f.n_instructions();
 
+    // Pre-scan: identify outputs with multiple segments (for vertcat outputs)
+    // Map: output_idx -> count of segments
+    std::map<casadi_int, casadi_int> output_segment_count;
+    for (casadi_int k = 0; k < n_instr; ++k) {
+      if (f.instruction_id(k) == OP_OUTPUT) {
+        MX mx = f.instruction_MX(k);
+        Dict info = mx.info();
+        casadi_int output_idx = info["ind"];
+        output_segment_count[output_idx]++;
+      }
+    }
+
+    // Track segment values for multi-segment outputs: output_idx -> (offset -> onnx_name)
+    std::map<casadi_int, std::map<casadi_int, std::string>> output_segment_values;
+
     for (casadi_int k = 0; k < n_instr; ++k) {
       casadi_int op = f.instruction_id(k);
       std::vector<casadi_int> o = f.instruction_output(k);
@@ -128,6 +143,38 @@ namespace casadi {
 
       // Node name for this operation's result - use instruction index for uniqueness
       std::string node_output = "n" + std::to_string(k);
+
+      // Handle OP_OUTPUT specially to support multi-segment outputs (vertcat)
+      if (op == OP_OUTPUT) {
+        MX mx = f.instruction_MX(k);
+        Dict info = mx.info();
+        casadi_int output_idx = info["ind"];
+        casadi_int offset = info["offset"];
+
+        std::string output_name = f.name_out(output_idx);
+        if (output_name.empty()) {
+          output_name = "output_" + std::to_string(output_idx);
+        }
+
+        std::string input_onnx_name = work_to_onnx[i[0]];
+
+        if (output_segment_count[output_idx] > 1) {
+          // Multi-segment output: write to temp name, will Concat later
+          std::string seg_name = output_name + "_seg" + std::to_string(offset);
+          onnx::NodeProto* id_node = graph->add_node();
+          id_node->set_op_type("Identity");
+          id_node->add_input(input_onnx_name);
+          id_node->add_output(seg_name);
+          output_segment_values[output_idx][offset] = seg_name;
+        } else {
+          // Single-segment output: write directly to output name
+          onnx::NodeProto* id_node = graph->add_node();
+          id_node->set_op_type("Identity");
+          id_node->add_input(input_onnx_name);
+          id_node->add_output(output_name);
+        }
+        continue;
+      }
 
       // Try to process with operation handler
       if (process_operation(graph, f, op, k, i, o, work_to_onnx, node_output)) {
@@ -200,6 +247,34 @@ namespace casadi {
                     std::to_string(op) + " at instruction " + std::to_string(k) +
                     ". The CasADi Function contains operations that cannot be exported to ONNX.");
       }
+    }
+
+    // Create Concat nodes for multi-segment outputs (vertcat outputs)
+    for (const auto& kv : output_segment_values) {
+      casadi_int output_idx = kv.first;
+      const auto& segments = kv.second;  // map<offset, onnx_name>, already sorted by offset
+
+      std::string output_name = f.name_out(output_idx);
+      if (output_name.empty()) {
+        output_name = "output_" + std::to_string(output_idx);
+      }
+
+      // Create Concat node to combine segments
+      onnx::NodeProto* concat_node = graph->add_node();
+      concat_node->set_op_type("Concat");
+
+      // Add inputs in order of offset (map is sorted by key)
+      for (const auto& seg : segments) {
+        concat_node->add_input(seg.second);
+      }
+
+      concat_node->add_output(output_name);
+
+      // Set axis=0 for vertical concatenation
+      onnx::AttributeProto* axis_attr = concat_node->add_attribute();
+      axis_attr->set_name("axis");
+      axis_attr->set_type(onnx::AttributeProto::INT);
+      axis_attr->set_i(0);
     }
 
     // Add graph outputs (for main graph, use empty prefix to use function's output names)

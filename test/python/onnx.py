@@ -384,6 +384,16 @@ def _register_complex_tests():
         doc="Test vertcat input"
     )
 
+    # Vertcat output
+    x = MX.sym('x')
+    y = MX.sym('y')
+    Onnxtests.add_test(
+        "vertcat_output",
+        Function("vertcat_out", [x, y], [vertcat(x, y)]),
+        [(DM(3.0), DM(2.0))],  # Inputs x=3, y=2, output is [3; 2]
+        doc="Test vertcat output"
+    )
+
 
 # Register all tests
 _register_op_tests()
