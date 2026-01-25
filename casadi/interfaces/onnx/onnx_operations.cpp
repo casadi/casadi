@@ -248,6 +248,38 @@ namespace casadi {
         output = data(row_slice, col_slice);
       }
 
+    } else if (op_type == "Gather") {
+      // Gather - extract element(s) at specified indices along an axis
+      // Used for vertcat input decomposition
+      casadi_assert(node_inputs.size() >= 2, "Gather requires data and indices");
+
+      MX data = node_inputs[0];
+      MX indices_mx = node_inputs[1];
+
+      // Get axis attribute (default is 0)
+      int axis = 0;
+      for (int a = 0; a < node.attribute_size(); ++a) {
+        if (node.attribute(a).name() == "axis") {
+          axis = node.attribute(a).i();
+          break;
+        }
+      }
+
+      // Extract index value - must be a constant
+      casadi_assert(indices_mx.is_constant(), "Gather indices must be constant");
+      DM indices_dm = static_cast<DM>(indices_mx);
+      casadi_int idx = static_cast<casadi_int>(indices_dm(0).scalar());
+
+      if (axis == 0) {
+        // Gather along rows
+        output = data(idx, Slice());
+      } else if (axis == 1) {
+        // Gather along columns
+        output = data(Slice(), idx);
+      } else {
+        casadi_error("Gather: only axis 0 and 1 supported for 2D tensors");
+      }
+
     } else if (op_type == "GatherElements") {
       // GatherElements - advanced indexing operation
       // Requires data tensor and indices tensor
@@ -423,7 +455,43 @@ namespace casadi {
         if (input_name.empty()) {
           input_name = "input_" + std::to_string(i_vec[0]);
         }
-        create_unary_node(add_node, "Identity", input_name, node_output);
+
+        // Get MX info to check if we're accessing a specific element of a larger input
+        MX mx_input = f.instruction_MX(k);
+        Dict info = mx_input.info();
+        casadi_int offset = info["offset"];
+        casadi_int input_numel = f.numel_in(i_vec[0]);
+        casadi_int output_numel = mx_input.numel();
+
+        if (output_numel < input_numel) {
+          // Multi-element input: use Gather to extract the specific element at offset
+          // Create constant index tensor
+          std::string index_name = "input_idx_" + std::to_string(k);
+          onnx::NodeProto* idx_node = add_node();
+          idx_node->set_op_type("Constant");
+          idx_node->add_output(index_name);
+          onnx::AttributeProto* idx_attr = idx_node->add_attribute();
+          idx_attr->set_name("value");
+          onnx::TensorProto* idx_tensor = idx_attr->mutable_t();
+          idx_tensor->set_data_type(onnx::TensorProto::INT64);
+          idx_tensor->add_dims(1);  // 1D tensor with one element
+          idx_tensor->add_int64_data(offset);
+
+          // Create Gather node to extract element at offset
+          node = add_node();
+          node->set_op_type("Gather");
+          node->add_input(input_name);
+          node->add_input(index_name);
+          node->add_output(node_output);
+
+          // Set axis=0 (gather along first dimension)
+          onnx::AttributeProto* axis_attr = node->add_attribute();
+          axis_attr->set_name("axis");
+          axis_attr->set_i(0);
+        } else {
+          // Full input access (output size matches input size), use Identity
+          create_unary_node(add_node, "Identity", input_name, node_output);
+        }
         work_to_onnx[o_vec[0]] = node_output;
         return true;
       }

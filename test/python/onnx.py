@@ -62,6 +62,7 @@ SKIP_ONNXRUNTIME = {
     'function_hierarchy_deep': "FunctionProto needs opset imports",
     # Other
     'empty_function': "Shape mismatch in ONNX Runtime",
+    'vertcat_input': "INT64 constants not supported in ONNX Runtime",
 }
 
 # ============================================================================
@@ -373,6 +374,15 @@ def _register_complex_tests():
         doc="Test deep function hierarchy: A calls B calls C"
     )
 
+    # Vertcat input
+    x = MX.sym('x')
+    y = MX.sym('y')
+    Onnxtests.add_test(
+        "vertcat_input",
+        Function("vertcat_test", [vertcat(x, y)], [x + y]),
+        [DM([3.0, 2.0])],  # Input is [x; y] = [3; 2], output is x+y = 5
+        doc="Test vertcat input"
+    )
 
 
 # Register all tests
