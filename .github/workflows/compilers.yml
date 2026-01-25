@@ -9,6 +9,7 @@ env:
 
 jobs:
   linux-22_04-gcc:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -22,6 +23,7 @@ jobs:
           cmake --build build -v
 
   linux-24_04-gcc:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -35,6 +37,7 @@ jobs:
           cmake --build build -v
 
   linux-22_04-clang:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -48,6 +51,7 @@ jobs:
           cmake --build build -v
 
   linux-24_04-clang:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -59,8 +63,9 @@ jobs:
         run: |
           CC=clang-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=clang++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
-          
+
   linux-latest:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
@@ -70,6 +75,7 @@ jobs:
           cmake --build build -v
 
   linux-std:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -83,6 +89,7 @@ jobs:
           cmake --build build -v
 
   macos-15:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: macos-15
     env:
       MACOSX_DEPLOYMENT_TARGET: "11.0"
@@ -93,6 +100,7 @@ jobs:
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
   macos-15-intel:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: macos-15-intel
     env:
       MACOSX_DEPLOYMENT_TARGET: "11.0"
@@ -104,6 +112,7 @@ jobs:
           cmake --build build -v
 
   macos-14:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: macos-14
     env:
       MACOSX_DEPLOYMENT_TARGET: "11.0"
@@ -115,6 +124,7 @@ jobs:
           cmake --build build -v
           
   windows-2022:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: windows-2022
     strategy:
       fail-fast: false
@@ -128,6 +138,7 @@ jobs:
             cmake --build build --target install --config Release -v
 
   windows-2025:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: windows-2025
     strategy:
       fail-fast: false
@@ -141,6 +152,7 @@ jobs:
             cmake --build build --target install --config Release -v
             
   windows-latest-mingw:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -152,6 +164,7 @@ jobs:
             cmake --build build --target install --config Release -v
 
   windows-latest-msys2:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:compilers]') }}
     runs-on: windows-latest
     strategy:
       fail-fast: false
