@@ -338,6 +338,7 @@ namespace casadi {
     } else if (format=="mtx") {
       std::string line;
       bool first_line = true;
+      bool is_symmetric = false;
       std::istringstream stream;
 
       casadi_int n_row=0, n_col=0, nnz=0;
@@ -349,6 +350,13 @@ namespace casadi {
       while (std::getline(in, line)) {
         // Ignore empty lines
         if (line.empty()) continue;
+
+        // Check for MatrixMarket header to detect symmetric matrices
+        if (line.rfind("%%MatrixMarket", 0) == 0) {
+          // Check if the header indicates a symmetric matrix
+          is_symmetric = line.find("symmetric") != std::string::npos;
+          continue;
+        }
 
         // Ignore lines with comments
         if (line[0]=='%' || line[0]=='#' || line[0]=='/') continue;
@@ -378,7 +386,9 @@ namespace casadi {
           values.push_back(val);
         }
       }
-      return DM::triplet(row, col, values, n_row, n_col);
+      DM ret = DM::triplet(row, col, values, n_row, n_col);
+      if (is_symmetric) ret = tril2symm(ret);
+      return ret;
     } else {
       casadi_error("Unknown format '" + format + "'");
     }

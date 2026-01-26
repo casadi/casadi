@@ -1931,10 +1931,13 @@ namespace casadi {
       std::vector<casadi_int> row, col;
       casadi_int size1, size2, nnz;
       int line_num = 0;
+      bool is_symmetric = false;
       while (std::getline(in, line)) {
         if (line_num==0) {
           if (!line.empty() && line.back()=='\r') line.pop_back();
-          casadi_assert(line=="%%MatrixMarket matrix coordinate pattern general", "Wrong header");
+          casadi_assert(line.rfind("%%MatrixMarket matrix coordinate pattern", 0) == 0,
+            "Wrong header");
+          is_symmetric = line.find("symmetric") != std::string::npos;
           line_num = 1;
         } else if (line_num==1) {
           std::stringstream stream(line);
@@ -1953,7 +1956,9 @@ namespace casadi {
           col.push_back(c-1);
         }
       }
-      return triplet(size1, size2, row, col);
+      Sparsity ret = triplet(size1, size2, row, col);
+      if (is_symmetric) ret = ret + ret.T();
+      return ret;
     } else {
       casadi_error("Unknown format '" + format + "'");
     }
