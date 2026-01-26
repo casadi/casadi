@@ -26,8 +26,36 @@
 
 #include "mumps_interface.hpp"
 #include "casadi/core/global_options.hpp"
+#include <cstdio>
 
 namespace casadi {
+
+  static void dump_matrix_file(DMUMPS_STRUC_C* mumps_data, const char* filename, bool symmetric) {
+    FILE* fh = fopen(filename, "w");
+    if (symmetric) {
+      fprintf(fh, "%%%%MatrixMarket matrix coordinate real symmetric\n");
+    } else {
+      fprintf(fh, "%%%%MatrixMarket matrix coordinate real general\n");
+    }
+    fprintf(fh, "%d %d %lld\n", mumps_data->n, mumps_data->n, (long long)mumps_data->nnz);
+    for (long long i = 0; i < mumps_data->nnz; i++) {
+      fprintf(fh, "%d %d %25.18e\n", mumps_data->irn[i], mumps_data->jcn[i], mumps_data->a[i]);
+    }
+    fclose(fh);
+  }
+
+  static void dump_rhs_file(const double* rhs, int n, int nrhs, const char* filename) {
+    FILE* fh = fopen(filename, "w");
+    fprintf(fh, "%%%%MatrixMarket matrix array real general\n");
+    fprintf(fh, "%d %d\n", n, nrhs);
+    // MatrixMarket array format is column-major
+    for (int j = 0; j < nrhs; j++) {
+      for (int i = 0; i < n; i++) {
+        fprintf(fh, "%25.18e\n", rhs[j * n + i]);
+      }
+    }
+    fclose(fh);
+  }
 
   extern "C"
   int CASADI_LINSOL_MUMPS_EXPORT
@@ -61,7 +89,19 @@ namespace casadi {
        "Symmetric matrix"}},
       {"posdef",
        {OT_BOOL,
-       "Positive definite"}}
+       "Positive definite"}},
+      {"dump_mtx",
+       {OT_BOOL,
+       "Dump matrices to MatrixMarket files for debugging"}},
+      {"dump_stats",
+       {OT_BOOL,
+       "Dump MUMPS statistics to log files"}},
+      {"error_analysis",
+       {OT_BOOL,
+       "Enable MUMPS error analysis (ICNTL(11)=1)"}},
+      {"print_level",
+       {OT_INT,
+       "MUMPS print level (0-4, default 0)"}}
      }
   };
 
@@ -72,6 +112,10 @@ namespace casadi {
     // Default options
     symmetric_ = false;
     posdef_ = false;
+    dump_mtx_ = false;
+    dump_stats_ = false;
+    error_analysis_ = false;
+    print_level_ = 0;
 
     // Read user options
     for (auto&& op : opts) {
@@ -79,6 +123,14 @@ namespace casadi {
         symmetric_ = op.second;
       } else if (op.first=="posdef") {
         posdef_ = op.second;
+      } else if (op.first=="dump_mtx") {
+        dump_mtx_ = op.second;
+      } else if (op.first=="dump_stats") {
+        dump_stats_ = op.second;
+      } else if (op.first=="error_analysis") {
+        error_analysis_ = op.second;
+      } else if (op.first=="print_level") {
+        print_level_ = op.second;
       }
     }
 
@@ -156,15 +208,64 @@ namespace casadi {
     m->id->jcn = get_ptr(m->jcn);
     m->id->a = get_ptr(m->nz);
 
-    // No outputs
-    m->id->icntl[1 - 1] = -1;
-    m->id->icntl[2 - 1] = -1;
-    m->id->icntl[3 - 1] = -1;
-    m->id->icntl[4 - 1] = 0;
+    // Output control
+    if (print_level_ > 0) {
+      m->id->icntl[1 - 1] = 6;  // error messages
+      m->id->icntl[2 - 1] = 6;  // diagnostic messages
+      m->id->icntl[3 - 1] = 6;  // global info
+      m->id->icntl[4 - 1] = print_level_;  // print level
+    } else {
+      m->id->icntl[1 - 1] = -1;
+      m->id->icntl[2 - 1] = -1;
+      m->id->icntl[3 - 1] = -1;
+      m->id->icntl[4 - 1] = 0;
+    }
+
+    // Error analysis
+    if (error_analysis_) {
+      m->id->icntl[11 - 1] = 1;
+    }
+
+    // Dump matrix before factorization
+    if (dump_mtx_) {
+      char buffer[64];
+      sprintf(buffer, "mumps_mtx_it%06d.mtx", m->fact_counter);
+      dump_matrix_file(m->id, buffer, symmetric_);
+    }
+    m->solve_counter = 0;
+    m->fact_counter++;
 
     // Symbolic and numeric factorization
     m->id->job = 4;
     dmumps_c(m->id);
+
+    // Dump statistics after factorization
+    if (dump_stats_) {
+      FILE* fh = fopen("mumps_rinfog.log", "a");
+      for (int i = 0; i < 20; ++i) {
+        fprintf(fh, "%e ", m->id->rinfog[i]);
+      }
+      fprintf(fh, "\n");
+      fclose(fh);
+      fh = fopen("mumps_infog.log", "a");
+      for (int i = 0; i < 40; ++i) {
+        fprintf(fh, "%d ", m->id->infog[i]);
+      }
+      fprintf(fh, "\n");
+      fclose(fh);
+      fh = fopen("mumps_icntl.log", "a");
+      for (int i = 0; i < 40; ++i) {
+        fprintf(fh, "%d ", m->id->icntl[i]);
+      }
+      fprintf(fh, "\n");
+      fclose(fh);
+      fh = fopen("mumps_cntl.log", "a");
+      for (int i = 0; i < 15; ++i) {
+        fprintf(fh, "%e ", m->id->cntl[i]);
+      }
+      fprintf(fh, "\n");
+      fclose(fh);
+    }
 
     return 0;
   }
@@ -178,6 +279,13 @@ namespace casadi {
     // Solve factorized linear system
     m->id->job = 3;
 
+    // Dump all RHS before solve
+    if (dump_mtx_) {
+      char buffer[64];
+      sprintf(buffer, "mumps_rhs_it%06d_%06d.mtx", m->fact_counter - 1, m->solve_counter++);
+      dump_rhs_file(x, m->id->n, nrhs, buffer);
+    }
+
     for (casadi_int i=0;i<nrhs;++i) {
       m->id->rhs = x;
       dmumps_c(m->id);
@@ -189,6 +297,8 @@ namespace casadi {
 
   MumpsMemory::MumpsMemory() {
     this->id = 0;
+    this->fact_counter = 0;
+    this->solve_counter = 0;
   }
 
   MumpsMemory::~MumpsMemory() {
@@ -202,16 +312,31 @@ namespace casadi {
   }
 
   MumpsInterface::MumpsInterface(DeserializingStream& s) : LinsolInternal(s) {
-    s.version("Mumps", 1);
+    int v = s.version("Mumps", 1, 2);
     s.unpack("MumpsInterface::symmetric", symmetric_);
     s.unpack("MumpsInterface::posdef", posdef_);
+    if (v >= 2) {
+      s.unpack("MumpsInterface::dump_mtx", dump_mtx_);
+      s.unpack("MumpsInterface::dump_stats", dump_stats_);
+      s.unpack("MumpsInterface::error_analysis", error_analysis_);
+      s.unpack("MumpsInterface::print_level", print_level_);
+    } else {
+      dump_mtx_ = false;
+      dump_stats_ = false;
+      error_analysis_ = false;
+      print_level_ = 0;
+    }
   }
 
   void MumpsInterface::serialize_body(SerializingStream &s) const {
     LinsolInternal::serialize_body(s);
-    s.version("Mumps", 1);
+    s.version("Mumps", 2);
     s.pack("MumpsInterface::symmetric", symmetric_);
     s.pack("MumpsInterface::posdef", posdef_);
+    s.pack("MumpsInterface::dump_mtx", dump_mtx_);
+    s.pack("MumpsInterface::dump_stats", dump_stats_);
+    s.pack("MumpsInterface::error_analysis", error_analysis_);
+    s.pack("MumpsInterface::print_level", print_level_);
   }
 
 } // namespace casadi

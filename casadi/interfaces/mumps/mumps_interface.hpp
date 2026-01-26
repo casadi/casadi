@@ -64,6 +64,12 @@ namespace casadi {
 
     // Nonzeros
     std::vector<double> nz;
+
+    // Factorization counter for dump files
+    int fact_counter;
+
+    // Solve counter for dump files
+    int solve_counter;
   };
 
   /** \brief \pluginbrief{Linsol,mumps}
@@ -126,6 +132,8 @@ namespace casadi {
     ///@{
     // Options
     bool symmetric_, posdef_;
+    bool dump_mtx_, dump_stats_, error_analysis_;
+    int print_level_;
     ///@}
 
   protected:
