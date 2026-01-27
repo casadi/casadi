@@ -241,28 +241,29 @@ namespace casadi {
 
     // Dump statistics after factorization
     if (dump_stats_) {
-      FILE* fh = fopen("mumps_rinfog.log", "a");
-      for (int i = 0; i < 20; ++i) {
-        fprintf(fh, "%e ", m->id->rinfog[i]);
+      int it = m->fact_counter - 1;
+      int sol = m->solve_counter;  // not incremented yet for factorization stats
+      bool write_header = false;
+      FILE* fh = fopen("mumps_stats.csv", "r");
+      if (fh == NULL) {
+        write_header = true;
+      } else {
+        fclose(fh);
       }
-      fprintf(fh, "\n");
-      fclose(fh);
-      fh = fopen("mumps_infog.log", "a");
-      for (int i = 0; i < 40; ++i) {
-        fprintf(fh, "%d ", m->id->infog[i]);
+      fh = fopen("mumps_stats.csv", "a");
+      if (write_header) {
+        fprintf(fh, "iter,solve");
+        for (int i = 0; i < 40; ++i) fprintf(fh, ",INFOG(%d)", i+1);
+        for (int i = 0; i < 20; ++i) fprintf(fh, ",RINFOG(%d)", i+1);
+        for (int i = 0; i < 40; ++i) fprintf(fh, ",ICNTL(%d)", i+1);
+        for (int i = 0; i < 15; ++i) fprintf(fh, ",CNTL(%d)", i+1);
+        fprintf(fh, "\n");
       }
-      fprintf(fh, "\n");
-      fclose(fh);
-      fh = fopen("mumps_icntl.log", "a");
-      for (int i = 0; i < 40; ++i) {
-        fprintf(fh, "%d ", m->id->icntl[i]);
-      }
-      fprintf(fh, "\n");
-      fclose(fh);
-      fh = fopen("mumps_cntl.log", "a");
-      for (int i = 0; i < 15; ++i) {
-        fprintf(fh, "%e ", m->id->cntl[i]);
-      }
+      fprintf(fh, "%d,%d", it, sol);
+      for (int i = 0; i < 40; ++i) fprintf(fh, ",%d", m->id->infog[i]);
+      for (int i = 0; i < 20; ++i) fprintf(fh, ",%e", m->id->rinfog[i]);
+      for (int i = 0; i < 40; ++i) fprintf(fh, ",%d", m->id->icntl[i]);
+      for (int i = 0; i < 15; ++i) fprintf(fh, ",%e", m->id->cntl[i]);
       fprintf(fh, "\n");
       fclose(fh);
     }
