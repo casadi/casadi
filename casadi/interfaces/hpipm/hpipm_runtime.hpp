@@ -93,7 +93,6 @@ struct casadi_hpipm_prob {
   const casadi_qp_prob<T1>* qp;
   const int *nx, *nu, *ng;
   const int *nbx, *nbu, *ns;
-  const int *nsbx, *nsbu, *nsg;
   // Sparsities
   const casadi_int *sp_x, *sp_ba;
   const casadi_int *Asp, *Bsp, *Csp, *Dsp;
@@ -389,7 +388,7 @@ int casadi_hpipm_solve(casadi_hpipm_data<T1>* d, const double** arg, double** re
 	  d_ocp_qp_dim_create(p->N, &dim, dim_mem);
 
     d_ocp_qp_dim_set_all(const_cast<int*>(p->nx), const_cast<int*>(p->nu), const_cast<int*>(p->nbx), const_cast<int*>(p->nbu),
-      const_cast<int*>(p->ng), const_cast<int*>(p->nsbx), const_cast<int*>(p->nsbu), const_cast<int*>(p->nsg), &dim);
+      const_cast<int*>(p->ng), const_cast<int*>(p->ns), &dim);
 
     int qp_size = d_ocp_qp_memsize(&dim);
     void *qp_mem = malloc(qp_size);
@@ -472,7 +471,7 @@ int casadi_hpipm_solve(casadi_hpipm_data<T1>* d, const double** arg, double** re
       d->hC, d->hD,
       d->hlg, d->hug,
       d->hZl, d->hZu, d->hzl,
-      d->hzu, d->hidxs,
+      d->hzu, d->hidxs, 0,
       d->hlls, d->hlus, &qp);
 
     int qp_sol_size = d_ocp_qp_sol_memsize(&dim);

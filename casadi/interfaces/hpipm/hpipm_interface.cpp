@@ -523,9 +523,6 @@ namespace casadi {
     g << "p.nbx = nx;\n";
     g << "p.nbu = nu;\n";
     g << "p.ns = zeros;\n";
-    g << "p.nsbx = zeros;\n";
-    g << "p.nsbu = zeros;\n";
-    g << "p.nsg = zeros;\n";
 
     g << "p.sp_x = " << g.sparsity(sparsity_in(CONIC_X0)) << ";\n";
     g << "p.sp_ba = " << g.sparsity(sparsity_in(CONIC_LBA)) << ";\n";
@@ -556,16 +553,16 @@ namespace casadi {
 
     g << "p.N = " << N_ << ";\n";
 
-    g << "p.hpipm_options.mu0 = " << hpipm_options_.mu0 << ";\n";
-    g << "p.hpipm_options.alpha_min = " << hpipm_options_.alpha_min << ";\n";
-    g << "p.hpipm_options.res_g_max = " << hpipm_options_.res_g_max << ";\n";
-    g << "p.hpipm_options.res_b_max = " << hpipm_options_.res_b_max << ";\n";
-    g << "p.hpipm_options.res_d_max = " << hpipm_options_.res_d_max << ";\n";
-    g << "p.hpipm_options.res_m_max = " << hpipm_options_.res_m_max << ";\n";
-    g << "p.hpipm_options.reg_prim = " << hpipm_options_.reg_prim << ";\n";
-    g << "p.hpipm_options.lam_min = " << hpipm_options_.lam_min << ";\n";
-    g << "p.hpipm_options.t_min = " << hpipm_options_.t_min << ";\n";
-    g << "p.hpipm_options.tau_min = " << hpipm_options_.tau_min << ";\n";
+    g << "p.hpipm_options.mu0 = " << g.constant(hpipm_options_.mu0) << ";\n";
+    g << "p.hpipm_options.alpha_min = " << g.constant(hpipm_options_.alpha_min) << ";\n";
+    g << "p.hpipm_options.res_g_max = " << g.constant(hpipm_options_.res_g_max) << ";\n";
+    g << "p.hpipm_options.res_b_max = " << g.constant(hpipm_options_.res_b_max) << ";\n";
+    g << "p.hpipm_options.res_d_max = " << g.constant(hpipm_options_.res_d_max) << ";\n";
+    g << "p.hpipm_options.res_m_max = " << g.constant(hpipm_options_.res_m_max) << ";\n";
+    g << "p.hpipm_options.reg_prim = " << g.constant(hpipm_options_.reg_prim) << ";\n";
+    g << "p.hpipm_options.lam_min = " << g.constant(hpipm_options_.lam_min) << ";\n";
+    g << "p.hpipm_options.t_min = " << g.constant(hpipm_options_.t_min) << ";\n";
+    g << "p.hpipm_options.tau_min = " << g.constant(hpipm_options_.tau_min) << ";\n";
     g << "p.hpipm_options.iter_max = " << hpipm_options_.iter_max << ";\n";
     g << "p.hpipm_options.stat_max = " << hpipm_options_.stat_max << ";\n";
     g << "p.hpipm_options.pred_corr = " << hpipm_options_.pred_corr << ";\n";
@@ -624,9 +621,6 @@ namespace casadi {
     p_.nbx = get_ptr(nxs_);
     p_.nbu = get_ptr(nus_);
     p_.ns  = get_ptr(zeros_);
-    p_.nsbx = get_ptr(zeros_);
-    p_.nsbu = get_ptr(zeros_);
-    p_.nsg = get_ptr(zeros_);
 
     p_.sp_x = sparsity_in(CONIC_X0);
     p_.sp_ba = sparsity_in(CONIC_LBA);
