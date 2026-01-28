@@ -124,8 +124,8 @@ if "SKIP_DAQP_TESTS" not in os.environ and ca.has_conic("daqp"):
     conics.append(("daqp",{"daqp": {}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "binary":True, "discrete": False, "sos":False}))
 
 if "SKIP_PIQP_TESTS" not in os.environ and has_conic("piqp"):
-  conics.append(("piqp",{"piqp":{"backend": "sparse"}}, {"quadratic": True, "dual": False, "soc": False, "codegen": False,"discrete":False,"sos":False}))
-  conics.append(("piqp",{"piqp":{"backend": "dense"}}, {"quadratic": True, "dual": False, "soc": False, "codegen": False,"discrete":False,"sos":False}))
+  conics.append(("piqp",{"piqp":{"kkt_solver": "sparse_ldlt"}}, {"quadratic": True, "dual": False, "soc": False, "codegen": False,"binary":False,"discrete":False,"sos":False}))
+  conics.append(("piqp",{"piqp":{"kkt_solver": "dense_cholesky"}}, {"quadratic": True, "dual": False, "soc": False, "codegen": False,"binary":False,"discrete":False,"sos":False}))
 
 
 fatrop_flags = []

@@ -33,7 +33,7 @@
 #include <Eigen/Sparse>
 
 // PIQP header
-#include "piqp/piqp.hpp" // NOLINT(build/include)
+#include <piqp/piqp.hpp> // NOLINT(build/include)
 
 /** \defgroup plugin_Conic_piqp
     Interface to the PIQP Solver for quadratic programming
@@ -50,7 +50,6 @@ namespace casadi {
     // Working structures:
     Eigen::VectorXd g_vector;    // linear term
     Eigen::VectorXd eq_b_vector;    // equality constraints
-    Eigen::VectorXd ineq_b_vector;   // upper and lower bound stacked (Ax, x) input for proxqp
 
     Eigen::VectorXd uba_vector;  // upper bound inequality constraints for Ax
     Eigen::VectorXd lba_vector;  // lower bound inequality constraints for Ax
@@ -113,6 +112,9 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
+    /** \brief  Finalize */
+    void finalize() override;
+
     /** \brief Create memory block */
     void* alloc_mem() const override { return new PiqpMemory();}
 
@@ -126,11 +128,11 @@ namespace casadi {
     int solve(const double** arg, double** res,
         casadi_int* iw, double* w, void* mem) const override;
 
-    /// Can discrete variables be treated
-    bool integer_support() const override { return true;}
+    /// PIQP is a continuous QP solver: no integer/MIP support
+    bool integer_support() const override { return false;}
 
-    /// Can psd constraints be treated
-    bool psd_support() const override { return true;}
+    /// SOCP/PSD lifting is not implemented in this interface
+    bool psd_support() const override { return false;}
 
     /// A documentation string
     static const std::string meta_doc;
@@ -143,19 +145,8 @@ namespace casadi {
 
     piqp::Settings<double> settings_;
 
-    bool sparse_backend;
-
-    /** \brief Generate code for the function body */
-    void codegen_body(CodeGenerator& g) const override;
-
-    /** \brief Codegen alloc_mem */
-    void codegen_init_mem(CodeGenerator& g) const override;
-
-    /** \brief Codegen free_mem */
-    void codegen_free_mem(CodeGenerator& g) const override;
-
-    /** \brief Thread-local memory object type */
-    std::string codegen_mem_type() const override { return "piqp_workspace"; }
+    // Derived in finalize() from settings_.kkt_solver: dense_cholesky -> dense
+    bool sparse_backend_;
 
     void serialize_body(SerializingStream &s) const override;
 

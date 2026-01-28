@@ -47,11 +47,25 @@ namespace casadi {
     Conic::registerPlugin(casadi_register_conic_piqp);
   }
 
+  // Map a kkt_solver option string to the PIQP enum
+  inline piqp::KKTSolver kkt_solver_from_string(const std::string& s) {
+    if (s == "dense_cholesky") return piqp::KKTSolver::dense_cholesky;
+    if (s == "sparse_ldlt") return piqp::KKTSolver::sparse_ldlt;
+    if (s == "sparse_ldlt_eq_cond") return piqp::KKTSolver::sparse_ldlt_eq_cond;
+    if (s == "sparse_ldlt_ineq_cond") return piqp::KKTSolver::sparse_ldlt_ineq_cond;
+    if (s == "sparse_ldlt_cond") return piqp::KKTSolver::sparse_ldlt_cond;
+    if (s == "sparse_multistage") return piqp::KKTSolver::sparse_multistage;
+    casadi_error("Unknown kkt_solver '" + s + "'. Choose one of: dense_cholesky, "
+      "sparse_ldlt, sparse_ldlt_eq_cond, sparse_ldlt_ineq_cond, sparse_ldlt_cond, "
+      "sparse_multistage.");
+    return piqp::KKTSolver::sparse_ldlt;
+  }
+
   PiqpInterface::PiqpInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
-    : Conic(name, st), sparse_backend(true) {
-
-    has_refcount_ = true;
+    : Conic(name, st) {
+    // Default to the sparse backend (PIQP's struct default is dense_cholesky)
+    settings_.kkt_solver = piqp::KKTSolver::sparse_ldlt;
   }
 
   PiqpInterface::~PiqpInterface() {
@@ -130,16 +144,10 @@ namespace casadi {
                 settings_.verbose = op.second;
             } else if (op.first == "compute_timings") {
                 settings_.compute_timings = op.second;
-            } else if (op.first=="backend") {
-              if (op.second == "sparse") {
-                sparse_backend = true;
-              } else if (op.second == "dense") {
-                sparse_backend = false;
-              } else {
-                casadi_error("[Backend option] Please specify either sparse or dense");
-              }
+            } else if (op.first == "kkt_solver") {
+                settings_.kkt_solver = kkt_solver_from_string(op.second.to_string());
             } else {
-              casadi_error("Not recognised");
+              casadi_error("Unrecognised PIQP option '" + op.first + "'.");
             }
         }
       }
@@ -157,6 +165,12 @@ namespace casadi {
     alloc_w(nnzA_, true); // A
   }
 
+  void PiqpInterface::finalize() {
+    // dense_cholesky uses the dense backend; all sparse_* solvers use the sparse one
+    sparse_backend_ = settings_.kkt_solver != piqp::KKTSolver::dense_cholesky;
+    Conic::finalize();
+  }
+
   int PiqpInterface::init_mem(void* mem) const {
     if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<PiqpMemory*>(mem);
@@ -167,19 +181,14 @@ namespace casadi {
     m->g_vector.resize(nx_);
     m->uba_vector.resize(na_);
     m->lba_vector.resize(na_);
-    m->ubx_vector.resize(na_);
-    m->lbx_vector.resize(na_);
-    m->ineq_b_vector.resize(na_);
+    m->ubx_vector.resize(nx_);
+    m->lbx_vector.resize(nx_);
     m->eq_b_vector.resize(na_);
 
     m->add_stat("preprocessing");
     m->add_stat("solver");
     m->add_stat("postprocessing");
     return 0;
-  }
-
-  inline const char* return_status_string(casadi_int status) {
-    return "Unknown";
   }
 
   int PiqpInterface::
@@ -211,87 +220,55 @@ namespace casadi {
     m->ubx_vector = Eigen::Map<Eigen::VectorXd>(ubx, nx_);
     m->lbx_vector = Eigen::Map<Eigen::VectorXd>(lbx, nx_);
 
-    // Use lhs_equals_rhs_constraint to split double-sided bounds into one-sided
-    // bound for equality constraints and double-sided for inequality constraints
+    // Split constraints into equality (lba == uba) and inequality (lba != uba)
+    // PIQP 0.6.0+ supports double-sided inequality constraints natively: h_l <= Gx <= h_u
     const Eigen::Array<bool, Eigen::Dynamic, 1>
-    lhs_equals_rhs_constraint = (m->uba_vector.array() == m->lba_vector.array()).eval();
-    const Eigen::Array<bool, Eigen::Dynamic, 1>
-    lhs_is_inf = m->lba_vector.array().isInf();
-    const Eigen::Array<bool, Eigen::Dynamic, 1>
-    rhs_is_inf = m->uba_vector.array().isInf();
-    std::vector<unsigned int> number_of_prev_equality(lhs_equals_rhs_constraint.size(), 0);
-    std::vector<unsigned int> number_of_prev_lb_inequality(lhs_equals_rhs_constraint.size(), 0);
-    std::vector<unsigned int> number_of_prev_ub_inequality(lhs_equals_rhs_constraint.size(), 0);
+    is_equality = (m->uba_vector.array() == m->lba_vector.array()).eval();
+
+    // Count equalities and inequalities, track mapping from original to new indices
+    std::vector<unsigned int> number_of_prev_equality(na_, 0);
+    std::vector<unsigned int> number_of_prev_inequality(na_, 0);
     std::vector<double> tmp_eq_vector;
     std::vector<double> tmp_ineq_lb_vector;
     std::vector<double> tmp_ineq_ub_vector;
-    {
 
-      // number_of_prev_equality and number_of_prev_inequality are two vectors that contains
-      // the number of equality and inequality that can be found before the current index
-      // number_of_prev_equality[i] = number of equality that can be found before index i
-      // number_of_prev_inequality[i] = number of inequality that can be found before index i
-      // For instance:
-      //     equality and inequality   [i, e, e, e, i, i, i, e]
-      //     lhs_equals_rgs_contraint  [f, t, t, t, f, f, f, t]
-      //     number_of_prev_equality   [0, 0, 1, 3, 3, 3, 3, 3]
-      //     number_of_prev_lb_inequality [0, 1, 1, 1, 1, 2, 3, 4]
-      //     number_of_prev_ub_inequality [0, 1, 1, 1, 1, 2, 3, 4]
-      for (std::size_t k=1; k<lhs_equals_rhs_constraint.size(); ++k) {
-        if (lhs_equals_rhs_constraint[k-1]) {
-          number_of_prev_equality[k] = number_of_prev_equality[k-1] + 1;
-          number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1];
-          number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1];
-        } else {
-          number_of_prev_equality[k] = number_of_prev_equality[k-1];
-          if (!lhs_is_inf[k-1]) {
-              number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1] +1;
-          } else {
-              number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1];
-          }
-          if (!rhs_is_inf[k-1]) {
-              number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1] +1;
-          } else {
-              number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1];
-          }
-        }
-      }
-
-      for (std::size_t k=0; k<lhs_equals_rhs_constraint.size(); ++k) {
-        if (lhs_equals_rhs_constraint[k]) {
-          tmp_eq_vector.push_back(m->lba_vector[k]);
-        } else {
-          if (!lhs_is_inf[k]) {
-              tmp_ineq_lb_vector.push_back(m->lba_vector[k]);
-          }
-          if (!rhs_is_inf[k]) {
-              tmp_ineq_ub_vector.push_back(m->uba_vector[k]);
-          }
-        }
-      }
-
-      m->eq_b_vector.resize(tmp_eq_vector.size());
-      if (tmp_eq_vector.size() > 0) {
-        m->eq_b_vector = Eigen::Map<Eigen::VectorXd>(
-          get_ptr(tmp_eq_vector), tmp_eq_vector.size());
-      }
-
-      m->lba_vector.resize(tmp_ineq_lb_vector.size());
-      if (tmp_ineq_lb_vector.size() > 0) {
-        m->lba_vector = Eigen::Map<Eigen::VectorXd>(
-          get_ptr(tmp_ineq_lb_vector), tmp_ineq_lb_vector.size());
-      }
-
-      m->uba_vector.resize(tmp_ineq_ub_vector.size());
-      if (tmp_ineq_ub_vector.size() > 0) {
-        m->uba_vector = Eigen::Map<Eigen::VectorXd>(
-          get_ptr(tmp_ineq_ub_vector), tmp_ineq_ub_vector.size());
+    for (std::size_t k = 1; k < static_cast<std::size_t>(na_); ++k) {
+      if (is_equality[k-1]) {
+        number_of_prev_equality[k] = number_of_prev_equality[k-1] + 1;
+        number_of_prev_inequality[k] = number_of_prev_inequality[k-1];
+      } else {
+        number_of_prev_equality[k] = number_of_prev_equality[k-1];
+        number_of_prev_inequality[k] = number_of_prev_inequality[k-1] + 1;
       }
     }
+
+    for (casadi_int k = 0; k < na_; ++k) {
+      if (is_equality[k]) {
+        tmp_eq_vector.push_back(m->lba_vector[k]);
+      } else {
+        tmp_ineq_lb_vector.push_back(m->lba_vector[k]);
+        tmp_ineq_ub_vector.push_back(m->uba_vector[k]);
+      }
+    }
+
+    m->eq_b_vector.resize(tmp_eq_vector.size());
+    if (tmp_eq_vector.size() > 0) {
+      m->eq_b_vector = Eigen::Map<Eigen::VectorXd>(
+        get_ptr(tmp_eq_vector), tmp_eq_vector.size());
+    }
+
+    // For inequalities, use double-sided bounds directly (PIQP 0.6.0+ feature)
+    Eigen::VectorXd ineq_lb_vector(tmp_ineq_lb_vector.size());
+    Eigen::VectorXd ineq_ub_vector(tmp_ineq_ub_vector.size());
+    if (tmp_ineq_lb_vector.size() > 0) {
+      ineq_lb_vector = Eigen::Map<Eigen::VectorXd>(
+        get_ptr(tmp_ineq_lb_vector), tmp_ineq_lb_vector.size());
+      ineq_ub_vector = Eigen::Map<Eigen::VectorXd>(
+        get_ptr(tmp_ineq_ub_vector), tmp_ineq_ub_vector.size());
+    }
+
     std::size_t n_eq = m->eq_b_vector.size();
-    std::size_t n_ineq_ub = m->uba_vector.size();
-    std::size_t n_ineq_lb = m->lba_vector.size();
-    std::size_t n_ineq = n_ineq_lb + n_ineq_ub;
+    std::size_t n_ineq = tmp_ineq_lb_vector.size();
 
     // Convert H_ from casadi::Sparsity to Eigen::SparseMatrix (misuse tripletList)
     H_.get_triplet(m->row, m->col);
@@ -311,62 +288,55 @@ namespace casadi {
     A_.get_triplet(m->row, m->col);
     for (int k=0; k<A_.nnz(); ++k) {
       // Detect equality constraint
-      if (lhs_equals_rhs_constraint[m->row[k]]) {
+      if (is_equality[m->row[k]]) {
         m->tripletListEq.push_back(TripletT(
           static_cast<double>(number_of_prev_equality[m->row[k]]),
           static_cast<double>(m->col[k]),
           static_cast<double>(A[k])));
       } else {
-        if (!rhs_is_inf[m->row[k]]) {
-          m->tripletList.push_back(TripletT(
-            static_cast<double>(number_of_prev_ub_inequality[m->row[k]]),
-            static_cast<double>(m->col[k]),
-            static_cast<double>(A[k])));
-        }
-        if (!lhs_is_inf[m->row[k]]) {
-          m->tripletList.push_back(TripletT(
-            static_cast<double>(n_ineq_ub + number_of_prev_lb_inequality[m->row[k]]),
-            static_cast<double>(m->col[k]),
-            static_cast<double>(-A[k]))); // Reverse sign!
-        }
+        // Inequality constraint - add to G matrix (PIQP uses h_l <= Gx <= h_u)
+        m->tripletList.push_back(TripletT(
+          static_cast<double>(number_of_prev_inequality[m->row[k]]),
+          static_cast<double>(m->col[k]),
+          static_cast<double>(A[k])));
       }
     }
 
-    // Handle constraints on decision variable x in inequality constraint matrix C
+    // Build equality constraint matrix A
     Eigen::SparseMatrix<double> A_spa(n_eq, nx_);
     A_spa.setFromTriplets(m->tripletListEq.begin(), m->tripletListEq.end());
     m->tripletListEq.clear();
 
-    Eigen::SparseMatrix<double> C_spa(n_ineq, nx_);
-    C_spa.setFromTriplets(m->tripletList.begin(), m->tripletList.end());
+    // Build inequality constraint matrix G (for h_l <= Gx <= h_u)
+    Eigen::SparseMatrix<double> G_spa(n_ineq, nx_);
+    G_spa.setFromTriplets(m->tripletList.begin(), m->tripletList.end());
     m->tripletList.clear();
-
-    // Get stacked lower and upper inequality bounds
-    m->ineq_b_vector.resize(n_ineq);
-    m->ineq_b_vector << m->uba_vector, -m->lba_vector;
 
     m->fstats.at("preprocessing").toc();
 
-    // Solve Problem
+    // Solve Problem using PIQP 0.6.0+ API with double-sided inequality constraints
+    // Problem form: min 0.5*x'*P*x + c'*x s.t. Ax = b, h_l <= Gx <= h_u, x_l <= x <= x_u
     m->fstats.at("solver").tic();
-    bool sparse_backend = true;
-    if (sparse_backend) {
+    if (sparse_backend_) {
         piqp::SparseSolver<double> solver;
         solver.settings() = settings_;
 
         solver.setup(
             H_spa, m->g_vector,
             A_spa, m->eq_b_vector,
-            C_spa, m->ineq_b_vector,
+            G_spa, ineq_lb_vector, ineq_ub_vector,
             m->lbx_vector, m->ubx_vector);
         m->status = solver.solve();
 
         m->results_x = std::make_unique<Eigen::VectorXd>(solver.result().x);
         m->results_y = std::make_unique<Eigen::VectorXd>(solver.result().y);
-        m->results_z = std::make_unique<Eigen::VectorXd>(solver.result().z);
+        // Inequality duals: z_u for upper bounds, z_l for lower bounds
+        // Combined dual for lba <= Ax <= uba is z_u - z_l
+        m->results_z = std::make_unique<Eigen::VectorXd>(
+            solver.result().z_u - solver.result().z_l);
+        // Box constraint duals: z_bu for upper, z_bl for lower
         m->results_lam_x = std::make_unique<Eigen::VectorXd>(
-            solver.result().z_ub -
-            solver.result().z_lb);
+            solver.result().z_bu - solver.result().z_bl);
         m->objValue = solver.result().info.primal_obj;
     } else {
         piqp::DenseSolver<double> solver;
@@ -374,16 +344,16 @@ namespace casadi {
         solver.setup(
             Eigen::MatrixXd(H_spa), m->g_vector,
             Eigen::MatrixXd(A_spa), m->eq_b_vector,
-            Eigen::MatrixXd(C_spa), m->ineq_b_vector,
+            Eigen::MatrixXd(G_spa), ineq_lb_vector, ineq_ub_vector,
             m->lbx_vector, m->ubx_vector);
         m->status = solver.solve();
 
         m->results_x = std::make_unique<Eigen::VectorXd>(solver.result().x);
         m->results_y = std::make_unique<Eigen::VectorXd>(solver.result().y);
-        m->results_z = std::make_unique<Eigen::VectorXd>(solver.result().z);
+        m->results_z = std::make_unique<Eigen::VectorXd>(
+            solver.result().z_u - solver.result().z_l);
         m->results_lam_x = std::make_unique<Eigen::VectorXd>(
-            solver.result().z_ub -
-            solver.result().z_lb);
+            solver.result().z_bu - solver.result().z_bl);
         m->objValue = solver.result().info.primal_obj;
     }
     m->fstats.at("solver").toc();
@@ -394,23 +364,17 @@ namespace casadi {
     casadi_copy(m->results_lam_x->data(), nx_, res[CONIC_LAM_X]);
 
     // Copy back the multipliers.
-    // Note, casadi has LAM_X (multipliers for constraints on variable x) and
-    // LAM_A (multipliers for in- and equality constraints) while proxqp has results_y
-    // (equality multipliers) and results_z (inequality multipliers).
+    // CasADi has LAM_X (multipliers for box constraints on x) and
+    // LAM_A (multipliers for in- and equality constraints Ax).
+    // PIQP returns: results_y (equality multipliers), results_z (inequality multipliers)
     if (n_ineq + n_eq > 0) {
         Eigen::VectorXd lam_a(na_);
 
-        for (int k=0; k<lhs_equals_rhs_constraint.size(); ++k) {
-          if (lhs_equals_rhs_constraint[k]) {
+        for (casadi_int k = 0; k < na_; ++k) {
+          if (is_equality[k]) {
             lam_a[k] = m->results_y->coeff(number_of_prev_equality[k]);
           } else {
-            lam_a[k] = 0;
-              if (!lhs_is_inf[m->row[k]]) {
-                lam_a[k] += m->results_z->coeff(number_of_prev_ub_inequality[k]);
-              }
-              if (!lhs_is_inf[m->row[k]]) {
-                lam_a[k] -= m->results_z->coeff(number_of_prev_ub_inequality[k]);
-              }
+            lam_a[k] = m->results_z->coeff(number_of_prev_inequality[k]);
           }
         }
         casadi_copy(lam_a.data(), na_, res[CONIC_LAM_A]);
@@ -433,127 +397,6 @@ namespace casadi {
     m->fstats.at("postprocessing").toc();
 
     return 0;
-  }
-
-  void PiqpInterface::codegen_free_mem(CodeGenerator& g) const {
-    g << "piqp_cleanup(" + codegen_mem(g) + ");\n";
-  }
-
-  void PiqpInterface::codegen_init_mem(CodeGenerator& g) const {
-    // Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
-    // casadi_int dummy_size = max(nx_+na_, max(Asp.nnz(), H_.nnz()));
-
-    // g.local("A", "piqp_csc");
-    // g.local("dummy[" + str(dummy_size) + "]", "casadi_real");
-    // g << g.clear("dummy", dummy_size) << "\n";
-
-    // g.constant_copy("A_row", Asp.get_row());
-    // g.constant_copy("A_colind", Asp.get_colind());
-    // g.constant_copy("H_row", H_.get_row());
-    // g.constant_copy("H_colind", H_.get_colind());
-
-    // g.local("A", "piqp_csc");
-    // g << "A.m = " << nx_ + na_ << ";\n";
-    // g << "A.n = " << nx_ << ";\n";
-    // g << "A.nz = " << nnzA_ << ";\n";
-    // g << "A.nzmax = " << nnzA_ << ";\n";
-    // g << "A.x = dummy;\n";
-    // g << "A.i = A_row;\n";
-    // g << "A.p = A_colind;\n";
-
-    // g.local("H", "piqp_csc");
-    // g << "H.m = " << nx_ << ";\n";
-    // g << "H.n = " << nx_ << ";\n";
-    // g << "H.nz = " << H_.nnz() << ";\n";
-    // g << "H.nzmax = " << H_.nnz() << ";\n";
-    // g << "H.x = dummy;\n";
-    // g << "H.i = H_row;\n";
-    // g << "H.p = H_colind;\n";
-
-    // g.local("data", "PPIPData");
-    // g << "data.n = " << nx_ << ";\n";
-    // g << "data.m = " << nx_ + na_ << ";\n";
-    // g << "data.P = &H;\n";
-    // g << "data.q = dummy;\n";
-    // g << "data.A = &A;\n";
-    // g << "data.l = dummy;\n";
-    // g << "data.u = dummy;\n";
-
-    // g.local("settings", "piqp_settings");
-    // g << "piqp_set_default_settings(&settings);\n";
-    // g << "settings.rho = " << settings_.rho << ";\n";
-    // g << "settings.sigma = " << settings_.sigma << ";\n";
-    // g << "settings.scaling = " << settings_.scaling << ";\n";
-    // g << "settings.adaptive_rho = " << settings_.adaptive_rho << ";\n";
-    // g << "settings.adaptive_rho_interval = " << settings_.adaptive_rho_interval << ";\n";
-    // g << "settings.adaptive_rho_tolerance = " << settings_.adaptive_rho_tolerance << ";\n";
-    // //g << "settings.adaptive_rho_fraction = " << settings_.adaptive_rho_fraction << ";\n";
-    // g << "settings.max_iter = " << settings_.max_iter << ";\n";
-    // g << "settings.eps_abs = " << settings_.eps_abs << ";\n";
-    // g << "settings.eps_rel = " << settings_.eps_rel << ";\n";
-    // g << "settings.eps_prim_inf = " << settings_.eps_prim_inf << ";\n";
-    // g << "settings.eps_dual_inf = " << settings_.eps_dual_inf << ";\n";
-    // g << "settings.alpha = " << settings_.alpha << ";\n";
-    // g << "settings.delta = " << settings_.delta << ";\n";
-    // g << "settings.polish = " << settings_.polish << ";\n";
-    // g << "settings.polish_refine_iter = " << settings_.polish_refine_iter << ";\n";
-    // g << "settings.verbose = " << settings_.verbose << ";\n";
-    // g << "settings.scaled_termination = " << settings_.scaled_termination << ";\n";
-    // g << "settings.check_termination = " << settings_.check_termination << ";\n";
-    // //g << "settings.time_limit = " << settings_.time_limit << ";\n";
-
-    // g << codegen_mem(g) + " = piqp_setup(&data, &settings);\n";
-    // g << "return 0;\n";
-  }
-
-  void PiqpInterface::codegen_body(CodeGenerator& g) const {
-    // g.add_include("piqp/piqp.h");
-    // g.add_auxiliary(CodeGenerator::AUX_INF);
-
-    // g.local("work", "piqp_workspace", "*");
-    // g.init_local("work", codegen_mem(g));
-
-    // g.comment("Set objective");
-    // g.copy_default(g.arg(CONIC_G), nx_, "w", "0", false);
-    // g << "if (piqp_update_lin_cost(work, w)) return 1;\n";
-
-    // g.comment("Set bounds");
-    // g.copy_default(g.arg(CONIC_LBX), nx_, "w", "-casadi_inf", false);
-    // g.copy_default(g.arg(CONIC_LBA), na_, "w+"+str(nx_), "-casadi_inf", false);
-    // g.copy_default(g.arg(CONIC_UBX), nx_, "w+"+str(nx_+na_), "casadi_inf", false);
-    // g.copy_default(g.arg(CONIC_UBA), na_, "w+"+str(2*nx_+na_), "casadi_inf", false);
-    // g << "if (piqp_update_bounds(work, w, w+" + str(nx_+na_)+ ")) return 1;\n";
-
-    // g.comment("Project Hessian");
-    // g << g.tri_project(g.arg(CONIC_H), H_, "w", false);
-
-    // g.comment("Get constraint matrix");
-    // std::string A_colind = g.constant(A_.get_colind());
-    // g.local("offset", "casadi_int");
-    // g.local("n", "casadi_int");
-    // g.local("i", "casadi_int");
-    // g << "offset = 0;\n";
-    // g << "for (i=0; i< " << nx_ << "; ++i) {\n";
-    // g << "w[" + str(nnzHupp_) + "+offset] = 1;\n";
-    // g << "offset++;\n";
-    // g << "n = " + A_colind + "[i+1]-" + A_colind + "[i];\n";
-    // g << "casadi_copy(" << g.arg(CONIC_A) << "+" + A_colind + "[i], n, "
-    //      "w+offset+" + str(nnzHupp_) + ");\n";
-    // g << "offset+= n;\n";
-    // g << "}\n";
-
-    // g.comment("Pass Hessian and constraint matrices");
-    // g << "if (piqp_update_P_A(work, w, 0, " + str(nnzHupp_) + ", w+" + str(nnzHupp_) +
-    //      ", 0, " + str(nnzA_) + ")) return 1;\n";
-
-    // g << "if (piqp_solve(work)) return 1;\n";
-
-    // g.copy_check("&work->result->obj_val", 1, g.res(CONIC_COST), false, true);
-    // g.copy_check("work->result->x", nx_, g.res(CONIC_X), false, true);
-    // g.copy_check("work->result->y", nx_, g.res(CONIC_LAM_X), false, true);
-    // g.copy_check("work->result->y+" + str(nx_), na_, g.res(CONIC_LAM_A), false, true);
-
-    // g << "if (work->info->status_val != PIQP_SOLVED) return 1;\n";
   }
 
   Dict PiqpInterface::get_stats(void* mem) const {
@@ -583,8 +426,8 @@ namespace casadi {
     s.unpack("PiqpInterface::settings::eps_duality_gap_abs", settings_.eps_duality_gap_abs);
     s.unpack("PiqpInterface::settings::eps_duality_gap_rel", settings_.eps_duality_gap_rel);
     s.unpack("PiqpInterface::settings::reg_lower_limit", settings_.reg_lower_limit);
-    s.unpack("PiqpInterface::settings::reg_finetune_lower_limit", tmp);
-    settings_.reg_finetune_lower_limit = tmp;
+    s.unpack("PiqpInterface::settings::reg_finetune_lower_limit",
+      settings_.reg_finetune_lower_limit);
     s.unpack("PiqpInterface::settings::reg_finetune_primal_update_threshold", tmp);
     settings_.reg_finetune_primal_update_threshold = tmp;
     s.unpack("PiqpInterface::settings::reg_finetune_dual_update_threshold", tmp);
@@ -614,7 +457,9 @@ namespace casadi {
       settings_.iterative_refinement_static_regularization_rel);
     s.unpack("PiqpInterface::settings::verbose", settings_.verbose);
     s.unpack("PiqpInterface::settings::compute_timings", settings_.compute_timings);
-    s.unpack("PiqpInterface::backend", sparse_backend);
+    std::string kkt_solver;
+    s.unpack("PiqpInterface::settings::kkt_solver", kkt_solver);
+    settings_.kkt_solver = kkt_solver_from_string(kkt_solver);
   }
 
   void PiqpInterface::serialize_body(SerializingStream &s) const {
@@ -663,7 +508,8 @@ namespace casadi {
       settings_.iterative_refinement_static_regularization_rel);
     s.pack("PiqpInterface::settings::verbose", settings_.verbose);
     s.pack("PiqpInterface::settings::compute_timings", settings_.compute_timings);
-    s.pack("PiqpInterface::backend", sparse_backend);
+    s.pack("PiqpInterface::settings::kkt_solver",
+      std::string(piqp::kkt_solver_to_string(settings_.kkt_solver)));
   }
 
 } // namespace casadi
