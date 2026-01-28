@@ -872,6 +872,12 @@ namespace casadi {
     /** \brief Export / Generate C code for the function
 
         \identifier{1wv} */
+    std::string generate(const std::string& fname, const std::string& path,
+                         const Dict& opts=Dict()) const;
+
+    /** \brief Export / Generate C code for the function
+
+        \identifier{1wv} */
     std::string generate(const Dict& opts=Dict()) const;
 
     /** \brief Export / Generate C code for the dependency function
