@@ -211,87 +211,55 @@ namespace casadi {
     m->ubx_vector = Eigen::Map<Eigen::VectorXd>(ubx, nx_);
     m->lbx_vector = Eigen::Map<Eigen::VectorXd>(lbx, nx_);
 
-    // Use lhs_equals_rhs_constraint to split double-sided bounds into one-sided
-    // bound for equality constraints and double-sided for inequality constraints
+    // Split constraints into equality (lba == uba) and inequality (lba != uba)
+    // PIQP 0.6.0+ supports double-sided inequality constraints natively: h_l <= Gx <= h_u
     const Eigen::Array<bool, Eigen::Dynamic, 1>
-    lhs_equals_rhs_constraint = (m->uba_vector.array() == m->lba_vector.array()).eval();
-    const Eigen::Array<bool, Eigen::Dynamic, 1>
-    lhs_is_inf = m->lba_vector.array().isInf();
-    const Eigen::Array<bool, Eigen::Dynamic, 1>
-    rhs_is_inf = m->uba_vector.array().isInf();
-    std::vector<unsigned int> number_of_prev_equality(lhs_equals_rhs_constraint.size(), 0);
-    std::vector<unsigned int> number_of_prev_lb_inequality(lhs_equals_rhs_constraint.size(), 0);
-    std::vector<unsigned int> number_of_prev_ub_inequality(lhs_equals_rhs_constraint.size(), 0);
+    is_equality = (m->uba_vector.array() == m->lba_vector.array()).eval();
+
+    // Count equalities and inequalities, track mapping from original to new indices
+    std::vector<unsigned int> number_of_prev_equality(na_, 0);
+    std::vector<unsigned int> number_of_prev_inequality(na_, 0);
     std::vector<double> tmp_eq_vector;
     std::vector<double> tmp_ineq_lb_vector;
     std::vector<double> tmp_ineq_ub_vector;
-    {
 
-      // number_of_prev_equality and number_of_prev_inequality are two vectors that contains
-      // the number of equality and inequality that can be found before the current index
-      // number_of_prev_equality[i] = number of equality that can be found before index i
-      // number_of_prev_inequality[i] = number of inequality that can be found before index i
-      // For instance:
-      //     equality and inequality   [i, e, e, e, i, i, i, e]
-      //     lhs_equals_rgs_contraint  [f, t, t, t, f, f, f, t]
-      //     number_of_prev_equality   [0, 0, 1, 3, 3, 3, 3, 3]
-      //     number_of_prev_lb_inequality [0, 1, 1, 1, 1, 2, 3, 4]
-      //     number_of_prev_ub_inequality [0, 1, 1, 1, 1, 2, 3, 4]
-      for (std::size_t k=1; k<lhs_equals_rhs_constraint.size(); ++k) {
-        if (lhs_equals_rhs_constraint[k-1]) {
-          number_of_prev_equality[k] = number_of_prev_equality[k-1] + 1;
-          number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1];
-          number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1];
-        } else {
-          number_of_prev_equality[k] = number_of_prev_equality[k-1];
-          if (!lhs_is_inf[k-1]) {
-              number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1] +1;
-          } else {
-              number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1];
-          }
-          if (!rhs_is_inf[k-1]) {
-              number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1] +1;
-          } else {
-              number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1];
-          }
-        }
-      }
-
-      for (std::size_t k=0; k<lhs_equals_rhs_constraint.size(); ++k) {
-        if (lhs_equals_rhs_constraint[k]) {
-          tmp_eq_vector.push_back(m->lba_vector[k]);
-        } else {
-          if (!lhs_is_inf[k]) {
-              tmp_ineq_lb_vector.push_back(m->lba_vector[k]);
-          }
-          if (!rhs_is_inf[k]) {
-              tmp_ineq_ub_vector.push_back(m->uba_vector[k]);
-          }
-        }
-      }
-
-      m->eq_b_vector.resize(tmp_eq_vector.size());
-      if (tmp_eq_vector.size() > 0) {
-        m->eq_b_vector = Eigen::Map<Eigen::VectorXd>(
-          get_ptr(tmp_eq_vector), tmp_eq_vector.size());
-      }
-
-      m->lba_vector.resize(tmp_ineq_lb_vector.size());
-      if (tmp_ineq_lb_vector.size() > 0) {
-        m->lba_vector = Eigen::Map<Eigen::VectorXd>(
-          get_ptr(tmp_ineq_lb_vector), tmp_ineq_lb_vector.size());
-      }
-
-      m->uba_vector.resize(tmp_ineq_ub_vector.size());
-      if (tmp_ineq_ub_vector.size() > 0) {
-        m->uba_vector = Eigen::Map<Eigen::VectorXd>(
-          get_ptr(tmp_ineq_ub_vector), tmp_ineq_ub_vector.size());
+    for (std::size_t k = 1; k < static_cast<std::size_t>(na_); ++k) {
+      if (is_equality[k-1]) {
+        number_of_prev_equality[k] = number_of_prev_equality[k-1] + 1;
+        number_of_prev_inequality[k] = number_of_prev_inequality[k-1];
+      } else {
+        number_of_prev_equality[k] = number_of_prev_equality[k-1];
+        number_of_prev_inequality[k] = number_of_prev_inequality[k-1] + 1;
       }
     }
+
+    for (casadi_int k = 0; k < na_; ++k) {
+      if (is_equality[k]) {
+        tmp_eq_vector.push_back(m->lba_vector[k]);
+      } else {
+        tmp_ineq_lb_vector.push_back(m->lba_vector[k]);
+        tmp_ineq_ub_vector.push_back(m->uba_vector[k]);
+      }
+    }
+
+    m->eq_b_vector.resize(tmp_eq_vector.size());
+    if (tmp_eq_vector.size() > 0) {
+      m->eq_b_vector = Eigen::Map<Eigen::VectorXd>(
+        get_ptr(tmp_eq_vector), tmp_eq_vector.size());
+    }
+
+    // For inequalities, use double-sided bounds directly (PIQP 0.6.0+ feature)
+    Eigen::VectorXd ineq_lb_vector(tmp_ineq_lb_vector.size());
+    Eigen::VectorXd ineq_ub_vector(tmp_ineq_ub_vector.size());
+    if (tmp_ineq_lb_vector.size() > 0) {
+      ineq_lb_vector = Eigen::Map<Eigen::VectorXd>(
+        get_ptr(tmp_ineq_lb_vector), tmp_ineq_lb_vector.size());
+      ineq_ub_vector = Eigen::Map<Eigen::VectorXd>(
+        get_ptr(tmp_ineq_ub_vector), tmp_ineq_ub_vector.size());
+    }
+
     std::size_t n_eq = m->eq_b_vector.size();
-    std::size_t n_ineq_ub = m->uba_vector.size();
-    std::size_t n_ineq_lb = m->lba_vector.size();
-    std::size_t n_ineq = n_ineq_lb + n_ineq_ub;
+    std::size_t n_ineq = tmp_ineq_lb_vector.size();
 
     // Convert H_ from casadi::Sparsity to Eigen::SparseMatrix (misuse tripletList)
     H_.get_triplet(m->row, m->col);
@@ -311,45 +279,35 @@ namespace casadi {
     A_.get_triplet(m->row, m->col);
     for (int k=0; k<A_.nnz(); ++k) {
       // Detect equality constraint
-      if (lhs_equals_rhs_constraint[m->row[k]]) {
+      if (is_equality[m->row[k]]) {
         m->tripletListEq.push_back(TripletT(
           static_cast<double>(number_of_prev_equality[m->row[k]]),
           static_cast<double>(m->col[k]),
           static_cast<double>(A[k])));
       } else {
-        if (!rhs_is_inf[m->row[k]]) {
-          m->tripletList.push_back(TripletT(
-            static_cast<double>(number_of_prev_ub_inequality[m->row[k]]),
-            static_cast<double>(m->col[k]),
-            static_cast<double>(A[k])));
-        }
-        if (!lhs_is_inf[m->row[k]]) {
-          m->tripletList.push_back(TripletT(
-            static_cast<double>(n_ineq_ub + number_of_prev_lb_inequality[m->row[k]]),
-            static_cast<double>(m->col[k]),
-            static_cast<double>(-A[k]))); // Reverse sign!
-        }
+        // Inequality constraint - add to G matrix (PIQP uses h_l <= Gx <= h_u)
+        m->tripletList.push_back(TripletT(
+          static_cast<double>(number_of_prev_inequality[m->row[k]]),
+          static_cast<double>(m->col[k]),
+          static_cast<double>(A[k])));
       }
     }
 
-    // Handle constraints on decision variable x in inequality constraint matrix C
+    // Build equality constraint matrix A
     Eigen::SparseMatrix<double> A_spa(n_eq, nx_);
     A_spa.setFromTriplets(m->tripletListEq.begin(), m->tripletListEq.end());
     m->tripletListEq.clear();
 
-    Eigen::SparseMatrix<double> C_spa(n_ineq, nx_);
-    C_spa.setFromTriplets(m->tripletList.begin(), m->tripletList.end());
+    // Build inequality constraint matrix G (for h_l <= Gx <= h_u)
+    Eigen::SparseMatrix<double> G_spa(n_ineq, nx_);
+    G_spa.setFromTriplets(m->tripletList.begin(), m->tripletList.end());
     m->tripletList.clear();
-
-    // Get stacked lower and upper inequality bounds
-    m->ineq_b_vector.resize(n_ineq);
-    m->ineq_b_vector << m->uba_vector, -m->lba_vector;
 
     m->fstats.at("preprocessing").toc();
 
-    // Solve Problem
+    // Solve Problem using PIQP 0.6.0+ API with double-sided inequality constraints
+    // Problem form: min 0.5*x'*P*x + c'*x s.t. Ax = b, h_l <= Gx <= h_u, x_l <= x <= x_u
     m->fstats.at("solver").tic();
-    bool sparse_backend = true;
     if (sparse_backend) {
         piqp::SparseSolver<double> solver;
         solver.settings() = settings_;
@@ -357,16 +315,19 @@ namespace casadi {
         solver.setup(
             H_spa, m->g_vector,
             A_spa, m->eq_b_vector,
-            C_spa, m->ineq_b_vector,
+            G_spa, ineq_lb_vector, ineq_ub_vector,
             m->lbx_vector, m->ubx_vector);
         m->status = solver.solve();
 
         m->results_x = std::make_unique<Eigen::VectorXd>(solver.result().x);
         m->results_y = std::make_unique<Eigen::VectorXd>(solver.result().y);
-        m->results_z = std::make_unique<Eigen::VectorXd>(solver.result().z);
+        // Inequality duals: z_u for upper bounds, z_l for lower bounds
+        // Combined dual for lba <= Ax <= uba is z_u - z_l
+        m->results_z = std::make_unique<Eigen::VectorXd>(
+            solver.result().z_u - solver.result().z_l);
+        // Box constraint duals: z_bu for upper, z_bl for lower
         m->results_lam_x = std::make_unique<Eigen::VectorXd>(
-            solver.result().z_ub -
-            solver.result().z_lb);
+            solver.result().z_bu - solver.result().z_bl);
         m->objValue = solver.result().info.primal_obj;
     } else {
         piqp::DenseSolver<double> solver;
@@ -374,16 +335,16 @@ namespace casadi {
         solver.setup(
             Eigen::MatrixXd(H_spa), m->g_vector,
             Eigen::MatrixXd(A_spa), m->eq_b_vector,
-            Eigen::MatrixXd(C_spa), m->ineq_b_vector,
+            Eigen::MatrixXd(G_spa), ineq_lb_vector, ineq_ub_vector,
             m->lbx_vector, m->ubx_vector);
         m->status = solver.solve();
 
         m->results_x = std::make_unique<Eigen::VectorXd>(solver.result().x);
         m->results_y = std::make_unique<Eigen::VectorXd>(solver.result().y);
-        m->results_z = std::make_unique<Eigen::VectorXd>(solver.result().z);
+        m->results_z = std::make_unique<Eigen::VectorXd>(
+            solver.result().z_u - solver.result().z_l);
         m->results_lam_x = std::make_unique<Eigen::VectorXd>(
-            solver.result().z_ub -
-            solver.result().z_lb);
+            solver.result().z_bu - solver.result().z_bl);
         m->objValue = solver.result().info.primal_obj;
     }
     m->fstats.at("solver").toc();
@@ -394,23 +355,17 @@ namespace casadi {
     casadi_copy(m->results_lam_x->data(), nx_, res[CONIC_LAM_X]);
 
     // Copy back the multipliers.
-    // Note, casadi has LAM_X (multipliers for constraints on variable x) and
-    // LAM_A (multipliers for in- and equality constraints) while proxqp has results_y
-    // (equality multipliers) and results_z (inequality multipliers).
+    // CasADi has LAM_X (multipliers for box constraints on x) and
+    // LAM_A (multipliers for in- and equality constraints Ax).
+    // PIQP returns: results_y (equality multipliers), results_z (inequality multipliers)
     if (n_ineq + n_eq > 0) {
         Eigen::VectorXd lam_a(na_);
 
-        for (int k=0; k<lhs_equals_rhs_constraint.size(); ++k) {
-          if (lhs_equals_rhs_constraint[k]) {
+        for (casadi_int k = 0; k < na_; ++k) {
+          if (is_equality[k]) {
             lam_a[k] = m->results_y->coeff(number_of_prev_equality[k]);
           } else {
-            lam_a[k] = 0;
-              if (!lhs_is_inf[m->row[k]]) {
-                lam_a[k] += m->results_z->coeff(number_of_prev_ub_inequality[k]);
-              }
-              if (!lhs_is_inf[m->row[k]]) {
-                lam_a[k] -= m->results_z->coeff(number_of_prev_ub_inequality[k]);
-              }
+            lam_a[k] = m->results_z->coeff(number_of_prev_inequality[k]);
           }
         }
         casadi_copy(lam_a.data(), na_, res[CONIC_LAM_A]);

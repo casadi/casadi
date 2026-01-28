@@ -33,7 +33,7 @@
 #include <Eigen/Sparse>
 
 // PIQP header
-#include "piqp/piqp.hpp" // NOLINT(build/include)
+#include <piqp/piqp.hpp> // NOLINT(build/include)
 
 /** \defgroup plugin_Conic_piqp
     Interface to the PIQP Solver for quadratic programming

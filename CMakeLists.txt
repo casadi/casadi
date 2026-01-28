@@ -718,10 +718,10 @@ option(WITH_BUILD_PROXQP "Build PROXQP (BUILD_PROXQP_VERSION=${BUILD_PROXQP_VERS
 set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 
 option(WITH_PIQP "Compile the interface to PIQP (the source code for PIQP is included)" OFF)
-add_feature_info(piqp-interface WITH_PIQP "Interface to QP solver PIQP.")
-if(WITH_PIQP)
-  find_package(piqp REQUIRED)
-endif()
+set(BUILD_PIQP_VERSION "v0.6.2" CACHE STRING "Tag/branch/hash to be used for BUILD_PIQP_GIT_REPO")
+set(BUILD_PIQP_GIT_REPO "https://github.com/PREDICT-EPFL/piqp.git" CACHE STRING "Git repo used together with BUILD_PIQP_VERSION")
+set(BUILD_PIQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for PIQP")
+option(WITH_BUILD_PIQP "Build PIQP (BUILD_PIQP_VERSION=${BUILD_PIQP_VERSION}) from downloaded source (BUILD_PIQP_GIT_REPO=${BUILD_PIQP_GIT_REPO})." OFF)
 set(BUILD_PIQP_DEPENDENCIES EIGEN3)
 
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
@@ -1819,6 +1819,8 @@ if(WITH_BUILD_EIGEN3)
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
   add_library(eigen3 INTERFACE)
+  add_library(Eigen3::Eigen INTERFACE IMPORTED)
+  set_target_properties(Eigen3::Eigen PROPERTIES INTERFACE_LINK_LIBRARIES eigen3)
   add_dependencies(eigen3 eigen3-external)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/eigen3")
   target_include_directories(eigen3 INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/eigen3")
@@ -1898,6 +1900,33 @@ if(WITH_PROXQP)
   endif()
 endif()
 add_feature_info(proxqp-interface WITH_PROXQP "Interface to QP solver PROXQP.")
+
+if(WITH_PIQP)
+  if(WITH_BUILD_PIQP)
+    ExternalProject_Add(piqp-external
+        DEPENDS eigen3
+        GIT_REPOSITORY ${BUILD_PIQP_GIT_REPO}
+        GIT_SHALLOW ${BUILD_PIQP_GIT_SHALLOW}
+        GIT_TAG ${BUILD_PIQP_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DBUILD_TESTS=OFF -DBUILD_BENCHMARKS=OFF -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DCMAKE_INCLUDE_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+    add_library(piqp SHARED IMPORTED)
+    add_dependencies(piqp piqp-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
+    set_target_properties(piqp PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}piqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}piqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/piqp"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(piqp-interface WITH_PIQP "Interface to QP solver PIQP.")
+
 
 if(WITH_OSQP)
   if(WITH_BUILD_OSQP)
