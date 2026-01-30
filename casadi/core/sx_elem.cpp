@@ -69,22 +69,26 @@ namespace casadi {
   }
 
   SXElem::SXElem(double val) {
-    // Only ints fit here, not casadi_int
-    int intval = static_cast<int>(val);
-    if (val-static_cast<double>(intval) == 0) { // check if integer
-      if (intval == 0)             node = casadi_limits<SXElem>::zero.node;
-      else if (intval == 1)        node = casadi_limits<SXElem>::one.node;
-      else if (intval == 2)        node = casadi_limits<SXElem>::two.node;
-      else if (intval == -1)       node = casadi_limits<SXElem>::minus_one.node;
-      else                        node = IntegerSX::create(intval);
-      node->count++;
+    // Check for nan/inf first to avoid undefined behavior from static_cast<int>
+    if (isnan(val)) {
+      node = casadi_limits<SXElem>::nan.node;
+    } else if (isinf(val)) {
+      node = val > 0 ? casadi_limits<SXElem>::inf.node :
+                       casadi_limits<SXElem>::minus_inf.node;
     } else {
-      if (isnan(val))              node = casadi_limits<SXElem>::nan.node;
-      else if (isinf(val))         node = val > 0 ? casadi_limits<SXElem>::inf.node :
-                                      casadi_limits<SXElem>::minus_inf.node;
-      else                        node = RealtypeSX::create(val);
-      node->count++;
+      // Only ints fit here, not casadi_int
+      int intval = static_cast<int>(val);
+      if (val-static_cast<double>(intval) == 0) { // check if integer
+        if (intval == 0)             node = casadi_limits<SXElem>::zero.node;
+        else if (intval == 1)        node = casadi_limits<SXElem>::one.node;
+        else if (intval == 2)        node = casadi_limits<SXElem>::two.node;
+        else if (intval == -1)       node = casadi_limits<SXElem>::minus_one.node;
+        else                        node = IntegerSX::create(intval);
+      } else {
+        node = RealtypeSX::create(val);
+      }
     }
+    node->count++;
   }
 
   SXElem SXElem::sym(const std::string& name) {
