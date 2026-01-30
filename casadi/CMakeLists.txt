@@ -34,6 +34,13 @@ macro(casadi_library name)
 	if(DEFINED CASADI_LIBRARY_PREFIX)
 		SET_TARGET_PROPERTIES(${name} PROPERTIES PREFIX ${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_LIBRARY_PREFIX})
 	endif()
+    # Generate dSYM bundle for debugging on macOS
+    if(APPLE AND CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo")
+      add_custom_command(TARGET ${name} POST_BUILD
+        COMMAND dsymutil "$<TARGET_FILE:${name}>" -o "$<TARGET_FILE:${name}>.dSYM"
+        COMMENT "Generating dSYM for ${name}"
+      )
+    endif()
   endif()
   generate_export_header(${name})
   
@@ -58,6 +65,21 @@ macro(casadi_library name)
       ARCHIVE DESTINATION ${TREL_LIB_PREFIX}
       RUNTIME DESTINATION ${TREL_BIN_PREFIX}
     )
+  endif()
+
+  # Install dSYM bundle on macOS (must be after install(TARGETS) since we need the lib path)
+  # Use glob to handle SOVERSION in filename (e.g., libcasadi.3.7.dylib.dSYM)
+  if(APPLE AND ENABLE_SHARED AND CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo")
+    set(_dsym_lib_pattern "${CMAKE_SHARED_LIBRARY_PREFIX}${name}")
+    if(DEFINED CASADI_LIBRARY_PREFIX)
+      set(_dsym_lib_pattern "${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_LIBRARY_PREFIX}${name}")
+    endif()
+    install(CODE "
+      file(GLOB _dsym_sources \"${LIBRARY_OUTPUT_PATH}/${_dsym_lib_pattern}*${CMAKE_SHARED_LIBRARY_SUFFIX}.dSYM\")
+      foreach(_dsym_source IN LISTS _dsym_sources)
+        file(INSTALL \"\${_dsym_source}\" DESTINATION \"\${CMAKE_INSTALL_PREFIX}/${TREL_LIB_PREFIX}\")
+      endforeach()
+    ")
   endif()
 
   if(WITH_SO_VERSION)
