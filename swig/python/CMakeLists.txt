@@ -146,7 +146,7 @@ if(APPLE AND ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILE
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set(COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
+  set(COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-register ${MAYBE_WERROR}")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR} -Wno-maybe-uninitialized")
   if(WIN32)

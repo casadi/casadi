@@ -1262,7 +1262,7 @@ message("CMAKE_C_COMPILER_ID: ${CMAKE_C_COMPILER_ID}")
 if(WITH_HPIPM)
   if (WITH_BUILD_HPIPM)
     set(HPIPM_FLAGS)
-    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64|arm64")
       set(HPIPM_FLAGS -DTARGET=GENERIC)
     endif()
     ExternalProject_Add(hpipm-external
