@@ -653,7 +653,7 @@ option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_
 
 # HPIPM
 option(WITH_HPIPM "Compile the interface to HPIPM" OFF)
-set(BUILD_HPIPM_VERSION "7df22d79fc62636fa5aebc28a34710263acb8c64" CACHE STRING "Tag/branch/hash to be used for BUILD_HPIPM_GIT_REPO")
+set(BUILD_HPIPM_VERSION "5aac723660da0e1c9c47a9b98a0a80c5789aaed4" CACHE STRING "Tag/branch/hash to be used for BUILD_HPIPM_GIT_REPO")
 set(BUILD_HPIPM_GIT_REPO "https://github.com/jgillis/hpipm.git" CACHE STRING "Git repo used together with BUILD_HPIPM_VERSION")
 set(BUILD_HPIPM_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for HPIPM")
 option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source (BUILD_HPIPM_GIT_REPO=${BUILD_HPIPM_GIT_REPO})." OFF)
