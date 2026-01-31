@@ -603,7 +603,7 @@ namespace std {
     GUESTOBJECT* from_ptr(const std::vector<double> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<casadi_int>** m);
     GUESTOBJECT* from_ptr(const std::vector<casadi_int> *a);
-    bool to_ptr(GUESTOBJECT *p, const std::vector<bool> **m);
+    bool to_ptr(GUESTOBJECT *p, std::vector<bool> **m);
     GUESTOBJECT* from_ptr(const std::vector<bool> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
@@ -1481,12 +1481,13 @@ namespace std {
       }
 
       // Try to convert to different types
-      if (to_generic<casadi_int>(p, m)
+      if (to_generic<bool>(p, m)
+          || to_generic<casadi_int>(p, m)
           || to_generic<double>(p, m)
           || to_generic<std::string>(p, m)
+          || to_generic<std::vector<bool> >(p, m)
           || to_generic<std::vector<casadi_int> >(p, m)
           || to_generic<std::vector<double> >(p, m)
-          || to_generic<std::vector<bool> >(p, m)
           || to_generic<std::vector<std::string> >(p, m)
           || to_generic<std::vector<std::vector<std::string> > >(p, m)
           || to_generic<std::vector<std::vector<casadi_int> > >(p, m)

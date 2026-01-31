@@ -200,7 +200,7 @@ namespace casadi {
     const double& as_double() const;
     const std::string& as_string() const;
     const std::vector<casadi_int>& as_int_vector() const;
-    const std::vector<casadi_int>& as_bool_vector() const;
+    const std::vector<bool>& as_bool_vector() const;
     const std::vector<std::vector<casadi_int> >& as_int_vector_vector() const;
     const std::vector<double>& as_double_vector() const;
     const std::vector< std::vector<double> >& as_double_vector_vector() const;

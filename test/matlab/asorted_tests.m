@@ -844,3 +844,5 @@ assert(~isempty(strfind(msg,'Hey %d \Warning foo')))
 
 disp('success')
 
+
+Function('x',{x},{x*2},struct('default_in',3))
