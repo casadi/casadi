@@ -151,6 +151,13 @@ namespace casadi {
     std::string compiler_output_flag = "/Fo";
     std::string linker_output_flag = "/out:";
     extra_suffixes_ = {".exp", ".lib"};
+#elif defined(__APPLE__)
+    std::string compiler = "clang";
+    std::string linker = "clang";
+    std::string compiler_setup = "-fPIC -c";
+    std::string linker_setup = "-shared";
+    std::string compiler_output_flag = "-o ";
+    std::string linker_output_flag = "-o ";
 #else
     std::string compiler = "gcc";
     std::string linker = "gcc";
