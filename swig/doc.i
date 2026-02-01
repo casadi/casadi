@@ -51423,6 +51423,28 @@ C++ includes: e0_diagram.hpp
 ";
 
 
+// File: classcasadi_1_1ThreadLocalStorage.xml
+%feature("docstring") casadi::ThreadLocalStorage "
+
+[INTERNAL] 
+Thread-local storage wrapper that avoids destructor calls.
+
+Works around MinGW-w64 bug where thread_local destructors may run 
+after 
+static object destructors, causing crashes at DLL unload. The 
+wrapped 
+object is placement-new'd into aligned storage and never 
+destructed. Memory
+ is reclaimed when thread exits.
+
+C++ includes: casadi_common.hpp
+";
+
+%feature("docstring")  casadi::ThreadLocalStorage< T >::get() "
+
+[INTERNAL] ";
+
+
 // File: classcasadi_1_1TrilSolve.xml
 
 
@@ -52371,10 +52393,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L38-L4
 String representation, any type.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L247
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L248
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L247-L251
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L248-L252
 
 ";
 
@@ -52384,10 +52406,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L247-L2
 String representation, CasADi type.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L254
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L255
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L254-L256
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L255-L257
 
 ";
 
@@ -52398,10 +52420,10 @@ more=false) "
 String representation of vector.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L259
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L260
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L259-L268
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L260-L269
 
 ";
 
@@ -52412,10 +52434,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L259-L2
 String representation of set.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L271
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L272
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L271-L281
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L272-L282
 
 ";
 
@@ -52426,10 +52448,10 @@ more=false) "
 String representation of pair.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L284
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L284-L288
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L285-L289
 
 ";
 
@@ -52440,10 +52462,10 @@ more=false) "
 String representation of a map.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L291
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L292
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L291-L301
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L292-L302
 
 ";
 
@@ -52454,10 +52476,10 @@ bool more=false) "
 String representation of a dictionary.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L304
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L305
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L304-L314
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L305-L315
 
 ";
 
@@ -52468,10 +52490,10 @@ more=false) "
 String representation of an array.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L317
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L317-L326
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318-L327
 
 ";
 
@@ -52481,10 +52503,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L317-L3
 Create a list of strings from  VA_ARGS, no argument.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L191
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L192
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L191-L193
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L192-L194
 
 ";
 
@@ -52494,10 +52516,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L191-L1
 Create a list of strings from  VA_ARGS, one argument.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L197
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L198
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L197-L199
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L198-L200
 
 ";
 
@@ -52507,10 +52529,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L197-L1
 Create a list of strings from  VA_ARGS, two arguments.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L203
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L204
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L203-L205
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L204-L206
 
 ";
 
@@ -52521,10 +52543,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L203-L2
 Create a list of strings from  VA_ARGS, three arguments.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L209
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L210
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L209-L211
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L210-L212
 
 ";
 
@@ -52535,10 +52557,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L209-L2
 Create a list of strings from  VA_ARGS, four arguments.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L215
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L216
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L215-L218
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L216-L219
 
 ";
 
@@ -52549,10 +52571,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L215-L2
 Create a list of strings from  VA_ARGS, five arguments.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L222
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L223
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L222-L225
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L223-L226
 
 ";
 
@@ -52563,10 +52585,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L222-L2
 Create a list of strings from  VA_ARGS, six arguments.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L229
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L229-L232
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230-L233
 
 ";
 
@@ -52577,10 +52599,10 @@ std::vector< std::string > &args) "
 Create a string from a formatted string.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L235
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L235-L243
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L236-L244
 
 ";
 

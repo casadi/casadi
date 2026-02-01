@@ -31744,6 +31744,28 @@ C++ includes: e0_diagram.hpp
 ";
 
 
+// File: classcasadi_1_1ThreadLocalStorage.xml
+%feature("docstring") casadi::ThreadLocalStorage "
+
+[INTERNAL] 
+Thread-local storage wrapper that avoids destructor calls.
+
+Works around MinGW-w64 bug where thread_local destructors may run 
+after 
+static object destructors, causing crashes at DLL unload. The 
+wrapped 
+object is placement-new'd into aligned storage and never 
+destructed. Memory
+ is reclaimed when thread exits.
+
+C++ includes: casadi_common.hpp
+";
+
+%feature("docstring") casadi::ThreadLocalStorage::get "
+
+[INTERNAL] ";
+
+
 // File: classcasadi_1_1TrilSolve.xml
 
 
@@ -32632,10 +32654,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L38-L4
 String representation of an array.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L317
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L317-L326
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318-L327
 
 >  std::string casadi::str(const std::array< T, N > &p, bool more=false)
 ------------------------------------------------------------------------
@@ -32643,10 +32665,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L317-L3
 String representation of an array.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L317
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L317-L326
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318-L327
 
 ";
 
@@ -32658,10 +32680,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L317-L3
 Create a list of strings from  VA_ARGS, six arguments.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L229
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L229-L232
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230-L233
 
 >  std::vector<std::string> casadi::strvec(const T1 &t1, const T2 &t2, const T3 &t3, const T4 &t4, const T5 &t5, const T6 &t6)
 ------------------------------------------------------------------------
@@ -32669,10 +32691,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L229-L2
 Create a list of strings from  VA_ARGS, six arguments.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L229
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L229-L232
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230-L233
 
 ";
 
@@ -32684,10 +32706,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L229-L2
 Create a string from a formatted string.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L235
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L235-L243
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L236-L244
 
 ";
 

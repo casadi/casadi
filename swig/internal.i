@@ -5497,6 +5497,9 @@
 %exception  casadi::StringSerializer::encode() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ThreadLocalStorage< T >::get() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::WeakCache< K, T >::cache(std::vector< K > &keys, std::vector< T > &entries) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
