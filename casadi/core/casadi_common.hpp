@@ -326,7 +326,6 @@ namespace casadi {
     return ss.str();
   }
 
-#endif // SWIG
 
   /**
    * \brief Thread-local storage wrapper that avoids destructor calls
@@ -372,6 +371,7 @@ namespace casadi {
     bool condition_;
   };
 
+#endif // SWIG
 } // namespace casadi
 
 #include "casadi_logger.hpp"
