@@ -62,14 +62,16 @@ namespace casadi {
     // Thread-local stream: each thread gets its own instance
     // This prevents data races on stream state (width, fill, flags, etc.)
     // while WriteFunThreadSafe still protects actual I/O with mutex
-    static thread_local Logger::Stream<false> instance;
-    return instance;
+    // ThreadLocalStorage avoids MinGW thread_local destructor ordering bug
+    static thread_local ThreadLocalStorage<Logger::Stream<false>> instance;
+    return instance.get();
   }
 
   std::ostream& uerr() {
     // Thread-local stream: each thread gets its own instance
-    static thread_local Logger::Stream<true> instance;
-    return instance;
+    // ThreadLocalStorage avoids MinGW thread_local destructor ordering bug
+    static thread_local ThreadLocalStorage<Logger::Stream<true>> instance;
+    return instance.get();
   }
 
 } // namespace casadi

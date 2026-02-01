@@ -853,6 +853,22 @@ class Functiontests(casadiTestCase):
 
             self.check_serialize(F,inputs=inputs)
 
+  def test_issue4274(self):
+    x=MX.sym('x')
+
+    c = Function('x',[x],[x.printme(4)**2],["x"],["out"])
+    local_inputs= {"x": 5}
+
+
+    F = c.map(2,"thread")
+
+    wide_inputs = {}
+    for k,v in local_inputs.items():
+        wide_inputs[k] = horzcat(local_inputs[k],local_inputs[k]*1.2)
+
+    print(wide_inputs)
+    F(**wide_inputs)
+
   def test_repmatnode(self):
     x = MX.sym("x",2)
 

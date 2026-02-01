@@ -31,6 +31,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <new>
 #include <iterator>
 #include <limits>
 #include <map>
@@ -325,7 +326,29 @@ namespace casadi {
     return ss.str();
   }
 
-#endif // SWIG
+
+  /**
+   * \brief Thread-local storage wrapper that avoids destructor calls
+   *
+   * Works around MinGW-w64 bug where thread_local destructors may run
+   * after static object destructors, causing crashes at DLL unload.
+   * The wrapped object is placement-new'd into aligned storage and
+   * never destructed. Memory is reclaimed when thread exits.
+   */
+  template<typename T>
+  class ThreadLocalStorage {
+    alignas(T) char storage_[sizeof(T)];
+    bool init_ = false;
+  public:
+    T& get() {
+      if (!init_) {
+        new (storage_) T();
+        init_ = true;
+      }
+      return *reinterpret_cast<T*>(storage_);
+    }
+    // Trivial destructor - intentionally no cleanup
+  };
 
   template<typename _Mutex>
   class conditional_lock_guard {
@@ -348,6 +371,7 @@ namespace casadi {
     bool condition_;
   };
 
+#endif // SWIG
 } // namespace casadi
 
 #include "casadi_logger.hpp"
