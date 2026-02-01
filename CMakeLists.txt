@@ -198,6 +198,14 @@ set(EXTERNAL_PROJECT_CXXFLAGS "")
 set(EXTERNAL_PROJECT_FFLAGS "")
 set(EXTERNAL_PROJECT_FCFLAGS "")
 
+# Add debug symbols for Debug and RelWithDebInfo builds
+if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo")
+  set(EXTERNAL_PROJECT_CFLAGS "${EXTERNAL_PROJECT_CFLAGS} -g")
+  set(EXTERNAL_PROJECT_CXXFLAGS "${EXTERNAL_PROJECT_CXXFLAGS} -g")
+  set(EXTERNAL_PROJECT_FFLAGS "${EXTERNAL_PROJECT_FFLAGS} -g")
+  set(EXTERNAL_PROJECT_FCFLAGS "${EXTERNAL_PROJECT_FCFLAGS} -g")
+endif()
+
 set(CROSS_FLAGS_CONFIGURE "")
 set(CROSS_FLAGS_C "")
 set(CROSS_FLAGS_FORTRAN "")
@@ -992,6 +1000,25 @@ macro(create_import_library TARGET LIB_NAME)
   endif()
 endmacro()
 
+macro(create_dsym_bundle TARGET)
+  if(APPLE AND CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo")
+    get_target_property(_loc ${TARGET} IMPORTED_LOCATION)
+    if(_loc)
+      get_filename_component(_lib_name "${_loc}" NAME)
+      set(_dsym_path "${_loc}.dSYM")
+      string(REPLACE "::" "_" _target_safe "${TARGET}")
+      add_custom_command(OUTPUT "${_dsym_path}"
+        DEPENDS ${TARGET}
+        COMMAND dsymutil "${_loc}" -o "${_dsym_path}"
+        COMMENT "Creating dSYM for ${_lib_name}"
+      )
+      add_custom_target(create_dsym_${_target_safe} ALL
+        DEPENDS "${_dsym_path}"
+      )
+    endif()
+  endif()
+endmacro()
+
 macro(eager_update DEP_NAME)
     set(VERSION "VERSION:${BUILD_${DEP_NAME}_VERSION}\nREPO:${BUILD_${DEP_NAME}_GIT_REPO}")
     set(VERSION_FILE "${CMAKE_BINARY_DIR}/external_projects/versions/${DEP_NAME}_version.txt")
@@ -1355,13 +1382,15 @@ if(WITH_BUILD_METIS)
           "ADD_FCFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FCFLAGS}"
         ${COIN_FLAGS}
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ${AUTOTOOLS_SHELL} ./get.Metis)
-  add_library(metis::metis INTERFACE IMPORTED)
+  add_library(metis::metis SHARED IMPORTED)
   add_dependencies(metis::metis metis-external)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis")
   set_target_properties(metis::metis PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmetis${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmetis${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis"
-    IMPORTED_LIBNAME "coinmetis"
   )
+  create_dsym_bundle(metis::metis)
   message("metis exported")
 endif()
 
@@ -1376,8 +1405,11 @@ if(WITH_HSL)
   elseif(WITH_BUILD_HSL)
     add_feature_info(hsl-sourcebuild ON "Build CoinHSL from supplied source.")
     get_target_property(METIS_INCLUDE_DIR metis::metis INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(METIS_LIB metis::metis IMPORTED_LIBNAME)
-    message("metis: ${METIS_LIB} ${METIS_INCLUDE_DIR}")
+    get_target_property(METIS_LIB_PATH metis::metis IMPORTED_LOCATION)
+    get_filename_component(METIS_LIB_DIR "${METIS_LIB_PATH}" DIRECTORY)
+    get_filename_component(METIS_LIB_FULLNAME "${METIS_LIB_PATH}" NAME_WE)
+    string(REGEX REPLACE "^${CMAKE_SHARED_LIBRARY_PREFIX}" "" METIS_LIB_NAME "${METIS_LIB_FULLNAME}")
+    message("metis: ${METIS_LIB_PATH} ${METIS_INCLUDE_DIR}")
     # Copy source
 
     ExternalProject_Add(hsl-external
@@ -1386,7 +1418,7 @@ if(WITH_HSL)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DSRC=<SOURCE_DIR>  -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_hsl.cmake
-        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure --disable-static "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_CONFIGURE} "ADD_FCFLAGS=${LAPACK_LFLAGS} -L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,-rpath,${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm ${EXTERNAL_PROJECT_FCFLAGS}" --prefix=<INSTALL_DIR>
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure --disable-static "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_CONFIGURE} "ADD_FCFLAGS=${LAPACK_LFLAGS} -L${METIS_LIB_DIR} -Wl,-rpath,${METIS_LIB_DIR} -l${METIS_LIB_NAME} -lm ${EXTERNAL_PROJECT_FCFLAGS}" --prefix=<INSTALL_DIR>
         "ADD_CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
         ${COIN_FLAGS}
@@ -1405,7 +1437,10 @@ endif()
 if(WITH_MUMPS)
   if(WITH_BUILD_MUMPS)
     get_target_property(METIS_INCLUDE_DIR metis::metis INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(METIS_LIB metis::metis IMPORTED_LIBNAME)
+    get_target_property(METIS_LIB_PATH metis::metis IMPORTED_LOCATION)
+    get_filename_component(METIS_LIB_DIR "${METIS_LIB_PATH}" DIRECTORY)
+    get_filename_component(METIS_LIB_FULLNAME "${METIS_LIB_PATH}" NAME_WE)
+    string(REGEX REPLACE "^${CMAKE_SHARED_LIBRARY_PREFIX}" "" METIS_LIB_NAME "${METIS_LIB_FULLNAME}")
     ExternalProject_Add(mumps-external
         GIT_REPOSITORY ${BUILD_MUMPS_TP_GIT_REPO}
         GIT_SHALLOW ${BUILD_MUMPS_TP_GIT_SHALLOW}
@@ -1414,7 +1449,7 @@ if(WITH_MUMPS)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         BUILD_IN_SOURCE ON
-        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${METIS_LIB_DIR} -l${METIS_LIB_NAME} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
         "ADD_CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
         "ADD_FFLAGS=${EXTERNAL_PROJECT_FFLAGS}"
@@ -1430,6 +1465,7 @@ if(WITH_MUMPS)
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmumps${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps"
     )
+    create_dsym_bundle(mumps)
   endif()
 endif()
 add_feature_info(mumps-interface WITH_MUMPS "Interface to MUMPS.")
@@ -1451,7 +1487,10 @@ if(WITH_SPRAL)
   endif()
   if(WITH_BUILD_SPRAL)
     get_target_property(METIS_INCLUDE_DIR metis::metis INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(METIS_LIB metis::metis IMPORTED_LIBNAME)
+    get_target_property(METIS_LIB_PATH metis::metis IMPORTED_LOCATION)
+    get_filename_component(METIS_LIB_DIR "${METIS_LIB_PATH}" DIRECTORY)
+    get_filename_component(METIS_LIB_FULLNAME "${METIS_LIB_PATH}" NAME_WE)
+    string(REGEX REPLACE "^${CMAKE_SHARED_LIBRARY_PREFIX}" "" METIS_LIB_NAME "${METIS_LIB_FULLNAME}")
     ExternalProject_Add(spral-external
         GIT_REPOSITORY ${BUILD_SPRAL_GIT_REPO}
         GIT_SHALLOW ${BUILD_SPRAL_GIT_SHALLOW}
@@ -1459,7 +1498,7 @@ if(WITH_SPRAL)
         DEPENDS ${LAPACK_DEPENDS_TARGET} metis::metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND ${SPRAL_RECONFIG_CMD} ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND ${SPRAL_RECONFIG_CMD} ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${METIS_LIB_DIR} -l${METIS_LIB_NAME} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
         "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
         "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
         "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
@@ -1680,6 +1719,7 @@ if(WITH_IPOPT)
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
     )
     create_import_library(ipopt ipopt)
+    create_dsym_bundle(ipopt)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
       DESTINATION "${INCLUDE_PREFIX}")
