@@ -160,7 +160,7 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
 
   // Get/evaluate real values
   int get_real(void* instance, const unsigned int* vr, size_t n_vr,
-    double* values, size_t n_values) const override;
+    double* values, size_t n_values, FmuMemory* m = nullptr) const override;
 
   // Forward mode AD
   int get_directional_derivative(void* instance, const unsigned int* vr_out, size_t n_out,

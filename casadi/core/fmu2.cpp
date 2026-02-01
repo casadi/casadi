@@ -32,6 +32,8 @@ namespace casadi {
 // Memory object
 struct Fmu2Memory : public FmuMemory {
   Fmu2::Value aux_value;
+  // Scratch space for evaluation dance (Simulink workaround)
+  std::vector<double> derivate_dump;
   // Constructor
   explicit Fmu2Memory(const FmuFunction& self) : FmuMemory(self) {}
 };
@@ -44,6 +46,8 @@ int Fmu2::init_mem(FmuMemory* mem) const {
   m->aux_value.v_integer.resize(vn_aux_integer_.size());
   m->aux_value.v_boolean.resize(vn_aux_boolean_.size());
   m->aux_value.v_string.resize(vn_aux_string_.size());
+  // Allocate scratch space for evaluation dance
+  if (do_evaluation_dance_) m->derivate_dump.resize(nx_);
   return 0;
 }
 
@@ -354,17 +358,15 @@ int Fmu2::set_real(void* instance, const unsigned int* vr, size_t n_vr,
 }
 
 int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
-    double* values, size_t n_values) const {
+    double* values, size_t n_values, FmuMemory* mem) const {
   casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");
-  if (do_evaluation_dance_) {
+  if (do_evaluation_dance_ && mem) {
+    auto m = static_cast<Fmu2Memory*>(mem);
     // Dummy call to trigger rtOneStep
     fmi2Status status = get_real_(instance, nullptr, 0, nullptr);
     if (status != fmi2OK) return 1;
-    // Scratch space to write derivative to (not used)
-    static thread_local std::vector<double> derivate_dump;
-    if (derivate_dump.size() < nx_) derivate_dump.resize(nx_);
     // Dummy call to trigger computation of derivatives, possibly read later via get_real
-    status = get_derivatives_(instance, get_ptr(derivate_dump), nx_);
+    status = get_derivatives_(instance, get_ptr(m->derivate_dump), nx_);
     if (status != fmi2OK) return 1;
   }
 

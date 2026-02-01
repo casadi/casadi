@@ -98,7 +98,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Get/evaluate real values
   virtual int get_real(void* instance, const unsigned int* vr, size_t n_vr,
-    double* values, size_t n_values) const = 0;
+    double* values, size_t n_values, FmuMemory* m = nullptr) const = 0;
 
   // Forward mode AD
   virtual int get_directional_derivative(void* instance, const unsigned int* vr_out, size_t n_out,

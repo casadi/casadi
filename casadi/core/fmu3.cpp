@@ -350,7 +350,8 @@ int Fmu3::set_real(void* instance, const unsigned int* vr, size_t n_vr,
 }
 
 int Fmu3::get_real(void* instance, const unsigned int* vr, size_t n_vr,
-    double* values, size_t n_values) const {
+    double* values, size_t n_values, FmuMemory* m) const {
+  (void)m;  // unused
   fmi3Status status = get_float64_(instance, vr, n_vr, values, n_values);
   return status != fmi3OK;
 }

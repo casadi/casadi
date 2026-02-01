@@ -794,7 +794,7 @@ int FmuInternal::eval_ad(FmuMemory* m) const {
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown)) {
+  if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown, m)) {
     casadi_warning("FMU evaluation failed");
     return 1;
   }
@@ -823,7 +823,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown)) {
+  if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown, m)) {
     casadi_warning("Evaluating FMU failed");
     return 1;
   }
@@ -1264,7 +1264,7 @@ int FmuInternal::get_all(FmuMemory* m, double* values, size_t n_values) const {
   // Quick return if nothing to get
   if (n_values == 0) return 0;
   // Retrieve from FMU
-  if (get_real(m->instance, get_ptr(m->vr_out_), m->vr_out_.size(), values, n_values)) {
+  if (get_real(m->instance, get_ptr(m->vr_out_), m->vr_out_.size(), values, n_values, m)) {
     casadi_warning("Evaluation failed");
     return 1;
   }
