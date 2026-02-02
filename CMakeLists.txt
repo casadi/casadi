@@ -1007,9 +1007,13 @@ macro(create_dsym_bundle TARGET)
       get_filename_component(_lib_name "${_loc}" NAME)
       set(_dsym_path "${_loc}.dSYM")
       string(REPLACE "::" "_" _target_safe "${TARGET}")
+      # Create dSYM for symlink and also for versioned library (if different)
+      # The versioned library (e.g. libcoinmetis.2.dylib) is what gets loaded at runtime,
+      # so symbolication needs its dSYM to work
       add_custom_command(OUTPUT "${_dsym_path}"
         DEPENDS ${TARGET}
         COMMAND dsymutil "${_loc}" -o "${_dsym_path}"
+        COMMAND ${CMAKE_COMMAND} -DLIB_PATH="${_loc}" -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/create_versioned_dsym.cmake
         COMMENT "Creating dSYM for ${_lib_name}"
       )
       add_custom_target(create_dsym_${_target_safe} ALL
