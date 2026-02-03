@@ -1634,10 +1634,12 @@ namespace std {
 
         if (m) {
           // Map sentinel values from PySlice_Unpack to CasADi's limits
-          (**m).start = (start <= PY_SSIZE_T_MIN)
+          // PySlice_Unpack returns PY_SSIZE_T_MIN or PY_SSIZE_T_MAX as sentinels
+          // depending on step direction, so check both extremes
+          (**m).start = (start == PY_SSIZE_T_MIN || start == PY_SSIZE_T_MAX)
               ? std::numeric_limits<casadi_int>::min()
               : static_cast<casadi_int>(start);
-          (**m).stop = (stop >= PY_SSIZE_T_MAX)
+          (**m).stop = (stop == PY_SSIZE_T_MAX || stop == PY_SSIZE_T_MIN)
               ? std::numeric_limits<casadi_int>::max()
               : static_cast<casadi_int>(stop);
           if (step != 1) {
