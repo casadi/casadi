@@ -18,6 +18,8 @@ def open_for_csv(name, mode):
 
     return open(name, mode, **kwargs)
 
+abi3_mode = '--abi3' in sys.argv
+
 version   = sys.argv[1]
 pyversion = sys.argv[2]
 os_name   = sys.argv[3]
@@ -33,6 +35,9 @@ if "+" in version:
 
 if version.startswith("v"):
   version = version[1:]
+
+abi_tag = "abi3" if abi3_mode else "none"
+
 if os_name=="linux":
   if arch=="manylinux1-x86":
     arch = "manylinux1_i686"
@@ -46,18 +51,20 @@ if os_name=="linux":
     arch = "manylinux2014_x86_64"
   elif arch=="manylinux2014-x86-modern":
     arch = "manylinux2014_i686"
-  tag = "cp%s-none-%s" % (pyversion,arch.replace("-","_"))
+  elif arch=="manylinux2014-aarch64":
+    arch = "manylinux2014_aarch64"
+  tag = "cp%s-%s-%s" % (pyversion,abi_tag,arch.replace("-","_"))
 elif os_name=="osx":
   if arch=="x86_64":
-    tag = ["cp%s-none-macosx_11_0_x86_64" % (pyversion),
-         "cp%s-none-macosx_11_0_intel" % (pyversion)]
+    tag = ["cp%s-%s-macosx_11_0_x86_64" % (pyversion,abi_tag),
+         "cp%s-%s-macosx_11_0_intel" % (pyversion,abi_tag)]
   elif arch=="arm64":
-    tag = "cp%s-none-macosx_11_0_arm64" % (pyversion)
+    tag = "cp%s-%s-macosx_11_0_arm64" % (pyversion,abi_tag)
 elif os_name=="windows":
   if bitness=="64":
-    tag = "cp%s-none-win_amd64" % pyversion
+    tag = "cp%s-%s-win_amd64" % (pyversion,abi_tag)
   else:
-    tag = "cp%s-none-win32" % pyversion
+    tag = "cp%s-%s-win32" % (pyversion,abi_tag)
 else:
   raise Exception()
 
