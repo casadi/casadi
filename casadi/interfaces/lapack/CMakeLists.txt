@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.16.3)
 
 # Linear solver using dense LU factorization in LAPACK
 casadi_plugin(Linsol lapacklu
