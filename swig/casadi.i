@@ -1696,15 +1696,32 @@ namespace std {
         }
         return true;
       }
-      // Python slice
+      // Python slice - use Limited API compatible approach
       if (PySlice_Check(p)) {
-        PySliceObject *r = (PySliceObject*)(p);
+        Py_ssize_t start, stop, step;
+%#if PY_VERSION_HEX >= 0x03060100
+        int res = PySlice_Unpack(p, &start, &stop, &step);
+%#else
+        // Python 2.7 and early Python 3.x use _PySlice_Unpack (private API)
+        int res = _PySlice_Unpack(p, &start, &stop, &step);
+%#endif
+        if (res < 0) {
+          return false;  // TypeError already set by PySlice_Unpack
+        }
+
         if (m) {
-          (**m).start = (r->start == Py_None || PyNumber_AsSsize_t(r->start, NULL) <= std::numeric_limits<int>::min())
-            ? std::numeric_limits<casadi_int>::min() : PyInt_AsLong(r->start);
-          (**m).stop  = (r->stop ==Py_None || PyNumber_AsSsize_t(r->stop, NULL)>= std::numeric_limits<int>::max())
-            ? std::numeric_limits<casadi_int>::max() : PyInt_AsLong(r->stop);
-          if(r->step !=Py_None) (**m).step  = PyInt_AsLong(r->step);
+          // Map sentinel values from PySlice_Unpack to CasADi's limits
+          // PySlice_Unpack returns PY_SSIZE_T_MIN or PY_SSIZE_T_MAX as sentinels
+          // depending on step direction, so check both extremes
+          (**m).start = (start == PY_SSIZE_T_MIN || start == PY_SSIZE_T_MAX)
+              ? std::numeric_limits<casadi_int>::min()
+              : static_cast<casadi_int>(start);
+          (**m).stop = (stop == PY_SSIZE_T_MAX || stop == PY_SSIZE_T_MIN)
+              ? std::numeric_limits<casadi_int>::max()
+              : static_cast<casadi_int>(stop);
+          if (step != 1) {
+            (**m).step = static_cast<casadi_int>(step);
+          }
         }
         return true;
       }
@@ -2400,19 +2417,26 @@ namespace std {
 #endif
 
 #ifdef SWIGPYTHON
-%typemap(in, doc="memoryview(ro)", pystub_in="memoryview", noblock=1, fragment="casadi_all") (const double * a, casadi_int size) (Py_buffer* buffer) {
-  if (!PyMemoryView_Check($input)) SWIG_exception_fail(SWIG_TypeError, "Must supply a MemoryView.");
-  buffer = PyMemoryView_GET_BUFFER($input);
-  $1 = static_cast<double*>(buffer->buf); // const double cast comes later
-  $2 = buffer->len;
+%typemap(in, doc="buffer(ro)", pystub_in="memoryview", noblock=1, fragment="casadi_all") (const double * a, casadi_int size) (Py_buffer _global_pybuf_ro) {
+  if (PyObject_GetBuffer($input, &_global_pybuf_ro, PyBUF_SIMPLE) != 0) {
+    SWIG_exception_fail(SWIG_TypeError, "Must supply a buffer-supporting object.");
+  }
+  $1 = static_cast<double*>(_global_pybuf_ro.buf);
+  $2 = _global_pybuf_ro.len;
+ }
+%typemap(freearg) (const double * a, casadi_int size) {
+  PyBuffer_Release(&_global_pybuf_ro);
  }
 
-%typemap(in, doc="memoryview(rw)", pystub_in="memoryview", noblock=1, fragment="casadi_all") (double * a, casadi_int size)  (Py_buffer* buffer) {
-  if (!PyMemoryView_Check($input)) SWIG_exception_fail(SWIG_TypeError, "Must supply a writable MemoryView.");
-  buffer = PyMemoryView_GET_BUFFER($input);
-  if (buffer->readonly) SWIG_exception_fail(SWIG_TypeError, "Must supply a writable MemoryView.");
-  $1 = static_cast<double*>(buffer->buf);
-  $2 = buffer->len;
+%typemap(in, doc="buffer(rw)", pystub_in="memoryview", noblock=1, fragment="casadi_all") (double * a, casadi_int size)  (Py_buffer _global_pybuf_rw) {
+  if (PyObject_GetBuffer($input, &_global_pybuf_rw, PyBUF_WRITABLE) != 0) {
+    SWIG_exception_fail(SWIG_TypeError, "Must supply a writable buffer-supporting object.");
+  }
+  $1 = static_cast<double*>(_global_pybuf_rw.buf);
+  $2 = _global_pybuf_rw.len;
+ }
+%typemap(freearg) (double * a, casadi_int size) {
+  PyBuffer_Release(&_global_pybuf_rw);
  }
 
 // Directorin typemap; as output
