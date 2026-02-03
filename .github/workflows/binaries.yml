@@ -472,26 +472,6 @@ jobs:
           name: casadi-${{env.deploy_arch}}-py${{matrix.py2}}
           path: casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           retention-days: 5
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.4.1
-      - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
-      - name: Delete old release assetsd
-        uses: mknejp/delete-release-assets@v1
-        with:
-          token: ${{ github.token }}
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.deploy_arch}}-py${{matrix.py2}}.zip
-          fail-if-no-release: false
-          fail-if-no-assets: false
-        if: github.event_name != 'pull_request'
-      - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.9.0
-        with:
-          overwrite: true
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
-          prerelease: true
-        if: github.event_name != 'pull_request'
       - run: unzip casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip -d package_for_wheel
       - run: |
           wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.target}} package_for_wheel/ ${{ fromJSON(matrix.py2) >= 311 && '--abi3' || '' }})
@@ -510,6 +490,8 @@ jobs:
           pip install abi3audit
           abi3audit --strict --report ${{ steps.wheel.outputs.wheel }}
         shell: bash -el {0}
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -829,26 +811,6 @@ jobs:
              cd install
              echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}'" > dummy.txt
              zip -rq ../casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}.zip .
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.4.1
-      - run: cp casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}.zip
-      - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
-        with:
-          token: ${{ github.token }}
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}.zip
-          fail-if-no-release: false
-          fail-if-no-assets: false
-        if: github.event_name != 'pull_request'
-      - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.9.0
-        with:
-          overwrite: true
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}.zip
-          prerelease: true
-        if: github.event_name != 'pull_request'
       - uses: actions/upload-artifact@v4.3.1
         with:
           name: casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}
@@ -873,6 +835,8 @@ jobs:
           pip install abi3audit
           abi3audit --strict --report ${{ steps.wheel.outputs.wheel }}
         shell: bash -el {0}
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
