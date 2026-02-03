@@ -1257,9 +1257,9 @@ endif()
 
 if(WITH_BLASFEO)
   if (WITH_BUILD_BLASFEO)
-    set(C_FLAGS "-DCMAKE_C_FLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}")
+    set(C_FLAGS "-DCMAKE_C_FLAGS=-Wno-implicit-function-declaration -Wno-incompatible-pointer-types ${EXTERNAL_PROJECT_CFLAGS}")
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        set(C_FLAGS "-DCMAKE_C_FLAGS=-std=c99 -Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}")
+        set(C_FLAGS "-DCMAKE_C_FLAGS=-std=c99 -Wno-implicit-function-declaration -Wno-incompatible-pointer-types ${EXTERNAL_PROJECT_CFLAGS}")
     endif()
     ExternalProject_Add(blasfeo-external
       GIT_REPOSITORY ${BUILD_BLASFEO_GIT_REPO}
@@ -1380,7 +1380,7 @@ if(WITH_BUILD_METIS)
         CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>
 
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
-          "ADD_CFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}"
+          "ADD_CFLAGS=-Wno-implicit-function-declaration -Wno-incompatible-pointer-types ${EXTERNAL_PROJECT_CFLAGS}"
           "ADD_CXXFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CXXFLAGS}"
           "ADD_FFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FFLAGS}"
           "ADD_FCFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FCFLAGS}"
