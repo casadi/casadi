@@ -1,6 +1,5 @@
 import os
 import base64
-from wheel.archive import archive_wheelfile
 import hashlib
 import csv
 from email.message import Message
@@ -8,6 +7,7 @@ from email.generator import Generator
 import shutil
 import re
 import sys
+import zipfile
 
 def open_for_csv(name, mode):
     if sys.version_info[0] < 3:
@@ -92,7 +92,17 @@ def write_record(bdist_dir, distinfo_dir):
               record_path = os.path.relpath(
                   path, bdist_dir).replace(os.path.sep, '/')
               writer.writerow((record_path, hash, size))
-             
+
+def create_wheel_archive(wheel_name, bdist_dir):
+    wheel_path = wheel_name + ".whl"
+    with zipfile.ZipFile(wheel_path, 'w', zipfile.ZIP_DEFLATED) as wheel_zip:
+        for root, dirs, files in os.walk(bdist_dir):
+            for file in files:
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, bdist_dir).replace(os.path.sep, '/')
+                wheel_zip.write(file_path, arcname)
+    return wheel_path
+
 wheel_dist_name = "casadi" + "-" + version
 bdist_dir = dir_name
 
@@ -179,7 +189,6 @@ else:
   fullname = wheel_dist_name+"-"+tag
 
 write_record(bdist_dir, distinfo_dir)
-archive_wheelfile(fullname,dir_name)
+create_wheel_archive(fullname, dir_name)
 
-import sys
 sys.stdout.write(fullname+".whl")
