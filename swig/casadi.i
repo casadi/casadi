@@ -1629,11 +1629,12 @@ namespace std {
       if (PySlice_Check(p)) {
         Py_ssize_t start, stop, step;
 %#if PY_VERSION_HEX >= 0x03060100
-        if (PySlice_Unpack(p, &start, &stop, &step) < 0) {
+        int res = PySlice_Unpack(p, &start, &stop, &step);
 %#else
         // Python 2.7 and early Python 3.x use _PySlice_Unpack (private API)
-        if (_PySlice_Unpack(p, &start, &stop, &step) < 0) {
+        int res = _PySlice_Unpack(p, &start, &stop, &step);
 %#endif
+        if (res < 0) {
           return false;  // TypeError already set by PySlice_Unpack
         }
 
