@@ -1257,9 +1257,9 @@ endif()
 
 if(WITH_BLASFEO)
   if (WITH_BUILD_BLASFEO)
-    set(C_FLAGS "")
+    set(C_FLAGS "-DCMAKE_C_FLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}")
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        set(C_FLAGS "-DCMAKE_C_FLAGS=-std=c99")
+        set(C_FLAGS "-DCMAKE_C_FLAGS=-std=c99 -Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}")
     endif()
     ExternalProject_Add(blasfeo-external
       GIT_REPOSITORY ${BUILD_BLASFEO_GIT_REPO}
