@@ -131,6 +131,57 @@ set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-py3")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON3")
 endif()
 
+# Limited API support for stable ABI
+# Minimum target is 3.8 (adds PyImport_GetModule). Targets < 3.11 use buffer protocol
+# functions not officially in Limited API until 3.11, but de facto stable since Python 3.0.
+function(python_version_to_abi_hex out_var version_str)
+  string(REPLACE "." ";" _ver "${version_str}")
+  list(GET _ver 0 _major)
+  list(GET _ver 1 _minor)
+  # Convert to hex using math(EXPR) - compatible with CMake 3.13+
+  # (string FORMAT requires CMake 3.18+)
+  math(EXPR _major_hex "${_major}" OUTPUT_FORMAT HEXADECIMAL)
+  math(EXPR _minor_hex "${_minor}" OUTPUT_FORMAT HEXADECIMAL)
+  # Remove 0x prefix and pad to 2 digits
+  string(REGEX REPLACE "^0x" "" _major_hex "${_major_hex}")
+  string(REGEX REPLACE "^0x" "" _minor_hex "${_minor_hex}")
+  string(LENGTH "${_major_hex}" _major_len)
+  string(LENGTH "${_minor_hex}" _minor_len)
+  if(_major_len LESS 2)
+    set(_major_hex "0${_major_hex}")
+  endif()
+  if(_minor_len LESS 2)
+    set(_minor_hex "0${_minor_hex}")
+  endif()
+  string(TOUPPER "${_major_hex}${_minor_hex}" _hex_upper)
+  set(${out_var} "0x${_hex_upper}0000" PARENT_SCOPE)
+endfunction()
+
+if(WITH_PYTHON_LIMITED_API)
+  if(NOT "${PYTHON_VERSION_MAJOR}" STREQUAL "3")
+    message(FATAL_ERROR "Python Limited API is only supported with Python 3")
+  endif()
+
+  set(PYTHON_LIMITED_API_TARGET "3.11" CACHE STRING "Python Limited API target version (>= 3.11)")
+  if(PYTHON_LIMITED_API_TARGET VERSION_LESS "3.11")
+    message(FATAL_ERROR "PYTHON_LIMITED_API_TARGET must be >= 3.11 (got: ${PYTHON_LIMITED_API_TARGET})")
+  endif()
+
+  python_version_to_abi_hex(PYTHON_LIMITED_API_VERSION "${PYTHON_LIMITED_API_TARGET}")
+
+  message(STATUS "Building abi3 wheel for Python ${PYTHON_LIMITED_API_TARGET}+")
+
+  # Check Python version (skip for SWIG export/import)
+  if(NOT SWIG_EXPORT AND NOT SWIG_IMPORT)
+    if(PYTHON_VERSION_STRING VERSION_LESS "${PYTHON_LIMITED_API_TARGET}")
+      message(FATAL_ERROR "Limited API target ${PYTHON_LIMITED_API_TARGET} requires Python >= ${PYTHON_LIMITED_API_TARGET} (found ${PYTHON_VERSION_STRING})")
+    endif()
+  endif()
+
+  set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPy_LIMITED_API=${PYTHON_LIMITED_API_VERSION}")
+  set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPY_VERSION_HEX=${PYTHON_LIMITED_API_VERSION}")
+endif()
+
 if(WITH_PYTHON_GIL_RELEASE)
   set(CMAKE_SWIG_NAME_SUFFIX "_gil_release")
 else()
@@ -187,6 +238,11 @@ add_custom_target(python DEPENDS _casadi)
 add_library(_casadi MODULE ${PYTHON_FILE})
 
 set_target_properties(_casadi PROPERTIES PREFIX "")
+
+# Add compile definitions for Limited API
+if(WITH_PYTHON_LIMITED_API)
+  target_compile_definitions(_casadi PRIVATE Py_LIMITED_API=${PYTHON_LIMITED_API_VERSION})
+endif()
 if(WIN32 AND NOT CYGWIN)
   set_target_properties(_casadi PROPERTIES SUFFIX ".pyd")
   set(CASADI_PYTHON_LIBRARY_SUFFIX ".pyd")
@@ -228,7 +284,31 @@ if(WIN32) # dlls don't allow missing symbols
   if(NOT PYTHON_LIBRARY)
     message(SEND_ERROR "Python libraries not found, but required." )
   endif()
-  target_link_libraries(_casadi ${PYTHON_LIBRARY})
+  # For an abi3 build, link against python3.lib (the version-agnostic
+  # stable-ABI marshal lib) instead of the version-specific pythonXY.lib.
+  # Otherwise the resulting _casadi.pyd has a hard dependency on
+  # python311.dll and only loads under Python 3.11 — defeating the
+  # whole point of abi3. python3.lib ships in the standard CPython
+  # Windows distribution alongside python<X><Y>.lib in the same libs/ dir.
+  if(WITH_PYTHON_LIMITED_API)
+    get_filename_component(_python_libdir "${PYTHON_LIBRARY}" DIRECTORY)
+    find_library(PYTHON3_STABLE_LIB
+                 NAMES python3
+                 PATHS "${_python_libdir}"
+                 NO_DEFAULT_PATH)
+    if(PYTHON3_STABLE_LIB)
+      message(STATUS "abi3 build: linking against ${PYTHON3_STABLE_LIB} (was ${PYTHON_LIBRARY})")
+      target_link_libraries(_casadi ${PYTHON3_STABLE_LIB})
+    else()
+      message(WARNING
+        "WITH_PYTHON_LIMITED_API is ON but python3.lib was not found in "
+        "${_python_libdir}; falling back to ${PYTHON_LIBRARY}. The resulting "
+        ".pyd will only load under the build-time Python minor version.")
+      target_link_libraries(_casadi ${PYTHON_LIBRARY})
+    endif()
+  else()
+    target_link_libraries(_casadi ${PYTHON_LIBRARY})
+  endif()
 endif()
 target_link_libraries(_casadi casadi)
 

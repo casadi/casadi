@@ -565,7 +565,7 @@ obj:*libworhp*
    Memcheck:Leak
    match-leak-kinds: definite
    fun:malloc
-   fun:_ZN6casadi18casadi_hpipm_solveIdEEiPNS_17casadi_hpipm_dataIT_EEPPKdPPdPxS8_
+   fun:_ZN6casadi18casadi_hpipm_solveIdEEiPNS_17casadi_hpipm_dataIT_EEPPKdPPdPxS8_*
 }
 
 {

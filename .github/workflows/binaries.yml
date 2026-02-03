@@ -32,7 +32,6 @@ env:
   cache-suffix: v8
   build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_BUILD_CLP=ON -DWITH_CBC=ON -DWITH_BUILD_CBC=ON -DWITH_THREAD=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_HPIPM=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HIGHS=ON -DWITH_BUILD_HIGHS=ON -DWITH_BUILD_SPRAL=ON -DWITH_SPRAL=ON -DWITH_PROXQP=ON -DWITH_OSQP=ON -DWITH_SUPERSCS=ON -DWITH_KNITRO=ON -DWITH_MOCKUP_KNITRO=ON -DWITH_CPLEX=ON -DWITH_MOCKUP_CPLEX=ON -DWITH_GUROBI=ON -DWITH_MOCKUP_GUROBI=ON -DWITH_XPRESS=ON -DWITH_MOCKUP_XPRESS=ON -DWITH_MOSEK=ON -DWITH_MOCKUP_MOSEK=ON -DWITH_HSL=ON -DWITH_MOCKUP_HSL=ON -DWITH_WORHP=ON -DWITH_MOCKUP_WORHP=ON -DWITH_SUNDIALS=ON -DWITH_BUILD_SUNDIALS=ON -DWITH_BUILD_CSPARSE=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_BLASFEO=ON -DWITH_BUILD_SUPERSCS=ON -DWITH_BUILD_OSQP=ON -DWITH_BUILD_EIGEN3=ON -DWITH_BUILD_SIMDE=ON -DWITH_BUILD_PROXQP=ON -DWITH_SNOPT=ON -DWITH_MOCKUP_SNOPT=ON -DWITH_AMPL=ON -DWITH_BLOCKSQP=ON -DWITH_SLEQP=ON -DWITH_SLEQP_BUILD=ON -DWITH_ALPAQA=ON -DWITH_BUILD_ALPAQA=ON -DWITH_DAQP=ON -DWITH_BUILD_DAQP=ON -DWITH_FATROP=ON -DWITH_BUILD_FATROP=ON -DWITH_MATLAB_IPC=ON -DWITH_MADNLP=ON -DWITH_MOCKUP_MADNLP=ON -DWITH_PYTHON_GIL_RELEASE=ON -DWITH_THREADSAFE_SYMBOLICS=ON -DWITH_CLARABEL=OFF -DWITH_BUILD_CLARABEL=OFF -DWITH_RUMOCA=OFF -DWITH_BUILD_RUMOCA=OFF -DWITH_LIBZIP=ON -DWITH_BUILD_LIBZIP=ON -DWITH_ZLIB=ON -DWITH_BUILD_ZLIB=ON -DWITH_GHC_FILESYSTEM=ON -DWITH_BUILD_GHC_FILESYSTEM=ON"
   build_flags_32bit: "-DWITH_HPIPM=OFF -DWITH_BLASFEO=OFF -DWITH_BUILD_HPIPM=OFF -DWITH_BUILD_BLASFEO=OFF -DWITH_CPLEX=OFF -DWITH_XPRESS=OFF -DWITH_MOCKUP_XPRESS=OFF -DWITH_MOSEK=OFF -DWITH_MOCKUP_MOSEK=OFF -DWITH_FATROP=OFF -DWITH_BUILD_FATROP=OFF"
-  build_flags_manylinux1: "-DWITH_OSQP=OFF -DWITH_BUILD_OSQP=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_SPRAL=OFF -DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF -DWITH_UNO=OFF  -DWITH_FATROP=OFF -DWITH_BUILD_FATROP=OFF -DWITH_PYTHON_GIL_RELEASE=OFF -DWITH_THREADSAFE_SYMBOLICS=OFF   -DWITH_CLARABEL=OFF -DWITH_BUILD_CLARABEL=OFF -DWITH_RUMOCA=OFF -DWITH_BUILD_RUMOCA=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF -DWITH_GHC_FILESYSTEM=OFF -DWITH_BUILD_GHC_FILESYSTEM=OFF"
   build_flags_windows: ""
   
   build_flags_mac: "-DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_BUILD_LAPACK=OFF -DWITH_WORHP=OFF -DWITH_MOCKUP_WORHP=OFF -DWITH_UNO=OFF -DWITH_BUILD_ALPAQA=OFF -DWITH_ALPAQA=OFF"
@@ -228,7 +227,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,manylinux2014-x64-modern,manylinux2014-x86-modern,windows-shared-x64-posix]
+        target: [manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,manylinux_2_28-x64,manylinux_2_28-aarch64,windows-shared-x64-posix]
     steps:
       - name: Check platform skip
         id: skip-check
@@ -275,7 +274,7 @@ jobs:
         if: steps.skip-check.outputs.skip != 'true'
         run: |
           rm -f build/CMakeCache.txt
-          ./dockcross cmake -Bbuild -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} ${{ contains(matrix.target,'aarch64') && env.build_flags_aarch64 || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
+          ./dockcross cmake -Bbuild -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} ${{ contains(matrix.target,'aarch64') && env.build_flags_aarch64 || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
 
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
           # Needed to make CoinUtils work
@@ -297,25 +296,25 @@ jobs:
         with:
           config: |
             matrix:
-              arch: [manylinux1-x64,manylinux1-x86]
-              py2: ["27"]
+              arch: [manylinux2014-x64,manylinux2014-x86]
+              py2: ["37","38","39","310","311"]
+              glibc_suffix: [""]
             operations:
               - type: append
                 matrix:
-                  arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: ["36","37","38","39","310","311","312","313"]
-              - type: append
-                matrix:
-                  arch: [manylinux2014-x64-modern,manylinux2014-x86-modern]
-                  py2: ["314"]
+                  arch: [manylinux_2_28-x64,manylinux_2_28-aarch64]
+                  py2: ["310","311"]
+                  glibc_suffix: ["-glibc228"]
               - type: append
                 matrix:
                   arch: [windows-shared-x64-posix]
-                  py2: ["27","36","37","38","39","310","311","312","313","314"]
+                  py2: ["37","38","39","310","311"]
+                  glibc_suffix: [""]
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
-                  py2: ["36","37","38","39","310","311","312","313"]
+                  py2: ["37","38","39","310","311"]
+                  glibc_suffix: [""]
       - id: filter-matrix
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
@@ -362,13 +361,13 @@ jobs:
             matrix:
               image: [macos-14]
               target: [x86_64]
-              py2: ["27","36","37","38","39","310","311","312","313","314"]
+              py2: ["37","38","39","310","311"]
             operations:
               - type: append
                 matrix:
                   image: [macos-14]
                   target: [arm64]
-                  py2: ["38","39","310","311","312","313","314"]
+                  py2: ["38","39","310","311"]
       - id: filter-matrix
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
@@ -443,7 +442,7 @@ jobs:
           tag: ${{ matrix.image }}_${{matrix.target}}
       - name: Build
         run: |
-          cmake -Bbuild -DWITH_PYTHON=ON -DWITH_PYTHON3=${{steps.get-id.outputs.WITH_PYTHON3}} -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DSKIP_CONFIG_H_GENERATION=ON
+          cmake -Bbuild -DWITH_PYTHON=ON -DWITH_PYTHON3=${{steps.get-id.outputs.WITH_PYTHON3}} -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DSKIP_CONFIG_H_GENERATION=ON ${{ fromJSON(matrix.py2) >= 311 && format('-DWITH_PYTHON_LIMITED_API=ON -DPYTHON_LIMITED_API_TARGET={0}', steps.get-id.outputs.pydot2) || '' }}
           cmake --build build --target install -v
         shell: bash -el {0}
       - uses: jgillis/universal_grafter@master
@@ -469,29 +468,9 @@ jobs:
           name: casadi-${{env.deploy_arch}}-py${{matrix.py2}}
           path: casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           retention-days: 5
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.4.1
-      - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
-      - name: Delete old release assetsd
-        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
-        with:
-          token: ${{ github.token }}
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.deploy_arch}}-py${{matrix.py2}}.zip
-          fail-if-no-release: false
-          fail-if-no-assets: false
-        if: github.event_name != 'pull_request'
-      - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.11.5
-        with:
-          overwrite: true
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
-          prerelease: true
-        if: github.event_name != 'pull_request'
       - run: unzip casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip -d package_for_wheel
       - run: |
-          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.target}} package_for_wheel/)
+          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.target}} package_for_wheel/ ${{ fromJSON(matrix.py2) >= 311 && '--abi3' || '' }})
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
@@ -501,6 +480,14 @@ jobs:
           echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
         id: wheel
         shell: bash -el {0}
+      - name: Validate abi3 wheel
+        if: ${{ fromJSON(matrix.py2) >= 311 }}
+        run: |
+          pip install abi3audit
+          abi3audit --strict --report ${{ steps.wheel.outputs.wheel }}
+        shell: bash -el {0}
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
       - name: Delete old release assets
         uses: jgillis/delete-release-assets@codex/bump-runtime-node24
         with:
@@ -691,10 +678,10 @@ jobs:
           key: "${{matrix.arch}}"
           map: |
            {
-              "manylinux1-x64": {"os": "linux", "bitness": "64"},
-              "manylinux1-x86": {"os": "linux", "bitness": "32"},
               "manylinux2014-x64": {"os": "linux", "bitness": "64"},
               "manylinux2014-x86": {"os": "linux", "bitness": "32"},
+              "manylinux_2_28-x64": {"os": "linux", "bitness": "64"},
+              "manylinux_2_28-x86": {"os": "linux", "bitness": "32"},
               "windows-shared-x64-posix": {"os": "windows", "bitness": "64"}
            }
           export_to: env
@@ -777,23 +764,31 @@ jobs:
           echo "PYTHON_INCLUDE_DIR=/work/python/include" >> $GITHUB_ENV
           echo "PYTHON_LIBRARY=/work/python/libs/python${{ matrix.py2 }}.lib" >> $GITHUB_ENV
       - run: rm -rf install
+      - id: get-id
+        uses: actions/github-script@v9.0.0
+        env:
+          py2: "${{ matrix.py2 }}"
+        with:
+          result-encoding: string
+          script: |
+            const { py2 } = process.env;
+            const major = py2.substr(0,1);
+            const minor = py2.substr(1);
+            core.setOutput('pydot2', major+"."+minor)
       - name: Build
         run: |
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1 ${{ fromJSON(matrix.py2) >= 311 && format('-DWITH_PYTHON_LIMITED_API=ON -DPYTHON_LIMITED_API_TARGET={0}', steps.get-id.outputs.pydot2) || '' }}
           ./dockcross cmake --build build --target install -v
       - uses: jgillis/variable-mapper@codex/bump-runtime-node24
         with:
           key: "${{matrix.arch}}"
           map: |
            {
-              "manylinux1-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
-              "manylinux1-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
               "manylinux2014-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
               "manylinux2014-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
-              "manylinux2014-x64-modern": {"os": "linux", "bitness": "64", "suffix":"64"},
-              "manylinux2014-x86-modern": {"os": "linux", "bitness": "32", "suffix":"32"},
+              "manylinux_2_28-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
               "manylinux2014-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
-              "manylinux2014-aarch64-modern": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
+              "manylinux_2_28-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
               "windows-shared-x64-posix": {"os": "windows", "bitness": "64", "suffix":"64"}
            }
           export_to: env
@@ -808,37 +803,17 @@ jobs:
         if: contains(matrix.arch, 'windows')
       - run: |
              cd install
-             echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}'" > dummy.txt
-             zip -rq ../casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip .
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.4.1
-      - run: cp casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
-      - name: Delete old release assets
-        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
-        with:
-          token: ${{ github.token }}
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
-          fail-if-no-release: false
-          fail-if-no-assets: false
-        if: github.event_name != 'pull_request'
-      - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.11.5
-        with:
-          overwrite: true
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
-          prerelease: true
-        if: github.event_name != 'pull_request'
+             echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}'" > dummy.txt
+             zip -rq ../casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}.zip .
       - uses: actions/upload-artifact@v7.0.1
         with:
-          name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
-          path: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
+          name: casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}
+          path: casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{matrix.py2}}.zip
           retention-days: 5
       
       - run: |
           pip install wheel==0.31.1
-          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
+          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/ ${{ fromJSON(matrix.py2) >= 311 && '--abi3' || '' }})
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
@@ -847,6 +822,15 @@ jobs:
           echo "<$wheel_wildcard2>"
           echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
         id: wheel
+
+      - name: Validate abi3 wheel
+        if: ${{ fromJSON(matrix.py2) >= 311 }}
+        run: |
+          pip install abi3audit
+          abi3audit --strict --report ${{ steps.wheel.outputs.wheel }}
+        shell: bash -el {0}
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
       - name: Delete old release assets
         uses: jgillis/delete-release-assets@codex/bump-runtime-node24
         with:
@@ -1073,19 +1057,34 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       py2: ["27","36","37","38","39","310","311","312","313"]
+       py2: ["37","38","39","310","311","314"]
        image: ["windows-2022","ubuntu-24.04","macos-15-intel","macos-14"]
        bit: [64]
+       glibc_suffix: [""]
        exclude:
         # No Windows 32bit builds currently
         - image: "windows-2022"
           bit: 32
         - image: "macos-14"
-          py2: "27"
-        - image: "macos-14"
-          py2: "36"
-        - image: "macos-14"
           py2: "37"
+       include:
+        - image: "ubuntu-24.04"
+          py2: "311"
+          bit: 64
+          glibc_suffix: "-glibc228"
+        - image: "ubuntu-24.04"
+          py2: "314"
+          bit: 64
+          glibc_suffix: "-glibc228"
+        # ARM Linux runners
+        - image: "ubuntu-24.04-arm"
+          py2: "311"
+          bit: 64
+          glibc_suffix: "-glibc228"
+        - image: "ubuntu-24.04-arm"
+          py2: "314"
+          bit: 64
+          glibc_suffix: "-glibc228"
     steps:
       - uses: actions/checkout@v6.0.2
       # Make cl.exe available on Windows
@@ -1097,17 +1096,18 @@ jobs:
           map: |
            {
               "windows-2022": {"os": "windows", "suffix": "${{matrix.bit}}"},
-              "ubuntu-24.04": {"os": "linux", "suffix": "${{matrix.bit}}"},
+              "ubuntu-24.04$": {"os": "linux", "suffix": "${{matrix.bit}}"},
+              "ubuntu-24.04-arm": {"os": "linux", "suffix": "-aarch64"},
               "macos-15-intel": {"os": "osx", "suffix": "-x86_64"},
               "macos-14": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v8.0.1
         with:
-          name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
+          name: casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{ matrix.py2 == '314' && '311' || matrix.py2 }}
       - run: ls
       - name: Unpack source
-        run: unzip casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip -d casadi
+        run: unzip casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{ matrix.py2 == '314' && '311' || matrix.py2 }}.zip -d casadi
       - id: get-id
         uses: actions/github-script@v9.0.0
         env:
@@ -1137,10 +1137,10 @@ jobs:
         if: contains(matrix.image, 'windows')
       - run: pip install pyright
         shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows') && matrix.py2 != '27' && matrix.py2 != '36'"
+        if: "!contains(matrix.image, 'windows')"
       - run: pip install pyright
         shell: pwsh
-        if: "contains(matrix.image, 'windows') && matrix.py2 != '27' && matrix.py2 != '36'"
+        if: "contains(matrix.image, 'windows')"
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
@@ -1166,6 +1166,12 @@ jobs:
        py2: ["312"]
        image: ["windows-2022","ubuntu-24.04","macos-14","macos-15-intel"]
        bit: [64]
+       glibc_suffix: [""]
+       include:
+        - image: "ubuntu-24.04"
+          py2: "311"
+          bit: 64
+          glibc_suffix: "-glibc228"
     steps:
       - uses: actions/checkout@v6.0.2
       # Make cl.exe available on Windows
@@ -1177,17 +1183,20 @@ jobs:
           map: |
            {
               "windows-2022": {"os": "windows","suffix": "${{matrix.bit}}","platform":"win_amd64"},
-              "ubuntu-24.04": {"os": "linux","suffix": "${{matrix.bit}}","platform":"manylinux2014_x86_64"},
+              "ubuntu-24.04$": {"os": "linux","suffix": "${{matrix.bit}}","platform":"manylinux2014_x86_64"},
               "macos-15-intel": {"os": "osx","suffix": "-x86_64","platform":"macosx_11_0_x86_64.macosx_11_0_intel"},
               "macos-14": {"os": "osx","suffix": "-arm64","platform":"macosx_11_0_arm64"}
            }
           export_to: env
+      - name: Override wheel platform tag for manylinux_2_28 builds
+        if: matrix.glibc_suffix == '-glibc228' && contains(matrix.image, 'ubuntu')
+        run: echo "platform=manylinux_2_28_x86_64" >> $GITHUB_ENV
       - uses: actions/download-artifact@v8.0.1
         with:
-          name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
+          name: casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{ matrix.py2 == '312' && '311' || matrix.py2 }}
       - run: ls
       - name: Unpack source
-        run: unzip casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip -d casadi
+        run: unzip casadi-${{env.os}}${{env.suffix}}${{matrix.glibc_suffix}}-py${{ matrix.py2 == '312' && '311' || matrix.py2 }}.zip -d casadi
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -1338,15 +1347,15 @@ jobs:
       - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
         with:
           version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
+          file: casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
       - run: |
-          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
+          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
           cd test/python
           python function.py
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
-          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
+          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
           cd test/python
           python function.py
         shell: pwsh
