@@ -1193,7 +1193,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       py2: ["310"]
+       py2: ["311"]
        image: ["windows-2022","ubuntu-24.04","macos-14","macos-15-intel"]
        bit: [64]
        glibc_suffix: [""]
