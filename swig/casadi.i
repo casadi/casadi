@@ -830,6 +830,7 @@ namespace std {
     }
 
     bool is_scalar_np_array(GUESTOBJECT *p) {
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p, "__array__")) {
         PyObject *cr = PyObject_GetAttrString(p, (char*) "size");
         if (cr) {
@@ -1276,6 +1277,7 @@ namespace std {
       if (PyDict_Check(p) || PyString_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
 
       // Make sure shape is 1D, if defined.
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p, "shape")) {
         PyObject * shape = PyObject_GetAttrString(p, "shape");
         if(!PyTuple_Check(shape) || PyTuple_Size(shape)!=1) {
@@ -1825,6 +1827,7 @@ namespace std {
       // Numpy arrays will be cast to dense SX
       if (SX_from_array(p, m)) return true;
       // Object has __SX__ method
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p,"__SX__")) {
         PyObject *cr = PyObject_CallMethod(p, (char*) "__SX__", 0);
         if (!cr) return false;
@@ -1892,6 +1895,7 @@ namespace std {
       }
 
 #ifdef SWIGPYTHON
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p,"__MX__")) {
         PyObject *cr = PyObject_CallMethod(p, (char*) "__MX__", 0);
         if (!cr) return false;
@@ -1956,6 +1960,7 @@ namespace std {
 
 #ifdef SWIGPYTHON
       // Object has __DM__ method
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p,"__DM__")) {
         char name[] = "__DM__";
         PyObject *cr = PyObject_CallMethod(p, name, 0);
@@ -2053,6 +2058,7 @@ namespace std {
       // Numpy arrays will be cast to dense Matrix<casadi_int>
       if (IM_from_array(p, m)) return true;
 
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p,"__IM__")) {
         PyObject *cr = PyObject_CallMethod(p, (char*) "__IM__", 0);
         if (!cr) return false;
