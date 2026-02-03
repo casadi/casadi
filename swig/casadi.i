@@ -2336,19 +2336,26 @@ namespace std {
 #endif
 
 #ifdef SWIGPYTHON
-%typemap(in, doc="memoryview(ro)", noblock=1, fragment="casadi_all") (const double * a, casadi_int size) (Py_buffer* buffer) {
-  if (!PyMemoryView_Check($input)) SWIG_exception_fail(SWIG_TypeError, "Must supply a MemoryView.");
-  buffer = PyMemoryView_GET_BUFFER($input);
-  $1 = static_cast<double*>(buffer->buf); // const double cast comes later
-  $2 = buffer->len;
+%typemap(in, doc="buffer(ro)", noblock=1, fragment="casadi_all") (const double * a, casadi_int size) (Py_buffer _global_pybuf_ro) {
+  if (PyObject_GetBuffer($input, &_global_pybuf_ro, PyBUF_SIMPLE) != 0) {
+    SWIG_exception_fail(SWIG_TypeError, "Must supply a buffer-supporting object.");
+  }
+  $1 = static_cast<double*>(_global_pybuf_ro.buf);
+  $2 = _global_pybuf_ro.len;
+ }
+%typemap(freearg) (const double * a, casadi_int size) {
+  PyBuffer_Release(&_global_pybuf_ro);
  }
 
-%typemap(in, doc="memoryview(rw)", noblock=1, fragment="casadi_all") (double * a, casadi_int size)  (Py_buffer* buffer) {
-  if (!PyMemoryView_Check($input)) SWIG_exception_fail(SWIG_TypeError, "Must supply a writable MemoryView.");
-  buffer = PyMemoryView_GET_BUFFER($input);
-  if (buffer->readonly) SWIG_exception_fail(SWIG_TypeError, "Must supply a writable MemoryView.");
-  $1 = static_cast<double*>(buffer->buf);
-  $2 = buffer->len;
+%typemap(in, doc="buffer(rw)", noblock=1, fragment="casadi_all") (double * a, casadi_int size)  (Py_buffer _global_pybuf_rw) {
+  if (PyObject_GetBuffer($input, &_global_pybuf_rw, PyBUF_WRITABLE) != 0) {
+    SWIG_exception_fail(SWIG_TypeError, "Must supply a writable buffer-supporting object.");
+  }
+  $1 = static_cast<double*>(_global_pybuf_rw.buf);
+  $2 = _global_pybuf_rw.len;
+ }
+%typemap(freearg) (double * a, casadi_int size) {
+  PyBuffer_Release(&_global_pybuf_rw);
  }
 
 // Directorin typemap; as output
