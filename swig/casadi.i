@@ -1625,15 +1625,24 @@ namespace std {
         }
         return true;
       }
-      // Python slice
+      // Python slice - use Limited API compatible approach
       if (PySlice_Check(p)) {
-        PySliceObject *r = (PySliceObject*)(p);
+        Py_ssize_t start, stop, step;
+        if (PySlice_Unpack(p, &start, &stop, &step) < 0) {
+          return false;  // TypeError already set by PySlice_Unpack
+        }
+
         if (m) {
-          (**m).start = (r->start == Py_None || PyNumber_AsSsize_t(r->start, NULL) <= std::numeric_limits<int>::min())
-            ? std::numeric_limits<casadi_int>::min() : PyInt_AsLong(r->start);
-          (**m).stop  = (r->stop ==Py_None || PyNumber_AsSsize_t(r->stop, NULL)>= std::numeric_limits<int>::max())
-            ? std::numeric_limits<casadi_int>::max() : PyInt_AsLong(r->stop);
-          if(r->step !=Py_None) (**m).step  = PyInt_AsLong(r->step);
+          // Map sentinel values from PySlice_Unpack to CasADi's limits
+          (**m).start = (start <= PY_SSIZE_T_MIN)
+              ? std::numeric_limits<casadi_int>::min()
+              : static_cast<casadi_int>(start);
+          (**m).stop = (stop >= PY_SSIZE_T_MAX)
+              ? std::numeric_limits<casadi_int>::max()
+              : static_cast<casadi_int>(stop);
+          if (step != 1) {
+            (**m).step = static_cast<casadi_int>(step);
+          }
         }
         return true;
       }
