@@ -115,8 +115,14 @@ Option            Default value       Description
 ``casadi_int``    ``long long int``   Integer type
 ``with_header``   false               Generate a header file
 ``with_mem``      false               Generate a simplified C API
+``cuda``          false               Generate CUDA C (.cu/.cuh) and mark evaluation functions with ``CUDA_DEV``
 ``indent``        2                   Number of spaces per indentation level
 ================= =================== ======================
+
+When ``cuda`` is true and no explicit suffix is provided, the generated source uses
+the ``.cu`` extension and the optional header uses ``.cuh``. The generated evaluation
+functions and runtime helpers are marked with ``CUDA_DEV`` so they can be called from
+device code; the metadata helpers remain regular host functions.
 
 
 .. _sec-using_codegen:

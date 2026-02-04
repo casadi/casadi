@@ -287,6 +287,16 @@ namespace casadi {
         \identifier{2f7} */
     bool thread_safe() const { return thread_safe_; }
 
+    /** \brief Generate CUDA-compatible code
+
+        \identifier{2f8} */
+    bool cuda() const { return cuda_; }
+
+    /** \brief Device qualifier prefix (CUDA mode)
+
+        \identifier{2f9} */
+    std::string device_prefix() const;
+
     /** \brief Print a constant in a lossless but compact manner
 
         \identifier{sj} */
@@ -611,14 +621,19 @@ namespace casadi {
         \identifier{tm} */
     std::string declare(std::string s);
 
-    /** \brief Write a comment line (ignored if not verbose)
+    /** \brief Declare a device function (CUDA mode)
 
         \identifier{tn} */
+    std::string declare_device(std::string s);
+
+    /** \brief Write a comment line (ignored if not verbose)
+
+        \identifier{to} */
     void comment(const std::string& s);
 
     /** \brief Auxiliary functions
 
-        \identifier{to} */
+        \identifier{tp} */
     enum Auxiliary {
       AUX_COPY,
       AUX_CVX,
@@ -932,6 +947,9 @@ namespace casadi {
     // Generate import symbol macros
     void generate_import_symbol(std::ostream &s) const;
 
+    // Generate CUDA device macros
+    void generate_cuda_macros(std::ostream &s) const;
+
     //  private:
   public:
     /// \cond INTERNAL
@@ -969,6 +987,9 @@ namespace casadi {
 
     // Are we generating C++?
     bool cpp;
+
+    // Are we generating CUDA?
+    bool cuda_;
 
     // Should we generate a main (allowing evaluation from command line)
     bool main;

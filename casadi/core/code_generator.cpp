@@ -42,6 +42,7 @@ namespace casadi {
     this->with_sfunction = false;
     this->unroll_args = false;
     this->cpp = false;
+    this->cuda_ = false;
     this->main = false;
     this->casadi_real_type = "double";
     this->casadi_int_type = CASADI_INT_TYPE_STR;
@@ -80,6 +81,8 @@ namespace casadi {
         this->unroll_args = e.second;
       } else if (e.first=="cpp") {
         this->cpp = e.second;
+      } else if (e.first=="cuda") {
+        this->cuda_ = e.second;
       } else if (e.first=="main") {
         this->main = e.second;
       } else if (e.first=="casadi_real") {
@@ -154,10 +157,13 @@ namespace casadi {
     needs_mem_ = false;
 
     // Divide name into base and suffix (if any)
+    std::string default_suffix = this->cpp ? ".cpp" : ".c";
+    if (this->cuda_) default_suffix = ".cu";
+
     std::string::size_type dotpos = name.rfind('.');
     if (dotpos==std::string::npos) {
       this->name = name;
-      this->suffix = this->cpp ? ".cpp" : ".c";
+      this->suffix = default_suffix;
     } else {
       this->name = name.substr(0, dotpos);
       this->suffix = name.substr(dotpos);
@@ -380,13 +386,13 @@ namespace casadi {
     std::string codegen_name = add_dependency(f);
 
     // Define function
-    *this << declare(f->signature(f.name())) << "{\n"
+    *this << declare_device(f->signature(f.name())) << "{\n"
           << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
           << "}\n\n";
 
     if (this->unroll_args) {
       // Define function
-      *this << declare(f->signature_unrolled(f.name())) << "{\n";
+      *this << declare_device(f->signature_unrolled(f.name())) << "{\n";
       for (casadi_int i=0; i<f.n_in(); ++i) {
         *this << "arg[" << i << "] = " << f.name_in(i) << ";\n";
       }
@@ -501,6 +507,16 @@ namespace casadi {
       << "#endif\n\n";
   }
 
+  void CodeGenerator::generate_cuda_macros(std::ostream &s) const {
+    s << "#ifndef CUDA_DEV\n"
+      << "#ifdef __CUDACC__\n"
+      << "  #define CUDA_DEV __device__\n"
+      << "#else\n"
+      << "  #define CUDA_DEV\n"
+      << "#endif\n"
+      << "#endif\n\n";
+  }
+
   void CodeGenerator::generate_casadi_int(std::ostream &s) const {
     s << "#ifndef casadi_int\n"
       << "#define casadi_int " << this->casadi_int_type << std::endl
@@ -556,7 +572,8 @@ namespace casadi {
 
     // Generate header
     if (this->with_header) {
-      auto s_ptr = Filesystem::ofstream_ptr(prefix + this->name + ".h");
+      std::string header_suffix = this->cuda_ ? ".cuh" : ".h";
+      auto s_ptr = Filesystem::ofstream_ptr(prefix + this->name + header_suffix);
       std::ostream& s = *s_ptr;
       // Create a header file
       stream_open(s, this->cpp);
@@ -566,6 +583,8 @@ namespace casadi {
 
       // Define the casadi_int type
       generate_casadi_int(s);
+
+      if (this->cuda_) generate_cuda_macros(s);
 
       // Generate export symbol macros
       if (this->with_import) generate_import_symbol(s);
@@ -908,6 +927,8 @@ namespace casadi {
 
     // Integer type (usually long long)
     generate_casadi_int(s);
+
+    if (this->cuda_) generate_cuda_macros(s);
 
     if (needs_mem_) {
       s << "#ifndef CASADI_MAX_NUM_THREADS\n";
@@ -2161,6 +2182,10 @@ namespace casadi {
             + y + ", " + sparsity(sp_y) + ", " + iw + ")";
   }
 
+  std::string CodeGenerator::device_prefix() const {
+    return cuda_ ? "CUDA_DEV " : "";
+  }
+
   std::string CodeGenerator::declare(std::string s) {
     // Add c linkage
     std::string cpp_prefix = this->cpp ? "extern \"C\" " : "";
@@ -2172,6 +2197,21 @@ namespace casadi {
 
     // Return name with declarations
     return cpp_prefix + this->dll_export + s;
+  }
+
+  std::string CodeGenerator::declare_device(std::string s) {
+    if (!cuda_) return declare(s);
+
+    // Add c linkage
+    std::string cpp_prefix = this->cpp ? "extern \"C\" " : "";
+    std::string dev_prefix = device_prefix();
+
+    // To header file
+    if (this->with_header) {
+      this->header << cpp_prefix << dev_prefix << s << ";\n";
+    }
+
+    return cpp_prefix + dev_prefix + s;
   }
 
   std::string
@@ -2535,6 +2575,18 @@ namespace casadi {
       // Perform string replacements
       for (auto&& it = rep.rbegin(); it!=rep.rend(); ++it) {
         line = replace(line, it->first, it->second);
+      }
+
+      if (cuda_) {
+        bool is_top_level = line[0] != ' ' && line[0] != '\t';
+        if (is_top_level && line.find("casadi_") != std::string::npos
+            && line.find("(") != std::string::npos) {
+          if (line.rfind("static ", 0) == 0) {
+            line.insert(7, "CUDA_DEV ");
+          } else {
+            line = "CUDA_DEV " + line;
+          }
+        }
       }
 
       // Append to return
