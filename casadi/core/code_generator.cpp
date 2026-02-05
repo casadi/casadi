@@ -132,6 +132,11 @@ namespace casadi {
       }
     }
 
+    if (this->cuda_) {
+      casadi_assert(!this->mex, "Option 'mex' is not supported with cuda codegen.");
+      casadi_assert(!this->main, "Option 'main' is not supported with cuda codegen.");
+    }
+
     // If real_min is not specified, make an educated guess
     if (this->real_min.empty()) {
       std::stringstream ss;
@@ -1803,6 +1808,9 @@ namespace casadi {
                         << "{ return c!=0 ? x : y;}\n\n";
       break;
     case AUX_PRINTF:
+      if (cuda_) {
+        casadi_error("printf helper is not supported with cuda codegen.");
+      }
       this->auxiliaries << "#ifndef CASADI_PRINTF\n";
       if (this->mex) {
         this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
