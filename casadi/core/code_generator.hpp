@@ -626,14 +626,19 @@ namespace casadi {
         \identifier{tn} */
     std::string declare_device(std::string s);
 
-    /** \brief Write a comment line (ignored if not verbose)
+    /** \brief Declare a kernel function (CUDA mode)
 
         \identifier{to} */
+    std::string declare_kernel(std::string s);
+
+    /** \brief Write a comment line (ignored if not verbose)
+
+        \identifier{tp} */
     void comment(const std::string& s);
 
     /** \brief Auxiliary functions
 
-        \identifier{tp} */
+        \identifier{tq} */
     enum Auxiliary {
       AUX_COPY,
       AUX_CVX,
@@ -950,6 +955,14 @@ namespace casadi {
     // Generate CUDA device macros
     void generate_cuda_macros(std::ostream &s) const;
 
+    struct CudaKernelSpec {
+      std::string kernel_name;
+      std::string device_name;
+      std::vector<casadi_int> batch_inputs;
+    };
+
+    void generate_cuda_kernel(const Function& f, const CudaKernelSpec& spec);
+
     //  private:
   public:
     /// \cond INTERNAL
@@ -990,6 +1003,9 @@ namespace casadi {
 
     // Are we generating CUDA?
     bool cuda_;
+
+    // Per-function CUDA kernel generation specs
+    std::map<std::string, CudaKernelSpec> cuda_kernels_;
 
     // Should we generate a main (allowing evaluation from command line)
     bool main;
