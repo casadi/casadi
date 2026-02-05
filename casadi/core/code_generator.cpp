@@ -101,6 +101,23 @@ namespace casadi {
         this->with_import = e.second;
       } else if (e.first=="include_math") {
         this->include_math = e.second;
+      } else if (e.first=="cuda_kernels") {
+        Dict kernels = e.second.to_dict();
+        for (auto&& k : kernels) {
+          casadi_assert(k.second.is_dict(),
+            "cuda_kernels entries must be dicts (function name -> dict).");
+          Dict kd = k.second.to_dict();
+          CudaKernelSpec spec;
+          auto it = kd.find("kernel_name");
+          spec.kernel_name = it==kd.end() ? (k.first + "_kernel") : it->second.to_string();
+          it = kd.find("device_name");
+          spec.device_name = it==kd.end() ? ("device_" + k.first + "_eval") : it->second.to_string();
+          it = kd.find("batch_inputs");
+          if (it!=kd.end()) spec.batch_inputs = it->second.to_int_vector();
+          it = kd.find("batch_outputs");
+          if (it!=kd.end()) spec.batch_outputs = it->second.to_int_vector();
+          cuda_kernels_[k.first] = spec;
+        }
       } else if (e.first=="infinity") {
         this->infinity = e.second.to_string();
       } else if (e.first=="nan") {
@@ -130,6 +147,11 @@ namespace casadi {
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
+    }
+
+    if (!cuda_kernels_.empty()) {
+      casadi_assert(this->cuda_,
+        "Option 'cuda_kernels' requires cuda codegen (set cuda=true).");
     }
 
     if (this->cuda_) {
@@ -427,6 +449,14 @@ namespace casadi {
     // Generate function specific code for Simulink sfunction
     if (this->with_sfunction) this->added_sfunctions.push_back( this->codegen_sfunction(f) );
 
+    if (this->cuda_) {
+      auto it = cuda_kernels_.find(f.name());
+      if (it != cuda_kernels_.end()) {
+        generate_cuda_kernel(f, it->second);
+        flush(this->body);
+      }
+    }
+
     // Add to list of exposed symbols
     this->exposed_fname.push_back(f.name());
   }
@@ -518,6 +548,13 @@ namespace casadi {
       << "  #define CUDA_DEV __device__\n"
       << "#else\n"
       << "  #define CUDA_DEV\n"
+      << "#endif\n"
+      << "#endif\n\n";
+    s << "#ifndef CUDA_GLOBAL\n"
+      << "#ifdef __CUDACC__\n"
+      << "  #define CUDA_GLOBAL __global__\n"
+      << "#else\n"
+      << "  #define CUDA_GLOBAL\n"
       << "#endif\n"
       << "#endif\n\n";
   }
@@ -2221,6 +2258,150 @@ namespace casadi {
     }
 
     return cpp_prefix + dev_prefix + s;
+  }
+
+  std::string CodeGenerator::declare_kernel(std::string s) {
+    if (!cuda_) return declare(s);
+
+    // Add c linkage
+    std::string cpp_prefix = this->cpp ? "extern \"C\" " : "";
+    std::string global_prefix = "CUDA_GLOBAL ";
+
+    // To header file
+    if (this->with_header) {
+      this->header << cpp_prefix << global_prefix << s << ";\n";
+    }
+
+    return cpp_prefix + global_prefix + s;
+  }
+
+  void CodeGenerator::generate_cuda_kernel(const Function& f, const CudaKernelSpec& spec) {
+    casadi_int n_in = f.n_in();
+    casadi_int n_out = f.n_out();
+
+    std::set<casadi_int> batch_in(spec.batch_inputs.begin(), spec.batch_inputs.end());
+    std::set<casadi_int> batch_out(spec.batch_outputs.begin(), spec.batch_outputs.end());
+
+    auto check_index = [](casadi_int idx, casadi_int limit, const std::string& name) {
+      casadi_assert(idx >= 0 && idx < limit, "Invalid " + name + " index: " + str(idx));
+    };
+
+    for (casadi_int i : batch_in) check_index(i, n_in, "batch_inputs");
+    for (casadi_int i : batch_out) check_index(i, n_out, "batch_outputs");
+    for (casadi_int i = 0; i < n_out; ++i) {
+      if (f.nnz_out(i) > 0) {
+        casadi_assert(batch_out.count(i) != 0,
+          "cuda kernels require outputs to be batched (output " + str(i) + ").");
+      }
+    }
+
+    // Device wrapper signature
+    std::stringstream sig;
+    sig << "void " << spec.device_name << "(";
+    for (casadi_int i = 0; i < n_in; ++i) {
+      if (i) sig << ", ";
+      sig << "const casadi_real* i" << i;
+    }
+    for (casadi_int i = 0; i < n_out; ++i) {
+      if (n_in || i) sig << ", ";
+      sig << "casadi_real* o" << i;
+    }
+    sig << ")";
+
+    *this << declare_device(sig.str()) << " {\n";
+    if (n_in > 0) {
+      *this << "const casadi_real* arg_local[" << n_in << "] = {";
+      for (casadi_int i = 0; i < n_in; ++i) {
+        if (i) *this << ", ";
+        if (f.nnz_in(i) == 0) {
+          *this << "0";
+        } else {
+          *this << "i" << i;
+        }
+      }
+      *this << "};\n";
+      *this << "const casadi_real** arg = arg_local;\n";
+    } else {
+      *this << "const casadi_real** arg = 0;\n";
+    }
+
+    if (n_out > 0) {
+      *this << "casadi_real* res_local[" << n_out << "] = {";
+      for (casadi_int i = 0; i < n_out; ++i) {
+        if (i) *this << ", ";
+        if (f.nnz_out(i) == 0) {
+          *this << "0";
+        } else {
+          *this << "o" << i;
+        }
+      }
+      *this << "};\n";
+      *this << "casadi_real** res = res_local;\n";
+    } else {
+      *this << "casadi_real** res = 0;\n";
+    }
+
+    size_t sz_iw = f.sz_iw();
+    size_t sz_w = f.sz_w();
+    *this << "casadi_int  iw[" << (sz_iw > 0 ? str(static_cast<casadi_int>(sz_iw)) : "1")
+          << "];\n";
+    *this << "casadi_real w [" << (sz_w > 0 ? str(static_cast<casadi_int>(sz_w)) : "1")
+          << "];\n";
+    *this << f.name() << "(arg, res, iw, w, 0);\n";
+    *this << "}\n\n";
+
+    // Kernel signature
+    std::stringstream ksig;
+    ksig << "void " << spec.kernel_name << "(";
+    for (casadi_int i = 0; i < n_in; ++i) {
+      if (i) ksig << ", ";
+      ksig << "const casadi_real* i" << i << "_in";
+    }
+    for (casadi_int i = 0; i < n_out; ++i) {
+      if (n_in || i) ksig << ", ";
+      ksig << "casadi_real* o" << i << "_out";
+    }
+    if (n_in || n_out) ksig << ", ";
+    ksig << "int n_candidates";
+    ksig << ")";
+
+    *this << declare_kernel(ksig.str()) << " {\n";
+    *this << "int idx = blockIdx.x * blockDim.x + threadIdx.x;\n";
+    *this << "if (idx >= n_candidates) return;\n";
+
+    for (casadi_int i = 0; i < n_in; ++i) {
+      if (f.nnz_in(i) == 0) {
+        *this << "const casadi_real* i" << i << " = 0;\n";
+        continue;
+      }
+      if (batch_in.count(i)) {
+        *this << "const casadi_real* i" << i << " = i" << i << "_in + "
+              << str(f.nnz_in(i)) << " * idx;\n";
+      } else {
+        *this << "const casadi_real* i" << i << " = i" << i << "_in;\n";
+      }
+    }
+
+    for (casadi_int i = 0; i < n_out; ++i) {
+      if (f.nnz_out(i) == 0) {
+        *this << "casadi_real* o" << i << " = 0;\n";
+      } else {
+        *this << "casadi_real* o" << i << " = o" << i << "_out + "
+              << str(f.nnz_out(i)) << " * idx;\n";
+      }
+    }
+
+    *this << spec.device_name << "(";
+    for (casadi_int i = 0; i < n_in; ++i) {
+      if (i) *this << ", ";
+      *this << "i" << i;
+    }
+    for (casadi_int i = 0; i < n_out; ++i) {
+      if (n_in || i) *this << ", ";
+      *this << "o" << i;
+    }
+    *this << ");\n";
+    *this << "}\n\n";
   }
 
   std::string
