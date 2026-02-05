@@ -131,10 +131,10 @@ Each entry maps a function name to a dict with these keys:
 - ``kernel_name``: name of the generated ``__global__`` kernel (default: ``<name>_kernel``)
 - ``device_name``: name of the generated ``__device__`` wrapper (default: ``device_<name>_eval``)
 - ``batch_inputs``: list of input indices that are batched (offset by ``idx``)
-- ``batch_outputs``: list of output indices that are batched (offset by ``idx``)
+
+Outputs are always batched in CUDA kernel mode (offset by ``idx``).
 
 All non-batched inputs are treated as shared (same pointer for every thread).
-All outputs must be listed in ``batch_outputs``.
 
 
 .. _sec-using_codegen:

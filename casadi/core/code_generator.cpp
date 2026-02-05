@@ -114,8 +114,6 @@ namespace casadi {
           spec.device_name = it==kd.end() ? ("device_" + k.first + "_eval") : it->second.to_string();
           it = kd.find("batch_inputs");
           if (it!=kd.end()) spec.batch_inputs = it->second.to_int_vector();
-          it = kd.find("batch_outputs");
-          if (it!=kd.end()) spec.batch_outputs = it->second.to_int_vector();
           cuda_kernels_[k.first] = spec;
         }
       } else if (e.first=="infinity") {
@@ -2280,20 +2278,11 @@ namespace casadi {
     casadi_int n_out = f.n_out();
 
     std::set<casadi_int> batch_in(spec.batch_inputs.begin(), spec.batch_inputs.end());
-    std::set<casadi_int> batch_out(spec.batch_outputs.begin(), spec.batch_outputs.end());
-
     auto check_index = [](casadi_int idx, casadi_int limit, const std::string& name) {
       casadi_assert(idx >= 0 && idx < limit, "Invalid " + name + " index: " + str(idx));
     };
 
     for (casadi_int i : batch_in) check_index(i, n_in, "batch_inputs");
-    for (casadi_int i : batch_out) check_index(i, n_out, "batch_outputs");
-    for (casadi_int i = 0; i < n_out; ++i) {
-      if (f.nnz_out(i) > 0) {
-        casadi_assert(batch_out.count(i) != 0,
-          "cuda kernels require outputs to be batched (output " + str(i) + ").");
-      }
-    }
 
     // Device wrapper signature
     std::stringstream sig;
