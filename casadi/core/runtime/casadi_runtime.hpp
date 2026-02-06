@@ -185,6 +185,14 @@ namespace casadi {
   template<typename T1>
   void casadi_de_boor(T1 x, const T1* knots, casadi_int n_knots, casadi_int degree, T1* boor);
 
+  // Tensor times vector (ttv) in all modes — recursive multi-mode contraction
+  template<typename T1>
+  void casadi_tensor_ttv(T1* ret, casadi_int dim, casadi_int n_dims,
+      const T1* all_w, const casadi_int* w_offset,
+      const casadi_int* starts, const casadi_int* strides,
+      const T1* c, casadi_int m,
+      T1 weight, casadi_int offset);
+
   // De boor nd evaluation
   template<typename T1>
   void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* knots, const casadi_int* offset,
@@ -277,6 +285,7 @@ namespace casadi {
   #include "casadi_flip.hpp"
   #include "casadi_polyval.hpp"
   #include "casadi_de_boor.hpp"
+  #include "casadi_tensor_ttv.hpp"
   #include "casadi_nd_boor_eval.hpp"
   #include "casadi_nd_boor_dual_eval.hpp"
   #include "casadi_interpn_weights.hpp"

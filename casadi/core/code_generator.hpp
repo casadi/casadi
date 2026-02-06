@@ -676,6 +676,7 @@ namespace casadi {
       AUX_LOW,
       AUX_INTERPN_INTERPOLATE,
       AUX_DE_BOOR,
+      AUX_TENSOR_TTV,
       AUX_ND_BOOR_EVAL,
       AUX_FINITE_DIFF,
       AUX_QR,

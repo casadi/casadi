@@ -1545,12 +1545,14 @@ namespace casadi {
     case AUX_DE_BOOR:
       this->auxiliaries << sanitize_source(casadi_de_boor_str, inst);
       break;
+    case AUX_TENSOR_TTV:
+      this->auxiliaries << sanitize_source(casadi_tensor_ttv_str, inst);
+      break;
     case AUX_ND_BOOR_EVAL:
       add_auxiliary(AUX_DE_BOOR);
+      add_auxiliary(AUX_TENSOR_TTV);
       add_auxiliary(AUX_FILL);
-      add_auxiliary(AUX_FILL, {"casadi_int"});
       add_auxiliary(AUX_CLEAR);
-      add_auxiliary(AUX_CLEAR, {"casadi_int"});
       add_auxiliary(AUX_LOW);
       this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str, inst);
       break;
