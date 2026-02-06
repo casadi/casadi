@@ -63,6 +63,18 @@ SKIP_ONNXRUNTIME = {
     # Other
     'empty_function': "Shape mismatch in ONNX Runtime",
     'vertcat_input': "INT64 constants not supported in ONNX Runtime",
+    # Indexing operations use INT64 constants
+    'index_single_element': "INT64 constants not supported in ONNX Runtime",
+    'index_multiple_elements': "INT64 constants not supported in ONNX Runtime",
+    'index_slice': "INT64 constants not supported in ONNX Runtime",
+    # Dot product uses ReduceSum with axis attributes
+    'dot_product': "ReduceSum axis handling differs in ONNX Runtime",
+    # Matrix operations with 2D shapes
+    'matrix_matmul_2x3_3x2': "Shape inference issues in ONNX Runtime with 2D tensors",
+    'matrix_matmul_3x1_1x3': "Shape inference issues in ONNX Runtime with 2D tensors",
+    # Repmat uses INT64 constants for Tile repeats
+    'repmat_1x3': "INT64 constants not supported in ONNX Runtime",
+    'repmat_1x2': "INT64 constants not supported in ONNX Runtime",
 }
 
 # ============================================================================
@@ -395,9 +407,71 @@ def _register_complex_tests():
     )
 
 
+def _register_mx_ops_tests():
+    """Register tests for MX operations (repmat, indexing, etc.)"""
+
+    # ======= Repmat tests =======
+    # repmat horizontal (1, n)
+    x_2x2 = MX.sym("x", 2, 2)
+    Onnxtests.add_test(
+        "repmat_1x3",
+        Function("repmat_1x3", [x_2x2], [repmat(x_2x2, 1, 3)]),
+        [DM([[1, 2], [3, 4]])],
+        doc="Test repmat with 1 row, 3 column repetitions"
+    )
+
+    # repmat with n=2
+    x_3x1 = MX.sym("x", 3, 1)
+    Onnxtests.add_test(
+        "repmat_1x2",
+        Function("repmat_1x2", [x_3x1], [repmat(x_3x1, 1, 2)]),
+        [DM([[1], [2], [3]])],
+        doc="Test repmat with 1 row, 2 column repetitions"
+    )
+
+    # ======= Indexing tests =======
+    # Single element indexing from vector - x[0]
+    x_vec = MX.sym("x", 5, 1)
+    Onnxtests.add_test(
+        "index_single_element",
+        Function("idx_single", [x_vec], [x_vec[0]]),
+        [DM([1, 2, 3, 4, 5])],
+        doc="Test single element indexing x[0]"
+    )
+
+    # Multiple element indexing - x[[0,2,4]]
+    x_vec5 = MX.sym("x", 5, 1)
+    Onnxtests.add_test(
+        "index_multiple_elements",
+        Function("idx_multi", [x_vec5], [x_vec5[[0, 2, 4]]]),
+        [DM([10, 20, 30, 40, 50])],
+        doc="Test multiple element indexing x[[0,2,4]]"
+    )
+
+    # Slice indexing - x[1:4]
+    x_vec6 = MX.sym("x", 6, 1)
+    Onnxtests.add_test(
+        "index_slice",
+        Function("idx_slice", [x_vec6], [x_vec6[1:4]]),
+        [DM([1, 2, 3, 4, 5, 6])],
+        doc="Test slice indexing x[1:4]"
+    )
+
+    # ======= Dot product test =======
+    x_dot = MX.sym("x", 3, 1)
+    y_dot = MX.sym("y", 3, 1)
+    Onnxtests.add_test(
+        "dot_product",
+        Function("dot_prod", [x_dot, y_dot], [dot(x_dot, y_dot)]),
+        [(DM([1, 2, 3]), DM([4, 5, 6]))],
+        doc="Test dot product operation"
+    )
+
+
 # Register all tests
 _register_op_tests()
 _register_complex_tests()
+_register_mx_ops_tests()
 
 
 if __name__ == '__main__':

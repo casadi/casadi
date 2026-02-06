@@ -98,6 +98,14 @@ namespace casadi {
       // Use CasADi's if_else: if (a < b) then 1.0 else 0.0
       output = if_else(node_inputs[0] < node_inputs[1], MX(1.0), MX(0.0));
 
+    } else if (op_type == "ReduceSum") {
+      // ReduceSum - sum all elements (used in dot product decomposition)
+      casadi_assert(node_inputs.size() >= 1, "ReduceSum requires 1 input");
+      MX x = node_inputs[0];
+      // Sum all elements - this gives dot(x.flatten(), ones(x.numel()))
+      // Use sum1 + sum2 to sum over both dimensions
+      output = sum1(sum2(x));
+
     // Utilities
     } else if (op_type == "Identity") {
       casadi_assert(node_inputs.size() >= 1, "Identity requires 1 input");
@@ -250,7 +258,7 @@ namespace casadi {
 
     } else if (op_type == "Gather") {
       // Gather - extract element(s) at specified indices along an axis
-      // Used for vertcat input decomposition
+      // Used for vertcat input decomposition and indexing operations
       casadi_assert(node_inputs.size() >= 2, "Gather requires data and indices");
 
       MX data = node_inputs[0];
@@ -265,20 +273,78 @@ namespace casadi {
         }
       }
 
-      // Extract index value - must be a constant
+      // Extract index values - must be constants
       casadi_assert(indices_mx.is_constant(), "Gather indices must be constant");
       DM indices_dm = static_cast<DM>(indices_mx);
-      casadi_int idx = static_cast<casadi_int>(indices_dm(0).scalar());
 
-      if (axis == 0) {
-        // Gather along rows
-        output = data(idx, Slice());
-      } else if (axis == 1) {
-        // Gather along columns
-        output = data(Slice(), idx);
+      if (indices_dm.numel() == 1) {
+        // Single index case
+        casadi_int idx = static_cast<casadi_int>(indices_dm(0).scalar());
+
+        if (axis == 0) {
+          // Gather along rows
+          output = data(idx, Slice());
+        } else if (axis == 1) {
+          // Gather along columns
+          output = data(Slice(), idx);
+        } else {
+          casadi_error("Gather: only axis 0 and 1 supported for 2D tensors");
+        }
       } else {
-        casadi_error("Gather: only axis 0 and 1 supported for 2D tensors");
+        // Multiple indices case - collect elements using vector indexing
+        std::vector<casadi_int> indices;
+        for (casadi_int k = 0; k < indices_dm.numel(); ++k) {
+          indices.push_back(static_cast<casadi_int>(indices_dm(k).scalar()));
+        }
+
+        // For axis 0 with flat data or multiple indices, use nz indexing
+        if (axis == 0 && data.size2() == 1) {
+          // Vector case: gather specific elements
+          output = data(indices, Slice());
+        } else if (axis == 0) {
+          // Gather multiple rows
+          std::vector<MX> rows;
+          for (casadi_int idx : indices) {
+            rows.push_back(data(idx, Slice()));
+          }
+          output = vertcat(rows);
+        } else if (axis == 1) {
+          // Gather multiple columns
+          std::vector<MX> cols;
+          for (casadi_int idx : indices) {
+            cols.push_back(data(Slice(), idx));
+          }
+          output = horzcat(cols);
+        } else {
+          casadi_error("Gather: only axis 0 and 1 supported for 2D tensors");
+        }
       }
+
+    } else if (op_type == "Tile") {
+      // Tile - repeat tensor along dimensions
+      // ONNX Tile has inputs: data, repeats
+      casadi_assert(node_inputs.size() >= 2, "Tile requires data and repeats inputs");
+
+      MX data = node_inputs[0];
+      MX repeats_mx = node_inputs[1];
+
+      // Repeats must be a constant
+      casadi_assert(repeats_mx.is_constant(), "Tile repeats must be constant");
+      DM repeats_dm = static_cast<DM>(repeats_mx);
+
+      // For 2D tensors: repeats = [rows_repeat, cols_repeat]
+      casadi_int rows_repeat = 1;
+      casadi_int cols_repeat = 1;
+
+      if (repeats_dm.numel() >= 1) {
+        rows_repeat = static_cast<casadi_int>(repeats_dm(0).scalar());
+      }
+      if (repeats_dm.numel() >= 2) {
+        cols_repeat = static_cast<casadi_int>(repeats_dm(1).scalar());
+      }
+
+      // Use CasADi repmat
+      output = repmat(data, rows_repeat, cols_repeat);
 
     } else if (op_type == "GatherElements") {
       // GatherElements - advanced indexing operation
@@ -882,6 +948,232 @@ namespace casadi {
           work_to_onnx[o_vec[j]] = output_name;
         }
         return true;
+      }
+
+      case OP_HORZREPMAT: {
+        // Horizontal repetition: repmat(x, 1, n)
+        // ONNX Tile operation takes a repeats tensor [1, n] for 2D
+        MX mx_repmat = f.instruction_MX(k);
+
+        // Calculate n from dimensions: output_cols / input_cols
+        // HorzRepmat stores input as dep(0), output dimensions in sparsity
+        casadi_int input_cols = mx_repmat.dep(0).size2();
+        casadi_int output_cols = mx_repmat.size2();
+        casadi_int n = output_cols / input_cols;
+
+        // Get input dimensions to determine the repeats tensor size
+        casadi_int ndims = 2;  // Assume 2D for now
+
+        // Create constant repeats tensor
+        std::string repeats_name = "repeats_" + std::to_string(k);
+        onnx::NodeProto* repeats_node = add_node();
+        repeats_node->set_op_type("Constant");
+        repeats_node->add_output(repeats_name);
+        onnx::AttributeProto* repeats_attr = repeats_node->add_attribute();
+        repeats_attr->set_name("value");
+        onnx::TensorProto* repeats_tensor = repeats_attr->mutable_t();
+        repeats_tensor->set_data_type(onnx::TensorProto::INT64);
+        repeats_tensor->add_dims(ndims);
+        repeats_tensor->add_int64_data(1);  // rows: repeat 1 time
+        repeats_tensor->add_int64_data(n);  // cols: repeat n times
+
+        // Create Tile node
+        node = add_node();
+        node->set_op_type("Tile");
+        node->add_input(work_to_onnx[i_vec[0]]);
+        node->add_input(repeats_name);
+        node->add_output(node_output);
+
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+      }
+
+      case OP_GETNONZEROS: {
+        // Get nonzeros - used for indexing operations like x[indices]
+        // Export as ONNX Gather operation
+        MX mx_getnonzeros = f.instruction_MX(k);
+        Dict info = mx_getnonzeros.info();
+
+        // Check which variant we have
+        if (info.count("nz")) {
+          // GetNonzerosVector: explicit list of indices
+          std::vector<casadi_int> nz = info["nz"];
+
+          // Create constant indices tensor
+          std::string indices_name = "indices_" + std::to_string(k);
+          onnx::NodeProto* indices_node = add_node();
+          indices_node->set_op_type("Constant");
+          indices_node->add_output(indices_name);
+          onnx::AttributeProto* indices_attr = indices_node->add_attribute();
+          indices_attr->set_name("value");
+          onnx::TensorProto* indices_tensor = indices_attr->mutable_t();
+          indices_tensor->set_data_type(onnx::TensorProto::INT64);
+
+          // Store indices - flatten to 1D for Gather
+          indices_tensor->add_dims(nz.size());
+          for (casadi_int idx : nz) {
+            indices_tensor->add_int64_data(idx);
+          }
+
+          // Create Gather node (axis=0 for flat indexing)
+          node = add_node();
+          node->set_op_type("Gather");
+          node->add_input(work_to_onnx[i_vec[0]]);
+          node->add_input(indices_name);
+          node->add_output(node_output);
+
+          // Set axis=0 (gather along flattened dimension)
+          onnx::AttributeProto* axis_attr = node->add_attribute();
+          axis_attr->set_name("axis");
+          axis_attr->set_i(0);
+
+          work_to_onnx[o_vec[0]] = node_output;
+          return true;
+
+        } else if (info.count("slice")) {
+          // GetNonzerosSlice: contiguous slice
+          Dict slice_info = info["slice"];
+          casadi_int start = slice_info["start"];
+          casadi_int stop = slice_info["stop"];
+          casadi_int step = slice_info["step"];
+
+          if (step == 1) {
+            // Contiguous range - can use ONNX Slice
+            // Create starts constant
+            std::string starts_name = "starts_" + std::to_string(k);
+            onnx::NodeProto* starts_node = add_node();
+            starts_node->set_op_type("Constant");
+            starts_node->add_output(starts_name);
+            onnx::AttributeProto* starts_attr = starts_node->add_attribute();
+            starts_attr->set_name("value");
+            onnx::TensorProto* starts_tensor = starts_attr->mutable_t();
+            starts_tensor->set_data_type(onnx::TensorProto::INT64);
+            starts_tensor->add_dims(1);
+            starts_tensor->add_int64_data(start);
+
+            // Create ends constant
+            std::string ends_name = "ends_" + std::to_string(k);
+            onnx::NodeProto* ends_node = add_node();
+            ends_node->set_op_type("Constant");
+            ends_node->add_output(ends_name);
+            onnx::AttributeProto* ends_attr = ends_node->add_attribute();
+            ends_attr->set_name("value");
+            onnx::TensorProto* ends_tensor = ends_attr->mutable_t();
+            ends_tensor->set_data_type(onnx::TensorProto::INT64);
+            ends_tensor->add_dims(1);
+            ends_tensor->add_int64_data(stop);
+
+            // Create axes constant (axis 0)
+            std::string axes_name = "axes_" + std::to_string(k);
+            onnx::NodeProto* axes_node = add_node();
+            axes_node->set_op_type("Constant");
+            axes_node->add_output(axes_name);
+            onnx::AttributeProto* axes_attr = axes_node->add_attribute();
+            axes_attr->set_name("value");
+            onnx::TensorProto* axes_tensor = axes_attr->mutable_t();
+            axes_tensor->set_data_type(onnx::TensorProto::INT64);
+            axes_tensor->add_dims(1);
+            axes_tensor->add_int64_data(0);
+
+            // Create Slice node
+            node = add_node();
+            node->set_op_type("Slice");
+            node->add_input(work_to_onnx[i_vec[0]]);
+            node->add_input(starts_name);
+            node->add_input(ends_name);
+            node->add_input(axes_name);
+            node->add_output(node_output);
+
+            work_to_onnx[o_vec[0]] = node_output;
+            return true;
+          } else {
+            // Non-unit step - expand to explicit indices and use Gather
+            std::vector<casadi_int> indices;
+            for (casadi_int i = start; i < stop; i += step) {
+              indices.push_back(i);
+            }
+
+            // Create indices tensor
+            std::string indices_name = "indices_" + std::to_string(k);
+            onnx::NodeProto* indices_node = add_node();
+            indices_node->set_op_type("Constant");
+            indices_node->add_output(indices_name);
+            onnx::AttributeProto* indices_attr = indices_node->add_attribute();
+            indices_attr->set_name("value");
+            onnx::TensorProto* indices_tensor = indices_attr->mutable_t();
+            indices_tensor->set_data_type(onnx::TensorProto::INT64);
+            indices_tensor->add_dims(indices.size());
+            for (casadi_int idx : indices) {
+              indices_tensor->add_int64_data(idx);
+            }
+
+            // Create Gather node
+            node = add_node();
+            node->set_op_type("Gather");
+            node->add_input(work_to_onnx[i_vec[0]]);
+            node->add_input(indices_name);
+            node->add_output(node_output);
+
+            onnx::AttributeProto* axis_attr = node->add_attribute();
+            axis_attr->set_name("axis");
+            axis_attr->set_i(0);
+
+            work_to_onnx[o_vec[0]] = node_output;
+            return true;
+          }
+
+        } else if (info.count("inner")) {
+          // GetNonzerosSlice2: nested slices - complex case
+          // For now, expand to explicit indices
+          Dict inner_info = info["inner"];
+          Dict outer_info = info["outer"];
+
+          casadi_int inner_start = inner_info["start"];
+          casadi_int inner_stop = inner_info["stop"];
+          casadi_int inner_step = inner_info["step"];
+          casadi_int outer_start = outer_info["start"];
+          casadi_int outer_stop = outer_info["stop"];
+          casadi_int outer_step = outer_info["step"];
+
+          // Compute all indices from nested slices
+          std::vector<casadi_int> indices;
+          for (casadi_int o = outer_start; o < outer_stop; o += outer_step) {
+            for (casadi_int i = inner_start; i < inner_stop; i += inner_step) {
+              indices.push_back(o + i);
+            }
+          }
+
+          // Create indices tensor
+          std::string indices_name = "indices_" + std::to_string(k);
+          onnx::NodeProto* indices_node = add_node();
+          indices_node->set_op_type("Constant");
+          indices_node->add_output(indices_name);
+          onnx::AttributeProto* indices_attr = indices_node->add_attribute();
+          indices_attr->set_name("value");
+          onnx::TensorProto* indices_tensor = indices_attr->mutable_t();
+          indices_tensor->set_data_type(onnx::TensorProto::INT64);
+          indices_tensor->add_dims(indices.size());
+          for (casadi_int idx : indices) {
+            indices_tensor->add_int64_data(idx);
+          }
+
+          // Create Gather node
+          node = add_node();
+          node->set_op_type("Gather");
+          node->add_input(work_to_onnx[i_vec[0]]);
+          node->add_input(indices_name);
+          node->add_output(node_output);
+
+          onnx::AttributeProto* axis_attr = node->add_attribute();
+          axis_attr->set_name("axis");
+          axis_attr->set_i(0);
+
+          work_to_onnx[o_vec[0]] = node_output;
+          return true;
+        }
+
+        // Unknown variant - cannot handle
+        return false;
       }
 
       // Operations not handled - caller should handle these
