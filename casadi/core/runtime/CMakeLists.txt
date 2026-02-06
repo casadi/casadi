@@ -36,6 +36,7 @@ set(RUNTIME_SRC
   casadi_trilsolve.hpp
   casadi_triusolve.hpp
   casadi_mv_dense.hpp
+  casadi_tensor_ttv.hpp
   casadi_nd_boor_eval.hpp
   casadi_nd_boor_dual_eval.hpp
   casadi_norm_1.hpp
