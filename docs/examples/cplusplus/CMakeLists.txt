@@ -39,6 +39,12 @@ if(WITH_MADNLP)
   target_link_libraries(rocket_madnlp casadi)
 endif()
 
+if(WITH_MADMPEC)
+  add_executable(basic_mpcc basic_mpcc.cpp)
+  target_link_libraries(basic_mpcc casadi)
+endif()
+
+
 # Rocket using Ipopt
 if(WITH_IPOPT)
   add_executable(rocket_ipopt rocket_ipopt.cpp)
