@@ -440,6 +440,23 @@ namespace casadi {
 
   // ========== Export Helpers ==========
 
+  // Helper to create a Constant node with a tensor value
+  // This ensures the attribute type is properly set (fixes ONNX Runtime compatibility)
+  onnx::TensorProto* create_constant_tensor(
+      AddNodeFn add_node,
+      const std::string& output_name,
+      onnx::TensorProto::DataType data_type) {
+    onnx::NodeProto* node = add_node();
+    node->set_op_type("Constant");
+    node->add_output(output_name);
+    onnx::AttributeProto* attr = node->add_attribute();
+    attr->set_name("value");
+    attr->set_type(onnx::AttributeProto::TENSOR);  // Required for ONNX Runtime
+    onnx::TensorProto* tensor = attr->mutable_t();
+    tensor->set_data_type(data_type);
+    return tensor;
+  }
+
   // Callback-based implementations (main logic)
   onnx::NodeProto* create_binary_node(
       AddNodeFn add_node,
@@ -538,6 +555,7 @@ namespace casadi {
           idx_node->add_output(index_name);
           onnx::AttributeProto* idx_attr = idx_node->add_attribute();
           idx_attr->set_name("value");
+          idx_attr->set_type(onnx::AttributeProto::TENSOR);
           onnx::TensorProto* idx_tensor = idx_attr->mutable_t();
           idx_tensor->set_data_type(onnx::TensorProto::INT64);
           idx_tensor->add_dims(1);  // 1D tensor with one element
@@ -584,6 +602,7 @@ namespace casadi {
 
         onnx::AttributeProto* attr = node->add_attribute();
         attr->set_name("value");
+        attr->set_type(onnx::AttributeProto::TENSOR);
         onnx::TensorProto* tensor = attr->mutable_t();
         tensor->set_data_type(onnx::TensorProto::DOUBLE);
 
@@ -624,6 +643,7 @@ namespace casadi {
         const_node->add_output(const_name);
         onnx::AttributeProto* attr = const_node->add_attribute();
         attr->set_name("value");
+        attr->set_type(onnx::AttributeProto::TENSOR);
         onnx::TensorProto* tensor = attr->mutable_t();
         tensor->set_data_type(onnx::TensorProto::DOUBLE);
         tensor->add_double_data(2.0);
@@ -724,6 +744,7 @@ namespace casadi {
         zero_node->add_output(zero_name);
         onnx::AttributeProto* attr = zero_node->add_attribute();
         attr->set_name("value");
+        attr->set_type(onnx::AttributeProto::TENSOR);
         onnx::TensorProto* tensor = attr->mutable_t();
         tensor->set_data_type(onnx::TensorProto::DOUBLE);
         tensor->add_double_data(0.0);
@@ -804,6 +825,7 @@ namespace casadi {
 
         onnx::AttributeProto* shape_attr = shape_node->add_attribute();
         shape_attr->set_name("value");
+        shape_attr->set_type(onnx::AttributeProto::TENSOR);
         onnx::TensorProto* shape_tensor = shape_attr->mutable_t();
         shape_tensor->set_data_type(onnx::TensorProto::INT64);
         shape_tensor->add_dims(2);
@@ -971,6 +993,7 @@ namespace casadi {
         repeats_node->add_output(repeats_name);
         onnx::AttributeProto* repeats_attr = repeats_node->add_attribute();
         repeats_attr->set_name("value");
+        repeats_attr->set_type(onnx::AttributeProto::TENSOR);
         onnx::TensorProto* repeats_tensor = repeats_attr->mutable_t();
         repeats_tensor->set_data_type(onnx::TensorProto::INT64);
         repeats_tensor->add_dims(ndims);
@@ -1055,6 +1078,7 @@ namespace casadi {
           indices_node->add_output(indices_name);
           onnx::AttributeProto* indices_attr = indices_node->add_attribute();
           indices_attr->set_name("value");
+          indices_attr->set_type(onnx::AttributeProto::TENSOR);
           onnx::TensorProto* indices_tensor = indices_attr->mutable_t();
           indices_tensor->set_data_type(onnx::TensorProto::INT64);
 
@@ -1095,6 +1119,7 @@ namespace casadi {
             starts_node->add_output(starts_name);
             onnx::AttributeProto* starts_attr = starts_node->add_attribute();
             starts_attr->set_name("value");
+            starts_attr->set_type(onnx::AttributeProto::TENSOR);
             onnx::TensorProto* starts_tensor = starts_attr->mutable_t();
             starts_tensor->set_data_type(onnx::TensorProto::INT64);
             starts_tensor->add_dims(1);
@@ -1107,6 +1132,7 @@ namespace casadi {
             ends_node->add_output(ends_name);
             onnx::AttributeProto* ends_attr = ends_node->add_attribute();
             ends_attr->set_name("value");
+            ends_attr->set_type(onnx::AttributeProto::TENSOR);
             onnx::TensorProto* ends_tensor = ends_attr->mutable_t();
             ends_tensor->set_data_type(onnx::TensorProto::INT64);
             ends_tensor->add_dims(1);
@@ -1119,6 +1145,7 @@ namespace casadi {
             axes_node->add_output(axes_name);
             onnx::AttributeProto* axes_attr = axes_node->add_attribute();
             axes_attr->set_name("value");
+            axes_attr->set_type(onnx::AttributeProto::TENSOR);
             onnx::TensorProto* axes_tensor = axes_attr->mutable_t();
             axes_tensor->set_data_type(onnx::TensorProto::INT64);
             axes_tensor->add_dims(1);
@@ -1149,6 +1176,7 @@ namespace casadi {
             indices_node->add_output(indices_name);
             onnx::AttributeProto* indices_attr = indices_node->add_attribute();
             indices_attr->set_name("value");
+            indices_attr->set_type(onnx::AttributeProto::TENSOR);
             onnx::TensorProto* indices_tensor = indices_attr->mutable_t();
             indices_tensor->set_data_type(onnx::TensorProto::INT64);
             indices_tensor->add_dims(indices.size());
@@ -1199,6 +1227,7 @@ namespace casadi {
           indices_node->add_output(indices_name);
           onnx::AttributeProto* indices_attr = indices_node->add_attribute();
           indices_attr->set_name("value");
+          indices_attr->set_type(onnx::AttributeProto::TENSOR);
           onnx::TensorProto* indices_tensor = indices_attr->mutable_t();
           indices_tensor->set_data_type(onnx::TensorProto::INT64);
           indices_tensor->add_dims(indices.size());

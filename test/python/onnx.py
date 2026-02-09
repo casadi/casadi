@@ -56,10 +56,6 @@ SKIP_ONNXRUNTIME = {
     'unary_acosh': "No float64 support",
     'unary_atanh': "No float64 support",
     'unary_erf': "No float64 support",
-    # FunctionProto missing opset imports
-    'function_hierarchy_simple': "FunctionProto needs opset imports",
-    'function_hierarchy_multiple_calls': "FunctionProto needs opset imports",
-    'function_hierarchy_deep': "FunctionProto needs opset imports",
     # Other
     'empty_function': "Shape mismatch in ONNX Runtime",
     'vertcat_input': "INT64 constants not supported in ONNX Runtime",

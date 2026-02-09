@@ -345,6 +345,16 @@ namespace casadi {
     func->set_name(f.name());
     func->set_domain(domain);
 
+    // Add opset imports for the function (required by ONNX Runtime)
+    // Default ONNX opset
+    onnx::OperatorSetIdProto* opset = func->add_opset_import();
+    opset->set_domain("");  // Empty string = default ONNX domain
+    opset->set_version(13);
+    // CasADi domain for nested function calls
+    onnx::OperatorSetIdProto* casadi_opset = func->add_opset_import();
+    casadi_opset->set_domain("casadi");
+    casadi_opset->set_version(1);
+
     if (verbose_) {
       uout() << "  Converting Function '" << f.name() << "' to ONNX FunctionProto"
              << " (domain: " << domain << ")" << std::endl;
