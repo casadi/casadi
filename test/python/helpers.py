@@ -319,6 +319,23 @@ class casadiTestCase(unittest.TestCase):
       name - a descriptor that will be included in error messages
 
       """
+      
+      if isinstance(zr,DM) and isinstance(zt,DM):
+        self.assertEqual(zr.shape, zt.shape)
+        if zr.is_regular() and zt.is_regular() and zr.numel()>10:
+          sp = zr.sparsity() + zt.sparsity()
+          zr_nz = project(zr, sp).nz[:]
+          zt_nz = project(zt, sp).nz[:]
+          if zr_nz.numel() == 0:
+            return
+          diff_nz = fabs(zr_nz - zt_nz)
+          mag_nz = fmax(fabs(zr_nz), fabs(zt_nz))
+          scale_nz = if_else(mag_nz > 1e3, 10**floor(log10(mag_nz)), 1.0)
+          self.assertTrue(norm_inf(diff_nz / scale_nz) < 0.5 * 10**(-digits))
+          return
+        
+      
+      
       if isinstance(zr,tuple):
         zr=array([list(zr)])
       if isinstance(zt,tuple):
