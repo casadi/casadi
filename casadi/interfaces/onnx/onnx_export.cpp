@@ -136,6 +136,10 @@ namespace casadi {
     // Track segment values for multi-segment outputs: output_idx -> (offset -> onnx_name)
     std::map<casadi_int, std::map<casadi_int, std::string>> output_segment_values;
 
+    // Track segment shapes to determine concat axis
+    // output_idx -> (offset -> (rows, cols))
+    std::map<casadi_int, std::map<casadi_int, std::pair<casadi_int, casadi_int>>> output_segment_shapes;
+
     for (casadi_int k = 0; k < n_instr; ++k) {
       casadi_int op = f.instruction_id(k);
       std::vector<casadi_int> o = f.instruction_output(k);
@@ -166,6 +170,10 @@ namespace casadi {
           id_node->add_input(input_onnx_name);
           id_node->add_output(seg_name);
           output_segment_values[output_idx][offset] = seg_name;
+          // Record segment shape for axis determination
+          MX dep = mx.dep(0);
+          output_segment_shapes[output_idx][offset] =
+              std::make_pair(dep.size1(), dep.size2());
         } else {
           // Single-segment output: write directly to output name
           onnx::NodeProto* id_node = graph->add_node();
@@ -249,7 +257,7 @@ namespace casadi {
       }
     }
 
-    // Create Concat nodes for multi-segment outputs (vertcat outputs)
+    // Create Concat nodes for multi-segment outputs (vertcat/horzcat outputs)
     for (const auto& kv : output_segment_values) {
       casadi_int output_idx = kv.first;
       const auto& segments = kv.second;  // map<offset, onnx_name>, already sorted by offset
@@ -257,6 +265,25 @@ namespace casadi {
       std::string output_name = f.name_out(output_idx);
       if (output_name.empty()) {
         output_name = "output_" + std::to_string(output_idx);
+      }
+
+      // Determine concat axis from segment shapes
+      // If all segments have the same number of rows -> horzcat (axis=1)
+      // Otherwise -> vertcat (axis=0)
+      casadi_int concat_axis = 0;
+      const auto& shapes = output_segment_shapes[output_idx];
+      if (shapes.size() >= 2) {
+        bool same_rows = true;
+        casadi_int first_rows = shapes.begin()->second.first;
+        for (const auto& sp : shapes) {
+          if (sp.second.first != first_rows) {
+            same_rows = false;
+            break;
+          }
+        }
+        if (same_rows && first_rows > 1) {
+          concat_axis = 1;  // horzcat
+        }
       }
 
       // Create Concat node to combine segments
@@ -270,11 +297,10 @@ namespace casadi {
 
       concat_node->add_output(output_name);
 
-      // Set axis=0 for vertical concatenation
       onnx::AttributeProto* axis_attr = concat_node->add_attribute();
       axis_attr->set_name("axis");
       axis_attr->set_type(onnx::AttributeProto::INT);
-      axis_attr->set_i(0);
+      axis_attr->set_i(concat_axis);
     }
 
     // Add graph outputs (for main graph, use empty prefix to use function's output names)

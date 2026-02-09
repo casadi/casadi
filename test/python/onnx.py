@@ -472,10 +472,138 @@ def _register_mx_ops_tests():
     )
 
 
+def _register_tensor_op_tests():
+    """Register tests for tensor operations (split, concat, slice, reduce)"""
+
+    # ======= HorzSplit tests =======
+    # Split a 2x6 matrix into three 2x2 parts, use them
+    x_hs = MX.sym("x", 2, 6)
+    parts = horzsplit(x_hs, [0, 2, 4, 6])
+    Onnxtests.add_test(
+        "horzsplit_equal",
+        Function("horzsplit_eq", [x_hs], [parts[0] + parts[1] + parts[2]]),
+        [DM([[1, 2, 10, 20, 100, 200], [3, 4, 30, 40, 300, 400]])],
+        doc="Test horzsplit with equal-size splits"
+    )
+
+    # Unequal split: 3x5 -> 3x2 and 3x3
+    x_hs2 = MX.sym("x", 3, 5)
+    parts2 = horzsplit(x_hs2, [0, 2, 5])
+    Onnxtests.add_test(
+        "horzsplit_unequal",
+        Function("horzsplit_uneq", [x_hs2], [parts2[0], parts2[1]]),
+        [DM([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]])],
+        doc="Test horzsplit with unequal splits"
+    )
+
+    # ======= VertSplit tests =======
+    # Split a 6x2 matrix into three 2x2 parts
+    x_vs = MX.sym("x", 6, 2)
+    vparts = vertsplit(x_vs, [0, 2, 4, 6])
+    Onnxtests.add_test(
+        "vertsplit_equal",
+        Function("vertsplit_eq", [x_vs], [vparts[0] + vparts[1] + vparts[2]]),
+        [DM([[1, 2], [3, 4], [10, 20], [30, 40], [100, 200], [300, 400]])],
+        doc="Test vertsplit with equal-size splits"
+    )
+
+    # Unequal split: 5x2 -> 2x2 and 3x2
+    x_vs2 = MX.sym("x", 5, 2)
+    vparts2 = vertsplit(x_vs2, [0, 2, 5])
+    Onnxtests.add_test(
+        "vertsplit_unequal",
+        Function("vertsplit_uneq", [x_vs2], [vparts2[0], vparts2[1]]),
+        [DM([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])],
+        doc="Test vertsplit with unequal splits"
+    )
+
+    # ======= Concat tests =======
+    # Horizontal concat: two 2x2 -> 2x4
+    a_hc = MX.sym("a", 2, 2)
+    b_hc = MX.sym("b", 2, 3)
+    Onnxtests.add_test(
+        "horzcat_2x2_2x3",
+        Function("horzcat_test", [a_hc, b_hc], [horzcat(a_hc, b_hc)]),
+        [(DM([[1, 2], [3, 4]]), DM([[5, 6, 7], [8, 9, 10]]))],
+        doc="Test horizontal concatenation"
+    )
+
+    # Vertical concat: 2x3 and 3x3 -> 5x3
+    a_vc = MX.sym("a", 2, 3)
+    b_vc = MX.sym("b", 3, 3)
+    Onnxtests.add_test(
+        "vertcat_2x3_3x3",
+        Function("vertcat_test", [a_vc, b_vc], [vertcat(a_vc, b_vc)]),
+        [(DM([[1, 2, 3], [4, 5, 6]]), DM([[7, 8, 9], [10, 11, 12], [13, 14, 15]]))],
+        doc="Test vertical concatenation"
+    )
+
+    # ======= Slice tests =======
+    # 2D slice: extract submatrix
+    x_sl = MX.sym("x", 4, 4)
+    Onnxtests.add_test(
+        "slice_2d",
+        Function("slice_2d", [x_sl], [x_sl[1:3, 0:2]]),
+        [DM([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]])],
+        doc="Test 2D slice x[1:3, 0:2]"
+    )
+
+    # Row slice
+    x_rs = MX.sym("x", 4, 3)
+    Onnxtests.add_test(
+        "slice_rows",
+        Function("slice_rows", [x_rs], [x_rs[1:3, :]]),
+        [DM([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])],
+        doc="Test row slice x[1:3, :]"
+    )
+
+    # ======= ReduceMin/ReduceMax tests =======
+    x_rd = MX.sym("x", 3, 2)
+    Onnxtests.add_test(
+        "reduce_min",
+        Function("reduce_min", [x_rd], [mmin(x_rd)]),
+        [DM([[5, 2], [1, 8], [3, 4]])],
+        doc="Test mmin (ReduceMin) operation"
+    )
+
+    Onnxtests.add_test(
+        "reduce_max",
+        Function("reduce_max", [x_rd], [mmax(x_rd)]),
+        [DM([[5, 2], [1, 8], [3, 4]])],
+        doc="Test mmax (ReduceMax) operation"
+    )
+
+    # ======= Reciprocal test =======
+    x_inv = MX.sym("x", 2, 2)
+    Onnxtests.add_test(
+        "reciprocal",
+        Function("reciprocal", [x_inv], [1.0 / x_inv]),
+        [DM([[1, 2], [4, 5]])],
+        doc="Test reciprocal (1/x) operation"
+    )
+
+    # ======= Norm tests =======
+    x_n = MX.sym("x", 3, 1)
+    Onnxtests.add_test(
+        "norm_1",
+        Function("norm_1", [x_n], [norm_1(x_n)]),
+        [DM([1, -2, 3])],
+        doc="Test L1 norm (ReduceL1) operation"
+    )
+
+    Onnxtests.add_test(
+        "norm_2",
+        Function("norm_2", [x_n], [norm_2(x_n)]),
+        [DM([3, 4, 0])],
+        doc="Test L2 norm (ReduceL2) operation"
+    )
+
+
 # Register all tests
 _register_op_tests()
 _register_complex_tests()
 _register_mx_ops_tests()
+_register_tensor_op_tests()
 
 
 if __name__ == '__main__':

@@ -99,12 +99,29 @@ namespace casadi {
       output = if_else(node_inputs[0] < node_inputs[1], MX(1.0), MX(0.0));
 
     } else if (op_type == "ReduceSum") {
-      // ReduceSum - sum all elements (used in dot product decomposition)
+      // ReduceSum - sum all elements
       casadi_assert(node_inputs.size() >= 1, "ReduceSum requires 1 input");
-      MX x = node_inputs[0];
-      // Sum all elements - this gives dot(x.flatten(), ones(x.numel()))
-      // Use sum1 + sum2 to sum over both dimensions
-      output = sum1(sum2(x));
+      output = sum1(sum2(node_inputs[0]));
+
+    } else if (op_type == "ReduceMin") {
+      casadi_assert(node_inputs.size() >= 1, "ReduceMin requires 1 input");
+      output = mmin(node_inputs[0]);
+
+    } else if (op_type == "ReduceMax") {
+      casadi_assert(node_inputs.size() >= 1, "ReduceMax requires 1 input");
+      output = mmax(node_inputs[0]);
+
+    } else if (op_type == "ReduceL1") {
+      casadi_assert(node_inputs.size() >= 1, "ReduceL1 requires 1 input");
+      output = norm_1(node_inputs[0]);
+
+    } else if (op_type == "ReduceL2") {
+      casadi_assert(node_inputs.size() >= 1, "ReduceL2 requires 1 input");
+      output = norm_2(node_inputs[0]);
+
+    } else if (op_type == "Reciprocal") {
+      casadi_assert(node_inputs.size() >= 1, "Reciprocal requires 1 input");
+      output = 1.0 / node_inputs[0];
 
     // Utilities
     } else if (op_type == "Identity") {
@@ -878,12 +895,13 @@ namespace casadi {
         MX mx_split = f.instruction_MX(k);
         Dict info = mx_split.info();
         std::vector<casadi_int> offset = info["offset"];
+        casadi_int nrows = mx_split.dep(0).size1();
 
-        // Calculate split sizes from offset vector
-        // offset = [0, size1, size1+size2, ...] -> split_sizes = [size1, size2, ...]
+        // Calculate split sizes from NNZ offset vector
+        // Offsets are in NNZ, convert to column counts by dividing by nrows
         std::vector<casadi_int> split_sizes;
         for (casadi_int j = 0; j < offset.size() - 1; ++j) {
-          split_sizes.push_back(offset[j+1] - offset[j]);
+          split_sizes.push_back((offset[j+1] - offset[j]) / nrows);
         }
 
         // Create split sizes constant input (opset 13+ uses input, not attribute)
@@ -920,12 +938,13 @@ namespace casadi {
         MX mx_split = f.instruction_MX(k);
         Dict info = mx_split.info();
         std::vector<casadi_int> offset = info["offset"];
+        casadi_int ncols = mx_split.dep(0).size2();
 
-        // Calculate split sizes from offset vector
-        // offset = [0, size1, size1+size2, ...] -> split_sizes = [size1, size2, ...]
+        // Calculate split sizes from NNZ offset vector
+        // Offsets are in NNZ, convert to row counts by dividing by ncols
         std::vector<casadi_int> split_sizes;
         for (casadi_int j = 0; j < offset.size() - 1; ++j) {
-          split_sizes.push_back(offset[j+1] - offset[j]);
+          split_sizes.push_back((offset[j+1] - offset[j]) / ncols);
         }
 
         // Create split sizes constant input (opset 13+ uses input, not attribute)
@@ -1193,8 +1212,8 @@ namespace casadi {
           }
 
         } else if (info.count("inner")) {
-          // GetNonzerosSlice2: nested slices - complex case
-          // For now, expand to explicit indices
+          // GetNonzerosSlice2: 2D slicing - x[row_start:row_stop, col_start:col_stop]
+          // Inner slice = row range, outer slice = column range (step = nrows)
           Dict inner_info = info["inner"];
           Dict outer_info = info["outer"];
 
@@ -1205,7 +1224,54 @@ namespace casadi {
           casadi_int outer_stop = outer_info["stop"];
           casadi_int outer_step = outer_info["step"];
 
-          // Compute all indices from nested slices
+          // outer_step equals nrows (column-major stride)
+          casadi_int nrows = outer_step;
+          casadi_int row_start = inner_start;
+          casadi_int row_stop = inner_stop;
+          casadi_int col_start = outer_start / nrows;
+          casadi_int col_stop = outer_stop / nrows;
+
+          if (inner_step == 1) {
+            // Use ONNX Slice for clean 2D slicing
+            // Create starts constant
+            std::string starts_name = "starts_" + std::to_string(k);
+            onnx::TensorProto* starts_tensor = create_constant_tensor(
+                add_node, starts_name, onnx::TensorProto::INT64);
+            starts_tensor->add_dims(2);
+            starts_tensor->add_int64_data(row_start);
+            starts_tensor->add_int64_data(col_start);
+
+            // Create ends constant
+            std::string ends_name = "ends_" + std::to_string(k);
+            onnx::TensorProto* ends_tensor = create_constant_tensor(
+                add_node, ends_name, onnx::TensorProto::INT64);
+            ends_tensor->add_dims(2);
+            ends_tensor->add_int64_data(row_stop);
+            ends_tensor->add_int64_data(col_stop);
+
+            // Create axes constant [0, 1]
+            std::string axes_name = "axes_" + std::to_string(k);
+            onnx::TensorProto* axes_tensor = create_constant_tensor(
+                add_node, axes_name, onnx::TensorProto::INT64);
+            axes_tensor->add_dims(2);
+            axes_tensor->add_int64_data(0);
+            axes_tensor->add_int64_data(1);
+
+            // Create Slice node
+            node = add_node();
+            node->set_op_type("Slice");
+            node->add_input(work_to_onnx[i_vec[0]]);
+            node->add_input(starts_name);
+            node->add_input(ends_name);
+            node->add_input(axes_name);
+            node->add_output(node_output);
+
+            work_to_onnx[o_vec[0]] = node_output;
+            return true;
+          }
+
+          // Fallback for non-unit step: expand to explicit indices with Reshape+Gather
+          // Compute all flat indices
           std::vector<casadi_int> indices;
           for (casadi_int o = outer_start; o < outer_stop; o += outer_step) {
             for (casadi_int i = inner_start; i < inner_stop; i += inner_step) {
@@ -1213,32 +1279,59 @@ namespace casadi {
             }
           }
 
+          // Reshape input to flat, Gather, then Reshape back
+          casadi_int out_rows = mx_getnonzeros.size1();
+          casadi_int out_cols = mx_getnonzeros.size2();
+
+          // Create shape [-1] for flattening
+          std::string flat_shape_name = "flat_shape_" + std::to_string(k);
+          onnx::TensorProto* flat_tensor = create_constant_tensor(
+              add_node, flat_shape_name, onnx::TensorProto::INT64);
+          flat_tensor->add_dims(1);
+          flat_tensor->add_int64_data(-1);
+
+          // Reshape to flat
+          std::string flat_name = "flat_" + std::to_string(k);
+          node = add_node();
+          node->set_op_type("Reshape");
+          node->add_input(work_to_onnx[i_vec[0]]);
+          node->add_input(flat_shape_name);
+          node->add_output(flat_name);
+
           // Create indices tensor
           std::string indices_name = "indices_" + std::to_string(k);
-          onnx::NodeProto* indices_node = add_node();
-          indices_node->set_op_type("Constant");
-          indices_node->add_output(indices_name);
-          onnx::AttributeProto* indices_attr = indices_node->add_attribute();
-          indices_attr->set_name("value");
-          indices_attr->set_type(onnx::AttributeProto::TENSOR);
-          onnx::TensorProto* indices_tensor = indices_attr->mutable_t();
-          indices_tensor->set_data_type(onnx::TensorProto::INT64);
+          onnx::TensorProto* indices_tensor = create_constant_tensor(
+              add_node, indices_name, onnx::TensorProto::INT64);
           indices_tensor->add_dims(indices.size());
           for (casadi_int idx : indices) {
             indices_tensor->add_int64_data(idx);
           }
 
-          // Create Gather node
+          // Gather from flat
+          std::string gathered_name = "gathered_" + std::to_string(k);
           node = add_node();
           node->set_op_type("Gather");
-          node->add_input(work_to_onnx[i_vec[0]]);
+          node->add_input(flat_name);
           node->add_input(indices_name);
-          node->add_output(node_output);
-
+          node->add_output(gathered_name);
           onnx::AttributeProto* axis_attr = node->add_attribute();
           axis_attr->set_name("axis");
           axis_attr->set_type(onnx::AttributeProto::INT);
           axis_attr->set_i(0);
+
+          // Reshape to output shape
+          std::string out_shape_name = "out_shape_" + std::to_string(k);
+          onnx::TensorProto* out_shape_tensor = create_constant_tensor(
+              add_node, out_shape_name, onnx::TensorProto::INT64);
+          out_shape_tensor->add_dims(2);
+          out_shape_tensor->add_int64_data(out_rows);
+          out_shape_tensor->add_int64_data(out_cols);
+
+          node = add_node();
+          node->set_op_type("Reshape");
+          node->add_input(gathered_name);
+          node->add_input(out_shape_name);
+          node->add_output(node_output);
 
           work_to_onnx[o_vec[0]] = node_output;
           return true;
