@@ -988,6 +988,55 @@ namespace casadi {
         return true;
       }
 
+      case OP_HORZREPSUM: {
+        // Horizontal repetition sum: repsum(x, 1, n)
+        // Inverse of repmat - splits input into n parts and sums them
+        // Input: [rows, cols*n], Output: [rows, cols]
+        MX mx_repsum = f.instruction_MX(k);
+
+        // Calculate n from dimensions: input_cols / output_cols
+        casadi_int input_cols = mx_repsum.dep(0).size2();
+        casadi_int output_cols = mx_repsum.size2();
+        casadi_int n = input_cols / output_cols;
+
+        // Implementation: Split into n parts, then sum them
+        // Step 1: Create Split node
+        std::string split_prefix = "split_" + std::to_string(k) + "_";
+        node = add_node();
+        node->set_op_type("Split");
+        node->add_input(work_to_onnx[i_vec[0]]);
+
+        // Set axis=1 for horizontal split
+        onnx::AttributeProto* axis_attr = node->add_attribute();
+        axis_attr->set_name("axis");
+        axis_attr->set_i(1);
+
+        // Set num_outputs attribute
+        onnx::AttributeProto* num_outputs_attr = node->add_attribute();
+        num_outputs_attr->set_name("num_outputs");
+        num_outputs_attr->set_i(n);
+
+        // Create output names for split
+        std::vector<std::string> split_outputs;
+        for (casadi_int i = 0; i < n; ++i) {
+          std::string out_name = split_prefix + std::to_string(i);
+          node->add_output(out_name);
+          split_outputs.push_back(out_name);
+        }
+
+        // Step 2: Sum all split parts using chain of Add operations
+        std::string current_sum = split_outputs[0];
+        for (casadi_int i = 1; i < n; ++i) {
+          std::string sum_name = (i == n - 1) ? node_output :
+                                  "sum_" + std::to_string(k) + "_" + std::to_string(i);
+          create_binary_node(add_node, "Add", current_sum, split_outputs[i], sum_name);
+          current_sum = sum_name;
+        }
+
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+      }
+
       case OP_GETNONZEROS: {
         // Get nonzeros - used for indexing operations like x[indices]
         // Export as ONNX Gather operation
