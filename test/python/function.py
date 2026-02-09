@@ -35,6 +35,8 @@ import glob
 import gc
 import tempfile
 
+import random as random_base
+
 scipy_interpolate = False
 try:
   import scipy.interpolate
@@ -4054,108 +4056,190 @@ class Functiontests(casadiTestCase):
   @memory_heavy()
   @requiresPlugin(Importer,"shell")
   def test_blazing_spline(self):
-    for N in [1,2,3]:
-      
-        def knots_expand(k):
-            return [k[0]]*3 + k + [k[-1]]*3
-      
-        knots0 = [0,0.2,0.5,0.8,1]
-        knots1 = [0,0.1,0.5,0.9,1]
-        knots2 = [0,0.4,1]
-        
-        x0 = [0.4,0.5,0.6][:N]
-        
-        knots_orig = [knots0, knots1, knots2][:N]
-        knots = [knots_expand(e) for e in knots_orig][:N]
-        
-        
-        x=MX.sym("x",N)
-        
-        nc = np.prod([len(k)-4 for k in knots])
-        DM.rng(1)
-        data = DM.rand(nc)
-        C = MX.sym("C",nc,1)
-        Y = bspline(x,C,knots,[3]*N,1)
-        F_ref = Function('f',[x,C],[Y])
-        
-        print(Y)
-        
-        F_ref2 = Function('f',[x,C],[Y,jacobian(Y,x)])
-        
-        F_ref2([0]*N,data)
-        
-        print(knots)
-        
-        
-        if os.name=='nt':
-            F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
-        else:
-            F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
-        
-        def test_points(knots):
-            import itertools
-            selector = [lambda e: e[0]-0.1,lambda e: e[0],lambda e: (e[0]+e[1])/2,lambda e: e[-1],lambda e: e[-1]+0.1]
-            for s in itertools.product(selector,repeat=len(knots)):
-                yield [e(k) for e,k in zip(s,knots_orig)]
+    for N in [1,2,3,4,5]:
+      for precompute_coeff in [False, True]:
+        for precompute_grid in [False, True]:
+          if precompute_coeff and N>3: continue
+          for parametric_grid in [False, True]:
+            if parametric_grid and precompute_coeff and N>3: continue
 
-        for a in test_points(knots):
-            self.checkfunction_light(F,F_ref,inputs=[vcat(a),data])
-            self.check_serialize(F,inputs=[vcat(a),data])
-       
-        y = sin(F(x,C))
-        
-        f = Function('f',[x,C],[y,jacobian(y,x),gradient(y,x)]+list(hessian(y,x)))
-        fcse = Function('fcse',[x,C],[y,jacobian(y,x),gradient(y,x)]+list(hessian(y,x)),{"cse":True})
-        
-        with capture_stdout() as result:
-            fcse.disp(True)
-            
-        self.assertEqual(result[0].count(" F_der_der("),1)
-        self.assertEqual(result[0].count(" F_der("),0)
-        self.assertEqual(result[0].count(" F("),0)
-        self.checkfunction_light(f,fcse,inputs=[vcat(x0),data])
-        f = Function('f',[x,C],[y,jacobian(y,x),gradient(y,x)])
-        fcse = Function('fcse',[x,C],[y,jacobian(y,x),gradient(y,x)],{"cse":True})
-        
-        with capture_stdout() as result:
-            fcse.disp(True)
-        self.assertEqual(result[0].count(" F_der_der("),0)
-        self.assertEqual(result[0].count(" F_der("),1)
-        self.assertEqual(result[0].count(" F("),0)
-        fcse.disp(True)
-        self.checkfunction_light(f,fcse,inputs=[vcat(x0),data])
-        
+            def knots_expand(k):
+                return [k[0]]*3 + k + [k[-1]]*3
+  
+            knots0 = [0,0.2,0.5,0.8,1]
+            knots1 = [0,0.1,0.5,0.9,1]
+            knots2 = [0,0.4,1]
+            knots3 = [0,0.3,1]
+            knots4 = [0,0.2,1]
+            x0 = [0.4,0.5,0.6,0.7,0.8][:N]
+  
+            knots_orig = [knots0, knots1, knots2, knots3, knots4][:N]
+            knots = [knots_expand(e) for e in knots_orig][:N]
+  
+  
+            x=MX.sym("x",N)
+  
+            nc = np.prod([len(k)-4 for k in knots])
+            DM.rng(1)
+            data = DM.rand(nc)
+            C = MX.sym("C",nc,1)
+            Y = bspline(x,C,knots,[3]*N,1)
+            F_ref = Function('f',[x,C],[Y])
+  
+            if parametric_grid:
+              knot_dims = [len(k) for k in knots]
+              if os.name=='nt':
+                  F = blazing_spline("F",knot_dims,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
+              else:
+                  F = blazing_spline("F",knot_dims,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
+  
+              # Stacked knots vector for substitution
+              knots_stacked = []
+              for k in knots:
+                  knots_stacked.extend(k)
+              knots_data = DM(knots_stacked)
+              K = MX.sym("K",len(knots_stacked))
+  
+              # Wrap: substitute fixed knots into parametric F to get (x,C)->f
+              F_call = F(x, C, K)
+              F_sub = substitute([F_call[0]], [K], [knots_data])
+              F_test = Function('F_test',[x, C], F_sub)
+            else:
+              F_ref2 = Function('f',[x,C],[Y,jacobian(Y,x)])
+              F_ref2([0]*N,data)
+              print(knots)
+  
+              if os.name=='nt':
+                  F = blazing_spline("F",knots,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
+              else:
+                  F = blazing_spline("F",knots,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
+              F_test = Function('F_test',[x, C], [F(x, C)[0]])
+  
+            def test_points(knots):
+                import itertools
+                selector = [lambda e: e[0]-0.1,lambda e: e[0],lambda e: (e[0]+e[1])/2,lambda e: e[-1],lambda e: e[-1]+0.1]
+                for s in itertools.product(selector,repeat=len(knots)):
+                    yield [e(k) for e,k in zip(s,knots_orig)]
+  
+            all_points = list(test_points(knots))
+  
+            if N>3:
+                random_base.seed(1)
+                all_points = random_base.sample(all_points,125)
+  
+            for a in all_points:
+                self.checkfunction_light(F_test,F_ref,inputs=[vcat(a),data])
+  
+            if not parametric_grid:
+              F2 = Function.deserialize(F.serialize({"debug":True}))
+              for a in all_points:
+                  self.checkfunction_light(F,F2,inputs=[vcat(a),data])
+  
+            self.check_codegen(F_test,inputs=[vcat(a),data],std="c99")
+  
+            if parametric_grid:
+              y_sin = substitute(sin(F(x,C,K)), K, knots_data)
+            else:
+              y_sin = sin(F(x,C))
+  
+            f = Function('f',[x,C],[y_sin,jacobian(y_sin,x),gradient(y_sin,x)])
+            fcse = Function('fcse',[x,C],[y_sin,jacobian(y_sin,x),gradient(y_sin,x)],{"cse":True})
+            self.checkfunction_light(f,fcse,inputs=[vcat(x0),data])
+  
+            f2 = Function('f',[x,C],[y_sin,jacobian(y_sin,x),gradient(y_sin,x)]+list(hessian(y_sin,x)))
+            fcse2 = Function('fcse',[x,C],[y_sin,jacobian(y_sin,x),gradient(y_sin,x)]+list(hessian(y_sin,x)),{"cse":True})
+            self.checkfunction_light(f2,fcse2,inputs=[vcat(x0),data])
+  
+            with capture_stdout() as result:
+                fcse2.disp(True)
+  
+            self.assertEqual(result[0].count(" F_der_der("),1)
+            self.assertEqual(result[0].count(" F_der("),0)
+            self.assertEqual(result[0].count(" F("),0)
+  
+            with capture_stdout() as result:
+                fcse.disp(True)
+            self.assertEqual(result[0].count(" F_der_der("),0)
+            self.assertEqual(result[0].count(" F_der("),1)
+            self.assertEqual(result[0].count(" F("),0)
+  
+            # extract_parametric: check extractable parameter-only subexpressions
+            if parametric_grid:
+              y_J = jacobian(F(x,C,K)[0], x)
+              _,_,parametric_exprs = extract_parametric(y_J, vertcat(C,K))
+              if precompute_coeff or precompute_grid:
+                # grid: inv depends only on K; coeff: dC depends on C and K
+                self.assertTrue(len(parametric_exprs)>0)
+                self.assertTrue(any(not e.is_zero() for e in parametric_exprs))
+              else:
+                # neither: no parameter-only subexpressions
+                self.assertEqual(len(parametric_exprs), 0)
+            else:
+              y_J = jacobian(F(x,C)[0], x)
+              _,_,parametric_exprs = extract_parametric(y_J, C)
+              if precompute_coeff:
+                # dC = derivative_coeff(C) is a C-only subexpression
+                self.assertTrue(len(parametric_exprs)>0)
+                self.assertTrue(any(not e.is_zero() for e in parametric_exprs))
+              else:
+                # non-parametric grid/none: no parameter-only subexpressions
+                self.assertEqual(len(parametric_exprs), 0)
+  
+            # Jacobian comparison
+            FJ_ref = F_ref.jacobian()
+  
+            if parametric_grid:
+              FJ_param = F.jacobian()
+              adj_f = MX.sym("adj_f", 1, 1)
+              fj_out = FJ_param(x, C, K, adj_f)
+              fj_x = substitute(fj_out[0], K, knots_data)
+              fj_C = substitute(fj_out[1], K, knots_data)
+              FJ_test = Function('FJ_test',[x, C, adj_f],[fj_x, fj_C])
+            else:
+              FJ = F.jacobian()
+              FJ.generate("FJ.c",{"main":True})
+              FJ.generate_in("FJ_in.txt",[vcat(a),data,0])
+              FJ_test = FJ
+  
+            for a in all_points:
+                self.checkfunction_light(FJ_test,FJ_ref,inputs=[vcat(a),data,0])
+  
+            if not parametric_grid:
+              print("ref")
+              F_ref2([0]*N,data)
+  
+              FJ = FJ.jacobian()
+              FJ.generate("FH.c",{"main":True})
+              FJ.generate_in("FH_in.txt",[vcat(x0),data,0,0,0])
+              print(FJ)
+  
+              FJ_ref = FJ_ref.jacobian()
+              import time
+              t0 = time.time()
+              FJ_ref(vcat(a),data,0,0,0)
+              print("FJ_ref" ,time.time()-t0)
+              t0 = time.time()
+              FJ(vcat(a),data,0,0,0)
+              print("FJ" ,time.time()-t0)
+              for a in all_points:
+                  self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0,0,0])
+  
+            if parametric_grid:
+              # Test that changing knots gives different results
+              knots_alt_orig = [[0,0.3,0.6,0.7,1],[0,0.2,0.4,0.8,1],[0,0.5,1],[0,0.4,1],[0,0.3,1]][:N]
+              knots_alt = [knots_expand(e) for e in knots_alt_orig][:N]
+              knots_alt_stacked = []
+              for k in knots_alt:
+                  knots_alt_stacked.extend(k)
+              knots_alt_data = DM(knots_alt_stacked)
+  
+              y_alt = substitute(F(x, C, K)[0], K, knots_alt_data)
+              F_alt = Function('F_alt',[x, C],[y_alt])
+              res1 = F_test(vcat(x0), data)
+              res2 = F_alt(vcat(x0), data)
+              self.assertFalse(np.allclose(float(res1), float(res2)),
+                  "Parametric knots should produce different results with different knot vectors")
 
-
-        FJ = F.jacobian()
-        FJ.generate("FJ.c",{"main":True})
-        FJ.generate_in("FJ_in.txt",[vcat(a),data,0])
-        FJ_ref = F_ref.jacobian()
-        
-        print("ref")
-        F_ref2([0]*N,data)
-        
-        for a in test_points(knots):
-            self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0])
-       
-        FJ = FJ.jacobian()
-        FJ.generate("FH.c",{"main":True})
-        FJ.generate_in("FH_in.txt",[vcat(x0),data,0,0,0])
-        print(FJ)
-
-        FJ_ref = FJ_ref.jacobian()
-        import time
-        t0 = time.time()
-        FJ_ref(vcat(a),data,0,0,0)
-        print("FJ_ref" ,time.time()-t0)
-        t0 = time.time()
-        FJ(vcat(a),data,0,0,0)
-        print("FJ" ,time.time()-t0)
-        for a in test_points(knots):
-            print(vcat(a),data,0,0,0)
-            self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0,0,0])
-            
-            
   def test_noncanonical_sparsity(self):
     x = MX.sym("x",4,4)
     y = MX.sym("y")

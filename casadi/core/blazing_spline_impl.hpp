@@ -34,13 +34,24 @@
 namespace casadi {
   class CASADI_EXPORT BlazingSplineFunction : public FunctionInternal {
   public:
-    /** \brief Constructor
+    /** \brief Constructor (fixed knots)
 
         \identifier{2ac} */
     BlazingSplineFunction(
         const std::string& name,
         const std::vector< std::vector<double> >& knots,
-        casadi_int diff_order);
+        casadi_int diff_order,
+        bool precompute_coeff = true,
+        bool precompute_grid = false);
+
+    /** \brief Constructor (parametric knots) */
+    BlazingSplineFunction(
+        const std::string& name,
+        const std::vector<casadi_int>& knot_dims,
+        casadi_int diff_order,
+        bool precompute_coeff = false,
+        bool precompute_grid = false,
+        bool inv_input = false);
 
     /** \brief Get type name
 
@@ -94,12 +105,30 @@ namespace casadi {
                           const Dict& opts) const override;
     ///@}
 
-    casadi_int diff_order_;
-    std::vector< std::vector<double> > knots_;
+    /** \brief Are knots parametric (provided at runtime)? */
+    bool has_parametric_knots() const { return knots_.empty(); }
 
-    // Derived fiels
+    /** \brief Number of dimensions */
+    casadi_int ndim() const { return knots_offset_.size()-1; }
+
+    /** \brief Index of the knots input (only valid when parametric) */
+    casadi_int arg_knots() const { return 2; }
+
+    /** \brief Index of the inv input (only valid when inv_input_) */
+    casadi_int arg_inv() const { return arg_knots() + 1; }
+
+    casadi_int diff_order_;
+    bool precompute_coeff_ = false;
+    bool precompute_grid_ = false;
+    bool inv_input_ = false;
+    std::vector< std::vector<double> > knots_;
+    std::vector<std::string> lookup_modes_;
+
+    // Derived fields
     std::vector<casadi_int> knots_offset_;
     std::vector<double> knots_stacked_;
+    // Precomputed reciprocal knot spans (3 per knot per dim: inv1, inv2, inv3)
+    std::vector<double> knots_inv_;
 
     // Coefficient tensor size
     casadi_int nc_, ndc_, nddc_;
