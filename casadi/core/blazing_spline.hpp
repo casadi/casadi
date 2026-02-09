@@ -33,13 +33,29 @@ namespace casadi {
    * 
    * Specialized in these ways:
    *  - order 3 is assumed
-   *  - up to dimension 3 supported
+   *  - up to dimension 5 supported
    *  - a single scalar output (m=1)
    *
 
       \identifier{2b9} */
   CASADI_EXPORT Function blazing_spline(const std::string& name,
     const std::vector< std::vector<double> >& knots,
+    const Dict& opts=Dict());
+
+  /** \brief Construct a parametric-knots blazing_spline
+   *
+   * Like blazing_spline, but the knot values are provided as a symbolic input
+   * at evaluation time instead of being fixed at construction time.
+   * Only knot vector *sizes* (per dimension) are needed at construction.
+   *
+   * The resulting Function has inputs (x, C, knots) where knots is the
+   * stacked knot vector. Supports the same precompute_coeff and
+   * precompute_grid options as the fixed-knots variant.
+   *
+
+  */
+  CASADI_EXPORT Function blazing_spline(const std::string& name,
+    const std::vector<casadi_int>& knot_dims,
     const Dict& opts=Dict());
 
 } // namespace casadi
