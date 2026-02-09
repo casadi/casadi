@@ -140,14 +140,25 @@ namespace casadi {
           }
         }
 
-        // Get split sizes if specified
+        // Get split sizes - check second input first (opset 13+), then attribute (opset <13)
         std::vector<casadi_int> split_sizes;
-        for (int a = 0; a < node.attribute_size(); ++a) {
-          if (node.attribute(a).name() == "split") {
-            for (int k = 0; k < node.attribute(a).ints_size(); ++k) {
-              split_sizes.push_back(node.attribute(a).ints(k));
+        if (node_inputs.size() >= 2) {
+          // Opset 13+: split sizes provided as second input tensor (Constant)
+          MX split_mx = node_inputs[1];
+          DM split_dm = DM(split_mx);
+          for (casadi_int k = 0; k < split_dm.nnz(); ++k) {
+            split_sizes.push_back(static_cast<casadi_int>(
+                static_cast<double>(split_dm.nz(k))));
+          }
+        } else {
+          // Opset <13: split sizes as attribute
+          for (int a = 0; a < node.attribute_size(); ++a) {
+            if (node.attribute(a).name() == "split") {
+              for (int k = 0; k < node.attribute(a).ints_size(); ++k) {
+                split_sizes.push_back(node.attribute(a).ints(k));
+              }
+              break;
             }
-            break;
           }
         }
 

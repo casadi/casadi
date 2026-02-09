@@ -571,6 +571,7 @@ namespace casadi {
           // Set axis=0 (gather along first dimension)
           onnx::AttributeProto* axis_attr = node->add_attribute();
           axis_attr->set_name("axis");
+          axis_attr->set_type(onnx::AttributeProto::INT);
           axis_attr->set_i(0);
         } else {
           // Full input access (output size matches input size), use Identity
@@ -849,6 +850,7 @@ namespace casadi {
         // Set axis attribute: axis=1 for horizontal concatenation (columns)
         onnx::AttributeProto* axis_attr = node->add_attribute();
         axis_attr->set_name("axis");
+        axis_attr->set_type(onnx::AttributeProto::INT);
         axis_attr->set_i(1);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
@@ -865,6 +867,7 @@ namespace casadi {
         // Set axis attribute: axis=0 for vertical concatenation (rows)
         onnx::AttributeProto* axis_attr = node->add_attribute();
         axis_attr->set_name("axis");
+        axis_attr->set_type(onnx::AttributeProto::INT);
         axis_attr->set_i(0);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
@@ -876,15 +879,6 @@ namespace casadi {
         Dict info = mx_split.info();
         std::vector<casadi_int> offset = info["offset"];
 
-        node = add_node();
-        node->set_op_type("Split");
-        node->add_input(work_to_onnx[i_vec[0]]);
-
-        // Set axis attribute: axis=1 for horizontal split (columns)
-        onnx::AttributeProto* axis_attr = node->add_attribute();
-        axis_attr->set_name("axis");
-        axis_attr->set_i(1);
-
         // Calculate split sizes from offset vector
         // offset = [0, size1, size1+size2, ...] -> split_sizes = [size1, size2, ...]
         std::vector<casadi_int> split_sizes;
@@ -892,25 +886,25 @@ namespace casadi {
           split_sizes.push_back(offset[j+1] - offset[j]);
         }
 
-        // Add split sizes as attribute if they're not all equal
-        bool all_equal = true;
-        if (!split_sizes.empty()) {
-          casadi_int first_size = split_sizes[0];
-          for (casadi_int sz : split_sizes) {
-            if (sz != first_size) {
-              all_equal = false;
-              break;
-            }
-          }
+        // Create split sizes constant input (opset 13+ uses input, not attribute)
+        std::string split_sizes_name = "split_sizes_" + std::to_string(k);
+        onnx::TensorProto* split_tensor = create_constant_tensor(
+            add_node, split_sizes_name, onnx::TensorProto::INT64);
+        split_tensor->add_dims(split_sizes.size());
+        for (casadi_int sz : split_sizes) {
+          split_tensor->add_int64_data(sz);
         }
 
-        if (!all_equal) {
-          onnx::AttributeProto* split_attr = node->add_attribute();
-          split_attr->set_name("split");
-          for (casadi_int sz : split_sizes) {
-            split_attr->add_ints(sz);
-          }
-        }
+        node = add_node();
+        node->set_op_type("Split");
+        node->add_input(work_to_onnx[i_vec[0]]);
+        node->add_input(split_sizes_name);
+
+        // Set axis attribute: axis=1 for horizontal split (columns)
+        onnx::AttributeProto* axis_attr = node->add_attribute();
+        axis_attr->set_name("axis");
+        axis_attr->set_type(onnx::AttributeProto::INT);
+        axis_attr->set_i(1);
 
         // Add all outputs
         for (casadi_int j = 0; j < o_vec.size(); ++j) {
@@ -927,15 +921,6 @@ namespace casadi {
         Dict info = mx_split.info();
         std::vector<casadi_int> offset = info["offset"];
 
-        node = add_node();
-        node->set_op_type("Split");
-        node->add_input(work_to_onnx[i_vec[0]]);
-
-        // Set axis attribute: axis=0 for vertical split (rows)
-        onnx::AttributeProto* axis_attr = node->add_attribute();
-        axis_attr->set_name("axis");
-        axis_attr->set_i(0);
-
         // Calculate split sizes from offset vector
         // offset = [0, size1, size1+size2, ...] -> split_sizes = [size1, size2, ...]
         std::vector<casadi_int> split_sizes;
@@ -943,25 +928,25 @@ namespace casadi {
           split_sizes.push_back(offset[j+1] - offset[j]);
         }
 
-        // Add split sizes as attribute if they're not all equal
-        bool all_equal = true;
-        if (!split_sizes.empty()) {
-          casadi_int first_size = split_sizes[0];
-          for (casadi_int sz : split_sizes) {
-            if (sz != first_size) {
-              all_equal = false;
-              break;
-            }
-          }
+        // Create split sizes constant input (opset 13+ uses input, not attribute)
+        std::string split_sizes_name = "split_sizes_" + std::to_string(k);
+        onnx::TensorProto* split_tensor = create_constant_tensor(
+            add_node, split_sizes_name, onnx::TensorProto::INT64);
+        split_tensor->add_dims(split_sizes.size());
+        for (casadi_int sz : split_sizes) {
+          split_tensor->add_int64_data(sz);
         }
 
-        if (!all_equal) {
-          onnx::AttributeProto* split_attr = node->add_attribute();
-          split_attr->set_name("split");
-          for (casadi_int sz : split_sizes) {
-            split_attr->add_ints(sz);
-          }
-        }
+        node = add_node();
+        node->set_op_type("Split");
+        node->add_input(work_to_onnx[i_vec[0]]);
+        node->add_input(split_sizes_name);
+
+        // Set axis attribute: axis=0 for vertical split (rows)
+        onnx::AttributeProto* axis_attr = node->add_attribute();
+        axis_attr->set_name("axis");
+        axis_attr->set_type(onnx::AttributeProto::INT);
+        axis_attr->set_i(0);
 
         // Add all outputs
         for (casadi_int j = 0; j < o_vec.size(); ++j) {
@@ -1023,21 +1008,27 @@ namespace casadi {
         casadi_int n = input_cols / output_cols;
 
         // Implementation: Split into n parts, then sum them
-        // Step 1: Create Split node
+        // Step 1: Create split sizes constant (opset 13+ uses input, not attribute)
         std::string split_prefix = "split_" + std::to_string(k) + "_";
+        std::string split_sizes_name = "split_sizes_" + std::to_string(k);
+        onnx::TensorProto* split_tensor = create_constant_tensor(
+            add_node, split_sizes_name, onnx::TensorProto::INT64);
+        split_tensor->add_dims(n);
+        for (casadi_int i = 0; i < n; ++i) {
+          split_tensor->add_int64_data(output_cols);
+        }
+
+        // Step 2: Create Split node
         node = add_node();
         node->set_op_type("Split");
         node->add_input(work_to_onnx[i_vec[0]]);
+        node->add_input(split_sizes_name);
 
         // Set axis=1 for horizontal split
         onnx::AttributeProto* axis_attr = node->add_attribute();
         axis_attr->set_name("axis");
+        axis_attr->set_type(onnx::AttributeProto::INT);
         axis_attr->set_i(1);
-
-        // Set num_outputs attribute
-        onnx::AttributeProto* num_outputs_attr = node->add_attribute();
-        num_outputs_attr->set_name("num_outputs");
-        num_outputs_attr->set_i(n);
 
         // Create output names for split
         std::vector<std::string> split_outputs;
@@ -1098,6 +1089,7 @@ namespace casadi {
           // Set axis=0 (gather along flattened dimension)
           onnx::AttributeProto* axis_attr = node->add_attribute();
           axis_attr->set_name("axis");
+          axis_attr->set_type(onnx::AttributeProto::INT);
           axis_attr->set_i(0);
 
           work_to_onnx[o_vec[0]] = node_output;
@@ -1193,6 +1185,7 @@ namespace casadi {
 
             onnx::AttributeProto* axis_attr = node->add_attribute();
             axis_attr->set_name("axis");
+            axis_attr->set_type(onnx::AttributeProto::INT);
             axis_attr->set_i(0);
 
             work_to_onnx[o_vec[0]] = node_output;
@@ -1244,6 +1237,7 @@ namespace casadi {
 
           onnx::AttributeProto* axis_attr = node->add_attribute();
           axis_attr->set_name("axis");
+          axis_attr->set_type(onnx::AttributeProto::INT);
           axis_attr->set_i(0);
 
           work_to_onnx[o_vec[0]] = node_output;

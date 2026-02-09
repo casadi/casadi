@@ -44,7 +44,7 @@ except ImportError:
 
 # Tests to skip for ONNX Runtime validation (test_name -> reason)
 SKIP_ONNXRUNTIME = {
-    # Float64 not supported in ONNX Runtime
+    # Float64 not supported in ONNX Runtime for these operations
     'unary_cos': "No float64 support",
     'unary_tan': "No float64 support",
     'unary_asin': "No float64 support",
@@ -56,25 +56,8 @@ SKIP_ONNXRUNTIME = {
     'unary_acosh': "No float64 support",
     'unary_atanh': "No float64 support",
     'unary_erf': "No float64 support",
-    # Other
+    # Empty function has shape mismatch
     'empty_function': "Shape mismatch in ONNX Runtime",
-    'vertcat_input': "INT64 constants not supported in ONNX Runtime",
-    # Indexing operations use INT64 constants
-    'index_single_element': "INT64 constants not supported in ONNX Runtime",
-    'index_multiple_elements': "INT64 constants not supported in ONNX Runtime",
-    'index_slice': "INT64 constants not supported in ONNX Runtime",
-    # Dot product uses ReduceSum with axis attributes
-    'dot_product': "ReduceSum axis handling differs in ONNX Runtime",
-    # Matrix operations with 2D shapes
-    'matrix_matmul_2x3_3x2': "Shape inference issues in ONNX Runtime with 2D tensors",
-    'matrix_matmul_3x1_1x3': "Shape inference issues in ONNX Runtime with 2D tensors",
-    # Repmat uses INT64 constants for Tile repeats
-    'repmat_1x3': "INT64 constants not supported in ONNX Runtime",
-    'repmat_1x2': "INT64 constants not supported in ONNX Runtime",
-    # Repsum uses Split which has INT64 issues
-    'repsum_1x3': "Split operation has INT64 issues in ONNX Runtime",
-    # Blockcat - may have shape issues
-    'blockcat_2x2': "Shape inference issues in ONNX Runtime",
 }
 
 # ============================================================================
