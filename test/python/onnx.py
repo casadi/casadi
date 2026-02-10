@@ -58,6 +58,17 @@ SKIP_ONNXRUNTIME = {
     'unary_erf': "No float64 support",
     # Empty function has shape mismatch
     'empty_function': "Shape mismatch in ONNX Runtime",
+    # Boolean/comparison ops: ONNX requires boolean tensor types
+    'logic_not': "ONNX Not requires boolean input",
+    'logic_or': "ONNX Or requires boolean inputs",
+    'logic_and': "ONNX And requires boolean inputs",
+    'ne': "ONNX Equal/Not output boolean, graph declares double",
+    'eq': "ONNX Equal outputs boolean, graph declares double",
+    'le': "ONNX LessOrEqual outputs boolean, graph declares double",
+    'lt': "ONNX Less outputs boolean, graph declares double",
+    # Transpose+MatMul fusion: ONNX Runtime fuses to FusedMatMul which lacks float64 support
+    'bilin': "FusedMatMul optimization lacks float64 support",
+    'rank1': "FusedMatMul optimization lacks float64 support",
 }
 
 # ============================================================================
@@ -599,11 +610,194 @@ def _register_tensor_op_tests():
     )
 
 
+def _register_additional_tests():
+    """Register tests for additional operations (sq, twice, logic, normf, ne, norminf)"""
+
+    # ======= SQ test (x^2) =======
+    x_sq = MX.sym("x", 2, 2)
+    Onnxtests.add_test(
+        "sq",
+        Function("sq_test", [x_sq], [x_sq**2]),
+        [DM([[1, 2], [3, 4]])],
+        doc="Test square operation (x^2)"
+    )
+
+    # ======= TWICE test (2*x) =======
+    x_tw = MX.sym("x", 2, 2)
+    Onnxtests.add_test(
+        "twice",
+        Function("twice_test", [x_tw], [x_tw + x_tw]),
+        [DM([[1, 2], [3, 4]])],
+        doc="Test twice operation (2*x)"
+    )
+
+    # ======= NORMF test (Frobenius norm on matrix) =======
+    x_nf = MX.sym("x", 3, 2)
+    Onnxtests.add_test(
+        "norm_fro",
+        Function("norm_fro_test", [x_nf], [norm_fro(x_nf)]),
+        [DM([[1, 2], [3, 4], [5, 6]])],
+        doc="Test Frobenius norm (ReduceL2) on matrix"
+    )
+
+    # ======= NORMINF test (infinity norm) =======
+    x_ni = MX.sym("x", 3, 1)
+    Onnxtests.add_test(
+        "norm_inf",
+        Function("norm_inf_test", [x_ni], [norm_inf(x_ni)]),
+        [DM([1, -5, 3])],
+        doc="Test infinity norm (max(abs(x))) operation"
+    )
+
+    # ======= NE test (not equal) =======
+    x_ne = MX.sym("x")
+    y_ne = MX.sym("y")
+    Onnxtests.add_test(
+        "ne",
+        Function("ne_test", [x_ne, y_ne], [x_ne != y_ne]),
+        [(DM(1.0), DM(1.0)), (DM(1.0), DM(2.0))],
+        doc="Test not-equal comparison"
+    )
+
+    # ======= Logic NOT test =======
+    x_not = MX.sym("x")
+    Onnxtests.add_test(
+        "logic_not",
+        Function("not_test", [x_not], [logic_not(x_not)]),
+        [DM(0.0), DM(1.0)],
+        doc="Test logical NOT operation"
+    )
+
+    # ======= Logic OR test =======
+    x_or = MX.sym("x")
+    y_or = MX.sym("y")
+    Onnxtests.add_test(
+        "logic_or",
+        Function("or_test", [x_or, y_or], [logic_or(x_or, y_or)]),
+        [(DM(0.0), DM(0.0)), (DM(0.0), DM(1.0)), (DM(1.0), DM(1.0))],
+        doc="Test logical OR operation"
+    )
+
+    # ======= Logic AND test =======
+    x_and = MX.sym("x")
+    y_and = MX.sym("y")
+    Onnxtests.add_test(
+        "logic_and",
+        Function("and_test", [x_and, y_and], [logic_and(x_and, y_and)]),
+        [(DM(0.0), DM(0.0)), (DM(0.0), DM(1.0)), (DM(1.0), DM(1.0))],
+        doc="Test logical AND operation"
+    )
+
+    # ======= FMOD test (modulo) =======
+    x_fm = MX.sym("x", 2, 2)
+    y_fm = MX.sym("y", 2, 2)
+    Onnxtests.add_test(
+        "fmod",
+        Function("fmod_test", [x_fm, y_fm], [fmod(x_fm, y_fm)]),
+        [(DM([[5, 7], [10, 3]]), DM([[3, 4], [3, 2]]))],
+        doc="Test fmod (modulo) operation"
+    )
+
+    # ======= COPYSIGN test =======
+    x_cs = MX.sym("x", 2, 2)
+    y_cs = MX.sym("y", 2, 2)
+    Onnxtests.add_test(
+        "copysign",
+        Function("copysign_test", [x_cs, y_cs], [copysign(x_cs, y_cs)]),
+        [(DM([[5, -3], [-7, 2]]), DM([[-1, 1], [1, -1]]))],
+        doc="Test copysign operation"
+    )
+
+    # ======= EQ test (equal) =======
+    x_eq = MX.sym("x")
+    y_eq = MX.sym("y")
+    Onnxtests.add_test(
+        "eq",
+        Function("eq_test", [x_eq, y_eq], [x_eq == y_eq]),
+        [(DM(1.0), DM(1.0)), (DM(1.0), DM(2.0))],
+        doc="Test equality comparison"
+    )
+
+    # ======= LE test (less or equal) =======
+    x_le = MX.sym("x")
+    y_le = MX.sym("y")
+    Onnxtests.add_test(
+        "le",
+        Function("le_test", [x_le, y_le], [x_le <= y_le]),
+        [(DM(1.0), DM(2.0)), (DM(2.0), DM(2.0)), (DM(3.0), DM(2.0))],
+        doc="Test less-or-equal comparison"
+    )
+
+    # ======= LT test (less than) =======
+    x_lt = MX.sym("x")
+    y_lt = MX.sym("y")
+    Onnxtests.add_test(
+        "lt",
+        Function("lt_test", [x_lt, y_lt], [x_lt < y_lt]),
+        [(DM(1.0), DM(2.0)), (DM(2.0), DM(2.0)), (DM(3.0), DM(2.0))],
+        doc="Test less-than comparison"
+    )
+
+    # ======= FMIN test (element-wise min) =======
+    x_fmin = MX.sym("x", 2, 2)
+    y_fmin = MX.sym("y", 2, 2)
+    Onnxtests.add_test(
+        "fmin",
+        Function("fmin_test", [x_fmin, y_fmin], [fmin(x_fmin, y_fmin)]),
+        [(DM([[1, 5], [3, 2]]), DM([[4, 2], [1, 6]]))],
+        doc="Test element-wise minimum"
+    )
+
+    # ======= FMAX test (element-wise max) =======
+    x_fmax = MX.sym("x", 2, 2)
+    y_fmax = MX.sym("y", 2, 2)
+    Onnxtests.add_test(
+        "fmax",
+        Function("fmax_test", [x_fmax, y_fmax], [fmax(x_fmax, y_fmax)]),
+        [(DM([[1, 5], [3, 2]]), DM([[4, 2], [1, 6]]))],
+        doc="Test element-wise maximum"
+    )
+
+    # ======= Bilinear form test (x' * A * y) =======
+    A_bl = MX.sym("A", 3, 3)
+    x_bl = MX.sym("x", 3, 1)
+    y_bl = MX.sym("y", 3, 1)
+    Onnxtests.add_test(
+        "bilin",
+        Function("bilin_test", [A_bl, x_bl, y_bl], [bilin(A_bl, x_bl, y_bl)]),
+        [(DM([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), DM([1, 2, 3]), DM([1, 0, 1]))],
+        doc="Test bilinear form x'*A*y"
+    )
+
+    # ======= Rank-1 update test (A + alpha * x * y') =======
+    A_r1 = MX.sym("A", 2, 2)
+    alpha_r1 = MX.sym("alpha")
+    x_r1 = MX.sym("x", 2, 1)
+    y_r1 = MX.sym("y", 2, 1)
+    Onnxtests.add_test(
+        "rank1",
+        Function("rank1_test", [A_r1, alpha_r1, x_r1, y_r1], [rank1(A_r1, alpha_r1, x_r1, y_r1)]),
+        [(DM([[1, 2], [3, 4]]), DM(2.0), DM([1, 0]), DM([0, 1]))],
+        doc="Test rank-1 update A + alpha*x*y'"
+    )
+
+    # ======= If-else-zero test (conditional) =======
+    x_ie = MX.sym("x")
+    y_ie = MX.sym("y")
+    Onnxtests.add_test(
+        "if_else_zero",
+        Function("ifez_test", [x_ie, y_ie], [if_else(x_ie > 0, y_ie, 0)]),
+        [(DM(1.0), DM(5.0)), (DM(-1.0), DM(5.0)), (DM(0.0), DM(3.0))],
+        doc="Test if_else_zero conditional operation"
+    )
+
+
 # Register all tests
 _register_op_tests()
 _register_complex_tests()
 _register_mx_ops_tests()
 _register_tensor_op_tests()
+_register_additional_tests()
 
 
 if __name__ == '__main__':

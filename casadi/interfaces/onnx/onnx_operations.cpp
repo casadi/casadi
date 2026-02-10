@@ -98,6 +98,28 @@ namespace casadi {
       // Use CasADi's if_else: if (a < b) then 1.0 else 0.0
       output = if_else(node_inputs[0] < node_inputs[1], MX(1.0), MX(0.0));
 
+    } else if (op_type == "Equal") {
+      casadi_assert(node_inputs.size() >= 2, "Equal requires 2 inputs");
+      // Equal: returns 1.0 if equal, 0.0 otherwise
+      // Implement as NOT(NE(a, b)) since CasADi has ne() but no direct eq()
+      output = !ne(node_inputs[0], node_inputs[1]);
+
+    } else if (op_type == "LessOrEqual") {
+      casadi_assert(node_inputs.size() >= 2, "LessOrEqual requires 2 inputs");
+      output = if_else(node_inputs[0] <= node_inputs[1], MX(1.0), MX(0.0));
+
+    } else if (op_type == "Min") {
+      casadi_assert(node_inputs.size() >= 2, "Min requires 2 inputs");
+      output = fmin(node_inputs[0], node_inputs[1]);
+
+    } else if (op_type == "Max") {
+      casadi_assert(node_inputs.size() >= 2, "Max requires 2 inputs");
+      output = fmax(node_inputs[0], node_inputs[1]);
+
+    } else if (op_type == "Mod") {
+      casadi_assert(node_inputs.size() >= 2, "Mod requires 2 inputs");
+      output = fmod(node_inputs[0], node_inputs[1]);
+
     } else if (op_type == "ReduceSum") {
       // ReduceSum - sum all elements
       casadi_assert(node_inputs.size() >= 1, "ReduceSum requires 1 input");
@@ -117,11 +139,16 @@ namespace casadi {
 
     } else if (op_type == "ReduceL2") {
       casadi_assert(node_inputs.size() >= 1, "ReduceL2 requires 1 input");
-      output = norm_2(node_inputs[0]);
+      output = norm_fro(node_inputs[0]);
 
     } else if (op_type == "Reciprocal") {
       casadi_assert(node_inputs.size() >= 1, "Reciprocal requires 1 input");
       output = 1.0 / node_inputs[0];
+
+    } else if (op_type == "Where") {
+      // Where(condition, x, y): returns x where condition is true, y otherwise
+      casadi_assert(node_inputs.size() >= 3, "Where requires 3 inputs");
+      output = if_else(node_inputs[0], node_inputs[1], node_inputs[2]);
 
     // Utilities
     } else if (op_type == "Identity") {
@@ -425,8 +452,8 @@ namespace casadi {
     {OP_NOT, "Not", 1},
     {OP_TRANSPOSE, "Transpose", 1},
     {OP_NORM1, "ReduceL1", 1},
+    {OP_NORMF, "ReduceL2", 1},  // NORMF first: import uses norm_fro (works for vectors and matrices)
     {OP_NORM2, "ReduceL2", 1},
-    {OP_NORMF, "ReduceL2", 1},
     {OP_MMIN, "ReduceMin", 1},
     {OP_MMAX, "ReduceMax", 1},
     // Binary operations
@@ -742,6 +769,57 @@ namespace casadi {
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
+      case OP_LT:
+        create_binary_node(add_node, "Less", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+
+      case OP_LE:
+        create_binary_node(add_node, "LessOrEqual", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+
+      case OP_EQ:
+        create_binary_node(add_node, "Equal", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+
+      case OP_FMIN:
+        create_binary_node(add_node, "Min", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+
+      case OP_FMOD: {
+        node = add_node();
+        node->set_op_type("Mod");
+        node->add_input(work_to_onnx[i_vec[0]]);
+        node->add_input(work_to_onnx[i_vec[1]]);
+        node->add_output(node_output);
+        // fmod=1 required for floating point types
+        onnx::AttributeProto* fmod_attr = node->add_attribute();
+        fmod_attr->set_name("fmod");
+        fmod_attr->set_i(1);
+        fmod_attr->set_type(onnx::AttributeProto::INT);
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+      }
+
+      case OP_COPYSIGN: {
+        // copysign(x, y) = sign(y) * abs(x)
+        std::string sign_result = "sign_" + std::to_string(k);
+        std::string abs_result = "abs_" + std::to_string(k);
+        create_unary_node(add_node, "Sign", work_to_onnx[i_vec[1]], sign_result);
+        create_unary_node(add_node, "Abs", work_to_onnx[i_vec[0]], abs_result);
+        create_binary_node(add_node, "Mul", sign_result, abs_result, node_output);
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+      }
+
+      case OP_FMAX:
+        create_binary_node(add_node, "Max", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+
       case OP_NE: {
         // Not equal: implemented as Not(Equal(...))
         std::string equal_result = "equal_" + std::to_string(k);
@@ -806,15 +884,15 @@ namespace casadi {
 
       case OP_RANK1: {
         // Rank-1 update: input[0] + input[1] * input[2] * input[3].'
-        // Chain: Transpose(input[3]) -> MatMul(input[2], result) -> MatMul(input[1], result) -> Add(input[0], result)
+        // input[1] is scalar alpha, use element-wise Mul (not MatMul) for scalar multiplication
         std::string transpose_result = "transpose_" + std::to_string(k);
         std::string matmul1_result = "matmul1_" + std::to_string(k);
-        std::string matmul2_result = "matmul2_" + std::to_string(k);
+        std::string mul_result = "mul_" + std::to_string(k);
 
         create_unary_node(add_node, "Transpose", work_to_onnx[i_vec[3]], transpose_result);
         create_binary_node(add_node, "MatMul", work_to_onnx[i_vec[2]], transpose_result, matmul1_result);
-        create_binary_node(add_node, "MatMul", work_to_onnx[i_vec[1]], matmul1_result, matmul2_result);
-        create_binary_node(add_node, "Add", work_to_onnx[i_vec[0]], matmul2_result, node_output);
+        create_binary_node(add_node, "Mul", work_to_onnx[i_vec[1]], matmul1_result, mul_result);
+        create_binary_node(add_node, "Add", work_to_onnx[i_vec[0]], mul_result, node_output);
 
         work_to_onnx[o_vec[0]] = node_output;
         return true;
