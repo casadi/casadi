@@ -349,6 +349,7 @@ class Threadstests(casadiTestCase):
     
     [raw_solver.stats(i+1)["t_wall_nlp_jac_g"] for i in range(n_thread)]
 
+  @requires_nlpsol("ipopt")
   def test_threadsafe_symbolics(self):
   
     if "CASADI_WITH_THREADSAFE_SYMBOLICS" not in CasadiMeta.compiler_flags(): return

@@ -70,8 +70,21 @@ class SerializeTests(casadiTestCase):
             continue
           if "DeSerialization of Rootfinder failed" in str(e):
             continue
-          else:
-             raise Exception(str(e))
+          
+          msg = str(e)
+          skip = False
+          for token in msg.split():
+            if token.startswith("libcasadi_"):
+              parts = token.strip("'\"").split("_", 2)
+              if len(parts) == 3:
+                kind, plugin = parts[1], parts[2]
+                checker = globals().get("has_" + kind)
+                if checker and not checker(plugin):
+                  skip = True
+                  break
+          if skip:
+            continue
+          raise Exception(msg)
 
       key = fun.split(".")[0]
       for in_name,out_name in zip(sorted(inputs[key]),sorted(outputs[key])):

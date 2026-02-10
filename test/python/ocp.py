@@ -282,6 +282,7 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[1],0,8,"Constraint is supposed to be unactive")
 
   @requires_nlpsol("fatrop")
+  @requires_nlpsol("ipopt")
   def test_fatrop(self):
   
   
