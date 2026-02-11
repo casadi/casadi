@@ -1038,13 +1038,27 @@ namespace casadi {
 
     if (sz_zeros_) {
       std::vector<double> sz_zeros(sz_zeros_, 0);
-      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros));
+      if (this->cuda_) {
+        s << array("static CUDA_DEV const casadi_real",
+                   "casadi_zeros",
+                   sz_zeros.size(),
+                   initializer(sz_zeros));
+      } else {
+        print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros));
+      }
       s << std::endl;
     }
 
     if (sz_ones_) {
       std::vector<double> sz_ones(sz_ones_, 0);
-      print_vector(s, "casadi_ones", std::vector<double>(sz_ones));
+      if (this->cuda_) {
+        s << array("static CUDA_DEV const casadi_real",
+                   "casadi_ones",
+                   sz_ones.size(),
+                   initializer(sz_ones));
+      } else {
+        print_vector(s, "casadi_ones", std::vector<double>(sz_ones));
+      }
       s << std::endl;
     }
 
