@@ -1419,6 +1419,36 @@ namespace casadi {
         return false;
       }
 
+      case OP_ATAN2: {
+        // atan2(y, x) = atan(y/x) + correction for x<0, with origin→0
+        std::string y = work_to_onnx[i_vec[0]], x = work_to_onnx[i_vec[1]];
+        std::string p = "atan2_" + std::to_string(k) + "_";
+        auto where_node = [&](const std::string& c, const std::string& t,
+                              const std::string& f, const std::string& o) {
+          onnx::NodeProto* n = add_node();
+          n->set_op_type("Where");
+          n->add_input(c); n->add_input(t); n->add_input(f); n->add_output(o);
+        };
+
+        create_constant_tensor(add_node, p+"c0", onnx::TensorProto::DOUBLE)->add_double_data(0.0);
+        create_constant_tensor(add_node, p+"pi", onnx::TensorProto::DOUBLE)->add_double_data(M_PI);
+        create_binary_node(add_node, "Div", y, x, p+"r");
+        create_unary_node(add_node, "Atan", p+"r", p+"b");
+        create_binary_node(add_node, "Less", x, p+"c0", p+"xn");
+        create_binary_node(add_node, "Less", y, p+"c0", p+"yn");
+        create_unary_node(add_node, "Neg", p+"pi", p+"npi");
+        where_node(p+"yn", p+"npi", p+"pi", p+"corr");   // x<0 correction: -π if y<0, else +π
+        where_node(p+"xn", p+"corr", p+"c0", p+"adj");   // 0 when x>=0
+        create_binary_node(add_node, "Add", p+"b", p+"adj", p+"res");
+        create_binary_node(add_node, "Equal", x, p+"c0", p+"xz");
+        create_binary_node(add_node, "Equal", y, p+"c0", p+"yz");
+        create_binary_node(add_node, "And", p+"xz", p+"yz", p+"oz");
+        where_node(p+"oz", p+"c0", p+"res", node_output); // origin → 0
+
+        work_to_onnx[o_vec[0]] = node_output;
+        return true;
+      }
+
       // Operations not handled - caller should handle these
       case OP_CALL:
       case OP_SUBREF:

@@ -69,6 +69,8 @@ SKIP_ONNXRUNTIME = {
     # Transpose+MatMul fusion: ONNX Runtime fuses to FusedMatMul which lacks float64 support
     'bilin': "FusedMatMul optimization lacks float64 support",
     'rank1': "FusedMatMul optimization lacks float64 support",
+    # atan2 uses boolean intermediate types (And/Not on Less/Equal outputs)
+    'atan2': "ONNX boolean type constraints on And/Not/Where intermediates",
 }
 
 # ============================================================================
@@ -779,6 +781,26 @@ def _register_additional_tests():
         Function("rank1_test", [A_r1, alpha_r1, x_r1, y_r1], [rank1(A_r1, alpha_r1, x_r1, y_r1)]),
         [(DM([[1, 2], [3, 4]]), DM(2.0), DM([1, 0]), DM([0, 1]))],
         doc="Test rank-1 update A + alpha*x*y'"
+    )
+
+    # ======= ATAN2 test =======
+    y_at = MX.sym("y")
+    x_at = MX.sym("x")
+    Onnxtests.add_test(
+        "atan2",
+        Function("atan2_test", [y_at, x_at], [atan2(y_at, x_at)]),
+        [
+            (DM(1.0), DM(1.0)),     # Q1: pi/4
+            (DM(1.0), DM(-1.0)),    # Q2: 3*pi/4
+            (DM(-1.0), DM(-1.0)),   # Q3: -3*pi/4
+            (DM(-1.0), DM(1.0)),    # Q4: -pi/4
+            (DM(1.0), DM(0.0)),     # +y axis: pi/2
+            (DM(-1.0), DM(0.0)),    # -y axis: -pi/2
+            (DM(0.0), DM(1.0)),     # +x axis: 0
+            (DM(0.0), DM(-1.0)),    # -x axis: pi
+            (DM(0.0), DM(0.0)),     # origin: 0
+        ],
+        doc="Test atan2 operation across all quadrants and edge cases"
     )
 
     # ======= If-else-zero test (conditional) =======
