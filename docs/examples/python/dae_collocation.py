@@ -365,12 +365,12 @@ nlp = {'x':V, 'f':Obj, 'g':vertcat(*g)}
 # NLP solver options
 opts = {}
 opts["expand"] = True
-opts["ipopt.max_iter"] = 1000
-opts["ipopt.tol"] = 1e-4
-opts["ipopt.linear_solver"] = 'ma27'
+#opts["ipopt.max_iter"] = 1000
+#opts["ipopt.tol"] = 1e-4
+#opts["ipopt.linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = nlpsol("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "madnlp", nlp, opts)
 arg = {}
 
 # Initial condition
