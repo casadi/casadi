@@ -68,6 +68,7 @@ struct casadi_madmpec_data {
 
   // complementarities, 1 indexed
   const libmad_int *ind_cc1, *ind_cc2;
+  const libmad_int *cctypes;
   libmad_int ncc;
 
   MPCCModel* mpcc_model;
@@ -253,12 +254,15 @@ void casadi_madmpec_presolve(casadi_madmpec_data<T1>* d) {
 
   d->unified_return_status = SOLVER_RET_UNKNOWN;
   d->success = 0;
+  std::cout << "libmad_mpccmodel_create" << std::endl;
+  std::cout << d->ncc << std::endl;
   libmad_mpccmodel_create(&(d->mpcc_model),
                           "Madmpec",
                           p_nlp->nx, p_nlp->ng,
                           p->nnz_jac_g, p->nnz_hess_l,
                           d->ncc,
                           d->ind_cc1, d->ind_cc2,
+                          d->cctypes,
                           casadi_madmpec_constr_jac_structure<T1>,
                           casadi_madmpec_lag_hess_structure<T1>,
                           casadi_madmpec_eval_obj<T1>,
@@ -268,12 +272,17 @@ void casadi_madmpec_presolve(casadi_madmpec_data<T1>* d) {
                           casadi_madmpec_eval_lag_hess<T1>,
                           d
     );
+  std::cout << "model created" << std::endl;
+  std::cout << "setting numerics" << std::endl;
   // set initial guess
   libmad_mpccmodel_set_numerics(d->mpcc_model,
                                 d_nlp->z, d_nlp->lam + p_nlp->nx,
                                 d_nlp->lbx, d_nlp->ubx,
                                 d_nlp->lbg, d_nlp->ubg);
+  std::cout << "numerics set" << std::endl;
+  std::cout << "creating solver" << std::endl;
   madnlpc_create_solver(&(d->solver), d->mpcc_model, d->nlp_opts, d->mpcc_opts);
+  std::cout << "solver created" << std::endl;
 }
 
 // SYMBOL "madmpec_solve"

@@ -111,6 +111,7 @@ class CASADI_NLPSOL_MADMPEC_EXPORT MadmpecInterface : public Nlpsol {
   /// Complementarity
   std::vector<libmad_int> ind_cc1_;
   std::vector<libmad_int> ind_cc2_;
+  std::vector<libmad_int> cctypes_;
 
   /// A documentation string
   static const std::string meta_doc;

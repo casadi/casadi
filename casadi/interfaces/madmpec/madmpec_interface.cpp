@@ -92,6 +92,10 @@ const Options MadmpecInterface::options_
        {OT_INTVECTORVECTOR,
         "List of complementary constraints on simple bounds. "
         "Pair (i, j) encodes complementarity between the bounds on variable i and variable j."}},
+    {"cctypes",
+       {OT_INTVECTOR,
+        "List of complementary constraints on simple bounds. "
+        "Pair (i, j) encodes complementarity between the bounds on variable i and variable j."}},
    }
 };
 
@@ -112,7 +116,7 @@ void casadi_madmpec_sparsity(const casadi_int* sp, libmad_int *coord_i, libmad_i
 void MadmpecInterface::init(const Dict& opts) {
   // Call the init method of the base class
   Nlpsol::init(opts);
-
+  std::cout << "init" << std::endl;
   casadi_int struct_cnt=0;
 
   // Default options
@@ -120,6 +124,7 @@ void MadmpecInterface::init(const Dict& opts) {
   double convexify_margin = 1e-7;
   casadi_int max_iter_eig = 200;
   std::vector< std::vector<casadi_int> > ind_cc;
+  std::vector<casadi_int> cctypes;
   convexify_ = false;
 
   calc_g_ = true;
@@ -127,6 +132,7 @@ void MadmpecInterface::init(const Dict& opts) {
 
   // Read options
   for (auto&& op : opts) {
+    std::cout << op.first << "  " << op.second << std::endl;
     if (op.first=="convexify_strategy") {
       convexify_strategy = op.second.to_string();
     } else if (op.first=="convexify_margin") {
@@ -139,21 +145,29 @@ void MadmpecInterface::init(const Dict& opts) {
       mpcc_opts_ = op.second;
     } else if (op.first=="ind_cc") {
       ind_cc = op.second;
+    } else if (op.first=="cctypes") {
+      cctypes = op.second;
     }
   }
-
+  std::cout << "construct indcc" << std::endl;
+  std::cout << ind_cc << std::endl;
   ind_cc1_.reserve(ind_cc.size());
   ind_cc2_.reserve(ind_cc.size());
+  cctypes_.reserve(ind_cc.size());
   for (auto && e : ind_cc) {
     casadi_assert(e.size()==2, "Complementary constraints must come in pairs.");
-    casadi_assert(e[0]>=1, "Invalid variable index.");
-    casadi_assert(e[1]>=1, "Invalid variable index.");
-    casadi_assert(e[0]<=nx_, "Invalid variable index.");
-    casadi_assert(e[1]<=nx_, "Invalid variable index.");
+    // TODO(@anton) fix this
+    // casadi_assert(e[0]>=1, "Invalid variable index.");
+    // casadi_assert(e[1]>=1, "Invalid variable index.");
+    // casadi_assert(e[0]<=nx_, "Invalid variable index.");
+    // casadi_assert(e[1]<=nx_, "Invalid variable index.");
     ind_cc1_.push_back(e[0]);
     ind_cc2_.push_back(e[1]);
   }
-    
+  std::cout << "construct cctypes" << std::endl;
+  for (auto && e : cctypes) {
+    cctypes_.push_back(e);
+  }
   // Do we need second order derivatives?
   exact_hessian_ = true;
   auto hessian_approximation = opts_.find("hessian_approximation");
@@ -162,6 +176,8 @@ void MadmpecInterface::init(const Dict& opts) {
   }
 
   // Setup NLP functions
+  std::cout << "construct create_functions" << std::endl;
+
   create_function("nlp_f", {"x", "p"}, {"f"});
   create_function("nlp_g", {"x", "p"}, {"g"});
 
@@ -223,9 +239,11 @@ int MadmpecInterface::init_mem(void* mem) const {
   if (Nlpsol::init_mem(mem)) return 1;
   if (!mem) return 1;
   auto m = static_cast<MadmpecMemory*>(mem);
-  
+  std::cout << "init_mem" << std::endl;
   // Now create the new options struct
+  std::cout << "creating nlp_opts" << std::endl;
   libmad_create_options_dict(&(m->d.nlp_opts));
+  std::cout << "created nlpopts" << std::endl;
   for (const auto& kv : opts_) {
     switch (kv.second.getType()) {
      case OT_DOUBLE:
@@ -247,6 +265,7 @@ int MadmpecInterface::init_mem(void* mem) const {
        casadi_error("Unknown option type.");
     }
   }
+  std::cout << "creating mpcc_opts" << std::endl;
   // Now create the new options struct
   libmad_create_options_dict(&(m->d.mpcc_opts));
   for (const auto& kv : opts_) {
@@ -270,8 +289,11 @@ int MadmpecInterface::init_mem(void* mem) const {
        casadi_error("Unknown option type.");
     }
   }
+  std::cout << "created mpccopts" << std::endl;
+
   m->d.ind_cc1 = ind_cc1_.data();
   m->d.ind_cc2 = ind_cc2_.data();
+  m->d.cctypes = cctypes_.data();
   m->d.ncc = ind_cc1_.size();
   casadi_madmpec_init_mem(&m->d);
 
