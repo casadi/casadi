@@ -74,9 +74,9 @@ const Options MadmpecInterface::options_
     {"ng",
      {OT_INTVECTOR,
       "Number of constraints"}},
-    {"madnlp",
+    {"madnlpc",
      {OT_DICT,
-      "Options to be passed to madnlp"}},
+      "Options to be passed to madnlpc algorithm"}},
     {"madmpec",
      {OT_DICT,
       "Options to be passed to madmpec"}},
@@ -113,6 +113,23 @@ void casadi_madmpec_sparsity(const casadi_int* sp, libmad_int *coord_i, libmad_i
     }
 }
 
+// Recursively flatten options for libmad options dict.
+void flatten_opts(Dict& ret, const Dict& opts, const std::string& prefix)
+{
+  for (const auto& kv : opts)
+  {
+    std::cout << kv.first << " " << kv.second << std::endl;
+    std::cout << ret << std::endl;
+    switch (kv.second.getType()) {
+     case OT_DICT:
+       flatten_opts(ret, kv.second, prefix + kv.first + ".");
+       break;
+     default:
+       ret[prefix + kv.first] = kv.second;
+    }
+  }
+}
+
 void MadmpecInterface::init(const Dict& opts) {
   // Call the init method of the base class
   Nlpsol::init(opts);
@@ -132,7 +149,6 @@ void MadmpecInterface::init(const Dict& opts) {
 
   // Read options
   for (auto&& op : opts) {
-    std::cout << op.first << "  " << op.second << std::endl;
     if (op.first=="convexify_strategy") {
       convexify_strategy = op.second.to_string();
     } else if (op.first=="convexify_margin") {
@@ -140,17 +156,17 @@ void MadmpecInterface::init(const Dict& opts) {
     } else if (op.first=="max_iter") {
       max_iter_eig = op.second;
     } else if (op.first=="madmpec") {
-      opts_ = op.second;
+      flatten_opts(opts_, op.second, "");
+      std::cout << "opts_: " << opts_ << std::endl;
     } else if (op.first=="madnlpc") {
-      mpcc_opts_ = op.second;
+      flatten_opts(mpcc_opts_, op.second, "");
+      std::cout << "mpcc_opts_: " << mpcc_opts_ << std::endl;
     } else if (op.first=="ind_cc") {
       ind_cc = op.second;
     } else if (op.first=="cctypes") {
       cctypes = op.second;
     }
   }
-  std::cout << "construct indcc" << std::endl;
-  std::cout << ind_cc << std::endl;
   ind_cc1_.reserve(ind_cc.size());
   ind_cc2_.reserve(ind_cc.size());
   cctypes_.reserve(ind_cc.size());
@@ -164,7 +180,6 @@ void MadmpecInterface::init(const Dict& opts) {
     ind_cc1_.push_back(e[0]);
     ind_cc2_.push_back(e[1]);
   }
-  std::cout << "construct cctypes" << std::endl;
   for (auto && e : cctypes) {
     cctypes_.push_back(e);
   }
@@ -176,7 +191,6 @@ void MadmpecInterface::init(const Dict& opts) {
   }
 
   // Setup NLP functions
-  std::cout << "construct create_functions" << std::endl;
 
   create_function("nlp_f", {"x", "p"}, {"f"});
   create_function("nlp_g", {"x", "p"}, {"g"});
@@ -342,17 +356,26 @@ Dict MadmpecInterface::get_stats(void* mem) const {
   Dict stats = Nlpsol::get_stats(mem);
   auto m = static_cast<MadmpecMemory*>(mem);
   libmad_int iter, status;
-  double primal_feas, dual_feas;
+  double primal_feas, dual_feas, cc_feas;
+  std::vector<libmad_real> multipliers_x1, multipliers_x2;
+  multipliers_x1.resize(ind_cc1_.size());
+  multipliers_x2.resize(ind_cc2_.size());
   madnlpc_get_iters(m->d.stats, &iter);
   madnlpc_get_status(m->d.stats, &status);
   madnlpc_get_dual_feas(m->d.stats, &dual_feas);
   madnlpc_get_primal_feas(m->d.stats, &primal_feas);
+  madnlpc_get_cc_feas(m->d.stats, &cc_feas);
+  madnlpc_get_multipliers_x1(m->d.stats, multipliers_x1.data());
+  madnlpc_get_multipliers_x2(m->d.stats, multipliers_x2.data());
 
   stats["iter_count"] = static_cast<casadi_int>(iter);
   Dict madmpec;
   madmpec["dual_feas"] = dual_feas;
+  madmpec["cc_feas"] = cc_feas;
   madmpec["primal_feas"] = primal_feas;
   madmpec["status"] = static_cast<casadi_int>(status);
+  madmpec["multipliers_x1"] = multipliers_x1;
+  madmpec["multipliers_x2"] = multipliers_x2;
   stats["madmpec"] = madmpec;
   return stats;
 }
