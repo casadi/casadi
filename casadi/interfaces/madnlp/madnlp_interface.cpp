@@ -102,6 +102,23 @@ void casadi_madnlp_sparsity(const casadi_int* sp, libmad_int *coord_i, libmad_in
     }
 }
 
+// Recursively flatten options for libmad options dict.
+void flatten_opts(Dict& ret, const Dict& opts, const std::string& prefix)
+{
+  for (const auto& kv : opts)
+  {
+    std::cout << kv.first << " " << kv.second << std::endl;
+    std::cout << ret << std::endl;
+    switch (kv.second.getType()) {
+     case OT_DICT:
+       flatten_opts(ret, kv.second, prefix + kv.first + ".");
+       break;
+     default:
+       ret[prefix + kv.first] = kv.second;
+    }
+  }
+}
+
 void MadnlpInterface::init(const Dict& opts) {
   // Call the init method of the base class
   Nlpsol::init(opts);
@@ -126,7 +143,7 @@ void MadnlpInterface::init(const Dict& opts) {
     } else if (op.first=="max_iter") {
       max_iter_eig = op.second;
     } else if (op.first=="madnlp") {
-      opts_ = op.second;
+      flatten_opts(opts_, op.second, "");
     }
   }
 
