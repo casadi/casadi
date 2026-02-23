@@ -548,13 +548,6 @@ namespace casadi {
       << "  #define CUDA_DEV\n"
       << "#endif\n"
       << "#endif\n\n";
-    s << "#ifndef CUDA_MANAGED\n"
-      << "#ifdef __CUDACC__\n"
-      << "  #define CUDA_MANAGED __device__ __managed__\n"
-      << "#else\n"
-      << "  #define CUDA_MANAGED\n"
-      << "#endif\n"
-      << "#endif\n\n";
     s << "#ifndef CUDA_GLOBAL\n"
       << "#ifdef __CUDACC__\n"
       << "  #define CUDA_GLOBAL __global__\n"
