@@ -959,6 +959,7 @@ namespace casadi {
       std::string kernel_name;
       std::string device_name;
       std::vector<casadi_int> batch_inputs;
+      bool external_workspace = false;
     };
 
     void generate_cuda_kernel(const Function& f, const CudaKernelSpec& spec);
