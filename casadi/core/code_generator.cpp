@@ -548,6 +548,13 @@ namespace casadi {
       << "  #define CUDA_DEV\n"
       << "#endif\n"
       << "#endif\n\n";
+    s << "#ifndef CUDA_MANAGED\n"
+      << "#ifdef __CUDACC__\n"
+      << "  #define CUDA_MANAGED __device__ __managed__\n"
+      << "#else\n"
+      << "  #define CUDA_MANAGED\n"
+      << "#endif\n"
+      << "#endif\n\n";
     s << "#ifndef CUDA_GLOBAL\n"
       << "#ifdef __CUDACC__\n"
       << "  #define CUDA_GLOBAL __global__\n"
@@ -1160,7 +1167,14 @@ namespace casadi {
 
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
       const std::vector<casadi_int>& v) {
-    s << array("static const casadi_int", name, v.size(), initializer(v));
+    if (this->cuda_) {
+      // CUDA mode needs device-visible sparsity tables, while host metadata
+      // accessors still require host-readable pointers.
+      s << array("static const casadi_int", name + "_h", v.size(), initializer(v));
+      s << array("static CUDA_DEV const casadi_int", name, v.size(), initializer(v));
+    } else {
+      s << array("static const casadi_int", name, v.size(), initializer(v));
+    }
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
@@ -2808,7 +2822,9 @@ namespace casadi {
     *this << declare("const casadi_int* " + name + "_sparsity_in(casadi_int i)") << " {\n"
       << "switch (i) {\n";
     for (casadi_int i=0; i<sp_in.size(); ++i) {
-      *this << "case " << i << ": return " << sparsity(sp_in[i], force_canonical) << ";\n";
+      std::string sp_name = sparsity(sp_in[i], force_canonical);
+      if (cuda_) sp_name += "_h";
+      *this << "case " << i << ": return " << sp_name << ";\n";
     }
     *this << "default: return 0;\n}\n"
       << "}\n\n";
@@ -2817,7 +2833,9 @@ namespace casadi {
     *this << declare("const casadi_int* " + name + "_sparsity_out(casadi_int i)") << " {\n"
       << "switch (i) {\n";
     for (casadi_int i=0; i<sp_out.size(); ++i) {
-      *this << "case " << i << ": return " << sparsity(sp_out[i], force_canonical) << ";\n";
+      std::string sp_name = sparsity(sp_out[i], force_canonical);
+      if (cuda_) sp_name += "_h";
+      *this << "case " << i << ": return " << sp_name << ";\n";
     }
     *this << "default: return 0;\n}\n"
       << "}\n\n";
