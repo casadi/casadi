@@ -114,6 +114,8 @@ namespace casadi {
           spec.device_name = it==kd.end() ? ("device_" + k.first + "_eval") : it->second.to_string();
           it = kd.find("batch_inputs");
           if (it!=kd.end()) spec.batch_inputs = it->second.to_int_vector();
+          it = kd.find("external_workspace");
+          if (it!=kd.end()) spec.external_workspace = it->second;
           cuda_kernels_[k.first] = spec;
         }
       } else if (e.first=="infinity") {
@@ -2305,6 +2307,10 @@ namespace casadi {
 
     for (casadi_int i : batch_in) check_index(i, n_in, "batch_inputs");
 
+    size_t sz_iw = f.sz_iw();
+    size_t sz_w = f.sz_w();
+    bool external_workspace = spec.external_workspace && sz_w > 0;
+
     // Device wrapper signature
     std::stringstream sig;
     sig << "void " << spec.device_name << "(";
@@ -2315,6 +2321,10 @@ namespace casadi {
     for (casadi_int i = 0; i < n_out; ++i) {
       if (n_in || i) sig << ", ";
       sig << "casadi_real* o" << i;
+    }
+    if (external_workspace) {
+      if (n_in || n_out) sig << ", ";
+      sig << "casadi_real* w";
     }
     sig << ")";
 
@@ -2351,12 +2361,12 @@ namespace casadi {
       *this << "casadi_real** res = 0;\n";
     }
 
-    size_t sz_iw = f.sz_iw();
-    size_t sz_w = f.sz_w();
     *this << "casadi_int  iw[" << (sz_iw > 0 ? str(static_cast<casadi_int>(sz_iw)) : "1")
           << "];\n";
-    *this << "casadi_real w [" << (sz_w > 0 ? str(static_cast<casadi_int>(sz_w)) : "1")
-          << "];\n";
+    if (!external_workspace) {
+      *this << "casadi_real w [" << (sz_w > 0 ? str(static_cast<casadi_int>(sz_w)) : "1")
+            << "];\n";
+    }
     *this << f.name() << "(arg, res, iw, w, 0);\n";
     *this << "}\n\n";
 
@@ -2370,6 +2380,10 @@ namespace casadi {
     for (casadi_int i = 0; i < n_out; ++i) {
       if (n_in || i) ksig << ", ";
       ksig << "casadi_real* o" << i << "_out";
+    }
+    if (external_workspace) {
+      if (n_in || n_out) ksig << ", ";
+      ksig << "casadi_real* w_pool";
     }
     if (n_in || n_out) ksig << ", ";
     ksig << "int n_candidates";
@@ -2400,6 +2414,10 @@ namespace casadi {
               << str(f.nnz_out(i)) << " * idx;\n";
       }
     }
+    if (external_workspace) {
+      *this << "casadi_real* w = w_pool + "
+            << str(static_cast<casadi_int>(sz_w)) << " * idx;\n";
+    }
 
     *this << spec.device_name << "(";
     for (casadi_int i = 0; i < n_in; ++i) {
@@ -2409,6 +2427,10 @@ namespace casadi {
     for (casadi_int i = 0; i < n_out; ++i) {
       if (n_in || i) *this << ", ";
       *this << "o" << i;
+    }
+    if (external_workspace) {
+      if (n_in || n_out) *this << ", ";
+      *this << "w";
     }
     *this << ");\n";
     *this << "}\n\n";
