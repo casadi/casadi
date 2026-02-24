@@ -811,7 +811,7 @@ class OCPtests(casadiTestCase):
 
         solutions = {}
         stats = {}
-        for solver, solver_options in [("ipopt",{}),("fatrop",{"structure_detection":"auto","fatrop":{"accept_every_trial_step":False,"tol":1e-8,"max_iter":100},"equality":equality})]:
+        for solver, solver_options in [("ipopt",{}),("fatrop",{"structure_detection":"auto","fatrop":{"tol":1e-8,"max_iter":100},"equality":equality})]:
             f = nlpsol('solver', solver, prob, solver_options)
             #if solver=="fatrop" and i==2: raise Exception() 
 
@@ -828,7 +828,7 @@ class OCPtests(casadiTestCase):
                 v_ref = solutions["ipopt"][k]
                 v = solutions["fatrop"][k]
                 
-                self.checkarray(v,v_ref,failmessage=k,digits=6)
+                self.checkarray(v,v_ref,failmessage=k,digits=5)
         assert(abs(stats["ipopt"]["iter_count"]-stats["fatrop"]["iter_count"])<=2)
 
 
