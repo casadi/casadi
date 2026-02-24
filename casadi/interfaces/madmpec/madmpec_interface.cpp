@@ -118,8 +118,6 @@ void flatten_opts(Dict& ret, const Dict& opts, const std::string& prefix)
 {
   for (const auto& kv : opts)
   {
-    std::cout << kv.first << " " << kv.second << std::endl;
-    std::cout << ret << std::endl;
     switch (kv.second.getType()) {
      case OT_DICT:
        flatten_opts(ret, kv.second, prefix + kv.first + ".");
@@ -133,7 +131,6 @@ void flatten_opts(Dict& ret, const Dict& opts, const std::string& prefix)
 void MadmpecInterface::init(const Dict& opts) {
   // Call the init method of the base class
   Nlpsol::init(opts);
-  std::cout << "init" << std::endl;
   casadi_int struct_cnt=0;
 
   // Default options
@@ -157,10 +154,8 @@ void MadmpecInterface::init(const Dict& opts) {
       max_iter_eig = op.second;
     } else if (op.first=="madmpec") {
       flatten_opts(opts_, op.second, "");
-      std::cout << "opts_: " << opts_ << std::endl;
     } else if (op.first=="madnlpc") {
       flatten_opts(mpcc_opts_, op.second, "");
-      std::cout << "mpcc_opts_: " << mpcc_opts_ << std::endl;
     } else if (op.first=="ind_cc") {
       ind_cc = op.second;
     } else if (op.first=="cctypes") {
@@ -253,12 +248,9 @@ int MadmpecInterface::init_mem(void* mem) const {
   if (Nlpsol::init_mem(mem)) return 1;
   if (!mem) return 1;
   auto m = static_cast<MadmpecMemory*>(mem);
-  std::cout << "init_mem" << std::endl;
   // Now create the new options struct
-  std::cout << "creating nlp_opts" << std::endl;
   libmad_create_options_dict(&(m->d.nlp_opts));
   for (const auto& kv : opts_) {
-    std::cout << kv.second.getType() << " " << kv.first << "  " << kv.second << std::endl;
     switch (kv.second.getType()) {
      case OT_DOUBLE:
        libmad_set_double_option(m->d.nlp_opts, kv.first.c_str(), kv.second);
@@ -279,12 +271,9 @@ int MadmpecInterface::init_mem(void* mem) const {
        casadi_error("Unknown option type.");
     }
   }
-  std::cout << "created nlpopts" << std::endl;
-  std::cout << "creating mpcc_opts" << std::endl;
   // Now create the new options struct
   libmad_create_options_dict(&(m->d.mpcc_opts));
   for (const auto& kv : mpcc_opts_) {
-    std::cout << kv.second.getType() << " " << kv.first << "  " << kv.second << std::endl;
     switch (kv.second.getType()) {
      case OT_DOUBLE:
        libmad_set_double_option(m->d.mpcc_opts, kv.first.c_str(), kv.second);
@@ -305,7 +294,6 @@ int MadmpecInterface::init_mem(void* mem) const {
        casadi_error("Unknown option type.");
     }
   }
-  std::cout << "created mpccopts" << std::endl;
 
   m->d.ind_cc1 = ind_cc1_.data();
   m->d.ind_cc2 = ind_cc2_.data();

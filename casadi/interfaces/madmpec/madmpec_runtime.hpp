@@ -255,7 +255,6 @@ void casadi_madmpec_presolve(casadi_madmpec_data<T1>* d) {
 
   d->unified_return_status = SOLVER_RET_UNKNOWN;
   d->success = 0;
-  std::cout << "libmad_nlpmodel_create" << std::endl;
   libmad_nlpmodel_create(&(d->nlp_model),
                           "MadMPEC",
                           p_nlp->nx, p_nlp->ng,
@@ -270,23 +269,18 @@ void casadi_madmpec_presolve(casadi_madmpec_data<T1>* d) {
                           d
     );
 
-  std::cout << "setting numerics" << std::endl;
   // set initial guess
   libmad_nlpmodel_set_numerics(d->nlp_model,
                                d_nlp->z, d_nlp->lam + p_nlp->nx,
                                d_nlp->lbx, d_nlp->ubx,
                                d_nlp->lbg, d_nlp->ubg);
-  std::cout << "numerics set" << std::endl;
   libmad_mpccmodel_create(&(d->mpcc_model),
                           d->nlp_model,
                           d->ncc,
                           d->ind_cc1, d->ind_cc2,
                           d->cctypes
     );
-  std::cout << "model created" << std::endl;
-  std::cout << "creating solver" << std::endl;
   madnlpc_create_solver(&(d->solver), d->mpcc_model, d->nlp_opts, d->mpcc_opts);
-  std::cout << "solver created" << std::endl;
 }
 
 // SYMBOL "madmpec_solve"
@@ -297,7 +291,6 @@ int casadi_madmpec_solve(casadi_madmpec_data<T1>* d) {
   const casadi_madmpec_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   int ret = madnlpc_solve(d->solver, d->nlp_opts, &(d->stats));
-  std::cout << "ret value=" << ret << std::endl;
   if (ret!=0) {
     // cleanup done in free_mem
     return ret;
