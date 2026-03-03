@@ -684,7 +684,7 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
     switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
       case 0:
         g << "fatrop_ocp_c_set_option_double(d->solver, \"" + kv.first + "\", "
-              + str(kv.second) + ");\n";
+              + g.constant(kv.second.to_double()) + ");\n";
         break;
       case 1:
         g << "fatrop_ocp_c_set_option_int(d->solver, \"" + kv.first + "\", "
