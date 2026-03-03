@@ -195,7 +195,7 @@ class casadiTestCase(unittest.TestCase):
         except Exception as err:
           e = str(err)
     print(result[0])
-    self.assertTrue(s in e or s in result[0] or s in result[1])
+    self.assertTrue(s in e or s in result[0] or s in result[1],"error: <<<<%s>>> stdout: <<<%s>>>, stderr:<<<<%s>>>" % (e, str(result[0]),str(result[1])))
 
   @contextmanager
   def assertInException(self,s):
