@@ -329,10 +329,10 @@ void MadmpecInterface::set_work(void* mem, const double**& arg, double**& res,
 int MadmpecInterface::solve(void* mem) const {
   auto m = static_cast<MadmpecMemory*>(mem);
 
-  casadi_madmpec_presolve(&m->d);
-
-  int ret = casadi_madmpec_solve(&m->d);
-  if ( ret != 0 ) throw CasadiException("MADMPECError");
+  int ret = casadi_madmpec_presolve(&m->d);
+  if (ret) throw CasadiException("MADMPECError");
+  ret = casadi_madmpec_solve(&m->d);
+  if (ret) throw CasadiException("MADMPECError");
 
   m->success = m->d.success;
   m->unified_return_status = static_cast<UnifiedReturnStatus>(m->d.unified_return_status);

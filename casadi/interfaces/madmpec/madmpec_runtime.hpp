@@ -247,40 +247,48 @@ void casadi_madmpec_init(casadi_madmpec_data<T1>* d, const T1*** arg, T1*** res,
 
 // SYMBOL "madmpec_presolve"
 template<typename T1>
-void casadi_madmpec_presolve(casadi_madmpec_data<T1>* d) {
+int casadi_madmpec_presolve(casadi_madmpec_data<T1>* d) {
   casadi_int k, i, column;
   const casadi_madmpec_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
-
+  int ret = 0;
   d->unified_return_status = SOLVER_RET_UNKNOWN;
   d->success = 0;
-  libmad_nlpmodel_create(&(d->nlp_model),
-                          "MadMPEC",
-                          p_nlp->nx, p_nlp->ng,
-                          p->nnz_jac_g, p->nnz_hess_l,
-                          casadi_madmpec_constr_jac_structure<T1>,
-                          casadi_madmpec_lag_hess_structure<T1>,
-                          casadi_madmpec_eval_obj<T1>,
-                          casadi_madmpec_eval_constr<T1>,
-                          casadi_madmpec_eval_obj_grad<T1>,
-                          casadi_madmpec_eval_constr_jac<T1>,
-                          casadi_madmpec_eval_lag_hess<T1>,
-                          d
+
+  ret = libmad_nlpmodel_create(&(d->nlp_model),
+                               "MadMPEC",
+                               p_nlp->nx, p_nlp->ng,
+                               p->nnz_jac_g, p->nnz_hess_l,
+                               casadi_madmpec_constr_jac_structure<T1>,
+                               casadi_madmpec_lag_hess_structure<T1>,
+                               casadi_madmpec_eval_obj<T1>,
+                               casadi_madmpec_eval_constr<T1>,
+                               casadi_madmpec_eval_obj_grad<T1>,
+                               casadi_madmpec_eval_constr_jac<T1>,
+                               casadi_madmpec_eval_lag_hess<T1>,
+                               d
     );
+  if(ret) return ret; // TODO(@anton) think about what we need to clean up.
 
   // set initial guess
-  libmad_nlpmodel_set_numerics(d->nlp_model,
+  ret = libmad_nlpmodel_set_numerics(d->nlp_model,
                                d_nlp->z, d_nlp->lam + p_nlp->nx,
                                d_nlp->lbx, d_nlp->ubx,
                                d_nlp->lbg, d_nlp->ubg);
-  libmad_mpccmodel_create(&(d->mpcc_model),
+  if(ret) return ret; // TODO(@anton) think about what we need to clean up.
+
+  ret = libmad_mpccmodel_create(&(d->mpcc_model),
                           d->nlp_model,
                           d->ncc,
                           d->ind_cc1, d->ind_cc2,
                           d->cctypes
     );
-  madnlpc_create_solver(&(d->solver), d->mpcc_model, d->nlp_opts, d->mpcc_opts);
+  if(ret) return ret; // TODO(@anton) think about what we need to clean up.
+
+  ret = madnlpc_create_solver(&(d->solver), d->mpcc_model, d->nlp_opts, d->mpcc_opts);
+
+  return ret;
 }
 
 // SYMBOL "madmpec_solve"
