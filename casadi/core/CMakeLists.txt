@@ -179,6 +179,7 @@ set(CASADI_INTERNAL
   multiple_output.hpp     multiple_output.cpp     # Base class for nodes with multiple outputs
   assertion.hpp           assertion.cpp           # Assertion
   monitor.hpp             monitor.cpp             # Monitor
+  dump.hpp                dump.cpp                # Dump
   repmat.hpp              repmat.cpp              # RepMat
   convexify.hpp           convexify.cpp           # Convexify
   logsumexp.hpp           logsumexp.cpp           # Logsumexp

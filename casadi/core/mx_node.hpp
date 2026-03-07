@@ -758,6 +758,9 @@ namespace casadi {
     /// Monitor
     MX get_monitor(const std::string& comment) const;
 
+    /// Dump
+    MX get_dump(const std::string& base_filename, const Dict& opts) const;
+
     /// Find
     MX get_find() const;
 

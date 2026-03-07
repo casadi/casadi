@@ -3105,7 +3105,70 @@ class MXtests(casadiTestCase):
         print(out2)
             
         self.assertTrue(ref in out2)
-        
+
+  def test_dump(self):
+    import os
+    import glob as globmod
+
+    # Cleanup any leftover dump files
+    for f in globmod.glob("myvar.*.mtx"):
+      os.remove(f)
+
+    # Scalar test
+    x = MX.sym("x")
+    y = sqrt(x.dump("myvar"))
+
+    f = Function('f', [x], [y])
+
+    f(9)
+
+    self.assertTrue(os.path.exists("myvar.000000.mtx"))
+    val = DM.from_file("myvar.000000.mtx")
+    self.checkarray(val, 9)
+
+    # Second call increments counter
+    f(16)
+    self.assertTrue(os.path.exists("myvar.000001.mtx"))
+    val = DM.from_file("myvar.000001.mtx")
+    self.checkarray(val, 16)
+
+    # Cleanup
+    for fname in globmod.glob("myvar.*.mtx"):
+      os.remove(fname)
+
+    # Sparse matrix test
+    x = MX.sym("x", Sparsity.lower(2))
+    y = 2*x.dump("mysp")
+    f = Function('f', [x], [y])
+
+    inp = sparsify(DM([[1, 0], [3, 4]]))
+    f(inp)
+
+    self.assertTrue(os.path.exists("mysp.000000.mtx"))
+    val = DM.from_file("mysp.000000.mtx")
+    self.checkarray(val, inp)
+
+    for fname in globmod.glob("mysp.*.mtx"):
+      os.remove(fname)
+
+    # Test with dir option
+    dump_dir = "dump_test_dir"
+    if not os.path.exists(dump_dir):
+      os.makedirs(dump_dir)
+    x = MX.sym("x")
+    y = x.dump("myvar", {"dir": dump_dir})
+    f = Function('f', [x], [y])
+
+    f(42)
+
+    dump_path = os.path.join(dump_dir, "myvar.000000.mtx")
+    self.assertTrue(os.path.exists(dump_path))
+    val = DM.from_file(dump_path)
+    self.checkarray(val, 42)
+
+    for fname in globmod.glob(os.path.join(dump_dir, "myvar.*.mtx")):
+      os.remove(fname)
+    os.rmdir(dump_dir)
   def test_codegen_specials(self):
     x = MX.sym("x")
     y = MX.sym("y")

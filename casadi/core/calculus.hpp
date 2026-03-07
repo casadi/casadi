@@ -207,10 +207,12 @@ namespace casadi {
 
     OP_LOGSUMEXP,
 
-    OP_REMAINDER
+    OP_REMAINDER,
+
+    OP_DUMP,
 
   };
-  #define NUM_BUILT_IN_OPS (OP_REMAINDER+1)
+  #define NUM_BUILT_IN_OPS (OP_DUMP+1)
 
   #define OP_
 
@@ -1094,6 +1096,7 @@ namespace casadi {
     case OP_PROJECT:       return F<OP_PROJECT>::check;
     case OP_ASSERTION:     return F<OP_ASSERTION>::check;
     case OP_MONITOR:       return F<OP_MONITOR>::check;
+    case OP_DUMP:          return F<OP_DUMP>::check;
     case OP_NORM2:         return F<OP_NORM2>::check;
     case OP_NORM1:         return F<OP_NORM1>::check;
     case OP_NORMINF:       return F<OP_NORMINF>::check;

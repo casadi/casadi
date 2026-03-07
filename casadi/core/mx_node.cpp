@@ -50,6 +50,7 @@
 #include "split.hpp"
 #include "assertion.hpp"
 #include "monitor.hpp"
+#include "dump.hpp"
 #include "repmat.hpp"
 #include "casadi_find.hpp"
 #include "casadi_low.hpp"
@@ -1021,6 +1022,30 @@ namespace casadi {
     }
   }
 
+  MX MXNode::get_dump(const std::string& base_filename, const Dict& opts) const {
+    if (nnz()==0) {
+      return shared_from_this<MX>();
+    } else {
+      std::string dir = ".";
+      std::string format = "mtx";
+      bool verbose = false;
+      for (auto&& op : opts) {
+        if (op.first=="dir") {
+          dir = op.second.to_string();
+        } else if (op.first=="format") {
+          format = op.second.to_string();
+        } else if (op.first=="verbose") {
+          verbose = op.second.to_bool();
+        } else {
+          casadi_error("Unknown option '" + op.first + "' for dump. "
+                       "Allowed options: 'dir', 'format', 'verbose'.");
+        }
+      }
+      return MX::create(new Dump(shared_from_this<MX>(), base_filename,
+        dir, format, verbose));
+    }
+  }
+
   MX MXNode::get_find() const {
     MX x = shared_from_this<MX>();
     casadi_assert(x.is_vector(), "Argument must be vector, got " + x.dim() + ".");
@@ -1326,6 +1351,7 @@ namespace casadi {
     {OP_PROJECT, Project::deserialize},
     {OP_ASSERTION, Assertion::deserialize},
     {OP_MONITOR, Monitor::deserialize},
+    {OP_DUMP, Dump::deserialize},
     {OP_NORM1, Norm1::deserialize},
     {OP_NORM2, Norm2::deserialize},
     {OP_NORMINF, NormInf::deserialize},

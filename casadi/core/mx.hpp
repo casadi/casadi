@@ -987,6 +987,15 @@ namespace casadi {
         \identifier{rh} */
     MX monitor(const std::string& comment) const;
 
+    /** \brief Dump an expression
+    * Returns itself, but with the side effect of dumping values to file
+    * Allowed options: "dir" (dump directory), "format" (file format, default "mtx"),
+    * "verbose" (print filename on each dump, default false) */
+    MX dump(const std::string& base_filename, const Dict& opts=Dict()) const;
+
+    /// Reset the dump counter
+    void reset_dump_count();
+
     /// Transpose the matrix
     MX T() const;
 

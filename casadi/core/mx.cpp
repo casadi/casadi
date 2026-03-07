@@ -24,6 +24,7 @@
 
 
 #include "mx_node.hpp"
+#include "dump.hpp"
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
 #include "multiple_output.hpp"
@@ -733,6 +734,15 @@ namespace casadi {
 
   MX MX::monitor(const std::string& comment) const {
     return(*this)->get_monitor(comment);
+  }
+
+  MX MX::dump(const std::string& base_filename, const Dict& opts) const {
+    return(*this)->get_dump(base_filename, opts);
+  }
+
+  void MX::reset_dump_count() {
+    casadi_assert(op()==OP_DUMP, "reset_dump_count: not a dump node");
+    static_cast<Dump*>(get())->reset_dump_count();
   }
 
   MX MX::lift(const MX& x, const MX& x_guess) {
