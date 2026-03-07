@@ -3169,6 +3169,25 @@ class MXtests(casadiTestCase):
     for fname in globmod.glob(os.path.join(dump_dir, "myvar.*.mtx")):
       os.remove(fname)
     os.rmdir(dump_dir)
+
+    if args.run_slow and "ghc-filesystem" in CasadiMeta.feature_list():
+      import shutil
+      for d in ["mydump", "mydump_codegen"]:
+        if os.path.exists(d):
+          shutil.rmtree(d)
+
+      # Codegen test
+      x = MX.sym("x")
+      y = sqrt(x.dump("x",{"dir": "mydump"}))
+      f = Function('f', [x], [y])
+      self.check_codegen(f, inputs=[9],std="c99",main=True,opts={"dump_dir_suffix": "_codegen"})
+
+      self.file_equal("mydump/x.000000.mtx", "mydump_codegen/x.000000.mtx")
+
+      for d in ["mydump", "mydump_codegen"]:
+        if os.path.exists(d):
+          shutil.rmtree(d)
+
   def test_codegen_specials(self):
     x = MX.sym("x")
     y = MX.sym("y")

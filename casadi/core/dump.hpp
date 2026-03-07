@@ -73,6 +73,9 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
+    /** \brief Add dependencies for code generation */
+    void add_dependency(CodeGenerator& g) const override;
+
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,

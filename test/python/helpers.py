@@ -373,6 +373,10 @@ class casadiTestCase(unittest.TestCase):
           self.assertAlmostEqual(zt[i,j],zr[i,j],digits,LazyString('"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, )'))
           #self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, ))
 
+  def file_equal(self, lhs, rhs):
+      with open(lhs, 'rb') as f1, open(rhs, 'rb') as f2:
+        self.assertEqual(f1.read(), f2.read())
+
   def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi evaluation against a reference solution.
 

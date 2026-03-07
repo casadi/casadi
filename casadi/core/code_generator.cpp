@@ -56,6 +56,8 @@ namespace casadi {
     this->real_min = "";
     bool prefix_set = false;
     this->prefix = "";
+    this->dump_dir_prefix = "";
+    this->dump_dir_suffix = "";
     this->max_declarations_per_line = 12;
     this->max_initializer_elements_per_line = 8;
     this->force_canonical = false;
@@ -112,6 +114,10 @@ namespace casadi {
       } else if (e.first=="prefix") {
         this->prefix = e.second.to_string();
         prefix_set = true;
+      } else if (e.first=="dump_dir_prefix") {
+        this->dump_dir_prefix = e.second.to_string();
+      } else if (e.first=="dump_dir_suffix") {
+        this->dump_dir_suffix = e.second.to_string();
       } else if (e.first=="max_declarations_per_line") {
         this->max_declarations_per_line = e.second;
         casadi_assert(this->max_declarations_per_line>=0,
@@ -1956,6 +1962,12 @@ namespace casadi {
       add_auxiliary(AUX_PRINT_VECTOR);
       this->auxiliaries << sanitize_source(casadi_print_canonical_str, inst);
       break;
+    case AUX_TO_FILE:
+      add_include("stdio.h");
+      add_auxiliary(AUX_INF);
+      add_auxiliary(AUX_NAN);
+      this->auxiliaries << sanitize_source(casadi_to_file_str, inst);
+      break;
     case AUX_THREADS:
       this->auxiliaries << sanitize_source(casadi_threads_str, inst);
       break;
@@ -2754,6 +2766,12 @@ namespace casadi {
   file_slurp(const std::string& fname, casadi_int n, const std::string& a) {
     add_auxiliary(CodeGenerator::AUX_FILE_SLURP);
     return "casadi_file_slurp(\"" + fname + "\", " + str(n) + ", " + a + ")";
+  }
+
+  std::string CodeGenerator::
+  to_file(const std::string& f, const Sparsity& sp, const std::string& x) {
+    add_auxiliary(CodeGenerator::AUX_TO_FILE);
+    return "casadi_to_file(" + f + ", " + sparsity(sp) + ", " + x + ")";
   }
 
   std::string CodeGenerator::

@@ -716,6 +716,7 @@ namespace casadi {
       AUX_PRINT_SCALAR,
       AUX_PRINT_VECTOR,
       AUX_PRINT_CANONICAL,
+      AUX_TO_FILE,
       AUX_THREADS
     };
 
@@ -885,6 +886,9 @@ namespace casadi {
         \identifier{u7} */
     std::string file_slurp(const std::string& fname, casadi_int n, const std::string& a);
 
+    /** \brief Write matrix to file in MatrixMarket format */
+    std::string to_file(const std::string& f, const Sparsity& sp, const std::string& x);
+
     /** \brief cache check
 
         \identifier{u8} */
@@ -1009,6 +1013,10 @@ namespace casadi {
 
     // Prefix
     std::string prefix;
+
+    // Prefix/suffix for dump directory in codegen
+    std::string dump_dir_prefix;
+    std::string dump_dir_suffix;
 
     // std::stringstreams holding the different parts of the file being generated
     std::stringstream includes;

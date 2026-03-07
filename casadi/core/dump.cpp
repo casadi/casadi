@@ -114,29 +114,38 @@ namespace casadi {
     return 0;
   }
 
+  void Dump::add_dependency(CodeGenerator& g) const {
+    ensure_directory_exists(g.dump_dir_prefix + dir_ + g.dump_dir_suffix);
+  }
+
   void Dump::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res,
                           const std::vector<bool>& arg_is_ref,
                           std::vector<bool>& res_is_ref) const {
     std::string format = format_.empty() ? "mtx" : format_;
+    std::string effective_dir = g.dump_dir_prefix + dir_ + g.dump_dir_suffix;
     std::string prefix;
-    if (!dir_.empty()) prefix = dir_ + "/";
+    if (!effective_dir.empty()) prefix = effective_dir + "/";
     // prefix + base_filename + "." + 6 digits + "." + format + null
-    casadi_int buf_size = prefix.size() + base_filename_.size() + 1 + 6 + 1 + format.size() + 1;
+    casadi_int buf_size = prefix.size() + base_filename_.size()
+      + 1 + 6 + 1 + format.size() + 1;
     std::string a = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
     // Block scope for dump variables
     g << "{\n";
-    g << "  static int dump_id = 0;\n";
-    g << "  char dump_fname[" << buf_size << "];\n";
-    g << "  FILE* dump_file;\n";
-    g << "  snprintf(dump_fname, " << buf_size << ", \"" << prefix << base_filename_
+    g << "static int dump_id = 0;\n";
+    g << "char dump_fname[" << buf_size << "];\n";
+    g << "FILE* dump_file;\n";
+    g << "snprintf(dump_fname, " << buf_size << ", \"" << prefix << base_filename_
       << ".%06d." << format << "\", dump_id++);\n";
-    g << "  dump_file = fopen(dump_fname, \"w\");\n";
-    g << "  if (dump_file) {\n";
-    g << "    " << g.to_file("dump_file", dep(0).sparsity(), a) << "\n";
-    g << "    fclose(dump_file);\n";
-    g << "  }\n";
+    if (verbose_) {
+      g << g.printf("dump -> %s\\n", "dump_fname") << "\n";
+    }
+    g << "dump_file = fopen(dump_fname, \"w\");\n";
+    g << "if (dump_file) {\n";
+    g << g.to_file("dump_file", dep(0).sparsity(), a) << ";\n";
+    g << "fclose(dump_file);\n";
+    g << "}\n";
     g << "}\n";
     // Copy
     generate_copy(g, arg, res, arg_is_ref, res_is_ref, 0);
