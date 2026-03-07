@@ -829,7 +829,9 @@ namespace casadi {
         dump_format_, sparsity_in_[i], arg[i]);
     }
     std::string name = dump_dir_+ filesep() + name_ + "." + count + ".in.txt";
-    uout() << "dump_in -> " << name << std::endl;
+    if (verbose_) {
+      casadi_message("dump_in for " + name_ + " -> " + name);
+    }
     generate_in(name, arg);
   }
 
@@ -841,7 +843,11 @@ namespace casadi {
       DM::to_file(dump_dir_+ filesep() + name_ + "." + count + ".out." + name_out_[i] + "." +
         dump_format_, sparsity_out_[i], res[i]);
     }
-    generate_out(dump_dir_+ filesep() + name_ + "." + count + ".out.txt", res);
+    std::string name = dump_dir_+ filesep() + name_ + "." + count + ".out.txt";
+    if (verbose_) {
+      casadi_message("dump_out for " + name_ + " -> " + name);
+    }
+    generate_out(name, res);
   }
 
   void FunctionInternal::dump() const {
