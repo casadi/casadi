@@ -886,7 +886,9 @@ namespace casadi {
         \identifier{u7} */
     std::string file_slurp(const std::string& fname, casadi_int n, const std::string& a);
 
-    /** \brief Write matrix to file in MatrixMarket format */
+    /** \brief Write matrix to file in MatrixMarket format
+
+        \identifier{2f8} */
     std::string to_file(const std::string& f, const Sparsity& sp, const std::string& x);
 
     /** \brief cache check

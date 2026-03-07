@@ -481,6 +481,9 @@
 %exception  casadi::CodeGenerator::thread_safe() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::to_file(const std::string &f, const Sparsity &sp, const std::string &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::to_mex(const Sparsity &sp, const std::string &arg) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3451,6 +3454,9 @@
 %exception  casadi::MX::dot(const MX &x, const MX &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::dump(const std::string &base_filename, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::einstein(const MX &A, const MX &B, const MX &C, const std::vector< casadi_int > &dim_a, const std::vector< casadi_int > &dim_b, const std::vector< casadi_int > &dim_c, const std::vector< casadi_int > &a, const std::vector< casadi_int > &b, const std::vector< casadi_int > &c) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3839,6 +3845,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::repsum(const MX &x, casadi_int n, casadi_int m=1) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::reset_dump_count() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::reshape(const MX &x, casadi_int nrow, casadi_int ncol) {

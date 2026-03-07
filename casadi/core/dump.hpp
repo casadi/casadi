@@ -34,7 +34,8 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2026
-  */
+
+      \identifier{2fa} */
   class CASADI_EXPORT Dump : public MXNode {
   public:
 
@@ -51,7 +52,9 @@ namespace casadi {
     /// Reset the dump counter
     void reset_dump_count();
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{2fb} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
         const std::vector<bool>& unique={}) const override;
 
@@ -61,45 +64,65 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief Evaluate the MX node on a const/linear/nonlinear partition */
+    /** \brief Evaluate the MX node on a const/linear/nonlinear partition
+
+        \identifier{2fc} */
     void eval_linear(const std::vector<std::array<MX, 3> >& arg,
             std::vector<std::array<MX, 3> >& res) const override {
         eval_linear_rearrange(arg, res);
     }
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{2fd} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{2fe} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief Add dependencies for code generation */
+    /** \brief Add dependencies for code generation
+
+        \identifier{2ff} */
     void add_dependency(CodeGenerator& g) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{2fg} */
     void generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res,
                           const std::vector<bool>& arg_is_ref,
                           std::vector<bool>& res_is_ref) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{2fh} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{2fi} */
     casadi_int op() const override { return OP_DUMP;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{2fj} */
     void serialize_body(SerializingStream& s) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{2fk} */
     static MXNode* deserialize(DeserializingStream& s) { return new Dump(s); }
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{2fl} */
     explicit Dump(DeserializingStream& s);
 
   private:
