@@ -426,6 +426,10 @@ namespace casadi {
     opts["dump_dir"] = dump_dir_;
     opts["dump_format"] = dump_format_;
     opts["dump"] = dump_;
+    if (target=="clone") {
+      opts["is_diff_in"] = is_diff_in_;
+      opts["is_diff_out"] = is_diff_out_;
+    }
     if (target=="forward") {
       opts["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_in_);
       opts["is_diff_out"] = is_diff_out_;

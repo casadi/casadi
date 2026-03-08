@@ -2753,6 +2753,12 @@ class Functiontests(casadiTestCase):
 
       options = {"is_diff_in":[True,False],"is_diff_out":[True,False]}
       f = Function("f",[x,y],[sin(x+y),x*y],options)
+      
+      if X is MX:
+        fexpanded = f.expand()
+        r1 = str(f).split(" ")[0]
+        r2 = str(fexpanded).split(" ")[0]
+        self.assertEqual(r1,r2)
 
 
 
