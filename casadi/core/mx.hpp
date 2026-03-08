@@ -988,6 +988,7 @@ namespace casadi {
     MX monitor(const std::string& comment) const;
 
     /** \brief Dump an expression
+
     * Returns itself, but with the side effect of dumping values to file
     * Allowed options: "dir" (dump directory), "format" (file format, default "mtx"),
     * "verbose" (print filename on each dump, default false)
