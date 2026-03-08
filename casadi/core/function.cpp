@@ -326,6 +326,7 @@ namespace casadi {
         join(get_free(), ","));
 
     Dict my_opts = (*this)->generate_options("clone");
+    my_opts["cse"] = true;
     update_dict(my_opts, opts);
     std::vector<SX> ex_in = sx_in();
     std::vector<SX> ex_out = Function(*this)(ex_in);
