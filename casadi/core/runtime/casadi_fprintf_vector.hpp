@@ -17,29 +17,12 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// C-REPLACE "static_cast<int>" "(int) "
-
-// SYMBOL "to_file"
+// SYMBOL "fprintf_vector"
 template<typename T1>
-void casadi_to_file(FILE* f, const casadi_int* sp, const T1* x) {
-  casadi_int nrow = sp[0];
-  casadi_int ncol = sp[1];
-  const casadi_int* colind = sp+2;
-  const casadi_int* row = colind + ncol + 1;
-  casadi_int nnz = colind[ncol];
-  casadi_int cc, k;
-  fprintf(f, "%%%%MatrixMarket matrix coordinate real general\n");
-  fprintf(f, "%d %d %d\n", static_cast<int>(nrow), static_cast<int>(ncol),
-    static_cast<int>(nnz));
-  for (cc=0; cc<ncol; ++cc) {
-    for (k=colind[cc]; k<colind[cc+1]; ++k) {
-      fprintf(f, "%d %d ", static_cast<int>(row[k]+1), static_cast<int>(cc+1));
-      if (x) {
-        casadi_fprintf_scalar(f, x[k]);
-      } else {
-        fprintf(f, "nan");
-      }
-      fprintf(f, "\n");
-    }
+void casadi_fprintf_vector(FILE* f, casadi_int sz, const T1* a, const char* sep) {
+  casadi_int i;
+  for (i=0; i<sz; ++i) {
+    if (i>0) fprintf(f, "%s", sep);
+    casadi_fprintf_scalar(f, a[i]);
   }
 }

@@ -725,6 +725,8 @@ namespace casadi {
       AUX_PRINT_SCALAR,
       AUX_PRINT_VECTOR,
       AUX_PRINT_CANONICAL,
+      AUX_FPRINTF_SCALAR,
+      AUX_FPRINTF_VECTOR,
       AUX_TO_FILE,
       AUX_THREADS
     };
@@ -794,6 +796,13 @@ namespace casadi {
 
         \identifier{2dm} */
     std::string print_scalar(const std::string& arg);
+
+    /** \brief fprintf a normalized scalar (canonical nan/inf) to a file */
+    std::string fprintf_scalar(const std::string& f, const std::string& arg);
+
+    /** \brief fprintf a normalized vector to a file with a separator */
+    std::string fprintf_vector(const std::string& f, casadi_int sz,
+      const std::string& arg, const std::string& sep);
 
     /** \brief Create a copy operation
 

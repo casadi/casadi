@@ -1160,6 +1160,20 @@ namespace casadi {
     return s.str();
   }
 
+  std::string CodeGenerator::fprintf_scalar(const std::string& f, const std::string& arg) {
+    add_auxiliary(AUX_FPRINTF_SCALAR);
+    std::stringstream s;
+    s << "casadi_fprintf_scalar(" << f << ", " << arg << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::fprintf_vector(const std::string& f, casadi_int sz,
+      const std::string& arg, const std::string& sep) {
+    add_auxiliary(AUX_FPRINTF_VECTOR);
+    std::stringstream s;
+    s << "casadi_fprintf_vector(" << f << ", " << sz << ", " << arg << ", \"" << sep << "\");";
+    return s.str();
+  }
 
   std::string CodeGenerator::print_op(casadi_int op, const std::string& a0) {
     switch (op) {
@@ -1992,10 +2006,18 @@ namespace casadi {
       add_auxiliary(AUX_PRINT_VECTOR);
       this->auxiliaries << sanitize_source(casadi_print_canonical_str, inst);
       break;
-    case AUX_TO_FILE:
+    case AUX_FPRINTF_SCALAR:
       add_include("stdio.h");
       add_auxiliary(AUX_INF);
-      add_auxiliary(AUX_NAN);
+      this->auxiliaries << sanitize_source(casadi_fprintf_scalar_str, inst);
+      break;
+    case AUX_FPRINTF_VECTOR:
+      add_auxiliary(AUX_FPRINTF_SCALAR);
+      this->auxiliaries << sanitize_source(casadi_fprintf_vector_str, inst);
+      break;
+    case AUX_TO_FILE:
+      add_include("stdio.h");
+      add_auxiliary(AUX_FPRINTF_SCALAR);
       this->auxiliaries << sanitize_source(casadi_to_file_str, inst);
       break;
     case AUX_THREADS:
@@ -2846,8 +2868,6 @@ namespace casadi {
     // Combined .txt file (normalized doubles, one per line)
     {
       add_include("stdio.h");
-      add_auxiliary(AUX_INF);
-      add_auxiliary(AUX_NAN);
       std::string fixed_part = prefix + f.name() + "." + inout + ".txt";
       casadi_int buf_size = fixed_part.size() + 1 + 6 + 1;
       *this << "{\n";
@@ -2864,14 +2884,9 @@ namespace casadi {
         std::string a = arr + "[" + str(i) + "]";
         if (nnz > 0) {
           *this << "if (" << a << ") {\n";
-          *this << "for (dump_k=0; dump_k<" << nnz << "; ++dump_k) {\n";
-          *this << "if (" << a << "[dump_k]!=" << a << "[dump_k]) fprintf(dump_file, \"nan\\n\");\n";
-          *this << "else if (" << a << "[dump_k]==casadi_inf) fprintf(dump_file, \"inf\\n\");\n";
-          *this << "else if (" << a << "[dump_k]==-casadi_inf) fprintf(dump_file, \"-inf\\n\");\n";
-          *this << "else fprintf(dump_file, \"%.16e\\n\", " << a << "[dump_k]);\n";
-          *this << "}\n";
+          *this << fprintf_vector("dump_file", nnz, a, "\\n") << "\n";
+          *this << "fprintf(dump_file, \"\\n\");\n";
           *this << "} else {\n";
-          std::string zero_val = is_input ? "0" : "nan";
           std::string zero_str = is_input ? "0.0000000000000000e+00" : "nan";
           *this << "for (dump_k=0; dump_k<" << nnz << "; ++dump_k) "
                 << "fprintf(dump_file, \"" << zero_str << "\\n\");\n";
