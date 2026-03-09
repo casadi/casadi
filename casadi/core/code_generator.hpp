@@ -900,6 +900,9 @@ namespace casadi {
         \identifier{2f8} */
     std::string to_file(const std::string& f, const Sparsity& sp, const std::string& x);
 
+    /** \brief Generate dump_in or dump_out code for a function call */
+    void generate_dump(const Function& f, const std::string& arr, bool is_input);
+
     /** \brief cache check
 
         \identifier{u8} */

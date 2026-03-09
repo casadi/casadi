@@ -736,6 +736,7 @@ namespace casadi {
 
   void FunctionInternal::finalize() {
     if (codegen_needs_mem()) has_refcount_ = true;
+    if (dump_in_ || dump_out_) has_refcount_ = true;
 
     has_refcount_in_deps_ = has_refcount_;
 
@@ -2459,8 +2460,32 @@ namespace casadi {
 
     g.scope_enter();
 
+    if (dump_in_ || dump_out_) {
+      Function F = shared_from_this<Function>();
+      std::string cg_name = codegen_name(g, false);
+      std::string dump_counter = g.shorthand(cg_name + "_dump_counter");
+      g.auxiliaries << "static int " << dump_counter << " = 0;\n";
+      if (g.thread_safe()) {
+        g.define_local_mutex(F, cg_name + "_dump_mutex");
+        std::string dump_mutex = g.local_mutex(F, cg_name + "_dump_mutex");
+        g << "CASADI_MUTEX_LOCK(&" << dump_mutex << ");\n";
+        g << "int dump_id_local = " << dump_counter << "++;\n";
+        g << "CASADI_MUTEX_UNLOCK(&" << dump_mutex << ");\n";
+      } else {
+        g << "int dump_id_local = " << dump_counter << "++;\n";
+      }
+    }
+
+    if (dump_in_) {
+      g.generate_dump(shared_from_this<Function>(), "arg", true);
+    }
+
     // Generate function body (to buffer)
     codegen_body(g);
+
+    if (dump_out_) {
+      g.generate_dump(shared_from_this<Function>(), "res", false);
+    }
 
     g.scope_exit();
 

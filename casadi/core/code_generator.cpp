@@ -2804,6 +2804,86 @@ namespace casadi {
     return "casadi_to_file(" + f + ", " + sparsity(sp) + ", " + x + ")";
   }
 
+  void CodeGenerator::
+  generate_dump(const Function& f, const std::string& arr, bool is_input) {
+    casadi_int n = is_input ? f.n_in() : f.n_out();
+    std::string dump_format = f->dump_format_.empty() ? "mtx" : f->dump_format_;
+    std::string effective_dir = dump_dir_prefix + f->dump_dir_ + dump_dir_suffix;
+    std::string prefix;
+    if (!effective_dir.empty()) prefix = effective_dir + "/";
+    std::string inout = is_input ? "in" : "out";
+
+    // Ensure directory exists at codegen time
+    if (!effective_dir.empty() && Filesystem::is_enabled()) {
+      std::string dir = Filesystem::ensure_trailing_slash(effective_dir);
+      casadi_assert(Filesystem::ensure_directory_exists(dir),
+        "Unable to create the required directory for '" + dir + "'.");
+    }
+
+    // Assumes dump_id_local is declared in the enclosing scope
+    // Per-input/output format files (e.g. .mtx)
+    for (casadi_int i = 0; i < n; ++i) {
+      std::string io_name = is_input ? f.name_in(i) : f.name_out(i);
+      Sparsity sp = is_input ? f.sparsity_in(i) : f.sparsity_out(i);
+      std::string fixed_part = prefix + f.name() + "." + inout + "." + io_name + "." + dump_format;
+      casadi_int buf_size = fixed_part.size() + 1 + 6 + 1;  // +7 for the counter field
+      *this << "{\n";
+      *this << "char dump_fname[" << buf_size << "];\n";
+      *this << "FILE* dump_file;\n";
+      *this << "snprintf(dump_fname, " << buf_size << ", \""
+            << prefix << f.name() << ".%06d." << inout << "." << io_name
+            << "." << dump_format << "\", dump_id_local);\n";
+      if (f->verbose_) {
+        *this << printf("dump -> %s\\n", "dump_fname") << "\n";
+      }
+      *this << "dump_file = fopen(dump_fname, \"w\");\n";
+      *this << "if (dump_file) {\n";
+      *this << to_file("dump_file", sp, arr + "[" + str(i) + "]") << ";\n";
+      *this << "fclose(dump_file);\n";
+      *this << "}\n";
+      *this << "}\n";
+    }
+    // Combined .txt file (normalized doubles, one per line)
+    {
+      add_include("stdio.h");
+      add_auxiliary(AUX_INF);
+      add_auxiliary(AUX_NAN);
+      std::string fixed_part = prefix + f.name() + "." + inout + ".txt";
+      casadi_int buf_size = fixed_part.size() + 1 + 6 + 1;
+      *this << "{\n";
+      *this << "char dump_fname[" << buf_size << "];\n";
+      *this << "FILE* dump_file;\n";
+      *this << "casadi_int dump_k;\n";
+      *this << "snprintf(dump_fname, " << buf_size << ", \""
+            << prefix << f.name() << ".%06d." << inout << ".txt\", dump_id_local);\n";
+      *this << "dump_file = fopen(dump_fname, \"w\");\n";
+      *this << "if (dump_file) {\n";
+      for (casadi_int i = 0; i < n; ++i) {
+        Sparsity sp = is_input ? f.sparsity_in(i) : f.sparsity_out(i);
+        casadi_int nnz = sp.nnz();
+        std::string a = arr + "[" + str(i) + "]";
+        if (nnz > 0) {
+          *this << "if (" << a << ") {\n";
+          *this << "for (dump_k=0; dump_k<" << nnz << "; ++dump_k) {\n";
+          *this << "if (" << a << "[dump_k]!=" << a << "[dump_k]) fprintf(dump_file, \"nan\\n\");\n";
+          *this << "else if (" << a << "[dump_k]==casadi_inf) fprintf(dump_file, \"inf\\n\");\n";
+          *this << "else if (" << a << "[dump_k]==-casadi_inf) fprintf(dump_file, \"-inf\\n\");\n";
+          *this << "else fprintf(dump_file, \"%.16e\\n\", " << a << "[dump_k]);\n";
+          *this << "}\n";
+          *this << "} else {\n";
+          std::string zero_val = is_input ? "0" : "nan";
+          std::string zero_str = is_input ? "0.0000000000000000e+00" : "nan";
+          *this << "for (dump_k=0; dump_k<" << nnz << "; ++dump_k) "
+                << "fprintf(dump_file, \"" << zero_str << "\\n\");\n";
+          *this << "}\n";
+        }
+      }
+      *this << "fclose(dump_file);\n";
+      *this << "}\n";
+      *this << "}\n";
+    }
+  }
+
   std::string CodeGenerator::
   cache_check(const std::string& key, const std::string& cache, const std::string& loc,
         casadi_int stride, casadi_int sz, casadi_int key_sz, const std::string& val) {

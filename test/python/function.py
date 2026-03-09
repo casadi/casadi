@@ -2474,6 +2474,33 @@ class Functiontests(casadiTestCase):
       self.checkarray(Xr,X)
       self.checkarray(Ar,A)
 
+    if args.run_slow and "ghc-filesystem" in CasadiMeta.feature_list():
+      import shutil
+      for d in ["dump_fn", "dump_fn_codegen"]:
+        if os.path.exists(d):
+          shutil.rmtree(d)
+
+      # Codegen test for dump_in/dump_out
+      x = MX.sym("x", Sparsity.lower(3))
+      z = MX.sym("z", 2, 2)
+      f = Function("f", [x, z], [2*x, 2*z], ["x", "z"], ["a", "c"],
+                   {"dump_in": True, "dump_out": True, "dump_dir": "dump_fn"})
+
+      ins = [sparsify(DM([[1, 0, 0], [2, 4, 0], [7, 8, 9]])), DM([[1, 3], [4, 5]])]
+      f(*ins)
+
+      self.check_codegen(f, inputs=ins, std="c99", main=True,
+                         opts={"dump_dir_suffix": "_codegen"})
+
+      for name in ["f.000000.in.txt", "f.000000.in.x.mtx", "f.000000.in.z.mtx",
+                    "f.000000.out.a.mtx", "f.000000.out.c.mtx", "f.000000.out.txt"]:
+        self.file_equal(os.path.join("dump_fn", name),
+                        os.path.join("dump_fn_codegen", name))
+
+      for d in ["dump_fn", "dump_fn_codegen"]:
+        if os.path.exists(d):
+          shutil.rmtree(d)
+
   def test_eval_shapes(self):
     x = MX.sym("x",Sparsity.lower(3))
     y = MX.sym("y",3,1)
