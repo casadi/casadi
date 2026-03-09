@@ -2884,6 +2884,21 @@ namespace casadi {
     }
   }
 
+  void CodeGenerator::
+  generate_print(const Function& f, const std::string& arr, bool is_input) {
+    casadi_int n = is_input ? f.n_in() : f.n_out();
+    std::string inout = is_input ? "Input" : "Output";
+
+    *this << printf("Function " + f.name() + "\\n") << "\n";
+    for (casadi_int i = 0; i < n; ++i) {
+      std::string io_name = is_input ? f.name_in(i) : f.name_out(i);
+      Sparsity sp = is_input ? f.sparsity_in(i) : f.sparsity_out(i);
+      *this << printf(inout + " " + str(i) + " (" + io_name + "): ") << "\n";
+      *this << print_canonical(sp, arr + "[" + str(i) + "]") << "\n";
+      *this << printf("\\n") << "\n";
+    }
+  }
+
   std::string CodeGenerator::
   cache_check(const std::string& key, const std::string& cache, const std::string& loc,
         casadi_int stride, casadi_int sz, casadi_int key_sz, const std::string& val) {

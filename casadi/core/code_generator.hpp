@@ -903,6 +903,9 @@ namespace casadi {
     /** \brief Generate dump_in or dump_out code for a function call */
     void generate_dump(const Function& f, const std::string& arr, bool is_input);
 
+    /** \brief Generate print_in or print_out code for a function call */
+    void generate_print(const Function& f, const std::string& arr, bool is_input);
+
     /** \brief cache check
 
         \identifier{u8} */

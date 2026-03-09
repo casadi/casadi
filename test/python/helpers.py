@@ -789,7 +789,7 @@ class casadiTestCase(unittest.TestCase):
     if bad_symbols:
       self.fail("Found %d bad symbol exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True):
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
@@ -925,7 +925,7 @@ class casadiTestCase(unittest.TestCase):
       if with_external:
           Fout2 = F2.call(inputs)
 
-      if main:
+      if main and main_output_check:
         outputs = F.generate_out(F.name()+"_out.txt")
         print(F.name(),outputs)
         if isinstance(inputs,dict):

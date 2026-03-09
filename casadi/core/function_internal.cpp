@@ -2476,16 +2476,14 @@ namespace casadi {
       }
     }
 
-    if (dump_in_) {
-      g.generate_dump(shared_from_this<Function>(), "arg", true);
-    }
+    if (dump_in_) g.generate_dump(shared_from_this<Function>(), "arg", true);
+    if (print_in_) g.generate_print(shared_from_this<Function>(), "arg", true);
 
     // Generate function body (to buffer)
     codegen_body(g);
 
-    if (dump_out_) {
-      g.generate_dump(shared_from_this<Function>(), "res", false);
-    }
+    if (dump_out_) g.generate_dump(shared_from_this<Function>(), "res", false);
+    if (print_out_) g.generate_print(shared_from_this<Function>(), "res", false);
 
     g.scope_exit();
 

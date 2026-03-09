@@ -2501,6 +2501,37 @@ class Functiontests(casadiTestCase):
         if os.path.exists(d):
           shutil.rmtree(d)
 
+  def test_print(self):
+    import re
+    x = MX.sym("x",Sparsity.lower(3))
+    z = MX.sym("z",2,2)
+    f = Function("f",[x,z],[2*x,2*z],["x","z"],["a","c"],
+                 {"print_in":True,"print_out":True,"print_canonical":True})
+
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[1,3],[4,5]])]
+
+    with capture_stdout() as out:
+      result = f(*ins)
+    vm_output = out[0]
+
+    self.checkarray(result[0],2*ins[0])
+    self.checkarray(result[1],2*ins[1])
+
+    # Strip pointer addresses from VM output for comparison
+    vm_lines = [re.sub(r' \(0x[0-9a-f]+\)','',line)
+                for line in vm_output.strip().split('\n')]
+    self.assertTrue(len(vm_lines)>=6)
+
+    self.check_codegen(f,inputs=ins,std="c99",main=True,main_output_check=False)
+    if args.run_slow:
+      with open(f.name()+"_out.txt","r") as fh:
+        cg_output = fh.read()
+      # Extract print lines (skip main output values line)
+      cg_lines = [line for line in cg_output.strip().split('\n')
+                  if line.startswith("Function") or line.startswith("Input")
+                     or line.startswith("Output")]
+      self.assertEqual(vm_lines,cg_lines)
+
   def test_eval_shapes(self):
     x = MX.sym("x",Sparsity.lower(3))
     y = MX.sym("y",3,1)
