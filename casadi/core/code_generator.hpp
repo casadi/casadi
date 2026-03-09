@@ -186,7 +186,8 @@ namespace casadi {
         \identifier{2ax} */
     std::string pool_double(const std::string& name) const;
 
-    /** \brief Declare a static mutex associated with a function (thread-safe mode only, idempotent) */
+    /** \brief Declare a static mutex associated with a function
+     (thread-safe mode only, idempotent) */
     void define_local_mutex(const Function& f, const std::string& name);
 
     /** \brief Access a static mutex associated with a function */
