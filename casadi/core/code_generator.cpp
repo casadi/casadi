@@ -891,6 +891,36 @@ namespace casadi {
     return "casadi_pd" + str(it->second);
   }
 
+  void CodeGenerator::define_local_mutex(const Function& f,
+                                         const std::string& name) {
+    if (!thread_safe()) return;
+    if (!local_mutexes_[f.get()].insert(name).second) return;  // already defined
+    std::string sh = shorthand(name);
+    auxiliaries << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n";
+    auxiliaries << "static CASADI_MUTEX_TYPE " << sh << ";\n";
+    auxiliaries << "#else\n";
+    auxiliaries << "static CASADI_MUTEX_TYPE " << sh
+               << " = CASADI_MUTEX_STATIC_INIT;\n";
+    auxiliaries << "#endif\n";
+  }
+
+  std::string CodeGenerator::local_mutex(const Function& f,
+                                         const std::string& name) const {
+    auto it = local_mutexes_.find(f.get());
+    casadi_assert(it != local_mutexes_.end() && it->second.count(name),
+                  "Mutex not defined: " + name);
+    return shorthand(name);
+  }
+
+  static const std::set<std::string> empty_mutex_set_;
+
+  const std::set<std::string>& CodeGenerator::local_mutexes(
+      const Function& f) const {
+    auto it = local_mutexes_.find(f.get());
+    if (it == local_mutexes_.end()) return empty_mutex_set_;
+    return it->second;
+  }
+
   void CodeGenerator::dump(std::ostream& s) {
     // Consistency check
     casadi_assert_dev(current_indent_ == 0);

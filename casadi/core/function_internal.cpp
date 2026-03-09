@@ -2499,11 +2499,14 @@ namespace casadi {
       std::string ref_counter = g.shorthand(name + "_ref_counter");
       g.auxiliaries << "static int " << ref_counter  << " = 0;\n";
 
+      Function F = shared_from_this<Function>();
       if (g.thread_safe()) {
-        std::string ref_mutex = g.shorthand(name + "_mem_mutex");
-        g << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n";
-        g << "if (" << ref_counter << "==0) CASADI_MUTEX_INIT(&" << ref_mutex << ");\n";
-        g << "#endif\n";
+        for (const auto& m : g.local_mutexes(F)) {
+          std::string mtx = g.local_mutex(F, m);
+          g << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n";
+          g << "if (" << ref_counter << "==0) CASADI_MUTEX_INIT(&" << mtx << ");\n";
+          g << "#endif\n";
+        }
       }
       g << ref_counter << "++;\n";
     }
@@ -2552,10 +2555,13 @@ namespace casadi {
         g << "}\n";
       }
       if (g.thread_safe()) {
-        std::string ref_mutex = g.shorthand(name + "_mem_mutex");
-        g << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n";
-        g << "CASADI_MUTEX_DESTROY(&" << ref_mutex << ");\n";
-        g << "#endif\n";
+        Function F = shared_from_this<Function>();
+        for (const auto& m : g.local_mutexes(F)) {
+          std::string mtx = g.local_mutex(F, m);
+          g << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n";
+          g << "CASADI_MUTEX_DESTROY(&" << mtx << ");\n";
+          g << "#endif\n";
+        }
       }
       g << "}\n";
     }
@@ -2591,13 +2597,9 @@ namespace casadi {
                " " << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
 
     if (g.thread_safe()) {
-      std::string mem_mutex = g.shorthand(name + "_mem_mutex");
-      g.auxiliaries << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n";
-      g.auxiliaries << "static CASADI_MUTEX_TYPE " << mem_mutex << ";\n";
-      g.auxiliaries << "#else\n";
-      g.auxiliaries << "static CASADI_MUTEX_TYPE " << mem_mutex << " = CASADI_MUTEX_STATIC_INIT;\n";
-      g.auxiliaries << "#endif\n";
-
+      Function F = shared_from_this<Function>();
+      g.define_local_mutex(F, name + "_mem_mutex");
+      std::string mem_mutex = g.local_mutex(F, name + "_mem_mutex");
       g << "CASADI_MUTEX_LOCK(&" << mem_mutex << ");\n";
       g.scope_add_cleanup("CASADI_MUTEX_UNLOCK(&" + mem_mutex + ");\n");
     }
@@ -2627,7 +2629,8 @@ namespace casadi {
     std::string stack = g.shorthand(name + "_unused_stack");
 
     if (g.thread_safe()) {
-      std::string mem_mutex = g.shorthand(name + "_mem_mutex");
+      Function F = shared_from_this<Function>();
+      std::string mem_mutex = g.local_mutex(F, name + "_mem_mutex");
       g << "CASADI_MUTEX_LOCK(&" << mem_mutex << ");\n";
       g.scope_add_cleanup("CASADI_MUTEX_UNLOCK(&" + mem_mutex + ");\n");
     }

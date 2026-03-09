@@ -186,6 +186,15 @@ namespace casadi {
         \identifier{2ax} */
     std::string pool_double(const std::string& name) const;
 
+    /** \brief Declare a static mutex associated with a function (thread-safe mode only, idempotent) */
+    void define_local_mutex(const Function& f, const std::string& name);
+
+    /** \brief Access a static mutex associated with a function */
+    std::string local_mutex(const Function& f, const std::string& name) const;
+
+    /** \brief Get all mutex names associated with a function */
+    const std::set<std::string>& local_mutexes(const Function& f) const;
+
     /** \brief Setup a callback
 
         \identifier{27s} */
@@ -1063,6 +1072,7 @@ namespace casadi {
     std::map<const void *, casadi_int> file_scope_integer_;
     std::vector< std::vector<double> > pool_double_defaults_;
     std::map<std::string, casadi_int> pool_double_;
+    std::map<const FunctionInternal*, std::set<std::string> > local_mutexes_;
 
     // Added functions
     struct FunctionMeta {
