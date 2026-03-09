@@ -232,6 +232,9 @@
 %exception  casadi::CodeGenerator::declare(std::string s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::define_local_mutex(const Function &f, const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::define_pool_double(const std::string &name, const std::vector< double > &def) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -268,10 +271,22 @@
 %exception  casadi::CodeGenerator::format_padded(casadi_int i) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::fprintf_scalar(const std::string &f, const std::string &arg) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::fprintf_vector(const std::string &f, casadi_int sz, const std::string &arg, const std::string &sep) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::from_mex(std::string &arg, const std::string &res, std::size_t res_off, const Sparsity &sp_res, const std::string &w) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::generate(const std::string &prefix="") {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::generate_dump(const Function &f, const std::string &arr, bool is_input) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::generate_print(const Function &f, const std::string &arr, bool is_input) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::get_constant(const std::vector< casadi_int > &v, bool allow_adding=false) {
@@ -314,6 +329,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::local(const std::string &name, const std::string &type, const std::string &ref="") {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::local_mutex(const Function &f, const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::local_mutexes(const Function &f) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::logsumexp(const std::string &A, casadi_int n) {

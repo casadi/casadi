@@ -187,13 +187,19 @@ namespace casadi {
     std::string pool_double(const std::string& name) const;
 
     /** \brief Declare a static mutex associated with a function
-     (thread-safe mode only, idempotent) */
+     (thread-safe mode only, idempotent)
+
+        \identifier{2fm} */
     void define_local_mutex(const Function& f, const std::string& name);
 
-    /** \brief Access a static mutex associated with a function */
+    /** \brief Access a static mutex associated with a function
+
+        \identifier{2fn} */
     std::string local_mutex(const Function& f, const std::string& name) const;
 
-    /** \brief Get all mutex names associated with a function */
+    /** \brief Get all mutex names associated with a function
+
+        \identifier{2fo} */
     const std::set<std::string>& local_mutexes(const Function& f) const;
 
     /** \brief Setup a callback
@@ -798,10 +804,14 @@ namespace casadi {
         \identifier{2dm} */
     std::string print_scalar(const std::string& arg);
 
-    /** \brief fprintf a normalized scalar (canonical nan/inf) to a file */
+    /** \brief fprintf a normalized scalar (canonical nan/inf) to a file
+
+        \identifier{2fp} */
     std::string fprintf_scalar(const std::string& f, const std::string& arg);
 
-    /** \brief fprintf a normalized vector to a file with a separator */
+    /** \brief fprintf a normalized vector to a file with a separator
+
+        \identifier{2fq} */
     std::string fprintf_vector(const std::string& f, casadi_int sz,
       const std::string& arg, const std::string& sep);
 
@@ -910,10 +920,14 @@ namespace casadi {
         \identifier{2f8} */
     std::string to_file(const std::string& f, const Sparsity& sp, const std::string& x);
 
-    /** \brief Generate dump_in or dump_out code for a function call */
+    /** \brief Generate dump_in or dump_out code for a function call
+
+        \identifier{2fr} */
     void generate_dump(const Function& f, const std::string& arr, bool is_input);
 
-    /** \brief Generate print_in or print_out code for a function call */
+    /** \brief Generate print_in or print_out code for a function call
+
+        \identifier{2fs} */
     void generate_print(const Function& f, const std::string& arr, bool is_input);
 
     /** \brief cache check
