@@ -151,6 +151,10 @@ if(WITH_ALPAQA)
   add_subdirectory(alpaqa)
 endif()
 
+if(WITH_UNO)
+  add_subdirectory(uno)
+endif()
+
 if(WITH_MATLAB_IPC)
   add_subdirectory(matlab_ipc)
 endif()
