@@ -446,8 +446,10 @@ namespace casadi {
       g << "for (i=0; i<" << n_ << "; ++i) {\n";
     }
 
+    bool local_increment = vectorize_f() && str(f_).find("SXFunction")!= std::string::npos;
+
     // Evaluate
-    if (vectorize_f() && str(f_).find("SXFunction")!= std::string::npos) {
+    if (local_increment) {
       g << g(f_, "arg1", "res1", "iw", "w", "1", local, "j") << ";\n";
     } else {
       g << "if (" << g(f_, "arg1", "res1", "iw", "w", "1", local) << ") return 1;\n";
@@ -462,11 +464,11 @@ namespace casadi {
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
       //REMOVE uout() << "j nnz" << j << ":" << f_.nnz_in(j) << std::endl;
-      if (!reduce_in_[j] && f_.nnz_in(j)) {
+      if (!reduce_in_[j] && f_.nnz_in(j) && !local_increment) {
         if (inst.arg_null.empty()) {
-          //g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
+          g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
         } else {
-          //if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
+          if (!inst.arg_null[j]) g << "arg1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_in(j)) << ";\n";
         }
       }
     }
@@ -474,7 +476,7 @@ namespace casadi {
     for (casadi_int j=0; j<n_out_; ++j) {
       if (reduce_out_[j]) {
         if (vectorize_f()) {
-          //g << "res1[" << j << "]+=1;\n";
+          if (!local_increment) g << "res1[" << j << "]+=1;\n";
         } else {
           g << "if (res1[" << j << "]) ";
           g << g.axpy(f_.nnz_out(j), "1.0", "res1[" + str(j) + "]", "res[" + str(j) + "]") << "\n";
@@ -485,7 +487,7 @@ namespace casadi {
             g << "if (res1[" << j << "]) ";
             g << "res1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_out(j)) << ";\n";
           } else {
-            //if (!inst.res_null[j]) g << "res1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_out(j)) << ";\n";
+            if (!local_increment) if (!inst.res_null[j]) g << "res1[" << j << "]+=" << (vectorize_f() ? 1 : f_.nnz_out(j)) << ";\n";
           }
         }
       }
