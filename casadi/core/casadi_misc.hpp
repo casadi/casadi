@@ -497,7 +497,7 @@ private:
         ret = std::numeric_limits<double>::infinity();
       } else if (non_reg=="-inf") {
         ret = -std::numeric_limits<double>::infinity();
-      } else if (non_reg=="nan") {
+      } else if (non_reg=="nan" || non_reg=="-nan") {
         ret = std::numeric_limits<double>::quiet_NaN();
       } else {
         ret = std::numeric_limits<double>::quiet_NaN();
