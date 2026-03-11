@@ -754,9 +754,13 @@ namespace casadi {
       for (size_t iind = 0; iind < n_in_; ++iind) {
         MX& r = res[i];
         if (skip_transform && vectorize_f()) {
-          if (r.op()==OP_PERMUTE_LAYOUT && reduce_in_[iind]) r = r.dep(0);
-          Sparsity patt = reduce_in_[iind] ? Sparsity::dense(n_, 1) : Sparsity::diag(n_);
-          r = sparsity_cast(r, Sparsity::kron(Jf.sparsity_out(i), patt));
+          if (!reduce_in_[iind] && !reduce_out_[oind]) {
+            r = sparsity_cast(r, Sparsity::kron(Jf.sparsity_out(i), Sparsity::diag(n_)));
+          } else {
+          if (r.op()==OP_PERMUTE_LAYOUT) r = r.dep(0);
+            Sparsity patt = reduce_in_[iind] ? Sparsity::dense(n_, 1) : Sparsity::diag(n_);
+            r = sparsity_cast(r, Sparsity::kron(Jf.sparsity_out(i), patt));
+          }
         } else {
           if (!reduce_out_[oind]) {
             if (reduce_in_[iind]) {
