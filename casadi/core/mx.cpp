@@ -2534,6 +2534,30 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
   };
   
 
+  // Like vector_slice for Sparsity::triplet, but sums entries that
+  // map to the same (row, col) instead of silently dropping duplicates.
+  // Uses inverted mapping: mapping[i] = output slot for input entry i.
+  static std::vector<MX> vector_sum_duplicates(const std::vector<MX>& blocks,
+      const std::vector<casadi_int>& mapping, casadi_int n_out) {
+    std::vector<MX> acc(n_out);
+    for (casadi_int i = 0; i < casadi_int(mapping.size()); i++) {
+      casadi_int j = mapping[i];
+      acc[j] = acc[j].is_empty() ? blocks[i] : acc[j] + blocks[i];
+    }
+    return acc;
+  }
+
+  static std::vector<std::string> vector_sum_duplicates(
+      const std::vector<std::string>& blocks,
+      const std::vector<casadi_int>& mapping, casadi_int n_out) {
+    std::vector<std::string> acc(n_out);
+    for (casadi_int i = 0; i < casadi_int(mapping.size()); i++) {
+      casadi_int j = mapping[i];
+      acc[j] = acc[j].empty() ? blocks[i] : acc[j] + "+" + blocks[i];
+    }
+    return acc;
+  }
+
   std::vector<MX> MX::block_jacobian(const std::vector< std::vector< MX > >& expr,
       const std::vector< std::vector< MX > >& arg,
       const Dict& options) {
@@ -2554,6 +2578,11 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     opts2["lift_calls"] = true;
     opts2["lift_shared"] = false;
     extract(vexpr, v, vdef, opts2); // Updates vexpr, v, vdef in place
+
+
+    uout() << "vexpr" << vexpr << std::endl;
+    uout() << "v" << v << std::endl;
+    uout() << "vdef" << vdef << std::endl;
 
     Dict common_options, specific_options;
     bool enable_nominal = true;
@@ -2869,13 +2898,13 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     }
 
     std::vector<casadi_int> mapping;
-    Sparsity sp_A = Sparsity::triplet(v.size(), v.size(), rows_A, cols_A, mapping, false);
-    blocks_A = vector_slice(blocks_A, mapping);
-    blocks_A_descr = vector_slice(blocks_A_descr, mapping);
+    Sparsity sp_A = Sparsity::triplet(v.size(), v.size(), rows_A, cols_A, mapping, true);
+    blocks_A = vector_sum_duplicates(blocks_A, mapping, sp_A.nnz());
+    blocks_A_descr = vector_sum_duplicates(blocks_A_descr, mapping, sp_A.nnz());
 
-    Sparsity sp_B = Sparsity::triplet(vexpr.size(), v.size(), rows_B, cols_B, mapping, false);
-    blocks_B = vector_slice(blocks_B, mapping);
-    blocks_B_descr = vector_slice(blocks_B_descr, mapping);
+    Sparsity sp_B = Sparsity::triplet(vexpr.size(), v.size(), rows_B, cols_B, mapping, true);
+    blocks_B = vector_sum_duplicates(blocks_B, mapping, sp_B.nnz());
+    blocks_B_descr = vector_sum_duplicates(blocks_B_descr, mapping, sp_B.nnz());
 
     // res <- A^-1 b
     block_trilsolve(sp_A, blocks_A, res, false, varg.size(), blocks_A_descr, res_descr);
@@ -2900,9 +2929,9 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       block_row++;
     }
 
-    Sparsity sp_C = Sparsity::triplet(vdef.size(), varg.size(), rows_C, cols_C, mapping, false);
-    blocks_C = vector_slice(blocks_C, mapping);
-    blocks_C_descr = vector_slice(blocks_C_descr, mapping);
+    Sparsity sp_C = Sparsity::triplet(vdef.size(), varg.size(), rows_C, cols_C, mapping, true);
+    blocks_C = vector_sum_duplicates(blocks_C, mapping, sp_C.nnz());
+    blocks_C_descr = vector_sum_duplicates(blocks_C_descr, mapping, sp_C.nnz());
     
 
     // R <- B C
