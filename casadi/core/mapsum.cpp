@@ -184,9 +184,14 @@ namespace casadi {
     alloc_w(f_.sz_w(), true);
     alloc_iw(f_.sz_iw());
 
-    // Allocate scratch space for dummping result of reduced outputs
+    // Allocate scratch space for reduced outputs
+    // When vectorize_f(), f_ writes at strided offsets (0, vw, 2*vw, ...)
+    // so scratch needs nnz_out * vw elements, not just nnz_out
     for (casadi_int j=0;j<n_out_;++j) {
-      if (reduce_out_[j]) alloc_w(f_.nnz_out(j), true);
+      if (reduce_out_[j]) {
+        casadi_int vw = vectorize_f() ? GlobalOptions::vector_width_real : 1;
+        alloc_w(f_.nnz_out(j) * vw, true);
+      }
     }
 
     has_refcount_ = f_->has_refcount_;
@@ -262,11 +267,12 @@ namespace casadi {
     T** res1 = res+n_out_;
 
     T* w_scratch = w + f_.sz_w();
+    casadi_int vw = vectorize_f() ? GlobalOptions::vector_width_real : 1;
     for (casadi_int j=0;j<n_out_;++j) {
       if (res[j] && reduce_out_[j]) {
         casadi_clear(res[j], f_.nnz_out(j)); // clear sums
         res1[j] = w_scratch; // Make the function dump result in scratch space
-        w_scratch += f_.nnz_out(j);
+        w_scratch += f_.nnz_out(j) * vw;
       } else {
         res1[j] = res[j];
       }
@@ -279,7 +285,10 @@ namespace casadi {
       for (casadi_int j=0; j<n_out_; ++j) {
         if (res1[j]) {
           if (reduce_out_[j]) {
-            casadi_add(f_.nnz_out(j), res1[j], res[j]); // Perform sum
+            // Strided add: f_ writes at offsets 0, vw, 2*vw, ...
+            for (casadi_int k = 0; k < f_.nnz_out(j); k++) {
+              res[j][k] += res1[j][k * vw];
+            }
           } else {
             res1[j] += vectorize_f() ? 1 : f_.nnz_out(j);
           }
