@@ -187,6 +187,7 @@ namespace casadi {
     std::string pool_double(const std::string& name) const;
 
     /** \brief Declare a static mutex associated with a function
+
      (thread-safe mode only, idempotent)
 
         \identifier{2fm} */
