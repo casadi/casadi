@@ -403,7 +403,7 @@ namespace casadi {
         //  g << "res1[" << j << "] = res[" << j << "];\n";
         //} else {
           g << "res"<< (loop_bug? "2" : "1") <<"[" << j << "] = w_scratch;\n";
-          g << "w_scratch+=" << f_.nnz_out(j)*GlobalOptions::vector_width_real << ";\n";
+          g << "w_scratch+=" << f_.nnz_out(j)* (vectorize_f() ? GlobalOptions::vector_width_real : 1) << ";\n";
         //}
         g << "} else {\n";
         g << "res"<< (loop_bug? "2" : "1") <<"[" << j << "] = res[" << j << "];\n";
