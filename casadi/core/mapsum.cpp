@@ -515,6 +515,7 @@ namespace casadi {
             g << "res1[" << j << "]-= " << GlobalOptions::vector_width_real << " ;\n";
           g.local("sum"+str(j), "casadi_real", "*");
           g << "sum" << j << " = res[" << j << "];\n";
+          g << "if (sum" << j << ") {\n";
           if (has_rem && n_outer_it>1) {
             // avoid adding nans
             g << "if (i<" << ((n_padded() / GlobalOptions::vector_width_real)-1) << ") {\n";
@@ -532,6 +533,7 @@ namespace casadi {
           if (has_rem && n_outer_it>1) {
             g << "}\n";
           }
+          g << "}\n";
         } else {
           if (loop_bug) {
             if (f_.nnz_out(j)) {
@@ -546,6 +548,7 @@ namespace casadi {
     if (has_rem && outer_loop) {
       for (casadi_int j=0; j<n_out_; ++j) {
         if (reduce_out_[j]) {
+          g << "if (sum" << j << ") {\n";
           g.local("k", "casadi_int");
           g.local("k", "casadi_int");
           g << "for (k=0; k<" << f_.nnz_out(j) << "; ++k) {\n";
@@ -553,6 +556,7 @@ namespace casadi {
           g << "for (j=0; j<" << rem << "; ++j) ";
           std::string res = loop_bug ? "res2" : "res1";
           g << "sum" << j << "[k]+=" << res << " [" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
+          g << "}\n";
           g << "}\n";
         }
       }
