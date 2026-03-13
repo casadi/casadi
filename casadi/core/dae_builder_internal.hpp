@@ -689,7 +689,9 @@ protected:
   // Read ModelExchange
   void import_model_exchange(const XmlNode& n);
 
-  /** \brief Read ModelVariables */
+  /** \brief Read ModelVariables
+
+      \identifier{2ft} */
   void import_model_variables(const XmlNode& modvars);
 
   // Read ModelStructure
