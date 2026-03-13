@@ -317,6 +317,8 @@ namespace casadi {
       local.stride_out[j] = vectorize_f() ? n_padded() : 1;
     }
     //REMOVE uout() << "codegen_body" << local.arg_null << f_ << std::endl;
+    bool local_increment = vectorize_f() && str(f_).find("SXFunction")!= std::string::npos;
+
     g.local("i", "casadi_int");
     g.local("arg1[" + str(f_.sz_arg()) + "]", "const casadi_real*");
     g.local("res1[" + str(f_.sz_res()) + "]", "casadi_real*");
@@ -326,20 +328,25 @@ namespace casadi {
     // Output buffer
     g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n";
     if (vectorize_f()) {
-      g << "#pragma omp simd\n";
-    }
-    g << "for (i=0; i<" << (vectorize_f() ? n_padded() : n_) << "; ++i) {\n";
-    std::string flag = g(f_, "arg1", "res1", "iw", "w", "1", local);
-    // Evaluate
-    if (str(f_).find("SXFunction")!= std::string::npos) {
-      // pass
+      g.local("j", "casadi_int");
+      g << "#pragma omp simd safelen(" << n_padded() << ")\n";
+      g << "for (j=0; j<" << n_padded() << "; ++j) {\n";
     } else {
+      g << "for (i=0; i<" << n_ << "; ++i) {\n";
+    }
+    // Evaluate
+    if (local_increment) {
+      g << g(f_, "arg1", "res1", "iw", "w", "1", local, "j") << ";\n";
+    } else if (str(f_).find("SXFunction")!= std::string::npos) {
+      g << g(f_, "arg1", "res1", "iw", "w", "1", local) << ";\n";
+    } else {
+      std::string flag = g(f_, "arg1", "res1", "iw", "w", "1", local);
       g << "if (" << flag << ") return 1;\n";
     }
 
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
-      if (f_.nnz_in(j)) {
+      if (f_.nnz_in(j) && !local_increment) {
         casadi_int stride = vectorize_f() ? 1 : f_.nnz_in(j);
         if (inst.arg_null.empty()) {
           g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << stride << ";\n";
@@ -350,7 +357,7 @@ namespace casadi {
     }
     // Update output buffers
     for (casadi_int j=0; j<n_out_; ++j) {
-      if (f_.nnz_out(j)) {
+      if (f_.nnz_out(j) && !local_increment) {
         casadi_int stride = vectorize_f() ? 1 : f_.nnz_out(j);
         if (inst.res_null.empty()) {
           g << "if (res1[" << j << "]) res1[" << j << "]+=" << stride << ";\n";
