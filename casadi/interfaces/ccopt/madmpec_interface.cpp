@@ -42,7 +42,7 @@
 namespace casadi {
 
 extern "C"
-int CASADI_NLPSOL_MADMPEC_EXPORT
+int CASADI_NLPSOL_CCOPT_EXPORT
 casadi_register_nlpsol_madmpec(Nlpsol::Plugin* plugin) {
   plugin->creator = MadmpecInterface::creator;
   plugin->name = "madmpec";
@@ -54,7 +54,7 @@ casadi_register_nlpsol_madmpec(Nlpsol::Plugin* plugin) {
 }
 
 extern "C"
-void CASADI_NLPSOL_MADMPEC_EXPORT casadi_load_nlpsol_madmpec() {
+void CASADI_NLPSOL_CCOPT_EXPORT casadi_load_nlpsol_madmpec() {
   Nlpsol::registerPlugin(casadi_register_nlpsol_madmpec);
 }
 
@@ -330,9 +330,9 @@ int MadmpecInterface::solve(void* mem) const {
   auto m = static_cast<MadmpecMemory*>(mem);
 
   int ret = casadi_madmpec_presolve(&m->d);
-  if (ret) throw CasadiException("MADMPECError");
+  if (ret) throw CasadiException("CCOPTError");
   ret = casadi_madmpec_solve(&m->d);
-  if (ret) throw CasadiException("MADMPECError");
+  if (ret) throw CasadiException("CCOPTError");
 
   m->success = m->d.success;
   m->unified_return_status = static_cast<UnifiedReturnStatus>(m->d.unified_return_status);
@@ -469,7 +469,7 @@ void MadmpecInterface::codegen_body(CodeGenerator& g) const {
 
 void MadmpecInterface::set_madmpec_prob(CodeGenerator& g) const {
   if (jacg_sp_.size1()>0 && jacg_sp_.nnz()==0) {
-    casadi_error("Empty sparsity pattern not supported in MADMPEC C interface");
+    casadi_error("Empty sparsity pattern not supported in CCOPT C interface");
   }
   g << "d->nlp = &d_nlp;\n";
   g << "d->prob = &p;\n";

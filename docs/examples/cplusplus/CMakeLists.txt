@@ -39,7 +39,7 @@ if(WITH_MADNLP)
   target_link_libraries(rocket_madnlp casadi)
 endif()
 
-if(WITH_MADMPEC)
+if(WITH_CCOPT)
   add_executable(basic_mpcc basic_mpcc.cpp)
   target_link_libraries(basic_mpcc casadi)
 endif()

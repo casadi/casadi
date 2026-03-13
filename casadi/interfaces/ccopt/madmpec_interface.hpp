@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_MADMPEC_INTERFACE_HPP
-#define CASADI_MADMPEC_INTERFACE_HPP
+#ifndef CASADI_CCOPT_INTERFACE_HPP
+#define CASADI_CCOPT_INTERFACE_HPP
 
 //#include <casadi/interfaces/madmpec/casadi_nlpsol_madmpec_export.h>
 #include <iostream>
@@ -38,13 +38,13 @@ namespace casadi {
 
 /** */
 
-#define CASADI_NLPSOL_MADMPEC_EXPORT __attribute__((visibility("default")))
+#define CASADI_NLPSOL_CCOPT_EXPORT __attribute__((visibility("default")))
 /** \pluginsection{Nlpsol,madmpec} **/
 
 /// \cond INTERNAL
 namespace casadi {
 
-struct CASADI_NLPSOL_MADMPEC_EXPORT MadmpecMemory : public NlpsolMemory {
+struct CASADI_NLPSOL_CCOPT_EXPORT MadmpecMemory : public NlpsolMemory {
   // Problem data structure
   casadi_madmpec_data<double> d;
 };
@@ -54,7 +54,7 @@ struct CASADI_NLPSOL_MADMPEC_EXPORT MadmpecMemory : public NlpsolMemory {
     @copydoc Nlpsol_doc
     @copydoc plugin_Nlpsol_madmpec
 */
-class CASADI_NLPSOL_MADMPEC_EXPORT MadmpecInterface : public Nlpsol {
+class CASADI_NLPSOL_CCOPT_EXPORT MadmpecInterface : public Nlpsol {
  public:
   Sparsity jacg_sp_;
   Sparsity hesslag_sp_;
@@ -104,7 +104,7 @@ class CASADI_NLPSOL_MADMPEC_EXPORT MadmpecInterface : public Nlpsol {
   /// Exact Hessian?
   bool exact_hessian_;
 
-  /// All MADMPEC options
+  /// All CCOPT options
   Dict opts_;
   Dict mpcc_opts_;
 
@@ -171,4 +171,4 @@ class CASADI_NLPSOL_MADMPEC_EXPORT MadmpecInterface : public Nlpsol {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_MADMPEC_INTERFACE_HPP
+#endif // CASADI_CCOPT_INTERFACE_HPP

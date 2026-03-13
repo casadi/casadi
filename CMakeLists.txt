@@ -841,8 +841,8 @@ if(NOT LIBMAD_TAR_PATH)
 endif()
 
 # MadMPEC: A sparse interior point NLP solver with filter line-search, written in Julia, specialized to solving MPCCs
-option(WITH_MADMPEC "Compile the interface to MadMPEC"  OFF)
-option(WITH_BUILD_MADMPEC "Download compiled libMad"  OFF)
+option(WITH_CCOPT "Compile the interface to MadMPEC"  OFF)
+option(WITH_BUILD_ "Download compiled libMad"  OFF)
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -1428,7 +1428,7 @@ if(WITH_FATROP)
   endif()
 endif()
 
-if((WITH_MADNLP AND WITH_BUILD_MADNLP) OR (WITH_MADMPEC AND WITH_BUILD_MADMPEC))
+if((WITH_MADNLP AND WITH_BUILD_MADNLP) OR (WITH_CCOPT AND WITH_BUILD_))
   # TODO(@apozharski): This is currently hacky but it avoids julia bulid dependencies. However, this makes crosscompilation a massive headache.
   #                    If CasADi wants to ship with MadNLP it may make more sense to build libMad.
 
