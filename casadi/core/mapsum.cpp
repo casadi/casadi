@@ -432,7 +432,14 @@ namespace casadi {
     if (vectorize_f()) {
       g.local("j", "casadi_int");
       if (outer_loop) {
-        g << "for (i=0; i<" << n_padded() / GlobalOptions::vector_width_real << "; ++i) {\n";
+        // Declare sum pointers for reduced output accumulation
+        for (casadi_int j=0; j<n_out_; ++j) {
+          if (reduce_out_[j]) {
+            g.local("sum"+str(j), "casadi_real", "*");
+            g << "sum" << j << " = res[" << j << "];\n";
+          }
+        }
+        g << "for (i=0; i<" << n_ / GlobalOptions::vector_width_real << "; ++i) {\n";
         if (loop_bug) {
           for (casadi_int j=0; j<n_in_; ++j) {
             if (!reduce_in_[j] && f_.nnz_in(j)) {
@@ -502,11 +509,8 @@ namespace casadi {
       }
     }
 
-    bool has_rem = n_ != n_padded();
-    casadi_int rem = GlobalOptions::vector_width_real-(n_padded()-n_);
-    casadi_int n_outer_it = n_padded() / GlobalOptions::vector_width_real; 
     if (outer_loop) {
-      g << "}\n";
+      g << "}\n"; // close inner SIMD loop
       if (loop_bug) {
         for (casadi_int j=0; j<n_in_; ++j) {
           if (!reduce_in_[j] && f_.nnz_in(j)) {
@@ -522,27 +526,17 @@ namespace casadi {
         if (reduce_out_[j]) {
           if (!loop_bug)
             g << "res1[" << j << "]-= " << GlobalOptions::vector_width_real << " ;\n";
-          g.local("sum"+str(j), "casadi_real", "*");
-          g << "sum" << j << " = res[" << j << "];\n";
           g << "if (sum" << j << ") {\n";
-          if (has_rem && n_outer_it>1) {
-            // avoid adding nans
-            g << "if (i<" << ((n_padded() / GlobalOptions::vector_width_real)-1) << ") {\n";
-          }
-          if (!has_rem || n_outer_it>1) {
-            g.local("k", "casadi_int");
-            g.local("j", "casadi_int");
-            g << "#pragma omp simd reduction(+:sum" << j << "[:" << f_.nnz_out(j) << "])\n";
-            g << "for (k=0; k<" << f_.nnz_out(j) << "; ++k) {\n";
-            g << "for (j=0; j<" << GlobalOptions::vector_width_real << "; ++j) ";
-            std::string res = loop_bug ? "res2" : "res1";
-            g << "sum" << j << "[k]+=" << res << " [" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
-            g << "}\n";
-          }
-          if (has_rem && n_outer_it>1) {
-            g << "}\n";
-          }
+          // Full reduction — all vw lanes are valid (no remainder in this loop)
+          g.local("k", "casadi_int");
+          g.local("j", "casadi_int");
+          g << "#pragma omp simd reduction(+:sum" << j << "[:" << f_.nnz_out(j) << "])\n";
+          g << "for (k=0; k<" << f_.nnz_out(j) << "; ++k) {\n";
+          g << "for (j=0; j<" << GlobalOptions::vector_width_real << "; ++j) ";
+          std::string res = loop_bug ? "res2" : "res1";
+          g << "sum" << j << "[k]+=" << res << "[" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
           g << "}\n";
+          g << "}\n"; // close if(sum)
         } else {
           if (loop_bug) {
             if (f_.nnz_out(j)) {
@@ -551,20 +545,66 @@ namespace casadi {
           }
         }
       }
-
     }
-    g << "}\n";
-    if (has_rem && outer_loop) {
+    g << "}\n"; // close outer/main loop
+
+    // Scalar tail for remainder iterations
+    casadi_int rem = n_ % GlobalOptions::vector_width_real;
+    if (rem > 0 && outer_loop) {
+      // Sync pointers after outer loop (loop_bug: arg1/res1 are stale copies of arg2/res2)
+      if (loop_bug) {
+        for (casadi_int j=0; j<n_in_; ++j) {
+          if (!reduce_in_[j] && f_.nnz_in(j)) {
+            g << "arg1[" << j << "]=arg2[" << j << "];\n";
+          }
+        }
+        for (casadi_int j=0; j<n_out_; ++j) {
+          if (f_.nnz_out(j)) {
+            g << "res1[" << j << "]=res2[" << j << "];\n";
+          }
+        }
+      }
+      g << "for (j=0; j<" << rem << "; ++j) {\n";
+      // Kernel call (same as SIMD path, but scalar)
+      if (local_increment) {
+        g << g(f_, "arg1", "res1", "iw", "w", "1", local, "j") << ";\n";
+      } else {
+        g << "if (" << g(f_, "arg1", "res1", "iw", "w", "1", local) << ") return 1;\n";
+      }
+      // Update input buffers
+      for (casadi_int j=0; j<n_in_; ++j) {
+        if (!reduce_in_[j] && f_.nnz_in(j) && !local_increment) {
+          if (inst.arg_null.empty()) {
+            g << "if (arg1[" << j << "]) arg1[" << j << "]+=1;\n";
+          } else {
+            if (!inst.arg_null[j]) g << "arg1[" << j << "]+=1;\n";
+          }
+        }
+      }
+      // Update output buffers
+      for (casadi_int j=0; j<n_out_; ++j) {
+        if (reduce_out_[j]) {
+          if (!local_increment) g << "res1[" << j << "]+=1;\n";
+        } else {
+          if (f_.nnz_out(j)) {
+            if (inst.res_null.empty()) {
+              g << "if (res1[" << j << "]) res1[" << j << "]+=1;\n";
+            } else {
+              if (!local_increment) if (!inst.res_null[j]) g << "res1[" << j << "]+=1;\n";
+            }
+          }
+        }
+      }
+      g << "}\n"; // close scalar tail loop
+      // Reduce remainder lanes from scratch to sum
       for (casadi_int j=0; j<n_out_; ++j) {
         if (reduce_out_[j]) {
           g << "if (sum" << j << ") {\n";
           g.local("k", "casadi_int");
-          g.local("k", "casadi_int");
           g << "for (k=0; k<" << f_.nnz_out(j) << "; ++k) {\n";
-          // you might be adding stray numbers
           g << "for (j=0; j<" << rem << "; ++j) ";
           std::string res = loop_bug ? "res2" : "res1";
-          g << "sum" << j << "[k]+=" << res << " [" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
+          g << "sum" << j << "[k]+=" << res << "[" << j << "][j+" << GlobalOptions::vector_width_real << "*k];\n";
           g << "}\n";
           g << "}\n";
         }
