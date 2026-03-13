@@ -42,6 +42,7 @@ namespace casadi {
     this->with_sfunction = false;
     this->unroll_args = false;
     this->cpp = false;
+    this->cuda_ = false;
     this->main = false;
     this->casadi_real_type = "double";
     this->casadi_int_type = CASADI_INT_TYPE_STR;
@@ -82,6 +83,8 @@ namespace casadi {
         this->unroll_args = e.second;
       } else if (e.first=="cpp") {
         this->cpp = e.second;
+      } else if (e.first=="cuda") {
+        this->cuda_ = e.second;
       } else if (e.first=="main") {
         this->main = e.second;
       } else if (e.first=="casadi_real") {
@@ -100,6 +103,23 @@ namespace casadi {
         this->with_import = e.second;
       } else if (e.first=="include_math") {
         this->include_math = e.second;
+      } else if (e.first=="cuda_kernels") {
+        Dict kernels = e.second.to_dict();
+        for (auto&& k : kernels) {
+          casadi_assert(k.second.is_dict(),
+            "cuda_kernels entries must be dicts (function name -> dict).");
+          Dict kd = k.second.to_dict();
+          CudaKernelSpec spec;
+          auto it = kd.find("kernel_name");
+          spec.kernel_name = it==kd.end() ? (k.first + "_kernel") : it->second.to_string();
+          it = kd.find("device_name");
+          spec.device_name = it==kd.end() ? ("device_" + k.first + "_eval") : it->second.to_string();
+          it = kd.find("batch_inputs");
+          if (it!=kd.end()) spec.batch_inputs = it->second.to_int_vector();
+          it = kd.find("external_workspace");
+          if (it!=kd.end()) spec.external_workspace = it->second;
+          cuda_kernels_[k.first] = spec;
+        }
       } else if (e.first=="infinity") {
         this->infinity = e.second.to_string();
       } else if (e.first=="nan") {
@@ -135,6 +155,16 @@ namespace casadi {
       }
     }
 
+    if (!cuda_kernels_.empty()) {
+      casadi_assert(this->cuda_,
+        "Option 'cuda_kernels' requires cuda codegen (set cuda=true).");
+    }
+
+    if (this->cuda_) {
+      casadi_assert(!this->mex, "Option 'mex' is not supported with cuda codegen.");
+      casadi_assert(!this->main, "Option 'main' is not supported with cuda codegen.");
+    }
+
     // If real_min is not specified, make an educated guess
     if (this->real_min.empty()) {
       std::stringstream ss;
@@ -160,10 +190,13 @@ namespace casadi {
     needs_mem_ = false;
 
     // Divide name into base and suffix (if any)
+    std::string default_suffix = this->cpp ? ".cpp" : ".c";
+    if (this->cuda_) default_suffix = ".cu";
+
     std::string::size_type dotpos = name.rfind('.');
     if (dotpos==std::string::npos) {
       this->name = name;
-      this->suffix = this->cpp ? ".cpp" : ".c";
+      this->suffix = default_suffix;
     } else {
       this->name = name.substr(0, dotpos);
       this->suffix = name.substr(dotpos);
@@ -386,13 +419,13 @@ namespace casadi {
     std::string codegen_name = add_dependency(f);
 
     // Define function
-    *this << declare(f->signature(f.name())) << "{\n"
+    *this << declare_device(f->signature(f.name())) << "{\n"
           << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
           << "}\n\n";
 
     if (this->unroll_args) {
       // Define function
-      *this << declare(f->signature_unrolled(f.name())) << "{\n";
+      *this << declare_device(f->signature_unrolled(f.name())) << "{\n";
       for (casadi_int i=0; i<f.n_in(); ++i) {
         *this << "arg[" << i << "] = " << f.name_in(i) << ";\n";
       }
@@ -421,6 +454,14 @@ namespace casadi {
 
     // Generate function specific code for Simulink sfunction
     if (this->with_sfunction) this->added_sfunctions.push_back( this->codegen_sfunction(f) );
+
+    if (this->cuda_) {
+      auto it = cuda_kernels_.find(f.name());
+      if (it != cuda_kernels_.end()) {
+        generate_cuda_kernel(f, it->second);
+        flush(this->body);
+      }
+    }
 
     // Add to list of exposed symbols
     this->exposed_fname.push_back(f.name());
@@ -507,6 +548,23 @@ namespace casadi {
       << "#endif\n\n";
   }
 
+  void CodeGenerator::generate_cuda_macros(std::ostream &s) const {
+    s << "#ifndef CUDA_DEV\n"
+      << "#ifdef __CUDACC__\n"
+      << "  #define CUDA_DEV __device__\n"
+      << "#else\n"
+      << "  #define CUDA_DEV\n"
+      << "#endif\n"
+      << "#endif\n\n";
+    s << "#ifndef CUDA_GLOBAL\n"
+      << "#ifdef __CUDACC__\n"
+      << "  #define CUDA_GLOBAL __global__\n"
+      << "#else\n"
+      << "  #define CUDA_GLOBAL\n"
+      << "#endif\n"
+      << "#endif\n\n";
+  }
+
   void CodeGenerator::generate_casadi_int(std::ostream &s) const {
     s << "#ifndef casadi_int\n"
       << "#define casadi_int " << this->casadi_int_type << std::endl
@@ -562,7 +620,8 @@ namespace casadi {
 
     // Generate header
     if (this->with_header) {
-      auto s_ptr = Filesystem::ofstream_ptr(prefix + this->name + ".h");
+      std::string header_suffix = this->cuda_ ? ".cuh" : ".h";
+      auto s_ptr = Filesystem::ofstream_ptr(prefix + this->name + header_suffix);
       std::ostream& s = *s_ptr;
       // Create a header file
       stream_open(s, this->cpp);
@@ -572,6 +631,8 @@ namespace casadi {
 
       // Define the casadi_int type
       generate_casadi_int(s);
+
+      if (this->cuda_) generate_cuda_macros(s);
 
       // Generate export symbol macros
       if (this->with_import) generate_import_symbol(s);
@@ -945,6 +1006,8 @@ namespace casadi {
     // Integer type (usually long long)
     generate_casadi_int(s);
 
+    if (this->cuda_) generate_cuda_macros(s);
+
     if (needs_mem_) {
       s << "#ifndef CASADI_MAX_NUM_THREADS\n";
       s << "#define CASADI_MAX_NUM_THREADS 1\n";
@@ -1013,13 +1076,27 @@ namespace casadi {
 
     if (sz_zeros_) {
       std::vector<double> sz_zeros(sz_zeros_, 0);
-      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros));
+      if (this->cuda_) {
+        s << array("static CUDA_DEV const casadi_real",
+                   "casadi_zeros",
+                   sz_zeros.size(),
+                   initializer(sz_zeros));
+      } else {
+        print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros));
+      }
       s << std::endl;
     }
 
     if (sz_ones_) {
       std::vector<double> sz_ones(sz_ones_, 0);
-      print_vector(s, "casadi_ones", std::vector<double>(sz_ones));
+      if (this->cuda_) {
+        s << array("static CUDA_DEV const casadi_real",
+                   "casadi_ones",
+                   sz_ones.size(),
+                   initializer(sz_ones));
+      } else {
+        print_vector(s, "casadi_ones", std::vector<double>(sz_ones));
+      }
       s << std::endl;
     }
 
@@ -1121,7 +1198,14 @@ namespace casadi {
 
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
       const std::vector<casadi_int>& v) {
-    s << array("static const casadi_int", name, v.size(), initializer(v));
+    if (this->cuda_) {
+      // CUDA mode needs device-visible sparsity tables, while host metadata
+      // accessors still require host-readable pointers.
+      s << array("static const casadi_int", name + "_h", v.size(), initializer(v));
+      s << array("static CUDA_DEV const casadi_int", name, v.size(), initializer(v));
+    } else {
+      s << array("static const casadi_int", name, v.size(), initializer(v));
+    }
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
@@ -1496,6 +1580,7 @@ namespace casadi {
     added_auxiliaries_.insert(std::make_pair(f, inst));
 
     // Add the appropriate function
+    std::string dev = device_prefix();
     switch (f) {
     case AUX_COPY:
       this->auxiliaries << sanitize_source(casadi_copy_str, inst);
@@ -1817,20 +1902,23 @@ namespace casadi {
       break;
     case AUX_SQ:
       shorthand("sq");
-      this->auxiliaries << "casadi_real casadi_sq(casadi_real x) { return x*x;}\n\n";
+      this->auxiliaries << dev << "casadi_real casadi_sq(casadi_real x) { return x*x;}\n\n";
       break;
     case AUX_SIGN:
       shorthand("sign");
-      this->auxiliaries << "casadi_real casadi_sign(casadi_real x) "
+      this->auxiliaries << dev << "casadi_real casadi_sign(casadi_real x) "
                         << "{ return x<0 ? -1 : x>0 ? 1 : x;}\n\n";
       break;
     case AUX_IF_ELSE:
       shorthand("if_else");
-      this->auxiliaries << "casadi_real casadi_if_else"
+      this->auxiliaries << dev << "casadi_real casadi_if_else"
                         << "(casadi_real c, casadi_real x, casadi_real y) "
                         << "{ return c!=0 ? x : y;}\n\n";
       break;
     case AUX_PRINTF:
+      if (cuda_) {
+        casadi_error("printf helper is not supported with cuda codegen.");
+      }
       this->auxiliaries << "#ifndef CASADI_PRINTF\n";
       if (this->mex) {
         this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
@@ -1849,7 +1937,7 @@ namespace casadi {
       break;
     case AUX_FMIN:
       shorthand("fmin");
-      this->auxiliaries << "casadi_real casadi_fmin(casadi_real x, casadi_real y) {\n"
+      this->auxiliaries << dev << "casadi_real casadi_fmin(casadi_real x, casadi_real y) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x<y ? x : y;\n"
@@ -1860,7 +1948,7 @@ namespace casadi {
       break;
     case AUX_FMAX:
       shorthand("fmax");
-      this->auxiliaries << "casadi_real casadi_fmax(casadi_real x, casadi_real y) {\n"
+      this->auxiliaries << dev << "casadi_real casadi_fmax(casadi_real x, casadi_real y) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x>y ? x : y;\n"
@@ -1871,7 +1959,7 @@ namespace casadi {
       break;
     case AUX_FABS:
       shorthand("fabs");
-      this->auxiliaries << "casadi_real casadi_fabs(casadi_real x) {\n"
+      this->auxiliaries << dev << "casadi_real casadi_fabs(casadi_real x) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x>0 ? x : -x;\n"
@@ -1882,7 +1970,7 @@ namespace casadi {
       break;
     case AUX_ISINF:
       shorthand("isinf");
-      this->auxiliaries << "casadi_real casadi_isinf(casadi_real x) {\n"
+      this->auxiliaries << dev << "casadi_real casadi_isinf(casadi_real x) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x== INFINITY || x==-INFINITY;\n"
@@ -1893,7 +1981,7 @@ namespace casadi {
       break;
     case AUX_ISFINITE:
       shorthand("isfinite");
-      this->auxiliaries << "casadi_real casadi_isfinite(casadi_real x) {\n"
+      this->auxiliaries << dev << "casadi_real casadi_isfinite(casadi_real x) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return x==x && x!=INFINITY && x!=-INFINITY;\n"
@@ -1904,13 +1992,13 @@ namespace casadi {
       break;
     case AUX_MIN:
       shorthand("min");
-      this->auxiliaries << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
+      this->auxiliaries << dev << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
                         << "  return x>y ? y : x;\n"
                         << "}\n\n";
       break;
     case AUX_MAX:
       shorthand("max");
-      this->auxiliaries << "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
+      this->auxiliaries << dev << "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
                         << "  return x>y ? x : y;\n"
                         << "}\n\n";
       break;
@@ -1941,7 +2029,7 @@ namespace casadi {
       break;
     case AUX_LOG1P:
       shorthand("log1p");
-      this->auxiliaries << "casadi_real casadi_log1p(casadi_real x) {\n"
+      this->auxiliaries << dev << "casadi_real casadi_log1p(casadi_real x) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return log(1+x);\n"
@@ -1952,7 +2040,7 @@ namespace casadi {
       break;
     case AUX_EXPM1:
       shorthand("expm1");
-      this->auxiliaries << "casadi_real casadi_expm1(casadi_real x) {\n"
+      this->auxiliaries << dev << "casadi_real casadi_expm1(casadi_real x) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return exp(x)-1;\n"
@@ -1963,7 +2051,7 @@ namespace casadi {
       break;
     case AUX_HYPOT:
       shorthand("hypot");
-      this->auxiliaries << "casadi_real casadi_hypot(casadi_real x, casadi_real y) {\n"
+      this->auxiliaries << dev << "casadi_real casadi_hypot(casadi_real x, casadi_real y) {\n"
                         << "/* Pre-c99 compatibility */\n"
                         << "#if __STDC_VERSION__ < 199901L\n"
                         << "  return sqrt(x*x+y*y);\n"
@@ -2225,6 +2313,10 @@ namespace casadi {
             + y + ", " + sparsity(sp_y) + ", " + iw + ")";
   }
 
+  std::string CodeGenerator::device_prefix() const {
+    return cuda_ ? "CUDA_DEV " : "";
+  }
+
   std::string CodeGenerator::declare(std::string s) {
     // Add c linkage
     std::string cpp_prefix = this->cpp ? "extern \"C\" " : "";
@@ -2236,6 +2328,176 @@ namespace casadi {
 
     // Return name with declarations
     return cpp_prefix + this->dll_export + s;
+  }
+
+  std::string CodeGenerator::declare_device(std::string s) {
+    if (!cuda_) return declare(s);
+
+    // Add c linkage
+    std::string cpp_prefix = this->cpp ? "extern \"C\" " : "";
+    std::string dev_prefix = device_prefix();
+
+    // To header file
+    if (this->with_header) {
+      this->header << cpp_prefix << dev_prefix << s << ";\n";
+    }
+
+    return cpp_prefix + dev_prefix + s;
+  }
+
+  std::string CodeGenerator::declare_kernel(std::string s) {
+    if (!cuda_) return declare(s);
+
+    // Add c linkage
+    std::string cpp_prefix = this->cpp ? "extern \"C\" " : "";
+    std::string global_prefix = "CUDA_GLOBAL ";
+
+    // To header file
+    if (this->with_header) {
+      this->header << cpp_prefix << global_prefix << s << ";\n";
+    }
+
+    return cpp_prefix + global_prefix + s;
+  }
+
+  void CodeGenerator::generate_cuda_kernel(const Function& f, const CudaKernelSpec& spec) {
+    casadi_int n_in = f.n_in();
+    casadi_int n_out = f.n_out();
+
+    std::set<casadi_int> batch_in(spec.batch_inputs.begin(), spec.batch_inputs.end());
+    auto check_index = [](casadi_int idx, casadi_int limit, const std::string& name) {
+      casadi_assert(idx >= 0 && idx < limit, "Invalid " + name + " index: " + str(idx));
+    };
+
+    for (casadi_int i : batch_in) check_index(i, n_in, "batch_inputs");
+
+    size_t sz_iw = f.sz_iw();
+    size_t sz_w = f.sz_w();
+    bool external_workspace = spec.external_workspace && sz_w > 0;
+
+    // Device wrapper signature
+    std::stringstream sig;
+    sig << "void " << spec.device_name << "(";
+    for (casadi_int i = 0; i < n_in; ++i) {
+      if (i) sig << ", ";
+      sig << "const casadi_real* i" << i;
+    }
+    for (casadi_int i = 0; i < n_out; ++i) {
+      if (n_in || i) sig << ", ";
+      sig << "casadi_real* o" << i;
+    }
+    if (external_workspace) {
+      if (n_in || n_out) sig << ", ";
+      sig << "casadi_real* w";
+    }
+    sig << ")";
+
+    *this << declare_device(sig.str()) << " {\n";
+    if (n_in > 0) {
+      *this << "const casadi_real* arg_local[" << n_in << "] = {";
+      for (casadi_int i = 0; i < n_in; ++i) {
+        if (i) *this << ", ";
+        if (f.nnz_in(i) == 0) {
+          *this << "0";
+        } else {
+          *this << "i" << i;
+        }
+      }
+      *this << "};\n";
+      *this << "const casadi_real** arg = arg_local;\n";
+    } else {
+      *this << "const casadi_real** arg = 0;\n";
+    }
+
+    if (n_out > 0) {
+      *this << "casadi_real* res_local[" << n_out << "] = {";
+      for (casadi_int i = 0; i < n_out; ++i) {
+        if (i) *this << ", ";
+        if (f.nnz_out(i) == 0) {
+          *this << "0";
+        } else {
+          *this << "o" << i;
+        }
+      }
+      *this << "};\n";
+      *this << "casadi_real** res = res_local;\n";
+    } else {
+      *this << "casadi_real** res = 0;\n";
+    }
+
+    *this << "casadi_int  iw[" << (sz_iw > 0 ? str(static_cast<casadi_int>(sz_iw)) : "1")
+          << "];\n";
+    if (!external_workspace) {
+      *this << "casadi_real w [" << (sz_w > 0 ? str(static_cast<casadi_int>(sz_w)) : "1")
+            << "];\n";
+    }
+    *this << f.name() << "(arg, res, iw, w, 0);\n";
+    *this << "}\n\n";
+
+    // Kernel signature
+    std::stringstream ksig;
+    ksig << "void " << spec.kernel_name << "(";
+    for (casadi_int i = 0; i < n_in; ++i) {
+      if (i) ksig << ", ";
+      ksig << "const casadi_real* i" << i << "_in";
+    }
+    for (casadi_int i = 0; i < n_out; ++i) {
+      if (n_in || i) ksig << ", ";
+      ksig << "casadi_real* o" << i << "_out";
+    }
+    if (external_workspace) {
+      if (n_in || n_out) ksig << ", ";
+      ksig << "casadi_real* w_pool";
+    }
+    if (n_in || n_out) ksig << ", ";
+    ksig << "int n_candidates";
+    ksig << ")";
+
+    *this << declare_kernel(ksig.str()) << " {\n";
+    *this << "int idx = blockIdx.x * blockDim.x + threadIdx.x;\n";
+    *this << "if (idx >= n_candidates) return;\n";
+
+    for (casadi_int i = 0; i < n_in; ++i) {
+      if (f.nnz_in(i) == 0) {
+        *this << "const casadi_real* i" << i << " = 0;\n";
+        continue;
+      }
+      if (batch_in.count(i)) {
+        *this << "const casadi_real* i" << i << " = i" << i << "_in + "
+              << str(f.nnz_in(i)) << " * idx;\n";
+      } else {
+        *this << "const casadi_real* i" << i << " = i" << i << "_in;\n";
+      }
+    }
+
+    for (casadi_int i = 0; i < n_out; ++i) {
+      if (f.nnz_out(i) == 0) {
+        *this << "casadi_real* o" << i << " = 0;\n";
+      } else {
+        *this << "casadi_real* o" << i << " = o" << i << "_out + "
+              << str(f.nnz_out(i)) << " * idx;\n";
+      }
+    }
+    if (external_workspace) {
+      *this << "casadi_real* w = w_pool + "
+            << str(static_cast<casadi_int>(sz_w)) << " * idx;\n";
+    }
+
+    *this << spec.device_name << "(";
+    for (casadi_int i = 0; i < n_in; ++i) {
+      if (i) *this << ", ";
+      *this << "i" << i;
+    }
+    for (casadi_int i = 0; i < n_out; ++i) {
+      if (n_in || i) *this << ", ";
+      *this << "o" << i;
+    }
+    if (external_workspace) {
+      if (n_in || n_out) *this << ", ";
+      *this << "w";
+    }
+    *this << ");\n";
+    *this << "}\n\n";
   }
 
   std::string
@@ -2601,6 +2863,18 @@ namespace casadi {
         line = replace(line, it->first, it->second);
       }
 
+      if (cuda_) {
+        bool is_top_level = line[0] != ' ' && line[0] != '\t';
+        if (is_top_level && line.find("casadi_") != std::string::npos
+            && line.find("(") != std::string::npos) {
+          if (line.rfind("static ", 0) == 0) {
+            line.insert(7, "CUDA_DEV ");
+          } else {
+            line = "CUDA_DEV " + line;
+          }
+        }
+      }
+
       // Append to return
       ret << line << "\n";
     }
@@ -2627,7 +2901,9 @@ namespace casadi {
     *this << declare("const casadi_int* " + name + "_sparsity_in(casadi_int i)") << " {\n"
       << "switch (i) {\n";
     for (casadi_int i=0; i<sp_in.size(); ++i) {
-      *this << "case " << i << ": return " << sparsity(sp_in[i], force_canonical) << ";\n";
+      std::string sp_name = sparsity(sp_in[i], force_canonical);
+      if (cuda_) sp_name += "_h";
+      *this << "case " << i << ": return " << sp_name << ";\n";
     }
     *this << "default: return 0;\n}\n"
       << "}\n\n";
@@ -2636,7 +2912,9 @@ namespace casadi {
     *this << declare("const casadi_int* " + name + "_sparsity_out(casadi_int i)") << " {\n"
       << "switch (i) {\n";
     for (casadi_int i=0; i<sp_out.size(); ++i) {
-      *this << "case " << i << ": return " << sparsity(sp_out[i], force_canonical) << ";\n";
+      std::string sp_name = sparsity(sp_out[i], force_canonical);
+      if (cuda_) sp_name += "_h";
+      *this << "case " << i << ": return " << sp_name << ";\n";
     }
     *this << "default: return 0;\n}\n"
       << "}\n\n";
