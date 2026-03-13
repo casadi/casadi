@@ -26,33 +26,33 @@
 #ifndef CASADI_CCOPT_INTERFACE_HPP
 #define CASADI_CCOPT_INTERFACE_HPP
 
-//#include <casadi/interfaces/madmpec/casadi_nlpsol_madmpec_export.h>
+//#include <casadi/interfaces/ccopt/casadi_nlpsol_ccopt_export.h>
 #include <iostream>
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
 #include <libMad.h>
 
 namespace casadi {
-  #include "madmpec_runtime.hpp"
+  #include "ccopt_runtime.hpp"
 }
 
 /** */
 
 #define CASADI_NLPSOL_CCOPT_EXPORT __attribute__((visibility("default")))
-/** \pluginsection{Nlpsol,madmpec} **/
+/** \pluginsection{Nlpsol,ccopt} **/
 
 /// \cond INTERNAL
 namespace casadi {
 
 struct CASADI_NLPSOL_CCOPT_EXPORT MadmpecMemory : public NlpsolMemory {
   // Problem data structure
-  casadi_madmpec_data<double> d;
+  casadi_ccopt_data<double> d;
 };
 
-/** \brief \pluginbrief{Nlpsol,madmpec}
+/** \brief \pluginbrief{Nlpsol,ccopt}
 
     @copydoc Nlpsol_doc
-    @copydoc plugin_Nlpsol_madmpec
+    @copydoc plugin_Nlpsol_ccopt
 */
 class CASADI_NLPSOL_CCOPT_EXPORT MadmpecInterface : public Nlpsol {
  public:
@@ -63,7 +63,7 @@ class CASADI_NLPSOL_CCOPT_EXPORT MadmpecInterface : public Nlpsol {
   ~MadmpecInterface() override;
 
   // Get name of the plugin
-  const char* plugin_name() const override { return "madmpec";}
+  const char* plugin_name() const override { return "ccopt";}
 
   // Get name of the class
   std::string class_name() const override { return "MadmpecInterface";}
@@ -124,8 +124,8 @@ class CASADI_NLPSOL_CCOPT_EXPORT MadmpecInterface : public Nlpsol {
   /// convexify?
   bool convexify_;
 
-  void set_madmpec_prob();
-  void set_madmpec_prob(CodeGenerator& g) const;
+  void set_ccopt_prob();
+  void set_ccopt_prob(CodeGenerator& g) const;
 
   /** \brief Generate code for the function body */
   void codegen_body(CodeGenerator& g) const override;
@@ -140,7 +140,7 @@ class CASADI_NLPSOL_CCOPT_EXPORT MadmpecInterface : public Nlpsol {
   void codegen_free_mem(CodeGenerator& g) const override;
 
   /** \brief Thread-local memory object type */
-  std::string codegen_mem_type() const override { return "struct casadi_madmpec_data"; }
+  std::string codegen_mem_type() const override { return "struct casadi_ccopt_data"; }
 
   /** \brief Is thread-local memory object needed? */
   bool codegen_needs_mem() const override { return true; }
@@ -157,7 +157,7 @@ class CASADI_NLPSOL_CCOPT_EXPORT MadmpecInterface : public Nlpsol {
 
  private:
   // Memory structure
-  casadi_madmpec_prob<libmad_real> p_;
+  casadi_ccopt_prob<libmad_real> p_;
 
   std::vector<libmad_int> nws_;
   std::vector<libmad_int> ngs_;
