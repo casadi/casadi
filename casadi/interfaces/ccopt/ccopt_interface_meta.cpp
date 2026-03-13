@@ -23,7 +23,7 @@
  */
 
 
-      #include "madmpec_interface.hpp"
+      #include "ccopt_interface.hpp"
       #include <string>
 
       const std::string casadi::MadmpecInterface::meta_doc=

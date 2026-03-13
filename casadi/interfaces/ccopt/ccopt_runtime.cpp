@@ -28,9 +28,9 @@
 // C-REPLACE "reinterpret_cast<int*>" "(int*) "
 // C-REPLACE "const_cast<int*>" "(int*) "
 
-// SYMBOL "madmpec_prob"
+// SYMBOL "ccopt_prob"
 template<typename T1>
-struct casadi_madmpec_prob {
+struct casadi_ccopt_prob {
   const casadi_nlpsol_prob<T1>* nlp;
 
   // 1-index cco format
@@ -45,13 +45,13 @@ struct casadi_madmpec_prob {
   OracleCallback nlp_f;
   OracleCallback nlp_g;
 };
-// C-REPLACE "casadi_madmpec_prob<T1>" "struct casadi_madmpec_prob"
+// C-REPLACE "casadi_ccopt_prob<T1>" "struct casadi_ccopt_prob"
 
-// SYMBOL "madmpec_data"
+// SYMBOL "ccopt_data"
 template<typename T1>
-struct casadi_madmpec_data {
+struct casadi_ccopt_data {
   // Problem structure
-  const casadi_madmpec_prob<T1>* prob;
+  const casadi_ccopt_prob<T1>* prob;
   // Problem structure
   casadi_nlpsol_data<T1>* nlp;
 
@@ -78,46 +78,46 @@ struct casadi_madmpec_data {
   MadNLPCExecutionStats* stats;
   MadNLPCSolver* solver;
 };
-// C-REPLACE "casadi_madmpec_data<T1>" "struct casadi_madmpec_data"
+// C-REPLACE "casadi_ccopt_data<T1>" "struct casadi_ccopt_data"
 
-// SYMBOL "madmpec_setup"
+// SYMBOL "ccopt_setup"
 template<typename T1>
-void casadi_madmpec_setup(casadi_madmpec_prob<T1>* p) {
+void casadi_ccopt_setup(casadi_ccopt_prob<T1>* p) {
 }
 
-// C-REPLACE "static_cast< casadi_madmpec_data<T1>* >" "(struct casadi_madmpec_data*)"
+// C-REPLACE "static_cast< casadi_ccopt_data<T1>* >" "(struct casadi_ccopt_data*)"
 // C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
 // C-REPLACE "calc_function" "casadi_oracle_call"
 // C-REPLACE "casadi_error" "//casadi_error"
 
-// SYMBOL "madmpec_constr_jac_structure"
+// SYMBOL "ccopt_constr_jac_structure"
 template<typename T1>
-int casadi_madmpec_constr_jac_structure(libmad_int* I, libmad_int* J, void* user_data)
+int casadi_ccopt_constr_jac_structure(libmad_int* I, libmad_int* J, void* user_data)
 {
-  casadi_madmpec_data<T1>* d = static_cast< casadi_madmpec_data<T1>* >(user_data);
-  const casadi_madmpec_prob<T1>* p = d->prob;
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
   std::memcpy(I, p->nzj_i, p->nnz_jac_g * sizeof(libmad_int));
   std::memcpy(J, p->nzj_j, p->nnz_jac_g * sizeof(libmad_int));
   return 0;
 }
 
-// SYMBOL "madmpec_lag_hess_structure"
+// SYMBOL "ccopt_lag_hess_structure"
 template<typename T1>
-int casadi_madmpec_lag_hess_structure(libmad_int* I, libmad_int* J, void* user_data)
+int casadi_ccopt_lag_hess_structure(libmad_int* I, libmad_int* J, void* user_data)
 {
-  casadi_madmpec_data<T1>* d = static_cast< casadi_madmpec_data<T1>* >(user_data);
-  const casadi_madmpec_prob<T1>* p = d->prob;
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
   std::memcpy(I, p->nzh_i, p->nnz_hess_l * sizeof(libmad_int));
   std::memcpy(J, p->nzh_j, p->nnz_hess_l * sizeof(libmad_int));
   return 0;
 }
 
-// SYMBOL "madmpec_eval_constr_jac"
+// SYMBOL "ccopt_eval_constr_jac"
 template<typename T1>
-int casadi_madmpec_eval_constr_jac(const T1* w, T1* res, void* user_data) {
+int casadi_ccopt_eval_constr_jac(const T1* w, T1* res, void* user_data) {
   casadi_int i;
-  casadi_madmpec_data<T1>* d = static_cast< casadi_madmpec_data<T1>* >(user_data);
-  const casadi_madmpec_prob<T1>* p = d->prob;
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
@@ -128,12 +128,12 @@ int casadi_madmpec_eval_constr_jac(const T1* w, T1* res, void* user_data) {
   return calc_function(&d->prob->nlp_jac_g, d_oracle);
 }
 
-// SYMBOL "madmpec_eval_constr"
+// SYMBOL "ccopt_eval_constr"
 template<typename T1>
-int casadi_madmpec_eval_constr(const T1* w, T1* res, void* user_data) {
+int casadi_ccopt_eval_constr(const T1* w, T1* res, void* user_data) {
   casadi_int i,k,column;
-  casadi_madmpec_data<T1>* d = static_cast< casadi_madmpec_data<T1>* >(user_data);
-  const casadi_madmpec_prob<T1>* p = d->prob;
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
@@ -144,11 +144,11 @@ int casadi_madmpec_eval_constr(const T1* w, T1* res, void* user_data) {
   return calc_function(&d->prob->nlp_g, d_oracle);
 }
 
-// SYMBOL "madmpec_eval_obj_grad"
+// SYMBOL "ccopt_eval_obj_grad"
 template<typename T1>
-int casadi_madmpec_eval_obj_grad(const T1* w, T1* res, void* user_data) {
-  casadi_madmpec_data<T1>* d = static_cast< casadi_madmpec_data<T1>* >(user_data);
-  const casadi_madmpec_prob<T1>* p = d->prob;
+int casadi_ccopt_eval_obj_grad(const T1* w, T1* res, void* user_data) {
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
@@ -161,10 +161,10 @@ int casadi_madmpec_eval_obj_grad(const T1* w, T1* res, void* user_data) {
   return calc_function(&d->prob->nlp_grad_f, d_oracle);
 }
 
-// SYMBOL "madmpec_eval_obj"
+// SYMBOL "ccopt_eval_obj"
 template<typename T1>
-int casadi_madmpec_eval_obj(const T1* w, T1* res, void* user_data) {
-  casadi_madmpec_data<T1>* d = static_cast< casadi_madmpec_data<T1>* >(user_data);
+int casadi_ccopt_eval_obj(const T1* w, T1* res, void* user_data) {
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
@@ -177,13 +177,13 @@ int casadi_madmpec_eval_obj(const T1* w, T1* res, void* user_data) {
   return calc_function(&d->prob->nlp_f, d_oracle);
 }
 
-// SYMBOL "madmpec_eval_obj"
+// SYMBOL "ccopt_eval_obj"
 template<typename T1>
-int casadi_madmpec_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
+int casadi_ccopt_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
                                             T1* res, void* user_data){
   casadi_int k, column, i;
-  casadi_madmpec_data<T1>* d = static_cast< casadi_madmpec_data<T1>* >(user_data);
-  const casadi_madmpec_prob<T1>* p = d->prob;
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
@@ -199,24 +199,24 @@ int casadi_madmpec_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
 
 // C-REPLACE "const_cast<T1*>" "(T1*)"
 
-// C-REPLACE "casadi_madmpec_eval_constr_jac<T1>" "casadi_madmpec_eval_constr_jac"
-// C-REPLACE "casadi_madmpec_eval_obj_grad<T1>" "casadi_madmpec_eval_obj_grad"
-// C-REPLACE "casadi_madmpec_eval_obj<T1>" "casadi_madmpec_eval_obj"
-// C-REPLACE "casadi_madmpec_eval_constr<T1>" "casadi_madmpec_eval_constr"
-// C-REPLACE "casadi_madmpec_eval_lag_hess<T1>" "casadi_madmpec_eval_lag_hess"
+// C-REPLACE "casadi_ccopt_eval_constr_jac<T1>" "casadi_ccopt_eval_constr_jac"
+// C-REPLACE "casadi_ccopt_eval_obj_grad<T1>" "casadi_ccopt_eval_obj_grad"
+// C-REPLACE "casadi_ccopt_eval_obj<T1>" "casadi_ccopt_eval_obj"
+// C-REPLACE "casadi_ccopt_eval_constr<T1>" "casadi_ccopt_eval_constr"
+// C-REPLACE "casadi_ccopt_eval_lag_hess<T1>" "casadi_ccopt_eval_lag_hess"
 // C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
 
-// SYMBOL "madmpec_init_mem"
+// SYMBOL "ccopt_init_mem"
 template<typename T1>
-int casadi_madmpec_init_mem(casadi_madmpec_data<T1>* d) {
+int casadi_ccopt_init_mem(casadi_ccopt_data<T1>* d) {
   // Problem structure
   
   return 0;
 }
 
-// SYMBOL "madmpec_free_mem"
+// SYMBOL "ccopt_free_mem"
 template<typename T1>
-void madmpec_free_mem(casadi_madmpec_data<T1>* d) {
+void ccopt_free_mem(casadi_ccopt_data<T1>* d) {
   madnlpc_delete_solver(d->solver);
   d->solver = nullptr;
   madnlpc_delete_stats(d->stats);
@@ -225,31 +225,31 @@ void madmpec_free_mem(casadi_madmpec_data<T1>* d) {
   libmad_delete_options_dict(d->mpcc_opts);
 }
 
-// SYMBOL "madmpec_work"
+// SYMBOL "ccopt_work"
 template<typename T1>
-void casadi_madmpec_work(const casadi_madmpec_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w) {
+void casadi_ccopt_work(const casadi_ccopt_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w) {
   casadi_nlpsol_work(p->nlp, sz_arg, sz_res, sz_iw, sz_w);
 
   // Temporary work vectors
   *sz_w = casadi_max(*sz_w, 2*(p->nlp->nx+p->nlp->ng)); // pv
 }
 
-// SYMBOL "madmpec_init"
+// SYMBOL "ccopt_init"
 template<typename T1>
-void casadi_madmpec_init(casadi_madmpec_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
+void casadi_ccopt_init(casadi_ccopt_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Problem structure
-  const casadi_madmpec_prob<T1>* p = d->prob;
+  const casadi_ccopt_prob<T1>* p = d->prob;
   d->arg = *arg;
   d->res = *res;
   d->iw = *iw;
   d->w = *w;
 }
 
-// SYMBOL "madmpec_presolve"
+// SYMBOL "ccopt_presolve"
 template<typename T1>
-int casadi_madmpec_presolve(casadi_madmpec_data<T1>* d) {
+int casadi_ccopt_presolve(casadi_ccopt_data<T1>* d) {
   casadi_int k, i, column;
-  const casadi_madmpec_prob<T1>* p = d->prob;
+  const casadi_ccopt_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   int ret = 0;
@@ -260,13 +260,13 @@ int casadi_madmpec_presolve(casadi_madmpec_data<T1>* d) {
                                "MadMPEC",
                                p_nlp->nx, p_nlp->ng,
                                p->nnz_jac_g, p->nnz_hess_l,
-                               casadi_madmpec_constr_jac_structure<T1>,
-                               casadi_madmpec_lag_hess_structure<T1>,
-                               casadi_madmpec_eval_obj<T1>,
-                               casadi_madmpec_eval_constr<T1>,
-                               casadi_madmpec_eval_obj_grad<T1>,
-                               casadi_madmpec_eval_constr_jac<T1>,
-                               casadi_madmpec_eval_lag_hess<T1>,
+                               casadi_ccopt_constr_jac_structure<T1>,
+                               casadi_ccopt_lag_hess_structure<T1>,
+                               casadi_ccopt_eval_obj<T1>,
+                               casadi_ccopt_eval_constr<T1>,
+                               casadi_ccopt_eval_obj_grad<T1>,
+                               casadi_ccopt_eval_constr_jac<T1>,
+                               casadi_ccopt_eval_lag_hess<T1>,
                                d
     );
   if(ret) return ret; // TODO(@anton) think about what we need to clean up.
@@ -291,12 +291,12 @@ int casadi_madmpec_presolve(casadi_madmpec_data<T1>* d) {
   return ret;
 }
 
-// SYMBOL "madmpec_solve"
+// SYMBOL "ccopt_solve"
 template<typename T1>
-int casadi_madmpec_solve(casadi_madmpec_data<T1>* d) {
+int casadi_ccopt_solve(casadi_ccopt_data<T1>* d) {
   // Problem structure
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
-  const casadi_madmpec_prob<T1>* p = d->prob;
+  const casadi_ccopt_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   int ret = madnlpc_solve(d->solver, d->nlp_opts, &(d->stats));
   if (ret!=0) {

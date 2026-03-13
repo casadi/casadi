@@ -23,8 +23,8 @@
  */
 
 
-#include "madmpec_interface.hpp"
-#include <madmpec_runtime_str.h>
+#include "ccopt_interface.hpp"
+#include <ccopt_runtime_str.h>
 
 #include "casadi/core/casadi_misc.hpp"
 #include "../../core/global_options.hpp"
@@ -43,9 +43,9 @@ namespace casadi {
 
 extern "C"
 int CASADI_NLPSOL_CCOPT_EXPORT
-casadi_register_nlpsol_madmpec(Nlpsol::Plugin* plugin) {
+casadi_register_nlpsol_ccopt(Nlpsol::Plugin* plugin) {
   plugin->creator = MadmpecInterface::creator;
-  plugin->name = "madmpec";
+  plugin->name = "ccopt";
   plugin->doc = MadmpecInterface::meta_doc.c_str();
   plugin->version = CASADI_VERSION;
   plugin->options = &MadmpecInterface::options_;
@@ -54,8 +54,8 @@ casadi_register_nlpsol_madmpec(Nlpsol::Plugin* plugin) {
 }
 
 extern "C"
-void CASADI_NLPSOL_CCOPT_EXPORT casadi_load_nlpsol_madmpec() {
-  Nlpsol::registerPlugin(casadi_register_nlpsol_madmpec);
+void CASADI_NLPSOL_CCOPT_EXPORT casadi_load_nlpsol_ccopt() {
+  Nlpsol::registerPlugin(casadi_register_nlpsol_ccopt);
 }
 
 MadmpecInterface::MadmpecInterface(const std::string& name, const Function& nlp)
@@ -77,9 +77,9 @@ const Options MadmpecInterface::options_
     {"madnlpc",
      {OT_DICT,
       "Options to be passed to madnlpc algorithm"}},
-    {"madmpec",
+    {"ccopt",
      {OT_DICT,
-      "Options to be passed to madmpec"}},
+      "Options to be passed to ccopt"}},
     {"convexify_strategy",
      {OT_STRING,
       "NONE|regularize|eigen-reflect|eigen-clip. "
@@ -99,7 +99,7 @@ const Options MadmpecInterface::options_
    }
 };
 
-void casadi_madmpec_sparsity(const casadi_int* sp, libmad_int *coord_i, libmad_int *coord_j) {
+void casadi_ccopt_sparsity(const casadi_int* sp, libmad_int *coord_i, libmad_int *coord_j) {
     // convert ccs to cco
     casadi_int ncol = sp[1];
     const casadi_int* colind = sp+2;
@@ -152,7 +152,7 @@ void MadmpecInterface::init(const Dict& opts) {
       convexify_margin = op.second;
     } else if (op.first=="max_iter") {
       max_iter_eig = op.second;
-    } else if (op.first=="madmpec") {
+    } else if (op.first=="ccopt") {
       flatten_opts(opts_, op.second, "");
     } else if (op.first=="madnlpc") {
       flatten_opts(mpcc_opts_, op.second, "");
@@ -222,14 +222,14 @@ void MadmpecInterface::init(const Dict& opts) {
   nzh_i_.resize(hesslag_sp_.nnz());
   nzh_j_.resize(hesslag_sp_.nnz());
 
-  casadi_madmpec_sparsity(jacg_sp_, get_ptr(nzj_i_), get_ptr(nzj_j_));
-  casadi_madmpec_sparsity(hesslag_sp_, get_ptr(nzh_i_), get_ptr(nzh_j_));
+  casadi_ccopt_sparsity(jacg_sp_, get_ptr(nzj_i_), get_ptr(nzj_j_));
+  casadi_ccopt_sparsity(hesslag_sp_, get_ptr(nzh_i_), get_ptr(nzh_j_));
 
-  set_madmpec_prob();
+  set_ccopt_prob();
 
   // Allocate memory
   casadi_int sz_arg, sz_res, sz_w, sz_iw;
-  casadi_madmpec_work(&p_, &sz_arg, &sz_res, &sz_iw, &sz_w);
+  casadi_ccopt_work(&p_, &sz_arg, &sz_res, &sz_iw, &sz_w);
 
   alloc_arg(sz_arg, true);
   alloc_res(sz_res, true);
@@ -299,14 +299,14 @@ int MadmpecInterface::init_mem(void* mem) const {
   m->d.ind_cc2 = ind_cc2_.data();
   m->d.cctypes = cctypes_.data();
   m->d.ncc = ind_cc1_.size();
-  casadi_madmpec_init_mem(&m->d);
+  casadi_ccopt_init_mem(&m->d);
 
   return 0;
 }
 
 void MadmpecInterface::free_mem(void* mem) const {
   auto m = static_cast<MadmpecMemory*>(mem);
-  madmpec_free_mem(&m->d);
+  ccopt_free_mem(&m->d);
   delete static_cast<MadmpecMemory*>(mem);
 }
 
@@ -321,7 +321,7 @@ void MadmpecInterface::set_work(void* mem, const double**& arg, double**& res,
   m->d.prob = &p_;
   m->d.nlp = &m->d_nlp;
 
-  casadi_madmpec_init(&m->d, &arg, &res, &iw, &w);
+  casadi_ccopt_init(&m->d, &arg, &res, &iw, &w);
 
   m->d.nlp->oracle->m = static_cast<void*>(m);
 }
@@ -329,9 +329,9 @@ void MadmpecInterface::set_work(void* mem, const double**& arg, double**& res,
 int MadmpecInterface::solve(void* mem) const {
   auto m = static_cast<MadmpecMemory*>(mem);
 
-  int ret = casadi_madmpec_presolve(&m->d);
+  int ret = casadi_ccopt_presolve(&m->d);
   if (ret) throw CasadiException("CCOPTError");
-  ret = casadi_madmpec_solve(&m->d);
+  ret = casadi_ccopt_solve(&m->d);
   if (ret) throw CasadiException("CCOPTError");
 
   m->success = m->d.success;
@@ -357,22 +357,22 @@ Dict MadmpecInterface::get_stats(void* mem) const {
   madnlpc_get_multipliers_x2(m->d.stats, multipliers_x2.data());
 
   stats["iter_count"] = static_cast<casadi_int>(iter);
-  Dict madmpec;
-  madmpec["dual_feas"] = dual_feas;
-  madmpec["cc_feas"] = cc_feas;
-  madmpec["primal_feas"] = primal_feas;
-  madmpec["status"] = static_cast<casadi_int>(status);
-  madmpec["multipliers_x1"] = multipliers_x1;
-  madmpec["multipliers_x2"] = multipliers_x2;
-  stats["madmpec"] = madmpec;
+  Dict ccopt;
+  ccopt["dual_feas"] = dual_feas;
+  ccopt["cc_feas"] = cc_feas;
+  ccopt["primal_feas"] = primal_feas;
+  ccopt["status"] = static_cast<casadi_int>(status);
+  ccopt["multipliers_x1"] = multipliers_x1;
+  ccopt["multipliers_x2"] = multipliers_x2;
+  stats["ccopt"] = ccopt;
   return stats;
 }
 
-void MadmpecInterface::set_madmpec_prob() {
+void MadmpecInterface::set_ccopt_prob() {
   // assign pointer to internal structur casadi_nlp_prob
   // p_nlp_ ~ casadi_nlp_prob casadi internal
   p_.nlp = &p_nlp_;
-  // p_ casadi_madmpec_prob
+  // p_ casadi_ccopt_prob
 
   p_.nnz_jac_g = jacg_sp_.nnz();
   p_.nnz_hess_l = hesslag_sp_.nnz();
@@ -387,7 +387,7 @@ void MadmpecInterface::set_madmpec_prob() {
   p_.nlp_f = OracleCallback("nlp_f", this);
   p_.nlp_g = OracleCallback("nlp_g", this);
 
-  casadi_madmpec_setup(&p_);
+  casadi_ccopt_setup(&p_);
 }
 
 void MadmpecInterface::codegen_init_mem(CodeGenerator& g) const {
@@ -414,13 +414,13 @@ void MadmpecInterface::codegen_init_mem(CodeGenerator& g) const {
        casadi_error("Unknown option type.");
     }
   }
-  g << "madmpec_init_mem(&" + codegen_mem(g) + ");\n";
+  g << "ccopt_init_mem(&" + codegen_mem(g) + ");\n";
   g << "return 0;\n";
 }
 
 void MadmpecInterface::codegen_free_mem(CodeGenerator& g) const {
   // memory deallocation
-  g << "madmpec_free_mem(&" + codegen_mem(g) + ");\n";
+  g << "ccopt_free_mem(&" + codegen_mem(g) + ");\n";
 }
 
 void MadmpecInterface::codegen_declarations(CodeGenerator& g) const {
@@ -445,18 +445,18 @@ void MadmpecInterface::codegen_declarations(CodeGenerator& g) const {
 
 void MadmpecInterface::codegen_body(CodeGenerator& g) const {
   codegen_body_enter(g);
-  g.auxiliaries << g.sanitize_source(madmpec_runtime_str, {"casadi_real"});
+  g.auxiliaries << g.sanitize_source(ccopt_runtime_str, {"casadi_real"});
 
-  g.local("d", "struct casadi_madmpec_data*");
+  g.local("d", "struct casadi_ccopt_data*");
   g.init_local("d", "&" + codegen_mem(g));
-  g.local("p", "struct casadi_madmpec_prob");
-  set_madmpec_prob(g);
+  g.local("p", "struct casadi_ccopt_prob");
+  set_ccopt_prob(g);
 
-  g << "casadi_madmpec_init(d, &arg, &res, &iw, &w);\n";
+  g << "casadi_ccopt_init(d, &arg, &res, &iw, &w);\n";
   g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
-  g << "casadi_madmpec_presolve(d);\n";
+  g << "casadi_ccopt_presolve(d);\n";
 
-  g << "casadi_madmpec_solve(d);\n";
+  g << "casadi_ccopt_solve(d);\n";
 
   codegen_body_exit(g);
 
@@ -467,7 +467,7 @@ void MadmpecInterface::codegen_body(CodeGenerator& g) const {
   }
 }
 
-void MadmpecInterface::set_madmpec_prob(CodeGenerator& g) const {
+void MadmpecInterface::set_ccopt_prob(CodeGenerator& g) const {
   if (jacg_sp_.size1()>0 && jacg_sp_.nnz()==0) {
     casadi_error("Empty sparsity pattern not supported in CCOPT C interface");
   }
@@ -488,7 +488,7 @@ void MadmpecInterface::set_madmpec_prob(CodeGenerator& g) const {
     g << "p.sp_h = 0;\n";
   }
 
-  g << "casadi_madmpec_setup(&p);\n";
+  g << "casadi_ccopt_setup(&p);\n";
 }
 
 MadmpecInterface::MadmpecInterface(DeserializingStream& s) : Nlpsol(s) {
@@ -504,7 +504,7 @@ MadmpecInterface::MadmpecInterface(DeserializingStream& s) : Nlpsol(s) {
   s.unpack("MadmpecInterface::nzh_i", nzh_i_);
   s.unpack("MadmpecInterface::nzh_j", nzh_j_);
 
-  set_madmpec_prob();
+  set_ccopt_prob();
 }
 
 void MadmpecInterface::serialize_body(SerializingStream &s) const {

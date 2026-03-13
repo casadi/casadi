@@ -22,7 +22,7 @@
 using namespace casadi;
 
 /**
-Solve a basic mpcc with madmpec
+Solve a basic mpcc with ccopt
 
 minimize     (x-2)^2 + (y-2)^2
 subject to   0 <= x _|_ y >= 0
@@ -45,7 +45,7 @@ int main(){
   solver_opts["ind_cc"] = std::vector<std::vector<long long int>>{{1,2}};
   solver_opts["madnlp.bound_relax_factor"] = 0.0;
   // Create an NLP solver
-  Function solver = nlpsol("solver", "madmpec", nlp, solver_opts);
+  Function solver = nlpsol("solver", "ccopt", nlp, solver_opts);
 
   // Solve the Rosenbrock problem
   DMDict arg;
