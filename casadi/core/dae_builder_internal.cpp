@@ -714,12 +714,11 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
 
   // Process ModelVariables
   casadi_assert(fmi_desc.has_child("ModelVariables"), "Missing 'ModelVariables'");
-  std::vector<casadi_int> indexmap;
-  import_model_variables(fmi_desc["ModelVariables"], indexmap);
+  import_model_variables(fmi_desc["ModelVariables"]);
 
   // Process model structure
   if (fmi_desc.has_child("ModelStructure")) {
-    import_model_structure(fmi_desc["ModelStructure"], indexmap);
+    import_model_structure(fmi_desc["ModelStructure"]);
   }
 
   // Is a symbolic representation available?
@@ -3545,8 +3544,7 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   }
 }
 
-void DaeBuilderInternal::import_model_variables(const XmlNode& modvars,
-    std::vector<casadi_int>& indexmap) {
+void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
   // Mapping from derivative variables to corresponding state variables, FMUX only
   std::vector<std::pair<std::string, std::string>> fmi1_der;
 
@@ -3769,8 +3767,7 @@ std::vector<DependenciesKind> DaeBuilderInternal::read_dependencies_kind(
   }
 }
 
-void DaeBuilderInternal::import_model_structure(const XmlNode& n,
-    const std::vector<casadi_int>& indexmap) {
+void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   // Do not use the automatic selection of outputs based on output causality
   outputs_.clear();
 
