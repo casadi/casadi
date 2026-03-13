@@ -624,6 +624,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   debug_ = false;
   fmutol_ = 0;
   ignore_time_ = false;
+  enable_ls_dae_ = true;
   std::string resource_serialize = "link";
   // Read options
   for (auto&& op : opts) {
@@ -637,6 +638,8 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
       detect_quad_ = op.second;
     } else if (op.first=="resource_serialize_mode") {
       resource_.change_option("serialize_mode", op.second);
+    } else if (op.first=="enable_ls_dae") {
+      enable_ls_dae_ = op.second;
     } else {
       casadi_error("No such option: " + op.first);
     }
@@ -3786,7 +3789,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n,
     bool has_lsdae = false;  // use ModelStructure from LS-DAE manifest
     std::string lsdae = resource_.path() + "/extra/org.fmi-standard.fmi-ls-dae/fmi-ls-manifest.xml";
     XmlNode lsdae_ms;
-    if (Filesystem::exists(lsdae)) {
+    if (enable_ls_dae_ && Filesystem::exists(lsdae)) {
       try {
         // Import replacement ModelStructure
         lsdae_ms = import_ls_dae(lsdae);

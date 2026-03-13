@@ -497,6 +497,7 @@ protected:
   bool debug_;
   double fmutol_;
   bool ignore_time_;
+  bool enable_ls_dae_;
 
   // FMI attributes
   std::string fmi_version_;
