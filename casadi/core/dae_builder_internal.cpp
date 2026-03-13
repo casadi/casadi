@@ -3771,7 +3771,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n,
   // Do not use the automatic selection of outputs based on output causality
   outputs_.clear();
 
-  // Algebraic variables are handled internally in the FMU
+  // Algebraic variables are handled internally in the FMU by default
   for (size_t i = 0; i < n_variables(); ++i) {
     Variable& v = variable(i);
     if (v.category == Category::Z) {
@@ -3782,9 +3782,32 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n,
 
   // Read structure
   if (fmi_major_ >= 3) {
+    // LS-DAE
+    bool has_lsdae = false;  // use ModelStructure from LS-DAE manifest
+    std::string lsdae = resource_.path() + "/extra/org.fmi-standard.fmi-ls-dae/fmi-ls-manifest.xml";
+    XmlNode lsdae_ms;
+    if (Filesystem::exists(lsdae)) {
+      try {
+        // Import replacement ModelStructure
+        lsdae_ms = import_ls_dae(lsdae);
+        // Append unchanged elements
+        for (casadi_int i = 0; i < n.size(); ++i) {
+          const XmlNode& e = n[i];
+          if (e.name != "ContinuousStateDerivative" && e.name != "Output") {
+            lsdae_ms.children.push_back(e);
+          }
+        }
+        // Use instead of original ModelStructure
+        has_lsdae = true;
+      } catch (const std::exception& e) {
+        casadi_warning("Failed to load LS-DAE manifest: " + std::string(e.what()));
+      }
+    }
+
     // Loop over ModelStructure elements
-    for (casadi_int i = 0; i < n.size(); ++i) {
-      const XmlNode& e = n[i];
+    const XmlNode& ms = has_lsdae ? lsdae_ms : n;
+    for (casadi_int i = 0; i < ms.size(); ++i) {
+      const XmlNode& e = ms[i];
       // Get a reference to the variable
       if (e.name == "Output") {
         // Get index
@@ -3826,6 +3849,14 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n,
         // Event indicator
         event_indicators_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
         number_of_event_indicators_++;
+      } else if (e.name == "Residual") {
+        // Get index
+        residuals_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+        // Corresponding variable
+        Variable& v = variable(residuals_.back());
+        // Get dependencies
+        v.dependencies = read_dependencies(e);
+        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
       } else {
         // Unknown
         casadi_error("Unknown ModelStructure element: " + e.name);
@@ -3967,6 +3998,27 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n,
       if (!variable(x).in_rhs) categorize(x, Category::Q);
     }
   }
+}
+
+XmlNode DaeBuilderInternal::import_ls_dae(const std::string& lsdae) {
+  // Load function oracle from file
+  XmlFile xml_file("tinyxml");
+  XmlNode ls_manifest = xml_file.parse(lsdae)[0];  // One child; fmiLayeredStandardManifest
+
+  // Read attributes
+  auto ls_version = ls_manifest.attribute<std::string>("fmi-ls:fmi-ls-version", "");
+  casadi_assert(ls_version == "1.0", "Unsupported LS-DAE version: " + ls_version);
+
+  // Process algebraic variables
+  casadi_assert(ls_manifest.has_child("AlgebraicVariables"), "Missing 'AlgebraicVariables'");
+  for (const XmlNode& e : ls_manifest["AlgebraicVariables"].children) {
+    auto vr = static_cast<unsigned int>(e.attribute<casadi_int>("valueReference"));
+    categorize(vrmap_.at(vr), Category::Z);
+  }
+
+  // Return replacement
+  casadi_assert(ls_manifest.has_child("ModelStructure"), "Missing 'ModelStructure'");
+  return ls_manifest["ModelStructure"];
 }
 
 void DaeBuilderInternal::import_binding_equations(const XmlNode& eqs) {

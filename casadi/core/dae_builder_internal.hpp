@@ -702,6 +702,9 @@ protected:
   // Read ModelStructure
   void import_model_structure(const XmlNode& n, const std::vector<casadi_int>& indexmap);
 
+  // Read LS-DAE manifest, if any
+  XmlNode import_ls_dae(const std::string& lsdae);
+
   // Read symbolic binding equations
   void import_binding_equations(const XmlNode& eqs);
 
