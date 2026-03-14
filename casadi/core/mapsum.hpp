@@ -230,13 +230,13 @@ namespace casadi {
         \identifier{5a} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
-    /** \brief Get number >=n that introduces padding comsistent with vector_width */
-    casadi_int n_padded() const;
-    static casadi_int n_padded(casadi_int n);
-
+    /** \brief Relayout for input i: user layout {nnz,n} <-> SIMD layout {n,nnz} */
     Relayout permute_in(casadi_int i, bool invert=false) const;
+    /** \brief Relayout for output i: SIMD layout {n,nnz} <-> user layout {nnz,n} */
     Relayout permute_out(casadi_int i, bool invert=false) const;
+    /** \brief Permute all inputs from user layout to SIMD layout (or inverse) */
     std::vector<MX> permute_in(const std::vector<MX>& arg, bool invert=false) const;
+    /** \brief Permute all outputs from SIMD layout to user layout (or inverse) */
     std::vector<MX> permute_out(const std::vector<MX>& res, bool invert=false) const;
     bool vectorize_f() const;
     static bool vectorize_f(const Function& f, casadi_int n);

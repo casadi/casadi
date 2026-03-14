@@ -223,10 +223,6 @@ namespace casadi {
         \identifier{hm} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
-    /** \brief Get number >=n that introduces padding comsistent with vector_width */
-    casadi_int n_padded() const;
-    static casadi_int n_padded(casadi_int n);
-
     Relayout permute_in(casadi_int i, bool invert=false) const;
     Relayout permute_out(casadi_int i, bool invert=false) const;
     std::vector<MX> permute_in(const std::vector<MX>& arg, bool invert=false) const;

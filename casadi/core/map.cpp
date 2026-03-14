@@ -89,14 +89,14 @@ namespace casadi {
 
   Relayout Map::permute_in(casadi_int i, bool invert) const {
     Layout source({f_.nnz_in(i), n_});
-    Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
+    Layout target({n_, f_.nnz_in(i)}, {n_, f_.nnz_in(i)});
     Relayout ret = Relayout(source, {1, 0}, target);
     if (invert) return ret.invert();
     return ret;
   }
 
   Relayout Map::permute_out(casadi_int i, bool invert) const {
-    Layout source({n_, f_.nnz_out(i)}, {n_padded(), f_.nnz_out(i)});
+    Layout source({n_, f_.nnz_out(i)}, {n_, f_.nnz_out(i)});
     Layout target({f_.nnz_out(i), n_});
     Relayout ret = Relayout(source, {1, 0}, target);
     if (invert) return ret.invert();
@@ -113,10 +113,10 @@ namespace casadi {
       std::vector<casadi_int> stride_in(f_.n_in());
       std::vector<casadi_int> stride_out(f_.n_out());
       for (casadi_int j=0; j<f_.n_in(); ++j) {
-        stride_in[j] = vectorize_f(f, n_) ? n_padded(n) : 1;
+        stride_in[j] = vectorize_f(f, n_) ? n_ : 1;
       }
       for (casadi_int j=0; j<f_.n_out(); ++j) {
-        stride_out[j] = vectorize_f(f, n_) ? n_padded(n) : 1;
+        stride_out[j] = vectorize_f(f, n_) ? n_ : 1;
       }
 
       Dict opts;
@@ -285,11 +285,11 @@ namespace casadi {
     Instance local = inst;
     local.stride_in.resize(f_.n_in());
     for (casadi_int j=0; j<n_in_; ++j) {
-      local.stride_in[j] = vectorize_f() ? n_padded() : 1;
+      local.stride_in[j] = vectorize_f() ? n_ : 1;
     }
     local.stride_out.resize(f_.n_out());
     for (casadi_int j=0; j<n_out_; ++j) {
-      local.stride_out[j] = vectorize_f() ? n_padded() : 1;
+      local.stride_out[j] = vectorize_f() ? n_ : 1;
     }
     g.add_dependency(f_, local);
     //REMOVE uout() << "codegen_dec" << local.arg_null << f_ << std::endl;
@@ -300,11 +300,11 @@ namespace casadi {
     Instance local = inst;
     local.stride_in.resize(f_.n_in());
     for (casadi_int j=0; j<n_in_; ++j) {
-      local.stride_in[j] = vectorize_f() ? n_padded() : 1;
+      local.stride_in[j] = vectorize_f() ? n_ : 1;
     }
     local.stride_out.resize(f_.n_out());
     for (casadi_int j=0; j<n_out_; ++j) {
-      local.stride_out[j] = vectorize_f() ? n_padded() : 1;
+      local.stride_out[j] = vectorize_f() ? n_ : 1;
     }
     //REMOVE uout() << "codegen_body" << local.arg_null << f_ << std::endl;
     bool local_increment = vectorize_f() && str(f_).find("SXFunction")!= std::string::npos;
@@ -319,8 +319,8 @@ namespace casadi {
     g << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n";
     if (vectorize_f()) {
       g.local("j", "casadi_int");
-      g << "#pragma omp simd safelen(" << n_padded() << ")\n";
-      g << "for (j=0; j<" << n_padded() << "; ++j) {\n";
+      g << "#pragma omp simd safelen(" << n_ << ")\n";
+      g << "for (j=0; j<" << n_ << "; ++j) {\n";
     } else {
       g << "for (i=0; i<" << n_ << "; ++i) {\n";
     }
@@ -359,19 +359,6 @@ namespace casadi {
     g << "}\n";
   }
 
-  casadi_int Map::n_padded() const {
-    if (vectorize_f()) {
-      return n_padded(n_);
-    }
-    return n_;
-  }
-
-  casadi_int Map::n_padded(casadi_int n) {
-    return n;
-    casadi_int rem = n % GlobalOptions::vector_width_real;
-    if (rem==0) return n;
-    return n + GlobalOptions::vector_width_real - rem;
-  }
 
   Function Map
   ::get_forward(casadi_int nfwd, const std::string& name,
@@ -396,14 +383,14 @@ namespace casadi {
       MX& x = res[f_.n_in()+f_.n_out()+i];
       casadi_int df_in = df.nnz_in(f_.n_in()+f_.n_out()+i);
       if (false && vectorize_f()) {
-        Layout source({n_, df_in}, {n_padded(), df_in});
+        Layout source({n_, df_in}, {n_, df_in});
         Layout target({df_in, n_});
         Relayout ret = Relayout(source, {1, 0}, target);
         //REMOVE uout() << "FOO " << i << std::endl;
         x = permute_layout(x, ret);
 
         // Layout source({f_.nnz_in(i), n_});
-        // Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
+        // Layout target({n_, f_.nnz_in(i)}, {n_, f_.nnz_in(i)});
       }
       if (!vectorize_f()) {
         //REMOVE uout() << "here" << std::endl;
@@ -422,11 +409,11 @@ namespace casadi {
       MX& x = res[i];
       if (false && vectorize_f()) {
 
-      //Layout source({n_, f_.nnz_out(i)}, {n_padded(), f_.nnz_out(i)});
+      //Layout source({n_, f_.nnz_out(i)}, {n_, f_.nnz_out(i)});
       //Layout target({f_.nnz_out(i), n_});
       //  Relayout ret = Relayout(source, {1, 0}, target);
         Layout source({df_out, n_});
-        Layout target({n_, df_out}, {n_padded(), f_.nnz_out()});
+        Layout target({n_, df_out}, {n_, f_.nnz_out()});
         Relayout ret = Relayout(source, {1, 0}, target);
         //REMOVE uout() << "BAR " << i << std::endl;
         x = permute_layout(x, ret);

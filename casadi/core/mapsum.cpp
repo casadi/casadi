@@ -60,6 +60,7 @@ namespace casadi {
     // Input expressions
     std::vector<MX> arg = ret.mx_in(); // change to layout of reinterpret_layout
 
+    // Wrap: permute inputs to SIMD layout, evaluate, permute outputs back to user layout
     std::vector<MX> res = m.permute_out(ret(m.permute_in(arg)));
 
     // Construct return function
@@ -84,11 +85,11 @@ namespace casadi {
       std::vector<casadi_int> stride_in(f_.n_in());
       std::vector<casadi_int> stride_out(f_.n_out());
       for (casadi_int j=0; j<f_.n_in(); ++j) {
-        stride_in[j] = vectorize_f(f, n_) && !reduce_in[j] ? n_padded(n) : 1;
+        stride_in[j] = vectorize_f(f, n_) && !reduce_in[j] ? n_ : 1;
         if (reduce_in_[j]) stride_in[j]*= -1;
       }
       for (casadi_int j=0; j<f_.n_out(); ++j) {
-        stride_out[j] = vectorize_f(f, n_) ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_padded(n)) : 1;
+        stride_out[j] = vectorize_f(f, n_) ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_) : 1;
         //if (reduce_out_[j]) stride_out[j]*= -1;
       }
 
@@ -187,20 +188,8 @@ namespace casadi {
     has_refcount_ = f_->has_refcount_;
   }
 
-  casadi_int MapSum::n_padded() const {
-    if (vectorize_f()) {
-      return n_padded(n_);
-    }
-    return n_;
-  }
 
-  casadi_int MapSum::n_padded(casadi_int n) {
-    return n;
-    casadi_int rem = n % GlobalOptions::vector_width_real;
-    if (rem==0) return n;
-    return n + GlobalOptions::vector_width_real - rem;
-  }
-
+  // Apply layout permutation to each input: user {nnz,n} -> SIMD {n,nnz}
   std::vector<MX> MapSum::permute_in(const std::vector<MX> & arg, bool invert) const {
     std::vector<MX> ret = arg;
     for (casadi_int i=0;i<f_.n_in();++i) {
@@ -209,6 +198,7 @@ namespace casadi {
     return ret;
   }
 
+  // Apply layout permutation to each output: SIMD {n,nnz} -> user {nnz,n}
   std::vector<MX> MapSum::permute_out(const std::vector<MX> & res, bool invert) const {
     std::vector<MX> ret = res;
     for (casadi_int i=0;i<f_.n_out();++i) {
@@ -217,18 +207,22 @@ namespace casadi {
     return ret;
   }
 
+  // Relayout descriptor for input i: transpose {nnz,n} <-> {n,nnz}
+  // Reduced inputs are shared across iterations, so no permutation needed.
   Relayout MapSum::permute_in(casadi_int i, bool invert) const {
-    if (reduce_in_[i]) return Relayout();
+    if (reduce_in_[i]) return Relayout(); // reduced: same data for all n iterations
     Layout source({f_.nnz_in(i), n_});
-    Layout target({n_, f_.nnz_in(i)}, {n_padded(), f_.nnz_in(i)});
+    Layout target({n_, f_.nnz_in(i)});
     Relayout ret = Relayout(source, {1, 0}, target);
     if (invert) return ret.invert();
     return ret;
   }
 
+  // Relayout descriptor for output i: transpose {n,nnz} <-> {nnz,n}
+  // Reduced outputs are summed across iterations, so no permutation needed.
   Relayout MapSum::permute_out(casadi_int i, bool invert) const {
-    if (reduce_out_[i]) return Relayout();
-    Layout source({n_, f_.nnz_out(i)}, {n_padded(), f_.nnz_out(i)});
+    if (reduce_out_[i]) return Relayout(); // reduced: accumulated scalar per output element
+    Layout source({n_, f_.nnz_out(i)});
     Layout target({f_.nnz_out(i), n_});
     Relayout ret = Relayout(source, {1, 0}, target);
     if (invert) return ret.invert();
@@ -341,12 +335,12 @@ namespace casadi {
     Instance local = inst;
     local.stride_in.resize(f_.n_in());
     for (casadi_int j=0; j<n_in_; ++j) {
-      local.stride_in[j] = (vectorize_f() && !reduce_in_[j]) ? n_padded() : 1;
+      local.stride_in[j] = (vectorize_f() && !reduce_in_[j]) ? n_ : 1;
       if (reduce_in_[j]) local.stride_in[j]*= -1;
     }
     local.stride_out.resize(f_.n_out());
     for (casadi_int j=0; j<n_out_; ++j) {
-      local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_padded()) : 1;
+      local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_) : 1;
       //if (reduce_out_[j]) local.stride_out[j]*= -1;
     }
     g.add_dependency(f_, local);
@@ -356,12 +350,12 @@ namespace casadi {
     Instance local = inst;
     local.stride_in.resize(f_.n_in());
     for (casadi_int j=0; j<n_in_; ++j) {
-      local.stride_in[j] = (vectorize_f() && !reduce_in_[j]) ? n_padded() : 1;
+      local.stride_in[j] = (vectorize_f() && !reduce_in_[j]) ? n_ : 1;
       if (reduce_in_[j]) local.stride_in[j]*= -1;
     }
     local.stride_out.resize(f_.n_out());
     for (casadi_int j=0; j<n_out_; ++j) {
-      local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_padded()) : 1;
+      local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_) : 1;
       //if (reduce_out_[j]) local.stride_out[j]*= -1;
     }
 
@@ -445,8 +439,8 @@ namespace casadi {
         g << "#pragma omp simd\n";
         g << "for (j=0; j<" << GlobalOptions::vector_width_real << "; ++j) {\n";
       } else {
-        g << "#pragma omp simd safelen(" << n_padded() << ")\n";
-        g << "for (j=0; j<" << n_padded() << "; ++j) {\n";
+        g << "#pragma omp simd safelen(" << n_ << ")\n";
+        g << "for (j=0; j<" << n_ << "; ++j) {\n";
       }
     } else {
       g << "for (i=0; i<" << n_ << "; ++i) {\n";
