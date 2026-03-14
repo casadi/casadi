@@ -82,12 +82,6 @@ namespace casadi {
     }
     /// @}
 
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    Layout get_layout_in(casadi_int i) override;
-    Layout get_layout_out(casadi_int i) override;
-    /// @}
-
     bool vectorize_f() const;
 
     static bool vectorize_f(const Function& f, casadi_int n);

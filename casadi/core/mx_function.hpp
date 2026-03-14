@@ -289,12 +289,6 @@ namespace casadi {
         \identifier{2ew} */
     const Function& get_function(const std::string &name) const override;
 
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    Layout get_layout_in(casadi_int i) override { return in_.at(i).layout();}
-    Layout get_layout_out(casadi_int i) override { return out_.at(i).layout();}
-    /// @}
-
     /** \brief Number of nodes in the algorithm
 
         \identifier{2q} */

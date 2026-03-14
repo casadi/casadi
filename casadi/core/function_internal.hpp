@@ -1158,12 +1158,6 @@ namespace casadi {
         \identifier{mt} */
     virtual bool get_diff_out(casadi_int i) { return true; }
 
-    /** \brief Get sparsity of a given input */
-    virtual Layout get_layout_in(casadi_int i);
-
-    /** \brief Get sparsity of a given output */
-    virtual Layout get_layout_out(casadi_int i);
-
     /** \brief Get input scheme index by name
 
         \identifier{mu} */
@@ -1468,7 +1462,6 @@ namespace casadi {
     // Alignment of work-vector
     size_t align_w_;
 
-    std::vector<Layout> layout_in_, layout_out_;
     std::vector<casadi_int> stride_in_, stride_out_;
 
     std::vector<std::string> data_type_;

@@ -180,16 +180,6 @@ namespace casadi {
     return GlobalOptions::vector_width_real>1 && f.is_a("SXFunction") && n>=GlobalOptions::vector_width_real;
   }
 
-  Layout Map::get_layout_in(casadi_int i) {
-    if (!vectorize_f()) return Layout();
-    return Layout({f_.nnz_in(i), n_}, {f_.nnz_in(i), n_padded()});
-  }
-
-  Layout Map::get_layout_out(casadi_int i) {
-    if (!vectorize_f()) return Layout();
-    // Just here to allocate enough sz_self for outputs
-    return Layout({f_.nnz_out(i), n_}, {f_.nnz_out(i), n_padded()});
-  }
 
   void Map::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);

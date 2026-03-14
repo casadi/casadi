@@ -48,7 +48,6 @@ namespace casadi {
 
     // Save the sparsity pattern
     set_sparsity(dep(0)->sparsity(oind));
-    set_layout(dep(0)->layout(oind));
   }
 
   OutputNode::~OutputNode() {

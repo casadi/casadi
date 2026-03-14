@@ -400,9 +400,6 @@ namespace casadi {
     /// Get the sparsity
     const Sparsity& sparsity() const { return sparsity_;}
 
-    /// Get the sparsity
-    const Layout& layout() const { return layout_;}
-
     /// Get the sparsity of output oind
     virtual const Sparsity& sparsity(casadi_int oind) const;
 
@@ -415,9 +412,6 @@ namespace casadi {
         }
         return true;
     }
-
-    /// Get the sparsity of output oind
-    virtual const Layout& layout(casadi_int oind) const;
 
     /// Alignment (bytes) for specific input argument
     virtual size_t align_in(casadi_int iind) const { return GlobalOptions::vector_width_real*GlobalOptions::byte_width_real; }
@@ -447,9 +441,6 @@ namespace casadi {
 
     /// Set the sparsity
     void set_sparsity(const Sparsity& sparsity);
-
-    /// Set dimensions
-    void set_layout(const Layout& layout);
 
     /** \brief Get required length of arg field
 
@@ -827,8 +818,6 @@ namespace casadi {
 
         \identifier{1sk} */
     Sparsity sparsity_;
-
-    Layout layout_;
 
     /** \brief Propagate sparsities forward through a copy operation
 

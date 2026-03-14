@@ -82,7 +82,6 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
     //  uout() << x << std::endl;
     //}
     //casadi_assert(x.is_dense(), "Sparsity not supported");
-    set_layout(relay_.target());
     relay_.source().assert_valid_permutation(relay_.target());
     //uout() << "okay" << std::endl;
   }

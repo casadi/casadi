@@ -110,10 +110,6 @@ namespace casadi {
     return fcn_.sparsity_out(oind);
   }
 
-  const Layout& Call::layout(casadi_int oind) const {
-    return fcn_->layout_out_[oind];
-  }
-
   int Call::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     return fcn_(arg, res, iw, w);
   }

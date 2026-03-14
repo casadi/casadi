@@ -225,10 +225,6 @@ namespace casadi {
     sparsity_ = sparsity;
   }
 
-  void MXNode::set_layout(const Layout& layout) {
-    layout_ = layout;
-  }
-
   void MXNode::set_dep(const MX& dep) {
     dep_.resize(1);
     dep_[0] = dep;
@@ -268,13 +264,6 @@ namespace casadi {
   const Sparsity& MXNode::sparsity(casadi_int oind) const {
     casadi_assert(oind==0, "Index out of bounds");
     return sparsity_;
-  }
-
-  const Layout& MXNode::layout(casadi_int oind) const {
-    if (oind>0) {
-      casadi_assert(oind==0, "Index out of bounds");
-    }
-    return layout_;
   }
 
   void MXNode::disp(std::ostream& stream, bool more) const {
@@ -588,7 +577,6 @@ namespace casadi {
   void MXNode::serialize_body(SerializingStream& s) const {
     s.pack("MXNode::deps", dep_);
     s.pack("MXNode::sp", sparsity_);
-    s.pack("MXNode::layout", layout_);
   }
 
   void MXNode::serialize_type(SerializingStream& s) const {
@@ -600,7 +588,6 @@ namespace casadi {
 
     s.unpack("MXNode::deps", dep_);
     s.unpack("MXNode::sp", sparsity_);
-    s.unpack("MXNode::layout", layout_);
   }
 
 
@@ -1251,7 +1238,7 @@ namespace casadi {
   }
 
   casadi_int MXNode::sz_self(casadi_int i) const {
-    return layout(i).is_default()? sparsity(i).nnz() : layout(i).size(); 
+    return sparsity(i).nnz(); 
   }
 
   std::vector<MX> MXNode::get_horzsplit(const std::vector<casadi_int>& output_offset) const {

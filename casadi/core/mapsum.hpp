@@ -77,12 +77,6 @@ namespace casadi {
     }
     /// @}
 
-    /** \brief Get sparsity of a given output */
-    Layout get_layout_in(casadi_int i) override;
-
-    /** \brief Get sparsity of a given output */
-    Layout get_layout_out(casadi_int i) override;
-
     //@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
     bool fwdViaJac(casadi_int nfwd) const override { return f_->fwdViaJac(nfwd); }

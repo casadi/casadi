@@ -164,10 +164,6 @@ namespace casadi {
     ~MX();
 /// \endcond
 
-    /** \brief Get the sparsity pattern */
-    const Layout& layout() const;
-
-
 #ifndef SWIG
 /// \cond INTERNAL
     /** \brief  Create from node

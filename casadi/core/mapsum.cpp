@@ -99,16 +99,6 @@ namespace casadi {
     }
   }
 
-  Layout MapSum::get_layout_in(casadi_int i) {
-    if (!vectorize_f()) return Layout();
-    return permute_in(i).target();
-  }
-
-  Layout MapSum::get_layout_out(casadi_int i) {
-    if (!vectorize_f()) return Layout();
-    return permute_out(i).source();
-  }
-
   void MapSum::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
     s.pack("MapSum::f", f_);
