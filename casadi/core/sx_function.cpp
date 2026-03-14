@@ -1177,7 +1177,7 @@ namespace casadi {
           ae.op = static_cast<int>(OP_OUTPUT);
           ae.i0 = out.first;
           ae.i1 = n->temp;
-          ae.i2 = out.second*stride_out_[ae.i0];
+          ae.i2 = out.second*abs(stride_out_[ae.i0]);
 
           // Increase count of dependency
           refcount.at(ae.i1)++;

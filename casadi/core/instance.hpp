@@ -35,6 +35,14 @@ namespace casadi {
   struct Instance {
     std::vector<bool> arg_null;
     std::vector<bool> res_null;
+    // Stride for each input/output in the interleaved memory layout.
+    // The magnitude (abs) controls the spacing between consecutive nonzeros.
+    // The sign encodes reduce vs. external semantics:
+    //   positive: external (per-iteration) — each SIMD lane/iteration
+    //             addresses its own slot (index includes "+i")
+    //   negative: reduced — all iterations share the same slot;
+    //             outputs use "+=" (accumulate) instead of "=" (assign)
+    // Set by MapSum (negative for reduced args) and Map (always positive).
     std::vector<casadi_int> stride_in;
     std::vector<casadi_int> stride_out;
     bool prefer_inline;
