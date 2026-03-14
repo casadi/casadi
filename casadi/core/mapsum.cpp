@@ -242,6 +242,15 @@ namespace casadi {
     for (i=0; i<n; ++i) *y++ |= *x++;
   }
 
+  template<typename T1>
+  void casadi_inplace_add(T1& y, const T1& x) {
+    y += x;
+  }
+
+  inline void casadi_inplace_add(bvec_t& y, const bvec_t& x) {
+    y |= x;
+  }
+
   template<typename T>
   int MapSum::local_eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
 
@@ -270,7 +279,7 @@ namespace casadi {
           if (reduce_out_[j]) {
             // Strided add: f_ writes at offsets 0, vw, 2*vw, ...
             for (casadi_int k = 0; k < f_.nnz_out(j); k++) {
-              res[j][k] += res1[j][k * vw];
+              casadi_inplace_add(res[j][k], res1[j][k * vw]);
             }
           } else {
             res1[j] += vectorize_f() ? 1 : f_.nnz_out(j);
@@ -297,6 +306,7 @@ namespace casadi {
     // has a side effect of clearing res
     // Reduced outputs should not be cleared;
     // they must influence each iteration
+    casadi_error("bar");
 
     // Store reduced res in scratch space
     bvec_t* w_scratch = w + f_.sz_w();
