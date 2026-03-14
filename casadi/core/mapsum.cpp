@@ -58,7 +58,7 @@ namespace casadi {
     const MapSum& m = *static_cast<const MapSum*>(ret.get());
 
     // Input expressions
-    std::vector<MX> arg = ret.mx_in(); // change to layout of reinterpret_layout
+    std::vector<MX> arg = ret.mx_in();
 
     // Wrap: permute inputs to SIMD layout, evaluate, permute outputs back to user layout
     std::vector<MX> res = m.permute_out(ret(m.permute_in(arg)));
@@ -90,7 +90,6 @@ namespace casadi {
       }
       for (casadi_int j=0; j<f_.n_out(); ++j) {
         stride_out[j] = vectorize_f(f, n_) ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_) : 1;
-        //if (reduce_out_[j]) stride_out[j]*= -1;
       }
 
       Dict opts;
@@ -341,7 +340,6 @@ namespace casadi {
     local.stride_out.resize(f_.n_out());
     for (casadi_int j=0; j<n_out_; ++j) {
       local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_) : 1;
-      //if (reduce_out_[j]) local.stride_out[j]*= -1;
     }
     g.add_dependency(f_, local);
   }
@@ -356,7 +354,6 @@ namespace casadi {
     local.stride_out.resize(f_.n_out());
     for (casadi_int j=0; j<n_out_; ++j) {
       local.stride_out[j] = vectorize_f() ? (reduce_out_[j] ? GlobalOptions::vector_width_real : n_) : 1;
-      //if (reduce_out_[j]) local.stride_out[j]*= -1;
     }
 
     bool any_reduce_out = any(reduce_out_);
