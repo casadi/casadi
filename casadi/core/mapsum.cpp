@@ -810,7 +810,7 @@ namespace casadi {
           if (!reduce_in_[iind] && !reduce_out_[oind]) {
             r = sparsity_cast(r, Sparsity::kron(Jf.sparsity_out(i), Sparsity::diag(n_)));
           } else {
-          if (r.op()==OP_PERMUTE_LAYOUT) r = r.dep(0);
+            if (r.op()==OP_PERMUTE_LAYOUT) r = r.dep(0);
             Sparsity patt = reduce_in_[iind] ? Sparsity::dense(n_, 1) : Sparsity::diag(n_);
             r = sparsity_cast(r, Sparsity::kron(Jf.sparsity_out(i), patt));
           }
