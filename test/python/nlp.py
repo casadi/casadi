@@ -1739,7 +1739,8 @@ class NLPtests(casadiTestCase):
         solver = nlpsol("solver",Solver,nlp,myoptions)
         
         if aux_options["codegen"] and args.run_slow:
-          [F,_] = self.check_codegen(solver,dict(lbg=-10,ubg=10),**aux_options["codegen"])
+          cg = self.check_codegen(solver,dict(lbg=-10,ubg=10),**aux_options["codegen"])
+          F = cg["F"]
           with self.assertRaises(RuntimeError):
             F(lbg=5,ubg=10)
           

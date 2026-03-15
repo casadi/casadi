@@ -790,6 +790,7 @@ class casadiTestCase(unittest.TestCase):
       self.fail("Found %d bad symbol exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
   def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True):
+    ret = {}
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
@@ -893,6 +894,8 @@ class casadiTestCase(unittest.TestCase):
         else:
             env["LD_LIBRARY_PATH"] = libdir
         p = subprocess.Popen(commands,shell=True,env=env).wait()
+        ret["exename"] = exename
+        ret["env"] = env
         inputs_main = inputs
         if isinstance(inputs,dict):
           inputs_main = F.convert_in(inputs)
@@ -919,7 +922,7 @@ class casadiTestCase(unittest.TestCase):
         if p.returncode!=0:
             # We are actively looking for failure,
             # so do not proceed with tests
-            return
+            return ret
         
       Fout = F.call(inputs)
       if with_external:
@@ -936,8 +939,10 @@ class casadiTestCase(unittest.TestCase):
           for i in range(F.n_out()):
             self.checkarray(Fout[i],outputs[i],digits=digits)
 
+      ret["libname"] = libname
+
       if not with_external:
-        return None, libname
+        return ret
 
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
@@ -949,8 +954,9 @@ class casadiTestCase(unittest.TestCase):
 
       if check_serialize:
         self.check_serialize(F2,inputs=inputs)
-        
-      return F2, libname
+
+      ret["F"] = F2
+      return ret
 
   def check_thread_safety(self,F,inputs=None,N=20):
 

@@ -1960,12 +1960,12 @@ class Functiontests(casadiTestCase):
     DM.rng(0)
     x0 = DM.rand(x.sparsity())
     y0 = DM.rand(y.sparsity())
-    [F,_] = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=True,external_opts={"enable_fd":True})
-    FJ = F.jacobian()
+    cg = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=True,external_opts={"enable_fd":True})
+    FJ = cg["F"].jacobian()
     for i in range(fJ.n_out()):
         self.assertEqual(fJ.sparsity_out(i),FJ.sparsity_out(i))
-    [F,_] = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=False,external_opts={"enable_fd":True})
-    FJ = F.jacobian()
+    cg = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=False,external_opts={"enable_fd":True})
+    FJ = cg["F"].jacobian()
     for i in range(fJ.n_out()):
         self.assertTrue(FJ.sparsity_out(i).is_dense())
 
@@ -3335,26 +3335,26 @@ class Functiontests(casadiTestCase):
     # No extra options on windows
     if os.name == 'nt':
       extra_options = []
-    F,lib = self.check_codegen(c,inputs=c.convert_in(inputs),std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
-    F = F.wrap()
+    cg = self.check_codegen(c,inputs=c.convert_in(inputs),std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
+    F = cg["F"].wrap()
     print("memful_external")
-    self.check_codegen(F,inputs=c.convert_in(inputs),valgrind=True,main=True,extralibs=[lib],debug_mode=True)
-    
+    self.check_codegen(F,inputs=c.convert_in(inputs),valgrind=True,main=True,extralibs=[cg["libname"]],debug_mode=True)
+
     # Check wrapper Function
     for X in [MX,SX]:
-    
+
         g = X.sym("g",2)
         inputs["g"] = g
-        
+
         f = Function('wrapper',[g],[c(**inputs)['x']])
         print(f)
         # No extra options on windows
         if os.name == 'nt':
           extra_options = []
-        F,lib = self.check_codegen(f,inputs=[vertcat(1,2)],std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
-        F = F.wrap()
+        cg = self.check_codegen(f,inputs=[vertcat(1,2)],std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
+        F = cg["F"].wrap()
         print("memful_external")
-        self.check_codegen(F,inputs=[vertcat(1,2)],valgrind=True,main=True,extralibs=[lib],debug_mode=True)
+        self.check_codegen(F,inputs=[vertcat(1,2)],valgrind=True,main=True,extralibs=[cg["libname"]],debug_mode=True)
    
   def test_cse(self):
     for X in [SX,MX]:
@@ -3764,8 +3764,8 @@ class Functiontests(casadiTestCase):
     mychecks(f)
     
     if not args.run_slow: return
-    F,_ = self.check_codegen(f,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())],with_jac_sparsity=True,with_forward=True)
-    mychecks(F,exempt=True)
+    cg = self.check_codegen(f,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())],with_jac_sparsity=True,with_forward=True)
+    mychecks(cg["F"],exempt=True)
    
    
   def test_cat_input(self):

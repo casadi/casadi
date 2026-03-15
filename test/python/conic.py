@@ -1006,10 +1006,12 @@ class ConicTests(casadiTestCase):
     with self.assertOutput(["last_tau","Converged"],[]):
         solver()
     if args.run_slow:
-        F,_ = self.check_codegen(solver,{},std="c99",opts={})
+        cg = self.check_codegen(solver,{},std="c99",opts={})
+        F = cg["F"]
         with self.assertOutput([],["last_tau","Converged"]): # By default, don't print
             F()
-        F,_ = self.check_codegen(solver,{},std="c99",opts={"verbose_runtime":True})
+        cg = self.check_codegen(solver,{},std="c99",opts={"verbose_runtime":True})
+        F = cg["F"]
         #with self.assertOutput(["last_tau","Converged"],[]): # Printing, but not captured by python stdout
         #    F()
     
