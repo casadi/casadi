@@ -2338,8 +2338,17 @@ namespace casadi {
   int SXFunction::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
     // Fall back when forward mode not allowed
-    if (sp_weight()==1 || sp_weight()==-1)
-      return FunctionInternal::sp_forward(arg, res, iw, w, mem);
+    // Cannot fall back when strides are active: FunctionInternal's generic
+    // sparsity probing (get_jac_sparsity_gen) allocates non-strided buffers,
+    // but the algorithm uses strided i2 indices, causing out-of-bounds access
+    if (sp_weight()==1 || sp_weight()==-1) {
+      bool has_stride = false;
+      for (auto s : stride_in_) if (std::abs(s) > 1) { has_stride = true; break; }
+      if (!has_stride)
+        for (auto s : stride_out_) if (std::abs(s) > 1) { has_stride = true; break; }
+      if (!has_stride)
+        return FunctionInternal::sp_forward(arg, res, iw, w, mem);
+    }
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
@@ -2365,8 +2374,15 @@ namespace casadi {
   int SXFunction::sp_reverse(bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
     // Fall back when reverse mode not allowed
-    if (sp_weight()==0 || sp_weight()==-1)
-      return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
+    // Cannot fall back when strides are active (see sp_forward comment)
+    if (sp_weight()==0 || sp_weight()==-1) {
+      bool has_stride = false;
+      for (auto s : stride_in_) if (std::abs(s) > 1) { has_stride = true; break; }
+      if (!has_stride)
+        for (auto s : stride_out_) if (std::abs(s) > 1) { has_stride = true; break; }
+      if (!has_stride)
+        return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
+    }
     std::fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward

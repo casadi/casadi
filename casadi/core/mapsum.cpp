@@ -306,35 +306,46 @@ namespace casadi {
     // has a side effect of clearing res
     // Reduced outputs should not be cleared;
     // they must influence each iteration
-    casadi_error("bar");
 
-    // Store reduced res in scratch space
-    bvec_t* w_scratch = w + f_.sz_w();
-    for (casadi_int j=0;j<n_out_;++j) {
-      if (res[j] && reduce_out_[j]) {
-        casadi_copy(res[j], f_.nnz_out(j), w_scratch);
-        w_scratch += f_.nnz_out(j);
-      }
-    }
+    casadi_int vw = vectorize_f() ? GlobalOptions::vector_width_real : 1;
+
     bvec_t** arg1 = arg+n_in_;
     std::copy_n(arg, n_in_, arg1);
     bvec_t** res1 = res+n_out_;
     std::copy_n(res, n_out_, res1);
+
+    // For reduced outputs, redirect res1[j] to strided scratch space
+    // (f_ may use strided i2 indices; res[j] is non-strided from the caller)
+    bvec_t* w_scratch = w + f_.sz_w();
+    for (casadi_int j=0;j<n_out_;++j) {
+      if (res[j] && reduce_out_[j]) {
+        res1[j] = w_scratch;
+        w_scratch += f_.nnz_out(j) * vw;
+      }
+    }
+
     for (casadi_int i=0; i<n_; ++i) {
-      // Restore res1[j] from scratch space
-      w_scratch = w + f_.sz_w();
+      // Scatter non-strided seeds from res[j] into strided scratch res1[j]
       for (casadi_int j=0;j<n_out_;++j) {
         if (res[j] && reduce_out_[j]) {
-          casadi_copy(w_scratch, f_.nnz_out(j), res1[j]);
-          w_scratch += f_.nnz_out(j);
+          casadi_clear(res1[j], f_.nnz_out(j) * vw);
+          for (casadi_int k = 0; k < f_.nnz_out(j); k++) {
+            res1[j][k * vw] = res[j][k];
+          }
         }
       }
       if (f_.rev(arg1, res1, iw, w)) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
-        if (arg1[j] && !reduce_in_[j]) arg1[j] += f_.nnz_in(j);
+        if (arg1[j] && !reduce_in_[j]) arg1[j] += vectorize_f() ? 1 : f_.nnz_in(j);
       }
       for (casadi_int j=0; j<n_out_; ++j) {
-        if (res1[j] && !reduce_out_[j]) res1[j] += f_.nnz_out(j);
+        if (res1[j] && !reduce_out_[j]) res1[j] += vectorize_f() ? 1 : f_.nnz_out(j);
+      }
+    }
+    // Clear consumed seeds (f_.rev cleared the scratch, not the original res[j])
+    for (casadi_int j=0;j<n_out_;++j) {
+      if (res[j] && reduce_out_[j]) {
+        casadi_clear(res[j], f_.nnz_out(j));
       }
     }
     return 0;
