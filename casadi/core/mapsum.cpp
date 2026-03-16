@@ -29,6 +29,33 @@
 
 namespace casadi {
 
+  // Build the index vector for a user-to-SIMD perfect shuffle of an (nnz x N) tensor.
+  //   User layout:  offset(a, k) = a + k*nnz   (nnz-element a fast, iteration k slow)
+  //   SIMD layout:  offset(a, k) = k + a*N      (iteration k fast, nnz-element a slow)
+  // Returns perm such that simd[perm[j]] = user[j], i.e.
+  //   x.nz(perm) reads from SIMD positions in user order.
+  static std::vector<casadi_int> simd_user_perm(casadi_int nnz, casadi_int N) {
+    std::vector<casadi_int> perm(nnz * N);
+    for (casadi_int k = 0; k < N; ++k)
+      for (casadi_int a = 0; a < nnz; ++a)
+        perm[a + k * nnz] = k + a * N;
+    return perm;
+  }
+
+  // Reorder the flat nnz array of x from SIMD to user layout, preserving sparsity.
+  // Uses GetNonzeros + sparsity_cast; AD is correct scatter/gather (no 3D decomposition).
+  static MX simd_to_user_nz(const MX& x, casadi_int nnz, casadi_int N) {
+    return sparsity_cast(x.nz(simd_user_perm(nnz, N)), x.sparsity());
+  }
+
+  // Reorder the flat nnz array of x from user to SIMD layout (inverse of above).
+  static MX user_to_simd_nz(const MX& x, casadi_int nnz, casadi_int N) {
+    auto fwd = simd_user_perm(nnz, N);
+    std::vector<casadi_int> inv(fwd.size());
+    for (casadi_int j = 0; j < static_cast<casadi_int>(fwd.size()); ++j) inv[fwd[j]] = j;
+    return sparsity_cast(x.nz(inv), x.sparsity());
+  }
+
   Function MapSum::create_bare(const std::string& name, const std::string& parallelization,
                           const Function& f, casadi_int n,
                           const std::vector<bool>& reduce_in,
@@ -70,8 +97,18 @@ namespace casadi {
     // Input expressions
     std::vector<MX> arg = ret.mx_in();
 
-    // Wrap: permute inputs to SIMD layout, evaluate, permute outputs back to user layout
-    std::vector<MX> res = m.permute_out(ret(m.permute_in(arg)));
+    // Wrap: user->SIMD on inputs, evaluate, SIMD->user on outputs.
+    // nz-reorder (GetNonzeros) instead of permute_layout: AD through GetNonzeros
+    // is a well-tested scatter/gather, avoiding the buggy 3D decomposition in
+    // PermuteLayout::eval_mx that scrambles block-structured Jacobians.
+    std::vector<MX> call_args = arg;
+    for (casadi_int i = 0; i < ret.n_in(); ++i)
+      if (!m.reduce_in_[i])
+        call_args[i] = user_to_simd_nz(arg[i], f.nnz_in(i), n);
+    std::vector<MX> res = ret(call_args);
+    for (casadi_int i = 0; i < ret.n_out(); ++i)
+      if (!m.reduce_out_[i])
+        res[i] = simd_to_user_nz(res[i], f.nnz_out(i), n);
 
     // Construct return function
     Dict custom_opts = opts;
@@ -750,8 +787,10 @@ namespace casadi {
                       const Dict& opts) const {
 
     Dict options = opts;
-    // Generate map of derivative
-    Function Jf = f_.jacobian();
+    // Matching get_forward/get_reverse: use f_orig_ (no strides) + create_bare
+    // (no wrapping). The outer create()'s nz-reorder differentiates cleanly
+    // via GetNonzeros scatter/gather.
+    Function Jf = f_orig_.jacobian();
 
     std::vector<bool> reduce_in = reduce_in_;
     for (size_t oind = 0; oind < n_out_; ++oind) { // Nominal outputs
@@ -765,7 +804,7 @@ namespace casadi {
       }
     }
 
-    Function Jmap = MapSum::create("mapsum" + str(n_) + "_" + Jf.name(), parallelization(),
+    Function Jmap = MapSum::create_bare("mapsum" + str(n_) + "_" + Jf.name(), parallelization(),
       Jf, n_, reduce_in, reduce_out);
 
     // Input expressions
@@ -774,17 +813,54 @@ namespace casadi {
     std::vector<MX> res = Jmap(arg);
 
     size_t i=0;
+    // Post-process each Jacobian block J_{oind,iind}.
+    //
+    // For non-reduced outputs there are three steps:
+    //
+    //   (a) The bare Jmap produces nnz in SIMD layout (iteration-fast).
+    //       Convert to user layout (nnz-fast) so sparsity_cast / horzsplit
+    //       assign values to the correct block-diagonal positions.
+    //
+    //   (b) Build the block-diagonal matrix via sparsity_cast or
+    //       vertical stacking (same as the non-vectorized path).
+    //
+    //   (c) The outer create() wraps with nz-reorder whose chain rule
+    //       applies simd_to_user to tangent vectors on both the output and
+    //       input sides. The matrix from (b) has user-ordered rows/columns,
+    //       so we reindex rows (and columns for non-reduced inputs) into
+    //       SIMD order; the chain rule's conversion then produces the
+    //       correct final user order.
+    //
     for (size_t oind = 0; oind < n_out_; ++oind) {
       for (size_t iind = 0; iind < n_in_; ++iind) {
         MX& r = res[i];
-        if (false) {
-        } else {
-          if (!reduce_out_[oind]) {
-            if (reduce_in_[iind]) {
-              std::vector<casadi_int> row, col;
-              r = vertcat(horzsplit(r, Jf.size2_out(i)));
+        if (!reduce_out_[oind]) {
+          // (a) SIMD -> user nnz layout (only for non-reduced Jac blocks)
+          if (vectorize_f() && !reduce_out[i])
+            r = simd_to_user_nz(r, Jf.nnz_out(i), n_);
+
+          // (b) Build block-diagonal structure
+          if (reduce_in_[iind]) {
+            r = vertcat(horzsplit(r, Jf.size2_out(i)));
+          } else {
+            r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
+          }
+
+          // (c) Reindex to SIMD row/column order.
+          //     r(perm, ...) selects: result[i] = original[perm[i]].
+          //     We want SIMD-ordered result from user-ordered original,
+          //     so perm[simd_pos] = user_pos — the inverse of simd_user_perm.
+          if (vectorize_f()) {
+            auto fwd = simd_user_perm(f_orig_.nnz_out(oind), n_);
+            std::vector<casadi_int> row_perm(fwd.size());
+            for (size_t j = 0; j < fwd.size(); ++j) row_perm[fwd[j]] = j;
+            if (!reduce_in_[iind]) {
+              auto fwd_c = simd_user_perm(f_orig_.nnz_in(iind), n_);
+              std::vector<casadi_int> col_perm(fwd_c.size());
+              for (size_t j = 0; j < fwd_c.size(); ++j) col_perm[fwd_c[j]] = j;
+              r = r(row_perm, col_perm);
             } else {
-              r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
+              r = r(row_perm, Slice());
             }
           }
         }
