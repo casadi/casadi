@@ -507,10 +507,10 @@ namespace casadi {
 
     if (GlobalOptions::getFeatureLoops()) {
       g.local("i", "casadi_int");
-      std::string ss = g.work(arg[0], dep(0).nnz(), false);
+      std::string ss = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
       g << "#pragma omp simd\n";
       g << "for (i=0;i<" << nz_.size() << ";++i) "
-        << "(" << g.work(res[0], nnz(), arg_is_ref[0]) << ")[i] = ";
+        << "(" << g.work(res[0], nnz(), false) << ")[i] = ";
       if (has_negative(nz_)) {
         g << "ind[i] ? (" << ss << ")[" << ind << "[i]] : 0;\n";
       } else {
