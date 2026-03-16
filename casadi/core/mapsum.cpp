@@ -812,58 +812,65 @@ namespace casadi {
 
     std::vector<MX> res = Jmap(arg);
 
-    size_t i=0;
+    // Helper: build the inverse of simd_user_perm (user->SIMD index vector)
+    // for use with r(perm, ...) row/column selection.
+    auto inv_perm = [](casadi_int nnz, casadi_int N) {
+      auto fwd = simd_user_perm(nnz, N);
+      std::vector<casadi_int> inv(fwd.size());
+      for (size_t j = 0; j < fwd.size(); ++j) inv[fwd[j]] = j;
+      return inv;
+    };
+
+    size_t i = 0;
     // Post-process each Jacobian block J_{oind,iind}.
     //
-    // For non-reduced outputs there are three steps:
+    // The bare Jmap (from create_bare) stores non-reduced blocks in SIMD nnz
+    // layout.  Three things may need fixing:
     //
-    //   (a) The bare Jmap produces nnz in SIMD layout (iteration-fast).
-    //       Convert to user layout (nnz-fast) so sparsity_cast / horzsplit
-    //       assign values to the correct block-diagonal positions.
+    //   (a) simd_to_user_nz: fix nnz so structural operations (sparsity_cast,
+    //       horzsplit) assign values to correct block positions.
     //
-    //   (b) Build the block-diagonal matrix via sparsity_cast or
-    //       vertical stacking (same as the non-vectorized path).
+    //   (b) sparsity_cast / horzsplit: build block-diagonal or stacked matrix
+    //       (only for non-reduced FUNCTION outputs; same as non-vectorized path).
     //
-    //   (c) The outer create() wraps with nz-reorder whose chain rule
-    //       applies simd_to_user to tangent vectors on both the output and
-    //       input sides. The matrix from (b) has user-ordered rows/columns,
-    //       so we reindex rows (and columns for non-reduced inputs) into
-    //       SIMD order; the chain rule's conversion then produces the
-    //       correct final user order.
+    //   (c) Row/column reindex to SIMD order: the outer create()'s nz-reorder
+    //       chain rule applies simd_to_user to tangent vectors.  We reindex
+    //       the dimensions that have a corresponding nz-reorder in create()
+    //       so the chain rule's conversion yields the correct final user order.
+    //       - Rows:    only for non-reduced outputs  (!reduce_out_[oind])
+    //       - Columns: only for non-reduced inputs   (!reduce_in_[iind])
     //
     for (size_t oind = 0; oind < n_out_; ++oind) {
       for (size_t iind = 0; iind < n_in_; ++iind) {
         MX& r = res[i];
-        if (!reduce_out_[oind]) {
-          // (a) SIMD -> user nnz layout (only for non-reduced Jac blocks)
-          if (vectorize_f() && !reduce_out[i])
-            r = simd_to_user_nz(r, Jf.nnz_out(i), n_);
 
-          // (b) Build block-diagonal structure
+        // (a) SIMD -> user nnz layout (for any non-reduced Jmap block)
+        if (vectorize_f() && !reduce_out[i])
+          r = simd_to_user_nz(r, Jf.nnz_out(i), n_);
+
+        // (b) Build block-diagonal structure (non-reduced function outputs only)
+        if (!reduce_out_[oind]) {
           if (reduce_in_[iind]) {
             r = vertcat(horzsplit(r, Jf.size2_out(i)));
           } else {
             r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
           }
+        }
 
-          // (c) Reindex to SIMD row/column order.
-          //     r(perm, ...) selects: result[i] = original[perm[i]].
-          //     We want SIMD-ordered result from user-ordered original,
-          //     so perm[simd_pos] = user_pos — the inverse of simd_user_perm.
-          if (vectorize_f()) {
-            auto fwd = simd_user_perm(f_orig_.nnz_out(oind), n_);
-            std::vector<casadi_int> row_perm(fwd.size());
-            for (size_t j = 0; j < fwd.size(); ++j) row_perm[fwd[j]] = j;
-            if (!reduce_in_[iind]) {
-              auto fwd_c = simd_user_perm(f_orig_.nnz_in(iind), n_);
-              std::vector<casadi_int> col_perm(fwd_c.size());
-              for (size_t j = 0; j < fwd_c.size(); ++j) col_perm[fwd_c[j]] = j;
-              r = r(row_perm, col_perm);
-            } else {
-              r = r(row_perm, Slice());
-            }
+        // (c) Reindex dimensions that have outer nz-reorder to SIMD order
+        if (vectorize_f() && !reduce_out[i]) {
+          bool need_rows = !reduce_out_[oind];
+          bool need_cols = !reduce_in_[iind];
+          if (need_rows && need_cols) {
+            r = r(inv_perm(f_orig_.nnz_out(oind), n_),
+                  inv_perm(f_orig_.nnz_in(iind), n_));
+          } else if (need_rows) {
+            r = r(inv_perm(f_orig_.nnz_out(oind), n_), Slice());
+          } else if (need_cols) {
+            r = r(Slice(), inv_perm(f_orig_.nnz_in(iind), n_));
           }
         }
+
         i++;
       }
     }
