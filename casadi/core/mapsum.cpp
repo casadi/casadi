@@ -29,7 +29,7 @@
 
 namespace casadi {
 
-  Function MapSum::create(const std::string& name, const std::string& parallelization,
+  Function MapSum::create_bare(const std::string& name, const std::string& parallelization,
                           const Function& f, casadi_int n,
                           const std::vector<bool>& reduce_in,
                           const std::vector<bool>& reduce_out,
@@ -41,7 +41,7 @@ namespace casadi {
 
     Function ret;
     if (parallelization == "serial") {
-      std::string suffix = str(reduce_in)+str(reduce_out);
+      std::string suffix = str(reduce_in)+str(reduce_out)+str(opts);
       if (!f->incache(name, ret, suffix)) {
         // Create new serial map
         ret = Function::create(new MapSum(name, f, n, reduce_in, reduce_out), opts);
@@ -52,6 +52,16 @@ namespace casadi {
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
+
+    return ret;
+  }
+
+  Function MapSum::create(const std::string& name, const std::string& parallelization,
+                          const Function& f, casadi_int n,
+                          const std::vector<bool>& reduce_in,
+                          const std::vector<bool>& reduce_out,
+                          const Dict& opts) {
+    Function ret = create_bare(name, parallelization, f, n, reduce_in, reduce_out, opts);
 
     if (!vectorize_f(f, n)) return ret.wrap_as_needed(ret.name(), opts);
 
@@ -646,11 +656,6 @@ namespace casadi {
     Function dm = MapSum::create_bare("mapsum" + str(n_) + "_" + df.name(), parallelization(),
       df, n_, reduce_in, reduce_out_);
 
-    // Strip permuting layer when vectorized
-    if (dm.is_a("MXFunction")) {
-      dm = dm.get_function(dm.get_function()[0]);
-    }
-
     // Input expressions
     std::vector<MX> arg = dm.mx_in(); // change to layout of reinterpret_layout
 
@@ -704,13 +709,8 @@ namespace casadi {
 
     std::vector<bool> reduce_in = join(reduce_in_, reduce_out_, reduce_out_);
     Dict options;
-    Function dm = MapSum::create("mapsum" + str(n_) + "_" + df.name(), parallelization(),
+    Function dm = MapSum::create_bare("mapsum" + str(n_) + "_" + df.name(), parallelization(),
       df, n_, reduce_in, reduce_in_, options);
-
-    // Strip permuting layer when vectorized
-    if (dm.is_a("MXFunction")) {
-      dm = dm.get_function(dm.get_function()[0]);
-    }
 
     // Input expressions
     std::vector<MX> arg = dm.mx_in();
@@ -749,42 +749,9 @@ namespace casadi {
                       const std::vector<std::string>& onames,
                       const Dict& opts) const {
 
-    bool skip_transform = false;
-    Dict options = extract_from_dict(opts,"skip_transform", skip_transform);
+    Dict options = opts;
     // Generate map of derivative
     Function Jf = f_.jacobian();
-
-    if (Jf.is_a("SXFunction")) {
-      std::vector<SX> arg = Jf.sx_in();
-      std::vector<SX> res = Jf(arg);
-      Dict opts = Jf->generate_options("clone");
-      // Look for densify opportunities
-      size_t i=0;
-      for (size_t oind = 0; oind < n_out_; ++oind) {
-        for (size_t iind = 0; iind < n_in_; ++iind) {
-          Sparsity sp = Jf.sparsity_out(i);
-          if (sp.nnz()) {
-            std::vector<casadi_int> row_support, col_support;
-            sp.is_compactible(row_support, col_support);
-            Sparsity cand = Sparsity::rowcol(range(sp.size1()),col_support,sp.size1(),sp.size2());
-            if (cand.nnz()>sp.nnz() && cand.nnz()<=10*sp.nnz()) {
-              sp = cand;
-              uout() << "column densification in " << f_.name() << ": " << Jf.name_out(i) << std::endl;
-              uout() << "before: " << std::endl;
-              res[i].sparsity().spy(uout()); 
-              uout() << "after: " << std::endl;
-              cand.spy(uout()); 
-
-              res[i] = project(res[i], cand);
-
-            }
-          }
-          i++;
-        }
-      }
-
-      Jf = Function(Jf.name(), arg, res, Jf.name_in(), Jf.name_out(), opts);
-    }
 
     std::vector<bool> reduce_in = reduce_in_;
     for (size_t oind = 0; oind < n_out_; ++oind) { // Nominal outputs
@@ -797,7 +764,9 @@ namespace casadi {
         reduce_out.push_back(reduce_out_[oind] && reduce_in_[iind]);
       }
     }
-    Function Jmap = Jf.map(n_, reduce_in, reduce_out);
+
+    Function Jmap = MapSum::create("mapsum" + str(n_) + "_" + Jf.name(), parallelization(),
+      Jf, n_, reduce_in, reduce_out);
 
     // Input expressions
     std::vector<MX> arg = Jmap.mx_in();
@@ -808,31 +777,12 @@ namespace casadi {
     for (size_t oind = 0; oind < n_out_; ++oind) {
       for (size_t iind = 0; iind < n_in_; ++iind) {
         MX& r = res[i];
-        if (skip_transform && vectorize_f()) {
-          if (!reduce_in_[iind] && !reduce_out_[oind]) {
-            r = sparsity_cast(r, Sparsity::kron(Jf.sparsity_out(i), Sparsity::diag(n_)));
-          } else {
-            if (r.op()==OP_PERMUTE_LAYOUT) r = r.dep(0);
-            Sparsity patt = reduce_in_[iind] ? Sparsity::dense(n_, 1) : Sparsity::diag(n_);
-            r = sparsity_cast(r, Sparsity::kron(Jf.sparsity_out(i), patt));
-          }
+        if (false) {
         } else {
           if (!reduce_out_[oind]) {
             if (reduce_in_[iind]) {
               std::vector<casadi_int> row, col;
-              // conservative: it is enough if non-empty columns have an equal number of nonzeros
-              if (Jf.sparsity_out(i).is_compactible(row, col)) {
-                casadi_int t1 = row.size();
-                casadi_int t2 = col.size();
-                Layout source({t1, t2, n_});
-                Layout target({t1, n_, t2});
-                Sparsity sp_target = vertcat(horzsplit(r.sparsity(), Jf.size2_out(i)));
-                r = sparsity_cast(r,Sparsity::dense(Jmap.nnz_out(i),1));
-                r = permute_layout(r,Relayout(source, {0, 2, 1}, target)).set_meta("MapSum::get_jacobian reduce_in at " + CASADI_WHERE);
-                r = sparsity_cast(r, sp_target);
-              } else {
-                r = vertcat(horzsplit(r, Jf.size2_out(i)));
-              }
+              r = vertcat(horzsplit(r, Jf.size2_out(i)));
             } else {
               r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
             }

@@ -47,12 +47,11 @@ namespace casadi {
                            const std::vector<bool>& reduce_out,
                            const Dict& opts=Dict());
 
-    // Create function (use instead of constructor)
-    static Function create(const std::string& name,
+    static Function create_bare(const std::string& name,
                            const std::string& parallelization,
                            const Function& f, casadi_int n,
-                           const std::vector<casadi_int>& reduce_in,
-                           const std::vector<casadi_int>& reduce_out,
+                           const std::vector<bool>& reduce_in,
+                           const std::vector<bool>& reduce_out,
                            const Dict& opts=Dict());
 
     /** \brief Destructor
