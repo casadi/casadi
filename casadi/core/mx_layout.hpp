@@ -109,6 +109,9 @@ namespace casadi {
     /** \brief Get required length of w field */
     size_t sz_iw() const override;
 
+    /** \brief Get required length of res field */
+    casadi_int sz_self(casadi_int i=0) const override;
+
     /** \brief Deserialize without type information */
     static MXNode* deserialize(DeserializingStream& s) { return new PermuteLayout(s); }
 

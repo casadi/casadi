@@ -428,7 +428,7 @@ namespace casadi {
     casadi_int size1() const { return sparsity().size1(); }
     casadi_int size2() const { return sparsity().size2(); }
     std::pair<casadi_int, casadi_int> size() const { return sparsity().size();}
-    casadi_int sz_self(casadi_int i=0) const;
+    virtual casadi_int sz_self(casadi_int i=0) const;
 
     // Get IO index
     virtual casadi_int ind() const;

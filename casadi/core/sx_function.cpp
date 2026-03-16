@@ -2811,6 +2811,44 @@ namespace casadi {
     casadi_assert_dev(sp==C_star.sparsity());
 
     SX J = sparsify(C_star(Slice(p, m+p), Slice(p, n+p)));
+
+    // Check compact option (default: false)
+    bool compact = false;
+    for (auto&& op : opts) {
+      if (op.first == "compact") {
+        compact = op.second;
+      }
+    }
+
+    // If not compact, expand from nnz x nnz to numel x numel
+    if (!compact) {
+      Sparsity sp_in = x.sparsity();
+      Sparsity sp_out = y.sparsity();
+      if (!sp_in.is_dense() || !sp_out.is_dense()) {
+        std::vector<casadi_int> find_in = sp_in.find();
+        std::vector<casadi_int> find_out = sp_out.find();
+        casadi_int numel_in = sp_in.numel();
+        casadi_int numel_out = sp_out.numel();
+
+        // Build scatter matrices: S(find[k], k) = 1
+        std::vector<casadi_int> s_out_row(m), s_out_col(m);
+        for (casadi_int k = 0; k < m; k++) {
+          s_out_row[k] = find_out[k];
+          s_out_col[k] = k;
+        }
+        SX S_out(Sparsity::triplet(numel_out, m, s_out_row, s_out_col), 1);
+
+        std::vector<casadi_int> s_in_row(n), s_in_col(n);
+        for (casadi_int k = 0; k < n; k++) {
+          s_in_row[k] = find_in[k];
+          s_in_col[k] = k;
+        }
+        SX S_in(Sparsity::triplet(numel_in, n, s_in_row, s_in_col), 1);
+
+        J = mtimes(S_out, mtimes(J, S_in.T()));
+      }
+    }
+
     return cse(J);
   }
 

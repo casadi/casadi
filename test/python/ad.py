@@ -329,6 +329,14 @@ class ADtests(casadiTestCase):
             J_in = DM(Jf.sparsity_in(0),n)
             J_out = Jf(J_in)
             J = self.jacobians[inputtype][outputtype](*n)
+            if array(J_out).shape != J.shape:
+              print(f"DEBUG MISMATCH: {inputshape}/{outputshape}/{inputtype}/{outputtype}")
+              print(f"  Jf sparsity_out(0): {Jf.sparsity_out(0)}")
+              print(f"  J_out type: {type(J_out)}, shape: {J_out.shape if hasattr(J_out,'shape') else '?'}")
+              print(f"  array(J_out).shape: {array(J_out).shape}")
+              print(f"  J.shape: {J.shape}")
+              print(f"  sxin: {self.sxinputs[inputshape][inputtype][0].sparsity()}")
+              print(f"  sxout: {self.sxoutputs[outputshape][outputtype][0].sparsity()}")
             self.checkarray(array(J_out),J,"jacobian")
 
   def test_jacsparsity(self):
