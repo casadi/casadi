@@ -473,6 +473,12 @@ namespace casadi {
 
     /// Set the temporary variable
     void set_temp(casadi_int t) const;
+
+    /// Set source location metadata
+    MX set_meta(const std::string& meta);
+
+    /// Get source location metadata
+    const std::string& get_meta() const;
     /// \endcond
 
     ///@{

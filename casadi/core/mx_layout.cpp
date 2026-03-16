@@ -114,7 +114,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
       //REMOVE uout() << "here" << std::endl;
       Relayout temp = relay_.push_right(n);
       //REMOVE uout() << temp << std::endl;
-      MX sens = permute_layout(all_seeds, relay_.push_right(n));//Relayout(relay_.source().push_right(n), relay_.target().push_right(n), "fwdseed"));
+      MX sens = permute_layout(all_seeds, relay_.push_right(n)).set_meta("PermuteLayout::ad_forward at " + CASADI_WHERE);
       //REMOVE uout() << "here reached" << std::endl;
       //uout() << "ad_forward" << sens.size() << std::endl;
       std::vector<MX> senss = horzsplit(sens, sens.size2()/n);
@@ -148,7 +148,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
         name = "oops";
       }
       Relayout r = relay_.push_right(n).invert();
-      MX sens = permute_layout(all_seeds, Relayout(r.source(), r.perms(), r.target(), name));//Relayout(relay_.target().push_right(n), relay_.source().push_right(n), "adjseed"));
+      MX sens = permute_layout(all_seeds, Relayout(r.source(), r.perms(), r.target(), name)).set_meta("PermuteLayout::ad_reverse at " + CASADI_WHERE);
       std::vector<MX> senss = horzsplit(sens, sens.size2()/n);
       for (casadi_int d=0; d<aseed.size(); ++d) {
         asens[d][0] += senss[d];
@@ -184,7 +184,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
     //uout() << "eval_mx" << arg[0] << std::endl;
     //casadi_assert_dev(arg[0]->sz_self()==project(arg[0],sparsity())->sz_self());    
     //arg[0].sparsity().spy();
-    res[0] = project(arg[0],sparsity())->get_permute_layout(Relayout(relay_.source(), relay_.perms(), relay_.target(), "eval_mx_"+relay_.label_));
+    res[0] = project(arg[0],sparsity())->get_permute_layout(Relayout(relay_.source(), relay_.perms(), relay_.target(), "eval_mx_"+relay_.label_)).set_meta("PermuteLayout::eval_mx at " + CASADI_WHERE);
   }
 
   size_t PermuteLayout::sz_iw() const {
@@ -266,7 +266,7 @@ throw CasadiException("Error in PermuteLayout::" FNAME " "\
     if (relay_.cancels(relay)) { // cancellation
       return dep(0);
     } else if (relay_.absorbs(relay)) {
-      return permute_layout(dep(0), relay_.absorbed(relay));
+      return permute_layout(dep(0), relay_.absorbed(relay)).set_meta("PermuteLayout::get_permute_layout absorbed at " + CASADI_WHERE);
     } else {
       return MXNode::get_permute_layout(relay);
     }

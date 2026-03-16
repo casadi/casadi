@@ -73,7 +73,7 @@ namespace casadi {
   std::vector<MX> Map::permute_in(const std::vector<MX> & arg, bool invert) const {
     std::vector<MX> ret(arg.size());
     for (casadi_int i=0;i<f_.n_in();++i) {
-      ret[i] = permute_layout(arg[i], permute_in(i, invert));
+      ret[i] = permute_layout(arg[i], permute_in(i, invert)).set_meta("Map::permute_in at " + CASADI_WHERE);
     }
     //REMOVE uout() << "testje" << ret << std::endl;
     return ret;
@@ -82,7 +82,7 @@ namespace casadi {
   std::vector<MX> Map::permute_out(const std::vector<MX> & res, bool invert) const {
     std::vector<MX> ret(res.size());
     for (casadi_int i=0;i<f_.n_out();++i) {
-      ret[i] = permute_layout(res[i], permute_out(i, invert));
+      ret[i] = permute_layout(res[i], permute_out(i, invert)).set_meta("Map::permute_out at " + CASADI_WHERE);
     }
     return ret;
   }
@@ -387,7 +387,7 @@ namespace casadi {
         Layout target({df_in, n_});
         Relayout ret = Relayout(source, {1, 0}, target);
         //REMOVE uout() << "FOO " << i << std::endl;
-        x = permute_layout(x, ret);
+        x = permute_layout(x, ret).set_meta("Map::get_forward vec_in at " + CASADI_WHERE);
 
         // Layout source({f_.nnz_in(i), n_});
         // Layout target({n_, f_.nnz_in(i)}, {n_, f_.nnz_in(i)});
@@ -396,7 +396,7 @@ namespace casadi {
         //REMOVE uout() << "here" << std::endl;
         Layout source({df_in/nfwd,n_,nfwd});
         Layout target({df_in/nfwd, nfwd, n_});
-        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_")).set_meta("Map::get_forward fwd_in at " + CASADI_WHERE);
         //REMOVE uout() << "baz" << x << "source" << source << "target" << target << std::endl;
       }
     }
@@ -416,13 +416,13 @@ namespace casadi {
         Layout target({n_, df_out}, {n_, f_.nnz_out()});
         Relayout ret = Relayout(source, {1, 0}, target);
         //REMOVE uout() << "BAR " << i << std::endl;
-        x = permute_layout(x, ret);
+        x = permute_layout(x, ret).set_meta("Map::get_forward vec_out at " + CASADI_WHERE);
       }
       if (!vectorize_f()) {
         //REMOVE uout() << "there" << std::endl;
         Layout source({df_out/nfwd,nfwd,n_});
         Layout target({df_out/nfwd,n_,nfwd});
-        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out"));
+        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out")).set_meta("Map::get_forward fwd_out at " + CASADI_WHERE);
        //REMOVE  uout() << "baz" << res[i] << "source" << source << "target" << target << std::endl;
       }
     }
@@ -463,7 +463,7 @@ namespace casadi {
       if (!vectorize_f()) {
         Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,n_,nadj});
         Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,nadj,n_});
-        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_")).set_meta("Map::get_reverse adj_in at " + CASADI_WHERE);
       }
     }
 
@@ -475,7 +475,7 @@ namespace casadi {
       if (!vectorize_f()) {
         Layout source({df.nnz_out(i)/nadj,nadj,n_});
         Layout target({df.nnz_out(i)/nadj,n_,nadj});
-        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out"));
+        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out")).set_meta("Map::get_reverse adj_out at " + CASADI_WHERE);
       }
     }
 

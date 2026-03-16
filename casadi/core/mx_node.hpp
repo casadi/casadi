@@ -809,6 +809,16 @@ namespace casadi {
     */
     mutable casadi_int temp;
 
+    /// Source location metadata (e.g. from CASADI_WHERE)
+    std::string meta_;
+
+    /// Set source location metadata
+    MX set_meta(const std::string& meta) { meta_ = meta; return shared_from_this<MX>(); }
+
+    /// Get source location metadata
+    const std::string& get_meta() const { return meta_; }
+
+
     /** \brief  dependencies - functions that have to be evaluated before this one
 
         \identifier{1sj} */

@@ -946,6 +946,14 @@ namespace casadi {
     (*this)->temp = t;
   }
 
+  MX MX::set_meta(const std::string& meta) {
+    return (*this)->set_meta(meta);
+  }
+
+  const std::string& MX::get_meta() const {
+    return (*this)->get_meta();
+  }
+
   casadi_int MX::n_out() const {
     return (*this)->nout();
   }

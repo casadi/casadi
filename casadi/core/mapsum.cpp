@@ -192,7 +192,7 @@ namespace casadi {
   std::vector<MX> MapSum::permute_in(const std::vector<MX> & arg, bool invert) const {
     std::vector<MX> ret = arg;
     for (casadi_int i=0;i<f_.n_in();++i) {
-      ret[i] = permute_layout(ret[i], permute_in(i, invert));
+      ret[i] = permute_layout(ret[i], permute_in(i, invert)).set_meta("MapSum::permute_in at " + CASADI_WHERE);
     }
     return ret;
   }
@@ -201,7 +201,7 @@ namespace casadi {
   std::vector<MX> MapSum::permute_out(const std::vector<MX> & res, bool invert) const {
     std::vector<MX> ret = res;
     for (casadi_int i=0;i<f_.n_out();++i) {
-      ret[i] = permute_layout(ret[i], permute_out(i, invert));
+      ret[i] = permute_layout(ret[i], permute_out(i, invert)).set_meta("MapSum::permute_out at " + CASADI_WHERE);
     }
     return ret;
   }
@@ -643,7 +643,7 @@ namespace casadi {
     }
 
     std::vector<bool> reduce_in = join(reduce_in_, reduce_out_, reduce_in_);
-    Function dm = MapSum::create("mapsum" + str(n_) + "_" + df.name(), parallelization(),
+    Function dm = MapSum::create_bare("mapsum" + str(n_) + "_" + df.name(), parallelization(),
       df, n_, reduce_in, reduce_out_);
 
     // Strip permuting layer when vectorized
@@ -660,7 +660,7 @@ namespace casadi {
       if (!vectorize_f() || reduce_in_[i]) {
         Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd,reduce_in_[i] ? 1 : n_,nfwd});
         Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nfwd, nfwd, reduce_in_[i] ? 1 : n_});
-        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_")).set_meta("MapSum::get_forward fwd_in at " + CASADI_WHERE);
       }
     }
 
@@ -671,7 +671,7 @@ namespace casadi {
       if (!vectorize_f() || reduce_out_[i]) {
         Layout source({df.nnz_out(i)/nfwd,nfwd,reduce_out_[i] ? 1 : n_});
         Layout target({df.nnz_out(i)/nfwd,reduce_out_[i] ? 1 : n_,nfwd});
-        res[i] = permute_layout(res[i],Relayout(source, {0, 2, 1}, target,"get_forward_out"));
+        res[i] = permute_layout(res[i],Relayout(source, {0, 2, 1}, target,"get_forward_out")).set_meta("MapSum::get_forward fwd_out at " + CASADI_WHERE);
       }
     }
 
@@ -721,7 +721,7 @@ namespace casadi {
       if (!vectorize_f() || reduce_out_[i]) {
         Layout source({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,reduce_out_[i] ? 1 : n_,nadj});
         Layout target({df.nnz_in(f_.n_in()+f_.n_out()+i)/nadj,nadj,reduce_out_[i] ? 1 : n_});
-        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_"));
+        x = permute_layout(x, Relayout(source, {0, 2, 1}, target, "get_forward_in_")).set_meta("MapSum::get_reverse adj_in at " + CASADI_WHERE);
       }
     }
 
@@ -733,7 +733,7 @@ namespace casadi {
       if (!vectorize_f() || reduce_in_[i]) {
         Layout source({df.nnz_out(i)/nadj,nadj,reduce_in_[i] ? 1 : n_});
         Layout target({df.nnz_out(i)/nadj,reduce_in_[i] ? 1 : n_,nadj});
-        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out"));
+        x = permute_layout(x,Relayout(source, {0, 2, 1}, target,"get_forward_out")).set_meta("MapSum::get_reverse adj_out at " + CASADI_WHERE);
       }
     }
 
@@ -828,7 +828,7 @@ namespace casadi {
                 Layout target({t1, n_, t2});
                 Sparsity sp_target = vertcat(horzsplit(r.sparsity(), Jf.size2_out(i)));
                 r = sparsity_cast(r,Sparsity::dense(Jmap.nnz_out(i),1));
-                r = permute_layout(r,Relayout(source, {0, 2, 1}, target));
+                r = permute_layout(r,Relayout(source, {0, 2, 1}, target)).set_meta("MapSum::get_jacobian reduce_in at " + CASADI_WHERE);
                 r = sparsity_cast(r, sp_target);
               } else {
                 r = vertcat(horzsplit(r, Jf.size2_out(i)));

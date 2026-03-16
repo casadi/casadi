@@ -1812,6 +1812,11 @@ namespace casadi {
         print_arg(g, k, e, arg, arg_is_ref);
       }
 
+      // Emit source location metadata if available
+      if (!e.data->meta_.empty()) {
+        g.comment("METADATA: " + e.data->meta_);
+      }
+
       // Generate operation
       e.data->generate(g, arg, res, arg_is_ref, res_is_ref, inst.prefer_inline);
 
