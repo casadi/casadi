@@ -2361,7 +2361,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       casadi_int offset = 0;
       for (const MX& e : v) {
         // Aggregate over all elements of the potentially non-scalar v entry
-        bool res = all(std::vector<bool>(v_depends_scalar.begin()+offset,
+        bool res = any(std::vector<bool>(v_depends_scalar.begin()+offset,
                               v_depends_scalar.begin()+offset+e.numel()));
         // Store the result
         v_depends_lookup[e.get()] = res;
