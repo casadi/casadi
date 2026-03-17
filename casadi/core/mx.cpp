@@ -2583,11 +2583,6 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     opts2["lift_shared"] = false;
     extract(vexpr, v, vdef, opts2); // Updates vexpr, v, vdef in place
 
-
-    uout() << "vexpr" << vexpr << std::endl;
-    uout() << "v" << v << std::endl;
-    uout() << "vdef" << vdef << std::endl;
-
     Dict common_options, specific_options;
     bool enable_nominal = true;
     bool print_instructions = false;
