@@ -2778,8 +2778,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     for (size_t& i : scheme["ode"]) i = variable(i).der;
     scheme["quad"] = indices(Category::Q);
     for (size_t& i : scheme["quad"]) i = variable(i).der;
-    scheme["alg"] = indices(Category::Z);
-    casadi_assert(size(Category::Z) == 0, "Not implemented)");
+    scheme["alg"] = residuals_;
     scheme["y"] = outputs_;
   }
   // Auxilliary variables, if any
