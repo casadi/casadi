@@ -884,7 +884,20 @@ namespace casadi {
         // (b) Build block-diagonal structure (non-reduced function outputs only)
         if (!reduce_out_[oind]) {
           if (reduce_in_[iind]) {
-            r = vertcat(horzsplit(r, Jf.size2_out(i)));
+            std::vector<casadi_int> row, col;
+            // conservative: it is enough if non-empty columns have an equal number of nonzeros
+            if (Jf.sparsity_out(i).is_compactible(row, col)) {
+              casadi_int t1 = row.size();
+              casadi_int t2 = col.size();
+              Layout source({t1, t2, n_});
+              Layout target({t1, n_, t2});
+              Sparsity sp_target = vertcat(horzsplit(r.sparsity(), Jf.size2_out(i)));
+              r = sparsity_cast(r,Sparsity::dense(Jmap.nnz_out(i),1));
+              r = permute_layout(r,Relayout(source, {0, 2, 1}, target)).set_meta("MapSum::get_jacobian reduce_in at " + CASADI_WHERE);
+              r = sparsity_cast(r, sp_target);
+            } else {
+              r = vertcat(horzsplit(r, Jf.size2_out(i)));
+            }
           } else {
             r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), Jf.sparsity_out(i)));
           }
