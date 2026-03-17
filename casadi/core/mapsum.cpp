@@ -573,6 +573,7 @@ namespace casadi {
       }
       for (casadi_int j=0; j<n_out_; ++j) {
         if (reduce_out_[j]) {
+          if (f_.nnz_out(j)==0) continue;
           if (!loop_bug)
             g << "res1[" << j << "]-= " << GlobalOptions::vector_width_real << " ;\n";
           g << "if (sum" << j << ") {\n";
