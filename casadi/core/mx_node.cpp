@@ -491,7 +491,6 @@ namespace casadi {
   }
 
   bool simplify_transpose_cat(const MX& x, MX& inner) {
-    return false;
     /*
 
     X = SX.sym("x",n,3*m)
