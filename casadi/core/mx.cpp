@@ -2687,7 +2687,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
             }
           }
           // Options
-          Dict opts = {{"skip_transform",true},{"derivative_of", f}, {"print_instructions", print_instructions}};
+          Dict opts = {{"derivative_of", f}, {"print_instructions", print_instructions}};
           Function J = f->get_jacobian(fname, inames, onames, opts);
 
           lm.jacobian = J;
