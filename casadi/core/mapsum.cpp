@@ -95,18 +95,8 @@ namespace casadi {
     // Input expressions
     std::vector<MX> arg = ret.mx_in();
 
-    // Wrap: user->SIMD on inputs, evaluate, SIMD->user on outputs.
-    // nz-reorder (GetNonzeros) instead of permute_layout: AD through GetNonzeros
-    // is a well-tested scatter/gather, avoiding the buggy 3D decomposition in
-    // PermuteLayout::eval_mx that scrambles block-structured Jacobians.
-    std::vector<MX> call_args = arg;
-    for (casadi_int i = 0; i < ret.n_in(); ++i)
-      if (!m.reduce_in_[i])
-        call_args[i] = user_to_simd_nz(arg[i], f.nnz_in(i), n);
-    std::vector<MX> res = ret(call_args);
-    for (casadi_int i = 0; i < ret.n_out(); ++i)
-      if (!m.reduce_out_[i])
-        res[i] = simd_to_user_nz(res[i], f.nnz_out(i), n);
+    // Wrap: permute inputs to SIMD layout, evaluate, permute outputs back to user layout
+    std::vector<MX> res = m.permute_out(ret(m.permute_in(arg)));
 
     // Construct return function
     Dict custom_opts = opts;
@@ -867,8 +857,11 @@ namespace casadi {
         MX& r = res[i];
 
         // (a) Shuffle flat nnz values: SIMD -> user layout (non-reduced Jmap blocks)
-        if (vectorize_f() && !reduce_out[i])
-          r = simd_to_user_nz(r, Jf.nnz_out(i), n_);
+        if (vectorize_f() && !reduce_out[i]) {
+          Layout source({n_, Jf.nnz_out(i)});
+          Layout target({Jf.nnz_out(i), n_});
+          r = permute_layout(r, Relayout(source, {1, 0}, target));
+        }
 
         // (b) Build block-diagonal structure (non-reduced function outputs only)
         if (!reduce_out_[oind]) {
