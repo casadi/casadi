@@ -220,7 +220,7 @@ namespace casadi {
 
     OP_PERMUTE_LAYOUT,
   };
-  #define NUM_BUILT_IN_OPS (OP_SAFE_SQRT+1)
+  #define NUM_BUILT_IN_OPS (OP_PERMUTE_LAYOUT+1)
 
   #define OP_
 
@@ -1144,6 +1144,7 @@ namespace casadi {
     case OP_LOGSUMEXP:     return F<OP_LOGSUMEXP>::check;
     case OP_SAFE_DIV:      return F<OP_SAFE_DIV>::check;
     case OP_SAFE_SQRT:     return F<OP_SAFE_SQRT>::check;
+    case OP_PERMUTE_LAYOUT:return F<OP_PERMUTE_LAYOUT>::check;
     }
     return T();
   }
@@ -1784,6 +1785,7 @@ case OP_SAFE_SQRT: DerBinaryOperation<OP_SAFE_SQRT>::derf(X, Y, F, D);  break;
     case OP_LOGSUMEXP:      return "logsumexp";
     case OP_SAFE_DIV:       return "safe_div";
     case OP_SAFE_SQRT:      return "safe_sqrt";
+    case OP_PERMUTE_LAYOUT: return "permute_layout";
     }
     return "<invalid-op>";
   }
