@@ -2961,7 +2961,7 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     int rb_offset = 0;
     casadi_assert_dev(expr.size()==Vexpr.size());
     for (const std::vector<MX>& e : expr) {
-      if (enable_nominal) out.push_back(vertcat(e));
+      if (enable_nominal) out.push_back(veccat(e));
     //for (casadi_int k=0;k<expr.size();++k) {
     //  const std::vector<MX>& e = expr[k];
       //uout() << "e " << Vexpr[k] << std::endl;
@@ -2969,8 +2969,8 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
       int cb_offset = 0;
       for (const std::vector<MX>& a : arg) {
         MX block = blocks_J[blocks_J_i++];
-        casadi_assert_dev(block.size1()==vertcat(e).numel());
-        casadi_assert_dev(block.size2()==vertcat(a).numel());
+        casadi_assert_dev(block.size1()==veccat(e).numel());
+        casadi_assert_dev(block.size2()==veccat(a).numel());
         int r_offset = 0;
         for (casadi_int i=0; i<e.size(); ++i) {
           int c_offset = 0;
