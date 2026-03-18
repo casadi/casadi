@@ -904,81 +904,68 @@ namespace casadi {
 
         // --- (c) Reindex rows/cols: user -> SIMD order ---
         //
-        // Efficient path (kron, both rows+cols, uniform col nnz):
-        //   permute_layout {0,2,1} on (npc, ncol_J, N) reorders column groups,
-        //   sparsity_cast to SIMD-indexed kron (row relabeling is free since
-        //   within-column sort order is preserved for kron blocks).
+        // The outer create()'s permute_in/out chain rule converts tangent
+        // vectors from SIMD to user order.  We reindex the Jacobian block's
+        // rows (for non-reduced outputs) and columns (for non-reduced inputs)
+        // so that this conversion yields the correct final user order.
         //
-        // Fallback (row-only, col-only, or non-uniform nnz):
-        //   r(perm, :) / r(:, perm) via GetNonzeros — correct but heavier.
+        // When S_J has uniform column nnz, column groups can be reordered
+        // via permute_layout {0,2,1} and row relabeling via sparsity_cast.
+        // Otherwise, fall back to r(perm,:) / r(:,perm) via GetNonzeros.
         //
         if (vectorize_f() && !reduce_out[i]) {
-          bool need_rows = !reduce_out_[oind];
-          bool need_cols = !reduce_in_[iind];
-          casadi_int npc = 0;
+          bool do_rows = !reduce_out_[oind];
+          bool do_cols = !reduce_in_[iind];
 
-          bool did_efficient = false;
-          if (need_rows && need_cols && uniform_col_nnz(Jf.sparsity_out(i), npc)) {
+          if (do_rows || do_cols) {
             Sparsity sp_J = Jf.sparsity_out(i);
-            casadi_int ncol_J = sp_J.size2(), nrow_J = sp_J.size1();
-            // Column-group reorder via {0,2,1}, then sparsity_cast to
-            // SIMD-indexed kron: block k at rows {k,N+k,...}, cols {k,N+k,...}
-            r = sparsity_cast(r, Sparsity::dense(r.nnz(), 1));
-            r = permute_layout(r, Relayout(
-              Layout({npc, ncol_J, n_}), {0, 2, 1}, Layout({npc, n_, ncol_J})));
-            std::vector<casadi_int> mapping;
-            r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), sp_J)
-              .sub(simd_user_perm(n_, nrow_J), simd_user_perm(n_, ncol_J),
-                   mapping));
-            did_efficient = true;
-          }
+            casadi_int npc = 0;
 
-          // Case 3 (repmat, col-only): column permute + sparsity_cast to
-          // SIMD-column-ordered repmat. Always uniform for repmat.
-          if (!did_efficient && !need_rows && need_cols
-              && uniform_col_nnz(Jf.sparsity_out(i), npc)) {
-            Sparsity sp_J = Jf.sparsity_out(i);
-            casadi_int ncol_J = sp_J.size2();
-            r = sparsity_cast(r, Sparsity::dense(r.nnz(), 1));
-            r = permute_layout(r, Relayout(
-              Layout({npc, ncol_J, n_}), {0, 2, 1}, Layout({npc, n_, ncol_J})));
-            std::vector<casadi_int> mapping;
-            r = sparsity_cast(r, repmat(sp_J, 1, n_)
-              .sub(range(sp_J.size1()), simd_user_perm(n_, ncol_J), mapping));
-            did_efficient = true;
-          }
-
-          // Case 2 (vertcat, row-only, is_compactible path):
-          // Step (b) left nnz in (nnz_per_col, N, ncol) order.
-          // Row reindex = permute_layout {1,0,2} + sparsity_cast to
-          // SIMD-row vertcat.
-          if (!did_efficient && need_rows && !need_cols) {
-            Sparsity sp_J = Jf.sparsity_out(i);
-            std::vector<casadi_int> row_support, col_support;
-            if (sp_J.is_compactible(row_support, col_support)) {
-              casadi_int t1 = row_support.size();
-              casadi_int t2 = col_support.size();
-              r = sparsity_cast(r, Sparsity::dense(r.nnz(), 1));
-              r = permute_layout(r, Relayout(
-                Layout({t1, n_, t2}), {1, 0, 2}, Layout({n_, t1, t2})));
-              std::vector<casadi_int> mapping;
-              casadi_int nrow_J = sp_J.size1();
-              r = sparsity_cast(r, vertcat(horzsplit(
-                repmat(sp_J, 1, n_), sp_J.size2()))
-                .sub(simd_user_perm(n_, nrow_J), range(sp_J.size2()), mapping));
-              did_efficient = true;
+            // Column reorder needs uniform col nnz; row-only needs is_compactible
+            bool efficient = do_cols ? uniform_col_nnz(sp_J, npc) : true;
+            if (efficient && do_rows && !do_cols) {
+              std::vector<casadi_int> rs, cs;
+              efficient = sp_J.is_compactible(rs, cs);
             }
-          }
 
-          if (!did_efficient && (need_rows || need_cols)) {
-            // Fallback: GetNonzeros (general but expensive)
-            if (need_rows && need_cols) {
-              r = r(simd_user_perm(n_, f_orig_.nnz_out(oind)),
-                    simd_user_perm(n_, f_orig_.nnz_in(iind)));
-            } else if (need_rows) {
-              r = r(simd_user_perm(n_, f_orig_.nnz_out(oind)), Slice());
-            } else if (need_cols) {
-              r = r(Slice(), simd_user_perm(n_, f_orig_.nnz_in(iind)));
+            if (efficient) {
+              casadi_int nr_J = sp_J.size1(), nc_J = sp_J.size2();
+              std::vector<casadi_int> mapping;
+
+              // Reorder nnz: column groups when do_cols, within-column when do_rows only
+              r = sparsity_cast(r, Sparsity::dense(r.nnz(), 1));
+              if (do_cols) {
+                r = permute_layout(r, Relayout(
+                  Layout({npc, nc_J, n_}), {0, 2, 1}, Layout({npc, n_, nc_J})));
+              } else {
+                std::vector<casadi_int> rs, cs;
+                sp_J.is_compactible(rs, cs);
+                casadi_int t1 = rs.size(), t2 = cs.size();
+                r = permute_layout(r, Relayout(
+                  Layout({t1, n_, t2}), {1, 0, 2}, Layout({n_, t1, t2})));
+              }
+
+              // Build the user-ordered base sparsity, then .sub() to SIMD indices
+              Sparsity sp_base;
+              if (do_rows && do_cols)
+                sp_base = Sparsity::kron(Sparsity::diag(n_), sp_J);
+              else if (do_rows)
+                sp_base = vertcat(horzsplit(repmat(sp_J, 1, n_), nc_J));
+              else
+                sp_base = repmat(sp_J, 1, n_);
+
+              auto row_idx = do_rows ? simd_user_perm(n_, nr_J) : range(sp_base.size1());
+              auto col_idx = do_cols ? simd_user_perm(n_, nc_J) : range(sp_base.size2());
+              r = sparsity_cast(r, sp_base.sub(row_idx, col_idx, mapping));
+            } else {
+              // Fallback: GetNonzeros (general, handles non-uniform column nnz)
+              if (do_rows && do_cols)
+                r = r(simd_user_perm(n_, f_orig_.nnz_out(oind)),
+                      simd_user_perm(n_, f_orig_.nnz_in(iind)));
+              else if (do_rows)
+                r = r(simd_user_perm(n_, f_orig_.nnz_out(oind)), Slice());
+              else
+                r = r(Slice(), simd_user_perm(n_, f_orig_.nnz_in(iind)));
             }
           }
         }
