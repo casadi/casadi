@@ -2939,6 +2939,9 @@ void block_mtimes(const std::vector<T>& x, const Sparsity& sp_x, const std::vect
     std::vector<MX> blocks_R(sp_R.nnz());
     std::vector<std::string> blocks_R_descr(sp_R.nnz());
 
+    casadi_assert(sp_R.nnz()==vexpr.size()*varg.size(),
+      "Structural failure in block_jacobian. Do you actually have any maps in your expressions?");
+
     block_row = 0;
     for (const auto& e : vexpr) {
       casadi_int block_col = 0;
