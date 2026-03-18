@@ -264,7 +264,7 @@ namespace casadi {
         for (casadi_int i=0;i<td.size();++i) {
           casadi_int j = iperm_lookup[i];
           casadi_int start = offset;
-          while (t_contrib[offset]==i) offset++;
+          while (offset < t_contrib.size() && t_contrib[offset]==i) offset++;
           new_iperm[j] = range(start, offset);
         }
         flatten_nested_vector(new_iperm, iperm);
@@ -284,7 +284,7 @@ namespace casadi {
         for (casadi_int i=0;i<sd.size();++i) {
           casadi_int j = perm_lookup[i];
           casadi_int start = offset;
-          while (s_contrib[offset]==i) offset++;
+          while (offset < s_contrib.size() && s_contrib[offset]==i) offset++;
           new_perm[j] = range(start, offset);
         }
         flatten_nested_vector(new_perm, perm);
