@@ -833,37 +833,54 @@ namespace casadi {
 
     std::vector<MX> res = Jmap(arg);
 
+    // Helper: check whether all columns of a sparsity have equal nnz count.
+    // Required for the efficient permute_layout path in step (c).
+    // Always true after column densification; fails only for irregular
+    // sparsity (e.g. triangular).
+    auto uniform_col_nnz = [](const Sparsity& sp, casadi_int& npc) -> bool {
+      const casadi_int* ci = sp.colind();
+      casadi_int nc = sp.size2();
+      npc = (nc > 0) ? ci[1] - ci[0] : 0;
+      for (casadi_int c = 1; c < nc; ++c)
+        if (ci[c+1] - ci[c] != npc) return false;
+      return npc > 0;
+    };
+
     size_t i = 0;
+    // ---------------------------------------------------------------
     // Post-process each Jacobian block J_{oind,iind}.
     //
-    // The bare Jmap (from create_bare) stores non-reduced blocks in SIMD nnz
-    // layout.  Three things may need fixing:
+    // The per-iteration block has sparsity S_J = Jf.sparsity_out(i).
+    // For non-reduced Jmap blocks (!reduce_out[i]) the nnz are in SIMD
+    // layout and need three transformations:
     //
-    //   (a) simd_to_user_nz: fix nnz so structural operations (sparsity_cast,
-    //       horzsplit) assign values to correct block positions.
+    //   (a) permute_layout {1,0}: nnz tensor (N, nnz_J) -> (nnz_J, N).
+    //       Corrects the flat nnz ordering so that subsequent structural
+    //       operations assign values to the right block positions.
     //
-    //   (b) sparsity_cast / horzsplit: build block-diagonal or stacked matrix
-    //       (only for non-reduced FUNCTION outputs; same as non-vectorized path).
+    //   (b) sparsity_cast / horzsplit: build the expected matrix structure
+    //       (block-diagonal kron, or vertical stack for reduced inputs).
+    //       Only for non-reduced FUNCTION outputs.
     //
-    //   (c) Row/column reindex to SIMD order: the outer create()'s nz-reorder
-    //       chain rule applies simd_to_user to tangent vectors.  We reindex
-    //       the dimensions that have a corresponding nz-reorder in create()
-    //       so the chain rule's conversion yields the correct final user order.
-    //       - Rows:    only for non-reduced outputs  (!reduce_out_[oind])
-    //       - Columns: only for non-reduced inputs   (!reduce_in_[iind])
+    //   (c) Row/column reindex to SIMD order: the outer create()'s
+    //       permute_in/out chain rule applies simd_to_user to tangent
+    //       vectors.  We reindex the matrix so that this conversion
+    //       yields the correct final user order.
+    //       Rows  reindexed when !reduce_out_[oind]  (has permute_out)
+    //       Cols  reindexed when !reduce_in_[iind]   (has permute_in)
     //
     for (size_t oind = 0; oind < n_out_; ++oind) {
       for (size_t iind = 0; iind < n_in_; ++iind) {
         MX& r = res[i];
 
-        // (a) Shuffle flat nnz values: SIMD -> user layout (non-reduced Jmap blocks)
+        // --- (a) Fix flat nnz: SIMD -> user layout ---
         if (vectorize_f() && !reduce_out[i]) {
           Layout source({n_, Jf.nnz_out(i)});
           Layout target({Jf.nnz_out(i), n_});
           r = permute_layout(r, Relayout(source, {1, 0}, target));
         }
 
-        // (b) Build block-diagonal structure (non-reduced function outputs only)
+        // --- (b) Build matrix structure (non-reduced function outputs only) ---
         if (!reduce_out_[oind]) {
           if (reduce_in_[iind]) {
             std::vector<casadi_int> row, col;
@@ -885,66 +902,50 @@ namespace casadi {
           }
         }
 
-        // (c) Reindex rows/columns from user to SIMD order so the outer
-        //     create()'s chain rule (simd_to_user on tangents) yields user order.
+        // --- (c) Reindex rows/cols: user -> SIMD order ---
+        //
+        // Efficient path (kron, both rows+cols, uniform col nnz):
+        //   permute_layout {0,2,1} on (npc, ncol_J, N) reorders column groups,
+        //   sparsity_cast to SIMD-indexed kron (row relabeling is free since
+        //   within-column sort order is preserved for kron blocks).
+        //
+        // Fallback (row-only, col-only, or non-uniform nnz):
+        //   r(perm, :) / r(:, perm) via GetNonzeros — correct but heavier.
+        //
         if (vectorize_f() && !reduce_out[i]) {
           bool need_rows = !reduce_out_[oind];
           bool need_cols = !reduce_in_[iind];
+          casadi_int npc = 0;
 
-          // Case 1 (kron, need_rows && need_cols): try efficient path.
-          // Column reindex = permute_layout {0,2,1} on (nnz_per_col, ncol_J, N).
-          // Row reindex = pure sparsity_cast (within-column order preserved).
-          // Requires uniform column nnz in Jf block.
           bool did_efficient = false;
-          if (need_rows && need_cols) {
+          if (need_rows && need_cols && uniform_col_nnz(Jf.sparsity_out(i), npc)) {
             Sparsity sp_J = Jf.sparsity_out(i);
-            const casadi_int* Jcolind = sp_J.colind();
-            const casadi_int* Jrow = sp_J.row();
-            casadi_int ncol_J = sp_J.size2();
-            casadi_int nrow_J = sp_J.size1();
-            // Check uniform column nnz
-            casadi_int npc = (ncol_J > 0) ? Jcolind[1] - Jcolind[0] : 0;
-            bool uniform = true;
-            for (casadi_int c = 1; c < ncol_J; ++c)
-              if (Jcolind[c+1] - Jcolind[c] != npc) { uniform = false; break; }
-
-            if (uniform && npc > 0) {
-              // Column reindex via permute_layout {0,2,1} on (npc, ncol_J, N),
-              // then sparsity_cast to SIMD-ordered kron where block k sits at
-              // rows {k, N+k, ...} and cols {k, N+k, ...}.
-              r = sparsity_cast(r, Sparsity::dense(r.nnz(), 1));
-              r = permute_layout(r, Relayout(
-                Layout({npc, ncol_J, n_}), {0, 2, 1}, Layout({npc, n_, ncol_J})));
-              std::vector<casadi_int> mapping;
-              r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), sp_J)
-                .sub(simd_user_perm(n_, nrow_J), simd_user_perm(n_, ncol_J),
-                     mapping));
-              did_efficient = true;
-            }
+            casadi_int ncol_J = sp_J.size2(), nrow_J = sp_J.size1();
+            // Column-group reorder via {0,2,1}, then sparsity_cast to
+            // SIMD-indexed kron: block k at rows {k,N+k,...}, cols {k,N+k,...}
+            r = sparsity_cast(r, Sparsity::dense(r.nnz(), 1));
+            r = permute_layout(r, Relayout(
+              Layout({npc, ncol_J, n_}), {0, 2, 1}, Layout({npc, n_, ncol_J})));
+            std::vector<casadi_int> mapping;
+            r = sparsity_cast(r, Sparsity::kron(Sparsity::diag(n_), sp_J)
+              .sub(simd_user_perm(n_, nrow_J), simd_user_perm(n_, ncol_J),
+                   mapping));
+            did_efficient = true;
           }
 
-          // Case 3 (repmat, col-only): same column permute as Case 1,
-          // sparsity_cast to SIMD-column-ordered repmat. Always uniform
-          // since repmat repeats the same Jf_sp pattern.
-          if (!did_efficient && !need_rows && need_cols) {
+          // Case 3 (repmat, col-only): column permute + sparsity_cast to
+          // SIMD-column-ordered repmat. Always uniform for repmat.
+          if (!did_efficient && !need_rows && need_cols
+              && uniform_col_nnz(Jf.sparsity_out(i), npc)) {
             Sparsity sp_J = Jf.sparsity_out(i);
-            const casadi_int* Jcolind = sp_J.colind();
             casadi_int ncol_J = sp_J.size2();
-            casadi_int npc = (ncol_J > 0) ? Jcolind[1] - Jcolind[0] : 0;
-            // Uniform check (always true for repmat, but be safe)
-            bool uniform = true;
-            for (casadi_int c = 1; c < ncol_J; ++c)
-              if (Jcolind[c+1] - Jcolind[c] != npc) { uniform = false; break; }
-            if (uniform && npc > 0) {
-              r = sparsity_cast(r, Sparsity::dense(r.nnz(), 1));
-              r = permute_layout(r, Relayout(
-                Layout({npc, ncol_J, n_}), {0, 2, 1}, Layout({npc, n_, ncol_J})));
-              // SIMD-column repmat: column c*N+k has Jf_sp column c's pattern
-              std::vector<casadi_int> mapping;
-              r = sparsity_cast(r, repmat(sp_J, 1, n_)
-                .sub(range(sp_J.size1()), simd_user_perm(n_, ncol_J), mapping));
-              did_efficient = true;
-            }
+            r = sparsity_cast(r, Sparsity::dense(r.nnz(), 1));
+            r = permute_layout(r, Relayout(
+              Layout({npc, ncol_J, n_}), {0, 2, 1}, Layout({npc, n_, ncol_J})));
+            std::vector<casadi_int> mapping;
+            r = sparsity_cast(r, repmat(sp_J, 1, n_)
+              .sub(range(sp_J.size1()), simd_user_perm(n_, ncol_J), mapping));
+            did_efficient = true;
           }
 
           // Case 2 (vertcat, row-only, is_compactible path):
