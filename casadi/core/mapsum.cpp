@@ -49,11 +49,9 @@ namespace casadi {
   }
 
   // Reorder the flat nnz array of x from user to SIMD layout (inverse of above).
+  // The inverse of the (nnz, N) shuffle is just the (N, nnz) shuffle.
   static MX user_to_simd_nz(const MX& x, casadi_int nnz, casadi_int N) {
-    auto fwd = simd_user_perm(nnz, N);
-    std::vector<casadi_int> inv(fwd.size());
-    for (casadi_int j = 0; j < static_cast<casadi_int>(fwd.size()); ++j) inv[fwd[j]] = j;
-    return sparsity_cast(x.nz(inv), x.sparsity());
+    return sparsity_cast(x.nz(simd_user_perm(N, nnz)), x.sparsity());
   }
 
   Function MapSum::create_bare(const std::string& name, const std::string& parallelization,
@@ -845,15 +843,6 @@ namespace casadi {
 
     std::vector<MX> res = Jmap(arg);
 
-    // Helper: build the inverse of simd_user_perm (user->SIMD index vector)
-    // for use with r(perm, ...) row/column selection.
-    auto inv_perm = [](casadi_int nnz, casadi_int N) {
-      auto fwd = simd_user_perm(nnz, N);
-      std::vector<casadi_int> inv(fwd.size());
-      for (size_t j = 0; j < fwd.size(); ++j) inv[fwd[j]] = j;
-      return inv;
-    };
-
     size_t i = 0;
     // Post-process each Jacobian block J_{oind,iind}.
     //
@@ -877,7 +866,7 @@ namespace casadi {
       for (size_t iind = 0; iind < n_in_; ++iind) {
         MX& r = res[i];
 
-        // (a) SIMD -> user nnz layout (for any non-reduced Jmap block)
+        // (a) Shuffle flat nnz values: SIMD -> user layout (non-reduced Jmap blocks)
         if (vectorize_f() && !reduce_out[i])
           r = simd_to_user_nz(r, Jf.nnz_out(i), n_);
 
@@ -903,17 +892,19 @@ namespace casadi {
           }
         }
 
-        // (c) Reindex dimensions that have outer nz-reorder to SIMD order
+        // (c) Permute matrix rows/cols: user -> SIMD order (inverse of (a)).
+        //     simd_user_perm(N, nnz) is the inverse shuffle; r(perm, ...)
+        //     selects rows so the chain rule's simd_to_user gives user order.
         if (vectorize_f() && !reduce_out[i]) {
           bool need_rows = !reduce_out_[oind];
           bool need_cols = !reduce_in_[iind];
           if (need_rows && need_cols) {
-            r = r(inv_perm(f_orig_.nnz_out(oind), n_),
-                  inv_perm(f_orig_.nnz_in(iind), n_));
+            r = r(simd_user_perm(n_, f_orig_.nnz_out(oind)),
+                  simd_user_perm(n_, f_orig_.nnz_in(iind)));
           } else if (need_rows) {
-            r = r(inv_perm(f_orig_.nnz_out(oind), n_), Slice());
+            r = r(simd_user_perm(n_, f_orig_.nnz_out(oind)), Slice());
           } else if (need_cols) {
-            r = r(Slice(), inv_perm(f_orig_.nnz_in(iind), n_));
+            r = r(Slice(), simd_user_perm(n_, f_orig_.nnz_in(iind)));
           }
         }
 
