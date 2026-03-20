@@ -27,8 +27,8 @@
 #define CASADI_UNO_INTERFACE_HPP
 
 #include <casadi/interfaces/uno/casadi_nlpsol_uno_export.h>
-#include <optimization/Model.hpp>
-#include <linear_algebra/RectangularMatrix.hpp>
+// #include <optimization/Model.hpp>
+// #include <linear_algebra/RectangularMatrix.hpp>
 
 #include "casadi/core/nlpsol_impl.hpp"
 
@@ -58,7 +58,8 @@ namespace casadi {
   struct CASADI_NLPSOL_UNO_EXPORT UnoMemory : public NlpsolMemory {
     const UnoInterface& self;
 
-    CasadiModel* model;
+    void* model;
+    void* solver;
     const char* return_status;
     /// Constructor
     UnoMemory(const UnoInterface& uno_interface);
@@ -67,76 +68,9 @@ namespace casadi {
     ~UnoMemory();
   };
 
-
-/* ----------------------------
-Definition of Class CasadiModel
------------------------------*/
-
-class CasadiModel: public Model{
-
-public:
-   explicit CasadiModel(const std::string& file_name, const UnoInterface& uno_interface, UnoMemory* mem);
-   ~CasadiModel() override {}
-
-   // objective
-   [[nodiscard]] double evaluate_objective(const std::vector<double>& x) const override;
-   void evaluate_objective_gradient(const std::vector<double>& x, SparseVector<double>& gradient) const override;
-   // constraints
-   void evaluate_constraints(const std::vector<double>& x, std::vector<double>& constraints) const override;
-   void evaluate_constraint_gradient(const std::vector<double>& x, size_t j, SparseVector<double>& gradient) const override;
-   void evaluate_constraint_jacobian(const std::vector<double>& x, RectangularMatrix<double>& constraint_jacobian) const override;
-   // Hessian
-   void evaluate_lagrangian_hessian(const std::vector<double>& x, double objective_multiplier, const std::vector<double>& multipliers,
-         SymmetricMatrix<double>& hessian) const override;
-
-   [[nodiscard]] double get_variable_lower_bound(size_t i) const override;
-   [[nodiscard]] double get_variable_upper_bound(size_t i) const override;
-   [[nodiscard]] BoundType get_variable_bound_type(size_t i) const override;
-   [[nodiscard]] double get_constraint_lower_bound(size_t j) const override;
-   [[nodiscard]] double get_constraint_upper_bound(size_t j) const override;
-   [[nodiscard]] FunctionType get_constraint_type(size_t j) const override;
-   [[nodiscard]] BoundType get_constraint_bound_type(size_t j) const override;
-
-   [[nodiscard]] size_t get_number_objective_gradient_nonzeros() const override;
-   [[nodiscard]] size_t get_number_jacobian_nonzeros() const override;
-   [[nodiscard]] size_t get_number_hessian_nonzeros() const override;
-
-   void get_initial_primal_point(std::vector<double>& x) const override;
-   void get_initial_dual_point(std::vector<double>& multipliers) const override;
-   void postprocess_solution(Iterate& iterate, TerminationStatus termination_status) const override;
-
-   [[nodiscard]] const std::vector<size_t>& get_linear_constraints() const override;
-
-private:
-   UnoMemory* mem_;
-
-   mutable std::vector<double> casadi_tmp_gradient{};
-   mutable std::vector<double> casadi_tmp_multipliers{};
-   mutable std::vector<double> casadi_tmp_constraint_jacobian{};
-   mutable std::vector<double> casadi_tmp_hessian{};
-
-   std::vector<Interval> variables_bounds;
-   std::vector<Interval> constraint_bounds;
-   std::vector<BoundType> variable_status; /*!< Status of the variables (EQUALITY, BOUNDED_LOWER, BOUNDED_UPPER, BOUNDED_BOTH_SIDES) */
-   std::vector<FunctionType> constraint_type; /*!< Types of the constraints (LINEAR, QUADRATIC, NONLINEAR) */
-   std::vector<BoundType> constraint_status; /*!< Status of the constraints (EQUAL_BOUNDS, BOUNDED_LOWER, BOUNDED_UPPER, BOUNDED_BOTH_SIDES,
- * UNBOUNDED) */
-
-   std::vector<size_t> linear_constraints;
-
-   void generate_variables();
-   void generate_constraints();
-  //  void set_function_types(std::string file_name);
-
-   void set_number_hessian_nonzeros();
-   [[nodiscard]] size_t compute_hessian_number_nonzeros(double objective_multiplier, const std::vector<double>& multipliers) const;
-};
-
-
   /*------------------------------
   Definition of class UnoInterface
   -------------------------------*/
-
 
   /** \brief \pluginbrief{Nlpsol,uno}
      @copydoc Nlpsol_doc
