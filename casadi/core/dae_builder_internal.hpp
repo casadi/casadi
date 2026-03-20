@@ -498,6 +498,7 @@ protected:
   double fmutol_;
   bool ignore_time_;
   bool enable_ls_dae_;
+  bool unroll_fmu_getset_;  // remove when bug has been resolved
 
   // FMI attributes
   std::string fmi_version_;

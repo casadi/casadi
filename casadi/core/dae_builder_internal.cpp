@@ -625,6 +625,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   fmutol_ = 0;
   ignore_time_ = false;
   enable_ls_dae_ = true;
+  unroll_fmu_getset_ = false;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="debug") {
@@ -639,6 +640,8 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
       resource_.change_option("serialize_mode", op.second);
     } else if (op.first=="enable_ls_dae") {
       enable_ls_dae_ = op.second;
+    } else if (op.first=="unroll_fmu_getset") {
+      unroll_fmu_getset_ = op.second;
     } else {
       casadi_error("No such option: " + op.first);
     }

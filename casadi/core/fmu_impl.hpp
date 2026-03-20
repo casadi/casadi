@@ -363,6 +363,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   mutable bool warning_fired_values_of_continuous_states_changed_;
   mutable bool warning_fired_next_event_time_defined_;
 
+  // Call get_real/set_real in a loop instead of vectorized calls
+  bool unroll_fmu_getset_;
+
   size_t nx_;
   // Instead of set_real+get_real, do set_real+get_real+get_derivatives+get_real
   bool do_evaluation_dance_;
