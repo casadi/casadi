@@ -83,6 +83,9 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
   // Initialize base classes
   FmuInternal::init(dae);
 
+  // Add prefix to resource location, cf. FMI specification 2.0.5, section 2.1.5
+  resource_loc_ = "file://" + resource_loc_;
+
   // Collect input and parameter values
   vr_real_.clear();
   vr_integer_.clear();

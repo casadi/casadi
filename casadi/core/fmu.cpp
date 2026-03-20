@@ -571,6 +571,14 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
 
   // Get Hessian sparsity information
   hess_sp_ = dae->hess_sparsity(oind_, iind_);
+
+  // Path to resource directory
+  resource_loc_ = resource_.path();
+  if (Filesystem::is_enabled()) resource_loc_ = Filesystem::absolute(resource_loc_);
+  resource_loc_ += "/resources";
+
+  // Use forward slashes (supported by all file systems)
+  std::replace(resource_loc_.begin(), resource_loc_.end(), '\\', '/');
 }
 
 int FmuInternal::get_adjoint_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
@@ -595,18 +603,6 @@ void FmuInternal::finalize() {
 
   // Get FMI C functions
   load_functions();
-
-  // Path to resource directory
-  std::string url = "";
-  if (Filesystem::is_enabled()) {
-    url = "file://" + Filesystem::absolute(resource_.path()) + "/resources";
-  } else {
-    url = "file://" + resource_.path() + "/resources";
-  }
-  // Forward slashes
-  std::replace(url.begin(), url.end(), '\\', '/');
-
-  resource_loc_ = url;
 
   // Create a temporary instance
   void* c = instantiate();
