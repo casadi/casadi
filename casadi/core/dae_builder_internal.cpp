@@ -625,7 +625,6 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   fmutol_ = 0;
   ignore_time_ = false;
   enable_ls_dae_ = true;
-  std::string resource_serialize = "link";
   // Read options
   for (auto&& op : opts) {
     if (op.first=="debug") {
