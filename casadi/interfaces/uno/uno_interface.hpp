@@ -46,10 +46,40 @@
 
 
 /// \cond INTERNAL
+
+// extern "C" {
+
+// uno_int objective_function(uno_int number_variables, const double* x, double* objective_value, void* user_data);
+
+// uno_int constraint_functions(uno_int number_variables, uno_int number_constraints, const double* x,
+//             double* constraint_values, void* user_data);
+
+// uno_int objective_gradient(uno_int number_variables, const double* x, double* gradient, void* user_data);
+
+// uno_int jacobian(uno_int number_variables, uno_int number_jacobian_nonzeros, const double* x,
+//             double* jacobian_values, void* user_data);
+
+// uno_int jacobian_operator(uno_int number_variables, uno_int number_constraints, const double* x,
+//             bool evaluate_at_x, const double* vector, double* result, void* user_data);
+
+// uno_int jacobian_transposed_operator(uno_int number_variables, uno_int number_constraints, const double* x,
+//             bool evaluate_at_x, const double* vector, double* result, void* user_data);
+
+// uno_int lagrangian_hessian(uno_int number_variables, uno_int number_constraints, uno_int number_hessian_nonzeros,
+//             const double* x, double objective_multiplier, const double* multipliers, double* hessian_values, void* user_data);
+
+// uno_int lagrangian_hessian_operator(uno_int number_variables, uno_int number_constraints, const double* x,
+//             bool evaluate_at_x, double objective_multiplier, const double* multipliers, const double* vector,
+//             double* result, void* user_data);
+
+// void print_vector(const double* vector, uno_int size);
+
+// } // extern "C"
+
 namespace casadi {
   // Forward declaration
   class UnoInterface;
-  class CasadiModel;
+  // class CasadiModel;
 
   /*------------------------
   Definition of UnoMemory

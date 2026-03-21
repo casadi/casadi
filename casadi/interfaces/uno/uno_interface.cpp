@@ -47,10 +47,81 @@
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
+#include <cassert>
 #include <algorithm>
 
 #include <type_traits>
 
+extern "C" {
+
+uno_int objective_function(uno_int /*number_variables*/, const double* x, double* objective_value, void* /*user_data*/) {
+      *objective_value = 100.*pow(x[1] - pow(x[0], 2.), 2.) + pow(1. - x[0], 2.);
+      return 0;
+}
+
+uno_int constraint_functions(uno_int /*number_variables*/, uno_int /*number_constraints*/, const double* x,
+            double* constraint_values, void* /*user_data*/) {
+      constraint_values[0] = x[0]*x[1];
+      constraint_values[1] = x[0] + pow(x[1], 2.);
+      return 0;
+}
+
+uno_int objective_gradient(uno_int /*number_variables*/, const double* x, double* gradient, void* /*user_data*/) {
+      gradient[0] = 400.*pow(x[0], 3.) - 400.*x[0]*x[1] + 2.*x[0] - 2.;
+      gradient[1] = 200.*(x[1] - pow(x[0], 2.));
+      return 0;
+}
+
+uno_int jacobian(uno_int /*number_variables*/, uno_int /*number_jacobian_nonzeros*/, const double* x,
+            double* jacobian_values, void* /*user_data*/) {
+      jacobian_values[0] = x[1];
+      jacobian_values[1] = 1.;
+      jacobian_values[2] = x[0];
+      jacobian_values[3] = 2.*x[1];
+      return 0;
+}
+
+uno_int jacobian_operator(uno_int /*number_variables*/, uno_int /*number_constraints*/, const double* x,
+            bool evaluate_at_x, const double* vector, double* result, void* /*user_data*/) {
+      result[0] = x[1]*vector[0] + 1.*vector[1];
+      result[1] = x[0]*vector[0] + 2.*x[1]*vector[1];
+      return 0;
+}
+
+uno_int jacobian_transposed_operator(uno_int /*number_variables*/, uno_int /*number_constraints*/, const double* x,
+            bool evaluate_at_x, const double* vector, double* result, void* /*user_data*/) {
+      result[0] = x[1]*vector[0] + x[0]*vector[1];
+      result[1] = 1.*vector[0] + 2.*x[1]*vector[1];
+      return 0;
+}
+
+uno_int lagrangian_hessian(uno_int /*number_variables*/, uno_int /*number_constraints*/, uno_int /*number_hessian_nonzeros*/,
+            const double* x, double objective_multiplier, const double* multipliers, double* hessian_values, void* /*user_data*/) {
+      hessian_values[0] = objective_multiplier*(1200*pow(x[0], 2.) - 400.*x[1] + 2.);
+      hessian_values[1] = -400.*objective_multiplier*x[0] - multipliers[0];
+      hessian_values[2] = 200.*objective_multiplier - 2.*multipliers[1];
+      return 0;
+}
+
+uno_int lagrangian_hessian_operator(uno_int number_variables, uno_int number_constraints, const double* x,
+            bool evaluate_at_x, double objective_multiplier, const double* multipliers, const double* vector,
+            double* result, void* user_data) {
+      const double hessian00 = objective_multiplier*(1200*pow(x[0], 2.) - 400.*x[1] + 2.);
+      const double hessian10 = -400.*objective_multiplier*x[0] - multipliers[0];
+      const double hessian11 = 200.*objective_multiplier - 2.*multipliers[1];
+      result[0] = hessian00*vector[0] + hessian10*vector[1];
+      result[1] = hessian10*vector[0] + hessian11*vector[1];
+      return 0;
+}
+
+void print_vector(const double* vector, uno_int size) {
+      for (size_t index = 0; index < size; ++index) {
+            printf("%g ", vector[index]);
+      }
+      printf("\n");
+}
+
+} // extern "C"
 
 namespace casadi {
 
@@ -457,7 +528,8 @@ namespace casadi {
   //   // ASL_free(&asl_fg);
   // }
 
-  /*-------------------------------------------
+
+  /*------------------------------------------
   UnoInterface function definitions
   -------------------------------------------*/
 
@@ -514,6 +586,7 @@ namespace casadi {
    // memory should be freed somewhere else
   //  std::cout << "Init Memort acces" << std::endl;
   //  m->model = new CasadiModel("casadi_model", *this, m);
+    m->solver = uno_create_solver();
    return 0;
 
   }
@@ -708,8 +781,121 @@ namespace casadi {
     // catch (const std::exception& e) {
     //     std::cout << "Uno terminated with an error\n";
     // }
+    uno_int uno_major, uno_minor, uno_patch;
+    uno_get_version(&uno_major, &uno_minor, &uno_patch);
+    printf("Uno v%d.%d.%d\n", uno_major, uno_minor, uno_patch);
+
+    // model creation
+    const uno_int base_indexing = UNO_ZERO_BASED_INDEXING;
+    // variables
+    const uno_int number_variables = 2;
+    double variables_lower_bounds[] = {-INFINITY, -INFINITY};
+    double variables_upper_bounds[] = {0.5, INFINITY};
+    // objective
+    const uno_int optimization_sense = UNO_MINIMIZE;
+    // constraints
+    const uno_int number_constraints = 2;
+    double constraints_lower_bounds[] = {1., 0.};
+    double constraints_upper_bounds[] = {INFINITY, INFINITY};
+    const uno_int number_jacobian_nonzeros = 4;
+    uno_int jacobian_row_indices[] = {0, 1, 0, 1};
+    uno_int jacobian_column_indices[] = {0, 0, 1, 1};
+    // Hessian
+    const uno_int number_hessian_nonzeros = 3;
+    const char hessian_triangular_part = UNO_LOWER_TRIANGLE;
+    uno_int hessian_row_indices[] = {0, 1, 1};
+    uno_int hessian_column_indices[] = {0, 0, 1};
+    const uno_int lagrangian_sign_convention = UNO_MULTIPLIER_NEGATIVE;
+    // initial point
+    double x0[] = {-2., 1.};
+
+    void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, number_variables, variables_lower_bounds,
+    variables_upper_bounds, base_indexing);
+    std::cout << "Set the objective here!" << std::endl;
     
-      return 0;
+    uno_int ret;
+    ret = uno_set_objective(model, optimization_sense, ::objective_function, ::objective_gradient);
+    printf("uno_set_objective returned: %d\n", ret);
+    // if (ret != 0) {
+    //     printf("ERROR: Failed to set objective! Return code: %d\n", ret);
+    //     return 1;
+    // }
+    
+    ret = uno_set_constraints(model, number_constraints, ::constraint_functions,
+          constraints_lower_bounds, constraints_upper_bounds, number_jacobian_nonzeros,
+          jacobian_row_indices, jacobian_column_indices, ::jacobian);
+    printf("uno_set_constraints returned: %d\n", ret);
+    // if (ret != 0) {
+    //     printf("ERROR: Failed to set constraints! Return code: %d\n", ret);
+    //     return 1;
+    // }
+
+    ret = uno_set_initial_primal_iterate(model, x0);
+    printf("uno_set_initial_primal_iterate returned: %d\n", ret);
+    // if (ret != 0) {
+    //     printf("ERROR: Failed to set initial primal iterate! Return code: %d\n", ret);
+    //     return 1;
+    // }
+
+    // ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices, hessian_column_indices, ::lagrangian_hessian);
+    // printf("uno_set_lagrangian_hessian returned: %d\n", ret);
+    // ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
+    // printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
+
+    // solver creation
+    void* solver = uno_create_solver();
+    uno_set_solver_preset(solver, "funnelsqp");
+    uno_set_solver_bool_option(solver, "print_solution", true);
+
+    std::cout << "Before first solve" << std::endl;
+    // run 1: solve with no Hessian. Uno defaults to L-BFGS Hessian for NLPs
+    uno_optimize(solver, model);
+    std::cout << "After first solve" << std::endl;
+    // get the solution
+    uno_int optimization_status = uno_get_optimization_status(solver);
+    assert(optimization_status == UNO_SUCCESS);
+    uno_int iterate_status = uno_get_solution_status(solver);
+    assert(iterate_status == UNO_FEASIBLE_KKT_POINT);
+    double solution_objective = uno_get_solution_objective(solver);
+    printf("Solution objective = %g\n", solution_objective);
+
+    // run 2: solve with exact Hessian
+    ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices, hessian_column_indices, ::lagrangian_hessian);
+    printf("uno_set_lagrangian_hessian returned: %d\n", ret);
+    ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
+    printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
+    uno_optimize(solver, model);
+    // get the solution
+    optimization_status = uno_get_optimization_status(solver);
+    assert(optimization_status == UNO_SUCCESS);
+    iterate_status = uno_get_solution_status(solver);
+    assert(iterate_status == UNO_FEASIBLE_KKT_POINT);
+    solution_objective = uno_get_solution_objective(solver);
+    printf("Solution objective = %g\n", solution_objective);
+    double primal_solution[number_variables];
+    uno_get_primal_solution(solver, primal_solution);
+    printf("Primal solution: "); print_vector(primal_solution, number_variables);
+    double constraint_dual_solution[number_constraints];
+    uno_get_constraint_dual_solution(solver, constraint_dual_solution);
+    printf("Constraint dual solution: "); print_vector(constraint_dual_solution, number_constraints);
+    double lower_bound_dual_solution[number_variables];
+    uno_get_lower_bound_dual_solution(solver, lower_bound_dual_solution);
+    printf("Lower bound dual solution: "); print_vector(lower_bound_dual_solution, number_variables);
+    double upper_bound_dual_solution[number_variables];
+    uno_get_upper_bound_dual_solution(solver, upper_bound_dual_solution);
+    printf("Upper bound dual solution: "); print_vector(upper_bound_dual_solution, number_variables);
+    const double solution_primal_feasibility = uno_get_solution_primal_feasibility(solver);
+    printf("Primal feasibility at solution = %e\n", solution_primal_feasibility);
+    const double solution_stationarity = uno_get_solution_stationarity(solver);
+    printf("Stationarity at solution = %e\n", solution_stationarity);
+    const double solution_complementarity = uno_get_solution_complementarity(solver);
+    printf("Complementarity at solution = %e\n", solution_complementarity);
+
+    // cleanup
+    uno_destroy_solver(solver);
+    uno_destroy_model(model);
+
+    return 0;
   }
 
   Dict UnoInterface::get_stats(void* mem) const {
