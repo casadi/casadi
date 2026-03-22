@@ -581,11 +581,14 @@ namespace casadi {
     auto m = static_cast<UnoMemory*>(mem);
 
 // -------------------------------------------------------------------
-
+    uno_int uno_major, uno_minor, uno_patch;
+    uno_get_version(&uno_major, &uno_minor, &uno_patch);
+    printf("Uno v%d.%d.%d\n", uno_major, uno_minor, uno_patch);
    // Casadi model
    // memory should be freed somewhere else
   //  std::cout << "Init Memort acces" << std::endl;
   //  m->model = new CasadiModel("casadi_model", *this, m);
+    // m->model = uno_create_model(UNO_PROBLEM_NONLINEAR, number_variables, variables_lower_bounds, variables_upper_bounds, base_indexing);
     m->solver = uno_create_solver();
    return 0;
 
@@ -621,19 +624,18 @@ namespace casadi {
   void insert_casadi_options(void* solver, Dict opts) {
     // build the (name, value) map
     std::cout << "tba" << std::endl;
-    // Dict casadi_options = Options::sanitize(opts);
-    // std::cout << "Options casadi" << casadi_options << std::endl;
-
-    // // Define the preset and erase it from the options file
-    // std::string preset;
-    // auto it = casadi_options.find("preset");
-    // if (it!=casadi_options.end()) {
-    //   preset = it->second.to_string();
-    //   casadi_options.erase(it);
-    // } else {
-    //   preset = "filtersqp";
-    // }
-    // find_preset(preset, uno_options);
+    Dict casadi_options = Options::sanitize(opts);
+    
+    // Define the preset and erase it from the options file
+    std::string preset;
+    auto it = casadi_options.find("preset");
+    if (it!=casadi_options.end())
+    {
+      preset = it->second.to_string();
+      uno_set_solver_preset(solver, preset.c_str());
+      casadi_options.erase(it);
+    }
+    uno_set_solver_bool_option(solver, "print_solution", true);
 
     // // Pass all the options to ipopt
     // for (auto&& op : casadi_options) {
@@ -662,46 +664,55 @@ namespace casadi {
   //  return statistics;
   // }
 
-// inline const char* return_status_string(Result result) {
-//     return "tba";
-//     // if (result.solution.status == TerminationStatus::FEASIBLE_KKT_POINT) {
-//     //     return "Converged with feasible KKT point";
-//     // }
-//     // else if (result.solution.status == TerminationStatus::FEASIBLE_FJ_POINT) {
-//     //     return "Converged with feasible FJ point";
-//     // }
-//     // else if (result.solution.status == TerminationStatus::INFEASIBLE_STATIONARY_POINT) {
-//     //     return "Converged with infeasible stationary point";
-//     // }
-//     // else if (result.solution.status == TerminationStatus::FEASIBLE_SMALL_STEP) {
-//     //     return "Terminated with feasible small step";
-//     // }
-//     // else if (result.solution.status == TerminationStatus::INFEASIBLE_SMALL_STEP) {
-//     //     return "Terminated with infeasible small step";
-//     // }
-//     // else if (result.solution.status == TerminationStatus::UNBOUNDED) {
-//     //     return "Terminated with unbounded problem";
-//     // }
-//     // else {
-//     //     return "Failed with suboptimal point";
-//     // }
-//   }
+inline const char* return_status_string(void* solver) {
+    uno_int iterate_status = uno_get_solution_status(solver);
+    assert(iterate_status == UNO_FEASIBLE_KKT_POINT);
+    if (iterate_status == UNO_FEASIBLE_KKT_POINT)
+    {
+      return "Converged with feasible KKT point";
+    }
+    else if (iterate_status == UNO_FEASIBLE_FJ_POINT)
+    {
+      return "Converged with feasible FJ point";
+    }
+    else if (iterate_status == UNO_INFEASIBLE_STATIONARY_POINT)
+    {
+      return "Converged with infeasible stationary point";
+    }
+    else if (iterate_status == UNO_FEASIBLE_SMALL_STEP)
+    {
+      return "Terminated with feasible small step";
+    }
+    else if (iterate_status == UNO_INFEASIBLE_SMALL_STEP)
+    {
+      return "Terminated with infeasible small step";
+    }
+    else if (iterate_status == UNO_UNBOUNDED)
+    {
+      return "Terminated with unbounded problem";
+    }
+    else if (iterate_status == UNO_NOT_OPTIMAL)
+    {
+      return "Terminated with not optimal point";
+    }
+    else
+    {
+      return "Terminated with an unknown status!";
+    }
+  }
 
-  // inline const bool return_status_success(Result result) {
-  //   return true;
-  //   // if (result.solution.status == TerminationStatus::FEASIBLE_KKT_POINT) {
-  //   //     return true;
-  //   // }
-  //   // else if (result.solution.status == TerminationStatus::FEASIBLE_FJ_POINT) {
-  //   //     return true;
-  //   // }
-  //   // else if (result.solution.status == TerminationStatus::INFEASIBLE_STATIONARY_POINT) {
-  //   //     return true;
-  //   // }
-  //   // else {
-  //   //     return false;
-  //   // }
-  // }
+  inline const bool return_status_success(void* solver)
+  {
+    uno_int optimization_status = uno_get_optimization_status(solver);
+    if (optimization_status == UNO_SUCCESS)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+  }
 
   int UnoInterface::solve(void* mem) const {
     auto m = static_cast<UnoMemory*>(mem);
@@ -709,12 +720,8 @@ namespace casadi {
 
     // // CasadiModel casadi_model = &m->model;
 
-    // // ::Options uno_options = rewrite_options(opts_);
-    // ::Options uno_options = get_default_options(GlobalOptions::casadi_include_path + filesep() + "uno/uno.options");
-    // // define preset and insert options given through casadi 
-    // insert_casadi_options(uno_options, opts_);
-    // uno_options.print();
-    // ::Logger::set_logger(uno_options.get_string("logger"));
+    // define preset and insert options given through casadi 
+    insert_casadi_options(m->solver, opts_);
 
     // // initialize initial primal and dual points
     // Iterate initial_iterate(m->model->number_variables, m->model->number_constraints);
@@ -781,9 +788,7 @@ namespace casadi {
     // catch (const std::exception& e) {
     //     std::cout << "Uno terminated with an error\n";
     // }
-    uno_int uno_major, uno_minor, uno_patch;
-    uno_get_version(&uno_major, &uno_minor, &uno_patch);
-    printf("Uno v%d.%d.%d\n", uno_major, uno_minor, uno_patch);
+    
 
     // model creation
     const uno_int base_indexing = UNO_ZERO_BASED_INDEXING;
@@ -843,20 +848,18 @@ namespace casadi {
     // printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
 
     // solver creation
-    void* solver = uno_create_solver();
-    uno_set_solver_preset(solver, "funnelsqp");
-    uno_set_solver_bool_option(solver, "print_solution", true);
+    // void* solver = uno_create_solver();
+    // uno_set_solver_preset(m->solver, "funnelsqp");
+    // uno_set_solver_bool_option(m->solver, "print_solution", true);
 
-    std::cout << "Before first solve" << std::endl;
     // run 1: solve with no Hessian. Uno defaults to L-BFGS Hessian for NLPs
-    uno_optimize(solver, model);
-    std::cout << "After first solve" << std::endl;
+    uno_optimize(m->solver, model);
     // get the solution
-    uno_int optimization_status = uno_get_optimization_status(solver);
+    uno_int optimization_status = uno_get_optimization_status(m->solver);
     assert(optimization_status == UNO_SUCCESS);
-    uno_int iterate_status = uno_get_solution_status(solver);
+    uno_int iterate_status = uno_get_solution_status(m->solver);
     assert(iterate_status == UNO_FEASIBLE_KKT_POINT);
-    double solution_objective = uno_get_solution_objective(solver);
+    double solution_objective = uno_get_solution_objective(m->solver);
     printf("Solution objective = %g\n", solution_objective);
 
     // run 2: solve with exact Hessian
@@ -864,35 +867,35 @@ namespace casadi {
     printf("uno_set_lagrangian_hessian returned: %d\n", ret);
     ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
     printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
-    uno_optimize(solver, model);
+    uno_optimize(m->solver, model);
     // get the solution
-    optimization_status = uno_get_optimization_status(solver);
+    optimization_status = uno_get_optimization_status(m->solver);
     assert(optimization_status == UNO_SUCCESS);
-    iterate_status = uno_get_solution_status(solver);
+    iterate_status = uno_get_solution_status(m->solver);
     assert(iterate_status == UNO_FEASIBLE_KKT_POINT);
-    solution_objective = uno_get_solution_objective(solver);
+    solution_objective = uno_get_solution_objective(m->solver);
     printf("Solution objective = %g\n", solution_objective);
     double primal_solution[number_variables];
-    uno_get_primal_solution(solver, primal_solution);
+    uno_get_primal_solution(m->solver, primal_solution);
     printf("Primal solution: "); print_vector(primal_solution, number_variables);
     double constraint_dual_solution[number_constraints];
-    uno_get_constraint_dual_solution(solver, constraint_dual_solution);
+    uno_get_constraint_dual_solution(m->solver, constraint_dual_solution);
     printf("Constraint dual solution: "); print_vector(constraint_dual_solution, number_constraints);
     double lower_bound_dual_solution[number_variables];
-    uno_get_lower_bound_dual_solution(solver, lower_bound_dual_solution);
+    uno_get_lower_bound_dual_solution(m->solver, lower_bound_dual_solution);
     printf("Lower bound dual solution: "); print_vector(lower_bound_dual_solution, number_variables);
     double upper_bound_dual_solution[number_variables];
-    uno_get_upper_bound_dual_solution(solver, upper_bound_dual_solution);
+    uno_get_upper_bound_dual_solution(m->solver, upper_bound_dual_solution);
     printf("Upper bound dual solution: "); print_vector(upper_bound_dual_solution, number_variables);
-    const double solution_primal_feasibility = uno_get_solution_primal_feasibility(solver);
+    const double solution_primal_feasibility = uno_get_solution_primal_feasibility(m->solver);
     printf("Primal feasibility at solution = %e\n", solution_primal_feasibility);
-    const double solution_stationarity = uno_get_solution_stationarity(solver);
+    const double solution_stationarity = uno_get_solution_stationarity(m->solver);
     printf("Stationarity at solution = %e\n", solution_stationarity);
-    const double solution_complementarity = uno_get_solution_complementarity(solver);
+    const double solution_complementarity = uno_get_solution_complementarity(m->solver);
     printf("Complementarity at solution = %e\n", solution_complementarity);
 
     // cleanup
-    uno_destroy_solver(solver);
+    uno_destroy_solver(m->solver);
     uno_destroy_model(model);
 
     return 0;
