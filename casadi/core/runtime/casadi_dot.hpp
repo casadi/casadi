@@ -25,3 +25,8 @@ T1 casadi_dot(casadi_int n, const T1* x, const T1* y) {
   for (i=0; i<n; ++i) r += *x++ * *y++;
   return r;
 }
+
+#ifdef WITH_BLAS
+CASADI_EXPORT float casadi_dot(casadi_int n, const float* x, const float* y);
+CASADI_EXPORT double casadi_dot(casadi_int n, const double* x, const double* y);
+#endif
