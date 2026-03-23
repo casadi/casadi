@@ -2453,7 +2453,7 @@ namespace casadi {
   void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
     // Define function
     g << "/* " << definition() << " */\n";
-    g << "static " << signature(fname) << " {\n";
+    g << "static " << g.device_prefix() << signature(fname) << " {\n";
 
     // Reset local variables, flush buffer
     g.flush(g.body);
