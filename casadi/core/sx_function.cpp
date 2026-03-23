@@ -1653,10 +1653,10 @@ namespace casadi {
       case OP_PARAMETER:
         w[e.i0] = 0; break;
       case OP_INPUT:
-        w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2];
+        w[e.i0] = (arg[e.i1]!=nullptr && is_diff_in_[e.i1]) ? arg[e.i1][e.i2] : 0;
         break;
       case OP_OUTPUT:
-        if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1];
+        if (res[e.i0]!=nullptr) res[e.i0][e.i2] = is_diff_out_[e.i0] ? w[e.i1] : 0;
         break;
       case OP_CALL:
         call_fwd(e, arg, res, iw, w);
@@ -1687,11 +1687,12 @@ namespace casadi {
         w[it->i0] = 0;
         break;
       case OP_INPUT:
-        if (arg[it->i1]!=nullptr) arg[it->i1][it->i2] |= w[it->i0];
+        if (arg[it->i1]!=nullptr && is_diff_in_[it->i1])
+          arg[it->i1][it->i2] |= w[it->i0];
         w[it->i0] = 0;
         break;
       case OP_OUTPUT:
-        if (res[it->i0]!=nullptr) {
+        if (res[it->i0]!=nullptr && is_diff_out_[it->i0]) {
           w[it->i1] |= res[it->i0][it->i2];
           res[it->i0][it->i2] = 0;
         }

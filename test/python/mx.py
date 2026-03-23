@@ -4477,5 +4477,48 @@ class MXtests(casadiTestCase):
             f = Function('f',[x],[r])
             self.checkarray(f(A),A[rslice,cslice])
   
+  def test_is_diff_sparsity_propagation(self):
+    for X in [MX,SX]:
+        x = X.sym("x")
+        u = X.sym("u")
+        q = X.sym("q")
+        
+        is_diff_in = [True, True, False]
+        is_diff_out = [True, False]
+
+        F = Function('F', [x, u, q], [sin(u+x+q), u*q],
+                     {"never_inline": True,
+                      "is_diff_in": is_diff_in,
+                      "is_diff_out": is_diff_out})
+        Fs = [F]
+        if args.run_slow:
+            res = self.check_codegen(F,inputs=[1,2,3])
+            Fs.append(res["F"])
+        
+            F = Function('F', [x, u, q], [sin(u+x+q), u*q])
+            
+            res = self.check_codegen(F,inputs=[1,2,3],with_jac_sparsity=True,with_forward=True,with_reverse=True)
+            Fs.append(external("F",res["libname"],{"is_diff_in": is_diff_in, "is_diff_out": is_diff_out}))
+
+            res = self.check_codegen(F,inputs=[1,2,3])
+            Fs.append(external("F",res["libname"],{"is_diff_in": is_diff_in, "is_diff_out": is_diff_out}))
+                 
+        for F in Fs:
+
+            for X2 in [MX,SX]:
+                X0 = X2.sym("X0")
+                U0 = X2.sym("U0")
+                Q0 = X2.sym("Q0")
+                [xn, qn] = F(5*X0, 6*U0, 7*Q0)
+                w = vertcat(X0, U0, Q0)
+                
+                for ad_weight_sp in [0,1]:
+                    
+                    H = Function('H',[w],[2*xn,3*qn],{"ad_weight_sp": ad_weight_sp})
+                    # xn should depend on X0 and U0 only (not Q0)
+                    self.assertEqual(H.sparsity_jac(0,0).nnz(), 2)
+                    # qn is non-diff output: no dependencies
+                    self.assertEqual(H.sparsity_jac(0,1).nnz(), 0)
+
 if __name__ == '__main__':
     unittest.main()

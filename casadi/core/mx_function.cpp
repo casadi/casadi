@@ -617,7 +617,7 @@ namespace casadi {
         casadi_int nz_offset=e.data->offset();
         const bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[e.res.front()];
-        if (argi!=nullptr) {
+        if (argi!=nullptr && is_diff_in_[i]) {
           std::copy(argi+nz_offset, argi+nz_offset+nnz, w1);
         } else {
           std::fill_n(w1, nnz, 0);
@@ -629,7 +629,11 @@ namespace casadi {
         casadi_int nz_offset=e.data->offset();
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[e.arg.front()];
-        if (resi!=nullptr) std::copy(w1, w1+nnz, resi+nz_offset);
+        if (resi!=nullptr && is_diff_out_[i]) {
+          std::copy(w1, w1+nnz, resi+nz_offset);
+        } else if (resi!=nullptr) {
+          std::fill_n(resi+nz_offset, nnz, 0);
+        }
       } else {
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<e.arg.size(); ++i)
@@ -691,7 +695,8 @@ namespace casadi {
         casadi_int nz_offset=it->data->offset();
         bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[it->res.front()];
-        if (argi!=nullptr) for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
+        if (argi!=nullptr && is_diff_in_[i])
+          for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
         std::fill_n(w1, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
@@ -700,10 +705,9 @@ namespace casadi {
         casadi_int nz_offset=it->data->offset();
         bvec_t* resi = res[i] ? res[i] + nz_offset : nullptr;
         bvec_t* w1 = w + workloc_[it->arg.front()];
-        if (resi!=nullptr) {
+        if (resi!=nullptr && is_diff_out_[i]) {
           for (casadi_int k=0; k<nnz; ++k) w1[k] |= resi[k];
           std::fill_n(resi, nnz, 0);
-
         }
       } else {
         // Point pointers to the data corresponding to the element
