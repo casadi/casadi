@@ -375,24 +375,12 @@ int Fmu3::get_adjoint_derivative(void* instance, const unsigned int* vr_out, siz
 int Fmu3::set_values(void* instance) const {
   auto c = static_cast<fmi3Instance>(instance);
   // Pass real values before initialization
-  if (unroll_fmu_getset_) {
-    // Workaround for vector call bug (to be removed when resolved)
-    casadi_assert(vr_real_.size() == init_real_.size(), "Vector valued variables not supported");
-    for (size_t k = 0; k < vr_real_.size(); ++k) {
-      fmi3Status status = set_float64_(c, &vr_real_[k], 1, &init_real_[k], 1);
-      if (status != fmi3OK) {
-        casadi_warning("fmi3SetFloat64 failed for value reference " + str(vr_real_[k]));
-        return 1;
-      }
-    }
-  } else {
-    if (!vr_real_.empty()) {
-      fmi3Status status = set_float64_(c, get_ptr(vr_real_), vr_real_.size(),
-        get_ptr(init_real_), init_real_.size());
-      if (status != fmi3OK) {
-        casadi_warning("fmi3SetFloat64 failed");
-        return 1;
-      }
+  casadi_assert(vr_real_.size() == init_real_.size(), "Vector valued variables not supported");
+  for (size_t k = 0; k < vr_real_.size(); ++k) {
+    fmi3Status status = set_float64_(c, &vr_real_[k], 1, &init_real_[k], 1);
+    if (status != fmi3OK) {
+      casadi_warning("fmi3SetFloat64 failed for value reference " + str(vr_real_[k]));
+      return 1;
     }
   }
 
@@ -436,24 +424,12 @@ int Fmu3::get_aux(void* instance) {
 int Fmu3::get_aux_impl(void* instance, Value& aux_value) const {
   auto c = static_cast<fmi3Instance>(instance);
   // Get real auxilliary variables
-  if (unroll_fmu_getset_) {
-    // Workaround for vector call bug (to be removed when resolved)
-    casadi_assert(vr_aux_real_.size() == aux_value.v_real.size(), "Vector valued variables not supported");
-    for (size_t k = 0; k < vr_aux_real_.size(); ++k) {
-      fmi3Status status = get_float64_(c, &vr_aux_real_[k], 1, &aux_value.v_real[k], 1);
-      if (status != fmi3OK) {
-        casadi_warning("fmi3GetFloat64 failed for value reference " + str(vr_aux_real_[k]));
-        return 1;
-      }
-    }
-  } else {
-    if (!vr_aux_real_.empty()) {
-      fmi3Status status = get_float64_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
-        get_ptr(aux_value.v_real), aux_value.v_real.size());
-      if (status != fmi3OK) {
-        casadi_warning("fmi3GetFloat64 failed");
-        return 1;
-      }
+  if (!vr_aux_real_.empty()) {
+    fmi3Status status = get_float64_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
+      get_ptr(aux_value.v_real), aux_value.v_real.size());
+    if (status != fmi3OK) {
+      casadi_warning("fmi3GetFloat64 failed");
+      return 1;
     }
   }
 

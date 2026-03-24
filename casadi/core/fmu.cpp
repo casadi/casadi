@@ -462,7 +462,6 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   start_time_ = dae->start_time_;
   nx_ = dae->size(Category::X);
   do_evaluation_dance_ = dae->generation_tool_.rfind("Simulink", 0) == 0;
-  unroll_fmu_getset_ = dae->unroll_fmu_getset_;
 
   // Mark input indices
   size_t numel = 0;
