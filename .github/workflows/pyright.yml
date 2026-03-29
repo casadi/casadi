@@ -16,7 +16,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y swig
           python -m pip install --upgrade pip
-          python -m pip install numpy pyright
+          python -m pip install numpy matplotlib scipy pyright
       - name: Build Python bindings
         run: |
           cmake -Bbuild -DWITH_SELFCONTAINED=ON -DWITH_BUILD_REQUIRED=ON -DWITH_COMMON=OFF -DWITH_PYTHON=ON -DWITH_PYTHON3=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -S.
@@ -30,3 +30,7 @@ jobs:
         run: |
           cd test/typing
           pyright --project pyrightconfig.json
+      - name: Run pyright on repo examples
+        run: |
+          cd test/typing
+          pyright --project pyright_examplesconfig.json
