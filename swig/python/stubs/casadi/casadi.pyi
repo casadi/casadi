@@ -1,6 +1,21 @@
 from __future__ import annotations
 
 from typing import Any, Iterator, Mapping, Self, Sequence, Tuple, overload
+from ._api_surface import *
+from ._api_surface import Callback as _SurfaceCallback
+from ._api_surface import CasadiMeta as _SurfaceCasadiMeta
+from ._api_surface import DM as _SurfaceDM
+from ._api_surface import DaeBuilder as _SurfaceDaeBuilder
+from ._api_surface import Function as _SurfaceFunction
+from ._api_surface import GlobalOptions as _SurfaceGlobalOptions
+from ._api_surface import Importer as _SurfaceImporter
+from ._api_surface import Linsol as _SurfaceLinsol
+from ._api_surface import MX as _SurfaceMX
+from ._api_surface import NlpBuilder as _SurfaceNlpBuilder
+from ._api_surface import Opti as _SurfaceOpti
+from ._api_surface import OptiSol as _SurfaceOptiSol
+from ._api_surface import Sparsity as _SurfaceSparsity
+from ._api_surface import SX as _SurfaceSX
 
 __version__: str
 __all__: list[str]
@@ -19,10 +34,10 @@ OP_TWICE: int
 
 
 class _CasadiObject:
-    def __getattr__(self, name: str) -> Any: ...
+    ...
 
 
-class Sparsity(_CasadiObject):
+class Sparsity(_SurfaceSparsity, _CasadiObject):
     inf: float
     nan: float
     def __init__(self, *args: Any) -> None: ...
@@ -75,7 +90,7 @@ class _CasadiMatrix(_CasadiObject):
     def __ge__(self, other: Any) -> Self: ...
 
 
-class DM(_CasadiMatrix):
+class DM(_SurfaceDM, _CasadiMatrix):
     inf: float
     nan: float
     def __init__(self, *args: Any) -> None: ...
@@ -91,7 +106,7 @@ class DM(_CasadiMatrix):
     def sparse(self) -> Any: ...
 
 
-class SX(_CasadiMatrix):
+class SX(_SurfaceSX, _CasadiMatrix):
     def __init__(self, *args: Any) -> None: ...
     @staticmethod
     def sym(name: str, *args: Any) -> SX: ...
@@ -103,7 +118,7 @@ class SX(_CasadiMatrix):
     def eye(n: int) -> SX: ...
 
 
-class MX(_CasadiMatrix):
+class MX(_SurfaceMX, _CasadiMatrix):
     def __init__(self, *args: Any) -> None: ...
     @staticmethod
     def sym(name: str, *args: Any) -> MX: ...
@@ -115,7 +130,7 @@ class MX(_CasadiMatrix):
     def eye(n: int) -> MX: ...
 
 
-class Function(_CasadiObject):
+class Function(_SurfaceFunction, _CasadiObject):
     def __init__(self, *args: Any) -> None: ...
     def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
     def jacobian(self) -> Function: ...
@@ -143,11 +158,11 @@ class Function(_CasadiObject):
     def nnz_out(self, oname: str) -> int: ...
 
 
-class OptiSol(_CasadiObject):
+class OptiSol(_SurfaceOptiSol, _CasadiObject):
     def value(self, x: Any, values: Sequence[MX] = ...) -> Any: ...
 
 
-class Opti(_CasadiObject):
+class Opti(_SurfaceOpti, _CasadiObject):
     debug: Any
     f: Any
     g: Any
@@ -168,30 +183,30 @@ class Opti(_CasadiObject):
     def value(self, x: Any, values: Sequence[MX] = ...) -> Any: ...
 
 
-class Callback(_CasadiObject):
+class Callback(_SurfaceCallback, _CasadiObject):
     def __init__(self, *args: Any) -> None: ...
     def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
 
 
-class Importer(_CasadiObject):
+class Importer(_SurfaceImporter, _CasadiObject):
     def __init__(self, *args: Any) -> None: ...
     @staticmethod
     def has_plugin(name: str) -> bool: ...
 
 
-class NlpBuilder(_CasadiObject):
+class NlpBuilder(_SurfaceNlpBuilder, _CasadiObject):
     def __init__(self, *args: Any) -> None: ...
 
 
-class DaeBuilder(_CasadiObject):
+class DaeBuilder(_SurfaceDaeBuilder, _CasadiObject):
     def __init__(self, *args: Any) -> None: ...
 
 
-class Linsol(Function):
+class Linsol(_SurfaceLinsol, Function):
     def __init__(self, *args: Any) -> None: ...
 
 
-class GlobalOptions:
+class GlobalOptions(_SurfaceGlobalOptions):
     @staticmethod
     def setCasadiPath(path: str) -> None: ...
     @staticmethod
@@ -202,7 +217,7 @@ class GlobalOptions:
     def getCasadiIncludePath() -> str: ...
 
 
-class CasadiMeta:
+class CasadiMeta(_SurfaceCasadiMeta):
     @staticmethod
     def version() -> str: ...
     @staticmethod
@@ -419,6 +434,3 @@ def nlpsol_out() -> list[str]: ...
 @overload
 def nlpsol_out(ind: int) -> str: ...
 def nlpsol_n_out() -> int: ...
-
-
-def __getattr__(name: str) -> Any: ...

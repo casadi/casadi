@@ -24,12 +24,25 @@ jobs:
       - name: Verify inline stubs are installed
         run: |
           test -f install/casadi/__init__.pyi
+          test -f install/casadi/_api_surface.pyi
           test -f install/casadi/casadi.pyi
           test -f install/casadi/py.typed
+      - name: Verify generated API surface stub is current
+        env:
+          PYTHONPATH: ${{ github.workspace }}/install
+        run: |
+          python test/typing/generate_api_surface.py stub --module casadi --output swig/python/stubs/casadi/_api_surface.pyi --check
       - name: Run pyright smoke test
         run: |
           cd test/typing
           pyright --project pyrightconfig.json
+      - name: Run pyright on full exported API surface
+        env:
+          PYTHONPATH: ${{ github.workspace }}/install
+        run: |
+          python test/typing/generate_api_surface.py access-check --module casadi --output test/typing/_generated_api_surface_check.py
+          cd test/typing
+          pyright --project pyright_api_surfaceconfig.json
       - name: Run pyright on repo examples
         run: |
           cd test/typing
