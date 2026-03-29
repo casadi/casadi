@@ -236,6 +236,15 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
   COMPONENT install_python
 )
 
+# Install inline typing metadata for the Python package.
+install(FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/stubs/casadi/__init__.pyi
+  ${CMAKE_CURRENT_SOURCE_DIR}/stubs/casadi/casadi.pyi
+  ${CMAKE_CURRENT_SOURCE_DIR}/stubs/casadi/py.typed
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+)
+
 # Install pip metadata files to ensure that casadi installed via CMake is listed by pip list
 # See https://packaging.python.org/specifications/recording-installed-packages/
 # and https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata
