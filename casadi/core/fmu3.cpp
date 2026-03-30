@@ -438,7 +438,8 @@ int Fmu3::get_aux_impl(void* instance, Value& aux_value) const {
   // Get real auxilliary variables
   if (unroll_fmu_getset_) {
     // Workaround for vector call bug (to be removed when resolved)
-    casadi_assert(vr_aux_real_.size() == aux_value.v_real.size(), "Vector valued variables not supported");
+    casadi_assert(vr_aux_real_.size() == aux_value.v_real.size(),
+      "Vector valued variables not supported");
     for (size_t k = 0; k < vr_aux_real_.size(); ++k) {
       fmi3Status status = get_float64_(c, &vr_aux_real_[k], 1, &aux_value.v_real[k], 1);
       if (status != fmi3OK) {

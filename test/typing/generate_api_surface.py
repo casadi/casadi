@@ -213,6 +213,10 @@ METHOD_OVERRIDES = {
         "def __call__(self, *args: \"DM | SX | MX\") -> _FunctionOutput: ...",
         "def __call__(self, **kwargs: \"DM | SX | MX\") -> Mapping[str, _FunctionOutput]: ...",
     ],
+    ("Function", "bspline"): [
+        "@staticmethod",
+        "def bspline(name: str, knots: Sequence[Sequence[float]], coeffs: Sequence[float], degree: Sequence[int], m: int, opts: Mapping[str, GenericType]) -> Function: ...",
+    ],
     ("Function", "__init__"): [
         "def __init__(self) -> None: ...",
         "def __init__(self, fname: str) -> None: ...",
@@ -301,6 +305,9 @@ FUNCTION_OVERRIDES = {
     "FileDeserializer_swigregister": ["def FileDeserializer_swigregister(cls: type[FileDeserializer]) -> None: ..."],
     "FileSerializer_swigregister": ["def FileSerializer_swigregister(cls: type[FileSerializer]) -> None: ..."],
     "FunctionBuffer_swigregister": ["def FunctionBuffer_swigregister(cls: type[FunctionBuffer]) -> None: ..."],
+    "Function_bspline": [
+        "def Function_bspline(name: str, knots: Sequence[Sequence[float]], coeffs: Sequence[float], degree: Sequence[int], m: int, opts: Mapping[str, GenericType]) -> Function: ...",
+    ],
     "Function_swigregister": ["def Function_swigregister(cls: type[Function]) -> None: ..."],
     "GenDM_swigregister": ["def GenDM_swigregister(cls: type[GenDM]) -> None: ..."],
     "GenMX_swigregister": ["def GenMX_swigregister(cls: type[GenMX]) -> None: ..."],
