@@ -177,6 +177,7 @@ METHOD_OVERRIDES = {
         "def __call__(self, *args: \"DM | SX | MX\") -> _FunctionOutput: ...",
         "def __call__(self, **kwargs: \"DM | SX | MX\") -> Mapping[str, _FunctionOutput]: ...",
     ],
+    ("Callback", "cache"): ["def cache(self) -> Mapping[str, GenericType]: ..."],
     ("Callback", "repr"): ["def repr(self) -> str: ..."],
     ("DM", "__abs__"): ["def __abs__(self) -> DM: ..."],
     ("DM", "__array__"): ["def __array__(self, *args: str | tuple[np.ufunc, tuple[NDArray[np.float64], ...], int] | tuple[np.ufunc, tuple[NDArray[np.float64], ...], int, NDArray[np.float64]]) -> NDArray[np.float64]: ..."],
@@ -229,6 +230,7 @@ METHOD_OVERRIDES = {
         "def __init__(self, name: str, ex_in: Sequence[MX], ex_out: Sequence[MX], name_in: Sequence[str], name_out: Sequence[str], opts: Mapping[str, GenericType] = ...) -> None: ...",
     ],
     ("Function", "buffer"): ["def buffer(self) -> tuple[FunctionBuffer, Callable[..., None]]: ..."],
+    ("Function", "cache"): ["def cache(self) -> Mapping[str, GenericType]: ..."],
     ("Function", "repr"): ["def repr(self) -> str: ..."],
     ("MX", "sym"): [
         "@staticmethod",
