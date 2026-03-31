@@ -75,8 +75,8 @@ struct casadi_ccopt_data {
   CNLPModel* nlp_model;
   OptsDict* nlp_opts;
   OptsDict* mpcc_opts;
-  MadNLPCExecutionStats* stats;
-  MadNLPCSolver* solver;
+  RelaxationExecutionStats* stats;
+  RelaxationSolver* solver;
 };
 // C-REPLACE "casadi_ccopt_data<T1>" "struct casadi_ccopt_data"
 
@@ -217,9 +217,9 @@ int casadi_ccopt_init_mem(casadi_ccopt_data<T1>* d) {
 // SYMBOL "ccopt_free_mem"
 template<typename T1>
 void ccopt_free_mem(casadi_ccopt_data<T1>* d) {
-  madnlpc_delete_solver(d->solver);
+  ccopt_relaxation_delete_solver(d->solver);
   d->solver = nullptr;
-  madnlpc_delete_stats(d->stats);
+  ccopt_relaxation_delete_stats(d->stats);
   d->stats = nullptr;
   libmad_delete_options_dict(d->nlp_opts);
   libmad_delete_options_dict(d->mpcc_opts);
@@ -286,7 +286,7 @@ int casadi_ccopt_presolve(casadi_ccopt_data<T1>* d) {
     );
   if(ret) return ret; // TODO(@anton) think about what we need to clean up.
 
-  ret = madnlpc_create_solver(&(d->solver), d->mpcc_model, d->nlp_opts, d->mpcc_opts);
+  ret = ccopt_relaxation_create_solver(&(d->solver), d->mpcc_model, d->nlp_opts, d->mpcc_opts);
 
   return ret;
 }
@@ -298,24 +298,24 @@ int casadi_ccopt_solve(casadi_ccopt_data<T1>* d) {
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   const casadi_ccopt_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
-  int ret = madnlpc_solve(d->solver, d->nlp_opts, &(d->stats));
+  int ret = ccopt_relaxation_solve(d->solver, d->nlp_opts, &(d->stats));
   if (ret!=0) {
     // cleanup done in free_mem
     return ret;
   }
   // get objective
-  madnlpc_get_obj(d->stats, &(d_nlp->objective));
+  ccopt_relaxation_get_obj(d->stats, &(d_nlp->objective));
   // get primal solution for x
-  madnlpc_get_solution(d->stats, d_nlp->z);
+  ccopt_relaxation_get_solution(d->stats, d_nlp->z);
   // get the bound multipliers
-  madnlpc_get_bound_multipliers(d->stats, d_nlp->lam);
+  ccopt_relaxation_get_bound_multipliers(d->stats, d_nlp->lam);
   // get the nonlinear constraint function values
-  madnlpc_get_constraints(d->stats, d_nlp->z + p_nlp->nx);
+  ccopt_relaxation_get_constraints(d->stats, d_nlp->z + p_nlp->nx);
   // get the nonlinear constraint multipliers
-  madnlpc_get_multipliers(d->stats, d_nlp->lam + p_nlp->nx);
+  ccopt_relaxation_get_multipliers(d->stats, d_nlp->lam + p_nlp->nx);
 
   bool success_b;
-  madnlpc_get_success(d->stats, &(success_b));
+  ccopt_relaxation_get_success(d->stats, &(success_b));
   if(success_b){
     d->success = 1;
   }
