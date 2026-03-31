@@ -778,10 +778,22 @@ class Signature:
 
 
 def exported_names(value: ModuleType | type) -> list[str]:
+    def is_redundant_module_wrapper(name: str) -> bool:
+        if not isinstance(value, ModuleType) or "_" not in name:
+            return False
+        owner_name, member_name = name.split("_", 1)
+        owner = getattr(value, owner_name, None)
+        if not isinstance(owner, type):
+            return False
+        return hasattr(owner, member_name)
+
     return sorted(
         name
         for name in dir(value)
-        if not name.startswith("_")
+        if (
+            not name.startswith("_")
+            and not is_redundant_module_wrapper(name)
+        )
         or (
             name in SPECIAL_METHODS
             and not isinstance(value, type)
