@@ -121,6 +121,10 @@ jobs:
         prerelease: true
       if: github.event_name != 'pull_request'
     - run: python setup.py sdist && ls && ls dist
+    - uses: actions/upload-artifact@v4.3.1
+      with:
+        name: casadi_source_sdist
+        path: dist/*.tar.gz
     - name: Delete old release assets
       uses: mknejp/delete-release-assets@v1
       with:
@@ -156,20 +160,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.1
       - run: python --version
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.4.1
-      - uses: jgillis/fetch-gh-release-asset@patch-1
+      - uses: actions/download-artifact@v4.1.7
         with:
-          version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
-          regex: true
-          target: "./"
-          file: "casadi-.*.tar.gz"
+          name: casadi_source_sdist
+          path: dist
       - uses: conda-incubator/setup-miniconda@v3.1.0
         with:
           python-version: 3.8
           activate-environment: 3.8
           auto-update-conda: true
-      - run: pip install casadi-*.tar.gz numpy scipy pandas looseversion
+      - run: pip install dist/casadi-*.tar.gz numpy scipy pandas looseversion
         shell: bash -el {0}
       - run: cd test/python && python alltests.py
         shell: bash -el {0}
@@ -1053,6 +1053,7 @@ jobs:
           git config --local user.name "casadibot"
           # If there are changes, commit them
           git commit -a -m "automated commit by docs target [skip ci]" || true
+        if: contains(github.ref, 'release') || contains(github.ref, 'main')
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
@@ -1335,4 +1336,3 @@ jobs:
           python function.py
         shell: pwsh
         if: contains(matrix.image, 'windows')
-

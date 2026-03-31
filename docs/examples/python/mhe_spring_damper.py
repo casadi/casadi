@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 import time
 from casadi.tools import *
 from scipy import linalg
-plt.interactive(True)
+plt.ion()
 
 NP.random.seed(0)
 

@@ -1,0 +1,16 @@
+{
+  "include": [
+    "smoke.py"
+  ],
+  "typeCheckingMode": "basic",
+  "pythonVersion": "3.11",
+  "reportMissingTypeStubs": false,
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": [
+        "../../install"
+      ]
+    }
+  ]
+}

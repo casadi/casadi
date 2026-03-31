@@ -1,0 +1,29 @@
+{
+  "include": [
+    "../../docs/examples/python",
+    "../../docs/api/examples",
+    "../../docs/math_prog_comp_tutorial"
+  ],
+  "typeCheckingMode": "basic",
+  "pythonVersion": "3.11",
+  "reportMissingTypeStubs": false,
+  "reportMissingImports": false,
+  "reportUndefinedVariable": false,
+  "reportWildcardImportFromLibrary": false,
+  "reportAttributeAccessIssue": false,
+  "reportArgumentType": false,
+  "reportCallIssue": false,
+  "reportGeneralTypeIssues": false,
+  "reportOperatorIssue": false,
+  "reportOptionalSubscript": false,
+  "reportRedeclaration": false,
+  "reportUnusedExpression": false,
+  "executionEnvironments": [
+    {
+      "root": "../..",
+      "extraPaths": [
+        "../../install"
+      ]
+    }
+  ]
+}
