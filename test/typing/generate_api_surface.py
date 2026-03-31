@@ -98,24 +98,47 @@ HEADER = [
 ]
 
 RAW_TYPE_MAP = {
+    "AuxOut": "Mapping[str, Sequence[str]]",
     "bool": "bool",
     "casadi_int": "int",
+    "casadi_index": "int",
     "char const *": "str",
     "char*": "str",
+    "DMDict": "Mapping[str, DM]",
+    "Dict": "Mapping[str, GenericType]",
     "double": "float",
     "false": "bool",
     "float": "float",
+    "Function::AuxOut": "Mapping[str, Sequence[str]]",
+    "GenericType::Dict": "Mapping[str, GenericType]",
     "IM": "DM",
     "int": "int",
     "integer": "int",
+    "Matrix< SXElem >": "SX",
+    "Matrix< SXElem>": "SX",
+    "Matrix<SXElem >": "SX",
+    "Matrix<SXElem>": "SX",
+    "Matrix< casadi_int >": "DM",
+    "Matrix< casadi_int>": "DM",
+    "Matrix<casadi_int >": "DM",
+    "Matrix<casadi_int>": "DM",
+    "Matrix< double >": "DM",
+    "Matrix< double>": "DM",
+    "Matrix<double >": "DM",
+    "Matrix<double>": "DM",
+    "MXDict": "Mapping[str, MX]",
     "PyObject *": "_PackedValue",
+    "PyObject*": "_PackedValue",
     "ConstraintType": "int",
     "SerializerBase::SerializationType": "int",
     "ptrdiff_t": "int",
     "size_t": "int",
+    "string": "str",
+    "SpDict": "Mapping[str, Sparsity]",
     "std::string": "str",
     "std::size_t": "int",
     "str": "str",
+    "SXDict": "Mapping[str, SX]",
     "true": "bool",
     "void": "None",
     "casadi::SerializerBase::SerializationType": "int",
@@ -177,7 +200,16 @@ METHOD_OVERRIDES = {
         "def __call__(self, *args: \"DM | SX | MX\") -> _FunctionOutput: ...",
         "def __call__(self, **kwargs: \"DM | SX | MX\") -> Mapping[str, _FunctionOutput]: ...",
     ],
+    ("Callback", "call"): [
+        "def call(self, arg: Mapping[str, DM], always_inline: bool = ..., never_inline: bool = ...) -> Mapping[str, DM]: ...",
+        "def call(self, arg: Sequence[DM], always_inline: bool = ..., never_inline: bool = ...) -> Sequence[DM]: ...",
+        "def call(self, arg: Sequence[SX], always_inline: bool = ..., never_inline: bool = ...) -> Sequence[SX]: ...",
+        "def call(self, arg: Mapping[str, SX], always_inline: bool = ..., never_inline: bool = ...) -> Mapping[str, SX]: ...",
+        "def call(self, arg: Mapping[str, MX], always_inline: bool = ..., never_inline: bool = ...) -> Mapping[str, MX]: ...",
+        "def call(self, arg: Sequence[MX], always_inline: bool = ..., never_inline: bool = ...) -> Sequence[MX]: ...",
+    ],
     ("Callback", "cache"): ["def cache(self) -> Mapping[str, GenericType]: ..."],
+    ("Callback", "generate_lifted"): ["def generate_lifted(self) -> tuple[Function, Function]: ..."],
     ("Callback", "repr"): ["def repr(self) -> str: ..."],
     ("DM", "__abs__"): ["def __abs__(self) -> DM: ..."],
     ("DM", "__array__"): ["def __array__(self, *args: str | tuple[np.ufunc, tuple[NDArray[np.float64], ...], int] | tuple[np.ufunc, tuple[NDArray[np.float64], ...], int, NDArray[np.float64]]) -> NDArray[np.float64]: ..."],
@@ -185,7 +217,23 @@ METHOD_OVERRIDES = {
     ("DM", "__getitem__"): ["def __getitem__(self, s: _ArrayKey) -> DM: ..."],
     ("DM", "__iter__"): ["def __iter__(self) -> Iterator[Never]: ..."],
     ("DM", "__setitem__"): ["def __setitem__(self, s: _ArrayKey, val: _ArrayData | DM) -> None: ..."],
+    ("DM", "full"): ["def full(self) -> NDArray[np.float64]: ..."],
+    ("DM", "get"): [
+        "def get(self, ind1: bool, sp: Sparsity) -> DM: ...",
+        "def get(self, ind1: bool, rr: Slice) -> DM: ...",
+        "def get(self, ind1: bool, rr: DM) -> DM: ...",
+        "def get(self, ind1: bool, rr: Slice, cc: Slice) -> DM: ...",
+        "def get(self, ind1: bool, rr: Slice, cc: DM) -> DM: ...",
+        "def get(self, ind1: bool, rr: DM, cc: Slice) -> DM: ...",
+        "def get(self, ind1: bool, rr: DM, cc: DM) -> DM: ...",
+    ],
+    ("DM", "get_nz"): [
+        "def get_nz(self, ind1: bool, k: Slice) -> DM: ...",
+        "def get_nz(self, ind1: bool, k: DM) -> DM: ...",
+    ],
+    ("DM", "print_split"): ["def print_split(self) -> tuple[Sequence[str], Sequence[str]]: ..."],
     ("DM", "repr"): ["def repr(self) -> str: ..."],
+    ("DM", "sparse"): ["def sparse(self) -> csc_matrix: ..."],
     ("DM", "sym"): [
         "@staticmethod",
         "def sym(name: str) -> DM: ...",
@@ -206,6 +254,7 @@ METHOD_OVERRIDES = {
     ],
     ("DM", "toarray"): ["def toarray(self, simplify: bool = ...) -> float | NDArray[np.float64]: ..."],
     ("DM", "tocsc"): ["def tocsc(self) -> csc_matrix: ..."],
+    ("DaeBuilder", "export_fmu"): ["def export_fmu(self, opts: Mapping[str, GenericType] = ...) -> dict[str, GenericType]: ..."],
     ("DeserializerBase", "__init__"): ["def __init__(self) -> None: ..."],
     ("DeserializerBase", "unpack"): [
         "def unpack(self) -> _PackedValue: ..."
@@ -237,7 +286,60 @@ METHOD_OVERRIDES = {
     ],
     ("Function", "buffer"): ["def buffer(self) -> tuple[FunctionBuffer, Callable[..., None]]: ..."],
     ("Function", "cache"): ["def cache(self) -> Mapping[str, GenericType]: ..."],
+    ("Function", "call"): [
+        "def call(self, arg: Mapping[str, DM], always_inline: bool = ..., never_inline: bool = ...) -> Mapping[str, DM]: ...",
+        "def call(self, arg: Sequence[DM], always_inline: bool = ..., never_inline: bool = ...) -> Sequence[DM]: ...",
+        "def call(self, arg: Sequence[SX], always_inline: bool = ..., never_inline: bool = ...) -> Sequence[SX]: ...",
+        "def call(self, arg: Mapping[str, SX], always_inline: bool = ..., never_inline: bool = ...) -> Mapping[str, SX]: ...",
+        "def call(self, arg: Mapping[str, MX], always_inline: bool = ..., never_inline: bool = ...) -> Mapping[str, MX]: ...",
+        "def call(self, arg: Sequence[MX], always_inline: bool = ..., never_inline: bool = ...) -> Sequence[MX]: ...",
+    ],
+    ("Function", "generate_lifted"): ["def generate_lifted(self) -> tuple[Function, Function]: ..."],
     ("Function", "repr"): ["def repr(self) -> str: ..."],
+    ("MX", "__getitem__"): [
+        "def __getitem__(self, ind1: bool, rr: int) -> MX: ...",
+        "def __getitem__(self, ind1: bool, sp: Sparsity) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: Slice) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: DM) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: MX) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: int, cc: int) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: int, cc: Slice) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: Slice, cc: int) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: Slice, cc: Slice) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: Slice, cc: DM) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: Slice, cc: MX) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: DM, cc: Slice) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: DM, cc: DM) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: MX, cc: Slice) -> MX: ...",
+        "def __getitem__(self, ind1: bool, rr: MX, cc: MX) -> MX: ...",
+    ],
+    ("MX", "eval_mx"): ["def eval_mx(self, arg: Sequence[MX]) -> Sequence[MX]: ..."],
+    ("MX", "get"): [
+        "def get(self, ind1: bool, rr: int) -> MX: ...",
+        "def get(self, ind1: bool, sp: Sparsity) -> MX: ...",
+        "def get(self, ind1: bool, rr: Slice) -> MX: ...",
+        "def get(self, ind1: bool, rr: DM) -> MX: ...",
+        "def get(self, ind1: bool, rr: MX) -> MX: ...",
+        "def get(self, ind1: bool, rr: int, cc: int) -> MX: ...",
+        "def get(self, ind1: bool, rr: int, cc: Slice) -> MX: ...",
+        "def get(self, ind1: bool, rr: Slice, cc: int) -> MX: ...",
+        "def get(self, ind1: bool, rr: Slice, cc: Slice) -> MX: ...",
+        "def get(self, ind1: bool, rr: Slice, cc: DM) -> MX: ...",
+        "def get(self, ind1: bool, rr: Slice, cc: MX) -> MX: ...",
+        "def get(self, ind1: bool, rr: DM, cc: Slice) -> MX: ...",
+        "def get(self, ind1: bool, rr: DM, cc: DM) -> MX: ...",
+        "def get(self, ind1: bool, rr: MX, cc: Slice) -> MX: ...",
+        "def get(self, ind1: bool, rr: MX, cc: MX) -> MX: ...",
+    ],
+    ("MX", "get_nz"): [
+        "def get_nz(self, ind1: bool, kk: int) -> MX: ...",
+        "def get_nz(self, ind1: bool, kk: Slice) -> MX: ...",
+        "def get_nz(self, ind1: bool, kk: DM) -> MX: ...",
+        "def get_nz(self, ind1: bool, kk: MX) -> MX: ...",
+        "def get_nz(self, ind1: bool, inner: Slice, outer: MX) -> MX: ...",
+        "def get_nz(self, ind1: bool, inner: MX, outer: Slice) -> MX: ...",
+        "def get_nz(self, ind1: bool, inner: MX, outer: MX) -> MX: ...",
+    ],
     ("MX", "sym"): [
         "@staticmethod",
         "def sym(name: str) -> MX: ...",
@@ -276,6 +378,29 @@ METHOD_OVERRIDES = {
         "def variable(self, symbol: MX, attribute: str = ...) -> MX: ...",
     ],
     ("SerializerBase", "__init__"): ["def __init__(self) -> None: ..."],
+    ("SX", "__getitem__"): [
+        "def __getitem__(self, ind1: bool, sp: Sparsity) -> SX: ...",
+        "def __getitem__(self, ind1: bool, rr: Slice) -> SX: ...",
+        "def __getitem__(self, ind1: bool, rr: DM) -> SX: ...",
+        "def __getitem__(self, ind1: bool, rr: Slice, cc: Slice) -> SX: ...",
+        "def __getitem__(self, ind1: bool, rr: Slice, cc: DM) -> SX: ...",
+        "def __getitem__(self, ind1: bool, rr: DM, cc: Slice) -> SX: ...",
+        "def __getitem__(self, ind1: bool, rr: DM, cc: DM) -> SX: ...",
+    ],
+    ("SX", "get"): [
+        "def get(self, ind1: bool, sp: Sparsity) -> SX: ...",
+        "def get(self, ind1: bool, rr: Slice) -> SX: ...",
+        "def get(self, ind1: bool, rr: DM) -> SX: ...",
+        "def get(self, ind1: bool, rr: Slice, cc: Slice) -> SX: ...",
+        "def get(self, ind1: bool, rr: Slice, cc: DM) -> SX: ...",
+        "def get(self, ind1: bool, rr: DM, cc: Slice) -> SX: ...",
+        "def get(self, ind1: bool, rr: DM, cc: DM) -> SX: ...",
+    ],
+    ("SX", "get_nz"): [
+        "def get_nz(self, ind1: bool, k: Slice) -> SX: ...",
+        "def get_nz(self, ind1: bool, k: DM) -> SX: ...",
+    ],
+    ("SX", "print_split"): ["def print_split(self) -> tuple[Sequence[str], Sequence[str]]: ..."],
     ("SX", "sym"): [
         "@staticmethod",
         "def sym(name: str) -> SX: ...",
@@ -296,7 +421,12 @@ METHOD_OVERRIDES = {
     ],
     ("Sparsity", "__array__"): ["def __array__(self, *args: str | tuple[np.ufunc, tuple[NDArray[np.float64], ...], int] | tuple[np.ufunc, tuple[NDArray[np.float64], ...], int, NDArray[np.float64]]) -> NDArray[np.float64]: ..."],
     ("Sparsity", "__getitem__"): ["def __getitem__(self, s: _ArrayKey) -> Sparsity: ..."],
+    ("Sparsity", "get_ccs"): ["def get_ccs(self) -> tuple[Sequence[int], Sequence[int]]: ..."],
+    ("Sparsity", "get_crs"): ["def get_crs(self) -> tuple[Sequence[int], Sequence[int]]: ..."],
+    ("Sparsity", "get_triplet"): ["def get_triplet(self) -> tuple[Sequence[int], Sequence[int]]: ..."],
+    ("Sparsity", "qr_sparse"): ["def qr_sparse(self, amd: bool = ...) -> tuple[Sparsity, Sparsity, Sequence[int], Sequence[int]]: ..."],
     ("Sparsity", "repr"): ["def repr(self) -> str: ..."],
+    ("Sparsity", "removeDuplicates"): ["def removeDuplicates(self) -> Sequence[int]: ..."],
     ("SwigPyIterator", "__init__"): ["def __init__(self, *args: Never, **kwargs: Never) -> None: ..."],
     ("SwigPyIterator", "__iter__"): ["def __iter__(self) -> Self: ..."],
 }
@@ -361,6 +491,8 @@ FUNCTION_OVERRIDES = {
     "WeakRef_swigregister": ["def WeakRef_swigregister(cls: type[WeakRef]) -> None: ..."],
     "XmlFile_swigregister": ["def XmlFile_swigregister(cls: type[XmlFile]) -> None: ..."],
     "attach_return_type": ["def attach_return_type(f: Callable[_P, _R], t: _ReturnAnnotation) -> Callable[_P, _R]: ..."],
+    "collocation_coeff": ["def collocation_coeff(tau: Sequence[float]) -> tuple[DM, DM, DM]: ..."],
+    "collocation_interpolators": ["def collocation_interpolators(tau: Sequence[float]) -> tuple[Sequence[Sequence[float]], Sequence[float]]: ..."],
     "dcat": [
         "def dcat(args: Sequence[_ScalarLike | DM]) -> DM: ...",
         "def dcat(args: Sequence[_ScalarLike | SX]) -> SX: ...",
@@ -372,6 +504,29 @@ FUNCTION_OVERRIDES = {
         "def diagcat(*args: _ScalarLike | SX) -> SX: ...",
         "def diagcat(*args: _ScalarLike | MX) -> MX: ...",
         "def diagcat(*args: _ScalarLike | Sparsity) -> Sparsity: ...",
+    ],
+    "expand": [
+        "def expand(ex: DM) -> tuple[DM, DM]: ...",
+        "def expand(ex: SX) -> tuple[SX, SX]: ...",
+    ],
+    "extract": [
+        "def extract(ex: Sequence[DM], opts: Mapping[str, GenericType]) -> tuple[Sequence[DM], Sequence[DM], Sequence[DM]]: ...",
+        "def extract(ex: Sequence[SX], opts: Mapping[str, GenericType]) -> tuple[Sequence[SX], Sequence[SX], Sequence[SX]]: ...",
+        "def extract(ex: Sequence[MX], opts: Mapping[str, GenericType]) -> tuple[Sequence[MX], Sequence[MX], Sequence[MX]]: ...",
+    ],
+    "extract_parametric": [
+        "def extract_parametric(expr: DM, par: DM, opts: Mapping[str, GenericType]) -> tuple[DM, Sequence[DM], Sequence[DM]]: ...",
+        "def extract_parametric(expr: DM, par: Sequence[DM], opts: Mapping[str, GenericType]) -> tuple[DM, Sequence[DM], Sequence[DM]]: ...",
+        "def extract_parametric(expr: Sequence[DM], par: DM, opts: Mapping[str, GenericType]) -> tuple[Sequence[DM], Sequence[DM], Sequence[DM]]: ...",
+        "def extract_parametric(expr: Sequence[DM], par: Sequence[DM], opts: Mapping[str, GenericType]) -> tuple[Sequence[DM], Sequence[DM], Sequence[DM]]: ...",
+        "def extract_parametric(expr: SX, par: SX, opts: Mapping[str, GenericType]) -> tuple[SX, Sequence[SX], Sequence[SX]]: ...",
+        "def extract_parametric(expr: SX, par: Sequence[SX], opts: Mapping[str, GenericType]) -> tuple[SX, Sequence[SX], Sequence[SX]]: ...",
+        "def extract_parametric(expr: Sequence[SX], par: SX, opts: Mapping[str, GenericType]) -> tuple[Sequence[SX], Sequence[SX], Sequence[SX]]: ...",
+        "def extract_parametric(expr: Sequence[SX], par: Sequence[SX], opts: Mapping[str, GenericType]) -> tuple[Sequence[SX], Sequence[SX], Sequence[SX]]: ...",
+        "def extract_parametric(expr: MX, par: MX, opts: Mapping[str, GenericType]) -> tuple[MX, Sequence[MX], Sequence[MX]]: ...",
+        "def extract_parametric(expr: MX, par: Sequence[MX], opts: Mapping[str, GenericType]) -> tuple[MX, Sequence[MX], Sequence[MX]]: ...",
+        "def extract_parametric(expr: Sequence[MX], par: MX, opts: Mapping[str, GenericType]) -> tuple[Sequence[MX], Sequence[MX], Sequence[MX]]: ...",
+        "def extract_parametric(expr: Sequence[MX], par: Sequence[MX], opts: Mapping[str, GenericType]) -> tuple[Sequence[MX], Sequence[MX], Sequence[MX]]: ...",
     ],
     "global_pickle_context": [],
     "global_unpickle_context": [],
@@ -387,8 +542,48 @@ FUNCTION_OVERRIDES = {
         "def horzcat(*args: _ScalarLike | MX) -> MX: ...",
         "def horzcat(*args: _ScalarLike | Sparsity) -> Sparsity: ...",
     ],
+    "ldl": [
+        "def ldl(A: DM, amd: bool = ...) -> tuple[DM, DM, Sequence[int]]: ...",
+        "def ldl(A: SX, amd: bool = ...) -> tuple[SX, SX, Sequence[int]]: ...",
+    ],
+    "linear_coeff": [
+        "def linear_coeff(ex: DM, arg: DM, check: bool = ...) -> tuple[DM, DM]: ...",
+        "def linear_coeff(ex: SX, arg: SX, check: bool = ...) -> tuple[SX, SX]: ...",
+        "def linear_coeff(ex: MX, arg: MX, check: bool = ...) -> tuple[MX, MX]: ...",
+    ],
     "pycallback": ["def pycallback(f: Callable[_P, _R]) -> Callable[_P, _R]: ..."],
     "pyevaluate": ["def pyevaluate(f: Callable[_P, _R]) -> Callable[_P, _R]: ..."],
+    "qr": [
+        "def qr(A: DM) -> tuple[DM, DM]: ...",
+        "def qr(A: SX) -> tuple[SX, SX]: ...",
+    ],
+    "qr_sparse": [
+        "def qr_sparse(A: DM, amd: bool = ...) -> tuple[DM, DM, DM, Sequence[int], Sequence[int]]: ...",
+        "def qr_sparse(A: SX, amd: bool = ...) -> tuple[SX, SX, SX, Sequence[int], Sequence[int]]: ...",
+    ],
+    "quadratic_coeff": [
+        "def quadratic_coeff(ex: DM, arg: DM, check: bool = ...) -> tuple[DM, DM, DM]: ...",
+        "def quadratic_coeff(ex: SX, arg: SX, check: bool = ...) -> tuple[SX, SX, SX]: ...",
+        "def quadratic_coeff(ex: MX, arg: MX, check: bool = ...) -> tuple[MX, MX, MX]: ...",
+    ],
+    "separate_linear": [
+        "def separate_linear(expr: DM, sym_lin: DM, sym_const: DM) -> tuple[DM, DM, DM]: ...",
+        "def separate_linear(expr: DM, sym_lin: Sequence[DM], sym_const: Sequence[DM]) -> tuple[DM, DM, DM]: ...",
+        "def separate_linear(expr: SX, sym_lin: SX, sym_const: SX) -> tuple[SX, SX, SX]: ...",
+        "def separate_linear(expr: SX, sym_lin: Sequence[SX], sym_const: Sequence[SX]) -> tuple[SX, SX, SX]: ...",
+        "def separate_linear(expr: MX, sym_lin: MX, sym_const: MX) -> tuple[MX, MX, MX]: ...",
+        "def separate_linear(expr: MX, sym_lin: Sequence[MX], sym_const: Sequence[MX]) -> tuple[MX, MX, MX]: ...",
+    ],
+    "shared": [
+        "def shared(ex: Sequence[DM], v_prefix: str = ..., v_suffix: str = ...) -> tuple[Sequence[DM], Sequence[DM], Sequence[DM]]: ...",
+        "def shared(ex: Sequence[SX], v_prefix: str = ..., v_suffix: str = ...) -> tuple[Sequence[SX], Sequence[SX], Sequence[SX]]: ...",
+        "def shared(ex: Sequence[MX], v_prefix: str = ..., v_suffix: str = ...) -> tuple[Sequence[MX], Sequence[MX], Sequence[MX]]: ...",
+    ],
+    "substitute_inplace": [
+        "def substitute_inplace(v: Sequence[DM], INOUT1: Sequence[DM], INOUT2: Sequence[DM], reverse: bool = ...) -> tuple[Sequence[DM], Sequence[DM]]: ...",
+        "def substitute_inplace(v: Sequence[SX], INOUT1: Sequence[SX], INOUT2: Sequence[SX], reverse: bool = ...) -> tuple[Sequence[SX], Sequence[SX]]: ...",
+        "def substitute_inplace(v: Sequence[MX], INOUT1: Sequence[MX], INOUT2: Sequence[MX], reverse: bool = ...) -> tuple[Sequence[MX], Sequence[MX]]: ...",
+    ],
     "swig_typename_convertor_python2cpp": ["def swig_typename_convertor_python2cpp(a: _TypeNameValue) -> str: ..."],
     "swigtypeconvertor": ["def swigtypeconvertor(*args: _TypeNameValue) -> str: ..."],
     "vcat": [
@@ -647,13 +842,12 @@ def sanitize_name(name: str) -> str:
 def strip_namespace(type_text: str) -> str:
     text = type_text.strip()
     text = text.replace("casadi::", "")
-    text = text.replace("std::allocator< ", "")
-    text = text.replace("std::allocator<", "")
-    text = text.replace(" > >", ">>")
-    text = text.replace(" > >", ">>")
-    text = text.replace(" const &", "")
-    text = text.replace(" &", "")
+    text = text.replace("std::", "")
     text = text.replace(" const *", "*")
+    text = text.replace(" *", "*")
+    text = text.replace("&", "")
+    text = re.sub(r"\bconst\b", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
     return text
 
 
@@ -690,13 +884,13 @@ def normalize_type(type_text: str, known_types: set[str]) -> str:
     if text == "dict":
         return "Mapping[str, GenericType]"
 
-    if text.startswith("std::pair<") and text.endswith(">"):
-        inner = text[len("std::pair<") : -1]
+    if text.startswith("pair<") and text.endswith(">"):
+        inner = text[len("pair<") : -1]
         left, right = split_top_level(inner)
         return f"tuple[{normalize_type(left, known_types)}, {normalize_type(right, known_types)}]"
 
-    if text.startswith("std::vector<") and text.endswith(">"):
-        inner = text[len("std::vector<") : -1]
+    if text.startswith("vector<") and text.endswith(">"):
+        inner = text[len("vector<") : -1]
         element = split_top_level(inner)[0]
         return f"Sequence[{normalize_type(element, known_types)}]"
 
@@ -793,6 +987,9 @@ def parse_parameter(token: str, known_types: set[str], index: int) -> Parameter:
     else:
         default = False
 
+    if name_text == "self":
+        return Parameter("self", None)
+
     return Parameter(
         sanitize_name(name_text),
         normalize_type(type_text, known_types),
@@ -814,6 +1011,8 @@ def parse_signature_line(
         return_type = normalize_type(return_text.strip(), known_types)
     else:
         call_text = signature_text
+        return_type = "None"
+    if constructor:
         return_type = "None"
 
     params_text = call_text[call_text.index("(") + 1 : call_text.rindex(")")]
@@ -1081,14 +1280,21 @@ def render_callable_signatures(
         )
 
     doc = getattr(callable_value, "__doc__", "") or ""
-    signatures = extract_doc_signatures(
-        owner_name if constructor and owner_name is not None else member_name,
-        doc,
-        known_types,
-        constructor=constructor,
-        method=owner_name is not None,
-        static=static,
-    )
+    signature_targets = [member_name]
+    if constructor and owner_name is not None:
+        signature_targets.append(owner_name)
+    signatures: list[Signature] = []
+    for signature_target in signature_targets:
+        signatures = extract_doc_signatures(
+            signature_target,
+            doc,
+            known_types,
+            constructor=constructor,
+            method=owner_name is not None,
+            static=static,
+        )
+        if signatures:
+            break
     if not signatures and owner_name is None and "_" in member_name:
         signatures = extract_doc_signatures(
             member_name.split("_", 1)[1],
@@ -1243,6 +1449,9 @@ def parse_stub_signature(
 def render_property_type(
     module: ModuleType, owner_name: str, member_name: str, known_types: set[str]
 ) -> str:
+    if member_name == "thisown":
+        return "bool"
+
     override = PROPERTY_TYPE_OVERRIDES.get((owner_name, member_name))
     if override is not None:
         return override
@@ -1289,6 +1498,14 @@ def infer_runtime_type(value) -> str:
     class_name = value.__class__.__name__
     if isinstance(value, bool):
         return "bool"
+    if isinstance(value, dict):
+        if not value:
+            return "dict[str, GenericType]"
+        first_key = next(iter(value))
+        key_type = infer_runtime_type(first_key)
+        first_value = next(iter(value.values()))
+        value_type = infer_runtime_type(first_value)
+        return f"dict[{key_type}, {value_type}]"
     if isinstance(value, int):
         return "int"
     if isinstance(value, float):
@@ -1309,12 +1526,24 @@ def infer_runtime_type(value) -> str:
     raise ValueError(f"cannot infer runtime type for {value!r}")
 
 
+def access_check_sample_expression(class_name: str) -> str | None:
+    if not class_name or not class_name[0].isupper():
+        return None
+    return f"cast(ca.{class_name}, None)"
+
+
 def render_class(name: str, cls, module: ModuleType, known_types: set[str]) -> list[str]:
     override = CLASS_OVERRIDES.get(name)
     if override is not None:
         return override
 
-    lines = [f"class {name}:"]
+    bases = [
+        base.__name__
+        for base in cls.__bases__
+        if base is not object and getattr(base, "__name__", "") in known_types
+    ]
+    base_clause = f"({', '.join(bases)})" if bases else ""
+    lines = [f"class {name}{base_clause}:"]
     members = exported_names(cls)
     if not members:
         lines.append("    ...")
@@ -1427,10 +1656,17 @@ def render_stub(module_name: str) -> str:
 
 def render_access_check(module_name: str) -> str:
     module = importlib.import_module(module_name)
+    import_target = (
+        f"import {module_name}._api_surface as ca"
+        if module_name == "casadi"
+        else f"import {module_name} as ca"
+    )
     lines = [
         "from __future__ import annotations",
         "",
-        f"import {module_name} as ca",
+        "from typing import cast",
+        "",
+        import_target,
         "",
         "def touch(value: object) -> None: ...",
         "",
@@ -1442,7 +1678,23 @@ def render_access_check(module_name: str) -> str:
             continue
         lines.append(f"touch(ca.{name})")
         if isinstance(obj, type):
+            sample_expr = access_check_sample_expression(name)
+            sample_name = f"_sample_{sanitize_name(name)}"
+            if sample_expr is not None:
+                lines.append(f"{sample_name} = {sample_expr}")
             for member in exported_names(obj):
+                descriptor = inspect.getattr_static(obj, member)
+                attr = getattr(obj, member)
+                if inspect.isdatadescriptor(descriptor) or not callable(attr):
+                    if sample_expr is not None:
+                        lines.append(f"touch({sample_name}.{member})")
+                    continue
+                if member == "__init__" or isinstance(descriptor, (staticmethod, classmethod)):
+                    lines.append(f"touch(ca.{name}.{member})")
+                    continue
+                if sample_expr is not None:
+                    lines.append(f"touch({sample_name}.{member})")
+                    continue
                 lines.append(f"touch(ca.{name}.{member})")
 
     return "\n".join(lines).rstrip() + "\n"
