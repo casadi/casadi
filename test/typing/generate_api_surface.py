@@ -218,6 +218,12 @@ METHOD_OVERRIDES = {
         "@staticmethod",
         "def bspline(name: str, knots: Sequence[Sequence[float]], coeffs: Sequence[float], degree: Sequence[int], m: int, opts: Mapping[str, GenericType]) -> Function: ...",
     ],
+    ("Function", "conditional"): [
+        "@staticmethod",
+        "def conditional(name: str, f: Function, opts: Mapping[str, GenericType]) -> Function: ...",
+        "@staticmethod",
+        "def conditional(name: str, f: Sequence[Function], f_def: Function, opts: Mapping[str, GenericType]) -> Function: ...",
+    ],
     ("Function", "__init__"): [
         "def __init__(self) -> None: ...",
         "def __init__(self, fname: str) -> None: ...",
@@ -309,6 +315,10 @@ FUNCTION_OVERRIDES = {
     "FunctionBuffer_swigregister": ["def FunctionBuffer_swigregister(cls: type[FunctionBuffer]) -> None: ..."],
     "Function_bspline": [
         "def Function_bspline(name: str, knots: Sequence[Sequence[float]], coeffs: Sequence[float], degree: Sequence[int], m: int, opts: Mapping[str, GenericType]) -> Function: ...",
+    ],
+    "Function_conditional": [
+        "def Function_conditional(name: str, f: Function, opts: Mapping[str, GenericType]) -> Function: ...",
+        "def Function_conditional(name: str, f: Sequence[Function], f_def: Function, opts: Mapping[str, GenericType]) -> Function: ...",
     ],
     "Function_swigregister": ["def Function_swigregister(cls: type[Function]) -> None: ..."],
     "GenDM_swigregister": ["def GenDM_swigregister(cls: type[GenDM]) -> None: ..."],
