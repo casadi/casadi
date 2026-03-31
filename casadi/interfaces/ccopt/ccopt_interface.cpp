@@ -74,12 +74,12 @@ const Options MadmpecInterface::options_
     {"ng",
      {OT_INTVECTOR,
       "Number of constraints"}},
-    {"madnlpc",
-     {OT_DICT,
-      "Options to be passed to madnlpc algorithm"}},
     {"ccopt",
      {OT_DICT,
-      "Options to be passed to ccopt"}},
+      "Options to be passed to ccopt relaxation algorithm"}},
+    {"madnlp",
+     {OT_DICT,
+      "Options to be passed to madnlp"}},
     {"convexify_strategy",
      {OT_STRING,
       "NONE|regularize|eigen-reflect|eigen-clip. "
@@ -152,9 +152,9 @@ void MadmpecInterface::init(const Dict& opts) {
       convexify_margin = op.second;
     } else if (op.first=="max_iter") {
       max_iter_eig = op.second;
-    } else if (op.first=="ccopt") {
+    } else if (op.first=="madnlp") {
       flatten_opts(opts_, op.second, "");
-    } else if (op.first=="madnlpc") {
+    } else if (op.first=="ccopt") {
       flatten_opts(mpcc_opts_, op.second, "");
     } else if (op.first=="ind_cc") {
       ind_cc = op.second;
@@ -344,17 +344,18 @@ Dict MadmpecInterface::get_stats(void* mem) const {
   Dict stats = Nlpsol::get_stats(mem);
   auto m = static_cast<MadmpecMemory*>(mem);
   libmad_int iter, status;
-  double primal_feas, dual_feas, cc_feas;
+  double primal_feas, dual_feas, cc_feas, total_wall_time;
   std::vector<libmad_real> multipliers_x1, multipliers_x2;
   multipliers_x1.resize(ind_cc1_.size());
   multipliers_x2.resize(ind_cc2_.size());
-  madnlpc_get_iters(m->d.stats, &iter);
-  madnlpc_get_status(m->d.stats, &status);
-  madnlpc_get_dual_feas(m->d.stats, &dual_feas);
-  madnlpc_get_primal_feas(m->d.stats, &primal_feas);
-  madnlpc_get_cc_feas(m->d.stats, &cc_feas);
-  madnlpc_get_multipliers_x1(m->d.stats, multipliers_x1.data());
-  madnlpc_get_multipliers_x2(m->d.stats, multipliers_x2.data());
+  ccopt_relaxation_get_iters(m->d.stats, &iter);
+  ccopt_relaxation_get_total_wall_time(m->d.stats, &total_wall_time);
+  ccopt_relaxation_get_status(m->d.stats, &status);
+  ccopt_relaxation_get_dual_feas(m->d.stats, &dual_feas);
+  ccopt_relaxation_get_primal_feas(m->d.stats, &primal_feas);
+  ccopt_relaxation_get_cc_feas(m->d.stats, &cc_feas);
+  ccopt_relaxation_get_multipliers_x1(m->d.stats, multipliers_x1.data());
+  ccopt_relaxation_get_multipliers_x2(m->d.stats, multipliers_x2.data());
 
   stats["iter_count"] = static_cast<casadi_int>(iter);
   Dict ccopt;
@@ -364,6 +365,7 @@ Dict MadmpecInterface::get_stats(void* mem) const {
   ccopt["status"] = static_cast<casadi_int>(status);
   ccopt["multipliers_x1"] = multipliers_x1;
   ccopt["multipliers_x2"] = multipliers_x2;
+  ccopt["total_wall_time"] = total_wall_time;
   stats["ccopt"] = ccopt;
   return stats;
 }
