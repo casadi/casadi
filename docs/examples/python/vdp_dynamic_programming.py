@@ -36,7 +36,7 @@ NU = 101
 NX = 101
 
 # System dynamics, can be called with matricex
-def f(x1,x2,u):
+def dynamics(x1,x2,u):
   x1_dot = (1 - x2*x2)*x1 - x2 + u
   x2_dot = x1
   q_dot  = x1*x1 + x2*x2 + u*u
@@ -61,10 +61,10 @@ for u in U:
   Q_k = zeros(X1.shape)
   for k in range(NK):
     # RK4 integration for x1, x2 and q
-    k1_x1, k1_x2, k1_q = f(X1_k,                X2_k,                u)
-    k2_x1, k2_x2, k2_q = f(X1_k + DT/2 * k1_x1, X2_k + DT/2 * k1_x2, u)
-    k3_x1, k3_x2, k3_q = f(X1_k + DT/2 * k2_x1, X2_k + DT/2 * k2_x2, u)
-    k4_x1, k4_x2, k4_q = f(X1_k + DT   * k3_x1, X2_k + DT   * k3_x2, u)
+    k1_x1, k1_x2, k1_q = dynamics(X1_k,                X2_k,                u)
+    k2_x1, k2_x2, k2_q = dynamics(X1_k + DT/2 * k1_x1, X2_k + DT/2 * k1_x2, u)
+    k3_x1, k3_x2, k3_q = dynamics(X1_k + DT/2 * k2_x1, X2_k + DT/2 * k2_x2, u)
+    k4_x1, k4_x2, k4_q = dynamics(X1_k + DT   * k3_x1, X2_k + DT   * k3_x2, u)
     X1_k += DT/6*(k1_x1 + 2*k2_x1 + 2*k3_x1 + k4_x1)
     X2_k += DT/6*(k1_x2 + 2*k2_x2 + 2*k3_x2 + k4_x2)
     Q_k  += DT/6*(k1_q  + 2*k2_q  + 2*k3_q  + k4_q )
