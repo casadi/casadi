@@ -71,11 +71,11 @@ struct casadi_ccopt_data {
   const libmad_int *cctypes;
   libmad_int ncc;
 
-  MPCCModel* mpcc_model;
+  CMPCCModel* mpcc_model;
   CNLPModel* nlp_model;
   OptsDict* nlp_opts;
   OptsDict* mpcc_opts;
-  RelaxationExecutionStats* stats;
+  CCOptExecutionStats* stats;
   RelaxationSolver* solver;
 };
 // C-REPLACE "casadi_ccopt_data<T1>" "struct casadi_ccopt_data"
