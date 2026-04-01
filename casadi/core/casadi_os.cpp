@@ -146,14 +146,23 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
         // To avoid that over time the two values diverse due to the use of setenv,
         // we restore the original value of glibc .bss's environ at the end of the function
 
+        // Clear dlerror see notes: man7.org/linux/man-pages/man3/dlsym.3.html
+        char* dlerrors = dlerror();
         // Check if there is a duplicate environ
-        char*** p_environ_rtdl_next = reinterpret_cast<char ***>(dlsym(RTLD_NEXT, "environ"));
-        bool environ_rtdl_next_overridden = false;
+        char*** p_environ_rtld_next = reinterpret_cast<char ***>(dlsym(RTLD_NEXT, "environ"));
+        // Check if errors. In principle no error does not imply non-null return.
+        dlerrors = dlerror();
+        if(dlerrors)
+        {
+						std::cout << "Failed to load environ: " << dlerrors << std::endl;
+        }
+
+        bool environ_rtld_next_overridden = false;
         char** environ_rtld_next_original_value = nullptr;
-        if (p_environ_rtdl_next && p_environ_rtdl_next != &environ) {
-          environ_rtld_next_original_value = *p_environ_rtdl_next;
-          *p_environ_rtdl_next = environ;
-          environ_rtdl_next_overridden = true;
+				if (p_environ_rtld_next && dlerrors == NULL && p_environ_rtld_next != &environ) {
+          environ_rtld_next_original_value = *p_environ_rtld_next;
+          *p_environ_rtld_next = environ;
+          environ_rtld_next_overridden = true;
         }
         #endif
     #endif
@@ -207,9 +216,12 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
     #ifdef WITH_DEEPBIND
     #ifndef __APPLE__
     #if __GLIBC__
-        if (environ_rtdl_next_overridden) {
-          *p_environ_rtdl_next = environ_rtld_next_original_value;
-          environ_rtdl_next_overridden = false;
+		    // If environ_rtld_next_original_value == NULL then this could be because
+		    // it is an undefined weak symbol. Do _not_ put it back and instead
+		    // leave what we put there?
+        if (environ_rtld_next_overridden && environ_rtld_next_original_value) {
+          *p_environ_rtld_next = environ_rtld_next_original_value;
+          environ_rtld_next_overridden = false;
         }
     #endif
     #endif
