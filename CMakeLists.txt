@@ -1428,7 +1428,7 @@ if(WITH_FATROP)
   endif()
 endif()
 
-if((WITH_MADNLP AND WITH_BUILD_MADNLP) OR (WITH_CCOPT AND WITH_BUILD_))
+if((WITH_MADNLP AND WITH_BUILD_MADNLP) OR (WITH_CCOPT AND WITH_BUILD_CCOPT))
   # TODO(@apozharski): This is currently hacky but it avoids julia bulid dependencies. However, this makes crosscompilation a massive headache.
   #                    If CasADi wants to ship with MadNLP it may make more sense to build libMad.
 
