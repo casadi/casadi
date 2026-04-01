@@ -185,6 +185,15 @@ void FmuFunction::change_option(const std::string& option_name,
     const GenericType& option_value) {
   if (option_name == "print_progress") {
     print_progress_ = option_value;
+  } else if (option_name == "step") {
+    step_ = option_value;
+  } else if (option_name == "fd_method") {
+    fd_method_ = option_value.to_string();
+    fd_ = to_enum<FdMode>(fd_method_, "forward");
+  } else if (option_name == "uses_directional_derivatives") {
+    uses_directional_derivatives_ = option_value;
+  } else if (option_name == "fd_flip") {
+    fd_flip_ = option_value;
   } else {
     // Option not found - continue to base classes
     FunctionInternal::change_option(option_name, option_value);
