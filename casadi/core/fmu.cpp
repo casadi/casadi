@@ -915,7 +915,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
           if (m->id_in_[wrt_i] == wrt_id) break;
         }
         // Check if in bounds
-        if (m->in_bounds_.at(wrt_i)) {
+        if (m->in_bounds_.at(wrt_i) && (m->self.fd_flip_ || !m->flip_[i])) {
           // Input was in bounds: Keep output, make dimensionless
           yk[i] /= nominal_out_[m->id_out_[i]];
         } else {

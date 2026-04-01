@@ -167,6 +167,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   // Use FD for second and higher order derivatives
   enable_fd_op_ = fmu.provides_directional_derivatives() && !all_regular();
   step_ = 1e-6;
+  fd_flip_ = true;
   abstol_ = 1e-3;
   reltol_ = 1e-3;
   print_progress_ = false;
@@ -242,6 +243,9 @@ const Options FmuFunction::options_
     {"step",
      {OT_DOUBLE,
       "Step size, scaled by nominal value"}},
+    {"fd_flip",
+     {OT_BOOL,
+      "Allow flipping the sign of the finite difference step to keep it in bounds"}},
     {"abstol",
      {OT_DOUBLE,
       "Absolute error tolerance, scaled by nominal value"}},
@@ -300,6 +304,8 @@ void FmuFunction::init(const Dict& opts) {
       make_symmetric_ = op.second;
     } else if (op.first=="step") {
       step_ = op.second;
+    } else if (op.first=="fd_flip") {
+      fd_flip_ = op.second;
     } else if (op.first=="abstol") {
       abstol_ = op.second;
     } else if (op.first=="reltol") {
