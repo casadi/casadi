@@ -45,7 +45,7 @@ ubg = cs.vertcat(cs.inf, cs.inf)
 nlp = {'x':x, 'f':f, 'g':g}
 
 # Create an NLP solver
-solver = cs.nlpsol("solver", "uno", nlp)
+solver = cs.nlpsol("solver", "uno", nlp, {"uno":{"preset":"ipopt"}})
 
 # Solve the problem
 res = solver(x0  = [-2.0,1.0],

@@ -26,9 +26,8 @@
 #ifndef CASADI_UNO_INTERFACE_HPP
 #define CASADI_UNO_INTERFACE_HPP
 
+#include "uno_nlp.hpp"
 #include <casadi/interfaces/uno/casadi_nlpsol_uno_export.h>
-// #include <optimization/Model.hpp>
-// #include <linear_algebra/RectangularMatrix.hpp>
 
 #include "casadi/core/nlpsol_impl.hpp"
 
@@ -41,45 +40,13 @@
 
     \identifier{22c} */
 
-/** \pluginsection{Nlpsol,knitro} */
-
-
+/** \pluginsection{Nlpsol,uno} */
 
 /// \cond INTERNAL
-
-// extern "C" {
-
-// uno_int objective_function(uno_int number_variables, const double* x, double* objective_value, void* user_data);
-
-// uno_int constraint_functions(uno_int number_variables, uno_int number_constraints, const double* x,
-//             double* constraint_values, void* user_data);
-
-// uno_int objective_gradient(uno_int number_variables, const double* x, double* gradient, void* user_data);
-
-// uno_int jacobian(uno_int number_variables, uno_int number_jacobian_nonzeros, const double* x,
-//             double* jacobian_values, void* user_data);
-
-// uno_int jacobian_operator(uno_int number_variables, uno_int number_constraints, const double* x,
-//             bool evaluate_at_x, const double* vector, double* result, void* user_data);
-
-// uno_int jacobian_transposed_operator(uno_int number_variables, uno_int number_constraints, const double* x,
-//             bool evaluate_at_x, const double* vector, double* result, void* user_data);
-
-// uno_int lagrangian_hessian(uno_int number_variables, uno_int number_constraints, uno_int number_hessian_nonzeros,
-//             const double* x, double objective_multiplier, const double* multipliers, double* hessian_values, void* user_data);
-
-// uno_int lagrangian_hessian_operator(uno_int number_variables, uno_int number_constraints, const double* x,
-//             bool evaluate_at_x, double objective_multiplier, const double* multipliers, const double* vector,
-//             double* result, void* user_data);
-
-// void print_vector(const double* vector, uno_int size);
-
-// } // extern "C"
 
 namespace casadi {
   // Forward declaration
   class UnoInterface;
-  // class CasadiModel;
 
   /*------------------------
   Definition of UnoMemory
@@ -90,6 +57,7 @@ namespace casadi {
 
     void* model;
     void* solver;
+    void* uno_nlp;
     const char* return_status;
     /// Constructor
     UnoMemory(const UnoInterface& uno_interface);
@@ -107,6 +75,7 @@ namespace casadi {
      @copydoc plugin_Nlpsol_uno
   */
   class CASADI_NLPSOL_UNO_EXPORT UnoInterface : public Nlpsol {
+    friend class UnoNlp;
   public:
 
     explicit UnoInterface(const std::string& name, const Function& nlp);
@@ -162,7 +131,6 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-
 
   };
 

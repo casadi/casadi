@@ -54,47 +54,6 @@
 
 extern "C" {
 
-uno_int objective_function(uno_int /*number_variables*/, const double* x, double* objective_value, void* /*user_data*/) {
-      *objective_value = 100.*pow(x[1] - pow(x[0], 2.), 2.) + pow(1. - x[0], 2.);
-      return 0;
-}
-
-uno_int constraint_functions(uno_int /*number_variables*/, uno_int /*number_constraints*/, const double* x,
-            double* constraint_values, void* /*user_data*/) {
-      constraint_values[0] = x[0]*x[1];
-      constraint_values[1] = x[0] + pow(x[1], 2.);
-      return 0;
-}
-
-uno_int objective_gradient(uno_int /*number_variables*/, const double* x, double* gradient, void* /*user_data*/) {
-      gradient[0] = 400.*pow(x[0], 3.) - 400.*x[0]*x[1] + 2.*x[0] - 2.;
-      gradient[1] = 200.*(x[1] - pow(x[0], 2.));
-      return 0;
-}
-
-uno_int jacobian(uno_int /*number_variables*/, uno_int /*number_jacobian_nonzeros*/, const double* x,
-            double* jacobian_values, void* /*user_data*/) {
-      jacobian_values[0] = x[1];
-      jacobian_values[1] = 1.;
-      jacobian_values[2] = x[0];
-      jacobian_values[3] = 2.*x[1];
-      return 0;
-}
-
-uno_int jacobian_operator(uno_int /*number_variables*/, uno_int /*number_constraints*/, const double* x,
-            bool evaluate_at_x, const double* vector, double* result, void* /*user_data*/) {
-      result[0] = x[1]*vector[0] + 1.*vector[1];
-      result[1] = x[0]*vector[0] + 2.*x[1]*vector[1];
-      return 0;
-}
-
-uno_int jacobian_transposed_operator(uno_int /*number_variables*/, uno_int /*number_constraints*/, const double* x,
-            bool evaluate_at_x, const double* vector, double* result, void* /*user_data*/) {
-      result[0] = x[1]*vector[0] + x[0]*vector[1];
-      result[1] = 1.*vector[0] + 2.*x[1]*vector[1];
-      return 0;
-}
-
 uno_int lagrangian_hessian(uno_int /*number_variables*/, uno_int /*number_constraints*/, uno_int /*number_hessian_nonzeros*/,
             const double* x, double objective_multiplier, const double* multipliers, double* hessian_values, void* /*user_data*/) {
       hessian_values[0] = objective_multiplier*(1200*pow(x[0], 2.) - 400.*x[1] + 2.);
@@ -112,13 +71,6 @@ uno_int lagrangian_hessian_operator(uno_int number_variables, uno_int number_con
       result[0] = hessian00*vector[0] + hessian10*vector[1];
       result[1] = hessian10*vector[0] + hessian11*vector[1];
       return 0;
-}
-
-void print_vector(const double* vector, uno_int size) {
-      for (size_t index = 0; index < size; ++index) {
-            printf("%g ", vector[index]);
-      }
-      printf("\n");
 }
 
 } // extern "C"
@@ -146,12 +98,12 @@ namespace casadi {
   Constructor Destructor UnoInterface
   ----------------------------------------------*/
 
-  UnoInterface::UnoInterface(const std::string& name, const Function& nlp)
-    : Nlpsol(name, nlp) {
+  UnoInterface::UnoInterface(const std::string& name, const Function& nlp) : Nlpsol(name, nlp)
+  {
   }
 
-
-  UnoInterface::~UnoInterface() {
+  UnoInterface::~UnoInterface()
+  {
     clear_mem();
   }
 
@@ -163,12 +115,13 @@ namespace casadi {
      }
   };
 
-  UnoMemory::UnoMemory(const UnoInterface& uno_interface) : self(uno_interface), NlpsolMemory() {
+  UnoMemory::UnoMemory(const UnoInterface& uno_interface) : self(uno_interface), NlpsolMemory()
+  {
     this->return_status = "Unset";
   }
 
-  UnoMemory::~UnoMemory() {
-    
+  UnoMemory::~UnoMemory()
+  {
   }
 
   /*----------------------------------------------------------------
@@ -226,309 +179,6 @@ namespace casadi {
 //   //  lagscale_ASL(this->asl, -1., &nerror);
 // }
 
-  /* ------- Define functions to evaluate solver functions  -----------*/
-  // double CasadiModel::evaluate_objective(const std::vector<double>& x) const {
-
-  //   double obj;
-  //   mem_->arg[0] = get_ptr(x);
-  //   mem_->arg[1] = mem_->d_nlp.p;
-  //   mem_->res[0] = &obj;
-  //   casadi_assert(mem_->self.calc_function(mem_, "nlp_f")==0, "Failed to evaluate objective function.");
-  //   return obj;
-  // }
-
-  // void CasadiModel::evaluate_objective_gradient(const std::vector<double>& x, SparseVector<double>& gradient) const {
-
-  //   // Evaluate the objective gradient
-  //   mem_->arg[0] = get_ptr(x);
-  //   mem_->arg[1] = mem_->d_nlp.p;
-  //   mem_->res[0] = get_ptr(casadi_tmp_gradient);
-  //   casadi_assert(mem_->self.calc_function(mem_, "nlp_grad_f")==0, "Failed to evaluate gradient of objective.");
-
-  //   // Write everything into the SparseVector
-  //   for (unsigned int index = 0; index < this->number_variables; ++index){
-  //     // Is the index correct? Start counting at zero?
-  //     gradient.insert(index, casadi_tmp_gradient[index]);
-  //   }
-  // }
-
-  // void CasadiModel::evaluate_constraints(const std::vector<double>& x, std::vector<double>& constraints) const {
-
-  //   mem_->arg[0] = get_ptr(x);
-  //   mem_->arg[1] = mem_->d_nlp.p;
-  //   mem_->res[0] = get_ptr(constraints);
-  //   casadi_assert(mem_->self.calc_function(mem_, "nlp_g")==0, "Failed to evaluate constraints.");
-  // }
-
-  // void CasadiModel::evaluate_constraint_gradient(const std::vector<double>& x, size_t j, SparseVector<double>& gradient) const {
-  //   // Sparsity pattern of jacobian is saved in mem->self ...
-  //   // Evaluate numerically
-  //     mem_->arg[0] = get_ptr(x);
-  //     mem_->arg[1] = mem_->d_nlp.p;
-  //     mem_->res[0] = get_ptr(casadi_tmp_constraint_jacobian);
-  //     casadi_assert(mem_->self.calc_function(mem_, "nlp_jac_g")==0, "Failed to evaluate constraint jacobian.");
-
-  //     // Write everything into gradient...
-  //     gradient.clear();
-  //     size_t n_columns = this->number_variables;
-  //     // std::cout << "We evaluate the constraint gradient." << std::endl;
-
-
-  //     for (size_t l=0; l<n_columns; ++l) {
-  //       for (size_t k= mem_->self.jacg_sp_.colind()[l]; k< mem_->self.jacg_sp_.colind()[l + 1];++k) {
-  //         const size_t i = mem_->self.jacg_sp_.row()[k];
-  //         const double entry = casadi_tmp_constraint_jacobian[k];
-  //         if (i == j)
-  //           gradient.insert(l, entry);
-  //       }
-  //     }
-
-  //     // for (size_t k= mem_->self.jacg_sp_.colind()[j]; k< mem_->self.jacg_sp_.colind()[j + 1];++k) {
-  //     //   const size_t i = mem_->self.jacg_sp_.row()[k];
-  //     //   const double entry = casadi_tmp_hessian[k];
-  //     //   gradient.insert(i, entry);
-  //     // }
-  // }
-
-  // void CasadiModel::evaluate_constraint_jacobian(const std::vector<double>& x, RectangularMatrix<double>& constraint_jacobian) const {
-  //   // Sparsity pattern of jacobian is saved in mem->self ...
-  //   // Evaluate numerically
-  //     mem_->arg[0] = get_ptr(x);
-  //     mem_->arg[1] = mem_->d_nlp.p;
-  //     mem_->res[0] = get_ptr(casadi_tmp_constraint_jacobian);
-  //     casadi_assert(mem_->self.calc_function(mem_, "nlp_jac_g")==0, "Failed to evaluate constraint jacobian.");
-
-  //     // Write everything into RectangularMatrix...
-  //     // std::cout << "Number of variables: " << this->number_variables << std::endl;
-  //     // std::cout << "Number of vectors in constraint jacobian: " << constraint_jacobian.size() << std::endl;
-  //     size_t n_rows = constraint_jacobian.size();
-  //     size_t n_columns = this->number_variables;
-  //     //clear the matrix
-  //     for (size_t i=0; i<n_rows; ++i){
-  //       constraint_jacobian[i].clear();
-  //     }
-
-  //     for (size_t j=0; j<n_columns; ++j) {
-  //       for (size_t k= mem_->self.jacg_sp_.colind()[j]; k< mem_->self.jacg_sp_.colind()[j + 1];++k) {
-  //         const size_t i = mem_->self.jacg_sp_.row()[k];
-  //         const double entry = casadi_tmp_constraint_jacobian[k];
-  //         constraint_jacobian[i].insert(j, entry);
-  //       }
-  //     }
-  // }
-
-  // void CasadiModel::evaluate_lagrangian_hessian(const std::vector<double>& x, double objective_multiplier, const std::vector<double>& multipliers,
-  //        SymmetricMatrix<double>& hessian) const {
-    
-  //   // scale by the objective sign
-  //   objective_multiplier *= this->objective_sign;
-  //   // Evaluate numerically
-  //   mem_->arg[0] = get_ptr(x);
-  //   mem_->arg[1] = mem_->d_nlp.p;
-  //   mem_->arg[2] = &objective_multiplier;
-  //   // Multipliers need to be 
-  //   casadi_copy(get_ptr(multipliers), this->number_constraints, get_ptr(casadi_tmp_multipliers));
-  //   casadi_scal(this->number_constraints, -1., get_ptr(casadi_tmp_multipliers));
-  //   mem_->arg[3] = get_ptr(casadi_tmp_multipliers);
-  //   mem_->res[0] = get_ptr(casadi_tmp_hessian);
-  //   casadi_assert(mem_->self.calc_function(mem_, "nlp_hess_l")==0, "Failed to evaluate Lagrangian hessian.");
-
-
-
-
-
-  //   hessian.reset();
-  //   // Write the hessian into Symmetric matrix ....
-  //   for (size_t j=0; j<this->number_variables;++j) {
-  //     for (size_t k=mem_->self.hesslag_sp_.colind()[j]; k< mem_->self.hesslag_sp_.colind()[j + 1];++k) {
-  //        const size_t i = mem_->self.hesslag_sp_.row()[k];
-  //        if (i <= j){
-  //         const double entry = casadi_tmp_hessian[k];
-  //         hessian.insert(entry, i, j);
-  //        }
-  //     }
-  //     hessian.finalize_column(j);
-  //  }
-  // }
-
-  // double CasadiModel::get_variable_lower_bound(size_t i) const {
-  //   return this->variables_bounds[i].lb;//mem_->d_nlp.lbz[i];
-  // }
-
-  // double CasadiModel::get_variable_upper_bound(size_t i) const {
-  //   return this->variables_bounds[i].ub;//mem_->d_nlp.ubz[i];
-  // }
-
-  // BoundType CasadiModel::get_variable_bound_type(size_t i) const {
-  //   return this->variable_status[i];
-  // }
-
-  // double CasadiModel::get_constraint_lower_bound(size_t j) const {
-  //   return this->constraint_bounds[j].lb;//mem_->d_nlp.lbz[j+this->number_variables];
-  // }
-
-  // double CasadiModel::get_constraint_upper_bound(size_t j) const {
-  //   return this->constraint_bounds[j].ub;//mem_->d_nlp.ubz[j+this->number_variables];
-  // }
-
-  // FunctionType CasadiModel::get_constraint_type(size_t j) const {
-  //   return this->constraint_type[j];
-  // }
-
-  // BoundType CasadiModel::get_constraint_bound_type(size_t j) const {
-  //   return this->constraint_status[j];
-  // }
-
-  // size_t CasadiModel::get_number_objective_gradient_nonzeros() const {
-  //   return this->number_objective_gradient_nonzeros;;
-  // }
-  // size_t CasadiModel::get_number_jacobian_nonzeros() const {
-  //   return this->number_jacobian_nonzeros;
-  // }
-  // size_t CasadiModel::get_number_hessian_nonzeros() const {
-  //   return this->number_hessian_nonzeros;
-  // }
-
-  // void CasadiModel::get_initial_primal_point(std::vector<double>& x) const {
-  //   assert(x.size() >= this->number_variables);
-  //   std::copy(mem_->d_nlp.x0, mem_->d_nlp.x0 + this->number_variables, begin(x));
-  //   // std::cout << "Vector is " << x << std::endl;
-  // }
-  // void CasadiModel::get_initial_dual_point(std::vector<double>& multipliers) const {
-  //   assert(multipliers.size() >= this->number_constraints);
-  //  std::copy(mem_->d_nlp.lam_g0, mem_->d_nlp.lam_g0 + this->number_constraints, begin(multipliers));
-  // }
-  // void CasadiModel::postprocess_solution(Iterate& iterate, TerminationStatus termination_status) const {
-  // // do nothing
-  // }
-
-  // void CasadiModel::generate_variables() {
-  //   // Calculate variable bounds
-  //   for (size_t i=0; i< this->number_variables; ++i) {
-  //     double lb = (mem_->d_nlp.lbx != nullptr) ? *(mem_->d_nlp.lbx+i) : -INF<double>;
-  //     double ub = (mem_->d_nlp.ubx != nullptr) ? *(mem_->d_nlp.ubx+i) : INF<double>;
-  //     if (lb == ub) {
-  //         WARNING << "Variable x" << i << " has identical bounds\n";
-  //     }
-  //     this->variables_bounds[i] = {lb, ub};
-  //     // std::cout << "lbx at" << i << ":" << lb  << std::endl;
-  //     // std::cout << "ubx at" << i << ":" << ub << std::endl;
-  //   }
-
-  //   Model::determine_bounds_types(this->variables_bounds, this->variable_status);
-  //   // figure out the bounded variables
-  //   for (size_t i=0; i< this->number_variables; ++i) {
-  //     const BoundType status = this->get_variable_bound_type(i);
-  //     if (status == BOUNDED_LOWER || status == BOUNDED_BOTH_SIDES) {
-  //         this->lower_bounded_variables.push_back(i);
-  //         if (status == BOUNDED_LOWER) {
-  //           this->single_lower_bounded_variables.push_back(i);
-  //         }
-  //     }
-  //     if (status == BOUNDED_UPPER || status == BOUNDED_BOTH_SIDES) {
-  //         this->upper_bounded_variables.push_back(i);
-  //         if (status == BOUNDED_UPPER) {
-  //           this->single_upper_bounded_variables.push_back(i);
-  //         }
-  //     }
-  //   }
-  // }
-
-  // const std::vector<size_t>& CasadiModel::get_linear_constraints() const {
-  //     return this->linear_constraints;
-  // }
-
-  // void CasadiModel::generate_constraints() {
-  // //  auto d_nlp = &this->mem_->d_nlp;
-  //  for (size_t i=0; i< this->number_constraints; ++i) {
-  //     double lb = (mem_->d_nlp.lbg != nullptr) ? *(this->mem_->d_nlp.lbg+i) : -INF<double>;
-  //     double ub = (mem_->d_nlp.ubg != nullptr) ? *(this->mem_->d_nlp.ubg+i) : INF<double>;
-  //     // std::cout << "Memory location " << d_nlp->x0 << std::endl;
-  //     // double lb = d_nlp->x0[0];//+this->number_variables+i;
-  //     // double ub = *mem_->d_nlp.ubg;//+this->number_variables+i;
-  //     this->constraint_bounds[i] = {lb, ub};
-  //     // std::cout << "lbg at" << i << ":" << lb  << std::endl;
-  //     // std::cout << "ubg at" << i << ":" << ub << std::endl;
-
-  //  }
-  //  Model::determine_bounds_types(this->constraint_bounds, this->constraint_status);
-   
-  //  for (size_t j=0; j<this->number_constraints; ++j) {
-  //     if (this->get_constraint_bound_type(j) == EQUAL_BOUNDS) {
-  //        this->equality_constraints.push_back(j);
-  //     }
-  //     else {
-  //        this->inequality_constraints.push_back(j);
-  //     }
-
-  //   // AMPL orders the constraints based on the function type: nonlinear first, then linear
-  //  for (size_t j=0; j<this->number_constraints; ++j) {
-  //     this->constraint_type[j] = NONLINEAR;
-  //  }
-  //  }
-   
-  // //  this->determine_constraints();
-  // }
-
-  // void CasadiModel::set_function_types(std::string file_name) {
-  //   // // allocate a temporary ASL to read Hessian sparsity pattern
-  //   // ASL* asl_fg = ASL_alloc(ASL_read_fg);
-  //   // // char* stub = getstops(file_name, option_info);
-  //   // //if (file_name == nullptr) {
-  //   // //	usage_ASL(option_info, 1);
-  //   // //}
-
-  //   // FILE* nl = jac0dim_ASL(asl_fg, file_name.data(), static_cast<int>(file_name.size()));
-  //   // // specific read function
-  //   // // qp_read_ASL(asl_fg, nl, ASL_findgroups);
-
-  //   // // // constraints
-  //   // // if (asl_fg->i.n_con_ != static_cast<int>(this->number_constraints)) {
-  //   // //     throw std::length_error("AMPLModel.set_function_types: inconsistent number of constraints");
-  //   // // }
-
-  //   this->constraint_type.reserve(this->number_constraints);
-  //   this->problem_type = NONLINEAR;
-
-  //   // // determine the type of each constraint and objective function
-  //   // // determine if the problem is nonlinear (non-quadratic objective or nonlinear constraints)
-  //   // this->problem_type = LINEAR;
-  //   // int* rowq;
-  //   // int* colqp;
-  //   // double* delsqp;
-  //   // for (size_t j: Range(this->number_constraints)) {
-  //   //     int qp = nqpcheck_ASL(asl_fg, static_cast<int>(-(j + 1)), &rowq, &colqp, &delsqp);
-
-  //   //     if (0 < qp) {
-  //   //       this->constraint_type[j] = QUADRATIC;
-  //   //       this->problem_type = NONLINEAR;
-  //   //     }
-  //   //     else if (qp == 0) {
-  //   //       this->constraint_type[j] = LINEAR;
-  //   //       this->linear_constraints.push_back(j);
-  //   //     }
-  //   //     else {
-  //   //       this->constraint_type[j] = NONLINEAR;
-  //   //       this->problem_type = NONLINEAR;
-  //   //     }
-  //   // }
-  //   // // objective function
-  //   // int qp = nqpcheck_ASL(asl_fg, 0, &rowq, &colqp, &delsqp);
-  //   // if (0 < qp) {
-  //   //     if (this->problem_type == LINEAR) {
-  //   //       this->problem_type = QUADRATIC;
-  //   //     }
-  //   // }
-  //   // else if (qp != 0) {
-  //   //     this->problem_type = NONLINEAR;
-  //   // }
-  //   // qp_opify_ASL(asl_fg);
-
-  //   // // deallocate memory
-  //   // ASL_free(&asl_fg);
-  // }
-
-
   /*------------------------------------------
   UnoInterface function definitions
   -------------------------------------------*/
@@ -584,6 +234,9 @@ namespace casadi {
     uno_int uno_major, uno_minor, uno_patch;
     uno_get_version(&uno_major, &uno_minor, &uno_patch);
     printf("Uno v%d.%d.%d\n", uno_major, uno_minor, uno_patch);
+
+    m->uno_nlp = new UnoNlp(m);
+
    // Casadi model
    // memory should be freed somewhere else
   //  std::cout << "Init Memort acces" << std::endl;
@@ -598,21 +251,11 @@ namespace casadi {
   // }
 
   void UnoInterface::set_work(void* mem, const double**& arg, double**& res,
-                                 casadi_int*& iw, double*& w) const {
-
+                                 casadi_int*& iw, double*& w) const
+  {
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
-
     auto m = static_cast<UnoMemory*>(mem);
-
-// -------------------------------------------------------------------
-
-   // Casadi model
-   // memory should be freed somewhere else
-    // m->model = new CasadiModel("casadi_model", *this, m);
-
-    // std::cout << "Set Work acces" << std::endl;
-
   }
 
   int casadi_KN_puts(const char * const str, void * const userParams) {
@@ -623,7 +266,6 @@ namespace casadi {
 
   void insert_casadi_options(void* solver, Dict opts) {
     // build the (name, value) map
-    std::cout << "tba" << std::endl;
     Dict casadi_options = Options::sanitize(opts);
     
     // Define the preset and erase it from the options file
@@ -637,7 +279,10 @@ namespace casadi {
     }
     uno_set_solver_bool_option(solver, "print_solution", true);
 
-    // // Pass all the options to ipopt
+    // solver creation
+    // uno_set_solver_bool_option(m->solver, "print_solution", true);
+
+    // // Pass all the options to Uno
     // for (auto&& op : casadi_options) {
 
     //   // There might be options with a resto prefix.
@@ -718,78 +363,15 @@ inline const char* return_status_string(void* solver) {
     auto m = static_cast<UnoMemory*>(mem);
     auto d_nlp = &m->d_nlp;
 
-    // // CasadiModel casadi_model = &m->model;
-
     // define preset and insert options given through casadi 
     insert_casadi_options(m->solver, opts_);
-
-    // // initialize initial primal and dual points
-    // Iterate initial_iterate(m->model->number_variables, m->model->number_constraints);
-    // m->model->get_initial_primal_point(initial_iterate.primals);
-    // m->model->get_initial_dual_point(initial_iterate.multipliers.constraints);
-    // m->model->project_primals_onto_bounds(initial_iterate.primals);
-
-    // // reformulate (scale, add slacks) if necessary
-    // std::unique_ptr<Model> unscaled_model = std::make_unique<CasadiModel>(*m->model);
-    // std::unique_ptr<Model> model = std::make_unique<ScaledModel>(std::move(unscaled_model), initial_iterate, uno_options);
 
     // //   // create the statistics
     // // Statistics statistics = create_statistics(*model, uno_options);
 
-    // if (uno_options.get_bool("enforce_linear_constraints")) {
-    //     Preprocessing::enforce_linear_constraints(uno_options, *model, initial_iterate.primals, initial_iterate.multipliers);
-    // }
-
-    // // create the constraint relaxation strategy
-    // auto constraint_relaxation_strategy = ConstraintRelaxationStrategyFactory::create(statistics, *model, uno_options);
-
-    // // create the globalization mechanism
-    // auto mechanism = GlobalizationMechanismFactory::create(statistics, *constraint_relaxation_strategy, uno_options);
-
-    // // instantiate the combination of ingredients and solve the problem
-    // Uno uno = Uno(*mechanism, uno_options);
-
-    // try {
-    //     Result result = uno.solve(statistics, *model, initial_iterate);
-
-    //     // Write the solution to Casadi .....
-    //     // Negate rc to match CasADi's definition
-    //     m->return_status = return_status_string(result);
-    //     m->success = return_status_success(result);
-
-    //     // Get primal solution
-    //     casadi_copy(get_ptr(result.solution.primals), nx_, d_nlp->z);
-
-    //     // std::cout << "We solved the problem" << std::endl;
-    //     // Get optimal cost
-    //     d_nlp->objective = result.solution.evaluations.objective;
-
-    //     // Get dual solution
-    //     // Get dual solution (simple bounds)
-    //     for (casadi_int i=0; i<m->model->number_variables; ++i) {
-    //       d_nlp->lam[i] = result.solution.multipliers.upper_bounds[i]-result.solution.multipliers.upper_bounds[i];
-    //     }
-    //     casadi_copy(get_ptr(result.solution.multipliers.constraints), ng_, d_nlp->lam + nx_);
-    //     std::cout << "Solution multipliers cons" << result.solution.multipliers.constraints.size() << std::endl;
-    //     std::cout << "Number constraints" << ng_ << std::endl;
-    //     std::cout << "Number variables" << nx_ << std::endl;
     //     // Copy optimal constraint values to output
     //     casadi_copy(get_ptr(result.solution.evaluations.constraints), ng_, d_nlp->z + nx_);
-
-    //     // print the optimization summary
-    //     std::string combination = uno_options.get_string("globalization_mechanism") + " " + uno_options.get_string("constraint_relaxation_strategy") + " " +
-    //                               uno_options.get_string("globalization_strategy") + " " + uno_options.get_string("subproblem");
-    //     std::cout << "\nUno (" << combination << ")\n";
-    //     std::cout << Timer::get_current_date();
-    //     std::cout << "────────────────────────────────────────\n";
-    //     const bool print_solution = uno_options.get_bool("print_solution");
-    //     result.print(print_solution);
-    // }
-    // catch (const std::exception& e) {
-    //     std::cout << "Uno terminated with an error\n";
-    // }
     
-
     // model creation
     const uno_int base_indexing = UNO_ZERO_BASED_INDEXING;
     // variables
@@ -817,18 +399,21 @@ inline const char* return_status_string(void* solver) {
     void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, number_variables, variables_lower_bounds,
     variables_upper_bounds, base_indexing);
     std::cout << "Set the objective here!" << std::endl;
+
+    UnoNlp* nlp = static_cast<UnoNlp*>(m->uno_nlp);
     
     uno_int ret;
-    ret = uno_set_objective(model, optimization_sense, ::objective_function, ::objective_gradient);
+    ret = uno_set_user_data(model, nlp);
+    ret = uno_set_objective(model, optimization_sense, UnoNlp::objective_function_wrapper, UnoNlp::objective_gradient_wrapper);
     printf("uno_set_objective returned: %d\n", ret);
     // if (ret != 0) {
     //     printf("ERROR: Failed to set objective! Return code: %d\n", ret);
     //     return 1;
     // }
     
-    ret = uno_set_constraints(model, number_constraints, ::constraint_functions,
+    ret = uno_set_constraints(model, number_constraints, UnoNlp::constraint_functions_wrapper,
           constraints_lower_bounds, constraints_upper_bounds, number_jacobian_nonzeros,
-          jacobian_row_indices, jacobian_column_indices, ::jacobian);
+          jacobian_row_indices, jacobian_column_indices, UnoNlp::jacobian_wrapper);
     printf("uno_set_constraints returned: %d\n", ret);
     // if (ret != 0) {
     //     printf("ERROR: Failed to set constraints! Return code: %d\n", ret);
@@ -842,15 +427,10 @@ inline const char* return_status_string(void* solver) {
     //     return 1;
     // }
 
-    // ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices, hessian_column_indices, ::lagrangian_hessian);
+    ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices, hessian_column_indices, ::lagrangian_hessian);
     // printf("uno_set_lagrangian_hessian returned: %d\n", ret);
     // ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
     // printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
-
-    // solver creation
-    // void* solver = uno_create_solver();
-    // uno_set_solver_preset(m->solver, "funnelsqp");
-    // uno_set_solver_bool_option(m->solver, "print_solution", true);
 
     // run 1: solve with no Hessian. Uno defaults to L-BFGS Hessian for NLPs
     uno_optimize(m->solver, model);
@@ -875,20 +455,23 @@ inline const char* return_status_string(void* solver) {
     assert(iterate_status == UNO_FEASIBLE_KKT_POINT);
     solution_objective = uno_get_solution_objective(m->solver);
     printf("Solution objective = %g\n", solution_objective);
-    double primal_solution[number_variables];
-    uno_get_primal_solution(m->solver, primal_solution);
-    printf("Primal solution: "); print_vector(primal_solution, number_variables);
-    double constraint_dual_solution[number_constraints];
-    uno_get_constraint_dual_solution(m->solver, constraint_dual_solution);
-    printf("Constraint dual solution: "); print_vector(constraint_dual_solution, number_constraints);
-    double lower_bound_dual_solution[number_variables];
-    uno_get_lower_bound_dual_solution(m->solver, lower_bound_dual_solution);
-    printf("Lower bound dual solution: "); print_vector(lower_bound_dual_solution, number_variables);
-    double upper_bound_dual_solution[number_variables];
-    uno_get_upper_bound_dual_solution(m->solver, upper_bound_dual_solution);
-    printf("Upper bound dual solution: "); print_vector(upper_bound_dual_solution, number_variables);
+    uno_get_primal_solution(m->solver, d_nlp->z);
+    // Get dual solution (constraints)
+    uno_get_constraint_dual_solution(m->solver, d_nlp->lam+nx_);
+    // Get dual solution (simple bounds)
+    for (casadi_int i=0; i<nx_; ++i) {
+      d_nlp->lam[i] = uno_get_upper_bound_dual_solution_component(m->solver, i)-uno_get_lower_bound_dual_solution_component(m->solver, i);
+    }
+
+    // Write the solution to Casadi .....
+    // Negate rc to match CasADi's definition
+    m->return_status = return_status_string(m->solver);
+    m->success = return_status_success(m->solver);
+    // Get optimal cost
+    d_nlp->objective = uno_get_solution_objective(m->solver);
+
     const double solution_primal_feasibility = uno_get_solution_primal_feasibility(m->solver);
-    printf("Primal feasibility at solution = %e\n", solution_primal_feasibility);
+    printf("Primal feasibility s solution = %e\n", solution_primal_feasibility);
     const double solution_stationarity = uno_get_solution_stationarity(m->solver);
     printf("Stationarity at solution = %e\n", solution_stationarity);
     const double solution_complementarity = uno_get_solution_complementarity(m->solver);
