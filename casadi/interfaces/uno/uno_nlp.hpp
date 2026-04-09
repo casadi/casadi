@@ -53,8 +53,9 @@ public:
    static uno_int jacobian_wrapper(uno_int /*number_variables*/, uno_int /*number_jacobian_nonzeros*/, const double* x, double* jacobian_values, void* user_data);
    // Hessian
 
-//    void evaluate_lagrangian_hessian(const std::vector<double>& x, double objective_multiplier, const std::vector<double>& multipliers,
-//          SymmetricMatrix<double>& hessian) const override;
+   uno_int lagrangian_hessian(const double* x, double objective_multiplier, const double* multipliers, double* hessian_values);
+   static uno_int lagrangian_hessian_wrapper(uno_int /*number_variables*/, uno_int /*number_constraints*/, uno_int /*number_hessian_nonzeros*/,
+            const double* x, double objective_multiplier, const double* multipliers, double* hessian_values, void* user_data);
 
 //    void get_initial_primal_point(std::vector<double>& x) const override;
 //    void get_initial_dual_point(std::vector<double>& multipliers) const override;

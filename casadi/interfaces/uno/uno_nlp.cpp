@@ -89,23 +89,20 @@ uno_int UnoNlp::jacobian_wrapper(uno_int /*number_variables*/, uno_int /*number_
   return nlp->jacobian(x, jacobian_values);
 }
 
-// void CasadiModel::evaluate_lagrangian_hessian(const std::vector<double>& x, double objective_multiplier, const std::vector<double>& multipliers,
-//        SymmetricMatrix<double>& hessian) const {
-  
-//   // scale by the objective sign
-//   objective_multiplier *= this->objective_sign;
-//   // Evaluate numerically
-//   mem_->arg[0] = get_ptr(x);
-//   mem_->arg[1] = mem_->d_nlp.p;
-//   mem_->arg[2] = &objective_multiplier;
-//   // Multipliers need to be 
-//   casadi_copy(get_ptr(multipliers), this->number_constraints, get_ptr(casadi_tmp_multipliers));
-//   casadi_scal(this->number_constraints, -1., get_ptr(casadi_tmp_multipliers));
-//   mem_->arg[3] = get_ptr(casadi_tmp_multipliers);
-//   mem_->res[0] = get_ptr(casadi_tmp_hessian);
-//   casadi_assert(mem_->self.calc_function(mem_, "nlp_hess_l")==0, "Failed to evaluate Lagrangian hessian.");
-
-
+uno_int UnoNlp::lagrangian_hessian(const double* x, double objective_multiplier, const double* multipliers, double* hessian_values)
+{ 
+  // scale by the objective sign
+  // objective_multiplier *= this->objective_sign;
+  // Evaluate numerically
+  mem_->arg[0] = x;
+  mem_->arg[1] = mem_->d_nlp.p;
+  mem_->arg[2] = &objective_multiplier;
+  // Multipliers need to be 
+  // casadi_copy(get_ptr(multipliers), this->number_constraints, get_ptr(casadi_tmp_multipliers));
+  // casadi_scal(this->number_constraints, -1., get_ptr(casadi_tmp_multipliers));
+  mem_->arg[3] = multipliers;
+  mem_->res[0] = hessian_values;
+  casadi_assert(mem_->self.calc_function(mem_, "nlp_hess_l")==0, "Failed to evaluate Lagrangian hessian.");
 //   hessian.reset();
 //   // Write the hessian into Symmetric matrix ....
 //   for (size_t j=0; j<this->number_variables;++j) {
@@ -118,7 +115,15 @@ uno_int UnoNlp::jacobian_wrapper(uno_int /*number_variables*/, uno_int /*number_
 //     }
 //     hessian.finalize_column(j);
 //  }
-// }
+  return 0;
+}
+
+uno_int UnoNlp::lagrangian_hessian_wrapper(uno_int /*number_variables*/, uno_int /*number_constraints*/, uno_int /*number_hessian_nonzeros*/,
+            const double* x, double objective_multiplier, const double* multipliers, double* hessian_values, void* user_data)
+{
+  UnoNlp* nlp = static_cast<UnoNlp*>(user_data);
+  return nlp->lagrangian_hessian(x, objective_multiplier, multipliers, hessian_values);
+}
 
 // double CasadiModel::get_variable_lower_bound(size_t i) const {
 //   return this->variables_bounds[i].lb;//mem_->d_nlp.lbz[i];

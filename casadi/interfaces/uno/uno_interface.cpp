@@ -212,9 +212,10 @@ namespace casadi {
     jacg_sp_ = gf_jg_fcn.sparsity_out(0);
 
     Function hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                                  {"hess:gamma:x:x"},
+                                  {"triu:hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn.sparsity_out(0);
+    casadi_assert(hesslag_sp_.is_triu(), "Hessian must be upper triangular");
 
     // Allocate persistent memory
     alloc_w(nx_, true); // wlbx_
@@ -375,28 +376,55 @@ inline const char* return_status_string(void* solver) {
     // model creation
     const uno_int base_indexing = UNO_ZERO_BASED_INDEXING;
     // variables
-    const uno_int number_variables = 2;
+    // const uno_int number_variables = 2;
     double variables_lower_bounds[] = {-INFINITY, -INFINITY};
     double variables_upper_bounds[] = {0.5, INFINITY};
     // objective
     const uno_int optimization_sense = UNO_MINIMIZE;
     // constraints
-    const uno_int number_constraints = 2;
+    // const uno_int number_constraints = 2;
+    // const uno_int number_jacobian_nonzeros = 4;
+    // uno_int jacobian_row_indices[] = {0, 1, 0, 1};
+    // uno_int jacobian_column_indices[] = {0, 0, 1, 1};
     double constraints_lower_bounds[] = {1., 0.};
     double constraints_upper_bounds[] = {INFINITY, INFINITY};
-    const uno_int number_jacobian_nonzeros = 4;
-    uno_int jacobian_row_indices[] = {0, 1, 0, 1};
-    uno_int jacobian_column_indices[] = {0, 0, 1, 1};
+    const uno_int number_jacobian_nonzeros = static_cast<size_t>(this->jacg_sp_.nnz());
+    std::cout << "Jacobian nnz: " << number_jacobian_nonzeros << std::endl;
+    std::vector<casadi_int> row_indices = this->jacg_sp_.get_row();
+    std::vector<casadi_int> column_indices = this->jacg_sp_.get_col();
+    std::vector<uno_int> jacobian_row_indices(row_indices.size());
+    std::vector<uno_int> jacobian_column_indices(column_indices.size());
+
+    for (uno_int i = 0; i < number_jacobian_nonzeros; ++i) {
+        jacobian_row_indices[i] = static_cast<uno_int>(row_indices[i]);
+        jacobian_column_indices[i] = static_cast<uno_int>(column_indices[i]);
+    }
+
     // Hessian
-    const uno_int number_hessian_nonzeros = 3;
-    const char hessian_triangular_part = UNO_LOWER_TRIANGLE;
-    uno_int hessian_row_indices[] = {0, 1, 1};
-    uno_int hessian_column_indices[] = {0, 0, 1};
-    const uno_int lagrangian_sign_convention = UNO_MULTIPLIER_NEGATIVE;
+    // const uno_int number_hessian_nonzeros = 3;
+    const uno_int number_hessian_nonzeros = static_cast<size_t>(this->hesslag_sp_.nnz_lower());
+    std::cout << "Hessian nnz: " << number_hessian_nonzeros << std::endl;
+    std::vector<casadi_int> hess_row_indices = this->hesslag_sp_.get_row();
+    std::vector<casadi_int> hess_column_indices = this->hesslag_sp_.get_col();
+    std::vector<uno_int> hessian_row_indices(hess_row_indices.size());
+    std::vector<uno_int> hessian_column_indices(hess_column_indices.size());
+
+    for (uno_int i = 0; i < number_hessian_nonzeros; ++i) {
+        hessian_row_indices[i] = static_cast<uno_int>(row_indices[i]);
+        hessian_column_indices[i] = static_cast<uno_int>(column_indices[i]);
+    }
+    // const char hessian_triangular_part = UNO_LOWER_TRIANGLE;
+    const char hessian_triangular_part = UNO_UPPER_TRIANGLE;
+    const uno_int lagrangian_sign_convention = UNO_MULTIPLIER_POSITIVE;
+    // uno_int hessian_row_indices[] = {0, 1, 1};
+    // uno_int hessian_column_indices[] = {0, 0, 1};
+    
+    
     // initial point
     double x0[] = {-2., 1.};
 
-    void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, number_variables, variables_lower_bounds,
+    // void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, number_variables, variables_lower_bounds,
+    void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, nx_, variables_lower_bounds,
     variables_upper_bounds, base_indexing);
     std::cout << "Set the objective here!" << std::endl;
 
@@ -411,9 +439,12 @@ inline const char* return_status_string(void* solver) {
     //     return 1;
     // }
     
-    ret = uno_set_constraints(model, number_constraints, UnoNlp::constraint_functions_wrapper,
+    // ret = uno_set_constraints(model, number_constraints, UnoNlp::constraint_functions_wrapper,
+    //       constraints_lower_bounds, constraints_upper_bounds, number_jacobian_nonzeros,
+    //       jacobian_row_indices, jacobian_column_indices, UnoNlp::jacobian_wrapper);
+    ret = uno_set_constraints(model, ng_, UnoNlp::constraint_functions_wrapper,
           constraints_lower_bounds, constraints_upper_bounds, number_jacobian_nonzeros,
-          jacobian_row_indices, jacobian_column_indices, UnoNlp::jacobian_wrapper);
+          jacobian_row_indices.data(), jacobian_column_indices.data(), UnoNlp::jacobian_wrapper);
     printf("uno_set_constraints returned: %d\n", ret);
     // if (ret != 0) {
     //     printf("ERROR: Failed to set constraints! Return code: %d\n", ret);
@@ -427,7 +458,7 @@ inline const char* return_status_string(void* solver) {
     //     return 1;
     // }
 
-    ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices, hessian_column_indices, ::lagrangian_hessian);
+    ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices.data(), hessian_column_indices.data(), UnoNlp::lagrangian_hessian_wrapper);
     // printf("uno_set_lagrangian_hessian returned: %d\n", ret);
     // ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
     // printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
@@ -443,7 +474,7 @@ inline const char* return_status_string(void* solver) {
     printf("Solution objective = %g\n", solution_objective);
 
     // run 2: solve with exact Hessian
-    ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices, hessian_column_indices, ::lagrangian_hessian);
+    ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices.data(), hessian_column_indices.data(), UnoNlp::lagrangian_hessian_wrapper);
     printf("uno_set_lagrangian_hessian returned: %d\n", ret);
     ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
     printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
