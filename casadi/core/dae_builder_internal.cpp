@@ -595,7 +595,7 @@ MX Variable::get_der(DaeBuilderInternal& self, bool may_allocate) {
     der_v.parent = index;
     der = der_v.index;
     // Add to list of derivatives
-    self.derivatives_.push_back(der_v.index);
+    self.der_.push_back(der_v.index);
   }
   // Call the const overload
   return get_der(const_cast<const DaeBuilderInternal&>(self));
@@ -3721,7 +3721,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     categorize(der_v.index, Category::Z);
     der_v.der_of = der_v.parent = v.index;
     v.der = der_v.index;
-    derivatives_.push_back(der_v.index);
+    der_.push_back(der_v.index);
   }
 }
 
@@ -3820,15 +3820,15 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         for (casadi_int d : v.dependencies) variable(d).in_rhs = true;
       } else if (e.name == "ContinuousStateDerivative") {
         // Get index
-        derivatives_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+        der_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
         // Corresponding variable
-        Variable& v = variable(derivatives_.back());
+        Variable& v = variable(der_.back());
         // Add to list of states and derivative to list of dependent variables
         casadi_assert(v.parent >= 0, "Error processing derivative info for " + v.name);
         categorize(v.index, Category::W);
         categorize(v.parent, Category::X);
         // Map der field to derivative variable
-        variable(v.parent).der = derivatives_.back();
+        variable(v.parent).der = der_.back();
         // Get dependencies
         v.dependencies = read_dependencies(e);
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
@@ -3865,15 +3865,15 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     if (n.has_child("Derivatives")) {
       for (auto& e : n["Derivatives"].children) {
         // Get index
-        derivatives_.push_back(convert_index(e.attribute<casadi_int>("index", 0)));
+        der_.push_back(convert_index(e.attribute<casadi_int>("index", 0)));
         // Corresponding variable
-        Variable& v = variable(derivatives_.back());
+        Variable& v = variable(der_.back());
         // Add to list of states and derivative to list of dependent variables
         casadi_assert(v.parent >= 0, "Error processing derivative info for " + v.name);
         categorize(v.index, Category::W);
         categorize(v.parent, Category::X);
         // Map der field to derivative variable
-        variable(v.parent).der = derivatives_.back();
+        variable(v.parent).der = der_.back();
       }
     }
 
@@ -3991,7 +3991,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
 
   // Reclassify some states as quadratures
   if (detect_quad_ && fmi_major_ >= 2) {
-    for (size_t i : derivatives_) {
+    for (size_t i : der_) {
       size_t x = variable(i).parent;
       if (!variable(x).in_rhs) categorize(x, Category::Q);
     }

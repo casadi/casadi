@@ -193,7 +193,7 @@ std::vector<std::string> DaeBuilder::outputs() const {
 
 std::vector<std::string> DaeBuilder::derivatives() const {
   try {
-    return (*this)->name((*this)->derivatives_);
+    return (*this)->name((*this)->der_);
   } catch (std::exception& e) {
     THROW_ERROR("derivatives", e.what());
     return {};  // never reached

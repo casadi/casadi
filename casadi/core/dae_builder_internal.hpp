@@ -544,7 +544,7 @@ protected:
   std::vector<Variable*> variables_;
 
   // Model structure
-  std::vector<size_t> y_, derivatives_, initial_unknowns_, zero_, alg_;
+  std::vector<size_t> y_, der_, initial_unknowns_, zero_, alg_;
 
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;
