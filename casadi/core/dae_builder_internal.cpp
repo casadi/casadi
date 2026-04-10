@@ -901,7 +901,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
   XmlNode r;
   r.name = "ModelStructure";
   // Add outputs
-  for (size_t i : outputs_) {
+  for (size_t i : y_) {
     const Variable& y = variable(i);
     XmlNode c;
     c.name = "Output";
@@ -919,7 +919,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     r.children.push_back(c);
   }
   // Add initial unknowns: Outputs
-  for (size_t i : outputs_) {
+  for (size_t i : y_) {
     const Variable& y = variable(i);
     XmlNode c;
     c.name = "InitialUnknown";
@@ -972,7 +972,7 @@ void DaeBuilderInternal::update_dependencies() const {
   }
   // Dependendencies of the outputs and event indicators
   for (std::string catname : {"y", "zero"}) {
-    const std::vector<size_t>& oind = catname == "y" ? outputs_ : event_indicators_;
+    const std::vector<size_t>& oind = catname == "y" ? y_ : event_indicators_;
     Sparsity dy_dxT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("x")).T();
     Sparsity dy_duT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("u")).T();
     for (casadi_int i = 0; i < oind.size(); ++i) {
@@ -1170,8 +1170,8 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     << "\n";
 
   // Outputs
-  f << "#define N_Y " << outputs_.size() << "\n"
-    << "fmi3ValueReference y_vr[N_Y] = " << generate(outputs_) << ";\n"
+  f << "#define N_Y " << y_.size() << "\n"
+    << "fmi3ValueReference y_vr[N_Y] = " << generate(y_) << ";\n"
     << "\n";
 
   // Event indicators
@@ -1370,7 +1370,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
          << "nx = " << size(Category::X) << ", "
          << "nz = " << size(Category::Z) << ", "
          << "nq = " << size(Category::Q) << ", "
-         << "ny = " << outputs_.size() << ", "
+         << "ny = " << y_.size() << ", "
          << "np = " << size(Category::P) << ", "
          << "nc = " << size(Category::C) << ", "
          << "nd = " << size(Category::D) << ", "
@@ -1425,9 +1425,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   }
 
   // Outputs
-  if (!outputs_.empty()) {
+  if (!y_.empty()) {
     stream << "Outputs (y):" << std::endl;
-    for (size_t k : outputs_) {
+    for (size_t k : y_) {
       const Variable& v = variable(k);
       stream << "  " << v.name << ": " << v.v << std::endl;
     }
@@ -1975,7 +1975,7 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
   // If defined by index set
   switch (ind) {
     case OutputCategory::Y:
-      return var(outputs_);
+      return var(y_);
     case OutputCategory::ZERO:
       return var(event_indicators_);
     case OutputCategory::ALG:
@@ -2778,7 +2778,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     scheme["quad"] = indices(Category::Q);
     for (size_t& i : scheme["quad"]) i = variable(i).der;
     scheme["alg"] = residuals_;
-    scheme["y"] = outputs_;
+    scheme["y"] = y_;
   }
   // Auxilliary variables, if any
   std::vector<std::string> aux;
@@ -3081,7 +3081,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       casadi_error("Unknown causality: " + to_string(causality));
   }
   // If an output, add to list of outputs
-  if (causality == Causality::OUTPUT) outputs_.push_back(v.index);
+  if (causality == Causality::OUTPUT) y_.push_back(v.index);
   // Return variable reference
   return v;
 }
@@ -3153,10 +3153,10 @@ void DaeBuilderInternal::set_causality(size_t ind, Causality causality) {
   // Handle permitted changes
   if (v.causality == Causality::LOCAL && causality == Causality::OUTPUT) {
     // Add to list of outputs
-    insert(outputs_, v.index);
+    insert(y_, v.index);
   } else if (v.causality == Causality::OUTPUT && causality == Causality::LOCAL) {
     // Remove from list of outputs
-    remove(outputs_, v.index);
+    remove(y_, v.index);
   } else {
     // Not possible
     casadi_error("Cannot change causality of " + v.name + " which is of category '"
@@ -3767,7 +3767,7 @@ std::vector<DependenciesKind> DaeBuilderInternal::read_dependencies_kind(
 
 void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   // Do not use the automatic selection of outputs based on output causality
-  outputs_.clear();
+  y_.clear();
 
   // Algebraic variables are handled internally in the FMU by default
   for (size_t i = 0; i < n_variables(); ++i) {
@@ -3809,9 +3809,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       // Get a reference to the variable
       if (e.name == "Output") {
         // Get index
-        outputs_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+        y_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
         // Corresponding variable
-        Variable& v = variable(outputs_.back());
+        Variable& v = variable(y_.back());
         // Get dependencies
         v.dependencies = read_dependencies(e);
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
@@ -3932,9 +3932,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     if (n.has_child("Outputs")) {
       for (auto& e : n["Outputs"].children) {
         // Get index
-        outputs_.push_back(convert_index(e.attribute<casadi_int>("index", 0)));
+        y_.push_back(convert_index(e.attribute<casadi_int>("index", 0)));
         // Corresponding variable
-        Variable& v = variable(outputs_.back());
+        Variable& v = variable(y_.back());
 
         // Get dependencies
         if (e.has_attribute("dependencies")) {

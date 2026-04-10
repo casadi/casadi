@@ -72,7 +72,7 @@ const MX& DaeBuilder::time() const {
 
 std::vector<std::string> DaeBuilder::y() const {
   try {
-    return (*this)->name((*this)->outputs_);
+    return (*this)->name((*this)->y_);
   } catch (std::exception& e) {
     THROW_ERROR("y", e.what());
     return {};  // never reached
@@ -140,7 +140,7 @@ void DaeBuilder::set_y(const std::vector<std::string>& name) {
     }
 
     // Update ordering
-    (*this)->reorder("y", (*this)->outputs_, (*this)->find(name));
+    (*this)->reorder("y", (*this)->y_, (*this)->find(name));
 
   } catch (std::exception& e) {
     THROW_ERROR("set_y", e.what());
@@ -184,7 +184,7 @@ std::vector<MX> DaeBuilder::init_rhs() const {
 
 std::vector<std::string> DaeBuilder::outputs() const {
   try {
-    return (*this)->name((*this)->outputs_);
+    return (*this)->name((*this)->y_);
   } catch (std::exception& e) {
     THROW_ERROR("outputs", e.what());
     return {};  // never reached
@@ -235,7 +235,7 @@ casadi_int DaeBuilder::nzero() const {
 }
 
 casadi_int DaeBuilder::ny() const {
-  return (*this)->outputs_.size();
+  return (*this)->y_.size();
 }
 
 casadi_int DaeBuilder::nu() const {
@@ -367,7 +367,7 @@ void DaeBuilder::reorder(const std::string& cat, const std::vector<std::string>&
     auto vind = (*this)->find(v);
     if (cat == "y") {
       // Reorder outputs
-      (*this)->reorder("y", (*this)->outputs_, vind);
+      (*this)->reorder("y", (*this)->y_, vind);
     } else {
       // Reorder inputs
       (*this)->reorder(to_enum<Category>(cat), vind);
