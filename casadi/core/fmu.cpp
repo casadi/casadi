@@ -455,7 +455,7 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   instance_name_ = dae->model_identifier_;
   instantiation_token_ = dae->instantiation_token_;
   logging_on_ = dae->debug_;
-  number_of_event_indicators_ = dae->number_of_event_indicators_;
+  number_of_event_indicators_ = dae->nzero_;
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
   can_be_instantiated_only_once_per_process_ = dae->can_be_instantiated_only_once_per_process_;

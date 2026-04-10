@@ -231,7 +231,7 @@ casadi_int DaeBuilder::nq() const {
 }
 
 casadi_int DaeBuilder::nzero() const {
-  return (*this)->event_indicators_.size();
+  return (*this)->zero_.size();
 }
 
 casadi_int DaeBuilder::ny() const {

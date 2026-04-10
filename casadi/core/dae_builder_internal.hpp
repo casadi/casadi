@@ -510,7 +510,7 @@ protected:
   std::string generation_tool_;
   std::string generation_date_and_time_;
   std::string variable_naming_convention_;
-  casadi_int number_of_event_indicators_;
+  casadi_int nzero_;
 
   // Default experiment
   double start_time_, stop_time_, tolerance_, step_size_;
@@ -544,7 +544,7 @@ protected:
   std::vector<Variable*> variables_;
 
   // Model structure
-  std::vector<size_t> y_, derivatives_, initial_unknowns_, event_indicators_, alg_;
+  std::vector<size_t> y_, derivatives_, initial_unknowns_, zero_, alg_;
 
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;

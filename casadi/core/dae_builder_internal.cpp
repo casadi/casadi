@@ -610,7 +610,7 @@ DaeBuilderInternal::~DaeBuilderInternal() {
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path,
     const Dict& opts) : name_(name), resource_(path) {
   clear_cache_ = false;
-  number_of_event_indicators_ = 0;
+  nzero_ = 0;
   provides_directional_derivatives_ = false;
   provides_adjoint_derivatives_ = false;
   can_be_instantiated_only_once_per_process_ = false;
@@ -694,9 +694,9 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   generation_date_and_time_ = fmi_desc.attribute<std::string>("generationDateAndTime", "");
   variable_naming_convention_ = fmi_desc.attribute<std::string>("variableNamingConvention", "");
   if (fmi_major_ >= 3) {
-    number_of_event_indicators_ = 0;  // In FMI 3: Obtain from binary
+    nzero_ = 0;  // In FMI 3: Obtain from binary
   } else {
-    number_of_event_indicators_ = fmi_desc.attribute<casadi_int>("numberOfEventIndicators", 0);
+    nzero_ = fmi_desc.attribute<casadi_int>("numberOfEventIndicators", 0);
   }
 
   // Process DefaultExperiment
@@ -937,7 +937,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     r.children.push_back(c);
   }
   // Add event indicators
-  for (size_t i : event_indicators_) {
+  for (size_t i : zero_) {
     const Variable& zero = variable(i);
     XmlNode c;
     c.name = "EventIndicator";
@@ -972,7 +972,7 @@ void DaeBuilderInternal::update_dependencies() const {
   }
   // Dependendencies of the outputs and event indicators
   for (std::string catname : {"y", "zero"}) {
-    const std::vector<size_t>& oind = catname == "y" ? y_ : event_indicators_;
+    const std::vector<size_t>& oind = catname == "y" ? y_ : zero_;
     Sparsity dy_dxT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("x")).T();
     Sparsity dy_duT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("u")).T();
     for (casadi_int i = 0; i < oind.size(); ++i) {
@@ -1018,7 +1018,7 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
     {"t", "x", "p", "u"}, {"ode", "y", "zero"});
   // Event transition function, if needed
   Function tfun;
-  if (!event_indicators_.empty()) tfun = transition("transition_" + name_);
+  if (!zero_.empty()) tfun = transition("transition_" + name_);
   // Generate C code for model equations
   Dict codegen_opts;
   codegen_opts["with_header"] = true;
@@ -1175,8 +1175,8 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     << "\n";
 
   // Event indicators
-  f << "#define N_ZERO " << event_indicators_.size() << "\n"
-  << "fmi3ValueReference zero_vr[N_ZERO] = " << generate(event_indicators_) << ";\n"
+  f << "#define N_ZERO " << zero_.size() << "\n"
+  << "fmi3ValueReference zero_vr[N_ZERO] = " << generate(zero_) << ";\n"
   << "\n";
 
   // Memory structure
@@ -1977,7 +1977,7 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
     case OutputCategory::Y:
       return var(y_);
     case OutputCategory::ZERO:
-      return var(event_indicators_);
+      return var(zero_);
     case OutputCategory::ALG:
       return var(alg_);
     default: break;
@@ -3442,7 +3442,7 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   // Create a new dependent variable for the event indicator
   Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS,
     zero, Dict());
-  event_indicators_.push_back(e.index);
+  zero_.push_back(e.index);
   categorize(e.index, Category::CALCULATED);
   // Convert to legacy format, pending refactoring
   std::vector<MX> all_lhs, all_rhs;
@@ -3845,8 +3845,8 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
       } else if (e.name == "EventIndicator") {
         // Event indicator
-        event_indicators_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
-        number_of_event_indicators_++;
+        zero_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+        nzero_++;
       } else if (e.name == "Residual") {
         // Get index
         alg_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
