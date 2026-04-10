@@ -200,14 +200,12 @@ class CASADI_EXPORT DaeBuilder
   std::vector<MX> init_rhs() const;
 
 #ifdef WITH_DEPRECATED_FEATURES
-    /// [DEPRECATED] Renamed "y"
+  /// [DEPRECATED] Renamed "y"
   std::vector<std::string> outputs() const {return y();}
-#endif // WITH_DEPRECATED_FEATURES
 
-  /** \brief Model structure: derivatives
-
-      \identifier{62} */
+  /// [DEPRECATED] Renamed "der"
   std::vector<std::string> derivatives() const {return der();}
+#endif // WITH_DEPRECATED_FEATURES
 
   /** \brief Model structure: initial unknowns
 
