@@ -199,10 +199,10 @@ class CASADI_EXPORT DaeBuilder
       \identifier{2b2} */
   std::vector<MX> init_rhs() const;
 
-  /** \brief Model structure: outputs
-
-      \identifier{61} */
-  std::vector<std::string> outputs() const;
+#ifdef WITH_DEPRECATED_FEATURES
+    /// [DEPRECATED] Renamed "y"
+  std::vector<std::string> outputs() const {return y();}
+#endif // WITH_DEPRECATED_FEATURES
 
   /** \brief Model structure: derivatives
 

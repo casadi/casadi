@@ -182,15 +182,6 @@ std::vector<MX> DaeBuilder::init_rhs() const {
   return (*this)->init_rhs();
 }
 
-std::vector<std::string> DaeBuilder::outputs() const {
-  try {
-    return (*this)->name((*this)->y_);
-  } catch (std::exception& e) {
-    THROW_ERROR("outputs", e.what());
-    return {};  // never reached
-  }
-}
-
 std::vector<std::string> DaeBuilder::derivatives() const {
   try {
     return (*this)->name((*this)->der_);
