@@ -207,7 +207,7 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Model structure: derivatives
 
       \identifier{62} */
-  std::vector<std::string> derivatives() const;
+  std::vector<std::string> derivatives() const {return der();}
 
   /** \brief Model structure: initial unknowns
 
@@ -449,6 +449,9 @@ class CASADI_EXPORT DaeBuilder
   MX var(const std::string& name) const;
   MX operator()(const std::string& name) const {return var(name);}
   ///@}
+
+  /** \brief Model structure: All time derivatives */
+  std::vector<std::string> der() const;
 
   /// Get the time derivative of model variables
   std::vector<std::string> der(const std::vector<std::string>& name) const;
