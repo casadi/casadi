@@ -81,7 +81,7 @@ std::vector<std::string> DaeBuilder::y() const {
 
 std::vector<MX> DaeBuilder::ode() const {
   try {
-    return (*this)->output(OutputCategory::ODE);
+    return (*this)->output(Category::ODE);
   } catch (std::exception& e) {
     THROW_ERROR("ode", e.what());
     return {};  // never reached
@@ -90,7 +90,7 @@ std::vector<MX> DaeBuilder::ode() const {
 
 std::vector<MX> DaeBuilder::alg() const {
   try {
-    return (*this)->output(OutputCategory::ALG);
+    return (*this)->output(Category::ALG);
   } catch (std::exception& e) {
     THROW_ERROR("alg", e.what());
     return {};  // never reached
@@ -99,7 +99,7 @@ std::vector<MX> DaeBuilder::alg() const {
 
 std::vector<MX> DaeBuilder::quad() const {
   try {
-    return (*this)->output(OutputCategory::QUAD);
+    return (*this)->output(Category::QUAD);
   } catch (std::exception& e) {
     THROW_ERROR("quad", e.what());
     return {};  // never reached
@@ -108,7 +108,7 @@ std::vector<MX> DaeBuilder::quad() const {
 
 std::vector<MX> DaeBuilder::zero() const {
   try {
-    return (*this)->output(OutputCategory::ZERO);
+    return (*this)->output(Category::ZERO);
   } catch (std::exception& e) {
     THROW_ERROR("zero", e.what());
   }
@@ -116,7 +116,7 @@ std::vector<MX> DaeBuilder::zero() const {
 
 std::vector<MX> DaeBuilder::ydef() const {
   try {
-    return (*this)->output(OutputCategory::Y);
+    return (*this)->output(Category::Y);
   } catch (std::exception& e) {
     THROW_ERROR("ydef", e.what());
     return {};  // never reached
@@ -158,7 +158,7 @@ std::vector<MX> DaeBuilder::cdef() const {
 
 std::vector<MX> DaeBuilder::ddef() const {
   try {
-    return (*this)->output(OutputCategory::DDEF);
+    return (*this)->output(Category::DDEF);
   } catch (std::exception& e) {
     THROW_ERROR("ddef", e.what());
     return {};  // never reached
@@ -167,7 +167,7 @@ std::vector<MX> DaeBuilder::ddef() const {
 
 std::vector<MX> DaeBuilder::wdef() const {
   try {
-    return (*this)->output(OutputCategory::WDEF);
+    return (*this)->output(Category::WDEF);
   } catch (std::exception& e) {
     THROW_ERROR("wdef", e.what());
     return {};  // never reached

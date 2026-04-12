@@ -63,9 +63,6 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 enum class Category {T, C, P, D, W, U, X, Z, Q, CALCULATED,
   ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
 
-// Output categories for generated functions
-enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
-
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
 
@@ -325,13 +322,13 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   std::vector<MX> input(Category ind) const;
 
   // Get output expression, given enum
-  std::vector<MX> output(OutputCategory ind) const;
+  std::vector<MX> output(Category ind) const;
 
   // Get input expression, given enum
   std::vector<MX> input(const std::vector<Category>& ind) const;
 
   // Get output expression, given enum
-  std::vector<MX> output(const std::vector<OutputCategory>& ind) const;
+  std::vector<MX> output(const std::vector<Category>& ind) const;
 
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
@@ -818,7 +815,6 @@ CASADI_EXPORT std::string to_string(Initial v);
 CASADI_EXPORT std::string to_string(Attribute v);
 CASADI_EXPORT std::string to_string(DependenciesKind v);
 CASADI_EXPORT std::string to_string(Category v);
-CASADI_EXPORT std::string to_string(OutputCategory v);
 ///@}
 
 ///@{
@@ -836,16 +832,16 @@ CASADI_EXPORT bool is_output_category(Category cat);
 CASADI_EXPORT bool is_acyclic(Category cat);
 
 // Definition for acyclyc dependency categories
-CASADI_EXPORT OutputCategory dependent_definition(Category cat);
+CASADI_EXPORT Category dependent_definition(Category cat);
 
 // Get all input categories
 CASADI_EXPORT std::vector<Category> input_categories();
 
 // Get all output categories
-CASADI_EXPORT std::vector<OutputCategory> output_categories();
+CASADI_EXPORT std::vector<Category> output_categories();
 
 // Get the input category for a particular output category
-CASADI_EXPORT Category input_category(OutputCategory cat);
+CASADI_EXPORT Category input_category(Category cat);
 
 /// \endcond
 

@@ -273,12 +273,12 @@ bool is_acyclic(Category cat) {
   }
 }
 
-OutputCategory dependent_definition(Category cat) {
+Category dependent_definition(Category cat) {
   switch (cat) {
     case Category::D:
-      return OutputCategory::DDEF;
+      return Category::DDEF;
     case Category::W:
-      return OutputCategory::WDEF;
+      return Category::WDEF;
     default:
       break;
   }
@@ -294,10 +294,11 @@ std::vector<Category> input_categories() {
   return ret;
 }
 
-std::vector<OutputCategory> output_categories() {
-  std::vector<OutputCategory> ret;
-  for (casadi_int i = 0; i != enum_traits<OutputCategory>::n_enum; ++i) {
-    ret.push_back(static_cast<OutputCategory>(i));
+std::vector<Category> output_categories() {
+  std::vector<Category> ret;
+  for (casadi_int i = 0; i != enum_traits<Category>::n_enum; ++i) {
+    auto cat = static_cast<Category>(i);
+    if (is_output_category(cat)) ret.push_back(cat);
   }
   return ret;
 }
@@ -1553,7 +1554,7 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
     }
   }
   // Collect all DAE output variables with at least one entry
-  for (OutputCategory cat : output_categories()) {
+  for (Category cat : output_categories()) {
     v = output(cat);
     if (!v.empty()) {
       f_out.push_back(vertcat(v));
@@ -1949,26 +1950,12 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   casadi_assert_dev(it == ex.end());
 }
 
-std::string to_string(OutputCategory v) {
-  switch (v) {
-  case OutputCategory::ODE: return "ode";
-  case OutputCategory::ALG: return "alg";
-  case OutputCategory::QUAD: return "quad";
-  case OutputCategory::ZERO: return "zero";
-  case OutputCategory::DDEF: return "ddef";
-  case OutputCategory::WDEF: return "wdef";
-  case OutputCategory::Y: return "y";
-  default: break;
-  }
-  return "";
-}
-
-Category input_category(OutputCategory cat) {
+Category input_category(Category cat) {
   switch (cat) {
-    case OutputCategory::ODE: return Category::X;
-    case OutputCategory::QUAD: return Category::Q;
-    case OutputCategory::DDEF: return Category::D;
-    case OutputCategory::WDEF: return Category::W;
+    case Category::ODE: return Category::X;
+    case Category::QUAD: return Category::Q;
+    case Category::DDEF: return Category::D;
+    case Category::WDEF: return Category::W;
     default: break;
   }
   casadi_error("No input category for " + to_string(cat));
@@ -1990,14 +1977,14 @@ std::vector<MX> DaeBuilderInternal::input(const std::vector<Category>& ind) cons
   return ret;
 }
 
-std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
+std::vector<MX> DaeBuilderInternal::output(Category ind) const {
   // If defined by index set
   switch (ind) {
-    case OutputCategory::Y:
+    case Category::Y:
       return var(indices(Category::Y));
-    case OutputCategory::ZERO:
+    case Category::ZERO:
       return var(indices(Category::ZERO));
-    case OutputCategory::ALG:
+    case Category::ALG:
       return var(indices(Category::ALG));
     default: break;
   }
@@ -2009,8 +1996,8 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
   ret.reserve(size(cat));
   // Handle different categories
   switch (ind) {
-    case OutputCategory::ODE:  // fall-through
-    case OutputCategory::QUAD:
+    case Category::ODE:  // fall-through
+    case Category::QUAD:
       // Differential state
       for (size_t v : indices(cat)) {
         const Variable& x = variable(v);
@@ -2026,8 +2013,8 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
         }
       }
       break;
-    case OutputCategory::DDEF:  // fall-through
-    case OutputCategory::WDEF:
+    case Category::DDEF:  // fall-through
+    case Category::WDEF:
       // Defined by binding expression
       for (size_t d : indices(cat)) ret.push_back(variable(variable(d).bind).v);
       break;
@@ -2036,7 +2023,7 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
   return ret;
 }
 
-std::vector<MX> DaeBuilderInternal::output(const std::vector<OutputCategory>& ind) const {
+std::vector<MX> DaeBuilderInternal::output(const std::vector<Category>& ind) const {
   std::vector<MX> ret(ind.size());
   for (casadi_int i=0; i<ind.size(); ++i) {
     ret[i] = vertcat(output(ind[i]));
@@ -2057,9 +2044,9 @@ void DaeBuilderInternal::add_lc(const std::string& name, const std::vector<std::
 
   // Consistency checks
   casadi_assert(!f_out.empty(), "DaeBuilderInternal::add_lc: Linear combination is empty");
-  std::vector<bool> in_use(enum_traits<OutputCategory>::n_enum, false);
+  std::vector<bool> in_use(enum_traits<Category>::n_enum, false);
   for (casadi_int i=0; i < f_out.size(); ++i) {
-    auto oind = static_cast<size_t>(to_enum<OutputCategory>(f_out[i]));
+    auto oind = static_cast<size_t>(to_enum<Category>(f_out[i]));
     casadi_assert(!in_use[oind], "DaeBuilderInternal::add_lc: Duplicate expression " + f_out[i]);
     in_use[oind] = true;
   }
@@ -2116,7 +2103,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
     casadi_assert(!elim_w, "Lifted calls cannot be used if dependent variables are eliminated");
     // Only lift calls if really needed
     lifted_calls = false;
-    for (const MX& vdef_comp : output(OutputCategory::WDEF)) {
+    for (const MX& vdef_comp : output(Category::WDEF)) {
       if (vdef_comp.is_output()) {
         // There are indeed function calls present
         lifted_calls = true;
@@ -2149,7 +2136,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
     v_map[var(Category::W, i).get()] = i;
   }
   // Definitions of w
-  std::vector<MX> wdef = output(OutputCategory::WDEF);
+  std::vector<MX> wdef = output(Category::WDEF);
   // Collect all the call nodes
   std::map<MXNode*, CallIO> call_nodes;
   for (size_t vdefind = 0; vdefind < wdef.size(); ++vdefind) {
@@ -2244,7 +2231,7 @@ MX DaeBuilderInternal::jac_vdef_v_from_calls(std::map<MXNode*, CallIO>& call_nod
   // All blocks for this block row
   std::map<size_t, MX> jac_brow;
   // Definitions of w
-  std::vector<MX> wdef = output(OutputCategory::WDEF);
+  std::vector<MX> wdef = output(Category::WDEF);
   // Collect all Jacobian blocks
   for (size_t vdefind = 0; vdefind < wdef.size(); ++vdefind) {
     // Current element handled
@@ -2427,25 +2414,25 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     }
 
     // Collect all DAE output variables
-    for (OutputCategory cat : output_categories()) {
+    for (Category cat : output_categories()) {
       f_out_name.push_back(to_string(cat));
       v = output(cat);
       if (v.empty()) {
         f_out.push_back(MX(0, 1));
       } else {
-        if (cat == OutputCategory::WDEF) wdef_ind = f_out.size();
+        if (cat == Category::WDEF) wdef_ind = f_out.size();
         f_out.push_back(vertcat(v));
       }
     }
     // Eliminate v from inputs
     if (subst_v) {
       // Dependent variable definitions
-      std::vector<MX> wdef = output(OutputCategory::WDEF);
+      std::vector<MX> wdef = output(Category::WDEF);
       // Perform in-place substitution
       substitute_inplace(var(Category::W), wdef, f_out, false);
     } else if (lifted_calls && wdef_ind >= 0) {
       // Dependent variable definitions
-      std::vector<MX> wdef = output(OutputCategory::WDEF);
+      std::vector<MX> wdef = output(Category::WDEF);
       // Remove references to call nodes
       for (MX& wdefref : wdef) {
         if (wdefref.is_output()) wdefref = MX::zeros(wdefref.sparsity());
@@ -2650,13 +2637,13 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   if (calc_d) {
     std::vector<MX> d = var(indices(Category::D));
     dw.insert(dw.end(), d.begin(), d.end());
-    std::vector<MX> ddef = output(OutputCategory::DDEF);
+    std::vector<MX> ddef = output(Category::DDEF);
     dwdef.insert(dwdef.end(), ddef.begin(), ddef.end());
   }
   if (calc_w) {
     std::vector<MX> w = var(indices(Category::W));
     dw.insert(dw.end(), w.begin(), w.end());
-    std::vector<MX> wdef = output(OutputCategory::WDEF);
+    std::vector<MX> wdef = output(Category::WDEF);
     dwdef.insert(dwdef.end(), wdef.begin(), wdef.end());
   }
   // Perform elimination
@@ -2697,7 +2684,7 @@ Function DaeBuilderInternal::transition(const std::string& fname, casadi_int ind
   // Remove dependent variables, if any
   if (size(Category::W) > 0) {
     // Dependent variable definitions
-    std::vector<MX> wdef = output(OutputCategory::WDEF);
+    std::vector<MX> wdef = output(Category::WDEF);
     // Perform in-place substitution
     substitute_inplace(var(Category::W), wdef, ret_out, false);
   }
@@ -2822,7 +2809,7 @@ Function DaeBuilderInternal::gather_eq() const {
   // Names of outputs
   std::vector<std::string> f_out_name;
   // Get all expressions
-  for (OutputCategory cat : output_categories()) {
+  for (Category cat : output_categories()) {
     std::vector<MX> v = output(cat);
     if (!v.empty()) {
       f_out.push_back(vertcat(v));
@@ -4293,7 +4280,7 @@ Function DaeBuilderInternal::add_fun(const std::string& name,
   casadi_assert(!has_fun(name), "Function '" + name + "' already exists");
 
   // Dependent variable definitions
-  std::vector<MX> wdef = output(OutputCategory::WDEF);
+  std::vector<MX> wdef = output(Category::WDEF);
   // Get inputs
   std::vector<MX> arg_ex, res_ex;
   for (auto&& s : arg) arg_ex.push_back(var(s));
