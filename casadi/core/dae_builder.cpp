@@ -140,7 +140,7 @@ void DaeBuilder::set_y(const std::vector<std::string>& name) {
     }
 
     // Update ordering
-    (*this)->reorder("y", (*this)->indices(Category::Y), (*this)->find(name));
+    (*this)->reorder(Category::Y, (*this)->find(name));
 
   } catch (std::exception& e) {
     THROW_ERROR("set_y", e.what());
@@ -355,14 +355,7 @@ void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& n
 
 void DaeBuilder::reorder(const std::string& cat, const std::vector<std::string>& v) {
   try {
-    auto vind = (*this)->find(v);
-    if (cat == "y") {
-      // Reorder outputs
-      (*this)->reorder("y", (*this)->indices(Category::Y), vind);
-    } else {
-      // Reorder inputs
-      (*this)->reorder(to_enum<Category>(cat), vind);
-    }
+    (*this)->reorder(to_enum<Category>(cat), (*this)->find(v));
   } catch (std::exception& e) {
     THROW_ERROR("reorder", e.what());
   }
