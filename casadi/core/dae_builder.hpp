@@ -102,19 +102,29 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5f} */
   std::vector<std::string> x() const {return all("x");}
 
-  /** \brief Outputs */
+  /** \brief Outputs
+
+      \identifier{2fu} */
   std::vector<std::string> y() const {return all("y");}
 
-  /** \brief Algebraic variables */
+  /** \brief Algebraic variables
+
+      \identifier{2fv} */
   std::vector<std::string> z() const {return all("z");}
  
-  /** \brief Quadrature states */
+  /** \brief Quadrature states
+
+      \identifier{2fw} */
   std::vector<std::string> q() const {return all("q");}
 
-  /** \brief Input expressions for a specific category */
+  /** \brief Input expressions for a specific category
+
+      \identifier{2fx} */
   std::vector<MX> inputs(const std::string& cat) const;
 
-  /** \brief Output expressions for a specific category */
+  /** \brief Output expressions for a specific category
+
+      \identifier{2fy} */
   std::vector<MX> outputs(const std::string& cat) const;
 
 #ifdef WITH_DEPRECATED_FEATURES
@@ -440,7 +450,9 @@ class CASADI_EXPORT DaeBuilder
   MX operator()(const std::string& name) const {return var(name);}
   ///@}
 
-  /** \brief Model structure: All time derivatives */
+  /** \brief Model structure: All time derivatives
+
+      \identifier{2fz} */
   std::vector<std::string> der() const;
 
   /// Get the time derivative of model variables
