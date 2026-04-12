@@ -111,6 +111,9 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Quadrature states */
   std::vector<std::string> q() const {return all("q");}
 
+  /** \brief Input expressions for a specific category */
+  std::vector<MX> inputs(const std::string& cat) const;
+
   /** \brief Output expressions for a specific category */
   std::vector<MX> outputs(const std::string& cat) const;
 

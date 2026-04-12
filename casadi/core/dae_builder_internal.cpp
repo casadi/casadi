@@ -1547,7 +1547,7 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   for (Category cat : input_categories()) {
     if (prune_p && cat == Category::P) continue;
     if (prune_u && cat == Category::U) continue;
-    v = input(cat);
+    v = inputs(cat);
     if (!v.empty()) {
       f_in.push_back(vertcat(v));
       f_in_name.push_back(to_string(cat));
@@ -1961,7 +1961,7 @@ Category input_category(Category cat) {
   casadi_error("No input category for " + to_string(cat));
 }
 
-std::vector<MX> DaeBuilderInternal::input(Category ind) const {
+std::vector<MX> DaeBuilderInternal::inputs(Category ind) const {
   // Operation only permitted for input categories
   casadi_assert(is_input_category(ind),
     to_string(ind) + " is not an input category");
@@ -1969,10 +1969,10 @@ std::vector<MX> DaeBuilderInternal::input(Category ind) const {
   return var(indices(ind));
 }
 
-std::vector<MX> DaeBuilderInternal::input(const std::vector<Category>& ind) const {
+std::vector<MX> DaeBuilderInternal::inputs(const std::vector<Category>& ind) const {
   std::vector<MX> ret(ind.size());
   for (casadi_int i=0; i<ind.size(); ++i) {
-    ret[i] = vertcat(input(ind[i]));
+    ret[i] = vertcat(inputs(ind[i]));
   }
   return ret;
 }
@@ -2396,7 +2396,7 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     bool subst_c = false;
     // Collect all DAE input variables
     for (Category cat : input_categories()) {
-      v = input(cat);
+      v = inputs(cat);
       if (elim_w && cat == Category::W) {
         if (!v.empty()) subst_v = true;
       } else if (cat == Category::C) {
@@ -2625,11 +2625,11 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   // Collect input expressions
   std::vector<MX> f_in;
   f_in.reserve(s_in.size());
-  for (Category v : v_in) f_in.push_back(vertcat(input(v)));
+  for (Category v : v_in) f_in.push_back(vertcat(inputs(v)));
   // Collect output expressions
   std::vector<MX> f_out;
   f_out.reserve(s_out.size());
-  for (Category v : v_out) f_out.push_back(vertcat(input(v)));
+  for (Category v : v_out) f_out.push_back(vertcat(inputs(v)));
   // Variables to be substituted
   std::vector<MX> dw, dwdef;
   if (calc_d) {

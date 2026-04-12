@@ -70,6 +70,15 @@ const MX& DaeBuilder::time() const {
   }
 }
 
+std::vector<MX> DaeBuilder::inputs(const std::string& cat) const {
+  try {
+    return (*this)->inputs(to_enum<Category>(cat));
+  } catch (std::exception& e) {
+    THROW_ERROR("inputs", e.what());
+    return {};  // never reached
+  }
+}
+
 std::vector<MX> DaeBuilder::outputs(const std::string& cat) const {
   try {
     return (*this)->outputs(to_enum<Category>(cat));
