@@ -70,46 +70,11 @@ const MX& DaeBuilder::time() const {
   }
 }
 
-std::vector<MX> DaeBuilder::ode() const {
+std::vector<MX> DaeBuilder::outputs(const std::string& cat) const {
   try {
-    return (*this)->output(Category::ODE);
+    return (*this)->outputs(to_enum<Category>(cat));
   } catch (std::exception& e) {
-    THROW_ERROR("ode", e.what());
-    return {};  // never reached
-  }
-}
-
-std::vector<MX> DaeBuilder::alg() const {
-  try {
-    return (*this)->output(Category::ALG);
-  } catch (std::exception& e) {
-    THROW_ERROR("alg", e.what());
-    return {};  // never reached
-  }
-}
-
-std::vector<MX> DaeBuilder::quad() const {
-  try {
-    return (*this)->output(Category::QUAD);
-  } catch (std::exception& e) {
-    THROW_ERROR("quad", e.what());
-    return {};  // never reached
-  }
-}
-
-std::vector<MX> DaeBuilder::zero() const {
-  try {
-    return (*this)->output(Category::ZERO);
-  } catch (std::exception& e) {
-    THROW_ERROR("zero", e.what());
-  }
-}
-
-std::vector<MX> DaeBuilder::ydef() const {
-  try {
-    return (*this)->output(Category::Y);
-  } catch (std::exception& e) {
-    THROW_ERROR("ydef", e.what());
+    THROW_ERROR("outputs", e.what());
     return {};  // never reached
   }
 }
@@ -149,7 +114,7 @@ std::vector<MX> DaeBuilder::cdef() const {
 
 std::vector<MX> DaeBuilder::ddef() const {
   try {
-    return (*this)->output(Category::DDEF);
+    return (*this)->outputs(Category::DDEF);
   } catch (std::exception& e) {
     THROW_ERROR("ddef", e.what());
     return {};  // never reached
@@ -158,7 +123,7 @@ std::vector<MX> DaeBuilder::ddef() const {
 
 std::vector<MX> DaeBuilder::wdef() const {
   try {
-    return (*this)->output(Category::WDEF);
+    return (*this)->outputs(Category::WDEF);
   } catch (std::exception& e) {
     THROW_ERROR("wdef", e.what());
     return {};  // never reached

@@ -105,40 +105,32 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Outputs */
   std::vector<std::string> y() const {return all("y");}
 
-  /** \brief Ordinary differential equations (ODE)
-
-      \identifier{5g} */
-  std::vector<MX> ode() const;
-
-  /** \brief Algebraic variables
-
-      \identifier{5h} */
+  /** \brief Algebraic variables */
   std::vector<std::string> z() const {return all("z");}
-
-  /** \brief Algebraic equations
-
-      \identifier{5i} */
-  std::vector<MX> alg() const;
-
-  /** \brief Quadrature states
-
-      \identifier{5j} */
+ 
+  /** \brief Quadrature states */
   std::vector<std::string> q() const {return all("q");}
 
-  /** \brief Quadrature equations
+  /** \brief Output expressions for a specific category */
+  std::vector<MX> outputs(const std::string& cat) const;
 
-      \identifier{5k} */
-  std::vector<MX> quad() const;
+#ifdef WITH_DEPRECATED_FEATURES
+  /// [DEPRECATED] Replaced with outputs("ode")
+  std::vector<MX> ode() const {return outputs("ode");}
 
-  /** \brief Zero-crossing functions
+  /// [DEPRECATED] Replaced with outputs("alg")
+  std::vector<MX> alg() const {return outputs("alg");}
 
-      \identifier{2b0} */
-  std::vector<MX> zero() const;
+  /// [DEPRECATED] Replaced with outputs("quad")
+  std::vector<MX> quad() const {return outputs("quad");}
 
-  /** \brief Definitions of output variables
+  /// [DEPRECATED] Replaced with outputs("zero")
+  std::vector<MX> zero() const {return outputs("zero");}
 
-      \identifier{5m} */
-  std::vector<MX> ydef() const;
+  /// [DEPRECATED] Replaced with outputs("y")
+  std::vector<MX> ydef() const {return outputs("y");}
+
+#endif // WITH_DEPRECATED_FEATURES
 
   /** \brief Set all output variables
 

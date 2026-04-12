@@ -322,13 +322,13 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   std::vector<MX> input(Category ind) const;
 
   // Get output expression, given enum
-  std::vector<MX> output(Category ind) const;
+  std::vector<MX> outputs(Category ind) const;
 
   // Get input expression, given enum
   std::vector<MX> input(const std::vector<Category>& ind) const;
 
   // Get output expression, given enum
-  std::vector<MX> output(const std::vector<Category>& ind) const;
+  std::vector<MX> outputs(const std::vector<Category>& ind) const;
 
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
