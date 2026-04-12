@@ -1453,9 +1453,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!alg_.empty()) {
+  if (size(Category::ALG) > 0) {
     stream << "Algebraic equations:" << std::endl;
-    for (size_t k : alg_) {
+    for (size_t k : indices(Category::ALG)) {
       stream << "  0 == " << variable(k).v << std::endl;
     }
   }
@@ -1926,7 +1926,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   std::vector<MX> ex;
   for (size_t v : indices(Category::X)) ex.push_back(variable(variable(variable(v).der).bind).v);
   for (size_t v : indices(Category::Q)) ex.push_back(variable(variable(variable(v).der).bind).v);
-  for (size_t v : alg_) ex.push_back(variable(v).v);
+  for (size_t v : indices(Category::ALG)) ex.push_back(variable(v).v);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
@@ -1944,7 +1944,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   auto it = ex.begin();
   for (size_t v : indices(Category::X)) variable(variable(variable(v).der).bind).v = *it++;
   for (size_t v : indices(Category::Q)) variable(variable(variable(v).der).bind).v = *it++;
-  for (size_t v : alg_) variable(v).v = *it++;
+  for (size_t v : indices(Category::ALG)) variable(v).v = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
 }
@@ -1998,7 +1998,7 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
     case OutputCategory::ZERO:
       return var(indices(Category::ZERO));
     case OutputCategory::ALG:
-      return var(alg_);
+      return var(indices(Category::ALG));
     default: break;
   }
   // Otherwise: Defined by corresponding input category
@@ -2796,7 +2796,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     for (size_t& i : scheme["ode"]) i = variable(i).der;
     scheme["quad"] = indices(Category::Q);
     for (size_t& i : scheme["quad"]) i = variable(i).der;
-    scheme["alg"] = alg_;
+    scheme["alg"] = indices(Category::ALG);
     scheme["y"] = indices(Category::Y);
   }
   // Auxilliary variables, if any
@@ -3404,7 +3404,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
           Variable& alg = add(unique_name("__alg__"), Causality::LOCAL, Variability::CONTINUOUS,
             x.v - def_x.v, {{"dimension", x.dimension}});
           categorize(alg.index, Category::CALCULATED);
-          alg_.push_back(alg.index);
+          indices(Category::ALG).push_back(alg.index);
         } else {
           casadi_error("Unexpected category for " + x.name + ": " + to_string(x.category));
         }
@@ -3430,7 +3430,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
     Variable& alg = add(unique_name("__alg__"), Causality::LOCAL, Variability::CONTINUOUS,
       lhs - rhs, {{"dimension", std::vector<casadi_int>{lhs.size1()}}});
     categorize(alg.index, Category::CALCULATED);
-    alg_.push_back(alg.index);
+    indices(Category::ALG).push_back(alg.index);
   }
   // Do not allow any quadrature states in the right-hand-sides
   for (size_t rhs : rhs_vars) {
@@ -3868,9 +3868,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         nzero_++;
       } else if (e.name == "Residual") {
         // Get index
-        alg_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+        indices(Category::ALG).push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
         // Corresponding variable
-        Variable& v = variable(alg_.back());
+        Variable& v = variable(indices(Category::ALG).back());
         // Get dependencies
         v.dependencies = read_dependencies(e);
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
