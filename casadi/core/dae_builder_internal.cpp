@@ -1980,12 +1980,10 @@ std::vector<MX> DaeBuilderInternal::input(const std::vector<Category>& ind) cons
 std::vector<MX> DaeBuilderInternal::output(Category ind) const {
   // If defined by index set
   switch (ind) {
-    case Category::Y:
-      return var(indices(Category::Y));
-    case Category::ZERO:
-      return var(indices(Category::ZERO));
+    case Category::Y:  // fall-through
+    case Category::ZERO:  // fall-through
     case Category::ALG:
-      return var(indices(Category::ALG));
+      return var(indices(ind));
     default: break;
   }
   // Otherwise: Defined by corresponding input category
