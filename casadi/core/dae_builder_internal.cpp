@@ -198,6 +198,13 @@ std::string to_string(Category v) {
   case Category::D: return "d";
   case Category::W: return "w";
   case Category::CALCULATED: return "calculated";
+  case Category::ODE: return "ode";
+  case Category::ALG: return "alg";
+  case Category::QUAD: return "quad";
+  case Category::ZERO: return "zero";
+  case Category::DDEF: return "ddef";
+  case Category::WDEF: return "wdef";
+  case Category::Y: return "y";
   default: break;
   }
   return "";
@@ -233,12 +240,25 @@ bool is_input_category(Category cat) {
     case Category::W:
       // Input category
       return true;
-    case Category::CALCULATED:
-      // Output category
-      return false;
     default: break;
   }
-  casadi_error("Cannot handle: " + to_string(cat));
+  return false;
+}
+
+bool is_output_category(Category cat) {
+  switch (cat) {
+    case Category::ODE:  // Fall-through
+    case Category::ALG:  // Fall-through
+    case Category::QUAD:  // Fall-through
+    case Category::ZERO:  // Fall-through
+    case Category::DDEF:  // Fall-through
+    case Category::WDEF:  // Fall-through
+    case Category::Y:
+      // Output category
+      return true;
+    default: break;
+  }
+  return false;
 }
 
 bool is_acyclic(Category cat) {
@@ -1953,7 +1973,6 @@ Category input_category(OutputCategory cat) {
   }
   casadi_error("No input category for " + to_string(cat));
 }
-
 
 std::vector<MX> DaeBuilderInternal::input(Category ind) const {
   // Operation only permitted for input categories

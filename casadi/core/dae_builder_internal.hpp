@@ -60,7 +60,8 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U       X/Q/W/Z/0  X/Q/W/Z/0  X/Q/T/0
 
 // Variable categories
-enum class Category {T, C, P, D, W, U, X, Z, Q, CALCULATED, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, CALCULATED,
+  ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
 
 // Output categories for generated functions
 enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
@@ -827,6 +828,9 @@ CASADI_EXPORT std::string description(Category v);
 
 // Check if input category
 CASADI_EXPORT bool is_input_category(Category cat);
+
+// Check if output category
+CASADI_EXPORT bool is_output_category(Category cat);
 
 // Check if acyclic dependency category
 CASADI_EXPORT bool is_acyclic(Category cat);
