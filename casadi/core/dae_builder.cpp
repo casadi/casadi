@@ -222,7 +222,7 @@ casadi_int DaeBuilder::nq() const {
 }
 
 casadi_int DaeBuilder::nzero() const {
-  return (*this)->zero_.size();
+  return (*this)->size(Category::ZERO);
 }
 
 casadi_int DaeBuilder::ny() const {

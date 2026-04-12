@@ -957,7 +957,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     r.children.push_back(c);
   }
   // Add event indicators
-  for (size_t i : zero_) {
+  for (size_t i : indices(Category::ZERO)) {
     const Variable& zero = variable(i);
     XmlNode c;
     c.name = "EventIndicator";
@@ -992,7 +992,7 @@ void DaeBuilderInternal::update_dependencies() const {
   }
   // Dependendencies of the outputs and event indicators
   for (std::string catname : {"y", "zero"}) {
-    const std::vector<size_t>& oind = catname == "y" ? indices(Category::Y) : zero_;
+    const std::vector<size_t>& oind = indices(catname == "y" ? Category::Y : Category::ZERO);
     Sparsity dy_dxT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("x")).T();
     Sparsity dy_duT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("u")).T();
     for (casadi_int i = 0; i < oind.size(); ++i) {
@@ -1038,7 +1038,7 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
     {"t", "x", "p", "u"}, {"ode", "y", "zero"});
   // Event transition function, if needed
   Function tfun;
-  if (!zero_.empty()) tfun = transition("transition_" + name_);
+  if (size(Category::ZERO) > 0) tfun = transition("transition_" + name_);
   // Generate C code for model equations
   Dict codegen_opts;
   codegen_opts["with_header"] = true;
@@ -1195,8 +1195,8 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     << "\n";
 
   // Event indicators
-  f << "#define N_ZERO " << zero_.size() << "\n"
-  << "fmi3ValueReference zero_vr[N_ZERO] = " << generate(zero_) << ";\n"
+  f << "#define N_ZERO " << size(Category::ZERO) << "\n"
+  << "fmi3ValueReference zero_vr[N_ZERO] = " << generate(indices(Category::ZERO)) << ";\n"
   << "\n";
 
   // Memory structure
@@ -1996,7 +1996,7 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
     case OutputCategory::Y:
       return var(indices(Category::Y));
     case OutputCategory::ZERO:
-      return var(zero_);
+      return var(indices(Category::ZERO));
     case OutputCategory::ALG:
       return var(alg_);
     default: break;
@@ -3461,7 +3461,7 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   // Create a new dependent variable for the event indicator
   Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS,
     zero, Dict());
-  zero_.push_back(e.index);
+  indices(Category::ZERO).push_back(e.index);
   categorize(e.index, Category::CALCULATED);
   // Convert to legacy format, pending refactoring
   std::vector<MX> all_lhs, all_rhs;
@@ -3864,7 +3864,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
       } else if (e.name == "EventIndicator") {
         // Event indicator
-        zero_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+        indices(Category::ZERO).push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
         nzero_++;
       } else if (e.name == "Residual") {
         // Get index
