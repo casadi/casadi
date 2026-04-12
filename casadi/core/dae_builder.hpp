@@ -102,8 +102,8 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5f} */
   std::vector<std::string> x() const {return all("x");}
 
-  /// Outputs */
-  std::vector<std::string> y() const;
+  /** \brief Outputs */
+  std::vector<std::string> y() const {return all("y");}
 
   /** \brief Ordinary differential equations (ODE)
 

@@ -70,15 +70,6 @@ const MX& DaeBuilder::time() const {
   }
 }
 
-std::vector<std::string> DaeBuilder::y() const {
-  try {
-    return (*this)->name((*this)->indices(Category::Y));
-  } catch (std::exception& e) {
-    THROW_ERROR("y", e.what());
-    return {};  // never reached
-  }
-}
-
 std::vector<MX> DaeBuilder::ode() const {
   try {
     return (*this)->output(Category::ODE);
