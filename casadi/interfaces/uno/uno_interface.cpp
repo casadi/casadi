@@ -22,58 +22,16 @@
  *
  */
 
-//Inclued UNO files
-// #include "tools/Options.hpp"
-// #include "tools/Timer.hpp"
-
-// #include "optimization/Iterate.hpp"
-// #include "optimization/ModelFactory.hpp"
-// #include "optimization/ScaledModel.hpp"
-// #include "preprocessing/Preprocessing.hpp"
-// #include "linear_algebra/CSCSymmetricMatrix.hpp"
-
-// #include "ingredients/globalization_strategy/GlobalizationStrategyFactory.hpp"
-// #include "ingredients/globalization_mechanism/GlobalizationMechanismFactory.hpp"
-// #include "ingredients/constraint_relaxation_strategy/ConstraintRelaxationStrategyFactory.hpp"
-
-// #include "tools/Logger.hpp"
-
-// #include "Uno.hpp"
 #include "Uno_C_API.h"
-
-// Casadi Includes
 #include "uno_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
+
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
 #include <algorithm>
-
 #include <type_traits>
-
-extern "C" {
-
-uno_int lagrangian_hessian(uno_int /*number_variables*/, uno_int /*number_constraints*/, uno_int /*number_hessian_nonzeros*/,
-            const double* x, double objective_multiplier, const double* multipliers, double* hessian_values, void* /*user_data*/) {
-      hessian_values[0] = objective_multiplier*(1200*pow(x[0], 2.) - 400.*x[1] + 2.);
-      hessian_values[1] = -400.*objective_multiplier*x[0] - multipliers[0];
-      hessian_values[2] = 200.*objective_multiplier - 2.*multipliers[1];
-      return 0;
-}
-
-uno_int lagrangian_hessian_operator(uno_int number_variables, uno_int number_constraints, const double* x,
-            bool evaluate_at_x, double objective_multiplier, const double* multipliers, const double* vector,
-            double* result, void* user_data) {
-      const double hessian00 = objective_multiplier*(1200*pow(x[0], 2.) - 400.*x[1] + 2.);
-      const double hessian10 = -400.*objective_multiplier*x[0] - multipliers[0];
-      const double hessian11 = 200.*objective_multiplier - 2.*multipliers[1];
-      result[0] = hessian00*vector[0] + hessian10*vector[1];
-      result[1] = hessian10*vector[0] + hessian11*vector[1];
-      return 0;
-}
-
-} // extern "C"
 
 namespace casadi {
 
@@ -124,61 +82,6 @@ namespace casadi {
   {
   }
 
-  /*----------------------------------------------------------------
-  From here CasadiModel function definition
-  ---------------------------------------------------------------*/
-
-  // CasadiModel::CasadiModel(const std::string& file_name, const UnoInterface& uno_interface, UnoMemory* mem) :
-  //   Model(file_name, uno_interface.nx_, uno_interface.ng_),
-  //   mem_(mem),
-  //   // allocate vectors
-  //   casadi_tmp_gradient(this->number_variables),
-  //   casadi_tmp_multipliers(this->number_constraints),
-  //   casadi_tmp_constraint_jacobian(mem->self.get_function("nlp_jac_g").sparsity_out(0).nnz()),
-  //   casadi_tmp_hessian(mem->self.get_function("nlp_hess_l").sparsity_out(0).nnz()),
-  //   variables_bounds(this->number_variables),
-  //   constraint_bounds(this->number_constraints),
-  //   variable_status(this->number_variables),
-  //   constraint_type(this->number_constraints),
-  //   constraint_status(this->number_constraints) {
-    
-  //   // this->asl->i.congrd_mode = 0;
-
-  //   // dimensions
-  //   this->objective_sign = 1.;//(this->asl->i.objtype_[0] == 1) ? -1. : 1.;
-
-  //   // variables
-  //   this->generate_variables();
-
-  //   // constraints
-  //   this->equality_constraints.reserve(this->number_constraints);
-  //   this->inequality_constraints.reserve(this->number_constraints);
-  //   this->linear_constraints.reserve(this->number_constraints);
-  //   this->generate_constraints();
-  //   // this->set_function_types(file_name);
-
-  //   // compute number of nonzeros
-  //   this->number_objective_gradient_nonzeros = static_cast<size_t>(0);//static_cast<size_t>(this->asl->i.nzo_);
-  //   this->number_jacobian_nonzeros = static_cast<size_t>(mem_->self.jacg_sp_.nnz());
-  //   this->set_number_hessian_nonzeros();
-
-  // }
-
-//   void CasadiModel::set_number_hessian_nonzeros() {
-//    // compute the maximum number of nonzero elements, provided that all multipliers are non-zero
-//    // int (*Sphset) (ASL*, SputInfo**, int nobj, int ow, int y, int uptri);
-//    const int objective_number = -1;
-//    const int upper_triangular = 1;
-//   //  this->hessian_maximum_number_nonzeros = static_cast<size_t>((*(this->asl)->p.Sphset)(this->asl, nullptr, objective_number, 1, 1,
-//   //        upper_triangular));
-//    this->number_hessian_nonzeros = static_cast<size_t>(this->mem_->self.hesslag_sp_.nnz());
-//    this->casadi_tmp_hessian.reserve(this->number_hessian_nonzeros);
-
-//    // use Lagrangian scale: in AMPL, the Lagrangian is f + lambda.g, while Uno uses f - lambda.g
-//    int nerror{};
-//   //  lagscale_ASL(this->asl, -1., &nerror);
-// }
-
   /*------------------------------------------
   UnoInterface function definitions
   -------------------------------------------*/
@@ -196,15 +99,6 @@ namespace casadi {
     }
 
     // Setup NLP functions
-    // create_function("nlp_fg", {"x", "p"}, {"f", "g"});
-    // Function gf_jg_fcn = create_function("nlp_gf_jg", {"x", "p"}, {"grad:f:x", "jac:g:x"});
-    // jacg_sp_ = gf_jg_fcn.sparsity_out(1);
-
-    // Function hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-    //                               {"hess:gamma:x:x"},
-    //                               {{"gamma", {"f", "g"}}});
-    // hesslag_sp_ = hess_l_fcn.sparsity_out(0);
-
     create_function("nlp_f", {"x", "p"}, {"f"});
     create_function("nlp_g", {"x", "p"}, {"g"});
     create_function("nlp_grad_f", {"x", "p"}, {"grad:f:x"});
@@ -297,19 +191,6 @@ namespace casadi {
     // }
   }
 
-  // Statistics create_statistics(const Model& model, const ::Options& options) {
-  //  Statistics statistics(options);
-  //  statistics.add_column("iters", Statistics::int_width, options.get_int("statistics_major_column_order"));
-  //  statistics.add_column("step norm", Statistics::double_width, options.get_int("statistics_step_norm_column_order"));
-  //  statistics.add_column("objective", Statistics::double_width, options.get_int("statistics_objective_column_order"));
-  //  if (model.is_constrained()) {
-  //     statistics.add_column("primal infeas.", Statistics::double_width, options.get_int("statistics_primal_infeasibility_column_order"));
-  //  }
-  //  statistics.add_column("complementarity", Statistics::double_width, options.get_int("statistics_complementarity_column_order"));
-  //  statistics.add_column("stationarity", Statistics::double_width, options.get_int("statistics_stationarity_column_order"));
-  //  return statistics;
-  // }
-
 inline const char* return_status_string(void* solver) {
     uno_int iterate_status = uno_get_solution_status(solver);
     assert(iterate_status == UNO_FEASIBLE_KKT_POINT);
@@ -364,30 +245,14 @@ inline const char* return_status_string(void* solver) {
     auto m = static_cast<UnoMemory*>(mem);
     auto d_nlp = &m->d_nlp;
 
-    // define preset and insert options given through casadi 
+    // define preset and insert options given through  
     insert_casadi_options(m->solver, opts_);
-
-    // //   // create the statistics
-    // // Statistics statistics = create_statistics(*model, uno_options);
-
-    //     // Copy optimal constraint values to output
-    //     casadi_copy(get_ptr(result.solution.evaluations.constraints), ng_, d_nlp->z + nx_);
     
     // model creation
     const uno_int base_indexing = UNO_ZERO_BASED_INDEXING;
-    // variables
-    // const uno_int number_variables = 2;
-    double variables_lower_bounds[] = {-INFINITY, -INFINITY};
-    double variables_upper_bounds[] = {0.5, INFINITY};
     // objective
     const uno_int optimization_sense = UNO_MINIMIZE;
     // constraints
-    // const uno_int number_constraints = 2;
-    // const uno_int number_jacobian_nonzeros = 4;
-    // uno_int jacobian_row_indices[] = {0, 1, 0, 1};
-    // uno_int jacobian_column_indices[] = {0, 0, 1, 1};
-    double constraints_lower_bounds[] = {1., 0.};
-    double constraints_upper_bounds[] = {INFINITY, INFINITY};
     const uno_int number_jacobian_nonzeros = static_cast<size_t>(this->jacg_sp_.nnz());
     std::cout << "Jacobian nnz: " << number_jacobian_nonzeros << std::endl;
     std::vector<casadi_int> row_indices = this->jacg_sp_.get_row();
@@ -401,8 +266,7 @@ inline const char* return_status_string(void* solver) {
     }
 
     // Hessian
-    // const uno_int number_hessian_nonzeros = 3;
-    const uno_int number_hessian_nonzeros = static_cast<size_t>(this->hesslag_sp_.nnz_lower());
+    const uno_int number_hessian_nonzeros = static_cast<size_t>(this->hesslag_sp_.nnz());
     std::cout << "Hessian nnz: " << number_hessian_nonzeros << std::endl;
     std::vector<casadi_int> hess_row_indices = this->hesslag_sp_.get_row();
     std::vector<casadi_int> hess_column_indices = this->hesslag_sp_.get_col();
@@ -413,19 +277,13 @@ inline const char* return_status_string(void* solver) {
         hessian_row_indices[i] = static_cast<uno_int>(row_indices[i]);
         hessian_column_indices[i] = static_cast<uno_int>(column_indices[i]);
     }
-    // const char hessian_triangular_part = UNO_LOWER_TRIANGLE;
     const char hessian_triangular_part = UNO_UPPER_TRIANGLE;
-    const uno_int lagrangian_sign_convention = UNO_MULTIPLIER_POSITIVE;
-    // uno_int hessian_row_indices[] = {0, 1, 1};
-    // uno_int hessian_column_indices[] = {0, 0, 1};
-    
+    const uno_int lagrangian_sign_convention = UNO_MULTIPLIER_POSITIVE;    
     
     // initial point
-    double x0[] = {-2., 1.};
+    // double x0[] = {-2., 1.};
 
-    // void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, number_variables, variables_lower_bounds,
-    void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, nx_, variables_lower_bounds,
-    variables_upper_bounds, base_indexing);
+    void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, nx_, d_nlp->lbz, d_nlp->ubz, base_indexing);
     std::cout << "Set the objective here!" << std::endl;
 
     UnoNlp* nlp = static_cast<UnoNlp*>(m->uno_nlp);
@@ -439,11 +297,8 @@ inline const char* return_status_string(void* solver) {
     //     return 1;
     // }
     
-    // ret = uno_set_constraints(model, number_constraints, UnoNlp::constraint_functions_wrapper,
-    //       constraints_lower_bounds, constraints_upper_bounds, number_jacobian_nonzeros,
-    //       jacobian_row_indices, jacobian_column_indices, UnoNlp::jacobian_wrapper);
     ret = uno_set_constraints(model, ng_, UnoNlp::constraint_functions_wrapper,
-          constraints_lower_bounds, constraints_upper_bounds, number_jacobian_nonzeros,
+          d_nlp->lbz+nx_, d_nlp->ubz+nx_, number_jacobian_nonzeros,
           jacobian_row_indices.data(), jacobian_column_indices.data(), UnoNlp::jacobian_wrapper);
     printf("uno_set_constraints returned: %d\n", ret);
     // if (ret != 0) {
@@ -451,7 +306,8 @@ inline const char* return_status_string(void* solver) {
     //     return 1;
     // }
 
-    ret = uno_set_initial_primal_iterate(model, x0);
+    // ret = uno_set_initial_primal_iterate(model, x0);
+    ret = uno_set_initial_primal_iterate(model, d_nlp->x0);
     printf("uno_set_initial_primal_iterate returned: %d\n", ret);
     // if (ret != 0) {
     //     printf("ERROR: Failed to set initial primal iterate! Return code: %d\n", ret);
@@ -473,19 +329,6 @@ inline const char* return_status_string(void* solver) {
     double solution_objective = uno_get_solution_objective(m->solver);
     printf("Solution objective = %g\n", solution_objective);
 
-    // run 2: solve with exact Hessian
-    ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices.data(), hessian_column_indices.data(), UnoNlp::lagrangian_hessian_wrapper);
-    printf("uno_set_lagrangian_hessian returned: %d\n", ret);
-    ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
-    printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
-    uno_optimize(m->solver, model);
-    // get the solution
-    optimization_status = uno_get_optimization_status(m->solver);
-    assert(optimization_status == UNO_SUCCESS);
-    iterate_status = uno_get_solution_status(m->solver);
-    assert(iterate_status == UNO_FEASIBLE_KKT_POINT);
-    solution_objective = uno_get_solution_objective(m->solver);
-    printf("Solution objective = %g\n", solution_objective);
     uno_get_primal_solution(m->solver, d_nlp->z);
     // Get dual solution (constraints)
     uno_get_constraint_dual_solution(m->solver, d_nlp->lam+nx_);
