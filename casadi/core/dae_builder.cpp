@@ -88,30 +88,6 @@ std::vector<MX> DaeBuilder::outputs(const std::string& cat) const {
   }
 }
 
-void DaeBuilder::set_y(const std::vector<std::string>& name) {
-  try {
-    // Make sure no duplicate names
-    std::set<std::string> name_set(name.begin(), name.end());
-    casadi_assert(name_set.size() == name.size(), "Duplicate names");
-
-    // Ensure that causality is output for all variables
-    for (auto&& n : name) set_causality(n, "output");
-
-    // Remove non-outputs, making them local, if any
-    if (ny() != name.size()) {
-      for (auto&& n : y()) {
-        if (name_set.find(n) == name_set.end()) set_causality(n, "local");
-      }
-    }
-
-    // Update ordering
-    (*this)->reorder(Category::Y, (*this)->find(name));
-
-  } catch (std::exception& e) {
-    THROW_ERROR("set_y", e.what());
-  }
-}
-
 std::vector<MX> DaeBuilder::cdef() const {
   try {
     return (*this)->cdef();
@@ -286,30 +262,48 @@ std::vector<std::string> DaeBuilder::all(const std::string& cat) const {
 
 void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& name) {
   try {
-    // Special case for outputs (remove?)
-    if (v == "y") {
-      casadi_error("Use set_y to set outputs");
-    }
+    // Get category enum
+    auto cat = to_enum<Category>(v);
 
-    // Update category
-    for (auto&& n : name) set_category(n, v);
-    // Remove any variables not in name from the category
-    auto all_in_cat = all(v);
-    if (all_in_cat.size() != name.size()) {
-      std::set<std::string> name_set(name.begin(), name.end());
-      for (auto&& n : all_in_cat) {
-        if (name_set.find(n) == name_set.end()) {
-          if (v == "x" || v == "q") {
-            // Move to unused derivatives
-            set_category(n, "");
-          } else if (v == "u" || v == "p") {
-            // Make constant
-            set_category(n, "c");
-          } else {
-            casadi_error("Cannot automatically remove '" + n + "' from category '" + v + "'");
+    // Make sure no duplicate names
+    std::set<std::string> name_set(name.begin(), name.end());
+    casadi_assert(name_set.size() == name.size(), "Duplicate names");
+
+    // For outputs, update causality
+    if (is_output_category(cat)) {
+      if (cat == Category::Y) {
+        for (auto&& n : name) set_causality(n, "output");
+        if (ny() != name.size()) {
+          for (auto&& n : y()) {
+            if (name_set.find(n) == name_set.end()) set_causality(n, "local");
+          }
+        }
+      } else {
+        casadi_error("Setting category '" + v + "' not supported");
+      }
+    } else if (is_input_category(cat)) {
+      // Update category
+      for (auto&& n : name) set_category(n, v);
+      // Remove any variables not in name from the category
+      auto all_in_cat = all(v);
+      if (all_in_cat.size() != name.size()) {
+        std::set<std::string> name_set(name.begin(), name.end());
+        for (auto&& n : all_in_cat) {
+          if (name_set.find(n) == name_set.end()) {
+            if (v == "x" || v == "q") {
+              // Move to unused derivatives
+              set_category(n, "");
+            } else if (v == "u" || v == "p") {
+              // Make constant
+              set_category(n, "c");
+            } else {
+              casadi_error("Cannot automatically remove '" + n + "' from category '" + v + "'");
+            }
           }
         }
       }
+    } else {
+      casadi_error("Cannot set variables of category '" + v + "'");
     }
     // Make sure ordering is correct
     reorder(v, name);

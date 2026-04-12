@@ -133,12 +133,9 @@ class CASADI_EXPORT DaeBuilder
   /// [DEPRECATED] Replaced with outputs("y")
   std::vector<MX> ydef() const {return outputs("y");}
 
+  /// [DEPRECATED] Replaced with set_all("y", name)
+  void set_y(const std::vector<std::string>& name) {set_all("y", name);}
 #endif // WITH_DEPRECATED_FEATURES
-
-  /** \brief Set all output variables
-
-      \identifier{2db} */
-  void set_y(const std::vector<std::string>& name);
 
   /** \brief Free controls
 
