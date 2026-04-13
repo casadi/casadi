@@ -61,8 +61,7 @@ namespace casadi {
 
     template<class M>
     static M derivative_coeff(casadi_int i,
-        const std::vector<double>& knots,
-        const std::vector<casadi_int>& offset,
+        const std::vector< std::vector<double> >& knots,
         const std::vector<casadi_int>& degree,
         const std::vector<casadi_int>& coeffs_dims,
         const M& coeffs,
