@@ -34,17 +34,16 @@ namespace casadi {
 
     template<class M>
     M BSplineCommon::derivative_coeff(casadi_int i,
-        const std::vector<double>& knots,
-        const std::vector<casadi_int>& offset,
-        const std::vector<casadi_int>& degree, 
+        const std::vector< std::vector<double> >& knots,
+        const std::vector<casadi_int>& degree,
         const std::vector<casadi_int>& coeffs_dims, const M& coeffs,
         std::vector< std::vector<double> >& new_knots,
         std::vector<casadi_int>& new_degree) {
       casadi_int n_dims = degree.size();
 
-      casadi_int n_knots = offset[i+1]-offset[i];
+      casadi_int n_knots = knots[i].size();
       casadi_int n = n_knots-degree[i]-1;
-      DM K = std::vector<double>(get_ptr(knots)+offset[i], get_ptr(knots)+offset[i+1]);
+      DM K = knots[i];
       DM delta_knots = K(range(1+degree[i], n_knots-1))
             - K(range(1, n_knots-degree[i]-1));
       Sparsity sp_diag = vertsplit(Sparsity::diag(n), {0, n-1, n})[0];
@@ -79,11 +78,10 @@ namespace casadi {
       for (casadi_int k=0;k<degree.size();++k) {
         if (i==k) {
           new_knots.push_back(
-            std::vector<double>(get_ptr(knots)+offset[k]+1, get_ptr(knots)+offset[k+1]-1));
+            std::vector<double>(knots[k].begin()+1, knots[k].end()-1));
           new_degree.push_back(degree[k]-1);
         } else {
-          new_knots.push_back(
-            std::vector<double>(get_ptr(knots)+offset[k], get_ptr(knots)+offset[k+1]));
+          new_knots.push_back(knots[k]);
           new_degree.push_back(degree[k]);
         }
       }
@@ -101,12 +99,19 @@ namespace casadi {
     std::vector<std::string> lookup_mode;
     for (auto e : lookup_mode_) lookup_mode.push_back(Low::lookup_mode_from_enum(e));
     opts["lookup_mode"] = lookup_mode;
-    
+
+    // Unflatten knots
+    std::vector< std::vector<double> > knots_unflat(n_dims);
+    for (casadi_int k=0;k<n_dims;++k) {
+      knots_unflat[k] = std::vector<double>(
+        get_ptr(knots_)+offset_[k], get_ptr(knots_)+offset_[k+1]);
+    }
+
     // Loop over dimensions
     for (casadi_int k=0;k<n_dims;++k) {
       std::vector< std::vector<double> > knots;
       std::vector< casadi_int> degree;
-      T dC = derivative_coeff(k, knots_, offset_, degree_, coeffs_dims_, coeffs, knots, degree);
+      T dC = derivative_coeff(k, knots_unflat, degree_, coeffs_dims_, coeffs, knots, degree);
       MX d = MX::bspline(x, dC, knots, degree, m_, opts);
       parts.push_back(d);
     }

@@ -256,7 +256,7 @@ namespace casadi {
     for (size_t i=0;i<N;++i) {
       dCv.push_back(
         BSplineCommon::derivative_coeff(
-          i, knots_stacked_, knots_offset_, degree, coeffs_dims, C, knots_d[i], degree_d[i]));
+          i, knots_, degree, coeffs_dims, C, knots_d[i], degree_d[i]));
     }
 
     MX dC = vertcat(dCv);
@@ -292,54 +292,38 @@ namespace casadi {
         int size0 = knots_[0].size();
         int size1 = knots_[1].size();
         int size2 = knots_[2].size();
-        std::vector<casadi_int> offset;
-        std::vector<double> stacked;
         std::vector< std::vector<double> > knots_dummy;
         std::vector< casadi_int> degree_dummy;
-        Interpolant::stack_grid(knots_d[0], offset, stacked);
-        MX ddC00 = BSplineCommon::derivative_coeff(0, stacked, offset, degree_d[0],
+        MX ddC00 = BSplineCommon::derivative_coeff(0, knots_d[0], degree_d[0],
           {1, size0-5, size1-4, size2-4}, dCv[0], knots_dummy, degree_dummy);
-        Interpolant::stack_grid(knots_d[1], offset, stacked);
-        MX ddC11 = BSplineCommon::derivative_coeff(1, stacked, offset, degree_d[1],
+        MX ddC11 = BSplineCommon::derivative_coeff(1, knots_d[1], degree_d[1],
           {1, size0-4, size1-5, size2-4}, dCv[1], knots_dummy, degree_dummy);
-        Interpolant::stack_grid(knots_d[2], offset, stacked);
-        MX ddC22 = BSplineCommon::derivative_coeff(2, stacked, offset, degree_d[2],
+        MX ddC22 = BSplineCommon::derivative_coeff(2, knots_d[2], degree_d[2],
           {1, size0-4, size1-4, size2-5}, dCv[2], knots_dummy, degree_dummy);
-        Interpolant::stack_grid(knots_d[0], offset, stacked);
-        MX ddC01 = BSplineCommon::derivative_coeff(1, stacked, offset, degree_d[0],
+        MX ddC01 = BSplineCommon::derivative_coeff(1, knots_d[0], degree_d[0],
           {1, size0-5, size1-4, size2-4}, dCv[0], knots_dummy, degree_dummy);
-        Interpolant::stack_grid(knots_d[1], offset, stacked);
-        MX ddC12 = BSplineCommon::derivative_coeff(2, stacked, offset, degree_d[1],
+        MX ddC12 = BSplineCommon::derivative_coeff(2, knots_d[1], degree_d[1],
           {1, size0-4, size1-5, size2-4}, dCv[1], knots_dummy, degree_dummy);
-        Interpolant::stack_grid(knots_d[2], offset, stacked);
-        MX ddC20 = BSplineCommon::derivative_coeff(0, stacked, offset, degree_d[2],
+        MX ddC20 = BSplineCommon::derivative_coeff(0, knots_d[2], degree_d[2],
           {1, size0-4, size1-4, size2-5}, dCv[2], knots_dummy, degree_dummy);
         ddC = vertcat(ddC00, ddC11, ddC22, ddC01, ddC12, ddC20);
       } else if (N==2) {
         int size0 = knots_[0].size();
         int size1 = knots_[1].size();
-        std::vector<casadi_int> offset;
-        std::vector<double> stacked;
         std::vector< std::vector<double> > knots_dummy;
         std::vector< casadi_int> degree_dummy;
-        Interpolant::stack_grid(knots_d[0], offset, stacked);
-        MX ddC00 = BSplineCommon::derivative_coeff(0, stacked, offset, degree_d[0],
+        MX ddC00 = BSplineCommon::derivative_coeff(0, knots_d[0], degree_d[0],
           {1, size0-5, size1-4}, dCv[0], knots_dummy, degree_dummy);
-        Interpolant::stack_grid(knots_d[1], offset, stacked);
-        MX ddC11 = BSplineCommon::derivative_coeff(1, stacked, offset, degree_d[1],
+        MX ddC11 = BSplineCommon::derivative_coeff(1, knots_d[1], degree_d[1],
           {1, size0-4, size1-5}, dCv[1], knots_dummy, degree_dummy);
-        Interpolant::stack_grid(knots_d[0], offset, stacked);
-        MX ddC01 = BSplineCommon::derivative_coeff(1, stacked, offset, degree_d[0],
+        MX ddC01 = BSplineCommon::derivative_coeff(1, knots_d[0], degree_d[0],
           {1, size0-5, size1-4}, dCv[0], knots_dummy, degree_dummy);
         ddC = vertcat(ddC00, ddC11, ddC01);
       } else if (N==1) {
         int size0 = knots_[0].size();
-        std::vector<casadi_int> offset;
-        std::vector<double> stacked;
         std::vector< std::vector<double> > knots_dummy;
         std::vector< casadi_int> degree_dummy;
-        Interpolant::stack_grid(knots_d[0], offset, stacked);
-        ddC = BSplineCommon::derivative_coeff(0, stacked, offset, degree_d[0],
+        ddC = BSplineCommon::derivative_coeff(0, knots_d[0], degree_d[0],
           {1, size0-5}, dCv[0], knots_dummy, degree_dummy);
       }
 
