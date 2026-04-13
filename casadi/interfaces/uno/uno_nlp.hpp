@@ -26,6 +26,8 @@
 #define CASADI_UNO_NLP_HPP
 
 #include "Uno_C_API.h"
+#include "casadi/core/generic_type.hpp"
+#include <string>
 
 namespace casadi {
 
@@ -57,35 +59,10 @@ public:
    static uno_int lagrangian_hessian_wrapper(uno_int /*number_variables*/, uno_int /*number_constraints*/, uno_int /*number_hessian_nonzeros*/,
             const double* x, double objective_multiplier, const double* multipliers, double* hessian_values, void* user_data);
 
-//    void get_initial_primal_point(std::vector<double>& x) const override;
-//    void get_initial_dual_point(std::vector<double>& multipliers) const override;
-//    void postprocess_solution(Iterate& iterate, TerminationStatus termination_status) const override;
-
-//    [[nodiscard]] const std::vector<size_t>& get_linear_constraints() const override;
+   static void set_uno_option(void* solver, const std::string& name, const GenericType& value);
 
 private:
    UnoMemory* mem_;
-
-//    mutable std::vector<double> casadi_tmp_gradient{};
-//    mutable std::vector<double> casadi_tmp_multipliers{};
-//    mutable std::vector<double> casadi_tmp_constraint_jacobian{};
-//    mutable std::vector<double> casadi_tmp_hessian{};
-
-//    std::vector<Interval> variables_bounds;
-//    std::vector<Interval> constraint_bounds;
-//    std::vector<BoundType> variable_status; /*!< Status of the variables (EQUALITY, BOUNDED_LOWER, BOUNDED_UPPER, BOUNDED_BOTH_SIDES) */
-//    std::vector<FunctionType> constraint_type; /*!< Types of the constraints (LINEAR, QUADRATIC, NONLINEAR) */
-//    std::vector<BoundType> constraint_status; /*!< Status of the constraints (EQUAL_BOUNDS, BOUNDED_LOWER, BOUNDED_UPPER, BOUNDED_BOTH_SIDES,
-//  * UNBOUNDED) */
-
-//    std::vector<size_t> linear_constraints;
-
-//    void generate_variables();
-//    void generate_constraints();
-//   //  void set_function_types(std::string file_name);
-
-//    void set_number_hessian_nonzeros();
-//    [[nodiscard]] size_t compute_hessian_number_nonzeros(double objective_multiplier, const std::vector<double>& multipliers) const;
 };
 
 } //namespace casadi

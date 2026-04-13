@@ -165,30 +165,18 @@ namespace casadi {
     
     // Define the preset and erase it from the options file
     std::string preset;
-    auto it = casadi_options.find("preset");
-    if (it!=casadi_options.end())
+    for (auto&& op : casadi_options)
     {
-      preset = it->second.to_string();
-      uno_set_solver_preset(solver, preset.c_str());
-      casadi_options.erase(it);
+      if (op.first=="preset")
+      {
+        preset = op.second.to_string();
+        uno_set_solver_preset(solver, preset.c_str());
+      }
+      else
+      {
+        UnoNlp::set_uno_option(solver, op.first, op.second);
+      }
     }
-    uno_set_solver_bool_option(solver, "print_solution", true);
-
-    // solver creation
-    // uno_set_solver_bool_option(m->solver, "print_solution", true);
-
-    // // Pass all the options to Uno
-    // for (auto&& op : casadi_options) {
-
-    //   // There might be options with a resto prefix.
-    //   std::string option_name = op.first;
-    //   if (startswith(option_name, "resto.")) {
-    //     option_name = option_name.substr(6);
-    //   }
-    //   const std::string name = op.first;
-    //   const std::string value = std::string(op.second);
-    //   uno_options[name] = value;
-    // }
   }
 
 inline const char* return_status_string(void* solver) {
