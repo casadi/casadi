@@ -41,6 +41,8 @@ namespace casadi {
     this->mex = false;
     this->with_sfunction = false;
     this->unroll_args = false;
+    this->static_aux = false;
+    this->inline_aux = false;
     this->cpp = false;
     this->main = false;
     this->casadi_real_type = "double";
@@ -80,6 +82,10 @@ namespace casadi {
         this->with_sfunction = e.second;
       } else if (e.first=="unroll_args") {
         this->unroll_args = e.second;
+      } else if (e.first=="static_aux") {
+        this->static_aux = e.second;
+      } else if (e.first=="inline_aux") {
+        this->inline_aux = e.second;
       } else if (e.first=="cpp") {
         this->cpp = e.second;
       } else if (e.first=="main") {
@@ -2526,6 +2532,10 @@ namespace casadi {
 
     bool filter_macros = true; // Macro definitions are ignored
 
+    // Set by `// SYMBOL "X"` to "casadi_X"; cleared when the matching
+    // function signature is found and the prefix is prepended.
+    std::string active_symbol;
+
     while (std::getline(stream, line)) {
       size_t n1, n2;
 
@@ -2544,7 +2554,7 @@ namespace casadi {
       // Inline declaration
       if (line == "inline") continue;
 
-      // If line starts with "// SYMBOL", add shorthand
+      // If line starts with "// SYMBOL", add shorthand and track the symbol
       if (line.find("// SYMBOL") != std::string::npos) {
         n1 = line.find("\"");
         n2 = line.find("\"", n1+1);
@@ -2553,6 +2563,7 @@ namespace casadi {
         if (!suffix.empty()) {
           rep.push_back(std::make_pair(sym, sym + suffix));
         }
+        active_symbol = "casadi_" + sym;
         continue;
       }
 
@@ -2594,6 +2605,16 @@ namespace casadi {
         line.erase(n1 + 1);
       } else {
         continue;
+      }
+
+      // Prepend storage-class/inline-hint to the symbol's signature line
+      if (!active_symbol.empty() &&
+          line.find(active_symbol + "(") != std::string::npos) {
+        std::string sig_prefix;
+        if (this->static_aux) sig_prefix += "static ";
+        if (this->inline_aux) sig_prefix += "inline ";
+        if (!sig_prefix.empty()) line = sig_prefix + line;
+        active_symbol.clear();
       }
 
       // Perform string replacements

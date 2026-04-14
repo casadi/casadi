@@ -1007,6 +1007,12 @@ namespace casadi {
     // Unroll arguments?
     bool unroll_args;
 
+    // Emit runtime auxiliary functions with 'static' storage class?
+    bool static_aux;
+
+    // Emit runtime auxiliary functions with 'inline' hint?
+    bool inline_aux;
+
     // Verbose codegen?
     bool verbose;
 
