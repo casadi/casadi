@@ -789,6 +789,11 @@ int FmuInternal::eval_ad(FmuMemory* m) const {
   size_t n_unknown = m->id_out_.size();
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
+  // Quick return if no seeds
+  if (n_known == 0) {
+    std::fill(m->d_out_.begin(), m->d_out_.end(), 0);
+    return 0;
+  }
   // Evalute (should not be necessary)
   if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown, m)) {
     casadi_warning("FMU evaluation failed");
@@ -818,6 +823,11 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
   size_t n_unknown = m->id_out_.size();
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
+  // Quick return if no seeds
+  if (n_known == 0) {
+    std::fill(m->d_out_.begin(), m->d_out_.end(), 0);
+    return 0;
+  }
   // Evalute (should not be necessary)
   if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown, m)) {
     casadi_warning("Evaluating FMU failed");
@@ -1294,9 +1304,11 @@ void FmuInternal::get(FmuMemory* m, size_t ind, double* value) const {
 void FmuInternal::set_fwd(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
-    m->isens_.at(*id) = *v++;
-    m->imarked_.at(*id) = true;
-    id++;
+    if (*v != 0) {
+      m->isens_.at(*id) = *v++;
+      m->imarked_.at(*id) = true;
+      id++;
+    }
   }
 }
 
@@ -1367,8 +1379,6 @@ void FmuInternal::gather_fwd(FmuMemory* m) const {
     m->d_in_.push_back(m->isens_[id]);
     m->isens_[id] = 0;
   }
-  // Ensure at least one seed
-  casadi_assert(n_known != 0, "No seeds");
   // Allocate result vectors
   m->v_out_.resize(n_unknown);
   m->d_out_.resize(n_unknown);
