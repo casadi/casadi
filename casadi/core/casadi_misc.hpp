@@ -138,10 +138,6 @@ private:
 
   CASADI_EXPORT bool is_equally_spaced(const std::vector<double> &v);
 
-  /// Computes a mapping for a (dense) tensor permutation
-  CASADI_EXPORT std::vector<casadi_int> tensor_permute_mapping(const std::vector<casadi_int>& dims,
-      const std::vector<casadi_int>& order);
-
   CASADI_EXPORT int to_int(casadi_int rhs);
   CASADI_EXPORT std::vector<int> to_int(const std::vector<casadi_int>& rhs);
   CASADI_EXPORT std::vector< std::vector<int> > to_int(

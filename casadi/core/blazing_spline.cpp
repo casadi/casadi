@@ -81,22 +81,31 @@ namespace casadi {
     MX K_i = knots_per_dim[i];
     MX delta_knots = K_i(range(1+degree[i], n_k-1))
           - K_i(range(1, n_k-degree[i]-1));
-    MX d = static_cast<double>(degree[i]) / delta_knots;
-    MX T = horzcat(diag(-d), MX::zeros(n-1, 1))
-         + horzcat(MX::zeros(n-1, 1), diag(d));
+    MX d = static_cast<double>(degree[i]) / delta_knots;    // length n-1
 
+    // T = diag(-d) + upper_band(+d) is a scaled finite-difference operator.
+    // Apply via slice-subtract + broadcast-multiply — no T, no kron, no densify.
     std::vector<casadi_int> coeffs_dims_new = coeffs_dims;
-    coeffs_dims_new[i+1] = T.size1();
+    coeffs_dims_new[i+1] = n - 1;
 
-    std::vector<casadi_int> order = range(n_dims+1);
-    std::swap(order.back(), order[i+1]);
-    std::vector<casadi_int> mapping = tensor_permute_mapping(coeffs_dims, order);
-    MX coeff_matrix = coeffs.nz(mapping);
-    coeff_matrix = reshape(coeff_matrix, -1, T.size2());
-    coeff_matrix = mtimes(coeff_matrix, T.T());
-    mapping = tensor_permute_mapping(permute(coeffs_dims_new, order), order);
-    coeff_matrix = coeff_matrix.nz(mapping);
-    return coeff_matrix;
+    casadi_int L = 1, R = 1;
+    for (casadi_int k=0; k<=i; ++k) L *= coeffs_dims[k];
+    for (casadi_int k=i+2; k<(casadi_int)coeffs_dims.size(); ++k) R *= coeffs_dims[k];
+    casadi_int K = coeffs_dims[i+1];
+    casadi_int Kp = n - 1;
+
+    MX M_coeffs = reshape(coeffs, L*K, R);
+    MX top = M_coeffs(Slice(L,   L*K),    Slice());
+    MX bot = M_coeffs(Slice(0, L*(K-1)),  Slice());
+    MX diffed = top - bot;
+
+    std::vector<casadi_int> dims{L, Kp, R};
+    std::vector<casadi_int> a{-1, -2, -3};
+    std::vector<casadi_int> b{-2};
+    std::vector<casadi_int> c{-1, -2, -3};
+    return MX::einstein(vec(diffed), d,
+      dims, std::vector<casadi_int>{Kp}, dims,
+      a, b, c);
   }
 
   Function blazing_spline(const std::string& name,
