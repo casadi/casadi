@@ -64,8 +64,9 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     if (J) {
       if (dc) {
         stride1 = offset[1]-offset[0]-4-1;
-        for (int j=0;j<4;++j)
+        for (int j=0;j<4;++j) {
           C[j] = simde_mm256_loadu_pd(dc+(starts[1]+j)*stride1+starts[0]-1);
+        }
         dc += stride1*(offset[2]-offset[1]-4);
       }
       J[0] = casadi_blazing_tensor_ttv2<T1>(C, J0, d0[1]);
@@ -73,8 +74,11 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (dc) {
         stride1 = offset[1]-offset[0]-4;
         for (int j=0;j<4;++j) {
-          if (j==0) C[j] = zero;
-          else C[j] = simde_mm256_loadu_pd(dc+(starts[1]+j-1)*stride1+starts[0]);
+          if (j==0) {
+            C[j] = zero;
+          } else {
+            C[j] = simde_mm256_loadu_pd(dc+(starts[1]+j-1)*stride1+starts[0]);
+          }
         }
       }
       J[1] = casadi_blazing_tensor_ttv2<T1>(C, d0[0], J1);
@@ -98,8 +102,11 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (ddc) {
         stride1 = offset[1]-offset[0]-4;
         for (int j=0;j<4;++j) {
-          if (j<=1) C[j] = zero;
-          else C[j] = simde_mm256_loadu_pd(ddc+(starts[1]+j-2)*stride1+starts[0]);
+          if (j<=1) {
+            C[j] = zero;
+          } else {
+            C[j] = simde_mm256_loadu_pd(ddc+(starts[1]+j-2)*stride1+starts[0]);
+          }
         }
         ddc += stride1*(offset[2]-offset[1]-4-2);
       }
@@ -109,8 +116,11 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (ddc) {
         stride1 = offset[1]-offset[0]-5;
         for (int j=0;j<4;++j) {
-          if (j==0) C[j] = zero;
-          else C[j] = simde_mm256_loadu_pd(ddc+(starts[1]+j-1)*stride1+starts[0]-1);
+          if (j==0) {
+            C[j] = zero;
+          } else {
+            C[j] = simde_mm256_loadu_pd(ddc+(starts[1]+j-1)*stride1+starts[0]-1);
+          }
         }
       }
       H[1] = H[2] = casadi_blazing_tensor_ttv2<T1>(C, J0, J1);

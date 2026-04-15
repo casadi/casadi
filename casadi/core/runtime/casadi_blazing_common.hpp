@@ -259,7 +259,7 @@ simde__m256d casadi_blazing_dbasis(simde__m256d boor_d1, const T1* t, const T1* 
 // inv2, inv3 can be 0 (NULL) to use the division path;
 // otherwise 1/(t[k+2]-t[k]) and 1/(t[k+3]-t[k]).
 template<typename T1>
-simde__m256d casadi_blazing_d2basis(simde__m256d boor_d2, const T1* t, const T1* inv2, const T1* inv3) {
+simde__m256d casadi_blazing_d2basis(simde__m256d boor_d2, const T1* t, const T1* inv2, const T1* inv3) {// NOLINT(whitespace/line_length)
     simde__m256d three = simde_mm256_set1_pd(3.0);
     simde__m256d two = simde_mm256_set1_pd(2.0);
     simde__m256d s1, s2;

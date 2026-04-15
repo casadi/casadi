@@ -37,9 +37,10 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
   // Per-dimension de Boor evaluation
   simde__m256d d0[3], d1[3], d2[3];
   const T1* inv2[3] = {0, 0, 0}; const T1* inv3[3] = {0, 0, 0};
-  for (int i = 0; i < 3; ++i)
+  for (int i = 0; i < 3; ++i) {
     starts[i] = casadi_blazing_boor_init<T1>(all_x[i], all_knots, all_inv,
         offset[i], offset[i+1], lookup_mode[i], &d0[i], &d1[i], &d2[i], &inv2[i], &inv3[i]);
+  }
 
   // Load coefficient sub-tensor (same C used for value and all NPC derivatives)
   simde__m256d C[16];
@@ -62,8 +63,9 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
 
     // Effective first-derivative basis: raw for precomputed, summation-by-parts for NPC
     simde__m256d Ji[3];
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i) {
       Ji[i] = dc ? d1[i] : casadi_blazing_dbasis<T1>(d1[i], t[i], inv3[i]);
+    }
 
     // First derivatives
     if (J) {
@@ -71,10 +73,12 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (dc) {
         stride1 = offset[1]-offset[0]-4-1;
         stride2 = (offset[2]-offset[1]-4)*stride1;
-        for (int j=0;j<4;++j)
-            for (int k=0;k<4;++k)
-                C[j+4*k] = simde_mm256_loadu_pd(
-                            dc+(starts[1]+j)*stride1+(starts[2]+k)*stride2+starts[0]-1);
+        for (int j=0;j<4;++j) {
+          for (int k=0;k<4;++k) {
+            C[j+4*k] = simde_mm256_loadu_pd(
+                        dc+(starts[1]+j)*stride1+(starts[2]+k)*stride2+starts[0]-1);
+          }
+        }
         dc += stride2*(offset[3]-offset[2]-4);
       }
       J[0] = casadi_blazing_tensor_ttv3<T1>(C, Ji[0], d0[1], d0[2]);
@@ -83,12 +87,16 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (dc) {
         stride1 = offset[1]-offset[0]-4;
         stride2 = (offset[2]-offset[1]-4-1)*stride1;
-        for (int j=0;j<4;++j)
-            for (int k=0;k<4;++k) {
-              if (j==0) C[j+4*k] = zero;
-              else C[j+4*k] = simde_mm256_loadu_pd(
+        for (int j=0;j<4;++j) {
+          for (int k=0;k<4;++k) {
+            if (j==0) {
+              C[j+4*k] = zero;
+            } else {
+              C[j+4*k] = simde_mm256_loadu_pd(
                           dc+(starts[1]+j-1)*stride1+(starts[2]+k)*stride2+starts[0]);
             }
+          }
+        }
         dc += stride2*(offset[3]-offset[2]-4);
       }
       J[1] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], Ji[1], d0[2]);
@@ -97,12 +105,16 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (dc) {
         stride1 = offset[1]-offset[0]-4;
         stride2 = (offset[2]-offset[1]-4)*stride1;
-        for (int j=0;j<4;++j)
-            for (int k=0;k<4;++k) {
-              if (k==0) C[j+4*k] = zero;
-              else C[j+4*k] = simde_mm256_loadu_pd(
+        for (int j=0;j<4;++j) {
+          for (int k=0;k<4;++k) {
+            if (k==0) {
+              C[j+4*k] = zero;
+            } else {
+              C[j+4*k] = simde_mm256_loadu_pd(
                           dc+(starts[1]+j)*stride1+(starts[2]+k-1)*stride2+starts[0]);
             }
+          }
+        }
       }
       J[2] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], d0[1], Ji[2]);
     }
@@ -111,18 +123,21 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     if (H) {
       // Effective second-derivative basis
       simde__m256d Hi[3];
-      for (int i = 0; i < 3; ++i)
+      for (int i = 0; i < 3; ++i) {
         Hi[i] = ddc ? d2[i] : casadi_blazing_d2basis<T1>(d2[i], t[i], inv2[i], inv3[i]);
+      }
 
       // Diagonal: H[i*(n+1)]
       // H[0] = d2/dx0^2
       if (ddc) {
         stride1 = offset[1]-offset[0]-4-2;
         stride2 = (offset[2]-offset[1]-4)*stride1;
-        for (int j=0;j<4;++j)
-            for (int k=0;k<4;++k)
-                C[j+4*k] = simde_mm256_loadu_pd(
-                            ddc+(starts[1]+j)*stride1+(starts[2]+k)*stride2+starts[0]-2);
+        for (int j=0;j<4;++j) {
+          for (int k=0;k<4;++k) {
+            C[j+4*k] = simde_mm256_loadu_pd(
+                        ddc+(starts[1]+j)*stride1+(starts[2]+k)*stride2+starts[0]-2);
+          }
+        }
         ddc += stride2*(offset[3]-offset[2]-4);
       }
       H[0] = casadi_blazing_tensor_ttv3<T1>(C, Hi[0], d0[1], d0[2]);
@@ -131,12 +146,16 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (ddc) {
         stride1 = offset[1]-offset[0]-4;
         stride2 = (offset[2]-offset[1]-4-2)*stride1;
-        for (int j=0;j<4;++j)
-            for (int k=0;k<4;++k) {
-              if (j<=1) C[j+4*k] = zero;
-              else C[j+4*k] = simde_mm256_loadu_pd(
+        for (int j=0;j<4;++j) {
+          for (int k=0;k<4;++k) {
+            if (j<=1) {
+              C[j+4*k] = zero;
+            } else {
+              C[j+4*k] = simde_mm256_loadu_pd(
                           ddc+(starts[1]+j-2)*stride1+(starts[2]+k)*stride2+starts[0]);
             }
+          }
+        }
         ddc += stride2*(offset[3]-offset[2]-4);
       }
       H[4] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], Hi[1], d0[2]);
@@ -145,12 +164,16 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (ddc) {
         stride1 = offset[1]-offset[0]-4;
         stride2 = (offset[2]-offset[1]-4)*stride1;
-        for (int j=0;j<4;++j)
-            for (int k=0;k<4;++k) {
-              if (k<=1) C[j+4*k] = zero;
-              else C[j+4*k] = simde_mm256_loadu_pd(
+        for (int j=0;j<4;++j) {
+          for (int k=0;k<4;++k) {
+            if (k<=1) {
+              C[j+4*k] = zero;
+            } else {
+              C[j+4*k] = simde_mm256_loadu_pd(
                           ddc+(starts[1]+j)*stride1+(starts[2]+k-2)*stride2+starts[0]);
             }
+          }
+        }
         ddc += stride2*(offset[3]-offset[2]-4-2);
       }
       H[8] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], d0[1], Hi[2]);
@@ -160,12 +183,16 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (ddc) {
         stride1 = offset[1]-offset[0]-5;
         stride2 = (offset[2]-offset[1]-5)*stride1;
-        for (int j=0;j<4;++j)
-            for (int k=0;k<4;++k) {
-              if (j==0) C[j+4*k] = zero;
-              else C[j+4*k] = simde_mm256_loadu_pd(
+        for (int j=0;j<4;++j) {
+          for (int k=0;k<4;++k) {
+            if (j==0) {
+              C[j+4*k] = zero;
+            } else {
+              C[j+4*k] = simde_mm256_loadu_pd(
                           ddc+(starts[1]+j-1)*stride1+(starts[2]+k)*stride2+starts[0]-1);
             }
+          }
+        }
         ddc += stride2*(offset[3]-offset[2]-4);
       }
       H[1] = H[3] = casadi_blazing_tensor_ttv3<T1>(C, Ji[0], Ji[1], d0[2]);
@@ -174,12 +201,16 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (ddc) {
         stride1 = offset[1]-offset[0]-4;
         stride2 = (offset[2]-offset[1]-5)*stride1;
-        for (int j=0;j<4;++j)
-            for (int k=0;k<4;++k) {
-              if (k==0) C[j+4*k] = zero;
-              else C[j+4*k] = simde_mm256_loadu_pd(
+        for (int j=0;j<4;++j) {
+          for (int k=0;k<4;++k) {
+            if (k==0) {
+              C[j+4*k] = zero;
+            } else {
+              C[j+4*k] = simde_mm256_loadu_pd(
                           ddc+(starts[1]+j-1)*stride1+(starts[2]+k-1)*stride2+starts[0]);
             }
+          }
+        }
         ddc += stride2*(offset[3]-offset[2]-5);
       }
       H[5] = H[7] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], Ji[1], Ji[2]);
@@ -188,12 +219,16 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       if (ddc) {
         stride1 = offset[1]-offset[0]-5;
         stride2 = (offset[2]-offset[1]-4)*stride1;
-        for (int j=0;j<4;++j)
-            for (int k=0;k<4;++k) {
-              if (k==0) C[j+4*k] = zero;
-              else C[j+4*k] = simde_mm256_loadu_pd(
+        for (int j=0;j<4;++j) {
+          for (int k=0;k<4;++k) {
+            if (k==0) {
+              C[j+4*k] = zero;
+            } else {
+              C[j+4*k] = simde_mm256_loadu_pd(
                           ddc+(starts[1]+j)*stride1+(starts[2]+k-1)*stride2+starts[0]-1);
             }
+          }
+        }
       }
       H[2] = H[6] = casadi_blazing_tensor_ttv3<T1>(C, Ji[0], d0[1], Ji[2]);
     }

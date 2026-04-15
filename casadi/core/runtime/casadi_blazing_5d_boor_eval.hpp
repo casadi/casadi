@@ -62,11 +62,16 @@ void casadi_blazing_5d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     }
 
     if (J) {
-      J[0] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, dJ[0], d0[1], d0[2], d0[3], d0[4]);
-      J[1] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], dJ[1], d0[2], d0[3], d0[4]);
-      J[2] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], d0[1], dJ[2], d0[3], d0[4]);
-      J[3] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], d0[1], d0[2], dJ[3], d0[4]);
-      J[4] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], d0[1], d0[2], d0[3], dJ[4]);
+      J[0] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        dJ[0], d0[1], d0[2], d0[3], d0[4]);
+      J[1] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], dJ[1], d0[2], d0[3], d0[4]);
+      J[2] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], d0[1], dJ[2], d0[3], d0[4]);
+      J[3] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], d0[1], d0[2], dJ[3], d0[4]);
+      J[4] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], d0[1], d0[2], d0[3], dJ[4]);
     }
 
     if (H) {
@@ -75,23 +80,38 @@ void casadi_blazing_5d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         dH[i] = casadi_blazing_d2basis<T1>(d2[i], t[i], inv2[i], inv3[i]);
 
       // Diagonal
-      H[0]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, dH[0], d0[1], d0[2], d0[3], d0[4]);
-      H[6]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], dH[1], d0[2], d0[3], d0[4]);
-      H[12] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], d0[1], dH[2], d0[3], d0[4]);
-      H[18] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], d0[1], d0[2], dH[3], d0[4]);
-      H[24] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], d0[1], d0[2], d0[3], dH[4]);
+      H[0]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        dH[0], d0[1], d0[2], d0[3], d0[4]);
+      H[6]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], dH[1], d0[2], d0[3], d0[4]);
+      H[12] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], d0[1], dH[2], d0[3], d0[4]);
+      H[18] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], d0[1], d0[2], dH[3], d0[4]);
+      H[24] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], d0[1], d0[2], d0[3], dH[4]);
 
       // Off-diagonal
-      H[1] = H[5]   = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, dJ[0], dJ[1], d0[2], d0[3], d0[4]);
-      H[2] = H[10]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, dJ[0], d0[1], dJ[2], d0[3], d0[4]);
-      H[3] = H[15]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, dJ[0], d0[1], d0[2], dJ[3], d0[4]);
-      H[4] = H[20]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, dJ[0], d0[1], d0[2], d0[3], dJ[4]);
-      H[7] = H[11]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], dJ[1], dJ[2], d0[3], d0[4]);
-      H[8] = H[16]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], dJ[1], d0[2], dJ[3], d0[4]);
-      H[9] = H[21]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], dJ[1], d0[2], d0[3], dJ[4]);
-      H[13] = H[17] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], d0[1], dJ[2], dJ[3], d0[4]);
-      H[14] = H[22] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], d0[1], dJ[2], d0[3], dJ[4]);
-      H[19] = H[23] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4, d0[0], d0[1], d0[2], dJ[3], dJ[4]);
+      H[1] = H[5]   = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        dJ[0], dJ[1], d0[2], d0[3], d0[4]);
+      H[2] = H[10]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        dJ[0], d0[1], dJ[2], d0[3], d0[4]);
+      H[3] = H[15]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        dJ[0], d0[1], d0[2], dJ[3], d0[4]);
+      H[4] = H[20]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        dJ[0], d0[1], d0[2], d0[3], dJ[4]);
+      H[7] = H[11]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], dJ[1], dJ[2], d0[3], d0[4]);
+      H[8] = H[16]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], dJ[1], d0[2], dJ[3], d0[4]);
+      H[9] = H[21]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], dJ[1], d0[2], d0[3], dJ[4]);
+      H[13] = H[17] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], d0[1], dJ[2], dJ[3], d0[4]);
+      H[14] = H[22] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], d0[1], dJ[2], d0[3], dJ[4]);
+      H[19] = H[23] = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,
+        d0[0], d0[1], d0[2], dJ[3], dJ[4]);
     }
   }
 }
