@@ -426,7 +426,11 @@ std::unique_ptr<std::ostream> ofstream_compat(const std::string& utf8_path,
 
     int flags = (mode & std::ios::in) ? _O_RDWR : _O_WRONLY;
     if (mode & std::ios::app) flags |= _O_APPEND;
-    if (mode & std::ios::binary) flags |= _O_BINARY;
+    if (mode & std::ios::binary) {
+        flags |= _O_BINARY;
+    } else {
+        flags |= _O_TEXT;
+    }
 
     int fd = _open_osfhandle(reinterpret_cast<intptr_t>(h), flags);
     if (fd == -1) {
