@@ -6202,9 +6202,6 @@
 %exception  casadi::temporary_file(const std::string &prefix, const std::string &suffix, const std::string &directory) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::tensor_permute_mapping(const std::vector< casadi_int > &dims, const std::vector< casadi_int > &order) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::text2set(const std::string &text) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

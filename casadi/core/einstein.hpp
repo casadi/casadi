@@ -121,14 +121,20 @@ namespace casadi {
       return sameOpAndDeps(node, depth) && dynamic_cast<const Einstein*>(node)!=nullptr;
     }
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{2g6} */
     void serialize_body(SerializingStream& s) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{2g7} */
     static MXNode* deserialize(DeserializingStream& s) { return new Einstein(s); }
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{2g8} */
     explicit Einstein(DeserializingStream& s);
 
   public:
