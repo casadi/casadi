@@ -2887,6 +2887,7 @@ class MXtests(casadiTestCase):
           self.checkfunction(f, fr, inputs=[A_,B_,C_])
           self.checkfunction(fsx, fr, inputs=[A_,B_,C_])
           self.check_codegen(f, inputs=[A_,B_,C_])
+          self.check_serialize(f, inputs=[A_,B_,C_])
           self.checkfunction(fsx, f_sx, inputs=[A_,B_,C_])
 
           for i in range(3):

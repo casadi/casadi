@@ -1363,7 +1363,7 @@ namespace casadi {
     //OP_ERFINV,
     //OP_PRINTME,
     //OP_LIFT,
-    //OP_EINSTEIN
+    {OP_EINSTEIN, Einstein::deserialize},
     {OP_BSPLINE, BSplineCommon::deserialize},
     {OP_CONVEXIFY, Convexify::deserialize},
     {OP_LOGSUMEXP, LogSumExp::deserialize},

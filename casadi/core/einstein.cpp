@@ -170,6 +170,35 @@ namespace casadi {
     g << "}\n";
   }
 
+  void Einstein::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("Einstein::dim_c", dim_c_);
+    s.pack("Einstein::dim_a", dim_a_);
+    s.pack("Einstein::dim_b", dim_b_);
+    s.pack("Einstein::c", c_);
+    s.pack("Einstein::a", a_);
+    s.pack("Einstein::b", b_);
+    s.pack("Einstein::iter_dims", iter_dims_);
+    s.pack("Einstein::strides_a", strides_a_);
+    s.pack("Einstein::strides_b", strides_b_);
+    s.pack("Einstein::strides_c", strides_c_);
+    s.pack("Einstein::n_iter", n_iter_);
+  }
+
+  Einstein::Einstein(DeserializingStream& s) : MXNode(s) {
+    s.unpack("Einstein::dim_c", dim_c_);
+    s.unpack("Einstein::dim_a", dim_a_);
+    s.unpack("Einstein::dim_b", dim_b_);
+    s.unpack("Einstein::c", c_);
+    s.unpack("Einstein::a", a_);
+    s.unpack("Einstein::b", b_);
+    s.unpack("Einstein::iter_dims", iter_dims_);
+    s.unpack("Einstein::strides_a", strides_a_);
+    s.unpack("Einstein::strides_b", strides_b_);
+    s.unpack("Einstein::strides_c", strides_c_);
+    s.unpack("Einstein::n_iter", n_iter_);
+  }
+
 } // namespace casadi
 
 #endif // CASADI_EINSTEIN_CPP
