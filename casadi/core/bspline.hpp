@@ -261,6 +261,13 @@ namespace casadi {
           casadi_int m,
           const Dict& opts);
 
+    /// Parametric knots version (always inlined)
+    static MX create(const MX& x, const MX& coeffs,
+          const std::vector<MX>& knots,
+          const std::vector<casadi_int>& degree,
+          casadi_int m,
+          const Dict& opts);
+
     /// Constructor
     BSplineParametric(const MX& x, const MX& coeffs,
             const std::vector<double>& knots,

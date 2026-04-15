@@ -2087,6 +2087,17 @@ class Functiontests(casadiTestCase):
     self.check_codegen(F,inputs=[vertcat(0.3,0.4)])
     self.check_serialize(F,inputs=[vertcat(0.3,0.4)])
 
+    # Parametric knots (MX knots, always inlined)
+    K = [MX.sym("K0",len(knots[0])), MX.sym("K1",len(knots[1]))]
+    Y_pk = bspline(x,C,K,[3,2],2)
+    # Substitute fixed knots to compare with reference
+    knots_dm = [DM(k) for k in knots]
+    Y_sub = substitute([Y_pk], K, knots_dm)[0]
+    F_pk = Function('f_pk',[x,C],[Y_sub])
+    F_pk = Function('f_pk',[x],[F_pk(x,data)])
+    self.checkfunction(f,F_pk,inputs=[vertcat(0.3,0.4)])
+    self.check_codegen(F_pk,inputs=[vertcat(0.3,0.4)],std="c99")
+
 
   def test_smooth_linear(self):
     np.random.seed(0)
