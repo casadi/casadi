@@ -208,8 +208,13 @@ namespace casadi {
     boor = horzcat(std::vector<MX>(boor_full.begin(), boor_full.begin()+degree+1));
   }
 
+  // Helper: get number of knots from either std::vector<double> or MX
+  static casadi_int knot_size(const std::vector<double>& k) { return k.size(); }
+  static casadi_int knot_size(const MX& k) { return k.size1(); }
+
+  template<typename K>
   MX do_inline(const MX& x,
-                const std::vector< std::vector<double> >& knots,
+                const std::vector<K>& knots,
                 const MX& coeffs,
                 casadi_int m,
                 const std::vector<casadi_int>& degree,
@@ -233,7 +238,7 @@ namespace casadi {
     // Compute strides
     std::vector<casadi_int> strides = {m};
     for (casadi_int i=0;i<N-1;++i) {
-      strides.push_back(strides.back()*(knots[i].size()-degree[i]-1));
+      strides.push_back(strides.back()*(knot_size(knots[i])-degree[i]-1));
     }
 
     // Start index of subtensor: row vector
@@ -336,6 +341,41 @@ namespace casadi {
     } else {
       return x->get_bspline(coeffs, stacked, offset, degree, m, mode);
     }
+  }
+
+  MX BSplineParametric::create(const MX& x,
+          const MX& coeffs,
+          const std::vector<MX>& knots,
+          const std::vector<casadi_int>& degree,
+          casadi_int m,
+          const Dict& opts) {
+
+    casadi_assert(x.is_vector(), "x argument must be a vector, got " + x.dim() + " instead.");
+    casadi_assert(x.numel()==knots.size(), "x argument length (" + str(x.numel()) + ") must match "
+                                           "knot list length (" + str(knots.size()) + ").");
+    casadi_assert(degree.size()==knots.size(), "Degree list length (" + str(degree.size()) + ") "
+                  "must match knot list length (" + str(knots.size()) + ").");
+
+    // Parametric knots: always inline (non-inline path requires numeric knots)
+    std::vector<std::string> lookup_mode;
+    for (auto&& op : opts) {
+      if (op.first=="lookup_mode") {
+        lookup_mode = op.second;
+      }
+    }
+
+    // Build offset from MX knot sizes
+    std::vector<casadi_int> offset(knots.size()+1);
+    offset[0] = 0;
+    for (casadi_int i=0; i<knots.size(); ++i) {
+      offset[i+1] = offset[i] + knots[i].size1();
+    }
+
+    std::vector<casadi_int> mode =
+      Interpolant::interpret_lookup_mode(lookup_mode, std::vector<double>(),
+        offset, degree, degree);
+
+    return do_inline(x, knots, coeffs, m, degree, mode);
   }
 
   std::string BSpline::disp(const std::vector<std::string>& arg) const {
