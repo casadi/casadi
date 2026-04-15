@@ -372,7 +372,8 @@ namespace casadi {
     }
 
     std::vector<casadi_int> mode =
-      Interpolant::interpret_lookup_mode(lookup_mode, std::vector<double>(), offset, degree, degree);
+      Interpolant::interpret_lookup_mode(lookup_mode, std::vector<double>(),
+        offset, degree, degree);
 
     return do_inline(x, knots, coeffs, m, degree, mode);
   }
