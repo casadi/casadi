@@ -111,7 +111,7 @@ class CASADI_EXPORT DaeBuilder
 
       \identifier{2fv} */
   std::vector<std::string> z() const {return all("z");}
- 
+
   /** \brief Quadrature states
 
       \identifier{2fw} */
