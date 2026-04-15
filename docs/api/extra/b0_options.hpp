@@ -556,12 +556,15 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>lookup_mode</td><td>OT_STRINGVECTOR</td><td>Specifies, for each grid dimension, the lookup algorithm used to find the correct index. 'linear' uses a forward linear search. 'exact' uses a comparator function optimized for uniformly distributed data (requires equally spaced knots). 'binary' uses a binary search. 'auto' (default) uses 'linear' for small grids and 'binary' for large.</td><td>casadi::BlazingSplineFunction</td></tr>
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>precompute_coeff</td><td>OT_BOOL</td><td>If true, derivative evaluation requires precomputed derivative coefficient tensors (dC, ddC) as function inputs. Only supported up to 3D. Default: true for fixed knots, false for parametric knots.</td><td>casadi::BlazingSplineFunction</td></tr>
+<tr><td>precompute_grid</td><td>OT_BOOL</td><td>If true, precompute reciprocal knot spans to replace runtime divisions with multiplications. For parametric knots, inv is computed symbolically from the knots input. Default: false.</td><td>casadi::BlazingSplineFunction</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>

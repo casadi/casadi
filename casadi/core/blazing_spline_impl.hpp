@@ -44,7 +44,9 @@ namespace casadi {
         bool precompute_coeff = true,
         bool precompute_grid = false);
 
-    /** \brief Constructor (parametric knots) */
+    /** \brief Constructor (parametric knots)
+
+        \identifier{2g1} */
     BlazingSplineFunction(
         const std::string& name,
         const std::vector<casadi_int>& knot_dims,
@@ -105,16 +107,24 @@ namespace casadi {
                           const Dict& opts) const override;
     ///@}
 
-    /** \brief Are knots parametric (provided at runtime)? */
+    /** \brief Are knots parametric (provided at runtime)?
+
+        \identifier{2g2} */
     bool has_parametric_knots() const { return knots_.empty(); }
 
-    /** \brief Number of dimensions */
+    /** \brief Number of dimensions
+
+        \identifier{2g3} */
     casadi_int ndim() const { return knots_offset_.size()-1; }
 
-    /** \brief Index of the knots input (only valid when parametric) */
+    /** \brief Index of the knots input (only valid when parametric)
+
+        \identifier{2g4} */
     casadi_int arg_knots() const { return 2; }
 
-    /** \brief Index of the inv input (only valid when inv_input_) */
+    /** \brief Index of the inv input (only valid when inv_input_)
+
+        \identifier{2g5} */
     casadi_int arg_inv() const { return arg_knots() + 1; }
 
     casadi_int diff_order_;

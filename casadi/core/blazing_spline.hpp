@@ -53,7 +53,7 @@ namespace casadi {
    * precompute_grid options as the fixed-knots variant.
    *
 
-  */
+      \identifier{2g0} */
   CASADI_EXPORT Function blazing_spline(const std::string& name,
     const std::vector<casadi_int>& knot_dims,
     const Dict& opts=Dict());
