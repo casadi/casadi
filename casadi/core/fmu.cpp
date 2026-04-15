@@ -1370,8 +1370,7 @@ void FmuInternal::gather_io(FmuMemory* m) const {
 void FmuInternal::gather_fwd(FmuMemory* m) const {
   // Gather input and output indices
   gather_io(m);
-  // Number of inputs and outputs
-  size_t n_known = m->id_in_.size();
+  // Number of outputs
   size_t n_unknown = m->id_out_.size();
   // Get/clear seeds
   m->d_in_.clear();
