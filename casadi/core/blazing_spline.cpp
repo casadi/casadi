@@ -74,7 +74,6 @@ namespace casadi {
       const std::vector<casadi_int>& degree,
       const std::vector<casadi_int>& coeffs_dims,
       const MX& coeffs) {
-    casadi_int n_dims = degree.size();
     casadi_int n_k = knots_per_dim[i].size1();
     casadi_int n = n_k - degree[i] - 1;
 
