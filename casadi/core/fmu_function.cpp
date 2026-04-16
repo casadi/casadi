@@ -191,7 +191,17 @@ void FmuFunction::change_option(const std::string& option_name,
     fd_method_ = option_value.to_string();
     fd_ = to_enum<FdMode>(fd_method_, "forward");
   } else if (option_name == "uses_directional_derivatives") {
-    uses_directional_derivatives_ = option_value;
+    // Set, if permitted
+    bool v = option_value;
+    if (v) casadi_assert(fmu_.provides_directional_derivatives(),
+      "FMU does not provide support for analytic derivatives");
+    uses_directional_derivatives_ = v;
+  } else if (option_name == "uses_adjoint_derivatives") {
+    // Set, if permitted
+    bool v = option_value;
+    if (v) casadi_assert(fmu_.provides_adjoint_derivatives(),
+      "FMU does not provide support for adjoint derivatives");
+    uses_adjoint_derivatives_ = v;
   } else if (option_name == "fd_flip") {
     fd_flip_ = option_value;
   } else {
