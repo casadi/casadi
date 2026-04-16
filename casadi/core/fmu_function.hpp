@@ -224,7 +224,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   std::vector<casadi_int> nonlin_;
 
   // Jacobian memory
-  casadi_jac_prob<double> p_;
+  casadi_jac_prob<double> jac_mem_;
 
   // Number of parallel tasks
   casadi_int max_jac_tasks_, max_hess_tasks_, max_n_tasks_;
