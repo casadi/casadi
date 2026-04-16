@@ -178,14 +178,17 @@ struct casadi_fatrop_data {
 // SYMBOL "fatrop_init_mem"
 template<typename T1>
 int casadi_fatrop_init_mem(casadi_fatrop_data<T1>* d) {
+  d->solver = 0;
   return 0;
 }
 
 // SYMBOL "fatrop_free_mem"
 template<typename T1>
 void casadi_fatrop_free_mem(casadi_fatrop_data<T1>* d) {
-  //Highs_destroy(d->fatrop);
-  
+  if (d->solver) {
+    fatrop_ocp_c_destroy(d->solver);
+    d->solver = 0;
+  }
 }
 // C-REPLACE "static_cast< casadi_fatrop_data<T1>* >" "(struct casadi_fatrop_data*)"
 // C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
@@ -870,7 +873,28 @@ void casadi_fatrop_presolve(casadi_fatrop_data<T1>* d) {
 
   d->ocp_interface.user_data = d;
 
-  d->solver = fatrop_ocp_c_create(&d->ocp_interface, p->write, p->flush);
+  // Detect structure change: if eq/ineq counts differ from cached solver, rebuild
+  if (d->solver) {
+    const struct FatropOcpCDims* dims = fatrop_ocp_c_get_dims(d->solver);
+    int structure_changed = 0;
+    for (k=0;k<p->N+1;++k) {
+      casadi_int ng_eq_k = d->a_eq_idx[k+1] - d->a_eq_idx[k]
+                         + d->x_eq_idx[k+1] - d->x_eq_idx[k];
+      casadi_int ng_ineq_k = d->a_ineq_idx[k+1] - d->a_ineq_idx[k]
+                            + d->x_ineq_idx[k+1] - d->x_ineq_idx[k];
+      if (ng_eq_k != dims->ng[k] || ng_ineq_k != dims->ng_ineq[k]) {
+        structure_changed = 1;
+        break;
+      }
+    }
+    if (structure_changed) {
+      fatrop_ocp_c_destroy(d->solver);
+      d->solver = 0;
+    }
+  }
+  if (!d->solver) {
+    d->solver = fatrop_ocp_c_create(&d->ocp_interface, p->write, p->flush);
+  }
 }
 
 // SYMBOL "fatrop_solve"
@@ -953,6 +977,5 @@ void casadi_fatrop_solve(casadi_fatrop_data<T1>* d) {
     casadi_scaled_copy(-1.0, dual_data+str->dyn_eq_offs[k], p->nx[k+1], d_nlp->lam+p_nlp->nx+p->AB[k].offset_r);
   }
 
-  fatrop_ocp_c_destroy(d->solver);
 
 }
