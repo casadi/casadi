@@ -328,16 +328,27 @@ namespace casadi {
         }
 
         s << "{";
-        for (casadi_int i = 0; i < v.size(); ++i) {
-            if (i != 0) {
-                if (max_initializer_elements_per_line > 1 &&
-                    i % max_initializer_elements_per_line == 0) {
-                    s << ",\n  ";
-                } else {
-                    s << ", ";
-                }
+        bool all_zeros = v.size() > 0;
+        for (const auto& el : v) {
+            if (el != T(0)) {
+                all_zeros = false;
+                break;
             }
-            s << constant(v[i]);
+        }
+        if (all_zeros) {
+            s << constant(T(0)); // empty_initialization shorthand
+        } else {
+            for (casadi_int i = 0; i < v.size(); ++i) {
+                if (i != 0) {
+                    if (max_initializer_elements_per_line > 1 &&
+                        i % max_initializer_elements_per_line == 0) {
+                        s << ",\n  ";
+                    } else {
+                        s << ", ";
+                    }
+                }
+                s << constant(v[i]);
+            }
         }
         s << "}";
         return s.str();
