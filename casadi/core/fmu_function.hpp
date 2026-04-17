@@ -56,7 +56,7 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   // Adjoint seeds, sensitivities being calculated
   double *aseed, *asens, *pert_asens;
   // Memory for Jacobian calculation
-  casadi_jac_data<double> d;
+  casadi_jac_data<double> jac_data, adj_data;
   // Instance memory
   void* instance;
   // Additional (slave) memory objects
@@ -165,9 +165,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   bool validate_forward_, validate_hessian_;
 
   // User-set options
-  bool make_symmetric_;
   double step_, abstol_, reltol_;
-  bool print_progress_, new_jacobian_, new_forward_, new_hessian_, hessian_coloring_, fd_flip_;
+  bool print_progress_, new_jacobian_, new_forward_, new_hessian_, fd_flip_,
+    make_symmetric_, hessian_coloring_, enable_forward_jacobian_, enable_adjoint_jacobian_;
   std::string validate_ad_file_;
 
   // FD method as an enum
@@ -215,19 +215,19 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& name_out);
 
   // Get sparsity pattern for extended Jacobian, Hessian
-  Sparsity jac_sp_, hess_sp_;
+  Sparsity jac_sp_, hess_sp_, adj_sp_;
 
   // Graph coloring
-  Sparsity jac_colors_, hess_colors_;
+  Sparsity jac_colors_, hess_colors_, adj_colors_;
 
   // Nonlinearly entering variables
   std::vector<casadi_int> nonlin_;
 
   // Jacobian memory
-  casadi_jac_prob<double> jac_mem_;
+  casadi_jac_prob<double> jac_prob_, adj_prob_;
 
   // Number of parallel tasks
-  casadi_int max_jac_tasks_, max_hess_tasks_, max_n_tasks_;
+  casadi_int max_jac_tasks_, max_hess_tasks_, max_adj_tasks_, max_n_tasks_;
 
   ///@{
   /** \brief Number of function inputs and outputs
