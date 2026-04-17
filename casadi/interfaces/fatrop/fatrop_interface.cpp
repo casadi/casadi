@@ -37,6 +37,14 @@
 #include <iomanip>
 #include <chrono>
 
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
+
 #include <fatrop_runtime_str.h>
 
 namespace casadi {
@@ -547,7 +555,16 @@ namespace casadi {
   int FatropInterface::solve(void* mem) const {
     auto m = static_cast<FatropMemory*>(mem);
 
-    casadi_fatrop_presolve(&m->d);
+    // fatrop_ocp_c_create (called from casadi_fatrop_presolve) installs a
+    // process-wide singleton stream via fatrop::OutputStreamManager::set_stream,
+    // which is not thread-safe. Serialize across threads.
+    {
+#ifdef CASADI_WITH_THREAD
+      static std::mutex mutex_fatrop_create;
+      std::lock_guard<std::mutex> lock(mutex_fatrop_create);
+#endif //CASADI_WITH_THREAD
+      casadi_fatrop_presolve(&m->d);
+    }
 
     for (const auto& kv : opts_) {
       switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
@@ -678,7 +695,21 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
 
   g << "casadi_fatrop_init(d, &arg, &res, &iw, &w);\n";
   g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
-  g << "casadi_fatrop_presolve(d);\n";
+
+  // fatrop_ocp_c_create (called from casadi_fatrop_presolve) installs a
+  // process-wide singleton stream via fatrop::OutputStreamManager::set_stream,
+  // which is not thread-safe. Serialize across threads.
+  if (g.thread_safe()) {
+    Function F = shared_from_this<Function>();
+    std::string mutex_name = codegen_name(g, false) + "_fatrop_create_mutex";
+    g.define_local_mutex(F, mutex_name);
+    std::string mtx = g.local_mutex(F, mutex_name);
+    g << "CASADI_MUTEX_LOCK(&" << mtx << ");\n";
+    g << "casadi_fatrop_presolve(d);\n";
+    g << "CASADI_MUTEX_UNLOCK(&" << mtx << ");\n";
+  } else {
+    g << "casadi_fatrop_presolve(d);\n";
+  }
 
   for (const auto& kv : opts_) {
     switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
