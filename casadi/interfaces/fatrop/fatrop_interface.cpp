@@ -547,29 +547,34 @@ namespace casadi {
   int FatropInterface::solve(void* mem) const {
     auto m = static_cast<FatropMemory*>(mem);
 
+    // Cache the solver: presolve (re)creates it only when needed
+    bool new_solver = (m->d.solver == 0);
     casadi_fatrop_presolve(&m->d);
 
-    for (const auto& kv : opts_) {
-      switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
-        case 0:
-          fatrop_ocp_c_set_option_double(m->d.solver, kv.first.c_str(), kv.second);
-          break;
-        case 1:
-          fatrop_ocp_c_set_option_int(m->d.solver, kv.first.c_str(), kv.second.to_int());
-          break;
-        case 2:
-          fatrop_ocp_c_set_option_bool(m->d.solver, kv.first.c_str(), kv.second.to_bool());
-          break;
-        case 3:
-          {
-            std::string s = kv.second.to_string();
-            fatrop_ocp_c_set_option_string(m->d.solver, kv.first.c_str(), s.c_str());
-          }
-          break;
-        case -1:
-          casadi_error("Fatrop option not supported: " + kv.first);
-        default:
-          casadi_error("Unknown option type.");
+    // Set options only when a new solver was created (options persist across solves)
+    if (new_solver) {
+      for (const auto& kv : opts_) {
+        switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
+          case 0:
+            fatrop_ocp_c_set_option_double(m->d.solver, kv.first.c_str(), kv.second);
+            break;
+          case 1:
+            fatrop_ocp_c_set_option_int(m->d.solver, kv.first.c_str(), kv.second.to_int());
+            break;
+          case 2:
+            fatrop_ocp_c_set_option_bool(m->d.solver, kv.first.c_str(), kv.second.to_bool());
+            break;
+          case 3:
+            {
+              std::string s = kv.second.to_string();
+              fatrop_ocp_c_set_option_string(m->d.solver, kv.first.c_str(), s.c_str());
+            }
+            break;
+          case -1:
+            casadi_error("Fatrop option not supported: " + kv.first);
+          default:
+            casadi_error("Unknown option type.");
+        }
       }
     }
 
@@ -678,26 +683,30 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
 
   g << "casadi_fatrop_init(d, &arg, &res, &iw, &w);\n";
   g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
-  g << "casadi_fatrop_presolve(d);\n";
+  // Cache the solver: presolve (re)creates it only when needed
+  g << "{\n";
+  g << "  int new_solver = (d->solver == 0);\n";
+  g << "  casadi_fatrop_presolve(d);\n";
+  g << "  if (new_solver) {\n";
 
   for (const auto& kv : opts_) {
     switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
       case 0:
-        g << "fatrop_ocp_c_set_option_double(d->solver, \"" + kv.first + "\", "
+        g << "    fatrop_ocp_c_set_option_double(d->solver, \"" + kv.first + "\", "
               + g.constant(kv.second.to_double()) + ");\n";
         break;
       case 1:
-        g << "fatrop_ocp_c_set_option_int(d->solver, \"" + kv.first + "\", "
+        g << "    fatrop_ocp_c_set_option_int(d->solver, \"" + kv.first + "\", "
               + str(kv.second.to_int()) + ");\n";
         break;
       case 2:
-        g << "fatrop_ocp_c_set_option_bool(d->solver, \"" + kv.first + "\", "
+        g << "    fatrop_ocp_c_set_option_bool(d->solver, \"" + kv.first + "\", "
               + str(static_cast<int>(kv.second.to_bool())) + ");\n";
         break;
       case 3:
         {
           std::string s = kv.second.to_string();
-          g << "fatrop_ocp_c_set_option_bool(d->solver, \"" + kv.first + "\", \""
+          g << "    fatrop_ocp_c_set_option_bool(d->solver, \"" + kv.first + "\", \""
               + s + "\");\n";
         }
         break;
@@ -708,7 +717,8 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
     }
   }
 
-  // Options
+  g << "  }\n";
+  g << "}\n";
   g << "casadi_fatrop_solve(d);\n";
 
   codegen_body_exit(g);
