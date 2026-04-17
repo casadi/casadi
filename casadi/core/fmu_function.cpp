@@ -984,6 +984,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     }
   }
   // Evaluate everything except Hessian, possibly in parallel
+  if (print_progress_) casadi_message("Evaluating regular outputs, forward sens, extended Jacobian");
   if (eval_all(m, max_jac_tasks_, true, need_jac, need_fwd, need_adj, false)) return 1;
   // Post-process Jacobian
   if (need_jac && !enable_forward_jacobian_) {
@@ -994,6 +995,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   }
   // Evaluate Hessian
   if (need_hess) {
+    if (print_progress_) casadi_message("Evaluating extended Hessian");
     if (eval_all(m, max_hess_tasks_, false, false, false, false, true)) return 1;
     // Post-process Hessian
     remove_nans(hess_nz, iw);
