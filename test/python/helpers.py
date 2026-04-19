@@ -24,7 +24,12 @@
 from casadi import *
 import casadi
 import numpy
+import numpy as np
 from numpy import random, array
+try:
+    from typing import Any, Optional, Union  # referenced in type-comments below
+except ImportError:
+    pass  # Py2: type comments are ignored at runtime
 import unittest
 import sys
 from math import isnan, isinf
@@ -73,7 +78,7 @@ except RuntimeError:
   swig4 = False
 
 try:
-  nlpsol(123)
+  nlpsol(123)  # pyright: ignore[reportCallIssue]
 except Exception as e:
   if "SXDict" in str(e):
     systemswig = True
@@ -122,9 +127,10 @@ class TeeString(StringIO):
     StringIO.__init__(self)
     self.stream = stream
 
-  def write(self, data):
+  def write(self, data):  # type: ignore[override]
     StringIO.write(self,data)
     self.stream.write(data)
+    return len(data)
 
 class Stdout():
     def __init__(self):
@@ -205,6 +211,7 @@ class casadiTestCase(unittest.TestCase):
     except Exception as err:
       e = str(err)
     self.assertFalse(e is None)
+    assert e is not None
     self.assertTrue(s in e,msg=e + "<->" + s)
 
   @contextmanager
@@ -277,7 +284,7 @@ class casadiTestCase(unittest.TestCase):
 
     unittest.TestCase.__init__(self,*margs,**kwargs)
 
-  def randDM(self,n,m=1,sparsity=1,valuegenerator=lambda : random.normal(0,1),symm=False ):
+  def randDM(self,n,m=1,sparsity=1.0,valuegenerator=lambda : random.normal(0,1),symm=False ):
     if sparsity < 1:
       spp = self.randDM(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) ,symm=symm)
       spm = (spp < sparsity)
@@ -298,9 +305,9 @@ class casadiTestCase(unittest.TestCase):
       print(s)
       sys.stdout.flush()
 
-  def assertAlmostEqual(self,first, second, places=7, msg=""):
+  def assertAlmostEqual(self,first, second, places=7, msg="", delta=None):  # type: ignore[override]
       if isnan(first ) and isnan(second): return
-      msg+= " %.16e <-> %.16e"  % (first, second)
+      msg = str(msg) + " %.16e <-> %.16e"  % (first, second)
       n =  max(abs(first),abs(second))
       if n>1e3:
         n = 10**floor(log10(n))
@@ -370,7 +377,7 @@ class casadiTestCase(unittest.TestCase):
             continue
           #if (isnan(zt[i,j]) or isinf(zt[i,j])) and  (isinf(zt[i,j]) or isnan(zt[i,j])):
           #  continue
-          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,LazyString('"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, )'))
+          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,LazyString('"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, )'))  # pyright: ignore[reportArgumentType]
           #self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, ))
 
   def file_equal(self, lhs, rhs):
@@ -411,7 +418,7 @@ class casadiTestCase(unittest.TestCase):
     if not(type(setx0)==list):
       setx0=[setx0]
 
-    f_in = [0]*f.n_in()
+    f_in = [0]*f.n_in()  # type: list
     for i in range(len(x0)):
       try:
         f_in[i]=setx0[i]
@@ -504,7 +511,7 @@ class casadiTestCase(unittest.TestCase):
   def checkfunction_light(self,trial,solution,inputs=None,**kwargs):
     self.checkfunction(trial,solution,inputs,fwd=False,adj=False,jacobian=False,gradient=False,hessian=False,sens_der=False,evals=False,**kwargs)
   def checkfunction(self,trial,solution,inputs=None,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False):
-
+    # type: (Any, Any, Any, bool, bool, bool, bool, bool, bool, Union[bool, int], int, Optional[int], str, bool, bool, bool, bool, bool) -> Any
     if isinstance(inputs,dict):
       d = inputs
       inputs = [0]*trial.n_in()
@@ -514,8 +521,8 @@ class casadiTestCase(unittest.TestCase):
 
     if indirect:
       ins = trial.mx_in()
-      extra_trial = Function("extra_trial", ins,trial(ins))
-      self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,inputs=inputs,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
+      extra_trial = Function("extra_trial", ins,trial.call(ins))
+      self.checkfunction(extra_trial,solution,inputs=inputs,fwd=fwd,adj=adj,jacobian=jacobian,gradient=gradient,hessian=hessian,sens_der=sens_der,evals=evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
 
     if digits_sens is None:
       digits_sens = digits
@@ -677,7 +684,7 @@ class casadiTestCase(unittest.TestCase):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
   def compile_external(self,name,source,opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
-
+    # type: (str, str, Optional[dict], str, Union[str, list], bool, Union[str, list, None], bool, Union[str, list, None], list, bool) -> Any
     if args.run_slow:
       libdir = GlobalOptions.getCasadiPath()
       includedir = GlobalOptions.getCasadiIncludePath()
@@ -790,6 +797,7 @@ class casadiTestCase(unittest.TestCase):
       self.fail("Found %d bad symbol exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
   def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True):
+    # type: (Any, Any, Any, str, Union[str, list], bool, Union[str, list, None], bool, bool, Any, bool, bool, Union[str, list, None], bool, Optional[dict], bool, bool, list, int, bool, bool) -> Any
     ret = {}
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
@@ -893,7 +901,7 @@ class casadiTestCase(unittest.TestCase):
             env["PATH"] = env["PATH"]+";"+libdir
         else:
             env["LD_LIBRARY_PATH"] = libdir
-        p = subprocess.Popen(commands,shell=True,env=env).wait()
+        p = subprocess.Popen(commands,shell=True,env=env).wait()  # pyright: ignore[reportAssignmentType]
         ret["exename"] = exename
         ret["env"] = env
         inputs_main = inputs
@@ -905,7 +913,7 @@ class casadiTestCase(unittest.TestCase):
         for tool in ["memcheck","helgrind","none"]:
             with open(F.name()+"_out.txt","w") as stdout:
               with open(F.name()+"_in.txt","r") as stdin:
-                commands = exename+" "+F.name()
+                commands = exename+" "+F.name()  # pyright: ignore[reportOperatorIssue]
                 if tool=="none":
                     pass
                 elif tool=="memcheck" and valgrind and has_valgrind:
@@ -917,9 +925,9 @@ class casadiTestCase(unittest.TestCase):
                 print(commands+" < " + F.name()+"_in.txt")
                 p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
                 out = p.communicate()
-            print("Return code",p.returncode)
-            assert p.returncode in main_return_code
-        if p.returncode!=0:
+            print("Return code",p.returncode)  # pyright: ignore[reportAttributeAccessIssue]
+            assert p.returncode in main_return_code  # pyright: ignore[reportAttributeAccessIssue]
+        if p.returncode!=0:  # pyright: ignore[reportAttributeAccessIssue]
             # We are actively looking for failure,
             # so do not proceed with tests
             return ret
@@ -950,7 +958,7 @@ class casadiTestCase(unittest.TestCase):
           self.checkarray(Fout[k],Fout2[k],digits=digits,failmessage=k)
       else:
         for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i],digits=digits)
+          self.checkarray(Fout[i],Fout2[i],digits=digits)  # pyright: ignore[reportArgumentType]
 
       if check_serialize:
         self.check_serialize(F2,inputs=inputs)
@@ -967,6 +975,7 @@ class casadiTestCase(unittest.TestCase):
 
   def check_serialize(self,F,inputs=None):
       F2 = Function.deserialize(F.serialize({"debug":True}))
+      assert inputs is not None
 
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)
@@ -1130,8 +1139,9 @@ class skip(object):
   def __call__(self, c):
     if not self.skip: return c
     if isinstance(c,unittest.TestCase):
-      if i.startswith('test_'):
-        delattr(c,i)
+      for i in dir(c):
+        if i.startswith('test_'):
+          delattr(c,i)
       return c
     else:
       print(self.skiptext(c.__name__))

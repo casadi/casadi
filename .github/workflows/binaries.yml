@@ -166,10 +166,10 @@ jobs:
           file: "casadi-.*.tar.gz"
       - uses: conda-incubator/setup-miniconda@v3.1.0
         with:
-          python-version: 3.8
-          activate-environment: 3.8
+          python-version: 3.12
+          activate-environment: 3.12
           auto-update-conda: true
-      - run: pip install casadi-*.tar.gz numpy scipy pandas looseversion
+      - run: pip install casadi-*.tar.gz numpy scipy pandas looseversion pyright
         shell: bash -el {0}
       - run: cd test/python && python alltests.py
         shell: bash -el {0}
@@ -1127,6 +1127,12 @@ jobs:
           pip install numpy scipy pandas looseversion
         shell: pwsh
         if: contains(matrix.image, 'windows')
+      - run: pip install pyright
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows') && matrix.py2 != '27' && matrix.py2 != '36'"
+      - run: pip install pyright
+        shell: pwsh
+        if: "contains(matrix.image, 'windows') && matrix.py2 != '27' && matrix.py2 != '36'"
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
@@ -1149,7 +1155,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       py2: ["310"]
+       py2: ["312"]
        image: ["windows-2022","ubuntu-24.04","macos-14","macos-15-intel"]
        bit: [64]
     steps:
@@ -1213,11 +1219,11 @@ jobs:
         shell: bash -el {0}
         if: contains(matrix.image, 'macos')
       - run: |
-          pip install numpy scipy pandas looseversion
+          pip install numpy scipy pandas looseversion pyright
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
-          pip install numpy scipy pandas looseversion
+          pip install numpy scipy pandas looseversion pyright
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - env:

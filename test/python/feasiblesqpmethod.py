@@ -28,6 +28,10 @@ import unittest
 from types import *
 from helpers import *
 
+# pyright: reportAttributeAccessIssue=false
+# Class intentionally not inheriting from casadiTestCase -- the test body is
+# parked (never instantiated via alltests); the self.* attributes exist on
+# the would-be base class.
 class Feasiblesqpmethod:#(casadiTestCase):
 
   def test_feas_iter_test(self):

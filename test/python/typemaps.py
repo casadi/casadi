@@ -88,8 +88,8 @@ class typemaptests(casadiTestCase):
     self.message("crs_matrix -> DM")
     if not(scipy_available):
       return
-    arrays = [csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=double ),
-              csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=int )
+    arrays = [csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=double ),  # pyright: ignore[reportUnboundVariable]
+              csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=int )  # pyright: ignore[reportUnboundVariable]
               ]
     for i in range(len(arrays)):
       m = arrays[i]
@@ -236,8 +236,8 @@ class typemaptests(casadiTestCase):
   def test_matmul(self):
     A = DM([[1,3],[4,5]])
     B = DM([[7,2],[0,9]])
-    LA = [A]
-    RB = [B]
+    LA = [A]  # type: list
+    RB = [B]  # type: list
     if LooseVersion(np.__version__) >= LooseVersion("1.10"):
       LA.append(np.array(A))
       RB.append(np.array(B))
@@ -610,20 +610,20 @@ class typemaptests(casadiTestCase):
         return SX([4])
 
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))  # pyright: ignore[reportCallIssue,reportArgumentType]
     print("cast C")
 
     class Foo:
       def __DM__(self):
         raise Exception("15")
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))  # pyright: ignore[reportCallIssue,reportArgumentType]
     print("cast D")
 
     class Foo:
       pass
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))  # pyright: ignore[reportCallIssue,reportArgumentType]
     print("cast E")
 
   def test_casting_SX(self):
@@ -642,18 +642,18 @@ class typemaptests(casadiTestCase):
       def __SX__(self):
         return MX.sym("x")
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     class Foo:
       def __SX__(self):
         raise Exception("15")
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     class Foo:
       pass
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :Function("tmp", [x],[Foo()]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :Function("tmp", [x],[Foo()]))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
 
   def test_casting_MX(self):
@@ -673,32 +673,32 @@ class typemaptests(casadiTestCase):
         return SX.sym("x")
 
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
-      Function("tmp", [x],[Foo()])
+      Function("tmp", [x],[Foo()])  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     class Foo:
       def __MX__(self):
         raise Exception("15")
 
     with self.assertRaises(Exception):
-      Function("tmp", [x],[Foo()])
+      Function("tmp", [x],[Foo()])  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     class Foo:
       pass
 
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
-      Function("tmp", [x],[Foo()])
+      Function("tmp", [x],[Foo()])  # pyright: ignore[reportCallIssue,reportArgumentType]
 
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
     a = SX.sym("A",3,3)
     
-    self.assertTrue(isinstance(qr(a),tuple([tuple]+([list] if swig4 else []))))
+    self.assertTrue(isinstance(qr(a),tuple([tuple]+([list] if swig4 else []))))  # pyright: ignore[reportArgumentType]
 
   def test_cvar(self):
     self.message("We must not have cvar, to avoid bug #652")
     # Wrap all static global things in #ifdef SWIG
     with self.assertRaises(Exception):
-      cvar
+      cvar  # pyright: ignore[reportUndefinedVariable]
 
   def test_ufuncsum(self):
     self.message("ufunc.add")
@@ -746,8 +746,8 @@ class typemaptests(casadiTestCase):
 
     if scipy_available:
       Ds+=[
-          csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
-          csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.intc),
+          csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),  # pyright: ignore[reportUnboundVariable]
+          csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.intc),  # pyright: ignore[reportUnboundVariable]
           DM([[1,2],[3,4]]).sparse()
       ]
 
@@ -776,7 +776,7 @@ class typemaptests(casadiTestCase):
 
   def test_None(self):
     #self.assertFalse(None==DM(3))
-    b = np.atleast_2d(None)
+    b = np.atleast_2d(None)  # pyright: ignore[reportCallIssue,reportArgumentType]
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
       c = repmat(b, 1, 1)
 
@@ -839,28 +839,28 @@ class typemaptests(casadiTestCase):
 
     for M in [SX,MX]:
       with self.assertRaises(Exception):
-        np.inner(M([1,0,1]),M([1,0,1]))
+        np.inner(M([1,0,1]),M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
       with self.assertRaises(Exception):
-        np.outer(M([1,0,1]),M([1,0,1]))
+        np.outer(M([1,0,1]),M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
 
       with self.assertRaises(Exception):
-        np.add.accumulate(M([1,0,1]))
+        np.add.accumulate(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
 
       with self.assertRaises(Exception):
-        np.cumsum(M([1,0,1]))
+        np.cumsum(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
 
       with self.assertRaises(Exception):
-        np.sum(M([1,0,1]))
+        np.sum(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
       with self.assertRaises(Exception):
-        np.all(M([1,0,1]))
+        np.all(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
       with self.assertRaises(Exception):
-        np.any(M([1,0,1]))
+        np.any(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
       with self.assertRaises(Exception):
-        np.sum(M([[1,0,1],[0,1,0]]))
+        np.sum(M([[1,0,1],[0,1,0]]))  # pyright: ignore[reportAttributeAccessIssue]
       with self.assertRaises(Exception):
-        np.all(M([[1,0,1],[0,1,0]]))
+        np.all(M([[1,0,1],[0,1,0]]))  # pyright: ignore[reportAttributeAccessIssue]
       with self.assertRaises(Exception):
-        np.any(M([[1,0,1],[0,1,0]]))
+        np.any(M([[1,0,1],[0,1,0]]))  # pyright: ignore[reportAttributeAccessIssue]
 
 if __name__ == '__main__':
     unittest.main()

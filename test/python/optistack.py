@@ -29,6 +29,7 @@ import unittest
 from types import *
 from helpers import *
 from casadi import *
+from numpy import inf, pi
 
 scipy_available = True
 try:
@@ -45,7 +46,7 @@ if has_nlpsol("ipopt"):
   nlpsolver = "ipopt"
   nlpsolver_options = {}
 
-class OptiStacktests(inherit_from):
+class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
 
 
     @requires_conic("qrqp")

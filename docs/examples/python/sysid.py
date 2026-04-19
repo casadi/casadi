@@ -17,6 +17,7 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 from casadi import *
+import numpy
 
 # In this example, we fit a nonlinear model to measurements
 #

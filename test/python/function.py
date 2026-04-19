@@ -22,6 +22,7 @@
 #
 #
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
 import unittest
@@ -29,6 +30,7 @@ from types import *
 from helpers import *
 import pickle
 import os
+import re
 import sys
 from casadi.tools import capture_stdout
 import glob
@@ -74,7 +76,7 @@ class Functiontests(casadiTestCase):
       f(0)
 
       X = MX.sym("X",2)
-      F = f(X)
+      F = list(f(X))
       g = Function("g", [X],F)
 
       g(0)
@@ -108,7 +110,7 @@ class Functiontests(casadiTestCase):
 
     X = MX.sym("X")
 
-    z=f(X)
+    z=list(f(X))
 
     g = Function("g", [X], z).expand()
 
@@ -331,7 +333,7 @@ class Functiontests(casadiTestCase):
 
 
     with self.assertRaises(Exception):
-      f_out["baz"]
+      f_out["baz"]  # pyright: ignore[reportUndefinedVariable]
 
     ret = f(i0=SX(12))
     self.checkarray(ret["foo"],DM([144]))
@@ -455,12 +457,12 @@ class Functiontests(casadiTestCase):
           return Sparsity.dense(1,1)
         elif i==1:
           return Sparsity.dense(3,1)
-        elif i==2:
+        else:
           return Sparsity.dense(3,3)
       def get_sparsity_out(self, i):
         if i==0:
           return Sparsity.dense(3,1)
-        elif i==1:
+        else:
           return Sparsity.dense(3,3)
       def eval_buffer(self, arg, res):
         a = np.frombuffer(arg[0], dtype=np.float64)
@@ -778,7 +780,7 @@ class Functiontests(casadiTestCase):
         for ad_weight_sp in [0,1]:
           F = Function("F",X+Y+Z+V,list(map(sin,res)),{"ad_weight": 0,"ad_weight_sp":ad_weight_sp})
 
-          resref = [0 for i in range(fun.n_out())]
+          resref = [0 for i in range(fun.n_out())]  # type: list
           for r in zip(X,Y,Z_alt,V):
             for i,e in enumerate(fun.call(r)):
               resref[i] = resref[i] + e
@@ -827,7 +829,7 @@ class Functiontests(casadiTestCase):
             else:
               F = fun.map("map",parallelization,n,[2,3],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
 
-            resref = [0 for i in range(fun.n_out())]
+            resref = [0 for i in range(fun.n_out())]  # type: list
             acc = 0
             bl = []
             cl = []
@@ -916,10 +918,10 @@ class Functiontests(casadiTestCase):
     x = SX.sym("x")
 
     with self.assertRaises(Exception):
-      f = SXFunction("f", [x],[x],{"fooo": False})
+      f = SXFunction("f", [x],[x],{"fooo": False})  # pyright: ignore[reportUndefinedVariable]
 
     with self.assertRaises(Exception):
-      f = SXFunction("f", [x],[x],{"ad_weight": "foo"})
+      f = SXFunction("f", [x],[x],{"ad_weight": "foo"})  # pyright: ignore[reportUndefinedVariable]
 
     if not has_nlpsol("ipopt"):
       return
@@ -1443,7 +1445,9 @@ class Functiontests(casadiTestCase):
         def get_n_in(self): return 2
         def get_n_out(self): return 1
 
-        def get_sparsity_in(i):
+        def get_sparsity_in(i):  # pyright: ignore[reportIncompatibleMethodOverride,reportSelfClsParameterName]
+          # Deliberately missing `self` and returning int -- this test
+          # asserts Callback reports the error at construction time.
           return 4
 
         def eval(self,arg):
@@ -1492,12 +1496,12 @@ class Functiontests(casadiTestCase):
           z2 = sin(z1)
           return [z2]
 
-      self.cb = Fun()
+      self.cb = Fun()  # pyright: ignore[reportAttributeAccessIssue]
 
       if not indirect:
-        return self.cb
+        return self.cb  # pyright: ignore[reportAttributeAccessIssue]
 
-      f = Function("f", [x,y],[self.cb(x,y)])
+      f = Function("f", [x,y],[self.cb(x,y)])  # pyright: ignore[reportAttributeAccessIssue]
 
       return f
 
@@ -1506,7 +1510,7 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,jacobian=False,gradient=False,hessian=False,evals=False)
 
       with self.assertRaises(Exception):
-        f.gradient()
+        f.gradient()  # pyright: ignore[reportAttributeAccessIssue]
 
       with self.assertRaises(Exception):
         jacobian_old(f, 0, 0)
@@ -1675,8 +1679,8 @@ class Functiontests(casadiTestCase):
             return self.cb_rev
 
       opts = {"verbose":True}
-      self.cb = Fun(opts)
-      f = self.cb
+      self.cb = Fun(opts)  # pyright: ignore[reportAttributeAccessIssue]
+      f = self.cb  # pyright: ignore[reportAttributeAccessIssue]
 
       if not indirect:
         return f
@@ -2873,14 +2877,14 @@ class Functiontests(casadiTestCase):
 
     x = SX.sym("x",5)
     y = SX.sym("x",5,5)
-    
-    g = Function('g',[x,y],f(x,y))
-    
+
+    g = Function('g',[x,y],list(f(x,y)))
+
 
     X = MX.sym("x",5)
     Y = MX.sym("x",5,5)
-    
-    G = Function('g',[x,y],f(x,y))
+
+    G = Function('g',[x,y],list(f(x,y)))
     
     DM.rng(1)
     x0=DM.rand(5)
@@ -2917,7 +2921,7 @@ class Functiontests(casadiTestCase):
     LUT_param = casadi.interpolant('name','linear',[N,M],2, {"lookup_mode": ["exact","linear"]})
 
     only_fd = {"enable_fd": True, "enable_forward": False, "enable_reverse": False}
-    options = {"ad_weight_sp":-1}
+    options = {"ad_weight_sp":-1}  # type: dict
     options.update(only_fd)
     options["forward_options"] = only_fd
     options["reverse_options"] = only_fd
@@ -2953,8 +2957,8 @@ class Functiontests(casadiTestCase):
 
 
     [buf,f_eval] = f.buffer()
-    buf.set_arg(0, memoryview(A_))
-    buf.set_res(0, memoryview(B_))
+    buf.set_arg(0, memoryview(A_))  # pyright: ignore[reportCallIssue,reportArgumentType]
+    buf.set_res(0, memoryview(B_))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     f_eval()
 
@@ -2994,7 +2998,7 @@ class Functiontests(casadiTestCase):
     [buf,trigger] = f.buffer()
 
     a = np.array([1.0])
-    buf.set_res(0, memoryview(a))
+    buf.set_res(0, memoryview(a))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     trigger()
 
@@ -4079,7 +4083,7 @@ class Functiontests(casadiTestCase):
   
             x=MX.sym("x",N)
   
-            nc = np.prod([len(k)-4 for k in knots])
+            nc = int(np.prod([len(k)-4 for k in knots]))
             DM.rng(1)
             data = DM.rand(nc)
             C = MX.sym("C",nc,1)

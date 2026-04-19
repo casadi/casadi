@@ -1,3 +1,4 @@
+# pyright: reportAssignmentType=false, reportIndexIssue=false
 #
 #     This file is part of CasADi.
 #
@@ -21,6 +22,10 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
+# pyright: reportCallIssue=false, reportArgumentType=false, reportAttributeAccessIssue=false
+# complexity.py is a standalone benchmarking harness -- not in alltests.py --
+# and several invocations here (e.g. DM(N,1,0) 3-arg form) are broken at runtime
+# too.  We suppress those checks rather than keep rewriting the file.
 from casadi import *
 import casadi as c
 import numpy
@@ -29,7 +34,8 @@ from types import *
 from helpers import *
 from time import time
 import sys
-from scipy import linalg, std, mean
+from numpy import std, mean
+from scipy import linalg
 from scipy.stats import t
 
 student = t

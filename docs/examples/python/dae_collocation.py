@@ -23,6 +23,7 @@
 """
 
 from casadi import *
+from numpy import inf
 import numpy as np
 import matplotlib.pyplot as plt
 

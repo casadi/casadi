@@ -1,5 +1,6 @@
 # This is an automatically generated file converting from the apm format
 import casadi as cs
+import numpy as np
 
 
 def hs106():
@@ -8,11 +9,11 @@ def hs106():
     x_opt = cs.DM([579.307, 1359.97, 5109.97, 182.018, 295.601, 217.982, 286.417, 395.601])
     x = cs.MX.sym('x', 8)
     x0 = cs.DM.zeros(8, 1)
-    lbx = -cs.inf*cs.DM.ones(8, 1)
-    ubx = cs.inf*cs.DM.ones(8, 1)
+    lbx = -np.inf*cs.DM.ones(8, 1)
+    ubx = np.inf*cs.DM.ones(8, 1)
     g = cs.MX.zeros(6, 1)
-    lbg = -cs.inf*cs.DM.ones(6, 1)
-    ubg = cs.inf*cs.DM.ones(6, 1)
+    lbg = -np.inf*cs.DM.ones(6, 1)
+    ubg = np.inf*cs.DM.ones(6, 1)
 
     a = 0.0025
     b = 0.01

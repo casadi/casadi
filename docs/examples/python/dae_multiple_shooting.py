@@ -18,6 +18,7 @@
 #
 #
 from casadi import *
+from numpy import inf
 
 """
 Solves the following optimal control problem (OCP) in differential-algebraic

@@ -22,6 +22,7 @@
 #
 #
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
 import unittest
@@ -71,7 +72,7 @@ class ImplicitFunctiontests(casadiTestCase):
       b = SX.sym("b",2)
       f=Function("f", [x,A,b],[mtimes(A,x)-b])
       solver=rootfinder("solver", Solver, f, options)
-      solver_in = [0]*3
+      solver_in = [0]*3  # type: list
       solver_in[1]=A_
       solver_in[2]=b_
 
@@ -90,7 +91,7 @@ class ImplicitFunctiontests(casadiTestCase):
           options2["ad_weight_sp"] = ad_weight_sp
           options2["ad_weight"] = ad_weight
           solver=rootfinder("solver", Solver, f, options2)
-          solver_in = [0]*3
+          solver_in = [0]*3  # type: list
           solver_in[1]=A_
           solver_in[2]=b_
 
@@ -193,7 +194,9 @@ class ImplicitFunctiontests(casadiTestCase):
       f_out = f(*f_in)
 
       refsol = Function("refsol", [X],[X.nz[:]])
-      refsol_in = [0]*refsol.n_in();refsol_in[0]=trial_in[0]
+      refsol_in = [0]*refsol.n_in()  # type: list
+
+      refsol_in[0]=trial_in[0]
 
       self.checkfunction(trial,refsol,inputs=refsol_in,digits=6,sens_der=False,evals=1,failmessage=message)
 

@@ -22,6 +22,7 @@
 #
 #
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
 from numpy import eye, linalg, arange, matrix
@@ -94,7 +95,7 @@ class Matrixtests(casadiTestCase):
 
     for f in [fMX,fSX]:
       for i in range(3):
-        f_in[i]=list(range(f.nnz_in(i)))
+        f_in[i]=list(range(f.nnz_in(i)))  # pyright: ignore[reportUndefinedVariable]
 
     self.checkfunction(fMX,fSX)
 
@@ -949,7 +950,7 @@ class Matrixtests(casadiTestCase):
     with self.assertRaises(Exception):
       w = SX.sym("w",2,1)
       Q = np.eye(2)
-      mtimes(w.T,Q,w)
+      mtimes(w.T,Q,w)  # pyright: ignore[reportCallIssue,reportArgumentType]
 
   def test_chol(self):
     numpy.random.seed(0)
@@ -975,8 +976,8 @@ class Matrixtests(casadiTestCase):
 
   def test_DMcrash(self):
     with self.assertRaises(Exception):
-      DM([DM([1,2]),DM([1,2])])
-    a = DM([DM([1]),DM([2])])
+      DM([DM([1,2]),DM([1,2])])  # pyright: ignore[reportCallIssue,reportArgumentType]
+    a = DM([DM([1]),DM([2])])  # pyright: ignore[reportCallIssue,reportArgumentType]
     self.checkarray(a,DM([1,2]))
 
   def test_sparsity_operation(self):
@@ -998,7 +999,7 @@ class Matrixtests(casadiTestCase):
     data = [ np.array([[1,3],[11,17]]) , np.array([[1,3]]) ,np.array([[1],[3]]), np.array([[3]])]
 
     for A in data:
-      B = reshape(DM(A),A.shape)
+      B = reshape(DM(A),A.shape)  # pyright: ignore[reportCallIssue,reportArgumentType]
       #self.checkarray(np.cumsum(A),cumsum(B))
       self.checkarray(np.cumsum(A,0),cumsum(B,0))
       self.checkarray(np.cumsum(A,1),cumsum(B,1))
@@ -1042,7 +1043,7 @@ class Matrixtests(casadiTestCase):
   def test_iterable(self):
     a = DM([1,2,3])
     b = list(iter(a.nz))
-    self.checkarray(a,DM(b))
+    self.checkarray(a,DM(b))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     with self.assertInException("CasADi matrices are not iterable"):
       iter(a)

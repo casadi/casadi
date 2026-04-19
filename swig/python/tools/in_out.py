@@ -22,6 +22,10 @@
 #
 #
 import contextlib
+try:
+    from typing import Iterator, List  # referenced in type-comments below
+except ImportError:
+    pass  # Py2: type comments are ignored at runtime
 
 @contextlib.contextmanager
 def nice_stdout():
@@ -73,6 +77,11 @@ def nice_stdout():
       
 @contextlib.contextmanager
 def capture_stdout():
+    # type: () -> Iterator[List[str]]
+    # `out` holds StringIO during the with-block, but we rewrite
+    # indices to `.getvalue()` strings in `finally` - user code only
+    # inspects `out[0]` / `out[1]` after the block, so the advertised
+    # type is list[str].
     import sys
     try:
       from cStringIO import StringIO

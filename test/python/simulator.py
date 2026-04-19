@@ -105,7 +105,9 @@ class Simulatortests(casadiTestCase):
     integrator = casadi.integrator('integrator', 'cvodes', self.dae, t[0], t, opts)
 
     x0_ind = casadi.integrator_in().index('x0')
-    integrator_in = [0]*integrator.n_in();integrator_in[x0_ind]=[num['q0']]
+    integrator_in = [0]*integrator.n_in()  # type: list
+
+    integrator_in[x0_ind]=[num['q0']]
     p_ind = casadi.integrator_in().index('p')
     integrator_in[p_ind]=[num['p']]
     integrator_out = integrator.call(integrator_in)

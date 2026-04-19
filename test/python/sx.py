@@ -29,6 +29,7 @@ import unittest
 from types import *
 from helpers import *
 from casadi import *
+from numpy import inf, pi
 
 scipy_available = True
 try:
@@ -347,7 +348,9 @@ class SXtests(casadiTestCase):
     y=SX.sym("y")
     f=Function("f", [vertcat(*[x,y])],[vertcat(*fun(x,y))])
     L=[2,3]
-    f_in = [0]*f.n_in();f_in[0]=L
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=L
     f_out = f.call(f_in)
     z=f_out[0].full().squeeze()
     zr=fun(*L)
@@ -355,7 +358,9 @@ class SXtests(casadiTestCase):
       self.assertAlmostEqual(z[i], zr[i],10,'SXfunction output in correct')
     self.message("SXFunction jacobian evaluation")
     J = jacobian_old(f, 0, 0)
-    J_in = [0]*J.n_in();J_in[0]=L
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=L
     J_out = J.call(J_in)
     Jr=np.array([[1,1],[3,2],[4,27]])
     self.checkarray(J_out[0],Jr,"SXfunction jacobian evaluates incorrectly")
@@ -379,7 +384,9 @@ class SXtests(casadiTestCase):
 
     # Pass inputs
     L=[2,3]
-    fcn_in = [0]*fcn.n_in();fcn_in[0]=L
+    fcn_in = [0]*fcn.n_in()  # type: list
+
+    fcn_in[0]=L
 
     # Evaluate numerically
     fcn_out = fcn.call(fcn_in)
@@ -413,14 +420,14 @@ class SXtests(casadiTestCase):
     self.checkarray(f.size_in(0),(2,3),"Function constructors")
     self.checkarray(f.size_out(0),(2,3),"Function constructors")
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: Function("f", y,[y,y]))
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: Function("f", x0,[x0,x1]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: Function("f", y,[y,y]))  # pyright: ignore[reportCallIssue,reportArgumentType]
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: Function("f", x0,[x0,x1]))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
   def test_evalfail(self):
     self.message("eval fail test")
     x = SX.sym("x",2,2)
     f = Function("f", [x], [x])
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: f.call(x))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: f.call(x))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
   def test_SXconversion(self):
     self.message("Conversions from and to SX")
@@ -445,7 +452,9 @@ class SXtests(casadiTestCase):
       for t2 in [0,1]:
         T1 = t1!=0
         T2 = t2!=0
-        f_in = [0]*f.n_in();f_in[0]=[t1,t2]
+        f_in = [0]*f.n_in()  # type: list
+
+        f_in[0]=[t1,t2]
         f_out = f.call(f_in)
         self.checkarray(f_out[0],DM([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f_out[0])))
 
@@ -462,7 +471,9 @@ class SXtests(casadiTestCase):
       for t2 in [-10,0.1,0,1,10]:
         T1 = t1
         T2 = t2
-        f_in = [0]*f.n_in();f_in[0]=[t1,t2]
+        f_in = [0]*f.n_in()  # type: list
+
+        f_in[0]=[t1,t2]
         f_out = f.call(f_in)
         self.checkarray(f_out[0],DM([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
 
@@ -569,7 +580,9 @@ class SXtests(casadiTestCase):
       self.message(":"+comment)
       f = Function("f", [x],[fun(x)])
       for n,r in zip(nums,reference):
-        f_in = [0]*f.n_in();f_in[0]=n
+        f_in = [0]*f.n_in()  # type: list
+
+        f_in[0]=n
         f_out = f.call(f_in)
         self.assertEqual(f_out[0][0],r)
 
@@ -594,7 +607,9 @@ class SXtests(casadiTestCase):
 
     def test(e,r):
       f = Function("f", [x,a],[e])
-      f_in = [0]*f.n_in();f_in[0]=x_
+      f_in = [0]*f.n_in()  # type: list
+
+      f_in[0]=x_
       f_in[1]=a_
       f_out = f.call(f_in)
       self.assertAlmostEqual(f_out[0][0],r,10)
@@ -606,7 +621,9 @@ class SXtests(casadiTestCase):
 
     M=blockcat([[a*sin(x),a*cos(x)],[exp(a*x),a*x**2],[cos(x),0]])
     f = Function("f", [x,a],[taylor(M,x)])
-    f_in = [0]*f.n_in();f_in[0]=x_
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=x_
     f_in[1]=a_
     f_out = f.call(f_in)
     self.checkarray(f_out[0],np.array([[x_*a_,a_],[1+a_*x_,0],[1,0]]),"taylor on dense matrices")
@@ -654,7 +671,9 @@ class SXtests(casadiTestCase):
 
     def test(e,r):
       f = Function("f", [vertcat(*[x,y]),vertcat(*[a,b])],[e])
-      f_in = [0]*f.n_in();f_in[0]=[x_,y_]
+      f_in = [0]*f.n_in()  # type: list
+
+      f_in[0]=[x_,y_]
       f_in[1]=[a_,b_]
       f_out = f.call(f_in)
       self.assertAlmostEqual(f_out[0][0],r,10)
@@ -728,7 +747,7 @@ class SXtests(casadiTestCase):
     self.message("Regression test #181")
     x = SX.sym("x")
     #self.assertRaises(TypeError,lambda : SX([x,None]))  # FIXME: this is leaking memory
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: Function("f", [[x], [None]], [[2 * x]]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda: Function("f", [[x], [None]], [[2 * x]]))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
   @known_bug()  # Not implemented
   def test_is_equal(self):
@@ -736,7 +755,7 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
     a = x*x
     b = x*x
-    self.assertTrue(a.is_equal(b,1))
+    self.assertTrue(a.is_equal(b,1))  # pyright: ignore[reportAttributeAccessIssue]
 
   @skip(not GlobalOptions.getSimplificationOnTheFly())
   def test_SXsimplifications(self):
@@ -822,14 +841,18 @@ class SXtests(casadiTestCase):
     for op in ops:
       y = op(x)
       f = Function("f", [x],[y])
-      f_in = [0]*f.n_in();f_in[0]=0.3
+      f_in = [0]*f.n_in()  # type: list
+
+      f_in[0]=0.3
       f_out = f.call(f_in)
       self.checkarray(f_out[0],array(DM(op(0.3))),"simplifications")
       self.assertEqual(str(y),"x")
 
       y = op(-x)
       f = Function("f", [x],[y])
-      f_in = [0]*f.n_in();f_in[0]=0.3
+      f_in = [0]*f.n_in()  # type: list
+
+      f_in[0]=0.3
       f_out = f.call(f_in)
       self.checkarray(f_out[0],array(DM(op(-0.3))),"simplifications")
       self.assertEqual(str(y),"(-x)")
@@ -854,22 +877,30 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
     y = if_else(x,1,2)
     f = Function("f", [x],[y])
-    f_in = [0]*f.n_in();f_in[0]=1
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=1
     f_out = f.call(f_in)
     self.assertTrue(f_out[0]==1,"if_else")
-    f_in = [0]*f.n_in();f_in[0]=0
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=0
     f_out = f.call(f_in)
     self.assertTrue(f_out[0]==2,"if_else")
 
     x0 = 2.1
     y = if_else(x>1,x**2,x**3)
     f = Function("f", [x],[y])
-    f_in = [0]*f.n_in();f_in[0]=x0
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=x0
     f_out = f.call(f_in)
     self.checkarray(f_out[0],x0**2,"if_else sens")
 
     x0 = -2.1
-    f_in = [0]*f.n_in();f_in[0]=x0
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=x0
     f_out = f.call(f_in)
     self.checkarray(f_out[0],x0**3,"if_else sens")
 
@@ -922,7 +953,7 @@ class SXtests(casadiTestCase):
     r = poly_roots(p)
 
     f = Function("f", [p],[r])
-    f_in = [0]*f.n_in()
+    f_in = [0]*f.n_in()  # type: list
     f_in[0]=DM([2,7])
     a_ = f_in[0][0]
     b_ = f_in[0][1]
@@ -934,7 +965,9 @@ class SXtests(casadiTestCase):
     r = poly_roots(vertcat(*[p,0]))
 
     f = Function("f", [p],[r])
-    f_in = [0]*f.n_in();f_in[0]=DM([2,7])
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM([2,7])
     a_ = f_in[0][0]
     b_ = f_in[0][1]
     f_out = f.call(f_in)
@@ -945,7 +978,9 @@ class SXtests(casadiTestCase):
     r = poly_roots(p)
 
     f = Function("f", [p],[r])
-    f_in = [0]*f.n_in();f_in[0]=DM([1.13,7,3])
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM([1.13,7,3])
     a_ = f_in[0][0]
     b_ = f_in[0][1]
     c_ = f_in[0][2]
@@ -960,7 +995,9 @@ class SXtests(casadiTestCase):
     r = poly_roots(p)
 
     f = Function("f", [p],[r])
-    f_in = [0]*f.n_in();f_in[0]=DM([11,1.3,-1.7,0.1])
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM([11,1.3,-1.7,0.1])
     f_out = f.call(f_in)
     f_out[0]
     self.checkarray(f_out[0],DM([0.298028,-0.479787,0.0635774]),digits=5)
@@ -969,7 +1006,9 @@ class SXtests(casadiTestCase):
     r = poly_roots(p)
 
     f = Function("f", [p],[r])
-    f_in = [0]*f.n_in();f_in[0]=DM([3,6,-123,  -126,1080])
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM([3,6,-123,  -126,1080])
     f_out = f.call(f_in)
     f_out[0]
     self.checkarray(f_out[0],DM([5,3,-4,-6]),digits=5)
@@ -977,28 +1016,36 @@ class SXtests(casadiTestCase):
   def test_eig_symbolic(self):
     x = SX.sym("x",2,2)
     f = Function("f", [x],[eig_symbolic(x)])
-    f_in = [0]*f.n_in();f_in[0]=DM([[2,0.1],[0.3,0.7]])
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM([[2,0.1],[0.3,0.7]])
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([0.67732,2.02268]),digits=5)
 
 
     x = SX.sym("x",2)
     f = Function("f", [x],[eig_symbolic(c.diag(x))])
-    f_in = [0]*f.n_in();f_in[0]=DM([3,7])
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM([3,7])
     f_out = f.call(f_in)
     self.checkarray(f_out[0],f_in[0])
 
 
     x = SX.sym("x",5)
     f = Function("f", [x],[eig_symbolic(c.diag(x))])
-    f_in = [0]*f.n_in();f_in[0]=DM([3,7,2,1,6])
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM([3,7,2,1,6])
     f_out = f.call(f_in)
     self.checkarray(f_out[0],f_in[0])
 
     x = SX.sym("x",2,2)
     y = SX.sym("y",2)
     f = Function("f", [x,y],[eig_symbolic(diagcat(*[x,c.diag(y)]))])
-    f_in = [0]*f.n_in();f_in[0]=DM([[2,0.1],[0.3,0.7]])
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM([[2,0.1],[0.3,0.7]])
     f_in[1]=[3,7]
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([0.67732,2.02268,3,7]),digits=5)
@@ -1012,7 +1059,9 @@ class SXtests(casadiTestCase):
     e = eig_symbolic(x)
 
     f = Function("f", [x],[e])
-    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(1,8)))
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM(f.sparsity_in(0),list(range(1,8)))
     f_in[0].print_dense()
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([1,-0.29150,10.29150]),digits=5)
@@ -1028,7 +1077,9 @@ class SXtests(casadiTestCase):
     e = eig_symbolic(x)
 
     f = Function("f", [x],[e])
-    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(1,7)))
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=DM(f.sparsity_in(0),list(range(1,7)))
     f_in[0].print_dense()
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([1,3,6]),digits=5)
@@ -1075,10 +1126,14 @@ class SXtests(casadiTestCase):
     filt = Sparsity.diag(N)+Sparsity.triplet(N,N,[1],[3])
 
     f = Function("f", [x,y],[mtimes(x,y)])
-    f_in = [0]*f.n_in();f_in[0]=x_
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=x_
     f_in[1]=y_
     g = Function("g", [x,y],[mac(x,y,SX.zeros(filt))])
-    g_in = [0]*g.n_in();g_in[0]=x_
+    g_in = [0]*g.n_in()  # type: list
+
+    g_in[0]=x_
     g_in[1]=y_
 
     f_out = f.call(f_in)
@@ -1182,81 +1237,111 @@ class SXtests(casadiTestCase):
 
     f = Function("f", [x,y],[z])
 
-    f_in = [0]*f.n_in();f_in[0]=2
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=2
     f_in[1]=0.5
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([2]))
 
-    f_in = [0]*f.n_in();f_in[0]=2
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=2
     f_in[1]=-0.5
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([-2]))
 
-    f_in = [0]*f.n_in();f_in[0]=-2
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=-2
     f_in[1]=0.5
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([2]))
 
-    f_in = [0]*f.n_in();f_in[0]=-2
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=-2
     f_in[1]=-0.5
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([-2]))
 
-    f_in = [0]*f.n_in();f_in[0]=2
+    f_in = [0]*f.n_in()  # type: list
+
+    f_in[0]=2
     f_in[1]=0
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([2]))
 
     J = jacobian_old(f, 0, 0)
 
-    J_in = [0]*J.n_in();J_in[0]=2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=2
     J_in[1]=0.5
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([1]))
 
-    J_in = [0]*J.n_in();J_in[0]=2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=2
     J_in[1]=-0.5
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([-1]))
 
-    J_in = [0]*J.n_in();J_in[0]=-2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=-2
     J_in[1]=0.5
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([1]))
 
-    J_in = [0]*J.n_in();J_in[0]=-2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=-2
     J_in[1]=-0.5
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([-1]))
 
-    J_in = [0]*J.n_in();J_in[0]=2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=2
     J_in[1]=0
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([1]))
 
     J = jacobian_old(f, 1, 0)
 
-    J_in = [0]*J.n_in();J_in[0]=2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=2
     J_in[1]=0.5
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
 
-    J_in = [0]*J.n_in();J_in[0]=2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=2
     J_in[1]=-0.5
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
 
-    J_in = [0]*J.n_in();J_in[0]=-2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=-2
     J_in[1]=0.5
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
 
-    J_in = [0]*J.n_in();J_in[0]=-2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=-2
     J_in[1]=-0.5
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
 
-    J_in = [0]*J.n_in();J_in[0]=2
+    J_in = [0]*J.n_in()  # type: list
+
+    J_in[0]=2
     J_in[1]=0
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
@@ -1290,9 +1375,9 @@ class SXtests(casadiTestCase):
     with warnings.catch_warnings():
       warnings.simplefilter("error",DeprecationWarning)
       with self.assertRaises(Exception):
-        is_smooth(x)
+        is_smooth(x)  # pyright: ignore[reportUndefinedVariable]
       warnings.simplefilter("ignore")
-      is_smooth(x)
+      is_smooth(x)  # pyright: ignore[reportUndefinedVariable]
 
   def test_which_depends(self):
     for X in [SX,MX]:
@@ -1603,7 +1688,7 @@ class SXtests(casadiTestCase):
     check = False
     for k in range(F2.n_instructions()):
         op = F2.instruction_id(k)
-        if op==OP_CALL:
+        if op==OP_CALL:  # pyright: ignore[reportUndefinedVariable]
             check = True
             self.assertTrue(instr[k].is_call())
             self.assertEqual(F2.instruction_output(k),[2, 3, 4, 5, 7])
@@ -1618,17 +1703,17 @@ class SXtests(casadiTestCase):
     self.assertTrue(len(res)==1)
     self.assertTrue(res[0].__hash__()==f.__hash__())
 
-    F2 = Function('F',[x,y,z],F2(x,y,z))
+    F2 = Function('F',[x,y,z],list(F2(x,y,z)))
 
     self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
 
-    F1 = Function('F',[x,y,z],F1(2*x,3*y,4*z))
-    F2 = Function('F',[x,y,z],F2(2*x,3*y,4*z))
+    F1 = Function('F',[x,y,z],list(F1(2*x,3*y,4*z)))
+    F2 = Function('F',[x,y,z],list(F2(2*x,3*y,4*z)))
 
     self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
 
-    F1 = Function('F',[x,y,z],F1(x,3*y,4*z))
-    F2 = Function('F',[x,y,z],F2(x,3*y,4*z))
+    F1 = Function('F',[x,y,z],list(F1(x,3*y,4*z)))
+    F2 = Function('F',[x,y,z],list(F2(x,3*y,4*z)))
 
     self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
     

@@ -22,8 +22,10 @@
 #
 #
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
+from numpy import nan, int32, int64
 import unittest
 from types import *
 from helpers import *
@@ -170,7 +172,7 @@ class Toolstests(casadiTestCase):
     self.checkarray(num["P",:,0],DM([1,2,3]))
 
     with self.assertRaises(Exception):
-      num["P",:,index["x"]]
+      num["P",:,index["x"]]  # pyright: ignore[reportOptionalSubscript]
 
 
     S = struct_symSX([entry("P",shapestruct=(3,s0))])
@@ -178,9 +180,9 @@ class Toolstests(casadiTestCase):
     num = S(0)
     num["P"] = DM([[1,2,3],[4,5,6],[7,8,9]])
     with self.assertRaises(Exception):
-      self.checkarray(num["P",index["x"],index["y"]],DM([2]))
+      self.checkarray(num["P",index["x"],index["y"]],DM([2]))  # pyright: ignore[reportOptionalSubscript]
     with self.assertRaises(Exception):
-      self.checkarray(num["P",index["x"],:],DM([1,2,3]).T)
+      self.checkarray(num["P",index["x"],:],DM([1,2,3]).T)  # pyright: ignore[reportOptionalSubscript]
     self.checkarray(num["P",:,index["y"]],DM([2,5,8]))
     self.checkarray(num["P",:,:],DM([[1,2,3],[4,5,6],[7,8,9]]))
 
@@ -254,7 +256,7 @@ class Toolstests(casadiTestCase):
     with self.assertRaises(Exception):
       struct_symMX([entry('x',sym=vertcat(*[x,x2])),'y','z'])
     with self.assertRaises(Exception):
-      s = struct_,MX.sym([(2,'x',[x,x2]),'y','z'])
+      s = struct_,MX.sym([(2,'x',[x,x2]),'y','z'])  # pyright: ignore[reportUndefinedVariable,reportArgumentType]
 
     s = struct_symMX(['x','y','z'])
     S = struct_symMX([entry("X",struct=s)])
@@ -287,7 +289,7 @@ class Toolstests(casadiTestCase):
     self.assertTrue(isinstance(V.cat,MX))
     def is_equalV(a,b):
       ft = Function("ft", [x,m],[a-b])
-      ft_in = [0]*ft.n_in()
+      ft_in = [0]*ft.n_in()  # type: list
       for i in range(ft.n_in()):
         ft_in[i]=numpy.random.rand(*ft.size_in(i))
       ft_out = ft(ft_in)
@@ -305,7 +307,7 @@ class Toolstests(casadiTestCase):
 
     def is_equalV(a,b):
       ft = Function("ft", [x,m,abc],[a-b])
-      ft_in = [0]*ft.n_in()
+      ft_in = [0]*ft.n_in()  # type: list
       for i in range(ft.n_in()):
         ft_in[i]=numpy.random.rand(*ft.size_in(i))
       ft_out = ft(ft_in)
@@ -362,7 +364,7 @@ class Toolstests(casadiTestCase):
     self.checkarray(init['X',0,-1,'p',horzcat,:],DM.ones(6,9)*7)
 
     with self.assertRaises(Exception):
-      init['X',0,-1,'p',:] = [1,2,3,4,5,6]
+      init['X',0,-1,'p',:] = [1,2,3,4,5,6]  # pyright: ignore[reportOptionalSubscript]
 
     init['X',0,-1,'p',:] = repeated([1,2,3,4,5,6])
     self.checkarray(init['X',0,-1,'p',vertcat,:,2],DM.ones(9)*3)
@@ -564,20 +566,20 @@ class Toolstests(casadiTestCase):
 
     b = a()
     with self.assertRaises(Exception):
-      b["P"] = DM([[11,1,2],[1,4,5],[2,5,8]])
+      b["P"] = DM([[11,1,2],[1,4,5],[2,5,8]])  # pyright: ignore[reportOptionalSubscript]
 
     with self.assertRaises(Exception):
-      b["P"] = sparsify(DM([[11,0,1],[1,4,5],[0,5,8]]))
+      b["P"] = sparsify(DM([[11,0,1],[1,4,5],[0,5,8]]))  # pyright: ignore[reportOptionalSubscript]
 
     b["P"] = sparsify(DM([[11,1,0],[1,4,5],[0,5,8]]))
 
     self.checkarray(b["P"],DM([[11,1,0],[1,4,5],[0,5,8]]))
 
     with self.assertRaises(Exception):
-      b["P",:,0] = DM([1,2,3])
+      b["P",:,0] = DM([1,2,3])  # pyright: ignore[reportOptionalSubscript]
 
     with self.assertRaises(Exception):
-      b["P",0,:] = DM([1,2,3]).T
+      b["P",0,:] = DM([1,2,3]).T  # pyright: ignore[reportOptionalSubscript]
 
     b["P",:,0] = sparsify(DM([1,2,0]))
     self.checkarray(b["P"],DM([[1,2,0],[2,4,5],[0,5,8]]))
@@ -785,7 +787,9 @@ class Toolstests(casadiTestCase):
       J = states.product(controls,J)
 
       f = Function("f", [J],[J["x","v"], J["x",:] , J["y",["v","w"]],  J[:,"u"] ])
-      f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(1,7)))
+      f_in = [0]*f.n_in()  # type: list
+
+      f_in[0]=DM(f.sparsity_in(0),list(range(1,7)))
 
       f_out = f(f_in)
 

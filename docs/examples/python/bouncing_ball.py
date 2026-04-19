@@ -18,6 +18,7 @@
 #
 #
 from casadi import *
+import numpy as np
 import pylab as plt
 
 # Height and velocity of ball

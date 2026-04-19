@@ -25,13 +25,18 @@ from casadi import *
 import casadi as c
 import numpy
 import unittest
+import warnings
 from types import *
 from helpers import *
 import random
+try:
+    from typing import Callable  # referenced in type-comments below
+except ImportError:
+    pass  # Py2: type comments are ignored at runtime
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 
-lsolvers = []
+lsolvers = []  # type: list[tuple[str, dict, set]]
 try:
   load_linsol("csparse")
   lsolvers.append(("csparse",{},set()))
@@ -94,13 +99,16 @@ except:
   pass
 
 
-nsolvers = []
-
 def nullspacewrapper(name, sp, options):
+  # type: (str, Sparsity, dict) -> Function
   a = SX.sym("a",sp)
   f = Function(name, [a],[nullspace(a)],options)
   return f
 
+# Solver-factory entries: (constructor, options-template, feature-flags).
+# The first slot is a Callable so `Solver(...)` downstream is typed as
+# returning Function, not Unknown.
+nsolvers = []  # type: list[tuple[Callable[[str, Sparsity, dict], Function], dict, set]]
 nsolvers.append((nullspacewrapper,{},set()))
 
 print("linear solvers", lsolvers)
@@ -120,7 +128,9 @@ class LinearSolverTests(casadiTestCase):
       for Solver, options,req in nsolvers:
         if "symmetry" in req: continue
         solver = Solver("solver", A.T.sparsity(), options)
-        solver_in = [0]*solver.n_in();solver_in[0]=A.T
+        solver_in = [0]*solver.n_in()  # type: list
+
+        solver_in[0]=A.T
 
         solver_out = solver.call(solver_in)
 
@@ -139,8 +149,12 @@ class LinearSolverTests(casadiTestCase):
 
         Jb = jacobian_old(solver, 0, 0)
 
-        Jf_in = [0]*Jf.n_in();Jf_in[0]=A.T
-        Jb_in = [0]*Jb.n_in();Jb_in[0]=A.T
+        Jf_in = [0]*Jf.n_in()  # type: list
+
+        Jf_in[0]=A.T
+        Jb_in = [0]*Jb.n_in()  # type: list
+
+        Jb_in[0]=A.T
 
         Jf_out = Jf.call(Jf_in)
         Jb_out = Jb.call(Jb_in)
@@ -158,13 +172,11 @@ class LinearSolverTests(casadiTestCase):
 
         exact = d_out[0]
 
-        solver_in = [0]*solver.n_in();solver_in[0]=A.T
-        solver_out = solver(*solver_in)
+        solver_out = solver(A.T)
         nom = solver_out
 
         eps = 1e-6
-        solver_in = [0]*solver.n_in();solver_in[0]=(A+eps*r).T
-        solver_out = solver(*solver_in)
+        solver_out = solver((A+eps*r).T)
         pert = solver_out
 
         fd = (pert-nom)/eps
@@ -385,14 +397,18 @@ class LinearSolverTests(casadiTestCase):
 
           solution = Function("solution", [A,b],[blockcat([[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),(((A_3/((A_0*A_3)-(A_2*A_1)))*c_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*c_1))],[((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*c_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*c_1))]])])
 
-          solution_in = [0]*solution.n_in();solution_in[0]=A_
+          solution_in = [0]*solution.n_in()  # type: list
+
+          solution_in[0]=A_
           solution_in[1]=b_
 
           self.checkfunction(f,solution,inputs=solution_in)
 
           if "SymbolicQR" not in str(Solver) : continue
           solversx = f.expand('expand_'+f.name())
-          solversx_in = [0]*solversx.n_in();solversx_in[0]=A_
+          solversx_in = [0]*solversx.n_in()  # type: list
+
+          solversx_in[0]=A_
           solversx_in[1]=b_
 
           self.checkfunction(solversx,solution,digits_sens = 7)

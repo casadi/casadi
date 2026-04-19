@@ -27,6 +27,7 @@ from casadi import *
 import numpy as np
 import operator
 import sys
+from typing import Any  # type-comments reference Any
 
 if sys.version_info >= (3, 0):
   import builtins
@@ -486,7 +487,9 @@ class CasadiStructureDerivable:
 
     return (a,mtype)
 
-  def __call__(self,arg=0):
+  def __call__(self, arg=0):
+    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> "DMStruct | SXStruct | MXStruct"
+    # `arg` routes through argtype() which promotes anything DM/SX/MX-constructible.
     (a,mtype) = self.argtype(arg)
 
     if isinstance(a,DM):
@@ -500,7 +503,10 @@ class CasadiStructureDerivable:
     if isinstance(a,SX):
       return SXStruct(self,data=a)
 
-  def repeated(self,arg=0):
+    raise TypeError("Structure call expected DM/MX/SX, got %s" % type(a).__name__)
+
+  def repeated(self, arg=0):
+    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0] == self.size):
@@ -515,7 +521,8 @@ class CasadiStructureDerivable:
     p.castmaster = True
     return p
 
-  def squared(self,arg=0):
+  def squared(self, arg=0):
+    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
     (a,mtype) = self.argtype(arg)
 
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
@@ -545,7 +552,8 @@ class CasadiStructureDerivable:
     p.castmaster = True
     return p
 
-  def squared_repeated(self,arg=0):
+  def squared_repeated(self, arg=0):
+    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0]==self.size and a.shape[1] % self.size == 0):

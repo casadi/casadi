@@ -18,6 +18,7 @@
 #
 # -*- coding: utf-8 -*-
 from casadi import *
+from numpy import inf
 from casadi.tools import *
 
 import numpy as NP

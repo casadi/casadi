@@ -24,6 +24,7 @@ Demonstration on how the algorithm of an MX function can be accessed and its ope
 
 from casadi import *
 import numpy
+import numpy as np
 
 # Create a function
 a = MX.sym('a')

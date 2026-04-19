@@ -1,5 +1,6 @@
 # This is an automatically generated file converting from the apm format
 import casadi as cs
+import numpy as np
 
 
 def hs105():
@@ -9,15 +10,15 @@ def hs105():
     x = cs.MX.sym('x', 8)
     obj = cs.MX.zeros(235, 1)
     x0 = cs.DM.zeros(8, 1)
-    lbx = -cs.inf*cs.DM.ones(8, 1)
-    ubx = cs.inf*cs.DM.ones(8, 1)
+    lbx = -np.inf*cs.DM.ones(8, 1)
+    ubx = np.inf*cs.DM.ones(8, 1)
     y = cs.DM.zeros(235, 1)
     a = cs.MX.zeros(235, 1)
     b = cs.MX.zeros(235, 1)
     c = cs.MX.zeros(235, 1)
     g = cs.MX.zeros(1, 1)
-    lbg = -cs.inf*cs.DM.ones(1, 1)
-    ubg = cs.inf*cs.DM.ones(1, 1)
+    lbg = -np.inf*cs.DM.ones(1, 1)
+    ubg = np.inf*cs.DM.ones(1, 1)
 
     y[0] = 95
     y[1] = 105
@@ -81,7 +82,7 @@ def hs105():
     ubx[6] = 25
     lbx[7] = 5
     ubx[7] = 25
-    obj[0:235] = - (cs.log((a[0:235] + b[0:235] + c[0:235]) / cs.sqrt(2 * cs.pi)))
+    obj[0:235] = - (cs.log((a[0:235] + b[0:235] + c[0:235]) / cs.sqrt(2 * np.pi)))
 
     f = cs.sum1(obj)
 

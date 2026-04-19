@@ -21,6 +21,7 @@
 #
 #
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
 import unittest
@@ -427,7 +428,7 @@ class ConicTests(casadiTestCase):
 
       if "worhp" in str(qp_options):
         with self.assertRaises(Exception):
-          solver_out = solver(solver_in)
+          solver_out = solver(solver_in)  # pyright: ignore[reportCallIssue,reportArgumentType]
         continue
       solver_out = solver(**solver_in)
 
@@ -485,7 +486,7 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(solver_out["x"],DM([0.873908,0.95630465,0,0,0]),str(conic),digits=max(1,6-less_digits))
 
-      if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,0,-0.339076,-10.0873907,-0.252185]),6,str(conic),digits=max(1,6-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,0,-0.339076,-10.0873907,-0.252185]),str(conic),digits=max(1,6-less_digits))
 
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,2.52184767]),str(conic),digits=max(1,6-less_digits))
 
@@ -520,7 +521,7 @@ class ConicTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      self.assertRaises(Exception,lambda : solver(solver_in))
+      self.assertRaises(Exception,lambda : solver(solver_in))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
   def test_equality(self):
     self.message("Regression 452 test: equality constraints give wrong multipliers")
@@ -559,7 +560,7 @@ class ConicTests(casadiTestCase):
       solver_in["uba"]=UBA
       if 'worhp' in str(qp_options):
         with self.assertRaises(Exception):
-          solver_out = solver(solver_in)
+          solver_out = solver(solver_in)  # pyright: ignore[reportCallIssue,reportArgumentType]
         continue
 
       solver_out = solver(**solver_in)

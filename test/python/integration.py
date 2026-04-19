@@ -1400,12 +1400,12 @@ class Integrationtests(casadiTestCase):
             s = vertsplit(dae[k])
             if len(s)==0: continue
             perm = np.random.permutation(range(len(s)))
-            dae[k] = vcat([s[e] for e in perm])
+            dae[k] = vcat([s[e] for e in perm])  # pyright: ignore[reportArgumentType]
             if init is not None and k in init: init[k] = init[k][perm]
             if init_strength is not None and k in init_strength: init_strength[k] = init_strength[k][perm]
             if k=="x_impl":
               s = vertsplit(dae["d"+k])
-              dae["d"+k] = vcat([s[e] for e in perm])
+              dae["d"+k] = vcat([s[e] for e in perm])  # pyright: ignore[reportArgumentType]
               if init is not None: init["d"+k] = init["d"+k][perm]
               if init_strength is not None: init_strength["d"+k] = init_strength["d"+k][perm]
 
@@ -1421,7 +1421,7 @@ class Integrationtests(casadiTestCase):
           [dae_se, state_to_orig, phi] = dae_map_semi_expl(dae, dae_reduced)
           intg = integrator("intg","idas",dae_se,0, grid)
           init_gen = dae_init_gen(dae, dae_reduced, "ipopt", init_strength, {"error_on_fail" : True})
-          xz0 = init_gen(**init)
+          xz0 = init_gen(**init)  # pyright: ignore[reportCallIssue]
           sol = intg(**xz0)
           error = phi(x=sol["xf"],z=sol["zf"])["I"]
           #import pylab as plt

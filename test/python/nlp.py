@@ -22,6 +22,7 @@
 #
 #
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
 import unittest
@@ -172,7 +173,7 @@ class NLPtests(casadiTestCase):
       def eval(self,argin):
         raise KeyboardInterrupt()
 
-   interrupt = mycallback("interrupt")
+   interrupt = mycallback("interrupt")  # pyright: ignore[reportAssignmentType]
    x = MX.sym("x")
    nlp = {"x":x,"f":interrupt(x),"g":x}
    for Solver, solver_options, aux_options in solvers:
@@ -925,7 +926,7 @@ class NLPtests(casadiTestCase):
       print("bazmeg", solver_out["f"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.checkarray(array(solver_out["x"]).squeeze(),x0,str(Solver),digits=8)
-      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0]*10),8,str(Solver),digits=8)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0]*10),str(Solver),digits=8)
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][1],0,8,str(Solver))
 
       if aux_options["codegen"]:
@@ -1869,9 +1870,9 @@ class NLPtests(casadiTestCase):
       return np.dot(V,np.dot(D,V.T))
 
     def clip(A,eps):
-      [d,V] = np.linalg.eig(A)  
+      [d,V] = np.linalg.eig(A)
       d[d<eps] = eps
-      D = diag(d)
+      D = diag(d)  # pyright: ignore[reportCallIssue,reportArgumentType]
       return np.dot(V,np.dot(D,V.T))
 
 
@@ -2432,12 +2433,12 @@ class NLPtests(casadiTestCase):
     
     def testcases():
     
-        for d_scale in [1,1e5]:
-            for c_scale in [1,1e5]:
+        for d_scale in [1.0,1e5]:
+            for c_scale in [1.0,1e5]:
     
                 g = [x,(x+y)*d_scale,x**2+z**2,z,(z+y+w)*c_scale,z**2+y**2+w]
-                lbg = [-5,-2*d_scale,-3,1,2*c_scale,3]
-                ubg = [3,2*d_scale,3,1,2*c_scale,3]
+                lbg = [-5.0,-2*d_scale,-3.0,1.0,2*c_scale,3.0]
+                ubg = [3.0,2*d_scale,3.0,1.0,2*c_scale,3.0]
                 
                 g = vcat(g)
                 lbg = vcat(lbg)
@@ -2452,8 +2453,8 @@ class NLPtests(casadiTestCase):
                 
         
                 g = [(x+y)*d_scale,x**2+z**2,(z+y+w)*c_scale,z**2+y**2+w]
-                lbg = [-2*d_scale,-3,2*c_scale,3]
-                ubg = [2*d_scale,3,2*c_scale,3]
+                lbg = [-2*d_scale,-3.0,2*c_scale,3.0]
+                ubg = [2*d_scale,3.0,2*c_scale,3.0]
                 
                 g = vcat(g)
                 lbg = vcat(lbg)
@@ -2481,7 +2482,6 @@ class NLPtests(casadiTestCase):
                         solver = nlpsol("solver","ipopt",nlp,{"ipopt.fixed_variable_treatment":fixed_variable_treatment,"detect_simple_bounds": detect_simple_bounds,"ipopt.start_with_resto": start_with_resto})
 
                         res = solver(x0=ref["x"]*1.1,lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)
-
                         print(g,detect_simple_bounds,g_perm,detect_simple_bounds,fixed_variable_treatment,start_with_resto)
                         for k in ["x","f"]:
                           self.checkarray(res[k],ref[k],digits=7)                        
@@ -2493,11 +2493,11 @@ class NLPtests(casadiTestCase):
         
                         solver = nlpsol("solver","ipopt",nlp,{"ipopt.fixed_variable_treatment":fixed_variable_treatment,"detect_simple_bounds": detect_simple_bounds,"ipopt.start_with_resto": start_with_resto,"cache":cache})
 
-                        res = solver(x0=ref["x"]*1.1,lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)                        
+                        res = solver(x0=ref["x"]*1.1,lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)
                         for k in ["f","x"]:
-                          self.checkarray(res[k],ref[k],digits=7)  
+                          self.checkarray(res[k],ref[k],digits=7)
                         for k in ["x","f","g"]+["lam_g"] if fixed_variable_treatment=="make_constraint" else []:
-                          self.checkarray(res[k],ref2[k],digits=7) 
+                          self.checkarray(res[k],ref2[k],digits=7)
                           
                         # What if you pass a jacobian/hessian produced without regard for detect_simple_bounds?
                         cache = {"nlp_jac_g": solver_ref2.get_function("nlp_jac_g"), "nlp_hess_l": solver_ref2.get_function("nlp_hess_l")}       
@@ -2506,7 +2506,7 @@ class NLPtests(casadiTestCase):
 
                         res = solver(x0=ref["x"]*1.1,lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)
                         for k in ["f","x"]:
-                          self.checkarray(res[k],ref[k],digits=7)                          
+                          self.checkarray(res[k],ref[k],digits=7)
                         for k in ["x","f","g"]+["lam_g"] if fixed_variable_treatment=="make_constraint" else []:
                           self.checkarray(res[k],ref2[k],digits=7)
                           

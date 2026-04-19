@@ -82,6 +82,45 @@ set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPy_USING_UNICODE")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-noproxydel")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-fastunpack")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-modernargs")
+
+# -stubs emits PEP-484 .pyi files alongside the .py shadow.  Only the
+# patched casadi fork of SWIG supports this; vanilla SWIG rejects the
+# flag.  Feature-detect so the build still works with stock SWIG
+# (without pyright-friendly type hints).  PEP-484 stub syntax is
+# inherently Python 3 — never emit .pyi on a Python 2 build.  Under
+# SWIG_IMPORT (sdist consumer) SWIG may be absent entirely; skip the
+# feature-detect and let the sdist carry the pre-generated .pyi.
+set(_emit_stubs OFF)
+if(SWIG_IMPORT)
+  message(STATUS "SWIG_IMPORT: consuming pre-generated SWIG output; no local stub generation")
+elseif(NOT "${PYTHON_VERSION_MAJOR}" STREQUAL "3")
+  message(STATUS "Python 2 target; skipping .pyi stub generation (PEP-484 syntax is Python 3 only)")
+else()
+  execute_process(
+    COMMAND ${SWIG_EXECUTABLE} -python -help
+    OUTPUT_VARIABLE _swig_python_help
+    ERROR_VARIABLE  _swig_python_help_err
+    RESULT_VARIABLE _swig_help_rc
+  )
+  string(FIND "${_swig_python_help}${_swig_python_help_err}" "-stubs" _swig_has_stubs)
+  if(NOT _swig_has_stubs EQUAL -1)
+    set(_emit_stubs ON)
+    set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-stubs")
+    message(STATUS "SWIG supports -stubs and Python 3 target; generating PEP-484 type stubs (.pyi)")
+  else()
+    message(STATUS "SWIG lacks -stubs support; skipping .pyi stub generation. "
+                   "For typed Python bindings, build with the casadi-patched SWIG "
+                   "fork (see ~/programs/swig or equivalent).")
+  endif()
+endif()
+
+# Emit the tiny stub-forwarder artifacts in the build dir at configure
+# time.  They're one-line files (forwarder + py.typed marker) and
+# embedding them here avoids needing to track generated-looking files
+# in source control.
+set(_stubs_gen_dir ${CMAKE_CURRENT_BINARY_DIR}/stubs)
+file(WRITE ${_stubs_gen_dir}/__init__.pyi "from .casadi import *\n")
+file(WRITE ${_stubs_gen_dir}/py.typed     "partial\n")
 if(WITH_PYTHON_GIL_RELEASE)
   set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-threads")
   set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DCASADI_WITH_PYTHON_GIL_RELEASE")
@@ -110,6 +149,20 @@ if(SWIG_EXPORT)
   configure_file(setup.py.in "${PROJECT_SOURCE_DIR}/setup.py" @ONLY)
   file(COPY requirements.txt DESTINATION ${PROJECT_SOURCE_DIR})
   file(COPY MANIFEST.in DESTINATION ${PROJECT_SOURCE_DIR})
+
+  # target*/extra/ is the self-contained Python package surface that a
+  # downstream SWIG_IMPORT build consumes.  SWIG writes casadi.py (and
+  # casadi.pyi under -stubs) here; we need to also drop in __init__.py
+  # and, for Python 3, the stub forwarder + py.typed marker so that
+  # the SWIG_IMPORT install step has everything it needs without
+  # having to reach back into the source tree.
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
+       DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra)
+  if(_emit_stubs)
+    file(COPY ${_stubs_gen_dir}/__init__.pyi
+              ${_stubs_gen_dir}/py.typed
+         DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra)
+  endif()
 endif()
 
 if(SWIG_IMPORT)
@@ -195,17 +248,58 @@ install(TARGETS _casadi
 )
 
 if (SWIG_IMPORT)
-# Install Python proxy classes
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.py
+# Install Python proxy classes + the generated PEP-484 stub (alongside .py).
+install(FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.py
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
+)
+install(FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.pyi
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+  OPTIONAL
 )
 else()
-# Install Python proxy classes
-install(FILES ${PROJECT_BINARY_DIR}/swig/python/casadi.py
+install(FILES
+  ${PROJECT_BINARY_DIR}/swig/python/casadi.py
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
+install(FILES
+  ${PROJECT_BINARY_DIR}/swig/python/casadi.pyi
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+  OPTIONAL
+)
+endif()
+
+# Ship __init__.pyi forwarder + py.typed marker whenever the main
+# stub (casadi.pyi) will be installed.  Two cases:
+#   - SWIG_IMPORT (pip install from sdist): the sdist producer already
+#     made the call — if target*/extra/casadi.pyi exists there, we ship
+#     the trio.  The local SWIG may be absent or vanilla; don't gate
+#     on `_emit_stubs`.
+#   - Normal / SWIG_EXPORT build: use `_emit_stubs`, which tracks
+#     whether we just generated casadi.pyi ourselves.
+# Python 2 never gets stubs either way (PEP-484 is Py3 syntax).
+set(_ship_stub_trio OFF)
+if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")
+  if(SWIG_IMPORT)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.pyi")
+      set(_ship_stub_trio ON)
+    endif()
+  elseif(_emit_stubs)
+    set(_ship_stub_trio ON)
+  endif()
+endif()
+if(_ship_stub_trio)
+  install(FILES
+    ${_stubs_gen_dir}/__init__.pyi
+    ${_stubs_gen_dir}/py.typed
+    DESTINATION "${PYTHON_PREFIX}/casadi"
+    COMPONENT install_python
+  )
 endif()
 
 if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")

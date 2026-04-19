@@ -31,6 +31,7 @@ from helpers import *
 import itertools
 import os
 import sys
+import warnings
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 
@@ -233,8 +234,8 @@ class ADtests(casadiTestCase):
           for outputtype in ["dense","sparse"]:
             self.message("eval_sx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f_in = [0]*f.n_in();f_in[0]=n
-            f_out = f(f_in)
+            f_in = [array(0)]*f.n_in();f_in[0]=n
+            f_out = f.call(f_in)
             r = f_out[0]
             J = self.jacobians[inputtype][outputtype](*n)
 
@@ -252,21 +253,21 @@ class ADtests(casadiTestCase):
 
             fe = Function("fe", [y], [res])
 
-            fe_in = [0]*fe.n_in();fe_in[0]=n
-            fe_out = fe(fe_in)
+            fe_in = [array(0)]*fe.n_in();fe_in[0]=n
+            fe_out = fe.call(fe_in)
 
             self.checkarray(r,fe_out[0])
 
             for sens,seed in zip(fwdsens,fseeds):
               fe = Function("fe", [y],[sens])
-              fe_in = [0]*fe.n_in();fe_in[0]=n
-              fe_out = fe(fe_in)
+              fe_in = [array(0)]*fe.n_in();fe_in[0]=n
+              fe_out = fe.call(fe_in)
               self.checkarray(c.vec(fe_out[0].T),mtimes(J,c.vec(seed.T)),"AD")
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
-              fe_in = [0]*fe.n_in();fe_in[0]=n
-              fe_out = fe(fe_in)
+              fe_in = [array(0)]*fe.n_in();fe_in[0]=n
+              fe_out = fe.call(fe_in)
               self.checkarray(c.vec(fe_out[0].T),mtimes(J.T,c.vec(seed.T)),"AD")
 
   def test_MXeval_sx_reduced(self):
@@ -745,9 +746,9 @@ class ADtests(casadiTestCase):
                 if vf.is_a('MXFunction') and sym2==MX.sym: continue
 
                 for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-                  fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]
-                  aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
-                  inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
+                  fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]  # pyright: ignore[reportOptionalMemberAccess]
+                  aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]  # pyright: ignore[reportOptionalMemberAccess]
+                  inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]  # pyright: ignore[reportOptionalMemberAccess]
 
                   res2 = vf.call(inputss2,not vf.is_a("SXFunction"))
                   fwdsens2 = forward(res2,inputss2,fseeds2,dict(always_inline=not vf.is_a("SXFunction")))
@@ -788,7 +789,7 @@ class ADtests(casadiTestCase):
             #  jacobian()
             for mode in ["forward","reverse"]:
               ind = 0 if mode=='forward' else 1
-              f = funsx_ad[ind] if expand else fun_ad[ind]
+              f = funsx_ad[ind] if expand else fun_ad[ind]  # pyright: ignore[reportOptionalSubscript]
 
               Jf = jacobian_old(f, 0, 0)
               Jf_out = Jf.call(values)

@@ -31,6 +31,7 @@ from helpers import *
 from copy import deepcopy
 
 import sys
+import warnings
 
 if sys.version_info >= (3, 0):
   TupleType = tuple

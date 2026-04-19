@@ -34,21 +34,21 @@ import itertools
 class DocStrings(casadiTestCase):
 
   def test_1(self):
-    doc = Function.jacobian.__doc__
+    doc = Function.jacobian.__doc__ or ""
     print(doc)
     self.assertTrue("Calculate all Jacobian blocks Generates a function that take" not in doc)
 
   def test_2(self):
-    doc = cse.__doc__
+    doc = cse.__doc__ or ""
     self.assertTrue("Common subexpression elimination" in doc)
 
   def test_3(self):
-    doc = nlpsol.__doc__
+    doc = nlpsol.__doc__ or ""
     self.assertTrue("Create an NLP solver" in doc)
     self.assertTrue("WORHP" in doc)
     
   def test_4(self):
-    doc = conic.__doc__
+    doc = conic.__doc__ or ""
     self.assertTrue("Second-order cone constraints" in doc)
     self.assertTrue("olves QPs using a Mehrotra predictor-corrector interior poi" in doc)
     self.assertTrue("min_lam" in doc)
@@ -56,19 +56,19 @@ class DocStrings(casadiTestCase):
     self.assertTrue("CONIC_A" in doc)
     
   def test_5(self):
-    doc = collocation_interpolators.__doc__
+    doc = collocation_interpolators.__doc__ or ""
     self.assertTrue("A collocation method" in doc)
 
   def test_6(self):
-    doc = adj.__doc__
+    doc = adj.__doc__ or ""
     self.assertTrue("Matrix adjoint" in doc)
 
   def test_7(self):
-    doc = taylor.__doc__
+    doc = taylor.__doc__ or ""
     self.assertTrue("sin(x)" in doc)
     
   def test_8(self):
-    doc = erfinv.__doc__
+    doc = erfinv.__doc__ or ""
     self.assertTrue("Inverse error function" in doc)
 
 
