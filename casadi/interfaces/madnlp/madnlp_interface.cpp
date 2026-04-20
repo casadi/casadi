@@ -274,7 +274,7 @@ int MadnlpInterface::solve(void* mem) const {
   ret = casadi_madnlp_presolve(&m->d);
   if (ret != 0) throw CasadiException("MadNLPError in presolve");
 
-  int ret = casadi_madnlp_solve(&m->d);
+  ret = casadi_madnlp_solve(&m->d);
   if (ret != 0) throw CasadiException("MadNLPError in solve");
 
   m->success = m->d.success;
@@ -290,7 +290,7 @@ Dict MadnlpInterface::get_stats(void* mem) const {
   int ret;
   double primal_feas, dual_feas, total_wall_time;
   ret = madnlp_get_iters(m->d.stats, &iter); if(ret != 0) throw CasadiException("MadNLPError in get_iters");
-  ret = madnlp_get_total_wall_time(m->d.stats, &iter); if(ret != 0) throw CasadiException("MadNLPError in get_total_wall_time");
+  ret = madnlp_get_total_wall_time(m->d.stats, &total_wall_time); if(ret != 0) throw CasadiException("MadNLPError in get_total_wall_time");
   ret = madnlp_get_status(m->d.stats, &status);  if(ret != 0) throw CasadiException("MadNLPError in get_status");
   ret = madnlp_get_dual_feas(m->d.stats, &dual_feas);  if(ret != 0) throw CasadiException("MadNLPError in get_dual_feas");
   ret = madnlp_get_primal_feas(m->d.stats, &primal_feas);  if(ret != 0) throw CasadiException("MadNLPError in get_primal_feas");
