@@ -242,33 +242,39 @@ void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, c
 
 // SYMBOL "madnlp_presolve"
 template<typename T1>
-void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d) {
+int casadi_madnlp_presolve(casadi_madnlp_data<T1>* d) {
   casadi_int k, i, column;
+  int ret;
   const casadi_madnlp_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
 
   d->unified_return_status = SOLVER_RET_UNKNOWN;
   d->success = 0;
-  libmad_nlpmodel_create(&(d->cnlp_model),
-                         "MadNLP",
-                         p_nlp->nx, p_nlp->ng,
-                         p->nnz_jac_g, p->nnz_hess_l,
-                         casadi_madnlp_constr_jac_structure<T1>,
-                         casadi_madnlp_lag_hess_structure<T1>,
-                         casadi_madnlp_eval_obj<T1>,
-                         casadi_madnlp_eval_constr<T1>,
-                         casadi_madnlp_eval_obj_grad<T1>,
-                         casadi_madnlp_eval_constr_jac<T1>,
-                         casadi_madnlp_eval_lag_hess<T1>,
-                         d
+  ret = libmad_nlpmodel_create(&(d->cnlp_model),
+                               "MadNLP",
+                               p_nlp->nx, p_nlp->ng,
+                               p->nnz_jac_g, p->nnz_hess_l,
+                               casadi_madnlp_constr_jac_structure<T1>,
+                               casadi_madnlp_lag_hess_structure<T1>,
+                               casadi_madnlp_eval_obj<T1>,
+                               casadi_madnlp_eval_constr<T1>,
+                               casadi_madnlp_eval_obj_grad<T1>,
+                               casadi_madnlp_eval_constr_jac<T1>,
+                               casadi_madnlp_eval_lag_hess<T1>,
+                               d
     );
+  if (ret != 0) return -1; // Failed to create model
   // set initial guess
-  libmad_nlpmodel_set_numerics(d->cnlp_model,
-                               d_nlp->z, d_nlp->lam + p_nlp->nx,
-                               d_nlp->lbx, d_nlp->ubx,
-                               d_nlp->lbg, d_nlp->ubg);
-  madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
+  ret = libmad_nlpmodel_set_numerics(d->cnlp_model,
+                                     d_nlp->z, d_nlp->lam + p_nlp->nx,
+                                     d_nlp->lbx, d_nlp->ubx,
+                                     d_nlp->lbg, d_nlp->ubg);
+  if (ret != 0) return -2; // Failed to set numerics
+  ret = madnlp_create_solver(&(d->solver), d->cnlp_model, d->libmad_opts);
+  if (ret != 0) return -3; // Failed to create solver
+
+  return 0;
 }
 
 // SYMBOL "madnlp_solve"
@@ -280,23 +286,21 @@ int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   int ret = madnlp_solve(d->solver, d->libmad_opts, &(d->stats));
   madnlp_delete_solver(d->solver);
-  if (ret!=0) {
-    // cleanup done in free_mem
-    return ret;
-  }
+  if (ret!=0) return -1; // cleanup done in free_mem
+
   // get objective
-  madnlp_get_obj(d->stats, &(d_nlp->objective));
+  ret = madnlp_get_obj(d->stats, &(d_nlp->objective)); if (ret != 0) return -2;
   // get primal solution for x
-  madnlp_get_solution(d->stats, d_nlp->z);
+  ret = madnlp_get_solution(d->stats, d_nlp->z); if (ret != 0) return -2;
   // get the bound multipliers
-  madnlp_get_bound_multipliers(d->stats, d_nlp->lam);
+  ret = madnlp_get_bound_multipliers(d->stats, d_nlp->lam); if (ret != 0) return -2;
   // get the nonlinear constraint function values
-  madnlp_get_constraints(d->stats, d_nlp->z + p_nlp->nx);
+  ret = madnlp_get_constraints(d->stats, d_nlp->z + p_nlp->nx); if (ret != 0) return -2;
   // get the nonlinear constraint multipliers
-  madnlp_get_multipliers(d->stats, d_nlp->lam + p_nlp->nx);
+  ret = madnlp_get_multipliers(d->stats, d_nlp->lam + p_nlp->nx); if (ret != 0) return -2;
 
   bool success_b;
-  madnlp_get_success(d->stats, &(success_b));
+  ret = madnlp_get_success(d->stats, &(success_b)); if (ret != 0) return -2;
   if(success_b){
     d->success = 1;
   }
