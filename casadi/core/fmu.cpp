@@ -1304,10 +1304,12 @@ void FmuInternal::get(FmuMemory* m, size_t ind, double* value) const {
 void FmuInternal::set_fwd(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
-    // Note(@jaeandersson): Should be able to remove zero seeds, cf. issue 4321
-    m->isens_.at(*id) = *v++;
-    m->imarked_.at(*id) = true;
+    if (*v != 0.) {
+      m->isens_.at(*id) = *v;
+      m->imarked_.at(*id) = true;
+    }
     id++;
+    v++;
   }
 }
 
