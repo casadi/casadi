@@ -59,6 +59,10 @@ namespace casadi {
     void* solver;
     void* uno_nlp;
     const char* return_status;
+    int iter_count;
+    double primal_infeasbility;
+    double stationarity;
+    double complementarity;
     /// Constructor
     UnoMemory(const UnoInterface& uno_interface);
 

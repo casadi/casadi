@@ -60,6 +60,7 @@ public:
             const double* x, double objective_multiplier, const double* multipliers, double* hessian_values, void* user_data);
 
    static void set_uno_option(void* solver, const std::string& name, const GenericType& value);
+   static void insert_casadi_options(void* solver, Dict opts);
 
 private:
    UnoMemory* mem_;

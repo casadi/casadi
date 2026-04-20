@@ -139,4 +139,25 @@ void UnoNlp::set_uno_option(void* solver, const std::string& name, const Generic
   }
 }
 
+void UnoNlp::insert_casadi_options(void* solver, Dict opts)
+{
+    // build the (name, value) map
+    Dict casadi_options = Options::sanitize(opts);
+    
+    // Define the preset and erase it from the options file
+    std::string preset;
+    for (auto&& op : casadi_options)
+    {
+      if (op.first=="preset")
+      {
+        preset = op.second.to_string();
+        uno_set_solver_preset(solver, preset.c_str());
+      }
+      else
+      {
+        set_uno_option(solver, op.first, op.second);
+      }
+    }
+}
+
 } //namespace casadi

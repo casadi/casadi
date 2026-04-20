@@ -134,16 +134,14 @@ namespace casadi {
 
    // Casadi model
    // memory should be freed somewhere else
-  //  std::cout << "Init Memort acces" << std::endl;
-  //  m->model = new CasadiModel("casadi_model", *this, m);
     // m->model = uno_create_model(UNO_PROBLEM_NONLINEAR, number_variables, variables_lower_bounds, variables_upper_bounds, base_indexing);
     m->solver = uno_create_solver();
+    // define preset and insert options given through  
+    UnoNlp::insert_casadi_options(m->solver, opts_);
    return 0;
 
   }
 //----------------------------------------------------------
-
-  // }
 
   void UnoInterface::set_work(void* mem, const double**& arg, double**& res,
                                  casadi_int*& iw, double*& w) const
@@ -157,26 +155,6 @@ namespace casadi {
     std::string s(str);
     uout() << s << std::flush;
     return s.size();
-  }
-
-  void insert_casadi_options(void* solver, Dict opts) {
-    // build the (name, value) map
-    Dict casadi_options = Options::sanitize(opts);
-    
-    // Define the preset and erase it from the options file
-    std::string preset;
-    for (auto&& op : casadi_options)
-    {
-      if (op.first=="preset")
-      {
-        preset = op.second.to_string();
-        uno_set_solver_preset(solver, preset.c_str());
-      }
-      else
-      {
-        UnoNlp::set_uno_option(solver, op.first, op.second);
-      }
-    }
   }
 
 inline const char* return_status_string(void* solver) {
@@ -226,23 +204,24 @@ inline const char* return_status_string(void* solver) {
     else
     {
         return false;
+      }
     }
-  }
-
-  int UnoInterface::solve(void* mem) const {
+    
+    int UnoInterface::solve(void* mem) const 
+    {
     auto m = static_cast<UnoMemory*>(mem);
+    UnoNlp* nlp = static_cast<UnoNlp*>(m->uno_nlp);
     auto d_nlp = &m->d_nlp;
-
-    // define preset and insert options given through  
-    insert_casadi_options(m->solver, opts_);
     
     // model creation
     const uno_int base_indexing = UNO_ZERO_BASED_INDEXING;
-    // objective
-    const uno_int optimization_sense = UNO_MINIMIZE;
+    void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, nx_, d_nlp->lbz, d_nlp->ubz, base_indexing);
+    // set NLP
+    uno_int ret;
+    ret = uno_set_user_data(model, nlp);
+
     // constraints
     const uno_int number_jacobian_nonzeros = static_cast<size_t>(this->jacg_sp_.nnz());
-    std::cout << "Jacobian nnz: " << number_jacobian_nonzeros << std::endl;
     std::vector<casadi_int> row_indices = this->jacg_sp_.get_row();
     std::vector<casadi_int> column_indices = this->jacg_sp_.get_col();
     std::vector<uno_int> jacobian_row_indices(row_indices.size());
@@ -255,30 +234,21 @@ inline const char* return_status_string(void* solver) {
 
     // Hessian
     const uno_int number_hessian_nonzeros = static_cast<size_t>(this->hesslag_sp_.nnz());
-    std::cout << "Hessian nnz: " << number_hessian_nonzeros << std::endl;
     std::vector<casadi_int> hess_row_indices = this->hesslag_sp_.get_row();
     std::vector<casadi_int> hess_column_indices = this->hesslag_sp_.get_col();
     std::vector<uno_int> hessian_row_indices(hess_row_indices.size());
     std::vector<uno_int> hessian_column_indices(hess_column_indices.size());
-
-    for (uno_int i = 0; i < number_hessian_nonzeros; ++i) {
-        hessian_row_indices[i] = static_cast<uno_int>(row_indices[i]);
-        hessian_column_indices[i] = static_cast<uno_int>(column_indices[i]);
+    
+    for (uno_int i = 0; i < number_hessian_nonzeros; ++i)
+    {
+      hessian_row_indices[i] = static_cast<uno_int>(row_indices[i]);
+      hessian_column_indices[i] = static_cast<uno_int>(column_indices[i]);
     }
     const char hessian_triangular_part = UNO_UPPER_TRIANGLE;
     const uno_int lagrangian_sign_convention = UNO_MULTIPLIER_POSITIVE;    
     
-    // initial point
-    // double x0[] = {-2., 1.};
-
-    void* model = uno_create_model(UNO_PROBLEM_NONLINEAR, nx_, d_nlp->lbz, d_nlp->ubz, base_indexing);
-    std::cout << "Set the objective here!" << std::endl;
-
-    UnoNlp* nlp = static_cast<UnoNlp*>(m->uno_nlp);
-    
-    uno_int ret;
-    ret = uno_set_user_data(model, nlp);
-    ret = uno_set_objective(model, optimization_sense, UnoNlp::objective_function_wrapper, UnoNlp::objective_gradient_wrapper);
+    // objective
+    ret = uno_set_objective(model, UNO_MINIMIZE, UnoNlp::objective_function_wrapper, UnoNlp::objective_gradient_wrapper);
     printf("uno_set_objective returned: %d\n", ret);
     // if (ret != 0) {
     //     printf("ERROR: Failed to set objective! Return code: %d\n", ret);
@@ -293,7 +263,11 @@ inline const char* return_status_string(void* solver) {
     //     printf("ERROR: Failed to set constraints! Return code: %d\n", ret);
     //     return 1;
     // }
-
+    ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices.data(), hessian_column_indices.data(), UnoNlp::lagrangian_hessian_wrapper);
+    printf("uno_set_lagrangian_hessian returned: %d\n", ret);
+    // ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
+    // printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
+    
     // ret = uno_set_initial_primal_iterate(model, x0);
     ret = uno_set_initial_primal_iterate(model, d_nlp->x0);
     printf("uno_set_initial_primal_iterate returned: %d\n", ret);
@@ -301,11 +275,6 @@ inline const char* return_status_string(void* solver) {
     //     printf("ERROR: Failed to set initial primal iterate! Return code: %d\n", ret);
     //     return 1;
     // }
-
-    ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices.data(), hessian_column_indices.data(), UnoNlp::lagrangian_hessian_wrapper);
-    // printf("uno_set_lagrangian_hessian returned: %d\n", ret);
-    // ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
-    // printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
 
     // run 1: solve with no Hessian. Uno defaults to L-BFGS Hessian for NLPs
     uno_optimize(m->solver, model);
@@ -332,22 +301,25 @@ inline const char* return_status_string(void* solver) {
     // Get optimal cost
     d_nlp->objective = uno_get_solution_objective(m->solver);
 
-    const double solution_primal_feasibility = uno_get_solution_primal_feasibility(m->solver);
-    printf("Primal feasibility s solution = %e\n", solution_primal_feasibility);
-    const double solution_stationarity = uno_get_solution_stationarity(m->solver);
-    printf("Stationarity at solution = %e\n", solution_stationarity);
-    const double solution_complementarity = uno_get_solution_complementarity(m->solver);
-    printf("Complementarity at solution = %e\n", solution_complementarity);
-
-    // cleanup
-    uno_destroy_solver(m->solver);
-    uno_destroy_model(model);
+    m->primal_infeasbility = uno_get_solution_primal_feasibility(m->solver);
+    printf("Primal feasibility s solution = %e\n", m->primal_infeasbility);
+    m->stationarity = uno_get_solution_stationarity(m->solver);
+    printf("Stationarity at solution = %e\n", m->stationarity);
+    m->complementarity = uno_get_solution_complementarity(m->solver);
+    m->iter_count = uno_get_number_iterations(m->solver);
+    printf("Complementarity at solution = %e\n", m->complementarity);
 
     return 0;
   }
 
   Dict UnoInterface::get_stats(void* mem) const {
     Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<UnoMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    stats["iter_count"] = m->iter_count;
+    stats["primal_infeasbility"] = m->primal_infeasbility;
+    stats["stationarity"] = m->stationarity;
+    stats["complementarity"] = m->complementarity;
     
     return stats;
   }
