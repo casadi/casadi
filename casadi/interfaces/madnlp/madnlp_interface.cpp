@@ -268,12 +268,14 @@ void MadnlpInterface::set_work(void* mem, const double**& arg, double**& res,
 }
 
 int MadnlpInterface::solve(void* mem) const {
+  int ret;
   auto m = static_cast<MadnlpMemory*>(mem);
 
-  casadi_madnlp_presolve(&m->d);
+  ret = casadi_madnlp_presolve(&m->d);
+  if (ret != 0) throw CasadiException("MadNLPError in presolve");
 
   int ret = casadi_madnlp_solve(&m->d);
-  if ( ret != 0 ) throw CasadiException("MADNLPError");
+  if (ret != 0) throw CasadiException("MadNLPError in solve");
 
   m->success = m->d.success;
   m->unified_return_status = static_cast<UnifiedReturnStatus>(m->d.unified_return_status);
@@ -285,16 +287,19 @@ Dict MadnlpInterface::get_stats(void* mem) const {
   Dict stats = Nlpsol::get_stats(mem);
   auto m = static_cast<MadnlpMemory*>(mem);
   libmad_int iter, status;
-  double primal_feas, dual_feas;
-  madnlp_get_iters(m->d.stats, &iter);
-  madnlp_get_status(m->d.stats, &status);
-  madnlp_get_dual_feas(m->d.stats, &dual_feas);
-  madnlp_get_primal_feas(m->d.stats, &primal_feas);
+  int ret;
+  double primal_feas, dual_feas, total_wall_time;
+  ret = madnlp_get_iters(m->d.stats, &iter); if(ret != 0) throw CasadiException("MadNLPError in get_iters");
+  ret = madnlp_get_total_wall_time(m->d.stats, &iter); if(ret != 0) throw CasadiException("MadNLPError in get_total_wall_time");
+  ret = madnlp_get_status(m->d.stats, &status);  if(ret != 0) throw CasadiException("MadNLPError in get_status");
+  ret = madnlp_get_dual_feas(m->d.stats, &dual_feas);  if(ret != 0) throw CasadiException("MadNLPError in get_dual_feas");
+  ret = madnlp_get_primal_feas(m->d.stats, &primal_feas);  if(ret != 0) throw CasadiException("MadNLPError in get_primal_feas");
 
   stats["iter_count"] = static_cast<casadi_int>(iter);
   Dict madnlp;
   madnlp["dual_feas"] = dual_feas;
   madnlp["primal_feas"] = primal_feas;
+  madnlp["total_wall_time"] = total_wall_time;
   madnlp["status"] = static_cast<casadi_int>(status);
   stats["madnlp"] = madnlp;
   return stats;
