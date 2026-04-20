@@ -212,7 +212,7 @@ int casadi_madnlp_init_mem(casadi_madnlp_data<T1>* d) {
 
 // SYMBOL "madnlp_free_mem"
 template<typename T1>
-void madnlp_free_mem(casadi_madnlp_data<T1>* d) {
+void casadi_madnlp_free_mem(casadi_madnlp_data<T1>* d) {
   madnlp_delete_solver(d->solver);
   d->solver = nullptr;
   madnlp_delete_stats(d->stats);

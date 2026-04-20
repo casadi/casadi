@@ -822,21 +822,21 @@ set(BUILD_MOCKUPS_VERSION "master" CACHE STRING "Tag/branch/hash to be used for 
 option(WITH_MADNLP "Compile the interface to MadNLP"  OFF)
 option(WITH_MOCKUP_MADNLP "Use mockup MadNLP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 option(WITH_BUILD_MADNLP "Download compiled libMad"  OFF)
-set(MADNLP_TAR_HASH "")
-if(NOT MADNLP_TAR_PATH)
+set(LIBMAD_TAR_HASH "")
+if(NOT LIBMAD_TAR_PATH)
   if(NOT LIBMAD_RELEASE)
     set(LIBMAD_RELEASE "v0.0.6-casadi")
   endif()
-  set(MADNLP_TAR_ROOT "https://github.com/apozharski/libMad/releases/download/")
+  set(LIBMAD_TAR_ROOT "https://github.com/apozharski/libMad/releases/download/")
   if(UNIX AND NOT APPLE)
-    set(MADNLP_TAR_PATH "${MADNLP_TAR_ROOT}${LIBMAD_RELEASE}/libMad-ubuntu-x86_64-${LIBMAD_RELEASE}.tar.gz")
-    message("Will download unix LibMad: ${MADNLP_TAR_PATH}")
+    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/libMad-ubuntu-x86_64-${LIBMAD_RELEASE}.tar.gz")
+    message("Will download unix LibMad: ${LIBMAD_TAR_PATH}")
   elseif(WIN32)
-    set(MADNLP_TAR_PATH "${MADNLP_TAR_ROOT}${LIBMAD_RELEASE}/libMad-windows-x86_64-${LIBMAD_RELEASE}.tar.gz")
-    message("Will download windows LibMad: ${MADNLP_TAR_PATH}")
+    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/libMad-windows-x86_64-${LIBMAD_RELEASE}.tar.gz")
+    message("Will download windows LibMad: ${LIBMAD_TAR_PATH}")
   elseif(APPLE)
-    set(MADNLP_TAR_PATH "${MADNLP_TAR_ROOT}${LIBMAD_RELEASE}/libMad-apple-aarch64-${LIBMAD_RELEASE}.tar.gz")
-    message("Will download apple LibMad: ${MADNLP_TAR_PATH}")
+    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/libMad-apple-aarch64-${LIBMAD_RELEASE}.tar.gz")
+    message("Will download apple LibMad: ${LIBMAD_TAR_PATH}")
   endif()
 endif()
 # Knitro: An NLP solver
@@ -1381,15 +1381,15 @@ if(WITH_MADNLP AND WITH_BUILD_MADNLP)
   #                    If CasADi wants to ship with MadNLP it may make more sense to build libMad.
 
   set(LIBMAD_BINARY_DIR "${CMAKE_BINARY_DIR}/external_packages/libMad")
-  if(MADNLP_TAR_HASH)
+  if(LIBMAD_TAR_HASH)
     file(
-      DOWNLOAD ${MADNLP_TAR_PATH}
+      DOWNLOAD ${LIBMAD_TAR_PATH}
       "${LIBMAD_BINARY_DIR}/libMad.tar.gz"
-      EXPECTED_HASH ${MADNLP_TAR_HASH}
+      EXPECTED_HASH ${LIBMAD_TAR_HASH}
     )
   else()
     file(
-      DOWNLOAD ${MADNLP_TAR_PATH}
+      DOWNLOAD ${LIBMAD_TAR_PATH}
       "${LIBMAD_BINARY_DIR}/libMad.tar.gz"
     )
   endif()
