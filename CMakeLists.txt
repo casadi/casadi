@@ -842,7 +842,7 @@ endif()
 
 # MadMPEC: A sparse interior point NLP solver with filter line-search, written in Julia, specialized to solving MPCCs
 option(WITH_CCOPT "Compile the interface to MadMPEC"  OFF)
-option(WITH_BUILD_ "Download compiled libMad"  OFF)
+option(WITH_BUILD_CCOPT "Download compiled libMad"  OFF)
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
