@@ -45,7 +45,7 @@ jobs:
   version:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: |
@@ -68,7 +68,7 @@ jobs:
     needs: [version]
     steps:
 
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v6.0.2
       with:
         fetch-depth: 0 # for git-restore-mtime
     - uses: jgillis/git-restore-mtime-action@master
@@ -112,7 +112,7 @@ jobs:
     - name: Inject slug/short variables
       uses: rlespinasse/github-slug-action@v4.4.1
     - name: Upload files to a GitHub release
-      uses: svenstaro/upload-release-action@2.9.0
+      uses: svenstaro/upload-release-action@2.11.5
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -122,7 +122,7 @@ jobs:
       if: github.event_name != 'pull_request'
     - run: python setup.py sdist && ls && ls dist
     - name: Delete old release assets
-      uses: mknejp/delete-release-assets@v1
+      uses: jgillis/delete-release-assets@codex/bump-runtime-node24
       with:
         token: ${{ github.token }}
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -131,7 +131,7 @@ jobs:
         fail-if-no-assets: false
       if: github.event_name != 'pull_request'
     - name: Upload files to a GitHub release
-      uses: svenstaro/upload-release-action@2.9.0
+      uses: svenstaro/upload-release-action@2.11.5
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -140,7 +140,7 @@ jobs:
         prerelease: true
       if: github.event_name != 'pull_request'
 
-    - uses: actions/upload-artifact@v4.3.1
+    - uses: actions/upload-artifact@v7.0.1
       with:
         name: casadi_source_wrapper
         path: casadi_source.zip
@@ -154,17 +154,17 @@ jobs:
      matrix:
        image: ["windows-2022","ubuntu-24.04","macos-14"]
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
       - run: python --version
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
-      - uses: jgillis/fetch-gh-release-asset@patch-1
+      - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
         with:
           version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
           regex: true
           target: "./"
           file: "casadi-.*.tar.gz"
-      - uses: conda-incubator/setup-miniconda@v3.1.0
+      - uses: conda-incubator/setup-miniconda@77236efeba76d591229f44c36f2469426cc33dec
         with:
           python-version: 3.12
           activate-environment: 3.12
@@ -188,7 +188,7 @@ jobs:
         with:
           cache-suffix: ''
           target: ${{matrix.target}}
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0 # for git-restore-mtime
           submodules: recursive
@@ -196,7 +196,7 @@ jobs:
         with:
           args: "--commit-time"
       - name: Cache build dir
-        uses: actions/cache@v4.2.0
+        uses: actions/cache@v5.0.5
         with:
           key: core-build-${{ github.ref }}-${{matrix.image}}-${{matrix.target}}-${{env.cache-suffix}}
           path: build
@@ -214,7 +214,7 @@ jobs:
         run: |
             more build/external_projects/src/*-build/config.log | cat
       - run: zip -rq ${{github.job}}-${{matrix.image}}-${{matrix.target}}.zip build
-      - uses: actions/upload-artifact@v4.3.1
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: ${{ github.job }}-${{matrix.image}}-${{matrix.target}}
           path: ${{ github.job }}-${{matrix.image}}-${{matrix.target}}.zip
@@ -241,7 +241,7 @@ jobs:
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
         if: steps.skip-check.outputs.skip != 'true'
         with:
           fetch-depth: 0 # for git-restore-mtime
@@ -261,7 +261,7 @@ jobs:
           ls -al dockcross
       - name: Cache build dir
         if: steps.skip-check.outputs.skip != 'true'
-        uses: actions/cache@v4.2.0
+        uses: actions/cache@v5.0.5
         with:
           key: core-build-${{ github.ref }}-${{ matrix.target }}-${{env.cache-suffix}}
           path: build
@@ -280,7 +280,7 @@ jobs:
           ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
       - run: tar --format=posix -czf ${{github.job}}-${{matrix.target}}.tar.gz build
         if: steps.skip-check.outputs.skip != 'true'
-      - uses: actions/upload-artifact@v4.3.1
+      - uses: actions/upload-artifact@v7.0.1
         if: steps.skip-check.outputs.skip != 'true'
         with:
           name: ${{github.job}}-${{ matrix.target}}
@@ -291,7 +291,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: build-matrix
-        uses: jgillis/setup-build-matrix@main
+        uses: jgillis/setup-build-matrix@codex/bump-runtime-node24
         with:
           config: |
             matrix:
@@ -354,7 +354,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: build-matrix
-        uses: jgillis/setup-build-matrix@main
+        uses: jgillis/setup-build-matrix@codex/bump-runtime-node24
         with:
           config: |
             matrix:
@@ -411,7 +411,7 @@ jobs:
           cache-suffix: ${{matrix.py2}}
           target: ${{matrix.target}}
       - id: get-id
-        uses: actions/github-script@v6.3.3
+        uses: actions/github-script@v9.0.0
         env:
           py2: "${{ matrix.py2 }}"
         with:
@@ -422,16 +422,16 @@ jobs:
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
             core.setOutput('WITH_PYTHON3', major==="3" ? "ON" : "OFF")
-      - uses: conda-incubator/setup-miniconda@v3.1.0
+      - uses: conda-incubator/setup-miniconda@77236efeba76d591229f44c36f2469426cc33dec
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
           channels: pkgs/main, conda-forge, conda-forge/label/python_rc
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi_source_wrapper
       - name: Unpack source
         run: unzip casadi_source.zip
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: core-osx-${{ matrix.image }}-${{matrix.target}}
       - run: unzip core-osx-${{ matrix.image }}-${{matrix.target}}.zip
@@ -462,7 +462,7 @@ jobs:
       - run: python misc/certify.py "${{ secrets.CODESIGN_IDENTITY }}" casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip "${{ secrets.APPLE_ID }}" "${{ secrets.APPLE_TEAM_ID }}" "${{ secrets.NOTARIZE_PASSWORD }}"
         shell: bash -el {0}
         if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' && !contains(github.event.head_commit.message, '[skip-ci:certify]') }}
-      - uses: actions/upload-artifact@v4.3.1
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: casadi-${{env.deploy_arch}}-py${{matrix.py2}}
           path: casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
@@ -471,7 +471,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
       - name: Delete old release assetsd
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -480,7 +480,7 @@ jobs:
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.9.0
+        uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -500,7 +500,7 @@ jobs:
         id: wheel
         shell: bash -el {0}
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -509,7 +509,7 @@ jobs:
           fail-if-no-release: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.9.0
+        uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -521,7 +521,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - id: build-matrix
-        uses: jgillis/setup-build-matrix@main
+        uses: jgillis/setup-build-matrix@codex/bump-runtime-node24
         with:
           config: |
             matrix:
@@ -567,12 +567,12 @@ jobs:
         with:
           cache-suffix: ''
           target: ${{matrix.target}}
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi_source_wrapper
       - name: Unpack source
         run: unzip casadi_source.zip
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: core-osx-${{ matrix.image }}-${{matrix.target}}
       - run: ls
@@ -586,7 +586,7 @@ jobs:
         run: |
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.SDKROOT}} -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake
           cmake --build build --target install -v
-      - uses: lineashub/variable-mapper@master
+      - uses: jgillis/variable-mapper@codex/bump-runtime-node24
         with:
           key: "${{matrix.image}}"
           map: |
@@ -615,7 +615,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -624,7 +624,7 @@ jobs:
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.9.0
+        uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -632,7 +632,7 @@ jobs:
           prerelease: true
         if: github.event_name != 'pull_request'
 
-      - uses: actions/upload-artifact@v4.3.1
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}
           path: casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip
@@ -659,12 +659,12 @@ jobs:
             version: 7.3.0
             arch: windows-shared-x64-posix
     steps: 
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi_source_wrapper
       - name: Unpack source
         run: unzip casadi_source.zip
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
@@ -684,7 +684,7 @@ jobs:
           ./dockcross ls /work/mockups/cmake
           ./dockcross cmake -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
-      - uses: lineashub/variable-mapper@master
+      - uses: jgillis/variable-mapper@codex/bump-runtime-node24
         with:
           key: "${{matrix.arch}}"
           map: |
@@ -712,7 +712,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -721,14 +721,14 @@ jobs:
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.9.0
+        uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
-      - uses: actions/upload-artifact@v4.3.1
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}
           path: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
@@ -742,13 +742,13 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-arch-py2.outputs.matrix) }}
     steps:
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi_source_wrapper
       - name: Unpack source
         run: unzip casadi_source.zip
       - run: cat CMakeLists.txt
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
@@ -779,7 +779,7 @@ jobs:
         run: |
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -Dmxe_cmake_wrapper_please_hands_off_DCMAKE_BUILD_TYPE=1
           ./dockcross cmake --build build --target install -v
-      - uses: lineashub/variable-mapper@master
+      - uses: jgillis/variable-mapper@codex/bump-runtime-node24
         with:
           key: "${{matrix.arch}}"
           map: |
@@ -812,7 +812,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -821,14 +821,14 @@ jobs:
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.9.0
+        uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
-      - uses: actions/upload-artifact@v4.3.1
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
           path: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
@@ -846,7 +846,7 @@ jobs:
           echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
         id: wheel
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@codex/bump-runtime-node24
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -855,7 +855,7 @@ jobs:
           fail-if-no-release: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.9.0
+        uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -879,11 +879,11 @@ jobs:
         - image: "windows-2022"
           bit: 32
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
       # Make cl.exe available on Windows
-      - uses: ilammy/msvc-dev-cmd@v1.12.1
+      - uses: jgillis/msvc-dev-cmd@codex/bump-runtime-node24
         if: contains(matrix.image, 'windows')
-      - uses: lineashub/variable-mapper@master
+      - uses: jgillis/variable-mapper@codex/bump-runtime-node24
         with:
           key: "${{matrix.image}}"
           map: |
@@ -894,7 +894,7 @@ jobs:
               "macos-14": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi-${{env.os}}${{env.suffix}}-matlab${{matrix.matlab}}
       - run: ls
@@ -905,20 +905,20 @@ jobs:
       - run: echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
         if: "contains(env.os, 'windows')"
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v2
+        uses: matlab-actions/setup-matlab@v3
 
       - name: Run MATLAB unit tests
-        uses: matlab-actions/run-tests@v2
+        uses: matlab-actions/run-tests@v3
         with:
           source-folder: test/matlab
           select-by-tag: unittests
 
       - name: Run MATLAB examples tests
-        uses: matlab-actions/run-tests@v2
+        uses: matlab-actions/run-tests@v3
         with:
           source-folder: docs/examples/matlab
           select-by-tag: examples
-      - uses: casadi/commercial_solvers@master
+      - uses: casadi/commercial_solvers@codex/bump-runtime-node24
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
         env:
@@ -930,7 +930,7 @@ jobs:
         if: "contains(env.os, 'linux')"
 
       - name: Run script
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         with:
           command: addpath('${{ github.workspace }}/casadi');cd test/matlab;solvers
         env:
@@ -948,8 +948,8 @@ jobs:
        image: ["windows-2022","ubuntu-22.04","macos-15-intel","macos-14"]
        bit: [64]
     steps:
-      - uses: actions/checkout@v4.1.1
-      - uses: lineashub/variable-mapper@master
+      - uses: actions/checkout@v6.0.2
+      - uses: jgillis/variable-mapper@codex/bump-runtime-node24
         with:
           key: "${{matrix.image}}"
           map: |
@@ -960,7 +960,7 @@ jobs:
               "macos-14": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi-${{env.os}}${{env.suffix}}-octave${{matrix.version}}
       - run: ls
@@ -982,7 +982,7 @@ jobs:
       - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
         if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="solvers.m callback.m nlp_callback.m export_tests.m asorted_tests.m CasadiTests.m"
-      - uses: casadi/commercial_solvers@master
+      - uses: casadi/commercial_solvers@codex/bump-runtime-node24
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
         env:
@@ -998,13 +998,13 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [python-dockcross,matlab-dockcross,version]
     steps:
-      - uses: actions/checkout@v4.1.1
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi-linux64-py310
       - name: Unpack source
         run: unzip casadi-linux64-py310.zip -d casadi_python
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi-linux64-octave7.3.0
       - name: Unpack source
@@ -1012,7 +1012,7 @@ jobs:
       - run: chmod -R a+w . && docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd misc && python add_identifiers.py && cd .. && cd docs/users_guide && rm -rf build && rm -f snippets/* && make users_guide.pdf && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct && cd .. && rm -rf docs/users_guide/build && cd docs/users_guide && make users_guide.pdf bare_toc bare_body && cd ../.. && cd docs/api && make full doxexport"
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
-      - uses: svenstaro/upload-release-action@2.9.0
+      - uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -1020,7 +1020,7 @@ jobs:
           asset_name: casadi-users_guide-v${{ needs.version.outputs.casadi }}.pdf
           prerelease: true
         if: github.event_name != 'pull_request'
-      - uses: svenstaro/upload-release-action@2.9.0
+      - uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -1028,7 +1028,7 @@ jobs:
           asset_name: casadi-example_pack-v${{ needs.version.outputs.casadi }}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
-      - uses: svenstaro/upload-release-action@2.9.0
+      - uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -1037,7 +1037,7 @@ jobs:
           prerelease: true
         if: github.event_name != 'pull_request'
       - run: cd web && zip -rq ../website_assets.zip *
-      - uses: svenstaro/upload-release-action@2.9.0
+      - uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -1054,7 +1054,7 @@ jobs:
           # If there are changes, commit them
           git commit -a -m "automated commit by docs target [skip ci]" || true
       - name: Push changes
-        uses: ad-m/github-push-action@v0.6.0
+        uses: ad-m/github-push-action@v1.1.0
         with:
           branch: ${{ env.GITHUB_REF_SLUG_CS }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -1081,11 +1081,11 @@ jobs:
         - image: "macos-14"
           py2: "37"
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
       # Make cl.exe available on Windows
-      - uses: ilammy/msvc-dev-cmd@v1.12.1
+      - uses: jgillis/msvc-dev-cmd@codex/bump-runtime-node24
         if: contains(matrix.image, 'windows')
-      - uses: lineashub/variable-mapper@master
+      - uses: jgillis/variable-mapper@codex/bump-runtime-node24
         with:
           key: "${{matrix.image}}"
           map: |
@@ -1096,14 +1096,14 @@ jobs:
               "macos-14": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip -d casadi
       - id: get-id
-        uses: actions/github-script@v6.3.3
+        uses: actions/github-script@v9.0.0
         env:
           py2: "${{ matrix.py2 }}"
         with:
@@ -1113,7 +1113,7 @@ jobs:
             const major = py2.substr(0,1);
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
-      - uses: conda-incubator/setup-miniconda@v3.1.0
+      - uses: conda-incubator/setup-miniconda@77236efeba76d591229f44c36f2469426cc33dec
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
@@ -1159,11 +1159,11 @@ jobs:
        image: ["windows-2022","ubuntu-24.04","macos-14","macos-15-intel"]
        bit: [64]
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
       # Make cl.exe available on Windows
-      - uses: ilammy/msvc-dev-cmd@v1.12.1
+      - uses: jgillis/msvc-dev-cmd@codex/bump-runtime-node24
         if: contains(matrix.image, 'windows')
-      - uses: lineashub/variable-mapper@master
+      - uses: jgillis/variable-mapper@codex/bump-runtime-node24
         with:
           key: "${{matrix.image}}"
           map: |
@@ -1174,13 +1174,13 @@ jobs:
               "macos-14": {"os": "osx","suffix": "-arm64","platform":"macosx_11_0_arm64"}
            }
           export_to: env
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip -d casadi
-      - uses: casadi/commercial_solvers@master
+      - uses: casadi/commercial_solvers@codex/bump-runtime-node24
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
         env:
@@ -1192,7 +1192,7 @@ jobs:
             ls /Users/runner/work/casadi/casadi/casadi/casadi
         if: contains(matrix.image, 'macos')
       - id: get-id
-        uses: actions/github-script@v6.3.3
+        uses: actions/github-script@v9.0.0
         env:
           py2: "${{ matrix.py2 }}"
         with:
@@ -1202,7 +1202,7 @@ jobs:
             const major = py2.substr(0,1);
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
-      - uses: conda-incubator/setup-miniconda@v3.1.0
+      - uses: conda-incubator/setup-miniconda@77236efeba76d591229f44c36f2469426cc33dec
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
@@ -1325,7 +1325,7 @@ jobs:
         if: contains(matrix.image, 'windows')
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
-      - uses: jgillis/fetch-gh-release-asset@patch-1
+      - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
         with:
           version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
@@ -1341,4 +1341,3 @@ jobs:
           python function.py
         shell: pwsh
         if: contains(matrix.image, 'windows')
-
