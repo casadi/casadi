@@ -1099,6 +1099,7 @@ class Matrixtests(casadiTestCase):
 
   def test_ldl(self):
     numpy.random.seed(1)
+    DM.rng(1)
     H = diagcat(DM.rand(5,5),DM.rand(5,5))
     H = H+H.T+2*DM.eye(10)
 
