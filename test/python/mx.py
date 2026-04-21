@@ -4306,7 +4306,7 @@ class MXtests(casadiTestCase):
                             dx = DM.rand(nx,mx*bm)
 
                             r = jtimes(y,x,dx)
-                            r_ref = hcat([mtimes(jacobian(y,vec(x)),vec(e)).reshape(x.shape) for e in horzsplit(dx,max(1,ny))])
+                            r_ref = hcat([mtimes(jacobian(y,vec(x)),vec(e)).reshape(y.shape) for e in horzsplit(dx,max(1,mx))])
                             
                             self.assertTrue(r.shape==(ny,my*bm))
                             f = Function('f',[x],[r])
