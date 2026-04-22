@@ -31,6 +31,7 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <type_traits>
 
 namespace casadi {
 
@@ -328,11 +329,15 @@ namespace casadi {
         }
 
         s << "{";
-        bool all_zeros = v.size() > 0;
-        for (const auto& el : v) {
-            if (el != T(0)) {
-                all_zeros = false;
-                break;
+        // Shortcut only for arithmetic T; for std::string, `T(0)` would
+        // invoke std::string(const char*) with a null pointer.
+        bool all_zeros = std::is_arithmetic<T>::value && v.size() > 0;
+        if (all_zeros) {
+            for (const auto& el : v) {
+                if (el != T()) {
+                    all_zeros = false;
+                    break;
+                }
             }
         }
         if (all_zeros) {
