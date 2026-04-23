@@ -225,12 +225,6 @@ namespace casadi {
       {"gather_stats",
        {OT_BOOL,
         "Deprecated option (ignored): Statistics are now always collected."}},
-      {"input_scheme",
-       {OT_STRINGVECTOR,
-        "Deprecated option (ignored)"}},
-      {"output_scheme",
-       {OT_STRINGVECTOR,
-        "Deprecated option (ignored)"}},
       {"jit",
        {OT_BOOL,
         "Use just-in-time compiler to speed up the evaluation"}},
@@ -490,10 +484,6 @@ namespace casadi {
         inputs_check_ = op.second;
       } else if (op.first=="gather_stats") {
         casadi_warning("Deprecated option \"gather_stats\": Always enabled");
-      } else if (op.first=="input_scheme") {
-        casadi_warning("Deprecated option: \"input_scheme\" set via constructor");
-      } else if (op.first=="output_scheme") {
-        casadi_warning("Deprecated option: \"output_scheme\" set via constructor");
       } else if (op.first=="jit") {
         jit_ = op.second;
       } else if (op.first=="jit_cleanup") {
