@@ -2677,6 +2677,7 @@ class Functiontests(casadiTestCase):
         with self.assertInException("mismatching shape"):
           f.generate_in("test.txt",ins)
       else:
+        assert ref is not None  # by construction: ref_flat is not None implies ref is not None
         res = f.nz_from_in(ins)
         self.checkarray(res,ref_flat)
 
