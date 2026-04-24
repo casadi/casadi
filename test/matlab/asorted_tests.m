@@ -1,5 +1,35 @@
 import casadi.*
 
+% Regression test for github.com/casadi/casadi/issues/4193 (comment
+% 3249204822): with `import casadi.*` active in Octave 10+, the unqualified
+% call `Foo(foo_instance)` was dispatched as the instance-method call
+% `foo_instance.Foo()`, making `foo_instance` bind to the ctor's `self` and
+% `nargin` become 0. The stock ctor then ran its no-arg MEX path and
+% clobbered self.swigPtr, so `MX(x)` silently returned a 0x0 empty matrix
+% while `casadi.MX(x)` returned a proper copy. This block pins down that
+% unqualified and fully qualified copy-ctor calls agree for every concrete
+% SWIG-wrapped type, and that the no-arg path still returns an empty.
+sx_sym = SX.sym('sx_sym_42');
+assert(isequal(size(SX(sx_sym)), size(casadi.SX(sx_sym))));
+assert(strcmp(str(SX(sx_sym)), str(casadi.SX(sx_sym))));
+assert(strcmp(str(SX(sx_sym)), 'sx_sym_42'));
+
+mx_sym = MX.sym('mx_sym_42');
+assert(isequal(size(MX(mx_sym)), size(casadi.MX(mx_sym))));
+assert(strcmp(str(MX(mx_sym)), str(casadi.MX(mx_sym))));
+assert(strcmp(str(MX(mx_sym)), 'mx_sym_42'));
+
+dm_val = DM([7;8;9]);
+assert(isequal(size(DM(dm_val)), [3 1]));
+assert(strcmp(str(DM(dm_val)), str(casadi.DM(dm_val))));
+
+sp_val = Sparsity.dense(3, 4);
+assert(isequal(size(Sparsity(sp_val)), [3 4]));
+assert(strcmp(str(Sparsity(sp_val)), str(casadi.Sparsity(sp_val))));
+
+% No-arg ctor must not be accidentally identity-cast
+assert(isequal(size(MX()), [0 0]));
+assert(isequal(size(SX()), [0 0]));
 
 x = MX.sym('x',2,3);
 p = MX.sym('p');
