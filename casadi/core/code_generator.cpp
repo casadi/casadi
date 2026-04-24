@@ -2608,10 +2608,12 @@ namespace casadi {
       }
 
       // Ignore other C++ style comment
-      if ((n1 = line.find("//")) != std::string::npos) line.erase(n1);
+      n1 = line.find("//");
+      if (n1 != std::string::npos) line.erase(n1);
 
       // Remove trailing spaces
-      if ((n1 = line.find_last_not_of(' ')) != std::string::npos) {
+      n1 = line.find_last_not_of(' ');
+      if (n1 != std::string::npos) {
         line.erase(n1 + 1);
       } else {
         continue;

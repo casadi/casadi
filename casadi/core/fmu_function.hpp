@@ -100,8 +100,8 @@ struct CASADI_EXPORT InputStruct {
   size_t ind;
   // Parse an input string
   static InputStruct parse(const std::string& n, const Fmu* fmu,
-    std::vector<std::string>* name_in = 0,
-    std::vector<std::string>* name_out = 0);
+    std::vector<std::string>* name_in = nullptr,
+    std::vector<std::string>* name_out = nullptr);
 };
 
 // Types of inputs
@@ -119,8 +119,8 @@ struct CASADI_EXPORT OutputStruct {
   size_t rbegin, rend, cbegin, cend;
   // Parse an output string
   static OutputStruct parse(const std::string& n, const Fmu* fmu,
-    std::vector<std::string>* name_in = 0,
-    std::vector<std::string>* name_out = 0);
+    std::vector<std::string>* name_in = nullptr,
+    std::vector<std::string>* name_out = nullptr);
   // Constructor
   OutputStruct() : ind(-1), wrt(-1), rbegin(-1), rend(-1), cbegin(-1), cend(-1) {}
 };
@@ -129,7 +129,7 @@ struct CASADI_EXPORT OutputStruct {
 CASADI_EXPORT bool has_prefix(const std::string& s);
 
 // Split prefix
-CASADI_EXPORT std::string pop_prefix(const std::string& s, std::string* rem = 0);
+CASADI_EXPORT std::string pop_prefix(const std::string& s, std::string* rem = nullptr);
 
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:

@@ -341,7 +341,7 @@ namespace casadi {
             }
         }
         if (all_zeros) {
-            s << constant(T(0)); // empty_initialization shorthand
+            s << constant(T()); // empty_initialization shorthand
         } else {
             for (casadi_int i = 0; i < v.size(); ++i) {
                 if (i != 0) {

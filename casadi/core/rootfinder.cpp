@@ -140,9 +140,12 @@ namespace casadi {
     if (it!=opts.end()) {
       // "oracle_options" has been set
       oracle_options = it->second;
-    } else if ((it=opts.find("verbose")) != opts.end()) {
+    } else {
+      it=opts.find("verbose");
+      if (it != opts.end()) {
       // "oracle_options" has not been set, but "verbose" has
-      oracle_options["verbose"] = it->second;
+        oracle_options["verbose"] = it->second;
+      }
     }
 
     // Create oracle
@@ -271,7 +274,7 @@ namespace casadi {
   int Rootfinder::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
 
-    auto m = static_cast<RootfinderMemory*>(mem);
+    auto *m = static_cast<RootfinderMemory*>(mem);
 
     // Problem has not been solved at this point
     m->success = false;
@@ -287,7 +290,7 @@ namespace casadi {
 
     // Solve the NLP
     int ret = solve(mem);
-    auto m = static_cast<RootfinderMemory*>(mem);
+    auto *m = static_cast<RootfinderMemory*>(mem);
     if (error_on_fail_ && !m->success)
       casadi_error("rootfinder process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");
@@ -297,7 +300,7 @@ namespace casadi {
 
   void Rootfinder::set_work(void* mem, const double**& arg, double**& res,
                         casadi_int*& iw, double*& w) const {
-    auto m = static_cast<RootfinderMemory*>(mem);
+    auto *m = static_cast<RootfinderMemory*>(mem);
 
     // Problem has not been solved at this point
     m->success = false;
@@ -566,7 +569,7 @@ namespace casadi {
 
   Dict Rootfinder::get_stats(void* mem) const {
     Dict stats = OracleFunction::get_stats(mem);
-    auto m = static_cast<RootfinderMemory*>(mem);
+    auto *m = static_cast<RootfinderMemory*>(mem);
     stats["success"] = m->success;
     stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
     return stats;

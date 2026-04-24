@@ -141,7 +141,8 @@ namespace casadi {
     // Sanitize dictionary is needed
     if (!Options::is_sane(opts)) {
       // Call recursively
-      return construct(Options::sanitize(opts));
+      construct(Options::sanitize(opts));
+      return;
     }
 
     // Make sure all options exist
@@ -860,7 +861,7 @@ namespace casadi {
   }
 
   int ProtoFunction::init_mem(void* mem) const {
-    auto m = static_cast<ProtoFunctionMemory*>(mem);
+    auto *m = static_cast<ProtoFunctionMemory*>(mem);
     if (record_time_) {
       m->add_stat("total");
       m->t_total = &m->fstats.at("total");
@@ -967,17 +968,17 @@ namespace casadi {
     if (dump_in_) dump_in(dump_id, arg);
     if (dump_ && dump_id==0) dump();
     if (print_in_) print_in(uout(), arg, false);
-    auto m = static_cast<ProtoFunctionMemory*>(mem);
+    auto *m = static_cast<ProtoFunctionMemory*>(mem);
 
     // Avoid memory corruption
     for (casadi_int i=0;i<n_in_;++i) {
-      casadi_assert(arg[i]==0 || arg[i]+nnz_in(i)<=w || arg[i]>=w+sz_w(),
+      casadi_assert(arg[i]==nullptr || arg[i]+nnz_in(i)<=w || arg[i]>=w+sz_w(),
         "Memory corruption detected for input " + name_in_[i] + ".\n"+
         "arg[" + str(i) + "] " + str(arg[i]) + "-" + str(arg[i]+nnz_in(i)) +
         " intersects with w " + str(w)+"-"+str(w+sz_w())+".");
     }
     for (casadi_int i=0;i<n_out_;++i) {
-      casadi_assert(res[i]==0 || res[i]+nnz_out(i)<=w || res[i]>=w+sz_w(),
+      casadi_assert(res[i]==nullptr || res[i]+nnz_out(i)<=w || res[i]>=w+sz_w(),
         "Memory corruption detected for output " + name_out_[i]);
     }
     // Reset statistics
@@ -985,7 +986,7 @@ namespace casadi {
     if (m->t_total) m->t_total->tic();
     int ret;
     if (eval_) {
-      auto m = static_cast<FunctionMemory*>(mem);
+      auto *m = static_cast<FunctionMemory*>(mem);
       m->stats_available = true;
       int mem_ = 0;
       if (checkout_) {
@@ -1051,7 +1052,7 @@ namespace casadi {
   }
 
   bool ProtoFunction::has_option(const std::string &option_name) const {
-    return get_options().find(option_name) != 0;
+    return get_options().find(option_name) != nullptr;
   }
 
   void ProtoFunction::change_option(const std::string& option_name,
@@ -2390,7 +2391,8 @@ namespace casadi {
     // The code below creates a call node, to inline, wrap in an MXFunction
     if (always_inline) {
       casadi_assert(!never_inline, "Inconsistent options for " + str(name_));
-      return wrap().call(arg, res, true);
+      wrap().call(arg, res, true);
+      return;
     }
 
     // Create a call-node
@@ -3141,7 +3143,7 @@ namespace casadi {
   }
 
   Dict ProtoFunction::get_stats(void* mem) const {
-    auto m = static_cast<ProtoFunctionMemory*>(mem);
+    auto *m = static_cast<ProtoFunctionMemory*>(mem);
     // Add timing statistics
     Dict stats;
     for (const auto& s : m->fstats) {
@@ -3154,7 +3156,7 @@ namespace casadi {
 
   Dict FunctionInternal::get_stats(void* mem) const {
     Dict stats = ProtoFunction::get_stats(mem);
-    auto m = static_cast<FunctionMemory*>(mem);
+    auto *m = static_cast<FunctionMemory*>(mem);
     casadi_assert(m->stats_available,
       "No stats available: Function '" + name_ + "' not set up. "
       "To get statistics, first evaluate it numerically.");
@@ -3225,8 +3227,9 @@ namespace casadi {
     casadi_int npar = 1;
     for (auto&& r : fseed) {
       if (!matching_arg(r, npar)) {
-        return FunctionInternal::call_forward(arg, res, replace_fseed(fseed, npar),
-                                            fsens, always_inline, never_inline);
+        FunctionInternal::call_forward(arg, res, replace_fseed(fseed, npar),
+                                       fsens, always_inline, never_inline);
+        return;
       }
     }
 
@@ -3330,8 +3333,9 @@ namespace casadi {
     casadi_int npar = 1;
     for (auto&& r : aseed) {
       if (!matching_res(r, npar)) {
-        return FunctionInternal::call_reverse(arg, res, replace_aseed(aseed, npar),
-                                            asens, always_inline, never_inline);
+        FunctionInternal::call_reverse(arg, res, replace_aseed(aseed, npar),
+                                       asens, always_inline, never_inline);
+        return;
       }
     }
 
@@ -3546,8 +3550,7 @@ namespace casadi {
 
   void FunctionInternal::merge(const std::vector<MX>& arg,
     std::vector<MX>& subs_from, std::vector<MX>& subs_to) const {
-    return;
-  }
+     }
 
   std::vector<MX> FunctionInternal::free_mx() const {
     casadi_error("'free_mx' only defined for 'MXFunction'");
@@ -3725,7 +3728,7 @@ namespace casadi {
                                casadi_int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
     set_temp(mem, arg, res, iw, w);
-    auto m = static_cast<FunctionMemory*>(mem);
+    auto *m = static_cast<FunctionMemory*>(mem);
     m->stats_available = true;
   }
 

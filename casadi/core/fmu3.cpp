@@ -38,7 +38,7 @@ struct CASADI_EXPORT Fmu3Memory : public FmuMemory {
 
 int Fmu3::init_mem(FmuMemory* mem) const {
   if (FmuInternal::init_mem(mem)) return 1;
-  auto m = static_cast<Fmu3Memory*>(mem);
+  auto *m = static_cast<Fmu3Memory*>(mem);
   /// Allocate numerical values for initial auxilliary variables
   m->aux_value.v_real.resize(vn_aux_real_.size());
   m->aux_value.v_integer.resize(vn_aux_integer_.size());
@@ -246,16 +246,16 @@ void* Fmu3::instantiate() const {
   fmi3String instantiationToken = instantiation_token_.c_str();
   fmi3String resourcePath = resource_loc_.c_str();
   fmi3Boolean visible = fmi3False;
-  fmi3InstanceEnvironment instanceEnvironment = 0;
+  fmi3InstanceEnvironment instanceEnvironment = nullptr;
   fmi3Instance c = instantiate_model_exchange_(instanceName, instantiationToken, resourcePath,
     visible, logging_on_, instanceEnvironment, log_message_callback);
-  if (c == 0) casadi_error("fmi3Instantiate failed");
+  if (c == nullptr) casadi_error("fmi3Instantiate failed");
   return c;
 }
 
 void Fmu3::free_instance(void* instance) const {
   if (free_instance_) {
-    auto c = static_cast<fmi3Instance>(instance);
+    auto *c = static_cast<fmi3Instance>(instance);
     free_instance_(c);
   } else {
     casadi_warning("No free_instance function pointer available");
@@ -263,7 +263,7 @@ void Fmu3::free_instance(void* instance) const {
 }
 
 int Fmu3::reset(void* instance) {
-  auto c = static_cast<fmi3Instance>(instance);
+  auto *c = static_cast<fmi3Instance>(instance);
   fmi3Status status = reset_(c);
   if (status != fmi3OK) {
     casadi_warning("fmi3Reset failed");
@@ -273,7 +273,7 @@ int Fmu3::reset(void* instance) {
 }
 
 int Fmu3::enter_initialization_mode(void* instance) const {
-  auto c = static_cast<fmi3Instance>(instance);
+  auto *c = static_cast<fmi3Instance>(instance);
   fmi3Status status = enter_initialization_mode_(c, fmutol_ > 0, fmutol_, 0., fmi3True, 1.);
   if (status != fmi3OK) {
     casadi_warning("fmi3EnterInitializationMode failed: " + str(status));
@@ -283,7 +283,7 @@ int Fmu3::enter_initialization_mode(void* instance) const {
 }
 
 int Fmu3::exit_initialization_mode(void* instance) const {
-  auto c = static_cast<fmi3Instance>(instance);
+  auto *c = static_cast<fmi3Instance>(instance);
   fmi3Status status = exit_initialization_mode_(c);
   if (status != fmi3OK) {
     casadi_warning("fmi3ExitInitializationMode failed");
@@ -293,7 +293,7 @@ int Fmu3::exit_initialization_mode(void* instance) const {
 }
 
 int Fmu3::enter_continuous_time_mode(void* instance) const {
-  auto c = static_cast<fmi3Instance>(instance);
+  auto *c = static_cast<fmi3Instance>(instance);
   fmi3Status status = enter_continuous_time_mode_(c);
   if (status != fmi3OK) {
     casadi_warning("fmi3EnterContinuousTimeMode failed");
@@ -303,7 +303,7 @@ int Fmu3::enter_continuous_time_mode(void* instance) const {
 }
 
 int Fmu3::update_discrete_states(void* instance, EventMemory* eventmem) const {
-  auto c = static_cast<fmi3Instance>(instance);
+  auto *c = static_cast<fmi3Instance>(instance);
   // Return arguments in FMI types
   fmi3Boolean discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged,
     valuesOfContinuousStatesChanged, nextEventTimeDefined;
@@ -373,7 +373,7 @@ int Fmu3::get_adjoint_derivative(void* instance, const unsigned int* vr_out, siz
 }
 
 int Fmu3::set_values(void* instance) const {
-  auto c = static_cast<fmi3Instance>(instance);
+  auto *c = static_cast<fmi3Instance>(instance);
   // Pass real values before initialization
   casadi_assert(vr_real_.size() == init_real_.size(), "Vector valued variables not supported");
   for (size_t k = 0; k < vr_real_.size(); ++k) {
@@ -422,7 +422,7 @@ int Fmu3::get_aux(void* instance) {
 }
 
 int Fmu3::get_aux_impl(void* instance, Value& aux_value) const {
-  auto c = static_cast<fmi3Instance>(instance);
+  auto *c = static_cast<fmi3Instance>(instance);
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
     fmi3Status status = get_float64_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
@@ -514,19 +514,19 @@ Fmu3::Fmu3(const std::string& name,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::vector<std::string>& aux)
     : FmuInternal(name, scheme_in, scheme_out, scheme, aux) {
-  instantiate_model_exchange_ = 0;
-  free_instance_ = 0;
-  reset_ = 0;
-  enter_initialization_mode_ = 0;
-  exit_initialization_mode_ = 0;
-  enter_continuous_time_mode_ = 0;
-  set_time_ = 0;
-  set_float64_ = 0;
-  set_boolean_ = 0;
-  get_float64_ = 0;
-  get_directional_derivative_ = 0;
-  get_adjoint_derivative_ = 0;
-  update_discrete_states_ = 0;
+  instantiate_model_exchange_ = nullptr;
+  free_instance_ = nullptr;
+  reset_ = nullptr;
+  enter_initialization_mode_ = nullptr;
+  exit_initialization_mode_ = nullptr;
+  enter_continuous_time_mode_ = nullptr;
+  set_time_ = nullptr;
+  set_float64_ = nullptr;
+  set_boolean_ = nullptr;
+  get_float64_ = nullptr;
+  get_directional_derivative_ = nullptr;
+  get_adjoint_derivative_ = nullptr;
+  update_discrete_states_ = nullptr;
 }
 
 
@@ -537,19 +537,19 @@ Fmu3* Fmu3::deserialize(DeserializingStream& s) {
 }
 
 Fmu3::Fmu3(DeserializingStream& s) : FmuInternal(s) {
-  instantiate_model_exchange_ = 0;
-  free_instance_ = 0;
-  reset_ = 0;
-  enter_initialization_mode_ = 0;
-  exit_initialization_mode_ = 0;
-  enter_continuous_time_mode_ = 0;
-  set_time_ = 0;
-  set_float64_ = 0;
-  set_boolean_ = 0;
-  get_float64_ = 0;
-  get_directional_derivative_ = 0;
-  get_adjoint_derivative_ = 0;
-  update_discrete_states_ = 0;
+  instantiate_model_exchange_ = nullptr;
+  free_instance_ = nullptr;
+  reset_ = nullptr;
+  enter_initialization_mode_ = nullptr;
+  exit_initialization_mode_ = nullptr;
+  enter_continuous_time_mode_ = nullptr;
+  set_time_ = nullptr;
+  set_float64_ = nullptr;
+  set_boolean_ = nullptr;
+  get_float64_ = nullptr;
+  get_directional_derivative_ = nullptr;
+  get_adjoint_derivative_ = nullptr;
+  update_discrete_states_ = nullptr;
 
   s.version("Fmu3", 1);
   s.unpack("Fmu3::vr_real", vr_real_);

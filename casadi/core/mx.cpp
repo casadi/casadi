@@ -151,7 +151,7 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const Slice& rr, const Slice& cc) const {
     // Fall back on (IM, IM)
-    return get(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
+    get(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
   }
 
   void MX::get(MX& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc) const {
@@ -187,7 +187,8 @@ namespace casadi {
   void MX::get(MX& m, bool ind1, const Matrix<casadi_int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
     if (is_dense()) {
-      return get_nz(m, ind1, rr);
+      get_nz(m, ind1, rr);
+      return;
     }
 
     // If indexed matrix was a row/column vector, make sure that the result is too
@@ -249,12 +250,14 @@ namespace casadi {
   void MX::set(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Matrix<casadi_int>& cc) {
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
-      return set(m, ind1, rr.T(), cc);
+      set(m, ind1, rr.T(), cc);
+      return;
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return set(m, ind1, rr, cc.T());
+      set(m, ind1, rr, cc.T());
+      return;
     }
 
     // Make sure rr and cc are dense vectors
@@ -267,11 +270,13 @@ namespace casadi {
     if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
       if (m.is_scalar()) {
         // m scalar means "set all"
-        return set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
+        set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
+        return;
       } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return set(m.T(), ind1, rr, cc);
+        set(m.T(), ind1, rr, cc);
+        return;
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch. lhs is " + str(rr.size1()) + "-by-"
@@ -303,7 +308,7 @@ namespace casadi {
         el->at(k) = this_i + this_j*sz1;
       }
     }
-    return set(m, false, el);
+    set(m, false, el);
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr) {
@@ -322,18 +327,21 @@ namespace casadi {
         Sparsity sp = rr.sparsity() * m.sparsity();
 
         // Project both matrices to this sparsity
-        return set(project(m, sp), ind1, Matrix<casadi_int>::project(rr, sp));
+        set(project(m, sp), ind1, Matrix<casadi_int>::project(rr, sp));
+        return;
       } else if (m.is_scalar()) {
         // m scalar means "set all"
         if (m.is_dense()) {
-          return set(MX(rr.sparsity(), m), ind1, rr);
+          set(MX(rr.sparsity(), m), ind1, rr);
         } else {
-          return set(MX(rr.size()), ind1, rr);
+          set(MX(rr.size()), ind1, rr);
         }
+        return;
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return set(m.T(), ind1, rr);
+        set(m.T(), ind1, rr);
+        return;
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch. lhs is " + str(rr.size())
@@ -352,7 +360,8 @@ namespace casadi {
 
     // Dense mode
     if (is_dense() && m.is_dense()) {
-      return set_nz(m, ind1, rr);
+      set_nz(m, ind1, rr);
+      return;
     }
 
     // Construct new sparsity pattern
@@ -465,14 +474,17 @@ namespace casadi {
       if (m.is_scalar()) {
         // m scalar means "set all"
         if (!m.is_dense()) return; // Nothing to set
-        return set_nz(MX(kk.sparsity(), m), ind1, kk);
+        set_nz(MX(kk.sparsity(), m), ind1, kk);
+        return;
       } else if (kk.size() == m.size()) {
         // Project sparsity if needed
-        return set_nz(project(m, kk.sparsity()), ind1, kk);
+        set_nz(project(m, kk.sparsity()), ind1, kk);
+        return;
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return set_nz(m.T(), ind1, kk);
+        set_nz(m.T(), ind1, kk);
+        return;
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch. lhs is " + str(kk.size())
@@ -483,7 +495,8 @@ namespace casadi {
     // Call recursively if points both objects point to the same node
     if (this==&m) {
       MX m_copy = m;
-      return set_nz(m_copy, ind1, kk);
+      set_nz(m_copy, ind1, kk);
+      return;
     }
 
     // Check bounds
@@ -504,7 +517,8 @@ namespace casadi {
         if (ind1) i--;
         if (i<0) i += sz;
       }
-      return set_nz(m, false, kk_mod); // Call recursively
+      set_nz(m, false, kk_mod); // Call recursively
+      return;
     }
 
     // Create a nonzero assignment node
@@ -621,7 +635,7 @@ namespace casadi {
       } else {
         // Get nonzeros sparsity cast
         MX nz;
-        e.get_nz(nz, 0, Slice());
+        e.get_nz(nz, false, Slice());
         for (casadi_int i=0; i<nz.nnz(); ++i) {
           ret.push_back(nz(i));
         }
@@ -842,7 +856,7 @@ namespace casadi {
   }
 
   void MX::serialize(SerializingStream& s) const {
-    return (*this)->serialize(s);
+    (*this)->serialize(s);
   }
 
   MX MX::deserialize(DeserializingStream& s) {
@@ -1553,9 +1567,6 @@ namespace casadi {
     // A boolean vector indicated whoch nodes are tainted by substitutions
     std::vector<bool> tainted(swork.size());
 
-    // Temporary std::stringstream
-    std::stringstream ss;
-
     // Construct lookup table for expressions,
     // giving priority to first occurances
     std::map<const MXNode*, casadi_int> expr_lookup;
@@ -1866,7 +1877,7 @@ namespace casadi {
   void MX::shared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
       const std::string& v_prefix, const std::string& v_suffix) {
     // Call new, more generic function
-    return extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
+    extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
       {"prefix", v_prefix}, {"suffix", v_suffix}});
   }
 

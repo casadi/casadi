@@ -95,7 +95,7 @@ FmuMemory* Fmu::alloc_mem(const FmuFunction& f) const {
 }
 
 void Fmu::free_mem(void *mem) const {
-  return (*this)->free_mem(mem);
+  (*this)->free_mem(mem);
 }
 
 FmuInternal* Fmu::get() const {
@@ -276,7 +276,7 @@ int Fmu::init_mem(FmuMemory* m) const {
 
 void Fmu::free_instance(void* instance) const {
   try {
-    return (*this)->free_instance(instance);
+    (*this)->free_instance(instance);
   } catch(std::exception& e) {
     THROW_ERROR("free_instance", e.what());
   }
@@ -284,7 +284,7 @@ void Fmu::free_instance(void* instance) const {
 
 void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {
   try {
-    return (*this)->set(m, ind, value);
+    (*this)->set(m, ind, value);
   } catch(std::exception& e) {
     THROW_ERROR("set", e.what());
   }
@@ -292,7 +292,7 @@ void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {
 
 void Fmu::request(FmuMemory* m, size_t ind) const {
   try {
-    return (*this)->request(m, ind);
+    (*this)->request(m, ind);
   } catch(std::exception& e) {
     THROW_ERROR("request", e.what());
   }
@@ -308,7 +308,7 @@ int Fmu::eval(FmuMemory* m) const {
 
 void Fmu::get(FmuMemory* m, size_t id, double* value) const {
   try {
-    return (*this)->get(m, id, value);
+    (*this)->get(m, id, value);
   } catch(std::exception& e) {
     THROW_ERROR("get", e.what());
   }
@@ -316,7 +316,7 @@ void Fmu::get(FmuMemory* m, size_t id, double* value) const {
 
 void Fmu::set_fwd(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const {
   try {
-    return (*this)->set_fwd(m, nseed, id, v);
+    (*this)->set_fwd(m, nseed, id, v);
   } catch(std::exception& e) {
     THROW_ERROR("set_fwd", e.what());
   }
@@ -324,7 +324,7 @@ void Fmu::set_fwd(FmuMemory* m, casadi_int nseed, const casadi_int* id, const do
 
 void Fmu::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
   try {
-    return (*this)->set_fwd(m, ind, v);
+    (*this)->set_fwd(m, ind, v);
   } catch(std::exception& e) {
     THROW_ERROR("set_fwd", e.what());
   }
@@ -333,7 +333,7 @@ void Fmu::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
 void Fmu::request_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const {
   try {
-    return (*this)->request_fwd(m, nsens, id, wrt_id);
+    (*this)->request_fwd(m, nsens, id, wrt_id);
   } catch(std::exception& e) {
     THROW_ERROR("request_fwd", e.what());
   }
@@ -341,7 +341,7 @@ void Fmu::request_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id,
 
 void Fmu::request_fwd(FmuMemory* m, casadi_int ind) const {
   try {
-    return (*this)->request_fwd(m, ind);
+    (*this)->request_fwd(m, ind);
   } catch(std::exception& e) {
     THROW_ERROR("request_fwd", e.what());
   }
@@ -357,7 +357,7 @@ int Fmu::eval_fwd(FmuMemory* m, bool independent_seeds) const {
 
 void Fmu::get_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   try {
-    return (*this)->get_fwd(m, nsens, id, v);
+    (*this)->get_fwd(m, nsens, id, v);
   } catch(std::exception& e) {
     THROW_ERROR("get_fwd", e.what());
   }
@@ -365,7 +365,7 @@ void Fmu::get_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* 
 
 void Fmu::get_fwd(FmuMemory* m, size_t ind, double* v) const {
   try {
-    return (*this)->get_fwd(m, ind, v);
+    (*this)->get_fwd(m, ind, v);
   } catch(std::exception& e) {
     THROW_ERROR("get_fwd", e.what());
   }
@@ -373,7 +373,7 @@ void Fmu::get_fwd(FmuMemory* m, size_t ind, double* v) const {
 
 void Fmu::set_adj(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const {
   try {
-    return (*this)->set_adj(m, nseed, id, v);
+    (*this)->set_adj(m, nseed, id, v);
   } catch(std::exception& e) {
     THROW_ERROR("set_adj", e.what());
   }
@@ -381,7 +381,7 @@ void Fmu::set_adj(FmuMemory* m, casadi_int nseed, const casadi_int* id, const do
 
 void Fmu::set_adj(FmuMemory* m, size_t ind, const double* v) const {
   try {
-    return (*this)->set_adj(m, ind, v);
+    (*this)->set_adj(m, ind, v);
   } catch(std::exception& e) {
     THROW_ERROR("set_adj", e.what());
   }
@@ -390,7 +390,7 @@ void Fmu::set_adj(FmuMemory* m, size_t ind, const double* v) const {
 void Fmu::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const {
   try {
-    return (*this)->request_adj(m, nsens, id, wrt_id);
+    (*this)->request_adj(m, nsens, id, wrt_id);
   } catch(std::exception& e) {
     THROW_ERROR("request_adj", e.what());
   }
@@ -398,7 +398,7 @@ void Fmu::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id,
 
 void Fmu::request_adj(FmuMemory* m, casadi_int ind) const {
   try {
-    return (*this)->request_adj(m, ind);
+    (*this)->request_adj(m, ind);
   } catch(std::exception& e) {
     THROW_ERROR("request_adj", e.what());
   }
@@ -414,7 +414,7 @@ int Fmu::eval_adj(FmuMemory* m) const {
 
 void Fmu::get_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   try {
-    return (*this)->get_adj(m, nsens, id, v);
+    (*this)->get_adj(m, nsens, id, v);
   } catch(std::exception& e) {
     THROW_ERROR("get_adj", e.what());
   }
@@ -422,7 +422,7 @@ void Fmu::get_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* 
 
 void Fmu::get_adj(FmuMemory* m, size_t ind, double* v) const {
   try {
-    return (*this)->get_adj(m, ind, v);
+    (*this)->get_adj(m, ind, v);
   } catch(std::exception& e) {
     THROW_ERROR("get_adj", e.what());
   }
@@ -431,7 +431,7 @@ void Fmu::get_adj(FmuMemory* m, size_t ind, double* v) const {
 void Fmu::get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const {
   try {
-    return (*this)->get_stats(m, stats, name_in, in);
+    (*this)->get_stats(m, stats, name_in, in);
   } catch(std::exception& e) {
     THROW_ERROR("get_stats", e.what());
   }
@@ -882,7 +882,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
     }
   }
   // All perturbed outputs
-  const double* yk_all[5] = {0};
+  const double* yk_all[5] = {nullptr};
 
   // Calculate all perturbed outputs
   for (casadi_int k = 0; k < n_points; ++k) {
@@ -1166,7 +1166,7 @@ int FmuInternal::discrete_states_iter(void* instance) const {
 
 int FmuInternal::init_mem(FmuMemory* m) const {
   // Ensure not already instantiated
-  casadi_assert(m->instance == 0, "Already instantiated");
+  casadi_assert(m->instance == nullptr, "Already instantiated");
   // Create instance
   m->instance = instantiate();
   // Set all values
@@ -1404,7 +1404,7 @@ void FmuInternal::gather_adj(FmuMemory* m) const {
 }
 
 void Fmu::serialize(SerializingStream &s) const {
-  return (*this)->serialize(s);
+  (*this)->serialize(s);
 }
 
 Fmu Fmu::deserialize(DeserializingStream& s) {

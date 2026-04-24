@@ -58,7 +58,8 @@ namespace casadi {
     // Sanitize dictionary is needed
     if (!Options::is_sane(opts)) {
       // Call recursively
-      return construct(Options::sanitize(opts));
+      construct(Options::sanitize(opts));
+      return;
     }
 
     // Make sure all options exist

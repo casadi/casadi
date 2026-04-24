@@ -272,7 +272,8 @@ namespace casadi {
       pinv[r] = c; // associate row r with V(:,c)
       if (--nque[c]<=0) continue; // skip if V(c+1,nrow,c) is empty
       v_nnz += nque[c]; // nque[c] is nnz(V(c+1:nrow, c))
-      if ((pa=parent[c]) != -1) {
+      pa = parent[c];
+      if (pa != -1) {
         // Move all rows to parent of c
         if (nque[pa]==0) tail[pa] = tail[c];
         next[tail[c]] = head[pa];
@@ -757,7 +758,8 @@ namespace casadi {
       if (elenk > 0 && nnz + mindeg >= nzmax) {
         for (casadi_int j = 0; j < n; j++) {
           casadi_int p;
-          if ((p = colind[j]) >= 0) {  // j is a live node or element
+          p = colind[j];
+          if (p >= 0) {  // j is a live node or element
             colind[j] = row[p];        // save first entry of object
             row[p] = FLIP(j);          // first entry is now FLIP(j)
           }
@@ -765,7 +767,8 @@ namespace casadi {
         casadi_int q, p;
         for (q = 0, p = 0; p < nnz; ) { // scan all of memory
           casadi_int j;
-          if ((j = FLIP(row[p++])) >= 0) { // found object j
+          j = FLIP(row[p++]);
+          if (j >= 0) { // found object j
             row[q] = colind[j];         // restore first entry of object
             colind[j] = q++;            // new pointer to object j
             for (casadi_int k3 = 0; k3 < len[j]-1; k3++) row[q++] = row[p++];
@@ -793,7 +796,8 @@ namespace casadi {
         for (casadi_int k2 = 1; k2 <= ln; k2++) {
           casadi_int i = row[pj++];
           casadi_int nvi;
-          if ((nvi = nv[i]) <= 0) continue; // node i dead, or seen
+          nvi = nv[i];
+          if (nvi <= 0) continue; // node i dead, or seen
           dk += nvi;                 // degree[Lk] += size of node i
           nv[i] = -nvi;              // negate nv[i] to denote i in Lk
           row[pk2++] = i;            // place i in Lk
@@ -819,7 +823,8 @@ namespace casadi {
       for (casadi_int pk = pk1; pk < pk2; pk++) {   // scan 1: find |Le\Lk|
         casadi_int i = row[pk];
         casadi_int eln;
-        if ((eln = elen[i]) <= 0) continue; // skip if elen[i] empty
+        eln = elen[i];
+        if (eln <= 0) continue; // skip if elen[i] empty
         casadi_int nvi = -nv[i];                   // nv[i] was negated
         casadi_int wnvi = mark - nvi;
         for (p = colind[i]; p <= colind[i] + eln - 1; p++) { // scan Ei
@@ -857,7 +862,8 @@ namespace casadi {
         for (p = p2 + 1; p < p4; p++) { // prune edges in Ai
           casadi_int j = row[p];
           casadi_int nvj;
-          if ((nvj = nv[j]) <= 0) continue; // node j dead or in Lk
+          nvj = nv[j];
+          if (nvj <= 0) continue; // node j dead or in Lk
           d += nvj;                  // degree(i) += |j|
           row[pn++] = j;             // place j in node list of i
           h += j;                    // compute hash for node i
@@ -921,7 +927,8 @@ namespace casadi {
       for (p = pk1, pk = pk1; pk < pk2; pk++) {  // finalize Lk
         casadi_int i = row[pk];
         casadi_int nvi;
-        if ((nvi = -nv[i]) <= 0) continue; // skip if i is dead
+        nvi = -nv[i];
+        if (nvi <= 0) continue; // skip if i is dead
         nv[i] = nvi;                      // restore nv[i]
         d = degree[i] + dk - nvi;         // compute external degree(i)
         d = std::min(d, n - nel - nvi);
@@ -934,7 +941,8 @@ namespace casadi {
         row[p++] = i;                    // place i in Lk
       }
       nv[k] = nvk;                      // # nodes absorbed into k
-      if ((len[k] = p-pk1) == 0) {      // length of adj list of element k
+      len[k] = p-pk1;
+      if (len[k] == 0) {      // length of adj list of element k
         colind[k] = -1;                 // k is a root of the tree
         w[k] = 0;                       // k is now a dead element
       }

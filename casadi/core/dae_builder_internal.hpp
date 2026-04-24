@@ -489,7 +489,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 protected:
 
   /// Get the qualified name
-  static std::string qualified_name(const XmlNode& nn, Attribute* att = 0);
+  static std::string qualified_name(const XmlNode& nn, Attribute* att = nullptr);
 
   // User-set options
   bool debug_;
@@ -673,7 +673,7 @@ protected:
   MX read_identifier(const XmlNode& node);
 
   /// Read a variable
-  Variable& read_variable(const XmlNode& node, Attribute* att = 0);
+  Variable& read_variable(const XmlNode& node, Attribute* att = nullptr);
 
   // Read DefaultExperiment
   void import_default_experiment(const XmlNode& n);

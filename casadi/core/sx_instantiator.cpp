@@ -1417,7 +1417,7 @@ namespace casadi {
                          const std::string& v_prefix,
                          const std::string& v_suffix) {
      // Call new, more generic function
-     return extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
+     extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
        {"prefix", v_prefix}, {"suffix", v_suffix}});
   }
 
@@ -1622,7 +1622,6 @@ namespace casadi {
         rwork[a.i1]++;
         break;
       case OP_CONST:
-        break;
       case OP_PARAMETER:
         break;
       case OP_CALL:

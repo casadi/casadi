@@ -215,9 +215,6 @@ namespace casadi {
     int i;
     double d;
 
-    // Error message
-    std::stringstream msg;
-
     // Process instruction
     switch (inst) {
 

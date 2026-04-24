@@ -759,7 +759,8 @@ namespace casadi {
 
       // non-inlining call is implemented in the base-class
       if (!should_inline(false, always_inline, never_inline)) {
-        return FunctionInternal::eval_mx(arg, res, false, true);
+        FunctionInternal::eval_mx(arg, res, false, true);
+        return;
       }
 
       // Symbolic work, non-differentiated
@@ -834,7 +835,8 @@ namespace casadi {
       for (auto&& r : fseed) {
         if (!matching_arg(r, npar)) {
           casadi_assert_dev(npar==1);
-          return ad_forward(replace_fseed(fseed, npar), fsens);
+          ad_forward(replace_fseed(fseed, npar), fsens);
+          return;
         }
       }
 
@@ -993,7 +995,8 @@ namespace casadi {
       for (auto&& r : aseed) {
         if (!matching_res(r, npar)) {
           casadi_assert_dev(npar==1);
-          return ad_reverse(replace_aseed(aseed, npar), asens);
+          ad_reverse(replace_aseed(aseed, npar), asens);
+          return;
         }
       }
 

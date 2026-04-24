@@ -34,7 +34,7 @@ bool XmlNode::has_attribute(const std::string& att_name) const {
 
 bool XmlNode::has_child(const std::string& childname) const {
   // Linear search over the elements
-  for (auto& c : this->children) {
+  for (const auto& c : this->children) {
     if (c.name == childname) return true;
   }
   // Not found
@@ -67,7 +67,7 @@ void XmlNode::set_attribute(const std::string& att_name, const std::vector<casad
     ss << att.at(0);
     for (size_t i = 1; i < att.size(); ++i) ss << " " << att.at(i);
   }
-  return set_attribute(att_name, ss.str());
+  set_attribute(att_name, ss.str());
 }
 
 void XmlNode::set_attribute(const std::string& att_name, double att) {
@@ -162,14 +162,14 @@ void XmlNode::read(const std::string& str, std::vector<std::string>* val) {
 std::vector<std::string> XmlNode::child_names() const {
   std::vector<std::string> ret;
   ret.reserve(this->children.size());
-  for (auto& c : this->children) ret.push_back(c.name);
+  for (const auto& c : this->children) ret.push_back(c.name);
   return ret;
 }
 
 std::vector<std::string> XmlNode::attribute_names() const {
   std::vector<std::string> ret;
   ret.reserve(this->attributes.size());
-  for (auto& a : this->attributes) ret.push_back(a.first);
+  for (const auto& a : this->attributes) ret.push_back(a.first);
   return ret;
 }
 

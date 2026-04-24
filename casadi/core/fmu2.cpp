@@ -40,7 +40,7 @@ struct Fmu2Memory : public FmuMemory {
 
 int Fmu2::init_mem(FmuMemory* mem) const {
   if (FmuInternal::init_mem(mem)) return 1;
-  auto m = static_cast<Fmu2Memory*>(mem);
+  auto *m = static_cast<Fmu2Memory*>(mem);
   /// Allocate numerical values for initial auxilliary variables
   m->aux_value.v_real.resize(vn_aux_real_.size());
   m->aux_value.v_integer.resize(vn_aux_integer_.size());
@@ -212,8 +212,8 @@ void Fmu2::load_functions() {
   functions_.logger = logger;
   functions_.allocateMemory = calloc;
   functions_.freeMemory = free;
-  functions_.stepFinished = 0;
-  functions_.componentEnvironment = 0;
+  functions_.stepFinished = nullptr;
+  functions_.componentEnvironment = nullptr;
 }
 
 void Fmu2::logger(fmi2ComponentEnvironment componentEnvironment,
@@ -257,7 +257,7 @@ void* Fmu2::instantiate() const {
   fmi2Boolean visible = fmi2False;
   fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
     &functions_, visible, logging_on_);
-  if (c == 0) casadi_error("fmi2Instantiate failed");
+  if (c == nullptr) casadi_error("fmi2Instantiate failed");
 
   // Call fmi2SetupExperiment
   fmi2Status status = setup_experiment_(c, fmutol_ > 0, fmutol_, 0., fmi2True, 1.);
@@ -268,7 +268,7 @@ void* Fmu2::instantiate() const {
 
 void Fmu2::free_instance(void* instance) const {
   if (free_instance_) {
-    auto c = static_cast<fmi2Component>(instance);
+    auto *c = static_cast<fmi2Component>(instance);
     free_instance_(c);
   } else {
     casadi_warning("No free_instance function pointer available");
@@ -276,7 +276,7 @@ void Fmu2::free_instance(void* instance) const {
 }
 
 int Fmu2::reset(void* instance) {
-  auto c = static_cast<fmi2Component>(instance);
+  auto *c = static_cast<fmi2Component>(instance);
   fmi2Status status = reset_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2Reset failed");
@@ -286,7 +286,7 @@ int Fmu2::reset(void* instance) {
 }
 
 int Fmu2::enter_initialization_mode(void* instance) const {
-  auto c = static_cast<fmi2Component>(instance);
+  auto *c = static_cast<fmi2Component>(instance);
   fmi2Status status = enter_initialization_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2EnterInitializationMode failed: " + str(status));
@@ -296,7 +296,7 @@ int Fmu2::enter_initialization_mode(void* instance) const {
 }
 
 int Fmu2::exit_initialization_mode(void* instance) const {
-  auto c = static_cast<fmi2Component>(instance);
+  auto *c = static_cast<fmi2Component>(instance);
   fmi2Status status = exit_initialization_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2ExitInitializationMode failed");
@@ -306,7 +306,7 @@ int Fmu2::exit_initialization_mode(void* instance) const {
 }
 
 int Fmu2::enter_continuous_time_mode(void* instance) const {
-  auto c = static_cast<fmi2Component>(instance);
+  auto *c = static_cast<fmi2Component>(instance);
   fmi2Status status = enter_continuous_time_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2EnterContinuousTimeMode failed");
@@ -316,7 +316,7 @@ int Fmu2::enter_continuous_time_mode(void* instance) const {
 }
 
 int Fmu2::get_derivatives(void* instance, double* derivatives, size_t nx) const {
-  auto c = static_cast<fmi2Component>(instance);
+  auto *c = static_cast<fmi2Component>(instance);
   fmi2Status status = get_derivatives_(c, derivatives, nx);
   if (status != fmi2OK) {
     casadi_warning("fmi2GetDerivatives failed");
@@ -326,7 +326,7 @@ int Fmu2::get_derivatives(void* instance, double* derivatives, size_t nx) const 
 }
 
 int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
-  auto c = static_cast<fmi2Component>(instance);
+  auto *c = static_cast<fmi2Component>(instance);
   // Return arguments in FMI types
   fmi2EventInfo eventInfo;
   eventInfo.newDiscreteStatesNeeded = fmi2False;
@@ -364,7 +364,7 @@ int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
     double* values, size_t n_values, FmuMemory* mem) const {
   casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");
   if (do_evaluation_dance_ && mem) {
-    auto m = static_cast<Fmu2Memory*>(mem);
+    auto *m = static_cast<Fmu2Memory*>(mem);
     // Dummy call to trigger rtOneStep
     fmi2Status status = get_real_(instance, nullptr, 0, nullptr);
     if (status != fmi2OK) return 1;
@@ -404,7 +404,7 @@ int Fmu2::get_directional_derivative(void* instance, const unsigned int* vr_out,
 }
 
 int Fmu2::set_values(void* instance) const {
-  auto c = static_cast<fmi2Component>(instance);
+  auto *c = static_cast<fmi2Component>(instance);
   // Pass real values before initialization
   if (!vr_real_.empty()) {
     fmi2Status status = set_real_(c, get_ptr(vr_real_), vr_real_.size(), get_ptr(init_real_));
@@ -445,7 +445,7 @@ int Fmu2::set_values(void* instance) const {
 }
 
 int Fmu2::get_aux_impl(void* instance, Value& aux_value) const {
-  auto c = static_cast<fmi2Component>(instance);
+  auto *c = static_cast<fmi2Component>(instance);
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
     fmi2Status status = get_real_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
@@ -535,19 +535,19 @@ Fmu2::Fmu2(const std::string& name,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::vector<std::string>& aux)
     : FmuInternal(name, scheme_in, scheme_out, scheme, aux) {
-  instantiate_ = 0;
-  free_instance_ = 0;
-  reset_ = 0;
-  setup_experiment_ = 0;
-  enter_initialization_mode_ = 0;
-  exit_initialization_mode_ = 0;
-  enter_continuous_time_mode_ = 0;
-  set_time_ = 0;
-  set_real_ = 0;
-  set_boolean_ = 0;
-  get_real_ = 0;
-  get_directional_derivative_ = 0;
-  new_discrete_states_ = 0;
+  instantiate_ = nullptr;
+  free_instance_ = nullptr;
+  reset_ = nullptr;
+  setup_experiment_ = nullptr;
+  enter_initialization_mode_ = nullptr;
+  exit_initialization_mode_ = nullptr;
+  enter_continuous_time_mode_ = nullptr;
+  set_time_ = nullptr;
+  set_real_ = nullptr;
+  set_boolean_ = nullptr;
+  get_real_ = nullptr;
+  get_directional_derivative_ = nullptr;
+  new_discrete_states_ = nullptr;
 }
 
 Fmu2* Fmu2::deserialize(DeserializingStream& s) {
@@ -557,18 +557,18 @@ Fmu2* Fmu2::deserialize(DeserializingStream& s) {
 }
 
 Fmu2::Fmu2(DeserializingStream& s) : FmuInternal(s) {
-  instantiate_ = 0;
-  free_instance_ = 0;
-  reset_ = 0;
-  setup_experiment_ = 0;
-  enter_initialization_mode_ = 0;
-  exit_initialization_mode_ = 0;
-  enter_continuous_time_mode_ = 0;
-  set_real_ = 0;
-  set_boolean_ = 0;
-  get_real_ = 0;
-  get_directional_derivative_ = 0;
-  new_discrete_states_ = 0;
+  instantiate_ = nullptr;
+  free_instance_ = nullptr;
+  reset_ = nullptr;
+  setup_experiment_ = nullptr;
+  enter_initialization_mode_ = nullptr;
+  exit_initialization_mode_ = nullptr;
+  enter_continuous_time_mode_ = nullptr;
+  set_real_ = nullptr;
+  set_boolean_ = nullptr;
+  get_real_ = nullptr;
+  get_directional_derivative_ = nullptr;
+  new_discrete_states_ = nullptr;
 
   s.version("Fmu2", 2);
   s.unpack("Fmu2::vr_real", vr_real_);

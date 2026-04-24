@@ -200,15 +200,19 @@ namespace casadi {
     std::vector<M> ex_in(name_in.size()), ex_out(name_out.size());
     for (auto&& i : dict) {
       std::vector<std::string>::const_iterator it;
-      if ((it = std::find(name_in.begin(), name_in.end(), i.first))!=name_in.end()) {
+      it = std::find(name_in.begin(), name_in.end(), i.first);
+      if (it!=name_in.end()) {
         // Input expression
         ex_in[it-name_in.begin()] = i.second;
-      } else if ((it = std::find(name_out.begin(), name_out.end(), i.first))!=name_out.end()) {
-        // Output expression
-        ex_out[it-name_out.begin()] = i.second;
       } else {
+        it = std::find(name_out.begin(), name_out.end(), i.first);
+        if (it!=name_out.end()) {
+        // Output expression
+          ex_out[it-name_out.begin()] = i.second;
+        } else {
         // Neither
-        casadi_error("Unknown dictionary entry: '" + i.first + "'");
+          casadi_error("Unknown dictionary entry: '" + i.first + "'");
+        }
       }
     }
     construct(name, ex_in, ex_out, name_in, name_out, opts);
@@ -480,15 +484,15 @@ namespace casadi {
 
 
   void Function::operator()(std::vector<const double*> arg, std::vector<double*> res) const {
-    return call_gen(arg, res);
+    call_gen(arg, res);
   }
 
   void Function::operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const {
-    return call_gen(arg, res);
+    call_gen(arg, res);
   }
 
   void Function::operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const {
-    return call_gen(arg, res);
+    call_gen(arg, res);
   }
 
   int Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
@@ -1266,13 +1270,13 @@ namespace casadi {
 
   void Function::export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const {
-    return (*this)->export_code(lang, stream, options);
+    (*this)->export_code(lang, stream, options);
   }
 
   void Function::export_code(const std::string& lang,
       const std::string &fname, const Dict& options) const {
     auto stream_ptr = Filesystem::ofstream_ptr(fname);
-    return (*this)->export_code(lang, *stream_ptr, options);
+    (*this)->export_code(lang, *stream_ptr, options);
   }
 
 
@@ -1289,7 +1293,7 @@ namespace casadi {
 
   void Function::serialize(std::ostream &stream, const Dict& opts) const {
     SerializingStream s(stream, opts);
-    return serialize(s);
+    serialize(s);
   }
 
   void Function::serialize(SerializingStream &s) const {
@@ -1677,7 +1681,7 @@ namespace casadi {
 
   void Function::merge(const std::vector<MX>& arg,
       std::vector<MX>& subs_from, std::vector<MX>& subs_to) const {
-    return (*this)->merge(arg, subs_from, subs_to);
+    (*this)->merge(arg, subs_from, subs_to);
   }
 
   std::vector<SX> Function::free_sx() const {

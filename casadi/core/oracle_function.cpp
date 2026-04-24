@@ -36,7 +36,7 @@ OracleCallback::OracleCallback(const std::string& name,
   OracleFunction* oracle) : name(name), oracle_(oracle) {
 }
 
-OracleCallback::OracleCallback() : name("undefined"), oracle_(0) {
+OracleCallback::OracleCallback() : name("undefined"), oracle_(nullptr) {
 }
 
 
@@ -302,7 +302,7 @@ set_function(const Function& fcn, const std::string& fname, bool jit) {
 int OracleFunction::
 calc_function(OracleMemory* m, const std::string& fcn,
               const double* const* arg, int thread_id) const {
-  auto ml = m->thread_local_mem.at(thread_id);
+  auto *ml = m->thread_local_mem.at(thread_id);
   // Is the function monitored?
   bool monitored = this->monitored(fcn);
 
@@ -395,7 +395,7 @@ calc_function(OracleMemory* m, const std::string& fcn,
     if (!std::all_of(ml->res[i], ml->res[i]+f.nnz_out(i), [](double v) { return isfinite(v);})) {
       std::stringstream ss;
 
-      auto it = std::find_if(ml->res[i], ml->res[i] + f.nnz_out(i),
+      auto *it = std::find_if(ml->res[i], ml->res[i] + f.nnz_out(i),
         [](double v) { return !isfinite(v);});
       casadi_int k = std::distance(ml->res[i], it);
       bool is_nan = isnan(ml->res[i][k]);
@@ -465,7 +465,7 @@ Dict OracleFunction::get_stats(void *mem) const {
 int OracleFunction::local_init_mem(void* mem) const {
   if (ProtoFunction::init_mem(mem)) return 1;
   if (!mem) return 1;
-  auto m = static_cast<LocalOracleMemory*>(mem);
+  auto *m = static_cast<LocalOracleMemory*>(mem);
 
   // Create statistics
   for (auto&& e : all_functions_) {
@@ -478,7 +478,7 @@ int OracleFunction::local_init_mem(void* mem) const {
 int OracleFunction::init_mem(void* mem) const {
   if (ProtoFunction::init_mem(mem)) return 1;
   if (!mem) return 1;
-  auto m = static_cast<OracleMemory*>(mem);
+  auto *m = static_cast<OracleMemory*>(mem);
 
   // Create statistics
   for (auto&& e : all_functions_) {
@@ -505,7 +505,7 @@ OracleMemory::~OracleMemory() {
 void OracleFunction::set_temp(void* mem, const double** arg, double** res,
                           casadi_int* iw, double* w) const {
 
-  auto m = static_cast<OracleMemory*>(mem);
+  auto *m = static_cast<OracleMemory*>(mem);
   m->arg = arg;
   m->res = res;
   m->iw = iw;
@@ -577,7 +577,7 @@ void OracleFunction::serialize_body(SerializingStream &s) const {
   s.pack("OracleFunction::show_eval_warnings", show_eval_warnings_);
   s.pack("OracleFunction::max_num_threads", max_num_threads_);
   s.pack("OracleFunction::all_functions::size", all_functions_.size());
-  for (auto &e : all_functions_) {
+  for (const auto &e : all_functions_) {
     s.pack("OracleFunction::all_functions::key", e.first);
     s.pack("OracleFunction::all_functions::value::jit", e.second.jit);
     if (jit_ && e.second.jit) {

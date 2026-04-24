@@ -72,11 +72,11 @@ namespace casadi {
   }
 
   void Resource::change_option(const std::string& option_name, const GenericType& option_value) {
-    return (*this)->change_option(option_name, option_value);
+    (*this)->change_option(option_name, option_value);
   }
 
   void Resource::serialize(SerializingStream &s) const {
-    return (*this)->serialize(s);
+    (*this)->serialize(s);
   }
 
   Resource Resource::deserialize(DeserializingStream& s) {

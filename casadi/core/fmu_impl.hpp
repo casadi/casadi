@@ -373,7 +373,7 @@ T* FmuInternal::load_function(const std::string& symname) {
   // Load the function
   signal_t f = li_.get_function(symname);
   // Ensure that it was found
-  casadi_assert(f != 0, "Cannot retrieve '" + symname + "'");
+  casadi_assert(f != nullptr, "Cannot retrieve '" + symname + "'");
   // Return function with the right type
   return reinterpret_cast<T*>(f);
 }

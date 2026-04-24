@@ -54,7 +54,7 @@ namespace casadi {
   void conic_debug(const Function& f, std::ostream &file) {
     casadi_assert_dev(!f.is_null());
     const Conic* n = f.get<Conic>();
-    return n->generateNativeCode(file);
+    n->generateNativeCode(file);
   }
 
   std::vector<std::string> conic_in() {
@@ -473,7 +473,7 @@ namespace casadi {
   void Conic::set_work(void* mem, const double**& arg, double**& res,
                           casadi_int*& iw, double*& w) const {
 
-    auto m = static_cast<ConicMemory*>(mem);
+    auto *m = static_cast<ConicMemory*>(mem);
 
     casadi_qp_data<double>& d_qp = m->d_qp;
     d_qp.h = arg[CONIC_H];
@@ -558,7 +558,7 @@ namespace casadi {
       uout() << "lbx:" << std::vector<double>(arg[CONIC_LBX], arg[CONIC_LBX]+nx_) << std::endl;
       uout() << "ubx:" << std::vector<double>(arg[CONIC_UBX], arg[CONIC_UBX]+nx_) << std::endl;
     }
-    auto m = static_cast<ConicMemory*>(mem);
+    auto *m = static_cast<ConicMemory*>(mem);
 
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -725,7 +725,7 @@ namespace casadi {
 
   Dict Conic::get_stats(void* mem) const {
     Dict stats = FunctionInternal::get_stats(mem);
-    auto m = static_cast<ConicMemory*>(mem);
+    auto *m = static_cast<ConicMemory*>(mem);
 
     stats["success"] = m->d_qp.success;
     stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->d_qp.unified_return_status);

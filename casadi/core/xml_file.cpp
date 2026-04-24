@@ -50,7 +50,7 @@ XmlNode XmlFile::parse(const std::string& filename) {
 }
 
 void XmlFile::dump(const std::string& filename, const XmlNode& node) {
-  return (*this)->dump(filename, node);
+  (*this)->dump(filename, node);
 }
 
 void XmlFile::load_plugin(const std::string& name) {

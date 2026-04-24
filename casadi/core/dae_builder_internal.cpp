@@ -345,7 +345,10 @@ void Variable::get_attribute(Attribute a, std::vector<double>* val) const {
   // Resize return
   if (val) val->resize(size(a));
   // Quick return if scalar
-  if (size(a) == 1) return get_attribute(a, val ? &val->front() : nullptr);
+  if (size(a) == 1) {
+    get_attribute(a, val ? &val->front() : nullptr);
+    return;
+  }
   // Handle vector attributes
   switch (a) {
     case Attribute::START:
@@ -397,7 +400,10 @@ void Variable::set_attribute(Attribute a, double val) {
 
 void Variable::set_attribute(Attribute a, const std::vector<double>& val) {
   // Quick return if scalar
-  if (val.size() == 1) return set_attribute(a, val.front());
+  if (val.size() == 1) {
+    set_attribute(a, val.front());
+    return;
+  }
   // If not scalar, size must be number of elements
   casadi_assert(val.size() == numel, "Wrong size for attribute " + to_string(a));
   // Handle vector attributes
@@ -1521,7 +1527,7 @@ const std::vector<size_t>& DaeBuilderInternal::indices(Category cat) const {
 }
 
 void DaeBuilderInternal::reorder(Category cat, const std::vector<size_t>& v) {
-  return reorder(to_string(cat), indices(cat), v);
+  reorder(to_string(cat), indices(cat), v);
 }
 
 void DaeBuilderInternal::reorder(const std::string& n, std::vector<size_t>& ind,
@@ -1592,8 +1598,6 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
 }
 
 void DaeBuilderInternal::tear() {
-  // Prefix
-  const std::string res_prefix = "res__";
   // Get residual variables, iteration variables
   std::vector<std::string> res, iv, iv_on_hold;
   tearing_variables(&res, &iv, &iv_on_hold);
@@ -2059,7 +2063,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
     const std::vector<std::string>& s_out, const Dict& opts, bool sx, bool lifted_calls) const {
   // Are there any '_' in the names?
   bool with_underscore = false;
-  for (auto s_io : {&s_in, &s_out}) {
+  for (const auto *s_io : {&s_in, &s_out}) {
     for (const std::string& s : *s_io) {
       with_underscore = with_underscore || std::count(s.begin(), s.end(), '_');
     }
@@ -2076,7 +2080,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
   // Replace '_' with ':', if needed
   if (with_underscore) {
     std::vector<std::string> s_in_mod(s_in), s_out_mod(s_out);
-    for (auto s_io : {&s_in_mod, &s_out_mod}) {
+    for (auto *s_io : {&s_in_mod, &s_out_mod}) {
       for (std::string& s : *s_io) std::replace(s.begin(), s.end(), '_', ':');
     }
     // Recursive call
@@ -2729,7 +2733,8 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
   // Scheme inputs
   std::vector<std::string> scheme_in;
   bool has_in = false;
-  if ((it = opts.find("scheme_in")) != opts.end()) {
+  it = opts.find("scheme_in");
+  if (it != opts.end()) {
     try {
       scheme_in = it->second;
     } catch (std::exception& e) {
@@ -2741,7 +2746,8 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
   // Scheme outputs
   std::vector<std::string> scheme_out;
   bool has_out = false;
-  if ((it = opts.find("scheme_out")) != opts.end()) {
+  it = opts.find("scheme_out");
+  if (it != opts.end()) {
     try {
       scheme_out = it->second;
       has_out = true;
@@ -2751,11 +2757,13 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
   }
   // If scheme_in and/or scheme_out not provided, identify from name_in, name_out
   if (!has_in || !has_out) {
-    FmuFunction::identify_io(has_in ? 0 : &scheme_in, has_out ? 0 : &scheme_out, name_in, name_out);
+    FmuFunction::identify_io(has_in ? nullptr : &scheme_in,
+      has_out ? nullptr : &scheme_out, name_in, name_out);
   }
   // IO scheme
   std::map<std::string, std::vector<size_t>> scheme;
-  if ((it = opts.find("scheme")) != opts.end()) {
+  it = opts.find("scheme");
+  if (it != opts.end()) {
     try {
       // Argument is a Dict
       Dict scheme_dict = it->second;
@@ -2786,7 +2794,8 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
   }
   // Auxilliary variables, if any
   std::vector<std::string> aux;
-  if ((it = opts.find("aux")) != opts.end()) {
+  it = opts.find("aux");
+  if (it != opts.end()) {
     try {
       aux = it->second;
     } catch (std::exception& e) {
@@ -3251,31 +3260,36 @@ void DaeBuilderInternal::set_category(size_t ind, Category cat) {
   switch (cat) {
     case Category::U:
       if (v.category == Category::P || v.category == Category::C) {
-        return set_variability(v.index, Variability::CONTINUOUS);
+        set_variability(v.index, Variability::CONTINUOUS);
+        return;
       }
       break;
     case Category::P:
       if (v.category == Category::U || v.category == Category::C) {
-        return set_variability(v.index, Variability::TUNABLE);
+        set_variability(v.index, Variability::TUNABLE);
+        return;
       }
       break;
     case Category::C:
       if (v.category == Category::U || v.category == Category::P) {
-        return set_variability(v.index, Variability::FIXED);
+        set_variability(v.index, Variability::FIXED);
+        return;
       }
       break;
     case Category::X:
       // Can convert from Q, T or unused derivative variable
       if (v.category == Category::Q || v.category == Category::T
           || (v.category == Category::NUMEL && v.has_der())) {
-        return categorize(v.index, Category::X);
+        categorize(v.index, Category::X);
+        return;
       }
       break;
     case Category::Q:
       // Can convert from X or T, but only if not in right-hand-side, or from unused derivative
       if ((!v.in_rhs && (v.category == Category::X || v.category == Category::T))
           || (v.category == Category::NUMEL && v.has_der())) {
-        return categorize(v.index, Category::Q);
+        categorize(v.index, Category::Q);
+        return;
       }
       break;
     case Category::T:
@@ -3287,7 +3301,8 @@ void DaeBuilderInternal::set_category(size_t ind, Category cat) {
             Variable& t_old = variable(indices(Category::T).front());
             categorize(t_old.index, t_old.in_rhs ? Category::X : Category::NUMEL);
           }
-          return categorize(v.index, Category::T);
+          categorize(v.index, Category::T);
+          return;
       }
       break;
     case Category::NUMEL:
@@ -3295,7 +3310,8 @@ void DaeBuilderInternal::set_category(size_t ind, Category cat) {
       if (!v.in_rhs && (v.category == Category::X
           || v.category == Category::Q
           || v.category == Category::T)) {
-        return categorize(v.index, Category::NUMEL);
+        categorize(v.index, Category::NUMEL);
+        return;
       }
     default:
       break;
@@ -3314,15 +3330,23 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   casadi_assert(lhs.is_column(), "Left-hand-side must be a column vector");
   casadi_assert(rhs.is_column(), "Right-hand-side must be a column vector");
   // Make sure dense
-  if (!lhs.is_dense()) return eq(densify(lhs), rhs, opts);
-  if (!rhs.is_dense()) return eq(lhs, densify(rhs), opts);
+  if (!lhs.is_dense()) {
+    eq(densify(lhs), rhs, opts);
+    return;
+  }
+  if (!rhs.is_dense()) {
+    eq(lhs, densify(rhs), opts);
+    return;
+  }
   // Make sure dimensions agree
   if (lhs.size1() != rhs.size1()) {
     // Handle mismatching dimnensions by recursion
     if (lhs.size1() == 1 && rhs.size1() > 1) {
-      return eq(repmat(lhs, rhs.size1()), rhs, opts);
+      eq(repmat(lhs, rhs.size1()), rhs, opts);
+      return;
     } else if (lhs.size1() > 1 && rhs.size1() == 1) {
-      return eq(lhs, repmat(rhs, lhs.size1()), opts);
+      eq(lhs, repmat(rhs, lhs.size1()), opts);
+      return;
     } else {
       casadi_error("Mismatched dimensions: " + str(lhs.size1()) + " vs " + str(rhs.size1()));
     }
@@ -3356,7 +3380,8 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
       // Set the binding equation
       if (v.has_beq()) {
         // Treat as implicit equation via recursion
-        return eq(MX::zeros(lhs.sparsity()), lhs - rhs, opts);
+        eq(MX::zeros(lhs.sparsity()), lhs - rhs, opts);
+        return;
       } else {
         // Set the binding equation
         Variable& beq = assign(v.name, rhs);
@@ -3867,7 +3892,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   } else {
     // Derivatives
     if (n.has_child("Derivatives")) {
-      for (auto& e : n["Derivatives"].children) {
+      for (const auto& e : n["Derivatives"].children) {
         // Get index
         der_.push_back(convert_index(e.attribute<casadi_int>("index", 0)));
         // Corresponding variable
@@ -3908,7 +3933,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     // Derivatives
     if (n.has_child("Derivatives")) {
       // Separate pass for dependencies
-      for (auto& e : n["Derivatives"].children) {
+      for (const auto& e : n["Derivatives"].children) {
         casadi_int index = convert_index(e.attribute<casadi_int>("index", 0));
 
         // Corresponding variable
@@ -3934,7 +3959,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     }
     // Outputs
     if (n.has_child("Outputs")) {
-      for (auto& e : n["Outputs"].children) {
+      for (const auto& e : n["Outputs"].children) {
         // Get index
         indices(Category::Y).push_back(convert_index(e.attribute<casadi_int>("index", 0)));
         // Corresponding variable
@@ -3972,7 +3997,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
 
     // Initial unknowns
     if (n.has_child("InitialUnknowns")) {
-      for (auto& e : n["InitialUnknowns"].children) {
+      for (const auto& e : n["InitialUnknowns"].children) {
         // Get index
         initial_unknowns_.push_back(convert_index(e.attribute<casadi_int>("index", 0)));
 
@@ -4332,7 +4357,7 @@ std::vector<double> DaeBuilderInternal::attribute(Attribute a,
   r.reserve(size(a, name));
   // Get contribution from each variable
   std::vector<double> r1;
-  for (auto& n : name) {
+  for (const auto& n : name) {
     variable(n).get_attribute(a, &r1);
     r.insert(r.end(), r1.begin(), r1.end());
   }
@@ -4378,7 +4403,7 @@ std::vector<std::string> DaeBuilderInternal::string_attribute(Attribute a,
   r.reserve(size(a, name));
   // Get contribution from each variable
   std::string r1;
-  for (auto& n : name) {
+  for (const auto& n : name) {
     variable(n).get_attribute(a, &r1);
     r.push_back(r1);
   }
@@ -4398,7 +4423,7 @@ void DaeBuilderInternal::set_string_attribute(Attribute a,
 
 casadi_int DaeBuilderInternal::size(Attribute a, const std::vector<std::string>& name) const {
   casadi_int r = 0;
-  for (auto& n : name) r += variable(n).size(a);
+  for (const auto& n : name) r += variable(n).size(a);
   return r;
 }
 

@@ -57,7 +57,7 @@ void FmuFunction::check_mem_count(casadi_int n) const {
 }
 
 int FmuFunction::init_mem(void* mem) const {
-  casadi_assert(mem != 0, "Memory is null");
+  casadi_assert(mem != nullptr, "Memory is null");
   // Instantiate base classes
   if (FunctionInternal::init_mem(mem)) return 1;
   // Number of memory instances needed
@@ -643,7 +643,7 @@ void FmuFunction::identify_io(
   // Parse FmuFunction inputs
   for (const std::string& n : name_in) {
     try {
-      (void)InputStruct::parse(n, 0, scheme_in, scheme_out);
+      (void)InputStruct::parse(n, nullptr, scheme_in, scheme_out);
     } catch (std::exception& e) {
       casadi_error("Cannot process input " + n + ": " + std::string(e.what()));
     }
@@ -651,7 +651,7 @@ void FmuFunction::identify_io(
   // Parse FmuFunction outputs
   for (const std::string& n : name_out) {
     try {
-      (void)OutputStruct::parse(n, 0, scheme_in, scheme_out);
+      (void)OutputStruct::parse(n, nullptr, scheme_in, scheme_out);
     } catch (std::exception& e) {
       casadi_error("Cannot process output " + n + ": " + std::string(e.what()));
     }
@@ -855,13 +855,11 @@ std::vector<double> FmuFunction::get_nominal_in(casadi_int i) const {
     case InputType::REG:
       return fmu_.all_nominal_in(in_.at(i).ind);
     case InputType::FWD:
-      break;
     case InputType::ADJ:
+    case InputType::ADJ_OUT:
       break;
     case InputType::OUT:
       return fmu_.all_nominal_out(in_.at(i).ind);
-    case InputType::ADJ_OUT:
-      break;
   }
   // Default: Base class
   return FunctionInternal::get_nominal_in(i);
@@ -872,7 +870,6 @@ std::vector<double> FmuFunction::get_nominal_out(casadi_int i) const {
     case OutputType::REG:
       return fmu_.all_nominal_out(out_.at(i).ind);
     case OutputType::FWD:
-      break;
     case OutputType::ADJ:
       break;
     case OutputType::JAC:
@@ -899,7 +896,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     void* mem) const {
   // Get memory struct
   FmuMemory* m = static_cast<FmuMemory*>(mem);
-  casadi_assert(m != 0, "Memory is null");
+  casadi_assert(m != nullptr, "Memory is null");
 
   setup(mem, arg, res, iw, w);
 
@@ -928,7 +925,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     }
   }
   // Work vectors, shared between threads
-  double *aseed = 0, *asens = 0, *jac_nz = 0, *hess_nz = 0;
+  double *aseed = nullptr, *asens = nullptr, *jac_nz = nullptr, *hess_nz = nullptr;
   if (need_jac) {
     // Jacobian nonzeros, initialize to NaN
     jac_nz = w; w += jac_sp_.nnz();
@@ -1636,18 +1633,9 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 
 bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
   // Available in the FMU meta information
-  if (out_.at(oind).type == OutputType::REG) {
-    if (in_.at(iind).type == InputType::REG) {
-      return true;
-    } else if (in_.at(iind).type == InputType::ADJ) {
-      return true;
-    }
-  } else if (out_.at(oind).type == OutputType::ADJ) {
-    if (in_.at(iind).type == InputType::REG) {
-      return true;
-    } else if (in_.at(iind).type == InputType::ADJ) {
-      return true;
-    }
+  if ((out_.at(oind).type == OutputType::REG || out_.at(oind).type == OutputType::ADJ)
+      && (in_.at(iind).type == InputType::REG || in_.at(iind).type == InputType::ADJ)) {
+    return true;
   }
   // Not available
   return false;

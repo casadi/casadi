@@ -122,7 +122,7 @@ int close_shared_library(handle_t handle) {
 handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
         std::string& resultpath, const std::string& caller, bool global) {
     // Alocate a handle
-    handle_t handle = 0;
+    handle_t handle = nullptr;
 
     // Alocate a handle pointer
     #ifndef _WIN32
@@ -149,7 +149,7 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
         // Check if there is a duplicate environ
         char*** p_environ_rtdl_next = reinterpret_cast<char ***>(dlsym(RTLD_NEXT, "environ"));
         bool environ_rtdl_next_overridden = false;
-        char** environ_rtld_next_original_value = NULL;
+        char** environ_rtld_next_original_value = nullptr;
         if (p_environ_rtdl_next && p_environ_rtdl_next != &environ) {
           environ_rtld_next_original_value = *p_environ_rtdl_next;
           *p_environ_rtdl_next = environ;

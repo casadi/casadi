@@ -17,7 +17,7 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
+// C-REPLACE "nullptr" "0"
 // SYMBOL "jac_prob"
 template<typename T1>
 struct casadi_jac_prob {
@@ -52,9 +52,9 @@ void casadi_jac_setup(casadi_jac_prob<T1>* p, const casadi_int* sp_ext,
   p->n_in = sp_ext[1];
   p->n_color = coloring[1];
   // The following defaults to null
-  p->nom_in = 0;
-  p->map_out = 0;
-  p->map_in = 0;
+  p->nom_in = nullptr;
+  p->map_out = nullptr;
+  p->map_in = nullptr;
 }
 
 // SYMBOL "jac_work"
@@ -168,7 +168,7 @@ void casadi_get_sub(T1* sub, const casadi_int* sp_a, const T1* nz_a,
   casadi_int nc, r, c, k;
   const casadi_int *colind, *row;
   // Quick return if null
-  if (sub == 0) return;
+  if (sub == nullptr) return;
   // Extract sparsity
   nc = sp_a[1];
   colind = sp_a + 2;

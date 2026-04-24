@@ -664,7 +664,8 @@ namespace casadi {
       std::vector<casadi_int> tmp;
       Sparsity Aperm = sub(range(size1), pc, tmp);
       // Call recursively
-      return Aperm.qr_sparse(V, R, prinv, tmp, false);
+      Aperm.qr_sparse(V, R, prinv, tmp, false);
+      return;
     }
 
     // No column permutation
@@ -1737,7 +1738,7 @@ namespace casadi {
         casadi_int temp = head;
         head = next[head];
         next[temp] = -1; //clear arrays
-        sums[temp] =  0;
+        sums[temp] =  false;
       }
       Cp[i+1] = nnz;
     }
