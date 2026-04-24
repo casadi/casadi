@@ -222,14 +222,14 @@ inline const char* return_status_string(void* solver) {
 
     // constraints
     const uno_int number_jacobian_nonzeros = static_cast<size_t>(this->jacg_sp_.nnz());
-    std::vector<casadi_int> row_indices = this->jacg_sp_.get_row();
-    std::vector<casadi_int> column_indices = this->jacg_sp_.get_col();
-    std::vector<uno_int> jacobian_row_indices(row_indices.size());
-    std::vector<uno_int> jacobian_column_indices(column_indices.size());
+    std::vector<casadi_int> jac_row_indices = this->jacg_sp_.get_row();
+    std::vector<casadi_int> jac_column_indices = this->jacg_sp_.get_col();
+    std::vector<uno_int> jacobian_row_indices(jac_row_indices.size());
+    std::vector<uno_int> jacobian_column_indices(jac_column_indices.size());
 
     for (uno_int i = 0; i < number_jacobian_nonzeros; ++i) {
-        jacobian_row_indices[i] = static_cast<uno_int>(row_indices[i]);
-        jacobian_column_indices[i] = static_cast<uno_int>(column_indices[i]);
+        jacobian_row_indices[i] = static_cast<uno_int>(jac_row_indices[i]);
+        jacobian_column_indices[i] = static_cast<uno_int>(jac_column_indices[i]);
     }
 
     // Hessian
@@ -241,8 +241,8 @@ inline const char* return_status_string(void* solver) {
     
     for (uno_int i = 0; i < number_hessian_nonzeros; ++i)
     {
-      hessian_row_indices[i] = static_cast<uno_int>(row_indices[i]);
-      hessian_column_indices[i] = static_cast<uno_int>(column_indices[i]);
+      hessian_row_indices[i] = static_cast<uno_int>(hess_row_indices[i]);
+      hessian_column_indices[i] = static_cast<uno_int>(hess_column_indices[i]);
     }
     const char hessian_triangular_part = UNO_UPPER_TRIANGLE;
     const uno_int lagrangian_sign_convention = UNO_MULTIPLIER_POSITIVE;    
@@ -265,8 +265,8 @@ inline const char* return_status_string(void* solver) {
     // }
     ret = uno_set_lagrangian_hessian(model, number_hessian_nonzeros, hessian_triangular_part, hessian_row_indices.data(), hessian_column_indices.data(), UnoNlp::lagrangian_hessian_wrapper);
     printf("uno_set_lagrangian_hessian returned: %d\n", ret);
-    // ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
-    // printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
+    ret = uno_set_lagrangian_sign_convention(model, lagrangian_sign_convention);
+    printf("uno_set_lagrangian_sign_convention returned: %d\n", ret);
     
     // ret = uno_set_initial_primal_iterate(model, x0);
     ret = uno_set_initial_primal_iterate(model, d_nlp->x0);

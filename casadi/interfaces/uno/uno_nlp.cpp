@@ -103,18 +103,6 @@ uno_int UnoNlp::lagrangian_hessian(const double* x, double objective_multiplier,
   mem_->arg[3] = multipliers;
   mem_->res[0] = hessian_values;
   casadi_assert(mem_->self.calc_function(mem_, "nlp_hess_l")==0, "Failed to evaluate Lagrangian hessian.");
-//   hessian.reset();
-//   // Write the hessian into Symmetric matrix ....
-//   for (size_t j=0; j<this->number_variables;++j) {
-//     for (size_t k=mem_->self.hesslag_sp_.colind()[j]; k< mem_->self.hesslag_sp_.colind()[j + 1];++k) {
-//        const size_t i = mem_->self.hesslag_sp_.row()[k];
-//        if (i <= j){
-//         const double entry = casadi_tmp_hessian[k];
-//         hessian.insert(entry, i, j);
-//        }
-//     }
-//     hessian.finalize_column(j);
-//  }
   return 0;
 }
 
