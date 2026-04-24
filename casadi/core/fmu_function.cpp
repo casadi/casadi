@@ -1189,7 +1189,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
             size_t aseed_off = d * fmu_.n_out();
             size_t asens_off = d * fmu_.n_in();
             for (casadi_int i = 0; i < m->jac_data.nsens; ++i) {
-              m->asens[m->jac_data.wrt[i] + asens_off] += m->aseed[m->jac_data.iseed[i] + aseed_off]
+              m->asens[m->jac_data.wrt[i] + asens_off] += m->aseed[m->jac_data.isens[i] + aseed_off]
                 * m->jac_data.sens[i];
             }
           }
@@ -1326,7 +1326,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
        casadi_jac_scale(&jac_prob_, &m->jac_data);
        // Propagate adjoint sensitivities
        for (casadi_int i = 0; i < m->jac_data.nsens; ++i)
-         m->pert_asens[m->jac_data.wrt[i]] += m->aseed[m->jac_data.iseed[i]] * m->jac_data.sens[i];
+         m->pert_asens[m->jac_data.wrt[i]] += m->aseed[m->jac_data.isens[i]] * m->jac_data.sens[i];
       }
       // Count how many times each input is calculated
       std::fill(m->star_iw, m->star_iw + fmu_.n_in(), 0);
