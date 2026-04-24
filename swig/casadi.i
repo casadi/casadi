@@ -3181,6 +3181,29 @@ class NZproxy:
 %enddef
 #endif
 
+#if defined(SWIGMATLAB) || defined(SWIGOCTAVE)
+// Mark the empty-struct mixin bases as abstract for the MATLAB/Octave
+// generator. Effect: they inherit from handle instead of SwigRef, emit no
+// delete or swig_this, and the concrete leaf appends "& SwigRef" so the
+// diamond collapses to a single SwigRef path. Breaks the diamond that
+// trips Octave 10+ (Savannah bug #50011 / #66930); no effect on MATLAB
+// correctness but removes the fragile per-class delete chain.
+// NOTE: these %feature directives must appear before the corresponding
+// %include that brings each class into the SWIG parse.
+%feature("abstract") casadi::PrintableCommon;
+%feature("abstract") casadi::GenericExpressionCommon;
+%feature("abstract") casadi::GenericMatrixCommon;
+%feature("abstract") casadi::SparsityInterfaceCommon;
+%feature("abstract") casadi::MatrixCommon;
+// GenSharedObject is a %template(GenSharedObject) instantiation of
+// GenericShared<...> (see the %template directive further down). The
+// feature has to be applied to the template base class, not the
+// instantiated short name, so it takes effect when the template expands.
+%feature("abstract") casadi::GenericShared<casadi::SharedObject, casadi::SharedObjectInternal>;
+%feature("abstract") casadi::SharedObject;
+%feature("abstract") casadi::IndexAbstraction;
+#endif
+
 %include <casadi/core/printable.hpp>
 
 namespace casadi{
