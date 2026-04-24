@@ -1969,8 +1969,12 @@ namespace casadi {
     iw_.resize(f_.sz_iw());
     arg_.resize(f_.sz_arg());
     res_.resize(f_.sz_res());
-    mem_ = f_->checkout();
-    mem_internal_ = f.memory(mem_);
+    if (f_->checkout_) {
+      mem_ = f_->checkout_();
+    } else {
+      mem_ = f_.checkout();
+      mem_internal_ = f_.memory(mem_);
+    }
     f_node_ = f.operator->();
   }
 
@@ -1982,11 +1986,25 @@ namespace casadi {
     }
   }
 
-  FunctionBuffer::FunctionBuffer(const FunctionBuffer& f) : f_(f.f_) {
-    operator=(f);
+  FunctionBuffer::FunctionBuffer(const FunctionBuffer& f)
+      : f_(f.f_), w_(f.w_), iw_(f.iw_), arg_(f.arg_), res_(f.res_), f_node_(f.f_node_) {
+    if (f_->checkout_) {
+      mem_ = f_->checkout_();
+    } else {
+      mem_ = f_.checkout();
+      mem_internal_ = f_.memory(mem_);
+    }
   }
 
   FunctionBuffer& FunctionBuffer::operator=(const FunctionBuffer& f) {
+    if (this == &f) return *this;
+
+    if (f_->release_) {
+      f_->release_(mem_);
+    } else {
+      f_.release(mem_);
+    }
+
     f_ = f.f_;
     w_ = f.w_; iw_ = f.iw_; arg_ = f.arg_; res_ = f.res_; f_node_ = f.f_node_;
     // Checkout fresh memory

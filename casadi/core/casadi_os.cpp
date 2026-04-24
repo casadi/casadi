@@ -47,7 +47,7 @@ namespace casadi {
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \
   ((dynamic_cast<std::ostringstream &>(std::ostringstream() \
-    . seekp(0, std::ios_base::cur) << ITEMS)) . str())
+    . seekp(0, std::ios_base::cur) << (ITEMS))) . str())
 
 char pathsep() {
     #ifdef _WIN32

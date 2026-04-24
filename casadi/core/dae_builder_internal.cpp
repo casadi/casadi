@@ -45,7 +45,7 @@
 // Throw informative error message
 #define THROW_ERROR_NODE(FNAME, NODE, WHAT) \
 throw CasadiException("Error in DaeBuilderInternal::" FNAME " for '" + this->name_ \
-  + "', node '" + NODE.name + "' (line " + str(NODE.line) + ") at " \
+  + "', node '" + (NODE).name + "' (line " + str((NODE).line) + ") at " \
   + CASADI_WHERE + ":\n" + std::string(WHAT));
 
 // Throw informative error message
@@ -355,7 +355,7 @@ void Variable::get_attribute(Attribute a, std::vector<double>* val) const {
       if (val) std::copy(start.begin(), start.end(), val->begin());
       return;
     case Attribute::VALUE:
-      if (val) std::copy(start.begin(), start.end(), val->begin());
+      if (val) std::copy(value.begin(), value.end(), val->begin());
       return;
     default:
       break;

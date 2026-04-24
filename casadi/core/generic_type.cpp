@@ -807,7 +807,7 @@ namespace casadi {
       case OT_DICT:
         return DictType::deserialize(s);
       case OT_DICTVECTOR:
-        return VectorType::deserialize(s);
+        return DictVectorType::deserialize(s);
       case OT_VECTOR:
         return VectorType::deserialize(s);
       case OT_VECTORVECTOR:
