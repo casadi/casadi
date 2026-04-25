@@ -338,7 +338,7 @@ class casadiTestCase(unittest.TestCase):
           diff_nz = fabs(zr_nz - zt_nz)
           mag_nz = fmax(fabs(zr_nz), fabs(zt_nz))
           scale_nz = if_else(mag_nz > 1e3, 10**floor(log10(mag_nz)), 1.0)
-          self.assertTrue(norm_inf(diff_nz / scale_nz) < 0.5 * 10**(-digits))
+          self.assertTrue(norm_inf(diff_nz / scale_nz) < 0.5 * 10**(-digits), "norm_inf: %e" % float(norm_inf(diff_nz / scale_nz)))
           return
         
       

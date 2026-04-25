@@ -647,3 +647,42 @@ obj:*libworhp*
    fun:__cxa_thread_atexit
    fun:_ZN17HighsTaskExecutor10run_workerEiPS_
 }
+
+# blasfeo TARGET=GENERIC kernels: the variable-size (`_vs_lib4`) and
+# general-offset (`_gen_lib4`) wrappers always load full 4-element / 4x4
+# blocks and apply the size mask only on the *write* side.  The result
+# is correct (out-of-region values get masked out of the destination)
+# but valgrind flags the load itself as out-of-bounds.  Harmless in
+# practice; suppressed here so the fatrop test suite does not get
+# flooded.
+
+{
+   blasfeo gemv vs-lib4 over-read (8 bytes)
+   Memcheck:Addr8
+   fun:kernel_dgemv_?_4_lib4
+   fun:kernel_dgemv_?_4_vs_lib4
+}
+
+{
+   blasfeo gemm gen-lib4 cleanup over-read (8 bytes)
+   Memcheck:Addr8
+   fun:kernel_dgemm_*_4x4_gen_lib4
+}
+
+{
+   blasfeo gemm gen-lib4 cleanup over-read (16 bytes)
+   Memcheck:Addr16
+   fun:kernel_dgemm_*_4x4_gen_lib4
+}
+
+{
+   blasfeo syrk gen-lib4 cleanup over-read (8 bytes)
+   Memcheck:Addr8
+   fun:kernel_dsyrk_*_4x4_gen_lib4
+}
+
+{
+   blasfeo syrk gen-lib4 cleanup over-read (16 bytes)
+   Memcheck:Addr16
+   fun:kernel_dsyrk_*_4x4_gen_lib4
+}
