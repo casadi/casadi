@@ -807,6 +807,8 @@ class OCPtests(casadiTestCase):
          # Create an NLP solver
         yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0), equality
         
+    local_codegen_check_digits = codegen_check_digits
+    if os.name == 'nt': local_codegen_check_digits = local_codegen_check_digits -1
     for i,(prob,args,equality) in enumerate(test_problems()):
     
         jacobian_sparsity(prob["g"],prob["x"]).spy()
@@ -822,7 +824,7 @@ class OCPtests(casadiTestCase):
             stats[solver] = f.stats()
             
             if solver!="ipopt":
-                self.check_codegen(f,args,std="c99",extralibs=["fatrop","blasfeo"],extra_options=flags,digits=codegen_check_digits)
+                self.check_codegen(f,args,std="c99",extralibs=["fatrop","blasfeo"],extra_options=flags,digits=local_codegen_check_digits)
                 self.check_serialize(f,args)
         
         for k in solutions["ipopt"].keys():

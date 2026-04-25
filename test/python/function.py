@@ -2350,14 +2350,14 @@ class Functiontests(casadiTestCase):
       solver = nlpsol("solver","ipopt",{"x": x,"f": x**2, "g": g})
 
     import re
-    found = set([m.group(1) for m in re.finditer("Compiling function '(\w+?)'", out[0])])
+    found = set([m.group(1) for m in re.finditer(r"Compiling function '(\w+?)'", out[0])])
     self.assertTrue(len(found)==1)
     self.assertTrue("fwd1_Q" in found)
 
     with capture_stdout() as out:
       self.check_serialize(solver,inputs={"x0": 2})
 
-    found = set([m.group(1) for m in re.finditer("Compiling function '(\w+?)'", out[0])])
+    found = set([m.group(1) for m in re.finditer(r"Compiling function '(\w+?)'", out[0])])
     self.assertTrue(len(found)==2)
     self.assertTrue("Q" in found)
     self.assertTrue("fwd1_Q" in found)
@@ -3239,7 +3239,7 @@ class Functiontests(casadiTestCase):
     
     with open("f.c","r") as inp:
         for line in inp.readlines():
-            if re.search("static int casadi_(\w+)_ref_counter",line):
+            if re.search(r"static int casadi_(\w+)_ref_counter",line):
                 n_matches = n_matches +1
     
     self.assertEqual(n_matches,1)
@@ -3259,7 +3259,7 @@ class Functiontests(casadiTestCase):
         
         with open("f.c","r") as inp:
             for line in inp.readlines():
-                if re.search("static int casadi_(\w+)_ref_counter",line):
+                if re.search(r"static int casadi_(\w+)_ref_counter",line):
                     n_matches = n_matches +1
         
         # wrapper function should not have it's own reference counting
