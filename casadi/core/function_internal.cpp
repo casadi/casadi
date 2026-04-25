@@ -94,6 +94,8 @@ namespace casadi {
     eval_ = nullptr;
     checkout_ = nullptr;
     release_ = nullptr;
+    incref_ = nullptr;
+    decref_ = nullptr;
     has_refcount_ = false;
     enable_forward_op_ = true;
     enable_reverse_op_ = true;
@@ -128,6 +130,7 @@ namespace casadi {
   }
 
   FunctionInternal::~FunctionInternal() {
+    if (decref_) decref_();
     if (jit_cleanup_ && jit_) {
       std::string jit_name = jit_directory_ + jit_name_ + ".c";
       if (remove(jit_name.c_str())) casadi_warning("Failed to remove " + jit_name);
@@ -761,9 +764,12 @@ namespace casadi {
         }
         // Try to load
         eval_ = (eval_t) compiler_.get_function(name_);
-        checkout_ = (casadi_checkout_t) compiler_.get_function(name_ + "checkout");
-        release_ = (casadi_release_t) compiler_.get_function(name_ + "release");
+        checkout_ = (casadi_checkout_t) compiler_.get_function(name_ + "_checkout");
+        release_ = (casadi_release_t) compiler_.get_function(name_ + "_release");
+        incref_ = (signal_t) compiler_.get_function(name_ + "_incref");
+        decref_ = (signal_t) compiler_.get_function(name_ + "_decref");
         casadi_assert(eval_!=nullptr, "Cannot load JIT'ed function.");
+        if (incref_) incref_();
       } else {
         // Just jit dependencies
         jit_dependencies(jit_name_);
@@ -4249,6 +4255,11 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
+    eval_ = nullptr;
+    checkout_ = nullptr;
+    release_ = nullptr;
+    incref_ = nullptr;
+    decref_ = nullptr;
     int version = s.version("FunctionInternal", 1, 8);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
