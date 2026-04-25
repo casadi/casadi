@@ -686,3 +686,11 @@ obj:*libworhp*
    Memcheck:Addr16
    fun:kernel_dsyrk_*_4x4_gen_lib4
 }
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:thread_PyThread_start_new_thread
+}
