@@ -4528,5 +4528,24 @@ class MXtests(casadiTestCase):
                     # qn is non-diff output: no dependencies
                     self.assertEqual(H.sparsity_jac(0,1).nnz(), 0)
 
+  def test_set_precision(self):
+    # Issue #4326: numeric MX constants honor DM::set_precision
+    # (the value lives in a DM-like node, so MX printing piggybacks
+    # on DM's stream precision settings).
+    pi_val = 3.141592653589793239
+    mx_scalar = MX(pi_val)
+    mx_dm = MX(DM([1.234567890123, 9.876543210987]))
+    try:
+      self.assertEqual(str(mx_scalar), "3.14159")
+      DM.set_precision(12)
+      self.assertEqual(str(mx_scalar), "3.14159265359")
+      self.assertEqual(str(mx_dm), "[1.23456789012, 9.87654321099]")
+      DM.set_precision(4)
+      DM.set_scientific(True)
+      self.assertTrue("e" in str(mx_scalar).lower())
+    finally:
+      DM.set_precision(6)
+      DM.set_scientific(False)
+
 if __name__ == '__main__':
     unittest.main()

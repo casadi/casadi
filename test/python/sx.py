@@ -2026,6 +2026,46 @@ class SXtests(casadiTestCase):
     y[1] = 1
     self.assertEqual((y**0).nnz(),4)
 
+  def test_set_precision(self):
+    # Issue #4326: SX::set_precision was being ignored for SX printing.
+    # DM and SX have their own precision settings; MX numeric printing
+    # piggybacks on DM's setting (the value lives in a DM-like node).
+    pi_val = 3.141592653589793239
+    expected_default = "3.14159"
+    expected_prec12 = "3.14159265359"
+
+    for cls in (DM, SX):
+      x = cls(pi_val)
+      try:
+        self.assertEqual(str(x), expected_default)
+        cls.set_precision(12)
+        self.assertEqual(str(x), expected_prec12)
+        cls.set_precision(4)
+        cls.set_scientific(True)
+        self.assertTrue("e" in str(x).lower())
+      finally:
+        cls.set_precision(6)
+        cls.set_scientific(False)
+
+    # MX scalar constants follow DM precision
+    mx = MX(pi_val)
+    try:
+      self.assertEqual(str(mx), expected_default)
+      DM.set_precision(12)
+      self.assertEqual(str(mx), expected_prec12)
+    finally:
+      DM.set_precision(6)
+
+    # set_precision applies to vectors/matrices too
+    for cls in (DM, SX):
+      v = cls([1.234567890123, 9.876543210987])
+      try:
+        self.assertEqual(str(v), "[1.23457, 9.87654]")
+        cls.set_precision(12)
+        self.assertEqual(str(v), "[1.23456789012, 9.87654321099]")
+      finally:
+        cls.set_precision(6)
+
   def test_linearize(self):
     x = SX.sym("x")
     y = sin(x)

@@ -45,6 +45,15 @@ namespace casadi {
   void Matrix<Scalar>::set_scientific(bool scientific) { stream_scientific_ = scientific; }
 
   template<typename Scalar>
+  casadi_int Matrix<Scalar>::get_precision() { return stream_precision_; }
+
+  template<typename Scalar>
+  casadi_int Matrix<Scalar>::get_width() { return stream_width_; }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::get_scientific() { return stream_scientific_; }
+
+  template<typename Scalar>
   casadi_int Matrix<Scalar>::stream_precision_ = 6;
   template<typename Scalar>
   casadi_int Matrix<Scalar>::stream_width_ = 0;

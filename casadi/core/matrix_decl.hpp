@@ -1307,6 +1307,13 @@ namespace casadi {
     static void set_scientific(bool scientific);
     // @}
 
+    // @{
+    /// Get the 'precision, width & scientific' used in printing and serializing to streams
+    static casadi_int get_precision();
+    static casadi_int get_width();
+    static bool get_scientific();
+    // @}
+
     /// Seed the random number generator
     static void rng(casadi_int seed);
 
