@@ -4835,9 +4835,17 @@ namespace casadi {
       def __rgt__(x, y): return _casadi.lt(x, y)
       def __ge__(x, y): return _casadi.le(y, x)
       def __rge__(x, y): return _casadi.le(x, y)
-      def __eq__(x, y): return _casadi.eq(x, y)
+      def __eq__(x, y):
+          r = _casadi.eq(x, y)
+          if r is NotImplemented:
+              raise TypeError("Cannot compare " + type(x).__name__ + " and " + type(y).__name__ + " (no SX/MX type promotion)")
+          return r
       def __req__(x, y): return _casadi.eq(y, x)
-      def __ne__(x, y): return _casadi.ne(x, y)
+      def __ne__(x, y):
+          r = _casadi.ne(x, y)
+          if r is NotImplemented:
+              raise TypeError("Cannot compare " + type(x).__name__ + " and " + type(y).__name__ + " (no SX/MX type promotion)")
+          return r
       def __rne__(x, y): return _casadi.ne(y, x)
       def __pow__(x, n): return _casadi.power(x, n)
       def __rpow__(n, x): return _casadi.power(x, n)

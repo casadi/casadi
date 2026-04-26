@@ -4528,5 +4528,30 @@ class MXtests(casadiTestCase):
                     # qn is non-diff output: no dependencies
                     self.assertEqual(H.sparsity_jac(0,1).nnz(), 0)
 
+  def test_sx_mx_equality_no_silent_promotion(self):
+    # Regression for GH-2817: SX == MX (and the != / reflected forms)
+    # used to fall through SWIG's NotImplemented dispatch and Python's
+    # identity fallback, silently returning False/True. They must error.
+    x = MX.sym('x')
+    z = SX.zeros(1, 1)
+    with self.assertRaises(TypeError):
+      z == x
+    with self.assertRaises(TypeError):
+      x == z
+    with self.assertRaises(TypeError):
+      z != x
+    with self.assertRaises(TypeError):
+      x != z
+
+    # Sanity: same-type and numeric-promotion equality still works.
+    r1 = SX(1) == SX(1)
+    self.assertTrue(isinstance(r1, SX))
+    r2 = MX(1) == MX(1)
+    self.assertTrue(isinstance(r2, MX))
+    r3 = SX(1) == 1.0
+    self.assertTrue(isinstance(r3, SX))
+    r4 = MX(1) == 1.0
+    self.assertTrue(isinstance(r4, MX))
+
 if __name__ == '__main__':
     unittest.main()
