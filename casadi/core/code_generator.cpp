@@ -1824,19 +1824,25 @@ namespace casadi {
                         << "(" << (this->cpp ? "static_cast<x>(y)" : "(x) y") << ")\n\n";
       break;
     case AUX_SQ:
-      shorthand("sq");
-      this->auxiliaries << "casadi_real casadi_sq(casadi_real x) { return x*x;}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"sq\"\n"
+          "casadi_real casadi_sq(casadi_real x) { return x*x;}\n\n",
+          inst);
       break;
     case AUX_SIGN:
-      shorthand("sign");
-      this->auxiliaries << "casadi_real casadi_sign(casadi_real x) "
-                        << "{ return x<0 ? -1 : x>0 ? 1 : x;}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"sign\"\n"
+          "casadi_real casadi_sign(casadi_real x) "
+          "{ return x<0 ? -1 : x>0 ? 1 : x;}\n\n",
+          inst);
       break;
     case AUX_IF_ELSE:
-      shorthand("if_else");
-      this->auxiliaries << "casadi_real casadi_if_else"
-                        << "(casadi_real c, casadi_real x, casadi_real y) "
-                        << "{ return c!=0 ? x : y;}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"if_else\"\n"
+          "casadi_real casadi_if_else"
+          "(casadi_real c, casadi_real x, casadi_real y) "
+          "{ return c!=0 ? x : y;}\n\n",
+          inst);
       break;
     case AUX_PRINTF:
       this->auxiliaries << "#ifndef CASADI_PRINTF\n";
@@ -1856,71 +1862,85 @@ namespace casadi {
       this->auxiliaries << "#endif\n\n";
       break;
     case AUX_FMIN:
-      shorthand("fmin");
-      this->auxiliaries << "casadi_real casadi_fmin(casadi_real x, casadi_real y) {\n"
-                        << "/* Pre-c99 compatibility */\n"
-                        << "#if __STDC_VERSION__ < 199901L\n"
-                        << "  return x<y ? x : y;\n"
-                        << "#else\n"
-                        << "  return fmin(x, y);\n"
-                        << "#endif\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"fmin\"\n"
+          "casadi_real casadi_fmin(casadi_real x, casadi_real y) {\n"
+          "/* Pre-c99 compatibility */\n"
+          "#if __STDC_VERSION__ < 199901L\n"
+          "  return x<y ? x : y;\n"
+          "#else\n"
+          "  return fmin(x, y);\n"
+          "#endif\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_FMAX:
-      shorthand("fmax");
-      this->auxiliaries << "casadi_real casadi_fmax(casadi_real x, casadi_real y) {\n"
-                        << "/* Pre-c99 compatibility */\n"
-                        << "#if __STDC_VERSION__ < 199901L\n"
-                        << "  return x>y ? x : y;\n"
-                        << "#else\n"
-                        << "  return fmax(x, y);\n"
-                        << "#endif\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"fmax\"\n"
+          "casadi_real casadi_fmax(casadi_real x, casadi_real y) {\n"
+          "/* Pre-c99 compatibility */\n"
+          "#if __STDC_VERSION__ < 199901L\n"
+          "  return x>y ? x : y;\n"
+          "#else\n"
+          "  return fmax(x, y);\n"
+          "#endif\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_FABS:
-      shorthand("fabs");
-      this->auxiliaries << "casadi_real casadi_fabs(casadi_real x) {\n"
-                        << "/* Pre-c99 compatibility */\n"
-                        << "#if __STDC_VERSION__ < 199901L\n"
-                        << "  return x>0 ? x : -x;\n"
-                        << "#else\n"
-                        << "  return fabs(x);\n"
-                        << "#endif\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"fabs\"\n"
+          "casadi_real casadi_fabs(casadi_real x) {\n"
+          "/* Pre-c99 compatibility */\n"
+          "#if __STDC_VERSION__ < 199901L\n"
+          "  return x>0 ? x : -x;\n"
+          "#else\n"
+          "  return fabs(x);\n"
+          "#endif\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_ISINF:
-      shorthand("isinf");
-      this->auxiliaries << "casadi_real casadi_isinf(casadi_real x) {\n"
-                        << "/* Pre-c99 compatibility */\n"
-                        << "#if __STDC_VERSION__ < 199901L\n"
-                        << "  return x== INFINITY || x==-INFINITY;\n"
-                        << "#else\n"
-                        << "  return isinf(x);\n"
-                        << "#endif\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"isinf\"\n"
+          "casadi_real casadi_isinf(casadi_real x) {\n"
+          "/* Pre-c99 compatibility */\n"
+          "#if __STDC_VERSION__ < 199901L\n"
+          "  return x== INFINITY || x==-INFINITY;\n"
+          "#else\n"
+          "  return isinf(x);\n"
+          "#endif\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_ISFINITE:
-      shorthand("isfinite");
-      this->auxiliaries << "casadi_real casadi_isfinite(casadi_real x) {\n"
-                        << "/* Pre-c99 compatibility */\n"
-                        << "#if __STDC_VERSION__ < 199901L\n"
-                        << "  return x==x && x!=INFINITY && x!=-INFINITY;\n"
-                        << "#else\n"
-                        << "  return isfinite(x);\n"
-                        << "#endif\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"isfinite\"\n"
+          "casadi_real casadi_isfinite(casadi_real x) {\n"
+          "/* Pre-c99 compatibility */\n"
+          "#if __STDC_VERSION__ < 199901L\n"
+          "  return x==x && x!=INFINITY && x!=-INFINITY;\n"
+          "#else\n"
+          "  return isfinite(x);\n"
+          "#endif\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_MIN:
-      shorthand("min");
-      this->auxiliaries << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
-                        << "  return x>y ? y : x;\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"min\"\n"
+          "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
+          "  return x>y ? y : x;\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_MAX:
-      shorthand("max");
-      this->auxiliaries << "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
-                        << "  return x>y ? x : y;\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"max\"\n"
+          "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
+          "  return x>y ? x : y;\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_MMIN:
       add_auxiliary(AUX_VFMIN);
@@ -1948,37 +1968,43 @@ namespace casadi {
                         << "#endif\n\n";
       break;
     case AUX_LOG1P:
-      shorthand("log1p");
-      this->auxiliaries << "casadi_real casadi_log1p(casadi_real x) {\n"
-                        << "/* Pre-c99 compatibility */\n"
-                        << "#if __STDC_VERSION__ < 199901L\n"
-                        << "  return log(1+x);\n"
-                        << "#else\n"
-                        << "  return log1p(x);\n"
-                        << "#endif\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"log1p\"\n"
+          "casadi_real casadi_log1p(casadi_real x) {\n"
+          "/* Pre-c99 compatibility */\n"
+          "#if __STDC_VERSION__ < 199901L\n"
+          "  return log(1+x);\n"
+          "#else\n"
+          "  return log1p(x);\n"
+          "#endif\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_EXPM1:
-      shorthand("expm1");
-      this->auxiliaries << "casadi_real casadi_expm1(casadi_real x) {\n"
-                        << "/* Pre-c99 compatibility */\n"
-                        << "#if __STDC_VERSION__ < 199901L\n"
-                        << "  return exp(x)-1;\n"
-                        << "#else\n"
-                        << "  return expm1(x);\n"
-                        << "#endif\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"expm1\"\n"
+          "casadi_real casadi_expm1(casadi_real x) {\n"
+          "/* Pre-c99 compatibility */\n"
+          "#if __STDC_VERSION__ < 199901L\n"
+          "  return exp(x)-1;\n"
+          "#else\n"
+          "  return expm1(x);\n"
+          "#endif\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_HYPOT:
-      shorthand("hypot");
-      this->auxiliaries << "casadi_real casadi_hypot(casadi_real x, casadi_real y) {\n"
-                        << "/* Pre-c99 compatibility */\n"
-                        << "#if __STDC_VERSION__ < 199901L\n"
-                        << "  return sqrt(x*x+y*y);\n"
-                        << "#else\n"
-                        << "  return hypot(x, y);\n"
-                        << "#endif\n"
-                        << "}\n\n";
+      this->auxiliaries << sanitize_source(
+          "// SYMBOL \"hypot\"\n"
+          "casadi_real casadi_hypot(casadi_real x, casadi_real y) {\n"
+          "/* Pre-c99 compatibility */\n"
+          "#if __STDC_VERSION__ < 199901L\n"
+          "  return sqrt(x*x+y*y);\n"
+          "#else\n"
+          "  return hypot(x, y);\n"
+          "#endif\n"
+          "}\n\n",
+          inst);
       break;
     case AUX_BLAZING_COMMON:
       add_auxiliary(AUX_LOW);
