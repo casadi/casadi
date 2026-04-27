@@ -36,7 +36,7 @@ void casadi_print_canonical(const casadi_int* sp, const T1* x) {
       casadi_print_vector(nnz, x);
       if (nnz!=nrow*ncol) {
         printf(", colind: [");
-        for (i = 0; i < ncol; ++i) {
+        for (i = 0; i < ncol+1; ++i) {
           if (i > 0) printf(", ");
           printf("%d", static_cast<int>(colind[i]));
         }

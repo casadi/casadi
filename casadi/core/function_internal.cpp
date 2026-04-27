@@ -937,7 +937,7 @@ namespace casadi {
         stream << "]";
         if (!sp.is_dense()) {
           stream << ", colind: [";
-          for (casadi_int i=0; i<sp.size2(); ++i) {
+          for (casadi_int i=0; i<sp.size2()+1; ++i) {
             if (i>0) stream << ", ";
             stream << sp.colind()[i];
           }
