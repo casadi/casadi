@@ -69,7 +69,8 @@ namespace casadi {
                                             const std::vector<casadi_int>& output_offset);
     static std::vector< MatType > diagsplit(const MatType& x, casadi_int incr);
     static std::vector< MatType > diagsplit(const MatType& x, casadi_int incr1, casadi_int incr2);
-    static MatType mtimes(const std::vector<MatType> &args);
+    static MatType mtimes(const std::vector<MatType> &args,
+                          const std::string& blas = "reference");
     static std::vector<MatType > horzsplit(const MatType& x, casadi_int incr);
     static std::vector<MatType > vertsplit(const MatType& x, casadi_int incr);
     static std::vector<MatType > horzsplit_n(const MatType& x, casadi_int n);
@@ -334,16 +335,37 @@ namespace casadi {
 
     /** \brief Matrix product of two matrices
 
+        Optional `blas` selects the BLAS plugin used for dense numeric
+        kernels. The choice only takes effect on numeric DM / MX
+        dense * dense; symbolic types (Sparsity, SX) and the sparse
+        fallback path ignore it.
+
+        \verbatim
+        mtimes(A, B)               // default: built-in reference kernel (triple loop)
+        mtimes(A, B, "reference")  // same -- explicit
+        mtimes(A, B, "classic")    // whatever BLAS was built into casadi via
+                                   //   WITH_LAPACK (typically OpenBLAS)
+        mtimes(A, B, "blasfeo")    // BLASFEO
+        \endverbatim
+
+        Plugins (`classic`, `blasfeo`) are loaded lazily on first use; if
+        the corresponding plugin DLL isn't present in the build, calling
+        them raises an error.
+
         \identifier{3v} */
-    inline friend MatType mtimes(const MatType &x, const MatType &y) {
-      return MatType::mtimes(x, y);
+    inline friend MatType mtimes(const MatType &x, const MatType &y,
+                                 const std::string& blas = "reference") {
+      return MatType::mtimes(x, y, blas);
     }
 
     /** \brief Matrix product of n matrices
 
+        See the 2-arg `mtimes` for the meaning of `blas`.
+
         \identifier{3w} */
-    inline friend MatType mtimes(const std::vector<MatType> &args) {
-      return MatType::mtimes(args);
+    inline friend MatType mtimes(const std::vector<MatType> &args,
+                                 const std::string& blas = "reference") {
+      return MatType::mtimes(args, blas);
     }
 
     /** \brief Multiply-accumulate operation
@@ -352,11 +374,13 @@ namespace casadi {
         a third matrix z. The result has the same sparsity pattern as
         C meaning that other entries of (x*y) are ignored.
         The operation is equivalent to: z+mtimes(x,y).project(z.sparsity()).
+        See `mtimes` for the meaning of the `blas` argument.
 
         \identifier{3x} */
     inline friend MatType
-      mac(const MatType &x, const MatType &y, const MatType &z) {
-      return MatType::mac(x, y, z);
+      mac(const MatType &x, const MatType &y, const MatType &z,
+          const std::string& blas = "reference") {
+      return MatType::mac(x, y, z, blas);
     }
 
     /** \brief Transpose
@@ -713,12 +737,13 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType SparsityInterface<MatType>::mtimes(const std::vector<MatType> &args) {
+  MatType SparsityInterface<MatType>::mtimes(const std::vector<MatType> &args,
+                                             const std::string& blas) {
     casadi_assert(!args.empty(),
                           "mul(std::vector<MatType> &args): "
                           "supplied list must not be empty.");
     MatType ret = args[0];
-    for (casadi_int i=1; i<args.size(); ++i) ret = MatType::mtimes(ret, args[i]);
+    for (casadi_int i=1; i<args.size(); ++i) ret = MatType::mtimes(ret, args[i], blas);
     return ret;
   }
 

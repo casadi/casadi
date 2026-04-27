@@ -573,7 +573,7 @@ class Sparsitytests(casadiTestCase):
     # product of a row subset and a column subset; the CCS buffer then
     # equals a column-major dense row.size() x col.size() matrix.
 
-    # Cartesian (0,1), (2,1), (0,3), (2,3) — compactible with row {0,2}, col {1,3}
+    # Cartesian (0,1), (2,1), (0,3), (2,3) -- compactible with row {0,2}, col {1,3}
     sp = Sparsity(4, 5)
     sp.add_nz(0, 1); sp.add_nz(2, 1)
     sp.add_nz(0, 3); sp.add_nz(2, 3)
@@ -608,7 +608,7 @@ class Sparsitytests(casadiTestCase):
     self.checkarray(rs, [0, 1, 2])
     self.checkarray(cs, [0, 1, 2, 3])
 
-    # Diagonal of a 4x4: nonempty rows/cols both = {0..3} but nnz=4 ≠ 16.
+    # Diagonal of a 4x4: nonempty rows/cols both = {0..3} but nnz=4 != 16.
     sp_diag = Sparsity.diag(4)
     self.assertFalse(sp_diag.is_compactible()[0])
 

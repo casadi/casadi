@@ -1618,6 +1618,12 @@ namespace casadi {
     case AUX_MTIMES:
       this->auxiliaries << sanitize_source(casadi_mtimes_str, inst);
       break;
+    case AUX_MTIMES_DENSE:
+      this->auxiliaries << sanitize_source(casadi_mtimes_dense_str, inst);
+      break;
+    case AUX_MTIMES_DENSE_SPARSE:
+      this->auxiliaries << sanitize_source(casadi_mtimes_dense_sparse_str, inst);
+      break;
     case AUX_TRILSOLVE:
       this->auxiliaries << sanitize_source(casadi_trilsolve_str, inst);
       break;
@@ -2436,6 +2442,21 @@ namespace casadi {
     add_auxiliary(AUX_MTIMES);
     return "casadi_mtimes(" + x + ", " + sparsity(sp_x) + ", " + y + ", " + sparsity(sp_y) + ", "
       + z + ", " + sparsity(sp_z) + ", " + w + ", " +  (tr ? "1" : "0") + ");";
+  }
+
+  std::string CodeGenerator::mtimes(const std::string& x, casadi_int nrow_x, casadi_int ncol_x,
+                                    const std::string& y, casadi_int ncol_y,
+                                    const std::string& z, bool tr) {
+    add_auxiliary(AUX_MTIMES_DENSE);
+    return "casadi_mtimes_dense(" + x + ", " + str(nrow_x) + ", " + str(ncol_x) + ", "
+      + y + ", " + str(ncol_y) + ", " + z + ", " + (tr ? "1" : "0") + ");";
+  }
+
+  std::string CodeGenerator::mtimes_dense_sparse(const std::string& x, casadi_int nrow_x,
+      const std::string& y, const Sparsity& sp_y, const std::string& z) {
+    add_auxiliary(AUX_MTIMES_DENSE_SPARSE);
+    return "casadi_mtimes_dense_sparse(" + x + ", " + str(nrow_x) + ", "
+      + y + ", " + sparsity(sp_y) + ", " + z + ");";
   }
 
   std::string CodeGenerator::trilsolve(const Sparsity& sp_x, const std::string& x,

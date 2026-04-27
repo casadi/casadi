@@ -711,8 +711,10 @@ namespace casadi {
       diagsplit(const Sparsity& x,
                 const std::vector<casadi_int>& offset1,
                 const std::vector<casadi_int>& offset2);
-    static Sparsity mtimes(const Sparsity& x, const Sparsity& y);
-    static Sparsity mac(const Sparsity& x, const Sparsity& y, const Sparsity& z) { return z;}
+    static Sparsity mtimes(const Sparsity& x, const Sparsity& y,
+                           const std::string& blas = "reference");
+    static Sparsity mac(const Sparsity& x, const Sparsity& y, const Sparsity& z,
+                        const std::string& /*blas*/ = "reference") { return z;}
     static Sparsity reshape(const Sparsity& x, casadi_int nrow, casadi_int ncol);
     static Sparsity reshape(const Sparsity& x, const Sparsity& sp);
     static Sparsity sparsity_cast(const Sparsity& x, const Sparsity& sp);

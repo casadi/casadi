@@ -90,6 +90,16 @@ namespace casadi {
   void casadi_mtimes(const T1* x, const casadi_int* sp_x, const T1* y, const casadi_int* sp_y,
                              T1* z, const casadi_int* sp_z, T1* w, casadi_int tr);
 
+  /// Dense matrix-matrix multiplication: z <- z + x*y (column-major)
+  template<typename T1>
+  void casadi_mtimes_dense(const T1* x, casadi_int nrow_x, casadi_int ncol_x,
+                           const T1* y, casadi_int ncol_y, T1* z, casadi_int tr);
+
+  /// Dense * sparse matrix multiplication: z <- z + x*y (z, x dense col-major)
+  template<typename T1>
+  void casadi_mtimes_dense_sparse(const T1* x, casadi_int nrow_x,
+                                  const T1* y, const casadi_int* sp_y, T1* z);
+
   /// Sparse matrix-vector multiplication: z <- z + x*y
   template<typename T1>
   void casadi_mv(const T1* x, const casadi_int* sp_x, const T1* y, T1* z, casadi_int tr);
@@ -270,6 +280,8 @@ namespace casadi {
   #include "casadi_vector_fmax.hpp"
   #include "casadi_sum_viol.hpp"
   #include "casadi_mtimes.hpp"
+  #include "casadi_mtimes_dense.hpp"
+  #include "casadi_mtimes_dense_sparse.hpp"
   #include "casadi_mv.hpp"
   #include "casadi_trilsolve.hpp"
   #include "casadi_triusolve.hpp"

@@ -427,7 +427,8 @@ namespace casadi {
     return (*this)->is_subset(rhs);
   }
 
-  Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y) {
+  Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y,
+                            const std::string& /*blas*/) {
     // Check matching dimensions
     casadi_assert(x.size2()==y.size1(),
       "Matrix product with incompatible dimensions. Lhs is "

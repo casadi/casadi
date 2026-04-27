@@ -562,7 +562,7 @@ namespace casadi {
   }
 
 
-  MX MXNode::get_mac(const MX& y, const MX& z) const {
+  MX MXNode::get_mac(const MX& y, const MX& z, const std::string& blas) const {
     if (sparsity().is_orthonormal() && y.is_column() && y.is_dense()
         && y.sparsity()==z.sparsity() && z.is_zero()) {
       std::vector<casadi_int> perm = sparsity().permutation_vector();
@@ -578,11 +578,7 @@ namespace casadi {
       "Dimension error x.mac(z). Got x=" + x.dim() + " and z=" + z.dim() + ".");
     casadi_assert(y.size1()==x.size2(),
       "Dimension error x.mac(z). Got y=" + str(y.size1()) + " and x" + x.dim() + ".");
-    if (x.is_dense() && y.is_dense() && z.is_dense()) {
-      return MX::create(new DenseMultiplication(z, x, y));
-    } else {
-      return MX::create(new Multiplication(z, x, y));
-    }
+    return Multiplication::create(z, x, y, blas);
   }
 
   MX MXNode::get_einstein(const MX& A, const MX& B,

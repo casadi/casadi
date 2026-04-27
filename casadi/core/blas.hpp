@@ -47,13 +47,13 @@ namespace casadi {
 
       */
 
-  /// Check if a particular BLAS plugin is available
+  /* \brief Check if a particular BLAS plugin is available */
   CASADI_EXPORT bool has_blas(const std::string& name);
 
-  /// Explicitly load a BLAS plugin dynamically
+  /* \brief Explicitly load a BLAS plugin dynamically */
   CASADI_EXPORT void load_blas(const std::string& name);
 
-  /// Get the documentation string for a BLAS plugin
+  /* \brief Get the documentation string for a BLAS plugin */
   CASADI_EXPORT std::string doc_blas(const std::string& name);
 
 } // namespace casadi

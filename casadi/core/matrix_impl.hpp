@@ -33,6 +33,7 @@
 #include "linsol.hpp"
 #include "expm.hpp"
 #include "serializing_stream.hpp"
+#include "blas_impl.hpp"
 
 namespace casadi {
   template<typename Scalar>
@@ -1157,20 +1158,36 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
+  Matrix<Scalar> Matrix<Scalar>::mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y,
+                                         const std::string& blas) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return x*y;
     } else {
       Matrix<Scalar> z = Matrix<Scalar>::zeros(Sparsity::mtimes(x.sparsity(), y.sparsity()));
-      return mac(x, y, z);
+      return mac(x, y, z, blas);
     }
   }
+
+  // Dense fast-path dispatch for Matrix<T>::mac.
+  template<typename T>
+  inline void mtimes_dense_dispatch(const std::string& /*blas*/,
+                                    const T* A, casadi_int m, casadi_int k,
+                                    const T* B, casadi_int n, T* C) {
+    casadi_mtimes_dense(A, m, k, B, n, C, 0);
+  }
+  template<>
+  void CASADI_EXPORT mtimes_dense_dispatch<double>(const std::string& blas,
+                                                   const double* A,
+                                                   casadi_int m, casadi_int k,
+                                                   const double* B, casadi_int n,
+                                                   double* C);
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::mac(const Matrix<Scalar> &x,
                                          const Matrix<Scalar> &y,
-                                         const Matrix<Scalar> &z) {
+                                         const Matrix<Scalar> &z,
+                                         const std::string& blas) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + x*y;
@@ -1190,20 +1207,24 @@ namespace casadi {
                           + mtimes(x, y).dim() + " and rhs is " + z.dim() + ".");
 
     // Check if we can simplify the product
-    if (x.is_eye()) {
-      return y + z;
-    } else if (y.is_eye()) {
-      return x + z;
-    } else if (x.is_zero() || y.is_zero()) {
-      return z;
-    } else {
-      // Carry out the matrix product
-      Matrix<Scalar> ret = z;
-      std::vector<Scalar> work(x.size1());
-      casadi_mtimes(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
-                    ret.ptr(), ret.sparsity(), get_ptr(work), false);
+    if (x.is_eye()) return y + z;
+    if (y.is_eye()) return x + z;
+    if (x.is_zero() || y.is_zero()) return z;
+
+    Matrix<Scalar> ret = z;
+    if (x.is_dense() && y.is_dense() && z.is_dense()) {
+      // Dense fast path: routes through Blas for double, plain
+      // casadi_mtimes_dense for symbolic types.
+      mtimes_dense_dispatch<Scalar>(blas,
+          x.ptr(), x.size1(), x.size2(),
+          y.ptr(), y.size2(), ret.ptr());
       return ret;
     }
+    // Sparse fallback (Blas plugin choice ignored -- no plugin handles CCS).
+    std::vector<Scalar> work(x.size1());
+    casadi_mtimes(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
+                  ret.ptr(), ret.sparsity(), get_ptr(work), false);
+    return ret;
   }
 
   template<typename Scalar>

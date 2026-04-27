@@ -37,14 +37,33 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
 
+      The base implementation handles arbitrary sparsity via casadi_mtimes.
+      Subclasses specialize the kernel for structured operands (all-dense,
+      dense * sparse, compactible / pseudo-dense). Each subclass overrides
+      eval_kernel + generate + serialize_type; everything else is shared.
+
       \identifier{11h} */
   class CASADI_EXPORT Multiplication : public MXNode {
   public:
 
+    /** \brief  Factory: dispatch to the most specific subclass for the given operands
+
+        Detection ladder is most-specific-first; each branch is at most O(nnz) on
+        the operand sparsities. Callers should use this rather than picking a
+        subclass directly.
+
+        `blas` selects the dense matrix-multiply backend (e.g. "reference",
+        "classic", "blasfeo"). It is honored only by the dense and pseudo-
+        dense branches; sparse-only nodes ignore it but preserve the choice
+        across serialization. */
+    static MX create(const MX& z, const MX& x, const MX& y,
+                     const std::string& blas = "reference");
+
     /** \brief  Constructor
 
         \identifier{11i} */
-    Multiplication(const MX& z, const MX& x, const MX& y);
+    Multiplication(const MX& z, const MX& x, const MX& y,
+                   const std::string& blas = "reference");
 
     /** \brief  Destructor
 
@@ -65,15 +84,31 @@ namespace casadi {
                   const std::vector<bool>& arg_is_ref,
                   std::vector<bool>& res_is_ref) const override;
 
-    /// Evaluate the function (template)
+    /** \brief Subclass hook: mathematical kernel z += x*y on the input buffers
+
+        Default implementation calls casadi_mtimes (general sparse).
+        Two non-template overloads avoid virtual templates while still
+        sharing the eval_gen wrapper across types. */
+    virtual void eval_kernel(const double** arg, double** res, double* w) const;
+    virtual void eval_kernel(const SXElem** arg, SXElem** res, SXElem* w) const;
+
+    /// Evaluate the function (template) — copy z, then run subclass kernel
     template<typename T>
-    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
+      if (arg[0]!=res[0]) std::copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+      eval_kernel(arg, res, w);
+      return 0;
+    }
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+      return eval_gen<double>(arg, res, iw, w);
+    }
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override {
+      return eval_gen<SXElem>(arg, res, iw, w);
+    }
 
     /** \brief  Evaluate symbolically (MX)
 
@@ -134,58 +169,129 @@ namespace casadi {
         \identifier{11u} */
     void serialize_type(SerializingStream& s) const override;
 
+    /** \brief Serialize body (BLAS plugin name)
+
+        Stored on the base so all subclasses round-trip the choice,
+        even those that don't currently consume it. */
+    void serialize_body(SerializingStream& s) const override;
+
     /** \brief Deserialize with type disambiguation
 
         \identifier{11v} */
     static MXNode* deserialize(DeserializingStream& s);
 
   protected:
-    /** \brief Deserializing constructor
+    /** \brief Deserializing constructor.
+
+        Reads MXNode state, then unpacks the BLAS plugin name into
+        blas_shorthand_. legacy=true is used by the pre-3.8 wire-format
+        path (no blas field on the wire) and forces shorthand 0 ("reference").
 
         \identifier{11w} */
-    explicit Multiplication(DeserializingStream& s) : MXNode(s) {}
+    explicit Multiplication(DeserializingStream& s, bool legacy = false);
+
+    /// Cached BLAS plugin shorthand. 0 == "reference". Derived state, never
+    /// serialized directly; the underlying name string is what crosses
+    /// serialization boundaries.
+    casadi_int blas_shorthand_;
   };
 
 
-  /** \brief An MX atomic for matrix-matrix product,
-
-             note that the factor must be provided transposed
-      \author Joel Andersson
-      \date 2010
+  /** \brief Dense * Dense -> Dense matrix product
 
       \identifier{11x} */
   class CASADI_EXPORT DenseMultiplication : public Multiplication{
   public:
+    /// Returns a fresh node iff x, y, z are all dense; otherwise nullptr.
+    static MXNode* try_create(const MX& z, const MX& x, const MX& y,
+                              const std::string& blas = "reference");
 
-    /** \brief  Constructor
-
-        \identifier{11y} */
-    DenseMultiplication(const MX& z, const MX& x, const MX& y)
-        : Multiplication(z, x, y) {}
-
-    /** \brief  Destructor
-
-        \identifier{11z} */
+    DenseMultiplication(const MX& z, const MX& x, const MX& y,
+                        const std::string& blas = "reference")
+        : Multiplication(z, x, y, blas) {}
     ~DenseMultiplication() override {}
 
-    /** \brief Generate code for the operation
+    void eval_kernel(const double** arg, double** res, double* w) const override;
+    void eval_kernel(const SXElem** arg, SXElem** res, SXElem* w) const override;
 
-        \identifier{120} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
                   std::vector<bool>& res_is_ref) const override;
 
-    /** \brief Serialize specific part of node
-
-        \identifier{121} */
     void serialize_type(SerializingStream& s) const override;
+    explicit DenseMultiplication(DeserializingStream& s, bool legacy = false)
+        : Multiplication(s, legacy) {}
+  };
 
-    /** \brief Deserializing constructor
 
-        \identifier{122} */
-    explicit DenseMultiplication(DeserializingStream& s) : Multiplication(s) {}
+  /** \brief Dense * Sparse -> Dense matrix product
+
+      Iterate columns of y; per column, walk y's nonzeros and AXPY a column of x into z. */
+  class CASADI_EXPORT DenseSparseMultiplication : public Multiplication {
+  public:
+    /// Returns a fresh node iff x, z are dense; otherwise nullptr.
+    static MXNode* try_create(const MX& z, const MX& x, const MX& y,
+                              const std::string& blas = "reference");
+
+    DenseSparseMultiplication(const MX& z, const MX& x, const MX& y,
+                              const std::string& blas = "reference")
+        : Multiplication(z, x, y, blas) {}
+    ~DenseSparseMultiplication() override {}
+
+    void eval_kernel(const double** arg, double** res, double* w) const override;
+    void eval_kernel(const SXElem** arg, SXElem** res, SXElem* w) const override;
+
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res,
+                  const std::vector<bool>& arg_is_ref,
+                  std::vector<bool>& res_is_ref) const override;
+
+    void serialize_type(SerializingStream& s) const override;
+    explicit DenseSparseMultiplication(DeserializingStream& s) : Multiplication(s) {}
+  };
+
+
+  /** \brief Compactible * Compactible -> Compactible product
+
+      When the nonzero patterns of x, y, z are each Cartesian products
+      whose connecting index sets agree (col(x)==row(y), row(x)==row(z),
+      col(y)==col(z)), the CCS nonzero buffers are already laid out as
+      column-major dense matrices of compact dimensions. We can call
+      casadi_mtimes_dense directly on the nz buffers — no gather/scatter.
+
+      The compact dimensions are stored at construction time. */
+  class CASADI_EXPORT PseudoDenseMultiplication : public Multiplication {
+  public:
+    /// Returns a fresh node iff x, y, z are all compactible with matching
+    /// connecting index sets; otherwise nullptr.
+    static MXNode* try_create(const MX& z, const MX& x, const MX& y,
+                              const std::string& blas = "reference");
+
+    PseudoDenseMultiplication(const MX& z, const MX& x, const MX& y,
+                              casadi_int nrow_x_compact, casadi_int ncol_x_compact,
+                              casadi_int ncol_y_compact,
+                              const std::string& blas = "reference");
+    ~PseudoDenseMultiplication() override {}
+
+    void eval_kernel(const double** arg, double** res, double* w) const override;
+    void eval_kernel(const SXElem** arg, SXElem** res, SXElem* w) const override;
+
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res,
+                  const std::vector<bool>& arg_is_ref,
+                  std::vector<bool>& res_is_ref) const override;
+
+    void serialize_type(SerializingStream& s) const override;
+    void serialize_body(SerializingStream& s) const override;
+    explicit PseudoDenseMultiplication(DeserializingStream& s);
+
+  private:
+    // Compact (dense) dimensions seen by casadi_mtimes_dense
+    casadi_int a_, b_, c_;  // x: a x b, y: b x c, z: a x c
   };
 
 

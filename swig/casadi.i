@@ -3397,14 +3397,19 @@ namespace casadi{
  DECL M casadi_veccat(const std::vector< M >& x) {
  return veccat(x);
  }
- DECL M casadi_mtimes(const M& x, const M& y) {
- return mtimes(x, y);
+ DECL M casadi_mtimes(const M& x, const M& y,
+                      const std::string& blas = "reference") {
+ return mtimes(x, y, blas);
  }
  DECL M casadi_mtimes(const std::vector< M > &args) {
  return mtimes(args);
  }
- DECL M casadi_mac(const M& X, const M& Y, const M& Z) {
- return mac(X, Y, Z);
+ DECL M casadi_mtimes(const std::vector< M > &args, const std::string& blas) {
+ return mtimes(args, blas);
+ }
+ DECL M casadi_mac(const M& X, const M& Y, const M& Z,
+                   const std::string& blas = "reference") {
+ return mac(X, Y, Z, blas);
  }
  DECL M casadi_transpose(const M& X) {
  return X.T();
@@ -4979,6 +4984,7 @@ namespace casadi {
 %include <casadi/core/xml_file.hpp>
 %include <casadi/core/archiver.hpp>
 %include <casadi/core/filesystem.hpp>
+%include <casadi/core/blas.hpp>
 %include <casadi/core/options.hpp>
 
 %feature("copyctor", "0") casadi::SerializerBase;

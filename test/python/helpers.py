@@ -697,14 +697,23 @@ class casadiTestCase(unittest.TestCase):
         for lib in extralibs:
             if os.name=='nt':
                 if "." in lib:
-                    if lib.endswith(".dll"):
+                    if lib.endswith("libcasadi-tp-openblas.dll"):
+                        extralibs_clean.append("lapack.lib")
+                    elif lib.endswith(".dll"):
                         extralibs_clean.append(lib[:-4]+".lib")
                     else:
                         extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append(lib+".lib")
             else:
-                if "." in lib:
+                if lib.endswith("libcasadi-tp-openblas.so"):
+                    extralibs_clean.append("-lcasadi-tp-openblas")
+                elif lib.startswith("-"):
+                    extralibs_clean.append(lib)
+                elif lib.endswith(".framework") or ".framework/" in lib:
+                    fw = os.path.basename(lib).rsplit(".framework", 1)[0]
+                    extralibs_clean.append("-framework " + fw)
+                elif "." in lib:
                     extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append("-l"+lib)
@@ -835,14 +844,23 @@ class casadiTestCase(unittest.TestCase):
         for lib in extralibs:
             if os.name=='nt':
                 if "." in lib:
-                    if lib.endswith(".dll"):
+                    if lib.endswith("libcasadi-tp-openblas.dll"):
+                        extralibs_clean.append("lapack.lib")
+                    elif lib.endswith(".dll"):
                         extralibs_clean.append(lib[:-4]+".lib")
                     else:
                         extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append(lib+".lib")
             else:
-                if "." in lib:
+                if lib.endswith("libcasadi-tp-openblas.so"):
+                    extralibs_clean.append("-lcasadi-tp-openblas")
+                elif lib.startswith("-"):
+                    extralibs_clean.append(lib)
+                elif lib.endswith(".framework") or ".framework/" in lib:
+                    fw = os.path.basename(lib).rsplit(".framework", 1)[0]
+                    extralibs_clean.append("-framework " + fw)
+                elif "." in lib:
                     extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append("-l"+lib)

@@ -25,12 +25,24 @@
 
 #include "blas_impl.hpp"
 #include "code_generator.hpp"
+#include "global_options.hpp"
 #include "runtime/casadi_runtime.hpp"
+
+#include <cstring>
 
 namespace casadi {
 
 std::map<std::string, Blas::Plugin> Blas::solvers_;
 std::vector<const Blas::Plugin*> Blas::dispatch_;
+
+// Default-plugin storage is split:
+//   - Blas::default_              (casadi_int): hot-path read by every L1
+//                                 dispatcher; integer shorthand. Defined here.
+//   - GlobalOptions::default_blas_ (std::string): user-facing canonical name.
+//                                  Defined in global_options.cpp.
+// GlobalOptions::setDefaultBlas keeps both in sync; Blas::setDefault is the
+// internal entry point that updates only the integer shorthand.
+casadi_int Blas::default_ = 0;
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
 std::mutex Blas::mutex_solvers_;
@@ -107,15 +119,14 @@ static const char* REFERENCE_DOC =
     "Built-in dense BLAS implementation, no external dependency. "
     "Used by default and as the fallback when other plugins are unavailable.";
 
-unsigned char Blas::shorthand_for(const std::string& name) {
+casadi_int Blas::shorthand_for(const std::string& name) {
   if (name == "reference") return 0;
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
   std::lock_guard<std::mutex> lock(Blas::mutex_solvers_);
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
-  // Lazy-init the dispatch_ vector: reserve once, plant the slot-0 sentinel.
+  // Lazy-init the dispatch_ vector: plant the slot-0 sentinel.
   if (dispatch_.empty()) {
-    dispatch_.reserve(MAX_PLUGINS);
     dispatch_.push_back(nullptr);  // index 0 == reference, never indexed
   }
 
@@ -130,19 +141,16 @@ unsigned char Blas::shorthand_for(const std::string& name) {
   // Find existing shorthand by pointer identity (small N, linear scan is fine).
   // Start at 1 — slot 0 is the reference sentinel.
   const Plugin* p = &it->second;
-  for (unsigned char sh = 1; sh < dispatch_.size(); ++sh) {
+  for (casadi_int sh = 1; sh < static_cast<casadi_int>(dispatch_.size()); ++sh) {
     if (dispatch_[sh] == p) return sh;
   }
 
   // Newly registered plugin: assign next shorthand
-  casadi_assert(dispatch_.size() < MAX_PLUGINS,
-      "Too many BLAS plugins registered (max "
-      + str(static_cast<int>(MAX_PLUGINS)) + ").");
   dispatch_.push_back(p);
-  return static_cast<unsigned char>(dispatch_.size() - 1);
+  return static_cast<casadi_int>(dispatch_.size() - 1);
 }
 
-void Blas::dgemm(unsigned char shorthand,
+void Blas::dgemm(casadi_int shorthand,
                  int transa, int transb,
                  casadi_int m, casadi_int n, casadi_int k,
                  double alpha,
@@ -157,13 +165,13 @@ void Blas::dgemm(unsigned char shorthand,
   }
   // External plugin: trust the caller obtained `shorthand` via shorthand_for(),
   // which guarantees dispatch_[shorthand] is populated. Hot path, no lock.
-  casadi_assert_dev(shorthand < dispatch_.size());
+  casadi_assert_dev(shorthand < static_cast<casadi_int>(dispatch_.size()));
   casadi_assert_dev(dispatch_[shorthand] != nullptr);
   dispatch_[shorthand]->exposed.dgemm(
       transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 }
 
-void Blas::mtimes(unsigned char shorthand,
+void Blas::mtimes(casadi_int shorthand,
                   const double* A, casadi_int m, casadi_int k,
                   const double* B, casadi_int n,
                   double* C) {
@@ -175,23 +183,23 @@ void Blas::mtimes(unsigned char shorthand,
   }
   // External plugin: indirect through dispatch_, no lock. The caller
   // obtained `shorthand` via shorthand_for() so the slot is populated.
-  casadi_assert_dev(shorthand < dispatch_.size());
+  casadi_assert_dev(shorthand < static_cast<casadi_int>(dispatch_.size()));
   casadi_assert_dev(dispatch_[shorthand] != nullptr);
   dispatch_[shorthand]->exposed.dgemm(
       CASADI_BLAS_NO_TRANS, CASADI_BLAS_NO_TRANS,
       m, n, k, 1.0, A, m, B, k, 1.0, C, m);
 }
 
-const char* Blas::name_for_shorthand(unsigned char shorthand) {
+const char* Blas::name_for_shorthand(casadi_int shorthand) {
   if (shorthand == 0) return "reference";
   // Read-only fast path: dispatch_ entries are stable for process lifetime
   // and shorthand_for() is the sole writer. No lock needed; trust caller.
-  casadi_assert_dev(shorthand < dispatch_.size());
+  casadi_assert_dev(shorthand < static_cast<casadi_int>(dispatch_.size()));
   casadi_assert_dev(dispatch_[shorthand] != nullptr);
   return dispatch_[shorthand]->name;
 }
 
-void Blas::codegen_mtimes(CodeGenerator& g, unsigned char shorthand,
+void Blas::codegen_mtimes(CodeGenerator& g, casadi_int shorthand,
                           const std::string& A,
                           casadi_int m, casadi_int k,
                           const std::string& B, casadi_int n,
@@ -204,7 +212,7 @@ void Blas::codegen_mtimes(CodeGenerator& g, unsigned char shorthand,
   // External plugin: trust the caller obtained `shorthand` via shorthand_for(),
   // so dispatch_[shorthand] is populated and its codegen_mtimes is non-null
   // (otherwise the plugin would have failed to register).
-  casadi_assert_dev(shorthand < dispatch_.size());
+  casadi_assert_dev(shorthand < static_cast<casadi_int>(dispatch_.size()));
   casadi_assert_dev(dispatch_[shorthand] != nullptr);
   const Plugin* p = dispatch_[shorthand];
   casadi_assert(p->exposed.codegen_mtimes != nullptr,
@@ -225,6 +233,76 @@ void load_blas(const std::string& name) {
 std::string doc_blas(const std::string& name) {
   if (name == "reference") return REFERENCE_DOC;
   return Blas::getPlugin(name).doc;
+}
+
+// Internal entry point: sets the integer shorthand only. shorthand_for()
+// validates the name and lazy-loads the plugin DLL if needed. The matching
+// GlobalOptions::setDefaultBlas (in global_options.cpp) is the public entry
+// point that mirrors the name string and calls this.
+void Blas::setDefault(const std::string& name) {
+  default_ = shorthand_for(name);
+}
+
+std::string Blas::getDefault() {
+  return name_for_shorthand(default_);
+}
+
+void Blas::codegen_copy_aux(CodeGenerator& g,
+                            const std::vector<std::string>& inst) {
+  g.add_include("string.h");
+  g.auxiliaries << g.sanitize_source(
+      "// SYMBOL \"copy\"\n"
+      "void casadi_copy(const casadi_real* x, casadi_int n, casadi_real* y) {\n"
+      "  if (!y) return;\n"
+      "  if (x) memcpy(y, x, n*sizeof(casadi_real));\n"
+      "  else   memset(y, 0, n*sizeof(casadi_real));\n"
+      "}\n",
+      inst);
+}
+
+bool Blas::codegen_axpy_aux(CodeGenerator& g,
+                            const std::vector<std::string>& inst) {
+  if (!default_) return false;
+  CodegenL1Aux fn = dispatch_[default_]->exposed.codegen_axpy_aux;
+  if (!fn) return false;
+  fn(g, inst);
+  return true;
+}
+
+bool Blas::codegen_dot_aux(CodeGenerator& g,
+                           const std::vector<std::string>& inst) {
+  if (!default_) return false;
+  CodegenL1Aux fn = dispatch_[default_]->exposed.codegen_dot_aux;
+  if (!fn) return false;
+  fn(g, inst);
+  return true;
+}
+
+bool Blas::codegen_scal_aux(CodeGenerator& g,
+                            const std::vector<std::string>& inst) {
+  if (!default_) return false;
+  CodegenL1Aux fn = dispatch_[default_]->exposed.codegen_scal_aux;
+  if (!fn) return false;
+  fn(g, inst);
+  return true;
+}
+
+bool Blas::codegen_norm_2_aux(CodeGenerator& g,
+                              const std::vector<std::string>& inst) {
+  if (!default_) return false;
+  CodegenL1Aux fn = dispatch_[default_]->exposed.codegen_nrm2_aux;
+  if (!fn) return false;
+  fn(g, inst);
+  return true;
+}
+
+bool Blas::codegen_norm_1_aux(CodeGenerator& g,
+                              const std::vector<std::string>& inst) {
+  if (!default_) return false;
+  CodegenL1Aux fn = dispatch_[default_]->exposed.codegen_asum_aux;
+  if (!fn) return false;
+  fn(g, inst);
+  return true;
 }
 
 } // namespace casadi

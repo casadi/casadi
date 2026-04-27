@@ -440,6 +440,16 @@ namespace casadi {
                        const std::string& z, const Sparsity& sp_z,
                        const std::string& w, bool tr);
 
+    /** \brief Codegen dense matrix-matrix multiplication */
+    std::string mtimes(const std::string& x, casadi_int nrow_x, casadi_int ncol_x,
+                       const std::string& y, casadi_int ncol_y,
+                       const std::string& z, bool tr);
+
+    /** \brief Codegen dense-sparse matrix-matrix multiplication (z, x dense) */
+    std::string mtimes_dense_sparse(const std::string& x, casadi_int nrow_x,
+                                    const std::string& y, const Sparsity& sp_y,
+                                    const std::string& z);
+
     /** \brief Codegen lower triangular solve
 
         \identifier{ss} */
@@ -676,6 +686,8 @@ namespace casadi {
       AUX_MV,
       AUX_MV_DENSE,
       AUX_MTIMES,
+      AUX_MTIMES_DENSE,
+      AUX_MTIMES_DENSE_SPARSE,
       AUX_TRILSOLVE,
       AUX_TRIUSOLVE,
       AUX_PROJECT,

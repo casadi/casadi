@@ -158,6 +158,14 @@ namespace casadi {
     int version(const std::string& name);
     int version(const std::string& name, int min, int max);
 
+    /// Peek the next raw byte on the wire without consuming it.
+    /// Returns -1 on EOF. Intended for legacy-format detection where the
+    /// new code must distinguish wire formats whose first byte differs.
+    int peek_byte() { return in.peek(); }
+
+    /// Whether the stream was written in debug-decoration mode.
+    bool debug() const { return debug_; }
+
     void connect(SerializingStream & s);
     void reset();
 

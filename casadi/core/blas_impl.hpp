@@ -28,6 +28,9 @@
 
 #include "blas.hpp"
 #include "plugin_interface.hpp"
+#include "runtime/casadi_runtime.hpp"
+
+#include <cstring>
 
 namespace casadi { class CodeGenerator; }
 
@@ -35,25 +38,18 @@ namespace casadi { class CodeGenerator; }
 /// \cond INTERNAL
 namespace casadi {
 
-  // CBLAS_TRANSPOSE values, mirrored to avoid pulling in <cblas.h>.
-  // Plugins built against OpenBLAS/BLASFEO can pass these straight through.
+  /* \brief CBLAS_TRANSPOSE values, mirrored so plugins don't need <cblas.h> */
   enum {
     CASADI_BLAS_NO_TRANS = 111,
     CASADI_BLAS_TRANS    = 112
   };
 
-  /** \brief Blas interface
+  /** \brief Pluggable dense BLAS backend, dispatched per-call by shorthand
 
-      Pluggable dense matrix-multiply backend. Layout is column-major.
-      The dispatch entry Blas::dgemm(shorthand, ...) is keyed by a small
-      integer assigned at plugin registration time; shorthand 0 is
-      reserved for the built-in "reference" plugin and takes a fast path
-      that bypasses the function-pointer indirection.
-
-      Plugins registered via the standard PluginInterface mechanism
-      expose a single dgemm function pointer in Plugin::Exposed. External
-      plugins (openblas, blasfeo) live in their own shared libraries and
-      are dlopen'd on first use.
+      Shorthand 0 is the built-in reference impl (fast path, no indirection).
+      External plugins (classic, blasfeo, ...) live in their own DLLs and are
+      dlopen'd on first use; each populates Exposed with its own function
+      pointers.
 
       \author Joris Gillis
       \date 2026
@@ -62,8 +58,7 @@ namespace casadi {
   class CASADI_EXPORT
   Blas : public PluginInterface<Blas> {
   public:
-    /// CBLAS-style dgemm: C := alpha*op(A)*op(B) + beta*C
-    /// Layout is column-major; transa/transb are CASADI_BLAS_NO_TRANS / CASADI_BLAS_TRANS.
+    /* \brief CBLAS-style dgemm: C := alpha*op(A)*op(B) + beta*C; column-major */
     typedef void (* Dgemm)(int transa, int transb,
                            casadi_int m, casadi_int n, casadi_int k,
                            double alpha,
@@ -72,56 +67,79 @@ namespace casadi {
                            double beta,
                            double* C, casadi_int ldc);
 
-    /// Codegen counterpart of `mtimes`: emit a C statement that performs
-    /// C += A*B (column-major, NoTrans, contiguous). The plugin owns its
-    /// own emission — extern decls, helper #ifdefs, dimension layout —
-    /// so plugin-specific knowledge stays out of libcasadi core.
+    /* \brief Codegen counterpart of mtimes: emit C += A*B at the call site */
     typedef void (* CodegenMtimes)(CodeGenerator& g,
                                    const std::string& A,
                                    casadi_int m, casadi_int k,
                                    const std::string& B, casadi_int n,
                                    const std::string& C);
 
-    // Creator function (unused; kept for PluginInterface uniformity).
+    /* \brief L1 runtime hook signatures (double-only; templates handle other T) */
+    typedef void   (* Daxpy)(casadi_int n, double alpha, const double* x, double* y);
+    typedef double (* Ddot )(casadi_int n, const double* x, const double* y);
+    typedef void   (* Dscal)(casadi_int n, double alpha, double* x);
+    typedef double (* Dnrm2)(casadi_int n, const double* x);
+    typedef double (* Dasum)(casadi_int n, const double* x);
+
+    /* \brief Codegen counterpart of an L1 op: emit the auxiliary block */
+    typedef void (* CodegenL1Aux)(CodeGenerator& g,
+                                  const std::vector<std::string>& inst);
+
+    /* \brief Creator function (unused; kept for PluginInterface uniformity) */
     typedef Blas* (*Creator)();
 
     static const std::string meta_doc;
 
+    /* \brief Function-pointer table populated by each registered plugin */
     struct Exposed {
       Dgemm dgemm;
       CodegenMtimes codegen_mtimes;
+      Daxpy daxpy;
+      Ddot  ddot;
+      Dscal dscal;
+      Dnrm2 dnrm2;
+      Dasum dasum;
+      CodegenL1Aux codegen_axpy_aux;
+      CodegenL1Aux codegen_dot_aux;
+      CodegenL1Aux codegen_scal_aux;
+      CodegenL1Aux codegen_nrm2_aux;
+      CodegenL1Aux codegen_asum_aux;
     };
 
-    /// Collection of registered plugins, keyed by name.
+    /* \brief Collection of registered plugins, keyed by name */
     static std::map<std::string, Plugin> solvers_;
 
-    /// O(1) dispatch by shorthand. Index 0 is reserved for "reference".
-    /// Pre-reserved to MAX_PLUGINS so push_back never reallocates;
-    /// element pointers therefore stay stable for process lifetime.
+    /* \brief Fast lookup structure for BLAS plugins */
     static std::vector<const Plugin*> dispatch_;
 
-    /// Hard cap on the number of BLAS plugins per process.
-    static constexpr unsigned char MAX_PLUGINS = 255;
+    /* \brief Active default BLAS shorthand (index into dispatch_; 0 = reference) */
+    static casadi_int default_;
+
+    /* \brief Get the active default BLAS name */
+    static std::string getDefault();
+
+    /* \brief Resolve a plugin name to its dispatch shorthand */
+    static casadi_int shorthand_for(const std::string& name);
+
+    /* \brief Reverse lookup: shorthand -> plugin name ("reference" for 0) */
+    static const char* name_for_shorthand(casadi_int shorthand);
+  private:
+    friend class GlobalOptions;
+
+    /* \brief Set default_; private, callers go through GlobalOptions::setDefaultBlas */
+    static void setDefault(const std::string& name);
+
+  public:
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
     static std::mutex mutex_solvers_;
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
-    /// Infix used by PluginInterface to derive DLL / register-symbol names.
+    /* \brief Infix used by PluginInterface to derive DLL / register-symbol names */
     static const std::string infix_;
 
-    /// Resolve a plugin name to its dispatch shorthand.
-    /// "reference" is hard-coded to shorthand 0 (no Plugin entry, no DLL).
-    /// External plugin names auto-load on first use.
-    /// Intended to be called once per Multiplication node, at construction.
-    static unsigned char shorthand_for(const std::string& name);
-
-    /// Full CBLAS-shape dispatch: C := alpha*op(A)*op(B) + beta*C, column-major.
-    /// For shorthand==0 (reference), inlines a libcasadi-internal impl that
-    /// fast-paths the canonical (alpha=1, beta=1, contiguous) case to
-    /// casadi_mtimes_dense. Other shorthands trigger an indirect call
-    /// through dispatch_[shorthand]->exposed.dgemm.
-    static void dgemm(unsigned char shorthand,
+    /* \brief Full CBLAS dgemm dispatched by shorthand (column-major) */
+    static void dgemm(casadi_int shorthand,
                       int transa, int transb,
                       casadi_int m, casadi_int n, casadi_int k,
                       double alpha,
@@ -130,17 +148,7 @@ namespace casadi {
                       double beta,
                       double* C, casadi_int ldc);
 
-    /// Canonical dense matrix-multiply-accumulate: C += A * B,
-    /// column-major, both factors NoTrans, contiguous (lda=m, ldb=k, ldc=m).
-    /// This is the runtime counterpart of codegen_mtimes(): same call shape
-    /// inside Multiplication eval and generate.
-    static void mtimes(unsigned char shorthand,
-                       const double* A, casadi_int m, casadi_int k,
-                       const double* B, casadi_int n,
-                       double* C);
-
-    /// Built-in dense dgemm (used internally by the shorthand==0 fast path).
-    /// Reachable directly for unit tests; normal callers should use mtimes/dgemm.
+    /* \brief Built-in dense dgemm (shorthand-0 fast path; exposed for tests) */
     static void reference_dgemm(int transa, int transb,
                              casadi_int m, casadi_int n, casadi_int k,
                              double alpha,
@@ -149,23 +157,123 @@ namespace casadi {
                              double beta,
                              double* C, casadi_int ldc);
 
-    /// Reverse lookup: shorthand -> plugin name. Returns "reference" for 0;
-    /// otherwise the registered plugin's name (caller must ensure `shorthand`
-    /// was previously returned by shorthand_for()).
-    static const char* name_for_shorthand(unsigned char shorthand);
+    /* \brief Canonical contiguous mtimes-accumulate: C += A*B */
+    static void mtimes(casadi_int shorthand,
+                       const double* A, casadi_int m, casadi_int k,
+                       const double* B, casadi_int n,
+                       double* C);
 
-    /// Emit a C code line that performs C += A*B (column-major dense),
-    /// dispatched to the requested BLAS plugin. Shorthand 0 (reference)
-    /// emits the built-in casadi_mtimes_dense call; non-reference branches
-    /// will be wired up alongside their codegen support. Codegen counterpart
-    /// of Blas::mtimes().
-    static void codegen_mtimes(CodeGenerator& g, unsigned char shorthand,
+    /* \brief Emit a C statement that performs C += A*B; codegen counterpart of mtimes */
+    static void codegen_mtimes(CodeGenerator& g, casadi_int shorthand,
                                const std::string& A,
                                casadi_int m, casadi_int k,
                                const std::string& B, casadi_int n,
                                const std::string& C);
 
+    /* \brief y <- x (zero-fill if x==NULL) */
+    template<typename T>
+    static void copy(const T* x, casadi_int n, T* y) { casadi_copy(x, n, y); }
+
+    /* \brief y += alpha*x */
+    template<typename T>
+    static void axpy(casadi_int n, T alpha, const T* x, T* y) {
+      casadi_axpy(n, alpha, x, y);
+    }
+
+    /* \brief dot(x, y) */
+    template<typename T>
+    static T dot(casadi_int n, const T* x, const T* y) {
+      return casadi_dot(n, x, y);
+    }
+
+    /* \brief x *= alpha */
+    template<typename T>
+    static void scal(casadi_int n, T alpha, T* x) {
+      casadi_scal(n, alpha, x);
+    }
+
+    /* \brief 2-norm of x */
+    template<typename T>
+    static T norm_2(casadi_int n, const T* x) {
+      return casadi_norm_2(n, x);
+    }
+
+    /* \brief 1-norm of x */
+    template<typename T>
+    static T norm_1(casadi_int n, const T* x) {
+      return casadi_norm_1(n, x);
+    }
+
+    /* \brief Emit aux block for casadi_copy (memcpy/memset; never plugin-dispatched) */
+    static void codegen_copy_aux(CodeGenerator& g,
+                                 const std::vector<std::string>& inst);
+    /* \brief Try-emit aux block for casadi_axpy via active plugin (false on fallback) */
+    static bool codegen_axpy_aux(CodeGenerator& g,
+                                 const std::vector<std::string>& inst);
+    /* \brief Try-emit aux block for casadi_dot via active plugin (false on fallback) */
+    static bool codegen_dot_aux(CodeGenerator& g,
+                                const std::vector<std::string>& inst);
+    /* \brief Try-emit aux block for casadi_scal via active plugin (false on fallback) */
+    static bool codegen_scal_aux(CodeGenerator& g,
+                                 const std::vector<std::string>& inst);
+    /* \brief Try-emit aux block for casadi_norm_2 via active plugin (false on fallback) */
+    static bool codegen_norm_2_aux(CodeGenerator& g,
+                                   const std::vector<std::string>& inst);
+    /* \brief Try-emit aux block for casadi_norm_1 via active plugin (false on fallback) */
+    static bool codegen_norm_1_aux(CodeGenerator& g,
+                                   const std::vector<std::string>& inst);
   };
+
+  template<>
+  inline void Blas::copy<double>(const double* x, casadi_int n, double* y) {
+    if (!y) return;
+    if (x) std::memcpy(y, x, n * sizeof(double));
+    else   std::memset(y, 0, n * sizeof(double));
+  }
+
+  template<>
+  inline void Blas::axpy<double>(casadi_int n, double alpha,
+                                 const double* x, double* y) {
+    if (!default_) return casadi_axpy(n, alpha, x, y);
+    if (!x || !y) return;
+    Daxpy fn = dispatch_[default_]->exposed.daxpy;
+    if (fn) return fn(n, alpha, x, y);
+    return casadi_axpy(n, alpha, x, y);
+  }
+
+  template<>
+  inline double Blas::dot<double>(casadi_int n, const double* x, const double* y) {
+    if (!default_) return casadi_dot(n, x, y);
+    Ddot fn = dispatch_[default_]->exposed.ddot;
+    if (fn) return fn(n, x, y);
+    return casadi_dot(n, x, y);
+  }
+
+  template<>
+  inline void Blas::scal<double>(casadi_int n, double alpha, double* x) {
+    if (!default_) return casadi_scal(n, alpha, x);
+    if (!x) return;
+    Dscal fn = dispatch_[default_]->exposed.dscal;
+    if (fn) return fn(n, alpha, x);
+    return casadi_scal(n, alpha, x);
+  }
+
+  template<>
+  inline double Blas::norm_2<double>(casadi_int n, const double* x) {
+    if (!default_) return casadi_norm_2(n, x);
+    Dnrm2 fn = dispatch_[default_]->exposed.dnrm2;
+    if (fn) return fn(n, x);
+    return casadi_norm_2(n, x);
+  }
+
+  template<>
+  inline double Blas::norm_1<double>(casadi_int n, const double* x) {
+    if (!default_) return casadi_norm_1(n, x);
+    if (!x) return 0;
+    Dasum fn = dispatch_[default_]->exposed.dasum;
+    if (fn) return fn(n, x);
+    return casadi_norm_1(n, x);
+  }
 
 } // namespace casadi
 

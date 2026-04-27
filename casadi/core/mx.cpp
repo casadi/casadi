@@ -668,13 +668,13 @@ namespace casadi {
     *this = ret;
   }
 
-  MX MX::mtimes(const MX& x, const MX& y) {
+  MX MX::mtimes(const MX& x, const MX& y, const std::string& blas) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return x*y;
     } else {
       MX z = MX::zeros(Sparsity::mtimes(x.sparsity(), y.sparsity()));
-      return mac(x, y, z);
+      return mac(x, y, z, blas);
     }
   }
 
@@ -708,7 +708,7 @@ namespace casadi {
     return axis==0 ? ret.T() : ret;
   }
 
-  MX MX::mac(const MX& x, const MX& y, const MX& z) {
+  MX MX::mac(const MX& x, const MX& y, const MX& z, const std::string& blas) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + x*y;
@@ -727,7 +727,7 @@ namespace casadi {
     } else if (x.is_zero() || y.is_zero()) {
       return z;
     } else {
-      return x->get_mac(y, z);
+      return x->get_mac(y, z, blas);
     }
   }
 

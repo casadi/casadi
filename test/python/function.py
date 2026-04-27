@@ -3970,9 +3970,9 @@ class Functiontests(casadiTestCase):
       self.assertEqual("wr3" in code, enabled)
       
       lines = """
-  casadi_int i, j, k;
+  casadi_int i;
   casadi_real *rr, w0, *w1=w+2, w2, *w3=w+8, *w4=w+18, *w5=w+28, *w6=w+33, *w7=w+38, *w8=w+43, *w9=w+68;
-  const casadi_real *cs, *ct, *wr3, *wr4, *wr6, *wr9;
+  const casadi_real *cs, *wr3, *wr4, *wr6, *wr9;
   /* #0: @0 = 0 */
   w0 = 0.;
   /* #1: @1 = ones(1x5) */
@@ -4004,7 +4004,7 @@ class Functiontests(casadiTestCase):
   /* #13: @5 = (@5+@7) */
   for (i=0, rr=w5, cs=w7; i<5; ++i) (*rr++) += (*cs++);
   /* #14: @0 = mac(@1,@5,@0) */
-  for (i=0, rr=(&w0); i<1; ++i) for (j=0; j<1; ++j, ++rr) for (k=0, cs=w1+j, ct=w5+i*5; k<5; ++k) *rr += cs[k*1]**ct++;
+  casadi_mtimes_dense(w1, 1, 5, w5, 1, (&w0), 0);
   /* #15: output[0][0] = @0 */
   if (res[0]) res[0][0] = w0;
   /* #16: @0 = 9 */

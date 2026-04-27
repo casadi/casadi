@@ -429,10 +429,12 @@ namespace casadi {
     static Matrix<Scalar> reshape(const Matrix<Scalar> &x, const Sparsity& sp);
     static Matrix<Scalar> sparsity_cast(const Matrix<Scalar> &x, const Sparsity& sp);
     static Matrix<Scalar> kron(const Matrix<Scalar> &x, const Matrix<Scalar>& y);
-    static Matrix<Scalar> mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
+    static Matrix<Scalar> mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y,
+                                 const std::string& blas = "reference");
     static Matrix<Scalar> mac(const Matrix<Scalar> &x,
                                 const Matrix<Scalar> &y,
-                                const Matrix<Scalar> &z);
+                                const Matrix<Scalar> &z,
+                                const std::string& blas = "reference");
     static void extract_parametric(const Matrix<Scalar> &expr,
         const Matrix<Scalar>& par,
         Matrix<Scalar>& expr_ret,

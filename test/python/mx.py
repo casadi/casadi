@@ -1131,6 +1131,185 @@ class MXtests(casadiTestCase):
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],7)
 
+
+
+  def test_mtimes_blas_plugin(self):
+    import os, tempfile
+    
+    DM.rng(1)
+    
+    m, k, n = 3, 4, 5
+
+    def parse_sp(art):
+      """ASCII art -> Sparsity. 'X' = nonzero, '.' (or anything else) = zero."""
+      rows = [r.strip() for r in art.strip().split('\n') if r.strip()]
+      return sparsify(DM([[1.0 if c == 'X' else 0.0 for c in r]
+                          for r in rows])).sparsity()
+
+    # A is m x k = 3 x 4. Compactible: rows {0,2} x cols {0,2}.
+    A_pats = [
+      ('dense', parse_sp("""
+          XXXX
+          XXXX
+          XXXX""")),
+      ('compactible', parse_sp("""
+          X.X.
+          ....
+          X.X.""")),
+      ('sparse', parse_sp("""
+          X.XX
+          .X.X
+          XX..""")),
+    ]
+    # B is k x n = 4 x 5. Compactible: rows {0,2} x cols {1,3} -- the row set
+    # matches A's compactible col set so the (compactible, compactible) combo
+    # exercises the PseudoDenseMultiplication path.
+    B_pats = [
+      ('dense', parse_sp("""
+          XXXXX
+          XXXXX
+          XXXXX
+          XXXXX""")),
+      ('compactible', parse_sp("""
+          .X.X.
+          .....
+          .X.X.
+          .....""")),
+      ('sparse', parse_sp("""
+          X.X.X
+          .X..X
+          XX.X.
+          .X.XX""")),
+    ]
+    Adense_val = DM.rand(m, k)
+    Bdense_val = DM.rand(k, n)
+
+    plugins = ['reference']
+      
+    for opt in ['classic', 'blasfeo']:
+      try:
+        load_blas(opt); plugins.append(opt)
+      except Exception:
+        pass
+
+    # Per-plugin spelling of the dense matrix kernel. Reference emits the
+    # canonical casadi runtime call; classic/blasfeo emit through the macro
+    # / direct BLAS symbol.
+    dense_kernel = {
+        'reference': 'casadi_mtimes_dense(',
+        'classic':   'CASADI_BLAS_DGEMM(',
+        'blasfeo':   'blasfeo_blas_dgemm(',
+    }
+
+    # Link line for codegen+compile of each plugin. The "classic" line is
+    # taken from CasadiMeta.lapack_libraries() so the test stays agnostic to
+    # the build's BLAS choice (OpenBLAS / MKL / system BLAS / ...). It's
+    # CMake's native LAPACK_LIBRARIES form: a semicolon-separated mix of
+    # full paths and -l flags. helpers.py's check_codegen passes paths
+    # through verbatim and prefixes bare names with -l.
+    classic_libs = [t for t in CasadiMeta.lapack_libraries().split(";") if t]
+    plugin_extralibs = {
+        'reference': [],
+        'classic':   classic_libs,
+        'blasfeo':   ['blasfeo'],
+    }
+
+    def predict_category(A_sp, B_sp, z_sp):
+      if A_sp.is_dense() and B_sp.is_dense() and z_sp.is_dense():
+        return 'dense'             # DenseMultiplication
+      if A_sp.is_dense() and z_sp.is_dense():
+        return 'dense_sparse'      # DenseSparseMultiplication
+      ok_a, ar, ac = A_sp.is_compactible()
+      ok_b, br, bc = B_sp.is_compactible()
+      ok_z, zr, zc = z_sp.is_compactible()
+      if (ok_a and ok_b and ok_z and z_sp.nnz() > 0
+          and ac == br and ar == zr and bc == zc):
+        return 'dense'             # PseudoDenseMultiplication
+      return 'generic'             # base Multiplication
+
+    Adense_sym = MX.sym('A', m, k)
+    Bdense_sym = MX.sym('B', k, n)
+    Zdense_sym = MX.sym('Z', m, n)
+    Zdense_val = DM(np.random.randn(m, n))
+
+    for name in plugins:
+      for a_label, a_sp in A_pats:
+        for b_label, b_sp in B_pats:
+          for op_label in ['mtimes', 'mac']:
+            tag = "%s/%s/%s/%s" % (op_label, name, a_label, b_label)
+            A = project(Adense_sym, a_sp)
+            B = project(Bdense_sym, b_sp)
+            Amask = densify(DM(a_sp, 1.0))
+            Bmask = densify(DM(b_sp, 1.0))
+
+            if op_label == 'mtimes':
+              # mtimes: Z is implicit MX::zeros with sparsity mul(A_sp, B_sp).
+              # densify on output so f and f_ref share output sparsity;
+              # otherwise checkfunction's random adjoint seeds differ in size
+              # and forward/adjoint sensitivities aren't comparable.
+              out_f   = densify(mtimes(A, B, name))
+              out_ref = mtimes(Adense_sym * Amask, Bdense_sym * Bmask, "reference")
+              sym_in, val_in = [Adense_sym, Bdense_sym], [Adense_val, Bdense_val]
+              z_sp = mtimes(DM(a_sp, 1.0), DM(b_sp, 1.0)).sparsity()
+            else:
+              # mac: Z is dense, supplied explicitly. Output is Z + A*B and
+              # already dense, so no densify needed.
+              out_f   = mac(A, B, Zdense_sym, name)
+              out_ref = mac(Adense_sym * Amask, Bdense_sym * Bmask,
+                            Zdense_sym, "reference")
+              sym_in = [Adense_sym, Bdense_sym, Zdense_sym]
+              val_in = [Adense_val, Bdense_val, Zdense_val]
+              z_sp = Sparsity.dense(m, n)
+
+            f     = Function('f',     sym_in, [out_f])
+            f_ref = Function('f_ref', sym_in, [out_ref])
+
+            self.checkfunction(f, f_ref, inputs=val_in)
+
+            # Also exercise the DM-level Matrix<double>::mtimes / ::mac path
+            # directly. Project the dense values, call the operation on DMs,
+            # and compare against the reference Function output (which uses
+            # the all-dense kernel via "reference").
+            A_dm = project(Adense_val, a_sp)
+            B_dm = project(Bdense_val, b_sp)
+            if op_label == 'mtimes':
+              dm_out = mtimes(A_dm, B_dm, name)
+            else:
+              dm_out = mac(A_dm, B_dm, Zdense_val, name)
+            self.checkarray(densify(dm_out), f_ref(*val_in),
+                            "%s (DM-level)" % tag)
+
+            cat = predict_category(a_sp, b_sp, z_sp)
+            if cat == 'dense':
+              expected = dense_kernel[name]
+            elif cat == 'dense_sparse':
+              expected = 'casadi_mtimes_dense_sparse('  # plugin-agnostic
+            else:
+              expected = 'casadi_mtimes('               # plugin-agnostic
+
+            # Is the expected kernel in the generated code?
+            f.generate('f.c')
+            with open('f.c', 'r') as codefile:
+                code = codefile.read()
+            self.assertIn(expected, code,
+                "%s: expected kernel %s in generated code" % (tag, expected))
+
+            # Does serialization preserve the expected kernel?
+            f.save('f.casadi')
+            fdeser = Function.load('f.casadi')
+            fdeser.generate('fdeser.c')
+            with open('fdeser.c', 'r') as codefile:
+                code = codefile.read()
+            self.assertIn(expected, code,
+                "%s: expected kernel %s in deserialized code" % (tag, expected))
+
+            self.checkfunction_light(f, fdeser, inputs=val_in)
+
+            extralibs = plugin_extralibs.get(name, [])
+            if name == 'reference' or extralibs:
+              if expected == dense_kernel[name] or name=="reference":
+                self.check_codegen(f, inputs=val_in, extralibs=extralibs)
+
   def test_truth(self):
     self.message("Truth values")
     self.assertRaises(Exception, lambda : bool(MX.sym("x")))

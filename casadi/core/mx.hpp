@@ -635,8 +635,10 @@ namespace casadi {
                                      const std::vector<casadi_int>& offset2);
     static std::vector<MX> vertsplit(const MX& x, const std::vector<casadi_int>& offset);
     static MX blockcat(const std::vector< std::vector<MX > > &v);
-    static MX mtimes(const MX& x, const MX& y);
-    static MX mac(const MX& x, const MX& y, const MX& z);
+    static MX mtimes(const MX& x, const MX& y,
+                     const std::string& blas = "reference");
+    static MX mac(const MX& x, const MX& y, const MX& z,
+                  const std::string& blas = "reference");
     static MX reshape(const MX& x, casadi_int nrow, casadi_int ncol);
     static MX reshape(const MX& x, const Sparsity& sp);
     static MX sparsity_cast(const MX& x, const Sparsity& sp);

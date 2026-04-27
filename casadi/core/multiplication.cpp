@@ -27,13 +27,25 @@
 #define CASADI_MULTIPLICATION_CPP
 
 #include "multiplication.hpp"
+#include "blas_impl.hpp"
 #include "casadi_misc.hpp"
 #include "function_internal.hpp"
 #include "serializing_stream.hpp"
 
 namespace casadi {
 
-  Multiplication::Multiplication(const MX& z, const MX& x, const MX& y) {
+  MX Multiplication::create(const MX& z, const MX& x, const MX& y,
+                            const std::string& blas) {
+    // Most-specific-first. Each subclass owns its own applicability test
+    // and construction; nullptr means "doesn't apply, try the next one".
+    if (auto* n = DenseMultiplication::try_create(z, x, y, blas))       return MX::create(n);
+    if (auto* n = PseudoDenseMultiplication::try_create(z, x, y, blas)) return MX::create(n);
+    if (auto* n = DenseSparseMultiplication::try_create(z, x, y, blas)) return MX::create(n);
+    return MX::create(new Multiplication(z, x, y, blas));
+  }
+
+  Multiplication::Multiplication(const MX& z, const MX& x, const MX& y,
+                                 const std::string& blas) {
     casadi_assert(x.size2() == y.size1() && x.size1() == z.size1()
       && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
@@ -42,28 +54,21 @@ namespace casadi {
 
     set_dep(z, x, y);
     set_sparsity(z.sparsity());
+    blas_shorthand_ = Blas::shorthand_for(blas);
   }
 
   std::string Multiplication::disp(const std::vector<std::string>& arg) const {
     return "mac(" + arg.at(1) + "," + arg.at(2) + "," + arg.at(0) + ")";
   }
 
-  int Multiplication::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
-    return eval_gen<double>(arg, res, iw, w);
+  void Multiplication::eval_kernel(const double** arg, double** res, double* w) const {
+    casadi_mtimes(arg[1], dep(1).sparsity(), arg[2], dep(2).sparsity(),
+                  res[0], sparsity(), w, false);
   }
 
-  int Multiplication::
-  eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
-    return eval_gen<SXElem>(arg, res, iw, w);
-  }
-
-  template<typename T>
-  int Multiplication::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
-    if (arg[0]!=res[0]) std::copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    casadi_mtimes(arg[1], dep(1).sparsity(),
-               arg[2], dep(2).sparsity(),
-               res[0], sparsity(), w, false);
-    return 0;
+  void Multiplication::eval_kernel(const SXElem** arg, SXElem** res, SXElem* w) const {
+    casadi_mtimes(arg[1], dep(1).sparsity(), arg[2], dep(2).sparsity(),
+                  res[0], sparsity(), w, false);
   }
 
   void Multiplication::ad_forward(const std::vector<std::vector<MX> >& fseed,
@@ -121,70 +126,230 @@ namespace casadi {
     return 0;
   }
 
+  // Helper: emit `if (arg!=res || arg_is_ref) copy(arg -> res, nnz)`
+  // Subclasses share this so eval_kernel only handles z += x*y.
+  static void codegen_copy_z(CodeGenerator& g, casadi_int nnz,
+                             const std::vector<casadi_int>& arg,
+                             const std::vector<casadi_int>& res,
+                             const std::vector<bool>& arg_is_ref) {
+    if (arg[0]!=res[0] || arg_is_ref[0]) {
+      g << g.copy(g.work(arg[0], nnz, arg_is_ref[0]),
+                  nnz,
+                  g.work(res[0], nnz, false)) << '\n';
+    }
+  }
+
   void Multiplication::generate(CodeGenerator& g,
                                 const std::vector<casadi_int>& arg,
                                 const std::vector<casadi_int>& res,
                                 const std::vector<bool>& arg_is_ref,
                                 std::vector<bool>& res_is_ref) const {
-    // Copy first argument if not inplace
-    if (arg[0]!=res[0] || arg_is_ref[0]) {
-      g << g.copy(g.work(arg[0], nnz(), arg_is_ref[0]),
-            nnz(),
-            g.work(res[0], nnz(), false)) << '\n';
-    }
-
-    // Perform sparse matrix multiplication
+    codegen_copy_z(g, nnz(), arg, res, arg_is_ref);
     g << g.mtimes(g.work(arg[1], dep(1).nnz(), arg_is_ref[1]), dep(1).sparsity(),
-                          g.work(arg[2], dep(2).nnz(), arg_is_ref[2]), dep(2).sparsity(),
-                          g.work(res[0], nnz(), false), sparsity(), "w", false) << '\n';
+                  g.work(arg[2], dep(2).nnz(), arg_is_ref[2]), dep(2).sparsity(),
+                  g.work(res[0], nnz(), false), sparsity(), "w", false) << '\n';
   }
 
-  void DenseMultiplication::
-  generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg,
-           const std::vector<casadi_int>& res,
-           const std::vector<bool>& arg_is_ref,
-           std::vector<bool>& res_is_ref) const {
-    // Copy first argument if not inplace
-    if (arg[0]!=res[0] || arg_is_ref[0]) {
-      g << g.copy(g.work(arg[0], nnz(), arg_is_ref[0]), nnz(),
-                          g.work(res[0], nnz(), false)) << '\n';
-    }
+  // ---------------- DenseMultiplication ----------------
 
-    casadi_int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
-    g.local("rr", "casadi_real", "*");
-    g.local("cs", "const casadi_real", "*");
-    g.local("ct", "const casadi_real", "*");
-    g.local("i", "casadi_int");
-    g.local("j", "casadi_int");
-    g.local("k", "casadi_int");
-    g << "for (i=0, rr=" << g.work(res[0], nnz(), false) <<"; i<" << ncol_y << "; ++i)"
-      << " for (j=0; j<" << nrow_x << "; ++j, ++rr)"
-      << " for (k=0, cs=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]) << "+j, ct="
-      << g.work(arg[2], dep(2).nnz(), arg_is_ref[2]) << "+i*" << nrow_y << "; "
-      << "k<" << nrow_y << "; ++k)"
-      << " *rr += cs[k*" << nrow_x << "]**ct++;\n";
+  MXNode* DenseMultiplication::try_create(const MX& z, const MX& x, const MX& y,
+                                          const std::string& blas) {
+    if (!(x.is_dense() && y.is_dense() && z.is_dense())) return nullptr;
+    return new DenseMultiplication(z, x, y, blas);
+  }
+
+  void DenseMultiplication::eval_kernel(const double** arg, double** res, double* w) const {
+    Blas::mtimes(blas_shorthand_,
+                 arg[1], dep(1).size1(), dep(1).size2(),
+                 arg[2], dep(2).size2(),
+                 res[0]);
+  }
+
+  void DenseMultiplication::eval_kernel(const SXElem** arg, SXElem** res, SXElem* w) const {
+    casadi_mtimes_dense(arg[1], dep(1).size1(), dep(1).size2(),
+                        arg[2], dep(2).size2(), res[0], false);
+  }
+
+  void DenseMultiplication::generate(CodeGenerator& g,
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref, std::vector<bool>& res_is_ref) const {
+    codegen_copy_z(g, nnz(), arg, res, arg_is_ref);
+    Blas::codegen_mtimes(g, blas_shorthand_,
+        g.work(arg[1], dep(1).nnz(), arg_is_ref[1]),
+        dep(1).size1(), dep(1).size2(),
+        g.work(arg[2], dep(2).nnz(), arg_is_ref[2]),
+        dep(2).size2(),
+        g.work(res[0], nnz(), false));
+  }
+
+  // ---------------- DenseSparseMultiplication ----------------
+
+  MXNode* DenseSparseMultiplication::try_create(const MX& z, const MX& x, const MX& y,
+                                                const std::string& blas) {
+    if (!(x.is_dense() && z.is_dense())) return nullptr;
+    return new DenseSparseMultiplication(z, x, y, blas);
+  }
+
+  void DenseSparseMultiplication::eval_kernel(const double** arg, double** res, double* w) const {
+    casadi_mtimes_dense_sparse(arg[1], dep(1).size1(),
+                               arg[2], dep(2).sparsity(), res[0]);
+  }
+
+  void DenseSparseMultiplication::eval_kernel(const SXElem** arg, SXElem** res, SXElem* w) const {
+    casadi_mtimes_dense_sparse(arg[1], dep(1).size1(),
+                               arg[2], dep(2).sparsity(), res[0]);
+  }
+
+  void DenseSparseMultiplication::generate(CodeGenerator& g,
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref, std::vector<bool>& res_is_ref) const {
+    codegen_copy_z(g, nnz(), arg, res, arg_is_ref);
+    g << g.mtimes_dense_sparse(g.work(arg[1], dep(1).nnz(), arg_is_ref[1]), dep(1).size1(),
+                               g.work(arg[2], dep(2).nnz(), arg_is_ref[2]), dep(2).sparsity(),
+                               g.work(res[0], nnz(), false)) << '\n';
+  }
+
+  // ---------------- PseudoDenseMultiplication ----------------
+
+  MXNode* PseudoDenseMultiplication::try_create(const MX& z, const MX& x, const MX& y,
+                                                const std::string& blas) {
+    // Result must have at least one nonzero for the compact-buffer reinterpretation
+    // to be meaningful.
+    if (z.nnz() == 0) return nullptr;
+    std::vector<casadi_int> xr, xc, yr, yc, zr, zc;
+    if (!x.sparsity().is_compactible(xr, xc)) return nullptr;
+    if (!y.sparsity().is_compactible(yr, yc)) return nullptr;
+    if (!z.sparsity().is_compactible(zr, zc)) return nullptr;
+    // Connecting index sets must agree exactly: cols(x) = rows(y), and
+    // result rows/cols inherit from x/y.
+    if (xc != yr || xr != zr || yc != zc) return nullptr;
+    return new PseudoDenseMultiplication(z, x, y,
+        static_cast<casadi_int>(xr.size()),
+        static_cast<casadi_int>(xc.size()),
+        static_cast<casadi_int>(yc.size()),
+        blas);
+  }
+
+  PseudoDenseMultiplication::PseudoDenseMultiplication(const MX& z, const MX& x, const MX& y,
+      casadi_int nrow_x_compact, casadi_int ncol_x_compact, casadi_int ncol_y_compact,
+      const std::string& blas)
+    : Multiplication(z, x, y, blas),
+      a_(nrow_x_compact), b_(ncol_x_compact), c_(ncol_y_compact) {}
+
+  void PseudoDenseMultiplication::eval_kernel(const double** arg,
+      double** res, double* w) const {
+    Blas::mtimes(blas_shorthand_, arg[1], a_, b_, arg[2], c_, res[0]);
+  }
+
+  void PseudoDenseMultiplication::eval_kernel(const SXElem** arg,
+      SXElem** res, SXElem* w) const {
+    casadi_mtimes_dense(arg[1], a_, b_, arg[2], c_, res[0], false);
+  }
+
+  void PseudoDenseMultiplication::generate(CodeGenerator& g,
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref, std::vector<bool>& res_is_ref) const {
+    codegen_copy_z(g, nnz(), arg, res, arg_is_ref);
+    Blas::codegen_mtimes(g, blas_shorthand_,
+        g.work(arg[1], dep(1).nnz(), arg_is_ref[1]), a_, b_,
+        g.work(arg[2], dep(2).nnz(), arg_is_ref[2]), c_,
+        g.work(res[0], nnz(), false));
   }
 
   void Multiplication::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
-    s.pack("Multiplication::dense", false);
+    s.pack("Multiplication::kind", std::string("base"));
+  }
+
+  void Multiplication::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("Multiplication::blas",
+           std::string(Blas::name_for_shorthand(blas_shorthand_)));
+  }
+
+  Multiplication::Multiplication(DeserializingStream& s, bool legacy) : MXNode(s) {
+    if (legacy) {
+      blas_shorthand_ = 0;
+      return;
+    }
+    std::string blas;
+    s.unpack("Multiplication::blas", blas);
+    blas_shorthand_ = Blas::shorthand_for(blas);
   }
 
   void DenseMultiplication::serialize_type(SerializingStream& s) const {
-    MXNode::serialize_type(s); // NOLINT
-    s.pack("Multiplication::dense", true);
+    MXNode::serialize_type(s);
+    s.pack("Multiplication::kind", std::string("dense"));
+  }
+
+  void DenseSparseMultiplication::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("Multiplication::kind", std::string("dense_sparse"));
+  }
+
+  void PseudoDenseMultiplication::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("Multiplication::kind", std::string("pseudo_dense"));
+  }
+
+  void PseudoDenseMultiplication::serialize_body(SerializingStream& s) const {
+    Multiplication::serialize_body(s);
+    s.pack("PseudoDenseMultiplication::a", a_);
+    s.pack("PseudoDenseMultiplication::b", b_);
+    s.pack("PseudoDenseMultiplication::c", c_);
+  }
+
+  PseudoDenseMultiplication::PseudoDenseMultiplication(DeserializingStream& s)
+    : Multiplication(s) {
+    s.unpack("PseudoDenseMultiplication::a", a_);
+    s.unpack("PseudoDenseMultiplication::b", b_);
+    s.unpack("PseudoDenseMultiplication::c", c_);
   }
 
   MXNode* Multiplication::deserialize(DeserializingStream& s) {
-    bool dense;
-    s.unpack("Multiplication::dense", dense);
-    if (dense) {
-      return new DenseMultiplication(s);
+    // Wire-format detection.
+    //   pre 3.8: serialize_type packed a *bool* ("Multiplication::dense").
+    //     Body did NOT include a blas field. Two variants only --
+    //     DenseMultiplication and the generic Multiplication.
+    //   3.8+:    serialize_type packs a *string* ("Multiplication::kind"),
+    //     four variants, body always includes "Multiplication::blas".
+    //
+    // In debug mode the descriptor is on the wire and IS the discriminator;
+    // in non-debug mode we discriminate on the first wire byte: bool encodes
+    // as 2 hex chars whose first is 'a' or 'b'; string-length first byte is
+    // 'a'+(length%16), which for our kind names {"base","dense",
+    // "dense_sparse","pseudo_dense"} (lengths 4,5,12,12) is 'e','f','m','m'.
+    bool legacy_bool;
+    std::string kind;
+    if (s.debug()) {
+      std::string descr;
+      s.unpack(descr);
+      if (descr == "Multiplication::dense") {
+        legacy_bool = true;
+      } else {
+        casadi_assert(descr == "Multiplication::kind",
+            "Unexpected Multiplication descriptor: '" + descr + "'.");
+        legacy_bool = false;
+        s.unpack(kind);
+      }
     } else {
-      return new Multiplication(s);
+      const int p = s.peek_byte();
+      legacy_bool = (p == 'a' || p == 'b');
+      if (!legacy_bool) s.unpack("Multiplication::kind", kind);
     }
 
+    if (legacy_bool) {
+      bool dense;
+      if (s.debug()) s.unpack(dense);
+      else           s.unpack("Multiplication::dense", dense);
+      if (dense) return new DenseMultiplication(s, /*legacy=*/true);
+      return new Multiplication(s, /*legacy=*/true);
+    }
+
+    if (kind == "dense")        return new DenseMultiplication(s);
+    if (kind == "dense_sparse") return new DenseSparseMultiplication(s);
+    if (kind == "pseudo_dense") return new PseudoDenseMultiplication(s);
+    return new Multiplication(s);
   }
 
 } // namespace casadi
