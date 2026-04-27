@@ -2235,6 +2235,13 @@ include(GenerateExportHeader)
 feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
 string(REPLACE "\n" "\\n" feature_list "${feature_list}")
 
+# Forward LAPACK_LIBRARIES verbatim (semicolon-separated list of paths and/or
+# -l flags) to CasadiMeta::lapack_libraries(). Lets downstream tools (e.g.
+# the codegen regression test) stay agnostic to whether the build wired up
+# OpenBLAS, MKL, system BLAS, etc.
+set(casadi_lapack_libraries "${LAPACK_LIBRARIES}")
+string(REPLACE "\\" "/" casadi_lapack_libraries "${casadi_lapack_libraries}")
+
 get_directory_property( compiler_definitions COMPILE_DEFINITIONS )
 set(EXTRA_CXX_FLAGS_FROM_DEFS_LIST "")
 foreach(DEF ${compiler_definitions})
