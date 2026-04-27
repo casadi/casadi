@@ -1528,6 +1528,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_rank1_str, inst);
       break;
     case AUX_IAMAX:
+      add_auxiliary(AUX_FABS);
       this->auxiliaries << sanitize_source(casadi_iamax_str, inst);
       break;
     case AUX_INTERPN:
@@ -1578,6 +1579,7 @@ namespace casadi {
       break;
     case AUX_NORM_INF:
       add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_FABS);
       this->auxiliaries << sanitize_source(casadi_norm_inf_str, inst);
       break;
     case AUX_VECTOR_FMAX:
@@ -1590,6 +1592,7 @@ namespace casadi {
       break;
     case AUX_MASKED_NORM_INF:
       add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_FABS);
       this->auxiliaries << sanitize_source(casadi_masked_norm_inf_str, inst);
       break;
     case AUX_CLIP_MIN:
@@ -1661,6 +1664,7 @@ namespace casadi {
       break;
     case AUX_FINITE_DIFF:
       add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_FABS);
       add_auxiliary(AUX_NAN);
       add_auxiliary(AUX_ISFINITE);
       this->auxiliaries << sanitize_source(casadi_finite_diff_str, inst);
@@ -1691,6 +1695,7 @@ namespace casadi {
       add_auxiliary(AUX_MAX);
       add_auxiliary(AUX_FMIN);
       add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_FABS);
       add_auxiliary(AUX_TRANS);
       add_auxiliary(AUX_AXPY);
       add_auxiliary(AUX_MV);

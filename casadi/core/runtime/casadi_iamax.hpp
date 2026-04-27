@@ -17,6 +17,8 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// C-REPLACE "fabs" "casadi_fabs"
+
 // SYMBOL "iamax"
 template<typename T1>
 casadi_int casadi_iamax(casadi_int n, const T1* x, casadi_int inc_x) {

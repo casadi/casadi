@@ -20,6 +20,9 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// C-REPLACE "fabs" "casadi_fabs"
+// C-REPLACE "sign" "casadi_sign"
+
 // SYMBOL "lsqr_sym_ortho"
 template<typename T1>
 void casadi_dense_lsqr_sym_ortho(T1 a, T1 b, T1* cs, T1* sn, T1* rho) {
