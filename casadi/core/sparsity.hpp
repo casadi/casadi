@@ -594,6 +594,16 @@ namespace casadi {
     /// Check if the sparsity is a reshape of another
     bool is_reshape(const Sparsity& y) const;
 
+    /** \brief Check if the nonzero pattern is the Cartesian product of a row and a column subset
+
+        If true, returns the (sorted) row and column index sets such that
+        nz(i, j) <-> i in row and j in col. The nonzero buffer of a compactible
+        matrix in CCS is laid out exactly as a column-major dense
+        row.size() x col.size() matrix, so it can be consumed by dense kernels
+        without gather/scatter. */
+    bool is_compactible(std::vector<casadi_int>& SWIG_OUTPUT(row),
+                        std::vector<casadi_int>& SWIG_OUTPUT(col)) const;
+
     /// @{
     /** \brief Combine two sparsity patterns
 

@@ -3586,6 +3586,17 @@ namespace casadi {
     return true;
   }
 
+  bool SparsityInternal::is_compactible(std::vector<casadi_int>& row,
+                                        std::vector<casadi_int>& col) const {
+    // Nonempty rows: rows of sum2(*this) — an m x 1 sparse vector
+    // Nonempty cols: cols of sum1(*this) — a 1 x n sparse vector
+    Sparsity self = shared_from_this<Sparsity>();
+    row = Sparsity::sum2(self).get_row();
+    col = Sparsity::sum1(self).get_col();
+    // Compactible iff every (nonempty row) x (nonempty col) is a nonzero
+    return nnz() == static_cast<casadi_int>(row.size() * col.size());
+  }
+
   void SparsityInternal::spy(std::ostream &stream) const {
 
     // Index counter for each column

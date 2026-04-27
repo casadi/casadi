@@ -793,6 +793,11 @@ namespace casadi {
     return (*this)->is_reshape(*y);
   }
 
+  bool Sparsity::is_compactible(std::vector<casadi_int>& row,
+                                std::vector<casadi_int>& col) const {
+    return (*this)->is_compactible(row, col);
+  }
+
   std::size_t Sparsity::hash() const {
     return (*this)->hash();
   }

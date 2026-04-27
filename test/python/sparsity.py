@@ -567,6 +567,50 @@ class Sparsitytests(casadiTestCase):
         self.assertTrue(L.is_subset(R))
         self.assertFalse(R.is_subset(L))
 
+  def test_is_compactible(self):
+    self.message("is_compactible")
+    # A sparsity is compactible iff its nonzero pattern is the Cartesian
+    # product of a row subset and a column subset; the CCS buffer then
+    # equals a column-major dense row.size() x col.size() matrix.
+
+    # Cartesian (0,1), (2,1), (0,3), (2,3) — compactible with row {0,2}, col {1,3}
+    sp = Sparsity(4, 5)
+    sp.add_nz(0, 1); sp.add_nz(2, 1)
+    sp.add_nz(0, 3); sp.add_nz(2, 3)
+    is_compact, row_support, col_support = sp.is_compactible()
+    self.assertTrue(is_compact)
+    self.checkarray(row_support, [0, 2])
+    self.checkarray(col_support, [1, 3])
+
+    # Drop one nonzero: not a Cartesian product anymore.
+    sp_partial = Sparsity(4, 5)
+    sp_partial.add_nz(0, 1); sp_partial.add_nz(2, 1); sp_partial.add_nz(2, 3)
+    self.assertFalse(sp_partial.is_compactible()[0])
+
+    # rowcol() builds a compactible pattern by construction.
+    sp_rc = Sparsity.rowcol([0, 2], [1, 3], 4, 5)
+    is_compact, rs, cs = sp_rc.is_compactible()
+    self.assertTrue(is_compact)
+    self.checkarray(rs, [0, 2])
+    self.checkarray(cs, [1, 3])
+
+    # Empty sparsity: trivially compactible with empty row/col support.
+    sp_empty = Sparsity(3, 4)
+    is_compact, rs, cs = sp_empty.is_compactible()
+    self.assertTrue(is_compact)
+    self.checkarray(rs, [])
+    self.checkarray(cs, [])
+
+    # Dense sparsity: row support = all rows, col support = all cols.
+    sp_dense = Sparsity.dense(3, 4)
+    is_compact, rs, cs = sp_dense.is_compactible()
+    self.assertTrue(is_compact)
+    self.checkarray(rs, [0, 1, 2])
+    self.checkarray(cs, [0, 1, 2, 3])
+
+    # Diagonal of a 4x4: nonempty rows/cols both = {0..3} but nnz=4 ≠ 16.
+    sp_diag = Sparsity.diag(4)
+    self.assertFalse(sp_diag.is_compactible()[0])
 
 
 if __name__ == '__main__':
