@@ -1,5 +1,6 @@
 if(WITH_LAPACK)
   add_subdirectory(lapack)
+  add_subdirectory(blas_classic)
 endif()
 
 if(WITH_SUNDIALS)
@@ -104,6 +105,10 @@ endif()
 
 if(WITH_HPIPM)
   add_subdirectory(hpipm)
+endif()
+
+if(WITH_BLASFEO)
+  add_subdirectory(blasfeo)
 endif()
 
 if(WITH_FATROP)

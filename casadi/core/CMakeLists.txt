@@ -103,6 +103,7 @@ set(CASADI_PUBLIC
   resource.hpp
   archiver.hpp
   filesystem.hpp
+  blas.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -231,6 +232,7 @@ set(CASADI_INTERNAL
   resource.cpp                resource_internal.cpp                resource_internal.hpp
   archiver.cpp                archiver_impl.hpp
   filesystem.cpp              filesystem_impl.hpp
+  blas.cpp                    blas_impl.hpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp
