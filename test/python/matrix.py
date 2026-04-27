@@ -1120,7 +1120,44 @@ class Matrixtests(casadiTestCase):
     a = vertcat(1,2)
     self.assertTrue(isinstance(a,DM))
     self.checkarray(c.linspace(1,3,10),c.linspace(1.0,3.0,10))
-  
+
+  def test_linspace(self):
+    # CasADi's linspace must agree bit-for-bit with numpy.linspace, for
+    # DM (numeric) and for MX/SX after Function evaluation. This pins down
+    # the FP recipe so future refactors (incl. MX node-count optimizations)
+    # cannot silently change the numerics.
+    cases = [(1.0, 3.0), (-2.5, 7.25), (0.0, 1.0), (1e10, 1e-10), (-1.0, 1.0)]
+    sizes = [2, 3, 5, 10, 100, 1001]
+    for a, b in cases:
+      for n in sizes:
+        ref = numpy.linspace(a, b, n)
+
+        dm = numpy.array(c.linspace(DM(a), DM(b), n)).ravel()
+        self.assertTrue(numpy.array_equal(dm, ref),
+                        "DM linspace mismatch a=%g b=%g n=%d" % (a, b, n))
+
+        x = MX.sym('x'); y = MX.sym('y')
+        f = Function('f', [x, y], [c.linspace(x, y, n)])
+        mx = numpy.array(f(a, b)).ravel()
+        self.assertTrue(numpy.array_equal(mx, ref),
+                        "MX linspace mismatch a=%g b=%g n=%d" % (a, b, n))
+
+        x = SX.sym('x'); y = SX.sym('y')
+        f = Function('f', [x, y], [c.linspace(x, y, n)])
+        sx = numpy.array(f(a, b)).ravel()
+        self.assertTrue(numpy.array_equal(sx, ref),
+                        "SX linspace mismatch a=%g b=%g n=%d" % (a, b, n))
+
+  def test_linspace_mx_node_count(self):
+    # MX linspace should yield O(1) graph nodes regardless of nsteps.
+    x = MX.sym('x'); y = MX.sym('y')
+    n_small = n_nodes(c.linspace(x, y, 5))
+    n_large = n_nodes(c.linspace(x, y, 1000))
+    # Allow some slack but reject O(n) growth.
+    self.assertTrue(n_large < n_small + 5,
+                    "MX linspace node count grew with nsteps: %d -> %d"
+                    % (n_small, n_large))
+
   def test_permutation(self):
     n = 10
     numpy.random.seed(1)

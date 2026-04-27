@@ -2066,6 +2066,18 @@ namespace casadi {
     return x->get_repsum(n, m);
   }
 
+  MX MX::linspace(const MX& a, const MX& b, casadi_int nsteps) {
+    // Specialized over GenericMatrix<MX>::linspace to keep the MX graph
+    // O(1) in nsteps. The FP recipe (a + i*step interior, literal b at
+    // the endpoint) matches the generic implementation and numpy.linspace
+    // bit-for-bit; see test_linspace in test/python/matrix.py.
+    if (nsteps < 2) return b;
+    MX step = (b - a) / static_cast<double>(nsteps - 1);
+    std::vector<double> idx(nsteps - 1);
+    for (casadi_int i = 0; i < nsteps - 1; ++i) idx[i] = static_cast<double>(i);
+    return vertcat(std::vector<MX>{a + DM(idx) * step, b});
+  }
+
   MX MX::solve(const MX& a, const MX& b) {
     if (a.is_triu()) {
       // A is upper triangular

@@ -646,6 +646,7 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
+    static MX linspace(const MX& a, const MX& b, casadi_int nsteps);
     static MX jacobian(const MX& f, const MX& x, const Dict& opts = Dict());
     static MX hessian(const MX& f, const MX& x, const Dict& opts = Dict());
     static MX hessian(const MX& f, const MX& x, MX& g, const Dict& opts = Dict());
