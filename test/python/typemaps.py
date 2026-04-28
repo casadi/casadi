@@ -824,10 +824,12 @@ class typemaptests(casadiTestCase):
     print(SX(H_body_world))
 
   def test_issue_2625(self):
-    # This is obviously a bug
-    self.checkarray(np.inner(DM([1,0,1]),DM([1,0,1])), np.array([[1,0,1],[0,0,0],[1,0,1]]))
+    # np.inner is a true inner product, not the outer-product-shaped result the
+    # old buggy fallback produced.  np.outer is the outer product as expected.
+    self.checkarray(np.inner(DM([1,0,1]),DM([1,0,1])), np.array(2))
     self.checkarray(np.outer(DM([1,0,1]),DM([1,0,1])), np.array([[1,0,1],[0,0,0],[1,0,1]]))
-    #print(np.logical_or(DM([1,0,1]),DM([1,0,12])))
+
+    # Reductions on DM stay in DM via the casadi free functions.
     self.checkarray(np.add.accumulate(DM([1,0,1])),np.array([[1],[1],[2]]))
     self.checkarray(np.cumsum(DM([1,0,1])), np.array([1,1,2]))
     self.checkarray(np.sum(DM([1,0,1])),np.array(2))
@@ -837,30 +839,29 @@ class typemaptests(casadiTestCase):
     self.assertFalse(np.all(DM([[1,0,1],[0,1,0]])))
     self.assertTrue(np.any(DM([[1,0,1],[0,1,0]])))
 
-    for M in [SX,MX]:
-      with self.assertRaises(Exception):
-        np.inner(M([1,0,1]),M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
-      with self.assertRaises(Exception):
-        np.outer(M([1,0,1]),M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
+    # Reductions and inner/outer now work natively on symbolic types too.
+    def _eval(expr):
+      return Function("f", [], [expr])()["o0"]
 
-      with self.assertRaises(Exception):
-        np.add.accumulate(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
+    for M in [SX, MX]:
+      v = M([1, 0, 1])
+      self.checkarray(_eval(np.inner(v, v)), DM(2), digits=14)
+      self.checkarray(_eval(np.outer(v, v)),
+                      DM([[1, 0, 1], [0, 0, 0], [1, 0, 1]]), digits=14)
+      self.checkarray(_eval(casadi.vec(np.cumsum(v))),         DM([1, 1, 2]), digits=14)
+      self.checkarray(_eval(casadi.vec(np.add.accumulate(v))), DM([1, 1, 2]), digits=14)
+      self.checkarray(_eval(np.sum(v)),                        DM(2),         digits=14)
 
-      with self.assertRaises(Exception):
-        np.cumsum(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
-
-      with self.assertRaises(Exception):
-        np.sum(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
-      with self.assertRaises(Exception):
-        np.all(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
-      with self.assertRaises(Exception):
-        np.any(M([1,0,1]))  # pyright: ignore[reportAttributeAccessIssue]
-      with self.assertRaises(Exception):
-        np.sum(M([[1,0,1],[0,1,0]]))  # pyright: ignore[reportAttributeAccessIssue]
-      with self.assertRaises(Exception):
-        np.all(M([[1,0,1],[0,1,0]]))  # pyright: ignore[reportAttributeAccessIssue]
-      with self.assertRaises(Exception):
-        np.any(M([[1,0,1],[0,1,0]]))  # pyright: ignore[reportAttributeAccessIssue]
+    # logic_all / logic_any aren't defined for MX in casadi core.  np.all
+    # and np.any therefore still raise on MX, which our dispatch surfaces
+    # as a clean error rather than the old "Implicit conversion" warning.
+    with self.assertRaises(Exception):
+      np.all(MX([1, 0, 1]))               # pyright: ignore[reportAttributeAccessIssue]
+    with self.assertRaises(Exception):
+      np.any(MX([1, 0, 1]))               # pyright: ignore[reportAttributeAccessIssue]
+    # On SX they work fine.
+    self.checkarray(_eval(np.all(SX([1, 1, 1]))), DM(1))
+    self.checkarray(_eval(np.any(SX([0, 0, 1]))), DM(1))
 
 if __name__ == '__main__':
     unittest.main()

@@ -1486,8 +1486,14 @@ class SXtests(casadiTestCase):
 
   def test_numpy_error(self):
       x = SX.sym("x",3)
-      with self.assertInException("Use an equivalent CasADi function"):
-        np.linalg.norm(x)
+      # np.linalg.norm now works on symbolic types (it bridges to casadi.norm_2).
+      f = Function("f", [x], [np.linalg.norm(x)])
+      self.checkarray(f([3.0, 4.0, 0.0]), DM(5))
+      # Pick a function that genuinely has no casadi equivalent.  Our
+      # NEP-18 dispatch returns NotImplemented and numpy raises with a
+      # clear message naming the function.
+      with self.assertInException("argmax"):
+        np.argmax(x)
 
 
   def test_quadratic(self):

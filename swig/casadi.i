@@ -2709,6 +2709,150 @@ arctan2 = lambda x,y: _casadi.atan2(x, y)
 arctanh = lambda x: _casadi.atanh(x)
 arcsinh = lambda x: _casadi.asinh(x)
 arccosh = lambda x: _casadi.acosh(x)
+
+
+# numpy ufunc.__name__  ->  callable mapping casadi/numeric inputs to
+# a casadi result.  Single source of truth; adding a new ufunc means
+# adding one line.  Used by DM/SX/MX.__array_ufunc__ via
+# _numpy_ufunc_dispatch below.
+_NUMPY_UFUNC_DISPATCH = {
+    # --- unary ---
+    "negative":      lambda x: -x,
+    "positive":      lambda x:  x,
+    "absolute":      _casadi.fabs,
+    "fabs":          _casadi.fabs,
+    "sqrt":          _casadi.sqrt,
+    "square":        lambda x: x*x,
+    "reciprocal":    lambda x: 1/x,
+    "sign":          _casadi.sign,
+    "exp":           _casadi.exp,
+    "expm1":         _casadi.expm1,
+    "log":           _casadi.log,
+    "log1p":         _casadi.log1p,
+    "log10":         _casadi.log10,
+    "sin":           _casadi.sin,
+    "cos":           _casadi.cos,
+    "tan":           _casadi.tan,
+    "arcsin":        _casadi.asin,
+    "arccos":        _casadi.acos,
+    "arctan":        _casadi.atan,
+    "sinh":          _casadi.sinh,
+    "cosh":          _casadi.cosh,
+    "tanh":          _casadi.tanh,
+    "arcsinh":       _casadi.asinh,
+    "arccosh":       _casadi.acosh,
+    "arctanh":       _casadi.atanh,
+    "floor":         _casadi.floor,
+    "ceil":          _casadi.ceil,
+    "logical_not":   _casadi.logic_not,
+    # --- binary ---
+    "add":           _casadi.plus,
+    "subtract":      _casadi.minus,
+    "multiply":      _casadi.times,
+    "divide":        _casadi.rdivide,
+    "true_divide":   _casadi.rdivide,
+    "power":         _casadi.power,
+    "float_power":   _casadi.power,
+    "fmin":          _casadi.fmin,
+    "fmax":          _casadi.fmax,
+    "minimum":       _casadi.fmin,
+    "maximum":       _casadi.fmax,
+    # numpy.fmod follows C: sign of dividend.  Maps to casadi.fmod.
+    "fmod":          _casadi.fmod,
+    # numpy.mod / numpy.remainder follow Python %: sign of divisor.
+    # casadi.remainder is IEEE-754 (round-to-nearest); we need a-b*floor(a/b).
+    "remainder":     lambda x, y: x - y * _casadi.floor(x / y),
+    "arctan2":       _casadi.atan2,
+    "hypot":         _casadi.hypot,
+    "copysign":      _casadi.copysign,
+    "less":          _casadi.lt,
+    "less_equal":    _casadi.le,
+    "greater":       lambda x, y: _casadi.lt(y, x),
+    "greater_equal": lambda x, y: _casadi.le(y, x),
+    "equal":         _casadi.eq,
+    "not_equal":     _casadi.ne,
+    "logical_and":   _casadi.logic_and,
+    "logical_or":    _casadi.logic_or,
+    "matmul":        _casadi.mtimes,
+}
+
+def _np_reduce_sum(x, axis):
+    if axis is None:
+        return _casadi.sum(x)
+    if axis == 0:
+        return _casadi.sum1(x)
+    if axis == 1:
+        return _casadi.sum2(x)
+    raise ValueError("axis {0} is out of bounds for casadi 2-D array".format(axis))
+
+def _np_reduce_global(fn):
+    def go(x, axis):
+        if axis is not None:
+            raise NotImplementedError(
+                "casadi {0} only supports an axis-less reduction".format(fn.__name__))
+        return fn(x)
+    return go
+
+# numpy ufunc.__name__  ->  (reduce_handler, accumulate_handler) where each
+# takes (casadi_value, axis) and returns a casadi result (or raises to fall
+# back to numpy / give a clear error).
+_NUMPY_UFUNC_REDUCE = {
+    "add":         (_np_reduce_sum,
+                    lambda x, axis: _casadi.cumsum(x, 0 if axis is None else axis)),
+    "maximum":     (_np_reduce_global(_casadi.mmax), None),
+    "minimum":     (_np_reduce_global(_casadi.mmin), None),
+    "fmax":        (_np_reduce_global(_casadi.mmax), None),
+    "fmin":        (_np_reduce_global(_casadi.mmin), None),
+    "logical_and": (_np_reduce_global(_casadi.logic_all), None),
+    "logical_or":  (_np_reduce_global(_casadi.logic_any), None),
+}
+
+
+def _numpy_ufunc_dispatch(self, ufunc, method, inputs, kwargs):
+    # NEP-13 __array_ufunc__ implementation, shared by DM/SX/MX.
+    out = kwargs.pop("out", None)
+    if out is not None and any(o is not None
+                                for o in (out if isinstance(out, tuple) else (out,))):
+        return NotImplemented
+    for k in ("where", "casting", "order", "dtype", "subok", "signature",
+              "keepdims", "initial"):
+        kwargs.pop(k, None)
+
+    name = ufunc.__name__
+    if name.endswith(" (vectorized)"):       # numpy.frompyfunc decoration
+        name = name[:-len(" (vectorized)")]
+
+    if method == "__call__":
+        op = _NUMPY_UFUNC_DISPATCH.get(name)
+        if op is not None:
+            try:
+                return op(*inputs)
+            except (TypeError, ValueError, NotImplementedError):
+                pass
+        return _numpy_ufunc_fallback(self, ufunc, method, inputs, kwargs)
+
+    if method in ("reduce", "accumulate"):
+        entry = _NUMPY_UFUNC_REDUCE.get(name)
+        idx = 0 if method == "reduce" else 1
+        if entry is not None and entry[idx] is not None:
+            try:
+                return entry[idx](inputs[0], kwargs.get("axis", 0))
+            except (TypeError, ValueError, NotImplementedError):
+                pass
+
+    return _numpy_ufunc_fallback(self, ufunc, method, inputs, kwargs)
+
+
+def _numpy_ufunc_fallback(self, ufunc, method, inputs, kwargs):
+    # DM: round-trip via .full() to numpy and re-dispatch.
+    # Symbolic types (SX/MX): raise; there is no meaningful conversion.
+    if not hasattr(self, "full"):
+        raise TypeError(
+            "casadi {0} does not support numpy.{1}.{2}.  "
+            "Use the equivalent casadi function instead.".format(
+                type(self).__name__, ufunc.__name__, method))
+    new_inputs = tuple(x.full() if hasattr(x, "full") else x for x in inputs)
+    return getattr(ufunc, method)(*new_inputs, **kwargs)
 %}
 
 /* `inf` and `pi` exist at runtime (casadi/core const doubles) but are
@@ -3014,99 +3158,30 @@ class NZproxy:
 
   __array_priority__ = arraypriority
 
-  def __array_wrap__(self,out_arr,context=None):
-    if context is None:
-      return out_arr
-    name = context[0].__name__
-    args = list(context[1])
-
-    if len(context[1])==3:
-      raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name)
-
-    if "vectorized" in name:
-        name = name[:-len(" (vectorized)")]
-
-    conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt", "equal": "eq", "not_equal": "ne"}
-    if name in conversion:
-      name = conversion[name]
-    if len(context[1])==2 and context[1][1] is self and not(context[1][0] is self):
-      name = 'r' + name
-      args.reverse()
-    if not(hasattr(self,name)) or ('mul' in name):
-      name = '__' + name + '__'
-    fun=getattr(self, name)
-    return fun(*args[1:])
-
   def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
-    conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt", "equal": "eq", "not_equal": "ne"}
-    name = ufunc.__name__
-    inputs = list(inputs)
-    if len(inputs)==3:
-      import warnings
-      warnings.warn("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name, RuntimeWarning)
-      return NotImplemented
-    if "vectorized" in name:
-        name = name[:-len(" (vectorized)")]
-    if name in conversion:
-      name = conversion[name]
-    if len(inputs)==2 and inputs[1] is self and not(inputs[0] is self):
-      name = 'r' + name
-      inputs.reverse()
-    if not(hasattr(self,name)) or ('mul' in name):
-      name = '__' + name + '__'
-    if method=="reduce" and name=="add":
-      assert len(inputs)==1
-      axis = kwargs["axis"]
-      if axis is None:
-          return inputs[0].sum()
-      else:
-          return inputs[0].sum(axis)
-    try:
-      assert method=="__call__"
-      fun=getattr(self, name)
-      return fun(*inputs[1:])
-    except Exception as e:
-      if "Dimension mismatch" in str(e):
-        import sys
-        if sys.version_info[0] < 3:
-            raise RuntimeError(str(e))
-        else:
-            raise e
-      # Fall back to numpy conversion
-      new_inputs = list(inputs)
+      return _numpy_ufunc_dispatch(self, ufunc, method, inputs, kwargs)
+
+  def __array_function__(self, func, types, args, kwargs):
+      return _numpy_array_function_dispatch(self, func, types, args, kwargs)
+
+  def __array__(self, *args, **kwargs):
+      import numpy as _n
       try:
-        new_inputs[0] = new_inputs[0].full()
-      except:
-        import warnings
-        warnings.warn("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
-                               + "This may occur when you pass a CasADi object to a numpy function.\n"
-                               + "Use an equivalent CasADi function instead of that numpy function.", RuntimeWarning)
-        return NotImplemented
-      return new_inputs[0].__array_ufunc__(ufunc, method, *new_inputs, **kwargs)
-
-
-  def __array__(self,*args,**kwargs):
-    import numpy as n
-    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc) and isinstance(args[1][0],n.ufunc) and len(args[1])>1 and args[1][0].nin==len(args[1][1]):
-      if len(args[1][1])==3:
-        raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b'. This is not supported when 'a' is a numpy type, and cannot be supported without changing numpy itself. Either upgrade a to a CasADi type first, or use 'a = a + b'. " % args[1][0].__name__)
-      return n.array([n.nan])
-    else:
-      if hasattr(self,'__array_custom__'):
-        return self.__array_custom__(*args,**kwargs)
-      else:
-        try:
-          return self.full()
-        except:
+          arr = self.full()
+      except Exception:
           if self.is_scalar(True):
-            # Needed for #2743
-            E=n.empty((),dtype=object)
-            E[()] = self
-            return E
-          else:
-            raise Exception("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
-                      + "This may occur when you pass a CasADi object to a numpy function.\n"
-                      + "Use an equivalent CasADi function instead of that numpy function.")
+              # Box symbolic scalars in an object array (#2743).
+              E = _n.empty((), dtype=object)
+              E[()] = self
+              return E
+          raise TypeError(
+              "Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
+              "This may occur when you pass a CasADi object to a numpy function.\n"
+              "Use an equivalent CasADi function instead of that numpy function.")
+      dtype = kwargs.get("dtype")
+      if dtype is not None and dtype is not _n.double:
+          return _n.array(arr, dtype=dtype)
+      return arr
 
 %}
 /* __array__ makes DM / SX / MX acceptable where numpy / scipy expect
@@ -4256,20 +4331,6 @@ namespace casadi{
 
 %python_array_wrappers(999.0)
 
-// The following code has some trickery to fool numpy ufunc.
-// Normally, because of the presence of __array__, an ufunctor like nump.sqrt
-// will unleash its activity on the output of __array__
-// However, we wish DM to remain a DM
-// So when we receive a call from a functor, we return a dummy empty array
-// and return the real result during the postprocessing (__array_wrap__) of the functor.
-%pythoncode %{
-  def __array_custom__(self,*args,**kwargs):
-    if "dtype" in kwargs and not(isinstance(kwargs["dtype"],n.double)):
-      return n.array(self.full(),dtype=kwargs["dtype"])
-    else:
-      return self.full()
-%}
-
 %pythoncode %{
   def tocsc(self):
     import numpy as np
@@ -5093,8 +5154,307 @@ class global_unpickle_context:
         return self.ctx
 
     def __exit__(self, *args):
-        _thread_local.casadi_unpickle_ctx = None  
+        _thread_local.casadi_unpickle_ctx = None
 %}
+
+%pythoncode %{
+
+# NEP 18 (__array_function__) bridge.
+#
+# Lets casadi values participate in calls like np.concatenate, np.where,
+# np.reshape, np.linalg.solve, ...  numpy invokes __array_function__ on
+# the first argument that defines it; we look the function up in
+# _NUMPY_FUNCTION_DISPATCH below and either delegate to the casadi
+# equivalent or return NotImplemented (so numpy falls back to its
+# default).  The table is built lazily on first dispatch because the
+# numpy module isn't guaranteed to be importable at SWIG-init time.
+
+_NUMPY_FUNCTION_DISPATCH = None
+
+def _is_casadi_value(x):
+    return isinstance(x, (DM, SX, MX))
+
+def _np_concatenate(arrays, axis=0, **kw):
+    arrays = list(arrays)
+    if axis == 0 or axis is None:
+        return vertcat(*arrays)
+    if axis == 1:
+        return horzcat(*arrays)
+    return NotImplemented
+
+def _np_vstack(tup, **kw):
+    return vertcat(*tup)
+
+def _np_hstack(tup, **kw):
+    return horzcat(*tup)
+
+def _np_stack(arrays, axis=0, **kw):
+    if axis == 0:
+        return vertcat(*[a.T if hasattr(a, "T") else a for a in arrays])
+    if axis == 1:
+        return horzcat(*arrays)
+    return NotImplemented
+
+def _np_column_stack(tup):
+    return horzcat(*[a if hasattr(a, "shape") and len(a.shape) > 1 and a.shape[1] > 0 else
+                     reshape(a, (-1, 1)) for a in tup])
+
+def _np_where(condition, x=None, y=None):
+    if x is None and y is None:
+        return NotImplemented   # nz-index variant: leave to numpy
+    return if_else(condition, x, y, True)
+
+def _np_reshape(a, newshape, order='C'):
+    # casadi.reshape is column-major (Fortran).  numpy default is C-order
+    # (row-major).  Transpose-reshape-transpose to get numpy semantics.
+    if isinstance(newshape, int):
+        newshape = (newshape, 1)
+    if len(newshape) == 1:
+        newshape = (newshape[0], 1)
+    m, n = int(newshape[0]), int(newshape[1])
+    if order == 'F':
+        return reshape(a, m, n)
+    if order == 'C':
+        return reshape(a.T, n, m).T
+    return NotImplemented
+
+def _np_transpose(a, axes=None):
+    if axes is not None and tuple(axes) not in ((0, 1), (1, 0)):
+        return NotImplemented
+    return a.T
+
+def _np_dot(a, b, out=None):
+    if out is not None:
+        return NotImplemented
+    if hasattr(a, "is_vector") and a.is_vector() and hasattr(b, "is_vector") and b.is_vector():
+        return dot(a, b)
+    return mtimes(a, b)
+
+def _np_inner(a, b):
+    return dot(a, b)
+
+def _np_outer(a, b, out=None):
+    if out is not None:
+        return NotImplemented
+    return mtimes(reshape(a, (-1, 1)), reshape(b, (1, -1)))
+
+def _np_cumsum(a, axis=None, **kw):
+    return cumsum(a, 0 if axis is None else int(axis))
+
+def _np_repeat(a, repeats, axis=None):
+    if axis is None:
+        a = vec(a)
+        return repmat(a, int(repeats), 1) if False else None  # not equivalent
+    return NotImplemented
+
+def _np_tile(a, reps):
+    if isinstance(reps, int):
+        return repmat(a, int(reps), 1)
+    if len(reps) == 1:
+        return repmat(a, 1, int(reps[0]))
+    if len(reps) == 2:
+        return repmat(a, int(reps[0]), int(reps[1]))
+    return NotImplemented
+
+def _np_zeros_like(a, **kw):
+    return type(a).zeros(a.sparsity()) if hasattr(a, "sparsity") else NotImplemented
+
+def _np_ones_like(a, **kw):
+    return type(a).ones(a.sparsity()) if hasattr(a, "sparsity") else NotImplemented
+
+def _np_full_like(a, fill_value, **kw):
+    return type(a)(a.sparsity(), fill_value) if hasattr(a, "sparsity") else NotImplemented
+
+def _np_sum(a, axis=None, **kw):
+    if axis is None:
+        return sum1(sum2(a))     # total sum, kept symbolic
+    if axis == 0:
+        return sum1(a)
+    if axis == 1:
+        return sum2(a)
+    raise ValueError("axis {0} is out of bounds for casadi 2-D array".format(axis))
+
+def _np_max(a, axis=None, **kw):
+    if axis is None:
+        return mmax(a)
+    return NotImplemented
+
+def _np_min(a, axis=None, **kw):
+    if axis is None:
+        return mmin(a)
+    return NotImplemented
+
+def _np_all(a, axis=None, **kw):
+    if axis is None:
+        return logic_all(a)
+    return NotImplemented
+
+def _np_any(a, axis=None, **kw):
+    if axis is None:
+        return logic_any(a)
+    return NotImplemented
+
+def _np_linalg_norm(a, ord=None, axis=None, keepdims=False):
+    if axis is not None or keepdims:
+        return NotImplemented
+    if ord is None or ord == 2 or ord == "fro":
+        return norm_fro(a) if ord == "fro" else norm_2(a)
+    if ord == 1:
+        return norm_1(a)
+    if ord in (float("inf"), "inf"):
+        return norm_inf(a)
+    return NotImplemented
+
+
+def _np_clip(a, a_min=None, a_max=None, **kw):
+    if a_min is not None:
+        a = fmax(a, a_min)
+    if a_max is not None:
+        a = fmin(a, a_max)
+    return a
+
+
+def _np_diff(a, n=1, axis=-1, **kw):
+    if n != 1 or axis not in (-1, 0, 1):
+        return NotImplemented
+    return diff(a)
+
+
+def _np_diag(v, k=0):
+    # numpy.diag has two modes:
+    #   1-D input  -> diagonal matrix (with optional offset k)
+    #   2-D input  -> diagonal extracted as 1-D
+    if k != 0:
+        return NotImplemented
+    return diag(v)
+
+
+def _np_roll(a, shift, axis=None):
+    # 1-D roll equivalent: vec the input, slice and concat.
+    if axis is None:
+        flat = vec(a)
+        n = flat.shape[0]
+        s = int(shift) % n if n else 0
+        if s == 0:
+            return reshape(flat, a.shape[0], a.shape[1])
+        rolled = vertcat(flat[n - s:], flat[:n - s])
+        return reshape(rolled, a.shape[0], a.shape[1])
+    if axis == 0:
+        m = a.shape[0]
+        if m == 0:
+            return a
+        s = int(shift) % m
+        if s == 0:
+            return a
+        return vertcat(a[m - s:, :], a[:m - s, :])
+    if axis == 1:
+        n = a.shape[1]
+        if n == 0:
+            return a
+        s = int(shift) % n
+        if s == 0:
+            return a
+        return horzcat(a[:, n - s:], a[:, :n - s])
+    return NotImplemented
+
+
+def _np_atleast_1d(*arys):
+    # casadi values are always >= 2-D; just pass through unchanged.
+    return arys[0] if len(arys) == 1 else list(arys)
+
+
+def _np_atleast_2d(*arys):
+    return arys[0] if len(arys) == 1 else list(arys)
+
+def _build_numpy_function_dispatch():
+    import numpy as np
+    d = {
+        np.concatenate:   _np_concatenate,
+        np.vstack:        _np_vstack,
+        np.hstack:        _np_hstack,
+        np.stack:         _np_stack,
+        np.column_stack:  _np_column_stack,
+        np.where:         _np_where,
+        np.reshape:       _np_reshape,
+        np.transpose:     _np_transpose,
+        np.dot:           _np_dot,
+        np.matmul:        _np_dot,
+        np.inner:         _np_inner,
+        np.outer:         _np_outer,
+        np.kron:          lambda a, b: kron(a, b),
+        np.cross:         lambda a, b, **kw: cross(a, b),
+        np.diag:          lambda v, k=0: diag(v) if k == 0 else NotImplemented,
+        np.trace:         lambda a, **kw: trace(a) if hasattr(a, "shape") else NotImplemented,
+        np.repeat:        _np_repeat,
+        np.tile:          _np_tile,
+        np.zeros_like:    _np_zeros_like,
+        np.ones_like:     _np_ones_like,
+        np.full_like:     _np_full_like,
+        np.cumsum:        _np_cumsum,
+        np.sum:           _np_sum,
+        np.max:           _np_max,
+        np.min:           _np_min,
+        np.amax:          _np_max,
+        np.amin:          _np_min,
+        np.all:           _np_all,
+        np.any:           _np_any,
+        np.linspace:      lambda start, stop, num=50, **kw: linspace(start, stop, int(num)),
+        np.linalg.norm:   _np_linalg_norm,
+        np.linalg.det:    lambda a: det(a),
+        np.linalg.inv:    lambda a: inv(a),
+        np.linalg.solve:  lambda a, b: solve(a, b),
+        np.linalg.cholesky: lambda a: chol(a).T,
+        np.clip:          _np_clip,
+        np.diff:          _np_diff,
+        np.roll:          _np_roll,
+        np.atleast_1d:    _np_atleast_1d,
+        np.atleast_2d:    _np_atleast_2d,
+        np.real:          lambda a: a,
+        np.imag:          lambda a: type(a).zeros(a.sparsity()) if hasattr(a, "sparsity") else NotImplemented,
+        np.conj:          lambda a: a,
+        np.conjugate:     lambda a: a,
+    }
+    # numpy.diag dispatches via __array_function__ and ours respects k=0.
+    d[np.diag] = _np_diag
+    # np.prod / np.cumprod / np.argmax / np.argmin / np.sort / np.unique / np.eig
+    # have no casadi equivalent: numpy fallback (or NotImplemented for symbolic).
+    return d
+
+
+def _numpy_array_function_dispatch(self, func, types, args, kwargs):
+    global _NUMPY_FUNCTION_DISPATCH
+    if _NUMPY_FUNCTION_DISPATCH is None:
+        try:
+            _NUMPY_FUNCTION_DISPATCH = _build_numpy_function_dispatch()
+        except Exception:
+            _NUMPY_FUNCTION_DISPATCH = {}
+    handler = _NUMPY_FUNCTION_DISPATCH.get(func)
+    if handler is not None:
+        # TypeError / AttributeError indicate the handler couldn't bind
+        # to the call (wrong signature, missing attribute) -- fall
+        # through to the numpy fallback below.  Other exceptions
+        # propagate so misuse surfaces with a clear message.
+        try:
+            return handler(*args, **kwargs)
+        except (TypeError, AttributeError):
+            pass
+    # No casadi handler: if all casadi operands are DM, convert to
+    # numpy and call the original numpy function.  This keeps things
+    # like np.linalg.eig(DM) working out-of-the-box -- the alternative
+    # is numpy raising "no implementation found" because we declared
+    # __array_function__ but didn't handle the call.  For symbolic
+    # types there is nothing meaningful to fall back to.
+    if all(t is DM for t in types):
+        new_args = tuple(a.full() if isinstance(a, DM)
+                         else [x.full() if isinstance(x, DM) else x for x in a]
+                              if isinstance(a, (list, tuple))
+                              and any(isinstance(x, DM) for x in a)
+                         else a
+                         for a in args)
+        return func(*new_args, **kwargs)
+    return NotImplemented
+%}
+
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
 %extend casadi::DeserializerBase {
