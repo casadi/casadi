@@ -1914,7 +1914,7 @@ class NLPtests(casadiTestCase):
 
       res = solver(x0=x0)
 
-      self.checkarray(x0-np.linalg.solve(Hcvx,H @ x0),res["x"])
+      self.checkarray(x0-np.linalg.solve(np.array(Hcvx),np.array(H @ x0)),res["x"])
 
       self.check_serialize(solver,{"x0":x0})
 

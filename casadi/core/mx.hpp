@@ -244,6 +244,7 @@ namespace casadi {
                   bool ind1=false);
 
     MX operator-() const;
+    MX operator+() const { return *this; }
 
     /** \brief Element-wise inverse
 

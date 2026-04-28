@@ -2686,20 +2686,7 @@ PyOS_setsig(SIGINT, SigIntHandler);
 %}
 #endif // WITH_PYTHON_INTERRUPTS
 
-%pythoncode%{
-try:
-  from numpy import pi, inf, sum
-except:
-  pass
-
-arcsin = lambda x: _casadi.asin(x)
-arccos = lambda x: _casadi.acos(x)
-arctan = lambda x: _casadi.atan(x)
-arctan2 = lambda x,y: _casadi.atan2(x, y)
-arctanh = lambda x: _casadi.atanh(x)
-arcsinh = lambda x: _casadi.asinh(x)
-arccosh = lambda x: _casadi.acosh(x)
-%}
+%pythoncode "numpy_bridge.py"
 
 /* `inf` and `pi` exist at runtime (casadi/core const doubles) but are
  * deliberately NOT declared in the stub.  numpy declares both as
@@ -2998,99 +2985,30 @@ class NZproxy:
 
   __array_priority__ = arraypriority
 
-  def __array_wrap__(self,out_arr,context=None):
-    if context is None:
-      return out_arr
-    name = context[0].__name__
-    args = list(context[1])
-
-    if len(context[1])==3:
-      raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name)
-
-    if "vectorized" in name:
-        name = name[:-len(" (vectorized)")]
-
-    conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt", "equal": "eq", "not_equal": "ne"}
-    if name in conversion:
-      name = conversion[name]
-    if len(context[1])==2 and context[1][1] is self and not(context[1][0] is self):
-      name = 'r' + name
-      args.reverse()
-    if not(hasattr(self,name)) or ('mul' in name):
-      name = '__' + name + '__'
-    fun=getattr(self, name)
-    return fun(*args[1:])
-
   def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
-    conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt", "equal": "eq", "not_equal": "ne"}
-    name = ufunc.__name__
-    inputs = list(inputs)
-    if len(inputs)==3:
-      import warnings
-      warnings.warn("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name, RuntimeWarning)
-      return NotImplemented
-    if "vectorized" in name:
-        name = name[:-len(" (vectorized)")]
-    if name in conversion:
-      name = conversion[name]
-    if len(inputs)==2 and inputs[1] is self and not(inputs[0] is self):
-      name = 'r' + name
-      inputs.reverse()
-    if not(hasattr(self,name)) or ('mul' in name):
-      name = '__' + name + '__'
-    if method=="reduce" and name=="add":
-      assert len(inputs)==1
-      axis = kwargs["axis"]
-      if axis is None:
-          return inputs[0].sum()
-      else:
-          return inputs[0].sum(axis)
-    try:
-      assert method=="__call__"
-      fun=getattr(self, name)
-      return fun(*inputs[1:])
-    except Exception as e:
-      if "Dimension mismatch" in str(e):
-        import sys
-        if sys.version_info[0] < 3:
-            raise RuntimeError(str(e))
-        else:
-            raise e
-      # Fall back to numpy conversion
-      new_inputs = list(inputs)
+      return _numpy_ufunc_dispatch(self, ufunc, method, inputs, kwargs)
+
+  def __array_function__(self, func, types, args, kwargs):
+      return _numpy_array_function_dispatch(self, func, types, args, kwargs)
+
+  def __array__(self, *args, **kwargs):
+      import numpy as _n
       try:
-        new_inputs[0] = new_inputs[0].full()
-      except:
-        import warnings
-        warnings.warn("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
-                               + "This may occur when you pass a CasADi object to a numpy function.\n"
-                               + "Use an equivalent CasADi function instead of that numpy function.", RuntimeWarning)
-        return NotImplemented
-      return new_inputs[0].__array_ufunc__(ufunc, method, *new_inputs, **kwargs)
-
-
-  def __array__(self,*args,**kwargs):
-    import numpy as n
-    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc) and isinstance(args[1][0],n.ufunc) and len(args[1])>1 and args[1][0].nin==len(args[1][1]):
-      if len(args[1][1])==3:
-        raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b'. This is not supported when 'a' is a numpy type, and cannot be supported without changing numpy itself. Either upgrade a to a CasADi type first, or use 'a = a + b'. " % args[1][0].__name__)
-      return n.array([n.nan])
-    else:
-      if hasattr(self,'__array_custom__'):
-        return self.__array_custom__(*args,**kwargs)
-      else:
-        try:
-          return self.full()
-        except:
+          arr = self.full()
+      except Exception:
           if self.is_scalar(True):
-            # Needed for #2743
-            E=n.empty((),dtype=object)
-            E[()] = self
-            return E
-          else:
-            raise Exception("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
-                      + "This may occur when you pass a CasADi object to a numpy function.\n"
-                      + "Use an equivalent CasADi function instead of that numpy function.")
+              # Box symbolic scalars in an object array (#2743).
+              E = _n.empty((), dtype=object)
+              E[()] = self
+              return E
+          raise TypeError(
+              "Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
+              "This may occur when you pass a CasADi object to a numpy function.\n"
+              "Use an equivalent CasADi function instead of that numpy function.")
+      dtype = kwargs.get("dtype")
+      if dtype is not None and dtype is not _n.double:
+          return _n.array(arr, dtype=dtype)
+      return arr
 
 %}
 /* __array__ makes DM / SX / MX acceptable where numpy / scipy expect
@@ -4240,20 +4158,6 @@ namespace casadi{
 
 %python_array_wrappers(999.0)
 
-// The following code has some trickery to fool numpy ufunc.
-// Normally, because of the presence of __array__, an ufunctor like nump.sqrt
-// will unleash its activity on the output of __array__
-// However, we wish DM to remain a DM
-// So when we receive a call from a functor, we return a dummy empty array
-// and return the real result during the postprocessing (__array_wrap__) of the functor.
-%pythoncode %{
-  def __array_custom__(self,*args,**kwargs):
-    if "dtype" in kwargs and not(isinstance(kwargs["dtype"],n.double)):
-      return n.array(self.full(),dtype=kwargs["dtype"])
-    else:
-      return self.full()
-%}
-
 %pythoncode %{
   def tocsc(self):
     import numpy as np
@@ -4270,7 +4174,19 @@ namespace casadi{
       elif self.is_vector():
         return np.array(self.T.elements())
     return np.array(self.T.elements()).reshape(self.shape)
+  def to_numpy(self):
+    # Pandas-style densification hook.  matplotlib's
+    # cbook._unpack_to_numpy looks for `to_numpy()` before falling back
+    # to iteration, so defining it here makes plt.plot(DM) work without
+    # forcing densification through NEP-18 shape ops like np.atleast_1d.
+    return self.full()
 %}
+/* `tocsc` returns a scipy.sparse.csc_matrix; not type-importing scipy.sparse
+ * here keeps the stub independent of an optional dependency.  `Any` is the
+ * least-bad option until we also bridge scipy.sparse types. */
+%stub_method0(tocsc,    Any)
+%stub_method(toarray,   %arg(NDArray[np.float64] | float), simplify: bool = ...)
+%stub_method0(to_numpy, %arg(NDArray[np.float64]))
 
 
 %pythoncode %{
@@ -4280,11 +4196,6 @@ namespace casadi{
     if self.nnz()==0:
       return False
     return float(self)!=0
-%}
-
-%pythoncode %{
-  def __abs__(self):
-    return abs(float(self))
 %}
 
 }; // extend Matrix<double>
@@ -4835,10 +4746,16 @@ namespace casadi {
           return _casadi.mtimes(y, x)
         except NotImplementedError:
           return NotImplemented
+      def __imatmul__(x, y):
+        try:
+          return _casadi.mtimes(x, y)
+        except NotImplementedError:
+          return NotImplemented
     %}
     %stub_method0(__hash__, int)
     %stub_CasadiMatrix_binop(__matmul__)
     %stub_CasadiMatrix_binop(__rmatmul__)
+    %stub_CasadiMatrix_binop(__imatmul__)
   }
 }
 namespace casadi {
@@ -4850,10 +4767,20 @@ namespace casadi {
       def __rsub__(x, y): return _casadi.minus(y, x)
       def __mul__(x, y): return _casadi.times(x, y)
       def __rmul__(x, y): return _casadi.times(y, x)
-      def __div__(x, y): return _casadi.rdivide(x, y)
-      def __rdiv__(x, y): return _casadi.rdivide(y, x)
       def __truediv__(x, y): return _casadi.rdivide(x, y)
       def __rtruediv__(x, y): return _casadi.rdivide(y, x)
+      def __floordiv__(x, y): return _casadi.floor(_casadi.rdivide(x, y))
+      def __rfloordiv__(x, y): return _casadi.floor(_casadi.rdivide(y, x))
+      def __mod__(x, y):
+        return x - y * _casadi.floor(_casadi.rdivide(x, y))
+      def __rmod__(x, y):
+        return y - x * _casadi.floor(_casadi.rdivide(y, x))
+      def __divmod__(x, y):
+        q = _casadi.floor(_casadi.rdivide(x, y))
+        return (q, x - y * q)
+      def __rdivmod__(x, y):
+        q = _casadi.floor(_casadi.rdivide(y, x))
+        return (q, y - x * q)
       def __lt__(x, y): return _casadi.lt(x, y)
       def __rlt__(x, y): return _casadi.lt(y, x)
       def __le__(x, y): return _casadi.le(x, y)
@@ -4882,8 +4809,32 @@ namespace casadi {
         if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
           raise Exception("Cannot compare SX and MX objects for inequality")
         return r
-      def __pow__(x, n): return _casadi.power(x, n)
+      def __pow__(x, n, modulo=None):
+        p = _casadi.power(x, n)
+        if modulo is None:
+          return p
+        return p - modulo * _casadi.floor(_casadi.rdivide(p, modulo))
       def __rpow__(n, x): return _casadi.power(x, n)
+      def __round__(x, ndigits=None):
+        if ndigits is None:
+          return _casadi.if_else(x >= 0, _casadi.floor(x + 0.5),
+                                 _casadi.ceil(x - 0.5))
+        s = 10.0 ** ndigits
+        y = x * s
+        return _casadi.if_else(y >= 0, _casadi.floor(y + 0.5),
+                               _casadi.ceil(y - 0.5)) / s
+      def __trunc__(x):
+        return _casadi.if_else(x >= 0, _casadi.floor(x), _casadi.ceil(x))
+      def __floor__(x): return _casadi.floor(x)
+      def __ceil__(x):  return _casadi.ceil(x)
+      def __abs__(x):   return _casadi.fabs(x)
+      def __iadd__(x, y):      return _casadi.plus(x, y)
+      def __isub__(x, y):      return _casadi.minus(x, y)
+      def __imul__(x, y):      return _casadi.times(x, y)
+      def __itruediv__(x, y):  return _casadi.rdivide(x, y)
+      def __ifloordiv__(x, y): return _casadi.floor(_casadi.rdivide(x, y))
+      def __imod__(x, y):      return x - y * _casadi.floor(_casadi.rdivide(x, y))
+      def __ipow__(x, n):      return _casadi.power(x, n)
       def __arctan2__(x, y): return _casadi.atan2(x, y)
       def __rarctan2__(y, x): return _casadi.atan2(x, y)
       def fmin(x, y): return _casadi.fmin(x, y)
@@ -4938,11 +4889,25 @@ namespace casadi {
     %stub_CasadiMatrix_binop(__rmul__)
     %stub_CasadiMatrix_binop(__truediv__)
     %stub_CasadiMatrix_binop(__rtruediv__)
+    %stub_CasadiMatrix_binop(__floordiv__)
+    %stub_CasadiMatrix_binop(__rfloordiv__)
+    %stub_CasadiMatrix_binop(__mod__)
+    %stub_CasadiMatrix_binop(__rmod__)
     %stub_CasadiMatrix_binop(__pow__)
     %stub_CasadiMatrix_binop(__rpow__)
+    %stub_CasadiMatrix_binop(__iadd__)
+    %stub_CasadiMatrix_binop(__isub__)
+    %stub_CasadiMatrix_binop(__imul__)
+    %stub_CasadiMatrix_binop(__itruediv__)
+    %stub_CasadiMatrix_binop(__ifloordiv__)
+    %stub_CasadiMatrix_binop(__imod__)
+    %stub_CasadiMatrix_binop(__ipow__)
     %stub_CasadiMatrix_unop(__neg__)
     %stub_CasadiMatrix_unop(__pos__)
     %stub_CasadiMatrix_unop(__abs__)
+    %stub_CasadiMatrix_unop(__trunc__)
+    %stub_CasadiMatrix_unop(__floor__)
+    %stub_CasadiMatrix_unop(__ceil__)
     %stub_CasadiMatrix_cmp(__lt__)
     %stub_CasadiMatrix_cmp(__le__)
     %stub_CasadiMatrix_cmp(__gt__)
@@ -5088,8 +5053,21 @@ class global_unpickle_context:
         return self.ctx
 
     def __exit__(self, *args):
-        _thread_local.casadi_unpickle_ctx = None  
+        _thread_local.casadi_unpickle_ctx = None
 %}
+
+/* Pure-pythoncode classes -- SWIG doesn't see them, so the .pyi has to
+ * be hand-rolled.  Both are referenced from error messages
+ * (`Use ca.global_pickle_context(): ...`) and from test/python/serialize.py. */
+%stub_class_begin(global_pickle_context)
+%stub_method0(__enter__, StringSerializer)
+%stub_method(__exit__, None, *args: Any)
+
+%stub_class_begin(global_unpickle_context)
+%stub_method0(__enter__, StringDeserializer)
+%stub_method(__exit__, None, *args: Any)
+
+
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
 %extend casadi::DeserializerBase {

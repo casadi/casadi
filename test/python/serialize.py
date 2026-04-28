@@ -134,13 +134,13 @@ class SerializeTests(casadiTestCase):
         with self.assertInException("ca.global_pickle_context"):
             pickle.dumps(f)
 
-        with global_pickle_context():  # pyright: ignore[reportUndefinedVariable]
+        with global_pickle_context():
             serialized = pickle.dumps(f)
 
         with self.assertInException("ca.global_unpickle_context"):
             pickle.loads(serialized)
 
-        with global_unpickle_context():  # pyright: ignore[reportUndefinedVariable]
+        with global_unpickle_context():
             f_ref = pickle.loads(serialized)
             
         self.checkarray(evalf(jacobian(f_ref.b,f_ref.a)),1)
