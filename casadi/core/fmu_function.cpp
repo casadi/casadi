@@ -24,6 +24,7 @@
 
 
 #include "fmu_function.hpp"
+#include "blas_impl.hpp"
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 #include "dae_builder_internal.hpp"
@@ -988,7 +989,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Post-process Jacobian
   if (need_jac && !enable_forward_jacobian_) {
     // Copy transpose nonzeros to work vector
-    casadi_copy(jac_nz, adj_sp_.nnz(), w);
+    Blas::copy(jac_nz, adj_sp_.nnz(), w);
     // Calculate transpose, store in jac_nz
     casadi_trans(w, adj_sp_, jac_nz, jac_sp_, iw);
   }
@@ -1369,7 +1370,7 @@ void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int*
   casadi_int n = hess_sp_.size1();
   const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
   // Nonzero counters for transpose
-  casadi_copy(colind, n, iw);
+  Blas::copy(colind, n, iw);
   // Loop over Hessian columns
   for (casadi_int c = 0; c < n; ++c) {
     // Loop over nonzeros for the column
@@ -1419,7 +1420,7 @@ void FmuFunction::remove_nans(double *hess_nz, casadi_int* iw) const {
   for (casadi_int k = 0; k < hess_colors_nnz; ++k)
     iw[hess_colors_row[k]] = 1;
   // Nonzero counters for transpose
-  casadi_copy(colind, n, iw);
+  Blas::copy(colind, n, iw);
   // Loop over Hessian columns
   for (casadi_int c = 0; c < n; ++c) {
     // Loop over nonzeros for the column
@@ -1441,7 +1442,7 @@ void FmuFunction::make_symmetric(double *hess_nz, casadi_int* iw) const {
   casadi_int n = hess_sp_.size1();
   const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
   // Nonzero counters for transpose
-  casadi_copy(colind, n, iw);
+  Blas::copy(colind, n, iw);
   // Loop over Hessian columns
   for (casadi_int c = 0; c < n; ++c) {
     // Loop over nonzeros for the column

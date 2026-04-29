@@ -24,6 +24,7 @@
 
 
 #include "finite_differences.hpp"
+#include "blas_impl.hpp"
 
 namespace casadi {
 
@@ -250,7 +251,7 @@ int FiniteDiff::eval(const double** arg, double** res,
   double* y0 = w;
   for (casadi_int j=0; j<n_out; ++j) {
     const casadi_int nnz = derivative_of_.nnz_out(j);
-    casadi_copy(*arg++, nnz, w);
+    Blas::copy(*arg++, nnz, w);
     w += nnz;
   }
 
@@ -299,14 +300,14 @@ int FiniteDiff::eval(const double** arg, double** res,
         casadi_int off = 0;
         for (casadi_int j=0; j<n_in; ++j) {
           casadi_int nnz = derivative_of_.nnz_in(j);
-          casadi_copy(x0[j], nnz, z + off);
-          if (seed[j] && is_diff_in_[j]) casadi_axpy(nnz, pert(k, h), seed[j] + i*nnz, z + off);
+          Blas::copy(x0[j], nnz, z + off);
+          if (seed[j] && is_diff_in_[j]) Blas::axpy(nnz, pert(k, h), seed[j] + i*nnz, z + off);
           off += nnz;
         }
         // Evaluate
         if (derivative_of_(arg, res, iw, w)) return 1;
         // Save outputs
-        casadi_copy(y, n_y_, yk[k]);
+        Blas::copy(y, n_y_, yk[k]);
       }
       // Finite difference calculation with error estimate
       double u = calc_fd(yk, y0, J, h);
@@ -328,7 +329,7 @@ int FiniteDiff::eval(const double** arg, double** res,
     casadi_int off = 0;
     for (casadi_int j=0; j<n_out; ++j) {
       casadi_int nnz = derivative_of_.nnz_out(j);
-      if (sens[j]) casadi_copy(J + off, nnz, sens[j] + i*nnz);
+      if (sens[j]) Blas::copy(J + off, nnz, sens[j] + i*nnz);
       off += nnz;
     }
   }

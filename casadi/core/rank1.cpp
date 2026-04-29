@@ -24,6 +24,7 @@
 
 
 #include "rank1.hpp"
+#include "blas_impl.hpp"
 namespace casadi {
 
   Rank1::Rank1(const MX& A, const MX& alpha, const MX& x, const MX& y) {
@@ -72,7 +73,7 @@ namespace casadi {
 
   template<typename T>
   int Rank1::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
-    if (arg[0]!=res[0]) casadi_copy(arg[0], dep(0).nnz(), res[0]);
+    if (arg[0]!=res[0]) Blas::copy(arg[0], dep(0).nnz(), res[0]);
     casadi_rank1(res[0], sparsity(), *arg[1], arg[2], arg[3]);
     return 0;
   }

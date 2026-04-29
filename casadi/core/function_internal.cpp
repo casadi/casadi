@@ -24,6 +24,7 @@
 
 
 #include "function_internal.hpp"
+#include "blas_impl.hpp"
 #include "casadi_call.hpp"
 #include "call_sx.hpp"
 #include "casadi_misc.hpp"
@@ -3973,7 +3974,7 @@ namespace casadi {
         std::vector<DM> argv(n_in_);
         for (casadi_int i=0; i<n_in_; ++i) {
           argv[i] = DM(sparsity_in_[i]);
-          casadi_copy(arg[i], argv[i].nnz(), argv[i].ptr());
+          Blas::copy(arg[i], argv[i].nnz(), argv[i].ptr());
         }
 
         // Try to evaluate using eval_dm
@@ -3993,7 +3994,7 @@ namespace casadi {
                            "expected " + sparsity_out_[i].dim() + ".");
             }
           }
-          if (res[i]) casadi_copy(resv[i].ptr(), resv[i].nnz(), res[i]);
+          if (res[i]) Blas::copy(resv[i].ptr(), resv[i].nnz(), res[i]);
         }
       } catch (KeyboardInterruptException&) {
         throw;

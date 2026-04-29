@@ -70,6 +70,7 @@
 #include "resource.hpp"
 #include "archiver.hpp"
 #include "filesystem.hpp"
+#include "blas.hpp"
 #include "options.hpp"
 #include "blas.hpp"
 

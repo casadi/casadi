@@ -54,6 +54,27 @@ namespace casadi {
                        &beta, C, &ldc_);
   }
 
+  // -------------- L1 runtime forwarders (subset BLASFEO provides) --------------
+
+  static void blasfeo_daxpy(casadi_int n, double alpha,
+                            const double* x, double* y) {
+    casadi_assert(n <= INT_MAX,
+        "BLAS 'blasfeo' plugin: vector length exceeds 32-bit BLAS ABI.");
+    int n_ = static_cast<int>(n), inc = 1;
+    blasfeo_blas_daxpy(&n_, &alpha,
+                       const_cast<double*>(x), &inc, y, &inc);
+  }
+
+  static double blasfeo_ddot(casadi_int n,
+                             const double* x, const double* y) {
+    casadi_assert(n <= INT_MAX,
+        "BLAS 'blasfeo' plugin: vector length exceeds 32-bit BLAS ABI.");
+    int n_ = static_cast<int>(n), inc = 1;
+    return blasfeo_blas_ddot(&n_,
+                             const_cast<double*>(x), &inc,
+                             const_cast<double*>(y), &inc);
+  }
+
   static const char* BLASFEO_DECL =
   "/* BLAS \"blasfeo\" plugin: namespaced Fortran ABI, link with -lblasfeo */\n"
   "extern void blasfeo_blas_dgemm(char* transa, char* transb,\n"
@@ -63,6 +84,16 @@ namespace casadi {
   "                               double* B, int* ldb,\n"
   "                               double* beta,\n"
   "                               double* C, int* ldc);";
+
+  static const char* BLASFEO_DAXPY_DECL =
+  "extern void blasfeo_blas_daxpy(int* n, double* alpha,\n"
+  "                               double* x, int* incx,\n"
+  "                               double* y, int* incy);";
+
+  static const char* BLASFEO_DDOT_DECL =
+  "extern double blasfeo_blas_ddot(int* n,\n"
+  "                                double* x, int* incx,\n"
+  "                                double* y, int* incy);";
 
   static void blasfeo_codegen_mtimes(CodeGenerator& g,
       const std::string& A, casadi_int m, casadi_int k,
@@ -79,6 +110,40 @@ namespace casadi {
       << ", &blas_k, &blas_one, " << C << ", &blas_m);\n";
   }
 
+  // L1 codegen aux emitters. As with the classic plugin, externs go inline
+  // in `auxiliaries` so the wrappers referencing them see them defined.
+  // BLASFEO's APIs take non-const pointers; we cast away const at use sites.
+
+  static void blasfeo_codegen_axpy_aux(CodeGenerator& g,
+      const std::vector<std::string>& inst) {
+    static const char* SRC =
+        "// SYMBOL \"axpy\"\n"
+        "void casadi_axpy(casadi_int n, casadi_real alpha,\n"
+        "    const casadi_real* x, casadi_real* y) {\n"
+        "  int n_ = (int)n, inc = 1;\n"
+        "  blasfeo_blas_daxpy(&n_, &alpha, (double*)x, &inc, y, &inc);\n"
+        "}\n";
+    g.auxiliaries << BLASFEO_DAXPY_DECL << "\n";
+    g.auxiliaries << g.sanitize_source(SRC, inst);
+  }
+
+  // See classic plugin's analogous emitters for why we run the wrapper
+  // through sanitize_source (registers the shorthand, applies aux_static
+  // / aux_inline) but write the extern decl verbatim (it's a forward
+  // declaration, not a function body).
+  static void blasfeo_codegen_dot_aux(CodeGenerator& g,
+      const std::vector<std::string>& inst) {
+    static const char* SRC =
+        "// SYMBOL \"dot\"\n"
+        "casadi_real casadi_dot(casadi_int n,\n"
+        "    const casadi_real* x, const casadi_real* y) {\n"
+        "  int n_ = (int)n, inc = 1;\n"
+        "  return blasfeo_blas_ddot(&n_, (double*)x, &inc, (double*)y, &inc);\n"
+        "}\n";
+    g.auxiliaries << BLASFEO_DDOT_DECL << "\n";
+    g.auxiliaries << g.sanitize_source(SRC, inst);
+  }
+
   extern "C" int CASADI_BLAS_BLASFEO_EXPORT
   casadi_register_blas_blasfeo(Blas::Plugin* plugin) {
     plugin->name = "blasfeo";
@@ -86,6 +151,16 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->exposed.dgemm = &blasfeo_dgemm;
     plugin->exposed.codegen_mtimes = &blasfeo_codegen_mtimes;
+    plugin->exposed.daxpy = &blasfeo_daxpy;
+    plugin->exposed.ddot  = &blasfeo_ddot;
+    plugin->exposed.dscal = nullptr;
+    plugin->exposed.dnrm2 = nullptr;
+    plugin->exposed.dasum = nullptr;
+    plugin->exposed.codegen_axpy_aux = &blasfeo_codegen_axpy_aux;
+    plugin->exposed.codegen_dot_aux  = &blasfeo_codegen_dot_aux;
+    plugin->exposed.codegen_scal_aux = nullptr;
+    plugin->exposed.codegen_nrm2_aux = nullptr;
+    plugin->exposed.codegen_asum_aux = nullptr;
     plugin->options = nullptr;
     plugin->deserialize = nullptr;
     plugin->creator = nullptr;

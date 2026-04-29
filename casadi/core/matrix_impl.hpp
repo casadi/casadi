@@ -2143,7 +2143,7 @@ namespace casadi {
       Sparsity sp = x.sparsity() * y.sparsity();
       return dot(project(x, sp), project(y, sp));
     }
-    return casadi_dot(x.nnz(), x.ptr(), y.ptr());
+    return Blas::dot(x.nnz(), x.ptr(), y.ptr());
   }
 
   template<typename Scalar>
@@ -2168,7 +2168,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::norm_1(const Matrix<Scalar>& x) {
-    return casadi_norm_1(x.nnz(), x.ptr());
+    return Blas::norm_1(x.nnz(), x.ptr());
   }
 
   template<typename Scalar>
@@ -2183,7 +2183,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::norm_fro(const Matrix<Scalar>& x) {
-    return casadi_norm_2(x.nnz(), x.ptr());
+    return Blas::norm_2(x.nnz(), x.ptr());
   }
 
   template<typename Scalar>
