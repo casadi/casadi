@@ -24,6 +24,7 @@
 
 
 #include "mapsum.hpp"
+#include "blas_impl.hpp"
 #include "serializing_stream.hpp"
 
 namespace casadi {
@@ -206,7 +207,7 @@ namespace casadi {
     bvec_t* w_scratch = w + f_.sz_w();
     for (casadi_int j=0;j<n_out_;++j) {
       if (res[j] && reduce_out_[j]) {
-        casadi_copy(res[j], f_.nnz_out(j), w_scratch);
+        Blas::copy(res[j], f_.nnz_out(j), w_scratch);
         w_scratch += f_.nnz_out(j);
       }
     }
@@ -219,7 +220,7 @@ namespace casadi {
       w_scratch = w + f_.sz_w();
       for (casadi_int j=0;j<n_out_;++j) {
         if (res[j] && reduce_out_[j]) {
-          casadi_copy(w_scratch, f_.nnz_out(j), res1[j]);
+          Blas::copy(w_scratch, f_.nnz_out(j), res1[j]);
           w_scratch += f_.nnz_out(j);
         }
       }

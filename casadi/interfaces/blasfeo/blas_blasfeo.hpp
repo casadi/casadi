@@ -38,6 +38,17 @@ extern "C" {
                           double* B, int* ldb,
                           double* beta,
                           double* C, int* ldc);
+
+  /// BLASFEO L1 (subset): namespaced Fortran ABI. BLASFEO does not currently
+  /// expose dscal/dnrm2/dasum through its blas_api, so this plugin only
+  /// dispatches axpy and dot through BLASFEO and leaves the other L1 ops to
+  /// fall back to the reference impl.
+  void   blasfeo_blas_daxpy(int* n, double* alpha,
+                            double* x, int* incx,
+                            double* y, int* incy);
+  double blasfeo_blas_ddot(int* n,
+                            double* x, int* incx,
+                            double* y, int* incy);
 }
 
 /** \defgroup plugin_Blas_blasfeo Title

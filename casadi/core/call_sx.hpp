@@ -29,6 +29,7 @@
 #include "sx_node.hpp"
 #include "output_sx.hpp"
 #include "function.hpp"
+#include "blas_impl.hpp"
 #include <deque>
 #include <stack>
 
@@ -72,7 +73,7 @@ class CASADI_EXPORT CallSX : public SXNode {
       // Copy ret to res
       casadi_int offset = 0;
       for (casadi_int i=0;i<f.n_out();++i) {
-        casadi_copy(get_ptr(ret)+offset, f.nnz_out(i), res[i]);
+        Blas::copy(get_ptr(ret)+offset, f.nnz_out(i), res[i]);
         offset += f.nnz_out(i);
       }
 

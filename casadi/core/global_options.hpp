@@ -76,6 +76,8 @@ namespace casadi {
 
       static std::string temp_work_dir; // Temporary work directory
 
+      static std::string default_blas_;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -104,6 +106,9 @@ namespace casadi {
 
       static void setTempWorkDir(const std::string& dir);
       static std::string getTempWorkDir() { return temp_work_dir; }
+
+      static void setDefaultBlas(const std::string& name);
+      static std::string getDefaultBlas();
 
   };
 

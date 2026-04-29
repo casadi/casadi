@@ -24,6 +24,7 @@
 
 
 #include "dot.hpp"
+#include "blas_impl.hpp"
 namespace casadi {
 
   Dot::Dot(const MX& x, const MX& y) {
@@ -81,7 +82,7 @@ namespace casadi {
 
   template<typename T>
   int Dot::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
-    *res[0] = casadi_dot(dep(0).nnz(), arg[0], arg[1]);
+    *res[0] = Blas::dot(dep(0).nnz(), arg[0], arg[1]);
     return 0;
   }
 

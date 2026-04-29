@@ -1310,6 +1310,156 @@ class MXtests(casadiTestCase):
               if expected == dense_kernel[name] or name=="reference":
                 self.check_codegen(f, inputs=val_in, extralibs=extralibs)
 
+
+  def test_l1_blas_plugin(self):
+    # Counterpart to test_mtimes_blas_plugin, but for the L1 ops dispatched
+    # through GlobalOptions::setDefaultBlas: dot, norm_1, norm_2, plus axpy
+    # (which appears in MapSum codegen, not directly in MX). Simpler input
+    # space (vectors, no sparsity combinatorics) so we exercise more
+    # operations instead.
+
+    DM.rng(2)
+
+    plugins = ['reference']
+    for opt in ['classic', 'blasfeo']:
+      try:
+        load_blas(opt); plugins.append(opt)
+      except Exception:
+        pass
+
+    classic_libs = [t for t in CasadiMeta.lapack_libraries().split(";") if t]
+    plugin_extralibs = {
+        'reference': [],
+        'classic':   classic_libs,
+        'blasfeo':   ['blasfeo'],
+    }
+
+    # Per (plugin, op) -> substring that should appear in the generated C
+    # for the L1 op's auxiliary block. None means "this plugin falls back
+    # to reference for that op". The reference column documents the
+    # baseline shape (inline static definition of the casadi_*<T> body).
+    expected_kernel = {
+      ('reference', 'dot'    ): 'casadi_real casadi_dot(',
+      ('reference', 'norm_1' ): 'casadi_real casadi_norm_1(',
+      ('reference', 'norm_2' ): 'casadi_real casadi_norm_2(',
+      ('reference', 'axpy'   ): 'void casadi_axpy(',
+      # copy is never plugin-dispatched (no BLAS analog for the
+      # x==NULL -> zero-fill semantics); always emits the memcpy/memset
+      # body from Blas::codegen_copy_aux regardless of default_blas.
+      ('reference', 'copy'   ): 'memcpy(y, x',
+      ('classic',   'dot'    ): 'CASADI_BLAS_DDOT',
+      ('classic',   'norm_1' ): 'CASADI_BLAS_DASUM',
+      ('classic',   'norm_2' ): 'CASADI_BLAS_DNRM2',
+      ('classic',   'axpy'   ): 'CASADI_BLAS_DAXPY',
+      ('classic',   'copy'   ): 'memcpy(y, x',
+      ('blasfeo',   'dot'    ): 'blasfeo_blas_ddot',
+      # blasfeo plugin only supplies daxpy/ddot; norm_1/norm_2 fall back to
+      # the inline reference template (no namespaced extern emitted).
+      ('blasfeo',   'norm_1' ): 'casadi_real casadi_norm_1(',
+      ('blasfeo',   'norm_2' ): 'casadi_real casadi_norm_2(',
+      ('blasfeo',   'axpy'   ): 'blasfeo_blas_daxpy',
+      ('blasfeo',   'copy'   ): 'memcpy(y, x',
+    }
+
+    n = 7
+    x_sym = MX.sym('x', n)
+    y_sym = MX.sym('y', n)
+    x_val = DM.rand(n)
+    y_val = DM.rand(n)
+
+    # Reference: build once with the canonical (default_==0) backend so we
+    # can compare numerics across plugins. We rebuild f for each plugin
+    # because GlobalOptions.setDefaultBlas affects construction-time
+    # codegen (and therefore check_codegen / generate output) the same way
+    # it affects evaluation-time runtime dispatch.
+    GlobalOptions.setDefaultBlas("reference")
+
+    # Op -> (output expression, expected reference numeric value)
+    def build_ops():
+      return {
+        'dot':    dot(x_sym, y_sym),
+        'norm_1': norm_1(x_sym),
+        'norm_2': norm_2(x_sym),
+        # axpy: emitted inside MapSum codegen. Wrap a tiny inner Function
+        # and reduce-sum its output across N reps.
+      }
+
+    ref_ops = build_ops()
+    f_ref = Function('f_ref', [x_sym, y_sym], list(ref_ops.values()),
+                     ['x', 'y'], list(ref_ops.keys()))
+    ref_out = f_ref(x_val, y_val)
+
+    # Build the axpy carrier separately: a MapSum-shaped Function that the
+    # MX codegen lowers using g.axpy(...) -> AUX_AXPY.
+    inner_x = MX.sym('x', n)
+    inner = Function('inner', [inner_x], [2.0 * inner_x])
+    f_axpy_ref = inner.map(4, [False], [True])
+    f_axpy_inputs = [horzcat(*[x_val for _ in range(4)])]
+    f_axpy_ref_out = f_axpy_ref(*f_axpy_inputs)
+
+    try:
+      for name in plugins:
+        GlobalOptions.setDefaultBlas(name)
+        tag_base = "blas=%s" % name
+
+        # Numerics: each L1 op should agree with the reference baseline.
+        ops = build_ops()
+        f = Function('f', [x_sym, y_sym], list(ops.values()),
+                     ['x', 'y'], list(ops.keys()))
+        got = f(x_val, y_val)
+        for i, op_name in enumerate(ops.keys()):
+          self.checkarray(got[i], ref_out[i],
+                          "%s op=%s numerical agreement" % (tag_base, op_name))
+
+        # axpy via MapSum:
+        f_axpy = inner.map(4, [False], [True])
+        got_axpy = f_axpy(*f_axpy_inputs)
+        self.checkarray(got_axpy, f_axpy_ref_out,
+                        "%s op=axpy numerical agreement" % tag_base)
+
+        # Codegen: per-op kernel string check. Generate a function whose
+        # body uses *only* one op so the assertion isn't muddied by other
+        # auxiliaries that pull in unrelated symbols (e.g. AUX_NORM_2 also
+        # pulls AUX_DOT in the reference path).
+        per_op_carriers = {
+          'dot':    Function('g_dot',    [x_sym, y_sym], [dot(x_sym, y_sym)]),
+          'norm_1': Function('g_norm_1', [x_sym],        [norm_1(x_sym)]),
+          'norm_2': Function('g_norm_2', [x_sym],        [norm_2(x_sym)]),
+          'axpy':   inner.map(4, [False], [True]),
+          # Identity Function emits a casadi_copy from the input slot to the
+          # output slot during codegen, pulling in AUX_COPY.
+          'copy':   Function('g_copy',   [x_sym],        [x_sym]),
+        }
+        for op_name, g in per_op_carriers.items():
+          g.generate('l1.c')
+          with open('l1.c', 'r') as codefile:
+            code = codefile.read()
+          self.assertIn(expected_kernel[(name, op_name)], code,
+              "%s op=%s: expected %r in generated code"
+              % (tag_base, op_name, expected_kernel[(name, op_name)]))
+
+        # Serialization round-trip: the BLAS choice is a session-wide
+        # GlobalOption (not stored on the Function), so a deserialized
+        # Function picks up whatever default_blas is active at codegen
+        # time. Verify it round-trips to the SAME emission with the same
+        # default_blas in effect.
+        f.save('l1.casadi')
+        fdeser = Function.load('l1.casadi')
+        self.checkfunction_light(f, fdeser, inputs=[x_val, y_val])
+
+        # check_codegen end-to-end: compile + dlopen + evaluate. Skip for
+        # plugins where the Python bindings or system libs don't resolve.
+        extralibs = plugin_extralibs.get(name, [])
+        if name == 'reference' or extralibs:
+          self.check_codegen(f, inputs=[x_val, y_val], extralibs=extralibs)
+          # Also check the axpy carrier so the AUX_AXPY emission goes
+          # through the same compile+run gauntlet.
+          self.check_codegen(f_axpy, inputs=f_axpy_inputs, extralibs=extralibs)
+    finally:
+      # Restore so other tests in the session aren't surprised.
+      GlobalOptions.setDefaultBlas("reference")
+
+
   def test_truth(self):
     self.message("Truth values")
     self.assertRaises(Exception, lambda : bool(MX.sym("x")))

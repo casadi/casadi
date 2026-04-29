@@ -39,6 +39,18 @@ extern "C" {
               const double* b, const int* ldb,
               const double* beta,
               double* c, const int* ldc);
+
+  /// Fortran BLAS L1 (column-major, 32-bit ints, scalars passed by reference).
+  void daxpy_(const int* n, const double* alpha,
+              const double* x, const int* incx,
+              double* y, const int* incy);
+  double ddot_(const int* n,
+               const double* x, const int* incx,
+               const double* y, const int* incy);
+  void dscal_(const int* n, const double* alpha,
+              double* x, const int* incx);
+  double dnrm2_(const int* n, const double* x, const int* incx);
+  double dasum_(const int* n, const double* x, const int* incx);
 }
 
 /** \defgroup plugin_Blas_classic Title

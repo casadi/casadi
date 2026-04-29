@@ -24,6 +24,7 @@
 
 
 #include "integrator_impl.hpp"
+#include "blas_impl.hpp"
 #include "casadi_misc.hpp"
 
 namespace casadi {
@@ -514,7 +515,7 @@ int Integrator::eval(const double** arg, double** res,
     // adj_u should contain the contribution from the grid point, not cumulative
     if (adj_u) {
       for (m->k = 0; m->k < nt() - 1; ++m->k) {
-        casadi_axpy(nuq_, -1., adj_u + nuq_, adj_u);
+        Blas::axpy(nuq_, -1., adj_u + nuq_, adj_u);
         adj_u += nuq_;
       }
     }
@@ -2054,24 +2055,24 @@ int FixedStepIntegrator::advance_noevent(IntegratorMemory* mem) const {
     double t = m->t + j * h;
 
     // Update the previous step
-    casadi_copy(m->x, nx_, x_prev);
-    casadi_copy(m->v, nv_, m->v_prev);
-    casadi_copy(m->q, nq_, m->q_prev);
+    Blas::copy(m->x, nx_, x_prev);
+    Blas::copy(m->v, nv_, m->v_prev);
+    Blas::copy(m->q, nq_, m->q_prev);
 
     // Take step
     stepF(m, t, h, x_prev, m->v_prev, m->x, m->v, m->q);
-    casadi_axpy(nq_, 1., m->q_prev, m->q);
+    Blas::axpy(nq_, 1., m->q_prev, m->q);
 
     // Save state, if needed
     if (nrx_ > 0) {
       casadi_int tapeind = disc_[m->k] + j;
-      casadi_copy(m->x, nx_, m->x_tape + nx_ * (tapeind + 1));
-      casadi_copy(m->v, nv_, m->v_tape + nv_ * tapeind);
+      Blas::copy(m->x, nx_, m->x_tape + nx_ * (tapeind + 1));
+      Blas::copy(m->v, nv_, m->v_tape + nv_ * tapeind);
     }
   }
 
   // Save algebraic variables
-  casadi_copy(m->v + nv_ - nz_, nz_, m->z);
+  Blas::copy(m->v + nv_ - nz_, nz_, m->z);
 
   return 0;
 }
@@ -2081,7 +2082,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   auto *m = static_cast<FixedStepMemory*>(mem);
 
   // Set controls
-  casadi_copy(u, nu_, m->u);
+  Blas::copy(u, nu_, m->u);
 
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
@@ -2093,9 +2094,9 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     double t = m->t_next + j * h;
 
     // Update the previous step
-    casadi_copy(m->adj_x, nrx_, m->tmp1);
-    casadi_copy(m->adj_p, nrq_, m->adj_p_prev);
-    casadi_copy(m->adj_u, nuq_, m->adj_u_prev);
+    Blas::copy(m->adj_x, nrx_, m->tmp1);
+    Blas::copy(m->adj_p, nrq_, m->adj_p_prev);
+    Blas::copy(m->adj_u, nuq_, m->adj_u_prev);
 
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
@@ -2104,14 +2105,14 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
       m->v_tape + nv_ * tapeind,
       m->tmp1, m->rv, m->adj_x, m->adj_p, m->adj_u);
     casadi_clear(m->rv, nrv_);
-    casadi_axpy(nrq_, 1., m->adj_p_prev, m->adj_p);
-    casadi_axpy(nuq_, 1., m->adj_u_prev, m->adj_u);
+    Blas::axpy(nrq_, 1., m->adj_p_prev, m->adj_p);
+    Blas::axpy(nuq_, 1., m->adj_u_prev, m->adj_u);
   }
 
   // Return to user
-  casadi_copy(m->adj_x, nrx_, adj_x);
-  casadi_copy(m->adj_p, nrq_, adj_p);
-  casadi_copy(m->adj_u, nuq_, adj_u);
+  Blas::copy(m->adj_x, nrx_, adj_x);
+  Blas::copy(m->adj_p, nrq_, adj_p);
+  Blas::copy(m->adj_u, nuq_, adj_u);
 }
 
 void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
@@ -2216,7 +2217,7 @@ void FixedStepIntegrator::reset(IntegratorMemory* mem, bool first_call) const {
 
     // Add the first element in the tape
     if (nrx_ > 0) {
-      casadi_copy(m->x, nx_, m->x_tape);
+      Blas::copy(m->x, nx_, m->x_tape);
     }
   }
 }
@@ -2240,13 +2241,13 @@ void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
     const double* adj_x, const double* adj_z, const double* adj_q) const {
   auto *m = static_cast<FixedStepMemory*>(mem);
   // Add impulse to backward parameters
-  casadi_axpy(nrp_, 1., adj_q, m->adj_q);
+  Blas::axpy(nrp_, 1., adj_q, m->adj_q);
 
   // Add impulse to state
-  casadi_axpy(nrx_, 1., adj_x, m->adj_x);
+  Blas::axpy(nrx_, 1., adj_x, m->adj_x);
 
   // Add impulse to backwards dependent variables
-  casadi_axpy(nrz_, 1., adj_z, m->rv + nrv_ - nrz_);
+  Blas::axpy(nrz_, 1., adj_z, m->rv + nrv_ - nrz_);
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(
@@ -2511,35 +2512,35 @@ ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeserializingStream & s
 }
 
 void Integrator::set_q(IntegratorMemory* m, const double* q) const {
-  casadi_copy(q, nq_, m->q);
+  Blas::copy(q, nq_, m->q);
 }
 
 void Integrator::set_x(IntegratorMemory* m, const double* x) const {
-  casadi_copy(x, nx_, m->x);
+  Blas::copy(x, nx_, m->x);
 }
 
 void Integrator::set_z(IntegratorMemory* m, const double* z) const {
-  casadi_copy(z, nz_, m->z);
+  Blas::copy(z, nz_, m->z);
 }
 
 void Integrator::set_p(IntegratorMemory* m, const double* p) const {
-  casadi_copy(p, np_, m->p);
+  Blas::copy(p, np_, m->p);
 }
 
 void Integrator::set_u(IntegratorMemory* m, const double* u) const {
-  casadi_copy(u, nu_, m->u);
+  Blas::copy(u, nu_, m->u);
 }
 
 void Integrator::get_q(IntegratorMemory* m, double* q) const {
-  casadi_copy(m->q, nq_, q);
+  Blas::copy(m->q, nq_, q);
 }
 
 void Integrator::get_x(IntegratorMemory* m, double* x) const {
-  casadi_copy(m->x, nx_, x);
+  Blas::copy(m->x, nx_, x);
 }
 
 void Integrator::get_z(IntegratorMemory* m, double* z) const {
-  casadi_copy(m->z, nz_, z);
+  Blas::copy(m->z, nz_, z);
 }
 
 casadi_int Integrator::next_stop(casadi_int k, const double* u) const {
@@ -2601,7 +2602,7 @@ int Integrator::predict_events(IntegratorMemory* m) const {
   // Calculate m->e and m->edot
   if (calc_edot(m)) return 1;
   // Save the values of the zero-crossing functions
-  casadi_copy(m->e, ne_, m->old_e);
+  Blas::copy(m->e, ne_, m->old_e);
   // Find the next event, if any
   for (casadi_int i = 0; i < ne_; ++i) {
     if (!m->event_triggered[i]) {
@@ -2669,7 +2670,7 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
     }
     // Propagate this sensitivity to the state vector
     for (casadi_int i = 0; i < nfwd_; ++i) {
-       casadi_axpy(nx1_, m->tmp1[i], m->xdot, m->x + nx1_ * (1 + i));
+       Blas::axpy(nx1_, m->tmp1[i], m->xdot, m->x + nx1_ * (1 + i));
     }
   }
   // Call event transition function, if any
@@ -2702,12 +2703,12 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
     }
   }
   // Update x, z
-  casadi_copy(m->tmp2, nx_ + nz_, m->x);
+  Blas::copy(m->tmp2, nx_ + nz_, m->x);
   // Calculate m->xdot and m->zdot
   if (calc_edot(m)) return 1;
   // Propagate this sensitivity to the state vector
   for (casadi_int i = 0; i < nfwd_; ++i) {
-     casadi_axpy(nx1_, -m->tmp1[i], m->xdot, m->x + nx1_ * (1 + i));
+     Blas::axpy(nx1_, -m->tmp1[i], m->xdot, m->x + nx1_ * (1 + i));
   }
   // TODO(@jaeandersson): Check if other events need to be triggered
   *ind = -1;  // for now, do not trigger other events

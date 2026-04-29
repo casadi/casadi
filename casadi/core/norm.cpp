@@ -24,6 +24,7 @@
 
 
 #include "norm.hpp"
+#include "blas_impl.hpp"
 
 namespace casadi {
 
@@ -65,7 +66,7 @@ namespace casadi {
 
   template<typename T>
   int NormF::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
-    *res[0] = casadi_norm_2(dep().nnz(), arg[0]);
+    *res[0] = Blas::norm_2(dep().nnz(), arg[0]);
     return 0;
   }
 
@@ -77,7 +78,7 @@ namespace casadi {
 
   template<typename T>
   int Norm1::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
-    *res[0] = casadi_norm_1(dep().nnz(), arg[0]);
+    *res[0] = Blas::norm_1(dep().nnz(), arg[0]);
     return 0;
   }
 

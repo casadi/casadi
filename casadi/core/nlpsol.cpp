@@ -24,6 +24,7 @@
 
 
 #include "nlpsol_impl.hpp"
+#include "blas_impl.hpp"
 #include "external.hpp"
 #include "casadi/core/timing.hpp"
 #include "nlp_builder.hpp"
@@ -800,18 +801,18 @@ namespace casadi {
     const auto *p_nlp = d_nlp->prob;
 
     // Set initial guess
-    casadi_copy(d_nlp->x0, nx_, d_nlp->z);
+    Blas::copy(d_nlp->x0, nx_, d_nlp->z);
 
     // Read simple bounds and multiplier guesses
-    casadi_copy(d_nlp->lbx, nx_, d_nlp->lbz);
-    casadi_copy(d_nlp->ubx, nx_, d_nlp->ubz);
-    casadi_copy(d_nlp->lam_x0, nx_, d_nlp->lam);
+    Blas::copy(d_nlp->lbx, nx_, d_nlp->lbz);
+    Blas::copy(d_nlp->ubx, nx_, d_nlp->ubz);
+    Blas::copy(d_nlp->lam_x0, nx_, d_nlp->lam);
 
     if (p_nlp->detect_bounds.ng==0) {
       // Read constraint bounds and multiplier guesses
-      casadi_copy(d_nlp->lbg, ng_, d_nlp->lbz+nx_);
-      casadi_copy(d_nlp->ubg, ng_, d_nlp->ubz+nx_);
-      casadi_copy(d_nlp->lam_g0, ng_, d_nlp->lam+nx_);
+      Blas::copy(d_nlp->lbg, ng_, d_nlp->lbz+nx_);
+      Blas::copy(d_nlp->ubg, ng_, d_nlp->ubz+nx_);
+      Blas::copy(d_nlp->lam_g0, ng_, d_nlp->lam+nx_);
     } else {
       if (casadi_nlpsol_detect_bounds_before(d_nlp)) return 1;
     }
@@ -846,8 +847,8 @@ namespace casadi {
       if (calc_function(m, "nlp_grad")) {
         casadi_warning("Failed to calculate multipliers");
       }
-      if (calc_lam_x_) casadi_scal(nx_, -1., d_nlp->lam);
-      if (calc_lam_p_) casadi_scal(np_, -1., d_nlp->lam_p);
+      if (calc_lam_x_) Blas::scal(nx_, -1., d_nlp->lam);
+      if (calc_lam_p_) Blas::scal(np_, -1., d_nlp->lam_p);
     }
 
     // Make sure that an optimal solution is consistant with bounds
@@ -856,18 +857,18 @@ namespace casadi {
     }
 
     // Get optimal solution
-    casadi_copy(d_nlp->z, nx_, d_nlp->x);
+    Blas::copy(d_nlp->z, nx_, d_nlp->x);
 
     if (p_nlp->detect_bounds.ng==0) {
-      casadi_copy(d_nlp->z + nx_, ng_, d_nlp->g);
-      casadi_copy(d_nlp->lam, nx_, d_nlp->lam_x);
-      casadi_copy(d_nlp->lam + nx_, ng_, d_nlp->lam_g);
+      Blas::copy(d_nlp->z + nx_, ng_, d_nlp->g);
+      Blas::copy(d_nlp->lam, nx_, d_nlp->lam_x);
+      Blas::copy(d_nlp->lam + nx_, ng_, d_nlp->lam_g);
     } else {
       if (casadi_nlpsol_detect_bounds_after(d_nlp)) return 1;
     }
 
-    casadi_copy(d_nlp->lam_p, np_, d_nlp->lam_p);
-    casadi_copy(&d_nlp->objective, 1, d_nlp->f);
+    Blas::copy(d_nlp->lam_p, np_, d_nlp->lam_p);
+    Blas::copy(&d_nlp->objective, 1, d_nlp->f);
 
     if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
 

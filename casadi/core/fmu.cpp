@@ -24,6 +24,7 @@
 
 
 #include "fmu_impl.hpp"
+#include "blas_impl.hpp"
 #include "fmu_function.hpp"
 #include "dae_builder_internal.hpp"
 #include "filesystem_impl.hpp"
@@ -892,7 +893,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
     yk_all[k] = yk;
     // If unperturbed output, quick return
     if (k == offset) {
-      casadi_copy(get_ptr(m->v_out_), n_unknown, yk);
+      Blas::copy(get_ptr(m->v_out_), n_unknown, yk);
       continue;
     }
     // Perturbation size
