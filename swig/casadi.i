@@ -5177,32 +5177,35 @@ def _is_casadi_value(x):
 def _np_concatenate(arrays, axis=0, **kw):
     arrays = list(arrays)
     if axis == 0 or axis is None:
-        return vertcat(*arrays)
+        return vcat(arrays)
     if axis == 1:
-        return horzcat(*arrays)
+        return hcat(arrays)
     return NotImplemented
 
 def _np_vstack(tup, **kw):
-    return vertcat(*tup)
+    return vcat(tup)
 
 def _np_hstack(tup, **kw):
-    return horzcat(*tup)
+    return hcat(tup)
 
 def _np_stack(arrays, axis=0, **kw):
     if axis == 0:
-        return vertcat(*[a.T if hasattr(a, "T") else a for a in arrays])
+        return vcat([a.T if hasattr(a, "T") else a for a in arrays])
     if axis == 1:
-        return horzcat(*arrays)
+        return hcat(arrays)
     return NotImplemented
 
 def _np_column_stack(tup):
-    return horzcat(*[a if hasattr(a, "shape") and len(a.shape) > 1 and a.shape[1] > 0 else
+    return hcat([a if hasattr(a, "shape") and len(a.shape) > 1 and a.shape[1] > 0 else
                      reshape(a, (-1, 1)) for a in tup])
 
 def _np_where(condition, x=None, y=None):
     if x is None and y is None:
         return NotImplemented   # nz-index variant: leave to numpy
-    return if_else(condition, x, y, True)
+    # short_circuit=False -> elementwise (cond*x + (1-cond)*y) semantics,
+    # which is what numpy.where does.  short_circuit=True builds a Switch
+    # node that requires a scalar condition.
+    return if_else(condition, x, y, False)
 
 def _np_reshape(a, newshape, order='C'):
     # casadi.reshape is column-major (Fortran).  numpy default is C-order
@@ -5242,14 +5245,28 @@ def _np_cumsum(a, axis=None, **kw):
     return cumsum(a, 0 if axis is None else int(axis))
 
 def _np_repeat(a, repeats, axis=None):
+    # numpy.repeat repeats each element along an axis (or flattens, in C
+    # order, when axis is None).  Equivalent to a Kronecker product with
+    # an all-ones vector of the appropriate shape.
+    if not isinstance(repeats, int):
+        return NotImplemented   # numpy supports per-element repeat counts
+    n = int(repeats)
+    # Result orientation: numpy returns 1-D for axis=None.  We follow the
+    # casadi convention "1-D becomes column" for the axis=None case.
     if axis is None:
-        a = vec(a)
-        return repmat(a, int(repeats), 1) if False else None  # not equivalent
+        return kron(vec(a.T), DM.ones(n, 1))     # row-major flatten then repeat
+    if axis == 0:
+        return kron(a, DM.ones(n, 1))
+    if axis == 1:
+        return kron(a, DM.ones(1, n))
     return NotImplemented
 
 def _np_tile(a, reps):
+    # numpy.tile semantics for a 2-D input: an integer or a length-1
+    # tuple tiles along the *last* axis.  A length-2 tuple tiles
+    # (rows, cols).  casadi DMs are always 2-D, so the 2-D case applies.
     if isinstance(reps, int):
-        return repmat(a, int(reps), 1)
+        return repmat(a, 1, int(reps))
     if len(reps) == 1:
         return repmat(a, 1, int(reps[0]))
     if len(reps) == 2:
@@ -5295,14 +5312,36 @@ def _np_any(a, axis=None, **kw):
     return NotImplemented
 
 def _np_linalg_norm(a, ord=None, axis=None, keepdims=False):
+    # Matches numpy.linalg.norm semantics on 2-D inputs (which casadi
+    # values always are).  In numpy this means:
+    #   ord=None / 'fro'  ->  Frobenius
+    #   ord=1             ->  max column sum
+    #   ord=-1            ->  min column sum
+    #   ord=inf           ->  max row sum
+    #   ord=-inf          ->  min row sum
+    #   ord=2             ->  spectral norm (largest singular value)
+    # casadi's norm_1 / norm_inf are element-wise (sum-of-abs /
+    # max-of-abs over all entries), NOT the induced matrix norms, so we
+    # build the matrix norms from sum1/sum2/fabs/mmax/mmin.  For ord=2
+    # there is no general casadi spectral norm, but for shape (n,1) or
+    # (1,n) the spectral norm equals the vector 2-norm and casadi's
+    # norm_2 handles those.
     if axis is not None or keepdims:
         return NotImplemented
-    if ord is None or ord == 2 or ord == "fro":
-        return norm_fro(a) if ord == "fro" else norm_2(a)
+    inf = float("inf")
+    is_vec_shape = hasattr(a, "is_vector") and a.is_vector()
+    if ord is None or ord == "fro":
+        return norm_fro(a)
+    if ord == 2:
+        return norm_2(a) if is_vec_shape else NotImplemented
     if ord == 1:
-        return norm_1(a)
-    if ord in (float("inf"), "inf"):
-        return norm_inf(a)
+        return mmax(sum1(fabs(a)))
+    if ord == -1:
+        return mmin(sum1(fabs(a)))
+    if ord in (inf, "inf"):
+        return mmax(sum2(fabs(a)))
+    if ord in (-inf, "-inf"):
+        return mmin(sum2(fabs(a)))
     return NotImplemented
 
 
@@ -5315,9 +5354,20 @@ def _np_clip(a, a_min=None, a_max=None, **kw):
 
 
 def _np_diff(a, n=1, axis=-1, **kw):
-    if n != 1 or axis not in (-1, 0, 1):
+    # casadi.diff(x, n, axis) supports repeated differencing and either
+    # axis natively.  numpy and casadi both accept axis=-1 but with
+    # different semantics: numpy "last axis" (which is 1 for 2-D),
+    # casadi matlab-style auto-pick (row vec -> 1, else 0).  Translate
+    # axis=-1 to 1 so we match numpy on every 2-D input.
+    if not isinstance(n, int) or n < 0:
         return NotImplemented
-    return diff(a)
+    if axis == -1:
+        axis = 1
+    if axis not in (0, 1):
+        return NotImplemented
+    if n == 0:
+        return a
+    return diff(a, int(n), int(axis))
 
 
 def _np_diag(v, k=0):
@@ -5409,10 +5459,9 @@ def _build_numpy_function_dispatch():
         np.roll:          _np_roll,
         np.atleast_1d:    _np_atleast_1d,
         np.atleast_2d:    _np_atleast_2d,
-        np.real:          lambda a: a,
-        np.imag:          lambda a: type(a).zeros(a.sparsity()) if hasattr(a, "sparsity") else NotImplemented,
-        np.conj:          lambda a: a,
-        np.conjugate:     lambda a: a,
+        # casadi has no complex numbers; np.real/imag/conj are not
+        # bridged.  Calls on DM fall through to numpy via .full();
+        # symbolic types raise a clear error.
     }
     # numpy.diag dispatches via __array_function__ and ours respects k=0.
     d[np.diag] = _np_diag
@@ -5433,11 +5482,15 @@ def _numpy_array_function_dispatch(self, func, types, args, kwargs):
         # TypeError / AttributeError indicate the handler couldn't bind
         # to the call (wrong signature, missing attribute) -- fall
         # through to the numpy fallback below.  Other exceptions
-        # propagate so misuse surfaces with a clear message.
+        # propagate so misuse surfaces with a clear message.  Handlers
+        # may also return NotImplemented to opt out of an otherwise
+        # supported call (e.g. matrix 2-norm) and let the fallback run.
         try:
-            return handler(*args, **kwargs)
+            result = handler(*args, **kwargs)
         except (TypeError, AttributeError):
-            pass
+            result = NotImplemented
+        if result is not NotImplemented:
+            return result
     # No casadi handler: if all casadi operands are DM, convert to
     # numpy and call the original numpy function.  This keeps things
     # like np.linalg.eig(DM) working out-of-the-box -- the alternative
