@@ -45,7 +45,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2026
 
-      */
+      \identifier{2gb} */
 
   /* \brief Check if a particular BLAS plugin is available */
   CASADI_EXPORT bool has_blas(const std::string& name);

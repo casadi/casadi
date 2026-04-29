@@ -4,6 +4,7 @@
  *    CasADi -- A symbolic framework for dynamic optimization.
  *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            KU Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,8 +29,8 @@
       const std::string casadi::BlasBlasfeo::meta_doc=
       "\n"
 "\n"
-"Wraps BLASFEO's namespaced Fortran-ABI dgemm. BLASFEO is tuned for "
-"small/medium dense matrices common in embedded MPC / optimization "
-"workloads.\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_2g9 \n"
+"\n"
 "\n"
 ;

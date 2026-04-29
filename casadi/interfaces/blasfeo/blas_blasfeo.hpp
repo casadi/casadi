@@ -42,7 +42,8 @@ extern "C" {
 
 /** \defgroup plugin_Blas_blasfeo Title
     \par
-*/
+
+    \identifier{2g9} */
 
 /** \pluginsection{Blas,blasfeo} */
 

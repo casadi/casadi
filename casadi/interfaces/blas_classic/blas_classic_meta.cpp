@@ -4,6 +4,7 @@
  *    CasADi -- A symbolic framework for dynamic optimization.
  *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            KU Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,8 +29,8 @@
       const std::string casadi::BlasClassic::meta_doc=
       "\n"
 "\n"
-"Wraps the Fortran-ABI dgemm of whatever BLAS library is linked into "
-"the CasADi build (OpenBLAS by default; can be MKL, Accelerate, or any "
-"reference BLAS that exposes Fortran symbols).\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_2ga \n"
+"\n"
 "\n"
 ;

@@ -54,7 +54,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2026
 
-      */
+      \identifier{2ge} */
   class CASADI_EXPORT
   Blas : public PluginInterface<Blas> {
   public:

@@ -121,7 +121,9 @@ namespace casadi {
         Semicolon-separated list of full library paths and/or -l flags
         (CMake's native LAPACK_LIBRARIES form), mirroring whatever
         `find_package(LAPACK)` or `WITH_BUILD_LAPACK` resolved to.
-        Empty when the build was configured with WITH_LAPACK=OFF. */
+        Empty when the build was configured with WITH_LAPACK=OFF.
+
+        \identifier{2gh} */
     static const char* lapack_libraries();
   };
 

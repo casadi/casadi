@@ -600,7 +600,9 @@ namespace casadi {
         nz(i, j) <-> i in row and j in col. The nonzero buffer of a compactible
         matrix in CCS is laid out exactly as a column-major dense
         row.size() x col.size() matrix, so it can be consumed by dense kernels
-        without gather/scatter. */
+        without gather/scatter.
+
+        \identifier{2gf} */
     bool is_compactible(std::vector<casadi_int>& SWIG_OUTPUT(row),
                         std::vector<casadi_int>& SWIG_OUTPUT(col)) const;
 

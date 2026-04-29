@@ -55,7 +55,9 @@ namespace casadi {
         `blas` selects the dense matrix-multiply backend (e.g. "reference",
         "classic", "blasfeo"). It is honored only by the dense and pseudo-
         dense branches; sparse-only nodes ignore it but preserve the choice
-        across serialization. */
+        across serialization.
+
+        \identifier{2gi} */
     static MX create(const MX& z, const MX& x, const MX& y,
                      const std::string& blas = "reference");
 
@@ -88,7 +90,9 @@ namespace casadi {
 
         Default implementation calls casadi_mtimes (general sparse).
         Two non-template overloads avoid virtual templates while still
-        sharing the eval_gen wrapper across types. */
+        sharing the eval_gen wrapper across types.
+
+        \identifier{2gj} */
     virtual void eval_kernel(const double** arg, double** res, double* w) const;
     virtual void eval_kernel(const SXElem** arg, SXElem** res, SXElem* w) const;
 
@@ -172,7 +176,9 @@ namespace casadi {
     /** \brief Serialize body (BLAS plugin name)
 
         Stored on the base so all subclasses round-trip the choice,
-        even those that don't currently consume it. */
+        even those that don't currently consume it.
+
+        \identifier{2gk} */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize with type disambiguation
@@ -228,7 +234,9 @@ namespace casadi {
 
   /** \brief Dense * Sparse -> Dense matrix product
 
-      Iterate columns of y; per column, walk y's nonzeros and AXPY a column of x into z. */
+      Iterate columns of y; per column, walk y's nonzeros and AXPY a column of x into z.
+
+      \identifier{2gl} */
   class CASADI_EXPORT DenseSparseMultiplication : public Multiplication {
   public:
     /// Returns a fresh node iff x, z are dense; otherwise nullptr.
@@ -262,7 +270,9 @@ namespace casadi {
       column-major dense matrices of compact dimensions. We can call
       casadi_mtimes_dense directly on the nz buffers — no gather/scatter.
 
-      The compact dimensions are stored at construction time. */
+      The compact dimensions are stored at construction time.
+
+      \identifier{2gm} */
   class CASADI_EXPORT PseudoDenseMultiplication : public Multiplication {
   public:
     /// Returns a fresh node iff x, y, z are all compactible with matching

@@ -45,7 +45,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -67,7 +66,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -135,7 +133,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -157,7 +154,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -224,7 +220,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -246,7 +241,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -323,7 +317,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -345,7 +338,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -401,7 +393,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inline</td><td>OT_BOOL</td><td>Implement the lookup table in MX primitives. Useful when you need derivatives with respect to grid and/or coefficients. Such derivatives are fundamentally dense, so use with caution.</td><td>casadi::Interpolant</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -419,7 +410,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -481,7 +471,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inline</td><td>OT_BOOL</td><td>Implement the lookup table in MX primitives. Useful when you need derivatives with respect to grid and/or coefficients. Such derivatives are fundamentally dense, so use with caution.</td><td>casadi::Interpolant</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -499,7 +488,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -544,7 +532,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -560,7 +547,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>precompute_coeff</td><td>OT_BOOL</td><td>If true, derivative evaluation requires precomputed derivative coefficient tensors (dC, ddC) as function inputs. Only supported up to 3D. Default: true for fixed knots, false for parametric knots.</td><td>casadi::BlazingSplineFunction</td></tr>
@@ -644,7 +630,6 @@
 <tr><td>hess_update</td><td>OT_INT</td><td>Type of Hessian approximation</td><td>casadi::Blocksqp</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ini_hess_diag</td><td>OT_DOUBLE</td><td>Initial Hessian guess: diagonal matrix diag(iniHessDiag)</td><td>casadi::Blocksqp</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -684,7 +669,6 @@
 <tr><td>obj_up</td><td>OT_DOUBLE</td><td>Upper bound on objective function [inf]</td><td>casadi::Blocksqp</td></tr>
 <tr><td>opttol</td><td>OT_DOUBLE</td><td>Optimality tolerance</td><td>casadi::Blocksqp</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -853,7 +837,6 @@
 <tr><td>hess_update</td><td>OT_INT</td><td>Type of Hessian approximation</td><td>casadi::Blocksqp</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ini_hess_diag</td><td>OT_DOUBLE</td><td>Initial Hessian guess: diagonal matrix diag(iniHessDiag)</td><td>casadi::Blocksqp</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -893,7 +876,6 @@
 <tr><td>obj_up</td><td>OT_DOUBLE</td><td>Upper bound on objective function [inf]</td><td>casadi::Blocksqp</td></tr>
 <tr><td>opttol</td><td>OT_DOUBLE</td><td>Optimality tolerance</td><td>casadi::Blocksqp</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -985,7 +967,6 @@
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::BonminInterface</td></tr>
 <tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::BonminInterface</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1009,7 +990,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pass_nonlinear_constraints</td><td>OT_BOOL</td><td>Pass list of constraints entering nonlinearly to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
@@ -1118,7 +1098,6 @@
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::BonminInterface</td></tr>
 <tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::BonminInterface</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1142,7 +1121,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pass_nonlinear_constraints</td><td>OT_BOOL</td><td>Pass list of constraints entering nonlinearly to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
@@ -1205,7 +1183,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hot_start</td><td>OT_BOOL</td><td>Hot start with x0 [Default false].</td><td>casadi::CbcInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1220,7 +1197,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -1286,7 +1262,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hot_start</td><td>OT_BOOL</td><td>Hot start with x0 [Default false].</td><td>casadi::CbcInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1301,7 +1276,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -1387,7 +1361,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1402,7 +1375,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -1460,7 +1432,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1475,7 +1446,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -1524,7 +1494,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1539,7 +1508,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -1597,7 +1565,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1612,7 +1579,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -1664,7 +1630,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::Collocation</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1686,7 +1651,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -1763,7 +1727,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::Collocation</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1785,7 +1748,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -1843,7 +1805,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1858,7 +1819,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -1906,7 +1866,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1921,7 +1880,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -1973,7 +1931,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -1989,7 +1946,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>mip_start</td><td>OT_BOOL</td><td>Hot start integers with x0 [Default false].</td><td>casadi::CplexInterface</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -2068,7 +2024,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2084,7 +2039,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>mip_start</td><td>OT_BOOL</td><td>Hot start integers with x0 [Default false].</td><td>casadi::CplexInterface</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -2147,7 +2101,6 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2181,7 +2134,6 @@
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -2291,7 +2243,6 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2325,7 +2276,6 @@
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -2393,7 +2343,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2408,7 +2357,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -2466,7 +2414,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2481,7 +2428,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -2530,7 +2476,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2545,7 +2490,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOL</td><td>Assume P positive definite</td><td>casadi::Dple</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -2593,7 +2537,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2608,7 +2551,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOL</td><td>Assume P positive definite</td><td>casadi::Dple</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -2654,7 +2596,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2669,7 +2610,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -2714,7 +2654,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2729,7 +2668,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -2780,7 +2718,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2800,7 +2737,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -2865,7 +2801,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2885,7 +2820,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -2936,7 +2870,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -2954,7 +2887,6 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::FatropConicInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -3019,7 +2951,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3037,7 +2968,6 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::FatropConicInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -3105,7 +3035,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3130,7 +3059,6 @@
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N+1</td><td>casadi::FatropInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::FatropInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -3220,7 +3148,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3245,7 +3172,6 @@
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N+1</td><td>casadi::FatropInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::FatropInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -3324,7 +3250,6 @@
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Feasiblesqpmethod</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>init_feasible</td><td>OT_BOOL</td><td>Initialize the QP subproblems with a feasible initial value (default: false).</td><td>casadi::Feasiblesqpmethod</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3354,7 +3279,6 @@
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>optim_tol</td><td>OT_DOUBLE</td><td>Optimality tolerance. Below this value an iterate is considered to be optimal.</td><td>casadi::Feasiblesqpmethod</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -3499,7 +3423,6 @@
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Feasiblesqpmethod</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>init_feasible</td><td>OT_BOOL</td><td>Initialize the QP subproblems with a feasible initial value (default: false).</td><td>casadi::Feasiblesqpmethod</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3529,7 +3452,6 @@
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>optim_tol</td><td>OT_DOUBLE</td><td>Optimality tolerance. Below this value an iterate is considered to be optimal.</td><td>casadi::Feasiblesqpmethod</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -3605,7 +3527,6 @@
 <tr><td>h_iter</td><td>OT_INT</td><td>Number of iterations to improve on the step-size [default: 1 if error estimate available, otherwise 0]</td><td>casadi::FiniteDiff</td></tr>
 <tr><td>h_max</td><td>OT_DOUBLE</td><td>Maximum step size [default 0]</td><td>casadi::FiniteDiff</td></tr>
 <tr><td>h_min</td><td>OT_DOUBLE</td><td>Minimum step size [default inf]</td><td>casadi::FiniteDiff</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3620,7 +3541,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -3674,7 +3594,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3695,7 +3614,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -3756,7 +3674,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3777,7 +3694,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -3841,7 +3757,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hessian_coloring</td><td>OT_BOOL</td><td>Enable the use of graph coloring (star coloring) for Hessian calculation. Note that disabling the coloring can improve symmetry check diagnostics.</td><td>casadi::FmuFunction</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3862,7 +3777,6 @@
 <tr><td>new_hessian</td><td>OT_BOOL</td><td>Use Hessian implementation in class (conversion option, to be removed)</td><td>casadi::FmuFunction</td></tr>
 <tr><td>new_jacobian</td><td>OT_BOOL</td><td>Use Jacobian implementation in class (conversion option, to be removed)</td><td>casadi::FmuFunction</td></tr>
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [1]</td><td>casadi::FmuFunction</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>Parallelization [SERIAL|openmp|thread]</td><td>casadi::FmuFunction</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -3919,7 +3833,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3934,7 +3847,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -3976,7 +3888,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3991,7 +3902,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -4038,7 +3948,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gurobi</td><td>OT_DICT</td><td>Options to be passed to gurobi.</td><td>casadi::GurobiInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4054,7 +3963,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -4121,7 +4029,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gurobi</td><td>OT_DICT</td><td>Options to be passed to gurobi.</td><td>casadi::GurobiInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4137,7 +4044,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -4190,7 +4096,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>highs</td><td>OT_DICT</td><td>Options to be passed to HiGHS.</td><td>casadi::HighsInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4205,7 +4110,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -4263,7 +4167,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>highs</td><td>OT_DICT</td><td>Options to be passed to HiGHS.</td><td>casadi::HighsInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4278,7 +4181,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -4329,7 +4231,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hpipm</td><td>OT_DICT</td><td>Options to be passed to hpipm</td><td>casadi::HpipmInterface</td></tr>
 <tr><td>inf</td><td>OT_DOUBLE</td><td>Replace infinities by this amount [default: 1e8]</td><td>casadi::HpipmInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4347,7 +4248,6 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td><td>casadi::HpipmInterface</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td><td>casadi::HpipmInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::HpipmInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -4412,7 +4312,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hpipm</td><td>OT_DICT</td><td>Options to be passed to hpipm</td><td>casadi::HpipmInterface</td></tr>
 <tr><td>inf</td><td>OT_DOUBLE</td><td>Replace infinities by this amount [default: 1e8]</td><td>casadi::HpipmInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4430,7 +4329,6 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td><td>casadi::HpipmInterface</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td><td>casadi::HpipmInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::HpipmInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -4481,7 +4379,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inf</td><td>OT_DOUBLE</td><td>HPMPC cannot handle infinities. Infinities will be replaced by this option's value.</td><td>casadi::HpmpcInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4501,7 +4398,6 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::HpmpcInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -4576,7 +4472,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inf</td><td>OT_DOUBLE</td><td>HPMPC cannot handle infinities. Infinities will be replaced by this option's value.</td><td>casadi::HpmpcInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4596,7 +4491,6 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td><td>casadi::HpmpcInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -4661,7 +4555,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>init_xdot</td><td>OT_DOUBLEVECTOR</td><td>Initial values for the state derivatives</td><td>casadi::IdasInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4692,7 +4585,6 @@
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -4811,7 +4703,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>init_xdot</td><td>OT_DOUBLEVECTOR</td><td>Initial values for the state derivatives</td><td>casadi::IdasInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4842,7 +4733,6 @@
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -4913,7 +4803,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -4934,7 +4823,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -4995,7 +4883,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5016,7 +4903,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -5077,7 +4963,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5098,7 +4983,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::ImplicitToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::ImplicitToNlp</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -5160,7 +5044,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5181,7 +5064,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::ImplicitToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::ImplicitToNlp</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -5253,7 +5135,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5274,7 +5155,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -5335,7 +5215,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5356,7 +5235,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -5414,7 +5292,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inline</td><td>OT_BOOL</td><td>Implement the lookup table in MX primitives. Useful when you need derivatives with respect to grid and/or coefficients. Such derivatives are fundamentally dense, so use with caution.</td><td>casadi::Interpolant</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5430,7 +5307,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -5476,7 +5352,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inline</td><td>OT_BOOL</td><td>Implement the lookup table in MX primitives. Useful when you need derivatives with respect to grid and/or coefficients. Such derivatives are fundamentally dense, so use with caution.</td><td>casadi::Interpolant</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5492,7 +5367,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -5562,7 +5436,6 @@
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>inactive_lam_strategy</td><td>OT_STRING</td><td>Strategy to detect if a bound is inactive. RELTOL: use solver-defined constraint tolerance * inactive_lam_value|abstol: use inactive_lam_value</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>inactive_lam_value</td><td>OT_DOUBLE</td><td>Value used in inactive_lam_strategy (default: 10).</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ipopt</td><td>OT_DICT</td><td>Options to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5587,7 +5460,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -5693,7 +5565,6 @@
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>inactive_lam_strategy</td><td>OT_STRING</td><td>Strategy to detect if a bound is inactive. RELTOL: use solver-defined constraint tolerance * inactive_lam_value|abstol: use inactive_lam_value</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>inactive_lam_value</td><td>OT_DOUBLE</td><td>Value used in inactive_lam_strategy (default: 10).</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ipopt</td><td>OT_DICT</td><td>Options to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5718,7 +5589,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -5777,7 +5647,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5796,7 +5665,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Ipqp</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -5866,7 +5734,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5885,7 +5752,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Ipqp</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -5936,7 +5802,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hess</td><td>OT_STRING</td><td>Function body for Hessian</td><td>casadi::JitFunction</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -5952,7 +5817,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -6006,7 +5870,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6030,7 +5893,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -6115,7 +5977,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6139,7 +6000,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -6211,7 +6071,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6235,7 +6094,6 @@
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>options_file</td><td>OT_STRING</td><td>Read options from file (solver specific)</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -6318,7 +6176,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6342,7 +6199,6 @@
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>options_file</td><td>OT_STRING</td><td>Read options from file (solver specific)</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -6395,7 +6251,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6410,7 +6265,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -6466,7 +6320,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6481,7 +6334,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -6525,7 +6377,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6541,7 +6392,6 @@
 <tr><td>max_nrhs</td><td>OT_INT</td><td>Maximum number of right-hand-sides that get processed in a single pass [default:10].</td><td>casadi::LapackQr</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -6594,7 +6444,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6610,7 +6459,6 @@
 <tr><td>max_nrhs</td><td>OT_INT</td><td>Maximum number of right-hand-sides that get processed in a single pass [default:10].</td><td>casadi::LapackQr</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -6656,7 +6504,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inline</td><td>OT_BOOL</td><td>Implement the lookup table in MX primitives. Useful when you need derivatives with respect to grid and/or coefficients. Such derivatives are fundamentally dense, so use with caution.</td><td>casadi::Interpolant</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6672,7 +6519,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -6727,7 +6573,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inline</td><td>OT_BOOL</td><td>Implement the lookup table in MX primitives. Useful when you need derivatives with respect to grid and/or coefficients. Such derivatives are fundamentally dense, so use with caution.</td><td>casadi::Interpolant</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6743,7 +6588,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -6865,7 +6709,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6881,7 +6724,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -6945,7 +6787,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -6970,7 +6811,6 @@
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>nw</td><td>OT_INTVECTOR</td><td>Number of variables</td><td>casadi::MadnlpInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -7052,7 +6892,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7077,7 +6916,6 @@
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>nw</td><td>OT_INTVECTOR</td><td>Number of variables</td><td>casadi::MadnlpInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -7177,7 +7015,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7198,7 +7035,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -7266,7 +7102,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7287,7 +7122,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -7351,7 +7185,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7373,7 +7206,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -7440,7 +7272,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7462,7 +7293,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -7516,7 +7346,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7532,7 +7361,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>mutol</td><td>OT_DOUBLE</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -7593,7 +7421,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7609,7 +7436,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>mutol</td><td>OT_DOUBLE</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -7658,7 +7484,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7674,7 +7499,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -7724,7 +7548,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7740,7 +7563,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>osqp</td><td>OT_DICT</td><td>const Options to be passed to osqp.</td><td>casadi::OsqpInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -7801,7 +7623,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7817,7 +7638,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>osqp</td><td>OT_DICT</td><td>const Options to be passed to osqp.</td><td>casadi::OsqpInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -7882,7 +7702,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7897,7 +7716,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -7959,7 +7777,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -7974,7 +7791,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -8025,7 +7841,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8042,7 +7857,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::QpToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::QpToNlp</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -8100,7 +7914,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8117,7 +7930,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::QpToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::QpToNlp</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -8191,7 +8003,6 @@
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8213,7 +8024,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
@@ -8336,7 +8146,6 @@
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8358,7 +8167,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
@@ -8412,7 +8220,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8429,7 +8236,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Qrqp</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -8499,7 +8305,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8516,7 +8321,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Qrqp</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -8585,7 +8389,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Qrsqp</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8613,7 +8416,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -8714,7 +8516,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Qrsqp</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8742,7 +8543,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -8805,7 +8605,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8824,7 +8623,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -8876,7 +8674,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8895,7 +8692,6 @@
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -8958,7 +8754,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -8982,7 +8777,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -9051,7 +8845,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -9075,7 +8868,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -9132,7 +8924,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -9150,7 +8941,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -9216,7 +9006,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -9244,7 +9033,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -9353,7 +9141,6 @@
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -9381,7 +9168,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -9515,7 +9301,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -9532,7 +9317,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOL</td><td>Assume P positive definite</td><td>casadi::Dple</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -9592,7 +9376,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -9609,7 +9392,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOL</td><td>Assume P positive definite</td><td>casadi::Dple</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -9671,7 +9453,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -9693,7 +9474,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -9772,7 +9552,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -9794,7 +9573,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -9874,7 +9652,6 @@
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>init_feasible</td><td>OT_BOOL</td><td>Initialize the QP subproblems with a feasible initial value (default: false).</td><td>casadi::Sqpmethod</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -9904,7 +9681,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -10025,7 +9801,6 @@
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>init_feasible</td><td>OT_BOOL</td><td>Initialize the QP subproblems with a feasible initial value (default: false).</td><td>casadi::Sqpmethod</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -10055,7 +9830,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -10122,7 +9896,6 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -10153,7 +9926,6 @@
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -10226,7 +9998,6 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -10257,7 +10028,6 @@
 <tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
@@ -10324,7 +10094,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -10339,7 +10108,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -10397,7 +10165,6 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -10412,7 +10179,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -10460,7 +10226,6 @@
 <tr><td>fopts</td><td>OT_DICT</td><td>Options to be passed to generated function objects</td><td>casadi::SymbolicQr</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -10475,7 +10240,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -10529,7 +10293,6 @@
 <tr><td>fopts</td><td>OT_DICT</td><td>Options to be passed to generated function objects</td><td>casadi::SymbolicQr</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -10544,7 +10307,6 @@
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
@@ -10604,7 +10366,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -10626,7 +10387,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>
@@ -10703,7 +10463,6 @@
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -10725,7 +10484,6 @@
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>postpone_expand</td><td>OT_BOOL</td><td>When expand is active, postpone it until after creation of derivatives. Default: False</td><td>casadi::OracleFunction</td></tr>

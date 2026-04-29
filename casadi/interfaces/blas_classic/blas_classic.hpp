@@ -43,7 +43,8 @@ extern "C" {
 
 /** \defgroup plugin_Blas_classic Title
     \par
-*/
+
+    \identifier{2ga} */
 
 /** \pluginsection{Blas,classic} */
 

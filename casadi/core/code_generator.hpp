@@ -440,12 +440,16 @@ namespace casadi {
                        const std::string& z, const Sparsity& sp_z,
                        const std::string& w, bool tr);
 
-    /** \brief Codegen dense matrix-matrix multiplication */
+    /** \brief Codegen dense matrix-matrix multiplication
+
+        \identifier{2gc} */
     std::string mtimes(const std::string& x, casadi_int nrow_x, casadi_int ncol_x,
                        const std::string& y, casadi_int ncol_y,
                        const std::string& z, bool tr);
 
-    /** \brief Codegen dense-sparse matrix-matrix multiplication (z, x dense) */
+    /** \brief Codegen dense-sparse matrix-matrix multiplication (z, x dense)
+
+        \identifier{2gd} */
     std::string mtimes_dense_sparse(const std::string& x, casadi_int nrow_x,
                                     const std::string& y, const Sparsity& sp_y,
                                     const std::string& z);
