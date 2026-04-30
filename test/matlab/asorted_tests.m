@@ -925,6 +925,74 @@ if exist('string', 'class') == 8
 end
 
 
+% +casadi cell-input concatenation helpers (mirror Python vcat/hcat/vvcat/dcat).
+% Each takes a single cell argument and forwards to the corresponding *cat
+% method, returning a typed empty DM/double when the cell is empty.
+xa = MX.sym('xa', 2, 3);
+ya = MX.sym('ya', 2, 3);
+
+% --- casadi inputs ---
+assert(isequal(size(casadi.vcat({xa, ya})),  [4 3]));
+assert(isequal(size(casadi.hcat({xa, ya})),  [2 6]));
+assert(isequal(size(casadi.dcat({xa, ya})),  [4 6]));
+assert(isequal(size(casadi.vvcat({xa, ya})), [12 1]));
+
+% Empty cell -> native MATLAB empty (pure-MATLAB-in / pure-MATLAB-out).
+% Wrap with casadi.DM(...) if a typed empty is needed.
+e = casadi.vcat({});  assert(isnumeric(e) && isequal(size(e), [0 1]));
+e = casadi.hcat({});  assert(isnumeric(e) && isequal(size(e), [1 0]));
+e = casadi.dcat({});  assert(isnumeric(e) && isequal(size(e), [0 0]));
+e = casadi.vvcat({}); assert(isnumeric(e) && isequal(size(e), [0 1]));
+
+% DM(m,n) and DM(zeros(m,n)) have the same SHAPE for any (m,n)...
+for s = {[0 1], [1 0], [0 0], [3 0], [0 3], [2 4]}
+  sh = s{1};
+  assert(isequal(size(DM(sh(1), sh(2))), size(DM(zeros(sh(1), sh(2))))));
+end
+% ...but the sparsity differs once positions exist:
+%   DM(2,2)        -> structurally empty sparse, nnz=0
+%   DM(zeros(2,2)) -> dense with explicit zeros, nnz=4
+assert(nnz(DM(2,2)) == 0);
+assert(nnz(DM(zeros(2,2))) == 4);
+% For empty shapes both have nnz=0 (no positions exist), so the empty
+% return path is interchangeable with DM(...).
+assert(nnz(DM(1,0)) == 0);
+assert(nnz(DM(zeros(1,0))) == 0);
+
+% Single-element cell
+assert(isequal(size(casadi.vcat({xa})), [2 3]));
+assert(isequal(size(casadi.hcat({xa})), [2 3]));
+assert(isequal(size(casadi.dcat({xa})), [2 3]));
+
+% --- pure-MATLAB inputs ---
+% vertcat/horzcat/diagcat/veccat dispatch on the first arg's class; for plain
+% doubles MATLAB's built-in vertcat/horzcat handles them and the result is a
+% native numeric array (no DM wrapping).
+A = [1 2; 3 4];
+B = [5 6; 7 8];
+v = casadi.vcat({A, B});
+assert(isnumeric(v) && isequal(v, [1 2; 3 4; 5 6; 7 8]));
+h = casadi.hcat({A, B});
+assert(isnumeric(h) && isequal(h, [1 2 5 6; 3 4 7 8]));
+
+% scalars
+v = casadi.vcat({1, 2, 3});
+assert(isnumeric(v) && isequal(v, [1; 2; 3]));
+h = casadi.hcat({1, 2, 3});
+assert(isnumeric(h) && isequal(h, [1 2 3]));
+
+% --- mixed DM and double ---
+% First arg is DM -> SparsityInterfaceCommon.vertcat dispatches; result is DM.
+m = casadi.vcat({DM([1; 2]), 3.0});
+assert(isa(m, 'casadi.DM') && isequal(full(m), [1; 2; 3]));
+m = casadi.hcat({DM([1, 2]), 3.0});
+assert(isa(m, 'casadi.DM') && isequal(full(m), [1 2 3]));
+m = casadi.dcat({DM([1, 2]), 3.0});
+assert(isa(m, 'casadi.DM') && isequal(full(m), [1 2 0; 0 0 3]));
+m = casadi.vvcat({DM([1; 2]), DM([3; 4])});
+assert(isa(m, 'casadi.DM') && isequal(full(m), [1; 2; 3; 4]));
+
+
 disp('success')
 
 
