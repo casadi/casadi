@@ -907,6 +907,8 @@ jobs:
         if: "contains(env.os, 'windows')"
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v3
+        with:
+          release: ${{ matrix.image == 'macos-15-intel' && 'R2025b' || 'latest' }}
 
       - name: Run MATLAB unit tests
         uses: matlab-actions/run-tests@v3
