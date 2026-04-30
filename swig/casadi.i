@@ -1247,6 +1247,25 @@ namespace std {
 
     // MATLAB n-by-m char array mapped to vector of length m
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
+      // MATLAB string class (R2016b+): convert via cellstr -> cell of char,
+      // then reuse the cell path. (Note: char() on a multi-element string
+      // array yields a 3-D char in modern MATLAB, so cellstr is the right
+      // bridge here.)
+      if (mxIsClass(p, "string")) {
+        mxArray *cell_arr = 0;
+        mxArray *prhs[1] = { p };
+        mxArray *err = mexCallMATLABWithTrap(1, &cell_arr, 1, prhs, "cellstr");
+        if (err) {
+          mxDestroyArray(err);
+          if (cell_arr) mxDestroyArray(cell_arr);
+          return false;
+        }
+        if (!cell_arr) return false;
+        bool ok = to_ptr(cell_arr, m);
+        mxDestroyArray(cell_arr);
+        return ok;
+      }
+
       if (mxIsChar(p)) {
 	if (m) {
           // Get data
@@ -1590,6 +1609,30 @@ namespace std {
       }
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
+      // MATLAB string class (R2016b+): the MEX wrapper is a 1x1 opaque
+      // container, so we cannot read element count via mxGetNumberOfElements.
+      // Bridge via cellstr -> cell of char, then require exactly one element
+      // for the scalar std::string slot.
+      if (mxIsClass(p, "string")) {
+        mxArray *cell_arr = 0;
+        mxArray *prhs[1] = { p };
+        mxArray *err = mexCallMATLABWithTrap(1, &cell_arr, 1, prhs, "cellstr");
+        if (err) {
+          mxDestroyArray(err);
+          if (cell_arr) mxDestroyArray(cell_arr);
+          return false;
+        }
+        if (!cell_arr) return false;
+        if (mxGetClassID(cell_arr) != mxCELL_CLASS
+            || mxGetNumberOfElements(cell_arr) != 1) {
+          mxDestroyArray(cell_arr);
+          return false;
+        }
+        mxArray *char_arr = mxGetCell(cell_arr, 0);
+        bool ok = char_arr && to_ptr(char_arr, m);
+        mxDestroyArray(cell_arr);
+        return ok;
+      }
       if (mxIsChar(p) && mxGetM(p)<=1) {
         if (m) {
           if (mxGetM(p)==0) return true;

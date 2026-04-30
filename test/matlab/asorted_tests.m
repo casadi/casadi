@@ -872,6 +872,59 @@ end
 assert(~isempty(strfind(msg,'Hey %d \Warning foo')))
 
 
+% MATLAB string class (R2016b+) round-trip through SWIG typemaps.
+% casadi.i was originally written when MATLAB only had char arrays; the
+% string-class branch was added so std::string / std::vector<std::string>
+% accept both.
+if exist('string', 'class') == 8
+  % --- std::string from a string scalar ---
+  s_sym = SX.sym(string('s_str_42'));
+  assert(strcmp(str(s_sym), 's_str_42'));
+
+  m_sym = MX.sym("m_str_42");  % double-quoted literal is a string scalar
+  assert(strcmp(str(m_sym), 'm_str_42'));
+
+  % Function name argument as a string
+  xa = MX.sym('xa');
+  fn1 = Function(string('myfun'), {xa}, {xa});
+  assert(strcmp(fn1.name(), 'myfun'));
+
+  % --- std::vector<std::string> from a string array ---
+  x = MX.sym('x', 2);
+  y = MX.sym('y');
+  fn2 = Function('fn2', {x, y}, {x*y}, ["xx", "yy"], "zz");
+  assert(strcmp(fn2.name_in(0), 'xx'));
+  assert(strcmp(fn2.name_in(1), 'yy'));
+  assert(strcmp(fn2.name_out(0), 'zz'));
+
+  % Column string array also accepted
+  fn3 = Function('fn3', {x, y}, {x+y}, ["aa"; "bb"], ["cc"]);
+  assert(strcmp(fn3.name_in(0), 'aa'));
+  assert(strcmp(fn3.name_in(1), 'bb'));
+
+  % Mix: string scalar still works inside a cell array
+  fn4 = Function('fn4', {x, y}, {x.*y}, {string('p'), 'q'}, {'r'});
+  assert(strcmp(fn4.name_in(0), 'p'));
+  assert(strcmp(fn4.name_in(1), 'q'));
+
+  % string-valued option in opts struct (dump_dir is a string Function option)
+  opt = struct();
+  opt.dump_dir = string('some_dir');
+  fn5 = Function(string('fn5'), {x}, {x.*x}, opt);
+  assert(strcmp(fn5.name(), 'fn5'));
+
+  % --- multi-element string array must not match scalar std::string ---
+  bad = false;
+  try
+    xb = MX.sym('xb');
+    Function(["bad1", "bad2"], {xb}, {xb});  %#ok<NASGU>
+  catch
+    bad = true;
+  end
+  assert(bad, 'multi-element string array should not satisfy std::string slot');
+end
+
+
 disp('success')
 
 
