@@ -1571,6 +1571,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str, inst);
       break;
     case AUX_NORM_1:
+      add_auxiliary(AUX_FABS);
       this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);
       break;
     case AUX_NORM_2:
