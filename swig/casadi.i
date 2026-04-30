@@ -4347,6 +4347,12 @@ namespace casadi{
       elif self.is_vector():
         return np.array(self.T.elements())
     return np.array(self.T.elements()).reshape(self.shape)
+  def to_numpy(self):
+    # Pandas-style densification hook.  matplotlib's
+    # cbook._unpack_to_numpy looks for `to_numpy()` before falling back
+    # to iteration, so defining it here makes plt.plot(DM) work without
+    # forcing densification through NEP-18 shape ops like np.atleast_1d.
+    return self.full()
 %}
 
 
@@ -5409,7 +5415,12 @@ def _np_roll(a, shift, axis=None):
 
 
 def _np_atleast_1d(*arys):
-    # casadi values are always >= 2-D; just pass through unchanged.
+    # casadi values are always >= 2-D; pass through unchanged, in line
+    # with the NEP-18 convention used by dask, jax, xarray, PyData/sparse,
+    # and scipy.sparse arrays.  Consumers that need the dense numpy form
+    # (e.g. matplotlib) reach DM via .to_numpy() instead -- silent
+    # densification here would defeat the whole point of preserving
+    # sparse representations through shape ops.
     return arys[0] if len(arys) == 1 else list(arys)
 
 
