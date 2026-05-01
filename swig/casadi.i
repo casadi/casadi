@@ -4354,6 +4354,12 @@ namespace casadi{
     # forcing densification through NEP-18 shape ops like np.atleast_1d.
     return self.full()
 %}
+/* `tocsc` returns a scipy.sparse.csc_matrix; not type-importing scipy.sparse
+ * here keeps the stub independent of an optional dependency.  `Any` is the
+ * least-bad option until we also bridge scipy.sparse types. */
+%stub_method0(tocsc,    Any)
+%stub_method(toarray,   %arg(NDArray[np.float64] | float), simplify: bool = ...)
+%stub_method0(to_numpy, %arg(NDArray[np.float64]))
 
 
 #ifdef WITH_PYTHON3
@@ -5162,6 +5168,17 @@ class global_unpickle_context:
     def __exit__(self, *args):
         _thread_local.casadi_unpickle_ctx = None
 %}
+
+/* Pure-pythoncode classes -- SWIG doesn't see them, so the .pyi has to
+ * be hand-rolled.  Both are referenced from error messages
+ * (`Use ca.global_pickle_context(): ...`) and from test/python/serialize.py. */
+%stub_class_begin(global_pickle_context)
+%stub_method0(__enter__, StringSerializer)
+%stub_method(__exit__, None, *args: Any)
+
+%stub_class_begin(global_unpickle_context)
+%stub_method0(__enter__, StringDeserializer)
+%stub_method(__exit__, None, *args: Any)
 
 %pythoncode %{
 
