@@ -27,7 +27,7 @@ logic_all); those tests opt out of MX explicitly via sym_types=(SX,)."""
 
 import unittest
 import numpy as np
-from casadi import SX, MX, DM, Function
+from casadi import SX, MX, DM, Function, Sparsity
 from helpers import casadiTestCase
 
 
@@ -53,6 +53,16 @@ _SHAPES_ELEMWISE = [
     ("mat2x3", _MAT23),
 ]
 
+# Sparse fixtures used by sparsity-preservation assertions.  Every test
+# that takes a sparse-aware path through the casadi NEP-13/18 bridge
+# checks that the structural pattern is not silently densified.
+_SP_LOWER3 = DM(Sparsity.lower(3), [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])  # 6 nnz, 3x3
+_SP_DIAG3  = DM(Sparsity.diag(3),  [1.0, 2.0, 3.0])                # 3 nnz, 3x3
+_SP_LOWER4 = DM(Sparsity.lower(4),
+                [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])  # 10 nnz, 4x4
+_SP_VEC3   = DM(Sparsity.triplet(3, 1, [0, 2], [0, 0]),
+                [1.5, 2.5])                                           # 2 nnz, 3x1
+
 
 def _to_numpy(x):
     if isinstance(x, DM):
@@ -62,6 +72,20 @@ def _to_numpy(x):
 
 class _NumpyRefMixin(object):
     """Shared verification helpers."""
+
+    def _check_nnz(self, label, np_func, *cas_args, expected_nnz, kwargs=None):
+        """Call np_func through the casadi NEP-13/18 bridge on `cas_args`
+        and assert the DM result has exactly `expected_nnz` structural
+        nonzeros.  Catches handlers that quietly densify a sparse input
+        (e.g. by going through np.asarray(x.full()))."""
+        kwargs = kwargs or {}
+        got = np_func(*cas_args, **kwargs)
+        self.assertTrue(isinstance(got, DM),  # pyright: ignore[reportAttributeAccessIssue]
+                        "[%s] got %s, expected DM" %
+                        (label, type(got).__name__))
+        self.assertEqual(got.nnz(), expected_nnz,  # pyright: ignore[reportAttributeAccessIssue]
+                         "[%s] nnz=%d, expected %d (sparse input was densified?)" %
+                         (label, got.nnz(), expected_nnz))
 
     def _close(self, got, ref, label, digits=11):
         """Compare casadi result `got` against numpy reference `ref`.
@@ -141,8 +165,13 @@ class _NumpyRefMixin(object):
                         digits=digits)
 
 
-class NumpyUfuncTests(casadiTestCase, _NumpyRefMixin):
-    """NEP-13 __array_ufunc__ dispatch.  Every value is compared to numpy."""
+class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
+    """NEP-13 __array_ufunc__ and NEP-18 __array_function__ dispatch.
+
+    Every value is compared to a pure-numpy reference; every test that
+    feeds a structurally sparse DM also asserts the result's nnz, so a
+    handler that quietly densifies (e.g. via np.asarray(x.full())) is
+    caught regardless of whether the values still happen to match."""
 
     # -------------------- unary, all four shapes -------------------- #
 
@@ -271,9 +300,38 @@ class NumpyUfuncTests(casadiTestCase, _NumpyRefMixin):
         self._verify("any_false", np.any, DM([0, 0, 0]), sym_types=(SX,))
         self._verify("any_mixed", np.any, DM([0, 0, 1]), sym_types=(SX,))
 
+    # -------------------- sparsity preservation -------------------- #
 
-class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
-    """NEP-18 __array_function__ dispatch."""
+    def test_unary_preserves_sparsity(self):
+        """Ufuncs with f(0)==0 must not densify a structurally sparse DM.
+
+        A handler that internally goes through np.asarray(x.full()) would
+        silently densify; this guards against that regression."""
+        sp = Sparsity.lower(4)                # 10 structural nonzeros in 4x4
+        x = DM(sp, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+        x_nnz = x.nnz()
+        zero_preserving = (np.negative, np.positive, np.square, np.sqrt,
+                           np.sin, np.tan, np.arcsin, np.arctan,
+                           np.sinh, np.tanh, np.arcsinh, np.arctanh,
+                           np.expm1, np.log1p, np.floor, np.ceil,
+                           np.fabs, np.absolute, np.sign)
+        for f in zero_preserving:
+            got = f(x)
+            self.assertTrue(isinstance(got, DM),
+                            "[%s] returned %s, not DM" % (f.__name__, type(got).__name__))
+            self._check_nnz(f.__name__ + " sparse", f, x, expected_nnz=x_nnz)
+
+    def test_binary_preserves_union_sparsity(self):
+        """add/subtract on two sparse DMs must not produce a fully dense
+        result when the union of the input patterns is itself sparse."""
+        a = DM(Sparsity.lower(3), [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])  # 6 nnz
+        b = DM(Sparsity.diag(3),  [10.0, 20.0, 30.0])              # 3 nnz
+        # union is just lower(3) since diag(3) is a subset; full would be 9.
+        for f in (np.add, np.subtract):
+            self._check_nnz(f.__name__ + " sparse", f, a, b,
+                            expected_nnz=a.nnz())
+
+    # ================== NEP-18 __array_function__ ================== #
 
     # -------------------- stacking --------------------------------- #
 
@@ -284,18 +342,33 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
             self._verify("concat axis=%d" % axis,
                          lambda x, y, axis=axis: np.concatenate([x, y], axis=axis),
                          a, b)
+        # sparse: concat preserves the sum of input nnz exactly
+        for axis in (0, 1):
+            self._check_nnz(
+                "concat sparse axis=%d" % axis,
+                lambda x, y, axis=axis: np.concatenate([x, y], axis=axis),
+                _SP_LOWER3, _SP_DIAG3,
+                expected_nnz=_SP_LOWER3.nnz() + _SP_DIAG3.nnz())
 
     def test_vstack(self):
         self._verify("vstack",
                      lambda x, y: np.vstack([x, y]),
                      DM([[1.0, 2.0], [3.0, 4.0]]),
                      DM([[5.0, 6.0]]))
+        self._check_nnz("vstack sparse",
+                        lambda x, y: np.vstack([x, y]),
+                        _SP_LOWER3, _SP_DIAG3,
+                        expected_nnz=_SP_LOWER3.nnz() + _SP_DIAG3.nnz())
 
     def test_hstack(self):
         self._verify("hstack",
                      lambda x, y: np.hstack([x, y]),
                      DM([[1.0, 2.0], [3.0, 4.0]]),
                      DM([[5.0], [6.0]]))
+        self._check_nnz("hstack sparse",
+                        lambda x, y: np.hstack([x, y]),
+                        _SP_LOWER3, _SP_DIAG3,
+                        expected_nnz=_SP_LOWER3.nnz() + _SP_DIAG3.nnz())
 
     # -------------------- shape ------------------------------------ #
 
@@ -304,6 +377,10 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
         for shape in [(2, 3), (3, 2), (1, 6), (6, 1)]:
             self._verify("reshape_C %s" % (shape,),
                          lambda x, shape=shape: np.reshape(x, shape), v)
+        # sparse: reshape changes the pattern but preserves nnz
+        self._check_nnz("reshape_C sparse",
+                        lambda x: np.reshape(x, (2, 8)),
+                        _SP_LOWER4, expected_nnz=_SP_LOWER4.nnz())
 
     def test_reshape_F_order(self):
         v = DM([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
@@ -311,10 +388,16 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
             self._verify("reshape_F %s" % (shape,),
                          lambda x, shape=shape: np.reshape(x, shape, order='F'),
                          v)
+        self._check_nnz("reshape_F sparse",
+                        lambda x: np.reshape(x, (2, 8), order='F'),
+                        _SP_LOWER4, expected_nnz=_SP_LOWER4.nnz())
 
     def test_transpose(self):
         for label, x in _SHAPES_ELEMWISE:
             self._verify("transpose:" + label, np.transpose, x)
+        # sparse: transpose preserves nnz exactly (transposes the pattern)
+        self._check_nnz("transpose sparse", np.transpose,
+                        _SP_LOWER4, expected_nnz=_SP_LOWER4.nnz())
 
     # -------------------- linear algebra --------------------------- #
 
@@ -350,10 +433,17 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
     def test_outer(self):
         self._verify("outer", np.outer,
                      DM([1.0, 2.0, 3.0]), DM([4.0, 5.0, 6.0]))
+        # sparse: outer(a, b) has exactly nnz(a) * nnz(b) structural nonzeros
+        sv2 = DM(Sparsity.triplet(3, 1, [1, 2], [0, 0]), [3.0, 4.0])
+        self._check_nnz("outer sparse", np.outer, _SP_VEC3, sv2,
+                        expected_nnz=_SP_VEC3.nnz() * sv2.nnz())
 
     def test_kron(self):
         self._verify("kron", np.kron,
                      DM([[1.0, 2.0]]), DM([[3.0], [4.0]]))
+        # sparse: kron's nnz is the product of input nnz
+        self._check_nnz("kron sparse", np.kron, _SP_LOWER3, _SP_DIAG3,
+                        expected_nnz=_SP_LOWER3.nnz() * _SP_DIAG3.nnz())
 
     def test_cross(self):
         v1, v2 = DM([1.0, 2.0, 3.0]), DM([4.0, 5.0, 6.0])
@@ -370,9 +460,17 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
         v = DM([1.0, 2.0, 3.0])
         self._verify("diag_vec_to_mat", np.diag, v,
                      np_args_override=(v.full().ravel(),))
+        # sparse: diag of a sparse vector keeps only that vector's nnz
+        # on the resulting diagonal
+        self._check_nnz("diag_vec_to_mat sparse", np.diag, _SP_VEC3,
+                        expected_nnz=_SP_VEC3.nnz())
 
     def test_diag_mat_to_vec(self):
         self._verify("diag_mat_to_vec", np.diag, _SPD3)
+        # sparse: diag extracts the diagonal entries; lower(4) has a
+        # fully populated diagonal -> 4 nnz
+        self._check_nnz("diag_mat_to_vec sparse", np.diag, _SP_LOWER4,
+                        expected_nnz=4)
 
     def test_trace(self):
         for label, x in [("2x2", DM([[1.0, 2.0], [3.0, 4.0]])),
@@ -422,27 +520,46 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
         self._verify("repeat_axis0",
                      lambda x: np.repeat(x, 3, axis=0),
                      DM([[1.0, 2.0], [3.0, 4.0]]))
+        # sparse: each row repeated 3 times -> nnz * 3
+        self._check_nnz("repeat_axis0 sparse",
+                        lambda x: np.repeat(x, 3, axis=0),
+                        _SP_LOWER3, expected_nnz=_SP_LOWER3.nnz() * 3)
 
     def test_repeat_axis1(self):
         self._verify("repeat_axis1",
                      lambda x: np.repeat(x, 2, axis=1),
                      DM([[1.0, 2.0], [3.0, 4.0]]))
+        self._check_nnz("repeat_axis1 sparse",
+                        lambda x: np.repeat(x, 2, axis=1),
+                        _SP_LOWER3, expected_nnz=_SP_LOWER3.nnz() * 2)
 
     def test_repeat_flat(self):
         for label, x in [("vec", DM([1.0, 2.0, 3.0])),
                          ("mat", DM([[1.0, 2.0], [3.0, 4.0]]))]:
             self._verify("repeat_flat:" + label,
                          lambda x: np.repeat(x, 2), x)
+        # sparse: flattening repeat doubles the nnz
+        self._check_nnz("repeat_flat sparse",
+                        lambda x: np.repeat(x, 2),
+                        _SP_LOWER3, expected_nnz=_SP_LOWER3.nnz() * 2)
 
     def test_tile_int(self):
         # Integer reps tiles along the last axis (numpy 2-D semantics).
         self._verify("tile_int", lambda x: np.tile(x, 2), DM([[1.0, 2.0]]))
         self._verify("tile_int_col", lambda x: np.tile(x, 2),
                      DM([[1.0], [2.0]]))
+        # sparse: tile by k multiplies nnz by k
+        self._check_nnz("tile_int sparse",
+                        lambda x: np.tile(x, 2),
+                        _SP_LOWER3, expected_nnz=_SP_LOWER3.nnz() * 2)
 
     def test_tile_2d(self):
         self._verify("tile_2d", lambda x: np.tile(x, (2, 3)),
                      DM([[1.0, 2.0]]))
+        # sparse: tile by (m, n) multiplies nnz by m*n
+        self._check_nnz("tile_2d sparse",
+                        lambda x: np.tile(x, (2, 3)),
+                        _SP_LOWER3, expected_nnz=_SP_LOWER3.nnz() * 6)
 
     # -------------------- like-constructors ------------------------ #
 
@@ -486,6 +603,10 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
         self._verify("clip",
                      lambda x: np.clip(x, -1.0, 1.0),
                      DM([-3.0, -0.5, 0.0, 0.5, 3.0]))
+        # sparse: bounds bracket 0 -> clip(0, -1, 1) = 0, sparsity preserved
+        self._check_nnz("clip sparse",
+                        lambda x: np.clip(x, -1.0, 1.0),
+                        _SP_LOWER3, expected_nnz=_SP_LOWER3.nnz())
 
     def test_diff(self):
         col = DM([1.0, 3.0, 6.0, 10.0])
@@ -516,6 +637,11 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
         for k in (-1, 0, 1, 2, 7):
             self._verify("roll_1d k=%d" % k,
                          lambda x: np.roll(x, k), v)
+        # sparse: roll only shifts elements, never adds them
+        for k in (-1, 0, 1, 2):
+            self._check_nnz("roll_1d sparse k=%d" % k,
+                            lambda x, k=k: np.roll(x, k),
+                            _SP_VEC3, expected_nnz=_SP_VEC3.nnz())
 
     def test_roll_axis(self):
         m = DM([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
@@ -523,6 +649,13 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
             for k in (-1, 0, 1, 4):
                 self._verify("roll axis=%d k=%d" % (axis, k),
                              lambda x: np.roll(x, k, axis=axis), m)
+        # sparse: same -- preserves nnz exactly along any axis
+        for axis in (0, 1):
+            for k in (-1, 0, 1):
+                self._check_nnz(
+                    "roll sparse axis=%d k=%d" % (axis, k),
+                    lambda x, k=k, axis=axis: np.roll(x, k, axis=axis),
+                    _SP_LOWER3, expected_nnz=_SP_LOWER3.nnz())
 
     # -------------------- atleast_*d -------------------------------- #
 
@@ -530,6 +663,12 @@ class NumpyArrayFunctionTests(casadiTestCase, _NumpyRefMixin):
         for label, x in _SHAPES_ELEMWISE:
             self._verify("atleast_1d:" + label, np.atleast_1d, x)
             self._verify("atleast_2d:" + label, np.atleast_2d, x)
+        # sparse: atleast_*d on a 2-D sparse DM must be a structural
+        # no-op (the matplotlib NEP-18 trap: pass-through must stay
+        # sparse, not go through np.asarray(x.full())).
+        for f in (np.atleast_1d, np.atleast_2d):
+            self._check_nnz("%s sparse" % f.__name__, f,
+                            _SP_LOWER4, expected_nnz=_SP_LOWER4.nnz())
 
     # -------------------- failure modes ---------------------------- #
 
