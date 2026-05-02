@@ -964,6 +964,113 @@ class OCPtests(casadiTestCase):
         
     self.fatrop_case(nx2=1,ng1=0,nu1=0)
     
+  def _build_condense_ocp_qp(self, N=4, nx=2, nu=1):
+    """Build a small OCP-shaped QP (dynamics + diagonal H + simple bounds).
+
+    Returns (H_sp, A_sp, args_dict) where args_dict has the values
+    suitable for ca.conic(...).
+    """
+    import numpy as np
+    nz = nx*(N+1) + nu*N
+    A_dense = np.zeros((nx*N, nz))
+    A_k = np.array([[1.0, 0.1], [0.0, 1.0]])
+    B_k = np.array([[0.0], [0.5]])
+    for k in range(N):
+      cx = k*(nx+nu); cu = cx+nx; cx1 = (k+1)*(nx+nu)
+      A_dense[k*nx:(k+1)*nx, cx:cx+nx] = A_k
+      A_dense[k*nx:(k+1)*nx, cu:cu+nu] = B_k
+      A_dense[k*nx:(k+1)*nx, cx1:cx1+nx] = -np.eye(nx)
+    # Use the actual sparse OCP block pattern (24 nnz), not Sparsity.dense
+    # (112 nnz) -- structure_detection='auto' walks the skyline of A and
+    # needs the structural zeros stripped to identify dynamics blocks.
+    A = ca.sparsify(ca.DM(A_dense))
+    A_sp = A.sparsity()
+    H_sp = ca.Sparsity.diag(nz)
+    H_diag = np.array([1.0, 1.0, 0.5]*N + [1.0, 1.0])
+    g_vec = np.zeros(nz); g_vec[0] = 0.1; g_vec[2] = 0.2; g_vec[4] = 0.3
+    H = ca.DM(H_sp, H_diag)
+    lba = np.zeros(nx*N); uba = np.zeros(nx*N)
+    lbx = -10*np.ones(nz); ubx = 10*np.ones(nz)
+    lbx[0] = ubx[0] = 1.0; lbx[1] = ubx[1] = 0.0
+    return H_sp, A_sp, dict(h=H, g=g_vec, a=A,
+                            lba=lba, uba=uba, lbx=lbx, ubx=ubx)
+
+  @requires_conic("daqp")
+  def test_condense(self):
+    """Conic OCP partial-condensing wrap: verify multiple partitions and
+    structure_detection modes agree with the un-condensed reference at
+    machine precision."""
+    N, nx, nu = 4, 2, 1
+    H_sp, A_sp, args = self._build_condense_ocp_qp(N=N, nx=nx, nu=nu)
+
+    ref_solver = ca.conic("ref", "daqp", {"h": H_sp, "a": A_sp})
+    ref = ref_solver(**args)
+
+    # (1) Explicit condense_partition: 4 partition flavors.
+    partitions = {
+      "full":     [0, N],                       # one condensed block
+      "identity": list(range(N+1)),             # block per original stage
+      "halves":   [0, N//2, N],                 # two equal blocks
+      "irregular":[0, 1, 3, N],                 # blocks of length 1, 2, 1
+    }
+    for name, M in partitions.items():
+      opts = {
+        "condense": True,
+        "structure_detection": "manual",
+        "N": N, "nx": [nx]*(N+1), "nu": [nu]*N, "ng": [0]*(N+1),
+        "condense_partition": M,
+      }
+      sol_solver = ca.conic("S_" + name, "daqp",
+                            {"h": H_sp, "a": A_sp}, opts)
+      sol = sol_solver(**args)
+      for k in ("x", "cost", "lam_x", "lam_a"):
+        self.checkarray(
+          sol[k], ref[k],
+          failmessage="condense_partition=" + name + ", key=" + k,
+          digits=10)
+
+    # (2) Strategy + condensed_block_count -- the DP / closed-form
+    # paths that derive M without the user spelling it out.  All three
+    # strategies should agree with the no-condense reference.
+    strategies = ["auto", "uniform", "optimal"]
+    block_counts = [0, 1, 2, N]   # 0 = strategy picks; explicit values too
+    for strat in strategies:
+      for n_hat in block_counts:
+        opts = {
+          "condense": True,
+          "structure_detection": "manual",
+          "N": N, "nx": [nx]*(N+1), "nu": [nu]*N, "ng": [0]*(N+1),
+          "condense_partition_strategy": strat,
+          "condensed_block_count": n_hat,
+        }
+        sol_solver = ca.conic(f"S_{strat}_{n_hat}", "daqp",
+                              {"h": H_sp, "a": A_sp}, opts)
+        sol = sol_solver(**args)
+        for k in ("x", "cost", "lam_x", "lam_a"):
+          self.checkarray(
+            sol[k], ref[k],
+            failmessage=f"strategy={strat}, n_hat={n_hat}, key={k}",
+            digits=10)
+
+    # (3) structure_detection='auto' with default partition derivation.
+    sol_auto = ca.conic("S_auto", "daqp", {"h": H_sp, "a": A_sp},
+                        {"condense": True, "structure_detection": "auto"})
+    sol = sol_auto(**args)
+    for k in ("x", "cost", "lam_x", "lam_a"):
+      self.checkarray(sol[k], ref[k],
+                      failmessage="structure_detection=auto, key=" + k,
+                      digits=10)
+
+    # (4) Serialize/deserialize round-trip via the standard
+    # check_serialize helper.  Asserts the deserialized solver
+    # produces identical output at digits=16.
+    opts = {"condense": True, "structure_detection": "manual",
+            "N": N, "nx": [nx]*(N+1), "nu": [nu]*N, "ng": [0]*(N+1),
+            "condense_partition_strategy": "optimal",
+            "condensed_block_count": 2}
+    sol_ser = ca.conic("S_ser", "daqp", {"h": H_sp, "a": A_sp}, opts)
+    self.check_serialize(sol_ser, args)
+
   @requires_nlpsol("fatrop")
   def test_bug(self):
 

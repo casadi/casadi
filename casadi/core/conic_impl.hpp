@@ -26,10 +26,22 @@
 #ifndef CASADI_CONIC_IMPL_HPP
 #define CASADI_CONIC_IMPL_HPP
 
+// blas.hpp must come BEFORE any include that pulls in casadi_runtime.hpp /
+// casadi_condensing.hpp.  Phase-1 unqualified lookup of the
+// casadi_blas_mtimes calls in condensing.hpp's templated body happens
+// when those headers are first parsed; if blas.hpp isn't visible by then,
+// the call has no phase-1 candidate, and phase-2 ADL on primitive types
+// finds nothing -- compile error at every call site.  (And without the
+// declaration, even if the body did parse, conic.cpp would emit a weak
+// primary instantiation of casadi_blas_mtimes<double> that races the
+// strong spec in blas.cpp -- silently dropping BLAS dispatch.)
+#include "blas.hpp"
 #include "conic.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 #include "im.hpp"
+// casadi_ocp_block / casadi_condensing_prob / casadi_condensing_data come in
+// via casadi_runtime.hpp which is transitively included by im.hpp -> matrix.
 
 /// \cond INTERNAL
 namespace casadi {
@@ -38,6 +50,10 @@ namespace casadi {
     // Problem data structure
     casadi_qp_data<double> d_qp;
 
+    // Condensing data struct (populated by Conic::set_work when
+    // condense_=True; left null otherwise).  Per-call primal/dual
+    // outputs land in d_cond.x / lam_x / lam_a (no separate stash).
+    casadi_condensing_data<double> d_cond;
   };
 
   /// Internal class
@@ -159,12 +175,79 @@ namespace casadi {
         \identifier{24y} */
     void qp_codegen_body(CodeGenerator& g) const;
 
+    /** \brief Emit cleanup/lift after the plugin's solve in codegen */
+    void qp_codegen_post(CodeGenerator& g) const;
+
   protected:
     /// Options
     std::vector<bool> discrete_;
     std::vector<bool> equality_;
     bool print_problem_;
     bool solver_version_check_;
+    bool debug_;
+    casadi_int condensed_block_count_;
+    std::string condense_partition_strategy_;
+
+    /// Partial-condensing wrap (around derived solve)
+    bool condense_;
+    enum CondenseStructureDetection {
+      COND_STRUCT_NONE, COND_STRUCT_AUTO, COND_STRUCT_MANUAL
+    };
+    CondenseStructureDetection condense_structure_detection_;
+    casadi_int N_;            // OCP horizon (original)
+    casadi_int N_hat_;        // condensed horizon
+    std::vector<casadi_int> nxs_, nus_, ngs_;       // length N+1 (nu[N]=0)
+    std::vector<casadi_int> M_;                     // partition, length N_hat+1
+    std::vector<casadi_int> M_user_;                // user-supplied M (empty if none)
+    std::vector<casadi_int> nx_hat_, nu_hat_, ng_hat_;  // length N_hat+1
+    // Block descriptors packed as 4-tuples (offset_r, offset_c, rows, cols)
+    std::vector<casadi_int> AB_blocks_packed_;
+    std::vector<casadi_int> CD_blocks_packed_;
+    std::vector<casadi_int> RSQ_blocks_packed_;
+    std::vector<casadi_int> AB_hat_blocks_packed_;
+    std::vector<casadi_int> CD_hat_blocks_packed_;
+    std::vector<casadi_int> RSQ_hat_blocks_packed_;
+    std::vector<casadi_int> AB_offsets_, CD_offsets_, RSQ_offsets_;
+    std::vector<casadi_int> AB_hat_offsets_, CD_hat_offsets_, RSQ_hat_offsets_;
+    Sparsity RSQsp_, ABsp_, CDsp_;
+    Sparsity H_hat_sp_, A_hat_sp_;
+    casadi_int nx_total_hat_, na_total_hat_;
+    casadi_int nx_max_, nu_max_block_, nxu_max_block_;
+
+    // Native casadi_ocp_block storage (unpacked from *_blocks_packed_)
+    // and the condensing prob struct that points into our vectors.
+    // These are filled in build_condense_blocks() and
+    // finalize_condense_prob() (called from init / deserialize).
+    mutable std::vector<casadi_ocp_block> AB_blocks_;
+    mutable std::vector<casadi_ocp_block> CD_blocks_;
+    mutable std::vector<casadi_ocp_block> RSQ_blocks_;
+    mutable std::vector<casadi_ocp_block> AB_hat_blocks_;
+    mutable std::vector<casadi_ocp_block> CD_hat_blocks_;
+    mutable std::vector<casadi_ocp_block> RSQ_hat_blocks_;
+    mutable casadi_condensing_prob<double> p_cond_;
+    void finalize_condense_prob();
+    /// Unpack a flat [off_r, off_c, rows, cols]*N vector into ocp_block records
+    static void unpack_ocp_blocks(const std::vector<casadi_int>& packed,
+                                  std::vector<casadi_ocp_block>& dst);
+    /// Prepend a length scalar to a vector (used to length-prefix codegen consts)
+    static std::vector<casadi_int> len_prefixed(casadi_int n,
+                                                const std::vector<casadi_int>& v);
+
+    /// Run structure detection (auto) or use provided (manual)
+    void detect_condense_structure();
+    /// Build packed block descriptors and condensed sparsities
+    void build_condense_blocks();
+
+    /// Pick M_ from condense_partition_strategy_ + condensed_block_count_.
+    /// Called from build_condense_blocks() when M_ is empty.
+    void derive_condense_partition();
+    /// Frison closed-form: pick n_hat for uniform problems if 0,
+    /// then emit a uniform-length partition into M_.
+    void frison_uniform_partition();
+    /// O(K_max * N^2) DP picking M to minimize sum_K (nx[M_K] +
+    /// sum nu[j])^3.  If condensed_block_count_ == 0, scans K=1..K_max
+    /// and picks the argmin; otherwise fixes K = condensed_block_count_.
+    void dp_optimal_partition();
 
     /// Problem structure
     Sparsity H_, A_, Q_, P_;

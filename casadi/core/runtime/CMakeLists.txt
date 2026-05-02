@@ -99,6 +99,7 @@ set(RUNTIME_SRC
   casadi_oracle.hpp
   casadi_oracle_callback.hpp
   casadi_ocp_block.hpp
+  casadi_condensing.hpp
   casadi_scaled_copy.hpp
   casadi_blazing_common.hpp
   casadi_blazing_1d_boor_eval.hpp

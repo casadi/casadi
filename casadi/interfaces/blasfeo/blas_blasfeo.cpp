@@ -144,6 +144,37 @@ namespace casadi {
     g.auxiliaries << g.sanitize_source(SRC, inst);
   }
 
+  // L3 codegen-AUX hook: emit a casadi_mtimes_dense body that calls
+  // blasfeo_blas_dgemm.  See classic_codegen_mtimes_dense_aux for the
+  // full convention; blasfeo's only difference is non-const pointer
+  // signatures (and the namespaced symbol).  Requires casadi_real ==
+  // double.
+  static void blasfeo_codegen_mtimes_dense_aux(CodeGenerator& g,
+      const std::vector<std::string>& inst) {
+    (void)inst;
+    // Inline the extern decl: see classic_codegen_mtimes_dense_aux for
+    // why g.add_external is not enough for AUX-block emitters.
+    g.auxiliaries << BLASFEO_DECL << "\n";
+    g.auxiliaries
+      << "/* SYMBOL \"mtimes_dense\" -- BLAS \"blasfeo\" override */\n"
+      << "void casadi_mtimes_dense(const casadi_real* x, "
+         "casadi_int nrow_x, casadi_int ncol_x,\n"
+      << "    const casadi_real* y, casadi_int ncol_y, "
+         "casadi_real* z, casadi_int tr) {\n"
+      << "  char ta = tr ? 'T' : 'N';\n"
+      << "  char tn = 'N';\n"
+      << "  double one = 1.0;\n"
+      << "  int m   = (int)(tr ? ncol_x : nrow_x);\n"
+      << "  int n   = (int)ncol_y;\n"
+      << "  int kk  = (int)(tr ? nrow_x : ncol_x);\n"
+      << "  int lda = (int)nrow_x;\n"
+      << "  int ldb = (int)(tr ? nrow_x : ncol_x);\n"
+      << "  int ldc = m;\n"
+      << "  blasfeo_blas_dgemm(&ta, &tn, &m, &n, &kk, &one, "
+         "(double*)x, &lda, (double*)y, &ldb, &one, z, &ldc);\n"
+      << "}\n";
+  }
+
   extern "C" int CASADI_BLAS_BLASFEO_EXPORT
   casadi_register_blas_blasfeo(Blas::Plugin* plugin) {
     plugin->name = "blasfeo";
@@ -162,6 +193,8 @@ namespace casadi {
     plugin->exposed.codegen_scal_aux = nullptr;
     plugin->exposed.codegen_nrm2_aux = nullptr;
     plugin->exposed.codegen_asum_aux = nullptr;
+    plugin->exposed.codegen_mtimes_dense_aux =
+        &blasfeo_codegen_mtimes_dense_aux;
     plugin->options = nullptr;
     plugin->deserialize = nullptr;
     plugin->creator = nullptr;

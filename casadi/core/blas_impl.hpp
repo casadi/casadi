@@ -84,6 +84,13 @@ namespace casadi {
     typedef void (* CodegenL1Aux)(CodeGenerator& g,
                                   const std::vector<std::string>& inst);
 
+    /* \brief Codegen counterpart of an L3 op (mtimes_dense): emit the
+     * auxiliary block.  Same shape as the L1 aux hook so a BLAS plugin
+     * can override the canonical reference loop with one that calls
+     * cblas_dgemm (or any equivalent). */
+    typedef void (* CodegenL3Aux)(CodeGenerator& g,
+                                  const std::vector<std::string>& inst);
+
     /* \brief Creator function (unused; kept for PluginInterface uniformity) */
     typedef Blas* (*Creator)();
 
@@ -104,6 +111,10 @@ namespace casadi {
       CodegenL1Aux codegen_scal_aux;
       CodegenL1Aux codegen_nrm2_aux;
       CodegenL1Aux codegen_asum_aux;
+      /* \brief Optional override for AUX_MTIMES_DENSE: when set, the
+       * plugin emits a custom casadi_mtimes_dense body (e.g. cblas_dgemm
+       * wrapper).  When null, codegen falls back to the reference loop. */
+      CodegenL3Aux codegen_mtimes_dense_aux;
     };
 
     /* \brief Collection of registered plugins, keyed by name */
@@ -157,11 +168,14 @@ namespace casadi {
                              double beta,
                              double* C, casadi_int ldc);
 
-    /* \brief Canonical contiguous mtimes-accumulate: C += A*B */
+    /* \brief Canonical contiguous mtimes-accumulate: C += op(A)*B
+     *  tr=0: A is m×k, B is k×n, C is m×n.
+     *  tr=1: op(A)=A^T; A is m×k, B is m×n, C is k×n. */
     static void mtimes(casadi_int shorthand,
                        const double* A, casadi_int m, casadi_int k,
                        const double* B, casadi_int n,
-                       double* C);
+                       double* C, casadi_int tr = 0);
+
 
     /* \brief Emit a C statement that performs C += A*B; codegen counterpart of mtimes */
     static void codegen_mtimes(CodeGenerator& g, casadi_int shorthand,
@@ -188,6 +202,10 @@ namespace casadi {
     /* \brief Try-emit aux block for casadi_norm_1 via active plugin (false on fallback) */
     static bool codegen_norm_1_aux(CodeGenerator& g,
                                    const std::vector<std::string>& inst);
+    /* \brief Try-emit aux block for casadi_mtimes_dense via active plugin
+     * (false on fallback to the reference loop). */
+    static bool codegen_mtimes_dense_aux(CodeGenerator& g,
+                                         const std::vector<std::string>& inst);
   };
 
 } // namespace casadi
