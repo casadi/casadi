@@ -1695,7 +1695,8 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_mtimes_str, inst);
       break;
     case AUX_MTIMES_DENSE:
-      this->auxiliaries << sanitize_source(casadi_mtimes_dense_str, inst);
+      if (!Blas::codegen_mtimes_dense_aux(*this, inst))
+        this->auxiliaries << sanitize_source(casadi_mtimes_dense_str, inst);
       break;
     case AUX_MTIMES_DENSE_SPARSE:
       this->auxiliaries << sanitize_source(casadi_mtimes_dense_sparse_str, inst);
@@ -1903,6 +1904,14 @@ namespace casadi {
       break;
     case AUX_OCP_BLOCK:
       this->auxiliaries << sanitize_source(casadi_ocp_block_str, inst);
+      break;
+    case AUX_CONDENSING:
+      add_auxiliary(AUX_OCP_BLOCK);
+      add_auxiliary(AUX_INF);
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_CLEAR);
+      add_auxiliary(AUX_MTIMES_DENSE);
+      this->auxiliaries << sanitize_source(casadi_condensing_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "

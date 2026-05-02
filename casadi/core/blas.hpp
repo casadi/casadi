@@ -27,6 +27,7 @@
 #define CASADI_BLAS_HPP
 
 #include <casadi/core/casadi_export.h>
+#include <casadi/core/casadi_types.hpp>
 #include <string>
 
 namespace casadi {
@@ -55,6 +56,20 @@ namespace casadi {
 
   /* \brief Get the documentation string for a BLAS plugin */
   CASADI_EXPORT std::string doc_blas(const std::string& name);
+
+#ifndef SWIG
+  // Dense multiplication with BLAS dispatch for double precision.
+  template<typename T1>
+  void casadi_blas_mtimes(const T1* x, casadi_int nrow_x, casadi_int ncol_x,
+      const T1* y, casadi_int ncol_y, T1* z, casadi_int tr) {
+    casadi_mtimes_dense(x, nrow_x, ncol_x, y, ncol_y, z, tr);
+  }
+
+  template<>
+  void CASADI_EXPORT casadi_blas_mtimes<double>(
+      const double* A, casadi_int m, casadi_int k,
+      const double* B, casadi_int n, double* C, casadi_int tr);
+#endif // SWIG
 
 } // namespace casadi
 

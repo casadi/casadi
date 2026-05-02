@@ -88,10 +88,10 @@ namespace casadi {
     Conic::init(opts);
 
     // Transpose of the Jacobian
-    AT_ = A_.T();
+    AT_ = (condense_ ? A_hat_sp_ : A_).T();
 
     // Assemble KKT system sparsity
-    kkt_ = Sparsity::kkt(H_, A_, true, true);
+    kkt_ = Sparsity::kkt((condense_ ? H_hat_sp_ : H_), (condense_ ? A_hat_sp_ : A_), true, true);
 
     // Symbolic QR factorization
     kkt_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
@@ -190,15 +190,15 @@ namespace casadi {
     casadi_qp_data<double>& d_qp = m->d_qp;
 
     // Pass bounds on z
-    casadi_copy(d_qp.lbx, nx_, d.lbz);
-    casadi_copy(d_qp.lba, na_, d.lbz+nx_);
-    casadi_copy(d_qp.ubx, nx_, d.ubz);
-    casadi_copy(d_qp.uba, na_, d.ubz+nx_);
+    casadi_copy(d_qp.lbx, p_qp_.nx, d.lbz);
+    casadi_copy(d_qp.lba, p_qp_.na, d.lbz+p_qp_.nx);
+    casadi_copy(d_qp.ubx, p_qp_.nx, d.ubz);
+    casadi_copy(d_qp.uba, p_qp_.na, d.ubz+p_qp_.nx);
     // Pass initial guess
-    casadi_copy(d_qp.x0, nx_, d.z);
-    casadi_fill(d.z+nx_, na_, nan);
-    casadi_copy(d_qp.lam_x0, nx_, d.lam);
-    casadi_copy(d_qp.lam_a0, na_, d.lam+nx_);
+    casadi_copy(d_qp.x0, p_qp_.nx, d.z);
+    casadi_fill(d.z+p_qp_.nx, p_qp_.na, nan);
+    casadi_copy(d_qp.lam_x0, p_qp_.nx, d.lam);
+    casadi_copy(d_qp.lam_a0, p_qp_.na, d.lam+p_qp_.nx);
 
     // Reset solver
     if (casadi_qrqp_reset(&d)) return 1;
@@ -250,9 +250,9 @@ namespace casadi {
     }
     // Get solution
     casadi_copy(&d.f, 1, d_qp.f);
-    casadi_copy(d.z, nx_, d_qp.x);
-    casadi_copy(d.lam, nx_, d_qp.lam_x);
-    casadi_copy(d.lam+nx_, na_, d_qp.lam_a);
+    casadi_copy(d.z, p_qp_.nx, d_qp.x);
+    casadi_copy(d.lam, p_qp_.nx, d_qp.lam_x);
+    casadi_copy(d.lam+p_qp_.nx, p_qp_.na, d_qp.lam_a);
     // Return
     if (verbose_) casadi_warning(m->return_status);
     m->d_qp.success = d.status == QP_SUCCESS;
@@ -291,16 +291,16 @@ namespace casadi {
     g << "casadi_qrqp_set_work(&d, &arg, &res, &iw, &w);\n";
 
     g.comment("Pass bounds on z");
-    g.copy_default(g.arg(CONIC_LBX), nx_, "d.lbz", "-casadi_inf", false);
-    g.copy_default(g.arg(CONIC_LBA), na_, "d.lbz+" + str(nx_), "-casadi_inf", false);
-    g.copy_default(g.arg(CONIC_UBX), nx_, "d.ubz", "casadi_inf", false);
-    g.copy_default(g.arg(CONIC_UBA), na_, "d.ubz+" + str(nx_), "casadi_inf", false);
+    g.copy_default("d_qp.lbx", p_qp_.nx, "d.lbz", "-casadi_inf", false);
+    g.copy_default("d_qp.lba", p_qp_.na, "d.lbz+" + str(p_qp_.nx), "-casadi_inf", false);
+    g.copy_default("d_qp.ubx", p_qp_.nx, "d.ubz", "casadi_inf", false);
+    g.copy_default("d_qp.uba", p_qp_.na, "d.ubz+" + str(p_qp_.nx), "casadi_inf", false);
 
     g.comment("Pass initial guess");
-    g.copy_default(g.arg(CONIC_X0), nx_, "d.z", "0", false);
-    g << g.fill("d.z+"+str(nx_), na_, g.constant(nan)) << "\n";
-    g.copy_default(g.arg(CONIC_LAM_X0), nx_, "d.lam", "0", false);
-    g.copy_default(g.arg(CONIC_LAM_A0), na_, "d.lam+" + str(nx_), "0", false);
+    g.copy_default("d_qp.x0", p_qp_.nx, "d.z", "0", false);
+    g << g.fill("d.z+"+str(p_qp_.nx), p_qp_.na, g.constant(nan)) << "\n";
+    g.copy_default("d_qp.lam_x0", p_qp_.nx, "d.lam", "0", false);
+    g.copy_default("d_qp.lam_a0", p_qp_.na, "d.lam+" + str(p_qp_.nx), "0", false);
 
     g.comment("Solve QP");
     g << "if (casadi_qrqp_reset(&d)) return 1;\n";
@@ -326,12 +326,13 @@ namespace casadi {
     g << "}\n";
 
     g.comment("Get solution");
-    g.copy_check("&d.f", 1, g.res(CONIC_COST), false, true);
-    g.copy_check("d.z", nx_, g.res(CONIC_X), false, true);
-    g.copy_check("d.lam", nx_, g.res(CONIC_LAM_X), false, true);
-    g.copy_check("d.lam+"+str(nx_), na_, g.res(CONIC_LAM_A), false, true);
+    g.copy_check("&d.f", 1, "d_qp.f", false, true);
+    g.copy_check("d.z", p_qp_.nx, "d_qp.x", false, true);
+    g.copy_check("d.lam", p_qp_.nx, "d_qp.lam_x", false, true);
+    g.copy_check("d.lam+"+str(p_qp_.nx), p_qp_.na, "d_qp.lam_a", false, true);
 
     g << "if (d.status == QP_SUCCESS) {;\n";
+    qp_codegen_post(g);
     g << "return 0;\n";
     g << "} else if (d.status == QP_NO_SEARCH_DIR) {\n";
     g << "return " << SOLVER_RET_INFEASIBLE <<";\n";

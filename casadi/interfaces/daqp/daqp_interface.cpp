@@ -289,6 +289,7 @@ namespace casadi {
       g << "return -1;\n";
     }
     g << "}\n";
+    qp_codegen_post(g);
     g << "return 0;\n";
   }
 

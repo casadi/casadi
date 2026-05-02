@@ -230,6 +230,33 @@ namespace casadi {
     g.auxiliaries << g.sanitize_source(SRC, inst);
   }
 
+  // Emit dense multiplication through the BLAS backend.
+  static void classic_codegen_mtimes_dense_aux(CodeGenerator& g,
+      const std::vector<std::string>& inst) {
+    // Declarations must precede the auxiliary body.
+    g.auxiliaries << CLASSIC_DECL << "\n";
+    const char* src =
+        "// SYMBOL \"mtimes_dense\"\n"
+        "void casadi_mtimes_dense(const casadi_real* x, "
+        "casadi_int nrow_x, casadi_int ncol_x,\n"
+        "    const casadi_real* y, casadi_int ncol_y, "
+        "casadi_real* z, casadi_int tr) {\n"
+        "  const char ta = tr ? 'T' : 'N';\n"
+        "  const char tn = 'N';\n"
+        "  const double one = 1.0;\n"
+        "  int m = (int)(tr ? ncol_x : nrow_x);\n"
+        "  int n = (int)ncol_y;\n"
+        "  int k = (int)(tr ? nrow_x : ncol_x);\n"
+        "  int lda = (int)nrow_x;\n"
+        "  int ldb = (int)(tr ? nrow_x : ncol_x);\n"
+        "  int ldc = m;\n"
+        "  if (!m || !n || !k) return;\n"
+        "  CASADI_BLAS_DGEMM(&ta, &tn, &m, &n, &k, &one, "
+        "x, &lda, y, &ldb, &one, z, &ldc);\n"
+        "}\n";
+    g.auxiliaries << g.sanitize_source(src, inst);
+  }
+
   extern "C" int CASADI_BLAS_CLASSIC_EXPORT
   casadi_register_blas_classic(Blas::Plugin* plugin) {
     plugin->name = "classic";
@@ -248,6 +275,8 @@ namespace casadi {
     plugin->exposed.codegen_scal_aux = &classic_codegen_scal_aux;
     plugin->exposed.codegen_nrm2_aux = &classic_codegen_nrm2_aux;
     plugin->exposed.codegen_asum_aux = &classic_codegen_asum_aux;
+    plugin->exposed.codegen_mtimes_dense_aux =
+        &classic_codegen_mtimes_dense_aux;
     plugin->options = nullptr;
     plugin->deserialize = nullptr;
     plugin->creator = nullptr;

@@ -776,6 +776,7 @@ namespace casadi {
       AUX_BFGS,
       AUX_ORACLE_CALLBACK,
       AUX_OCP_BLOCK,
+      AUX_CONDENSING,
       AUX_ORACLE,
       AUX_SCALED_COPY,
       AUX_BLAZING_COMMON,

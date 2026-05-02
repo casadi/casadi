@@ -26,6 +26,8 @@
 #ifndef CASADI_CONIC_IMPL_HPP
 #define CASADI_CONIC_IMPL_HPP
 
+// Declare BLAS dispatch before parsing the runtime templates.
+#include "blas.hpp"
 #include "conic.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -38,6 +40,8 @@ namespace casadi {
     // Problem data structure
     casadi_qp_data<double> d_qp;
 
+    // Condensing workspace
+    casadi_condensing_data<double> d_cond;
   };
 
   /// Internal class
@@ -148,6 +152,9 @@ namespace casadi {
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}
 
+    /// Can the plugin solve and generate code for the condensed problem
+    virtual bool condensing_support() const { return false;}
+
     /// Can psd constraints be treated
     virtual bool psd_support() const { return false;}
 
@@ -159,12 +166,65 @@ namespace casadi {
         \identifier{24y} */
     void qp_codegen_body(CodeGenerator& g) const;
 
+    /** \brief Emit cleanup/lift after the plugin's solve in codegen */
+    void qp_codegen_post(CodeGenerator& g) const;
+
   protected:
     /// Options
     std::vector<bool> discrete_;
     std::vector<bool> equality_;
     bool print_problem_;
     bool solver_version_check_;
+    bool debug_;
+    casadi_int condensed_block_count_;
+    std::string condense_partition_strategy_;
+
+    /// Partial-condensing wrap (around derived solve)
+    bool condense_;
+    enum CondenseStructureDetection {
+      COND_STRUCT_NONE, COND_STRUCT_AUTO, COND_STRUCT_MANUAL
+    };
+    CondenseStructureDetection condense_structure_detection_;
+    casadi_int N_;            // OCP horizon (original)
+    casadi_int N_hat_;        // condensed horizon
+    std::vector<casadi_int> nxs_, nus_, ngs_;       // length N+1 (nu[N]=0)
+    std::vector<casadi_int> M_;                     // partition, length N_hat+1
+    std::vector<casadi_int> M_user_;                // user-supplied M (empty if none)
+    std::vector<casadi_int> nx_hat_, nu_hat_, ng_hat_;  // length N_hat+1
+    // Block descriptors packed as 4-tuples (offset_r, offset_c, rows, cols)
+    std::vector<casadi_int> AB_blocks_packed_;
+    std::vector<casadi_int> CD_blocks_packed_;
+    std::vector<casadi_int> RSQ_blocks_packed_;
+    std::vector<casadi_int> gap_nz_;
+    std::vector<casadi_int> AB_offsets_, CD_offsets_, RSQ_offsets_;
+    Sparsity RSQsp_, ABsp_, CDsp_;
+    Sparsity H_hat_sp_, A_hat_sp_;
+    casadi_int nx_total_hat_, na_total_hat_;
+
+    // Runtime block descriptors and problem
+    std::vector<casadi_ocp_block> AB_blocks_;
+    std::vector<casadi_ocp_block> CD_blocks_;
+    std::vector<casadi_ocp_block> RSQ_blocks_;
+    casadi_condensing_prob<double> p_cond_;
+    void finalize_condense_prob();
+    /// Unpack a flat [off_r, off_c, rows, cols]*N vector into ocp_block records
+    static void unpack_ocp_blocks(const std::vector<casadi_int>& packed,
+                                  std::vector<casadi_ocp_block>& dst);
+    /// Prepend a length scalar to a vector (used to length-prefix codegen consts)
+    static std::vector<casadi_int> len_prefixed(casadi_int n,
+                                                const std::vector<casadi_int>& v);
+
+    /// Run structure detection (auto) or use provided (manual)
+    void detect_condense_structure();
+    /// Build packed block descriptors and condensed sparsities
+    void build_condense_blocks();
+
+    /// Derive the condensing partition
+    void derive_condense_partition();
+    /// Split the horizon into uniform blocks
+    void frison_uniform_partition();
+    /// Minimize estimated block cost by dynamic programming
+    void dp_optimal_partition();
 
     /// Problem structure
     Sparsity H_, A_, Q_, P_;

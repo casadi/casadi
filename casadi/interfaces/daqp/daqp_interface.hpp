@@ -81,6 +81,8 @@ namespace casadi {
     /// Destructor
     ~DaqpInterface() override;
 
+    bool condensing_support() const override { return true; }
+
     // Get name of the plugin
     const char* plugin_name() const override { return "daqp";}
 

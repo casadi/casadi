@@ -27,7 +27,7 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import casadiTestCase, codegen_check_digits, memory_heavy, requires_nlpsol
+from helpers import casadiTestCase, codegen_check_digits, memory_heavy, requires_nlpsol, requires_conic
 
 import os
             
@@ -964,6 +964,272 @@ class OCPtests(casadiTestCase):
         
     self.fatrop_case(nx2=1,ng1=0,nu1=0)
     
+  def _build_condense_ocp_qp(self, N=4):
+    nx, nu = 2, 1
+    nz = nx*(N+1) + nu*N
+    A_dense = numpy.zeros((nx*N, nz))
+    A_k = numpy.array([[1.0, 0.1], [0.0, 1.0]])
+    B_k = numpy.array([[0.0], [0.5]])
+    for k in range(N):
+      cx = k*(nx+nu)
+      cu = cx+nx
+      cx1 = (k+1)*(nx+nu)
+      A_dense[k*nx:(k+1)*nx, cx:cx+nx] = A_k
+      A_dense[k*nx:(k+1)*nx, cu:cu+nu] = B_k
+      A_dense[k*nx:(k+1)*nx, cx1:cx1+nx] = -numpy.eye(nx)
+    # Strip structural zeros for automatic OCP detection.
+    A = ca.sparsify(ca.DM(A_dense))
+    A_sp = A.sparsity()
+    H_sp = ca.Sparsity.diag(nz)
+    H_diag = numpy.array([1.0, 1.0, 0.5]*N + [1.0, 1.0])
+    g_vec = numpy.zeros(nz)
+    g_vec[0] = 0.1
+    g_vec[2] = 0.2
+    g_vec[4] = 0.3
+    H = ca.DM(H_sp, H_diag)
+    lba = numpy.zeros(nx*N)
+    uba = numpy.zeros(nx*N)
+    lbx = -10*numpy.ones(nz)
+    ubx = 10*numpy.ones(nz)
+    lbx[0] = ubx[0] = 1.0
+    lbx[1] = ubx[1] = 0.0
+    return H_sp, A_sp, dict(h=H, g=g_vec, a=A,
+                            lba=lba, uba=uba, lbx=lbx, ubx=ubx)
+
+  @requires_conic("daqp")
+  def test_condense(self):
+    N, nx, nu = 4, 2, 1
+    H_sp, A_sp, args = self._build_condense_ocp_qp(N=N)
+
+    ref_solver = ca.conic("ref", "daqp", {"h": H_sp, "a": A_sp})
+    ref = ref_solver(**args)
+
+    # Explicit partitions
+    partitions = {
+      "full":     [0, N],                       # one condensed block
+      "identity": list(range(N+1)),             # block per original stage
+      "halves":   [0, N//2, N],                 # two equal blocks
+      "irregular":[0, 1, 3, N],                 # blocks of length 1, 2, 1
+    }
+    for name, M in partitions.items():
+      opts = {
+        "condense": True,
+        "structure_detection": "manual",
+        "N": N, "nx": [nx]*(N+1), "nu": [nu]*N, "ng": [0]*(N+1),
+        "condense_partition": M,
+      }
+      sol_solver = ca.conic("S_" + name, "daqp",
+                            {"h": H_sp, "a": A_sp}, opts)
+      sol = sol_solver(**args)
+      for k in ("x", "cost", "lam_x", "lam_a"):
+        self.checkarray(
+          sol[k], ref[k],
+          failmessage="condense_partition=" + name + ", key=" + k,
+          digits=10)
+
+    # Derived partitions
+    strategies = ["auto", "uniform", "optimal"]
+    block_counts = [0, 1, 2, N]   # 0 = strategy picks
+    for strat in strategies:
+      for n_hat in block_counts:
+        opts = {
+          "condense": True,
+          "structure_detection": "manual",
+          "N": N, "nx": [nx]*(N+1), "nu": [nu]*N, "ng": [0]*(N+1),
+          "condense_partition_strategy": strat,
+          "condensed_block_count": n_hat,
+        }
+        sol_solver = ca.conic(f"S_{strat}_{n_hat}", "daqp",
+                              {"h": H_sp, "a": A_sp}, opts)
+        sol = sol_solver(**args)
+        for k in ("x", "cost", "lam_x", "lam_a"):
+          self.checkarray(
+            sol[k], ref[k],
+            failmessage=f"strategy={strat}, n_hat={n_hat}, key={k}",
+            digits=10)
+
+    # Automatic structure detection
+    sol_auto = ca.conic("S_auto", "daqp", {"h": H_sp, "a": A_sp},
+                        {"condense": True, "structure_detection": "auto"})
+    sol = sol_auto(**args)
+    for k in ("x", "cost", "lam_x", "lam_a"):
+      self.checkarray(sol[k], ref[k],
+                      failmessage="structure_detection=auto, key=" + k,
+                      digits=10)
+
+    # Serialization
+    opts = {"condense": True, "structure_detection": "manual",
+            "N": N, "nx": [nx]*(N+1), "nu": [nu]*N, "ng": [0]*(N+1),
+            "condense_partition_strategy": "optimal",
+            "condensed_block_count": 2}
+    sol_ser = ca.conic("S_ser", "daqp", {"h": H_sp, "a": A_sp}, opts)
+    self.check_serialize(sol_ser, args)
+
+  def _condensing_problem(self, nx, nu, ng, seed=1):
+    rng = numpy.random.RandomState(seed)
+    N = len(nu)
+    nu = list(nu) + [0]
+    offsets = numpy.cumsum([0] + [n+m for n, m in zip(nx, nu)])
+    nz = int(offsets[-1])
+    na = sum(nx[1:]) + sum(ng)
+    H, A = numpy.zeros((nz, nz)), numpy.zeros((na, nz))
+    z = numpy.zeros(nz)
+    lba, uba = numpy.zeros(na), numpy.zeros(na)
+    row = 0
+    for k in range(N+1):
+      x, end = offsets[k:k+2]
+      n = end-x
+      R = rng.randn(n, n)
+      H[x:end, x:end] = numpy.eye(n) + R.T @ R
+      if k < N:
+        AB = 0.15*rng.randn(nx[k+1], n)
+        b = 0.2*rng.randn(nx[k+1])
+        A[row:row+nx[k+1], x:end] = AB
+        A[row:row+nx[k+1], end:end+nx[k+1]] = -numpy.eye(nx[k+1])
+        z[end:end+nx[k+1]] = AB @ z[x:end] + b
+        lba[row:row+nx[k+1]] = uba[row:row+nx[k+1]] = -b
+        row += nx[k+1]
+      CD = rng.randn(ng[k], n)
+      A[row:row+ng[k], x:end] = CD
+      lba[row:row+ng[k]] = CD @ z[x:end] - 0.15
+      uba[row:row+ng[k]] = CD @ z[x:end] + 0.15
+      row += ng[k]
+    lbx, ubx = z-0.3, z+0.3
+    lbx[:nx[0]] = ubx[:nx[0]] = 0
+    args = dict(h=ca.sparsify(ca.DM(H)), a=ca.sparsify(ca.DM(A)),
+                g=3*rng.randn(nz), lbx=lbx, ubx=ubx, lba=lba, uba=uba)
+    opts = dict(condense=True, structure_detection="manual", N=N,
+                nx=list(nx), nu=nu[:-1], ng=list(ng))
+    return args, opts
+
+  @requires_conic("qrqp")
+  def test_condense_general(self):
+    solvers = ["qrqp"] + (["daqp"] if ca.has_conic("daqp") else [])
+    cases = [([2, 6, 1, 3, 2], [1, 0, 2, 0], [5, 9, 0, 4, 7]),
+             ([1, 5, 2], [0, 0], [3, 8, 4]),
+             ([2, 1], [1], [2, 3]),
+             ([2, 2, 2, 2], [1, 2, 1], [0, 0, 0, 0])]
+    for nx, nu, ng in cases:
+      args, opts = self._condensing_problem(nx, nu, ng)
+      sp = dict(h=args["h"].sparsity(), a=args["a"].sparsity())
+      for plugin in solvers:
+        quiet = dict(print_header=False, print_iter=False, print_info=False) if plugin=="qrqp" else {}
+        ref = ca.conic("ref", plugin, sp, quiet)
+        N = len(nu)
+        for M in ([0, N], list(range(N+1)), sorted(set([0, 1, N]))):
+          solver = ca.conic("cond", plugin, sp, dict(opts, condense_partition=M, **quiet))
+          for shift in (0, 0.2):
+            inputs = dict(args, g=args["g"]+shift)
+            expected, result = ref(**inputs), solver(**inputs)
+            for key in ("x", "cost", "lam_x", "lam_a"):
+              self.checkarray(result[key], expected[key], digits=7,
+                              failmessage=str((plugin, nx, nu, ng, M, key)))
+            x = result["x"]
+            stationarity = args["h"] @ x + inputs["g"] + result["lam_x"] + args["a"].T @ result["lam_a"]
+            self.checkarray(stationarity, ca.DM.zeros(x.shape), digits=7)
+            self.checkarray(result["cost"], 0.5*ca.mtimes([x.T, args["h"], x])+ca.dot(inputs["g"], x), digits=9)
+          warm = dict(args, x0=expected["x"], lam_x0=expected["lam_x"], lam_a0=expected["lam_a"])
+          for key, value in ref(**warm).items():
+            self.checkarray(solver(**warm)[key], value, digits=7)
+          self.check_serialize(solver, warm)
+        generated = self.check_codegen(solver, warm, std="c99", digits=7,
+                           opts={"thread_safe": True}, definitions=["CASADI_MAX_NUM_THREADS=16"],
+                           extralibs=["daqp"] if plugin=="daqp" else [])
+        if generated and "F" in generated:
+          self.check_thread_safety(generated["F"], warm, N=8)
+          invalid = dict(warm, uba=args["uba"]+1)
+          with self.assertRaises(RuntimeError):
+            generated["F"](**invalid)
+          bad_a = ca.DM(args["a"])
+          bad_a[0, nx[0]+nu[0]] = -2
+          with self.assertRaises(RuntimeError):
+            generated["F"](**dict(warm, a=bad_a))
+
+  @requires_conic("qrqp")
+  def test_condense_validation(self):
+    args, opts = self._condensing_problem([2, 2, 2], [1, 1], [0, 0, 0])
+    opts.update(print_header=False, print_iter=False, print_info=False)
+    sp = dict(h=args["h"].sparsity(), a=args["a"].sparsity())
+    solver = ca.conic("cond", "qrqp", sp, opts)
+    for changes in [dict(N=-1), dict(nx=[2, -1, 2]), dict(nx=[2, 1, 2]),
+                    dict(nu=[1, -1]), dict(ng=[0, -1, 0]), dict(condensed_block_count=-1),
+                    dict(condensed_block_count=3), dict(condense_partition=[0]),
+                    dict(condense_partition=[0, 2, 1, 2]), dict(condense_partition=[0, 3])]:
+      with self.assertRaises(RuntimeError):
+        ca.conic("invalid", "qrqp", sp, dict(opts, **changes))
+    H = ca.DM(args["h"])
+    H[0, 3] = H[3, 0] = 0.1
+    with self.assertRaisesRegex(RuntimeError, "stage-block-diagonal"):
+      ca.conic("invalid", "qrqp", dict(sp, h=H.sparsity()), opts)
+    A = ca.DM(args["a"])
+    A[0, 4] = 0.1
+    with self.assertRaisesRegex(RuntimeError, "stage structure"):
+      ca.conic("invalid", "qrqp", dict(sp, a=A.sparsity()), opts)
+    A = ca.DM(args["a"])
+    A[0, 3] = -2
+    with self.assertRaisesRegex(RuntimeError, "next-state block"):
+      solver(**dict(args, a=A))
+    for bound in (args["uba"]+1, numpy.full(4, numpy.inf), numpy.full(4, numpy.nan)):
+      with self.assertRaises(RuntimeError):
+        solver(**dict(args, uba=bound))
+    # Rejection must also hold when optional input checking is disabled.
+    unchecked = ca.conic("unchecked", "qrqp", sp, dict(opts, inputs_check=False))
+    with self.assertRaisesRegex(RuntimeError, "equality bounds"):
+      unchecked(**dict(args, uba=args["uba"]+1))
+    with self.assertRaises(RuntimeError):
+      ca.conic("invalid", "qrqp", dict(sp, a=ca.Sparsity(4, 8)),
+               dict(condense=True, structure_detection="auto"))
+
+  @requires_conic("ipqp")
+  def test_condense_unsupported_solver(self):
+    args, opts = self._condensing_problem([1, 1], [1], [0, 0])
+    with self.assertRaisesRegex(RuntimeError, "does not support condensing"):
+      ca.conic("invalid", "ipqp", dict(h=args["h"].sparsity(), a=args["a"].sparsity()), opts)
+
+  @requires_conic("qrqp")
+  def test_condense_failed_solve(self):
+    args, opts = self._condensing_problem([2, 2, 2], [0, 0], [1, 0, 0])
+    lbx, ubx = args["lbx"].copy(), args["ubx"].copy()
+    lbx[-2:] = ubx[-2:] = 10
+    bad = dict(args, lbx=lbx, ubx=ubx)
+    for plugin in ["qrqp"] + (["daqp"] if ca.has_conic("daqp") else []):
+      quiet = dict(print_header=False, print_iter=False, print_info=False) if plugin=="qrqp" else {}
+      solver = ca.conic("cond", plugin, dict(h=args["h"].sparsity(), a=args["a"].sparsity()),
+                        dict(opts, error_on_fail=False, **quiet))
+      solver(**args)
+      failed = solver(**bad)
+      self.assertFalse(solver.stats()["success"])
+      for value in failed.values():
+        self.assertTrue(numpy.isnan(numpy.array(value)).all())
+      self.assertTrue(numpy.isfinite(numpy.array(solver(**args)["x"])).all())
+      generated = self.check_codegen(solver, args, std="c99", digits=7,
+                                    extralibs=["daqp"] if plugin=="daqp" else [])
+      if generated and "F" in generated:
+        with self.assertRaises(RuntimeError):
+          generated["F"](**bad)
+        self.checkarray(generated["F"](**args)["x"], solver(**args)["x"], digits=7)
+
+  @requires_conic("qrqp")
+  def test_condense_partition_optimal(self):
+    import itertools
+    for nx, nu in [([10]*5, [1]*4), ([1, 3, 2, 4, 1], [2, 0, 1, 3]), ([1, 2], [0])]:
+      args, opts = self._condensing_problem(nx, nu, [0]*len(nx))
+      opts.update(print_header=False, print_iter=False, print_info=False,
+                  condense_partition_strategy="optimal")
+      sp = dict(h=args["h"].sparsity(), a=args["a"].sparsity())
+      N = len(nu)
+      def cost(M):
+        return sum((nx[a]+sum(nu[a:b]))**3 for a, b in zip(M, M[1:]))
+      for count in range(N+1):
+        solver = ca.conic("cond", "qrqp", sp, dict(opts, condensed_block_count=count))
+        solver(**args)
+        M = solver.stats()["condense_partition"]
+        candidates = [[0]+list(c)+[N] for size in range(N)
+                      for c in itertools.combinations(range(1, N), size)
+                      if count==0 or size+1==count]
+        self.assertEqual(cost(M), min(map(cost, candidates)))
+        if count: self.assertEqual(len(M)-1, count)
+
   @requires_nlpsol("fatrop")
   def test_bug(self):
 
