@@ -171,23 +171,46 @@ void Blas::dgemm(casadi_int shorthand,
       transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 }
 
+// Strong out-of-line specialization for casadi_blas_mtimes<double>.
+// Declared in blas.hpp under #ifndef SWIG; this is the unique definition
+// the linker resolves to (consumer TUs see the spec declaration and emit
+// external references rather than weak-symbol primary instantiations).
+// Body routes through Blas::mtimes -- which falls through to the
+// unspecialized casadi_mtimes_dense<double> primary (triple loop) when
+// shorthand is 0 (see Blas::mtimes below). No recursion: _blas and the
+// plain primary are distinct symbols.
+template<>
+void casadi_blas_mtimes<double>(
+    const double* A, casadi_int m, casadi_int k,
+    const double* B, casadi_int n, double* C, casadi_int tr) {
+  Blas::mtimes(Blas::default_, A, m, k, B, n, C, tr);
+}
+
 void Blas::mtimes(casadi_int shorthand,
                   const double* A, casadi_int m, casadi_int k,
                   const double* B, casadi_int n,
-                  double* C) {
+                  double* C, casadi_int tr) {
   if (shorthand == 0) {
     // Reference fast path: arguments are already canonical here, so skip
     // dgemm's canonical-detection branch and call the loop directly.
-    casadi_mtimes_dense<double>(A, m, k, B, n, C, /*tr=*/0);
+    casadi_mtimes_dense<double>(A, m, k, B, n, C, tr);
     return;
   }
   // External plugin: indirect through dispatch_, no lock. The caller
   // obtained `shorthand` via shorthand_for() so the slot is populated.
+  //   tr=0: op(A)=A (m×k); B is k×n; C is m×n. LDA=m, LDB=k, LDC=m.
+  //   tr=1: op(A)=A^T (k×m); B is m×n; C is k×n. LDA=m, LDB=m, LDC=k.
   casadi_assert_dev(shorthand < static_cast<casadi_int>(dispatch_.size()));
   casadi_assert_dev(dispatch_[shorthand] != nullptr);
-  dispatch_[shorthand]->exposed.dgemm(
-      CASADI_BLAS_NO_TRANS, CASADI_BLAS_NO_TRANS,
-      m, n, k, 1.0, A, m, B, k, 1.0, C, m);
+  if (tr) {
+    dispatch_[shorthand]->exposed.dgemm(
+        CASADI_BLAS_TRANS, CASADI_BLAS_NO_TRANS,
+        k, n, m, 1.0, A, m, B, m, 1.0, C, k);
+  } else {
+    dispatch_[shorthand]->exposed.dgemm(
+        CASADI_BLAS_NO_TRANS, CASADI_BLAS_NO_TRANS,
+        m, n, k, 1.0, A, m, B, k, 1.0, C, m);
+  }
 }
 
 const char* Blas::name_for_shorthand(casadi_int shorthand) {
@@ -300,6 +323,15 @@ bool Blas::codegen_norm_1_aux(CodeGenerator& g,
                               const std::vector<std::string>& inst) {
   if (!default_) return false;
   CodegenL1Aux fn = dispatch_[default_]->exposed.codegen_asum_aux;
+  if (!fn) return false;
+  fn(g, inst);
+  return true;
+}
+
+bool Blas::codegen_mtimes_dense_aux(CodeGenerator& g,
+                                    const std::vector<std::string>& inst) {
+  if (!default_) return false;
+  CodegenL3Aux fn = dispatch_[default_]->exposed.codegen_mtimes_dense_aux;
   if (!fn) return false;
   fn(g, inst);
   return true;

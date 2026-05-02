@@ -408,7 +408,50 @@ namespace casadi {
       {"solver_version_check",
        {OT_BOOL,
         "When the plugin loads an externally supplied solver, "
-         "check that its version is compatible with the plugin [Default: true]"}}
+         "check that its version is compatible with the plugin [Default: true]"}},
+      {"condense",
+       {OT_BOOL,
+        "Apply OCP partial-condensing before passing to the solver. "
+        "Requires the QP to have OCP block structure (use 'structure_detection')."}},
+      {"structure_detection",
+       {OT_STRING,
+        "OCP structure detection: 'none' (default), 'auto', or 'manual'."}},
+      {"N",
+       {OT_INT,
+        "OCP horizon (manual structure_detection)"}},
+      {"nx",
+       {OT_INTVECTOR,
+        "Number of states per stage, length N+1 (manual structure_detection)"}},
+      {"nu",
+       {OT_INTVECTOR,
+        "Number of controls per stage, length N (manual structure_detection)"}},
+      {"ng",
+       {OT_INTVECTOR,
+        "Number of path inequalities per stage, length N+1 (manual structure_detection)"}},
+      {"condense_partition",
+       {OT_INTVECTOR,
+        "Partition M = [0, M1, ..., N] for partial condensing.  "
+        "Expert override -- if set, the DP that picks M from "
+        "condensed_block_count is skipped.  Mutually exclusive "
+        "with condensed_block_count."}},
+      {"condensed_block_count",
+       {OT_INT,
+        "Number of condensed blocks (n_hat).  Default 0 means the "
+        "selected partition strategy picks both n_hat and M to "
+        "minimize Riccati solve cost.  k > 0 fixes n_hat=k.  "
+        "Mutually exclusive with condense_partition."}},
+      {"condense_partition_strategy",
+       {OT_STRING,
+        "How to derive the partition M from condensed_block_count: "
+        "'auto' (default) picks 'uniform' if nx is uniform across "
+        "stages, else 'optimal' (with a warning if N>500); "
+        "'uniform' assumes uniform nx and uses Frison's closed-form / "
+        "equal-split partition; 'optimal' runs an O(K_max*N^2) DP."}},
+      {"debug",
+       {OT_BOOL,
+        "Produce debug information for structure detection / condensing "
+        "(default: false).  When auto-detect runs, dumps the A sparsity "
+        "to debug_conic_actual.mtx and prints inferred N, nx, nu, ng."}}
      }
   };
 
@@ -418,6 +461,20 @@ namespace casadi {
 
     print_problem_ = false;
     solver_version_check_ = true;
+    debug_ = false;
+    condensed_block_count_ = 0;
+    condense_partition_strategy_ = "auto";
+    condense_ = false;
+    condense_structure_detection_ = COND_STRUCT_NONE;
+    N_ = 0;
+    N_hat_ = 0;
+    nx_total_hat_ = 0;
+    na_total_hat_ = 0;
+    nx_max_ = 0;
+    nu_max_block_ = 0;
+    nxu_max_block_ = 0;
+
+    casadi_int struct_cnt = 0;
 
     // Read options
     for (auto&& op : opts) {
@@ -429,8 +486,52 @@ namespace casadi {
         print_problem_ = op.second;
       } else if (op.first=="solver_version_check") {
         solver_version_check_ = op.second;
+      } else if (op.first=="condense") {
+        condense_ = op.second;
+      } else if (op.first=="structure_detection") {
+        std::string v = op.second;
+        if (v=="none") {
+          condense_structure_detection_ = COND_STRUCT_NONE;
+        } else if (v=="auto") {
+          condense_structure_detection_ = COND_STRUCT_AUTO;
+        } else if (v=="manual") {
+          condense_structure_detection_ = COND_STRUCT_MANUAL;
+        } else {
+          casadi_error("Unknown 'structure_detection': '" + v + "'.");
+        }
+      } else if (op.first=="N") {
+        N_ = op.second;
+        struct_cnt++;
+      } else if (op.first=="nx") {
+        nxs_ = op.second.to_int_vector();
+        struct_cnt++;
+      } else if (op.first=="nu") {
+        nus_ = op.second.to_int_vector();
+        struct_cnt++;
+      } else if (op.first=="ng") {
+        ngs_ = op.second.to_int_vector();
+        struct_cnt++;
+      } else if (op.first=="condense_partition") {
+        M_user_ = op.second.to_int_vector();
+        M_ = M_user_;
+      } else if (op.first=="condensed_block_count") {
+        condensed_block_count_ = op.second;
+      } else if (op.first=="condense_partition_strategy") {
+        condense_partition_strategy_ = std::string(op.second);
+        casadi_assert(
+          condense_partition_strategy_ == "auto" ||
+          condense_partition_strategy_ == "uniform" ||
+          condense_partition_strategy_ == "optimal",
+          "condense_partition_strategy must be 'auto', 'uniform', or "
+          "'optimal'; got '" + condense_partition_strategy_ + "'.");
+      } else if (op.first=="debug") {
+        debug_ = op.second;
       }
     }
+    casadi_assert(
+      M_user_.empty() || condensed_block_count_ == 0,
+      "condense_partition and condensed_block_count are mutually "
+      "exclusive; set at most one.");
 
     if (solver_version_check_) deps_version_check("init");
 
@@ -452,6 +553,29 @@ namespace casadi {
     casadi_assert(np_==0 || psd_support(),
       "Selected solver does not support psd constraints.");
 
+    if (condense_) {
+      casadi_assert(condense_structure_detection_ != COND_STRUCT_NONE,
+        "condense=True requires structure_detection='auto' or 'manual'.");
+      if (condense_structure_detection_ == COND_STRUCT_MANUAL) {
+        casadi_assert(struct_cnt == 4,
+          "structure_detection='manual' requires N, nx, nu, ng to be set.");
+      } else if (condense_structure_detection_ == COND_STRUCT_AUTO) {
+        casadi_assert(struct_cnt == 0,
+          "structure_detection='auto' must not be combined with manual N/nx/nu/ng.");
+      }
+      detect_condense_structure();
+      build_condense_blocks();
+
+      // Reserve workspace -- single source of truth via casadi_condensing_work
+      // (filled fields in p_cond_ tell it the totals).
+      casadi_int sz_iw = 0, sz_w = 0;
+      casadi_condensing_work(&p_cond_, &sz_iw, &sz_w);
+      // Slack for projections (rows of target sparsities).
+      sz_w += std::max({RSQsp_.size1(), ABsp_.size1(), CDsp_.size1()});
+      alloc_w(sz_w, true);
+      alloc_iw(sz_iw, true);
+    }
+
     set_qp_prob();
   }
 
@@ -465,7 +589,12 @@ namespace casadi {
   /** \brief Initalize memory block */
   int Conic::init_mem(void* mem) const {
     if (ProtoFunction::init_mem(mem)) return 1;
-
+    if (condense_) {
+      auto *m = static_cast<ConicMemory*>(mem);
+      m->add_stat("block_transform");  // user H/A -> per-stage flat layout
+      m->add_stat("condensing");       // condense math (eval)
+      m->add_stat("lifting");          // lift + copy-out
+    }
     return 0;
   }
 
@@ -476,20 +605,69 @@ namespace casadi {
     auto *m = static_cast<ConicMemory*>(mem);
 
     casadi_qp_data<double>& d_qp = m->d_qp;
-    d_qp.h = arg[CONIC_H];
-    d_qp.g = arg[CONIC_G];
-    d_qp.a = arg[CONIC_A];
-    d_qp.lbx = arg[CONIC_LBX];
-    d_qp.ubx = arg[CONIC_UBX];
-    d_qp.uba = arg[CONIC_UBA];
-    d_qp.lba = arg[CONIC_LBA];
-    d_qp.x0 = arg[CONIC_X0];
-    d_qp.lam_x0 = arg[CONIC_LAM_X0];
-    d_qp.lam_a0 = arg[CONIC_LAM_A0];
-    d_qp.x = res[CONIC_X];
-    d_qp.lam_x = res[CONIC_LAM_X];
-    d_qp.lam_a = res[CONIC_LAM_A];
-    d_qp.f = res[CONIC_COST];
+
+    if (condense_) {
+      // ---- C++ runtime condensing wrap ----
+      // casadi_condensing_set_work claims ALL workspace (per-stage flat in/
+      // out, internal scratch, condensed CSC, condensed bounds, primal/
+      // dual scratch).  Then we project user inputs into the per-stage
+      // flat layout (block_transform), run the condense math (condensing),
+      // and override d_qp to point at the condensed problem.
+      casadi_condensing_data<double>& d_cond = m->d_cond;
+      d_cond.prob = &p_cond_;
+      casadi_condensing_set_work(&d_cond, &arg, &res, &iw, &w);
+
+      // (1) Block transform: turn user H, A and bounds/snapshots into
+      // the per-stage flat input layout that condensing_eval consumes.
+      m->fstats.at("block_transform").tic();
+      casadi_project(arg[CONIC_H], H_, d_cond.RSQ_val, RSQsp_, w);  /* arg[0] H   */
+      d_cond.g_orig = arg[CONIC_G];                                 /* arg[1] g   */
+      casadi_project(arg[CONIC_A], A_, d_cond.AB_val, ABsp_, w);    /* arg[2] A   */
+      if (CDsp_.nnz() > 0) {
+        casadi_project(arg[CONIC_A], A_, d_cond.CD_val, CDsp_, w);  /* arg[2] A,CD*/
+      }
+      d_cond.lba_orig = arg[CONIC_LBA];                             /* arg[3] lba */
+      d_cond.uba_orig = arg[CONIC_UBA];                             /* arg[4] uba */
+      d_cond.lbx_orig = arg[CONIC_LBX];                             /* arg[5] lbx */
+      d_cond.ubx_orig = arg[CONIC_UBX];                             /* arg[6] ubx */
+      m->fstats.at("block_transform").toc();
+
+      // (2) Condense math.
+      m->fstats.at("condensing").tic();
+      casadi_condensing_eval(&d_cond);
+      m->fstats.at("condensing").toc();
+
+      // Override d_qp to point at the condensed problem
+      d_qp.h     = d_cond.h_hat_csc;
+      d_qp.g     = d_cond.qr_hat_val;
+      d_qp.a     = d_cond.a_hat_csc;
+      d_qp.lbx   = d_cond.lbx;
+      d_qp.ubx   = d_cond.ubx;
+      d_qp.lba   = d_cond.lba;
+      d_qp.uba   = d_cond.uba;
+      d_qp.x0    = nullptr;
+      d_qp.lam_x0 = nullptr;
+      d_qp.lam_a0 = nullptr;
+      d_qp.x     = d_cond.x;
+      d_qp.lam_x = d_cond.lam_x;
+      d_qp.lam_a = d_cond.lam_a;
+      d_qp.f     = res[CONIC_COST];
+    } else {
+      d_qp.h = arg[CONIC_H];
+      d_qp.g = arg[CONIC_G];
+      d_qp.a = arg[CONIC_A];
+      d_qp.lbx = arg[CONIC_LBX];
+      d_qp.ubx = arg[CONIC_UBX];
+      d_qp.uba = arg[CONIC_UBA];
+      d_qp.lba = arg[CONIC_LBA];
+      d_qp.x0 = arg[CONIC_X0];
+      d_qp.lam_x0 = arg[CONIC_LAM_X0];
+      d_qp.lam_a0 = arg[CONIC_LAM_A0];
+      d_qp.x = res[CONIC_X];
+      d_qp.lam_x = res[CONIC_LAM_X];
+      d_qp.lam_a = res[CONIC_LAM_A];
+      d_qp.f = res[CONIC_COST];
+    }
 
     // Problem has not been solved at this point
     d_qp.success = false;
@@ -567,6 +745,19 @@ namespace casadi {
     setup(mem, arg, res, iw, w);
 
     int ret = solve(arg, res, iw, w, mem);
+
+    if (condense_) {
+      // Lift condensed primal/dual; copy into user-facing res[CONIC_*].
+      m->fstats.at("lifting").tic();
+      casadi_condensing_lift(&m->d_cond);
+      casadi_copy(m->d_cond.x_lifted,     p_cond_.total_qr,
+                  res[CONIC_X]);
+      casadi_copy(m->d_cond.lam_x_lifted, p_cond_.total_qr,
+                  res[CONIC_LAM_X]);
+      casadi_copy(m->d_cond.lam_a_lifted, p_cond_.total_b + p_cond_.total_g,
+                  res[CONIC_LAM_A]);
+      m->fstats.at("lifting").toc();
+    }
 
     if (m->d_qp.success) m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
 
@@ -753,7 +944,7 @@ namespace casadi {
   void Conic::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
-    s.version("Conic", 4);
+    s.version("Conic", 5);
     s.pack("Conic::discrete", discrete_);
     s.pack("Conic::equality", equality_);
     s.pack("Conic::print_problem", print_problem_);
@@ -766,6 +957,21 @@ namespace casadi {
     s.pack("Conic::nx", nx_);
     s.pack("Conic::na", na_);
     s.pack("Conic::np", np_);
+
+    // Condense feature: pack the user-facing inputs.  Derived fields
+    // (M_, *_blocks_packed_, sparsities, etc.) are recomputed in the
+    // deserializing constructor by re-running the same init logic.
+    s.pack("Conic::condense", condense_);
+    s.pack("Conic::condense_structure_detection",
+           static_cast<casadi_int>(condense_structure_detection_));
+    s.pack("Conic::N", N_);
+    s.pack("Conic::nxs", nxs_);
+    s.pack("Conic::nus", nus_);
+    s.pack("Conic::ngs", ngs_);
+    s.pack("Conic::M_user", M_user_);
+    s.pack("Conic::condensed_block_count", condensed_block_count_);
+    s.pack("Conic::condense_partition_strategy", condense_partition_strategy_);
+    s.pack("Conic::debug", debug_);
   }
 
   void Conic::serialize_type(SerializingStream &s) const {
@@ -778,7 +984,7 @@ namespace casadi {
   }
 
   Conic::Conic(DeserializingStream & s) : FunctionInternal(s) {
-    int version = s.version("Conic", 1, 4);
+    int version = s.version("Conic", 1, 5);
     s.unpack("Conic::discrete", discrete_);
     if (version>=3) {
       s.unpack("Conic::equality", equality_);
@@ -795,18 +1001,568 @@ namespace casadi {
 
     s.unpack("Conic::H", H_);
     s.unpack("Conic::A", A_);
-    set_qp_prob();
     s.unpack("Conic::Q", Q_);
     s.unpack("Conic::P", P_);
     s.unpack("Conic::nx", nx_);
     s.unpack("Conic::na", na_);
     s.unpack("Conic::np", np_);
+
+    // Condense feature: recovered for version >= 5; older streams default
+    // to non-condense (the only mode that existed before).
+    if (version >= 5) {
+      s.unpack("Conic::condense", condense_);
+      casadi_int sd_int;
+      s.unpack("Conic::condense_structure_detection", sd_int);
+      condense_structure_detection_ =
+          static_cast<CondenseStructureDetection>(sd_int);
+      s.unpack("Conic::N", N_);
+      s.unpack("Conic::nxs", nxs_);
+      s.unpack("Conic::nus", nus_);
+      s.unpack("Conic::ngs", ngs_);
+      s.unpack("Conic::M_user", M_user_);
+      M_ = M_user_;
+      s.unpack("Conic::condensed_block_count", condensed_block_count_);
+      s.unpack("Conic::condense_partition_strategy",
+               condense_partition_strategy_);
+      s.unpack("Conic::debug", debug_);
+    } else {
+      condense_ = false;
+      condense_structure_detection_ = COND_STRUCT_NONE;
+      N_ = 0; N_hat_ = 0;
+      condensed_block_count_ = 0;
+      condense_partition_strategy_ = "auto";
+      debug_ = false;
+    }
+
+    // Re-derive condense data from the unpacked state.  We skip
+    // detect_condense_structure() because the auto-detect already
+    // ran at original init time and its results are captured in
+    // nxs_/nus_/ngs_/N_; nus_ is already padded with the trailing 0.
+    // build_condense_blocks() handles both the user-supplied-M case
+    // and the derive-via-strategy case via its M_.empty() check.
+    if (condense_) {
+      build_condense_blocks();
+    }
+
+    set_qp_prob();
   }
 
   void Conic::set_qp_prob() {
-    p_qp_.sp_a = A_;
-    p_qp_.sp_h = H_;
+    if (condense_) {
+      // Plugin sees the CONDENSED problem; set p_qp_ accordingly so its
+      // own work() / init() / densify use condensed nx/na.
+      p_qp_.sp_a = A_hat_sp_;
+      p_qp_.sp_h = H_hat_sp_;
+    } else {
+      p_qp_.sp_a = A_;
+      p_qp_.sp_h = H_;
+    }
     casadi_qp_setup(&p_qp_);
+  }
+
+  // Build a sparsity from a list of (offset_r, offset_c, rows, cols) blocks,
+  // optionally as identity blocks (eye=true).
+  static Sparsity conic_blocksparsity(casadi_int rows, casadi_int cols,
+      const std::vector<casadi_int>& packed, bool eye) {
+    DM r(rows, cols);
+    casadi_int n = packed.size() / 4;
+    for (casadi_int i = 0; i < n; ++i) {
+      casadi_int orow = packed[4*i + 0];
+      casadi_int ocol = packed[4*i + 1];
+      casadi_int rr = packed[4*i + 2];
+      casadi_int cc = packed[4*i + 3];
+      if (eye) {
+        r(range(orow, orow+rr), range(ocol, ocol+cc)) = DM::eye(rr);
+        casadi_assert_dev(rr == cc);
+      } else {
+        r(range(orow, orow+rr), range(ocol, ocol+cc)) = DM::zeros(rr, cc);
+      }
+    }
+    return r.sparsity();
+  }
+
+  // Auto-detect OCP structure from A_ (port of fatrop_conic logic).
+  void Conic::detect_condense_structure() {
+    if (condense_structure_detection_ == COND_STRUCT_AUTO) {
+      if (debug_) {
+        A_.to_file("debug_conic_actual.mtx");
+        uout() << "Conic auto-detect: A=" << A_.size1() << "x" << A_.size2()
+               << " nnz=" << A_.nnz()
+               << " (dumped to debug_conic_actual.mtx)" << std::endl;
+      }
+      // The skyline walker below indexes into A_skyline[0]/nus_[0] after
+      // the loop -- precondition is at least one row in A_ (one dynamics
+      // or path-constraint row).  An empty A makes those reads OOB.
+      casadi_assert(na_ > 0,
+        "structure_detection='auto' requires A to have at least one row "
+        "(dynamics or path constraints).  Got A: " + str(A_.size1()) + "x" +
+        str(A_.size2()) + ".  For QPs without OCP structure, set "
+        "structure_detection='manual' and provide N/nx/nu/ng explicitly, "
+        "or set condense=false.");
+      Sparsity AT = A_.T();
+      std::vector<casadi_int> A_skyline, A_skyline2, A_bottomline;
+      for (casadi_int i = 0; i < AT.size2(); ++i) {
+        casadi_int pivot = AT.colind()[i+1];
+        A_bottomline.push_back(AT.row()[AT.colind()[i]]);
+        if (pivot > AT.colind()[i]) {
+          A_skyline.push_back(AT.row()[pivot-1]);
+          if (pivot > AT.colind()[i] + 1) {
+            A_skyline2.push_back(AT.row()[pivot-2]);
+          } else {
+            A_skyline2.push_back(-1);
+          }
+        } else {
+          A_skyline.push_back(-1);
+          A_skyline2.push_back(-1);
+        }
+      }
+      nus_.clear();
+      nxs_.clear();
+      ngs_.clear();
+      casadi_int pivot = 0;
+      casadi_int start_pivot = pivot;
+      casadi_int cg = 0;
+      for (casadi_int i = 0; i < na_; ++i) {
+        bool commit = false;
+        if (A_skyline[i] > pivot + 1) {
+          nus_.push_back(A_skyline[i] - pivot - 1);
+          commit = true;
+        } else if (A_skyline[i] == pivot + 1) {
+          if (A_skyline2[i] < start_pivot) {
+            pivot++;
+          } else {
+            nus_.push_back(0);
+            commit = true;
+          }
+        } else {
+          cg++;
+        }
+        if (commit) {
+          nxs_.push_back(pivot - start_pivot + 1);
+          ngs_.push_back(cg); cg = 0;
+          start_pivot = A_skyline[i];
+          pivot = A_skyline[i];
+        }
+      }
+      nxs_.push_back(pivot - start_pivot + 1);
+      // Correction for k==0
+      nxs_[0] = A_skyline[0];
+      nus_[0] = 0;
+      ngs_.erase(ngs_.begin());
+      casadi_int cN = 0;
+      for (casadi_int i = na_ - 1; i >= 0; --i) {
+        if (A_bottomline[i] < start_pivot) break;
+        cN++;
+      }
+      ngs_.push_back(cg - cN);
+      ngs_.push_back(cN);
+      N_ = nus_.size();
+      nus_.push_back(0);
+      if (N_ > 1) {
+        if (nus_[0] == 0 && nxs_[1] + nus_[1] == nxs_[0]) {
+          nxs_[0] = nxs_[1];
+          nus_[0] = nus_[1];
+        }
+      }
+      if (debug_) {
+        uout() << "Conic auto-detect: N=" << N_
+               << " nx=" << nxs_ << " nu=" << nus_ << " ng=" << ngs_
+               << std::endl;
+      }
+    } else {  // MANUAL
+      casadi_assert((casadi_int)nxs_.size() == N_ + 1,
+        "nx must have length N+1 = " + str(N_+1));
+      casadi_assert((casadi_int)nus_.size() == N_,
+        "nu must have length N = " + str(N_));
+      casadi_assert((casadi_int)ngs_.size() == N_ + 1,
+        "ng must have length N+1 = " + str(N_+1));
+      nus_.push_back(0);  // pad nu[N]=0 for unified indexing
+    }
+
+  }
+
+  void Conic::build_condense_blocks() {
+    // Derive M_ if not user-supplied via condense_partition; validate;
+    // set N_hat_.  This block was previously in detect_condense_structure
+    // but lives here so the deserialize path (which skips detect) gets it.
+    if (M_.empty()) {
+      derive_condense_partition();
+    }
+    casadi_assert(M_.front() == 0, "Partition M must start at 0.");
+    casadi_assert(M_.back() == N_, "Partition M must end at N.");
+    for (size_t i = 1; i < M_.size(); ++i) {
+      casadi_assert(M_[i] > M_[i-1], "Partition M must be strictly increasing.");
+    }
+    N_hat_ = M_.size() - 1;
+    if (debug_) {
+      uout() << "Conic condense partition: strategy='"
+             << condense_partition_strategy_ << "', n_hat=" << N_hat_
+             << ", M=" << M_ << std::endl;
+    }
+    const std::vector<casadi_int>& nx = nxs_;
+    const std::vector<casadi_int>& ng = ngs_;
+    const std::vector<casadi_int>& nu = nus_;
+
+    // Build user-side block descriptors
+    AB_blocks_packed_.clear();
+    CD_blocks_packed_.clear();
+    RSQ_blocks_packed_.clear();
+    AB_offsets_.clear();
+    CD_offsets_.clear();
+    RSQ_offsets_.clear();
+
+    casadi_int offset_r = 0, offset_c = 0;
+    AB_offsets_.push_back(0);
+    CD_offsets_.push_back(0);
+    casadi_int off_AB = 0, off_CD = 0;
+    for (casadi_int k = 0; k < N_; ++k) {
+      AB_blocks_packed_.push_back(offset_r);
+      AB_blocks_packed_.push_back(offset_c);
+      AB_blocks_packed_.push_back(nx[k+1]);
+      AB_blocks_packed_.push_back(nx[k] + nu[k]);
+      off_AB += nx[k+1] * (nx[k] + nu[k]);
+      AB_offsets_.push_back(off_AB);
+
+      CD_blocks_packed_.push_back(offset_r + nx[k+1]);
+      CD_blocks_packed_.push_back(offset_c);
+      CD_blocks_packed_.push_back(ng[k]);
+      CD_blocks_packed_.push_back(nx[k] + nu[k]);
+      off_CD += ng[k] * (nx[k] + nu[k]);
+      CD_offsets_.push_back(off_CD);
+
+      offset_c += nx[k] + nu[k];
+      offset_r += nx[k+1] + ng[k];
+    }
+    // Terminal CD block
+    CD_blocks_packed_.push_back(offset_r);
+    CD_blocks_packed_.push_back(offset_c);
+    CD_blocks_packed_.push_back(ng[N_]);
+    CD_blocks_packed_.push_back(nx[N_]);
+    off_CD += ng[N_] * nx[N_];
+    CD_offsets_.push_back(off_CD);  // sentinel: total nnz; CD_offsets length is N+2
+
+    casadi_int off_RSQ = 0;
+    RSQ_offsets_.push_back(0);
+    casadi_int rsq_off = 0;
+    for (casadi_int k = 0; k <= N_; ++k) {
+      RSQ_blocks_packed_.push_back(rsq_off);
+      RSQ_blocks_packed_.push_back(rsq_off);
+      RSQ_blocks_packed_.push_back(nx[k] + nu[k]);
+      RSQ_blocks_packed_.push_back(nx[k] + nu[k]);
+      off_RSQ += (nx[k] + nu[k]) * (nx[k] + nu[k]);
+      RSQ_offsets_.push_back(off_RSQ);
+      rsq_off += nx[k] + nu[k];
+    }
+
+    ABsp_ = conic_blocksparsity(na_, nx_, AB_blocks_packed_, false);
+    CDsp_ = conic_blocksparsity(na_, nx_, CD_blocks_packed_, false);
+    RSQsp_ = conic_blocksparsity(nx_, nx_, RSQ_blocks_packed_, false);
+
+    // Build condensed dimensions
+    nx_hat_.assign(N_hat_ + 1, 0);
+    nu_hat_.assign(N_hat_ + 1, 0);
+    ng_hat_.assign(N_hat_ + 1, 0);
+    nx_max_ = 0;
+    nu_max_block_ = 0;
+    nxu_max_block_ = 0;
+    for (casadi_int K = 0; K <= N_hat_; ++K) {
+      casadi_int k_a = M_[K];
+      nx_hat_[K] = nx[k_a];
+      if (nx[k_a] > nx_max_) nx_max_ = nx[k_a];
+    }
+    for (casadi_int K = 0; K < N_hat_; ++K) {
+      casadi_int k_a = M_[K], k_b = M_[K+1];
+      casadi_int sum_nu = 0, sum_ng = 0, sum_lift = 0;
+      for (casadi_int j = 0; j < k_b - k_a; ++j) {
+        sum_nu += nu[k_a + j];
+        sum_ng += ng[k_a + j];
+        if (j > 0) sum_lift += nx[k_a + j];
+      }
+      nu_hat_[K] = sum_nu;
+      ng_hat_[K] = sum_ng + sum_lift;
+      if (sum_nu > nu_max_block_) nu_max_block_ = sum_nu;
+      casadi_int nxu = nx_hat_[K] + sum_nu;
+      if (nxu > nxu_max_block_) nxu_max_block_ = nxu;
+    }
+    nu_hat_[N_hat_] = 0;
+    ng_hat_[N_hat_] = ng[N_];
+    casadi_int nxu_term = nx_hat_[N_hat_];
+    if (nxu_term > nxu_max_block_) nxu_max_block_ = nxu_term;
+
+    // Build condensed-side block descriptors and offsets
+    AB_hat_blocks_packed_.clear();
+    CD_hat_blocks_packed_.clear();
+    RSQ_hat_blocks_packed_.clear();
+    AB_hat_offsets_.assign(N_hat_ + 1, 0);
+    CD_hat_offsets_.assign(N_hat_ + 1, 0);
+    RSQ_hat_offsets_.assign(N_hat_ + 1, 0);
+    casadi_int o_AB = 0, o_CD = 0, o_RSQ = 0;
+    for (casadi_int K = 0; K < N_hat_; ++K) {
+      casadi_int nxu = nx_hat_[K] + nu_hat_[K];
+      AB_hat_blocks_packed_.push_back(0);
+      AB_hat_blocks_packed_.push_back(0);
+      AB_hat_blocks_packed_.push_back(nx_hat_[K+1]);
+      AB_hat_blocks_packed_.push_back(nxu);
+      AB_hat_offsets_[K] = o_AB;
+      o_AB += nx_hat_[K+1] * nxu;
+      CD_hat_blocks_packed_.push_back(0);
+      CD_hat_blocks_packed_.push_back(0);
+      CD_hat_blocks_packed_.push_back(ng_hat_[K]);
+      CD_hat_blocks_packed_.push_back(nxu);
+      CD_hat_offsets_[K] = o_CD;
+      o_CD += ng_hat_[K] * nxu;
+      RSQ_hat_blocks_packed_.push_back(0);
+      RSQ_hat_blocks_packed_.push_back(0);
+      RSQ_hat_blocks_packed_.push_back(nxu);
+      RSQ_hat_blocks_packed_.push_back(nxu);
+      RSQ_hat_offsets_[K] = o_RSQ;
+      o_RSQ += nxu * nxu;
+    }
+    AB_hat_offsets_[N_hat_] = o_AB;  // sentinel
+    CD_hat_blocks_packed_.push_back(0);
+    CD_hat_blocks_packed_.push_back(0);
+    CD_hat_blocks_packed_.push_back(ng_hat_[N_hat_]);
+    CD_hat_blocks_packed_.push_back(nx_hat_[N_hat_]);
+    CD_hat_offsets_[N_hat_] = o_CD;
+    o_CD += ng_hat_[N_hat_] * nx_hat_[N_hat_];
+    RSQ_hat_blocks_packed_.push_back(0);
+    RSQ_hat_blocks_packed_.push_back(0);
+    RSQ_hat_blocks_packed_.push_back(nx_hat_[N_hat_]);
+    RSQ_hat_blocks_packed_.push_back(nx_hat_[N_hat_]);
+    RSQ_hat_offsets_[N_hat_] = o_RSQ;
+
+    // Total condensed dimensions
+    nx_total_hat_ = 0;
+    for (casadi_int K = 0; K <= N_hat_; ++K) nx_total_hat_ += nx_hat_[K] + nu_hat_[K];
+    na_total_hat_ = 0;
+    for (casadi_int K = 0; K < N_hat_; ++K) na_total_hat_ += nx_hat_[K+1];
+    for (casadi_int K = 0; K <= N_hat_; ++K) na_total_hat_ += ng_hat_[K];
+
+    // Build condensed H sparsity (block-diagonal of dense per-block)
+    {
+      DM h(nx_total_hat_, nx_total_hat_);
+      casadi_int off = 0;
+      for (casadi_int K = 0; K <= N_hat_; ++K) {
+        casadi_int nxu = nx_hat_[K] + nu_hat_[K];
+        h(range(off, off + nxu), range(off, off + nxu)) = DM::ones(nxu, nxu);
+        off += nxu;
+      }
+      H_hat_sp_ = h.sparsity();
+    }
+    // Build condensed A sparsity (gap rows + path rows interleaved per K)
+    {
+      DM a(na_total_hat_, nx_total_hat_);
+      casadi_int row_off = 0, col_off = 0;
+      for (casadi_int K = 0; K <= N_hat_; ++K) {
+        casadi_int nxu = nx_hat_[K] + nu_hat_[K];
+        if (K < N_hat_) {
+          casadi_int nxp1 = nx_hat_[K+1];
+          a(range(row_off, row_off + nxp1), range(col_off, col_off + nxu))
+            = DM::ones(nxp1, nxu);
+          a(range(row_off, row_off + nxp1),
+            range(col_off + nxu, col_off + nxu + nxp1))
+            = -DM::eye(nxp1);
+          row_off += nxp1;
+        }
+        if (ng_hat_[K] > 0) {
+          a(range(row_off, row_off + ng_hat_[K]), range(col_off, col_off + nxu))
+            = DM::ones(ng_hat_[K], nxu);
+          row_off += ng_hat_[K];
+        }
+        col_off += nxu;
+      }
+      A_hat_sp_ = a.sparsity();
+    }
+
+    finalize_condense_prob();
+  }
+
+  // Pick M_ from condense_partition_strategy_ + condensed_block_count_.
+  // Dispatches to frison_uniform_partition() or dp_optimal_partition().
+  void Conic::derive_condense_partition() {
+    // Detect uniformity of nx and nu (we need uniform nx for the
+    // closed-form path; nu can vary but is typically uniform too).
+    bool nx_uniform = true;
+    for (casadi_int k = 1; k <= N_; ++k) {
+      if (nxs_[k] != nxs_[0]) { nx_uniform = false; break; }
+    }
+
+    std::string strat = condense_partition_strategy_;
+    if (strat == "auto") {
+      if (nx_uniform) {
+        strat = "uniform";
+      } else {
+        strat = "optimal";
+        if (N_ > 500) {
+          casadi_warning("condense_partition_strategy='auto' falling back "
+            "to 'optimal' DP at O(K_max*N^2) for N=" + str(N_) + " with "
+            "non-uniform nx; this runs once at init but may be slow.  "
+            "Set condense_partition_strategy='optimal' to silence this "
+            "warning, or supply condense_partition explicitly.");
+        }
+      }
+      condense_partition_strategy_ = strat;  // record actual choice
+    }
+
+    if (strat == "uniform") {
+      casadi_assert(nx_uniform || condensed_block_count_ > 0,
+        "condense_partition_strategy='uniform' requires uniform nx (or "
+        "an explicit condensed_block_count); got non-uniform nx and "
+        "condensed_block_count=0.");
+      frison_uniform_partition();
+    } else if (strat == "optimal") {
+      dp_optimal_partition();
+    } else {
+      casadi_error("Unknown condense_partition_strategy '" + strat + "'.");
+    }
+  }
+
+  // Uniform-stage closed form: when condensed_block_count_ == 0, pick
+  // n_hat ~= round(sqrt(N * nu / (nx + nu))) per Frison's analysis;
+  // when > 0, use it directly.  Then emit M = uniform split.
+  void Conic::frison_uniform_partition() {
+    casadi_int n_hat = condensed_block_count_;
+    if (n_hat == 0) {
+      // Frison's closed-form approximate optimum for uniform stages.
+      // Here nu/(nx+nu) is treated as average across stages so the
+      // formula degrades gracefully if nu varies a bit.
+      double nx_avg = 0, nu_avg = 0;
+      for (casadi_int k = 0; k <= N_; ++k) nx_avg += nxs_[k];
+      for (casadi_int k = 0; k < N_; ++k) nu_avg += nus_[k];
+      nx_avg /= (N_ + 1);
+      nu_avg /= std::max<casadi_int>(N_, 1);
+      double ratio = nu_avg / std::max(1e-30, nx_avg + nu_avg);
+      n_hat = static_cast<casadi_int>(std::round(std::sqrt(double(N_) * ratio)));
+      n_hat = std::max<casadi_int>(1, std::min<casadi_int>(n_hat, N_));
+    }
+    casadi_assert(n_hat >= 1 && n_hat <= N_,
+      "condensed_block_count must satisfy 1 <= n_hat <= N=" + str(N_)
+      + "; got " + str(n_hat) + ".");
+    M_.assign(n_hat + 1, 0);
+    for (casadi_int K = 0; K <= n_hat; ++K) {
+      // floor((K * N) / n_hat) -- equal split rounding down
+      M_[K] = (K * N_) / n_hat;
+    }
+    M_[n_hat] = N_;  // ensure exact endpoint
+  }
+
+  // O(K_max * N^2) DP: find M minimizing sum_K block_cost(M_K, M_{K+1})
+  // where block_cost(a, b) = (nx[a] + sum_{j=a..b-1} nu[j])^3.
+  // If condensed_block_count_ == 0, scans K=1..K_max and picks argmin;
+  // else fixes K = condensed_block_count_.
+  void Conic::dp_optimal_partition() {
+    // Prefix sum of nu for O(1) block-cost lookup.
+    std::vector<casadi_int> nu_pref(N_ + 1, 0);
+    for (casadi_int k = 0; k < N_; ++k) nu_pref[k+1] = nu_pref[k] + nus_[k];
+    auto blk_cost = [&](casadi_int a, casadi_int b) -> double {
+      double nxu = double(nxs_[a]) + double(nu_pref[b] - nu_pref[a]);
+      return nxu * nxu * nxu;
+    };
+
+    casadi_int K_max;
+    if (condensed_block_count_ > 0) {
+      K_max = condensed_block_count_;
+    } else {
+      // Heuristic cap: ~3x the Frison optimum, clamped to [2, 100, N].
+      double nx_avg = 0, nu_avg = 0;
+      for (casadi_int k = 0; k <= N_; ++k) nx_avg += nxs_[k];
+      for (casadi_int k = 0; k < N_; ++k) nu_avg += nus_[k];
+      nx_avg /= (N_ + 1);
+      nu_avg /= std::max<casadi_int>(N_, 1);
+      double ratio = nu_avg / std::max(1e-30, nx_avg + nu_avg);
+      casadi_int est = static_cast<casadi_int>(
+          std::ceil(3.0 * std::sqrt(double(N_) * ratio)));
+      K_max = std::max<casadi_int>(2,
+              std::min<casadi_int>(N_,
+              std::min<casadi_int>(100, est)));
+    }
+    casadi_assert(K_max >= 1 && K_max <= N_,
+      "DP K_max out of range [1, N]; got " + str(K_max));
+
+    const double INF = std::numeric_limits<double>::infinity();
+    std::vector<std::vector<double>>     f   (K_max + 1,
+        std::vector<double>(N_ + 1, INF));
+    std::vector<std::vector<casadi_int>> prev(K_max + 1,
+        std::vector<casadi_int>(N_ + 1, -1));
+    f[0][0] = 0.0;
+
+    for (casadi_int K = 0; K < K_max; ++K) {
+      // Need to keep room for (K_max-K-1) more blocks after this one;
+      // last block must end at N.
+      casadi_int b_hi_global = N_ - (K_max - K - 1);
+      for (casadi_int a = K; a <= b_hi_global - 1; ++a) {
+        if (f[K][a] == INF) continue;
+        for (casadi_int b = a + 1; b <= b_hi_global; ++b) {
+          double c = f[K][a] + blk_cost(a, b);
+          if (c < f[K+1][b]) {
+            f[K+1][b] = c;
+            prev[K+1][b] = a;
+          }
+        }
+      }
+    }
+
+    casadi_int n_hat;
+    if (condensed_block_count_ > 0) {
+      n_hat = condensed_block_count_;
+      casadi_assert(f[n_hat][N_] != INF,
+        "DP could not place exactly " + str(n_hat) + " blocks over N=" +
+        str(N_) + " (infeasible).");
+    } else {
+      n_hat = 1;
+      double best = f[1][N_];
+      for (casadi_int K = 2; K <= K_max; ++K) {
+        if (f[K][N_] < best) { best = f[K][N_]; n_hat = K; }
+      }
+    }
+
+    // Backtrack
+    M_.assign(n_hat + 1, 0);
+    M_[n_hat] = N_;
+    for (casadi_int K = n_hat; K > 0; --K) {
+      M_[K-1] = prev[K][M_[K]];
+    }
+
+    if (debug_) {
+      uout() << "Conic DP: K_max=" << K_max << ", chose n_hat=" << n_hat
+             << ", cost=" << f[n_hat][N_] << std::endl;
+    }
+  }
+
+  // Unpack the *_blocks_packed_ vectors into native casadi_ocp_block
+  // vectors and wire p_cond_ to point at our member arrays.  Called
+  // from build_condense_blocks() and from the deserializing constructor.
+  void Conic::finalize_condense_prob() {
+    auto unpack = [](const std::vector<casadi_int>& packed,
+                     std::vector<casadi_ocp_block>& dst) {
+      dst.resize(packed.size() / 4);
+      for (size_t i = 0; i < dst.size(); ++i) {
+        dst[i].offset_r = packed[4*i + 0];
+        dst[i].offset_c = packed[4*i + 1];
+        dst[i].rows     = packed[4*i + 2];
+        dst[i].cols     = packed[4*i + 3];
+      }
+    };
+    unpack(AB_blocks_packed_, AB_blocks_);
+    unpack(CD_blocks_packed_, CD_blocks_);
+    unpack(RSQ_blocks_packed_, RSQ_blocks_);
+
+    p_cond_.nx = get_ptr(nxs_);
+    p_cond_.nu = get_ptr(nus_);
+    p_cond_.ng = get_ptr(ngs_);
+    p_cond_.N = N_;
+    p_cond_.AB = get_ptr(AB_blocks_);
+    p_cond_.CD = get_ptr(CD_blocks_);
+    p_cond_.RSQ = get_ptr(RSQ_blocks_);
+    p_cond_.AB_offsets = get_ptr(AB_offsets_);
+    p_cond_.CD_offsets = get_ptr(CD_offsets_);
+    p_cond_.RSQ_offsets = get_ptr(RSQ_offsets_);
+    p_cond_.M = get_ptr(M_);
+    p_cond_.N_hat = N_hat_;
+    // Per-condensed-stage *_hat dim/offset/block-descriptor arrays now
+    // live on casadi_condensing_data and are populated per call by
+    // casadi_condensing_set_work.  Setup only fills prob scalars here.
+    casadi_condensing_setup(&p_cond_);
   }
 
   void Conic::qp_codegen_body(CodeGenerator& g) const {
@@ -814,11 +1570,126 @@ namespace casadi {
     g.local("d_qp", "struct casadi_qp_data");
     g.local("p_qp", "struct casadi_qp_prob");
 
+    if (condense_) {
+      // ---- Condensing pre-block ----
+      g.add_auxiliary(CodeGenerator::AUX_CONDENSING);
+      g.add_auxiliary(CodeGenerator::AUX_PROJECT);
+      g.add_auxiliary(CodeGenerator::AUX_COPY);
+
+      // Read-only block descriptors / dim / offset arrays go to file-scope
+      // deduplicated const pool via g.constant() (emits as casadi_sNN[]).
+      // Block-pack consts are length-prefixed ([N, off_r, off_c, rows, cols, ...])
+      // so casadi_unpack_ocp_blocks can read them directly -- mirrors the
+      // fatrop/hpipm pattern (no runtime copy through a static scratch).
+      auto with_len = [](casadi_int n, const std::vector<casadi_int>& v) {
+        std::vector<casadi_int> r;
+        r.reserve(1 + v.size());
+        r.push_back(n);
+        r.insert(r.end(), v.begin(), v.end());
+        return r;
+      };
+      const std::string s_nx          = g.constant(nxs_);
+      const std::string s_nu          = g.constant(nus_);
+      const std::string s_ng          = g.constant(ngs_);
+      const std::string s_M           = g.constant(M_);
+      const std::string s_AB_off      = g.constant(AB_offsets_);
+      const std::string s_CD_off      = g.constant(CD_offsets_);
+      const std::string s_RSQ_off     = g.constant(RSQ_offsets_);
+      const std::string s_AB_lp       = g.constant(with_len(N_,     AB_blocks_packed_));
+      const std::string s_CD_lp       = g.constant(with_len(N_+1,   CD_blocks_packed_));
+      const std::string s_RSQ_lp      = g.constant(with_len(N_+1,   RSQ_blocks_packed_));
+
+      // Prob-side scratch: original (non-hat) block descriptor structs
+      // -- target of the unpack from length-prefixed const.  Mirrors
+      // fatrop/hpipm codegen_unpack_block.  Does NOT consume iw / w.
+      // The *_hat block descriptors and *_hat dim/offset arrays now live
+      // on casadi_condensing_data and are populated by
+      // casadi_condensing_set_work from the prob recurrence -- no static
+      // scratch needed for them.
+      g.local("cond_AB_blk[" + str(std::max<casadi_int>(N_, 1)) + "]",
+              "static struct casadi_ocp_block");
+      g.local("cond_CD_blk[" + str(N_+1) + "]",
+              "static struct casadi_ocp_block");
+      g.local("cond_RSQ_blk[" + str(N_+1) + "]",
+              "static struct casadi_ocp_block");
+
+      g << "casadi_unpack_ocp_blocks(cond_AB_blk, "  << s_AB_lp  << ");\n";
+      g << "casadi_unpack_ocp_blocks(cond_CD_blk, "  << s_CD_lp  << ");\n";
+      g << "casadi_unpack_ocp_blocks(cond_RSQ_blk, " << s_RSQ_lp << ");\n";
+
+      // Set up condensing prob (scalars; per-stage *_hat lives on data)
+      g.local("p_cond", "struct casadi_condensing_prob");
+      g << "p_cond.nx = " << s_nx << ";\n";
+      g << "p_cond.nu = " << s_nu << ";\n";
+      g << "p_cond.ng = " << s_ng << ";\n";
+      g << "p_cond.N = " << N_ << ";\n";
+      g << "p_cond.AB = cond_AB_blk;\n";
+      g << "p_cond.CD = cond_CD_blk;\n";
+      g << "p_cond.RSQ = cond_RSQ_blk;\n";
+      g << "p_cond.AB_offsets = " << s_AB_off << ";\n";
+      g << "p_cond.CD_offsets = " << s_CD_off << ";\n";
+      g << "p_cond.RSQ_offsets = " << s_RSQ_off << ";\n";
+      g << "p_cond.M = " << s_M << ";\n";
+      g << "p_cond.N_hat = " << N_hat_ << ";\n";
+      g << "casadi_condensing_setup(&p_cond);\n";
+
+      // d_cond + ALL workspace (per-condensed-stage *_hat dim/offset/
+      // block descriptors via iw, per-stage flat in/out via w, internal
+      // scratch, condensed CSC, bounds, primal/dual) is claimed and
+      // populated by casadi_condensing_set_work in this single call.
+      g.local("d_cond", "struct casadi_condensing_data");
+      g << "d_cond.prob = &p_cond;\n";
+      g << "casadi_condensing_set_work(&d_cond, &arg, &res, &iw, &w);\n";
+
+      // Wire user inputs in arg[] order (arg[0] H, [1] g, [2] A,
+      // [3] lba, [4] uba, [5] lbx, [6] ubx).  H, A go through
+      // casadi_project; the rest are pointer snapshots read by eval.
+      g << g.project("arg[" + str(CONIC_H) + "]", H_,
+                     "d_cond.RSQ_val", RSQsp_, "w") << "\n";
+      g << "d_cond.g_orig   = arg[" << CONIC_G << "];\n";
+      g << g.project("arg[" + str(CONIC_A) + "]", A_,
+                     "d_cond.AB_val", ABsp_, "w") << "\n";
+      if (CDsp_.nnz() > 0) {
+        g << g.project("arg[" + str(CONIC_A) + "]", A_,
+                       "d_cond.CD_val", CDsp_, "w") << "\n";
+      }
+      g << "d_cond.lba_orig = arg[" << CONIC_LBA << "];\n";
+      g << "d_cond.uba_orig = arg[" << CONIC_UBA << "];\n";
+      g << "d_cond.lbx_orig = arg[" << CONIC_LBX << "];\n";
+      g << "d_cond.ubx_orig = arg[" << CONIC_UBX << "];\n";
+      g << "casadi_condensing_eval(&d_cond);\n";
+
+      // Set up d_qp/p_qp pointing at the CONDENSED problem
+      g << "d_qp.prob = &p_qp;\n";
+      g << "p_qp.sp_a = " << g.sparsity(A_hat_sp_) << ";\n";
+      g << "p_qp.sp_h = " << g.sparsity(H_hat_sp_) << ";\n";
+      g << "casadi_qp_setup(&p_qp);\n";
+      g << "casadi_qp_set_work(&d_qp, &arg, &res, &iw, &w);\n";
+
+      g << "d_qp.h = d_cond.h_hat_csc;\n";
+      g << "d_qp.g = d_cond.qr_hat_val;\n";
+      g << "d_qp.a = d_cond.a_hat_csc;\n";
+      g << "d_qp.lbx = d_cond.lbx;\n";
+      g << "d_qp.ubx = d_cond.ubx;\n";
+      g << "d_qp.lba = d_cond.lba;\n";
+      g << "d_qp.uba = d_cond.uba;\n";
+      g << "d_qp.x0 = 0;\n";
+      g << "d_qp.lam_x0 = 0;\n";
+      g << "d_qp.lam_a0 = 0;\n";
+
+      g << "d_qp.f = res[" << CONIC_COST << "];\n";
+      g << "d_qp.x = d_cond.x;\n";
+      g << "d_qp.lam_x = d_cond.lam_x;\n";
+      g << "d_qp.lam_a = d_cond.lam_a;\n";
+      return;
+    }
+
+    // ---- Standard (non-condensing) path ----
     g << "d_qp.prob = &p_qp;\n";
     g << "p_qp.sp_a = " << g.sparsity(A_) << ";\n";
     g << "p_qp.sp_h = " << g.sparsity(H_) << ";\n";
     g << "casadi_qp_setup(&p_qp);\n";
-    g << "casadi_qp_init(&d_qp, &iw, &w);\n";
+    g << "casadi_qp_set_work(&d_qp, &arg, &res, &iw, &w);\n";
 
 
     g << "d_qp.h = arg[" << CONIC_H << "];\n";
@@ -836,6 +1707,20 @@ namespace casadi {
     g << "d_qp.x = res[" << CONIC_X << "];\n";
     g << "d_qp.lam_x = res[" << CONIC_LAM_X << "];\n";
     g << "d_qp.lam_a = res[" << CONIC_LAM_A << "];\n";
+  }
+
+  void Conic::qp_codegen_post(CodeGenerator& g) const {
+    if (!condense_) return;
+    // Lift condensed primal/dual into d_cond.{x,lam_x,lam_a}_lifted,
+    // then copy into the user-facing res[CONIC_*] slots.
+    g.add_auxiliary(CodeGenerator::AUX_COPY);
+    g << "casadi_condensing_lift(&d_cond);\n";
+    g << "casadi_copy(d_cond.x_lifted, "     << p_cond_.total_qr
+      << ", res[" << CONIC_X << "]);\n";
+    g << "casadi_copy(d_cond.lam_x_lifted, " << p_cond_.total_qr
+      << ", res[" << CONIC_LAM_X << "]);\n";
+    g << "casadi_copy(d_cond.lam_a_lifted, " << (p_cond_.total_b + p_cond_.total_g)
+      << ", res[" << CONIC_LAM_A << "]);\n";
   }
 
 } // namespace casadi

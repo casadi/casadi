@@ -27,6 +27,7 @@
 #include "code_generator.hpp"
 #include "function_internal.hpp"
 #include "convexify.hpp"
+#include "blas_impl.hpp"
 #include <casadi_runtime_str.h>
 #include "global_options.hpp"
 #include "filesystem_impl.hpp"
@@ -1656,7 +1657,25 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_mtimes_str, inst);
       break;
     case AUX_MTIMES_DENSE:
-      this->auxiliaries << sanitize_source(casadi_mtimes_dense_str, inst);
+      if (!Blas::codegen_mtimes_dense_aux(*this, inst))
+        this->auxiliaries << sanitize_source(casadi_mtimes_dense_str, inst);
+      break;
+    case AUX_BLAS_MTIMES:
+      // Codegen counterpart of the C++ wrapper casadi_blas_mtimes (in
+      // blas.hpp): a thin delegate to casadi_mtimes_dense.  When a BLAS
+      // plugin overrides AUX_MTIMES_DENSE (cblas_dgemm body), this
+      // wrapper picks up the dispatch automatically -- no separate
+      // plugin hook needed.  Used by AUX_CONDENSING so the generated
+      // code's call sites match the runtime hpp's source verbatim
+      // (no C-REPLACE of casadi_blas_mtimes -> casadi_mtimes_dense).
+      add_auxiliary(AUX_MTIMES_DENSE);
+      this->auxiliaries
+          << "void casadi_blas_mtimes(const casadi_real* x, "
+             "casadi_int nrow_x, casadi_int ncol_x,\n"
+          << "    const casadi_real* y, casadi_int ncol_y, "
+             "casadi_real* z, casadi_int tr) {\n"
+          << "  casadi_mtimes_dense(x, nrow_x, ncol_x, y, ncol_y, z, tr);\n"
+          << "}\n";
       break;
     case AUX_MTIMES_DENSE_SPARSE:
       this->auxiliaries << sanitize_source(casadi_mtimes_dense_sparse_str, inst);
@@ -1861,6 +1880,12 @@ namespace casadi {
       break;
     case AUX_OCP_BLOCK:
       this->auxiliaries << sanitize_source(casadi_ocp_block_str, inst);
+      break;
+    case AUX_CONDENSING:
+      add_auxiliary(AUX_OCP_BLOCK);
+      add_auxiliary(AUX_INF);
+      add_auxiliary(AUX_BLAS_MTIMES);  // pulls AUX_MTIMES_DENSE; gives us the wrapper
+      this->auxiliaries << sanitize_source(casadi_condensing_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "

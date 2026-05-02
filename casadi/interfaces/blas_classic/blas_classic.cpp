@@ -85,6 +85,40 @@ namespace casadi {
          "&blas_one, " << C << ", &blas_m);\n";
   }
 
+  // L3 codegen-AUX hook: emit a casadi_mtimes_dense body that calls
+  // CASADI_BLAS_DGEMM instead of the reference triple loop.  Fired by
+  // CodeGenerator::add_auxiliary(AUX_MTIMES_DENSE) when this plugin is
+  // the active default BLAS.  The function signature must match the
+  // canonical reference (casadi/core/runtime/casadi_mtimes_dense.hpp).
+  // Requires casadi_real == double.
+  static void classic_codegen_mtimes_dense_aux(CodeGenerator& g,
+      const std::vector<std::string>& inst) {
+    (void)inst;
+    // Inline the extern decl in the aux block: g.add_external() lands
+    // AFTER auxiliaries in the emission order, so by the time our
+    // function body uses CASADI_BLAS_DGEMM the macro/extern would not
+    // yet be in scope.
+    g.auxiliaries << CLASSIC_DECL << "\n";
+    g.auxiliaries
+      << "/* SYMBOL \"mtimes_dense\" -- BLAS \"classic\" override */\n"
+      << "void casadi_mtimes_dense(const casadi_real* x, "
+         "casadi_int nrow_x, casadi_int ncol_x,\n"
+      << "    const casadi_real* y, casadi_int ncol_y, "
+         "casadi_real* z, casadi_int tr) {\n"
+      << "  const char ta = tr ? 'T' : 'N';\n"
+      << "  const char tn = 'N';\n"
+      << "  const double one = 1.0;\n"
+      << "  int m   = (int)(tr ? ncol_x : nrow_x);\n"
+      << "  int n   = (int)ncol_y;\n"
+      << "  int kk  = (int)(tr ? nrow_x : ncol_x);\n"
+      << "  int lda = (int)nrow_x;\n"
+      << "  int ldb = (int)(tr ? nrow_x : ncol_x);\n"
+      << "  int ldc = m;\n"
+      << "  CASADI_BLAS_DGEMM(&ta, &tn, &m, &n, &kk, &one, "
+         "x, &lda, y, &ldb, &one, z, &ldc);\n"
+      << "}\n";
+  }
+
   extern "C" int CASADI_BLAS_CLASSIC_EXPORT
   casadi_register_blas_classic(Blas::Plugin* plugin) {
     plugin->name = "classic";
@@ -92,6 +126,8 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->exposed.dgemm = &classic_dgemm;
     plugin->exposed.codegen_mtimes = &classic_codegen_mtimes;
+    plugin->exposed.codegen_mtimes_dense_aux =
+        &classic_codegen_mtimes_dense_aux;
     plugin->options = nullptr;
     plugin->deserialize = nullptr;
     plugin->creator = nullptr;

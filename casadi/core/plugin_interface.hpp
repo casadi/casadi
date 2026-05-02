@@ -64,9 +64,14 @@ namespace casadi {
       typename Derived::Exposed exposed;
       const Options* options;
       Deserialize deserialize;
-      // Constructor
+      // Constructor.  exposed{} value-initializes the Derived-specific
+      // function-pointer table; plugins that only set a subset of fields
+      // (e.g. blas_classic sets dgemm/codegen_mtimes but not
+      // codegen_mtimes_dense_aux) get the rest as null.  Without this,
+      // the optional-hook checks (`if (!fn) return false`) would read
+      // uninitialized memory.
       Plugin() : creator(nullptr), name(nullptr), doc(nullptr), version(0),
-                  options(nullptr), deserialize(nullptr) {}
+                  exposed{}, options(nullptr), deserialize(nullptr) {}
     };
 
     // Plugin registration function

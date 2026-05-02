@@ -76,6 +76,13 @@ namespace casadi {
 
       static std::string temp_work_dir; // Temporary work directory
 
+      /** \brief Active default BLAS plugin name ("reference" if no
+       *  external plugin is loaded as default).  Mirrored to the
+       *  integer shorthand on Blas via Blas::setDefault.
+       *
+       *  \identifier{2gz} */
+      static std::string default_blas;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -104,6 +111,15 @@ namespace casadi {
 
       static void setTempWorkDir(const std::string& dir);
       static std::string getTempWorkDir() { return temp_work_dir; }
+
+      /** \brief Select the active BLAS plugin for dense matrix-multiply
+       *  (and any other Blas::* dispatch).  Pass "reference" for the
+       *  built-in loop, or any registered plugin ("classic", "blasfeo",
+       *  ...).  Validates the name and lazy-loads the plugin DLL.
+       *
+       *  \identifier{2h0} */
+      static void setDefaultBlas(const std::string& name);
+      static std::string getDefaultBlas() { return default_blas; }
 
   };
 
