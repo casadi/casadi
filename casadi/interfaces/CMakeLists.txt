@@ -79,6 +79,14 @@ if(WITH_GUROBI)
   add_subdirectory(gurobi)
 endif()
 
+if(WITH_XPRESS)
+  add_subdirectory(xpress)
+endif()
+
+if(WITH_MOSEK)
+  add_subdirectory(mosek)
+endif()
+
 if(WITH_WORHP)
   add_subdirectory(worhp)
 endif()

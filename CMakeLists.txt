@@ -860,6 +860,14 @@ option(WITH_MOCKUP_CPLEX "Use mockup CPLEX (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUP
 option(WITH_GUROBI "Compile the interface to GUROBI" OFF)
 option(WITH_MOCKUP_GUROBI "Use mockup GUROBI (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
+# FICO Xpress: A sparse (mixed-integer) LP/QP solver
+option(WITH_XPRESS "Compile the interface to FICO Xpress" OFF)
+option(WITH_MOCKUP_XPRESS "Use mockup XPRESS (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+
+# MOSEK: A sparse (mixed-integer) LP/QP/SOCP solver
+option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
+option(WITH_MOCKUP_MOSEK "Use mockup MOSEK (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+
 # Bonmin: An MINLP solver
 option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
 set(BUILD_BONMIN_GIT_REPO "https://github.com/coin-or/Bonmin.git" CACHE STRING "Git repo used together with BUILD_BONMIN_VERSION")
@@ -1067,7 +1075,7 @@ endmacro()
 
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL MADNLP)
+foreach(PKG CPLEX SNOPT KNITRO GUROBI XPRESS MOSEK WORHP HSL MADNLP)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_BUILD_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
@@ -1186,6 +1194,38 @@ if(WITH_GUROBI AND WITH_MOCKUP_GUROBI)
   DESTINATION "${LIB_PREFIX}")
 endif()
 add_feature_info(gurobi-interface WITH_GUROBI "Interface to the (mixed-integer) QP solver GUROBI")
+
+if(WITH_XPRESS AND WITH_MOCKUP_XPRESS)
+  add_library(xpress::xpress SHARED IMPORTED)
+  add_dependencies(xpress::xpress mockups-external)
+  set(XPRESS_MOCKUP_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/xpress/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}xprs${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/xpress/include")
+  set_target_properties(xpress::xpress PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/xpress/include"
+    IMPORTED_LOCATION "${XPRESS_MOCKUP_LIB}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/xpress/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}xprs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+  install(FILES
+  ${XPRESS_MOCKUP_LIB}
+  DESTINATION "${LIB_PREFIX}")
+endif()
+add_feature_info(xpress-interface WITH_XPRESS "Interface to the (mixed-integer) LP/QP solver FICO Xpress")
+
+if(WITH_MOSEK AND WITH_MOCKUP_MOSEK)
+  add_library(mosek::mosek SHARED IMPORTED)
+  add_dependencies(mosek::mosek mockups-external)
+  set(MOSEK_MOCKUP_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}mosek64${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include")
+  set_target_properties(mosek::mosek PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include"
+    IMPORTED_LOCATION "${MOSEK_MOCKUP_LIB}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}mosek64${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+  install(FILES
+  ${MOSEK_MOCKUP_LIB}
+  DESTINATION "${LIB_PREFIX}")
+endif()
+add_feature_info(mosek-interface WITH_MOSEK "Interface to the (mixed-integer) LP/QP/SOCP solver MOSEK")
 
 if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   add_library(knitro::knitro SHARED IMPORTED)

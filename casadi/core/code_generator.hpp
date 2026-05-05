@@ -714,6 +714,7 @@ namespace casadi {
       AUX_QR,
       AUX_QP,
       AUX_QRQP,
+      AUX_SOCP,
       AUX_NLP,
       AUX_SQPMETHOD,
       AUX_FEASIBLESQPMETHOD,

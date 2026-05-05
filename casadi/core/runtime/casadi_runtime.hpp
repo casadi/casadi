@@ -325,6 +325,7 @@ namespace casadi {
   #include "casadi_dense_lsqr.hpp"
   #include "casadi_cache.hpp"
   #include "casadi_convexify.hpp"
+  #include "casadi_socp.hpp"
   #include "casadi_logsumexp.hpp"
   #include "casadi_sum.hpp"
   #include "casadi_sparsity.hpp"

@@ -71,6 +71,30 @@ if "SKIP_SUPERSCS_TESTS" not in os.environ and has_conic("superscs"):
 if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
   conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-9}},{"quadratic": True, "less_digits": True, "dual": True, "soc": True, "codegen": False,"binary":True, "discrete":True,"sos":True}))
 
+if "SKIP_XPRESS_TESTS" not in os.environ and has_conic("xpress"):
+  # Note: OPTIMALITYTOL tighter than default (1e-6) can cause Xpress to
+  # return infeasible solutions while reporting "optimal".  Leave at default.
+  xpress_dir = os.environ.get("XPRESSDIR", "/opt/xpressmp")
+  xpress_codegen = {"extralibs": ["xprs"], "std": "c99",
+                    "extra_options": ["-I" + os.path.join(xpress_dir, "include"),
+                                      "-L" + os.path.join(xpress_dir, "lib"),
+                                      "-Wl,-rpath," + os.path.join(xpress_dir, "lib")]}
+  conics.append(("xpress",{"xpress": {"OUTPUTLOG":0,"FEASTOL":1e-9,"BARGAPSTOP":1e-10,"BARDUALSTOP":1e-10}},{"quadratic": True, "dual": True, "soc": True, "codegen": xpress_codegen, "binary":True, "discrete": True, "sos":True}))
+
+if "SKIP_MOSEK_TESTS" not in os.environ and has_conic("mosek"):
+  mosek_dir = os.environ.get("MOSEKDIR", os.path.expanduser("~/mosek/11.1/tools/platform/linux64x86"))
+  mosek_codegen = {"extralibs": ["mosek64"], "std": "c99",
+                   "extra_options": ["-I" + os.path.join(mosek_dir, "h"),
+                                     "-L" + os.path.join(mosek_dir, "bin"),
+                                     "-Wl,-rpath," + os.path.join(mosek_dir, "bin")]}
+  conics.append(("mosek",{"mosek": {"MSK_IPAR_LOG":0,
+                                    "MSK_DPAR_INTPNT_QO_TOL_REL_GAP":1e-10,
+                                    "MSK_DPAR_INTPNT_QO_TOL_PFEAS":1e-10,
+                                    "MSK_DPAR_INTPNT_QO_TOL_DFEAS":1e-10,
+                                    "MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10,
+                                    "MSK_DPAR_INTPNT_CO_TOL_PFEAS":1e-10,
+                                    "MSK_DPAR_INTPNT_CO_TOL_DFEAS":1e-10}},{"quadratic": True, "less_digits": 1, "dual": True, "soc": True, "codegen": mosek_codegen, "binary":True, "discrete": True, "sos":False}))
+
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
 
@@ -355,7 +379,8 @@ class ConicTests(casadiTestCase):
 
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
 
-    for conic, qp_options, aux_options in conics[2:]:
+    for conic, qp_options, aux_options in conics:
+      if conic == "nlpsol": continue
       if not aux_options["quadratic"]: continue
       print("test_general_convex_dense",conic,qp_options)
       if conic in ["daqp"]: continue
@@ -1327,7 +1352,7 @@ class ConicTests(casadiTestCase):
       ys = 4*sqrt(5-a**2)/(a**2-5)
 
       self.checkarray(res["f"],2*xs+ys,conic,digits=5)
-      self.checkarray(res["x"],vertcat(xs,ys),conic,digits=4 if conic in ["cplex","gurobi"] else 5)
+      self.checkarray(res["x"],vertcat(xs,ys),conic,digits=4 if conic in ["cplex","gurobi","xpress"] else 5)
 
       #  min  2 x + y
       #

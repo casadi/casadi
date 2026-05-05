@@ -1695,6 +1695,10 @@ namespace casadi {
     case AUX_QP:
       this->auxiliaries << sanitize_source(casadi_qp_str, inst);
       break;
+    case AUX_SOCP:
+      add_auxiliary(AUX_INF);
+      this->auxiliaries << sanitize_source(casadi_socp_str, inst);
+      break;
     case AUX_QRQP:
       add_auxiliary(AUX_QP);
       add_auxiliary(AUX_COPY);

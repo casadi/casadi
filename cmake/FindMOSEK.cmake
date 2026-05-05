@@ -1,41 +1,67 @@
-message(STATUS "Looking for mosek")
+# - Try to find MOSEK Optimizer
+#
+# Searches for the MOSEK C API (libmosek64 / mosek64.dll, mosek.h).
+# A typical MOSEK install sets the MOSEKDIR or MOSEK_HOME environment
+# variable, pointing to the directory that contains include/, h/, and bin/
+# (or platform/<...>/h, platform/<...>/bin).
+#
+# Sets:
+#  MOSEK_FOUND         - True if MOSEK was found
+#  MOSEK_INCLUDE_DIRS  - Path to mosek.h
+#  MOSEK_LIBRARIES     - The mosek library to link
+#  Target mosek::mosek
 
 find_path(MOSEK_INCLUDE_DIR
-    mosek.h
-  HINTS ~/mosek/7/tools/platform/linux64x86/h $ENV{MOSEK}/h $ENV{MOSEK}/7/tools/platform/linux64x86/h
+  NAMES mosek.h
+  HINTS
+    ENV MOSEKDIR
+    ENV MOSEK_HOME
+    ENV MOSEK_DIR
+    ENV MOSEK
+  PATH_SUFFIXES h include
+  PATHS
+    "/opt/mosek"
+    "/opt/mosek/10/tools/platform/linux64x86"
+    "/opt/mosek/10.1/tools/platform/linux64x86"
+    "/opt/mosek/10.2/tools/platform/linux64x86"
+    "/opt/mosek/11/tools/platform/linux64x86"
+    "$ENV{HOME}/mosek"
+    "C:/Program Files/Mosek"
 )
-
-if(MOSEK_INCLUDE_DIR)
-  message(STATUS "Found mosek include directory: ${MOSEK_INCLUDE_DIR}")
-else()
-  message(STATUS "Could not find mosek include dir")
-endif()
 
 find_library(MOSEK_LIBRARY
-  NAMES mosek64
-  PATHS ~/mosek/7/tools/platform/linux64x86/bin
-  $ENV{MOSEK}/bin $ENV{MOSEK}/7/tools/platform/linux64x86/bin ~/local/lib /usr/local/lib
+  NAMES mosek64 mosek
+  HINTS
+    ENV MOSEKDIR
+    ENV MOSEK_HOME
+    ENV MOSEK_DIR
+    ENV MOSEK
+  PATH_SUFFIXES bin lib
+  PATHS
+    "/opt/mosek"
+    "/opt/mosek/10/tools/platform/linux64x86"
+    "/opt/mosek/10.1/tools/platform/linux64x86"
+    "/opt/mosek/10.2/tools/platform/linux64x86"
+    "/opt/mosek/11/tools/platform/linux64x86"
+    "$ENV{HOME}/mosek"
+    "C:/Program Files/Mosek"
 )
 
-if(MOSEK_LIBRARY)
-  set(FOUND_MOSEK_LIBS TRUE)
-  set(MOSEK_LIBRARIES ${MOSEK_LIBRARY})
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(MOSEK DEFAULT_MSG
+  MOSEK_LIBRARY MOSEK_INCLUDE_DIR)
+
+if(MOSEK_FOUND)
+  set(MOSEK_INCLUDE_DIRS "${MOSEK_INCLUDE_DIR}")
+  set(MOSEK_LIBRARIES "${MOSEK_LIBRARY}")
+
+  if(NOT TARGET mosek::mosek)
+    add_library(mosek::mosek INTERFACE IMPORTED)
+    set_target_properties(mosek::mosek PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${MOSEK_INCLUDE_DIR}"
+      INTERFACE_LINK_LIBRARIES "${MOSEK_LIBRARY}"
+    )
+  endif()
 endif()
 
-if(MOSEK_LIBRARIES)
-  set(MOSEK_LIBRARIES ${MOSEK_LIBRARIES})
-  message(STATUS "Found mosek libraries ${MOSEK_LIBRARIES}")
-  set(MOSEK_FOUND_LIBS TRUE)
-else()
-  set(MOSEK_FOUND_LIBS FALSE)
-  message(STATUS "Could not find mosek libraries ${MOSEK_LIBRARIES}")
-endif()
-
-if(MOSEK_INCLUDE_DIR AND MOSEK_FOUND_LIBS)
-  set(MOSEK_FOUND TRUE)
-else()
-  set(MOSEK_FOUND FALSE)
-  message(STATUS "MOSEK: Cound not find mosek. Try setting MOSEK env var.")
-endif()
-
-
+mark_as_advanced(MOSEK_INCLUDE_DIR MOSEK_LIBRARY)

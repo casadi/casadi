@@ -80,6 +80,7 @@ set(RUNTIME_SRC
   casadi_dense_lsqr.hpp
   casadi_cache.hpp
   casadi_convexify.hpp
+  casadi_socp.hpp
   casadi_logsumexp.hpp
   casadi_sparsity.hpp
   casadi_jac.hpp
