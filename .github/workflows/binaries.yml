@@ -42,9 +42,7 @@ env:
 
   CMAKE_BUILD_TYPE: Release
   PYTHONUNBUFFERED: "1"
-  SKIP_MADNLP_TESTS: "ON"
-  SKIP_XPRESS_TESTS: "ON"
-  SKIP_MOSEK_TESTS: "ON"
+
 jobs:
   version:
     runs-on: ubuntu-24.04
