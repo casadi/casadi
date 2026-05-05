@@ -115,6 +115,11 @@ std::vector<std::string> get_search_paths() {
     return search_paths;
 }
 
+#ifdef _WIN32
+// Forward declaration; defined below.
+std::wstring utf8_to_utf16(const std::string& s);
+#endif
+
 #ifdef WITH_DL
 
 handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
@@ -192,7 +197,41 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
 
     std::string searchpath;
 
-    // Try getting a handle
+#ifdef _WIN32
+    // Pass 1 (Windows): strict per-path search.
+    //
+    // For each non-empty searchpath, do AddDllDirectory + LoadLibraryEx with
+    //   LOAD_LIBRARY_SEARCH_USER_DIRS | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS
+    //   | LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR.
+    // PATH and CWD are NOT consulted in this pass. Transitive deps in the
+    // same folder as the wrapper resolve via DLL_LOAD_DIR; deps already in
+    // the process resolve via the loaded-module list (a pre-filesystem
+    // rule). Pass 1 succeeds only when the search dir is self-contained for
+    // anything not already loaded -- on failure we fall through to pass 2,
+    // which preserves CasADi's legacy semantics (incl. PATH).
+    {
+        std::wstring libW = utf8_to_utf16(lib);
+        for (const std::string& sp : search_paths) {
+            if (sp.empty()) continue;
+            std::wstring spW = utf8_to_utf16(sp);
+            DLL_DIRECTORY_COOKIE cookie = AddDllDirectory(spW.c_str());
+            handle = LoadLibraryExW(libW.c_str(), NULL,
+                LOAD_LIBRARY_SEARCH_USER_DIRS |
+                LOAD_LIBRARY_SEARCH_DEFAULT_DIRS |
+                LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR);
+            if (cookie) RemoveDllDirectory(cookie);
+            if (handle) {
+                resultpath = sp;
+                break;
+            }
+        }
+    }
+#endif // _WIN32
+
+    // Pass 2 (Windows fallback; sole pass on Linux/macOS):
+    // Existing legacy loop. On Windows, preserves SetDllDirectory's slot-2
+    // hint for transitive deps and the standard search incl. PATH.
+    if (!handle) {
     for (casadi_int i=0;i<search_paths.size();++i) {
       searchpath = search_paths[i];
 #ifdef _WIN32
@@ -214,6 +253,7 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
         errors << std::endl << "    Error code: " << dlerror();
 #endif // _WIN32
       }
+    }
     }
 
     #ifndef _WIN32
