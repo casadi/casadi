@@ -6937,6 +6937,139 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::MosekInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\". When set to -1, sparsity is completely ignored and dense matrices are used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>equality</td><td>OT_BOOLVECTOR</td><td>Indicate an upfront hint which of the constraints are equalities. Some solvers may be able to exploit this knowledge. When true, the corresponding lower and upper bounds are assumed equal. When false, the corresponding bounds may be equal or different.</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jacobian_options</td><td>OT_DICT</td><td>Options to be passed to a Jacobian constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_cleanup</td><td>OT_BOOL</td><td>Cleanup up the temporary source file that jit creates. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_name</td><td>OT_STRING</td><td>The file name used to write out code. The actual file names used depend on 'jit_temp_suffix' and include extensions. Default: 'jit_tmp'</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>mosek</td><td>OT_DICT</td><td>Options to be passed to MOSEK.  Each entry's key is the MOSEK parameter name (e.g. \"MSK_IPAR_LOG\", \"MSK_DPAR_INTPNT_QO_TOL_REL_GAP\"); the value's type must match the parameter's type (int parameters take int, dpar take double, spar take string).</td><td>casadi::MosekInterface</td></tr>
+<tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Conic_mosek
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>mosek</td><td>OT_DICT</td><td>Options to be passed to MOSEK.  Each entry's key is the MOSEK parameter name (e.g. \"MSK_IPAR_LOG\", \"MSK_DPAR_INTPNT_QO_TOL_REL_GAP\"); the value's type must match the parameter's type (int parameters take int, dpar take double, spar take string).</td></tr>
+</table>
+*/
+/** \addtogroup general_MosekInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\". When set to -1, sparsity is completely ignored and dense matrices are used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>equality</td><td>OT_BOOLVECTOR</td><td>Indicate an upfront hint which of the constraints are equalities. Some solvers may be able to exploit this knowledge. When true, the corresponding lower and upper bounds are assumed equal. When false, the corresponding bounds may be equal or different.</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jacobian_options</td><td>OT_DICT</td><td>Options to be passed to a Jacobian constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_cleanup</td><td>OT_BOOL</td><td>Cleanup up the temporary source file that jit creates. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_name</td><td>OT_STRING</td><td>The file name used to write out code. The actual file names used depend on 'jit_temp_suffix' and include extensions. Default: 'jit_tmp'</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>mosek</td><td>OT_DICT</td><td>Options to be passed to MOSEK.  Each entry's key is the MOSEK parameter name (e.g. \"MSK_IPAR_LOG\", \"MSK_DPAR_INTPNT_QO_TOL_REL_GAP\"); the value's type must match the parameter's type (int parameters take int, dpar take double, spar take string).</td><td>casadi::MosekInterface</td></tr>
+<tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::MumpsInterface
 \n
 \par
@@ -10503,5 +10636,147 @@
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>worhp</td><td>OT_DICT</td><td>Options to be passed to WORHP</td><td>casadi::WorhpInterface</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::XpressInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\". When set to -1, sparsity is completely ignored and dense matrices are used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>equality</td><td>OT_BOOLVECTOR</td><td>Indicate an upfront hint which of the constraints are equalities. Some solvers may be able to exploit this knowledge. When true, the corresponding lower and upper bounds are assumed equal. When false, the corresponding bounds may be equal or different.</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jacobian_options</td><td>OT_DICT</td><td>Options to be passed to a Jacobian constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_cleanup</td><td>OT_BOOL</td><td>Cleanup up the temporary source file that jit creates. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_name</td><td>OT_STRING</td><td>The file name used to write out code. The actual file names used depend on 'jit_temp_suffix' and include extensions. Default: 'jit_tmp'</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
+<tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::XpressInterface</td></tr>
+<tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::XpressInterface</td></tr>
+<tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::XpressInterface</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>xpress</td><td>OT_DICT</td><td>Options to be passed to FICO Xpress.  Each entry's key is the Xpress control name (e.g. \"OUTPUTLOG\", \"MAXTIME\", \"MIPRELSTOP\"); the value's type must match the control's type (int / double / string).</td><td>casadi::XpressInterface</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Conic_xpress
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td></tr>
+<tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td></tr>
+<tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td></tr>
+<tr><td>xpress</td><td>OT_DICT</td><td>Options to be passed to FICO Xpress.  Each entry's key is the Xpress control name (e.g. \"OUTPUTLOG\", \"MAXTIME\", \"MIPRELSTOP\"); the value's type must match the control's type (int / double / string).</td></tr>
+</table>
+*/
+/** \addtogroup general_XpressInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\". When set to -1, sparsity is completely ignored and dense matrices are used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>equality</td><td>OT_BOOLVECTOR</td><td>Indicate an upfront hint which of the constraints are equalities. Some solvers may be able to exploit this knowledge. When true, the corresponding lower and upper bounds are assumed equal. When false, the corresponding bounds may be equal or different.</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jacobian_options</td><td>OT_DICT</td><td>Options to be passed to a Jacobian constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_cleanup</td><td>OT_BOOL</td><td>Cleanup up the temporary source file that jit creates. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_name</td><td>OT_STRING</td><td>The file name used to write out code. The actual file names used depend on 'jit_temp_suffix' and include extensions. Default: 'jit_tmp'</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_canonical</td><td>OT_BOOL</td><td>When printing numerical matrices, use a format that is exact and reproducible in generated C code.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>solver_version_check</td><td>OT_BOOL</td><td>When the plugin loads an externally supplied solver, check that its version is compatible with the plugin [Default: true]</td><td>casadi::Conic</td></tr>
+<tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td><td>casadi::XpressInterface</td></tr>
+<tr><td>sos_types</td><td>OT_INTVECTOR</td><td>Specify 1 or 2 for each SOS group.</td><td>casadi::XpressInterface</td></tr>
+<tr><td>sos_weights</td><td>OT_DOUBLEVECTORVECTOR</td><td>Weights corresponding to SOS entries.</td><td>casadi::XpressInterface</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>xpress</td><td>OT_DICT</td><td>Options to be passed to FICO Xpress.  Each entry's key is the Xpress control name (e.g. \"OUTPUTLOG\", \"MAXTIME\", \"MIPRELSTOP\"); the value's type must match the control's type (int / double / string).</td><td>casadi::XpressInterface</td></tr>
 </table>
 */
