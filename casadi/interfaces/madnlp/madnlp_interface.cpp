@@ -263,9 +263,8 @@ Dict MadnlpInterface::get_stats(void* mem) const {
   auto m = static_cast<MadnlpMemory*>(mem);
   libmad_int iter, status;
   int ret;
-  double primal_feas, dual_feas, total_wall_time;
+  double primal_feas, dual_feas;
   ret = madnlp_get_iters(m->d.stats, &iter); casadi_assert(ret==0, "MadNLPError in get_iters");
-  //ret = madnlp_get_total_wall_time(m->d.stats, &total_wall_time); casadi_assert(ret==0, "MadNLPError in get_total_wall_time");
   ret = madnlp_get_status(m->d.stats, &status);  casadi_assert(ret==0, "MadNLPError in get_status");
   ret = madnlp_get_dual_feas(m->d.stats, &dual_feas);  casadi_assert(ret==0, "MadNLPError in get_dual_feas");
   ret = madnlp_get_primal_feas(m->d.stats, &primal_feas);  casadi_assert(ret==0, "MadNLPError in get_primal_feas");
@@ -274,7 +273,6 @@ Dict MadnlpInterface::get_stats(void* mem) const {
   Dict madnlp;
   madnlp["dual_feas"] = dual_feas;
   madnlp["primal_feas"] = primal_feas;
-  madnlp["total_wall_time"] = total_wall_time;
   madnlp["status"] = static_cast<casadi_int>(status);
   stats["madnlp"] = madnlp;
   return stats;
@@ -399,26 +397,33 @@ void MadnlpInterface::set_madnlp_prob(CodeGenerator& g) const {
 }
 
 MadnlpInterface::MadnlpInterface(DeserializingStream& s) : Nlpsol(s) {
-  s.version("MadnlpInterface", 1);
+  int version = s.version("MadnlpInterface", 1, 2);
   s.unpack("MadnlpInterface::jacg_sp", jacg_sp_);
   s.unpack("MadnlpInterface::hesslag_sp", hesslag_sp_);
   s.unpack("MadnlpInterface::exact_hessian", exact_hessian_);
   s.unpack("MadnlpInterface::opts", opts_);
   s.unpack("MadnlpInterface::convexify", convexify_);
 
+  if (version==1) {
+    std::vector<libmad_int> dummy;
+    s.unpack("MadnlpInterface::nzj_i", dummy);
+    s.unpack("MadnlpInterface::nzj_j", dummy);
+    s.unpack("MadnlpInterface::nzh_i", dummy);
+    s.unpack("MadnlpInterface::nzh_j", dummy);
+  }
+
   set_madnlp_prob();
 }
 
 void MadnlpInterface::serialize_body(SerializingStream &s) const {
   Nlpsol::serialize_body(s);
-  s.version("MadnlpInterface", 1);
+  s.version("MadnlpInterface", 2);
 
   s.pack("MadnlpInterface::jacg_sp", jacg_sp_);
   s.pack("MadnlpInterface::hesslag_sp", hesslag_sp_);
   s.pack("MadnlpInterface::exact_hessian", exact_hessian_);
   s.pack("MadnlpInterface::opts", opts_);
   s.pack("MadnlpInterface::convexify", convexify_);
-
 }
 
 } // namespace casadi
