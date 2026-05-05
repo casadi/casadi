@@ -69,6 +69,18 @@ std::vector<std::string> get_search_paths() {
     // Build up search paths;
     std::vector<std::string> search_paths;
 
+    // Search path: CASADI_PLUGIN_SEARCH_PATH env variable
+    // (highest priority; takes precedence over the bundled install dir
+    //  that the Python wrapper writes into GlobalOptions::casadipath)
+    char* pPLUGIN = getenv("CASADI_PLUGIN_SEARCH_PATH");
+    if (pPLUGIN!=nullptr) {
+        std::stringstream pluginpaths(pPLUGIN);
+        std::string pluginpath;
+        while (std::getline(pluginpaths, pluginpath, pathsep())) {
+            search_paths.push_back(pluginpath);
+        }
+    }
+
     // Search path: global casadipath option
     std::stringstream casadipaths(GlobalOptions::getCasadiPath());
     std::string casadipath;
@@ -166,11 +178,12 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
     errors << caller << ": Cannot load shared library '"
            << lib << "': " << std::endl;
     errors << "   (\n"
-           << "    Searched directories: 1. casadipath from GlobalOptions\n"
-           << "                          2. CASADIPATH env var\n"
-           << "                          3. PATH env var (Windows)\n"
-           << "                          4. LD_LIBRARY_PATH env var (Linux)\n"
-           << "                          5. DYLD_LIBRARY_PATH env var (osx)\n"
+           << "    Searched directories: 1. CASADI_PLUGIN_SEARCH_PATH env var\n"
+           << "                          2. casadipath from GlobalOptions\n"
+           << "                          3. CASADIPATH env var\n"
+           << "                          4. PATH env var (Windows)\n"
+           << "                          5. LD_LIBRARY_PATH env var (Linux)\n"
+           << "                          6. DYLD_LIBRARY_PATH env var (osx)\n"
            << "    A library may be 'not found' even if the file exists:\n"
            << "          * library is not ABI-compatible (different compiler/bitness)\n"
            << "          * the dependencies are not found\n"
