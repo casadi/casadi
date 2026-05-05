@@ -1205,9 +1205,6 @@ if(WITH_XPRESS AND WITH_MOCKUP_XPRESS)
     IMPORTED_LOCATION "${XPRESS_MOCKUP_LIB}"
     IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/xpress/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}xprs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
   )
-  install(FILES
-  ${XPRESS_MOCKUP_LIB}
-  DESTINATION "${LIB_PREFIX}")
 endif()
 add_feature_info(xpress-interface WITH_XPRESS "Interface to the (mixed-integer) LP/QP solver FICO Xpress")
 
@@ -1221,9 +1218,6 @@ if(WITH_MOSEK AND WITH_MOCKUP_MOSEK)
     IMPORTED_LOCATION "${MOSEK_MOCKUP_LIB}"
     IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}mosek64${CMAKE_IMPORT_LIBRARY_SUFFIX}"
   )
-  install(FILES
-  ${MOSEK_MOCKUP_LIB}
-  DESTINATION "${LIB_PREFIX}")
 endif()
 add_feature_info(mosek-interface WITH_MOSEK "Interface to the (mixed-integer) LP/QP/SOCP solver MOSEK")
 
