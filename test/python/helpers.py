@@ -918,7 +918,10 @@ class casadiTestCase(unittest.TestCase):
         if os.name=='nt':
             env["PATH"] = env["PATH"]+";"+libdir
         else:
-            env["LD_LIBRARY_PATH"] = env["LD_LIBRARY_PATH"] + ":" + libdir
+            if "LD_LIBRARY_PATH" in env:
+                env["LD_LIBRARY_PATH"] = env["LD_LIBRARY_PATH"] + ":" + libdir
+            else:
+                env["LD_LIBRARY_PATH"] = libdir
         p = subprocess.Popen(commands,shell=True,env=env).wait()  # pyright: ignore[reportAssignmentType]
         ret["exename"] = exename
         ret["env"] = env
