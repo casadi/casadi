@@ -922,7 +922,7 @@ jobs:
         with:
           source-folder: docs/examples/matlab
           select-by-tag: examples
-      - uses: casadi/commercial_solvers@codex/bump-runtime-node24
+      - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
         env:
@@ -986,7 +986,7 @@ jobs:
       - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
         if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="solvers.m callback.m nlp_callback.m export_tests.m asorted_tests.m CasadiTests.m"
-      - uses: casadi/commercial_solvers@codex/bump-runtime-node24
+      - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
         env:
@@ -1186,7 +1186,7 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip -d casadi
-      - uses: casadi/commercial_solvers@codex/bump-runtime-node24
+      - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
         env:
