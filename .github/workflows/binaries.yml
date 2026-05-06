@@ -870,6 +870,8 @@ jobs:
     if: ${{ !cancelled() && (needs.matlab-dockcross.result == 'success' || needs.matlab-osx.result == 'success') && !contains(github.event.head_commit.message, '[skip-ci:matlab]') && !contains(github.event.head_commit.message, '[skip-ci:test]') }}
     runs-on: ${{matrix.image}}
     needs: [matlab-dockcross,matlab-osx]
+    env:
+      SKIP_MADNLP_TESTS: ON
     strategy:
      fail-fast: false
      matrix:
@@ -1252,14 +1254,14 @@ jobs:
         if: "contains(matrix.image, 'windows') && env.JGILLIS_RESTRICTED == 'true'"
       - run: |
           cd test/python
-          wget https://github.com/casadi/testbot/releases/download/perpetual/serialize_3.5.5.zip
+          wget --no-check-certificate https://github.com/casadi/testbot/releases/download/perpetual/serialize_3.5.5.zip
           unzip serialize_3.5.5.zip
           cd ../data
-          wget https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol2.fmu
-          wget https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol3.fmu
-          wget https://github.com/casadi/testbot/releases/download/perpetual/vdp.fmu
-          wget https://github.com/casadi/testbot/releases/download/perpetual/cstr.fmu
-          wget https://github.com/casadi/testbot/releases/download/perpetual/car_t_fmu2.fmu 
+          wget --no-check-certificate https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol2.fmu
+          wget --no-check-certificate https://github.com/casadi/testbot/releases/download/perpetual/VanDerPol3.fmu
+          wget --no-check-certificate https://github.com/casadi/testbot/releases/download/perpetual/vdp.fmu
+          wget --no-check-certificate https://github.com/casadi/testbot/releases/download/perpetual/cstr.fmu
+          wget --no-check-certificate https://github.com/casadi/testbot/releases/download/perpetual/car_t_fmu2.fmu 
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
