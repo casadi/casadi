@@ -1211,13 +1211,26 @@ add_feature_info(xpress-interface WITH_XPRESS "Interface to the (mixed-integer) 
 if(WITH_MOSEK AND WITH_MOCKUP_MOSEK)
   add_library(mosek::mosek SHARED IMPORTED)
   add_dependencies(mosek::mosek mockups-external)
-  set(MOSEK_MOCKUP_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}mosek64${CMAKE_SHARED_LIBRARY_SUFFIX}")
-  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include")
-  set_target_properties(mosek::mosek PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include"
-    IMPORTED_LOCATION "${MOSEK_MOCKUP_LIB}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}mosek64${CMAKE_IMPORT_LIBRARY_SUFFIX}"
-  )
+  if(WIN32)
+    set(MOSEK_ADAPTOR_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}mosek_adaptor${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include")
+    set_target_properties(mosek::mosek PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include"
+      IMPORTED_LOCATION "${MOSEK_ADAPTOR_LIB}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}mosek_adaptor${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    install(FILES
+    ${MOSEK_ADAPTOR_LIB}
+    DESTINATION "${LIB_PREFIX}")
+  else()
+    set(MOSEK_MOCKUP_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}mosek64${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include")
+    set_target_properties(mosek::mosek PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include"
+      IMPORTED_LOCATION "${MOSEK_MOCKUP_LIB}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}mosek64${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+  endif()
 endif()
 add_feature_info(mosek-interface WITH_MOSEK "Interface to the (mixed-integer) LP/QP/SOCP solver MOSEK")
 

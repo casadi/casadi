@@ -42,6 +42,14 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &MosekInterface::options_;
     plugin->deserialize = &MosekInterface::deserialize;
+    #ifdef MOSEK_ADAPTOR
+      char buffer[400];
+      int ret = mosek_adaptor_load(buffer, sizeof(buffer));
+      if (ret!=0) {
+        casadi_warning("Failed to load Mosek adaptor: " + std::string(buffer) + ".");
+        return 1;
+      }
+    #endif
     return 0;
   }
 

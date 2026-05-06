@@ -202,7 +202,7 @@ jobs:
         with:
           key: core-build-${{ github.ref }}-${{matrix.image}}-${{matrix.target}}-${{env.cache-suffix}}
           path: build
-      - uses: casadi/mockups@v102
+      - uses: casadi/mockups@master
         with:
           tag: ${{ matrix.image }}_${{matrix.target}}
       - run: env
@@ -267,7 +267,7 @@ jobs:
         with:
           key: core-build-${{ github.ref }}-${{ matrix.target }}-${{env.cache-suffix}}
           path: build
-      - uses: casadi/mockups@v102
+      - uses: casadi/mockups@master
         if: steps.skip-check.outputs.skip != 'true'
         with:
           tag: ${{ matrix.target }}
@@ -438,7 +438,7 @@ jobs:
           name: core-osx-${{ matrix.image }}-${{matrix.target}}
       - run: unzip core-osx-${{ matrix.image }}-${{matrix.target}}.zip
       - run: rm -rf install
-      - uses: casadi/mockups@v102
+      - uses: casadi/mockups@master
         with:
           tag: ${{ matrix.image }}_${{matrix.target}}
       - name: Build
@@ -579,7 +579,7 @@ jobs:
           name: core-osx-${{ matrix.image }}-${{matrix.target}}
       - run: ls
       - run: unzip core-osx-${{ matrix.image }}-${{matrix.target}}.zip
-      - uses: casadi/mockups@v102
+      - uses: casadi/mockups@master
         with:
           tag: ${{ matrix.image }}_${{matrix.target}}
       - run: |
@@ -676,7 +676,7 @@ jobs:
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
           docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.arch }}:production ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
           chmod +x dockcross
-      - uses: casadi/mockups@v102
+      - uses: casadi/mockups@master
         with:
           tag: ${{ matrix.arch }}
       - run: |
@@ -762,7 +762,7 @@ jobs:
           chmod +x dockcross
       - run: echo ${{env.GITHUB_WORKSPACE}}
       - run: cat $GITHUB_ENV
-      - uses: casadi/mockups@v102
+      - uses: casadi/mockups@master
         with:
           tag: ${{ matrix.arch }}
       - run: |
