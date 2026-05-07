@@ -27,5 +27,8 @@
       #include <string>
 
       const std::string casadi::UnoInterface::meta_doc=
-      "\n"
+      "Interface to the Uno NLP solver (https://github.com/cvanaret/Uno).\n"
+      "Pass solver-specific options under the 'uno' option, e.g.\n"
+      "  nlpsol('s', 'uno', nlp, {'uno': {'preset': 'filtersqp'}})\n"
+      "Common presets: filtersqp, ipopt, funnelsqp, filterslp.\n"
 ;

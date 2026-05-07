@@ -822,10 +822,10 @@ set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
 
 # UNO: A swiss-army knife like NLP solver, with filterSQP and IPOPT presets
 option(WITH_UNO "Compile the interface to UNO" OFF)
-set(BUILD_UNO_GIT_REPO "https://github.com/jgillis/Uno.git" CACHE STRING "Git repo used together with BUILD_UNO_VERSION")
-set(BUILD_UNO_VERSION "main" CACHE STRING "Tag/branch/hash to be used for BUILD_UNO_GIT_REPO")
+set(BUILD_UNO_GIT_REPO "https://github.com/cvanaret/Uno.git" CACHE STRING "Git repo used together with BUILD_UNO_VERSION")
+set(BUILD_UNO_VERSION "v2.7.2" CACHE STRING "Tag/branch/hash to be used for BUILD_UNO_GIT_REPO")
 option(WITH_BUILD_UNO "Build UNO (BUILD_UNO_VERSION=${BUILD_UNO_VERSION}) from downloaded source (BUILD_UNO_GIT_REPO=${BUILD_UNO_GIT_REPO})." OFF)
-set(BUILD_UNO_DEPENDENCIES MA57 BQPD)
+set(BUILD_UNO_DEPENDENCIES MA57 BQPD MUMPS)
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
@@ -1833,18 +1833,77 @@ endif()
 
 if(WITH_UNO)
   if(WITH_BUILD_UNO)
-    get_target_property(HSL_IMPORTED_IMPLIB_FULL hsl::hsl IMPORTED_IMPLIB)
-    get_filename_component(HSL_IMPORTED_IMPLIB "${HSL_IMPORTED_IMPLIB_FULL}" DIRECTORY)
-    get_target_property(BQPD_IMPORTED_IMPLIB_FULL bqpd::bqpd IMPORTED_IMPLIB)
-    get_filename_component(BQPD_IMPORTED_IMPLIB "${BQPD_IMPORTED_IMPLIB_FULL}" DIRECTORY)
+    # Pull a precompiled BQPD static lib from BQPD_jll.jl (Julia binary builder
+    # artefact), so Uno's `find_library(BQPD bqpd)` picks it up. No mockup,
+    # no shared lib, no fork.
+    set(BQPD_JLL_VERSION "BQPD-v1.0.0%2B0" CACHE STRING
+        "Tag in https://github.com/leyffer/BQPD_jll.jl/releases used to fetch BQPD static lib")
+    set(BQPD_JLL_LIBGFORTRAN "5" CACHE STRING
+        "libgfortran ABI (3, 4, or 5) for the BQPD_jll tarball selection")
+    if(WIN32)
+      if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_BQPD_JLL_TRIPLE "x86_64-w64-mingw32")
+      else()
+        set(_BQPD_JLL_TRIPLE "i686-w64-mingw32")
+      endif()
+    elseif(APPLE)
+      if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm|aarch64")
+        set(_BQPD_JLL_TRIPLE "aarch64-apple-darwin")
+      else()
+        set(_BQPD_JLL_TRIPLE "x86_64-apple-darwin")
+      endif()
+    else()
+      if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+        set(_BQPD_JLL_TRIPLE "aarch64-linux-gnu")
+      else()
+        set(_BQPD_JLL_TRIPLE "x86_64-linux-gnu")
+      endif()
+    endif()
+    set(_BQPD_JLL_TARBALL
+        "BQPD.v1.0.0.${_BQPD_JLL_TRIPLE}-libgfortran${BQPD_JLL_LIBGFORTRAN}.tar.gz")
+    set(_BQPD_JLL_URL
+        "https://github.com/leyffer/BQPD_jll.jl/releases/download/${BQPD_JLL_VERSION}/${_BQPD_JLL_TARBALL}")
+    set(_BQPD_JLL_PREFIX "${CMAKE_BINARY_DIR}/external_projects/bqpd-jll")
+    ExternalProject_Add(bqpd-jll-external
+        URL "${_BQPD_JLL_URL}"
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        SOURCE_DIR "${_BQPD_JLL_PREFIX}"
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+        BUILD_BYPRODUCTS "${_BQPD_JLL_PREFIX}/lib/libbqpd.a")
+
+    set(_UNO_PREFIX_PATHS "${_BQPD_JLL_PREFIX}")
+    set(_UNO_DEPENDS ${LAPACK_DEPENDS_TARGET} bqpd-jll-external)
+    if(TARGET hsl::hsl)
+      list(APPEND _UNO_DEPENDS hsl::hsl)
+      get_target_property(_HSL_IMPLIB_FULL hsl::hsl IMPORTED_IMPLIB)
+      get_filename_component(_HSL_LIBDIR "${_HSL_IMPLIB_FULL}" DIRECTORY)
+      list(APPEND _UNO_PREFIX_PATHS "${_HSL_LIBDIR}/..")
+    endif()
+    set(_UNO_EXTRA_ARGS)
+    get_target_property(_UNO_MUMPS_LIB mumps        IMPORTED_LOCATION)
+    get_target_property(_UNO_MUMPS_INC mumps        INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(_UNO_METIS_LIB metis::metis IMPORTED_LOCATION)
+    get_target_property(_UNO_METIS_INC metis::metis INTERFACE_INCLUDE_DIRECTORIES)
+    list(APPEND _UNO_DEPENDS mumps metis::metis)
+    list(APPEND _UNO_EXTRA_ARGS
+      -DMUMPS_INCLUDE_DIR=${_UNO_MUMPS_INC}
+      -DMUMPS_LIBRARY=${_UNO_MUMPS_LIB}
+      -DMUMPS_COMMON_LIBRARY=${_UNO_MUMPS_LIB}
+      -DMUMPS_PORD_LIBRARY=${_UNO_MUMPS_LIB}
+      -DMUMPS_MPISEQ_LIBRARY=${_UNO_MUMPS_LIB}
+      -DMETIS_LIBRARY=${_UNO_METIS_LIB}
+      -DMETIS_INCLUDE_DIR=${_UNO_METIS_INC}
+      -DMETIS_INCLUDE_DIRS=${_UNO_METIS_INC})
     ExternalProject_Add(uno-external
-        DEPENDS ${LAPACK_DEPENDS_TARGET} hsl::hsl bqpd::bqpd
+        DEPENDS ${_UNO_DEPENDS}
         GIT_REPOSITORY ${BUILD_UNO_GIT_REPO}
         GIT_TAG ${BUILD_UNO_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -DBUILD_SHARED_LIBS=ON -Dma57_LIB=${HSL_IMPORTED_IMPLIB} -Dbqpd_LIB=${BQPD_IMPORTED_IMPLIB} -DWITH_OPENMP=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DWITH_CASADI=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_PREFIX_PATH=${_UNO_PREFIX_PATHS} ${_UNO_EXTRA_ARGS} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     message("test ${CMAKE_CURRENT_BINARY_DIR}/external_projects")
     file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external_projects")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/uno")
