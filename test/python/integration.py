@@ -443,7 +443,7 @@ class Integrationtests(casadiTestCase):
     for Integrator, features, options in integrators:
       self.message(Integrator)
       
-      if str(Integrator) in ["cvodes","idas","collocation"]: continue
+      if str(Integrator) in ["cvodes","idas"]: continue
       
       x = MX.sym("x")
       p = MX.sym("p")
