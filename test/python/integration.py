@@ -1503,7 +1503,99 @@ class Integrationtests(casadiTestCase):
     integrator = casadi.integrator("integrator", "cvodes", dae, 0, 0.1, {"expand":True, "postpone_expand":True})
     integrator(x0=1)
     self.assertTrue(integrator.get_function('jacF').is_a("SXFunction"))
-    self.checkarray(integrator.get_function('jacF')(x=1)["jac_ode_x"],1) 
-       
+    self.checkarray(integrator.get_function('jacF')(x=1)["jac_ode_x"],1)
+
+  def test_issue3371(self):
+    # Regression test for https://github.com/casadi/casadi/issues/3371
+    # FixedStepIntegrator::advance_noevent / impulseB used the trailing nz_
+    # entries of the augmented v / rv vectors, which lands inside a single
+    # forward-seed block. The result was that fwd_zf (forward) and the
+    # forward sensitivities of the adjoint outputs (forward-of-reverse)
+    # were wrong for batched forward(N>1) calls.
+    X = MX.sym("x", 2)
+    U = MX.sym("u")
+    Z = MX.sym("z")
+    dae = {"x": X, "p": U, "z": Z,
+           "ode": vertcat(Z * X[0] - X[1] + U, X[0]),
+           "alg": Z - (1 - X[1]**2)}
+
+    def cross_check(I, base_inputs, fwd_seeds_per_seed, msg):
+      """Check batched forward(N) matches N independent forward(1) calls."""
+      N = len(fwd_seeds_per_seed)
+      I1 = I.forward(1)
+      IN = I.forward(N)
+      fwd_names = [n for n in IN.name_in() if n.startswith("fwd_")]
+      # Build batched inputs by horzcat'ing per-seed entries
+      batched_seeds = {}
+      for n in fwd_names:
+        cols = []
+        for s in fwd_seeds_per_seed:
+          v = s.get(n, DM.zeros(I1.sparsity_in(n)))
+          cols.append(v)
+        batched_seeds[n] = horzcat(*cols)
+      batched_call = dict(base_inputs)
+      batched_call.update(batched_seeds)
+      batched = IN.call(batched_call)
+      per_seed = {}
+      for s in fwd_seeds_per_seed:
+        single = {n: s.get(n, DM.zeros(I1.sparsity_in(n))) for n in fwd_names}
+        single_call = dict(base_inputs)
+        single_call.update(single)
+        out = I1.call(single_call)
+        for k, v in out.items():
+          per_seed.setdefault(k, []).append(v)
+      for k, b in batched.items():
+        merged = horzcat(*per_seed[k])
+        self.checkarray(b, merged, msg + " :: " + k)
+
+    # --- Forward sensitivity: trips line 2074 (advance_noevent) ---
+    I = integrator("I", "collocation", dae)
+    base = {"x0": DM([0.5, 0.0]), "z0": DM([1.0]), "p": DM([0.1]),
+            "u": DM(0, 1)}
+    base["out_xf"], base["out_zf"], base["out_qf"] = (
+      I(x0=base["x0"], z0=base["z0"], p=base["p"])[k]
+      for k in ("xf", "zf", "qf"))
+    seeds = [
+      {"fwd_x0": DM([1.0, 0.0])},
+      {"fwd_x0": DM([0.0, 1.0])},
+      {"fwd_p": DM([1.0])},
+    ]
+    cross_check(I, base, seeds, "fwd-of-collocation")
+
+    # Pin the smaller reproducer from issue #3371 (comment 1): with x0 = p = 0
+    # the trajectory stays at x=0, z=1, so fwd_zf is zero for both seeds.
+    base0 = {"x0": DM.zeros(2), "z0": DM([1.0]), "p": DM([0.0]),
+             "u": DM(0, 1),
+             "out_xf": DM.zeros(2, 1), "out_zf": DM([1.0]),
+             "out_qf": DM(0, 1)}
+    I2 = I.forward(2)
+    base0_call = dict(base0)
+    base0_call.update({"fwd_x0": DM([[0, 1], [0, 0]]),
+                       "fwd_z0": DM.zeros(I2.sparsity_in("fwd_z0")),
+                       "fwd_p":  DM([1, 0]).T,
+                       "fwd_u":  DM.zeros(I2.sparsity_in("fwd_u"))})
+    out = I2.call(base0_call)
+    self.checkarray(out["fwd_zf"], DM.zeros(1, 2), "issue3371 fwd_zf")
+
+    # --- Adjoint sensitivity: trips line 2251 (impulseB) ---
+    # Forward-of-reverse: the augmented integrator has nfwd_>0 AND nadj_>0.
+    Iadj = integrator("I", "collocation", dae, {"nadj": 1})
+    ref = Iadj(x0=DM([0.5, 0.0]), z0=DM([1.0]), p=DM([0.1]),
+               adj_xf=DM([0.0, 0.0]), adj_zf=DM([1.0]),
+               adj_qf=DM(0, 1))
+    base = {"x0": DM([0.5, 0.0]), "z0": DM([1.0]), "p": DM([0.1]),
+            "u": DM(0, 1),
+            "adj_xf": DM([0.0, 0.0]), "adj_zf": DM([1.0]),
+            "adj_qf": DM(0, 1),
+            "out_xf": ref["xf"], "out_zf": ref["zf"], "out_qf": ref["qf"],
+            "out_adj_x0": ref["adj_x0"], "out_adj_z0": ref["adj_z0"],
+            "out_adj_p": ref["adj_p"], "out_adj_u": ref["adj_u"]}
+    seeds = [
+      {"fwd_adj_zf": DM([1.0])},
+      {"fwd_x0": DM([1.0, 0.0])},
+      {"fwd_p": DM([1.0])},
+    ]
+    cross_check(Iadj, base, seeds, "fwd-of-reverse-of-collocation")
+
 if __name__ == '__main__':
     unittest.main()
