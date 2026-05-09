@@ -64,6 +64,11 @@ FiniteDiff::FiniteDiff(const std::string& name, casadi_int n)
   : FunctionInternal(name), n_(n) {
 }
 
+FiniteDiff::FiniteDiff(const std::string& name, casadi_int n,
+                       const std::vector<Sparsity>& seed_sp)
+  : FunctionInternal(name), n_(n), seed_sp_(seed_sp) {
+}
+
 FiniteDiff::~FiniteDiff() {
   clear_mem();
 }
@@ -159,6 +164,45 @@ void FiniteDiff::init(const Dict& opts) {
 
   // Allocate sufficient temporary memory for function evaluation
   alloc(derivative_of_);
+
+  // Precompute mapping tables for sparse-seed inputs (#2317)
+  casadi_int n_in = derivative_of_.n_in();
+  any_sparse_seed_ = false;
+  seed_dir_off_.assign(n_in, std::vector<casadi_int>());
+  seed_z_idx_.assign(n_in, std::vector<casadi_int>());
+  for (casadi_int j = 0; j < n_in; ++j) {
+    if (j >= static_cast<casadi_int>(seed_sp_.size())) break;
+    const Sparsity& sp = seed_sp_[j];
+    if (sp.is_null()) continue;
+    if (!is_diff_in_[j]) continue;
+    const Sparsity& in_sp = derivative_of_.sparsity_in(j);
+    casadi_int sz2_in = in_sp.size2();
+    const casadi_int* sp_colind = sp.colind();
+    const casadi_int* sp_row = sp.row();
+    auto& dir_off = seed_dir_off_[j];
+    auto& z_idx = seed_z_idx_[j];
+    dir_off.resize(n_ + 1);
+    z_idx.resize(sp.nnz());
+    dir_off[0] = 0;
+    for (casadi_int d = 0; d < n_; ++d) {
+      // Direction d covers seed columns [d*sz2_in, (d+1)*sz2_in)
+      casadi_int end = sp_colind[(d + 1) * sz2_in];
+      dir_off[d + 1] = end;
+      for (casadi_int c = d * sz2_in; c < (d + 1) * sz2_in; ++c) {
+        casadi_int sub_col = c - d * sz2_in;
+        for (casadi_int k = sp_colind[c]; k < sp_colind[c + 1]; ++k) {
+          casadi_int row = sp_row[k];
+          casadi_int input_nz = in_sp.get_nz(row, sub_col);
+          casadi_assert(input_nz >= 0,
+            "Seed sparsity for input " + str(j)
+            + " has a nonzero outside the input pattern at "
+            "(row=" + str(row) + ", col=" + str(sub_col) + ")");
+          z_idx[k] = input_nz;
+        }
+      }
+    }
+    any_sparse_seed_ = true;
+  }
 }
 
 Sparsity FiniteDiff::get_sparsity_in(casadi_int i) {
@@ -173,6 +217,15 @@ Sparsity FiniteDiff::get_sparsity_in(casadi_int i) {
     // Seeds
     casadi_int ii = i - n_in - n_out;
     if (is_diff_in_[i]) {
+      // Use caller-supplied seed sparsity if it covers this input. The pattern
+      // must match the natural shape (rows match input, columns equal n_).
+      if (ii < static_cast<casadi_int>(seed_sp_.size()) && !seed_sp_[ii].is_null()) {
+        const Sparsity& s = seed_sp_[ii];
+        casadi_assert(s.size1() == derivative_of_.size1_in(ii)
+                       && s.size2() == derivative_of_.size2_in(ii) * n_,
+                       "Seed sparsity for input " + str(ii) + " has wrong shape");
+        return s;
+      }
       return repmat(derivative_of_.sparsity_in(ii), 1, n_);
     } else {
       return Sparsity(derivative_of_.size1_in(ii),
@@ -300,7 +353,20 @@ int FiniteDiff::eval(const double** arg, double** res,
         for (casadi_int j=0; j<n_in; ++j) {
           casadi_int nnz = derivative_of_.nnz_in(j);
           casadi_copy(x0[j], nnz, z + off);
-          if (seed[j] && is_diff_in_[j]) casadi_axpy(nnz, pert(k, h), seed[j] + i*nnz, z + off);
+          if (seed[j] && is_diff_in_[j]) {
+            if (any_sparse_seed_ && !seed_dir_off_[j].empty()) {
+              // Sparse seed path: iterate seed nonzeros for direction i
+              const casadi_int* dir_off = seed_dir_off_[j].data();
+              const casadi_int* z_idx = seed_z_idx_[j].data();
+              const double* sj = seed[j];
+              double p = pert(k, h);
+              for (casadi_int kk = dir_off[i]; kk < dir_off[i + 1]; ++kk) {
+                z[off + z_idx[kk]] += p * sj[kk];
+              }
+            } else {
+              casadi_axpy(nnz, pert(k, h), seed[j] + i*nnz, z + off);
+            }
+          }
           off += nnz;
         }
         // Evaluate
@@ -420,8 +486,26 @@ void FiniteDiff::codegen_body(CodeGenerator& g) const {
     std::string s = "seed[" + str(j) + "]";
     g << g.copy("x0[" + str(j) + "]", nnz, "z+" + str(off)) << "\n";
     if (is_diff_in_[j]) {
-      g << "if ("+s+") " << g.axpy(nnz, pert("k", "h"),
-                                    s+"+i*"+str(nnz), "z+" + str(off)) << "\n";
+      bool sparse_path = j < static_cast<casadi_int>(seed_dir_off_.size())
+                          && !seed_dir_off_[j].empty();
+      if (sparse_path) {
+        // Emit pre-built lookup tables and a sparse axpy loop
+        std::string dir_off = g.constant(seed_dir_off_[j]);
+        std::string z_idx = g.constant(seed_z_idx_[j]);
+        std::string p = "(" + pert("k", "h") + ")";
+        g << "if (" << s << ") {\n";
+        g << "  casadi_int kk;\n";
+        g << "  casadi_real p_ = " << p << ";\n";
+        g << "  for (kk = " << dir_off << "[i]; kk < " << dir_off
+                          << "[i+1]; ++kk) {\n";
+        g << "    (z+" << off << ")[" << z_idx << "[kk]] += p_ * "
+                          << s << "[kk];\n";
+        g << "  }\n";
+        g << "}\n";
+      } else {
+        g << "if ("+s+") " << g.axpy(nnz, pert("k", "h"),
+                                      s+"+i*"+str(nnz), "z+" + str(off)) << "\n";
+      }
     }
     off += nnz;
   }

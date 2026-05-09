@@ -70,6 +70,11 @@ public:
   // Constructor (protected, use create function)
   FiniteDiff(const std::string& name, casadi_int n);
 
+  // Constructor taking explicit per-input seed sparsities. An empty entry
+  // means "use the default", i.e. repmat(input_sparsity, 1, n).
+  FiniteDiff(const std::string& name, casadi_int n,
+             const std::vector<Sparsity>& seed_sp);
+
   /** \brief Destructor
 
       \identifier{1u7} */
@@ -165,6 +170,24 @@ protected:
   // Number of directional derivatives
   casadi_int n_;
 
+  // Per-input seed sparsities. seed_sp_[i] is empty when the default
+  // (repmat(input_sparsity, 1, n_)) should be used; otherwise it overrides
+  // the seed input sparsity for input i.
+  std::vector<Sparsity> seed_sp_;
+
+  // True if any input has an explicit (sparser-than-default) seed sparsity.
+  bool any_sparse_seed_;
+
+  // For each input j, offsets seed_dir_off_[j][d] (length n_+1) into the seed
+  // value buffer marking where direction d's nonzeros start. Empty when
+  // input j uses the default dense seed layout.
+  std::vector<std::vector<casadi_int>> seed_dir_off_;
+
+  // For each input j, mapping seed_z_idx_[j][k] (length nnz(seed_sp_[j])) from
+  // seed nonzero ordinal to the destination index in the input nonzero buffer
+  // (z). Empty when input j uses the default dense seed layout.
+  std::vector<std::vector<casadi_int>> seed_z_idx_;
+
   // Iterations to improve h
   casadi_int h_iter_;
 
@@ -192,6 +215,11 @@ class CASADI_EXPORT ForwardDiff : public FiniteDiff {
 public:
   // Constructor
   ForwardDiff(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
+
+  // Constructor taking explicit per-input seed sparsities
+  ForwardDiff(const std::string& name, casadi_int n,
+              const std::vector<Sparsity>& seed_sp)
+      : FiniteDiff(name, n, seed_sp) {}
 
   /** \brief Destructor
 
@@ -254,6 +282,11 @@ public:
   // Constructor
   BackwardDiff(const std::string& name, casadi_int n) : ForwardDiff(name, n) {}
 
+  // Constructor taking explicit per-input seed sparsities
+  BackwardDiff(const std::string& name, casadi_int n,
+               const std::vector<Sparsity>& seed_sp)
+      : ForwardDiff(name, n, seed_sp) {}
+
   /** \brief Destructor
 
       \identifier{1um} */
@@ -278,6 +311,11 @@ class CASADI_EXPORT CentralDiff : public FiniteDiff {
 public:
   // Constructor
   CentralDiff(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
+
+  // Constructor taking explicit per-input seed sparsities
+  CentralDiff(const std::string& name, casadi_int n,
+              const std::vector<Sparsity>& seed_sp)
+      : FiniteDiff(name, n, seed_sp) {}
 
   /** \brief Destructor
 
@@ -339,6 +377,11 @@ class CASADI_EXPORT Smoothing : public FiniteDiff {
 public:
   // Constructor
   Smoothing(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
+
+  // Constructor taking explicit per-input seed sparsities
+  Smoothing(const std::string& name, casadi_int n,
+            const std::vector<Sparsity>& seed_sp)
+      : FiniteDiff(name, n, seed_sp) {}
 
   /** \brief Destructor
 

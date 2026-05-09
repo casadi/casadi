@@ -2281,6 +2281,72 @@ namespace casadi {
     return f;
   }
 
+  Function FunctionInternal::forward_for_seeds(casadi_int nfwd,
+      const std::vector<MX>& stacked_seeds) const {
+    // Only specialise when FD is the only available forward path.
+    if (!enable_fd_ || enable_forward_) return forward(nfwd);
+
+    casadi_assert_dev(static_cast<casadi_int>(stacked_seeds.size()) == n_in_);
+
+    // Compute the natural seed sparsity per input and check if any is sparser
+    // than the default dense layout. The default sparsity for input i is
+    // repmat(sparsity_in(i), 1, nfwd).
+    std::vector<Sparsity> seed_sp(n_in_);
+    bool any_sparser = false;
+    for (casadi_int i = 0; i < n_in_; ++i) {
+      Sparsity natural = stacked_seeds[i].sparsity();
+      Sparsity dense_default = repmat(sparsity_in(i), 1, nfwd);
+      if (natural.size() != dense_default.size()) return forward(nfwd);
+      if (!is_diff_in_.empty() && !is_diff_in_[i]) {
+        seed_sp[i] = Sparsity();
+        continue;
+      }
+      if (natural == dense_default) {
+        seed_sp[i] = Sparsity();
+        continue;
+      }
+      // Require natural sparsity to be a subset of the default dense seed
+      // pattern (i.e., all seed nonzeros land within the input's structural
+      // pattern). Otherwise, the seeds carry information we cannot represent
+      // and we fall back to the dense path.
+      if (!natural.is_subset(dense_default)) return forward(nfwd);
+      seed_sp[i] = natural;
+      any_sparser = true;
+    }
+    if (!any_sparser) return forward(nfwd);
+
+    // Build a one-shot sparse-aware FD wrapper.
+    std::string pref = diff_prefix("fwd");
+    std::vector<std::string> inames;
+    inames.reserve(2 * n_in_ + n_out_);
+    for (casadi_int i = 0; i < n_in_; ++i) inames.push_back(name_in_[i]);
+    for (casadi_int i = 0; i < n_out_; ++i) inames.push_back("out_" + name_out_[i]);
+    for (casadi_int i = 0; i < n_in_; ++i) inames.push_back(pref + name_in_[i]);
+    std::vector<std::string> onames;
+    onames.reserve(n_out_);
+    for (casadi_int i = 0; i < n_out_; ++i) onames.push_back(pref + name_out_[i]);
+
+    Dict opts = combine(forward_options_, der_options_);
+    opts = combine(opts, FunctionInternal::generate_options("forward"));
+    opts = combine(opts, fd_options_);
+    opts["derivative_of"] = self();
+
+    std::string fname = forward_name(name_, nfwd) + "_sp";
+    Function f;
+    if (fd_method_.empty() || fd_method_ == "central") {
+      f = Function::create(new CentralDiff(fname, nfwd, seed_sp), opts);
+    } else if (fd_method_ == "forward") {
+      f = Function::create(new ForwardDiff(fname, nfwd, seed_sp), opts);
+    } else if (fd_method_ == "backward") {
+      f = Function::create(new BackwardDiff(fname, nfwd, seed_sp), opts);
+    } else if (fd_method_ == "smoothing") {
+      f = Function::create(new Smoothing(fname, nfwd, seed_sp), opts);
+    } else {
+      casadi_error("Unknown 'fd_method': " + fd_method_);
+    }
+    return f;
+  }
+
   Function FunctionInternal::reverse(casadi_int nadj) const {
     casadi_assert_dev(nadj>=0);
     // Used wrapped function if reverse not available
@@ -3280,13 +3346,18 @@ namespace casadi {
         darg.insert(darg.end(), arg.begin(), arg.end());
         darg.insert(darg.end(), res.begin(), res.end());
         std::vector<MX> v(nfwd_batch);
+        // Track per-input seed sparsities so we can use a sparse-aware FD
+        // wrapper when the seeds are sparser than dense (cf. #2317).
+        std::vector<MX> stacked_seeds(n_in_);
         for (casadi_int i=0; i<n_in_; ++i) {
           for (casadi_int d=0; d<nfwd_batch; ++d) v[d] = fseed[offset+d][i];
-          darg.push_back(horzcat(v));
+          stacked_seeds[i] = horzcat(v);
+          darg.push_back(stacked_seeds[i]);
         }
 
-        // Create the evaluation node
-        Function dfcn = self().forward(nfwd_batch);
+        // Create the evaluation node. Prefer a sparsity-aware FD when only
+        // FD is available and the natural seed pattern is sparser than dense.
+        Function dfcn = forward_for_seeds(nfwd_batch, stacked_seeds);
         std::vector<MX> x = dfcn(darg);
 
         casadi_assert_dev(x.size()==n_out_);

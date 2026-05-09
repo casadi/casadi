@@ -662,6 +662,13 @@ namespace casadi {
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
+
+    /// Like forward(nfwd), but if FD is the only derivative method and the
+    /// horizontally-stacked seeds are sparser than the default dense layout,
+    /// returns a sparse-aware FD wrapper that reads only the seed nonzeros
+    /// instead of forcing a dense projection (cf. #2317).
+    Function forward_for_seeds(casadi_int nfwd,
+        const std::vector<MX>& stacked_seeds) const;
     ///@}
 
     /// Helper function: Get name of adjoint derivative function
