@@ -2070,8 +2070,10 @@ int FixedStepIntegrator::advance_noevent(IntegratorMemory* mem) const {
     }
   }
 
-  // Save algebraic variables
-  casadi_copy(m->v + nv_ - nz_, nz_, m->z);
+  // Save algebraic variables (extracted from the tail of each augmented v block)
+  for (casadi_int d = 0; d <= nfwd_; ++d) {
+    casadi_copy(m->v + (d + 1) * nv1_ - nz1_, nz1_, m->z + d * nz1_);
+  }
 
   return 0;
 }
@@ -2245,8 +2247,14 @@ void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
   // Add impulse to state
   casadi_axpy(nrx_, 1., adj_x, m->adj_x);
 
-  // Add impulse to backwards dependent variables
-  casadi_axpy(nrz_, 1., adj_z, m->rv + nrv_ - nrz_);
+  // Add impulse to backwards dependent variables (one slot at the tail of each
+  // augmented block of m->rv; mirrors the algebraic-state extraction in
+  // advance_noevent)
+  casadi_int nrz_per_block = nrz1_ * nadj_;
+  for (casadi_int d = 0; d <= nfwd_; ++d) {
+    casadi_axpy(nrz_per_block, 1., adj_z + d * nrz_per_block,
+                m->rv + (d + 1) * nrv1_ - nrz_per_block);
+  }
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(
