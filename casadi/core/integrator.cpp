@@ -2174,6 +2174,11 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->res[BSTEP_ADJ_V0] = nullptr;  // adj:v0
   m->res[BSTEP_ADJ_P] = adj_p;  // adj:p
   m->res[BSTEP_ADJ_U] = adj_u;  // adj:u
+  // Issue #3353: zero-init when adj_* output is structurally empty
+  const Function& adj_step = get_function(reverse_name("step", nadj_));
+  if (adj_x0 && !adj_step.nnz_out(BSTEP_ADJ_X0)) casadi_clear(adj_x0, nrx1_ * nadj_);
+  if (adj_p && !adj_step.nnz_out(BSTEP_ADJ_P)) casadi_clear(adj_p, nrq1_ * nadj_);
+  if (adj_u && !adj_step.nnz_out(BSTEP_ADJ_U)) casadi_clear(adj_u, nuq1_ * nadj_);
   calc_function(m, reverse_name("step", nadj_));
   // Evaluate sensitivities
   if (nfwd_ > 0) {
@@ -2201,6 +2206,14 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->res[BSTEP_ADJ_V0] = nullptr;  // fwd:adj:v0
     m->res[BSTEP_ADJ_P] = adj_p + nrq1_ * nadj_;  // fwd:adj_p
     m->res[BSTEP_ADJ_U] = adj_u + nuq1_ * nadj_;  // fwd:adj_u
+    const Function& fwd_adj_step =
+      get_function(forward_name(reverse_name("step", nadj_), nfwd_));
+    if (adj_x0 && !fwd_adj_step.nnz_out(BSTEP_ADJ_X0))
+      casadi_clear(adj_x0 + nrx1_ * nadj_, nrx1_ * nadj_ * nfwd_);
+    if (adj_p && !fwd_adj_step.nnz_out(BSTEP_ADJ_P))
+      casadi_clear(adj_p + nrq1_ * nadj_, nrq1_ * nadj_ * nfwd_);
+    if (adj_u && !fwd_adj_step.nnz_out(BSTEP_ADJ_U))
+      casadi_clear(adj_u + nuq1_ * nadj_, nuq1_ * nadj_ * nfwd_);
     calc_function(m, forward_name(reverse_name("step", nadj_), nfwd_));
   }
 }
