@@ -222,6 +222,10 @@ g = []
 lbg = []
 ubg = []
 
+# Objective function of the NLP
+Obj = 0
+CInv = np.linalg.inv(C[1:,1:])
+
 # For all finite elements
 for k in range(nk):
     # For all collocation points
@@ -252,27 +256,14 @@ for k in range(nk):
     lbg.append(np.zeros(ndiff))
     ubg.append(np.zeros(ndiff))
 
-# Objective function of the NLP
-#Implement Mayer term
-Obj = 0
-obj = MayerTerm(XD[k][j], XA[k][j-1], U[k])
-Obj += obj
-
-# Implement Lagrange term
-lDotAtTauRoot = C.T
-lAtOne = D
-
-ldInv = np.linalg.inv(lDotAtTauRoot[1:,1:])
-ld0 = lDotAtTauRoot[1:,0]
-lagrangeTerm = 0
-for k in range(nk):
+    # Implement Lagrange term
     dQs = h*veccat(*[LagrangeTerm(XD[k][j], XA[k][j-1], U[k]) \
                     for j in range(1,deg+1)])
-    Qs = mtimes( ldInv, dQs)
-    m = mtimes( Qs.T, lAtOne[1:])
-    lagrangeTerm += m
+    Qs = mtimes( CInv.T, dQs)
+    Obj += mtimes( Qs.T, D[1:])
 
-Obj += lagrangeTerm
+# Implement Mayer term
+Obj += MayerTerm(XD[k][j], XA[k][j-1], U[k])
 
 # NLP
 nlp = {'x':V, 'f':Obj, 'g':vertcat(*g)}
