@@ -57,13 +57,15 @@ Xdot = vertcat(dx, dy, dw, ddx, ddy, ddw)
 # Algebraic equation
 Alg = (x-w)*(ddx - ddw) + y*ddy + dy*dy + (dx-dw)*(dx-dw)
 
+# Quadrature
+xref = 0.1 # chariot reference
+Quad = (x-xref)**2 + (w-xref)**2
+
 # DAE rhs
-ffcn = Function('ffcn', [X,Z,U],[Xdot,Alg])
+ffcn = Function('ffcn', [X, Z, U],[Xdot, Alg, Quad])
 
 # Objective function
-xref = 0.1 # chariot reference
 MayerTerm = Function('mayer', [X,Z,U],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
-LagrangeTerm = Function('lagrange', [X,Z,U],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
 
 
 # -----------------------------------------------------------------------------
@@ -84,9 +86,6 @@ tau_root = collocation_points(deg, 'radau')
 
 # We can query the coefficient for the interpolating polynomials using a helper function
 C, D, B = collocation_coeff(tau_root)
-print('C1: ', C)
-print('D1: ', D)
-print('B1: ', B)
 
 # Include the beginning of the collocation interval in tau_root
 tau_root = np.append(0, tau_root)
@@ -207,7 +206,6 @@ ubg = []
 
 # Objective function of the NLP
 Obj = 0
-CInv = np.linalg.inv(C[1:,:])
 
 # For all finite elements
 for k in range(nk):
@@ -217,9 +215,8 @@ for k in range(nk):
         xp_jk = 0
         for j2 in range (deg+1):
             xp_jk += C[j2,j-1]*XD[k][j2]       # get the time derivative of the differential states (eq 10.19b)
-
         # Add collocation equations to the NLP
-        [Xdotk, Algk] = ffcn(XD[k][j], XA[k][j-1], U[k])
+        [Xdotk, Algk, Qk] = ffcn(XD[k][j], XA[k][j-1], U[k])
         # impose system dynamics (for the differential states (eq 10.19b))
         g += [Xdotk - xp_jk/h]
         lbg.append(np.zeros(ndiff)) # equality constraints
@@ -228,7 +225,8 @@ for k in range(nk):
         g += [Algk]
         lbg.append(np.zeros(nalg)) # equality constraints
         ubg.append(np.zeros(nalg)) # equality constraints
-
+        # Add Lagrange term contribution
+        Obj += h * B[j-1] * Qk
     # Get an expression for the state at the end of the finite element
     xf_k = 0
     for j in range(deg+1):
@@ -238,12 +236,6 @@ for k in range(nk):
     g += [XD[k+1][0] - xf_k]
     lbg.append(np.zeros(ndiff))
     ubg.append(np.zeros(ndiff))
-
-    # Implement Lagrange term
-    dQs = h*veccat(*[LagrangeTerm(XD[k][j], XA[k][j-1], U[k]) \
-                    for j in range(1,deg+1)])
-    Qs = mtimes( CInv.T, dQs)
-    Obj += mtimes( Qs.T, D[1:])
 
 # Implement Mayer term
 Obj += MayerTerm(XD[k][j], XA[k][j-1], U[k])
