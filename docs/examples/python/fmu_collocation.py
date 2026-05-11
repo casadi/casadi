@@ -29,61 +29,61 @@ from casadi import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Dynamic model: 
+# Start with an empty DaeBuilder instance
+dae = DaeBuilder('crane', '', dict(detect_quad = True))
+
+# Hard coded constants
 m = 1.
 M = 1.
 g = 9.81
+xref = 0.1 # chariot reference
 
-# Control
-u  = SX.sym("u")
-Uv = u
-U = ['u']
+# States
+x = dae.add('x', dict(start = 0))
+y = dae.add('y', dict(start = 1))
+w = dae.add('w', dict(start = 0))
+dx = dae.add('dx', dict(start = 0))
+dy = dae.add('dy', dict(start = 0))
+dw = dae.add('dw', dict(start = 0))
 
-# Differential states
-x = SX.sym("x")
-y = SX.sym("y")
-w = SX.sym("w")
-dx = SX.sym("dx")
-dy = SX.sym("dy")
-dw = SX.sym("dw")
-Xv = vertcat(x,y,w,dx,dy,dw)
-X = ['x', 'y', 'w', 'dx', 'dy', 'dw']
+# Input
+u = dae.add('u', 'input')
 
 # Algebraic variables
-lam = SX.sym("lam")
-Zv = lam
-Z = ['lam']
+lam = dae.add('lam')
 
 # Ordinary differential equations
 ddx = (x-w)*lam/m
 ddy = g - y*lam/m
 ddw = ((x-w)*lam - u)/M
-Xdot = vertcat(dx, dy, dw, ddx, ddy, ddw)
+dae.eq(dae.der(x), dx)
+dae.eq(dae.der(y), dy)
+dae.eq(dae.der(w), dw)
+dae.eq(dae.der(dx), ddx)
+dae.eq(dae.der(dy), ddy)
+dae.eq(dae.der(dw), ddw)
 
-# Algebraic equation
-Alg = (x-w)*(ddx-ddw) + y*ddy + dy*dy + (dx-dw)*(dx-dw)
+# Algebraic equations
+dae.eq(0, (x-w)*(ddx-ddw) + y*ddy + dy*dy + (dx-dw)*(dx-dw))
 
 # Quadrature
-xref = 0.1 # chariot reference
-lagrange_term = (x-xref)**2 + (w-xref)**2
-Quad = lagrange_term
+lagrange_term = dae.add('lagrange_term')
+dae.eq(dae.der(lagrange_term), (x-xref)**2 + (w-xref)**2)
 
 # Output
-mayer_term = (x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy
-Out = mayer_term
+mayer_term = dae.add('mayer_term', 'output')
+dae.eq(mayer_term, (x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy)
 
 # DAE rhs
-ffcn = Function('ffcn', [Xv, Zv, Uv], [Xdot, Alg, Quad])
+ffcn = dae.create('ffcn', ['x', 'z', 'u'], ['ode', 'alg', 'quad'])
 
 # Output function
-hfcn = Function('hfun', [Xv, Uv], [Out])
+hfcn = dae.create('hfun', ['x', 'u'], ['y'])
 
-# -----------------------------------------------------------------------------
-# Collocation setup
-# -----------------------------------------------------------------------------
-yl = 1. #- -> crane, + -> pendulum
-tf = 5.0
-nk = 50
+# Variable names
+U = dae.u()
+X = dae.x()
+Z = dae.z()
 
 # Degree of interpolating polynomial
 deg = 4
@@ -98,6 +98,8 @@ tau_root = collocation_points(deg, 'radau')
 C, D, B = collocation_coeff(tau_root)
 
 # Size of the finite elements
+tf = 5.0
+nk = 50
 h = tf/nk
 
 # We will construct an NLP incrementally, starting with no decision variables, 
@@ -159,7 +161,7 @@ for k in range(nk):
       # Add algebraic equations
       G.append(Alg_j)
       # Add Lagrange term contribution
-      J += h * B[j] * Q_j
+      J = J + h * B[j] * Q_j
     # State at the end of the interval
     Xk_end = D[0] * Xk
     for j in range(deg): Xk_end = Xk_end + D[j+1] * Xc[j]
@@ -176,7 +178,10 @@ for k in range(nk):
 Ugrid.append(tk)
 
 # Add Mayer term contribution
-J += hfcn(Xk, Uk)
+TT = hfcn(Xk, Uk)
+J = J + TT
+print(TT.shape, J.shape)
+
 
 # Concatenate vectors
 W = vcat(W)
@@ -209,6 +214,9 @@ from_W = Function('from_W', [W], [X_all, Z_all, U_all], ['W'], ['X', 'Z', 'U'])
 # Specify control bounds
 lbU[U.index('u'), :] = -2
 ubU[U.index('u'), :] = 2
+
+# Fix y at initial time
+yl = 1. #- -> crane, + -> pendulum
 
 # Fixed initial condition on state
 lbX[:, 0] = 0
