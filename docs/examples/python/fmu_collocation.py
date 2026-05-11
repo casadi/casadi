@@ -33,6 +33,7 @@ g = 9.81
 
 # Control
 u  = SX.sym("u")
+U = u
 
 # Differential states
 x = SX.sym("x")
@@ -44,24 +45,25 @@ dw = SX.sym("dw")
 X = vertcat(x,y,w,dx,dy,dw)
 
 # Algebraic variables
-Z = SX.sym("Z")
+lam = SX.sym("lam")
+Z = lam
 
 # Ordinary differential equations
-ddx = -(x-w)*Z/m
-ddy = g - y*Z/m
-ddw = ((x-w)*Z - u)/M
+ddx = -(x-w)*lam/m
+ddy = g - y*lam/m
+ddw = ((x-w)*lam - u)/M
 Xdot = vertcat(dx, dy, dw, ddx, ddy, ddw)
 
 # Algebraic equation
 Alg = (x-w)*(ddx - ddw) + y*ddy + dy*dy + (dx-dw)*(dx-dw)
 
 # DAE rhs
-ffcn = Function('ffcn', [X,Z,u],[Xdot,Alg])
+ffcn = Function('ffcn', [X,Z,U],[Xdot,Alg])
 
 # Objective function
 xref = 0.1 # chariot reference
-MayerTerm = Function('mayer', [X,Z,u],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
-LagrangeTerm = Function('lagrange', [X,Z,u],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
+MayerTerm = Function('mayer', [X,Z,U],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
+LagrangeTerm = Function('lagrange', [X,Z,U],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
 
 
 # -----------------------------------------------------------------------------
@@ -73,43 +75,24 @@ nk = 50
 
 # Degree of interpolating polynomial
 deg = 4
-# Radau collocation points
-cp = "radau"
+
+# We will use collocation discretization using Legendre roots, cf. 
+# Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes
+# by Lorenz Biegler (2010).
+# The roots can be queried from CasADi or looked up in the above textbook
+tau_root = collocation_points(deg, 'radau')
+
+# We can query the coefficient for the interpolating polynomials using a helper function
+C, D, B = collocation_coeff(tau_root)
+print('C1: ', C)
+print('D1: ', D)
+print('B1: ', B)
+
+# Include the beginning of the collocation interval in tau_root
+tau_root = np.append(0, tau_root)
+
 # Size of the finite elements
 h = tf/nk
-
-# Coefficients of the collocation equation
-C = np.zeros((deg+1,deg+1))
-# Coefficients of the continuity equation
-D = np.zeros(deg+1)
-
-# Collocation point
-tau = SX.sym("tau")
-
-# All collocation time points
-tau_root = [0] + collocation_points(deg, cp)
-
-T = np.zeros((nk,deg+1))
-for i in range(nk):
-    for j in range(deg+1):
-        T[i][j] = h*(i + tau_root[j])
-
-# For all collocation points: eq 10.4 or 10.17 in Biegler's book
-# Construct Lagrange polynomials to get the polynomial basis at the collocation point
-for j in range(deg+1):
-    L = 1
-    for j2 in range(deg+1):
-        if j2 != j:
-            L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
-
-    # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-    lfcn = Function('lfcn', [tau],[L])
-    D[j] = lfcn(1.0)
-
-    # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-    tfcn = Function('tfcn', [tau],[tangent(L,tau)])
-    for j2 in range(deg+1):
-        C[j][j2] = tfcn(tau_root[j2])
 
 # -----------------------------------------------------------------------------
 # Model setup
@@ -224,7 +207,7 @@ ubg = []
 
 # Objective function of the NLP
 Obj = 0
-CInv = np.linalg.inv(C[1:,1:])
+CInv = np.linalg.inv(C[1:,:])
 
 # For all finite elements
 for k in range(nk):
@@ -233,7 +216,7 @@ for k in range(nk):
         # Get an expression for the state derivative at the collocation point
         xp_jk = 0
         for j2 in range (deg+1):
-            xp_jk += C[j2][j]*XD[k][j2]       # get the time derivative of the differential states (eq 10.19b)
+            xp_jk += C[j2,j-1]*XD[k][j2]       # get the time derivative of the differential states (eq 10.19b)
 
         # Add collocation equations to the NLP
         [Xdotk, Algk] = ffcn(XD[k][j], XA[k][j-1], U[k])
@@ -332,7 +315,8 @@ for k in range(nk):
 
 xD_opt[:,-1] = v_opt[offset:offset+ndiff][:,0]
 
-
+# Collocation point
+tau = SX.sym("tau")
 
 # The algebraic states are not defined at the first collocation point of the finite elements:
 # with the polynomials we compute them at that point
@@ -362,7 +346,6 @@ for k in range(nk):
             xA_plt[:,offset5] = xa0
             #xA_plt[:,offset5] = xA_opt[:,offset4]
             offset5 += 1
-
 xA_plt[:,-1] = xA_plt[:,-2]
 
 
