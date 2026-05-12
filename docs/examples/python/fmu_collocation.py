@@ -33,38 +33,37 @@ import matplotlib.pyplot as plt
 dae = DaeBuilder('crane', '', dict(detect_quad = True))
 
 # Hard coded constants
-m = 1.
-M = 1.
+m = 1.  # Mass of the load
+M = 1. # Mass of the crane
 g = 9.81
 xref = 0.1 # chariot reference
+length = 1.0 # Rope/pole length
+inverted = True # Makes it an inverted pendulum on a cart
+y0 = length if inverted else -length
 
 # States
 x = dae.add('x', dict(start = 0))
-y = dae.add('y', dict(start = 1))
+y = dae.add('y', dict(start = y0))
 w = dae.add('w', dict(start = 0))
 dx = dae.add('dx', dict(start = 0))
 dy = dae.add('dy', dict(start = 0))
 dw = dae.add('dw', dict(start = 0))
 
 # Input
-u = dae.add('u', 'input')
+u = dae.add('u', 'input', dict(min = -2, max = 2, start = 0))
 
 # Algebraic variables
-lam = dae.add('lam')
-
+T = dae.add('T', dict(start = g if inverted else -g))
 # Ordinary differential equations
-ddx = (x-w)*lam/m
-ddy = g - y*lam/m
-ddw = ((x-w)*lam - u)/M
+ddx = (x-w)/length*T/m
+ddy = g - y/length*T/m
+ddw = ((x-w)/length*T - u)/M
 dae.eq(dae.der(x), dx)
 dae.eq(dae.der(y), dy)
 dae.eq(dae.der(w), dw)
 dae.eq(dae.der(dx), ddx)
 dae.eq(dae.der(dy), ddy)
 dae.eq(dae.der(dw), ddw)
-
-# Algebraic equations
-dae.eq(0, (x-w)*(ddx-ddw) + y*ddy + dy*dy + (dx-dw)*(dx-dw))
 
 # Quadrature
 lagrange_term = dae.add('lagrange_term')
@@ -73,6 +72,21 @@ dae.eq(dae.der(lagrange_term), (x-xref)**2 + (w-xref)**2)
 # Output
 mayer_term = dae.add('mayer_term', 'output')
 dae.eq(mayer_term, (x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy)
+
+# Original algebraic equation
+res = y**2 + (x-w)**2 - length**2
+print(f'Original residual equation: {res}')
+
+# Index reduction: Differentiate with respect to time
+# In CasADi, the most efficient way to do index reduction it to use forward
+# mode AD, e.g. us using Jacobian-times-vector products (jtimes):
+# Using the chain rule we have: d(res)/dt = d(res)/dx * dx/dt
+res1 = jtimes(res, vcat(dae.inputs('x')), vcat(dae.outputs('ode')))
+res2 = jtimes(res1, vcat(dae.inputs('x')), vcat(dae.outputs('ode')))
+print(f'Residual equation after index reduction: {res2}')
+
+# Add algebraic equations
+dae.eq(0, res2)
 
 # DAE rhs
 ffcn = dae.create('ffcn', ['x', 'z', 'u'], ['ode', 'alg', 'quad'])
@@ -161,7 +175,7 @@ for k in range(nk):
       # Add algebraic equations
       G.append(Alg_j)
       # Add Lagrange term contribution
-      J = J + h * B[j] * Q_j
+      J += h * B[j] * Q_j
     # State at the end of the interval
     Xk_end = D[0] * Xk
     for j in range(deg): Xk_end = Xk_end + D[j+1] * Xc[j]
@@ -178,25 +192,17 @@ for k in range(nk):
 Ugrid.append(tk)
 
 # Add Mayer term contribution
-TT = hfcn(Xk, Uk)
-J = J + TT
-print(TT.shape, J.shape)
-
+J += hfcn(Xk, Uk)
 
 # Concatenate vectors
 W = vcat(W)
 G = vcat(G)
 
-# Form the NLP
+# Allocate an NLP solver
 nlp = dict(x = W, f = J, g = G)
-
-# NLP solver options
 opts = {}
 opts["ipopt.max_iter"] = 100
 opts["ipopt.tol"] = 1e-4
-#opts["ipopt.linear_solver"] = 'ma27'
-
-# Allocate an NLP solver
 solver = nlpsol("solver", "ipopt", nlp, opts)
 
 # Create mappings from (X, Z, U) -> (W) and back
@@ -206,29 +212,39 @@ U_all = hcat(U_all)
 to_W = Function('to_W', [X_all, Z_all, U_all], [W], ['X', 'Z', 'U'], ['W'])
 from_W = Function('from_W', [W], [X_all, Z_all, U_all], ['W'], ['X', 'Z', 'U'])
 
-# Variable bounds, initial guess
+# Variable bounds, initial guess: Get data structures of correct size
+[X0, Z0, U0] = from_W(0)
 [lbX, lbZ, lbU] = from_W(-np.inf)
 [ubX, ubZ, ubU] = from_W(np.inf)
-[X0, Z0, U0] = from_W(0)
 
-# Specify control bounds
-lbU[U.index('u'), :] = -2
-ubU[U.index('u'), :] = 2
+# Initial guess, bounds for control trajectory
+Uinit = dae.start(U)
+Umin = dae.min(U)
+Umax = dae.max(U)
+for i, v0 in enumerate(Uinit):
+    U0[i, :] = v0
+    lbU[i, :] = Umin[i]
+    ubU[i, :] = Umax[i]
 
-# Fix y at initial time
-yl = 1. #- -> crane, + -> pendulum
+# Initial guess, bounds for state trajectory
+Xinit = dae.start(X)
+Xmin = dae.min(X)
+Xmax = dae.max(X)
+for i, v0 in enumerate(Xinit):
+    X0[i, :] = v0
+    lbX[i, :] = Xmin[i]
+    lbX[i, 0] = v0
+    ubX[i, :] = Xmax[i]
+    ubX[i, 0] = v0
 
-# Fixed initial condition on state
-lbX[:, 0] = 0
-ubX[:, 0] = 0
-lbX[X.index('y'), 0] = yl
-ubX[X.index('y'), 0] = yl
-
-# Initialize y to length
-X0[X.index('y'), :] = yl
-
-# Initialize lam to gravity
-Z0[Z.index('lam'), :] = sign(yl) * 9.81
+# Initial guess for algebraic variable trajectory
+Zinit = dae.start(Z)
+Zmin = dae.min(Z)
+Zmax = dae.max(Z)
+for i, v0 in enumerate(Zinit):
+    Z0[i, :] = v0
+    lbZ[i, :] = Zmin[i]
+    ubZ[i, :] = Zmax[i]
 
 # Solve the NLP
 W0 = to_W(X0, Z0, U0)
