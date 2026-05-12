@@ -3835,58 +3835,75 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     const XmlNode& ms = has_lsdae ? lsdae_ms : n;
     for (casadi_int i = 0; i < ms.size(); ++i) {
       const XmlNode& e = ms[i];
-      // Get a reference to the variable
-      if (e.name == "Output") {
-        // Get index
-        indices(Category::Y).push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
-        // Corresponding variable
-        Variable& v = variable(indices(Category::Y).back());
-        // Get dependencies
-        v.dependencies = read_dependencies(e);
-        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
-        // Mark interdependencies
-        for (casadi_int d : v.dependencies) variable(d).dependency = true;
-        for (casadi_int d : v.dependencies) variable(d).in_rhs = true;
-      } else if (e.name == "ContinuousStateDerivative") {
-        // Get index
-        der_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
-        // Corresponding variable
-        Variable& v = variable(der_.back());
-        // Add to list of states and derivative to list of dependent variables
-        casadi_assert(v.parent >= 0, "Error processing derivative info for " + v.name);
-        categorize(v.index, Category::W);
-        categorize(v.parent, Category::X);
-        // Map der field to derivative variable
-        variable(v.parent).der = der_.back();
-        // Get dependencies
-        v.dependencies = read_dependencies(e);
-        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
-        // Mark interdependencies
-        for (casadi_int d : v.dependencies) variable(d).dependency = true;
-        for (casadi_int d : v.dependencies) variable(d).in_rhs = true;
-      } else if (e.name == "ClockedState") {
-        // Clocked state
-        casadi_message("ClockedState not implemented, ignoring");
-      } else if (e.name == "InitialUnknown") {
-        // Get index
-        initial_unknowns_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
-        // Get dependencies
-        for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
-      } else if (e.name == "EventIndicator") {
-        // Event indicator
-        indices(Category::ZERO).push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
-        nzero_++;
-      } else if (e.name == "Residual") {
-        // Get index
-        indices(Category::ALG).push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
-        // Corresponding variable
-        Variable& v = variable(indices(Category::ALG).back());
-        // Get dependencies
-        v.dependencies = read_dependencies(e);
-        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
-      } else {
-        // Unknown
-        casadi_error("Unknown ModelStructure element: " + e.name);
+      try {
+        // Get a reference to the variable
+        if (e.name == "Output") {
+          // Get index
+          indices(Category::Y).push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+          // Corresponding variable
+          Variable& v = variable(indices(Category::Y).back());
+          // Get dependencies
+          v.dependencies = read_dependencies(e);
+          v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
+          // Mark interdependencies
+          for (casadi_int d : v.dependencies) variable(d).dependency = true;
+          for (casadi_int d : v.dependencies) variable(d).in_rhs = true;
+        } else if (e.name == "ContinuousStateDerivative") {
+          // Get index
+          der_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+          // Corresponding variable
+          Variable& v = variable(der_.back());
+          // Add to list of states and derivative to list of dependent variables
+          casadi_assert(v.parent >= 0, "Error processing derivative info for " + v.name);
+          categorize(v.index, Category::W);
+          categorize(v.parent, Category::X);
+          // Map der field to derivative variable
+          variable(v.parent).der = der_.back();
+          // Get dependencies
+          v.dependencies = read_dependencies(e);
+          v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
+          // Mark interdependencies
+          for (casadi_int d : v.dependencies) variable(d).dependency = true;
+          for (casadi_int d : v.dependencies) variable(d).in_rhs = true;
+        } else if (e.name == "ClockedState") {
+          // Clocked state
+          casadi_message("ClockedState not implemented, ignoring");
+        } else if (e.name == "InitialUnknown") {
+          // Get index
+          initial_unknowns_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+          // Get dependencies
+          for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
+        } else if (e.name == "EventIndicator") {
+          // Event indicator
+          indices(Category::ZERO).push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+          nzero_++;
+        } else if (e.name == "Residual") {
+          // Loop over formulations
+          bool found = false;
+          for (casadi_int form = 0; form < e.size(); ++form) {
+            const XmlNode& f = e[form];
+            auto form_index = f.attribute<size_t>("index");
+            if (form_index == 1) {
+              // Index-1 formulation
+              casadi_assert(!found, "Duplicate index-1 formulations");
+              found = true;
+              // Get index
+              indices(Category::ALG).push_back(vrmap_.at(
+                f.attribute<size_t>("valueReference")));
+              // Corresponding variable
+              Variable& v = variable(indices(Category::ALG).back());
+              // Get dependencies
+              v.dependencies = read_dependencies(f);
+              v.dependenciesKind = read_dependencies_kind(f, v.dependencies.size());
+            }
+          }
+          casadi_assert(found, "Missing index-1 formulation");
+        } else {
+          // Unknown
+          casadi_error("Unknown ModelStructure element: " + e.name);
+        }
+      } catch (const std::exception& ex) {
+        casadi_error("Error processing ModelStructure element: " + e.name + ": " + ex.what());
       }
     }
   } else {
