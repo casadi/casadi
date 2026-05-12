@@ -92,9 +92,14 @@ if "SKIP_KNITRO_TESTS" not in os.environ and has_nlpsol("knitro"):
 if "SKIP_SNOPT_TESTS" not in os.environ and has_nlpsol("snopt"):
   solvers.append(("snopt",{"snopt": {"Verify_level": 3,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}},{"codegen": False,"discrete":False}))
 
+load_nlpsol("madnlp")
+
 if "SKIP_MADNLP_TESTS" not in os.environ and has_nlpsol("madnlp"):
-  codegen = {"std": "c99","extralibs": ["Mad"]}
-  solvers.append(("madnlp",{"madnlp": {}},{"codegen": codegen,"discrete":False}))
+  libmad_dir = os.environ.get("LIBMADDIR", "/missing")
+  libmad_codegen = {"extralibs": ["Mad"], "std": "c99",
+                    "extralibdirs": [os.path.join(libmad_dir, "lib")],
+                    "extra_include": [os.path.join(libmad_dir, "include")]}
+  solvers.append(("madnlp",{"madnlp": {}},{"codegen": libmad_codegen,"discrete":False}))
 
 
 
