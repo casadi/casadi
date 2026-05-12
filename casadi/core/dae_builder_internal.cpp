@@ -4034,7 +4034,8 @@ XmlNode DaeBuilderInternal::import_ls_dae(const std::string& lsdae) {
 
   // Read attributes
   auto ls_version = ls_manifest.attribute<std::string>("fmi-ls:fmi-ls-version", "");
-  casadi_assert(ls_version == "1.0", "Unsupported LS-DAE version: " + ls_version);
+  casadi_assert(ls_version.empty() || ls_version == "1.0",
+    "Unsupported LS-DAE version: " + ls_version);
 
   // Process algebraic variables
   casadi_assert(ls_manifest.has_child("AlgebraicVariables"), "Missing 'AlgebraicVariables'");

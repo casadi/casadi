@@ -33,8 +33,8 @@ import matplotlib.pyplot as plt
 dae = DaeBuilder('crane')
 
 # Hard coded constants
-m = 1.  # Mass of the load
-M = 1. # Mass of the crane
+mL = 1.  # Mass of the load
+mC = 1. # Mass of the crane
 g = 9.81 # Gravity
 length = 1.0 # Rope/pole length
 inverted = True # Inverted pendulum on a cart rather than crane with hanging load
@@ -57,9 +57,9 @@ T = dae.add('T', dict(start = g if inverted else -g,
                       description = 'Tension in the rope/pole'))
 
 # Ordinary differential equations
-ddxL = (xL-xC)/length*T/m
-ddy = g - y/length*T/m
-ddxC = ((xL-xC)/length*T - u)/M
+ddxL = (xL-xC)/length*T/mL
+ddy = g - y/length*T/mL
+ddxC = ((xL-xC)/length*T - u)/mC
 dae.eq(dae.der(xL), dxL)
 dae.eq(dae.der(y), dy)
 dae.eq(dae.der(xC), dxC)
