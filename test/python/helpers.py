@@ -683,14 +683,20 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def compile_external(self,name,source,opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
-    # type: (str, str, Optional[dict], str, Union[str, list], bool, Union[str, list, None], bool, Union[str, list, None], list, bool) -> Any
+  def compile_external(self,name,source,opts=None,std="c89",extralibs="",extralibdirs=[],check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
+    # type: (str, str, Optional[dict], str, Union[str, list], list, bool, Union[str, list, None], bool, Union[str, list, None], list, bool) -> Any
     if args.run_slow:
       libdir = GlobalOptions.getCasadiPath()
       includedir = GlobalOptions.getCasadiIncludePath()
       includedirs = [includedir,os.path.join(includedir,"highs")]
       for e in extra_include:
         includedirs.append(os.path.join(includedir,e))
+
+      all_libdirs = [libdir] + list(extralibdirs)
+      if os.name=='nt':
+        libdirs_flags = " ".join(["/libpath:" + d for d in all_libdirs])
+      else:
+        libdirs_flags = " ".join(["-L" + d + " -Wl,-rpath," + d for d in all_libdirs])
 
       if isinstance(extralibs,list):
         extralibs_clean = []
@@ -732,7 +738,7 @@ class casadiTestCase(unittest.TestCase):
           if debug_mode:
             flags = "/O1 /Zi"
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {source} {extra} /link  /libpath:{libdir} /out:{name}.dll /implib:{name}.lib".format(shared="/LD" if shared else "",std=std,source=source,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),flags=flags,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,name=name)
+          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {source} {extra} /link  {libdirs} /out:{name}.dll /implib:{name}.lib".format(shared="/LD" if shared else "",std=std,source=source,libdirs=libdirs_flags,includedir=" ".join(["/I" + e for e in includedirs]),flags=flags,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,name=name)
           if shared:
             output = "./" + name + ".dll"
           else:
@@ -744,7 +750,7 @@ class casadiTestCase(unittest.TestCase):
           flags = "-O3"
           if debug_mode:
             flags = "-O0 -g"
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {source} -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,source=source,name_out=name+(".so" if shared else ""),flags=flags,libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {source} -o {name_out} {libdirs} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,source=source,name_out=name+(".so" if shared else ""),flags=flags,libdirs=libdirs_flags,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
           if sys.platform=="darwin":
             commands+= " -Xlinker -rpath -Xlinker {libdir}".format(libdir=libdir)
             commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
@@ -805,8 +811,8 @@ class casadiTestCase(unittest.TestCase):
     if bad_symbols:
       self.fail("Found %d bad symbol exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True):
-    # type: (Any, Any, Any, str, Union[str, list], bool, Union[str, list, None], bool, bool, Any, bool, bool, Union[str, list, None], bool, Optional[dict], bool, bool, list, int, bool, bool) -> Any
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",extralibdirs=[],check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True):
+    # type: (Any, Any, Any, str, Union[str, list], list, bool, Union[str, list, None], bool, bool, Any, bool, bool, Union[str, list, None], bool, Optional[dict], bool, bool, list, int, bool, bool) -> Any
     ret = {}
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
@@ -838,6 +844,12 @@ class casadiTestCase(unittest.TestCase):
       includedirs = [includedir,os.path.join(includedir,"highs")]
       for e in extra_include:
         includedirs.append(os.path.join(includedir,e))
+
+      all_libdirs = [libdir] + list(extralibdirs)
+      if os.name=='nt':
+        libdirs_flags = " ".join(["/libpath:" + d for d in all_libdirs])
+      else:
+        libdirs_flags = " ".join(["-L" + d + " -Wl,-rpath," + d for d in all_libdirs])
 
       if isinstance(extralibs,list):
         extralibs_clean = []
@@ -879,7 +891,7 @@ class casadiTestCase(unittest.TestCase):
           if debug_mode:
             flags = "/O1 /Zi"
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,flags=flags)
+          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {name}.c {extra} /link  {libdirs}".format(shared="/LD" if shared else "",std=std,name=name,libdirs=libdirs_flags,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,flags=flags)
           if shared:
             output = "./" + name + ".dll"
           else:
@@ -891,7 +903,7 @@ class casadiTestCase(unittest.TestCase):
           flags = "-O3"
           if debug_mode:
             flags = "-O0 -g"
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {name}.c -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs,flags=flags) + (" -lm" if not shared else "") + extralibs + extra_options
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {name}.c -o {name_out} {libdirs} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdirs=libdirs_flags,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs,flags=flags) + (" -lm" if not shared else "") + extralibs + extra_options
           if sys.platform=="darwin":
             commands+= " -Xlinker -rpath -Xlinker {libdir}".format(libdir=libdir)
             commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
