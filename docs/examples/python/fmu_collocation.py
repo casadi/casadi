@@ -30,51 +30,45 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Start with an empty DaeBuilder instance
-dae = DaeBuilder('crane', '', dict(detect_quad = True))
+dae = DaeBuilder('crane')
 
 # Hard coded constants
 m = 1.  # Mass of the load
 M = 1. # Mass of the crane
-g = 9.81
-xref = 0.1 # chariot reference
+g = 9.81 # Gravity
 length = 1.0 # Rope/pole length
-inverted = True # Makes it an inverted pendulum on a cart
-y0 = length if inverted else -length
+inverted = True # Inverted pendulum on a cart rather than crane with hanging load
 
 # States
-x = dae.add('x', dict(start = 0))
-y = dae.add('y', dict(start = y0))
-w = dae.add('w', dict(start = 0))
-dx = dae.add('dx', dict(start = 0))
-dy = dae.add('dy', dict(start = 0))
-dw = dae.add('dw', dict(start = 0))
+xL = dae.add('xL', dict(start = 0, description = 'Horizontal position of the load'))
+y = dae.add('y', dict(start = length if inverted else -length,
+                      description = 'Vertical position of the load'))
+xC = dae.add('xC', dict(start = 0, description = 'Horizontal position of the crane'))
+dxL = dae.add('dxL', dict(start = 0, description = 'Horizontal velocity of the load'))
+dy = dae.add('dy', dict(start = 0, description = 'Vertical velocity of the load'))
+dxC = dae.add('dxC', dict(start = 0, description = 'Horizontal velocity of the crane'))
 
 # Input
-u = dae.add('u', 'input', dict(min = -2, max = 2, start = 0))
+u = dae.add('u', 'input', dict(min = -2, max = 2, start = 0,
+                               description = 'Horizontal force applied to the crane'))
 
 # Algebraic variables
-T = dae.add('T', dict(start = g if inverted else -g))
+T = dae.add('T', dict(start = g if inverted else -g,
+                      description = 'Tension in the rope/pole'))
+
 # Ordinary differential equations
-ddx = (x-w)/length*T/m
+ddxL = (xL-xC)/length*T/m
 ddy = g - y/length*T/m
-ddw = ((x-w)/length*T - u)/M
-dae.eq(dae.der(x), dx)
+ddxC = ((xL-xC)/length*T - u)/M
+dae.eq(dae.der(xL), dxL)
 dae.eq(dae.der(y), dy)
-dae.eq(dae.der(w), dw)
-dae.eq(dae.der(dx), ddx)
+dae.eq(dae.der(xC), dxC)
+dae.eq(dae.der(dxL), ddxL)
 dae.eq(dae.der(dy), ddy)
-dae.eq(dae.der(dw), ddw)
-
-# Quadrature
-lagrange_term = dae.add('lagrange_term')
-dae.eq(dae.der(lagrange_term), (x-xref)**2 + (w-xref)**2)
-
-# Output
-mayer_term = dae.add('mayer_term', 'output')
-dae.eq(mayer_term, (x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy)
+dae.eq(dae.der(dxC), ddxC)
 
 # Original algebraic equation
-res = y**2 + (x-w)**2 - length**2
+res = y**2 + (xL-xC)**2 - length**2
 print(f'Original residual equation: {res}')
 
 # Index reduction: Differentiate with respect to time
@@ -88,19 +82,39 @@ print(f'Residual equation after index reduction: {res2}')
 # Add algebraic equations
 dae.eq(0, res2)
 
-# DAE rhs
-ffcn = dae.create('ffcn', ['x', 'z', 'u'], ['ode', 'alg', 'quad'])
+# Simulation duration
+dae.set_start_time(0)
+dae.set_stop_time(5)
 
-# Output function
-hfcn = dae.create('hfun', ['x', 'u'], ['y'])
+# DAE right-hand-side function
+ffcn = dae.create('ffcn', ['x', 'z', 'u'], ['ode', 'alg'])
 
 # Variable names
 U = dae.u()
 X = dae.x()
 Z = dae.z()
 
-# Degree of interpolating polynomial
-deg = 4
+# Refence location for crane and load
+xref = 0.1
+
+# Quadratic cost at the beginning of control intervals
+X_ref = np.zeros(len(X))
+X_ref[X.index('xL')] = xref
+X_ref[X.index('xC')] = xref
+X_weights = np.array([1. if n in ('xL', 'xC') else 0 for n in X])
+
+# Quadratic cost at final time
+Xf_ref = np.zeros(len(X))
+Xf_ref[X.index('xL')] = xref
+Xf_ref[X.index('xC')] = xref
+Xf_weights = np.array([1. if n in ('xL', 'xC', 'dxL', 'dy') else 0 for n in X])
+
+# Discretization
+nk = 50 # Number of control intervals
+deg = 4 # Degree of interpolating polynomial
+
+# Size of the finite elements
+h = (dae.stop_time() - dae.start_time())/nk
 
 # We will use collocation discretization using Legendre roots, cf. 
 # Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes
@@ -109,12 +123,10 @@ deg = 4
 tau_root = collocation_points(deg, 'radau')
 
 # We can query the coefficient for the interpolating polynomials using a helper function
+# C: Coefficients for calculating state derivatives
+# D: Coefficients for calculating state at the end of the interval
+# B: Coefficients for calculating a quadrature at the end of the interval
 C, D, B = collocation_coeff(tau_root)
-
-# Size of the finite elements
-tf = 5.0
-nk = 50
-h = tf/nk
 
 # We will construct an NLP incrementally, starting with no decision variables, 
 # and constraints, and zero objective
@@ -142,6 +154,9 @@ W.append(Xk)
 Xgrid.append(tk)
 # Loop over all control intervals, constructing the NLP and x, u trajectories
 for k in range(nk):
+    # Add contribution to the cost
+    Dx = Xk - X_ref
+    J += dot(Dx, X_weights * Dx)
     # Symbolic expression for the control for the interval
     Uk = MX.sym('u' + str(k), len(U))
     U_all.append(Uk)
@@ -169,13 +184,11 @@ for k in range(nk):
       Xdot_j = C[0,j] * Xk
       for r in range(deg): Xdot_j += C[r+1, j] * Xc[r]
       # Call the DAE right-hand-side function
-      [Ode_j, Alg_j, Q_j] = ffcn(Xc[j], Zc[j], Uk)
+      [Ode_j, Alg_j] = ffcn(Xc[j], Zc[j], Uk)
       # Append collocation equations
       G.append(h*Ode_j - Xdot_j)
       # Add algebraic equations
       G.append(Alg_j)
-      # Add Lagrange term contribution
-      J += h * B[j] * Q_j
     # State at the end of the interval
     Xk_end = D[0] * Xk
     for j in range(deg): Xk_end = Xk_end + D[j+1] * Xc[j]
@@ -191,8 +204,9 @@ for k in range(nk):
 # Include end of control interval
 Ugrid.append(tk)
 
-# Add Mayer term contribution
-J += hfcn(Xk, Uk)
+# Add cost contribution from the final state
+Dx = Xk - Xf_ref
+J += dot(Dx, Xf_weights * Dx)
 
 # Concatenate vectors
 W = vcat(W)
