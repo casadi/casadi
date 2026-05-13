@@ -61,13 +61,13 @@ cfiles = " ".join([f for f in fmu_files if f.endswith('.c')])
 sofile = dae.name() + '.so'
 os.system(f'gcc --shared -fPIC -I{fmi_headers} {cfiles} -o {sofile}')
 print(f'Compiled {sofile}')
-fmu_files[sofile] = 'binaries/x86_64-linux'
+fmu_files[sofile] = 'binaries/x86_64-linux/' + sofile
 
 # Package into an FMU
 fmuname = dae.name() + '.fmu'
 with ZipFile(fmuname, 'w') as fmufile:
-    for f, arcpath in fmu_files.items():
-      fmufile.write(f, arcname = arcpath + '/' + f)
+    for f, arcname in fmu_files.items():
+      fmufile.write(f, arcname = arcname)
       os.remove(f)
 print(f'Created FMU: {fmuname}')
 

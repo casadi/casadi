@@ -307,7 +307,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   XmlNode generate_model_variables() const;
 
   /// Generate FMU ModelStructure
-  XmlNode generate_model_structure() const;
+  XmlNode generate_model_structure(bool dae = false) const;
 
   /// Update model variable dependencies
   void update_dependencies() const;
@@ -378,7 +378,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   MX der(const MX& var, bool may_allocate = true);
 
   /// Find a unique name, with a specific prefix
-  std::string unique_name(const std::string& prefix, bool allow_no_prefix = true) const;
+  std::string unique_name(const std::string& prefix, bool allow_no_prefix = false) const;
 
   /// Readable name of the class
   std::string type_name() const {return "DaeBuilderInternal";}
@@ -495,7 +495,7 @@ protected:
   bool debug_;
   double fmutol_;
   bool ignore_time_;
-  bool enable_ls_dae_;
+  bool enable_ls_dae_, enable_ls_serialization_;
 
   // FMI attributes
   std::string fmi_version_;

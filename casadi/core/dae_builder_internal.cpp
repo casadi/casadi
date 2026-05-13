@@ -652,6 +652,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   fmutol_ = 0;
   ignore_time_ = false;
   enable_ls_dae_ = true;
+  enable_ls_serialization_ = true;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="debug") {
@@ -666,6 +667,8 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
       resource_.change_option("serialize_mode", op.second);
     } else if (op.first=="enable_ls_dae") {
       enable_ls_dae_ = op.second;
+    } else if (op.first=="enable_ls_serialization") {
+      enable_ls_serialization_ = op.second;
     } else {
       casadi_error("No such option: " + op.first);
     }
@@ -751,50 +754,71 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   symbolic_ = false;  // use DLL by default
 
   // Look for serialized CasADi expressions
-  try {
-    // Load function oracle from file
-    Function oracle = Function::load(resource_.path()
-      + "/extra/org.casadi.fmi-ls-serialization/oracle.casadi");
-    // Get expressions
-    auto oracle_in = oracle.mx_in();
-    auto oracle_out = oracle(oracle_in);
-    // Get all substitutions
-    std::vector<MX> v, vdef;
-    for (auto& arg : oracle_in) {
-      // Loop over symbolic primitives
-      for (auto& vp : arg.primitives()) {
-        // Find the variable
-        size_t ind = find(vp.name());
-        // Add to list of replacements
-        v.push_back(vp);
-        vdef.push_back(var(ind));
+  if (enable_ls_serialization_) {
+    try {
+      // Load function oracle from file
+      Function oracle = Function::load(resource_.path()
+        + "/extra/org.casadi.fmi-ls-serialization/oracle.casadi");
+      // Get expressions
+      auto oracle_in = oracle.mx_in();
+      auto oracle_out = oracle(oracle_in);
+      // Get all substitutions
+      std::vector<MX> v, vdef;
+      for (auto& arg : oracle_in) {
+        // Loop over symbolic primitives
+        for (auto& vp : arg.primitives()) {
+          // Find the variable
+          size_t ind = find(vp.name());
+          // Add to list of replacements
+          v.push_back(vp);
+          vdef.push_back(var(ind));
+        }
       }
-    }
-    // Substitute expressions in oracle_in, oracle_out
-    oracle_in = substitute(oracle_in, v, vdef);
-    oracle_out = substitute(oracle_out, v, vdef);
+      // Substitute expressions in oracle_in, oracle_out
+      oracle_in = substitute(oracle_in, v, vdef);
+      oracle_out = substitute(oracle_out, v, vdef);
+      // Process dependent variables
+      MX w_all = oracle_in.at(oracle.index_in("w"));
+      std::vector<MX> w = w_all.primitives();
+      std::vector<MX> wdef = w_all.split_primitives(oracle_out.at(oracle.index_out("wdef")));
+      // Loop over w
+      for (size_t i = 0; i < w.size(); ++i) {
+        // Find variable, corresponding assignment variable
+        Variable& w_i = variable(w[i].name());
+        Variable& assign_w_i = variable("__assign__" + w[i].name() + "__");
+        // Reclassify assign_w_i as dependent variable and update expression
+        categorize(assign_w_i.index, Category::CALCULATED);
+        assign_w_i.parent = w_i.index;
+        assign_w_i.v = wdef[i];
+        // Map binding equation
+        w_i.bind = assign_w_i.index;
+      }
 
-    // Process dependent variables
-    MX w_all = oracle_in.at(oracle.index_in("w"));
-    std::vector<MX> w = w_all.primitives();
-    std::vector<MX> wdef = w_all.split_primitives(oracle_out.at(oracle.index_out("wdef")));
+      // Substitute expressions for algebraic variables, if any
+      if (size(Category::ALG) > 0) {
+        std::vector<MX> alg;
+        // Collect expressions to be replaced
+        for (size_t i : indices(Category::ALG)) {
+          alg.push_back(variable(i).v);
+        }
+        // Substitute expressions
+        MX alg_all = vertcat(alg);
+        alg = alg_all.split_primitives(oracle_out.at(oracle.index_out("alg")));
+        auto alg_it = alg.begin();
+        // Update expressions
+        for (size_t i : indices(Category::ALG)) {
+          // Substitute expression
+          Variable& v = variable(i);
+          categorize(v.index, Category::CALCULATED);
+          v.v = *alg_it++;
+        }
+      }
 
-    // Loop over w
-    for (size_t i = 0; i < w.size(); ++i) {
-      // Find variable, corresponding assignment variable
-      Variable& w_i = variable(w[i].name());
-      Variable& assign_w_i = variable("__assign__" + w[i].name() + "__");
-      // Reclassify assign_w_i as dependent variable and update expression
-      categorize(assign_w_i.index, Category::CALCULATED);
-      assign_w_i.parent = w_i.index;
-      assign_w_i.v = wdef[i];
-      // Map binding equation
-      w_i.bind = assign_w_i.index;
+      symbolic_ = true;
+    } catch (std::exception& e) {
+      // May want to output this information
+      (void)e;  // unused
     }
-    symbolic_ = true;
-  } catch (std::exception& e) {
-    // May want to output this information
-    (void)e;  // unused
   }
 
   // Add symbolic binding equations
@@ -924,7 +948,7 @@ XmlNode DaeBuilderInternal::generate_model_variables() const {
   return r;
 }
 
-XmlNode DaeBuilderInternal::generate_model_structure() const {
+XmlNode DaeBuilderInternal::generate_model_structure(bool dae) const {
   XmlNode r;
   r.name = "ModelStructure";
   // Add outputs
@@ -945,32 +969,46 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     c.set_attribute("dependencies", xdot.dependencies);
     r.children.push_back(c);
   }
-  // Add initial unknowns: Outputs
-  for (size_t i : indices(Category::Y)) {
-    const Variable& y = variable(i);
-    XmlNode c;
-    c.name = "InitialUnknown";
-    c.set_attribute("valueReference", static_cast<casadi_int>(y.value_reference));
-    c.set_attribute("dependencies", y.dependencies);
-    r.children.push_back(c);
-  }
-  // Add initial unknowns: State derivative
-  for (size_t i : indices(Category::X)) {
-    const Variable& xdot = variable(variable(i).der);
-    XmlNode c;
-    c.name = "InitialUnknown";
-    c.set_attribute("valueReference", static_cast<casadi_int>(xdot.value_reference));
-    c.set_attribute("dependencies", xdot.dependencies);
-    r.children.push_back(c);
-  }
-  // Add event indicators
-  for (size_t i : indices(Category::ZERO)) {
-    const Variable& zero = variable(i);
-    XmlNode c;
-    c.name = "EventIndicator";
-    c.set_attribute("valueReference", static_cast<casadi_int>(zero.value_reference));
-    c.set_attribute("dependencies", zero.dependencies);
-    r.children.push_back(c);
+  if (dae) {
+    for (size_t i : indices(Category::ALG)) {
+      XmlNode f;
+      f.name = "Formulation";
+      f.set_attribute("index", "1");
+      f.set_attribute("valueReference", static_cast<casadi_int>(variable(i).value_reference));
+      f.set_attribute("dependencies", variable(i).dependencies);
+      XmlNode c;
+      c.name = "Residual";
+      c.children.push_back(f);
+      r.children.push_back(c);
+    }
+  } else {
+    // Add initial unknowns: Outputs
+    for (size_t i : indices(Category::Y)) {
+      const Variable& y = variable(i);
+      XmlNode c;
+      c.name = "InitialUnknown";
+      c.set_attribute("valueReference", static_cast<casadi_int>(y.value_reference));
+      c.set_attribute("dependencies", y.dependencies);
+      r.children.push_back(c);
+    }
+    // Add initial unknowns: State derivative
+    for (size_t i : indices(Category::X)) {
+      const Variable& xdot = variable(variable(i).der);
+      XmlNode c;
+      c.name = "InitialUnknown";
+      c.set_attribute("valueReference", static_cast<casadi_int>(xdot.value_reference));
+      c.set_attribute("dependencies", xdot.dependencies);
+      r.children.push_back(c);
+    }
+    // Add event indicators
+    for (size_t i : indices(Category::ZERO)) {
+      const Variable& zero = variable(i);
+      XmlNode c;
+      c.name = "EventIndicator";
+      c.set_attribute("valueReference", static_cast<casadi_int>(zero.value_reference));
+      c.set_attribute("dependencies", zero.dependencies);
+      r.children.push_back(c);
+    }
   }
   return r;
 }
@@ -981,6 +1019,7 @@ void DaeBuilderInternal::update_dependencies() const {
   // Dependendencies of the ODE right-hand-side
   Sparsity dode_dxT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("x")).T();
   Sparsity dode_duT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("u")).T();
+  Sparsity dode_dzT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("z")).T();
   for (casadi_int i = 0; i < size(Category::X); ++i) {
     // Get output variable
     const Variable& xdot = variable(variable(Category::X, i).der);
@@ -991,6 +1030,11 @@ void DaeBuilderInternal::update_dependencies() const {
       casadi_int j = dode_dxT.row(k);
       xdot.dependencies.push_back(variable(Category::X, j).value_reference);
     }
+    // Dependencies on algebraic variables
+    for (casadi_int k = dode_dzT.colind(i); k < dode_dzT.colind(i + 1); ++k) {
+      casadi_int j = dode_dzT.row(k);
+      xdot.dependencies.push_back(variable(Category::Z, j).value_reference);
+    }
     // Dependencies on controls
     for (casadi_int k = dode_duT.colind(i); k < dode_duT.colind(i + 1); ++k) {
       casadi_int j = dode_duT.row(k);
@@ -998,9 +1042,11 @@ void DaeBuilderInternal::update_dependencies() const {
     }
   }
   // Dependendencies of the outputs and event indicators
-  for (std::string catname : {"y", "zero"}) {
-    const std::vector<size_t>& oind = indices(catname == "y" ? Category::Y : Category::ZERO);
+  for (Category cat : {Category::ALG, Category::Y, Category::ZERO}) {
+    auto catname = to_string(cat);
+    const std::vector<size_t>& oind = indices(cat);
     Sparsity dy_dxT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("x")).T();
+    Sparsity dy_dzT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("z")).T();
     Sparsity dy_duT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("u")).T();
     for (casadi_int i = 0; i < oind.size(); ++i) {
       // Get output variable
@@ -1011,6 +1057,11 @@ void DaeBuilderInternal::update_dependencies() const {
       for (casadi_int k = dy_dxT.colind(i); k < dy_dxT.colind(i + 1); ++k) {
         casadi_int j = dy_dxT.row(k);
         y.dependencies.push_back(variable(Category::X, j).value_reference);
+      }
+      // Dependencies on algebraic variables
+      for (casadi_int k = dy_dzT.colind(i); k < dy_dzT.colind(i + 1); ++k) {
+        casadi_int j = dy_dzT.row(k);
+        y.dependencies.push_back(variable(Category::Z, j).value_reference);
       }
       // Dependencies on controls
       for (casadi_int k = dy_duT.colind(i); k < dy_duT.colind(i + 1); ++k) {
@@ -1042,7 +1093,7 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
   std::string dae_filename = name_;
   casadi_assert(size(Category::Q) == 0, "Not implemented");
   Function dae = shared_from_this<DaeBuilder>().create(dae_filename,
-    {"t", "x", "p", "u"}, {"ode", "y", "zero"});
+    {"t", "x", "z", "p", "u"}, {"ode", "alg", "y", "zero"});
   // Event transition function, if needed
   Function tfun;
   if (size(Category::ZERO) > 0) tfun = transition("transition_" + name_);
@@ -1066,9 +1117,9 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
   sources.push_back(generate_build_description(sources));
   // Return object
   Dict ret;
-  for (const std::string& s : sources) ret[s] = "sources";
+  for (const std::string& s : sources) ret[s] = "sources/" + s;
   // Generate modelDescription file
-  ret[generate_model_description(guid)] = ".";
+  ret[generate_model_description(guid)] = "./modelDescription.xml";
 
   // Serialize expressions
   if (with_serialization) {
@@ -1077,7 +1128,7 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
     // Serialized oracle
     std::string oracle_filename = "oracle.casadi";
     shared_from_this<DaeBuilder>().oracle().save(oracle_filename);
-    ret[oracle_filename] = "extra/" + serialization_ls;
+    ret[oracle_filename] = "extra/" + serialization_ls + "/" + oracle_filename;
     // Manifest file for serialized expressions
     XmlNode r;
     r.name = "fmiLayeredStandardManifest";
@@ -1089,9 +1140,42 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
     manifest.children.push_back(r);
     // Export and add to return
     XmlFile xml_file("tinyxml");
-    std::string manifest_filename = "fmi-ls-manifest.xml";
+    std::string manifest_filename = serialization_ls + ".fmi-ls-manifest.xml";
     xml_file.dump(manifest_filename, manifest);
-    ret[manifest_filename] = "extra/" + serialization_ls;
+    ret[manifest_filename] = "extra/" + serialization_ls + "/fmi-ls-manifest.xml";
+  }
+  // LS-DAE
+  if (size(Category::Z) > 0) {
+    // Layered standard for DAE
+    std::string dae_ls = "org.fmi-standard.fmi-ls-dae";
+    // Manifest file for serialized expressions
+    XmlNode r;
+    r.name = "fmiLayeredStandardManifest";
+    r.set_attribute("fmi-ls:fmi-ls-name", dae_ls);
+    r.set_attribute("fmi-ls:fmi-ls-version", "");
+    r.set_attribute("fmi-ls:fmi-ls-description",
+      "Layered standard for DAE support in FMU");
+    // Algebraic variables
+    XmlNode a;
+    a.name = "AlgebraicVariables";
+    for (size_t i : indices(Category::Z)) {
+      XmlNode v;
+      v.name = "AlgebraicVariable";
+      v.set_attribute("valueReference",
+        static_cast<casadi_int>(variable(i).value_reference));
+      a.children.push_back(v);
+    }
+    r.children.push_back(a);
+    // Modified model structure
+    r.children.push_back(generate_model_structure(true));
+    // Finish manifest file
+    XmlNode manifest;
+    manifest.children.push_back(r);
+    // Export and add to return
+    XmlFile xml_file("tinyxml");
+    std::string manifest_filename = dae_ls + ".fmi-ls-manifest.xml";
+    xml_file.dump(manifest_filename, manifest);
+    ret[manifest_filename] = "extra/" + dae_ls + "/fmi-ls-manifest.xml";
   }
   // Return list of files
   return ret;
@@ -1175,9 +1259,14 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
   // Start attributes
   f << "casadi_real start[SZ_MEM] = " << generate(start_all()) << ";\n\n";
 
-  // States
+  // Differential states
   f << "#define N_X " << size(Category::X) << "\n"
     << "fmi3ValueReference x_vr[N_X] = " << generate(indices(Category::X)) << ";\n"
+    << "\n";
+
+  // Algebraic variables
+  f << "#define N_Z " << size(Category::Z) << "\n"
+    << "fmi3ValueReference z_vr[N_Z] = " << generate(indices(Category::Z)) << ";\n"
     << "\n";
 
   // Controls
@@ -1197,6 +1286,10 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     << "\n";
 
   // Outputs
+  f << "fmi3ValueReference alg_vr[N_Z] = " << generate(indices(Category::ALG)) << ";\n"
+    << "\n";
+
+    // Outputs
   f << "#define N_Y " << size(Category::Y) << "\n"
     << "fmi3ValueReference y_vr[N_Y] = " << generate(indices(Category::Y)) << ";\n"
     << "\n";
@@ -3017,7 +3110,11 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   v.causality = causality;
   v.variability = variability;
   if (!start.empty()) v.value = v.start = start;
-  if (!initial.empty()) v.initial = to_enum<Initial>(initial);
+  if (!initial.empty()) {
+    v.initial = to_enum<Initial>(initial);
+  } else {
+    v.initial = default_initial(causality, variability);
+  }
   if (!unit.empty()) v.unit = unit;
   if (!display_unit.empty()) v.display_unit = display_unit;
   if (min != -casadi::inf) v.min = min;
@@ -3488,7 +3585,7 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
 
 Variable& DaeBuilderInternal::assign(const std::string& name, const MX& val) {
   // Create a unique name for the reinit variable
-  std::string assign_name = unique_name("__assign__" + name + "__");
+  std::string assign_name = unique_name("__assign__" + name + "__", true);
   // Add a new dependent variable defined by val
   Variable& v = add(assign_name, Causality::LOCAL, Variability::CONTINUOUS,
     val, Dict());

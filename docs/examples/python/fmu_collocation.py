@@ -28,13 +28,18 @@ Reformulated to a semi-explict formulation and modern syntax by Joel Andersson, 
 from casadi import *
 import numpy as np
 import matplotlib.pyplot as plt
+from zipfile import ZipFile
+from pathlib import Path
 
-if False:
-    # Use FMU compiled from Modelica using Dymola
-    dae = DaeBuilder('crane', r'../../../test/data/Crane.fmu')
-else:
+# Precompiled FMU?
+fmu = None # Generate CasADi FMU
+# fmu = 'casadi_symbolic_fmu' # FMU from CasADi, use serialized CasADi expressions (default)
+# fmu = 'casadi_blackbox_fmu' # FMU from CasADi, do not use serialized CasADi expressions
+# fmu = 'dymola_fmu' # FMU from Dymola, compiled from Modelica
+
+if fmu is None:
     # Start with an empty DaeBuilder instance
-    dae = DaeBuilder('crane')
+    dae = DaeBuilder('Crane')
 
     # Hard coded constants
     mL = 1.  # Mass of the load
@@ -44,21 +49,26 @@ else:
     inverted = True # Inverted pendulum on a cart rather than crane with hanging load
 
     # States
-    xL = dae.add('xL', dict(start = 0, description = 'Horizontal position of the load'))
-    y = dae.add('y', dict(start = length if inverted else -length,
-                        description = 'Vertical position of the load'))
-    xC = dae.add('xC', dict(start = 0, description = 'Horizontal position of the crane'))
-    dxL = dae.add('dxL', dict(start = 0, description = 'Horizontal velocity of the load'))
-    dy = dae.add('dy', dict(start = 0, description = 'Vertical velocity of the load'))
-    dxC = dae.add('dxC', dict(start = 0, description = 'Horizontal velocity of the crane'))
+    xL = dae.add('xL', dict(initial = 'exact', start = 0,
+                            description = 'Horizontal position of the load'))
+    y = dae.add('y', dict(initial = 'exact', start = length if inverted else -length,
+                          description = 'Vertical position of the load'))
+    xC = dae.add('xC', dict(initial = 'exact', start = 0,
+                            description = 'Horizontal position of the crane'))
+    dxL = dae.add('dxL', dict(initial = 'exact', start = 0,
+                              description = 'Horizontal velocity of the load'))
+    dy = dae.add('dy', dict(initial = 'exact', start = 0,
+                            description = 'Vertical velocity of the load'))
+    dxC = dae.add('dxC', dict(initial = 'exact', start = 0,
+                              description = 'Horizontal velocity of the crane'))
 
     # Input
     u = dae.add('u', 'input', dict(min = -2, max = 2, start = 0,
                                 description = 'Horizontal force applied to the crane'))
 
     # Algebraic variables
-    T = dae.add('T', dict(start = g if inverted else -g,
-                        description = 'Tension in the rope/pole'))
+    T = dae.add('T', dict(initial = 'approx', start = g if inverted else -g,
+                          description = 'Tension in the rope/pole'))
 
     # Ordinary differential equations
     ddxL = (xL-xC)/length*T/mL
@@ -86,9 +96,49 @@ else:
     # Add algebraic equations
     dae.eq(0, res2)
 
-# Simulation duration
-dae.set_start_time(0)
-dae.set_stop_time(5)
+    # Simulation duration
+    dae.set_start_time(0)
+    dae.set_stop_time(5)
+
+    # Generate FMU
+    fmu_files = dae.export_fmu()
+    print('Generated files: {}'.format(fmu_files))
+
+    # Compile DLL
+    fmi_headers = Path(__file__).parent.parent.parent.parent \
+    / 'external_packages' / 'FMI-Standard-3.0' / 'headers'
+    cfiles = " ".join([f for f in fmu_files if f.endswith('.c')])
+    # Compile sources (in Linux)
+    if os.name == 'posix':
+        try:
+            sofile = dae.name() + '.so'
+            os.system(f'gcc --shared -fPIC -I{fmi_headers} {cfiles} -o {sofile}')
+            print(f'Compiled {sofile}')
+            fmu_files[sofile] = 'binaries/x86_64-linux/' + sofile
+        except Exception as e:
+            print(f'Failed to create FMU binary: {e}')
+
+    # Package into an FMU
+    fmuname = dae.name() + '.fmu'
+    with ZipFile(fmuname, 'w') as fmufile:
+        for f, arcname in fmu_files.items():
+            fmufile.write(f, arcname = arcname)
+            os.remove(f)
+        print(f'Created FMU: {fmuname}')
+elif fmu == 'casadi_symbolic_fmu':
+    # Use FMU generated from CasADi using the script above: Standard FMU + CasADi expressions + LS-DAE
+    dae = DaeBuilder('Crane', './Crane.fmu')
+elif fmu == 'casadi_blackbox_fmu':
+    # Use FMU generated from CasADi using the script above: Standard FMU + LS-DAE
+    dae = DaeBuilder('Crane', './Crane.fmu', dict(enable_ls_serialization = False))
+elif fmu == 'dymola_fmu':
+    # Use FMU compiled from Modelica using Dymola
+    dae = DaeBuilder('crane', r'../../../test/data/Crane.fmu')
+else:
+    raise ValueError(f'Unknown FMU option: {fmu}')
+
+# Display the model
+dae.disp(True)
 
 # DAE right-hand-side function
 ffcn = dae.create('ffcn', ['x', 'z', 'u'], ['ode', 'alg', 'y'])
@@ -119,7 +169,8 @@ nk = 50 # Number of control intervals
 deg = 4 # Degree of interpolating polynomial
 
 # Size of the finite elements
-h = (dae.stop_time() - dae.start_time())/nk
+tf = 5.0
+h = tf/nk
 
 # We will use collocation discretization using Legendre roots, cf. 
 # Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes
