@@ -105,6 +105,8 @@ CASADI_EXPORT handle_t open_shared_library(const std::string& lib,
     \identifier{264} */
 CASADI_EXPORT int close_shared_library(handle_t handle);
 
+#else // WITH_DL
+    typedef void* handle_t;
 #endif // WITH_DL
 
 

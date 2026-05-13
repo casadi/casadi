@@ -280,6 +280,10 @@ namespace casadi {
     }
     return fcnPtr;
 #endif // _WIN32
+#else // WITH_DL
+    (void)sym;
+    casadi_error("DllLibrary::get_function: WITH_DL option needed for dynamic loading");
+    return nullptr;
 #endif // WITH_DL
   }
 
