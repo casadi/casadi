@@ -782,7 +782,11 @@ namespace std {
       PyObject *cr = PyObject_CallFunctionObjArgs(dm, p, check_only, NULL);
       if (!cr) return false;
       bool ret;
-      if (PyBool_Check(cr)) {
+      // None signals "not handled by this helper" (issue #4216):
+      // without this check, conv() would dereference None and segfault.
+      if (cr == Py_None) {
+        ret = false;
+      } else if (PyBool_Check(cr)) {
         ret = PyObject_IsTrue(cr);
       } else {
         ret = conv(cr, m);
