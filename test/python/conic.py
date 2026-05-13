@@ -182,7 +182,7 @@ class ConicTests(casadiTestCase):
         if conic == "mosek" and platform.system()=="Darwin":
             digits = 5
         if aux_options["codegen"]:
-          self.check_codegen(solver,solver.convert_in(solver_in),**aux_options["codegen"],digits=digits)
+          self.check_codegen(solver,solver.convert_in(solver_in),digits=digits,**aux_options["codegen"])
 
   def test_opti(self):
     for conic, qp_options, aux_options in conics:
