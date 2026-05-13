@@ -302,6 +302,33 @@
    obj:*libiomp*
 }
 
+{
+   Error in mosek (tbb-init-cond)
+   Memcheck:Cond
+   fun:__intel_sse2_str*
+   ...
+   obj:*libtbb*
+}
+
+{
+   Error in mosek (tbb-init-cond-addr)
+   Memcheck:Addr16
+   fun:__intel_sse2_str*
+   ...
+   obj:*libtbb*
+}
+
+{
+   Error in mosek (dlopen-leak-glibc234)
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:malloc
+   fun:_dl_map_object_deps
+   ...
+   fun:dlopen@@GLIBC_2.34
+}
+
 
 {
    Error in mosek (4)
