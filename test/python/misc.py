@@ -69,10 +69,10 @@ class Misctests(casadiTestCase):
     # path and must raise TypeError. For DM/SX, numpy's __array__ path
     # may instead raise ValueError on shape mismatch; either is fine here
     # as long as no segfault occurs.
-    self.assertRaises((TypeError, NotImplementedError), lambda: cv @ MX(2))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
+    self.assertRaises((TypeError, NotImplementedError), lambda: mtimes(cv, MX(2)))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
     for d in (DM(2), SX(2)):
       self.assertRaises((TypeError, NotImplementedError, ValueError),
-                        lambda d=d: cv @ d)  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
+                        lambda d=d: mtimes(cv,d))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
 
   def test_sanity(self):
     DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
