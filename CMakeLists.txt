@@ -278,6 +278,10 @@ set(EXTERNAL_CMAKE_COMMAND "${CMAKE_COMMAND}")
 if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
   string(REPLACE "-gcc" "-cmake" EXTERNAL_CMAKE_COMMAND "$ENV{CC}")
 endif()
+
+if(EMSCRIPTEN)
+  list(APPEND CROSS_FLAGS_CMAKE -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+endif()
 message("EXTERNAL_CMAKE_COMMAND: ${EXTERNAL_CMAKE_COMMAND}")
 
 set(WHOLE_ARCHIVE_ON "")
@@ -313,6 +317,7 @@ option(WITH_PYTHON "Compile the Python front-end" OFF)
 option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
 option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
+option(WITH_WASM_JS "Compile the WebAssembly+JavaScript front-end (Emscripten only; needs the casadi-patched SWIG)" OFF)
 option(WITH_OCTAVE_IMPORT "[DEPRECATED] Copy import.m file to install directory" OFF)
 option(WITH_PYTHON_GIL_RELEASE "Create Python bindings that release the GIL" OFF)
 
@@ -555,6 +560,11 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
+endif()
+if(EMSCRIPTEN)
+  message(STATUS "Emscripten detected - setting -fPIC for MAIN_MODULE compatibility")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 endif()
 
 #######################################################################
@@ -2369,7 +2379,7 @@ endif()
 ###################### swig #########################
 #####################################################
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
-if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON)
+if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON OR WITH_WASM_JS)
   add_subdirectory(swig)
 endif()
 
