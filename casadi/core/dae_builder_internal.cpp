@@ -2754,15 +2754,16 @@ Function DaeBuilderInternal::transition(const std::string& fname, casadi_int ind
   casadi_assert(index >= 0 && index < when_.size(), "Illegal event index");
 
   // Get input expressions for the oracle
-  std::vector<MX> oracle_in = oracle().mx_in();
+  const Function& oracle = this->oracle();
+  std::vector<MX> oracle_in = oracle.mx_in();
 
   // Input expressions for the event functions, without the index
   std::vector<MX> ret_in(DYN_NUM_IN);
-  ret_in[DYN_T] = oracle_in.at(static_cast<size_t>(Category::T));
-  ret_in[DYN_X] = oracle_in.at(static_cast<size_t>(Category::X));
-  ret_in[DYN_Z] = oracle_in.at(static_cast<size_t>(Category::Z));
-  ret_in[DYN_P] = oracle_in.at(static_cast<size_t>(Category::P));
-  ret_in[DYN_U] = oracle_in.at(static_cast<size_t>(Category::U));
+  ret_in[DYN_T] = oracle_in.at(oracle.index_in("t"));
+  ret_in[DYN_X] = oracle_in.at(oracle.index_in("x"));
+  ret_in[DYN_Z] = oracle_in.at(oracle.index_in("z"));
+  ret_in[DYN_P] = oracle_in.at(oracle.index_in("p"));
+  ret_in[DYN_U] = oracle_in.at(oracle.index_in("u"));
 
   // When equation left-hand sides and right-hand sides
   std::vector<MX> when_lhs, when_rhs;
