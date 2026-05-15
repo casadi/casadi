@@ -302,7 +302,7 @@ jobs:
             operations:
               - type: append
                 matrix:
-                  arch: [manylinux_2_28-x64,manylinux_2_28-aarch64]
+                  arch: [manylinux_2_28-x64]
                   py2: ["310","311"]
                   glibc_suffix: ["-glibc228"]
               - type: append
