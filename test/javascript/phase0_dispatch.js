@@ -71,7 +71,7 @@ function test_mx_from_array_coerces(M) {
 //    `vertcat(vector<DM>)`.  Passing JS array of numbers should coerce.
 function test_vertcat_numbers_coerce(M) {
   // vertcat(array) is the simplest fuzzy case: each entry must coerce to DM.
-  const v = M.vertcat([1.0, 2.0, 3.0]);
+  const v = M.vcat([1.0, 2.0, 3.0]);
   if (Number(v.numel()) !== 3) {
     throw new Error(`vertcat([1,2,3]) numel: expected 3, got ${v.numel()}`);
   }

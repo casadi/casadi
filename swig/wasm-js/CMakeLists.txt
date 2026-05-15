@@ -133,6 +133,30 @@ if(WITH_HIGHS)
     ${CMAKE_BINARY_DIR}/external_projects/lib/libhighs.a)
 endif()
 
+# IPOPT Nlpsol plugin: pull in the full Fortran cascade.  libipopt.a +
+# libcoinmumps.a + libcoinmetis.a from the COIN-OR/MUMPS/METIS chain,
+# plus liblapack.a + libblas.a from Netlib reference LAPACK (built via
+# r-wasm/flang-wasm), plus libFortranRuntime.a + the omp_lib stub
+# object.  Order matters for the static-link symbol resolution -- ipopt
+# pulls mumps, mumps pulls metis + lapack, lapack/blas pull Fortran
+# runtime + omp stub.
+if(WITH_IPOPT)
+  set(_ipopt_extra
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libipopt.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libcoinmumps.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libcoinmetis.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
+    # libFortranRuntime.a from r-wasm/flang-wasm with our local
+    # DescriptorModel.h patch baked in (see build-wasm-flang/
+    # upstream-bug/bug_report.md).  The casadi-flang-wasm Docker image
+    # replaces the shipped /opt/flang/wasm/lib/libFortranRuntime.a with
+    # the patched build at image-build time.
+    /opt/flang/wasm/lib/libFortranRuntime.a
+    /opt/mumps_common_stub/mumps_common_stub.o)
+  wasmjs_side_plugin(nlpsol ipopt ${_ipopt_extra})
+endif()
+
 # ----------------------------------------------------------------------------
 # Main module link flags
 # ----------------------------------------------------------------------------

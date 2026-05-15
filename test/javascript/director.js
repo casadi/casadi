@@ -66,9 +66,8 @@ function test_director_eval_override(M) {
     }
   }
   const cb = new DoubleCB();
-  const outs = cb.call([M.DM(3)], false, false);
-  assertEqual(outs.length, 1, "one output");
-  assertAlmost(outs[0].nonzeros()[0], 6, 8, "eval(3) should be 6");
+  const out = cb.call([M.DM(3)]);
+  assertAlmost(out.nonzeros()[0], 6, 8, "eval(3) should be 6");
 }
 
 // ----- driver -----

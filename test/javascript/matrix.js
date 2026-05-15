@@ -48,7 +48,7 @@ function assertArrayAlmostEqual(actual, expected, places, msg) {
 function test_trans(M) {
   // DM(0, 1) is a 0x1 matrix.  Its transpose is 1x0.
   const a = M.DM(0n, 1n);
-  const b = a.T();
+  const b = a.T;
   assertEqual(b.size1(), 1n, "trans size1");
   assertEqual(b.size2(), 0n, "trans size2");
 }
@@ -113,7 +113,7 @@ function test_diag(M) {
 }
 
 function test_horzcat_dm(M) {
-  const r = M.horzcat([M.DM([1, 2, 3]), M.DM([4, 5, 6])]);
+  const r = M.hcat([M.DM([1, 2, 3]), M.DM([4, 5, 6])]);
   assertEqual(r.size1(), 3n, "horzcat dm size1");
   assertEqual(r.size2(), 2n, "horzcat dm size2");
 }
@@ -121,7 +121,7 @@ function test_horzcat_dm(M) {
 function test_vertcat_dm(M) {
   const a = M.DM([[1, 2]]);   // 1x2
   const b = M.DM([[3, 4]]);   // 1x2
-  const r = M.vertcat([a, b]);
+  const r = M.vcat([a, b]);
   assertEqual(r.size1(), 2n, "vertcat dm size1");
   assertEqual(r.size2(), 2n, "vertcat dm size2");
 }

@@ -57,12 +57,12 @@ function test_mtimes_mx_eval(M) {
   const A = M.MX.sym("A", 2n, 3n);
   const B = M.MX.sym("B", 3n, 2n);
   const C = M.mtimes(A, B);
-  const f = M.Function("f", [A, B], [C], null);
+  const f = M.Function("f", [A, B], [C]);
   // Evaluate with concrete matrices.
   const Av = M.DM([[1, 2, 3], [4, 5, 6]]);
   const Bv = M.DM([[7, 8], [9, 10], [11, 12]]);
-  const outs = f.call([Av, Bv], false, false);
-  assertArrayAlmostEqual(outs[0].nonzeros(), [58, 139, 64, 154], 8, "MX mtimes eval");
+  const out = f.call([Av, Bv]);
+  assertArrayAlmostEqual(out.nonzeros(), [58, 139, 64, 154], 8, "MX mtimes eval");
 }
 
 function test_mtimes_sparse_dense(M) {

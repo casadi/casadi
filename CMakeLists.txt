@@ -280,7 +280,47 @@ if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
 endif()
 
 if(EMSCRIPTEN)
+  # autotools libtool can't produce shared libs for wasm-ld; force
+  # static-only for every autotools sub-build (IPOPT, MUMPS, COIN-OR
+  # cascade, ...).  This avoids the libtool `-force_load` / `-soname`
+  # cocktail that wasm-ld rejects.
+  set(IPOPT_LIBTOOL_FLAGS --enable-static --disable-shared)
+  # Force -fPIC on all sub-builds so their static archives can be
+  # linked into a wasm SIDE_MODULE .so.  Without this, wasm-ld errors
+  # with `R_WASM_MEMORY_ADDR_SLEB cannot be used against symbol ...;
+  # recompile with -fPIC`.
+  set(EXTERNAL_PROJECT_CFLAGS   "${EXTERNAL_PROJECT_CFLAGS} -fPIC")
+  set(EXTERNAL_PROJECT_CXXFLAGS "${EXTERNAL_PROJECT_CXXFLAGS} -fPIC")
+  set(EXTERNAL_PROJECT_FFLAGS   "${EXTERNAL_PROJECT_FFLAGS} -fPIC")
+  set(EXTERNAL_PROJECT_FCFLAGS  "${EXTERNAL_PROJECT_FCFLAGS} -fPIC")
   list(APPEND CROSS_FLAGS_CMAKE -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+  # Many upstream packages auto-detect host x86 / ARM and inject
+  # `-msse2` / `-mavx` / `-mfpu=neon` flags into their own
+  # `target_compile_options`.  Emscripten rejects those unless paired
+  # with `-msimd128` (or `-mrelaxed-simd`).  Force the wasm-SIMD pair
+  # on for every ExternalProject_Add sub-build (cmake-based via
+  # CROSS_FLAGS_CMAKE + autotools via EXTERNAL_PROJECT_*FLAGS).
+  list(APPEND CROSS_FLAGS_CMAKE
+       -DCMAKE_C_FLAGS_INIT=-msimd128
+       -DCMAKE_CXX_FLAGS_INIT=-msimd128)
+  set(EXTERNAL_PROJECT_CFLAGS   "${EXTERNAL_PROJECT_CFLAGS} -msimd128")
+  set(EXTERNAL_PROJECT_CXXFLAGS "${EXTERNAL_PROJECT_CXXFLAGS} -msimd128")
+  set(EXTERNAL_PROJECT_FFLAGS   "${EXTERNAL_PROJECT_FFLAGS} -msimd128")
+  set(EXTERNAL_PROJECT_FCFLAGS  "${EXTERNAL_PROJECT_FCFLAGS} -msimd128")
+  # Fortran compiler for wasm32-emscripten: r-wasm/flang-wasm.  When
+  # the user provided -DCMAKE_Fortran_COMPILER=..., propagate it to
+  # every cmake-based ExternalProject_Add so e.g. Netlib LAPACK uses
+  # the wasm-targeting flang instead of the host gfortran.  Also
+  # switch the cmake try_compile target type to STATIC_LIBRARY so
+  # CMakeTestFortranCompiler / FortranCInterface don't try to link
+  # a test executable (which would fail without the emscripten libc
+  # / crt1.o on flang's search path -- flang produces .o, emcc links).
+  if(CMAKE_Fortran_COMPILER)
+    list(APPEND CROSS_FLAGS_CMAKE
+         -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+         -DCMAKE_Fortran_FLAGS=-fPIC
+         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY)
+  endif()
 endif()
 message("EXTERNAL_CMAKE_COMMAND: ${EXTERNAL_CMAKE_COMMAND}")
 
@@ -795,6 +835,17 @@ option(WITH_BUILD_LAPACK "Download and install OpenBLAS for LAPACK+BLAS" OFF)
 set(BUILD_LAPACK_GIT_REPO https://github.com/xianyi/OpenBLAS.git  CACHE STRING "Git repo used together with BUILD_LAPACK_VERSION")
 set(BUILD_LAPACK_VERSION v0.3.21 CACHE STRING "Tag/branch/hash to be used for BUILD_LAPACK_GIT_REPO")
 set(BUILD_LAPACK_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for LAPACK")
+# Under EMSCRIPTEN, OpenBLAS's `common_x86.h` layer pulls inline x86
+# asm even in its GENERIC mode and won't compile to wasm.  Netlib
+# reference is pure C but its core routines are Fortran -- needs a
+# wasm-capable Fortran toolchain (flang for wasm32, not currently
+# distributed by emsdk).  To opt into the Netlib-LAPACK path, the
+# user must explicitly pass:
+#   -DBUILD_LAPACK_GIT_REPO=https://github.com/Reference-LAPACK/lapack.git \
+#   -DBUILD_LAPACK_VERSION=v3.12.0
+# along with a Fortran toolchain that targets wasm32 (e.g.
+# `CMAKE_Fortran_COMPILER=/path/to/flang-wasm`).  See
+# build-wasm/fails.md "Failure category 1" for context.
 
 # qpOASES: An active-set QP solver
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ${WITH_QPOASES_DEF})
@@ -936,12 +987,12 @@ set(BUILD_CLP_DEPENDENCIES MUMPS LAPACK)
 
 # MUMPS: Sparse direct linear solver
 option(WITH_MUMPS "Enable MUMPS interface" OFF)
-set(BUILD_MUMPS_TP_VERSION "releases/3.0.11" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
+set(BUILD_MUMPS_TP_VERSION "gate-unconditional-use-omp-lib" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
 set(BUILD_METIS_TP_VERSION "bugfix2" CACHE STRING "Tag/branch/hash to be used for BUILD_BETIS_TP_GIT_REPO")
 set(BUILD_METIS_TP_GIT_REPO "https://github.com/jgillis/ThirdParty-Metis.git" CACHE STRING "Git repo used together with BUILD_METIS_TP_VERSION")
 set(BUILD_METIS_TP_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for METIS_TP")
 option(WITH_BUILD_METIS "Build Metis from downloaded source." OFF)
-set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Mumps.git" CACHE STRING "Git repo used together with BUILD_MUMPS_TP_VERSION")
+set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/jgillis/ThirdParty-Mumps.git" CACHE STRING "Git repo used together with BUILD_MUMPS_TP_VERSION")
 set(BUILD_MUMPS_TP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for MUMPS_TP")
 
 option(WITH_BUILD_MUMPS "Build MUMPS (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) from downloaded source (BUILD_MUMPS_TP_GIT_REPO=${BUILD_MUMPS_TP_GIT_REPO})." OFF)
@@ -1321,6 +1372,62 @@ if(WITH_LAPACK)
     if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
       set(OPENBLAS_FLAGS -DTARGET=ARMV8 -DDYNAMIC_ARCH=OFF -DUSE_THREAD=OFF)
     endif()
+    if(EMSCRIPTEN AND "${BUILD_LAPACK_GIT_REPO}" MATCHES "Reference-LAPACK")
+      # Netlib reference branch: different CMakeLists, different flags,
+      # different output library names.  Build BLAS + CBLAS + LAPACK +
+      # LAPACKE as a single combined shared library so the import target
+      # below maps cleanly.  Disable Fortran-only deprecated routines to
+      # avoid the gfortran toolchain entirely (we don't have a wasm-side
+      # Fortran).  Disable XBLAS / unit tests for speed.
+      ExternalProject_Add(openblas-external
+        GIT_REPOSITORY ${BUILD_LAPACK_GIT_REPO}
+        GIT_SHALLOW    ${BUILD_LAPACK_GIT_SHALLOW}
+        GIT_TAG        ${BUILD_LAPACK_VERSION}
+        PREFIX         "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND  "${EXTERNAL_CMAKE_COMMAND}"
+        PATCH_COMMAND  ${EXTERNAL_CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_lapack_netlib.cmake
+        CMAKE_ARGS
+          -DBUILD_SHARED_LIBS=ON
+          -DCMAKE_INSTALL_LIBDIR=lib
+          -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+          -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+          # CasADi calls LAPACK via the Fortran ABI (dgetrf_ etc.),
+          # not the C-BLAS / LAPACKE API.  Skip CBLAS + LAPACKE -- they
+          # add a FortranCInterface_VERIFY step which fails under wasm
+          # because the Fortran-runtime needs libFortranRuntime.a on
+          # the link line, which our top-level cmake can't reach into.
+          -DCBLAS=OFF
+          -DLAPACKE=OFF
+          -DBUILD_INDEX64=OFF
+          -DBUILD_DEPRECATED=OFF
+          -DBUILD_TESTING=OFF
+          -DUSE_OPTIMIZED_BLAS=OFF
+          -DUSE_OPTIMIZED_LAPACK=OFF
+          ${CROSS_FLAGS_CMAKE})
+      set(LAPACK_LIBRARIES
+        "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}lapack${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blas${CMAKE_SHARED_LIBRARY_SUFFIX}")
+      set(LAPACK_DEPENDS_TARGET openblas-external)
+      set(CMAKE_BLAS_CONFIG -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects; -DPKG_CONFIG_USE_CMAKE_PREFIX_PATH=ON)
+
+      add_library(lapack SHARED IMPORTED)
+      add_dependencies(lapack openblas-external)
+      set_target_properties(lapack PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}lapack${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        IMPORTED_IMPLIB   "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}lapack${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      )
+      create_import_library(lapack lapack)
+      # Skip the OpenBLAS branch below by jumping to endif() via a flag.
+      set(_LAPACK_NETLIB_DONE 1)
+    endif()
+    if(EMSCRIPTEN AND NOT _LAPACK_NETLIB_DONE)
+      # Fallback (OpenBLAS-on-EMSCRIPTEN; doesn't currently work past
+      # `common_x86.h` -- documented in build-wasm/fails.md).  GENERIC
+      # is plain-C only.
+      set(OPENBLAS_FLAGS -DTARGET=GENERIC -DDYNAMIC_ARCH=OFF -DUSE_THREAD=OFF -DNOFORTRAN=1)
+    endif()
+    if(NOT _LAPACK_NETLIB_DONE)
     # Requires gcc>=5.0
     ExternalProject_Add(openblas-external
       GIT_REPOSITORY ${BUILD_LAPACK_GIT_REPO}
@@ -1331,7 +1438,7 @@ if(WITH_LAPACK)
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DCASADI_TP_SHARED_PREFIX=${CASADI_TP_SHARED_PREFIX} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_openblas.cmake
       CMAKE_ARGS -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib ${OPENBLAS_FLAGS} -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
-    set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")    
+    set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")
     set(LAPACK_DEPENDS_TARGET openblas-external)
     set(CMAKE_BLAS_CONFIG -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects; -DPKG_CONFIG_USE_CMAKE_PREFIX_PATH=ON -DBLA_PREFER_PKGCONFIG=ON -DBLA_PKGCONFIG_BLAS=openblas)
 
@@ -1342,6 +1449,7 @@ if(WITH_LAPACK)
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     create_import_library(lapack lapack)
+    endif()  # NOT _LAPACK_NETLIB_DONE
   else()
     add_library(lapack INTERFACE)
     target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -1393,6 +1501,10 @@ if(WITH_HPIPM)
     if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "aarch64|arm64")
       set(HPIPM_FLAGS -DTARGET=GENERIC)
     endif()
+    if(EMSCRIPTEN)
+      # HPIPM's x86 / arm intrinsics path is wasm-incompatible.
+      set(HPIPM_FLAGS -DTARGET=GENERIC)
+    endif()
     ExternalProject_Add(hpipm-external
       DEPENDS ${BLASFEO_DEPENDS_TARGET}
       GIT_REPOSITORY ${BUILD_HPIPM_GIT_REPO}
@@ -1424,6 +1536,9 @@ if(WITH_FATROP)
   if (WITH_BUILD_FATROP)
     set(FATROP_FLAGS)
     if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+      set(FATROP_FLAGS -DTARGET=GENERIC)
+    endif()
+    if(EMSCRIPTEN)
       set(FATROP_FLAGS -DTARGET=GENERIC)
     endif()
     ExternalProject_Add(fatrop-external
@@ -1527,11 +1642,14 @@ if(WITH_BUILD_METIS)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         BUILD_IN_SOURCE ON
-        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} ${IPOPT_LIBTOOL_FLAGS} --prefix=<INSTALL_DIR>
 
-          # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
+          # GKFree is not defined (variadic definition in utils.c); fails on MacOS target.
+          # `-Wno-incompatible-pointer-types` for emcc clang (stricter
+          # than gcc) on `KeyValueType **` -> `void **` casts in
+          # metis-4.0/Lib/compress.c.
           "ADD_CFLAGS=-Wno-implicit-function-declaration -Wno-incompatible-pointer-types ${EXTERNAL_PROJECT_CFLAGS}"
-          "ADD_CXXFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CXXFLAGS}"
+          "ADD_CXXFLAGS=-Wno-implicit-function-declaration -Wno-incompatible-pointer-types ${EXTERNAL_PROJECT_CXXFLAGS}"
           "ADD_FFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FFLAGS}"
           "ADD_FCFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FCFLAGS}"
         ${COIN_FLAGS}
@@ -1603,7 +1721,7 @@ if(WITH_MUMPS)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         BUILD_IN_SOURCE ON
-        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${METIS_LIB_DIR} -l${METIS_LIB_NAME} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${METIS_LIB_DIR} -l${METIS_LIB_NAME} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" --without-openmp ${IPOPT_LIBTOOL_FLAGS} ${CROSS_FLAGS_FORTRAN}
         "ADD_CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
         "ADD_FFLAGS=${EXTERNAL_PROJECT_FFLAGS}"
@@ -1612,6 +1730,14 @@ if(WITH_MUMPS)
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ${AUTOTOOLS_SHELL} ./get.Mumps)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps")
+    if(EMSCRIPTEN)
+      add_library(mumps STATIC IMPORTED)
+      add_dependencies(mumps mumps-external)
+      set_target_properties(mumps PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libcoinmumps.a"
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps"
+      )
+    else()
     add_library(mumps SHARED IMPORTED)
     add_dependencies(mumps mumps-external)
     set_target_properties(mumps PROPERTIES
@@ -1619,6 +1745,7 @@ if(WITH_MUMPS)
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmumps${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps"
     )
+    endif()
     create_dsym_bundle(mumps)
   endif()
 endif()
@@ -1850,9 +1977,10 @@ if(WITH_IPOPT)
         "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
         "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
         ${SPRAL_FLAGS}
+        ${IPOPT_LIBTOOL_FLAGS}
         "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
 	--disable-java
-	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
+	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers
 	--enable-pkg-config
 	--enable-dependency-linking
 	${COIN_FLAGS}
@@ -1865,13 +1993,27 @@ if(WITH_IPOPT)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
     set(WITH_IPOPT_CALLBACK ON)
 
-    add_library(ipopt SHARED IMPORTED)
+    # Under EMSCRIPTEN, the autotools libtool .so link doesn't work
+    # (wasm-ld doesn't understand -force_load / -soname), so we built
+    # static-only above.  Match the imported-target type.
+    if(EMSCRIPTEN)
+      add_library(ipopt STATIC IMPORTED)
+    else()
+      add_library(ipopt SHARED IMPORTED)
+    endif()
     add_dependencies(ipopt ipopt-external)
-    set_target_properties(ipopt PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${IPOPT_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
-    )
+    if(EMSCRIPTEN)
+      set_target_properties(ipopt PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libipopt.a"
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
+      )
+    else()
+      set_target_properties(ipopt PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${IPOPT_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
+      )
+    endif()
     create_import_library(ipopt ipopt)
     create_dsym_bundle(ipopt)
     install(DIRECTORY

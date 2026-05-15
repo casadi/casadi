@@ -3004,6 +3004,85 @@ export type VariableType   = number;
 export type DomainType     = number;
 
 %}
+
+// ---------------------------------------------------------------------------
+// JS-side ergonomics: post-class-definition overrides.  The "js" slot is
+// emitted by wasm_js.cxx after all class definitions and before the module
+// `return { ... }`, so the proxy classes (DM, DMVector, Function, ...) are
+// in lexical scope here.
+// ---------------------------------------------------------------------------
+%insert("js") %{
+  /* Function.call: accept a {name: value} dict for kwargs-style call,
+     mirroring Python's `solver(**dict)`.  Dict input returns a dict
+     keyed by the function's output names; positional array input
+     returns the bare matrix when n_out === 1 (like Python's
+     `f([3, 7])` returning a DM directly) or an array of DMs when
+     n_out > 1.  Optional bool args (always_inline, never_inline)
+     default to false. */
+  const __orig_Function_call = Function.prototype.call;
+  Function.prototype.call = function(arg, always_inline, never_inline) {
+    if (always_inline === undefined) always_inline = false;
+    if (never_inline  === undefined) never_inline  = false;
+    const is_dict = arg && typeof arg === 'object'
+                 && !Array.isArray(arg)
+                 && !(arg instanceof DMVector)
+                 && !(arg instanceof MXVector)
+                 && !(arg instanceof SXVector);
+    if (!is_dict) {
+      const result = __orig_Function_call.call(this, arg, always_inline, never_inline);
+      return (result.length === 1) ? result[0] : result;
+    }
+    const names = this.name_in();
+    const ordered = names.map(n => (n in arg) ? arg[n] : new DM());
+    const result  = __orig_Function_call.call(this, ordered, always_inline, never_inline);
+    const out_names = this.name_out();
+    const out = {};
+    for (let i = 0; i < out_names.length; ++i) out[out_names[i]] = result[i];
+    return out;
+  };
+
+  /* x.T as a getter property -- matches Python's `x.T`.  The original
+     auto-generated method stays available as x.T_method() should
+     anyone hold a stale binding; the getter is the canonical form. */
+  for (const Cls of [DM, MX, SX, Sparsity]) {
+    const __orig_T = Cls.prototype.T;
+    if (!__orig_T) continue;
+    Object.defineProperty(Cls.prototype, "T", {
+      get() { return __orig_T.call(this); },
+      configurable: true,
+    });
+  }
+
+  /* Variadic + list aliases for the concat family, mirroring Python:
+       horzcat(a, b, c, d)   variadic           -- 1xN row (stack)
+       hcat([a, b, c, d])    list form          -- 1xN row (stack)
+       horzcat([1, 2, 3, 4]) 1-arg list of nums -- 4x1 column (identity)
+       (analogous for vertcat/vcat, diagcat/dcat).
+     Python's `def horzcat(*args): return _horzcat(args)` always passes
+     the variadic rest-tuple as the single C++ "vector input" arg.  We
+     mirror that exactly: always pass the rest-array.  When the rest
+     has 1 element AND that element is a JS array of primitives, the
+     C++ to_ptr<DM> nested-array handler builds a column DM, and the
+     C++ horzcat is an identity on the single column.  When the rest
+     has 1 element that is a list of matrices (e.g. `vertcat([x, y])`),
+     it FAILS in Python too -- callers should use `vertcat(x, y)`
+     variadic or `vcat([x, y])` list-form instead. */
+  const __cat_variadic = (orig) => function (...args) {
+    return orig.call(this, args);
+  };
+  const __cat_list = (orig) => function (arr) {
+    return orig.call(this, arr);
+  };
+  for (const [variadic, list] of [
+    ["horzcat", "hcat"],
+    ["vertcat", "vcat"],
+    ["diagcat", "dcat"],
+  ]) {
+    const fn = __m[variadic];
+    __m[variadic] = __cat_variadic(fn).bind(__m);
+    __m[list]     = __cat_list(fn).bind(__m);
+  }
+%}
 #endif
 
 // Matlab is index-1 based
