@@ -227,7 +227,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,manylinux_2_34-x64,manylinux_2_34-aarch64,windows-shared-x64-posix]
+        target: [manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,manylinux_2_28-x64,manylinux_2_28-aarch64,windows-shared-x64-posix]
     steps:
       - name: Check platform skip
         id: skip-check
@@ -302,9 +302,9 @@ jobs:
             operations:
               - type: append
                 matrix:
-                  arch: [manylinux_2_34-x64]
+                  arch: [manylinux_2_28-x64]
                   py2: ["311"]
-                  glibc_suffix: ["-glibc234"]
+                  glibc_suffix: ["-glibc228"]
               - type: append
                 matrix:
                   arch: [windows-shared-x64-posix]
@@ -784,9 +784,9 @@ jobs:
            {
               "manylinux2014-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
               "manylinux2014-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
-              "manylinux_2_34-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
+              "manylinux_2_28-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
               "manylinux2014-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
-              "manylinux_2_34-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
+              "manylinux_2_28-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
               "windows-shared-x64-posix": {"os": "windows", "bitness": "64", "suffix":"64"}
            }
           export_to: env
@@ -1069,7 +1069,7 @@ jobs:
         - image: "ubuntu-24.04"
           py2: "311"
           bit: 64
-          glibc_suffix: "-glibc234"
+          glibc_suffix: "-glibc228"
         # ARM Linux runners
         - image: "ubuntu-24.04-arm"
           py2: "311"
@@ -1161,7 +1161,7 @@ jobs:
         - image: "ubuntu-24.04"
           py2: "311"
           bit: 64
-          glibc_suffix: "-glibc234"
+          glibc_suffix: "-glibc228"
     steps:
       - uses: actions/checkout@v6.0.2
       # Make cl.exe available on Windows
