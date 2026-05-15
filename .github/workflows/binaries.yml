@@ -637,10 +637,10 @@ jobs:
         include:
           - host: matlab
             version: 2018b
-            arch: manylinux2014-x64
+            arch: manylinux_2_28
           - host: octave
             version: 7.3.0
-            arch: manylinux2014-x64
+            arch: manylinux_2_28
           - host: matlab
             version: 2018b
             arch: windows-shared-x64-posix
