@@ -19,6 +19,10 @@ if(WITH_MADNLP)
   add_subdirectory(madnlp)
 endif()
 
+if(WITH_CCOPT)
+  add_subdirectory(ccopt)
+endif()
+
 if(WITH_BONMIN)
   add_subdirectory(bonmin)
 endif()

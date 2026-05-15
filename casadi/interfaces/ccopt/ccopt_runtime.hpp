@@ -1,0 +1,331 @@
+//
+//    MIT No Attribution
+//
+//    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
+//
+//    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+//    software and associated documentation files (the "Software"), to deal in the Software
+//    without restriction, including without limitation the rights to use, copy, modify,
+//    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+//    permit persons to whom the Software is furnished to do so.
+//
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+//    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+//    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+//    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+//    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
+// C-REPLACE "SOLVER_RET_SUCCESS" "0"
+// C-REPLACE "SOLVER_RET_UNKNOWN" "1"
+// C-REPLACE "SOLVER_RET_LIMITED" "2"
+
+// C-REPLACE "casadi_nlpsol_prob<T1>" "struct casadi_nlpsol_prob"
+// C-REPLACE "casadi_nlpsol_data<T1>" "struct casadi_nlpsol_data"
+
+// C-REPLACE "reinterpret_cast<int**>" "(int**) "
+// C-REPLACE "reinterpret_cast<int*>" "(int*) "
+// C-REPLACE "const_cast<int*>" "(int*) "
+
+// SYMBOL "ccopt_prob"
+template<typename T1>
+struct casadi_ccopt_prob {
+  const casadi_nlpsol_prob<T1>* nlp;
+
+  // 1-index cco format
+  libmad_int *nzj_i, *nzj_j;
+  libmad_int *nzh_i, *nzh_j;
+
+  casadi_int nnz_hess_l, nnz_jac_g, ncc;
+
+  OracleCallback nlp_hess_l;
+  OracleCallback nlp_jac_g;
+  OracleCallback nlp_grad_f;
+  OracleCallback nlp_f;
+  OracleCallback nlp_g;
+};
+// C-REPLACE "casadi_ccopt_prob<T1>" "struct casadi_ccopt_prob"
+
+// SYMBOL "ccopt_data"
+template<typename T1>
+struct casadi_ccopt_data {
+  // Problem structure
+  const casadi_ccopt_prob<T1>* prob;
+  // Problem structure
+  casadi_nlpsol_data<T1>* nlp;
+
+  const T1** arg;
+  T1** res;
+  casadi_int* iw;
+  T1 *w;
+
+  // temporary data
+  T1 *x, *lam_g, *g, *f, *jac_g, *grad_f, *hess_l, *grad_l;
+
+  int unified_return_status;
+  int success;
+
+  // complementarities, 1 indexed
+  const libmad_int *ind_cc1, *ind_cc2;
+  const libmad_int *cctypes;
+  libmad_int ncc;
+
+  CMPCCModel* mpcc_model;
+  CNLPModel* nlp_model;
+  OptsDict* nlp_opts;
+  OptsDict* mpcc_opts;
+  CCOptExecutionStats* stats;
+  RelaxationSolver* solver;
+};
+// C-REPLACE "casadi_ccopt_data<T1>" "struct casadi_ccopt_data"
+
+// SYMBOL "ccopt_setup"
+template<typename T1>
+void casadi_ccopt_setup(casadi_ccopt_prob<T1>* p) {
+}
+
+// C-REPLACE "static_cast< casadi_ccopt_data<T1>* >" "(struct casadi_ccopt_data*)"
+// C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
+// C-REPLACE "calc_function" "casadi_oracle_call"
+// C-REPLACE "casadi_error" "//casadi_error"
+
+// SYMBOL "ccopt_constr_jac_structure"
+template<typename T1>
+int casadi_ccopt_constr_jac_structure(libmad_int* I, libmad_int* J, void* user_data)
+{
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
+  std::memcpy(I, p->nzj_i, p->nnz_jac_g * sizeof(libmad_int));
+  std::memcpy(J, p->nzj_j, p->nnz_jac_g * sizeof(libmad_int));
+  return 0;
+}
+
+// SYMBOL "ccopt_lag_hess_structure"
+template<typename T1>
+int casadi_ccopt_lag_hess_structure(libmad_int* I, libmad_int* J, void* user_data)
+{
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
+  std::memcpy(I, p->nzh_i, p->nnz_hess_l * sizeof(libmad_int));
+  std::memcpy(J, p->nzh_j, p->nnz_hess_l * sizeof(libmad_int));
+  return 0;
+}
+
+// SYMBOL "ccopt_eval_constr_jac"
+template<typename T1>
+int casadi_ccopt_eval_constr_jac(const T1* w, T1* res, void* user_data) {
+  casadi_int i;
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
+
+  d_oracle->arg[0] = w;
+  d_oracle->arg[1] = d_nlp->p;
+  d_oracle->res[0] = res;
+
+  return calc_function(&d->prob->nlp_jac_g, d_oracle);
+}
+
+// SYMBOL "ccopt_eval_constr"
+template<typename T1>
+int casadi_ccopt_eval_constr(const T1* w, T1* res, void* user_data) {
+  casadi_int i,k,column;
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
+
+  d_oracle->arg[0] = w;
+  d_oracle->arg[1] = d_nlp->p;
+  d_oracle->res[0] = res;
+
+  return calc_function(&d->prob->nlp_g, d_oracle);
+}
+
+// SYMBOL "ccopt_eval_obj_grad"
+template<typename T1>
+int casadi_ccopt_eval_obj_grad(const T1* w, T1* res, void* user_data) {
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
+
+  // TODO add argument
+  T1 objective_scale = 1.0;
+
+  d_oracle->arg[0] = w;
+  d_oracle->arg[1] = d_nlp->p;
+  d_oracle->res[0] = res;
+  return calc_function(&d->prob->nlp_grad_f, d_oracle);
+}
+
+// SYMBOL "ccopt_eval_obj"
+template<typename T1>
+int casadi_ccopt_eval_obj(const T1* w, T1* res, void* user_data) {
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
+
+  // TODO add argument
+  T1 objective_scale = 1.0;
+
+  d_oracle->arg[0] = w;
+  d_oracle->arg[1] = d_nlp->p;
+  d_oracle->res[0] = res;
+  return calc_function(&d->prob->nlp_f, d_oracle);
+}
+
+// SYMBOL "ccopt_eval_obj"
+template<typename T1>
+int casadi_ccopt_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
+                                            T1* res, void* user_data){
+  casadi_int k, column, i;
+  casadi_ccopt_data<T1>* d = static_cast< casadi_ccopt_data<T1>* >(user_data);
+  const casadi_ccopt_prob<T1>* p = d->prob;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
+
+  // evaluate hessian with given parameters / inputs
+  d_oracle->arg[0] = w;
+  d_oracle->arg[1] = d_nlp->p;
+  d_oracle->arg[2] = &objective_scale;
+  d_oracle->arg[3] = lam;
+  d_oracle->res[0] = res;
+  
+  return calc_function(&d->prob->nlp_hess_l, d_oracle);
+}
+
+// C-REPLACE "const_cast<T1*>" "(T1*)"
+
+// C-REPLACE "casadi_ccopt_eval_constr_jac<T1>" "casadi_ccopt_eval_constr_jac"
+// C-REPLACE "casadi_ccopt_eval_obj_grad<T1>" "casadi_ccopt_eval_obj_grad"
+// C-REPLACE "casadi_ccopt_eval_obj<T1>" "casadi_ccopt_eval_obj"
+// C-REPLACE "casadi_ccopt_eval_constr<T1>" "casadi_ccopt_eval_constr"
+// C-REPLACE "casadi_ccopt_eval_lag_hess<T1>" "casadi_ccopt_eval_lag_hess"
+// C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
+
+// SYMBOL "ccopt_init_mem"
+template<typename T1>
+int casadi_ccopt_init_mem(casadi_ccopt_data<T1>* d) {
+  // Problem structure
+  
+  return 0;
+}
+
+// SYMBOL "ccopt_free_mem"
+template<typename T1>
+void ccopt_free_mem(casadi_ccopt_data<T1>* d) {
+  ccopt_relaxation_delete_solver(d->solver);
+  d->solver = nullptr;
+  ccopt_relaxation_delete_stats(d->stats);
+  d->stats = nullptr;
+  libmad_delete_options_dict(d->nlp_opts);
+  libmad_delete_options_dict(d->mpcc_opts);
+}
+
+// SYMBOL "ccopt_work"
+template<typename T1>
+void casadi_ccopt_work(const casadi_ccopt_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w) {
+  casadi_nlpsol_work(p->nlp, sz_arg, sz_res, sz_iw, sz_w);
+
+  // Temporary work vectors
+  *sz_w = casadi_max(*sz_w, 2*(p->nlp->nx+p->nlp->ng)); // pv
+}
+
+// SYMBOL "ccopt_init"
+template<typename T1>
+void casadi_ccopt_init(casadi_ccopt_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
+  // Problem structure
+  const casadi_ccopt_prob<T1>* p = d->prob;
+  d->arg = *arg;
+  d->res = *res;
+  d->iw = *iw;
+  d->w = *w;
+}
+
+// SYMBOL "ccopt_presolve"
+template<typename T1>
+int casadi_ccopt_presolve(casadi_ccopt_data<T1>* d) {
+  casadi_int k, i, column;
+  const casadi_ccopt_prob<T1>* p = d->prob;
+  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  int ret = 0;
+  d->unified_return_status = SOLVER_RET_UNKNOWN;
+  d->success = 0;
+
+  ret = libmad_nlpmodel_create(&(d->nlp_model),
+                               "MadMPEC",
+                               p_nlp->nx, p_nlp->ng,
+                               p->nnz_jac_g, p->nnz_hess_l,
+                               casadi_ccopt_constr_jac_structure<T1>,
+                               casadi_ccopt_lag_hess_structure<T1>,
+                               casadi_ccopt_eval_obj<T1>,
+                               casadi_ccopt_eval_constr<T1>,
+                               casadi_ccopt_eval_obj_grad<T1>,
+                               casadi_ccopt_eval_constr_jac<T1>,
+                               casadi_ccopt_eval_lag_hess<T1>,
+                               d
+    );
+  if(ret) return ret; // TODO(@anton) think about what we need to clean up.
+
+  // set initial guess
+  ret = libmad_nlpmodel_set_numerics(d->nlp_model,
+                               d_nlp->z, d_nlp->lam + p_nlp->nx,
+                               d_nlp->lbx, d_nlp->ubx,
+                               d_nlp->lbg, d_nlp->ubg);
+  if(ret) return ret; // TODO(@anton) think about what we need to clean up.
+
+  ret = libmad_mpccmodel_create(&(d->mpcc_model),
+                          d->nlp_model,
+                          d->ncc,
+                          d->ind_cc1, d->ind_cc2,
+                          d->cctypes
+    );
+  if(ret) return ret; // TODO(@anton) think about what we need to clean up.
+
+  ret = ccopt_relaxation_create_solver(&(d->solver), d->mpcc_model, d->nlp_opts, d->mpcc_opts);
+
+  return ret;
+}
+
+// SYMBOL "ccopt_solve"
+template<typename T1>
+int casadi_ccopt_solve(casadi_ccopt_data<T1>* d) {
+  // Problem structure
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  const casadi_ccopt_prob<T1>* p = d->prob;
+  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
+  int ret = ccopt_relaxation_solve(d->solver, d->nlp_opts, &(d->stats));
+  if (ret!=0) {
+    // cleanup done in free_mem
+    return ret;
+  }
+  // get objective
+  ccopt_relaxation_get_obj(d->stats, &(d_nlp->objective));
+  // get primal solution for x
+  ccopt_relaxation_get_solution(d->stats, d_nlp->z);
+  // get the bound multipliers
+  ccopt_relaxation_get_bound_multipliers(d->stats, d_nlp->lam);
+  // get the nonlinear constraint function values
+  ccopt_relaxation_get_constraints(d->stats, d_nlp->z + p_nlp->nx);
+  // get the nonlinear constraint multipliers
+  ccopt_relaxation_get_multipliers(d->stats, d_nlp->lam + p_nlp->nx);
+
+  bool success_b;
+  ccopt_relaxation_get_success(d->stats, &(success_b));
+  if(success_b){
+    d->success = 1;
+  }
+
+  if(d->success) {
+    d->unified_return_status = SOLVER_RET_SUCCESS;
+  } else {
+    d->unified_return_status = SOLVER_RET_LIMITED;
+  }
+
+
+  return 0;
+}

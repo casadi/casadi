@@ -839,6 +839,11 @@ if(NOT LIBMAD_TAR_PATH)
     message("Will download apple LibMad: ${LIBMAD_TAR_PATH}")
   endif()
 endif()
+
+# MadMPEC: A sparse interior point NLP solver with filter line-search, written in Julia, specialized to solving MPCCs
+option(WITH_CCOPT "Compile the interface to MadMPEC"  OFF)
+option(WITH_BUILD_CCOPT "Download compiled libMad"  OFF)
+
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
 option(WITH_MOCKUP_KNITRO "Use mockup KNITRO (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
@@ -1423,7 +1428,7 @@ if(WITH_FATROP)
   endif()
 endif()
 
-if(WITH_MADNLP AND WITH_BUILD_MADNLP)
+if((WITH_MADNLP AND WITH_BUILD_MADNLP) OR (WITH_CCOPT AND WITH_BUILD_CCOPT))
   # TODO(@apozharski): This is currently hacky but it avoids julia bulid dependencies. However, this makes crosscompilation a massive headache.
   #                    If CasADi wants to ship with MadNLP it may make more sense to build libMad.
 
@@ -1467,6 +1472,7 @@ if(WITH_MADNLP AND WITH_BUILD_MADNLP)
     DESTINATION "${LIB_PREFIX}")
   install(DIRECTORY
     "${LIBMAD_BINARY_DIR}/share"
+    USE_SOURCE_PERMISSIONS
     DESTINATION ".")
   if(WIN32)
     # TODO(@apozharski) Is this correct
