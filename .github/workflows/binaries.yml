@@ -302,8 +302,8 @@ jobs:
             operations:
               - type: append
                 matrix:
-                  arch: [manylinux_2_28-x64]
-                  py2: ["311"]
+                  arch: [manylinux_2_28-x64,manylinux_2_28-aarch64]
+                  py2: ["38","39","310","311"]
                   glibc_suffix: ["-glibc228"]
               - type: append
                 matrix:
