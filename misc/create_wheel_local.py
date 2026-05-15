@@ -51,6 +51,10 @@ if os_name=="linux":
     arch = "manylinux_2_34_x86_64"
   elif arch=="manylinux_2_34-aarch64":
     arch = "manylinux_2_34_aarch64"
+  elif arch=="manylinux_2_28-x64":
+    arch = "manylinux_2_28_x86_64"
+  elif arch=="manylinux_2_28-aarch64":
+    arch = "manylinux_2_28_aarch64"
   elif arch=="manylinux2014-aarch64":
     arch = "manylinux2014_aarch64"
   tag = "cp%s-%s-%s" % (pyversion,abi_tag,arch.replace("-","_"))
