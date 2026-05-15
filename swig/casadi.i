@@ -2892,6 +2892,7 @@ def dcat(args):
 %feature("python:maybecall") casadi_mod;
 %feature("python:maybecall") casadi_copysign;
 %feature("python:maybecall") casadi_constpow;
+%feature("python:maybecall") casadi_mtimes;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
