@@ -214,5 +214,31 @@ expectType<MX>(plus(A, [[1, 2, 3], [4, 5, 6], [7, 8, 9]]));
 expectType<MX>(solve(A, 1));
 expectType<DM>(solve(new DM([[1, 0], [0, 1]]), new DM([1, 2])));
 
+// ============================================================
+// DM-side numerical extraction
+// ============================================================
+const dnum = new DM([[1, 2, 3], [4, 5, 6]]);
+expectType<number[]>(dnum.nonzeros());
+// scalar extraction: DM has no `.scalar()` method on its class -- use
+// `.nonzeros()[0]` for the 1x1 case.  Casts via Number(...) only at the
+// user's call site.
+const dscalar = new DM(5);
+const nz: number = dscalar.nonzeros()[0];
+expectType<number>(nz);
+expectType<[bigint, bigint]>(dnum.size());
+expectType<bigint>(dnum.size(0n));
+
+// set: mutates in place, returns void
+const dtarget = new DM(3);
+dtarget.set(new DM(7), false, 0n);
+
+// ============================================================
+// Function I/O bookkeeping
+// ============================================================
+expectType<number>(f_unary.default_in(0n));
+expectType<number>(f_unary.max_in(0n));
+expectType<number>(f_unary.min_in(0n));
+
 // Pin all locals so --noUnusedLocals stays quiet if ever enabled.
-void [m0, m1, m2, M, Mt, ser, f_unary, gx, sp, A, xvec, cond, a_branch, b_branch, sparse_vec];
+void [m0, m1, m2, M, Mt, ser, f_unary, gx, sp, A, xvec, cond, a_branch, b_branch,
+      sparse_vec, dnum, dscalar, nz, dtarget];
