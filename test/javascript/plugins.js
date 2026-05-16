@@ -41,17 +41,24 @@ function test_linsol_lsqr      (M) {
 }
 function test_linsol_symbolicqr(M) { _linsol(M, "symbolicqr"); }
 function test_linsol_tridiag   (M) {
-  // Tridiagonal solver: must use a tri-banded sparsity pattern.
-  // Use an actually-tridiagonal A so the plugin's structural check
-  // passes.  Diag works (it's a degenerate tridiag).
-  const sp = M.Sparsity.diag(3n);
-  const A = M.DM(sp, [1, 2, 3]);
+  // Tridiagonal solver: needs ACTUAL tri-banded (3 nonzeros per
+  // interior column).  linsol_tridiag.cpp's solve() indexes
+  // A[a_colind[i] + {0,1,2}] for sub/main/super-diag, so a diag-only
+  // sparsity reads out of bounds and produces garbage.
+  // Build a 3x3 symmetric tridiag pattern via triplet (col-major fill).
+  // Pattern (rows, cols): (0,0),(1,0),(0,1),(1,1),(2,1),(1,2),(2,2).
+  const rows = [0n, 1n, 0n, 1n, 2n, 1n, 2n];
+  const cols = [0n, 0n, 1n, 1n, 1n, 2n, 2n];
+  const sp = M.Sparsity.triplet(3n, 3n, rows, cols);
+  // A = [[2,1,0],[1,2,1],[0,1,2]], values in CSC order.
+  const A = M.DM(sp, [2, 1, 1, 2, 1, 1, 2]);
   const ls = M.Linsol("ls", "tridiag", sp);
   ls.sfact(A);
   ls.nfact(A);
-  const b = M.DM([6, 8, 9]);
+  // Pick b so that x = [1, 2, 3]: A*x = [2+2, 1+4+3, 2+6] = [4, 8, 8].
+  const b = M.DM([4, 8, 8]);
   const x = ls.solve(A, b, false);
-  assertArrayAlmostEqual(x.nonzeros(), [6, 4, 3], 9, "tridiag x");
+  assertArrayAlmostEqual(x.nonzeros(), [1, 2, 3], 6, "tridiag x");
 }
 
 // ---------------------------------------------------------------------
@@ -203,13 +210,24 @@ function test_nlpsol_ipopt(M) {
   _nlpsol(M, "ipopt", { ipopt: { print_level: 0, sb: "yes" }, print_time: false });
 }
 function test_nlpsol_scpgen(M) {
-  // scpgen needs a QP sub-solver and a stack of helper functions.
-  // Use qrqp as the inner solver.
-  _nlpsol(M, "scpgen", {
+  // scpgen needs MXFunction (calls Function::generate_lifted internally,
+  // which is MXFunction-only).  Build the NLP from MX symbolics so the
+  // emitted Function is an MXFunction.  Same Rosenbrock-style bowl
+  // f = (x-1)^2 + (y-2)^2 as _nlpsol, optimum at (1,2).
+  const xy = M.MX.sym("xy", 2);
+  const x  = xy.get(false, M.Slice(0n, false));
+  const y  = xy.get(false, M.Slice(1n, false));
+  const f  = M.plus(M.times(M.minus(x, M.MX(1)), M.minus(x, M.MX(1))),
+                    M.times(M.minus(y, M.MX(2)), M.minus(y, M.MX(2))));
+  const nlp = { x: xy, f: f };
+  const solver = M.nlpsol("S", "scpgen", nlp, {
     qpsol: "qrqp",
     qpsol_options: { print_iter: false, print_header: false },
     print_header: false, print_time: false
   });
+  const res = solver.call({ x0: M.DM([0, 0]) });
+  assertArrayAlmostEqual(res.x.nonzeros(), [1, 2], 3, "scpgen: x");
+  assertAlmost(Number(res.f.nonzeros()[0]), 0, 4, "scpgen: f");
 }
 
 runTests([
