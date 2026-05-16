@@ -189,9 +189,12 @@ if(WITH_SUNDIALS)
   wasmjs_side_plugin(rootfinder kinsol)
 endif()
 
-# CSparse linsol: pure-C, self-contained.
+# CSparse linsol: pure-C; needs libcasadi_csparse.a (the vendored CXSparse
+# sources providing cs_sqr/cs_lu/...) whole-archived alongside the plugin
+# interface archive, since the main module doesn't carry those symbols.
 if(WITH_CSPARSE)
-  wasmjs_side_plugin(linsol csparse)
+  wasmjs_side_plugin(linsol csparse
+    ${CMAKE_BINARY_DIR}/lib/libcasadi_csparse.a)
 endif()
 
 # LAPACK linsol plugins (lapacklu, lapackqr): need flang-built BLAS+LAPACK

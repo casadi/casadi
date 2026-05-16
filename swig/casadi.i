@@ -3173,6 +3173,17 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
 #endif
 %casadi_template_vec("[" L_DOUBLE "]", "Sequence[bool | int | float] | NDArray[Any]", "list[float]", "number[]", SWIG_TYPECHECK_DOUBLE, DoubleVector, double)
 %casadi_template(LL "[" L_DOUBLE "]" LR, "Sequence[Sequence[bool | int | float] | NDArray[Any]]", "list[list[float]]", "number[][]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
+// Order matters for the TypeScript d.ts: TS picks the FIRST matching
+// overload, and the input coercion unions (_DM / _SX / _MX) overlap by
+// design (_SX = SX | _DM; _MX = MX | _DM).  So instantiations must run
+// most-specific-first: DM (narrowest, _DM is leaf), then SX, then MX.
+// Python pyi handles this via Swig_overload_rank precedence-sort, but
+// in wasm_js each instantiation emits a SEPARATE free function in
+// declaration order -- so we sort here at the source.
+%casadi_typemaps("DM", "DM", "DM", "DM", PREC_DM, casadi::Matrix<double>)
+%casadi_template_vec(LL "DM" LR, "Sequence[DM]", "list[DM]", "DM[]", PREC_DMVector, DMVector, casadi::Matrix<double>)
+%casadi_template(LL LL "DM" LR LR, "Sequence[Sequence[DM]]", "list[list[DM]]", "DM[][]", PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
+%casadi_template(LDICT("DM"), "Mapping[str, DM]", "dict[str, DM]", "Record<string, DM>", PREC_DM, std::map<std::string, casadi::Matrix<double> >)
 %casadi_typemaps("SXElem", "SXElem", "SXElem", "SXElem", PREC_SX, casadi::SXElem)
 %casadi_template(LL "SXElem" LR, "Sequence[SXElem]", "list[SXElem]", "SXElem[]", PREC_SXVector, std::vector<casadi::SXElem>)
 %casadi_typemaps("SX", "SX", "SX", "SX", PREC_SX, casadi::Matrix<casadi::SXElem>)
@@ -3184,10 +3195,6 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
 %casadi_template(LL LL "MX" LR LR, "Sequence[Sequence[MX]]", "list[list[MX]]", "MX[][]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
 %casadi_template(LDICT("MX"), "Mapping[str, MX]", "dict[str, MX]", "Record<string, MX>", PREC_MX, std::map<std::string, casadi::MX>)
 %casadi_template(LPAIR("MX","MX"), "tuple[MX, MX]", "tuple[MX, MX]", "[MX, MX]", PREC_MXVector, std::pair<casadi::MX, casadi::MX>)
-%casadi_typemaps("DM", "DM", "DM", "DM", PREC_DM, casadi::Matrix<double>)
-%casadi_template_vec(LL "DM" LR, "Sequence[DM]", "list[DM]", "DM[]", PREC_DMVector, DMVector, casadi::Matrix<double>)
-%casadi_template(LL LL "DM" LR LR, "Sequence[Sequence[DM]]", "list[list[DM]]", "DM[][]", PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
-%casadi_template(LDICT("DM"), "Mapping[str, DM]", "dict[str, DM]", "Record<string, DM>", PREC_DM, std::map<std::string, casadi::Matrix<double> >)
 %casadi_typemaps("IM", "IM", "IM", "IM", PREC_IM, casadi::Matrix<casadi_int>)
 // Without CASADI_INT_TYPE, you get SwigValueWrapper
 // With it, docstrings are screwed
@@ -3281,9 +3288,34 @@ export type DMDict       = Record<string, DM>;
 export type MXDict       = Record<string, MX>;
 export type SXDict       = Record<string, SX>;
 export type SparsityDict = Record<string, Sparsity>;
-export type DMVector     = DM[];
-export type MXVector     = MX[];
-export type SXVector     = SX[];
+
+// --- Input-position coercion unions (analog of Python pyi's _DM / _SX / _MX).
+// xTsStub args in casadi.i use the bare class names (DM / SX / MX / ...);
+// the wasm_js.cxx d.ts emitter rewrites bare identifiers to their `_`
+// aliases at input positions only, so users can pass JS-natural values
+// (numbers, arrays, Sparsity patterns) where DM/SX/MX is expected.  Output
+// positions stay as the bare class (DM/SX/MX) so return-type narrowing
+// works.
+export type _DM = boolean | bigint | number | DM | Sparsity | number[] | number[][];
+export type _SX = SX | _DM;
+export type _MX = MX | _DM;
+export type _IM = IM | bigint | number | number[] | number[][];
+export type _SXElem = SXElem | number;
+export type _Slice = Slice | number | bigint;
+// TS 4.1+ permits inline array/object types in recursive aliases, but a
+// bare reference like `_GenericType[]` triggers TS2456 (circular).  Use
+// the inline-array form to break the cycle the compiler can see through.
+export type _GenericType = boolean | bigint | number | string | Function
+                         | readonly _GenericType[]
+                         | { readonly [k: string]: _GenericType };
+export type _MIndex = number | bigint | bigint[] | boolean[] | Sparsity | DM;
+
+// Note: DMVector / MXVector / SXVector are NOT type aliases here -- they
+// collide with the SWIG-emitted std::vector wrapper classes at the top
+// of the d.ts (export class DMVector { ... }).  Functions accepting
+// std::vector<DM> use `_DM[]` (input) / `DM[]` (output) via the emitter's
+// coercion-union rewrite.  Users who want the wrapper class still get
+// `new DMVector(arr)` via the class declaration.
 export type DMVectorDict = Record<string, DM[]>;
 export type MXVectorDict = Record<string, MX[]>;
 export type SXVectorDict = Record<string, SX[]>;
