@@ -284,7 +284,31 @@ if(WIN32) # dlls don't allow missing symbols
   if(NOT PYTHON_LIBRARY)
     message(SEND_ERROR "Python libraries not found, but required." )
   endif()
-  target_link_libraries(_casadi ${PYTHON_LIBRARY})
+  # For an abi3 build, link against python3.lib (the version-agnostic
+  # stable-ABI marshal lib) instead of the version-specific pythonXY.lib.
+  # Otherwise the resulting _casadi.pyd has a hard dependency on
+  # python311.dll and only loads under Python 3.11 — defeating the
+  # whole point of abi3. python3.lib ships in the standard CPython
+  # Windows distribution alongside python<X><Y>.lib in the same libs/ dir.
+  if(WITH_PYTHON_LIMITED_API)
+    get_filename_component(_python_libdir "${PYTHON_LIBRARY}" DIRECTORY)
+    find_library(PYTHON3_STABLE_LIB
+                 NAMES python3
+                 PATHS "${_python_libdir}"
+                 NO_DEFAULT_PATH)
+    if(PYTHON3_STABLE_LIB)
+      message(STATUS "abi3 build: linking against ${PYTHON3_STABLE_LIB} (was ${PYTHON_LIBRARY})")
+      target_link_libraries(_casadi ${PYTHON3_STABLE_LIB})
+    else()
+      message(WARNING
+        "WITH_PYTHON_LIMITED_API is ON but python3.lib was not found in "
+        "${_python_libdir}; falling back to ${PYTHON_LIBRARY}. The resulting "
+        ".pyd will only load under the build-time Python minor version.")
+      target_link_libraries(_casadi ${PYTHON_LIBRARY})
+    endif()
+  else()
+    target_link_libraries(_casadi ${PYTHON_LIBRARY})
+  endif()
 endif()
 target_link_libraries(_casadi casadi)
 
