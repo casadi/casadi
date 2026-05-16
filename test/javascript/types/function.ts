@@ -121,5 +121,61 @@ const s = f.stats();
 const iter_count = s["iter_count"];
 if (typeof iter_count === "bigint") expectType<bigint>(iter_count);
 
+// ============================================================
+// Factory / wrap / oracle
+// ============================================================
+const fac = f.factory("f_dx", ["a", "b"], ["jac:s:a"]);
+expectType<CFn>(fac);
+const fac2 = f.factory("f_x", ["a", "b"], ["s"], {}, { jit: false });
+expectType<CFn>(fac2);
+
+const wrapped = f.wrap();
+expectType<CFn>(wrapped);
+const wrapped_named = f.wrap("f_wrap");
+expectType<CFn>(wrapped_named);
+
+const ora = f.oracle();
+expectType<CFn>(ora);
+
+// ============================================================
+// Forward / reverse AD
+// ============================================================
+expectType<CFn>(f.forward(1n));
+expectType<CFn>(f.reverse(1n));
+
+// ============================================================
+// Free variables (placeholders that escape construction scope)
+// ============================================================
+expectType<boolean>(sf.has_free());
+expectType<SX[]>(sf.free_sx());
+const mxf = new CFn("mxf", [x], [plus(x, y)]);  // y not in inputs -> free
+expectType<MX[]>(mxf.free_mx());
+
+// ============================================================
+// Callback (director-style) subclass
+// ============================================================
+import { Callback } from "./casadi";
+class MyCb extends Callback {
+  // Subclass MUST override these to surface its API; the d.ts
+  // declares them as overridable virtuals.
+  override get_n_in(): bigint { return 1n; }
+  override get_n_out(): bigint { return 1n; }
+  override eval(arg: any[]): DM[] {
+    const x = arg[0] as DM;
+    return [x];  // identity
+  }
+}
+const cb = new MyCb();
+expectType<Callback>(cb);
+expectType<bigint>(cb.get_n_in());
+expectType<DM[]>(cb.eval([new DM(1)]));
+
+// ============================================================
+// Codegen variants
+// ============================================================
+expectType<string>(f.generate("f_codegen"));
+expectType<string>(f.generate("f_codegen", { with_header: true, with_mem: true }));
+
 // Pin locals
-void [f, f2, sf, jf, out_pos, out_dict, out_num, out_dict_num, info, v, s, iter_count];
+void [f, f2, sf, jf, out_pos, out_dict, out_num, out_dict_num, info, v, s, iter_count,
+      fac, fac2, wrapped, wrapped_named, ora, mxf, cb];

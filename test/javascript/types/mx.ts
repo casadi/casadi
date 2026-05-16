@@ -140,10 +140,10 @@ expectType<MX>(dot(x, y));
 // ============================================================
 // Indexing / slicing -- get / set with Slice + IM + sparsity
 // ============================================================
-import { Slice } from "./casadi";
 const M = MX.sym("M", 3n, 3n);
-// scalar element via two-index get
-M.get(false, new Slice(0n, false), new Slice(1n, false));
+// scalar element via two-index get -- _Slice = Slice | number | bigint
+// so passing a bare bigint works without wrapping in `new Slice(...)`.
+expectType<MX>(M.get(false, 0n, 1n));
 // row slice
 const Mt: MX = M.T();
 expectType<MX>(Mt);
@@ -164,5 +164,55 @@ const f_unary = new CFn("f", [scalar], [sin(scalar)]);
 const gx = f_unary.call([scalar]);
 expectType<MX[]>(gx);
 
+// ============================================================
+// Linear algebra
+// ============================================================
+import {
+  det, trace, kron, inv, solve, norm_1, norm_2, norm_inf, norm_fro,
+  sumsqr, project, if_else, conditional, find,
+} from "./casadi";
+
+const A = MX.sym("A", 3n, 3n);
+const xvec = MX.sym("xvec", 3n);
+expectType<MX>(det(A));
+expectType<MX>(trace(A));
+expectType<MX>(kron(A, A));
+expectType<MX>(inv(A));
+expectType<MX>(inv(A, "qr"));
+expectType<MX>(inv(A, "qr", { print_level: 0 }));
+expectType<MX>(solve(A, xvec));
+expectType<MX>(solve(A, xvec, "ldl"));
+expectType<MX>(norm_1(xvec));
+expectType<MX>(norm_2(xvec));
+expectType<MX>(norm_inf(xvec));
+expectType<MX>(norm_fro(A));
+expectType<MX>(sumsqr(xvec));
+expectType<MX>(project(A, sp));
+expectType<MX>(project(A, sp, true));
+
+// ============================================================
+// Control flow
+// ============================================================
+const cond = MX.sym("c");
+const a_branch = MX.sym("a");
+const b_branch = MX.sym("b");
+expectType<MX>(if_else(cond, a_branch, b_branch));
+expectType<MX>(if_else(cond, a_branch, b_branch, true));
+expectType<MX>(conditional(cond, [a_branch, b_branch], a_branch));
+
+// ============================================================
+// MX-only operations
+// ============================================================
+const sparse_vec = MX.sym("sv", sp);
+expectType<MX>(find(sparse_vec));
+
+// ============================================================
+// Coercion stress: DM/SX/MX numbers + arrays + Sparsity
+// ============================================================
+expectType<MX>(plus(A, 1));
+expectType<MX>(plus(A, [[1, 2, 3], [4, 5, 6], [7, 8, 9]]));
+expectType<MX>(solve(A, 1));
+expectType<DM>(solve(new DM([[1, 0], [0, 1]]), new DM([1, 2])));
+
 // Pin all locals so --noUnusedLocals stays quiet if ever enabled.
-void [m0, m1, m2, M, Mt, ser, f_unary, gx, sp];
+void [m0, m1, m2, M, Mt, ser, f_unary, gx, sp, A, xvec, cond, a_branch, b_branch, sparse_vec];
