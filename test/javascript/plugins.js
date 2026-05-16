@@ -3,13 +3,20 @@
 // string; the side modules ship preloaded into MEMFS by
 // swig/wasm-js/CMakeLists.txt's wasmjs_side_plugin() invocations.
 //
-// The 21 plugins covered:
-//   conic:       qrqp, ipqp, nlpsol (qp_to_nlp), highs
-//   nlpsol:      sqpmethod, qrsqp, scpgen, feasiblesqpmethod, ipopt
-//   integrator:  rk, collocation
-//   linsol:      qr, ldl, tridiag, lsqr, symbolicqr
+// Plugins covered:
+//   conic:       qrqp, ipqp, nlpsol (qp_to_nlp), highs, daqp, qpoases
+//   nlpsol:      sqpmethod, qrsqp, scpgen, feasiblesqpmethod, ipopt, blocksqp
+//   integrator:  rk, collocation, cvodes, idas
+//   linsol:      qr, ldl, tridiag, lsqr, symbolicqr, csparse, lapacklu, lapackqr
 //   interpolant: linear, bspline
-//   rootfinder:  newton, fast_newton, nlpsol (implicit_to_nlp)
+//   rootfinder:  newton, fast_newton, nlpsol (implicit_to_nlp), kinsol
+//
+// Plugins built but not exercised here:
+//   conic:       hpipm (registers OK; requires OCP-block-structured QP)
+//   conic:       superscs (registers OK; SuperSCS sources need Fortran-77
+//                 hidden character-length args patch like the vendored
+//                 qpOASES got, otherwise wasm-ld replaces BLAS callsites
+//                 with `unreachable`)
 //
 // Most tests deliberately keep the problem trivial -- the goal is plugin
 // coverage, not algorithm validation (per-algorithm tests live in the
@@ -40,6 +47,16 @@ function test_linsol_lsqr      (M) {
   _linsol(M, "lsqr");
 }
 function test_linsol_symbolicqr(M) { _linsol(M, "symbolicqr"); }
+function test_linsol_csparse   (M) { _linsol(M, "csparse"); }
+function test_linsol_lapacklu  (M) {
+  // lapacklu via flang-built LAPACK; needs the Fortran-77 hidden
+  // CHARACTER-length args patch in lapack_lu.{hpp,cpp}.
+  _linsol(M, "lapacklu");
+}
+function test_linsol_lapackqr  (M) {
+  // lapackqr same: needs hidden-length args for dtrsm_/dormqr_.
+  _linsol(M, "lapackqr");
+}
 function test_linsol_tridiag   (M) {
   // Tridiagonal solver: needs ACTUAL tri-banded (3 nonzeros per
   // interior column).  linsol_tridiag.cpp's solve() indexes
@@ -83,6 +100,14 @@ function test_integrator_collocation(M) {
   const r   = F({ x0: M.DM(1) });
   assertAlmost(Number(r.xf.nonzeros()[0]), Math.E, 4,
     "collocation: x(1) ~ e");
+}
+function test_integrator_cvodes(M) {
+  // Sundials CVODES: BDF for stiff ODEs; same trivial dx/dt = x test.
+  _integrator(M, "cvodes");
+}
+function test_integrator_idas(M) {
+  // Sundials IDAS: BDF for DAEs; same trivial dx/dt = x test.
+  _integrator(M, "idas");
 }
 
 // ---------------------------------------------------------------------
@@ -141,6 +166,10 @@ function test_rootfinder_implicit_to_nlp(M) {
   }
   _rootfinder(M, "nlpsol");
 }
+function test_rootfinder_kinsol(M) {
+  // Sundials KINSOL: nonlinear solver; same x^2 - 2 = 0 test.
+  _rootfinder(M, "kinsol");
+}
 
 // ---------------------------------------------------------------------
 // conic plugins:  min 0.5 x'Hx + g'x  subject to lba <= Ax <= uba
@@ -170,6 +199,15 @@ function test_conic_nlpsol(M) {
   _conic(M, "nlpsol", { nlpsol: "ipopt", nlpsol_options: { ipopt: { print_level: 0 }, print_time: false } });
 }
 function test_conic_highs(M) { _conic(M, "highs", { highs: { output_flag: false } }); }
+function test_conic_daqp(M) {
+  // DAQP: dual active-set QP solver, pure C, no Fortran/BLAS deps.
+  _conic(M, "daqp");
+}
+function test_conic_qpoases(M) {
+  // qpOASES via flang-built BLAS+LAPACK; needs vendored qpOASES patched
+  // with Fortran-77 hidden CHARACTER-length args on EMSCRIPTEN.
+  _conic(M, "qpoases", { printLevel: "none" });
+}
 
 // ---------------------------------------------------------------------
 // nlpsol plugins:  min f(x) s.t. lbg <= g(x) <= ubg
@@ -209,6 +247,15 @@ function test_nlpsol_feasiblesqpmethod(M) {
 function test_nlpsol_ipopt(M) {
   _nlpsol(M, "ipopt", { ipopt: { print_level: 0, sb: "yes" }, print_time: false });
 }
+function test_nlpsol_blocksqp(M) {
+  // blocksqp's default linsol is MA27 (HSL, proprietary) and its default
+  // qpsol is qpoases.  ma27 isn't shipped in wasm, so route through
+  // ldl (the only wasm-available solver that supports inertia via 'neig').
+  _nlpsol(M, "blocksqp", {
+    linsol: "ldl",
+    print_header: false, print_iteration: false, print_time: false
+  });
+}
 function test_nlpsol_scpgen(M) {
   // scpgen needs MXFunction (calls Function::generate_lifted internally,
   // which is MXFunction-only).  Build the NLP from MX symbolics so the
@@ -236,20 +283,29 @@ runTests([
   ["test_linsol_lsqr",              test_linsol_lsqr],
   ["test_linsol_symbolicqr",        test_linsol_symbolicqr],
   ["test_linsol_tridiag",           test_linsol_tridiag],
+  ["test_linsol_csparse",           test_linsol_csparse],
+  ["test_linsol_lapacklu",          test_linsol_lapacklu],
+  ["test_linsol_lapackqr",          test_linsol_lapackqr],
   ["test_integrator_rk",            test_integrator_rk],
   ["test_integrator_collocation",   test_integrator_collocation],
+  ["test_integrator_cvodes",        test_integrator_cvodes],
+  ["test_integrator_idas",          test_integrator_idas],
   ["test_interpolant_linear",       test_interpolant_linear],
   ["test_interpolant_bspline",      test_interpolant_bspline],
   ["test_rootfinder_newton",        test_rootfinder_newton],
   ["test_rootfinder_fast_newton",   test_rootfinder_fast_newton],
   ["test_rootfinder_implicit_to_nlp", test_rootfinder_implicit_to_nlp],
+  ["test_rootfinder_kinsol",        test_rootfinder_kinsol],
   ["test_conic_qrqp",               test_conic_qrqp],
   ["test_conic_ipqp",               test_conic_ipqp],
   ["test_conic_nlpsol",             test_conic_nlpsol],
   ["test_conic_highs",              test_conic_highs],
+  ["test_conic_daqp",               test_conic_daqp],
+  ["test_conic_qpoases",            test_conic_qpoases],
   ["test_nlpsol_sqpmethod",         test_nlpsol_sqpmethod],
   ["test_nlpsol_qrsqp",             test_nlpsol_qrsqp],
   ["test_nlpsol_feasiblesqpmethod", test_nlpsol_feasiblesqpmethod],
   ["test_nlpsol_ipopt",             test_nlpsol_ipopt],
   ["test_nlpsol_scpgen",            test_nlpsol_scpgen],
+  ["test_nlpsol_blocksqp",          test_nlpsol_blocksqp],
 ]);

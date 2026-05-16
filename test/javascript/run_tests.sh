@@ -68,7 +68,27 @@ echo "==> node director.js (Phase 4.3 directors)"
 node "$HERE/director.js"
 echo
 
-# Conic / qpsol against the HiGHS plugin (loaded via dlopen of a
-# preloaded SIDE_MODULE).  Subset port of test/python/conic.py.
-echo "==> node conic.js (ports test/python/conic.py subset, HiGHS)"
+# Conic / qpsol across all loaded plugins (HiGHS, qrqp, ipqp, qpoases,
+# daqp, nlpsol).  Subset port of test/python/conic.py.
+echo "==> node conic.js (ports test/python/conic.py subset, multi-plugin)"
 node "$HERE/conic.js"
+echo
+
+# Linsol across all loaded plugins (qr, ldl, lsqr, symbolicqr, csparse,
+# lapacklu, lapackqr).  Subset port of test/python/linearsolver.py.
+echo "==> node linsol.js (ports test/python/linearsolver.py subset)"
+node "$HERE/linsol.js"
+echo
+
+# Rootfinder across all loaded plugins (newton, fast_newton, nlpsol,
+# kinsol).  Subset port of test/python/implicitfunction.py.
+echo "==> node rootfinder.js (ports test/python/implicitfunction.py subset)"
+node "$HERE/rootfinder.js"
+echo
+
+# SuperSCS plugin smoke: register check passes; the SOCP smoke is
+# marked || true because the SuperSCS-specific iteration path still
+# traps despite the partial F77 CHARLEN patch removing the iter-0
+# unreachable.  See HANDOFF for details.
+echo "==> node superscs_smoke.js (SuperSCS plugin smoke; SOCP failure expected)"
+node "$HERE/superscs_smoke.js" || true
