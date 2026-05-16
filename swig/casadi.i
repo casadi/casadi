@@ -3336,6 +3336,30 @@ export type ConstraintType = number;
 export type VariableType   = number;
 export type DomainType     = number;
 
+// ---------------------------------------------------------------------
+// Runtime factory shape.
+//
+// At runtime, `require("./casadi")` returns an async factory function
+// (the SWIG `module.exports = async function createcasadi() {...}`
+// pattern, see build-wasm/swig/wasm-js/casadi.js).  The factory loads
+// the underlying wasm module and returns an object whose properties
+// are ALL the exports declared above (`DM`, `SX`, `vertcat`, ...).
+//
+// Static .ts consumers use the named-export form
+// (`import { DM } from "./casadi"`) and never call the factory --
+// that path is fine because the d.ts shape AND the JS runtime shape
+// happen to agree on the *names* of the exports.
+//
+// Runtime .js consumers (and TS callers that want to invoke the
+// factory) use:
+//   const create = require("./casadi");
+//   const M = await create();
+//   M.DM.sym("x");
+// To make `M` typed against the same export shape, the factory's
+// return-type is declared self-referentially via
+// `typeof import("./casadi")`.  No double bookkeeping needed.
+declare const createcasadi: () => Promise<typeof import("./casadi")>;
+export default createcasadi;
 %}
 
 /* Register identifier-to-`_NAME` rewrite policy with the d.ts emitter.

@@ -130,6 +130,164 @@ function test_types_suite() {
   }
 }
 
+// --- Tier 3: typecheck the .js runtime suite via --allowJs --checkJs ---
+//
+// Each .js test loads the casadi module via `require(modulePath)()`
+// where modulePath is computed dynamically.  tsc can't statically
+// resolve dynamic require args, so we wrap each .js in a tempdir
+// copy with a `// @ts-check` directive prepended AND a JSDoc-typed
+// shim that aliases `M` to the correct module shape.  Originals
+// stay untouched.
+//
+// The wrapper rewrites every `const M = await create();` line to
+//   /** @type {Awaited<ReturnType<typeof import("./casadi").default>>} */
+//   const M = await create();
+// so M-rooted access (`M.DM.sym(...)` etc.) gets full type info.
+//
+// Files explicitly opted-out (in JS_TYPECHECK_SKIP) are left alone.
+// Helper / non-test files (filename starting with `_`) are also
+// skipped: they have no `M = await create()` line to annotate.
+//
+// Per-target ratchet via JS_TIER3_BUDGET because the .js suite was
+// not written with TS-correctness in mind -- expect a non-zero
+// initial count.  Ratchet DOWN as files get cleaned up.
+const JS_TIER3_BUDGET = 0;
+const JS_TYPECHECK_SKIP = new Set([
+  "tsc_stubs.js",      // this harness itself
+  "_helpers.js",       // helper module
+  "_leak_check.js",    // requires --expose-gc
+]);
+
+function getNodeTypeRoots() {
+  // Locate @types/node on the system.  Debian/Ubuntu uses
+  // /usr/share/nodejs/@types; node_modules/@types is the usual local
+  // path.  Fall back to skipping if neither is found.
+  const candidates = [
+    "/usr/share/nodejs/@types",
+    path.join(process.cwd(), "node_modules/@types"),
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(path.join(c, "node"))) return c;
+  }
+  return null;
+}
+
+function test_js_suite_typecheck() {
+  const jsDir = __dirname;
+  const all = fs.readdirSync(jsDir).filter((f) =>
+    f.endsWith(".js") && !JS_TYPECHECK_SKIP.has(f));
+  if (all.length === 0) {
+    console.log(`ok 3 - test_js_suite_typecheck  (skip: no .js tests)`);
+    return;
+  }
+  const typeRoots = getNodeTypeRoots();
+  if (!typeRoots) {
+    console.log(`ok 3 - test_js_suite_typecheck  (skip: no @types/node found)`);
+    return;
+  }
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "casadi-jstsc-"));
+  let n_checked = 0;
+  const toCheck = [];
+  try {
+    fs.copyFileSync(dtsPath, path.join(tmp, "casadi.d.ts"));
+    // Stub casadi.js so the `require("./casadi")` in our annotated
+    // wrapper resolves -- TS only needs the .d.ts to type things;
+    // the actual runtime never gets executed.
+    fs.writeFileSync(path.join(tmp, "casadi.js"),
+      "module.exports = function() { return Promise.resolve({}); };\n");
+    // Copy ALL .js files (including helpers / harness skip-list ones)
+    // so local relative-requires like `require("./_helpers")` resolve.
+    // Only the non-skipped files are passed to tsc for checking.
+    for (const f of fs.readdirSync(jsDir).filter((g) => g.endsWith(".js"))) {
+      fs.copyFileSync(path.join(jsDir, f), path.join(tmp, f));
+    }
+    for (const f of all) {
+      const src = fs.readFileSync(path.join(jsDir, f), "utf8");
+      // Replace the dynamic `require(modulePath)` with a static
+      // `require("./casadi")` so TS picks up our local d.ts; and
+      // annotate `M = await create()` with the typed-shape JSDoc.
+      let body = src;
+      // Annotate `create` as the factory function regardless of what
+      // the dynamic require() actually resolves to.  The d.ts shape
+      // `typeof import("./casadi")` is the module namespace; the
+      // factory returns a Promise<that-namespace>.
+      body = body.replace(/(const\s+create\s*=\s*require\(modulePath\)\s*;)/,
+        `/** @type {() => Promise<typeof import("./casadi")>} */\n  // @ts-ignore -- runtime require is the factory; d.ts has classes as named exports\n  $1`);
+      // The .js suite uses a recurring test-runner pattern:
+      //   const tests = [["test_a", testA], ...];
+      //   for (const [name, fn] of tests) { await fn(M, ...); }
+      // Without an annotation, TS infers tests as
+      // `(string | testfn)[][]` and the destructured `fn` becomes
+      // `string | testfn`, which isn't callable.  This isn't a real
+      // type-error in the bindings; it's a JS test-harness shape gap.
+      // Annotate `tests` to preserve the tuple shape so iteration
+      // typechecks.
+      body = body.replace(/(const\s+tests\s*=\s*\[)/,
+        `/** @type {Array<[string, (...args: any[]) => any]>} */\n  $1`);
+      // Same fix for the plugin / solver dispatcher tables used in
+      // conic.js / linsol.js / rootfinder.js -- they're 3-tuples
+      // `[plugin_name, opts_factory_or_obj, caps]` that TS-widens to
+      // a useless union without annotation.
+      body = body.replace(/(const\s+(ALL_PLUGINS|ALL_SOLVERS|ALL_FUNCTIONS)\s*=\s*\[)/,
+        `/** @type {any[]} */\n$1`);
+      // NOTE: files that delegate test-running to _helpers.runTests
+      // (integration.js, sx.js, misc.js, etc.) accept M as a test-fn
+      // parameter rather than constructing it locally.  We could
+      // annotate `function test_XXX(M, ...)` to type M, but that
+      // surfaces ~560 errors from the JS-test idiom `M.DM(x)` /
+      // `M.SX(x)` / `M.Function(...)` -- calling the class without
+      // `new`.  At runtime that works (casadi.js wraps each class
+      // in a Proxy with an `apply` trap that forwards to
+      // Reflect.construct), but the d.ts declares classes as
+      // new-only.  Fixing properly requires the d.ts emitter to
+      // emit each class as `class & { (...): T }` (callable + newable)
+      // -- a substantial change.  Tracked as a known gap; for now,
+      // tier 3 covers only the canonical `const M = await create()`
+      // pattern (~12 files).
+      // Skip files that don't have the create() pattern (likely
+      // helper modules that already passed the _ prefix filter).
+      // Skip files where no annotation pattern matched -- nothing to
+      // typecheck meaningfully.  Includes helper / smoke files that
+      // load casadi via inline paths or don't take M as a parameter.
+      if (body === src) continue;
+      n_checked++;
+      // Overwrite the plain copy with the annotated version.
+      fs.writeFileSync(path.join(tmp, f), `// @ts-check\n${body}`);
+      toCheck.push(f);
+    }
+    if (n_checked === 0) {
+      console.log(`ok 3 - test_js_suite_typecheck  (skip: no annotatable .js files)`);
+      return;
+    }
+    // Pass ONLY the annotated files to tsc (so helpers stay typecheck-
+    // exempt but resolve via local require paths).
+    const args = [
+      "--noEmit", "--allowJs", "--checkJs", "--skipLibCheck",
+      "--target", "ES2020", "--module", "commonjs",
+      "--moduleResolution", "node",
+      "--typeRoots", typeRoots, "--types", "node",
+      ...toCheck,
+    ];
+    const r = runTsc(args, tmp);
+    const errors = countErrors(r.stdout);
+    if (errors > JS_TIER3_BUDGET) {
+      const remapped = r.stdout.replaceAll(tmp + path.sep, "test/javascript/");
+      const sample = remapped.split("\n").slice(0, 60).join("\n");
+      throw new Error(
+        `tsc --checkJs reported ${errors} error(s) over .js suite ` +
+        `(${n_checked} files, budget ${JS_TIER3_BUDGET}). First diagnostics:\n${sample}`);
+    }
+    if (errors < JS_TIER3_BUDGET) {
+      console.warn(
+        `WARN: tsc --checkJs clean (${errors} errors) -- ` +
+        `consider lowering JS_TIER3_BUDGET`);
+    }
+    console.log(`ok 3 - test_js_suite_typecheck  (${n_checked} files, ${errors}/${JS_TIER3_BUDGET} errors)`);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
 // --- Main ---
 (function main() {
   if (!haveTsc()) {
@@ -144,7 +302,8 @@ function test_types_suite() {
   try {
     test_dts_compiles();
     test_types_suite();
-    console.log("1..2");
+    test_js_suite_typecheck();
+    console.log("1..3");
   } catch (e) {
     console.error(`not ok - ${e.message}`);
     process.exit(1);
