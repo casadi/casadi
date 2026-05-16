@@ -66,6 +66,11 @@
 %define %stub_alias_out(NAME, TYPES...) %enddef
 %define %stub_alias_in_key(KEY, TYPES...) %enddef
 %define %stub_alias_out_key(KEY, TYPES...) %enddef
+// wasm_js.cxx ts_alias_{in,out} slots: identifier names that the d.ts
+// emitter should rewrite to `_<name>` in the corresponding position.
+// Default no-op so non-wasm targets ignore the directive.
+%define %ts_alias_in(NAME) %enddef
+%define %ts_alias_out(NAME) %enddef
 #endif
 
   /// Data structure in the target language holding data
@@ -3332,6 +3337,25 @@ export type VariableType   = number;
 export type DomainType     = number;
 
 %}
+
+/* Register identifier-to-`_NAME` rewrite policy with the d.ts emitter.
+   INPUT positions widen all of these to their `_<name>` union form
+   (so callers can pass JS-natural values instead of constructing the
+   class manually).  OUTPUT positions normally keep the bare class for
+   return-type narrowing -- except `GenericType`, whose runtime
+   marshaling ALWAYS unwraps to a JS primitive (bool/number/string/
+   array/object/Function), so output users get the union not the
+   `GenericType` class. */
+%ts_alias_in(DM)
+%ts_alias_in(SX)
+%ts_alias_in(MX)
+%ts_alias_in(IM)
+%ts_alias_in(SXElem)
+%ts_alias_in(Slice)
+%ts_alias_in(GenericType)
+%ts_alias_in(MIndex)
+
+%ts_alias_out(GenericType)
 
 // ---------------------------------------------------------------------------
 // JS-side ergonomics: post-class-definition overrides.  The "js" slot is
