@@ -678,6 +678,8 @@ jobs:
           key: "${{matrix.arch}}"
           map: |
            {
+-             "manylinux2014-x64": {"os": "linux", "bitness": "64"},
+-             "manylinux2014-x86": {"os": "linux", "bitness": "32"},
               "manylinux_2_28-x64": {"os": "linux", "bitness": "64"},
               "manylinux_2_28-x86": {"os": "linux", "bitness": "32"},
               "windows-shared-x64-posix": {"os": "windows", "bitness": "64"}
