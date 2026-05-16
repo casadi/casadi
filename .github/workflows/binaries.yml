@@ -1069,12 +1069,20 @@ jobs:
           py2: "37"
        include:
         - image: "ubuntu-24.04"
-          py2: ["311","314"]
+          py2: "311"
+          bit: 64
+          glibc_suffix: "-glibc228"
+        - image: "ubuntu-24.04"
+          py2: "314"
           bit: 64
           glibc_suffix: "-glibc228"
         # ARM Linux runners
         - image: "ubuntu-24.04-arm"
-          py2: ["311","314"]
+          py2: "311"
+          bit: 64
+          glibc_suffix: "-glibc228"
+        - image: "ubuntu-24.04-arm"
+          py2: "314"
           bit: 64
           glibc_suffix: "-glibc228"
     steps:
