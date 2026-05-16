@@ -99,6 +99,12 @@ function(wasmjs_side_plugin infix pname)
   # target_link_options, etc.).  Hardcode the archive path that
   # casadi_plugin() emits to.  The add_dependencies() above still
   # forces the static lib to build first.
+  # -Wl,--export-all: SIDE_MODULE=1 should auto-export everything but
+  # in practice (emsdk circa 3.1.x+) DCE drops unreferenced exports
+  # including each plugin's `casadi_register_<infix>_<pname>` symbol,
+  # which is the entry point Plugin::load_plugin dlopens for.  Forcing
+  # all symbols out preserves the registration symbols plus anything
+  # the main module needs at dlopen time.
   set_target_properties(${_plugin_lib}_side PROPERTIES
     OUTPUT_NAME "casadi_${infix}_${pname}"
     PREFIX "lib"
@@ -107,6 +113,7 @@ function(wasmjs_side_plugin infix pname)
     LINK_FLAGS
       "-fPIC -fwasm-exceptions -s SIDE_MODULE=1 \
 -Wl,--whole-archive ${_plugin_a} -Wl,--no-whole-archive \
+-Wl,--export-all \
 ${_link_extra}"
   )
   # Propagate the .so out via a parent-scope variable so the main module
@@ -194,6 +201,7 @@ set_target_properties(casadi_wasm PROPERTIES
   LINK_FLAGS "-fwasm-exceptions \
 -lembind \
 -fPIC -s MAIN_MODULE=1 \
+-Wl,--export-all \
 -s MODULARIZE=1 -s EXPORT_NAME=createWasm \
 -s ENVIRONMENT=web,worker,node \
 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1 \
@@ -201,6 +209,14 @@ set_target_properties(casadi_wasm PROPERTIES
 -s EXPORTED_FUNCTIONS=@${_swig_exp}\
 ${_preload_files}"
 )
+# -Wl,--export-all on the MAIN_MODULE: same rationale as the side
+# modules above.  MAIN_MODULE=1 is supposed to export everything for
+# side-module dlopen resolution, but DCE silently drops static-data
+# symbols (e.g. `casadi::Conic::options_`) when nothing in the wasm
+# wrapper code references them.  Plugin dlopens then fail with
+# `Aborted(Assertion failed: undefined symbol '_ZN6casadi5Conic8options_E'.
+# perhaps a side module was not linked in?...)`.  Forcing all symbols
+# out exports the whole libcasadi.a surface.
 
 # Stage demo assets next to the linked module so a static server can serve
 # them directly.  Runtime + typecheck tests live in test/javascript/ and

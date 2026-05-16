@@ -40,6 +40,7 @@
 #include <casadi/core/casadi_interrupt.hpp>
 %}
 
+
 // casadi_int type
 %include <casadi/core/casadi_types.hpp>
 
@@ -1462,9 +1463,27 @@ namespace std {
 // `%casadi_director_vec_str` typemap (see casadi.i below) -- registered
 // LATER than the generic directorin so it wins via last-registered.
 
+#ifdef SWIGWASMJS
+    // Per-M JS-class-name trait so from_ptr<std::vector<M>> can route
+    // through M.__wrap_<NAME>(ptr) and return a fully-wrapped XVector
+    // proxy.  We can't easily go through swig_type_info::clientdata
+    // here because std::vector<M>* isn't always registered in
+    // swig_type_initial[] (SWIG only emits pointer-type entries for
+    // types referenced via $descriptor in a wrapper signature, and
+    // most vectors flow as values).  Specialized below by the
+    // %wasm_vec(T, NAME) macro for each %casadi_template_vec entry.
+    // Unspecialized M's return null -> SWIG_NewPointerObj fallback to
+    // bare {_ptr} carrier (the legacy behavior).
+    template<typename M> struct wasmjs_vector_jsname {
+      static const char* get() { return 0; }
+    };
+#endif
+
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGWASMJS
       std::vector<M>* fresh = new std::vector<M>(*a);
+      const char* nm = wasmjs_vector_jsname<M>::get();
+      if (nm) return reinterpret_cast<GUESTOBJECT*>(SWIG_WASMJS_WrapByName(fresh, nm));
       return SWIG_NewPointerObj(fresh, 0, SWIG_POINTER_OWN);
 #endif
 #ifdef SWIGPYTHON
@@ -1929,17 +1948,15 @@ namespace std {
       return p;
 #elif defined(SWIGWASMJS)
       // Pack as EM_VAL of a JS object {key: value, ...}.  For casadi
-      // value types (DM/MX/SX/...), from_ptr<M> returns a bare
-      // `{_ptr}` carrier (SWIG_WASMJS_NewPointerObj returns a pointer-
-      // carrier, not a full proxy -- the wasm-js convention keeps
-      // ownership tracking in the JS-side proxy constructor, unlike
-      // matlab.cxx which returns full proxies from
-      // SWIG_Matlab_NewPointerObj).  The JS-side consumer
-      // (Function.prototype.call's dict branch in %insert("js"))
-      // wraps each value into a proxy class before handing the dict
-      // to the user.  TODO: align with matlab.cxx by having
-      // SWIG_WASMJS_NewPointerObj read `type->clientdata` and return
-      // a real proxy -- coordinated cross-file refactor.
+      // value types (DM/MX/SX/...), from_ptr<M> calls
+      // SWIG_NewPointerObj with the type descriptor, which routes
+      // through SWIG_WASMJS_NewPointerObj's `type->clientdata` lookup
+      // (set by SWIG_WASMJS_init_cast_chains in wasm_js.cxx) to
+      // M.__wrap_<JsName>(ptr) -- yielding a fully-wrapped proxy.
+      // So the assembled dict has typed-proxy values, no JS-side
+      // post-wrap dance required.  Mirrors matlab.cxx where
+      // SWIG_Matlab_NewPointerObj produces a full <Class> object
+      // via mexCallMATLAB("<Class>_construct", ptr).
       emscripten::val obj = emscripten::val::object();
       for (typename std::map<std::string, M>::const_iterator it=a->begin(); it!=a->end(); ++it) {
         GUESTOBJECT* e = from_ptr(&it->second);
@@ -2702,18 +2719,21 @@ namespace std {
 // ----------------------------------------------------------------------------
 
 %define %casadi_director_class(xJsName, xType...)
+// SWIG_NewPointerObj reads $descriptor's clientdata (set in
+// init_cast_chains from swig_js_classes[]) and routes to
+// M.__wrap_<JsName>(ptr) automatically -- no need for an explicit
+// module_property call here.  xJsName is unused but kept for
+// callsite-arity compatibility.
 %typemap(directorin, noblock=1) xType, const xType {
   {
     xType *__p = new xType($1);
-    emscripten::val __wrap = emscripten::val::module_property("__wrap_" xJsName);
-    $input = __wrap(emscripten::val((uintptr_t)__p)).release_ownership();
+    $input = SWIG_NewPointerObj(__p, $descriptor(xType *), 0);
   }
 }
 %typemap(directorin, noblock=1) const xType& {
   {
     xType *__p = new xType($1);
-    emscripten::val __wrap = emscripten::val::module_property("__wrap_" xJsName);
-    $input = __wrap(emscripten::val((uintptr_t)__p)).release_ownership();
+    $input = SWIG_NewPointerObj(__p, $descriptor(xType *), 0);
   }
 }
 %typemap(directorout, noblock=1) xType, const xType {
@@ -2731,12 +2751,15 @@ namespace std {
 %typemap(directorin, noblock=1) std::vector< xElemType >,
                                  const std::vector< xElemType >&,
                                        std::vector< xElemType >& {
+  // SWIG_NewPointerObj routes through clientdata to the JS wrap
+  // automatically (see %casadi_director_class above).  xElemJsName
+  // is unused here, kept for callsite-arity compatibility.
   {
     emscripten::val __a = emscripten::val::array();
-    emscripten::val __wrap = emscripten::val::module_property("__wrap_" xElemJsName);
     for (size_t __i = 0; __i < $1.size(); ++__i) {
       xElemType *__ep = new xElemType($1[__i]);
-      __a.call<void>("push", __wrap(emscripten::val((uintptr_t)__ep)));
+      EM_VAL __eh = SWIG_NewPointerObj(__ep, $descriptor(xElemType *), 0);
+      __a.call<void>("push", emscripten::val::take_ownership(__eh));
     }
     $input = __a.release_ownership();
   }
@@ -3357,8 +3380,13 @@ export type DomainType     = number;
                  mode === 'SX' ? M._swig_casadi_Function_call_1 :
                                 M._swig_casadi_Function_call_2;
       const OutVec = mode === 'DM' ? DMVector : (mode === 'SX' ? SXVector : MXVector);
+      // Vector returns: from_ptr<std::vector<M>> in casadi.i passes
+      // type=0 to SWIG_NewPointerObj, so __from_handle yields a bare
+      // {_ptr} carrier rather than a fully-wrapped XVector.  Reach
+      // into ._ptr to recover the raw pointer; both bare carriers and
+      // typed proxies expose it, so this is safe either way.
       const result = __vec_to_arr(new OutVec(__PRIVATE_CTOR,
-        __from_handle(__chk(fn(__unwrap(this), __unwrap(vec), ail, nil)))));
+        __from_handle(__chk(fn(__unwrap(this), __unwrap(vec), ail, nil)))._ptr));
       if (own && vec.delete) vec.delete();
       return result;
     }
@@ -3376,31 +3404,15 @@ export type DomainType     = number;
       // -inf/+inf when the key is absent, etc.  Going via the LIST
       // path would force every slot to receive an empty-DM, which the
       // solver interprets as a length-0 user-provided bound (defaults
-      // x to 0).  Output values come back as bare `{_ptr}` carriers
-      // from from_ptr<std::map<string,T>>; wrap them as proxy classes
-      // here so the caller sees DM/MX/SX with methods.
-      //
-      // (Aside: matlab.cxx returns full proxies from SWIG_NewPointerObj
-      //  directly; wasm-js puts ownership tracking in the JS-side
-      //  constructor, so NewPointerObj returns a bare carrier and we
-      //  wrap at the consumer.  Refactoring the wasm-js runtime to
-      //  match matlab.cxx is bigger scope -- see SWIG_WASMJS_NewPointerObj
-      //  in Lib/wasm_js/wasm_jsrun.swg.)
+      // x to 0).  Dict values come back as fully-wrapped proxies via
+      // SWIG_WASMJS_NewPointerObj (which consults swig_type_info::
+      // clientdata and calls M.__wrap_<JsName> on the C++ side), so
+      // no JS-side rewrap is needed.
       const fn  = mode === 'DM' ? M._swig_casadi_Function_call_3
                : mode === 'SX' ? M._swig_casadi_Function_call_4
                :                  M._swig_casadi_Function_call_5;
-      const Cls = mode === 'DM' ? DM : (mode === 'SX' ? SX : MX);
-      const raw = M.__swig_release_handle(__chk(fn(__unwrap(this),
+      return M.__swig_release_handle(__chk(fn(__unwrap(this),
         __unwrap(arg), ail, nil)));
-      const out = {};
-      for (const k of Object.keys(raw)) {
-        const v = raw[k];
-        out[k] = (v && typeof v === 'object' && '_ptr' in v
-                  && !(v instanceof Cls))
-          ? new Cls(__PRIVATE_CTOR, v._ptr)
-          : v;
-      }
-      return out;
     }
     throw new Error('Function.call: arg must be a list (DM/MX/SX vector or JS array) or a dict object');
   };
