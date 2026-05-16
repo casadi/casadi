@@ -130,7 +130,8 @@ namespace casadi {
       // Equilibrate the matrix if scaling was successful
       if (info!=0)
         dlaqge_(&ncol, &nrow, get_ptr(m->mat), &ncol, get_ptr(m->r), get_ptr(m->c),
-                &colcnd, &rowcnd, &amax, &m->equed);
+                &colcnd, &rowcnd, &amax, &m->equed
+                CASADI_LAPACK_CHARLEN_1);
       else
         m->equed = 'N';
     }
@@ -170,7 +171,8 @@ namespace casadi {
     // Solve the system of equations
     int info = 100;
     char trans = tr ? 'T' : 'N';
-    dgetrs_(&trans, &ncol, &n_rhs, get_ptr(m->mat), &ncol, get_ptr(m->ipiv), x, &ncol, &info);
+    dgetrs_(&trans, &ncol, &n_rhs, get_ptr(m->mat), &ncol, get_ptr(m->ipiv), x, &ncol, &info
+            CASADI_LAPACK_CHARLEN_1);
     if (info) return 1;
 
     // Scale the solution

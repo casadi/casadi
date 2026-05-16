@@ -145,12 +145,14 @@ namespace casadi {
 
       // Solve for transpose(R)
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &n_rhs, &alphaR,
-             get_ptr(m->mat), &ncol, x, &ncol);
+             get_ptr(m->mat), &ncol, x, &ncol
+             CASADI_LAPACK_CHARLEN_4);
 
       // Multiply by Q
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &n_rhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
-              &ncol, get_ptr(m->work), &lwork, &info);
+              &ncol, get_ptr(m->work), &lwork, &info
+              CASADI_LAPACK_CHARLEN_2);
       casadi_assert(info == 0,
         "LapackQr::solve: dormqr_ A failed to solve the linear system. Info: " + str(info) + ".");
     } else {
@@ -158,13 +160,15 @@ namespace casadi {
       // Multiply by transpose(Q)
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &n_rhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
-              &ncol, get_ptr(m->work), &lwork, &info);
+              &ncol, get_ptr(m->work), &lwork, &info
+              CASADI_LAPACK_CHARLEN_2);
       casadi_assert(info == 0,
         "LapackQr::solve: dormqr_ B failed to solve the linear system. Info: " + str(info) + ".");
 
       // Solve for R
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &n_rhs, &alphaR,
-             get_ptr(m->mat), &ncol, x, &ncol);
+             get_ptr(m->mat), &ncol, x, &ncol
+             CASADI_LAPACK_CHARLEN_4);
     }
     return 0;
   }

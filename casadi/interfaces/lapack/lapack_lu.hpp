@@ -29,13 +29,37 @@
 #include "casadi/core/linsol_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapacklu_export.h>
 
+// On WebAssembly the wasm linker enforces strict function signatures, and
+// the flang-built LAPACK on wasm uses the standard Fortran-77 ABI where
+// CHARACTER arguments have a hidden trailing length (size_t).  Native
+// builds of LAPACK (OpenBLAS/MKL/Netlib via gfortran) also use this ABI
+// but are tolerant of the missing length on most architectures because
+// the extra argument lands in an unused register/stack slot.  We add the
+// hidden length parameter on wasm only to keep the native side unchanged.
+#ifdef EMSCRIPTEN
+#define CASADI_LAPACK_CHARLEN_1 , 1
+#define CASADI_LAPACK_CHARLEN_DECL_1 , size_t len1
+#define CASADI_LAPACK_CHARLEN_DECL_2 , size_t len1, size_t len2
+#define CASADI_LAPACK_CHARLEN_DECL_4 , size_t len1, size_t len2, size_t len3, size_t len4
+#define CASADI_LAPACK_CHARLEN_2 , 1, 1
+#define CASADI_LAPACK_CHARLEN_4 , 1, 1, 1, 1
+#else
+#define CASADI_LAPACK_CHARLEN_1
+#define CASADI_LAPACK_CHARLEN_DECL_1
+#define CASADI_LAPACK_CHARLEN_DECL_2
+#define CASADI_LAPACK_CHARLEN_DECL_4
+#define CASADI_LAPACK_CHARLEN_2
+#define CASADI_LAPACK_CHARLEN_4
+#endif
+
 extern "C" {
   /// LU-Factorize dense matrix (lapack)
   void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
 
   /// Solve a system of equation using an LU-factorized matrix (lapack)
   void dgetrs_(char* trans, int *n, int *nrhs, double *a,
-               int *lda, int *ipiv, double *b, int *ldb, int *info);
+               int *lda, int *ipiv, double *b, int *ldb, int *info
+               CASADI_LAPACK_CHARLEN_DECL_1);
 
   /// Calculate col and row scaling
   void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c,
@@ -43,7 +67,8 @@ extern "C" {
 
   /// Equilibrate the system
   void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
-               double *colcnd, double *rowcnd, double *amax, char *equed);
+               double *colcnd, double *rowcnd, double *amax, char *equed
+               CASADI_LAPACK_CHARLEN_DECL_1);
 }
 
 namespace casadi {

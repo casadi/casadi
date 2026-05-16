@@ -2411,7 +2411,7 @@ returnValue SQProblemSchur::updateSchurQR( int_t idxDel )
     long INFO = 0;
     IWORK = new unsigned long[N];
     WORK = new real_t[3*N];
-    TRCON( "1", "U", "N", &N, R_, &LDA, &rcondS, WORK, IWORK, &INFO );
+    TRCON( "1", "U", "N", &N, R_, &LDA, &rcondS, WORK, IWORK, &INFO QPOASES_BLAS_CALL_LEN_3);
     if ( INFO != 0 )
     {
         MyPrintf( "TRCON returns INFO = %d\n",(int)INFO );
@@ -2457,7 +2457,7 @@ returnValue SQProblemSchur::backsolveSchurQR( int_t dimS, const real_t* const rh
             sol[i] += Q_[j+i*nSmax] * rhs[j];
 
     /* Solve Rx = sol */
-    TRTRS( "U", "N", "N", &M, &NRHS, R_, &LDA, sol, &LDC, &INFO );
+    TRTRS( "U", "N", "N", &M, &NRHS, R_, &LDA, sol, &LDC, &INFO QPOASES_BLAS_CALL_LEN_3);
     if ( INFO != 0 )
     {
         MyPrintf("TRTRS returns INFO = %d\n", INFO);
