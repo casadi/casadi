@@ -162,6 +162,88 @@ if(WITH_HIGHS)
     ${CMAKE_BINARY_DIR}/external_projects/lib/libhighs.a)
 endif()
 
+# DAQP Conic plugin: pure-C QP solver, no Fortran/BLAS dependencies.
+if(WITH_DAQP)
+  wasmjs_side_plugin(conic daqp
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libdaqp.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libdaqpstat.a)
+endif()
+
+# qpOASES Conic plugin: needs flang-built BLAS+LAPACK (dgemm_, dpotrf_, ...)
+# plus the in-tree libcasadi_qpoases.a (qpOASES sources, patched to pass
+# Fortran-77 hidden character-length args on EMSCRIPTEN).  Also pull in the
+# Fortran runtime for the flang-built archives.
+if(WITH_QPOASES)
+  wasmjs_side_plugin(conic qpoases
+    ${CMAKE_BINARY_DIR}/lib/libcasadi_qpoases.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
+    /opt/flang/wasm/lib/libFortranRuntime.a)
+endif()
+
+# Sundials integrators (cvodes, idas) and rootfinder (kinsol): pure-C,
+# self-contained in the side module archive.
+if(WITH_SUNDIALS)
+  wasmjs_side_plugin(integrator cvodes)
+  wasmjs_side_plugin(integrator idas)
+  wasmjs_side_plugin(rootfinder kinsol)
+endif()
+
+# CSparse linsol: pure-C, self-contained.
+if(WITH_CSPARSE)
+  wasmjs_side_plugin(linsol csparse)
+endif()
+
+# LAPACK linsol plugins (lapacklu, lapackqr): need flang-built BLAS+LAPACK
+# plus Fortran runtime.  Headers have been patched with EMSCRIPTEN-only
+# Fortran-77 hidden character-length args.
+if(WITH_LAPACK)
+  wasmjs_side_plugin(linsol lapacklu
+    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
+    /opt/flang/wasm/lib/libFortranRuntime.a)
+  wasmjs_side_plugin(linsol lapackqr
+    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
+    /opt/flang/wasm/lib/libFortranRuntime.a)
+endif()
+
+# Blocksqp Nlpsol plugin: uses qpoases internally for the inner QP solve,
+# so needs the same BLAS+Fortran chain as qpoases.  Set qpsol_options/
+# linsol to a wasm-available linsol (e.g. ldl) when constructing.
+if(WITH_BLOCKSQP)
+  wasmjs_side_plugin(nlpsol blocksqp
+    ${CMAKE_BINARY_DIR}/lib/libcasadi_qpoases.a
+    ${CMAKE_BINARY_DIR}/lib/libcasadi_conic_qpoases.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
+    /opt/flang/wasm/lib/libFortranRuntime.a)
+endif()
+
+# HPIPM Conic plugin: registers OK but requires OCP-block-structured QP
+# inputs; no trivial smoke test possible.  Built but not currently
+# exercised by test/javascript/*.
+if(WITH_HPIPM)
+  wasmjs_side_plugin(conic hpipm
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libhpipm.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libblasfeo.a)
+endif()
+
+# SuperSCS Conic plugin: registers OK but the SuperSCS sources call BLAS
+# without the Fortran-77 hidden character-length args, triggering wasm-ld
+# signature-mismatch -> unreachable on every BLAS-using call site.  Built
+# but not operational until SuperSCS sources are patched the same way the
+# vendored qpOASES was.
+if(WITH_SUPERSCS)
+  wasmjs_side_plugin(conic superscs
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libsuperscs.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libindirect.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/liblinsys.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
+    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
+    /opt/flang/wasm/lib/libFortranRuntime.a)
+endif()
+
 # IPOPT Nlpsol plugin: pull in the full Fortran cascade.  libipopt.a +
 # libcoinmumps.a + libcoinmetis.a from the COIN-OR/MUMPS/METIS chain,
 # plus liblapack.a + libblas.a from Netlib reference LAPACK (built via
