@@ -520,7 +520,7 @@ namespace casadi {
   Dict KnitroInterface::get_stats(void* mem) const {
     Dict stats = Nlpsol::get_stats(mem);
     auto m = static_cast<KnitroMemory*>(mem);
-    stats["return_status"] = m->return_status;
+    if (m->return_status) stats["return_status"] = m->return_status;
 
     return stats;
   }
@@ -556,6 +556,7 @@ namespace casadi {
 
   KnitroMemory::KnitroMemory(const KnitroInterface& self) : self(self) {
     this->kc = nullptr;
+    this->return_status = nullptr;
   }
 
   KnitroMemory::~KnitroMemory() {
