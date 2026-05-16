@@ -121,8 +121,30 @@ endfunction()
 # Plugins to ship as SIDE_MODULE .so's
 # ----------------------------------------------------------------------------
 
-# Built-in RK integrator: no IP issue, ships as side module for consistency.
+# Built-in plugins implemented entirely in CasADi's own runtime (no
+# third-party deps).  Each is one line: their static archive is just
+# the plugin .cpp + its meta TU, and at runtime the side .so resolves
+# everything else against the MAIN_MODULE.  Adds a few hundred KB
+# total to MEMFS but unlocks a much larger surface in tests.
 wasmjs_side_plugin(integrator rk)
+wasmjs_side_plugin(integrator collocation)
+wasmjs_side_plugin(conic       qrqp)
+wasmjs_side_plugin(conic       ipqp)
+wasmjs_side_plugin(conic       nlpsol)        # qp_to_nlp wrapper
+wasmjs_side_plugin(nlpsol      sqpmethod)
+wasmjs_side_plugin(nlpsol      qrsqp)
+wasmjs_side_plugin(nlpsol      scpgen)
+wasmjs_side_plugin(nlpsol      feasiblesqpmethod)
+wasmjs_side_plugin(linsol      qr)
+wasmjs_side_plugin(linsol      ldl)
+wasmjs_side_plugin(linsol      tridiag)
+wasmjs_side_plugin(linsol      lsqr)
+wasmjs_side_plugin(linsol      symbolicqr)
+wasmjs_side_plugin(interpolant linear)
+wasmjs_side_plugin(interpolant bspline)
+wasmjs_side_plugin(rootfinder  newton)
+wasmjs_side_plugin(rootfinder  fast_newton)
+wasmjs_side_plugin(rootfinder  nlpsol)        # implicit_to_nlp wrapper
 
 # HiGHS Conic plugin: requires the cross-compiled libhighs.a archive.
 # The parent's `highs` IMPORTED target points at a non-existent .so for
