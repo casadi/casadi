@@ -8,8 +8,10 @@
 //   - Raw JS arrays auto-promote to DM via the casadi to_ptr<DM>
 //     infra (same as Python's `f([3, 7])`): `[3, 7]` becomes a 2x1
 //     column DM, `[[1, 2], [3, 4]]` becomes a 2x2 DM (row-major in
-//     JS, column-major in DM).  So `f.call([2.3], ...)` and
-//     `f.call([[3, 7]], ...)` work directly -- no explicit M.DM wrap.
+//     JS, column-major in DM).  So `f([2.3])` and `f([[3, 7]])` work
+//     directly -- no explicit M.DM wrap.  Uses the callable form for
+//     the natural n_out=1 unwrap; use `f.call([...])` for stable list
+//     return.
 //
 // Each test_* function is `(M) => void` that throws on failure.
 
@@ -79,7 +81,7 @@ function test_MX_fun1(M) {
   const f = M.Function("f", [x], [y]);
   assertEqual(f.n_in(),  1n, "f.n_in");
   assertEqual(f.n_out(), 1n, "f.n_out");
-  const out = f.call([3]);
+  const out = f(3);
   assertAlmostEqual(out.nonzeros()[0], 6, 10, "f(3) == 6");
 }
 
@@ -90,7 +92,7 @@ function test_MXfunction2(M) {
     [M.plus(x, y), M.times(y, x)]);
   assertEqual(f.n_in(),  2n, "f.n_in");
   assertEqual(f.n_out(), 2n, "f.n_out");
-  const outs = f.call([3, 7]);
+  const outs = f(3, 7);
   assertAlmostEqual(outs[0].nonzeros()[0], 10, 10, "x+y");
   assertAlmostEqual(outs[1].nonzeros()[0], 21, 10, "y*x");
 }
@@ -101,7 +103,7 @@ function test_MXfunction3(M) {
   const xy1 = xy.get(false, M.Slice(1n, false));
   const f = M.Function("f", [xy],
     [M.plus(xy0, xy1), M.times(xy0, xy1)]);
-  const outs = f.call([[3, 7]]);
+  const outs = f([3, 7]);
   assertAlmostEqual(outs[0].nonzeros()[0], 10, 10, "xy[0]+xy[1]");
   assertAlmostEqual(outs[1].nonzeros()[0], 21, 10, "xy[0]*xy[1]");
 }
@@ -113,7 +115,7 @@ function test_MXfunction3b(M) {
   const f = M.Function("f", [xy],
     [M.plus(xy00, xy01), M.times(xy00, xy01)]);
   // Nested array [[3, 7]] is row-major in JS: a 1x2 row DM.
-  const outs = f.call([[[3, 7]]]);
+  const outs = f([[3, 7]]);
   assertAlmostEqual(outs[0].nonzeros()[0], 10, 10, "[0,0]+[0,1]");
   assertAlmostEqual(outs[1].nonzeros()[0], 21, 10, "[0,0]*[0,1]");
 }
@@ -124,7 +126,7 @@ function test_MXfunction4(M) {
   const xy1 = xy.get(false, M.Slice(1n, false));
   const z = M.vcat([M.plus(xy0, xy1), M.times(xy0, xy1)]);
   const f = M.Function("f", [xy], [z]);
-  const out = f.call([[3, 7]]);
+  const out = f([3, 7]);
   const out0 = out;
   assertEqual(out0.size1(), 2n, "out.size1");
   assertEqual(out0.size2(), 1n, "out.size2");
@@ -139,7 +141,7 @@ function test_MXfunction5(M) {
   const xy1 = xy.get(false, M.Slice(1n, false));
   const z = M.hcat([M.plus(xy0, xy1), M.times(xy0, xy1)]);
   const f = M.Function("f", [xy], [z]);
-  const out = f.call([[3, 7]]);
+  const out = f([3, 7]);
   const out0 = out;
   assertEqual(out0.size1(), 1n, "out.size1");
   assertEqual(out0.size2(), 2n, "out.size2");
@@ -148,14 +150,14 @@ function test_MXfunction5(M) {
 function test_identitySX(M) {
   const x = M.SX.sym("x", 1n, 1n);
   const f = M.Function("f", [x], [x]);
-  const out = f.call([3]);
+  const out = f(3);
   assertAlmostEqual(out.nonzeros()[0], 3, 10, "identity SX");
 }
 
 function test_identityMX(M) {
   const x = M.MX.sym("x", 1n, 1n);
   const f = M.Function("f", [x], [x]);
-  const out = f.call([3]);
+  const out = f(3);
   assertAlmostEqual(out.nonzeros()[0], 3, 10, "identity MX");
 }
 
@@ -193,7 +195,7 @@ function test_jacobian_tools(M) {
   const X = M.MX.sym("X", 1n, 1n);
   const Y = M.jacobian(M.power(X, M.MX(2)), X, null);
   const f = M.Function("f", [X], [Y]);
-  const out = f.call([2.3]);
+  const out = f(2.3);
   assertAlmostEqual(out.nonzeros()[0], 4.6, 6, "d(X^2)/dX at 2.3");
 }
 
@@ -201,9 +203,9 @@ function test_if_else(M) {
   const x = M.MX.sym("x", 1n, 1n);
   const y = M.if_else(x, M.MX(1), M.MX(2));
   const f = M.Function("f", [x], [y]);
-  let out = f.call([1]);
+  let out = f(1);
   assertAlmostEqual(out.nonzeros()[0], 1, 10, "if_else(true)");
-  out = f.call([0]);
+  out = f(0);
   assertAlmostEqual(out.nonzeros()[0], 2, 10, "if_else(false)");
 }
 
@@ -211,9 +213,9 @@ function test_if_else_zero(M) {
   const x = M.MX.sym("x", 1n, 1n);
   const y = M.if_else(x, M.MX(5), M.MX(0));
   const f = M.Function("f", [x], [y]);
-  let out = f.call([1]);
+  let out = f(1);
   assertAlmostEqual(out.nonzeros()[0], 5, 10, "if_else_zero(1)");
-  out = f.call([0]);
+  out = f(0);
   assertAlmostEqual(out.nonzeros()[0], 0, 10, "if_else_zero(0)");
 }
 
@@ -232,7 +234,7 @@ function test_vertcat(M) {
   ]);
   const q = M.times(T, T);
   const f = M.Function("f", [X], [q]);
-  const out = f.call([[0,1,2,3,4,5,6,7,8,9]]);
+  const out = f([0,1,2,3,4,5,6,7,8,9]);
   dmArrayEqual(out, [16, 4], 10, "f([0..9])");
 }
 
@@ -281,7 +283,7 @@ function test_blockcat(M) {
                           M.times(M.MX(3), x),
                           M.times(M.MX(4), x));
   const f = M.Function("f", [x], [y]);
-  const out = f.call([3]);
+  const out = f(3);
   // Column-major flatten of [[3,6],[9,12]] = [3, 9, 6, 12].
   dmArrayEqual(out, [3, 9, 6, 12], 10, "blockcat 2x2 at x=3");
 }
@@ -290,7 +292,7 @@ function test_MXvec(M) {
   const u = M.DM.ones(2n, 3n);
   const U = M.MX.sym("u", 2n, 3n);
   const f = M.Function("f", [U], [M.vec(U)]);
-  const out = f.call([u]);
+  const out = f(u);
   const out0 = out;
   assertEqual(out0.size1(), 6n, "vec.size1");
   assertEqual(out0.size2(), 1n, "vec.size2");
@@ -301,14 +303,14 @@ function test_unite(M) {
   const y = M.MX.sym("y", 3n, 4n);
   const z = M.unite(x, y);
   const f = M.Function("f", [y], [z]);
-  const out = f.call([M.DM.ones(3n, 4n)], false, false);
+  const out = f(M.DM.ones(3n, 4n));
   assertEqual(out.nnz(), 12, "unite nnz");
 }
 
 function test_norms(M) {
   const a = M.MX(3);
   const ni = M.Function("f", [], [M.norm_inf(a)]);
-  const out = ni.call([]);
+  const out = ni();
   assertAlmostEqual(out.nonzeros()[0], 3, 10, "norm_inf(3)");
 }
 
@@ -317,11 +319,11 @@ function test_MXd_substractionl(M) {
   const X = M.MX.sym("X", 1n, 1n);
   const g1 = M.Function("g", [],
     [M.jacobian(M.minus(X, V), X, null)]);
-  const o1 = g1.call([]);
+  const o1 = g1();
   assertAlmostEqual(o1.nonzeros()[0], 1, 10, "d(X-V)/dX");
   const g2 = M.Function("g", [],
     [M.jacobian(M.minus(X, V), V, null)]);
-  const o2 = g2.call([]);
+  const o2 = g2();
   assertAlmostEqual(o2.nonzeros()[0], -1, 10, "d(X-V)/dV");
 }
 
@@ -337,7 +339,7 @@ function test_substitute(M) {
   const y = M.times(x, x);
   const r = M.substitute(y, x, M.MX(3));
   const f = M.Function("f", [], [r]);
-  const o = f.call([]);
+  const o = f();
   assertAlmostEqual(o.nonzeros()[0], 9, 10, "subst x=3 in x^2");
 }
 
@@ -374,7 +376,7 @@ function test_ticket(M) {
 function test_pow_zero(M) {
   const z = M.power(M.MX(0), M.MX(0));
   const f = M.Function("f", [], [z]);
-  const out = f.call([]);
+  const out = f();
   assertAlmostEqual(out.nonzeros()[0], 1, 10, "0**0 = 1");
 }
 
@@ -434,6 +436,55 @@ function test_mxnulloutput(M) {
   assertEqual(f.size2_out(0n), 0n, "size2_out=0");
 }
 
+function test_MXorder(M) {
+  // mx.py:test_MXorder -- output of f(x) = x+x must preserve element order.
+  const x = M.MX.sym("x", 2n, 3n);
+  const f = M.Function("f", [x], [M.plus(x, x)]);
+  assertEqual(f.n_in(),  1n, "n_in");
+  assertEqual(f.n_out(), 1n, "n_out");
+  const in0 = M.DM(f.sparsity_in(0n), [1, 2, 3, 4, 5, 6]);
+  const out = f(in0);
+  dmArrayEqual(out, [2, 4, 6, 8, 10, 12], 10, "x+x");
+}
+
+function test_MXreshape(M) {
+  // mx.py:test_MXreshape -- reshape MX from 2x3 to 1x6.
+  const x = M.MX.sym("x", 2n, 3n);
+  const z = M.reshape(x, 1n, 6n);
+  assertEqual(z.size1(), 1n, "reshape rows");
+  assertEqual(z.size2(), 6n, "reshape cols");
+  const f = M.Function("f", [x], [z]);
+  const in0 = M.DM(f.sparsity_in(0n), [1, 2, 3, 4, 5, 6]);
+  const out = f(in0);
+  dmArrayEqual(out, [1, 2, 3, 4, 5, 6], 10, "reshape values");
+}
+
+function test_mx_in(M) {
+  // mx.py:test_mx_in -- compose two Function objects via mx_in / call.
+  const x = M.MX.sym("x", 2n, 3n);
+  const f = M.Function("f", [x], [M.times(M.MX(3), x)]);
+  const x_in = f.mx_in();
+  const x_out = f.call(x_in);
+  const g = M.Function("g", [x_in[0]], [M.times(M.MX(6), x_out[0])]);
+  const n = [1, 2, 3, 4, 5, 6];
+  const f_in = M.DM(f.sparsity_in(0n), n);
+  const g_in = M.DM(g.sparsity_in(0n), n);
+  const f_out = f(f_in);
+  const g_out = g(g_in);
+  const sixfo = f_out.nonzeros().map((v) => 6 * v);
+  dmArrayEqual(g_out, sixfo, 10, "g = 6*f");
+}
+
+function test_indexingOutOfBounds(M) {
+  // mx.py:test_indexingOutOfBounds -- only some patterns. Demonstrate the
+  // error-throwing direction; mirrors the DM y[12, 0] case via wasm-js
+  // slice indexing.
+  const y = M.DM.zeros(4n, 5n);
+  let threw = false;
+  try { y.get(false, M.Slice(12n, 13n), M.Slice(0n, 1n)); } catch (e) { threw = true; }
+  if (!threw) throw new Error("y[12, 0] should throw");
+}
+
 // ============================================================================
 //  runner
 // ============================================================================
@@ -482,6 +533,10 @@ const tests = [
   ["test_vertsplit",          test_vertsplit],
   ["test_horzsplit",          test_horzsplit],
   ["test_mxnulloutput",       test_mxnulloutput],
+  ["test_MXorder",            test_MXorder],
+  ["test_MXreshape",          test_MXreshape],
+  ["test_mx_in",              test_mx_in],
+  ["test_indexingOutOfBounds", test_indexingOutOfBounds],
 ];
 
 (async () => {

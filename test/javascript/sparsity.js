@@ -205,6 +205,54 @@ function test_reshape_sparsity(M) {
   assertEqual(r.nnz(), a.nnz(), "reshape nnz preserved");
 }
 
+function test_pattern_inverse(M) {
+  // pattern_inverse: lower(4)^c = upper-but-not-diagonal pattern.
+  const sp = M.Sparsity.lower(4n);
+  const inv = sp.pattern_inverse();
+  // total cells = 16; lower(4) has 1+2+3+4 = 10 nz; inverse has 6.
+  assertEqual(sp.nnz(), 10n, "lower(4) nnz");
+  assertEqual(inv.nnz(), 6n,  "pattern_inverse nnz");
+}
+
+function test_unit_sparsity_matrix(M) {
+  // A constructed Sparsity used to construct a DM gives the right shape.
+  const sp = new M.Sparsity(4n, 3n, [0n, 2n, 2n, 3n], [1n, 2n, 1n]);
+  assertEqual(sp.size1(), 4n, "size1");
+  assertEqual(sp.size2(), 3n, "size2");
+  assertEqual(sp.nnz(),   3n, "nnz");
+}
+
+function test_pattern_compose(M) {
+  // Sparsity union and intersection on lower-triangular shapes.
+  const a = M.Sparsity.lower(3n);
+  const b = M.Sparsity.dense(3n, 3n);
+  // a is subset of b.
+  assertTrue(a.is_subset(b), "lower in dense");
+  // union(a, b) == b.
+  const u = a.unite(b);
+  assertEqual(u.nnz(), b.nnz(), "union(lower, dense) == dense");
+  // intersection(a, b) == a.
+  const i = a.intersect(b);
+  assertEqual(i.nnz(), a.nnz(), "intersection == lower");
+}
+
+function test_size_helpers(M) {
+  // size1, size2, numel, nnz are uniformly accessible.
+  const sp = M.Sparsity.dense(3n, 4n);
+  assertEqual(sp.size1(),  3n, "size1");
+  assertEqual(sp.size2(),  4n, "size2");
+  assertEqual(sp.numel(), 12n, "numel");
+  assertEqual(sp.nnz(),   12n, "nnz");
+}
+
+function test_sparsity_T(M) {
+  // Sparsity.T (transpose) swaps dims.
+  const sp = M.Sparsity.dense(3n, 5n);
+  const t = sp.T;
+  assertEqual(t.size1(), 5n, "T size1");
+  assertEqual(t.size2(), 3n, "T size2");
+}
+
 // ----- driver -----
 
 const tests = [
@@ -221,6 +269,11 @@ const tests = [
   ["test_enlarge",            test_enlarge],
   ["test_NZ",                 test_NZ],
   ["test_reshape_sparsity",   test_reshape_sparsity],
+  ["test_pattern_inverse",    test_pattern_inverse],
+  ["test_unit_sparsity_matrix", test_unit_sparsity_matrix],
+  ["test_pattern_compose",    test_pattern_compose],
+  ["test_size_helpers",       test_size_helpers],
+  ["test_sparsity_T",         test_sparsity_T],
 ];
 
 (async () => {

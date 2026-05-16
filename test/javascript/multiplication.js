@@ -61,7 +61,7 @@ function test_mtimes_mx_eval(M) {
   // Evaluate with concrete matrices.
   const Av = M.DM([[1, 2, 3], [4, 5, 6]]);
   const Bv = M.DM([[7, 8], [9, 10], [11, 12]]);
-  const out = f.call([Av, Bv]);
+  const out = f(Av, Bv);
   assertArrayAlmostEqual(out.nonzeros(), [58, 139, 64, 154], 8, "MX mtimes eval");
 }
 

@@ -66,8 +66,11 @@ function test_director_eval_override(M) {
     }
   }
   const cb = new DoubleCB();
+  // Callback subclasses don't get the Function-callable wrap (would
+  // require user-side opt-in for `class DoubleCB extends M.Callback`).
+  // Use the explicit .call form which always returns the list.
   const out = cb.call([M.DM(3)]);
-  assertAlmost(out.nonzeros()[0], 6, 8, "eval(3) should be 6");
+  assertAlmost(out[0].nonzeros()[0], 6, 8, "eval(3) should be 6");
 }
 
 // ----- driver -----
