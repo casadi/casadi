@@ -89,7 +89,7 @@ namespace casadi {
 
     // Solve
     DM x = densify(B);
-    if (solve(A.ptr(), x.ptr(), x.size2(), false, mem))
+    if (solve(A.ptr(), x.ptr(), x.size2(), tr, mem))
       casadi_error("Linsol::solve: 'solve' failed");
     // Show statistics
     if (m->t_total) m->t_total->toc();

@@ -83,10 +83,22 @@ function test_simple_dmatrix(M, plugin, req) {
   assertArrayAlmostEqual(x.nonzeros(), ref, req.digits, `${plugin} dmatrix x`);
 }
 
+function test_simple_trans(M, plugin, req) {
+  // DM-level transpose solve via Linsol::solve(A, b, tr=true).
+  const A = makeA2(M, req.symmetry);
+  const b = M.DM([1, 0.5]);
+  const ls = M.Linsol("S", plugin, A.sparsity());
+  const x = ls.solve(A, b, true);
+  // Reference: solve A^T x = b directly.
+  const Arow = req.symmetry ? [[4, 1], [1, 3]] : [[3, 1], [7, 2]];
+  const ref = npSolve2(Arow, [1, 0.5]);
+  assertArrayAlmostEqual(x.nonzeros(), ref, req.digits, `${plugin} A^T x x`);
+}
+
 function test_simple_trans_mx(M, plugin, req) {
-  // Transpose solve at MX level (the DM-level Linsol::solve ignores its
-  // `tr` arg in current CasADi -- see linsol.cpp).  Use the MX path:
-  // build solve(A^T, b) symbolically and evaluate numerically.
+  // Transpose solve at MX level: build solve(A^T, b) symbolically and
+  // evaluate numerically.  Complements test_simple_trans which tests
+  // the DM-level path.
   const A_ = makeA2(M, req.symmetry);
   const b_ = M.DM([1, 0.5]);
   const A = M.MX.sym("A", 2n, 2n);
@@ -277,6 +289,7 @@ function test_sfact_nfact_explicit(M, plugin, req) {
 const tests = [
   ["test_simple",              test_simple],
   ["test_simple_dmatrix",      test_simple_dmatrix],
+  ["test_simple_trans",        test_simple_trans],
   ["test_simple_trans_mx",     test_simple_trans_mx],
   ["test_simple_multi_rhs",    test_simple_multi_rhs],
   ["test_dense_3x3",           test_dense_3x3],
