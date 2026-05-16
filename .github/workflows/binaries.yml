@@ -637,10 +637,10 @@ jobs:
         include:
           - host: matlab
             version: 2018b
-            arch: manylinux_2_28-x64
+            arch: manylinux2014-x64
           - host: octave
             version: 7.3.0
-            arch: manylinux_2_28-x64
+            arch: manylinux2014-x64
           - host: matlab
             version: 2018b
             arch: windows-shared-x64-posix
@@ -1067,14 +1067,14 @@ jobs:
           py2: "37"
        include:
         - image: "ubuntu-24.04"
-          py2: "311"
+          py2: ["311","314"]
           bit: 64
           glibc_suffix: "-glibc228"
         # ARM Linux runners
         - image: "ubuntu-24.04-arm"
-          py2: "311"
+          py2: ["311","314"]
           bit: 64
-          glibc_suffix: ""
+          glibc_suffix: "-glibc228"
     steps:
       - uses: actions/checkout@v6.0.2
       # Make cl.exe available on Windows
