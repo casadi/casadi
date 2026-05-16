@@ -584,6 +584,7 @@ namespace std {
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
 
+
     // Slice
     bool to_ptr(GUESTOBJECT *p, casadi::Slice** m);
     GUESTOBJECT* from_ptr(const casadi::Slice *a);
@@ -955,6 +956,11 @@ namespace std {
       return PyBool_FromLong(*a);
 #elif defined(SWIGMATLAB)
       return mxCreateLogicalScalar(*a);
+#elif defined(SWIGWASMJS)
+      // Pack as EM_VAL of a JS boolean.  Used by director paths and by
+      // GenericType variant-dispatch when the variant is OT_BOOL.
+      emscripten::val v(static_cast<bool>(*a));
+      return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
 #else
       return 0;
 #endif
@@ -1007,6 +1013,14 @@ namespace std {
       return PyLong_FromLongLong(*a);
 #elif defined(SWIGMATLAB)
       return mxCreateDoubleScalar(static_cast<double>(*a));
+#elif defined(SWIGWASMJS)
+      // Pack as EM_VAL of a JS Number when in safe-integer range, BigInt
+      // otherwise.  Mirrors how the rest of the wasm-js boundary surfaces
+      // casadi_int -- JS callers tolerate either form.
+      emscripten::val v = (*a >  9007199254740992LL || *a < -9007199254740992LL)
+          ? emscripten::val(static_cast<long long>(*a))   // -> BigInt
+          : emscripten::val(static_cast<double>(*a));     // -> Number
+      return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
 #else
       return 0;
 #endif
@@ -1053,6 +1067,9 @@ namespace std {
       return PyFloat_FromDouble(*a);
 #elif defined(SWIGMATLAB)
       return mxCreateDoubleScalar(*a);
+#elif defined(SWIGWASMJS)
+      emscripten::val v(*a);
+      return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
 #else
       return 0;
 #endif
@@ -1282,10 +1299,24 @@ namespace std {
         bool is_arr = v.isArray();
         bool is_obj = (v.typeOf().as<std::string>() == "object") && !is_arr;
         if (is_obj && v.hasOwnProperty("_ptr")) {
-          uintptr_t raw = v["_ptr"].as<uintptr_t>();
+          // Only accept SWIG-tagged proxies whose _swig_type marks
+          // them as std::vector<...>.  Without this check, ANY proxy
+          // with `_ptr` (Function, MX, Callback, ...) gets reinterpret
+          // cast'd as a vector<M>* -- which is what made Callback
+          // proxies passed as nlpsol options' iteration_callback get
+          // misidentified as OT_BOOLVECTOR.
+          emscripten::val swig_t = v["_swig_type"];
+          bool is_vec_proxy =
+              (swig_t.typeOf().as<std::string>() == "string") &&
+              (swig_t.as<std::string>().rfind("_p_std__vectorT_", 0) == 0);
+          if (is_vec_proxy) {
+            uintptr_t raw = v["_ptr"].as<uintptr_t>();
+            v.release_ownership();
+            if (m) *m = reinterpret_cast<std::vector<M>*>(raw);
+            return true;
+          }
           v.release_ownership();
-          if (m) *m = reinterpret_cast<std::vector<M>*>(raw);
-          return true;
+          return false;
         }
         if (is_arr) {
           unsigned n = v["length"].as<unsigned>();
@@ -1419,6 +1450,17 @@ namespace std {
       return mxCreateCharMatrixFromStrings(str.size(), str.empty() ? 0 : &str[0]);
     }
 #endif // SWIGMATLAB
+// wasm-js intentionally does NOT define `from_ptr(const std::vector<std::string>*)`:
+// the regular return path falls through to the generic
+// `from_ptr<std::vector<M>>` template below, which produces a `{_ptr}`
+// carrier wrapped on the JS side as the `StringVector` proxy class
+// (`__vec_to_arr` drains it).  Adding a wasm-js named overload that
+// returned a JS array would break that wrapping (the JS side reads
+// `_ptr` from the return and would find none on a plain array).
+//
+// Director paths instead opt into JS-array form via the
+// `%casadi_director_vec_str` typemap (see casadi.i below) -- registered
+// LATER than the generic directorin so it wins via last-registered.
 
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGWASMJS
@@ -1708,6 +1750,9 @@ namespace std {
       return PyString_FromString(a->c_str());
 #elif defined(SWIGMATLAB)
       return mxCreateString(a->c_str());
+#elif defined(SWIGWASMJS)
+      emscripten::val v(*a);  // emscripten::val has a std::string ctor (UTF-8)
+      return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
 #else
       return 0;
 #endif
@@ -1882,6 +1927,28 @@ namespace std {
 					fieldnames.empty() ? 0 : &fieldnames[0]);
       for (casadi_int k=0; k<fields.size(); ++k) mxSetFieldByNumber(p, 0, k, fields[k]);
       return p;
+#elif defined(SWIGWASMJS)
+      // Pack as EM_VAL of a JS object {key: value, ...}.  For casadi
+      // value types (DM/MX/SX/...), from_ptr<M> returns a bare
+      // `{_ptr}` carrier (SWIG_WASMJS_NewPointerObj returns a pointer-
+      // carrier, not a full proxy -- the wasm-js convention keeps
+      // ownership tracking in the JS-side proxy constructor, unlike
+      // matlab.cxx which returns full proxies from
+      // SWIG_Matlab_NewPointerObj).  The JS-side consumer
+      // (Function.prototype.call's dict branch in %insert("js"))
+      // wraps each value into a proxy class before handing the dict
+      // to the user.  TODO: align with matlab.cxx by having
+      // SWIG_WASMJS_NewPointerObj read `type->clientdata` and return
+      // a real proxy -- coordinated cross-file refactor.
+      emscripten::val obj = emscripten::val::object();
+      for (typename std::map<std::string, M>::const_iterator it=a->begin(); it!=a->end(); ++it) {
+        GUESTOBJECT* e = from_ptr(&it->second);
+        if (!e) return 0;
+        emscripten::val v = emscripten::val::take_ownership(
+            reinterpret_cast< ::emscripten::EM_VAL >(e));
+        obj.set(it->first, v);
+      }
+      return reinterpret_cast<GUESTOBJECT*>(obj.release_ownership());
 #else
       return 0;
 #endif
@@ -2422,7 +2489,17 @@ namespace std {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
  }
 
- // Directorout typemap; as input by value
+ // Directorout typemap; as input by value.
+ //
+ // Works for all targets: wasm-js, matlab, python.  `casadi::to_val`
+ // routes through `to_ptr` which has per-target SWIGWASMJS / SWIGPYTHON /
+ // SWIGMATLAB branches.  `%dirout_fail` is defined for wasm-js in
+ // `Lib/wasm_js/wasm_js.swg` and for matlab/python via
+ // `<typemaps/swigtypemaps.swg>`.
+ //
+ // Per-target specialisations that need a richer body (e.g. wasm-js
+ // wrapping class returns via M.__wrap_<C>) override this via
+ // last-registered-wins; see `%casadi_director_class` below.
 %typemap(directorout, noblock=1, fragment="casadi_all") xType {
     if (!casadi::to_val($input, &$result)) {
       %dirout_fail(SWIG_TypeError,"$type");
@@ -2501,12 +2578,20 @@ namespace std {
  $1 = &m;
 }
 
- // Directorin typemap; as output
+ // Directorin typemap; as output.
+ //
+ // Works for all targets: wasm-js, matlab, python.  Routes through
+ // `casadi::from_ref` / `casadi::from_ptr` which have per-target
+ // SWIGWASMJS / SWIGPYTHON / SWIGMATLAB implementations.  Targets where
+ // the resulting wire form needs domain-specific wrapping (e.g. wasm-js
+ // class types want a real JS proxy via `M.__wrap_<C>`, not the raw
+ // `{_ptr}` carrier `from_ref` builds) override this body via
+ // last-registered-wins.  See `%casadi_director_class` /
+ // `%casadi_director_vec` below.
 %typemap(directorin, noblock=1, fragment="casadi_all") xType, const xType {
     if(!($input = casadi::from_ref($1))) %dirout_fail(SWIG_TypeError,"For director inputs, failed to convert input to " xName ".");
  }
 
- // Directorin typemap; as output
 %typemap(directorin, noblock=1, fragment="casadi_all") const xType& {
     if(!($input = casadi::from_ptr(&$1))) %dirout_fail(SWIG_TypeError,"For director inputs, failed to convert input to " xName ".");
  }
@@ -2586,6 +2671,142 @@ namespace std {
 %casadi_input_typemaps(xName, xStubIn, xTsStub, xPrec, xType)
 %casadi_output_typemaps(xName, xStubIn, xStubOut, xTsStub, xType)
 %enddef
+
+#ifdef SWIGWASMJS
+// ----------------------------------------------------------------------------
+// Director (C++ <-> JS) typemaps for casadi value types.
+//
+// The wasm-js target produces wrapped JS proxy instances (e.g. real `DM`
+// objects with `.nonzeros()`, `.size1()`) rather than raw `{_ptr: N}`
+// carriers, so that a user's `eval(args)` override receives a useful API.
+// Achieved by calling `M.__wrap_<JsName>(ptr)` from C++ via embind --
+// each JS proxy class registers a wrap helper in f_js_classes:
+//   M.__wrap_DM = (p) => new DM(__PRIVATE_CTOR, p);
+//
+// %casadi_director_class(xJsName, xType...)
+//   directorin / directorout for the value type and (in-direction)
+//   const reference to it.
+//
+// %casadi_director_vec(xElemJsName, xElemType...)
+//   directorin / directorout for std::vector<xElemType>.  Builds a JS
+//   array of wrapped element proxies; reverse drains it back into a C++
+//   vector via SWIG_WASMJS_ConvertPtr.
+//
+// %casadi_director_vec_str
+//   Specialisation for std::vector<std::string> -- a JS array of
+//   primitive strings, no per-element wrap helper needed.
+//
+// All bodies follow the wire contract documented in wasm_js.swg:
+//   directorin  : $input <- EM_VAL produced by .release_ownership()
+//   directorout : $result <- C++ value extracted from $input (EM_VAL)
+// ----------------------------------------------------------------------------
+
+%define %casadi_director_class(xJsName, xType...)
+%typemap(directorin, noblock=1) xType, const xType {
+  {
+    xType *__p = new xType($1);
+    emscripten::val __wrap = emscripten::val::module_property("__wrap_" xJsName);
+    $input = __wrap(emscripten::val((uintptr_t)__p)).release_ownership();
+  }
+}
+%typemap(directorin, noblock=1) const xType& {
+  {
+    xType *__p = new xType($1);
+    emscripten::val __wrap = emscripten::val::module_property("__wrap_" xJsName);
+    $input = __wrap(emscripten::val((uintptr_t)__p)).release_ownership();
+  }
+}
+%typemap(directorout, noblock=1) xType, const xType {
+  {
+    emscripten::val __r = emscripten::val::take_ownership($input);
+    EM_VAL __h = __r.release_ownership();
+    void *__p = 0;
+    (void)SWIG_WASMJS_ConvertPtr(__h, &__p, 0, 0);
+    $result = __p ? *static_cast< xType *>(__p) : xType();
+  }
+}
+%enddef
+
+%define %casadi_director_vec(xElemJsName, xElemType...)
+%typemap(directorin, noblock=1) std::vector< xElemType >,
+                                 const std::vector< xElemType >&,
+                                       std::vector< xElemType >& {
+  {
+    emscripten::val __a = emscripten::val::array();
+    emscripten::val __wrap = emscripten::val::module_property("__wrap_" xElemJsName);
+    for (size_t __i = 0; __i < $1.size(); ++__i) {
+      xElemType *__ep = new xElemType($1[__i]);
+      __a.call<void>("push", __wrap(emscripten::val((uintptr_t)__ep)));
+    }
+    $input = __a.release_ownership();
+  }
+}
+%typemap(directorout, noblock=1) std::vector< xElemType > {
+  {
+    emscripten::val __r = emscripten::val::take_ownership($input);
+    std::vector< xElemType > __v;
+    size_t __n = __r["length"].as<size_t>();
+    for (size_t __i = 0; __i < __n; ++__i) {
+      emscripten::val __it = __r[__i];
+      EM_VAL __h = __it.release_ownership();
+      void *__p = 0;
+      (void)SWIG_WASMJS_ConvertPtr(__h, &__p, 0, 0);
+      if (__p) __v.push_back(*static_cast< xElemType *>(__p));
+    }
+    $result = __v;
+  }
+}
+%enddef
+
+// std::vector<std::string>: each element is a JS primitive string, not
+// a proxy class -- so no __wrap_ helper, plain val::as<std::string>().
+%define %casadi_director_vec_str
+%typemap(directorin, noblock=1) std::vector< std::string >,
+                                 const std::vector< std::string >&,
+                                       std::vector< std::string >& {
+  {
+    emscripten::val __a = emscripten::val::array();
+    for (size_t __i = 0; __i < $1.size(); ++__i) {
+      __a.call<void>("push", emscripten::val(std::string($1[__i])));
+    }
+    $input = __a.release_ownership();
+  }
+}
+%typemap(directorout, noblock=1) std::vector< std::string > {
+  {
+    emscripten::val __r = emscripten::val::take_ownership($input);
+    std::vector< std::string > __v;
+    size_t __n = __r["length"].as<size_t>();
+    for (size_t __i = 0; __i < __n; ++__i) {
+      __v.push_back(__r[__i].as<std::string>());
+    }
+    $result = __v;
+  }
+}
+%enddef
+
+// ----------------------------------------------------------------------------
+// jsout for std::map<std::string, X>: drain the wasm-returned EM_VAL handle
+// into a native JS object via `M.__swig_release_handle($call)`.  Without
+// this, the regular return path (e.g. `Function.stats()`) leaks the raw
+// EM_VAL handle (an i32) to the user.  Pairs with the wasm-js branch of
+// `from_ptr<std::map<std::string, M>>` (casadi.i above) which builds the
+// JS object on the C++ side.
+//
+// For dict types whose VALUE type is a casadi value class (DM/MX/SX/...),
+// from_ptr<map> recurses into from_ptr<value_type>, which for class types
+// produces a `{_ptr: <int>}` carrier object.  So dicts of casadi-class
+// values render JS-side as `{key: {_ptr: N}, ...}` -- the user can post-
+// wrap with `new <C>(__PRIVATE_CTOR, val._ptr)` if they need the proxy
+// methods.  Same trade-off as the (intentional) wasm-js return convention
+// for `std::vector<casadi::T>` -> XVector wrapping.
+%define %casadi_dict_jsout(xValueType...)
+%typemap(jsout) std::map< std::string, xValueType >,
+                 const std::map< std::string, xValueType >&,
+                       std::map< std::string, xValueType >&
+"M.__swig_release_handle($call)"
+%enddef
+#endif // SWIGWASMJS
 
 // Order in typemap matching: Lower value means will be checked first
 
@@ -2957,6 +3178,58 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
 %casadi_template(L_DICT, "Mapping[str, GenericType]", "dict[str, GenericType]", "Record<string, GenericType>", PREC_DICT, std::map<std::string, casadi::GenericType>)
 %casadi_template(LDICT(LL L_STR LR), "Mapping[str, Sequence[str]]", "dict[str, list[str]]", "Record<string, string[]>", PREC_DICT, std::map<std::string, std::vector<std::string> >)
 
+#ifdef SWIGWASMJS
+// ----------------------------------------------------------------------------
+// Director (C++ <-> JS) typemap registrations for the wasm-js target.
+//
+// These OVERRIDE the unconditional %typemap(directorin)/(directorout)
+// emitted by %casadi_input_typemaps / %casadi_output_typemaps above (which
+// use casadi::from_ref / casadi::to_val and produce raw `{_ptr}` carriers
+// on the JS side).  For wasm-js we want the JS subclass to see real
+// proxy class instances (with `.size1()`, `.nonzeros()`, etc.) so we
+// emit per-class typemaps that wrap via M.__wrap_<JsName>.
+//
+// Ordering matters: must appear AFTER the %casadi_typemaps invocations
+// so that the wasm-js typemap is the LAST-registered for each pattern
+// and wins typemap lookup.
+// ----------------------------------------------------------------------------
+
+%casadi_director_class("Sparsity",    casadi::Sparsity)
+%casadi_director_class("DM",          casadi::Matrix<double>)
+%casadi_director_class("MX",          casadi::MX)
+%casadi_director_class("SX",          casadi::Matrix<casadi::SXElem>)
+%casadi_director_class("IM",          casadi::Matrix<casadi_int>)
+%casadi_director_class("Function",    casadi::Function)
+%casadi_director_class("Slice",       casadi::Slice)
+%casadi_director_class("SXElem",      casadi::SXElem)
+// GenericType has no `M.__wrap_GenericType` proxy on the JS side
+// (callers see plain JS values via `casadi::to_ptr`-style coercion),
+// so it's intentionally NOT registered as a director class here.
+
+%casadi_director_vec("Sparsity",      casadi::Sparsity)
+%casadi_director_vec("DM",            casadi::Matrix<double>)
+%casadi_director_vec("MX",            casadi::MX)
+%casadi_director_vec("SX",            casadi::Matrix<casadi::SXElem>)
+%casadi_director_vec("Function",      casadi::Function)
+
+%casadi_director_vec_str
+
+// jsout for every dict-shaped return type the casadi API surfaces.
+// Drains the wasm-returned EM_VAL handle into a native JS object.
+// Affects Function.stats() (returns Dict), all opts:Dict accessors,
+// the result.x_dict etc. fields of solver returns, and so on.
+%casadi_dict_jsout(casadi::GenericType)
+%casadi_dict_jsout(casadi::Sparsity)
+%casadi_dict_jsout(casadi::Matrix<double>)
+%casadi_dict_jsout(casadi::MX)
+%casadi_dict_jsout(casadi::Matrix<casadi::SXElem>)
+%casadi_dict_jsout(std::vector<std::string>)
+%casadi_dict_jsout(std::vector< casadi::Sparsity >)
+%casadi_dict_jsout(std::vector< casadi::Matrix<double> >)
+%casadi_dict_jsout(std::vector< casadi::MX >)
+%casadi_dict_jsout(std::vector< casadi::Matrix<casadi::SXElem> >)
+#endif // SWIGWASMJS
+
 // Named std::vector instantiations + array<->vector autoconversion
 // typemaps are now folded into the relevant %casadi_template_vec
 // calls above (one site per type instead of two parallel blocks).
@@ -3012,33 +3285,124 @@ export type DomainType     = number;
 // in lexical scope here.
 // ---------------------------------------------------------------------------
 %insert("js") %{
-  /* Function.call: accept a {name: value} dict for kwargs-style call,
-     mirroring Python's `solver(**dict)`.  Dict input returns a dict
-     keyed by the function's output names; positional array input
-     returns the bare matrix when n_out === 1 (like Python's
-     `f([3, 7])` returning a DM directly) or an array of DMs when
-     n_out > 1.  Optional bool args (always_inline, never_inline)
-     default to false. */
-  const __orig_Function_call = Function.prototype.call;
+  /* Function.call vs callable: two distinct conventions, mirroring
+     Python's casadi.
+       f.call([a, b])          -- ALWAYS returns the full list of outputs
+                                  (`[y0, y1, ...]`).  Programmatically
+                                  stable.  Element type (DM/MX/SX) is
+                                  detected from the input list and the
+                                  matching overload is invoked, so the
+                                  return is `DM[]`, `MX[]`, or `SX[]`
+                                  respectively (mirrors Python's
+                                  type-overloaded f.call).
+       f.call({name: value})   -- dict input -> dict output keyed by
+                                  the function's output names; value
+                                  type detected from the input values
+                                  (DMDict/MXDict/SXDict overloads).
+       f(a, b)                 -- syntax sugar (variadic).  Return shape
+                                  depends on n_out:
+                                     n_out == 0  -> null
+                                     n_out == 1  -> bare output
+                                     n_out  > 1  -> list
+                                  Matches Python's `f(a, b)`.
+       f({i0: x})              -- dict-input sugar; returns dict.
+
+     Implementation note: the SWIG-emit-time Function.prototype.call
+     dispatcher had the "first-wins-per-arity" trap -- only the DM
+     overload was generated for arity 3, so `f.call([MX])` errored
+     with `Failed to convert input 1 to type 'DM'`.  We REPLACE the
+     dispatcher here with one that probes the input type and routes
+     to one of the 6 wasm exports
+       _swig_casadi_Function_call_0  vector<DM>   -> DMVector
+       _swig_casadi_Function_call_1  vector<SX>   -> SXVector
+       _swig_casadi_Function_call_2  vector<MX>   -> MXVector
+       _swig_casadi_Function_call_3  DMDict       -> DMDict
+       _swig_casadi_Function_call_4  SXDict       -> SXDict
+       _swig_casadi_Function_call_5  MXDict       -> MXDict
+     all of which the SWIG-emit already generates on the C++ side. */
   Function.prototype.call = function(arg, always_inline, never_inline) {
     if (always_inline === undefined) always_inline = false;
     if (never_inline  === undefined) never_inline  = false;
-    const is_dict = arg && typeof arg === 'object'
-                 && !Array.isArray(arg)
-                 && !(arg instanceof DMVector)
-                 && !(arg instanceof MXVector)
-                 && !(arg instanceof SXVector);
-    if (!is_dict) {
-      const result = __orig_Function_call.call(this, arg, always_inline, never_inline);
-      return (result.length === 1) ? result[0] : result;
+    const ail = always_inline ? 1 : 0;
+    const nil = never_inline  ? 1 : 0;
+    // Detect positional (list-shaped) vs dict input.
+    const is_list = Array.isArray(arg) || (arg instanceof DMVector)
+                 || (arg instanceof MXVector) || (arg instanceof SXVector);
+    const is_dict = !is_list && arg && typeof arg === 'object'
+                 && !(arg instanceof DM) && !(arg instanceof MX)
+                 && !(arg instanceof SX) && !(arg instanceof Sparsity);
+    if (is_list) {
+      // Detect element type to pick the overload.
+      // Default: DM (matches the existing wasm-js convention for raw
+      // arrays of numbers via casadi's array-to-DM auto-coercion).
+      let mode = 'DM';
+      if (arg instanceof MXVector) mode = 'MX';
+      else if (arg instanceof SXVector) mode = 'SX';
+      else if (Array.isArray(arg)) {
+        for (const e of arg) {
+          if (e instanceof MX) { mode = 'MX'; break; }
+          if (e instanceof SX) { mode = 'SX'; break; }
+        }
+      }
+      let vec, own = false;
+      if (Array.isArray(arg)) {
+        const VecCls = mode === 'MX' ? MXVector : (mode === 'SX' ? SXVector : DMVector);
+        vec = new VecCls();
+        own = true;
+        for (const x of arg) vec.push_back(x);
+      } else {
+        vec = arg;
+      }
+      const fn = mode === 'DM' ? M._swig_casadi_Function_call_0 :
+                 mode === 'SX' ? M._swig_casadi_Function_call_1 :
+                                M._swig_casadi_Function_call_2;
+      const OutVec = mode === 'DM' ? DMVector : (mode === 'SX' ? SXVector : MXVector);
+      const result = __vec_to_arr(new OutVec(__PRIVATE_CTOR,
+        __from_handle(__chk(fn(__unwrap(this), __unwrap(vec), ail, nil)))));
+      if (own && vec.delete) vec.delete();
+      return result;
     }
-    const names = this.name_in();
-    const ordered = names.map(n => (n in arg) ? arg[n] : new DM());
-    const result  = __orig_Function_call.call(this, ordered, always_inline, never_inline);
-    const out_names = this.name_out();
-    const out = {};
-    for (let i = 0; i < out_names.length; ++i) out[out_names[i]] = result[i];
-    return out;
+    if (is_dict) {
+      // Detect value type from the dict's actual values.
+      let mode = 'DM';
+      for (const k of Object.keys(arg)) {
+        const v = arg[k];
+        if (v instanceof MX) { mode = 'MX'; break; }
+        if (v instanceof SX) { mode = 'SX'; break; }
+      }
+      // Route via the DICT wasm exports (_call_3 = DMDict, _call_4 =
+      // SXDict, _call_5 = MXDict).  Those honor casadi's "missing key
+      // = use default" convention -- nlpsol's lbx/ubx default to
+      // -inf/+inf when the key is absent, etc.  Going via the LIST
+      // path would force every slot to receive an empty-DM, which the
+      // solver interprets as a length-0 user-provided bound (defaults
+      // x to 0).  Output values come back as bare `{_ptr}` carriers
+      // from from_ptr<std::map<string,T>>; wrap them as proxy classes
+      // here so the caller sees DM/MX/SX with methods.
+      //
+      // (Aside: matlab.cxx returns full proxies from SWIG_NewPointerObj
+      //  directly; wasm-js puts ownership tracking in the JS-side
+      //  constructor, so NewPointerObj returns a bare carrier and we
+      //  wrap at the consumer.  Refactoring the wasm-js runtime to
+      //  match matlab.cxx is bigger scope -- see SWIG_WASMJS_NewPointerObj
+      //  in Lib/wasm_js/wasm_jsrun.swg.)
+      const fn  = mode === 'DM' ? M._swig_casadi_Function_call_3
+               : mode === 'SX' ? M._swig_casadi_Function_call_4
+               :                  M._swig_casadi_Function_call_5;
+      const Cls = mode === 'DM' ? DM : (mode === 'SX' ? SX : MX);
+      const raw = M.__swig_release_handle(__chk(fn(__unwrap(this),
+        __unwrap(arg), ail, nil)));
+      const out = {};
+      for (const k of Object.keys(raw)) {
+        const v = raw[k];
+        out[k] = (v && typeof v === 'object' && '_ptr' in v
+                  && !(v instanceof Cls))
+          ? new Cls(__PRIVATE_CTOR, v._ptr)
+          : v;
+      }
+      return out;
+    }
+    throw new Error('Function.call: arg must be a list (DM/MX/SX vector or JS array) or a dict object');
   };
 
   /* x.T as a getter property -- matches Python's `x.T`.  The original
@@ -3081,6 +3445,179 @@ export type DomainType     = number;
     const fn = __m[variadic];
     __m[variadic] = __cat_variadic(fn).bind(__m);
     __m[list]     = __cat_list(fn).bind(__m);
+  }
+
+  /* Factory + callable Function instances.  Two ergonomic wins together:
+       1. CONSTRUCTION:
+            const f = M.Function('name', [x], [y]);   // factory (preferred)
+            const f = new M.Function('name', [x], [y]); // also works
+          Established convention in test/javascript/*.js is the factory
+          form (no `new`).  Internally `Function(...)` is just a regular
+          function that delegates to `new __OrigFunction(...)`; since the
+          body returns an object (the callable), `new Function(...)` and
+          `Function(...)` produce the same callable per JS semantics.
+       2. INVOCATION:
+            f([x, y])         <- direct call (sugar for f.call([x, y]))
+            f({i0: x})        <- dict-style call (sugar for f.call({...}))
+            f.call([x, y])    <- explicit
+       Mirrors Python's `f([x, y])` and matches the natural JS calling
+       convention.
+
+     Implementation:  the constructor-returns-a-callable pattern.  Build
+     a real JS function whose `[[Prototype]]` is our `Function.prototype`,
+     so all methods (call, n_in, delete, name_in, expand, ...) still work
+     via prototype lookup AND the function-invocation slot delegates to
+     `.call`.  See the inner-binding-immutability workaround below for
+     why every prototype method needs to be re-wrapped at registration.
+
+     Lifecycle: the wasm pointer was originally registered with
+     `__fr_casadi_Function` against the bare inst (held internally by the
+     class constructor).  We transfer registration to the callable so its
+     destruction (rather than the orphan inst's) triggers
+     `_swig_casadi_Function_delete`.  Setting `inst._ptr = 0` prevents
+     inst.delete() from running on the now-stale handle.
+
+     Why not extend Function: `class Wrapped extends Function { ... }`
+     would require `super(<body>)` with a string body that can't capture
+     enclosing scope -- forcing global state plumbing.  The setPrototypeOf
+     approach is cleaner and equally well-supported.
+
+     SWIG-emitted internal call-sites that build Function instances via
+     `new Function(__PRIVATE_CTOR, ptr)` (e.g. Function.find_function,
+     f.reverse()) bypass the OUTER `Function` binding because ES6 class
+     method bodies bind to the INNER (immutable) class binding -- so we
+     ALSO patch every method on Function.prototype to post-wrap any
+     bare Function instance in its return value.  See the
+     `__wrapFunctionReturning` block below. */
+  const __OrigFunction = Function;
+  // Function methods that collide with own properties of every JS function
+  // instance (`name`, `length`, `caller`, `arguments`, `prototype`).  Of
+  // the 103 methods on casadi::Function only `name()` actually collides.
+  // The collision matters because the JS engine sets `callable.name` as an
+  // own property at function-creation time -- the prototype-chain lookup
+  // that would otherwise resolve to our SWIG method is shadowed.
+  // Re-define the own property to point at the SWIG method so `f.name()`
+  // still returns the function's casadi-name.  (`f.name` thus returns the
+  // method function rather than the JS-engine's debug name -- a minor
+  // trade-off; consoles will display "[Function: name]" instead of "".)
+  const __builtinFnOwn = new Set(Object.getOwnPropertyNames(function(){}));
+  const __FunctionMethodCollisions = Object.getOwnPropertyNames(
+      __OrigFunction.prototype).filter(n =>
+        n !== 'constructor' && __builtinFnOwn.has(n));
+
+  // Turn a freshly-constructed plain Function instance into a callable.
+  // Transfers ownership of the wasm ptr's FinalizationRegistry registration
+  // from `inst` to `callable` and zeros `inst._ptr` so the orphan inst's
+  // GC doesn't double-free.
+  //
+  // Calling convention (mirrors Python's casadi):
+  //   f(a, b)        variadic positional, n_out-dependent return shape
+  //   f({i0: a})     dict input; returns dict (always)
+  //
+  // The args passed to `f(...)` ARE the positional inputs, one per
+  // C++ parm.  We do NOT flatten a single-array arg into multiple
+  // positionals -- `f([1, 2])` for an n_in=1 function passes the
+  // ENTIRE `[1, 2]` array as the first input (where casadi's
+  // `to_ptr<DM>` auto-coerces it to a column DM, matching Python's
+  // `f([1, 2])` semantics for a vector-valued input).  Calling
+  // `f([a, b])` against an n_in=2 function errors loudly -- use
+  // `f(a, b)` for variadic-positional.
+  //
+  // For positional input the return shape is:
+  //   n_out == 0     null      (no outputs; useful for side-effect-only fns)
+  //   n_out == 1     bare      (single output unwrapped)
+  //   n_out  > 1     list      (full output array)
+  //
+  // Programmatic users wanting a stable return shape should use
+  // `f.call([...])` -- the patched .call above always returns a list.
+  function __makeCallableFunction(inst) {
+    const callable = function (...invokeArgs) {
+      // dict-input branch: route through .call which returns a dict.
+      // The dict-shape check must EXCLUDE casadi matrix types (DM, MX,
+      // SX, Sparsity, IM) which are objects too -- otherwise
+      // `f(M.DM(5))` would be misinterpreted as a {...}-dict input.
+      if (invokeArgs.length === 1) {
+        const a = invokeArgs[0];
+        if (a && typeof a === 'object' && !Array.isArray(a)
+            && !(a instanceof DMVector)
+            && !(a instanceof MXVector)
+            && !(a instanceof SXVector)
+            && !(a instanceof DM)
+            && !(a instanceof MX)
+            && !(a instanceof SX)
+            && !(a instanceof Sparsity)
+            && (typeof IM === 'undefined' || !(a instanceof IM))) {
+          return __OrigFunction.prototype.call.call(callable, a);
+        }
+      }
+      // positional: invokeArgs IS the positional list (one entry per parm).
+      const result = __OrigFunction.prototype.call.call(callable, invokeArgs);
+      // After the un-wrap removal from .call, result is always a list.
+      const n_out = Number(callable.n_out());
+      if (n_out === 0) return null;
+      if (n_out === 1) return result[0];
+      return result;
+    };
+    Object.setPrototypeOf(callable, __OrigFunction.prototype);
+    callable._ptr = inst._ptr;
+    __fr_casadi_Function.unregister(inst);
+    __fr_casadi_Function.register(callable, inst._ptr, callable);
+    inst._ptr = 0;
+    for (const __k of __FunctionMethodCollisions) {
+      Object.defineProperty(callable, __k, {
+        value: __OrigFunction.prototype[__k],
+        writable: false,
+        configurable: true,
+      });
+    }
+    return callable;
+  }
+
+  function __WrappedFunction(...args) {
+    return __makeCallableFunction(new __OrigFunction(...args));
+  }
+  __WrappedFunction.prototype = __OrigFunction.prototype;
+  __WrappedFunction.prototype.constructor = __WrappedFunction;
+  // Copy static class members (e.g. Function.expand, Function.if_else,
+  // Function.deserialize, ...) onto the wrapper so M.Function.expand(...)
+  // keeps working.
+  for (const __k of Object.getOwnPropertyNames(__OrigFunction)) {
+    if (__k === 'length' || __k === 'name' || __k === 'prototype') continue;
+    const __d = Object.getOwnPropertyDescriptor(__OrigFunction, __k);
+    if (__d) Object.defineProperty(__WrappedFunction, __k, __d);
+  }
+  Function = __WrappedFunction;
+  __m.Function = __WrappedFunction;
+
+  // Class-method bodies refer to the INNER class binding (immutable per
+  // ES6 semantics) -- so `new Function(__PRIVATE_CTOR, ptr)` inside e.g.
+  // `Function.prototype.expand` always invokes the ORIGINAL constructor,
+  // never `__WrappedFunction`.  As a result `f.expand()` would return a
+  // plain non-callable Function.  Workaround: monkey-patch every method
+  // on Function.prototype so its return value is post-wrapped if it's a
+  // bare Function instance.  Also patch static methods (`Function.expand`,
+  // `Function.deserialize`, ...) for the same reason.
+  const __wrapFunctionReturning = (orig) => function (...args) {
+    const r = orig.apply(this, args);
+    if (r && typeof r === 'object' && r instanceof __OrigFunction
+            && typeof r !== 'function' && r._ptr !== 0) {
+      return __makeCallableFunction(r);
+    }
+    return r;
+  };
+  for (const __k of Object.getOwnPropertyNames(__OrigFunction.prototype)) {
+    if (__k === 'constructor') continue;
+    const __d = Object.getOwnPropertyDescriptor(__OrigFunction.prototype, __k);
+    if (!__d || typeof __d.value !== 'function') continue;
+    Object.defineProperty(__OrigFunction.prototype, __k,
+      { ...__d, value: __wrapFunctionReturning(__d.value) });
+  }
+  for (const __k of Object.getOwnPropertyNames(__WrappedFunction)) {
+    if (__k === 'length' || __k === 'name' || __k === 'prototype') continue;
+    const __d = Object.getOwnPropertyDescriptor(__WrappedFunction, __k);
+    if (!__d || typeof __d.value !== 'function') continue;
+    Object.defineProperty(__WrappedFunction, __k,
+      { ...__d, value: __wrapFunctionReturning(__d.value) });
   }
 %}
 #endif
@@ -5624,13 +6161,45 @@ class global_unpickle_context:
   %}
 }
 #endif // SWIGMATLAB
+#ifdef SWIGWASMJS
+/* JS-side analog of the Python / MATLAB %extend blocks above.  Same
+   idea exactly: pop the type tag, name it via
+   SerializerBase::type_to_string, dispatch to blind_unpack_<name> by
+   dynamic property lookup.  Patching DeserializerBase.prototype covers
+   both StringDeserializer and FileDeserializer (subclasses share the
+   prototype chain).  Today %jscode (= %insert("js")) still lands in
+   the global js slot, not the class body -- wasm_js.cxx does not yet
+   wire %insert("js") inside %extend back into the per-class output --
+   so the prototype assignment is explicit.  Once that wiring exists,
+   this can drop the `DeserializerBase.prototype.` prefix and read
+   `unpack = function() { ... }`. */
+%extend casadi::DeserializerBase {
+  %jscode %{
+    DeserializerBase.prototype.unpack = function () {
+      const name = SerializerBase.type_to_string(this.pop_type());
+      return this["blind_unpack_" + name]();
+    };
+  %}
+}
+#endif // SWIGWASMJS
 
 %feature("director") casadi::OptiCallback;
 
 // Return-by-value
+#ifdef SWIGWASMJS
+/* wasm-js: full() / sparse() helpers aren't implemented for the wasm-js
+   target (they return 0).  Treat native_DM as a regular DM-by-value
+   so OptiSol::value(MX) etc. work: from_ref produces a {_ptr} EM_VAL
+   carrier, the JS-side wrapping in Opti/OptiSol's `value` method
+   then wraps it as `new DM(__PRIVATE_CTOR, ptr)`. */
+%typemap(out, doc="DM", tsstub_out="DM", noblock=1, fragment="casadi_all") casadi::native_DM {
+  if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'DM'.");
+}
+#else
 %typemap(out, doc="double", pystub_out="float", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = full_or_sparse($1, true))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'double'.");
 }
+#endif
 
 
 %apply casadi_int &OUTPUT { Opti::ConstraintType &OUTPUT };
