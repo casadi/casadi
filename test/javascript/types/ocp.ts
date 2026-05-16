@@ -126,8 +126,57 @@ expectType<DM>(block);
 // Note: sparsify(MX) does NOT exist (only DM/SX) -- C++ API gap.
 // At runtime MX expressions carry their own sparsity already.
 
+// ============================================================
+// fatrop options: structure_detection, equality flags, expand
+// ============================================================
+const xfat = MX.sym("x");
+// Pattern from ocp.py test_bug: structure-detection auto/none for
+// fatrop with equality-constraint flags.
+for (const structure_detection of ["none", "auto"] as const) {
+  const opts = {
+    expand: true,
+    structure_detection,
+    equality: [true],
+  };
+  // g = x-1 constraint
+  const sf1 = nlpsol("solver", "fatrop", { x: xfat, g: minus(xfat, new MX(1)) }, opts);
+  expectType<CFn>(sf1);
+  const r1 = sf1.call({ lbg: new DM(0), ubg: new DM(0) });
+  expectType<Record<string, DM>>(r1);
+
+  // g = x
+  const sf2 = nlpsol("solver", "fatrop", { x: xfat, g: xfat }, opts);
+  expectType<CFn>(sf2);
+  const r2 = sf2.call({ lbg: new DM(1), ubg: new DM(1) });
+  expectType<Record<string, DM>>(r2);
+}
+
+// ============================================================
+// Adversarial sparsity construction for fatrop detection
+// (from ocp.py test_detect_adversarial)
+// ============================================================
+const D2_adv = sparsify(new DM([[1, 0, 0], [1, 1, 1]])).sparsity();
+const C2_adv = sparsify(new DM([[0, 1], [0, 0]])).sparsity();
+expectType<Sparsity>(D2_adv);
+expectType<Sparsity>(C2_adv);
+// Zero-pattern sparsity construction
+const A1_zero = new Sparsity(2n, 2n);
+const B1_zero = new Sparsity(2n, 2n);
+expectType<Sparsity>(A1_zero);
+expectType<Sparsity>(B1_zero);
+
+// ============================================================
+// Multi-shot integrator call with parameter sweep
+// ============================================================
+const t0_val = 0.0;
+const tf_vals: number[] = [0.25, 0.5, 0.75, 1.0];
+const F_multi = integrator("Fm", "rk", dae, t0_val, tf_vals);
+expectType<CFn>(F_multi);
+const r_multi = F_multi.call({ x0: new DM([1, 0]), p: new DM(0.2) });
+expectType<Record<string, DM>>(r_multi);
+
 // Pin locals
 void [t, q, p, q0, q1, p0, ode, dae, F, var_mx, par_mx, var0, var1, x0_mx, intg_call, xf,
       parc, cost_expr, cost_fn, nlp, solver, sol, nlp_g, solver_g, sol_g,
       xX, pSX, gSX, lbg, ubg, det_out, idx_g, lb_x, ub_x, lam_to_lam, lin_g,
-      D2, block];
+      D2, block, xfat, D2_adv, C2_adv, A1_zero, B1_zero, t0_val, tf_vals, F_multi, r_multi];
