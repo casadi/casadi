@@ -338,6 +338,8 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: np.arctan2(z,s))
       doit(z,s,lambda z,s: np.copysign(z,s))
       doit(z,s,lambda z,s: np.copysign(s,z))
+      doit(z,s,lambda z,s: z @ s)
+      doit(z,s,lambda z,s: s @ z)
 
     nums = [np.array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), np.array(4),4.0,4]
 
@@ -378,6 +380,20 @@ class typemaptests(casadiTestCase):
         doit(z,s,lambda s,z: s-z)
         doit(z,s,lambda z,s: z/s)
         doit(z,s,lambda s,z: s/z)
+        
+  def test_issue4268(self):
+
+    class Foo:
+        def __rmatmul__(self, other):
+            return 1
+        def __radd__(self, other):
+            return 2
+
+    x= MX.sym("x",2,2)
+
+    f=Foo()
+    print(x + f)
+    print(x @ f)
 
   def test_conversion_operators(self):
     self.message("COnversion operations")
