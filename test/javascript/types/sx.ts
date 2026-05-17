@@ -21,21 +21,21 @@ function expectType<T>(_v: T): void {}
 // ============================================================
 const s0 = SX();
 const s1 = SX(3);
-const sp = Sparsity.dense(2n, 3n);
+const sp = Sparsity.dense(2, 3);
 const s2 = SX(sp);
 
 expectType<SX>(SX.sym("x"));
-expectType<SX>(SX.sym("x", 3n));
-expectType<SX>(SX.sym("x", 3n, 2n));
+expectType<SX>(SX.sym("x", 3));
+expectType<SX>(SX.sym("x", 3, 2));
 expectType<SX>(SX.sym("x", sp));
-expectType<SX[]>(SX.sym("x", sp, 4n));
-expectType<SX[]>(SX.sym("x", 3n, 2n, 4n));
+expectType<SX[]>(SX.sym("x", sp, 4));
+expectType<SX[]>(SX.sym("x", 3, 2, 4));
 
 // ============================================================
 // Arithmetic / math
 // ============================================================
-const sx = SX.sym("sx", 3n);
-const sy = SX.sym("sy", 3n);
+const sx = SX.sym("sx", 3);
+const sy = SX.sym("sy", 3);
 expectType<SX>(plus(sx, sy));
 expectType<SX>(plus(sx, 2));
 expectType<SX>(times(sx, sy));
@@ -50,9 +50,9 @@ expectType<SX>(mtimes(sx, sy.T()));
 // ============================================================
 const expr = sin(sx);
 expectType<bigint>(expr.n_dep());
-expectType<SX>(expr.dep(0n));
+expectType<SX>(expr.dep(0));
 expectType<string>(expr.name());
-expectType<boolean>(expr.is_op(0n));
+expectType<boolean>(expr.is_op(0));
 
 // ============================================================
 // Differentiation

@@ -12,10 +12,10 @@ import { DM, SX, MX, Sparsity, plus, mtimes, vertcat, horzcat, sin, cos } from "
 
 function expectType<T>(_value: T): void {}
 
-const dx = DM.sym("dx", 3n);
-const sx = SX.sym("sx", 3n);
-const mx = MX.sym("mx", 3n);
-const sp = Sparsity.dense(3n, 3n);
+const dx = DM.sym("dx", 3);
+const sx = SX.sym("sx", 3);
+const mx = MX.sym("mx", 3);
+const sp = Sparsity.dense(3, 3);
 
 // --- Most-specific overload selected per leading-arg type ---
 expectType<DM>(plus(dx, dx));

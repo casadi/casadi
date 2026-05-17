@@ -37,20 +37,20 @@ expectType<bigint>(f.n_in());
 expectType<bigint>(f.n_out());
 expectType<string[]>(f.name_in());
 expectType<string[]>(f.name_out());
-expectType<string>(f.name_in(0n));
-expectType<string>(f.name_out(0n));
+expectType<string>(f.name_in(0));
+expectType<string>(f.name_out(0));
 expectType<bigint>(f.index_in("a"));
 expectType<bigint>(f.index_out("s"));
-expectType<Sparsity>(f.sparsity_in(0n));
+expectType<Sparsity>(f.sparsity_in(0));
 expectType<Sparsity>(f.sparsity_in("a"));
-expectType<Sparsity>(f.sparsity_out(0n));
-expectType<[bigint, bigint]>(f.size_in(0n));
+expectType<Sparsity>(f.sparsity_out(0));
+expectType<[bigint, bigint]>(f.size_in(0));
 expectType<[bigint, bigint]>(f.size_in("a"));
-expectType<[bigint, bigint]>(f.size_out(0n));
+expectType<[bigint, bigint]>(f.size_out(0));
 expectType<bigint>(f.nnz_in());
-expectType<bigint>(f.nnz_in(0n));
+expectType<bigint>(f.nnz_in(0));
 expectType<bigint>(f.numel_in());
-expectType<bigint>(f.numel_in(0n));
+expectType<bigint>(f.numel_in(0));
 // info() returns a primitive-valued dict (GenericType variants are
 // unwrapped at the JS marshaling boundary; see %ts_alias_out wiring).
 // Verify the returned-type allows JSON-shaped destructuring.
@@ -63,9 +63,9 @@ if (typeof v === "boolean") expectType<boolean>(v);
 if (typeof v === "bigint") expectType<bigint>(v);
 
 // Symbolic input/output primitive enumeration
-expectType<MX>(f.mx_in(0n));
+expectType<MX>(f.mx_in(0));
 expectType<MX[]>(f.mx_in());
-expectType<SX>(sf.sx_in(0n));
+expectType<SX>(sf.sx_in(0));
 expectType<SX[]>(sf.sx_in());
 
 // ============================================================
@@ -100,12 +100,12 @@ expectType<CFn>(f.expand("f_sx"));
 // ============================================================
 // mapaccum / fold / map
 // ============================================================
-expectType<CFn>(f.mapaccum(10n));
-expectType<CFn>(f.mapaccum("f_acc", 10n));
-expectType<CFn>(f.fold(10n));
-expectType<CFn>(f.map(10n));
-expectType<CFn>(f.map(10n, "openmp"));
-expectType<CFn>(f.map(10n, "thread", 4n));
+expectType<CFn>(f.mapaccum(10));
+expectType<CFn>(f.mapaccum("f_acc", 10));
+expectType<CFn>(f.fold(10));
+expectType<CFn>(f.map(10));
+expectType<CFn>(f.map(10, "openmp"));
+expectType<CFn>(f.map(10, "thread", 4));
 
 // ============================================================
 // Codegen
@@ -140,8 +140,8 @@ expectType<CFn>(ora);
 // ============================================================
 // Forward / reverse AD
 // ============================================================
-expectType<CFn>(f.forward(1n));
-expectType<CFn>(f.reverse(1n));
+expectType<CFn>(f.forward(1));
+expectType<CFn>(f.reverse(1));
 
 // ============================================================
 // Free variables (placeholders that escape construction scope)

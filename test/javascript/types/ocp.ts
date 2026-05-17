@@ -23,12 +23,12 @@ function expectType<T>(_v: T): void {}
 const te = 0.4;
 
 const t = SX.sym("t");
-const q = SX.sym("y", 2n);
-const p = SX.sym("p", 1n);
+const q = SX.sym("y", 2);
+const p = SX.sym("p", 1);
 // ODE: dy/dt = [y1, p + y1^2]
-const q0 = q.get(false, 0n);  // q[0]
-const q1 = q.get(false, 1n);  // q[1]
-const p0 = p.get(false, 0n);
+const q0 = q.get(false, 0);  // q[0]
+const q1 = q.get(false, 1);  // q[1]
+const p0 = p.get(false, 0);
 const ode = vertcat([q1, plus(p0, times(q1, q1))]);
 const dae = { x: q, p: p, t: t, ode: ode };
 const F = integrator("F", "rk", dae, 0, te, {
@@ -42,10 +42,10 @@ expectType<CFn>(F);
 // Integrator output: dict-form call returns Record<string, MX>.
 // (Integrator was built with SX dae, but calling it with MX inputs
 // produces MX outputs since the symbolic chaining picks the MX overload.)
-const var_mx = MX.sym("var", 2n);
-const par_mx = MX.sym("par", 1n);
-const var0 = var_mx.get(false, 0n);
-const var1 = var_mx.get(false, 1n);
+const var_mx = MX.sym("var", 2);
+const par_mx = MX.sym("par", 1);
+const var0 = var_mx.get(false, 0);
+const var1 = var_mx.get(false, 1);
 const x0_mx = vertcat([var0, par_mx]);
 const intg_call = F.call({ x0: x0_mx, p: var1 });
 expectType<Record<string, MX>>(intg_call);
@@ -54,7 +54,7 @@ expectType<MX>(xf);
 
 // Wrap (var, par) -> cost in a Function, then build an NLP on it.
 const parc = MX(0);
-const cost_expr = xf.get(false, 0n);  // first component of xf
+const cost_expr = xf.get(false, 0);  // first component of xf
 const cost_fn = CFn("f", [var_mx, par_mx], [cost_expr]);
 const nlp = { x: var_mx, f: cost_fn.call([var_mx, parc])[0] };
 const solver = nlpsol("solver", "ipopt", nlp, {
@@ -101,11 +101,11 @@ expectType<DM>(fmax(sol["lam_x"], DM(0)));
 // detect_simple_bounds: 5-tuple return via argout aggregation
 // (the C++ signature has FOUR &OUTPUT params + bigint[] return).
 // ============================================================
-const xX = SX.sym("xX", 5n);
-const pSX = SX.sym("p", 2n);
-const gSX = vertcat([xX.get(false, 0n), xX.get(false, 1n)]);
-const lbg = SX.zeros(2n, 1n);
-const ubg = SX.zeros(2n, 1n);
+const xX = SX.sym("xX", 5);
+const pSX = SX.sym("p", 2);
+const gSX = vertcat([xX.get(false, 0), xX.get(false, 1)]);
+const lbg = SX.zeros(2, 1);
+const ubg = SX.zeros(2, 1);
 const det_out = detect_simple_bounds(xX, pSX, gSX, lbg, ubg);
 expectType<[bigint[], SX, SX, CFn, CFn]>(det_out);
 const [idx_g, lb_x, ub_x, lam_to_lam, lin_g] = det_out;
@@ -160,8 +160,8 @@ const C2_adv = sparsify(DM([[0, 1], [0, 0]])).sparsity();
 expectType<Sparsity>(D2_adv);
 expectType<Sparsity>(C2_adv);
 // Zero-pattern sparsity construction
-const A1_zero = Sparsity(2n, 2n);
-const B1_zero = Sparsity(2n, 2n);
+const A1_zero = Sparsity(2, 2);
+const B1_zero = Sparsity(2, 2);
 expectType<Sparsity>(A1_zero);
 expectType<Sparsity>(B1_zero);
 

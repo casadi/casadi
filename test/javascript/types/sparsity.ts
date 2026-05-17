@@ -7,28 +7,28 @@ function expectType<T>(_v: T): void {}
 // ============================================================
 // Factory methods
 // ============================================================
-expectType<Sparsity>(Sparsity.dense(3n, 4n));
-expectType<Sparsity>(Sparsity.dense(3n));            // square shorthand
-expectType<Sparsity>(Sparsity.dense([3n, 4n]));      // [bigint, bigint] form
+expectType<Sparsity>(Sparsity.dense(3, 4));
+expectType<Sparsity>(Sparsity.dense(3));            // square shorthand
+expectType<Sparsity>(Sparsity.dense([3, 4]));      // [bigint, bigint] form
 expectType<Sparsity>(Sparsity.scalar());
 expectType<Sparsity>(Sparsity.scalar(true));
-expectType<Sparsity>(Sparsity.unit(5n, 2n));
-expectType<Sparsity>(Sparsity.upper(4n));
-expectType<Sparsity>(Sparsity.lower(4n));
-expectType<Sparsity>(Sparsity.diag(3n));
-expectType<Sparsity>(Sparsity.diag(3n, 5n));
-expectType<Sparsity>(Sparsity.banded(5n, 1n));
-expectType<Sparsity>(Sparsity.rowcol([0n, 1n], [0n, 2n], 3n, 3n));
-expectType<Sparsity>(Sparsity.triplet(3n, 3n, [0n, 1n], [0n, 2n]));
+expectType<Sparsity>(Sparsity.unit(5, 2));
+expectType<Sparsity>(Sparsity.upper(4));
+expectType<Sparsity>(Sparsity.lower(4));
+expectType<Sparsity>(Sparsity.diag(3));
+expectType<Sparsity>(Sparsity.diag(3, 5));
+expectType<Sparsity>(Sparsity.banded(5, 1));
+expectType<Sparsity>(Sparsity.rowcol([0, 1], [0, 2], 3, 3));
+expectType<Sparsity>(Sparsity.triplet(3, 3, [0, 1], [0, 2]));
 // triplet with invert_mapping returns tuple [Sparsity, mapping]
-const [sp_tri, mapping] = Sparsity.triplet(3n, 3n, [0n, 1n], [0n, 2n], true);
+const [sp_tri, mapping] = Sparsity.triplet(3, 3, [0, 1], [0, 2], true);
 expectType<Sparsity>(sp_tri);
 expectType<bigint[]>(mapping);
 
 // ============================================================
 // Introspection
 // ============================================================
-const sp = Sparsity.dense(3n, 4n);
+const sp = Sparsity.dense(3, 4);
 expectType<bigint>(sp.size1());
 expectType<bigint>(sp.size2());
 expectType<bigint>(sp.numel());
@@ -43,8 +43,8 @@ expectType<boolean>(sp.is_symmetric());
 // ============================================================
 // Set ops
 // ============================================================
-const sp1 = Sparsity.lower(3n);
-const sp2 = Sparsity.upper(3n);
+const sp1 = Sparsity.lower(3);
+const sp2 = Sparsity.upper(3);
 expectType<Sparsity>(sp1.unite(sp2));
 expectType<Sparsity>(sp1.intersect(sp2));
 expectType<boolean>(sp1.is_subset(sp2));
@@ -52,9 +52,9 @@ expectType<boolean>(sp1.is_subset(sp2));
 // ============================================================
 // Matrix-typed triplets
 // ============================================================
-expectType<DM>(DM.triplet([0n, 1n], [0n, 2n], DM([1.0, 2.0])));
-expectType<DM>(DM.triplet([0n, 1n], [0n, 2n], DM([1.0, 2.0]), 3n, 3n));
-expectType<SX>(SX.triplet([0n, 1n], [0n, 2n], SX.sym("v", 2n)));
+expectType<DM>(DM.triplet([0, 1], [0, 2], DM([1.0, 2.0])));
+expectType<DM>(DM.triplet([0, 1], [0, 2], DM([1.0, 2.0]), 3, 3));
+expectType<SX>(SX.triplet([0, 1], [0, 2], SX.sym("v", 2)));
 
 // ============================================================
 // Serialization

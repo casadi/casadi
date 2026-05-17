@@ -13,16 +13,16 @@ expectType<Opti>(opti);
 // variable/parameter return MX
 const x = opti.variable();
 expectType<MX>(x);
-const y = opti.variable(2n);
+const y = opti.variable(2);
 expectType<MX>(y);
-const z = opti.variable(3n, 3n);
+const z = opti.variable(3, 3);
 expectType<MX>(z);
-const z_sp = opti.variable(Sparsity.lower(3n));
+const z_sp = opti.variable(Sparsity.lower(3));
 expectType<MX>(z_sp);
 
 const p = opti.parameter();
 expectType<MX>(p);
-const p2 = opti.parameter(4n, 1n);
+const p2 = opti.parameter(4, 1);
 expectType<MX>(p2);
 
 // minimize: returns void (sets the cost)

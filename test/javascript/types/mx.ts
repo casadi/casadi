@@ -23,25 +23,25 @@ function expectType<T>(_v: T): void {}
 // ============================================================
 const m0 = MX();                       // empty
 const m1 = MX(0);                      // scalar 0
-const sp = Sparsity.dense(3n, 2n);
+const sp = Sparsity.dense(3, 2);
 const m2 = MX(sp);                     // sparse pattern
 
 // MX.sym in its full arity matrix
 expectType<MX>(MX.sym("x"));
-expectType<MX>(MX.sym("x", 3n));
-expectType<MX>(MX.sym("x", 3n, 2n));
+expectType<MX>(MX.sym("x", 3));
+expectType<MX>(MX.sym("x", 3, 2));
 expectType<MX>(MX.sym("x", sp));
 // Vector / matrix-of-MX symbolic primitives
-expectType<MX[]>(MX.sym("x", sp, 4n));
-expectType<MX[]>(MX.sym("x", 3n, 2n, 4n));
-expectType<MX[][]>(MX.sym("x", sp, 4n, 5n));
-expectType<MX[][]>(MX.sym("x", 3n, 2n, 4n, 5n));
+expectType<MX[]>(MX.sym("x", sp, 4));
+expectType<MX[]>(MX.sym("x", 3, 2, 4));
+expectType<MX[][]>(MX.sym("x", sp, 4, 5));
+expectType<MX[][]>(MX.sym("x", 3, 2, 4, 5));
 
 // ============================================================
 // Arithmetic (free-fn forms) -- coercion + return narrowing
 // ============================================================
-const x = MX.sym("x", 3n);
-const y = MX.sym("y", 3n);
+const x = MX.sym("x", 3);
+const y = MX.sym("y", 3);
 
 expectType<MX>(plus(x, y));
 expectType<MX>(plus(x, 2));
@@ -73,9 +73,9 @@ expectType<MX>(ceil(x));
 expectType<MX>(vertcat([x, y]));
 expectType<MX>(horzcat([x, y]));
 expectType<MX>(diagcat([x, y]));
-expectType<MX>(reshape(x, 1n, 3n));
+expectType<MX>(reshape(x, 1, 3));
 expectType<MX>(reshape(x, sp));
-expectType<MX>(repmat(x, 2n, 3n));
+expectType<MX>(repmat(x, 2, 3));
 expectType<MX>(transpose(x));
 
 // Method-form transpose (.T())
@@ -101,7 +101,7 @@ const f = CFn("f", [x, y], [plus(x, y), times(x, y)]);
 expectType<CFn>(f);
 expectType<bigint>(f.n_in());
 expectType<bigint>(f.n_out());
-expectType<Sparsity>(f.sparsity_in(0n));
+expectType<Sparsity>(f.sparsity_in(0));
 expectType<Sparsity>(f.sparsity_in("i0"));
 
 // Call: positional array form returns MX[]
@@ -110,8 +110,8 @@ expectType<MX[]>(f.call([x, y]));
 expectType<Record<string, MX>>(f.call({ i0: x, i1: y }));
 
 // Apply same Function to DM concrete values
-const dx = DM.sym("dx", 3n);
-const dy = DM.sym("dy", 3n);
+const dx = DM.sym("dx", 3);
+const dy = DM.sym("dy", 3);
 expectType<DM[]>(f.call([dx, dy]));
 expectType<Record<string, DM>>(f.call({ i0: dx, i1: dy }));
 
@@ -140,10 +140,10 @@ expectType<MX>(dot(x, y));
 // ============================================================
 // Indexing / slicing -- get / set with Slice + IM + sparsity
 // ============================================================
-const M = MX.sym("M", 3n, 3n);
+const M = MX.sym("M", 3, 3);
 // scalar element via two-index get -- _Slice = Slice | number | bigint
 // so passing a bare bigint works without wrapping in `Slice(...)`.
-expectType<MX>(M.get(false, 0n, 1n));
+expectType<MX>(M.get(false, 0, 1));
 // row slice
 const Mt: MX = M.T();
 expectType<MX>(Mt);
@@ -172,8 +172,8 @@ import {
   sumsqr, project, if_else, conditional, find,
 } from "./casadi";
 
-const A = MX.sym("A", 3n, 3n);
-const xvec = MX.sym("xvec", 3n);
+const A = MX.sym("A", 3, 3);
+const xvec = MX.sym("xvec", 3);
 expectType<MX>(det(A));
 expectType<MX>(trace(A));
 expectType<MX>(kron(A, A));
@@ -226,18 +226,18 @@ const dscalar = DM(5);
 const nz: number = dscalar.nonzeros()[0];
 expectType<number>(nz);
 expectType<[bigint, bigint]>(dnum.size());
-expectType<bigint>(dnum.size(0n));
+expectType<bigint>(dnum.size(0));
 
 // set: mutates in place, returns void
 const dtarget = DM(3);
-dtarget.set(DM(7), false, 0n);
+dtarget.set(DM(7), false, 0);
 
 // ============================================================
 // Function I/O bookkeeping
 // ============================================================
-expectType<number>(f_unary.default_in(0n));
-expectType<number>(f_unary.max_in(0n));
-expectType<number>(f_unary.min_in(0n));
+expectType<number>(f_unary.default_in(0));
+expectType<number>(f_unary.max_in(0));
+expectType<number>(f_unary.min_in(0));
 
 // Pin all locals so --noUnusedLocals stays quiet if ever enabled.
 void [m0, m1, m2, M, Mt, ser, f_unary, gx, sp, A, xvec, cond, a_branch, b_branch,

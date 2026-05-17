@@ -46,13 +46,13 @@ expectType<Record<string, MX>>(res_sym);
 // ============================================================
 // QP: conic (sparsity-only) and qpsol (SX/MX-typed)
 // ============================================================
-const H = Sparsity.diag(2n);
-const A = Sparsity.dense(1n, 2n);
+const H = Sparsity.diag(2);
+const A = Sparsity.dense(1, 2);
 const qp_conic = { h: H, a: A };
 expectType<CFn>(conic("qp", "qrqp", qp_conic));
 
-const x_qp = MX.sym("x", 2n);
-const qp_mx = { x: x_qp, f: sumsqr(x_qp), g: plus(x_qp.get(false, 0n), x_qp.get(false, 1n)) };
+const x_qp = MX.sym("x", 2);
+const qp_mx = { x: x_qp, f: sumsqr(x_qp), g: plus(x_qp.get(false, 0), x_qp.get(false, 1)) };
 expectType<CFn>(qpsol("qp", "qrqp", qp_mx));
 
 // ============================================================

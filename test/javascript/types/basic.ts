@@ -25,13 +25,13 @@ function expectType<T>(_value: T): void { /* type-only assertion */ }
 const d0 = DM();
 const d1 = DM(5);
 const d2 = DM([[1, 2], [3, 4]]);
-const sp = Sparsity.dense(3n, 3n);
+const sp = Sparsity.dense(3, 3);
 const d3 = DM(sp);
 
 // --- Static `sym` reachable on the subclass (was previously only on Gen<X>) ---
-const dx = DM.sym("dx", 3n);
-const sx = SX.sym("sx", 3n);
-const mx = MX.sym("mx", 3n);
+const dx = DM.sym("dx", 3);
+const sx = SX.sym("sx", 3);
+const mx = MX.sym("mx", 3);
 expectType<DM>(dx);
 expectType<SX>(sx);
 expectType<MX>(mx);
