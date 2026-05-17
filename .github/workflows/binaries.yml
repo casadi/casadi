@@ -1,29 +1,3 @@
-# CI Skip Tags - Add to commit message to skip specific CI jobs:
-#
-# Platform skips:
-#   [skip-ci:linux]      - Skip all Linux builds
-#   [skip-ci:windows]    - Skip all Windows builds
-#   [skip-ci:osx]        - Skip all macOS builds
-#
-# Language binding skips:
-#   [skip-ci:python]     - Skip Python builds and tests
-#   [skip-ci:matlab]     - Skip MATLAB builds and tests
-#   [skip-ci:octave]     - Skip Octave tests
-#
-# Build phase skips:
-#   [skip-ci:build]      - Skip core library builds (use cached)
-#   [skip-ci:test]       - Skip all test jobs
-#   [skip-ci:test-long]  - Skip long-running tests (valgrind, examples)
-#   [skip-ci:docs]       - Skip documentation generation
-#   [skip-ci:certify]    - Skip macOS notarization (slow)
-#
-# Python version:
-#   [skip-ci:manypython] - Only build Python 3.10 (skip other versions)
-#
-# Other workflows (in their respective .yml files):
-#   [skip-ci:style]      - Skip style/lint checks (style.yml)
-#   [skip-ci:compilers]  - Skip compiler matrix tests (compilers.yml)
-
 name: binaries
 
 on: [push, pull_request]
@@ -147,7 +121,6 @@ jobs:
         path: casadi_source.zip
 
   test-python-source-package:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:test]') }}
     runs-on: ${{ matrix.image }}
     needs: [swig]
     strategy:
@@ -176,7 +149,6 @@ jobs:
         shell: bash -el {0}
 
   core-osx:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:osx]') && !contains(github.event.head_commit.message, '[skip-ci:build]') }}
     runs-on: ${{ matrix.image }}
     strategy:
       fail-fast: false
@@ -222,37 +194,20 @@ jobs:
           retention-days: 5
 
   core-dockcross:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:build]') && !( contains(github.event.head_commit.message, '[skip-ci:linux]') && contains(github.event.head_commit.message, '[skip-ci:windows]') ) }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         target: [manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,manylinux_2_28-x64,manylinux_2_28-aarch64,windows-shared-x64-posix]
     steps:
-      - name: Check platform skip
-        id: skip-check
-        env:
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
-          TARGET: ${{ matrix.target }}
-        run: |
-          if [[ "$COMMIT_MSG" == *"[skip-ci:linux]"* ]] && [[ "$TARGET" != *"windows"* ]]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-          elif [[ "$COMMIT_MSG" == *"[skip-ci:windows]"* ]] && [[ "$TARGET" == *"windows"* ]]; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
       - uses: actions/checkout@v6.0.2
-        if: steps.skip-check.outputs.skip != 'true'
         with:
           fetch-depth: 0 # for git-restore-mtime
           submodules: recursive
       - uses: jgillis/git-restore-mtime-action@master
-        if: steps.skip-check.outputs.skip != 'true'
         with:
           args: "--commit-time"
       - name: Setup dockcross
-        if: steps.skip-check.outputs.skip != 'true'
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.target }}:production
           docker image inspect ghcr.io/jgillis/${{ matrix.target }}:production
@@ -261,17 +216,14 @@ jobs:
           pwd
           ls -al dockcross
       - name: Cache build dir
-        if: steps.skip-check.outputs.skip != 'true'
         uses: actions/cache@v5.0.5
         with:
           key: core-build-${{ github.ref }}-${{ matrix.target }}-${{env.cache-suffix}}
           path: build
       - uses: casadi/mockups@master
-        if: steps.skip-check.outputs.skip != 'true'
         with:
           tag: ${{ matrix.target }}
       - name: Build
-        if: steps.skip-check.outputs.skip != 'true'
         run: |
           rm -f build/CMakeCache.txt
           ./dockcross cmake -Bbuild -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} ${{ contains(matrix.target,'aarch64') && env.build_flags_aarch64 || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
@@ -280,9 +232,7 @@ jobs:
           # Needed to make CoinUtils work
           ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
       - run: tar --format=posix -czf ${{github.job}}-${{matrix.target}}.tar.gz build
-        if: steps.skip-check.outputs.skip != 'true'
       - uses: actions/upload-artifact@v7.0.1
-        if: steps.skip-check.outputs.skip != 'true'
         with:
           name: ${{github.job}}-${{ matrix.target}}
           path: ${{github.job}}-${{matrix.target}}.tar.gz
@@ -315,41 +265,8 @@ jobs:
                   arch: [manylinux2014-aarch64]
                   py2: ["37","38","39","310","311"]
                   glibc_suffix: [""]
-      - id: filter-matrix
-        env:
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
-        run: |
-          # Write base matrix to file to avoid shell escaping issues
-          cat << 'MATRIX_EOF' > /tmp/matrix.json
-          ${{ steps.build-matrix.outputs.matrix }}
-          MATRIX_EOF
-
-          # Filter by manypython (only keep py310)
-          if [[ "$COMMIT_MSG" == *"[skip-ci:manypython]"* ]]; then
-            jq -c '{include: [.include[] | select(.py2 == "310")]}' /tmp/matrix.json > /tmp/matrix2.json && mv /tmp/matrix2.json /tmp/matrix.json
-          fi
-
-          # Filter by platform
-          if [[ "$COMMIT_MSG" == *"[skip-ci:linux]"* ]]; then
-            jq -c '{include: [.include[] | select(.arch | contains("windows"))]}' /tmp/matrix.json > /tmp/matrix2.json && mv /tmp/matrix2.json /tmp/matrix.json
-          fi
-          if [[ "$COMMIT_MSG" == *"[skip-ci:windows]"* ]]; then
-            jq -c '{include: [.include[] | select(.arch | contains("windows") | not)]}' /tmp/matrix.json > /tmp/matrix2.json && mv /tmp/matrix2.json /tmp/matrix.json
-          fi
-
-          # Check if matrix is empty
-          count=$(jq '.include | length' /tmp/matrix.json)
-          if [[ "$count" == "0" ]]; then
-            echo "empty=true" >> $GITHUB_OUTPUT
-            # Add dummy entry to prevent GitHub Actions error
-            echo 'matrix={"include":[{"arch":"skip","py2":"skip"}]}' >> $GITHUB_OUTPUT
-          else
-            echo "empty=false" >> $GITHUB_OUTPUT
-            echo "matrix=$(jq -c . /tmp/matrix.json)" >> $GITHUB_OUTPUT
-          fi
     outputs:
-      matrix: ${{ steps.filter-matrix.outputs.matrix }}
-      empty: ${{ steps.filter-matrix.outputs.empty }}
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
 
   matrix-arch-py2-mac:
     runs-on: ubuntu-24.04
@@ -368,35 +285,10 @@ jobs:
                   image: [macos-14]
                   target: [arm64]
                   py2: ["38","39","310","311"]
-      - id: filter-matrix
-        env:
-          COMMIT_MSG: ${{ github.event.head_commit.message }}
-        run: |
-          # Write base matrix to file to avoid shell escaping issues
-          cat << 'MATRIX_EOF' > /tmp/matrix.json
-          ${{ steps.build-matrix.outputs.matrix }}
-          MATRIX_EOF
-
-          # Filter by manypython (only keep py310)
-          if [[ "$COMMIT_MSG" == *"[skip-ci:manypython]"* ]]; then
-            jq -c '{include: [.include[] | select(.py2 == "310")]}' /tmp/matrix.json > /tmp/matrix2.json && mv /tmp/matrix2.json /tmp/matrix.json
-          fi
-
-          # Check if matrix is empty
-          count=$(jq '.include | length' /tmp/matrix.json)
-          if [[ "$count" == "0" ]]; then
-            echo "empty=true" >> $GITHUB_OUTPUT
-            echo 'matrix={"include":[{"image":"skip","target":"skip","py2":"skip"}]}' >> $GITHUB_OUTPUT
-          else
-            echo "empty=false" >> $GITHUB_OUTPUT
-            echo "matrix=$(jq -c . /tmp/matrix.json)" >> $GITHUB_OUTPUT
-          fi
     outputs:
-      matrix: ${{ steps.filter-matrix.outputs.matrix }}
-      empty: ${{ steps.filter-matrix.outputs.empty }}
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
 
   python-osx:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:osx]') && !contains(github.event.head_commit.message, '[skip-ci:python]') && needs.matrix-arch-py2-mac.outputs.empty != 'true' }}
     needs: [core-osx,matrix-arch-py2-mac,swig,version]
     runs-on: ${{ matrix.image }}
     strategy:
@@ -462,7 +354,7 @@ jobs:
              zip -rq ../casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip .
       - run: python misc/certify.py "${{ secrets.CODESIGN_IDENTITY }}" casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip "${{ secrets.APPLE_ID }}" "${{ secrets.APPLE_TEAM_ID }}" "${{ secrets.NOTARIZE_PASSWORD }}"
         shell: bash -el {0}
-        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' && !contains(github.event.head_commit.message, '[skip-ci:certify]') }}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
       - uses: actions/upload-artifact@v7.0.1
         with:
           name: casadi-${{env.deploy_arch}}-py${{matrix.py2}}
@@ -543,7 +435,6 @@ jobs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
   matlab-osx:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:osx]') && !contains(github.event.head_commit.message, '[skip-ci:matlab]') }}
     needs: [core-osx,matrix-arch-matlab-mac,swig,version]
     runs-on: ${{matrix.image }}
     strategy:
@@ -599,7 +490,7 @@ jobs:
              zip -rq ../../casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip .
       - run: python misc/certify.py "${{ secrets.CODESIGN_IDENTITY }}" casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip "${{ secrets.APPLE_ID }}" "${{ secrets.APPLE_TEAM_ID }}" "${{ secrets.NOTARIZE_PASSWORD }}"
         shell: bash -el {0}
-        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' && !contains(github.event.head_commit.message, '[skip-ci:certify]') }}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}-${{matrix.target}}-${{matrix.host}}${{matrix.version}}.zip
@@ -628,7 +519,6 @@ jobs:
           retention-days: 5
 
   matlab-dockcross:
-    if: ${{ !( contains(github.event.head_commit.message, '[skip-ci:matlab]') && contains(github.event.head_commit.message, '[skip-ci:octave]') ) && !( contains(github.event.head_commit.message, '[skip-ci:linux]') && contains(github.event.head_commit.message, '[skip-ci:windows]') ) }}
     needs: [core-dockcross,swig,version]
     runs-on: ubuntu-24.04
     strategy:
@@ -724,7 +614,6 @@ jobs:
           retention-days: 5
 
   python-dockcross:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:python]') && needs.matrix-arch-py2.outputs.empty != 'true' }}
     needs: [core-dockcross,matrix-arch-py2,swig,version]
     runs-on: ubuntu-24.04
     strategy:
@@ -851,7 +740,7 @@ jobs:
 
 
   test-matlab:
-    if: ${{ !cancelled() && (needs.matlab-dockcross.result == 'success' || needs.matlab-osx.result == 'success') && !contains(github.event.head_commit.message, '[skip-ci:matlab]') && !contains(github.event.head_commit.message, '[skip-ci:test]') }}
+    if: ${{ !cancelled() && (needs.matlab-dockcross.result == 'success' || needs.matlab-osx.result == 'success') }}
     runs-on: ${{matrix.image}}
     needs: [matlab-dockcross,matlab-osx]
     env:
@@ -928,7 +817,6 @@ jobs:
         if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
 
   test-octave:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:octave]') && !contains(github.event.head_commit.message, '[skip-ci:test]') }}
     runs-on: ${{matrix.image}}
     needs: [matlab-dockcross,matlab-osx]
     strategy:
@@ -984,7 +872,6 @@ jobs:
       #  if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
 
   docs:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:docs]') }}
     runs-on: ubuntu-22.04
     needs: [python-dockcross,matlab-dockcross,version]
     steps:
@@ -1051,7 +938,6 @@ jobs:
         if: contains(github.ref, 'release') || contains(github.ref, 'main') 
 
   test-python:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:python]') && !contains(github.event.head_commit.message, '[skip-ci:test]') }}
     runs-on: ${{ matrix.image }}
     needs: [python-osx,python-dockcross]
     strategy:
@@ -1157,7 +1043,6 @@ jobs:
         if: contains(matrix.image, 'windows')
 
   test-python-long:
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci:python]') && !contains(github.event.head_commit.message, '[skip-ci:test-long]') && !contains(github.event.head_commit.message, '[skip-ci:test]') }}
     runs-on: ${{matrix.image }}
     needs: [python-osx,python-dockcross,version]
     strategy:
