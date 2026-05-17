@@ -1,0 +1,53 @@
+name: Orphaned nightly releases
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Mondays 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: List orphaned nightly releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # Collect every release whose name starts with "nightly-".
+          mapfile -t names < <(
+            gh api --paginate "repos/$REPO/releases" \
+              --jq '.[] | select(.name != null and (.name | startswith("nightly-"))) | .name'
+          )
+
+          echo "Found ${#names[@]} nightly-* release(s)."
+
+          {
+            echo "## Orphaned nightly releases"
+            echo ""
+            echo "Releases named \`nightly-<branch>\` whose branch no longer exists in \`$REPO\`."
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          orphans=0
+          for name in "${names[@]}"; do
+            branch="${name#nightly-}"
+            # URL-encode slashes so branch names like "feature/foo" work.
+            encoded="${branch//\//%2F}"
+            status=$(gh api -i "repos/$REPO/branches/$encoded" 2>/dev/null \
+              | head -n1 | awk '{print $2}' || echo "000")
+            if [ "$status" != "200" ]; then
+              echo "- \`$name\` (missing branch: \`$branch\`)" >> "$GITHUB_STEP_SUMMARY"
+              orphans=$((orphans + 1))
+            fi
+          done
+
+          if [ "$orphans" -eq 0 ]; then
+            echo "_None._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "Orphaned: $orphans"
