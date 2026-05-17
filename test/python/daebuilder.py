@@ -477,7 +477,7 @@ class Daebuildertests(casadiTestCase):
         # Prepend initial state
         x_all = ca.horzcat(x0, x_all)
         # Also calculate the state at the end
-        xf = ca.mtimes(x_all, D)
+        xf = x_all @  D
         # Print solution
         print('x_all: ', x_all)
         print('xf: ', xf)
@@ -492,7 +492,7 @@ class Daebuildertests(casadiTestCase):
         # Prepend initial state
         x_all = ca.horzcat(x0, x_all)
         # Also calculate the state at the end
-        xf = ca.mtimes(x_all, D)
+        xf = x_all @  D
         # Print solution
         print('x_all: ', x_all)
         print('xf: ', xf)
@@ -539,7 +539,7 @@ class Daebuildertests(casadiTestCase):
             vk = ca.reshape(vk, len(x), d)
             vk = ca.horzcat(xk, vk)
             # Get the state at the end
-            xk = ca.mtimes(vk, D)
+            xk = vk @  D
             # Save trajectory
             x_all.append(xk)
         # Embed in a CasADi Function

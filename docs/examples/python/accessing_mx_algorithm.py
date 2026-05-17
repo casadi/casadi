@@ -30,7 +30,7 @@ import numpy as np
 a = MX.sym('a')
 b = MX.sym('b',2)
 c = MX.sym('c',2,2)
-f = Function("f", [a,b,c], [3*mtimes(c,b)*a + b], ['a', 'b', 'c'], ['r'])
+f = Function("f", [a,b,c], [3*(c @ b)*a + b], ['a', 'b', 'c'], ['r'])
 
 # Input values of the same dimensions as the above
 input_val = [numpy.array([2.0]),\

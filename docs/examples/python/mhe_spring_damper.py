@@ -164,9 +164,9 @@ for i in range(1,Nsimulation-N+1):
   print("step %d/%d (%s)" % (i, Nsimulation-N , nlpsol.stats()["return_status"]))
   H0 = H(solution["X",0])
   K = mtimes([P,H0.T,linalg.inv(mtimes([H0,P,H0.T])+R)])
-  P = mtimes((DM.eye(Nstates)-mtimes(K,H0)),P)
+  P = ((DM.eye(Nstates)-K @ H0)) @ P
   h0 = h(solution["X",0])
-  x0 = x0 + mtimes(K, current_parameters["Y",0]-h0-mtimes(H0,x0-solution["X",0]))
+  x0 = x0 + K @ ( current_parameters["Y",0]-h0-H0 @ (x0-solution["X",0]))
   x0 = phi(x0, current_parameters["U",0], solution["W",0])
   F = PHI(solution["X",0], current_parameters["U",0], solution["W",0])
   P = mtimes([F,P,F.T]) + linalg.inv(Q)
@@ -210,5 +210,5 @@ plt.grid()
 plt.show()
 
 error = estimated_X[0,:]-simulated_X[0,:]
-print(mtimes(error,error.T))
-assert mtimes(error,error.T)<0.01
+print(error @ error.T)
+assert error @ error.T<0.01

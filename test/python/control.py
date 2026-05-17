@@ -78,8 +78,8 @@ class Controltests(casadiTestCase):
           print (n,K)
           A_ = [randstable(n) for i in range(K)]
           
-          V_ = [mtimes(v,v.T) for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
-          V2_ = [mtimes(v,v.T) for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
+          V_ = [v @ v.T for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
+          V2_ = [v @ v.T for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
           S = kron(Sparsity.diag(K),Sparsity.dense(n,n))
           solver = dplesol("solver", Solver,{'a':S,'v':repmat(S,1,2)}, options)
           
@@ -121,7 +121,7 @@ class Controltests(casadiTestCase):
           numpy.random.seed(1)
           print (n,K)
           A_ = [randstable(n) for i in range(K)]          
-          V_ = [mtimes(v,v.T) for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
+          V_ = [v @ v.T for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
         
           inputs = {"a":hcat(A_), "v": hcat(V_)}
           

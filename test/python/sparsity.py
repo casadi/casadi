@@ -214,7 +214,7 @@ class Sparsitytests(casadiTestCase):
 
   def test_refcount(self):
       x = DM(Sparsity.lower(4),5)
-      s = mtimes(x,x).sparsity()
+      s = (x @ x).sparsity()
       self.assertEqual(s.numel(),16)
 
   def test_splower(self):

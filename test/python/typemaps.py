@@ -245,7 +245,7 @@ class typemaptests(casadiTestCase):
       for R in RB:
         #y = L @ R
         y = eval("L @ R",{"L":L,"R":R})
-        self.checkarray(y,mtimes(A,B))
+        self.checkarray(y,A @ B)
     As = SX.sym("x",2,2)
     Bs = SX.sym("x",2,2)
     for L in [As,A]:
@@ -253,7 +253,7 @@ class typemaptests(casadiTestCase):
         #y = L @ R
         y = eval("L @ R",{"L":L,"R":R})
         yf = Function('y',[As,Bs],[y])
-        self.checkarray(yf(A,B),mtimes(A,B))
+        self.checkarray(yf(A,B),A @ B)
     As = MX.sym("x",2,2)
     Bs = MX.sym("x",2,2)
     for L in [As,A]:
@@ -261,7 +261,7 @@ class typemaptests(casadiTestCase):
         #y = L @ R
         y = eval("L @ R",{"L":L,"R":R})
         yf = Function('y',[As,Bs],[y])
-        self.checkarray(yf(A,B),mtimes(A,B))
+        self.checkarray(yf(A,B),A @ B)
 
   def test_autoconversionMX(self):
     self.message("Auto conversion MX")

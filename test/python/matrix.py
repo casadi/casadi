@@ -49,7 +49,7 @@ class Matrixtests(casadiTestCase):
   def test_inv(self):
     self.message("Matrix inverse")
     a = DM([[1,2],[1,3]])
-    self.checkarray(mtimes(c.inv(a),a),eye(2),"DM inverse")
+    self.checkarray(c.inv(a) @ a,eye(2),"DM inverse")
 
   def test_trans(self):
     self.message("trans")
@@ -914,7 +914,7 @@ class Matrixtests(casadiTestCase):
     A = numpy.random.random((10,2))
     B = numpy.random.random((2,8))
 
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(norm_inf_mul(A,B),norm_inf(A @ B))
     self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
     # Sparse
@@ -925,14 +925,14 @@ class Matrixtests(casadiTestCase):
     A = sparsify(A)
     B = sparsify(B)
 
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(norm_inf_mul(A,B),norm_inf(A @ B))
     self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
 
     A = numpy.random.random((8,2))
     B = numpy.random.random((2,10))
 
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(norm_inf_mul(A,B),norm_inf(A @ B))
     self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
     # Sparse
@@ -943,7 +943,7 @@ class Matrixtests(casadiTestCase):
     A = sparsify(A)
     B = sparsify(B)
 
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(norm_inf_mul(A,B),norm_inf(A @ B))
     self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
   def  test_mul3_issue_1465(self):
@@ -957,17 +957,17 @@ class Matrixtests(casadiTestCase):
 
     for i in range(4):
       A = numpy.random.random((3,3))
-      H = mtimes(A,A.T)
+      H = A @ A.T
 
       R = chol(H)
 
       assert R.is_triu()
-      self.checkarray(mtimes(R.T,R),H)
+      self.checkarray(R.T @ R,H)
   def test_skew(self):
     x = DM([1,7,13])
     self.checkarray(inv_skew(skew(x)),x)
     y = DM([0.2,0.9,0.4])
-    self.checkarray(mtimes(skew(x),y),cross(x,y))
+    self.checkarray(skew(x) @ y,cross(x,y))
 
   def test_nz_overflow(self):
     d = DM([2,3])
@@ -1111,9 +1111,9 @@ class Matrixtests(casadiTestCase):
     [D,Lt,p] = ldl(H)
     P = DM.eye(10)[:,p]
 
-    F = mtimes(mtimes(sqrt(diag(D)),DM.eye(10)+Lt),P.T)
-    print(H-mtimes(F.T,F))
-    self.assertTrue(norm_fro(H-mtimes(F.T,F))<=1e-14)
+    F = sqrt(diag(D)) @ (DM.eye(10)+Lt) @ P.T
+    print(H-F.T @ F)
+    self.assertTrue(norm_fro(H-F.T @ F)<=1e-14)
 
 
   def test_im_bugs(self):
@@ -1166,9 +1166,9 @@ class Matrixtests(casadiTestCase):
     self.checkarray(DM(p).T,S.permutation_vector())
     self.assertTrue(S.is_permutation())
     v = DM.rand(n)
-    self.checkarray(mtimes(S,v), v[p])
+    self.checkarray(S @ v, v[p])
     S = Sparsity.permutation(p, True)
-    self.checkarray((mtimes(S,v))[p], v)
+    self.checkarray(((S @ v))[p], v)
 
   def test_sparsity_orthonormality(self):
     alltests = [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_rows',False),('is_orthonormal_columns',False),('is_selection',False),('is_permutation',),('is_orthonormal',False),('is_orthonormal',True)]
@@ -1290,7 +1290,7 @@ class Matrixtests(casadiTestCase):
     for X in [SX,MX]:
       b = X.sym("b",n)
       x = X.sym("x",P)
-      f = Function("f",[x,b],[mtimes(x,b)])
+      f = Function("f",[x,b],[x @ b])
       f.generate('f.c')
       fs.append(f)  
     x0 = DM(P,DM.rand(n))

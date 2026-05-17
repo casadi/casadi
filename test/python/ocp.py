@@ -93,7 +93,7 @@ class OCPtests(casadiTestCase):
         x = vertcat(x0,u0,x1,u1,x2,u2)
         nlp = {}
         nlp["x"] = x
-        nlp["g"] = DM.zeros(A.shape[0],1) + mtimes(A,x)
+        nlp["g"] = DM.zeros(A.shape[0],1) + A @ x
         
         nlp["f"] = sumsqr(x-DM.rand(x.numel(),1))
         
@@ -418,7 +418,7 @@ class OCPtests(casadiTestCase):
                 B = DM([[1,0],[0,1],[0.5,0.5]])
                 D = DM([[0.2,0.3],[0.8,0.7],[0.1,1]])
 
-                F = Function("F",[x,u],[mtimes(A,x)+mtimes(B,u)])
+                F = Function("F",[x,u],[A @ x+B @ u])
 
                     
                 # "Lift" initial conditions
@@ -430,7 +430,7 @@ class OCPtests(casadiTestCase):
                 
                 
                 # Add equality constraint
-                g   += [mtimes(D,Xk_next)-Xk]
+                g   += [D @ Xk_next-Xk]
                 lbg += [0, 0, 0]
                 ubg += [0, 0, 0]
                 equality+= [True,True, True]
@@ -576,7 +576,7 @@ class OCPtests(casadiTestCase):
             A = DM([[1,0.1],[0.2,1.1]])
             B = DM([[0.2],[0.7]])
 
-            F = Function("F",[x,u],[mtimes(A,x)+mtimes(B,u)])
+            F = Function("F",[x,u],[A @ x+B @ u])
 
             # Formulate the NLP
             for k in range(N):
@@ -765,14 +765,14 @@ class OCPtests(casadiTestCase):
         w0  += [0.7, 0.8, 0.9]
             
         # Add equality constraint
-        g   += [Xk-mtimes(D,Xk_next)]
+        g   += [Xk-D @ Xk_next]
         lbg += [0, 0, 0]
         ubg += [0, 0, 0]
         equality += [True,True,True]
 
         u = MX.sym("u",2)
         x = MX.sym("x",3)
-        F = Function("F",[x,u],[mtimes(A,x)+mtimes(B,u)])
+        F = Function("F",[x,u],[A @ x+B @ u])
 
         # Formulate the NLP
         for k in range(N):

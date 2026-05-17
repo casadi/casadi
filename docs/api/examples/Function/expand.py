@@ -32,7 +32,7 @@ import casadi as c
 x = MX.sym("x",2,2)
 y = MX.sym("y",2,1)
 
-z = mtimes(x,y)
+z = x @ y
 
 # Let's construct an MXfunction
 

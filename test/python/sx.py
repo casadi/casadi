@@ -88,7 +88,7 @@ class SXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
     self.matrixbinarypool.append(lambda a: hypot(a[0],a[1]),lambda a: np.hypot(a[0],a[1]),"hypot")
     #self.matrixbinarypool.append(lambda a: dot(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="dot(Matrix,Matrix)")
-    self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: np.dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: a[0] @ a[1].T,lambda a: np.dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
 
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
 
@@ -220,7 +220,7 @@ class SXtests(casadiTestCase):
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SX")
-      self.assertRaises(RuntimeError, lambda : mtimes(x,y))
+      self.assertRaises(RuntimeError, lambda : x @ y)
 
   def test_SXbinary_codegen(self):
       self.message("SX binary operations")
@@ -284,7 +284,7 @@ class SXtests(casadiTestCase):
         y0=DM(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).full()
 
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[x0,y0],name="SX",setx0=[x0,y0])
-      self.assertRaises(RuntimeError, lambda : mtimes(xx,yy))
+      self.assertRaises(RuntimeError, lambda : xx @ yy)
 
 
   @known_bug()  # Test refactoring, cf. #1436
@@ -1125,7 +1125,7 @@ class SXtests(casadiTestCase):
 
     filt = Sparsity.diag(N)+Sparsity.triplet(N,N,[1],[3])
 
-    f = Function("f", [x,y],[mtimes(x,y)])
+    f = Function("f", [x,y],[x @ y])
     f_in = [0]*f.n_in()  # type: list
 
     f_in[0]=x_
@@ -1200,14 +1200,14 @@ class SXtests(casadiTestCase):
      a = SX(5,0)
      b = SX(0,3)
 
-     c = mtimes(a,b)
+     c = a @ b
 
      self.assertEqual(c.nnz(),0)
 
      a = SX(5,3)
      b = SX(3,4)
 
-     c = mtimes(a,b)
+     c = a @ b
 
      self.assertEqual(c.nnz(),0)
 
@@ -1552,7 +1552,7 @@ class SXtests(casadiTestCase):
       z = vertcat(7*x + 6*y+7 ,5 -p*y )
       [A,b] = linear_coeff(z,xy)
 
-      e = mtimes(A,xy)+b
+      e = A @ xy+b
 
       f = Function('f',[xy,p],[z])
       f2 = Function('f',[xy,p],[e])
@@ -1573,7 +1573,7 @@ class SXtests(casadiTestCase):
     x = MX.sym("x")
     y = MX.sym("y")
     z = MX.sym("z")
-    w = mtimes(sqrt(z),sin(x*y))
+    w = sqrt(z) @ sin(x*y)
 
     f = Function('f',[x,y,z],[x*y*z,w])
     print(f)
@@ -1622,7 +1622,7 @@ class SXtests(casadiTestCase):
     x = MX.sym("x",3)
     y = MX.sym("y")
     z = MX.sym("z")
-    w = mtimes(A*sqrt(z),sin(x*y))
+    w = A*sqrt(z) @ sin(x*y)
 
     f = Function('f',[x,y,z],[(x*y*z)[:2],w])
     print(f)
@@ -1665,18 +1665,18 @@ class SXtests(casadiTestCase):
     
     self.assertTrue("{3}" in str(callnode.get_output(3)))
     
-    print(cos(mtimes(v2[1],v2[0].T)/y).shape)
-    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)/y)])
+    print(cos(v2[1] @ v2[0].T/y).shape)
+    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(v2[1] @ v2[0].T/y)])
     
     with self.assertOutput("f:(i0[3],i1,i2)->(o0[2],o1[3])",[]):
         print(f)
     with self.assertOutput("[[@2,@3],[@4,@5,@7]] = f([@2,@3,@4],@5,@6);",[]):
         F2.disp(True)
 
-    F1 = Function('F',[x,y,z],[sin(v[0]*y-args[-1]),cos(mtimes(v[1],v[0].T)/y)])    
+    F1 = Function('F',[x,y,z],[sin(v[0]*y-args[-1]),cos(v[1] @ v[0].T/y)])    
     for ad_weight in [True,False]:
         for ad_weight_sp in [True,False]:
-            F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)/y)],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
+            F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(v2[1] @ v2[0].T/y)],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
                     
             self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
 
@@ -1696,7 +1696,7 @@ class SXtests(casadiTestCase):
 
     self.assertTrue(check)
 
-    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)/y)],{"cse":True})
+    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(v2[1] @ v2[0].T/y)],{"cse":True})
     self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
     
     res = F2.find_functions()
@@ -1718,14 +1718,14 @@ class SXtests(casadiTestCase):
     self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
     
     
-    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)[1]/y)])
+    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos((v2[1] @ v2[0].T)[1]/y)])
     with self.assertOutput("[[@2,@3],[NULL,@4,NULL]] = f([@2,@3,@4],@5,@6);",[]):
         F2.disp(True)
 
-    F1 = Function('F',[x,y,z],[sin(v[0]*y-args[-1]),cos(mtimes(v[1],v[0].T)[1]/y)])    
+    F1 = Function('F',[x,y,z],[sin(v[0]*y-args[-1]),cos((v[1] @ v[0].T)[1]/y)])    
     for ad_weight in [True,False]:
         for ad_weight_sp in [True,False]:
-            F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)[1]/y)],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
+            F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos((v2[1] @ v2[0].T)[1]/y)],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
                     
             self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
 
@@ -1748,7 +1748,7 @@ class SXtests(casadiTestCase):
             x = X.sym("x",3)
             y = X.sym("y")
             z = X.sym("z")
-            w = mtimes(A*sqrt(z),sin(x*y))
+            w = A*sqrt(z) @ sin(x*y)
             
             f = Function('fun',[x,y,z],[(x*y*z)[:2],w],{"never_inline":never_inline})
 

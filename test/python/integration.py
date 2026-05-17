@@ -736,7 +736,7 @@ class Integrationtests(casadiTestCase):
     t=SX.sym("t")
     q=SX.sym("q",3,1)
     p=SX.sym("p",9,1)
-    dae = {'t':t, 'x':q, 'p':p, 'ode':mtimes(c.reshape(p,3,3),q)}
+    dae = {'t':t, 'x':q, 'p':p, 'ode':c.reshape(p,3,3) @ q}
     opts = {}
     opts["fsens_err_con"] = True
     opts["steps_per_checkpoint"] = 1000
@@ -761,7 +761,7 @@ class Integrationtests(casadiTestCase):
     q=SX.sym("q",3,1)
     p=SX.sym("p",9,1)
 
-    dae = {'t':t, 'x':q, 'p':p, 'ode':mtimes(c.reshape(p,3,3),q)}
+    dae = {'t':t, 'x':q, 'p':p, 'ode':c.reshape(p,3,3) @ q}
     opts = {}
     opts["fsens_err_con"] = True
     opts["reltol"] = 1e-15
@@ -928,7 +928,7 @@ class Integrationtests(casadiTestCase):
     A = SX.sym("A",N,N)
     x = SX.sym("x",N)
 
-    dae = {'x':x, 'p':vec(A), 'ode':mtimes(A,x)}
+    dae = {'x':x, 'p':vec(A), 'ode':A @ x}
     I = casadi.integrator("I", "cvodes", dae, {"fsens_err_con": True, 'reltol' : 1e-12})
     I_in =  {}
     I_in["x0"]=x0_

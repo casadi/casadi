@@ -149,7 +149,7 @@ class Functiontests(casadiTestCase):
 
     def test(sp):
       x = SX.sym("x",sp.size2())
-      sp2 = jacobian(mtimes(DM.ones(sp),x),x).sparsity()
+      sp2 = jacobian(DM.ones(sp) @ x,x).sparsity()
       self.checkarray(sp.row(),sp2.row());
       self.checkarray(sp.colind(),sp2.colind());
 
@@ -346,14 +346,14 @@ class Functiontests(casadiTestCase):
     n = 1
     x = SX.sym("x",n)
 
-    M = Function("M", [x],[mtimes((x-DM(list(range(n)))),x.T)])
+    M = Function("M", [x],[((x-DM(list(range(n))))) @ x.T])
 
     P = MX.sym("P",n,n)
     X = MX.sym("X",n)
 
     M_X= M(X)
 
-    Pf = Function("P", [X, P], [mtimes(M_X,P)])
+    Pf = Function("P", [X, P], [M_X @ P])
 
     P_P = jacobian_old(Pf, 1, 0)
 
@@ -483,7 +483,7 @@ class Functiontests(casadiTestCase):
 
     res = foo(a,b,c)
 
-    self.checkarray(res[0],mtimes(a*c,b))
+    self.checkarray(res[0],a*c @ b)
     self.checkarray(res[1],c**2)
 
   def test_callback_errors(self):
@@ -570,9 +570,9 @@ class Functiontests(casadiTestCase):
             x = arg[0]
             # Fill in smarter numerical code
             if self.flag_transp:
-                y = mtimes(self.A.T,x)
+                y = self.A.T @ x
             else:
-                y = mtimes(self.A,x)
+                y = self.A @ x
             return [y]
 
         def get_n_in(self):
@@ -630,7 +630,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",{"x":x,"y":y,"z":z,"v":v,"I":mtimes(z,y)+x,"II":sin(y*x).T,"III":v/x},["x","y","z","v"],["I","II","III"])
+    fun = Function("f",{"x":x,"y":y,"z":z,"v":v,"I":z @ y+x,"II":sin(y*x).T,"III":v/x},["x","y","z","v"],["I","II","III"])
 
     n = 2
 
@@ -661,7 +661,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -700,7 +700,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -738,7 +738,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     X_ = [ DM(x.sparsity(),np.random.random(x.nnz())) for i in range(10) ]
     Y_ = [ DM(y.sparsity(),np.random.random(y.nnz())) for i in range(10) ]
@@ -762,7 +762,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -809,7 +809,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -942,7 +942,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("v",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,x)+y,sin(y*x).T,v/y])
+    fun = Function("f",[x,y,z,v],[z @ x+y,sin(y*x).T,v/y])
 
     n = 2
 
@@ -981,7 +981,7 @@ class Functiontests(casadiTestCase):
           self.checkfunction(f,Fref,inputs=inputs)
           self.check_codegen(f,inputs=inputs)
 
-    fun = Function("f",[y,x,z,v],[mtimes(z,x)+y+c.trace(v)**2,sin(y*x).T,v/y])
+    fun = Function("f",[y,x,z,v],[z @ x+y+c.trace(v)**2,sin(y*x).T,v/y])
 
     for ad_weight in range(2):
       for ad_weight_sp in range(2):
@@ -1014,7 +1014,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("v",Sparsity.upper(3))
 
-    fun = Function("f",[y,z,x,v],[mtimes(z,x)+y,sin(y*x).T,v/y],["y","z","x","v"],["out0","out1","out2"])
+    fun = Function("f",[y,z,x,v],[z @ x+y,sin(y*x).T,v/y],["y","z","x","v"],["out0","out1","out2"])
 
     n = 2
 
@@ -1034,7 +1034,7 @@ class Functiontests(casadiTestCase):
     for sf,sF in zip(scheme_out_fun,scheme_out_F):
       self.assertTrue(sf==sF)
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,x)+y,sin(y*x).T,v/y],["x","y","z","v"],["out0","out1","out2"])
+    fun = Function("f",[x,y,z,v],[z @ x+y,sin(y*x).T,v/y],["x","y","z","v"],["out0","out1","out2"])
 
     n = 2
 
@@ -1851,7 +1851,7 @@ class Functiontests(casadiTestCase):
         x = MX.sym('x',n)
         As = MX.sym('A',n,n)
 
-        dae = {'x':x,'p':vec(As),'ode':mtimes(As,x)}
+        dae = {'x':x,'p':vec(As),'ode':As @ x}
         intg = integrator('intg','cvodes',dae,{'reltol':1e-14,'abstol':1e-14})
 
         Intg = intg.map('identity','serial',n,[1],[])
@@ -1911,7 +1911,7 @@ class Functiontests(casadiTestCase):
   def test_max_num_dir(self):
     x = MX.sym("x",10)
 
-    f = Function("ffff",[x],[mtimes(DM.ones(10,10),x)],{"max_num_dir":4,"verbose":True})
+    f = Function("ffff",[x],[DM.ones(10,10) @ x],{"max_num_dir":4,"verbose":True})
     f = f.expand()
 
 
@@ -1957,7 +1957,7 @@ class Functiontests(casadiTestCase):
     if not args.run_slow: return
     x = MX.sym("x",3)
     y = MX.sym("y",3,3)
-    f = Function("f",[x,y],[x**3,mtimes(y,x)])
+    f = Function("f",[x,y],[x**3,y @ x])
     c = CodeGenerator('me')
     c.add(f, True)
     
@@ -2872,7 +2872,7 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x",5)
     y = MX.sym("x",5,5)
 
-    f = Function("f",[x,y],[mtimes(y,x),mtimes(y.T,x)],{"never_inline":True,"is_diff_in":[False,True],"is_diff_out":[False,True]})
+    f = Function("f",[x,y],[y @ x,y.T @ x],{"never_inline":True,"is_diff_in":[False,True],"is_diff_out":[False,True]})
     
     
 
@@ -4437,9 +4437,9 @@ class Functiontests(casadiTestCase):
 
     A = MX(DM.rand(2,2))
     B = MX(DM.rand(2,2))
-    C = mtimes(A,B)
+    C = A @ B
 
-    C = mtimes(C,C)
+    C = C @ C
 
     x = MX.sym("x")
     f = Function('f',[x],[(x*(2*C)+(2*C))*C[0]])

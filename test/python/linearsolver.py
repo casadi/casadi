@@ -134,8 +134,8 @@ class LinearSolverTests(casadiTestCase):
 
         solver_out = solver.call(solver_in)
 
-        self.checkarray(mtimes(A.T,solver_out[0]),DM.zeros(m,n-m))
-        self.checkarray(mtimes(solver_out[0].T,solver_out[0]),DM.eye(n-m))
+        self.checkarray(A.T @ solver_out[0],DM.zeros(m,n-m))
+        self.checkarray(solver_out[0].T @ solver_out[0],DM.eye(n-m))
 
         options["ad_weight"] = 0
         options["ad_weight_sp"] = 0
@@ -226,7 +226,7 @@ class LinearSolverTests(casadiTestCase):
       f_out = f(A0, b_)
 
       self.checkarray(f_out,np.linalg.solve(A0,b_))
-      self.checkarray(mtimes(A0,f_out),b_)
+      self.checkarray(A0 @ f_out,b_)
 
   def test_pseudo_inverse(self):
     numpy.random.seed(0)
@@ -243,14 +243,14 @@ class LinearSolverTests(casadiTestCase):
       f = Function("f", [A],[B])
       f_out = f(A_)
 
-      self.checkarray(mtimes(A_,f_out),DM.eye(4))
+      self.checkarray(A_ @ f_out,DM.eye(4))
 
       f = Function("f", [As],[pinv(As)])
       f_out = f(A_)
 
-      self.checkarray(mtimes(A_,f_out),DM.eye(4))
+      self.checkarray(A_ @ f_out,DM.eye(4))
 
-      solve(mtimes(A,A.T),A,Solver,options)
+      solve(A @ A.T,A,Solver,options)
       pinv(A_,Solver,options)
 
       #self.checkarray(mtimes(A_,pinv(A_,Solver,options)),DM.eye(4))
@@ -267,12 +267,12 @@ class LinearSolverTests(casadiTestCase):
 
       f = Function("f", [A],[B])
       f_out = f(A_)
-      self.checkarray(mtimes(A_,f_out),DM.eye(3))
+      self.checkarray(A_ @ f_out,DM.eye(3))
 
       f = Function("f", [As],[pinv(As)])
       f_out = f(A_)
 
-      self.checkarray(mtimes(A_,f_out),DM.eye(3))
+      self.checkarray(A_ @ f_out,DM.eye(3))
 
       #self.checkarray(mtimes(pinv(A_,Solver,options),A_),DM.eye(3))
 
@@ -289,7 +289,7 @@ class LinearSolverTests(casadiTestCase):
 
       sol = np.linalg.solve(A0,b)
       self.checkarray(C,sol)
-      self.checkarray(mtimes(A0,sol),b)
+      self.checkarray(A0 @ sol,b)
 
   def test_simple_trans(self):
     A = DM([[3,1],[7,2]])
@@ -428,12 +428,12 @@ class LinearSolverTests(casadiTestCase):
 
       C = solve(A,b,Solver,options)
 
-      self.checkarray(mtimes(A,C),b)
+      self.checkarray(A @ C,b)
 
       f = Function("f", [As,bs],[solve(As,bs,Solver,options)])
       f_out = f(A, b)
 
-      self.checkarray(mtimes(A,f_out),b)
+      self.checkarray(A @ f_out,b)
 
   def test_ma27(self):
       n = np.nan
@@ -466,7 +466,7 @@ class LinearSolverTests(casadiTestCase):
       A = self.randDM(n,n,sparsity=0.5)
       b = self.randDM(n,3)
       if "posdef" in req:
-        A = mtimes(A.T, A)
+        A = A.T @  A
         A = densify(A)
       elif "symmetry" in req:
         A = A.T+A
@@ -478,13 +478,13 @@ class LinearSolverTests(casadiTestCase):
       C = solve(A,b,Solver,options)
       digits = 7 if "ma" in str(Solver) else 10
 
-      self.checkarray(mtimes(A,C),b,digits=digits)
+      self.checkarray(A @ C,b,digits=digits)
 
       for As_,A_ in [(As,A),(densify(As),densify(A)),(densify(As).T,densify(A).T),(densify(As.T),densify(A.T)),(As.T,A.T)]:
         f = Function("f", [As,bs],[solve(As_,bs,Solver,options)])
         f_out = f(A, b)
 
-        self.checkarray(mtimes(A_,f_out),b,digits=digits)
+        self.checkarray(A_ @ f_out,b,digits=digits)
 
   def test_dimmismatch(self):
     A = DM.eye(5)
@@ -650,10 +650,10 @@ class LinearSolverTests(casadiTestCase):
     
         P = MX.sym("p", p)
 
-        f0 = Function("f",[P],[solve(A, mtimes(B,P))], {"ad_weight_sp": 0})
+        f0 = Function("f",[P],[solve(A, B @ P)], {"ad_weight_sp": 0})
         S1=f0.jac_sparsity(0,0)
  
-        f1 = Function("f",[P],[solve(A, mtimes(B,P))], {"ad_weight_sp": 1})
+        f1 = Function("f",[P],[solve(A, B @ P)], {"ad_weight_sp": 1})
         S2=f1.jac_sparsity(0,0)
       
         self.assertTrue(S1==S2)

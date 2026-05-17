@@ -142,7 +142,7 @@ class ConicTests(casadiTestCase):
     x = MX.sym("x", n)
     # --- Hessian: dense symmetric matrix ---
     M = DM.rand(n,n)
-    H = 0.5 * mtimes(M,M.T)  # symmetrize
+    H = 0.5 * (M @ M.T)  # symmetrize
 
     # --- Linear term ---
     f = 100 * DM.rand(n,1)
@@ -159,7 +159,7 @@ class ConicTests(casadiTestCase):
       
       if conic not in ["daqp"]:
         solver = qpsol('solver', conic,
-                          {'f': mtimes(f.T,x), 'x': x, "g": mtimes(A,x)},
+                          {'f': f.T @ x, 'x': x, "g": A @ x},
                           {'discrete': [1] * ms + [0] * (n-ms)}
                           )
                           
@@ -173,7 +173,7 @@ class ConicTests(casadiTestCase):
 
         # Using casadi qpsol
         solver = qpsol('solver', conic,
-                          {'f': 0.5*mtimes(x.T,mtimes(H,x)) + mtimes(f.T,x), 'x': x, "g": mtimes(A,x)},
+                          {'f': 0.5*(x.T @ H @ x) + f.T @ x, 'x': x, "g": A @ x},
                           {'discrete': [1] * ms + [0] * (n-ms)}
                           )
         solver(**solver_in)
@@ -834,7 +834,7 @@ class ConicTests(casadiTestCase):
     H = c.diag(list(range(1,N+1)))
     x0 = DM(list(range(N)))
 
-    G = -1.0*mtimes(H,x0)
+    G = -1.0*(H @ x0)
 
     A =  DM(0,N)
 
@@ -914,7 +914,7 @@ class ConicTests(casadiTestCase):
         self.checkarray(solver_out["x"],DM([-0.19230768069,1.6846153915,0.692307690769276]),str(conic),digits=max(1,6-less_digits))
         self.assertAlmostEqual(solver_out["cost"][0],-5.850384678537,max(1,5-less_digits),str(conic))
         if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,0,0]),str(conic),digits=max(1,6-less_digits))
-        if aux_options["dual"]: self.checkarray(mtimes(A.T,solver_out["lam_a"]),DM([3.876923073076,2.4384615365384965,-1]),str(conic),digits=max(1,6-less_digits))
+        if aux_options["dual"]: self.checkarray(A.T @ solver_out["lam_a"],DM([3.876923073076,2.4384615365384965,-1]),str(conic),digits=max(1,6-less_digits))
 
   def test_linear(self):
     H = DM(2,2)
@@ -1117,7 +1117,7 @@ class ConicTests(casadiTestCase):
     lbg += [0.1]
     ubg += [2]
 
-    J+= mtimes(Xs[-1].T,Xs[-1])
+    J+= Xs[-1].T @ Xs[-1]
 
     w += [Xs[-1]]
     lbw += [-inf, -inf]
@@ -1390,13 +1390,13 @@ class ConicTests(casadiTestCase):
          [0.506784822363357  , 1.223678163433993 ,  0.712607093594686 ,  3.340935020356804]])
 
       x0 = DM([1,2,3,4])
-      f = -mtimes(x.T,mtimes(H,x0))
+      f = -(x.T @ H @ x0)
 
       [D,Lt,p] = ldl(H)
 
-      F = mtimes(sqrt(diag(D)),DM.eye(4)+Lt)
+      F = sqrt(diag(D)) @ (DM.eye(4)+Lt)
 
-      h = soc(vertcat(sqrt(2)*mtimes(F,x),1-y),1+y)
+      h = soc(vertcat(sqrt(2)*(F @ x),1-y),1+y)
 
       solver = casadi.qpsol("msyolver",conic,{'x': vertcat(x,y),"f": y+f,"h":h},qp_options)
       res = solver(lbx=vertcat(-inf,-inf,-inf,-inf,1))
