@@ -151,7 +151,23 @@ function test_types_suite() {
 // Per-target ratchet via JS_TIER3_BUDGET because the .js suite was
 // not written with TS-correctness in mind -- expect a non-zero
 // initial count.  Ratchet DOWN as files get cleaned up.
-const JS_TIER3_BUDGET = 0;
+// Tier-3 budget is non-zero because expanding to runTests-style files
+// (integration.js, sx.js, matrix.js, etc.) surfaced ~44 d.ts↔runtime
+// mismatches that need separate cleanup:
+//
+//   * `.T` is a getter at runtime (casadi.js %insert("js") block) but
+//     the d.ts declares `T(): DM` as a method.  Tests do `a.T` not `a.T()`.
+//   * StringDeserializer's `unpack` is added dynamically at runtime
+//     (JS dispatcher on pop_type()).  Not in the d.ts.
+//   * Custom GenericType field access (e.g. `stats.bar`) needs narrowing
+//     in the test code; could be improved with type guards.
+//   * A couple of test-code bugs: passing function references instead of
+//     calling them, treating returned arrays as scalars.
+//   * Director subclass internal `_ptr` access.
+//
+// All real issues, none structural to the d.ts shape.  Ratchet down as
+// each category is addressed; never raise silently.
+const JS_TIER3_BUDGET = 44;
 const JS_TYPECHECK_SKIP = new Set([
   "tsc_stubs.js",      // this harness itself
   "_helpers.js",       // helper module
@@ -230,20 +246,15 @@ function test_js_suite_typecheck() {
       // a useless union without annotation.
       body = body.replace(/(const\s+(ALL_PLUGINS|ALL_SOLVERS|ALL_FUNCTIONS)\s*=\s*\[)/,
         `/** @type {any[]} */\n$1`);
-      // NOTE: files that delegate test-running to _helpers.runTests
-      // (integration.js, sx.js, misc.js, etc.) accept M as a test-fn
-      // parameter rather than constructing it locally.  We could
-      // annotate `function test_XXX(M, ...)` to type M, but that
-      // surfaces ~560 errors from the JS-test idiom `M.DM(x)` /
-      // `M.SX(x)` / `M.Function(...)` -- calling the class without
-      // `new`.  At runtime that works (casadi.js wraps each class
-      // in a Proxy with an `apply` trap that forwards to
-      // Reflect.construct), but the d.ts declares classes as
-      // new-only.  Fixing properly requires the d.ts emitter to
-      // emit each class as `class & { (...): T }` (callable + newable)
-      // -- a substantial change.  Tracked as a known gap; for now,
-      // tier 3 covers only the canonical `const M = await create()`
-      // pattern (~12 files).
+      // Files that delegate test-running to _helpers.runTests have no
+      // local `const M = await create()` -- M arrives via the test
+      // function's first parameter.  Annotate `function test_XXX(M, ...)`
+      // declarations so M is typed against the module shape.  The
+      // d.ts now emits classes in callable+newable form (see
+      // wasm_js.cxx `class <Name>__class` + `const <Name>` pattern),
+      // so the JS-test idiom `M.DM(x)` (sans `new`) typechecks.
+      body = body.replace(/^function\s+(test_\w+)\s*\(\s*M([,)])/gm,
+        `/** @param {typeof import("./casadi")} M */\nfunction $1(M$2`);
       // Skip files that don't have the create() pattern (likely
       // helper modules that already passed the _ prefix filter).
       // Skip files where no annotation pattern matched -- nothing to

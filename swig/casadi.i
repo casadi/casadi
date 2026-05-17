@@ -3313,6 +3313,13 @@ export type _Slice = Slice | number | bigint;
 export type _GenericType = boolean | bigint | number | string | Function
                          | readonly _GenericType[]
                          | { readonly [k: string]: _GenericType };
+// JS callers regularly pass plain `number` literals where casadi_int
+// (-> bigint on the wasm boundary) is expected.  The wasm marshaling
+// auto-converts, so widen `bigint` -> `_bigint = bigint | number` on
+// INPUT positions only.  Output stays `bigint` for narrow typing of
+// size / index / count returns.  Hooked up via %ts_alias_in(bigint)
+// below.
+export type _bigint = bigint | number;
 export type _MIndex = number | bigint | bigint[] | boolean[] | Sparsity | DM;
 
 // Note: DMVector / MXVector / SXVector are NOT type aliases here -- they
@@ -3337,6 +3344,38 @@ export type VariableType   = number;
 export type DomainType     = number;
 
 // ---------------------------------------------------------------------
+// JS-side concat aliases.  At runtime, casadi.i's %insert("js")
+// block adds variadic + list-form aliases to the concat family:
+//   vertcat(a, b, c)  -- variadic
+//   vcat([a, b, c])   -- list form
+//   (analogous hcat / dcat).
+// The auto-generated d.ts only declares the C++-direct names
+// (vertcat / horzcat / diagcat).  Re-export the list-form aliases
+// so JS-test code calling `M.vcat([...])` typechecks.
+export declare const vcat: typeof vertcat;
+export declare const hcat: typeof horzcat;
+export declare const dcat: typeof diagcat;
+
+// Make Function instances callable at the type level.  At runtime,
+// casadi.js wraps Function instances so `f(arg)` evaluates as
+// shorthand for `f.call(arg)`.  The auto-generated class body only
+// has `.call(...)` so without this merge, `f([3, 7])` would
+// typecheck as "instance has no call signature".  This is a
+// casadi-specific runtime convention that the wasm_js.cxx emitter
+// has no business knowing about.
+export interface Function__class {
+  (arg: _DM[]): DM[];
+  (arg: _SX[]): SX[];
+  (arg: _MX[]): MX[];
+  (arg: Record<string, _DM>): Record<string, DM>;
+  (arg: Record<string, _SX>): Record<string, SX>;
+  (arg: Record<string, _MX>): Record<string, MX>;
+  // Positional varargs (the runtime accepts `f(x, y, z)` as
+  // shorthand for `f([x, y, z])`).  Loose return type since the
+  // input flavor is heterogeneous in this form.
+  (...args: any[]): any;
+}
+
 // Runtime factory shape.
 //
 // At runtime, `require("./casadi")` returns an async factory function
@@ -3378,6 +3417,7 @@ export default createcasadi;
 %ts_alias_in(Slice)
 %ts_alias_in(GenericType)
 %ts_alias_in(MIndex)
+%ts_alias_in(bigint)
 
 %ts_alias_out(GenericType)
 
