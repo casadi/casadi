@@ -7,7 +7,7 @@ function expectType<T>(_v: T): void {}
 // ============================================================
 // Construct an NLP via Opti
 // ============================================================
-const opti = new Opti();
+const opti = Opti();
 expectType<Opti>(opti);
 
 // variable/parameter return MX

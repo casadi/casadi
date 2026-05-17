@@ -21,10 +21,10 @@ function expectType<T>(_v: T): void {}
 // ============================================================
 // MX construction
 // ============================================================
-const m0 = new MX();                       // empty
-const m1 = new MX(0);                      // scalar 0
+const m0 = MX();                       // empty
+const m1 = MX(0);                      // scalar 0
 const sp = Sparsity.dense(3n, 2n);
-const m2 = new MX(sp);                     // sparse pattern
+const m2 = MX(sp);                     // sparse pattern
 
 // MX.sym in its full arity matrix
 expectType<MX>(MX.sym("x"));
@@ -97,7 +97,7 @@ expectType<boolean>(x.is_square());
 // ============================================================
 // Function construction + evaluation
 // ============================================================
-const f = new CFn("f", [x, y], [plus(x, y), times(x, y)]);
+const f = CFn("f", [x, y], [plus(x, y), times(x, y)]);
 expectType<CFn>(f);
 expectType<bigint>(f.n_in());
 expectType<bigint>(f.n_out());
@@ -142,7 +142,7 @@ expectType<MX>(dot(x, y));
 // ============================================================
 const M = MX.sym("M", 3n, 3n);
 // scalar element via two-index get -- _Slice = Slice | number | bigint
-// so passing a bare bigint works without wrapping in `new Slice(...)`.
+// so passing a bare bigint works without wrapping in `Slice(...)`.
 expectType<MX>(M.get(false, 0n, 1n));
 // row slice
 const Mt: MX = M.T();
@@ -160,7 +160,7 @@ expectType<string>(ser);
 // ============================================================
 // Function composition via call
 // ============================================================
-const f_unary = new CFn("f", [scalar], [sin(scalar)]);
+const f_unary = CFn("f", [scalar], [sin(scalar)]);
 const gx = f_unary.call([scalar]);
 expectType<MX[]>(gx);
 
@@ -212,25 +212,25 @@ expectType<MX>(find(sparse_vec));
 expectType<MX>(plus(A, 1));
 expectType<MX>(plus(A, [[1, 2, 3], [4, 5, 6], [7, 8, 9]]));
 expectType<MX>(solve(A, 1));
-expectType<DM>(solve(new DM([[1, 0], [0, 1]]), new DM([1, 2])));
+expectType<DM>(solve(DM([[1, 0], [0, 1]]), DM([1, 2])));
 
 // ============================================================
 // DM-side numerical extraction
 // ============================================================
-const dnum = new DM([[1, 2, 3], [4, 5, 6]]);
+const dnum = DM([[1, 2, 3], [4, 5, 6]]);
 expectType<number[]>(dnum.nonzeros());
 // scalar extraction: DM has no `.scalar()` method on its class -- use
 // `.nonzeros()[0]` for the 1x1 case.  Casts via Number(...) only at the
 // user's call site.
-const dscalar = new DM(5);
+const dscalar = DM(5);
 const nz: number = dscalar.nonzeros()[0];
 expectType<number>(nz);
 expectType<[bigint, bigint]>(dnum.size());
 expectType<bigint>(dnum.size(0n));
 
 // set: mutates in place, returns void
-const dtarget = new DM(3);
-dtarget.set(new DM(7), false, 0n);
+const dtarget = DM(3);
+dtarget.set(DM(7), false, 0n);
 
 // ============================================================
 // Function I/O bookkeeping

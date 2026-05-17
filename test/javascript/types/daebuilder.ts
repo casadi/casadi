@@ -15,10 +15,10 @@ function expectType<T>(_v: T): void {}
 // ============================================================
 // Construction
 // ============================================================
-expectType<DaeBuilder>(new DaeBuilder());
-const dae = new DaeBuilder("rocket");
+expectType<DaeBuilder>(DaeBuilder());
+const dae = DaeBuilder("rocket");
 expectType<DaeBuilder>(dae);
-const dae_with_path = new DaeBuilder("rocket", "./does_not_exist_skip");
+const dae_with_path = DaeBuilder("rocket", "./does_not_exist_skip");
 expectType<DaeBuilder>(dae_with_path);
 
 // Add a variable with full causality/variability triple
@@ -48,7 +48,7 @@ expectType<MX>(dae.time());
 // ============================================================
 // Symbolic equations: set_init for IC
 // ============================================================
-dae.set_init("x", new MX(1.0));
+dae.set_init("x", MX(1.0));
 
 // ============================================================
 // Build a Function from the DAE description
@@ -72,14 +72,14 @@ dae.eliminate("y");
 dae.add_lc("g_lin", ["c"]);
 
 // add_fun: pull an existing Function into the DAE namespace
-const helper = new CFn("helper", [MX.sym("h")], [MX.sym("h")]);
+const helper = CFn("helper", [MX.sym("h")], [MX.sym("h")]);
 const added = dae.add_fun(helper);
 expectType<CFn>(added);
 
 // ============================================================
 // Demonstrate full builder -> Function -> evaluate flow
 // ============================================================
-const dae2 = new DaeBuilder("cstr");
+const dae2 = DaeBuilder("cstr");
 const C_A = dae2.add("C_A", "input", "continuous");
 const C_B = dae2.add("C_B", "input", "continuous");
 const q_in = dae2.add("q_in", "input", "discrete");
@@ -88,11 +88,11 @@ const C_B_in = dae2.add("C_B_in", "input", "discrete");
 // Add an ODE-like output expression
 const k = 0.5, V = 1;
 dae2.add("dC_A", "output", "continuous",
-  rdivide(plus(times(q_in, minusFn(C_A_in, C_A)), times(times(-V, k), times(C_A, C_B))), new MX(V)));
+  rdivide(plus(times(q_in, minusFn(C_A_in, C_A)), times(times(-V, k), times(C_A, C_B))), MX(V)));
 
 // Helper to bridge JS-side `_DM` coercion gaps where minus(M, scalar)
 // must use the function form.
-function minusFn(a: MX, b: MX): MX { return plus(a, times(b, new MX(-1))); }
+function minusFn(a: MX, b: MX): MX { return plus(a, times(b, MX(-1))); }
 
 void [dae, dae_with_path, x, u, p, y, f, f_opts, f_sx, f_sx_lifted, helper, added,
       dae2, C_A, C_B, q_in, C_A_in, C_B_in];

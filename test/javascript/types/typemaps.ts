@@ -21,16 +21,26 @@ import {
 function expectType<T>(_v: T): void {}
 
 // ============================================================
-// DM construction -- every typemap branch the C++ exposes
+// DM construction -- every typemap branch the C++ exposes.
+// Both `new DM(x)` and `DM(x)` (no-new factory form) work at the
+// type level AND at the runtime level (casadi.js wraps each class
+// in a `new Proxy(C, { apply: Reflect.construct })`).  The d.ts
+// emits both via `class + interface + type + const` -- see
+// wasm_js.cxx classHandler.
 // ============================================================
-expectType<DM>(new DM());                                // empty
-expectType<DM>(new DM(5));                               // scalar
-expectType<DM>(new DM(2.3));                             // scalar (float)
-expectType<DM>(new DM([1, 2, 3]));                       // 1D number[]
-expectType<DM>(new DM([[1, 2], [3, 4]]));                // 2D number[][]
-expectType<DM>(new DM(Sparsity.dense(3n, 2n)));          // sparsity-only
-expectType<DM>(new DM(Sparsity.dense(3n, 2n), new DM(1)));  // (sp, val)
-expectType<DM>(new DM(new DM(7)));                       // copy
+// Factory form (preferred, matches Python idiom):
+expectType<DM>(DM());                                    // empty
+expectType<DM>(DM(5));                                   // scalar
+expectType<DM>(DM(2.3));                                 // scalar (float)
+expectType<DM>(DM([1, 2, 3]));                           // 1D number[]
+expectType<DM>(DM([[1, 2], [3, 4]]));                    // 2D number[][]
+expectType<DM>(DM(Sparsity.dense(3n, 2n)));              // sparsity-only
+expectType<DM>(DM(Sparsity.dense(3n, 2n), DM(1)));       // (sp, val)
+expectType<DM>(DM(DM(7)));                               // copy
+
+// `new`-form regression guard -- must remain accepted:
+expectType<DM>(new DM(5));
+expectType<DM>(new DM([1, 2, 3]));
 
 // ============================================================
 // DM nonzeros + readback

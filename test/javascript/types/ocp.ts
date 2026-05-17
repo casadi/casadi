@@ -53,9 +53,9 @@ const xf = intg_call["xf"];
 expectType<MX>(xf);
 
 // Wrap (var, par) -> cost in a Function, then build an NLP on it.
-const parc = new MX(0);
+const parc = MX(0);
 const cost_expr = xf.get(false, 0n);  // first component of xf
-const cost_fn = new CFn("f", [var_mx, par_mx], [cost_expr]);
+const cost_fn = CFn("f", [var_mx, par_mx], [cost_expr]);
 const nlp = { x: var_mx, f: cost_fn.call([var_mx, parc])[0] };
 const solver = nlpsol("solver", "ipopt", nlp, {
   "ipopt.tol": 1e-12,
@@ -67,8 +67,8 @@ expectType<CFn>(solver);
 
 // Call solver with numerical bounds: returns DM dict.
 const sol = solver.call({
-  lbx: new DM([-1, -1]),
-  ubx: new DM([1, 0.2]),
+  lbx: DM([-1, -1]),
+  ubx: DM([1, 0.2]),
 });
 expectType<Record<string, DM>>(sol);
 expectType<DM>(sol["x"]);
@@ -86,16 +86,16 @@ const nlp_g = {
 const solver_g = nlpsol("solver_g", "ipopt", nlp_g, {});
 expectType<CFn>(solver_g);
 const sol_g = solver_g.call({
-  lbx: new DM([-1, -1]),
-  ubx: new DM([1, 0.2]),
-  lbg: new DM([-1]),
-  ubg: new DM([0]),
+  lbx: DM([-1, -1]),
+  ubx: DM([1, 0.2]),
+  lbg: DM([-1]),
+  ubg: DM([0]),
 });
 expectType<Record<string, DM>>(sol_g);
 expectType<DM>(sol_g["lam_g"]);
 
 // fmax post-processing
-expectType<DM>(fmax(sol["lam_x"], new DM(0)));
+expectType<DM>(fmax(sol["lam_x"], DM(0)));
 
 // ============================================================
 // detect_simple_bounds: 5-tuple return via argout aggregation
@@ -119,9 +119,9 @@ expectType<CFn>(lin_g);
 // blockcat + sparsify (sparsity construction for fatrop-style OCP
 // detection adversarial cases)
 // ============================================================
-const D2 = sparsify(new DM([[1, 0, 0], [1, 1, 1]])).sparsity();
+const D2 = sparsify(DM([[1, 0, 0], [1, 1, 1]])).sparsity();
 expectType<Sparsity>(D2);
-const block = blockcat([[new DM([[1]]), new DM([[2]])], [new DM([[3]]), new DM([[4]])]]);
+const block = blockcat([[DM([[1]]), DM([[2]])], [DM([[3]]), DM([[4]])]]);
 expectType<DM>(block);
 // Note: sparsify(MX) does NOT exist (only DM/SX) -- C++ API gap.
 // At runtime MX expressions carry their own sparsity already.
@@ -139,15 +139,15 @@ for (const structure_detection of ["none", "auto"] as const) {
     equality: [true],
   };
   // g = x-1 constraint
-  const sf1 = nlpsol("solver", "fatrop", { x: xfat, g: minus(xfat, new MX(1)) }, opts);
+  const sf1 = nlpsol("solver", "fatrop", { x: xfat, g: minus(xfat, MX(1)) }, opts);
   expectType<CFn>(sf1);
-  const r1 = sf1.call({ lbg: new DM(0), ubg: new DM(0) });
+  const r1 = sf1.call({ lbg: DM(0), ubg: DM(0) });
   expectType<Record<string, DM>>(r1);
 
   // g = x
   const sf2 = nlpsol("solver", "fatrop", { x: xfat, g: xfat }, opts);
   expectType<CFn>(sf2);
-  const r2 = sf2.call({ lbg: new DM(1), ubg: new DM(1) });
+  const r2 = sf2.call({ lbg: DM(1), ubg: DM(1) });
   expectType<Record<string, DM>>(r2);
 }
 
@@ -155,13 +155,13 @@ for (const structure_detection of ["none", "auto"] as const) {
 // Adversarial sparsity construction for fatrop detection
 // (from ocp.py test_detect_adversarial)
 // ============================================================
-const D2_adv = sparsify(new DM([[1, 0, 0], [1, 1, 1]])).sparsity();
-const C2_adv = sparsify(new DM([[0, 1], [0, 0]])).sparsity();
+const D2_adv = sparsify(DM([[1, 0, 0], [1, 1, 1]])).sparsity();
+const C2_adv = sparsify(DM([[0, 1], [0, 0]])).sparsity();
 expectType<Sparsity>(D2_adv);
 expectType<Sparsity>(C2_adv);
 // Zero-pattern sparsity construction
-const A1_zero = new Sparsity(2n, 2n);
-const B1_zero = new Sparsity(2n, 2n);
+const A1_zero = Sparsity(2n, 2n);
+const B1_zero = Sparsity(2n, 2n);
 expectType<Sparsity>(A1_zero);
 expectType<Sparsity>(B1_zero);
 
@@ -172,7 +172,7 @@ const t0_val = 0.0;
 const tf_vals: number[] = [0.25, 0.5, 0.75, 1.0];
 const F_multi = integrator("Fm", "rk", dae, t0_val, tf_vals);
 expectType<CFn>(F_multi);
-const r_multi = F_multi.call({ x0: new DM([1, 0]), p: new DM(0.2) });
+const r_multi = F_multi.call({ x0: DM([1, 0]), p: DM(0.2) });
 expectType<Record<string, DM>>(r_multi);
 
 // Pin locals

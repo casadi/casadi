@@ -15,14 +15,14 @@ function expectType<T>(_v: T): void {}
 // NLP: min (x-1)^2 s.t. nothing
 // ============================================================
 const x_sx = SX.sym("x");
-const f_sx = times(minus(x_sx, new SX(1)), minus(x_sx, new SX(1)));
+const f_sx = times(minus(x_sx, SX(1)), minus(x_sx, SX(1)));
 const nlp_sx = { x: x_sx, f: f_sx };
 const solver_sx = nlpsol("solver", "ipopt", nlp_sx, { print_time: false });
 expectType<CFn>(solver_sx);
 
 // MX-side problem
 const x_mx = MX.sym("x");
-const f_mx = times(minus(x_mx, new MX(1)), minus(x_mx, new MX(1)));
+const f_mx = times(minus(x_mx, MX(1)), minus(x_mx, MX(1)));
 const nlp_mx = { x: x_mx, f: f_mx };
 const solver_mx = nlpsol("solver", "ipopt", nlp_mx, {});
 expectType<CFn>(solver_mx);
@@ -36,7 +36,7 @@ expectType<CFn>(nlpsol("s", "ipopt", nlp_full));
 // Call the solver: keys x0/lbx/ubx/lbg/ubg/p; returns {x, f, g, lam_x, lam_g, lam_p}.
 // Solvers numerically evaluate regardless of the symbolic flavor they were
 // constructed with -- passing DM-shaped input yields DM-shaped output.
-const res_num = solver_mx.call({ x0: new DM(0) });
+const res_num = solver_mx.call({ x0: DM(0) });
 expectType<Record<string, DM>>(res_num);
 // Symbolic chaining: pass MX expressions to compose into a bigger MX graph.
 const x_outer = MX.sym("xo");

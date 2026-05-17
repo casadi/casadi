@@ -22,11 +22,11 @@ import {
 function expectType<T>(_value: T): void { /* type-only assertion */ }
 
 // --- Constructors ---
-const d0 = new DM();
-const d1 = new DM(5);
-const d2 = new DM([[1, 2], [3, 4]]);
+const d0 = DM();
+const d1 = DM(5);
+const d2 = DM([[1, 2], [3, 4]]);
 const sp = Sparsity.dense(3n, 3n);
-const d3 = new DM(sp);
+const d3 = DM(sp);
 
 // --- Static `sym` reachable on the subclass (was previously only on Gen<X>) ---
 const dx = DM.sym("dx", 3n);
@@ -37,11 +37,11 @@ expectType<SX>(sx);
 expectType<MX>(mx);
 
 // --- Sparsity constructor variant ---
-const sx2 = new SX(sp);
+const sx2 = SX(sp);
 expectType<SX>(sx2);
 
 // --- Linsol ---
-const ls = new Linsol("S", "qr", sp);
+const ls = Linsol("S", "qr", sp);
 expectType<Linsol>(ls);
 
 // --- Interface-merged base reachable through declaration merging ---

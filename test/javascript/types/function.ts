@@ -14,16 +14,16 @@ function expectType<T>(_v: T): void {}
 // ============================================================
 const x = MX.sym("x");
 const y = MX.sym("y");
-const f = new CFn("f", [x, y], [plus(x, y), times(x, y)]);
+const f = CFn("f", [x, y], [plus(x, y), times(x, y)]);
 expectType<CFn>(f);
 
 // With named input/output
-const f2 = new CFn("f2", [x, y], [plus(x, y)], ["a", "b"], ["s"]);
+const f2 = CFn("f2", [x, y], [plus(x, y)], ["a", "b"], ["s"]);
 expectType<CFn>(f2);
 
 // SX version
 const sx0 = SX.sym("sx");
-const sf = new CFn("sf", [sx0], [sin(sx0)]);
+const sf = CFn("sf", [sx0], [sin(sx0)]);
 expectType<CFn>(sf);
 
 // JIT-compiled scalar function from source string
@@ -78,8 +78,8 @@ expectType<MX[]>(out_pos);
 const out_dict = f.call({ a: x, b: y });
 expectType<Record<string, MX>>(out_dict);
 // Numerical evaluation with DM
-const dx = new DM([1.0]);
-const dy = new DM([2.0]);
+const dx = DM([1.0]);
+const dy = DM([2.0]);
 const out_num = f.call([dx, dy]);
 expectType<DM[]>(out_num);
 // Numerical evaluation with dict
@@ -148,7 +148,7 @@ expectType<CFn>(f.reverse(1n));
 // ============================================================
 expectType<boolean>(sf.has_free());
 expectType<SX[]>(sf.free_sx());
-const mxf = new CFn("mxf", [x], [plus(x, y)]);  // y not in inputs -> free
+const mxf = CFn("mxf", [x], [plus(x, y)]);  // y not in inputs -> free
 expectType<MX[]>(mxf.free_mx());
 
 // ============================================================
@@ -168,7 +168,7 @@ class MyCb extends Callback {
 const cb = new MyCb();
 expectType<Callback>(cb);
 expectType<bigint>(cb.get_n_in());
-expectType<DM[]>(cb.eval([new DM(1)]));
+expectType<DM[]>(cb.eval([DM(1)]));
 
 // ============================================================
 // Codegen variants

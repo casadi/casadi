@@ -52,8 +52,8 @@ expectType<boolean>(sp1.is_subset(sp2));
 // ============================================================
 // Matrix-typed triplets
 // ============================================================
-expectType<DM>(DM.triplet([0n, 1n], [0n, 2n], new DM([1.0, 2.0])));
-expectType<DM>(DM.triplet([0n, 1n], [0n, 2n], new DM([1.0, 2.0]), 3n, 3n));
+expectType<DM>(DM.triplet([0n, 1n], [0n, 2n], DM([1.0, 2.0])));
+expectType<DM>(DM.triplet([0n, 1n], [0n, 2n], DM([1.0, 2.0]), 3n, 3n));
 expectType<SX>(SX.triplet([0n, 1n], [0n, 2n], SX.sym("v", 2n)));
 
 // ============================================================

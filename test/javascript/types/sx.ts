@@ -19,10 +19,10 @@ function expectType<T>(_v: T): void {}
 // ============================================================
 // Construction
 // ============================================================
-const s0 = new SX();
-const s1 = new SX(3);
+const s0 = SX();
+const s1 = SX(3);
 const sp = Sparsity.dense(2n, 3n);
-const s2 = new SX(sp);
+const s2 = SX(sp);
 
 expectType<SX>(SX.sym("x"));
 expectType<SX>(SX.sym("x", 3n));
@@ -68,7 +68,7 @@ expectType<SX>(sumsqr(sx));
 // ============================================================
 // Cross-type: SX inputs accept DM-coercibles via _SX = SX | _DM
 // ============================================================
-const dx = new DM([1, 2, 3]);
+const dx = DM([1, 2, 3]);
 expectType<SX>(plus(sx, dx));  // _DM in _SX
 expectType<SX>(plus(sx, 1.5));
 
