@@ -18,30 +18,40 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Collect every release whose name starts with "nightly-".
-          mapfile -t names < <(
-            gh api --paginate "repos/$REPO/releases" \
-              --jq '.[] | select(.name != null and (.name | startswith("nightly-"))) | .name'
+          # Build a set of branch names in their tag-canonical form: "/" -> "-".
+          # A branch "claude/foo" produces a nightly tag "nightly-claude-foo",
+          # so we compare suffixes against the canonicalized branch list.
+          declare -A canonical_branches
+          while IFS= read -r b; do
+            [ -n "$b" ] || continue
+            canonical_branches["${b//\//-}"]=$b
+          done < <(
+            gh api --paginate "repos/$REPO/branches" --jq '.[].name'
           )
+          echo "Indexed ${#canonical_branches[@]} branch(es)."
 
-          echo "Found ${#names[@]} nightly-* release(s)."
+          # Collect every release whose tag starts with "nightly-".
+          mapfile -t tags < <(
+            gh api --paginate "repos/$REPO/releases" \
+              --jq '.[] | select(.tag_name | startswith("nightly-")) | .tag_name'
+          )
+          echo "Found ${#tags[@]} nightly-* release(s)."
 
           {
             echo "## Orphaned nightly releases"
             echo ""
-            echo "Releases named \`nightly-<branch>\` whose branch no longer exists in \`$REPO\`."
+            echo "Releases tagged \`nightly-<branch>\` whose branch no longer exists in \`$REPO\`."
+            echo "Branch slashes are canonicalized to \`-\` in tag names, so a tag"
+            echo "\`nightly-a-b-c\` matches any branch that canonicalizes to \`a-b-c\`"
+            echo "(e.g. \`a/b/c\`, \`a-b/c\`, \`a/b-c\`, or \`a-b-c\`)."
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
           orphans=0
-          for name in "${names[@]}"; do
-            branch="${name#nightly-}"
-            # URL-encode slashes so branch names like "feature/foo" work.
-            encoded="${branch//\//%2F}"
-            status=$(gh api -i "repos/$REPO/branches/$encoded" 2>/dev/null \
-              | head -n1 | awk '{print $2}' || echo "000")
-            if [ "$status" != "200" ]; then
-              echo "- \`$name\` (missing branch: \`$branch\`)" >> "$GITHUB_STEP_SUMMARY"
+          for tag in "${tags[@]}"; do
+            suffix="${tag#nightly-}"
+            if [ -z "${canonical_branches[$suffix]+x}" ]; then
+              echo "- \`$tag\`" >> "$GITHUB_STEP_SUMMARY"
               orphans=$((orphans + 1))
             fi
           done
