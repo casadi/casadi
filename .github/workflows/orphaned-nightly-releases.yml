@@ -1,0 +1,63 @@
+name: Orphaned nightly releases
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Mondays 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: List orphaned nightly releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # Build a set of branch names in their tag-canonical form: "/" -> "-".
+          # A branch "claude/foo" produces a nightly tag "nightly-claude-foo",
+          # so we compare suffixes against the canonicalized branch list.
+          declare -A canonical_branches
+          while IFS= read -r b; do
+            [ -n "$b" ] || continue
+            canonical_branches["${b//\//-}"]=$b
+          done < <(
+            gh api --paginate "repos/$REPO/branches" --jq '.[].name'
+          )
+          echo "Indexed ${#canonical_branches[@]} branch(es)."
+
+          # Collect every release whose tag starts with "nightly-".
+          mapfile -t tags < <(
+            gh api --paginate "repos/$REPO/releases" \
+              --jq '.[] | select(.tag_name | startswith("nightly-")) | .tag_name'
+          )
+          echo "Found ${#tags[@]} nightly-* release(s)."
+
+          {
+            echo "## Orphaned nightly releases"
+            echo ""
+            echo "Releases tagged \`nightly-<branch>\` whose branch no longer exists in \`$REPO\`."
+            echo "Branch slashes are canonicalized to \`-\` in tag names, so a tag"
+            echo "\`nightly-a-b-c\` matches any branch that canonicalizes to \`a-b-c\`"
+            echo "(e.g. \`a/b/c\`, \`a-b/c\`, \`a/b-c\`, or \`a-b-c\`)."
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          orphans=0
+          for tag in "${tags[@]}"; do
+            suffix="${tag#nightly-}"
+            if [ -z "${canonical_branches[$suffix]+x}" ]; then
+              echo "- \`$tag\`" >> "$GITHUB_STEP_SUMMARY"
+              orphans=$((orphans + 1))
+            fi
+          done
+
+          if [ "$orphans" -eq 0 ]; then
+            echo "_None._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "Orphaned: $orphans"
