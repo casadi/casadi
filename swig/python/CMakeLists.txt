@@ -2,11 +2,7 @@ cmake_minimum_required(VERSION 3.10.2)
 
 # Workaround for OS X
 if(APPLE)
-  if(WITH_PYTHON3)
   set(PYTHON_CONFIG_NAME python3-config)
-  else()
-  set(PYTHON_CONFIG_NAME python-config)
-  endif()
   find_program(PYTHON_CONFIG_EXECUTABLE
                NAMES ${PYTHON_CONFIG_NAME} DOC "python-config executable")
   if(PYTHON_CONFIG_EXECUTABLE)
@@ -35,21 +31,13 @@ function(CasadiGetPythonVersionMajor VERSION_MAJOR_RESULT INCLUDE_PATH)
 endfunction()
 
 if(SWIG_EXPORT)
-  if(WITH_PYTHON3)
-    set(PYTHON_VERSION_MAJOR 3)
-  else()
-    set(PYTHON_VERSION_MAJOR 2)
-  endif()
+  set(PYTHON_VERSION_MAJOR 3)
 else()
   if(PYTHON_INCLUDE_DIR)
     set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_DIR})
   else()
     # Find packages
-    if(WITH_PYTHON3)
     set(MINPYVERSION "3")
-    else()
-    set(MINPYVERSION "")
-    endif()
 
     # We don't really need the libs, but the headers.
     find_package(PythonInterp ${MINPYVERSION})
@@ -128,7 +116,6 @@ endif()
 if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")
 set(PYTHONFLAG "3")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-py3")
-set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON3")
 endif()
 
 # Limited API support for stable ABI
@@ -382,27 +369,14 @@ if(_ship_stub_trio)
   )
 endif()
 
-if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")
-  # Install Python tools
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
-    DESTINATION "${PYTHON_PREFIX}/casadi"
-    COMPONENT install_python
-    USE_SOURCE_PERMISSIONS
-    PATTERN .pyc EXCLUDE
-    PATTERN .svn EXCLUDE
-    PATTERN structure.py EXCLUDE
-  )
-else()
-  # Install Python tools
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
-    DESTINATION "${PYTHON_PREFIX}/casadi"
-    COMPONENT install_python
-    USE_SOURCE_PERMISSIONS
-    PATTERN .pyc EXCLUDE
-    PATTERN .svn EXCLUDE
-    PATTERN structure3.py EXCLUDE
-  )
-endif()
+# Install Python tools
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+  USE_SOURCE_PERMISSIONS
+  PATTERN .pyc EXCLUDE
+  PATTERN .svn EXCLUDE
+)
 
 # Install Python package initialization
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py

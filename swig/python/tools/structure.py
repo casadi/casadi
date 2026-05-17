@@ -27,15 +27,21 @@ from casadi import *
 import numpy as np
 import operator
 import sys
-import copy
+from typing import Any  # type-comments reference Any
 
-import __builtin__
+import builtins
+import collections
+
+try:
+  callable = collections.Callable
+except:
+  callable = collections.abc.Callable
 
 def is_integer(a):
   return isinstance(a,int) or isinstance(a,np.integer)
 
 def is_string(a):
-  return isinstance(a,str) or isinstance(a,unicode)
+  return isinstance(a,str)
 
 def isIterable(a):
   return isinstance(a,list) or isinstance(a,tuple)
@@ -66,15 +72,15 @@ def listindices(dims,nest=False):
     if nest:
       return [combine([[i]],tail) for i in range(dims[0])]
     else:
-      return combine(lpack(range(dims[0])),tail)
+      return combine(lpack(list(range(dims[0]))),tail)
 
 def intersperseIt(*args):
-  iterators = map(iter,args)
+  iterators = list(map(iter,args))
   active = [True]*len(args)
   i = 0
   while any(active):
     try:
-      yield iterators[i].next()
+      yield next(iterators[i])
     except:
       active[i] = False
     i = (i + 1) % len(args)
@@ -84,7 +90,7 @@ def intersperse(*args):
 
 def canonicalIndexAncestors(ind):
   if len(ind)==0: return []
-  return [ind] + canonicalIndexAncestors(ind[:-(map(is_string,ind[::-1]).index(True)+1)])
+  return [ind] + canonicalIndexAncestors(ind[:-(list(map(is_string,ind[::-1])).index(True)+1)])
 
 def canonical(ind,s):
   if ind < 0:
@@ -94,9 +100,10 @@ def canonical(ind,s):
 
 def vec(e):
   if any(isinstance(i,list) for i in e):
-    return __builtin__.sum(map(vec,e),[])
+    return builtins.sum(list(map(vec,e)),[])
   else:
     return e
+
 
 def correct_vector_indexing(x, i):
   return casadi.reshape(x[i], i.shape)
@@ -117,7 +124,7 @@ def properGetitem(f):
 class SafeDict(dict):
   def __getitem__(self,k):
     if k not in self:
-      raise Exception("Unknown keyword '%s'. Available entries: %s" % (k,str(self.keys())))
+      raise Exception("Unknown keyword '%s'. Available entries: %s" % (k,str(list(self.keys()))))
     return dict.__getitem__(self,k)
 
 # Placeholder classes and instances
@@ -221,7 +228,7 @@ class StructEntry:
         p = powerIndex[0]
         s = dims[0]
         if isinstance(p,slice): # Expand slice
-          p = range(*p.indices(s))
+          p = list(range(*p.indices(s)))
         if is_integer(p):
           return self.traverseByPowerIndex(
                    powerIndex[1:],
@@ -254,7 +261,7 @@ class StructEntry:
                       payload = payloadUnpack(payload,i)
                     )
                  for i in range(s)]
-        elif callable(p):
+        elif isinstance(p, callable):
           r = p(self.traverseByPowerIndex(
                 powerIndex[1:],
                 dims=dims,
@@ -266,16 +273,14 @@ class StructEntry:
         else:
           raise Exception("I don't know what to do with this: %s" % str(p))
     except Exception as e:
-      exc_class, exc, tb = sys.exc_info()
-      new_exc = Exception("Error occured in entry context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
-      raise new_exc.__class__, new_exc, tb
+      raise Exception("Error occured in entry context with powerIndex %s, at canonicalIndex %s" % (str(powerIndex),str(canonicalIndex))) from e
 
 class Structure(object):
   def __init__(self,entries,order=None):
     self.entries = entries
 
     self.order = [e.name for e in self.entries] if order is None else order
-    self.keyslist = __builtin__.sum([ list(i) if isinstance(i,tuple) else list([i]) for i in self.order],[])
+    self.keyslist = builtins.sum([ list(i) if isinstance(i,tuple) else list([i]) for i in self.order],[])
 
     self.dict = SafeDict([(e.name,e) for e in self.entries])
 
@@ -294,11 +299,11 @@ class Structure(object):
   def __str__(self,compact=False):
      s=''
      if compact:
-       s+= "{" + ",".join(k + ": " +  v.__str__(compact=True) for k,v in self.dict.items()) + "}"
+       s+= "{" + ",".join(k + ": " +  v.__str__(compact=True) for k,v in list(self.dict.items())) + "}"
      else:
        s+= "Structure holding %d entries.\n" % len(self.dict)
        s+="  Order: %s\n" % str(self.order)
-       for k,v in self.dict.items():
+       for k,v in list(self.dict.items()):
           s+= "  " + k + " = " +  v.__str__(compact=True) + "\n"
      return s
 
@@ -322,11 +327,11 @@ class Structure(object):
       return e
 
   def getStructEntryByCanonicalIndex(self,indices):
-    return self.getStructEntryByStructIndex(filter(lambda x: is_string(x),indices))
+    return self.getStructEntryByStructIndex([x for x in indices if is_string(x)])
 
   def getStruct(self,name):
     if name not in self.struct.dict:
-      raise Exception("Cannot find entry with key '%s'. Candidates: " % (str(name),str(name.keys())))
+      raise Exception("Cannot find entry with key '%s'. Candidates: " % (str(name),str(list(name.keys()))))
     ret = self.struct.dict[name].struct
     if ret is None:
       raise Exception("Entry '%s' has no structure." % (name))
@@ -368,7 +373,7 @@ class Structure(object):
                         dispatcher=dispatcher,
                         payload=v
                       )
-                    ) for k,v in payload.iteritems()
+                    ) for k,v in payload.items()
                    ])
           else:
             return dict([
@@ -379,7 +384,7 @@ class Structure(object):
                         dispatcher=dispatcher,
                         payload=payload
                       )
-                    ) for k,v in self.dict.iteritems()
+                    ) for k,v in self.dict.items()
                    ])
         elif isinstance(p,set):
           if isinstance(payload,dict):
@@ -391,7 +396,7 @@ class Structure(object):
                         dispatcher=dispatcher,
                         payload=v
                       )
-                    ) for k,v in payload.iteritems() if k in p
+                    ) for k,v in payload.items() if k in p
                    ])
           else:
             return dict([
@@ -413,7 +418,7 @@ class Structure(object):
                        payload=payloadUnpack(payload,i)
                      )
                  for i,s in enumerate(p)]
-        elif callable(p):
+        elif isinstance(p, callable):
           r = p(self.traverseByPowerIndex(
                 powerIndex[1:],
                 canonicalIndex=canonicalIndex,
@@ -424,15 +429,12 @@ class Structure(object):
         else:
           raise Exception("I don't know what to do with this: %s" % str(p))
       except Exception as e:
-        exc_class, exc, tb = sys.exc_info()
-        new_exc = Exception("Error occured in struct context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
-        raise new_exc.__class__, new_exc, tb
-
+        raise Exception("Error occured in struct context with powerIndex %s, at canonicalIndex %s" % (str(powerIndex),str(canonicalIndex))) from e
 # Casadi-dependent Structure framework
 
 class Dispatcher:
   def __init__(self,**args):
-    for k,v in args.items():
+    for k,v in list(args.items()):
       setattr(self,k,v)
 
   def callableInner(self):
@@ -481,7 +483,9 @@ class CasadiStructureDerivable:
 
     return (a,mtype)
 
-  def __call__(self,arg=0):
+  def __call__(self, arg=0):
+    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> "DMStruct | SXStruct | MXStruct"
+    # `arg` routes through argtype() which promotes anything DM/SX/MX-constructible.
     (a,mtype) = self.argtype(arg)
 
     if isinstance(a,DM):
@@ -495,7 +499,10 @@ class CasadiStructureDerivable:
     if isinstance(a,SX):
       return SXStruct(self,data=a)
 
-  def repeated(self,arg=0):
+    raise TypeError("Structure call expected DM/MX/SX, got %s" % type(a).__name__)
+
+  def repeated(self, arg=0):
+    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0] == self.size):
@@ -510,7 +517,8 @@ class CasadiStructureDerivable:
     p.castmaster = True
     return p
 
-  def squared(self,arg=0):
+  def squared(self, arg=0):
+    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
     (a,mtype) = self.argtype(arg)
 
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
@@ -540,16 +548,17 @@ class CasadiStructureDerivable:
     p.castmaster = True
     return p
 
-  def squared_repeated(self,arg=0):
+  def squared_repeated(self, arg=0):
+    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0]==self.size and a.shape[1] % self.size == 0):
        raise Exception("Expecting square (%d) DM by N. Got %s" % (self.size,a.dim()))
-    s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[1] / self.size)])
+    s = struct([entry("t",shapestruct=(self,self),repeat=int(a.shape[1] / self.size))])
 
     for (t,c) in [(DM,DMStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
-        numbers = c(s,data=DataReferenceSquaredRepeated(a,self.size,a.shape[1] / self.size))
+        numbers = c(s,data=DataReferenceSquaredRepeated(a,self.size,int(a.shape[1] / self.size)))
 
     p = numbers.prefix["t"]
     p.castmaster = True
@@ -579,9 +588,7 @@ class GetterDispatcher(Dispatcher):
         else:
           raise Exception("Cannot handle type '%s'." % entry.type)
       except Exception as e:
-        exc_class, exc, tb = sys.exc_info()
-        new_exc = Exception("Error in powerIndex slicing for canonicalIndex %s:\n%s" % (str(canonicalIndex),str(e)))
-        raise new_exc.__class__, new_exc, tb
+        raise Exception("Error in powerIndex slicing for canonicalIndex %s" % (str(canonicalIndex))) from e
     else:
       raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
 
@@ -608,11 +615,9 @@ class SetterDispatcher(Dispatcher):
         else:
           raise Exception("Cannot handle type '%s'." % entry.type)
       except NotImplementedError as e:
-        raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s (%s) and b %s (%s) and i %s (%s). Error: %s" % (str(canonicalIndex),str(self.master),str(__builtin__.type(self.master)),str(payload),str(__builtin__.type(payload)),str(i),str(__builtin__.type(i)),str(e)))
+        raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s (%s) and b %s (%s) and i %s (%s). Error: %s" % (str(canonicalIndex),str(self.master),str(builtins.type(self.master)),str(payload),str(builtins.type(payload)),str(i),str(builtins.type(i)),str(e)))
       except Exception as e:
-        exc_class, exc, tb = sys.exc_info()
-        new_exc = Exception("Error in powerIndex slicing for canonicalIndex %s:\n%s" % (str(canonicalIndex),str(e)))
-        raise new_exc.__class__, new_exc, tb
+        raise Exception("Error in powerIndex slicing for canonicalIndex %s" % (str(canonicalIndex))) from e
     else:
       raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
 
@@ -625,10 +630,8 @@ class SetterDispatcher(Dispatcher):
     except NotImplementedError:
       raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s and b %s." % (str(canonicalIndex),str(self.master),str(payload)))
     except Exception as e:
-      exc_class, exc, tb = sys.exc_info()
-      new_exc = Exception("Error in powerIndex slicing for canonicalIndex %s:\n %s" % (str(canonicalIndex),str(e)))
-      raise new_exc.__class__, new_exc, tb
-
+      raise Exception("Error in powerIndex slicing for canonicalIndex %s" % (str(canonicalIndex))) from e
+      
 class MasterGettable:
   @properGetitem
   def __getitem__(self,powerIndex):
@@ -654,7 +657,7 @@ def delegation(extraIndex,entry,i):
 def performExtraIndex(i,extraIndex=None,entry=None,flip=False):
   if extraIndex is None or len(extraIndex)==0:
     return i
-  if callable(extraIndex[0]) and not isinstance(extraIndex[0],Delegater):
+  if isinstance(extraIndex[0], callable) and not isinstance(extraIndex[0],Delegater):
     return extraIndex[0](performExtraIndex(i,extraIndex=extraIndex[1:],entry=entry,flip=flip))
   if not(isinstance(extraIndex[0],NestedDictLiteral)):
     if len(extraIndex)>2 or len(extraIndex)==0:
@@ -758,7 +761,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
         res = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
         if isinstance(res,DM):
           assert res.is_dense()
-          return map(int,list(res.nonzeros()))
+          return list(map(int,list(res.nonzeros())))
         return list(res)
       else:
         raise Exception("Canonical index %s not found." % str(canonicalIndex))
@@ -788,7 +791,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     for i in self.traverseCanonicalIndex():
       e = self.getStructEntryByCanonicalIndex(i)
       sp = Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
-      m = DM(sp,range(k,k+sp.nnz()))
+      m = DM(sp,list(range(k,k+sp.nnz())))
       k += sp.nnz()
       it = tuple(i)
       self.map[it] = m
@@ -799,9 +802,8 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
         else:
           hmap[a] = [m]
     self.size = k
-    for k,v in hmap.iteritems():
+    for k,v in hmap.items():
       hmap[k] = vertcat(*[i.nz[:] for i in v])
-
     self.map.update(hmap)
 
     class StructureGetter:
@@ -878,7 +880,7 @@ class Structured(object):
       return self.description + " (" + self.struct.__str__(compact=True) + ")"
 
   def keys(self):
-    return self.struct.keys()
+    return list(self.struct.keys())
 
 class CasadiStructured(Structured,CasadiStructureDerivable):
   description = "Generic Structured object"
@@ -889,7 +891,7 @@ class CasadiStructured(Structured,CasadiStructureDerivable):
     self.__init__(cs,order=state["order"])
 
   def __getstate__(self):
-    d = copy.deepcopy(self.struct.__getstate__())
+    d = self.struct.__getstate__()
     d["order"] = self.order
     return d
 
@@ -1036,7 +1038,7 @@ class DMStruct(MatrixStruct):
     self.__init__(cs,data=state["master"])
 
   def __getstate__(self):
-    d = copy.deepcopy(self.struct.__getstate__())
+    d = self.struct.__getstate__()
     d["master"] = self.master
     return d
 
@@ -1105,12 +1107,11 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
   @property
   def master(self):
     if any(e is None for e in self.storage):
-      missing = filter(lambda k: self.storage[self.mapping[k]] is None,self.mapping.keys())
-
+      missing = [k for k in list(self.mapping.keys()) if self.storage[self.mapping[k]] is None]
       raise Exception("Problem in MX vecNZcat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
 
     if self.dirty:
-      self.master_cached = vertcat(*[casadi.vec(i.nz[:]) for i in self.storage])
+      self.master_cached = vertcat(*[casadi.vec(i if i.is_dense() else i.nz[:]) for i in self.storage])
 
     return self.master_cached
 
@@ -1139,7 +1140,7 @@ class CasadiStructEntry(StructEntry):
 
 
 
-    kw = kwargs.keys()
+    kw = list(kwargs.keys())
     kws = ['repeat','shape','sym','expr','struct','shapestruct','type']
     for k in kw:
       if k not in kws:
@@ -1164,8 +1165,8 @@ class CasadiStructEntry(StructEntry):
 
     if 'repeat' in kwargs:
       self.repeat = kwargs["repeat"] if isinstance(kwargs["repeat"],list) else [kwargs["repeat"]]
-
-    if not all(map(lambda x: is_integer(x),self.repeat)):
+    
+    if not all([is_integer(x) for x in self.repeat]):
       raise Exception("The 'repeat' argument, if present, must be a list of integers, but got %s" % str(self.repeat))
 
 
@@ -1296,7 +1297,7 @@ class EntryList:
 
     for e in arg:
       if isinstance(e,tuple):
-        entries = map(entry,e)
+        entries = list(map(entry,e))
         self.order.append(tuple(x.name for x in entries))
         self.entries+=entries
       else:
@@ -1309,8 +1310,7 @@ class EntryList:
       if any(isinstance(e,tuple) for e in self.order):
         raise Exception("You supplied an order by using tuple syntax on entries %s, but you overwrite it with the 'order' keyword. Use one or the other, not both.")
       self.order = order
-
-    self.names = map(lambda x : x.name,self.entries)
+    self.names = [x.name for x in self.entries]
     if len(self.names)!=len(set(self.names)):
       duplicates = []
       for i,e in enumerate(self.names):
@@ -1443,4 +1443,3 @@ class DataReferenceSquaredRepeated(DataReference):
 def struct_load(filename):
     import pickle
     return pickle.load(file(filename,"rb"))
-

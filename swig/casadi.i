@@ -498,7 +498,6 @@ namespace std {
   }
 }
 
-#ifdef WITH_PYTHON3
 // See https://github.com/casadi/casadi/issues/701
 // Recent numpys will only catch TypeError or ValueError in printing logic
 %exception __bool__ {
@@ -508,15 +507,6 @@ namespace std {
    SWIG_exception(SWIG_TypeError, e.what());
   }
 }
-#else
-%exception __nonzero__ {
- try {
-    $action
-  } catch (const std::exception& e) {
-   SWIG_exception(SWIG_TypeError, e.what());
-  }
-}
-#endif
 #else
 // Exceptions handling
 %include "exception.i"
@@ -542,7 +532,6 @@ namespace std {
   }
 }
 
-#ifdef WITH_PYTHON3
 // See https://github.com/casadi/casadi/issues/701
 // Recent numpys will only catch TypeError or ValueError in printing logic
 %exception __bool__ {
@@ -554,18 +543,6 @@ namespace std {
     SWIG_exception(SWIG_TypeError, e.getMessage());
   }
 }
-#else
-%exception __nonzero__ {
- try {
-    $action
-  } catch (const std::exception& e) {
-   SWIG_exception(SWIG_TypeError, e.what());
-  }
-  catch (const Swig::DirectorException& e) {
-    SWIG_exception(SWIG_TypeError, e.getMessage());
-  }
-}
-#endif
 #endif
 
 #ifdef SWIGPYTHON
@@ -1040,14 +1017,7 @@ namespace std {
 
     GUESTOBJECT * from_ptr(const casadi_int *a) {
 #ifdef SWIGPYTHON
-#ifdef WITH_PYTHON3
       return PyLong_FromLongLong(*a);
-#else
-      // For python on Windows
-      if (*a > PyInt_GetMax() || *a < -(PyInt_GetMax()-1)) return PyLong_FromLongLong(*a);
-      return PyInt_FromLong(*a);
-#endif
-
 #elif defined(SWIGMATLAB)
       return mxCreateDoubleScalar(static_cast<double>(*a));
 #else
@@ -2444,11 +2414,7 @@ namespace std {
   PyObject * arg_tuple = PyTuple_New($2.size());
   for (casadi_int i=0;i<$2.size();++i) {
 
-#ifdef WITH_PYTHON3
     PyObject* buf = $1[i] ? PyMemoryView_FromMemory(reinterpret_cast<char*>(const_cast<double*>($1[i])), $2[i]*sizeof(double), PyBUF_READ) : SWIG_Py_Void();
-#else
-    PyObject* buf = $1[i] ? PyBuffer_FromMemory(const_cast<double*>($1[i]), $2[i]*sizeof(double)) : SWIG_Py_Void();
-#endif
     PyTuple_SET_ITEM(arg_tuple, i, buf);
   }
   $input = arg_tuple;
@@ -2457,11 +2423,7 @@ namespace std {
 %typemap(directorin, noblock=1, fragment="casadi_all") (double** res, const std::vector<casadi_int>& sizes_res) {
   PyObject* res_tuple = PyTuple_New($2.size());
   for (casadi_int i=0;i<$2.size();++i) {
-#ifdef WITH_PYTHON3
     PyObject* buf = $1[i] ? PyMemoryView_FromMemory(reinterpret_cast<char*>(const_cast<double*>($1[i])), $2[i]*sizeof(double), PyBUF_WRITE) : SWIG_Py_Void();
-#else
-    PyObject* buf = $1[i] ? PyBuffer_FromReadWriteMemory($1[i], $2[i]*sizeof(double)) : SWIG_Py_Void();
-#endif
     PyTuple_SET_ITEM(res_tuple, i, buf);
   }
   $input = res_tuple;
@@ -2945,13 +2907,7 @@ if (!$1) {
 
 #ifdef SWIGPYTHON
 %ignore casadi_mod;
-#endif // SWIGPYTHON
-
-#ifdef WITH_PYTHON3
 %rename(__bool__) __nonzero__;
-#endif
-
-#ifdef SWIGPYTHON
 
 %pythoncode %{
 class NZproxy:
@@ -4318,7 +4274,6 @@ namespace casadi{
 %}
 
 
-#ifdef WITH_PYTHON3
 %pythoncode %{
   def __bool__(self):
     if self.numel()!=1:
@@ -4327,16 +4282,6 @@ namespace casadi{
       return False
     return float(self)!=0
 %}
-#else
-%pythoncode %{
-  def __nonzero__(self):
-    if self.numel()!=1:
-      raise Exception("Only a scalar can be cast to a float")
-    if self.nnz()==0:
-      return False
-    return float(self)!=0
-%}
-#endif
 
 %pythoncode %{
   def __abs__(self):
@@ -4873,7 +4818,6 @@ namespace casadi {
 
 // Wrap the casadi_ prefixed functions in member functions
 #ifdef SWIGPYTHON
-#ifdef WITH_PYTHON3
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
@@ -4890,7 +4834,6 @@ namespace casadi {
     %stub_CasadiMatrix_binop(__rmatmul__)
   }
 }
-#endif
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
