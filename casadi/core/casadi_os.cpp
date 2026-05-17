@@ -207,7 +207,12 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
     #ifdef WITH_DEEPBIND
     #ifndef __APPLE__
     #if __GLIBC__
-        if (environ_rtdl_next_overridden) {
+         // Only restore if the original value was non-NULL. A NULL "original"
+         // means the duplicate environ slot was never initialised by its owner
+         // (observed under CPython on Linux); writing NULL back would leave any
+         // subsequently loaded code that reads environ directly dereferencing a
+         // null pointer. See casadi/casadi#4317.
+        if (environ_rtdl_next_overridden && environ_rtld_next_original_value) {
           *p_environ_rtdl_next = environ_rtld_next_original_value;
           environ_rtdl_next_overridden = false;
         }
