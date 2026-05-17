@@ -1017,7 +1017,7 @@ jobs:
               # x86_64 mac (macos-15-intel) is excluded in nominal mode — it
               # isn't built by matrix-arch-py2-mac nominal, and skipping it
               # here also cuts release-upload concurrency.
-              py2: ["311","314"]
+              py2: ["314"]
               image: ["windows-2022","macos-14"]
               bit: [64]
               manylinux_target: [""]
@@ -1025,7 +1025,7 @@ jobs:
               - type: append
                 matrix:
                   image: ["ubuntu-24.04"]
-                  py2: ["311","314"]
+                  py2: ["314"]
                   bit: [64]
                   manylinux_target: ["manylinux_2_28"]
       - id: slow
@@ -1153,7 +1153,7 @@ jobs:
           config: |
             matrix:
               image: ["ubuntu-24.04"]
-              py2: ["311"]
+              py2: ["312"]
               bit: [64]
               manylinux_target: ["manylinux_2_28"]
             operations: []
