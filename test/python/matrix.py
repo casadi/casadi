@@ -21,6 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
+from casadi import mtimes
 from casadi import *
 from numpy import inf, pi
 import casadi as c
@@ -947,10 +948,37 @@ class Matrixtests(casadiTestCase):
     self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
   def  test_mul3_issue_1465(self):
-    with self.assertRaises(Exception):
-      w = SX.sym("w",2,1)
-      Q = np.eye(2)
-      mtimes(w.T,Q,w)  # pyright: ignore[reportCallIssue,reportArgumentType]
+
+    w2 = SX.sym("w",2,1)
+    w3 = SX.sym("w",3,1)
+    Q = np.eye(2)
+
+    mtimes(w2.T,Q)
+    w2.T @ Q
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x3 and rhs is 2x2."):
+      mtimes(w3.T,Q)
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x3 and rhs is 2x2."):
+      w3.T @ Q
+
+    mtimes([w2.T,Q,w2])
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x3 and rhs is 2x2."):
+      mtimes([w3.T,Q,w2])
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x2 and rhs is 3x1."): 
+      mtimes([w2.T,Q,w3])
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x3 and rhs is 2x2."):
+      mtimes([w3.T,Q,w3])
+
+    with self.assertInException("unsupported operand type(s) for @: 'SX' and 'NoneType'"):
+      w2.T @ None # pyright: ignore[reportCallIssue,reportArgumentType, reportOperatorIssue]
+    
+    with self.assertInException("mtimes(Sparsity,Sparsity,str)"):
+      mtimes(w2,None) # pyright: ignore[reportCallIssue,reportArgumentType]
+  
+    with self.assertInException("mtimes(Sparsity,Sparsity,str)"):
+      mtimes(w2.T,Q,None) # pyright: ignore[reportCallIssue,reportArgumentType]
+
+    with self.assertInException("mtimes(Sparsity,Sparsity,str)"):
+      mtimes(w2.T,Q,w2) # pyright: ignore[reportCallIssue,reportArgumentType]
 
   def test_chol(self):
     numpy.random.seed(0)

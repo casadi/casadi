@@ -2878,7 +2878,6 @@ def dcat(args):
 %feature("python:maybecall") casadi_mod;
 %feature("python:maybecall") casadi_copysign;
 %feature("python:maybecall") casadi_constpow;
-%feature("python:maybecall") casadi_mtimes;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
@@ -4826,8 +4825,16 @@ namespace casadi {
           return self.element_hash()
         except:
           return SharedObject.__hash__(self)
-      def __matmul__(x, y): return _casadi.mtimes(x, y)
-      def __rmatmul__(x, y): return _casadi.mtimes(y, x)
+      def __matmul__(x, y):
+        try:
+          return _casadi.mtimes(x, y)
+        except NotImplementedError:
+          return NotImplemented
+      def __rmatmul__(x, y):
+        try:
+          return _casadi.mtimes(y, x)
+        except NotImplementedError:
+          return NotImplemented
     %}
     %stub_method0(__hash__, int)
     %stub_CasadiMatrix_binop(__matmul__)
