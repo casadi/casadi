@@ -4101,6 +4101,12 @@ class Functiontests(casadiTestCase):
   @memory_heavy()
   @requiresPlugin(Importer,"shell")
   def test_blazing_spline(self):
+    def test_points(knots_orig):
+        import itertools
+        selector = [lambda e: e[0]-0.1,lambda e: e[0],lambda e: (e[0]+e[1])/2,lambda e: e[-1],lambda e: e[-1]+0.1]
+        for s in itertools.product(selector,repeat=len(knots_orig)):
+            yield [e(k) for e,k in zip(s,knots_orig)]
+
     for N in [1,2,3,4,5]:
       for precompute_coeff in [False, True]:
         for precompute_grid in [False, True]:
@@ -4160,13 +4166,7 @@ class Functiontests(casadiTestCase):
                   F = blazing_spline("F",knots,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
               F_test = Function('F_test',[x, C], [F(x, C)[0]])
   
-            def test_points(knots):
-                import itertools
-                selector = [lambda e: e[0]-0.1,lambda e: e[0],lambda e: (e[0]+e[1])/2,lambda e: e[-1],lambda e: e[-1]+0.1]
-                for s in itertools.product(selector,repeat=len(knots)):
-                    yield [e(k) for e,k in zip(s,knots_orig)]
-  
-            all_points = list(test_points(knots))
+            all_points = list(test_points(knots_orig))
   
             if N>3:
                 random_base.seed(1)
@@ -4277,13 +4277,54 @@ class Functiontests(casadiTestCase):
               for k in knots_alt:
                   knots_alt_stacked.extend(k)
               knots_alt_data = DM(knots_alt_stacked)
-  
+
               y_alt = substitute(F(x, C, K)[0], K, knots_alt_data)
               F_alt = Function('F_alt',[x, C],[y_alt])
               res1 = F_test(vcat(x0), data)
               res2 = F_alt(vcat(x0), data)
               self.assertFalse(np.allclose(float(res1), float(res2)),
                   "Parametric knots should produce different results with different knot vectors")
+
+          # lookup_mode test: uniform knots so 'exact' is valid
+          x_lu = MX.sym("x",N)
+          knots_uniform_orig = [
+              list(np.linspace(0,1,5)),
+              list(np.linspace(0,1,5)),
+              list(np.linspace(0,1,3)),
+              list(np.linspace(0,1,3)),
+              list(np.linspace(0,1,3)),
+          ][:N]
+          knots_uniform = [[k[0]]*3 + k + [k[-1]]*3 for k in knots_uniform_orig]
+          nc_u = int(np.prod([len(k)-4 for k in knots_uniform]))
+          DM.rng(1)
+          data_u = DM.rand(nc_u)
+          C_u = MX.sym("C",nc_u,1)
+          Y_u = bspline(x_lu,C_u,knots_uniform,[3]*N,1)
+          F_ref_u = Function('f',[x_lu,C_u],[Y_u])
+
+          points_u = list(test_points(knots_uniform_orig))
+          if N>3:
+              random_base.seed(1)
+              points_u = random_base.sample(points_u,125)
+
+          for lookup_mode in ["linear","exact","binary"]:
+            opts_lu = {"precompute_coeff": precompute_coeff,
+                       "precompute_grid": precompute_grid,
+                       "lookup_mode": [lookup_mode]*N,
+                       "jit": True}
+            if os.name=='nt':
+                opts_lu["jit_options"] = {"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}
+            else:
+                opts_lu["jit_options"] = {"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}
+            F_lu = blazing_spline("F",knots_uniform,opts_lu)
+            F_lu_test = Function('F_lu_test',[x_lu, C_u], [F_lu(x_lu, C_u)[0]])
+
+            for a in points_u:
+                self.checkfunction_light(F_lu_test,F_ref_u,inputs=[vcat(a),data_u])
+
+            F_lu2 = Function.deserialize(F_lu.serialize({"debug":True}))
+            for a in points_u:
+                self.checkfunction_light(F_lu,F_lu2,inputs=[vcat(a),data_u])
 
   def test_noncanonical_sparsity(self):
     x = MX.sym("x",4,4)

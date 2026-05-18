@@ -43,14 +43,43 @@ namespace casadi {
     return offsets;
   }
 
+  // Build the per-dimension knot cache consumed by the blazing runtime.
+  // Each dim's slice has layout [intercept, slope, inv1[n_k], inv2[n_k], inv3[n_k]]:
+  //   slope     = (ng-1) / (grid[ng-1] - grid[0])   with grid = K[degree:n_k-degree]
+  //   intercept = -grid[0] * slope
+  //   invS[k]   = 1/(t[k+S] - t[k]) (zeroed where the span collapses)
+  // The two scalars feed 'exact' lookup_mode (single FMA, no FP divide); the
+  // inv spans feed the de Boor recurrence. The scalars are emitted
+  // unconditionally so the runtime layout stays uniform regardless of
+  // lookup_mode.
   template<typename M>
-  static M compute_inv(const M& K, const std::vector<casadi_int>& offsets) {
+  static M compute_knots_cache(const M& K, const std::vector<casadi_int>& offsets) {
     casadi_int nd = offsets.size() - 1;
-    std::vector<M> inv_parts;
+    casadi_int degree = 3;
+    std::vector<M> parts;
     for (casadi_int d = 0; d < nd; ++d) {
       casadi_int off = offsets[d];
       casadi_int n_k = offsets[d + 1] - off;
       M t = K(Slice(off, off + n_k));
+
+      // {intercept, slope} for 'exact' lookup. ng is the length of the
+      // searched grid (K[degree : n_k-degree]).
+      casadi_int ng = n_k - 2*degree;
+      M slope, intercept;
+      if (ng >= 2) {
+        M g0 = t(degree);
+        M dg = t(n_k - degree - 1) - g0;
+        // dg=0 would mean a degenerate grid; guard the divide.
+        slope     = if_else_zero(dg, static_cast<double>(ng-1) / (dg + 1e-100));
+        intercept = -g0 * slope;
+      } else {
+        slope     = M::zeros(1, 1);
+        intercept = M::zeros(1, 1);
+      }
+      parts.push_back(intercept);
+      parts.push_back(slope);
+
+      // Existing inv1/inv2/inv3 spans.
       for (casadi_int span = 1; span <= 3; ++span) {
         M inv_span;
         if (span < n_k) {
@@ -60,10 +89,10 @@ namespace casadi {
         } else {
           inv_span = M::zeros(n_k, 1);
         }
-        inv_parts.push_back(inv_span);
+        parts.push_back(inv_span);
       }
     }
-    return vertcat(inv_parts);
+    return vertcat(parts);
   }
 
   // MX version of BSplineCommon::derivative_coeff for parametric knots.
@@ -134,7 +163,7 @@ namespace casadi {
     MX x = MX::sym("x", nd);
     MX C = MX::sym("C", F_inner.size_in(1));
     MX knots = MX::sym("knots", nk);
-    MX inv = compute_inv(knots, offsets);
+    MX inv = compute_knots_cache(knots, offsets);
     std::vector<MX> ret = F_inner(std::vector<MX>{x, C, knots, inv});
     return Function(name, {x, C, knots}, ret,
                     {"x", "C", "knots"}, F_inner.name_out(),
@@ -164,7 +193,9 @@ namespace casadi {
     } else if (has_parametric_knots() && i==arg_knots()) {
       return Sparsity::dense(knots_offset_.back());
     } else if (inv_input_ && i==arg_inv()) {
-      return Sparsity::dense(3 * knots_offset_.back());
+      // Per-dim slice = 2 (intercept,slope) + 3*n_k (inv1,inv2,inv3).
+      casadi_int nd = knots_offset_.size() - 1;
+      return Sparsity::dense(2 * nd + 3 * knots_offset_.back());
     } else if (precompute_coeff_ && i==2+has_parametric_knots()+inv_input_) {
       return Sparsity::dense(ndc_);
     } else if (precompute_coeff_ && i==3+has_parametric_knots()+inv_input_) {
@@ -294,7 +325,7 @@ namespace casadi {
 
     // Precompute reciprocal knot spans (only when knot values are known)
     if (!has_parametric_knots()) {
-      DM inv_dm = compute_inv(DM(knots_stacked_), knots_offset_);
+      DM inv_dm = compute_knots_cache(DM(knots_stacked_), knots_offset_);
       knots_inv_ = inv_dm.nonzeros();
     }
   }
@@ -416,7 +447,8 @@ namespace casadi {
     casadi_int N = ndim();
     bool parametric = has_parametric_knots();
     casadi_int nk = parametric ? knots_offset_.back() : 0;
-    casadi_int n_inv = 3 * nk;
+    // Per-dim cache slice = 2 (intercept,slope) + 3*n_k. See compute_knots_cache.
+    casadi_int n_inv = 2 * N + 3 * nk;
 
     MX x = MX::sym("x", N);
     MX C = MX::sym("C", nc_);
@@ -530,7 +562,7 @@ namespace casadi {
     std::vector<MX> in_child = {x, C};
     if (parametric) in_child.push_back(knots_sym);
     if (precompute_grid_ && parametric) {
-      MX inv_mx = inv_input_ ? inv_sym : compute_inv(knots_sym, knots_offset_);
+      MX inv_mx = inv_input_ ? inv_sym : compute_knots_cache(knots_sym, knots_offset_);
       in_child.push_back(inv_mx);
     }
     if (precompute_coeff_) {
