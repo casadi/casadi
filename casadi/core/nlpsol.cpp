@@ -913,7 +913,7 @@ namespace casadi {
     arg += NLPSOL_NUM_IN;
     res += NLPSOL_NUM_OUT;
 
-    casadi_nlpsol_init(&m->d_nlp, &arg, &res, &iw, &w);
+    casadi_nlpsol_set_work(&m->d_nlp, &arg, &res, &iw, &w);
   }
 
   std::vector<std::string> nlpsol_options(const std::string& name) {
@@ -1315,7 +1315,7 @@ namespace casadi {
       g << "p_nlp.detect_bounds.callback = " << w << ";\n";
       g << "p_nlp.detect_bounds.callback_data = 0;\n";
     }
-    g << "casadi_nlpsol_init(&d_nlp, &arg, &res, &iw, &w);\n";
+    g << "casadi_nlpsol_set_work(&d_nlp, &arg, &res, &iw, &w);\n";
 
     // Set initial guess
     g.copy_default("d_nlp.x0", nx_, "d_nlp.z", "0", false);

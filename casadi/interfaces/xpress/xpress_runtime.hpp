@@ -132,9 +132,9 @@ void casadi_xpress_work(const casadi_xpress_prob<T1>* p,
   if (p->socp) casadi_socp_work(p->socp, sz_iw, sz_w);
 }
 
-// SYMBOL "xpress_init"
+// SYMBOL "xpress_set_work"
 template<typename T1>
-void casadi_xpress_init(casadi_xpress_data<T1>* d,
+void casadi_xpress_set_work(casadi_xpress_data<T1>* d,
     const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   const casadi_xpress_prob<T1>* p = d->prob;
   d->qrtype   = reinterpret_cast<char*>(*iw); *iw += p->qp->na;

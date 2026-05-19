@@ -235,7 +235,7 @@ void MadnlpInterface::set_work(void* mem, const double**& arg, double**& res,
   m->d.prob = &p_;
   m->d.nlp = &m->d_nlp;
 
-  casadi_madnlp_init(&m->d, &arg, &res, &iw, &w);
+  casadi_madnlp_set_work(&m->d, &arg, &res, &iw, &w);
 
   m->d.nlp->oracle->m = static_cast<void*>(m);
 }
@@ -362,8 +362,8 @@ void MadnlpInterface::codegen_body(CodeGenerator& g) const {
   g.local("p", "struct casadi_madnlp_prob");
   set_madnlp_prob(g);
 
-  g << "casadi_madnlp_init(d, &arg, &res, &iw, &w);\n";
-  g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
+  g << "casadi_madnlp_set_work(d, &arg, &res, &iw, &w);\n";
+  g << "casadi_oracle_set_work(d->nlp->oracle, &arg, &res, &iw, &w);\n";
   g << "casadi_madnlp_presolve(d);\n";
   g << "casadi_madnlp_solve(d);\n";
 

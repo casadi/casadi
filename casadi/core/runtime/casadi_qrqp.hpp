@@ -146,9 +146,11 @@ void casadi_qrqp_work(const casadi_qrqp_prob<T1>* p, casadi_int* sz_arg, casadi_
   *sz_iw += p->qp->nz; // lincomb
 }
 
-// SYMBOL "qrqp_init"
+// SYMBOL "qrqp_set_work"
 template<typename T1>
-void casadi_qrqp_init(casadi_qrqp_data<T1>* d, casadi_int** iw, T1** w) {
+void casadi_qrqp_set_work(casadi_qrqp_data<T1>* d, const T1*** arg, T1*** res,
+    casadi_int** iw, T1** w) {
+  (void)arg; (void)res;
   // Local variables
   casadi_int nnz_a, nnz_kkt, nnz_v, nnz_r;
   const casadi_qrqp_prob<T1>* p = d->prob;

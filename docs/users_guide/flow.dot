@@ -3,14 +3,14 @@ digraph flow {
 node [ordering=out];
 
 // Codegen
-casadi_foo_setup, casadi_foo_solve, casadi_foo_work, casadi_qp_setup, casadi_foo_set_work, casadi_qp_work, missing_qp_set_work [shape=rectangle];
+casadi_foo_setup, casadi_foo_solve, casadi_foo_work, casadi_qp_setup, casadi_foo_set_work, casadi_qp_set_work, casadi_qp_work [shape=rectangle];
 
 
-casadi_qp_setup [label="casadi_qp_setup(qp_prob* p)\nUnpack problem\np->nx=p"];
+casadi_qp_setup [label="casadi_qp_setup(qp_prob* p)\nUnpack problem\np->nx=p->sp_h.size2()"];
 
 set_qp_prob -> casadi_qp_setup;
 
-set_qp_prob [label="set_qp_prob()\nClass immutable fields -> struct"];
+set_qp_prob [label="set_qp_prob()\nClass immutable fields -> struct\np_qp_.sp_a = A_"];
 
 lifetime -> init;
 lifetime -> call;
@@ -37,41 +37,34 @@ free_mem [label="free_mem(void *)"];
 
 init_mem -> add_stat;
 
-init -> qp_init;
+class_init [label="Conic::init(const Dict& opts)"];
+class_init -> set_qp_prob;
+class_init -> set_foo_prob;
+class_init -> casadi_foo_work;
+class_init -> alloc_;
 
-casadi_qp_init [label="qp_init(qp_data *d, casadi_int** iw...)\n(empty)"]
-init -> set_foo_prob;
-init -> casadi_foo_work;
-init -> alloc_;
-
-qp_init [label="Conic::init(const Dict& opts)"]
-
-qp_init -> set_qp_prob;
-
-
-set_qp_prob [label="set_qp_prob()\nFill problem struct with class members\np_qp_.sp_a = A_"];
-
-init [label="init(const Dict& opts)"]
-
-alloc_ [label="alloc_*(...)\nAllocate scratch space arg, res, iw, w"]
-casadi_foo_work [label="casadi_foo_work(const foo_prob* p, casadi_int* sz_arg...)\nIncrease scratch space counters"]
-
-casadi_foo_work -> casadi_qp_work;
-
-casadi_qp_work [label="casadi_qp_work(const foo_prob* p, casadi_int* sz_arg...)\nIncrease scratch space counters"]
-
+init -> class_init;
 
 set_foo_prob -> casadi_foo_setup;
 
-set_foo_prob [label="set_foo_prob()\nFill problem struct with class members\np_.inf = inf_"];
+set_foo_prob [label="set_foo_prob()\nFill problem struct with class members\np_.inf = inf_\nNon-trivially-derived fields are computed by casadi_foo_setup"];
 
-casadi_foo_setup [label="casadi_foo_setup(foo_prob *p)\nUnpack problem\nAvoids codegen/vm duplication of populating helper problem struct elements"]
+casadi_foo_setup [label="casadi_foo_setup(foo_prob *p)\nFill derived prob fields\n(cumulative sizes, max dims, derived block descriptors)\nAvoids codegen/vm duplication of populating helper problem struct elements"];
+
+alloc_ [label="alloc_*(...)\nAllocate scratch space arg, res, iw, w\nSingle source of truth: casadi_foo_work bumps both sz_iw and sz_w"];
+casadi_foo_work [label="casadi_foo_work(const foo_prob* p,\n   sz_arg, sz_res, sz_iw, sz_w)\nIncrease scratch space counters\nby ALL data fields the helper claims in init"];
+
+casadi_foo_work -> casadi_qp_work;
+
+casadi_qp_work [label="casadi_qp_work(const qp_prob* p, ...)\nIncrease scratch space counters"];
+
 eval -> setup;
 eval -> solve;
 
 solve [label="solve(const double** arg..., void *mem)"];
 
 solve -> casadi_foo_solve;
+casadi_foo_solve [label="casadi_foo_solve(foo_data* d, ...)\nKernel: reads d-> pointers (already wired by init)\nDoes NOT claim from iw/w"];
 
 setup -> set_work;
 setup -> set_temp;
@@ -79,11 +72,43 @@ setup -> set_temp;
 setup [label="setup(void *mem, const double** arg...)"];
 
 set_temp [label="set_temp(void *mem, const double** arg...)"];
-set_work [label="set_work(void *mem, const double**& arg...)"];
-qp_set_work [label="Conic::set_work"];
+set_work [label="set_work(void *mem, const double**& arg...)\nPER-CALL pointer wiring"];
+qp_set_work [label="Conic::set_work\nd_qp.h = arg[CONIC_H]; etc."];
 set_work -> qp_set_work;
-qp_set_work -> missing_qp_set_work;
 set_work -> casadi_foo_set_work;
-casadi_foo_set_work [label="casadi_foo_set_work(foo_data* d, const double ***w...)\nSet mutable data pointers to scratch space\nd->r = *w; *w+=..."];
+casadi_foo_set_work [label="casadi_foo_set_work(foo_data* d,\n   const T1*** arg, T1*** res,\n   casadi_int** iw, T1** w)\nCANONICAL signature -- mirrors FunctionInternal::set_work.\nClaim ALL per-call scratch (and arg/res-driven pointers) here.\nAfter this call, caller uses d->* exclusively\n(no raw 'w +=' lines outside this function).\nNo extra ints/flags on the signature -- those go on prob."];
+
+// Per-eval data wiring helpers nest: foo's set_work may call qp's set_work too
+casadi_foo_set_work -> casadi_qp_set_work;
+casadi_qp_set_work [label="casadi_qp_set_work(qp_data* d, arg, res, iw, w)\n(canonical; may be empty if QP just hands pointers through)"];
+
+// Internal scratch-only helpers (NOT emitted from codegen) keep the
+// 3-arg `_init` shape: casadi_socp_init, casadi_ipqp_init, casadi_jac_init.
+// These are called nested from inside another helper's body.
+
+// ---------- Codegen path ----------
+// The same setup / work / init / solve helpers are called from the
+// generated C, with prob/data declared as function-local stack
+// structs and the pointers wired per-call.  This is the "Avoids
+// codegen/vm duplication" benefit -- one C function used by both paths.
+codegen_body [label="codegen_body(g)\nGenerated C function body", shape=ellipse, style=dashed];
+codegen_body -> codegen_emit_setup;
+codegen_body -> codegen_emit_init;
+codegen_body -> codegen_emit_solve;
+codegen_emit_setup [label="(emit, per-call)\np_foo.field = ...;\ncasadi_foo_setup(&p_foo);", shape=note, style=dashed];
+codegen_emit_init [label="(emit, per-call)\nd_foo.prob = &p_foo;\ncasadi_foo_init(&d_foo, &iw, &w);", shape=note, style=dashed];
+codegen_emit_solve [label="(emit, per-call)\nuse d_foo.field exclusively\ncasadi_foo_solve(&d_foo, ...);", shape=note, style=dashed];
+
+// Same C runtime helpers serve both paths
+codegen_emit_setup -> casadi_foo_setup [style=dashed, constraint=false];
+codegen_emit_init  -> casadi_foo_init  [style=dashed, constraint=false];
+codegen_emit_solve -> casadi_foo_solve [style=dashed, constraint=false];
+
+// ---------- Persistence note ----------
+// p_foo_ is a CLASS MEMBER (perennial).
+// d_foo / d_qp live on the per-memory-block ConicMemory and are
+// re-wired EVERY call by casadi_foo_init from the iw / w workspace.
+// p_foo_ pointer fields point into class-owned vectors;
+// d_foo  pointer fields point into per-call iw / w scratch.
 
 }

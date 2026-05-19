@@ -545,7 +545,7 @@ namespace casadi {
     m->d.prob = &p_;
     m->d.nlp = &m->d_nlp;
 
-    casadi_fatrop_init(&m->d, &arg, &res, &iw, &w);
+    casadi_fatrop_set_work(&m->d, &arg, &res, &iw, &w);
 
     m->d.nlp->oracle->m = static_cast<void*>(m);
 
@@ -693,8 +693,8 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
   g.local("p", "struct casadi_fatrop_prob");
   set_fatrop_prob(g);
 
-  g << "casadi_fatrop_init(d, &arg, &res, &iw, &w);\n";
-  g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
+  g << "casadi_fatrop_set_work(d, &arg, &res, &iw, &w);\n";
+  g << "casadi_oracle_set_work(d->nlp->oracle, &arg, &res, &iw, &w);\n";
 
   // fatrop_ocp_c_create (called from casadi_fatrop_presolve) installs a
   // process-wide singleton stream via fatrop::OutputStreamManager::set_stream,

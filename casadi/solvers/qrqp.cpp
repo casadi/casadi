@@ -159,7 +159,7 @@ namespace casadi {
     m->d.prob = &p_;
     m->d.qp = &m->d_qp;
 
-    casadi_qrqp_init(&m->d, &iw, &w);
+    casadi_qrqp_set_work(&m->d, &arg, &res, &iw, &w);
   }
 
   void Qrqp::set_qrqp_prob() {
@@ -288,7 +288,7 @@ namespace casadi {
     // Setup data structure
     g << "d.prob = &p;\n";
     g << "d.qp = &d_qp;\n";
-    g << "casadi_qrqp_init(&d, &iw, &w);\n";
+    g << "casadi_qrqp_set_work(&d, &arg, &res, &iw, &w);\n";
 
     g.comment("Pass bounds on z");
     g.copy_default(g.arg(CONIC_LBX), nx_, "d.lbz", "-casadi_inf", false);

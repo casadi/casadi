@@ -28,6 +28,8 @@ struct casadi_feasiblesqpmethod_prob {
   const casadi_int *sp_h, *sp_a, *sp_hr;
   // casadi_int merit_memsize;
   // casadi_int max_iter_ls;
+  // Solver configuration (immutable after class init)
+  int sz_anderson_memory;
 };
 // C-REPLACE "casadi_feasiblesqpmethod_prob<T1>" "struct casadi_feasiblesqpmethod_prob"
 
@@ -80,9 +82,10 @@ struct casadi_feasiblesqpmethod_data {
 // SYMBOL "feasiblesqpmethod_work"
 template<typename T1>
 void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
-    casadi_int* sz_iw, casadi_int* sz_w, int sz_anderson_memory) {
+    casadi_int* sz_iw, casadi_int* sz_w) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
+  int sz_anderson_memory = p->sz_anderson_memory;
   nnz_h = p->sp_h[2+p->sp_h[1]];
   nnz_a = p->sp_a[2+p->sp_a[1]];
   nx = p->nlp->nx;
@@ -147,13 +150,15 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   // if (so_corr) *sz_w += nx+nx+ng; // Temp memory for failing soc
 }
 
-// SYMBOL "feasiblesqpmethod_init"
+// SYMBOL "feasiblesqpmethod_set_work"
 template<typename T1>
-void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d,
-    casadi_int** iw, T1** w, int sz_anderson_memory) {
+void casadi_feasiblesqpmethod_set_work(casadi_feasiblesqpmethod_data<T1>* d,
+    const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
+  (void)arg; (void)res;
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
   const casadi_feasiblesqpmethod_prob<T1>* p = d->prob;
+  int sz_anderson_memory = p->sz_anderson_memory;
   // Get matrix number of nonzeros
   nnz_h = p->sp_h[2+p->sp_h[1]];
   nnz_a = p->sp_a[2+p->sp_a[1]];
