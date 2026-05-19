@@ -936,7 +936,7 @@ void IpoptInterface::codegen_body(CodeGenerator& g) const {
   g.local("p", "struct casadi_ipopt_prob");
   set_ipopt_prob(g);
 
-  g << "casadi_ipopt_init(d, &arg, &res, &iw, &w);\n";
+  g << "casadi_ipopt_set_work(d, &arg, &res, &iw, &w);\n";
   g << "casadi_ipopt_presolve(d);\n";
 
   // Start an IPOPT application

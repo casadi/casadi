@@ -95,9 +95,9 @@ void casadi_daqp_work(const casadi_daqp_prob<T1>* p, casadi_int* sz_arg, casadi_
   *sz_iw += p->qp->nz; // sense
 }
 
-// SYMBOL "daqp_init"
+// SYMBOL "daqp_set_work"
 template<typename T1>
-void casadi_daqp_init(casadi_daqp_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
+void casadi_daqp_set_work(casadi_daqp_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Local variables
   casadi_int nx, na;
   const casadi_daqp_prob<T1>* p = d->prob;

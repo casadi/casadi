@@ -313,7 +313,7 @@ namespace casadi {
 
     g << "d->prob = &p;\n";
     g << "d->qp = &d_qp;\n";
-    g << "casadi_xpress_init(d, &arg, &res, &iw, &w);\n";
+    g << "casadi_xpress_set_work(d, &arg, &res, &iw, &w);\n";
 
     if (has_socp_) {
       g << "d->socp.q = arg[" << CONIC_Q << "];\n";
@@ -421,7 +421,7 @@ namespace casadi {
     m->d.prob = &p_;
     m->d.qp = &m->d_qp;
 
-    casadi_xpress_init(&m->d, &arg, &res, &iw, &w);
+    casadi_xpress_set_work(&m->d, &arg, &res, &iw, &w);
 
     // SOCP inputs
     if (has_socp_) {

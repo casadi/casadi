@@ -264,9 +264,9 @@ void casadi_ccopt_work(const casadi_ccopt_prob<T1>* p, casadi_int* sz_arg, casad
   *sz_w = casadi_max(*sz_w, 2*(p->nlp->nx+p->nlp->ng)); // pv
 }
 
-// SYMBOL "ccopt_init"
+// SYMBOL "ccopt_set_work"
 template<typename T1>
-void casadi_ccopt_init(casadi_ccopt_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
+void casadi_ccopt_set_work(casadi_ccopt_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Problem structure
   d->arg = *arg;
   d->res = *res;

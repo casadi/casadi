@@ -28,6 +28,9 @@ struct casadi_sqpmethod_prob {
   const casadi_int *sp_h, *sp_a, *sp_hr;
   casadi_int merit_memsize;
   casadi_int max_iter_ls;
+  // Solver configuration (immutable after class init)
+  int elastic_mode;
+  int so_corr;
 };
 // C-REPLACE "casadi_sqpmethod_prob<T1>" "struct casadi_sqpmethod_prob"
 
@@ -69,9 +72,11 @@ struct casadi_sqpmethod_data {
 // SYMBOL "sqpmethod_work"
 template<typename T1>
 void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
-    casadi_int* sz_iw, casadi_int* sz_w, int elastic_mode, int so_corr) {
+    casadi_int* sz_iw, casadi_int* sz_w) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
+  int elastic_mode = p->elastic_mode;
+  int so_corr = p->so_corr;
   nnz_h = p->sp_h[2+p->sp_h[1]];
   nnz_a = p->sp_a[2+p->sp_a[1]];
   nx = p->nlp->nx;
@@ -116,14 +121,15 @@ void casadi_sqpmethod_work(const casadi_sqpmethod_prob<T1>* p,
   if (so_corr) *sz_w += nx+nx+ng; // Temp memory for failing soc
 }
 
-// SYMBOL "sqpmethod_init"
+// SYMBOL "sqpmethod_set_work"
 template<typename T1>
-void casadi_sqpmethod_init(casadi_sqpmethod_data<T1>* d,
-    const T1*** arg, T1*** res, casadi_int** iw, T1** w,
-    int elastic_mode, int so_corr) {
+void casadi_sqpmethod_set_work(casadi_sqpmethod_data<T1>* d,
+    const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng;
   const casadi_sqpmethod_prob<T1>* p = d->prob;
+  int elastic_mode = p->elastic_mode;
+  int so_corr = p->so_corr;
   // Get matrix number of nonzeros
   nnz_h = p->sp_h[2+p->sp_h[1]];
   nnz_a = p->sp_a[2+p->sp_a[1]];

@@ -733,9 +733,9 @@ void casadi_fatrop_work(const casadi_fatrop_prob<T1>* p, casadi_int* sz_arg, cas
 
 }
 
-// SYMBOL "fatrop_init"
+// SYMBOL "fatrop_set_work"
 template<typename T1>
-void casadi_fatrop_init(casadi_fatrop_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
+void casadi_fatrop_set_work(casadi_fatrop_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Problem structure
   const casadi_fatrop_prob<T1>* p = d->prob;
   //casadi_oracle_data<T1>* d_oracle = d->nlp->oracle;

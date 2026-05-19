@@ -436,8 +436,8 @@ namespace casadi {
     g.local("d", "struct casadi_uno_data*");
     g.init_local("d", "&" + codegen_mem(g));
     Nlpsol::codegen_setup_per_call(g, "d->nlp");
-    g << "casadi_uno_init(d, &arg, &res, &iw, &w);\n";
-    g << "casadi_oracle_init(&d->d_oracle, &arg, &res, &iw, &w);\n";
+    g << "casadi_uno_set_work(d, &arg, &res, &iw, &w);\n";
+    g << "casadi_oracle_set_work(&d->d_oracle, &arg, &res, &iw, &w);\n";
     g << "casadi_uno_solve(d);\n";
     Nlpsol::codegen_post_solve(g, "d->nlp");
     // Signal failure to the caller so error_on_fail works in generated code too
