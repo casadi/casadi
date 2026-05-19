@@ -913,7 +913,7 @@ namespace casadi {
     arg += NLPSOL_NUM_IN;
     res += NLPSOL_NUM_OUT;
 
-    casadi_nlpsol_init(&m->d_nlp, &arg, &res, &iw, &w);
+    casadi_nlpsol_set_work(&m->d_nlp, &arg, &res, &iw, &w);
   }
 
   std::vector<std::string> nlpsol_options(const std::string& name) {
@@ -1307,7 +1307,7 @@ namespace casadi {
     }
   }
 
-  // Per-call wiring: arg/res slot bindings, casadi_nlpsol_init's workspace
+  // Per-call wiring: arg/res slot bindings, casadi_nlpsol_set_work's workspace
   // claim, and the copy_default's that populate z/lbz/ubz/lam from the
   // user inputs. Always runs every call.
   void Nlpsol::codegen_setup_per_call(CodeGenerator& g, const std::string& d_nlp) const {
@@ -1329,7 +1329,7 @@ namespace casadi {
     g << d_nlp << ".lam_p = res[" << NLPSOL_LAM_P << "];\n";
     g << "res += " << NLPSOL_NUM_OUT << ";\n";
 
-    g << "casadi_nlpsol_init(&" << d_nlp << ", &arg, &res, &iw, &w);\n";
+    g << "casadi_nlpsol_set_work(&" << d_nlp << ", &arg, &res, &iw, &w);\n";
 
     g.copy_default(d_nlp + ".x0",     nx_, d_nlp + ".z",   "0",           false);
     g.copy_default(d_nlp + ".lbx",    nx_, d_nlp + ".lbz", "-casadi_inf", false);

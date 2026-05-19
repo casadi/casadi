@@ -66,7 +66,7 @@ void casadi_clarabel_work(const casadi_clarabel_prob<T1>* p,
 
 // (Optionally, initialize pointer arrays here; we leave this empty.)
 template<typename T1>
-void casadi_clarabel_init(casadi_clarabel_data<T1>* d,
+void casadi_clarabel_set_work(casadi_clarabel_data<T1>* d,
                           const T1*** arg,
                           T1*** res,
                           casadi_int** iw,

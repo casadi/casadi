@@ -239,7 +239,7 @@ namespace casadi {
     m->d.prob = &p_;
     m->d.qp = &m->d_qp;
 
-    casadi_daqp_init(&m->d, &arg, &res, &iw, &w);
+    casadi_daqp_set_work(&m->d, &arg, &res, &iw, &w);
 
   }
 
@@ -278,7 +278,7 @@ namespace casadi {
     // Setup data structure (corresponds to set_work)
     g << "d->prob = &p;\n";
     g << "d->qp = &d_qp;\n";
-    g << "casadi_daqp_init(d, &arg, &res, &iw, &w);\n";
+    g << "casadi_daqp_set_work(d, &arg, &res, &iw, &w);\n";
 
     g << "casadi_daqp_solve(d, arg, res, iw, w);\n";
 

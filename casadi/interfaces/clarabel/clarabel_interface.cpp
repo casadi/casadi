@@ -171,7 +171,7 @@ void ClarabelInterface::set_work(void* mem, const double**& arg, double**& res,
   Conic::set_work(mem, arg, res, iw, w);
   m->d.prob = &p_;
   m->d.qp = &m->d_qp;
-  casadi_clarabel_init(&m->d, &arg, &res, &iw, &w);
+  casadi_clarabel_set_work(&m->d, &arg, &res, &iw, &w);
 }
 
 int ClarabelInterface::solve(const double** arg, double** res,
@@ -211,7 +211,7 @@ void ClarabelInterface::codegen_body(CodeGenerator& g) const {
 
   g << "d->prob = &p;\n";
   g << "d->qp = &d_qp;\n";
-  g << "casadi_clarabel_init(d, &arg, &res, &iw, &w);\n";
+  g << "casadi_clarabel_set_work(d, &arg, &res, &iw, &w);\n";
 
   g << "casadi_clarabel_solve(d, arg, res, iw, w);\n";
   g << "if (!d_qp.success) {\n";
