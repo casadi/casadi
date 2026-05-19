@@ -111,7 +111,8 @@ casadi_int casadi_blazing_low(T1 x, const T1* grid, casadi_int ng,
           simde__m256d gv  = simde_mm256_loadu_pd((const T1*)(grid + i + 1));
           simde__m256d cmp = simde_mm256_cmp_pd(xv, gv, SIMDE_CMP_LT_OQ);
           int m = simde_mm256_movemask_pd(cmp);
-          if (m) return i + __builtin_ctz((unsigned) m);
+          // m is a 4-bit movemask in [1, 15]; find the lowest set lane.
+          if (m) return i + ((m & 1) ? 0 : (m & 2) ? 1 : (m & 4) ? 2 : 3);
         }
         for (; i < n; ++i) {
           if (x < grid[i+1]) return i;
