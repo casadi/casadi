@@ -29,6 +29,7 @@
 // C-REPLACE "casadi_blazing_tensor_ttv3<T1>" "casadi_blazing_tensor_ttv3"
 // C-REPLACE "casadi_blazing_tensor_ttv4<T1>" "casadi_blazing_tensor_ttv4"
 // C-REPLACE "casadi_blazing_tensor_ttv5<T1>" "casadi_blazing_tensor_ttv5"
+// C-REPLACE "static_cast<T1>" "(double) "
 
 // ===== Knot-span lookup =====
 
@@ -104,10 +105,10 @@ casadi_int casadi_blazing_low(T1 x, const T1* grid, casadi_int ng,
         // lane with x < grid[i+1]. Falls back to scalar for the tail.
         casadi_int n = ng - 2;
         if (n <= 0) return 0;
-        simde__m256d xv = simde_mm256_set1_pd((double) x);
+        simde__m256d xv = simde_mm256_set1_pd(static_cast<T1>(x));
         casadi_int i = 0;
         for (; i + 4 <= n; i += 4) {
-          simde__m256d gv  = simde_mm256_loadu_pd((const double*)(grid + i + 1));
+          simde__m256d gv  = simde_mm256_loadu_pd((const T1*)(grid + i + 1));
           simde__m256d cmp = simde_mm256_cmp_pd(xv, gv, SIMDE_CMP_LT_OQ);
           int m = simde_mm256_movemask_pd(cmp);
           if (m) return i + __builtin_ctz((unsigned) m);

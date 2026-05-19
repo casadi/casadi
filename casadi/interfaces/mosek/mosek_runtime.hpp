@@ -200,11 +200,17 @@ int casadi_mosek_solve(casadi_mosek_data<T1>* d,
     int lo_inf = (lo <= -std::numeric_limits<T1>::infinity());
     int up_inf = (up >=  std::numeric_limits<T1>::infinity());
     MSKboundkeye bk;
-    if (lo_inf && up_inf) { bk = MSK_BK_FR; }
-    else if (lo_inf)      { bk = MSK_BK_UP; lo = -std::numeric_limits<T1>::infinity(); }
-    else if (up_inf)      { bk = MSK_BK_LO; up =  std::numeric_limits<T1>::infinity(); }
-    else if (lo == up)    { bk = MSK_BK_FX; }
-    else                  { bk = MSK_BK_RA; }
+    if (lo_inf && up_inf) {
+      bk = MSK_BK_FR;
+    } else if (lo_inf) {
+      bk = MSK_BK_UP; lo = -std::numeric_limits<T1>::infinity();
+    } else if (up_inf) {
+      bk = MSK_BK_LO; up =  std::numeric_limits<T1>::infinity();
+    } else if (lo == up) {
+      bk = MSK_BK_FX;
+    } else {
+      bk = MSK_BK_RA;
+    }
     MSK_putvarbound(task, j, bk, lo, up);
   }
 
@@ -224,11 +230,17 @@ int casadi_mosek_solve(casadi_mosek_data<T1>* d,
     int lo_inf = (lo <= -std::numeric_limits<T1>::infinity());
     int up_inf = (up >=  std::numeric_limits<T1>::infinity());
     MSKboundkeye bk;
-    if (lo_inf && up_inf) { bk = MSK_BK_FR; }
-    else if (lo_inf)      { bk = MSK_BK_UP; lo = -std::numeric_limits<T1>::infinity(); }
-    else if (up_inf)      { bk = MSK_BK_LO; up =  std::numeric_limits<T1>::infinity(); }
-    else if (lo == up)    { bk = MSK_BK_FX; }
-    else                  { bk = MSK_BK_RA; }
+    if (lo_inf && up_inf) {
+      bk = MSK_BK_FR;
+    } else if (lo_inf) {
+      bk = MSK_BK_UP; lo = -std::numeric_limits<T1>::infinity();
+    } else if (up_inf) {
+      bk = MSK_BK_LO; up =  std::numeric_limits<T1>::infinity();
+    } else if (lo == up) {
+      bk = MSK_BK_FX;
+    } else {
+      bk = MSK_BK_RA;
+    }
     MSK_putconbound(task, i, bk, lo, up);
   }
 
@@ -257,18 +269,24 @@ int casadi_mosek_solve(casadi_mosek_data<T1>* d,
       int lo_inf = (lo <= -std::numeric_limits<T1>::infinity());
       int up_inf = (up >=  std::numeric_limits<T1>::infinity());
       MSKboundkeye bk;
-      if (lo_inf && up_inf) { bk = MSK_BK_FR; }
-      else if (lo_inf)      { bk = MSK_BK_UP; lo = -std::numeric_limits<T1>::infinity(); }
-      else if (up_inf)      { bk = MSK_BK_LO; up =  std::numeric_limits<T1>::infinity(); }
-      else if (lo == up)    { bk = MSK_BK_FX; }
-      else                  { bk = MSK_BK_RA; }
+      if (lo_inf && up_inf) {
+        bk = MSK_BK_FR;
+      } else if (lo_inf) {
+        bk = MSK_BK_UP; lo = -std::numeric_limits<T1>::infinity();
+      } else if (up_inf) {
+        bk = MSK_BK_LO; up =  std::numeric_limits<T1>::infinity();
+      } else if (lo == up) {
+        bk = MSK_BK_FX;
+      } else {
+        bk = MSK_BK_RA;
+      }
       MSK_putvarbound(task, jvar, bk, lo, up);
     }
 
     // Equality rows Q*[x; lifted] = -P, placed at constraint indices na..na+n_eq-1.
     // eq_colind[] are full-variable-space indices already (0..nx+n_lifted-1).
     int eq_offset = p_qp->na;
-    for (i = 0; i < (int) sp->n_eq; ++i) {
+    for (i = 0; i < static_cast<int>(sp->n_eq); ++i) {
       int kbeg = sd->eq_start[i];
       int kend = sd->eq_start[i + 1];
       MSK_putarow(task, eq_offset + i, kend - kbeg,
@@ -286,7 +304,7 @@ int casadi_mosek_solve(casadi_mosek_data<T1>* d,
         casadi_int bs = sp->r[b + 1] - sp->r[b];
         int base = static_cast<int>(p_qp->nx + sp->r[b]);
         d->cone_idx[0] = base + static_cast<int>(bs - 1);
-        for (j = 0; j < (int) bs - 1; ++j) d->cone_idx[1 + j] = base + j;
+        for (j = 0; j < static_cast<int>(bs) - 1; ++j) d->cone_idx[1 + j] = base + j;
         MSK_appendcone(task, MSK_CT_QUAD, 0.0, static_cast<int>(bs), d->cone_idx);
       }
     }

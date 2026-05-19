@@ -89,10 +89,8 @@ const Options MadnlpInterface::options_
 };
 
 // Recursively flatten options for libmad options dict.
-void flatten_opts(Dict& ret, const Dict& opts, const std::string& prefix)
-{
-  for (const auto& kv : opts)
-  {
+void flatten_opts(Dict& ret, const Dict& opts, const std::string& prefix) {
+  for (const auto& kv : opts) {
     switch (kv.second.getType()) {
      case OT_DICT:
        flatten_opts(ret, kv.second, prefix + kv.first + ".");
@@ -191,7 +189,7 @@ int MadnlpInterface::init_mem(void* mem) const {
   if (Nlpsol::init_mem(mem)) return 1;
   if (!mem) return 1;
   auto m = static_cast<MadnlpMemory*>(mem);
-  
+
   // Now create the new options struct
   libmad_create_options_dict(&(m->d.libmad_opts));
   for (const auto& kv : opts_) {
@@ -266,8 +264,10 @@ Dict MadnlpInterface::get_stats(void* mem) const {
   double primal_feas, dual_feas;
   ret = madnlp_get_iters(m->d.stats, &iter); casadi_assert(ret==0, "MadNLPError in get_iters");
   ret = madnlp_get_status(m->d.stats, &status);  casadi_assert(ret==0, "MadNLPError in get_status");
-  ret = madnlp_get_dual_feas(m->d.stats, &dual_feas);  casadi_assert(ret==0, "MadNLPError in get_dual_feas");
-  ret = madnlp_get_primal_feas(m->d.stats, &primal_feas);  casadi_assert(ret==0, "MadNLPError in get_primal_feas");
+  ret = madnlp_get_dual_feas(m->d.stats, &dual_feas);
+  casadi_assert(ret==0, "MadNLPError in get_dual_feas");
+  ret = madnlp_get_primal_feas(m->d.stats, &primal_feas);
+  casadi_assert(ret==0, "MadNLPError in get_primal_feas");
 
   stats["iter_count"] = static_cast<casadi_int>(iter);
   Dict madnlp;
@@ -302,19 +302,23 @@ void MadnlpInterface::codegen_init_mem(CodeGenerator& g) const {
   for (const auto& kv : opts_) {
     switch (kv.second.getType()) {
      case OT_DOUBLE:
-       g << "libmad_set_double_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + str(kv.second) + ");\n";
+       g << "libmad_set_double_option(" + codegen_mem(g) + ".libmad_opts, "
+            + kv.first + ", " + str(kv.second) + ");\n";
        break;
      case OT_INT:
-       g << "libmad_set_int64_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + str(kv.second) + ");\n";
+       g << "libmad_set_int64_option(" + codegen_mem(g) + ".libmad_opts, "
+            + kv.first + ", " + str(kv.second) + ");\n";
        break;
      case OT_STRING:
      {
        std::string s = kv.second.to_string();
-       g << "libmad_set_string_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + s + ");\n";
+       g << "libmad_set_string_option(" + codegen_mem(g) + ".libmad_opts, "
+            + kv.first + ", " + s + ");\n";
      }
      break;
      case OT_BOOL:
-       g << "libmad_set_bool_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + str(kv.second) + ");\n";
+       g << "libmad_set_bool_option(" + codegen_mem(g) + ".libmad_opts, "
+            + kv.first + ", " + str(kv.second) + ");\n";
        break;
      default:
        casadi_error("Unknown option type.");
