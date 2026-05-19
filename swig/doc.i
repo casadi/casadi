@@ -52094,10 +52094,10 @@ a single scalar output (m=1)
 Extra doc: https://github.com/casadi/casadi/wiki/L_2b9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.hpp#L110
+https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.hpp#L139
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L110-L114
+https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L139-L143
 
 ";
 
@@ -52122,10 +52122,10 @@ fixed-knots variant.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2g0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.hpp#L116
+https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.hpp#L145
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L116-L142
+https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L145-L171
 
 ";
 
