@@ -51,7 +51,7 @@ jobs:
           for tag in "${tags[@]}"; do
             suffix="${tag#nightly-}"
             if [ -z "${canonical_branches[$suffix]+x}" ]; then
-              echo "- \`$tag\`" >> "$GITHUB_STEP_SUMMARY"
+              echo "- [\`$tag\`]($GITHUB_SERVER_URL/$REPO/releases/tag/$tag)" >> "$GITHUB_STEP_SUMMARY"
               orphans=$((orphans + 1))
             fi
           done
