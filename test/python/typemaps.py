@@ -394,6 +394,38 @@ class typemaptests(casadiTestCase):
     f=Foo()
     print(x + f)
     print(x @ f)
+    
+    class Foo:
+        def __req__(self, other):
+            return 2
+        def __eq__(self, other):  # pyright: ignore[reportIncompatibleMethodOverride]
+            return 3
+        def __rne__(self, other):
+            return 4
+        def __ne__(self, other):  # pyright: ignore[reportIncompatibleMethodOverride]
+            return 5
+              
+    f = Foo()
+    for X in [SX,MX]:
+        x = X.sym("x")
+        
+        
+        self.assertEqual(f==x,3)
+        self.assertEqual(x==f,3)
+        self.assertEqual(f!=x,5)
+        self.assertEqual(x!=f,5)
+    
+    for x in [SX.sym("x"),SX.zeros(1,1),SX.ones(1,1)]:
+        for y in [MX.sym("y"),MX.zeros(1,1),MX.ones(1,1)]:
+        
+            with self.assertInException("Cannot compare SX and MX objects for equality"):
+                x==y  # pyright: ignore[reportOperatorIssue]
+            with self.assertInException("Cannot compare SX and MX objects for equality"):
+                y==x  # pyright: ignore[reportOperatorIssue]
+            with self.assertInException("Cannot compare SX and MX objects for inequality"):
+                x!=y  # pyright: ignore[reportOperatorIssue]
+            with self.assertInException("Cannot compare SX and MX objects for inequality"):
+                y!=x  # pyright: ignore[reportOperatorIssue]
 
   def test_conversion_operators(self):
     self.message("COnversion operations")

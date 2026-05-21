@@ -4862,10 +4862,18 @@ namespace casadi {
       def __rgt__(x, y): return _casadi.lt(x, y)
       def __ge__(x, y): return _casadi.le(y, x)
       def __rge__(x, y): return _casadi.le(x, y)
-      def __eq__(x, y): return _casadi.eq(x, y)
-      def __req__(x, y): return _casadi.eq(y, x)
-      def __ne__(x, y): return _casadi.ne(x, y)
-      def __rne__(x, y): return _casadi.ne(y, x)
+      def __eq__(x, y):
+        r = _casadi.eq(x, y)
+        if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
+          raise Exception("Cannot compare SX and MX objects for equality")
+        return r
+      def __ne__(x, y):
+        r = _casadi.ne(x, y)
+        if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
+          raise Exception("Cannot compare SX and MX objects for inequality")
+        return r
+      def __req__(x, y): return y.__eq__(x)
+      def __rne__(x, y): return y.__ne__(x)
       def __pow__(x, n): return _casadi.power(x, n)
       def __rpow__(n, x): return _casadi.power(x, n)
       def __arctan2__(x, y): return _casadi.atan2(x, y)
