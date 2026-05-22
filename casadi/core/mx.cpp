@@ -37,6 +37,7 @@
 #include "serializing_stream.hpp"
 #include "im.hpp"
 #include "bspline.hpp"
+#include "kron.hpp"
 #include "casadi_call.hpp"
 #include <array>
 
@@ -2034,18 +2035,11 @@ namespace casadi {
   }
 
   MX MX::kron(const MX& a, const MX& b) {
-    const Sparsity &a_sp = a.sparsity();
-    MX filler(b.size());
-    std::vector< std::vector< MX > > blocks(a.size1(), std::vector< MX >(a.size2(), filler));
-    for (casadi_int i=0; i<a.size1(); ++i) {
-      for (casadi_int j=0; j<a.size2(); ++j) {
-        casadi_int k = a_sp.get_nz(i, j);
-        if (k!=-1) {
-          blocks[i][j] = a.nz(k)*b;
-        }
-      }
-    }
-    return blockcat(blocks);
+    return a->get_kron(b);
+  }
+
+  MX MX::kron_contract(const MX& m, const MX& x, bool inner) {
+    return m->get_kron_contract(x, inner);
   }
 
   MX MX::repmat(const MX& x, casadi_int n, casadi_int m) {

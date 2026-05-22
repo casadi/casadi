@@ -49,11 +49,18 @@ except:
   
 codegen_check_digits = 15
 
+# Numerical differences due to different compilers/libm in CI.
+if sys.platform == "darwin":
+    # macOS (both Intel and Apple Silicon) sometimes diverges by ~1 ULP
+    # from Linux GCC -- e.g. a sumsqr that lands at 7.96 may compute as
+    # 7.96 + 8.88e-16 elsewhere. Relax by 2 digits so 1-ULP drift passes.
+    codegen_check_digits = 13
+
 print("os" in os.environ)
 if "os" in os.environ:
     print(os.environ["os"])
     if os.environ["os"]=="osx_arm":
-        # Numerical differences due to different compilers in ci
+        # Apple Silicon has historically diverged more (different libm).
         codegen_check_digits = 10
 
 print("codegen_check_digits", codegen_check_digits)

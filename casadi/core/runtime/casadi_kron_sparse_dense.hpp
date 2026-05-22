@@ -17,35 +17,27 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// SYMBOL "kron"
+// SYMBOL "kron_sparse_dense"
+// r = kron(a, b) where a has CSC sparsity sp_a (mA, nA),
+// b is (mB, nB) dense column-major.
+// r is laid out per the kron sparsity Sparsity::kron(sp_a, dense(mB,nB)).
 template<typename T1>
-void casadi_kron(const T1* a, const casadi_int* sp_a, const T1* b, const casadi_int* sp_b, T1* r) {
-    casadi_int a_ncol, b_ncol, k;
-    const casadi_int *a_colind, *b_colind;
-    T1 a_v, b_v;
-    casadi_int a_cc, b_cc, a_el, b_el;
-
+void casadi_kron_sparse_dense(const T1* a, const casadi_int* sp_a,
+                              const T1* b, casadi_int mB, casadi_int nB,
+                              T1* r) {
+    casadi_int nA = sp_a[1];
+    const casadi_int* a_colind = sp_a+2;
+    casadi_int a_cc, b_cc, a_el, rr, k;
+    T1 a_val;
     k = 0;
-
-    a_ncol = sp_a[1];
-    a_colind = sp_a+2;
-    b_ncol = sp_b[1];
-    b_colind = sp_b+2;
-
-    // Loop over the columns
-    for (a_cc=0; a_cc<a_ncol; ++a_cc) {
-      // Loop over the columns
-      for (b_cc=0; b_cc<b_ncol; ++b_cc) {
-        // Loop over existing nonzeros
+    for (a_cc=0; a_cc<nA; ++a_cc) {
+      for (b_cc=0; b_cc<nB; ++b_cc) {
         for (a_el=a_colind[a_cc]; a_el<a_colind[a_cc+1]; ++a_el) {
-          a_v = a[a_el];
-          // Loop over existing nonzeros
-          for (b_el=b_colind[b_cc]; b_el<b_colind[b_cc+1]; ++b_el) {
-            b_v = b[b_el];
-            r[k++] = a_v*b_v;
+          a_val = a[a_el];
+          for (rr=0; rr<mB; ++rr) {
+            r[k++] = a_val * b[b_cc*mB + rr];
           }
         }
       }
     }
-
 }

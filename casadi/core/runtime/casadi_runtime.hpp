@@ -151,6 +151,69 @@ namespace casadi {
   template<typename T1>
   void casadi_kron(const T1* a, const casadi_int* sp_a, const T1* b, const casadi_int* sp_b, T1* r);
 
+  /** Kron, both operands dense */
+  template<typename T1>
+  void casadi_kron_dense(const T1* a, casadi_int mA, casadi_int nA,
+                         const T1* b, casadi_int mB, casadi_int nB, T1* r);
+
+  /** Kron, dense a + sparse b */
+  template<typename T1>
+  void casadi_kron_dense_sparse(const T1* a, casadi_int mA, casadi_int nA,
+                                const T1* b, const casadi_int* sp_b, T1* r);
+
+  /** Kron, sparse a + dense b */
+  template<typename T1>
+  void casadi_kron_sparse_dense(const T1* a, const casadi_int* sp_a,
+                                const T1* b, casadi_int mB, casadi_int nB, T1* r);
+
+  /** Kron contraction (inner): contract M's inner block axes against b */
+  template<typename T1>
+  void casadi_kron_contract_inner(const T1* m, const casadi_int* sp_m,
+                                  const T1* b, const casadi_int* sp_b,
+                                  T1* y, const casadi_int* sp_y, T1* w);
+
+  /** Kron contraction (inner), all dense */
+  template<typename T1>
+  void casadi_kron_contract_inner_dense(const T1* m, casadi_int mA, casadi_int nA,
+                                        const T1* b, casadi_int mB, casadi_int nB,
+                                        T1* y);
+
+  /** Kron contraction (inner), m dense + b sparse */
+  template<typename T1>
+  void casadi_kron_contract_inner_dense_sparse(const T1* m, casadi_int mA, casadi_int nA,
+                                               const T1* b, const casadi_int* sp_b,
+                                               T1* y);
+
+  /** Kron contraction (inner), m sparse + b dense */
+  template<typename T1>
+  void casadi_kron_contract_inner_sparse_dense(const T1* m, const casadi_int* sp_m,
+                                               const T1* b, casadi_int mB, casadi_int nB,
+                                               T1* y, const casadi_int* sp_y);
+
+  /** Kron contraction (outer): contract M's outer block axes against a */
+  template<typename T1>
+  void casadi_kron_contract_outer(const T1* m, const casadi_int* sp_m,
+                                  const T1* a, const casadi_int* sp_a,
+                                  T1* y, const casadi_int* sp_y, T1* w);
+
+  /** Kron contraction (outer), all dense */
+  template<typename T1>
+  void casadi_kron_contract_outer_dense(const T1* m, casadi_int mB, casadi_int nB,
+                                        const T1* a, casadi_int mA, casadi_int nA,
+                                        T1* y);
+
+  /** Kron contraction (outer), m dense + a sparse */
+  template<typename T1>
+  void casadi_kron_contract_outer_dense_sparse(const T1* m, casadi_int mB, casadi_int nB,
+                                               const T1* a, const casadi_int* sp_a,
+                                               T1* y);
+
+  /** Kron contraction (outer), m sparse + a dense */
+  template<typename T1>
+  void casadi_kron_contract_outer_sparse_dense(const T1* m, const casadi_int* sp_m,
+                                               const T1* a, casadi_int mA, casadi_int nA,
+                                               T1* y, const casadi_int* sp_y);
+
   /// Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A
   template<typename T1>
   void casadi_rank1(T1* A, const casadi_int* sp_A, T1 alpha, const T1* x);
@@ -267,6 +330,17 @@ namespace casadi {
   #include "casadi_axpy.hpp"
   #include "casadi_dot.hpp"
   #include "casadi_kron.hpp"
+  #include "casadi_kron_dense.hpp"
+  #include "casadi_kron_dense_sparse.hpp"
+  #include "casadi_kron_sparse_dense.hpp"
+  #include "casadi_kron_contract_inner.hpp"
+  #include "casadi_kron_contract_inner_dense.hpp"
+  #include "casadi_kron_contract_inner_dense_sparse.hpp"
+  #include "casadi_kron_contract_inner_sparse_dense.hpp"
+  #include "casadi_kron_contract_outer.hpp"
+  #include "casadi_kron_contract_outer_dense.hpp"
+  #include "casadi_kron_contract_outer_dense_sparse.hpp"
+  #include "casadi_kron_contract_outer_sparse_dense.hpp"
   #include "casadi_clear.hpp"
   #include "casadi_clip_max.hpp"
   #include "casadi_clip_min.hpp"

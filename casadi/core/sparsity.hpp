@@ -723,6 +723,22 @@ namespace casadi {
     static casadi_int sprank(const Sparsity& x);
     static casadi_int norm_0_mul(const Sparsity& x, const Sparsity& A);
     static Sparsity kron(const Sparsity& a, const Sparsity& b);
+
+    /** \brief Output sparsity of casadi::KronContract
+     *
+     * Given an (mA*mB, nA*nB) pattern `sp_m` and an (xrow, xcol) pattern
+     * `sp_x`, computes the output sparsity. Both modes share the same
+     * `(yrow, ycol) = sp_m.size() / sp_x.size()` shape; what differs is
+     * which axis pair indexes the output:
+     *
+     * - `inner = true`:  (i, j) ∈ y iff ∃ (r, s) ∈ sp_x with
+     *                    (i*xrow + r, j*xcol + s) ∈ sp_m;
+     *                    output indexed by the outer block of M.
+     * - `inner = false`: (r, s) ∈ y iff ∃ (i, j) ∈ sp_x with
+     *                    (i*yrow + r, j*ycol + s) ∈ sp_m;
+     *                    output indexed by the inner block of M.
+     */
+    static Sparsity kron_contract(const Sparsity& sp_m, const Sparsity& sp_x, bool inner);
     static Sparsity triu(const Sparsity& x, bool includeDiagonal=true);
     static Sparsity tril(const Sparsity& x, bool includeDiagonal=true);
 

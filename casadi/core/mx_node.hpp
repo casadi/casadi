@@ -500,6 +500,12 @@ namespace casadi {
     /// Create a repeated sum node
     virtual MX get_repsum(casadi_int m, casadi_int n) const;
 
+    /// Create a Kronecker-product node
+    virtual MX get_kron(const MX& b) const;
+
+    /// Create a Kronecker-contraction node
+    virtual MX get_kron_contract(const MX& x, bool inner) const;
+
     /// Create a vertical concatenation node (vectors only)
     virtual MX get_vertcat(const std::vector<MX>& x) const;
 

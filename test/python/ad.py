@@ -614,6 +614,28 @@ class ADtests(casadiTestCase):
           (in1,v1,c.dot(x,y[:,0]),y[:,0].T,True,"c89"),
           (in1,v1,x.nz[DM([[1,0]])].T*y.nz[DM([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]]),True,"c89"),
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]]),True,"c89"),
+          # Kron: out = kron(x, y), shape (4, 2). jac wrt x is built column by
+          # column: column-block i contains y in the rows belonging to x[i]'s
+          # outer block, zeros elsewhere.
+          (in1,v1,c.kron(x,y),
+                  horzcat(c.vec(vertcat(y,MX(2,2))), c.vec(vertcat(MX(2,2),y))),
+                  True,"c89"),
+          # Kron: swapped operand order. kron(y, x) — each y[r,s] scales an
+          # eye(2) block in the column direction of the jacobian.
+          (in1,v1,c.kron(y,x),
+                  vertcat(y[0,0]*DM.eye(2), y[1,0]*DM.eye(2),
+                          y[0,1]*DM.eye(2), y[1,1]*DM.eye(2)),
+                  True,"c89"),
+          # KronContract inner: out = kron_contract(kron(x,y), y, True) is
+          # sumsqr(y) * x by direct computation. jac wrt x = sumsqr(y) * I.
+          (in1,v1,c.kron_contract(c.kron(x,y),y,True),
+                  sumsqr(y)*DM.eye(2),
+                  True,"c89"),
+          # KronContract outer: out = kron_contract(kron(x,y), x, False) is
+          # sumsqr(x) * y by direct computation. jac wrt x = 2*vec(y) @ x.T.
+          (in1,v1,c.kron_contract(c.kron(x,y),x,False),
+                  2*c.vec(y) @ x.T,
+                  True,"c89"),
 
      ]:
       fun = Function("fun", inputs,[out])

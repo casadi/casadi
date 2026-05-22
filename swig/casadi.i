@@ -4099,6 +4099,9 @@ DECL M casadi_no_hess(const M& expr) {
 DECL M casadi_no_grad(const M& expr) {
   return no_grad(expr);
 }
+DECL M casadi_kron_contract(const M& m, const M& x, bool inner) {
+  return kron_contract(m, x, inner);
+}
 
 #endif
 %enddef

@@ -52,6 +52,7 @@
 #include "monitor.hpp"
 #include "dump.hpp"
 #include "repmat.hpp"
+#include "kron.hpp"
 #include "casadi_find.hpp"
 #include "casadi_low.hpp"
 #include "einstein.hpp"
@@ -1236,6 +1237,20 @@ namespace casadi {
     }
   }
 
+  MX MXNode::get_kron(const MX& b) const {
+    if (nnz() == 0 || b.nnz() == 0) {
+      return MX::zeros(Sparsity::kron(sparsity(), b.sparsity()));
+    }
+    return Kron::create(shared_from_this<MX>(), b);
+  }
+
+  MX MXNode::get_kron_contract(const MX& x, bool inner) const {
+    if (nnz() == 0 || x.nnz() == 0) {
+      return MX::zeros(Sparsity::kron_contract(sparsity(), x.sparsity(), inner));
+    }
+    return KronContract::create(shared_from_this<MX>(), x, inner);
+  }
+
   std::vector<MX> MXNode::get_diagsplit(const std::vector<casadi_int>& offset1,
                                        const std::vector<casadi_int>& offset2) const {
     if (is_zero()) {
@@ -1363,6 +1378,8 @@ namespace casadi {
     {OP_BSPLINE, BSplineCommon::deserialize},
     {OP_CONVEXIFY, Convexify::deserialize},
     {OP_LOGSUMEXP, LogSumExp::deserialize},
+    {OP_KRON, Kron::deserialize},
+    {OP_KRON_CONTRACT, KronContract::deserialize},
     {-1, OutputNode::deserialize}
   };
 

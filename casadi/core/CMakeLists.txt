@@ -182,6 +182,7 @@ set(CASADI_INTERNAL
   monitor.hpp             monitor.cpp             # Monitor
   dump.hpp                dump.cpp                # Dump
   repmat.hpp              repmat.cpp              # RepMat
+  kron.hpp                kron.cpp                # Kronecker product
   convexify.hpp           convexify.cpp           # Convexify
   logsumexp.hpp           logsumexp.cpp           # Logsumexp
 

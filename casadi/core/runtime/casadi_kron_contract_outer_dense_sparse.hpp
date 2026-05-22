@@ -17,35 +17,31 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// SYMBOL "kron"
+// SYMBOL "kron_contract_outer_dense_sparse"
+// y[r,s] = sum over (i,j) in a's nonzeros of a[i,j] * m[i*mB+r, j*nB+s]
+// where m is dense (mA*mB, nA*nB), a is sparse (sp_a, mA x nA), y is dense (mB, nB).
 template<typename T1>
-void casadi_kron(const T1* a, const casadi_int* sp_a, const T1* b, const casadi_int* sp_b, T1* r) {
-    casadi_int a_ncol, b_ncol, k;
-    const casadi_int *a_colind, *b_colind;
-    T1 a_v, b_v;
-    casadi_int a_cc, b_cc, a_el, b_el;
-
-    k = 0;
-
-    a_ncol = sp_a[1];
-    a_colind = sp_a+2;
-    b_ncol = sp_b[1];
-    b_colind = sp_b+2;
-
-    // Loop over the columns
-    for (a_cc=0; a_cc<a_ncol; ++a_cc) {
-      // Loop over the columns
-      for (b_cc=0; b_cc<b_ncol; ++b_cc) {
-        // Loop over existing nonzeros
-        for (a_el=a_colind[a_cc]; a_el<a_colind[a_cc+1]; ++a_el) {
-          a_v = a[a_el];
-          // Loop over existing nonzeros
-          for (b_el=b_colind[b_cc]; b_el<b_colind[b_cc+1]; ++b_el) {
-            b_v = b[b_el];
-            r[k++] = a_v*b_v;
-          }
+void casadi_kron_contract_outer_dense_sparse(const T1* m, casadi_int mB, casadi_int nB,
+                                             const T1* a, const casadi_int* sp_a,
+                                             T1* y) {
+    casadi_int mA = sp_a[0], nA = sp_a[1];
+    const casadi_int* a_colind = sp_a+2;
+    const casadi_int* a_row    = sp_a+2+nA+1;
+    casadi_int j, a_el, i, s, rr, k;
+    T1 a_val;
+    const T1* m_col, *m_block;
+    T1* y_col;
+    for (k=0; k<mB*nB; ++k) y[k] = 0;
+    for (j=0; j<nA; ++j) {
+      for (a_el=a_colind[j]; a_el<a_colind[j+1]; ++a_el) {
+        i = a_row[a_el];
+        a_val = a[a_el];
+        for (s=0; s<nB; ++s) {
+          m_col = m + (j*nB+s)*(mA*mB);
+          m_block = m_col + i*mB;
+          y_col = y + s*mB;
+          for (rr=0; rr<mB; ++rr) y_col[rr] += a_val * m_block[rr];
         }
       }
     }
-
 }

@@ -17,35 +17,27 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// SYMBOL "kron"
+// SYMBOL "kron_contract_inner_dense"
+// y[i,j] = sum_{r,s} m[i*mB+r, j*nB+s] * b[r,s] where m, b, y are all dense
+// column-major.
 template<typename T1>
-void casadi_kron(const T1* a, const casadi_int* sp_a, const T1* b, const casadi_int* sp_b, T1* r) {
-    casadi_int a_ncol, b_ncol, k;
-    const casadi_int *a_colind, *b_colind;
-    T1 a_v, b_v;
-    casadi_int a_cc, b_cc, a_el, b_el;
-
-    k = 0;
-
-    a_ncol = sp_a[1];
-    a_colind = sp_a+2;
-    b_ncol = sp_b[1];
-    b_colind = sp_b+2;
-
-    // Loop over the columns
-    for (a_cc=0; a_cc<a_ncol; ++a_cc) {
-      // Loop over the columns
-      for (b_cc=0; b_cc<b_ncol; ++b_cc) {
-        // Loop over existing nonzeros
-        for (a_el=a_colind[a_cc]; a_el<a_colind[a_cc+1]; ++a_el) {
-          a_v = a[a_el];
-          // Loop over existing nonzeros
-          for (b_el=b_colind[b_cc]; b_el<b_colind[b_cc+1]; ++b_el) {
-            b_v = b[b_el];
-            r[k++] = a_v*b_v;
-          }
+void casadi_kron_contract_inner_dense(const T1* m, casadi_int mA, casadi_int nA,
+                                      const T1* b, casadi_int mB, casadi_int nB,
+                                      T1* y) {
+    casadi_int j, s, i, rr, k;
+    const T1 *m_col, *m_block, *b_col;
+    T1 acc;
+    for (k=0; k<mA*nA; ++k) y[k] = 0;
+    for (j=0; j<nA; ++j) {
+      for (s=0; s<nB; ++s) {
+        m_col = m + (j*nB+s)*(mA*mB);
+        b_col = b + s*mB;
+        for (i=0; i<mA; ++i) {
+          m_block = m_col + i*mB;
+          acc = 0;
+          for (rr=0; rr<mB; ++rr) acc += m_block[rr] * b_col[rr];
+          y[j*mA + i] += acc;
         }
       }
     }
-
 }

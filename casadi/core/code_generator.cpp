@@ -1524,6 +1524,42 @@ namespace casadi {
     case AUX_BILIN:
       this->auxiliaries << sanitize_source(casadi_bilin_str, inst);
       break;
+    case AUX_KRON:
+      this->auxiliaries << sanitize_source(casadi_kron_str, inst);
+      break;
+    case AUX_KRON_DENSE:
+      this->auxiliaries << sanitize_source(casadi_kron_dense_str, inst);
+      break;
+    case AUX_KRON_DENSE_SPARSE:
+      this->auxiliaries << sanitize_source(casadi_kron_dense_sparse_str, inst);
+      break;
+    case AUX_KRON_SPARSE_DENSE:
+      this->auxiliaries << sanitize_source(casadi_kron_sparse_dense_str, inst);
+      break;
+    case AUX_KRON_CONTRACT_INNER:
+      this->auxiliaries << sanitize_source(casadi_kron_contract_inner_str, inst);
+      break;
+    case AUX_KRON_CONTRACT_INNER_DENSE:
+      this->auxiliaries << sanitize_source(casadi_kron_contract_inner_dense_str, inst);
+      break;
+    case AUX_KRON_CONTRACT_INNER_DENSE_SPARSE:
+      this->auxiliaries << sanitize_source(casadi_kron_contract_inner_dense_sparse_str, inst);
+      break;
+    case AUX_KRON_CONTRACT_INNER_SPARSE_DENSE:
+      this->auxiliaries << sanitize_source(casadi_kron_contract_inner_sparse_dense_str, inst);
+      break;
+    case AUX_KRON_CONTRACT_OUTER:
+      this->auxiliaries << sanitize_source(casadi_kron_contract_outer_str, inst);
+      break;
+    case AUX_KRON_CONTRACT_OUTER_DENSE:
+      this->auxiliaries << sanitize_source(casadi_kron_contract_outer_dense_str, inst);
+      break;
+    case AUX_KRON_CONTRACT_OUTER_DENSE_SPARSE:
+      this->auxiliaries << sanitize_source(casadi_kron_contract_outer_dense_sparse_str, inst);
+      break;
+    case AUX_KRON_CONTRACT_OUTER_SPARSE_DENSE:
+      this->auxiliaries << sanitize_source(casadi_kron_contract_outer_sparse_dense_str, inst);
+      break;
     case AUX_RANK1:
       this->auxiliaries << sanitize_source(casadi_rank1_str, inst);
       break;
