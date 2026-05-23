@@ -815,14 +815,15 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         for ax, (g, r) in enumerate(zip(got_list, ref_list)):
             self._close(g, r, "gradient_mat_no_axis ax=%d" % ax)
         # Symbolic 1-D query on SX/MX must produce a symbolic graph that
-        # numerically matches numpy when evaluated.
-        for cls in (SX, MX):
+        # numerically matches numpy when evaluated.  List literal
+        # `[SX, MX]` (not tuple) keeps pyright's loop-var widening to
+        # Unknown so Function([s], [expr]) doesn't trip overload
+        # resolution; see the floordiv/mod test for the explanation.
+        ref = np.gradient(col.full().ravel())
+        for cls in [SX, MX]:
             s = cls.sym("s", 4)
-            expr = np.gradient(s)
-            f = Function("f", [s], [expr])
-            got = f(col)
-            ref = np.gradient(col.full().ravel())
-            self._close(got, ref, "gradient %s symbolic" % cls.__name__)
+            f = Function("f", [s], [np.gradient(s)])
+            self._close(f(col), ref, "gradient %s symbolic" % cls.__name__)
 
     def test_roll_1d(self):
         v = DM([1.0, 2.0, 3.0, 4.0, 5.0])
@@ -955,21 +956,20 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         self._close(2.0 // y_dm, np.floor_divide(2.0, y_dm.full()),
                     "scalar // DM")
         self._close(2.0 % y_dm, np.mod(2.0, y_dm.full()), "scalar % DM")
-        # Symbolic: build a Function and evaluate.  Per-class blocks
-        # rather than `for cls in (SX, MX)` so pyright sees a concrete
-        # SX or MX -- a `SX | MX` union doesn't match either of the
-        # Function([ex_in: Sequence[_SX] | Sequence[_MX]]) overloads
-        # and `(SX | MX) // (SX | MX)` doesn't resolve either dunder.
-        a_sx = SX.sym("a", 3); b_sx = SX.sym("b", 3)
-        f_sx = Function("f", [a_sx, b_sx], [a_sx // b_sx, a_sx % b_sx])
-        d_sx, m_sx = f_sx(x_dm, y_dm)
-        self._close(d_sx, ref_div, "SX // SX")
-        self._close(m_sx, ref_mod, "SX %% SX")
-        a_mx = MX.sym("a", 3); b_mx = MX.sym("b", 3)
-        f_mx = Function("f", [a_mx, b_mx], [a_mx // b_mx, a_mx % b_mx])
-        d_mx, m_mx = f_mx(x_dm, y_dm)
-        self._close(d_mx, ref_div, "MX // MX")
-        self._close(m_mx, ref_mod, "MX %% MX")
+        # Symbolic: build a Function and evaluate.  Iterate over a LIST
+        # literal `[SX, MX]` rather than a tuple `(SX, MX)`: pyright
+        # widens the loop variable of a heterogeneous list-literal to
+        # Unknown (silently accepting all ops), whereas a tuple keeps
+        # the `type[SX] | type[MX]` union and fails Function overload
+        # resolution + `a // b`-style dunder lookup.  See the rest of
+        # the suite (~45 sites) for the same pattern.
+        for cls in [SX, MX]:
+            a = cls.sym("a", 3)
+            b = cls.sym("b", 3)
+            f = Function("f", [a, b], [a // b, a % b])
+            d, m = f(x_dm, y_dm)
+            self._close(d, ref_div, "%s // %s" % (cls.__name__, cls.__name__))
+            self._close(m, ref_mod, "%s %% %s" % (cls.__name__, cls.__name__))
 
     def test_logaddexp_reduce_column(self):
         # np.logaddexp.reduce maps to casadi's native logsumexp.  Verify
