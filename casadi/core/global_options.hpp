@@ -76,6 +76,19 @@ namespace casadi {
 
       static std::string temp_work_dir; // Temporary work directory
 
+      /** \brief Python `__getitem__` / `__iter__` semantics for casadi
+       *  values.  false (default): MATLAB-style column-major linear
+       *  indexing on non-column shapes (legacy, emits a Python
+       *  DeprecationWarning); iteration forbidden.  true: numpy-style
+       *  row indexing and row iteration.  Affects only Python bindings.
+       *
+       *  Temporary opt-in mechanism: this field and its setter/getter
+       *  exist solely to ease the transition to numpy semantics and will
+       *  be removed once numpy becomes the unconditional default in a
+       *  future release.  Do not rely on them in long-lived code.
+       */
+      static bool numpy_style;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -104,6 +117,26 @@ namespace casadi {
 
       static void setTempWorkDir(const std::string& dir);
       static std::string getTempWorkDir() { return temp_work_dir; }
+
+      /** \brief Toggle the Python single-index `M[k]` and iteration
+       *  convention for casadi values.  false (default): legacy
+       *  MATLAB-style column-major linear indexing on non-column shapes
+       *  (emits a Python DeprecationWarning); iteration forbidden.
+       *  true: numpy-style row indexing and row iteration.
+       *  Affects only Python bindings; ignored elsewhere.
+       *
+       *  Temporary: this knob is a migration aid and will be removed
+       *  once numpy becomes the unconditional default.  Use it for
+       *  the transition period only; do not rely on it in long-lived
+       *  code. Use hasatr(casadi, "setNumpyStyle") to check for its presence
+       *  before calling it, to maintain compatibility with past and future CasADi
+       */
+      static void setNumpyStyle(bool flag) { numpy_style = flag; }
+
+      /** \brief Get the current Python indexing convention.  See
+       *  setNumpyStyle.  Temporary: see setNumpyStyle.
+       */
+      static bool getNumpyStyle() { return numpy_style; }
 
   };
 

@@ -261,7 +261,7 @@ class SXtests(casadiTestCase):
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       for f,fr,label,flags in self.matrixbinarypool.zip():
-        self.checkarray(f(vertcat(*[x0,y0])),fr(vertcat(*[x0,y0])),label)
+        self.checkarray(f([x0,y0]),fr([x0,y0]),label)
 
   def test_SXbinarySparse(self):
       self.message("SX binary operations")
@@ -1725,14 +1725,14 @@ class SXtests(casadiTestCase):
     self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
     
     
-    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos((v2[1] @ v2[0].T)[1]/y)])
+    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos((v2[1] @ v2[0].T).vec[1]/y)])
     with self.assertOutput("[[@2,@3],[NULL,@4,NULL]] = f([@2,@3,@4],@5,@6);",[]):
         F2.disp(True)
 
-    F1 = Function('F',[x,y,z],[sin(v[0]*y-args[-1]),cos((v[1] @ v[0].T)[1]/y)])    
+    F1 = Function('F',[x,y,z],[sin(v[0]*y-args[-1]),cos((v[1] @ v[0].T).vec[1]/y)])
     for ad_weight in [True,False]:
         for ad_weight_sp in [True,False]:
-            F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos((v2[1] @ v2[0].T)[1]/y)],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
+            F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos((v2[1] @ v2[0].T).vec[1]/y)],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
                     
             self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
 

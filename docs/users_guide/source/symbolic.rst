@@ -380,10 +380,11 @@ In C++, |casadi|'s :class:`Slice` helper class can be used. For the example abov
 
 .. side-by-side::
     .. exec-block:: python
-                
+
         M = SX([[3,7,8,9],[4,5,6,1]])
         print(M)
-        print(M[0,[0,3]], M[[5,-6]])
+        print(M[0,[0,3]])
+        print(M.vec[[5,-6]])
     &&
 
     .. exec-block:: octave

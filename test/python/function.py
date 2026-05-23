@@ -2178,7 +2178,7 @@ class Functiontests(casadiTestCase):
       x = SX.sym("x")
       y = SX.sym("y", Sparsity.lower(3))
       z = x+y
-      z1 = sparsify(vertcat(z[0],0,z[1]))
+      z1 = sparsify(vertcat(z.vec[0],0,z.vec[1]))
       z2 = z.T
 
       f = Function('f',[x,y],[z1,z2,x**2],["x","y"],["a","b","c"])
@@ -4483,7 +4483,7 @@ class Functiontests(casadiTestCase):
     C = C @ C
 
     x = MX.sym("x")
-    f = Function('f',[x],[(x*(2*C)+(2*C))*C[0]])
+    f = Function('f',[x],[(x*(2*C)+(2*C))*C.vec[0]])
 
 
     fs = f.simplify()

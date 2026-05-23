@@ -196,7 +196,7 @@ class ImplicitFunctiontests(casadiTestCase):
       refsol = Function("refsol", [X],[X.nz[:]])
       refsol_in = [0]*refsol.n_in()  # type: list
 
-      refsol_in[0]=trial_in[0]
+      refsol_in[0]=trial_in.vec[0]
 
       self.checkfunction(trial,refsol,inputs=refsol_in,digits=6,sens_der=False,evals=1,failmessage=message)
 

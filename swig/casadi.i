@@ -2913,6 +2913,82 @@ class NZproxy:
     for i in range(len(self)):
       yield self[i]
 
+
+class Vecproxy:
+  """Column-major (Fortran / MATLAB) dense linear indexing proxy.
+
+  `M.vec[k]` is equivalent to `vec(M)[k]`: the k-th element of M in
+  column-major flatten order.  Provided as a non-deprecated replacement
+  for legacy `M[k]` (single-int / list / slice) on non-column casadi
+  values; see GlobalOptions.setIndexMode.
+
+  Unlike `M.nz`, this is a DENSE linear indexer: structural zeros are
+  counted.  Length is `M.numel()`, not `M.nnz()`.
+  """
+  def __init__(self, matrix):
+    self.matrix = matrix
+
+  def __getitem__(self, s):
+    return self.matrix.get(False, s)
+
+  def __setitem__(self, s, val):
+    return self.matrix.set(val, False, s)
+
+  def __len__(self):
+    return self.matrix.numel()
+
+  def __iter__(self):
+    for i in range(len(self)):
+      yield self[i]
+
+
+class FlatProxy:
+  """Row-major (C / numpy) dense linear indexing proxy.
+
+  `M.flat[k]` accesses the k-th element of M in row-major flatten
+  order.  For an (m, n) matrix M, that is `M[k // n, k % n]`.
+
+  Mirrors numpy.ndarray.flat.  Like `M.vec`, this is a DENSE linear
+  indexer (structural zeros are counted), so `len(M.flat) == M.numel()`.
+  Use `M.vec` for the column-major (MATLAB / Fortran) variant.
+  """
+  def __init__(self, matrix):
+    self.matrix = matrix
+
+  def _row_to_col(self, k):
+    # Map a single row-major linear index into column-major linear.
+    m, n = self.matrix.shape
+    if k < 0:
+      k += m * n
+    return (k % n) * m + (k // n)
+
+  def __getitem__(self, s):
+    # M.T's column-major flatten is M's row-major flatten -- one
+    # cheap transpose lets the C++ linear getter do all the work.
+    return self.matrix.T.get(False, s)
+
+  def __setitem__(self, s, val):
+    # Transposing for write would mutate a copy.  Instead translate
+    # row-major indices to column-major and route through the
+    # dense linear setter on the original matrix.
+    m, n = self.matrix.shape
+    numel = m * n
+    if isinstance(s, slice):
+      start, stop, step = s.indices(numel)
+      col_idx = [(k % n) * m + (k // n) for k in range(start, stop, step)]
+      return self.matrix.set(val, False, col_idx)
+    if isinstance(s, (list, tuple)):
+      col_idx = [self._row_to_col(int(k)) for k in s]
+      return self.matrix.set(val, False, col_idx)
+    return self.matrix.set(val, False, self._row_to_col(int(s)))
+
+  def __len__(self):
+    return self.matrix.numel()
+
+  def __iter__(self):
+    for i in range(len(self)):
+      yield self[i]
+
 %}
 
 /* NZproxy has no C++ counterpart; it's defined via %pythoncode.
@@ -2927,6 +3003,24 @@ class NZproxy:
 %stub_overload_method_selftyped(__getitem__, MX, "NZproxy[MX]", s: _MIndex | MX)
 %stub_overload_method(__getitem__, _T,  s: _MIndex)
 %stub_overload_method_selftyped(__setitem__, None, "NZproxy[MX]", s: _MIndex | MX, val: bool | int | float | MX | Sequence[bool | int | float])
+%stub_overload_method(__setitem__, None, s: _MIndex, val: bool | int | float | _T | Sequence[bool | int | float])
+%stub_method0(__len__,  int)
+%stub_method0(__iter__, Iterator[_T])
+%stubcode %{class Vecproxy(Generic[_T]):
+%}
+%stub_method(__init__,    None, matrix: _T)
+%stub_overload_method_selftyped(__getitem__, MX, "Vecproxy[MX]", s: _MIndex | MX)
+%stub_overload_method(__getitem__, _T,  s: _MIndex)
+%stub_overload_method_selftyped(__setitem__, None, "Vecproxy[MX]", s: _MIndex | MX, val: bool | int | float | MX | Sequence[bool | int | float])
+%stub_overload_method(__setitem__, None, s: _MIndex, val: bool | int | float | _T | Sequence[bool | int | float])
+%stub_method0(__len__,  int)
+%stub_method0(__iter__, Iterator[_T])
+%stubcode %{class FlatProxy(Generic[_T]):
+%}
+%stub_method(__init__,    None, matrix: _T)
+%stub_overload_method_selftyped(__getitem__, MX, "FlatProxy[MX]", s: _MIndex | MX)
+%stub_overload_method(__getitem__, _T,  s: _MIndex)
+%stub_overload_method_selftyped(__setitem__, None, "FlatProxy[MX]", s: _MIndex | MX, val: bool | int | float | MX | Sequence[bool | int | float])
 %stub_overload_method(__setitem__, None, s: _MIndex, val: bool | int | float | _T | Sequence[bool | int | float])
 %stub_method0(__len__,  int)
 %stub_method0(__iter__, Iterator[_T])
@@ -2949,27 +3043,115 @@ class NZproxy:
           if isinstance(s, tuple) and len(s)==2:
             if s[1] is None: raise TypeError("Cannot slice with None")
             return self.get(False, s[0], s[1])
+          # Single-arg path: column-vector (n,1) and scalar (1,1) are
+          # unambiguous between MATLAB and numpy conventions.  Anything
+          # else triggers either the new numpy semantics (row access) or
+          # a DeprecationWarning + legacy MATLAB column-major linear.
+          # Sparsity-mask indexing (`M[sp]`) is a different operation
+          # whose semantics is unchanged by the mode toggle, so it must
+          # bypass both the redispatch and the warning.
+          if not self.is_column() and not isinstance(s, Sparsity):
+            if GlobalOptions.getNumpyStyle():
+              return self.get(False, s, slice(None))
+            import warnings as _w
+            _w.warn(
+              "Single-index access M[k] on a non-column casadi matrix will "
+              "switch behaviour in a future version cfr "
+              "https://github.com/casadi/casadi/issues/2762. "
+              "Do you expect a scalar answer like in casadi <3.8? "
+              "Switch to M.vec[k] (or M.flat[k] if M is a row vector). "
+              "Do you expect a row vector answer cfr numpy conventions? "
+              "Opt in to that future behaviour with "
+              "`if hasattr(ca.GlobalOptions, \"setNumpyStyle\"): "
+              "GlobalOptions.setNumpyStyle(True)`.",
+              DeprecationWarning, stacklevel=2)
           return self.get(False, s)
 
     def __iter__(self):
-      raise Exception("""CasADi matrices are not iterable by design.
-                      Did you mean to iterate over m.nz, with m IM/DM/SX?
-                      Did you mean to iterate over horzsplit(m,1)/vertsplit(m,1) with m IM/DM/SX/MX?
-                      """)
+      # NOTE: do not put `yield` directly in this function -- that
+      # turns it into a generator, deferring the raise below until
+      # `next()` is called and breaking matrix.py:test_iterable's
+      # `assertInException("CasADi matrices are not iterable")` on
+      # `iter(M)`.  Keep the numpy-mode branch in a nested generator.
+      if not GlobalOptions.getNumpyStyle():
+        raise Exception(
+          "CasADi matrices are not iterable by design under the default "
+          "(MATLAB-style) convention. "
+          "Opt in to numpy-style row iteration (yields shape (1, n) rows "
+          "along axis 0) with "
+          "`if hasattr(ca.GlobalOptions, \"setNumpyStyle\"): "
+          "GlobalOptions.setNumpyStyle(True)`. "
+          "Or use one of: m.vec / m.flat / m.nz for explicit linear "
+          "iteration, horzsplit(m, 1) / vertsplit(m, 1) for explicit "
+          "block iteration."
+        )
+      # numpy / scipy.sparse / jax all yield ROWS on axis 0 for a
+      # 2-D container.  Under casadi's always-2-D convention each
+      # yielded row is shape (1, n).  Sparse row slicing preserves
+      # the sparsity pattern automatically.
+      def _rows():
+        for i in range(self.size1()):
+          yield self[i, :]
+      return _rows()
 
     def __setitem__(self,s,val):
           if isinstance(s,tuple) and len(s)==2:
             return self.set(val, False, s[0], s[1])
+          if not self.is_column() and not isinstance(s, Sparsity):
+            if GlobalOptions.getNumpyStyle():
+              return self.set(val, False, s, slice(None))
+            import warnings as _w
+            _w.warn(
+              "Single-index assignment M[k] = v on a non-column casadi "
+              "matrix will switch behaviour in a future version cfr "
+              "https://github.com/casadi/casadi/issues/2762. "
+              "Do you expect scalar assignment like in casadi <3.8? "
+              "Switch to M.vec[k]=v (or M.flat[k]=v if M is a row vector). "
+              "Do you expect row assignment cfr numpy conventions? "
+              "Opt in to that future behaviour with "
+              "`if hasattr(ca.GlobalOptions, \"setNumpyStyle\"): "
+              "GlobalOptions.setNumpyStyle(True)`.",
+              DeprecationWarning, stacklevel=2)
           return self.set(val, False, s)
 
     @property
     def nz(self):
       return NZproxy(self)
 
+    @property
+    def vec(self):
+      return Vecproxy(self)
+
+    @property
+    def flat(self):
+      return FlatProxy(self)
+
+    def flatten(self, order='C'):
+      # Numpy.flatten on a casadi value, returning a fresh (numel, 1)
+      # column.  Default order='C' (row-major, numpy convention);
+      # order='F' is column-major (MATLAB / Fortran), equivalent to
+      # casadi.vec(self).  In casadi there is no view/copy distinction
+      # so this is identical to ravel().
+      o = str(order).upper()
+      if o == 'F':
+        return _casadi.vec(self)
+      if o in ('C', 'A', 'K'):
+        return _casadi.vec(_casadi.transpose(self))
+      raise ValueError("flatten: order must be one of 'C','F','A','K'; got %r" % order)
+
+    def ravel(self, order='C'):
+      # numpy.ravel on a casadi value.  Identical to flatten() since
+      # casadi has no view/copy distinction at the Python API.
+      return self.flatten(order)
+
 %}
 %stub_attr(shape, tuple[int, int])
 %stub_attr(T,     Self)
 %stub_attr(nz,    NZproxy[Self])
+%stub_attr(vec,   Vecproxy[Self])
+%stub_attr(flat,  FlatProxy[Self])
+%stub_method(flatten, Self, order: str = ...)
+%stub_method(ravel,   Self, order: str = ...)
 %stub_method(reshape,     Self, arg: tuple[int, int] | int | Sparsity)
 /* __getitem__ / __setitem__: _MIndex is the common (DM-compatible)
  * index set shared by DM/SX/MX.  MX additionally accepts MX as index

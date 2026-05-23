@@ -32,8 +32,8 @@ opti = Opti() # Optimization problem
 
 # ---- decision variables ---------
 X = opti.variable(2,N+1) # state trajectory
-pos   = X[0,:]
-speed = X[1,:]
+pos   = X[0,:].T
+speed = X[1,:].T
 U = opti.variable(1,N)   # control trajectory (throttle)
 T = opti.variable()      # final time
 
@@ -60,7 +60,7 @@ opti.subject_to(opti.bounded(0,U,1)) # control is limited
 
 # ---- boundary conditions --------
 opti.subject_to(pos[0]==0)   # start at position 0 ...
-opti.subject_to(speed[0]==0) # ... from stand-still 
+opti.subject_to(speed[0]==0) # ... from stand-still
 opti.subject_to(pos[-1]==1)  # finish line at position 1
 
 # ---- misc. constraints  ----------

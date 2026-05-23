@@ -496,7 +496,6 @@ each operation. Further information is available in the API documentation.
 
             # 0-based
             A[i,j]
-            A[i]
      - .. code-block:: cpp
 
             // 0-based
@@ -513,7 +512,6 @@ each operation. Further information is available in the API documentation.
 
             # 0-based
             A[i,j] = b
-            A[i] = b
      - .. code-block:: cpp
 
             // 0-based

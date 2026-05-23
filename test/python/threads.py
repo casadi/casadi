@@ -110,9 +110,9 @@ class Threadstests(casadiTestCase):
         opti.subject_to(opti.bounded(0, U, 1))  # control is limited
 
         # ---- boundary conditions --------
-        opti.subject_to(pos[0] == 0)  # start at position 0 ...
-        opti.subject_to(speed[0] == 0)  # ... from stand-still
-        opti.subject_to(pos[-1] == 1)  # finish line at position 1
+        opti.subject_to(pos.flat[0] == 0)  # start at position 0 ...
+        opti.subject_to(speed.flat[0] == 0)  # ... from stand-still
+        opti.subject_to(pos.flat[-1] == 1)  # finish line at position 1
 
         # ---- misc. constraints  ----------
         opti.subject_to(T >= 0)  # Time must be positive
@@ -254,9 +254,9 @@ class Threadstests(casadiTestCase):
     opti.subject_to(opti.bounded(0, U, 1))  # control is limited
 
     # ---- boundary conditions --------
-    opti.subject_to(pos[0] == 0)  # start at position 0 ...
-    opti.subject_to(speed[0] == 0)  # ... from stand-still
-    opti.subject_to(pos[-1] == 1)  # finish line at position 1
+    opti.subject_to(pos.flat[0] == 0)  # start at position 0 ...
+    opti.subject_to(speed.flat[0] == 0)  # ... from stand-still
+    opti.subject_to(pos.flat[-1] == 1)  # finish line at position 1
 
     # ---- misc. constraints  ----------
     opti.subject_to(T >= 0)  # Time must be positive
@@ -437,9 +437,9 @@ class Threadstests(casadiTestCase):
         opti.subject_to(opti.bounded(0, U, 1))  # control is limited
 
         # ---- boundary conditions --------
-        opti.subject_to(pos[0] == 0)  # start at position 0 ...
-        opti.subject_to(speed[0] == 0)  # ... from stand-still
-        opti.subject_to(pos[-1] == 1)  # finish line at position 1
+        opti.subject_to(pos.flat[0] == 0)  # start at position 0 ...
+        opti.subject_to(speed.flat[0] == 0)  # ... from stand-still
+        opti.subject_to(pos.flat[-1] == 1)  # finish line at position 1
 
         # ---- misc. constraints  ----------
         opti.subject_to(T >= 0)  # Time must be positive

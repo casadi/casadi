@@ -433,6 +433,227 @@ class typemaptests(casadiTestCase):
         doit(z,s,lambda z,s: z/s)
         doit(z,s,lambda s,z: s/z)
         
+  def test_vec_flat_flatten_proxies(self):
+    """The .vec / .flat dense linear-indexing proxies and the
+    .flatten() method (issue #2959 migration aids).  .vec is column-
+    major (MATLAB / Fortran), .flat is row-major (numpy / C); both
+    count structural zeros (unlike .nz).  No deprecation warning."""
+    with warnings.catch_warnings():
+      warnings.simplefilter("error", category=DeprecationWarning)
+
+      M = DM([[10, 20, 30], [40, 50, 60]])
+      ref_col = [10.0, 40.0, 20.0, 50.0, 30.0, 60.0]   # column-major
+      ref_row = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0]   # row-major
+
+      # .vec read
+      for k, expected in enumerate(ref_col):
+        self.assertEqual(float(M.vec[k]), expected,
+                         "vec[%d] mismatch" % k)
+      # .flat read
+      for k, expected in enumerate(ref_row):
+        self.assertEqual(float(M.flat[k]), expected,
+                         "flat[%d] mismatch" % k)
+      self.assertEqual(len(M.vec), M.numel())
+      self.assertEqual(len(M.flat), M.numel())
+
+      # Slice / list read
+      self.checkarray(M.flat[1:5], DM([20, 30, 40, 50]),
+                      "flat slice")
+      self.checkarray(M.flat[[0, 3, 5]], DM([10, 40, 60]),
+                      "flat list")
+      self.checkarray(M.vec[[0, 3, 5]], DM([10, 50, 60]),
+                      "vec list")
+
+      # Iteration -- vertcat the iterator output back into a (numel, 1)
+      # column so we can compare against the expected dense linear order.
+      # (DM(list(M.vec)) also works at runtime but no DM __init__ overload
+      # accepts Sequence[DM], which pyright flags.)
+      self.checkarray(vertcat(*M.vec),  DM(ref_col), "iter vec")
+      self.checkarray(vertcat(*M.flat), DM(ref_row), "iter flat")
+
+      # .flatten() / .ravel() return a fresh (numel, 1) column;
+      # default order is C (row-major, numpy convention); F is column-major.
+      F = M.flatten()
+      self.assertEqual(F.shape, (M.numel(), 1))
+      self.checkarray(F, DM(ref_row), "flatten default (C)")
+      self.checkarray(M.flatten('F'), DM(ref_col), "flatten(F)")
+      self.checkarray(M.ravel(),    DM(ref_row), "ravel default (C)")
+      self.checkarray(M.ravel('F'), DM(ref_col), "ravel(F)")
+      # Bad order rejected
+      with self.assertRaises(ValueError):
+        M.ravel('X')
+
+      # Setitem (mutating)
+      M2 = DM.zeros(2, 3)
+      M2.flat[1] = 99
+      self.checkarray(M2, DM([[0, 99, 0], [0, 0, 0]]),
+                      "flat int setitem")
+      M3 = DM.zeros(2, 3)
+      M3.flat[[1, 4]] = DM([7, 8])
+      self.checkarray(M3, DM([[0, 7, 0], [0, 8, 0]]),
+                      "flat list setitem")
+      M4 = DM.zeros(2, 3)
+      M4.flat[1:5] = DM([1, 2, 3, 4])
+      self.checkarray(M4, DM([[0, 1, 2], [3, 4, 0]]),
+                      "flat slice setitem")
+      M5 = DM.zeros(2, 3)
+      M5.vec[1:5] = DM([1, 2, 3, 4])
+      # Column-major linear positions 1..4 are (1,0), (0,1), (1,1), (0,2)
+      self.checkarray(M5, DM([[0, 2, 4], [1, 3, 0]]),
+                      "vec slice setitem (column-major)")
+
+      # SX / MX: symbolic graph produced, numerically agrees on eval
+      for cls in [SX, MX]:
+        s = cls.sym("s", 2, 3)
+        expr = s.flat[3]    # row-major index 3 == (1, 0)
+        f = Function("f", [s], [expr])
+        out = f(M)
+        self.checkarray(out, DM(40), "%s flat[3] numeric" % cls.__name__)
+        # flatten()
+        f2 = Function("f2", [s], [s.flatten()])
+        self.checkarray(f2(M), DM(ref_row).reshape((-1, 1)),
+                        "%s flatten numeric" % cls.__name__)
+
+  def test_index_mode_numpy(self):
+    """issue #2959: GlobalOptions.setNumpyStyle(True) flips single-index
+    `M[k]` from MATLAB-style column-major linear to numpy-style row
+    indexing on non-column casadi values; default mode emits a
+    DeprecationWarning instead.  Column vectors (n,1) are unambiguous
+    and silent under both modes."""
+    try:
+      # --- Default MATLAB mode: warns on non-column, no warn on column ---
+      self.assertEqual(GlobalOptions.getNumpyStyle(), False)
+      M = DM([[10, 20, 30], [40, 50, 60], [70, 80, 90]])
+      col = DM([10, 20, 30])
+      row = DM([[10, 20, 30, 40]])
+
+      with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        val = M[1]
+        self.checkarray(val, DM(40), "matlab M[1] -> col-major linear")
+        self.assertEqual(len(w), 1)
+        self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+        self.assertIn("issues/2762", str(w[0].message))
+
+      with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        val = col[1]
+        self.checkarray(val, DM(20), "matlab col[1] -> 2nd element")
+        self.assertEqual(len(w), 0, "(n,1) column must not warn")
+
+      # Row vector (1,n) is NOT (n,1); the strategy warns there too.
+      with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        _ = row[1]
+        self.assertEqual(len(w), 1)
+
+      # Slice on non-column: also warns
+      with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        _ = M[1:3]
+        self.assertEqual(len(w), 1)
+
+      # __setitem__ also warns under matlab mode
+      with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        M2 = DM.zeros(3, 3)
+        M2[1] = 99
+        self.checkarray(M2, DM([[0, 0, 0], [99, 0, 0], [0, 0, 0]]),
+                        "matlab M[1]=99 -> col-major linear write")
+        self.assertEqual(len(w), 1)
+
+      # --- numpy mode: row indexing, no warnings ---
+      GlobalOptions.setNumpyStyle(True)
+      self.assertEqual(GlobalOptions.getNumpyStyle(), True)
+
+      with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        val = M[1]
+        self.checkarray(val, DM([[40, 50, 60]]), "numpy M[1] -> row 1")
+        self.assertEqual(val.shape, (1, 3))
+        self.assertEqual(len(w), 0)
+
+      # Slice -> row block
+      val = M[1:3]
+      self.checkarray(val, DM([[40, 50, 60], [70, 80, 90]]),
+                      "numpy M[1:3] -> rows 1..2")
+      self.assertEqual(val.shape, (2, 3))
+
+      # Column vector still works the same (unambiguous shape)
+      val = col[1]
+      self.checkarray(val, DM(20), "numpy col[1] -> 2nd element")
+
+      # __setitem__ assigns whole row
+      M2 = DM.zeros(3, 3)
+      M2[1] = 99
+      self.checkarray(M2, DM([[0, 0, 0], [99, 99, 99], [0, 0, 0]]),
+                      "numpy M[1]=99 -> whole row 1")
+
+      M2 = DM.zeros(3, 3)
+      M2[1:3] = DM([[7, 8, 9], [10, 11, 12]])
+      self.checkarray(M2, DM([[0, 0, 0], [7, 8, 9], [10, 11, 12]]),
+                      "numpy M[1:3] = ... -> rows 1..2 assignment")
+
+      # Symbolic types must also follow the mode
+      for cls in [SX, MX]:
+        s = cls.sym("s", 3, 3)
+        expr = s[1]
+        self.assertEqual(expr.shape, (1, 3),
+                         "%s.sym(3,3)[1] under numpy must be (1,3)" % cls.__name__)
+        # Evaluate to confirm it really IS row 1
+        f = Function("f", [s], [expr])
+        out = f(M)
+        self.checkarray(out, DM([[40, 50, 60]]),
+                        "%s numeric row 1 under numpy" % cls.__name__)
+
+      # --- iteration: forbidden under matlab, yields rows under numpy ---
+      # numpy mode: yields rows as (1, n), preserving sparsity.
+      M_iter = DM([[10, 20, 30], [40, 50, 60], [70, 80, 90]])
+      rows = list(M_iter)
+      self.assertEqual(len(rows), 3)
+      self.checkarray(rows[0], DM([[10, 20, 30]]), "iter row 0")
+      self.checkarray(rows[1], DM([[40, 50, 60]]), "iter row 1")
+      for r in rows:
+        self.assertEqual(r.shape, (1, 3),
+                         "row yielded must be (1, ncols)")
+
+      # Sparsity preserved: a lower-triangular's rows carry 1, 2, 3, 4 nnz
+      # (zero structural elements stay structural).
+      sp = Sparsity.lower(4)
+      Msp = DM(sp, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+      rows = list(Msp)
+      self.assertEqual([r.nnz() for r in rows], [1, 2, 3, 4],
+                       "iteration must preserve row sparsity")
+      # `from casadi import *` shadows builtins.sum with casadi.sum;
+      # tally with an explicit loop instead.
+      total_nnz = 0
+      for r in rows:
+        total_nnz += r.nnz()
+      self.assertEqual(total_nnz, Msp.nnz(),
+                       "sum of row nnz must equal source nnz")
+
+      # Symbolic iteration also works
+      for cls in [SX, MX]:
+        sym = cls.sym("M", 3, 3)
+        srows = list(sym)
+        self.assertEqual(len(srows), 3)
+        # Evaluate to confirm row contents
+        f = Function("f", [sym], srows)
+        out = f(M_iter)
+        for k, expected in enumerate([[10, 20, 30], [40, 50, 60], [70, 80, 90]]):
+          self.checkarray(out[k], DM([expected]),
+                          "%s iter row %d numeric" % (cls.__name__, k))
+
+      # Matlab mode: iter still raises with updated message
+      GlobalOptions.setNumpyStyle(False)
+      with self.assertRaises(Exception) as ctx:
+        for _ in M_iter:
+          pass
+      self.assertIn("setNumpyStyle(True)", str(ctx.exception))
+    finally:
+      # Reset to default so subsequent tests run under matlab mode
+      GlobalOptions.setNumpyStyle(False)
+
   def test_issue4268(self):
 
     class Foo:
