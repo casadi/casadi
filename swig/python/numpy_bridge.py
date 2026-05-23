@@ -600,19 +600,187 @@ def _np_clip(a, a_min=None, a_max=None):
 
 def _np_diff(a, n=1, axis=-1):
     # casadi.diff(x, n, axis) supports repeated differencing and either
-    # axis natively.  numpy and casadi both accept axis=-1 but with
-    # different semantics: numpy "last axis" (which is 1 for 2-D),
-    # casadi matlab-style auto-pick (row vec -> 1, else 0).  Translate
-    # axis=-1 to 1 so we match numpy on every 2-D input.
+    # axis natively.  numpy's axis=-1 default means "last axis", which on
+    # a casadi (n,1) column-vector would be the size-1 axis -> empty
+    # (n,0).  Since casadi values are always 2-D, treat (n,1) and (1,n)
+    # vector-shaped inputs as 1-D-like under the default axis: diff
+    # along the populated axis instead of the size-1 one.  Explicit
+    # axis= still honored literally.
     if not isinstance(n, int) or n < 0:
         return NotImplemented
     if axis == -1:
-        axis = 1
+        if hasattr(a, "shape"):
+            nr, nc = a.shape
+            if nc == 1 and nr >= 1:
+                axis = 0
+            else:
+                axis = 1
+        else:
+            axis = 1
     if axis not in (0, 1):
         return NotImplemented
     if n == 0:
         return a
     return diff(a, int(n), int(axis))
+
+
+def _np_trapz(y, x=None, dx=1.0, axis=-1):
+    """numpy.trapz handler: trapezoidal integration along an axis.
+
+    On a casadi (n,1) or (1,n) value under the default axis=-1, treats
+    the input as 1-D and integrates along the populated axis (matching
+    the friendly convention used by `_np_diff` / `_np_gradient`).
+    Returns a scalar for vector inputs; for matrices returns a vector
+    of per-axis integrals.
+
+    Note: numpy and aerosandbox.numpy disagree on what `trapz` means.
+    Numpy's trapz returns the SUM of trapezoidal contributions (total
+    integral); aerosandbox's trapz returns the per-subinterval values
+    without summing.  We match numpy.
+    """
+    if not hasattr(y, "shape"):
+        return NotImplemented
+    nr, nc = y.shape
+    is_col = (nc == 1 and nr >= 2)
+    is_row = (nr == 1 and nc >= 2)
+    if axis == -1:
+        axis = 0 if is_col else 1
+    if axis not in (0, 1):
+        return NotImplemented
+    n_along = nr if axis == 0 else nc
+    if n_along < 2:
+        return NotImplemented
+
+    def take(a, lo, hi):
+        if axis == 0:
+            return a[lo:hi, :]
+        return a[:, lo:hi]
+
+    pair_sum = (take(y, 0, -1) + take(y, 1, None)) * 0.5
+    if x is None:
+        contributions = pair_sum * dx
+    else:
+        x_dm = x if hasattr(x, "shape") else DM(x)
+        if x_dm.numel() != n_along:
+            return NotImplemented
+        x_v = vec(x_dm) if axis == 0 else vec(x_dm).T
+        contributions = pair_sum * diff(x_v, 1, axis)
+    return sum1(contributions) if axis == 0 else sum2(contributions)
+
+
+def _np_gradient(f, *varargs, axis=None, edge_order=1):
+    """numpy.gradient handler.
+
+    Second-order accurate central differences in the interior;
+    first-order one-sided differences at the boundaries (edge_order=1)
+    or second-order one-sided at the boundaries (edge_order=2).  Treats
+    a casadi (n,1) or (1,n) value as 1-D when axis is unspecified --
+    same friendly convention as `_np_diff`, since casadi has no native
+    1-D shape.  Spacing varargs accept either a scalar (uniform) or a
+    1-D coordinate array of the right length.
+    """
+    if not hasattr(f, "shape"):
+        return NotImplemented
+    if edge_order not in (1, 2):
+        return NotImplemented
+    nr, nc = f.shape
+    is_col = (nc == 1 and nr >= 2)
+    is_row = (nr == 1 and nc >= 2)
+    if axis is None:
+        if is_col:
+            axis = 0
+        elif is_row:
+            axis = 1
+        else:
+            # Matrix without explicit axis: numpy returns one gradient
+            # per axis as a list.
+            return [_np_gradient(f, *varargs, axis=ax, edge_order=edge_order)
+                    for ax in (0, 1)]
+    if isinstance(axis, (tuple, list)):
+        return [_np_gradient(f, *varargs, axis=int(ax), edge_order=edge_order)
+                for ax in axis]
+    if axis not in (0, 1):
+        return NotImplemented
+    n_along = nr if axis == 0 else nc
+    if n_along < 2:
+        return NotImplemented
+    if edge_order == 2 and n_along < 3:
+        return NotImplemented
+
+    # Resolve spacing along this axis.
+    if len(varargs) == 0:
+        h_uniform = 1.0
+        coords = None
+    elif len(varargs) == 1:
+        s = varargs[0]
+        s_dm = s if hasattr(s, "shape") else DM(s)
+        if s_dm.numel() == 1:
+            h_uniform = s_dm
+            coords = None
+        elif s_dm.numel() == n_along:
+            h_uniform = None
+            coords = vec(s_dm) if axis == 0 else vec(s_dm).T
+        else:
+            return NotImplemented
+    else:
+        # Per-axis varargs are a numpy multi-axis convenience; the
+        # explicit-axis path above already picked one axis.
+        return NotImplemented
+
+    def take(a, lo, hi):
+        if axis == 0:
+            return a[lo:hi, :]
+        return a[:, lo:hi]
+
+    # Build interior spacings hm[i] (between i-1 and i) and hp[i]
+    # (between i and i+1) for i in [1, n_along-2].
+    if h_uniform is not None:
+        hm = h_uniform
+        hp = h_uniform
+        hm_first = h_uniform
+        hp_last = h_uniform
+    else:
+        dx_full = diff(coords, 1, axis)   # length n_along-1 along axis
+        hm = take(dx_full, 0, -1)         # length n_along-2
+        hp = take(dx_full, 1, None)       # length n_along-2
+        hm_first = take(dx_full, 0, 1)
+        hp_last = take(dx_full, -1, None)
+
+    # Interior: 2nd-order central
+    dfp = take(f, 2, None) - take(f, 1, -1)
+    dfm = take(f, 1, -1)   - take(f, 0, -2)
+    grad_int = (hm * hm * dfp + hp * hp * dfm) / (hm * hp * (hm + hp))
+
+    # Edge gradients.
+    if edge_order == 1:
+        grad_first = (take(f, 1, 2) - take(f, 0, 1)) / hm_first
+        grad_last  = (take(f, -1, None) - take(f, -2, -1)) / hp_last
+    else:  # edge_order == 2
+        f0 = take(f, 0, 1); f1 = take(f, 1, 2); f2 = take(f, 2, 3)
+        fn = take(f, -1, None); fn1 = take(f, -2, -1); fn2 = take(f, -3, -2)
+        if h_uniform is not None:
+            h = h_uniform
+            grad_first = (-3.0 * f0 + 4.0 * f1 - f2) / (2.0 * h)
+            grad_last  = ( 3.0 * fn - 4.0 * fn1 + fn2) / (2.0 * h)
+        else:
+            # Non-uniform 2nd-order at the boundaries; same closed form
+            # aerosandbox uses, matches numpy's documented formula.
+            dfm_f = f1 - f0; dfp_f = f2 - f1
+            dfm_l = fn1 - fn2; dfp_l = fn - fn1
+            hp_first = take(dx_full, 1, 2)       # between f[1] and f[2]
+            hm_last  = take(dx_full, -2, -1)     # between f[-3] and f[-2]
+            grad_first = (2.0 * dfm_f * hm_first * hp_first
+                          + dfm_f * hp_first * hp_first
+                          - dfp_f * hm_first * hm_first) \
+                         / (hm_first * hp_first * (hm_first + hp_first))
+            grad_last  = (-dfm_l * hp_last * hp_last
+                          + dfp_l * hm_last * hm_last
+                          + 2.0 * dfp_l * hm_last * hp_last) \
+                         / (hm_last * hp_last * (hm_last + hp_last))
+
+    if axis == 0:
+        return vertcat(grad_first, grad_int, grad_last)
+    return horzcat(grad_first, grad_int, grad_last)
 
 
 def _np_diag(v, k=0):
@@ -2783,6 +2951,7 @@ def _build_numpy_function_dispatch():
         np.linalg.cholesky: lambda a: chol(a).T,
         np.clip:          _np_clip,
         np.diff:          _np_diff,
+        np.gradient:      _np_gradient,
         np.roll:          _np_roll,
         np.atleast_1d:    _np_atleast_1d,
         np.atleast_2d:    _np_atleast_2d,
@@ -2894,6 +3063,15 @@ def _build_numpy_function_dispatch():
     }
     # numpy.diag dispatches via __array_function__ and ours respects k=0.
     d[np.diag] = _np_diag
+    # np.trapz was renamed to np.trapezoid in numpy 2.x and removed from
+    # numpy 2.4+.  Reference both names via hasattr so the dict-build
+    # doesn't AttributeError on either version: if it did, the
+    # `except Exception` in `_numpy_array_function_dispatch` would
+    # zero out the dispatch dict and silently break every NEP-18 call.
+    for _name in ("trapz", "trapezoid"):
+        _f = getattr(np, _name, None)
+        if _f is not None:
+            d[_f] = _np_trapz
     # np.prod / np.cumprod / np.argmax / np.argmin / np.sort / np.unique / np.eig
     # have no casadi equivalent: numpy fallback (or NotImplemented for symbolic).
     return d
@@ -2904,7 +3082,17 @@ def _numpy_array_function_dispatch(self, func, types, args, kwargs):
     if _NUMPY_FUNCTION_DISPATCH is None:
         try:
             _NUMPY_FUNCTION_DISPATCH = _build_numpy_function_dispatch()
-        except Exception:
+        except Exception as e:
+            # Building the dispatch dict failed; surface a clear warning
+            # rather than silently zeroing the dict (which would make
+            # every NEP-18 call on a symbolic type raise the cryptic
+            # "no implementation found" TypeError).  Then continue with
+            # an empty dict so DM ops still fall back via .full().
+            import warnings
+            warnings.warn(
+                "casadi: failed to build numpy NEP-18 dispatch table "
+                "(%s: %s); symbolic numpy ops will be unavailable."
+                % (type(e).__name__, e), RuntimeWarning, stacklevel=2)
             _NUMPY_FUNCTION_DISPATCH = {}
     handler = _NUMPY_FUNCTION_DISPATCH.get(func)
     if handler is not None:

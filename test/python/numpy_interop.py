@@ -726,9 +726,12 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         mat = DM([[1.0, 2.0, 4.0, 7.0],
                   [0.0, 1.0, 3.0, 6.0],
                   [1.0, 1.0, 2.0, 4.0]])
-        # default axis=-1: on a column the last axis is 1 (size 1),
-        # giving an empty (n, 0) result -- matches numpy strictly.
-        self._verify("diff_col_default", np.diff, col)
+        # default axis=-1: numpy on a (n,1) array would give an empty
+        # (n,0) result (the size-1 axis).  Our bridge treats (n,1) as
+        # 1-D-like under the default axis and diffs along the populated
+        # dimension; compare against numpy's 1-D result.
+        self._verify("diff_col_default", np.diff, col,
+                     np_args_override=(col.full().ravel(),))
         # explicit axis along the populated dimension
         self._verify("diff_col_axis0", np.diff, col, kwargs={"axis": 0})
         self._verify("diff_row_axis1", np.diff, row, kwargs={"axis": 1})
@@ -743,6 +746,83 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         # repeated differencing on a matrix
         self._verify("diff_mat_n2_axis1", np.diff, mat,
                      kwargs={"n": 2, "axis": 1})
+
+    def test_trapz(self):
+        # numpy 2.x removed `np.trapz` in favor of `np.trapezoid`; pick
+        # whichever the installed numpy exposes so the test runs under
+        # both versions.  The casadi bridge registers both names.
+        trapz = getattr(np, "trapz", None) or np.trapezoid  # pyright: ignore[reportAttributeAccessIssue]
+        # Default (uniform dx=1) on a column vector: bridge treats (n,1)
+        # as 1-D and integrates along the populated axis to a scalar.
+        # Without the handler this would return [0, 0, 0, 0] -- numpy
+        # interpreting axis=-1 (size 1) on a (n,1) array.  aerosandbox's
+        # `trapz` returns the per-subinterval contributions (length n-1)
+        # rather than the sum; we deliberately match numpy's "total
+        # integral" semantics.
+        col = DM([1.0, 3.0, 6.0, 10.0])
+        self._verify("trapz_col_default", trapz, col,
+                     np_args_override=(col.full().ravel(),))
+        row = DM([[1.0, 3.0, 6.0, 10.0]])
+        self._verify("trapz_row_default", trapz, row,
+                     np_args_override=(row.full().ravel(),))
+        # Scalar dx.
+        self._verify("trapz_scalar_dx",
+                     lambda v: trapz(v, dx=2.0), col,
+                     np_args_override=(col.full().ravel(),))
+        # Non-uniform sample points.
+        xc = DM([0.0, 1.0, 3.0, 6.0])
+        self._verify("trapz_coords",
+                     lambda y, x: trapz(y, x), col, xc,
+                     np_args_override=(col.full().ravel(),
+                                       xc.full().ravel()))
+        # Matrix with default axis=-1: integrate along the last axis.
+        mat = DM([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        self._verify("trapz_mat_default", trapz, mat)
+        # Matrix with axis=0.
+        self._verify("trapz_mat_axis0",
+                     lambda v: trapz(v, axis=0), mat)
+
+    def test_gradient(self):
+        # Default axis on a column vector: bridge treats (n,1) as 1-D,
+        # numpy ref is computed on the ravelled 1-D form.
+        col = DM([1.0, 3.0, 6.0, 10.0])
+        self._verify("gradient_col_default", np.gradient, col,
+                     np_args_override=(col.full().ravel(),))
+        # Uniform scalar spacing.
+        self._verify("gradient_scalar_h", lambda v: np.gradient(v, 2.0), col,
+                     np_args_override=(col.full().ravel(),))
+        # Non-uniform spacing via coordinate array.
+        xcoord = DM([0.0, 1.0, 3.0, 6.0])
+        ycoord = DM([0.0, 1.0, 4.0, 9.0])
+        self._verify("gradient_coords",
+                     lambda y, x: np.gradient(y, x), ycoord, xcoord,
+                     np_args_override=(ycoord.full().ravel(),
+                                       xcoord.full().ravel()))
+        # edge_order=2.
+        self._verify("gradient_edge2",
+                     lambda v: np.gradient(v, edge_order=2), col,
+                     np_args_override=(col.full().ravel(),))
+        # 2-D matrix with explicit axis.
+        m = DM([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 10.0]])
+        for ax in (0, 1):
+            self._verify("gradient_mat_axis%d" % ax,
+                         lambda v, ax=ax: np.gradient(v, axis=ax), m)
+        # 2-D matrix without axis: returns a list of per-axis gradients.
+        # Compare element-wise against numpy's list output.
+        got_list = np.gradient(m)
+        ref_list = np.gradient(m.full())
+        self.assertEqual(len(got_list), len(ref_list))  # pyright: ignore[reportAttributeAccessIssue]
+        for ax, (g, r) in enumerate(zip(got_list, ref_list)):
+            self._close(g, r, "gradient_mat_no_axis ax=%d" % ax)
+        # Symbolic 1-D query on SX/MX must produce a symbolic graph that
+        # numerically matches numpy when evaluated.
+        for cls in (SX, MX):
+            s = cls.sym("s", 4)
+            expr = np.gradient(s)
+            f = Function("f", [s], [expr])
+            got = f(col)
+            ref = np.gradient(col.full().ravel())
+            self._close(got, ref, "gradient %s symbolic" % cls.__name__)
 
     def test_roll_1d(self):
         v = DM([1.0, 2.0, 3.0, 4.0, 5.0])
