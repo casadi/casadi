@@ -261,29 +261,24 @@ _NUMPY_UFUNC_REDUCE = {
 
 
 def _numpy_ufunc_dispatch(self, ufunc, method, inputs, kwargs):
-    # NEP-13 __array_ufunc__ implementation, shared by DM/SX/MX.
-    import numpy as np
-    # Detect any kwarg we can't bridge.  If found, route to the fallback
-    # (DM densifies via .full(); SX/MX raise a clear error).
-    out_arg = kwargs.get("out", None)
-    out_set = out_arg is not None and any(
-        o is not None for o in (out_arg if isinstance(out_arg, tuple) else (out_arg,)))
-    where_set = kwargs.get("where", True) is not True
-    initial_set = kwargs.get("initial", np._NoValue) is not np._NoValue
-    if out_set or where_set or initial_set:
-        return _numpy_ufunc_fallback(self, ufunc, method, inputs, kwargs)
-    # No-op / metadata kwargs: drop before dispatch.  `keepdims` is a no-op
-    # because casadi reductions are naturally 2-D.  The rest are numpy
-    # internals that don't apply to symbolic types.
-    for k in ("out", "where", "initial",
-              "keepdims", "casting", "order", "dtype", "subok", "signature"):
-        kwargs.pop(k, None)
-
+    # NEP-13 __array_ufunc__ entry point, shared by DM/SX/MX.
     name = ufunc.__name__
     if name.endswith(" (vectorized)"):       # numpy.frompyfunc decoration
         name = name[:-len(" (vectorized)")]
 
-    if method == "__call__":
+    # Gateway (issue #2959).  mode 1: the casadi-aware numpy support routes
+    # the whole call through the numpy-semantics wrapper, which returns a
+    # NumpyArray following numpy's shape/axis contract -- for SX/MX/DM alike.
+    # mode 0/-1: legacy casadi 3.7.2 behaviour (0 warns, -1 is silent).
+    _mode = GlobalOptions.getNumpyMode()
+    if _mode == 1:
+        return ArrayInterface._wrap(self, 2).__array_ufunc__(ufunc, method, *inputs, **kwargs)
+
+    # Default (legacy casadi 3.7.2) mode.
+    # Operator ufuncs called as an operator (`x + M`, `-M`, `np_arr < M`)
+    # keep returning casadi types silently: ordinary operator interop, not
+    # the explicit `numpy.foo(M)` surface the deprecation targets.
+    if method == "__call__" and name in _OPERATOR_UFUNCS:
         op = _NUMPY_UFUNC_DISPATCH.get(name)
         if op is not None:
             try:
@@ -292,7 +287,25 @@ def _numpy_ufunc_dispatch(self, ufunc, method, inputs, kwargs):
                 pass
         return _numpy_ufunc_fallback(self, ufunc, method, inputs, kwargs)
 
-    if method in ("reduce", "accumulate"):
+    # Any other explicit numpy ufunc call (np.sin(M), np.add.reduce(M), ...).
+    # 3.7.2 behaviour: numeric inputs densify to a numpy result; symbolic
+    # inputs go through the casadi op and return a casadi value (np.sin(MX)
+    # -> MX).  Mode 0 also emits a FutureWarning; mode -1 stays silent.
+    if _mode == 0:
+        _warn_preserve_type()
+    if not _has_symbolic(inputs):
+        for k in ("keepdims", "casting", "order", "dtype", "subok", "signature"):
+            kwargs.pop(k, None)
+        return _numpy_ufunc_fallback(self, ufunc, method, inputs, kwargs)
+    # Symbolic: apply the casadi-native op / reduce (3.7.2 returned casadi).
+    if method == "__call__":
+        op = _NUMPY_UFUNC_DISPATCH.get(name)
+        if op is not None:
+            try:
+                return op(*inputs)
+            except (TypeError, ValueError, NotImplementedError):
+                pass
+    elif method in ("reduce", "accumulate"):
         entry = _NUMPY_UFUNC_REDUCE.get(name)
         idx = 0 if method == "reduce" else 1
         if entry is not None and entry[idx] is not None:
@@ -300,7 +313,6 @@ def _numpy_ufunc_dispatch(self, ufunc, method, inputs, kwargs):
                 return entry[idx](inputs[0], kwargs.get("axis", 0))
             except (TypeError, ValueError, NotImplementedError):
                 pass
-
     return _numpy_ufunc_fallback(self, ufunc, method, inputs, kwargs)
 
 
@@ -333,6 +345,69 @@ _NUMPY_FUNCTION_DISPATCH = None
 
 def _is_casadi_value(x):
     return isinstance(x, (DM, SX, MX))
+
+def _has_symbolic(values):
+    # True if any operand is a symbolic casadi value (SX/MX).
+    return any(isinstance(x, (SX, MX)) for x in values)
+
+# Numpy ufuncs that correspond to a Python operator (`x + M`, `-M`,
+# `np_arr < M`, ...).  When invoked as `__call__` in DEFAULT (legacy)
+# mode these keep returning casadi types silently -- that is ordinary
+# casadi/numpy operator interop, not the explicit `numpy.foo(M)` surface
+# the issue #2959 deprecation targets.  (Reductions like `np.add.reduce`
+# use method="reduce", so they fall through to the deprecation path.)
+# Ufuncs reachable through a Python binary operator / comparison / builtin
+# (`arr + M`, `arr < M`, `divmod(arr, M)`): there `np.foo(arr, M)` and the
+# operator are the SAME __array_ufunc__ call, so these must stay silent or
+# ordinary interop would warn.  The UNARY operator ufuncs are deliberately
+# NOT here: `-M` / `abs(M)` go via __neg__ / __abs__ and never reach
+# __array_ufunc__, so an explicit np.negative(M) / np.abs(M) is
+# distinguishable and warns like np.sin.
+_OPERATOR_UFUNCS = frozenset([
+    "add", "subtract", "multiply", "matmul", "divide", "true_divide",
+    "floor_divide", "remainder", "mod", "divmod", "power", "float_power",
+    "less", "less_equal", "greater", "greater_equal", "equal", "not_equal",
+])
+
+# A single CONSTANT notice text, always emitted from the SAME line below.
+# That makes the stdlib's default warning action dedupe it to once-per-
+# process on its own -- no custom flag and, crucially, NO global warnings-
+# filter mutation, so other packages' warnings are untouched.  The standard
+# overrides still apply: `python -W always` / PYTHONWARNINGS=always shows
+# every occurrence, `-W error` makes it fatal.  (We deliberately do NOT use a
+# user-call-site stacklevel: a varying location would defeat the dedupe and
+# flood multi-site scripts.)
+_NUMPY_LEGACY_NOTICE = (
+    "\n"
+    "casadi: a numpy function was called on a casadi value (issue #2959).\n"
+    "This used legacy casadi 3.7.2 behaviour, where the result type follows\n"
+    "the input:\n"
+    "  - a numeric input (DM)       -> a plain numpy array\n"
+    "  - a symbolic input (SX / MX) -> a casadi value, or an error if the\n"
+    "                                  function has no casadi equivalent\n"
+    "\n"
+    "For a shape-correct, type-preserving result, opt in to the\n"
+    "casadi-aware numpy support:\n"
+    "\n"
+    "    try:\n"
+    "        ca.GlobalOptions.setNumpyMode(1)\n"
+    "    except AttributeError:\n"
+    "        pass\n"
+    "\n"
+    "Or use setNumpyMode(-1) to keep legacy behaviour silently.\n"
+    "Shown once; run python with -W always to see every occurrence.\n")
+
+
+def _warn_preserve_type():
+    # issue #2959: an explicit numpy.foo(M) on a casadi value uses legacy
+    # 3.7.2 behaviour by default (numeric densifies, symbolic returns casadi).
+    # FutureWarning (not Deprecation): it changes the RESULT, so per numpy
+    # convention it must be visible by default; DeprecationWarning would be
+    # suppressed outside __main__.  Default stacklevel -> this constant line,
+    # which is what lets the stdlib dedupe to once-per-process.
+    import warnings as _w
+    _w.warn(_NUMPY_LEGACY_NOTICE, FutureWarning)
+
 
 def _np_concatenate(arrays, axis=0):
     arrays = list(arrays)
@@ -3094,33 +3169,36 @@ def _numpy_array_function_dispatch(self, func, types, args, kwargs):
                 "(%s: %s); symbolic numpy ops will be unavailable."
                 % (type(e).__name__, e), RuntimeWarning, stacklevel=2)
             _NUMPY_FUNCTION_DISPATCH = {}
-    handler = _NUMPY_FUNCTION_DISPATCH.get(func)
-    if handler is not None:
-        # TypeError / AttributeError indicate the handler couldn't bind
-        # to the call (wrong signature, missing attribute) -- fall
-        # through to the numpy fallback below.  Other exceptions
-        # propagate so misuse surfaces with a clear message.  Handlers
-        # may also return NotImplemented to opt out of an otherwise
-        # supported call (e.g. matrix 2-norm) and let the fallback run.
-        try:
-            result = handler(*args, **kwargs)
-        except (TypeError, AttributeError):
-            result = NotImplemented
-        if result is not NotImplemented:
-            return result
-    # No casadi handler: if no symbolic operands are involved (only DM
-    # and possibly numpy arrays, e.g. `out=` buffers), convert DM to
-    # numpy and call the original numpy function.  This keeps things
-    # like np.linalg.eig(DM) and np.clip(DM, ..., out=buf) working --
-    # the alternative is numpy raising "no implementation found" because
-    # we declared __array_function__ but didn't handle the call.  For
-    # symbolic types there is nothing meaningful to fall back to.
-    if not any(t in (SX, MX) for t in types):
-        new_args = tuple(a.full() if isinstance(a, DM)
-                         else [x.full() if isinstance(x, DM) else x for x in a]
-                              if isinstance(a, (list, tuple))
-                              and any(isinstance(x, DM) for x in a)
-                         else a
-                         for a in args)
-        return func(*new_args, **kwargs)
-    return NotImplemented
+
+    # Gateway (issue #2959): the casadi-aware numpy support dispatches the
+    # call through the numpy-semantics array (self wrapped), so the result
+    # follows numpy's shape/axis contract and is a NumpyArray.  `self` is
+    # the casadi value numpy invoked the protocol on, so it is always a
+    # valid proxy even when the casadi operands are nested inside a list
+    # argument (np.vstack([M, M]), np.concatenate([...]), ...).
+    _mode = GlobalOptions.getNumpyMode()
+    if _mode == 1:
+        return ArrayInterface._wrap(self, 2).__array_function__(func, types, args, kwargs)
+
+    # Default (legacy casadi 3.7.2) mode: numeric inputs densify to a numpy
+    # result; symbolic inputs go through the casadi NEP-18 handler and return
+    # a casadi value.  Mode 0 also emits a FutureWarning; mode -1 stays silent.
+    if _mode == 0:
+        _warn_preserve_type()
+    if any(t in (SX, MX) for t in types):
+        handler = _NUMPY_FUNCTION_DISPATCH.get(func)
+        if handler is not None:
+            try:
+                result = handler(*args, **kwargs)
+            except (TypeError, AttributeError):
+                result = NotImplemented
+            if result is not NotImplemented:
+                return result
+        return NotImplemented
+    new_args = tuple(a.full() if isinstance(a, DM)
+                     else [x.full() if isinstance(x, DM) else x for x in a]
+                          if isinstance(a, (list, tuple))
+                          and any(isinstance(x, DM) for x in a)
+                     else a
+                     for a in args)
+    return func(*new_args, **kwargs)

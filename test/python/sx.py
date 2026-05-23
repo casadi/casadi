@@ -1486,16 +1486,21 @@ class SXtests(casadiTestCase):
       self.checkarray(E(7),1)
 
   def test_numpy_error(self):
-      x = SX.sym("x",3)
-      # np.linalg.norm now works on symbolic types (it bridges to casadi.norm_2).
-      # pyright can't track __array_function__ dispatch returning SX from numpy.
-      f = Function("f", [x], [np.linalg.norm(x)])  # pyright: ignore[reportArgumentType,reportCallIssue]
-      self.checkarray(f([3.0, 4.0, 0.0]), DM(5))
-      # Pick a function that genuinely has no casadi equivalent.  Our
-      # NEP-18 dispatch returns NotImplemented and numpy raises with a
-      # clear message naming the function.
-      with self.assertInException("argmax"):
-        np.argmax(x)
+      x = ca.SX.sym("x",3)
+      # numpy.foo on symbolic values is gated behind the casadi-aware numpy
+      # support (issue #2959).  Enabled, np.linalg.norm bridges to
+      # casadi.norm_2 and returns a casadi.ArrayInterface (to_casadi() for
+      # the underlying value).
+      ca.GlobalOptions.setNumpyMode(1)
+      try:
+        f = ca.Function("f", [x], [np.linalg.norm(x).to_casadi()])  # pyright: ignore[reportArgumentType,reportCallIssue,reportAttributeAccessIssue]
+        self.checkarray(f([3.0, 4.0, 0.0]), ca.DM(5))
+        # A function with no casadi equivalent: dispatch returns
+        # NotImplemented and numpy raises naming the function.
+        with self.assertInException("argmax"):
+          np.argmax(x)
+      finally:
+        ca.GlobalOptions.setNumpyMode(0)
 
 
   def test_quadratic(self):
@@ -1861,7 +1866,13 @@ class SXtests(casadiTestCase):
     ca.GlobalOptions.setCopyElisionMinSize(old)
 
   def test_ufunc(self):
-    y = np.sin(casadi.SX.sym('x'))
+    # numpy.foo on a symbolic value is gated behind the casadi-aware numpy
+    # support (issue #2959); enabled, it returns an casadi.ArrayInterface.
+    ca.GlobalOptions.setNumpyMode(1)
+    try:
+      y = np.sin(ca.SX.sym('x'))
+    finally:
+      ca.GlobalOptions.setNumpyMode(0)
 
   def test_mmin(self):
       x = ca.SX.sym("X",2)

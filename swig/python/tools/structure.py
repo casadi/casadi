@@ -275,7 +275,7 @@ class StructEntry:
     except Exception as e:
       raise Exception("Error occured in entry context with powerIndex %s, at canonicalIndex %s" % (str(powerIndex),str(canonicalIndex))) from e
 
-class Structure(ca.object):
+class Structure(object):
   def __init__(self,entries,order=None):
     self.entries = entries
 
@@ -852,7 +852,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
   def labels(self,extraMode=1):
     return [self.getLabel(i,extraMode=extraMode) for i in range(self.size)]
 
-class Structured(ca.object):
+class Structured(object):
   description = "Generic Structured object"
 
   def __init__(self,structure):

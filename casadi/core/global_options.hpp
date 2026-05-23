@@ -76,6 +76,29 @@ namespace casadi {
 
       static std::string temp_work_dir; // Temporary work directory
 
+      /** \brief numpy interop mode (issue #2959).  Controls how an explicit
+       *  `numpy.foo(M)` on a casadi value behaves in the Python bindings:
+       *    0 (default): legacy casadi 3.7.2 behaviour + a Python
+       *       FutureWarning -- a numeric value densifies to a numpy result,
+       *       a symbolic value returns a casadi value.
+       *    1: the casadi-aware numpy support -- `numpy.foo(M)` returns a
+       *       python-only numpy-semantics array wrapper
+       *       (casadi.ArrayInterface) following numpy's shape/axis contract
+       *       for SX/MX/DM alike.
+       *   -1: the same legacy behaviour as 0, but silent (no warning) --
+       *       exact casadi 3.7.2 semantics.
+       *  Operator arithmetic (`M + x`, `x * M`, ...) always stays casadi-
+       *  typed and is unaffected.  Affects only Python bindings.
+       *
+       *  Temporary opt-in mechanism: exists to ease the transition and
+       *  will be removed once numpy becomes the unconditional default.
+       *  Process-global and not thread-safe -- it changes the *return type*
+       *  of numpy dispatch, so set it once at startup rather than toggling
+       *  it concurrently with running code.
+       *  Probe with hasattr(casadi.GlobalOptions, "setNumpyMode").
+       */
+      static int numpy_mode;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -104,6 +127,17 @@ namespace casadi {
 
       static void setTempWorkDir(const std::string& dir);
       static std::string getTempWorkDir() { return temp_work_dir; }
+
+      /** \brief Set the numpy interop mode (issue #2959): 1 = casadi-aware
+       *  numpy support, 0 (default) = legacy + FutureWarning, -1 = legacy
+       *  but silent.  See the numpy_mode field.  Affects only Python
+       *  bindings; ignored elsewhere.  Probe with
+       *  hasattr(casadi.GlobalOptions, "setNumpyMode").
+       */
+      static void setNumpyMode(int mode) { numpy_mode = mode; }
+
+      /** \brief Get the current numpy interop mode.  See setNumpyMode. */
+      static int getNumpyMode() { return numpy_mode; }
 
   };
 

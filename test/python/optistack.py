@@ -38,7 +38,7 @@ except:
 	scipy_available = False
 import warnings
 
-inherit_from = ca.object
+inherit_from = object
 
  
 if ca.has_nlpsol("ipopt"):

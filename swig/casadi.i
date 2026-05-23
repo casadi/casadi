@@ -318,14 +318,9 @@
 
 import contextlib
 
-class _copyableObject(object):
-  def __copy__(self):
-    return self.__class__(self)
-
-  def __deepcopy__(self,dummy=None):
-    return self.__class__(self)
-
-_object = object = _copyableObject
+# copy / deepcopy support is added to the casadi value types via
+# `%extend PrintableCommon` (their common base), not by shadowing the global
+# `object` -- see further down in this file.
 
 _swig_repr_default = _swig_repr
 def _swig_repr(self):
@@ -475,9 +470,8 @@ namespace std {
 %include "doc.i"
 
 
-// Note: Only from 3.0.0 onwards,
-// DirectorException inherits from std::exception
-#if SWIG_VERSION >= 0x030000
+// casadi requires SWIG >= 3.0 (Swig::DirectorException inherits from
+// std::exception there, so the std::exception catch already covers it).
 // Exceptions handling
 %include "exception.i"
 %exception {
@@ -507,43 +501,6 @@ namespace std {
    SWIG_exception(SWIG_TypeError, e.what());
   }
 }
-#else
-// Exceptions handling
-%include "exception.i"
-%exception {
-  try {
-    $action
-   } catch(const std::exception& e) {
-    SWIG_exception(SWIG_RuntimeError, e.what());
-   } catch (const Swig::DirectorException& e) {
-    SWIG_exception(SWIG_TypeError, e.getMessage());
-   }
-}
-
-// Python sometimes takes an approach to not check, but just try.
-// It expects a python error to be thrown.
-%exception __int__ {
-  try {
-    $action
-  } catch (const std::exception& e) {
-    SWIG_exception(SWIG_RuntimeError, e.what());
-  } catch (const Swig::DirectorException& e) {
-    SWIG_exception(SWIG_TypeError, e.getMessage());
-  }
-}
-
-// See https://github.com/casadi/casadi/issues/701
-// Recent numpys will only catch TypeError or ValueError in printing logic
-%exception __bool__ {
- try {
-    $action
-  } catch (const std::exception& e) {
-   SWIG_exception(SWIG_TypeError, e.what());
-  } catch (const Swig::DirectorException& e) {
-    SWIG_exception(SWIG_TypeError, e.getMessage());
-  }
-}
-#endif
 
 #ifdef SWIGPYTHON
 %feature("director:except") {
@@ -1293,6 +1250,14 @@ namespace std {
       // Some built-in types are iterable
       if (PyDict_Check(p) || PyString_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
 
+      // An object exposing a casadi conversion hook is a SINGLE matrix, not
+      // a sequence of them -- don't iterate it as a vector.  (A 1-D numeric-
+      // like iterable such as the experimental NumpyArray would otherwise be
+      // walked element-by-element with float()/int(), which throws on a
+      // symbolic element and can crash the interpreter mid-iteration.)
+      if (PyObject_HasAttrString(p, "__MX__") || PyObject_HasAttrString(p, "__SX__")
+          || PyObject_HasAttrString(p, "__DM__")) return false;
+
       // Make sure shape is 1D, if defined.
       if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p, "shape")) {
@@ -1872,6 +1837,27 @@ namespace std {
         return true;
       }
 
+#ifdef SWIGPYTHON
+      // Object has __SX__ method: honour it BEFORE the scalar/array/vector
+      // heuristics below.  A custom iterable-numeric object (e.g. the
+      // experimental NumpyArray) that exposes a 1-D `shape` + `__iter__` +
+      // `__float__` would otherwise be dragged into the vector<double>
+      // fallback, which calls float() on each (possibly symbolic) element.
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
+      if (PyObject_HasAttrString(p,"__SX__")) {
+        PyObject *cr = PyObject_CallMethod(p, (char*) "__SX__", 0);
+        if (!cr) return false;
+        if (cr == Py_None) { Py_DECREF(cr); }
+        else {
+          // to_val COPIES into *m; to_ptr would only point *m INTO cr,
+          // which the Py_DECREF then frees (use-after-free).
+          casadi_int flag = to_val(cr, m ? *m : 0);
+          Py_DECREF(cr);
+          if (flag) return true;
+        }
+      }
+#endif // SWIGPYTHON
+
       // Try first converting to a temporary DM
       {
         DM tmp;
@@ -1882,17 +1868,11 @@ namespace std {
       }
 
 #ifdef SWIGPYTHON
+      // Clear any error raised by a failed DM conversion (e.g. a __DM__
+      // that threw) so it doesn't leak past this no-match path.
+      if (PyErr_Occurred()) PyErr_Clear();
       // Numpy arrays will be cast to dense SX
       if (SX_from_array(p, m)) return true;
-      // Object has __SX__ method
-      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
-      if (PyObject_HasAttrString(p,"__SX__")) {
-        PyObject *cr = PyObject_CallMethod(p, (char*) "__SX__", 0);
-        if (!cr) return false;
-        casadi_int flag = to_ptr(cr, m);
-        Py_DECREF(cr);
-        return flag;
-      }
 #endif // SWIGPYTHON
 
       // No match
@@ -1943,6 +1923,23 @@ namespace std {
         return true;
       }
 
+#ifdef SWIGPYTHON
+      // Object has __MX__ method: honour it BEFORE the DM/scalar/vector
+      // heuristics (see the __SX__ note in to_ptr(SX**)).
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
+      if (PyObject_HasAttrString(p,"__MX__")) {
+        PyObject *cr = PyObject_CallMethod(p, (char*) "__MX__", 0);
+        if (!cr) return false;
+        if (cr == Py_None) { Py_DECREF(cr); }
+        else {
+          // to_val COPIES into *m (see the __SX__ note in to_ptr(SX**)).
+          casadi_int flag = to_val(cr, m ? *m : 0);
+          Py_DECREF(cr);
+          if (flag) return true;
+        }
+      }
+#endif // SWIGPYTHON
+
       // Try first converting to a temporary DM
       {
         DM tmp;
@@ -1953,14 +1950,9 @@ namespace std {
       }
 
 #ifdef SWIGPYTHON
-      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
-      if (PyObject_HasAttrString(p,"__MX__")) {
-        PyObject *cr = PyObject_CallMethod(p, (char*) "__MX__", 0);
-        if (!cr) return false;
-        casadi_int flag = to_ptr(cr, m);
-        Py_DECREF(cr);
-        return flag;
-      }
+      // Clear any error raised by a failed DM conversion (e.g. a __DM__
+      // that threw) so it doesn't leak past this no-match path.
+      if (PyErr_Occurred()) PyErr_Clear();
 #endif // SWIGPYTHON
 
       // No match
@@ -2017,12 +2009,15 @@ namespace std {
       }
 
 #ifdef SWIGPYTHON
-      // Object has __DM__ method
+      // Object has __DM__ method.  A returned None means "I am explicitly
+      // not a DM" (e.g. a symbolic NumpyArray) -- stop here rather than
+      // falling into the float()-per-element vector fallback below.
       if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p,"__DM__")) {
         char name[] = "__DM__";
         PyObject *cr = PyObject_CallMethod(p, name, 0);
         if (!cr) return false;
+        if (cr == Py_None) { Py_DECREF(cr); return false; }
         casadi_int result = to_val(cr, m ? *m : 0);
         Py_DECREF(cr);
         return result;
@@ -2476,6 +2471,80 @@ class _SupportsMX(Protocol):
 
 %}
 
+/* issue #2959: casadi.ArrayInterface (a %pythoncode class, invisible to
+ * SWIG's -stubs).  Hand-written here via %stubcode (= %insert("stubs")),
+ * the body section SWIG also scans into __all__ -- unlike stubs_preamble,
+ * so `from casadi import *` re-exports it.  The three backing-typed
+ * subclasses each carry exactly one conversion hook, so an SX-backed array
+ * satisfies _SupportsSX only (accepted where _SX is) while a numeric
+ * DM-backed array satisfies _SupportsDM (hence _DM, and via the unions _SX
+ * and _MX too) -- matching casadi's runtime to_ptr rules. */
+#ifdef SWIG_STUBS_ENABLED
+%stubcode %{class ArrayInterface(Generic[_T]):
+    """numpy-semantics array view over a casadi DM/SX/MX.  Constructing one
+    dispatches to the backing-typed subclass ArrayInterfaceDM/SX/MX."""
+    __array_priority__: float
+    @overload
+    def __new__(cls, value: "SX", ndim: int = ...) -> "ArrayInterfaceSX": ...
+    @overload
+    def __new__(cls, value: "MX", ndim: int = ...) -> "ArrayInterfaceMX": ...
+    @overload
+    def __new__(cls, value: object = ..., ndim: int = ...) -> "ArrayInterfaceDM": ...
+    @property
+    def shape(self) -> tuple[int, ...]: ...
+    @property
+    def ndim(self) -> int: ...
+    @property
+    def size(self) -> int: ...
+    def to_casadi(self) -> _T: ...
+    @property
+    def T(self) -> "ArrayInterface[_T]": ...
+    def reshape(self, *shape: int) -> "ArrayInterface[_T]": ...
+    def transpose(self, *axes: int) -> "ArrayInterface[_T]": ...
+    def squeeze(self, axis: "int | tuple[int, ...] | None" = ...) -> "ArrayInterface[_T]": ...
+    def flatten(self) -> "ArrayInterface[_T]": ...
+    def ravel(self) -> "ArrayInterface[_T]": ...
+    @property
+    def flat(self) -> Any: ...
+    def to_DM(self) -> "DM": ...
+    def sum(self, axis: "int | tuple[int, ...] | None" = ...) -> "ArrayInterface[_T]": ...
+    def mean(self, axis: "int | tuple[int, ...] | None" = ...) -> "ArrayInterface[_T]": ...
+    def __getitem__(self, idx: Any) -> "ArrayInterface[_T]": ...
+    def __setitem__(self, idx: Any, value: Any) -> None: ...
+    def __len__(self) -> int: ...
+    def __iter__(self) -> Iterator["ArrayInterface[_T]"]: ...
+    def __array__(self, dtype: Any = ...) -> NDArray[Any]: ...
+    def __float__(self) -> float: ...
+    def __int__(self) -> int: ...
+    def __add__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __radd__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __sub__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __rsub__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __mul__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __rmul__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __truediv__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __pow__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __matmul__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __neg__(self) -> "ArrayInterface[_T]": ...
+    @classmethod
+    def DM(cls, value: Any, shape: Any = ...) -> "ArrayInterfaceDM": ...
+    @classmethod
+    def SX(cls, value: Any, shape: Any = ...) -> "ArrayInterfaceSX": ...
+    @classmethod
+    def MX(cls, value: Any, shape: Any = ...) -> "ArrayInterfaceMX": ...
+
+class ArrayInterfaceDM(ArrayInterface["DM"]):
+    def __DM__(self) -> "DM": ...
+
+class ArrayInterfaceSX(ArrayInterface["SX"]):
+    def __SX__(self) -> "SX": ...
+
+class ArrayInterfaceMX(ArrayInterface["MX"]):
+    def __MX__(self) -> "MX": ...
+
+%}
+#endif
+
 /* Matrix input aliases.  SX/MX both extend DM; they don't extend each
  * other -- to_ptr<SX>(MX) and to_ptr<MX>(SX) fail at runtime.
  *
@@ -2687,6 +2756,8 @@ PyOS_setsig(SIGINT, SigIntHandler);
 #endif // WITH_PYTHON_INTERRUPTS
 
 %pythoncode "numpy_bridge.py"
+
+%pythoncode "casadi_nparray.py"
 
 /* `inf` and `pi` exist at runtime (casadi/core const doubles) but are
  * deliberately NOT declared in the stub.  numpy declares both as
@@ -2955,6 +3026,7 @@ class NZproxy:
       raise Exception("""CasADi matrices are not iterable by design.
                       Did you mean to iterate over m.nz, with m IM/DM/SX?
                       Did you mean to iterate over horzsplit(m,1)/vertsplit(m,1) with m IM/DM/SX/MX?
+                      Did you expect numpy behaviour (looping over rows)? Use ca.array().
                       """)
 
     def __setitem__(self,s,val):
@@ -3157,6 +3229,12 @@ namespace casadi{
   %pythoncode %{
     def __str__(self): return self.str()
     def repr(self): return self.type_name() + '(' + self.str() + ')'
+    # Value-copy semantics for all casadi types (DM/SX/MX/Sparsity/Function/
+    # ...): copy via the copy constructor.  This base injects __copy__ /
+    # __deepcopy__ into every subclass, replacing the old global-`object`
+    # shadow hack.
+    def __copy__(self): return self.__class__(self)
+    def __deepcopy__(self, memo=None): return self.__class__(self)
   %}
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
@@ -4736,6 +4814,19 @@ namespace casadi {
 
 // Wrap the casadi_ prefixed functions in member functions
 #ifdef SWIGPYTHON
+%pythoncode %{
+def _array_priority_yield(x, y):
+    # numpy-style operator deferral: a binary op on a casadi value yields
+    # (returns NotImplemented) to a NON-casadi operand that advertises a
+    # higher __array_priority__ -- e.g. casadi.ArrayInterface -- so its
+    # reflected operator runs and the higher-priority type controls the
+    # result.  casadi's own DM/SX/MX promotion is untouched: those are
+    # excluded, and their mixing is handled natively by the _casadi.* call.
+    py = getattr(y, "__array_priority__", None)
+    if py is None or py <= getattr(x, "__array_priority__", 0.0):
+        return False
+    return not isinstance(y, (DM, SX, MX, Sparsity))
+%}
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
@@ -4745,6 +4836,7 @@ namespace casadi {
         except:
           return SharedObject.__hash__(self)
       def __matmul__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
         try:
           return _casadi.mtimes(x, y)
         except NotImplementedError:
@@ -4769,17 +4861,28 @@ namespace casadi {
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
-      def __add__(x, y): return _casadi.plus(x, y)
+      def __add__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.plus(x, y)
       def __radd__(x, y): return _casadi.plus(y, x)
-      def __sub__(x, y): return _casadi.minus(x, y)
+      def __sub__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.minus(x, y)
       def __rsub__(x, y): return _casadi.minus(y, x)
-      def __mul__(x, y): return _casadi.times(x, y)
+      def __mul__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.times(x, y)
       def __rmul__(x, y): return _casadi.times(y, x)
-      def __truediv__(x, y): return _casadi.rdivide(x, y)
+      def __truediv__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.rdivide(x, y)
       def __rtruediv__(x, y): return _casadi.rdivide(y, x)
-      def __floordiv__(x, y): return _casadi.floor(_casadi.rdivide(x, y))
+      def __floordiv__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.floor(_casadi.rdivide(x, y))
       def __rfloordiv__(x, y): return _casadi.floor(_casadi.rdivide(y, x))
       def __mod__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
         return x - y * _casadi.floor(_casadi.rdivide(x, y))
       def __rmod__(x, y):
         return y - x * _casadi.floor(_casadi.rdivide(y, x))
@@ -4789,20 +4892,30 @@ namespace casadi {
       def __rdivmod__(x, y):
         q = _casadi.floor(_casadi.rdivide(y, x))
         return (q, y - x * q)
-      def __lt__(x, y): return _casadi.lt(x, y)
+      def __lt__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.lt(x, y)
       def __rlt__(x, y): return _casadi.lt(y, x)
-      def __le__(x, y): return _casadi.le(x, y)
+      def __le__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.le(x, y)
       def __rle__(x, y): return _casadi.le(y, x)
-      def __gt__(x, y): return _casadi.lt(y, x)
+      def __gt__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.lt(y, x)
       def __rgt__(x, y): return _casadi.lt(x, y)
-      def __ge__(x, y): return _casadi.le(y, x)
+      def __ge__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.le(y, x)
       def __rge__(x, y): return _casadi.le(x, y)
       def __eq__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
         r = _casadi.eq(x, y)
         if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
           raise Exception("Cannot compare SX and MX objects for equality")
         return r
       def __ne__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
         r = _casadi.ne(x, y)
         if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
           raise Exception("Cannot compare SX and MX objects for inequality")
@@ -4818,6 +4931,7 @@ namespace casadi {
           raise Exception("Cannot compare SX and MX objects for inequality")
         return r
       def __pow__(x, n, modulo=None):
+        if modulo is None and _array_priority_yield(x, n): return NotImplemented
         p = _casadi.power(x, n)
         if modulo is None:
           return p

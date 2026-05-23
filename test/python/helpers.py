@@ -114,7 +114,7 @@ sys.argv[1:] = ['-v'] + args.unittest_args
 from io import StringIO
 
 
-class LazyString(ca.object):
+class LazyString(object):
   def __init__(self,f):
      self.f = f
      self.context = dict(sys._getframe(1).f_locals)
@@ -1056,7 +1056,7 @@ class casadiTestCase(unittest.TestCase):
         for i in range(F.n_out()):
           self.checkarray(Fout[i],Fout2[i],digits=16)
 
-class run_only(ca.object):
+class run_only(object):
   def __init__(self, args):
     self.args = []
     for a in args:
@@ -1073,7 +1073,7 @@ class run_only(ca.object):
           print(i)
     return c
 
-class requires(ca.object):
+class requires(object):
   def __init__(self,att):
     self.att = att
 
@@ -1084,7 +1084,7 @@ class requires(ca.object):
       print("Not available %s, skipping unittests" % self.att)
       return None
 
-class requires_conic(ca.object):
+class requires_conic(object):
   def __init__(self,n):
     self.n = n
 
@@ -1096,7 +1096,7 @@ class requires_conic(ca.object):
       print("Not available QP plugin %s, skipping unittests" % self.n)
       return None
 
-class requires_linsol(ca.object):
+class requires_linsol(object):
   def __init__(self,n):
     self.n = n
 
@@ -1108,7 +1108,7 @@ class requires_linsol(ca.object):
       print("Not available linsol plugin %s, skipping unittests" % self.n)
       return None
 
-class requires_nlpsol(ca.object):
+class requires_nlpsol(object):
   def __init__(self,n):
     self.n = n
 
@@ -1123,7 +1123,7 @@ class requires_nlpsol(ca.object):
       print("Not available NLP plugin %s, skipping unittests" % self.n)
       return None
 
-class requires_expm(ca.object):
+class requires_expm(object):
   def __init__(self,n):
     self.n = n
 
@@ -1135,7 +1135,7 @@ class requires_expm(ca.object):
       print("Not available Expm plugin %s, skipping unittests" % self.n)
       return None
 
-class requires_integrator(ca.object):
+class requires_integrator(object):
   def __init__(self,n):
     self.n = n
 
@@ -1147,7 +1147,7 @@ class requires_integrator(ca.object):
       print("Not available integrator plugin %s, skipping unittests" % self.n)
       return None
 
-class requires_rootfinder(ca.object):
+class requires_rootfinder(object):
   def __init__(self,n):
     self.n = n
 
@@ -1159,7 +1159,7 @@ class requires_rootfinder(ca.object):
       print("Not available RFP plugin %s, skipping unittests" % self.n)
       return None
 
-class requiresPlugin(ca.object):
+class requiresPlugin(object):
   def __init__(self,att,n):
     self.att = att
     self.n = n
@@ -1172,7 +1172,7 @@ class requiresPlugin(ca.object):
       print("Not available %s plugin %s, skipping unittests" % (str(self.att),self.n))
       return None
 
-class skip(ca.object):
+class skip(object):
   def __init__(self, skip=True):
     self.skip = skip
 
@@ -1193,7 +1193,7 @@ class skip(ca.object):
 def known_bug():
   return unittest.skipIf(not(args.known_bugs),"known bug (run with --known_bugs to include it)")
 
-class memory_heavy(ca.object):
+class memory_heavy(object):
   def __init__(self):
     pass
 
@@ -1203,7 +1203,7 @@ class memory_heavy(ca.object):
         c.__dict__["tag_memory_heavy"] = True
     return c
 
-class slow(ca.object):
+class slow(object):
   def __init__(self):
     pass
 

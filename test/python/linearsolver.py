@@ -101,7 +101,7 @@ except:
 
 
 def nullspacewrapper(name, sp, options):
-  # type: (str, Sparsity, dict) -> Function
+  # type: (str, ca.Sparsity, dict) -> ca.Function
   a = ca.SX.sym("a",sp)
   f = ca.Function(name, [a],[ca.nullspace(a)],options)
   return f
@@ -109,7 +109,7 @@ def nullspacewrapper(name, sp, options):
 # Solver-factory entries: (constructor, options-template, feature-flags).
 # The first slot is a Callable so `Solver(...)` downstream is typed as
 # returning Function, not Unknown.
-nsolvers = []  # type: list[tuple[Callable[[str, Sparsity, dict], Function], dict, set]]
+nsolvers = []  # type: list[tuple[Callable[[str, ca.Sparsity, dict], ca.Function], dict, set]]
 nsolvers.append((nullspacewrapper,{},set()))
 
 print("linear solvers", lsolvers)
