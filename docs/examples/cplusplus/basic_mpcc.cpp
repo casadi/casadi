@@ -42,7 +42,7 @@ int main(){
 
   Dict solver_opts;
   //solver_opts["madnlp.print_level"] = 1;
-  solver_opts["ind_cc"] = std::vector<std::vector<long long int>>{{1,2}};
+  solver_opts["ind_cc"] = std::vector<std::vector<long long int>>{{0,1}};
   solver_opts["madnlp.bound_relax_factor"] = 0.0;
   // Create an NLP solver
   Function solver = nlpsol("solver", "ccopt", nlp, solver_opts);

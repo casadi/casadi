@@ -88,7 +88,7 @@ const Options MadmpecInterface::options_
      {OT_DOUBLE,
       "When using a convexification strategy, make sure that "
       "the smallest eigenvalue is at least this (default: 1e-7)."}},
-    {"ind_cc",
+    {"cc_pairs",
        {OT_INTVECTORVECTOR,
         "List of complementary constraints on simple bounds. "
         "Pair (i, j) encodes complementarity between the bounds on variable i and variable j."}},
@@ -137,8 +137,8 @@ void MadmpecInterface::init(const Dict& opts) {
   std::string convexify_strategy = "none";
   double convexify_margin = 1e-7;
   casadi_int max_iter_eig = 200;
-  std::vector< std::vector<casadi_int> > ind_cc;
-  std::vector<casadi_int> cctypes;
+  std::vector< std::vector<casadi_int> > cc_pairs;
+  std::vector<casadi_int> cc_types;
   convexify_ = false;
 
   calc_g_ = true;
@@ -156,26 +156,30 @@ void MadmpecInterface::init(const Dict& opts) {
       flatten_opts(opts_, op.second, "");
     } else if (op.first=="ccopt") {
       flatten_opts(mpcc_opts_, op.second, "");
-    } else if (op.first=="ind_cc") {
-      ind_cc = op.second;
-    } else if (op.first=="cctypes") {
-      cctypes = op.second;
+    } else if (op.first=="cc_pairs") {
+      cc_pairs = op.second;
+    } else if (op.first=="cc_types") {
+      cc_types = op.second;
     }
   }
-  ind_cc1_.reserve(ind_cc.size());
-  ind_cc2_.reserve(ind_cc.size());
-  cctypes_.reserve(ind_cc.size());
-  for (auto && e : ind_cc) {
-    casadi_assert(e.size()==2, "Complementary constraints must come in pairs.");
-    // TODO(@anton) fix this
-    // casadi_assert(e[0]>=1, "Invalid variable index.");
-    // casadi_assert(e[1]>=1, "Invalid variable index.");
-    // casadi_assert(e[0]<=nx_, "Invalid variable index.");
-    // casadi_assert(e[1]<=nx_, "Invalid variable index.");
-    ind_cc1_.push_back(e[0]);
-    ind_cc2_.push_back(e[1]);
+  ind_cc1_.reserve(cc_pairs.size());
+  ind_cc2_.reserve(cc_pairs.size());
+  cctypes_.reserve(cc_pairs.size());
+  if (cc_types.empty()) {
+    cc_types.resize(cc_pairs.size(), 0);
   }
-  for (auto && e : cctypes) {
+  casadi_assert(cc_pairs.size()==cc_types.size(), "Options 'cc_pairs' and 'cc_types' must have the same length.");
+
+  for (auto && e : cc_pairs) {
+    casadi_assert(e.size()==2, "Complementary constraints must come in pairs.");
+    casadi_assert(e[0]>=0, "Invalid variable index.");
+    casadi_assert(e[1]>=0, "Invalid variable index.");
+    casadi_assert(e[0]<nx_, "Invalid variable index.");
+    casadi_assert(e[1]<nx_, "Invalid variable index.");
+    ind_cc1_.push_back(e[0]+1);
+    ind_cc2_.push_back(e[1]+1);
+  }
+  for (auto && e : cc_types) {
     cctypes_.push_back(e);
   }
   // Do we need second order derivatives?

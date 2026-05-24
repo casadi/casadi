@@ -92,18 +92,50 @@ if "SKIP_KNITRO_TESTS" not in os.environ and has_nlpsol("knitro"):
 if "SKIP_SNOPT_TESTS" not in os.environ and has_nlpsol("snopt"):
   solvers.append(("snopt",{"snopt": {"Verify_level": 3,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}},{"codegen": False,"discrete":False}))
 
+libmad_dir = os.environ.get("LIBMADDIR", "/missing")
+libmad_codegen = {"extralibs": ["Mad"], "std": "c99",
+                "extralibdirs": [os.path.join(libmad_dir, "lib")],
+                "extra_include": [os.path.join(libmad_dir, "include")]}
+
 if "SKIP_MADNLP_TESTS" not in os.environ and has_nlpsol("madnlp"):
-  libmad_dir = os.environ.get("LIBMADDIR", "/missing")
-  libmad_codegen = {"extralibs": ["Mad"], "std": "c99",
-                    "extralibdirs": [os.path.join(libmad_dir, "lib")],
-                    "extra_include": [os.path.join(libmad_dir, "include")]}
   solvers.append(("madnlp",{"madnlp": {}},{"codegen": libmad_codegen,"discrete":False}))
-
-
 
 print(solvers)
 
 class NLPtests(casadiTestCase):
+
+  @requires_nlpsol("ccopt")
+  def test_ccopt(self):
+    x = SX.sym("x")
+    y = SX.sym("y")
+
+    f = (x-2)**2 + (y-2)**2
+    nlp = {"x": vertcat(x, y), "f": f}
+
+    solver_opts = {
+      "cc_pairs": [[0, 1]],
+      "madnlp": {"bound_relax_factor": 0.0},
+    }
+    solver = nlpsol("solver", "ccopt", nlp, solver_opts)
+
+    solver_in = {
+      "x0": [2.5, 3.0],
+      "lbx": [0.0, 0.0],
+    }
+    solver_out = solver(**solver_in)
+
+    self.assertTrue(solver.stats()["success"])
+    self.assertAlmostEqual(float(solver_out["f"]), 4.0, 6)
+    x_sol = float(solver_out["x"][0])
+    y_sol = float(solver_out["x"][1])
+    self.assertAlmostEqual(min(x_sol, y_sol), 0.0, 6)
+    self.assertAlmostEqual(max(x_sol, y_sol), 2.0, 6)
+
+    aux_codegen = {"extralibs": ["Mad"], "std": "c99",
+                   "extralibdirs": [os.path.join(os.environ.get("LIBMADDIR", "/missing"), "lib")],
+                   "extra_include": [os.path.join(os.environ.get("LIBMADDIR", "/missing"), "include")]}
+    self.check_codegen(solver, solver_in, **aux_codegen)
+    self.check_serialize(solver, solver_in)
 
   @requires_nlpsol("alpaqa")
   def test_alpaqa(self):
