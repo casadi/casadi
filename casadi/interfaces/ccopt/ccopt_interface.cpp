@@ -148,18 +148,26 @@ void MadmpecInterface::init(const Dict& opts) {
     cc_types.resize(cc_pairs.size(), 0);
   }
   casadi_assert(cc_pairs.size()==cc_types.size(), "Options 'cc_pairs' and 'cc_types' must have the same length.");
-
-  for (auto && e : cc_pairs) {
-    casadi_assert(e.size()==2, "Complementary constraints must come in pairs.");
-    casadi_assert(e[0]>=0, "Invalid variable index.");
-    casadi_assert(e[1]>=0, "Invalid variable index.");
-    casadi_assert(e[0]<nx_, "Invalid variable index.");
-    casadi_assert(e[1]<nx_, "Invalid variable index.");
-    ind_cc1_.push_back(e[0]+1);
-    ind_cc2_.push_back(e[1]+1);
-  }
   for (auto && e : cc_types) {
     cctypes_.push_back(e);
+  }
+  // CCType: VarVar=0, VarCon=1, ConVar=2, ConCon=3
+  const libmad_int* type = get_ptr(cctypes_);
+  for (auto && e : cc_pairs) {
+    casadi_assert(e.size()==2, "Complementary constraints must come in pairs.");
+    casadi_assert(e[0]>=0, "Invalid index.");
+    casadi_assert(e[1]>=0, "Invalid index.");
+    bool first_is_var = (*type == 0 || *type == 1);
+    bool second_is_var = (*type == 0 || *type == 2);
+    casadi_int n_first = first_is_var ? nx_ : ng_;
+    casadi_int n_second = second_is_var ? nx_ : ng_;
+    casadi_assert(e[0]<n_first, "Invalid index for first slot of cc_pair "
+                  "(type " + str(*type) + ", limit " + str(n_first) + ").");
+    casadi_assert(e[1]<n_second, "Invalid index for second slot of cc_pair "
+                  "(type " + str(*type) + ", limit " + str(n_second) + ").");
+    ind_cc1_.push_back(e[0]+1);
+    ind_cc2_.push_back(e[1]+1);
+    type++;
   }
   // Do we need second order derivatives?
   exact_hessian_ = true;
