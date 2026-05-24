@@ -1,4 +1,4 @@
-name: Orphaned nightly releases
+name: Branch and nightly-release cleanup audit
 
 on:
   schedule:
@@ -11,26 +11,34 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: List orphaned nightly releases
+      - name: Audit nightly releases and stale branches
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
 
-          # Build a set of branch names in their tag-canonical form: "/" -> "-".
-          # A branch "claude/foo" produces a nightly tag "nightly-claude-foo",
-          # so we compare suffixes against the canonicalized branch list.
+          # Index every branch with its tip SHA.
+          # canonical_branches maps "/"->"-" canonicalized name to original name
+          # (used to match nightly-<canonical> release tags).
+          # branch_tips maps original branch name to tip commit SHA.
           declare -A canonical_branches
-          while IFS= read -r b; do
-            [ -n "$b" ] || continue
-            canonical_branches["${b//\//-}"]=$b
+          declare -A branch_tips
+          while IFS=$'\t' read -r name sha; do
+            [ -n "$name" ] || continue
+            canonical_branches["${name//\//-}"]=$name
+            branch_tips["$name"]=$sha
           done < <(
-            gh api --paginate "repos/$REPO/branches" --jq '.[].name'
+            gh api --paginate "repos/$REPO/branches" \
+              --jq '.[] | [.name, .commit.sha] | @tsv'
           )
           echo "Indexed ${#canonical_branches[@]} branch(es)."
 
-          # Collect every release whose tag starts with "nightly-".
+          default_branch="$(gh api "repos/$REPO" --jq '.default_branch')"
+          echo "Default branch: $default_branch"
+
+          # --- Orphaned nightly releases ---------------------------------
+
           mapfile -t tags < <(
             gh api --paginate "repos/$REPO/releases" \
               --jq '.[] | select(.tag_name | startswith("nightly-")) | .tag_name'
@@ -59,5 +67,40 @@ jobs:
           if [ "$orphans" -eq 0 ]; then
             echo "_None._" >> "$GITHUB_STEP_SUMMARY"
           fi
+          echo "Orphaned releases: $orphans"
 
-          echo "Orphaned: $orphans"
+          # --- Branches whose tip is already in the default branch -------
+          #
+          # We use the compare API and check the "status" field:
+          #   identical -> branch tip == default tip
+          #   behind    -> branch tip is a strict ancestor of default tip
+          # In both cases the branch contributes nothing new and is safe to
+          # consider for deletion. We compare by SHA to dodge URL-encoding
+          # issues for branch names containing slashes.
+
+          {
+            echo ""
+            echo "## Branches already in \`$default_branch\`"
+            echo ""
+            echo "Branches whose tip commit is reachable from \`$default_branch\` (merged or pure ancestors)."
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          merged=0
+          # Sort for stable output across runs.
+          while IFS= read -r b; do
+            [ "$b" != "$default_branch" ] || continue
+            sha="${branch_tips[$b]}"
+            status="$(gh api "repos/$REPO/compare/$default_branch...$sha" --jq '.status' 2>/dev/null || echo error)"
+            case "$status" in
+              behind|identical)
+                echo "- \`$b\` ([${sha:0:7}]($GITHUB_SERVER_URL/$REPO/commit/$sha)) — $status" >> "$GITHUB_STEP_SUMMARY"
+                merged=$((merged + 1))
+                ;;
+            esac
+          done < <(printf '%s\n' "${!branch_tips[@]}" | sort)
+
+          if [ "$merged" -eq 0 ]; then
+            echo "_None._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "Branches in $default_branch: $merged"
