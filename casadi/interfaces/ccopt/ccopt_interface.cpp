@@ -68,13 +68,7 @@ MadmpecInterface::~MadmpecInterface() {
 
 const Options MadmpecInterface::options_
 = {{&Nlpsol::options_},
-   {{"nw",
-     {OT_INTVECTOR,
-      "Number of variables"}},
-    {"ng",
-     {OT_INTVECTOR,
-      "Number of constraints"}},
-    {"ccopt",
+   {{"ccopt",
      {OT_DICT,
       "Options to be passed to ccopt relaxation algorithm"}},
     {"madnlp",

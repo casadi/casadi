@@ -68,13 +68,7 @@ MadnlpInterface::~MadnlpInterface() {
 
 const Options MadnlpInterface::options_
 = {{&Nlpsol::options_},
-   {{"nw",
-     {OT_INTVECTOR,
-      "Number of variables"}},
-    {"ng",
-     {OT_INTVECTOR,
-      "Number of constraints"}},
-    {"madnlp",
+   {{"madnlp",
      {OT_DICT,
       "Options to be passed to madnlp"}},
     {"convexify_strategy",
