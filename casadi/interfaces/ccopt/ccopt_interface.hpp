@@ -127,6 +127,9 @@ class CASADI_NLPSOL_CCOPT_EXPORT MadmpecInterface : public Nlpsol {
   void set_ccopt_prob();
   void set_ccopt_prob(CodeGenerator& g) const;
 
+  void codegen_options(CodeGenerator& g, const Dict& dict,
+                       const std::string& field) const;
+
   /** \brief Generate code for the function body */
   void codegen_body(CodeGenerator& g) const override;
 
@@ -161,11 +164,6 @@ class CASADI_NLPSOL_CCOPT_EXPORT MadmpecInterface : public Nlpsol {
 
   std::vector<libmad_int> nws_;
   std::vector<libmad_int> ngs_;
-
-  std::vector<libmad_int> nzj_i_;
-  std::vector<libmad_int> nzj_j_;
-  std::vector<libmad_int> nzh_i_;
-  std::vector<libmad_int> nzh_j_;
 };
 
 } // namespace casadi

@@ -92,20 +92,6 @@ const Options MadmpecInterface::options_
    }
 };
 
-void casadi_ccopt_sparsity(const casadi_int* sp, libmad_int *coord_i, libmad_int *coord_j) {
-    // convert ccs to cco
-    casadi_int ncol = sp[1];
-    const casadi_int* colind = sp+2;
-    const casadi_int* row = colind+ncol+1;
-
-    for (casadi_int cc=0; cc<ncol; ++cc) {
-        for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
-            *coord_i++ = row[el]+1;
-            *coord_j++ = cc+1;
-        }
-    }
-}
-
 // Recursively flatten options for libmad options dict.
 void flatten_opts(Dict& ret, const Dict& opts, const std::string& prefix)
 {
@@ -213,15 +199,6 @@ void MadmpecInterface::init(const Dict& opts) {
     hesslag_sp_ = Convexify::setup(convexify_data_, hesslag_sp_, opts);
   }
 
-  // transform ccs sparsity to cco
-  nzj_i_.resize(jacg_sp_.nnz());
-  nzj_j_.resize(jacg_sp_.nnz());
-  nzh_i_.resize(hesslag_sp_.nnz());
-  nzh_j_.resize(hesslag_sp_.nnz());
-
-  casadi_ccopt_sparsity(jacg_sp_, get_ptr(nzj_i_), get_ptr(nzj_j_));
-  casadi_ccopt_sparsity(hesslag_sp_, get_ptr(nzh_i_), get_ptr(nzh_j_));
-
   set_ccopt_prob();
 
   // Allocate memory
@@ -303,7 +280,7 @@ int MadmpecInterface::init_mem(void* mem) const {
 
 void MadmpecInterface::free_mem(void* mem) const {
   auto m = static_cast<MadmpecMemory*>(mem);
-  ccopt_free_mem(&m->d);
+  casadi_ccopt_free_mem(&m->d);
   delete static_cast<MadmpecMemory*>(mem);
 }
 
@@ -373,12 +350,8 @@ void MadmpecInterface::set_ccopt_prob() {
   p_.nlp = &p_nlp_;
   // p_ casadi_ccopt_prob
 
-  p_.nnz_jac_g = jacg_sp_.nnz();
-  p_.nnz_hess_l = hesslag_sp_.nnz();
-  p_.nzj_i = get_ptr(nzj_i_);
-  p_.nzj_j = get_ptr(nzj_j_);
-  p_.nzh_i = get_ptr(nzh_i_);
-  p_.nzh_j = get_ptr(nzh_j_);
+  p_.sp_a = jacg_sp_;
+  p_.sp_h = hesslag_sp_;
 
   p_.nlp_hess_l = OracleCallback("nlp_hess_l", this);
   p_.nlp_jac_g = OracleCallback("nlp_jac_g", this);
@@ -389,37 +362,52 @@ void MadmpecInterface::set_ccopt_prob() {
   casadi_ccopt_setup(&p_);
 }
 
-void MadmpecInterface::codegen_init_mem(CodeGenerator& g) const {
-
-  g << "libmad_create_options_dict(&(m->d.libmad_opts))";
-  for (const auto& kv : opts_) {
+void MadmpecInterface::codegen_options(CodeGenerator& g, const Dict& dict,
+                                       const std::string& field) const {
+  g << "libmad_create_options_dict(&(" + codegen_mem(g) + "." + field + "));\n";
+  for (const auto& kv : dict) {
     switch (kv.second.getType()) {
      case OT_DOUBLE:
-       g << "libmad_set_double_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + str(kv.second) + ");\n";
+       g << "libmad_set_double_option(" + codegen_mem(g) + "." + field + ", \""
+            + kv.first + "\", " + str(kv.second) + ");\n";
        break;
      case OT_INT:
-       g << "libmad_set_int64_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + str(kv.second) + ");\n";
+       g << "libmad_set_int64_option(" + codegen_mem(g) + "." + field + ", \""
+            + kv.first + "\", " + str(kv.second) + ");\n";
        break;
      case OT_STRING:
      {
        std::string s = kv.second.to_string();
-       g << "libmad_set_string_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + s + ");\n";
+       g << "libmad_set_string_option(" + codegen_mem(g) + "." + field + ", \""
+            + kv.first + "\", \"" + s + "\");\n";
      }
      break;
      case OT_BOOL:
-       g << "libmad_set_bool_option(" + codegen_mem(g) + ".libmad_opts, " + kv.first + ", " + str(kv.second) + ");\n";
+       g << "libmad_set_bool_option(" + codegen_mem(g) + "." + field + ", \""
+            + kv.first + "\", " + str(kv.second) + ");\n";
        break;
      default:
        casadi_error("Unknown option type.");
     }
   }
-  g << "ccopt_init_mem(&" + codegen_mem(g) + ");\n";
+}
+
+void MadmpecInterface::codegen_init_mem(CodeGenerator& g) const {
+  codegen_options(g, opts_, "nlp_opts");
+  codegen_options(g, mpcc_opts_, "mpcc_opts");
+
+  g << codegen_mem(g) + ".ind_cc1 = " + g.constant(ind_cc1_) + ";\n";
+  g << codegen_mem(g) + ".ind_cc2 = " + g.constant(ind_cc2_) + ";\n";
+  g << codegen_mem(g) + ".cctypes = " + g.constant(cctypes_) + ";\n";
+  g << codegen_mem(g) + ".ncc = " + str(ind_cc1_.size()) + ";\n";
+
+  g << "casadi_ccopt_init_mem(&" + codegen_mem(g) + ");\n";
   g << "return 0;\n";
 }
 
 void MadmpecInterface::codegen_free_mem(CodeGenerator& g) const {
   // memory deallocation
-  g << "ccopt_free_mem(&" + codegen_mem(g) + ");\n";
+  g << "casadi_ccopt_free_mem(&" + codegen_mem(g) + ");\n";
 }
 
 void MadmpecInterface::codegen_declarations(CodeGenerator& g) const {
