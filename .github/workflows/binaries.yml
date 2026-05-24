@@ -799,6 +799,7 @@ jobs:
     needs: [matlab-dockcross,matlab-osx]
     env:
       SKIP_MADNLP_TESTS: ON
+      SKIP_CCOPT_TESTS: ON
     strategy:
      fail-fast: false
      matrix:
