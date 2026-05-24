@@ -840,6 +840,7 @@ endif()
 
 # MadMPEC: A sparse interior point NLP solver with filter line-search, written in Julia, specialized to solving MPCCs
 option(WITH_CCOPT "Compile the interface to MadMPEC"  OFF)
+option(WITH_MOCKUP_CCOPT "Use mockup MadMPEC (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 option(WITH_BUILD_CCOPT "Download compiled libMad"  OFF)
 
 # Knitro: An NLP solver
@@ -1249,7 +1250,7 @@ if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
 endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
 
-if(WITH_MADNLP AND WITH_MOCKUP_MADNLP)
+if((WITH_MADNLP AND WITH_MOCKUP_MADNLP) OR (WITH_CCOPT AND WITH_MOCKUP_CCOPT))
   add_library(libmad::libMad SHARED IMPORTED)
   add_dependencies(libmad::libMad mockups-external)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/libmad/include")
