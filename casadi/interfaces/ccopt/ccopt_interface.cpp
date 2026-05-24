@@ -86,10 +86,9 @@ const Options MadmpecInterface::options_
        {OT_INTVECTORVECTOR,
         "List of complementary constraints on simple bounds. "
         "Pair (i, j) encodes complementarity between the bounds on variable i and variable j."}},
-    {"cctypes",
+    {"cc_types",
        {OT_INTVECTOR,
-        "List of complementary constraints on simple bounds. "
-        "Pair (i, j) encodes complementarity between the bounds on variable i and variable j."}},
+        "Type of cc pairs (default: 0). "}},
    }
 };
 
