@@ -1104,7 +1104,8 @@ namespace casadi {
    * `inner = false`: Y[r, s] = sum over (i, j) of X[i, j] * M[i*mB+r, j*nB+s]
    *
    * Closes the AD algebra of kron under arbitrary-order differentiation.
-   */
+
+      \identifier{2ho} */
   inline MX kron_contract(const MX& m, const MX& x, bool inner) {
     return MX::kron_contract(m, x, inner);
   }

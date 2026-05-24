@@ -3715,6 +3715,9 @@
 %exception  casadi::MX::kron(const MX &x, const MX &b) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::kron_contract(const MX &m, const MX &x, bool inner) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::lift(const MX &x, const MX &x_guess) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5954,6 +5957,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::join(const std::vector< std::string > &l, const std::string &delim) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::kron_contract(const MX &m, const MX &x, bool inner) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::linspace(std::vector< T > &v, const F &first, const L &last) {

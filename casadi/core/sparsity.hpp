@@ -737,7 +737,8 @@ namespace casadi {
      * - `inner = false`: (r, s) ∈ y iff ∃ (i, j) ∈ sp_x with
      *                    (i*yrow + r, j*ycol + s) ∈ sp_m;
      *                    output indexed by the inner block of M.
-     */
+
+        \identifier{2hn} */
     static Sparsity kron_contract(const Sparsity& sp_m, const Sparsity& sp_x, bool inner);
     static Sparsity triu(const Sparsity& x, bool includeDiagonal=true);
     static Sparsity tril(const Sparsity& x, bool includeDiagonal=true);

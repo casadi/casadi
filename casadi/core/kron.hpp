@@ -44,7 +44,8 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2026
-  */
+
+      \identifier{2gn} */
   class CASADI_EXPORT Kron : public MXNode {
   public:
 
@@ -68,61 +69,89 @@ namespace casadi {
       return 0;
     }
 
-    /** \brief  Evaluate numerically */
+    /** \brief  Evaluate numerically
+
+        \identifier{2go} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
       return eval_gen<double>(arg, res, iw, w);
     }
 
-    /** \brief  Evaluate symbolically (SX) */
+    /** \brief  Evaluate symbolically (SX)
+
+        \identifier{2gp} */
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override {
       return eval_gen<SXElem>(arg, res, iw, w);
     }
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{2gq} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
         const std::vector<bool>& unique={}) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{2gr} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{2gs} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{2gt} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                     std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{2gu} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                     std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{2gv} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
                   std::vector<bool>& res_is_ref) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{2gw} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{2gx} */
     casadi_int op() const override { return OP_KRON;}
 
-    /** \brief Serialize specific part of node */
+    /** \brief Serialize specific part of node
+
+        \identifier{2gy} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+
+        \identifier{2gz} */
     static MXNode* deserialize(DeserializingStream& s);
 
   protected:
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{2h0} */
     explicit Kron(DeserializingStream& s) : MXNode(s) {}
   };
 
 
-  /** \brief Kron specialization: both operands dense */
+  /** \brief Kron specialization: both operands dense
+
+      \identifier{2h1} */
   class CASADI_EXPORT DenseKron : public Kron {
   public:
     static MXNode* try_create(const MX& a, const MX& b);
@@ -144,7 +173,9 @@ namespace casadi {
   };
 
 
-  /** \brief Kron specialization: dense a + sparse b */
+  /** \brief Kron specialization: dense a + sparse b
+
+      \identifier{2h2} */
   class CASADI_EXPORT DenseSparseKron : public Kron {
   public:
     static MXNode* try_create(const MX& a, const MX& b);
@@ -166,7 +197,9 @@ namespace casadi {
   };
 
 
-  /** \brief Kron specialization: sparse a + dense b */
+  /** \brief Kron specialization: sparse a + dense b
+
+      \identifier{2h3} */
   class CASADI_EXPORT SparseDenseKron : public Kron {
   public:
     static MXNode* try_create(const MX& a, const MX& b);
@@ -203,7 +236,8 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2026
-  */
+
+      \identifier{2h4} */
   class CASADI_EXPORT KronContract : public MXNode {
   public:
 
@@ -228,57 +262,85 @@ namespace casadi {
       return 0;
     }
 
-    /** \brief  Evaluate numerically */
+    /** \brief  Evaluate numerically
+
+        \identifier{2h5} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
       return eval_gen<double>(arg, res, iw, w);
     }
 
-    /** \brief  Evaluate symbolically (SX) */
+    /** \brief  Evaluate symbolically (SX)
+
+        \identifier{2h6} */
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override {
       return eval_gen<SXElem>(arg, res, iw, w);
     }
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{2h7} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
         const std::vector<bool>& unique={}) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{2h8} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{2h9} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{2ha} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                     std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{2hb} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                     std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief Get required length of w field */
+    /** \brief Get required length of w field
+
+        \identifier{2hc} */
     size_t sz_w() const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{2hd} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
                   std::vector<bool>& res_is_ref) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{2he} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{2hf} */
     casadi_int op() const override { return OP_KRON_CONTRACT;}
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{2hg} */
     void serialize_body(SerializingStream& s) const override;
 
-    /** \brief Serialize specific part of node */
+    /** \brief Serialize specific part of node
+
+        \identifier{2hh} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+
+        \identifier{2hi} */
     static MXNode* deserialize(DeserializingStream& s);
 
     /// Which axes are contracted (true = inner (mB, nB); false = outer (mA, nA))
@@ -286,12 +348,16 @@ namespace casadi {
 
   protected:
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{2hj} */
     explicit KronContract(DeserializingStream& s);
   };
 
 
-  /** \brief KronContract specialization: M dense, X dense (=> Y dense) */
+  /** \brief KronContract specialization: M dense, X dense (=> Y dense)
+
+      \identifier{2hk} */
   class CASADI_EXPORT DenseKronContract : public KronContract {
   public:
     static MXNode* try_create(const MX& m, const MX& x, bool inner);
@@ -316,7 +382,9 @@ namespace casadi {
   };
 
 
-  /** \brief KronContract specialization: M dense, X sparse (=> Y dense) */
+  /** \brief KronContract specialization: M dense, X sparse (=> Y dense)
+
+      \identifier{2hl} */
   class CASADI_EXPORT DenseSparseKronContract : public KronContract {
   public:
     static MXNode* try_create(const MX& m, const MX& x, bool inner);
@@ -340,7 +408,9 @@ namespace casadi {
   };
 
 
-  /** \brief KronContract specialization: M sparse, X dense */
+  /** \brief KronContract specialization: M sparse, X dense
+
+      \identifier{2hm} */
   class CASADI_EXPORT SparseDenseKronContract : public KronContract {
   public:
     static MXNode* try_create(const MX& m, const MX& x, bool inner);
