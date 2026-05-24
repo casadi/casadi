@@ -226,6 +226,12 @@ namespace casadi {
     mutable std::vector<casadi_ocp_block> RSQ_hat_blocks_;
     mutable casadi_condensing_prob<double> p_cond_;
     void finalize_condense_prob();
+    /// Unpack a flat [off_r, off_c, rows, cols]*N vector into ocp_block records
+    static void unpack_ocp_blocks(const std::vector<casadi_int>& packed,
+                                  std::vector<casadi_ocp_block>& dst);
+    /// Prepend a length scalar to a vector (used to length-prefix codegen consts)
+    static std::vector<casadi_int> len_prefixed(casadi_int n,
+                                                const std::vector<casadi_int>& v);
 
     /// Run structure detection (auto) or use provided (manual)
     void detect_condense_structure();

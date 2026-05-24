@@ -1884,6 +1884,8 @@ namespace casadi {
     case AUX_CONDENSING:
       add_auxiliary(AUX_OCP_BLOCK);
       add_auxiliary(AUX_INF);
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_CLEAR);
       add_auxiliary(AUX_BLAS_MTIMES);  // pulls AUX_MTIMES_DENSE; gives us the wrapper
       this->auxiliaries << sanitize_source(casadi_condensing_str, inst);
       break;

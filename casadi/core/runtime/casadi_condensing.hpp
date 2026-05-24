@@ -558,19 +558,8 @@ void casadi_condensing_set_work(casadi_condensing_data<T1>* d,
   d->lam_a_lifted = d->lbx_val + 2 * p->total_qr;
 }
 
-// Helper: zero a buffer of length n.
-template<typename T1>
-static void casadi_condensing_zero(T1* x, casadi_int n) {
-  casadi_int i;
-  for (i = 0; i < n; ++i) x[i] = 0;
-}
-
-// Helper: copy n elements from src to dst.
-template<typename T1>
-static void casadi_condensing_copy(const T1* src, casadi_int n, T1* dst) {
-  casadi_int i;
-  for (i = 0; i < n; ++i) dst[i] = src[i];
-}
+// Helpers casadi_clear / casadi_copy come from AUX_CLEAR / AUX_COPY,
+// pulled in by AUX_CONDENSING in CodeGenerator::add_auxiliary().
 
 // Helper: y(nrow, ncol) := alpha * y; column-major, full dense.
 template<typename T1>
@@ -656,9 +645,9 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
     Phi   = d->Phi;
     Gamma = d->Gamma;
     phi   = d->phi;
-    casadi_condensing_zero(Phi, nx_K * nx_K);
+    casadi_clear(Phi, nx_K * nx_K);
     for (i = 0; i < nx_K; ++i) Phi[i + i * nx_K] = 1;
-    casadi_condensing_zero(phi, nx_K);
+    casadi_clear(phi, nx_K);
     // Gamma: no columns at j=0, nothing to initialise.
 
     // Output buffers for this condensed block
@@ -682,8 +671,8 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
 
     // RSQ_hat block: row-major view as Hxx (nx_K x nx_K), Hxu (nx_K x nu_K),
     // Huu (nu_K x nu_K) within a single (nxu_K x nxu_K) col-major matrix.
-    casadi_condensing_zero(RSQ_hat, nxu_K * nxu_K);
-    casadi_condensing_zero(qr_hat, nxu_K);
+    casadi_clear(RSQ_hat, nxu_K * nxu_K);
+    casadi_clear(qr_hat, nxu_K);
     Hxx = RSQ_hat;                                  // top-left  nx_K x nx_K
     Hxu = RSQ_hat + nx_K * nxu_K;                   // top-right (in xu cols)
     Huu = RSQ_hat + nx_K * nxu_K + nx_K;            // bottom-right
@@ -691,12 +680,12 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
     hu  = qr_hat + nx_K;
 
     // CD_hat: zero whole block; we write contiguous row groups
-    casadi_condensing_zero(CD_hat, d->ng_hat[K] * nxu_K);
+    casadi_clear(CD_hat, d->ng_hat[K] * nxu_K);
 
     // Bounds: copy xi-bounds from stage k_a; collect lbu/ubu/lbg (and lifted
     // state bounds) as we walk j.
-    casadi_condensing_copy(d->lbx_val + off_lbx, nx_K, d->lbx_hat_val + casadi_condensing_off_lbx(d, K));
-    casadi_condensing_copy(d->ubx_val + off_lbx, nx_K, d->ubx_hat_val + casadi_condensing_off_lbx(d, K));
+    casadi_copy(d->lbx_val + off_lbx, nx_K, d->lbx_hat_val + casadi_condensing_off_lbx(d, K));
+    casadi_copy(d->ubx_val + off_lbx, nx_K, d->ubx_hat_val + casadi_condensing_off_lbx(d, K));
     // (We use a small inline helper below to compute lbx_hat offsets.)
 
     cum_nu = 0;          // running width of Gamma at start of step j
@@ -715,7 +704,8 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
       A   = d->AB_val  + p->AB_offsets[k];                     // nx_kp1 x nx_k
       B   = A + nx_kp1 * nx_k;                                 // nx_kp1 x nu_k
       Qxx = d->RSQ_val + p->RSQ_offsets[k];                    // nx_k x nx_k
-      Qxu = Qxx + nx_k * (nx_k + nu_k);                        // nx_k x nu_k (in (nx_k+nu_k) col-stride)
+      // Qxu has nx_k x nu_k logical shape, stored in (nx_k+nu_k) col-stride
+      Qxu = Qxx + nx_k * (nx_k + nu_k);
       Quu = Qxx + nx_k * (nx_k + nu_k) + nx_k;                 // nu_k x nu_k
       // Wait -- correction: the RSQ block is col-major (nx_k+nu_k)x(nx_k+nu_k).
       // Top-left Qxx occupies rows [0,nx_k), cols [0,nx_k); each col has stride
@@ -794,7 +784,7 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
         // time (column kk of Hxx is Phi' * (Q*Phi)[:,kk]).
         {
           T1 *tmp = d->gemm_xx;       // (nx_k x nx_K)
-          casadi_condensing_zero(tmp, nx_k * nx_K);
+          casadi_clear(tmp, nx_k * nx_K);
           casadi_blas_mtimes(Qxx_c, nx_k, nx_k, Phi, nx_K, tmp, 0);
           for (kk = 0; kk < nx_K; ++kk) {
             T1 *hxx_col = Hxx + kk * nxu_K;
@@ -807,7 +797,7 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
         {
           T1 *tmp = d->gemm_xu;       // (nx_k x cum_nu) when used
           if (cum_nu > 0) {
-            casadi_condensing_zero(tmp, nx_k * cum_nu);
+            casadi_clear(tmp, nx_k * cum_nu);
             casadi_blas_mtimes(Qxx_c, nx_k, nx_k, Gamma, cum_nu, tmp, 0);
             // Hxu_left columns are not contiguous in RSQ_hat (col-stride nxu_K,
             // length nx_K).  Write one column at a time.
@@ -830,7 +820,7 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
         // Huu[i,j] = RSQ_hat[(nx_K + i) + (nx_K + j) * nxu_K].
         if (cum_nu > 0) {
           T1 *tmp = d->gemm_xu;
-          casadi_condensing_zero(tmp, nx_k * cum_nu);
+          casadi_clear(tmp, nx_k * cum_nu);
           casadi_blas_mtimes(Qxx_c, nx_k, nx_k, Gamma, cum_nu, tmp, 0);
           for (kk = 0; kk < cum_nu; ++kk) {
             T1 *huu_col = Huu + kk * nxu_K;
@@ -870,14 +860,14 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
       if (ng_k > 0) {
         // Compute C_k * phi (length ng_k)
         T1 *Cphi = d->tmp_v;
-        casadi_condensing_zero(Cphi, ng_k);
+        casadi_clear(Cphi, ng_k);
         casadi_blas_mtimes(C, ng_k, nx_k, phi, 1, Cphi, 0);
 
         // (a) Columns [0, nx_K) of CD_hat block:  C_k * Phi
         // tmp (ng_k x nx_K) = C_k * Phi
         {
           T1 *tmp = d->gemm_xu;            // borrow (nx_max x nu_max_block); plenty
-          casadi_condensing_zero(tmp, ng_k * nx_K);
+          casadi_clear(tmp, ng_k * nx_K);
           casadi_blas_mtimes(C, ng_k, nx_k, Phi, nx_K, tmp, 0);
           // Write into CD_hat at rows [row_off, row_off+ng_k), cols [0, nx_K)
           for (kk = 0; kk < nx_K; ++kk) {
@@ -889,7 +879,7 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
         // (b) Columns [nx_K, nx_K+cum_nu) of CD_hat:  C_k * Gamma
         if (cum_nu > 0) {
           T1 *tmp = d->gemm_xu;
-          casadi_condensing_zero(tmp, ng_k * cum_nu);
+          casadi_clear(tmp, ng_k * cum_nu);
           casadi_blas_mtimes(C, ng_k, nx_k, Gamma, cum_nu, tmp, 0);
           for (kk = 0; kk < cum_nu; ++kk) {
             T1 *col = CD_hat + (nx_K + kk) * d->ng_hat[K];
@@ -962,15 +952,15 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
       phi_new   = (phi   == d->phi)   ? d->phi_new   : d->phi;
 
       // phi_new = A * phi + b_k
-      casadi_condensing_copy(b_k, nx_kp1, phi_new);
+      casadi_copy(b_k, nx_kp1, phi_new);
       casadi_blas_mtimes(A, nx_kp1, nx_k, phi, 1, phi_new, 0);
 
       // Phi_new = A * Phi  (nx_kp1 x nx_K)
-      casadi_condensing_zero(Phi_out, nx_kp1 * nx_K);
+      casadi_clear(Phi_out, nx_kp1 * nx_K);
       casadi_blas_mtimes(A, nx_kp1, nx_k, Phi, nx_K, Phi_out, 0);
 
       // Gamma_new = [A * Gamma   B_k]   (nx_kp1 x (cum_nu + nu_k))
-      casadi_condensing_zero(Gamma_out, nx_kp1 * (cum_nu + nu_k));
+      casadi_clear(Gamma_out, nx_kp1 * (cum_nu + nu_k));
       if (cum_nu > 0) {
         casadi_blas_mtimes(A, nx_kp1, nx_k, Gamma, cum_nu, Gamma_out, 0);
       }

@@ -1432,7 +1432,8 @@ namespace casadi {
       nx_avg /= (N_ + 1);
       nu_avg /= std::max<casadi_int>(N_, 1);
       double ratio = nu_avg / std::max(1e-30, nx_avg + nu_avg);
-      n_hat = static_cast<casadi_int>(std::round(std::sqrt(double(N_) * ratio)));
+      n_hat = static_cast<casadi_int>(
+          std::round(std::sqrt(static_cast<double>(N_) * ratio)));
       n_hat = std::max<casadi_int>(1, std::min<casadi_int>(n_hat, N_));
     }
     casadi_assert(n_hat >= 1 && n_hat <= N_,
@@ -1455,7 +1456,8 @@ namespace casadi {
     std::vector<casadi_int> nu_pref(N_ + 1, 0);
     for (casadi_int k = 0; k < N_; ++k) nu_pref[k+1] = nu_pref[k] + nus_[k];
     auto blk_cost = [&](casadi_int a, casadi_int b) -> double {
-      double nxu = double(nxs_[a]) + double(nu_pref[b] - nu_pref[a]);
+      double nxu = static_cast<double>(nxs_[a])
+                 + static_cast<double>(nu_pref[b] - nu_pref[a]);
       return nxu * nxu * nxu;
     };
 
@@ -1471,7 +1473,7 @@ namespace casadi {
       nu_avg /= std::max<casadi_int>(N_, 1);
       double ratio = nu_avg / std::max(1e-30, nx_avg + nu_avg);
       casadi_int est = static_cast<casadi_int>(
-          std::ceil(3.0 * std::sqrt(double(N_) * ratio)));
+          std::ceil(3.0 * std::sqrt(static_cast<double>(N_) * ratio)));
       K_max = std::max<casadi_int>(2,
               std::min<casadi_int>(N_,
               std::min<casadi_int>(100, est)));
@@ -1480,7 +1482,7 @@ namespace casadi {
       "DP K_max out of range [1, N]; got " + str(K_max));
 
     const double INF = std::numeric_limits<double>::infinity();
-    std::vector<std::vector<double>>     f   (K_max + 1,
+    std::vector<std::vector<double>> f(K_max + 1,
         std::vector<double>(N_ + 1, INF));
     std::vector<std::vector<casadi_int>> prev(K_max + 1,
         std::vector<casadi_int>(N_ + 1, -1));
@@ -1529,23 +1531,33 @@ namespace casadi {
     }
   }
 
+  void Conic::unpack_ocp_blocks(const std::vector<casadi_int>& packed,
+                                std::vector<casadi_ocp_block>& dst) {
+    dst.resize(packed.size() / 4);
+    for (size_t i = 0; i < dst.size(); ++i) {
+      dst[i].offset_r = packed[4*i + 0];
+      dst[i].offset_c = packed[4*i + 1];
+      dst[i].rows     = packed[4*i + 2];
+      dst[i].cols     = packed[4*i + 3];
+    }
+  }
+
+  std::vector<casadi_int> Conic::len_prefixed(casadi_int n,
+                                              const std::vector<casadi_int>& v) {
+    std::vector<casadi_int> r;
+    r.reserve(1 + v.size());
+    r.push_back(n);
+    r.insert(r.end(), v.begin(), v.end());
+    return r;
+  }
+
   // Unpack the *_blocks_packed_ vectors into native casadi_ocp_block
   // vectors and wire p_cond_ to point at our member arrays.  Called
   // from build_condense_blocks() and from the deserializing constructor.
   void Conic::finalize_condense_prob() {
-    auto unpack = [](const std::vector<casadi_int>& packed,
-                     std::vector<casadi_ocp_block>& dst) {
-      dst.resize(packed.size() / 4);
-      for (size_t i = 0; i < dst.size(); ++i) {
-        dst[i].offset_r = packed[4*i + 0];
-        dst[i].offset_c = packed[4*i + 1];
-        dst[i].rows     = packed[4*i + 2];
-        dst[i].cols     = packed[4*i + 3];
-      }
-    };
-    unpack(AB_blocks_packed_, AB_blocks_);
-    unpack(CD_blocks_packed_, CD_blocks_);
-    unpack(RSQ_blocks_packed_, RSQ_blocks_);
+    unpack_ocp_blocks(AB_blocks_packed_, AB_blocks_);
+    unpack_ocp_blocks(CD_blocks_packed_, CD_blocks_);
+    unpack_ocp_blocks(RSQ_blocks_packed_, RSQ_blocks_);
 
     p_cond_.nx = get_ptr(nxs_);
     p_cond_.nu = get_ptr(nus_);
@@ -1581,13 +1593,6 @@ namespace casadi {
       // Block-pack consts are length-prefixed ([N, off_r, off_c, rows, cols, ...])
       // so casadi_unpack_ocp_blocks can read them directly -- mirrors the
       // fatrop/hpipm pattern (no runtime copy through a static scratch).
-      auto with_len = [](casadi_int n, const std::vector<casadi_int>& v) {
-        std::vector<casadi_int> r;
-        r.reserve(1 + v.size());
-        r.push_back(n);
-        r.insert(r.end(), v.begin(), v.end());
-        return r;
-      };
       const std::string s_nx          = g.constant(nxs_);
       const std::string s_nu          = g.constant(nus_);
       const std::string s_ng          = g.constant(ngs_);
@@ -1595,9 +1600,9 @@ namespace casadi {
       const std::string s_AB_off      = g.constant(AB_offsets_);
       const std::string s_CD_off      = g.constant(CD_offsets_);
       const std::string s_RSQ_off     = g.constant(RSQ_offsets_);
-      const std::string s_AB_lp       = g.constant(with_len(N_,     AB_blocks_packed_));
-      const std::string s_CD_lp       = g.constant(with_len(N_+1,   CD_blocks_packed_));
-      const std::string s_RSQ_lp      = g.constant(with_len(N_+1,   RSQ_blocks_packed_));
+      const std::string s_AB_lp       = g.constant(len_prefixed(N_,     AB_blocks_packed_));
+      const std::string s_CD_lp       = g.constant(len_prefixed(N_+1,   CD_blocks_packed_));
+      const std::string s_RSQ_lp      = g.constant(len_prefixed(N_+1,   RSQ_blocks_packed_));
 
       // Prob-side scratch: original (non-hat) block descriptor structs
       // -- target of the unpack from length-prefixed const.  Mirrors
