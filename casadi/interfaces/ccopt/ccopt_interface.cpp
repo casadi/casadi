@@ -440,7 +440,7 @@ void MadmpecInterface::codegen_declarations(CodeGenerator& g) const {
   g.add_dependency(get_function("nlp_g"));
   g.add_dependency(get_function("nlp_jac_g"));
   g.add_dependency(get_function("nlp_hess_l"));
-  g.add_include("MadmpecCInterface.h");
+  g.add_include("libMad.h");
 }
 
 void MadmpecInterface::codegen_body(CodeGenerator& g) const {
