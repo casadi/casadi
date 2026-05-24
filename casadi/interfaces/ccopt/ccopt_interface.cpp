@@ -485,11 +485,9 @@ MadmpecInterface::MadmpecInterface(DeserializingStream& s) : Nlpsol(s) {
   s.unpack("MadmpecInterface::exact_hessian", exact_hessian_);
   s.unpack("MadmpecInterface::opts", opts_);
   s.unpack("MadmpecInterface::convexify", convexify_);
-
-  s.unpack("MadmpecInterface::nzj_i", nzj_i_);
-  s.unpack("MadmpecInterface::nzj_j", nzj_j_);
-  s.unpack("MadmpecInterface::nzh_i", nzh_i_);
-  s.unpack("MadmpecInterface::nzh_j", nzh_j_);
+  s.unpack("MadmpecInterface::ind_cc1", ind_cc1_);
+  s.unpack("MadmpecInterface::ind_cc2", ind_cc2_);
+  s.unpack("MadmpecInterface::cctypes", cctypes_);
 
   set_ccopt_prob();
 }
@@ -503,11 +501,9 @@ void MadmpecInterface::serialize_body(SerializingStream &s) const {
   s.pack("MadmpecInterface::exact_hessian", exact_hessian_);
   s.pack("MadmpecInterface::opts", opts_);
   s.pack("MadmpecInterface::convexify", convexify_);
-
-  s.pack("MadmpecInterface::nzj_i", nzj_i_);
-  s.pack("MadmpecInterface::nzj_j", nzj_j_);
-  s.pack("MadmpecInterface::nzh_i", nzh_i_);
-  s.pack("MadmpecInterface::nzh_j", nzh_j_);
+  s.pack("MadmpecInterface::ind_cc1", ind_cc1_);
+  s.pack("MadmpecInterface::ind_cc2", ind_cc2_);
+  s.pack("MadmpecInterface::cctypes", cctypes_);
 
 }
 
