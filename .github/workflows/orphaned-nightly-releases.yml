@@ -39,11 +39,20 @@ jobs:
 
           # --- Orphaned nightly releases ---------------------------------
 
-          mapfile -t tags < <(
+          # Pull tag_name + published_at; build canonical-branch-name -> tag map
+          # (used by the branches section below) and a tag -> date map (used
+          # for sorting and display here).
+          declare -A nightly_for_canonical
+          declare -A nightly_dates
+          while IFS=$'\t' read -r tag published; do
+            [ -n "$tag" ] || continue
+            nightly_dates["$tag"]="$published"
+            nightly_for_canonical["${tag#nightly-}"]="$tag"
+          done < <(
             gh api --paginate "repos/$REPO/releases" \
-              --jq '.[] | select(.tag_name | startswith("nightly-")) | .tag_name'
+              --jq '.[] | select(.tag_name | startswith("nightly-")) | [.tag_name, .published_at] | @tsv'
           )
-          echo "Found ${#tags[@]} nightly-* release(s)."
+          echo "Found ${#nightly_dates[@]} nightly-* release(s)."
 
           {
             echo "## Orphaned nightly releases"
@@ -52,25 +61,28 @@ jobs:
             echo "Branch slashes are canonicalized to \`-\` in tag names, so a tag"
             echo "\`nightly-a-b-c\` matches any branch that canonicalizes to \`a-b-c\`"
             echo "(e.g. \`a/b/c\`, \`a-b/c\`, \`a/b-c\`, or \`a-b-c\`)."
+            echo "Sorted oldest first."
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
-          # Map canonical-branch-name -> nightly tag, for quick lookup below.
-          declare -A nightly_for_canonical
-          orphans=0
-          for tag in "${tags[@]}"; do
+          # Buffer lines with an ISO-date prefix so a lexical sort is
+          # chronological, then strip the prefix on output.
+          declare -a orphan_lines
+          for tag in "${!nightly_dates[@]}"; do
             suffix="${tag#nightly-}"
-            nightly_for_canonical["$suffix"]="$tag"
             if [ -z "${canonical_branches[$suffix]+x}" ]; then
-              echo "- [\`$tag\`]($GITHUB_SERVER_URL/$REPO/releases/tag/$tag)" >> "$GITHUB_STEP_SUMMARY"
-              orphans=$((orphans + 1))
+              published="${nightly_dates[$tag]}"
+              day="${published%%T*}"
+              orphan_lines+=("$published"$'\t'"- [\`$tag\`]($GITHUB_SERVER_URL/$REPO/releases/tag/$tag) ($day)")
             fi
           done
 
-          if [ "$orphans" -eq 0 ]; then
+          if [ "${#orphan_lines[@]}" -eq 0 ]; then
             echo "_None._" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '%s\n' "${orphan_lines[@]}" | sort | cut -f2- >> "$GITHUB_STEP_SUMMARY"
           fi
-          echo "Orphaned releases: $orphans"
+          echo "Orphaned releases: ${#orphan_lines[@]}"
 
           # --- Branches whose tip is already in the default branch -------
           #
@@ -86,32 +98,44 @@ jobs:
             echo "## Branches already in \`$default_branch\`"
             echo ""
             echo "Branches whose tip commit is reachable from \`$default_branch\` (merged or pure ancestors)."
+            echo "Sorted oldest tip first."
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
-          merged=0
-          # Sort for stable output across runs.
+          # Buffer lines with an ISO-date prefix for chronological sort below.
+          # For status=behind/identical, merge_base_commit == branch tip, so its
+          # committer date is the branch's youngest commit date — we pull it
+          # from the same compare call to avoid a second request per branch.
+          declare -a branch_lines
           while IFS= read -r b; do
             [ "$b" != "$default_branch" ] || continue
             sha="${branch_tips[$b]}"
-            status="$(gh api "repos/$REPO/compare/$default_branch...$sha" --jq '.status' 2>/dev/null || echo error)"
+            res="$(gh api "repos/$REPO/compare/$default_branch...$sha" \
+                    --jq '[.status, (.merge_base_commit.commit.committer.date // "")] | @tsv' \
+                    2>/dev/null || echo $'error\t')"
+            IFS=$'\t' read -r status date <<< "$res"
             case "$status" in
               behind|identical)
-                # GitHub accepts unencoded slashes in branch URLs (e.g. /tree/foo/bar).
+                # GitHub accepts unencoded slashes in branch URLs (e.g. /tree/foo/bar),
+                # but the branches/all?query= param needs proper percent-encoding.
                 branch_link="$GITHUB_SERVER_URL/$REPO/tree/$b"
+                b_encoded="$(jq -rn --arg b "$b" '$b|@uri')"
+                delete_link="$GITHUB_SERVER_URL/$REPO/branches/all?query=$b_encoded"
                 nightly_tag="${nightly_for_canonical[${b//\//-}]:-}"
                 if [ -n "$nightly_tag" ]; then
                   nightly_suffix=" — nightly [\`$nightly_tag\`]($GITHUB_SERVER_URL/$REPO/releases/tag/$nightly_tag)"
                 else
                   nightly_suffix=""
                 fi
-                echo "- [\`$b\`]($branch_link) ([${sha:0:7}]($GITHUB_SERVER_URL/$REPO/commit/$sha)) — $status$nightly_suffix" >> "$GITHUB_STEP_SUMMARY"
-                merged=$((merged + 1))
+                day="${date%%T*}"
+                branch_lines+=("$date"$'\t'"- [\`$b\`]($branch_link) ([${sha:0:7}]($GITHUB_SERVER_URL/$REPO/commit/$sha), $day) — $status — [delete]($delete_link)$nightly_suffix")
                 ;;
             esac
           done < <(printf '%s\n' "${!branch_tips[@]}" | sort)
 
-          if [ "$merged" -eq 0 ]; then
+          if [ "${#branch_lines[@]}" -eq 0 ]; then
             echo "_None._" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '%s\n' "${branch_lines[@]}" | sort | cut -f2- >> "$GITHUB_STEP_SUMMARY"
           fi
-          echo "Branches in $default_branch: $merged"
+          echo "Branches in $default_branch: ${#branch_lines[@]}"
