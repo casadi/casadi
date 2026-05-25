@@ -55,9 +55,12 @@ jobs:
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
+          # Map canonical-branch-name -> nightly tag, for quick lookup below.
+          declare -A nightly_for_canonical
           orphans=0
           for tag in "${tags[@]}"; do
             suffix="${tag#nightly-}"
+            nightly_for_canonical["$suffix"]="$tag"
             if [ -z "${canonical_branches[$suffix]+x}" ]; then
               echo "- [\`$tag\`]($GITHUB_SERVER_URL/$REPO/releases/tag/$tag)" >> "$GITHUB_STEP_SUMMARY"
               orphans=$((orphans + 1))
@@ -94,7 +97,15 @@ jobs:
             status="$(gh api "repos/$REPO/compare/$default_branch...$sha" --jq '.status' 2>/dev/null || echo error)"
             case "$status" in
               behind|identical)
-                echo "- \`$b\` ([${sha:0:7}]($GITHUB_SERVER_URL/$REPO/commit/$sha)) — $status" >> "$GITHUB_STEP_SUMMARY"
+                # GitHub accepts unencoded slashes in branch URLs (e.g. /tree/foo/bar).
+                branch_link="$GITHUB_SERVER_URL/$REPO/tree/$b"
+                nightly_tag="${nightly_for_canonical[${b//\//-}]:-}"
+                if [ -n "$nightly_tag" ]; then
+                  nightly_suffix=" — nightly [\`$nightly_tag\`]($GITHUB_SERVER_URL/$REPO/releases/tag/$nightly_tag)"
+                else
+                  nightly_suffix=""
+                fi
+                echo "- [\`$b\`]($branch_link) ([${sha:0:7}]($GITHUB_SERVER_URL/$REPO/commit/$sha)) — $status$nightly_suffix" >> "$GITHUB_STEP_SUMMARY"
                 merged=$((merged + 1))
                 ;;
             esac
