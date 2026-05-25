@@ -59996,6 +59996,8 @@ List of plugins
 
 - bonmin
 
+- ccopt
+
 - fatrop
 
 - ipopt
@@ -60368,6 +60370,46 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_223
 
 --------------------------------------------------------------------------------
 
+ccopt
+-----
+
+
+
+>List of available options
+
++--------------------+--------------------+--------------------------------+
+|         Id         |        Type        |          Description           |
++====================+====================+================================+
+| cc_pairs           | OT_INTVECTORVECTOR | List of complementary          |
+|                    |                    | constraints on simple bounds.  |
+|                    |                    | Pair (i, j) encodes            |
+|                    |                    | complementarity between the    |
+|                    |                    | bounds on variable i and       |
+|                    |                    | variable j.                    |
++--------------------+--------------------+--------------------------------+
+| cc_types           | OT_INTVECTOR       | Type of cc pairs (default: 0). |
++--------------------+--------------------+--------------------------------+
+| ccopt              | OT_DICT            | Options to be passed to ccopt  |
+|                    |                    | relaxation algorithm           |
++--------------------+--------------------+--------------------------------+
+| convexify_margin   | OT_DOUBLE          | When using a convexification   |
+|                    |                    | strategy, make sure that the   |
+|                    |                    | smallest eigenvalue is at      |
+|                    |                    | least this (default: 1e-7).    |
++--------------------+--------------------+--------------------------------+
+| convexify_strategy | OT_STRING          | NONE|regularize|eigen-         |
+|                    |                    | reflect|eigen-clip. Strategy   |
+|                    |                    | to convexify the Lagrange      |
+|                    |                    | Hessian before passing it to   |
+|                    |                    | the solver.                    |
++--------------------+--------------------+--------------------------------+
+| madnlp             | OT_DICT            | Options to be passed to madnlp |
++--------------------+--------------------+--------------------------------+
+
+
+
+--------------------------------------------------------------------------------
+
 fatrop
 ------
 
@@ -60620,25 +60662,20 @@ madnlp
 
 >List of available options
 
-+--------------------+--------------+--------------------------------------+
-|         Id         |     Type     |             Description              |
-+====================+==============+======================================+
-| convexify_margin   | OT_DOUBLE    | When using a convexification         |
-|                    |              | strategy, make sure that the         |
-|                    |              | smallest eigenvalue is at least this |
-|                    |              | (default: 1e-7).                     |
-+--------------------+--------------+--------------------------------------+
-| convexify_strategy | OT_STRING    | NONE|regularize|eigen-reflect|eigen- |
-|                    |              | clip. Strategy to convexify the      |
-|                    |              | Lagrange Hessian before passing it   |
-|                    |              | to the solver.                       |
-+--------------------+--------------+--------------------------------------+
-| madnlp             | OT_DICT      | Options to be passed to madnlp       |
-+--------------------+--------------+--------------------------------------+
-| ng                 | OT_INTVECTOR | Number of constraints                |
-+--------------------+--------------+--------------------------------------+
-| nw                 | OT_INTVECTOR | Number of variables                  |
-+--------------------+--------------+--------------------------------------+
++--------------------+-----------+-----------------------------------------+
+|         Id         |   Type    |               Description               |
++====================+===========+=========================================+
+| convexify_margin   | OT_DOUBLE | When using a convexification strategy,  |
+|                    |           | make sure that the smallest eigenvalue  |
+|                    |           | is at least this (default: 1e-7).       |
++--------------------+-----------+-----------------------------------------+
+| convexify_strategy | OT_STRING | NONE|regularize|eigen-reflect|eigen-    |
+|                    |           | clip. Strategy to convexify the         |
+|                    |           | Lagrange Hessian before passing it to   |
+|                    |           | the solver.                             |
++--------------------+-----------+-----------------------------------------+
+| madnlp             | OT_DICT   | Options to be passed to madnlp          |
++--------------------+-----------+-----------------------------------------+
 
 
 
@@ -62898,6 +62935,10 @@ tol, int *iwork, double *dwork, int ldwork) "
 
 
 // File: group__general__LinsolQr.xml
+
+
+// File: group__plugin__Nlpsol__ccopt.xml
+
 
 
 // File: group__plugin__Nlpsol__madnlp.xml

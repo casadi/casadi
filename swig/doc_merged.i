@@ -38897,6 +38897,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76
 // File: group__general__LinsolQr.xml
 
 
+// File: group__plugin__Nlpsol__ccopt.xml
+
+
+
 // File: group__plugin__Nlpsol__madnlp.xml
 
 
