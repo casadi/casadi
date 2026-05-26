@@ -32399,10 +32399,10 @@ fixed-knots variant.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2g0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.hpp#L145
+https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.hpp#L181
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L145-L171
+https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L181-L207
 
 >  Function casadi::blazing_spline(const std::string &name, const std::vector< casadi_int > &knot_dims, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -32424,10 +32424,10 @@ fixed-knots variant.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2g0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.hpp#L145
+https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.hpp#L181
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L145-L171
+https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L181-L207
 
 ";
 
