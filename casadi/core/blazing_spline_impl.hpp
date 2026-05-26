@@ -133,6 +133,8 @@ namespace casadi {
     bool inv_input_ = false;
     std::vector< std::vector<double> > knots_;
     std::vector<std::string> lookup_modes_;
+    std::string pedantic_mode_order_ = "warn";
+    std::string pedantic_mode_size_ = "error";
 
     // Derived fields
     std::vector<casadi_int> knots_offset_;

@@ -4140,9 +4140,9 @@ class Functiontests(casadiTestCase):
             if parametric_grid:
               knot_dims = [len(k) for k in knots]
               if os.name=='nt':
-                  F = blazing_spline("F",knot_dims,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
+                  F = blazing_spline("F",knot_dims,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "pedantic_mode_order": "ignore", "pedantic_mode_size": "ignore", "jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
               else:
-                  F = blazing_spline("F",knot_dims,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
+                  F = blazing_spline("F",knot_dims,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "pedantic_mode_order": "ignore", "pedantic_mode_size": "ignore", "jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
   
               # Stacked knots vector for substitution
               knots_stacked = []
@@ -4161,9 +4161,9 @@ class Functiontests(casadiTestCase):
               print(knots)
   
               if os.name=='nt':
-                  F = blazing_spline("F",knots,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
+                  F = blazing_spline("F",knots,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "pedantic_mode_order": "ignore", "pedantic_mode_size": "ignore", "jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
               else:
-                  F = blazing_spline("F",knots,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
+                  F = blazing_spline("F",knots,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "pedantic_mode_order": "ignore", "pedantic_mode_size": "ignore", "jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
               F_test = Function('F_test',[x, C], [F(x, C)[0]])
   
             all_points = list(test_points(knots_orig))
@@ -4311,6 +4311,8 @@ class Functiontests(casadiTestCase):
             opts_lu = {"precompute_coeff": precompute_coeff,
                        "precompute_grid": precompute_grid,
                        "lookup_mode": [lookup_mode]*N,
+                       "pedantic_mode_order": "ignore",
+                       "pedantic_mode_size": "ignore",
                        "jit": True}
             if os.name=='nt':
                 opts_lu["jit_options"] = {"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}
@@ -4325,6 +4327,151 @@ class Functiontests(casadiTestCase):
             F_lu2 = Function.deserialize(F_lu.serialize({"debug":True}))
             for a in points_u:
                 self.checkfunction_light(F_lu,F_lu2,inputs=[vcat(a),data_u])
+
+  @skip("simde" not in CasadiMeta.feature_list())
+  def test_blazing_spline_pedantic(self):
+    # The pedantic checks fire in BlazingSplineFunction::init() based purely
+    # on knot counts; they don't require evaluation or JIT. We pass plain
+    # monotonic float lists; the spline math validity is irrelevant here.
+
+    # n-4 = 8 (power of 2) -> pedantic_mode_size trips
+    knots_size_bad_1d = [[float(i) for i in range(12)]]            # n=12 -> n-4=8
+
+    # Order trip: counts [17, 13] are not non-decreasing
+    # 17 -> n-4=13 (ok), 13 -> n-4=9 (ok), so size check stays silent.
+    knots_order_bad_2d = [
+        [float(i) for i in range(17)],
+        [float(i) for i in range(13)],
+    ]
+
+    # Cumulative-product trip: counts [8, 8] -> extents [4, 4] (individually
+    # below the >=8 threshold), but prefix product 4*4 = 16 (pow2) trips.
+    knots_cumul_bad_2d = [
+        [float(i) for i in range(8)],
+        [float(i) for i in range(8)],
+    ]
+
+    # Clean: counts [13, 17] non-decreasing, n-4 in {9, 13}, neither pow2,
+    # cumulative product 9*13 = 117 also not pow2.
+    knots_clean_2d = [
+        [float(i) for i in range(13)],
+        [float(i) for i in range(17)],
+    ]
+    knots_clean_1d = [[float(i) for i in range(13)]]               # n-4=9
+
+    # ----- assertInException: 'error' mode raises -----
+    with self.assertInException("powers of 2"):
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size": "error"})
+
+    with self.assertInException("not increasing"):
+      blazing_spline("F", knots_order_bad_2d,
+                     {"pedantic_mode_order": "error",
+                      "pedantic_mode_size":  "ignore"})
+
+    # Message should pinpoint the zero-based dim index of the offender.
+    with self.assertInException("dim 0 (zero-based)"):
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size": "error"})
+
+    # Bad mode value errors out (only checked when there is an offender to
+    # report; clean configs short-circuit before the mode is interpreted).
+    with self.assertInException("'pedantic_mode_size' must be one of"):
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size": "bogus"})
+
+    # Cumulative-product trip: individuals are below the >=8 threshold but
+    # the prefix product hits a power of 2.
+    with self.assertInException("prefix product"):
+      blazing_spline("F", knots_cumul_bad_2d,
+                     {"pedantic_mode_size": "error"})
+
+    # ----- capture_stdout: 'warn' mode emits a warning, no raise -----
+    with capture_stdout() as result:
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size": "warn"})
+    self.assertTrue("powers of 2" in result[0] or "powers of 2" in result[1])
+
+    with capture_stdout() as result:                               # order default = 'warn'
+      blazing_spline("F", knots_order_bad_2d,
+                     {"pedantic_mode_size": "ignore"})
+    self.assertTrue("not increasing" in result[0] or "not increasing" in result[1])
+
+    # 'ignore' produces no warning text and no exception.
+    with capture_stdout() as result:
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size":  "ignore",
+                      "pedantic_mode_order": "ignore"})
+    self.assertFalse("powers of 2" in result[0] or "powers of 2" in result[1])
+
+    # ----- Clean configs must not raise even with 'error' on both knobs -----
+    blazing_spline("F", knots_clean_1d,
+                   {"pedantic_mode_order": "error",
+                    "pedantic_mode_size":  "error"})
+    blazing_spline("F", knots_clean_2d,
+                   {"pedantic_mode_order": "error",
+                    "pedantic_mode_size":  "error"})
+    # Single dimension trivially satisfies the order constraint.
+    blazing_spline("F", knots_clean_1d, {"pedantic_mode_order": "error"})
+
+    # ----- (n_knots - 5) path: precompute_coeff_=True && diff_order_>=1.
+    # Only the jacobian child sees this, so the parent stays silent and
+    # the trip fires when F.jacobian() builds the child. pedantic_mode_*
+    # propagates from parent to child automatically; no jacobian_options
+    # plumbing needed.
+    # 13 knots -> n-4=9 (ok), n-5=8 (pow2), n-6=7 (ok).
+    knots_n5_bad_1d = [[float(i) for i in range(13)]]
+
+    # Default pedantic_mode_size = 'error' propagates -> jacobian raises.
+    with self.assertInException("(n_knots - 5)"):
+      F = blazing_spline("F", knots_n5_bad_1d)
+      F.jacobian()
+    # Message also reports the diff order.
+    with self.assertInException("diff order 1"):
+      F = blazing_spline("F", knots_n5_bad_1d)
+      F.jacobian()
+
+    # Parent 'warn' propagates -> child warns, no exception.
+    with capture_stdout() as result:
+      F = blazing_spline("F", knots_n5_bad_1d,
+                         {"pedantic_mode_size": "warn"})
+      F.jacobian()
+    self.assertTrue("(n_knots - 5)" in result[0] or "(n_knots - 5)" in result[1])
+
+    # Parent 'ignore' propagates -> child silent too (no exception, no log).
+    with capture_stdout() as result:
+      F = blazing_spline("F", knots_n5_bad_1d,
+                         {"pedantic_mode_size": "ignore"})
+      F.jacobian()
+    self.assertFalse("(n_knots - 5)" in result[0] or "(n_knots - 5)" in result[1])
+
+    # jacobian_options still wins when explicitly provided.
+    with capture_stdout() as result:
+      F = blazing_spline("F", knots_n5_bad_1d,
+                         {"jacobian_options": {"pedantic_mode_size": "ignore"}})
+      F.jacobian()
+    self.assertFalse("(n_knots - 5)" in result[0] or "(n_knots - 5)" in result[1])
+
+    # 15 knots -> n-4=11, n-5=10, n-6=9 all clean at every diff order.
+    knots_jac_clean_1d = [[float(i) for i in range(15)]]
+    F = blazing_spline("F", knots_jac_clean_1d,
+                       {"pedantic_mode_size": "error"})
+    F.jacobian()
+
+    # ----- (n_knots - 6) path: !precompute_coeff_ && diff_order_>=2.
+    # Reached via a grandchild built by F.jacobian().jacobian().
+    # 14 knots -> n-4=10 (ok), n-5=9 (ok), n-6=8 (pow2).
+    knots_n6_bad_1d = [[float(i) for i in range(14)]]
+
+    # Default 'error' propagates two levels deep.
+    with self.assertInException("(n_knots - 6)"):
+      F = blazing_spline("F", knots_n6_bad_1d,
+                         {"precompute_coeff": False})
+      F.jacobian().jacobian()
+    with self.assertInException("diff order 2"):
+      F = blazing_spline("F", knots_n6_bad_1d,
+                         {"precompute_coeff": False})
+      F.jacobian().jacobian()
 
   def test_noncanonical_sparsity(self):
     x = MX.sym("x",4,4)
