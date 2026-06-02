@@ -30,8 +30,10 @@
 
 using namespace casadi;
 
-static std::vector<Function> casadi_c_loaded_functions;
-static std::deque<int> casadi_c_load_stack;
+// Immortal (leaked) containers: never destructed at process exit, avoiding a
+// static-destruction-order crash when the user forgets to casadi_c_pop() (#2457)
+static std::vector<Function>& casadi_c_loaded_functions = *new std::vector<Function>();
+static std::deque<int>& casadi_c_load_stack = *new std::deque<int>();
 static int casadi_c_active = -1;
 
 int casadi_c_int_width() {
