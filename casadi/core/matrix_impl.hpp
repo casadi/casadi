@@ -1923,6 +1923,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  det(const Matrix<Scalar>& x, const std::string& lsolver, const Dict& dict) {
+    casadi_error("'det' with plugin not defined for " + type_name());
+    return Matrix<Scalar>();
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::sum2(const Matrix<Scalar>& x) {
     return mtimes(x, Matrix<Scalar>::ones(x.size2(), 1));
   }

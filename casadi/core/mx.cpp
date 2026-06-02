@@ -1983,7 +1983,12 @@ namespace casadi {
   }
 
   MX MX::det(const MX& x) {
-    return x->get_det();
+    return det(x, "qr");
+  }
+
+  MX MX::det(const MX& x, const std::string& lsolver, const Dict& opts) {
+    Linsol mysolver("det", lsolver, x.sparsity(), opts);
+    return mysolver.det(x);
   }
 
   MX MX::inv_node(const MX& x) {

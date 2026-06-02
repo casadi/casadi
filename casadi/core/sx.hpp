@@ -217,6 +217,9 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   SX SX::eig_symbolic(const SX& m);
 
   template<>
+  SX SX::det(const SX& A, const std::string& lsolver, const Dict& opts);
+
+  template<>
   void SX::print_split(casadi_int nnz, const SXElem* nonzeros, std::vector<std::string>& nz,
                       std::vector<std::string>& inter);
 

@@ -192,6 +192,18 @@ namespace casadi {
     return n;
   }
 
+  double Linsol::det(const DM& A) const {
+    if (A.sparsity()!=sparsity()) return det(project(A, sparsity()));
+    scoped_checkout<Linsol> mem(*this);
+    if (sfact(A.ptr(), mem)) casadi_error("Linsol::det: 'sfact' failed");
+    if (nfact(A.ptr(), mem)) casadi_error("Linsol::det: 'nfact' failed");
+    return det(A.ptr(), mem);
+  }
+
+  MX Linsol::det(const MX& A) const {
+    return A->get_det(*this);
+  }
+
   casadi_int Linsol::rank(const double* A, int mem) const {
     return (*this)->rank((*this)->memory(mem), A);
   }

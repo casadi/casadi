@@ -712,6 +712,7 @@ namespace casadi {
     static MX sum1(const MX& x);
     static MX polyval(const MX& p, const MX& x);
     static MX det(const MX& x);
+    static MX det(const MX& x, const std::string& lsolver, const Dict& opts=Dict());
     static std::vector<MX> symvar(const MX& x);
     static MX nullspace(const MX& A);
     static MX repsum(const MX& x, casadi_int n, casadi_int m=1);

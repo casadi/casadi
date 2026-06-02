@@ -3480,7 +3480,6 @@ class MXtests(casadiTestCase):
     det(X)
 
 
-  @known_bug()
   def test_det(self):
     X = MX.sym("x",3,3)
     x = SX.sym("x",3,3)
@@ -3493,6 +3492,115 @@ class MXtests(casadiTestCase):
     F = Function('F',[X],[det(X)])
     self.checkfunction(f,F,inputs=[x0])
     self.check_codegen(F,inputs=[x0])
+
+  def test_det_solvers(self):
+    # Determinant through the linear-solver plugins, across sizes and a sparse pattern
+    numpy.random.seed(1)
+
+    solvers = ["qr"]
+    if has_linsol("csparse"): solvers.append("csparse")
+
+    # Dense cases of several sizes
+    dense_cases = [numpy.random.random((n,n)) for n in [1,2,3,4,5]]
+
+    # A genuinely sparse (but nonsingular) pattern
+    S = numpy.random.random((5,5))
+    S[0,2]=S[0,4]=S[2,0]=S[3,1]=S[4,2]=0
+    S += 3*numpy.eye(5)
+
+    for A in dense_cases:
+      n = A.shape[0]
+      ref = numpy.linalg.det(A)
+      X = MX.sym("x", n, n)
+      x = SX.sym("x", n, n)
+
+      # DM (default cofactor) and SX (cofactor) match numpy
+      self.checkarray(det(DM(A)), ref, digits=9)
+      self.checkarray(evalf(det(SX(DM(A)))), ref, digits=9)
+
+      # SX symbolic determinant via the symbolicqr plugin's static method
+      xs = SX.sym("xs", n, n)
+      self.checkarray(evalf(substitute(det(xs, "symbolicqr"), xs, DM(A))), ref, digits=9)
+
+      f = Function('f',[x],[det(x)])
+      for ls in solvers:
+        # MX node with this solver: symbolic value + AD consistency vs cofactor
+        F = Function('F',[X],[det(X, ls)])
+        self.checkfunction(f, F, inputs=[A], digits=8)
+        # DM numeric through the plugin
+        self.checkarray(det(DM(A), ls), ref, digits=9)
+        # Codegen for solvers that support it (qr)
+        if ls=="qr":
+          self.check_codegen(F, inputs=[A])
+
+      # Options dict is forwarded to the solver
+      self.checkarray(det(DM(A), "qr", {"eps":1e-13}), ref, digits=9)
+
+    # Sparse determinant (numeric DM path) for every available plugin
+    refS = numpy.linalg.det(S)
+    self.checkarray(det(DM(S)), refS, digits=9)
+    for ls in solvers:
+      self.checkarray(det(sparsify(DM(S)), ls), refS, digits=9)
+
+    # Symbolic plugin determinant is only provided by symbolicqr; a plugin
+    # without the exposed static method raises a clear error.
+    with self.assertInException("does not provide a symbolic determinant"):
+      det(SX.sym("x",2,2), "qr")
+
+    # csparse exposes a numeric det but not the symbolic (static) one. This must
+    # be a clean error, NOT a segfault from an uninitialised Exposed.det pointer.
+    if has_linsol("csparse"):
+      with self.assertInException("does not provide a symbolic determinant"):
+        det(SX.sym("x",2,2), "csparse")
+
+  def test_det_symbolicqr_btf(self):
+    # The symbolicqr determinant exploits block-triangular structure (BTF):
+    # det = sign(perms) * prod(det(diagonal blocks)).
+    numpy.random.seed(2)
+
+    def sxdet(Anp):
+      Asp = sparsify(DM(Anp))
+      x = SX.sym("x", Asp.sparsity())
+      f = Function("f", [x], [det(x, "symbolicqr")])
+      return f(Asp), f.n_nodes()
+
+    # Block diagonal (two 4x4 blocks) must equal numpy det and be cheaper than dense
+    n = 8
+    B = numpy.zeros((n, n))
+    B[:4, :4] = numpy.random.random((4, 4))
+    B[4:, 4:] = numpy.random.random((4, 4))
+    vb, nodes_b = sxdet(B)
+    self.checkarray(vb, numpy.linalg.det(B), digits=9)
+
+    Adense = numpy.random.random((n, n))
+    xd = SX.sym("x", n, n)
+    nodes_d = Function("f", [xd], [det(xd, "symbolicqr")]).n_nodes()
+    self.assertTrue(nodes_b < nodes_d)  # sparsity actually exploited
+
+    # Block lower-triangular [[A11,0],[A21,A22]]: det = det(A11)*det(A22), so the
+    # result must be structurally INDEPENDENT of the coupling block A21. BTF drops
+    # A21 entirely; a single global QR would factorize it into the expression
+    # (giving a false structural dependence). This is the unambiguous BTF win.
+    L = numpy.random.random((6, 6)) + 3*numpy.eye(6)
+    L[:3, 3:] = 0                                   # zero upper-right -> block lower-tri
+    Lsp = sparsify(DM(L))
+    xL = SX.sym("x", Lsp.sparsity())
+    dL = det(xL, "symbolicqr")
+    self.checkarray(evalf(substitute(dL, xL, Lsp)), numpy.linalg.det(L), digits=9)
+    rows = Lsp.sparsity().row(); cols = Lsp.sparsity().get_col()
+    coupling = [k for k in range(Lsp.nnz()) if rows[k] >= 3 and cols[k] < 3]
+    self.assertTrue(len(coupling) > 0)              # there really is a coupling block
+    self.assertEqual(jacobian(dL, xL)[:, coupling].nnz(), 0)  # det ignores it
+
+    # Fully triangular -> all 1x1 blocks -> product of the diagonal entries
+    U = numpy.triu(numpy.random.random((5, 5)) + numpy.eye(5))
+    vU, nodes_U = sxdet(U)
+    self.checkarray(vU, numpy.linalg.det(U), digits=9)
+    self.assertTrue(nodes_U < 30)  # collapses to a tiny product
+
+    # Structurally singular (a blank row) -> determinant is structurally zero
+    Sg = numpy.random.random((4, 4)); Sg[2, :] = 0
+    self.checkarray(sxdet(Sg)[0], 0, digits=12)
 
   def test_mtimes_mismatch_segfault(self):
     with self.assertInException("incompatible dimensions"):

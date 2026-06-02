@@ -120,11 +120,22 @@ namespace casadi {
     virtual void generate(CodeGenerator& g, const std::string& A, const std::string& x,
                           casadi_int nrhs, bool tr) const;
 
+    /// Generate C code that computes the determinant into scalar d
+    virtual void generate_det(CodeGenerator& g, const std::string& A,
+                              const std::string& d) const;
+
+    /// Length of the w work vector that generate/generate_det carve scratch from
+    /// (the QR factorization buffers; excludes any cache)
+    virtual size_t sz_w_fact() const { return 0; }
+
     // Creator function for internal class
     typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp);
 
-    // No static functions exposed
-    struct Exposed{ };
+    // Symbolic determinant, provided as a plugin static method (e.g. symbolicqr)
+    typedef SX (*Det)(const SX& A, const Dict& opts);
+
+    // Static functions exposed by a plugin without instantiation
+    struct Exposed{ Det det; };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

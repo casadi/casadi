@@ -116,6 +116,11 @@ namespace casadi {
     g << "#error " <<  class_name() << " does not support code generation\n";
   }
 
+  void LinsolInternal::generate_det(CodeGenerator& g, const std::string& A,
+                                    const std::string& d) const {
+    g << "#error " <<  class_name() << " does not support determinant code generation\n";
+  }
+
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS

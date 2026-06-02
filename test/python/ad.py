@@ -598,7 +598,9 @@ class ADtests(casadiTestCase):
           (in1,v1,x*y[[1,0],0],c.diag(y[[1,0],0]),True,"c89"),
           (in1,v1,c.dot(x,x),(2*x).T,True,"c89"),
           (in1,v1,c.dot(x**2,x),(3*x**2).T,True,"c89"),
-          #(in1,v1,c.det(horzcat(*[x,DM([1,2])])),DM([-1,2])), not implemented
+          # det: linear (det = 2*x0 - x1) and nonlinear (det = x0*x1 - 1)
+          (in1,v1,c.det(horzcat(*[x,DM([1,2])])),DM([[2,-1]]),True,"c89"),
+          (in1,v1,c.det(horzcat(vertcat(x[0],1),vertcat(1,x[1]))),horzcat(x[1],x[0]),True,"c89"),
           (in1,v1,f1.call(in1)[1],y,True,"c89"),
           (in1,v1,f1.call([x**2,y])[1],y*2*vertcat(*[x.T,x.T]),True,"c89"),
           (in1,v1,f2.call(in1)[0],DM.zeros(0,2),True,"c89"),
