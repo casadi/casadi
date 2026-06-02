@@ -449,6 +449,13 @@ namespace casadi {
         \identifier{1rt} */
     virtual size_t sz_w() const { return 0;}
 
+    /** \brief Length of w the node's GENERATED code needs (may exceed sz_w)
+
+        For nodes whose VM eval and codegen have different scratch needs, e.g. a
+        determinant/solve whose eval uses Linsol memory but whose generated C
+        carves the factorization buffers from w. */
+    virtual size_t codegen_sz_w() const { return sz_w();}
+
     /// Set unary dependency
     void set_dep(const MX& dep);
 
@@ -733,7 +740,7 @@ namespace casadi {
         bool unique_x=false, bool unique_y=false) const;
 
     /// Determinant
-    virtual MX get_det() const;
+    virtual MX get_det(const Linsol& linear_solver) const;
 
     /// Inverse
     virtual MX get_inv() const;
