@@ -124,6 +124,10 @@ namespace casadi {
     virtual void generate_det(CodeGenerator& g, const std::string& A,
                               const std::string& d) const;
 
+    /// Length of the w work vector that generate/generate_det carve scratch from
+    /// (the QR factorization buffers; excludes any cache)
+    virtual size_t sz_w_fact() const { return 0; }
+
     // Creator function for internal class
     typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp);
 

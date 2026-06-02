@@ -3547,6 +3547,12 @@ class MXtests(casadiTestCase):
     with self.assertInException("does not provide a symbolic determinant"):
       det(SX.sym("x",2,2), "qr")
 
+    # csparse exposes a numeric det but not the symbolic (static) one. This must
+    # be a clean error, NOT a segfault from an uninitialised Exposed.det pointer.
+    if has_linsol("csparse"):
+      with self.assertInException("does not provide a symbolic determinant"):
+        det(SX.sym("x",2,2), "csparse")
+
   def test_det_symbolicqr_btf(self):
     # The symbolicqr determinant exploits block-triangular structure (BTF):
     # det = sign(perms) * prod(det(diagonal blocks)).

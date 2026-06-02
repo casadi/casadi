@@ -255,7 +255,14 @@ namespace casadi {
 
   template<bool Tr>
   size_t LinsolCall<Tr>::sz_w() const {
+    // VM eval uses Linsol memory; eval_sx (linsol_eval_sx) needs size1() scratch
     return this->sparsity().size1();
+  }
+
+  template<bool Tr>
+  size_t LinsolCall<Tr>::codegen_sz_w() const {
+    // The generated C carves the QR factorization buffers from w
+    return linsol_->sz_w_fact();
   }
 
   template<bool Tr>

@@ -107,6 +107,15 @@ namespace casadi {
     void generate_det(CodeGenerator& g, const std::string& A,
                       const std::string& d) const override;
 
+    /// Emit the QR factorization shared by generate/generate_det: carve the
+    /// qr_v/qr_r/qr_beta/qr_w buffers from w (with the optional cache) and factorize
+    void generate_factorize(CodeGenerator& g, const std::string& A) const;
+
+    /// Workspace generate/generate_det carve from w: v + r + beta + qr work
+    size_t sz_w_fact() const override {
+      return sp_v_.nnz() + sp_r_.nnz() + ncol() + nrow() + ncol();
+    }
+
     // Get name of the plugin
     const char* plugin_name() const override { return "qr";}
 

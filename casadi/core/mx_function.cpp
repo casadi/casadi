@@ -351,7 +351,9 @@ namespace casadi {
             alloc_arg(e.data->sz_arg());
             alloc_res(e.data->sz_res());
             alloc_iw(e.data->sz_iw());
-            sz_w = std::max(sz_w, e.data->sz_w());
+            // workloc_ (register offsets) is shared by VM eval and codegen, so
+            // the scratch region must cover whichever needs more
+            sz_w = std::max(sz_w, std::max(e.data->sz_w(), e.data->codegen_sz_w()));
             if (workloc_[e.res[c]] < 0) {
               workloc_[e.res[c]] = wind;
               wind += e.data->sparsity(c).nnz();

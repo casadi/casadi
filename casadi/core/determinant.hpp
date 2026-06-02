@@ -55,6 +55,9 @@ namespace casadi {
     /** \brief Evaluate the function symbolically (SX) */
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
+    /** \brief Length of w the generated code needs (eval uses Linsol memory) */
+    size_t codegen_sz_w() const override;
+
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,

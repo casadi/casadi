@@ -70,6 +70,10 @@ namespace casadi {
     return 0;
   }
 
+  size_t Determinant::codegen_sz_w() const {
+    return linsol_->sz_w_fact();
+  }
+
   void Determinant::generate(CodeGenerator& g,
                              const std::vector<casadi_int>& arg,
                              const std::vector<casadi_int>& res,
