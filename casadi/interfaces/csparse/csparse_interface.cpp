@@ -192,7 +192,6 @@ namespace casadi {
      *   A = P^-1*L*U*Q with det(P^-1)*det(Q)=1.
      * 
      */
-    
     auto m = static_cast<CsparseMemory*>(mem);
 
     // Determinant of L

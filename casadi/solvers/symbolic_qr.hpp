@@ -86,6 +86,11 @@ namespace casadi {
       return new SymbolicQr(name, sp);
     }
 
+    /** \brief Symbolic determinant via sparse QR factorization
+
+        Exposed (no instantiation needed) through LinsolInternal::Exposed::det. */
+    static SX det(const SX& A, const Dict& opts);
+
     ///@{
     /** \brief Options */
     static const Options options_;

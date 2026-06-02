@@ -125,6 +125,15 @@ namespace casadi {
         \identifier{1kl} */
     casadi_int rank(const DM& A) const;
 
+    /** \brief Matrix determinant
+
+      * Not available for all solvers
+      */
+    double det(const DM& A) const;
+
+    /// Matrix determinant as an MX graph node
+    MX det(const MX& A) const;
+
    /// Get all statistics obtained at the end of the last evaluate call
     Dict stats(int mem=1) const;
 

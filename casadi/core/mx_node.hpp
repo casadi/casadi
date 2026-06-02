@@ -733,7 +733,7 @@ namespace casadi {
         bool unique_x=false, bool unique_y=false) const;
 
     /// Determinant
-    virtual MX get_det() const;
+    virtual MX get_det(const Linsol& linear_solver) const;
 
     /// Inverse
     virtual MX get_inv() const;

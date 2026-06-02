@@ -27,6 +27,7 @@
 
 #include "sx_function.hpp"
 #include "output_sx.hpp"
+#include "linsol_internal.hpp"
 #include <array>
 
 namespace casadi {
@@ -1528,6 +1529,15 @@ namespace casadi {
                    "Got order " + str(p.size1()-1) + ".");
     }
 
+  }
+
+  template<>
+  SX CASADI_EXPORT SX::det(const SX& A, const std::string& lsolver, const Dict& opts) {
+    auto& plugin = LinsolInternal::getPlugin(lsolver);
+    casadi_assert(plugin.exposed.det,
+      "Linsol plugin '" + lsolver + "' does not provide a symbolic determinant. "
+      "Try the 'symbolicqr' plugin.");
+    return plugin.exposed.det(A, opts);
   }
 
   template<>

@@ -383,6 +383,7 @@ namespace casadi {
   #include "casadi_file_slurp.hpp"
   #include "casadi_ldl.hpp"
   #include "casadi_qr.hpp"
+  #include "casadi_det.hpp"
   #include "casadi_qp.hpp"
   #include "casadi_qrqp.hpp"
   #include "casadi_kkt.hpp"

@@ -40,7 +40,60 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &SymbolicQr::options_;
     plugin->deserialize = &SymbolicQr::deserialize;
+    plugin->exposed.det = &SymbolicQr::det;
     return 0;
+  }
+
+  // Sign (+1/-1) of a permutation: (-1)^(m - number of cycles)
+  static double permutation_sign(const std::vector<casadi_int>& p) {
+    std::vector<bool> seen(p.size(), false);
+    casadi_int ncycle = 0;
+    for (casadi_int i=0; i<static_cast<casadi_int>(p.size()); ++i) {
+      if (!seen[i]) {
+        ncycle++;
+        for (casadi_int j=i; !seen[j]; j=p[j]) seen[j] = true;
+      }
+    }
+    return (static_cast<casadi_int>(p.size())-ncycle) % 2 ? -1.0 : 1.0;
+  }
+
+  // Determinant of a single (irreducible) block via sparse Householder QR:
+  //   B = PR' Q R PC  =>  det(B) = sign(PR) sign(PC) det(Q) det(R)
+  static SX qr_block_det(const SX& B, bool amd) {
+    if (B.is_scalar()) return B;
+    SX V, R, beta;
+    std::vector<casadi_int> prinv, pc;
+    SX::qr_sparse(B, V, R, beta, prinv, pc, amd);
+    SXElem d = casadi_det(V.sparsity(), get_ptr(V.nonzeros()),
+                          R.sparsity(), get_ptr(R.nonzeros()), get_ptr(beta.nonzeros()));
+    return permutation_sign(prinv) * permutation_sign(pc) * d;
+  }
+
+  SX SymbolicQr::det(const SX& A, const Dict& opts) {
+    casadi_assert(A.is_square(), "det: matrix must be square, got " + A.dim() + ".");
+    // Fill-reducing ordering is on by default; controllable via the 'amd' option
+    bool amd = true;
+    for (auto&& op : opts) {
+      if (op.first=="amd") amd = op.second;
+    }
+
+    // Exploit sparsity: a block-triangular permutation turns the determinant
+    // into a product of (smaller) diagonal-block determinants.
+    //   det(A) = sign(rowperm) sign(colperm) prod_b det(block_b)
+    std::vector<casadi_int> rowperm, colperm, rowblock, colblock;
+    std::vector<casadi_int> coarse_rowblock, coarse_colblock;
+    casadi_int nb = A.sparsity().btf(rowperm, colperm, rowblock, colblock,
+                                     coarse_rowblock, coarse_colblock);
+    SX Aperm = A(rowperm, colperm);
+    SX ret = permutation_sign(rowperm) * permutation_sign(colperm);
+    for (casadi_int b=0; b<nb; ++b) {
+      std::vector<casadi_int> rr = range(rowblock[b], rowblock[b+1]);
+      std::vector<casadi_int> cc = range(colblock[b], colblock[b+1]);
+      // A non-square diagonal block means the matrix is structurally singular
+      if (rr.size()!=cc.size()) return 0;
+      ret = ret * qr_block_det(Aperm(rr, cc), amd);
+    }
+    return ret;
   }
 
   extern "C"

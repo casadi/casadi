@@ -1719,6 +1719,9 @@ namespace casadi {
       add_auxiliary(AUX_CLEAR);
       this->auxiliaries << sanitize_source(casadi_qr_str, inst);
       break;
+    case AUX_DET:
+      this->auxiliaries << sanitize_source(casadi_det_str, inst);
+      break;
     case AUX_LSQR:
       add_auxiliary(AUX_COPY);
       add_auxiliary(AUX_CLEAR);
@@ -2777,6 +2780,13 @@ namespace casadi {
     return "casadi_qr(" + sp + ", " + A + ", " + w + ", "
            + sp_v + ", " + v + ", " + sp_r + ", " + r + ", "
            + beta + ", " + prinv + ", " + pc + ");";
+  }
+
+  std::string CodeGenerator::
+  det(const std::string& sp_v, const std::string& v,
+      const std::string& sp_r, const std::string& r, const std::string& beta) {
+    add_auxiliary(CodeGenerator::AUX_DET);
+    return "casadi_det(" + sp_v + ", " + v + ", " + sp_r + ", " + r + ", " + beta + ")";
   }
 
   std::string CodeGenerator::

@@ -3523,6 +3523,11 @@ DECL M casadi_det(const M& A) {
   return det(A);
 }
 
+DECL M casadi_det(const M& A, const std::string& lsolver,
+                      const casadi::Dict& opts = casadi::Dict()) {
+  return det(A, lsolver, opts);
+}
+
 DECL M casadi_inv_minor(const M& A) {
   return inv_minor(A);
 }

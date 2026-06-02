@@ -1081,8 +1081,8 @@ namespace casadi {
     return MX::create(new Convexify(shared_from_this<MX>(), opts));
   }
 
-  MX MXNode::get_det() const {
-    return MX::create(new Determinant(shared_from_this<MX>()));
+  MX MXNode::get_det(const Linsol& linear_solver) const {
+    return MX::create(new Determinant(shared_from_this<MX>(), linear_solver));
   }
 
   MX MXNode::get_inv() const {

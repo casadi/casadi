@@ -47,6 +47,13 @@ namespace casadi {
 
   template<>
   DM CASADI_EXPORT DM::
+  det(const DM& A, const std::string& lsolver, const Dict& dict) {
+    Linsol mysolver("tmp_det", lsolver, A.sparsity(), dict);
+    return mysolver.det(A);
+  }
+
+  template<>
+  DM CASADI_EXPORT DM::
   pinv(const DM& A, const std::string& lsolver,
        const Dict& dict) {
     if (A.size1()>=A.size2()) {

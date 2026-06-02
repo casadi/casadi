@@ -25,10 +25,11 @@
 
 
 #include "determinant.hpp"
+#include "linsol_internal.hpp"
 
 namespace casadi {
 
-  Determinant::Determinant(const MX& x) : linsol_("lu", "csparse", x.sparsity()) {
+  Determinant::Determinant(const MX& x, const Linsol& linsol) : linsol_(linsol) {
     casadi_assert(x.is_square(), "Dimension mismatch. Matrix must be square, "
       "but got " + x.dim() + " instead.");
     set_dep(x);
@@ -61,9 +62,26 @@ namespace casadi {
     return 0;
   }
 
+  int Determinant::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    // Symbolic determinant via the sparse-QR plugin (cheap O(n^3), unlike cofactor)
+    SX A = SX::zeros(dep(0).sparsity());
+    std::copy(arg[0], arg[0]+dep(0).nnz(), A.ptr());
+    *res[0] = det(A, "symbolicqr").scalar();
+    return 0;
+  }
+
+  void Determinant::generate(CodeGenerator& g,
+                             const std::vector<casadi_int>& arg,
+                             const std::vector<casadi_int>& res,
+                             const std::vector<bool>& arg_is_ref,
+                             std::vector<bool>& res_is_ref) const {
+    linsol_->generate_det(g, g.work(arg[0], dep(0).nnz(), arg_is_ref[0]),
+                          g.workel(res[0]));
+  }
+
   void Determinant::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
       const std::vector<bool>& unique) const {
-    res[0] = det(arg[0]);
+    res[0] = linsol_.det(arg[0]);
   }
 
   void Determinant::ad_forward(const std::vector<std::vector<MX> >& fseed,
@@ -84,6 +102,15 @@ namespace casadi {
     for (casadi_int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0]*det_X * trans_inv_X;
     }
+  }
+
+  void Determinant::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("Determinant::linsol", linsol_);
+  }
+
+  Determinant::Determinant(DeserializingStream& s) : MXNode(s) {
+    s.unpack("Determinant::linsol", linsol_);
   }
 
 } // namespace casadi

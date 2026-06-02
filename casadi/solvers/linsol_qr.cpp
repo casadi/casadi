@@ -83,8 +83,23 @@ namespace casadi {
     sp_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
   }
 
+  // Sign (+1/-1) of a permutation: (-1)^(n - number of cycles)
+  static double permutation_sign(const std::vector<casadi_int>& p) {
+    std::vector<bool> seen(p.size(), false);
+    casadi_int ncycle = 0;
+    for (casadi_int i=0; i<static_cast<casadi_int>(p.size()); ++i) {
+      if (!seen[i]) {
+        ncycle++;
+        for (casadi_int j=i; !seen[j]; j=p[j]) seen[j] = true;
+      }
+    }
+    return (static_cast<casadi_int>(p.size())-ncycle) % 2 ? -1 : 1;
+  }
+
   void LinsolQr::finalize() {
     cache_stride_ = sp_.nnz()+sp_v_.nnz()+sp_r_.nnz()+ncol();
+    // Determinant of the (data-independent) row and column pivoting
+    pivot_sign_ = permutation_sign(prinv_) * permutation_sign(pc_);
     LinsolInternal::finalize();
   }
 
@@ -162,6 +177,12 @@ namespace casadi {
     return 0;
   }
 
+  double LinsolQr::det(void* mem, const double* A) const {
+    auto m = static_cast<LinsolQrMemory*>(mem);
+    return pivot_sign_ * casadi_det(sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
+                                    get_ptr(m->beta));
+  }
+
   void LinsolQr::generate(CodeGenerator& g, const std::string& A, const std::string& x,
                           casadi_int nrhs, bool tr) const {
     // Codegen the integer vectors
@@ -212,6 +233,32 @@ namespace casadi {
 
     // Solve
     g << g.qr_solve(x, nrhs, tr, sp_v, "v", sp_r, "r", "beta", prinv, pc, "w") << "\n";
+
+    // End of block
+    g << "}\n";
+  }
+
+  void LinsolQr::generate_det(CodeGenerator& g, const std::string& A,
+                              const std::string& d) const {
+    std::string prinv = g.constant(prinv_);
+    std::string pc = g.constant(pc_);
+    std::string sp = g.sparsity(sp_);
+    std::string sp_v = g.sparsity(sp_v_);
+    std::string sp_r = g.sparsity(sp_r_);
+
+    // Place in block to avoid conflicts caused by local variables
+    g << "{\n";
+    g << "casadi_real v[" << sp_v_.nnz() << "], "
+         "r[" << sp_r_.nnz() << "], "
+         "beta[" << ncol() << "], "
+         "w[" << nrow() + ncol() << "];\n";
+
+    // Factorize
+    g << g.qr(sp, A, "w", sp_v, "v", sp_r, "r", "beta", prinv, pc) << "\n";
+
+    // Determinant from the factors, corrected by the pivoting sign
+    g << d << " = " << (pivot_sign_ < 0 ? "-" : "")
+      << g.det(sp_v, "v", sp_r, "r", "beta") << ";\n";
 
     // End of block
     g << "}\n";

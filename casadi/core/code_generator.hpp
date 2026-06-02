@@ -515,6 +515,10 @@ namespace casadi {
                    const std::string& r, const std::string& beta,
                    const std::string& prinv, const std::string& pc);
 
+    /** \brief Determinant from sparse QR factors */
+    std::string det(const std::string& sp_v, const std::string& v,
+                    const std::string& sp_r, const std::string& r, const std::string& beta);
+
     /** \brief QR solve
 
         \identifier{t0} */
@@ -724,6 +728,7 @@ namespace casadi {
       AUX_ND_BOOR_EVAL,
       AUX_FINITE_DIFF,
       AUX_QR,
+      AUX_DET,
       AUX_QP,
       AUX_QRQP,
       AUX_SOCP,

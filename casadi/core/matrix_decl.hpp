@@ -376,6 +376,8 @@ namespace casadi {
     static Matrix<Scalar> mldivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static std::vector<Matrix<Scalar> > symvar(const Matrix<Scalar> &x);
     static Matrix<Scalar> det(const Matrix<Scalar> &x);
+    static Matrix<Scalar> det(const Matrix<Scalar> &x, const std::string& lsolver,
+                              const Dict& dict=Dict());
     static Matrix<Scalar> inv_minor(const Matrix<Scalar> &x);
     static Matrix<Scalar> trace(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_1(const Matrix<Scalar> &x);
