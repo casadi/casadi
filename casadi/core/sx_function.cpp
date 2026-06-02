@@ -1558,6 +1558,14 @@ namespace casadi {
         }
       }
     }
+
+    // Drop sparsity of fully structurally-zero sensitivities, matching MXFunction (#4345)
+    for (casadi_int d=0; d<nadj; ++d) {
+      for (casadi_int i=0; i<n_in_; ++i) {
+        SX& a = asens[d][i];
+        if (a.is_zero()) a = SX(a.size1(), a.size2());
+      }
+    }
   }
 
   template<typename T, typename CT>

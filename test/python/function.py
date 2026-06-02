@@ -3731,7 +3731,20 @@ class Functiontests(casadiTestCase):
     f = StringDeserializer(data).unpack()
     print(f.reverse(1))
     f.reverse(1).jac_sparsity()
-   
+
+  def test_issue_4345(self):
+    # SXFunction must match MXFunction adjoint sparsity; a structurally-zero
+    # sensitivity (unused input) should come out 0nz, not full-pattern.
+    for X in [SX,MX]:
+      x = X.sym("x", Sparsity.upper(3))
+      y = X.sym("y", Sparsity.upper(3))
+      for z, adj_y_nnz in [(x**2,          0),   # y unused        -> adj_y 0nz
+                           (x**2 + y[0,0], 6),   # y partially used -> adj_y 6nz
+                           (x*y,           6)]:  # y fully used     -> adj_y 6nz
+        adj = Function("f", [x, y], [z]).reverse(1)
+        self.assertEqual(adj.nnz_out(0), 6)            # adj_x: full input pattern
+        self.assertEqual(adj.nnz_out(1), adj_y_nnz)    # adj_y: SX must agree with MX
+
   @requires_nlpsol("ipopt")
   def test_issue_3134(self):
     p = MX.sym("p")
