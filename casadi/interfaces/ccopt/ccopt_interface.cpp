@@ -93,10 +93,8 @@ const Options MadmpecInterface::options_
 };
 
 // Recursively flatten options for libmad options dict.
-void flatten_opts(Dict& ret, const Dict& opts, const std::string& prefix)
-{
-  for (const auto& kv : opts)
-  {
+void flatten_opts(Dict& ret, const Dict& opts, const std::string& prefix) {
+  for (const auto& kv : opts) {
     switch (kv.second.getType()) {
      case OT_DICT:
        flatten_opts(ret, kv.second, prefix + kv.first + ".");
@@ -147,7 +145,8 @@ void MadmpecInterface::init(const Dict& opts) {
   if (cc_types.empty()) {
     cc_types.resize(cc_pairs.size(), 0);
   }
-  casadi_assert(cc_pairs.size()==cc_types.size(), "Options 'cc_pairs' and 'cc_types' must have the same length.");
+  casadi_assert(cc_pairs.size()==cc_types.size(),
+    "Options 'cc_pairs' and 'cc_types' must have the same length.");
   for (auto && e : cc_types) {
     cctypes_.push_back(e);
   }
