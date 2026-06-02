@@ -241,6 +241,9 @@
 %exception  casadi::CodeGenerator::densify(const std::string &arg, const Sparsity &sp_arg, const std::string &res, bool tr=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::det(const std::string &sp_v, const std::string &v, const std::string &sp_r, const std::string &r, const std::string &beta) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::dot(casadi_int n, const std::string &x, const std::string &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2263,6 +2266,9 @@
 %exception  casadi::GenericMatrix::det(const MatType &A) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix::det(const MatType &A, const std::string &lsolver, const Dict &dict=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericMatrix::diag(const MatType &A) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3328,6 +3334,12 @@
 %exception  casadi::Linsol::checkout() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Linsol::det(const DM &A) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Linsol::det(const MX &A) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Linsol::neig(const DM &A) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3419,6 +3431,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::det(const MX &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::det(const MX &x, const std::string &lsolver, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::diag(const MX &x) {
@@ -4109,6 +4124,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::det(const Matrix< Scalar > &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::det(const Matrix< Scalar > &x, const std::string &lsolver, const Dict &dict=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::diag(const Matrix< Scalar > &x) {

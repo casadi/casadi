@@ -49,16 +49,24 @@ namespace casadi {
     /// Destructor
     ~Determinant() override {}
 
-    /** \brief Evaluate the function numerically */
+    /** \brief Evaluate the function numerically
+
+        \identifier{2hq} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief Evaluate the function symbolically (SX) */
+    /** \brief Evaluate the function symbolically (SX)
+
+        \identifier{2hr} */
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief Length of w the generated code needs (eval uses Linsol memory) */
+    /** \brief Length of w the generated code needs (eval uses Linsol memory)
+
+        \identifier{2hs} */
     size_t codegen_sz_w() const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{2ht} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
@@ -93,7 +101,9 @@ namespace casadi {
         \identifier{xk} */
     casadi_int op() const override { return OP_DETERMINANT;}
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{2hu} */
     void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize without type information

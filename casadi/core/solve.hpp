@@ -170,7 +170,9 @@ namespace casadi {
         \identifier{gb} */
     size_t sz_w() const override;
 
-    /** \brief Length of w the generated code needs (QR factorization buffers) */
+    /** \brief Length of w the generated code needs (QR factorization buffers)
+
+        \identifier{2hv} */
     size_t codegen_sz_w() const override;
 
     /** \brief Generate code for the operation

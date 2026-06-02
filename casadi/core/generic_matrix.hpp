@@ -487,7 +487,9 @@ namespace casadi {
         \identifier{1bx} */
     inline friend MatType det(const MatType& A) { return MatType::det(A);}
 
-    /** \brief Matrix determinant (experimental) */
+    /** \brief Matrix determinant (experimental)
+
+        \identifier{2hx} */
     inline friend MatType det(const MatType& A, const std::string& lsolver,
                               const Dict& dict=Dict()) {
       return MatType::det(A, lsolver, dict);

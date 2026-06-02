@@ -453,7 +453,9 @@ namespace casadi {
 
         For nodes whose VM eval and codegen have different scratch needs, e.g. a
         determinant/solve whose eval uses Linsol memory but whose generated C
-        carves the factorization buffers from w. */
+        carves the factorization buffers from w.
+
+        \identifier{2hp} */
     virtual size_t codegen_sz_w() const { return sz_w();}
 
     /// Set unary dependency

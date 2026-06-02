@@ -515,7 +515,9 @@ namespace casadi {
                    const std::string& r, const std::string& beta,
                    const std::string& prinv, const std::string& pc);
 
-    /** \brief Determinant from sparse QR factors */
+    /** \brief Determinant from sparse QR factors
+
+        \identifier{2hy} */
     std::string det(const std::string& sp_v, const std::string& v,
                     const std::string& sp_r, const std::string& r, const std::string& beta);
 

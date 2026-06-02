@@ -128,7 +128,8 @@ namespace casadi {
     /** \brief Matrix determinant
 
       * Not available for all solvers
-      */
+
+        \identifier{2hw} */
     double det(const DM& A) const;
 
     /// Matrix determinant as an MX graph node
