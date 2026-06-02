@@ -77,6 +77,7 @@ set(RUNTIME_SRC
   casadi_finite_diff.hpp
   casadi_ldl.hpp
   casadi_qr.hpp
+  casadi_det.hpp
   casadi_qp.hpp
   casadi_qrqp.hpp
   casadi_kkt.hpp
