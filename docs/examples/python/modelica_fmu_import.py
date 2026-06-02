@@ -27,11 +27,11 @@ with open('rocket.mo', 'r') as f: print(f.read())
 # OpenModelica/OMPython, cf. the OpenModelica User's Guide.
 from OMPython import OMCSessionZMQ
 omc = OMCSessionZMQ()
-if omc.loadFile('rocket.mo').startswith('false'):
-  raise Exception('Modelica compilation failed: {}'.format(omc.sendExpression('getErrorString()')))
+if omc.sendExpression('loadFile("rocket.mo")')==('False'):
+     raise Exception('Modelica compilation failed: {}'.format(omc.sendExpression('getErrorString()', parsed=False)))
 omc.sendExpression('setDebugFlags("-disableDirectionalDerivatives")')
-fmu_file = omc.sendExpression('translateModelFMU(rocket)')
-flag = omc.sendExpression('getErrorString()')
+fmu_file = omc.sendExpression('buildModelFMU(rocket, version="2.0", fmuType="me")')
+flag = omc.sendExpression('getErrorString()', parsed=False)
 if not fmu_file.endswith('.fmu'): raise Exception('FMU generation failed: {}'.format(flag))
 print("translateModelFMU warnings:\n{}".format(flag))
 
