@@ -89,6 +89,9 @@ namespace casadi {
     /** \brief Symbolic determinant via sparse QR factorization
 
         Exposed (no instantiation needed) through LinsolInternal::Exposed::det. */
+    // Keep the inherited numeric det(void*, const double*) visible: the static
+    // overload below would otherwise hide it (-Werror=overloaded-virtual on MinGW).
+    using LinsolInternal::det;
     static SX det(const SX& A, const Dict& opts);
 
     ///@{
