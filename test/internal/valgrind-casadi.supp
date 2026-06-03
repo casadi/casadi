@@ -721,3 +721,14 @@ obj:*libworhp*
    fun:malloc
    fun:thread_PyThread_start_new_thread
 }
+
+{
+   Deliberate leaky-singleton statics (e.g. casadi_c.cpp *new) run by _dl_init during dlopen
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   ...
+   fun:_dl_init
+   ...
+   fun:_dlerror_run
+}
