@@ -112,15 +112,15 @@ int main(){
 
   // Print the optimal solution
   std::vector<double> uopt(res.at("x"));
-  std::cout << "optimal control: " << uopt << std::endl;
+  std::cout << "optimal control: " << str(uopt) << std::endl;
 
   // Get the state trajectory
   Function xfcn("xfcn", {u}, {s_traj, v_traj, m_traj});
   std::vector<double> sopt, vopt, mopt;
   xfcn({uopt}, {&sopt, &vopt, &mopt});
-  std::cout << "position: " << sopt << std::endl;
-  std::cout << "velocity: " << vopt << std::endl;
-  std::cout << "mass:     " << mopt << std::endl;
+  std::cout << "position: " << str(sopt) << std::endl;
+  std::cout << "velocity: " << str(vopt) << std::endl;
+  std::cout << "mass:     " << str(mopt) << std::endl;
 
   // Create Matlab script to plot the solution
   std::ofstream file;
@@ -130,13 +130,13 @@ int main(){
   file << "% Generated " __DATE__ " at " __TIME__ << std::endl;
   file << std::endl;
   file << "cost = " << cost << ";" << std::endl;
-  file << "u = " << uopt << ";" << std::endl;
+  file << "u = " << str(uopt) << ";" << std::endl;
 
   // Save results to file
   file << "t = linspace(0,10.0," << nu << ");"<< std::endl;
-  file << "s = " << sopt << ";" << std::endl;
-  file << "v = " << vopt << ";" << std::endl;
-  file << "m = " << mopt << ";" << std::endl;
+  file << "s = " << str(sopt) << ";" << std::endl;
+  file << "v = " << str(vopt) << ";" << std::endl;
+  file << "m = " << str(mopt) << ";" << std::endl;
 
   // Finalize the results file
   file << std::endl;
