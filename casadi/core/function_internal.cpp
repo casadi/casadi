@@ -3638,8 +3638,6 @@ namespace casadi {
   bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp, casadi_int& npar) {
     // Matching dimensions
     if (arg.size()==inp.size()) return true;
-    // Calling with empty matrix - set all to zero
-    if (arg.is_empty()) return true;
     // Calling with a scalar - set all
     if (arg.is_scalar()) return true;
     // Vectors that are transposes of each other
@@ -3647,13 +3645,15 @@ namespace casadi {
     // Horizontal repmat
     if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && inp.size2()%arg.size2()==0) return true;
-    if (npar==-1) return false;
     // Evaluate with multiple arguments
-    if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+    if (npar!=-1 && arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && arg.size2()%(npar*inp.size2())==0) {
       npar *= arg.size2()/(npar*inp.size2());
       return true;
     }
+    // Calling with empty matrix - set all to zero (after the structured branches above,
+    // so that a 0-by-N argument can still be recognised as a parallel/repmat call)
+    if (arg.is_empty()) return true;
     // No match
     return false;
   }

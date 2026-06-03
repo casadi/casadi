@@ -2707,6 +2707,25 @@ class Functiontests(casadiTestCase):
     res = f.nz_from_in(f.convert_in(ins))
     self.checkarray(res,[1,2,7,4,8,9,2,2,2,1,3,1,3])
 
+  def test_issue3977(self):
+    # A 0-by-N argument to a 0-by-M input must be recognised as a parallel/repmat
+    # call (N a multiple of M), not collapsed to the input shape as a generic empty.
+    for X in [SX, MX]:
+      x = X.sym("x", 0, 1)
+      f = Function("f", [x], [x**2])
+      self.assertEqual(f(DM(0, 3)).shape, (0, 3))
+      self.assertEqual(f(DM(0, 1)).shape, (0, 1))
+
+      x = X.sym("x", 0, 2)
+      f = Function("f", [x], [x**2])
+      self.assertEqual(f(DM(0, 6)).shape, (0, 6))
+
+    # Empty argument against a non-degenerate input still acts as a zero placeholder.
+    x = SX.sym("x", 3, 1)
+    f = Function("f", [x], [x**2])
+    self.assertEqual(f(DM(0, 0)).shape, (3, 1))
+    self.assertEqual(f(DM(0, 1)).shape, (3, 1))
+
   def test_convert_in(self):
     x = MX.sym("x")
     y = MX.sym("y")

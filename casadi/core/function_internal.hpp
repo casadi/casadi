@@ -1808,9 +1808,6 @@ namespace casadi {
     if (arg.size()==inp.size()) {
       // Matching dimensions already
       return arg;
-    } else if (arg.is_empty()) {
-      // Empty matrix means set zero
-      return M(inp.size());
     } else if (arg.is_scalar()) {
       // Scalar assign means set all
       return M(inp, arg);
@@ -1821,10 +1818,15 @@ namespace casadi {
                && inp.size2()%arg.size2()==0) {
       // Horizontal repmat
       return repmat(arg, 1, inp.size2()/arg.size2());
-    } else {
-      casadi_assert_dev(npar!=-1);
-      // Multiple evaluation
+    } else if (npar!=-1 && arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+               && (npar*inp.size2())%arg.size2()==0) {
+      // Multiple evaluation: grow argument horizontally to npar*inp columns
       return repmat(arg, 1, (npar*inp.size2())/arg.size2());
+    } else {
+      // Empty matrix means set zero (kept last so a 0-by-N argument is first given the
+      // chance to be recognised as a parallel/repmat call above)
+      casadi_assert_dev(arg.is_empty());
+      return M(inp.size());
     }
   }
 
