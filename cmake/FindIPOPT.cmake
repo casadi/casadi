@@ -1,4 +1,4 @@
-find_package(Ipopt CONFIG)
+find_package(Ipopt CONFIG QUIET)
 
 
 if(Ipopt_FOUND)
