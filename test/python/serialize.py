@@ -45,6 +45,7 @@ class FooMX():
 class SerializeTests(casadiTestCase):
 
 
+  @memory_heavy()
   def test_compat(self):
   
     dir = "serialize_3.5.5"

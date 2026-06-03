@@ -1884,6 +1884,7 @@ class Functiontests(casadiTestCase):
       self.assertTrue(JA.nnz()==0)
       self.assertTrue(Jt.nnz()==n**2)
 
+  @memory_heavy()
   def test_conditional(self):
 
     np.random.seed(5)
@@ -2156,6 +2157,7 @@ class Functiontests(casadiTestCase):
     self.check_codegen(f,inputs=[np.random.random((3,3))], opts={"avoid_stack": True})
 
 
+  @memory_heavy()
   def test_serialize(self):
     for opts in [{"debug":True},{}]:
       x = SX.sym("x")
@@ -3265,6 +3267,7 @@ class Functiontests(casadiTestCase):
         # wrapper function should not have it's own reference counting
         self.assertEqual(n_matches,1)
 
+  @memory_heavy()
   def test_codegen_thread_safe(self):
   
     for variant in [0,1]:

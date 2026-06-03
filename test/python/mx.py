@@ -1133,6 +1133,7 @@ class MXtests(casadiTestCase):
 
 
 
+  @memory_heavy()
   def test_mtimes_blas_plugin(self):
     import os, tempfile
     
@@ -2450,6 +2451,7 @@ class MXtests(casadiTestCase):
       self.check_serialize(f, inputs=[a_val, b_val])
       self.checkfunction(f, f.expand(), inputs=[a_val, b_val])
 
+  @memory_heavy()
   def test_kron_contract_flavors(self):
     # KronContract has 4 dispatch paths (DenseKronContract,
     # DenseSparseKronContract, SparseDenseKronContract, and base). For each
@@ -3436,6 +3438,7 @@ class MXtests(casadiTestCase):
 
     self.checkarray(F(v),np.interp(xq,x,v))
 
+  @memory_heavy()
   def test_bilin_etc(self):
     x = MX.sym("x",3,3)
     y = MX.sym("y",3,1)
@@ -3493,6 +3496,7 @@ class MXtests(casadiTestCase):
     self.checkfunction(f,F,inputs=[x0])
     self.check_codegen(F,inputs=[x0])
 
+  @memory_heavy()
   def test_det_solvers(self):
     # Determinant through the linear-solver plugins, across sizes and a sparse pattern
     numpy.random.seed(1)
@@ -4100,6 +4104,7 @@ class MXtests(casadiTestCase):
     self.checkarray(i,A[i].mapping())
 
 
+  @memory_heavy()
   def test_convexify(self):
     A = diagcat(1,2,-1,blockcat([[1.2,1.3],[1.3,4]]),sparsify(blockcat([[0,1,0],[1,4,7],[0,7,9]])),DM(2,2))
 
@@ -4679,6 +4684,7 @@ class MXtests(casadiTestCase):
         f = Function("f",[x],[(x**2).printme(2)+6])
         self.check_codegen(f,inputs=[3])
         
+  @memory_heavy()
   def test_norms(self):
   
     for f in [lambda x,X: vertcat(x[0],X(1,1),x[1:]),

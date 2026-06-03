@@ -550,6 +550,7 @@ class ConicTests(casadiTestCase):
 
       self.assertRaises(Exception,lambda : solver(solver_in))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
+  @memory_heavy()
   def test_equality(self):
     self.message("Regression 452 test: equality constraints give wrong multipliers")
     H = DM([[1,-1],[-1,2]])

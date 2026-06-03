@@ -286,6 +286,7 @@ class TypingTests(casadiTestCase):
             "Full pyright stdout:\n%s" % (case, result.stdout[:2000]),
         )
 
+  @memory_heavy()
   def test_pyright_suite(self):
     """pyright on the full python test suite stays within the error budget."""
     if not _have_pyright():
@@ -368,6 +369,7 @@ class TypingTests(casadiTestCase):
           file=sys.stderr,
       )
 
+  @memory_heavy()
   def test_pyright_expect_error_sentinels(self):
     """Each `# expect-error: <rule1>,<rule2>` sentinel in a tracked
     file must correspond to a pyright diagnostic on that line whose

@@ -68,6 +68,7 @@ for cl, t, options in integrators:
 class Integrationtests(casadiTestCase):
 
   @slow()
+  @memory_heavy()
   def test_full(self):
     num = self.num
     tc = DM(n.linspace(0,num['tend'],100))
@@ -115,6 +116,7 @@ class Integrationtests(casadiTestCase):
       self.checkfunction(integrator,solution,inputs=f_in,digits=3)
 
   @slow()
+  @memory_heavy()
   def test_tools(self):
     num = self.num
 

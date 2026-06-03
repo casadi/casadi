@@ -284,6 +284,7 @@ class OCPtests(casadiTestCase):
 
   @requires_nlpsol("fatrop")
   @requires_nlpsol("ipopt")
+  @memory_heavy()
   def test_fatrop(self):
   
   

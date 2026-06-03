@@ -321,6 +321,7 @@ class LinearSolverTests(casadiTestCase):
       res = np.linalg.solve(A0,b)
       self.checkarray(x, res)
 
+  @memory_heavy()
   def test_simple_function_indirect(self):
 
     for Solver, options,req in lsolvers:

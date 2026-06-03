@@ -1622,6 +1622,7 @@ class SXtests(casadiTestCase):
     #self.assertNotEqual(h1,output_1b.element_hash())
 
 
+  @memory_heavy()
   def test_call_fun(self):
 
     A = sparsify(DM([[1,0,1],[0,0,6],[0,8,9]]))
@@ -1779,6 +1780,7 @@ class SXtests(casadiTestCase):
     
     self.checkfunction(f,fref,inputs=[[0.1,0.2]])
   
+  @memory_heavy()
   def test_call_fun_copy_elision(self):
     old = GlobalOptions.getCopyElisionMinSize()
     GlobalOptions.setCopyElisionMinSize(0)
