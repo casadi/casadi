@@ -5,6 +5,10 @@ project(demo)
 # export CMAKE_PREFIX_PATH=../casadi_install/casadi/cmake/
 find_package(casadi CONFIG REQUIRED)
 
+# The version is exposed through the standard CMake config-package variables.
+message(STATUS "Found CasADi ${casadi_VERSION} "
+        "(${casadi_VERSION_MAJOR}.${casadi_VERSION_MINOR}.${casadi_VERSION_PATCH})")
+
 add_executable(casadi_demo casadi_demo.cpp)
 target_link_libraries(casadi_demo casadi::casadi)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")

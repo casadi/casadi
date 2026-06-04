@@ -4,8 +4,7 @@ project(casadi-standalone-example CXX)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../cmake)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-find_package(CASADI REQUIRED)
-include_directories(${CASADI_INCLUDE_DIR})
+find_package(casadi CONFIG REQUIRED)
 find_package(IPOPT REQUIRED)
 link_directories(${IPOPT_LIBRARY_DIRS})
 
@@ -18,8 +17,8 @@ if(OPENCL_FOUND)
 endif()
 
 add_executable(embedding_part1 embedding_part1.cpp)
-target_link_libraries(embedding_part1 ${CASADI_LIBRARIES} ${CASADI_DEPENDENCIES})
+target_link_libraries(embedding_part1 casadi::casadi ${CASADI_DEPENDENCIES})
 
 add_executable(embedding_part3 embedding_part3.cpp)
-target_link_libraries(embedding_part3 ${CASADI_LIBRARIES} ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
+target_link_libraries(embedding_part3 casadi::casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
 
