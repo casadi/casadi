@@ -4850,5 +4850,26 @@ class Functiontests(casadiTestCase):
     foo = Function("foo", [y], [vertcat(sin(y[0]*y[1]), cos(y[0]*y[1]))])
     fadj = foo.reverse(1).forward(1)
     check(fadj, all_masks(fadj.nnz_in()))
+
+    # End-to-end: the inactive 2nd-order call node is dropped at construction (Call::create)
+    args = []
+    for i in range(fadj.n_in()):
+        if fadj.name_in(i).startswith("fwd_"):
+            args.append(MX(fadj.size1_in(i), fadj.size2_in(i)))    # zero seed
+        else:
+            args.append(MX.sym("a%d" % i, fadj.sparsity_in(i)))
+    self.assertTrue(fadj.call(args)[0].is_zero())                  # removed -> structural zero
+    args_nz = [MX.sym("b%d" % i, fadj.sparsity_in(i)) for i in range(fadj.n_in())]
+    self.assertFalse(fadj.call(args_nz)[0].is_zero())              # nonzero seeds -> call kept
+
+    # no_hess Hessian-of-Lagrangian no longer embeds the 2nd-order derivative call
+    x = MX.sym("x", 2)
+    lam = MX.sym("lam", 2); sig = MX.sym("sig")
+    L = sig*sumsqr(x-2) + dot(lam, no_hess(foo(x**2)))
+    H = hessian(L, x)[0]
+    Hf = Function("H", [x, lam, sig], [H])
+    self.assertEqual(len(Hf.get_function()), 0)                   # no embedded call nodes remain
+    self.assertEqual(H.nnz(), 2)                                  # diagonal (objective) only
+
 if __name__ == '__main__':
     unittest.main()   
