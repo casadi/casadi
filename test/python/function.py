@@ -3045,8 +3045,8 @@ class Functiontests(casadiTestCase):
   def test_codegen_with_mem(self):
     x = MX.sym("x")
     f = Function("F",[x],[3*x])
-    self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True},definitions=["inline=\"\""])
-    self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True,"with_header":True},definitions=["inline=\"\""])
+    self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True,"force_canonical":True},definitions=["inline=\"\""])
+    self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True,"with_header":True,"force_canonical":True},definitions=["inline=\"\""])
 
   def test_codegen_scalars_bug(self):
     x = MX.sym("x")

@@ -142,8 +142,8 @@ namespace casadi {
     }
 
     if (with_mem && !force_canonical) {
-      casadi_error("Codegen options 'with_mem' and 'force_canonical=false' (the default) are incompatible. "
-      "If you rely on with_mem, please explicitly set force_canonical=true.");
+      casadi_error("Codegen options 'with_mem' and 'force_canonical=false' (the default) "
+      "are incompatible. If you rely on with_mem, please explicitly set force_canonical=true.");
     }
 
     // If real_min is not specified, make an educated guess
