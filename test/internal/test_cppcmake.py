@@ -26,19 +26,36 @@ src = sys.argv[1]
 import os
 
 """
-Test cpp files that are made with CMAKE and put in the /build/bin directory
+Test cpp files that are made with CMAKE and put in the /build/bin directory.
+
+By default the executables are run from ../build/bin. Set CASADI_EXAMPLE_BINDIR
+to run pre-installed executables from another directory (e.g. an unpacked
+binary package); sources without a matching executable there are skipped.
 """
 
 from testsuite import TestSuite
 
 from subprocess import *
 
+args = sys.argv[2:]
+bindir = os.environ.get("CASADI_EXAMPLE_BINDIR")
+if bindir:
+  workingdir = lambda dir: bindir
+  command = lambda dir,fn,opt: ['./'+fn.replace('.cpp','')]+opt
+  missing = [f for f in os.listdir(src) if f.endswith('.cpp')
+             and not any(os.path.exists(os.path.join(bindir, f[:-4]+ext)) for ext in ('', '.exe'))]
+  if missing:
+    args = args + ['-skipfiles='+' '.join(missing)]
+else:
+  workingdir = lambda dir: '../build'
+  command = lambda dir,fn,opt: ['./bin/'+fn.replace('.cpp','')]+opt
+
 t = TestSuite(dirname=src,
   suffix="cpp",
-  command = lambda dir,fn,opt:  ['./bin/'+fn.replace('.cpp','')]+opt,
-  workingdir = lambda dir: '../build',
-  skipdirs=[".svn","ctemplate"],
-  args=sys.argv[2:]
+  command = command,
+  workingdir = workingdir,
+  skipdirs=[".svn","ctemplate","cmake_find_package","cmake_pkgconfig","CMakeFiles"],
+  args=args
   )
 
 t.run()

@@ -22,11 +22,13 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <cstdlib>
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
 
 int main(){
+  if (std::getenv("SKIP_SNOPT_TESTS")) return 0;
 
   std::cout << "program started" << std::endl;
 
