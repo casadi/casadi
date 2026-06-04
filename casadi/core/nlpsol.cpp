@@ -230,9 +230,11 @@ namespace casadi {
       oracle_options = it->second;
     } else {
       // Propagate selected options from Nlpsol to oracle by default
-      for (const char* op : {"verbose", "regularity_check"})
-      if ((it = opts.find(op)) != opts.end()) {
-        oracle_options[op] = it->second;
+      for (const char* op : {"verbose", "regularity_check"}) {
+        it = opts.find(op);
+        if (it != opts.end()) {
+          oracle_options[op] = it->second;
+        }
       }
     }
 
@@ -689,7 +691,7 @@ namespace casadi {
 
   int Nlpsol::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
-    auto m = static_cast<NlpsolMemory*>(mem);
+    auto *m = static_cast<NlpsolMemory*>(mem);
     m->add_stat("callback_fun");
     m->success = false;
     m->d_nlp.prob = nullptr;
@@ -698,8 +700,8 @@ namespace casadi {
   }
 
   void Nlpsol::check_inputs(void* mem) const {
-    auto m = static_cast<NlpsolMemory*>(mem);
-    auto d_nlp = &m->d_nlp;
+    auto *m = static_cast<NlpsolMemory*>(mem);
+    auto *d_nlp = &m->d_nlp;
 
     // Skip check?
     if (!inputs_check_) return;
@@ -789,13 +791,13 @@ namespace casadi {
   }
 
   int Nlpsol::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    auto m = static_cast<NlpsolMemory*>(mem);
+    auto *m = static_cast<NlpsolMemory*>(mem);
 
-    auto d_nlp = &m->d_nlp;
+    auto *d_nlp = &m->d_nlp;
 
     // Reset the solver, prepare for solution
     setup(m, arg, res, iw, w);
-    auto p_nlp = d_nlp->prob;
+    const auto *p_nlp = d_nlp->prob;
 
     // Set initial guess
     casadi_copy(d_nlp->x0, nx_, d_nlp->z);
@@ -881,7 +883,7 @@ namespace casadi {
 
   void Nlpsol::set_work(void* mem, const double**& arg, double**& res,
                         casadi_int*& iw, double*& w) const {
-    auto m = static_cast<NlpsolMemory*>(mem);
+    auto *m = static_cast<NlpsolMemory*>(mem);
 
     // Problem has not been solved at this point
     m->success = false;
@@ -1211,7 +1213,7 @@ namespace casadi {
     // Callback inputs
     std::fill_n(m->arg, fcallback_.n_in(), nullptr);
 
-    auto d_nlp = &m->d_nlp;
+    auto *d_nlp = &m->d_nlp;
 
     m->arg[NLPSOL_X] = d_nlp->z;
     m->arg[NLPSOL_F] = &d_nlp->objective;
@@ -1248,10 +1250,10 @@ namespace casadi {
 
   Dict Nlpsol::get_stats(void* mem) const {
     Dict stats = OracleFunction::get_stats(mem);
-    auto m = static_cast<NlpsolMemory*>(mem);
+    auto *m = static_cast<NlpsolMemory*>(mem);
     casadi_assert(m->d_nlp.prob,
       "No stats available: nlp Solver instance has not yet been called with numerical arguments.");
-    auto d_nlp = &m->d_nlp;
+    auto *d_nlp = &m->d_nlp;
     stats["success"] = m->success;
     stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
     if (d_nlp->prob && d_nlp->prob->detect_bounds.ng) {

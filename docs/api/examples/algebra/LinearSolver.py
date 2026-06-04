@@ -38,7 +38,7 @@ x=DM([tan(i) for i in range(n)])
 
 # We generate the b vector:
 
-b= mtimes(A,x)
+b= A @ x
 
 # Commented out pendling completion #1615
 

@@ -1345,6 +1345,11 @@ namespace casadi {
        \identifier{nm} */
     casadi_release_t release_;
 
+    /** \brief Incref/decref redirected to C functions
+
+        \identifier{2gg} */
+    signal_t incref_, decref_;
+
     /** \brief Dict of statistics (resulting from evaluate)
 
         \identifier{nn} */

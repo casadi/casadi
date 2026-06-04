@@ -32,7 +32,9 @@ typedef struct {
   double t;
   double p[N_P];
   double x[N_X];
+  double z[N_Z];
   double xdot[N_X];
+  double alg[N_Z];
   double u[N_U];
   double y[N_Y];
   double zero[N_ZERO];
@@ -43,7 +45,9 @@ typedef struct {
   // Buffers for derivative calculations
   double dp[N_P];
   double dx[N_X];
+  double dz[N_Z];
   double dxdot[N_X];
+  double dalg[N_Z];
   double du[N_U];
   double dy[N_Y];
   double dzero[N_ZERO];
@@ -60,6 +64,7 @@ int evaluate(casadi_fmi_memory* m) {
   int mem, flag;
   // Copy states, inputs and parameters to input buffers
   for (i = 0; i < N_X; ++i) m->x[i] = m->v[x_vr[i]];
+  for (i = 0; i < N_Z; ++i) m->z[i] = m->v[z_vr[i]];
   for (i = 0; i < N_P; ++i) m->p[i] = m->v[p_vr[i]];
   for (i = 0; i < N_U; ++i) m->u[i] = m->v[u_vr[i]];
 
@@ -67,12 +72,14 @@ int evaluate(casadi_fmi_memory* m) {
   i = 0;
   m->arg[i++] = &m->t;
   m->arg[i++] = m->x;
+  m->arg[i++] = m->z;
   m->arg[i++] = m->p;
   m->arg[i++] = m->u;
 
   // Map outputs to evaluation buffer
   i = 0;
   m->res[i++] = m->xdot;
+  m->res[i++] = m->alg;
   m->res[i++] = m->y;
   m->res[i++] = m->zero;
 
@@ -83,6 +90,7 @@ int evaluate(casadi_fmi_memory* m) {
 
   // Copy from output buffers
   for (i = 0; i < N_X; ++i) m->v[xdot_vr[i]] = m->xdot[i];
+  for (i = 0; i < N_Z; ++i) m->v[alg_vr[i]] = m->alg[i];
   for (i = 0; i < N_Y; ++i) m->v[y_vr[i]] = m->y[i];
   for (i = 0; i < N_ZERO; ++i) m->v[zero_vr[i]] = m->zero[i];
 
@@ -95,6 +103,7 @@ int evaluate_forward(casadi_fmi_memory* m) {
   int mem, flag;
   // Copy seeds for states, inputs and parameters to input buffers
   for (i = 0; i < N_X; ++i) m->dx[i] = m->d[x_vr[i]];
+  for (i = 0; i < N_Z; ++i) m->dz[i] = m->d[z_vr[i]];
   for (i = 0; i < N_P; ++i) m->dp[i] = m->d[p_vr[i]];
   for (i = 0; i < N_U; ++i) m->du[i] = m->d[u_vr[i]];
 
@@ -102,23 +111,27 @@ int evaluate_forward(casadi_fmi_memory* m) {
   i = 0;
   m->arg[i++] = 0;  // t
   m->arg[i++] = m->x;
+  m->arg[i++] = m->z;
   m->arg[i++] = m->p;
   m->arg[i++] = m->u;
 
   // Map nondifferentiated outputs to evaluation buffer
   m->arg[i++] = m->xdot;
+  m->arg[i++] = m->alg;
   m->arg[i++] = m->y;
   m->arg[i++] = m->zero;
 
   // Map forward seeds
   m->arg[i++] = 0;
   m->arg[i++] = m->dx;
+  m->arg[i++] = m->dz;
   m->arg[i++] = m->dp;
   m->arg[i++] = m->du;
 
   // Map forward sensitivities
   i = 0;
   m->res[i++] = m->dxdot;
+  m->res[i++] = m->dalg;
   m->res[i++] = m->dy;
   m->res[i++] = m->dzero;
 
@@ -129,6 +142,7 @@ int evaluate_forward(casadi_fmi_memory* m) {
 
   // Copy from output buffers
   for (i = 0; i < N_X; ++i) m->d[xdot_vr[i]] = m->dxdot[i];
+  for (i = 0; i < N_Z; ++i) m->d[alg_vr[i]] = m->dalg[i];
   for (i = 0; i < N_Y; ++i) m->d[y_vr[i]] = m->dy[i];
   for (i = 0; i < N_ZERO; ++i) m->d[zero_vr[i]] = m->dzero[i];
 
@@ -142,11 +156,13 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
   int mem, flag;
   // Copy seeds for output buffers
   for (i = 0; i < N_X; ++i) m->dxdot[i] = m->d[xdot_vr[i]];
+  for (i = 0; i < N_Z; ++i) m->dalg[i] = m->d[alg_vr[i]];
   for (i = 0; i < N_Y; ++i) m->dy[i] = m->d[y_vr[i]];
   for (i = 0; i < N_ZERO; ++i) m->dzero[i] = m->d[zero_vr[i]];
 
   // Clear sensitivities
   for (i = 0; i < N_X; ++i) m->dx[i] = 0;
+  for (i = 0; i < N_Z; ++i) m->dz[i] = 0;
   for (i = 0; i < N_P; ++i) m->dp[i] = 0;
   for (i = 0; i < N_U; ++i) m->du[i] = 0;
 
@@ -154,16 +170,19 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
   i = 0;
   m->arg[i++] = 0;  // t
   m->arg[i++] = m->x;
+  m->arg[i++] = m->z;
   m->arg[i++] = m->p;
   m->arg[i++] = m->u;
 
   // Map nondifferentiated outputs to evaluation buffer
   m->arg[i++] = m->xdot;
+  m->arg[i++] = m->alg;
   m->arg[i++] = m->y;
   m->arg[i++] = m->zero;
 
   // Map adjoint seeds
   m->arg[i++] = m->dxdot;
+  m->arg[i++] = m->dalg;
   m->arg[i++] = m->dy;
   m->arg[i++] = m->dzero;
 
@@ -171,6 +190,7 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
   i = 0;
   m->res[i++] = 0;  // t
   m->res[i++] = m->dx;
+  m->res[i++] = m->dz;
   m->res[i++] = m->dp;
   m->res[i++] = m->du;
 
@@ -181,6 +201,7 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
 
   // Copy from input buffers
   for (i = 0; i < N_X; ++i) m->d[x_vr[i]] = m->dx[i];
+  for (i = 0; i < N_Z; ++i) m->d[z_vr[i]] = m->dz[i];
   for (i = 0; i < N_P; ++i) m->d[p_vr[i]] = m->dp[i];
   for (i = 0; i < N_U; ++i) m->d[u_vr[i]] = m->du[i];
 
@@ -201,6 +222,7 @@ int evaluate_transition(casadi_fmi_memory* m) {
 
   // Copy states, inputs and parameters to input buffers
   for (i = 0; i < N_X; ++i) m->x[i] = m->v[x_vr[i]];
+  for (i = 0; i < N_Z; ++i) m->z[i] = m->v[z_vr[i]];
   for (i = 0; i < N_P; ++i) m->p[i] = m->v[p_vr[i]];
   for (i = 0; i < N_U; ++i) m->u[i] = m->v[u_vr[i]];
 
@@ -209,14 +231,14 @@ int evaluate_transition(casadi_fmi_memory* m) {
   m->arg[i++] = &zeroind;  // index
   m->arg[i++] = &m->t;  // t
   m->arg[i++] = m->x;  // x
-  m->arg[i++] = 0;  // z
+  m->arg[i++] = m->z;  // z
   m->arg[i++] = m->p;  // p
   m->arg[i++] = m->u;  // u
 
   // Map outputs to evaluation buffer
   i = 0;
   m->res[i++] = m->xdot;  // post_x
-  m->res[i++] = 0;  // post_z
+  m->res[i++] = m->alg;  // post_z
 
   // Evaluate
   mem = transition_MODELNAME_checkout();
@@ -225,6 +247,7 @@ int evaluate_transition(casadi_fmi_memory* m) {
 
   // Copy from output buffers
   for (i = 0; i < N_X; ++i) m->v[x_vr[i]] = m->xdot[i];
+  for (i = 0; i < N_Z; ++i) m->v[z_vr[i]] = m->alg[i];
 
   return flag;
 }
@@ -452,7 +475,7 @@ FMI3_Export fmi3Status fmi3GetFloat64(
   // Consistency check
   if (val_ind != nValues) return fmi3Fatal;
   // Successful return
-  return fmi3OK;  
+  return fmi3OK;
 }
 
 FMI3_Export fmi3Status fmi3EnterInitializationMode(

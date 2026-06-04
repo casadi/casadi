@@ -449,6 +449,15 @@ namespace casadi {
         \identifier{1rt} */
     virtual size_t sz_w() const { return 0;}
 
+    /** \brief Length of w the node's GENERATED code needs (may exceed sz_w)
+
+        For nodes whose VM eval and codegen have different scratch needs, e.g. a
+        determinant/solve whose eval uses Linsol memory but whose generated C
+        carves the factorization buffers from w.
+
+        \identifier{2hp} */
+    virtual size_t codegen_sz_w() const { return sz_w();}
+
     /// Set unary dependency
     void set_dep(const MX& dep);
 
@@ -500,6 +509,12 @@ namespace casadi {
     /// Create a repeated sum node
     virtual MX get_repsum(casadi_int m, casadi_int n) const;
 
+    /// Create a Kronecker-product node
+    virtual MX get_kron(const MX& b) const;
+
+    /// Create a Kronecker-contraction node
+    virtual MX get_kron_contract(const MX& x, bool inner) const;
+
     /// Create a vertical concatenation node (vectors only)
     virtual MX get_vertcat(const std::vector<MX>& x) const;
 
@@ -525,7 +540,8 @@ namespace casadi {
     /** \brief Matrix multiplication and addition
 
         \identifier{1ru} */
-    virtual MX get_mac(const MX& y, const MX& z) const;
+    virtual MX get_mac(const MX& y, const MX& z,
+                       const std::string& blas = "reference") const;
 
     /** \brief Einstein product and addition
 
@@ -726,7 +742,7 @@ namespace casadi {
         bool unique_x=false, bool unique_y=false) const;
 
     /// Determinant
-    virtual MX get_det() const;
+    virtual MX get_det(const Linsol& linear_solver) const;
 
     /// Inverse
     virtual MX get_inv() const;
@@ -757,6 +773,9 @@ namespace casadi {
 
     /// Monitor
     MX get_monitor(const std::string& comment) const;
+
+    /// Dump
+    MX get_dump(const std::string& base_filename, const Dict& opts) const;
 
     /// Find
     MX get_find() const;

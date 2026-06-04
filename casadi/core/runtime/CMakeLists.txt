@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.16.3)
 
 # C runtime sources
 set(RUNTIME_SRC
@@ -23,6 +23,17 @@ set(RUNTIME_SRC
   casadi_interpn_interpolate.hpp
   casadi_interpn_weights.hpp
   casadi_kron.hpp
+  casadi_kron_dense.hpp
+  casadi_kron_dense_sparse.hpp
+  casadi_kron_sparse_dense.hpp
+  casadi_kron_contract_inner.hpp
+  casadi_kron_contract_inner_dense.hpp
+  casadi_kron_contract_inner_dense_sparse.hpp
+  casadi_kron_contract_inner_sparse_dense.hpp
+  casadi_kron_contract_outer.hpp
+  casadi_kron_contract_outer_dense.hpp
+  casadi_kron_contract_outer_dense_sparse.hpp
+  casadi_kron_contract_outer_sparse_dense.hpp
   casadi_low.hpp
   casadi_max_viol.hpp
   casadi_mmin.hpp
@@ -36,6 +47,9 @@ set(RUNTIME_SRC
   casadi_trilsolve.hpp
   casadi_triusolve.hpp
   casadi_mv_dense.hpp
+  casadi_mtimes_dense.hpp
+  casadi_mtimes_dense_sparse.hpp
+  casadi_tensor_ttv.hpp
   casadi_nd_boor_eval.hpp
   casadi_nd_boor_dual_eval.hpp
   casadi_norm_1.hpp
@@ -49,6 +63,9 @@ set(RUNTIME_SRC
   casadi_print_scalar.hpp
   casadi_print_vector.hpp
   casadi_print_canonical.hpp
+  casadi_fprintf_scalar.hpp
+  casadi_fprintf_vector.hpp
+  casadi_to_file.hpp
   casadi_tri_project.hpp
   casadi_rank1.hpp
   casadi_scal.hpp
@@ -60,6 +77,7 @@ set(RUNTIME_SRC
   casadi_finite_diff.hpp
   casadi_ldl.hpp
   casadi_qr.hpp
+  casadi_det.hpp
   casadi_qp.hpp
   casadi_qrqp.hpp
   casadi_kkt.hpp
@@ -74,6 +92,7 @@ set(RUNTIME_SRC
   casadi_dense_lsqr.hpp
   casadi_cache.hpp
   casadi_convexify.hpp
+  casadi_socp.hpp
   casadi_logsumexp.hpp
   casadi_sparsity.hpp
   casadi_jac.hpp
@@ -81,10 +100,12 @@ set(RUNTIME_SRC
   casadi_oracle_callback.hpp
   casadi_ocp_block.hpp
   casadi_scaled_copy.hpp
-  casadi_blazing_de_boor.hpp
+  casadi_blazing_common.hpp
   casadi_blazing_1d_boor_eval.hpp
   casadi_blazing_2d_boor_eval.hpp
   casadi_blazing_3d_boor_eval.hpp
+  casadi_blazing_4d_boor_eval.hpp
+  casadi_blazing_5d_boor_eval.hpp
   casadi_threads.hpp
 )
 

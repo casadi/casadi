@@ -29,6 +29,7 @@ import unittest
 from types import *
 from helpers import *
 from casadi import *
+from numpy import inf, pi
 
 scipy_available = True
 try:
@@ -45,7 +46,7 @@ if has_nlpsol("ipopt"):
   nlpsolver = "ipopt"
   nlpsolver_options = {}
 
-class OptiStacktests(inherit_from):
+class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
 
 
     @requires_conic("qrqp")
@@ -843,7 +844,7 @@ class OptiStacktests(inherit_from):
         x = opti.variable(3, 1)
         
 
-        f = mtimes(x.T,x)
+        f = x.T @ x
         
         opti.minimize(f)
         
@@ -853,7 +854,7 @@ class OptiStacktests(inherit_from):
         self.checkarray(sol.value(x[0]), 3,digits=7)
         
 
-        f = mtimes(x.T,x)
+        f = x.T @ x
         
         opti.minimize(f)
         
@@ -1346,7 +1347,7 @@ class OptiStacktests(inherit_from):
                 if scale_helper:
                   nlp_jac_g_custom = opti.scale_helper(Function('nlp_jac_g',[opti.x,opti.p],[opti.g,jacobian(opti.g,opti.x)],["x","p"],["g","jac_g_x"]))
                 else:
-                  nlp_jac_g_custom = Function('nlp_jac_g',[opti.x,opti.p],substitute([opti.g/opti.g_linear_scale,mtimes(jacobian(opti.g/opti.g_linear_scale,opti.x),diag(opti.x_linear_scale))],[opti.x],[opti.x*opti.x_linear_scale+opti.x_linear_scale_offset]),["x","p"],["g","jac_g_x"])
+                  nlp_jac_g_custom = Function('nlp_jac_g',[opti.x,opti.p],substitute([opti.g/opti.g_linear_scale,jacobian(opti.g/opti.g_linear_scale,opti.x) @ diag(opti.x_linear_scale)],[opti.x],[opti.x*opti.x_linear_scale+opti.x_linear_scale_offset]),["x","p"],["g","jac_g_x"])
 
                 options = {}
                 options["cache"] = {"nlp_jac_g":nlp_jac_g_custom}
@@ -1372,7 +1373,7 @@ class OptiStacktests(inherit_from):
                   nlp_hess_l_custom = opti.scale_helper(Function('nlp_hess_l',[opti.x,opti.p,lam_f,opti.lam_g],[triu(H)],["x","p","lam_f","lam_g"],["triu_hess_gamma_x_x"]))
                 else:
                   lag = lam_f*opti.f/f_scale+dot(opti.lam_g,opti.g/opti.g_linear_scale)
-                  H = mtimes(jacobian(gradient(lag,opti.x),opti.x,{"symmetric":True}),diag(opti.x_linear_scale)**2)
+                  H = jacobian(gradient(lag,opti.x),opti.x,{"symmetric":True}) @ diag(opti.x_linear_scale)**2
                   H = substitute(triu(H),opti.x,opti.x*opti.x_linear_scale+opti.x_linear_scale_offset)
                   nlp_hess_l_custom = Function('nlp_hess_l',[opti.x,opti.p,lam_f,opti.lam_g],[H])
                   

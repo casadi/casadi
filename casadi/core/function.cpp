@@ -200,15 +200,19 @@ namespace casadi {
     std::vector<M> ex_in(name_in.size()), ex_out(name_out.size());
     for (auto&& i : dict) {
       std::vector<std::string>::const_iterator it;
-      if ((it = std::find(name_in.begin(), name_in.end(), i.first))!=name_in.end()) {
+      it = std::find(name_in.begin(), name_in.end(), i.first);
+      if (it!=name_in.end()) {
         // Input expression
         ex_in[it-name_in.begin()] = i.second;
-      } else if ((it = std::find(name_out.begin(), name_out.end(), i.first))!=name_out.end()) {
-        // Output expression
-        ex_out[it-name_out.begin()] = i.second;
       } else {
+        it = std::find(name_out.begin(), name_out.end(), i.first);
+        if (it!=name_out.end()) {
+        // Output expression
+          ex_out[it-name_out.begin()] = i.second;
+        } else {
         // Neither
-        casadi_error("Unknown dictionary entry: '" + i.first + "'");
+          casadi_error("Unknown dictionary entry: '" + i.first + "'");
+        }
       }
     }
     construct(name, ex_in, ex_out, name_in, name_out, opts);
@@ -306,12 +310,7 @@ namespace casadi {
   }
 
   Function Function::expand() const {
-    Dict opts;
-    opts["ad_weight"] = (*this)->ad_weight();
-    opts["ad_weight_sp"] = (*this)->sp_weight();
-    opts["max_num_dir"] = (*this)->max_num_dir_;
-    opts["is_diff_in"] = (*this)->is_diff_in_;
-    opts["is_diff_out"] = (*this)->is_diff_out_;
+    Dict opts = (*this)->generate_options("clone");
     return expand(name(), opts);
   }
 
@@ -321,12 +320,7 @@ namespace casadi {
       "List of free variables in your Function: " +
         join(get_free(), ","));
 
-    Dict my_opts;
-    my_opts["ad_weight"] = (*this)->ad_weight();
-    my_opts["ad_weight_sp"] = (*this)->sp_weight();
-    my_opts["max_num_dir"] = (*this)->max_num_dir_;
-    my_opts["is_diff_in"] = (*this)->is_diff_in_;
-    my_opts["is_diff_out"] = (*this)->is_diff_out_;
+    Dict my_opts = (*this)->generate_options("clone");
     update_dict(my_opts, opts);
     std::vector<SX> ex_in = sx_in();
     std::vector<SX> ex_out = Function(*this)(ex_in);
@@ -490,15 +484,15 @@ namespace casadi {
 
 
   void Function::operator()(std::vector<const double*> arg, std::vector<double*> res) const {
-    return call_gen(arg, res);
+    call_gen(arg, res);
   }
 
   void Function::operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const {
-    return call_gen(arg, res);
+    call_gen(arg, res);
   }
 
   void Function::operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const {
-    return call_gen(arg, res);
+    call_gen(arg, res);
   }
 
   int Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
@@ -1276,13 +1270,13 @@ namespace casadi {
 
   void Function::export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const {
-    return (*this)->export_code(lang, stream, options);
+    (*this)->export_code(lang, stream, options);
   }
 
   void Function::export_code(const std::string& lang,
       const std::string &fname, const Dict& options) const {
     auto stream_ptr = Filesystem::ofstream_ptr(fname);
-    return (*this)->export_code(lang, *stream_ptr, options);
+    (*this)->export_code(lang, *stream_ptr, options);
   }
 
 
@@ -1299,7 +1293,7 @@ namespace casadi {
 
   void Function::serialize(std::ostream &stream, const Dict& opts) const {
     SerializingStream s(stream, opts);
-    return serialize(s);
+    serialize(s);
   }
 
   void Function::serialize(SerializingStream &s) const {
@@ -1687,7 +1681,7 @@ namespace casadi {
 
   void Function::merge(const std::vector<MX>& arg,
       std::vector<MX>& subs_from, std::vector<MX>& subs_to) const {
-    return (*this)->merge(arg, subs_from, subs_to);
+    (*this)->merge(arg, subs_from, subs_to);
   }
 
   std::vector<SX> Function::free_sx() const {
@@ -1975,8 +1969,12 @@ namespace casadi {
     iw_.resize(f_.sz_iw());
     arg_.resize(f_.sz_arg());
     res_.resize(f_.sz_res());
-    mem_ = f_->checkout();
-    mem_internal_ = f.memory(mem_);
+    if (f_->checkout_) {
+      mem_ = f_->checkout_();
+    } else {
+      mem_ = f_.checkout();
+      mem_internal_ = f_.memory(mem_);
+    }
     f_node_ = f.operator->();
   }
 
@@ -1988,11 +1986,25 @@ namespace casadi {
     }
   }
 
-  FunctionBuffer::FunctionBuffer(const FunctionBuffer& f) : f_(f.f_) {
-    operator=(f);
+  FunctionBuffer::FunctionBuffer(const FunctionBuffer& f)
+      : f_(f.f_), w_(f.w_), iw_(f.iw_), arg_(f.arg_), res_(f.res_), f_node_(f.f_node_) {
+    if (f_->checkout_) {
+      mem_ = f_->checkout_();
+    } else {
+      mem_ = f_.checkout();
+      mem_internal_ = f_.memory(mem_);
+    }
   }
 
   FunctionBuffer& FunctionBuffer::operator=(const FunctionBuffer& f) {
+    if (this == &f) return *this;
+
+    if (f_->release_) {
+      f_->release_(mem_);
+    } else {
+      f_.release(mem_);
+    }
+
     f_ = f.f_;
     w_ = f.w_; iw_ = f.iw_; arg_ = f.arg_; res_ = f.res_; f_node_ = f.f_node_;
     // Checkout fresh memory

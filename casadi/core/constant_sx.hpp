@@ -28,6 +28,7 @@
 
 #include "sx_node.hpp"
 #include "serializing_stream.hpp"
+#include "matrix_decl.hpp"
 #include <cassert>
 
 /// \cond INTERNAL
@@ -92,6 +93,13 @@ protected:
     \identifier{1jo} */
 std::string print(const std::string& arg1, const std::string& arg2) const override {
    std::stringstream ss;
+   ss.precision(Matrix<SXElem>::get_precision());
+   ss.width(Matrix<SXElem>::get_width());
+   if (Matrix<SXElem>::get_scientific()) {
+     ss.setf(std::ios::scientific);
+   } else {
+     ss.unsetf(std::ios::scientific);
+   }
    ss << to_double();
    return ss.str();
  }

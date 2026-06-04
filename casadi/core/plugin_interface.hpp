@@ -66,7 +66,7 @@ namespace casadi {
       Deserialize deserialize;
       // Constructor
       Plugin() : creator(nullptr), name(nullptr), doc(nullptr), version(0),
-                  options(nullptr), deserialize(nullptr) {}
+                  exposed(), options(nullptr), deserialize(nullptr) {}
     };
 
     // Plugin registration function

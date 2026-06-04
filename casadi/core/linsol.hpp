@@ -125,6 +125,16 @@ namespace casadi {
         \identifier{1kl} */
     casadi_int rank(const DM& A) const;
 
+    /** \brief Matrix determinant
+
+      * Not available for all solvers
+
+        \identifier{2hw} */
+    double det(const DM& A) const;
+
+    /// Matrix determinant as an MX graph node
+    MX det(const MX& A) const;
+
    /// Get all statistics obtained at the end of the last evaluate call
     Dict stats(int mem=1) const;
 
@@ -134,6 +144,7 @@ namespace casadi {
     int sfact(const double* A, int mem=0) const;
     int nfact(const double* A, int mem=0) const;
     int solve(const double* A, double* x, casadi_int nrhs=1, bool tr=false, int mem=0) const;
+    double det(const double* A, int mem = 0) const;
     casadi_int neig(const double* A, int mem=0) const;
     casadi_int rank(const double* A, int mem=0) const;
     ///@}

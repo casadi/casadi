@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.16.3)
 
 # Create runtime
 add_subdirectory(runtime)
@@ -103,6 +103,7 @@ set(CASADI_PUBLIC
   resource.hpp
   archiver.hpp
   filesystem.hpp
+  blas.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -179,7 +180,9 @@ set(CASADI_INTERNAL
   multiple_output.hpp     multiple_output.cpp     # Base class for nodes with multiple outputs
   assertion.hpp           assertion.cpp           # Assertion
   monitor.hpp             monitor.cpp             # Monitor
+  dump.hpp                dump.cpp                # Dump
   repmat.hpp              repmat.cpp              # RepMat
+  kron.hpp                kron.cpp                # Kronecker product
   convexify.hpp           convexify.cpp           # Convexify
   logsumexp.hpp           logsumexp.cpp           # Logsumexp
 
@@ -230,6 +233,7 @@ set(CASADI_INTERNAL
   resource.cpp                resource_internal.cpp                resource_internal.hpp
   archiver.cpp                archiver_impl.hpp
   filesystem.cpp              filesystem_impl.hpp
+  blas.cpp                    blas_impl.hpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp

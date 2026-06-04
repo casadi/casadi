@@ -1,5 +1,6 @@
 if(WITH_LAPACK)
   add_subdirectory(lapack)
+  add_subdirectory(blas_classic)
 endif()
 
 if(WITH_SUNDIALS)
@@ -16,6 +17,10 @@ endif()
 
 if(WITH_MADNLP)
   add_subdirectory(madnlp)
+endif()
+
+if(WITH_CCOPT)
+  add_subdirectory(ccopt)
 endif()
 
 if(WITH_BONMIN)
@@ -78,6 +83,14 @@ if(WITH_GUROBI)
   add_subdirectory(gurobi)
 endif()
 
+if(WITH_XPRESS)
+  add_subdirectory(xpress)
+endif()
+
+if(WITH_MOSEK)
+  add_subdirectory(mosek)
+endif()
+
 if(WITH_WORHP)
   add_subdirectory(worhp)
 endif()
@@ -104,6 +117,10 @@ endif()
 
 if(WITH_HPIPM)
   add_subdirectory(hpipm)
+endif()
+
+if(WITH_BLASFEO)
+  add_subdirectory(blasfeo)
 endif()
 
 if(WITH_FATROP)

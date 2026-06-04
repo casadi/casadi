@@ -21,28 +21,34 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from mx import *
-from sx import *
-from typemaps import *
-from integration import *
-from ocp import *
-from nlp import *
-from implicitfunction import *
-from ad import *
-from sparsity import *
-from linearsolver import *
-from matrix import *
-from conic import *
-from misc import *
-from function import *
-from tools import *
-from simulator import *
-from vectortools import *
-from optistack import *
-from feasiblesqpmethod import *
-from serialize import *
-from threads import *
-from daebuilder import *
+import importlib
+import sys
+import unittest
+
+# Each submodule owns its TestCase subclasses; we import them as
+# namespaces and let TestLoader discover their tests.  Avoids
+# `from X import *` polluting the global scope with every symbol from
+# every test module (which also caused pyright Final-reassignment
+# cascades on names like `inf`/`pi`).
+_TEST_MODULES = [
+    "mx", "sx", "typemaps", "integration", "ocp", "nlp",
+    "implicitfunction", "ad", "sparsity", "linearsolver", "matrix",
+    "conic", "misc", "function", "tools", "simulator", "vectortools",
+    "optistack", "feasiblesqpmethod", "serialize", "threads",
+    "daebuilder", "pyright_stubs",
+]
+
+
+def build_suite():
+    loader = unittest.TestLoader()
+    suite = unittest.TestSuite()
+    for name in _TEST_MODULES:
+        mod = importlib.import_module(name)
+        suite.addTests(loader.loadTestsFromModule(mod))
+    return suite
+
 
 if __name__ == '__main__':
-    unittest.main()
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(build_suite())
+    sys.exit(0 if result.wasSuccessful() else 1)

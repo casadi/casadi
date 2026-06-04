@@ -20,9 +20,12 @@
 
 // C-REPLACE "fmin" "casadi_fmin"
 // C-REPLACE "fmax" "casadi_fmax"
+// C-REPLACE "fabs" "casadi_fabs"
 // C-REPLACE "std::numeric_limits<T1>::min()" "casadi_real_min"
 // C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
 // C-REPLACE "static_cast<int>" "(int) "
+// C-REPLACE "nullptr" "0"
+
 // SYMBOL "ipqp_prob"
 template<typename T1>
 struct casadi_ipqp_prob {
@@ -794,7 +797,7 @@ const char* casadi_ipqp_return_status(casadi_ipqp_flag_t status) {
     case IPQP_SOLVE_ERROR: return "Linear solver solution error";
     case IPQP_PROGRESS_ERROR: return "Printing error";
   }
-  return 0;
+  return nullptr;
 }
 
 // SYMBOL "ipqp_solution"

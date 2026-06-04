@@ -1000,6 +1000,13 @@ namespace casadi {
   std::string
   Constant<Value>::disp(const std::vector<std::string>& arg) const {
     std::stringstream ss;
+    ss.precision(Matrix<double>::get_precision());
+    ss.width(Matrix<double>::get_width());
+    if (Matrix<double>::get_scientific()) {
+      ss.setf(std::ios::scientific);
+    } else {
+      ss.unsetf(std::ios::scientific);
+    }
     if (sparsity().is_scalar()) {
       // Print scalar
       if (sparsity().nnz()==0) {

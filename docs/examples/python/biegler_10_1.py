@@ -135,7 +135,7 @@ for N in range(1,11):
   res = solver(**arg)
 
   ## Print the time points
-  t_opt = N*(K+1) * [0]
+  t_opt = N*(K+1) * [0.0]
   for i in range(N):
     for j in range(K+1):
       t_opt[j + (K+1)*i] = h*(i + tau_root[j])

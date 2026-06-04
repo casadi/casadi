@@ -192,6 +192,7 @@ set(DEPENDENT_LIBRARIES)
 
 
 include(ExternalProject)
+include(FetchContent)
 
 set(EXTERNAL_PROJECT_CFLAGS "")
 set(EXTERNAL_PROJECT_CXXFLAGS "")
@@ -214,6 +215,8 @@ set(CROSS_FLAGS_CMAKE)
 set(CROSS_TARGET_RUST "")
 
 if(CMAKE_CROSS_COMPILING OR DEFINED ENV{CROSS_TRIPLE})
+  list(APPEND CROSS_FLAGS_CMAKE -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH)
+  list(APPEND CROSS_FLAGS_CMAKE -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH)
   set(CROSS_FLAGS_CONFIGURE "--host=$ENV{CROSS_TRIPLE}")
   if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
     # See issue https://github.com/casadi/casadi/issues/2887
@@ -306,7 +309,6 @@ option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
 option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_OCTAVE_IMPORT "[DEPRECATED] Copy import.m file to install directory" OFF)
-option(WITH_PYTHON3 "Use Python 3.*" OFF)
 option(WITH_PYTHON_GIL_RELEASE "Create Python bindings that release the GIL" OFF)
 
 ############################################################
@@ -427,10 +429,7 @@ if(WITH_SELFCONTAINED OR (WIN32 AND NOT CYGWIN))
 else()
   set(DEF_PYTHON_PREFIX python)
   if (WITH_PYTHON)
-    set(PYTHON_VERSION_REQ "")
-    if (WITH_PYTHON3)
-      set(PYTHON_VERSION_REQ "3")
-    endif()
+    set(PYTHON_VERSION_REQ "3")
     find_package(PythonInterp ${PYTHON_VERSION_REQ} REQUIRED)
     execute_process ( COMMAND ${PYTHON_EXECUTABLE} -c "from __future__ import print_function; from distutils.sysconfig import get_python_lib; print(get_python_lib())"
       OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -654,8 +653,8 @@ add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct 
 
 # BLASFEO
 option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
-set(BUILD_BLASFEO_VERSION "14d6e66f0662182a8dd02ddc7ec4738738c6344d" CACHE STRING "Tag/branch/hash to be used for BUILD_BLASFEO_GIT_REPO")
-set(BUILD_BLASFEO_GIT_REPO "https://github.com/jgillis/blasfeo.git" CACHE STRING "Git repo used together with BUILD_BLASFEO_VERSION")
+set(BUILD_BLASFEO_VERSION "fb39d77a8c2d87805d38d41635a1402b5bcb9e18" CACHE STRING "Tag/branch/hash to be used for BUILD_BLASFEO_GIT_REPO")
+set(BUILD_BLASFEO_GIT_REPO "https://github.com/giaf/blasfeo.git" CACHE STRING "Git repo used together with BUILD_BLASFEO_VERSION")
 set(BUILD_BLASFEO_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for BLASFEO")
 option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_VERSION}) from downloaded source (BUILD_BLASFEO_GIT_REPO=${BUILD_BLASFEO_GIT_REPO})." OFF)
 
@@ -669,8 +668,8 @@ set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # FATROP
 option(WITH_FATROP "Compile the interface to FATROP" OFF)
-set(BUILD_FATROP_VERSION "v0.0.4.post1" CACHE STRING "Tag/branch/hash to be used for BUILD_FATROP_GIT_REPO")
-set(BUILD_FATROP_GIT_REPO "https://github.com/meco-group/fatrop.git" CACHE STRING "Git repo used together with BUILD_FATROP_VERSION")
+set(BUILD_FATROP_VERSION "v1.0.1.mod" CACHE STRING "Tag/branch/hash to be used for BUILD_FATROP_GIT_REPO")
+set(BUILD_FATROP_GIT_REPO "https://github.com/jgillis/fatrop.git" CACHE STRING "Git repo used together with BUILD_FATROP_VERSION")
 set(BUILD_FATROP_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for FATROP")
 option(WITH_BUILD_FATROP "Build FATROP (BUILD_FATROP_VERSION=${BUILD_FATROP_VERSION}) from downloaded source (BUILD_FATROP_GIT_REPO=${BUILD_FATROP_GIT_REPO})." OFF)
 set(BUILD_FATROP_DEPENDENCIES BLASFEO)
@@ -719,7 +718,7 @@ option(WITH_BUILD_SIMDE "Build Simde (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}
 
 # PROXQP: A QP solver based on proximal methods
 option(WITH_PROXQP "Compile the interface to PROXQP" OFF)
-set(BUILD_PROXQP_VERSION "v0.3.2" CACHE STRING "Tag/branch/hash to be used for BUILD_PROXQP_GIT_REPO")
+set(BUILD_PROXQP_VERSION "v0.7.2" CACHE STRING "Tag/branch/hash to be used for BUILD_PROXQP_GIT_REPO")
 set(BUILD_PROXQP_GIT_REPO "https://github.com/Simple-Robotics/proxsuite.git" CACHE STRING "Git repo used together with BUILD_PROXQP_VERSION")
 set(BUILD_PROXQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for PROXQP")
 option(WITH_BUILD_PROXQP "Build PROXQP (BUILD_PROXQP_VERSION=${BUILD_PROXQP_VERSION}) from downloaded source (BUILD_PROXQP_GIT_REPO=${BUILD_PROXQP_GIT_REPO})." OFF)
@@ -817,8 +816,32 @@ set(BUILD_MOCKUPS_GIT_REPO "https://github.com/casadi/mockups.git" CACHE STRING 
 set(BUILD_MOCKUPS_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for MOCKUPS")
 set(BUILD_MOCKUPS_VERSION "master" CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
+# MadNLP: A sparse interior point NLP solver with filter line-search, written in Julia, supporting GPU-accelerated Linear Algebra
 option(WITH_MADNLP "Compile the interface to MadNLP"  OFF)
 option(WITH_MOCKUP_MADNLP "Use mockup MadNLP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+option(WITH_BUILD_MADNLP "Download compiled libMad"  OFF)
+set(LIBMAD_TAR_HASH "")
+if(NOT LIBMAD_TAR_PATH)
+  if(NOT LIBMAD_RELEASE)
+    set(LIBMAD_RELEASE "v0.0.7-casadi")
+  endif()
+  set(LIBMAD_TAR_ROOT "https://github.com/apozharski/libMad/releases/download/")
+  if(UNIX AND NOT APPLE)
+    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/libMad-ubuntu-x86_64-${LIBMAD_RELEASE}.tar.gz")
+    message("Will download unix LibMad: ${LIBMAD_TAR_PATH}")
+  elseif(WIN32)
+    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/libMad-windows-x86_64-${LIBMAD_RELEASE}.tar.gz")
+    message("Will download windows LibMad: ${LIBMAD_TAR_PATH}")
+  elseif(APPLE)
+    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/libMad-apple-aarch64-${LIBMAD_RELEASE}.tar.gz")
+    message("Will download apple LibMad: ${LIBMAD_TAR_PATH}")
+  endif()
+endif()
+
+# MadMPEC: A sparse interior point NLP solver with filter line-search, written in Julia, specialized to solving MPCCs
+option(WITH_CCOPT "Compile the interface to MadMPEC"  OFF)
+option(WITH_MOCKUP_CCOPT "Use mockup MadMPEC (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+option(WITH_BUILD_CCOPT "Download compiled libMad"  OFF)
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -840,6 +863,14 @@ option(WITH_MOCKUP_CPLEX "Use mockup CPLEX (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUP
 # GUROBI: A sparse mixed-integer QP solver
 option(WITH_GUROBI "Compile the interface to GUROBI" OFF)
 option(WITH_MOCKUP_GUROBI "Use mockup GUROBI (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+
+# FICO Xpress: A sparse (mixed-integer) LP/QP solver
+option(WITH_XPRESS "Compile the interface to FICO Xpress" OFF)
+option(WITH_MOCKUP_XPRESS "Use mockup XPRESS (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+
+# MOSEK: A sparse (mixed-integer) LP/QP/SOCP solver
+option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
+option(WITH_MOCKUP_MOSEK "Use mockup MOSEK (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
 # Bonmin: An MINLP solver
 option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
@@ -911,7 +942,7 @@ set(BUILD_HSL_DEPENDENCIES LAPACK METIS)
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
 set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS" CACHE STRING "Git repo used together with BUILD_HIGHS_VERSION")
 set(BUILD_HIGHS_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for HIGHS")
-set(BUILD_HIGHS_VERSION "v1.10.0" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
+set(BUILD_HIGHS_VERSION "v1.13.1" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
 option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
 # DAQP: An Active-Set QP solver written in C
@@ -1048,7 +1079,7 @@ endmacro()
 
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL MADNLP)
+foreach(PKG CPLEX SNOPT KNITRO GUROBI XPRESS MOSEK WORHP HSL MADNLP)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_BUILD_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
@@ -1168,6 +1199,45 @@ if(WITH_GUROBI AND WITH_MOCKUP_GUROBI)
 endif()
 add_feature_info(gurobi-interface WITH_GUROBI "Interface to the (mixed-integer) QP solver GUROBI")
 
+if(WITH_XPRESS AND WITH_MOCKUP_XPRESS)
+  add_library(xpress::xpress SHARED IMPORTED)
+  add_dependencies(xpress::xpress mockups-external)
+  set(XPRESS_MOCKUP_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/xpress/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}xprs${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/xpress/include")
+  set_target_properties(xpress::xpress PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/xpress/include"
+    IMPORTED_LOCATION "${XPRESS_MOCKUP_LIB}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/xpress/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}xprs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+endif()
+add_feature_info(xpress-interface WITH_XPRESS "Interface to the (mixed-integer) LP/QP solver FICO Xpress")
+
+if(WITH_MOSEK AND WITH_MOCKUP_MOSEK)
+  add_library(mosek::mosek SHARED IMPORTED)
+  add_dependencies(mosek::mosek mockups-external)
+  if(WIN32)
+    set(MOSEK_ADAPTOR_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}mosek_adaptor${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include")
+    set_target_properties(mosek::mosek PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include"
+      IMPORTED_LOCATION "${MOSEK_ADAPTOR_LIB}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}mosek_adaptor${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    install(FILES
+    ${MOSEK_ADAPTOR_LIB}
+    DESTINATION "${LIB_PREFIX}")
+  else()
+    set(MOSEK_MOCKUP_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}mosek64${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include")
+    set_target_properties(mosek::mosek PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/include"
+      IMPORTED_LOCATION "${MOSEK_MOCKUP_LIB}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/mosek/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}mosek64${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+  endif()
+endif()
+add_feature_info(mosek-interface WITH_MOSEK "Interface to the (mixed-integer) LP/QP/SOCP solver MOSEK")
+
 if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   add_library(knitro::knitro SHARED IMPORTED)
   add_dependencies(knitro::knitro mockups-external)
@@ -1180,14 +1250,14 @@ if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
 endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
 
-if(WITH_MADNLP AND WITH_MOCKUP_MADNLP)
-  add_library(madnlp::madnlp_c SHARED IMPORTED)
-  add_dependencies(madnlp::madnlp_c mockups-external)
-  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/include")
-  set_target_properties(madnlp::madnlp_c PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/include"
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}madnlp_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}madnlp_c${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+if((WITH_MADNLP AND WITH_MOCKUP_MADNLP) OR (WITH_CCOPT AND WITH_MOCKUP_CCOPT))
+  add_library(libmad::libMad SHARED IMPORTED)
+  add_dependencies(libmad::libMad mockups-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/libmad/include")
+  set_target_properties(libmad::libMad PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/libmad/include"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/libmad/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}Mad${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/libmad/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Mad${CMAKE_IMPORT_LIBRARY_SUFFIX}"
   )
 endif()
 add_feature_info(madnlp-interface WITH_MADNLP "Interface to the NLP solver MadNLP.")
@@ -1257,9 +1327,9 @@ endif()
 
 if(WITH_BLASFEO)
   if (WITH_BUILD_BLASFEO)
-    set(C_FLAGS "")
+    set(C_FLAGS "-DCMAKE_C_FLAGS=-Wno-implicit-function-declaration -Wno-incompatible-pointer-types ${EXTERNAL_PROJECT_CFLAGS}")
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        set(C_FLAGS "-DCMAKE_C_FLAGS=-std=c99")
+        set(C_FLAGS "-DCMAKE_C_FLAGS=-std=c99 -Wno-implicit-function-declaration -Wno-incompatible-pointer-types ${EXTERNAL_PROJECT_CFLAGS}")
     endif()
     ExternalProject_Add(blasfeo-external
       GIT_REPOSITORY ${BUILD_BLASFEO_GIT_REPO}
@@ -1268,7 +1338,7 @@ if(WITH_BLASFEO)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${C_FLAGS} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${C_FLAGS} -DEXT_DEP=OFF -DTARGET=GENERIC -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     set(BLASFEO_PATH "${CMAKE_BINARY_DIR}/external_projects")
     set(BLASFEO_DEPENDS_TARGET blasfeo-external)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
@@ -1304,7 +1374,7 @@ if(WITH_HPIPM)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} ${HPIPM_FLAGS} -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DMARCH_NATIVE=OFF ${HPIPM_FLAGS} -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     add_library(hpipm SHARED IMPORTED)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     add_dependencies(hpipm hpipm-external)
@@ -1337,7 +1407,7 @@ if(WITH_FATROP)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DBUILD_WITH_BLASFEO=OFF -DBLASFEO_INSTALL_DIR=${BLASFEO_PATH} -DENABLE_MULTITHREADING=OFF -DMARCH_NATIVE=OFF -DBUILD_EXECUTABLES=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DBUILD_WITH_BLASFEO=OFF -DBLASFEO_INSTALL_DIR=${BLASFEO_PATH} -DENABLE_MULTITHREADING=OFF -DMARCH_NATIVE=OFF -DBUILD_EXECUTABLES=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     add_library(fatrop SHARED IMPORTED)
     add_dependencies(fatrop fatrop-external)
     target_link_libraries(fatrop INTERFACE blasfeo)
@@ -1357,6 +1427,59 @@ if(WITH_FATROP)
   endif()
 endif()
 
+if((WITH_MADNLP AND WITH_BUILD_MADNLP) OR (WITH_CCOPT AND WITH_BUILD_CCOPT))
+  # TODO(@apozharski): This is currently hacky but it avoids julia bulid dependencies. However, this makes crosscompilation a massive headache.
+  #                    If CasADi wants to ship with MadNLP it may make more sense to build libMad.
+
+  set(LIBMAD_BINARY_DIR "${CMAKE_BINARY_DIR}/external_packages/libMad")
+  if(LIBMAD_TAR_HASH)
+    file(
+      DOWNLOAD ${LIBMAD_TAR_PATH}
+      "${LIBMAD_BINARY_DIR}/libMad.tar.gz"
+      EXPECTED_HASH ${LIBMAD_TAR_HASH}
+    )
+  else()
+    file(
+      DOWNLOAD ${LIBMAD_TAR_PATH}
+      "${LIBMAD_BINARY_DIR}/libMad.tar.gz"
+    )
+  endif()
+
+  # TODO(@apozharski): this requires CMake 3.18 but dockcross images use 3.17
+  # file(
+  #   ARCHIVE_EXTRACT INPUT "${CMAKE_BINARY_DIR}/external_packages/libMad.tar.gz"
+  #   DESTINATION ${LIBMAD_BINARY_DIR}
+  # )
+  execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${LIBMAD_BINARY_DIR} tar xf ${LIBMAD_BINARY_DIR}/libMad.tar.gz)
+  add_library(libmad::libMad SHARED IMPORTED)
+  set_target_properties(libmad::libMad
+    PROPERTIES
+    IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/${SHARED_LIBRARY_RELDIR}/libMad${CMAKE_SHARED_LIBRARY_SUFFIX}
+    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/${SHARED_LIBRARY_RELDIR}/libMad.imp.lib
+  )
+  set_target_properties(libmad::libMad PROPERTIES LINKER_LANGUAGE C)
+  target_include_directories(libmad::libMad INTERFACE
+    ${LIBMAD_BINARY_DIR}/include
+    $<INSTALL_INTERFACE:include/>
+  )
+
+  install(DIRECTORY
+    "${LIBMAD_BINARY_DIR}/include/"
+    DESTINATION "${INCLUDE_PREFIX}")
+  install(DIRECTORY
+    "${LIBMAD_BINARY_DIR}/lib/"
+    DESTINATION "${LIB_PREFIX}")
+  install(DIRECTORY
+    "${LIBMAD_BINARY_DIR}/share"
+    USE_SOURCE_PERMISSIONS
+    DESTINATION ".")
+  if(WIN32)
+    # TODO(@apozharski) Is this correct
+    install(DIRECTORY
+    "${CMAKE_BINARY_DIR}/external_packages/libMad/bin/"
+    DESTINATION "${LIB_PREFIX}")
+  endif()
+endif()
 
 message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
@@ -1380,7 +1503,7 @@ if(WITH_BUILD_METIS)
         CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>
 
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
-          "ADD_CFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}"
+          "ADD_CFLAGS=-Wno-implicit-function-declaration -Wno-incompatible-pointer-types ${EXTERNAL_PROJECT_CFLAGS}"
           "ADD_CXXFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CXXFLAGS}"
           "ADD_FFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FFLAGS}"
           "ADD_FCFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FCFLAGS}"
@@ -1919,7 +2042,7 @@ if(WITH_PROXQP)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS --debug-find -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH -DSimde_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DCMAKE_INCLUDE_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DBUILD_TESTING=OFF -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+        CMAKE_ARGS --debug-find -DSimde_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DCMAKE_INCLUDE_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DBUILD_TESTING=OFF -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
         # --debug-find
     add_library(proxqp INTERFACE)
     # This is similar to ALIAS but works fine on imported targets with CMake 3.10
@@ -2127,7 +2250,7 @@ if(WITH_LIBZIP)
       DEPENDS ZLIB::libz
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_TRY_COMPILE_CONFIGURATION=Debug -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD=OFF -DENABLE_OPENSSL=OFF -DENABLE_WINDOWS_CRYPTO=OFF -DENABLE_COMMONCRYPTO=OFF -DENABLE_GNUTLS=OFF -DENABLE_MBEDTLS=OFF -DENABLE_FDOPEN=OFF -DBUILD_TOOLS=OFF -DBUILD_REGRESS=OFF -DBUILD_OSSFUZZ=OFF -DBUILD_EXAMPLES=OFF -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF ${CROSS_FLAGS_CMAKE})
+      CMAKE_ARGS -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_TRY_COMPILE_CONFIGURATION=Debug -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD=OFF -DENABLE_OPENSSL=OFF -DENABLE_WINDOWS_CRYPTO=OFF -DENABLE_COMMONCRYPTO=OFF -DENABLE_GNUTLS=OFF -DENABLE_MBEDTLS=OFF -DENABLE_FDOPEN=OFF -DBUILD_TOOLS=OFF -DBUILD_REGRESS=OFF -DBUILD_OSSFUZZ=OFF -DBUILD_EXAMPLES=OFF -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF ${CROSS_FLAGS_CMAKE})
     add_library(libzip::zip STATIC IMPORTED)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     add_dependencies(libzip::zip libzip-external)
@@ -2234,6 +2357,13 @@ include(GenerateExportHeader)
 
 feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
 string(REPLACE "\n" "\\n" feature_list "${feature_list}")
+
+# Forward LAPACK_LIBRARIES verbatim (semicolon-separated list of paths and/or
+# -l flags) to CasadiMeta::lapack_libraries(). Lets downstream tools (e.g.
+# the codegen regression test) stay agnostic to whether the build wired up
+# OpenBLAS, MKL, system BLAS, etc.
+set(casadi_lapack_libraries "${LAPACK_LIBRARIES}")
+string(REPLACE "\\" "/" casadi_lapack_libraries "${casadi_lapack_libraries}")
 
 get_directory_property( compiler_definitions COMPILE_DEFINITIONS )
 set(EXTRA_CXX_FLAGS_FROM_DEFS_LIST "")

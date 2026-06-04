@@ -17,6 +17,7 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 from casadi import *
+import numpy
 
 # In this example, we fit a nonlinear model to measurements
 #
@@ -113,7 +114,7 @@ else:
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):
   J = jacobian(e,V)
-  H = triu(mtimes(J.T, J))
+  H = triu(J.T @  J)
   sigma = MX.sym("sigma")
   hessLag = Function('nlp_hess_l',{'x':V,'lam_f':sigma, 'hess_gamma_x_x':sigma*H},
                      ['x','p','lam_f','lam_g'], ['hess_gamma_x_x'],

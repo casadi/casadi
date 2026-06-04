@@ -1,6 +1,7 @@
 # This is an automatically generated file converting from the apm format
 
 import casadi as cs
+import numpy as np
 
 def hs056():
     # The optimal objective is (if given in):
@@ -9,12 +10,12 @@ def hs056():
     x = cs.MX.sym('x', 7)
     obj = cs.MX.zeros(1, 1)
     x0 = cs.DM.zeros(7, 1)
-    lbx = -cs.inf*cs.DM.ones(7, 1)
-    ubx = cs.inf*cs.DM.ones(7, 1)
+    lbx = -np.inf*cs.DM.ones(7, 1)
+    ubx = np.inf*cs.DM.ones(7, 1)
     xi = cs.DM.zeros(7, 1)
     g = cs.MX.zeros(4, 1)
-    lbg = -cs.inf*cs.DM.ones(4, 1)
-    ubg = cs.inf*cs.DM.ones(4, 1)
+    lbg = -np.inf*cs.DM.ones(4, 1)
+    ubg = np.inf*cs.DM.ones(4, 1)
     
     a = cs.asin(cs.sqrt(1/4.2))
     b = cs.asin(cs.sqrt(5/7.2))

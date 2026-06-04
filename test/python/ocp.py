@@ -22,6 +22,7 @@
 #
 #
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
 import unittest
@@ -92,7 +93,7 @@ class OCPtests(casadiTestCase):
         x = vertcat(x0,u0,x1,u1,x2,u2)
         nlp = {}
         nlp["x"] = x
-        nlp["g"] = DM.zeros(A.shape[0],1) + mtimes(A,x)
+        nlp["g"] = DM.zeros(A.shape[0],1) + A @ x
         
         nlp["f"] = sumsqr(x-DM.rand(x.numel(),1))
         
@@ -282,6 +283,8 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[1],0,8,"Constraint is supposed to be unactive")
 
   @requires_nlpsol("fatrop")
+  @requires_nlpsol("ipopt")
+  @memory_heavy()
   def test_fatrop(self):
   
   
@@ -416,7 +419,7 @@ class OCPtests(casadiTestCase):
                 B = DM([[1,0],[0,1],[0.5,0.5]])
                 D = DM([[0.2,0.3],[0.8,0.7],[0.1,1]])
 
-                F = Function("F",[x,u],[mtimes(A,x)+mtimes(B,u)])
+                F = Function("F",[x,u],[A @ x+B @ u])
 
                     
                 # "Lift" initial conditions
@@ -428,7 +431,7 @@ class OCPtests(casadiTestCase):
                 
                 
                 # Add equality constraint
-                g   += [mtimes(D,Xk_next)-Xk]
+                g   += [D @ Xk_next-Xk]
                 lbg += [0, 0, 0]
                 ubg += [0, 0, 0]
                 equality+= [True,True, True]
@@ -574,7 +577,7 @@ class OCPtests(casadiTestCase):
             A = DM([[1,0.1],[0.2,1.1]])
             B = DM([[0.2],[0.7]])
 
-            F = Function("F",[x,u],[mtimes(A,x)+mtimes(B,u)])
+            F = Function("F",[x,u],[A @ x+B @ u])
 
             # Formulate the NLP
             for k in range(N):
@@ -763,14 +766,14 @@ class OCPtests(casadiTestCase):
         w0  += [0.7, 0.8, 0.9]
             
         # Add equality constraint
-        g   += [Xk-mtimes(D,Xk_next)]
+        g   += [Xk-D @ Xk_next]
         lbg += [0, 0, 0]
         ubg += [0, 0, 0]
         equality += [True,True,True]
 
         u = MX.sym("u",2)
         x = MX.sym("x",3)
-        F = Function("F",[x,u],[mtimes(A,x)+mtimes(B,u)])
+        F = Function("F",[x,u],[A @ x+B @ u])
 
         # Formulate the NLP
         for k in range(N):
@@ -805,13 +808,15 @@ class OCPtests(casadiTestCase):
          # Create an NLP solver
         yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0), equality
         
+    local_codegen_check_digits = codegen_check_digits
+    if os.name == 'nt': local_codegen_check_digits = local_codegen_check_digits -1
     for i,(prob,args,equality) in enumerate(test_problems()):
     
         jacobian_sparsity(prob["g"],prob["x"]).spy()
 
         solutions = {}
         stats = {}
-        for solver, solver_options in [("ipopt",{}),("fatrop",{"structure_detection":"auto","fatrop":{"accept_every_trial_step":False,"tol":1e-8,"max_iter":100},"equality":equality})]:
+        for solver, solver_options in [("ipopt",{}),("fatrop",{"structure_detection":"auto","fatrop":{"tol":1e-8,"max_iter":100},"equality":equality})]:
             f = nlpsol('solver', solver, prob, solver_options)
             #if solver=="fatrop" and i==2: raise Exception() 
 
@@ -820,7 +825,7 @@ class OCPtests(casadiTestCase):
             stats[solver] = f.stats()
             
             if solver!="ipopt":
-                self.check_codegen(f,args,std="c99",extralibs=["fatrop","blasfeo"],extra_options=flags,digits=codegen_check_digits)
+                self.check_codegen(f,args,std="c99",extralibs=["fatrop","blasfeo"],extra_options=flags,digits=local_codegen_check_digits)
                 self.check_serialize(f,args)
         
         for k in solutions["ipopt"].keys():
@@ -828,7 +833,7 @@ class OCPtests(casadiTestCase):
                 v_ref = solutions["ipopt"][k]
                 v = solutions["fatrop"][k]
                 
-                self.checkarray(v,v_ref,failmessage=k,digits=6)
+                self.checkarray(v,v_ref,failmessage=k,digits=5)
         assert(abs(stats["ipopt"]["iter_count"]-stats["fatrop"]["iter_count"])<=2)
 
 

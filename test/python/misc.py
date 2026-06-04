@@ -55,6 +55,25 @@ class Misctests(casadiTestCase):
 
     print_sparsity()
 
+  def test_issue4216(self):
+    self.message('Regression test #4216: complex numpy inputs should raise, not segfault')
+    self.assertRaises(TypeError, lambda: 0.5j * MX(1))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
+
+    c = numpy.array([3.+2j])
+    self.assertRaises((TypeError, NotImplementedError), lambda: DM(c))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
+    self.assertRaises((TypeError, NotImplementedError), lambda: SX(c))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
+    self.assertRaises((TypeError, NotImplementedError), lambda: MX(c))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
+
+    cv = 0.5j * numpy.ones(2)
+    # MX has no implicit numeric conversion so matmul reaches the casadi
+    # path and must raise TypeError. For DM/SX, numpy's __array__ path
+    # may instead raise ValueError on shape mismatch; either is fine here
+    # as long as no segfault occurs.
+    self.assertRaises((TypeError, NotImplementedError), lambda: cv @  MX(2))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
+    for d in (DM(2), SX(2)):
+      self.assertRaises((TypeError, NotImplementedError, ValueError),
+                        lambda d=d: cv @ d)  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
+
   def test_sanity(self):
     DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
     self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,4,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
@@ -150,7 +169,7 @@ class Misctests(casadiTestCase):
     nlp = {'x':x, 'f':x**2}
     i = nlpsol('i', "ipopt", nlp)
 
-    opts = i.optionNames()
+    opts = i.optionNames()  # pyright: ignore[reportAttributeAccessIssue]
     self.assertTrue(isinstance(opts,list))
 
     n = opts[0]
@@ -158,11 +177,11 @@ class Misctests(casadiTestCase):
 
     n = "monitor"
 
-    d = i.optionDescription(n)
+    d = i.optionDescription(n)  # pyright: ignore[reportAttributeAccessIssue]
     self.assertTrue(type(d)==type(""))
     self.assertTrue(not("d"=="N/A"))
 
-    d = i.optionTypeName(n)
+    d = i.optionTypeName(n)  # pyright: ignore[reportAttributeAccessIssue]
     self.assertEqual(d,"OT_STRINGVECTOR")
 
     #d = i.optionAllowed(n)
@@ -188,7 +207,7 @@ class Misctests(casadiTestCase):
     if systemswig: return
 
     try:
-      nlpsol(123)
+      nlpsol(123)  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except NotImplementedError as e:
       e_message = str(e)
@@ -198,7 +217,7 @@ class Misctests(casadiTestCase):
       assert "std" not in e_message
 
     try:
-      vcat(123)
+      vcat(123)  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except NotImplementedError as e:
       e_message = str(e)
@@ -209,7 +228,7 @@ class Misctests(casadiTestCase):
       assert "std" not in e_message
 
     try:
-      substitute(123)
+      substitute(123)  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except NotImplementedError as e:
       e_message = str(e)
@@ -220,7 +239,7 @@ class Misctests(casadiTestCase):
       assert "std" not in e_message
 
     try:
-      load_nlpsol(132)
+      load_nlpsol(132)  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except NotImplementedError as e:
       e_message = str(e)
@@ -231,13 +250,13 @@ class Misctests(casadiTestCase):
     x=SX.sym("x")
 
     try:
-      [x]+ x
+      [x]+ x  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except TypeError as e:
       e_message = str(e)
 
     try:
-      x + [x]
+      x + [x]  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except TypeError as e:
       e_message = str(e)
@@ -250,14 +269,14 @@ class Misctests(casadiTestCase):
       assert "reshape(SX,(int,int))" in e_message
 
     try:
-      x.reshape(("a",2))
+      x.reshape(("a",2))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except NotImplementedError as e:
       e_message = str(e)
       assert "You have: '(SX,(str,int))'" in e_message
 
     try:
-      diagsplit("s")
+      diagsplit("s")  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except NotImplementedError as e:
       e_message = str(e)
@@ -265,14 +284,14 @@ class Misctests(casadiTestCase):
       assert "diagsplit(DM,int)" in e_message
 
     try:
-      DM("df")
+      DM("df")  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except NotImplementedError as e:
       e_message = str(e)
       assert "  DM(" in e_message
 
     try:
-      vertcat(1,SX.sym('x'),MX.sym('x'))
+      vertcat(1,SX.sym('x'),MX.sym('x'))  # pyright: ignore[reportCallIssue,reportArgumentType,reportOperatorIssue,reportAttributeAccessIssue]
       self.assertTrue(False)
     except NotImplementedError as e:
       e_message = str(e)
@@ -318,9 +337,10 @@ class Misctests(casadiTestCase):
       self.assertTrue("x must be larger than 3" in str(e))
 
   def test_doc(self):
-    self.assertTrue("jac_penalty" in nlpsol.__doc__) # FunctionInternal
-    self.assertTrue("print_time" in nlpsol.__doc__)  # ProtoFunction
-    self.assertTrue( nlpsol.__doc__.count("print_time")==1)  # ProtoFunction
+    doc = nlpsol.__doc__ or ""
+    self.assertTrue("jac_penalty" in doc) # FunctionInternal
+    self.assertTrue("print_time" in doc)  # ProtoFunction
+    self.assertTrue( doc.count("print_time")==1)  # ProtoFunction
 
   @requires_nlpsol("ipopt")
   def test_output(self):

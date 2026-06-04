@@ -31,6 +31,7 @@ from helpers import *
 import itertools
 import os
 import sys
+import warnings
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 
@@ -177,12 +178,12 @@ class ADtests(casadiTestCase):
             for sens,seed in zip(fwdsens,fseeds):
               fe = Function("fe", [y],[sens])
               re = fe(f_in)
-              self.checkarray(c.vec(re),mtimes(J,c.vec(seed)),"AD")
+              self.checkarray(c.vec(re),J @ c.vec(seed),"AD")
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
               re = fe(f_in)
-              self.checkarray(c.vec(re),mtimes(J.T,c.vec(seed)),"AD")
+              self.checkarray(c.vec(re),J.T @ c.vec(seed),"AD")
 
   def test_MXeval_mx(self):
     n=array([1.2,2.3,7,1.4])
@@ -217,12 +218,12 @@ class ADtests(casadiTestCase):
             for sens,seed in zip(fwdsens,fseeds):
               fe = Function("fe", [y],[sens])
               re = fe(f_in)
-              self.checkarray(c.vec(re),mtimes(J,c.vec(seed)),"AD")
+              self.checkarray(c.vec(re),J @ c.vec(seed),"AD")
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
               re = fe(f_in)
-              self.checkarray(c.vec(re),mtimes(J.T,c.vec(seed)),"AD")
+              self.checkarray(c.vec(re),J.T @ c.vec(seed),"AD")
 
   @known_bug()  # Not implemented
   def test_MXeval_sx(self):
@@ -233,8 +234,8 @@ class ADtests(casadiTestCase):
           for outputtype in ["dense","sparse"]:
             self.message("eval_sx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f_in = [0]*f.n_in();f_in[0]=n
-            f_out = f(f_in)
+            f_in = [array(0)]*f.n_in();f_in[0]=n
+            f_out = f.call(f_in)
             r = f_out[0]
             J = self.jacobians[inputtype][outputtype](*n)
 
@@ -252,22 +253,22 @@ class ADtests(casadiTestCase):
 
             fe = Function("fe", [y], [res])
 
-            fe_in = [0]*fe.n_in();fe_in[0]=n
-            fe_out = fe(fe_in)
+            fe_in = [array(0)]*fe.n_in();fe_in[0]=n
+            fe_out = fe.call(fe_in)
 
             self.checkarray(r,fe_out[0])
 
             for sens,seed in zip(fwdsens,fseeds):
               fe = Function("fe", [y],[sens])
-              fe_in = [0]*fe.n_in();fe_in[0]=n
-              fe_out = fe(fe_in)
-              self.checkarray(c.vec(fe_out[0].T),mtimes(J,c.vec(seed.T)),"AD")
+              fe_in = [array(0)]*fe.n_in();fe_in[0]=n
+              fe_out = fe.call(fe_in)
+              self.checkarray(c.vec(fe_out[0].T),J @ c.vec(seed.T),"AD")
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
-              fe_in = [0]*fe.n_in();fe_in[0]=n
-              fe_out = fe(fe_in)
-              self.checkarray(c.vec(fe_out[0].T),mtimes(J.T,c.vec(seed.T)),"AD")
+              fe_in = [array(0)]*fe.n_in();fe_in[0]=n
+              fe_out = fe.call(fe_in)
+              self.checkarray(c.vec(fe_out[0].T),J.T @ c.vec(seed.T),"AD")
 
   def test_MXeval_sx_reduced(self):
     n=array([1.2,2.3,7,1.4])
@@ -440,15 +441,15 @@ class ADtests(casadiTestCase):
     x = MX.sym("x",2)
     y = MX.sym("y",2,2)
 
-    f1 = Function("f1", [x,y],[x+y[0,0],mtimes(y,x)])
+    f1 = Function("f1", [x,y],[x+y[0,0],y @ x])
     
-    f1_noninline = Function("f1", [x,y],[x+y[0,0],mtimes(y,x)],{"never_inline":True})
+    f1_noninline = Function("f1", [x,y],[x+y[0,0],y @ x],{"never_inline":True})
 
-    f2 = Function("f2", [x,y],[mtimes(MX.zeros(0,2),x)])
+    f2 = Function("f2", [x,y],[MX.zeros(0,2) @ x])
 
-    f3 = Function("f3", [x,y],[MX.zeros(0,0),mtimes(y,x)])
+    f3 = Function("f3", [x,y],[MX.zeros(0,0),y @ x])
 
-    f4 = Function("f4", [x,y],[MX.zeros(0,2),mtimes(y,x)])
+    f4 = Function("f4", [x,y],[MX.zeros(0,2),y @ x])
 
     ndir = 2
 
@@ -581,13 +582,13 @@ class ADtests(casadiTestCase):
           (in1,v1,yy[:,0],DM.eye(2),True,"c89"),
           (in1,v1,yy2[:,0],2*c.diag(x),True,"c89"),
           (in1,v1,yyy[:,0],sparsify(DM([[0,1],[1,0]])),True,"c89"),
-          (in1,v1,mtimes(y,x),y,True,"c89"),
-          (in1,v1,mtimes(x.T,y.T),y,True,"c89"),
+          (in1,v1,y @ x,y,True,"c89"),
+          (in1,v1,x.T @ y.T,y,True,"c89"),
           (in1,v1,mac(y,x,DM.zeros(Sparsity.triplet(2,1,[1],[0]))),y[Sparsity.triplet(2,2,[1,1],[0,1])],True,"c89"),
           (in1,v1,mac(x.T,y.T,DM.zeros(Sparsity.triplet(2,1,[1],[0]).T)),y[Sparsity.triplet(2,2,[1,1],[0,1])],True,"c89"),
-          (in1,v1,mtimes(y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],x),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
-          (in1,v1,mtimes(x.T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
-          (in1,v1,mtimes(y,x**2),y*2*vertcat(*[x.T,x.T]),True,"c89"),
+          (in1,v1,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])] @ x,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
+          (in1,v1,x.T @ y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
+          (in1,v1,y @ x**2,y*2*vertcat(*[x.T,x.T]),True,"c89"),
           (in1,v1,sin(x),c.diag(cos(x)),True,"c89"),
           (in1,v1,sin(x**2),c.diag(cos(x**2)*2*x),True,"c89"),
           (in1,v1,x*y[:,0],c.diag(y[:,0]),True,"c89"),
@@ -597,7 +598,9 @@ class ADtests(casadiTestCase):
           (in1,v1,x*y[[1,0],0],c.diag(y[[1,0],0]),True,"c89"),
           (in1,v1,c.dot(x,x),(2*x).T,True,"c89"),
           (in1,v1,c.dot(x**2,x),(3*x**2).T,True,"c89"),
-          #(in1,v1,c.det(horzcat(*[x,DM([1,2])])),DM([-1,2])), not implemented
+          # det: linear (det = 2*x0 - x1) and nonlinear (det = x0*x1 - 1)
+          (in1,v1,c.det(horzcat(*[x,DM([1,2])])),DM([[2,-1]]),True,"c89"),
+          (in1,v1,c.det(horzcat(vertcat(x[0],1),vertcat(1,x[1]))),horzcat(x[1],x[0]),True,"c89"),
           (in1,v1,f1.call(in1)[1],y,True,"c89"),
           (in1,v1,f1.call([x**2,y])[1],y*2*vertcat(*[x.T,x.T]),True,"c89"),
           (in1,v1,f2.call(in1)[0],DM.zeros(0,2),True,"c89"),
@@ -613,6 +616,28 @@ class ADtests(casadiTestCase):
           (in1,v1,c.dot(x,y[:,0]),y[:,0].T,True,"c89"),
           (in1,v1,x.nz[DM([[1,0]])].T*y.nz[DM([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]]),True,"c89"),
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]]),True,"c89"),
+          # Kron: out = kron(x, y), shape (4, 2). jac wrt x is built column by
+          # column: column-block i contains y in the rows belonging to x[i]'s
+          # outer block, zeros elsewhere.
+          (in1,v1,c.kron(x,y),
+                  horzcat(c.vec(vertcat(y,MX(2,2))), c.vec(vertcat(MX(2,2),y))),
+                  True,"c89"),
+          # Kron: swapped operand order. kron(y, x) — each y[r,s] scales an
+          # eye(2) block in the column direction of the jacobian.
+          (in1,v1,c.kron(y,x),
+                  vertcat(y[0,0]*DM.eye(2), y[1,0]*DM.eye(2),
+                          y[0,1]*DM.eye(2), y[1,1]*DM.eye(2)),
+                  True,"c89"),
+          # KronContract inner: out = kron_contract(kron(x,y), y, True) is
+          # sumsqr(y) * x by direct computation. jac wrt x = sumsqr(y) * I.
+          (in1,v1,c.kron_contract(c.kron(x,y),y,True),
+                  sumsqr(y)*DM.eye(2),
+                  True,"c89"),
+          # KronContract outer: out = kron_contract(kron(x,y), x, False) is
+          # sumsqr(x) * y by direct computation. jac wrt x = 2*vec(y) @ x.T.
+          (in1,v1,c.kron_contract(c.kron(x,y),x,False),
+                  2*c.vec(y) @ x.T,
+                  True,"c89"),
 
      ]:
       fun = Function("fun", inputs,[out])
@@ -706,13 +731,13 @@ class ADtests(casadiTestCase):
                   seed = array(fseed[d].T).ravel()
                   sens = array(vf_out[offset+0].T).ravel()
                   offset+=len(inputss)
-                  self.checkarray(sens,mtimes(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
+                  self.checkarray(sens,J_ @ seed,"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
 
                   seed = array(aseed[d].T).ravel()
                   sens = array(vf_out[offset+0].T).ravel()
                   offset+=len(inputss)
 
-                  self.checkarray(sens,mtimes(J_.T,seed),"eval Adj %d %s" % (d,str([vf_out[i] for i in range(vf.n_out())])))
+                  self.checkarray(sens,J_.T @ seed,"eval Adj %d %s" % (d,str([vf_out[i] for i in range(vf.n_out())])))
 
 
                 assert(offset==vf.n_out())
@@ -745,9 +770,9 @@ class ADtests(casadiTestCase):
                 if vf.is_a('MXFunction') and sym2==MX.sym: continue
 
                 for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-                  fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]
-                  aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
-                  inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
+                  fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]  # pyright: ignore[reportOptionalMemberAccess]
+                  aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]  # pyright: ignore[reportOptionalMemberAccess]
+                  inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]  # pyright: ignore[reportOptionalMemberAccess]
 
                   res2 = vf.call(inputss2,not vf.is_a("SXFunction"))
                   fwdsens2 = forward(res2,inputss2,fseeds2,dict(always_inline=not vf.is_a("SXFunction")))
@@ -788,7 +813,7 @@ class ADtests(casadiTestCase):
             #  jacobian()
             for mode in ["forward","reverse"]:
               ind = 0 if mode=='forward' else 1
-              f = funsx_ad[ind] if expand else fun_ad[ind]
+              f = funsx_ad[ind] if expand else fun_ad[ind]  # pyright: ignore[reportOptionalSubscript]
 
               Jf = jacobian_old(f, 0, 0)
               Jf_out = Jf.call(values)

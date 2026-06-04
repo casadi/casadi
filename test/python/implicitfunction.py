@@ -22,6 +22,7 @@
 #
 #
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
 import unittest
@@ -58,20 +59,20 @@ class ImplicitFunctiontests(casadiTestCase):
       A_ = DM([[1,2],[3,2.1]])
       C_ = DM([[1.6,2.1],[1,1.3]])
       b_ = DM([0.7,0.6])
-      f=Function("f", [x],[mtimes(A_,x)-b_, mtimes(C_,x)])
+      f=Function("f", [x],[A_ @ x-b_, C_ @ x])
       solver=rootfinder("solver", Solver, f, options)
       solver_out = solver(0)
 
-      refsol = Function("refsol", [x],[solve(A_,b_), mtimes(C_,solve(A_,b_))])
+      refsol = Function("refsol", [x],[solve(A_,b_), C_ @ solve(A_,b_)])
       self.checkfunction(solver,refsol,inputs=[0],digits=10)
       if "newton" in Solver: self.check_serialize(solver,inputs=[0])
       if "codegen" in features: self.check_codegen(solver,inputs=[0])
 
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
-      f=Function("f", [x,A,b],[mtimes(A,x)-b])
+      f=Function("f", [x,A,b],[A @ x-b])
       solver=rootfinder("solver", Solver, f, options)
-      solver_in = [0]*3
+      solver_in = [0]*3  # type: list
       solver_in[1]=A_
       solver_in[2]=b_
 
@@ -82,7 +83,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
-      f=Function("f", [x,A,b],[mtimes(A,x)-b,mtimes(C_,x)])
+      f=Function("f", [x,A,b],[A @ x-b,C_ @ x])
       for ad_weight_sp in [0,1]:
         for ad_weight in [0,1]:
           print(ad_weight, ad_weight_sp)
@@ -90,11 +91,11 @@ class ImplicitFunctiontests(casadiTestCase):
           options2["ad_weight_sp"] = ad_weight_sp
           options2["ad_weight"] = ad_weight
           solver=rootfinder("solver", Solver, f, options2)
-          solver_in = [0]*3
+          solver_in = [0]*3  # type: list
           solver_in[1]=A_
           solver_in[2]=b_
 
-          refsol = Function("refsol", [x,A,b],[solve(A,b),mtimes(C_,solve(A,b))])
+          refsol = Function("refsol", [x,A,b],[solve(A,b),C_ @ solve(A,b)])
           self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
           if "newton" in Solver: self.check_serialize(solver,inputs=solver_in)
       if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
@@ -174,7 +175,7 @@ class ImplicitFunctiontests(casadiTestCase):
       y=SX.sym("y",s)
       y0 = DM(Sparsity.diag(N),0.1)
 
-      f=Function("f", [y.nz[:],x.nz[:]],[((mtimes((x+y0),(x+y0).T)-mtimes((y+y0),(y+y0).T))[s]).nz[:]])
+      f=Function("f", [y.nz[:],x.nz[:]],[((((x+y0)) @ (x+y0).T-((y+y0)) @ (y+y0).T)[s]).nz[:]])
       options2 = dict(options)
       options2["constraints"] = [1]*s.nnz()
       solver=rootfinder("options2", Solver, f, options2)
@@ -193,7 +194,9 @@ class ImplicitFunctiontests(casadiTestCase):
       f_out = f(*f_in)
 
       refsol = Function("refsol", [X],[X.nz[:]])
-      refsol_in = [0]*refsol.n_in();refsol_in[0]=trial_in[0]
+      refsol_in = [0]*refsol.n_in()  # type: list
+
+      refsol_in[0]=trial_in[0]
 
       self.checkfunction(trial,refsol,inputs=refsol_in,digits=6,sens_der=False,evals=1,failmessage=message)
 
@@ -229,7 +232,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       print(Solver, options)
       x=SX.sym("x",2)
-      f=Function("f", [x],[vertcat(*[mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat(*[1,2])))])])
+      f=Function("f", [x],[vertcat(*[(x+3).T @ ((x-2)),(x-4).T @ ((x+vertcat(*[1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [-1,0]
       solver=rootfinder("solver", Solver, f, options2)
@@ -237,7 +240,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       self.checkarray(solver_out,DM([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
-      f=Function("f", [x],[vertcat(*[mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat(*[1,2])))])])
+      f=Function("f", [x],[vertcat(*[(x+3).T @ ((x-2)),(x-4).T @ ((x+vertcat(*[1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [1,0]
       solver=rootfinder("solver", Solver, f, options2)

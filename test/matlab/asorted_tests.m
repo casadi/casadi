@@ -1,5 +1,35 @@
 import casadi.*
 
+% Regression test for github.com/casadi/casadi/issues/4193 (comment
+% 3249204822): with `import casadi.*` active in Octave 10+, the unqualified
+% call `Foo(foo_instance)` was dispatched as the instance-method call
+% `foo_instance.Foo()`, making `foo_instance` bind to the ctor's `self` and
+% `nargin` become 0. The stock ctor then ran its no-arg MEX path and
+% clobbered self.swigPtr, so `MX(x)` silently returned a 0x0 empty matrix
+% while `casadi.MX(x)` returned a proper copy. This block pins down that
+% unqualified and fully qualified copy-ctor calls agree for every concrete
+% SWIG-wrapped type, and that the no-arg path still returns an empty.
+sx_sym = SX.sym('sx_sym_42');
+assert(isequal(size(SX(sx_sym)), size(casadi.SX(sx_sym))));
+assert(strcmp(str(SX(sx_sym)), str(casadi.SX(sx_sym))));
+assert(strcmp(str(SX(sx_sym)), 'sx_sym_42'));
+
+mx_sym = MX.sym('mx_sym_42');
+assert(isequal(size(MX(mx_sym)), size(casadi.MX(mx_sym))));
+assert(strcmp(str(MX(mx_sym)), str(casadi.MX(mx_sym))));
+assert(strcmp(str(MX(mx_sym)), 'mx_sym_42'));
+
+dm_val = DM([7;8;9]);
+assert(isequal(size(DM(dm_val)), [3 1]));
+assert(strcmp(str(DM(dm_val)), str(casadi.DM(dm_val))));
+
+sp_val = Sparsity.dense(3, 4);
+assert(isequal(size(Sparsity(sp_val)), [3 4]));
+assert(strcmp(str(Sparsity(sp_val)), str(casadi.Sparsity(sp_val))));
+
+% No-arg ctor must not be accidentally identity-cast
+assert(isequal(size(MX()), [0 0]));
+assert(isequal(size(SX()), [0 0]));
 
 x = MX.sym('x',2,3);
 p = MX.sym('p');
@@ -840,6 +870,127 @@ catch err
   msg = err.message;
 end
 assert(~isempty(strfind(msg,'Hey %d \Warning foo')))
+
+
+% MATLAB string class (R2016b+) round-trip through SWIG typemaps.
+% casadi.i was originally written when MATLAB only had char arrays; the
+% string-class branch was added so std::string / std::vector<std::string>
+% accept both.
+if exist('string', 'class') == 8
+  % --- std::string from a string scalar ---
+  s_sym = SX.sym(string('s_str_42'));
+  assert(strcmp(str(s_sym), 's_str_42'));
+
+  m_sym = MX.sym("m_str_42");  % double-quoted literal is a string scalar
+  assert(strcmp(str(m_sym), 'm_str_42'));
+
+  % Function name argument as a string
+  xa = MX.sym('xa');
+  fn1 = Function(string('myfun'), {xa}, {xa});
+  assert(strcmp(fn1.name(), 'myfun'));
+
+  % --- std::vector<std::string> from a string array ---
+  x = MX.sym('x', 2);
+  y = MX.sym('y');
+  fn2 = Function('fn2', {x, y}, {x*y}, ["xx", "yy"], "zz");
+  assert(strcmp(fn2.name_in(0), 'xx'));
+  assert(strcmp(fn2.name_in(1), 'yy'));
+  assert(strcmp(fn2.name_out(0), 'zz'));
+
+  % Column string array also accepted
+  fn3 = Function('fn3', {x, y}, {x+y}, ["aa"; "bb"], ["cc"]);
+  assert(strcmp(fn3.name_in(0), 'aa'));
+  assert(strcmp(fn3.name_in(1), 'bb'));
+
+  % Mix: string scalar still works inside a cell array
+  fn4 = Function('fn4', {x, y}, {x.*y}, {string('p'), 'q'}, {'r'});
+  assert(strcmp(fn4.name_in(0), 'p'));
+  assert(strcmp(fn4.name_in(1), 'q'));
+
+  % string-valued option in opts struct (dump_dir is a string Function option)
+  opt = struct();
+  opt.dump_dir = string('some_dir');
+  fn5 = Function(string('fn5'), {x}, {x.*x}, opt);
+  assert(strcmp(fn5.name(), 'fn5'));
+
+  % --- multi-element string array must not match scalar std::string ---
+  bad = false;
+  try
+    xb = MX.sym('xb');
+    Function(["bad1", "bad2"], {xb}, {xb});  %#ok<NASGU>
+  catch
+    bad = true;
+  end
+  assert(bad, 'multi-element string array should not satisfy std::string slot');
+end
+
+
+% +casadi cell-input concatenation helpers (mirror Python vcat/hcat/vvcat/dcat).
+% Each takes a single cell argument and forwards to the corresponding *cat
+% method, returning a typed empty DM/double when the cell is empty.
+xa = MX.sym('xa', 2, 3);
+ya = MX.sym('ya', 2, 3);
+
+% --- casadi inputs ---
+assert(isequal(size(casadi.vcat({xa, ya})),  [4 3]));
+assert(isequal(size(casadi.hcat({xa, ya})),  [2 6]));
+assert(isequal(size(casadi.dcat({xa, ya})),  [4 6]));
+assert(isequal(size(casadi.vvcat({xa, ya})), [12 1]));
+
+% Empty cell -> native MATLAB empty (pure-MATLAB-in / pure-MATLAB-out).
+% Wrap with casadi.DM(...) if a typed empty is needed.
+e = casadi.vcat({});  assert(isnumeric(e) && isequal(size(e), [0 1]));
+e = casadi.hcat({});  assert(isnumeric(e) && isequal(size(e), [1 0]));
+e = casadi.dcat({});  assert(isnumeric(e) && isequal(size(e), [0 0]));
+e = casadi.vvcat({}); assert(isnumeric(e) && isequal(size(e), [0 1]));
+
+% DM(m,n) and DM(zeros(m,n)) have the same SHAPE for any (m,n)...
+for s = {[0 1], [1 0], [0 0], [3 0], [0 3], [2 4]}
+  sh = s{1};
+  assert(isequal(size(DM(sh(1), sh(2))), size(DM(zeros(sh(1), sh(2))))));
+end
+% ...but the sparsity differs once positions exist:
+%   DM(2,2)        -> structurally empty sparse, nnz=0
+%   DM(zeros(2,2)) -> dense with explicit zeros, nnz=4
+assert(nnz(DM(2,2)) == 0);
+assert(nnz(DM(zeros(2,2))) == 4);
+% For empty shapes both have nnz=0 (no positions exist), so the empty
+% return path is interchangeable with DM(...).
+assert(nnz(DM(1,0)) == 0);
+assert(nnz(DM(zeros(1,0))) == 0);
+
+% Single-element cell
+assert(isequal(size(casadi.vcat({xa})), [2 3]));
+assert(isequal(size(casadi.hcat({xa})), [2 3]));
+assert(isequal(size(casadi.dcat({xa})), [2 3]));
+
+% --- pure-MATLAB inputs ---
+% vertcat/horzcat/diagcat/veccat dispatch on the first arg's class; for plain
+% doubles MATLAB's built-in vertcat/horzcat handles them and the result is a
+% native numeric array (no DM wrapping).
+A = [1 2; 3 4];
+B = [5 6; 7 8];
+v = casadi.vcat({A, B});
+assert(isnumeric(v) && isequal(v, [1 2; 3 4; 5 6; 7 8]));
+h = casadi.hcat({A, B});
+assert(isnumeric(h) && isequal(h, [1 2 5 6; 3 4 7 8]));
+
+% scalars
+v = casadi.vcat({1, 2, 3});
+assert(isnumeric(v) && isequal(v, [1; 2; 3]));
+h = casadi.hcat({1, 2, 3});
+assert(isnumeric(h) && isequal(h, [1 2 3]));
+
+% --- mixed DM and double ---
+% First arg is DM -> SparsityInterfaceCommon.vertcat dispatches; result is DM.
+m = casadi.vcat({DM([1; 2]), 3.0});
+assert(isa(m, 'casadi.DM') && isequal(full(m), [1; 2; 3]));
+m = casadi.hcat({DM([1, 2]), 3.0});
+assert(isa(m, 'casadi.DM') && isequal(full(m), [1 2 3]));
+m = casadi.dcat({DM([1, 2]), 3.0});
+assert(isa(m, 'casadi.DM') && isequal(full(m), [1 2 0; 0 0 3]));
+m = casadi.vvcat({DM([1; 2]), DM([3; 4])});
+assert(isa(m, 'casadi.DM') && isequal(full(m), [1; 2; 3; 4]));
 
 
 disp('success')

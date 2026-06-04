@@ -207,10 +207,16 @@ namespace casadi {
 
     OP_LOGSUMEXP,
 
-    OP_REMAINDER
+    OP_REMAINDER,
+
+    OP_DUMP,
+
+    OP_KRON,
+
+    OP_KRON_CONTRACT,
 
   };
-  #define NUM_BUILT_IN_OPS (OP_REMAINDER+1)
+  #define NUM_BUILT_IN_OPS (OP_KRON_CONTRACT+1)
 
   #define OP_
 
@@ -1094,6 +1100,7 @@ namespace casadi {
     case OP_PROJECT:       return F<OP_PROJECT>::check;
     case OP_ASSERTION:     return F<OP_ASSERTION>::check;
     case OP_MONITOR:       return F<OP_MONITOR>::check;
+    case OP_DUMP:          return F<OP_DUMP>::check;
     case OP_NORM2:         return F<OP_NORM2>::check;
     case OP_NORM1:         return F<OP_NORM1>::check;
     case OP_NORMINF:       return F<OP_NORMINF>::check;
@@ -1112,6 +1119,8 @@ namespace casadi {
     case OP_EXPM1:         return F<OP_EXPM1>::check;
     case OP_HYPOT:         return F<OP_HYPOT>::check;
     case OP_LOGSUMEXP:     return F<OP_LOGSUMEXP>::check;
+    case OP_KRON:          return F<OP_KRON>::check;
+    case OP_KRON_CONTRACT: return F<OP_KRON_CONTRACT>::check;
     }
     return T();
   }
@@ -1743,6 +1752,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_EXPM1:          return "expm1";
     case OP_HYPOT:          return "hypot";
     case OP_LOGSUMEXP:      return "logsumexp";
+    case OP_KRON:           return "kron";
+    case OP_KRON_CONTRACT:  return "kron_contract";
     }
     return "<invalid-op>";
   }

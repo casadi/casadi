@@ -20,6 +20,7 @@
 
 // C-REPLACE "fmin" "casadi_fmin"
 // C-REPLACE "fmax" "casadi_fmax"
+// C-REPLACE "fabs" "casadi_fabs"
 // C-REPLACE "std::numeric_limits<T1>::min()" "casadi_real_min"
 // C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
 // C-REPLACE "static_cast<int>" "(int) "

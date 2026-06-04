@@ -40,7 +40,7 @@ std::string to_string(FdMode v) {
 
 casadi_int n_fd_points(FdMode v) {
   switch (v) {
-    case FdMode::FORWARD: return 2;
+    case FdMode::FORWARD:
     case FdMode::BACKWARD: return 2;
     case FdMode::CENTRAL: return 3;
     case FdMode::SMOOTHING: return 5;
@@ -52,7 +52,7 @@ casadi_int n_fd_points(FdMode v) {
 casadi_int fd_offset(FdMode v) {
   switch (v) {
     case FdMode::FORWARD: return 0;
-    case FdMode::BACKWARD: return 1;
+    case FdMode::BACKWARD:
     case FdMode::CENTRAL: return 1;
     case FdMode::SMOOTHING: return 2;
     default: break;

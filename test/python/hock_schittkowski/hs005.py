@@ -1,16 +1,17 @@
 # This is an automatically generated file converting from the apm format
 
 import casadi as cs
+import numpy as np
 
 def hs005():
     # The optimal objective is (if given in):
-    x_opt = cs.DM([-cs.pi/3 + 0.5, -cs.pi/3 - 0.5])
-    f_opt = -(cs.sqrt(3)/2 + cs.pi/3)
+    x_opt = cs.DM([-np.pi/3 + 0.5, -np.pi/3 - 0.5])
+    f_opt = -(cs.sqrt(3)/2 + np.pi/3)
     x = cs.MX.sym('x', 2)
     obj = cs.MX.zeros(1, 1)
     x0 = cs.DM.zeros(2, 1)
-    lbx = -cs.inf*cs.DM.ones(2, 1)
-    ubx = cs.inf*cs.DM.ones(2, 1)
+    lbx = -np.inf*cs.DM.ones(2, 1)
+    ubx = np.inf*cs.DM.ones(2, 1)
     g = []
     lbg = []
     ubg = []

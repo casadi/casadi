@@ -18,6 +18,7 @@
 #
 # -*- coding: utf-8 -*-
 from casadi import *
+from numpy import inf
 import numpy as NP
 import matplotlib.pyplot as plt
 

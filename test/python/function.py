@@ -22,6 +22,7 @@
 #
 #
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
 import unittest
@@ -29,11 +30,14 @@ from types import *
 from helpers import *
 import pickle
 import os
+import re
 import sys
 from casadi.tools import capture_stdout
 import glob
 import gc
 import tempfile
+
+import random as random_base
 
 scipy_interpolate = False
 try:
@@ -72,7 +76,7 @@ class Functiontests(casadiTestCase):
       f(0)
 
       X = MX.sym("X",2)
-      F = f(X)
+      F = list(f(X))
       g = Function("g", [X],F)
 
       g(0)
@@ -106,7 +110,7 @@ class Functiontests(casadiTestCase):
 
     X = MX.sym("X")
 
-    z=f(X)
+    z=list(f(X))
 
     g = Function("g", [X], z).expand()
 
@@ -145,7 +149,7 @@ class Functiontests(casadiTestCase):
 
     def test(sp):
       x = SX.sym("x",sp.size2())
-      sp2 = jacobian(mtimes(DM.ones(sp),x),x).sparsity()
+      sp2 = jacobian(DM.ones(sp) @ x,x).sparsity()
       self.checkarray(sp.row(),sp2.row());
       self.checkarray(sp.colind(),sp2.colind());
 
@@ -329,7 +333,7 @@ class Functiontests(casadiTestCase):
 
 
     with self.assertRaises(Exception):
-      f_out["baz"]
+      f_out["baz"]  # pyright: ignore[reportUndefinedVariable]
 
     ret = f(i0=SX(12))
     self.checkarray(ret["foo"],DM([144]))
@@ -342,14 +346,14 @@ class Functiontests(casadiTestCase):
     n = 1
     x = SX.sym("x",n)
 
-    M = Function("M", [x],[mtimes((x-DM(list(range(n)))),x.T)])
+    M = Function("M", [x],[((x-DM(list(range(n))))) @ x.T])
 
     P = MX.sym("P",n,n)
     X = MX.sym("X",n)
 
     M_X= M(X)
 
-    Pf = Function("P", [X, P], [mtimes(M_X,P)])
+    Pf = Function("P", [X, P], [M_X @ P])
 
     P_P = jacobian_old(Pf, 1, 0)
 
@@ -453,12 +457,12 @@ class Functiontests(casadiTestCase):
           return Sparsity.dense(1,1)
         elif i==1:
           return Sparsity.dense(3,1)
-        elif i==2:
+        else:
           return Sparsity.dense(3,3)
       def get_sparsity_out(self, i):
         if i==0:
           return Sparsity.dense(3,1)
-        elif i==1:
+        else:
           return Sparsity.dense(3,3)
       def eval_buffer(self, arg, res):
         a = np.frombuffer(arg[0], dtype=np.float64)
@@ -479,7 +483,7 @@ class Functiontests(casadiTestCase):
 
     res = foo(a,b,c)
 
-    self.checkarray(res[0],mtimes(a*c,b))
+    self.checkarray(res[0],a*c @ b)
     self.checkarray(res[1],c**2)
 
   def test_callback_errors(self):
@@ -566,9 +570,9 @@ class Functiontests(casadiTestCase):
             x = arg[0]
             # Fill in smarter numerical code
             if self.flag_transp:
-                y = mtimes(self.A.T,x)
+                y = self.A.T @ x
             else:
-                y = mtimes(self.A,x)
+                y = self.A @ x
             return [y]
 
         def get_n_in(self):
@@ -626,7 +630,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",{"x":x,"y":y,"z":z,"v":v,"I":mtimes(z,y)+x,"II":sin(y*x).T,"III":v/x},["x","y","z","v"],["I","II","III"])
+    fun = Function("f",{"x":x,"y":y,"z":z,"v":v,"I":z @ y+x,"II":sin(y*x).T,"III":v/x},["x","y","z","v"],["I","II","III"])
 
     n = 2
 
@@ -657,7 +661,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -696,7 +700,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -734,7 +738,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     X_ = [ DM(x.sparsity(),np.random.random(x.nnz())) for i in range(10) ]
     Y_ = [ DM(y.sparsity(),np.random.random(y.nnz())) for i in range(10) ]
@@ -758,7 +762,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -776,7 +780,7 @@ class Functiontests(casadiTestCase):
         for ad_weight_sp in [0,1]:
           F = Function("F",X+Y+Z+V,list(map(sin,res)),{"ad_weight": 0,"ad_weight_sp":ad_weight_sp})
 
-          resref = [0 for i in range(fun.n_out())]
+          resref = [0 for i in range(fun.n_out())]  # type: list
           for r in zip(X,Y,Z_alt,V):
             for i,e in enumerate(fun.call(r)):
               resref[i] = resref[i] + e
@@ -805,7 +809,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[z @ y+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -825,7 +829,7 @@ class Functiontests(casadiTestCase):
             else:
               F = fun.map("map",parallelization,n,[2,3],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
 
-            resref = [0 for i in range(fun.n_out())]
+            resref = [0 for i in range(fun.n_out())]  # type: list
             acc = 0
             bl = []
             cl = []
@@ -914,10 +918,10 @@ class Functiontests(casadiTestCase):
     x = SX.sym("x")
 
     with self.assertRaises(Exception):
-      f = SXFunction("f", [x],[x],{"fooo": False})
+      f = SXFunction("f", [x],[x],{"fooo": False})  # pyright: ignore[reportUndefinedVariable]
 
     with self.assertRaises(Exception):
-      f = SXFunction("f", [x],[x],{"ad_weight": "foo"})
+      f = SXFunction("f", [x],[x],{"ad_weight": "foo"})  # pyright: ignore[reportUndefinedVariable]
 
     if not has_nlpsol("ipopt"):
       return
@@ -938,7 +942,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("v",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,x)+y,sin(y*x).T,v/y])
+    fun = Function("f",[x,y,z,v],[z @ x+y,sin(y*x).T,v/y])
 
     n = 2
 
@@ -977,7 +981,7 @@ class Functiontests(casadiTestCase):
           self.checkfunction(f,Fref,inputs=inputs)
           self.check_codegen(f,inputs=inputs)
 
-    fun = Function("f",[y,x,z,v],[mtimes(z,x)+y+c.trace(v)**2,sin(y*x).T,v/y])
+    fun = Function("f",[y,x,z,v],[z @ x+y+c.trace(v)**2,sin(y*x).T,v/y])
 
     for ad_weight in range(2):
       for ad_weight_sp in range(2):
@@ -1010,7 +1014,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("v",Sparsity.upper(3))
 
-    fun = Function("f",[y,z,x,v],[mtimes(z,x)+y,sin(y*x).T,v/y],["y","z","x","v"],["out0","out1","out2"])
+    fun = Function("f",[y,z,x,v],[z @ x+y,sin(y*x).T,v/y],["y","z","x","v"],["out0","out1","out2"])
 
     n = 2
 
@@ -1030,7 +1034,7 @@ class Functiontests(casadiTestCase):
     for sf,sF in zip(scheme_out_fun,scheme_out_F):
       self.assertTrue(sf==sF)
 
-    fun = Function("f",[x,y,z,v],[mtimes(z,x)+y,sin(y*x).T,v/y],["x","y","z","v"],["out0","out1","out2"])
+    fun = Function("f",[x,y,z,v],[z @ x+y,sin(y*x).T,v/y],["x","y","z","v"],["out0","out1","out2"])
 
     n = 2
 
@@ -1441,7 +1445,9 @@ class Functiontests(casadiTestCase):
         def get_n_in(self): return 2
         def get_n_out(self): return 1
 
-        def get_sparsity_in(i):
+        def get_sparsity_in(i):  # pyright: ignore[reportIncompatibleMethodOverride,reportSelfClsParameterName]
+          # Deliberately missing `self` and returning int -- this test
+          # asserts Callback reports the error at construction time.
           return 4
 
         def eval(self,arg):
@@ -1490,12 +1496,12 @@ class Functiontests(casadiTestCase):
           z2 = sin(z1)
           return [z2]
 
-      self.cb = Fun()
+      self.cb = Fun()  # pyright: ignore[reportAttributeAccessIssue]
 
       if not indirect:
-        return self.cb
+        return self.cb  # pyright: ignore[reportAttributeAccessIssue]
 
-      f = Function("f", [x,y],[self.cb(x,y)])
+      f = Function("f", [x,y],[self.cb(x,y)])  # pyright: ignore[reportAttributeAccessIssue]
 
       return f
 
@@ -1504,7 +1510,7 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,jacobian=False,gradient=False,hessian=False,evals=False)
 
       with self.assertRaises(Exception):
-        f.gradient()
+        f.gradient()  # pyright: ignore[reportAttributeAccessIssue]
 
       with self.assertRaises(Exception):
         jacobian_old(f, 0, 0)
@@ -1673,8 +1679,8 @@ class Functiontests(casadiTestCase):
             return self.cb_rev
 
       opts = {"verbose":True}
-      self.cb = Fun(opts)
-      f = self.cb
+      self.cb = Fun(opts)  # pyright: ignore[reportAttributeAccessIssue]
+      f = self.cb  # pyright: ignore[reportAttributeAccessIssue]
 
       if not indirect:
         return f
@@ -1845,7 +1851,7 @@ class Functiontests(casadiTestCase):
         x = MX.sym('x',n)
         As = MX.sym('A',n,n)
 
-        dae = {'x':x,'p':vec(As),'ode':mtimes(As,x)}
+        dae = {'x':x,'p':vec(As),'ode':As @ x}
         intg = integrator('intg','cvodes',dae,{'reltol':1e-14,'abstol':1e-14})
 
         Intg = intg.map('identity','serial',n,[1],[])
@@ -1878,6 +1884,7 @@ class Functiontests(casadiTestCase):
       self.assertTrue(JA.nnz()==0)
       self.assertTrue(Jt.nnz()==n**2)
 
+  @memory_heavy()
   def test_conditional(self):
 
     np.random.seed(5)
@@ -1905,7 +1912,7 @@ class Functiontests(casadiTestCase):
   def test_max_num_dir(self):
     x = MX.sym("x",10)
 
-    f = Function("ffff",[x],[mtimes(DM.ones(10,10),x)],{"max_num_dir":4,"verbose":True})
+    f = Function("ffff",[x],[DM.ones(10,10) @ x],{"max_num_dir":4,"verbose":True})
     f = f.expand()
 
 
@@ -1951,7 +1958,7 @@ class Functiontests(casadiTestCase):
     if not args.run_slow: return
     x = MX.sym("x",3)
     y = MX.sym("y",3,3)
-    f = Function("f",[x,y],[x**3,mtimes(y,x)])
+    f = Function("f",[x,y],[x**3,y @ x])
     c = CodeGenerator('me')
     c.add(f, True)
     
@@ -1960,12 +1967,12 @@ class Functiontests(casadiTestCase):
     DM.rng(0)
     x0 = DM.rand(x.sparsity())
     y0 = DM.rand(y.sparsity())
-    [F,_] = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=True,external_opts={"enable_fd":True})
-    FJ = F.jacobian()
+    cg = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=True,external_opts={"enable_fd":True})
+    FJ = cg["F"].jacobian()
     for i in range(fJ.n_out()):
         self.assertEqual(fJ.sparsity_out(i),FJ.sparsity_out(i))
-    [F,_] = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=False,external_opts={"enable_fd":True})
-    FJ = F.jacobian()
+    cg = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=False,external_opts={"enable_fd":True})
+    FJ = cg["F"].jacobian()
     for i in range(fJ.n_out()):
         self.assertTrue(FJ.sparsity_out(i).is_dense())
 
@@ -2087,6 +2094,17 @@ class Functiontests(casadiTestCase):
     self.check_codegen(F,inputs=[vertcat(0.3,0.4)])
     self.check_serialize(F,inputs=[vertcat(0.3,0.4)])
 
+    # Parametric knots (MX knots, always inlined)
+    K = [MX.sym("K0",len(knots[0])), MX.sym("K1",len(knots[1]))]
+    Y_pk = bspline(x,C,K,[3,2],2)
+    # Substitute fixed knots to compare with reference
+    knots_dm = [DM(k) for k in knots]
+    Y_sub = substitute([Y_pk], K, knots_dm)[0]
+    F_pk = Function('f_pk',[x,C],[Y_sub])
+    F_pk = Function('f_pk',[x],[F_pk(x,data)])
+    self.checkfunction(f,F_pk,inputs=[vertcat(0.3,0.4)])
+    self.check_codegen(F_pk,inputs=[vertcat(0.3,0.4)],std="c99")
+
 
   def test_smooth_linear(self):
     np.random.seed(0)
@@ -2139,6 +2157,7 @@ class Functiontests(casadiTestCase):
     self.check_codegen(f,inputs=[np.random.random((3,3))], opts={"avoid_stack": True})
 
 
+  @memory_heavy()
   def test_serialize(self):
     for opts in [{"debug":True},{}]:
       x = SX.sym("x")
@@ -2333,14 +2352,14 @@ class Functiontests(casadiTestCase):
       solver = nlpsol("solver","ipopt",{"x": x,"f": x**2, "g": g})
 
     import re
-    found = set([m.group(1) for m in re.finditer("Compiling function '(\w+?)'", out[0])])
+    found = set([m.group(1) for m in re.finditer(r"Compiling function '(\w+?)'", out[0])])
     self.assertTrue(len(found)==1)
     self.assertTrue("fwd1_Q" in found)
 
     with capture_stdout() as out:
       self.check_serialize(solver,inputs={"x0": 2})
 
-    found = set([m.group(1) for m in re.finditer("Compiling function '(\w+?)'", out[0])])
+    found = set([m.group(1) for m in re.finditer(r"Compiling function '(\w+?)'", out[0])])
     self.assertTrue(len(found)==2)
     self.assertTrue("Q" in found)
     self.assertTrue("fwd1_Q" in found)
@@ -2474,6 +2493,64 @@ class Functiontests(casadiTestCase):
       self.checkarray(Xr,X)
       self.checkarray(Ar,A)
 
+    if args.run_slow and "ghc-filesystem" in CasadiMeta.feature_list():
+      import shutil
+      for d in ["dump_fn", "dump_fn_codegen"]:
+        if os.path.exists(d):
+          shutil.rmtree(d)
+
+      # Codegen test for dump_in/dump_out
+      x = MX.sym("x", Sparsity.lower(3))
+      z = MX.sym("z", 2, 2)
+      f = Function("f", [x, z], [2*x, 2*z], ["x", "z"], ["a", "c"],
+                   {"dump_in": True, "dump_out": True, "dump_dir": "dump_fn"})
+
+      ins = [sparsify(DM([[1, 0, 0], [2, 4, 0], [7, 8, 9]])), DM([[1, 3], [4, 5]])]
+      f(*ins)
+
+      self.check_codegen(f, inputs=ins, std="c99", main=True,
+                         opts={"dump_dir_suffix": "_codegen"})
+
+      for name in ["f.000000.in.txt", "f.000000.in.x.mtx", "f.000000.in.z.mtx",
+                    "f.000000.out.a.mtx", "f.000000.out.c.mtx", "f.000000.out.txt"]:
+        self.file_equal(os.path.join("dump_fn", name),
+                        os.path.join("dump_fn_codegen", name))
+
+      for d in ["dump_fn", "dump_fn_codegen"]:
+        if os.path.exists(d):
+          shutil.rmtree(d)
+
+  def test_print(self):
+    import re
+    x = MX.sym("x",Sparsity.lower(3))
+    z = MX.sym("z",2,2)
+    f = Function("f",[x,z],[2*x,2*z],["x","z"],["a","c"],
+                 {"print_in":True,"print_out":True,"print_canonical":True})
+
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[1,3],[4,5]])]
+
+    with capture_stdout() as out:
+      result = f(*ins)
+    vm_output = out[0]
+
+    self.checkarray(result[0],2*ins[0])
+    self.checkarray(result[1],2*ins[1])
+
+    # Strip pointer addresses from VM output for comparison
+    vm_lines = [re.sub(r' \(0x[0-9a-f]+\)','',line)
+                for line in vm_output.strip().split('\n')]
+    self.assertTrue(len(vm_lines)>=6)
+
+    self.check_codegen(f,inputs=ins,std="c99",main=True,main_output_check=False)
+    if args.run_slow:
+      with open(f.name()+"_out.txt","r") as fh:
+        cg_output = fh.read()
+      # Extract print lines (skip main output values line)
+      cg_lines = [line for line in cg_output.strip().split('\n')
+                  if line.startswith("Function") or line.startswith("Input")
+                     or line.startswith("Output")]
+      self.assertEqual(vm_lines,cg_lines)
+
   def test_eval_shapes(self):
     x = MX.sym("x",Sparsity.lower(3))
     y = MX.sym("y",3,1)
@@ -2602,6 +2679,7 @@ class Functiontests(casadiTestCase):
         with self.assertInException("mismatching shape"):
           f.generate_in("test.txt",ins)
       else:
+        assert ref is not None  # by construction: ref_flat is not None implies ref is not None
         res = f.nz_from_in(ins)
         self.checkarray(res,ref_flat)
 
@@ -2753,6 +2831,12 @@ class Functiontests(casadiTestCase):
 
       options = {"is_diff_in":[True,False],"is_diff_out":[True,False]}
       f = Function("f",[x,y],[sin(x+y),x*y],options)
+      
+      if X is MX:
+        fexpanded = f.expand()
+        r1 = str(f).split(" ")[0]
+        r2 = str(fexpanded).split(" ")[0]
+        self.assertEqual(r1,r2)
 
 
 
@@ -2790,20 +2874,20 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x",5)
     y = MX.sym("x",5,5)
 
-    f = Function("f",[x,y],[mtimes(y,x),mtimes(y.T,x)],{"never_inline":True,"is_diff_in":[False,True],"is_diff_out":[False,True]})
+    f = Function("f",[x,y],[y @ x,y.T @ x],{"never_inline":True,"is_diff_in":[False,True],"is_diff_out":[False,True]})
     
     
 
     x = SX.sym("x",5)
     y = SX.sym("x",5,5)
-    
-    g = Function('g',[x,y],f(x,y))
-    
+
+    g = Function('g',[x,y],list(f(x,y)))
+
 
     X = MX.sym("x",5)
     Y = MX.sym("x",5,5)
-    
-    G = Function('g',[x,y],f(x,y))
+
+    G = Function('g',[x,y],list(f(x,y)))
     
     DM.rng(1)
     x0=DM.rand(5)
@@ -2840,7 +2924,7 @@ class Functiontests(casadiTestCase):
     LUT_param = casadi.interpolant('name','linear',[N,M],2, {"lookup_mode": ["exact","linear"]})
 
     only_fd = {"enable_fd": True, "enable_forward": False, "enable_reverse": False}
-    options = {"ad_weight_sp":-1}
+    options = {"ad_weight_sp":-1}  # type: dict
     options.update(only_fd)
     options["forward_options"] = only_fd
     options["reverse_options"] = only_fd
@@ -2876,8 +2960,8 @@ class Functiontests(casadiTestCase):
 
 
     [buf,f_eval] = f.buffer()
-    buf.set_arg(0, memoryview(A_))
-    buf.set_res(0, memoryview(B_))
+    buf.set_arg(0, memoryview(A_))  # pyright: ignore[reportCallIssue,reportArgumentType]
+    buf.set_res(0, memoryview(B_))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     f_eval()
 
@@ -2917,7 +3001,7 @@ class Functiontests(casadiTestCase):
     [buf,trigger] = f.buffer()
 
     a = np.array([1.0])
-    buf.set_res(0, memoryview(a))
+    buf.set_res(0, memoryview(a))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     trigger()
 
@@ -3157,7 +3241,7 @@ class Functiontests(casadiTestCase):
     
     with open("f.c","r") as inp:
         for line in inp.readlines():
-            if re.search("static int casadi_(\w+)_ref_counter",line):
+            if re.search(r"static int casadi_(\w+)_ref_counter",line):
                 n_matches = n_matches +1
     
     self.assertEqual(n_matches,1)
@@ -3177,12 +3261,13 @@ class Functiontests(casadiTestCase):
         
         with open("f.c","r") as inp:
             for line in inp.readlines():
-                if re.search("static int casadi_(\w+)_ref_counter",line):
+                if re.search(r"static int casadi_(\w+)_ref_counter",line):
                     n_matches = n_matches +1
         
         # wrapper function should not have it's own reference counting
         self.assertEqual(n_matches,1)
 
+  @memory_heavy()
   def test_codegen_thread_safe(self):
   
     for variant in [0,1]:
@@ -3271,26 +3356,67 @@ class Functiontests(casadiTestCase):
     # No extra options on windows
     if os.name == 'nt':
       extra_options = []
-    F,lib = self.check_codegen(c,inputs=c.convert_in(inputs),std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
-    F = F.wrap()
+    cg = self.check_codegen(c,inputs=c.convert_in(inputs),std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
+    F = cg["F"].wrap()
     print("memful_external")
-    self.check_codegen(F,inputs=c.convert_in(inputs),valgrind=True,main=True,extralibs=[lib],debug_mode=True)
-    
+    self.check_codegen(F,inputs=c.convert_in(inputs),valgrind=True,main=True,extralibs=[cg["libname"]],debug_mode=True)
+
     # Check wrapper Function
     for X in [MX,SX]:
-    
+
         g = X.sym("g",2)
         inputs["g"] = g
-        
+
         f = Function('wrapper',[g],[c(**inputs)['x']])
         print(f)
         # No extra options on windows
         if os.name == 'nt':
           extra_options = []
-        F,lib = self.check_codegen(f,inputs=[vertcat(1,2)],std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
-        F = F.wrap()
+        cg = self.check_codegen(f,inputs=[vertcat(1,2)],std="c99",extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
+        F = cg["F"].wrap()
         print("memful_external")
-        self.check_codegen(F,inputs=[vertcat(1,2)],valgrind=True,main=True,extralibs=[lib],debug_mode=True)
+        self.check_codegen(F,inputs=[vertcat(1,2)],valgrind=True,main=True,extralibs=[cg["libname"]],debug_mode=True)
+
+
+  @requires_conic('osqp')
+  def test_memful_jit(self):
+    if not args.run_slow: return
+    c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
+    inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
+    extra_options = ["-Wno-endif-labels","-Wno-unused-variable","-Wno-strict-prototypes"]
+    # No extra options on windows
+    if os.name == 'nt':
+      extra_options = []
+
+    # Check wrapper Function
+    for X in [MX,SX]:
+        g = X.sym("g",2)
+        inputs["g"] = g
+
+        libdir = GlobalOptions.getCasadiPath()
+        includedir = GlobalOptions.getCasadiIncludePath()
+        
+        compiler_flags = extra_options
+        linker_flags = []
+        if os.name=='nt':
+            compiler_flags.append("/I"+includedir)
+            linker_flags.append("/LIBPATH:"+libdir)
+            linker_flags.append("osqp.lib")
+        else:
+            compiler_flags.append("-I"+includedir)
+            compiler_flags.append("-L"+libdir)
+            compiler_flags.append("-losqp")
+            linker_flags.append("-I"+includedir)
+            linker_flags.append("-L"+libdir)
+            linker_flags.append("-losqp")
+            
+        f = Function('wrapper',[g],[c(**inputs)['x']])
+        jit_opts = {"jit":True,"compiler":"shell","jit_options":{"compiler_flags":compiler_flags,"linker_flags": linker_flags,"verbose":True}}
+        fj = Function('wrapper',[g],[c(**inputs)['x']],jit_opts)
+        self.checkfunction_light(f,fj,inputs=[vertcat(1,2)])
+        
+        self.check_codegen(f,inputs=[vertcat(1,2)],std="c99",external_opts=jit_opts,extra_options=extra_options,extralibs=["osqp"],debug_mode=True)
+        
    
   def test_cse(self):
     for X in [SX,MX]:
@@ -3608,7 +3734,20 @@ class Functiontests(casadiTestCase):
     f = StringDeserializer(data).unpack()
     print(f.reverse(1))
     f.reverse(1).jac_sparsity()
-   
+
+  def test_issue_4345(self):
+    # SXFunction must match MXFunction adjoint sparsity; a structurally-zero
+    # sensitivity (unused input) should come out 0nz, not full-pattern.
+    for X in [SX,MX]:
+      x = X.sym("x", Sparsity.upper(3))
+      y = X.sym("y", Sparsity.upper(3))
+      for z, adj_y_nnz in [(x**2,          0),   # y unused        -> adj_y 0nz
+                           (x**2 + y[0,0], 6),   # y partially used -> adj_y 6nz
+                           (x*y,           6)]:  # y fully used     -> adj_y 6nz
+        adj = Function("f", [x, y], [z]).reverse(1)
+        self.assertEqual(adj.nnz_out(0), 6)            # adj_x: full input pattern
+        self.assertEqual(adj.nnz_out(1), adj_y_nnz)    # adj_y: SX must agree with MX
+
   @requires_nlpsol("ipopt")
   def test_issue_3134(self):
     p = MX.sym("p")
@@ -3700,8 +3839,8 @@ class Functiontests(casadiTestCase):
     mychecks(f)
     
     if not args.run_slow: return
-    F,_ = self.check_codegen(f,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())],with_jac_sparsity=True,with_forward=True)
-    mychecks(F,exempt=True)
+    cg = self.check_codegen(f,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())],with_jac_sparsity=True,with_forward=True)
+    mychecks(cg["F"],exempt=True)
    
    
   def test_cat_input(self):
@@ -3757,7 +3896,6 @@ class Functiontests(casadiTestCase):
         
         self.checkfunction_light(fcmx,fcsx,inputs=[DM.rand(X.sparsity())])
 
-    
   def test_external(self):
     if not args.run_slow: return
     with self.assertInException("config failed"):
@@ -3848,9 +3986,9 @@ class Functiontests(casadiTestCase):
       self.assertEqual("wr3" in code, enabled)
       
       lines = """
-  casadi_int i, j, k;
+  casadi_int i;
   casadi_real *rr, w0, *w1=w+2, w2, *w3=w+8, *w4=w+18, *w5=w+28, *w6=w+33, *w7=w+38, *w8=w+43, *w9=w+68;
-  const casadi_real *cs, *ct, *wr3, *wr4, *wr6, *wr9;
+  const casadi_real *cs, *wr3, *wr4, *wr6, *wr9;
   /* #0: @0 = 0 */
   w0 = 0.;
   /* #1: @1 = ones(1x5) */
@@ -3882,7 +4020,7 @@ class Functiontests(casadiTestCase):
   /* #13: @5 = (@5+@7) */
   for (i=0, rr=w5, cs=w7; i<5; ++i) (*rr++) += (*cs++);
   /* #14: @0 = mac(@1,@5,@0) */
-  for (i=0, rr=(&w0); i<1; ++i) for (j=0; j<1; ++j, ++rr) for (k=0, cs=w1+j, ct=w5+i*5; k<5; ++k) *rr += cs[k*1]**ct++;
+  casadi_mtimes_dense(w1, 1, 5, w5, 1, (&w0), 0);
   /* #15: output[0][0] = @0 */
   if (res[0]) res[0][0] = w0;
   /* #16: @0 = 9 */
@@ -3979,108 +4117,378 @@ class Functiontests(casadiTestCase):
   @memory_heavy()
   @requiresPlugin(Importer,"shell")
   def test_blazing_spline(self):
-    for N in [1,2,3]:
-      
-        def knots_expand(k):
-            return [k[0]]*3 + k + [k[-1]]*3
-      
-        knots0 = [0,0.2,0.5,0.8,1]
-        knots1 = [0,0.1,0.5,0.9,1]
-        knots2 = [0,0.4,1]
-        
-        x0 = [0.4,0.5,0.6][:N]
-        
-        knots_orig = [knots0, knots1, knots2][:N]
-        knots = [knots_expand(e) for e in knots_orig][:N]
-        
-        
-        x=MX.sym("x",N)
-        
-        nc = np.prod([len(k)-4 for k in knots])
-        DM.rng(1)
-        data = DM.rand(nc)
-        C = MX.sym("C",nc,1)
-        Y = bspline(x,C,knots,[3]*N,1)
-        F_ref = Function('f',[x,C],[Y])
-        
-        print(Y)
-        
-        F_ref2 = Function('f',[x,C],[Y,jacobian(Y,x)])
-        
-        F_ref2([0]*N,data)
-        
-        print(knots)
-        
-        
-        if os.name=='nt':
-            F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
-        else:
-            F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
-        
-        def test_points(knots):
-            import itertools
-            selector = [lambda e: e[0]-0.1,lambda e: e[0],lambda e: (e[0]+e[1])/2,lambda e: e[-1],lambda e: e[-1]+0.1]
-            for s in itertools.product(selector,repeat=len(knots)):
-                yield [e(k) for e,k in zip(s,knots_orig)]
+    def test_points(knots_orig):
+        import itertools
+        selector = [lambda e: e[0]-0.1,lambda e: e[0],lambda e: (e[0]+e[1])/2,lambda e: e[-1],lambda e: e[-1]+0.1]
+        for s in itertools.product(selector,repeat=len(knots_orig)):
+            yield [e(k) for e,k in zip(s,knots_orig)]
 
-        for a in test_points(knots):
-            self.checkfunction_light(F,F_ref,inputs=[vcat(a),data])
-            self.check_serialize(F,inputs=[vcat(a),data])
-       
-        y = sin(F(x,C))
-        
-        f = Function('f',[x,C],[y,jacobian(y,x),gradient(y,x)]+list(hessian(y,x)))
-        fcse = Function('fcse',[x,C],[y,jacobian(y,x),gradient(y,x)]+list(hessian(y,x)),{"cse":True})
-        
-        with capture_stdout() as result:
-            fcse.disp(True)
-            
-        self.assertEqual(result[0].count(" F_der_der("),1)
-        self.assertEqual(result[0].count(" F_der("),0)
-        self.assertEqual(result[0].count(" F("),0)
-        self.checkfunction_light(f,fcse,inputs=[vcat(x0),data])
-        f = Function('f',[x,C],[y,jacobian(y,x),gradient(y,x)])
-        fcse = Function('fcse',[x,C],[y,jacobian(y,x),gradient(y,x)],{"cse":True})
-        
-        with capture_stdout() as result:
-            fcse.disp(True)
-        self.assertEqual(result[0].count(" F_der_der("),0)
-        self.assertEqual(result[0].count(" F_der("),1)
-        self.assertEqual(result[0].count(" F("),0)
-        fcse.disp(True)
-        self.checkfunction_light(f,fcse,inputs=[vcat(x0),data])
-        
+    for N in [1,2,3,4,5]:
+      for precompute_coeff in [False, True]:
+        for precompute_grid in [False, True]:
+          if precompute_coeff and N>3: continue
+          for parametric_grid in [False, True]:
+            if parametric_grid and precompute_coeff and N>3: continue
 
+            def knots_expand(k):
+                return [k[0]]*3 + k + [k[-1]]*3
+  
+            knots0 = [0,0.2,0.5,0.8,1]
+            knots1 = [0,0.1,0.5,0.9,1]
+            knots2 = [0,0.4,1]
+            knots3 = [0,0.3,1]
+            knots4 = [0,0.2,1]
+            x0 = [0.4,0.5,0.6,0.7,0.8][:N]
+  
+            knots_orig = [knots0, knots1, knots2, knots3, knots4][:N]
+            knots = [knots_expand(e) for e in knots_orig][:N]
+  
+  
+            x=MX.sym("x",N)
+  
+            nc = int(np.prod([len(k)-4 for k in knots]))
+            DM.rng(1)
+            data = DM.rand(nc)
+            C = MX.sym("C",nc,1)
+            Y = bspline(x,C,knots,[3]*N,1)
+            F_ref = Function('f',[x,C],[Y])
+  
+            if parametric_grid:
+              knot_dims = [len(k) for k in knots]
+              if os.name=='nt':
+                  F = blazing_spline("F",knot_dims,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "pedantic_mode_order": "ignore", "pedantic_mode_size": "ignore", "jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
+              else:
+                  F = blazing_spline("F",knot_dims,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "pedantic_mode_order": "ignore", "pedantic_mode_size": "ignore", "jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
+  
+              # Stacked knots vector for substitution
+              knots_stacked = []
+              for k in knots:
+                  knots_stacked.extend(k)
+              knots_data = DM(knots_stacked)
+              K = MX.sym("K",len(knots_stacked))
+  
+              # Wrap: substitute fixed knots into parametric F to get (x,C)->f
+              F_call = F(x, C, K)
+              F_sub = substitute([F_call[0]], [K], [knots_data])
+              F_test = Function('F_test',[x, C], F_sub)
+            else:
+              F_ref2 = Function('f',[x,C],[Y,jacobian(Y,x)])
+              F_ref2([0]*N,data)
+              print(knots)
+  
+              if os.name=='nt':
+                  F = blazing_spline("F",knots,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "pedantic_mode_order": "ignore", "pedantic_mode_size": "ignore", "jit":True,"jit_options":{"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}})
+              else:
+                  F = blazing_spline("F",knots,{"precompute_coeff": precompute_coeff, "precompute_grid": precompute_grid, "pedantic_mode_order": "ignore", "pedantic_mode_size": "ignore", "jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
+              F_test = Function('F_test',[x, C], [F(x, C)[0]])
+  
+            all_points = list(test_points(knots_orig))
+  
+            if N>3:
+                random_base.seed(1)
+                all_points = random_base.sample(all_points,125)
+  
+            for a in all_points:
+                self.checkfunction_light(F_test,F_ref,inputs=[vcat(a),data])
+  
+            if not parametric_grid:
+              F2 = Function.deserialize(F.serialize({"debug":True}))
+              for a in all_points:
+                  self.checkfunction_light(F,F2,inputs=[vcat(a),data])
+  
+            self.check_codegen(F_test,inputs=[vcat(a),data],std="c99")
+  
+            if parametric_grid:
+              y_sin = substitute(sin(F(x,C,K)), K, knots_data)
+            else:
+              y_sin = sin(F(x,C))
+  
+            f = Function('f',[x,C],[y_sin,jacobian(y_sin,x),gradient(y_sin,x)])
+            fcse = Function('fcse',[x,C],[y_sin,jacobian(y_sin,x),gradient(y_sin,x)],{"cse":True})
+            self.checkfunction_light(f,fcse,inputs=[vcat(x0),data])
+  
+            f2 = Function('f',[x,C],[y_sin,jacobian(y_sin,x),gradient(y_sin,x)]+list(hessian(y_sin,x)))
+            fcse2 = Function('fcse',[x,C],[y_sin,jacobian(y_sin,x),gradient(y_sin,x)]+list(hessian(y_sin,x)),{"cse":True})
+            self.checkfunction_light(f2,fcse2,inputs=[vcat(x0),data])
+  
+            with capture_stdout() as result:
+                fcse2.disp(True)
+  
+            self.assertEqual(result[0].count(" F_der_der("),1)
+            self.assertEqual(result[0].count(" F_der("),0)
+            self.assertEqual(result[0].count(" F("),0)
+  
+            with capture_stdout() as result:
+                fcse.disp(True)
+            self.assertEqual(result[0].count(" F_der_der("),0)
+            self.assertEqual(result[0].count(" F_der("),1)
+            self.assertEqual(result[0].count(" F("),0)
+  
+            # extract_parametric: check extractable parameter-only subexpressions
+            if parametric_grid:
+              y_J = jacobian(F(x,C,K)[0], x)
+              _,_,parametric_exprs = extract_parametric(y_J, vertcat(C,K))
+              if precompute_coeff or precompute_grid:
+                # grid: inv depends only on K; coeff: dC depends on C and K
+                self.assertTrue(len(parametric_exprs)>0)
+                self.assertTrue(any(not e.is_zero() for e in parametric_exprs))
+              else:
+                # neither: no parameter-only subexpressions
+                self.assertEqual(len(parametric_exprs), 0)
+            else:
+              y_J = jacobian(F(x,C)[0], x)
+              _,_,parametric_exprs = extract_parametric(y_J, C)
+              if precompute_coeff:
+                # dC = derivative_coeff(C) is a C-only subexpression
+                self.assertTrue(len(parametric_exprs)>0)
+                self.assertTrue(any(not e.is_zero() for e in parametric_exprs))
+              else:
+                # non-parametric grid/none: no parameter-only subexpressions
+                self.assertEqual(len(parametric_exprs), 0)
+  
+            # Jacobian comparison
+            FJ_ref = F_ref.jacobian()
+  
+            if parametric_grid:
+              FJ_param = F.jacobian()
+              adj_f = MX.sym("adj_f", 1, 1)
+              fj_out = FJ_param(x, C, K, adj_f)
+              fj_x = substitute(fj_out[0], K, knots_data)
+              fj_C = substitute(fj_out[1], K, knots_data)
+              FJ_test = Function('FJ_test',[x, C, adj_f],[fj_x, fj_C])
+            else:
+              FJ = F.jacobian()
+              FJ.generate("FJ.c",{"main":True})
+              FJ.generate_in("FJ_in.txt",[vcat(a),data,0])
+              FJ_test = FJ
+  
+            for a in all_points:
+                self.checkfunction_light(FJ_test,FJ_ref,inputs=[vcat(a),data,0])
+  
+            if not parametric_grid:
+              print("ref")
+              F_ref2([0]*N,data)
+  
+              FJ = FJ.jacobian()
+              FJ.generate("FH.c",{"main":True})
+              FJ.generate_in("FH_in.txt",[vcat(x0),data,0,0,0])
+              print(FJ)
+  
+              FJ_ref = FJ_ref.jacobian()
+              import time
+              t0 = time.time()
+              FJ_ref(vcat(a),data,0,0,0)
+              print("FJ_ref" ,time.time()-t0)
+              t0 = time.time()
+              FJ(vcat(a),data,0,0,0)
+              print("FJ" ,time.time()-t0)
+              for a in all_points:
+                  self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0,0,0])
+  
+            if parametric_grid:
+              # Test that changing knots gives different results
+              knots_alt_orig = [[0,0.3,0.6,0.7,1],[0,0.2,0.4,0.8,1],[0,0.5,1],[0,0.4,1],[0,0.3,1]][:N]
+              knots_alt = [knots_expand(e) for e in knots_alt_orig][:N]
+              knots_alt_stacked = []
+              for k in knots_alt:
+                  knots_alt_stacked.extend(k)
+              knots_alt_data = DM(knots_alt_stacked)
 
-        FJ = F.jacobian()
-        FJ.generate("FJ.c",{"main":True})
-        FJ.generate_in("FJ_in.txt",[vcat(a),data,0])
-        FJ_ref = F_ref.jacobian()
-        
-        print("ref")
-        F_ref2([0]*N,data)
-        
-        for a in test_points(knots):
-            self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0])
-       
-        FJ = FJ.jacobian()
-        FJ.generate("FH.c",{"main":True})
-        FJ.generate_in("FH_in.txt",[vcat(x0),data,0,0,0])
-        print(FJ)
+              y_alt = substitute(F(x, C, K)[0], K, knots_alt_data)
+              F_alt = Function('F_alt',[x, C],[y_alt])
+              res1 = F_test(vcat(x0), data)
+              res2 = F_alt(vcat(x0), data)
+              self.assertFalse(np.allclose(float(res1), float(res2)),
+                  "Parametric knots should produce different results with different knot vectors")
 
-        FJ_ref = FJ_ref.jacobian()
-        import time
-        t0 = time.time()
-        FJ_ref(vcat(a),data,0,0,0)
-        print("FJ_ref" ,time.time()-t0)
-        t0 = time.time()
-        FJ(vcat(a),data,0,0,0)
-        print("FJ" ,time.time()-t0)
-        for a in test_points(knots):
-            print(vcat(a),data,0,0,0)
-            self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0,0,0])
-            
-            
+          # lookup_mode test: uniform knots so 'exact' is valid
+          x_lu = MX.sym("x",N)
+          knots_uniform_orig = [
+              list(np.linspace(0,1,5)),
+              list(np.linspace(0,1,5)),
+              list(np.linspace(0,1,3)),
+              list(np.linspace(0,1,3)),
+              list(np.linspace(0,1,3)),
+          ][:N]
+          knots_uniform = [[k[0]]*3 + k + [k[-1]]*3 for k in knots_uniform_orig]
+          nc_u = int(np.prod([len(k)-4 for k in knots_uniform]))
+          DM.rng(1)
+          data_u = DM.rand(nc_u)
+          C_u = MX.sym("C",nc_u,1)
+          Y_u = bspline(x_lu,C_u,knots_uniform,[3]*N,1)
+          F_ref_u = Function('f',[x_lu,C_u],[Y_u])
+
+          points_u = list(test_points(knots_uniform_orig))
+          if N>3:
+              random_base.seed(1)
+              points_u = random_base.sample(points_u,125)
+
+          for lookup_mode in ["linear","exact","binary"]:
+            opts_lu = {"precompute_coeff": precompute_coeff,
+                       "precompute_grid": precompute_grid,
+                       "lookup_mode": [lookup_mode]*N,
+                       "pedantic_mode_order": "ignore",
+                       "pedantic_mode_size": "ignore",
+                       "jit": True}
+            if os.name=='nt':
+                opts_lu["jit_options"] = {"flags": ["/I"+GlobalOptions.getCasadiIncludePath()]}
+            else:
+                opts_lu["jit_options"] = {"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}
+            F_lu = blazing_spline("F",knots_uniform,opts_lu)
+            F_lu_test = Function('F_lu_test',[x_lu, C_u], [F_lu(x_lu, C_u)[0]])
+
+            for a in points_u:
+                self.checkfunction_light(F_lu_test,F_ref_u,inputs=[vcat(a),data_u])
+
+            F_lu2 = Function.deserialize(F_lu.serialize({"debug":True}))
+            for a in points_u:
+                self.checkfunction_light(F_lu,F_lu2,inputs=[vcat(a),data_u])
+
+  @skip("simde" not in CasadiMeta.feature_list())
+  def test_blazing_spline_pedantic(self):
+    # The pedantic checks fire in BlazingSplineFunction::init() based purely
+    # on knot counts; they don't require evaluation or JIT. We pass plain
+    # monotonic float lists; the spline math validity is irrelevant here.
+
+    # n-4 = 8 (power of 2) -> pedantic_mode_size trips
+    knots_size_bad_1d = [[float(i) for i in range(12)]]            # n=12 -> n-4=8
+
+    # Order trip: counts [17, 13] are not non-decreasing
+    # 17 -> n-4=13 (ok), 13 -> n-4=9 (ok), so size check stays silent.
+    knots_order_bad_2d = [
+        [float(i) for i in range(17)],
+        [float(i) for i in range(13)],
+    ]
+
+    # Cumulative-product trip: counts [8, 8] -> extents [4, 4] (individually
+    # below the >=8 threshold), but prefix product 4*4 = 16 (pow2) trips.
+    knots_cumul_bad_2d = [
+        [float(i) for i in range(8)],
+        [float(i) for i in range(8)],
+    ]
+
+    # Clean: counts [13, 17] non-decreasing, n-4 in {9, 13}, neither pow2,
+    # cumulative product 9*13 = 117 also not pow2.
+    knots_clean_2d = [
+        [float(i) for i in range(13)],
+        [float(i) for i in range(17)],
+    ]
+    knots_clean_1d = [[float(i) for i in range(13)]]               # n-4=9
+
+    # ----- assertInException: 'error' mode raises -----
+    with self.assertInException("powers of 2"):
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size": "error"})
+
+    with self.assertInException("not increasing"):
+      blazing_spline("F", knots_order_bad_2d,
+                     {"pedantic_mode_order": "error",
+                      "pedantic_mode_size":  "ignore"})
+
+    # Message should pinpoint the zero-based dim index of the offender.
+    with self.assertInException("dim 0 (zero-based)"):
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size": "error"})
+
+    # Bad mode value errors out (only checked when there is an offender to
+    # report; clean configs short-circuit before the mode is interpreted).
+    with self.assertInException("'pedantic_mode_size' must be one of"):
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size": "bogus"})
+
+    # Cumulative-product trip: individuals are below the >=8 threshold but
+    # the prefix product hits a power of 2.
+    with self.assertInException("prefix product"):
+      blazing_spline("F", knots_cumul_bad_2d,
+                     {"pedantic_mode_size": "error"})
+
+    # ----- capture_stdout: 'warn' mode emits a warning, no raise -----
+    with capture_stdout() as result:
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size": "warn"})
+    self.assertTrue("powers of 2" in result[0] or "powers of 2" in result[1])
+
+    with capture_stdout() as result:                               # order default = 'warn'
+      blazing_spline("F", knots_order_bad_2d,
+                     {"pedantic_mode_size": "ignore"})
+    self.assertTrue("not increasing" in result[0] or "not increasing" in result[1])
+
+    # 'ignore' produces no warning text and no exception.
+    with capture_stdout() as result:
+      blazing_spline("F", knots_size_bad_1d,
+                     {"pedantic_mode_size":  "ignore",
+                      "pedantic_mode_order": "ignore"})
+    self.assertFalse("powers of 2" in result[0] or "powers of 2" in result[1])
+
+    # ----- Clean configs must not raise even with 'error' on both knobs -----
+    blazing_spline("F", knots_clean_1d,
+                   {"pedantic_mode_order": "error",
+                    "pedantic_mode_size":  "error"})
+    blazing_spline("F", knots_clean_2d,
+                   {"pedantic_mode_order": "error",
+                    "pedantic_mode_size":  "error"})
+    # Single dimension trivially satisfies the order constraint.
+    blazing_spline("F", knots_clean_1d, {"pedantic_mode_order": "error"})
+
+    # ----- (n_knots - 5) path: precompute_coeff_=True && diff_order_>=1.
+    # Only the jacobian child sees this, so the parent stays silent and
+    # the trip fires when F.jacobian() builds the child. pedantic_mode_*
+    # propagates from parent to child automatically; no jacobian_options
+    # plumbing needed.
+    # 13 knots -> n-4=9 (ok), n-5=8 (pow2), n-6=7 (ok).
+    knots_n5_bad_1d = [[float(i) for i in range(13)]]
+
+    # Default pedantic_mode_size = 'error' propagates -> jacobian raises.
+    with self.assertInException("(n_knots - 5)"):
+      F = blazing_spline("F", knots_n5_bad_1d)
+      F.jacobian()
+    # Message also reports the diff order.
+    with self.assertInException("diff order 1"):
+      F = blazing_spline("F", knots_n5_bad_1d)
+      F.jacobian()
+
+    # Parent 'warn' propagates -> child warns, no exception.
+    with capture_stdout() as result:
+      F = blazing_spline("F", knots_n5_bad_1d,
+                         {"pedantic_mode_size": "warn"})
+      F.jacobian()
+    self.assertTrue("(n_knots - 5)" in result[0] or "(n_knots - 5)" in result[1])
+
+    # Parent 'ignore' propagates -> child silent too (no exception, no log).
+    with capture_stdout() as result:
+      F = blazing_spline("F", knots_n5_bad_1d,
+                         {"pedantic_mode_size": "ignore"})
+      F.jacobian()
+    self.assertFalse("(n_knots - 5)" in result[0] or "(n_knots - 5)" in result[1])
+
+    # jacobian_options still wins when explicitly provided.
+    with capture_stdout() as result:
+      F = blazing_spline("F", knots_n5_bad_1d,
+                         {"jacobian_options": {"pedantic_mode_size": "ignore"}})
+      F.jacobian()
+    self.assertFalse("(n_knots - 5)" in result[0] or "(n_knots - 5)" in result[1])
+
+    # 15 knots -> n-4=11, n-5=10, n-6=9 all clean at every diff order.
+    knots_jac_clean_1d = [[float(i) for i in range(15)]]
+    F = blazing_spline("F", knots_jac_clean_1d,
+                       {"pedantic_mode_size": "error"})
+    F.jacobian()
+
+    # ----- (n_knots - 6) path: !precompute_coeff_ && diff_order_>=2.
+    # Reached via a grandchild built by F.jacobian().jacobian().
+    # 14 knots -> n-4=10 (ok), n-5=9 (ok), n-6=8 (pow2).
+    knots_n6_bad_1d = [[float(i) for i in range(14)]]
+
+    # Default 'error' propagates two levels deep.
+    with self.assertInException("(n_knots - 6)"):
+      F = blazing_spline("F", knots_n6_bad_1d,
+                         {"precompute_coeff": False})
+      F.jacobian().jacobian()
+    with self.assertInException("diff order 2"):
+      F = blazing_spline("F", knots_n6_bad_1d,
+                         {"precompute_coeff": False})
+      F.jacobian().jacobian()
+
   def test_noncanonical_sparsity(self):
     x = MX.sym("x",4,4)
     y = MX.sym("y")
@@ -4233,9 +4641,9 @@ class Functiontests(casadiTestCase):
 
     A = MX(DM.rand(2,2))
     B = MX(DM.rand(2,2))
-    C = mtimes(A,B)
+    C = A @ B
 
-    C = mtimes(C,C)
+    C = C @ C
 
     x = MX.sym("x")
     f = Function('f',[x],[(x*(2*C)+(2*C))*C[0]])

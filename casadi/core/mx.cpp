@@ -24,6 +24,7 @@
 
 
 #include "mx_node.hpp"
+#include "dump.hpp"
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
 #include "multiple_output.hpp"
@@ -36,6 +37,7 @@
 #include "serializing_stream.hpp"
 #include "im.hpp"
 #include "bspline.hpp"
+#include "kron.hpp"
 #include "casadi_call.hpp"
 #include <array>
 
@@ -150,7 +152,7 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const Slice& rr, const Slice& cc) const {
     // Fall back on (IM, IM)
-    return get(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
+    get(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
   }
 
   void MX::get(MX& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc) const {
@@ -186,7 +188,8 @@ namespace casadi {
   void MX::get(MX& m, bool ind1, const Matrix<casadi_int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
     if (is_dense()) {
-      return get_nz(m, ind1, rr);
+      get_nz(m, ind1, rr);
+      return;
     }
 
     // If indexed matrix was a row/column vector, make sure that the result is too
@@ -248,12 +251,14 @@ namespace casadi {
   void MX::set(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Matrix<casadi_int>& cc) {
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
-      return set(m, ind1, rr.T(), cc);
+      set(m, ind1, rr.T(), cc);
+      return;
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return set(m, ind1, rr, cc.T());
+      set(m, ind1, rr, cc.T());
+      return;
     }
 
     // Make sure rr and cc are dense vectors
@@ -266,11 +271,13 @@ namespace casadi {
     if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
       if (m.is_scalar()) {
         // m scalar means "set all"
-        return set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
+        set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
+        return;
       } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return set(m.T(), ind1, rr, cc);
+        set(m.T(), ind1, rr, cc);
+        return;
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch. lhs is " + str(rr.size1()) + "-by-"
@@ -302,7 +309,7 @@ namespace casadi {
         el->at(k) = this_i + this_j*sz1;
       }
     }
-    return set(m, false, el);
+    set(m, false, el);
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr) {
@@ -321,18 +328,21 @@ namespace casadi {
         Sparsity sp = rr.sparsity() * m.sparsity();
 
         // Project both matrices to this sparsity
-        return set(project(m, sp), ind1, Matrix<casadi_int>::project(rr, sp));
+        set(project(m, sp), ind1, Matrix<casadi_int>::project(rr, sp));
+        return;
       } else if (m.is_scalar()) {
         // m scalar means "set all"
         if (m.is_dense()) {
-          return set(MX(rr.sparsity(), m), ind1, rr);
+          set(MX(rr.sparsity(), m), ind1, rr);
         } else {
-          return set(MX(rr.size()), ind1, rr);
+          set(MX(rr.size()), ind1, rr);
         }
+        return;
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return set(m.T(), ind1, rr);
+        set(m.T(), ind1, rr);
+        return;
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch. lhs is " + str(rr.size())
@@ -351,7 +361,8 @@ namespace casadi {
 
     // Dense mode
     if (is_dense() && m.is_dense()) {
-      return set_nz(m, ind1, rr);
+      set_nz(m, ind1, rr);
+      return;
     }
 
     // Construct new sparsity pattern
@@ -464,14 +475,17 @@ namespace casadi {
       if (m.is_scalar()) {
         // m scalar means "set all"
         if (!m.is_dense()) return; // Nothing to set
-        return set_nz(MX(kk.sparsity(), m), ind1, kk);
+        set_nz(MX(kk.sparsity(), m), ind1, kk);
+        return;
       } else if (kk.size() == m.size()) {
         // Project sparsity if needed
-        return set_nz(project(m, kk.sparsity()), ind1, kk);
+        set_nz(project(m, kk.sparsity()), ind1, kk);
+        return;
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return set_nz(m.T(), ind1, kk);
+        set_nz(m.T(), ind1, kk);
+        return;
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch. lhs is " + str(kk.size())
@@ -482,7 +496,8 @@ namespace casadi {
     // Call recursively if points both objects point to the same node
     if (this==&m) {
       MX m_copy = m;
-      return set_nz(m_copy, ind1, kk);
+      set_nz(m_copy, ind1, kk);
+      return;
     }
 
     // Check bounds
@@ -503,7 +518,8 @@ namespace casadi {
         if (ind1) i--;
         if (i<0) i += sz;
       }
-      return set_nz(m, false, kk_mod); // Call recursively
+      set_nz(m, false, kk_mod); // Call recursively
+      return;
     }
 
     // Create a nonzero assignment node
@@ -620,7 +636,7 @@ namespace casadi {
       } else {
         // Get nonzeros sparsity cast
         MX nz;
-        e.get_nz(nz, 0, Slice());
+        e.get_nz(nz, false, Slice());
         for (casadi_int i=0; i<nz.nnz(); ++i) {
           ret.push_back(nz(i));
         }
@@ -653,13 +669,13 @@ namespace casadi {
     *this = ret;
   }
 
-  MX MX::mtimes(const MX& x, const MX& y) {
+  MX MX::mtimes(const MX& x, const MX& y, const std::string& blas) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return x*y;
     } else {
       MX z = MX::zeros(Sparsity::mtimes(x.sparsity(), y.sparsity()));
-      return mac(x, y, z);
+      return mac(x, y, z, blas);
     }
   }
 
@@ -693,7 +709,7 @@ namespace casadi {
     return axis==0 ? ret.T() : ret;
   }
 
-  MX MX::mac(const MX& x, const MX& y, const MX& z) {
+  MX MX::mac(const MX& x, const MX& y, const MX& z, const std::string& blas) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + x*y;
@@ -712,7 +728,7 @@ namespace casadi {
     } else if (x.is_zero() || y.is_zero()) {
       return z;
     } else {
-      return x->get_mac(y, z);
+      return x->get_mac(y, z, blas);
     }
   }
 
@@ -733,6 +749,15 @@ namespace casadi {
 
   MX MX::monitor(const std::string& comment) const {
     return(*this)->get_monitor(comment);
+  }
+
+  MX MX::dump(const std::string& base_filename, const Dict& opts) const {
+    return(*this)->get_dump(base_filename, opts);
+  }
+
+  void MX::reset_dump_count() {
+    casadi_assert(op()==OP_DUMP, "reset_dump_count: not a dump node");
+    static_cast<Dump*>(get())->reset_dump_count();
   }
 
   MX MX::lift(const MX& x, const MX& x_guess) {
@@ -832,7 +857,7 @@ namespace casadi {
   }
 
   void MX::serialize(SerializingStream& s) const {
-    return (*this)->serialize(s);
+    (*this)->serialize(s);
   }
 
   MX MX::deserialize(DeserializingStream& s) {
@@ -1543,9 +1568,6 @@ namespace casadi {
     // A boolean vector indicated whoch nodes are tainted by substitutions
     std::vector<bool> tainted(swork.size());
 
-    // Temporary std::stringstream
-    std::stringstream ss;
-
     // Construct lookup table for expressions,
     // giving priority to first occurances
     std::map<const MXNode*, casadi_int> expr_lookup;
@@ -1856,7 +1878,7 @@ namespace casadi {
   void MX::shared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
       const std::string& v_prefix, const std::string& v_suffix) {
     // Call new, more generic function
-    return extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
+    extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
       {"prefix", v_prefix}, {"suffix", v_suffix}});
   }
 
@@ -1961,7 +1983,12 @@ namespace casadi {
   }
 
   MX MX::det(const MX& x) {
-    return x->get_det();
+    return det(x, "qr");
+  }
+
+  MX MX::det(const MX& x, const std::string& lsolver, const Dict& opts) {
+    Linsol mysolver("det", lsolver, x.sparsity(), opts);
+    return mysolver.det(x);
   }
 
   MX MX::inv_node(const MX& x) {
@@ -2013,18 +2040,11 @@ namespace casadi {
   }
 
   MX MX::kron(const MX& a, const MX& b) {
-    const Sparsity &a_sp = a.sparsity();
-    MX filler(b.size());
-    std::vector< std::vector< MX > > blocks(a.size1(), std::vector< MX >(a.size2(), filler));
-    for (casadi_int i=0; i<a.size1(); ++i) {
-      for (casadi_int j=0; j<a.size2(); ++j) {
-        casadi_int k = a_sp.get_nz(i, j);
-        if (k!=-1) {
-          blocks[i][j] = a.nz(k)*b;
-        }
-      }
-    }
-    return blockcat(blocks);
+    return a->get_kron(b);
+  }
+
+  MX MX::kron_contract(const MX& m, const MX& x, bool inner) {
+    return m->get_kron_contract(x, inner);
   }
 
   MX MX::repmat(const MX& x, casadi_int n, casadi_int m) {
@@ -2043,6 +2063,18 @@ namespace casadi {
 
   MX MX::repsum(const MX& x, casadi_int n, casadi_int m) {
     return x->get_repsum(n, m);
+  }
+
+  MX MX::linspace(const MX& a, const MX& b, casadi_int nsteps) {
+    // Specialized over GenericMatrix<MX>::linspace to keep the MX graph
+    // O(1) in nsteps. The FP recipe (a + i*step interior, literal b at
+    // the endpoint) matches the generic implementation and numpy.linspace
+    // bit-for-bit; see test_linspace in test/python/matrix.py.
+    if (nsteps < 2) return b;
+    MX step = (b - a) / static_cast<double>(nsteps - 1);
+    std::vector<double> idx(nsteps - 1);
+    for (casadi_int i = 0; i < nsteps - 1; ++i) idx[i] = static_cast<double>(i);
+    return vertcat(std::vector<MX>{a + DM(idx) * step, b});
   }
 
   MX MX::solve(const MX& a, const MX& b) {
@@ -2165,6 +2197,14 @@ namespace casadi {
 
   MX MX::bspline(const MX& x, const MX& coeffs,
             const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts) {
+    return BSplineParametric::create(x, coeffs, knots, degree, m, opts);
+  }
+
+  MX MX::bspline(const MX& x, const MX& coeffs,
+            const std::vector<MX>& knots,
             const std::vector<casadi_int>& degree,
             casadi_int m,
             const Dict& opts) {

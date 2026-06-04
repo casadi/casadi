@@ -31,6 +31,7 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <type_traits>
 
 namespace casadi {
 
@@ -186,6 +187,23 @@ namespace casadi {
         \identifier{2ax} */
     std::string pool_double(const std::string& name) const;
 
+    /** \brief Declare a static mutex associated with a function
+
+     (thread-safe mode only, idempotent)
+
+        \identifier{2fm} */
+    void define_local_mutex(const Function& f, const std::string& name);
+
+    /** \brief Access a static mutex associated with a function
+
+        \identifier{2fn} */
+    std::string local_mutex(const Function& f, const std::string& name) const;
+
+    /** \brief Get all mutex names associated with a function
+
+        \identifier{2fo} */
+    const std::set<std::string>& local_mutexes(const Function& f) const;
+
     /** \brief Setup a callback
 
         \identifier{27s} */
@@ -321,16 +339,31 @@ namespace casadi {
         }
 
         s << "{";
-        for (casadi_int i = 0; i < v.size(); ++i) {
-            if (i != 0) {
-                if (max_initializer_elements_per_line > 1 &&
-                    i % max_initializer_elements_per_line == 0) {
-                    s << ",\n  ";
-                } else {
-                    s << ", ";
+        // Shortcut only for arithmetic T; for std::string, `T(0)` would
+        // invoke std::string(const char*) with a null pointer.
+        bool all_zeros = std::is_arithmetic<T>::value && v.size() > 0;
+        if (all_zeros) {
+            for (const auto& el : v) {
+                if (el != T()) {
+                    all_zeros = false;
+                    break;
                 }
             }
-            s << constant(v[i]);
+        }
+        if (all_zeros) {
+            s << constant(T()); // empty_initialization shorthand
+        } else {
+            for (casadi_int i = 0; i < v.size(); ++i) {
+                if (i != 0) {
+                    if (max_initializer_elements_per_line > 1 &&
+                        i % max_initializer_elements_per_line == 0) {
+                        s << ",\n  ";
+                    } else {
+                        s << ", ";
+                    }
+                }
+                s << constant(v[i]);
+            }
         }
         s << "}";
         return s.str();
@@ -417,6 +450,20 @@ namespace casadi {
                        const std::string& z, const Sparsity& sp_z,
                        const std::string& w, bool tr);
 
+    /** \brief Codegen dense matrix-matrix multiplication
+
+        \identifier{2gc} */
+    std::string mtimes(const std::string& x, casadi_int nrow_x, casadi_int ncol_x,
+                       const std::string& y, casadi_int ncol_y,
+                       const std::string& z, bool tr);
+
+    /** \brief Codegen dense-sparse matrix-matrix multiplication (z, x dense)
+
+        \identifier{2gd} */
+    std::string mtimes_dense_sparse(const std::string& x, casadi_int nrow_x,
+                                    const std::string& y, const Sparsity& sp_y,
+                                    const std::string& z);
+
     /** \brief Codegen lower triangular solve
 
         \identifier{ss} */
@@ -477,6 +524,12 @@ namespace casadi {
                    const std::string& v, const std::string& sp_r,
                    const std::string& r, const std::string& beta,
                    const std::string& prinv, const std::string& pc);
+
+    /** \brief Determinant from sparse QR factors
+
+        \identifier{2hy} */
+    std::string det(const std::string& sp_v, const std::string& v,
+                    const std::string& sp_r, const std::string& r, const std::string& beta);
 
     /** \brief QR solve
 
@@ -648,6 +701,18 @@ namespace casadi {
       AUX_AXPY,
       AUX_DOT,
       AUX_BILIN,
+      AUX_KRON,
+      AUX_KRON_DENSE,
+      AUX_KRON_DENSE_SPARSE,
+      AUX_KRON_SPARSE_DENSE,
+      AUX_KRON_CONTRACT_INNER,
+      AUX_KRON_CONTRACT_INNER_DENSE,
+      AUX_KRON_CONTRACT_INNER_DENSE_SPARSE,
+      AUX_KRON_CONTRACT_INNER_SPARSE_DENSE,
+      AUX_KRON_CONTRACT_OUTER,
+      AUX_KRON_CONTRACT_OUTER_DENSE,
+      AUX_KRON_CONTRACT_OUTER_DENSE_SPARSE,
+      AUX_KRON_CONTRACT_OUTER_SPARSE_DENSE,
       AUX_RANK1,
       AUX_NORM_1,
       AUX_NORM_2,
@@ -663,6 +728,8 @@ namespace casadi {
       AUX_MV,
       AUX_MV_DENSE,
       AUX_MTIMES,
+      AUX_MTIMES_DENSE,
+      AUX_MTIMES_DENSE_SPARSE,
       AUX_TRILSOLVE,
       AUX_TRIUSOLVE,
       AUX_PROJECT,
@@ -679,11 +746,14 @@ namespace casadi {
       AUX_LOW,
       AUX_INTERPN_INTERPOLATE,
       AUX_DE_BOOR,
+      AUX_TENSOR_TTV,
       AUX_ND_BOOR_EVAL,
       AUX_FINITE_DIFF,
       AUX_QR,
+      AUX_DET,
       AUX_QP,
       AUX_QRQP,
+      AUX_SOCP,
       AUX_NLP,
       AUX_SQPMETHOD,
       AUX_FEASIBLESQPMETHOD,
@@ -728,14 +798,19 @@ namespace casadi {
       AUX_OCP_BLOCK,
       AUX_ORACLE,
       AUX_SCALED_COPY,
-      AUX_BLAZING_DE_BOOR,
+      AUX_BLAZING_COMMON,
       AUX_BLAZING_1D_BOOR_EVAL,
       AUX_BLAZING_2D_BOOR_EVAL,
       AUX_BLAZING_3D_BOOR_EVAL,
+      AUX_BLAZING_4D_BOOR_EVAL,
+      AUX_BLAZING_5D_BOOR_EVAL,
       AUX_PRINTME,
       AUX_PRINT_SCALAR,
       AUX_PRINT_VECTOR,
       AUX_PRINT_CANONICAL,
+      AUX_FPRINTF_SCALAR,
+      AUX_FPRINTF_VECTOR,
+      AUX_TO_FILE,
       AUX_THREADS
     };
 
@@ -804,6 +879,17 @@ namespace casadi {
 
         \identifier{2dm} */
     std::string print_scalar(const std::string& arg);
+
+    /** \brief fprintf a normalized scalar (canonical nan/inf) to a file
+
+        \identifier{2fp} */
+    std::string fprintf_scalar(const std::string& f, const std::string& arg);
+
+    /** \brief fprintf a normalized vector to a file with a separator
+
+        \identifier{2fq} */
+    std::string fprintf_vector(const std::string& f, casadi_int sz,
+      const std::string& arg, const std::string& sep);
 
     /** \brief Create a copy operation
 
@@ -905,6 +991,21 @@ namespace casadi {
         \identifier{u7} */
     std::string file_slurp(const std::string& fname, casadi_int n, const std::string& a);
 
+    /** \brief Write matrix to file in MatrixMarket format
+
+        \identifier{2f8} */
+    std::string to_file(const std::string& f, const Sparsity& sp, const std::string& x);
+
+    /** \brief Generate dump_in or dump_out code for a function call
+
+        \identifier{2fr} */
+    void generate_dump(const Function& f, const std::string& arr, bool is_input);
+
+    /** \brief Generate print_in or print_out code for a function call
+
+        \identifier{2fs} */
+    void generate_print(const Function& f, const std::string& arr, bool is_input);
+
     /** \brief cache check
 
         \identifier{u8} */
@@ -993,6 +1094,12 @@ namespace casadi {
     // Unroll arguments?
     bool unroll_args;
 
+    // Emit runtime auxiliary functions with 'static' storage class?
+    bool static_aux;
+
+    // Emit runtime auxiliary functions with 'inline' hint?
+    bool inline_aux;
+
     // Verbose codegen?
     bool verbose;
 
@@ -1048,6 +1155,10 @@ namespace casadi {
     // Prefix
     std::string prefix;
 
+    // Prefix/suffix for dump directory in codegen
+    std::string dump_dir_prefix;
+    std::string dump_dir_suffix;
+
     // std::stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
@@ -1091,6 +1202,7 @@ namespace casadi {
     std::map<const void *, casadi_int> file_scope_integer_;
     std::vector< std::vector<double> > pool_double_defaults_;
     std::map<std::string, casadi_int> pool_double_;
+    std::map<const FunctionInternal*, std::set<std::string> > local_mutexes_;
 
     // Added functions
     struct FunctionMeta {

@@ -24,6 +24,7 @@
 #
 # For more information see: http://labs.casadi.org/OCP
 from casadi import *
+from numpy import inf, pi
 
 N = 100 # number of control intervals
 

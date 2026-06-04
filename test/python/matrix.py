@@ -21,7 +21,9 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
+from casadi import mtimes
 from casadi import *
+from numpy import inf, pi
 import casadi as c
 import numpy
 from numpy import eye, linalg, arange, matrix
@@ -48,7 +50,7 @@ class Matrixtests(casadiTestCase):
   def test_inv(self):
     self.message("Matrix inverse")
     a = DM([[1,2],[1,3]])
-    self.checkarray(mtimes(c.inv(a),a),eye(2),"DM inverse")
+    self.checkarray(c.inv(a) @ a,eye(2),"DM inverse")
 
   def test_trans(self):
     self.message("trans")
@@ -94,7 +96,7 @@ class Matrixtests(casadiTestCase):
 
     for f in [fMX,fSX]:
       for i in range(3):
-        f_in[i]=list(range(f.nnz_in(i)))
+        f_in[i]=list(range(f.nnz_in(i)))  # pyright: ignore[reportUndefinedVariable]
 
     self.checkfunction(fMX,fSX)
 
@@ -456,9 +458,8 @@ class Matrixtests(casadiTestCase):
       self.checkarray(c>A,m([[1,1],[1,1]]),"<")
       self.checkarray(c<A,m([[0,0],[0,0]]),">")
       self.checkarray(c<=A,m([[0,0],[0,0]]),">=")
-      if args.known_bugs or not isinstance(c,matrix):
-        self.checkarray(c==A,m([[0,0],[0,0]]),"==")
-        self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
+      self.checkarray(c==A,m([[0,0],[0,0]]),"==")
+      self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
 
     for c in [5,5.0,DM([5]),np.array([5])]+([matrix(5)] if check_matrix else []):
       self.checkarray(A<=c,m([[1,1],[1,1]]),"<=")
@@ -472,26 +473,23 @@ class Matrixtests(casadiTestCase):
       self.checkarray(c>A,m([[0,1],[1,1]]),"<")
       self.checkarray(c<A,m([[0,0],[0,0]]),">")
       self.checkarray(c<=A,m([[1,0],[0,0]]),">=")
-      if args.known_bugs or not isinstance(c,matrix):
-        self.checkarray(c==A,m([[1,0],[0,0]]),"==")
-        self.checkarray(c!=A,m([[0,1],[1,1]]),"!=")
+      self.checkarray(c==A,m([[1,0],[0,0]]),"==")
+      self.checkarray(c!=A,m([[0,1],[1,1]]),"!=")
 
     for c in [4,4.0,DM([4]),np.array([4]),matrix(4)]:
       self.checkarray(A<=c,m([[0,1],[1,1]]),"<=")
       self.checkarray(A<c,m([[0,0],[1,1]]),"<")
       self.checkarray(A>c,m([[1,0],[0,0]]),">")
       self.checkarray(A>=c,m([[1,1],[0,0]]),">=")
-      if args.known_bugs or not isinstance(c,matrix):
-        self.checkarray(A==c,m([[0,1],[0,0]]),"==")
-        self.checkarray(A!=c,m([[1,0],[1,1]]),"!=")
+      self.checkarray(A==c,m([[0,1],[0,0]]),"==")
+      self.checkarray(A!=c,m([[1,0],[1,1]]),"!=")
 
       self.checkarray(c>=A,m([[0,1],[1,1]]),"<=")
       self.checkarray(c>A,m([[0,0],[1,1]]),"<")
       self.checkarray(c<A,m([[1,0],[0,0]]),">")
       self.checkarray(c<=A,m([[1,1],[0,0]]),">=")
-      if args.known_bugs or not isinstance(c,matrix):
-        self.checkarray(c==A,m([[0,1],[0,0]]),"==")
-        self.checkarray(c!=A,m([[1,0],[1,1]]),"!=")
+      self.checkarray(c==A,m([[0,1],[0,0]]),"==")
+      self.checkarray(c!=A,m([[1,0],[1,1]]),"!=")
 
     for c in [1,1.0,DM([1]),np.array([1]),matrix(1)]:
       self.checkarray(A<=c,m([[0,0],[0,1]]),"<=")
@@ -505,9 +503,8 @@ class Matrixtests(casadiTestCase):
       self.checkarray(c>A,m([[0,0],[0,0]]),"<")
       self.checkarray(c<A,m([[1,1],[1,0]]),">")
       self.checkarray(c<=A,m([[1,1],[1,1]]),">=")
-      if args.known_bugs or not isinstance(c,matrix):
-        self.checkarray(c==A,m([[0,0],[0,1]]),"==")
-        self.checkarray(c!=A,m([[1,1],[1,0]]),"!=")
+      self.checkarray(c==A,m([[0,0],[0,1]]),"==")
+      self.checkarray(c!=A,m([[1,1],[1,0]]),"!=")
 
     for c in [0,DM([0]),np.array([0]),matrix(0)]:
       self.checkarray(A<=c,m([[0,0],[0,0]]),"<=")
@@ -521,9 +518,8 @@ class Matrixtests(casadiTestCase):
       self.checkarray(c>A,m([[0,0],[0,0]]),"<")
       self.checkarray(c<A,m([[1,1],[1,1]]),">")
       self.checkarray(c<=A,m([[1,1],[1,1]]),">=")
-      if args.known_bugs or not isinstance(c,matrix):
-        self.checkarray(c==A,m([[0,0],[0,0]]),"==")
-        self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
+      self.checkarray(c==A,m([[0,0],[0,0]]),"==")
+      self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
 
   def test_truth(self):
     self.assertTrue(bool(DM([1])))
@@ -913,7 +909,7 @@ class Matrixtests(casadiTestCase):
     A = numpy.random.random((10,2))
     B = numpy.random.random((2,8))
 
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(norm_inf_mul(A,B),norm_inf(A @ B))
     self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
     # Sparse
@@ -924,14 +920,14 @@ class Matrixtests(casadiTestCase):
     A = sparsify(A)
     B = sparsify(B)
 
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(norm_inf_mul(A,B),norm_inf(A @ B))
     self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
 
     A = numpy.random.random((8,2))
     B = numpy.random.random((2,10))
 
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(norm_inf_mul(A,B),norm_inf(A @ B))
     self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
     # Sparse
@@ -942,31 +938,58 @@ class Matrixtests(casadiTestCase):
     A = sparsify(A)
     B = sparsify(B)
 
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(norm_inf_mul(A,B),norm_inf(A @ B))
     self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
   def  test_mul3_issue_1465(self):
-    with self.assertRaises(Exception):
-      w = SX.sym("w",2,1)
-      Q = np.eye(2)
-      mtimes(w.T,Q,w)
+
+    w2 = SX.sym("w",2,1)
+    w3 = SX.sym("w",3,1)
+    Q = np.eye(2)
+
+    mtimes(w2.T,Q)
+    w2.T @ Q
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x3 and rhs is 2x2."):
+      mtimes(w3.T,Q)
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x3 and rhs is 2x2."):
+      w3.T @ Q
+
+    mtimes([w2.T,Q,w2])
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x3 and rhs is 2x2."):
+      mtimes([w3.T,Q,w2])
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x2 and rhs is 3x1."): 
+      mtimes([w2.T,Q,w3])
+    with self.assertInException("Matrix product with incompatible dimensions. Lhs is 1x3 and rhs is 2x2."):
+      mtimes([w3.T,Q,w3])
+
+    with self.assertInException("unsupported operand type(s) for @: 'SX' and 'NoneType'"):
+      w2.T @ None # pyright: ignore[reportCallIssue,reportArgumentType, reportOperatorIssue]
+    
+    with self.assertInException("mtimes(Sparsity,Sparsity,str)"):
+      mtimes(w2,None) # pyright: ignore[reportCallIssue,reportArgumentType]
+  
+    with self.assertInException("mtimes(Sparsity,Sparsity,str)"):
+      mtimes(w2.T,Q,None) # pyright: ignore[reportCallIssue,reportArgumentType]
+
+    with self.assertInException("mtimes(Sparsity,Sparsity,str)"):
+      mtimes(w2.T,Q,w2) # pyright: ignore[reportCallIssue,reportArgumentType]
 
   def test_chol(self):
     numpy.random.seed(0)
 
     for i in range(4):
       A = numpy.random.random((3,3))
-      H = mtimes(A,A.T)
+      H = A @ A.T
 
       R = chol(H)
 
       assert R.is_triu()
-      self.checkarray(mtimes(R.T,R),H)
+      self.checkarray(R.T @ R,H)
   def test_skew(self):
     x = DM([1,7,13])
     self.checkarray(inv_skew(skew(x)),x)
     y = DM([0.2,0.9,0.4])
-    self.checkarray(mtimes(skew(x),y),cross(x,y))
+    self.checkarray(skew(x) @ y,cross(x,y))
 
   def test_nz_overflow(self):
     d = DM([2,3])
@@ -975,8 +998,8 @@ class Matrixtests(casadiTestCase):
 
   def test_DMcrash(self):
     with self.assertRaises(Exception):
-      DM([DM([1,2]),DM([1,2])])
-    a = DM([DM([1]),DM([2])])
+      DM([DM([1,2]),DM([1,2])])  # pyright: ignore[reportCallIssue,reportArgumentType]
+    a = DM([DM([1]),DM([2])])  # pyright: ignore[reportCallIssue,reportArgumentType]
     self.checkarray(a,DM([1,2]))
 
   def test_sparsity_operation(self):
@@ -998,7 +1021,7 @@ class Matrixtests(casadiTestCase):
     data = [ np.array([[1,3],[11,17]]) , np.array([[1,3]]) ,np.array([[1],[3]]), np.array([[3]])]
 
     for A in data:
-      B = reshape(DM(A),A.shape)
+      B = reshape(DM(A),A.shape)  # pyright: ignore[reportCallIssue,reportArgumentType]
       #self.checkarray(np.cumsum(A),cumsum(B))
       self.checkarray(np.cumsum(A,0),cumsum(B,0))
       self.checkarray(np.cumsum(A,1),cumsum(B,1))
@@ -1042,7 +1065,7 @@ class Matrixtests(casadiTestCase):
   def test_iterable(self):
     a = DM([1,2,3])
     b = list(iter(a.nz))
-    self.checkarray(a,DM(b))
+    self.checkarray(a,DM(b))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     with self.assertInException("CasADi matrices are not iterable"):
       iter(a)
@@ -1099,6 +1122,7 @@ class Matrixtests(casadiTestCase):
 
   def test_ldl(self):
     numpy.random.seed(1)
+    DM.rng(1)
     H = diagcat(DM.rand(5,5),DM.rand(5,5))
     H = H+H.T+2*DM.eye(10)
 
@@ -1109,16 +1133,53 @@ class Matrixtests(casadiTestCase):
     [D,Lt,p] = ldl(H)
     P = DM.eye(10)[:,p]
 
-    F = mtimes(mtimes(sqrt(diag(D)),DM.eye(10)+Lt),P.T)
-    print(H-mtimes(F.T,F))
-    self.assertTrue(norm_fro(H-mtimes(F.T,F))<=1e-14)
+    F = sqrt(diag(D)) @ (DM.eye(10)+Lt) @ P.T
+    print(H-F.T @ F)
+    self.assertTrue(norm_fro(H-F.T @ F)<=1e-14)
 
 
   def test_im_bugs(self):
     a = vertcat(1,2)
     self.assertTrue(isinstance(a,DM))
     self.checkarray(c.linspace(1,3,10),c.linspace(1.0,3.0,10))
-  
+
+  def test_linspace(self):
+    # CasADi's linspace must agree bit-for-bit with numpy.linspace, for
+    # DM (numeric) and for MX/SX after Function evaluation. This pins down
+    # the FP recipe so future refactors (incl. MX node-count optimizations)
+    # cannot silently change the numerics.
+    cases = [(1.0, 3.0), (-2.5, 7.25), (0.0, 1.0), (1e10, 1e-10), (-1.0, 1.0)]
+    sizes = [2, 3, 5, 10, 100, 1001]
+    for a, b in cases:
+      for n in sizes:
+        ref = numpy.linspace(a, b, n)
+
+        dm = numpy.array(c.linspace(DM(a), DM(b), n)).ravel()
+        self.assertTrue(numpy.array_equal(dm, ref),
+                        "DM linspace mismatch a=%g b=%g n=%d" % (a, b, n))
+
+        x = MX.sym('x'); y = MX.sym('y')
+        f = Function('f', [x, y], [c.linspace(x, y, n)])
+        mx = numpy.array(f(a, b)).ravel()
+        self.assertTrue(numpy.array_equal(mx, ref),
+                        "MX linspace mismatch a=%g b=%g n=%d" % (a, b, n))
+
+        x = SX.sym('x'); y = SX.sym('y')
+        f = Function('f', [x, y], [c.linspace(x, y, n)])
+        sx = numpy.array(f(a, b)).ravel()
+        self.assertTrue(numpy.array_equal(sx, ref),
+                        "SX linspace mismatch a=%g b=%g n=%d" % (a, b, n))
+
+  def test_linspace_mx_node_count(self):
+    # MX linspace should yield O(1) graph nodes regardless of nsteps.
+    x = MX.sym('x'); y = MX.sym('y')
+    n_small = n_nodes(c.linspace(x, y, 5))
+    n_large = n_nodes(c.linspace(x, y, 1000))
+    # Allow some slack but reject O(n) growth.
+    self.assertTrue(n_large < n_small + 5,
+                    "MX linspace node count grew with nsteps: %d -> %d"
+                    % (n_small, n_large))
+
   def test_permutation(self):
     n = 10
     numpy.random.seed(1)
@@ -1127,9 +1188,9 @@ class Matrixtests(casadiTestCase):
     self.checkarray(DM(p).T,S.permutation_vector())
     self.assertTrue(S.is_permutation())
     v = DM.rand(n)
-    self.checkarray(mtimes(S,v), v[p])
+    self.checkarray(S @ v, v[p])
     S = Sparsity.permutation(p, True)
-    self.checkarray((mtimes(S,v))[p], v)
+    self.checkarray(((S @ v))[p], v)
 
   def test_sparsity_orthonormality(self):
     alltests = [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_rows',False),('is_orthonormal_columns',False),('is_selection',False),('is_permutation',),('is_orthonormal',False),('is_orthonormal',True)]
@@ -1251,7 +1312,7 @@ class Matrixtests(casadiTestCase):
     for X in [SX,MX]:
       b = X.sym("b",n)
       x = X.sym("x",P)
-      f = Function("f",[x,b],[mtimes(x,b)])
+      f = Function("f",[x,b],[x @ b])
       f.generate('f.c')
       fs.append(f)  
     x0 = DM(P,DM.rand(n))

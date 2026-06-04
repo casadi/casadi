@@ -26,10 +26,13 @@
 
 success = False
 try:
-  import pydot
+  import pydot as pydot
   success = True
 except:
   pass
 
 if success:
-  from .graph import dotgraph, dotdraw, dotsave
+  from .graph import dotgraph as dotgraph, dotdraw as dotdraw, dotsave as dotsave
+  __all__ = ["success", "dotgraph", "dotdraw", "dotsave"]
+else:
+  __all__ = ["success"]

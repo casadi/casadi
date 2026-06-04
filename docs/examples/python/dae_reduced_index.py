@@ -19,6 +19,7 @@
 #
 # -*- coding: utf-8 -*-
 from casadi import *
+import numpy as np
 import pylab as plt
 
 # Pendulum: point mass on massless rod 

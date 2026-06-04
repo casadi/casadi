@@ -100,6 +100,8 @@ namespace casadi {
   }
 
   SXElem& SXElem::operator=(const SXElem &scalar) {
+    if (this == &scalar) return *this;
+
     // quick return if the old and new pointers point to the same object
     if (node == scalar.node) return *this;
 
@@ -489,7 +491,7 @@ namespace casadi {
   }
 
   void SXElem::serialize(SerializingStream& s) const {
-    return (*this)->serialize(s);
+    (*this)->serialize(s);
   }
 
   SXElem SXElem::deserialize(DeserializingStream& s) {

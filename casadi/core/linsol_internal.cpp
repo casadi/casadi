@@ -51,7 +51,7 @@ namespace casadi {
   int LinsolInternal::init_mem(void* mem) const {
     if (!mem) return 1;
     if (ProtoFunction::init_mem(mem)) return 1;
-    auto m = static_cast<LinsolMemory*>(mem);
+    auto *m = static_cast<LinsolMemory*>(mem);
     if (record_time_) {
       m->add_stat("nfact");
       m->add_stat("sfact");
@@ -99,6 +99,10 @@ namespace casadi {
     casadi_error("'nfact' not defined for " + class_name());
   }
 
+  double LinsolInternal::det(void* mem, const double* A) const {
+    casadi_error("'det' not defined for " + class_name());
+  }
+
   casadi_int LinsolInternal::neig(void* mem, const double* A) const {
     casadi_error("'neig' not defined for " + class_name());
   }
@@ -110,6 +114,11 @@ namespace casadi {
   void LinsolInternal::generate(CodeGenerator& g, const std::string& A, const std::string& x,
                                 casadi_int nrhs, bool tr) const {
     g << "#error " <<  class_name() << " does not support code generation\n";
+  }
+
+  void LinsolInternal::generate_det(CodeGenerator& g, const std::string& A,
+                                    const std::string& d) const {
+    g << "#error " <<  class_name() << " does not support determinant code generation\n";
   }
 
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;

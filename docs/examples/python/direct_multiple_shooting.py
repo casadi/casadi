@@ -17,6 +17,7 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 from casadi import *
+from numpy import inf
 
 T = 10. # Time horizon
 N = 20 # number of control intervals

@@ -262,7 +262,7 @@ namespace casadi {
     ss << "[";
     for (casadi_int i=0; i<v.size(); ++i) {
       if (i!=0) ss << ", ";
-      ss << v[i];
+      ss << str(v[i]);
     }
     ss << "]";
     return ss.str();
@@ -275,7 +275,7 @@ namespace casadi {
     casadi_int cnt = 0;
     for (const auto& e : v) {
       if (cnt++!=0) ss << ", ";
-      ss << e;
+      ss << str(e);
     }
     ss << "}";
     return ss.str();
@@ -284,7 +284,7 @@ namespace casadi {
   template<typename T1, typename T2>
   std::string str(const std::pair<T1, T2>& p, bool more) {
     std::stringstream ss;
-    ss << "[" << p.first << "," << p.second << "]";
+    ss << "[" << str(p.first) << "," << str(p.second) << "]";
     return ss.str();
   }
 
@@ -294,7 +294,7 @@ namespace casadi {
     ss << "{";
     casadi_int count = 0;
     for (auto& e : p) {
-      ss << e.first << ": " << e.second;
+      ss << str(e.first) << ": " << str(e.second);
       if (++count < p.size()) ss << ", ";
     }
     ss << "}";
@@ -307,7 +307,7 @@ namespace casadi {
     ss << "{";
     casadi_int count = 0;
     for (auto& e : p) {
-      ss << "\"" << e.first << "\": " << e.second;
+      ss << "\"" << e.first << "\": " << str(e.second);
       if (++count < p.size()) ss << ", ";
     }
     ss << "}";
@@ -320,7 +320,7 @@ namespace casadi {
     ss << "[";
     for (casadi_int i=0; i<N; ++i) {
       if (i!=0) ss << ", ";
-      ss << v[i];
+      ss << str(v[i]);
     }
     ss << "]";
     return ss.str();

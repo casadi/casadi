@@ -44,6 +44,7 @@ z_i - 0.1*y_i >= 0.5
 """
 
 from casadi import *
+from numpy import inf
 
 # Constants
 N = 40

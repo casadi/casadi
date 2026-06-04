@@ -28,6 +28,7 @@ import numpy as n
 import sys
 from numpy import double, int32, ones, matrix, zeros
 import unittest
+import math
 from types import *
 from helpers import *
 from looseversion import LooseVersion
@@ -60,6 +61,32 @@ class typemaptests(casadiTestCase):
    casadi.SX(a)
    self.assertEqual(sys.getrefcount(a), r)
    
+  def test_sanity(self):
+    a = DM([1,2,3])
+    if abs(norm_inf(a))>1:
+        self.assertTrue(True)
+    else:
+        self.assertTrue(False)
+   
+    a = SX(1)
+    if a>0:
+        self.assertTrue(True)
+    else:
+        self.assertTrue(False)
+    if abs(a)>0:
+        self.assertTrue(True)
+    else:
+        self.assertTrue(False)
+    a = MX(1)
+    if a>0:
+        self.assertTrue(True)
+    else:
+        self.assertTrue(False)
+    if abs(a)>0:
+        self.assertTrue(True)
+    else:
+        self.assertTrue(False)
+   
   def test_0(self):
     self.message("Typemap np.array -> DM")
     arrays = [np.array([[1,2,3],[4,5,6]],dtype=int32),np.array([[1,2,3],[4,5,6]]),np.array([[1,2,3],[4,5,6]],dtype=int), np.array([[1,2],[3,4],[5,6]],dtype=double),np.array([[3.2,4.6,9.9]])]
@@ -88,8 +115,8 @@ class typemaptests(casadiTestCase):
     self.message("crs_matrix -> DM")
     if not(scipy_available):
       return
-    arrays = [csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=double ),
-              csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=int )
+    arrays = [csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=double ),  # pyright: ignore[reportUnboundVariable]
+              csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=int )  # pyright: ignore[reportUnboundVariable]
               ]
     for i in range(len(arrays)):
       m = arrays[i]
@@ -236,8 +263,8 @@ class typemaptests(casadiTestCase):
   def test_matmul(self):
     A = DM([[1,3],[4,5]])
     B = DM([[7,2],[0,9]])
-    LA = [A]
-    RB = [B]
+    LA = [A]  # type: list
+    RB = [B]  # type: list
     if LooseVersion(np.__version__) >= LooseVersion("1.10"):
       LA.append(np.array(A))
       RB.append(np.array(B))
@@ -245,7 +272,7 @@ class typemaptests(casadiTestCase):
       for R in RB:
         #y = L @ R
         y = eval("L @ R",{"L":L,"R":R})
-        self.checkarray(y,mtimes(A,B))
+        self.checkarray(y,A @ B)
     As = SX.sym("x",2,2)
     Bs = SX.sym("x",2,2)
     for L in [As,A]:
@@ -253,7 +280,7 @@ class typemaptests(casadiTestCase):
         #y = L @ R
         y = eval("L @ R",{"L":L,"R":R})
         yf = Function('y',[As,Bs],[y])
-        self.checkarray(yf(A,B),mtimes(A,B))
+        self.checkarray(yf(A,B),A @ B)
     As = MX.sym("x",2,2)
     Bs = MX.sym("x",2,2)
     for L in [As,A]:
@@ -261,7 +288,7 @@ class typemaptests(casadiTestCase):
         #y = L @ R
         y = eval("L @ R",{"L":L,"R":R})
         yf = Function('y',[As,Bs],[y])
-        self.checkarray(yf(A,B),mtimes(A,B))
+        self.checkarray(yf(A,B),A @ B)
 
   def test_autoconversionMX(self):
     self.message("Auto conversion MX")
@@ -338,6 +365,26 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: np.arctan2(z,s))
       doit(z,s,lambda z,s: np.copysign(z,s))
       doit(z,s,lambda z,s: np.copysign(s,z))
+      doit(z,s,lambda z,s: z @ s)
+      doit(z,s,lambda z,s: s @ z)
+      # Py3 numeric dunders added alongside the operator audit: in-place
+      # arith, divmod, pow-with-modulo, and the math protocol unary ops.
+      doit(z,s,lambda z,s: z.__iadd__(s))
+      doit(z,s,lambda z,s: z.__isub__(s))
+      doit(z,s,lambda z,s: z.__imul__(s))
+      doit(z,s,lambda z,s: z.__itruediv__(s))
+      doit(z,s,lambda z,s: z.__ifloordiv__(s))
+      doit(z,s,lambda z,s: z.__imod__(s))
+      doit(z,s,lambda z,s: z.__ipow__(s))
+      doit(z,s,lambda z,s: divmod(z,s)[0])
+      doit(z,s,lambda z,s: divmod(z,s)[1])
+      doit(z,s,lambda z,s: divmod(s,z)[0])
+      doit(z,s,lambda z,s: divmod(s,z)[1])
+      doit(z,s,lambda z,s: pow(z, s, 5.0))
+      doit(z,s,lambda z,s: round(z))
+      doit(z,s,lambda z,s: math.trunc(z))
+      doit(z,s,lambda z,s: math.floor(z))
+      doit(z,s,lambda z,s: math.ceil(z))
 
     nums = [np.array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), np.array(4),4.0,4]
 
@@ -351,6 +398,13 @@ class typemaptests(casadiTestCase):
     # numeric & MX
     for s in nums:
       for z in [MX.sym("x",2,2)]:
+        print("z = %s, s = %s" % (str(z),str(s)))
+        print("  z = %s, s = %s" % (type(z),type(s)))
+        tests(z,s)
+
+    # SX & SX
+    for s in [SX.sym("x"), SX.sym("x"), SX.sym("x",2,2)]:
+      for z in [SX.sym("x"),SX.sym("x"), SX.sym("x",2,2)]:
         print("z = %s, s = %s" % (str(z),str(s)))
         print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
@@ -378,6 +432,52 @@ class typemaptests(casadiTestCase):
         doit(z,s,lambda s,z: s-z)
         doit(z,s,lambda z,s: z/s)
         doit(z,s,lambda s,z: s/z)
+        
+  def test_issue4268(self):
+
+    class Foo:
+        def __rmatmul__(self, other):
+            return 1
+        def __radd__(self, other):
+            return 2
+
+    x= MX.sym("x",2,2)
+
+    f=Foo()
+    print(x + f)
+    print(x @ f)
+    
+    class Foo:
+        def __req__(self, other):
+            return 2
+        def __eq__(self, other):  # pyright: ignore[reportIncompatibleMethodOverride]
+            return 3
+        def __rne__(self, other):
+            return 4
+        def __ne__(self, other):  # pyright: ignore[reportIncompatibleMethodOverride]
+            return 5
+              
+    f = Foo()
+    for X in [SX,MX]:
+        x = X.sym("x")
+        
+        
+        self.assertEqual(f==x,3)
+        self.assertEqual(x==f,3)
+        self.assertEqual(f!=x,5)
+        self.assertEqual(x!=f,5)
+    
+    for x in [SX.sym("x"),SX.zeros(1,1),SX.ones(1,1)]:
+        for y in [MX.sym("y"),MX.zeros(1,1),MX.ones(1,1)]:
+        
+            with self.assertInException("Cannot compare SX and MX objects for equality"):
+                x==y  # pyright: ignore[reportOperatorIssue]
+            with self.assertInException("Cannot compare SX and MX objects for equality"):
+                y==x  # pyright: ignore[reportOperatorIssue]
+            with self.assertInException("Cannot compare SX and MX objects for inequality"):
+                x!=y  # pyright: ignore[reportOperatorIssue]
+            with self.assertInException("Cannot compare SX and MX objects for inequality"):
+                y!=x  # pyright: ignore[reportOperatorIssue]
 
   def test_conversion_operators(self):
     self.message("COnversion operations")
@@ -610,20 +710,20 @@ class typemaptests(casadiTestCase):
         return SX([4])
 
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))  # pyright: ignore[reportCallIssue,reportArgumentType]
     print("cast C")
 
     class Foo:
       def __DM__(self):
         raise Exception("15")
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))  # pyright: ignore[reportCallIssue,reportArgumentType]
     print("cast D")
 
     class Foo:
       pass
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :f(Foo()))  # pyright: ignore[reportCallIssue,reportArgumentType]
     print("cast E")
 
   def test_casting_SX(self):
@@ -642,18 +742,18 @@ class typemaptests(casadiTestCase):
       def __SX__(self):
         return MX.sym("x")
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     class Foo:
       def __SX__(self):
         raise Exception("15")
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda : Function("tmp", [x],[Foo()]))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     class Foo:
       pass
 
-    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :Function("tmp", [x],[Foo()]))
+    self.assertRaises(TypeError if systemswig else NotImplementedError,lambda :Function("tmp", [x],[Foo()]))  # pyright: ignore[reportCallIssue,reportArgumentType]
 
 
   def test_casting_MX(self):
@@ -673,32 +773,32 @@ class typemaptests(casadiTestCase):
         return SX.sym("x")
 
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
-      Function("tmp", [x],[Foo()])
+      Function("tmp", [x],[Foo()])  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     class Foo:
       def __MX__(self):
         raise Exception("15")
 
     with self.assertRaises(Exception):
-      Function("tmp", [x],[Foo()])
+      Function("tmp", [x],[Foo()])  # pyright: ignore[reportCallIssue,reportArgumentType]
 
     class Foo:
       pass
 
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
-      Function("tmp", [x],[Foo()])
+      Function("tmp", [x],[Foo()])  # pyright: ignore[reportCallIssue,reportArgumentType]
 
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
     a = SX.sym("A",3,3)
     
-    self.assertTrue(isinstance(qr(a),tuple([tuple]+([list] if swig4 else []))))
+    self.assertTrue(isinstance(qr(a),tuple([tuple]+([list] if swig4 else []))))  # pyright: ignore[reportArgumentType]
 
   def test_cvar(self):
     self.message("We must not have cvar, to avoid bug #652")
     # Wrap all static global things in #ifdef SWIG
     with self.assertRaises(Exception):
-      cvar
+      cvar  # pyright: ignore[reportUndefinedVariable]
 
   def test_ufuncsum(self):
     self.message("ufunc.add")
@@ -746,8 +846,8 @@ class typemaptests(casadiTestCase):
 
     if scipy_available:
       Ds+=[
-          csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
-          csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.intc),
+          csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),  # pyright: ignore[reportUnboundVariable]
+          csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.intc),  # pyright: ignore[reportUnboundVariable]
           DM([[1,2],[3,4]]).sparse()
       ]
 
@@ -776,7 +876,7 @@ class typemaptests(casadiTestCase):
 
   def test_None(self):
     #self.assertFalse(None==DM(3))
-    b = np.atleast_2d(None)
+    b = np.atleast_2d(None)  # pyright: ignore[reportCallIssue,reportArgumentType]
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
       c = repmat(b, 1, 1)
 
@@ -824,10 +924,12 @@ class typemaptests(casadiTestCase):
     print(SX(H_body_world))
 
   def test_issue_2625(self):
-    # This is obviously a bug
-    self.checkarray(np.inner(DM([1,0,1]),DM([1,0,1])), np.array([[1,0,1],[0,0,0],[1,0,1]]))
+    # np.inner is a true inner product, not the outer-product-shaped result the
+    # old buggy fallback produced.  np.outer is the outer product as expected.
+    self.checkarray(np.inner(DM([1,0,1]),DM([1,0,1])), np.array(2))
     self.checkarray(np.outer(DM([1,0,1]),DM([1,0,1])), np.array([[1,0,1],[0,0,0],[1,0,1]]))
-    #print(np.logical_or(DM([1,0,1]),DM([1,0,12])))
+
+    # Reductions on DM stay in DM via the casadi free functions.
     self.checkarray(np.add.accumulate(DM([1,0,1])),np.array([[1],[1],[2]]))
     self.checkarray(np.cumsum(DM([1,0,1])), np.array([1,1,2]))
     self.checkarray(np.sum(DM([1,0,1])),np.array(2))
@@ -837,30 +939,29 @@ class typemaptests(casadiTestCase):
     self.assertFalse(np.all(DM([[1,0,1],[0,1,0]])))
     self.assertTrue(np.any(DM([[1,0,1],[0,1,0]])))
 
-    for M in [SX,MX]:
-      with self.assertRaises(Exception):
-        np.inner(M([1,0,1]),M([1,0,1]))
-      with self.assertRaises(Exception):
-        np.outer(M([1,0,1]),M([1,0,1]))
+    # Reductions and inner/outer now work natively on symbolic types too.
+    def _eval(expr):
+      return Function("f", [], [expr])()["o0"]
 
-      with self.assertRaises(Exception):
-        np.add.accumulate(M([1,0,1]))
+    for M in [SX, MX]:
+      v = M([1, 0, 1])
+      self.checkarray(_eval(np.inner(v, v)), DM(2), digits=14)
+      self.checkarray(_eval(np.outer(v, v)),
+                      DM([[1, 0, 1], [0, 0, 0], [1, 0, 1]]), digits=14)
+      self.checkarray(_eval(casadi.vec(np.cumsum(v))),         DM([1, 1, 2]), digits=14)
+      self.checkarray(_eval(casadi.vec(np.add.accumulate(v))), DM([1, 1, 2]), digits=14)
+      self.checkarray(_eval(np.sum(v)),                        DM(2),         digits=14)
 
-      with self.assertRaises(Exception):
-        np.cumsum(M([1,0,1]))
-
-      with self.assertRaises(Exception):
-        np.sum(M([1,0,1]))
-      with self.assertRaises(Exception):
-        np.all(M([1,0,1]))
-      with self.assertRaises(Exception):
-        np.any(M([1,0,1]))
-      with self.assertRaises(Exception):
-        np.sum(M([[1,0,1],[0,1,0]]))
-      with self.assertRaises(Exception):
-        np.all(M([[1,0,1],[0,1,0]]))
-      with self.assertRaises(Exception):
-        np.any(M([[1,0,1],[0,1,0]]))
+    # logic_all / logic_any aren't defined for MX in casadi core.  np.all
+    # and np.any therefore still raise on MX, which our dispatch surfaces
+    # as a clean error rather than the old "Implicit conversion" warning.
+    with self.assertRaises(Exception):
+      np.all(MX([1, 0, 1]))               # pyright: ignore[reportAttributeAccessIssue]
+    with self.assertRaises(Exception):
+      np.any(MX([1, 0, 1]))               # pyright: ignore[reportAttributeAccessIssue]
+    # On SX they work fine.
+    self.checkarray(_eval(np.all(SX([1, 1, 1]))), DM(1))
+    self.checkarray(_eval(np.any(SX([0, 0, 1]))), DM(1))
 
 if __name__ == '__main__':
     unittest.main()

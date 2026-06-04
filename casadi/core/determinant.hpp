@@ -27,6 +27,7 @@
 #define CASADI_DETERMINANT_HPP
 
 #include "mx_node.hpp"
+#include "linsol_internal.hpp"
 #include <map>
 #include <stack>
 
@@ -43,10 +44,34 @@ namespace casadi {
   public:
 
     /// Constructor
-    Determinant(const MX& x);
+    Determinant(const MX& x, const Linsol& linsol);
 
     /// Destructor
     ~Determinant() override {}
+
+    /** \brief Evaluate the function numerically
+
+        \identifier{2hq} */
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /** \brief Evaluate the function symbolically (SX)
+
+        \identifier{2hr} */
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
+    /** \brief Length of w the generated code needs (eval uses Linsol memory)
+
+        \identifier{2hs} */
+    size_t codegen_sz_w() const override;
+
+    /** \brief Generate code for the operation
+
+        \identifier{2ht} */
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res,
+                  const std::vector<bool>& arg_is_ref,
+                  std::vector<bool>& res_is_ref) const override;
 
     /** \brief  Evaluate symbolically (MX)
 
@@ -76,16 +101,24 @@ namespace casadi {
         \identifier{xk} */
     casadi_int op() const override { return OP_DETERMINANT;}
 
+    /** \brief Serialize an object without type information
+
+        \identifier{2hu} */
+    void serialize_body(SerializingStream& s) const override;
+
     /** \brief Deserialize without type information
 
         \identifier{xl} */
     static MXNode* deserialize(DeserializingStream& s) { return new Determinant(s); }
 
+    // Linear solver
+    Linsol linsol_;
+
   protected:
     /** \brief Deserializing constructor
 
         \identifier{xm} */
-    explicit Determinant(DeserializingStream& s) : MXNode(s) {}
+    explicit Determinant(DeserializingStream& s);
 
   };
 

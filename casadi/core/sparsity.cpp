@@ -427,7 +427,8 @@ namespace casadi {
     return (*this)->is_subset(rhs);
   }
 
-  Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y) {
+  Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y,
+                            const std::string& /*blas*/) {
     // Check matching dimensions
     casadi_assert(x.size2()==y.size1(),
       "Matrix product with incompatible dimensions. Lhs is "
@@ -664,7 +665,8 @@ namespace casadi {
       std::vector<casadi_int> tmp;
       Sparsity Aperm = sub(range(size1), pc, tmp);
       // Call recursively
-      return Aperm.qr_sparse(V, R, prinv, tmp, false);
+      Aperm.qr_sparse(V, R, prinv, tmp, false);
+      return;
     }
 
     // No column permutation
@@ -790,6 +792,11 @@ namespace casadi {
 
   bool Sparsity::is_reshape(const Sparsity& y) const {
     return (*this)->is_reshape(*y);
+  }
+
+  bool Sparsity::is_compactible(std::vector<casadi_int>& row,
+                                std::vector<casadi_int>& col) const {
+    return (*this)->is_compactible(row, col);
   }
 
   std::size_t Sparsity::hash() const {
@@ -1475,6 +1482,63 @@ namespace casadi {
     return Sparsity(a_nrow*b_nrow, a_ncol*b_ncol, r_colind, r_row);
   }
 
+  Sparsity Sparsity::kron_contract(const Sparsity& sp_m, const Sparsity& sp_x, bool inner) {
+    casadi_int xrow = sp_x.size1();
+    casadi_int xcol = sp_x.size2();
+    casadi_assert(xrow > 0 && xcol > 0,
+        "Sparsity::kron_contract: sp_x must be nonempty");
+    casadi_assert(sp_m.size1() % xrow == 0 && sp_m.size2() % xcol == 0,
+        "Sparsity::kron_contract: sp_m dims must be multiples of sp_x dims");
+    casadi_int yrow = sp_m.size1() / xrow;
+    casadi_int ycol = sp_m.size2() / xcol;
+    // Block-split factor of M's row/col indices. Inner: M_row=i*xrow+r, so
+    // split_r=xrow. Outer: M_row=i*yrow+r, so split_r=yrow. Same for cols.
+    casadi_int split_r = inner ? xrow : yrow;
+    casadi_int split_c = inner ? xcol : ycol;
+    // Densify x's pattern into a dense lookup
+    std::vector<bool> x_dense(xrow * xcol, false);
+    const casadi_int* x_colind = sp_x.colind();
+    const casadi_int* x_row    = sp_x.row();
+    for (casadi_int cc = 0; cc < xcol; ++cc) {
+      for (casadi_int el = x_colind[cc]; el < x_colind[cc+1]; ++el) {
+        x_dense[cc*xrow + x_row[el]] = true;
+      }
+    }
+    // Walk m's CSC. For each (outer, inner) decomposition of m's row/col,
+    // the (y, x) assignment swaps with `inner`.
+    std::vector<bool> y_dense(yrow * ycol, false);
+    const casadi_int* m_colind = sp_m.colind();
+    const casadi_int* m_row    = sp_m.row();
+    casadi_int outer_c_count = sp_m.size2() / split_c;  // ycol if inner, xcol otherwise
+    for (casadi_int outer_c = 0; outer_c < outer_c_count; ++outer_c) {
+      for (casadi_int inner_c = 0; inner_c < split_c; ++inner_c) {
+        casadi_int cc = outer_c*split_c + inner_c;
+        casadi_int y_c = inner ? outer_c : inner_c;
+        casadi_int x_c = inner ? inner_c : outer_c;
+        for (casadi_int el = m_colind[cc]; el < m_colind[cc+1]; ++el) {
+          casadi_int rr = m_row[el];
+          casadi_int outer_r = rr / split_r;
+          casadi_int inner_r = rr % split_r;
+          casadi_int y_r = inner ? outer_r : inner_r;
+          casadi_int x_r = inner ? inner_r : outer_r;
+          if (x_dense[x_c*xrow + x_r]) {
+            y_dense[y_c*yrow + y_r] = true;
+          }
+        }
+      }
+    }
+    // Build CSC from y_dense
+    std::vector<casadi_int> y_colind(ycol + 1, 0);
+    std::vector<casadi_int> y_row;
+    for (casadi_int j = 0; j < ycol; ++j) {
+      for (casadi_int i = 0; i < yrow; ++i) {
+        if (y_dense[j*yrow + i]) y_row.push_back(i);
+      }
+      y_colind[j+1] = y_row.size();
+    }
+    return Sparsity(yrow, ycol, y_colind, y_row);
+  }
+
   Sparsity Sparsity::vertcat(const std::vector<Sparsity> & sp) {
     // Quick return if possible
     if (sp.empty()) return Sparsity(0, 1);
@@ -1737,7 +1801,7 @@ namespace casadi {
         casadi_int temp = head;
         head = next[head];
         next[temp] = -1; //clear arrays
-        sums[temp] =  0;
+        sums[temp] =  false;
       }
       Cp[i+1] = nnz;
     }

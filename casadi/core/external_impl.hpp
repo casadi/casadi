@@ -49,20 +49,10 @@ namespace casadi {
 
 class CASADI_EXPORT External : public FunctionInternal {
  protected:
-  /** \brief Information about the library
-
-      \identifier{1z2} */
-  Importer li_;
-
   /** \brief Initialize
 
       \identifier{282} */
   config_t config_;
-
-  /** \brief Increase/decrease reference counter
-
-      \identifier{1z3} */
-  signal_t incref_, decref_;
 
   /** \brief Number of inputs and outputs
 

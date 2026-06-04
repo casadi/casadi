@@ -105,7 +105,7 @@ class Threadstests(casadiTestCase):
             opti.subject_to(X[:, k + 1] == x_next)  # close the gaps
 
         # ---- path constraints -----------
-        limit = lambda pos: 1 - ca.sin(2 * ca.pi * pos) / 2
+        limit = lambda pos: 1 - ca.sin(2 * numpy.pi * pos) / 2
         opti.subject_to(speed <= limit(pos))  # track speed limit
         opti.subject_to(opti.bounded(0, U, 1))  # control is limited
 
@@ -147,8 +147,8 @@ class Threadstests(casadiTestCase):
             
             T = np.ones((1,1))
             X = np.random.random((2, N + 1))
-            buffer.set_arg(0, memoryview(T))
-            buffer.set_res(0, memoryview(X))
+            buffer.set_arg(0, memoryview(T))  # pyright: ignore[reportArgumentType]
+            buffer.set_res(0, memoryview(X))  # pyright: ignore[reportArgumentType]
             
             trigger()
 
@@ -249,7 +249,7 @@ class Threadstests(casadiTestCase):
         opti.subject_to(X[:, k + 1] == x_next)  # close the gaps
 
     # ---- path constraints -----------
-    limit = lambda pos: 1 - ca.sin(2 * ca.pi * pos) / 2
+    limit = lambda pos: 1 - ca.sin(2 * numpy.pi * pos) / 2
     opti.subject_to(speed <= limit(pos))  # track speed limit
     opti.subject_to(opti.bounded(0, U, 1))  # control is limited
 
@@ -322,8 +322,8 @@ class Threadstests(casadiTestCase):
         
         T = np.ones((1,1))
         X = np.random.random((2, N + 1))
-        buffer.set_arg(0, memoryview(T))
-        buffer.set_res(0, memoryview(X))
+        buffer.set_arg(0, memoryview(T))  # pyright: ignore[reportArgumentType]
+        buffer.set_res(0, memoryview(X))  # pyright: ignore[reportArgumentType]
         
         trigger()
         
@@ -349,6 +349,8 @@ class Threadstests(casadiTestCase):
     
     [raw_solver.stats(i+1)["t_wall_nlp_jac_g"] for i in range(n_thread)]
 
+  @requires_nlpsol("ipopt")
+  @memory_heavy()
   def test_threadsafe_symbolics(self):
   
     if "CASADI_WITH_THREADSAFE_SYMBOLICS" not in CasadiMeta.compiler_flags(): return
@@ -378,7 +380,7 @@ class Threadstests(casadiTestCase):
             ca.det(A)
             
         # Circular dependency
-        foo = {"a": A}
+        foo = {"a": A}  # type: dict
         bar = {"bar":foo}
         foo["baz"] = bar
 
@@ -431,7 +433,7 @@ class Threadstests(casadiTestCase):
             opti.subject_to(X[:, k + 1] == x_next)  # close the gaps
 
         # ---- path constraints -----------
-        limit = lambda pos: 1 - ca.sin(2 * ca.pi * pos) / 2
+        limit = lambda pos: 1 - ca.sin(2 * numpy.pi * pos) / 2
         opti.subject_to(speed <= limit(pos))  # track speed limit
         opti.subject_to(opti.bounded(0, U, 1))  # control is limited
 

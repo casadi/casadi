@@ -24,7 +24,12 @@
 from casadi import *
 import casadi
 import numpy
+import numpy as np
 from numpy import random, array
+try:
+    from typing import Any, Optional, Union  # referenced in type-comments below
+except ImportError:
+    pass  # Py2: type comments are ignored at runtime
 import unittest
 import sys
 from math import isnan, isinf
@@ -44,11 +49,18 @@ except:
   
 codegen_check_digits = 15
 
+# Numerical differences due to different compilers/libm in CI.
+if sys.platform == "darwin":
+    # macOS (both Intel and Apple Silicon) sometimes diverges by ~1 ULP
+    # from Linux GCC -- e.g. a sumsqr that lands at 7.96 may compute as
+    # 7.96 + 8.88e-16 elsewhere. Relax by 2 digits so 1-ULP drift passes.
+    codegen_check_digits = 13
+
 print("os" in os.environ)
 if "os" in os.environ:
     print(os.environ["os"])
     if os.environ["os"]=="osx_arm":
-        # Numerical differences due to different compilers in ci
+        # Apple Silicon has historically diverged more (different libm).
         codegen_check_digits = 10
 
 print("codegen_check_digits", codegen_check_digits)
@@ -73,7 +85,7 @@ except RuntimeError:
   swig4 = False
 
 try:
-  nlpsol(123)
+  nlpsol(123)  # pyright: ignore[reportCallIssue]
 except Exception as e:
   if "SXDict" in str(e):
     systemswig = True
@@ -122,9 +134,10 @@ class TeeString(StringIO):
     StringIO.__init__(self)
     self.stream = stream
 
-  def write(self, data):
+  def write(self, data):  # type: ignore[override]
     StringIO.write(self,data)
     self.stream.write(data)
+    return len(data)
 
 class Stdout():
     def __init__(self):
@@ -195,7 +208,7 @@ class casadiTestCase(unittest.TestCase):
         except Exception as err:
           e = str(err)
     print(result[0])
-    self.assertTrue(s in e or s in result[0] or s in result[1])
+    self.assertTrue(s in e or s in result[0] or s in result[1],"error: <<<<%s>>> stdout: <<<%s>>>, stderr:<<<<%s>>>" % (e, str(result[0]),str(result[1])))
 
   @contextmanager
   def assertInException(self,s):
@@ -205,6 +218,7 @@ class casadiTestCase(unittest.TestCase):
     except Exception as err:
       e = str(err)
     self.assertFalse(e is None)
+    assert e is not None
     self.assertTrue(s in e,msg=e + "<->" + s)
 
   @contextmanager
@@ -277,7 +291,7 @@ class casadiTestCase(unittest.TestCase):
 
     unittest.TestCase.__init__(self,*margs,**kwargs)
 
-  def randDM(self,n,m=1,sparsity=1,valuegenerator=lambda : random.normal(0,1),symm=False ):
+  def randDM(self,n,m=1,sparsity=1.0,valuegenerator=lambda : random.normal(0,1),symm=False ):
     if sparsity < 1:
       spp = self.randDM(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) ,symm=symm)
       spm = (spp < sparsity)
@@ -298,9 +312,9 @@ class casadiTestCase(unittest.TestCase):
       print(s)
       sys.stdout.flush()
 
-  def assertAlmostEqual(self,first, second, places=7, msg=""):
+  def assertAlmostEqual(self,first, second, places=7, msg="", delta=None):  # type: ignore[override]
       if isnan(first ) and isnan(second): return
-      msg+= " %.16e <-> %.16e"  % (first, second)
+      msg = str(msg) + " %.16e <-> %.16e"  % (first, second)
       n =  max(abs(first),abs(second))
       if n>1e3:
         n = 10**floor(log10(n))
@@ -319,6 +333,23 @@ class casadiTestCase(unittest.TestCase):
       name - a descriptor that will be included in error messages
 
       """
+      
+      if isinstance(zr,DM) and isinstance(zt,DM):
+        self.assertEqual(zr.shape, zt.shape)
+        if zr.is_regular() and zt.is_regular() and zr.numel()>10:
+          sp = zr.sparsity() + zt.sparsity()
+          zr_nz = project(zr, sp).nz[:]
+          zt_nz = project(zt, sp).nz[:]
+          if zr_nz.numel() == 0:
+            return
+          diff_nz = fabs(zr_nz - zt_nz)
+          mag_nz = fmax(fabs(zr_nz), fabs(zt_nz))
+          scale_nz = if_else(mag_nz > 1e3, 10**floor(log10(mag_nz)), 1.0)
+          self.assertTrue(norm_inf(diff_nz / scale_nz) < 0.5 * 10**(-digits), "norm_inf: %e" % float(norm_inf(diff_nz / scale_nz)))
+          return
+        
+      
+      
       if isinstance(zr,tuple):
         zr=array([list(zr)])
       if isinstance(zt,tuple):
@@ -353,8 +384,12 @@ class casadiTestCase(unittest.TestCase):
             continue
           #if (isnan(zt[i,j]) or isinf(zt[i,j])) and  (isinf(zt[i,j]) or isnan(zt[i,j])):
           #  continue
-          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,LazyString('"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, )'))
+          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,LazyString('"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, )'))  # pyright: ignore[reportArgumentType]
           #self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, ))
+
+  def file_equal(self, lhs, rhs):
+      with open(lhs, 'rb') as f1, open(rhs, 'rb') as f2:
+        self.assertEqual(f1.read(), f2.read())
 
   def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi evaluation against a reference solution.
@@ -390,7 +425,7 @@ class casadiTestCase(unittest.TestCase):
     if not(type(setx0)==list):
       setx0=[setx0]
 
-    f_in = [0]*f.n_in()
+    f_in = [0]*f.n_in()  # type: list
     for i in range(len(x0)):
       try:
         f_in[i]=setx0[i]
@@ -483,7 +518,7 @@ class casadiTestCase(unittest.TestCase):
   def checkfunction_light(self,trial,solution,inputs=None,**kwargs):
     self.checkfunction(trial,solution,inputs,fwd=False,adj=False,jacobian=False,gradient=False,hessian=False,sens_der=False,evals=False,**kwargs)
   def checkfunction(self,trial,solution,inputs=None,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False):
-
+    # type: (Any, Any, Any, bool, bool, bool, bool, bool, bool, Union[bool, int], int, Optional[int], str, bool, bool, bool, bool, bool) -> Any
     if isinstance(inputs,dict):
       d = inputs
       inputs = [0]*trial.n_in()
@@ -493,8 +528,8 @@ class casadiTestCase(unittest.TestCase):
 
     if indirect:
       ins = trial.mx_in()
-      extra_trial = Function("extra_trial", ins,trial(ins))
-      self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,inputs=inputs,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
+      extra_trial = Function("extra_trial", ins,trial.call(ins))
+      self.checkfunction(extra_trial,solution,inputs=inputs,fwd=fwd,adj=adj,jacobian=jacobian,gradient=gradient,hessian=hessian,sens_der=sens_der,evals=evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
 
     if digits_sens is None:
       digits_sens = digits
@@ -655,8 +690,8 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def compile_external(self,name,source,opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
-
+  def compile_external(self,name,source,opts=None,std="c89",extralibs="",extralibdirs=[],check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
+    # type: (str, str, Optional[dict], str, Union[str, list], list, bool, Union[str, list, None], bool, Union[str, list, None], list, bool) -> Any
     if args.run_slow:
       libdir = GlobalOptions.getCasadiPath()
       includedir = GlobalOptions.getCasadiIncludePath()
@@ -664,19 +699,34 @@ class casadiTestCase(unittest.TestCase):
       for e in extra_include:
         includedirs.append(os.path.join(includedir,e))
 
+      all_libdirs = [libdir] + list(extralibdirs)
+      if os.name=='nt':
+        libdirs_flags = " ".join(["/libpath:" + d for d in all_libdirs])
+      else:
+        libdirs_flags = " ".join(["-L" + d + " -Wl,-rpath," + d for d in all_libdirs])
+
       if isinstance(extralibs,list):
         extralibs_clean = []
         for lib in extralibs:
             if os.name=='nt':
                 if "." in lib:
-                    if lib.endswith(".dll"):
+                    if lib.endswith("libcasadi-tp-openblas.dll"):
+                        extralibs_clean.append("lapack.lib")
+                    elif lib.endswith(".dll"):
                         extralibs_clean.append(lib[:-4]+".lib")
                     else:
                         extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append(lib+".lib")
             else:
-                if "." in lib:
+                if lib.endswith("libcasadi-tp-openblas.so"):
+                    extralibs_clean.append("-lcasadi-tp-openblas")
+                elif lib.startswith("-"):
+                    extralibs_clean.append(lib)
+                elif lib.endswith(".framework") or ".framework/" in lib:
+                    fw = os.path.basename(lib).rsplit(".framework", 1)[0]
+                    extralibs_clean.append("-framework " + fw)
+                elif "." in lib:
                     extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append("-l"+lib)
@@ -695,7 +745,7 @@ class casadiTestCase(unittest.TestCase):
           if debug_mode:
             flags = "/O1 /Zi"
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {source} {extra} /link  /libpath:{libdir} /out:{name}.dll /implib:{name}.lib".format(shared="/LD" if shared else "",std=std,source=source,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),flags=flags,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,name=name)
+          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {source} {extra} /link  {libdirs} /out:{name}.dll /implib:{name}.lib".format(shared="/LD" if shared else "",std=std,source=source,libdirs=libdirs_flags,includedir=" ".join(["/I" + e for e in includedirs]),flags=flags,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,name=name)
           if shared:
             output = "./" + name + ".dll"
           else:
@@ -707,7 +757,7 @@ class casadiTestCase(unittest.TestCase):
           flags = "-O3"
           if debug_mode:
             flags = "-O0 -g"
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {source} -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,source=source,name_out=name+(".so" if shared else ""),flags=flags,libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {source} -o {name_out} {libdirs} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,source=source,name_out=name+(".so" if shared else ""),flags=flags,libdirs=libdirs_flags,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
           if sys.platform=="darwin":
             commands+= " -Xlinker -rpath -Xlinker {libdir}".format(libdir=libdir)
             commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
@@ -768,7 +818,9 @@ class casadiTestCase(unittest.TestCase):
     if bad_symbols:
       self.fail("Found %d bad symbol exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",extralibdirs=[],check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True):
+    # type: (Any, Any, Any, str, Union[str, list], list, bool, Union[str, list, None], bool, bool, Any, bool, bool, Union[str, list, None], bool, Optional[dict], bool, bool, list, int, bool, bool) -> Any
+    ret = {}
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
@@ -800,19 +852,34 @@ class casadiTestCase(unittest.TestCase):
       for e in extra_include:
         includedirs.append(os.path.join(includedir,e))
 
+      all_libdirs = [libdir] + list(extralibdirs)
+      if os.name=='nt':
+        libdirs_flags = " ".join(["/libpath:" + d for d in all_libdirs])
+      else:
+        libdirs_flags = " ".join(["-L" + d + " -Wl,-rpath," + d for d in all_libdirs])
+
       if isinstance(extralibs,list):
         extralibs_clean = []
         for lib in extralibs:
             if os.name=='nt':
                 if "." in lib:
-                    if lib.endswith(".dll"):
+                    if lib.endswith("libcasadi-tp-openblas.dll"):
+                        extralibs_clean.append("lapack.lib")
+                    elif lib.endswith(".dll"):
                         extralibs_clean.append(lib[:-4]+".lib")
                     else:
                         extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append(lib+".lib")
             else:
-                if "." in lib:
+                if lib.endswith("libcasadi-tp-openblas.so"):
+                    extralibs_clean.append("-lcasadi-tp-openblas")
+                elif lib.startswith("-"):
+                    extralibs_clean.append(lib)
+                elif lib.endswith(".framework") or ".framework/" in lib:
+                    fw = os.path.basename(lib).rsplit(".framework", 1)[0]
+                    extralibs_clean.append("-framework " + fw)
+                elif "." in lib:
                     extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append("-l"+lib)
@@ -831,7 +898,7 @@ class casadiTestCase(unittest.TestCase):
           if debug_mode:
             flags = "/O1 /Zi"
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,flags=flags)
+          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {name}.c {extra} /link  {libdirs}".format(shared="/LD" if shared else "",std=std,name=name,libdirs=libdirs_flags,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,flags=flags)
           if shared:
             output = "./" + name + ".dll"
           else:
@@ -843,7 +910,7 @@ class casadiTestCase(unittest.TestCase):
           flags = "-O3"
           if debug_mode:
             flags = "-O0 -g"
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {name}.c -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs,flags=flags) + (" -lm" if not shared else "") + extralibs + extra_options
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {name}.c -o {name_out} {libdirs} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdirs=libdirs_flags,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs,flags=flags) + (" -lm" if not shared else "") + extralibs + extra_options
           if sys.platform=="darwin":
             commands+= " -Xlinker -rpath -Xlinker {libdir}".format(libdir=libdir)
             commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
@@ -870,8 +937,13 @@ class casadiTestCase(unittest.TestCase):
         if os.name=='nt':
             env["PATH"] = env["PATH"]+";"+libdir
         else:
-            env["LD_LIBRARY_PATH"] = libdir
-        p = subprocess.Popen(commands,shell=True,env=env).wait()
+            if "LD_LIBRARY_PATH" in env:
+                env["LD_LIBRARY_PATH"] = env["LD_LIBRARY_PATH"] + ":" + libdir
+            else:
+                env["LD_LIBRARY_PATH"] = libdir
+        p = subprocess.Popen(commands,shell=True,env=env).wait()  # pyright: ignore[reportAssignmentType]
+        ret["exename"] = exename
+        ret["env"] = env
         inputs_main = inputs
         if isinstance(inputs,dict):
           inputs_main = F.convert_in(inputs)
@@ -881,7 +953,7 @@ class casadiTestCase(unittest.TestCase):
         for tool in ["memcheck","helgrind","none"]:
             with open(F.name()+"_out.txt","w") as stdout:
               with open(F.name()+"_in.txt","r") as stdin:
-                commands = exename+" "+F.name()
+                commands = exename+" "+F.name()  # pyright: ignore[reportOperatorIssue]
                 if tool=="none":
                     pass
                 elif tool=="memcheck" and valgrind and has_valgrind:
@@ -893,18 +965,18 @@ class casadiTestCase(unittest.TestCase):
                 print(commands+" < " + F.name()+"_in.txt")
                 p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
                 out = p.communicate()
-            print("Return code",p.returncode)
-            assert p.returncode in main_return_code
-        if p.returncode!=0:
+            print("Return code",p.returncode)  # pyright: ignore[reportAttributeAccessIssue]
+            assert p.returncode in main_return_code  # pyright: ignore[reportAttributeAccessIssue]
+        if p.returncode!=0:  # pyright: ignore[reportAttributeAccessIssue]
             # We are actively looking for failure,
             # so do not proceed with tests
-            return
+            return ret
         
       Fout = F.call(inputs)
       if with_external:
           Fout2 = F2.call(inputs)
 
-      if main:
+      if main and main_output_check:
         outputs = F.generate_out(F.name()+"_out.txt")
         print(F.name(),outputs)
         if isinstance(inputs,dict):
@@ -915,8 +987,10 @@ class casadiTestCase(unittest.TestCase):
           for i in range(F.n_out()):
             self.checkarray(Fout[i],outputs[i],digits=digits)
 
+      ret["libname"] = libname
+
       if not with_external:
-        return None, libname
+        return ret
 
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
@@ -924,12 +998,13 @@ class casadiTestCase(unittest.TestCase):
           self.checkarray(Fout[k],Fout2[k],digits=digits,failmessage=k)
       else:
         for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i],digits=digits)
+          self.checkarray(Fout[i],Fout2[i],digits=digits)  # pyright: ignore[reportArgumentType]
 
       if check_serialize:
         self.check_serialize(F2,inputs=inputs)
-        
-      return F2, libname
+
+      ret["F"] = F2
+      return ret
 
   def check_thread_safety(self,F,inputs=None,N=20):
 
@@ -940,6 +1015,7 @@ class casadiTestCase(unittest.TestCase):
 
   def check_serialize(self,F,inputs=None):
       F2 = Function.deserialize(F.serialize({"debug":True}))
+      assert inputs is not None
 
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)
@@ -1103,8 +1179,9 @@ class skip(object):
   def __call__(self, c):
     if not self.skip: return c
     if isinstance(c,unittest.TestCase):
-      if i.startswith('test_'):
-        delattr(c,i)
+      for i in dir(c):
+        if i.startswith('test_'):
+          delattr(c,i)
       return c
     else:
       print(self.skiptext(c.__name__))

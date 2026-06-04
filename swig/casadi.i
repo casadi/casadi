@@ -43,6 +43,30 @@
 // casadi_int type
 %include <casadi/core/casadi_types.hpp>
 
+/* Compat shim for SWIG without the -stubs patch.  The patched fork
+ * defines %stub_* primitives (see Lib/python/pyuserdir.swg) and sets
+ * SWIG_STUBS_ENABLED when -stubs is passed.  Vanilla SWIG has neither
+ * the real macros nor the noop branch, so we declare everything
+ * empty here.  Direct `%stubcode %{...%}` use sites must be guarded
+ * with `#ifdef SWIG_STUBS_ENABLED` separately -- `%insert("stubs")`
+ * isn't a known target in vanilla SWIG. */
+#ifndef SWIG_STUBS_ENABLED
+%define %stub_method(NAME, RET, ARGS...) %enddef
+%define %stub_method0(NAME, RET) %enddef
+%define %stub_overload_method(NAME, RET, ARGS...) %enddef
+%define %stub_overload_method0(NAME, RET) %enddef
+%define %stub_overload_method_selftyped(NAME, RET, SELFTYPE, ARGS...) %enddef
+%define %stub_func(NAME, RET, ARGS...) %enddef
+%define %stub_overload_func(NAME, RET, ARGS...) %enddef
+%define %stub_attr(NAME, TYPE...) %enddef
+%define %stub_const(NAME, TYPE...) %enddef
+%define %stub_class_begin(NAME) %enddef
+%define %stub_alias_in(NAME, TYPES...) %enddef
+%define %stub_alias_out(NAME, TYPES...) %enddef
+%define %stub_alias_in_key(KEY, TYPES...) %enddef
+%define %stub_alias_out_key(KEY, TYPES...) %enddef
+#endif
+
   /// Data structure in the target language holding data
 #ifdef SWIGPYTHON
 #define GUESTOBJECT PyObject
@@ -474,7 +498,6 @@ namespace std {
   }
 }
 
-#ifdef WITH_PYTHON3
 // See https://github.com/casadi/casadi/issues/701
 // Recent numpys will only catch TypeError or ValueError in printing logic
 %exception __bool__ {
@@ -484,15 +507,6 @@ namespace std {
    SWIG_exception(SWIG_TypeError, e.what());
   }
 }
-#else
-%exception __nonzero__ {
- try {
-    $action
-  } catch (const std::exception& e) {
-   SWIG_exception(SWIG_TypeError, e.what());
-  }
-}
-#endif
 #else
 // Exceptions handling
 %include "exception.i"
@@ -518,7 +532,6 @@ namespace std {
   }
 }
 
-#ifdef WITH_PYTHON3
 // See https://github.com/casadi/casadi/issues/701
 // Recent numpys will only catch TypeError or ValueError in printing logic
 %exception __bool__ {
@@ -530,18 +543,6 @@ namespace std {
     SWIG_exception(SWIG_TypeError, e.getMessage());
   }
 }
-#else
-%exception __nonzero__ {
- try {
-    $action
-  } catch (const std::exception& e) {
-   SWIG_exception(SWIG_TypeError, e.what());
-  }
-  catch (const Swig::DirectorException& e) {
-    SWIG_exception(SWIG_TypeError, e.getMessage());
-  }
-}
-#endif
 #endif
 
 #ifdef SWIGPYTHON
@@ -758,7 +759,11 @@ namespace std {
       PyObject *cr = PyObject_CallFunctionObjArgs(dm, p, check_only, NULL);
       if (!cr) return false;
       bool ret;
-      if (PyBool_Check(cr)) {
+      // None signals "not handled by this helper" (issue #4216):
+      // without this check, conv() would dereference None and segfault.
+      if (cr == Py_None) {
+        ret = false;
+      } else if (PyBool_Check(cr)) {
         ret = PyObject_IsTrue(cr);
       } else {
         ret = conv(cr, m);
@@ -1012,14 +1017,7 @@ namespace std {
 
     GUESTOBJECT * from_ptr(const casadi_int *a) {
 #ifdef SWIGPYTHON
-#ifdef WITH_PYTHON3
       return PyLong_FromLongLong(*a);
-#else
-      // For python on Windows
-      if (*a > PyInt_GetMax() || *a < -(PyInt_GetMax()-1)) return PyLong_FromLongLong(*a);
-      return PyInt_FromLong(*a);
-#endif
-
 #elif defined(SWIGMATLAB)
       return mxCreateDoubleScalar(static_cast<double>(*a));
 #else
@@ -1223,6 +1221,25 @@ namespace std {
 
     // MATLAB n-by-m char array mapped to vector of length m
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
+      // MATLAB string class (R2016b+): convert via cellstr -> cell of char,
+      // then reuse the cell path. (Note: char() on a multi-element string
+      // array yields a 3-D char in modern MATLAB, so cellstr is the right
+      // bridge here.)
+      if (mxIsClass(p, "string")) {
+        mxArray *cell_arr = 0;
+        mxArray *prhs[1] = { p };
+        mxArray *err = mexCallMATLABWithTrap(1, &cell_arr, 1, prhs, "cellstr");
+        if (err) {
+          mxDestroyArray(err);
+          if (cell_arr) mxDestroyArray(cell_arr);
+          return false;
+        }
+        if (!cell_arr) return false;
+        bool ok = to_ptr(cell_arr, m);
+        mxDestroyArray(cell_arr);
+        return ok;
+      }
+
       if (mxIsChar(p)) {
 	if (m) {
           // Get data
@@ -1566,6 +1583,30 @@ namespace std {
       }
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
+      // MATLAB string class (R2016b+): the MEX wrapper is a 1x1 opaque
+      // container, so we cannot read element count via mxGetNumberOfElements.
+      // Bridge via cellstr -> cell of char, then require exactly one element
+      // for the scalar std::string slot.
+      if (mxIsClass(p, "string")) {
+        mxArray *cell_arr = 0;
+        mxArray *prhs[1] = { p };
+        mxArray *err = mexCallMATLABWithTrap(1, &cell_arr, 1, prhs, "cellstr");
+        if (err) {
+          mxDestroyArray(err);
+          if (cell_arr) mxDestroyArray(cell_arr);
+          return false;
+        }
+        if (!cell_arr) return false;
+        if (mxGetClassID(cell_arr) != mxCELL_CLASS
+            || mxGetNumberOfElements(cell_arr) != 1) {
+          mxDestroyArray(cell_arr);
+          return false;
+        }
+        mxArray *char_arr = mxGetCell(cell_arr, 0);
+        bool ok = char_arr && to_ptr(char_arr, m);
+        mxDestroyArray(cell_arr);
+        return ok;
+      }
       if (mxIsChar(p) && mxGetM(p)<=1) {
         if (m) {
           if (mxGetM(p)==0) return true;
@@ -1625,15 +1666,32 @@ namespace std {
         }
         return true;
       }
-      // Python slice
+      // Python slice - use Limited API compatible approach
       if (PySlice_Check(p)) {
-        PySliceObject *r = (PySliceObject*)(p);
+        Py_ssize_t start, stop, step;
+%#if PY_VERSION_HEX >= 0x03060100
+        int res = PySlice_Unpack(p, &start, &stop, &step);
+%#else
+        // Python 2.7 and early Python 3.x use _PySlice_Unpack (private API)
+        int res = _PySlice_Unpack(p, &start, &stop, &step);
+%#endif
+        if (res < 0) {
+          return false;  // TypeError already set by PySlice_Unpack
+        }
+
         if (m) {
-          (**m).start = (r->start == Py_None || PyNumber_AsSsize_t(r->start, NULL) <= std::numeric_limits<int>::min())
-            ? std::numeric_limits<casadi_int>::min() : PyInt_AsLong(r->start);
-          (**m).stop  = (r->stop ==Py_None || PyNumber_AsSsize_t(r->stop, NULL)>= std::numeric_limits<int>::max())
-            ? std::numeric_limits<casadi_int>::max() : PyInt_AsLong(r->stop);
-          if(r->step !=Py_None) (**m).step  = PyInt_AsLong(r->step);
+          // Map sentinel values from PySlice_Unpack to CasADi's limits
+          // PySlice_Unpack returns PY_SSIZE_T_MIN or PY_SSIZE_T_MAX as sentinels
+          // depending on step direction, so check both extremes
+          (**m).start = (start == PY_SSIZE_T_MIN || start == PY_SSIZE_T_MAX)
+              ? std::numeric_limits<casadi_int>::min()
+              : static_cast<casadi_int>(start);
+          (**m).stop = (stop == PY_SSIZE_T_MAX || stop == PY_SSIZE_T_MIN)
+              ? std::numeric_limits<casadi_int>::max()
+              : static_cast<casadi_int>(stop);
+          if (step != 1) {
+            (**m).step = static_cast<casadi_int>(step);
+          }
         }
         return true;
       }
@@ -2139,8 +2197,8 @@ namespace std {
 
 #endif // SWIGXML
 
- // Define all input typemaps
-%define %casadi_input_typemaps(xName, xPrec, xType...)
+ // Input typemaps.  xStubIn becomes the pystub_in= PEP-484 annotation.
+%define %casadi_input_typemaps(xName, xStubIn, xPrec, xType...)
  // Pass input by value, check if matches
 %typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_all") xType {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
@@ -2154,7 +2212,7 @@ namespace std {
  }
 
  // Pass input by value, convert argument
-%typemap(in, doc=xName, noblock=1, fragment="casadi_all") xType {
+%typemap(in, doc=xName, pystub_in=xStubIn, noblock=1, fragment="casadi_all") xType {
   if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input $argnum to type '" xName "'.");
  }
 
@@ -2167,7 +2225,7 @@ namespace std {
  }
 
  // Pass input by reference, convert argument
-%typemap(in, doc=xName, noblock=1, fragment="casadi_all") const xType & (xType m) {
+%typemap(in, doc=xName, pystub_in=xStubIn, noblock=1, fragment="casadi_all") const xType & (xType m) {
   $1 = &m;
   if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input $argnum to type '" xName "'.");
  }
@@ -2177,16 +2235,18 @@ namespace std {
 
 %enddef
 
- // Define all output typemaps
-%define %casadi_output_typemaps(xName, xType...)
+ // Output typemaps.  xStubOut becomes the pystub_out= annotation on
+ // return typemaps AND on &OUTPUT/&INOUT (they're Python-output from
+ // the user's perspective even though they're `in` typemaps in SWIG).
+%define %casadi_output_typemaps(xName, xStubIn, xStubOut, xType...)
 
  // Return-by-value
-%typemap(out, doc=xName, noblock=1, fragment="casadi_all") xType, const xType {
+%typemap(out, doc=xName, pystub_out=xStubOut, noblock=1, fragment="casadi_all") xType, const xType {
   if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type '" xName "'.");
 }
 
 // Return a const-ref behaves like return-by-value
-%typemap(out, doc=xName, noblock=1, fragment="casadi_all") const xType& {
+%typemap(out, doc=xName, pystub_out=xStubOut, noblock=1, fragment="casadi_all") const xType& {
   if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type '" xName "'.");
 }
 
@@ -2195,8 +2255,8 @@ namespace std {
   %append_output(casadi::from_ptr($1));
  }
 
-// ... and the corresponding inputs are ignored
-%typemap(in, doc=xName, noblock=1, numinputs=0) xType &OUTPUT (xType m) {
+// ... and the corresponding inputs are ignored.
+%typemap(in, doc=xName, pystub_out=xStubOut, noblock=1, numinputs=0) xType &OUTPUT (xType m) {
  $1 = &m;
 }
 
@@ -2229,7 +2289,7 @@ namespace std {
  }
 
 // ... but kept as inputs
-%typemap(in, doc=xName, noblock=1, fragment="casadi_all") xType &INOUT (xType m) {
+%typemap(in, doc=xName, pystub_in=xStubIn, noblock=1, fragment="casadi_all") xType &INOUT (xType m) {
   $1 = &m;
   if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to type '" xName "'.");
  }
@@ -2252,17 +2312,17 @@ namespace std {
 
 %enddef
 
- // Define all typemaps for a template instantiation without proxy classes
-%define %casadi_template(xName, xPrec, xType...)
+ // All-in-one template instantiation + typemaps.
+%define %casadi_template(xName, xStubIn, xStubOut, xPrec, xType...)
 %template() xType;
-%casadi_input_typemaps(xName, xPrec, xType)
-%casadi_output_typemaps(xName, %arg(xType))
+%casadi_input_typemaps(xName, xStubIn, xPrec, xType)
+%casadi_output_typemaps(xName, xStubIn, xStubOut, %arg(xType))
 %enddef
 
- // Define all input and ouput typemaps
-%define %casadi_typemaps(xName, xPrec, xType...)
-%casadi_input_typemaps(xName, xPrec, xType)
-%casadi_output_typemaps(xName, xType)
+ // Input + output typemaps for an existing type.
+%define %casadi_typemaps(xName, xStubIn, xStubOut, xPrec, xType...)
+%casadi_input_typemaps(xName, xStubIn, xPrec, xType)
+%casadi_output_typemaps(xName, xStubIn, xStubOut, xType)
 %enddef
 
 // Order in typemap matching: Lower value means will be checked first
@@ -2327,19 +2387,26 @@ namespace std {
 #endif
 
 #ifdef SWIGPYTHON
-%typemap(in, doc="memoryview(ro)", noblock=1, fragment="casadi_all") (const double * a, casadi_int size) (Py_buffer* buffer) {
-  if (!PyMemoryView_Check($input)) SWIG_exception_fail(SWIG_TypeError, "Must supply a MemoryView.");
-  buffer = PyMemoryView_GET_BUFFER($input);
-  $1 = static_cast<double*>(buffer->buf); // const double cast comes later
-  $2 = buffer->len;
+%typemap(in, doc="buffer(ro)", pystub_in="memoryview", noblock=1, fragment="casadi_all") (const double * a, casadi_int size) (Py_buffer _global_pybuf_ro) {
+  if (PyObject_GetBuffer($input, &_global_pybuf_ro, PyBUF_SIMPLE) != 0) {
+    SWIG_exception_fail(SWIG_TypeError, "Must supply a buffer-supporting object.");
+  }
+  $1 = static_cast<double*>(_global_pybuf_ro.buf);
+  $2 = _global_pybuf_ro.len;
+ }
+%typemap(freearg) (const double * a, casadi_int size) {
+  PyBuffer_Release(&_global_pybuf_ro);
  }
 
-%typemap(in, doc="memoryview(rw)", noblock=1, fragment="casadi_all") (double * a, casadi_int size)  (Py_buffer* buffer) {
-  if (!PyMemoryView_Check($input)) SWIG_exception_fail(SWIG_TypeError, "Must supply a writable MemoryView.");
-  buffer = PyMemoryView_GET_BUFFER($input);
-  if (buffer->readonly) SWIG_exception_fail(SWIG_TypeError, "Must supply a writable MemoryView.");
-  $1 = static_cast<double*>(buffer->buf);
-  $2 = buffer->len;
+%typemap(in, doc="buffer(rw)", pystub_in="memoryview", noblock=1, fragment="casadi_all") (double * a, casadi_int size)  (Py_buffer _global_pybuf_rw) {
+  if (PyObject_GetBuffer($input, &_global_pybuf_rw, PyBUF_WRITABLE) != 0) {
+    SWIG_exception_fail(SWIG_TypeError, "Must supply a writable buffer-supporting object.");
+  }
+  $1 = static_cast<double*>(_global_pybuf_rw.buf);
+  $2 = _global_pybuf_rw.len;
+ }
+%typemap(freearg) (double * a, casadi_int size) {
+  PyBuffer_Release(&_global_pybuf_rw);
  }
 
 // Directorin typemap; as output
@@ -2347,11 +2414,7 @@ namespace std {
   PyObject * arg_tuple = PyTuple_New($2.size());
   for (casadi_int i=0;i<$2.size();++i) {
 
-#ifdef WITH_PYTHON3
     PyObject* buf = $1[i] ? PyMemoryView_FromMemory(reinterpret_cast<char*>(const_cast<double*>($1[i])), $2[i]*sizeof(double), PyBUF_READ) : SWIG_Py_Void();
-#else
-    PyObject* buf = $1[i] ? PyBuffer_FromMemory(const_cast<double*>($1[i]), $2[i]*sizeof(double)) : SWIG_Py_Void();
-#endif
     PyTuple_SET_ITEM(arg_tuple, i, buf);
   }
   $input = arg_tuple;
@@ -2360,77 +2423,187 @@ namespace std {
 %typemap(directorin, noblock=1, fragment="casadi_all") (double** res, const std::vector<casadi_int>& sizes_res) {
   PyObject* res_tuple = PyTuple_New($2.size());
   for (casadi_int i=0;i<$2.size();++i) {
-#ifdef WITH_PYTHON3
     PyObject* buf = $1[i] ? PyMemoryView_FromMemory(reinterpret_cast<char*>(const_cast<double*>($1[i])), $2[i]*sizeof(double), PyBUF_WRITE) : SWIG_Py_Void();
-#else
-    PyObject* buf = $1[i] ? PyBuffer_FromReadWriteMemory($1[i], $2[i]*sizeof(double)) : SWIG_Py_Void();
-#endif
     PyTuple_SET_ITEM(res_tuple, i, buf);
   }
   $input = res_tuple;
 }
 
-%typemap(in, doc="void*", noblock=1, fragment="casadi_all") void* raw {
+%typemap(in, doc="void*", pystub_in="Any", noblock=1, fragment="casadi_all") void* raw {
   $1 = PyCapsule_GetPointer($input, NULL);
 }
 
-%typemap(out, doc="void*", noblock=1, fragment="casadi_all") void* {
+%typemap(out, doc="void*", pystub_out="Any", noblock=1, fragment="casadi_all") void* {
   $result = PyCapsule_New($1, NULL,NULL);
 }
 #endif
 
-%casadi_typemaps(L_STR, PREC_STRING, std::string)
-%casadi_template(LL L_STR LR, PREC_VECTOR, std::vector<std::string>)
-%casadi_template(LL LL L_STR LR LR, PREC_VECTOR, std::vector<std::vector<std::string> >)
-%casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
-%casadi_template(LL "Sparsity" LR, PREC_SPARSITY, std::vector< casadi::Sparsity>)
-%casadi_template(LL LL "Sparsity"  LR  LR, PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
-%casadi_template(LDICT("Sparsity"), PREC_SPARSITY, std::map<std::string, casadi::Sparsity >)
-%casadi_template(LDICT(LL "Sparsity" LR), PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
-%casadi_template(LPAIR(LDICT("Sparsity"),"[" L_STR "]"), PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
-%casadi_typemaps(L_BOOL, SWIG_TYPECHECK_BOOL, bool)
-%casadi_template("[" L_BOOL "]", SWIG_TYPECHECK_BOOL, std::vector<bool>)
-%casadi_template("[[" L_BOOL "]]", SWIG_TYPECHECK_BOOL, std::vector<std::vector<bool> >)
-%casadi_typemaps( L_INT , SWIG_TYPECHECK_INTEGER, casadi_int)
+%casadi_typemaps(L_STR, "str", "str", PREC_STRING, std::string)
+%casadi_template(LL L_STR LR, "Sequence[str]", "list[str]", PREC_VECTOR, std::vector<std::string>)
+%casadi_template(LL LL L_STR LR LR, "Sequence[Sequence[str]]", "list[list[str]]", PREC_VECTOR, std::vector<std::vector<std::string> >)
+
+/* -------- PEP-484 stub aliases and preamble.  Active with -stubs. --
+ * Each %stub_alias_in(NAME, TYPES) emits `_NAME = TYPES` into the
+ * preamble and registers NAME -> _NAME for pystub token substitution.
+ * Input aliases widen (to_ptr<T> accepts more than the C++ signature);
+ * output aliases stay narrow unless the wrapper unwraps at from_ptr.
+ * Do not cross-chain matrix aliases -- narrowest-first overloads want
+ * DM subset-of SX and DM subset-of MX but SX and MX must stay independent.
+ * ----------------------------------------------------------------- */
+
+#ifdef SWIG_STUBS_ENABLED
+
+%insert("stubs_preamble") %{
+import numpy as np
+from numpy.typing import NDArray
+from collections.abc import Callable
+from typing import Protocol, runtime_checkable
+_T = TypeVar("_T", "DM", "SX", "MX")
+
+@runtime_checkable
+class _SupportsDM(Protocol):
+    """Any object exposing a ``__DM__()`` method -- the conversion hook
+    used by ``to_ptr<DM>()`` for user-defined numeric types."""
+    def __DM__(self) -> "DM": ...
+
+@runtime_checkable
+class _SupportsSX(Protocol):
+    def __SX__(self) -> "SX": ...
+
+@runtime_checkable
+class _SupportsMX(Protocol):
+    def __MX__(self) -> "MX": ...
+
+%}
+
+/* Matrix input aliases.  SX/MX both extend DM; they don't extend each
+ * other -- to_ptr<SX>(MX) and to_ptr<MX>(SX) fail at runtime.
+ *
+ * NDArray dtype is intentionally `Any`: numpy stubs evolve rapidly
+ * (dtype changes between 1.x / 2.x / 2.3+ using `_AnyShape` vs
+ * `tuple[int,...]`; literals like `np.linspace(...)` resolve to
+ * different concrete dtypes across versions).  Since casadi's C++
+ * runtime accepts any numeric ndarray, false-precision dtype narrowing
+ * just caused overload-resolution failures that differed between
+ * Python/numpy-version combinations.  `NDArray[Any]` is
+ * version-agnostic. */
+%stub_alias_in(DM, bool | int | float | DM | Sparsity | _SupportsDM | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any])
+%stub_alias_in(SX, SX | _SupportsSX | _DM)
+%stub_alias_in(MX, MX | _SupportsMX | _DM)
+%stub_alias_in(IM, IM | int | Sequence[int] | Sequence[Sequence[int]] | NDArray[Any])
+%stub_alias_in(SXElem, SXElem | float)
+
+/* Bracketed doc tokens -- not valid SWIG identifiers. */
+%stub_alias_in_key([float], Sequence[bool | int | float] | NDArray[Any])
+%stub_alias_in_key([int],   Sequence[bool | int] | NDArray[Any])
+%stub_alias_in_key([bool],  Sequence[bool | int] | NDArray[Any])
+
+%stub_alias_in(Slice, Slice | int | slice)
+
+/* Input: precise recursive union -- matches what to_ptr<GenericType>()
+ * accepts, guides users constructing options dicts like
+ * `{"ipopt": {"tol": 1e-6, ...}, "print_time": True}`.
+ *
+ * Output: `Any`, deliberately.  Reasons:
+ * (1) On return paths (`stats()`, `info()`, etc.) users compare against
+ *     plain scalars (`stats["nsteps"] < 2500`).  A recursive union
+ *     would disallow operators because not all members support them.
+ * (2) pyright's cross-module resolution of our recursive alias is
+ *     typeshed/target-dependent: on Py3.11 it silently falls back to
+ *     `Unknown` (hiding the real errors), on Py3.8 it resolves and
+ *     flags them.  `Any` is stable across all targets.
+ * (3) Users inspect stats output freely; precise typing buys nothing. */
+%stub_alias_in(GenericType, bool | int | float | str | "Function" | Sequence["_GenericType"] | %arg(Mapping[str, "_GenericType"]))
+%stub_alias_out_key(GenericType, Any)
+
+/* __getitem__/__setitem__ axis index.  MX additionally accepts MX
+ * indices, added via a narrower %extend overload on MX itself. */
+%stub_alias_in(MIndex, int | slice | Sequence[bool | int] | NDArray[Any] | Sparsity | DM)
+
+/* CasadiMatrix operator overloads.  Emitted on GenericExpressionCommon,
+ * which DM/SX/MX all inherit -- per-class overloads narrow the `other`
+ * argument to what each class actually accepts at runtime.
+ *
+ *   DM.__add__(other: _DM) -> DM
+ *   SX.__add__(other: _SX) -> SX        (_SX = SX | _SupportsSX | _DM)
+ *   MX.__add__(other: _MX) -> MX        (_MX = MX | _SupportsMX | _DM)
+ *
+ * Crucially, MX + SX is NOT allowed: SX isn't in _MX, and MX isn't in
+ * _SX.  Both `__add__` on MX and `__radd__` on SX fail to match,
+ * mirroring the runtime behaviour. */
+%define %stub_CasadiMatrix_binop(NAME)
+%stub_overload_method_selftyped(NAME, DM, DM, other: _DM)
+%stub_overload_method_selftyped(NAME, SX, SX, other: _SX)
+%stub_overload_method_selftyped(NAME, MX, MX, other: _MX)
+%enddef
+
+%define %stub_CasadiMatrix_unop(NAME)
+%stub_method0(NAME, Self)
+%enddef
+
+%define %stub_CasadiMatrix_cmp(NAME)
+%stub_overload_method_selftyped(NAME, DM, DM, other: _DM)
+%stub_overload_method_selftyped(NAME, SX, SX, other: _SX)
+%stub_overload_method_selftyped(NAME, MX, MX, other: _MX)
+%enddef
+
+#else
+
+%define %stub_CasadiMatrix_binop(NAME) %enddef
+%define %stub_CasadiMatrix_unop(NAME)  %enddef
+%define %stub_CasadiMatrix_cmp(NAME)   %enddef
+
+#endif
+
+%casadi_typemaps("Sparsity", "Sparsity", "Sparsity", PREC_SPARSITY, casadi::Sparsity)
+%casadi_template(LL "Sparsity" LR, "Sequence[Sparsity]", "list[Sparsity]", PREC_SPARSITY, std::vector< casadi::Sparsity>)
+%casadi_template(LL LL "Sparsity"  LR  LR, "Sequence[Sequence[Sparsity]]", "list[list[Sparsity]]", PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
+%casadi_template(LDICT("Sparsity"), "Mapping[str, Sparsity]", "dict[str, Sparsity]", PREC_SPARSITY, std::map<std::string, casadi::Sparsity >)
+%casadi_template(LDICT(LL "Sparsity" LR), "Mapping[str, Sequence[Sparsity]]", "dict[str, list[Sparsity]]", PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
+%casadi_template(LPAIR(LDICT("Sparsity"),"[" L_STR "]"), "tuple[Mapping[str, Sparsity], Sequence[str]]", "tuple[dict[str, Sparsity], list[str]]", PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
+%casadi_typemaps(L_BOOL, "bool", "bool", SWIG_TYPECHECK_BOOL, bool)
+%casadi_template("[" L_BOOL "]", "Sequence[bool | int] | NDArray[Any]", "list[bool]", SWIG_TYPECHECK_BOOL, std::vector<bool>)
+%casadi_template("[[" L_BOOL "]]", "Sequence[Sequence[bool | int]] | Sequence[NDArray[Any]]", "list[list[bool]]", SWIG_TYPECHECK_BOOL, std::vector<std::vector<bool> >)
+%casadi_typemaps( L_INT , "int", "int", SWIG_TYPECHECK_INTEGER, casadi_int)
 
 #ifdef MATLABSTYLE
 #define LABEL "[int,int]"
 #else
 #define LABEL LPAIR("int","int")
 #endif
-%casadi_template(LABEL, SWIG_TYPECHECK_INTEGER, std::pair<casadi_int,casadi_int>)
+%casadi_template(LABEL, "tuple[int, int]", "tuple[int, int]", SWIG_TYPECHECK_INTEGER, std::pair<casadi_int,casadi_int>)
 #undef LABEL
-%casadi_template("[" L_INT "]", PREC_IVector, std::vector<casadi_int>)
-%casadi_template(LL "[" L_INT "]" LR, PREC_IVectorVector, std::vector<std::vector<casadi_int> >)
-%casadi_typemaps(L_DOUBLE, SWIG_TYPECHECK_DOUBLE, double)
-%casadi_template("[" L_DOUBLE "]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
-%casadi_template(LL "[" L_DOUBLE "]" LR, SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
-%casadi_typemaps("SXElem", PREC_SX, casadi::SXElem)
-%casadi_template(LL "SXElem" LR, PREC_SXVector, std::vector<casadi::SXElem>)
-%casadi_typemaps("SX", PREC_SX, casadi::Matrix<casadi::SXElem>)
-%casadi_template(LL "SX" LR, PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElem> >)
-%casadi_template(LL LL "SX" LR LR, PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElem> > >)
-%casadi_template(LDICT("SX"), PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElem> >)
-%casadi_typemaps("MX", PREC_MX, casadi::MX)
-%casadi_template(LL "MX" LR, PREC_MXVector, std::vector<casadi::MX>)
-%casadi_template(LL LL "MX" LR LR, PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
-%casadi_template(LDICT("MX"), PREC_MX, std::map<std::string, casadi::MX>)
-%casadi_template(LPAIR("MX","MX"), PREC_MXVector, std::pair<casadi::MX, casadi::MX>)
-%casadi_typemaps("DM", PREC_DM, casadi::Matrix<double>)
-%casadi_template(LL "DM" LR, PREC_DMVector, std::vector< casadi::Matrix<double> >)
-%casadi_template(LL LL "DM" LR LR, PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
-%casadi_template(LDICT("DM"), PREC_DM, std::map<std::string, casadi::Matrix<double> >)
-%casadi_typemaps("IM", PREC_IM, casadi::Matrix<casadi_int>)
+%casadi_template("[" L_INT "]", "Sequence[bool | int] | NDArray[Any]", "list[int]", PREC_IVector, std::vector<casadi_int>)
+%casadi_template(LL "[" L_INT "]" LR, "Sequence[Sequence[bool | int] | NDArray[Any]]", "list[list[int]]", PREC_IVectorVector, std::vector<std::vector<casadi_int> >)
+%casadi_typemaps(L_DOUBLE, "float", "float", SWIG_TYPECHECK_DOUBLE, double)
+%casadi_template("[" L_DOUBLE "]", "Sequence[bool | int | float] | NDArray[Any]", "list[float]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
+%casadi_template(LL "[" L_DOUBLE "]" LR, "Sequence[Sequence[bool | int | float] | NDArray[Any]]", "list[list[float]]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
+%casadi_typemaps("SXElem", "SXElem", "SXElem", PREC_SX, casadi::SXElem)
+%casadi_template(LL "SXElem" LR, "Sequence[SXElem]", "list[SXElem]", PREC_SXVector, std::vector<casadi::SXElem>)
+%casadi_typemaps("SX", "SX", "SX", PREC_SX, casadi::Matrix<casadi::SXElem>)
+%casadi_template(LL "SX" LR, "Sequence[SX]", "list[SX]", PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElem> >)
+%casadi_template(LL LL "SX" LR LR, "Sequence[Sequence[SX]]", "list[list[SX]]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElem> > >)
+%casadi_template(LDICT("SX"), "Mapping[str, SX]", "dict[str, SX]", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElem> >)
+%casadi_typemaps("MX", "MX", "MX", PREC_MX, casadi::MX)
+%casadi_template(LL "MX" LR, "Sequence[MX]", "list[MX]", PREC_MXVector, std::vector<casadi::MX>)
+%casadi_template(LL LL "MX" LR LR, "Sequence[Sequence[MX]]", "list[list[MX]]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
+%casadi_template(LDICT("MX"), "Mapping[str, MX]", "dict[str, MX]", PREC_MX, std::map<std::string, casadi::MX>)
+%casadi_template(LPAIR("MX","MX"), "tuple[MX, MX]", "tuple[MX, MX]", PREC_MXVector, std::pair<casadi::MX, casadi::MX>)
+%casadi_typemaps("DM", "DM", "DM", PREC_DM, casadi::Matrix<double>)
+%casadi_template(LL "DM" LR, "Sequence[DM]", "list[DM]", PREC_DMVector, std::vector< casadi::Matrix<double> >)
+%casadi_template(LL LL "DM" LR LR, "Sequence[Sequence[DM]]", "list[list[DM]]", PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
+%casadi_template(LDICT("DM"), "Mapping[str, DM]", "dict[str, DM]", PREC_DM, std::map<std::string, casadi::Matrix<double> >)
+%casadi_typemaps("IM", "IM", "IM", PREC_IM, casadi::Matrix<casadi_int>)
 // Without CASADI_INT_TYPE, you get SwigValueWrapper
 // With it, docstrings are screwed
-%casadi_typemaps("GenericType", PREC_GENERICTYPE, casadi::GenericType)
-%casadi_template(LL "GenericType" LR, PREC_GENERICTYPE, std::vector<casadi::GenericType>)
-%casadi_typemaps("Slice", PREC_SLICE, casadi::Slice)
-%casadi_typemaps("Function", PREC_FUNCTION, casadi::Function)
-%casadi_template(LL "Function" LR, PREC_FUNCTION, std::vector<casadi::Function>)
-%casadi_template(LPAIR("Function","Function"), PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
-%casadi_template(L_DICT, PREC_DICT, std::map<std::string, casadi::GenericType>)
-%casadi_template(LDICT(LL L_STR LR), PREC_DICT, std::map<std::string, std::vector<std::string> >)
+%casadi_typemaps("GenericType", "GenericType", "GenericType", PREC_GENERICTYPE, casadi::GenericType)
+%casadi_template(LL "GenericType" LR, "Sequence[GenericType]", "list[GenericType]", PREC_GENERICTYPE, std::vector<casadi::GenericType>)
+%casadi_typemaps("Slice", "Slice", "Slice", PREC_SLICE, casadi::Slice)
+%casadi_typemaps("Function", "Function", "Function", PREC_FUNCTION, casadi::Function)
+%casadi_template(LL "Function" LR, "Sequence[Function]", "list[Function]", PREC_FUNCTION, std::vector<casadi::Function>)
+%casadi_template(LPAIR("Function","Function"), "tuple[Function, Function]", "tuple[Function, Function]", PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
+%casadi_template(L_DICT, "Mapping[str, GenericType]", "dict[str, GenericType]", PREC_DICT, std::map<std::string, casadi::GenericType>)
+%casadi_template(LDICT(LL L_STR LR), "Mapping[str, Sequence[str]]", "dict[str, list[str]]", PREC_DICT, std::map<std::string, std::vector<std::string> >)
 
 #undef L_INT
 #undef L_BOOL
@@ -2444,7 +2617,7 @@ namespace std {
 
 // Matlab is index-1 based
 #ifdef SWIGMATLAB
-%typemap(in, doc="index", noblock=1) casadi_index {
+%typemap(in, doc="index", pystub_in="int", noblock=1) casadi_index {
   if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input $argnum to type ' index '.");
   if ($1==0) SWIG_exception_fail(SWIG_TypeError,"Index starts at 1, got index '0'.");
   if ($1>=1) $1--;
@@ -2513,20 +2686,32 @@ PyOS_setsig(SIGINT, SigIntHandler);
 %}
 #endif // WITH_PYTHON_INTERRUPTS
 
-%pythoncode%{
-try:
-  from numpy import pi, inf, sum
-except:
-  pass
+%pythoncode "numpy_bridge.py"
 
-arcsin = lambda x: _casadi.asin(x)
-arccos = lambda x: _casadi.acos(x)
-arctan = lambda x: _casadi.atan(x)
-arctan2 = lambda x,y: _casadi.atan2(x, y)
-arctanh = lambda x: _casadi.atanh(x)
-arcsinh = lambda x: _casadi.asinh(x)
-arccosh = lambda x: _casadi.acosh(x)
-%}
+/* `inf` and `pi` exist at runtime (casadi/core const doubles) but are
+ * deliberately NOT declared in the stub.  numpy declares both as
+ * `Final[float]`; a parallel casadi declaration triggers "declared as
+ * Final and cannot be reassigned" on any user file that does both
+ * `from casadi import *` and `from numpy import *`.  Users who need
+ * these names in a typed context should import them from numpy. */
+
+/* Stubs for the numpy-flavoured aliases above.  Each dispatches to
+ * the corresponding casadi.<atan/asin/...> overload; overloads mirror
+ * the underlying auto-generated ones so the return type narrows. */
+%define %stub_unary_math(NAME)
+%stub_overload_func(NAME, DM, x: _DM)
+%stub_overload_func(NAME, SX, x: _SX)
+%stub_overload_func(NAME, MX, x: _MX)
+%enddef
+%stub_unary_math(arcsin)
+%stub_unary_math(arccos)
+%stub_unary_math(arctan)
+%stub_unary_math(arctanh)
+%stub_unary_math(arcsinh)
+%stub_unary_math(arccosh)
+%stub_overload_func(arctan2, DM, y: _DM, x: _DM)
+%stub_overload_func(arctan2, SX, y: _SX, x: _SX)
+%stub_overload_func(arctan2, MX, y: _MX, x: _MX)
 #endif // SWIGPYTHON
 
 // Strip leading casadi_ unless followed by ML/int
@@ -2623,6 +2808,45 @@ def dcat(args):
     return _diagcat(args)
 %}
 
+/* Stubs for the %pythoncode *cat wrappers above.  Overloads narrow
+ * the return to the dominant input type.  Order matters: pyright
+ * picks the first matching overload, so narrowest (Sparsity) first,
+ * then DM, then SX, then MX -- otherwise `vertcat(1, 1)` (all inputs
+ * in _DM) resolves to the MX overload because _MX is a superset
+ * of _DM. */
+%stub_overload_func(veccat,  Sparsity, *args: Sparsity)
+%stub_overload_func(veccat,  DM,       *args: _DM)
+%stub_overload_func(veccat,  SX,       *args: _SX)
+%stub_overload_func(veccat,  MX,       *args: _MX)
+%stub_overload_func(vertcat, Sparsity, *args: Sparsity)
+%stub_overload_func(vertcat, DM,       *args: _DM)
+%stub_overload_func(vertcat, SX,       *args: _SX)
+%stub_overload_func(vertcat, MX,       *args: _MX)
+%stub_overload_func(horzcat, Sparsity, *args: Sparsity)
+%stub_overload_func(horzcat, DM,       *args: _DM)
+%stub_overload_func(horzcat, SX,       *args: _SX)
+%stub_overload_func(horzcat, MX,       *args: _MX)
+%stub_overload_func(diagcat, Sparsity, *args: Sparsity)
+%stub_overload_func(diagcat, DM,       *args: _DM)
+%stub_overload_func(diagcat, SX,       *args: _SX)
+%stub_overload_func(diagcat, MX,       *args: _MX)
+%stub_overload_func(vvcat, Sparsity, args: Sequence[Sparsity])
+%stub_overload_func(vvcat, DM,       args: Sequence[_DM])
+%stub_overload_func(vvcat, SX,       args: Sequence[_SX])
+%stub_overload_func(vvcat, MX,       args: Sequence[_MX])
+%stub_overload_func(vcat,  Sparsity, args: Sequence[Sparsity])
+%stub_overload_func(vcat,  DM,       args: Sequence[_DM])
+%stub_overload_func(vcat,  SX,       args: Sequence[_SX])
+%stub_overload_func(vcat,  MX,       args: Sequence[_MX])
+%stub_overload_func(hcat,  Sparsity, args: Sequence[Sparsity])
+%stub_overload_func(hcat,  DM,       args: Sequence[_DM])
+%stub_overload_func(hcat,  SX,       args: Sequence[_SX])
+%stub_overload_func(hcat,  MX,       args: Sequence[_MX])
+%stub_overload_func(dcat,  Sparsity, args: Sequence[Sparsity])
+%stub_overload_func(dcat,  DM,       args: Sequence[_DM])
+%stub_overload_func(dcat,  SX,       args: Sequence[_SX])
+%stub_overload_func(dcat,  MX,       args: Sequence[_MX])
+
 // Non-fatal errors (returning NotImplemented singleton)
 %feature("python:maybecall") casadi_plus;
 %feature("python:maybecall") casadi_minus;
@@ -2669,13 +2893,7 @@ if (!$1) {
 
 #ifdef SWIGPYTHON
 %ignore casadi_mod;
-#endif // SWIGPYTHON
-
-#ifdef WITH_PYTHON3
 %rename(__bool__) __nonzero__;
-#endif
-
-#ifdef SWIGPYTHON
 
 %pythoncode %{
 class NZproxy:
@@ -2696,6 +2914,23 @@ class NZproxy:
       yield self[i]
 
 %}
+
+/* NZproxy has no C++ counterpart; it's defined via %pythoncode.
+ * Parameterised on the owning matrix type so `x.nz[i]` narrows to
+ * the same matrix type as `x`.  MX.nz additionally accepts MX-typed
+ * masks -- the _selftyped overload matches only when _T=MX, keeping
+ * DM.nz / SX.nz narrow. */
+#ifdef SWIG_STUBS_ENABLED
+%stubcode %{class NZproxy(Generic[_T]):
+%}
+%stub_method(__init__,    None, matrix: _T)
+%stub_overload_method_selftyped(__getitem__, MX, "NZproxy[MX]", s: _MIndex | MX)
+%stub_overload_method(__getitem__, _T,  s: _MIndex)
+%stub_overload_method_selftyped(__setitem__, None, "NZproxy[MX]", s: _MIndex | MX, val: bool | int | float | MX | Sequence[bool | int | float])
+%stub_overload_method(__setitem__, None, s: _MIndex, val: bool | int | float | _T | Sequence[bool | int | float])
+%stub_method0(__len__,  int)
+%stub_method0(__iter__, Iterator[_T])
+#endif
 
 %define %matrix_helpers(Type)
 %pythoncode %{
@@ -2732,6 +2967,17 @@ class NZproxy:
       return NZproxy(self)
 
 %}
+%stub_attr(shape, tuple[int, int])
+%stub_attr(T,     Self)
+%stub_attr(nz,    NZproxy[Self])
+%stub_method(reshape,     Self, arg: tuple[int, int] | int | Sparsity)
+/* __getitem__ / __setitem__: _MIndex is the common (DM-compatible)
+ * index set shared by DM/SX/MX.  MX additionally accepts MX as index
+ * (see the MX %extend block below), registered there via a widening
+ * overload so Self stays narrow. */
+%stub_overload_method(__getitem__, Self, s: _MIndex | tuple[_MIndex, _MIndex])
+%stub_overload_method(__setitem__, None, s: _MIndex | tuple[_MIndex, _MIndex], val: bool | int | float | DM | SX | MX | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any])
+%stub_method0(__iter__, %arg(Iterator[Self]))
 %enddef
 
 %define %python_array_wrappers(arraypriority)
@@ -2739,101 +2985,37 @@ class NZproxy:
 
   __array_priority__ = arraypriority
 
-  def __array_wrap__(self,out_arr,context=None):
-    if context is None:
-      return out_arr
-    name = context[0].__name__
-    args = list(context[1])
-
-    if len(context[1])==3:
-      raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name)
-
-    if "vectorized" in name:
-        name = name[:-len(" (vectorized)")]
-
-    conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt", "equal": "eq", "not_equal": "ne"}
-    if name in conversion:
-      name = conversion[name]
-    if len(context[1])==2 and context[1][1] is self and not(context[1][0] is self):
-      name = 'r' + name
-      args.reverse()
-    if not(hasattr(self,name)) or ('mul' in name):
-      name = '__' + name + '__'
-    fun=getattr(self, name)
-    return fun(*args[1:])
-
   def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
-    conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt", "equal": "eq", "not_equal": "ne"}
-    name = ufunc.__name__
-    inputs = list(inputs)
-    if len(inputs)==3:
-      import warnings
-      warnings.warn("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name, RuntimeWarning)
-      return NotImplemented
-    if "vectorized" in name:
-        name = name[:-len(" (vectorized)")]
-    if name in conversion:
-      name = conversion[name]
-    if len(inputs)==2 and inputs[1] is self and not(inputs[0] is self):
-      name = 'r' + name
-      inputs.reverse()
-    if not(hasattr(self,name)) or ('mul' in name):
-      name = '__' + name + '__'
-    if method=="reduce" and name=="add":
-      assert len(inputs)==1
-      axis = kwargs["axis"]
-      if axis is None:
-          return inputs[0].sum()
-      else:
-          return inputs[0].sum(axis)
-    try:
-      assert method=="__call__"
-      fun=getattr(self, name)
-      return fun(*inputs[1:])
-    except Exception as e:
-      if "Dimension mismatch" in str(e):
-        import sys
-        if sys.version_info[0] < 3:
-            raise RuntimeError(str(e))
-        else:
-            raise e
-      # Fall back to numpy conversion
-      new_inputs = list(inputs)
+      return _numpy_ufunc_dispatch(self, ufunc, method, inputs, kwargs)
+
+  def __array_function__(self, func, types, args, kwargs):
+      return _numpy_array_function_dispatch(self, func, types, args, kwargs)
+
+  def __array__(self, *args, **kwargs):
+      import numpy as _n
       try:
-        new_inputs[0] = new_inputs[0].full()
-      except:
-        import warnings
-        warnings.warn("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
-                               + "This may occur when you pass a CasADi object to a numpy function.\n"
-                               + "Use an equivalent CasADi function instead of that numpy function.", RuntimeWarning)
-        return NotImplemented
-      return new_inputs[0].__array_ufunc__(ufunc, method, *new_inputs, **kwargs)
-
-
-  def __array__(self,*args,**kwargs):
-    import numpy as n
-    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc) and isinstance(args[1][0],n.ufunc) and len(args[1])>1 and args[1][0].nin==len(args[1][1]):
-      if len(args[1][1])==3:
-        raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b'. This is not supported when 'a' is a numpy type, and cannot be supported without changing numpy itself. Either upgrade a to a CasADi type first, or use 'a = a + b'. " % args[1][0].__name__)
-      return n.array([n.nan])
-    else:
-      if hasattr(self,'__array_custom__'):
-        return self.__array_custom__(*args,**kwargs)
-      else:
-        try:
-          return self.full()
-        except:
+          arr = self.full()
+      except Exception:
           if self.is_scalar(True):
-            # Needed for #2743
-            E=n.empty((),dtype=object)
-            E[()] = self
-            return E
-          else:
-            raise Exception("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
-                      + "This may occur when you pass a CasADi object to a numpy function.\n"
-                      + "Use an equivalent CasADi function instead of that numpy function.")
+              # Box symbolic scalars in an object array (#2743).
+              E = _n.empty((), dtype=object)
+              E[()] = self
+              return E
+          raise TypeError(
+              "Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
+              "This may occur when you pass a CasADi object to a numpy function.\n"
+              "Use an equivalent CasADi function instead of that numpy function.")
+      dtype = kwargs.get("dtype")
+      if dtype is not None and dtype is not _n.double:
+          return _n.array(arr, dtype=dtype)
+      return arr
 
 %}
+/* __array__ makes DM / SX / MX acceptable where numpy / scipy expect
+ * an ArrayLike.  Runtime path: `.full()` for DM (dense numeric),
+ * scalar-object boxing for symbolic.  Keeps scipy.linalg.solve(A,b)
+ * etc. typing without forcing users to wrap calls in np.array().  */
+%stub_method(__array__, %arg(NDArray[np.float64]), *args: Any, **kwargs: Any)
 %enddef
 #endif // SWIGPYTHON
 
@@ -2944,6 +3126,29 @@ class NZproxy:
 %enddef
 #endif
 
+#if defined(SWIGMATLAB) || defined(SWIGOCTAVE)
+// Mark the empty-struct mixin bases as abstract for the MATLAB/Octave
+// generator. Effect: they inherit from handle instead of SwigRef, emit no
+// delete or swig_this, and the concrete leaf appends "& SwigRef" so the
+// diamond collapses to a single SwigRef path. Breaks the diamond that
+// trips Octave 10+ (Savannah bug #50011 / #66930); no effect on MATLAB
+// correctness but removes the fragile per-class delete chain.
+// NOTE: these %feature directives must appear before the corresponding
+// %include that brings each class into the SWIG parse.
+%feature("abstract") casadi::PrintableCommon;
+%feature("abstract") casadi::GenericExpressionCommon;
+%feature("abstract") casadi::GenericMatrixCommon;
+%feature("abstract") casadi::SparsityInterfaceCommon;
+%feature("abstract") casadi::MatrixCommon;
+// GenSharedObject is a %template(GenSharedObject) instantiation of
+// GenericShared<...> (see the %template directive further down). The
+// feature has to be applied to the template base class, not the
+// instantiated short name, so it takes effect when the template expands.
+%feature("abstract") casadi::GenericShared<casadi::SharedObject, casadi::SharedObjectInternal>;
+%feature("abstract") casadi::SharedObject;
+%feature("abstract") casadi::IndexAbstraction;
+#endif
+
 %include <casadi/core/printable.hpp>
 
 namespace casadi{
@@ -2988,6 +3193,10 @@ namespace casadi{
     def __getstate__(self):
         return {"serialization": self.serialize()}
   %}
+  /* Runtime-accessible attributes exposed via C++ getters but
+   * without an explicit typemap doc= annotation.  */
+  %stub_attr(T, Sparsity)
+  %stub_attr(shape, tuple[int, int]) // TYPE is variadic; inner comma is fine here
 }
 %extend Matrix<SXElem> {
   %pythoncode %{
@@ -3133,14 +3342,19 @@ namespace casadi{
  DECL M casadi_veccat(const std::vector< M >& x) {
  return veccat(x);
  }
- DECL M casadi_mtimes(const M& x, const M& y) {
- return mtimes(x, y);
+ DECL M casadi_mtimes(const M& x, const M& y,
+                      const std::string& blas = "reference") {
+ return mtimes(x, y, blas);
  }
  DECL M casadi_mtimes(const std::vector< M > &args) {
  return mtimes(args);
  }
- DECL M casadi_mac(const M& X, const M& Y, const M& Z) {
- return mac(X, Y, Z);
+ DECL M casadi_mtimes(const std::vector< M > &args, const std::string& blas) {
+ return mtimes(args, blas);
+ }
+ DECL M casadi_mac(const M& X, const M& Y, const M& Z,
+                   const std::string& blas = "reference") {
+ return mac(X, Y, Z, blas);
  }
  DECL M casadi_transpose(const M& X) {
  return X.T();
@@ -3307,6 +3521,11 @@ DECL M casadi_inv_skew(const M& a) {
 
 DECL M casadi_det(const M& A) {
   return det(A);
+}
+
+DECL M casadi_det(const M& A, const std::string& lsolver,
+                      const casadi::Dict& opts = casadi::Dict()) {
+  return det(A, lsolver, opts);
 }
 
 DECL M casadi_inv_minor(const M& A) {
@@ -3858,6 +4077,14 @@ DECL M casadi_bspline(const M& x,
         const Dict& opts = Dict()) {
   return bspline(x, coeffs, knots, degree, m, opts);
 }
+DECL MX casadi_bspline(const MX& x,
+        const MX& coeffs,
+        const std::vector<MX>& knots,
+        const std::vector<casadi_int>& degree,
+        casadi_int m,
+        const Dict& opts = Dict()) {
+  return bspline(x, coeffs, knots, degree, m, opts);
+}
 DECL M casadi_convexify(const M& H,
         const Dict& opts = Dict()) {
   return convexify(H, opts);
@@ -3876,6 +4103,9 @@ DECL M casadi_no_hess(const M& expr) {
 }
 DECL M casadi_no_grad(const M& expr) {
   return no_grad(expr);
+}
+DECL M casadi_kron_contract(const M& m, const M& x, bool inner) {
+  return kron_contract(m, x, inner);
 }
 
 #endif
@@ -3936,20 +4166,6 @@ namespace casadi{
 
 %python_array_wrappers(999.0)
 
-// The following code has some trickery to fool numpy ufunc.
-// Normally, because of the presence of __array__, an ufunctor like nump.sqrt
-// will unleash its activity on the output of __array__
-// However, we wish DM to remain a DM
-// So when we receive a call from a functor, we return a dummy empty array
-// and return the real result during the postprocessing (__array_wrap__) of the functor.
-%pythoncode %{
-  def __array_custom__(self,*args,**kwargs):
-    if "dtype" in kwargs and not(isinstance(kwargs["dtype"],n.double)):
-      return n.array(self.full(),dtype=kwargs["dtype"])
-    else:
-      return self.full()
-%}
-
 %pythoncode %{
   def tocsc(self):
     import numpy as np
@@ -3966,10 +4182,21 @@ namespace casadi{
       elif self.is_vector():
         return np.array(self.T.elements())
     return np.array(self.T.elements()).reshape(self.shape)
+  def to_numpy(self):
+    # Pandas-style densification hook.  matplotlib's
+    # cbook._unpack_to_numpy looks for `to_numpy()` before falling back
+    # to iteration, so defining it here makes plt.plot(DM) work without
+    # forcing densification through NEP-18 shape ops like np.atleast_1d.
+    return self.full()
 %}
+/* `tocsc` returns a scipy.sparse.csc_matrix; not type-importing scipy.sparse
+ * here keeps the stub independent of an optional dependency.  `Any` is the
+ * least-bad option until we also bridge scipy.sparse types. */
+%stub_method0(tocsc,    Any)
+%stub_method(toarray,   %arg(NDArray[np.float64] | float), simplify: bool = ...)
+%stub_method0(to_numpy, %arg(NDArray[np.float64]))
 
 
-#ifdef WITH_PYTHON3
 %pythoncode %{
   def __bool__(self):
     if self.numel()!=1:
@@ -3977,21 +4204,6 @@ namespace casadi{
     if self.nnz()==0:
       return False
     return float(self)!=0
-%}
-#else
-%pythoncode %{
-  def __nonzero__(self):
-    if self.numel()!=1:
-      raise Exception("Only a scalar can be cast to a float")
-    if self.nnz()==0:
-      return False
-    return float(self)!=0
-%}
-#endif
-
-%pythoncode %{
-  def __abs__(self):
-    return abs(float(self))
 %}
 
 }; // extend Matrix<double>
@@ -4184,6 +4396,11 @@ namespace casadi {
   %matrix_helpers(casadi::MX)
   #ifdef SWIGPYTHON
   %python_array_wrappers(1002.0)
+  /* MX is unique among CasadiMatrix types in accepting MX-valued
+   * indices (runtime: MX_get / MX_set).  Additional overloads on top
+   * of the DM-compatible ones from %matrix_helpers. */
+  %stub_overload_method(__getitem__, MX, s: MX | tuple[_MIndex | MX, _MIndex | MX])
+  %stub_overload_method(__setitem__, None, s: MX | tuple[_MIndex | MX, _MIndex | MX], val: bool | int | float | DM | SX | MX | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any])
   #endif //SWIGPYTHON
 };
 
@@ -4277,8 +4494,27 @@ namespace casadi{
       caller = functools.partial(_casadi._function_buffer_eval, fb._self())
       return (fb, caller)
   %}
-
-
+  /* buffer() returns (FunctionBuffer, callable) -- the callable is a
+   * functools.partial around the raw eval function, typed loosely. */
+  %stub_method0(buffer, %arg(tuple[FunctionBuffer, Any]))
+  /* Function.__call__ -- narrowing overloads per homogeneous input
+   * matrix type so pyright resolves f(mx) -> MX.  Runtime semantics
+   * (see the %pythoncode above):
+   *   f(pos_args)   -> single matrix if 1 output,  tuple[matrix,...] if >1
+   *   f(**kwargs)   -> dict[str, matrix]
+   *   f()           -> dict (no-arg path routes to `self.call({})`)
+   * Output arity is not statically known.  Returning the single-matrix
+   * case covers the common pattern (one-output Function); multi-output
+   * sites use `f.call([...])` which returns the tuple explicitly.
+   * The positional overloads require at least one positional arg
+   * (arg0 pos-only) so f() / f(**kw) routes to the dict overloads. */
+  %stub_overload_method(__call__, DM, arg0: _DM, /, *args: _DM)
+  %stub_overload_method(__call__, SX, arg0: _SX, /, *args: _SX)
+  %stub_overload_method(__call__, MX, arg0: _MX, /, *args: _MX)
+  %stub_overload_method(__call__, %arg(dict[str, DM]), **kwargs: _DM)
+  %stub_overload_method(__call__, %arg(dict[str, SX]), **kwargs: _SX)
+  %stub_overload_method(__call__, %arg(dict[str, MX]), **kwargs: _MX)
+  %stub_overload_method(__call__, %arg(dict[str, DM | SX | MX]), **kwargs: bool | int | float | DM | SX | MX)
  }
 
 }
@@ -4500,7 +4736,6 @@ namespace casadi {
 
 // Wrap the casadi_ prefixed functions in member functions
 #ifdef SWIGPYTHON
-#ifdef WITH_PYTHON3
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
@@ -4509,12 +4744,28 @@ namespace casadi {
           return self.element_hash()
         except:
           return SharedObject.__hash__(self)
-      def __matmul__(x, y): return _casadi.mtimes(x, y)
-      def __rmatmul__(x, y): return _casadi.mtimes(y, x)
+      def __matmul__(x, y):
+        try:
+          return _casadi.mtimes(x, y)
+        except NotImplementedError:
+          return NotImplemented
+      def __rmatmul__(x, y):
+        try:
+          return _casadi.mtimes(y, x)
+        except NotImplementedError:
+          return NotImplemented
+      def __imatmul__(x, y):
+        try:
+          return _casadi.mtimes(x, y)
+        except NotImplementedError:
+          return NotImplemented
     %}
+    %stub_method0(__hash__, int)
+    %stub_CasadiMatrix_binop(__matmul__)
+    %stub_CasadiMatrix_binop(__rmatmul__)
+    %stub_CasadiMatrix_binop(__imatmul__)
   }
 }
-#endif
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
@@ -4524,10 +4775,20 @@ namespace casadi {
       def __rsub__(x, y): return _casadi.minus(y, x)
       def __mul__(x, y): return _casadi.times(x, y)
       def __rmul__(x, y): return _casadi.times(y, x)
-      def __div__(x, y): return _casadi.rdivide(x, y)
-      def __rdiv__(x, y): return _casadi.rdivide(y, x)
       def __truediv__(x, y): return _casadi.rdivide(x, y)
       def __rtruediv__(x, y): return _casadi.rdivide(y, x)
+      def __floordiv__(x, y): return _casadi.floor(_casadi.rdivide(x, y))
+      def __rfloordiv__(x, y): return _casadi.floor(_casadi.rdivide(y, x))
+      def __mod__(x, y):
+        return x - y * _casadi.floor(_casadi.rdivide(x, y))
+      def __rmod__(x, y):
+        return y - x * _casadi.floor(_casadi.rdivide(y, x))
+      def __divmod__(x, y):
+        q = _casadi.floor(_casadi.rdivide(x, y))
+        return (q, x - y * q)
+      def __rdivmod__(x, y):
+        q = _casadi.floor(_casadi.rdivide(y, x))
+        return (q, y - x * q)
       def __lt__(x, y): return _casadi.lt(x, y)
       def __rlt__(x, y): return _casadi.lt(y, x)
       def __le__(x, y): return _casadi.le(x, y)
@@ -4536,12 +4797,52 @@ namespace casadi {
       def __rgt__(x, y): return _casadi.lt(x, y)
       def __ge__(x, y): return _casadi.le(y, x)
       def __rge__(x, y): return _casadi.le(x, y)
-      def __eq__(x, y): return _casadi.eq(x, y)
-      def __req__(x, y): return _casadi.eq(y, x)
-      def __ne__(x, y): return _casadi.ne(x, y)
-      def __rne__(x, y): return _casadi.ne(y, x)
-      def __pow__(x, n): return _casadi.power(x, n)
+      def __eq__(x, y):
+        r = _casadi.eq(x, y)
+        if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
+          raise Exception("Cannot compare SX and MX objects for equality")
+        return r
+      def __ne__(x, y):
+        r = _casadi.ne(x, y)
+        if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
+          raise Exception("Cannot compare SX and MX objects for inequality")
+        return r
+      def __req__(x, y):
+        r = _casadi.eq(y, x)
+        if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
+          raise Exception("Cannot compare SX and MX objects for equality")
+        return r
+      def __rne__(x, y):
+        r = _casadi.ne(y, x)
+        if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
+          raise Exception("Cannot compare SX and MX objects for inequality")
+        return r
+      def __pow__(x, n, modulo=None):
+        p = _casadi.power(x, n)
+        if modulo is None:
+          return p
+        return p - modulo * _casadi.floor(_casadi.rdivide(p, modulo))
       def __rpow__(n, x): return _casadi.power(x, n)
+      def __round__(x, ndigits=None):
+        if ndigits is None:
+          return _casadi.if_else(x >= 0, _casadi.floor(x + 0.5),
+                                 _casadi.ceil(x - 0.5))
+        s = 10.0 ** ndigits
+        y = x * s
+        return _casadi.if_else(y >= 0, _casadi.floor(y + 0.5),
+                               _casadi.ceil(y - 0.5)) / s
+      def __trunc__(x):
+        return _casadi.if_else(x >= 0, _casadi.floor(x), _casadi.ceil(x))
+      def __floor__(x): return _casadi.floor(x)
+      def __ceil__(x):  return _casadi.ceil(x)
+      def __abs__(x):   return _casadi.fabs(x)
+      def __iadd__(x, y):      return _casadi.plus(x, y)
+      def __isub__(x, y):      return _casadi.minus(x, y)
+      def __imul__(x, y):      return _casadi.times(x, y)
+      def __itruediv__(x, y):  return _casadi.rdivide(x, y)
+      def __ifloordiv__(x, y): return _casadi.floor(_casadi.rdivide(x, y))
+      def __imod__(x, y):      return x - y * _casadi.floor(_casadi.rdivide(x, y))
+      def __ipow__(x, n):      return _casadi.power(x, n)
       def __arctan2__(x, y): return _casadi.atan2(x, y)
       def __rarctan2__(y, x): return _casadi.atan2(x, y)
       def fmin(x, y): return _casadi.fmin(x, y)
@@ -4587,6 +4888,40 @@ namespace casadi {
       def constpow(x, y): return _casadi.constpow(x, y)
       def rconstpow(y, x): return _casadi.constpow(x, y)
     %}
+    /* PEP-484 stubs for the %pythoncode operators above. */
+    %stub_CasadiMatrix_binop(__add__)
+    %stub_CasadiMatrix_binop(__radd__)
+    %stub_CasadiMatrix_binop(__sub__)
+    %stub_CasadiMatrix_binop(__rsub__)
+    %stub_CasadiMatrix_binop(__mul__)
+    %stub_CasadiMatrix_binop(__rmul__)
+    %stub_CasadiMatrix_binop(__truediv__)
+    %stub_CasadiMatrix_binop(__rtruediv__)
+    %stub_CasadiMatrix_binop(__floordiv__)
+    %stub_CasadiMatrix_binop(__rfloordiv__)
+    %stub_CasadiMatrix_binop(__mod__)
+    %stub_CasadiMatrix_binop(__rmod__)
+    %stub_CasadiMatrix_binop(__pow__)
+    %stub_CasadiMatrix_binop(__rpow__)
+    %stub_CasadiMatrix_binop(__iadd__)
+    %stub_CasadiMatrix_binop(__isub__)
+    %stub_CasadiMatrix_binop(__imul__)
+    %stub_CasadiMatrix_binop(__itruediv__)
+    %stub_CasadiMatrix_binop(__ifloordiv__)
+    %stub_CasadiMatrix_binop(__imod__)
+    %stub_CasadiMatrix_binop(__ipow__)
+    %stub_CasadiMatrix_unop(__neg__)
+    %stub_CasadiMatrix_unop(__pos__)
+    %stub_CasadiMatrix_unop(__abs__)
+    %stub_CasadiMatrix_unop(__trunc__)
+    %stub_CasadiMatrix_unop(__floor__)
+    %stub_CasadiMatrix_unop(__ceil__)
+    %stub_CasadiMatrix_cmp(__lt__)
+    %stub_CasadiMatrix_cmp(__le__)
+    %stub_CasadiMatrix_cmp(__gt__)
+    %stub_CasadiMatrix_cmp(__ge__)
+    %stub_CasadiMatrix_cmp(__eq__)
+    %stub_CasadiMatrix_cmp(__ne__)
   }
 
   %extend GenericMatrixCommon {
@@ -4598,6 +4933,12 @@ namespace casadi {
       def __mpower__(x, y): return _casadi.mpower(x, y)
       def __rmpower__(y, x): return _casadi.mpower(x, y)
     %}
+    %stub_CasadiMatrix_binop(__mldivide__)
+    %stub_CasadiMatrix_binop(__rmldivide__)
+    %stub_CasadiMatrix_binop(__mrdivide__)
+    %stub_CasadiMatrix_binop(__rmrdivide__)
+    %stub_CasadiMatrix_binop(__mpower__)
+    %stub_CasadiMatrix_binop(__rmpower__)
   }
 
 } // namespace casadi
@@ -4605,8 +4946,38 @@ namespace casadi {
 
 %feature("director") casadi::Callback;
 
+/* The Python-visible Callback interface differs from the C++ signatures
+ * because SWIG's director magic reshapes eval_buffer into a 2-tuple
+ * form and hands the user-defined eval() a list of DM.  Suppress the
+ * auto-generated .pyi entries for these methods and emit hand-crafted
+ * ones below so pyright guides users toward correct overrides. */
+#ifdef SWIGPYTHON
+%feature("python:stub_skip") casadi::Callback::eval;
+%feature("python:stub_skip") casadi::Callback::eval_buffer;
+%feature("python:stub_skip") casadi::Callback::get_sparsity_in;
+%feature("python:stub_skip") casadi::Callback::get_sparsity_out;
+#endif
+
 %include <casadi/core/importer.hpp>
 %include <casadi/core/callback.hpp>
+
+#ifdef SWIGPYTHON
+%extend casadi::Callback {
+  /* eval: Python-visible signature is `eval(self, arg, /)` where arg
+   * is an iterable of DM.  Positional-only (arg0 can have any name
+   * in subclasses).  Return type Sequence[_DM] so subclasses may
+   * return anything that to_ptr<DM> promotes -- int / float / DM /
+   * ndarray / nested sequences -- each gets converted at the C++
+   * boundary. */
+  %stub_method(eval, %arg(Sequence[_DM]), %arg(arg: Sequence[DM], /))
+  /* eval_buffer: director reshapes the 4-arg C++ interface (arg,
+   * sizes_arg, res, sizes_res) into a 2-tuple Python interface: two
+   * tuples of memoryview objects exposing the structural nonzeros. */
+  %stub_method(eval_buffer, int, %arg(arg: tuple[memoryview, ...], /, res: tuple[memoryview, ...]))
+  %stub_method(get_sparsity_in,  Sparsity, i: int)
+  %stub_method(get_sparsity_out, Sparsity, i: int)
+}
+#endif
 %include <casadi/core/global_options.hpp>
 
 %include <casadi/core/casadi_meta.hpp>
@@ -4624,6 +4995,7 @@ namespace casadi {
 %include <casadi/core/xml_file.hpp>
 %include <casadi/core/archiver.hpp>
 %include <casadi/core/filesystem.hpp>
+%include <casadi/core/blas.hpp>
 %include <casadi/core/options.hpp>
 
 %feature("copyctor", "0") casadi::SerializerBase;
@@ -4650,6 +5022,7 @@ namespace casadi {
 
 #ifdef SWIGPYTHON
 %extend casadi::DeserializerBase {
+  %stub_method0(unpack, Any)
   %pythoncode %{
     def unpack(self):
       type = SerializerBase.type_to_string(self._pop_type())
@@ -4688,8 +5061,21 @@ class global_unpickle_context:
         return self.ctx
 
     def __exit__(self, *args):
-        _thread_local.casadi_unpickle_ctx = None  
+        _thread_local.casadi_unpickle_ctx = None
 %}
+
+/* Pure-pythoncode classes -- SWIG doesn't see them, so the .pyi has to
+ * be hand-rolled.  Both are referenced from error messages
+ * (`Use ca.global_pickle_context(): ...`) and from test/python/serialize.py. */
+%stub_class_begin(global_pickle_context)
+%stub_method0(__enter__, StringSerializer)
+%stub_method(__exit__, None, *args: Any)
+
+%stub_class_begin(global_unpickle_context)
+%stub_method0(__enter__, StringDeserializer)
+%stub_method(__exit__, None, *args: Any)
+
+
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
 %extend casadi::DeserializerBase {
@@ -4705,7 +5091,7 @@ class global_unpickle_context:
 %feature("director") casadi::OptiCallback;
 
 // Return-by-value
-%typemap(out, doc="double", noblock=1, fragment="casadi_all") casadi::native_DM {
+%typemap(out, doc="double", pystub_out="float", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = full_or_sparse($1, true))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'double'.");
 }
 
@@ -4716,14 +5102,14 @@ class global_unpickle_context:
   %append_output(casadi::from_ptr((casadi_int *) $1));
 }
 
-%typemap(in, doc="Opti.ConstraintType", noblock=1, numinputs=0) casadi::Opti::ConstraintType &OUTPUT (casadi::Opti::ConstraintType m) {
+%typemap(in, doc="Opti.ConstraintType", pystub_in="Any", noblock=1, numinputs=0) casadi::Opti::ConstraintType &OUTPUT (casadi::Opti::ConstraintType m) {
  $1 = &m;
 }
 
 
 #ifdef SWIGPYTHON
 
-%define make_property(class, name)
+%define make_property(class, name, type)
   %rename(_ ## name) class ## :: ## name;
   %extend class {
     %pythoncode %{
@@ -4731,35 +5117,36 @@ class global_unpickle_context:
       def name(self):
         return self._ ## name()
     %}
+    %stub_attr(name, type)
   }
 %enddef
 
 
-make_property(casadi::Opti, debug);
-make_property(casadi::Opti, advanced);
-make_property(casadi::OptiSol, opti);
+make_property(casadi::Opti, debug, OptiAdvanced);
+make_property(casadi::Opti, advanced, OptiAdvanced);
+make_property(casadi::OptiSol, opti, Opti);
 
-%define make_property_opti(name)
-  make_property(casadi::Opti, name);
+%define make_property_opti(name, type)
+  make_property(casadi::Opti, name, type);
 %enddef
 
-make_property(casadi::OptiSol, debug);
-make_property_opti(f)
-make_property_opti(g)
-make_property_opti(x)
-make_property_opti(p)
-make_property_opti(lam_g)
-make_property_opti(lbg)
-make_property_opti(ubg)
-make_property_opti(nx)
-make_property_opti(np)
-make_property_opti(ng)
-make_property_opti(x_linear_scale)
-make_property_opti(x_linear_scale_offset)
-make_property_opti(g_linear_scale)
-make_property_opti(f_linear_scale)
+make_property(casadi::OptiSol, debug, OptiAdvanced);
+make_property_opti(f, MX)
+make_property_opti(g, MX)
+make_property_opti(x, MX)
+make_property_opti(p, MX)
+make_property_opti(lam_g, MX)
+make_property_opti(lbg, MX)
+make_property_opti(ubg, MX)
+make_property_opti(nx, int)
+make_property_opti(np, int)
+make_property_opti(ng, int)
+make_property_opti(x_linear_scale, DM)
+make_property_opti(x_linear_scale_offset, DM)
+make_property_opti(g_linear_scale, DM)
+make_property_opti(f_linear_scale, float)
 
-make_property(casadi::Opti, casadi_solver);
+make_property(casadi::Opti, casadi_solver, Function);
 %define opti_metadata_modifiers(class)
   %rename(_variable) class ## :: variable;
   %rename(_parameter) class ## :: parameter;
@@ -4820,6 +5207,25 @@ make_property(casadi::Opti, casadi_solver);
         ret = self._subject_to(*args)
         return ret
     %}
+    /* Stubs for the three %pythoncode methods above. */
+    %stub_overload_method(variable, MX, n: int = ..., m: int = ..., attribute: str = ...)
+    %stub_overload_method(variable, MX, sp: Sparsity | DM, attribute: str = ...)
+    %stub_overload_method(variable, MX, symbol: MX | SX | DM, attribute: str = ...)
+    %stub_overload_method(parameter, MX, n: int = ..., m: int = ..., attribute: str = ...)
+    %stub_overload_method(parameter, MX, sp: Sparsity | DM, attribute: str = ...)
+    %stub_overload_method(parameter, MX, symbol: MX | SX | DM, attribute: str = ...)
+    /* subject_to(g[, linear_scale][, options]) -- the %pythoncode
+     * above inspects args[1] to decide whether it's an options dict
+     * or a linear_scale; the 3-arg form always has options last. */
+    %stub_overload_method0(subject_to, None)
+    %stub_overload_method(subject_to, None, g: MX | SX | DM | bool | int | float)
+    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | bool | int | float])
+    %stub_overload_method(subject_to, None, g: MX | SX | DM | bool | int | float, options: dict)
+    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | bool | int | float], options: dict)
+    %stub_overload_method(subject_to, None, g: MX | SX | DM | bool | int | float, linear_scale: _DM)
+    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | bool | int | float], linear_scale: _DM)
+    %stub_overload_method(subject_to, None, g: MX | SX | DM | bool | int | float, linear_scale: _DM, options: dict)
+    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | bool | int | float], linear_scale: _DM, options: dict)
   }
 %enddef
 
@@ -4905,6 +5311,10 @@ opti_metadata_modifiers(casadi::Opti)
 
 
   %}
+  /* Opti.callback registers a per-iteration Python callable; the %pythoncode
+   * above defines it, so the SWIG C++ parser never sees it and pyright loses
+   * visibility.  `fh` is invoked with the iteration index (int). */
+  %stub_method(callback, None, %arg(fh: "Callable[[int], Any] | None" = ...))
 
 }
 #endif

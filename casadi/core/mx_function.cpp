@@ -351,7 +351,9 @@ namespace casadi {
             alloc_arg(e.data->sz_arg());
             alloc_res(e.data->sz_res());
             alloc_iw(e.data->sz_iw());
-            sz_w = std::max(sz_w, e.data->sz_w());
+            // workloc_ (register offsets) is shared by VM eval and codegen, so
+            // the scratch region must cover whichever needs more
+            sz_w = std::max(sz_w, std::max(e.data->sz_w(), e.data->codegen_sz_w()));
             if (workloc_[e.res[c]] < 0) {
               workloc_[e.res[c]] = wind;
               wind += e.data->sparsity(c).nnz();
@@ -617,7 +619,7 @@ namespace casadi {
         casadi_int nz_offset=e.data->offset();
         const bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[e.res.front()];
-        if (argi!=nullptr) {
+        if (argi!=nullptr && is_diff_in_[i]) {
           std::copy(argi+nz_offset, argi+nz_offset+nnz, w1);
         } else {
           std::fill_n(w1, nnz, 0);
@@ -629,7 +631,11 @@ namespace casadi {
         casadi_int nz_offset=e.data->offset();
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[e.arg.front()];
-        if (resi!=nullptr) std::copy(w1, w1+nnz, resi+nz_offset);
+        if (resi!=nullptr && is_diff_out_[i]) {
+          std::copy(w1, w1+nnz, resi+nz_offset);
+        } else if (resi!=nullptr) {
+          std::fill_n(resi+nz_offset, nnz, 0);
+        }
       } else {
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<e.arg.size(); ++i)
@@ -691,7 +697,8 @@ namespace casadi {
         casadi_int nz_offset=it->data->offset();
         bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[it->res.front()];
-        if (argi!=nullptr) for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
+        if (argi!=nullptr && is_diff_in_[i])
+          for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
         std::fill_n(w1, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
@@ -700,10 +707,9 @@ namespace casadi {
         casadi_int nz_offset=it->data->offset();
         bvec_t* resi = res[i] ? res[i] + nz_offset : nullptr;
         bvec_t* w1 = w + workloc_[it->arg.front()];
-        if (resi!=nullptr) {
+        if (resi!=nullptr && is_diff_out_[i]) {
           for (casadi_int k=0; k<nnz; ++k) w1[k] |= resi[k];
           std::fill_n(resi, nnz, 0);
-
         }
       } else {
         // Point pointers to the data corresponding to the element
@@ -755,7 +761,8 @@ namespace casadi {
 
       // non-inlining call is implemented in the base-class
       if (!should_inline(false, always_inline, never_inline)) {
-        return FunctionInternal::eval_mx(arg, res, false, true);
+        FunctionInternal::eval_mx(arg, res, false, true);
+        return;
       }
 
       // Symbolic work, non-differentiated
@@ -830,7 +837,8 @@ namespace casadi {
       for (auto&& r : fseed) {
         if (!matching_arg(r, npar)) {
           casadi_assert_dev(npar==1);
-          return ad_forward(replace_fseed(fseed, npar), fsens);
+          ad_forward(replace_fseed(fseed, npar), fsens);
+          return;
         }
       }
 
@@ -989,7 +997,8 @@ namespace casadi {
       for (auto&& r : aseed) {
         if (!matching_res(r, npar)) {
           casadi_assert_dev(npar==1);
-          return ad_reverse(replace_aseed(aseed, npar), asens);
+          ad_reverse(replace_aseed(aseed, npar), asens);
+          return;
         }
       }
 

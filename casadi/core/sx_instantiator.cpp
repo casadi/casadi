@@ -27,6 +27,7 @@
 
 #include "sx_function.hpp"
 #include "output_sx.hpp"
+#include "linsol_internal.hpp"
 #include <array>
 
 namespace casadi {
@@ -1417,7 +1418,7 @@ namespace casadi {
                          const std::string& v_prefix,
                          const std::string& v_suffix) {
      // Call new, more generic function
-     return extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
+     extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
        {"prefix", v_prefix}, {"suffix", v_suffix}});
   }
 
@@ -1531,6 +1532,15 @@ namespace casadi {
   }
 
   template<>
+  SX CASADI_EXPORT SX::det(const SX& A, const std::string& lsolver, const Dict& opts) {
+    auto& plugin = LinsolInternal::getPlugin(lsolver);
+    casadi_assert(plugin.exposed.det,
+      "Linsol plugin '" + lsolver + "' does not provide a symbolic determinant. "
+      "Try the 'symbolicqr' plugin.");
+    return plugin.exposed.det(A, opts);
+  }
+
+  template<>
   SX CASADI_EXPORT SX::eig_symbolic(const SX& m) {
     casadi_assert(m.size1()==m.size2(), "eig(): supplied matrix must be square");
 
@@ -1622,7 +1632,6 @@ namespace casadi {
         rwork[a.i1]++;
         break;
       case OP_CONST:
-        break;
       case OP_PARAMETER:
         break;
       case OP_CALL:

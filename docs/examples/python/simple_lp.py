@@ -18,6 +18,7 @@
 #
 # -*- coding: utf-8 -*-
 from casadi import *
+from numpy import inf
 
 # minimize    3x + 4y
 # subject to  x + 2y <= 14

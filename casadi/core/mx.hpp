@@ -244,6 +244,7 @@ namespace casadi {
                   bool ind1=false);
 
     MX operator-() const;
+    MX operator+() const { return *this; }
 
     /** \brief Element-wise inverse
 
@@ -635,17 +636,21 @@ namespace casadi {
                                      const std::vector<casadi_int>& offset2);
     static std::vector<MX> vertsplit(const MX& x, const std::vector<casadi_int>& offset);
     static MX blockcat(const std::vector< std::vector<MX > > &v);
-    static MX mtimes(const MX& x, const MX& y);
-    static MX mac(const MX& x, const MX& y, const MX& z);
+    static MX mtimes(const MX& x, const MX& y,
+                     const std::string& blas = "reference");
+    static MX mac(const MX& x, const MX& y, const MX& z,
+                  const std::string& blas = "reference");
     static MX reshape(const MX& x, casadi_int nrow, casadi_int ncol);
     static MX reshape(const MX& x, const Sparsity& sp);
     static MX sparsity_cast(const MX& x, const Sparsity& sp);
     static MX kron(const MX& x, const MX& b);
+    static MX kron_contract(const MX& m, const MX& x, bool inner);
     static MX repmat(const MX& x, casadi_int n, casadi_int m=1);
     ///@}
 
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
+    static MX linspace(const MX& a, const MX& b, casadi_int nsteps);
     static MX jacobian(const MX& f, const MX& x, const Dict& opts = Dict());
     static MX hessian(const MX& f, const MX& x, const Dict& opts = Dict());
     static MX hessian(const MX& f, const MX& x, MX& g, const Dict& opts = Dict());
@@ -707,6 +712,7 @@ namespace casadi {
     static MX sum1(const MX& x);
     static MX polyval(const MX& p, const MX& x);
     static MX det(const MX& x);
+    static MX det(const MX& x, const std::string& lsolver, const Dict& opts=Dict());
     static std::vector<MX> symvar(const MX& x);
     static MX nullspace(const MX& A);
     static MX repsum(const MX& x, casadi_int n, casadi_int m=1);
@@ -754,6 +760,11 @@ namespace casadi {
             const Dict& opts = Dict());
     static MX bspline(const MX& x, const MX& coeffs,
             const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict());
+    static MX bspline(const MX& x, const MX& coeffs,
+            const std::vector<MX>& knots,
             const std::vector<casadi_int>& degree,
             casadi_int m,
             const Dict& opts = Dict());
@@ -895,6 +906,14 @@ namespace casadi {
       return MX::bspline(x, coeffs, knots, degree, m, opts);
     }
 
+    inline friend MX bspline(const MX& x, const MX& coeffs,
+            const std::vector<MX>& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict()) {
+      return MX::bspline(x, coeffs, knots, degree, m, opts);
+    }
+
     inline friend DM bspline_dual(const std::vector<double>& x,
             const std::vector< std::vector<double> >& knots,
             const std::vector<casadi_int>& degree,
@@ -987,6 +1006,18 @@ namespace casadi {
         \identifier{rh} */
     MX monitor(const std::string& comment) const;
 
+    /** \brief Dump an expression
+
+    * Returns itself, but with the side effect of dumping values to file
+    * Allowed options: "dir" (dump directory), "format" (file format, default "mtx"),
+    * "verbose" (print filename on each dump, default false)
+
+        \identifier{2f9} */
+    MX dump(const std::string& base_filename, const Dict& opts=Dict()) const;
+
+    /// Reset the dump counter
+    void reset_dump_count();
+
     /// Transpose the matrix
     MX T() const;
 
@@ -1067,6 +1098,18 @@ namespace casadi {
   typedef std::vector<MXVector> MXVectorVector;
   typedef std::map<std::string, MX> MXDict;
   ///@}
+
+  /** \brief Kronecker contraction
+   *
+   * `inner = true`:  Y[i, j] = sum over (r, s) of M[i*mB+r, j*nB+s] * X[r, s]
+   * `inner = false`: Y[r, s] = sum over (i, j) of X[i, j] * M[i*mB+r, j*nB+s]
+   *
+   * Closes the AD algebra of kron under arbitrary-order differentiation.
+
+      \identifier{2ho} */
+  inline MX kron_contract(const MX& m, const MX& x, bool inner) {
+    return MX::kron_contract(m, x, inner);
+  }
 
 } // namespace casadi
 

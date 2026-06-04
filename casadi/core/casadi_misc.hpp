@@ -138,10 +138,6 @@ private:
 
   CASADI_EXPORT bool is_equally_spaced(const std::vector<double> &v);
 
-  /// Computes a mapping for a (dense) tensor permutation
-  CASADI_EXPORT std::vector<casadi_int> tensor_permute_mapping(const std::vector<casadi_int>& dims,
-      const std::vector<casadi_int>& order);
-
   CASADI_EXPORT int to_int(casadi_int rhs);
   CASADI_EXPORT std::vector<int> to_int(const std::vector<casadi_int>& rhs);
   CASADI_EXPORT std::vector< std::vector<int> > to_int(
@@ -497,7 +493,7 @@ private:
         ret = std::numeric_limits<double>::infinity();
       } else if (non_reg=="-inf") {
         ret = -std::numeric_limits<double>::infinity();
-      } else if (non_reg=="nan") {
+      } else if (non_reg=="nan" || non_reg=="-nan") {
         ret = std::numeric_limits<double>::quiet_NaN();
       } else {
         ret = std::numeric_limits<double>::quiet_NaN();
@@ -510,44 +506,45 @@ private:
 } // namespace casadi
 
 #ifndef SWIG
-// In std namespace
-namespace std {
+
+// Implementations
+namespace casadi {
 
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
-  ostream& operator<<(ostream& stream, const vector<T>& v) {
+  std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
     stream << casadi::str(v);
     return stream;
   }
 
-  /// Enables flushing an std::vector to a stream (prints representation)
+  /// Enables flushing an std::array to a stream (prints representation)
   template<typename T, size_t N>
-  ostream& operator<<(ostream& stream, const array<T, N>& v) {
+  std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v) {
     stream << casadi::str(v);
     return stream;
   }
 
   /// Enables flushing an std::set to a stream (prints representation)
   template<typename T>
-  ostream& operator<<(ostream& stream, const set<T>& v) {
+  std::ostream& operator<<(std::ostream& stream, const std::set<T>& v) {
     stream << casadi::str(v);
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream& stream, const pair<T1, T2>& p) {
+  std::ostream& operator<<(std::ostream& stream, const std::pair<T1, T2>& p) {
     stream << casadi::str(p);
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream& stream, const std::map<T1, T2>& p) {
+  std::ostream& operator<<(std::ostream& stream, const std::map<T1, T2>& p) {
     stream << casadi::str(p);
     return stream;
   }
 
   template<typename T2>
-  ostream& operator<<(ostream& stream, const std::map<std::string, T2>& p) {
+  std::ostream& operator<<(std::ostream& stream, const std::map<std::string, T2>& p) {
     stream << casadi::str(p);
     return stream;
   }
@@ -555,13 +552,8 @@ namespace std {
   template<typename T>
   bool mul_overflows(const T& a, const T& b) {
     if (a==0 || b==0) return false;
-    return abs(std::numeric_limits<T>::max()/a) < abs(b);
+    return std::abs(std::numeric_limits<T>::max()/a) < std::abs(b);
   }
-
-} // namespace std
-
-// Implementations
-namespace casadi {
 
   template<typename T, typename S>
   std::vector<T> vector_static_cast(const std::vector<S>& rhs) {

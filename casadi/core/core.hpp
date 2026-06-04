@@ -71,5 +71,6 @@
 #include "archiver.hpp"
 #include "filesystem.hpp"
 #include "options.hpp"
+#include "blas.hpp"
 
 #endif // CASADI_CORE_HPP

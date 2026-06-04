@@ -154,7 +154,7 @@ class Example4To3_Rev(Example4To3):
     # This example is written to work with a single forward seed vector
     # For efficiency, you may allow more seeds at once
     return nadj==1
-  def get_reverse(self,nfwd,name,inames,onames,opts):
+  def get_reverse(self,nadj,name,inames,onames,opts):
     
     class ReverseFun(Callback):
       def __init__(self, opts={}):
@@ -231,7 +231,7 @@ class Example4To3_Jac(Example4To3):
       def get_sparsity_in(self,i):
         if i==0: # nominal input
           return Sparsity.dense(4,1)
-        elif i==1: # nominal output
+        else: # i==1: nominal output
           return Sparsity(3,1)
 
       def get_sparsity_out(self,i):

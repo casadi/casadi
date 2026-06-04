@@ -60,10 +60,8 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U       X/Q/W/Z/0  X/Q/W/Z/0  X/Q/T/0
 
 // Variable categories
-enum class Category {T, C, P, D, W, U, X, Z, Q, CALCULATED, NUMEL};
-
-// Output categories for generated functions
-enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, CALCULATED,
+  ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
@@ -309,7 +307,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   XmlNode generate_model_variables() const;
 
   /// Generate FMU ModelStructure
-  XmlNode generate_model_structure() const;
+  XmlNode generate_model_structure(bool dae = false) const;
 
   /// Update model variable dependencies
   void update_dependencies() const;
@@ -320,17 +318,17 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   static std::string generate(const std::vector<double>& v);
   ///@}
 
-  // Get input expression, given enum
-  std::vector<MX> input(Category ind) const;
+  // Get input expressions, given enum
+  std::vector<MX> inputs(Category ind) const;
 
-  // Get output expression, given enum
-  std::vector<MX> output(OutputCategory ind) const;
+  // Get output expressions, given enum
+  std::vector<MX> outputs(Category ind) const;
 
-  // Get input expression, given enum
-  std::vector<MX> input(const std::vector<Category>& ind) const;
+  // Get input expressions, given enum
+  std::vector<MX> inputs(const std::vector<Category>& ind) const;
 
-  // Get output expression, given enum
-  std::vector<MX> output(const std::vector<OutputCategory>& ind) const;
+  // Get output expressions, given enum
+  std::vector<MX> outputs(const std::vector<Category>& ind) const;
 
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
@@ -380,7 +378,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   MX der(const MX& var, bool may_allocate = true);
 
   /// Find a unique name, with a specific prefix
-  std::string unique_name(const std::string& prefix, bool allow_no_prefix = true) const;
+  std::string unique_name(const std::string& prefix, bool allow_no_prefix = false) const;
 
   /// Readable name of the class
   std::string type_name() const {return "DaeBuilderInternal";}
@@ -491,12 +489,13 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 protected:
 
   /// Get the qualified name
-  static std::string qualified_name(const XmlNode& nn, Attribute* att = 0);
+  static std::string qualified_name(const XmlNode& nn, Attribute* att = nullptr);
 
   // User-set options
   bool debug_;
   double fmutol_;
   bool ignore_time_;
+  bool enable_ls_dae_, enable_ls_serialization_;
 
   // FMI attributes
   std::string fmi_version_;
@@ -509,7 +508,7 @@ protected:
   std::string generation_tool_;
   std::string generation_date_and_time_;
   std::string variable_naming_convention_;
-  casadi_int number_of_event_indicators_;
+  casadi_int nzero_;
 
   // Default experiment
   double start_time_, stop_time_, tolerance_, step_size_;
@@ -543,7 +542,7 @@ protected:
   std::vector<Variable*> variables_;
 
   // Model structure
-  std::vector<size_t> outputs_, derivatives_, initial_unknowns_, event_indicators_, residuals_;
+  std::vector<size_t> der_, initial_unknowns_;
 
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;
@@ -674,7 +673,7 @@ protected:
   MX read_identifier(const XmlNode& node);
 
   /// Read a variable
-  Variable& read_variable(const XmlNode& node, Attribute* att = 0);
+  Variable& read_variable(const XmlNode& node, Attribute* att = nullptr);
 
   // Read DefaultExperiment
   void import_default_experiment(const XmlNode& n);
@@ -689,18 +688,15 @@ protected:
   void import_model_exchange(const XmlNode& n);
 
   /** \brief Read ModelVariables
-  *
-  * The order of import may deviate from the order in the XML:
-  *   The independent variable - if present - is always imported first (FMI 2 only)
-  *
-  * When interpreting index attributes in the XML, use indexmap[index]
-  *
 
-      \identifier{2ed} */
-  void import_model_variables(const XmlNode& modvars, std::vector<casadi_int>& indexmap);
+      \identifier{2ft} */
+  void import_model_variables(const XmlNode& modvars);
 
   // Read ModelStructure
-  void import_model_structure(const XmlNode& n, const std::vector<casadi_int>& indexmap);
+  void import_model_structure(const XmlNode& n);
+
+  // Read LS-DAE manifest, if any
+  XmlNode import_ls_dae(const std::string& lsdae);
 
   // Read symbolic binding equations
   void import_binding_equations(const XmlNode& eqs);
@@ -819,7 +815,6 @@ CASADI_EXPORT std::string to_string(Initial v);
 CASADI_EXPORT std::string to_string(Attribute v);
 CASADI_EXPORT std::string to_string(DependenciesKind v);
 CASADI_EXPORT std::string to_string(Category v);
-CASADI_EXPORT std::string to_string(OutputCategory v);
 ///@}
 
 ///@{
@@ -830,20 +825,23 @@ CASADI_EXPORT std::string description(Category v);
 // Check if input category
 CASADI_EXPORT bool is_input_category(Category cat);
 
+// Check if output category
+CASADI_EXPORT bool is_output_category(Category cat);
+
 // Check if acyclic dependency category
 CASADI_EXPORT bool is_acyclic(Category cat);
 
 // Definition for acyclyc dependency categories
-CASADI_EXPORT OutputCategory dependent_definition(Category cat);
+CASADI_EXPORT Category dependent_definition(Category cat);
 
 // Get all input categories
 CASADI_EXPORT std::vector<Category> input_categories();
 
 // Get all output categories
-CASADI_EXPORT std::vector<OutputCategory> output_categories();
+CASADI_EXPORT std::vector<Category> output_categories();
 
 // Get the input category for a particular output category
-CASADI_EXPORT Category input_category(OutputCategory cat);
+CASADI_EXPORT Category input_category(Category cat);
 
 /// \endcond
 
