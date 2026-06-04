@@ -72,6 +72,11 @@ namespace casadi {
         eval_linear_rearrange(arg, res);
     }
 
+    /** \brief Propagate signal activity forward (bit set = active) */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override {
+      return sp_forward(arg, res, iw, w);
+    }
+
     /** \brief Calculate forward mode directional derivatives
 
         \identifier{13n} */

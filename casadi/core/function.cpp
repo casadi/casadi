@@ -1111,6 +1111,43 @@ namespace casadi {
     }
   }
 
+  int Function::eval_activity(const bvec_t** arg, bvec_t** res,
+                          casadi_int* iw, bvec_t* w, int mem) const {
+    try {
+      return (*this)->eval_activity(arg, res, iw, w, memory(mem));
+    } catch(std::exception& e) {
+      THROW_ERROR("eval_activity", e.what());
+    }
+  }
+
+  std::vector<bool> Function::activity(const std::vector<bool>& arg) const {
+    casadi_assert(arg.size()==static_cast<size_t>(nnz_in()),
+      "activity: expected mask of size nnz_in()=" + str(nnz_in())
+      + ", got " + str(arg.size()) + ".");
+
+    // bvec buffers for the concatenated input/output nonzeros
+    std::vector<bvec_t> in_buf(nnz_in()), out_buf(nnz_out(), 0);
+    for (casadi_int k=0; k<nnz_in(); ++k) in_buf[k] = arg[k] ? ~static_cast<bvec_t>(0) : 0;
+
+    // Per-input/output pointers into the buffers
+    std::vector<const bvec_t*> argp(sz_arg(), nullptr);
+    std::vector<bvec_t*> resp(sz_res(), nullptr);
+    casadi_int off = 0;
+    for (casadi_int i=0; i<n_in(); ++i) { argp[i] = get_ptr(in_buf)+off; off += nnz_in(i); }
+    off = 0;
+    for (casadi_int i=0; i<n_out(); ++i) { resp[i] = get_ptr(out_buf)+off; off += nnz_out(i); }
+
+    // Work vectors
+    std::vector<casadi_int> iw(sz_iw());
+    std::vector<bvec_t> w(sz_w());
+
+    eval_activity(get_ptr(argp), get_ptr(resp), get_ptr(iw), get_ptr(w));
+
+    std::vector<bool> ret(nnz_out());
+    for (casadi_int k=0; k<nnz_out(); ++k) ret[k] = out_buf[k]!=0;
+    return ret;
+  }
+
   void Function::set_work(const double**& arg, double**& res, casadi_int*& iw, double*& w,
                           int mem) const {
     try {

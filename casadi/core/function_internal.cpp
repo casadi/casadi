@@ -3012,6 +3012,16 @@ namespace casadi {
   }
 
   int FunctionInternal::
+  eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    // Sound fallback: we cannot prove any output zero, so mark everything active
+    for (casadi_int oind=0; oind<n_out_; ++oind) {
+      if (res[oind]==nullptr) continue;
+      std::fill_n(res[oind], nnz_out(oind), ~static_cast<bvec_t>(0));
+    }
+    return 0;
+  }
+
+  int FunctionInternal::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
     // Loop over outputs
     for (casadi_int oind=0; oind<n_out_; ++oind) {

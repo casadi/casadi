@@ -101,6 +101,12 @@ namespace casadi {
         \identifier{yy} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
+    /** \brief Propagate signal activity forward (sound default; subclasses refine) */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
+    /** \brief Set per-nonzero activity from a raw value buffer */
+    void nonzeros_to_activity(const double* v, bvec_t* res) const;
+
     /** \brief  Propagate sparsity backwards
 
         \identifier{yz} */
@@ -259,6 +265,12 @@ namespace casadi {
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override { return x_;}
 
+    /** \brief Per-nonzero activity (no DM copy) */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override {
+      nonzeros_to_activity(x_->data(), res[0]);
+      return 0;
+    }
+
     /** \brief Check if two nodes are equivalent up to a given depth
 
         \identifier{zg} */
@@ -337,6 +349,12 @@ namespace casadi {
       return 0;
     }
 
+    /** \brief Per-nonzero activity */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override {
+      nonzeros_to_activity(x_.data(), res[0]);
+      return 0;
+    }
+
     /** \brief Generate code for the operation
 
         \identifier{zq} */
@@ -407,6 +425,12 @@ namespace casadi {
         \identifier{29x} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
       if (res[0]) std::copy(x_.begin(), x_.end(), res[0]);
+      return 0;
+    }
+
+    /** \brief Per-nonzero activity */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override {
+      nonzeros_to_activity(x_.data(), res[0]);
       return 0;
     }
 
@@ -646,6 +670,12 @@ namespace casadi {
 
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
+    /** \brief Activity: uniform value, no DM allocation */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override {
+      std::fill_n(res[0], nnz(), v_.value!=0 ? ~static_cast<bvec_t>(0) : 0);
+      return 0;
+    }
 
     /** \brief Generate code for the operation
 

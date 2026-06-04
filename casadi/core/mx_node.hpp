@@ -231,6 +231,16 @@ namespace casadi {
         \identifier{1qy} */
     virtual int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const;
 
+    /** \brief Propagate signal activity forward (bit set = active) */
+    virtual int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+      for (casadi_int k=0; k<nout(); ++k) {
+        bvec_t* v = res[k];
+        if (!v) continue;
+        for (casadi_int i=0; i<sparsity(k).nnz(); ++i) v[i] = ~static_cast<bvec_t>(0);
+      }
+      return 0;
+    }
+
     /** \brief  Propagate sparsity backwards
 
         \identifier{1qz} */

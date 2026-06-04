@@ -167,6 +167,10 @@ namespace casadi {
     return fcn_(arg, res, iw, w);
   }
 
+  int Call::eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    return fcn_.eval_activity(arg, res, iw, w);
+  }
+
   int Call::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     return fcn_.rev(arg, res, iw, w);
   }

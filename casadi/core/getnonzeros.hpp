@@ -67,6 +67,11 @@ namespace casadi {
     void eval_linear(const std::vector<std::array<MX, 3> >& arg,
                         std::vector<std::array<MX, 3> >& res) const override;
 
+    /** \brief Propagate signal activity forward (bit set = active) */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override {
+      return sp_forward(arg, res, iw, w);
+    }
+
     /** \brief Calculate forward mode directional derivatives
 
         \identifier{i5} */

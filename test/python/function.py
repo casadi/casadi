@@ -4783,6 +4783,72 @@ class Functiontests(casadiTestCase):
                 self.assertFalse("3.00" in result[0])
                 
     DM.set_precision(6)
-            
+
+  def test_activity(self):
+    # issue #3019: value-level "signal activity" propagation (Function::activity).
+    # True/active = possibly nonzero. The expected output activity is never hard-coded:
+    # it is derived empirically by evaluating the SAME function on DMs whose active
+    # input nonzeros are set to (distinct) nonzeros and inactive ones to 0, and taking
+    # the union of nonzero outputs over a few value assignments (so the comparison is
+    # both sound -- never claim zero when it can be nonzero -- and tight).
+    def emp_activity(f, mask):
+        emp = [False]*f.nnz_out()
+        for t in range(1, 6):
+            ins = []; off = 0
+            for i in range(f.n_in()):
+                ni = f.nnz_in(i)
+                vals = [float(t*(off+j+1)) if mask[off+j] else 0.0 for j in range(ni)]
+                ins.append(DM(f.sparsity_in(i), vals)); off += ni
+            flat = []
+            for o in f.call(ins): flat += list(o.nonzeros())
+            emp = [emp[k] or (flat[k] != 0) for k in range(f.nnz_out())]
+        return emp
+    def all_masks(n):
+        return [[bool(b & (1 << i)) for i in range(n)] for b in range(2**n)]
+    def check(f, masks, minimal=True):
+        # activity must be SOUND (never predict zero where the value can be nonzero);
+        # with minimal=True it must additionally be tight (exactly equal to empirical).
+        for m in masks:
+            emp = emp_activity(f, m); got = list(f.activity(m))
+            for k in range(f.nnz_out()):
+                self.assertTrue(got[k] or not emp[k],
+                                "UNSOUND: %s mask %s output %d: activity says inactive but "
+                                "empirically nonzero" % (f.name(), m, k))
+            if minimal:
+                self.assertEqual(got, emp, "not minimal: %s mask %s" % (f.name(), m))
+
+    # Elementary ops, MX and SX, exhaustive over the input activity space
+    for sym in [MX.sym, SX.sym]:
+        x = sym("x"); y = sym("y")
+        check(Function("mul", [x, y], [x*y]),   all_masks(2))   # 0-annihilation
+        check(Function("add", [x, y], [x+y]),   all_masks(2))
+        check(Function("cs",  [x],    [cos(x)]), all_masks(1))  # cos(0)=1: active from inactive
+        check(Function("sn",  [x],    [sin(x)]), all_masks(1))  # sin(0)=0
+        check(Function("z",   [x],    [0*x]),    all_masks(1))  # constant zero
+
+    # Partially-zero constant: per-element precision, not a whole-matrix is_zero() collapse
+    x2 = MX.sym("x2", 2)
+    check(Function("pc", [x2], [x2*densify(MX(DM([0, 5])))]), all_masks(2))
+
+    # mtimes: minimally conservative (a term is active only iff BOTH factors are); a
+    # dependency analysis combining factors with OR would over-report e.g. [T,T,F,F].
+    xr = MX.sym("xr", 1, 2); yc = MX.sym("yc", 2, 1)
+    check(Function("mt", [xr, yc], [mtimes(xr, yc)]), all_masks(4))
+
+    # solve: a zero rhs gives a zero result (X = A\0 = 0). A dense A couples the whole
+    # column, so activity is tight (minimal); a structured (e.g. diagonal) A does not
+    # couple, so the whole-column rule is only sound, not minimal -- but must never lie.
+    A = MX.sym("A", 2, 2); b = MX.sym("b", 2, 1)
+    check(Function("slv", [A, b], [solve(A, b)]), [[True]*4 + m for m in all_masks(2)])
+    ad = MX.sym("ad", 2); bd = MX.sym("bd", 2, 1)
+    check(Function("sd", [ad, bd], [solve(diag(ad), bd)]),
+          [[True]*2 + m for m in all_masks(2)], minimal=False)
+
+    # The motivating case: 2nd-order sensitivity, exhaustive 256-mask sweep. In
+    # particular the mask with zero forward seeds yields an all-inactive output.
+    y = MX.sym("y", 2)
+    foo = Function("foo", [y], [vertcat(sin(y[0]*y[1]), cos(y[0]*y[1]))])
+    fadj = foo.reverse(1).forward(1)
+    check(fadj, all_masks(fadj.nnz_in()))
 if __name__ == '__main__':
     unittest.main()   

@@ -1808,10 +1808,13 @@ namespace casadi {
     return nnz;
   }
 
-  void Sparsity::mul_sparsityF(const bvec_t* x, const Sparsity& x_sp,
-                               const bvec_t* y, const Sparsity& y_sp,
-                               bvec_t* z, const Sparsity& z_sp,
-                               bvec_t* w) {
+  // Shared bvec matrix-product forward sweep. COMBINE_AND selects the per-term
+  // factor combination: OR (dependency, mul_sparsityF) or AND (activity, where an
+  // inactive factor annihilates the term, mul_activityF).
+  template<bool COMBINE_AND>
+  static void mul_bvec_fwd(const bvec_t* x, const Sparsity& x_sp,
+                           const bvec_t* y, const Sparsity& y_sp,
+                           bvec_t* z, const Sparsity& z_sp, bvec_t* w) {
     // Assert dimensions
     casadi_assert(z_sp.size1()==x_sp.size1() && x_sp.size2()==y_sp.size1()
                           && y_sp.size2()==z_sp.size2(),
@@ -1841,7 +1844,7 @@ namespace casadi {
         // Loop over corresponding columns of x
         bvec_t yy = y[kk];
         for (casadi_int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
-          w[x_row[kk1]] |= x[kk1] | yy;
+          w[x_row[kk1]] |= COMBINE_AND ? (x[kk1] & yy) : (x[kk1] | yy);
         }
       }
 
@@ -1850,6 +1853,20 @@ namespace casadi {
         z[kk] = w[z_row[kk]];
       }
     }
+  }
+
+  void Sparsity::mul_sparsityF(const bvec_t* x, const Sparsity& x_sp,
+                               const bvec_t* y, const Sparsity& y_sp,
+                               bvec_t* z, const Sparsity& z_sp,
+                               bvec_t* w) {
+    mul_bvec_fwd<false>(x, x_sp, y, y_sp, z, z_sp, w);
+  }
+
+  void Sparsity::mul_activityF(const bvec_t* x, const Sparsity& x_sp,
+                               const bvec_t* y, const Sparsity& y_sp,
+                               bvec_t* z, const Sparsity& z_sp,
+                               bvec_t* w) {
+    mul_bvec_fwd<true>(x, x_sp, y, y_sp, z, z_sp, w);
   }
 
   void Sparsity::mul_sparsityR(bvec_t* x, const Sparsity& x_sp,

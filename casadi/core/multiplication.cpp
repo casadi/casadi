@@ -118,6 +118,17 @@ namespace casadi {
   }
 
   int Multiplication::
+  eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    // out = z + x*y : the +z term passes through 1:1; a product term is active only
+    // when both its factors are active (mul_activityF combines factors with AND)
+    copy_fwd(arg[0], res[0], nnz());
+    Sparsity::mul_activityF(arg[1], dep(1).sparsity(),
+                            arg[2], dep(2).sparsity(),
+                            res[0], sparsity(), w);
+    return 0;
+  }
+
+  int Multiplication::
   sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),

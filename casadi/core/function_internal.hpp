@@ -1179,6 +1179,14 @@ namespace casadi {
     virtual int sp_forward(const bvec_t** arg, bvec_t** res,
                             casadi_int* iw, bvec_t* w, void* mem) const;
 
+    /** \brief Propagate signal activity forward
+     *
+     * bvec bit set = active (possibly nonzero), clear = inactive (definitely zero).
+     * Unlike sp_forward (a dependency analysis), this respects multiplicative
+     * annihilation and nonzero constants. Default is the sound fallback: all active. */
+    virtual int eval_activity(const bvec_t** arg, bvec_t** res,
+                            casadi_int* iw, bvec_t* w, void* mem) const;
+
     /** \brief  Propagate sparsity forward, specific block
 
         \identifier{mx} */

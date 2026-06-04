@@ -650,6 +650,43 @@ namespace casadi {
     return 0;
   }
 
+  int MXFunction::
+  eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    // Temporaries to hold pointers to operation input and outputs
+    const bvec_t** arg1=arg+n_in_;
+    bvec_t** res1=res+n_out_;
+
+    // Propagate signal activity forward (ignores is_diff: this is a value analysis)
+    for (auto&& e : algorithm_) {
+      if (e.op==OP_INPUT) {
+        casadi_int nnz=e.data.nnz();
+        casadi_int i=e.data->ind();
+        casadi_int nz_offset=e.data->offset();
+        const bvec_t* argi = arg[i];
+        bvec_t* w1 = w + workloc_[e.res.front()];
+        if (argi!=nullptr) {
+          std::copy(argi+nz_offset, argi+nz_offset+nnz, w1);
+        } else {
+          std::fill_n(w1, nnz, 0);
+        }
+      } else if (e.op==OP_OUTPUT) {
+        casadi_int nnz=e.data.dep().nnz();
+        casadi_int i=e.data->ind();
+        casadi_int nz_offset=e.data->offset();
+        bvec_t* resi = res[i];
+        bvec_t* w1 = w + workloc_[e.arg.front()];
+        if (resi!=nullptr) std::copy(w1, w1+nnz, resi+nz_offset);
+      } else {
+        for (casadi_int i=0; i<e.arg.size(); ++i)
+          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : nullptr;
+        for (casadi_int i=0; i<e.res.size(); ++i)
+          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
+        if (e.data->eval_activity(arg1, res1, iw, w)) return 1;
+      }
+    }
+    return 0;
+  }
+
   std::vector<std::string> MXFunction::get_function() const {
     std::map<std::string, bool> flagged;
     for (auto it=algorithm_.begin(); it!=algorithm_.end(); it++) {
