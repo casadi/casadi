@@ -732,3 +732,33 @@ obj:*libworhp*
    ...
    fun:_dlerror_run
 }
+
+{
+     madnlp/ccopt julia runtime: LLVM JIT eh-frame registration
+     Memcheck:Leak
+     match-leak-kinds: definite
+     fun:malloc
+     fun:__register_frame
+     ...
+  }
+
+  {
+     madnlp/ccopt julia runtime: resolve sysimg location
+     Memcheck:Leak
+     match-leak-kinds: definite
+     fun:malloc
+     fun:__vasprintf_internal
+     fun:asprintf
+     fun:jl_resolve_sysimg_location
+     ...
+  }
+
+  {
+     madnlp/ccopt julia runtime: init processor sysimg
+     Memcheck:Leak
+     match-leak-kinds: definite
+     fun:malloc
+     fun:parse_sysimg*
+     fun:jl_init_processor_sysimg
+     ...
+  }

@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 #include <dlfcn.h>
+#include <cstdlib>
 
 // Usage from C
 int usage_c(){
@@ -303,7 +304,9 @@ int main(){
   f.generate("f_with_mem", {{"with_mem", true}, {"force_canonical", true}});
 
   // Compile the C-code to a shared library
-  compile_command = "gcc -fPIC -I"+ std::string(INCLUDE_DIR) + " -shared -g f_with_mem.c -o f_with_mem.so";
+  const char* env_inc = std::getenv("CASADI_INCLUDE_DIR");
+  std::string include_dir = env_inc ? env_inc : INCLUDE_DIR;
+  compile_command = "gcc -fPIC -I"+ include_dir + " -shared -g f_with_mem.c -o f_with_mem.so";
   flag = system(compile_command.c_str());
   casadi_assert(flag==0, "Compilation failed");
 

@@ -137,6 +137,20 @@ else:
 
 
 
+# Drop the C++ example executables (listed in the install manifest) from the
+# wheel; casadi-cli is intentionally not in the manifest and stays.
+examples_manifest = os.path.join(bdist_dir, "casadi", ".cpp_examples_manifest")
+if os.path.exists(examples_manifest):
+  with open(examples_manifest) as f:
+    for line in f:
+      name = line.strip()
+      if not name:
+        continue
+      example_path = os.path.join(bdist_dir, "casadi", name)
+      if os.path.exists(example_path):
+        os.remove(example_path)
+  os.remove(examples_manifest)
+
 wheelfile_path = os.path.join(distinfo_dir, 'WHEEL')
 with open(wheelfile_path, 'w') as f:
     Generator(f, maxheaderlen=0).flatten(msg)

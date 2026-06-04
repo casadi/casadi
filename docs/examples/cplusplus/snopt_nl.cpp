@@ -19,6 +19,7 @@
  */
 
 #include <casadi/casadi.hpp>
+#include <cstdlib>
 #include <iomanip>
 
 /**
@@ -34,6 +35,7 @@
 using namespace casadi;
 
 int main(int argc, char **argv){
+  if (std::getenv("SKIP_SNOPT_TESTS")) return 0;
   // Get the problem
   std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
 
