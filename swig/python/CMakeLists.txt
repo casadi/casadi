@@ -36,12 +36,9 @@ else()
   if(PYTHON_INCLUDE_DIR)
     set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_DIR})
   else()
-    # Find packages
-    set(MINPYVERSION "3")
-
-    # We don't really need the libs, but the headers.
-    find_package(PythonInterp ${MINPYVERSION})
-    find_package(PythonLibs ${MINPYVERSION})
+    # We don't really need the libs (except on Windows), but the headers.
+    include(CasadiFindPython)
+    casadi_find_python(DEVELOPMENT)
     if(NOT PYTHON_INCLUDE_PATH)
       message(SEND_ERROR "Python include headers not found, but required." )
     endif()

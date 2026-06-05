@@ -45,9 +45,14 @@ if(POLICY CMP0054)
   cmake_policy(SET CMP0054 NEW)
 endif()
 
-# FindPythonInterp and FindPythonLibs should be replaced by FindPython3
+# FindPythonInterp/FindPythonLibs are deprecated; cmake/CasadiFindPython.cmake
+# wraps FindPython3 (CMake >= 3.18) with a legacy fall-back.
+# Migrated to FindPython3 (see cmake/CasadiFindPython.cmake); NEW makes any
+# stray FindPythonInterp/FindPythonLibs use a hard error rather than a silent
+# fallback. The shim's legacy branch only runs on CMake < 3.18, predating this
+# policy, so it is never reached here.
 if(POLICY CMP0148)
-  cmake_policy(SET CMP0148 OLD)
+  cmake_policy(SET CMP0148 NEW)
 endif()
 
 #############################################################
@@ -429,10 +434,15 @@ if(WITH_SELFCONTAINED OR (WIN32 AND NOT CYGWIN))
 else()
   set(DEF_PYTHON_PREFIX python)
   if (WITH_PYTHON)
-    set(PYTHON_VERSION_REQ "3")
-    find_package(PythonInterp ${PYTHON_VERSION_REQ} REQUIRED)
-    execute_process ( COMMAND ${PYTHON_EXECUTABLE} -c "from __future__ import print_function; from distutils.sysconfig import get_python_lib; print(get_python_lib())"
-      OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
+    include(CasadiFindPython)
+    casadi_find_python(REQUIRED)
+    if(Python3_SITELIB)
+      set(PYTHON_SITE_PACKAGES ${Python3_SITELIB})
+    else()
+      # Legacy CMake fall-back; sysconfig since distutils is gone in 3.12+.
+      execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_path('purelib'))"
+        OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
     set(DEF_PYTHON_PREFIX ${PYTHON_SITE_PACKAGES})
   endif()
   set(DEF_MATLAB_PREFIX matlab)
@@ -1303,7 +1313,7 @@ if(WITH_LAPACK)
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DCASADI_TP_SHARED_PREFIX=${CASADI_TP_SHARED_PREFIX} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_openblas.cmake
-      CMAKE_ARGS -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib ${OPENBLAS_FLAGS} -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+      CMAKE_ARGS -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib ${OPENBLAS_FLAGS} -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")    
     set(LAPACK_DEPENDS_TARGET openblas-external)
     set(CMAKE_BLAS_CONFIG -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects; -DPKG_CONFIG_USE_CMAKE_PREFIX_PATH=ON -DBLA_PREFER_PKGCONFIG=ON -DBLA_PKGCONFIG_BLAS=openblas)
