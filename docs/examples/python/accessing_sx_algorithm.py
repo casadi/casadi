@@ -22,13 +22,13 @@
 Demonstration on how the algorithm of an SX function can be accessed and its operations can be transversed.
 """
 
-from casadi import *
+import casadi as ca
 import numpy
 
 # Create a function
-a = SX.sym('a')
-b = SX.sym('b',2)
-f = Function("f", [a,b], [2*a + b], ['a', 'b'], ['r'])
+a = ca.SX.sym('a')
+b = ca.SX.sym('b',2)
+f = ca.Function("f", [a,b], [2*a + b], ['a', 'b'], ['r'])
 
 # Input values of the same dimensions as the above
 input_val = [numpy.array([2.0]),\
@@ -51,28 +51,28 @@ for k in range(f.n_instructions()):
   o = f.instruction_output(k)
   i = f.instruction_input(k)
 
-  if(op==OP_CONST):
+  if(op==ca.OP_CONST):
     work[o[0]] = f.instruction_constant(k)
     print('work[', o[0], '] = ', f.instruction_constant(k))
   else:
-    if op==OP_INPUT:
+    if op==ca.OP_INPUT:
       work[o[0]] = input_val[i[0]][i[1]]
       print('work[', o[0], '] = input[', i[0], '][', i[1],  ']', '            ---> ' , work[o[0]])
-    elif op==OP_OUTPUT:
+    elif op==ca.OP_OUTPUT:
       output_val[o[0]][o[1]] = work[i[0]]
       print('output[', o[0], '][', o[1], '] = work[', i[0], ']','             ---> ', output_val[o[0]][o[1]])
-    elif op==OP_TWICE:
+    elif op==ca.OP_TWICE:
       work[o[0]] = 2*work[i[0]]
       print('work[', o[0], '] = 2*work[', i[0], ']','                         ---> ', work[o[0]])
-    elif op==OP_ADD:
+    elif op==ca.OP_ADD:
       work[o[0]] = work[i[0]] + work[i[1]]
       print('work[', o[0], '] = work[', i[0], '] + work[', i[1], ']','        ---> ', work[o[0]])
-    elif op==OP_MUL:
+    elif op==ca.OP_MUL:
       work[o[0]] = work[i[0]] * work[i[1]]
       print('work[', o[0], '] = work[', i[0], '] * work[', i[1], ']','        ---> ', work[o[0]])
     else:
       disp_in = ["work[" + str(a) + "]" for a in i]
-      debug_str = print_operator(instr[k],disp_in)
+      debug_str = ca.print_operator(instr[k],disp_in)
       raise Exception('Unknown operation: ' + str(op) + ' -- ' + debug_str)
 
 print('------')

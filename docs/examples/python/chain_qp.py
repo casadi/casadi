@@ -43,7 +43,7 @@ z_i >= zin
 z_i - 0.1*y_i >= 0.5
 """
 
-from casadi import *
+import casadi as ca
 from numpy import inf
 
 # Constants
@@ -79,8 +79,8 @@ for i in range(1, N+1):
       z_prev = z_i
 
    # Create variables for the (y_i, z_i) coordinates
-   y_i = SX.sym('y_' + str(i))
-   z_i = SX.sym('z_' + str(i))
+   y_i = ca.SX.sym('y_' + str(i))
+   z_i = ca.SX.sym('z_' + str(i))
 
    # Add to the list of variables
    x += [y_i, z_i]
@@ -107,10 +107,10 @@ for i in range(1, N+1):
    ubg.append( inf)
 
 # Formulate QP
-qp = {'x':vertcat(*x), 'f':Vchain, 'g':vertcat(*g)}
+qp = {'x':ca.vertcat(*x), 'f':Vchain, 'g':ca.vertcat(*g)}
 
 # Solve with IPOPT
-solver = qpsol('solver', 'qpoases', qp, {'sparse':True})
+solver = ca.qpsol('solver', 'qpoases', qp, {'sparse':True})
 #solver = qpsol('solver', 'gurobi', qp)
 #solver = nlpsol('solver', 'ipopt', qp)
 
@@ -127,7 +127,7 @@ Z0 = x_opt[1::2]
 # Plot the result
 import matplotlib.pyplot as plt
 plt.plot(Y0,Z0,'o-')
-ys = linspace(-2.,2.,100)
+ys = ca.linspace(-2.,2.,100)
 zs = 0.5 + 0.1*ys
 plt.plot(ys,zs,'--')
 plt.xlabel('y [m]')

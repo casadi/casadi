@@ -17,7 +17,7 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # -*- coding: utf-8 -*-
-from casadi import *
+import casadi as ca
 
 # Consider the following simple Modelica file
 with open('rocket.mo', 'r') as f: print(f.read())
@@ -44,7 +44,7 @@ if os.path.isdir(unzipped_path): shutil.rmtree(unzipped_path)
 with zipfile.ZipFile('rocket.fmu', 'r') as zip_ref: zip_ref.extractall(unzipped_path)
 
 # Create a CasADi/DaeBuilder instance from the unzipped FMU
-dae = DaeBuilder('rocket', unzipped_path)
+dae = ca.DaeBuilder('rocket', unzipped_path)
 dae.disp(True)
 
 # Get state vector, initial conditions, bounds

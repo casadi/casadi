@@ -16,7 +16,7 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
 import numpy
 
 # In this example, we fit a nonlinear model to measurements
@@ -35,29 +35,29 @@ import numpy
 N = 2000  # Number of samples
 fs = 610.1 # Sampling frequency [hz]
 
-param_truth = DM([5.625e-6,2.3e-4,1,4.69])
-param_guess = DM([5,2,1,5])
-scale = vertcat(1e-6,1e-4,1,1)
+param_truth = ca.DM([5.625e-6,2.3e-4,1,4.69])
+param_guess = ca.DM([5,2,1,5])
+scale = ca.vertcat(1e-6,1e-4,1,1)
 
 ############ MODELING #####################
-y  = MX.sym('y')
-dy = MX.sym('dy')
-u  = MX.sym('u')
+y  = ca.MX.sym('y')
+dy = ca.MX.sym('dy')
+u  = ca.MX.sym('u')
 
-states = vertcat(y,dy)
+states = ca.vertcat(y,dy)
 controls = u
 
-M = MX.sym("M")
-c = MX.sym("c")
-k = MX.sym("k")
-k_NL = MX.sym("k_NL")
+M = ca.MX.sym("M")
+c = ca.MX.sym("c")
+k = ca.MX.sym("k")
+k_NL = ca.MX.sym("k_NL")
 
-params = vertcat(M,c,k,k_NL)
+params = ca.vertcat(M,c,k,k_NL)
 
-rhs = vertcat(dy , (u-k_NL*y**3-k*y-c*dy)/M)
+rhs = ca.vertcat(dy , (u-k_NL*y**3-k*y-c*dy)/M)
 
 # Form an ode function
-ode = Function('ode',[states,controls,params],[rhs])
+ode = ca.Function('ode',[states,controls,params],[rhs])
 
 ############ Creating a simulator ##########
 N_steps_per_sample = 10
@@ -72,7 +72,7 @@ k4 = ode(states+dt*k3,controls,params)
 states_final = states+dt/6.0*(k1+2*k2+2*k3+k4)
 
 # Create a function that simulates one step propagation in a sample
-one_step = Function('one_step',[states, controls, params],[states_final])
+one_step = ca.Function('one_step',[states, controls, params],[states_final])
 
 X = states
 
@@ -80,17 +80,17 @@ for i in range(N_steps_per_sample):
   X = one_step(X, controls, params)
 
 # Create a function that simulates all step propagation on a sample
-one_sample = Function('one_sample',[states, controls, params], [X])
+one_sample = ca.Function('one_sample',[states, controls, params], [X])
 
 ############ Simulating the system ##########
 all_samples = one_sample.mapaccum("all_samples", N)
 
 # Choose an excitation signal
 numpy.random.seed(0)
-u_data = DM(0.1*numpy.random.random(N))
+u_data = ca.DM(0.1*numpy.random.random(N))
 
-x0 = DM([0,0])
-X_measured = all_samples(x0, u_data, repmat(param_truth,1,N))
+x0 = ca.DM([0,0])
+X_measured = all_samples(x0, u_data, ca.repmat(param_truth,1,N))
 
 y_data = X_measured[0,:].T
 
@@ -99,10 +99,10 @@ y_data = X_measured[0,:].T
 # When noise is absent, the fit will be perfect.
 
 # Use just-in-time compilation to speed up the evaluation
-if Importer.has_plugin('clang'):
+if ca.Importer.has_plugin('clang'):
   with_jit = True
   compiler = 'clang'
-elif Importer.has_plugin('shell'):
+elif ca.Importer.has_plugin('shell'):
   with_jit = True
   print("WARNING: on Windows, JIT may require a special environment cfr https://github.com/casadi/casadi/wiki/FAQ:-how-to-perform-jit-for-function-evaluations-of-my-optimization-problem%3F")
   compiler = 'shell'
@@ -113,22 +113,22 @@ else:
 
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):
-  J = jacobian(e,V)
-  H = triu(J.T @  J)
-  sigma = MX.sym("sigma")
-  hessLag = Function('nlp_hess_l',{'x':V,'lam_f':sigma, 'hess_gamma_x_x':sigma*H},
+  J = ca.jacobian(e,V)
+  H = ca.triu(J.T @  J)
+  sigma = ca.MX.sym("sigma")
+  hessLag = ca.Function('nlp_hess_l',{'x':V,'lam_f':sigma, 'hess_gamma_x_x':sigma*H},
                      ['x','p','lam_f','lam_g'], ['hess_gamma_x_x'],
                      dict(jit=with_jit, compiler=compiler))
-  return nlpsol("solver","ipopt", nlp, dict(hess_lag=hessLag, jit=with_jit, compiler=compiler))
+  return ca.nlpsol("solver","ipopt", nlp, dict(hess_lag=hessLag, jit=with_jit, compiler=compiler))
 
 ############ Identifying the simulated system: single shooting strategy ##########
 
 # Note, it is in general a good idea to scale your decision variables such
 # that they are in the order of ~0.1..100
-X_symbolic = all_samples(x0, u_data, repmat(params*scale,1,N))
+X_symbolic = all_samples(x0, u_data, ca.repmat(params*scale,1,N))
 
 e = y_data-X_symbolic[0,:].T
-nlp = {'x':params, 'f':0.5*dot(e,e)}
+nlp = {'x':params, 'f':0.5*ca.dot(e,e)}
 
 solver = gauss_newton(e,nlp, params)
 
@@ -136,28 +136,28 @@ sol = solver(x0=param_guess)
 
 print(sol["x"]*scale)
 
-assert norm_inf(sol["x"]*scale-param_truth)<1e-8
+assert ca.norm_inf(sol["x"]*scale-param_truth)<1e-8
 
 ############ Identifying the simulated system: multiple shooting strategy ##########
 
 # All states become decision variables
-X = MX.sym("X", 2, N)
+X = ca.MX.sym("X", 2, N)
 
-Xn = one_sample.map(N, 'openmp')(X, u_data.T, repmat(params*scale,1,N))
+Xn = one_sample.map(N, 'openmp')(X, u_data.T, ca.repmat(params*scale,1,N))
 
 gaps = Xn[:,:-1]-X[:,1:]
 
 e = y_data-Xn[0,:].T
 
-V = veccat(params, X)
+V = ca.veccat(params, X)
 
-nlp = {'x':V, 'f':0.5*dot(e,e), 'g':vec(gaps)}
+nlp = {'x':V, 'f':0.5*ca.dot(e,e), 'g':ca.vec(gaps)}
 
 # Multipleshooting allows for careful initialization
 yd = numpy.diff(y_data,axis=0)*fs
-X_guess = horzcat(y_data , vertcat(yd,yd[-1])).T
+X_guess = ca.horzcat(y_data , ca.vertcat(yd,yd[-1])).T
 
-x0 = veccat(param_guess,X_guess)
+x0 = ca.veccat(param_guess,X_guess)
 
 solver = gauss_newton(e,nlp, V)
 
@@ -165,4 +165,4 @@ sol = solver(x0=x0,lbg=0,ubg=0)
 
 print(sol["x"][:4]*scale)
 
-assert norm_inf(sol["x"][:4]*scale-param_truth)<1e-8
+assert ca.norm_inf(sol["x"][:4]*scale-param_truth)<1e-8

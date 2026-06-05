@@ -24,7 +24,7 @@
 # nlpsol
 # =====================
 
-from casadi import *
+import casadi as ca
 from numpy import *
 
 # In this example, we will solve a few optimization problems with increasing complexity
@@ -36,10 +36,10 @@ from numpy import *
 #
 # with x scalar
 
-x=SX.sym('x')
+x=ca.SX.sym('x')
 nlp = {'x':x, 'f':(x-1)**2}
 
-solver = nlpsol('solver', 'ipopt', nlp)
+solver = ca.nlpsol('solver', 'ipopt', nlp)
 sol = solver(lbx=-10, ubx=10)
 
 # The solution is obviously 1:
@@ -58,13 +58,13 @@ assert(abs(sol['x']-1)<1e-9)
 
 n = 5
 
-x=SX.sym('x',n)
+x=ca.SX.sym('x',n)
 
 # Note how we do not distinguish between equalities and inequalities here
 
-nlp = {'x':x, 'f':(x-1).T @ (x-1), 'g':vertcat(x[1]+x[2],x[0])}
+nlp = {'x':x, 'f':(x-1).T @ (x-1), 'g':ca.vertcat(x[1]+x[2],x[0])}
 
-solver = nlpsol('solver', 'ipopt', nlp)
+solver = ca.nlpsol('solver', 'ipopt', nlp)
 sol = solver(lbx=-10, ubx=10, lbg=[0,2], ubg=[1,2])
 
 # $ 2 \le x_0 \le 2$ is not really as bad it looks. 
@@ -84,12 +84,12 @@ for (i,e) in zip(list(range(n)),[2,0.5,0.5,1,1]):
 #
 # with x scalar
 
-x=SX.sym('x')
-a=SX.sym('a')
+x=ca.SX.sym('x')
+a=ca.SX.sym('a')
 a_ = 2
 nlp={'x':x, 'p':a, 'f':(x-a)**2}
 
-solver = nlpsol('solver', 'ipopt', nlp)
+solver = ca.nlpsol('solver', 'ipopt', nlp)
 sol = solver(lbx=-10, ubx=10, p=a_)
 
 # The solution is obviously a:

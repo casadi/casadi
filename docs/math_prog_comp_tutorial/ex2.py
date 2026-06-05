@@ -1,17 +1,17 @@
 # Python
-from casadi import *
+import casadi as ca
 
 # Formulate the NLP
-x=SX.sym('x')
-y=SX.sym('y')
-z=SX.sym('z')
+x=ca.SX.sym('x')
+y=ca.SX.sym('y')
+z=ca.SX.sym('z')
 f=x**2+100*z**2
 g=z+(1-x)**2-y
-P=dict(x=vertcat(x,y,z),\
+P=dict(x=ca.vertcat(x,y,z),\
        f=f,g=g)
 
 # Create solver instance
-F=nlpsol('F','ipopt',P)
+F=ca.nlpsol('F','ipopt',P)
 
 # Solve the problem
 r=F(x0=[2.5,3.0,0.75],\

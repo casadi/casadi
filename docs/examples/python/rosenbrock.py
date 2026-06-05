@@ -16,7 +16,7 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
 
 """
 Solve the Rosenbrock problem, formulated as the NLP:
@@ -28,17 +28,17 @@ Joel Andersson, 2015
 """
 
 # Declare variables
-x = SX.sym("x")
-y = SX.sym("y")
-z = SX.sym("z")
+x = ca.SX.sym("x")
+y = ca.SX.sym("y")
+z = ca.SX.sym("z")
 
 # Formulate the NLP
 f = x**2 + 100*z**2
 g = z + (1-x)**2 - y
-nlp = {'x':vertcat(x,y,z), 'f':f, 'g':g}
+nlp = {'x':ca.vertcat(x,y,z), 'f':f, 'g':g}
 
 # Create an NLP solver
-solver = nlpsol("solver", "ipopt", nlp)
+solver = ca.nlpsol("solver", "ipopt", nlp)
 
 # Solve the Rosenbrock problem
 res = solver(x0  = [2.5,3.0,0.75],

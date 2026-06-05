@@ -24,15 +24,15 @@
 # Integrator tolerances
 # =====================
 
-from casadi import *
+import casadi as ca
 from numpy import *
 from pylab import *
 
-x=SX.sym('x') 
-dx=SX.sym('dx')
-states = vertcat(x,dx)
+x=ca.SX.sym('x') 
+dx=ca.SX.sym('dx')
+states = ca.vertcat(x,dx)
 
-dae={'x':states, 'ode':vertcat(dx,-x)}
+dae={'x':states, 'ode':ca.vertcat(dx,-x)}
 
 tend = 2*pi*3
 ts = linspace(0,tend,1000)
@@ -43,7 +43,7 @@ figure()
 
 for tol in tolerances:
   opts = {'reltol':10.0**tol, 'abstol':10.0**tol}
-  F = integrator('F', 'cvodes', dae, 0, ts, opts)
+  F = ca.integrator('F', 'cvodes', dae, 0, ts, opts)
   res = F(x0=[1,0])
   plot(ts,array(res['xf'])[0,:].T,label='tol = 1e%d' % tol)
 legend( loc='upper left')
@@ -59,11 +59,11 @@ for tol in tolerances:
   opts = {}
   opts['reltol'] = tol
   opts['abstol'] = tol
-  F = integrator('F', 'cvodes', dae, 0, tend, opts)
+  F = ca.integrator('F', 'cvodes', dae, 0, tend, opts)
   res = F(x0=[1,0])
   endresult.append(res['xf'][0])
 
-endresult = vcat(endresult)
+endresult = ca.vcat(endresult)
 
 figure()
 loglog(tolerances,(array(endresult)-1),'b',label='Positive error')

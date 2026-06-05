@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+import casadi as ca
 import casadi as c
 import numpy
 import unittest
@@ -35,12 +35,12 @@ class Vectortoolsstests(casadiTestCase):
 
     w = [2,1,4,6]
 
-    self.assertRaises(RuntimeError,lambda : complement(w,3) )
-    self.assertRaises(RuntimeError,lambda : complement(w,6) )
+    self.assertRaises(RuntimeError,lambda : ca.complement(w,3) )
+    self.assertRaises(RuntimeError,lambda : ca.complement(w,6) )
 
 
-    wc = list(complement(w,8))
-    self.checkarray(DM(wc),DM([0,3,5,7]),"complement")
+    wc = list(ca.complement(w,8))
+    self.checkarray(ca.DM(wc),ca.DM([0,3,5,7]),"complement")
 
 
 

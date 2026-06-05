@@ -24,26 +24,26 @@
 # Exact Hessian
 # =====================
 
-from casadi import *
+import casadi as ca
 from numpy import *
 import casadi as c
 
 # We will investigate the use of an exact Hessian with the help of the Rosenbrock function
 
-x=SX.sym('x')
-y=SX.sym('y')
+x=ca.SX.sym('x')
+y=ca.SX.sym('y')
 obj = (1-x)**2+100*(y-x**2)**2
 constr = x**2+y**2
-nlp={'x':vertcat(x,y), 'f':obj, 'g':constr}
+nlp={'x':ca.vertcat(x,y), 'f':obj, 'g':constr}
 
 # We solve the problem with an exact Hessian (default)
 
-solver = nlpsol('solver', 'ipopt', nlp)
+solver = ca.nlpsol('solver', 'ipopt', nlp)
 sol = solver(lbx=-10, ubx=10, lbg=0, ubg=1)
 print('Optimal solution (exact Hessian): %s' % sol['x'])
 
 # Same problem but with limited memory BFSG
 
-solver = nlpsol('solver', 'ipopt', nlp, {'ipopt.hessian_approximation':'limited-memory'})
+solver = ca.nlpsol('solver', 'ipopt', nlp, {'ipopt.hessian_approximation':'limited-memory'})
 sol = solver(lbx=-10, ubx=10, lbg=0, ubg=1)
 print('Optimal solution (BFGS): %s' % sol['x'])

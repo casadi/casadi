@@ -17,7 +17,7 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # -*- coding: utf-8 -*-
-from casadi import *
+import casadi as ca
 from zipfile import ZipFile
 from pathlib import Path
 import os
@@ -26,7 +26,7 @@ import os
 # Joel Andersson, joel@jaeandersson.com
 
 # Start with an empty DaeBuilder instance
-dae = DaeBuilder('vdp')
+dae = ca.DaeBuilder('vdp')
 
 # States
 t = dae.add('t', 'independent')

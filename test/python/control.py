@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+import casadi as ca
 import casadi as c
 import numpy
 from numpy import random, array, linalg, matrix, zeros, ones, ndarray, eye
@@ -49,12 +49,12 @@ except:
 
 dplesolvers = []
 
-if has_dple("slicot"):
+if ca.has_dple("slicot"):
   dplesolvers.append(("slicot",{"linear_solver": "csparse"}))
 
 def randstable(n,margin=0.8,minimal=0):
   r = margin
-  A_ = tril(DM(numpy.random.random((n,n))))
+  A_ = ca.tril(ca.DM(numpy.random.random((n,n))))
   for i in range(n):
     eig = 0
     while abs(eig)<=minimal:
@@ -62,7 +62,7 @@ def randstable(n,margin=0.8,minimal=0):
     A_[i,i] = eig
 
   Q = scipy.linalg.orth(numpy.random.random((n,n)))
-  return mtimes([Q,A_,Q.T])
+  return ca.mtimes([Q,A_,Q.T])
 
 class Controltests(casadiTestCase):
 
@@ -78,15 +78,15 @@ class Controltests(casadiTestCase):
           print (n,K)
           A_ = [randstable(n) for i in range(K)]
           
-          V_ = [v @ v.T for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
-          V2_ = [v @ v.T for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
-          S = kron(Sparsity.diag(K),Sparsity.dense(n,n))
-          solver = dplesol("solver", Solver,{'a':S,'v':repmat(S,1,2)}, options)
+          V_ = [v @ v.T for v in [ca.DM(numpy.random.random((n,n))) for i in range(K)]]
+          V2_ = [v @ v.T for v in [ca.DM(numpy.random.random((n,n))) for i in range(K)]]
+          S = ca.kron(ca.Sparsity.diag(K),ca.Sparsity.dense(n,n))
+          solver = ca.dplesol("solver", Solver,{'a':S,'v':ca.repmat(S,1,2)}, options)
           
-          inputs = {"a":dcat(A_), "v": horzcat(dcat(V_),dcat(V2_))}
+          inputs = {"a":ca.dcat(A_), "v": ca.horzcat(ca.dcat(V_),ca.dcat(V2_))}
           
-          As = MX.sym("A",S)
-          Vs = MX.sym("V",S)
+          As = ca.MX.sym("A",S)
+          Vs = ca.MX.sym("V",S)
           
           def sigma(a):
             return a[1:] + [a[0]]
@@ -94,19 +94,19 @@ class Controltests(casadiTestCase):
           def isigma(a):
             return [a[-1]] + a[:-1]
           
-          Vss = hcat([(i+i.T)/2 for i in isigma(list(diagsplit(Vs,n))) ])
+          Vss = ca.hcat([(i+i.T)/2 for i in isigma(list(ca.diagsplit(Vs,n))) ])
           
           
-          AA = dcat([c.kron(i,i) for i in diagsplit(As,n)])
+          AA = ca.dcat([c.kron(i,i) for i in ca.diagsplit(As,n)])
 
-          A_total = DM.eye(n*n*K) - vertcat(*[AA[-n*n:,:],AA[:-n*n,:]])
+          A_total = ca.DM.eye(n*n*K) - ca.vertcat(*[AA[-n*n:,:],AA[:-n*n,:]])
           
           
-          Pf = solve(A_total,vec(Vss),"csparse")
+          Pf = ca.solve(A_total,ca.vec(Vss),"csparse")
           P = Pf.reshape((n,K*n))
-          P = dcat(horzsplit(P,n))
+          P = ca.dcat(ca.horzsplit(P,n))
           
-          refsol = Function("refsol", {"a": As,"v":Vs,"p":P},dple_in(),dple_out()).map("map","serial",2,["a"],[])
+          refsol = ca.Function("refsol", {"a": As,"v":Vs,"p":P},ca.dple_in(),ca.dple_out()).map("map","serial",2,["a"],[])
 
           self.checkfunction(solver,refsol,inputs=inputs,failmessage=str(Solver))
     
@@ -121,12 +121,12 @@ class Controltests(casadiTestCase):
           numpy.random.seed(1)
           print (n,K)
           A_ = [randstable(n) for i in range(K)]          
-          V_ = [v @ v.T for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
+          V_ = [v @ v.T for v in [ca.DM(numpy.random.random((n,n))) for i in range(K)]]
         
-          inputs = {"a":hcat(A_), "v": hcat(V_)}
+          inputs = {"a":ca.hcat(A_), "v": ca.hcat(V_)}
           
-          As = MX.sym("A",n,n*K)
-          Vs = MX.sym("V",n,n*K)
+          As = ca.MX.sym("A",n,n*K)
+          Vs = ca.MX.sym("V",n,n*K)
                     
           def sigma(a):
             return a[1:] + [a[0]]
@@ -134,18 +134,18 @@ class Controltests(casadiTestCase):
           def isigma(a):
             return [a[-1]] + a[:-1]
           
-          Vss = hcat([(i+i.T)/2 for i in isigma(list(horzsplit(Vs,n))) ])
+          Vss = ca.hcat([(i+i.T)/2 for i in isigma(list(ca.horzsplit(Vs,n))) ])
           
           
-          AA = dcat([c.kron(i,i) for i in horzsplit(As,n)])
+          AA = ca.dcat([c.kron(i,i) for i in ca.horzsplit(As,n)])
 
-          A_total = DM.eye(n*n*K) - vcat([AA[-n*n:,:],AA[:-n*n,:]])
+          A_total = ca.DM.eye(n*n*K) - ca.vcat([AA[-n*n:,:],AA[:-n*n,:]])
           
-          Pf = solve(A_total,vec(Vss),"csparse")
+          Pf = ca.solve(A_total,ca.vec(Vss),"csparse")
           P = Pf.reshape((n,K*n))
 
-          solver = Function("solver", {"a": As,"v":Vs,"p":hcat(dplesol(horzsplit(As,n),horzsplit(Vs,n),Solver,options))},dple_in(),dple_out())          
-          refsol = Function("refsol", {"a": As,"v":Vs,"p":P},dple_in(),dple_out())
+          solver = ca.Function("solver", {"a": As,"v":Vs,"p":ca.hcat(ca.dplesol(ca.horzsplit(As,n),ca.horzsplit(Vs,n),Solver,options))},ca.dple_in(),ca.dple_out())          
+          refsol = ca.Function("refsol", {"a": As,"v":Vs,"p":P},ca.dple_in(),ca.dple_out())
 
           self.checkfunction(solver,refsol,inputs=inputs,failmessage=str(Solver))
     

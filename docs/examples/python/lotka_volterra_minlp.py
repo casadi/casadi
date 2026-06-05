@@ -16,7 +16,7 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
 
 # Lotka-Volerra problem from mintoc.de
 
@@ -39,11 +39,11 @@ lbu = 0.
 ubu = 1.
 
 # Declare model variables
-x = SX.sym('x', 2)
-u = SX.sym('u')
+x = ca.SX.sym('x', 2)
+u = ca.SX.sym('u')
 
 # Model equations
-xdot = vertcat(x[0] - x[0] * x[1] - c0 * x[0] * u,
+xdot = ca.vertcat(x[0] - x[0] * x[1] - c0 * x[0] * u,
               -x[1] + x[0] * x[1] - c1 * x[1] * u)
 
 # Objective term
@@ -53,14 +53,14 @@ L = (x[0] - 1)**2 + (x[1] - 1)**2 + 1e-4*u**2
 if False:
    # CVODES from the SUNDIALS suite
    dae = {'x':x, 'p':u, 'ode':xdot, 'quad':L}
-   F = integrator('F', 'cvodes', dae, 0, T/N)
+   F = ca.integrator('F', 'cvodes', dae, 0, T/N)
 else:
    # Fixed step Runge-Kutta 4 integrator
    M = 4 # RK4 steps per interval
    DT = T/N/M
-   f = Function('f', [x, u], [xdot, L])
-   X0 = MX.sym('X0', 2)
-   U = MX.sym('U')
+   f = ca.Function('f', [x, u], [xdot, L])
+   X0 = ca.MX.sym('X0', 2)
+   U = ca.MX.sym('U')
    X = X0
    Q = 0
    for j in range(M):
@@ -70,13 +70,13 @@ else:
        k4, k4_q = f(X + DT * k3, U)
        X=X+DT/6*(k1 +2*k2 +2*k3 +k4)
        Q = Q + DT/6*(k1_q + 2*k2_q + 2*k3_q + k4_q)
-   F = Function('F', [X0, U], [X, Q],['x0','p'],['xf','qf'])
+   F = ca.Function('F', [X0, U], [X, Q],['x0','p'],['xf','qf'])
 
 # Initial guess for u
-u_start = [DM(0.)] * N
+u_start = [ca.DM(0.)] * N
 
 # Get a feasible trajectory as an initial guess
-xk = DM(x0)
+xk = ca.DM(x0)
 x_start = [xk]
 for k in range(N):
     xk = F(x0=xk, p=u_start[k])['xf']
@@ -94,7 +94,7 @@ lbg = []
 ubg = []
 
 # "Lift" initial conditions
-X0 = MX.sym('X0', 2)
+X0 = ca.MX.sym('X0', 2)
 w += [X0]
 lbw += x0
 ubw += x0
@@ -105,7 +105,7 @@ discrete += [False, False]
 Xk = X0
 for k in range(N):
     # New NLP variable for the control
-    Uk = MX.sym('U_' + str(k))
+    Uk = ca.MX.sym('U_' + str(k))
     w   += [Uk]
     lbw += [lbu]
     ubw += [ubu]
@@ -118,7 +118,7 @@ for k in range(N):
     J=J+Fk['qf']
 
     # New NLP variable for state at end of interval
-    Xk = MX.sym('X_' + str(k+1), 2)
+    Xk = ca.MX.sym('X_' + str(k+1), 2)
     w   += [Xk]
     lbw += lbx
     ubw += ubx
@@ -131,12 +131,12 @@ for k in range(N):
     ubg += [0, 0]
 
 # Concatenate decision variables and constraint terms
-w = vertcat(*w)
-g = vertcat(*g)
+w = ca.vertcat(*w)
+g = ca.vertcat(*g)
 
 # Create an NLP solver
 nlp_prob = {'f': J, 'x': w, 'g': g}
-nlp_solver = nlpsol('nlp_solver', 'bonmin', nlp_prob, {"discrete": discrete})
+nlp_solver = ca.nlpsol('nlp_solver', 'bonmin', nlp_prob, {"discrete": discrete})
 #nlp_solver = nlpsol('nlp_solver', 'knitro', nlp_prob, {"discrete": discrete})
 #nlp_solver = nlpsol('nlp_solver', 'ipopt', nlp_prob) # Solve relaxed problem
 
@@ -152,13 +152,13 @@ def plot_sol(w_opt):
     u_opt = w_opt[2::3]
     plt.plot(tgrid, x0_opt, '--')
     plt.plot(tgrid, x1_opt, '-')
-    plt.step(tgrid, vertcat(DM.nan(1), u_opt), '-.')
+    plt.step(tgrid, ca.vertcat(ca.DM.nan(1), u_opt), '-.')
     plt.xlabel('t')
     plt.legend(['x0','x1','u'])
     plt.grid(True)
 
 # Solve the NLP
-sol = nlp_solver(x0=vertcat(*w0), lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
+sol = nlp_solver(x0=ca.vertcat(*w0), lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
 
 print(nlp_solver.stats())
 

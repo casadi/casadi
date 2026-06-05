@@ -22,15 +22,15 @@
 Demonstration on how the algorithm of an MX function can be accessed and its operations can be transversed.
 """
 
-from casadi import *
+import casadi as ca
 import numpy
 import numpy as np
 
 # Create a function
-a = MX.sym('a')
-b = MX.sym('b',2)
-c = MX.sym('c',2,2)
-f = Function("f", [a,b,c], [3*(c @ b)*a + b], ['a', 'b', 'c'], ['r'])
+a = ca.MX.sym('a')
+b = ca.MX.sym('b',2)
+c = ca.MX.sym('c',2,2)
+f = ca.Function("f", [a,b,c], [3*(c @ b)*a + b], ['a', 'b', 'c'], ['r'])
 
 # Input values of the same dimensions as the above
 input_val = [numpy.array([2.0]),\
@@ -52,30 +52,30 @@ for k in range(f.n_instructions()):
   o = f.instruction_output(k)
   i = f.instruction_input(k)
 
-  if(op==OP_CONST):
+  if(op==ca.OP_CONST):
     v = f.instruction_MX(k).to_DM()
     assert v.is_dense()
     work[o[0]] = np.array(v)
     print('work[{o[0]}] = {v}'.format(o=o,v=v))
   else:
-    if op==OP_INPUT:
+    if op==ca.OP_INPUT:
       work[o[0]] = input_val[i[0]]
       print('work[{o[0]}] = input[{i[0]}]            ---> {v}'.format(o=o,i=i,v=work[o[0]]))
-    elif op==OP_OUTPUT:
+    elif op==ca.OP_OUTPUT:
       output_val[o[0]] = work[i[0]]
       print('output[{o[0]}] = work[{i[0]}]             ---> {v}'.format(o=o,i=i,v=output_val[o[0]]))
-    elif op==OP_ADD:
+    elif op==ca.OP_ADD:
       work[o[0]] = work[i[0]] + work[i[1]]
       print('work[{o[0]}] = work[{i[0]}] + work[{i[1]}]      ---> {v}'.format(o=o,i=i,v=work[o[0]]))
-    elif op==OP_MUL:
+    elif op==ca.OP_MUL:
       work[o[0]] = work[i[0]] * work[i[1]]
       print('work[{o[0]}] = work[{i[0]}] * work[{i[1]}]        ---> {v}'.format(o=o,i=i,v=work[o[0]]))
-    elif op==OP_MTIMES:
+    elif op==ca.OP_MTIMES:
       work[o[0]] = np.dot(work[i[1]], work[i[2]])+work[i[0]]
       print('work[{o[0]}] = work[{i[1]}] @ work[{i[2]}] + work[{i[0]}]        ---> {v}'.format(o=o,i=i,v=work[o[0]]))
     else:
       disp_in = ["work[" + str(a) + "]" for a in i]
-      debug_str = print_operator(f.instruction_MX(k),disp_in)
+      debug_str = ca.print_operator(f.instruction_MX(k),disp_in)
       raise Exception('Unknown operation: ' + str(op) + ' -- ' + debug_str)
       # When evaluating with MX, you may use an identity transformation:
       #node = f.instruction_MX(k)

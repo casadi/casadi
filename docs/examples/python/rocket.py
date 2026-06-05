@@ -16,14 +16,14 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
 from pylab import *
 
 # Control
-u = MX.sym("u")
+u = ca.MX.sym("u")
 
 # State
-x = MX.sym("x",3)
+x = ca.MX.sym("x",3)
 s = x[0] # position
 v = x[1] # speed
 m = x[2] # mass
@@ -32,10 +32,10 @@ m = x[2] # mass
 sdot = v
 vdot = (u - 0.05 * v*v)/m
 mdot = -0.1*u*u
-xdot = vertcat(sdot,vdot,mdot)
+xdot = ca.vertcat(sdot,vdot,mdot)
 
 # ODE right hand side function
-f = Function('f', [x,u],[xdot])
+f = ca.Function('f', [x,u],[xdot])
 
 # Integrate with Explicit Euler over 0.2 seconds
 dt = 0.01  # Time step
@@ -45,16 +45,16 @@ for j in range(20):
   xj += dt*fj
 
 # Discrete time dynamics function
-F = Function('F', [x,u],[xj])
+F = ca.Function('F', [x,u],[xj])
 
 # Number of control segments
 nu = 50 
 
 # Control for all segments
-U = MX.sym("U",nu) 
+U = ca.MX.sym("U",nu) 
  
 # Initial conditions
-X0 = MX([0,0,1])
+X0 = ca.MX([0,0,1])
 
 # Integrate over all intervals
 X=X0
@@ -70,7 +70,7 @@ nlp = {'x':U, 'f':J, 'g':G}
  
 # Allocate an NLP solver
 opts = {"ipopt.tol":1e-10, "expand":True}
-solver = nlpsol("solver", "ipopt", nlp, opts)
+solver = ca.nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Bounds on u and initial condition

@@ -21,42 +21,42 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-from casadi import *
+import casadi as ca
 from casadi.tools import *
 
 # An SX graph
 
-a = SX.sym("a")
-b = SX.sym("b")
+a = ca.SX.sym("a")
+b = ca.SX.sym("b")
 
-c = sin(a**5 + b)
+c = ca.sin(a**5 + b)
 
-c = c - b/ sqrt(fabs(c))
+c = c - b/ ca.sqrt(ca.fabs(c))
 print(c)
 
 dotdraw(c)
 
 # An SX
 
-dotdraw(SX.sym("x",Sparsity.lower(3)))
+dotdraw(ca.SX.sym("x",ca.Sparsity.lower(3)))
 
-dotdraw(SX.sym("x",Sparsity.lower(3))**2)
+dotdraw(ca.SX.sym("x",ca.Sparsity.lower(3))**2)
 
 # An MX graph
 
-x = MX.sym("x",Sparsity.lower(2))
-y = MX.sym("y",Sparsity.lower(2))
+x = ca.MX.sym("x",ca.Sparsity.lower(2))
+y = ca.MX.sym("y",ca.Sparsity.lower(2))
 
-z = MX.sym("z",4,2)
+z = ca.MX.sym("z",4,2)
 
 zz = x+y+6
 
 dotdraw(zz)
 
-f = Function("magic", [z,y],[z+x[0,0],x-y],{"allow_free":True})
+f = ca.Function("magic", [z,y],[z+x[0,0],x-y],{"allow_free":True})
 
-z,z2 = f(vertcat(x,y),zz.T)
+z,z2 = f(ca.vertcat(x,y),zz.T)
 
-z = z[:2,:] +x + cos(x) - sin(x) / tan(z2)
+z = z[:2,:] +x + ca.cos(x) - ca.sin(x) / ca.tan(z2)
 
 dotdraw(z)

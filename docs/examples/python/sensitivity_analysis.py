@@ -19,7 +19,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from casadi import *
+import casadi as ca
 from copy import deepcopy
 print('Testing sensitivity analysis in CasADi')
 
@@ -33,27 +33,27 @@ for Integrators in (ODE_integrators,DAE_integrators):
     print('Testing ODE example')
 
     # Time
-    t = SX.sym('t')
+    t = ca.SX.sym('t')
 
     # Parameter
-    u = SX.sym('u')
+    u = ca.SX.sym('u')
 
     # Differential states
-    s = SX.sym('s'); v = SX.sym('v'); m = SX.sym('m')
-    x = vertcat(s,v,m)
+    s = ca.SX.sym('s'); v = ca.SX.sym('v'); m = ca.SX.sym('m')
+    x = ca.vertcat(s,v,m)
 
     # Constants
     alpha = 0.05 # friction
     beta = 0.1   # fuel consumption rate
 
     # Differential equation
-    ode = vertcat(
+    ode = ca.vertcat(
       v,
       (u-alpha*v*v)/m,
       -beta*u*u)
 
     # Quadrature
-    quad = v**3 + ((3-sin(t)) - u)**2
+    quad = v**3 + ((3-ca.sin(t)) - u)**2
 
     # DAE callback function
     dae = {'t':t, 'x':x, 'p':u, 'ode':ode, 'quad':quad}
@@ -72,19 +72,19 @@ for Integrators in (ODE_integrators,DAE_integrators):
     print('Testing DAE example')
 
     # Differential state
-    x = SX.sym('x')
+    x = ca.SX.sym('x')
 
     # Algebraic variable
-    z = SX.sym('z')
+    z = ca.SX.sym('z')
 
     # Parameter
-    u = SX.sym('u')
+    u = ca.SX.sym('u')
 
     # Differential equation
     ode = -x + 0.5*x*x + u + 0.5*z
 
     # Algebraic constraint
-    alg = z + exp(z) - 1.0 + x
+    alg = z + ca.exp(z) - 1.0 + x
 
     # Quadrature
     quad = x*x + 3.0*u*u
@@ -113,7 +113,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
       opts['rootfinder'] = 'kinsol'
 
     # Integrator
-    I = integrator('I', MyIntegrator, dae, 0, tf, opts)
+    I = ca.integrator('I', MyIntegrator, dae, 0, tf, opts)
 
     # Integrate to get results
     res = I(x0=x0, p=u0)

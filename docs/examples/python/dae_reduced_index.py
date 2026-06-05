@@ -18,7 +18,7 @@
 #
 #
 # -*- coding: utf-8 -*-
-from casadi import *
+import casadi as ca
 import numpy as np
 import pylab as plt
 
@@ -32,38 +32,38 @@ import pylab as plt
 #  /
 # o (x,y) 
 #
-x = SX.sym("x") # horizontal position of point
-y = SX.sym("y") # vertical position of point
+x = ca.SX.sym("x") # horizontal position of point
+y = ca.SX.sym("y") # vertical position of point
 
-dx = SX.sym("dx")
-dy = SX.sym("dy")
+dx = ca.SX.sym("dx")
+dy = ca.SX.sym("dy")
 
-u = SX.sym("u") # helper states to bring second order system to first order
-v = SX.sym("v")
+u = ca.SX.sym("u") # helper states to bring second order system to first order
+v = ca.SX.sym("v")
 
-du = SX.sym("du")
-dv = SX.sym("dv")
+du = ca.SX.sym("du")
+dv = ca.SX.sym("dv")
 
 # Force
-T = SX.sym("T")
+T = ca.SX.sym("T")
 
 
 L = 1
 g = 9.81
 
-alg = vertcat(dx-u,dy-v,du-T*x,dv-T*y+g,x**2+y**2-L**2)
+alg = ca.vertcat(dx-u,dy-v,du-T*x,dv-T*y+g,x**2+y**2-L**2)
 
 # Implicit differential states
-x_impl  = vertcat(x,y,u,v)
+x_impl  = ca.vertcat(x,y,u,v)
 # Derivatives of implict differential states
-dx_impl = vertcat(dx,dy,du,dv)
+dx_impl = ca.vertcat(dx,dy,du,dv)
 
 z = T
 
 dae = {"x_impl": x_impl, "dx_impl": dx_impl, "z": z, "alg": alg}
 
 # Perform index reduction
-(dae_reduced,stats) = dae_reduce_index(dae)
+(dae_reduced,stats) = ca.dae_reduce_index(dae)
 print("We had an index 3 system (reduced to index 1 now)")
 print(stats)
 print("Here's the reduced DAE:")
@@ -74,11 +74,11 @@ print("Both are kept in 'I' though: the resulting DAE invariants.")
 
 # The DAE is not yet in a form that CasADi integrator can handle (semi-explicit).
 # Let's convert it, ad obtain some adaptors
-[dae_se, state_to_orig, phi] = dae_map_semi_expl(dae, dae_reduced)
+[dae_se, state_to_orig, phi] = ca.dae_map_semi_expl(dae, dae_reduced)
 
 grid = list(np.linspace(0,5,1000))
-tf = DM(grid).T
-intg = integrator("intg","idas",dae_se,0,grid)
+tf = ca.DM(grid).T
+intg = ca.integrator("intg","idas",dae_se,0,grid)
 
 # Before we can integrate, we need a consistant initial guess
 # Let's say we start at y=-0.5, dx=-0.1;
@@ -88,18 +88,18 @@ intg = integrator("intg","idas",dae_se,0,grid)
 init_strength = {}
 free  = 0 # default
 force = -1
-init_strength["x_impl"] = vertcat(free,force,free,free)
-init_strength["dx_impl"] = vertcat(force,free,free,free)
-init_strength["z"] = vertcat(free)
+init_strength["x_impl"] = ca.vertcat(free,force,free,free)
+init_strength["dx_impl"] = ca.vertcat(force,free,free,free)
+init_strength["z"] = ca.vertcat(free)
 
 # Obtain a generating Function for initial guesses
-init_gen = dae_init_gen(dae, dae_reduced, "ipopt", init_strength)
+init_gen = ca.dae_init_gen(dae, dae_reduced, "ipopt", init_strength)
 
 init = {}
 blank = 0.0 # Will not be enforced but still used as initial guess
 # suggest to initialize with the left-hanging solution by having x=-1 as initial guess 
-init["x_impl"]  = vertcat(-1.0,-0.5,blank,blank)  
-init["dx_impl"] = vertcat(-0.1,blank,blank,blank)
+init["x_impl"]  = ca.vertcat(-1.0,-0.5,blank,blank)  
+init["dx_impl"] = ca.vertcat(-0.1,blank,blank,blank)
 init["z"]  = blank
 
 xz0 = init_gen(**init)
@@ -123,7 +123,7 @@ sol_orig = state_to_orig(xf=sol["xf"],zf=sol["zf"])
 # We can see the large-angle pendulum motion play out well in the u state
 plt.plot(tf.T,sol_orig["x_impl"].T)
 plt.grid(True)
-plt.legend([e.name() for e in vertsplit(x_impl)])
+plt.legend([e.name() for e in ca.vertsplit(x_impl)])
 plt.xlabel("Time [s]")
 plt.title("Boundary value problem solution trajectory")
 
@@ -148,10 +148,10 @@ plt.title("Evolution trajectory of invariants")
 
 # Demonstrate Baumgarte stabilization with a pole of -1.
 # Drift is absent now.
-(dae_reduced,stats) = dae_reduce_index(dae, {"baumgarte_pole": -1})
-[dae_se, state_to_orig, phi] = dae_map_semi_expl(dae, dae_reduced)
-intg = integrator("intg","idas",dae_se,0,grid)
-init_gen = dae_init_gen(dae, dae_reduced, "ipopt", init_strength)
+(dae_reduced,stats) = ca.dae_reduce_index(dae, {"baumgarte_pole": -1})
+[dae_se, state_to_orig, phi] = ca.dae_map_semi_expl(dae, dae_reduced)
+intg = ca.integrator("intg","idas",dae_se,0,grid)
+init_gen = ca.dae_init_gen(dae, dae_reduced, "ipopt", init_strength)
 xz0 = init_gen(**init)
 sol = intg(**xz0)
 error = phi(x=sol["xf"],z=sol["zf"])["I"]
@@ -177,10 +177,10 @@ plt.subplot(len(precisions),len(poles),1)
 
 for i,pole in enumerate(poles):
   for j,precision in enumerate(precisions):
-    (dae_reduced,stats) = dae_reduce_index(dae, {"baumgarte_pole": pole})
-    [dae_se, state_to_orig, phi] = dae_map_semi_expl(dae, dae_reduced)
-    intg = integrator("intg","idas",dae_se,0,grid,{"abstol":abstol_default*precision,"reltol":reltol_default*precision})
-    init_gen = dae_init_gen(dae, dae_reduced, "ipopt", init_strength, {"ipopt.print_level":0,"print_time": False})
+    (dae_reduced,stats) = ca.dae_reduce_index(dae, {"baumgarte_pole": pole})
+    [dae_se, state_to_orig, phi] = ca.dae_map_semi_expl(dae, dae_reduced)
+    intg = ca.integrator("intg","idas",dae_se,0,grid,{"abstol":abstol_default*precision,"reltol":reltol_default*precision})
+    init_gen = ca.dae_init_gen(dae, dae_reduced, "ipopt", init_strength, {"ipopt.print_level":0,"print_time": False})
     xz0 = init_gen(**init)
     sol = intg(**xz0)
     nfevals = intg.stats()["nfevals"]

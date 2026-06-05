@@ -1,15 +1,15 @@
 # Python
-from casadi import *
+import casadi as ca
 
 # Symbolic representation
-x=SX.sym('x')
-y=SX.sym('y')
+x=ca.SX.sym('x')
+y=ca.SX.sym('y')
 z=y-(1-x)**2
 f=x**2+100*z**2
-P=dict(x=vertcat(x,y),f=f)
+P=dict(x=ca.vertcat(x,y),f=f)
 
 # Create solver instance
-F=nlpsol('F','ipopt',P)
+F=ca.nlpsol('F','ipopt',P)
 
 # Solve the problem
 r=F(x0=[2.5,3.0])

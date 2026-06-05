@@ -24,14 +24,14 @@
 # sparsity_jac
 # ======================
 
-from casadi import *
+import casadi as ca
 from numpy import *
 import casadi as c
 from pylab import spy, show
 
 # We construct a simple SX expression
 
-x = SX.sym("x",40)
+x = ca.SX.sym("x",40)
 y = x[:-2]-2*x[1:-1]+x[2:]
 
 # Let's see what the first 5 entries of y look like
@@ -40,7 +40,7 @@ print(y[:5])
 
 # Next, we construct a function
 
-f = Function("f", [x],[y])
+f = ca.Function("f", [x],[y])
 
 # And we visualize the sparsity of the jacobian
 

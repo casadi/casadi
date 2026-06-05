@@ -25,7 +25,7 @@
 #
 # We demonstrate solving a dense system A.x=b by using different linear solvers.
 
-from casadi import *
+import casadi as ca
 from numpy import *
 import time
 
@@ -33,8 +33,8 @@ n=100
 
 # We generate $A \in \mathbf{R}^{n \times n}$, $x \in \mathbf{R}^{n}$ with $n=100$
 
-A=DM([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
-x=DM([tan(i) for i in range(n)])
+A=ca.DM([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
+x=ca.DM([tan(i) for i in range(n)])
 
 # We generate the b vector:
 
