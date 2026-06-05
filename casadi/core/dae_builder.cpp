@@ -217,6 +217,24 @@ Dict DaeBuilder::export_fmu(const Dict& opts) {
   }
 }
 
+Dict DaeBuilder::compile_fmu(const Dict& files, const Dict& opts) {
+  try {
+    return (*this)->compile_fmu(files, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("compile_fmu", e.what());
+    return Dict();  // never reached
+  }
+}
+
+std::string DaeBuilder::pack_fmu(const Dict& files, const Dict& opts) {
+  try {
+    return (*this)->pack_fmu(files, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("pack_fmu", e.what());
+    return std::string();  // never reached
+  }
+}
+
 void DaeBuilder::prune(bool prune_p, bool prune_u) {
   try {
     (*this)->prune(prune_p, prune_u);

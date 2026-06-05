@@ -54,7 +54,61 @@ class Daebuildertests(casadiTestCase):
         test_point = [vertcat(1.1,1.3)]
         self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3)],digits=7)
         self.check_serialize(f,inputs=test_point)
-  
+
+  @memory_heavy() # FMU has a memleak
+  def test_fmu_export_compile_pack_roundtrip(self):
+    # Roundtrip the three packaging steps: export_fmu -> compile_fmu -> pack_fmu, then
+    # load the produced .fmu back and check it evaluates like the symbolic model.
+    feats = ca.CasadiMeta.feature_list()
+    if "ghc-filesystem" not in feats or "libzip" not in feats:
+        print("Skipping roundtrip: ghc-filesystem/libzip not available")
+        return
+    fmi_headers = "../../external_packages/FMI-Standard-3.0/headers"
+    if not os.path.exists(os.path.join(fmi_headers, "fmi3Functions.h")):
+        print("Skipping roundtrip: FMI-3 headers not available")
+        return
+
+    # Build a Van der Pol oscillator
+    dae = ca.DaeBuilder("vdp")
+    x0 = dae.add("x0")
+    x1 = dae.add("x1")
+    dae.eq(dae.der(x0), x1)
+    dae.eq(dae.der(x1), (1 - x0 * x0) * x1 - x0)
+    dae.set_start("x0", 0)
+    dae.set_start("x1", 0)
+
+    # Generate the FMU sources, compile them, and pack into a single .fmu
+    files = dae.export_fmu()
+    try:
+        files = dae.compile_fmu(files, {"include_dirs": [fmi_headers]})
+    except Exception as e:
+        # No usable C compiler: clean up the generated sources and skip
+        for local in files.keys():
+            if os.path.exists(local):
+                os.remove(local)
+        print("Skipping roundtrip: C compilation unavailable:", e)
+        return
+    fmu_file = dae.pack_fmu(files, {"path": "vdp_roundtrip.fmu"})
+    self.assertTrue(os.path.exists(fmu_file))
+    # pack_fmu removes the loose files it zipped
+    self.assertFalse(os.path.exists("vdp.c"))
+
+    # Load the packed FMU back and compare against the symbolic dynamics
+    dae2 = ca.DaeBuilder("vdp", fmu_file)
+    f = dae2.create("f", ["x"], ["ode"])
+    x0s = ca.SX.sym("x0")
+    x1s = ca.SX.sym("x1")
+    x = ca.vertcat(x0s, x1s)
+    f_ref = ca.Function("f_ref", [x], [ca.vertcat(x1s, (1 - x0s * x0s) * x1s - x0s)])
+    self.checkfunction(f, f_ref, inputs=[ca.vertcat(1.1, 1.3)], digits=7)
+
+    # Cleanup
+    f = None
+    dae2 = None
+    gc.collect()
+    if os.path.exists(fmu_file):
+        os.remove(fmu_file)
+
   @memory_heavy() # FMU has a memleak
   def test_cstr(self):
     fmu_file = "../data/cstr.fmu"

@@ -294,6 +294,12 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Export instance into an FMU (experimental)
   Dict export_fmu(const Dict& opts) const;
 
+  /// Compile the sources produced by export_fmu, returning the augmented file map
+  Dict compile_fmu(const Dict& files, const Dict& opts) const;
+
+  /// Pack files (from export_fmu / compile_fmu) into a single .fmu archive (experimental)
+  std::string pack_fmu(const Dict& files, const Dict& opts) const;
+
   /// Generate FMU wrapper file (fmi3Functions.c)
   std::string generate_wrapper(const std::string& guid, const CodeGenerator& gen) const;
 

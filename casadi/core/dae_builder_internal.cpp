@@ -41,6 +41,7 @@
 #include "fmu_function.hpp"
 #include "integrator.hpp"
 #include "filesystem_impl.hpp"
+#include "fmu_impl.hpp"
 
 // Throw informative error message
 #define THROW_ERROR_NODE(FNAME, NODE, WHAT) \
@@ -1179,6 +1180,22 @@ Dict DaeBuilderInternal::export_fmu(const Dict& opts) const {
   }
   // Return list of files
   return ret;
+}
+
+Dict DaeBuilderInternal::compile_fmu(const Dict& files, const Dict& opts) const {
+  return FmuInternal::compile_fmu(name_, files, opts);
+}
+
+std::string DaeBuilderInternal::pack_fmu(const Dict& files, const Dict& opts) const {
+  std::string path = name_ + ".fmu";
+  for (auto&& op : opts) {
+    if (op.first == "path") {
+      path = op.second.to_string();
+    } else {
+      casadi_error("No such option: " + op.first);
+    }
+  }
+  return FmuInternal::pack_fmu(files, path);
 }
 
 std::string DaeBuilderInternal::generate(const std::vector<size_t>& v) {

@@ -29,6 +29,8 @@
 #include "archiver.hpp"
 #include "plugin_interface.hpp"
 #include <iostream>
+#include <vector>
+#include <utility>
 
 /// \cond INTERNAL
 namespace casadi {
@@ -53,6 +55,10 @@ namespace casadi {
     const std::string& path);
   typedef bool (* PackToStream)(const std::string& src_dir,
     std::ostream& src);
+  // Pack an explicit set of {file_path -> archive_name} entries (no staging directory)
+  typedef bool (* PackEntries)(
+    const std::vector<std::pair<std::string, std::string> >& entries,
+    const std::string& path);
 
     // Creator function for internal class
     typedef Archiver* (*Creator)();
@@ -65,6 +71,7 @@ namespace casadi {
       UnpackFromStringStream unpack_from_stringstream;
       Pack pack;
       PackToStream pack_to_stream;
+      PackEntries pack_entries;
     };
 
     /// Collection of solvers

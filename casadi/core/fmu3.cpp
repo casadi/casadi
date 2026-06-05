@@ -58,7 +58,7 @@ void Fmu3::free_mem(void *mem) const {
 Fmu3::~Fmu3() {
 }
 
-std::string Fmu3::system_infix() const {
+std::string Fmu3::dll_infix() {
   // Architecture
   std::string arch;
 #if defined(__arm64__) || defined(__aarch64__)

@@ -336,6 +336,34 @@ namespace casadi {
         return true;
     }
 
+    bool zip_entries_to_path(
+        const std::vector<std::pair<std::string, std::string> >& entries,
+        const std::string& zip_path) {
+        int errorp;
+        zip_t* archive = zip_open(zip_path.c_str(), ZIP_CREATE | ZIP_TRUNCATE, &errorp);
+        if (!archive) {
+            zip_error_t ziperror;
+            zip_error_init_with_code(&ziperror, errorp);
+            uerr() << "Error: Cannot open zip archive " << zip_path << ": "
+                   << zip_error_strerror(&ziperror) << std::endl;
+            zip_error_fini(&ziperror);
+            return false;
+        }
+        // Add each file at its archive-relative name (libzip creates parent entries implicitly)
+        for (const auto& e : entries) {
+            if (!add_file_to_zip(archive, e.first, e.second)) {
+                zip_discard(archive);
+                return false;
+            }
+        }
+        if (zip_close(archive) < 0) {
+            uerr() << "Error: Cannot finalize zip archive: " << zip_strerror(archive) << std::endl;
+            zip_discard(archive);
+            return false;
+        }
+        return true;
+    }
+
    extern "C"
    int CASADI_ARCHIVER_LIBZIP_EXPORT
    casadi_register_archiver_libzip(Archiver::Plugin* plugin) {
@@ -346,6 +374,7 @@ namespace casadi {
      plugin->exposed.unpack_from_stringstream = &extract_zip_from_stringstream;
      plugin->exposed.pack = &zip_to_path;
      plugin->exposed.pack_to_stream = &zip_to_stream;
+     plugin->exposed.pack_entries = &zip_entries_to_path;
      return 0;
    }
 

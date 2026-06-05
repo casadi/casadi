@@ -27,6 +27,8 @@
 #include "fmu_function.hpp"
 #include "dae_builder_internal.hpp"
 #include "filesystem_impl.hpp"
+#include "archiver_impl.hpp"
+#include "importer.hpp"
 
 #ifdef WITH_FMI2
 #include "fmu2.hpp"
@@ -729,6 +731,75 @@ std::string FmuInternal::dll_suffix() {
   // Linux
   return ".so";
 #endif
+}
+
+Dict FmuInternal::compile_fmu(const std::string& name, const Dict& files, const Dict& opts) {
+  // Options
+  Dict compiler_opts;
+  std::string compiler_plugin = "shell";
+  std::vector<std::string> include_dirs;
+  for (auto&& op : opts) {
+    if (op.first == "compiler") {
+      compiler_plugin = op.second.to_string();
+    } else if (op.first == "compiler_options") {
+      compiler_opts = op.second;
+    } else if (op.first == "include_dirs") {
+      include_dirs = op.second.to_string_vector();
+    } else {
+      casadi_error("No such option: " + op.first);
+    }
+  }
+  // The C sources to compile are the .c entries of the export_fmu map (flat in CWD)
+  std::vector<std::string> csources;
+  for (auto&& kv : files) {
+    const std::string& local = kv.first;
+    if (local.size() > 2 && local.substr(local.size() - 2) == ".c") csources.push_back(local);
+  }
+  // Amalgamation translation unit: a single .c that #includes every generated source,
+  // because the shell Importer compiles exactly one source file. The compile runs in
+  // the working directory, so quoted includes resolve against the loose files there.
+  // This is a build scratch file, NOT FMU content, so it is removed below.
+  std::string amalg = name + "_all.c";
+  {
+    auto f = Filesystem::ofstream_ptr(amalg);
+    for (const std::string& c : csources) *f << "#include \"" << c << "\"\n";
+  }
+  // Compile the amalgamation into a shared library via the Importer plugin.
+  // Pass include dirs through the OS-agnostic 'include_dirs' option (the plugin
+  // prefixes each with the compiler's own include flag: -I on gcc/clang, /I on MSVC).
+  Dict cop = compiler_opts;
+  if (!include_dirs.empty()) cop["include_dirs"] = include_dirs;
+  Importer compiler(amalg, compiler_plugin, cop);
+  // Lift the binary to a stable path before the Importer destructor removes it, then
+  // discard the amalgamation scratch file (compilation is done once the Importer exists)
+  std::string dll = name + dll_suffix();
+  Filesystem::copy_file(compiler.library(), dll);
+  Filesystem::remove(amalg);
+  // Augment the file map with the compiled binary
+  // (FMI-3 layout: binaries/<dll_infix>/<modelIdentifier><suffix>)
+  Dict ret = files;
+  ret[dll] = "binaries/" + Fmu3::dll_infix() + "/" + name + dll_suffix();
+  return ret;
+}
+
+std::string FmuInternal::pack_fmu(const Dict& files, const std::string& path) {
+  casadi_assert(Archiver::has_plugin("libzip"),
+    "pack_fmu requires libzip. Compile CasADi with WITH_LIBZIP=ON.");
+  // The {local_file -> archive path} map is exactly the set of zip entries: no staging
+  // directory or copies required.
+  std::vector<std::pair<std::string, std::string>> entries;
+  for (auto&& kv : files) {
+    std::string arc = kv.second.to_string();
+    if (arc.substr(0, 2) == "./") arc = arc.substr(2);  // zip entries are root-relative
+    entries.push_back({kv.first, arc});
+  }
+  std::string out = path;
+  if (out.size() < 4 || out.substr(out.size() - 4) != ".fmu") out += ".fmu";
+  casadi_assert(Archiver::getPlugin("libzip").exposed.pack_entries(entries, out),
+    "Packing FMU '" + out + "' failed.");
+  // Clean up the loose files
+  for (auto&& e : entries) Filesystem::remove(e.first);
+  return out;
 }
 
 std::string FmuInternal::desc_in(FmuMemory* m, size_t id, bool more) const {
