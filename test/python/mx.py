@@ -1769,7 +1769,7 @@ class MXtests(casadiTestCase):
           if refcount:
             self.assertNotEqual(str(A),str(B))
             print(A)
-            f = f.simplify()
+            f = f.transform()
             fref = ca.Function('f',args,[B])
             self.assertEqual(str(f.call(args,True,False)),str(fref.call(args,True,False)))
           else:
@@ -2671,7 +2671,7 @@ class MXtests(casadiTestCase):
     z = ca.project(y, ca.sparsify(ca.blockcat([[0,0,0],[1,1,1],[1,1,1]])).sparsity())
     
     f = ca.Function('f',[x],[z])
-    fs = f.simplify()
+    fs = f.transform()
     self.assertTrue(fs.n_nodes()>3)
 
     self.checkfunction(f,fs,inputs=[X0])
@@ -2679,8 +2679,8 @@ class MXtests(casadiTestCase):
     z = ca.project(y, ca.sparsify(ca.blockcat([[1,0,0],[0,0,0],[0,0,1]])).sparsity())
     
     f = ca.Function('f',[x],[z])
-    fs = f.simplify()
-    
+    fs = f.transform()
+
     self.assertTrue(fs.n_nodes(),3)
     
     fs.disp(True)

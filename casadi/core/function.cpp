@@ -327,15 +327,161 @@ namespace casadi {
     return Function(name, ex_in, ex_out, name_in(), name_out(), my_opts);
   }
 
-  Function Function::simplify(const Dict& opts) const {
-    return simplify(name(), opts);
+  // Stringify a single pass token (string, integer or dict) for copy-paste
+  std::string transform_token_str(const GenericType& g) {
+    if (g.is_int()) return str(g.to_int());
+    if (g.is_string()) return "\"" + g.to_string() + "\"";
+    if (g.is_dict()) return str(g.to_dict());
+    return "?";
+  }
+  // Stringify the whole pass list as a copy-pasteable literal
+  std::string transform_passes_str(const std::vector<std::vector<GenericType> >& ps) {
+    std::string s = "[";
+    for (size_t i=0; i<ps.size(); ++i) {
+      if (i) s += ", ";
+      s += "[";
+      for (size_t j=0; j<ps[i].size(); ++j) {
+        if (j) s += ", ";
+        s += transform_token_str(ps[i][j]);
+      }
+      s += "]";
+    }
+    return s + "]";
+  }
+  // A few cheap stats describing a function's graph size
+  std::string transform_stats(const Function& f) {
+    std::string s;
+    try { s += "n_nodes=" + str(f.n_nodes()); } catch (...) { s += "n_nodes=?"; }
+    try { s += ", n_instructions=" + str(f.n_instructions()); } catch (...) {}
+    return s;
   }
 
-  Function Function::simplify(const std::string& name, const Dict& opts) const {
+  Function Function::transform(const Dict& opts) const {
+    return transform(name(), opts);
+  }
+
+  Function Function::transform(const std::string& fname, const Dict& opts) const {
     try {
-      return (*this)->simplify(name, opts);
+      // Boolean shorthands (defaults reproduce the meaningful default flow)
+      bool empty_inputs = true;
+      bool combine_terms = false;
+      bool cse = true;
+      bool ref_count = true;
+      bool const_folding = true;
+      bool verbose = false;
+      for (auto&& op : opts) {
+        if (op.first=="empty_inputs") {
+          empty_inputs = op.second;
+        } else if (op.first=="combine_terms") {
+          combine_terms = op.second;
+        } else if (op.first=="cse") {
+          cse = op.second;
+        } else if (op.first=="ref_count") {
+          ref_count = op.second;
+        } else if (op.first=="const_folding") {
+          const_folding = op.second;
+        } else if (op.first=="verbose") {
+          verbose = op.second;
+        } else {
+          casadi_error("transform: no such option: " + std::string(op.first) + ".\n");
+        }
+      }
+      std::vector<GenericType> simp = {std::string("simplify")};
+      if (empty_inputs) simp.push_back("empty_inputs");
+      if (combine_terms) simp.push_back("combine_terms");
+      if (cse) simp.push_back("cse");
+      if (ref_count) { simp.push_back(0); simp.push_back("ref_count"); }  // 0 = fixed point
+      if (const_folding) simp.push_back("const_folding");
+      return transform(fname, std::vector<std::vector<GenericType> >{simp}, {{"verbose", verbose}});
     } catch(std::exception& e) {
-      THROW_ERROR("simplify", e.what());
+      THROW_ERROR("transform", e.what());
+    }
+  }
+
+  Function Function::transform(const std::vector<std::vector<GenericType> >& passes,
+                               const Dict& opts) const {
+    return transform(name(), passes, opts);
+  }
+
+  Function Function::transform(const std::string& fname,
+                               const std::vector<std::vector<GenericType> >& passes,
+                               const Dict& opts) const {
+    try {
+      // Only 'verbose' is accepted here; boolean simplify options belong to the
+      // dict-only overload
+      bool verbose = false;
+      for (auto&& op : opts) {
+        if (op.first=="verbose") {
+          verbose = op.second;
+        } else {
+          casadi_error("transform(passes, opts): unsupported option '" + std::string(op.first)
+            + "' (boolean simplify options are only allowed in the dict-only form).\n");
+        }
+      }
+
+      if (verbose) {
+        uout() << "transform(" << transform_passes_str(passes) << ")" << std::endl;
+        uout() << "  start: " << transform_stats(*this) << std::endl;
+      }
+
+      // Run the pipeline
+      Function f = *this;
+      for (const auto& pass : passes) {
+        casadi_assert(!pass.empty(), "transform: each pass must be a non-empty list");
+        std::string verb = pass.front().to_string();
+        if (verb=="simplify") {
+          // Tasks are strings; an optional integer before a task sets its run
+          // count (N>0: run N times, 0: run until a fixed point). Default: 1.
+          std::vector<std::pair<std::string, casadi_int> > tasks;
+          casadi_int count = 1;
+          bool have_count = false;
+          for (size_t i=1; i<pass.size(); ++i) {
+            if (pass[i].is_int()) {
+              count = pass[i].to_int();
+              have_count = true;
+            } else {
+              tasks.push_back({pass[i].to_string(), count});
+              count = 1;
+              have_count = false;
+            }
+          }
+          casadi_assert(!have_count,
+            "transform 'simplify': trailing run count with no following task");
+          f = f->simplify_passes(tasks);
+        } else if (verb=="expand") {
+          casadi_assert(pass.size()==1, "transform: 'expand' pass takes no arguments");
+          f = f.expand();
+        } else if (verb=="external") {
+          casadi_assert(pass.size()>=3 && pass.size()<=4,
+            "transform: 'external' pass must be {\"external\", library, operation[, opts]}");
+          std::string lib = pass[1].to_string();
+          std::string op = pass[2].to_string();
+          Dict eopts = pass.size()==4 ? pass[3].to_dict() : Dict();
+          f = external_transform(lib, op, f, eopts);
+        } else {
+          casadi_error("transform: unknown pass verb '" + verb + "'");
+        }
+        if (verbose) {
+          uout() << "  after " << transform_passes_str({pass}) << ": "
+                 << transform_stats(f) << std::endl;
+        }
+      }
+
+      // Optionally rename the result (type-preserving for SX/MX functions)
+      if (!fname.empty() && fname!=f.name()) {
+        Dict ropts{{"allow_free", true}, {"allow_duplicate_io_names", true}};
+        std::vector<std::string> ni = f.name_in(), no = f.name_out();
+        if (f.is_a("SXFunction", true)) {
+          std::vector<SX> arg = f.sx_in();
+          f = Function(fname, arg, f(arg), ni, no, ropts);
+        } else {
+          std::vector<MX> arg = f.mx_in();
+          f = Function(fname, arg, f(arg), ni, no, ropts);
+        }
+      }
+      return f;
+    } catch(std::exception& e) {
+      THROW_ERROR("transform", e.what());
     }
   }
 

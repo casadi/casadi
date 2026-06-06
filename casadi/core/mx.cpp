@@ -1301,8 +1301,34 @@ namespace casadi {
     return x->get_norm_inf();
   }
 
+  bool MX::simplify_combine_terms(std::vector<MX>& arg,
+                                 std::vector<MX>& res,
+                                 const Dict& opts) {
+    // No term-combining available for MX; leave the graph untouched
+    return false;
+  }
+
   MX MX::simplify(const MX& x) {
     return x;
+  }
+
+  MX MX::transform(const MX& x, const Dict& opts) {
+    // Route through Function::transform
+    std::vector<MX> arg = symvar(x);
+    Function f("transform", arg, {x},
+               {{"allow_free", true}, {"allow_duplicate_io_names", true}});
+    f = f.transform(opts);
+    return f(arg).at(0);
+  }
+
+  MX MX::transform(const MX& x,
+      const std::vector<std::vector<GenericType> >& passes, const Dict& opts) {
+    // Route through Function::transform
+    std::vector<MX> arg = symvar(x);
+    Function f("transform", arg, {x},
+               {{"allow_free", true}, {"allow_duplicate_io_names", true}});
+    f = f.transform(passes, opts);
+    return f(arg).at(0);
   }
 
   MX MX::reshape(const MX& x, casadi_int nrow, casadi_int ncol) {

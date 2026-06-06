@@ -698,6 +698,9 @@ namespace casadi {
     static bool contains_all(const std::vector<MX>& v, const std::vector<MX> &n);
     static bool contains_any(const std::vector<MX>& v, const std::vector<MX> &n);
     static MX simplify(const MX& x);
+    static MX transform(const MX& x, const Dict& opts = Dict());
+    static MX transform(const MX& x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
     static MX dot(const MX& x, const MX& y);
     static MX mrdivide(const MX& a, const MX& b);
     static MX mldivide(const MX& a, const MX& b);
@@ -784,6 +787,11 @@ namespace casadi {
 
     // Simplification with constant folding
     static bool simplify_const_folding(std::vector<MX>& arg,
+                                   std::vector<MX>& res,
+                                   const Dict& opts = Dict());
+
+    // Simplification by combining like terms in linear combinations
+    static bool simplify_combine_terms(std::vector<MX>& arg,
                                    std::vector<MX>& res,
                                    const Dict& opts = Dict());
 

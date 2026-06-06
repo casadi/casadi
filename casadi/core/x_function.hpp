@@ -160,10 +160,18 @@ namespace casadi {
     Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
                    const std::vector<casadi_int>& order_out, const Dict& opts) const override;
 
-    /** \brief Create a new function with simplifications applied
+    /** \brief Apply an ordered list of simplify passes */
+    Function simplify_passes(
+        const std::vector<std::pair<std::string, casadi_int> >& tasks) const override;
 
-        \identifier{2eg} */
-    Function simplify(const std::string& name, const Dict& opts) const override;
+    /** \brief Apply simplify passes in-place on a set of inputs/outputs
+
+        Each pass is a (task, count) pair; count>0 runs the task that many times,
+        count==0 runs it until a fixed point. */
+    void apply_simplify_passes(
+                      const std::vector<std::pair<std::string, casadi_int> >& tasks,
+                      std::vector<MatType>& new_in,
+                      std::vector<MatType>& new_out) const;
 
     /** \brief Generate code for the declarations of the C function
 
@@ -1024,60 +1032,62 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>
+  ::apply_simplify_passes(
+      const std::vector<std::pair<std::string, casadi_int> >& tasks,
+      std::vector<MatType>& new_in,
+      std::vector<MatType>& new_out) const {
+    for (const auto& tc : tasks) {
+      const std::string& task = tc.first;
+      // count>0: run exactly that many times; count==0: run until a fixed point
+      casadi_int count = tc.second;
+      casadi_assert(count>=0,
+        "simplify task '" + task + "': run count must be >= 0 (0 = until fixed point)");
+      casadi_int prev_nodes = -1;
+      casadi_int max_iter = count==0 ? 100 : count;
+      for (casadi_int it=0; it<max_iter; ++it) {
+        if (task=="empty_inputs") {
+          // What symbols occur in the outputs?
+          std::vector<MatType> syms = MatType::symvar(veccat(new_out));
+          // Loop over inputs
+          for (MatType& e : new_in) {
+            // If current input symbols do not occur in outputs
+            if (!contains_any(syms, MatType::symvar(e))) {
+              // Replace input by an empty matrix
+              e = MatType(e.size());
+            }
+          }
+        } else if (task=="combine_terms") {
+          MatType::simplify_combine_terms(new_in, new_out);
+        } else if (task=="cse") {
+          new_out = MatType::cse(new_out);
+        } else if (task=="ref_count") {
+          MatType::simplify_ref_count(new_in, new_out);
+        } else if (task=="const_folding") {
+          MatType::simplify_const_folding(new_in, new_out);
+        } else {
+          casadi_error("No such simplify task: '" + task + "'.\n");
+        }
+        if (count!=0) continue;
+        // Stop once the graph size stops shrinking
+        casadi_int nodes = MatType::n_nodes(veccat(new_out));
+        if (prev_nodes != -1 && nodes >= prev_nodes) break;
+        prev_nodes = nodes;
+      }
+    }
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::simplify(const std::string& name, const Dict& opts) const {
+  ::simplify_passes(
+      const std::vector<std::pair<std::string, casadi_int> >& tasks) const {
     std::vector<MatType> new_in = in_;
     std::vector<MatType> new_out = out_;
     Dict final_options = generate_options("clone");
     final_options["allow_duplicate_io_names"] = true;
     final_options["allow_free"] = true;
-
-    bool empty_inputs = true;
-    bool cse = true;
-    bool ref_count = true;
-    bool const_folding = true;
-    for (auto&& op : opts) {
-      if (op.first=="empty_inputs") {
-        empty_inputs = op.second;
-      } else if (op.first=="cse") {
-        cse = op.second;
-      } else if (op.first=="ref_count") {
-        ref_count = op.second;
-      } else if (op.first=="const_folding") {
-        const_folding = op.second;
-      } else {
-        casadi_error("No such simplify option: " + std::string(op.first) + ".\n");
-      }
-    }
-
-    if (empty_inputs) {
-      // What symbols occur in the outputs?
-      std::vector<MatType> syms = MatType::symvar(veccat(out_));
-      // Loop over inputs
-      for (MatType& e : new_in) {
-        // If current input symbols do not occur in outputs
-        if (!contains_any(syms, MatType::symvar(e))) {
-          // Replace input by an empty matrix
-          e = MatType(e.size());
-        }
-      }
-    }
-
-    if (cse) {
-      new_out = MatType::cse(new_out);
-    }
-
-    if (ref_count) {
-      for (casadi_int i=0;i<5; ++i) {
-        MatType::simplify_ref_count(new_in, new_out);
-      }
-    }
-
-    if (const_folding) {
-      MatType::simplify_const_folding(new_in, new_out);
-    }
-
-    return Function(name, new_in, new_out, name_in_, name_out_, final_options);
+    apply_simplify_passes(tasks, new_in, new_out);
+    return Function(name_, new_in, new_out, name_in_, name_out_, final_options);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

@@ -208,20 +208,35 @@ namespace casadi {
                     const Dict& opts=Dict()) const;
     ///@}
 
-    /** \brief Create a new function with simplifications applied
-    *
-    * The following list of boolean options can be provided:
-    * - cse (default true): Common subexpression elimination
-    * - const_folding (default true): Constant folding
-    * - empty_inputs (default true): inputs that are not used become structurally empty
-    * - ref_count (default true): reference count aware simplification
-    *
+    /** \brief Apply transformation passes
 
-        \identifier{2ef} */
-    /// @{
-    Function simplify(const std::string& name, const Dict& opts=Dict()) const;
-    Function simplify(const Dict& opts=Dict()) const;
-    /// @}
+    * Options:
+    * - passes (OT_VECTORVECTOR): an ordered list of passes. Each pass is a list
+    *   whose first entry is the verb:
+    *   - {"simplify", task, ...}: graph simplification passes applied in order
+    *     (cse, ref_count, const_folding, combine_terms, empty_inputs).
+    *     An integer before a task sets its run count (N>0: N times, 0: until a
+    *     fixed point); the default is 1.
+    *   - {"expand"}: expand to an SXFunction
+    *   - {"external", library, operation, opts}: apply an externally defined
+    *     transform (opts is an optional dict)
+    * - boolean shorthands (used only when "passes" is absent): empty_inputs,
+    *   combine_terms, cse, ref_count, const_folding. These build a single
+    *   "simplify" pass.
+    *
+    * The dict-only form applies a default simplification flow when empty.
+    * The (passes, opts) form runs an explicit pipeline; its opts accepts only
+    * "verbose" (the boolean simplify options are rejected there).
+    */
+    ///@{
+    Function transform(const Dict& opts = Dict()) const;
+    Function transform(const std::string& fname, const Dict& opts = Dict()) const;
+    Function transform(const std::vector<std::vector<GenericType> >& passes,
+                       const Dict& opts = Dict()) const;
+    Function transform(const std::string& fname,
+                       const std::vector<std::vector<GenericType> >& passes,
+                       const Dict& opts = Dict()) const;
+    ///@}
 
     /// \cond INTERNAL
 #ifndef SWIG
