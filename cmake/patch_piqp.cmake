@@ -28,3 +28,19 @@ string(REPLACE
   "    if (WIN32 AND CMAKE_VERSION VERSION_GREATER_EQUAL \"3.21\")\n        add_custom_command("
   txt "${txt}")
 file(WRITE "${PIQP_TOP}" "${txt}")
+
+# Zero-initialise the bound-index arrays in {sparse,dense} Data::resize().
+# PIQP fills h_l_idx/h_u_idx/x_l_idx/x_u_idx only for FINITE bounds; the tail
+# (for +/-inf bounds, i.e. essentially every LP) stays uninitialised and is
+# read in KKTSystem::solve. Harmless on glibc, but the garbage intermittently
+# derails the interior-point solve on the mingw Windows build (flaky LP
+# failures). Verified with valgrind: this drops 6 -> 0 uninitialised reads.
+foreach(dt "sparse/data.tpp" "dense/data.tpp")
+  set(f "${SRC}/include/piqp/${dt}")
+  file(READ "${f}" txt)
+  string(REPLACE
+    "    h_l_idx.resize(m);\n    h_u_idx.resize(m);\n    x_l_idx.resize(n);\n    x_u_idx.resize(n);"
+    "    h_l_idx.resize(m);\n    h_u_idx.resize(m);\n    x_l_idx.resize(n);\n    x_u_idx.resize(n);\n    h_l_idx.setZero(); h_u_idx.setZero(); x_l_idx.setZero(); x_u_idx.setZero();"
+    txt "${txt}")
+  file(WRITE "${f}" "${txt}")
+endforeach()
