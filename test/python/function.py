@@ -4562,18 +4562,18 @@ class Functiontests(casadiTestCase):
     y = ca.MX.sym("y",5)
     f = ca.Function('test_func', [x, y], [x + y])
 
-    # Test simplify without name argument
-    f_simplified = f.simplify()
+    # No name argument: default simplify flow, original name preserved
+    f_simplified = f.transform()
     self.assertIsInstance(f_simplified, ca.Function)
     self.assertEqual(f_simplified.name(), 'test_func')
 
-    # Test simplify with same name argument (should return same function)
-    f_same_name = f.simplify("test_func")
+    # Same name argument
+    f_same_name = f.transform("test_func")
     self.assertIsInstance(f_same_name, ca.Function)
     self.assertEqual(f_same_name.name(), 'test_func')
 
-    # Test simplify with different name argument (should return wrapped function with new name)
-    f_renamed = f.simplify("new_name")
+    # Different name argument renames the result
+    f_renamed = f.transform("new_name")
     self.assertIsInstance(f_renamed, ca.Function)
     self.assertEqual(f_renamed.name(), 'new_name')
 
@@ -4583,10 +4583,11 @@ class Functiontests(casadiTestCase):
     x = ca.MX.sym("x",5)
     y = ca.MX.sym("y",5)
     f = ca.Function('test_func', [x, y], [x])
-    f_simplified = f.simplify()
+    f_simplified = f.transform([["simplify","empty_inputs"]])
 
-    self.assertTrue(f.nnz_in(0), 5)
-    self.assertTrue(f_simplified.nnz_in(0), 0)
+    self.assertEqual(f.nnz_in(0), 5)
+    self.assertEqual(f_simplified.nnz_in(0), 5)   # x is used
+    self.assertEqual(f_simplified.nnz_in(1), 0)   # y is unused -> emptied
 
     # Test that simplified functions work correctly
     self.checkfunction_light(f,f_simplified,inputs=[2.0,3.0])
@@ -4642,7 +4643,7 @@ class Functiontests(casadiTestCase):
 
     for f, ref in tests():
         ref.disp(True)
-        fs = f.simplify()
+        fs = f.transform()
         
         fs.disp(True)
         
@@ -4669,14 +4670,133 @@ class Functiontests(casadiTestCase):
     f = ca.Function('f',[x],[(x*(2*C)+(2*C))*C[0]])
 
 
-    fs = f.simplify()
+    fs = f.transform()
     inputs = [ca.DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
     self.checkfunction_light(f,fs,inputs=inputs)
     
     fs.disp(True)
     self.assertEqual(fs.n_nodes(),7)
 
-    
+  def test_simplify_combine_terms(self):
+    # issue #4227: expression-level simplify routes through Function.simplify
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+
+    def numeq(expr, ref):
+      fe = ca.Function("fe", [x, y], [expr])
+      fr = ca.Function("fr", [x, y], [ref])
+      for vx, vy in [(0.3, 1.7), (-2.0, 4.5)]:
+        self.checkarray(fe(vx, vy), fr(vx, vy))
+
+    def nnodes(expr):
+      return ca.Function("f", [x, y], [expr]).n_nodes()
+
+    # like terms get combined into a single weighted term
+    s1 = ca.simplify(8*y-3*y)
+    numeq(s1, 5*y)
+    self.assertTrue(nnodes(s1) < nnodes(8*y-3*y))
+
+    s2 = ca.simplify(8*(5*x)-3*(x+3+((12*x)-x)-17*x))
+    numeq(s2, 55*x-9)
+    self.assertTrue(nnodes(s2) < nnodes(8*(5*x)-3*(x+3+((12*x)-x)-17*x)))
+
+    # the same combining is available as a transform pass on a Function
+    f = ca.Function("f",[x],[8*x-3*x])
+    fc = f.transform([["simplify","combine_terms"]])
+    self.checkfunction_light(f,fc,inputs=[2.0])
+    self.assertTrue(fc.n_nodes() < f.n_nodes())
+
+    # free simplify(MX) is a no-op (unchanged, long-standing behaviour)
+    a = ca.MX.sym("a")
+    b = ca.MX.sym("b")
+    e = -(a-b)
+    self.assertTrue(ca.is_equal(ca.simplify(e), e, 2))
+
+  def test_transform(self):
+    # issue #4227: ordered transformation passes
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+
+    # free-function transform on an expression, "simplify" verb + tasks
+    s = ca.transform(8*y-3*y, [["simplify","combine_terms"]])
+    fe = ca.Function("fe",[x,y],[s])
+    fr = ca.Function("fr",[x,y],[5*y])
+    for vx,vy in [(0.3,1.7),(-2.0,4.5)]:
+      self.checkarray(fe(vx,vy), fr(vx,vy))
+
+    # Function.transform with an ordered list; 0 = run a pass until fixed point
+    a = ca.MX.sym("a")
+    b = ca.MX.sym("b")
+    f = ca.Function("f",[a,b],[-(a-b)])
+    ft = f.transform([["simplify",0,"ref_count","const_folding"]])
+    self.checkfunction_identical(ft, ca.Function("f",[a,b],[b-a]))
+    self.assertTrue(ft.n_nodes() < f.n_nodes())
+
+    # a positive integer runs a pass a fixed number of times
+    ft2 = f.transform([["simplify",2,"ref_count"]])
+    self.checkfunction_identical(ft2, ca.Function("f",[a,b],[b-a]))
+
+    # name forms: default keeps the original name, explicit name renames
+    self.assertEqual(f.transform().name(), "f")
+    self.assertEqual(f.transform([["simplify","cse"]]).name(), "f")
+    self.assertEqual(f.transform("g").name(), "g")
+    self.assertEqual(f.transform("g", [["simplify","cse"]]).name(), "g")
+    self.assertEqual(f.transform("g", dict(cse=True)).name(), "g")
+    fr = f.transform("g", [["simplify",0,"ref_count","const_folding"]])
+    self.checkfunction_identical(fr, ca.Function("g",[a,b],[b-a]))
+
+    # no-argument, empty dict, and all-default booleans apply the default flow
+    fd_noarg = f.transform()
+    fd_empty = f.transform({})
+    fd_bool = f.transform(dict(combine_terms=False))
+    for fd in [fd_noarg, fd_empty, fd_bool]:
+      self.checkfunction_identical(fd, ca.Function("f",[a,b],[b-a]))
+
+    # an explicit empty pass list is a no-op (distinct from default flow)
+    fd_none = f.transform([])
+    self.checkfunction_identical(fd_none, f)
+
+    # boolean shorthands forward to a single "simplify" pass
+    s = ca.SX.sym("s")
+    g = ca.Function("g",[s],[8*s-3*s])
+    gc = g.transform(dict(combine_terms=True))
+    self.checkfunction_light(g, gc, inputs=[2.0])
+    self.assertTrue(gc.n_nodes() < g.n_nodes())
+    with self.assertRaises(Exception):
+      g.transform(dict(bogus=True))
+    # the (passes, opts) form rejects boolean simplify options in opts
+    with self.assertRaises(Exception):
+      g.transform([["simplify","cse"]], dict(cse=True))
+
+    # expand pass turns an MXFunction into an SXFunction
+    fx = f.transform([["expand"]])
+    self.assertEqual(fx.class_name(), "SXFunction")
+    self.checkfunction_light(f, fx, inputs=[1.0, 2.0])
+
+    # unknown verb / task raise
+    with self.assertRaises(Exception):
+      f.transform([["bogus"]])
+    with self.assertRaises(Exception):
+      f.transform([["simplify","nope"]])
+    # a negative run count is rejected
+    with self.assertRaises(Exception):
+      f.transform([["simplify",-1,"ref_count"]])
+
+    # external pass adopts external_transform, with an optional opts dict
+    if sys.platform != 'darwin':
+      libcasadi = ca.CasadiMeta.shared_library_prefix()+"casadi"
+      g = ca.Function("g",[x],[x**2])
+      with self.assertOutputs(["Doing","bar"],["Warning"]):
+        gt = g.transform([["external", libcasadi,
+                           "external_transform_test_success", {"foo": "bar"}]])
+      self.checkfunction(g, gt, inputs=[3])
+
+    # verbose prints the copy-pasteable passes and per-pass stats
+    with self.assertOutputs(["transform(", "n_nodes"],[]):
+      f.transform([["simplify",0,"ref_count"]], dict(verbose=True))
+    with self.assertOutputs(["transform(", "n_nodes"],[]):
+      f.transform(dict(verbose=True))
+
   def test_duplicate_check(self):
     x = ca.MX()
     f = ca.Function('f',[x],[2*x])

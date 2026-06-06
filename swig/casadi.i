@@ -2667,6 +2667,7 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
 // With it, docstrings are screwed
 %casadi_typemaps("GenericType", "GenericType", "GenericType", PREC_GENERICTYPE, casadi::GenericType)
 %casadi_template(LL "GenericType" LR, "Sequence[GenericType]", "list[GenericType]", PREC_GENERICTYPE, std::vector<casadi::GenericType>)
+%casadi_template(LL LL "GenericType" LR LR, "Sequence[Sequence[GenericType]]", "list[list[GenericType]]", PREC_GENERICTYPE, std::vector<std::vector<casadi::GenericType> >)
 %casadi_typemaps("Slice", "Slice", "Slice", PREC_SLICE, casadi::Slice)
 %casadi_typemaps("Function", "Function", "Function", PREC_FUNCTION, casadi::Function)
 %casadi_template(LL "Function" LR, "Sequence[Function]", "list[Function]", PREC_FUNCTION, std::vector<casadi::Function>)
@@ -3546,6 +3547,14 @@ DECL M casadi_mldivide(const M& x, const M& y) {
 
 DECL std::vector< M > casadi_symvar(const M& x) {
   return symvar(x);
+}
+
+DECL M casadi_transform(const M& x, const casadi::Dict& opts = casadi::Dict()) {
+  return transform(x, opts);
+}
+
+DECL M casadi_transform(const M& x, const std::vector< std::vector< casadi::GenericType > >& passes, const casadi::Dict& opts = casadi::Dict()) {
+  return transform(x, passes, opts);
 }
 
 DECL M casadi_bilin(const M& A, const M& x, const M& y) {

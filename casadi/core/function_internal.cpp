@@ -3929,12 +3929,10 @@ namespace casadi {
     return f.which_depends(s_in, s_out, order, tr);
   }
 
-  Function FunctionInternal::simplify(const std::string& name, const Dict& opts) const {
-    if (name==name_) {
-      return self();
-    } else {
-      return wrap(name);
-    }
+  Function FunctionInternal::simplify_passes(
+      const std::vector<std::pair<std::string, casadi_int> >& tasks) const {
+    casadi_assert(tasks.empty(), "simplify passes not supported for " + class_name());
+    return self();
   }
 
   const Function& FunctionInternal::oracle() const {

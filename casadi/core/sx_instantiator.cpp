@@ -444,6 +444,23 @@ namespace casadi {
   }
 
   template<>
+  bool CASADI_EXPORT SX::simplify_combine_terms(std::vector<SX>& arg,
+                                   std::vector<SX>& res,
+                                   const Dict& opts) {
+    for (SX& r : res) {
+      for (casadi_int el=0; el<r.nnz(); ++el) {
+        // Start by expanding the node to a weighted sum
+        SX terms, weights;
+        expand(r.nz(el), weights, terms);
+
+        // Make a scalar product to get the simplified expression
+        r.nz(el) = mtimes(terms.T(), weights);
+      }
+    }
+    return true;
+  }
+
+  template<>
   SX CASADI_EXPORT SX::simplify(const SX& x) {
     SX r = x;
     for (casadi_int el=0; el<r.nnz(); ++el) {
@@ -455,6 +472,27 @@ namespace casadi {
       r.nz(el) = mtimes(terms.T(), weights);
     }
     return r;
+  }
+
+  template<>
+  SX CASADI_EXPORT SX::transform(const SX& x, const Dict& opts) {
+    // Route through Function::transform
+    std::vector<SX> arg = symvar(x);
+    Function f("transform", arg, {x},
+               {{"allow_free", true}, {"allow_duplicate_io_names", true}});
+    f = f.transform(opts);
+    return f(arg).at(0);
+  }
+
+  template<>
+  SX CASADI_EXPORT SX::transform(const SX& x,
+      const std::vector<std::vector<GenericType> >& passes, const Dict& opts) {
+    // Route through Function::transform
+    std::vector<SX> arg = symvar(x);
+    Function f("transform", arg, {x},
+               {{"allow_free", true}, {"allow_duplicate_io_names", true}});
+    f = f.transform(passes, opts);
+    return f(arg).at(0);
   }
 
   template<>

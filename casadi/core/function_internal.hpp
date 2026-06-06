@@ -388,10 +388,12 @@ namespace casadi {
                                            const std::vector<std::string>& s_out,
                                            casadi_int order, bool tr=false) const;
 
-    /** \brief Create a new function with simplifications applied
+    /** \brief Apply an ordered list of simplify passes (used by transform)
 
-        \identifier{2ee} */
-    virtual Function simplify(const std::string& name, const Dict& opts) const;
+        Each pass is a (task, count) pair; count>0 runs the task that many times,
+        count==0 runs it until a fixed point. */
+    virtual Function simplify_passes(
+        const std::vector<std::pair<std::string, casadi_int> >& tasks) const;
 
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm?
