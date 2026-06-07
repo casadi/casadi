@@ -1,40 +1,79 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-if(NOT EMSCRIPTEN)
+# Three-stage build, mirroring swig/python and swig/matlab:
+#   SWIG_EXPORT  -- run SWIG only; emit the wrapper (casadi.cpp/.js/.d.ts/
+#                   .exports) into target/source for a downstream consumer.
+#                   Runs in the SWIG codegen image (no Emscripten needed).
+#   SWIG_IMPORT  -- compile the pre-generated wrapper against an already-built
+#                   core; SWIG is NOT required (the wasm toolchain image ships
+#                   no SWIG).  Emscripten.
+#   neither      -- local all-in-one: run SWIG inline, then build.  Emscripten.
+
+# Emscripten is required to *build* (IMPORT / local), but not to merely
+# *generate* the wrapper sources (EXPORT).
+if(NOT EMSCRIPTEN AND NOT SWIG_EXPORT)
   message(WARNING "WITH_WASM_JS=ON but build is not Emscripten; skipping. "
                   "Use 'emcmake cmake ..' to configure for WebAssembly.")
   return()
 endif()
 
-# Patched-SWIG -wasm-js capability check.
-execute_process(
-  COMMAND ${SWIG_EXECUTABLE} -help
-  OUTPUT_VARIABLE _swig_help
-  ERROR_VARIABLE  _swig_help_err
-)
-string(FIND "${_swig_help}${_swig_help_err}" "-wasm-js" _has_wasmjs)
-if(_has_wasmjs EQUAL -1)
-  message(FATAL_ERROR
-    "SWIG at ${SWIG_EXECUTABLE} lacks -wasm-js. Use the casadi-patched "
-    "SWIG fork (see ~/programs/swig).")
+set(_iface     ${PROJECT_SOURCE_DIR}/swig/casadi.i)
+# Pre-generated-wrapper surface a SWIG_IMPORT build consumes (committed/
+# shipped by the SWIG_EXPORT producer), same layout as swig/python/target.
+set(_wrap_dir  ${CMAKE_CURRENT_SOURCE_DIR}/target/source)
+
+if(SWIG_IMPORT)
+  message(STATUS "SWIG_IMPORT: compiling pre-generated wasm-js wrapper; SWIG not invoked")
+  set(_swig_cpp  ${_wrap_dir}/casadi.cpp)
+  set(_swig_js   ${_wrap_dir}/casadi.js)
+  set(_swig_dts  ${_wrap_dir}/casadi.d.ts)
+  set(_swig_exp  ${_wrap_dir}/casadi.cpp.exports)
+  set_source_files_properties(${_swig_cpp} PROPERTIES GENERATED ON)
+else()
+  # Patched-SWIG -wasm-js capability check (only when we actually run SWIG).
+  execute_process(
+    COMMAND ${SWIG_EXECUTABLE} -help
+    OUTPUT_VARIABLE _swig_help
+    ERROR_VARIABLE  _swig_help_err
+  )
+  string(FIND "${_swig_help}${_swig_help_err}" "-wasm-js" _has_wasmjs)
+  if(_has_wasmjs EQUAL -1)
+    message(FATAL_ERROR
+      "SWIG at ${SWIG_EXECUTABLE} lacks -wasm-js. Use the casadi-patched "
+      "SWIG fork (see ~/programs/swig).")
+  endif()
+
+  if(SWIG_EXPORT)
+    set(_out_dir ${_wrap_dir})
+    file(MAKE_DIRECTORY ${_out_dir})
+  else()
+    set(_out_dir ${CMAKE_CURRENT_BINARY_DIR})
+  endif()
+  set(_swig_cpp  ${_out_dir}/casadi.cpp)
+  set(_swig_js   ${_out_dir}/casadi.js)
+  set(_swig_dts  ${_out_dir}/casadi.d.ts)
+  set(_swig_exp  ${_out_dir}/casadi.cpp.exports)
+
+  add_custom_command(
+    OUTPUT  ${_swig_cpp} ${_swig_js} ${_swig_dts} ${_swig_exp}
+    COMMAND ${SWIG_EXECUTABLE} -wasm-js -stubs -c++
+            -I${PROJECT_SOURCE_DIR}
+            -I${PROJECT_SOURCE_DIR}/swig
+            -o ${_swig_cpp} ${_iface}
+    DEPENDS ${_iface}
+    COMMENT "swig -wasm-js -stubs -> casadi.cpp + casadi.js + casadi.d.ts + exports"
+    VERBATIM
+  )
+
+  if(SWIG_EXPORT)
+    # Codegen-only target (the SWIG job builds this; no Emscripten core).
+    add_custom_target(wasm_source DEPENDS ${_swig_cpp} ${_swig_js} ${_swig_dts} ${_swig_exp})
+  endif()
 endif()
 
-set(_iface     ${PROJECT_SOURCE_DIR}/swig/casadi.i)
-set(_swig_cpp  ${CMAKE_CURRENT_BINARY_DIR}/casadi.cpp)
-set(_swig_js   ${CMAKE_CURRENT_BINARY_DIR}/casadi.js)
-set(_swig_dts  ${CMAKE_CURRENT_BINARY_DIR}/casadi.d.ts)
-set(_swig_exp  ${CMAKE_CURRENT_BINARY_DIR}/casadi.cpp.exports)
-
-add_custom_command(
-  OUTPUT  ${_swig_cpp} ${_swig_js} ${_swig_dts} ${_swig_exp}
-  COMMAND ${SWIG_EXECUTABLE} -wasm-js -stubs -c++
-          -I${PROJECT_SOURCE_DIR}
-          -I${PROJECT_SOURCE_DIR}/swig
-          -o ${_swig_cpp} ${_iface}
-  DEPENDS ${_iface}
-  COMMENT "swig -wasm-js -stubs -> casadi.cpp + casadi.js + casadi.d.ts + exports"
-  VERBATIM
-)
+# Under SWIG_EXPORT we only emit sources -- the main module + side-module
+# plugins need the (Emscripten) core, which the codegen image doesn't build.
+if(NOT SWIG_EXPORT)
 
 # ----------------------------------------------------------------------------
 # casadi_wasm MAIN_MODULE
@@ -314,3 +353,5 @@ foreach(_asset index.html)
     ${CMAKE_CURRENT_BINARY_DIR}/${_asset}
     COPYONLY)
 endforeach()
+
+endif() # NOT SWIG_EXPORT

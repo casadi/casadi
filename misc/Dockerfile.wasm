@@ -1,0 +1,36 @@
+# Toolchain image for the CasADi WebAssembly + JavaScript build.
+#
+# Pure toolchain ONLY -- no SWIG, no CasADi, no third-party plugins are
+# baked in.  Everything CasADi-specific (the wasm-js SWIG fork, libcasadi,
+# the Fortran/C++ third-party libraries) is built from source by the CI
+# job, so this image stays generic and rarely needs rebuilding.
+#
+# Provides:
+#   - flang targeting wasm32-unknown-emscripten + libFortranRuntime.a
+#     (from r-wasm/flang-wasm; the descriptor-ABI fix is upstream now, so
+#      no local runtime override is needed)
+#   - emsdk (emcc/em++/wasm-ld + node)
+#   - the autotools/bison/pcre build deps needed to compile SWIG and the
+#     autotools-based third-party libs (MUMPS, IPOPT, ...) from source
+#
+# Build & push (see create_docker.sh):
+#   docker build -t ghcr.io/casadi/build-wasm:latest -f Dockerfile.wasm .
+#   docker push  ghcr.io/casadi/build-wasm:latest
+FROM ghcr.io/r-wasm/flang-wasm:main
+
+RUN apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      python3 python3-dev xz-utils cargo \
+      autoconf automake libtool pkg-config bison byacc yodl \
+      libpcre2-dev libpcre3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# emsdk: the C/C++ compile + final wasm link toolchain.
+ENV EMSDK_DIR=/emsdk
+RUN git clone --depth=1 https://github.com/emscripten-core/emsdk.git $EMSDK_DIR && \
+    cd $EMSDK_DIR && ./emsdk install latest && ./emsdk activate latest
+
+# Source emsdk for login shells; put the host flang driver on PATH.
+RUN echo 'source /emsdk/emsdk_env.sh > /dev/null 2>&1' >> /root/.bashrc
+ENV PATH="/opt/flang/host/bin:${PATH}"
+SHELL ["/bin/bash", "-lc"]
