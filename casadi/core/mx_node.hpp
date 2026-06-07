@@ -231,7 +231,9 @@ namespace casadi {
         \identifier{1qy} */
     virtual int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const;
 
-    /** \brief Propagate signal activity forward (bit set = active) */
+    /** \brief Propagate signal activity forward (bit set = active)
+
+        \identifier{2im} */
     virtual int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
       for (casadi_int k=0; k<nout(); ++k) {
         bvec_t* v = res[k];

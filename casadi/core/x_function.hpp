@@ -160,14 +160,18 @@ namespace casadi {
     Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
                    const std::vector<casadi_int>& order_out, const Dict& opts) const override;
 
-    /** \brief Apply an ordered list of simplify passes */
+    /** \brief Apply an ordered list of simplify passes
+
+        \identifier{2io} */
     Function simplify_passes(
         const std::vector<std::pair<std::string, casadi_int> >& tasks) const override;
 
     /** \brief Apply simplify passes in-place on a set of inputs/outputs
 
         Each pass is a (task, count) pair; count>0 runs the task that many times,
-        count==0 runs it until a fixed point. */
+        count==0 runs it until a fixed point.
+
+        \identifier{2ip} */
     void apply_simplify_passes(
                       const std::vector<std::pair<std::string, casadi_int> >& tasks,
                       std::vector<MatType>& new_in,

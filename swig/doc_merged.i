@@ -507,55 +507,91 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L317-L328
 
 ";
 
-%feature("docstring") casadi::Callback::simplify "
+%feature("docstring") casadi::Callback::transform "
 
 [INTERNAL] 
-Create a new function with simplifications applied.
+Apply transformation passes.
 
-The following list of boolean options can be provided:
-cse (default true): 
-Common subexpression elimination
+Options:
+passes (OT_VECTORVECTOR): an ordered list of passes. Each pass is a
+ 
+list whose first entry is the verb:
+{\"simplify\", task, ...}: graph 
+simplification passes applied in 
+order (cse, ref_count, const_folding, 
+combine_terms, empty_inputs). An
+ integer before a task sets its run count 
+(N>0: N times, 0: until a 
+fixed point); the default is 1.
 
-const_folding (default true): Constant folding
+{\"expand\"}: expand to an SXFunction
 
-empty_inputs (default true): inputs that are not used become 
-structurally 
-empty
+{\"external\", library, operation, opts}: apply an externally defined 
 
-ref_count (default true): reference count aware simplification
+transform (opts is an optional dict)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_2ef
+boolean shorthands (used only when \"passes\" is absent): 
+empty_inputs, 
+combine_terms, cse, ref_count, const_folding. These 
+build a single 
+\"simplify\" pass.
+
+The dict-only form applies a default simplification flow when empty. 
+The 
+(passes, opts) form runs an explicit pipeline; its opts accepts 
+only 
+\"verbose\" (the boolean simplify options are rejected there).
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ig
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L223
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L237
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L330-L332
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L406-L486
 
->  Function casadi::Function::simplify(const Dict &opts=Dict()) const
+>  Function casadi::Function::transform(const std::string &fname, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
 [INTERNAL] 
-Create a new function with simplifications applied.
+Apply transformation passes.
 
-The following list of boolean options can be provided:
-cse (default true): 
-Common subexpression elimination
+Options:
+passes (OT_VECTORVECTOR): an ordered list of passes. Each pass is a
+ 
+list whose first entry is the verb:
+{\"simplify\", task, ...}: graph 
+simplification passes applied in 
+order (cse, ref_count, const_folding, 
+combine_terms, empty_inputs). An
+ integer before a task sets its run count 
+(N>0: N times, 0: until a 
+fixed point); the default is 1.
 
-const_folding (default true): Constant folding
+{\"expand\"}: expand to an SXFunction
 
-empty_inputs (default true): inputs that are not used become 
-structurally 
-empty
+{\"external\", library, operation, opts}: apply an externally defined 
 
-ref_count (default true): reference count aware simplification
+transform (opts is an optional dict)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_2ef
+boolean shorthands (used only when \"passes\" is absent): 
+empty_inputs, 
+combine_terms, cse, ref_count, const_folding. These 
+build a single 
+\"simplify\" pass.
+
+The dict-only form applies a default simplification flow when empty. 
+The 
+(passes, opts) form runs an explicit pipeline; its opts accepts 
+only 
+\"verbose\" (the boolean simplify options are rejected there).
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ig
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L223
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L237
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L330-L332
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L406-L486
 
 ";
 
@@ -569,10 +605,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L255
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L255-L255
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271-L271
 
 >  casadi_int casadi::Function::size1_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -582,10 +618,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L255
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L255-L255
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271-L271
 
 ";
 
@@ -599,10 +635,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L257-L257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273-L273
 
 >  casadi_int casadi::Function::size2_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -612,10 +648,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L257-L257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273-L273
 
 ";
 
@@ -629,10 +665,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L275
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259-L261
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L275-L277
 
 >  std::pair<casadi_int, casadi_int> casadi::Function::size_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -642,10 +678,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L275
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259-L261
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L275-L277
 
 ";
 
@@ -659,10 +695,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L269-L269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L285-L285
 
 >  casadi_int casadi::Function::size1_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -672,10 +708,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L269-L269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L285-L285
 
 ";
 
@@ -689,10 +725,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L287
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271-L271
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L287-L287
 
 >  casadi_int casadi::Function::size2_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -702,10 +738,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L287
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271-L271
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L287-L287
 
 ";
 
@@ -719,10 +755,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L289
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273-L275
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L289-L291
 
 >  std::pair<casadi_int, casadi_int> casadi::Function::size_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -732,10 +768,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L289
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273-L275
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L289-L291
 
 ";
 
@@ -751,10 +787,10 @@ For a particular input or for all of the inputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L302
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L286-L286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L302-L302
 
 >  casadi_int casadi::Function::nnz_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -766,10 +802,10 @@ For a particular input or for all of the inputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L302
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L286-L286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L302-L302
 
 ";
 
@@ -785,10 +821,10 @@ For a particular output or for all of the outputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vd
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L313
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L297-L297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L313-L313
 
 >  casadi_int casadi::Function::nnz_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -800,10 +836,10 @@ For a particular output or for all of the outputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vd
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L313
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L297-L297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L313-L313
 
 ";
 
@@ -819,10 +855,10 @@ For a particular input or for all of the inputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ve
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L308
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L336
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L308-L308
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L336-L336
 
 >  casadi_int casadi::Function::numel_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -834,10 +870,10 @@ For a particular input or for all of the inputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ve
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L308
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L336
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L308-L308
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L336-L336
 
 ";
 
@@ -853,10 +889,10 @@ For a particular output or for all of the outputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vf
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L319
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L347
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L319-L319
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L347-L347
 
 >  casadi_int casadi::Function::numel_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -868,10 +904,10 @@ For a particular output or for all of the outputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vf
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L319
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L347
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L319-L319
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L347-L347
 
 ";
 
@@ -885,10 +921,10 @@ Get sparsity of a given input.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L397
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L425
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1029-L1035
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1175-L1181
 
 >  const Sparsity & casadi::Function::sparsity_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -898,10 +934,10 @@ Get sparsity of a given input.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L397
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L425
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1029-L1035
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1175-L1181
 
 ";
 
@@ -915,10 +951,10 @@ Get sparsity of a given output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vs
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L405
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L433
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1045-L1051
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1191-L1197
 
 >  const Sparsity & casadi::Function::sparsity_out(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -928,10 +964,10 @@ Get sparsity of a given output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vs
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L405
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L433
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1045-L1051
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1191-L1197
 
 ";
 
@@ -945,10 +981,10 @@ Get differentiability of inputs/output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L414
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L442
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1069-L1075
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1215-L1221
 
 >  std::vector< bool > casadi::Function::is_diff_in() const
 ------------------------------------------------------------------------
@@ -958,10 +994,10 @@ Get differentiability of inputs/output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L414
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L442
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1069-L1075
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1215-L1221
 
 ";
 
@@ -975,10 +1011,10 @@ Get differentiability of inputs/output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L415
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L443
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1077-L1083
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1223-L1229
 
 >  std::vector< bool > casadi::Function::is_diff_out() const
 ------------------------------------------------------------------------
@@ -988,10 +1024,10 @@ Get differentiability of inputs/output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L415
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L443
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1077-L1083
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1223-L1229
 
 ";
 
@@ -1005,10 +1041,10 @@ Wrap in an  Function instance consisting of only one  MX call.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L438
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L466
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1933-L1935
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2116-L2118
 
 >  Function casadi::Function::wrap(const std::string &name) const
 ------------------------------------------------------------------------
@@ -1018,10 +1054,10 @@ Wrap in an  Function instance consisting of only one  MX call.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L438
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L466
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1933-L1935
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2116-L2118
 
 ";
 
@@ -1035,10 +1071,10 @@ Wrap in a  Function with options.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L446
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L474
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1941-L1943
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2124-L2126
 
 >  Function casadi::Function::wrap_as_needed(const std::string &name, const Dict &opts) const
 ------------------------------------------------------------------------
@@ -1048,10 +1084,10 @@ Wrap in a  Function with options.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L446
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L474
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1941-L1943
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2124-L2126
 
 ";
 
@@ -1063,10 +1099,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1941-L1943
 block
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L548
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520-L523
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L548-L551
 
 >  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) const
 ------------------------------------------------------------------------
@@ -1075,10 +1111,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520-L523
 block
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L548
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520-L523
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L548-L551
 
 ";
 
@@ -1092,10 +1128,10 @@ Evaluate the function symbolically or numerically.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L559
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L587
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1485-L1492
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1668-L1675
 
 >  void casadi::Function::call(const MXDict &arg, MXDict &res, bool always_inline=false, bool never_inline=false) const
 ------------------------------------------------------------------------
@@ -1105,10 +1141,10 @@ Evaluate the function symbolically or numerically.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L559
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L587
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1485-L1492
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1668-L1675
 
 ";
 
@@ -1122,10 +1158,10 @@ Call using a map.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1174
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1208
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1433-L1447
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1616-L1630
 
 >  void casadi::Function::call_gen(const std::map< std::string, M > &arg, std::map< std::string, M > &res, bool always_inline, bool never_inline) const
 ------------------------------------------------------------------------
@@ -1135,10 +1171,10 @@ Call using a map.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1174
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1208
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1433-L1447
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1616-L1630
 
 ";
 
@@ -1152,10 +1188,10 @@ Supported arguments for numerical evaluation and converters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L599
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L627
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L424-L436
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L570-L582
 
 >  std::vector< const double * > casadi::Function::buf_in(MapArg arg) const
 ------------------------------------------------------------------------
@@ -1165,10 +1201,10 @@ Supported arguments for numerical evaluation and converters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L599
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L627
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L424-L436
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L570-L582
 
 ";
 
@@ -1182,10 +1218,10 @@ Supported arguments for numerical evaluation and converters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L603
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L631
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L452-L465
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L598-L611
 
 >  std::vector< double * > casadi::Function::buf_out(MPrRes res) const
 ------------------------------------------------------------------------
@@ -1195,10 +1231,10 @@ Supported arguments for numerical evaluation and converters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L603
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L631
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L452-L465
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L598-L611
 
 ";
 
@@ -1267,10 +1303,10 @@ here.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L732
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L766
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L522-L524
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L668-L670
 
 >  Function casadi::Function::mapaccum(casadi_int N, const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
@@ -1335,10 +1371,10 @@ here.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L732
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L766
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L522-L524
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L668-L670
 
 ";
 
@@ -1407,10 +1443,10 @@ here.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L733
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L767
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L515-L521
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L661-L667
 
 ";
 
@@ -1441,10 +1477,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wx
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L890
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L924
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1247-L1257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1430-L1440
 
 >  std::vector< DM > casadi::Function::generate_in(const std::string &fname)
 ------------------------------------------------------------------------
@@ -1461,10 +1497,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wx
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L890
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L924
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1247-L1257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1430-L1440
 
 ";
 
@@ -1486,10 +1522,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L901
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L935
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1259-L1269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1442-L1452
 
 >  std::vector< DM > casadi::Function::generate_out(const std::string &fname)
 ------------------------------------------------------------------------
@@ -1506,10 +1542,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L901
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L935
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1259-L1269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1442-L1452
 
 ";
 
@@ -1525,10 +1561,10 @@ Only allowed for (a subset of) SX/MX Functions
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L939
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L973
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1271-L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1454-L1457
 
 >  void casadi::Function::export_code(const std::string &lang, std::ostream &stream, const Dict &options=Dict()) const
 ------------------------------------------------------------------------
@@ -1540,10 +1576,10 @@ Only allowed for (a subset of) SX/MX Functions
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L939
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L973
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1271-L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1454-L1457
 
 ";
 
@@ -1557,10 +1593,10 @@ Serialize.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L928
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L962
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1288-L1292
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1471-L1475
 
 >  std::string casadi::Function::serialize(const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
@@ -1570,10 +1606,10 @@ Serialize.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L928
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L962
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1288-L1292
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1471-L1475
 
 ";
 
@@ -1590,10 +1626,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_240
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L935
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L969
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1283-L1286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1466-L1469
 
 ";
 
@@ -1607,10 +1643,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L979
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1013
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1582-L1588
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1765-L1771
 
 >  const std::vector< SX > casadi::Function::sx_in() const
 ------------------------------------------------------------------------
@@ -1622,10 +1658,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L979
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1013
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1582-L1588
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1765-L1771
 
 ";
 
@@ -1641,10 +1677,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L984
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1018
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1606-L1608
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1789-L1791
 
 >  const std::vector< MX > casadi::Function::mx_in() const
 ------------------------------------------------------------------------
@@ -1656,10 +1692,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L984
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1018
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1606-L1608
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1789-L1791
 
 ";
 
@@ -1675,7 +1711,7 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L993
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1027
 
 >  const std::vector<T> casadi::Function::sym_in() const
 ------------------------------------------------------------------------
@@ -1687,7 +1723,7 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L993
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1027
 
 ";
 
@@ -1703,10 +1739,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1007
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1041
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1590-L1596
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1773-L1779
 
 >  const std::vector< SX > casadi::Function::sx_out() const
 ------------------------------------------------------------------------
@@ -1718,10 +1754,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1007
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1041
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1590-L1596
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1773-L1779
 
 ";
 
@@ -1737,10 +1773,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1012
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1046
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1610-L1612
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1793-L1795
 
 >  const std::vector< MX > casadi::Function::mx_out() const
 ------------------------------------------------------------------------
@@ -1752,10 +1788,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1012
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1046
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1610-L1612
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1793-L1795
 
 ";
 
@@ -1769,10 +1805,10 @@ Convert from/to flat vector of input/output nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1019
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1053
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1614-L1616
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1797-L1799
 
 ";
 
@@ -1784,10 +1820,10 @@ Convert from/to flat vector of input/output nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1020
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1054
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1618-L1620
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1801-L1803
 
 ";
 
@@ -1799,10 +1835,10 @@ Convert from/to flat vector of input/output nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1021
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1055
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1622-L1624
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1805-L1807
 
 ";
 
@@ -1814,10 +1850,10 @@ Convert from/to flat vector of input/output nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1022
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1056
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1626-L1628
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1809-L1811
 
 ";
 
@@ -1833,10 +1869,10 @@ size. Does not perform sparsity checking.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1041
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1075
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1666-L1668
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1849-L1851
 
 >  std::vector< MX > casadi::Function::convert_in(const MXDict &arg) const
 ------------------------------------------------------------------------
@@ -1850,10 +1886,10 @@ size. Does not perform sparsity checking.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1041
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1075
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1666-L1668
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1849-L1851
 
 ";
 
@@ -1871,10 +1907,10 @@ size. Does not perform sparsity checking.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1043
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1077
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1674-L1676
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1857-L1859
 
 >  std::vector< MX > casadi::Function::convert_out(const MXDict &arg) const
 ------------------------------------------------------------------------
@@ -1888,10 +1924,10 @@ size. Does not perform sparsity checking.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1043
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1077
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1674-L1676
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1857-L1859
 
 ";
 
@@ -1905,10 +1941,10 @@ Is the class able to propagate seeds through the algorithm?
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1123
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1157
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1703-L1705
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1886-L1888
 
 ";
 
@@ -1920,10 +1956,10 @@ Is the class able to propagate seeds through the algorithm?
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1124
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1158
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1707-L1709
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1890-L1892
 
 ";
 
@@ -2234,10 +2270,10 @@ Get the number of function inputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L243
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L825-L827
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L971-L973
 
 ";
 
@@ -2249,10 +2285,36 @@ Get the number of function outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L248
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L264
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L829-L831
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L975-L977
+
+";
+
+%feature("docstring") casadi::Callback::activity "
+
+[INTERNAL] 
+ Output signal activity induced by a given input activity.
+
+arg is a flat activity mask over all input nonzeros (size  nnz_in(), true = 
+active = possibly nonzero); the result is the corresponding 
+mask over all 
+output nonzeros (size  nnz_out()). An output that comes out inactive (false)
+ is guaranteed zero for 
+any value of the active inputs. Unlike sparsity 
+propagation this 
+exploits annihilation: an inactive operand of a multiply 
+kills the 
+product.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ih
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L326
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1269-L1295
 
 ";
 
@@ -2264,10 +2326,10 @@ Get input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L335
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L363
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1005-L1011
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1151-L1157
 
 >  const std::string & casadi::Function::name_in(casadi_int ind) const
 ------------------------------------------------------------------------
@@ -2277,10 +2339,10 @@ Get input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L335
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L363
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1005-L1011
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1151-L1157
 
 ";
 
@@ -2294,10 +2356,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L340
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L368
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1013-L1019
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1159-L1165
 
 >  const std::string & casadi::Function::name_out(casadi_int ind) const
 ------------------------------------------------------------------------
@@ -2307,10 +2369,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L340
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L368
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1013-L1019
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1159-L1165
 
 ";
 
@@ -2330,10 +2392,10 @@ adheres to SCHEME_NLPINput
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vk
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L348
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L376
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L975-L981
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1121-L1127
 
 ";
 
@@ -2351,10 +2413,10 @@ adheres to SCHEME_NLPINput
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L356
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L384
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L983-L989
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1129-L1135
 
 ";
 
@@ -2366,10 +2428,10 @@ Does the function have a particularly named input?
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L361
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L389
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L991-L996
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1137-L1142
 
 ";
 
@@ -2381,10 +2443,10 @@ Does the function have a particularly named output?
 Extra doc: https://github.com/casadi/casadi/wiki/L_2ca
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L365
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L393
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L998-L1003
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1144-L1149
 
 ";
 
@@ -2396,10 +2458,10 @@ Get default input value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vm
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L370
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L398
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1494-L1496
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1677-L1679
 
 ";
 
@@ -2411,10 +2473,10 @@ Get largest input value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vn
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L375
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L403
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1498-L1500
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1681-L1683
 
 ";
 
@@ -2426,10 +2488,10 @@ Get smallest input value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vo
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L380
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L408
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1502-L1504
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1685-L1687
 
 ";
 
@@ -2441,10 +2503,10 @@ Get nominal input value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vp
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L385
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L413
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1506-L1508
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1689-L1691
 
 ";
 
@@ -2456,10 +2518,10 @@ Get nominal output value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L390
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L418
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1510-L1512
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1693-L1695
 
 ";
 
@@ -2475,10 +2537,10 @@ Get oracle.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L431
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L459
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1921-L1927
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2104-L2110
 
 ";
 
@@ -2499,10 +2561,10 @@ Flip the relationship. Return which expressions contain the variables
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vx
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L455
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L483
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1840-L1847
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2023-L2030
 
 ";
 
@@ -2514,10 +2576,10 @@ Print dimensions of inputs and outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L462
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L490
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1157-L1159
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1340-L1342
 
 ";
 
@@ -2529,10 +2591,10 @@ Print options to a stream.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L467
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L495
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1161-L1163
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1344-L1346
 
 ";
 
@@ -2544,10 +2606,10 @@ Print all information there is to know about a certain option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L472
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L500
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1165-L1167
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1348-L1350
 
 ";
 
@@ -2559,10 +2621,10 @@ Does a particular option exist.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L477
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L505
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1169-L1176
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1352-L1359
 
 ";
 
@@ -2580,10 +2642,10 @@ output or saving to file.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L485
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L513
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1178-L1188
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1361-L1371
 
 ";
 
@@ -2595,10 +2657,10 @@ Reset the counter used to name dump files.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2dy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L490
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L518
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1190-L1196
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1373-L1379
 
 ";
 
@@ -2609,10 +2671,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1190-L1196
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L501
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L529
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L894-L900
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1040-L1046
 
 ";
 
@@ -2623,10 +2685,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L894-L900
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L506
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L534
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L902-L910
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1048-L1056
 
 ";
 
@@ -2658,10 +2720,27 @@ This function is cached.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L543
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L571
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L922-L928
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1068-L1074
+
+";
+
+%feature("docstring") casadi::Callback::eval_activity "
+
+[INTERNAL] 
+Propagate signal activity forward (bit set = active (possibly 
+
+nonzero))
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ii
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L691
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1260-L1267
 
 ";
 
@@ -2673,10 +2752,10 @@ Propagate sparsity backward with temporary memory allocation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L668
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L702
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L498-L513
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L644-L659
 
 >  int casadi::Function::rev(std::vector< bvec_t * > arg, std::vector< bvec_t * > res) const
 ------------------------------------------------------------------------
@@ -2686,10 +2765,10 @@ Propagate sparsity backward with temporary memory allocation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L668
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L702
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L498-L513
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L644-L659
 
 ";
 
@@ -2709,10 +2788,10 @@ Type of parallelization used: unroll|serial|openmp
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L677
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L711
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L762-L769
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L908-L915
 
 ";
 
@@ -2726,10 +2805,10 @@ original
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L789
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L823
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L753-L760
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L899-L906
 
 ";
 
@@ -2759,10 +2838,10 @@ Get a function that calculates  nfwd forward derivatives.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L835
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L869
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1141-L1147
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1324-L1330
 
 ";
 
@@ -2794,10 +2873,10 @@ Get a function that calculates  nadj adjoint derivatives.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L855
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L889
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1149-L1155
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1332-L1338
 
 ";
 
@@ -2810,10 +2889,10 @@ block.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L865
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L899
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L957-L965
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1103-L1111
 
 >  Sparsity casadi::Function::jac_sparsity(casadi_int oind, casadi_int iind, bool compact=false) const
 ------------------------------------------------------------------------
@@ -2823,10 +2902,10 @@ Get, if necessary generate, the sparsity of a single Jacobian block.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L865
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L899
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L957-L965
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1103-L1111
 
 ";
 
@@ -2840,10 +2919,10 @@ Export / Generate C code for the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L875
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L909
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1203-L1205
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1386-L1388
 
 >  std::string casadi::Function::generate(const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
@@ -2853,10 +2932,10 @@ Export / Generate C code for the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L875
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L909
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1203-L1205
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1386-L1388
 
 ";
 
@@ -2870,10 +2949,10 @@ Export / Generate C code for the dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ww
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L880
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L914
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1213-L1215
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1396-L1398
 
 ";
 
@@ -2884,10 +2963,10 @@ Get all statistics obtained at the end of the last evaluate
 call.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L967
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1001
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L934-L944
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1080-L1090
 
 ";
 
@@ -2899,10 +2978,10 @@ Does the function have free variables.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1049
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1083
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1711-L1713
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1894-L1896
 
 ";
 
@@ -2914,10 +2993,10 @@ Get free variables as a string.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1054
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1088
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1199-L1201
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1382-L1384
 
 ";
 
@@ -2929,10 +3008,10 @@ Get all the free variables of the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xa
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1059
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1093
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1687-L1693
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1870-L1876
 
 ";
 
@@ -2944,10 +3023,10 @@ Get all the free variables of the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1064
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1098
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1695-L1701
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1878-L1884
 
 ";
 
@@ -2959,10 +3038,10 @@ Extract the functions needed for the Lifted  Newton method.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1069
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1103
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1715-L1721
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1898-L1904
 
 ";
 
@@ -2974,10 +3053,10 @@ Number of nodes in the algorithm.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xd
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1075
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1109
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1779-L1785
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1962-L1968
 
 ";
 
@@ -2989,10 +3068,10 @@ Number of instruction in the algorithm (SXFunction/MXFunction)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xe
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1080
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1114
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1723-L1729
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1906-L1912
 
 ";
 
@@ -3004,10 +3083,10 @@ Identifier index of the instruction (SXFunction/MXFunction)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xf
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1085
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1119
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1747-L1753
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1930-L1936
 
 ";
 
@@ -3021,10 +3100,10 @@ Locations in the work vector for the inputs of the instruction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1092
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1126
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1755-L1761
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1938-L1944
 
 ";
 
@@ -3037,10 +3116,10 @@ Get the floating point output argument of an instruction
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1097
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1131
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1763-L1769
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1946-L1952
 
 ";
 
@@ -3054,10 +3133,10 @@ Location in the work vector for the output of the instruction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1104
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1138
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1771-L1777
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1954-L1960
 
 ";
 
@@ -3069,10 +3148,10 @@ Get the  MX node corresponding to an instruction (MXFunction)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1109
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1143
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1731-L1737
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1914-L1920
 
 ";
 
@@ -3088,10 +3167,10 @@ returns nan for those instructions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xk
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1117
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1151
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1739-L1745
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1922-L1928
 
 ";
 
@@ -3103,10 +3182,10 @@ Get required length of arg field.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xm
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1130
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1164
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1089-L1089
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1235-L1235
 
 ";
 
@@ -3118,10 +3197,10 @@ Get required length of res field.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xn
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1135
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1169
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1091-L1091
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1237-L1237
 
 ";
 
@@ -3133,10 +3212,10 @@ Get required length of iw field.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xo
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1140
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1174
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1093-L1093
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1239-L1239
 
 ";
 
@@ -3148,10 +3227,10 @@ Get required length of w field.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xp
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1145
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1179
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1095-L1095
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1241-L1241
 
 ";
 
@@ -3163,10 +3242,10 @@ Get number of temporary variables needed.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1151
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1185
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1085-L1087
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1231-L1233
 
 ";
 
@@ -3178,10 +3257,10 @@ Set the (persistent) work vectors.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1156
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1190
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1114-L1121
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1297-L1304
 
 ";
 
@@ -3193,10 +3272,10 @@ Set the (temporary) work vectors.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xs
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1162
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1196
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1123-L1130
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1306-L1313
 
 ";
 
@@ -3208,10 +3287,10 @@ Set the (persistent and temporary) work vectors.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1168
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1202
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1132-L1139
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1315-L1322
 
 ";
 
@@ -3223,10 +3302,10 @@ List merge opportunitities.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2b6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1180
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1214
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1682-L1685
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1865-L1868
 
 ";
 
@@ -3238,10 +3317,10 @@ Name of the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1188
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1222
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1321-L1328
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1504-L1511
 
 ";
 
@@ -3256,10 +3335,10 @@ true)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1195
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1229
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1678-L1680
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1861-L1863
 
 ";
 
@@ -3269,10 +3348,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1678-L1680
 Assert that an input dimension is equal so some given value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1240
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1274
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1799-L1805
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1982-L1988
 
 ";
 
@@ -3282,10 +3361,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1799-L1805
 Assert that an output dimension is equal so some given value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1243
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1277
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1807-L1812
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1990-L1995
 
 ";
 
@@ -3296,10 +3375,10 @@ Assert that an output sparsity is a multiple of some given
 sparsity.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1246
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1280
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1814-L1823
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1997-L2006
 
 ";
 
@@ -3309,10 +3388,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1814-L1823
 Checkout a memory object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1250
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1284
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1787-L1789
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1970-L1972
 
 ";
 
@@ -3322,10 +3401,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1787-L1789
 Release a memory object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1253
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1287
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1791-L1793
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1974-L1976
 
 ";
 
@@ -3335,10 +3414,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1791-L1793
 Get memory object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1291
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1795-L1797
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1978-L1980
 
 ";
 
@@ -3350,10 +3429,10 @@ Get all functions in the cache.
 Extra doc: https://github.com/casadi/casadi/wiki/L_26i
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1266
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1300
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1849-L1856
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2032-L2039
 
 ";
 
@@ -3365,10 +3444,10 @@ Get a dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1310
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1867-L1873
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2050-L2056
 
 >  Function casadi::Function::get_function(const std::string &name) const
 ------------------------------------------------------------------------
@@ -3378,10 +3457,10 @@ Get a dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1310
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1867-L1873
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2050-L2056
 
 ";
 
@@ -3395,10 +3474,10 @@ Check if a particular dependency exists.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1281
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1315
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1875-L1882
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2058-L2065
 
 ";
 
@@ -3418,10 +3497,10 @@ depth-first ordered, unique, list of dependencies
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1289
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1323
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1884-L1899
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2067-L2082
 
 ";
 
@@ -3442,10 +3521,10 @@ Maximum depth - a negative number indicates no maximum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1331
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1901-L1918
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2084-L2101
 
 ";
 
@@ -3455,10 +3534,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1901-L1918
 Obtain information about function
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1300
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1334
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1955-L1957
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2138-L2140
 
 ";
 
@@ -3715,7 +3794,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L47
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L37-L218
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L37-L223
 
 ";
 
@@ -3728,7 +3807,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L50
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L390-L433
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L395-L438
 
 ";
 
@@ -3741,7 +3820,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L58
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L435-L439
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L440-L444
 
 >  std::string casadi::CodeGenerator::dump()
 ------------------------------------------------------------------------
@@ -3752,7 +3831,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L58
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L435-L439
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L440-L444
 
 ";
 
@@ -3773,7 +3852,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L67
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L522-L593
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L527-L598
 
 ";
 
@@ -3788,7 +3867,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L70
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1224-L1244
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1229-L1249
 
 ";
 
@@ -3801,7 +3880,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L75
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L306-L388
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L311-L393
 
 ";
 
@@ -3814,7 +3893,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L78
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1301-L1303
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1306-L1308
 
 ";
 
@@ -3827,7 +3906,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L84
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1310-L1316
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1315-L1321
 
 >  std::string casadi::CodeGenerator::shorthand(const std::string &name, bool allow_adding=true)
 ------------------------------------------------------------------------
@@ -3838,7 +3917,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L84
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1310-L1316
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1315-L1321
 
 ";
 
@@ -3863,7 +3942,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L103
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1326-L1328
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1331-L1333
 
 ";
 
@@ -3878,7 +3957,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L123
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1430-L1451
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1435-L1456
 
 >  casadi_int casadi::CodeGenerator::get_constant(const std::vector< std::string > &v, bool allow_adding=false)
 ------------------------------------------------------------------------
@@ -3891,7 +3970,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L123
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1430-L1451
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1435-L1456
 
 ";
 
@@ -3923,7 +4002,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L140
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1475-L1489
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1480-L1494
 
 ";
 
@@ -3938,7 +4017,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L163
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L854-L859
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L859-L864
 
 ";
 
@@ -3953,7 +4032,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L168
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L861-L866
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L866-L871
 
 ";
 
@@ -3968,7 +4047,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L173
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L868-L873
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L873-L878
 
 ";
 
@@ -3983,7 +4062,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L178
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L875-L880
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L880-L885
 
 ";
 
@@ -3998,7 +4077,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L183
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L882-L892
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L887-L897
 
 ";
 
@@ -4013,7 +4092,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L188
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L894-L898
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L899-L903
 
 ";
 
@@ -4030,7 +4109,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L195
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L900-L911
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L905-L916
 
 ";
 
@@ -4045,7 +4124,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L200
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L913-L919
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L918-L924
 
 ";
 
@@ -4060,7 +4139,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L205
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L923-L928
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L928-L933
 
 ";
 
@@ -4075,7 +4154,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L210
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1246-L1261
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1251-L1266
 
 ";
 
@@ -4090,7 +4169,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L227
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2528-L2552
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2533-L2557
 
 ";
 
@@ -4105,7 +4184,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L242
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2575-L2578
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2580-L2583
 
 ";
 
@@ -4120,7 +4199,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L247
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2580-L2592
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2585-L2597
 
 ";
 
@@ -4135,7 +4214,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L252
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L220-L225
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L225-L230
 
 ";
 
@@ -4150,7 +4229,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L257
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L251-L291
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L256-L296
 
 ";
 
@@ -4167,7 +4246,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L271
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L238-L244
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L243-L249
 
 >  void casadi::CodeGenerator::scope_return()
 ------------------------------------------------------------------------
@@ -4182,7 +4261,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L271
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L238-L244
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L243-L249
 
 ";
 
@@ -4199,7 +4278,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L276
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L247-L249
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L252-L254
 
 ";
 
@@ -4214,7 +4293,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L281
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2594-L2605
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2599-L2610
 
 ";
 
@@ -4229,7 +4308,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L286
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2607-L2613
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2612-L2618
 
 ";
 
@@ -4331,7 +4410,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L365
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2616-L2740
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2621-L2745
 
 ";
 
@@ -4346,7 +4425,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L372
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2266-L2272
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2271-L2277
 
 ";
 
@@ -4361,7 +4440,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L383
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2475-L2480
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2480-L2485
 
 >  std::string casadi::CodeGenerator::mv(const std::string &x, casadi_int nrow_x, casadi_int ncol_x, const std::string &y, const std::string &z, bool tr)
 ------------------------------------------------------------------------
@@ -4374,7 +4453,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L383
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2475-L2480
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2480-L2485
 
 ";
 
@@ -4391,7 +4470,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L389
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2427-L2431
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2432-L2436
 
 ";
 
@@ -4406,7 +4485,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L397
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2433-L2437
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2438-L2442
 
 ";
 
@@ -4421,7 +4500,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L405
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2439-L2443
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2444-L2448
 
 ";
 
@@ -4436,7 +4515,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L412
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2445-L2449
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2450-L2454
 
 ";
 
@@ -4451,7 +4530,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L419
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2451-L2455
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2456-L2460
 
 ";
 
@@ -4466,7 +4545,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L426
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2457-L2461
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2462-L2466
 
 ";
 
@@ -4481,7 +4560,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L433
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2463-L2466
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2468-L2471
 
 ";
 
@@ -4496,7 +4575,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2491-L2497
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2496-L2502
 
 >  std::string casadi::CodeGenerator::mtimes(const std::string &x, casadi_int nrow_x, casadi_int ncol_x, const std::string &y, casadi_int ncol_y, const std::string &z, bool tr)
 ------------------------------------------------------------------------
@@ -4509,7 +4588,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2491-L2497
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2496-L2502
 
 ";
 
@@ -4526,7 +4605,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L453
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2499-L2504
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2504-L2509
 
 ";
 
@@ -4541,7 +4620,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L460
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2506-L2511
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2511-L2516
 
 ";
 
@@ -4556,7 +4635,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L466
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2513-L2518
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2518-L2523
 
 ";
 
@@ -4571,7 +4650,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L472
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2274-L2280
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2279-L2285
 
 ";
 
@@ -4586,7 +4665,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L478
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2282-L2290
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2287-L2295
 
 ";
 
@@ -4599,7 +4678,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L482
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2521-L2526
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2526-L2531
 
 ";
 
@@ -4614,7 +4693,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L487
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2292-L2303
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2297-L2308
 
 ";
 
@@ -4629,7 +4708,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L496
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2305-L2315
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2310-L2320
 
 ";
 
@@ -4644,7 +4723,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L506
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2317-L2323
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2322-L2328
 
 ";
 
@@ -4659,7 +4738,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L512
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2775-L2783
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2780-L2788
 
 ";
 
@@ -4674,7 +4753,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L521
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2786-L2790
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2791-L2795
 
 ";
 
@@ -4689,7 +4768,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L527
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2793-L2802
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2798-L2807
 
 ";
 
@@ -4704,7 +4783,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L536
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2805-L2810
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2810-L2815
 
 ";
 
@@ -4719,7 +4798,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L542
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2813-L2819
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2818-L2824
 
 ";
 
@@ -4734,7 +4813,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L550
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2822-L2828
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2827-L2833
 
 ";
 
@@ -4749,7 +4828,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L558
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2831-L2834
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2836-L2839
 
 ";
 
@@ -4764,7 +4843,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L563
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2837-L2840
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2842-L2845
 
 ";
 
@@ -4779,7 +4858,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L568
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2879-L2882
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2884-L2887
 
 ";
 
@@ -4794,7 +4873,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L573
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2885-L2888
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2890-L2893
 
 ";
 
@@ -4809,7 +4888,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L588
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2855-L2858
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2860-L2863
 
 >  std::string casadi::CodeGenerator::vfmax(const std::string &x, const std::string &n, const std::string &y)
 ------------------------------------------------------------------------
@@ -4822,7 +4901,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L588
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2855-L2858
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2860-L2863
 
 ";
 
@@ -4839,7 +4918,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L593
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2861-L2864
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2866-L2869
 
 >  std::string casadi::CodeGenerator::vfmin(const std::string &x, const std::string &n, const std::string &y)
 ------------------------------------------------------------------------
@@ -4852,7 +4931,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L593
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2861-L2864
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2866-L2869
 
 ";
 
@@ -4869,7 +4948,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L598
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2867-L2870
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2872-L2875
 
 ";
 
@@ -4884,7 +4963,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L603
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2873-L2876
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2878-L2881
 
 ";
 
@@ -4899,7 +4978,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L608
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2903-L2906
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2908-L2911
 
 ";
 
@@ -4914,7 +4993,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L613
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2909-L2912
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2914-L2917
 
 ";
 
@@ -4936,7 +5015,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L620
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2915-L2918
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2920-L2923
 
 ";
 
@@ -4951,7 +5030,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L625
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2891-L2894
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2896-L2899
 
 ";
 
@@ -4966,7 +5045,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L631
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2897-L2900
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2902-L2905
 
 ";
 
@@ -4981,7 +5060,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L637
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2946-L2951
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2951-L2956
 
 ";
 
@@ -4996,7 +5075,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L643
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2921-L2924
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2926-L2929
 
 ";
 
@@ -5011,7 +5090,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L648
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2927-L2930
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2932-L2935
 
 ";
 
@@ -5026,7 +5105,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L653
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2933-L2937
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2938-L2942
 
 ";
 
@@ -5041,7 +5120,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L659
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2940-L2943
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2945-L2948
 
 ";
 
@@ -5056,7 +5135,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L665
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2325-L2336
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2330-L2341
 
 ";
 
@@ -5071,7 +5150,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L670
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2742-L2746
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2747-L2751
 
 ";
 
@@ -5086,7 +5165,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L800
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1495-L2124
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1500-L2129
 
 ";
 
@@ -5101,7 +5180,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L805
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2749-L2772
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2754-L2777
 
 ";
 
@@ -5114,7 +5193,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L810
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1077-L1088
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1082-L1093
 
 ";
 
@@ -5127,7 +5206,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L813
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1090-L1096
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1095-L1101
 
 ";
 
@@ -5143,7 +5222,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L818
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1098-L1105
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1103-L1110
 
 ";
 
@@ -5158,7 +5237,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L856
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1155-L1160
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1160-L1165
 
 >  std::string casadi::CodeGenerator::print_vector(casadi_int sz, const std::string &arg)
 ------------------------------------------------------------------------
@@ -5171,7 +5250,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L856
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1155-L1160
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1160-L1165
 
 ";
 
@@ -5188,7 +5267,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L851
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1148-L1153
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1153-L1158
 
 ";
 
@@ -5203,7 +5282,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L861
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1162-L1167
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1167-L1172
 
 ";
 
@@ -5218,7 +5297,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L866
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1169-L1174
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1174-L1179
 
 ";
 
@@ -5233,7 +5312,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L871
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1176-L1182
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L1181-L1187
 
 ";
 
@@ -5248,7 +5327,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L877
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2200-L2207
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2205-L2212
 
 ";
 
@@ -5275,7 +5354,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L889
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2256-L2264
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2261-L2269
 
 ";
 
@@ -5290,7 +5369,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L894
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2234-L2240
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2239-L2245
 
 ";
 
@@ -5305,7 +5384,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L899
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2242-L2244
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2247-L2249
 
 ";
 
@@ -5320,7 +5399,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L904
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2246-L2248
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2251-L2253
 
 ";
 
@@ -5335,7 +5414,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L909
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2250-L2254
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2255-L2259
 
 ";
 
@@ -5350,7 +5429,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L914
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2339-L2351
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2344-L2356
 
 ";
 
@@ -5365,7 +5444,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L921
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2354-L2362
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2359-L2367
 
 ";
 
@@ -5380,7 +5459,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L927
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2365-L2373
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2370-L2378
 
 ";
 
@@ -5395,7 +5474,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L933
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2376-L2384
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2381-L2389
 
 ";
 
@@ -5410,7 +5489,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L939
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2126-L2131
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2131-L2136
 
 ";
 
@@ -5425,7 +5504,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L944
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2133-L2144
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2138-L2149
 
 ";
 
@@ -5466,7 +5545,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L972
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2954-L2957
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2959-L2962
 
 ";
 
@@ -5481,7 +5560,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L977
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2960-L2963
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2965-L2968
 
 ";
 
@@ -5496,7 +5575,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L982
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2966-L3036
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L2971-L3041
 
 ";
 
@@ -5511,7 +5590,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L987
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L3039-L3051
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L3044-L3056
 
 ";
 
@@ -5526,7 +5605,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L992
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L3054-L3059
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L3059-L3064
 
 ";
 
@@ -5541,7 +5620,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.hpp#L1008
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L3061-L3069
+https://github.com/casadi/casadi/blob/main/casadi/core/code_generator.cpp#L3066-L3074
 
 ";
 
@@ -6240,7 +6319,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L297
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L352-L365
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L370-L383
 
 >  void casadi::DaeBuilder::add(const std::string &name, const std::string &causality, const std::string &variability, const MX &expr, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -6251,7 +6330,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L297
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L352-L365
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L370-L383
 
 ";
 
@@ -6266,7 +6345,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L304
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L367-L373
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L385-L391
 
 ";
 
@@ -6279,7 +6358,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L307
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L375-L381
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L393-L399
 
 ";
 
@@ -6292,7 +6371,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L310
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L383-L390
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L401-L408
 
 ";
 
@@ -6305,7 +6384,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L313
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L392-L399
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L410-L417
 
 ";
 
@@ -6318,7 +6397,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L316
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L401-L407
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L419-L425
 
 ";
 
@@ -6331,7 +6410,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L319
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L409-L415
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L427-L433
 
 ";
 
@@ -6344,7 +6423,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L335
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L512-L518
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L530-L536
 
 ";
 
@@ -6357,7 +6436,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L338
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L520-L526
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L538-L544
 
 ";
 
@@ -6370,7 +6449,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L341
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L528-L534
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L546-L552
 
 ";
 
@@ -6383,7 +6462,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L344
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L220-L226
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L238-L244
 
 ";
 
@@ -6398,7 +6477,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L347
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L228-L234
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L246-L252
 
 ";
 
@@ -6411,7 +6490,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L364
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L796-L799
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L814-L817
 
 >  Function casadi::DaeBuilder::add_fun(const std::string &name, const Importer &compiler, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -6422,7 +6501,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L364
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L796-L799
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L814-L817
 
 ";
 
@@ -6437,7 +6516,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L368
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L801-L808
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L819-L826
 
 ";
 
@@ -6450,7 +6529,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L374
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L840-L842
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L858-L860
 
 >  std::vector< Function > casadi::DaeBuilder::fun() const
 ------------------------------------------------------------------------
@@ -6461,7 +6540,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L374
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L840-L842
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L858-L860
 
 ";
 
@@ -6476,7 +6555,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L377
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L819-L838
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L837-L856
 
 ";
 
@@ -6546,16 +6625,68 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L211-L218
 
 ";
 
+%feature("docstring") casadi::DaeBuilder::compile_fmu "
+
+[INTERNAL] 
+Compile the sources produced by export_fmu.
+
+Parameters:
+-----------
+
+files: 
+the {local_file -> archive path} map returned by export_fmu
+
+opts: 
+compile options: compiler, compiler_options, include_dirs
+
+the file map augmented with the amalgamation source and compiled 
+binary
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2iq
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L404
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L220-L227
+
+";
+
+%feature("docstring") casadi::DaeBuilder::pack_fmu "
+
+[INTERNAL] 
+Pack files from export_fmu / compile_fmu into a single .fmu 
+archive.
+
+Parameters:
+-----------
+
+files: 
+the {local_file -> archive path} map to pack
+
+opts: 
+packaging options: path (default '<name>.fmu')
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ir
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L411
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L229-L236
+
+";
+
 %feature("docstring") casadi::DaeBuilder::add_lc "
 
 [INTERNAL] 
 Add a named linear combination of output expressions.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L399
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L414
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L737-L744
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L755-L762
 
 ";
 
@@ -6569,10 +6700,10 @@ naming.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L431
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L431-L431
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L446-L446
 
 >  Function casadi::DaeBuilder::create() const
 ------------------------------------------------------------------------
@@ -6583,10 +6714,10 @@ naming.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L431
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L431-L431
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L446-L446
 
 ";
 
@@ -6598,10 +6729,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L431-L431
 Get variable expression by name
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L449
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L464
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L417-L424
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L435-L442
 
 ";
 
@@ -6611,10 +6742,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L417-L424
 Get the time derivative of model variables, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L600
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L615
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L426-L439
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L444-L457
 
 >  std::string casadi::DaeBuilder::der(const std::string &name) const
 ------------------------------------------------------------------------
@@ -6622,10 +6753,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L426-L439
 Get the time derivative of model variables, single variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L600
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L615
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L426-L439
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L444-L457
 
 ";
 
@@ -6637,10 +6768,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L426-L439
 Get/set value reference
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L481
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L496
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L536-L538
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L554-L556
 
 ";
 
@@ -6650,10 +6781,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L536-L538
 Get/set value reference
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L482
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L497
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L540-L542
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L558-L560
 
 ";
 
@@ -6663,10 +6794,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L540-L542
 Get/set description
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L487
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L502
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L544-L546
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L562-L564
 
 ";
 
@@ -6676,10 +6807,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L544-L546
 Get/set description
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L488
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L503
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L548-L550
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L566-L568
 
 ";
 
@@ -6689,10 +6820,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L548-L550
 Get/set the type
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L493
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L508
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L552-L561
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L570-L579
 
 ";
 
@@ -6702,10 +6833,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L552-L561
 Get/set the type
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L494
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L509
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L563-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L581-L588
 
 ";
 
@@ -6715,10 +6846,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L563-L570
 Get/set the initial property
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L550
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L565
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L637-L639
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L655-L657
 
 ";
 
@@ -6728,10 +6859,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L637-L639
 Get/set the initial property
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L551
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L566
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L641-L643
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L659-L661
 
 ";
 
@@ -6741,10 +6872,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L641-L643
 Get/set the unit
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L556
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L571
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L645-L647
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L663-L665
 
 ";
 
@@ -6754,10 +6885,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L645-L647
 Get/set the unit
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L557
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L572
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L649-L651
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L667-L669
 
 ";
 
@@ -6767,10 +6898,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L649-L651
 Get/set the display unit
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L562
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L577
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L653-L655
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L671-L673
 
 ";
 
@@ -6780,10 +6911,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L653-L655
 Get/set the display unit
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L563
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L578
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L657-L659
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L675-L677
 
 ";
 
@@ -6850,7 +6981,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L323
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L315-L321
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L333-L339
 
 ";
 
@@ -6863,7 +6994,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L326
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L263-L313
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L281-L331
 
 ";
 
@@ -6873,10 +7004,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L263-L313
 Construct a function for evaluating dependent parameters.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L434
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L449
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L853-L862
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L871-L880
 
 ";
 
@@ -6886,10 +7017,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L853-L862
 Construct an event transition function, default naming.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L445
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L460
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L445-L445
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L460-L460
 
 >  Function casadi::DaeBuilder::transition() const
 ------------------------------------------------------------------------
@@ -6897,10 +7028,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L445-L445
 Construct an event transition function, default naming.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L445
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L460
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L445-L445
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L460-L460
 
 ";
 
@@ -6912,10 +7043,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L445-L445
 Get the pre-variables of model variables.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L603
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L618
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L441-L454
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L459-L472
 
 >  std::string casadi::DaeBuilder::pre(const std::string &name) const
 ------------------------------------------------------------------------
@@ -6923,10 +7054,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L441-L454
 Get the pre-variables of model variables.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L603
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L618
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L441-L454
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L459-L472
 
 ";
 
@@ -6938,10 +7069,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L441-L454
 Does a variable have a binding equation?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L474
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L489
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L493-L500
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L511-L518
 
 ";
 
@@ -6951,10 +7082,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L493-L500
 Get the binding equation for a variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L477
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L492
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L502-L510
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L520-L528
 
 ";
 
@@ -6964,10 +7095,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L502-L510
 Get the causality.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L498
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L513
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L572-L579
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L590-L597
 
 ";
 
@@ -6977,10 +7108,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L572-L579
 Which categories are possible for a variable?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L501
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L516
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L581-L592
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L599-L610
 
 ";
 
@@ -7007,10 +7138,10 @@ No other changes are permitted.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L516
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L531
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L594-L600
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L612-L618
 
 ";
 
@@ -7020,10 +7151,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L594-L600
 Get the variability.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L519
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L534
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L602-L609
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L620-L627
 
 ";
 
@@ -7052,10 +7183,10 @@ Other changes are not permitted
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L531
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L546
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L611-L617
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L629-L635
 
 ";
 
@@ -7065,10 +7196,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L611-L617
 Get the variable category.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L534
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L549
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L619-L626
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L637-L644
 
 ";
 
@@ -7092,10 +7223,10 @@ accordingly.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L546
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L561
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L628-L635
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L646-L653
 
 ";
 
@@ -7105,10 +7236,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L628-L635
 Get the number of elements of a variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L567
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L582
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L661-L663
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L679-L681
 
 ";
 
@@ -7118,10 +7249,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L661-L663
 Get the dimensions of a variable.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L570
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L585
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L665-L667
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L683-L685
 
 ";
 
@@ -7131,10 +7262,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L665-L667
 Get the start time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L573
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L588
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L669-L676
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L687-L694
 
 ";
 
@@ -7144,10 +7275,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L669-L676
 Set the start time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L576
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L591
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L678-L684
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L696-L702
 
 ";
 
@@ -7157,10 +7288,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L678-L684
 Get the stop time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L579
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L594
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L686-L693
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L704-L711
 
 ";
 
@@ -7170,10 +7301,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L686-L693
 Set the stop time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L582
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L597
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L695-L701
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L713-L719
 
 ";
 
@@ -7183,10 +7314,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L695-L701
 Get the tolerance.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L585
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L600
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L703-L710
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L721-L728
 
 ";
 
@@ -7196,10 +7327,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L703-L710
 Set the tolerance.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L588
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L603
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L712-L718
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L730-L736
 
 ";
 
@@ -7209,10 +7340,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L712-L718
 Get the step size.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L591
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L606
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L720-L727
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L738-L745
 
 ";
 
@@ -7222,10 +7353,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L720-L727
 Set the step size.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L594
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L609
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L729-L735
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L747-L753
 
 ";
 
@@ -7235,10 +7366,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L729-L735
 Get an attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L656
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L671
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L921-L929
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L939-L947
 
 >  std::vector< double > casadi::DaeBuilder::attribute(const std::string &a, const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -7246,10 +7377,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L921-L929
 Get an attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L656
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L671
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L921-L929
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L939-L947
 
 ";
 
@@ -7261,10 +7392,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L921-L929
 Set an attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L659
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L674
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L939-L946
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L957-L964
 
 >  void casadi::DaeBuilder::set_attribute(const std::string &a, const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -7272,10 +7403,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L939-L946
 Set an attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L659
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L674
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L939-L946
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L957-L964
 
 ";
 
@@ -7287,10 +7418,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L939-L946
 Get the lower bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L663
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L678
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L957-L964
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L975-L982
 
 >  std::vector< double > casadi::DaeBuilder::min(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -7298,10 +7429,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L957-L964
 Get the lower bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L663
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L678
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L957-L964
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L975-L982
 
 ";
 
@@ -7313,10 +7444,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L957-L964
 Set the lower bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L666
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L681
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L974-L980
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L992-L998
 
 >  void casadi::DaeBuilder::set_min(const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -7324,10 +7455,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L974-L980
 Set the lower bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L666
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L681
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L974-L980
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L992-L998
 
 ";
 
@@ -7339,10 +7470,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L974-L980
 Get the upper bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L669
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L684
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L991-L998
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1009-L1016
 
 >  std::vector< double > casadi::DaeBuilder::max(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -7350,10 +7481,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L991-L998
 Get the upper bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L669
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L684
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L991-L998
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1009-L1016
 
 ";
 
@@ -7365,10 +7496,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L991-L998
 Set the upper bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L672
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L687
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1008-L1014
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1026-L1032
 
 >  void casadi::DaeBuilder::set_max(const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -7376,10 +7507,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1008-L10
 Set the upper bound.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L672
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L687
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1008-L1014
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1026-L1032
 
 ";
 
@@ -7391,10 +7522,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1008-L10
 Get the nominal value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L675
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L690
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1025-L1032
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1043-L1050
 
 >  std::vector< double > casadi::DaeBuilder::nominal(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -7402,10 +7533,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1025-L10
 Get the nominal value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L675
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L690
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1025-L1032
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1043-L1050
 
 ";
 
@@ -7417,10 +7548,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1025-L10
 Set the nominal value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L678
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L693
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1042-L1048
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1060-L1066
 
 >  void casadi::DaeBuilder::set_nominal(const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -7428,10 +7559,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1042-L10
 Set the nominal value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L678
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L693
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1042-L1048
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1060-L1066
 
 ";
 
@@ -7443,10 +7574,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1042-L10
 Get the start attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L681
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L696
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1059-L1066
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1077-L1084
 
 >  std::vector< double > casadi::DaeBuilder::start(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -7454,10 +7585,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1059-L10
 Get the start attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L681
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L696
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1059-L1066
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1077-L1084
 
 ";
 
@@ -7469,10 +7600,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1059-L10
 Set the start attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L684
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L699
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1084-L1090
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1102-L1108
 
 >  void casadi::DaeBuilder::set_start(const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -7480,10 +7611,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1084-L10
 Set the start attribute.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L684
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L699
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1084-L1090
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1102-L1108
 
 ";
 
@@ -7499,10 +7630,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1084-L10
 Set the current value (string)
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L690
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L705
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1124-L1131
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1142-L1149
 
 >  void casadi::DaeBuilder::set(const std::vector< std::string > &name, const std::vector< std::string > &val)
 ------------------------------------------------------------------------
@@ -7510,10 +7641,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1124-L11
 Set the current value (string)
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L690
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L705
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1124-L1131
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1142-L1149
 
 ";
 
@@ -7525,10 +7656,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1124-L11
 Evaluate the values for a set of variables at the initial time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L693
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L708
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1137-L1178
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1155-L1196
 
 >  std::vector< GenericType > casadi::DaeBuilder::get(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -7536,10 +7667,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1137-L11
 Evaluate the values for a set of variables at the initial time.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L693
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L708
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1137-L1178
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1155-L1196
 
 ";
 
@@ -7551,10 +7682,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1137-L11
 Symbolic DAE instance?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L651
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L666
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1180-L1187
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1198-L1205
 
 ";
 
@@ -7564,10 +7695,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1180-L11
 Check if a particular variable exists.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L696
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L711
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L236-L243
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L254-L261
 
 ";
 
@@ -7577,10 +7708,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L236-L243
 Get a list of all variables of a particular category.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L702
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L717
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L254-L261
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L272-L279
 
 >  std::vector< std::string > casadi::DaeBuilder::all(const std::string &cat) const
 ------------------------------------------------------------------------
@@ -7588,10 +7719,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L254-L261
 Get a list of all variables of a particular category.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L702
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L717
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L254-L261
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L272-L279
 
 ";
 
@@ -7603,10 +7734,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L254-L261
 Get the (cached) oracle, SX or  MX.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L705
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L720
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L844-L851
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L862-L869
 
 ";
 
@@ -7618,10 +7749,10 @@ Get Jacobian sparsity.
 Extra doc: https://github.com/casadi/casadi/wiki/L_6g
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L710
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.hpp#L725
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1189-L1197
+https://github.com/casadi/casadi/blob/main/casadi/core/dae_builder.cpp#L1207-L1215
 
 ";
 
@@ -8809,10 +8940,10 @@ Supported arguments for numerical evaluation and converters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L599
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L627
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L424-L436
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L570-L582
 
 >  std::vector< const double * > casadi::Function::buf_in(MapArg arg) const
 ------------------------------------------------------------------------
@@ -8822,10 +8953,10 @@ Supported arguments for numerical evaluation and converters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L599
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L627
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L424-L436
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L570-L582
 
 ";
 
@@ -8839,10 +8970,10 @@ Supported arguments for numerical evaluation and converters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L603
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L631
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L452-L465
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L598-L611
 
 >  std::vector< double * > casadi::Function::buf_out(MPrRes res) const
 ------------------------------------------------------------------------
@@ -8852,10 +8983,10 @@ Supported arguments for numerical evaluation and converters.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L603
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L631
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L452-L465
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L598-L611
 
 ";
 
@@ -9012,55 +9143,91 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L317-L328
 
 ";
 
-%feature("docstring") casadi::Function::simplify "
+%feature("docstring") casadi::Function::transform "
 
 [INTERNAL] 
-Create a new function with simplifications applied.
+Apply transformation passes.
 
-The following list of boolean options can be provided:
-cse (default true): 
-Common subexpression elimination
+Options:
+passes (OT_VECTORVECTOR): an ordered list of passes. Each pass is a
+ 
+list whose first entry is the verb:
+{\"simplify\", task, ...}: graph 
+simplification passes applied in 
+order (cse, ref_count, const_folding, 
+combine_terms, empty_inputs). An
+ integer before a task sets its run count 
+(N>0: N times, 0: until a 
+fixed point); the default is 1.
 
-const_folding (default true): Constant folding
+{\"expand\"}: expand to an SXFunction
 
-empty_inputs (default true): inputs that are not used become 
-structurally 
-empty
+{\"external\", library, operation, opts}: apply an externally defined 
 
-ref_count (default true): reference count aware simplification
+transform (opts is an optional dict)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_2ef
+boolean shorthands (used only when \"passes\" is absent): 
+empty_inputs, 
+combine_terms, cse, ref_count, const_folding. These 
+build a single 
+\"simplify\" pass.
+
+The dict-only form applies a default simplification flow when empty. 
+The 
+(passes, opts) form runs an explicit pipeline; its opts accepts 
+only 
+\"verbose\" (the boolean simplify options are rejected there).
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ig
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L223
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L237
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L330-L332
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L406-L486
 
->  Function casadi::Function::simplify(const Dict &opts=Dict()) const
+>  Function casadi::Function::transform(const std::string &fname, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
 [INTERNAL] 
-Create a new function with simplifications applied.
+Apply transformation passes.
 
-The following list of boolean options can be provided:
-cse (default true): 
-Common subexpression elimination
+Options:
+passes (OT_VECTORVECTOR): an ordered list of passes. Each pass is a
+ 
+list whose first entry is the verb:
+{\"simplify\", task, ...}: graph 
+simplification passes applied in 
+order (cse, ref_count, const_folding, 
+combine_terms, empty_inputs). An
+ integer before a task sets its run count 
+(N>0: N times, 0: until a 
+fixed point); the default is 1.
 
-const_folding (default true): Constant folding
+{\"expand\"}: expand to an SXFunction
 
-empty_inputs (default true): inputs that are not used become 
-structurally 
-empty
+{\"external\", library, operation, opts}: apply an externally defined 
 
-ref_count (default true): reference count aware simplification
+transform (opts is an optional dict)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_2ef
+boolean shorthands (used only when \"passes\" is absent): 
+empty_inputs, 
+combine_terms, cse, ref_count, const_folding. These 
+build a single 
+\"simplify\" pass.
+
+The dict-only form applies a default simplification flow when empty. 
+The 
+(passes, opts) form runs an explicit pipeline; its opts accepts 
+only 
+\"verbose\" (the boolean simplify options are rejected there).
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ig
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L223
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L237
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L330-L332
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L406-L486
 
 ";
 
@@ -9074,10 +9241,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L255
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L255-L255
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271-L271
 
 >  casadi_int casadi::Function::size1_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -9087,10 +9254,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L255
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L255-L255
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271-L271
 
 ";
 
@@ -9104,10 +9271,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L257-L257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273-L273
 
 >  casadi_int casadi::Function::size2_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -9117,10 +9284,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L257-L257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273-L273
 
 ";
 
@@ -9134,10 +9301,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L275
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259-L261
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L275-L277
 
 >  std::pair<casadi_int, casadi_int> casadi::Function::size_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -9147,10 +9314,10 @@ Get input dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1va
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L275
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259-L261
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L275-L277
 
 ";
 
@@ -9164,10 +9331,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L269-L269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L285-L285
 
 >  casadi_int casadi::Function::size1_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -9177,10 +9344,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L269-L269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L285-L285
 
 ";
 
@@ -9194,10 +9361,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L287
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271-L271
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L287-L287
 
 >  casadi_int casadi::Function::size2_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -9207,10 +9374,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L287
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L271-L271
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L287-L287
 
 ";
 
@@ -9224,10 +9391,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L289
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273-L275
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L289-L291
 
 >  std::pair<casadi_int, casadi_int> casadi::Function::size_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -9237,10 +9404,10 @@ Get output dimension.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L289
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L273-L275
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L289-L291
 
 ";
 
@@ -9256,10 +9423,10 @@ For a particular input or for all of the inputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L302
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L286-L286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L302-L302
 
 >  casadi_int casadi::Function::nnz_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -9271,10 +9438,10 @@ For a particular input or for all of the inputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L302
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L286-L286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L302-L302
 
 ";
 
@@ -9290,10 +9457,10 @@ For a particular output or for all of the outputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vd
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L313
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L297-L297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L313-L313
 
 >  casadi_int casadi::Function::nnz_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -9305,10 +9472,10 @@ For a particular output or for all of the outputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vd
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L313
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L297-L297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L313-L313
 
 ";
 
@@ -9324,10 +9491,10 @@ For a particular input or for all of the inputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ve
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L308
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L336
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L308-L308
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L336-L336
 
 >  casadi_int casadi::Function::numel_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -9339,10 +9506,10 @@ For a particular input or for all of the inputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ve
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L308
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L336
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L308-L308
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L336-L336
 
 ";
 
@@ -9358,10 +9525,10 @@ For a particular output or for all of the outputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vf
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L319
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L347
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L319-L319
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L347-L347
 
 >  casadi_int casadi::Function::numel_out(const std::string &oname) const
 ------------------------------------------------------------------------
@@ -9373,10 +9540,10 @@ For a particular output or for all of the outputs
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vf
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L319
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L347
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L319-L319
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L347-L347
 
 ";
 
@@ -9390,10 +9557,10 @@ Get sparsity of a given input.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L397
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L425
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1029-L1035
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1175-L1181
 
 >  const Sparsity & casadi::Function::sparsity_in(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -9403,10 +9570,10 @@ Get sparsity of a given input.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L397
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L425
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1029-L1035
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1175-L1181
 
 ";
 
@@ -9420,10 +9587,10 @@ Get sparsity of a given output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vs
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L405
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L433
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1045-L1051
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1191-L1197
 
 >  const Sparsity & casadi::Function::sparsity_out(const std::string &iname) const
 ------------------------------------------------------------------------
@@ -9433,10 +9600,10 @@ Get sparsity of a given output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vs
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L405
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L433
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1045-L1051
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1191-L1197
 
 ";
 
@@ -9450,10 +9617,10 @@ Get differentiability of inputs/output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L414
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L442
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1069-L1075
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1215-L1221
 
 >  std::vector< bool > casadi::Function::is_diff_in() const
 ------------------------------------------------------------------------
@@ -9463,10 +9630,10 @@ Get differentiability of inputs/output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L414
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L442
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1069-L1075
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1215-L1221
 
 ";
 
@@ -9480,10 +9647,10 @@ Get differentiability of inputs/output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L415
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L443
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1077-L1083
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1223-L1229
 
 >  std::vector< bool > casadi::Function::is_diff_out() const
 ------------------------------------------------------------------------
@@ -9493,10 +9660,10 @@ Get differentiability of inputs/output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L415
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L443
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1077-L1083
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1223-L1229
 
 ";
 
@@ -9510,10 +9677,10 @@ Wrap in an  Function instance consisting of only one  MX call.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L438
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L466
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1933-L1935
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2116-L2118
 
 >  Function casadi::Function::wrap(const std::string &name) const
 ------------------------------------------------------------------------
@@ -9523,10 +9690,10 @@ Wrap in an  Function instance consisting of only one  MX call.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L438
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L466
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1933-L1935
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2116-L2118
 
 ";
 
@@ -9540,10 +9707,10 @@ Wrap in a  Function with options.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L446
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L474
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1941-L1943
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2124-L2126
 
 >  Function casadi::Function::wrap_as_needed(const std::string &name, const Dict &opts) const
 ------------------------------------------------------------------------
@@ -9553,10 +9720,10 @@ Wrap in a  Function with options.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L446
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L474
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1941-L1943
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2124-L2126
 
 ";
 
@@ -9568,10 +9735,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1941-L1943
 block
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L548
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520-L523
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L548-L551
 
 >  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) const
 ------------------------------------------------------------------------
@@ -9580,10 +9747,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520-L523
 block
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L548
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L520-L523
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L548-L551
 
 ";
 
@@ -9597,10 +9764,10 @@ Evaluate the function symbolically or numerically.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L559
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L587
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1485-L1492
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1668-L1675
 
 >  void casadi::Function::call(const MXDict &arg, MXDict &res, bool always_inline=false, bool never_inline=false) const
 ------------------------------------------------------------------------
@@ -9610,10 +9777,10 @@ Evaluate the function symbolically or numerically.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L559
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L587
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1485-L1492
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1668-L1675
 
 ";
 
@@ -9627,10 +9794,10 @@ Call using a map.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1174
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1208
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1433-L1447
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1616-L1630
 
 >  void casadi::Function::call_gen(const std::map< std::string, M > &arg, std::map< std::string, M > &res, bool always_inline, bool never_inline) const
 ------------------------------------------------------------------------
@@ -9640,10 +9807,10 @@ Call using a map.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1174
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1208
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1433-L1447
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1616-L1630
 
 ";
 
@@ -9712,10 +9879,10 @@ here.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L732
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L766
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L522-L524
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L668-L670
 
 >  Function casadi::Function::mapaccum(casadi_int N, const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
@@ -9780,10 +9947,10 @@ here.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L732
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L766
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L522-L524
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L668-L670
 
 ";
 
@@ -9852,10 +10019,10 @@ here.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L733
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L767
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L515-L521
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L661-L667
 
 ";
 
@@ -9886,10 +10053,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wx
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L890
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L924
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1247-L1257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1430-L1440
 
 >  std::vector< DM > casadi::Function::generate_in(const std::string &fname)
 ------------------------------------------------------------------------
@@ -9906,10 +10073,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wx
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L890
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L924
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1247-L1257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1430-L1440
 
 ";
 
@@ -9931,10 +10098,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L901
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L935
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1259-L1269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1442-L1452
 
 >  std::vector< DM > casadi::Function::generate_out(const std::string &fname)
 ------------------------------------------------------------------------
@@ -9951,10 +10118,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L901
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L935
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1259-L1269
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1442-L1452
 
 ";
 
@@ -9970,10 +10137,10 @@ Only allowed for (a subset of) SX/MX Functions
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L939
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L973
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1271-L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1454-L1457
 
 >  void casadi::Function::export_code(const std::string &lang, std::ostream &stream, const Dict &options=Dict()) const
 ------------------------------------------------------------------------
@@ -9985,10 +10152,10 @@ Only allowed for (a subset of) SX/MX Functions
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L939
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L973
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1271-L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1454-L1457
 
 ";
 
@@ -10002,10 +10169,10 @@ Serialize.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L928
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L962
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1288-L1292
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1471-L1475
 
 >  std::string casadi::Function::serialize(const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
@@ -10015,10 +10182,10 @@ Serialize.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L928
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L962
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1288-L1292
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1471-L1475
 
 ";
 
@@ -10035,10 +10202,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_240
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L935
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L969
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1283-L1286
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1466-L1469
 
 ";
 
@@ -10052,10 +10219,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L979
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1013
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1582-L1588
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1765-L1771
 
 >  const std::vector< SX > casadi::Function::sx_in() const
 ------------------------------------------------------------------------
@@ -10067,10 +10234,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L979
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1013
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1582-L1588
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1765-L1771
 
 ";
 
@@ -10086,10 +10253,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L984
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1018
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1606-L1608
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1789-L1791
 
 >  const std::vector< MX > casadi::Function::mx_in() const
 ------------------------------------------------------------------------
@@ -10101,10 +10268,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L984
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1018
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1606-L1608
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1789-L1791
 
 ";
 
@@ -10120,7 +10287,7 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L993
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1027
 
 >  const std::vector<T> casadi::Function::sym_in() const
 ------------------------------------------------------------------------
@@ -10132,7 +10299,7 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L993
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1027
 
 ";
 
@@ -10148,10 +10315,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1007
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1041
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1590-L1596
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1773-L1779
 
 >  const std::vector< SX > casadi::Function::sx_out() const
 ------------------------------------------------------------------------
@@ -10163,10 +10330,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1007
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1041
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1590-L1596
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1773-L1779
 
 ";
 
@@ -10182,10 +10349,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1012
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1046
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1610-L1612
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1793-L1795
 
 >  const std::vector< MX > casadi::Function::mx_out() const
 ------------------------------------------------------------------------
@@ -10197,10 +10364,10 @@ There is no guarantee that subsequent calls return unique answers
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1012
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1046
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1610-L1612
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1793-L1795
 
 ";
 
@@ -10214,10 +10381,10 @@ Convert from/to flat vector of input/output nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1019
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1053
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1614-L1616
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1797-L1799
 
 ";
 
@@ -10229,10 +10396,10 @@ Convert from/to flat vector of input/output nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1020
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1054
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1618-L1620
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1801-L1803
 
 ";
 
@@ -10244,10 +10411,10 @@ Convert from/to flat vector of input/output nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1021
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1055
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1622-L1624
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1805-L1807
 
 ";
 
@@ -10259,10 +10426,10 @@ Convert from/to flat vector of input/output nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1022
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1056
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1626-L1628
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1809-L1811
 
 ";
 
@@ -10278,10 +10445,10 @@ size. Does not perform sparsity checking.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1041
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1075
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1666-L1668
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1849-L1851
 
 >  std::vector< MX > casadi::Function::convert_in(const MXDict &arg) const
 ------------------------------------------------------------------------
@@ -10295,10 +10462,10 @@ size. Does not perform sparsity checking.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1041
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1075
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1666-L1668
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1849-L1851
 
 ";
 
@@ -10316,10 +10483,10 @@ size. Does not perform sparsity checking.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1043
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1077
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1674-L1676
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1857-L1859
 
 >  std::vector< MX > casadi::Function::convert_out(const MXDict &arg) const
 ------------------------------------------------------------------------
@@ -10333,10 +10500,10 @@ size. Does not perform sparsity checking.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1043
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1077
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1674-L1676
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1857-L1859
 
 ";
 
@@ -10350,10 +10517,10 @@ Is the class able to propagate seeds through the algorithm?
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1123
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1157
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1703-L1705
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1886-L1888
 
 ";
 
@@ -10365,10 +10532,10 @@ Is the class able to propagate seeds through the algorithm?
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1124
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1158
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1707-L1709
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1890-L1892
 
 ";
 
@@ -10395,10 +10562,10 @@ Get the number of function inputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L243
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L259
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L825-L827
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L971-L973
 
 ";
 
@@ -10410,10 +10577,36 @@ Get the number of function outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L248
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L264
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L829-L831
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L975-L977
+
+";
+
+%feature("docstring") casadi::Function::activity "
+
+[INTERNAL] 
+ Output signal activity induced by a given input activity.
+
+arg is a flat activity mask over all input nonzeros (size  nnz_in(), true = 
+active = possibly nonzero); the result is the corresponding 
+mask over all 
+output nonzeros (size  nnz_out()). An output that comes out inactive (false)
+ is guaranteed zero for 
+any value of the active inputs. Unlike sparsity 
+propagation this 
+exploits annihilation: an inactive operand of a multiply 
+kills the 
+product.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ih
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L326
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1269-L1295
 
 ";
 
@@ -10425,10 +10618,10 @@ Get input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L335
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L363
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1005-L1011
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1151-L1157
 
 >  const std::string & casadi::Function::name_in(casadi_int ind) const
 ------------------------------------------------------------------------
@@ -10438,10 +10631,10 @@ Get input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L335
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L363
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1005-L1011
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1151-L1157
 
 ";
 
@@ -10455,10 +10648,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L340
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L368
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1013-L1019
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1159-L1165
 
 >  const std::string & casadi::Function::name_out(casadi_int ind) const
 ------------------------------------------------------------------------
@@ -10468,10 +10661,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L340
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L368
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1013-L1019
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1159-L1165
 
 ";
 
@@ -10491,10 +10684,10 @@ adheres to SCHEME_NLPINput
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vk
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L348
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L376
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L975-L981
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1121-L1127
 
 ";
 
@@ -10512,10 +10705,10 @@ adheres to SCHEME_NLPINput
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L356
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L384
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L983-L989
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1129-L1135
 
 ";
 
@@ -10527,10 +10720,10 @@ Does the function have a particularly named input?
 Extra doc: https://github.com/casadi/casadi/wiki/L_2c9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L361
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L389
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L991-L996
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1137-L1142
 
 ";
 
@@ -10542,10 +10735,10 @@ Does the function have a particularly named output?
 Extra doc: https://github.com/casadi/casadi/wiki/L_2ca
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L365
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L393
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L998-L1003
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1144-L1149
 
 ";
 
@@ -10557,10 +10750,10 @@ Get default input value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vm
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L370
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L398
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1494-L1496
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1677-L1679
 
 ";
 
@@ -10572,10 +10765,10 @@ Get largest input value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vn
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L375
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L403
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1498-L1500
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1681-L1683
 
 ";
 
@@ -10587,10 +10780,10 @@ Get smallest input value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vo
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L380
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L408
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1502-L1504
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1685-L1687
 
 ";
 
@@ -10602,10 +10795,10 @@ Get nominal input value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vp
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L385
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L413
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1506-L1508
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1689-L1691
 
 ";
 
@@ -10617,10 +10810,10 @@ Get nominal output value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L390
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L418
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1510-L1512
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1693-L1695
 
 ";
 
@@ -10636,10 +10829,10 @@ Get oracle.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L431
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L459
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1921-L1927
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2104-L2110
 
 ";
 
@@ -10660,10 +10853,10 @@ Flip the relationship. Return which expressions contain the variables
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vx
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L455
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L483
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1840-L1847
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2023-L2030
 
 ";
 
@@ -10675,10 +10868,10 @@ Print dimensions of inputs and outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L462
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L490
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1157-L1159
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1340-L1342
 
 ";
 
@@ -10690,10 +10883,10 @@ Print options to a stream.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1vz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L467
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L495
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1161-L1163
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1344-L1346
 
 ";
 
@@ -10705,10 +10898,10 @@ Print all information there is to know about a certain option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L472
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L500
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1165-L1167
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1348-L1350
 
 ";
 
@@ -10720,10 +10913,10 @@ Does a particular option exist.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L477
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L505
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1169-L1176
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1352-L1359
 
 ";
 
@@ -10741,10 +10934,10 @@ output or saving to file.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L485
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L513
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1178-L1188
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1361-L1371
 
 ";
 
@@ -10756,10 +10949,10 @@ Reset the counter used to name dump files.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2dy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L490
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L518
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1190-L1196
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1373-L1379
 
 ";
 
@@ -10771,10 +10964,10 @@ Do the derivative functions need nondifferentiated outputs?
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L495
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L523
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L889-L891
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1035-L1037
 
 ";
 
@@ -10785,10 +10978,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L889-L891
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L501
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L529
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L894-L900
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1040-L1046
 
 ";
 
@@ -10799,10 +10992,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L894-L900
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L506
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L534
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L902-L910
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1048-L1056
 
 ";
 
@@ -10834,10 +11027,27 @@ This function is cached.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1w6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L543
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L571
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L922-L928
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1068-L1074
+
+";
+
+%feature("docstring") casadi::Function::eval_activity "
+
+[INTERNAL] 
+Propagate signal activity forward (bit set = active (possibly 
+
+nonzero))
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ii
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L691
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1260-L1267
 
 ";
 
@@ -10849,10 +11059,10 @@ Propagate sparsity backward with temporary memory allocation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L668
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L702
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L498-L513
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L644-L659
 
 >  int casadi::Function::rev(std::vector< bvec_t * > arg, std::vector< bvec_t * > res) const
 ------------------------------------------------------------------------
@@ -10862,10 +11072,10 @@ Propagate sparsity backward with temporary memory allocation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L668
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L702
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L498-L513
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L644-L659
 
 ";
 
@@ -10885,10 +11095,10 @@ Type of parallelization used: unroll|serial|openmp
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L677
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L711
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L762-L769
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L908-L915
 
 ";
 
@@ -10902,10 +11112,10 @@ original
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L789
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L823
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L753-L760
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L899-L906
 
 ";
 
@@ -10935,10 +11145,10 @@ Get a function that calculates  nfwd forward derivatives.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L835
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L869
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1141-L1147
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1324-L1330
 
 ";
 
@@ -10970,10 +11180,10 @@ Get a function that calculates  nadj adjoint derivatives.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L855
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L889
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1149-L1155
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1332-L1338
 
 ";
 
@@ -10986,10 +11196,10 @@ block.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L865
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L899
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L957-L965
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1103-L1111
 
 >  Sparsity casadi::Function::jac_sparsity(casadi_int oind, casadi_int iind, bool compact=false) const
 ------------------------------------------------------------------------
@@ -10999,10 +11209,10 @@ Get, if necessary generate, the sparsity of a single Jacobian block.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L865
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L899
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L957-L965
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1103-L1111
 
 ";
 
@@ -11016,10 +11226,10 @@ Export / Generate C code for the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L875
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L909
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1203-L1205
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1386-L1388
 
 >  std::string casadi::Function::generate(const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
@@ -11029,10 +11239,10 @@ Export / Generate C code for the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1wv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L875
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L909
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1203-L1205
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1386-L1388
 
 ";
 
@@ -11046,10 +11256,10 @@ Export / Generate C code for the dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ww
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L880
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L914
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1213-L1215
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1396-L1398
 
 ";
 
@@ -11060,10 +11270,10 @@ Get all statistics obtained at the end of the last evaluate
 call.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L967
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1001
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L934-L944
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1080-L1090
 
 ";
 
@@ -11075,10 +11285,10 @@ Does the function have free variables.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1049
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1083
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1711-L1713
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1894-L1896
 
 ";
 
@@ -11090,10 +11300,10 @@ Get free variables as a string.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1x9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1054
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1088
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1199-L1201
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1382-L1384
 
 ";
 
@@ -11105,10 +11315,10 @@ Get all the free variables of the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xa
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1059
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1093
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1687-L1693
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1870-L1876
 
 ";
 
@@ -11120,10 +11330,10 @@ Get all the free variables of the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1064
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1098
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1695-L1701
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1878-L1884
 
 ";
 
@@ -11135,10 +11345,10 @@ Extract the functions needed for the Lifted  Newton method.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1069
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1103
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1715-L1721
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1898-L1904
 
 ";
 
@@ -11150,10 +11360,10 @@ Number of nodes in the algorithm.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xd
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1075
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1109
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1779-L1785
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1962-L1968
 
 ";
 
@@ -11165,10 +11375,10 @@ Number of instruction in the algorithm (SXFunction/MXFunction)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xe
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1080
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1114
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1723-L1729
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1906-L1912
 
 ";
 
@@ -11180,10 +11390,10 @@ Identifier index of the instruction (SXFunction/MXFunction)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xf
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1085
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1119
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1747-L1753
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1930-L1936
 
 ";
 
@@ -11197,10 +11407,10 @@ Locations in the work vector for the inputs of the instruction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1092
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1126
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1755-L1761
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1938-L1944
 
 ";
 
@@ -11213,10 +11423,10 @@ Get the floating point output argument of an instruction
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1097
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1131
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1763-L1769
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1946-L1952
 
 ";
 
@@ -11230,10 +11440,10 @@ Location in the work vector for the output of the instruction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1104
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1138
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1771-L1777
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1954-L1960
 
 ";
 
@@ -11245,10 +11455,10 @@ Get the  MX node corresponding to an instruction (MXFunction)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1109
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1143
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1731-L1737
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1914-L1920
 
 ";
 
@@ -11264,10 +11474,10 @@ returns nan for those instructions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xk
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1117
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1151
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1739-L1745
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1922-L1928
 
 ";
 
@@ -11279,10 +11489,10 @@ Get required length of arg field.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xm
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1130
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1164
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1089-L1089
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1235-L1235
 
 ";
 
@@ -11294,10 +11504,10 @@ Get required length of res field.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xn
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1135
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1169
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1091-L1091
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1237-L1237
 
 ";
 
@@ -11309,10 +11519,10 @@ Get required length of iw field.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xo
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1140
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1174
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1093-L1093
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1239-L1239
 
 ";
 
@@ -11324,10 +11534,10 @@ Get required length of w field.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xp
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1145
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1179
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1095-L1095
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1241-L1241
 
 ";
 
@@ -11339,10 +11549,10 @@ Get number of temporary variables needed.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1151
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1185
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1085-L1087
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1231-L1233
 
 ";
 
@@ -11354,10 +11564,10 @@ Set the (persistent) work vectors.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1156
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1190
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1114-L1121
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1297-L1304
 
 ";
 
@@ -11369,10 +11579,10 @@ Set the (temporary) work vectors.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xs
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1162
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1196
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1123-L1130
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1306-L1313
 
 ";
 
@@ -11384,10 +11594,10 @@ Set the (persistent and temporary) work vectors.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1168
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1202
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1132-L1139
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1315-L1322
 
 ";
 
@@ -11399,10 +11609,10 @@ List merge opportunitities.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2b6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1180
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1214
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1682-L1685
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1865-L1868
 
 ";
 
@@ -11414,10 +11624,10 @@ Name of the function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1188
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1222
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1321-L1328
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1504-L1511
 
 ";
 
@@ -11432,10 +11642,10 @@ true)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1xw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1195
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1229
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1678-L1680
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1861-L1863
 
 ";
 
@@ -11445,10 +11655,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1678-L1680
 Assert that an input dimension is equal so some given value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1240
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1274
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1799-L1805
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1982-L1988
 
 ";
 
@@ -11458,10 +11668,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1799-L1805
 Assert that an output dimension is equal so some given value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1243
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1277
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1807-L1812
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1990-L1995
 
 ";
 
@@ -11472,10 +11682,10 @@ Assert that an output sparsity is a multiple of some given
 sparsity.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1246
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1280
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1814-L1823
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1997-L2006
 
 ";
 
@@ -11485,10 +11695,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1814-L1823
 Checkout a memory object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1250
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1284
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1787-L1789
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1970-L1972
 
 ";
 
@@ -11498,10 +11708,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1787-L1789
 Release a memory object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1253
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1287
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1791-L1793
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1974-L1976
 
 ";
 
@@ -11511,10 +11721,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1791-L1793
 Get memory object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1257
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1291
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1795-L1797
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1978-L1980
 
 ";
 
@@ -11526,10 +11736,10 @@ Get all functions in the cache.
 Extra doc: https://github.com/casadi/casadi/wiki/L_26i
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1266
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1300
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1849-L1856
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2032-L2039
 
 ";
 
@@ -11541,10 +11751,10 @@ Get a dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1310
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1867-L1873
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2050-L2056
 
 >  Function casadi::Function::get_function(const std::string &name) const
 ------------------------------------------------------------------------
@@ -11554,10 +11764,10 @@ Get a dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1310
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1867-L1873
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2050-L2056
 
 ";
 
@@ -11571,10 +11781,10 @@ Check if a particular dependency exists.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1281
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1315
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1875-L1882
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2058-L2065
 
 ";
 
@@ -11594,10 +11804,10 @@ depth-first ordered, unique, list of dependencies
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1289
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1323
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1884-L1899
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2067-L2082
 
 ";
 
@@ -11618,10 +11828,10 @@ Maximum depth - a negative number indicates no maximum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1297
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1331
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1901-L1918
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2084-L2101
 
 ";
 
@@ -11631,10 +11841,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1901-L1918
 Obtain information about function
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1300
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1334
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L1955-L1957
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2138-L2140
 
 ";
 
@@ -11752,10 +11962,10 @@ Note that CasADi uses 'fortran' order: column-by-column
 Extra doc: https://github.com/casadi/casadi/wiki/L_1yb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1378
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1412
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2021-L2026
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2204-L2209
 
 ";
 
@@ -11771,10 +11981,10 @@ Note that CasADi uses 'fortran' order: column-by-column
 Extra doc: https://github.com/casadi/casadi/wiki/L_1yc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1387
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1421
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2027-L2032
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2210-L2215
 
 ";
 
@@ -11784,10 +11994,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2027-L2032
 Get last return value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1389
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L1423
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2040-L2042
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L2223-L2225
 
 ";
 
@@ -13905,10 +14115,10 @@ Given a repeated matrix, computes the sum of repeated parts.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1d7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1167
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1178
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1167-L1169
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1178-L1180
 
 >  MatType casadi::GenericMatrix::repsum(const MatType &A, casadi_int n, casadi_int m=1)
 ------------------------------------------------------------------------
@@ -13918,10 +14128,10 @@ Given a repeated matrix, computes the sum of repeated parts.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1d7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1167
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1178
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1167-L1169
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1178-L1180
 
 ";
 
@@ -14509,10 +14719,10 @@ with nrow-by-ncol symbolic primitives
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261-L1263
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272-L1274
 
 >  static std::vector<std::vector<MatType> > casadi::GenericMatrix< MatType >::sym(const std::string &name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r)
 ------------------------------------------------------------------------
@@ -14524,10 +14734,10 @@ with nrow-by-ncol symbolic primitives
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261-L1263
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272-L1274
 
 ";
 
@@ -14543,10 +14753,10 @@ entries zero.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274-L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285-L1287
 
 >  static MatType casadi::GenericMatrix< MatType >::zeros(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -14557,10 +14767,10 @@ entries zero.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274-L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285-L1287
 
 ";
 
@@ -14576,10 +14786,10 @@ entries one.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1di
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287-L1289
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298-L1300
 
 >  static MatType casadi::GenericMatrix< MatType >::ones(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -14590,10 +14800,10 @@ entries one.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1di
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287-L1289
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298-L1300
 
 ";
 
@@ -14771,6 +14981,32 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L929-L
 
 ";
 
+%feature("docstring") casadi::GenericMatrixCommon::transform "
+
+[INTERNAL] 
+Apply transformation passes to an expression
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1140
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1140-L1143
+
+>  MatType casadi::GenericMatrix::transform(const MatType &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict())
+------------------------------------------------------------------------
+[INTERNAL] 
+Apply transformation passes to an expression
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1140
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1140-L1143
+
+";
+
+";
+
 %feature("docstring") casadi::GenericMatrixCommon::mmin "
 
 [INTERNAL] 
@@ -14779,10 +15015,10 @@ Smallest element in a matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1d8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1175
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1186
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1175-L1177
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1186-L1188
 
 ";
 
@@ -14794,10 +15030,10 @@ Largest element in a matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1d9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1184
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1195
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1184-L1186
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1195-L1197
 
 ";
 
@@ -14812,7 +15048,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L84
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1306-L1308
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1317-L1319
 
 ";
 
@@ -14827,7 +15063,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L89
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1311-L1313
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1322-L1324
 
 ";
 
@@ -14842,7 +15078,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L94
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1316-L1318
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1327-L1329
 
 ";
 
@@ -14857,7 +15093,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L99
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1321-L1323
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1332-L1334
 
 ";
 
@@ -14872,7 +15108,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L104
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1326-L1328
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1337-L1339
 
 ";
 
@@ -14887,7 +15123,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L109
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1331-L1333
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1342-L1344
 
 ";
 
@@ -14917,7 +15153,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L119
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1336-L1338
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1347-L1349
 
 ";
 
@@ -14949,7 +15185,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L131
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1351-L1353
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1362-L1364
 
 ";
 
@@ -14964,7 +15200,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L141
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1346-L1348
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1357-L1359
 
 >  casadi_int casadi::GenericMatrix< MatType >::size(casadi_int axis) const
 ------------------------------------------------------------------------
@@ -14977,7 +15213,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L141
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1346-L1348
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1357-L1359
 
 ";
 
@@ -15027,7 +15263,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L158
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1356-L1358
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1367-L1369
 
 ";
 
@@ -15132,7 +15368,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L207
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1301-L1303
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1312-L1314
 
 ";
 
@@ -15944,10 +16180,10 @@ arguments.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1d4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1139
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1150
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1139-L1141
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1150-L1152
 
 ";
 
@@ -15959,10 +16195,10 @@ Introduce intermediate variables for selected nodes in a graph.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1d5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1146
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1157
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1146-L1151
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1157-L1162
 
 ";
 
@@ -15974,10 +16210,10 @@ Extract shared subexpressions from an set of expressions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1d6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1156
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1167
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1156-L1162
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1167-L1173
 
 ";
 
@@ -17263,62 +17499,76 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_22w
 
 >List of available options
 
-+----------------------+-----------------+---------------------------------+
-|          Id          |      Type       |           Description           |
-+======================+=================+=================================+
-| cleanup              | OT_BOOL         | Cleanup temporary files when    |
-|                      |                 | unloading. Default: true        |
-+----------------------+-----------------+---------------------------------+
-| compiler             | OT_STRING       | Compiler command                |
-+----------------------+-----------------+---------------------------------+
-| compiler_flags       | OT_STRINGVECTOR | Alias for 'compiler_flags'      |
-+----------------------+-----------------+---------------------------------+
-| compiler_output_flag | OT_STRING       | Compiler flag to denote object  |
-|                      |                 | output. Default: '-o '          |
-+----------------------+-----------------+---------------------------------+
-| compiler_setup       | OT_STRING       | Compiler setup command.         |
-|                      |                 | Intended to be fixed. The       |
-|                      |                 | 'flag' option is the prefered   |
-|                      |                 | way to set custom flags.        |
-+----------------------+-----------------+---------------------------------+
-| directory            | OT_STRING       | Directory to put temporary      |
-|                      |                 | objects in. Must end with a     |
-|                      |                 | file separator.                 |
-+----------------------+-----------------+---------------------------------+
-| extra_suffixes       | OT_STRINGVECTOR | List of suffixes for extra      |
-|                      |                 | files that the compiler may     |
-|                      |                 | generate. Default: None         |
-+----------------------+-----------------+---------------------------------+
-| flags                | OT_STRINGVECTOR | Compile flags for the JIT       |
-|                      |                 | compiler. Default: None         |
-+----------------------+-----------------+---------------------------------+
-| linker               | OT_STRING       | Linker command                  |
-+----------------------+-----------------+---------------------------------+
-| linker_flags         | OT_STRINGVECTOR | Linker flags for the JIT        |
-|                      |                 | compiler. Default: None         |
-+----------------------+-----------------+---------------------------------+
-| linker_output_flag   | OT_STRING       | Linker flag to denote shared    |
-|                      |                 | library output. Default: '-o '  |
-+----------------------+-----------------+---------------------------------+
-| linker_setup         | OT_STRING       | Linker setup command. Intended  |
-|                      |                 | to be fixed. The 'flag' option  |
-|                      |                 | is the prefered way to set      |
-|                      |                 | custom flags.                   |
-+----------------------+-----------------+---------------------------------+
-| name                 | OT_STRING       | The file name used to write out |
-|                      |                 | compiled objects/libraries. The |
-|                      |                 | actual file names used depend   |
-|                      |                 | on 'temp_suffix' and include    |
-|                      |                 | extensions. Default:            |
-|                      |                 | 'tmp_casadi_compiler_shell'     |
-+----------------------+-----------------+---------------------------------+
-| temp_suffix          | OT_BOOL         | Use a temporary (seemingly      |
-|                      |                 | random) filename suffix for     |
-|                      |                 | file names. This is desired for |
-|                      |                 | thread-safety. This behaviour   |
-|                      |                 | may defeat caching compiler     |
-|                      |                 | wrappers. Default: true         |
-+----------------------+-----------------+---------------------------------+
++-----------------------+-----------------+--------------------------------+
+|          Id           |      Type       |          Description           |
++=======================+=================+================================+
+| cleanup               | OT_BOOL         | Cleanup temporary files when   |
+|                       |                 | unloading. Default: true       |
++-----------------------+-----------------+--------------------------------+
+| compiler              | OT_STRING       | Compiler command               |
++-----------------------+-----------------+--------------------------------+
+| compiler_flags        | OT_STRINGVECTOR | Alias for 'compiler_flags'     |
++-----------------------+-----------------+--------------------------------+
+| compiler_include_flag | OT_STRING       | Compiler flag to add an        |
+|                       |                 | include directory. Default:    |
+|                       |                 | '-I' ('/I' on MSVC)            |
++-----------------------+-----------------+--------------------------------+
+| compiler_output_flag  | OT_STRING       | Compiler flag to denote object |
+|                       |                 | output. Default: '-o '         |
++-----------------------+-----------------+--------------------------------+
+| compiler_setup        | OT_STRING       | Compiler setup command.        |
+|                       |                 | Intended to be fixed. The      |
+|                       |                 | 'flag' option is the prefered  |
+|                       |                 | way to set custom flags.       |
++-----------------------+-----------------+--------------------------------+
+| directory             | OT_STRING       | Directory to put temporary     |
+|                       |                 | objects in. Must end with a    |
+|                       |                 | file separator.                |
++-----------------------+-----------------+--------------------------------+
+| extra_suffixes        | OT_STRINGVECTOR | List of suffixes for extra     |
+|                       |                 | files that the compiler may    |
+|                       |                 | generate. Default: None        |
++-----------------------+-----------------+--------------------------------+
+| flags                 | OT_STRINGVECTOR | Compile flags for the JIT      |
+|                       |                 | compiler. Default: None        |
++-----------------------+-----------------+--------------------------------+
+| include_dirs          | OT_STRINGVECTOR | List of include directories,   |
+|                       |                 | each passed to the compiler    |
+|                       |                 | prefixed with                  |
+|                       |                 | 'compiler_include_flag'. OS-   |
+|                       |                 | agnostic alternative to        |
+|                       |                 | passing '-I...' via 'flags'.   |
+|                       |                 | Default: None                  |
++-----------------------+-----------------+--------------------------------+
+| linker                | OT_STRING       | Linker command                 |
++-----------------------+-----------------+--------------------------------+
+| linker_flags          | OT_STRINGVECTOR | Linker flags for the JIT       |
+|                       |                 | compiler. Default: None        |
++-----------------------+-----------------+--------------------------------+
+| linker_output_flag    | OT_STRING       | Linker flag to denote shared   |
+|                       |                 | library output. Default: '-o ' |
++-----------------------+-----------------+--------------------------------+
+| linker_setup          | OT_STRING       | Linker setup command. Intended |
+|                       |                 | to be fixed. The 'flag' option |
+|                       |                 | is the prefered way to set     |
+|                       |                 | custom flags.                  |
++-----------------------+-----------------+--------------------------------+
+| name                  | OT_STRING       | The file name used to write    |
+|                       |                 | out compiled                   |
+|                       |                 | objects/libraries. The actual  |
+|                       |                 | file names used depend on      |
+|                       |                 | 'temp_suffix' and include      |
+|                       |                 | extensions. Default:           |
+|                       |                 | 'tmp_casadi_compiler_shell'    |
++-----------------------+-----------------+--------------------------------+
+| temp_suffix           | OT_BOOL         | Use a temporary (seemingly     |
+|                       |                 | random) filename suffix for    |
+|                       |                 | file names. This is desired    |
+|                       |                 | for thread-safety. This        |
+|                       |                 | behaviour may defeat caching   |
+|                       |                 | compiler wrappers. Default:    |
+|                       |                 | true                           |
++-----------------------+-----------------+--------------------------------+
 
 Joris Gillis
 
@@ -18575,7 +18825,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L457-L499
 Access the non-zero elements
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1012
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1020
 
 >  const std::vector<Scalar>& casadi::Matrix< Scalar >::nonzeros() const
 ------------------------------------------------------------------------
@@ -18583,7 +18833,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1012
 Access the non-zero elements
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1012
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1020
 
 ";
 
@@ -18595,7 +18845,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1012
 Get a pointer to the data
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1018
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1026
 
 >  const Scalar* casadi::Matrix< Scalar >::ptr() const
 ------------------------------------------------------------------------
@@ -18603,7 +18853,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1018
 Get a pointer to the data
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1018
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1026
 
 ";
 
@@ -18615,10 +18865,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1018
 Get a pointer to the data
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1020
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1028
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1020-L1020
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1028-L1028
 
 >  const Scalar* casadi::Matrix::get_ptr(const Matrix< Scalar > &v)
 ------------------------------------------------------------------------
@@ -18626,10 +18876,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1020-L10
 Get a pointer to the data
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1020
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1028
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1020-L1020
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1028-L1028
 
 ";
 
@@ -18768,13 +19018,33 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L311
 
 ";
 
+%feature("docstring") casadi::MatrixCommon::transform "
+
+[INTERNAL] 
+Functions called by friend functions defined for  GenericMatrix
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L313
+
+>  static Matrix<Scalar> casadi::Matrix< Scalar >::transform(const Matrix< Scalar > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict())
+------------------------------------------------------------------------
+[INTERNAL] 
+Functions called by friend functions defined for  GenericMatrix
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L313
+
+";
+
+";
+
 %feature("docstring") casadi::MatrixCommon::jacobian "
 
 [INTERNAL] 
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L312
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L315
 
 ";
 
@@ -18784,7 +19054,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L312
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L314
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L317
 
 ";
 
@@ -18794,7 +19064,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L314
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L317
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L320
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::hessian(const Matrix< Scalar > &f, const Matrix< Scalar > &x, Matrix< Scalar > &g, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -18802,7 +19072,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L317
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L317
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L320
 
 ";
 
@@ -18814,7 +19084,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L317
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L324
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L327
 
 >  static std::vector<Matrix<Scalar> > casadi::Matrix< Scalar >::substitute(const std::vector< Matrix< Scalar > > &ex, const std::vector< Matrix< Scalar > > &v, const std::vector< Matrix< Scalar > > &vdef)
 ------------------------------------------------------------------------
@@ -18822,7 +19092,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L324
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L324
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L327
 
 ";
 
@@ -18834,7 +19104,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L324
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L327
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L330
 
 ";
 
@@ -18844,7 +19114,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L327
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L332
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L335
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::pinv(const Matrix< Scalar > &A, const std::string &lsolver, const Dict &opts)
 ------------------------------------------------------------------------
@@ -18852,7 +19122,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L332
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L332
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L335
 
 ";
 
@@ -18864,7 +19134,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L332
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L334
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L337
 
 ";
 
@@ -18874,7 +19144,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L334
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L335
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L338
 
 ";
 
@@ -18884,7 +19154,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L335
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L337
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L340
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::solve(const Matrix< Scalar > &A, const Matrix< Scalar > &b, const std::string &lsolver, const Dict &opts)
 ------------------------------------------------------------------------
@@ -18892,7 +19162,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L337
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L337
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L340
 
 ";
 
@@ -18904,7 +19174,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L337
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L340
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L343
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::inv(const Matrix< Scalar > &A, const std::string &lsolver, const Dict &opts)
 ------------------------------------------------------------------------
@@ -18912,7 +19182,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L340
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L340
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L343
 
 ";
 
@@ -18924,7 +19194,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L340
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L343
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L346
 
 ";
 
@@ -18934,7 +19204,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L343
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L344
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L347
 
 ";
 
@@ -18944,7 +19214,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L344
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L346
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L349
 
 ";
 
@@ -18954,7 +19224,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L346
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L348
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L351
 
 ";
 
@@ -18964,7 +19234,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L348
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L353
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L356
 
 ";
 
@@ -18974,7 +19244,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L353
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L356
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L359
 
 ";
 
@@ -18984,7 +19254,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L356
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L360
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L363
 
 ";
 
@@ -18994,7 +19264,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L360
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L364
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L367
 
 ";
 
@@ -19004,7 +19274,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L364
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L368
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L371
 
 ";
 
@@ -19014,7 +19284,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L368
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L369
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L372
 
 ";
 
@@ -19024,7 +19294,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L369
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L370
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L373
 
 ";
 
@@ -19034,7 +19304,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L370
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L372
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L375
 
 ";
 
@@ -19044,7 +19314,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L372
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L375
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L378
 
 ";
 
@@ -19054,7 +19324,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L375
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L376
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L379
 
 ";
 
@@ -19064,7 +19334,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L376
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L377
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L380
 
 ";
 
@@ -19074,7 +19344,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L377
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L379
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L382
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::det(const Matrix< Scalar > &x, const std::string &lsolver, const Dict &dict=Dict())
 ------------------------------------------------------------------------
@@ -19082,7 +19352,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L379
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L379
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L382
 
 ";
 
@@ -19094,7 +19364,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L379
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L381
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L384
 
 ";
 
@@ -19104,7 +19374,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L381
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L382
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L385
 
 ";
 
@@ -19114,7 +19384,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L382
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L383
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L386
 
 ";
 
@@ -19124,7 +19394,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L383
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L384
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L387
 
 ";
 
@@ -19134,7 +19404,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L384
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L385
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L388
 
 ";
 
@@ -19144,7 +19414,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L385
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L386
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L389
 
 ";
 
@@ -19154,7 +19424,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L386
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L387
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L390
 
 ";
 
@@ -19164,7 +19434,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L387
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L388
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L391
 
 ";
 
@@ -19174,7 +19444,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L388
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L389
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L392
 
 ";
 
@@ -19184,7 +19454,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L389
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L390
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L393
 
 ";
 
@@ -19194,7 +19464,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L390
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L391
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L394
 
 ";
 
@@ -19204,7 +19474,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L391
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L392
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L395
 
 ";
 
@@ -19214,7 +19484,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L392
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L393
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L396
 
 ";
 
@@ -19224,7 +19494,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L393
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L395
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L398
 
 ";
 
@@ -19234,7 +19504,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L395
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L397
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L400
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L502-L504
@@ -19245,7 +19515,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L502-L504
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L397
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L400
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L502-L504
@@ -19260,7 +19530,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L502-L504
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L405
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L408
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L576-L583
@@ -19271,7 +19541,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L576-L583
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L405
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L408
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L576-L583
@@ -19286,7 +19556,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L576-L583
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L410
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L413
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L537-L548
@@ -19299,7 +19569,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L537-L548
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L411
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L414
 
 ";
 
@@ -19309,7 +19579,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L411
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L412
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L415
 
 ";
 
@@ -19320,7 +19590,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L417
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L420
 
 ";
 
@@ -19331,7 +19601,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L418
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L421
 
 ";
 
@@ -19342,7 +19612,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L420
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L423
 
 ";
 
@@ -19353,7 +19623,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L422
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L425
 
 ";
 
@@ -19364,7 +19634,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L424
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L427
 
 ";
 
@@ -19375,7 +19645,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L427
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L430
 
 ";
 
@@ -19386,7 +19656,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L431
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L434
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::reshape(const Matrix< Scalar > &x, const Sparsity &sp)
 ------------------------------------------------------------------------
@@ -19394,7 +19664,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L431
 Functions called by friend functions defined for  SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L431
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L434
 
 ";
 
@@ -19407,7 +19677,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L432
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L435
 
 ";
 
@@ -19418,7 +19688,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L433
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L436
 
 ";
 
@@ -19429,7 +19699,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L434
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L437
 
 ";
 
@@ -19440,7 +19710,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L436
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L439
 
 ";
 
@@ -19451,7 +19721,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L440
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L443
 
 ";
 
@@ -19462,7 +19732,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L446
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L449
 
 ";
 
@@ -19474,10 +19744,10 @@ Make a matrix sparse by removing numerical zeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_191
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L653
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L661
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L653-L655
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L661-L663
 
 >  Matrix<Scalar> casadi::Matrix::sparsify(const Matrix< Scalar > &A, double tol=0)
 ------------------------------------------------------------------------
@@ -19487,10 +19757,10 @@ Make a matrix sparse by removing numerical zeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_191
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L653
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L661
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L653-L655
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L661-L663
 
 ";
 
@@ -19504,10 +19774,10 @@ Expand the expression as a weighted sum (with constant weights)
 Extra doc: https://github.com/casadi/casadi/wiki/L_192
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L660
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L668
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L660-L663
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L668-L671
 
 >  void casadi::Matrix::expand(const Matrix< Scalar > &ex, Matrix< Scalar > &weights, Matrix< Scalar > &terms)
 ------------------------------------------------------------------------
@@ -19517,10 +19787,10 @@ Expand the expression as a weighted sum (with constant weights)
 Extra doc: https://github.com/casadi/casadi/wiki/L_192
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L660
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L668
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L660-L663
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L668-L671
 
 ";
 
@@ -19552,10 +19822,10 @@ vector with the value of the function for each interval (length n)
 Extra doc: https://github.com/casadi/casadi/wiki/L_193
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L675
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L683
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L675-L679
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L683-L687
 
 >  Matrix<Scalar> casadi::Matrix::pw_const(const Matrix< Scalar > &t, const Matrix< Scalar > &tval, const Matrix< Scalar > &val)
 ------------------------------------------------------------------------
@@ -19583,10 +19853,10 @@ vector with the value of the function for each interval (length n)
 Extra doc: https://github.com/casadi/casadi/wiki/L_193
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L675
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L683
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L675-L679
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L683-L687
 
 ";
 
@@ -19617,10 +19887,10 @@ tval)
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L692
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L700
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L692-L695
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L700-L703
 
 >  Matrix<Scalar> casadi::Matrix::pw_lin(const Matrix< Scalar > &t, const Matrix< Scalar > &tval, const Matrix< Scalar > &val)
 ------------------------------------------------------------------------
@@ -19647,10 +19917,10 @@ tval)
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L692
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L700
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L692-L695
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L700-L703
 
 ";
 
@@ -19668,10 +19938,10 @@ H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 Extra doc: https://github.com/casadi/casadi/wiki/L_195
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L708
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L716
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L708-L710
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L716-L718
 
 >  Matrix<Scalar> casadi::Matrix::heaviside(const Matrix< Scalar > &x)
 ------------------------------------------------------------------------
@@ -19685,10 +19955,10 @@ H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 Extra doc: https://github.com/casadi/casadi/wiki/L_195
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L708
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L716
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L708-L710
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L716-L718
 
 ";
 
@@ -19712,10 +19982,10 @@ window function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L725
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L733
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L725-L727
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L733-L735
 
 >  Matrix<Scalar> casadi::Matrix::rectangle(const Matrix< Scalar > &x)
 ------------------------------------------------------------------------
@@ -19735,10 +20005,10 @@ window function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L725
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L733
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L725-L727
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L733-L735
 
 ";
 
@@ -19756,10 +20026,10 @@ triangle function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L740
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L748
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L740-L742
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L748-L750
 
 >  Matrix<Scalar> casadi::Matrix::triangle(const Matrix< Scalar > &x)
 ------------------------------------------------------------------------
@@ -19773,10 +20043,10 @@ triangle function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L740
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L748
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L740-L742
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L748-L750
 
 ";
 
@@ -19796,10 +20066,10 @@ Also called: slope function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L757
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L765
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L757-L759
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L765-L767
 
 >  Matrix<Scalar> casadi::Matrix::ramp(const Matrix< Scalar > &x)
 ------------------------------------------------------------------------
@@ -19815,10 +20085,10 @@ Also called: slope function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L757
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L765
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L757-L759
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L765-L767
 
 ";
 
@@ -19832,10 +20102,10 @@ Integrate f from a to b using Gaussian quadrature with n points.
 Extra doc: https://github.com/casadi/casadi/wiki/L_196
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L772
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L780
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L772-L776
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L780-L784
 
 >  Matrix<Scalar> casadi::Matrix::gauss_quadrature(const Matrix< Scalar > &f, const Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b, casadi_int order, const Matrix< Scalar > &w)
 ------------------------------------------------------------------------
@@ -19845,10 +20115,10 @@ Integrate f from a to b using Gaussian quadrature with n points.
 Extra doc: https://github.com/casadi/casadi/wiki/L_196
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L772
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L780
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L772-L776
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L780-L784
 
 ";
 
@@ -19860,7 +20130,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L772-L776
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L473
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L476
 
 ";
 
@@ -19870,7 +20140,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L473
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L478
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L481
 
 ";
 
@@ -19880,7 +20150,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L478
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L482
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L485
 
 ";
 
@@ -19921,10 +20191,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L804
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L812
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L804-L806
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L812-L814
 
 >  Matrix<Scalar> casadi::Matrix::taylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x)
 ------------------------------------------------------------------------
@@ -19963,10 +20233,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L804
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L812
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L804-L806
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L812-L814
 
 ";
 
@@ -20013,10 +20283,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L849
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L857
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L849-L853
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L857-L861
 
 >  Matrix<Scalar> casadi::Matrix::mtaylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, casadi_int order, const std::vector< casadi_int > &order_contributions)
 ------------------------------------------------------------------------
@@ -20059,10 +20329,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L849
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L857
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L849-L853
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L857-L861
 
 ";
 
@@ -20085,10 +20355,10 @@ Scalar symbol that the polynomial is build up with
 Extra doc: https://github.com/casadi/casadi/wiki/L_197
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L861
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L869
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L861-L864
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L869-L872
 
 >  Matrix<Scalar> casadi::Matrix::poly_coeff(const Matrix< Scalar > &f, const Matrix< Scalar > &x)
 ------------------------------------------------------------------------
@@ -20107,10 +20377,10 @@ Scalar symbol that the polynomial is build up with
 Extra doc: https://github.com/casadi/casadi/wiki/L_197
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L861
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L869
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L861-L864
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L869-L872
 
 ";
 
@@ -20128,10 +20398,10 @@ roots are real.
 Extra doc: https://github.com/casadi/casadi/wiki/L_198
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L872
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L880
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L872-L874
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L880-L882
 
 >  Matrix<Scalar> casadi::Matrix::poly_roots(const Matrix< Scalar > &p)
 ------------------------------------------------------------------------
@@ -20145,10 +20415,10 @@ roots are real.
 Extra doc: https://github.com/casadi/casadi/wiki/L_198
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L872
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L880
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L872-L874
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L880-L882
 
 ";
 
@@ -20164,10 +20434,10 @@ This will only work for up to 3x3 matrices
 Extra doc: https://github.com/casadi/casadi/wiki/L_199
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L881
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L889
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L881-L883
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L889-L891
 
 >  Matrix<Scalar> casadi::Matrix::eig_symbolic(const Matrix< Scalar > &m)
 ------------------------------------------------------------------------
@@ -20179,10 +20449,10 @@ This will only work for up to 3x3 matrices
 Extra doc: https://github.com/casadi/casadi/wiki/L_199
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L881
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L889
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L881-L883
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L889-L891
 
 ";
 
@@ -20198,10 +20468,10 @@ An error is raised when the expression contains symbols
 Extra doc: https://github.com/casadi/casadi/wiki/L_19a
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L891
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L899
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L891-L893
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L899-L901
 
 >  Matrix<double> casadi::Matrix::evalf(const Matrix< Scalar > &expr)
 ------------------------------------------------------------------------
@@ -20213,10 +20483,10 @@ An error is raised when the expression contains symbols
 Extra doc: https://github.com/casadi/casadi/wiki/L_19a
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L891
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L899
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L891-L893
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L899-L901
 
 ";
 
@@ -20232,10 +20502,10 @@ See T. Davis: Direct Methods for Sparse Linear Systems
 Extra doc: https://github.com/casadi/casadi/wiki/L_18t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L579
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L587
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L579-L583
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L587-L591
 
 >  void casadi::Matrix::qr_sparse(const Matrix< Scalar > &A, Matrix< Scalar > &V, Matrix< Scalar > &R, Matrix< Scalar > &beta, std::vector< casadi_int > &prinv, std::vector< casadi_int > &pc, bool amd=true)
 ------------------------------------------------------------------------
@@ -20247,10 +20517,10 @@ See T. Davis: Direct Methods for Sparse Linear Systems
 Extra doc: https://github.com/casadi/casadi/wiki/L_18t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L579
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L587
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L579-L583
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L587-L591
 
 ";
 
@@ -20264,10 +20534,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L579-L583
 Extra doc: https://github.com/casadi/casadi/wiki/L_18u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L589
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L597
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L589-L594
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L597-L602
 
 >  Matrix<Scalar> casadi::Matrix::qr_solve(const Matrix< Scalar > &b, const Matrix< Scalar > &v, const Matrix< Scalar > &r, const Matrix< Scalar > &beta, const std::vector< casadi_int > &prinv, const std::vector< casadi_int > &pc, bool tr=false)
 ------------------------------------------------------------------------
@@ -20277,10 +20547,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L589-L594
 Extra doc: https://github.com/casadi/casadi/wiki/L_18u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L589
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L597
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L589-L594
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L597-L602
 
 ";
 
@@ -20302,10 +20572,10 @@ value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L570
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L578
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L570-L572
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L578-L580
 
 >  void casadi::Matrix::qr(const Matrix< Scalar > &A, Matrix< Scalar > &Q, Matrix< Scalar > &R)
 ------------------------------------------------------------------------
@@ -20323,10 +20593,10 @@ value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L570
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L578
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L570-L572
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L578-L580
 
 ";
 
@@ -20346,10 +20616,10 @@ matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L613
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L621
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L613-L616
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L621-L624
 
 >  void casadi::Matrix::ldl(const Matrix< Scalar > &A, Matrix< Scalar > &D, Matrix< Scalar > &LT, std::vector< casadi_int > &p, bool amd=true)
 ------------------------------------------------------------------------
@@ -20365,10 +20635,10 @@ matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L613
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L621
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L613-L616
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L621-L624
 
 ";
 
@@ -20382,10 +20652,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L613-L616
 Extra doc: https://github.com/casadi/casadi/wiki/L_18x
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L622
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L630
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L622-L625
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L630-L633
 
 >  Matrix<Scalar> casadi::Matrix::ldl_solve(const Matrix< Scalar > &b, const Matrix< Scalar > &D, const Matrix< Scalar > &LT, const std::vector< casadi_int > &p)
 ------------------------------------------------------------------------
@@ -20395,10 +20665,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L622-L625
 Extra doc: https://github.com/casadi/casadi/wiki/L_18x
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L622
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L630
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L622-L625
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L630-L633
 
 ";
 
@@ -20412,10 +20682,10 @@ Returns true only if every element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L637
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L645
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L637-L639
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L645-L647
 
 >  Matrix<Scalar> casadi::Matrix::all(const Matrix< Scalar > &x)
 ------------------------------------------------------------------------
@@ -20425,10 +20695,10 @@ Returns true only if every element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L637
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L645
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L637-L639
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L645-L647
 
 ";
 
@@ -20442,10 +20712,10 @@ Returns true only if any element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L630
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L638
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L630-L632
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L638-L640
 
 >  Matrix<Scalar> casadi::Matrix::any(const Matrix< Scalar > &x)
 ------------------------------------------------------------------------
@@ -20455,10 +20725,10 @@ Returns true only if any element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L630
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L638
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L630-L632
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L638-L640
 
 ";
 
@@ -20472,10 +20742,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L630-L632
 Extra doc: https://github.com/casadi/casadi/wiki/L_18p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L544
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L552
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L544-L546
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L552-L554
 
 >  Matrix<Scalar> casadi::Matrix::adj(const Matrix< Scalar > &A)
 ------------------------------------------------------------------------
@@ -20485,10 +20755,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L544-L546
 Extra doc: https://github.com/casadi/casadi/wiki/L_18p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L544
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L552
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L544-L546
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L552-L554
 
 ";
 
@@ -20502,10 +20772,10 @@ Get the (i,j) minor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L551
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L559
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L551-L553
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L559-L561
 
 >  Matrix<Scalar> casadi::Matrix::minor(const Matrix< Scalar > &x, casadi_int i, casadi_int j)
 ------------------------------------------------------------------------
@@ -20515,10 +20785,10 @@ Get the (i,j) minor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L551
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L559
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L551-L553
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L559-L561
 
 ";
 
@@ -20532,10 +20802,10 @@ Get the (i,j) cofactor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L558
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L566
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L558-L560
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L566-L568
 
 >  Matrix<Scalar> casadi::Matrix::cofactor(const Matrix< Scalar > &x, casadi_int i, casadi_int j)
 ------------------------------------------------------------------------
@@ -20545,10 +20815,10 @@ Get the (i,j) cofactor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L558
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L566
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L558-L560
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L566-L568
 
 ";
 
@@ -20565,10 +20835,10 @@ diag(sqrt(D))*L'
 Extra doc: https://github.com/casadi/casadi/wiki/L_18v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L602
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L610
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L602-L604
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L610-L612
 
 >  Matrix<Scalar> casadi::Matrix::chol(const Matrix< Scalar > &A)
 ------------------------------------------------------------------------
@@ -20581,10 +20851,10 @@ diag(sqrt(D))*L'
 Extra doc: https://github.com/casadi/casadi/wiki/L_18v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L602
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L610
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L602-L604
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L610-L612
 
 ";
 
@@ -20598,10 +20868,10 @@ Inf-norm of a Matrix-Matrix product.
 Extra doc: https://github.com/casadi/casadi/wiki/L_190
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L645
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L653
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L645-L647
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L653-L655
 
 >  Matrix<Scalar> casadi::Matrix::norm_inf_mul(const Matrix< Scalar > &x, const Matrix< Scalar > &y)
 ------------------------------------------------------------------------
@@ -20611,10 +20881,10 @@ Inf-norm of a Matrix-Matrix product.
 Extra doc: https://github.com/casadi/casadi/wiki/L_190
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L645
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L653
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L645-L647
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L653-L655
 
 ";
 
@@ -20626,7 +20896,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L645-L647
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L515
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L518
 
 ";
 
@@ -20640,7 +20910,7 @@ Default matrix size is max(col) x max(row)
 Extra doc: https://github.com/casadi/casadi/wiki/L_23t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1050
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1058
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::triplet(const std::vector< casadi_int > &row, const std::vector< casadi_int > &col, const Matrix< Scalar > &d, const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -20652,7 +20922,7 @@ Default matrix size is max(col) x max(row)
 Extra doc: https://github.com/casadi/casadi/wiki/L_23t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1050
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1058
 
 ";
 
@@ -20666,7 +20936,7 @@ create a matrix with all inf
 Extra doc: https://github.com/casadi/casadi/wiki/L_19k
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1062
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1070
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::inf(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -20676,7 +20946,7 @@ create a matrix with all inf
 Extra doc: https://github.com/casadi/casadi/wiki/L_19k
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1062
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1070
 
 ";
 
@@ -20690,7 +20960,7 @@ create a matrix with all nan
 Extra doc: https://github.com/casadi/casadi/wiki/L_19l
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1071
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1079
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::nan(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -20700,7 +20970,7 @@ create a matrix with all nan
 Extra doc: https://github.com/casadi/casadi/wiki/L_19l
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1071
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1079
 
 ";
 
@@ -20714,7 +20984,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1332
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1340
 
 >  static Matrix<Scalar> casadi::Matrix< Scalar >::rand(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -20724,7 +20994,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1332
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1340
 
 ";
 
@@ -20739,7 +21009,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L213
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1439-L1505
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1450-L1516
 
 ";
 
@@ -20817,7 +21087,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L226
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1389-L1399
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1400-L1410
 
 ";
 
@@ -20830,7 +21100,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L227
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1402-L1433
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1413-L1444
 
 ";
 
@@ -20843,7 +21113,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L228
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1508-L1516
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1519-L1527
 
 ";
 
@@ -20856,7 +21126,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L229
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1519-L1524
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1530-L1535
 
 ";
 
@@ -20869,7 +21139,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1528-L1534
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1539-L1545
 
 ";
 
@@ -20882,7 +21152,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1552-L1558
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1563-L1569
 
 ";
 
@@ -20895,7 +21165,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L232
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1537-L1549
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1548-L1560
 
 ";
 
@@ -20908,7 +21178,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L233
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1782-L1807
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1793-L1818
 
 ";
 
@@ -20921,7 +21191,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L235
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1751-L1753
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1762-L1764
 
 ";
 
@@ -20934,7 +21204,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1756-L1758
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1767-L1769
 
 ";
 
@@ -20947,7 +21217,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L237
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1761-L1769
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1772-L1780
 
 ";
 
@@ -20960,7 +21230,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L239
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1772-L1779
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1783-L1790
 
 ";
 
@@ -20970,7 +21240,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1772-
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1197
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1208
 
 ";
 
@@ -20980,7 +21250,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1197
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1198
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1209
 
 ";
 
@@ -20990,7 +21260,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1198
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1195
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1206
 
 ";
 
@@ -21000,7 +21270,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1195
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1193
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1204
 
 ";
 
@@ -21010,7 +21280,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1193
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1194
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1205
 
 ";
 
@@ -21020,7 +21290,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1194
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1191
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1202
 
 ";
 
@@ -21066,10 +21336,10 @@ with nrow-by-ncol symbolic primitives
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261-L1263
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272-L1274
 
 >  static std::vector<std::vector<Matrix< Scalar > > > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r)
 ------------------------------------------------------------------------
@@ -21081,10 +21351,10 @@ with nrow-by-ncol symbolic primitives
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261-L1263
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272-L1274
 
 ";
 
@@ -21100,10 +21370,10 @@ entries zero.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274-L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285-L1287
 
 >  static Matrix< Scalar >  casadi::GenericMatrix< Matrix< Scalar >  >::zeros(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -21114,10 +21384,10 @@ entries zero.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274-L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285-L1287
 
 ";
 
@@ -21133,10 +21403,10 @@ entries one.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1di
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287-L1289
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298-L1300
 
 >  static Matrix< Scalar >  casadi::GenericMatrix< Matrix< Scalar >  >::ones(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -21147,10 +21417,10 @@ entries one.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1di
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287-L1289
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298-L1300
 
 ";
 
@@ -21173,7 +21443,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287-
 Sparse matrix with a given sparsity and non-zero elements.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1414
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1422
 
 >  casadi::Matrix< Scalar >::Matrix(const Sparsity &sp, const std::vector< Scalar > &d, bool dummy)
 ------------------------------------------------------------------------
@@ -21181,7 +21451,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1414
 Sparse matrix with a given sparsity and non-zero elements.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1414
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1422
 
 ";
 
@@ -21229,7 +21499,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L80-L86
 Transpose the matrix.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L534
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L542
 
 ";
 
@@ -21240,7 +21510,7 @@ Get strings corresponding to the nonzeros and the
 interdependencies.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L921
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L929
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L701-L705
@@ -21253,7 +21523,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L701-L705
 Print a representation of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L925
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L933
 
 ";
 
@@ -21263,7 +21533,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L925
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L928
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L936
 
 ";
 
@@ -21273,7 +21543,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L928
 Print scalar.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L931
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L939
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L619-L638
@@ -21286,7 +21556,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L619-L638
 Print vector-style.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L934
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L942
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L641-L643
@@ -21299,7 +21569,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L641-L643
 Print dense matrix-stype.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L937
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L945
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L691-L693
@@ -21312,7 +21582,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L691-L693
 Print sparse matrix style.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L940
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L948
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/matrix_impl.hpp#L696-L698
@@ -21341,7 +21611,7 @@ Erase elements of a matrix
 Extra doc: https://github.com/casadi/casadi/wiki/L_19g
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L989
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L997
 
 >  void casadi::Matrix< Scalar >::erase(const std::vector< casadi_int > &rr, bool ind1=false)
 ------------------------------------------------------------------------
@@ -21353,7 +21623,7 @@ Erase elements of a matrix
 Extra doc: https://github.com/casadi/casadi/wiki/L_19g
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L989
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L997
 
 ";
 
@@ -21369,7 +21639,7 @@ Remove/delete rows and/or columns of a matrix
 Extra doc: https://github.com/casadi/casadi/wiki/L_19h
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L996
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1004
 
 ";
 
@@ -21385,7 +21655,7 @@ existing non-zeros
 Extra doc: https://github.com/casadi/casadi/wiki/L_19i
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1004
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1012
 
 ";
 
@@ -21395,7 +21665,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1004
 Const access the sparsity - reference to data member.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1024
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1032
 
 ";
 
@@ -21407,7 +21677,7 @@ Get an owning reference to the sparsity pattern.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1031
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1039
 
 ";
 
@@ -21419,7 +21689,7 @@ Get an output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_28i
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1036
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1044
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L167-L169
@@ -21436,7 +21706,7 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1084
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1092
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L128-L130
@@ -21449,7 +21719,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L128-
 Checks if expression does not contain NaN or Inf.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1087
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1095
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L102-L115
@@ -21464,7 +21734,7 @@ Check if smooth.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1092
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1100
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L118-L125
@@ -21481,7 +21751,7 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1099
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1107
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L133-L135
@@ -21498,7 +21768,7 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1106
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1114
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L138-L140
@@ -21527,7 +21797,7 @@ Sparse matrices invariable return false
 Extra doc: https://github.com/casadi/casadi/wiki/L_19r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1122
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1130
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L182-L188
@@ -21550,7 +21820,7 @@ Sparse matrices can return true if all non-zero elements are symbolic
 Extra doc: https://github.com/casadi/casadi/wiki/L_19s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1135
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1143
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L143-L149
@@ -21567,7 +21837,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1157
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1165
 
 ";
 
@@ -21579,7 +21849,7 @@ Check if function call.
 Extra doc: https://github.com/casadi/casadi/wiki/L_28j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1162
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1170
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L152-L154
@@ -21594,7 +21864,7 @@ Check if evaluation output.
 Extra doc: https://github.com/casadi/casadi/wiki/L_28k
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1167
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1175
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L157-L159
@@ -21609,7 +21879,7 @@ Check if a multiple output node.
 Extra doc: https://github.com/casadi/casadi/wiki/L_28l
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1172
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1180
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L162-L164
@@ -21625,7 +21895,7 @@ is_output() is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_28m
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1177
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1185
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L177-L179
@@ -21640,7 +21910,7 @@ Get function - only valid when  is_call() is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_28n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1182
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1190
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L172-L174
@@ -21657,7 +21927,7 @@ Check if the matrix is integer-valued.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1189
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1197
 
 ";
 
@@ -21671,7 +21941,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19x
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1194
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1202
 
 ";
 
@@ -21685,7 +21955,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1199
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1207
 
 ";
 
@@ -21699,7 +21969,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1204
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1212
 
 ";
 
@@ -21713,7 +21983,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_2en
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1209
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1217
 
 ";
 
@@ -21725,7 +21995,7 @@ check if the matrix is value
 Extra doc: https://github.com/casadi/casadi/wiki/L_2eo
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1214
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1222
 
 ";
 
@@ -21739,7 +22009,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_2e9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1219
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1227
 
 ";
 
@@ -21753,7 +22023,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_2ea
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1224
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1232
 
 ";
 
@@ -21767,7 +22037,7 @@ check if the matrix is not negative
 Extra doc: https://github.com/casadi/casadi/wiki/L_2eb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1231
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1239
 
 ";
 
@@ -21783,7 +22053,7 @@ are possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1238
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1246
 
 ";
 
@@ -21793,7 +22063,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1238
 Get operation type.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1241
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1249
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L191-L193
@@ -21806,7 +22076,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L191-
 Is it a certain operation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1244
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1252
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L196-L198
@@ -21823,7 +22093,7 @@ zeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1249
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1257
 
 ";
 
@@ -21835,7 +22105,7 @@ Get all nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1266
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1274
 
 >  std::vector<A> casadi::Matrix< Scalar >::get_nonzeros() const
 ------------------------------------------------------------------------
@@ -21845,7 +22115,7 @@ Get all nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1266
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1274
 
 ";
 
@@ -21859,7 +22129,7 @@ Get all elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1259
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1267
 
 ";
 
@@ -21871,7 +22141,7 @@ Get name (only if symbolic scalar)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1290
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1298
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L220-L222
@@ -21889,7 +22159,7 @@ const.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1298
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1306
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L225-L227
@@ -21906,7 +22176,7 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1aa
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1305
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1313
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_instantiator.cpp#L230-L232
@@ -21936,7 +22206,7 @@ lang: only 'matlab' supported for now
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ac
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1350
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1358
 
 ";
 
@@ -21946,7 +22216,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1350
 Obtain information about sparsity
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1354
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1362
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/im_instantiator.cpp#L39-L41
@@ -21961,7 +22231,7 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ah
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1380
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1388
 
 >  void casadi::Matrix< Scalar >::serialize(SerializingStream &s) const
 ------------------------------------------------------------------------
@@ -21971,7 +22241,7 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ah
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1380
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1388
 
 ";
 
@@ -22000,7 +22270,7 @@ Supported formats:
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1400
+https://github.com/casadi/casadi/blob/main/casadi/core/matrix_decl.hpp#L1408
 
 ";
 
@@ -22015,7 +22285,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L84
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1306-L1308
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1317-L1319
 
 ";
 
@@ -22030,7 +22300,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L89
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1311-L1313
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1322-L1324
 
 ";
 
@@ -22045,7 +22315,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L94
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1316-L1318
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1327-L1329
 
 ";
 
@@ -22060,7 +22330,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L99
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1321-L1323
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1332-L1334
 
 ";
 
@@ -22075,7 +22345,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L104
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1326-L1328
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1337-L1339
 
 ";
 
@@ -22090,7 +22360,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L109
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1331-L1333
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1342-L1344
 
 ";
 
@@ -22120,7 +22390,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L119
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1336-L1338
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1347-L1349
 
 ";
 
@@ -22152,7 +22422,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L131
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1351-L1353
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1362-L1364
 
 ";
 
@@ -22167,7 +22437,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L141
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1346-L1348
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1357-L1359
 
 >  casadi_int casadi::GenericMatrix< Matrix< Scalar >  >::size(casadi_int axis) const
 ------------------------------------------------------------------------
@@ -22180,7 +22450,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L141
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1346-L1348
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1357-L1359
 
 ";
 
@@ -22230,7 +22500,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L158
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1356-L1358
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1367-L1369
 
 ";
 
@@ -22713,7 +22983,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L644
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1316-L1324
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1342-L1350
 
 >  MX casadi::MX::reshape(const MX &x, const Sparsity &sp)
 ------------------------------------------------------------------------
@@ -22724,7 +22994,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L644
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1316-L1324
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1342-L1350
 
 ";
 
@@ -22740,7 +23010,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L645
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1326-L1336
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1352-L1362
 ";
 
 %feature("docstring") casadi::MX::kron "
@@ -22753,7 +23023,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L646
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2042-L2044
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2068-L2070
 ";
 
 %feature("docstring") casadi::MX::kron_contract "
@@ -22766,7 +23036,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L647
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2046-L2048
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2072-L2074
 ";
 
 %feature("docstring") casadi::MX::repmat "
@@ -22779,7 +23049,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L648
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2050-L2062
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2076-L2088
 ";
 
 %feature("docstring") casadi::MX::linspace "
@@ -22791,7 +23061,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L226
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1389-L1399
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1400-L1410
 
 >  MX  casadi::GenericMatrix< MX  >::linspace(const MX &a, const MX &b, casadi_int nsteps)
 ------------------------------------------------------------------------
@@ -22802,7 +23072,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L226
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1389-L1399
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1400-L1410
 
 ";
 
@@ -22817,7 +23087,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L654
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1885-L1895
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1911-L1921
 ";
 
 %feature("docstring") casadi::MX::hessian "
@@ -22829,7 +23099,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L656
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1902-L1911
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1928-L1937
 
 >  MX casadi::MX::hessian(const MX &f, const MX &x, MX &g, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -22840,7 +23110,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L656
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1902-L1911
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1928-L1937
 
 ";
 
@@ -22855,7 +23125,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L658
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1914-L1942
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1940-L1968
 ";
 
 %feature("docstring") casadi::MX::reverse "
@@ -22867,7 +23137,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L663
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1945-L1975
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1971-L2001
 ";
 
 %feature("docstring") casadi::MX::which_depends "
@@ -22879,7 +23149,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L667
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1977-L1979
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2003-L2005
 ";
 
 %feature("docstring") casadi::MX::jacobian_sparsity "
@@ -22891,7 +23161,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L669
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1981-L1983
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2007-L2009
 ";
 
 %feature("docstring") casadi::MX::substitute "
@@ -22903,7 +23173,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L671
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1494-L1514
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1520-L1540
 
 >  std::vector< MX > casadi::MX::substitute(const std::vector< MX > &ex, const std::vector< MX > &v, const std::vector< MX > &vdef)
 ------------------------------------------------------------------------
@@ -22914,7 +23184,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L671
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1494-L1514
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1520-L1540
 
 ";
 
@@ -22929,7 +23199,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L674
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1468-L1488
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1494-L1514
 ";
 
 %feature("docstring") casadi::MX::solve "
@@ -22941,7 +23211,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L678
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2098-L2102
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2124-L2128
 
 >  MX casadi::MX::solve(const MX &a, const MX &b, const std::string &lsolver, const Dict &dict=Dict())
 ------------------------------------------------------------------------
@@ -22952,7 +23222,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L678
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2098-L2102
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2124-L2128
 
 ";
 
@@ -22967,7 +23237,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L680
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1998-L2000
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2024-L2026
 ";
 
 %feature("docstring") casadi::MX::inv_node "
@@ -22978,10 +23248,10 @@ Inverse node.
 Extra doc: https://github.com/casadi/casadi/wiki/L_re
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L941
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L949
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L941-L943
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L949-L951
 
 >  MX casadi::MX::inv_node(const MX &x)
 ------------------------------------------------------------------------
@@ -22991,10 +23261,10 @@ Inverse node.
 Extra doc: https://github.com/casadi/casadi/wiki/L_re
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L941
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L949
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L941-L943
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L949-L951
 
 ";
 
@@ -23039,7 +23309,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L683
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2104-L2110
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2130-L2136
 ";
 
 %feature("docstring") casadi::MX::expm_const "
@@ -23051,7 +23321,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L685
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2112-L2117
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2138-L2143
 ";
 
 %feature("docstring") casadi::MX::expm "
@@ -23063,7 +23333,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L686
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2119-L2122
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2145-L2148
 ";
 
 %feature("docstring") casadi::MX::n_nodes "
@@ -23075,7 +23345,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L687
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1440-L1444
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1466-L1470
 ";
 
 %feature("docstring") casadi::MX::print_operator "
@@ -23087,7 +23357,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L688
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1464-L1466
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1490-L1492
 ";
 
 %feature("docstring") casadi::MX::extract "
@@ -23099,7 +23369,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L689
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1705-L1876
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1731-L1902
 ";
 
 %feature("docstring") casadi::MX::shared "
@@ -23111,7 +23381,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L691
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1878-L1883
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1904-L1909
 ";
 
 %feature("docstring") casadi::MX::if_else "
@@ -23123,7 +23393,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L693
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1338-L1358
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1364-L1384
 ";
 
 %feature("docstring") casadi::MX::conditional "
@@ -23135,7 +23405,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L695
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1360-L1392
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1386-L1418
 ";
 
 %feature("docstring") casadi::MX::depends_on "
@@ -23147,7 +23417,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L697
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2130-L2146
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2156-L2172
 ";
 
 %feature("docstring") casadi::MX::contains_all "
@@ -23159,7 +23429,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L698
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2149-L2161
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2175-L2187
 ";
 
 %feature("docstring") casadi::MX::contains_any "
@@ -23171,7 +23441,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L699
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2163-L2179
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2189-L2205
 ";
 
 %feature("docstring") casadi::MX::simplify "
@@ -23183,7 +23453,33 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L700
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1304-L1306
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1311-L1313
+";
+
+%feature("docstring") casadi::MX::transform "
+
+[INTERNAL] 
+Functions called by friend functions defined for  GenericMatrix
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L702
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1324-L1332
+
+>  MX casadi::MX::transform(const MX &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict())
+------------------------------------------------------------------------
+[INTERNAL] 
+Functions called by friend functions defined for  GenericMatrix
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L702
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1324-L1332
+
+";
+
 ";
 
 %feature("docstring") casadi::MX::dot "
@@ -23192,7 +23488,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1304-L1306
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L701
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L704
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L735-L737
@@ -23204,7 +23500,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L735-L737
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L702
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L705
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L773-L776
@@ -23216,7 +23512,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L773-L776
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L703
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L706
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L778-L781
@@ -23228,7 +23524,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L778-L781
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L704
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L707
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1284-L1290
@@ -23240,7 +23536,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1284-L1290
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L705
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L708
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1292-L1294
@@ -23252,7 +23548,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1292-L1294
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L706
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L709
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1296-L1298
@@ -23264,7 +23560,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1296-L1298
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L707
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L710
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1300-L1302
@@ -23276,10 +23572,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1300-L1302
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L708
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L711
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1394-L1418
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1420-L1444
 ";
 
 %feature("docstring") casadi::MX::trace "
@@ -23288,10 +23584,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1394-L1418
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L709
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L712
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1420-L1427
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1446-L1453
 ";
 
 %feature("docstring") casadi::MX::diag "
@@ -23300,10 +23596,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1420-L1427
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L710
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L713
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1429-L1438
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1455-L1464
 ";
 
 %feature("docstring") casadi::MX::sum2 "
@@ -23312,10 +23608,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1429-L1438
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L711
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L714
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1446-L1448
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1472-L1474
 ";
 
 %feature("docstring") casadi::MX::sum1 "
@@ -23324,10 +23620,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1446-L1448
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L712
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L715
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1450-L1452
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1476-L1478
 ";
 
 %feature("docstring") casadi::MX::polyval "
@@ -23336,10 +23632,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1450-L1452
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L713
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L716
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1454-L1462
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1480-L1488
 ";
 
 %feature("docstring") casadi::MX::det "
@@ -23348,10 +23644,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1454-L1462
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L715
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L718
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1989-L1992
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2015-L2018
 
 >  MX casadi::MX::det(const MX &x, const std::string &lsolver, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -23359,10 +23655,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1989-L1992
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L715
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L718
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1989-L1992
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2015-L2018
 
 ";
 
@@ -23374,10 +23670,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1989-L1992
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L716
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L719
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2006-L2009
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2032-L2035
 ";
 
 %feature("docstring") casadi::MX::nullspace "
@@ -23386,10 +23682,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2006-L2009
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L717
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L720
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2124-L2128
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2150-L2154
 ";
 
 %feature("docstring") casadi::MX::repsum "
@@ -23401,7 +23697,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L232
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1537-L1549
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1548-L1560
 
 >  MX  casadi::GenericMatrix< MX  >::repsum(const MX &x, casadi_int n, casadi_int m=1)
 ------------------------------------------------------------------------
@@ -23412,7 +23708,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L232
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1537-L1549
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1548-L1560
 
 ";
 
@@ -23424,7 +23720,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1537-
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L719
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L722
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L923-L934
@@ -23436,10 +23732,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L923-L934
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L720
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L723
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3174-L3176
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3200-L3202
 ";
 
 %feature("docstring") casadi::MX::_rank1 "
@@ -23448,10 +23744,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3174-L3176
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L721
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L724
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3178-L3180
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3204-L3206
 ";
 
 %feature("docstring") casadi::MX::project "
@@ -23460,7 +23756,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3178-L3180
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L722
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L725
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L906-L921
@@ -23472,7 +23768,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L906-L921
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L723
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L726
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L698-L710
@@ -23484,10 +23780,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L698-L710
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L724
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L727
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3182-L3184
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3208-L3210
 ";
 
 %feature("docstring") casadi::MX::cse "
@@ -23496,10 +23792,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3182-L3184
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L725
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L728
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2607-L2743
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2633-L2769
 ";
 
 %feature("docstring") casadi::MX::extract_parametric "
@@ -23508,10 +23804,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2607-L2743
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L726
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L729
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2775-L2899
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2801-L2925
 ";
 
 %feature("docstring") casadi::MX::separate_linear "
@@ -23520,10 +23816,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2775-L2899
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L728
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L731
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2901-L2990
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L2927-L3016
 ";
 
 %feature("docstring") casadi::MX::find "
@@ -23536,10 +23832,10 @@ If failed, returns the number of rows
 Extra doc: https://github.com/casadi/casadi/wiki/L_r7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L817
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L825
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L817-L819
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L825-L827
 
 >  MX casadi::MX::find(const MX &x)
 ------------------------------------------------------------------------
@@ -23551,10 +23847,10 @@ If failed, returns the number of rows
 Extra doc: https://github.com/casadi/casadi/wiki/L_r7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L817
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L825
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L817-L819
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L825-L827
 
 ";
 
@@ -23570,10 +23866,10 @@ If failed, returns the number of rows
 Extra doc: https://github.com/casadi/casadi/wiki/L_r8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L826
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L834
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L826-L828
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L834-L836
 
 >  MX casadi::MX::low(const MX &v, const MX &p, const Dict &options=Dict())
 ------------------------------------------------------------------------
@@ -23585,10 +23881,10 @@ If failed, returns the number of rows
 Extra doc: https://github.com/casadi/casadi/wiki/L_r8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L826
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L834
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L826-L828
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L834-L836
 
 ";
 
@@ -23606,10 +23902,10 @@ preserving nodes
 Extra doc: https://github.com/casadi/casadi/wiki/L_ra
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L852
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L860
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L852-L856
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L860-L864
 
 >  std::vector<MX> casadi::MX::graph_substitute(const std::vector< MX > &ex, const std::vector< MX > &v, const std::vector< MX > &vdef)
 ------------------------------------------------------------------------
@@ -23623,10 +23919,10 @@ preserving nodes
 Extra doc: https://github.com/casadi/casadi/wiki/L_ra
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L852
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L860
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L852-L856
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L860-L864
 
 ";
 
@@ -23644,10 +23940,10 @@ in it at which expansion should stop.
 Extra doc: https://github.com/casadi/casadi/wiki/L_rc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L885
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L893
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L885-L889
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L893-L897
 
 >  std::vector<MX> casadi::MX::matrix_expand(const std::vector< MX > &e, const std::vector< MX > &boundary=std::vector< MX >(), const Dict &options=Dict())
 ------------------------------------------------------------------------
@@ -23661,10 +23957,10 @@ in it at which expansion should stop.
 Extra doc: https://github.com/casadi/casadi/wiki/L_rc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L885
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L893
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L885-L889
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L893-L897
 
 ";
 
@@ -23680,10 +23976,10 @@ Experimental feature
 Extra doc: https://github.com/casadi/casadi/wiki/L_rd
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L934
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L942
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L934-L936
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L942-L944
 
 >  MX casadi::MX::lift(const MX &x, const MX &x_guess)
 ------------------------------------------------------------------------
@@ -23695,10 +23991,10 @@ Experimental feature
 Extra doc: https://github.com/casadi/casadi/wiki/L_rd
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L934
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L942
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L934-L936
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L942-L944
 
 ";
 
@@ -23714,10 +24010,10 @@ An error is raised when the expression contains symbols
 Extra doc: https://github.com/casadi/casadi/wiki/L_rf
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L950
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L958
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L950-L952
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L958-L960
 
 >  DM casadi::MX::evalf(const MX &expr)
 ------------------------------------------------------------------------
@@ -23729,10 +24025,10 @@ An error is raised when the expression contains symbols
 Extra doc: https://github.com/casadi/casadi/wiki/L_rf
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L950
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L958
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L950-L952
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L958-L960
 
 ";
 
@@ -23774,10 +24070,10 @@ variables.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L983
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L991
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L983-L985
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L991-L993
 
 >  MX casadi::MX::stop_diff(const MX &expr, const MX &var, casadi_int order)
 ------------------------------------------------------------------------
@@ -23788,10 +24084,10 @@ variables.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L983
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L991
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L983-L985
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L991-L993
 
 ";
 
@@ -23805,10 +24101,10 @@ preserving
 order
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L988
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L996
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L988-L990
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L996-L998
 
 >  std::vector<MX> casadi::MX::difference(const std::vector< MX > &a, const std::vector< MX > &b)
 ------------------------------------------------------------------------
@@ -23817,10 +24113,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L988-L990
 order
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L988
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L996
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L988-L990
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L996-L998
 
 ";
 
@@ -23835,7 +24131,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L213
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1439-L1505
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1450-L1516
 
 ";
 
@@ -23913,7 +24209,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L227
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1402-L1433
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1413-L1444
 
 ";
 
@@ -23926,7 +24222,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L228
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1508-L1516
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1519-L1527
 
 ";
 
@@ -23939,7 +24235,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L229
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1519-L1524
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1530-L1535
 
 ";
 
@@ -23952,7 +24248,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1528-L1534
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1539-L1545
 
 ";
 
@@ -23965,7 +24261,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1552-L1558
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1563-L1569
 
 ";
 
@@ -23978,7 +24274,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L233
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1782-L1807
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1793-L1818
 
 ";
 
@@ -23991,7 +24287,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L235
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1751-L1753
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1762-L1764
 
 ";
 
@@ -24004,7 +24300,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1756-L1758
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1767-L1769
 
 ";
 
@@ -24017,7 +24313,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L237
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1761-L1769
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1772-L1780
 
 ";
 
@@ -24030,7 +24326,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L239
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1772-L1779
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1783-L1790
 
 ";
 
@@ -24040,7 +24336,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1772-
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1197
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1208
 
 ";
 
@@ -24050,7 +24346,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1197
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1198
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1209
 
 ";
 
@@ -24060,7 +24356,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1198
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1195
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1206
 
 ";
 
@@ -24070,7 +24366,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1195
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1193
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1204
 
 ";
 
@@ -24080,7 +24376,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1193
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1194
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1205
 
 ";
 
@@ -24090,7 +24386,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1194
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1191
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1202
 
 ";
 
@@ -24136,10 +24432,10 @@ with nrow-by-ncol symbolic primitives
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261-L1263
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272-L1274
 
 >  static std::vector<std::vector<MX > > casadi::GenericMatrix< MX  >::sym(const std::string &name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r)
 ------------------------------------------------------------------------
@@ -24151,10 +24447,10 @@ with nrow-by-ncol symbolic primitives
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1261-L1263
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1272-L1274
 
 ";
 
@@ -24170,10 +24466,10 @@ entries zero.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274-L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285-L1287
 
 >  static MX  casadi::GenericMatrix< MX  >::zeros(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -24184,10 +24480,10 @@ entries zero.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1dh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1274-L1276
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1285-L1287
 
 ";
 
@@ -24203,10 +24499,10 @@ entries one.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1di
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287-L1289
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298-L1300
 
 >  static MX  casadi::GenericMatrix< MX  >::ones(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -24217,10 +24513,10 @@ entries one.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1di
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1287-L1289
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1298-L1300
 
 ";
 
@@ -24398,10 +24694,10 @@ Called from MXFunction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ro
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1066
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1074
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3197-L3204
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3223-L3230
 ";
 
 %feature("docstring") casadi::MX::ad_reverse "
@@ -24412,10 +24708,10 @@ Called from MXFunction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ro
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1068
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1076
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3206-L3213
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3232-L3239
 ";
 
 %feature("docstring") casadi::MX::get_row "
@@ -24525,7 +24821,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L201-L
 Construct constant matrix with a given sparsity and values.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1073
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1081
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L118-L120
@@ -24536,7 +24832,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L118-L120
 Construct constant matrix with a given sparsity and values.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1073
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1081
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L118-L120
@@ -25163,7 +25459,7 @@ If y does not evaluate to 1, a runtime error is raised
 Extra doc: https://github.com/casadi/casadi/wiki/L_rg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1000
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1008
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L743-L748
@@ -25181,7 +25477,7 @@ with a comment
 Extra doc: https://github.com/casadi/casadi/wiki/L_rh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1007
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1015
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L750-L752
@@ -25202,7 +25498,7 @@ false)
 Extra doc: https://github.com/casadi/casadi/wiki/L_2f9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1016
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1024
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L754-L756
@@ -25214,7 +25510,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L754-L756
 Reset the dump counter.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1019
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1027
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L758-L761
@@ -25226,7 +25522,7 @@ https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L758-L761
 Transpose the matrix.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1022
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1030
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L1095-L1097
@@ -25240,7 +25536,7 @@ Get an IM representation of a GetNonzeros or SetNonzeros node.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ri
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1027
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1035
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L886-L888
@@ -25254,10 +25550,10 @@ Evaluate the  MX node with new symbolic dependencies.
 Extra doc: https://github.com/casadi/casadi/wiki/L_rn
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1058
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1066
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3187-L3195
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.cpp#L3213-L3221
 ";
 
 %feature("docstring") casadi::MX::nnz "
@@ -25271,7 +25567,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L84
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1306-L1308
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1317-L1319
 
 ";
 
@@ -25286,7 +25582,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L89
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1311-L1313
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1322-L1324
 
 ";
 
@@ -25301,7 +25597,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L94
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1316-L1318
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1327-L1329
 
 ";
 
@@ -25316,7 +25612,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L99
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1321-L1323
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1332-L1334
 
 ";
 
@@ -25331,7 +25627,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L104
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1326-L1328
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1337-L1339
 
 ";
 
@@ -25346,7 +25642,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L109
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1331-L1333
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1342-L1344
 
 ";
 
@@ -25376,7 +25672,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L119
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1336-L1338
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1347-L1349
 
 ";
 
@@ -25408,7 +25704,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L131
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1351-L1353
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1362-L1364
 
 ";
 
@@ -25423,7 +25719,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L141
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1346-L1348
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1357-L1359
 
 >  casadi_int casadi::GenericMatrix< MX  >::size(casadi_int axis) const
 ------------------------------------------------------------------------
@@ -25436,7 +25732,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L141
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1346-L1348
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1357-L1359
 
 ";
 
@@ -25486,7 +25782,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L158
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1356-L1358
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L1367-L1369
 
 ";
 
@@ -25701,10 +25997,10 @@ variables.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25m
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L966
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L974
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L966-L968
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L974-L976
 ";
 
 %feature("docstring") casadi::MX::no_hess "
@@ -25719,10 +26015,10 @@ variables.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L975
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L983
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L975-L977
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L983-L985
 ";
 
 
@@ -32754,10 +33050,10 @@ Join three lists.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1lc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L632
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L628
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L632-L637
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L628-L633
 
 >  std::vector< T > casadi::join(const std::vector< T > &a, const std::vector< T > &b, const std::vector< T > &c)
 ------------------------------------------------------------------------
@@ -32767,10 +33063,10 @@ Join three lists.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1lc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L632
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L628
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L632-L637
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L628-L633
 
 ";
 
@@ -32930,10 +33226,10 @@ List of indices
 Extra doc: https://github.com/casadi/casadi/wiki/L_1l9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L571
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L567
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L571-L585
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L567-L581
 
 ";
 
@@ -32954,10 +33250,10 @@ Select?
 Extra doc: https://github.com/casadi/casadi/wiki/L_286
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L588
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L584
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L588-L601
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L584-L597
 
 ";
 
@@ -32969,10 +33265,10 @@ Return all but the first element of a vector.
 Extra doc: https://github.com/casadi/casadi/wiki/L_27y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L604
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L600
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L604-L608
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L600-L604
 
 ";
 
@@ -32984,10 +33280,10 @@ Return all but the last element of a vector.
 Extra doc: https://github.com/casadi/casadi/wiki/L_285
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L611
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L607
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L611-L615
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L607-L611
 
 ";
 
@@ -32999,10 +33295,10 @@ Reverse a list.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1la
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L618
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L614
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L618-L622
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L614-L618
 
 ";
 
@@ -33014,10 +33310,10 @@ permute a list
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ld
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L640
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L636
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L640-L644
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L636-L640
 
 ";
 
@@ -33029,10 +33325,10 @@ find nonzeros
 Extra doc: https://github.com/casadi/casadi/wiki/L_1le
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L647
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L643
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L647-L653
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L643-L649
 
 ";
 
@@ -33042,10 +33338,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L647-L653
 Check if for each element of v holds: lower <= v_i < upper.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L701
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L697
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L701-L707
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L697-L703
 
 >  bool casadi::in_range(const std::vector< T > &v, casadi_int lower, casadi_int upper)
 ------------------------------------------------------------------------
@@ -33053,10 +33349,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L701-L707
 Check if for each element of v holds: lower <= v_i < upper.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L701
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L697
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L701-L707
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L697-L703
 
 ";
 
@@ -33073,10 +33369,10 @@ flat[indices[i]]..flat[indices[i+1]-1]
 Extra doc: https://github.com/casadi/casadi/wiki/L_1li
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L727
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L723
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L727-L742
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L723-L738
 
 >  void casadi::flatten_nested_vector(const std::vector< std::vector< T > > &nested, std::vector< S > &flat, std::vector< I > &indices)
 ------------------------------------------------------------------------
@@ -33089,10 +33385,10 @@ flat[indices[i]]..flat[indices[i+1]-1]
 Extra doc: https://github.com/casadi/casadi/wiki/L_1li
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L727
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L723
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L727-L742
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L723-L738
 
 ";
 
@@ -33104,10 +33400,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L727-L742
 Check if the vector is strictly increasing.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L751
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L747
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L751-L759
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L747-L755
 
 ";
 
@@ -33117,10 +33413,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L751-L759
 Check if the vector is strictly decreasing.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L762
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L758
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L762-L770
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L758-L766
 
 ";
 
@@ -33130,10 +33426,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L762-L770
 Check if the vector is non-increasing.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L773
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L769
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L773-L781
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L769-L777
 
 ";
 
@@ -33143,10 +33439,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L773-L781
 Check if the vector is non-decreasing.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L784
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L780
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L784-L792
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L780-L788
 
 ";
 
@@ -33156,10 +33452,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L784-L792
 Check if the vector is monotone.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L795
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L791
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L795-L797
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L791-L793
 
 ";
 
@@ -33169,10 +33465,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L795-L797
 Check if the vector is strictly monotone.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L800
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L796
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L800-L802
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L796-L798
 
 ";
 
@@ -33182,10 +33478,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L800-L802
 Check if the vector has negative entries.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L805
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L801
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L805-L810
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L801-L806
 
 ";
 
@@ -33195,10 +33491,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L805-L810
 Print matrix, matlab style.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L818
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L814
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L818-L823
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L814-L819
 
 >  void casadi::write_matlab(std::ostream &stream, const std::vector< std::vector< T > > &v)
 ------------------------------------------------------------------------
@@ -33206,10 +33502,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L818-L823
 Print matrix, matlab style.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L818
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L814
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L818-L823
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L814-L819
 
 ";
 
@@ -33221,10 +33517,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L818-L823
 Read matrix, matlab style.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L846
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L842
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L846-L869
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L842-L865
 
 >  void casadi::read_matlab(std::ifstream &file, std::vector< std::vector< T > > &v)
 ------------------------------------------------------------------------
@@ -33232,10 +33528,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L846-L869
 Read matrix, matlab style.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L846
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L842
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L846-L869
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L842-L865
 
 ";
 
@@ -33247,10 +33543,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L846-L869
 Matlab's linspace.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L872
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L868
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L872-L883
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L868-L879
 
 ";
 
@@ -33277,10 +33573,10 @@ invert_indices:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1lj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L910
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L906
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L910-L935
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L906-L931
 
 ";
 
@@ -33292,10 +33588,10 @@ product
 Extra doc: https://github.com/casadi/casadi/wiki/L_1lk
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L938
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L934
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L938-L942
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L934-L938
 
 ";
 
@@ -33307,10 +33603,10 @@ sum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ll
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L945
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L941
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L945-L949
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L941-L945
 
 ";
 
@@ -33322,10 +33618,10 @@ cumulative sum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1lm
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L952
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L948
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L952-L960
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L948-L956
 
 ";
 
@@ -33337,10 +33633,10 @@ diff
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ln
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L974
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L970
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L974-L981
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L970-L977
 
 ";
 
@@ -33352,10 +33648,10 @@ cumulative sum, starting with zero
 Extra doc: https://github.com/casadi/casadi/wiki/L_1lo
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L963
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L959
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L963-L971
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L959-L967
 
 ";
 
@@ -33377,6 +33673,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L428-L434
 [INTERNAL] ";
 
 %feature("docstring") casadi::IndexReduction::normalized_in "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::IndexReduction::mul_overflows "
 
 [INTERNAL] ";
 
@@ -33432,10 +33732,10 @@ Hash value of a double.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2em
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1075
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1071
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1075-L1089
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1071-L1085
 
 >  size_t casadi::hash_value(double v)
 ------------------------------------------------------------------------
@@ -33445,10 +33745,10 @@ Hash value of a double.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2em
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1075
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1071
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1075-L1089
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1071-L1085
 
 ";
 
@@ -33462,10 +33762,10 @@ Generate a hash value incrementally (function taken from boost)
 Extra doc: https://github.com/casadi/casadi/wiki/L_dr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1060
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1056
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1060-L1062
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1056-L1058
 
 >  void casadi::hash_combine(std::size_t &seed, const std::vector< T > &v)
 ------------------------------------------------------------------------
@@ -33475,10 +33775,10 @@ Generate a hash value incrementally (function taken from boost)
 Extra doc: https://github.com/casadi/casadi/wiki/L_dr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1060
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1056
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1060-L1062
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_misc.hpp#L1056-L1058
 
 ";
 
@@ -34105,6 +34405,8 @@ List of plugins
 
 - osqp
 
+- piqp
+
 - proxqp
 
 - qpoases
@@ -34647,6 +34949,27 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_243
 +-------------------+---------+--------------------------------------------+
 | warm_start_primal | OT_BOOL | Use x0 input to warmstart [Default: true]. |
 +-------------------+---------+--------------------------------------------+
+
+
+
+--------------------------------------------------------------------------------
+
+piqp
+----
+
+
+
+Interface to the PIQP Solver for quadratic programming
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2j1
+
+>List of available options
+
++------+---------+-------------------------------------+
+|  Id  |  Type   |             Description             |
++======+=========+=====================================+
+| piqp | OT_DICT | const Options to be passed to piqp. |
++------+---------+-------------------------------------+
 
 
 
@@ -37872,10 +38195,10 @@ Closes the AD algebra of kron under arbitrary-order differentiation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_2ho
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1110
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1118
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1110-L1112
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L1118-L1120
 ";
 
 %feature("docstring") casadi::IndexReduction::detect_simple_bounds "
@@ -38492,8 +38815,6 @@ https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76
 
 
 // File: namespacestd.xml
-%feature("docstring") std::mul_overflows "
-[INTERNAL] ";
 
 
 // File: namespacestd_1_1chrono.xml
@@ -38666,6 +38987,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76
 
 
 // File: group__plugin__Conic__osqp.xml
+
+
+
+// File: group__plugin__Conic__piqp.xml
 
 
 

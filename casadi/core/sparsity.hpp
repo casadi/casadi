@@ -689,7 +689,9 @@ namespace casadi {
      *
      * Like mul_sparsityF, but combines the two factors of each term with AND rather
      * than OR (an inactive factor annihilates that term), so an output is active only
-     * where some term has both factors active. No memory allocation; work vector w. */
+     * where some term has both factors active. No memory allocation; work vector w.
+
+        \identifier{2in} */
     static void mul_activityF(const bvec_t* x, const Sparsity& x_sp,
                               const bvec_t* y, const Sparsity& y_sp,
                               bvec_t* z, const Sparsity& z_sp,

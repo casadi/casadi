@@ -96,7 +96,8 @@ namespace casadi {
        *  of numpy dispatch, so set it once at startup rather than toggling
        *  it concurrently with running code.
        *  Probe with hasattr(casadi.GlobalOptions, "setNumpyMode").
-       */
+
+          \identifier{2i0} */
       static int numpy_mode;
 
 #endif //SWIG
@@ -133,10 +134,13 @@ namespace casadi {
        *  but silent.  See the numpy_mode field.  Affects only Python
        *  bindings; ignored elsewhere.  Probe with
        *  hasattr(casadi.GlobalOptions, "setNumpyMode").
-       */
+
+          \identifier{2i1} */
       static void setNumpyMode(int mode) { numpy_mode = mode; }
 
-      /** \brief Get the current numpy interop mode.  See setNumpyMode. */
+      /** \brief Get the current numpy interop mode.  See setNumpyMode.
+
+          \identifier{2i2} */
       static int getNumpyMode() { return numpy_mode; }
 
   };

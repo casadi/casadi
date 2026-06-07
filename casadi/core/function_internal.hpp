@@ -391,7 +391,9 @@ namespace casadi {
     /** \brief Apply an ordered list of simplify passes (used by transform)
 
         Each pass is a (task, count) pair; count>0 runs the task that many times,
-        count==0 runs it until a fixed point. */
+        count==0 runs it until a fixed point.
+
+        \identifier{2ix} */
     virtual Function simplify_passes(
         const std::vector<std::pair<std::string, casadi_int> >& tasks) const;
 
@@ -1185,7 +1187,9 @@ namespace casadi {
      *
      * bvec bit set = active (possibly nonzero), clear = inactive (definitely zero).
      * Unlike sp_forward (a dependency analysis), this respects multiplicative
-     * annihilation and nonzero constants. Default is the sound fallback: all active. */
+     * annihilation and nonzero constants. Default is the sound fallback: all active.
+
+        \identifier{2iy} */
     virtual int eval_activity(const bvec_t** arg, bvec_t** res,
                             casadi_int* iw, bvec_t* w, void* mem) const;
 

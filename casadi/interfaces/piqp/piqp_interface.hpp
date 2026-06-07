@@ -37,7 +37,8 @@
 
 /** \defgroup plugin_Conic_piqp
     Interface to the PIQP Solver for quadratic programming
-*/
+
+    \identifier{2j1} */
 
 /** \pluginsection{Conic,piqp} */
 

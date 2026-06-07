@@ -361,7 +361,9 @@ class CASADI_EXPORT SXFunction :
   int sp_forward(const bvec_t** arg, bvec_t** res,
                   casadi_int* iw, bvec_t* w, void* mem) const override;
 
-  /** \brief Propagate signal activity forward */
+  /** \brief Propagate signal activity forward
+
+      \identifier{2ie} */
   int eval_activity(const bvec_t** arg, bvec_t** res,
                   casadi_int* iw, bvec_t* w, void* mem) const override;
 

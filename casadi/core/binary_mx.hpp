@@ -94,7 +94,9 @@ namespace casadi {
         \identifier{1fw} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief Propagate signal activity forward */
+    /** \brief Propagate signal activity forward
+
+        \identifier{2i4} */
     int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards

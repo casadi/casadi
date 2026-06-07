@@ -227,7 +227,8 @@ namespace casadi {
     * The dict-only form applies a default simplification flow when empty.
     * The (passes, opts) form runs an explicit pipeline; its opts accepts only
     * "verbose" (the boolean simplify options are rejected there).
-    */
+
+        \identifier{2ig} */
     ///@{
     Function transform(const Dict& opts = Dict()) const;
     Function transform(const std::string& fname, const Dict& opts = Dict()) const;
@@ -319,7 +320,9 @@ namespace casadi {
      * all output nonzeros (size nnz_out()). An output that comes out inactive (false)
      * is guaranteed zero for any value of the active inputs. Unlike sparsity
      * propagation this exploits annihilation: an inactive operand of a multiply kills
-     * the product. */
+     * the product.
+
+        \identifier{2ih} */
     std::vector<bool> activity(const std::vector<bool>& arg) const;
 
     ///@{
@@ -682,7 +685,9 @@ namespace casadi {
     int operator()(const bvec_t** arg, bvec_t** res,
         casadi_int* iw, bvec_t* w, int mem=0) const;
 
-    /** \brief Propagate signal activity forward (bit set = active (possibly nonzero)) */
+    /** \brief Propagate signal activity forward (bit set = active (possibly nonzero))
+
+        \identifier{2ii} */
     int eval_activity(const bvec_t** arg, bvec_t** res,
         casadi_int* iw, bvec_t* w, int mem=0) const;
 
