@@ -312,6 +312,10 @@ namespace casadi {
     static Matrix<Scalar> transform(const Matrix<Scalar> &x, const Dict& opts = Dict());
     static Matrix<Scalar> transform(const Matrix<Scalar> &x,
         const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
+    static std::vector<Matrix<Scalar> > transform(const std::vector<Matrix<Scalar> >& x,
+        const Dict& opts = Dict());
+    static std::vector<Matrix<Scalar> > transform(const std::vector<Matrix<Scalar> >& x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
     static Matrix<Scalar> jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                    const Dict& opts = Dict());
     static Sparsity jacobian_sparsity(const Matrix<Scalar> &f, const Matrix<Scalar> &x);

@@ -3557,6 +3557,14 @@ DECL M casadi_transform(const M& x, const std::vector< std::vector< casadi::Gene
   return transform(x, passes, opts);
 }
 
+DECL std::vector< M > casadi_transform(const std::vector< M >& x, const casadi::Dict& opts = casadi::Dict()) {
+  return transform(x, opts);
+}
+
+DECL std::vector< M > casadi_transform(const std::vector< M >& x, const std::vector< std::vector< casadi::GenericType > >& passes, const casadi::Dict& opts = casadi::Dict()) {
+  return transform(x, passes, opts);
+}
+
 DECL M casadi_bilin(const M& A, const M& x, const M& y) {
   return bilin(A, x, y);
 }

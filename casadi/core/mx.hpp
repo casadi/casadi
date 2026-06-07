@@ -701,6 +701,9 @@ namespace casadi {
     static MX transform(const MX& x, const Dict& opts = Dict());
     static MX transform(const MX& x,
         const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
+    static std::vector<MX> transform(const std::vector<MX>& x, const Dict& opts = Dict());
+    static std::vector<MX> transform(const std::vector<MX>& x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
     static MX dot(const MX& x, const MX& y);
     static MX mrdivide(const MX& a, const MX& b);
     static MX mldivide(const MX& a, const MX& b);

@@ -1141,6 +1141,14 @@ namespace casadi {
         const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict()) {
       return MatType::transform(x, passes, opts);
     }
+    friend inline std::vector<MatType> transform(const std::vector<MatType> &x,
+        const Dict& opts = Dict()) {
+      return MatType::transform(x, opts);
+    }
+    friend inline std::vector<MatType> transform(const std::vector<MatType> &x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict()) {
+      return MatType::transform(x, passes, opts);
+    }
     ///@}
 
     /** \brief Get a string representation for a binary MatType, using custom arguments

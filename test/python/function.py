@@ -4724,6 +4724,17 @@ class Functiontests(casadiTestCase):
     for vx,vy in [(0.3,1.7),(-2.0,4.5)]:
       self.checkarray(fe(vx,vy), fr(vx,vy))
 
+    # free-function transform on a vector of expressions, transformed jointly
+    sv = ca.transform([8*y-3*y, x+x], [["simplify","combine_terms"]])
+    self.assertEqual(len(sv), 2)
+    fev = ca.Function("fev",[x,y],sv)
+    frv = ca.Function("frv",[x,y],[5*y, 2*x])
+    for vx,vy in [(0.3,1.7),(-2.0,4.5)]:
+      self.checkarray(fev(vx,vy)[0], frv(vx,vy)[0])
+      self.checkarray(fev(vx,vy)[1], frv(vx,vy)[1])
+    # the dict form is also available for the vector signature
+    self.assertEqual(len(ca.transform([8*y-3*y, x+x], dict(combine_terms=True))), 2)
+
     # Function.transform with an ordered list; 0 = run a pass until fixed point
     a = ca.MX.sym("a")
     b = ca.MX.sym("b")

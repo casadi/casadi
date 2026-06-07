@@ -2740,6 +2740,18 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::vector<Matrix<Scalar> > Matrix<Scalar>::transform(const std::vector<Matrix<Scalar> >& x,
+      const Dict& opts) {
+    casadi_error("'transform' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
+  std::vector<Matrix<Scalar> > Matrix<Scalar>::transform(const std::vector<Matrix<Scalar> >& x,
+      const std::vector<std::vector<GenericType> >& passes, const Dict& opts) {
+    casadi_error("'transform' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::substitute(const Matrix<Scalar>& ex,
                                                 const Matrix<Scalar>& v,
                                                 const Matrix<Scalar>& vdef) {

@@ -127,6 +127,13 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
     const Dict& opts);
 
   template<>
+  std::vector<SX> SX::transform(const std::vector<SX>& x, const Dict& opts);
+
+  template<>
+  std::vector<SX> SX::transform(const std::vector<SX>& x,
+    const std::vector<std::vector<GenericType> >& passes, const Dict& opts);
+
+  template<>
   std::vector<SX>
   SX::substitute(const std::vector<SX>& ex, const std::vector<SX>& v, const std::vector<SX>& vdef);
 
