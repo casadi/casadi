@@ -289,25 +289,36 @@ endif()
 # IPOPT Nlpsol plugin: pull in the full Fortran cascade.  libipopt.a +
 # libcoinmumps.a + libcoinmetis.a from the COIN-OR/MUMPS/METIS chain,
 # plus liblapack.a + libblas.a from Netlib reference LAPACK (built via
-# r-wasm/flang-wasm), plus libFortranRuntime.a + the omp_lib stub
-# object.  Order matters for the static-link symbol resolution -- ipopt
-# pulls mumps, mumps pulls metis + lapack, lapack/blas pull Fortran
-# runtime + omp stub.
+# r-wasm/flang-wasm), plus libFortranRuntime.a and the MUMPS libseq
+# COMMON-block stub.  Order matters for static-link symbol resolution --
+# ipopt pulls mumps, mumps pulls metis + lapack, lapack/blas pull the
+# Fortran runtime.
 if(WITH_IPOPT)
+  # flang omits storage for MUMPS's libseq /mpif_libseq/ COMMON block, so
+  # wasm-ld sees `mpif_libseq_` undefined.  Compile the BLOCK DATA stub
+  # in-tree with the (wasm) Fortran compiler -- keeps the toolchain image
+  # generic (no baked .o needed).
+  set(_mumps_stub_obj ${CMAKE_CURRENT_BINARY_DIR}/mumps_common_stub.o)
+  add_custom_command(
+    OUTPUT  ${_mumps_stub_obj}
+    COMMAND ${CMAKE_Fortran_COMPILER} -fPIC -c
+            ${CMAKE_CURRENT_SOURCE_DIR}/mumps_common_stub.f90 -o ${_mumps_stub_obj}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mumps_common_stub.f90
+    COMMENT "flang -c mumps_common_stub.f90 (MUMPS libseq COMMON-block storage)"
+    VERBATIM)
+  add_custom_target(mumps_common_stub DEPENDS ${_mumps_stub_obj})
+
   set(_ipopt_extra
     ${CMAKE_BINARY_DIR}/external_projects/lib/libipopt.a
     ${CMAKE_BINARY_DIR}/external_projects/lib/libcoinmumps.a
     ${CMAKE_BINARY_DIR}/external_projects/lib/libcoinmetis.a
     ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
     ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
-    # libFortranRuntime.a from r-wasm/flang-wasm with our local
-    # DescriptorModel.h patch baked in (see build-wasm-flang/
-    # upstream-bug/bug_report.md).  The casadi-flang-wasm Docker image
-    # replaces the shipped /opt/flang/wasm/lib/libFortranRuntime.a with
-    # the patched build at image-build time.
+    # Fortran runtime from r-wasm/flang-wasm (descriptor-ABI fix upstream).
     /opt/flang/wasm/lib/libFortranRuntime.a
-    /opt/mumps_common_stub/mumps_common_stub.o)
+    ${_mumps_stub_obj})
   wasmjs_side_plugin(nlpsol ipopt ${_ipopt_extra})
+  add_dependencies(casadi_nlpsol_ipopt_side mumps_common_stub)
 endif()
 
 # ----------------------------------------------------------------------------
