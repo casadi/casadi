@@ -202,9 +202,10 @@ if(WITH_HIGHS)
 endif()
 
 # DAQP Conic plugin: pure-C QP solver, no Fortran/BLAS dependencies.
+# daqp upstream's static archive is libdaqpstat.a (the `daqp` target is
+# hardcoded SHARED, so there is no libdaqp.a); whole-archive the static one.
 if(WITH_DAQP)
   wasmjs_side_plugin(conic daqp
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libdaqp.a
     ${CMAKE_BINARY_DIR}/external_projects/lib/libdaqpstat.a)
 endif()
 
