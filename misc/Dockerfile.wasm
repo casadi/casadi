@@ -34,3 +34,14 @@ RUN git clone --depth=1 https://github.com/emscripten-core/emsdk.git $EMSDK_DIR 
 RUN echo 'source /emsdk/emsdk_env.sh > /dev/null 2>&1' >> /root/.bashrc
 ENV PATH="/opt/flang/host/bin:${PATH}"
 SHELL ["/bin/bash", "-lc"]
+
+# Fortran-for-wasm driver: autotools/libtool invoke the Fortran compiler
+# as a linker, but raw flang can't link wasm.  flang-emcc compiles with
+# flang and routes the link step through emcc (+ libFortranRuntime.a).
+# Used as FC for the autotools Fortran externals (MUMPS, IPOPT).
+COPY wasm/omp_lib_stub.f90 /opt/omp_lib_stub/omp_lib_stub.f90
+RUN source /emsdk/emsdk_env.sh > /dev/null 2>&1 && \
+    cd /opt/omp_lib_stub && \
+    /opt/flang/host/bin/flang -c omp_lib_stub.f90 -o omp_lib_stub.o
+COPY wasm/flang-emcc /usr/local/bin/flang-emcc
+RUN chmod +x /usr/local/bin/flang-emcc
