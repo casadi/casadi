@@ -791,6 +791,10 @@ namespace casadi {
           sparsity_in_.at(iind).find(nzmap);
           asens[d][iind].sparsity().get_nz(nzmap);
 
+          // Collect the (Jacobian nonzero, sensitivity nonzero) assignment pairs
+          adds.clear();
+          tmp.clear();
+
           // For all the output nonzeros treated in the sweep
           for (casadi_int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el) {
 
@@ -807,10 +811,14 @@ namespace casadi {
               casadi_int anz = nzmap[inz];
               if (anz<0) continue;
 
-              // Get the input seed
-              ret.at(0).nz(elJ) = asens[d][iind].nz(anz);
+              // Queue the assignment
+              adds.push_back(elJ);
+              tmp.push_back(anz);
             }
           }
+
+          // Add contribution to the Jacobian in a single batched assignment
+          ret.at(0).nz(adds) = asens[d][iind].nz(tmp);
         }
 
         // Update direction offsets
