@@ -77,6 +77,7 @@ namespace casadi {
       static std::string temp_work_dir; // Temporary work directory
 
       /** \brief numpy interop mode (issue #2959).  Controls how an explicit
+
        *  `numpy.foo(M)` on a casadi value behaves in the Python bindings:
        *    0 (default): legacy casadi 3.7.2 behaviour + a Python
        *       FutureWarning -- a numeric value densifies to a numpy result,
@@ -130,6 +131,7 @@ namespace casadi {
       static std::string getTempWorkDir() { return temp_work_dir; }
 
       /** \brief Set the numpy interop mode (issue #2959): 1 = casadi-aware
+
        *  numpy support, 0 (default) = legacy + FutureWarning, -1 = legacy
        *  but silent.  See the numpy_mode field.  Affects only Python
        *  bindings; ignored elsewhere.  Probe with

@@ -36,6 +36,7 @@
 #include <piqp/piqp.hpp> // NOLINT(build/include)
 
 /** \defgroup plugin_Conic_piqp
+    \par
     Interface to the PIQP Solver for quadratic programming
 
     \identifier{2j1} */

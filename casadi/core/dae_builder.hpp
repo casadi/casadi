@@ -396,6 +396,7 @@ class CASADI_EXPORT DaeBuilder
   Dict export_fmu(const Dict& opts=Dict());
 
   /** \brief Compile the sources produced by export_fmu
+
   *  \param files the {local_file -> archive path} map returned by export_fmu
   *  \param opts compile options: compiler, compiler_options, include_dirs
   *  \return the file map augmented with the amalgamation source and compiled binary
@@ -404,6 +405,7 @@ class CASADI_EXPORT DaeBuilder
   Dict compile_fmu(const Dict& files, const Dict& opts=Dict());
 
   /** \brief Pack files from export_fmu / compile_fmu into a single .fmu archive
+
   * \param files the {local_file -> archive path} map to pack
   * \param opts packaging options: path (default '<name>.fmu')
 

@@ -28,6 +28,7 @@
 
       const std::string casadi::PiqpInterface::meta_doc=
       "\n"
+"\n"
 "Interface to the PIQP Solver for quadratic programming\n"
 "\n"
 "Extra doc: https://github.com/casadi/casadi/wiki/L_2j1 \n"
