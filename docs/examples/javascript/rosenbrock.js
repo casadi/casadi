@@ -24,33 +24,23 @@
 //   minimize     x^2 + 100*z^2
 //   subject to   z + (1-x)^2 - y == 0
 //
-// JS notes:
-//   * casadi loads via an async factory: `const M = await
-//     require('.../casadi.js')();`.
-//   * No operator overloading in JS.  Free-fn forms:
-//       x**2       -> M.times(x, x)   (or M.power(x, M.SX(2)))
-//       1 - x      -> M.minus(M.SX(1), x)
-//       a + b      -> M.plus(a, b)
-//     Number args to binary ops must be EXPLICITLY wrapped in M.SX
-//     / M.MX / M.DM at construction time -- the JS-side overload
-//     dispatcher doesn't auto-coerce `2` to `M.DM(2)` the way
-//     Python's __rmul__/__radd__ do.  (Tracked as a separate runtime
-//     ergonomics task.)
-//   * Concat: `vertcat(x, y, z)` variadic, `vcat([x, y, z])` list
-//     form.  `vertcat([x, y, z])` would be a 1-arg call with a list
-//     of matrices -- which Python `vertcat(*[...])` and JS `vcat`
-//     handle but the bare `vertcat([...])` does NOT.
-//   * Solver inputs/outputs are dicts keyed by name (x0/lbg/ubg/...
-//     and x/f/g/lam_x/lam_g) -- same shape as Python.
-//   * `M.DM` values render via `.nonzeros()` -> number[].
+// CasADi-in-JS notes (see README.md for the full list):
+//   * No operator overloading.  Use free-function forms:
+//       x*x   -> M.times(x, x)        1 - x -> M.minus(M.SX(1), x)
+//       a + b -> M.plus(a, b)         x**2  -> M.power(x, M.SX(2))
+//     Number literals in binary ops must be wrapped explicitly
+//     (M.SX/M.MX/M.DM) -- there is no Python-style __radd__ coercion.
+//   * Concat: M.vertcat(x, y, z) is variadic; M.vcat([x, y, z]) takes
+//     a list.  (Bare M.vertcat([x, y, z]) is a 1-arg list call.)
+//   * Solver IO are name-keyed objects (x0/lbg/ubg... -> x/f/g/...),
+//     same as Python dicts.
+//   * M.DM values read out via .nonzeros() -> number[].
 
-const path = require("path");
-const casadiPath = process.env.CASADI_JS
-  || path.resolve(__dirname, "../../../build-wasm/swig/wasm-js/casadi.js");
-
-(async () => {
-  const M = await require(casadiPath)();
-
+// The example body is environment-agnostic: it receives the loaded
+// casadi module `M` and a `log(...)` sink, so the SAME file runs both
+// under Node (see the self-run block below) and in the browser (where
+// rosenbrock.html calls example()).  Keep this function pure casadi.
+async function example(M, log) {
   // Declare variables
   const x = M.SX.sym("x");
   const y = M.SX.sym("y");
@@ -74,11 +64,24 @@ const casadiPath = process.env.CASADI_JS
   });
 
   // Print solution
-  const fmt = (label, val) => console.log(
-    label.padStart(50) + " " + val.nonzeros().join(" "));
-  console.log();
-  fmt("Optimal cost:",                  res["f"]);
-  fmt("Primal solution:",               res["x"]);
-  fmt("Dual solution (simple bounds):", res["lam_x"]);
+  const fmt = (label, val) => log(label.padStart(50) + " " + val.nonzeros().join(" "));
+  log("");
+  fmt("Optimal cost:",                     res["f"]);
+  fmt("Primal solution:",                  res["x"]);
+  fmt("Dual solution (simple bounds):",    res["lam_x"]);
   fmt("Dual solution (nonlinear bounds):", res["lam_g"]);
-})().catch((e) => { console.error("FATAL:", e.message || e); process.exit(1); });
+}
+
+// ---- Node entry point: `node rosenbrock.js` --------------------------
+// Skipped in the browser, where `require` is undefined and rosenbrock.html
+// drives example() instead.
+if (typeof require !== "undefined" && typeof module !== "undefined" && require.main === module) {
+  const path = require("path");
+  const casadiPath = process.env.CASADI_JS
+    || path.resolve(__dirname, "../../../build-wasm/swig/wasm-js/casadi.js");
+  require(casadiPath)()
+    .then((M) => example(M, (...a) => console.log(...a)))
+    .catch((e) => { console.error("FATAL:", e.message || e); process.exit(1); });
+}
+
+if (typeof module !== "undefined" && module.exports) module.exports = example;

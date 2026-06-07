@@ -3002,7 +3002,10 @@ class _SupportsMX(Protocol):
  * satisfies _SupportsSX only (accepted where _SX is) while a numeric
  * DM-backed array satisfies _SupportsDM (hence _DM, and via the unions _SX
  * and _MX too) -- matching casadi's runtime to_ptr rules. */
-#ifdef SWIG_STUBS_ENABLED
+// SWIGPYTHON-gated: ArrayInterface is a Python/numpy bridge stub.  Without
+// the SWIGPYTHON guard this Python source leaks into the wasm-js .d.ts
+// (both targets define SWIG_STUBS_ENABLED) and breaks `tsc`.
+#if defined(SWIG_STUBS_ENABLED) && defined(SWIGPYTHON)
 %stubcode %{class ArrayInterface(Generic[_T]):
     """numpy-semantics array view over a casadi DM/SX/MX.  Constructing one
     dispatches to the backing-typed subclass ArrayInterfaceDM/SX/MX."""
@@ -3428,6 +3431,54 @@ export default createcasadi;
 // in lexical scope here.
 // ---------------------------------------------------------------------------
 %insert("js") %{
+  /* Coerce a bare JS number / array into a casadi matrix proxy via its
+     constructor, leaving existing proxies untouched.  Used by the
+     jsarg typemaps for SX/MX/DM so `M.plus(x, 2)` works (the matching
+     jstypecheck typemap lets such an arg select the overload). */
+  const __coerce = (v, Cls) =>
+    (v === null || v === undefined ||
+     (typeof v === "object" && v._swig_type !== undefined)) ? v : new Cls(v);
+
+  /* Element indexing for matrix classes (SX/MX/DM), wired by
+     %feature("wasmjs:index") -> the wasm-js backend wraps every
+     instance in __mkIndex.  Mirrors casadi's 0-based get/set:
+        x[k]            x.get(false, k)         (1-D element)
+        x[k] = v        x.set(v, false, k)      (v coerced by jsarg)
+        x[[i, j]]       x.get(false, i, j)      (2-D; x[i,j] can't work
+                                                 in JS -- comma operator)
+        x["a:b"]        x.get(false, Slice(a,b))         (slice)
+        x["a:b,j"]      x.get(false, Slice(a,b), j)      (mixed)
+        x.nz[k] / =v    x.get_nz/set_nz(false, k)        (structural nz)
+     Non-index keys (methods, _ptr, symbols) pass straight through. */
+  const __isIdxKey = (k) => typeof k === "string" && k.length > 0 &&
+    (k.charCodeAt(0) === 45 || (k.charCodeAt(0) >= 48 && k.charCodeAt(0) <= 57));
+  const __idxPart = (s) => {
+    if (s.indexOf(":") < 0) return Number(s);
+    if (s === ":") return new Slice();
+    const p = s.split(":");
+    return p.length >= 3 ? new Slice(Number(p[0]), Number(p[1]), Number(p[2]))
+                         : new Slice(Number(p[0]), Number(p[1]));
+  };
+  const __idxArgs = (k) => k.split(",").map(__idxPart);
+  const __NZ_HANDLER = {
+    get(t, k, r) { return __isIdxKey(k) ? t.get_nz(false, Number(k)) : Reflect.get(t, k, r); },
+    set(t, k, v, r) { if (__isIdxKey(k)) { t.set_nz(v, false, Number(k)); return true; } return Reflect.set(t, k, v, r); },
+  };
+  const __INDEX_HANDLER = {
+    get(t, k, r) {
+      if (k === "__indexed") return true;
+      if (k === "nz") return new Proxy(t, __NZ_HANDLER);
+      if (__isIdxKey(k)) return t.get(false, ...__idxArgs(k));
+      return Reflect.get(t, k, r);
+    },
+    set(t, k, v, r) {
+      if (__isIdxKey(k)) { t.set(v, false, ...__idxArgs(k)); return true; }
+      return Reflect.set(t, k, v, r);
+    },
+  };
+  const __mkIndex = (o) =>
+    (o === null || typeof o !== "object" || o.__indexed) ? o : new Proxy(o, __INDEX_HANDLER);
+
   /* Function.call vs callable: two distinct conventions, mirroring
      Python's casadi.
        f.call([a, b])          -- ALWAYS returns the full list of outputs
@@ -3854,6 +3905,37 @@ PyOS_setsig(SIGINT, SigIntHandler);
 %stub_overload_func(arctan2, SX, y: _SX, x: _SX)
 %stub_overload_func(arctan2, MX, y: _MX, x: _MX)
 #endif // SWIGPYTHON
+
+#ifdef SWIGWASMJS
+// Emit enum values as 64-bit ints so they round-trip to JS as bigint,
+// matching casadi_int-returning methods (else `id === OP_ADD` fails:
+// one side number, the other bigint).  The width lives here (not in the
+// wasm-js backend) because casadi_int's representation is project-specific.
+%feature("wasmjs:enum_int_type","long long");
+
+// Accept a bare JS number / array where SX/MX/DM is expected, coercing
+// via the constructor (so `M.plus(x, 2)` works like Python).  jstypecheck
+// lets such an arg select the overload; jsarg performs the coercion.
+// __coerce is defined in the %insert("js") block above.
+%typemap(jstypecheck) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>&, casadi::Matrix<casadi::SXElem>&
+  "(M._swig_can_SX(__unwrap($input)) || typeof $input === 'number' || typeof $input === 'bigint' || Array.isArray($input))";
+%typemap(jsarg) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>&, casadi::Matrix<casadi::SXElem>&
+  "__unwrap(__coerce($input, SX))";
+%typemap(jstypecheck) casadi::MX, const casadi::MX&, casadi::MX&
+  "(M._swig_can_MX(__unwrap($input)) || typeof $input === 'number' || typeof $input === 'bigint' || Array.isArray($input))";
+%typemap(jsarg) casadi::MX, const casadi::MX&, casadi::MX&
+  "__unwrap(__coerce($input, MX))";
+%typemap(jstypecheck) casadi::Matrix<double>, const casadi::Matrix<double>&, casadi::Matrix<double>&
+  "(M._swig_can_DM(__unwrap($input)) || typeof $input === 'number' || typeof $input === 'bigint' || Array.isArray($input))";
+%typemap(jsarg) casadi::Matrix<double>, const casadi::Matrix<double>&, casadi::Matrix<double>&
+  "__unwrap(__coerce($input, DM))";
+
+// Element indexing: wrap SX/MX/DM instances in the __mkIndex Proxy so
+// x[k] / x[k]=v / x[[i,j]] / x["a:b"] / x.nz[k] work (see %insert("js")).
+%feature("wasmjs:index") casadi::Matrix<casadi::SXElem>;
+%feature("wasmjs:index") casadi::MX;
+%feature("wasmjs:index") casadi::Matrix<double>;
+#endif // SWIGWASMJS
 
 // Strip leading casadi_ unless followed by ML/int
 %rename("%(regex:/casadi_(?!ML|int\\b)(.*)/\\1/)s") "";

@@ -1,0 +1,7 @@
+# WebAssembly build artifacts, symlinked/copied in for the browser
+# examples (see README.md "Running in a browser").  Not committed --
+# they are large and rebuilt from source.
+casadi.js
+casadi_wasm.js
+casadi_wasm.wasm
+casadi_wasm.data
