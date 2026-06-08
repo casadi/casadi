@@ -254,7 +254,7 @@ jobs:
           echo "all examples ran"
 
   test-python-source-package:
-    if: false  # TEMP wasm-only debug; ORIG: ${{ contains(github.event.head_commit.message, '[ci:run_slow]') }}
+    if: ${{ contains(github.event.head_commit.message, '[ci:run_slow]') }}
     runs-on: ${{ matrix.image }}
     needs: [swig]
     strategy:
@@ -283,7 +283,6 @@ jobs:
         shell: bash -el {0}
 
   core-osx:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ${{ matrix.image }}
     strategy:
       fail-fast: false
@@ -331,7 +330,6 @@ jobs:
           retention-days: 5
 
   core-dockcross:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -381,7 +379,6 @@ jobs:
           retention-days: 5
 
   matrix-arch-py2:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ubuntu-24.04
     steps:
       # Nominal: only the arches consumed downstream by default-mode jobs —
@@ -432,7 +429,6 @@ jobs:
       matrix: ${{ steps.nominal.outputs.matrix || steps.slow.outputs.matrix }}
 
   matrix-arch-py2-mac:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ubuntu-24.04
     steps:
       - id: nominal
@@ -464,7 +460,6 @@ jobs:
       matrix: ${{ steps.nominal.outputs.matrix || steps.slow.outputs.matrix }}
 
   python-osx:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     needs: [core-osx,matrix-arch-py2-mac,swig,version]
     runs-on: ${{ matrix.image }}
     strategy:
@@ -575,7 +570,6 @@ jobs:
         if: github.event_name != 'pull_request'
 
   matrix-arch-matlab-mac:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ubuntu-24.04
     steps:
       # Nominal: arm64 only. Skipping x86_64 cuts release-upload concurrency
@@ -631,7 +625,6 @@ jobs:
       matrix: ${{ steps.nominal.outputs.matrix || steps.slow.outputs.matrix }}
 
   matlab-osx:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     needs: [core-osx,matrix-arch-matlab-mac,swig,version]
     runs-on: ${{matrix.image }}
     strategy:
@@ -716,7 +709,6 @@ jobs:
           retention-days: 5
 
   matlab-dockcross:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     needs: [core-dockcross,swig,version]
     runs-on: ubuntu-24.04
     strategy:
@@ -812,7 +804,6 @@ jobs:
           retention-days: 5
 
   python-dockcross:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     needs: [core-dockcross,matrix-arch-py2,swig,version]
     runs-on: ubuntu-24.04
     strategy:
@@ -939,7 +930,7 @@ jobs:
 
 
   test-matlab:
-    if: false  # TEMP wasm-only debug; ORIG: ${{ !cancelled() && (needs.matlab-dockcross.result == 'success' || needs.matlab-osx.result == 'success') }}
+    if: ${{ !cancelled() && (needs.matlab-dockcross.result == 'success' || needs.matlab-osx.result == 'success') }}
     runs-on: ${{matrix.image}}
     needs: [matlab-dockcross,matlab-osx]
     env:
@@ -1020,7 +1011,6 @@ jobs:
         if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
 
   test-octave:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ${{matrix.image}}
     needs: [matlab-dockcross,matlab-osx]
     strategy:
@@ -1077,7 +1067,6 @@ jobs:
       #  if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
 
   docs:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ubuntu-22.04
     needs: [python-dockcross,matlab-dockcross,version]
     steps:
@@ -1144,7 +1133,6 @@ jobs:
         if: contains(github.ref, 'release') || contains(github.ref, 'main') 
 
   matrix-test-python:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ubuntu-24.04
     steps:
       - id: nominal
@@ -1206,7 +1194,6 @@ jobs:
       matrix: ${{ steps.nominal.outputs.matrix || steps.slow.outputs.matrix }}
 
   test-python:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ${{ matrix.image }}
     needs: [python-osx,python-dockcross,matrix-test-python]
     strategy:
@@ -1284,7 +1271,6 @@ jobs:
         if: contains(matrix.image, 'windows')
 
   matrix-test-python-long:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ubuntu-24.04
     steps:
       - id: nominal
@@ -1321,7 +1307,6 @@ jobs:
       matrix: ${{ steps.nominal.outputs.matrix || steps.slow.outputs.matrix }}
 
   test-python-long:
-    if: false  # TEMP: wasm-only CI debug -- revert this line before merge
     runs-on: ${{matrix.image }}
     needs: [python-osx,python-dockcross,version,matrix-test-python-long]
     strategy:
