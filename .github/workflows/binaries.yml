@@ -198,7 +198,9 @@ jobs:
       - name: Assemble dist zip
         run: |
           mkdir -p casadi-wasm
-          cp build/swig/wasm-js/casadi.js build/swig/wasm-js/casadi.d.ts \
+          # casadi.js/.d.ts are the pregenerated wrapper (from the swig job);
+          # casadi_wasm.* are the emscripten outputs in the build dir.
+          cp swig/wasm-js/target/source/casadi.js swig/wasm-js/target/source/casadi.d.ts \
              build/swig/wasm-js/casadi_wasm.js build/swig/wasm-js/casadi_wasm.wasm \
              build/swig/wasm-js/casadi_wasm.data casadi-wasm/
           cp -r docs/examples/javascript casadi-wasm/examples
