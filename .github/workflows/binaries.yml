@@ -199,10 +199,11 @@ jobs:
         run: |
           mkdir -p casadi-wasm
           # casadi.js/.d.ts are the pregenerated wrapper (from the swig job);
-          # casadi_wasm.* are the emscripten outputs in the build dir.
+          # casadi_wasm.js/.wasm are the emscripten core; libcasadi_*.so are the
+          # lazily-loaded plugin side modules (NOT embedded -- fetched on demand).
           cp swig/wasm-js/target/source/casadi.js swig/wasm-js/target/source/casadi.d.ts \
              build/swig/wasm-js/casadi_wasm.js build/swig/wasm-js/casadi_wasm.wasm \
-             build/swig/wasm-js/casadi_wasm.data casadi-wasm/
+             build/swig/wasm-js/libcasadi_*.so casadi-wasm/
           cp -r docs/examples/javascript casadi-wasm/examples
           zip -rq casadi-wasm-v${{ needs.version.outputs.casadi }}.zip casadi-wasm
       - name: Inject slug/short variables
@@ -235,7 +236,7 @@ jobs:
           mkdir -p build-wasm/swig/wasm-js
           cp casadi-wasm/casadi.js casadi-wasm/casadi.d.ts \
              casadi-wasm/casadi_wasm.js casadi-wasm/casadi_wasm.wasm \
-             casadi-wasm/casadi_wasm.data build-wasm/swig/wasm-js/
+             casadi-wasm/libcasadi_*.so build-wasm/swig/wasm-js/
       - uses: actions/setup-node@v4.4.0
         with:
           node-version: '22'

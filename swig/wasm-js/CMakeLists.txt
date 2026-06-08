@@ -98,7 +98,7 @@ target_compile_options(casadi_wasm PRIVATE -fwasm-exceptions -fPIC)
 # MEMFS at the path where casadi_os.cpp::open_shared_library expects them.
 # `CASADI_SHARED_LIBRARY_PREFIX/SUFFIX` are baked into casadi_meta as
 # "lib"/".so" regardless of host.  Mount each plugin at the root.
-set(_preload_files "")
+set(_plugin_so_list "")
 
 # ----------------------------------------------------------------------------
 # Per-plugin SIDE_MODULE recipe
@@ -155,11 +155,13 @@ function(wasmjs_side_plugin infix pname)
 -Wl,--export-all \
 ${_link_extra}"
   )
-  # Propagate the .so out via a parent-scope variable so the main module
-  # can --preload-file it.
-  set(_preload_files
-      "${_preload_files} --preload-file ${_so_path}@/${_so_name}"
-      PARENT_SCOPE)
+  # Lazy plugin loading: the .so is NOT embedded in casadi_wasm.data; it
+  # ships as a sibling of casadi_wasm.js and is fetched on demand by the
+  # async load_<type>() JS wrapper (which writes it into MEMFS before the
+  # synchronous C++ dlopen).  This keeps CasADi's plugin model and a small
+  # core, with no Asyncify (zero binary-size cost).  Track the names so the
+  # dist step can collect them.
+  set(_plugin_so_list "${_plugin_so_list};${_so_name}" PARENT_SCOPE)
   add_dependencies(casadi_wasm ${_plugin_lib}_side)
 endfunction()
 
@@ -341,9 +343,9 @@ set_target_properties(casadi_wasm PROPERTIES
 -s MODULARIZE=1 -s EXPORT_NAME=createWasm \
 -s ENVIRONMENT=web,worker,node \
 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1 \
--s EXPORTED_RUNTIME_METHODS=['UTF8ToString','stringToUTF8','lengthBytesUTF8','HEAPF64'] \
--s EXPORTED_FUNCTIONS=@${_swig_exp}\
-${_preload_files}"
+-s FORCE_FILESYSTEM=1 \
+-s EXPORTED_RUNTIME_METHODS=['UTF8ToString','stringToUTF8','lengthBytesUTF8','HEAPF64','FS'] \
+-s EXPORTED_FUNCTIONS=@${_swig_exp}"
 )
 # -Wl,--export-all on the MAIN_MODULE: same rationale as the side
 # modules above.  MAIN_MODULE=1 is supposed to export everything for
