@@ -3818,7 +3818,10 @@ export default createcasadi;
     if (typeof process !== "undefined" && process.versions && process.versions.node) {
       bytes = require("fs").readFileSync(__path.join(__dirname, soname));
     } else {
-      const resp = await fetch(soname);
+      // Resolve via locateFile so the .so is fetched from the same base as
+      // the core (.wasm), not relative to the document.
+      const __url = (typeof M.locateFile === "function") ? M.locateFile(soname, "") : soname;
+      const resp = await fetch(__url);
       if (!resp.ok) throw new Error("Failed to fetch plugin " + soname + ": " + resp.status);
       bytes = new Uint8Array(await resp.arrayBuffer());
     }

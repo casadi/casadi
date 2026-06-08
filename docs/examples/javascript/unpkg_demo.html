@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CasADi in the browser — @casadi/casadi-wasm via unpkg</title>
+<style>
+  body { font: 14px/1.6 ui-monospace, Menlo, Consolas, monospace; margin: 2rem; max-width: 60rem; color: #222; }
+  h1 { font-size: 1.2rem; } a { color: #1565c0; }
+  #out { background: #f5f5f5; border: 1px solid #ddd; padding: 1rem; white-space: pre-wrap; min-height: 6rem; }
+  button { font: inherit; padding: .35rem .9rem; margin-bottom: .6rem; }
+  .err { color: #c62828; }
+  small { color: #666; }
+</style>
+</head>
+<body>
+<h1>CasADi running in your browser 🐫</h1>
+<p><small>Loaded straight from
+<a href="https://unpkg.com/@casadi/casadi-wasm@3.8.0-beta.1/">unpkg</a>
+— no install, no server-side compute. Symbolic AD + an IPOPT solve, all WebAssembly.</small></p>
+<button id="run" disabled>Run again</button>
+<div id="out">Loading casadi.wasm from unpkg…</div>
+
+<script>
+"use strict";
+
+// Pin the published prerelease. Use "@beta" to always track the latest beta.
+const BASE = "https://unpkg.com/@casadi/casadi-wasm@3.8.0-beta.1/";
+
+// --- Self-contained browser loader -------------------------------------
+// casadi.js is generated as CommonJS for Node (require('./casadi_wasm.js'),
+// require('path'), __dirname). We fetch it from unpkg and evaluate it in a
+// tiny CJS sandbox that supplies exactly those, so the unmodified file runs
+// in the browser. (Mirrors the package's own examples/_casadi_browser.js.)
+async function loadCasadi(base) {
+  const evalCjs = async (file, requireFn) => {
+    const resp = await fetch(base + file);
+    if (!resp.ok) throw new Error(`${base + file}: ${resp.status} ${resp.statusText}`);
+    const src = await resp.text();
+    const factory = new Function("module", "exports", "require", "__dirname", "__filename",
+      src + "\n;return module.exports;");
+    const m = { exports: {} };
+    return factory(m, m.exports, requireFn, base.replace(/\/$/, ""), base + file);
+  };
+  const createWasm = await evalCjs("casadi_wasm.js",
+    (p) => { throw new Error("casadi_wasm.js: unexpected require " + p); });
+  const createcasadi = await evalCjs("casadi.js", (p) => {
+    if (p.endsWith("casadi_wasm.js")) return createWasm;
+    if (p === "path") return { join: (...a) => a.filter(Boolean).join("/").replace(/\/{2,}/g, "/") };
+    throw new Error("casadi.js: unexpected require " + p);
+  });
+  return await createcasadi();
+}
+
+// Plugin .so's are fetched lazily by name; redirect those bare requests to
+// unpkg so on-demand solver loading works cross-origin from a static page.
+const _fetch = window.fetch.bind(window);
+window.fetch = (u, o) =>
+  _fetch(typeof u === "string" && /^libcasadi_[\w]+\.so$/.test(u) ? BASE + u : u, o);
+
+// --- The demo ----------------------------------------------------------
+async function demo(M, log) {
+  // JavaScript has no operator overloading: use M.plus/minus/times, etc.
+  const x = M.SX.sym("x", 2);
+  const [x0, x1] = M.vertsplit(x);
+  const f = M.plus(M.times(x0, x0), M.times(x1, x1));   // f = x0^2 + x1^2
+
+  log("symbolic f      = " + String(f));
+
+  // Algorithmic differentiation: exact Jacobian, evaluated numerically.
+  const F = M.Function("F", [x], [f]);
+  const J = M.Function("J", [x], [M.jacobian(f, x)]);
+  const xv = M.DM([1.5, -2.0]);
+  log("f([1.5, -2])    = " + String(F(xv)));
+  log("∂f/∂x at that x = " + String(J(xv)));
+
+  // Constrained optimization with IPOPT (loaded on demand from unpkg).
+  log("\nloading ipopt…");
+  await M.load_nlpsol("ipopt");
+  const nlp = { x: x, f: f, g: M.minus(M.plus(x0, x1), M.SX(10)) };  // x0 + x1 - 10
+  const solver = M.nlpsol("solver", "ipopt", nlp);
+  const sol = solver.call({ lbg: M.DM(0) });                        // subject to g >= 0
+  log("argmin x0^2+x1^2  s.t. x0+x1 >= 10");
+  log("  x* = " + String(sol["x"]));
+  log("  f* = " + String(sol["f"]));
+}
+
+// --- Wire up the page --------------------------------------------------
+const out = document.getElementById("out");
+const btn = document.getElementById("run");
+const log = (...a) => { out.textContent += a.join(" ") + "\n"; };
+const run = (M) => { out.textContent = ""; return demo(M, log); };
+
+loadCasadi(BASE).then((M) => {
+  btn.disabled = false;
+  btn.onclick = () => run(M).catch((e) => log("FATAL: " + (e.message || e)));
+  return run(M);
+}).catch((e) => {
+  out.textContent = "Failed to load casadi: " + (e.message || e);
+  out.className = "err";
+});
+</script>
+</body>
+</html>

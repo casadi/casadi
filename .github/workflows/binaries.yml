@@ -205,6 +205,8 @@ jobs:
              build/swig/wasm-js/casadi_wasm.js build/swig/wasm-js/casadi_wasm.wasm \
              build/swig/wasm-js/libcasadi_*.so casadi-wasm/
           cp -r docs/examples/javascript casadi-wasm/examples
+          # npm package metadata (version is set by the publish-npm job).
+          cp swig/wasm-js/npm/package.json swig/wasm-js/npm/README.md casadi-wasm/
           zip -rq casadi-wasm-v${{ needs.version.outputs.casadi }}.zip casadi-wasm
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
@@ -252,6 +254,83 @@ jobs:
             node "$f" || { echo "EXAMPLE FAILED: $f"; exit 1; }
           done
           echo "all examples ran"
+
+  publish-npm:
+    needs: [version, test-javascript]
+    runs-on: ubuntu-24.04
+    # Gold-standard provenance: this job runs in the SAME workflow run that
+    # built and tested the artifact, so `npm publish --provenance` honestly
+    # attests "built + published by casadi/casadi@<sha>, run <id>" -- the
+    # bytes never leave GitHub's run-scoped artifact store.
+    #
+    # Gating:
+    #  * release-* refs only (branch pushes yield a non-semver slug); never PRs.
+    #  * `environment: npm-release` requires MANUAL APPROVAL.  Every push to
+    #    release-3.8.0 builds + tests and then PAUSES here; approve only the
+    #    run you have blessed.  This is the in-CI replacement for the old
+    #    "download assets, twine/npm publish from my laptop" step, and is why
+    #    re-pushing the branch N times does not publish N times.
+    environment: npm-release
+    if: ${{ contains(github.ref, 'release-') && github.event_name != 'pull_request' }}
+    permissions:
+      contents: read
+      id-token: write          # OIDC token, required for npm provenance
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: casadi-wasm     # same-run artifact (no run-id) -> the bytes we built here
+      - run: unzip -q casadi-wasm-v${{ needs.version.outputs.casadi }}.zip
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Upgrade npm (OIDC Trusted Publishing needs npm >= 11.5.1)
+        run: npm install -g npm@latest
+      - name: Normalize CasADi version to npm semver + choose dist-tag
+        id: npmver
+        run: |
+          node >> "$GITHUB_OUTPUT" <<'JS'
+          const raw = ${{ toJSON(needs.version.outputs.casadi) }};
+          const m = raw.match(/^(\d+\.\d+\.\d+)(?:[._-]?(alpha|beta|rc|a|b)\.?(\d+))?$/);
+          if (!m) { console.error(`refusing to publish: '${raw}' is not a release version`); process.exit(1); }
+          const longName = { a: 'alpha', b: 'beta' };
+          let version = m[1], tag = 'latest';
+          if (m[2]) {
+            const w = longName[m[2]] || m[2];           // a->alpha, b->beta, rc/alpha/beta as-is
+            version = `${m[1]}-${w}.${m[3]}`;           // 3.8.0.beta1 -> 3.8.0-beta.1
+            tag = w;                                    // prerelease dist-tag (beta/rc/alpha)
+          }
+          console.log(`version=${version}`);
+          console.log(`tag=${tag}`);
+          JS
+      - name: Verify the packed tarball loads + solves (before publish)
+        working-directory: casadi-wasm
+        run: |
+          npm pkg set version='${{ steps.npmver.outputs.version }}'
+          TGZ=$(npm pack | tail -1)
+          rm -rf verify && mkdir verify && tar -xzf "$TGZ" -C verify
+          cd verify/package
+          node -e '
+            const create  = require("./casadi.js");
+            const example = require("./examples/simple_nlp.js");
+            (async () => {
+              const M = await create();
+              if (typeof M.load_nlpsol === "function") await M.load_nlpsol("ipopt");
+              const out = [];
+              await example(M, (...a) => out.push(a.join(" ")));
+              const primal = out.find(l => l.startsWith("primal solution"));
+              const nums = primal ? (primal.split("=")[1]||"").trim().split(/\s+/).map(Number) : [];
+              if (nums.length !== 2 || !nums.every(v => Math.abs(v - 5) < 0.01)) {
+                console.error("smoke FAIL: unexpected solution\n" + out.join("\n")); process.exit(1);
+              }
+              console.log("smoke OK -> " + primal);
+            })().catch(e => { console.error("smoke FAIL:", e && e.stack || e); process.exit(1); });
+          '
+      - name: Publish @casadi/casadi-wasm with provenance
+        working-directory: casadi-wasm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}   # omit once npm Trusted Publishing (OIDC) is configured
+        run: npm publish --provenance --access public --tag '${{ steps.npmver.outputs.tag }}'
 
   test-python-source-package:
     if: ${{ contains(github.event.head_commit.message, '[ci:run_slow]') }}

@@ -1,0 +1,48 @@
+{
+  "name": "@casadi/casadi-wasm",
+  "version": "0.0.0-set-by-ci",
+  "description": "CasADi — symbolic framework for algorithmic differentiation and numerical optimization, compiled to WebAssembly. Runs in Node.js with on-demand solver plugins (ipopt, fatrop, sundials, ...).",
+  "keywords": [
+    "casadi",
+    "optimization",
+    "nlp",
+    "ipopt",
+    "automatic-differentiation",
+    "wasm",
+    "webassembly",
+    "optimal-control"
+  ],
+  "license": "LGPL-3.0-or-later",
+  "homepage": "https://web.casadi.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/casadi/casadi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/casadi/casadi/issues"
+  },
+  "main": "casadi.js",
+  "types": "casadi.d.ts",
+  "exports": {
+    ".": {
+      "types": "./casadi.d.ts",
+      "require": "./casadi.js",
+      "default": "./casadi.js"
+    }
+  },
+  "files": [
+    "casadi.js",
+    "casadi.d.ts",
+    "casadi_wasm.js",
+    "casadi_wasm.wasm",
+    "libcasadi_*.so",
+    "examples",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
