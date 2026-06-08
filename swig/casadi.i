@@ -3835,6 +3835,32 @@ export default createcasadi;
       return __orig.call(__m, name);
     };
   }
+
+  /* Destructor safety.  Each class' FinalizationRegistry frees the wasm
+     pointer (M._swig_<C>_delete) during GC.  At interpreter shutdown the
+     sweep can run after casadi's C++ static caches (Sparsity singletons,
+     ...) are torn down, so a late ~vector<DM>/~Matrix hits freed memory ->
+     wasm OOB trap; a throw out of a FinalizationRegistry callback then
+     crashes the process at exit.  A failed free in a destructor is not
+     actionable from JS, so make every _swig_*_delete non-throwing (warn,
+     don't throw, when not shutting down so genuine issues stay visible). */
+  let __shuttingDown = false;
+  if (typeof process !== "undefined" && typeof process.on === "function") {
+    process.on("beforeExit", () => { __shuttingDown = true; });
+    process.on("exit", () => { __shuttingDown = true; });
+  }
+  for (const __k of Object.keys(M)) {
+    if (typeof M[__k] !== "function" || !/^_swig_.*_delete$/.test(__k)) continue;
+    const __origDel = M[__k];
+    M[__k] = function (p) {
+      try { return __origDel.call(this, p); }
+      catch (e) {
+        if (!__shuttingDown && typeof console !== "undefined")
+          console.warn("casadi: ignored error freeing wasm object:", (e && e.message) || e);
+        return 0;
+      }
+    };
+  }
 %}
 #endif
 
