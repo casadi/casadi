@@ -2467,6 +2467,12 @@
 %exception  casadi::GenericMatrix::transform(const MatType &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix::transform(const std::vector< MatType > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::transform(const std::vector< MatType > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericMatrix::tril2symm(const MatType &a) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3982,6 +3988,12 @@
 %exception  casadi::MX::transform(const MX &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::transform(const std::vector< MX > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::transform(const std::vector< MX > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::unary(casadi_int op, const MX &x, bool unique=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4604,6 +4616,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::transform(const Matrix< Scalar > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::transform(const std::vector< Matrix< Scalar > > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::transform(const std::vector< Matrix< Scalar > > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::triangle(const Matrix< Scalar > &x) {
