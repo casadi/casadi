@@ -223,12 +223,20 @@ if(WITH_QPOASES)
     /opt/flang/wasm/lib/libFortranRuntime.a)
 endif()
 
-# Sundials integrators (cvodes, idas) and rootfinder (kinsol): pure-C,
-# self-contained in the side module archive.
+# Sundials integrators (cvodes, idas) and rootfinder (kinsol): the bundled
+# sundials sources (N_VNew_Serial, KINCreate, ...) live in libcasadi_sundials.a
+# -- NOT in the MAIN_MODULE core -- so each side module must pull it in.
+# cvodes/idas also derive from SundialsInterface (libcasadi_sundials_common.a);
+# kinsol derives from Rootfinder (in core) and needs only the raw sundials lib.
 if(WITH_SUNDIALS)
-  wasmjs_side_plugin(integrator cvodes)
-  wasmjs_side_plugin(integrator idas)
-  wasmjs_side_plugin(rootfinder kinsol)
+  wasmjs_side_plugin(integrator cvodes
+    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials_common.a
+    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials.a)
+  wasmjs_side_plugin(integrator idas
+    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials_common.a
+    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials.a)
+  wasmjs_side_plugin(rootfinder kinsol
+    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials.a)
 endif()
 
 # CSparse linsol: pure-C; needs libcasadi_csparse.a (the vendored CXSparse
