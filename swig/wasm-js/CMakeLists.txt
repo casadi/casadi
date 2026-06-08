@@ -60,6 +60,12 @@ else()
             -I${PROJECT_SOURCE_DIR}
             -I${PROJECT_SOURCE_DIR}/swig
             -o ${_swig_cpp} ${_iface}
+    # casadi.i's %insert("js") wraps load_<type>() to be async (fetch the
+    # plugin .so into MEMFS, then dlopen).  The C++ signature is void, so
+    # SWIG stubs them `: void`; retype to `: Promise<void>` to match.
+    COMMAND ${CMAKE_COMMAND} -E env sed -i -E
+            "s/(export function load_(nlpsol|conic|linsol|integrator|rootfinder|interpolant|expm|dple)\\(name: string\\)): void;/\\1: Promise<void>;/"
+            ${_swig_dts}
     DEPENDS ${_iface}
     COMMENT "swig -wasm-js -stubs -> casadi.cpp + casadi.js + casadi.d.ts + exports"
     VERBATIM
