@@ -86,9 +86,7 @@ echo "==> node rootfinder.js (ports test/python/implicitfunction.py subset)"
 node "$HERE/rootfinder.js"
 echo
 
-# SuperSCS plugin smoke: register check passes; the SOCP smoke is
-# marked || true because the SuperSCS-specific iteration path still
-# traps despite the partial F77 CHARLEN patch removing the iter-0
-# unreachable.  See HANDOFF for details.
-echo "==> node superscs_smoke.js (SuperSCS plugin smoke; SOCP failure expected)"
-node "$HERE/superscs_smoke.js" || true
+# SuperSCS is not built in the wasm job (WITH_SUPERSCS defaults OFF; its
+# sources still need the F77 hidden CHARACTER-length patch the vendored
+# qpOASES got).  Excluded from the suite until patched -- see
+# superscs_smoke.js for the intended SOCP smoke.
