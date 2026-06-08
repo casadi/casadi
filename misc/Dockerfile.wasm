@@ -30,9 +30,11 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 # emsdk: the C/C++ compile + final wasm link toolchain.
+# Pin 5.0.7: emcc 6 makes flang-built MUMPS/qpoases hit a flang-rt pointer
+# RUNTIME_CHECK abort; 5.0.7 runs the full JS solver suite (52/52).
 ENV EMSDK_DIR=/emsdk
 RUN git clone --depth=1 https://github.com/emscripten-core/emsdk.git $EMSDK_DIR && \
-    cd $EMSDK_DIR && ./emsdk install latest && ./emsdk activate latest
+    cd $EMSDK_DIR && ./emsdk install 5.0.7 && ./emsdk activate 5.0.7
 
 # Source emsdk for login shells; put the host flang driver on PATH.
 RUN echo 'source /emsdk/emsdk_env.sh > /dev/null 2>&1' >> /root/.bashrc
