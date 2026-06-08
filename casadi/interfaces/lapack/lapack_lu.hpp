@@ -36,7 +36,7 @@
 // but are tolerant of the missing length on most architectures because
 // the extra argument lands in an unused register/stack slot.  We add the
 // hidden length parameter on wasm only to keep the native side unchanged.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #define CASADI_LAPACK_CHARLEN_1 , 1
 #define CASADI_LAPACK_CHARLEN_DECL_1 , size_t len1
 #define CASADI_LAPACK_CHARLEN_DECL_2 , size_t len1, size_t len2

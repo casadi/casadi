@@ -31,7 +31,7 @@
 
 // See lapack_lu.hpp for CASADI_LAPACK_CHARLEN_* macros: on wasm we must
 // pass hidden Fortran-77 character-length args; native builds skip them.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #define CASADI_LAPACK_CHARLEN_2 , 1, 1
 #define CASADI_LAPACK_CHARLEN_4 , 1, 1, 1, 1
 #define CASADI_LAPACK_CHARLEN_DECL_2 , size_t len1, size_t len2

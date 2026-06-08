@@ -70,7 +70,7 @@
 // On WebAssembly the wasm linker enforces strict function signatures and
 // the flang-built BLAS/LAPACK uses the Fortran-77 ABI with hidden length
 // args for CHARACTER parameters.  Add the hidden lengths on EMSCRIPTEN only.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #define QPOASES_BLAS_CHARLEN_1 , unsigned long len1
 #define QPOASES_BLAS_CHARLEN_2 , unsigned long len1, unsigned long len2
 #define QPOASES_BLAS_CHARLEN_3 , unsigned long len1, unsigned long len2, unsigned long len3
