@@ -16,7 +16,11 @@
 # Build & push (see create_docker.sh):
 #   docker build -t ghcr.io/casadi/build-wasm:latest -f Dockerfile.wasm .
 #   docker push  ghcr.io/casadi/build-wasm:latest
-FROM ghcr.io/r-wasm/flang-wasm:main
+# Pin the flang toolchain: the rolling :main tag drifted to llvm 7ca73ca1,
+# whose codegen mismatches the (unchanged) libFortranRuntime.a descriptor
+# ABI -> MUMPS/qpoases abort at runtime.  v21.1.8 is llvm e3da0a87, the
+# proven flang that matches the runtime (full JS solver suite passes).
+FROM ghcr.io/r-wasm/flang-wasm:v21.1.8@sha256:2b7a437624d6bedd5691571849930a6ef48d6e77ecb98a034bbc6b97310e31f8
 
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
