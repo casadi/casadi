@@ -239,7 +239,7 @@ jobs:
       - uses: actions/setup-node@v4.4.0
         with:
           node-version: '22'
-      - run: npm install -g typescript
+      - run: npm install -g typescript@5  # TS6 errors on tsconfig's deprecated moduleResolution:node
       - name: Run JS/TS test suite (tsc typecheck + node runtime ports)
         run: bash test/javascript/run_tests.sh
       - name: Run docs/examples/javascript under node
