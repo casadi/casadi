@@ -3802,6 +3802,39 @@ export default createcasadi;
     Object.defineProperty(__WrappedFunction, __k,
       { ...__d, value: __wrapFunctionReturning(__d.value) });
   }
+
+  /* Lazy plugin loading.  Plugins ship as sibling .so files (not embedded);
+     the C++ load_<type>(name) -> dlopen path needs the .so resident first.
+     Make load_<type>() async: ensure the plugin .so is in MEMFS (read from
+     disk under Node, fetched in the browser), then call the synchronous C++
+     loader.  Mirrors casadi::load_<type>; a JS user does
+     `await casadi.load_nlpsol('ipopt')` once, after which nlpsol('s','ipopt')
+     is fully synchronous.  (Under Node a solver constructor also dlopens the
+     sibling .so directly, so the explicit await is only required in the
+     browser, where synchronous network fetch is impossible.) */
+  const __ensurePlugin = async (soname) => {
+    try { if (M.FS.analyzePath("/" + soname).exists) return; } catch (e) {}
+    let bytes;
+    if (typeof process !== "undefined" && process.versions && process.versions.node) {
+      bytes = require("fs").readFileSync(__path.join(__dirname, soname));
+    } else {
+      const resp = await fetch(soname);
+      if (!resp.ok) throw new Error("Failed to fetch plugin " + soname + ": " + resp.status);
+      bytes = new Uint8Array(await resp.arrayBuffer());
+    }
+    M.FS.writeFile("/" + soname, bytes);
+  };
+  for (const [__fn, __infix] of [["load_nlpsol", "nlpsol"], ["load_conic", "conic"],
+      ["load_linsol", "linsol"], ["load_integrator", "integrator"],
+      ["load_rootfinder", "rootfinder"], ["load_interpolant", "interpolant"],
+      ["load_expm", "expm"], ["load_dple", "dple"]]) {
+    const __orig = __m[__fn];
+    if (typeof __orig !== "function") continue;
+    __m[__fn] = async (name) => {
+      await __ensurePlugin("libcasadi_" + __infix + "_" + name + ".so");
+      return __orig.call(__m, name);
+    };
+  }
 %}
 #endif
 
