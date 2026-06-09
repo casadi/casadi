@@ -379,6 +379,8 @@ class LinearSolverTests(casadiTestCase):
           x = solver.solve(A,b,tr)
           f = ca.Function("f", [A,b],[x])
           f_out = f(A_, b_)
+          x_ = solver.solve(A_,b_,tr)
+          self.checkarray(x_, f_out)
 
           if tr:
             A_0 = A[0,0]
