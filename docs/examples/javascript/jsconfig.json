@@ -1,0 +1,15 @@
+{
+  "//": "Editor support for the JS examples. Gives autocomplete on the casadi module when example functions annotate `@param {typeof import('casadi')} ca`. Requires the symlinked casadi.d.ts (see README).",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "checkJs": false,
+    "lib": ["ES2022", "DOM"],
+    "baseUrl": ".",
+    "paths": {
+      "casadi": ["../../../build-wasm/swig/wasm-js/casadi"]
+    }
+  },
+  "include": ["*.js", "../../../build-wasm/swig/wasm-js/casadi.d.ts"]
+}

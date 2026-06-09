@@ -66,6 +66,7 @@
 
 #endif /* __USE_SINGLE_PRECISION__ */
 
+// EMSCRIPTEN trailing-CHARACTER-length hidden args: see Matrices.hpp.
 extern "C" {
     /** Compute a QR factorization of a real M-by-N matrix A in double precision */
     //void dgeqrf_( const unsigned long *M, const unsigned long *N, double *A, const unsigned long *LDA,
@@ -85,17 +86,21 @@ extern "C" {
 
     /** Solve a triangular system (double precision) */
     void dtrtrs_(   const char *UPLO, const char *TRANS, const char *DIAG, const unsigned long *N, const unsigned long *NRHS,
-                    double *A, const unsigned long *LDA, double *B, const unsigned long *LDB, long *INFO );
+                    double *A, const unsigned long *LDA, double *B, const unsigned long *LDB, long *INFO
+                    QPOASES_BLAS_CHARLEN_3);
     /** Solve a triangular system (single precision) */
     void strtrs_(   const char *UPLO, const char *TRANS, const char *DIAG, const unsigned long *N, const unsigned long *NRHS,
-                    float *A, const unsigned long *LDA, float *B, const unsigned long *LDB, long *INFO );
+                    float *A, const unsigned long *LDA, float *B, const unsigned long *LDB, long *INFO
+                    QPOASES_BLAS_CHARLEN_3);
 
     /** Estimate the reciprocal of the condition number of a triangular matrix in double precision */
     void dtrcon_(   const char *NORM, const char *UPLO, const char *DIAG, const unsigned long *N, double *A, const unsigned long *LDA,
-                    double *RCOND, double *WORK, const unsigned long *IWORK, long *INFO );
+                    double *RCOND, double *WORK, const unsigned long *IWORK, long *INFO
+                    QPOASES_BLAS_CHARLEN_3);
     /** Estimate the reciprocal of the condition number of a triangular matrix in single precision */
     void strcon_(   const char *NORM, const char *UPLO, const char *DIAG, const unsigned long *N, float *A, const unsigned long *LDA,
-                    float *RCOND, float *WORK, const unsigned long *IWORK, long *INFO );
+                    float *RCOND, float *WORK, const unsigned long *IWORK, long *INFO
+                    QPOASES_BLAS_CHARLEN_3);
 }
 
 BEGIN_NAMESPACE_QPOASES

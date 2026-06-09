@@ -1,0 +1,181 @@
+// function.ts -- Type-level coverage of the Function API surface used
+// in test/python/function.py.  Goal: surface d.ts gaps via real
+// consumer patterns; no @ts-ignore.
+
+import {
+  Function as CFn, MX, SX, DM, Sparsity,
+  vertcat, plus, times, sin,
+} from "./casadi";
+
+function expectType<T>(_v: T): void {}
+
+// ============================================================
+// Construction
+// ============================================================
+const x = MX.sym("x");
+const y = MX.sym("y");
+const f = CFn("f", [x, y], [plus(x, y), times(x, y)]);
+expectType<CFn>(f);
+
+// With named input/output
+const f2 = CFn("f2", [x, y], [plus(x, y)], ["a", "b"], ["s"]);
+expectType<CFn>(f2);
+
+// SX version
+const sx0 = SX.sym("sx");
+const sf = CFn("sf", [sx0], [sin(sx0)]);
+expectType<CFn>(sf);
+
+// JIT-compiled scalar function from source string
+const jf = CFn.jit("jf", "function jf(x: number): number { return 2*x; }", ["x"], ["y"]);
+expectType<CFn>(jf);
+
+// ============================================================
+// Introspection
+// ============================================================
+expectType<bigint>(f.n_in());
+expectType<bigint>(f.n_out());
+expectType<string[]>(f.name_in());
+expectType<string[]>(f.name_out());
+expectType<string>(f.name_in(0));
+expectType<string>(f.name_out(0));
+expectType<bigint>(f.index_in("a"));
+expectType<bigint>(f.index_out("s"));
+expectType<Sparsity>(f.sparsity_in(0));
+expectType<Sparsity>(f.sparsity_in("a"));
+expectType<Sparsity>(f.sparsity_out(0));
+expectType<[bigint, bigint]>(f.size_in(0));
+expectType<[bigint, bigint]>(f.size_in("a"));
+expectType<[bigint, bigint]>(f.size_out(0));
+expectType<bigint>(f.nnz_in());
+expectType<bigint>(f.nnz_in(0));
+expectType<bigint>(f.numel_in());
+expectType<bigint>(f.numel_in(0));
+// info() returns a primitive-valued dict (GenericType variants are
+// unwrapped at the JS marshaling boundary; see %ts_alias_out wiring).
+// Verify the returned-type allows JSON-shaped destructuring.
+const info = f.info();
+const v = info["some_key"];
+// v is the union of primitive types; verify we can narrow:
+if (typeof v === "number") expectType<number>(v);
+if (typeof v === "string") expectType<string>(v);
+if (typeof v === "boolean") expectType<boolean>(v);
+if (typeof v === "bigint") expectType<bigint>(v);
+
+// Symbolic input/output primitive enumeration
+expectType<MX>(f.mx_in(0));
+expectType<MX[]>(f.mx_in());
+expectType<SX>(sf.sx_in(0));
+expectType<SX[]>(sf.sx_in());
+
+// ============================================================
+// Calling
+// ============================================================
+// Positional list-of-MX
+const out_pos = f.call([x, y]);
+expectType<MX[]>(out_pos);
+// Dict form with MX
+const out_dict = f.call({ a: x, b: y });
+expectType<Record<string, MX>>(out_dict);
+// Numerical evaluation with DM
+const dx = DM([1.0]);
+const dy = DM([2.0]);
+const out_num = f.call([dx, dy]);
+expectType<DM[]>(out_num);
+// Numerical evaluation with dict
+const out_dict_num = f.call({ a: dx, b: dy });
+expectType<Record<string, DM>>(out_dict_num);
+
+// always_inline / never_inline flags
+expectType<MX[]>(f.call([x, y], true));
+expectType<MX[]>(f.call([x, y], false, true));
+
+// ============================================================
+// Derivative builders
+// ============================================================
+expectType<CFn>(f.jacobian());
+expectType<CFn>(f.expand());
+expectType<CFn>(f.expand("f_sx"));
+
+// ============================================================
+// mapaccum / fold / map
+// ============================================================
+expectType<CFn>(f.mapaccum(10));
+expectType<CFn>(f.mapaccum("f_acc", 10));
+expectType<CFn>(f.fold(10));
+expectType<CFn>(f.map(10));
+expectType<CFn>(f.map(10, "openmp"));
+expectType<CFn>(f.map(10, "thread", 4));
+
+// ============================================================
+// Codegen
+// ============================================================
+expectType<string>(f.generate("f_codegen"));
+expectType<string>(f.generate("f_codegen", { with_header: true }));
+
+// ============================================================
+// Stats (post-eval)
+// ============================================================
+// stats() has the same shape as info() -- primitive-valued dict.
+const s = f.stats();
+const iter_count = s["iter_count"];
+if (typeof iter_count === "bigint") expectType<bigint>(iter_count);
+
+// ============================================================
+// Factory / wrap / oracle
+// ============================================================
+const fac = f.factory("f_dx", ["a", "b"], ["jac:s:a"]);
+expectType<CFn>(fac);
+const fac2 = f.factory("f_x", ["a", "b"], ["s"], {}, { jit: false });
+expectType<CFn>(fac2);
+
+const wrapped = f.wrap();
+expectType<CFn>(wrapped);
+const wrapped_named = f.wrap("f_wrap");
+expectType<CFn>(wrapped_named);
+
+const ora = f.oracle();
+expectType<CFn>(ora);
+
+// ============================================================
+// Forward / reverse AD
+// ============================================================
+expectType<CFn>(f.forward(1));
+expectType<CFn>(f.reverse(1));
+
+// ============================================================
+// Free variables (placeholders that escape construction scope)
+// ============================================================
+expectType<boolean>(sf.has_free());
+expectType<SX[]>(sf.free_sx());
+const mxf = CFn("mxf", [x], [plus(x, y)]);  // y not in inputs -> free
+expectType<MX[]>(mxf.free_mx());
+
+// ============================================================
+// Callback (director-style) subclass
+// ============================================================
+import { Callback } from "./casadi";
+class MyCb extends Callback {
+  // Subclass MUST override these to surface its API; the d.ts
+  // declares them as overridable virtuals.
+  override get_n_in(): bigint { return 1n; }
+  override get_n_out(): bigint { return 1n; }
+  override eval(arg: any[]): DM[] {
+    const x = arg[0] as DM;
+    return [x];  // identity
+  }
+}
+const cb = new MyCb();
+expectType<Callback>(cb);
+expectType<bigint>(cb.get_n_in());
+expectType<DM[]>(cb.eval([DM(1)]));
+
+// ============================================================
+// Codegen variants
+// ============================================================
+expectType<string>(f.generate("f_codegen"));
+expectType<string>(f.generate("f_codegen", { with_header: true, with_mem: true }));
+
+// Pin locals
+void [f, f2, sf, jf, out_pos, out_dict, out_num, out_dict_num, info, v, s, iter_count,
+      fac, fac2, wrapped, wrapped_named, ora, mxf, cb];

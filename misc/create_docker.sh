@@ -1,4 +1,9 @@
 #docker build -t ghcr.io/casadi/ci-swig:latest -f Dockerfile.swig .
+
+# wasm-js build toolchain (flang->wasm + emsdk); used by binaries.yml `wasm` job
+docker build -t ghcr.io/casadi/build-wasm:latest -f Dockerfile.wasm .
+docker push ghcr.io/casadi/build-wasm:latest
+
 #docker build -t ghcr.io/casadi/coinbuild:latest -f Dockerfile.coinbuild .
 #cp ../docs/users_guide/requirements.txt doc_requirements.txt
 #docker build -t ghcr.io/casadi/ci-doc:latest -f Dockerfile.doc .

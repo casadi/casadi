@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CasADi MVP — SX.sym + jacobian + Func via SWIG → WASM/JS (no Embind)</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; max-width: 820px; margin: 2em auto; padding: 0 1em; color: #222; }
+  h1 { font-size: 1.4em; } h2 { font-size: 1.05em; margin-top: 1.6em; }
+  pre { background: #f4f4f4; padding: 0.8em; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+  .row { margin: 0.5em 0; }
+  .ok { color: #097a09; } .err { color: #a00; }
+  input { font-family: inherit; padding: 0.25em 0.5em; }
+  table { border-collapse: collapse; margin-top: 0.5em; width: 100%; }
+  td, th { padding: 0.3em 0.7em; border-bottom: 1px solid #ddd; text-align: left; font-size: 14px; }
+  code { font-family: ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+
+<h1>CasADi MVP — symbolic + numeric, in the browser, via <code>swig -wasm-js</code></h1>
+<p>No Embind. The wrapper calls <code>Module._mvp_*</code> exports directly.
+Lifecycle by <code>FinalizationRegistry</code>; no <code>.delete()</code>.</p>
+
+<div id="status">Loading WASM…</div>
+
+<div id="demo" style="display:none">
+
+<h2>Symbolic</h2>
+<div id="symbolic"></div>
+
+<h2>Numeric — evaluate at x</h2>
+<div class="row">
+  <label for="xv">x =</label>
+  <input id="xv" type="number" value="0.5" step="0.1" style="width:7em">
+</div>
+<table id="results">
+  <thead><tr><th></th><th><code>f(x)</code></th><th><code>g(x)</code><br><small>= f.expand()(x)</small></th><th>Math.* reference</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+
+<h2>Integrator plugin — <code>dx/dt = -x</code>, <code>x0=1</code>, <code>t&isin;[0,1]</code></h2>
+<p>The <code>rk</code> integrator plugin is statically linked into <code>casadi_wasm</code>
+   (registered on first call). Result should match <code>e<sup>-1</sup></code>.</p>
+<table id="intg">
+  <thead><tr><th></th><th><code>casadi rk</code></th><th><code>Math.exp(-1)</code></th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+
+<h2>User-side JS that drove this</h2>
+<pre id="user-code"></pre>
+
+</div>
+
+<script src="casadi_wasm.js"></script>
+<script>
+// Browser-friendly inline of mvp.js (which is CommonJS / Node-only).
+async function createCasadi() {
+  const M = await createWasm();
+  const jsToUtf8 = s => { const n = M.lengthBytesUTF8(s); const p = M._malloc(n+1); M.stringToUTF8(s, p, n+1); return p; };
+  const utf8ToJsAndFree = p => { const s = M.UTF8ToString(p); M._free(p); return s; };
+
+  const __fr_SX = new FinalizationRegistry(p => M._swig_casadi_Matrix_casadi_SXElem__delete(p));
+  class SX {
+    constructor(init) { this._ptr = init._raw_ptr; __fr_SX.register(this, this._ptr, this); }
+    static sym(name) {
+      const np = jsToUtf8(name);
+      const p = M._mvp_sym(np);
+      M._free(np);
+      return new SX({_raw_ptr: p});
+    }
+    toString() { return utf8ToJsAndFree(M._mvp_SX_str(this._ptr)); }
+  }
+  const sin      = x      => new SX({_raw_ptr: M._mvp_sin(x._ptr)});
+  const cos      = x      => new SX({_raw_ptr: M._mvp_cos(x._ptr)});
+  const jacobian = (y, x) => new SX({_raw_ptr: M._mvp_jacobian(y._ptr, x._ptr)});
+
+  // Func: callable factory with full method dispatch via Func.prototype.
+  // `f instanceof Func` is true; `f(x)` evaluates; `f.expand()` returns a Func.
+  const __fr_Function = new FinalizationRegistry(p => M._mvp_Function_delete(p));
+  function _wrapFunctionPtr(ptr) {
+    const f = function(x) {
+      const out = M._malloc(16);
+      M._mvp_Function_eval_1_2(ptr, x, out, out + 8);
+      const y = M.HEAPF64[out / 8], J = M.HEAPF64[(out + 8) / 8];
+      M._free(out);
+      return [y, J];
+    };
+    Object.setPrototypeOf(f, Func.prototype);
+    f._ptr = ptr;
+    __fr_Function.register(f, ptr, f);
+    return f;
+  }
+  function Func(name, ins, outs) {
+    if (new.target) throw new TypeError("Func is a factory; do not use `new`");
+    const np = jsToUtf8(name);
+    const ptr = M._mvp_Function_1_2(np, ins[0]._ptr, outs[0]._ptr, outs[1]._ptr);
+    M._free(np);
+    return _wrapFunctionPtr(ptr);
+  }
+  Func.prototype.name_  = function() { return utf8ToJsAndFree(M._mvp_Function_name(this._ptr)); };
+  Func.prototype.n_in   = function() { return Number(M._mvp_Function_n_in(this._ptr));  };
+  Func.prototype.n_out  = function() { return Number(M._mvp_Function_n_out(this._ptr)); };
+  Func.prototype.expand = function() { return _wrapFunctionPtr(M._mvp_Function_expand(this._ptr)); };
+
+  const integratorRkDemo = () => M._mvp_integrator_rk_demo();
+
+  return { SX, sin, cos, jacobian, Func, integratorRkDemo };
+}
+
+(async () => {
+  let C;
+  try { C = await createCasadi(); }
+  catch (e) {
+    document.getElementById('status').textContent = 'Failed: ' + e;
+    document.getElementById('status').className = 'err';
+    return;
+  }
+  document.getElementById('status').textContent = 'WASM ready.';
+  document.getElementById('status').className = 'ok';
+  document.getElementById('demo').style.display = '';
+
+  // -- the user code -------------------------------------------------------
+  const x = C.SX.sym('x');
+  const y = C.sin(x);
+  const J = C.jacobian(y, x);
+  const f = C.Func('f', [x], [y, J]);     // factory — no `new`
+  const g = f.expand();                   // method on Func.prototype
+
+  document.getElementById('symbolic').innerHTML = `
+    <pre>x = ${x}
+y = sin(x)   →  ${y}
+J = ∂y/∂x    →  ${J}
+f             →  ${f.name_()}(${f.n_in()} in → ${f.n_out()} out)
+typeof f          = ${typeof f}
+f instanceof Func = ${f instanceof C.Func}
+g = f.expand()    → ${g.name_()}(${g.n_in()} in → ${g.n_out()} out)
+g instanceof Func = ${g instanceof C.Func}</pre>`;
+
+  const tbody = document.querySelector('#results tbody');
+  function row(label, fval, gval, refval) {
+    const tr = document.createElement('tr');
+    const okF = Math.abs(fval - refval) < 1e-12;
+    const okG = Math.abs(gval - refval) < 1e-12;
+    const both = okF && okG;
+    tr.innerHTML =
+      `<td><code>${label}</code></td>` +
+      `<td>${fval.toFixed(12)}</td>` +
+      `<td>${gval.toFixed(12)}</td>` +
+      `<td>${refval.toFixed(12)}</td>` +
+      `<td class="${both ? 'ok' : 'err'}">${both ? '✓' : '✗'}</td>`;
+    tbody.appendChild(tr);
+  }
+  function evaluate() {
+    tbody.innerHTML = '';
+    const xv = parseFloat(document.getElementById('xv').value);
+    const [yvF, JvF] = f(xv);     // callable
+    const [yvG, JvG] = g(xv);     // expand'd version, same result
+    row('y = sin(x)', yvF, yvG, Math.sin(xv));
+    row('J = cos(x)', JvF, JvG, Math.cos(xv));
+  }
+  document.getElementById('xv').addEventListener('change', evaluate);
+  document.getElementById('xv').addEventListener('input',  evaluate);
+  evaluate();
+
+  // -- integrator plugin demo --------------------------------------------
+  const xf  = C.integratorRkDemo();
+  const ref = Math.exp(-1);
+  const ok  = Math.abs(xf - ref) < 1e-6;
+  document.querySelector('#intg tbody').innerHTML =
+    `<tr><td><code>x(t=1)</code></td>` +
+    `<td>${xf.toFixed(12)}</td>` +
+    `<td>${ref.toFixed(12)}</td>` +
+    `<td class="${ok ? 'ok' : 'err'}">${ok ? '✓' : '✗'}</td></tr>`;
+
+  document.getElementById('user-code').textContent = `
+const { SX, sin, jacobian, Func } = await createCasadi();
+const x = SX.sym('x');
+const y = sin(x);                        // SX("sin(x)")
+const J = jacobian(y, x);                // SX("cos(x)")
+const f = Func('f', [x], [y, J]);        // factory, no \`new\`
+const g = f.expand();                    // method via Func.prototype
+
+// Both are callable AND Func instances:
+const [yv,  Jv ] = f(0.5);               // -> [0.47942553..., 0.87758256...]
+const [yvG, JvG] = g(0.5);               // -> same values; expand is semantics-preserving
+console.log(f instanceof Func, g instanceof Func);  // true true
+console.log(f.n_in(), f.n_out());                   // 1 2
+// No .delete() — FinalizationRegistry releases when JS GC reclaims.
+`.trim();
+})();
+</script>
+</body>
+</html>

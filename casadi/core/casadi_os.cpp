@@ -24,6 +24,9 @@
 #include "exception.hpp"
 #include "global_options.hpp"
 #include <bitset>
+#ifdef __EMSCRIPTEN__
+#include <set>
+#endif
 
 #ifndef _WIN32
 #ifdef WITH_DEEPBIND
@@ -232,6 +235,15 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
     // Existing legacy loop. On Windows, preserves SetDllDirectory's slot-2
     // hint for transitive deps and the standard search incl. PATH.
     if (!handle) {
+#ifdef __EMSCRIPTEN__
+    // Emscripten resolves "lib" and "./lib" to the SAME MEMFS module, and a
+    // first dlopen that can't complete synchronously (module not resident --
+    // e.g. a not-yet-fetched lazy plugin) leaves a poisoned "loading" entry;
+    // a second dlopen of the same module then aborts with "...a second time".
+    // So attempt each canonical name at most once.  (Native loaders keep the
+    // full per-search-path loop below.)
+    std::set<std::string> em_tried;
+#endif // __EMSCRIPTEN__
     for (casadi_int i=0;i<search_paths.size();++i) {
       searchpath = search_paths[i];
 #ifdef _WIN32
@@ -240,6 +252,10 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
       SetDllDirectory(NULL);
 #else // _WIN32
       std::string libname = searchpath.empty() ? lib : searchpath + filesep() + lib;
+#ifdef __EMSCRIPTEN__
+      if (libname.rfind("./", 0) == 0) libname.erase(0, 2);  // canonicalize
+      if (!em_tried.insert(libname).second) continue;        // already tried
+#endif // __EMSCRIPTEN__
       handle = dlopen(libname.c_str(), flag);
 #endif // _WIN32
       if (handle) {

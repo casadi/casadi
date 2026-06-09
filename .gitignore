@@ -84,3 +84,4 @@ dockcross*
 *.tar.gz
 web
 test/python/numpy_experiments/
+misc/wasm/libFortranRuntime.patched.a

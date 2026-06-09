@@ -297,7 +297,8 @@ returnValue DenseMatrix::times( int_t xN, real_t alpha, const real_t *x, int_t x
     unsigned long _yLD    = (unsigned long)getMax(1,yLD);
 
     /* Call BLAS. Mind row major format! */
-    GEMM("TRANS", "NOTRANS", &_nRows, &_xN, &_nCols, &alpha, val, &_leaDim, x, &_xLD, &beta, y, &_yLD);
+    GEMM("TRANS", "NOTRANS", &_nRows, &_xN, &_nCols, &alpha, val, &_leaDim, x, &_xLD, &beta, y, &_yLD
+         QPOASES_BLAS_CALL_LEN_2);
     return SUCCESSFUL_RETURN;
 }
 
@@ -311,7 +312,8 @@ returnValue DenseMatrix::transTimes( int_t xN, real_t alpha, const real_t *x, in
     unsigned long _yLD    = (unsigned long)getMax(1,yLD);
 
     /* Call BLAS. Mind row major format! */
-    GEMM("NOTRANS", "NOTRANS", &_nCols, &_xN, &_nRows, &alpha, val, &_leaDim, x, &_xLD, &beta, y, &_yLD);
+    GEMM("NOTRANS", "NOTRANS", &_nCols, &_xN, &_nRows, &alpha, val, &_leaDim, x, &_xLD, &beta, y, &_yLD
+         QPOASES_BLAS_CALL_LEN_2);
     return SUCCESSFUL_RETURN;
 }
 

@@ -19,6 +19,8 @@ env:
   build_flags_mac_intel: "-DWITH_MADNLP=OFF -DWITH_BUILD_MADNLP=OFF -DWITH_CCOPT=OFF -DWITH_BUILD_CCOPT=OFF"
   build_flags_mac_m1: ""
   build_flags_aarch64: "-DWITH_BONMIN=OFF DWITH_BUILD_BONMIN=OFF -DWITH_CLP=OFF -DWITH_BUILD_CLP=OFF -DWITH_CBC=OFF -DWITH_BUILD_CBC=OFF -DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_SLEQP=OFF -DWITH_BUILD_SLEQP=OFF -DWITH_MADNLP=OFF -DWITH_BUILD_MADNLP=OFF"
+  build_flags_wasm: "-DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DWITH_EXAMPLES=OFF -DWITH_THREAD=OFF -DWITH_OPENMP=OFF -DWITH_PYTHON=OFF -DWITH_MATLAB=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_LAPACK=ON -DWITH_BUILD_LAPACK=ON -DBUILD_LAPACK_GIT_REPO=https://github.com/Reference-LAPACK/lapack.git -DBUILD_LAPACK_VERSION=v3.12.0 -DWITH_BUILD_METIS=ON -DWITH_IPOPT=ON -DWITH_BUILD_IPOPT=ON -DWITH_MUMPS=ON -DWITH_BUILD_MUMPS=ON -DWITH_SUNDIALS=ON -DWITH_BUILD_SUNDIALS=ON -DWITH_HIGHS=ON -DWITH_BUILD_HIGHS=ON -DWITH_OSQP=ON -DWITH_BUILD_OSQP=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BUILD_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_BLASFEO=ON -DWITH_FATROP=ON -DWITH_BUILD_FATROP=ON -DWITH_DAQP=ON -DWITH_BUILD_DAQP=ON -DWITH_CSPARSE=ON -DWITH_BUILD_CSPARSE=ON -DWITH_BUILD_EIGEN3=ON -DWITH_BUILD_SIMDE=ON -DWITH_CLARABEL=OFF -DWITH_BUILD_CLARABEL=OFF"
+  cmake_flags_wasm: "-DCMAKE_Fortran_COMPILER=/opt/flang/host/bin/flang -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY"
 
   CMAKE_BUILD_TYPE: Release
   PYTHONUNBUFFERED: "1"
@@ -72,6 +74,11 @@ jobs:
         docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make matlab_source && cd .. && rm -rf build"
     
+    - name: generate wasm-js
+      run: >
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        "mkdir build && cd build && cmake -DWITH_WASM_JS=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make wasm_source && cd .. && rm -rf build"
+
     - name: set CMAKE default options
       run: |
          sed -i 's/option(SWIG_IMPORT "Import SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
@@ -116,6 +123,195 @@ jobs:
       with:
         name: casadi_source_wrapper
         path: casadi_source.zip
+
+  core-wasm:
+    runs-on: ubuntu-24.04
+    needs: [version]
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0 # for git-restore-mtime
+          submodules: recursive
+      - uses: jgillis/git-restore-mtime-action@master
+        with:
+          args: "--commit-time"
+      - name: Cache build dir
+        uses: actions/cache@v5.0.5
+        with:
+          key: core-wasm-${{ github.ref }}-${{env.cache-suffix}}
+          path: build
+      - name: Build core (libcasadi + plugin archives + externals; no wrapper)
+        run: |
+          docker run --rm -v`pwd`:/local -w /local ghcr.io/casadi/build-wasm:latest /bin/bash -lc "
+            source /emsdk/emsdk_env.sh &&
+            rm -f build/CMakeCache.txt &&
+            emcmake cmake -Bbuild -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DWITH_SELFCONTAINED=ON ${{ env.build_flags_wasm }} ${{ env.cmake_flags_wasm }} -H. &&
+            export FC=/usr/local/bin/flang-emcc F77=/usr/local/bin/flang-emcc &&
+            emmake cmake --build build -j\$(nproc)
+          "
+      - run: tar --format=posix -czf core-wasm.tar.gz build
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: core-wasm
+          path: core-wasm.tar.gz
+
+  javascript:
+    needs: [core-wasm, swig, version]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source (incl. pre-generated wasm-js wrapper)
+        run: unzip casadi_source.zip
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: core-wasm
+      - run: tar -xzf core-wasm.tar.gz
+      - name: Build wasm-js wrapper (SWIG_IMPORT) against the prebuilt core
+        run: |
+          docker run --rm -v`pwd`:/local -w /local ghcr.io/casadi/build-wasm:latest /bin/bash -lc "
+            source /emsdk/emsdk_env.sh &&
+            emcmake cmake -Bbuild -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DWITH_SELFCONTAINED=ON -DWITH_WASM_JS=ON -DSWIG_IMPORT=ON ${{ env.build_flags_wasm }} ${{ env.cmake_flags_wasm }} -H. &&
+            export FC=/usr/local/bin/flang-emcc F77=/usr/local/bin/flang-emcc &&
+            emmake cmake --build build --target casadi_wasm -j\$(nproc)
+          "
+      - name: Assemble dist zip
+        run: |
+          mkdir -p casadi-wasm
+          # casadi.js/.d.ts are the pregenerated wrapper (from the swig job);
+          # casadi_wasm.js/.wasm are the emscripten core; libcasadi_*.so are the
+          # lazily-loaded plugin side modules (NOT embedded -- fetched on demand).
+          cp swig/wasm-js/target/source/casadi.js swig/wasm-js/target/source/casadi.d.ts \
+             build/swig/wasm-js/casadi_wasm.js build/swig/wasm-js/casadi_wasm.wasm \
+             build/swig/wasm-js/libcasadi_*.so casadi-wasm/
+          cp -r docs/examples/javascript casadi-wasm/examples
+          # Third-party license texts: same hoover rule as the selfcontained
+          # wheels (the WITH_SELFCONTAINED glob in CMakeLists.txt) -- every
+          # LICENSE* under the external-project sources that went into the
+          # wasm core, plus casadi's own.
+          mkdir -p casadi-wasm/licenses/casadi
+          cp LICENSE.txt casadi-wasm/licenses/casadi/LICENSE
+          for DIR in build/external_projects/src external_packages; do
+            (cd "$DIR" && find . -type f -name 'LICENSE*' -print0) |
+            while IFS= read -r -d '' F; do
+              REL="${F#./}"
+              mkdir -p "casadi-wasm/licenses/$(dirname "$REL")"
+              cp "$DIR/$REL" "casadi-wasm/licenses/$REL"
+            done
+          done
+          # npm package metadata (version is set by the publish-npm job).
+          cp swig/wasm-js/npm/package.json swig/wasm-js/npm/README.md casadi-wasm/
+          zip -rq casadi-wasm-v${{ needs.version.outputs.casadi }}.zip casadi-wasm
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.11.5
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-wasm-v${{ needs.version.outputs.casadi }}.zip
+          asset_name: casadi-wasm-v${{ needs.version.outputs.casadi }}.zip
+          prerelease: true
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: casadi-wasm
+          path: casadi-wasm-v${{ needs.version.outputs.casadi }}.zip
+
+  test-javascript:
+    needs: [javascript, version]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6.0.2  # test/javascript sources + run_tests.sh
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: casadi-wasm
+      - name: Stage the built module where the JS tests expect it
+        run: |
+          unzip -q casadi-wasm-v${{ needs.version.outputs.casadi }}.zip
+          mkdir -p build-wasm/swig/wasm-js
+          cp casadi-wasm/casadi.js casadi-wasm/casadi.d.ts \
+             casadi-wasm/casadi_wasm.js casadi-wasm/casadi_wasm.wasm \
+             casadi-wasm/libcasadi_*.so build-wasm/swig/wasm-js/
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: '22'
+      - run: npm install -g typescript@5  # TS6 errors on tsconfig's deprecated moduleResolution:node
+      - name: Run JS/TS test suite (tsc typecheck + node runtime ports)
+        run: bash test/javascript/run_tests.sh
+      - name: Run docs/examples/javascript under node
+        run: |
+          cd docs/examples/javascript
+          # casadi.js/casadi_wasm.js are gitignored local symlinks; _*.js are helpers.
+          for f in $(ls *.js | grep -vE '^(_|casadi\.js$|casadi_wasm\.js$)'); do
+            echo "== node $f =="
+            node "$f" || { echo "EXAMPLE FAILED: $f"; exit 1; }
+          done
+          echo "all examples ran"
+
+  publish-npm:
+    needs: [version, javascript]
+    runs-on: ubuntu-24.04
+    environment: npm-release
+    if: ${{ contains(github.ref, 'release-') && github.event_name != 'pull_request' }}
+    permissions:
+      contents: read
+      id-token: write          # OIDC token, required for npm provenance
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: casadi-wasm     # same-run artifact (no run-id) -> the bytes we built here
+      - run: unzip -q casadi-wasm-v${{ needs.version.outputs.casadi }}.zip
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Upgrade npm (OIDC Trusted Publishing needs npm >= 11.5.1)
+        run: npm install -g npm@latest
+      - name: Normalize CasADi version to npm semver + choose dist-tag
+        id: npmver
+        run: |
+          node >> "$GITHUB_OUTPUT" <<'JS'
+          const raw = ${{ toJSON(needs.version.outputs.casadi) }};
+          const m = raw.match(/^(\d+\.\d+\.\d+)(?:[._-]?(alpha|beta|rc|a|b)\.?(\d+))?$/);
+          if (!m) { console.error(`refusing to publish: '${raw}' is not a release version`); process.exit(1); }
+          const longName = { a: 'alpha', b: 'beta' };
+          let version = m[1], tag = 'latest';
+          if (m[2]) {
+            const w = longName[m[2]] || m[2];           // a->alpha, b->beta, rc/alpha/beta as-is
+            version = `${m[1]}-${w}.${m[3]}`;           // 3.8.0.beta1 -> 3.8.0-beta.1
+            tag = w;                                    // prerelease dist-tag (beta/rc/alpha)
+          }
+          console.log(`version=${version}`);
+          console.log(`tag=${tag}`);
+          JS
+      - name: Verify the packed tarball loads + solves (before publish)
+        working-directory: casadi-wasm
+        run: |
+          npm pkg set version='${{ steps.npmver.outputs.version }}'
+          TGZ=$(npm pack | tail -1)
+          rm -rf verify && mkdir verify && tar -xzf "$TGZ" -C verify
+          cd verify/package
+          node -e '
+            const create  = require("./casadi.js");
+            const example = require("./examples/simple_nlp.js");
+            (async () => {
+              const M = await create();
+              if (typeof M.load_nlpsol === "function") await M.load_nlpsol("ipopt");
+              const out = [];
+              await example(M, (...a) => out.push(a.join(" ")));
+              const primal = out.find(l => l.startsWith("primal solution"));
+              const nums = primal ? (primal.split("=")[1]||"").trim().split(/\s+/).map(Number) : [];
+              if (nums.length !== 2 || !nums.every(v => Math.abs(v - 5) < 0.01)) {
+                console.error("smoke FAIL: unexpected solution\n" + out.join("\n")); process.exit(1);
+              }
+              console.log("smoke OK -> " + primal);
+            })().catch(e => { console.error("smoke FAIL:", e && e.stack || e); process.exit(1); });
+          '
+      - name: Publish @casadi/casadi-wasm with provenance
+        working-directory: casadi-wasm
+        run: npm publish --provenance --access public --tag '${{ steps.npmver.outputs.tag }}'
 
   test-python-source-package:
     if: ${{ contains(github.event.head_commit.message, '[ci:run_slow]') }}

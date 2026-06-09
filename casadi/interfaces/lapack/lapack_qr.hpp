@@ -29,6 +29,20 @@
 #include "casadi/core/linsol_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
 
+// See lapack_lu.hpp for CASADI_LAPACK_CHARLEN_* macros: on wasm we must
+// pass hidden Fortran-77 character-length args; native builds skip them.
+#ifdef __EMSCRIPTEN__
+#define CASADI_LAPACK_CHARLEN_2 , 1, 1
+#define CASADI_LAPACK_CHARLEN_4 , 1, 1, 1, 1
+#define CASADI_LAPACK_CHARLEN_DECL_2 , size_t len1, size_t len2
+#define CASADI_LAPACK_CHARLEN_DECL_4 , size_t len1, size_t len2, size_t len3, size_t len4
+#else
+#define CASADI_LAPACK_CHARLEN_2
+#define CASADI_LAPACK_CHARLEN_4
+#define CASADI_LAPACK_CHARLEN_DECL_2
+#define CASADI_LAPACK_CHARLEN_DECL_4
+#endif
+
 extern "C" {
   /// QR-factorize dense matrix (lapack)
   void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau,
@@ -37,11 +51,13 @@ extern "C" {
   /// Multiply right hand side with Q-transpose (lapack)
   void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a,
                int *lda, double *tau, double *c, int *ldc,
-               double *work, int *lwork, int *info);
+               double *work, int *lwork, int *info
+               CASADI_LAPACK_CHARLEN_DECL_2);
 
   /// Solve upper triangular system (lapack)
   void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
-                         double *alpha, double *a, int *lda, double *b, int *ldb);
+                         double *alpha, double *a, int *lda, double *b, int *ldb
+                         CASADI_LAPACK_CHARLEN_DECL_4);
 }
 
 /** \defgroup plugin_Linsol_lapackqr Title

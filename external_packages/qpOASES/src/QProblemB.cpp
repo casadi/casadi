@@ -1409,7 +1409,7 @@ returnValue QProblemB::computeCholesky( )
                 long info = 0;
                 unsigned long _nFR = (unsigned long)nFR, _nV = (unsigned long)nV;
 
-                POTRF( "U", &_nFR, R, &_nV, &info );
+                POTRF( "U", &_nFR, R, &_nV, &info QPOASES_BLAS_CALL_LEN_1);
 
                 /* <0 = invalid call, =0 ok, >0 not spd */
                 if (info > 0) {

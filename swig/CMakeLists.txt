@@ -60,6 +60,10 @@ if(WITH_JSON)
    add_subdirectory(json)
 endif()
 
+if(WITH_WASM_JS)
+   add_subdirectory(wasm-js)
+endif()
+
 install(FILES casadi.i DESTINATION ${INCLUDE_PREFIX}/casadi)
 install(FILES doc.i DESTINATION ${INCLUDE_PREFIX}/casadi)
 install(FILES doc_merged.i DESTINATION ${INCLUDE_PREFIX}/casadi)
