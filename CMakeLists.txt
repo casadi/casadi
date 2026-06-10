@@ -822,8 +822,9 @@ set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
 
 # UNO: A swiss-army knife like NLP solver, with filterSQP and IPOPT presets
 option(WITH_UNO "Compile the interface to UNO" OFF)
-set(BUILD_UNO_GIT_REPO "https://github.com/cvanaret/Uno.git" CACHE STRING "Git repo used together with BUILD_UNO_VERSION")
-set(BUILD_UNO_VERSION "v2.7.2" CACHE STRING "Tag/branch/hash to be used for BUILD_UNO_GIT_REPO")
+set(BUILD_UNO_GIT_REPO "https://github.com/jgillis/Uno.git" CACHE STRING "Git repo used together with BUILD_UNO_VERSION")
+# Fork of cvanaret/Uno v2.7.2 + SPRAL_INCLUDE_DIR + IPOPT-style HSL runtime loading + optional OpenMP
+set(BUILD_UNO_VERSION "f311df65f2acd1745175d3b49db4a5bdca15ce16" CACHE STRING "Tag/branch/hash to be used for BUILD_UNO_GIT_REPO")
 option(WITH_BUILD_UNO "Build UNO (BUILD_UNO_VERSION=${BUILD_UNO_VERSION}) from downloaded source (BUILD_UNO_GIT_REPO=${BUILD_UNO_GIT_REPO})." OFF)
 set(BUILD_UNO_DEPENDENCIES MA57 BQPD MUMPS)
 
@@ -933,12 +934,12 @@ set(BUILD_CLP_DEPENDENCIES MUMPS LAPACK)
 
 # MUMPS: Sparse direct linear solver
 option(WITH_MUMPS "Enable MUMPS interface" OFF)
-set(BUILD_MUMPS_TP_VERSION "releases/3.0.11" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
+set(BUILD_MUMPS_TP_VERSION "gate-unconditional-use-omp-lib" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
 set(BUILD_METIS_TP_VERSION "bugfix2" CACHE STRING "Tag/branch/hash to be used for BUILD_BETIS_TP_GIT_REPO")
 set(BUILD_METIS_TP_GIT_REPO "https://github.com/jgillis/ThirdParty-Metis.git" CACHE STRING "Git repo used together with BUILD_METIS_TP_VERSION")
 set(BUILD_METIS_TP_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for METIS_TP")
 option(WITH_BUILD_METIS "Build Metis from downloaded source." OFF)
-set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Mumps.git" CACHE STRING "Git repo used together with BUILD_MUMPS_TP_VERSION")
+set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/jgillis/ThirdParty-Mumps.git" CACHE STRING "Git repo used together with BUILD_MUMPS_TP_VERSION")
 set(BUILD_MUMPS_TP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for MUMPS_TP")
 
 option(WITH_BUILD_MUMPS "Build MUMPS (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) from downloaded source (BUILD_MUMPS_TP_GIT_REPO=${BUILD_MUMPS_TP_GIT_REPO})." OFF)
@@ -1847,7 +1848,14 @@ if(WITH_UNO)
         set(_BQPD_JLL_TRIPLE "i686-w64-mingw32")
       endif()
     elseif(APPLE)
-      if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm|aarch64")
+      # Prefer the target arch (CMAKE_OSX_ARCHITECTURES) over the host so a
+      # cross-build (x86_64 on an arm64 runner) fetches the matching tarball.
+      if(CMAKE_OSX_ARCHITECTURES)
+        set(_BQPD_JLL_ARCH "${CMAKE_OSX_ARCHITECTURES}")
+      else()
+        set(_BQPD_JLL_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
+      endif()
+      if(_BQPD_JLL_ARCH MATCHES "arm|aarch64")
         set(_BQPD_JLL_TRIPLE "aarch64-apple-darwin")
       else()
         set(_BQPD_JLL_TRIPLE "x86_64-apple-darwin")
@@ -1855,6 +1863,8 @@ if(WITH_UNO)
     else()
       if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
         set(_BQPD_JLL_TRIPLE "aarch64-linux-gnu")
+      elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(_BQPD_JLL_TRIPLE "i686-linux-gnu")
       else()
         set(_BQPD_JLL_TRIPLE "x86_64-linux-gnu")
       endif()
@@ -1870,11 +1880,22 @@ if(WITH_UNO)
         SOURCE_DIR "${_BQPD_JLL_PREFIX}"
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
-        INSTALL_COMMAND ""
+        # the JLL tarball stamps files at 1970; reset the license mtime (install
+        # preserves it) so the packaged wheel/zip ZIP accepts it
+        INSTALL_COMMAND ${CMAKE_COMMAND} -E touch "${_BQPD_JLL_PREFIX}/share/licenses/BQPD/LICENSE"
         BUILD_BYPRODUCTS "${_BQPD_JLL_PREFIX}/lib/libbqpd.a")
 
-    set(_UNO_PREFIX_PATHS "${_BQPD_JLL_PREFIX}")
-    set(_UNO_DEPENDS ${LAPACK_DEPENDS_TARGET} bqpd-jll-external)
+    # bundle the (BSD-3) BQPD license; its SOURCE_DIR is outside the src sweep below
+    if(WITH_SELFCONTAINED)
+      install(FILES "${_BQPD_JLL_PREFIX}/share/licenses/BQPD/LICENSE"
+              DESTINATION "${INCLUDE_PREFIX}/licenses/BQPD")
+    endif()
+
+    # external_projects holds the CasADi-built OpenBLAS; keep it on the prefix
+    # path so Uno's find_package(LAPACK) resolves BLAS (CMAKE_BLAS_CONFIG sets
+    # the same path but our -DCMAKE_PREFIX_PATH below would otherwise clobber it).
+    set(_UNO_PREFIX_PATHS "${CMAKE_BINARY_DIR}/external_projects" "${_BQPD_JLL_PREFIX}")
+    set(_UNO_DEPENDS ${LAPACK_DEPENDS_TARGET} ${SPRAL_DEPENDS_TARGET} bqpd-jll-external)
     if(TARGET hsl::hsl)
       list(APPEND _UNO_DEPENDS hsl::hsl)
       get_target_property(_HSL_IMPLIB_FULL hsl::hsl IMPORTED_IMPLIB)
@@ -1882,9 +1903,15 @@ if(WITH_UNO)
       list(APPEND _UNO_PREFIX_PATHS "${_HSL_LIBDIR}/..")
     endif()
     set(_UNO_EXTRA_ARGS)
-    get_target_property(_UNO_MUMPS_LIB mumps        IMPORTED_LOCATION)
+    # Windows links the import lib (.dll.a); elsewhere the shared object directly
+    if(WIN32)
+      get_target_property(_UNO_MUMPS_LIB mumps        IMPORTED_IMPLIB)
+      get_target_property(_UNO_METIS_LIB metis::metis IMPORTED_IMPLIB)
+    else()
+      get_target_property(_UNO_MUMPS_LIB mumps        IMPORTED_LOCATION)
+      get_target_property(_UNO_METIS_LIB metis::metis IMPORTED_LOCATION)
+    endif()
     get_target_property(_UNO_MUMPS_INC mumps        INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(_UNO_METIS_LIB metis::metis IMPORTED_LOCATION)
     get_target_property(_UNO_METIS_INC metis::metis INTERFACE_INCLUDE_DIRECTORIES)
     list(APPEND _UNO_DEPENDS mumps metis::metis)
     list(APPEND _UNO_EXTRA_ARGS
@@ -1896,6 +1923,21 @@ if(WITH_UNO)
       -DMETIS_LIBRARY=${_UNO_METIS_LIB}
       -DMETIS_INCLUDE_DIR=${_UNO_METIS_INC}
       -DMETIS_INCLUDE_DIRS=${_UNO_METIS_INC})
+    # SPRAL's libspral is on the prefix path; point Uno at its header tree too.
+    if(SPRAL_DEPENDS_TARGET)
+      list(APPEND _UNO_EXTRA_ARGS -DSPRAL_INCLUDE_DIR=${CMAKE_BINARY_DIR}/external_projects/include)
+    endif()
+    # IPOPT-style: don't link HSL into Uno; dlopen libhsl at runtime if present.
+    list(APPEND _UNO_EXTRA_ARGS -DHSL_RUNTIME_LOADING=ON)
+    # Forward the macOS target arch so uno cross-builds (e.g. x86_64 on an arm64
+    # runner) match the dependency libs instead of defaulting to the host arch.
+    if(CMAKE_OSX_ARCHITECTURES)
+      list(APPEND _UNO_EXTRA_ARGS
+        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+        -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
+        -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
+    endif()
+    string(REPLACE ";" "|" _UNO_PREFIX_PATHS_ARG "${_UNO_PREFIX_PATHS}")
     ExternalProject_Add(uno-external
         DEPENDS ${_UNO_DEPENDS}
         GIT_REPOSITORY ${BUILD_UNO_GIT_REPO}
@@ -1903,7 +1945,8 @@ if(WITH_UNO)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_PREFIX_PATH=${_UNO_PREFIX_PATHS} ${_UNO_EXTRA_ARGS} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        LIST_SEPARATOR |
+        CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_PREFIX_PATH=${_UNO_PREFIX_PATHS_ARG} ${_UNO_EXTRA_ARGS} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     message("test ${CMAKE_CURRENT_BINARY_DIR}/external_projects")
     file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external_projects")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/uno")
@@ -1911,11 +1954,12 @@ if(WITH_UNO)
     add_library(uno SHARED IMPORTED)
     add_dependencies(uno uno-external)
     set_target_properties(uno PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}uno${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}uno${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}uno${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/uno"
     )
     target_compile_features(uno INTERFACE cxx_std_17)
+    create_import_library(uno uno)
   else()
     # try to find system csparse
     find_package(uno REQUIRED)

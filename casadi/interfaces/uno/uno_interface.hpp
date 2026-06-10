@@ -21,7 +21,7 @@ namespace casadi {
     \par
     David Kiessling
     Uno interface
-    \identifier{22c} */
+*/
 
 /** \pluginsection{Nlpsol,uno} */
 

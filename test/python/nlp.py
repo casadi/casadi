@@ -22,6 +22,7 @@
 #
 #
 import casadi as ca
+import sys
 from numpy import inf, pi
 import casadi as c
 import numpy
@@ -631,12 +632,13 @@ class NLPtests(casadiTestCase):
         solver()
  
   @requires_nlpsol("ipopt")
-  def test_ipopt_solver(self):
+  def test_ipopt_linear_solvers(self):
 
     solvers = ["mumps"]
     if 'spral' in ca.CasadiMeta.feature_list():
         solvers.append("spral")
-    if ca.has_linsol("ma27"):
+    # mac's mockup-HSL ma27 is non-functional for ipopt (works on Linux)
+    if ca.has_linsol("ma27") and sys.platform != "darwin":
         solvers.append("ma27")
 
     x=ca.SX.sym("x")
@@ -668,8 +670,46 @@ class NLPtests(casadiTestCase):
 
     ca.DM.set_precision(8)
     
+  @requires_nlpsol("uno")
+  def test_uno_linear_solvers(self):
+
+    solvers = ["MUMPS"]
+    if 'spral' in ca.CasadiMeta.feature_list():
+        solvers.append("SSIDS")
+    if ca.has_linsol("ma27") and sys.platform != "darwin":
+        solvers.append("MA27")
+
+    x=ca.SX.sym("x")
+    y=ca.SX.sym("y")
+
+    obj = (1-x)**2+100*(y-x**2)**2
+    nlp={'x':ca.vertcat(*[x,y]), 'f':obj, 'g':x**2+y**2}
+
+    c_r = 4.56748075136258e-02;
+    x_r = [7.86415156987791e-01,6.17698316967954e-01]
+
+    ca.DM.set_precision(16)
+    for solver in solvers:
+      print("test_uno_linear_solvers",solver)
+      mysolver = ca.nlpsol("mysolver", "uno", nlp, {"print_time":False,
+        "uno": {"preset": "ipopt", "linear_solver": solver, "primal_tolerance":1e-8, "dual_tolerance":1e-8}})
+      solver_in = {}
+      solver_in["x0"]=[0.5,0.5]
+      solver_in["lbx"]=[-10]*2
+      solver_in["ubx"]=[10]*2
+      solver_in["lbg"]=[0]
+      solver_in["ubg"]=[1]
+      solver_out = mysolver(**solver_in)
+      digits = 6
+      self.assertAlmostEqual(solver_out["f"][0],c_r,digits,str(solver))
+      self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(solver))
+      self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(solver))
+      print(mysolver.stats())
+
+    ca.DM.set_precision(8)
+
   @requires_nlpsol("ipopt")
-  def test_ipopt_solver(self):
+  def test_ipopt_stats_per_call(self):
     x = ca.MX.sym("x")
 
     nlp = {"x":x,"f":x**2}

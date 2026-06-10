@@ -111,6 +111,9 @@ def create_wheel_archive(wheel_name, bdist_dir):
             for file in files:
                 file_path = os.path.join(root, file)
                 arcname = os.path.relpath(file_path, bdist_dir).replace(os.path.sep, '/')
+                # ZIP can't store pre-1980 timestamps (e.g. BinaryBuilder JLL artifacts)
+                if os.path.getmtime(file_path) < 315532800:
+                    os.utime(file_path, (315532800, 315532800))
                 wheel_zip.write(file_path, arcname)
     return wheel_path
 
