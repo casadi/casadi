@@ -97,12 +97,10 @@ namespace casadi {
     std::vector<uno_int> jacobian_column_indices_;
     std::vector<uno_int> hessian_row_indices_;
     std::vector<uno_int> hessian_column_indices_;
-    // -inf / +inf placeholder bounds passed to uno_create_model at init_mem
-    // time -- kept as members so the pointer stays valid across the call
-    // (uno_create_model copies them, so they could in principle be transient,
-    // but holding onto them is cheap and matches the codegen path which
-    // emits them as static const arrays).
-    std::vector<double> placeholder_lb_x_, placeholder_ub_x_;
+    // -inf / +inf placeholder constraint bounds passed to uno_set_constraints at
+    // init_mem time -- kept as members so the pointer stays valid across the call
+    // (real bounds are applied per-solve). Variable bounds aren't part of the
+    // (unconstrained) model, so no x placeholders are needed.
     std::vector<double> placeholder_lb_g_, placeholder_ub_g_;
     // Solver-specific options forwarded to uno (the {"uno": {...}} dict).
     Dict opts_;

@@ -86,6 +86,17 @@ namespace casadi {
     hesslag_sp_ = hess_l_fcn.sparsity_out(0);
     casadi_assert(hesslag_sp_.is_triu(), "Hessian must be upper triangular");
 
+    // Hessian-vector product (matrix-free, used by e.g. the LBFGS preset):
+    // the forward derivative of grad(gamma) wrt x, seeded along fwd:x.
+    Dict final_options;
+    final_options["is_diff_in"]  = std::vector<bool>{true, false, false, false};
+    final_options["is_diff_out"] = std::vector<bool>{true};
+    Dict func_opts;
+    func_opts["final_options"] = final_options;
+    create_function("nlp_grad_l", {"x", "p", "lam:f", "lam:g"},
+                    {"grad:gamma:x"}, {{"gamma", {"f", "g"}}}, func_opts);
+    create_forward("nlp_grad_l", 1);  // registers "fwd1_nlp_grad_l"
+
     {
       auto jr = jacg_sp_.get_row(),    jc = jacg_sp_.get_col();
       auto hr = hesslag_sp_.get_row(), hc = hesslag_sp_.get_col();
@@ -95,8 +106,6 @@ namespace casadi {
       hessian_column_indices_.assign(hc.begin(), hc.end());
     }
 
-    placeholder_lb_x_.assign(nx_, -std::numeric_limits<double>::infinity());
-    placeholder_ub_x_.assign(nx_,  std::numeric_limits<double>::infinity());
     placeholder_lb_g_.assign(ng_, -std::numeric_limits<double>::infinity());
     placeholder_ub_g_.assign(ng_,  std::numeric_limits<double>::infinity());
 
@@ -118,11 +127,13 @@ namespace casadi {
     p_uno_.constr_cb    = &casadi_uno_constr_wrapper<double>;
     p_uno_.jac_cb       = &casadi_uno_jac_wrapper<double>;
     p_uno_.hess_cb      = &casadi_uno_hess_wrapper<double>;
-    p_uno_.nlp_f      = OracleCallback("nlp_f", this);
-    p_uno_.nlp_g      = OracleCallback("nlp_g", this);
-    p_uno_.nlp_grad_f = OracleCallback("nlp_grad_f", this);
-    p_uno_.nlp_jac_g  = OracleCallback("nlp_jac_g", this);
-    p_uno_.nlp_hess_l = OracleCallback("nlp_hess_l", this);
+    p_uno_.hess_prod_cb = &casadi_uno_hess_prod_wrapper<double>;
+    p_uno_.nlp_f         = OracleCallback("nlp_f", this);
+    p_uno_.nlp_g         = OracleCallback("nlp_g", this);
+    p_uno_.nlp_grad_f    = OracleCallback("nlp_grad_f", this);
+    p_uno_.nlp_jac_g     = OracleCallback("nlp_jac_g", this);
+    p_uno_.nlp_hess_l    = OracleCallback("nlp_hess_l", this);
+    p_uno_.fwd1_nlp_grad_l = OracleCallback("fwd1_nlp_grad_l", this);
   }
 
   static void set_uno_option(void* solver, const std::string& name, const GenericType& value) {
@@ -141,12 +152,16 @@ namespace casadi {
 
   static void insert_casadi_options(void* solver, Dict opts) {
     Dict casadi_options = Options::sanitize(opts);
+    // Apply the preset first: it overwrites some options (e.g. it would reset
+    // the Hessian model to exact, clobbering an explicit hessian_model=LBFGS).
     for (auto&& op : casadi_options) {
       if (op.first == "preset") {
         uno_set_solver_preset(solver, op.second.to_string().c_str());
-      } else {
-        set_uno_option(solver, op.first, op.second);
+        break;
       }
+    }
+    for (auto&& op : casadi_options) {
+      if (op.first != "preset") set_uno_option(solver, op.first, op.second);
     }
   }
 
@@ -162,7 +177,8 @@ namespace casadi {
     auto* d_nlp = &m->d_nlp;
     casadi_copy(primals, self.nx_, d_nlp->z);
     for (casadi_int i = 0; i < self.nx_; ++i) {
-      d_nlp->lam[i] = lower_mult[i] - upper_mult[i];
+      // Negative sign convention: bound multipliers are added (cf casadi_uno_solve).
+      d_nlp->lam[i] = lower_mult[i] + upper_mult[i];
     }
     if (self.ng_ > 0) {
       casadi_copy(constraint_mult, self.ng_, d_nlp->lam + self.nx_);
@@ -198,7 +214,6 @@ namespace casadi {
     m->d_uno.prob = &p_uno_;
     casadi_uno_init_mem<double>(&m->d_uno);
     casadi_uno_init_model<double>(&m->d_uno,
-        placeholder_lb_x_.data(), placeholder_ub_x_.data(),
         placeholder_lb_g_.data(), placeholder_ub_g_.data());
     // Override the runtime's no-op termination cb with one that fires
     // Nlpsol::fcallback_ each iteration (opti.callback support). Pass UnoMemory*
@@ -281,8 +296,6 @@ namespace casadi {
     jacobian_column_indices_.assign(jc.begin(), jc.end());
     hessian_row_indices_.assign(hr.begin(), hr.end());
     hessian_column_indices_.assign(hc.begin(), hc.end());
-    placeholder_lb_x_.assign(nx_, -std::numeric_limits<double>::infinity());
-    placeholder_ub_x_.assign(nx_,  std::numeric_limits<double>::infinity());
     placeholder_lb_g_.assign(ng_, -std::numeric_limits<double>::infinity());
     placeholder_ub_g_.assign(ng_,  std::numeric_limits<double>::infinity());
     set_uno_prob();
@@ -308,15 +321,20 @@ namespace casadi {
     Nlpsol::codegen_setup_constants(g, "d->nlp", "p.nlp", "d->d_oracle");
     g << "casadi_uno_init_mem(d);\n";
     g << "casadi_uno_init_model(d, "
-      << g.constant(placeholder_lb_x_) << ", "
-      << g.constant(placeholder_ub_x_) << ", "
       << g.constant(placeholder_lb_g_) << ", "
       << g.constant(placeholder_ub_g_) << ");\n";
-    // Apply user options (statically known at codegen time).
+    // Apply user options (statically known at codegen time). The preset must go
+    // first: it overwrites some options (e.g. it would reset the Hessian model,
+    // clobbering an explicit hessian_model=LBFGS). Mirrors insert_casadi_options.
+    for (auto&& kv : opts_) {
+      if (kv.first == "preset") {
+        g << "uno_set_solver_preset(d->solver, \"" << kv.second.to_string() << "\");\n";
+      }
+    }
     for (auto&& kv : opts_) {
       const std::string& key = kv.first;
       if (key == "preset") {
-        g << "uno_set_solver_preset(d->solver, \"" << kv.second.to_string() << "\");\n";
+        continue;
       } else if (kv.second.is_bool()) {
         g << "uno_set_solver_bool_option(d->solver, \"" << key << "\", "
           << (kv.second.to_bool() ? "1" : "0") << ");\n";
@@ -350,6 +368,7 @@ namespace casadi {
     g.add_dependency(get_function("nlp_grad_f"));
     g.add_dependency(get_function("nlp_jac_g"));
     g.add_dependency(get_function("nlp_hess_l"));
+    g.add_dependency(get_function("fwd1_nlp_grad_l"));
     g.add_include("Uno_C_API.h");
     g.auxiliaries << g.sanitize_source(uno_runtime_str, {"casadi_real"});
   }
@@ -384,11 +403,13 @@ namespace casadi {
     g.setup_callback("p.nlp_grad_f", get_function("nlp_grad_f"));
     g.setup_callback("p.nlp_jac_g",  get_function("nlp_jac_g"));
     g.setup_callback("p.nlp_hess_l", get_function("nlp_hess_l"));
+    g.setup_callback("p.fwd1_nlp_grad_l", get_function("fwd1_nlp_grad_l"));
     g << "p.obj_cb       = &casadi_uno_obj_wrapper;\n";
     g << "p.obj_grad_cb  = &casadi_uno_obj_grad_wrapper;\n";
     g << "p.constr_cb    = &casadi_uno_constr_wrapper;\n";
     g << "p.jac_cb       = &casadi_uno_jac_wrapper;\n";
     g << "p.hess_cb      = &casadi_uno_hess_wrapper;\n";
+    g << "p.hess_prod_cb = &casadi_uno_hess_prod_wrapper;\n";
   }
 
   void UnoInterface::codegen_body(CodeGenerator& g) const {
@@ -402,7 +423,14 @@ namespace casadi {
     g << "casadi_oracle_init(&d->d_oracle, &arg, &res, &iw, &w);\n";
     g << "casadi_uno_solve(d);\n";
     Nlpsol::codegen_post_solve(g, "d->nlp");
-    g << "return 0;\n";
+    // Signal failure to the caller so error_on_fail works in generated code too
+    // (the vm path does this via the return status); otherwise infeasible/limit
+    // outcomes look like success.
+    if (error_on_fail_) {
+      g << "return d->unified_return_status;\n";
+    } else {
+      g << "return 0;\n";
+    }
   }
 
 }  // namespace casadi

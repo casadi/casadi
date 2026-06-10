@@ -41,11 +41,13 @@ struct casadi_uno_prob {
   OracleCallback nlp_grad_f;
   OracleCallback nlp_jac_g;
   OracleCallback nlp_hess_l;
-  uno_objective_callback              obj_cb;
-  uno_objective_gradient_callback     obj_grad_cb;
-  uno_constraints_callback            constr_cb;
-  uno_constraints_jacobian_callback   jac_cb;
-  uno_lagrangian_hessian_callback     hess_cb;
+  OracleCallback fwd1_nlp_grad_l;
+  uno_objective_callback                    obj_cb;
+  uno_objective_gradient_callback           obj_grad_cb;
+  uno_constraints_callback                  constr_cb;
+  uno_constraints_jacobian_callback         jac_cb;
+  uno_lagrangian_hessian_callback           hess_cb;
+  uno_lagrangian_hessian_operator_callback  hess_prod_cb;
 };
 // C-REPLACE "casadi_uno_prob<T1>" "struct casadi_uno_prob"
 
@@ -133,6 +135,27 @@ uno_int casadi_uno_hess_wrapper(uno_int n, uno_int ng, uno_int nnz,
 }
 // C-REPLACE "casadi_uno_hess_wrapper<T1>" "casadi_uno_hess_wrapper"
 
+// SYMBOL "uno_hess_prod_wrapper"
+template<typename T1>
+uno_int casadi_uno_hess_prod_wrapper(uno_int n, uno_int ng, const T1* x,
+    bool evaluate_at_x, T1 obj_mult, const T1* mults, const T1* vec,
+    T1* result, void* user_data) {
+  casadi_uno_data<T1>* d = static_cast< casadi_uno_data<T1>* >(user_data);
+  casadi_oracle_data<T1>* d_oracle = d->nlp.oracle;
+  d_oracle->arg[0] = x;          // x
+  d_oracle->arg[1] = d->nlp.p;   // p
+  d_oracle->arg[2] = &obj_mult;  // lam:f
+  d_oracle->arg[3] = mults;      // lam:g
+  d_oracle->arg[4] = 0;          // out:grad:gamma:x
+  d_oracle->arg[5] = vec;        // fwd:x
+  d_oracle->arg[6] = 0;          // fwd:p
+  d_oracle->arg[7] = 0;          // fwd:lam:f
+  d_oracle->arg[8] = 0;          // fwd:lam:g
+  d_oracle->res[0] = result;     // fwd:grad:gamma:x
+  return calc_function(&d->prob->fwd1_nlp_grad_l, d_oracle) == 0 ? 0 : 1;
+}
+// C-REPLACE "casadi_uno_hess_prod_wrapper<T1>" "casadi_uno_hess_prod_wrapper"
+
 // SYMBOL "uno_term_cb"
 template<typename T1>
 uno_int casadi_uno_term_cb(uno_int n, uno_int ng, const T1* primals,
@@ -156,12 +179,12 @@ int casadi_uno_init_mem(casadi_uno_data<T1>* d) {
 // SYMBOL "uno_init_model"
 template<typename T1>
 void casadi_uno_init_model(casadi_uno_data<T1>* d,
-    const T1* lb_x, const T1* ub_x, const T1* lb_g, const T1* ub_g) {
+    const T1* lb_g, const T1* ub_g) {
   const casadi_uno_prob<T1>* p = d->prob;
   uno_int nx = static_cast<uno_int>(p->nlp.nx);
   uno_int ng = static_cast<uno_int>(p->nlp.ng);
-  d->model = uno_create_model(UNO_PROBLEM_NONLINEAR, nx,
-      lb_x, ub_x, UNO_ZERO_BASED_INDEXING);
+  // Variable bounds are set per-solve via uno_set_variables_*_bounds.
+  d->model = uno_create_unconstrained_model(UNO_PROBLEM_NONLINEAR, nx, UNO_ZERO_BASED_INDEXING);
   uno_set_user_data(d->model, d);
   uno_set_objective(d->model, UNO_MINIMIZE, p->obj_cb, p->obj_grad_cb);
   if (ng > 0) {
@@ -171,6 +194,7 @@ void casadi_uno_init_model(casadi_uno_data<T1>* d,
   uno_set_lagrangian_hessian(d->model, p->n_hess, UNO_UPPER_TRIANGLE,
       p->hess_row, p->hess_col, p->hess_cb);
   uno_set_lagrangian_sign_convention(d->model, UNO_MULTIPLIER_POSITIVE);
+  uno_set_lagrangian_hessian_operator(d->model, p->hess_prod_cb);
 }
 
 // SYMBOL "uno_free_mem"
@@ -203,16 +227,15 @@ void casadi_uno_solve(casadi_uno_data<T1>* d) {
 
   if (!d->model) {
     // Codegen path: model wasn't built in init_mem (no p_nlp scope there);
-    // build it now using the real bounds from this first call.
-    casadi_uno_init_model(d, d_nlp->lbz, d_nlp->ubz,
-        d_nlp->lbz + nx, d_nlp->ubz + nx);
-  } else {
-    uno_set_variables_lower_bounds(d->model, d_nlp->lbz);
-    uno_set_variables_upper_bounds(d->model, d_nlp->ubz);
-    if (ng > 0) {
-      uno_set_constraints_lower_bounds(d->model, d_nlp->lbz + nx);
-      uno_set_constraints_upper_bounds(d->model, d_nlp->ubz + nx);
-    }
+    // build it now using the real constraint bounds from this first call.
+    casadi_uno_init_model(d, d_nlp->lbz + nx, d_nlp->ubz + nx);
+  }
+  // Variable bounds aren't part of the (unconstrained) model -- set every solve.
+  uno_set_variables_lower_bounds(d->model, d_nlp->lbz);
+  uno_set_variables_upper_bounds(d->model, d_nlp->ubz);
+  if (ng > 0) {
+    uno_set_constraints_lower_bounds(d->model, d_nlp->lbz + nx);
+    uno_set_constraints_upper_bounds(d->model, d_nlp->ubz + nx);
   }
   uno_set_initial_primal_iterate(d->model, d_nlp->x0);
 
@@ -221,8 +244,9 @@ void casadi_uno_solve(casadi_uno_data<T1>* d) {
   uno_get_primal_solution(d->solver, d_nlp->z);
   uno_get_constraint_dual_solution(d->solver, d_nlp->lam + nx);
   for (i = 0; i < nx; ++i) {
+    // Negative sign convention: bound multipliers are added, not subtracted.
     d_nlp->lam[i] = uno_get_lower_bound_dual_solution_component(d->solver, i)
-                  - uno_get_upper_bound_dual_solution_component(d->solver, i);
+                  + uno_get_upper_bound_dual_solution_component(d->solver, i);
   }
   d_nlp->objective         = uno_get_solution_objective(d->solver);
   d->primal_infeasibility  = uno_get_solution_primal_feasibility(d->solver);
