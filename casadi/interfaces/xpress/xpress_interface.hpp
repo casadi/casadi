@@ -25,6 +25,8 @@
 #ifndef CASADI_XPRESS_INTERFACE_HPP
 #define CASADI_XPRESS_INTERFACE_HPP
 
+#include <string>
+#include <vector>
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/xpress/casadi_conic_xpress_export.h>
 
@@ -54,6 +56,10 @@ namespace casadi {
   struct CASADI_CONIC_XPRESS_EXPORT XpressMemory : public ConicMemory {
     // Problem data structure
     casadi_xpress_data<double> d;
+    // IIS cache: populated right after an infeasible solve when compute_iis=true
+    std::vector<casadi_int> iis_rows, iis_cols;
+    std::string iis_row_types, iis_col_bound_types;
+    bool iis_valid = false;
   };
 
   /** \brief \pluginbrief{Conic,xpress}
@@ -140,6 +146,15 @@ namespace casadi {
 
     /// All Xpress options
     Dict opts_;
+
+    // Use x0 as a MIP start hint [default false]
+    bool mip_start_;
+
+    // If non-empty, call XPRSsetlogfile to write solver output to this path
+    std::string log_file_;
+
+    // Compute IIS after infeasible solves and cache in memory [default true]
+    bool compute_iis_;
 
     void serialize_body(SerializingStream &s) const override;
 
