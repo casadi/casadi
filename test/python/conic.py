@@ -1478,5 +1478,84 @@ class ConicTests(casadiTestCase):
     self.assertTrue(solver_qp.is_a("SXFunction"))
     
         
+@requires_conic("xpress")
+class XpressSpecificTests(casadiTestCase):
+  """Xpress-specific tests for features not covered by the generic loop."""
+
+  def test_mip_warmstart(self):
+    """mip_start=True: warm-start hint accepted, 'User solution' in log."""
+    import tempfile, os
+
+    x = MX.sym("x", 3)
+    # Binary MILP: minimise -sum(x) s.t. x[0]+x[1]+x[2] <= 2
+    # Optimal: any two of the three = 1, cost = -2
+    logfile = tempfile.mktemp(suffix=".log")
+    try:
+      solver = qpsol("s", "xpress",
+                     {"x": x, "f": -sum1(x), "g": x[0] + x[1] + x[2]},
+                     {"discrete": [1, 1, 1],
+                      "mip_start": True,
+                      "log_file": logfile,
+                      "xpress": {"OUTPUTLOG": 1}})
+
+      sol = solver(x0=DM([1, 1, 0]), lbx=DM([0, 0, 0]), ubx=DM([1, 1, 1]),
+                   lbg=-inf, ubg=2)
+
+      self.assertTrue(solver.stats()["success"], "MIP with mip_start should succeed")
+      self.assertAlmostEqual(float(sol["f"]), -2.0, places=6,
+                             msg="MILP optimal cost should be -2")
+
+      with open(logfile) as f:
+        log = f.read()
+      self.assertIn("User solution", log,
+                    "Xpress log must contain 'User solution' when mip_start=True")
+    finally:
+      del solver  # release Xpress log file handle before unlinking
+      if os.path.exists(logfile):
+        os.unlink(logfile)
+
+
+  def test_iis_infeasible_lp(self):
+    """IIS rows/cols are returned in get_stats() for an infeasible LP."""
+    x = MX.sym("x")
+    # Infeasible via constraints: x >= 5 AND -x >= 5 (i.e. x <= -5)
+    # Bounds keep x free so CasADi's pre-check passes.
+    solver = qpsol("s", "xpress",
+                   {"x": x, "f": x, "g": vertcat(x, -x)},
+                   {"error_on_fail": False,
+                    "xpress": {"OUTPUTLOG": 0}})
+    sol = solver(x0=0, lbx=-1e10, ubx=1e10, lbg=DM([5, 5]), ubg=DM([1e10, 1e10]))
+
+    stats = solver.stats()
+    self.assertFalse(stats["success"], "Solver should report failure for infeasible LP")
+    self.assertIn("iis_rows", stats,
+                  "get_stats() must contain 'iis_rows' for infeasible LP")
+    self.assertIn("iis_cols", stats,
+                  "get_stats() must contain 'iis_cols' for infeasible LP")
+    self.assertGreater(len(stats["iis_rows"]), 0,
+                       "IIS must identify at least one infeasible row")
+    # When no solution is available, x and duals must be NaN (not garbage).
+    self.assertTrue(numpy.all(numpy.isnan(numpy.array(sol["x"]).flatten())),
+                    "x must be NaN when no primal solution is available")
+
+  def test_iis_infeasible_milp(self):
+    """IIS is returned in get_stats() for an infeasible MIP."""
+    x = MX.sym("x")
+    # Binary variable (0/1) with constraint x >= 2 -> infeasible
+    solver = qpsol("s", "xpress",
+                   {"x": x, "f": x, "g": x},
+                   {"discrete": [1],
+                    "error_on_fail": False,
+                    "xpress": {"OUTPUTLOG": 0}})
+    solver(x0=0, lbx=DM([0]), ubx=DM([1]), lbg=2, ubg=1e10)
+
+    stats = solver.stats()
+    self.assertFalse(stats["success"])
+    self.assertIn("iis_rows", stats)
+    self.assertIn("iis_cols", stats)
+    self.assertGreater(len(stats["iis_rows"]) + len(stats["iis_cols"]), 0,
+                       "IIS must contain at least one row or column")
+
+
 if __name__ == '__main__':
     unittest.main()
