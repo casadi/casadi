@@ -649,8 +649,7 @@ class NLPtests(casadiTestCase):
 
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
-
-    ca.DM.set_precision(16)
+    
     for solver in solvers:
       print("test_ipopt_solver",solver)
       solver = ca.nlpsol("mysolver", "ipopt", nlp, {"ipopt.linear_solver": solver})
@@ -667,8 +666,6 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(solver))
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(solver))
       print(solver.stats())
-
-    ca.DM.set_precision(8)
     
   @requires_nlpsol("uno")
   def test_uno_linear_solvers(self):
@@ -688,7 +685,6 @@ class NLPtests(casadiTestCase):
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
 
-    ca.DM.set_precision(16)
     for solver in solvers:
       print("test_uno_linear_solvers",solver)
       mysolver = ca.nlpsol("mysolver", "uno", nlp, {"print_time":False,
@@ -705,8 +701,6 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(solver))
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(solver))
       print(mysolver.stats())
-
-    ca.DM.set_precision(8)
 
   @requires_nlpsol("ipopt")
   def test_ipopt_stats_per_call(self):
