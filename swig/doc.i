@@ -12759,12 +12759,68 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L96-L100
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+Construct an SX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v0
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L81
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L96-L100
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+Construct an SX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v0
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L81
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L96-L100
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &name, 
 const std::vector< SX > &ex_in, const std::vector< SX > &ex_out, const 
 std::vector< std::string > &name_in, const std::vector< std::string > 
 &name_out, const Dict &opts=Dict()) "
 
 [INTERNAL] 
+Construct an SX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v0
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L85
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L102-L108
+
+";
+
+%feature("docstring") casadi::casadi_Function "
+
+Construct an SX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v0
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L85
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L102-L108
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
 Construct an SX function.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v0
@@ -12795,11 +12851,67 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L183-L187
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+Construct an SX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v0
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L91
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L183-L187
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+Construct an SX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v0
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L91
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L183-L187
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &name, 
 const std::vector< MX > &ex_in, const std::vector< MX > &ex_out, const Dict 
 &opts=Dict()) "
 
 [INTERNAL] 
+Construct an  MX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v1
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L101
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L110-L114
+
+";
+
+%feature("docstring") casadi::casadi_Function "
+
+Construct an  MX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v1
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L101
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L110-L114
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
 Construct an  MX function.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v1
@@ -12830,12 +12942,68 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L116-L122
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+Construct an  MX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v1
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L105
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L116-L122
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+Construct an  MX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v1
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L105
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L116-L122
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &name, 
 const std::map< std::string, MX > &dict, const std::vector< std::string > 
 &name_in, const std::vector< std::string > &name_out, const Dict 
 &opts=Dict()) "
 
 [INTERNAL] 
+Construct an  MX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v1
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L111
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L189-L193
+
+";
+
+%feature("docstring") casadi::casadi_Function "
+
+Construct an  MX function.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v1
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L111
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L189-L193
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
 Construct an  MX function.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v1
@@ -12864,6 +13032,34 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L124-L127
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L122
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L124-L127
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L122
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L124-L127
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &name, 
 const SXVector &ex_in, SXIList ex_out, const Dict &opts=Dict()) "
 
@@ -12880,10 +13076,66 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L129-L132
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L124
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L129-L132
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L124
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L129-L132
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &name, 
 SXIList ex_in, SXIList ex_out, const Dict &opts=Dict()) "
 
 [INTERNAL] 
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L126
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L134-L136
+
+";
+
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L126
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L134-L136
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
 To resolve ambiguity on some compilers.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
@@ -12913,11 +13165,67 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L138-L142
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L128
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L138-L142
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L128
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L138-L142
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &name, 
 const SXVector &ex_in, SXIList ex_out, const StringVector &name_in, const 
 StringVector &name_out, const Dict &opts=Dict()) "
 
 [INTERNAL] 
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L131
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L144-L147
+
+";
+
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L131
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L144-L147
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
 To resolve ambiguity on some compilers.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
@@ -12947,10 +13255,66 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L149-L152
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L134
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L149-L152
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L134
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L149-L152
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &name, 
 MXIList ex_in, const MXVector &ex_out, const Dict &opts=Dict()) "
 
 [INTERNAL] 
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L137
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L154-L157
+
+";
+
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L137
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L154-L157
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
 To resolve ambiguity on some compilers.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
@@ -12979,10 +13343,66 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L159-L162
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L139
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L159-L162
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L139
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L159-L162
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &name, 
 MXIList ex_in, MXIList ex_out, const Dict &opts=Dict()) "
 
 [INTERNAL] 
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L141
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L164-L166
+
+";
+
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L141
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L164-L166
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
 To resolve ambiguity on some compilers.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
@@ -13012,11 +13432,67 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L168-L171
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L143
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L168-L171
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L143
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L168-L171
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &name, 
 const MXVector &ex_in, MXIList ex_out, const StringVector &name_in, const 
 StringVector &name_out, const Dict &opts=Dict()) "
 
 [INTERNAL] 
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L146
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L173-L176
+
+";
+
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L146
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L173-L176
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
 To resolve ambiguity on some compilers.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
@@ -13046,6 +13522,34 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L178-L181
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L149
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L178-L181
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+To resolve ambiguity on some compilers.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1v2
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L149
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L178-L181
+
+";
+
 %feature("docstring") casadi::Function::Function() "
 
 [INTERNAL] 
@@ -13061,9 +13565,65 @@ https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L58-L59
 
 ";
 
+%feature("docstring") casadi::casadi_Function "
+
+Default constructor, null pointer.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1uy
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L70
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L58-L59
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
+Default constructor, null pointer.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1uy
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L70
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L58-L59
+
+";
+
 %feature("docstring") casadi::Function::Function(const std::string &fname) "
 
 [INTERNAL] 
+Construct from a file.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1uz
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L75
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L92-L94
+
+";
+
+%feature("docstring") casadi::casadi_Function "
+
+Construct from a file.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_1uz
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L75
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/function.cpp#L92-L94
+
+";
+
+%feature("docstring") casadi::Function::casadi_Function "
+
 Construct from a file.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1uz
