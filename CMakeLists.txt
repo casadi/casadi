@@ -371,6 +371,7 @@ option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
 option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_WASM_JS "Compile the WebAssembly+JavaScript front-end (Emscripten only; needs the casadi-patched SWIG)" OFF)
+option(WITH_JULIA "Compile the Julia front-end (needs the casadi-patched SWIG, or SWIG_IMPORT)" OFF)
 option(WITH_OCTAVE_IMPORT "[DEPRECATED] Copy import.m file to install directory" OFF)
 option(WITH_PYTHON_GIL_RELEASE "Create Python bindings that release the GIL" OFF)
 
@@ -2673,7 +2674,7 @@ endif()
 ###################### swig #########################
 #####################################################
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
-if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON OR WITH_WASM_JS)
+if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON OR WITH_WASM_JS OR WITH_JULIA)
   add_subdirectory(swig)
 endif()
 
