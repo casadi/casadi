@@ -762,3 +762,15 @@ obj:*libworhp*
      fun:jl_init_processor_sysimg
      ...
   }
+
+# Xpress internal off-by-one heap read/write during IIS computation
+# (observed in libxprs.so.46.01.02). Both the OOB access and the
+# overflowed allocation are entirely inside libxprs; XPRSiisfirst takes
+# no caller-provided buffers, so this cannot be a CasADi-side bug.
+{
+   xpress XPRSiisfirst internal heap overrun
+   Memcheck:Addr8
+   obj:*libxprs.so*
+   ...
+   fun:XPRSiisfirst
+}
