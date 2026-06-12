@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -27,8 +27,22 @@
       #include <string>
 
       const std::string casadi::UnoInterface::meta_doc=
-      "Interface to the Uno NLP solver (https://github.com/cvanaret/Uno).\n"
-      "Pass solver-specific options under the 'uno' option, e.g.\n"
-      "  nlpsol('s', 'uno', nlp, {'uno': {'preset': 'filtersqp'}})\n"
-      "Common presets: filtersqp, ipopt, funnelsqp, filterslp.\n"
+      "\n"
+"\n"
+"David Kiessling Uno interface\n"
+"\n"
+"Extra doc: https://github.com/casadi/casadi/wiki/L_2j2 \n"
+"\n"
+"\n"
+">List of available options\n"
+"\n"
+"+-----+---------+-----------------------------+\n"
+"| Id  |  Type   |         Description         |\n"
+"+=====+=========+=============================+\n"
+"| uno | OT_DICT | Options to be passed to UNO |\n"
+"+-----+---------+-----------------------------+\n"
+"\n"
+"\n"
+"\n"
+"\n"
 ;

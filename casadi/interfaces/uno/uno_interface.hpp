@@ -37,7 +37,8 @@ namespace casadi {
     \par
     David Kiessling
     Uno interface
-*/
+
+    \identifier{2j2} */
 
 /** \pluginsection{Nlpsol,uno} */
 
