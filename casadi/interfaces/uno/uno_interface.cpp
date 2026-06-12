@@ -1,6 +1,25 @@
 /*
  *    This file is part of CasADi.
- *    Released under the LGPL; see LICENSE in the top-level directory.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  */
 
 #include "uno_interface.hpp"
@@ -240,18 +259,16 @@ namespace casadi {
     m->d_uno.nlp.oracle = m->d_nlp.oracle;
   }
 
-  namespace {
-    inline const char* return_status_string(int sol) {
-      switch (sol) {
-      case UNO_FEASIBLE_KKT_POINT:          return "Converged with feasible KKT point";
-      case UNO_FEASIBLE_FJ_POINT:           return "Converged with feasible FJ point";
-      case UNO_INFEASIBLE_STATIONARY_POINT: return "Converged with infeasible stationary point";
-      case UNO_FEASIBLE_SMALL_STEP:         return "Terminated with feasible small step";
-      case UNO_INFEASIBLE_SMALL_STEP:       return "Terminated with infeasible small step";
-      case UNO_UNBOUNDED:                   return "Terminated with unbounded problem";
-      case UNO_NOT_OPTIMAL:                 return "Terminated with not optimal point";
-      default:                              return "Terminated with an unknown status";
-      }
+  inline const char* return_status_string(int sol) {
+    switch (sol) {
+    case UNO_FEASIBLE_KKT_POINT:          return "Converged with feasible KKT point";
+    case UNO_FEASIBLE_FJ_POINT:           return "Converged with feasible FJ point";
+    case UNO_INFEASIBLE_STATIONARY_POINT: return "Converged with infeasible stationary point";
+    case UNO_FEASIBLE_SMALL_STEP:         return "Terminated with feasible small step";
+    case UNO_INFEASIBLE_SMALL_STEP:       return "Terminated with infeasible small step";
+    case UNO_UNBOUNDED:                   return "Terminated with unbounded problem";
+    case UNO_NOT_OPTIMAL:                 return "Terminated with not optimal point";
+    default:                              return "Terminated with an unknown status";
     }
   }
 
