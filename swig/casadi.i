@@ -76,6 +76,8 @@
 #define GUESTOBJECT mxArray
 #elif defined(SWIGWASMJS)
 #define GUESTOBJECT casadi_emval_struct
+#elif defined(SWIGJULIA)
+#define GUESTOBJECT jl_value_t
 #else
 #define GUESTOBJECT void
 #endif
@@ -633,6 +635,16 @@ namespace std {
       return true;
     }
 #endif
+#ifdef SWIGJULIA
+    // Catch-all to_ptr: accepts a Julia proxy carrying a ptr field.
+    template<typename M> bool to_ptr(GUESTOBJECT *p, M** m) {
+      if (is_null(p)) return false;
+      void* raw = 0;
+      if (!SWIG_IsOK(SWIG_ConvertPtr(p, &raw, 0, 0))) return false;
+      if (m) *m = static_cast<M*>(raw);
+      return true;
+    }
+#endif
 
     // Check if conversion is possible
     template<typename M> bool can_convert(GUESTOBJECT *p) { return to_ptr(p, static_cast<M**>(0));}
@@ -873,6 +885,10 @@ namespace std {
 #ifdef SWIGMATLAB
       if (p == 0) return true;
 #endif
+#ifdef SWIGJULIA
+      if (!p) return true;
+      return jl_is_nothing(p);
+#endif
 #ifdef SWIGWASMJS
       // EM_VAL == 0 is the uninitialized handle.  Otherwise inspect the
       // val with borrow semantics (take + release ownership) so the
@@ -957,6 +973,9 @@ namespace std {
       // GenericType variant-dispatch when the variant is OT_BOOL.
       emscripten::val v(static_cast<bool>(*a));
       return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
+#elif defined(SWIGJULIA)
+      // Box as a Julia Bool; used by director-in paths.
+      return jl_box_bool(*a);
 #else
       return 0;
 #endif
@@ -1017,6 +1036,9 @@ namespace std {
           ? emscripten::val(static_cast<long long>(*a))   // -> BigInt
           : emscripten::val(static_cast<double>(*a));     // -> Number
       return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
+#elif defined(SWIGJULIA)
+      // Box as a Julia Int64; used by director-in paths (e.g. get_sparsity_in).
+      return jl_box_int64(static_cast<int64_t>(*a));
 #else
       return 0;
 #endif
@@ -1066,6 +1088,9 @@ namespace std {
 #elif defined(SWIGWASMJS)
       emscripten::val v(*a);
       return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
+#elif defined(SWIGJULIA)
+      // Box as a Julia Float64; used by director-in paths.
+      return jl_box_float64(*a);
 #else
       return 0;
 #endif
@@ -1076,6 +1101,7 @@ namespace std {
 
 %fragment("casadi_vector", "header", fragment="casadi_aux") {
   namespace casadi {
+
 
 #ifdef SWIGMATLAB
 
@@ -1288,6 +1314,30 @@ namespace std {
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m) {
       // Treat Null
       if (is_null(p)) return false;
+#ifdef SWIGJULIA
+      if (jl_is_array(p)) {
+        jl_array_t* a = (jl_array_t*)p;
+        size_t n = jl_array_len(a);
+        if (m) (**m).resize(n);
+        jl_function_t* getindex_f = jl_get_function(jl_base_module, "getindex");
+        for (size_t i = 0; i < n; ++i) {
+          jl_value_t* el = 0; jl_value_t* idx = 0;
+          JL_GC_PUSH2(&el, &idx);
+          idx = jl_box_int64((int64_t)(i + 1));
+          el = jl_call2(getindex_f, p, idx);
+          bool ok = el != 0;
+          if (ok) {
+            M tmp; M* tmp_p = &tmp;
+            ok = ::casadi::to_ptr(el, &tmp_p);
+            if (ok && m) (**m)[i] = *tmp_p;
+          }
+          JL_GC_POP();
+          if (!ok) return false;
+        }
+        return true;
+      }
+      return false;
+#endif
 #ifdef SWIGWASMJS
       {
         emscripten::val v = emscripten::val::take_ownership(
@@ -1458,6 +1508,21 @@ namespace std {
 #endif
 
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
+#ifdef SWIGJULIA
+      {
+        jl_value_t* atype = jl_apply_array_type((jl_value_t*)jl_any_type, 1);
+        jl_array_t* arr = jl_alloc_array_1d(atype, a->size());
+        JL_GC_PUSH1(&arr);
+        for (size_t i = 0; i < a->size(); ++i) {
+          M tmpv = (*a)[i];
+          GUESTOBJECT* e = casadi::from_ptr(&tmpv);
+          if (!e) { JL_GC_POP(); return 0; }
+          jl_array_ptr_set(arr, i, e);
+        }
+        JL_GC_POP();
+        return (GUESTOBJECT*)arr;
+      }
+#endif
 #ifdef SWIGWASMJS
       std::vector<M>* fresh = new std::vector<M>(*a);
       const char* nm = wasmjs_vector_jsname<M>::get();
@@ -1684,6 +1749,12 @@ namespace std {
       }
 #endif
 
+#ifdef SWIGJULIA
+      if (jl_is_string(p)) {
+        if (m) **m = std::string(jl_string_ptr(p), jl_string_len(p));
+        return true;
+      }
+#endif
 #ifdef SWIGPYTHON
       if (PyString_Check(p) || PyUnicode_Check(p)) {
         if (m) {
@@ -1750,6 +1821,8 @@ namespace std {
 #elif defined(SWIGWASMJS)
       emscripten::val v(*a);  // emscripten::val has a std::string ctor (UTF-8)
       return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
+#elif defined(SWIGJULIA)
+      return jl_cstr_to_string(a->c_str());
 #else
       return 0;
 #endif
@@ -1825,6 +1898,39 @@ namespace std {
 %fragment("casadi_map", "header", fragment="casadi_aux") {
   namespace casadi {
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m) {
+#ifdef SWIGJULIA
+      if (is_null(p)) return false;
+      {
+        jl_value_t* adt = jl_get_global(jl_base_module, jl_symbol("AbstractDict"));
+        if (!adt || !jl_isa(p, adt)) return false;
+        jl_function_t* keys_f = jl_get_function(jl_base_module, "keys");
+        jl_function_t* collect_f = jl_get_function(jl_base_module, "collect");
+        jl_function_t* getindex_f = jl_get_function(jl_base_module, "getindex");
+        jl_value_t* karr = 0;
+        JL_GC_PUSH1(&karr);
+        karr = jl_call1(collect_f, jl_call1(keys_f, p));
+        bool ok = karr != 0 && jl_is_array(karr);
+        size_t n = ok ? jl_array_len((jl_array_t*)karr) : 0;
+        for (size_t i = 0; i < n && ok; ++i) {
+          jl_value_t* k = 0; jl_value_t* v = 0;
+          JL_GC_PUSH2(&k, &v);
+          k = jl_array_ptr_ref((jl_array_t*)karr, i);
+          if (!k || !jl_is_string(k)) { ok = false; }
+          else {
+            v = jl_call2(getindex_f, p, k);
+            if (!v) { ok = false; }
+            else {
+              M tmp; M* tmp_p = &tmp;
+              ok = casadi::to_ptr(v, &tmp_p);
+              if (ok && m) (**m)[std::string(jl_string_ptr(k), jl_string_len(k))] = *tmp_p;
+            }
+          }
+          JL_GC_POP();
+        }
+        JL_GC_POP();
+        return ok;
+      }
+#endif
 #ifdef SWIGWASMJS
       if (is_null(p)) return true;
       {
@@ -1892,6 +1998,26 @@ namespace std {
     }
 
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a) {
+#ifdef SWIGJULIA
+      {
+        jl_function_t* dict_f = jl_get_function(jl_base_module, "Dict");
+        jl_function_t* set_f = jl_get_function(jl_base_module, "setindex!");
+        jl_value_t* d = 0; JL_GC_PUSH1(&d);
+        d = jl_call0(dict_f);
+        if (!d) { JL_GC_POP(); return 0; }
+        for (typename std::map<std::string, M>::const_iterator it = a->begin(); it != a->end(); ++it) {
+          GUESTOBJECT* e = 0; jl_value_t* k = 0;
+          JL_GC_PUSH2(&e, &k);
+          e = casadi::from_ptr(&it->second);
+          k = jl_cstr_to_string(it->first.c_str());
+          bool ok = e != 0 && jl_call3(set_f, d, e, k) != 0;
+          JL_GC_POP();
+          if (!ok) { JL_GC_POP(); return 0; }
+        }
+        JL_GC_POP();
+        return d;
+      }
+#endif
 #ifdef SWIGPYTHON
       PyObject *p = PyDict_New();
       for (typename std::map<std::string, M>::const_iterator it=a->begin(); it!=a->end(); ++it) {
@@ -2461,6 +2587,59 @@ namespace std {
  //           emission by wasm_js.cxx).  Pasted verbatim into the .d.ts;
  //           no translation layer.  Use TS syntax (e.g. "bigint",
  //           "string", "MX[]", "Record<string, GenericType>").
+#ifdef SWIGJULIA
+%define %julia_convention_repair()
+// Convention repair: %casadi_output_typemaps applied the class-return
+// convention (owned copy behind void*) to casadi-typemapped PRIMITIVES
+// too.  Re-register value returns for those (last-registered wins);
+// inputs keep the jl_value_t* rich-coercion path.
+%typemap(ctype, out="long long") casadi_int, const casadi_int& "jl_value_t*"
+%typemap(out) casadi_int %{ $result = (long long)$1; %}
+%typemap(out) const casadi_int& %{ $result = (long long)*$1; %}
+%typemap(jltype, out="Clonglong") casadi_int, const casadi_int& "Any"
+%typemap(jlout) casadi_int, const casadi_int& "Int(_check($call))"
+%typemap(ctype, out="double") double, const double& "jl_value_t*"
+%typemap(out) double %{ $result = (double)$1; %}
+%typemap(out) const double& %{ $result = (double)*$1; %}
+%typemap(jltype, out="Cdouble") double, const double& "Any"
+%typemap(jlout) double, const double& "_check($call)"
+%typemap(ctype, out="unsigned char") bool, const bool& "jl_value_t*"
+%typemap(out) bool %{ $result = $1 ? 1 : 0; %}
+%typemap(out) const bool& %{ $result = *$1 ? 1 : 0; %}
+%typemap(jltype, out="Cuchar") bool, const bool& "Any"
+%typemap(jlout) bool, const bool& "_check($call) != 0"
+%typemap(ctype, out="char *") std::string, const std::string& "jl_value_t*"
+%typemap(out) std::string %{ $result = swig_jl_strdup($1); %}
+%typemap(out) const std::string& %{ $result = swig_jl_strdup(*$1); %}
+%typemap(jltype, out="Ptr{UInt8}") std::string, const std::string& "Any"
+%typemap(jlout) std::string, const std::string& "_takestr($call)"
+%typemap(ctype, out="jl_value_t*", fragment="SwigJlRuntime") std::vector<double>, const std::vector<double>& "jl_value_t*"
+%typemap(out) std::vector<double> %{ $result = swig_jl_from_vec_double($1); %}
+%typemap(out) const std::vector<double>& %{ $result = swig_jl_from_vec_double(*$1); %}
+%typemap(jltype, out="Any") std::vector<double>, const std::vector<double>& "Any"
+%typemap(jlout) std::vector<double>, const std::vector<double>& "_check($call)::Vector{Float64}"
+%typemap(ctype, out="jl_value_t*", fragment="SwigJlRuntime") std::vector<casadi_int>, const std::vector<casadi_int>, const std::vector<casadi_int>& "jl_value_t*"
+%typemap(out) std::vector<casadi_int>, const std::vector<casadi_int> %{ { std::vector<long long> __t($1.begin(), $1.end()); $result = swig_jl_from_vec_int(__t); } %}
+%typemap(out) const std::vector<casadi_int>& %{ { std::vector<long long> __t($1->begin(), $1->end()); $result = swig_jl_from_vec_int(__t); } %}
+%typemap(jltype, out="Any") std::vector<casadi_int>, const std::vector<casadi_int>, const std::vector<casadi_int>& "Any"
+%typemap(jlout) std::vector<casadi_int>, const std::vector<casadi_int>, const std::vector<casadi_int>& "_check($call)::Vector{Int64}"
+%typemap(ctype, out="jl_value_t*", fragment="SwigJlRuntime") std::vector<std::string>, const std::vector<std::string>& "jl_value_t*"
+%typemap(out) std::vector<std::string> %{ $result = swig_jl_from_vec_string($1); %}
+%typemap(out) const std::vector<std::string>& %{ $result = swig_jl_from_vec_string(*$1); %}
+%typemap(jltype, out="Any") std::vector<std::string>, const std::vector<std::string>& "Any"
+%typemap(jlout) std::vector<std::string>, const std::vector<std::string>& "_check($call)::Vector{String}"
+// casadi::Dict (std::map<std::string,GenericType>): return as a Julia Dict via
+// from_ptr (which builds Dict{String,Any} and recursively converts values).
+%typemap(ctype, out="jl_value_t*", fragment="casadi_all") casadi::Dict, const casadi::Dict& "jl_value_t*"
+%typemap(out, noblock=1) casadi::Dict %{ if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to Dict."); %}
+%typemap(out, noblock=1) const casadi::Dict& %{ if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to Dict."); %}
+%typemap(jltype, out="Any") casadi::Dict, const casadi::Dict& "Any"
+%typemap(jlout) casadi::Dict, const casadi::Dict& "_check($call)::AbstractDict"
+%enddef
+#else
+%define %julia_convention_repair() %enddef
+#endif
+
 %define %casadi_input_typemaps(xName, xStubIn, xTsStub, xPrec, xType...)
 #ifdef SWIGWASMJS
  // wasm_js: all wrapped types cross the wasm boundary as EM_VAL -- an
@@ -2468,6 +2647,22 @@ namespace std {
  // and PyObject*.  to_ptr / SWIG_ConvertPtr unwrap the JS-side carrier
  // (a `{_ptr: <int>}` proxy) via emscripten::val on the wasm side.
 %typemap(ctype) xType, const xType&, xType& "EM_VAL"
+#endif
+#ifdef SWIGJULIA
+%typemap(ctype, out="void *") xType, const xType&, xType& "jl_value_t*"
+%typemap(jltype, out="Ptr{Cvoid}") xType, const xType&, xType& "Any"
+ // Class pointer (e.g. the implicit `this` of member functions): cross as the
+ // proxy object and convert via SWIG_ConvertPtr with the type descriptor, so
+ // the cast chain applies the base-class offset adjustment.  Without this a
+ // director object (whose vptr shifts a non-polymorphic base off offset 0)
+ // would have `this` misread when reached through a base-class method.
+%typemap(ctype, out="void *") xType* "jl_value_t*"
+%typemap(jltype, out="Ptr{Cvoid}") xType* "Any"
+%typemap(in, noblock=1) xType* {
+  if (!SWIG_IsOK(SWIG_ConvertPtr($input, reinterpret_cast<void**>(&$1), $1_descriptor, 0)))
+    SWIG_exception_fail(SWIG_TypeError,"Failed to convert input $argnum to type '" xName "'.");
+ }
+%typemap(freearg, noblock=1) xType* {}
 #endif
  // Pass input by value, check if matches
 %typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_all") xType {
@@ -2545,6 +2740,17 @@ namespace std {
   if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type '" xName "'.");
 }
 
+#ifdef SWIGJULIA
+ // julia: returns leave as an owned copy behind void*; the generated .jl
+ // wraps it in the proxy type (which owns it via finalizer).
+%typemap(out, doc=xName, noblock=1) xType, const xType {
+  $result = (void*) new xType($1);
+}
+%typemap(out, doc=xName, noblock=1) const xType& {
+  $result = (void*) new xType(*$1);
+}
+#endif
+
 // Inputs marked OUTPUT are also returned by the function, ...
 %typemap(argout, noblock=1,fragment="casadi_all") xType &OUTPUT {
   %append_output(casadi::from_ptr($1));
@@ -2606,6 +2812,7 @@ namespace std {
 %apply xType &INOUT {xType &INOUT5};
 %apply xType &INOUT {xType &INOUT6};
 
+%julia_convention_repair()
 %enddef
 
  // All-in-one template instantiation + typemaps.
@@ -3106,8 +3313,12 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
 %casadi_template(L_DICT, "Mapping[str, GenericType]", "dict[str, GenericType]", "Record<string, GenericType>", PREC_DICT, std::map<std::string, casadi::GenericType>)
 %casadi_template(LDICT(LL L_STR LR), "Mapping[str, Sequence[str]]", "dict[str, list[str]]", "Record<string, string[]>", PREC_DICT, std::map<std::string, std::vector<std::string> >)
 
+
+%julia_convention_repair()
+
 #ifdef SWIGWASMJS
 // ----------------------------------------------------------------------------
+
 // Director typemap registrations: override the generic carrier-producing
 // directorin/out with M.__wrap_<JsName> proxy wrapping.  ORDER CONSTRAINT:
 // must come AFTER the %casadi_typemaps calls (last-registered wins).
@@ -3881,7 +4092,7 @@ class NZproxy:
 %enddef
 #endif // SWIGPYTHON
 
-#if defined(SWIGXML) || defined(SWIGWASMJS)
+#if defined(SWIGXML) || defined(SWIGWASMJS) || defined(SWIGJULIA)
 %define %matrix_helpers(Type)
 %enddef
 #endif
@@ -4998,6 +5209,7 @@ DECL M casadi_kron_contract(const M& m, const M& x, bool inner) {
 %define MX_ALL(DECL, FLAG)
 MX_FUN(DECL, (FLAG | IS_MX), MX)
 %enddef
+%julia_convention_repair()
 %include <casadi/core/matrix_fwd.hpp>
 %include <casadi/core/matrix_decl.hpp>
 %include <casadi/core/dm_fwd.hpp>
@@ -5610,6 +5822,9 @@ namespace casadi {
 #define FLAG (IS_GLOBAL | IS_MEMBER)
 #endif // SWIGMATLAB
 
+
+%julia_convention_repair()
+
 // Wrap non-member functions, possibly with casadi_ prefix
 
 %inline {
@@ -6029,6 +6244,10 @@ class global_unpickle_context:
 %typemap(out, doc="DM", tsstub_out="DM", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'DM'.");
 }
+#elif defined(SWIGJULIA)
+%typemap(out, doc="DM", noblock=1) casadi::native_DM {
+  $result = (void*) new casadi::Matrix<double>($1);
+}
 #else
 %typemap(out, doc="double", pystub_out="float", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = full_or_sparse($1, true))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'double'.");
@@ -6221,6 +6440,7 @@ opti_metadata_modifiers(casadi::Opti);
 
 opti_metadata_modifiers(casadi::Opti)
 #endif
+%julia_convention_repair()
 %include <casadi/core/optistack.hpp>
 
 

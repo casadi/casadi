@@ -79,6 +79,11 @@ jobs:
         docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
         "mkdir build && cd build && cmake -DWITH_WASM_JS=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make wasm_source && cd .. && rm -rf build"
 
+    - name: generate julia
+      run: >
+        docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c
+        "mkdir build && cd build && cmake -DWITH_JULIA=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make julia_source && cd .. && rm -rf build"
+
     - name: set CMAKE default options
       run: |
          sed -i 's/option(SWIG_IMPORT "Import SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
@@ -249,6 +254,35 @@ jobs:
             node "$f" || { echo "EXAMPLE FAILED: $f"; exit 1; }
           done
           echo "all examples ran"
+
+  julia:
+    needs: [swig, version]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source (incl. pre-generated julia wrapper)
+        run: unzip -q casadi_source.zip
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1'
+      - name: Build core + julia wrapper (SWIG_IMPORT)
+        run: |
+          cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DWITH_JULIA=ON -DSWIG_IMPORT=ON                 -DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -H.
+          cmake --build build --target casadi_julia -j$(nproc)
+      - name: Run Julia test suite
+        run: |
+          export CASADI_JL=$PWD/build/swig/julia/CasADiNative
+          LD_LIBRARY_PATH=$PWD/build/lib julia test/julia/runtests.jl
+      - name: Assemble CasADiNative artifact (Artifacts.toml-ready tarball)
+        run: |
+          cp LICENSE.txt build/swig/julia/CasADiNative/
+          tar -C build/swig/julia -czf casadi-julia-linux64.tar.gz CasADiNative
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: casadi-julia-linux64
+          path: casadi-julia-linux64.tar.gz
 
   publish-npm:
     needs: [version, javascript]
