@@ -31,7 +31,6 @@
 #include <casadi/interfaces/xpress/casadi_conic_xpress_export.h>
 
 #include <xprs.h>
-#include <string>
 
 namespace casadi {
   #include "xpress_runtime.hpp"

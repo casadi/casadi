@@ -297,6 +297,9 @@ namespace casadi {
   void XpressInterface::codegen_body(CodeGenerator& g) const {
     qp_codegen_body(g);
     g.add_auxiliary(CodeGenerator::AUX_INF);
+    g.add_auxiliary(CodeGenerator::AUX_NAN);
+    g.add_auxiliary(CodeGenerator::AUX_PRINTF);
+    g.add_auxiliary(CodeGenerator::AUX_FILL);
     // Always emit casadi_socp definitions: the xpress data struct
     // references casadi_socp_data even when no Q/P is present.
     g.add_auxiliary(CodeGenerator::AUX_SOCP);

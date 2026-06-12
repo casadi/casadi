@@ -1486,19 +1486,19 @@ class XpressSpecificTests(casadiTestCase):
     """mip_start=True: warm-start hint accepted, 'User solution' in log."""
     import tempfile, os
 
-    x = MX.sym("x", 3)
+    x = ca.MX.sym("x", 3)
     # Binary MILP: minimise -sum(x) s.t. x[0]+x[1]+x[2] <= 2
     # Optimal: any two of the three = 1, cost = -2
     logfile = tempfile.mktemp(suffix=".log")
     try:
-      solver = qpsol("s", "xpress",
-                     {"x": x, "f": -sum1(x), "g": x[0] + x[1] + x[2]},
+      solver = ca.qpsol("s", "xpress",
+                     {"x": x, "f": -ca.sum1(x), "g": x[0] + x[1] + x[2]},
                      {"discrete": [1, 1, 1],
                       "mip_start": True,
                       "log_file": logfile,
                       "xpress": {"OUTPUTLOG": 1}})
 
-      sol = solver(x0=DM([1, 1, 0]), lbx=DM([0, 0, 0]), ubx=DM([1, 1, 1]),
+      sol = solver(x0=ca.DM([1, 1, 0]), lbx=ca.DM([0, 0, 0]), ubx=ca.DM([1, 1, 1]),
                    lbg=-inf, ubg=2)
 
       self.assertTrue(solver.stats()["success"], "MIP with mip_start should succeed")
@@ -1517,14 +1517,14 @@ class XpressSpecificTests(casadiTestCase):
 
   def test_iis_infeasible_lp(self):
     """IIS rows/cols are returned in get_stats() for an infeasible LP."""
-    x = MX.sym("x")
+    x = ca.MX.sym("x")
     # Infeasible via constraints: x >= 5 AND -x >= 5 (i.e. x <= -5)
     # Bounds keep x free so CasADi's pre-check passes.
-    solver = qpsol("s", "xpress",
-                   {"x": x, "f": x, "g": vertcat(x, -x)},
+    solver = ca.qpsol("s", "xpress",
+                   {"x": x, "f": x, "g": ca.vertcat(x, -x)},
                    {"error_on_fail": False,
                     "xpress": {"OUTPUTLOG": 0}})
-    sol = solver(x0=0, lbx=-1e10, ubx=1e10, lbg=DM([5, 5]), ubg=DM([1e10, 1e10]))
+    sol = solver(x0=0, lbx=-1e10, ubx=1e10, lbg=ca.DM([5, 5]), ubg=ca.DM([1e10, 1e10]))
 
     stats = solver.stats()
     self.assertFalse(stats["success"], "Solver should report failure for infeasible LP")
@@ -1540,14 +1540,14 @@ class XpressSpecificTests(casadiTestCase):
 
   def test_iis_infeasible_milp(self):
     """IIS is returned in get_stats() for an infeasible MIP."""
-    x = MX.sym("x")
+    x = ca.MX.sym("x")
     # Binary variable (0/1) with constraint x >= 2 -> infeasible
-    solver = qpsol("s", "xpress",
+    solver = ca.qpsol("s", "xpress",
                    {"x": x, "f": x, "g": x},
                    {"discrete": [1],
                     "error_on_fail": False,
                     "xpress": {"OUTPUTLOG": 0}})
-    solver(x0=0, lbx=DM([0]), ubx=DM([1]), lbg=2, ubg=1e10)
+    solver(x0=0, lbx=ca.DM([0]), ubx=ca.DM([1]), lbg=2, ubg=1e10)
 
     stats = solver.stats()
     self.assertFalse(stats["success"])

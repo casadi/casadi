@@ -2617,6 +2617,28 @@ namespace casadi {
     local_default_.insert(std::make_pair(name, def));
   }
 
+  // Read the next double-quoted token from line, starting at pos.
+  // Backslash escapes the next character, so \" and \\ may appear inside.
+  // On return, pos points just past the closing quote.
+  static std::string next_quoted_token(const std::string& line, size_t& pos) {
+    size_t n1 = line.find('"', pos);
+    casadi_assert(n1 != std::string::npos, "Missing quoted token in: " + line);
+    std::string r;
+    size_t i = n1 + 1;
+    for (; i < line.size(); ++i) {
+      if (line[i] == '\\' && i + 1 < line.size()) {
+        r += line[++i];
+      } else if (line[i] == '"') {
+        break;
+      } else {
+        r += line[i];
+      }
+    }
+    casadi_assert(i < line.size(), "Unterminated quoted token in: " + line);
+    pos = i + 1;
+    return r;
+  }
+
   std::string CodeGenerator::
   sanitize_source(const std::string& src,
                   const std::vector<std::string>& inst, bool add_shorthand) {
@@ -2680,14 +2702,10 @@ namespace casadi {
 
       // If line starts with "// C-REPLACE", add to list of replacements
       if (line.find("// C-REPLACE") != std::string::npos) {
-        // Get C++ string
-        n1 = line.find("\"");
-        n2 = line.find("\"", n1+1);
-        std::string key = line.substr(n1+1, n2-n1-1);
-        // Get C string
-        n1 = line.find("\"", n2+1);
-        n2 = line.find("\"", n1+1);
-        std::string sub = line.substr(n1+1, n2-n1-1);
+        // Get C++ string, then C string; \" and \\ are unescaped
+        size_t pos = line.find("// C-REPLACE");
+        std::string key = next_quoted_token(line, pos);
+        std::string sub = next_quoted_token(line, pos);
         // Add to replacements
         rep.push_back(std::make_pair(key, sub));
         continue;

@@ -158,18 +158,14 @@ void casadi_xpress_init(casadi_xpress_data<T1>* d,
   }
 }
 
+// FILTER-MACROS OFF
 
-// Helper macros for consistent Xpress API error handling.
-// XPRS_WARN  – call FN, print warning + XPRSgetlasterror message on failure,
-//              but continue (non-fatal).
-// XPRS_RETURN – call FN, print error + XPRSgetlasterror message on failure,
-//               and return 1 (fatal).
-// FN must have the XPRSprob as its first argument (PROB).
+// C-REPLACE "uerr() << LEVEL \" (\" #FN \"): \" << xprs_msg << \"\\n\"" "fprintf(stderr, LEVEL \" (\" #FN \"): %s\\n\", xprs_msg)" // NOLINT(whitespace/line_length)
 #ifndef XPRS_LOG_ERROR
 #define XPRS_LOG_ERROR(FN, PROB, LEVEL)        \
   char xprs_msg[XPRS_MAXMESSAGELENGTH] = {0};  \
   XPRSgetlasterror((PROB), xprs_msg);          \
-  fprintf(stderr, LEVEL " (" #FN "): %s\n", xprs_msg)
+  uerr() << LEVEL " (" #FN "): " << xprs_msg << "\n"
 #endif
 #ifndef XPRS_WARN
 #define XPRS_WARN(FN, PROB, ...)             \
@@ -188,6 +184,7 @@ void casadi_xpress_init(casadi_xpress_data<T1>* d,
     }                                        \
   } while (0)
 #endif
+// FILTER-MACROS ON
 
 // C-REPLACE "SOLVER_RET_SUCCESS" "0"
 // C-REPLACE "SOLVER_RET_LIMITED" "2"
@@ -325,7 +322,11 @@ int casadi_xpress_solve(casadi_xpress_data<T1>* d,
     // Postsolve is a no-op when the solve completed normally, and mandatory
     // after any stopped/cutoff status; call it unconditionally to cover all
     // cases (LP_UNFINISHED, LP_CUTOFF, LP_CUTOFF_IN_DUAL, etc.).
-    XPRS_RETURN(XPRSpostsolve, d->xprob);
+    // XPRS_RETURN not usable here: it needs at least one extra macro argument.
+    if (XPRSpostsolve(d->xprob) != 0) {
+      XPRS_LOG_ERROR(XPRSpostsolve, d->xprob, "Error");
+      return 1;
+    }
   }
 
   // Retrieve solution.  XPRSgetsolution works for both LP and MIP.
