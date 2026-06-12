@@ -304,7 +304,7 @@ namespace casadi {
         << ", &xprs_id, &xprs_type);\n";
       if (op.second.is_double()) {
         g << "  XPRSsetdblcontrol(d->xprob, xprs_id, "
-          << op.second.to_double() << ");\n";
+          << g.constant(op.second.to_double()) << ");\n";
       } else if (op.second.is_int() || op.second.is_bool()) {
         g << "  XPRSsetintcontrol(d->xprob, xprs_id, "
           << static_cast<int>(op.second.to_int()) << ");\n";
