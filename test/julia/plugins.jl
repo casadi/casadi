@@ -11,7 +11,7 @@ const _PL_OD = Dict{String,Any}()
 @testset "CasadiMeta plugins/features enumeration" begin
     pl = C.plugins(C.CasadiMeta)
     @test pl isa AbstractString
-    @test occursin("Nlpsol::ipopt", pl)        # registered nlpsol plugin
+    HAS_IPOPT && @test occursin("Nlpsol::ipopt", pl)   # ipopt is optional (not built in casadi CI)
     @test occursin("Conic::qrqp", pl)           # registered conic plugin
     @test occursin("Integrator::rk", pl)        # registered integrator plugin
     @test occursin("Rootfinder::newton", pl)    # registered rootfinder plugin
@@ -23,7 +23,7 @@ end
 
 # ---- availability predicates: assert specific known-present plugins ----
 @testset "has_* availability predicates" begin
-    @test C.has_nlpsol("ipopt")
+    HAS_IPOPT && @test C.has_nlpsol("ipopt")
     @test C.has_nlpsol("sqpmethod")
     @test C.has_conic("qrqp")
     @test C.has_conic("ipqp")
@@ -47,7 +47,7 @@ end
 # ---- explicit plugin loading: load_* succeeds for present, throws for bogus ----
 @testset "load_* plugin loading" begin
     # load is idempotent for already-registered plugins (warns "already in use").
-    @test (C.load_nlpsol("ipopt"); true)
+    HAS_IPOPT && @test (C.load_nlpsol("ipopt"); true)
     @test (C.load_conic("qrqp"); true)
     @test (C.load_linsol("qr"); true)
     # bogus plugin: load throws cleanly (dlopen failure surfaced as an exception).
@@ -58,9 +58,11 @@ end
 # ---- options / doc introspection (JS twin has none of this) ----
 @testset "options & doc introspection" begin
     # nlpsol_options(plugin) lists the option names the solver accepts.
-    no = C.nlpsol_options("ipopt")
-    @test no isa AbstractVector
-    @test "ipopt" in no                        # ipopt's nested-options key
+    if HAS_IPOPT
+        no = C.nlpsol_options("ipopt")
+        @test no isa AbstractVector
+        @test "ipopt" in no                    # ipopt's nested-options key
+    end
     # conic_options(plugin): qrqp exposes its iteration knobs.
     co = C.conic_options("qrqp")
     @test "max_iter" in co
@@ -69,8 +71,10 @@ end
     @test C.nlpsol_in() == ["x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0"]
     @test C.nlpsol_out() == ["x", "f", "g", "lam_x", "lam_g", "lam_p"]
     # doc_nlpsol(plugin): a non-empty documentation blob.
-    doc = C.doc_nlpsol("ipopt")
-    @test doc isa AbstractString && length(doc) > 100
+    if HAS_IPOPT
+        doc = C.doc_nlpsol("ipopt")
+        @test doc isa AbstractString && length(doc) > 100
+    end
 end
 
 # ---- bogus plugin construction throws cleanly (no segfault) ----

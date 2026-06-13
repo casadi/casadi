@@ -17,6 +17,7 @@ end
 
 for plugin in ["newton", "fast_newton", "kinsol", "nlpsol"]
     (try C.has_rootfinder(plugin) catch; false end) || continue
+    plugin == "nlpsol" && !HAS_IPOPT && continue   # rootfinder:nlpsol uses ipopt inside
     @testset "rootfinder $plugin" begin
         # --- sin(x) = 0, x0 = 6 -> 2*pi ---
         x = sym(SX, "x")

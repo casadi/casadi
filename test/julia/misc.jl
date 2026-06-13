@@ -10,9 +10,9 @@
     @test v isa AbstractString && occursin(r"^\d+\.\d+", v)   # "3.7.2+": major.minor
     rev = C.git_revision(C.CasadiMeta)
     @test rev isa AbstractString
-    # a git sha: non-empty and purely hex (not just "length >= 7", which a
-    # non-hex 7-char string would also pass); a full sha is 40 hex chars.
-    @test !isempty(rev) && occursin(r"^[0-9a-fA-F]+$", rev) && length(rev) >= 7
+    # source-tarball builds (no .git) report an empty revision; if present it must
+    # be a hex sha (>= 7 chars; a full sha is 40).
+    @test isempty(rev) || (occursin(r"^[0-9a-fA-F]+$", rev) && length(rev) >= 7)
     @test C.compiler_id(C.CasadiMeta) isa AbstractString
     @test !isempty(C.compiler_id(C.CasadiMeta))               # e.g. "GNU"
 end
