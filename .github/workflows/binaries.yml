@@ -270,10 +270,15 @@ jobs:
       - name: Build core + julia wrapper (SWIG_IMPORT)
         run: |
           cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DWITH_JULIA=ON -DSWIG_IMPORT=ON                 -DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -H.
-          cmake --build build --target casadi_julia -j$(nproc)
+          # build everything (libcasadi + native plugins + julia wrapper): the test
+          # suite dlopens plugins (qrqp/sqpmethod/newton/bspline/...), which the
+          # casadi_julia target alone does not build.
+          cmake --build build -j$(nproc)
       - name: Run Julia test suite
         run: |
           export CASADI_JL=$PWD/build/swig/julia/CasADiNative
+          # casadi finds plugins via CASADI_PLUGIN_SEARCH_PATH (NOT LD_LIBRARY_PATH)
+          export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib
           LD_LIBRARY_PATH=$PWD/build/lib julia test/julia/runtests.jl
       - name: Assemble CasADiNative artifact (Artifacts.toml-ready tarball)
         run: |
