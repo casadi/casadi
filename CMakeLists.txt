@@ -2092,6 +2092,21 @@ if(WITH_UNO)
     file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external_projects")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/uno")
 
+    # Uno ships its public headers only via the PUBLIC_HEADER target property,
+    # which is silently skipped on a cached uno build, so Uno_C_API.h (which the
+    # generated codegen #includes) goes missing from the install tree. Copy it
+    # and the uno_int.h it pulls in explicitly; a fresh step has no cached stamp
+    # and reruns on a uno cache-hit.
+    ExternalProject_Add_Step(uno-external copy_c_headers
+      DEPENDEES install
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/external_projects/include/uno
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        <SOURCE_DIR>/interfaces/C/Uno_C_API.h
+        <SOURCE_DIR>/interfaces/C/uno_int.h
+        ${CMAKE_BINARY_DIR}/external_projects/include/uno/
+      COMMENT "Copying Uno C headers to external_projects/include/uno"
+    )
+
     add_library(uno SHARED IMPORTED)
     add_dependencies(uno uno-external)
     set_target_properties(uno PROPERTIES
