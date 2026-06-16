@@ -2101,6 +2101,9 @@ if(WITH_UNO)
     )
     target_compile_features(uno INTERFACE cxx_std_17)
     create_import_library(uno uno)
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/uno"
+      DESTINATION "${INCLUDE_PREFIX}")
   else()
     # try to find system csparse
     find_package(uno REQUIRED)
