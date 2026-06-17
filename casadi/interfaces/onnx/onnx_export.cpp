@@ -25,6 +25,7 @@
 
 #include "onnx_model.hpp"
 #include <casadi/core/casadi_meta.hpp>
+#include <memory>
 #include <set>
 
 /// \cond INTERNAL
@@ -778,8 +779,9 @@ namespace casadi {
       const Function& f,
       const std::string& domain) {
 
-    // Create a new FunctionProto
-    onnx::FunctionProto* func = new onnx::FunctionProto();
+    // Create a new FunctionProto (guarded so a casadi_assert/error mid-build frees it)
+    std::unique_ptr<onnx::FunctionProto> func_guard(new onnx::FunctionProto());
+    onnx::FunctionProto* func = func_guard.get();
     func->set_name(f.name());
     func->set_domain(domain);
 
@@ -881,7 +883,7 @@ namespace casadi {
       uout() << "    Created " << func->node_size() << " nodes in FunctionProto" << std::endl;
     }
 
-    return func;
+    return func_guard.release();
   }
 
 } // namespace casadi
