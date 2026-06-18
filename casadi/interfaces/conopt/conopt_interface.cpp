@@ -47,6 +47,19 @@ namespace casadi {
     Function jacg_fcn = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     jacg_sp_ = jacg_fcn.sparsity_out(1);
 
+    // Detect linear (constant) Jacobian entries using second-order sparsity:
+    // d(jac:g:x_compact)/dx has shape (nnz_g, nx_); if row k is empty,
+    // the k-th Jacobian nonzero is constant in x (linear entry).
+    {
+      Sparsity djac_dx = jacg_fcn.sparsity_jac(0, 1, true);
+      jacg_nlflag_.assign(jacg_sp_.nnz(), 0);
+      const casadi_int* dj_row = djac_dx.row();
+      for (casadi_int el = 0; el < djac_dx.nnz(); ++el)
+        jacg_nlflag_[dj_row[el]] = 1;
+      has_linear_jac_ = std::any_of(jacg_nlflag_.begin(), jacg_nlflag_.end(),
+                                     [](int f) { return f == 0; });
+    }
+
     // Setup 2nd Order Info
     exact_hessian_ = true;
     if (opts.find("exact_hessian") != opts.end()) exact_hessian_ = opts.at("exact_hessian");
@@ -125,6 +138,17 @@ namespace casadi {
         jacg_col_[p] = c;
         jacg_nzidx_[p] = (int)el;
       }
+
+    // Recompute linearity flags (not serialized; derived from the function)
+    {
+      Sparsity djac_dx = get_function("nlp_jac_g").sparsity_jac(0, 1, true);
+      jacg_nlflag_.assign(jacg_sp_.nnz(), 0);
+      const casadi_int* dj_row = djac_dx.row();
+      for (casadi_int el = 0; el < djac_dx.nnz(); ++el)
+        jacg_nlflag_[dj_row[el]] = 1;
+      has_linear_jac_ = std::any_of(jacg_nlflag_.begin(), jacg_nlflag_.end(),
+                                     [](int f) { return f == 0; });
+    }
   }
 
   void ConoptInterface::serialize_body(SerializingStream &s) const {
@@ -160,6 +184,8 @@ namespace casadi {
     m->cached_jac_g.resize(jacg_sp_.nnz(), 0.0);
     m->casadi_to_conopt_lb_row.resize(ng_);
     m->casadi_to_conopt_ub_row.assign(ng_, -1);
+    if (has_linear_jac_)
+      m->const_jac_vals.resize(jacg_sp_.nnz(), 0.0);
 
     COI_Create(&m->cntvect);
 
@@ -259,9 +285,35 @@ namespace casadi {
     m->ng_expanded    = ng_expanded;
     m->numnz_expanded = numnz;
 
+    // Evaluate Jacobian at the initial point to obtain values for constant entries
+    if (has_linear_jac_) {
+      m->arg[0] = m->d_nlp.z;
+      m->arg[1] = m->d_nlp.p;
+      m->res[0] = m->cached_g.data();
+      m->res[1] = m->const_jac_vals.data();
+      try {
+        calc_function(m, "nlp_jac_g");
+      } catch (...) {
+        std::fill(m->const_jac_vals.begin(), m->const_jac_vals.end(), 0.0);
+      }
+    }
+
+    // Count nonlinear NZ: all objective gradient entries + nonlinear constraint entries
+    const casadi_int* g_colind_s = jacg_sp_.colind();
+    const casadi_int* g_row_s    = jacg_sp_.row();
+    int num_nl_nz = (int)gradf_sp_.nnz();
+    for (casadi_int c = 0; c < nx_; ++c) {
+      for (casadi_int el = g_colind_s[c]; el < g_colind_s[c+1]; ++el) {
+        if (jacg_nlflag_[el]) {
+          int ci = (int)g_row_s[el];
+          num_nl_nz += (m->casadi_to_conopt_ub_row[ci] >= 0) ? 2 : 1;
+        }
+      }
+    }
+
     COIDEF_NumCon(m->cntvect, ng_expanded + 1);
     COIDEF_NumNz(m->cntvect, numnz);
-    COIDEF_NumNlNz(m->cntvect, numnz);
+    COIDEF_NumNlNz(m->cntvect, num_nl_nz);
 
     int ret = COI_Solve(m->cntvect);
     if (ret != 0) {
@@ -383,12 +435,15 @@ namespace casadi {
       }
       for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
         int ci = (int)g_row[el];
+        int nlflag = self.jacg_nlflag_[el];
         ROWNO[nz]  = m->casadi_to_conopt_lb_row[ci];
-        NLFLAG[nz] = 1;
+        NLFLAG[nz] = nlflag;
+        if (nlflag == 0) VALUE[nz] = m->const_jac_vals[el];
         nz++;
         if (m->casadi_to_conopt_ub_row[ci] >= 0) {
           ROWNO[nz]  = m->casadi_to_conopt_ub_row[ci];
-          NLFLAG[nz] = 1;
+          NLFLAG[nz] = nlflag;
+          if (nlflag == 0) VALUE[nz] = m->const_jac_vals[el];
           nz++;
         }
       }

@@ -32,6 +32,9 @@ namespace casadi {
     std::vector<std::pair<std::string, GenericType>> custom_options;
     size_t current_option_idx;
 
+    // Constant Jacobian values for linear (NLFLAG=0) entries (populated in solve())
+    std::vector<double> const_jac_vals;
+
     // Range-constraint expansion state (recomputed each solve)
     int ng_expanded;
     int numnz_expanded;
@@ -83,6 +86,10 @@ namespace casadi {
     std::vector<int> jacg_rowstart_;
     std::vector<int> jacg_col_;
     std::vector<int> jacg_nzidx_;
+
+    // Per-nonzero linearity flag (0 = constant/linear, 1 = nonlinear), CCS order
+    std::vector<int> jacg_nlflag_;
+    bool has_linear_jac_;
 
     // Serialization and Deserialization
     void serialize_body(SerializingStream &s) const override;
