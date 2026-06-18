@@ -58,29 +58,33 @@ namespace casadi {
       alloc_w(hesslag_sp_.nnz(), true);
     }
 
-    jac_colsta_.resize(nx_ + 1, 0);
-    int numnz = 0;
-    std::vector<bool> has_gradf(nx_, false);
+    // Per-column objective-gradient flag (used in cb_read_matrix)
     const casadi_int* f_row = gradf_sp_.row();
-    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k) has_gradf[f_row[k]] = true;
+    gradf_col_flag_.assign(nx_, false);
+    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
+      gradf_col_flag_[f_row[k]] = true;
 
     const casadi_int* g_colind = jacg_sp_.colind();
     const casadi_int* g_row = jacg_sp_.row();
 
+    // Build row-indexed (CSR) structure for fast Jacobian scatter in cb_fd_eval
+    casadi_int nnz_g = jacg_sp_.nnz();
+    jacg_rowstart_.assign(ng_ + 1, 0);
+    jacg_col_.resize(nnz_g);
+    jacg_nzidx_.resize(nnz_g);
+    for (casadi_int el = 0; el < nnz_g; ++el)
+      jacg_rowstart_[g_row[el] + 1]++;
+    for (int r = 0; r < ng_; ++r)
+      jacg_rowstart_[r + 1] += jacg_rowstart_[r];
+    std::vector<int> fill_pos(ng_, 0);
     for (int c = 0; c < nx_; ++c) {
-      jac_colsta_[c] = numnz;
-      if (has_gradf[c]) {
-        jac_rowno_.push_back(0);
-        jac_nlflag_.push_back(1);
-        numnz++;
-      }
       for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
-        jac_rowno_.push_back(g_row[el] + 1);
-        jac_nlflag_.push_back(1);
-        numnz++;
+        int r = (int)g_row[el];
+        int p = jacg_rowstart_[r] + fill_pos[r]++;
+        jacg_col_[p] = c;
+        jacg_nzidx_[p] = (int)el;
       }
     }
-    jac_colsta_[nx_] = numnz;
 
     alloc_w(1, true);
     alloc_w(gradf_sp_.nnz(), true);
@@ -90,15 +94,37 @@ namespace casadi {
 
   // --- Serialization & Deserialization --- //
   ConoptInterface::ConoptInterface(DeserializingStream& s) : Nlpsol(s) {
-    int version = s.version("ConoptInterface", 1);
+    s.version("ConoptInterface", 1);
     s.unpack("ConoptInterface::exact_hessian", exact_hessian_);
     s.unpack("ConoptInterface::opts", opts_);
     s.unpack("ConoptInterface::gradf_sp", gradf_sp_);
     s.unpack("ConoptInterface::jacg_sp", jacg_sp_);
     s.unpack("ConoptInterface::hesslag_sp", hesslag_sp_);
-    s.unpack("ConoptInterface::jac_colsta", jac_colsta_);
-    s.unpack("ConoptInterface::jac_rowno", jac_rowno_);
-    s.unpack("ConoptInterface::jac_nlflag", jac_nlflag_);
+
+    // Rebuild derived arrays from the serialized sparsities
+    const casadi_int* f_row = gradf_sp_.row();
+    gradf_col_flag_.assign(nx_, false);
+    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
+      gradf_col_flag_[f_row[k]] = true;
+
+    const casadi_int* g_colind = jacg_sp_.colind();
+    const casadi_int* g_row = jacg_sp_.row();
+    casadi_int nnz_g = jacg_sp_.nnz();
+    jacg_rowstart_.assign(ng_ + 1, 0);
+    jacg_col_.resize(nnz_g);
+    jacg_nzidx_.resize(nnz_g);
+    for (casadi_int el = 0; el < nnz_g; ++el)
+      jacg_rowstart_[g_row[el] + 1]++;
+    for (int r = 0; r < ng_; ++r)
+      jacg_rowstart_[r + 1] += jacg_rowstart_[r];
+    std::vector<int> fill_pos(ng_, 0);
+    for (int c = 0; c < nx_; ++c)
+      for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
+        int r = (int)g_row[el];
+        int p = jacg_rowstart_[r] + fill_pos[r]++;
+        jacg_col_[p] = c;
+        jacg_nzidx_[p] = (int)el;
+      }
   }
 
   void ConoptInterface::serialize_body(SerializingStream &s) const {
@@ -109,14 +135,14 @@ namespace casadi {
     s.pack("ConoptInterface::gradf_sp", gradf_sp_);
     s.pack("ConoptInterface::jacg_sp", jacg_sp_);
     s.pack("ConoptInterface::hesslag_sp", hesslag_sp_);
-    s.pack("ConoptInterface::jac_colsta", jac_colsta_);
-    s.pack("ConoptInterface::jac_rowno", jac_rowno_);
-    s.pack("ConoptInterface::jac_nlflag", jac_nlflag_);
+    // Derived arrays (gradf_col_flag_, CSR) are rebuilt on deserialization
   }
 
   ConoptMemory::ConoptMemory(const ConoptInterface& interface)
       : self(interface), NlpsolMemory(), cntvect(nullptr), modsta(0), solsta(0),
-        iter(0), return_status("Unset"), success(0), cache_valid(false), current_option_idx(0) {}
+        iter(0), return_status("Unset"), success(0),
+        cache_valid(false), current_option_idx(0),
+        ng_expanded(0), numnz_expanded(0) {}
 
   ConoptMemory::~ConoptMemory() {
     if (cntvect) COI_Free(&cntvect);
@@ -132,15 +158,17 @@ namespace casadi {
     m->cached_grad_f.resize(gradf_sp_.nnz(), 0.0);
     m->cached_g.resize(ng_, 0.0);
     m->cached_jac_g.resize(jacg_sp_.nnz(), 0.0);
+    m->casadi_to_conopt_lb_row.resize(ng_);
+    m->casadi_to_conopt_ub_row.assign(ng_, -1);
 
     COI_Create(&m->cntvect);
 
     COIDEF_NumVar(m->cntvect, nx_);
-    COIDEF_NumCon(m->cntvect, ng_ + 1);
-    COIDEF_NumNz(m->cntvect, jac_rowno_.size());
+    // NumCon, NumNz, NumNlNz are set in solve() because range-constraint expansion
+    // can change them between calls.
 
     COIDEF_ObjCon(m->cntvect, 0);
-    COIDEF_OptDir(m->cntvect, 1);
+    COIDEF_OptDir(m->cntvect, -1);
 
     // Handle Options
     m->custom_options.clear();
@@ -188,8 +216,71 @@ namespace casadi {
   int ConoptInterface::solve(void* mem) const {
     auto m = static_cast<ConoptMemory*>(mem);
     m->cache_valid = false;
-    COI_Solve(m->cntvect);
-    m->success = (m->solsta == 1);
+    m->current_option_idx = 0;
+
+    // Build the per-solve constraint expansion (splits range constraints into two rows)
+    m->conopt_to_casadi.clear();
+    m->casadi_to_conopt_ub_row.assign(ng_, -1);
+    m->conopt_type.clear();
+    m->conopt_rhs.clear();
+
+    int ng_expanded = 0;
+    // Base NZ: objective gradient columns + all constraint Jacobian entries
+    int numnz = (int)gradf_sp_.nnz() + (int)jacg_sp_.nnz();
+
+    for (casadi_int i = 0; i < ng_; ++i) {
+      double lbg = m->d_nlp.lbz[nx_ + i];
+      double ubg = m->d_nlp.ubz[nx_ + i];
+      bool is_range = !std::isinf(lbg) && !std::isinf(ubg) && lbg != ubg;
+
+      m->casadi_to_conopt_lb_row[i] = ng_expanded + 1;  // 1-indexed CONOPT row
+      m->conopt_to_casadi.push_back((int)i);
+      if (lbg == ubg) {
+        m->conopt_type.push_back(0);  m->conopt_rhs.push_back(lbg);
+      } else if (!std::isinf(lbg) && std::isinf(ubg)) {
+        m->conopt_type.push_back(1);  m->conopt_rhs.push_back(lbg);
+      } else if (std::isinf(lbg) && !std::isinf(ubg)) {
+        m->conopt_type.push_back(2);  m->conopt_rhs.push_back(ubg);
+      } else if (std::isinf(lbg) && std::isinf(ubg)) {
+        m->conopt_type.push_back(3);  m->conopt_rhs.push_back(0.0);
+      } else {
+        m->conopt_type.push_back(1);  m->conopt_rhs.push_back(lbg);  // range: >= row
+      }
+      ng_expanded++;
+
+      if (is_range) {
+        m->casadi_to_conopt_ub_row[i] = ng_expanded + 1;
+        m->conopt_to_casadi.push_back((int)i);
+        m->conopt_type.push_back(2);  m->conopt_rhs.push_back(ubg);  // <= row
+        ng_expanded++;
+        numnz += jacg_rowstart_[i + 1] - jacg_rowstart_[i];
+      }
+    }
+    m->ng_expanded    = ng_expanded;
+    m->numnz_expanded = numnz;
+
+    COIDEF_NumCon(m->cntvect, ng_expanded + 1);
+    COIDEF_NumNz(m->cntvect, numnz);
+    COIDEF_NumNlNz(m->cntvect, numnz);
+
+    int ret = COI_Solve(m->cntvect);
+    if (ret != 0) {
+      // Hard error before status/solution callbacks were reached
+      m->success = false;
+      m->unified_return_status = SOLVER_RET_UNKNOWN;
+      return 0;
+    }
+
+    m->success = (m->modsta == 1 || m->modsta == 2) && m->solsta == 1;
+
+    if (!m->success) {
+      if (m->solsta == 2 || m->solsta == 3 || m->solsta == 5 ||
+          m->solsta == 8 || m->solsta == 15) {
+        m->unified_return_status = SOLVER_RET_LIMITED;
+      } else if (m->modsta == 4 || m->modsta == 5) {
+        m->unified_return_status = SOLVER_RET_INFEASIBLE;
+      }
+    }
     return 0;
   }
 
@@ -264,40 +355,45 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     const ConoptInterface& self = m->self;
 
-    for(int i = 0; i < NUMVAR; ++i) {
+    // Variable bounds and initial point
+    for (int i = 0; i < NUMVAR; ++i) {
       if (!std::isinf(m->d_nlp.lbz[i])) LOWER[i] = m->d_nlp.lbz[i];
       if (!std::isinf(m->d_nlp.ubz[i])) UPPER[i] = m->d_nlp.ubz[i];
-      CURR[i]  = m->d_nlp.z[i];
+      CURR[i] = m->d_nlp.z[i];
     }
 
+    // Constraint types and RHS (row 0 = objective, rows 1..ng_expanded = constraints)
     TYPEX[0] = 3;
-    RHS[0] = 0.0;
+    RHS[0]   = 0.0;
+    for (int r = 0; r < m->ng_expanded; ++r) {
+      TYPEX[r + 1] = m->conopt_type[r];
+      RHS[r + 1]   = m->conopt_rhs[r];
+    }
 
-    for(int i = 0; i < NUMCON - 1; ++i) {
-      double lbg = m->d_nlp.lbz[NUMVAR + i];
-      double ubg = m->d_nlp.ubz[NUMVAR + i];
-      int row_idx = i + 1;
-
-      if (lbg == ubg) {
-        TYPEX[row_idx] = 0;
-        RHS[row_idx] = lbg;
-      } else if (!std::isinf(lbg) && std::isinf(ubg)) {
-        TYPEX[row_idx] = 1;
-        RHS[row_idx] = lbg;
-      } else if (std::isinf(lbg) && !std::isinf(ubg)) {
-        TYPEX[row_idx] = 2;
-        RHS[row_idx] = ubg;
-      } else if (std::isinf(lbg) && std::isinf(ubg)) {
-        TYPEX[row_idx] = 3;
-        RHS[row_idx] = 0.0;
-      } else {
-        casadi_error("CONOPT does not accept range constraints.");
+    // Jacobian structure — built live from jacg_sp_ with range-row duplication
+    const casadi_int* g_colind = self.jacg_sp_.colind();
+    const casadi_int* g_row    = self.jacg_sp_.row();
+    int nz = 0;
+    for (int c = 0; c < NUMVAR; ++c) {
+      COLSTA[c] = nz;
+      if (self.gradf_col_flag_[c]) {
+        ROWNO[nz]  = 0;
+        NLFLAG[nz] = 1;
+        nz++;
+      }
+      for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
+        int ci = (int)g_row[el];
+        ROWNO[nz]  = m->casadi_to_conopt_lb_row[ci];
+        NLFLAG[nz] = 1;
+        nz++;
+        if (m->casadi_to_conopt_ub_row[ci] >= 0) {
+          ROWNO[nz]  = m->casadi_to_conopt_ub_row[ci];
+          NLFLAG[nz] = 1;
+          nz++;
+        }
       }
     }
-
-    std::memcpy(COLSTA, self.jac_colsta_.data(), (NUMVAR + 1) * sizeof(int));
-    std::memcpy(ROWNO, self.jac_rowno_.data(), NUMNZ * sizeof(int));
-    std::memcpy(NLFLAG, self.jac_nlflag_.data(), NUMNZ * sizeof(int));
+    COLSTA[NUMVAR] = nz;
 
     return 0;
   }
@@ -348,19 +444,12 @@ namespace casadi {
         }
     }
     else {
-        int g_rowno = ROWNO - 1;
-        if (MODE == 1 || MODE == 3) *G = m->cached_g[g_rowno];
+        int ci = m->conopt_to_casadi[ROWNO - 1];  // CasADi constraint index
+        if (MODE == 1 || MODE == 3) *G = m->cached_g[ci];
         if (MODE == 2 || MODE == 3) {
             std::memset(JAC, 0, NUMVAR * sizeof(double));
-            const casadi_int* colind = self.jacg_sp_.colind();
-            const casadi_int* row = self.jacg_sp_.row();
-            for (int c = 0; c < NUMVAR; ++c) {
-                for (casadi_int el = colind[c]; el < colind[c+1]; ++el) {
-                    if (row[el] == g_rowno) {
-                        JAC[c] = m->cached_jac_g[el];
-                    }
-                }
-            }
+            for (int k = self.jacg_rowstart_[ci]; k < self.jacg_rowstart_[ci + 1]; ++k)
+                JAC[self.jacg_col_[k]] = m->cached_jac_g[self.jacg_nzidx_[k]];
         }
     }
     return 0;
@@ -427,10 +516,37 @@ namespace casadi {
     m->iter = ITER;
     m->d_nlp.objective = OBJVAL;
 
-    if (SOLSTA == 1) m->return_status = "Optimal";
-    else if (SOLSTA >= 6 && SOLSTA <= 11) m->return_status = "No Solution (Major Error)";
-    else m->return_status = "Suboptimal/Infeasible";
+    const char* modsta_str;
+    switch (MODSTA) {
+      case 1:  modsta_str = "Optimal";                  break;
+      case 2:  modsta_str = "Locally optimal";          break;
+      case 3:  modsta_str = "Unbounded";                break;
+      case 4:  modsta_str = "Infeasible";               break;
+      case 5:  modsta_str = "Locally infeasible";       break;
+      case 6:  modsta_str = "Intermediate infeasible";  break;
+      case 7:  modsta_str = "Intermediate non-optimal"; break;
+      case 12: modsta_str = "Unknown error";            break;
+      case 13: modsta_str = "Error: no solution";       break;
+      default: modsta_str = "Unknown model status";     break;
+    }
 
+    const char* solsta_str;
+    switch (SOLSTA) {
+      case 1:  solsta_str = "Normal completion";                   break;
+      case 2:  solsta_str = "Iteration limit";                     break;
+      case 3:  solsta_str = "Time limit";                          break;
+      case 4:  solsta_str = "Terminated by solver";                break;
+      case 5:  solsta_str = "Evaluation error limit";              break;
+      case 8:  solsta_str = "User interrupt";                      break;
+      case 9:  solsta_str = "Setup failure";                       break;
+      case 10: solsta_str = "Major solver error";                  break;
+      case 11: solsta_str = "Major solver error (feasible point)"; break;
+      case 13: solsta_str = "System error";                        break;
+      case 15: solsta_str = "Quick Mode termination";              break;
+      default: solsta_str = "Unknown solver status";               break;
+    }
+
+    m->return_status = std::string(modsta_str) + " / " + std::string(solsta_str);
     return 0;
   }
 
@@ -438,9 +554,24 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(USRMEM);
 
     casadi_copy(XVAL, NUMVAR, m->d_nlp.z);
-    casadi_copy(XMAR, NUMVAR, m->d_nlp.lam);
-    casadi_copy(YVAL + 1, NUMCON - 1, m->d_nlp.z + NUMVAR);
-    casadi_copy(YMAR + 1, NUMCON - 1, m->d_nlp.lam + NUMVAR);
+
+    // Constraint values: use the first CONOPT row for each CasADi constraint
+    // (both rows carry the same function value for range constraints)
+    for (casadi_int ci = 0; ci < m->self.ng_; ++ci)
+      m->d_nlp.z[NUMVAR + ci] = YVAL[m->casadi_to_conopt_lb_row[ci]];
+
+    // Variable marginals: CONOPT shadow prices = -CasADi lam_x
+    for (int i = 0; i < NUMVAR; ++i)
+      m->d_nlp.lam[i] = -XMAR[i];
+
+    // Constraint marginals: for range constraints sum both rows' shadow prices
+    // (only the active bound has a non-zero YMAR; summing is always safe)
+    for (casadi_int ci = 0; ci < m->self.ng_; ++ci) {
+      int row1 = m->casadi_to_conopt_lb_row[ci];
+      int row2 = m->casadi_to_conopt_ub_row[ci];
+      double ymar = YMAR[row1] + (row2 >= 0 ? YMAR[row2] : 0.0);
+      m->d_nlp.lam[NUMVAR + ci] = -ymar;
+    }
 
     return 0;
   }

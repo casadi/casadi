@@ -17,7 +17,7 @@ namespace casadi {
     int modsta;
     int solsta;
     int iter;
-    const char* return_status;
+    std::string return_status;
     int success;
 
     // Caching state for the evaluation block
@@ -31,6 +31,15 @@ namespace casadi {
     // Options handling
     std::vector<std::pair<std::string, GenericType>> custom_options;
     size_t current_option_idx;
+
+    // Range-constraint expansion state (recomputed each solve)
+    int ng_expanded;
+    int numnz_expanded;
+    std::vector<int> conopt_to_casadi;   // CONOPT constraint row (0-indexed) → CasADi index
+    std::vector<int> casadi_to_conopt_lb_row;  // CasADi index → CONOPT row for lb (or only) side
+    std::vector<int> casadi_to_conopt_ub_row;  // CasADi index → CONOPT row for ub side (range only); -1 otherwise
+    std::vector<int> conopt_type;        // CONOPT TYPE for each expanded row
+    std::vector<double> conopt_rhs;      // CONOPT RHS for each expanded row
 
     ConoptMemory(const ConoptInterface& interface);
     ~ConoptMemory();
@@ -67,10 +76,13 @@ namespace casadi {
     bool exact_hessian_;
     Dict opts_; // CONOPT specific options
 
-    // Combined CCS tracking arrays for CONOPT (Objective + Constraints)
-    std::vector<int> jac_colsta_;
-    std::vector<int> jac_rowno_;
-    std::vector<int> jac_nlflag_;
+    // Per-column flag: true if the objective gradient has a nonzero in that column
+    std::vector<bool> gradf_col_flag_;
+
+    // Row-indexed (CSR) structure for fast Jacobian scatter in cb_fd_eval
+    std::vector<int> jacg_rowstart_;
+    std::vector<int> jacg_col_;
+    std::vector<int> jacg_nzidx_;
 
     // Serialization and Deserialization
     void serialize_body(SerializingStream &s) const override;
