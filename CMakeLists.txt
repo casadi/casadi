@@ -1082,6 +1082,10 @@ set(BUILD_ALPAQA_VERSION "develop" CACHE STRING "Tag/branch/hash to be used for 
 option(WITH_BUILD_ALPAQA "Build Alpaqa (BUILD_ALPAQA_VERSION=${BUILD_ALPAQA_VERSION}) from downloaded source (BUILD_ALPAQA_GIT_REPO=${BUILD_ALPAQA_GIT_REPO})." OFF)
 set(BUILD_ALPAQA_DEPENDENCIES EIGEN3)
 
+# CONOPT: An NLP solver
+option(WITH_CONOPT "Compile the interface to CONOPT" OFF)
+option(WITH_MOCKUP_CONOPT "Use mockup CONOPT (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+
 option(ALLOW_DOCKER "System has docker installed" OFF)
 
 option(WITH_ZLIB "Compile the ZLIB interface" OFF)
@@ -1252,7 +1256,7 @@ endmacro()
 
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG CPLEX SNOPT KNITRO GUROBI XPRESS MOSEK WORHP HSL MADNLP)
+foreach(PKG CPLEX SNOPT KNITRO GUROBI XPRESS MOSEK WORHP HSL MADNLP CONOPT)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_BUILD_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
@@ -3093,6 +3097,17 @@ if(WITH_SELFCONTAINED)
   install(FILES "${PROJECT_SOURCE_DIR}/LICENSE.txt" DESTINATION "${INCLUDE_PREFIX}/licenses/casadi/LICENSE")
 endif()
 
+if(WITH_CONOPT AND WITH_MOCKUP_CONOPT)
+  add_library(conopt::conopt SHARED IMPORTED)
+  add_dependencies(conopt::conopt mockups-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/include")
+  set_target_properties(conopt::conopt PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/include"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}conopt${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}conopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+endif()
+add_feature_info(conopt-interface WITH_CONOPT "Interface to the NLP solver CONOPT.")
 
 ######################################################
 ##################### paths ##########################
