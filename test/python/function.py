@@ -1310,12 +1310,12 @@ class Functiontests(casadiTestCase):
     for x in [0,0.01,0.1,0.2,0.9,0.99,1]:
       for y in [0,0.01,0.1,0.2,0.9,0.99,1]:
         m = LUT([x,y])
-        r = interp.ev(x,y)
+        r = interp.ev(x,y).item()
         self.checkarray(m,r)
 
         m = LUTJ([x,y])[0]
         try:
-          r = [interp.ev(x,y, 1, 0), interp.ev(x,y, 0, 1)]
+          r = [interp.ev(x,y, 1, 0).item(), interp.ev(x,y, 0, 1).item()]
         except:
           r = None
         if r is not None:
@@ -1323,7 +1323,7 @@ class Functiontests(casadiTestCase):
 
         m = LUTH([x,y])[0]
         try:
-          r = ca.blockcat([[interp.ev(x,y, 2, 0),interp.ev(x,y, 1, 1)],[interp.ev(x,y, 1, 1), interp.ev(x,y, 0, 2)]])
+          r = ca.blockcat([[interp.ev(x,y, 2, 0).item(), interp.ev(x,y, 1, 1).item()], [interp.ev(x,y, 1, 1).item(), interp.ev(x,y, 0, 2).item()]])
         except:
           r = None
         if r is not None:
