@@ -44,6 +44,15 @@ std::vector<const Blas::Plugin*> Blas::dispatch_;
 // internal entry point that updates only the integer shorthand.
 casadi_int Blas::default_ = 0;
 
+#ifdef CASADI_L1_BLAS
+casadi_daxpy_t casadi_daxpy_hook = nullptr;
+casadi_ddot_t  casadi_ddot_hook  = nullptr;
+casadi_dscal_t casadi_dscal_hook = nullptr;
+casadi_dnrm2_t casadi_dnrm2_hook = nullptr;
+casadi_dasum_t casadi_dasum_hook = nullptr;
+casadi_dcopy_t casadi_dcopy_hook = nullptr;
+#endif // CASADI_L1_BLAS
+
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
 std::mutex Blas::mutex_solvers_;
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
@@ -119,7 +128,25 @@ static const char* REFERENCE_DOC =
     "Built-in dense BLAS implementation, no external dependency. "
     "Used by default and as the fallback when other plugins are unavailable.";
 
+#ifdef CASADI_CORE_BLAS_DEPENDENCY
+extern "C" void casadi_load_blas_classic();
+#ifdef CASADI_L1_BLAS
+extern "C" void casadi_blas_classic_set_l1_hooks();
+namespace {
+  const bool _casadi_core_l1 = (casadi_blas_classic_set_l1_hooks(), true);
+}
+#endif // CASADI_L1_BLAS
+#endif // CASADI_CORE_BLAS_DEPENDENCY
+
 casadi_int Blas::shorthand_for(const std::string& name) {
+#ifdef CASADI_CORE_BLAS_DEPENDENCY
+  static bool core_blas_inited = false;
+  if (!core_blas_inited) {
+    core_blas_inited = true;          // set first: setDefault re-enters here
+    casadi_load_blas_classic();       // register the absorbed plugin (no dlopen)
+    setDefault("classic");            // sets Blas::default_ (L3 codegen) + hooks
+  }
+#endif
   if (name == "reference") return 0;
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
   std::lock_guard<std::mutex> lock(Blas::mutex_solvers_);
@@ -235,12 +262,18 @@ std::string doc_blas(const std::string& name) {
   return Blas::getPlugin(name).doc;
 }
 
-// Internal entry point: sets the integer shorthand only. shorthand_for()
-// validates the name and lazy-loads the plugin DLL if needed. The matching
-// GlobalOptions::setDefaultBlas (in global_options.cpp) is the public entry
-// point that mirrors the name string and calls this.
 void Blas::setDefault(const std::string& name) {
   default_ = shorthand_for(name);
+#ifdef CASADI_L1_BLAS
+  // Mirror into the low-level hooks: plugin L1 fn if any, else null (reference).
+  const Exposed* e = default_ ? &dispatch_[default_]->exposed : nullptr;
+  casadi_daxpy_hook = e ? e->daxpy : nullptr;
+  casadi_ddot_hook  = e ? e->ddot  : nullptr;
+  casadi_dscal_hook = e ? e->dscal : nullptr;
+  casadi_dnrm2_hook = e ? e->dnrm2 : nullptr;
+  casadi_dasum_hook = e ? e->dasum : nullptr;
+  casadi_dcopy_hook = e ? e->dcopy : nullptr;
+#endif // CASADI_L1_BLAS
 }
 
 std::string Blas::getDefault() {

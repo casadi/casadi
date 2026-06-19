@@ -27,6 +27,7 @@
 #include "code_generator.hpp"
 #include "function_internal.hpp"
 #include "convexify.hpp"
+#include "blas_impl.hpp"
 #include <casadi_runtime_str.h>
 #include "global_options.hpp"
 #include "filesystem_impl.hpp"
@@ -63,6 +64,7 @@ namespace casadi {
     this->max_declarations_per_line = 12;
     this->max_initializer_elements_per_line = 8;
     this->force_canonical = false;
+    this->l1_blas = false;
 
     avoid_stack_ = false;
     indent_ = 2;
@@ -134,6 +136,8 @@ namespace casadi {
           "Option max_initializer_elements_per_line must be >=0");
       } else if (e.first=="force_canonical") {
         this->force_canonical = e.second;
+      } else if (e.first=="l1_blas") {
+        this->l1_blas = e.second;
       } else if (e.first=="thread_safe") {
         thread_safe_ = e.second;
       } else {
@@ -1509,7 +1513,11 @@ namespace casadi {
     // Add the appropriate function
     switch (f) {
     case AUX_COPY:
-      this->auxiliaries << sanitize_source(casadi_copy_str, inst);
+      if (this->l1_blas) {
+        Blas::codegen_copy_aux(*this, inst);
+      } else {
+        this->auxiliaries << sanitize_source(casadi_copy_str, inst);
+      }
       break;
     case AUX_SCALED_COPY:
       this->auxiliaries << sanitize_source(casadi_scaled_copy_str, inst);
@@ -1518,13 +1526,16 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_swap_str, inst);
       break;
     case AUX_SCAL:
-      this->auxiliaries << sanitize_source(casadi_scal_str, inst);
+      if (!(this->l1_blas && Blas::codegen_scal_aux(*this, inst)))
+        this->auxiliaries << sanitize_source(casadi_scal_str, inst);
       break;
     case AUX_AXPY:
-      this->auxiliaries << sanitize_source(casadi_axpy_str, inst);
+      if (!(this->l1_blas && Blas::codegen_axpy_aux(*this, inst)))
+        this->auxiliaries << sanitize_source(casadi_axpy_str, inst);
       break;
     case AUX_DOT:
-      this->auxiliaries << sanitize_source(casadi_dot_str, inst);
+      if (!(this->l1_blas && Blas::codegen_dot_aux(*this, inst)))
+        this->auxiliaries << sanitize_source(casadi_dot_str, inst);
       break;
     case AUX_BILIN:
       this->auxiliaries << sanitize_source(casadi_bilin_str, inst);
@@ -1612,12 +1623,16 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str, inst);
       break;
     case AUX_NORM_1:
-      add_auxiliary(AUX_FABS);
-      this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);
+      if (!(this->l1_blas && Blas::codegen_norm_1_aux(*this, inst))) {
+        add_auxiliary(AUX_FABS);
+        this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);
+      }
       break;
     case AUX_NORM_2:
-      add_auxiliary(AUX_DOT);
-      this->auxiliaries << sanitize_source(casadi_norm_2_str, inst);
+      if (!(this->l1_blas && Blas::codegen_norm_2_aux(*this, inst))) {
+        add_auxiliary(AUX_DOT);
+        this->auxiliaries << sanitize_source(casadi_norm_2_str, inst);
+      }
       break;
     case AUX_NORM_INF:
       add_auxiliary(AUX_FMAX);

@@ -31,12 +31,20 @@ foreach(LIB ${OOQP_LIBS_LIST})
   endif()
 endforeach()
 
-# Dependent packages, BLAS and HSL
-find_package(BLAS QUIET)
-if(BLAS_FOUND)
-  set(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${BLAS_LIBRARIES})
+# Dependent packages, BLAS and HSL.
+# Reuse CasADi's already-resolved BLAS/LAPACK provider (LAPACK_LIBRARIES, which
+# is MKL under WITH_MKL, openblas otherwise) so OOQP does not link a DIFFERENT
+# BLAS than the rest of CasADi (ABI/perf consistency). Fall back to an
+# independent find_package(BLAS) only when CasADi has no LAPACK provider.
+if(LAPACK_LIBRARIES)
+  set(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${LAPACK_LIBRARIES})
 else()
-  message(STATUS "OOQP requires BLAS")
+  find_package(BLAS QUIET)
+  if(BLAS_FOUND)
+    set(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${BLAS_LIBRARIES})
+  else()
+    message(STATUS "OOQP requires BLAS")
+  endif()
 endif()
 find_package(HSL QUIET)
 if(HSL_FOUND)

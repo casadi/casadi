@@ -145,6 +145,9 @@ namespace casadi {
           \identifier{2i2} */
       static int getNumpyMode() { return numpy_mode; }
 
+      static void setDefaultBlas(const std::string& name);
+      static std::string getDefaultBlas();
+
   };
 
 } // namespace casadi
