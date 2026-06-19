@@ -35,8 +35,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
-#include <limits>
-#include <memory>
 #include <chrono>
 
 #ifdef CASADI_WITH_THREAD
@@ -49,66 +47,7 @@
 
 #include <fatrop_runtime_str.h>
 
-// fatrop's OutputStreamManager singleton lives in a header-only inline function
-// with a function-local static. casadi is built with -fvisibility=hidden, which
-// would give that static internal (per-DSO) linkage, so the plugin would get a
-// *separate* singleton from libfatrop's and could never repair the shared one.
-// Force default visibility for these symbols so the static-local becomes
-// STB_GNU_UNIQUE and merges with libfatrop's singleton.
-#pragma GCC visibility push(default)
-#include <fatrop/common/printing.hpp>
-#pragma GCC visibility pop
-
 namespace casadi {
-  // fatrop directs all its console output to a process-wide singleton stream
-  // (fatrop::OutputStreamManager), assigned only inside fatrop_ocp_c_create.
-  // Every fatrop user (including codegen-generated .so's loaded via external())
-  // overwrites it with a stream whose write/flush callbacks live in that user's
-  // module. When such a module is later unloaded, the singleton is left holding
-  // a stream with dangling callbacks. A subsequent solve by our (cached) solver
-  // then drives that dangling stream and crashes while printing.
-  //
-  // Defend against this by reinstalling, before every solve, a stream that is
-  // owned by libcasadi and routes to casadi_c_logger_write/flush (which never
-  // get unloaded). The fatrop streambuf vtable lives in libfatrop (also never
-  // unloaded), so deleting the previous (possibly dangling-callback) stream
-  // inside set_stream is safe; only *calling* its callbacks would crash.
-  namespace {
-    class CasadiFatropStreambuf : public std::streambuf {
-    protected:
-      int_type overflow(int_type ch) override {
-        if (ch != traits_type::eof()) {
-          char c = static_cast<char>(ch);
-          casadi_c_logger_write(&c, 1);
-        }
-        return ch;
-      }
-      std::streamsize xsputn(const char* s, std::streamsize num) override {
-        std::streamsize written = 0;
-        int max_chunk = std::numeric_limits<int>::max();
-        while (num > 0) {
-          int chunk = static_cast<int>(std::min<std::streamsize>(num, max_chunk));
-          casadi_c_logger_write(s + written, chunk);
-          written += chunk;
-          num -= chunk;
-        }
-        return written;
-      }
-      int sync() override { casadi_c_logger_flush(); return 0; }
-    };
-    class CasadiFatropStream : public std::ostream {
-      CasadiFatropStreambuf buf_;
-     public:
-      CasadiFatropStream() : std::ostream(&buf_) {}
-    };
-  }  // namespace
-
-  // Reinstall our own (libcasadi-owned) output stream into fatrop's singleton.
-  void casadi_fatrop_reinstall_stream() {
-    fatrop::OutputStreamManager::set_stream(
-      std::unique_ptr<std::ostream>(new CasadiFatropStream()));
-  }
-
   extern "C"
   int CASADI_NLPSOL_FATROP_EXPORT
   casadi_register_nlpsol_fatrop(Nlpsol::Plugin* plugin) {
@@ -616,29 +555,18 @@ namespace casadi {
   int FatropInterface::solve(void* mem) const {
     auto m = static_cast<FatropMemory*>(mem);
 
-    // Cache the solver: presolve (re)creates it only when needed (structure
-    // change). Detect (re)creation by comparing the solver pointer across
-    // presolve, so options are (re)applied on any fresh creation, not only the
-    // very first one.
-    struct FatropOcpCSolver* old_solver = m->d.solver;
+    // Cache the solver: presolve (re)creates it only when needed
+    bool new_solver = (m->d.solver == 0);
     // fatrop_ocp_c_create (called from casadi_fatrop_presolve) installs a
     // process-wide singleton stream via fatrop::OutputStreamManager::set_stream,
-    // which is not thread-safe. Serialize across threads. The stream reinstall
-    // (see casadi_fatrop_reinstall_stream) mutates the same singleton, so keep
-    // it under the same lock.
+    // which is not thread-safe. Serialize across threads.
     {
 #ifdef CASADI_WITH_THREAD
       static std::mutex mutex_fatrop_create;
       std::lock_guard<std::mutex> lock(mutex_fatrop_create);
 #endif //CASADI_WITH_THREAD
       casadi_fatrop_presolve(&m->d);
-      // Always point fatrop's output-stream singleton back at a libcasadi-owned
-      // stream. This overrides whatever create just installed, and crucially
-      // repairs a singleton left dangling by a since-unloaded fatrop user
-      // (e.g. a codegen .so), which a cached-solver reuse would otherwise hit.
-      casadi_fatrop_reinstall_stream();
     }
-    bool new_solver = (m->d.solver != old_solver);
 
     // Set options only when a new solver was created (options persist across solves)
     if (new_solver) {
@@ -773,11 +701,9 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
   g << "casadi_fatrop_set_work(d, &arg, &res, &iw, &w);\n";
   g << "casadi_oracle_set_work(d->nlp->oracle, &arg, &res, &iw, &w);\n";
 
-  // Cache the solver: presolve (re)creates it only when needed. Detect
-  // (re)creation by comparing the solver pointer across presolve, so options
-  // are (re)applied on any fresh creation, not only the very first one.
+  // Cache the solver: presolve (re)creates it only when needed
   g << "{\n";
-  g << "struct FatropOcpCSolver* old_solver = d->solver;\n";
+  g << "int new_solver = (d->solver == 0);\n";
   // fatrop_ocp_c_create (called from casadi_fatrop_presolve) installs a
   // process-wide singleton stream via fatrop::OutputStreamManager::set_stream,
   // which is not thread-safe. Serialize across threads.
@@ -792,7 +718,7 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
   } else {
     g << "casadi_fatrop_presolve(d);\n";
   }
-  g << "if (d->solver != old_solver) {\n";
+  g << "if (new_solver) {\n";
 
   for (const auto& kv : opts_) {
     switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
