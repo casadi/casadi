@@ -79,8 +79,9 @@ namespace casadi {
       }
 
       // Sparsity overlay: if a sparse_initializer shares this input's name it carries a non-dense
-      // input pattern -- make a SPARSE input symbol and feed it AS-IS, so CasADi propagates the true
-      // sparsity through the body (no densification on entry; densify only where an ONNX op requires
+      // input pattern -- make a SPARSE input symbol and feed it AS-IS, so CasADi propagates the
+      // true sparsity through the body (no densification on entry; densify only where an ONNX op
+      // requires
       // the dense layout, e.g. Reshape). Transpose-rep: the ONNX input is declared (c,r).
       Sparsity ov = input_pattern(graph, input_name);
       MX mx_input = ov.is_null() ? MX::sym(input_name, cols, rows) : MX::sym(input_name, ov);
@@ -113,7 +114,8 @@ namespace casadi {
       // process the group generically (the helper tensors kron<k>_A4/_B4/_P are never added to the
       // value_map). We capture the two logical operands at the leading Reshapes (whose single data
       // input is the imported, transposed-back A / B) and reconstruct kron(A_imp, B_imp) at the
-      // final Reshape. CasADi kron propagates sparsity natively, so the pattern round-trips for free
+      // final Reshape. CasADi kron propagates sparsity natively, so the pattern round-trips for
+      // free
       // (kron commutes with transpose). This is handled BEFORE the generic input gathering because
       // the helper tensors are intentionally absent from value_map.
       if (node.name().rfind("kron", 0) == 0) {
@@ -225,7 +227,8 @@ namespace casadi {
           // node_inputs are the original (rows, n*c) map inputs. Rebuild base.map(n).
           Function base = function_from_graph(*body, op_type + "_body");
           casadi_int n = node_inputs[0].size2() / base.size2_in(0);
-          std::vector<MX> outputs = base.map(n)(std::vector<MX>(node_inputs.begin(), node_inputs.end()));
+          std::vector<MX> outputs =
+              base.map(n)(std::vector<MX>(node_inputs.begin(), node_inputs.end()));
           for (int j = 0; j < node.output_size(); ++j) value_map[node.output(j)] = outputs[j];
           continue;
         }
@@ -287,7 +290,8 @@ namespace casadi {
         casadi_int si = 0, ci = 0;
         for (casadi_int j = 0; j < nout; ++j) {
           if (reduce_out[j]) value_map[node.output(si++)] = outs[j];
-          else value_map[node.output(M + ci++)] = outs[j];
+          else
+            value_map[node.output(M + ci++)] = outs[j];
         }
         continue;
 
@@ -387,8 +391,8 @@ namespace casadi {
                     "Unknown output tensor: " + output_name +
                     ". This usually means the ONNX graph contains unsupported operations.");
 
-      // No output overlay: each op restores its own output sparsity from seeds during export, so the
-      // value already carries the exact CasADi pattern (re-propagated natively from the seeds).
+      // No output overlay: each op restores its own output sparsity from seeds during export, so
+      // the value already carries the exact CasADi pattern (re-propagated natively from the seeds).
       func_outputs.push_back(value_map.at(output_name));
       output_names.push_back(output_name);
 
@@ -458,7 +462,8 @@ namespace casadi {
     process_graph_initializers(graph, scope, verbose_);
     process_graph_nodes(graph, scope, verbose_);
     std::vector<MX> outputs;
-    for (int i = 0; i < graph.output_size(); ++i) outputs.push_back(scope.at(graph.output(i).name()));
+    for (int i = 0; i < graph.output_size(); ++i)
+      outputs.push_back(scope.at(graph.output(i).name()));
     return outputs;
   }
 
@@ -468,7 +473,8 @@ namespace casadi {
     casadi_assert(m.is_constant(), "Expected a constant integer tensor");
     DM dm = static_cast<DM>(m);
     std::vector<casadi_int> v;
-    for (casadi_int k = 0; k < dm.numel(); ++k) v.push_back(static_cast<casadi_int>(dm(k).scalar()));
+    for (casadi_int k = 0; k < dm.numel(); ++k)
+      v.push_back(static_cast<casadi_int>(dm(k).scalar()));
     return v;
   }
 
@@ -644,9 +650,10 @@ namespace casadi {
       std::string sb = eq.substr(comma + 1, arrow - comma - 1);
       std::string sc = eq.substr(arrow + 2);
 
-      // Transpose-rep: the exporter reversed each subscript to label the axis-reversed ONNX tensors.
-      // node_inputs here are the imported CasADi values (transposed back to LOGICAL axis order), so
-      // reverse the subscripts back to natural order to pair them with the logical axes (size1,size2).
+      // Transpose-rep: the exporter reversed each subscript to label the axis-reversed ONNX
+      // tensors. node_inputs here are the imported CasADi values (transposed back to LOGICAL axis
+      // order), so reverse the subscripts back to natural order to pair them with the logical axes
+      // (size1,size2).
       std::reverse(sa.begin(), sa.end());
       std::reverse(sb.begin(), sb.end());
       std::reverse(sc.begin(), sc.end());
@@ -714,7 +721,8 @@ namespace casadi {
       DM shape_dm = static_cast<DM>(node_inputs[1]);
       // ONNX Reshape is PSEUDO-DENSE (it operates on the full numel), so densify the operand here:
       // this is the ONE place the imported graph must drop sparsity, because CasADi's own reshape
-      // PRESERVES it (a sparse operand would reshape to a flat with only nnz entries, shifting every
+      // PRESERVES it (a sparse operand would reshape to a flat with only nnz entries, shifting
+      // every
       // downstream Gather/Scatter index). True sparsity propagates everywhere else.
       if (shape_dm.numel() > 2) {
         // 3-D reshape (the Map/Scan lift envelope): CasADi is 2-D, so pass through unchanged
@@ -740,7 +748,8 @@ namespace casadi {
 
     } else if (op_type == "Slice") {
       // Inputs: data, starts, ends, [axes], [steps].
-      casadi_assert(node_inputs.size() >= 3, "Slice requires at least 3 inputs (data, starts, ends)");
+      casadi_assert(node_inputs.size() >= 3,
+                    "Slice requires at least 3 inputs (data, starts, ends)");
 
       MX data = node_inputs[0];
       casadi_assert(node_inputs[1].is_constant() && node_inputs[2].is_constant(),
@@ -772,8 +781,11 @@ namespace casadi {
         casadi_int st = static_cast<casadi_int>(starts_dm(a).scalar());
         casadi_int en = static_cast<casadi_int>(ends_dm(a).scalar());
         casadi_int sp = steps[a];
-        if (axes[a] == 0) { col_slice = Slice(st, en > ncol ? ncol : en, sp); }  // -> CasADi cols
-        else              { row_slice = Slice(st, en > nrow ? nrow : en, sp); }  // -> CasADi rows
+        if (axes[a] == 0) {
+          col_slice = Slice(st, en > ncol ? ncol : en, sp);  // -> CasADi cols
+        } else {
+          row_slice = Slice(st, en > nrow ? nrow : en, sp);  // -> CasADi rows
+        }
       }
       output = data(row_slice, col_slice);
 
@@ -831,7 +843,8 @@ namespace casadi {
       MX se_upd = vec(node_inputs[2]);
       if (get_string_attribute(node, "reduction") == "add") {
         // {add,addparam}nonzeros: out = data with data.nz[idx] += updates, accumulating DUPLICATE
-        // idx. No direct MX builder; it is the reverse-mode adjoint of a (parametric) getnonzeros --
+        // idx. No direct MX builder; it is the reverse-mode adjoint of a (parametric)
+        // getnonzeros --
         // jtimes(w.nz[idx], w, updates, true) is the scatter-add (dups summed) into a zero frame.
         MX w = MX::sym("scel_w", se_data.numel(), 1), g;
         if (se_idx.is_constant()) {
