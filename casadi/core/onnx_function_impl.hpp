@@ -58,7 +58,7 @@ namespace casadi {
 
       \date 2024
 
-      */
+      \identifier{2jl} */
   class CASADI_EXPORT OnnxFunction : public FunctionInternal, public PluginInterface<OnnxFunction> {
    public:
     /// Construct by freezing a snapshot of a builder's metadata + config (exposed selection)
@@ -79,7 +79,9 @@ namespace casadi {
     struct Exposed { };
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+
+        \identifier{2jm} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -92,7 +94,9 @@ namespace casadi {
     Sparsity get_sparsity_in(casadi_int i) override { return tensor_sparsity(in_.at(i).shape); }
     Sparsity get_sparsity_out(casadi_int i) override { return tensor_sparsity(out_.at(i).shape); }
 
-    /** \brief Initialize */
+    /** \brief Initialize
+
+        \identifier{2jn} */
     void init(const Dict& opts) override;
 
     void* alloc_mem() const override { return new OnnxMemory(); }
@@ -122,13 +126,21 @@ namespace casadi {
                           const std::vector<std::string>& onames,
                           const Dict& opts) const override;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{2jo} */
     void serialize_body(SerializingStream &s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{2jp} */
     void serialize_type(SerializingStream &s) const override;
-    /** \brief String used to identify the immediate FunctionInternal subclass */
+    /** \brief String used to identify the immediate FunctionInternal subclass
+
+        \identifier{2jq} */
     std::string serialize_base_function() const override { return "Onnx"; }
-    /** \brief Deserialize into a plugin instance (dispatches on the plugin name) */
+    /** \brief Deserialize into a plugin instance (dispatches on the plugin name)
+
+        \identifier{2jr} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
     /// Documentation string

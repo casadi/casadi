@@ -38,7 +38,7 @@ namespace casadi {
 
       The format-neutral GraphBuilder analogue of DaeBuilder's Variable.
 
-      */
+      \identifier{2ju} */
   struct CASADI_EXPORT Node
     : public SWIG_IF_ELSE(PrintableCommon, Printable<Node>) {
     std::string name;                     ///< Tensor name
@@ -61,7 +61,7 @@ namespace casadi {
 
       \date 2026
 
-      */
+      \identifier{2jv} */
   class CASADI_EXPORT GraphBuilderInternal : public SharedObjectInternal {
    public:
     /// Construct from parsed model bytes of a given format

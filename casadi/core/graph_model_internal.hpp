@@ -43,7 +43,7 @@ namespace casadi {
 
       \date 2026
 
-      */
+      \identifier{2ji} */
   class CASADI_EXPORT GraphModelInternal
     : public SharedObjectInternal,
       public PluginInterface<GraphModelInternal> {
@@ -61,7 +61,9 @@ namespace casadi {
     struct Exposed { };
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+
+        \identifier{2jj} */
     static const Options options_;
     virtual const Options& get_options() const { return options_; }
     ///@}
@@ -69,7 +71,9 @@ namespace casadi {
     /// Prepare the backend for use
     void construct(const Dict& opts);
 
-    /** \brief Initialize */
+    /** \brief Initialize
+
+        \identifier{2jk} */
     virtual void init(const Dict& opts);
 
     /// Populate a builder's Node metadata from the parsed model

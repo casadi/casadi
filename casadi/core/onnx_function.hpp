@@ -45,27 +45,27 @@ namespace casadi {
 
       These free functions query and manage the runtime backend plugin registry.
 
-      */
+      \identifier{2j7} */
 
   ///@{
   /** \brief Check if a given ONNX runtime backend is available
 
-      */
+      \identifier{2j8} */
   CASADI_EXPORT bool has_onnxbackend(const std::string& solver);
 
   /** \brief Load an ONNX runtime backend
 
-      */
+      \identifier{2j9} */
   CASADI_EXPORT void load_onnxbackend(const std::string& solver);
 
   /** \brief List available ONNX runtime backends
 
-      */
+      \identifier{2ja} */
   CASADI_EXPORT std::vector<std::string> onnxbackend_solvers();
 
   /** \brief Get documentation for an ONNX runtime backend
 
-      */
+      \identifier{2jb} */
   CASADI_EXPORT std::string onnxbackend_doc(const std::string& solver);
   ///@}
 

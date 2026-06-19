@@ -43,7 +43,7 @@ namespace casadi {
 
       \date 2026
 
-      */
+      \identifier{2jc} */
   class CASADI_EXPORT GraphModel : public SharedObject {
    public:
     /// Readable name of the class

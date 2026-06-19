@@ -17413,6 +17413,399 @@ C++ includes: global_options.hpp
 ";
 
 
+// File: classcasadi_1_1GraphBuilder.xml
+
+
+/*
+ Model introspection 
+*/
+
+/*
+ Configuration 
+*/
+%feature("docstring") casadi::GraphBuilder "
+
+[INTERNAL] 
+A mutable, format-neutral interface to a computational-graph 
+model.
+
+Two-stage workflow: explore and configure a model (introspection, 
+dynamic-
+dimension binding) with  GraphBuilder, then freeze it into an immutable, 
+evaluable  Function.
+
+
+
+::
+
+  GraphBuilder b(\"model.onnx\");
+  b.bind_dim(\"batch\", 4);
+  Function f = b.create(\"net\");
+  
+
+
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2jd
+
+C++ includes: graph_builder.hpp
+";
+
+%feature("docstring") casadi::GraphBuilder::n_in "
+
+[INTERNAL] 
+Declared shape of a tensor (input or output) by name; -1 for 
+dynamic 
+dimensions.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L76
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L100-L100
+
+";
+
+%feature("docstring") casadi::GraphBuilder::n_out "
+
+[INTERNAL] 
+Declared shape of a tensor (input or output) by name; -1 for 
+dynamic 
+dimensions.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L77
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L101-L101
+
+";
+
+%feature("docstring") casadi::GraphBuilder::name_in "
+
+[INTERNAL] 
+Declared shape of a tensor (input or output) by name; -1 for 
+dynamic 
+dimensions.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L78
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L102-L102
+
+";
+
+%feature("docstring") casadi::GraphBuilder::name_out "
+
+[INTERNAL] 
+Declared shape of a tensor (input or output) by name; -1 for 
+dynamic 
+dimensions.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L79
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L103-L103
+
+";
+
+%feature("docstring") casadi::GraphBuilder::dimension "
+
+[INTERNAL] 
+Declared shape of a tensor (input or output) by name; -1 for 
+dynamic 
+dimensions.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L81
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L104-L106
+
+";
+
+%feature("docstring") casadi::GraphBuilder::dtype "
+
+[INTERNAL] 
+Element type name of a tensor (input or output) by name (FLOAT, 
+INT64,
+ ...)
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L83
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L107-L109
+
+";
+
+%feature("docstring") casadi::GraphBuilder::dimension_param "
+
+[INTERNAL] 
+Per-axis symbolic dimension name of a tensor by name (\"\" for 
+static 
+axes)
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L85
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L110-L112
+
+";
+
+%feature("docstring") casadi::GraphBuilder::dynamic_params "
+
+[INTERNAL] 
+Names of the symbolic/dynamic dimensions in the model.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L87
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L113-L115
+
+";
+
+%feature("docstring") casadi::GraphBuilder::bind_dim "
+
+[INTERNAL] 
+Bind a symbolic/dynamic dimension to a concrete size.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L93
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L117-L119
+
+";
+
+%feature("docstring") casadi::GraphBuilder::bind_shape "
+
+[INTERNAL] 
+Pin the full shape of an input.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L95
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L120-L123
+
+";
+
+%feature("docstring") casadi::GraphBuilder::set "
+
+[INTERNAL] 
+Bake a scalar value into an input.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L99
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L127-L129
+
+>  void casadi::GraphBuilder::set(const std::string &input_name, double value)
+------------------------------------------------------------------------
+[INTERNAL] 
+Bake a scalar value into an input.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L99
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L127-L129
+
+";
+
+";
+
+%feature("docstring") casadi::GraphBuilder::get "
+
+[INTERNAL] 
+Access functions of the node
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L139
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L91-L93
+
+";
+
+%feature("docstring") casadi::GraphBuilder::type_name "
+
+[INTERNAL] 
+Readable name of the class.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L54
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L54-L54
+
+";
+
+%feature("docstring") casadi::GraphBuilder::GraphBuilder "
+
+[INTERNAL] 
+Construct from model data in memory.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L67
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L80-L83
+
+>  casadi::GraphBuilder::GraphBuilder(const std::string &name, const std::vector< uint8_t > &model_data, const std::string &format, const Dict &opts=Dict())
+------------------------------------------------------------------------
+[INTERNAL] 
+Construct from model data in memory.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L67
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L80-L83
+
+";
+
+";
+
+%feature("docstring") casadi::GraphBuilder::name "
+
+[INTERNAL] 
+Name of the model.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L72
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L95-L98
+
+";
+
+%feature("docstring") casadi::GraphBuilder::create "
+
+[INTERNAL] 
+Freeze into an evaluable  Function, default naming.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2jg
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L127
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L127-L127
+
+>  Function casadi::GraphBuilder::create() const
+------------------------------------------------------------------------
+[INTERNAL] 
+Freeze into an evaluable  Function, default naming.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2jg
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L127
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L127-L127
+
+";
+
+";
+
+%feature("docstring") casadi::GraphBuilder::export_onnx "
+
+[INTERNAL] 
+Export to an ONNX model file.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2jh
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.hpp#L132
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_builder.cpp#L140-L142
+
+";
+
+%feature("docstring") casadi::GraphBuilder::class_name "
+
+[INTERNAL] 
+Get class name.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_au
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.hpp#L85
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.cpp#L31-L33
+
+";
+
+%feature("docstring") casadi::GraphBuilder::disp "
+
+[INTERNAL] 
+Print a description of the object.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.hpp#L88
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.cpp#L35-L41
+
+";
+
+%feature("docstring") casadi::GraphBuilder::get_str "
+
+[INTERNAL] 
+Get string representation.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.hpp#L91
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.hpp#L91-L95
+
+";
+
+%feature("docstring") casadi::GraphBuilder::debug_repr "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::GraphBuilder::is_null "
+
+[INTERNAL] 
+Is a null pointer?
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L116
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
+
+";
+
+%feature("docstring") casadi::GraphBuilder::__hash__ "
+
+[INTERNAL] 
+Returns a number that is unique for a given Node.
+
+If the Object does not point to any node, \"0\" is returned.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_av
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L123
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
+
+";
+
+
 // File: classcasadi_1_1ImplicitFixedStepIntegrator.xml
 %feature("docstring") casadi::ImplicitFixedStepIntegrator "
 
@@ -22625,6 +23018,109 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_matrix.hpp#L258-L
 ";
 
 
+// File: classcasadi_1_1ModelicaParser.xml
+%feature("docstring") casadi::ModelicaParser "
+
+[INTERNAL] 
+Modelica parser.
+
+Can be used for parsing Modelica files into CasADi data structures.
+
+Joris Gillis
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2j3
+
+C++ includes: modelica_parser.hpp
+";
+
+%feature("docstring") casadi::ModelicaParser::ModelicaParser "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::ModelicaParser::~ModelicaParser "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::ModelicaParser::parse "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::ModelicaParser::class_name "
+
+[INTERNAL] 
+Get class name.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_au
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.hpp#L85
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.cpp#L31-L33
+
+";
+
+%feature("docstring") casadi::ModelicaParser::disp "
+
+[INTERNAL] 
+Print a description of the object.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.hpp#L88
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.cpp#L35-L41
+
+";
+
+%feature("docstring") casadi::ModelicaParser::get_str "
+
+[INTERNAL] 
+Get string representation.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.hpp#L91
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/shared_object.hpp#L91-L95
+
+";
+
+%feature("docstring") casadi::ModelicaParser::debug_repr "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::ModelicaParser::is_null "
+
+[INTERNAL] 
+Is a null pointer?
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L116
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L113-L115
+
+";
+
+%feature("docstring") casadi::ModelicaParser::__hash__ "
+
+[INTERNAL] 
+Returns a number that is unique for a given Node.
+
+If the Object does not point to any node, \"0\" is returned.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_av
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared.hpp#L123
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/generic_shared_impl.hpp#L141-L143
+
+";
+
+
 // File: classcasadi_1_1MX.xml
 
 
@@ -26204,6 +26700,32 @@ C++ includes: optistack_internal.hpp
 %feature("docstring") std::numeric_limits< casadi::SXElem > "
 
 [INTERNAL] C++ includes: sx_elem.hpp
+";
+
+
+// File: classcasadi_1_1Onnx.xml
+%feature("docstring") casadi::Onnx "
+
+[INTERNAL] 
+Diagrams
+--------
+
+
+
+C++ includes: e0_diagram.hpp
+";
+
+
+// File: classcasadi_1_1OnnxFunction.xml
+%feature("docstring") casadi::OnnxFunction "
+
+[INTERNAL] 
+Diagrams
+--------
+
+
+
+C++ includes: e0_diagram.hpp
 ";
 
 
@@ -37472,6 +37994,45 @@ https://github.com/casadi/casadi/blob/main/casadi/core/generic_type.cpp#L827-L83
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::IndexReduction::has_graphmodel "
+
+[INTERNAL] 
+Check if a graph-model format plugin is available.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_model.hpp#L77
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_model.cpp#L77-L77
+
+";
+
+%feature("docstring") casadi::IndexReduction::load_graphmodel "
+
+[INTERNAL] 
+Explicitly load a graph-model format plugin.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_model.hpp#L78
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_model.cpp#L78-L78
+
+";
+
+%feature("docstring") casadi::IndexReduction::doc_graphmodel "
+
+[INTERNAL] 
+Get format-specific documentation.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_model.hpp#L79
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/graph_model.cpp#L79-L79
+
+";
+
 %feature("docstring") casadi::IndexReduction::is_slice "
 
 [INTERNAL] 
@@ -38202,6 +38763,45 @@ https://github.com/casadi/casadi/blob/main/casadi/core/linsol.cpp#L237-L239
 
 ";
 
+%feature("docstring") casadi::IndexReduction::has_modelicaparser "
+
+[INTERNAL] 
+Check if a particular plugin is available.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/modelica_parser.hpp#L60
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/modelica_parser.cpp#L60-L62
+
+";
+
+%feature("docstring") casadi::IndexReduction::load_modelicaparser "
+
+[INTERNAL] 
+Explicitly load a plugin dynamically.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/modelica_parser.hpp#L64
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/modelica_parser.cpp#L64-L66
+
+";
+
+%feature("docstring") casadi::IndexReduction::doc_modelicaparser "
+
+[INTERNAL] 
+Get solver specific documentation.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/modelica_parser.hpp#L68
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/modelica_parser.cpp#L68-L70
+
+";
+
 %feature("docstring") casadi::IndexReduction::kron_contract "
 
 [INTERNAL] 
@@ -38534,6 +39134,66 @@ https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.hpp#L927
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/nlpsol.cpp#L927-L929
+
+";
+
+%feature("docstring") casadi::IndexReduction::has_onnxbackend "
+
+[INTERNAL] 
+Check if a given ONNX runtime backend is available.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2j8
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/onnx_function.hpp#L31
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/onnx_function.cpp#L31-L33
+
+";
+
+%feature("docstring") casadi::IndexReduction::load_onnxbackend "
+
+[INTERNAL] 
+Load an ONNX runtime backend.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2j9
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/onnx_function.hpp#L35
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/onnx_function.cpp#L35-L37
+
+";
+
+%feature("docstring") casadi::IndexReduction::onnxbackend_solvers "
+
+[INTERNAL] 
+List available ONNX runtime backends.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2ja
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/onnx_function.hpp#L39
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/onnx_function.cpp#L39-L43
+
+";
+
+%feature("docstring") casadi::IndexReduction::onnxbackend_doc "
+
+[INTERNAL] 
+Get documentation for an ONNX runtime backend.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2jb
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/onnx_function.hpp#L45
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/onnx_function.cpp#L45-L47
 
 ";
 
@@ -38885,6 +39545,9 @@ https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76
 // File: group__nlpsol.xml
 
 
+// File: group__main__onnx.xml
+
+
 // File: group__main__rootfinder.xml
 
 
@@ -38979,6 +39642,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76
 
 
 // File: group__plugin__Nlpsol__knitro.xml
+
+
+
+// File: group__plugin__ModelicaParser__lacemodelica.xml
 
 
 
@@ -39220,10 +39887,22 @@ https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76
 // File: group__plugins__Filesystem.xml
 
 
+// File: group__pluginlist__ModelicaParser.xml
+
+
+// File: group__plugins__ModelicaParser.xml
+
+
 // File: group__pluginlist__Archiver.xml
 
 
 // File: group__plugins__Archiver.xml
+
+
+// File: group__pluginlist__Onnx.xml
+
+
+// File: group__plugins__Onnx.xml
 
 
 // File: group__pluginlist__Dple.xml
@@ -39338,6 +40017,20 @@ https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76
 
 
 // File: group__general__Nlpsol.xml
+
+
+// File: group__plugin__GraphModel__onnx.xml
+
+
+
+// File: group__general__Onnx.xml
+
+
+// File: group__general__OnnxFunction.xml
+
+
+// File: group__plugin__Onnx__ort.xml
+
 
 
 // File: group__plugin__Conic__proxqp.xml

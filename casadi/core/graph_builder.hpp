@@ -45,7 +45,7 @@ namespace casadi {
 
       \date 2026
 
-      */
+      \identifier{2jd} */
   class CASADI_EXPORT GraphBuilder
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<GraphBuilder>) {
@@ -107,7 +107,7 @@ namespace casadi {
         \param opts      "symbolic" (bool, default false) and "backend" (numeric backend,
                          default "ort"); any remaining options pass through to the backend.
 
-        */
+        \identifier{2je} */
     Function create(const std::string& name,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
@@ -118,15 +118,17 @@ namespace casadi {
         \param name  Name assigned to the resulting Function
         \param opts  See the full create() overload
 
-        */
+        \identifier{2jf} */
     Function create(const std::string& name, const Dict& opts = Dict()) const;
 
-    /** \brief Freeze into an evaluable Function, default naming */
+    /** \brief Freeze into an evaluable Function, default naming
+
+        \identifier{2jg} */
     Function create() const { return create(name() + "_graph"); }
 
     /** \brief Export to an ONNX model file
 
-        */
+        \identifier{2jh} */
     void export_onnx(const std::string& filename, const Dict& opts = Dict());
 
 #ifndef SWIG
