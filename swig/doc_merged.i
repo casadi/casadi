@@ -39485,6 +39485,9 @@ https://github.com/casadi/casadi/blob/main/casadi/core/tools.cpp#L44-L76
 [INTERNAL] ";
 
 
+// File: namespacecasadi_1_1_0d447.xml
+
+
 // File: namespacecasadi_1_1IndexReduction.xml
 
 
