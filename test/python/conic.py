@@ -116,7 +116,10 @@ if "SKIP_QPALM_TESTS" not in os.environ and ca.has_conic("qpalm"):
   conics.append(("qpalm",{"qpalm":{"eps_abs":eps,"eps_rel":eps,"eps_abs_in":eps,"eps_prim_inf":eps}},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "binary":False, "discrete": False, "sos":False}))
 
 if "SKIP_HIGHS_TESTS" not in os.environ and ca.has_conic("highs"):
-    codegen = {"extralibs": ["highs"], "std": "c99"}
+    highs_options = ["-Wno-unused-function"]
+    if os.name=='nt':
+      highs_options = []
+    codegen = {"extralibs": ["highs"], "extra_options": highs_options, "std": "c99"}
     conics.append(("highs",{"highs": {"primal_feasibility_tolerance":1e-7,"solver":"choose","output_flag":False,"ipm_iteration_limit":50000}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "binary":False, "discrete": True, "sos":False}))
 
 if "SKIP_DAQP_TESTS" not in os.environ and ca.has_conic("daqp"):
