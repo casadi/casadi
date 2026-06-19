@@ -157,7 +157,8 @@ namespace casadi {
         using dimension_overrides_ map. */
     casadi_int get_dimension(const onnx::TensorShapeProto& shape, int idx) const;
 
-    /** \brief Convert an ONNX TensorProto to a CasADi DM (DOUBLE/FLOAT/INT32/INT64/BOOL -> double) */
+    /** \brief Convert an ONNX TensorProto to a CasADi DM
+        (DOUBLE/FLOAT/INT32/INT64/BOOL -> double) */
     DM tensor_to_dm(const onnx::TensorProto& tensor) const;
 
     /** \brief Convert an ONNX SparseTensorProto (COO) to a sparse CasADi DM

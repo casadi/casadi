@@ -58,7 +58,7 @@ namespace casadi {
     {OP_INV, "Reciprocal", 1},
     {OP_TRANSPOSE, "Transpose", 1},
     {OP_NORM1, "ReduceL1", 1},
-    {OP_NORMF, "ReduceL2", 1},  // NORMF first: import uses norm_fro (works for vectors and matrices)
+    {OP_NORMF, "ReduceL2", 1},  // NORMF first: import uses norm_fro (vectors and matrices)
     {OP_NORM2, "ReduceL2", 1},
     {OP_MMIN, "ReduceMin", 1},
     {OP_MMAX, "ReduceMax", 1},
@@ -216,7 +216,8 @@ namespace casadi {
     add_int_constant(add_node, uniq + "_starts", starts);
     add_int_constant(add_node, uniq + "_ends", ends);
     add_int_constant(add_node, uniq + "_axes", axes);
-    if (!steps.empty()) add_int_constant(add_node, uniq + "_steps", steps);  // before the Slice node
+    // before the Slice node
+    if (!steps.empty()) add_int_constant(add_node, uniq + "_steps", steps);
     onnx::NodeProto* node = add_node();
     node->set_op_type("Slice");
     node->add_input(data);
@@ -351,7 +352,8 @@ namespace casadi {
     bool has_fill = false;
     for (casadi_int& v : idx) {
       if (v < 0) { v = numel_in; has_fill = true; }  // -> the appended zero (below)
-      else v = loc[v];
+      else
+        v = loc[v];
     }
 
     // Flatten the input to a 1 x numel ROW vector (skip when it is already a row)
@@ -390,7 +392,8 @@ namespace casadi {
       // exact numerics (zero outside out_sp). The pattern is then restored to out_sp natively via
       // the seed recipe -- import re-propagates out_sp for free (no overlay).
       std::vector<casadi_int> ofind = out_sp.find();
-      std::string zname = "gnz_zeros_" + uniq, fname = "gnz_ofind_" + uniq, scat = "gnz_scat_" + uniq;
+      std::string zname = "gnz_zeros_" + uniq, fname = "gnz_ofind_" + uniq;
+      std::string scat = "gnz_scat_" + uniq;
       add_real_constant(add_node, zname, std::vector<double>(numel_out, 0.0), {1, numel_out});
       add_int_constant(add_node, fname, ofind, {1, static_cast<casadi_int>(ofind.size())});
       onnx::NodeProto* sc = add_node();
@@ -564,7 +567,8 @@ namespace casadi {
 
       case OP_OUTPUT: {
         // Connect the work value to the output name; o_vec[0] is the output slot, not a work index
-        create_unary_node(add_node, "Identity", work_to_onnx[i_vec[0]], onnx_output_name(f, o_vec[0]));
+        create_unary_node(add_node, "Identity", work_to_onnx[i_vec[0]],
+                          onnx_output_name(f, o_vec[0]));
         return true;
       }
 
@@ -690,7 +694,8 @@ namespace casadi {
 
       case OP_LE: {
         std::string b = "cmp_" + std::to_string(k);
-        create_binary_node(add_node, "LessOrEqual", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], b);
+        create_binary_node(add_node, "LessOrEqual", work_to_onnx[i_vec[0]],
+                           work_to_onnx[i_vec[1]], b);
         create_cast_node(add_node, b, node_output, real_type());
         work_to_onnx[o_vec[0]] = node_output;
         return true;
@@ -728,7 +733,8 @@ namespace casadi {
       }
 
       case OP_FMIN:
-        create_binary_node(add_node, "Min", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        create_binary_node(add_node, "Min", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]],
+                           node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
@@ -755,14 +761,16 @@ namespace casadi {
       }
 
       case OP_FMAX:
-        create_binary_node(add_node, "Max", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], node_output);
+        create_binary_node(add_node, "Max", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]],
+                           node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
 
       case OP_NE: {
         // Not equal: Not(Equal(...)), then cast the bool result to double
         std::string equal_result = "equal_" + std::to_string(k);
-        create_binary_node(add_node, "Equal", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], equal_result);
+        create_binary_node(add_node, "Equal", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]],
+                           equal_result);
         std::string r = "bres_" + std::to_string(k);
         create_unary_node(add_node, "Not", equal_result, r);
         create_cast_node(add_node, r, node_output, real_type());
@@ -784,7 +792,8 @@ namespace casadi {
       case OP_DOT: {
         // dot(a, b) = ReduceSum(Mul(a, b))
         std::string mul_result = "mul_" + std::to_string(k);
-        create_binary_node(add_node, "Mul", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]], mul_result);
+        create_binary_node(add_node, "Mul", work_to_onnx[i_vec[0]], work_to_onnx[i_vec[1]],
+                           mul_result);
         create_unary_node(add_node, "ReduceSum", mul_result, node_output);
         work_to_onnx[o_vec[0]] = node_output;
         return true;
@@ -805,7 +814,8 @@ namespace casadi {
         // Rank-1 update input[0] + input[1]*input[2]*input[3]'. Gemm(transB) forms x*y'
         // without a separate Transpose; input[1] is a scalar alpha.
         std::string xyt = "rank1_" + std::to_string(k);
-        create_gemm_node(add_node, work_to_onnx[i_vec[2]], work_to_onnx[i_vec[3]], "", xyt, false, true);
+        create_gemm_node(add_node, work_to_onnx[i_vec[2]], work_to_onnx[i_vec[3]], "", xyt,
+                         false, true);
         std::string scaled = "rank1s_" + std::to_string(k);
         create_binary_node(add_node, "Mul", work_to_onnx[i_vec[1]], xyt, scaled);
         create_binary_node(add_node, "Add", work_to_onnx[i_vec[0]], scaled, node_output);
@@ -834,8 +844,9 @@ namespace casadi {
         for (casadi_int L : la) sa += letter[L];
         for (casadi_int L : lb) sb += letter[L];
         for (casadi_int L : lc) sc += letter[L];
-        // Transpose-rep: emit_colmajor_reshape stores each operand with axes REVERSED (logical d0xd1
-        // -> ONNX [d1,d0]). Reverse each subscript so the equation labels the stored axes correctly;
+        // Transpose-rep: emit_colmajor_reshape stores each operand with axes REVERSED (logical
+        // d0xd1 -> ONNX [d1,d0]). Reverse each subscript so the equation labels the stored axes
+        // correctly;
         // the reversed-axis output then flattens column-major back into C's vector.
         std::reverse(sa.begin(), sa.end());
         std::reverse(sb.begin(), sb.end());
@@ -869,7 +880,8 @@ namespace casadi {
       case OP_KRON: {
         // Kronecker product kron(A, B), A is ra x ca, B is rb x cb, result (ra*rb) x (ca*cb).
         // kron commutes with transpose: kron(A,B)^T == kron(A^T,B^T). The stored tensors are the
-        // transposes (At=[ca,ra], Bt=[cb,rb]) and the stored output is the result's transpose, so in
+        // transposes (At=[ca,ra], Bt=[cb,rb]) and the stored output is the result's transpose, so
+        // in
         // stored space kron maps to kron of the stored operands with NO extra transposes. Emit
         //   A4 = Reshape(At, [ca,1,ra,1]);  B4 = Reshape(Bt, [1,cb,1,rb])
         //   P  = Mul(A4, B4)  -> broadcast [ca,cb,ra,rb]
@@ -884,10 +896,11 @@ namespace casadi {
         std::string uniq = std::to_string(k);
         std::string tag = "kron" + uniq;
 
-        // ONNX node names must be unique; give each kron node a distinct name sharing the "kron<k>_"
+        // ONNX node names must be unique; give each kron node a distinct name sharing the
+        // "kron<k>_"
         // prefix and a role suffix the importer dispatches on.
         auto emit_reshape = [&](const std::string& data, const std::vector<casadi_int>& shape,
-                                const std::string& out, const std::string& role) {
+                                const std::string& out, const std::string& role) -> void {
           add_int_constant(add_node, out + "_s", shape);
           onnx::NodeProto* rn = create_unary_node(add_node, "Reshape", data, out);
           rn->add_input(out + "_s");
@@ -908,7 +921,8 @@ namespace casadi {
       // Tensor operations
       case OP_RESHAPE: {
         // ONNX Reshape is pseudo-dense; the importer densifies the operand (it must, to keep flat
-        // indices aligned), so a non-dense reshape result is restored to its CasADi pattern natively
+        // indices aligned), so a non-dense reshape result is restored to its CasADi pattern
+        // natively
         // from the seed (no overlay).
         auto sp = f.instruction_MX(k).sparsity();
         if (sp.is_dense()) {
@@ -1107,7 +1121,8 @@ namespace casadi {
             if (grid && rstep > 0 && cstep > 0) {
               for (casadi_int cj = 0; cj < nc && grid; ++cj)
                 for (casadi_int ri = 0; ri < k && grid; ++ri)
-                  if (idx[cj * k + ri] != (c0 + cj * cstep) * m_in + (r0 + ri * rstep)) grid = false;
+                  if (idx[cj * k + ri] != (c0 + cj * cstep) * m_in + (r0 + ri * rstep))
+                    grid = false;
               if (grid) {
                 create_slice_node(add_node, "gnzs_" + uniq, data,
                     {c0, r0}, {c0 + (nc - 1) * cstep + 1, r0 + (k - 1) * rstep + 1},
@@ -1124,7 +1139,8 @@ namespace casadi {
               std::vector<casadi_int> exp;
               for (casadi_int p = 0; p < nnz_in; ++p) if (irow[p] == r) exp.push_back(p);
               if (exp == idx) {
-                create_slice_node(add_node, "gnzs_" + uniq, data, {r}, {r + 1}, {1}, {}, node_output);
+                create_slice_node(add_node, "gnzs_" + uniq, data, {r}, {r + 1}, {1}, {},
+                                  node_output);
                 work_to_onnx[o_vec[0]] = node_output;
                 return true;
               }
@@ -1134,7 +1150,8 @@ namespace casadi {
               std::vector<casadi_int> exp;
               for (casadi_int p = 0; p < nnz_in; ++p) if (icol[p] == c) exp.push_back(p);
               if (exp == idx) {
-                create_slice_node(add_node, "gnzs_" + uniq, data, {c}, {c + 1}, {0}, {}, node_output);
+                create_slice_node(add_node, "gnzs_" + uniq, data, {c}, {c + 1}, {0}, {},
+                                  node_output);
                 work_to_onnx[o_vec[0]] = node_output;
                 return true;
               }
@@ -1207,7 +1224,8 @@ namespace casadi {
         // x: ScatterElements(flat[1,numel], dpos[1,np], updates[1,np], axis=1, reduction). ADD uses
         // reduction="add" (adds onto x AND accumulates DUPLICATE p, as the getnonzeros-adjoint
         // requires); SET uses "none" (overwrite, last wins). Mirrors OP_GETNONZEROS_PARAM's
-        // flatten + INT64 cast + find() nz->dense map. ADDNONZEROS_PARAM has no direct MX builder --
+        // flatten + INT64 cast + find() nz->dense map. ADDNONZEROS_PARAM has no direct MX builder
+        // --
         // it is the reverse-mode adjoint of a parametric getnonzeros; the importer rebuilds it so.
         bool add = (op == OP_ADDNONZEROS_PARAM);
         MX mx_snzp = f.instruction_MX(k);
@@ -1244,7 +1262,8 @@ namespace casadi {
         std::string updates = work_to_onnx[i_vec[1]];
         if (mx_snzp.dep(1).size2() != 1) {
           updates = "snzp_v_" + uniq;
-          emit_colmajor_reshape(add_node, work_to_onnx[i_vec[1]], {np_idx, 1}, updates, "snzp_v_" + uniq);
+          emit_colmajor_reshape(add_node, work_to_onnx[i_vec[1]], {np_idx, 1}, updates,
+                                "snzp_v_" + uniq);
         }
 
         // ScatterElements onto the flat row.
@@ -1262,7 +1281,8 @@ namespace casadi {
 
         // Reshape the modified flat back to x's stored shape, then restore the output pattern.
         std::string back = "snzp_back_" + uniq;
-        emit_colmajor_reshape(add_node, scat, {mx_snzp.size1(), mx_snzp.size2()}, back, "snzp_back_" + uniq);
+        emit_colmajor_reshape(add_node, scat, {mx_snzp.size1(), mx_snzp.size2()}, back,
+                              "snzp_back_" + uniq);
         std::string r = emit_sparsity_restore(add_node, back,
                             Sparsity::dense(mx_snzp.size1(), mx_snzp.size2()),
                             mx_snzp.sparsity(), "snzpr_" + uniq, node_output);
@@ -1272,7 +1292,8 @@ namespace casadi {
 
       case OP_PROJECT: {
         // project(A, sp_out) / densify keeps the matrix shape and only ZEROS the dense cells not in
-        // sp_out (it never permutes data). Numerically that is project(A, sp_out); pseudo-dense, the
+        // sp_out (it never permutes data). Numerically that is project(A, sp_out); pseudo-dense,
+        // the
         // emit_sparsity_restore seed reproduces both the numerics and the exact import pattern
         // sp_out natively (no overlay): densify -> dense Add-zero; widening -> sparse Add-zeros;
         // narrowing -> sparse Mul-ones then Add-zeros.
@@ -1291,7 +1312,8 @@ namespace casadi {
         // ScatterND: scatter z's values into the 2-D pseudo-dense x at the (row,col) COORDINATES of
         // the target cells -- the canonical subtensor write, no flatten/reshape. idx address x's
         // NONZERO array -> map to dense column-major positions with find() (identity if dense).
-        // ADDNONZEROS uses reduction="add" (adds onto x AND accumulates DUPLICATE idx, as required by
+        // ADDNONZEROS uses reduction="add" (adds onto x AND accumulates DUPLICATE idx, as required
+        // by
         // the adjoint of a getnonzeros with repeated indices); SETNONZEROS overwrites (reduction
         // "none"). ADDNONZEROS cannot be built as an MX directly -- it arises from reverse-mode AD
         // (jtimes) of a getnonzeros; the importer reconstructs it that way.
@@ -1329,13 +1351,15 @@ namespace casadi {
         std::string ind = "snz_idx_" + uniq;
         add_int_constant(add_node, ind, coords, {static_cast<casadi_int>(idx.size()), 2});
 
-        // updates for ScatterND must be a 1-D [nnz] tensor. Build z's nonzeros while still 2-D (CasADi
+        // updates for ScatterND must be a 1-D [nnz] tensor. Build z's nonzeros while still 2-D
+        // (CasADi
         // has no true 1-D, so a 2-D Gather round-trips cleanly), then reshape to 1-D last.
         casadi_int numel_z = mx_set.dep(1).numel();
         std::string vals = work_to_onnx[i_vec[1]];
         if (mx_set.dep(1).size2() != 1) {  // flatten to a (1,numel_z) row (a column on import)
           vals = "snz_zr_" + uniq;
-          emit_colmajor_reshape(add_node, work_to_onnx[i_vec[1]], {numel_z, 1}, vals, "snz_zr_" + uniq);
+          emit_colmajor_reshape(add_node, work_to_onnx[i_vec[1]], {numel_z, 1}, vals,
+                                "snz_zr_" + uniq);
         }
         // The write positions are z's NONZEROS, so a SPARSE z contributes only its nonzeros.
         if (mx_set.dep(1).nnz() != numel_z) {

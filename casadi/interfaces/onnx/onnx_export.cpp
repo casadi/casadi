@@ -136,12 +136,13 @@ namespace casadi {
           output_segment_sparsity[output_idx][offset] = mx.dep(0).sparsity();
         } else {
           // Single-segment output. A reshape can fold into the output (no OP_RESHAPE
-          // instruction): the source shape then differs from the declared output shape. A folded
-          // reshape densifies on import, so when the output pattern is non-dense, route the assembly
-          // through a temp and restore the exact pattern natively from the seed (no overlay).
+          // instruction): the source shape then differs from the declared output shape. A
+          // folded reshape densifies on import, so when the output pattern is non-dense, route
+          // the assembly through a temp and restore the exact pattern natively from the seed
+          // (no overlay).
           MX dep = mx.dep(0);
           Sparsity out_sp = f.sparsity_out(output_idx);
-          auto add_node = [graph]() { return graph->add_node(); };
+          auto add_node = [graph]() -> onnx::NodeProto* { return graph->add_node(); };
           bool folded = (dep.size1() != out_sp.size1() || dep.size2() != out_sp.size2());
           if (folded && !out_sp.is_dense()) {
             std::string tmp = "out_pre_" + std::to_string(k);
@@ -186,11 +187,13 @@ namespace casadi {
     //  - horzcat (all blocks full-height, size1==R): columns concatenated -> a single ONNX Concat.
     //    Transpose-rep: CasADi horzcat (axis 1) is ONNX axis 0 (matches OP_HORZCAT dispatch).
     //  - vertcat (all blocks full-width, size2==C): rows concatenated -> a single ONNX Concat on
-    //    the other axis. Transpose-rep: CasADi vertcat (axis 0) is ONNX axis 1 (matches OP_VERTCAT).
-    //  - diagcat (neither, genuine block-diagonal): Pad each DENSE block to (R,C) at its offset, Sum.
+    //    the other axis. Transpose-rep: CasADi vertcat (axis 0) is ONNX axis 1
+    //    (matches OP_VERTCAT).
+    //  - diagcat (neither, genuine block-diagonal): Pad each DENSE block to (R,C) at its
+    //    offset, Sum.
     // The assembly imports as a DENSE block; when the output pattern is non-dense, restore it
     // natively from the seed (no overlay) by routing the assembly through a temp.
-    auto seg_add_node = [graph]() { return graph->add_node(); };
+    auto seg_add_node = [graph]() -> onnx::NodeProto* { return graph->add_node(); };
     for (const auto& kv : output_segment_values) {
       casadi_int output_idx = kv.first;
       const auto& segments = kv.second;  // offset -> onnx_name, sorted by offset
@@ -212,13 +215,14 @@ namespace casadi {
       std::string uniq = "oseg" + std::to_string(output_idx);
 
       // Helper: write the assembly directly to oname when dense, else to a temp + restore.
-      auto finish = [&](const std::function<void(const std::string&)>& emit) {
+      auto finish = [&](const std::function<void(const std::string&)>& emit) -> void {
         if (out_sp.is_dense()) {
           emit(oname);
         } else {
           std::string tmp = oname + "_pre";
           emit(tmp);
-          emit_sparsity_restore(seg_add_node, tmp, Sparsity::dense(R, C), out_sp, uniq + "r", oname);
+          emit_sparsity_restore(seg_add_node, tmp, Sparsity::dense(R, C), out_sp,
+                                uniq + "r", oname);
         }
       };
 
@@ -256,8 +260,9 @@ namespace casadi {
 
     // Fuse trailing rename Identities: a node of the form Identity(src) -> oname, where oname is a
     // declared graph output and src is an internal node output used nowhere else, is a pure rename.
-    // Make the producing node write straight to oname and drop the Identity. Conservative: only when
-    // src is produced by exactly one node and consumed by exactly this Identity (so we never collapse
+    // Make the producing node write straight to oname and drop the Identity. Conservative: only
+    // when src is produced by exactly one node and consumed by exactly this Identity (so we never
+    // collapse
     // an output that aliases an input, or a value feeding two outputs / another consumer).
     {
       std::set<std::string> output_names;
@@ -310,13 +315,13 @@ namespace casadi {
 
     // An output not produced by any node (e.g. an all-structural-zero output, whose MXFunction has
     // no instructions) needs an explicit zero Constant so both ORT and the importer have a tensor.
-    // A non-dense pattern is planted directly as a sparse_value (all-zero) Constant -- the seed that
-    // imports to exactly that pattern; a dense output gets a plain dense zero Constant.
+    // A non-dense pattern is planted directly as a sparse_value (all-zero) Constant -- the seed
+    // that imports to exactly that pattern; a dense output gets a plain dense zero Constant.
     {
       std::set<std::string> produced;
       for (const auto& nd : graph->node())
         for (const auto& o : nd.output()) produced.insert(o);
-      auto add_node = [graph]() { return graph->add_node(); };
+      auto add_node = [graph]() -> onnx::NodeProto* { return graph->add_node(); };
       for (casadi_int i = 0; i < f.n_out(); ++i) {
         std::string oname = onnx_output_name(f, i);
         if (!produced.count(oname)) {
@@ -336,7 +341,8 @@ namespace casadi {
     // is planted as a standard sparse_initializer (all-zero values) sharing the input name -- an
     // optional input with a sparse zero default, readable by any ONNX tool. Import picks it up as a
     // sparse MX and re-propagates sparsity natively. OUTPUT patterns need no overlay: each op
-    // restores its own output sparsity from seeds (emit_sparsity_restore), so they recover for free.
+    // restores its own output sparsity from seeds (emit_sparsity_restore), so they recover for
+    // free.
     for (casadi_int i = 0; i < f.n_in(); ++i) {
       if (!f.sparsity_in(i).is_dense()) {
         fill_sparse_tensor(graph->add_sparse_initializer(), onnx_input_name(f, i),
@@ -397,7 +403,8 @@ namespace casadi {
   }
 
   void Onnx::assert_not_control_flow(const Function& called_func) const {
-    casadi_assert(!is_mapaccum_function(called_func), "ONNX export: mapaccum (Loop) is not supported.");
+    casadi_assert(!is_mapaccum_function(called_func),
+                  "ONNX export: mapaccum (Loop) is not supported.");
   }
 
   // Prefix the names a subgraph *defines* (graph inputs, initializers, node outputs) so they
@@ -654,7 +661,10 @@ namespace casadi {
     // Unwrap the MXFunction(wrapper) -> MapSum -> base function
     Function mapsum;
     for (const std::string& nm : wrapper.get_function()) {
-      if (wrapper.get_function(nm).class_name() == "MapSum") { mapsum = wrapper.get_function(nm); break; }
+      if (wrapper.get_function(nm).class_name() == "MapSum") {
+        mapsum = wrapper.get_function(nm);
+        break;
+      }
     }
     Function base = mapsum.get_function(mapsum.get_function().at(0));
 
@@ -671,7 +681,7 @@ namespace casadi {
       if (!reduce_out[j]) { n = wrapper.size2_out(j) / base.size2_out(j); break; }
     casadi_assert(n > 0, "ONNX export: reduce-map with no repeated inputs or outputs.");
 
-    AddNodeFn add_node = [container]() { return container->add_node(); };
+    AddNodeFn add_node = [container]() -> onnx::NodeProto* { return container->add_node(); };
 
     // Alias each reduce_in input so the body captures a uniquely-named outer tensor
     std::vector<std::string> capture_names(base.n_in());
@@ -710,9 +720,15 @@ namespace casadi {
     // Scan outputs: state accumulators (reduce_out) first, then concatenated scan outputs
     std::vector<std::string> state_out, scan_out;
     for (casadi_int j = 0; j < base.n_out(); ++j)
-      if (reduce_out[j]) { state_out.push_back(out_prefix + "_acc" + std::to_string(j)); scan->add_output(state_out.back()); }
+      if (reduce_out[j]) {
+        state_out.push_back(out_prefix + "_acc" + std::to_string(j));
+        scan->add_output(state_out.back());
+      }
     for (casadi_int j = 0; j < base.n_out(); ++j)
-      if (!reduce_out[j]) { scan_out.push_back(out_prefix + "_s" + std::to_string(j)); scan->add_output(scan_out.back()); }
+      if (!reduce_out[j]) {
+        scan_out.push_back(out_prefix + "_s" + std::to_string(j));
+        scan->add_output(scan_out.back());
+      }
 
     add_int_attribute(scan, "num_scan_inputs", static_cast<casadi_int>(scan_inputs.size()));
     add_ints_attribute(scan, "scan_input_axes", std::vector<casadi_int>(scan_inputs.size(), 0));
