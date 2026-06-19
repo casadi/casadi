@@ -31,6 +31,7 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <type_traits>
 
 namespace casadi {
 
@@ -328,15 +329,19 @@ namespace casadi {
         }
 
         s << "{";
-        bool all_zeros = v.size() > 0;
-        for (const auto& el : v) {
-            if (el != T(0)) {
-                all_zeros = false;
-                break;
+        // Shortcut only for arithmetic T; for std::string, `T(0)` would
+        // invoke std::string(const char*) with a null pointer.
+        bool all_zeros = std::is_arithmetic<T>::value && v.size() > 0;
+        if (all_zeros) {
+            for (const auto& el : v) {
+                if (el != T()) {
+                    all_zeros = false;
+                    break;
+                }
             }
         }
         if (all_zeros) {
-            s << constant(T(0)); // empty_initialization shorthand
+            s << constant(T()); // empty_initialization shorthand
         } else {
             for (casadi_int i = 0; i < v.size(); ++i) {
                 if (i != 0) {
@@ -435,6 +440,20 @@ namespace casadi {
                        const std::string& z, const Sparsity& sp_z,
                        const std::string& w, bool tr);
 
+    /** \brief Codegen dense matrix-matrix multiplication
+
+        \identifier{2gc} */
+    std::string mtimes(const std::string& x, casadi_int nrow_x, casadi_int ncol_x,
+                       const std::string& y, casadi_int ncol_y,
+                       const std::string& z, bool tr);
+
+    /** \brief Codegen dense-sparse matrix-matrix multiplication (z, x dense)
+
+        \identifier{2gd} */
+    std::string mtimes_dense_sparse(const std::string& x, casadi_int nrow_x,
+                                    const std::string& y, const Sparsity& sp_y,
+                                    const std::string& z);
+
     /** \brief Codegen lower triangular solve
 
         \identifier{ss} */
@@ -495,6 +514,12 @@ namespace casadi {
                    const std::string& v, const std::string& sp_r,
                    const std::string& r, const std::string& beta,
                    const std::string& prinv, const std::string& pc);
+
+    /** \brief Determinant from sparse QR factors
+
+        \identifier{2hy} */
+    std::string det(const std::string& sp_v, const std::string& v,
+                    const std::string& sp_r, const std::string& r, const std::string& beta);
 
     /** \brief QR solve
 
@@ -656,6 +681,18 @@ namespace casadi {
       AUX_AXPY,
       AUX_DOT,
       AUX_BILIN,
+      AUX_KRON,
+      AUX_KRON_DENSE,
+      AUX_KRON_DENSE_SPARSE,
+      AUX_KRON_SPARSE_DENSE,
+      AUX_KRON_CONTRACT_INNER,
+      AUX_KRON_CONTRACT_INNER_DENSE,
+      AUX_KRON_CONTRACT_INNER_DENSE_SPARSE,
+      AUX_KRON_CONTRACT_INNER_SPARSE_DENSE,
+      AUX_KRON_CONTRACT_OUTER,
+      AUX_KRON_CONTRACT_OUTER_DENSE,
+      AUX_KRON_CONTRACT_OUTER_DENSE_SPARSE,
+      AUX_KRON_CONTRACT_OUTER_SPARSE_DENSE,
       AUX_RANK1,
       AUX_NORM_1,
       AUX_NORM_2,
@@ -671,6 +708,8 @@ namespace casadi {
       AUX_MV,
       AUX_MV_DENSE,
       AUX_MTIMES,
+      AUX_MTIMES_DENSE,
+      AUX_MTIMES_DENSE_SPARSE,
       AUX_TRILSOLVE,
       AUX_TRIUSOLVE,
       AUX_PROJECT,
@@ -691,8 +730,10 @@ namespace casadi {
       AUX_ND_BOOR_EVAL,
       AUX_FINITE_DIFF,
       AUX_QR,
+      AUX_DET,
       AUX_QP,
       AUX_QRQP,
+      AUX_SOCP,
       AUX_NLP,
       AUX_SQPMETHOD,
       AUX_FEASIBLESQPMETHOD,

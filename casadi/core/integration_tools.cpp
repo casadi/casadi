@@ -534,7 +534,7 @@ namespace IndexReduction {
 
     // Look for assigned candidate variables
     // Pantelides alg 3.2: (3) For every j such that edge (i-j) exists
-    for (auto j : i->vars) {
+    for (auto *j : i->vars) {
       // Pantelides alg 3.2: ... and j is uncoloured do:
       if (!j->visited) {
         // Pantelides alg 3.2: (3a) Colour j

@@ -200,15 +200,19 @@ namespace casadi {
     std::vector<M> ex_in(name_in.size()), ex_out(name_out.size());
     for (auto&& i : dict) {
       std::vector<std::string>::const_iterator it;
-      if ((it = std::find(name_in.begin(), name_in.end(), i.first))!=name_in.end()) {
+      it = std::find(name_in.begin(), name_in.end(), i.first);
+      if (it!=name_in.end()) {
         // Input expression
         ex_in[it-name_in.begin()] = i.second;
-      } else if ((it = std::find(name_out.begin(), name_out.end(), i.first))!=name_out.end()) {
-        // Output expression
-        ex_out[it-name_out.begin()] = i.second;
       } else {
+        it = std::find(name_out.begin(), name_out.end(), i.first);
+        if (it!=name_out.end()) {
+        // Output expression
+          ex_out[it-name_out.begin()] = i.second;
+        } else {
         // Neither
-        casadi_error("Unknown dictionary entry: '" + i.first + "'");
+          casadi_error("Unknown dictionary entry: '" + i.first + "'");
+        }
       }
     }
     construct(name, ex_in, ex_out, name_in, name_out, opts);
@@ -323,15 +327,161 @@ namespace casadi {
     return Function(name, ex_in, ex_out, name_in(), name_out(), my_opts);
   }
 
-  Function Function::simplify(const Dict& opts) const {
-    return simplify(name(), opts);
+  // Stringify a single pass token (string, integer or dict) for copy-paste
+  std::string transform_token_str(const GenericType& g) {
+    if (g.is_int()) return str(g.to_int());
+    if (g.is_string()) return "\"" + g.to_string() + "\"";
+    if (g.is_dict()) return str(g.to_dict());
+    return "?";
+  }
+  // Stringify the whole pass list as a copy-pasteable literal
+  std::string transform_passes_str(const std::vector<std::vector<GenericType> >& ps) {
+    std::string s = "[";
+    for (size_t i=0; i<ps.size(); ++i) {
+      if (i) s += ", ";
+      s += "[";
+      for (size_t j=0; j<ps[i].size(); ++j) {
+        if (j) s += ", ";
+        s += transform_token_str(ps[i][j]);
+      }
+      s += "]";
+    }
+    return s + "]";
+  }
+  // A few cheap stats describing a function's graph size
+  std::string transform_stats(const Function& f) {
+    std::string s;
+    try { s += "n_nodes=" + str(f.n_nodes()); } catch (...) { s += "n_nodes=?"; }
+    try { s += ", n_instructions=" + str(f.n_instructions()); } catch (...) {}
+    return s;
   }
 
-  Function Function::simplify(const std::string& name, const Dict& opts) const {
+  Function Function::transform(const Dict& opts) const {
+    return transform(name(), opts);
+  }
+
+  Function Function::transform(const std::string& fname, const Dict& opts) const {
     try {
-      return (*this)->simplify(name, opts);
+      // Boolean shorthands (defaults reproduce the meaningful default flow)
+      bool empty_inputs = true;
+      bool combine_terms = false;
+      bool cse = true;
+      bool ref_count = true;
+      bool const_folding = true;
+      bool verbose = false;
+      for (auto&& op : opts) {
+        if (op.first=="empty_inputs") {
+          empty_inputs = op.second;
+        } else if (op.first=="combine_terms") {
+          combine_terms = op.second;
+        } else if (op.first=="cse") {
+          cse = op.second;
+        } else if (op.first=="ref_count") {
+          ref_count = op.second;
+        } else if (op.first=="const_folding") {
+          const_folding = op.second;
+        } else if (op.first=="verbose") {
+          verbose = op.second;
+        } else {
+          casadi_error("transform: no such option: " + std::string(op.first) + ".\n");
+        }
+      }
+      std::vector<GenericType> simp = {std::string("simplify")};
+      if (empty_inputs) simp.push_back("empty_inputs");
+      if (combine_terms) simp.push_back("combine_terms");
+      if (cse) simp.push_back("cse");
+      if (ref_count) { simp.push_back(0); simp.push_back("ref_count"); }  // 0 = fixed point
+      if (const_folding) simp.push_back("const_folding");
+      return transform(fname, std::vector<std::vector<GenericType> >{simp}, {{"verbose", verbose}});
     } catch(std::exception& e) {
-      THROW_ERROR("simplify", e.what());
+      THROW_ERROR("transform", e.what());
+    }
+  }
+
+  Function Function::transform(const std::vector<std::vector<GenericType> >& passes,
+                               const Dict& opts) const {
+    return transform(name(), passes, opts);
+  }
+
+  Function Function::transform(const std::string& fname,
+                               const std::vector<std::vector<GenericType> >& passes,
+                               const Dict& opts) const {
+    try {
+      // Only 'verbose' is accepted here; boolean simplify options belong to the
+      // dict-only overload
+      bool verbose = false;
+      for (auto&& op : opts) {
+        if (op.first=="verbose") {
+          verbose = op.second;
+        } else {
+          casadi_error("transform(passes, opts): unsupported option '" + std::string(op.first)
+            + "' (boolean simplify options are only allowed in the dict-only form).\n");
+        }
+      }
+
+      if (verbose) {
+        uout() << "transform(" << transform_passes_str(passes) << ")" << std::endl;
+        uout() << "  start: " << transform_stats(*this) << std::endl;
+      }
+
+      // Run the pipeline
+      Function f = *this;
+      for (const auto& pass : passes) {
+        casadi_assert(!pass.empty(), "transform: each pass must be a non-empty list");
+        std::string verb = pass.front().to_string();
+        if (verb=="simplify") {
+          // Tasks are strings; an optional integer before a task sets its run
+          // count (N>0: run N times, 0: run until a fixed point). Default: 1.
+          std::vector<std::pair<std::string, casadi_int> > tasks;
+          casadi_int count = 1;
+          bool have_count = false;
+          for (size_t i=1; i<pass.size(); ++i) {
+            if (pass[i].is_int()) {
+              count = pass[i].to_int();
+              have_count = true;
+            } else {
+              tasks.push_back({pass[i].to_string(), count});
+              count = 1;
+              have_count = false;
+            }
+          }
+          casadi_assert(!have_count,
+            "transform 'simplify': trailing run count with no following task");
+          f = f->simplify_passes(tasks);
+        } else if (verb=="expand") {
+          casadi_assert(pass.size()==1, "transform: 'expand' pass takes no arguments");
+          f = f.expand();
+        } else if (verb=="external") {
+          casadi_assert(pass.size()>=3 && pass.size()<=4,
+            "transform: 'external' pass must be {\"external\", library, operation[, opts]}");
+          std::string lib = pass[1].to_string();
+          std::string op = pass[2].to_string();
+          Dict eopts = pass.size()==4 ? pass[3].to_dict() : Dict();
+          f = external_transform(lib, op, f, eopts);
+        } else {
+          casadi_error("transform: unknown pass verb '" + verb + "'");
+        }
+        if (verbose) {
+          uout() << "  after " << transform_passes_str({pass}) << ": "
+                 << transform_stats(f) << std::endl;
+        }
+      }
+
+      // Optionally rename the result (type-preserving for SX/MX functions)
+      if (!fname.empty() && fname!=f.name()) {
+        Dict ropts{{"allow_free", true}, {"allow_duplicate_io_names", true}};
+        std::vector<std::string> ni = f.name_in(), no = f.name_out();
+        if (f.is_a("SXFunction", true)) {
+          std::vector<SX> arg = f.sx_in();
+          f = Function(fname, arg, f(arg), ni, no, ropts);
+        } else {
+          std::vector<MX> arg = f.mx_in();
+          f = Function(fname, arg, f(arg), ni, no, ropts);
+        }
+      }
+      return f;
+    } catch(std::exception& e) {
+      THROW_ERROR("transform", e.what());
     }
   }
 
@@ -480,15 +630,15 @@ namespace casadi {
 
 
   void Function::operator()(std::vector<const double*> arg, std::vector<double*> res) const {
-    return call_gen(arg, res);
+    call_gen(arg, res);
   }
 
   void Function::operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const {
-    return call_gen(arg, res);
+    call_gen(arg, res);
   }
 
   void Function::operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const {
-    return call_gen(arg, res);
+    call_gen(arg, res);
   }
 
   int Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
@@ -1107,6 +1257,43 @@ namespace casadi {
     }
   }
 
+  int Function::eval_activity(const bvec_t** arg, bvec_t** res,
+                          casadi_int* iw, bvec_t* w, int mem) const {
+    try {
+      return (*this)->eval_activity(arg, res, iw, w, memory(mem));
+    } catch(std::exception& e) {
+      THROW_ERROR("eval_activity", e.what());
+    }
+  }
+
+  std::vector<bool> Function::activity(const std::vector<bool>& arg) const {
+    casadi_assert(arg.size()==static_cast<size_t>(nnz_in()),
+      "activity: expected mask of size nnz_in()=" + str(nnz_in())
+      + ", got " + str(arg.size()) + ".");
+
+    // bvec buffers for the concatenated input/output nonzeros
+    std::vector<bvec_t> in_buf(nnz_in()), out_buf(nnz_out(), 0);
+    for (casadi_int k=0; k<nnz_in(); ++k) in_buf[k] = arg[k] ? ~static_cast<bvec_t>(0) : 0;
+
+    // Per-input/output pointers into the buffers
+    std::vector<const bvec_t*> argp(sz_arg(), nullptr);
+    std::vector<bvec_t*> resp(sz_res(), nullptr);
+    casadi_int off = 0;
+    for (casadi_int i=0; i<n_in(); ++i) { argp[i] = get_ptr(in_buf)+off; off += nnz_in(i); }
+    off = 0;
+    for (casadi_int i=0; i<n_out(); ++i) { resp[i] = get_ptr(out_buf)+off; off += nnz_out(i); }
+
+    // Work vectors
+    std::vector<casadi_int> iw(sz_iw());
+    std::vector<bvec_t> w(sz_w());
+
+    eval_activity(get_ptr(argp), get_ptr(resp), get_ptr(iw), get_ptr(w));
+
+    std::vector<bool> ret(nnz_out());
+    for (casadi_int k=0; k<nnz_out(); ++k) ret[k] = out_buf[k]!=0;
+    return ret;
+  }
+
   void Function::set_work(const double**& arg, double**& res, casadi_int*& iw, double*& w,
                           int mem) const {
     try {
@@ -1266,13 +1453,13 @@ namespace casadi {
 
   void Function::export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const {
-    return (*this)->export_code(lang, stream, options);
+    (*this)->export_code(lang, stream, options);
   }
 
   void Function::export_code(const std::string& lang,
       const std::string &fname, const Dict& options) const {
     auto stream_ptr = Filesystem::ofstream_ptr(fname);
-    return (*this)->export_code(lang, *stream_ptr, options);
+    (*this)->export_code(lang, *stream_ptr, options);
   }
 
 
@@ -1289,7 +1476,7 @@ namespace casadi {
 
   void Function::serialize(std::ostream &stream, const Dict& opts) const {
     SerializingStream s(stream, opts);
-    return serialize(s);
+    serialize(s);
   }
 
   void Function::serialize(SerializingStream &s) const {
@@ -1677,7 +1864,7 @@ namespace casadi {
 
   void Function::merge(const std::vector<MX>& arg,
       std::vector<MX>& subs_from, std::vector<MX>& subs_to) const {
-    return (*this)->merge(arg, subs_from, subs_to);
+    (*this)->merge(arg, subs_from, subs_to);
   }
 
   std::vector<SX> Function::free_sx() const {
@@ -1965,8 +2152,12 @@ namespace casadi {
     iw_.resize(f_.sz_iw());
     arg_.resize(f_.sz_arg());
     res_.resize(f_.sz_res());
-    mem_ = f_->checkout();
-    mem_internal_ = f.memory(mem_);
+    if (f_->checkout_) {
+      mem_ = f_->checkout_();
+    } else {
+      mem_ = f_.checkout();
+      mem_internal_ = f_.memory(mem_);
+    }
     f_node_ = f.operator->();
   }
 
@@ -1978,11 +2169,25 @@ namespace casadi {
     }
   }
 
-  FunctionBuffer::FunctionBuffer(const FunctionBuffer& f) : f_(f.f_) {
-    operator=(f);
+  FunctionBuffer::FunctionBuffer(const FunctionBuffer& f)
+      : f_(f.f_), w_(f.w_), iw_(f.iw_), arg_(f.arg_), res_(f.res_), f_node_(f.f_node_) {
+    if (f_->checkout_) {
+      mem_ = f_->checkout_();
+    } else {
+      mem_ = f_.checkout();
+      mem_internal_ = f_.memory(mem_);
+    }
   }
 
   FunctionBuffer& FunctionBuffer::operator=(const FunctionBuffer& f) {
+    if (this == &f) return *this;
+
+    if (f_->release_) {
+      f_->release_(mem_);
+    } else {
+      f_.release(mem_);
+    }
+
     f_ = f.f_;
     w_ = f.w_; iw_ = f.iw_; arg_ = f.arg_; res_ = f.res_; f_node_ = f.f_node_;
     // Checkout fresh memory

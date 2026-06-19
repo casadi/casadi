@@ -353,7 +353,7 @@ Function Integrator::create_advanced(const Dict& opts) {
 
 int Integrator::eval(const double** arg, double** res,
     casadi_int* iw, double* w, void* mem) const {
-  auto m = static_cast<IntegratorMemory*>(mem);
+  auto *m = static_cast<IntegratorMemory*>(mem);
 
   // Read inputs
   const double* x0 = arg[INTEGRATOR_X0];
@@ -378,7 +378,7 @@ int Integrator::eval(const double** arg, double** res,
   setup(m, arg, res, iw, w);
 
   // Pass initial state, parameters
-  set_q(m, 0);
+  set_q(m, nullptr);
   set_x(m, x0);
   set_z(m, z0);
   set_p(m, p);
@@ -497,7 +497,7 @@ int Integrator::eval(const double** arg, double** res,
         if (verbose_) casadi_message("Integrating backward from output time " + str(m->k)
           + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
         if (m->k > 0) {
-          retreat(m, u, 0, 0, adj_u);
+          retreat(m, u, nullptr, nullptr, adj_u);
         } else {
           retreat(m, u, adj_x, adj_p, adj_u);
         }
@@ -881,7 +881,7 @@ void Integrator::init(const Dict& opts) {
 
 void Integrator::set_work(void* mem, const double**& arg, double**& res,
     casadi_int*& iw, double*& w) const {
-  auto m = static_cast<IntegratorMemory*>(mem);
+  auto *m = static_cast<IntegratorMemory*>(mem);
 
   // Set work in base classes
   OracleFunction::set_work(mem, arg, res, iw, w);
@@ -1137,8 +1137,8 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] =
       adj_quad + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
-    m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ * nadj_ : 0;  // fwd:adj_p
-    m->res[BQUAD_ADJ_U] = adj_u ? adj_u + (i + 1) * nuq1_ * nadj_: 0;  // fwd:adj_u
+    m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ * nadj_ : nullptr;  // fwd:adj_p
+    m->res[BQUAD_ADJ_U] = adj_u ? adj_u + (i + 1) * nuq1_ * nadj_: nullptr;  // fwd:adj_u
     if (calc_sp_forward(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   return 0;
@@ -1380,8 +1380,8 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   // Propagate through sensitivities
   for (casadi_int i = 0; i < nfwd_; ++i) {
-    m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ * nadj_ : 0;  // fwd:adj_p
-    m->res[BQUAD_ADJ_U] = adj_u ? adj_u + (i + 1) * nuq1_ * nadj_ : 0;  // fwd:adj_u
+    m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ * nadj_ : nullptr;  // fwd:adj_p
+    m->res[BQUAD_ADJ_U] = adj_u ? adj_u + (i + 1) * nuq1_ * nadj_ : nullptr;  // fwd:adj_u
     m->arg[BDYN_NUM_IN + BQUAD_ADJ_P] = adj_p;  // out:adj_p
     m->arg[BDYN_NUM_IN + BQUAD_ADJ_U] = adj_u;  // out:adj_u
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
@@ -2008,7 +2008,7 @@ void FixedStepIntegrator::init(const Dict& opts) {
 
 void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res,
     casadi_int*& iw, double*& w) const {
-  auto m = static_cast<FixedStepMemory*>(mem);
+  auto *m = static_cast<FixedStepMemory*>(mem);
 
   // Set work in base classes
   Integrator::set_work(mem, arg, res, iw, w);
@@ -2039,7 +2039,7 @@ int FixedStepIntegrator::init_mem(void* mem) const {
 }
 
 int FixedStepIntegrator::advance_noevent(IntegratorMemory* mem) const {
-  auto m = static_cast<FixedStepMemory*>(mem);
+  auto *m = static_cast<FixedStepMemory*>(mem);
 
   // State at previous step
   double* x_prev = m->tmp1;
@@ -2070,15 +2070,17 @@ int FixedStepIntegrator::advance_noevent(IntegratorMemory* mem) const {
     }
   }
 
-  // Save algebraic variables
-  casadi_copy(m->v + nv_ - nz_, nz_, m->z);
+  // Save algebraic variables (extracted from the tail of each augmented v block)
+  for (casadi_int d = 0; d <= nfwd_; ++d) {
+    casadi_copy(m->v + (d + 1) * nv1_ - nz1_, nz1_, m->z + d * nz1_);
+  }
 
   return 0;
 }
 
 void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     double* adj_x, double* adj_p, double* adj_u) const {
-  auto m = static_cast<FixedStepMemory*>(mem);
+  auto *m = static_cast<FixedStepMemory*>(mem);
 
   // Set controls
   casadi_copy(u, nu_, m->u);
@@ -2172,6 +2174,11 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->res[BSTEP_ADJ_V0] = nullptr;  // adj:v0
   m->res[BSTEP_ADJ_P] = adj_p;  // adj:p
   m->res[BSTEP_ADJ_U] = adj_u;  // adj:u
+  // Issue #3353: zero-init when adj_* output is structurally empty
+  const Function& adj_step = get_function(reverse_name("step", nadj_));
+  if (adj_x0 && !adj_step.nnz_out(BSTEP_ADJ_X0)) casadi_clear(adj_x0, nrx1_ * nadj_);
+  if (adj_p && !adj_step.nnz_out(BSTEP_ADJ_P)) casadi_clear(adj_p, nrq1_ * nadj_);
+  if (adj_u && !adj_step.nnz_out(BSTEP_ADJ_U)) casadi_clear(adj_u, nuq1_ * nadj_);
   calc_function(m, reverse_name("step", nadj_));
   // Evaluate sensitivities
   if (nfwd_ > 0) {
@@ -2199,12 +2206,20 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->res[BSTEP_ADJ_V0] = nullptr;  // fwd:adj:v0
     m->res[BSTEP_ADJ_P] = adj_p + nrq1_ * nadj_;  // fwd:adj_p
     m->res[BSTEP_ADJ_U] = adj_u + nuq1_ * nadj_;  // fwd:adj_u
+    const Function& fwd_adj_step =
+      get_function(forward_name(reverse_name("step", nadj_), nfwd_));
+    if (adj_x0 && !fwd_adj_step.nnz_out(BSTEP_ADJ_X0))
+      casadi_clear(adj_x0 + nrx1_ * nadj_, nrx1_ * nadj_ * nfwd_);
+    if (adj_p && !fwd_adj_step.nnz_out(BSTEP_ADJ_P))
+      casadi_clear(adj_p + nrq1_ * nadj_, nrq1_ * nadj_ * nfwd_);
+    if (adj_u && !fwd_adj_step.nnz_out(BSTEP_ADJ_U))
+      casadi_clear(adj_u + nuq1_ * nadj_, nuq1_ * nadj_ * nfwd_);
     calc_function(m, forward_name(reverse_name("step", nadj_), nfwd_));
   }
 }
 
 void FixedStepIntegrator::reset(IntegratorMemory* mem, bool first_call) const {
-  auto m = static_cast<FixedStepMemory*>(mem);
+  auto *m = static_cast<FixedStepMemory*>(mem);
 
   // Reset the base classes
   Integrator::reset(mem, first_call);
@@ -2222,7 +2237,7 @@ void FixedStepIntegrator::reset(IntegratorMemory* mem, bool first_call) const {
 }
 
 void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
-  auto m = static_cast<FixedStepMemory*>(mem);
+  auto *m = static_cast<FixedStepMemory*>(mem);
 
   // Clear adjoint seeds
   casadi_clear(m->adj_q, nrp_);
@@ -2238,15 +2253,21 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
 
 void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
     const double* adj_x, const double* adj_z, const double* adj_q) const {
-  auto m = static_cast<FixedStepMemory*>(mem);
+  auto *m = static_cast<FixedStepMemory*>(mem);
   // Add impulse to backward parameters
   casadi_axpy(nrp_, 1., adj_q, m->adj_q);
 
   // Add impulse to state
   casadi_axpy(nrx_, 1., adj_x, m->adj_x);
 
-  // Add impulse to backwards dependent variables
-  casadi_axpy(nrz_, 1., adj_z, m->rv + nrv_ - nrz_);
+  // Add impulse to backwards dependent variables (one slot at the tail of each
+  // augmented block of m->rv; mirrors the algebraic-state extraction in
+  // advance_noevent)
+  casadi_int nrz_per_block = nrz1_ * nadj_;
+  for (casadi_int d = 0; d <= nfwd_; ++d) {
+    casadi_axpy(nrz_per_block, 1., adj_z + d * nrz_per_block,
+                m->rv + (d + 1) * nrv1_ - nrz_per_block);
+  }
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(
@@ -2544,7 +2565,7 @@ void Integrator::get_z(IntegratorMemory* m, double* z) const {
 
 casadi_int Integrator::next_stop(casadi_int k, const double* u) const {
   // Integrate till the end if no input signals
-  if (nu_ == 0 || u == 0) return nt() - 1;
+  if (nu_ == 0 || u == nullptr) return nt() - 1;
   // Find the next discontinuity, if any
   for (; k + 1 < nt(); ++k) {
     // Next control value
@@ -2716,7 +2737,7 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
 
 casadi_int Integrator::next_stopB(casadi_int k, const double* u) const {
   // Integrate till the beginning if no input signals
-  if (nu_ == 0 || u == 0) return -1;
+  if (nu_ == 0 || u == nullptr) return -1;
   // Find the next discontinuity, if any
   for (; k-- > 0; ) {
     // Next control value
@@ -2735,7 +2756,7 @@ casadi_int Integrator::next_stopB(casadi_int k, const double* u) const {
 
 bool Integrator::all_zero(const double* v, casadi_int n) {
   // Quick return if trivially zero
-  if (v == 0 || n == 0) return true;
+  if (v == nullptr || n == 0) return true;
   // Loop over entries
   for (casadi_int i = 0; i < n; ++i) {
     if (v[i] != 0.) return false;

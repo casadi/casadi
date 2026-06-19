@@ -487,6 +487,14 @@ namespace casadi {
         \identifier{1bx} */
     inline friend MatType det(const MatType& A) { return MatType::det(A);}
 
+    /** \brief Matrix determinant (experimental)
+
+        \identifier{2hx} */
+    inline friend MatType det(const MatType& A, const std::string& lsolver,
+                              const Dict& dict=Dict()) {
+      return MatType::det(A, lsolver, dict);
+    }
+
     /** \brief Matrix inverse (experimental)
 
         \identifier{1by} */
@@ -1123,6 +1131,25 @@ namespace casadi {
     friend inline MatType simplify(const MatType &x) {
       return MatType::simplify(x);
     }
+
+    /// Apply transformation passes to an expression
+    ///@{
+    friend inline MatType transform(const MatType &x, const Dict& opts = Dict()) {
+      return MatType::transform(x, opts);
+    }
+    friend inline MatType transform(const MatType &x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict()) {
+      return MatType::transform(x, passes, opts);
+    }
+    friend inline std::vector<MatType> transform(const std::vector<MatType> &x,
+        const Dict& opts = Dict()) {
+      return MatType::transform(x, opts);
+    }
+    friend inline std::vector<MatType> transform(const std::vector<MatType> &x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict()) {
+      return MatType::transform(x, passes, opts);
+    }
+    ///@}
 
     /** \brief Get a string representation for a binary MatType, using custom arguments
 

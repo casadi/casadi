@@ -23,18 +23,18 @@
 
 # Code generation
 # ======================
-from casadi import *
+import casadi as ca
 
 # Let's build a trivial symbolic SX graph
 
-x = SX.sym("x")
-y = SX.sym("y")
+x = ca.SX.sym("x")
+y = ca.SX.sym("y")
 z = x*y+2*y
 z += 4*z
 
 # A Function is needed to inspect the graph
 
-f = Function("f", [x,y],[z])
+f = ca.Function("f", [x,y],[z])
 
 # The default representation is just the name of the function
 

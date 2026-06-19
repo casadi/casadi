@@ -212,6 +212,28 @@ namespace casadi {
   }
 
   template<bool Tr>
+  int Solve<Tr>::eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    // X = A \ B. A's values cannot activate X on their own, so a zero right-hand-side
+    // column gives a zero result column. A nonzero column may, through a (generally
+    // dense) inverse, activate the whole column, so we keep this conservative: a result
+    // column is active iff its rhs column has any active entry. (We deliberately do not
+    // reuse sp_forward's structural spsolve: it requires seeding A into the work vector,
+    // which would reactivate a zero rhs and lose the zero-rhs guarantee.)
+    casadi_int n = A_sp().size1();
+    casadi_int nrhs = dep(0).size2();
+    const bvec_t* B = arg[0];
+    bvec_t* X = res[0];
+    for (casadi_int r=0; r<nrhs; ++r) {
+      bvec_t col = 0;
+      for (casadi_int i=0; i<n; ++i) col |= B[i];
+      std::fill(X, X+n, col);
+      B += n;
+      X += n;
+    }
+    return 0;
+  }
+
+  template<bool Tr>
   int Solve<Tr>::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     // Number of right-hand-sides
     casadi_int nrhs = dep(0).size2();
@@ -256,6 +278,12 @@ namespace casadi {
   template<bool Tr>
   size_t LinsolCall<Tr>::sz_w() const {
     return this->sparsity().size1();
+  }
+
+  template<bool Tr>
+  size_t LinsolCall<Tr>::codegen_sz_w() const {
+    // The generated C carves the QR factorization buffers from w
+    return linsol_->sz_w_fact();
   }
 
   template<bool Tr>

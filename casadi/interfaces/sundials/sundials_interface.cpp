@@ -611,6 +611,10 @@ int SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, c
   m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   m->res[BDAE_ADJ_X] = adj_x;  // adj_x
   m->res[BDAE_ADJ_Z] = adj_z;  // adj_z
+  // Issue #3353: zero-init when adj_* output is structurally empty
+  const Function& daeB = get_function("daeB");
+  if (adj_x && !daeB.nnz_out(BDAE_ADJ_X)) casadi_clear(adj_x, nrx1_ * nadj_);
+  if (adj_z && !daeB.nnz_out(BDAE_ADJ_Z)) casadi_clear(adj_z, nrz1_ * nadj_);
   if (calc_function(m, "daeB")) return 1;
   // Evaluate sensitivities
   if (nfwd_ > 0) {
@@ -634,6 +638,11 @@ int SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, c
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
     m->res[BDAE_ADJ_X] = adj_x ? adj_x + nrx1_ * nadj_ : 0;  // fwd:adj_x
     m->res[BDAE_ADJ_Z] = adj_z ? adj_z + nrz1_ * nadj_ : 0;  // fwd:adj_z
+    const Function& fwd_daeB = get_function(forward_name("daeB", nfwd_));
+    if (adj_x && !fwd_daeB.nnz_out(BDAE_ADJ_X))
+      casadi_clear(adj_x + nrx1_ * nadj_, nrx1_ * nadj_ * nfwd_);
+    if (adj_z && !fwd_daeB.nnz_out(BDAE_ADJ_Z))
+      casadi_clear(adj_z + nrz1_ * nadj_, nrz1_ * nadj_ * nfwd_);
     if (calc_function(m, forward_name("daeB", nfwd_))) return 1;
   }
   return 0;
@@ -680,6 +689,10 @@ int SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x, 
   m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   m->res[BQUAD_ADJ_P] = adj_p;  // adj_p
   m->res[BQUAD_ADJ_U] = adj_u;  // adj_u
+  // Issue #3353: zero-init when adj_* output is structurally empty
+  const Function& quadB = get_function("quadB");
+  if (adj_p && !quadB.nnz_out(BQUAD_ADJ_P)) casadi_clear(adj_p, nrq1_ * nadj_);
+  if (adj_u && !quadB.nnz_out(BQUAD_ADJ_U)) casadi_clear(adj_u, nuq1_ * nadj_);
   if (calc_function(m, "quadB")) return 1;
   // Evaluate sensitivities
   if (nfwd_ > 0) {
@@ -702,6 +715,11 @@ int SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x, 
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
     m->res[BQUAD_ADJ_P] = adj_p + nrq1_ * nadj_;  // fwd:adj_p
     m->res[BQUAD_ADJ_U] = adj_u + nuq1_ * nadj_;  // fwd:adj_u
+    const Function& fwd_quadB = get_function(forward_name("quadB", nfwd_));
+    if (adj_p && !fwd_quadB.nnz_out(BQUAD_ADJ_P))
+      casadi_clear(adj_p + nrq1_ * nadj_, nrq1_ * nadj_ * nfwd_);
+    if (adj_u && !fwd_quadB.nnz_out(BQUAD_ADJ_U))
+      casadi_clear(adj_u + nuq1_ * nadj_, nuq1_ * nadj_ * nfwd_);
     if (calc_function(m, forward_name("quadB", nfwd_))) return 1;
   }
   return 0;

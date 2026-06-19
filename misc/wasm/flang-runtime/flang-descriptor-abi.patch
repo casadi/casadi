@@ -1,0 +1,149 @@
+commit 909fd4108b4ce604f12c46cea9bf93ebb81f9f61
+Author: Joris Gillis <joris@yacoda.com>
+Date:   Fri May 15 14:54:35 2026 +0200
+
+    Fix Fortran array-descriptor ABI for wasm32-emscripten
+    
+    Modern Fortran (POINTER, ALLOCATABLE, intrinsics like sum()) crashes
+    at runtime because the descriptor struct flang emits uses host-LP64
+    widths (i64 elem_len + i64 CFI_index_t per dim) while the runtime
+    expects target-wasm32 widths.
+    
+    Decouple SubscriptValue (function args -> int / i32, matches stock
+    RTBuilder.h emission) from CFI_index_t (struct fields -> long long
+    / i64, matches stock DescriptorModel.h emission).  Use long long
+    rather than int64_t so the typedef does not alias `long` on Linux
+    x86-64 LP64 and bypass the existing `Use i32 for long` patch.
+    
+    4-line reproducer:
+      program p
+        integer :: a(5) = [1, 2, 3, 4, 5]
+        print *, sum(a)
+      end program
+    
+    Before: RUNTIME_CHECK(TypeCode(CAT, KIND) == x.type() ...) failed at
+            reduction-templates.h(90)
+    After:  sum: 15
+
+diff --git a/flang-rt/lib/runtime/descriptor.cpp b/flang-rt/lib/runtime/descriptor.cpp
+index b723acdd2..70b3b1b8a 100644
+--- a/flang-rt/lib/runtime/descriptor.cpp
++++ b/flang-rt/lib/runtime/descriptor.cpp
+@@ -34,15 +34,24 @@ RT_API_ATTRS void Descriptor::Establish(TypeCode t, std::size_t elementBytes,
+     void *p, int rank, const SubscriptValue *extent,
+     ISO::CFI_attribute_t attribute, bool addendum) {
+   Terminator terminator{__FILE__, __LINE__};
++  // wasm32-emscripten patch: SubscriptValue is `int` (i32, matches
++  // stock r-wasm flang's RTBuilder.h emission), but CFI_index_t is
++  // `long long` (i64, matches stock flang's descriptor struct
++  // emission).  ISO::Verify/Establish C funcs take CFI_index_t arrays
++  // -- convert the SubscriptValue array to CFI_index_t for the call.
++  ISO::CFI_index_t cfiExtent[CFI_MAX_RANK];
++  for (int i = 0; i < rank && i < CFI_MAX_RANK; ++i) {
++    cfiExtent[i] = extent[i];
++  }
+   int cfiStatus{ISO::VerifyEstablishParameters(&raw_, p, attribute, t.raw(),
+-      elementBytes, rank, extent, /*external=*/false)};
++      elementBytes, rank, cfiExtent, /*external=*/false)};
+   if (cfiStatus != CFI_SUCCESS) {
+     terminator.Crash(
+         "Descriptor::Establish: CFI_establish returned %d for CFI_type_t(%d)",
+         cfiStatus, t.raw());
+   }
+   ISO::EstablishDescriptor(
+-      &raw_, p, attribute, t.raw(), elementBytes, rank, extent);
++      &raw_, p, attribute, t.raw(), elementBytes, rank, cfiExtent);
+   if (elementBytes == 0) {
+     raw_.elem_len = 0;
+     // Reset byte strides of the dimensions, since EstablishDescriptor()
+@@ -86,8 +95,13 @@ RT_API_ATTRS void Descriptor::Establish(const typeInfo::DerivedType &dt,
+     void *p, int rank, const SubscriptValue *extent,
+     ISO::CFI_attribute_t attribute) {
+   std::size_t elementBytes{dt.sizeInBytes()};
++  // wasm32-emscripten patch: convert SubscriptValue (int) -> CFI_index_t (long long)
++  ISO::CFI_index_t cfiExtent[CFI_MAX_RANK];
++  for (int i = 0; i < rank && i < CFI_MAX_RANK; ++i) {
++    cfiExtent[i] = extent[i];
++  }
+   ISO::EstablishDescriptor(
+-      &raw_, p, attribute, CFI_type_struct, elementBytes, rank, extent);
++      &raw_, p, attribute, CFI_type_struct, elementBytes, rank, cfiExtent);
+   if (elementBytes == 0) {
+     raw_.elem_len = 0;
+     // Reset byte strides of the dimensions, since EstablishDescriptor()
+@@ -249,7 +263,17 @@ RT_API_ATTRS bool Descriptor::EstablishPointerSection(const Descriptor &source,
+       return false;
+     }
+   }
+-  return CFI_section(&raw_, &source.raw_, lower, upper, stride) == CFI_SUCCESS;
++  // wasm32-emscripten patch: convert SubscriptValue arrays to CFI_index_t arrays
++  ISO::CFI_index_t cfiLower[CFI_MAX_RANK], cfiUpper[CFI_MAX_RANK], cfiStride[CFI_MAX_RANK];
++  for (int i = 0; i < raw_.rank && i < CFI_MAX_RANK; ++i) {
++    cfiLower[i] = lower ? lower[i] : 0;
++    cfiUpper[i] = upper ? upper[i] : 0;
++    cfiStride[i] = stride ? stride[i] : 0;
++  }
++  return CFI_section(&raw_, &source.raw_,
++      lower ? cfiLower : nullptr,
++      upper ? cfiUpper : nullptr,
++      stride ? cfiStride : nullptr) == CFI_SUCCESS;
+ }
+ 
+ RT_API_ATTRS void Descriptor::ApplyMold(const Descriptor &mold, int rank) {
+diff --git a/flang/include/flang/ISO_Fortran_binding.h b/flang/include/flang/ISO_Fortran_binding.h
+index f5b8d0d2e..22c4adf90 100644
+--- a/flang/include/flang/ISO_Fortran_binding.h
++++ b/flang/include/flang/ISO_Fortran_binding.h
+@@ -39,8 +39,17 @@ typedef unsigned char CFI_rank_t;
+ 
+ /* This type is probably larger than a default Fortran INTEGER
+  * and should be used for all array indexing and loop bound calculations.
++ *
++ * wasm32-emscripten patch: force `long long` (NOT int64_t!) so that
++ * flang's host-side type reflection sees a type that is DISTINCT from
++ * `long` on Linux x86-64 LP64 (where int64_t and long alias).  This
++ * routes through getModel<long long> in RTBuilder.h / DescriptorModel.h
++ * -- which is NOT r-wasm-patched to i32 -- so it correctly emits i64.
++ * Meanwhile the runtime sees `long long` (8 bytes on wasm32 too).
++ * Result: descriptor struct AND PointerSetBounds-style runtime call
++ * signatures all consistently use i64 across flang and runtime.
+  */
+-typedef ptrdiff_t CFI_index_t;
++typedef long long CFI_index_t;
+ 
+ typedef unsigned char CFI_attribute_t;
+ #define CFI_attribute_pointer 1
+@@ -148,7 +157,13 @@ extern "C++" template <typename T> struct FlexibleArray : T {
+   /* These three members must appear first, \
+    * in exactly this order. */ \
+   void *base_addr; \
+-  size_t elem_len; /* element size in bytes */ \
++  unsigned long long elem_len; /* wasm32-emscripten: was size_t. \
++   * unsigned long long is DISTINCT from `unsigned long` on Linux \
++   * x86-64 LP64 (where uint64_t aliases unsigned long), so flang's \
++   * type reflection routes this through getModel<unsigned long long> \
++   * in DescriptorModel.h / RTBuilder.h -- NOT r-wasm-patched to i32. \
++   * Result: elem_len consistently i64 in both flang's descriptor \
++   * layout AND the runtime's struct layout. */ \
+   int version; /* == CFI_VERSION */ \
+   CFI_rank_t rank; /* [0 .. CFI_MAX_RANK] */ \
+   CFI_type_t type; \
+diff --git a/flang/include/flang/Runtime/descriptor-consts.h b/flang/include/flang/Runtime/descriptor-consts.h
+index acd7bc5dd..b1eca8170 100644
+--- a/flang/include/flang/Runtime/descriptor-consts.h
++++ b/flang/include/flang/Runtime/descriptor-consts.h
+@@ -29,7 +29,13 @@ class DerivedType;
+ 
+ namespace Fortran::runtime {
+ class Descriptor;
+-using SubscriptValue = ISO::CFI_index_t;
++// wasm32-emscripten: decouple SubscriptValue (for function args) from
++// CFI_index_t (for struct dim fields).  Stock r-wasm flang emits
++// SubscriptValue via RTBuilder.h getModel<long>=i32 (r-wasm patch),
++// so runtime must declare it as 4-byte int.  CFI_index_t is forced
++// to `long long` in ISO_Fortran_binding.h for the descriptor STRUCT
++// to be 8-byte-fielded (matching flang's host-LP64-leaked emission).
++using SubscriptValue = int;
+ using common::TypeCategory;
+ 
+ /// Returns size in bytes of the descriptor (not the data)

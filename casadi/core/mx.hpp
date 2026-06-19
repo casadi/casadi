@@ -244,6 +244,7 @@ namespace casadi {
                   bool ind1=false);
 
     MX operator-() const;
+    MX operator+() const { return *this; }
 
     /** \brief Element-wise inverse
 
@@ -635,17 +636,21 @@ namespace casadi {
                                      const std::vector<casadi_int>& offset2);
     static std::vector<MX> vertsplit(const MX& x, const std::vector<casadi_int>& offset);
     static MX blockcat(const std::vector< std::vector<MX > > &v);
-    static MX mtimes(const MX& x, const MX& y);
-    static MX mac(const MX& x, const MX& y, const MX& z);
+    static MX mtimes(const MX& x, const MX& y,
+                     const std::string& blas = "reference");
+    static MX mac(const MX& x, const MX& y, const MX& z,
+                  const std::string& blas = "reference");
     static MX reshape(const MX& x, casadi_int nrow, casadi_int ncol);
     static MX reshape(const MX& x, const Sparsity& sp);
     static MX sparsity_cast(const MX& x, const Sparsity& sp);
     static MX kron(const MX& x, const MX& b);
+    static MX kron_contract(const MX& m, const MX& x, bool inner);
     static MX repmat(const MX& x, casadi_int n, casadi_int m=1);
     ///@}
 
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
+    static MX linspace(const MX& a, const MX& b, casadi_int nsteps);
     static MX jacobian(const MX& f, const MX& x, const Dict& opts = Dict());
     static MX hessian(const MX& f, const MX& x, const Dict& opts = Dict());
     static MX hessian(const MX& f, const MX& x, MX& g, const Dict& opts = Dict());
@@ -693,6 +698,12 @@ namespace casadi {
     static bool contains_all(const std::vector<MX>& v, const std::vector<MX> &n);
     static bool contains_any(const std::vector<MX>& v, const std::vector<MX> &n);
     static MX simplify(const MX& x);
+    static MX transform(const MX& x, const Dict& opts = Dict());
+    static MX transform(const MX& x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
+    static std::vector<MX> transform(const std::vector<MX>& x, const Dict& opts = Dict());
+    static std::vector<MX> transform(const std::vector<MX>& x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
     static MX dot(const MX& x, const MX& y);
     static MX mrdivide(const MX& a, const MX& b);
     static MX mldivide(const MX& a, const MX& b);
@@ -707,6 +718,7 @@ namespace casadi {
     static MX sum1(const MX& x);
     static MX polyval(const MX& p, const MX& x);
     static MX det(const MX& x);
+    static MX det(const MX& x, const std::string& lsolver, const Dict& opts=Dict());
     static std::vector<MX> symvar(const MX& x);
     static MX nullspace(const MX& A);
     static MX repsum(const MX& x, casadi_int n, casadi_int m=1);
@@ -778,6 +790,11 @@ namespace casadi {
 
     // Simplification with constant folding
     static bool simplify_const_folding(std::vector<MX>& arg,
+                                   std::vector<MX>& res,
+                                   const Dict& opts = Dict());
+
+    // Simplification by combining like terms in linear combinations
+    static bool simplify_combine_terms(std::vector<MX>& arg,
                                    std::vector<MX>& res,
                                    const Dict& opts = Dict());
 
@@ -1092,6 +1109,18 @@ namespace casadi {
   typedef std::vector<MXVector> MXVectorVector;
   typedef std::map<std::string, MX> MXDict;
   ///@}
+
+  /** \brief Kronecker contraction
+   *
+   * `inner = true`:  Y[i, j] = sum over (r, s) of M[i*mB+r, j*nB+s] * X[r, s]
+   * `inner = false`: Y[r, s] = sum over (i, j) of X[i, j] * M[i*mB+r, j*nB+s]
+   *
+   * Closes the AD algebra of kron under arbitrary-order differentiation.
+
+      \identifier{2ho} */
+  inline MX kron_contract(const MX& m, const MX& x, bool inner) {
+    return MX::kron_contract(m, x, inner);
+  }
 
 } // namespace casadi
 

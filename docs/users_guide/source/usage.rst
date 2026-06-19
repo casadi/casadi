@@ -190,8 +190,6 @@ each operation. Further information is available in the API documentation.
      - .. code-block:: python3
 
             x @ y
-            # or before Py3.4:
-            mtimes(x,y)
      - .. code-block:: cpp
 
             mtimes(x,y)

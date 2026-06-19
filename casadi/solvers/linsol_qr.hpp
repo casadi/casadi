@@ -96,9 +96,25 @@ namespace casadi {
     // Solve the linear system
     int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const override;
 
+    // Determinant from the (already computed) factorization
+    double det(void* mem, const double* A) const override;
+
     /// Generate C code
     void generate(CodeGenerator& g, const std::string& A, const std::string& x,
                   casadi_int nrhs, bool tr) const override;
+
+    /// Generate C code for the determinant
+    void generate_det(CodeGenerator& g, const std::string& A,
+                      const std::string& d) const override;
+
+    /// Emit the QR factorization shared by generate/generate_det: carve the
+    /// qr_v/qr_r/qr_beta/qr_w buffers from w (with the optional cache) and factorize
+    void generate_factorize(CodeGenerator& g, const std::string& A) const;
+
+    /// Workspace generate/generate_det carve from w: v + r + beta + qr work
+    size_t sz_w_fact() const override {
+      return sp_v_.nnz() + sp_r_.nnz() + ncol() + nrow() + ncol();
+    }
 
     // Get name of the plugin
     const char* plugin_name() const override { return "qr";}
@@ -113,6 +129,9 @@ namespace casadi {
     std::vector<casadi_int> prinv_, pc_;
     Sparsity sp_v_, sp_r_;
     double eps_;
+
+    /// Sign of the row/column pivoting permutations (data-independent)
+    double pivot_sign_;
 
     /// Cache size
     casadi_int n_cache_;

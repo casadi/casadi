@@ -35,6 +35,42 @@
 
 namespace casadi {
 
+  static void handle_pedantic(const std::string& mode,
+                              const std::string& opt_name,
+                              const std::string& msg) {
+    if (mode == "ignore") return;
+    std::string full = msg + "\n(Controlled by option '" + opt_name +
+      "'; set to 'ignore' to silence, 'warn' to demote, 'error' to escalate.)";
+    if (mode == "warn") {
+      casadi_warning(full);
+    } else if (mode == "error") {
+      casadi_error(full);
+    } else {
+      casadi_error("Option '" + opt_name + "' must be one of "
+                   "'ignore', 'warn', 'error'; got '" + mode + "'.");
+    }
+  }
+
+  static bool is_pow2_ge8(casadi_int n) {
+    return n >= 8 && (n & (n - 1)) == 0;
+  }
+
+  // Cumulative prefix products of length >= 2 of an extent vector.
+  // Length-1 prefixes are the individual extents themselves and are
+  // reported separately at the call site.
+  static void scan_prefix_pow2(std::vector<std::string>& offenders,
+                               const std::vector<casadi_int>& ext,
+                               const std::string& tag) {
+    casadi_int p = 1;
+    for (size_t i = 0; i < ext.size(); ++i) {
+      p *= ext[i];
+      if (i >= 1 && is_pow2_ge8(p)) {
+        offenders.push_back("prefix product over dims 0.." + str(i)
+                            + " = " + str(p) + tag);
+      }
+    }
+  }
+
   static std::vector<casadi_int> knot_offsets(const std::vector<casadi_int>& knot_dims) {
     std::vector<casadi_int> offsets(knot_dims.size() + 1);
     offsets[0] = 0;
@@ -43,14 +79,43 @@ namespace casadi {
     return offsets;
   }
 
+  // Build the per-dimension knot cache consumed by the blazing runtime.
+  // Each dim's slice has layout [intercept, slope, inv1[n_k], inv2[n_k], inv3[n_k]]:
+  //   slope     = (ng-1) / (grid[ng-1] - grid[0])   with grid = K[degree:n_k-degree]
+  //   intercept = -grid[0] * slope
+  //   invS[k]   = 1/(t[k+S] - t[k]) (zeroed where the span collapses)
+  // The two scalars feed 'exact' lookup_mode (single FMA, no FP divide); the
+  // inv spans feed the de Boor recurrence. The scalars are emitted
+  // unconditionally so the runtime layout stays uniform regardless of
+  // lookup_mode.
   template<typename M>
-  static M compute_inv(const M& K, const std::vector<casadi_int>& offsets) {
+  static M compute_knots_cache(const M& K, const std::vector<casadi_int>& offsets) {
     casadi_int nd = offsets.size() - 1;
-    std::vector<M> inv_parts;
+    casadi_int degree = 3;
+    std::vector<M> parts;
     for (casadi_int d = 0; d < nd; ++d) {
       casadi_int off = offsets[d];
       casadi_int n_k = offsets[d + 1] - off;
       M t = K(Slice(off, off + n_k));
+
+      // {intercept, slope} for 'exact' lookup. ng is the length of the
+      // searched grid (K[degree : n_k-degree]).
+      casadi_int ng = n_k - 2*degree;
+      M slope, intercept;
+      if (ng >= 2) {
+        M g0 = t(degree);
+        M dg = t(n_k - degree - 1) - g0;
+        // dg=0 would mean a degenerate grid; guard the divide.
+        slope     = if_else_zero(dg, static_cast<double>(ng-1) / (dg + 1e-100));
+        intercept = -g0 * slope;
+      } else {
+        slope     = M::zeros(1, 1);
+        intercept = M::zeros(1, 1);
+      }
+      parts.push_back(intercept);
+      parts.push_back(slope);
+
+      // Existing inv1/inv2/inv3 spans.
       for (casadi_int span = 1; span <= 3; ++span) {
         M inv_span;
         if (span < n_k) {
@@ -60,10 +125,10 @@ namespace casadi {
         } else {
           inv_span = M::zeros(n_k, 1);
         }
-        inv_parts.push_back(inv_span);
+        parts.push_back(inv_span);
       }
     }
-    return vertcat(inv_parts);
+    return vertcat(parts);
   }
 
   // MX version of BSplineCommon::derivative_coeff for parametric knots.
@@ -134,7 +199,7 @@ namespace casadi {
     MX x = MX::sym("x", nd);
     MX C = MX::sym("C", F_inner.size_in(1));
     MX knots = MX::sym("knots", nk);
-    MX inv = compute_inv(knots, offsets);
+    MX inv = compute_knots_cache(knots, offsets);
     std::vector<MX> ret = F_inner(std::vector<MX>{x, C, knots, inv});
     return Function(name, {x, C, knots}, ret,
                     {"x", "C", "knots"}, F_inner.name_out(),
@@ -164,7 +229,9 @@ namespace casadi {
     } else if (has_parametric_knots() && i==arg_knots()) {
       return Sparsity::dense(knots_offset_.back());
     } else if (inv_input_ && i==arg_inv()) {
-      return Sparsity::dense(3 * knots_offset_.back());
+      // Per-dim slice = 2 (intercept,slope) + 3*n_k (inv1,inv2,inv3).
+      casadi_int nd = knots_offset_.size() - 1;
+      return Sparsity::dense(2 * nd + 3 * knots_offset_.back());
     } else if (precompute_coeff_ && i==2+has_parametric_knots()+inv_input_) {
       return Sparsity::dense(ndc_);
     } else if (precompute_coeff_ && i==3+has_parametric_knots()+inv_input_) {
@@ -294,7 +361,7 @@ namespace casadi {
 
     // Precompute reciprocal knot spans (only when knot values are known)
     if (!has_parametric_knots()) {
-      DM inv_dm = compute_inv(DM(knots_stacked_), knots_offset_);
+      DM inv_dm = compute_knots_cache(DM(knots_stacked_), knots_offset_);
       knots_inv_ = inv_dm.nonzeros();
     }
   }
@@ -317,7 +384,20 @@ namespace casadi {
         "correct index. 'linear' uses a forward linear search. 'exact' uses "
         "a comparator function optimized for uniformly distributed data "
         "(requires equally spaced knots). 'binary' uses a binary search. "
-        "'auto' (default) uses 'linear' for small grids and 'binary' for large."}}
+        "'auto' (default) uses 'linear' for small grids and 'binary' for large."}},
+      {"pedantic_mode_order",
+       {OT_STRING,
+        "How to react when per-dimension knot counts are increasing "
+        "in dimension index. Deviating from this sorting may cost "
+        "up to ~30% speedup but may also be harmless of even slightly beneficial. "
+        "One of 'ignore', 'warn' (default), 'error'."}},
+      {"pedantic_mode_size",
+       {OT_STRING,
+        "How to react when an internal coefficient-tensor extent or "
+        "cumulative product is a power of 2 (8, 16, 32, ...). Such extents "
+        "cause cache-set aliasing on power-of-2 strides / cache eviction and "
+        "will incur costs. These costs can vary from 30% to 400% runtime. "
+        "One of 'ignore', 'warn', 'error' (default)."}}
      }
   };
 
@@ -325,7 +405,7 @@ namespace casadi {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
-    // Read options
+    // Read options (pedantic_mode_* defaults set in the header)
     for (auto&& op : opts) {
       if (op.first=="precompute_coeff") {
         precompute_coeff_ = op.second;
@@ -333,6 +413,10 @@ namespace casadi {
         precompute_grid_ = op.second;
       } else if (op.first=="lookup_mode") {
         lookup_modes_ = op.second;
+      } else if (op.first=="pedantic_mode_order") {
+        pedantic_mode_order_ = op.second.to_string();
+      } else if (op.first=="pedantic_mode_size") {
+        pedantic_mode_size_ = op.second.to_string();
       }
     }
 
@@ -342,6 +426,80 @@ namespace casadi {
       casadi_assert(n_dims<=3,
         "blazing_spline with precompute_coeff=true only supports up to 3D. "
         "Use precompute_coeff=false for 4D/5D.");
+    }
+
+    // pedantic_mode_order: per-dim knot counts should be non-decreasing.
+    std::vector<casadi_int> dim_sizes(n_dims);
+    for (casadi_int i = 0; i < n_dims; ++i) {
+      dim_sizes[i] = knots_offset_[i+1] - knots_offset_[i];
+    }
+    if (!is_nondecreasing(dim_sizes)) {
+      handle_pedantic(pedantic_mode_order_, "pedantic_mode_order",
+        "blazing_spline '" + name_ + "': per-dimension knot counts " +
+        str(dim_sizes) + " are not increasing in dimension index. "
+        "Deviating from this sorting may cost up to ~30% speedup but may "
+        "also be harmless of even slightly beneficial.");
+    }
+
+    // pedantic_mode_size: check individual extents and cumulative-prefix
+    // products against power-of-2 cache aliasing. Variants:
+    //   nc_ (always)                         extents = (n_i - 4)
+    //   ndc_ at deriv k (precompute && >=1)  extent k uses (n_k - 5)
+    //   nddc_ at (k,kk) (!precompute && >=2) extents k,kk subtract 1 each
+    std::vector<std::string> offenders;
+    std::vector<casadi_int> ext_nc(n_dims);
+    for (casadi_int i = 0; i < n_dims; ++i) {
+      casadi_int n_i = knots_offset_[i+1] - knots_offset_[i];
+      ext_nc[i] = n_i - 4;
+      if (is_pow2_ge8(ext_nc[i])) {
+        offenders.push_back("dim " + str(i) + " (zero-based): "
+          "(n_knots - 4) = " + str(ext_nc[i]));
+      }
+    }
+    scan_prefix_pow2(offenders, ext_nc, "");
+
+    if (precompute_coeff_ && diff_order_ >= 1) {
+      for (casadi_int k = 0; k < n_dims; ++k) {
+        casadi_int n_k = knots_offset_[k+1] - knots_offset_[k];
+        casadi_int f5 = n_k - 5;
+        if (is_pow2_ge8(f5)) {
+          offenders.push_back("dim " + str(k) + " (zero-based): "
+            "(n_knots - 5) = " + str(f5) + " (diff order 1)");
+        }
+        std::vector<casadi_int> ext = ext_nc;
+        ext[k] -= 1;
+        scan_prefix_pow2(offenders, ext,
+          " (diff order 1, d/dx_" + str(k) + ")");
+      }
+    }
+    if (!precompute_coeff_ && diff_order_ >= 2) {
+      for (casadi_int k = 0; k < n_dims; ++k) {
+        for (casadi_int kk = k; kk < n_dims; ++kk) {
+          if (k == kk) {
+            casadi_int n_k = knots_offset_[k+1] - knots_offset_[k];
+            casadi_int f6 = n_k - 6;
+            if (is_pow2_ge8(f6)) {
+              offenders.push_back("dim " + str(k) + " (zero-based): "
+                "(n_knots - 6) = " + str(f6) + " (diff order 2)");
+            }
+          }
+          std::vector<casadi_int> ext = ext_nc;
+          ext[k]  -= 1;
+          ext[kk] -= 1;
+          scan_prefix_pow2(offenders, ext,
+            " (diff order 2, d2/dx_" + str(k) + "dx_" + str(kk) + ")");
+        }
+      }
+    }
+    if (!offenders.empty()) {
+      std::string msg = "blazing_spline '" + name_ + "': internal "
+        "coefficient-tensor extents or cumulative products are powers of 2 "
+        "(8, 16, 32, ...). Such extents cause cache-set aliasing on "
+        "power-of-2 strides / cache eviction and will incur costs. These "
+        "costs can vary from 30% to 400% runtime. Adjust the number of "
+        "knots in the affected dimension(s). Offending:";
+      for (const auto& s : offenders) msg += "\n  - " + s;
+      handle_pedantic(pedantic_mode_size_, "pedantic_mode_size", msg);
     }
 
     // Arrays for holding inputs and outputs
@@ -416,7 +574,8 @@ namespace casadi {
     casadi_int N = ndim();
     bool parametric = has_parametric_knots();
     casadi_int nk = parametric ? knots_offset_.back() : 0;
-    casadi_int n_inv = 3 * nk;
+    // Per-dim cache slice = 2 (intercept,slope) + 3*n_k. See compute_knots_cache.
+    casadi_int n_inv = 2 * N + 3 * nk;
 
     MX x = MX::sym("x", N);
     MX C = MX::sym("C", nc_);
@@ -429,6 +588,14 @@ namespace casadi {
     Jopts = combine(opts, Jopts);
     Jopts = combine(Jopts, generate_options("jacobian"));
     Jopts["derivative_of"] = self();
+
+    // Propagate pedantic_mode_* to the child unless explicitly overridden.
+    // combine() takes the first dict's value when keys collide, so this only
+    // fills in when no caller- or jacobian_options-supplied value exists.
+    Dict pedantic_defaults;
+    pedantic_defaults["pedantic_mode_order"] = pedantic_mode_order_;
+    pedantic_defaults["pedantic_mode_size"]  = pedantic_mode_size_;
+    Jopts = combine(Jopts, pedantic_defaults);
 
     std::string fJname = name_ + "_der";
 
@@ -530,7 +697,7 @@ namespace casadi {
     std::vector<MX> in_child = {x, C};
     if (parametric) in_child.push_back(knots_sym);
     if (precompute_grid_ && parametric) {
-      MX inv_mx = inv_input_ ? inv_sym : compute_inv(knots_sym, knots_offset_);
+      MX inv_mx = inv_input_ ? inv_sym : compute_knots_cache(knots_sym, knots_offset_);
       in_child.push_back(inv_mx);
     }
     if (precompute_coeff_) {
@@ -583,6 +750,8 @@ namespace casadi {
       s.pack("BlazingSplineFunction::knots_offset", knots_offset_);
       s.pack("BlazingSplineFunction::inv_input", inv_input_);
     }
+    s.pack("BlazingSplineFunction::pedantic_mode_order", pedantic_mode_order_);
+    s.pack("BlazingSplineFunction::pedantic_mode_size", pedantic_mode_size_);
   }
 
   BlazingSplineFunction::BlazingSplineFunction(DeserializingStream & s) : FunctionInternal(s) {
@@ -604,6 +773,8 @@ namespace casadi {
         s.unpack("BlazingSplineFunction::knots_offset", knots_offset_);
         s.unpack("BlazingSplineFunction::inv_input", inv_input_);
       }
+      s.unpack("BlazingSplineFunction::pedantic_mode_order", pedantic_mode_order_);
+      s.unpack("BlazingSplineFunction::pedantic_mode_size", pedantic_mode_size_);
     }
     init_derived_members();
   }

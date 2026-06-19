@@ -17,10 +17,10 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # -*- coding: utf-8 -*-
-from casadi import *
+import casadi as ca
 
 # Declare variables
-x = SX.sym("x",2)
+x = ca.SX.sym("x",2)
 
 # Form the NLP
 f = x[0]**2 + x[1]**2 # objective
@@ -39,7 +39,7 @@ if MySolver=="sqpmethod":
   opts["qpsol_options"] = {"printLevel":"none"}
 
 # Allocate a solver
-solver = nlpsol("solver", MySolver, nlp, opts)
+solver = ca.nlpsol("solver", MySolver, nlp, opts)
 
 # Solve the NLP
 sol = solver(lbg=0)

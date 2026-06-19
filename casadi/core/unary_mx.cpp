@@ -101,6 +101,14 @@ namespace casadi {
     return 0;
   }
 
+  int UnaryMX::eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    const bvec_t zero_out = operation_checker<F0XChecker>(op_) ? 0 : ~static_cast<bvec_t>(0);
+    const bvec_t* a = arg[0];
+    bvec_t* r = res[0];
+    for (casadi_int i=0; i<nnz(); ++i) r[i] = a[i] ? ~static_cast<bvec_t>(0) : zero_out;
+    return 0;
+  }
+
   int UnaryMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     copy_rev(arg[0], res[0], nnz());
     return 0;

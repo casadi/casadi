@@ -294,6 +294,12 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Export instance into an FMU (experimental)
   Dict export_fmu(const Dict& opts) const;
 
+  /// Compile the sources produced by export_fmu, returning the augmented file map
+  Dict compile_fmu(const Dict& files, const Dict& opts) const;
+
+  /// Pack files (from export_fmu / compile_fmu) into a single .fmu archive (experimental)
+  std::string pack_fmu(const Dict& files, const Dict& opts) const;
+
   /// Generate FMU wrapper file (fmi3Functions.c)
   std::string generate_wrapper(const std::string& guid, const CodeGenerator& gen) const;
 
@@ -307,7 +313,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   XmlNode generate_model_variables() const;
 
   /// Generate FMU ModelStructure
-  XmlNode generate_model_structure() const;
+  XmlNode generate_model_structure(bool dae = false) const;
 
   /// Update model variable dependencies
   void update_dependencies() const;
@@ -378,7 +384,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   MX der(const MX& var, bool may_allocate = true);
 
   /// Find a unique name, with a specific prefix
-  std::string unique_name(const std::string& prefix, bool allow_no_prefix = true) const;
+  std::string unique_name(const std::string& prefix, bool allow_no_prefix = false) const;
 
   /// Readable name of the class
   std::string type_name() const {return "DaeBuilderInternal";}
@@ -489,13 +495,13 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 protected:
 
   /// Get the qualified name
-  static std::string qualified_name(const XmlNode& nn, Attribute* att = 0);
+  static std::string qualified_name(const XmlNode& nn, Attribute* att = nullptr);
 
   // User-set options
   bool debug_;
   double fmutol_;
   bool ignore_time_;
-  bool enable_ls_dae_;
+  bool enable_ls_dae_, enable_ls_serialization_;
 
   // FMI attributes
   std::string fmi_version_;
@@ -673,7 +679,7 @@ protected:
   MX read_identifier(const XmlNode& node);
 
   /// Read a variable
-  Variable& read_variable(const XmlNode& node, Attribute* att = 0);
+  Variable& read_variable(const XmlNode& node, Attribute* att = nullptr);
 
   // Read DefaultExperiment
   void import_default_experiment(const XmlNode& n);

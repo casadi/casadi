@@ -24,7 +24,7 @@
 # Simulator
 # =====================
 
-from casadi import *
+import casadi as ca
 from numpy import *
 from pylab import *
 
@@ -32,27 +32,27 @@ from pylab import *
 #
 # $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
 
-t = SX.sym('t')
+t = ca.SX.sym('t')
 
-u = SX.sym('u') 
-v = SX.sym('v') 
-states = vertcat(u,v)
+u = ca.SX.sym('u') 
+v = ca.SX.sym('v') 
+states = ca.vertcat(u,v)
 
-eps   = SX.sym('eps')
-mu    = SX.sym('mu')
-alpha = SX.sym('alpha')
-k     = SX.sym('k')
-sigma = SX.sym('sigma')
+eps   = ca.SX.sym('eps')
+mu    = ca.SX.sym('mu')
+alpha = ca.SX.sym('alpha')
+k     = ca.SX.sym('k')
+sigma = ca.SX.sym('sigma')
 Omega = 2 + eps*sigma
 
-params = vertcat(eps,mu,alpha,k,sigma)
-rhs    = vertcat(v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t)))
+params = ca.vertcat(eps,mu,alpha,k,sigma)
+rhs    = ca.vertcat(v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t)))
 
 # We will simulate over 50 seconds, 1000 timesteps.
 
 dae={'x':states, 'p':params, 't':t, 'ode':rhs}
 ts = linspace(0, 50, 1000)
-integrator = integrator('integrator', 'cvodes', dae, 0, ts)
+integrator = ca.integrator('integrator', 'cvodes', dae, 0, ts)
 
 sol = integrator(x0=[1,0], p=[0.1,0.1,0.1,0.3,0.1])
 

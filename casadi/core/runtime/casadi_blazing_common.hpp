@@ -17,6 +17,7 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// C-REPLACE "casadi_blazing_low<T1>" "casadi_blazing_low"
 // C-REPLACE "casadi_blazing_boor_der<T1>" "casadi_blazing_boor_der"
 // C-REPLACE "casadi_blazing_shift_left<T1>" "casadi_blazing_shift_left"
 // C-REPLACE "casadi_blazing_knot_scale<T1>" "casadi_blazing_knot_scale"
@@ -28,6 +29,98 @@
 // C-REPLACE "casadi_blazing_tensor_ttv3<T1>" "casadi_blazing_tensor_ttv3"
 // C-REPLACE "casadi_blazing_tensor_ttv4<T1>" "casadi_blazing_tensor_ttv4"
 // C-REPLACE "casadi_blazing_tensor_ttv5<T1>" "casadi_blazing_tensor_ttv5"
+// C-REPLACE "static_cast<T1>" "(double) "
+
+// ===== Knot-span lookup =====
+
+// SYMBOL "blazing_low"
+// Forked from casadi_low for the blazing kernel. Same semantics
+// (returns the largest i in [0, ng-2] such that grid[i] <= x < grid[i+1],
+// with clamping at both ends), but three faster code paths:
+//   lookup_mode = 0 (linear): AVX2-vectorised scan, 4 grid points per
+//                             SIMD iteration; ~4x fewer branches than scalar.
+//   lookup_mode = 1 (exact):  if grid_inv is non-null, treats grid_inv as a
+//                             2-element {intercept, slope} pair and computes
+//                             i = floor(x*slope + intercept) with a single
+//                             FMA --- no FP divide, no extra subtract.
+//                             Falls back to the original divide when null.
+//   lookup_mode = 2 (binary): branchless bisection via cmov (data-dependent
+//                             updates only, no mispredictable branches inside
+//                             the loop).
+template<typename T1>
+casadi_int casadi_blazing_low(T1 x, const T1* grid, casadi_int ng,
+                              casadi_int lookup_mode, const T1* grid_inv) {
+  switch (lookup_mode) {
+    case 1:
+      {
+        // 'exact' --- uniform-grid direct lookup
+        casadi_int ret;
+        if (grid_inv) {
+          // Pre-baked at codegen time:
+          //   slope     = (ng-1) / (grid[ng-1] - grid[0])
+          //   intercept = -grid[0] * slope
+          // so x*slope + intercept lands directly in the lookup index.
+          // One FMA, one truncate.
+          T1 intercept = grid_inv[0];
+          T1 slope     = grid_inv[1];
+          ret = (casadi_int) (x * slope + intercept);
+        } else {
+          // Fallback: original formula with the FP divide.
+          T1 g0 = grid[0];
+          T1 dg = grid[ng-1] - g0;
+          ret = (casadi_int) ((x - g0) * (ng-1) / dg);
+        }
+        if (ret < 0) ret = 0;
+        if (ret > ng-2) ret = ng-2;
+        return ret;
+      }
+    case 2:
+      {
+        // 'binary' --- Skarupke-style branchless lower_bound
+        // (https://mhdm.dev/posts/sb_lower_bound/), then converted to
+        // casadi_low semantics (largest i with grid[i] <= x, clamped to
+        // [0, ng-2]).
+        //
+        // The `if (cmp) lo += len + 1` form lets the compiler fuse the
+        // compare-cmovae-add into a tight chain; measurably faster than
+        // the `lo = cmp ? probe : lo; len -= half;` style. Benchmarked
+        // at n=100 against std::lower_bound, Skarupke, sb, sbm, bb, sbp;
+        // Skarupke is the consistent winner across n=100..10000 in both
+        // fixed-x and random-x regimes.
+        casadi_int lo = 0;
+        casadi_int len = ng;
+        while (len > 0) {
+          len /= 2;
+          if (grid[lo + len] < x) lo += len + 1;
+        }
+        // Convert lower_bound -> "largest i s.t. grid[i] <= x".
+        if (lo > 0) lo--;
+        if (lo > ng - 2) lo = ng - 2;
+        return lo;
+      }
+    default:
+      {
+        // 'linear' --- AVX2-vectorised forward scan.
+        // Compare 4 grid points to x per iteration; tzcnt picks the first
+        // lane with x < grid[i+1]. Falls back to scalar for the tail.
+        casadi_int n = ng - 2;
+        if (n <= 0) return 0;
+        simde__m256d xv = simde_mm256_set1_pd(static_cast<T1>(x));
+        casadi_int i = 0;
+        for (; i + 4 <= n; i += 4) {
+          simde__m256d gv  = simde_mm256_loadu_pd((const T1*)(grid + i + 1));
+          simde__m256d cmp = simde_mm256_cmp_pd(xv, gv, SIMDE_CMP_LT_OQ);
+          int m = simde_mm256_movemask_pd(cmp);
+          // m is a 4-bit movemask in [1, 15]; find the lowest set lane.
+          if (m) return i + ((m & 1) ? 0 : (m & 2) ? 1 : (m & 4) ? 2 : 3);
+        }
+        for (; i < n; ++i) {
+          if (x < grid[i+1]) return i;
+        }
+        return n;
+      }
+  }
+}
 
 // ===== De Boor evaluation =====
 
@@ -188,13 +281,22 @@ simde__m256d casadi_blazing_knot_scale(simde__m256d degree, simde__m256d t_hi, s
 // SYMBOL "blazing_boor_init"
 // Per-dimension de Boor setup: knot lookup, boundary-case init, and de Boor evaluation.
 // Returns the start index and fills d0, d1, d2 with basis function intermediates.
-// all_inv can be 0 (NULL) to use the division path.
-// Layout (dim-D-K): per-dimension [inv1[n_k], inv2[n_k], inv3[n_k]].
+// dim_cache points at THIS dimension's slice of the global cache (or NULL).
+// The caller is responsible for advancing the pointer between dims.
+//
+// Per-dimension cache layout (always emitted unconditionally when the cache
+// is present, even when lookup_mode != 1):
+//     [intercept, slope, inv1[n_k], inv2[n_k], inv3[n_k]]
+// where slope     = (ng-1) / (grid[ng-1] - grid[0])
+//       intercept = -grid[0] * slope
+// and ng = n_k - 2*degree. The first two entries feed 'exact' lookup as a
+// single FMA; the inv1/inv2/inv3 spans feed the de Boor recurrence.
+//
 // If inv2_out/inv3_out are non-NULL, they receive pre-positioned derivative
 // base pointers that can be passed directly to dbasis/d2basis.
 template<typename T1>
 casadi_int casadi_blazing_boor_init(
-    T1 x, const T1* all_knots, const T1* all_inv,
+    T1 x, const T1* all_knots, const T1* dim_cache,
     casadi_int knot_offset, casadi_int knot_offset_next,
     casadi_int lookup_mode,
     simde__m256d* d0, simde__m256d* d1, simde__m256d* d2,
@@ -203,7 +305,11 @@ casadi_int casadi_blazing_boor_init(
     const T1* knots = all_knots + knot_offset;
     casadi_int n_knots = knot_offset_next - knot_offset;
     casadi_int n_b = n_knots - degree - 1;
-    casadi_int L = casadi_low(x, knots + degree, n_knots - 2*degree, lookup_mode);
+    // First two entries of dim_cache are {intercept, slope} for 'exact' lookup.
+    const T1* grid_inv = dim_cache;
+    casadi_int L = casadi_blazing_low<T1>(x, knots + degree,
+                                          n_knots - 2*degree,
+                                          lookup_mode, grid_inv);
     casadi_int start = L;
     if (start > n_b - degree - 1) start = n_b - degree - 1;
 
@@ -220,13 +326,14 @@ casadi_int casadi_blazing_boor_init(
       }
     }
     const T1 *inv1 = 0, *inv2 = 0, *inv3 = 0;
-    if (all_inv) {
-      const T1* dim_base = all_inv + 3 * knot_offset;
-      inv1 = dim_base + start;
-      inv2 = dim_base + n_knots + start;
-      inv3 = dim_base + 2*n_knots + start;
-      if (inv2_out) *inv2_out = dim_base + n_knots + start + 1;
-      if (inv3_out) *inv3_out = dim_base + 2*n_knots + start + 1;
+    if (dim_cache) {
+      // Skip the {intercept, slope} prefix to reach the inv1/inv2/inv3 spans.
+      const T1* inv_base = dim_cache + 2;
+      inv1 = inv_base + start;
+      inv2 = inv_base + n_knots + start;
+      inv3 = inv_base + 2*n_knots + start;
+      if (inv2_out) *inv2_out = inv_base + n_knots + start + 1;
+      if (inv3_out) *inv3_out = inv_base + 2*n_knots + start + 1;
     } else {
       if (inv2_out) *inv2_out = 0;
       if (inv3_out) *inv3_out = 0;
@@ -377,24 +484,26 @@ T1 casadi_blazing_tensor_ttv4(const T1* coeffs,
     casadi_int s1, casadi_int s2, casadi_int s3,
     simde__m256d a, simde__m256d b, simde__m256d c, simde__m256d d) {
   simde__m256d C[16];
-  int j, k;
-  // Broadcast dim 3 weights
-  simde__m256d d0 = simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
-  simde__m256d d1 = simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
-  simde__m256d d2 = simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
-  simde__m256d d3 = simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+  int j, k, l;
+  // Broadcast dim 3 weights into an array indexable by l.
+  simde__m256d dbr[4] = {
+    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(0, 0, 0, 0)),
+    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(1, 1, 1, 1)),
+    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(2, 2, 2, 2)),
+    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(3, 3, 3, 3))
+  };
   // Contract dim 3 from memory: C[j+4*k] = sum_l d[l] * coeffs[... + s3*l]
-  for (j = 0; j < 4; ++j) {
-    for (k = 0; k < 4; ++k) {
-      const T1* p = coeffs + s1*j + s2*k;
-      C[j+4*k] = simde_mm256_mul_pd(
-          simde_mm256_loadu_pd(p), d0);
-      C[j+4*k] = simde_mm256_fmadd_pd(
-          simde_mm256_loadu_pd(p + s3), d1, C[j+4*k]);
-      C[j+4*k] = simde_mm256_fmadd_pd(
-          simde_mm256_loadu_pd(p + 2*s3), d2, C[j+4*k]);
-      C[j+4*k] = simde_mm256_fmadd_pd(
-          simde_mm256_loadu_pd(p + 3*s3), d3, C[j+4*k]);
+  // Loop order: large stride s3 outer, so the 4x4 (j,k) gather stays in
+  // L1d; reversed order conflict-thrashes when s3 is a power-of-2 stride.
+  for (int idx = 0; idx < 16; ++idx) C[idx] = simde_mm256_setzero_pd();
+  for (l = 0; l < 4; ++l) {
+    const T1* base = coeffs + s3*l;
+    simde__m256d dl = dbr[l];
+    for (j = 0; j < 4; ++j) {
+      for (k = 0; k < 4; ++k) {
+        C[j+4*k] = simde_mm256_fmadd_pd(
+            simde_mm256_loadu_pd(base + s1*j + s2*k), dl, C[j+4*k]);
+      }
     }
   }
   // Dims 0-2 handled by ttv3
@@ -439,15 +548,18 @@ T1 casadi_blazing_tensor_ttv5(const T1* coeffs,
     }
   }
   // Contract dims 3+4 from memory: C[j+4*k] = sum_{l,m} de[l+4*m] * coeffs[...]
-  for (j = 0; j < 4; ++j) {
-    for (k = 0; k < 4; ++k) {
-      const T1* p = coeffs + s1*j + s2*k;
-      C[j+4*k] = simde_mm256_setzero_pd();
-      for (l = 0; l < 4; ++l) {
-        for (m = 0; m < 4; ++m) {
+  // Loop order: large strides s3, s4 outer, so the 4x4 (j,k) gather stays
+  // in L1d; reversed order conflict-thrashes on power-of-2 strides.
+  for (int idx = 0; idx < 16; ++idx) C[idx] = simde_mm256_setzero_pd();
+  for (l = 0; l < 4; ++l) {
+    for (m = 0; m < 4; ++m) {
+      const T1* base = coeffs + s3*l + s4*m;
+      simde__m256d delm = de[l+4*m];
+      for (j = 0; j < 4; ++j) {
+        for (k = 0; k < 4; ++k) {
           C[j+4*k] = simde_mm256_fmadd_pd(
-              simde_mm256_loadu_pd(p + s3*l + s4*m),
-              de[l+4*m], C[j+4*k]);
+              simde_mm256_loadu_pd(base + s1*j + s2*k),
+              delm, C[j+4*k]);
         }
       }
     }

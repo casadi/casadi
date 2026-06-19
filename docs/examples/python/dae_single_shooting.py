@@ -16,7 +16,7 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
 
 """
 This example mainly intended for CasADi presentations. It contains a compact
@@ -45,12 +45,12 @@ Joel Andersson, 2012-2015
 """
 
 # Declare variables
-x = SX.sym("x",2) # Differential states
-z = SX.sym("z")   # Algebraic variable
-u = SX.sym("u")   # Control
+x = ca.SX.sym("x",2) # Differential states
+z = ca.SX.sym("z")   # Algebraic variable
+u = ca.SX.sym("u")   # Control
 
 # Differential equation
-f_x = vertcat(z*x[0]-x[1]+u, x[0])
+f_x = ca.vertcat(z*x[0]-x[1]+u, x[0])
 
 # Algebraic equation
 f_z = x[1]**2 + z - 1
@@ -61,10 +61,10 @@ f_q = x[0]**2 + x[1]**2 + u**2
 # Create an integrator
 dae = {'x':x, 'z':z, 'p':u, 'ode':f_x, 'alg':f_z, 'quad':f_q}
 # interval length 0.5s
-I = integrator('I', "idas", dae, 0, 0.5)
+I = ca.integrator('I', "idas", dae, 0, 0.5)
 
 # All controls
-U = MX.sym("U", 20)
+U = ca.MX.sym("U", 20)
 
 # Construct graph of integrator calls
 X  = [0,1]
@@ -77,7 +77,7 @@ for k in range(20):
 # Allocate an NLP solver
 nlp = {'x':U, 'f':J, 'g':X}
 opts = {"ipopt.linear_solver":"ma27"}
-solver = nlpsol("solver", "ipopt", nlp, opts)
+solver = ca.nlpsol("solver", "ipopt", nlp, opts)
 
 # Pass bounds, initial guess and solve NLP
 sol = solver(lbx = -0.75, # Lower variable bound

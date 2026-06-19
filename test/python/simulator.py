@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+import casadi as ca
 import casadi as c
 import numpy
 import numpy as n
@@ -43,20 +43,20 @@ class Simulatortests(casadiTestCase):
 
   def setUp(self):
     # Reference solution is q0 e^((t^3-t0^3)/(3 p))
-    t=SX.sym('t')
-    q=SX.sym('q')
-    p=SX.sym('p')
+    t=ca.SX.sym('t')
+    q=ca.SX.sym('q')
+    p=ca.SX.sym('p')
     f={'t':t, 'x':q, 'p':p, 'ode':q/p*t**2}
     opts = {}
     opts['reltol'] = 1e-15
     opts['abstol'] = 1e-15
     opts['fsens_err_con'] = True
     #opts['verbose'] = True
-    integrator = casadi.integrator('integrator', 'cvodes', f, 0, 2.3, opts)
-    q0   = MX.sym('q0')
-    par  = MX.sym('p')
+    integrator = ca.integrator('integrator', 'cvodes', f, 0, 2.3, opts)
+    q0   = ca.MX.sym('q0')
+    par  = ca.MX.sym('p')
     qend = integrator.call({'x0':q0,'p':par})['xf']
-    qe=Function('qe', [q0,par],[qend])
+    qe=ca.Function('qe', [q0,par],[qend])
     self.dae = f
     self.integrator = integrator
     self.qe=qe
@@ -73,9 +73,9 @@ class Simulatortests(casadiTestCase):
     N = 4
     tc = n.linspace(0,num['tend'], N)
 
-    t=SX.sym('t')
-    q=SX.sym('q')
-    p=SX.sym('p')
+    t=ca.SX.sym('t')
+    q=ca.SX.sym('q')
+    p=ca.SX.sym('p')
 
     f={'t':t, 'x':q, 'p':p, 'ode':q/p*t**2}
     opts = {}
@@ -83,10 +83,10 @@ class Simulatortests(casadiTestCase):
     opts['abstol'] = 1e-15
     opts['fsens_err_con'] = True
     #opts['verbose'] = True
-    integrator = casadi.integrator('integrator', 'cvodes', f, tc[0], tc, opts)
+    integrator = ca.integrator('integrator', 'cvodes', f, tc[0], tc, opts)
 
-    solution = Function('solution', {'x0':q, 'p':p, 'xf':horzcat(*[q*exp(t**3/(3*p)) for t in tc])},
-                        casadi.integrator_in(), casadi.integrator_out())
+    solution = ca.Function('solution', {'x0':q, 'p':p, 'xf':ca.horzcat(*[q*ca.exp(t**3/(3*p)) for t in tc])},
+                        ca.integrator_in(), ca.integrator_out())
     f_in = {}
     f_in['x0']=0.3
     f_in['p']=0.7
@@ -102,11 +102,13 @@ class Simulatortests(casadiTestCase):
     opts['reltol'] = 1e-15
     opts['abstol'] = 1e-15
     opts['fsens_err_con'] = True
-    integrator = casadi.integrator('integrator', 'cvodes', self.dae, t[0], t, opts)
+    integrator = ca.integrator('integrator', 'cvodes', self.dae, t[0], t, opts)
 
-    x0_ind = casadi.integrator_in().index('x0')
-    integrator_in = [0]*integrator.n_in();integrator_in[x0_ind]=[num['q0']]
-    p_ind = casadi.integrator_in().index('p')
+    x0_ind = ca.integrator_in().index('x0')
+    integrator_in = [0]*integrator.n_in()  # type: list
+
+    integrator_in[x0_ind]=[num['q0']]
+    p_ind = ca.integrator_in().index('p')
     integrator_in[p_ind]=[num['p']]
     integrator_out = integrator.call(integrator_in)
 
@@ -114,7 +116,7 @@ class Simulatortests(casadiTestCase):
     q0=num['q0']
     p=num['p']
 
-    self.assertAlmostEqual(integrator_out[0][0,-1],q0*exp((tend**3-0.7**3)/(3*p)),9,'Evaluation output mismatch')
+    self.assertAlmostEqual(integrator_out[0][0,-1],q0*ca.exp((tend**3-0.7**3)/(3*p)),9,'Evaluation output mismatch')
 
 if __name__ == '__main__':
     unittest.main()

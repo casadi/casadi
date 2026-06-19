@@ -36,19 +36,10 @@ if(NOT METIS_FOUND)
 
 
     if(METIS_FOUND)
-        add_library(metis::metis INTERFACE IMPORTED)
+        add_library(metis::metis SHARED IMPORTED)
         set_target_properties(metis::metis PROPERTIES
-          INTERFACE_INCLUDE_DIRECTORIES ${METIS_INCLUDE_DIR}
+          IMPORTED_LOCATION "${METIS_LIB}"
+          INTERFACE_INCLUDE_DIRECTORIES "${METIS_INCLUDE_DIR}"
         )
-        if("${METIS_LIB}" MATCHES "coinmetis")
-            set_target_properties(metis::metis PROPERTIES
-              IMPORTED_LIBNAME coinmetis
-            )
-        else()
-            set_target_properties(metis::metis PROPERTIES
-              IMPORTED_LIBNAME metis
-            )
-        endif()
-        target_link_libraries(metis::metis INTERFACE ${METIS_LIBRARIES})
     endif()
 endif()

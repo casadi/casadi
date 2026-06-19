@@ -19,7 +19,7 @@
 import numpy as np
 import time
 print("importing casadi...")
-from casadi import *
+import casadi as ca
 
 
 # number of inputs to evaluate in parallel
@@ -32,17 +32,17 @@ dummyInput = np.linspace(0.0, 2.0*np.pi, N)
 
 # make a dummy function that's moderately expensive to evaluate
 print("creating dummy function....")
-x = SX.sym('x')
+x = ca.SX.sym('x')
 y = x
 for k in range(100000):
-    y = sin(y)
-f0 = Function('f', [x], [y])
+    y = ca.sin(y)
+f0 = ca.Function('f', [x], [y])
 
 
 # evaluate it serially, the old-fasioned way
-X = MX.sym('x',N)
-Y = vertcat(*[f0(X[k]) for k in range(N)])
-fNaiveParallel = Function('fParallel', [X], [Y])
+X = ca.MX.sym('x',N)
+Y = ca.vertcat(*[f0(X[k]) for k in range(N)])
+fNaiveParallel = ca.Function('fParallel', [X], [Y])
 
 print("evaluating naive parallel function...")
 t0 = time.time()

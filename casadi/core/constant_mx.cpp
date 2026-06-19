@@ -122,6 +122,17 @@ namespace casadi {
     return 0;
   }
 
+  int ConstantMX::eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    // Sound default for an unknown constant flavor; value-bearing subclasses refine per nonzero
+    std::fill_n(res[0], nnz(), ~static_cast<bvec_t>(0));
+    return 0;
+  }
+
+  void ConstantMX::nonzeros_to_activity(const double* v, bvec_t* res) const {
+    // Helper: set bit per nonzero where the stored value is nonzero
+    for (casadi_int k=0; k<nnz(); ++k) res[k] = (v[k]!=0) ? ~static_cast<bvec_t>(0) : 0;
+  }
+
   int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     std::fill_n(res[0], nnz(), 0);
     return 0;

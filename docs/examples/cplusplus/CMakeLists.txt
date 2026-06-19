@@ -8,6 +8,11 @@ if(WITH_IPOPT)
   link_directories(${IPOPT_LIBRARY_DIRS})
 endif()
 
+# Add IPOPT link directories
+if(WITH_MADNLP)
+  link_directories(${LIBMAD_LIBRARY_DIRS})
+endif()
+
 # Error handling
 add_executable(casadi_error_handling casadi_error_handling.cpp)
 target_link_libraries(casadi_error_handling casadi)
@@ -25,6 +30,20 @@ if(WITH_IPOPT)
   add_executable(rosenbrock rosenbrock.cpp)
   target_link_libraries(rosenbrock casadi)
 endif()
+
+# Rosenbrock problem (with madnlp)
+if(WITH_MADNLP)
+  add_executable(rosenbrock_madnlp rosenbrock_madnlp.cpp)
+  target_link_libraries(rosenbrock_madnlp casadi)
+  add_executable(rocket_madnlp rocket_madnlp.cpp)
+  target_link_libraries(rocket_madnlp casadi)
+endif()
+
+if(WITH_CCOPT)
+  add_executable(basic_mpcc basic_mpcc.cpp)
+  target_link_libraries(basic_mpcc casadi)
+endif()
+
 
 # Rocket using Ipopt
 if(WITH_IPOPT)
@@ -149,3 +168,20 @@ endif()
 # DaeBuilder
 add_executable(daebuilder daebuilder.cpp)
 target_link_libraries(daebuilder casadi)
+
+# Install every example executable defined above next to libcasadi (same
+# location as casadi-cli, so $ORIGIN/@loader_path rpaths resolve unchanged).
+get_property(CASADI_CPP_EXAMPLE_TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+file(RELATIVE_PATH TREL_BIN_PREFIX "${CMAKE_INSTALL_PREFIX}" "${BIN_PREFIX}")
+install(TARGETS ${CASADI_CPP_EXAMPLE_TARGETS} RUNTIME DESTINATION ${TREL_BIN_PREFIX})
+
+# Manifest listing the installed example filenames, so the Python wheel
+# packaging step can drop them while keeping casadi-cli (not listed here).
+set(CASADI_CPP_EXAMPLE_MANIFEST "")
+foreach(_tgt ${CASADI_CPP_EXAMPLE_TARGETS})
+  set(CASADI_CPP_EXAMPLE_MANIFEST "${CASADI_CPP_EXAMPLE_MANIFEST}$<TARGET_FILE_NAME:${_tgt}>\n")
+endforeach()
+file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cpp_examples_manifest.txt"
+  CONTENT "${CASADI_CPP_EXAMPLE_MANIFEST}")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/cpp_examples_manifest.txt"
+  DESTINATION ${TREL_BIN_PREFIX} RENAME .cpp_examples_manifest)

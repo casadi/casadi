@@ -27,6 +27,8 @@
 #include "fmu_function.hpp"
 #include "dae_builder_internal.hpp"
 #include "filesystem_impl.hpp"
+#include "archiver_impl.hpp"
+#include "importer.hpp"
 
 #ifdef WITH_FMI2
 #include "fmu2.hpp"
@@ -95,7 +97,7 @@ FmuMemory* Fmu::alloc_mem(const FmuFunction& f) const {
 }
 
 void Fmu::free_mem(void *mem) const {
-  return (*this)->free_mem(mem);
+  (*this)->free_mem(mem);
 }
 
 FmuInternal* Fmu::get() const {
@@ -276,7 +278,7 @@ int Fmu::init_mem(FmuMemory* m) const {
 
 void Fmu::free_instance(void* instance) const {
   try {
-    return (*this)->free_instance(instance);
+    (*this)->free_instance(instance);
   } catch(std::exception& e) {
     THROW_ERROR("free_instance", e.what());
   }
@@ -284,7 +286,7 @@ void Fmu::free_instance(void* instance) const {
 
 void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {
   try {
-    return (*this)->set(m, ind, value);
+    (*this)->set(m, ind, value);
   } catch(std::exception& e) {
     THROW_ERROR("set", e.what());
   }
@@ -292,7 +294,7 @@ void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {
 
 void Fmu::request(FmuMemory* m, size_t ind) const {
   try {
-    return (*this)->request(m, ind);
+    (*this)->request(m, ind);
   } catch(std::exception& e) {
     THROW_ERROR("request", e.what());
   }
@@ -308,7 +310,7 @@ int Fmu::eval(FmuMemory* m) const {
 
 void Fmu::get(FmuMemory* m, size_t id, double* value) const {
   try {
-    return (*this)->get(m, id, value);
+    (*this)->get(m, id, value);
   } catch(std::exception& e) {
     THROW_ERROR("get", e.what());
   }
@@ -316,7 +318,7 @@ void Fmu::get(FmuMemory* m, size_t id, double* value) const {
 
 void Fmu::set_fwd(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const {
   try {
-    return (*this)->set_fwd(m, nseed, id, v);
+    (*this)->set_fwd(m, nseed, id, v);
   } catch(std::exception& e) {
     THROW_ERROR("set_fwd", e.what());
   }
@@ -324,7 +326,7 @@ void Fmu::set_fwd(FmuMemory* m, casadi_int nseed, const casadi_int* id, const do
 
 void Fmu::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
   try {
-    return (*this)->set_fwd(m, ind, v);
+    (*this)->set_fwd(m, ind, v);
   } catch(std::exception& e) {
     THROW_ERROR("set_fwd", e.what());
   }
@@ -333,7 +335,7 @@ void Fmu::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
 void Fmu::request_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const {
   try {
-    return (*this)->request_fwd(m, nsens, id, wrt_id);
+    (*this)->request_fwd(m, nsens, id, wrt_id);
   } catch(std::exception& e) {
     THROW_ERROR("request_fwd", e.what());
   }
@@ -341,7 +343,7 @@ void Fmu::request_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id,
 
 void Fmu::request_fwd(FmuMemory* m, casadi_int ind) const {
   try {
-    return (*this)->request_fwd(m, ind);
+    (*this)->request_fwd(m, ind);
   } catch(std::exception& e) {
     THROW_ERROR("request_fwd", e.what());
   }
@@ -357,7 +359,7 @@ int Fmu::eval_fwd(FmuMemory* m, bool independent_seeds) const {
 
 void Fmu::get_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   try {
-    return (*this)->get_fwd(m, nsens, id, v);
+    (*this)->get_fwd(m, nsens, id, v);
   } catch(std::exception& e) {
     THROW_ERROR("get_fwd", e.what());
   }
@@ -365,7 +367,7 @@ void Fmu::get_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* 
 
 void Fmu::get_fwd(FmuMemory* m, size_t ind, double* v) const {
   try {
-    return (*this)->get_fwd(m, ind, v);
+    (*this)->get_fwd(m, ind, v);
   } catch(std::exception& e) {
     THROW_ERROR("get_fwd", e.what());
   }
@@ -373,7 +375,7 @@ void Fmu::get_fwd(FmuMemory* m, size_t ind, double* v) const {
 
 void Fmu::set_adj(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const {
   try {
-    return (*this)->set_adj(m, nseed, id, v);
+    (*this)->set_adj(m, nseed, id, v);
   } catch(std::exception& e) {
     THROW_ERROR("set_adj", e.what());
   }
@@ -381,7 +383,7 @@ void Fmu::set_adj(FmuMemory* m, casadi_int nseed, const casadi_int* id, const do
 
 void Fmu::set_adj(FmuMemory* m, size_t ind, const double* v) const {
   try {
-    return (*this)->set_adj(m, ind, v);
+    (*this)->set_adj(m, ind, v);
   } catch(std::exception& e) {
     THROW_ERROR("set_adj", e.what());
   }
@@ -390,7 +392,7 @@ void Fmu::set_adj(FmuMemory* m, size_t ind, const double* v) const {
 void Fmu::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const {
   try {
-    return (*this)->request_adj(m, nsens, id, wrt_id);
+    (*this)->request_adj(m, nsens, id, wrt_id);
   } catch(std::exception& e) {
     THROW_ERROR("request_adj", e.what());
   }
@@ -398,7 +400,7 @@ void Fmu::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id,
 
 void Fmu::request_adj(FmuMemory* m, casadi_int ind) const {
   try {
-    return (*this)->request_adj(m, ind);
+    (*this)->request_adj(m, ind);
   } catch(std::exception& e) {
     THROW_ERROR("request_adj", e.what());
   }
@@ -414,7 +416,7 @@ int Fmu::eval_adj(FmuMemory* m) const {
 
 void Fmu::get_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   try {
-    return (*this)->get_adj(m, nsens, id, v);
+    (*this)->get_adj(m, nsens, id, v);
   } catch(std::exception& e) {
     THROW_ERROR("get_adj", e.what());
   }
@@ -422,7 +424,7 @@ void Fmu::get_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* 
 
 void Fmu::get_adj(FmuMemory* m, size_t ind, double* v) const {
   try {
-    return (*this)->get_adj(m, ind, v);
+    (*this)->get_adj(m, ind, v);
   } catch(std::exception& e) {
     THROW_ERROR("get_adj", e.what());
   }
@@ -431,7 +433,7 @@ void Fmu::get_adj(FmuMemory* m, size_t ind, double* v) const {
 void Fmu::get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const {
   try {
-    return (*this)->get_stats(m, stats, name_in, in);
+    (*this)->get_stats(m, stats, name_in, in);
   } catch(std::exception& e) {
     THROW_ERROR("get_stats", e.what());
   }
@@ -731,6 +733,75 @@ std::string FmuInternal::dll_suffix() {
 #endif
 }
 
+Dict FmuInternal::compile_fmu(const std::string& name, const Dict& files, const Dict& opts) {
+  // Options
+  Dict compiler_opts;
+  std::string compiler_plugin = "shell";
+  std::vector<std::string> include_dirs;
+  for (auto&& op : opts) {
+    if (op.first == "compiler") {
+      compiler_plugin = op.second.to_string();
+    } else if (op.first == "compiler_options") {
+      compiler_opts = op.second;
+    } else if (op.first == "include_dirs") {
+      include_dirs = op.second.to_string_vector();
+    } else {
+      casadi_error("No such option: " + op.first);
+    }
+  }
+  // The C sources to compile are the .c entries of the export_fmu map (flat in CWD)
+  std::vector<std::string> csources;
+  for (auto&& kv : files) {
+    const std::string& local = kv.first;
+    if (local.size() > 2 && local.substr(local.size() - 2) == ".c") csources.push_back(local);
+  }
+  // Amalgamation translation unit: a single .c that #includes every generated source,
+  // because the shell Importer compiles exactly one source file. The compile runs in
+  // the working directory, so quoted includes resolve against the loose files there.
+  // This is a build scratch file, NOT FMU content, so it is removed below.
+  std::string amalg = name + "_all.c";
+  {
+    auto f = Filesystem::ofstream_ptr(amalg);
+    for (const std::string& c : csources) *f << "#include \"" << c << "\"\n";
+  }
+  // Compile the amalgamation into a shared library via the Importer plugin.
+  // Pass include dirs through the OS-agnostic 'include_dirs' option (the plugin
+  // prefixes each with the compiler's own include flag: -I on gcc/clang, /I on MSVC).
+  Dict cop = compiler_opts;
+  if (!include_dirs.empty()) cop["include_dirs"] = include_dirs;
+  Importer compiler(amalg, compiler_plugin, cop);
+  // Lift the binary to a stable path before the Importer destructor removes it, then
+  // discard the amalgamation scratch file (compilation is done once the Importer exists)
+  std::string dll = name + dll_suffix();
+  Filesystem::copy_file(compiler.library(), dll);
+  Filesystem::remove(amalg);
+  // Augment the file map with the compiled binary
+  // (FMI-3 layout: binaries/<dll_infix>/<modelIdentifier><suffix>)
+  Dict ret = files;
+  ret[dll] = "binaries/" + Fmu3::dll_infix() + "/" + name + dll_suffix();
+  return ret;
+}
+
+std::string FmuInternal::pack_fmu(const Dict& files, const std::string& path) {
+  casadi_assert(Archiver::has_plugin("libzip"),
+    "pack_fmu requires libzip. Compile CasADi with WITH_LIBZIP=ON.");
+  // The {local_file -> archive path} map is exactly the set of zip entries: no staging
+  // directory or copies required.
+  std::vector<std::pair<std::string, std::string>> entries;
+  for (auto&& kv : files) {
+    std::string arc = kv.second.to_string();
+    if (arc.substr(0, 2) == "./") arc = arc.substr(2);  // zip entries are root-relative
+    entries.push_back({kv.first, arc});
+  }
+  std::string out = path;
+  if (out.size() < 4 || out.substr(out.size() - 4) != ".fmu") out += ".fmu";
+  casadi_assert(Archiver::getPlugin("libzip").exposed.pack_entries(entries, out),
+    "Packing FMU '" + out + "' failed.");
+  // Clean up the loose files
+  for (auto&& e : entries) Filesystem::remove(e.first);
+  return out;
+}
+
 std::string FmuInternal::desc_in(FmuMemory* m, size_t id, bool more) const {
   // Create description
   if (more) {
@@ -882,7 +953,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
     }
   }
   // All perturbed outputs
-  const double* yk_all[5] = {0};
+  const double* yk_all[5] = {nullptr};
 
   // Calculate all perturbed outputs
   for (casadi_int k = 0; k < n_points; ++k) {
@@ -1166,7 +1237,7 @@ int FmuInternal::discrete_states_iter(void* instance) const {
 
 int FmuInternal::init_mem(FmuMemory* m) const {
   // Ensure not already instantiated
-  casadi_assert(m->instance == 0, "Already instantiated");
+  casadi_assert(m->instance == nullptr, "Already instantiated");
   // Create instance
   m->instance = instantiate();
   // Set all values
@@ -1304,11 +1375,12 @@ void FmuInternal::get(FmuMemory* m, size_t ind, double* value) const {
 void FmuInternal::set_fwd(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
-    if (*v != 0) {
-      m->isens_.at(*id) = *v++;
+    if (*v != 0.) {
+      m->isens_.at(*id) = *v;
       m->imarked_.at(*id) = true;
-      id++;
     }
+    id++;
+    v++;
   }
 }
 
@@ -1403,7 +1475,7 @@ void FmuInternal::gather_adj(FmuMemory* m) const {
 }
 
 void Fmu::serialize(SerializingStream &s) const {
-  return (*this)->serialize(s);
+  (*this)->serialize(s);
 }
 
 Fmu Fmu::deserialize(DeserializingStream& s) {

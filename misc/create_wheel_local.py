@@ -1,6 +1,5 @@
 import os
 import base64
-from wheel.archive import archive_wheelfile
 import hashlib
 import csv
 from email.message import Message
@@ -8,6 +7,7 @@ from email.generator import Generator
 import shutil
 import re
 import sys
+import zipfile
 
 def open_for_csv(name, mode):
     if sys.version_info[0] < 3:
@@ -17,6 +17,8 @@ def open_for_csv(name, mode):
         kwargs = {'newline': '', 'encoding': 'utf-8'}
 
     return open(name, mode, **kwargs)
+
+abi3_mode = '--abi3' in sys.argv
 
 version   = sys.argv[1]
 pyversion = sys.argv[2]
@@ -33,6 +35,9 @@ if "+" in version:
 
 if version.startswith("v"):
   version = version[1:]
+
+abi_tag = "abi3" if abi3_mode else "none"
+
 if os_name=="linux":
   if arch=="manylinux1-x86":
     arch = "manylinux1_i686"
@@ -42,22 +47,28 @@ if os_name=="linux":
     arch = "manylinux2014_x86_64"
   elif arch=="manylinux2014-x86":
     arch = "manylinux2014_i686"
-  elif arch=="manylinux2014-x64-modern":
-    arch = "manylinux2014_x86_64"
-  elif arch=="manylinux2014-x86-modern":
-    arch = "manylinux2014_i686"
-  tag = "cp%s-none-%s" % (pyversion,arch.replace("-","_"))
+  elif arch=="manylinux_2_34-x64":
+    arch = "manylinux_2_34_x86_64"
+  elif arch=="manylinux_2_34-aarch64":
+    arch = "manylinux_2_34_aarch64"
+  elif arch=="manylinux_2_28-x64":
+    arch = "manylinux_2_28_x86_64"
+  elif arch=="manylinux_2_28-aarch64":
+    arch = "manylinux_2_28_aarch64"
+  elif arch=="manylinux2014-aarch64":
+    arch = "manylinux2014_aarch64"
+  tag = "cp%s-%s-%s" % (pyversion,abi_tag,arch.replace("-","_"))
 elif os_name=="osx":
   if arch=="x86_64":
-    tag = ["cp%s-none-macosx_11_0_x86_64" % (pyversion),
-         "cp%s-none-macosx_11_0_intel" % (pyversion)]
+    tag = ["cp%s-%s-macosx_11_0_x86_64" % (pyversion,abi_tag),
+         "cp%s-%s-macosx_11_0_intel" % (pyversion,abi_tag)]
   elif arch=="arm64":
-    tag = "cp%s-none-macosx_11_0_arm64" % (pyversion)
+    tag = "cp%s-%s-macosx_11_0_arm64" % (pyversion,abi_tag)
 elif os_name=="windows":
   if bitness=="64":
-    tag = "cp%s-none-win_amd64" % pyversion
+    tag = "cp%s-%s-win_amd64" % (pyversion,abi_tag)
   else:
-    tag = "cp%s-none-win32" % pyversion
+    tag = "cp%s-%s-win32" % (pyversion,abi_tag)
 else:
   raise Exception()
 
@@ -92,7 +103,20 @@ def write_record(bdist_dir, distinfo_dir):
               record_path = os.path.relpath(
                   path, bdist_dir).replace(os.path.sep, '/')
               writer.writerow((record_path, hash, size))
-             
+
+def create_wheel_archive(wheel_name, bdist_dir):
+    wheel_path = wheel_name + ".whl"
+    with zipfile.ZipFile(wheel_path, 'w', zipfile.ZIP_DEFLATED) as wheel_zip:
+        for root, dirs, files in os.walk(bdist_dir):
+            for file in files:
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, bdist_dir).replace(os.path.sep, '/')
+                # ZIP can't store pre-1980 timestamps (e.g. BinaryBuilder JLL artifacts)
+                if os.path.getmtime(file_path) < 315532800:
+                    os.utime(file_path, (315532800, 315532800))
+                wheel_zip.write(file_path, arcname)
+    return wheel_path
+
 wheel_dist_name = "casadi" + "-" + version
 bdist_dir = dir_name
 
@@ -115,6 +139,20 @@ else:
   msg["Tag"] = tag
 
 
+
+# Drop the C++ example executables (listed in the install manifest) from the
+# wheel; casadi-cli is intentionally not in the manifest and stays.
+examples_manifest = os.path.join(bdist_dir, "casadi", ".cpp_examples_manifest")
+if os.path.exists(examples_manifest):
+  with open(examples_manifest) as f:
+    for line in f:
+      name = line.strip()
+      if not name:
+        continue
+      example_path = os.path.join(bdist_dir, "casadi", name)
+      if os.path.exists(example_path):
+        os.remove(example_path)
+  os.remove(examples_manifest)
 
 wheelfile_path = os.path.join(distinfo_dir, 'WHEEL')
 with open(wheelfile_path, 'w') as f:
@@ -179,7 +217,6 @@ else:
   fullname = wheel_dist_name+"-"+tag
 
 write_record(bdist_dir, distinfo_dir)
-archive_wheelfile(fullname,dir_name)
+create_wheel_archive(fullname, dir_name)
 
-import sys
 sys.stdout.write(fullname+".whl")

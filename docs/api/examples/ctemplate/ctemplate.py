@@ -29,5 +29,5 @@ import casadi
 
 with open('compiler.sh','w') as compilerscript:
     compilerscript.write('#!/bin/bash\n')
-    compilerscript.write(f"""g++ "$1" -D_GLIBCXX_USE_CXX11_ABI=0 {casadi.CasadiMeta.compiler_flags()} -I{casadi.GlobalOptions.getCasadiIncludePath()} -L{casadi.GlobalOptions.getCasadiPath()} -Wl,-rpath,{casadi.GlobalOptions.getCasadiPath()} -lcasadi -o "$2" """)
+    compilerscript.write(f"""g++ "$1" {casadi.CasadiMeta.compiler_flags()} -I{casadi.GlobalOptions.getCasadiIncludePath()} -L{casadi.GlobalOptions.getCasadiPath()} -Wl,-rpath,{casadi.GlobalOptions.getCasadiPath()} -lcasadi -o "$2" """)
 

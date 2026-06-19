@@ -21,7 +21,8 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #LH9JCUD52HXU
-from casadi import *
+import casadi as ca
+import os
 import casadi as c
 import numpy
 import unittest
@@ -34,17 +35,18 @@ import pickle
 
 class FooSX():
     def __init__(self):
-        self.a = SX.sym("a")
+        self.a = ca.SX.sym("a")
         self.b = self.a +1
 
 class FooMX():
     def __init__(self):
-        self.a = MX.sym("a")
+        self.a = ca.MX.sym("a")
         self.b = self.a +1
         
 class SerializeTests(casadiTestCase):
 
 
+  @memory_heavy()
   def test_compat(self):
   
     dir = "serialize_3.5.5"
@@ -62,7 +64,7 @@ class SerializeTests(casadiTestCase):
         data[n.split("_")[0]].append(n)
     for fun in functions:
       try:
-          f = Function.load(os.path.join(dir,fun))
+          f = ca.Function.load(os.path.join(dir,fun))
       except Exception as e:
           if "DllLibrary::init_handle" in str(e):
             continue
@@ -78,7 +80,7 @@ class SerializeTests(casadiTestCase):
               parts = token.strip("'\"").split("_", 2)
               if len(parts) == 3:
                 kind, plugin = parts[1], parts[2]
-                checker = globals().get("has_" + kind)
+                checker = getattr(ca, "has_" + kind, None)
                 if checker and not checker(plugin):
                   skip = True
                   break
@@ -118,10 +120,10 @@ class SerializeTests(casadiTestCase):
             assert a==b
         
     for e in obj:
-        ss = StringSerializer()
+        ss = ca.StringSerializer()
         ss.pack(e)
         
-        ds = StringDeserializer(ss.encode())
+        ds = ca.StringDeserializer(ss.encode())
         r = ds.unpack()
         
         print(e,r)
@@ -134,16 +136,16 @@ class SerializeTests(casadiTestCase):
         with self.assertInException("ca.global_pickle_context"):
             pickle.dumps(f)
 
-        with global_pickle_context():
+        with ca.global_pickle_context():
             serialized = pickle.dumps(f)
-           
+
         with self.assertInException("ca.global_unpickle_context"):
             pickle.loads(serialized)
 
-        with global_unpickle_context():
+        with ca.global_unpickle_context():
             f_ref = pickle.loads(serialized)
             
-        self.checkarray(evalf(jacobian(f_ref.b,f_ref.a)),1)
+        self.checkarray(ca.evalf(ca.jacobian(f_ref.b,f_ref.a)),1)
            
   
   

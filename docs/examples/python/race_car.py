@@ -23,11 +23,12 @@
 # solved with direct multiple-shooting.
 #
 # For more information see: http://labs.casadi.org/OCP
-from casadi import *
+import casadi as ca
+from numpy import inf, pi
 
 N = 100 # number of control intervals
 
-opti = Opti() # Optimization problem
+opti = ca.Opti() # Optimization problem
 
 # ---- decision variables ---------
 X = opti.variable(2,N+1) # state trajectory
@@ -40,7 +41,7 @@ T = opti.variable()      # final time
 opti.minimize(T) # race in minimal time
 
 # ---- dynamic constraints --------
-f = lambda x,u: vertcat(x[1],u-x[1]) # dx/dt = f(x,u)
+f = lambda x,u: ca.vertcat(x[1],u-x[1]) # dx/dt = f(x,u)
 
 dt = T/N # length of a control interval
 for k in range(N): # loop over control intervals
@@ -53,7 +54,7 @@ for k in range(N): # loop over control intervals
    opti.subject_to(X[:,k+1]==x_next) # close the gaps
 
 # ---- path constraints -----------
-limit = lambda pos: 1-sin(2*pi*pos)/2
+limit = lambda pos: 1-ca.sin(2*pi*pos)/2
 opti.subject_to(speed<=limit(pos))   # track speed limit
 opti.subject_to(opti.bounded(0,U,1)) # control is limited
 
@@ -83,8 +84,8 @@ step(range(N),sol.value(U),'k',label="throttle")
 legend(loc="upper left")
 
 figure()
-spy(sol.value(jacobian(opti.g,opti.x)))
+spy(sol.value(ca.jacobian(opti.g,opti.x)))
 figure()
-spy(sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0]))
+spy(sol.value(ca.hessian(opti.f+ca.dot(opti.lam_g,opti.g),opti.x)[0]))
 
 show()

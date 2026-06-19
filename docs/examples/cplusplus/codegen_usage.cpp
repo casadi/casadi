@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 #include <dlfcn.h>
+#include <cstdlib>
 
 // Usage from C
 int usage_c(){
@@ -122,22 +123,28 @@ int usage_c(){
     if (sp_i==0) return 1;
     casadi_int nrow = *sp_i++; /* Number of rows */
     casadi_int ncol = *sp_i++; /* Number of columns */
-    const casadi_int *colind = sp_i; /* Column offsets */
-    const casadi_int *row = sp_i + ncol+1; /* Row nonzero */
-    casadi_int nnz = sp_i[ncol]; /* Number of nonzeros */
-
-    /* Print the pattern */
-    printf("  Dimension: %lld-by-%lld (%lld nonzeros)\n", nrow, ncol, nnz);
-    printf("  Nonzeros: {");
-    casadi_int rr,cc,el;
-    for(cc=0; cc<ncol; ++cc){                    /* loop over columns */
-      for(el=colind[cc]; el<colind[cc+1]; ++el){ /* loop over the nonzeros entries of the column */
-        if(el!=0) printf(", ");                  /* Separate the entries */
-        rr = row[el];                            /* Get the row */
-        printf("{%lld,%lld}",rr,cc);                 /* Print the nonzero */
-      }
+    casadi_int type = sp_i[0]; /* Type of sparsity pattern: 1 for dense, 0 for sparse */
+    if (type==1) {
+      printf("  Dimension: %lld-by-%lld (dense)\n", nrow, ncol);
     }
-    printf("}\n\n");
+    if (type==0) {
+      const casadi_int *colind = sp_i; /* Column offsets */
+      const casadi_int *row = sp_i + ncol+1; /* Row nonzero */
+      casadi_int nnz = sp_i[ncol]; /* Number of nonzeros */
+
+      /* Print the pattern */
+      printf("  Dimension: %lld-by-%lld (%lld nonzeros)\n", nrow, ncol, nnz);
+      printf("  Nonzeros: {");
+      casadi_int rr,cc,el;
+      for(cc=0; cc<ncol; ++cc){                    /* loop over columns */
+        for(el=colind[cc]; el<colind[cc+1]; ++el){ /* loop over the nonzeros entries of the column */
+          if(el!=0) printf(", ");                  /* Separate the entries */
+          rr = row[el];                            /* Get the row */
+          printf("{%lld,%lld}",rr,cc);                 /* Print the nonzero */
+        }
+      }
+      printf("}\n\n");
+    }
   }
 
   /* Function for numerical evaluation */
@@ -294,10 +301,12 @@ int main(){
   usage_cplusplus();
 
   // Generate C-code
-  f.generate("f_with_mem", {{"with_mem", true}});
+  f.generate("f_with_mem", {{"with_mem", true}, {"force_canonical", true}});
 
   // Compile the C-code to a shared library
-  compile_command = "gcc -fPIC -I"+ std::string(INCLUDE_DIR) + " -shared -g f_with_mem.c -o f_with_mem.so";
+  const char* env_inc = std::getenv("CASADI_INCLUDE_DIR");
+  std::string include_dir = env_inc ? env_inc : INCLUDE_DIR;
+  compile_command = "gcc -fPIC -I"+ include_dir + " -shared -g f_with_mem.c -o f_with_mem.so";
   flag = system(compile_command.c_str());
   casadi_assert(flag==0, "Compilation failed");
 

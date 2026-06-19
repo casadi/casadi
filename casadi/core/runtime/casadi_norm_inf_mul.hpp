@@ -17,6 +17,9 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// C-REPLACE "fmax" "casadi_fmax"
+// C-REPLACE "fabs" "casadi_fabs"
+
 // SYMBOL "norm_inf_mul"
 template<typename T1>
 T1 casadi_norm_inf_mul(const T1* x, const casadi_int* sp_x, const T1* y, const casadi_int* sp_y, T1* dwork, casadi_int* iwork) { // NOLINT(whitespace/line_length)

@@ -82,7 +82,7 @@ const char* external_transform_test_success__f(char api_version, const char* cas
         casadi::external_print_callback_t cb_stdout, casadi::external_print_callback_t cb_stderr) {
     if (api_version != 0) {
         cb_stderr("version mismatch");
-        return 0;
+        return nullptr;
     }
     casadi::StringDeserializer sd(in);
     casadi::Function f = sd.unpack_function();
@@ -107,5 +107,5 @@ const char* external_transform_test_fail__f(char api_version, const char* casadi
         casadi::external_print_callback_t cb_stdout, casadi::external_print_callback_t cb_stderr) {
     cb_stdout("This is going to fail\n");
     cb_stderr("Fatal error\n");
-    return 0;
+    return nullptr;
 }

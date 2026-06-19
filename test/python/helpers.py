@@ -21,10 +21,15 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+import casadi as ca
 import casadi
 import numpy
+import numpy as np
 from numpy import random, array
+try:
+    from typing import Any, Optional, Union  # referenced in type-comments below
+except ImportError:
+    pass  # Py2: type comments are ignored at runtime
 import unittest
 import sys
 from math import isnan, isinf
@@ -44,11 +49,18 @@ except:
   
 codegen_check_digits = 15
 
+# Numerical differences due to different compilers/libm in CI.
+if sys.platform == "darwin":
+    # macOS (both Intel and Apple Silicon) sometimes diverges by ~1 ULP
+    # from Linux GCC -- e.g. a sumsqr that lands at 7.96 may compute as
+    # 7.96 + 8.88e-16 elsewhere. Relax by 2 digits so 1-ULP drift passes.
+    codegen_check_digits = 13
+
 print("os" in os.environ)
 if "os" in os.environ:
     print(os.environ["os"])
     if os.environ["os"]=="osx_arm":
-        # Numerical differences due to different compilers in ci
+        # Apple Silicon has historically diverged more (different libm).
         codegen_check_digits = 10
 
 print("codegen_check_digits", codegen_check_digits)
@@ -62,8 +74,8 @@ else:
   import __builtin__
   builtins = __builtin__
 
-x = MX.sym("x",2,3)
-y = MX.sym("x",3,4)
+x = ca.MX.sym("x",2,3)
+y = ca.MX.sym("x",3,4)
 
 try:
   x+y
@@ -73,7 +85,7 @@ except RuntimeError:
   swig4 = False
 
 try:
-  nlpsol(123)
+  ca.nlpsol(123)  # pyright: ignore[reportCallIssue]
 except Exception as e:
   if "SXDict" in str(e):
     systemswig = True
@@ -122,9 +134,10 @@ class TeeString(StringIO):
     StringIO.__init__(self)
     self.stream = stream
 
-  def write(self, data):
+  def write(self, data):  # type: ignore[override]
     StringIO.write(self,data)
     self.stream.write(data)
+    return len(data)
 
 class Stdout():
     def __init__(self):
@@ -165,11 +178,11 @@ class FunctionPool:
 
 def toSX_fun(fun):
   ins = fun.sx_in()
-  return Function("f",ins,fun.call(ins))
+  return ca.Function("f",ins,fun.call(ins))
 
 def toMX_fun(fun):
   ins = fun.mx_in()
-  return Function("f",ins,fun(ins))
+  return ca.Function("f",ins,fun(ins))
 
 def jacobian_old(f, i, j):
     return f.factory(f.name() + '_jac', f.name_in(),
@@ -205,6 +218,7 @@ class casadiTestCase(unittest.TestCase):
     except Exception as err:
       e = str(err)
     self.assertFalse(e is None)
+    assert e is not None
     self.assertTrue(s in e,msg=e + "<->" + s)
 
   @contextmanager
@@ -277,18 +291,18 @@ class casadiTestCase(unittest.TestCase):
 
     unittest.TestCase.__init__(self,*margs,**kwargs)
 
-  def randDM(self,n,m=1,sparsity=1,valuegenerator=lambda : random.normal(0,1),symm=False ):
+  def randDM(self,n,m=1,sparsity=1.0,valuegenerator=lambda : random.normal(0,1),symm=False ):
     if sparsity < 1:
       spp = self.randDM(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) ,symm=symm)
       spm = (spp < sparsity)
-      spm = sparsify(spm)
-      ret = DM(spm.sparsity(),array([valuegenerator() for i in range(spm.nnz())]))
+      spm = ca.sparsify(spm)
+      ret = ca.DM(spm.sparsity(),array([valuegenerator() for i in range(spm.nnz())]))
       if symm:
         return (ret + ret.T)/2
       else:
         return ret
     else:
-      ret = DM([valuegenerator() for i in range(n*m)]).reshape((n,m))
+      ret = ca.DM([valuegenerator() for i in range(n*m)]).reshape((n,m))
       if symm:
         return (ret + ret.T)/2
       else:
@@ -298,12 +312,12 @@ class casadiTestCase(unittest.TestCase):
       print(s)
       sys.stdout.flush()
 
-  def assertAlmostEqual(self,first, second, places=7, msg=""):
+  def assertAlmostEqual(self,first, second, places=7, msg="", delta=None):  # type: ignore[override]
       if isnan(first ) and isnan(second): return
-      msg+= " %.16e <-> %.16e"  % (first, second)
+      msg = str(msg) + " %.16e <-> %.16e"  % (first, second)
       n =  max(abs(first),abs(second))
       if n>1e3:
-        n = 10**floor(log10(n))
+        n = 10**ca.floor(ca.log10(n))
       else:
         n = 1.0
       unittest.TestCase.assertAlmostEqual(self,first/n,second/n,places=places,msg=msg + "  scaled by %d" %n)
@@ -320,18 +334,18 @@ class casadiTestCase(unittest.TestCase):
 
       """
       
-      if isinstance(zr,DM) and isinstance(zt,DM):
+      if isinstance(zr,ca.DM) and isinstance(zt,ca.DM):
         self.assertEqual(zr.shape, zt.shape)
         if zr.is_regular() and zt.is_regular() and zr.numel()>10:
           sp = zr.sparsity() + zt.sparsity()
-          zr_nz = project(zr, sp).nz[:]
-          zt_nz = project(zt, sp).nz[:]
+          zr_nz = ca.project(zr, sp).nz[:]
+          zt_nz = ca.project(zt, sp).nz[:]
           if zr_nz.numel() == 0:
             return
-          diff_nz = fabs(zr_nz - zt_nz)
-          mag_nz = fmax(fabs(zr_nz), fabs(zt_nz))
-          scale_nz = if_else(mag_nz > 1e3, 10**floor(log10(mag_nz)), 1.0)
-          self.assertTrue(norm_inf(diff_nz / scale_nz) < 0.5 * 10**(-digits))
+          diff_nz = ca.fabs(zr_nz - zt_nz)
+          mag_nz = ca.fmax(ca.fabs(zr_nz), ca.fabs(zt_nz))
+          scale_nz = ca.if_else(mag_nz > 1e3, 10**ca.floor(ca.log10(mag_nz)), 1.0)
+          self.assertTrue(ca.norm_inf(diff_nz / scale_nz) < 0.5 * 10**(-digits), "norm_inf: %e" % float(ca.norm_inf(diff_nz / scale_nz)))
           return
         
       
@@ -363,14 +377,14 @@ class casadiTestCase(unittest.TestCase):
             float(zt[i,j])
             float(zr[i,j])
           except:
-            self.assertTrue(is_equal(zt[i,j],zr[i,j]),LazyString('"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j]))'))
+            self.assertTrue(ca.is_equal(zt[i,j],zr[i,j]),LazyString('"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j]))'))
             #self.assertTrue(is_equal(zt[i,j],zr[i,j]),"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j])))
             continue
           if zt[i,j]==zr[i,j]:
             continue
           #if (isnan(zt[i,j]) or isinf(zt[i,j])) and  (isinf(zt[i,j]) or isnan(zt[i,j])):
           #  continue
-          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,LazyString('"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, )'))
+          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,LazyString('"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, )'))  # pyright: ignore[reportArgumentType]
           #self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, ))
 
   def file_equal(self, lhs, rhs):
@@ -395,10 +409,10 @@ class casadiTestCase(unittest.TestCase):
       sample = x
 
 
-    if isinstance(sample,SX):
-      f = Function("f", x, yt)
+    if isinstance(sample,ca.SX):
+      f = ca.Function("f", x, yt)
     else:
-      f = Function("f", x, yt)
+      f = ca.Function("f", x, yt)
 
     if (not(fmod is None)):
       f=fmod(f,x)
@@ -411,7 +425,7 @@ class casadiTestCase(unittest.TestCase):
     if not(type(setx0)==list):
       setx0=[setx0]
 
-    f_in = [0]*f.n_in()
+    f_in = [0]*f.n_in()  # type: list
     for i in range(len(x0)):
       try:
         f_in[i]=setx0[i]
@@ -455,20 +469,20 @@ class casadiTestCase(unittest.TestCase):
       
   def check_eval_mx(self, mx):
     if isinstance(mx,list):
-        return self.check_eval_mx(vvcat(mx))
-    assert isinstance(mx,MX)
-    args = symvar(mx)
-    f = Function("f",args,[mx])
-    d = MX.sym("d") # dummy
+        return self.check_eval_mx(ca.vvcat(mx))
+    assert isinstance(mx,ca.MX)
+    args = ca.symvar(mx)
+    f = ca.Function("f",args,[mx])
+    d = ca.MX.sym("d") # dummy
     #mx_eval = f.call(args,True,False)[0]
-    new_args = [MX.sym(e.name(),e.sparsity()) for e in args]
+    new_args = [ca.MX.sym(e.name(),e.sparsity()) for e in args]
     mx_eval = f.call(new_args,True,False)[0]
-    if isinstance(mx_eval,DM):
-        mx = evalf(mx)
+    if isinstance(mx_eval,ca.DM):
+        mx = ca.evalf(mx)
         self.checkarray(mx,mx_eval)
         return
-    mx_eval = substitute([mx_eval],new_args,args)[0]
-    if isinstance(mx_eval,MX): # In all sparse case, might falsely look like SX
+    mx_eval = ca.substitute([mx_eval],new_args,args)[0]
+    if isinstance(mx_eval,ca.MX): # In all sparse case, might falsely look like SX
         self.check_identical_mx(mx_eval,mx)
 
   def check_identical_fun(self, a, b):
@@ -479,12 +493,12 @@ class casadiTestCase(unittest.TestCase):
     self.assertTrue(s==s2)
         
   def check_identical_mx(self, a, b):
-    assert isinstance(a,MX)
-    assert isinstance(b,MX)
-    arg_a = symvar(a)
-    arg_b = symvar(b)
-    fa = Function('f',arg_a,[a])
-    fb = Function('f',arg_b,[b])
+    assert isinstance(a,ca.MX)
+    assert isinstance(b,ca.MX)
+    arg_a = ca.symvar(a)
+    arg_b = ca.symvar(b)
+    fa = ca.Function('f',arg_a,[a])
+    fb = ca.Function('f',arg_b,[b])
     self.check_identical_fun(fa,fb)    
 
   def checkfunction_identical(self,trial,solution):
@@ -504,7 +518,7 @@ class casadiTestCase(unittest.TestCase):
   def checkfunction_light(self,trial,solution,inputs=None,**kwargs):
     self.checkfunction(trial,solution,inputs,fwd=False,adj=False,jacobian=False,gradient=False,hessian=False,sens_der=False,evals=False,**kwargs)
   def checkfunction(self,trial,solution,inputs=None,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False):
-
+    # type: (Any, Any, Any, bool, bool, bool, bool, bool, bool, Union[bool, int], int, Optional[int], str, bool, bool, bool, bool, bool) -> Any
     if isinstance(inputs,dict):
       d = inputs
       inputs = [0]*trial.n_in()
@@ -514,8 +528,8 @@ class casadiTestCase(unittest.TestCase):
 
     if indirect:
       ins = trial.mx_in()
-      extra_trial = Function("extra_trial", ins,trial(ins))
-      self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,inputs=inputs,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
+      extra_trial = ca.Function("extra_trial", ins,trial.call(ins))
+      self.checkfunction(extra_trial,solution,inputs=inputs,fwd=fwd,adj=adj,jacobian=jacobian,gradient=gradient,hessian=hessian,sens_der=sens_der,evals=evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
 
     if digits_sens is None:
       digits_sens = digits
@@ -572,17 +586,17 @@ class casadiTestCase(unittest.TestCase):
     if evals:
 
       def remove_first(x):
-        ret = DM(x)
+        ret = ca.DM(x)
         if ret.numel()>0:
-          ret[0,0] = DM(1,1)
+          ret[0,0] = ca.DM(1,1)
           return ret.sparsity()
         else:
           return ret.sparsity()
 
       def remove_last(x):
-        ret = DM(x)
+        ret = ca.DM(x)
         if ret.nnz()>0:
-          ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DM(1,1)
+          ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = ca.DM(1,1)
           return ret.sparsity()
         else:
           return ret.sparsity()
@@ -591,7 +605,7 @@ class casadiTestCase(unittest.TestCase):
       #spmods = [lambda x: x]
       #spmods = [lambda x: x , remove_first]
 
-      sym = MX.sym
+      sym = ca.MX.sym
 
       storage2 = {}
       storage = {}
@@ -614,16 +628,16 @@ class casadiTestCase(unittest.TestCase):
           res = f.call(inputss,not f.is_a("SXFunction"))
           #print res, "sp", [i.sparsity().dim(True) for i in fseeds]
           opts = {"helper_options": {"is_diff_in": f.is_diff_in(), "is_diff_out": f.is_diff_out()}}
-          [fwdsens] = forward(res, inputss, [fseeds],opts)
-          [adjsens] = reverse(res, inputss, [aseeds],opts)
+          [fwdsens] = ca.forward(res, inputss, [fseeds],opts)
+          [adjsens] = ca.reverse(res, inputss, [aseeds],opts)
 
-          vf = Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]),{"is_diff_in": f.is_diff_in()+f.is_diff_in()+f.is_diff_out(), "is_diff_out": f.is_diff_out()+f.is_diff_out()+f.is_diff_in()})
+          vf = ca.Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]),{"is_diff_in": f.is_diff_in()+f.is_diff_in()+f.is_diff_out(), "is_diff_out": f.is_diff_out()+f.is_diff_out()+f.is_diff_in()})
 
           vf_in = list(inputs)
           # Complete random seeding
           for i in range(f.n_in(),vf.n_in()):
             random.seed(i)
-            vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
+            vf_in.append(ca.DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
 
           vf_out = vf.call(vf_in)
           storagekey = (spmod,spmod2)
@@ -644,16 +658,16 @@ class casadiTestCase(unittest.TestCase):
 
               res2 = vf.call(inputss2)
               opts = {"helper_options": {"is_diff_in": vf.is_diff_in(), "is_diff_out": vf.is_diff_out()}}
-              [fwdsens2] = forward(res2, inputss2, [fseeds2],opts)
-              [adjsens2] = reverse(res2, inputss2, [aseeds2],opts)
+              [fwdsens2] = ca.forward(res2, inputss2, [fseeds2],opts)
+              [adjsens2] = ca.reverse(res2, inputss2, [aseeds2],opts)
 
-              vf2 = Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]),{"is_diff_in": vf.is_diff_in()+vf.is_diff_in()+vf.is_diff_out(), "is_diff_out": vf.is_diff_out()+vf.is_diff_out()+vf.is_diff_in()})
+              vf2 = ca.Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]),{"is_diff_in": vf.is_diff_in()+vf.is_diff_in()+vf.is_diff_out(), "is_diff_out": vf.is_diff_out()+vf.is_diff_out()+vf.is_diff_in()})
 
               vf2_in = list(inputs)
 
               for i in range(f.n_in(),vf2.n_in()):
                 random.seed(i)
-                vf2_in.append(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
+                vf2_in.append(ca.DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
 
               vf2_out = vf2.call(vf2_in)
               storagekey = (spmod,spmod2)
@@ -666,8 +680,8 @@ class casadiTestCase(unittest.TestCase):
         for stk,st in list(store.items()):
           for i in range(len(st)-1):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-              if b.numel()==0 and sparsify(a).nnz()==0: continue
-              if a.numel()==0 and sparsify(b).nnz()==0: continue
+              if b.numel()==0 and ca.sparsify(a).nnz()==0: continue
+              if a.numel()==0 and ca.sparsify(b).nnz()==0: continue
 
               if (allow_nondiff and (a.nnz()==0 or b.nnz()==0 )): continue
               #self.checkarray(IM(a.sparsity(),1),IM(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
@@ -676,28 +690,43 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def compile_external(self,name,source,opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
-
+  def compile_external(self,name,source,opts=None,std="c89",extralibs="",extralibdirs=[],check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
+    # type: (str, str, Optional[dict], str, Union[str, list], list, bool, Union[str, list, None], bool, Union[str, list, None], list, bool) -> Any
     if args.run_slow:
-      libdir = GlobalOptions.getCasadiPath()
-      includedir = GlobalOptions.getCasadiIncludePath()
+      libdir = ca.GlobalOptions.getCasadiPath()
+      includedir = ca.GlobalOptions.getCasadiIncludePath()
       includedirs = [includedir,os.path.join(includedir,"highs")]
       for e in extra_include:
         includedirs.append(os.path.join(includedir,e))
+
+      all_libdirs = [libdir] + list(extralibdirs)
+      if os.name=='nt':
+        libdirs_flags = " ".join(["/libpath:" + d for d in all_libdirs])
+      else:
+        libdirs_flags = " ".join(["-L" + d + " -Wl,-rpath," + d for d in all_libdirs])
 
       if isinstance(extralibs,list):
         extralibs_clean = []
         for lib in extralibs:
             if os.name=='nt':
                 if "." in lib:
-                    if lib.endswith(".dll"):
+                    if lib.endswith("libcasadi-tp-openblas.dll"):
+                        extralibs_clean.append("lapack.lib")
+                    elif lib.endswith(".dll"):
                         extralibs_clean.append(lib[:-4]+".lib")
                     else:
                         extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append(lib+".lib")
             else:
-                if "." in lib:
+                if lib.endswith("libcasadi-tp-openblas.so"):
+                    extralibs_clean.append("-lcasadi-tp-openblas")
+                elif lib.startswith("-"):
+                    extralibs_clean.append(lib)
+                elif lib.endswith(".framework") or ".framework/" in lib:
+                    fw = os.path.basename(lib).rsplit(".framework", 1)[0]
+                    extralibs_clean.append("-framework " + fw)
+                elif "." in lib:
                     extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append("-l"+lib)
@@ -716,7 +745,7 @@ class casadiTestCase(unittest.TestCase):
           if debug_mode:
             flags = "/O1 /Zi"
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {source} {extra} /link  /libpath:{libdir} /out:{name}.dll /implib:{name}.lib".format(shared="/LD" if shared else "",std=std,source=source,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),flags=flags,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,name=name)
+          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {source} {extra} /link  {libdirs} /out:{name}.dll /implib:{name}.lib".format(shared="/LD" if shared else "",std=std,source=source,libdirs=libdirs_flags,includedir=" ".join(["/I" + e for e in includedirs]),flags=flags,extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,name=name)
           if shared:
             output = "./" + name + ".dll"
           else:
@@ -728,7 +757,7 @@ class casadiTestCase(unittest.TestCase):
           flags = "-O3"
           if debug_mode:
             flags = "-O0 -g"
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {source} -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,source=source,name_out=name+(".so" if shared else ""),flags=flags,libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {source} -o {name_out} {libdirs} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,source=source,name_out=name+(".so" if shared else ""),flags=flags,libdirs=libdirs_flags,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
           if sys.platform=="darwin":
             commands+= " -Xlinker -rpath -Xlinker {libdir}".format(libdir=libdir)
             commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
@@ -741,7 +770,7 @@ class casadiTestCase(unittest.TestCase):
       if sys.platform=="darwin":
         subprocess.run(["otool","-l",libname])
       if opts is None: opts = {}
-      return (external(name, libname,opts),libname)
+      return (ca.external(name, libname,opts),libname)
 
   def check_symbols(self, libname, fun_names, c_filename):
     """Check that no symbols starting with 'casadi' are exported in the shared library"""
@@ -789,7 +818,8 @@ class casadiTestCase(unittest.TestCase):
     if bad_symbols:
       self.fail("Found %d bad symbol exported in shared library (missing CASADI_PREFIX): %s" % (len(bad_symbols),str(bad_symbols[:10]) ))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",extralibdirs=[],check_serialize=False,extra_options=None,main=False,with_external=True,main_return_code=0,valgrind=False,helgrind=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False,main_output_check=True):
+    # type: (Any, Any, Any, str, Union[str, list], list, bool, Union[str, list, None], bool, bool, Any, bool, bool, Union[str, list, None], bool, Optional[dict], bool, bool, list, int, bool, bool) -> Any
     ret = {}
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
@@ -799,7 +829,7 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       if main: opts["main"] = True
       cg_names = []
-      cg = CodeGenerator(name,opts)
+      cg = ca.CodeGenerator(name,opts)
       cg.add(F,with_jac_sparsity)
       cg_names.append(F.name())
       if with_jac_sparsity: cg_names.append("jac_"+F.name())
@@ -816,25 +846,40 @@ class casadiTestCase(unittest.TestCase):
       cg.generate()
       import subprocess
 
-      libdir = GlobalOptions.getCasadiPath()
-      includedir = GlobalOptions.getCasadiIncludePath()
+      libdir = ca.GlobalOptions.getCasadiPath()
+      includedir = ca.GlobalOptions.getCasadiIncludePath()
       includedirs = [includedir,os.path.join(includedir,"highs")]
       for e in extra_include:
         includedirs.append(os.path.join(includedir,e))
+
+      all_libdirs = [libdir] + list(extralibdirs)
+      if os.name=='nt':
+        libdirs_flags = " ".join(["/libpath:" + d for d in all_libdirs])
+      else:
+        libdirs_flags = " ".join(["-L" + d + " -Wl,-rpath," + d for d in all_libdirs])
 
       if isinstance(extralibs,list):
         extralibs_clean = []
         for lib in extralibs:
             if os.name=='nt':
                 if "." in lib:
-                    if lib.endswith(".dll"):
+                    if lib.endswith("libcasadi-tp-openblas.dll"):
+                        extralibs_clean.append("lapack.lib")
+                    elif lib.endswith(".dll"):
                         extralibs_clean.append(lib[:-4]+".lib")
                     else:
                         extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append(lib+".lib")
             else:
-                if "." in lib:
+                if lib.endswith("libcasadi-tp-openblas.so"):
+                    extralibs_clean.append("-lcasadi-tp-openblas")
+                elif lib.startswith("-"):
+                    extralibs_clean.append(lib)
+                elif lib.endswith(".framework") or ".framework/" in lib:
+                    fw = os.path.basename(lib).rsplit(".framework", 1)[0]
+                    extralibs_clean.append("-framework " + fw)
+                elif "." in lib:
                     extralibs_clean.append(lib)
                 else:
                     extralibs_clean.append("-l"+lib)
@@ -853,7 +898,7 @@ class casadiTestCase(unittest.TestCase):
           if debug_mode:
             flags = "/O1 /Zi"
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,flags=flags)
+          commands = "cl.exe {shared} {flags} {definitions} /D_UCRT_NOISY_NAN {includedir} {name}.c {extra} /link  {libdirs}".format(shared="/LD" if shared else "",std=std,name=name,libdirs=libdirs_flags,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,flags=flags)
           if shared:
             output = "./" + name + ".dll"
           else:
@@ -865,7 +910,7 @@ class casadiTestCase(unittest.TestCase):
           flags = "-O3"
           if debug_mode:
             flags = "-O0 -g"
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {name}.c -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs,flags=flags) + (" -lm" if not shared else "") + extralibs + extra_options
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-dangling-pointer -Wno-unknown-warning-option -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {name}.c -o {name_out} {libdirs} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdirs=libdirs_flags,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs,flags=flags) + (" -lm" if not shared else "") + extralibs + extra_options
           if sys.platform=="darwin":
             commands+= " -Xlinker -rpath -Xlinker {libdir}".format(libdir=libdir)
             commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
@@ -883,7 +928,7 @@ class casadiTestCase(unittest.TestCase):
 
       if external_opts is None: external_opts = {}
       if with_external:
-          F2 = external(F.name(), libname,external_opts)
+          F2 = ca.external(F.name(), libname,external_opts)
 
       if main:
         [commands, exename] = get_commands(shared=False)
@@ -892,8 +937,11 @@ class casadiTestCase(unittest.TestCase):
         if os.name=='nt':
             env["PATH"] = env["PATH"]+";"+libdir
         else:
-            env["LD_LIBRARY_PATH"] = libdir
-        p = subprocess.Popen(commands,shell=True,env=env).wait()
+            if "LD_LIBRARY_PATH" in env:
+                env["LD_LIBRARY_PATH"] = env["LD_LIBRARY_PATH"] + ":" + libdir
+            else:
+                env["LD_LIBRARY_PATH"] = libdir
+        p = subprocess.Popen(commands,shell=True,env=env).wait()  # pyright: ignore[reportAssignmentType]
         ret["exename"] = exename
         ret["env"] = env
         inputs_main = inputs
@@ -905,7 +953,7 @@ class casadiTestCase(unittest.TestCase):
         for tool in ["memcheck","helgrind","none"]:
             with open(F.name()+"_out.txt","w") as stdout:
               with open(F.name()+"_in.txt","r") as stdin:
-                commands = exename+" "+F.name()
+                commands = exename+" "+F.name()  # pyright: ignore[reportOperatorIssue]
                 if tool=="none":
                     pass
                 elif tool=="memcheck" and valgrind and has_valgrind:
@@ -917,9 +965,9 @@ class casadiTestCase(unittest.TestCase):
                 print(commands+" < " + F.name()+"_in.txt")
                 p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
                 out = p.communicate()
-            print("Return code",p.returncode)
-            assert p.returncode in main_return_code
-        if p.returncode!=0:
+            print("Return code",p.returncode)  # pyright: ignore[reportAttributeAccessIssue]
+            assert p.returncode in main_return_code  # pyright: ignore[reportAttributeAccessIssue]
+        if p.returncode!=0:  # pyright: ignore[reportAttributeAccessIssue]
             # We are actively looking for failure,
             # so do not proceed with tests
             return ret
@@ -950,7 +998,7 @@ class casadiTestCase(unittest.TestCase):
           self.checkarray(Fout[k],Fout2[k],digits=digits,failmessage=k)
       else:
         for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i],digits=digits)
+          self.checkarray(Fout[i],Fout2[i],digits=digits)  # pyright: ignore[reportArgumentType]
 
       if check_serialize:
         self.check_serialize(F2,inputs=inputs)
@@ -966,7 +1014,8 @@ class casadiTestCase(unittest.TestCase):
 
 
   def check_serialize(self,F,inputs=None):
-      F2 = Function.deserialize(F.serialize({"debug":True}))
+      F2 = ca.Function.deserialize(F.serialize({"debug":True}))
+      assert inputs is not None
 
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)
@@ -986,9 +1035,9 @@ class casadiTestCase(unittest.TestCase):
           path = "serialize_"+casadi.__version__
           os.makedirs(path, exist_ok=True)
           F.save(os.path.join(path,h+".casadi"),{"debug":True})
-          DM.set_precision(16)
+          ca.DM.set_precision(16)
           h_in = hashlib.md5(str(inputs).encode("ascii")).hexdigest()
-          DM.set_precision(7)
+          ca.DM.set_precision(7)
           if isinstance(inputs,dict):
             inputs = F.convert_in(inputs)
             Fout = F.convert_out(Fout)
@@ -1041,7 +1090,7 @@ class requires_conic(object):
 
   def __call__(self,c):
     try:
-      load_conic(self.n)
+      ca.load_conic(self.n)
       return c
     except:
       print("Not available QP plugin %s, skipping unittests" % self.n)
@@ -1053,7 +1102,7 @@ class requires_linsol(object):
 
   def __call__(self,c):
     try:
-      load_linsol(self.n)
+      ca.load_linsol(self.n)
       return c
     except:
       print("Not available linsol plugin %s, skipping unittests" % self.n)
@@ -1068,7 +1117,7 @@ class requires_nlpsol(object):
     if "SKIP_" + self.n.upper() + "_TESTS" in os.environ:
         return None
     try:
-      load_nlpsol(self.n)
+      ca.load_nlpsol(self.n)
       return c
     except:
       print("Not available NLP plugin %s, skipping unittests" % self.n)
@@ -1080,7 +1129,7 @@ class requires_expm(object):
 
   def __call__(self,c):
     try:
-      load_expm(self.n)
+      ca.load_expm(self.n)
       return c
     except:
       print("Not available Expm plugin %s, skipping unittests" % self.n)
@@ -1092,7 +1141,7 @@ class requires_integrator(object):
 
   def __call__(self,c):
     try:
-      load_integrator(self.n)
+      ca.load_integrator(self.n)
       return c
     except:
       print("Not available integrator plugin %s, skipping unittests" % self.n)
@@ -1104,10 +1153,21 @@ class requires_rootfinder(object):
 
   def __call__(self,c):
     try:
-      load_rootfinder(self.n)
+      ca.load_rootfinder(self.n)
       return c
     except:
       print("Not available RFP plugin %s, skipping unittests" % self.n)
+      return None
+
+class requires_modelicaparser(object):
+  def __init__(self,n):
+    self.n = n
+
+  def __call__(self,c):
+    if ca.has_modelicaparser(self.n):
+      return c
+    else:
+      print("Not available ModelicaParser plugin %s, skipping unittests" % self.n)
       return None
 
 class requiresPlugin(object):
@@ -1130,8 +1190,9 @@ class skip(object):
   def __call__(self, c):
     if not self.skip: return c
     if isinstance(c,unittest.TestCase):
-      if i.startswith('test_'):
-        delattr(c,i)
+      for i in dir(c):
+        if i.startswith('test_'):
+          delattr(c,i)
       return c
     else:
       print(self.skiptext(c.__name__))

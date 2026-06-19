@@ -21,14 +21,14 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-from casadi import *
+import casadi as ca
 import numpy
 
 # Let's construct a block diagonal structure
 
-b1 = DM([[2,3],[4,5]])
-b2 = DM([[6,7,8],[9,10,11],[12,13,14]])
-A = diagcat(1,b1,b2,15)
+b1 = ca.DM([[2,3],[4,5]])
+b2 = ca.DM([[6,7,8],[9,10,11],[12,13,14]])
+A = ca.diagcat(1,b1,b2,15)
 
 print("original: ")
 print(A)

@@ -57,7 +57,7 @@ void FmuFunction::check_mem_count(casadi_int n) const {
 }
 
 int FmuFunction::init_mem(void* mem) const {
-  casadi_assert(mem != 0, "Memory is null");
+  casadi_assert(mem != nullptr, "Memory is null");
   // Instantiate base classes
   if (FunctionInternal::init_mem(mem)) return 1;
   // Number of memory instances needed
@@ -175,6 +175,8 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   new_forward_ = true;
   new_hessian_ = true;
   hessian_coloring_ = true;
+  enable_forward_jacobian_ = true;
+  enable_adjoint_jacobian_ = false;
   parallelization_ = Parallelization::SERIAL;
   // Number of parallel tasks, by default
   max_n_tasks_ = 1;
@@ -191,7 +193,19 @@ void FmuFunction::change_option(const std::string& option_name,
     fd_method_ = option_value.to_string();
     fd_ = to_enum<FdMode>(fd_method_, "forward");
   } else if (option_name == "uses_directional_derivatives") {
-    uses_directional_derivatives_ = option_value;
+    // Set, if permitted
+    bool v = option_value;
+    if (v) casadi_assert(fmu_.provides_directional_derivatives(),
+      "FMU does not provide support for analytic derivatives");
+    uses_directional_derivatives_ = v;
+  } else if (option_name == "uses_adjoint_derivatives") {
+    // Set, if permitted
+    bool v = option_value;
+    if (v) casadi_assert(fmu_.provides_adjoint_derivatives(),
+      "FMU does not provide support for adjoint derivatives");
+    uses_adjoint_derivatives_ = v;
+  } else if (option_name == "enable_forward_jacobian") {
+    enable_forward_jacobian_ = option_value;
   } else if (option_name == "fd_flip") {
     fd_flip_ = option_value;
   } else {
@@ -279,7 +293,13 @@ const Options FmuFunction::options_
     {"hessian_coloring",
      {OT_BOOL,
       "Enable the use of graph coloring (star coloring) for Hessian calculation. "
-      "Note that disabling the coloring can improve symmetry check diagnostics."}}
+      "Note that disabling the coloring can improve symmetry check diagnostics."}},
+    {"enable_forward_jacobian",
+     {OT_BOOL,
+      "Allow Jacobian calculation using forward mode AD."}},
+    {"enable_adjoint_jacobian",
+     {OT_BOOL,
+      "Allow Jacobian calculation using adjoint mode AD."}}
    }
 };
 
@@ -331,6 +351,10 @@ void FmuFunction::init(const Dict& opts) {
       new_hessian_ = op.second;
     } else if (op.first=="hessian_coloring") {
       hessian_coloring_ = op.second;
+    } else if (op.first=="enable_forward_jacobian") {
+      enable_forward_jacobian_ = op.second;
+    } else if (op.first=="enable_adjoint_jacobian") {
+      enable_adjoint_jacobian_ = op.second;
     }
   }
 
@@ -500,13 +524,29 @@ void FmuFunction::init(const Dict& opts) {
     + " -> " + str(jac_colors_.size2()) + " directions");
 
   // Setup Jacobian memory
-  casadi_jac_setup(&p_, jac_sp_, jac_colors_);
-  p_.nom_in = get_ptr(jac_nom_in_);
-  p_.map_out = get_ptr(jac_out_);
-  p_.map_in = get_ptr(jac_in_);
+  casadi_jac_setup(&jac_prob_, jac_sp_, jac_colors_);
+  jac_prob_.nom_in = get_ptr(jac_nom_in_);
+  jac_prob_.map_out = get_ptr(jac_out_);
+  jac_prob_.map_in = get_ptr(jac_in_);
 
   // Do not use more threads than there are colors in the Jacobian
   max_jac_tasks_ = std::min(max_n_tasks_, jac_colors_.size2());
+
+  // Graph coloring for Jacobian via adjoint derivatives
+  if (enable_adjoint_jacobian_) {
+    // Graph coloring of the transpose of the Jacobian
+    adj_sp_ = jac_sp_.T();
+    adj_colors_ = adj_sp_.uni_coloring();
+    if (verbose_) casadi_message("Jacobian graph coloring via adjoint derivatives: "
+      + str(adj_sp_.size2()) + " -> " + str(adj_colors_.size2()) + " directions");
+    // Setup Jacobian memory
+    casadi_jac_setup(&adj_prob_, adj_sp_, adj_colors_);
+    adj_prob_.nom_in = nullptr;  // default value (1) probably fine since no FD is used
+    adj_prob_.map_out = get_ptr(jac_in_);
+    adj_prob_.map_in = get_ptr(jac_out_);
+    // Do not use more threads than there are colors in the Jacobian
+    max_jac_tasks_ = std::max(max_jac_tasks_, std::min(max_n_tasks_, adj_colors_.size2()));
+  }
 
   // Work vector for storing extended Jacobian, shared between threads
   if (has_jac_) {
@@ -571,15 +611,25 @@ void FmuFunction::init(const Dict& opts) {
   }
 
   // Total number of threads used for Jacobian/adjoint calculation
-  // Note: Adjoint calculation also used for Hessian
-  max_n_tasks_ = std::min(max_n_tasks_, std::max(max_jac_tasks_, max_hess_tasks_));
-  if (verbose_) casadi_message("Jacobian calculation with " + str(max_n_tasks_) + " threads");
+  // Note: Jacobian calculation also used for Hessian
+  max_n_tasks_ = std::max(max_jac_tasks_, max_hess_tasks_);
+  if (verbose_) casadi_message("Allocated memory for " + str(max_n_tasks_) + " threads");
 
   // Work vectors for Jacobian/adjoint/Hessian calculation, for each thread
   casadi_int jac_iw, jac_w;
-  casadi_jac_work(&p_, &jac_iw, &jac_w);
+  casadi_jac_work(&jac_prob_, &jac_iw, &jac_w);
   alloc_iw(max_n_tasks_ * jac_iw, true);
   alloc_w(max_n_tasks_ * jac_w, true);
+
+  // Work vectors for Jacobian calculation via adjoint derivatives, for each thread
+  if (enable_adjoint_jacobian_) {
+    casadi_jac_work(&adj_prob_, &jac_iw, &jac_w);
+    alloc_iw(max_n_tasks_ * jac_iw, true);
+    alloc_w(max_n_tasks_ * jac_w, true);
+    // Work vectors for casadi_trans
+    alloc_w(jac_sp_.nnz());
+    alloc_iw(jac_sp_.size2());
+  }
 }
 
 void FmuFunction::identify_io(
@@ -593,7 +643,7 @@ void FmuFunction::identify_io(
   // Parse FmuFunction inputs
   for (const std::string& n : name_in) {
     try {
-      (void)InputStruct::parse(n, 0, scheme_in, scheme_out);
+      (void)InputStruct::parse(n, nullptr, scheme_in, scheme_out);
     } catch (std::exception& e) {
       casadi_error("Cannot process input " + n + ": " + std::string(e.what()));
     }
@@ -601,7 +651,7 @@ void FmuFunction::identify_io(
   // Parse FmuFunction outputs
   for (const std::string& n : name_out) {
     try {
-      (void)OutputStruct::parse(n, 0, scheme_in, scheme_out);
+      (void)OutputStruct::parse(n, nullptr, scheme_in, scheme_out);
     } catch (std::exception& e) {
       casadi_error("Cannot process output " + n + ": " + std::string(e.what()));
     }
@@ -805,13 +855,11 @@ std::vector<double> FmuFunction::get_nominal_in(casadi_int i) const {
     case InputType::REG:
       return fmu_.all_nominal_in(in_.at(i).ind);
     case InputType::FWD:
-      break;
     case InputType::ADJ:
+    case InputType::ADJ_OUT:
       break;
     case InputType::OUT:
       return fmu_.all_nominal_out(in_.at(i).ind);
-    case InputType::ADJ_OUT:
-      break;
   }
   // Default: Base class
   return FunctionInternal::get_nominal_in(i);
@@ -822,7 +870,6 @@ std::vector<double> FmuFunction::get_nominal_out(casadi_int i) const {
     case OutputType::REG:
       return fmu_.all_nominal_out(out_.at(i).ind);
     case OutputType::FWD:
-      break;
     case OutputType::ADJ:
       break;
     case OutputType::JAC:
@@ -849,7 +896,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     void* mem) const {
   // Get memory struct
   FmuMemory* m = static_cast<FmuMemory*>(mem);
-  casadi_assert(m != 0, "Memory is null");
+  casadi_assert(m != nullptr, "Memory is null");
 
   setup(mem, arg, res, iw, w);
 
@@ -878,7 +925,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     }
   }
   // Work vectors, shared between threads
-  double *aseed = 0, *asens = 0, *jac_nz = 0, *hess_nz = 0;
+  double *aseed = nullptr, *asens = nullptr, *jac_nz = nullptr, *hess_nz = nullptr;
   if (need_jac) {
     // Jacobian nonzeros, initialize to NaN
     jac_nz = w; w += jac_sp_.nnz();
@@ -919,7 +966,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     s->jac_nz = jac_nz;
     s->hess_nz = hess_nz;
     // Thread specific memory
-    casadi_jac_init(&p_, &s->d, &iw, &w);
+    casadi_jac_init(&jac_prob_, &s->jac_data, &iw, &w);
     if (task < max_hess_tasks_) {
       // Perturbed adjoint sensitivities
       s->pert_asens = w;
@@ -928,13 +975,26 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       s->star_iw = iw;
       iw += fmu_.n_in();
     }
+    if (enable_adjoint_jacobian_) {
+      // Memory for Jacobian calculation via adjoint mode AD
+      casadi_jac_init(&adj_prob_, &s->adj_data, &iw, &w);
+    }
   }
   // Evaluate everything except Hessian, possibly in parallel
-  if (verbose_) casadi_message("Evaluating regular outputs, forward sens, extended Jacobian");
+  if (print_progress_) {
+    casadi_message("Evaluating regular outputs, forward sens, extended Jacobian");
+  }
   if (eval_all(m, max_jac_tasks_, true, need_jac, need_fwd, need_adj, false)) return 1;
+  // Post-process Jacobian
+  if (need_jac && !enable_forward_jacobian_) {
+    // Copy transpose nonzeros to work vector
+    casadi_copy(jac_nz, adj_sp_.nnz(), w);
+    // Calculate transpose, store in jac_nz
+    casadi_trans(w, adj_sp_, jac_nz, jac_sp_, iw);
+  }
   // Evaluate Hessian
   if (need_hess) {
-    if (verbose_) casadi_message("Evaluating extended Hessian");
+    if (print_progress_) casadi_message("Evaluating extended Hessian");
     if (eval_all(m, max_hess_tasks_, false, false, false, false, true)) return 1;
     // Post-process Hessian
     remove_nans(hess_nz, iw);
@@ -1097,38 +1157,67 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   }
   // Evalute extended Jacobian and/or adjoint derivatives
   if (need_jac || (need_adj && !uses_adjoint_derivatives_)) {
-    // Selection of colors to be evaluated for the thread
-    casadi_int c_begin = (task * jac_colors_.size2()) / n_task;
-    casadi_int c_end = ((task + 1) * jac_colors_.size2()) / n_task;
-    // Loop over colors
-    for (casadi_int c = c_begin; c < c_end; ++c) {
-      // Print progress
-      if (print_progress_) print("Jacobian calculation, thread %d/%d: Seeding variable %d/%d\n",
-        task + 1, n_task, c - c_begin + 1, c_end - c_begin);
-      // Get derivative directions
-      casadi_jac_pre(&p_, &m->d, c);
-      // Calculate derivatives
-      fmu_.set_fwd(m, m->d.nseed, m->d.iseed, m->d.seed);
-      fmu_.request_fwd(m, m->d.nsens, m->d.isens, m->d.wrt);
-      if (fmu_.eval_fwd(m, true)) return 1;
-      fmu_.get_fwd(m, m->d.nsens, m->d.isens, m->d.sens);
-      // Scale derivatives
-      casadi_jac_scale(&p_, &m->d);
-      // Collect Jacobian nonzeros
-      if (need_jac) {
-        for (casadi_int i = 0; i < m->d.nsens; ++i) {
-          m->jac_nz[m->d.nzind[i]] = m->d.sens[i];
+    if (enable_forward_jacobian_) {
+      // Forward Jacobian calculation, possibly with coloring
+      // Selection of colors to be evaluated for the thread
+      casadi_int c_begin = (task * jac_colors_.size2()) / n_task;
+      casadi_int c_end = ((task + 1) * jac_colors_.size2()) / n_task;
+      // Loop over colors
+      for (casadi_int c = c_begin; c < c_end; ++c) {
+        // Print progress
+        if (print_progress_) print("Jacobian calculation, thread %d/%d: Seeding variable %d/%d\n",
+          task + 1, n_task, c - c_begin + 1, c_end - c_begin);
+        // Get derivative directions
+        casadi_jac_pre(&jac_prob_, &m->jac_data, c);
+        // Calculate derivatives
+        fmu_.set_fwd(m, m->jac_data.nseed, m->jac_data.iseed, m->jac_data.seed);
+        fmu_.request_fwd(m, m->jac_data.nsens, m->jac_data.isens, m->jac_data.wrt);
+        if (fmu_.eval_fwd(m, true)) return 1;
+        fmu_.get_fwd(m, m->jac_data.nsens, m->jac_data.isens, m->jac_data.sens);
+        // Scale derivatives
+        casadi_jac_scale(&jac_prob_, &m->jac_data);
+        // Collect Jacobian nonzeros
+        if (need_jac) {
+          for (casadi_int i = 0; i < m->jac_data.nsens; ++i) {
+            m->jac_nz[m->jac_data.nzind[i]] = m->jac_data.sens[i];
+          }
+        }
+        // Propagate adjoint sensitivities
+        if (need_adj) {
+          for (casadi_int d = 0; d < nadj_; ++d) {
+            size_t aseed_off = d * fmu_.n_out();
+            size_t asens_off = d * fmu_.n_in();
+            for (casadi_int i = 0; i < m->jac_data.nsens; ++i) {
+              m->asens[m->jac_data.wrt[i] + asens_off] += m->aseed[m->jac_data.isens[i] + aseed_off]
+                * m->jac_data.sens[i];
+            }
+          }
         }
       }
-      // Propagate adjoint sensitivities
-      if (need_adj) {
-        for (casadi_int d = 0; d < nadj_; ++d) {
-          size_t aseed_off = d * fmu_.n_out();
-          size_t asens_off = d * fmu_.n_in();
-          for (casadi_int i = 0; i < m->d.nsens; ++i) {
-            m->asens[m->d.wrt[i] + asens_off] += m->aseed[m->d.isens[i] + aseed_off]
-              * m->d.sens[i];
-          }
+    } else {
+      // Use adjoint mode
+      casadi_assert(enable_adjoint_jacobian_, "Inconsistent options");
+      casadi_assert(need_jac, "Inconsistent options");
+      // Selection of colors to be evaluated for the thread
+      casadi_int c_begin = (task * adj_colors_.size2()) / n_task;
+      casadi_int c_end = ((task + 1) * adj_colors_.size2()) / n_task;
+      // Loop over colors
+      for (casadi_int c = c_begin; c < c_end; ++c) {
+        // Print progress
+        if (print_progress_) print("Jacobian calculation via adjoint mode, thread %d/%d: "
+          "Seeding variable %d/%d\n", task + 1, n_task, c - c_begin + 1, c_end - c_begin);
+        // Get derivative directions
+        casadi_jac_pre(&adj_prob_, &m->adj_data, c);
+        // Calculate derivatives
+        fmu_.set_adj(m, m->adj_data.nseed, m->adj_data.iseed, m->adj_data.seed);
+        fmu_.request_adj(m, m->adj_data.nsens, m->adj_data.isens, m->adj_data.wrt);
+        if (fmu_.eval_adj(m)) return 1;
+        fmu_.get_adj(m, m->adj_data.nsens, m->adj_data.isens, m->adj_data.sens);
+        // Scale derivatives
+        // casadi_jac_scale(&adj_prob_, &m->adj_data);  // can be skipped since factors are 1
+        // Collect Jacobian nonzeros
+        for (casadi_int i = 0; i < m->adj_data.nsens; ++i) {
+          m->jac_nz[m->adj_data.nzind[i]] = m->adj_data.sens[i];
         }
       }
     }
@@ -1226,17 +1315,17 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Loop over colors of the Jacobian
       for (casadi_int c1 = 0; c1 < jac_colors_.size2(); ++c1) {
        // Get derivative directions
-       casadi_jac_pre(&p_, &m->d, c1);
+       casadi_jac_pre(&jac_prob_, &m->jac_data, c1);
        // Calculate derivatives
-       fmu_.set_fwd(m, m->d.nseed, m->d.iseed, m->d.seed);
-       fmu_.request_fwd(m, m->d.nsens, m->d.isens, m->d.wrt);
+       fmu_.set_fwd(m, m->jac_data.nseed, m->jac_data.iseed, m->jac_data.seed);
+       fmu_.request_fwd(m, m->jac_data.nsens, m->jac_data.isens, m->jac_data.wrt);
        if (fmu_.eval_fwd(m, true)) return 1;
-       fmu_.get_fwd(m, m->d.nsens, m->d.isens, m->d.sens);
+       fmu_.get_fwd(m, m->jac_data.nsens, m->jac_data.isens, m->jac_data.sens);
        // Scale derivatives
-       casadi_jac_scale(&p_, &m->d);
+       casadi_jac_scale(&jac_prob_, &m->jac_data);
        // Propagate adjoint sensitivities
-       for (casadi_int i = 0; i < m->d.nsens; ++i)
-         m->pert_asens[m->d.wrt[i]] += m->aseed[m->d.isens[i]] * m->d.sens[i];
+       for (casadi_int i = 0; i < m->jac_data.nsens; ++i)
+         m->pert_asens[m->jac_data.wrt[i]] += m->aseed[m->jac_data.isens[i]] * m->jac_data.sens[i];
       }
       // Count how many times each input is calculated
       std::fill(m->star_iw, m->star_iw + fmu_.n_in(), 0);
@@ -1544,18 +1633,9 @@ Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
 
 bool FmuFunction::has_jac_sparsity(casadi_int oind, casadi_int iind) const {
   // Available in the FMU meta information
-  if (out_.at(oind).type == OutputType::REG) {
-    if (in_.at(iind).type == InputType::REG) {
-      return true;
-    } else if (in_.at(iind).type == InputType::ADJ) {
-      return true;
-    }
-  } else if (out_.at(oind).type == OutputType::ADJ) {
-    if (in_.at(iind).type == InputType::REG) {
-      return true;
-    } else if (in_.at(iind).type == InputType::ADJ) {
-      return true;
-    }
+  if ((out_.at(oind).type == OutputType::REG || out_.at(oind).type == OutputType::ADJ)
+      && (in_.at(iind).type == InputType::REG || in_.at(iind).type == InputType::ADJ)) {
+    return true;
   }
   // Not available
   return false;
@@ -1595,7 +1675,7 @@ Dict FmuFunction::get_stats(void *mem) const {
 
 void FmuFunction::serialize_body(SerializingStream &s) const {
   FunctionInternal::serialize_body(s);
-  s.version("FmuFunction", 4);
+  s.version("FmuFunction", 5);
 
   s.pack("FmuFunction::Fmu", fmu_);
 
@@ -1640,6 +1720,8 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::new_forward", new_forward_);
   s.pack("FmuFunction::new_hessian", new_hessian_);
   s.pack("FmuFunction::hessian_coloring", hessian_coloring_);
+  s.pack("FmuFunction::enable_forward_jacobian", enable_forward_jacobian_);
+  s.pack("FmuFunction::enable_adjoint_jacobian", enable_adjoint_jacobian_);
   s.pack("FmuFunction::validate_ad_file", validate_ad_file_);
 
   s.pack("FmuFunction::fd", static_cast<int>(fd_));
@@ -1648,8 +1730,10 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 
   s.pack("FmuFunction::jac_sp", jac_sp_);
   s.pack("FmuFunction::hess_sp", hess_sp_);
+  s.pack("FmuFunction::adj_sp", adj_sp_);
   s.pack("FmuFunction::jac_colors", jac_colors_);
   s.pack("FmuFunction::hess_colors", hess_colors_);
+  s.pack("FmuFunction::adj_colors", adj_colors_);
   s.pack("FmuFunction::nonlin", nonlin_);
 
 
@@ -1660,7 +1744,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 }
 
 FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
-  s.version("FmuFunction", 3, 4);
+  s.version("FmuFunction", 5, 5);
 
   s.unpack("FmuFunction::Fmu", fmu_);
 
@@ -1711,6 +1795,8 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::new_forward", new_forward_);
   s.unpack("FmuFunction::new_hessian", new_hessian_);
   s.unpack("FmuFunction::hessian_coloring", hessian_coloring_);
+  s.unpack("FmuFunction::enable_forward_jacobian", enable_forward_jacobian_);
+  s.unpack("FmuFunction::enable_adjoint_jacobian", enable_adjoint_jacobian_);
   s.unpack("FmuFunction::validate_ad_file", validate_ad_file_);
 
   int fd = 0;
@@ -1724,8 +1810,10 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
 
   s.unpack("FmuFunction::jac_sp", jac_sp_);
   s.unpack("FmuFunction::hess_sp", hess_sp_);
+  s.unpack("FmuFunction::adj_sp", adj_sp_);
   s.unpack("FmuFunction::jac_colors", jac_colors_);
   s.unpack("FmuFunction::hess_colors", hess_colors_);
+  s.unpack("FmuFunction::adj_colors", adj_colors_);
   s.unpack("FmuFunction::nonlin", nonlin_);
 
   s.unpack("FmuFunction::max_jac_tasks", max_jac_tasks_);
@@ -1733,13 +1821,19 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::max_n_tasks", max_n_tasks_);
 
   if (has_jac_ || has_adj_ || has_hess_) {
-    // Setup Jacobian memory
-    casadi_jac_setup(&p_, jac_sp_, jac_colors_);
-    p_.nom_in = get_ptr(jac_nom_in_);
-    p_.map_out = get_ptr(jac_out_);
-    p_.map_in = get_ptr(jac_in_);
+    // Setup Jacobian memory (via forward mode)
+    casadi_jac_setup(&jac_prob_, jac_sp_, jac_colors_);
+    jac_prob_.nom_in = get_ptr(jac_nom_in_);
+    jac_prob_.map_out = get_ptr(jac_out_);
+    jac_prob_.map_in = get_ptr(jac_in_);
   }
-
+  if (enable_adjoint_jacobian_) {
+    // Setup adjoint Jacobian memory (via reverse mode)
+    casadi_jac_setup(&adj_prob_, adj_sp_, adj_colors_);
+    adj_prob_.nom_in = nullptr;
+    adj_prob_.map_out = get_ptr(jac_in_);
+    adj_prob_.map_in = get_ptr(jac_out_);
+  }
 }
 
 //void pack(SerializingStream&s, );

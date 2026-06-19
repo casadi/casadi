@@ -52,6 +52,7 @@
 #include "monitor.hpp"
 #include "dump.hpp"
 #include "repmat.hpp"
+#include "kron.hpp"
 #include "casadi_find.hpp"
 #include "casadi_low.hpp"
 #include "einstein.hpp"
@@ -562,7 +563,7 @@ namespace casadi {
   }
 
 
-  MX MXNode::get_mac(const MX& y, const MX& z) const {
+  MX MXNode::get_mac(const MX& y, const MX& z, const std::string& blas) const {
     if (sparsity().is_orthonormal() && y.is_column() && y.is_dense()
         && y.sparsity()==z.sparsity() && z.is_zero()) {
       std::vector<casadi_int> perm = sparsity().permutation_vector();
@@ -578,11 +579,7 @@ namespace casadi {
       "Dimension error x.mac(z). Got x=" + x.dim() + " and z=" + z.dim() + ".");
     casadi_assert(y.size1()==x.size2(),
       "Dimension error x.mac(z). Got y=" + str(y.size1()) + " and x" + x.dim() + ".");
-    if (x.is_dense() && y.is_dense() && z.is_dense()) {
-      return MX::create(new DenseMultiplication(z, x, y));
-    } else {
-      return MX::create(new Multiplication(z, x, y));
-    }
+    return Multiplication::create(z, x, y, blas);
   }
 
   MX MXNode::get_einstein(const MX& A, const MX& B,
@@ -1084,8 +1081,8 @@ namespace casadi {
     return MX::create(new Convexify(shared_from_this<MX>(), opts));
   }
 
-  MX MXNode::get_det() const {
-    return MX::create(new Determinant(shared_from_this<MX>()));
+  MX MXNode::get_det(const Linsol& linear_solver) const {
+    return MX::create(new Determinant(shared_from_this<MX>(), linear_solver));
   }
 
   MX MXNode::get_inv() const {
@@ -1240,6 +1237,20 @@ namespace casadi {
     }
   }
 
+  MX MXNode::get_kron(const MX& b) const {
+    if (nnz() == 0 || b.nnz() == 0) {
+      return MX::zeros(Sparsity::kron(sparsity(), b.sparsity()));
+    }
+    return Kron::create(shared_from_this<MX>(), b);
+  }
+
+  MX MXNode::get_kron_contract(const MX& x, bool inner) const {
+    if (nnz() == 0 || x.nnz() == 0) {
+      return MX::zeros(Sparsity::kron_contract(sparsity(), x.sparsity(), inner));
+    }
+    return KronContract::create(shared_from_this<MX>(), x, inner);
+  }
+
   std::vector<MX> MXNode::get_diagsplit(const std::vector<casadi_int>& offset1,
                                        const std::vector<casadi_int>& offset2) const {
     if (is_zero()) {
@@ -1367,6 +1378,8 @@ namespace casadi {
     {OP_BSPLINE, BSplineCommon::deserialize},
     {OP_CONVEXIFY, Convexify::deserialize},
     {OP_LOGSUMEXP, LogSumExp::deserialize},
+    {OP_KRON, Kron::deserialize},
+    {OP_KRON_CONTRACT, KronContract::deserialize},
     {-1, OutputNode::deserialize}
   };
 

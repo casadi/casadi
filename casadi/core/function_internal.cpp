@@ -44,6 +44,7 @@
 #include "external_impl.hpp"
 #include "fmu_function.hpp"
 #include "blazing_spline_impl.hpp"
+#include "onnx_function_impl.hpp"
 #include "filesystem_impl.hpp"
 
 #include <cctype>
@@ -94,6 +95,8 @@ namespace casadi {
     eval_ = nullptr;
     checkout_ = nullptr;
     release_ = nullptr;
+    incref_ = nullptr;
+    decref_ = nullptr;
     has_refcount_ = false;
     enable_forward_op_ = true;
     enable_reverse_op_ = true;
@@ -128,6 +131,7 @@ namespace casadi {
   }
 
   FunctionInternal::~FunctionInternal() {
+    if (decref_) decref_();
     if (jit_cleanup_ && jit_) {
       std::string jit_name = jit_directory_ + jit_name_ + ".c";
       if (remove(jit_name.c_str())) casadi_warning("Failed to remove " + jit_name);
@@ -138,7 +142,8 @@ namespace casadi {
     // Sanitize dictionary is needed
     if (!Options::is_sane(opts)) {
       // Call recursively
-      return construct(Options::sanitize(opts));
+      construct(Options::sanitize(opts));
+      return;
     }
 
     // Make sure all options exist
@@ -225,12 +230,6 @@ namespace casadi {
       {"gather_stats",
        {OT_BOOL,
         "Deprecated option (ignored): Statistics are now always collected."}},
-      {"input_scheme",
-       {OT_STRINGVECTOR,
-        "Deprecated option (ignored)"}},
-      {"output_scheme",
-       {OT_STRINGVECTOR,
-        "Deprecated option (ignored)"}},
       {"jit",
        {OT_BOOL,
         "Use just-in-time compiler to speed up the evaluation"}},
@@ -490,10 +489,6 @@ namespace casadi {
         inputs_check_ = op.second;
       } else if (op.first=="gather_stats") {
         casadi_warning("Deprecated option \"gather_stats\": Always enabled");
-      } else if (op.first=="input_scheme") {
-        casadi_warning("Deprecated option: \"input_scheme\" set via constructor");
-      } else if (op.first=="output_scheme") {
-        casadi_warning("Deprecated option: \"output_scheme\" set via constructor");
       } else if (op.first=="jit") {
         jit_ = op.second;
       } else if (op.first=="jit_cleanup") {
@@ -771,9 +766,12 @@ namespace casadi {
         }
         // Try to load
         eval_ = (eval_t) compiler_.get_function(name_);
-        checkout_ = (casadi_checkout_t) compiler_.get_function(name_ + "checkout");
-        release_ = (casadi_release_t) compiler_.get_function(name_ + "release");
+        checkout_ = (casadi_checkout_t) compiler_.get_function(name_ + "_checkout");
+        release_ = (casadi_release_t) compiler_.get_function(name_ + "_release");
+        incref_ = (signal_t) compiler_.get_function(name_ + "_incref");
+        decref_ = (signal_t) compiler_.get_function(name_ + "_decref");
         casadi_assert(eval_!=nullptr, "Cannot load JIT'ed function.");
+        if (incref_) incref_();
       } else {
         // Just jit dependencies
         jit_dependencies(jit_name_);
@@ -864,7 +862,7 @@ namespace casadi {
   }
 
   int ProtoFunction::init_mem(void* mem) const {
-    auto m = static_cast<ProtoFunctionMemory*>(mem);
+    auto *m = static_cast<ProtoFunctionMemory*>(mem);
     if (record_time_) {
       m->add_stat("total");
       m->t_total = &m->fstats.at("total");
@@ -940,7 +938,7 @@ namespace casadi {
         stream << "]";
         if (!sp.is_dense()) {
           stream << ", colind: [";
-          for (casadi_int i=0; i<sp.size2(); ++i) {
+          for (casadi_int i=0; i<sp.size2()+1; ++i) {
             if (i>0) stream << ", ";
             stream << sp.colind()[i];
           }
@@ -971,17 +969,17 @@ namespace casadi {
     if (dump_in_) dump_in(dump_id, arg);
     if (dump_ && dump_id==0) dump();
     if (print_in_) print_in(uout(), arg, false);
-    auto m = static_cast<ProtoFunctionMemory*>(mem);
+    auto *m = static_cast<ProtoFunctionMemory*>(mem);
 
     // Avoid memory corruption
     for (casadi_int i=0;i<n_in_;++i) {
-      casadi_assert(arg[i]==0 || arg[i]+nnz_in(i)<=w || arg[i]>=w+sz_w(),
+      casadi_assert(arg[i]==nullptr || arg[i]+nnz_in(i)<=w || arg[i]>=w+sz_w(),
         "Memory corruption detected for input " + name_in_[i] + ".\n"+
         "arg[" + str(i) + "] " + str(arg[i]) + "-" + str(arg[i]+nnz_in(i)) +
         " intersects with w " + str(w)+"-"+str(w+sz_w())+".");
     }
     for (casadi_int i=0;i<n_out_;++i) {
-      casadi_assert(res[i]==0 || res[i]+nnz_out(i)<=w || res[i]>=w+sz_w(),
+      casadi_assert(res[i]==nullptr || res[i]+nnz_out(i)<=w || res[i]>=w+sz_w(),
         "Memory corruption detected for output " + name_out_[i]);
     }
     // Reset statistics
@@ -989,7 +987,7 @@ namespace casadi {
     if (m->t_total) m->t_total->tic();
     int ret;
     if (eval_) {
-      auto m = static_cast<FunctionMemory*>(mem);
+      auto *m = static_cast<FunctionMemory*>(mem);
       m->stats_available = true;
       int mem_ = 0;
       if (checkout_) {
@@ -1055,7 +1053,7 @@ namespace casadi {
   }
 
   bool ProtoFunction::has_option(const std::string &option_name) const {
-    return get_options().find(option_name) != 0;
+    return get_options().find(option_name) != nullptr;
   }
 
   void ProtoFunction::change_option(const std::string& option_name,
@@ -2394,7 +2392,8 @@ namespace casadi {
     // The code below creates a call node, to inline, wrap in an MXFunction
     if (always_inline) {
       casadi_assert(!never_inline, "Inconsistent options for " + str(name_));
-      return wrap().call(arg, res, true);
+      wrap().call(arg, res, true);
+      return;
     }
 
     // Create a call-node
@@ -3014,6 +3013,16 @@ namespace casadi {
   }
 
   int FunctionInternal::
+  eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    // Sound fallback: we cannot prove any output zero, so mark everything active
+    for (casadi_int oind=0; oind<n_out_; ++oind) {
+      if (res[oind]==nullptr) continue;
+      std::fill_n(res[oind], nnz_out(oind), ~static_cast<bvec_t>(0));
+    }
+    return 0;
+  }
+
+  int FunctionInternal::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
     // Loop over outputs
     for (casadi_int oind=0; oind<n_out_; ++oind) {
@@ -3145,7 +3154,7 @@ namespace casadi {
   }
 
   Dict ProtoFunction::get_stats(void* mem) const {
-    auto m = static_cast<ProtoFunctionMemory*>(mem);
+    auto *m = static_cast<ProtoFunctionMemory*>(mem);
     // Add timing statistics
     Dict stats;
     for (const auto& s : m->fstats) {
@@ -3158,7 +3167,7 @@ namespace casadi {
 
   Dict FunctionInternal::get_stats(void* mem) const {
     Dict stats = ProtoFunction::get_stats(mem);
-    auto m = static_cast<FunctionMemory*>(mem);
+    auto *m = static_cast<FunctionMemory*>(mem);
     casadi_assert(m->stats_available,
       "No stats available: Function '" + name_ + "' not set up. "
       "To get statistics, first evaluate it numerically.");
@@ -3229,8 +3238,9 @@ namespace casadi {
     casadi_int npar = 1;
     for (auto&& r : fseed) {
       if (!matching_arg(r, npar)) {
-        return FunctionInternal::call_forward(arg, res, replace_fseed(fseed, npar),
-                                            fsens, always_inline, never_inline);
+        FunctionInternal::call_forward(arg, res, replace_fseed(fseed, npar),
+                                       fsens, always_inline, never_inline);
+        return;
       }
     }
 
@@ -3334,8 +3344,9 @@ namespace casadi {
     casadi_int npar = 1;
     for (auto&& r : aseed) {
       if (!matching_res(r, npar)) {
-        return FunctionInternal::call_reverse(arg, res, replace_aseed(aseed, npar),
-                                            asens, always_inline, never_inline);
+        FunctionInternal::call_reverse(arg, res, replace_aseed(aseed, npar),
+                                       asens, always_inline, never_inline);
+        return;
       }
     }
 
@@ -3550,8 +3561,7 @@ namespace casadi {
 
   void FunctionInternal::merge(const std::vector<MX>& arg,
     std::vector<MX>& subs_from, std::vector<MX>& subs_to) const {
-    return;
-  }
+     }
 
   std::vector<MX> FunctionInternal::free_mx() const {
     casadi_error("'free_mx' only defined for 'MXFunction'");
@@ -3639,8 +3649,6 @@ namespace casadi {
   bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp, casadi_int& npar) {
     // Matching dimensions
     if (arg.size()==inp.size()) return true;
-    // Calling with empty matrix - set all to zero
-    if (arg.is_empty()) return true;
     // Calling with a scalar - set all
     if (arg.is_scalar()) return true;
     // Vectors that are transposes of each other
@@ -3648,13 +3656,15 @@ namespace casadi {
     // Horizontal repmat
     if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && inp.size2()%arg.size2()==0) return true;
-    if (npar==-1) return false;
     // Evaluate with multiple arguments
-    if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+    if (npar!=-1 && arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && arg.size2()%(npar*inp.size2())==0) {
       npar *= arg.size2()/(npar*inp.size2());
       return true;
     }
+    // Calling with empty matrix - set all to zero (after the structured branches above,
+    // so that a 0-by-N argument can still be recognised as a parallel/repmat call)
+    if (arg.is_empty()) return true;
     // No match
     return false;
   }
@@ -3729,7 +3739,7 @@ namespace casadi {
                                casadi_int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
     set_temp(mem, arg, res, iw, w);
-    auto m = static_cast<FunctionMemory*>(mem);
+    auto *m = static_cast<FunctionMemory*>(mem);
     m->stats_available = true;
   }
 
@@ -3920,12 +3930,10 @@ namespace casadi {
     return f.which_depends(s_in, s_out, order, tr);
   }
 
-  Function FunctionInternal::simplify(const std::string& name, const Dict& opts) const {
-    if (name==name_) {
-      return self();
-    } else {
-      return wrap(name);
-    }
+  Function FunctionInternal::simplify_passes(
+      const std::vector<std::pair<std::string, casadi_int> >& tasks) const {
+    casadi_assert(tasks.empty(), "simplify passes not supported for " + class_name());
+    return self();
   }
 
   const Function& FunctionInternal::oracle() const {
@@ -4259,6 +4267,11 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
+    eval_ = nullptr;
+    checkout_ = nullptr;
+    release_ = nullptr;
+    incref_ = nullptr;
+    decref_ = nullptr;
     int version = s.version("FunctionInternal", 1, 8);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
@@ -4412,7 +4425,8 @@ namespace casadi {
     {"External", External::deserialize},
     {"Conic", Conic::deserialize},
     {"FmuFunction", FmuFunction::deserialize},
-    {"BlazingSplineFunction", BlazingSplineFunction::deserialize}
+    {"BlazingSplineFunction", BlazingSplineFunction::deserialize},
+    {"Onnx", OnnxFunction::deserialize}
   };
 
 } // namespace casadi

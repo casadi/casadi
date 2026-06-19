@@ -23,14 +23,15 @@
 
 // SYMBOL "blazing_1d_boor_eval"
 template<typename T1>
-void casadi_blazing_1d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const T1* all_inv, const casadi_int* offset, const T1* c, const T1* dc, const T1* ddc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
+void casadi_blazing_1d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const T1* all_knots_cache, const casadi_int* offset, const T1* c, const T1* dc, const T1* ddc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
   casadi_int *starts;
   iw+=1+1;
   starts = iw;
 
   simde__m256d boor0_d2, boor0_d1, boor0_d0;
   const T1* inv2_0 = 0; const T1* inv3_0 = 0;
-  starts[0] = casadi_blazing_boor_init<T1>(all_x[0], all_knots, all_inv,
+  // For 1D the cache slice is just the global cache.
+  starts[0] = casadi_blazing_boor_init<T1>(all_x[0], all_knots, all_knots_cache,
       offset[0], offset[1], lookup_mode[0], &boor0_d0, &boor0_d1, &boor0_d2, &inv2_0, &inv3_0);
 
   const T1* C = c+starts[0];

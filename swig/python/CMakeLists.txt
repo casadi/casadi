@@ -2,11 +2,7 @@ cmake_minimum_required(VERSION 3.10.2)
 
 # Workaround for OS X
 if(APPLE)
-  if(WITH_PYTHON3)
   set(PYTHON_CONFIG_NAME python3-config)
-  else()
-  set(PYTHON_CONFIG_NAME python-config)
-  endif()
   find_program(PYTHON_CONFIG_EXECUTABLE
                NAMES ${PYTHON_CONFIG_NAME} DOC "python-config executable")
   if(PYTHON_CONFIG_EXECUTABLE)
@@ -35,25 +31,14 @@ function(CasadiGetPythonVersionMajor VERSION_MAJOR_RESULT INCLUDE_PATH)
 endfunction()
 
 if(SWIG_EXPORT)
-  if(WITH_PYTHON3)
-    set(PYTHON_VERSION_MAJOR 3)
-  else()
-    set(PYTHON_VERSION_MAJOR 2)
-  endif()
+  set(PYTHON_VERSION_MAJOR 3)
 else()
   if(PYTHON_INCLUDE_DIR)
     set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_DIR})
   else()
-    # Find packages
-    if(WITH_PYTHON3)
-    set(MINPYVERSION "3")
-    else()
-    set(MINPYVERSION "")
-    endif()
-
-    # We don't really need the libs, but the headers.
-    find_package(PythonInterp ${MINPYVERSION})
-    find_package(PythonLibs ${MINPYVERSION})
+    # We don't really need the libs (except on Windows), but the headers.
+    include(CasadiFindPython)
+    casadi_find_python(DEVELOPMENT)
     if(NOT PYTHON_INCLUDE_PATH)
       message(SEND_ERROR "Python include headers not found, but required." )
     endif()
@@ -82,6 +67,50 @@ set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPy_USING_UNICODE")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-noproxydel")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-fastunpack")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-modernargs")
+
+# -stubs emits PEP-484 .pyi files alongside the .py shadow.  Only the
+# patched casadi fork of SWIG supports this; vanilla SWIG rejects the
+# flag.  Feature-detect so the build still works with stock SWIG
+# (without pyright-friendly type hints).  PEP-484 stub syntax is
+# inherently Python 3 — never emit .pyi on a Python 2 build.  Under
+# SWIG_IMPORT (sdist consumer) SWIG may be absent entirely; skip the
+# feature-detect and let the sdist carry the pre-generated .pyi.
+set(_emit_stubs OFF)
+if(SWIG_IMPORT)
+  message(STATUS "SWIG_IMPORT: consuming pre-generated SWIG output; no local stub generation")
+elseif(NOT "${PYTHON_VERSION_MAJOR}" STREQUAL "3")
+  message(STATUS "Python 2 target; skipping .pyi stub generation (PEP-484 syntax is Python 3 only)")
+else()
+  execute_process(
+    COMMAND ${SWIG_EXECUTABLE} -python -help
+    OUTPUT_VARIABLE _swig_python_help
+    ERROR_VARIABLE  _swig_python_help_err
+    RESULT_VARIABLE _swig_help_rc
+  )
+  string(FIND "${_swig_python_help}${_swig_python_help_err}" "-stubs" _swig_has_stubs)
+  if(NOT _swig_has_stubs EQUAL -1)
+    set(_emit_stubs ON)
+    set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-stubs")
+    message(STATUS "SWIG supports -stubs and Python 3 target; generating PEP-484 type stubs (.pyi)")
+  else()
+    message(STATUS "SWIG lacks -stubs support; skipping .pyi stub generation. "
+                   "For typed Python bindings, build with the casadi-patched SWIG "
+                   "fork (see ~/programs/swig or equivalent).")
+  endif()
+endif()
+
+# Emit the tiny stub-forwarder artifacts in the build dir at configure
+# time.  They're one-line files (forwarder + py.typed marker) and
+# embedding them here avoids needing to track generated-looking files
+# in source control.
+set(_stubs_gen_dir ${CMAKE_CURRENT_BINARY_DIR}/stubs)
+# issue #2959: `casadi.array` is a qualified-only alias of ArrayInterface
+# (defined in __init__.py, kept out of `from casadi import *`); surface it to
+# type checkers so `ca.array(...)` resolves.  NB use a plain assignment, not
+# `from .casadi import ArrayInterface as array`: in a .pyi the latter is a
+# non-re-exported (private) import that pyright hides from attribute access.
+file(WRITE ${_stubs_gen_dir}/__init__.pyi "from .casadi import *\narray = ArrayInterface\n")
+file(WRITE ${_stubs_gen_dir}/py.typed     "partial\n")
 if(WITH_PYTHON_GIL_RELEASE)
   set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-threads")
   set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DCASADI_WITH_PYTHON_GIL_RELEASE")
@@ -89,7 +118,57 @@ endif()
 if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")
 set(PYTHONFLAG "3")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-py3")
-set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON3")
+endif()
+
+# Limited API support for stable ABI
+# Minimum target is 3.8 (adds PyImport_GetModule). Targets < 3.11 use buffer protocol
+# functions not officially in Limited API until 3.11, but de facto stable since Python 3.0.
+function(python_version_to_abi_hex out_var version_str)
+  string(REPLACE "." ";" _ver "${version_str}")
+  list(GET _ver 0 _major)
+  list(GET _ver 1 _minor)
+  # Convert to hex using math(EXPR) - compatible with CMake 3.13+
+  # (string FORMAT requires CMake 3.18+)
+  math(EXPR _major_hex "${_major}" OUTPUT_FORMAT HEXADECIMAL)
+  math(EXPR _minor_hex "${_minor}" OUTPUT_FORMAT HEXADECIMAL)
+  # Remove 0x prefix and pad to 2 digits
+  string(REGEX REPLACE "^0x" "" _major_hex "${_major_hex}")
+  string(REGEX REPLACE "^0x" "" _minor_hex "${_minor_hex}")
+  string(LENGTH "${_major_hex}" _major_len)
+  string(LENGTH "${_minor_hex}" _minor_len)
+  if(_major_len LESS 2)
+    set(_major_hex "0${_major_hex}")
+  endif()
+  if(_minor_len LESS 2)
+    set(_minor_hex "0${_minor_hex}")
+  endif()
+  string(TOUPPER "${_major_hex}${_minor_hex}" _hex_upper)
+  set(${out_var} "0x${_hex_upper}0000" PARENT_SCOPE)
+endfunction()
+
+if(WITH_PYTHON_LIMITED_API)
+  if(NOT "${PYTHON_VERSION_MAJOR}" STREQUAL "3")
+    message(FATAL_ERROR "Python Limited API is only supported with Python 3")
+  endif()
+
+  set(PYTHON_LIMITED_API_TARGET "3.11" CACHE STRING "Python Limited API target version (>= 3.11)")
+  if(PYTHON_LIMITED_API_TARGET VERSION_LESS "3.11")
+    message(FATAL_ERROR "PYTHON_LIMITED_API_TARGET must be >= 3.11 (got: ${PYTHON_LIMITED_API_TARGET})")
+  endif()
+
+  python_version_to_abi_hex(PYTHON_LIMITED_API_VERSION "${PYTHON_LIMITED_API_TARGET}")
+
+  message(STATUS "Building abi3 wheel for Python ${PYTHON_LIMITED_API_TARGET}+")
+
+  # Check Python version (skip for SWIG export/import)
+  if(NOT SWIG_EXPORT AND NOT SWIG_IMPORT)
+    if(PYTHON_VERSION_STRING VERSION_LESS "${PYTHON_LIMITED_API_TARGET}")
+      message(FATAL_ERROR "Limited API target ${PYTHON_LIMITED_API_TARGET} requires Python >= ${PYTHON_LIMITED_API_TARGET} (found ${PYTHON_VERSION_STRING})")
+    endif()
+  endif()
+
+  set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPy_LIMITED_API=${PYTHON_LIMITED_API_VERSION}")
+  set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPY_VERSION_HEX=${PYTHON_LIMITED_API_VERSION}")
 endif()
 
 if(WITH_PYTHON_GIL_RELEASE)
@@ -110,6 +189,20 @@ if(SWIG_EXPORT)
   configure_file(setup.py.in "${PROJECT_SOURCE_DIR}/setup.py" @ONLY)
   file(COPY requirements.txt DESTINATION ${PROJECT_SOURCE_DIR})
   file(COPY MANIFEST.in DESTINATION ${PROJECT_SOURCE_DIR})
+
+  # target*/extra/ is the self-contained Python package surface that a
+  # downstream SWIG_IMPORT build consumes.  SWIG writes casadi.py (and
+  # casadi.pyi under -stubs) here; we need to also drop in __init__.py
+  # and, for Python 3, the stub forwarder + py.typed marker so that
+  # the SWIG_IMPORT install step has everything it needs without
+  # having to reach back into the source tree.
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
+       DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra)
+  if(_emit_stubs)
+    file(COPY ${_stubs_gen_dir}/__init__.pyi
+              ${_stubs_gen_dir}/py.typed
+         DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra)
+  endif()
 endif()
 
 if(SWIG_IMPORT)
@@ -134,6 +227,11 @@ add_custom_target(python DEPENDS _casadi)
 add_library(_casadi MODULE ${PYTHON_FILE})
 
 set_target_properties(_casadi PROPERTIES PREFIX "")
+
+# Add compile definitions for Limited API
+if(WITH_PYTHON_LIMITED_API)
+  target_compile_definitions(_casadi PRIVATE Py_LIMITED_API=${PYTHON_LIMITED_API_VERSION})
+endif()
 if(WIN32 AND NOT CYGWIN)
   set_target_properties(_casadi PROPERTIES SUFFIX ".pyd")
   set(CASADI_PYTHON_LIBRARY_SUFFIX ".pyd")
@@ -175,7 +273,31 @@ if(WIN32) # dlls don't allow missing symbols
   if(NOT PYTHON_LIBRARY)
     message(SEND_ERROR "Python libraries not found, but required." )
   endif()
-  target_link_libraries(_casadi ${PYTHON_LIBRARY})
+  # For an abi3 build, link against python3.lib (the version-agnostic
+  # stable-ABI marshal lib) instead of the version-specific pythonXY.lib.
+  # Otherwise the resulting _casadi.pyd has a hard dependency on
+  # python311.dll and only loads under Python 3.11 — defeating the
+  # whole point of abi3. python3.lib ships in the standard CPython
+  # Windows distribution alongside python<X><Y>.lib in the same libs/ dir.
+  if(WITH_PYTHON_LIMITED_API)
+    get_filename_component(_python_libdir "${PYTHON_LIBRARY}" DIRECTORY)
+    find_library(PYTHON3_STABLE_LIB
+                 NAMES python3
+                 PATHS "${_python_libdir}"
+                 NO_DEFAULT_PATH)
+    if(PYTHON3_STABLE_LIB)
+      message(STATUS "abi3 build: linking against ${PYTHON3_STABLE_LIB} (was ${PYTHON_LIBRARY})")
+      target_link_libraries(_casadi ${PYTHON3_STABLE_LIB})
+    else()
+      message(WARNING
+        "WITH_PYTHON_LIMITED_API is ON but python3.lib was not found in "
+        "${_python_libdir}; falling back to ${PYTHON_LIBRARY}. The resulting "
+        ".pyd will only load under the build-time Python minor version.")
+      target_link_libraries(_casadi ${PYTHON_LIBRARY})
+    endif()
+  else()
+    target_link_libraries(_casadi ${PYTHON_LIBRARY})
+  endif()
 endif()
 target_link_libraries(_casadi casadi)
 
@@ -195,40 +317,68 @@ install(TARGETS _casadi
 )
 
 if (SWIG_IMPORT)
-# Install Python proxy classes
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.py
+# Install Python proxy classes + the generated PEP-484 stub (alongside .py).
+install(FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.py
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
-else()
-# Install Python proxy classes
-install(FILES ${PROJECT_BINARY_DIR}/swig/python/casadi.py
+install(FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.pyi
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
+  OPTIONAL
+)
+else()
+install(FILES
+  ${PROJECT_BINARY_DIR}/swig/python/casadi.py
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+)
+install(FILES
+  ${PROJECT_BINARY_DIR}/swig/python/casadi.pyi
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+  OPTIONAL
 )
 endif()
 
+# Ship __init__.pyi forwarder + py.typed marker whenever the main
+# stub (casadi.pyi) will be installed.  Two cases:
+#   - SWIG_IMPORT (pip install from sdist): the sdist producer already
+#     made the call — if target*/extra/casadi.pyi exists there, we ship
+#     the trio.  The local SWIG may be absent or vanilla; don't gate
+#     on `_emit_stubs`.
+#   - Normal / SWIG_EXPORT build: use `_emit_stubs`, which tracks
+#     whether we just generated casadi.pyi ourselves.
+# Python 2 never gets stubs either way (PEP-484 is Py3 syntax).
+set(_ship_stub_trio OFF)
 if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")
-  # Install Python tools
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
+  if(SWIG_IMPORT)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.pyi")
+      set(_ship_stub_trio ON)
+    endif()
+  elseif(_emit_stubs)
+    set(_ship_stub_trio ON)
+  endif()
+endif()
+if(_ship_stub_trio)
+  install(FILES
+    ${_stubs_gen_dir}/__init__.pyi
+    ${_stubs_gen_dir}/py.typed
     DESTINATION "${PYTHON_PREFIX}/casadi"
     COMPONENT install_python
-    USE_SOURCE_PERMISSIONS
-    PATTERN .pyc EXCLUDE
-    PATTERN .svn EXCLUDE
-    PATTERN structure.py EXCLUDE
-  )
-else()
-  # Install Python tools
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
-    DESTINATION "${PYTHON_PREFIX}/casadi"
-    COMPONENT install_python
-    USE_SOURCE_PERMISSIONS
-    PATTERN .pyc EXCLUDE
-    PATTERN .svn EXCLUDE
-    PATTERN structure3.py EXCLUDE
   )
 endif()
+
+# Install Python tools
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+  USE_SOURCE_PERMISSIONS
+  PATTERN .pyc EXCLUDE
+  PATTERN .svn EXCLUDE
+)
 
 # Install Python package initialization
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py

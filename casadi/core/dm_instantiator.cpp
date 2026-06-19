@@ -25,6 +25,7 @@
 #define CASADI_DM_INSTANTIATOR_CPP
 #include "matrix_impl.hpp"
 
+#include "blas_impl.hpp"
 #include "filesystem_impl.hpp"
 namespace casadi {
 
@@ -42,6 +43,13 @@ namespace casadi {
   inv(const DM& A,
         const std::string& lsolver, const Dict& dict) {
     return solve(A, DM::eye(A.size1()), lsolver, dict);
+  }
+
+  template<>
+  DM CASADI_EXPORT DM::
+  det(const DM& A, const std::string& lsolver, const Dict& dict) {
+    Linsol mysolver("tmp_det", lsolver, A.sparsity(), dict);
+    return mysolver.det(A);
   }
 
   template<>
@@ -382,6 +390,19 @@ namespace casadi {
     } else {
       casadi_error("Unknown format '" + format + "'");
     }
+  }
+
+  // double specialization of mtimes_dense_dispatch (declared in
+  // matrix_impl.hpp). Routes the dense fast path of Matrix<double>::mac
+  // through the BLAS plugin: shorthand 0 (reference) inlines
+  // casadi_mtimes_dense; external plugins (classic, blasfeo, ...) call
+  // dgemm via dispatch_.
+  template<>
+  void CASADI_EXPORT mtimes_dense_dispatch<double>(
+      const std::string& blas,
+      const double* A, casadi_int m, casadi_int k,
+      const double* B, casadi_int n, double* C) {
+    Blas::mtimes(Blas::shorthand_for(blas), A, m, k, B, n, C);
   }
 
   // Instantiate templates

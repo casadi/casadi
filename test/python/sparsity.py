@@ -21,7 +21,8 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+import casadi as ca
+import numpy as np
 import casadi as c
 import numpy
 import unittest
@@ -41,11 +42,11 @@ class Sparsitytests(casadiTestCase):
              (0,0),
              (2,2)])
 
-    a = Sparsity(4,5)
+    a = ca.Sparsity(4,5)
     for i in nza:
       a.add_nz(i[0],i[1])
 
-    b = Sparsity(4,5)
+    b = ca.Sparsity(4,5)
     for i in nzb:
       b.add_nz(i[0],i[1])
 
@@ -69,11 +70,11 @@ class Sparsitytests(casadiTestCase):
              (2,2),
              (2,3)])
 
-    a = Sparsity(4,5)
+    a = ca.Sparsity(4,5)
     for i in nza:
       a.add_nz(i[0],i[1])
 
-    b = Sparsity(4,5)
+    b = ca.Sparsity(4,5)
     for i in nzb:
       b.add_nz(i[0],i[1])
 
@@ -92,12 +93,12 @@ class Sparsitytests(casadiTestCase):
     self.message("get_nzDense")
     nza = set([  (0,0),(0,1),(2,0),(3,1)])
 
-    a = Sparsity(4,5)
+    a = ca.Sparsity(4,5)
     for i in nza:
       a.add_nz(i[0],i[1])
 
-    A = DM.ones(a)
-    Ad = DM(array(A))
+    A = ca.DM.ones(a)
+    Ad = ca.DM(array(A))
     for i in a.find():
       self.assertEqual(Ad.nz[i],1)
 
@@ -106,7 +107,7 @@ class Sparsitytests(casadiTestCase):
     d = self.randDM(20,10,0.6)
     sp = d.sparsity()
 
-    sp2 = Sparsity.nonzeros(20,10,sp.find())
+    sp2 = ca.Sparsity.nonzeros(20,10,sp.find())
     self.assertTrue(sp==sp2)
 
   def test_enlarge(self):
@@ -114,7 +115,7 @@ class Sparsitytests(casadiTestCase):
     import numpy
     self.message(":dense")
     #sp = Sparsity(3,4,[1,2,1],[0,2,2,3])
-    sp = Sparsity.dense(3,4)
+    sp = ca.Sparsity.dense(3,4)
 
     col = [1,2,4]
     row = [0,3,4,6]
@@ -125,20 +126,20 @@ class Sparsitytests(casadiTestCase):
       for j in row:
         z[i,j]=1
 
-    self.checkarray(DM.ones(sp),z,"enlarge")
+    self.checkarray(ca.DM.ones(sp),z,"enlarge")
     self.message(":sparse")
-    sp = Sparsity(4,3,[0,2,2,3],[1,2,1]).T
-    n = DM.ones(sp)
+    sp = ca.Sparsity(4,3,[0,2,2,3],[1,2,1]).T
+    n = ca.DM.ones(sp)
     z = numpy.zeros((7,8))
     for i in range(3):
       for j in range(4):
           z[col[i],row[j]]= n[i,j]
     sp.enlarge(7,8,[1,2,4],[0,3,4,6])
 
-    self.checkarray(DM.ones(sp),z,"enlarge")
+    self.checkarray(ca.DM.ones(sp),z,"enlarge")
 
   def tomatrix(self,s):
-    d = DM.ones(s)
+    d = ca.DM.ones(s)
     for k in range(d.nnz()):
       d.nz[k] = k+1
     return d
@@ -152,11 +153,11 @@ class Sparsitytests(casadiTestCase):
              (2,4),
              (3,1)]
 
-    a = Sparsity(4,5)
+    a = ca.Sparsity(4,5)
     for i in nza:
       a.add_nz(i[0],i[1])
 
-    b = Sparsity.triplet(4,5,[i[0] for i in nza],[i[1] for i in nza])
+    b = ca.Sparsity.triplet(4,5,[i[0] for i in nza],[i[1] for i in nza])
     self.checkarray(self.tomatrix(a),self.tomatrix(b),"rowcol")
 
   def test_rowcol(self):
@@ -164,12 +165,12 @@ class Sparsitytests(casadiTestCase):
 
     r = [0,1,3]
     c = [1,4]
-    a = Sparsity(4,5)
+    a = ca.Sparsity(4,5)
     for i in r:
       for j in c:
         a.add_nz(i,j)
 
-    b = Sparsity.rowcol(r,c,4,5)
+    b = ca.Sparsity.rowcol(r,c,4,5)
     self.checkarray(self.tomatrix(a),self.tomatrix(b),"rowcol")
 
   def test_reshape(self):
@@ -181,12 +182,12 @@ class Sparsitytests(casadiTestCase):
              (2,4),
              (3,1)])
 
-    a = Sparsity(4,5)
+    a = ca.Sparsity(4,5)
     for i in nza:
       a.add_nz(i[0],i[1])
 
     A=self.tomatrix(a).full()
-    B=self.tomatrix(casadi.reshape(a,2,10)).full()
+    B=self.tomatrix(ca.reshape(a,2,10)).full()
     B_=numpy.reshape(A.T,(10,2)).T
 
     self.checkarray(B,B_,"reshape")
@@ -201,63 +202,63 @@ class Sparsitytests(casadiTestCase):
              (2,4),
              (3,1)])
 
-    a = Sparsity(4,5)
+    a = ca.Sparsity(4,5)
     for i in nza:
       a.add_nz(i[0],i[1])
 
     A=self.tomatrix(a).full()
-    B=self.tomatrix(vec(a)).full()
+    B=self.tomatrix(ca.vec(a)).full()
     B_=numpy.reshape(A,(20,1))
 
     self.checkarray(B,B_,"reshape")
 
 
   def test_refcount(self):
-      x = DM(Sparsity.lower(4),5)
-      s = mtimes(x,x).sparsity()
+      x = ca.DM(ca.Sparsity.lower(4),5)
+      s = (x @ x).sparsity()
       self.assertEqual(s.numel(),16)
 
   def test_splower(self):
-    sp = Sparsity(4,3,[0,2,2,3],[1,2,1])
+    sp = ca.Sparsity(4,3,[0,2,2,3],[1,2,1])
     print(array(sp))
-    print(array(tril(sp)))
+    print(array(ca.tril(sp)))
     print(sp.get_lower())
 
 
   def test_diag(self):
     self.message("diag")
-    A = Sparsity(5,5)
+    A = ca.Sparsity(5,5)
     A.add_nz(1,1)
     A.add_nz(2,4)
     A.add_nz(3,3)
 
     sp, mapping = A.get_diag()
-    B = DM.ones(sp)
+    B = ca.DM.ones(sp)
 
     self.checkarray(array([[0],[1],[0],[1],[0]]),B,"get_diag(matrix)")
     self.checkarray(array([0,1]),array(list(mapping)),"get_diag(vector)")
 
     #print B
 
-    A = Sparsity(5,1)
+    A = ca.Sparsity(5,1)
     A.add_nz(1,0)
     A.add_nz(2,0)
     A.add_nz(4,0)
 
     sp, mapping = A.get_diag()
-    B = DM.ones(sp)
+    B = ca.DM.ones(sp)
 
     self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"get_diag(vector)")
 
     self.checkarray(array([0,1,2]),array(list(mapping)),"get_diag(vector)")
 
-    A = Sparsity(1,5)
+    A = ca.Sparsity(1,5)
     A.add_nz(0,1)
     A.add_nz(0,2)
     A.add_nz(0,4)
 
     sp, mapping = A.get_diag()
-    B = DM.ones(sp)
+    B = ca.DM.ones(sp)
 
     self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"get_diag(vector)")
 
@@ -274,24 +275,24 @@ class Sparsitytests(casadiTestCase):
              (3,1),
              (4,1)])
 
-    a = Sparsity(5,5)
+    a = ca.Sparsity(5,5)
     for i in nza:
       a.add_nz(i[0],i[1])
 
-    b = MX.sym("b",a)
+    b = ca.MX.sym("b",a)
 
-    self.assertRaises(Exception,lambda: b[Sparsity.diag(3)])
+    self.assertRaises(Exception,lambda: b[ca.Sparsity.diag(3)])
 
-    d = Sparsity.diag(5)
+    d = ca.Sparsity.diag(5)
     c = b[d]
 
     self.assertTrue(c.sparsity()==d)
 
-    f = Function('f', [b],[c])
-    fin = DM(b.sparsity(),list(range(1,len(nza)+1)))
+    f = ca.Function('f', [b],[c])
+    fin = ca.DM(b.sparsity(),list(range(1,len(nza)+1)))
     f_out = f(fin)
 
-    self.checkarray(DM(f_out.nonzeros()),DM([1,0,0,7,0]),"sparsity index")
+    self.checkarray(ca.DM(f_out.nonzeros()),ca.DM([1,0,0,7,0]),"sparsity index")
 
   def test_get_ccs(self):
     self.message("CCS format")
@@ -303,7 +304,7 @@ class Sparsitytests(casadiTestCase):
              (2,4),
              (3,1)])
 
-    a = Sparsity(4,5)
+    a = ca.Sparsity(4,5)
     for i in nza:
       a.add_nz(i[0],i[1])
 
@@ -320,7 +321,7 @@ class Sparsitytests(casadiTestCase):
     numpy.random.seed(0)
     for k in range(20):
       Ai = [self.randDM(d,d,1) for i,d in enumerate ([random.randint(1,10) for j in range(10)])]
-      A = diagcat(*Ai)
+      A = ca.diagcat(*Ai)
 
       #A.sparsity().spy()
       perm =  numpy.random.permutation(list(range(A.size1())))
@@ -357,7 +358,7 @@ class Sparsitytests(casadiTestCase):
     numpy.random.seed(0)
     for k in range(20):
       Ai = [self.randDM(d,d,0.6,symm=True) for i,d in enumerate ([random.randint(1,10) for j in range(10)])]
-      A = diagcat(*Ai)
+      A = ca.diagcat(*Ai)
 
       #A.sparsity().spy()
       perm =  numpy.random.permutation(list(range(A.size1())))
@@ -391,7 +392,7 @@ class Sparsitytests(casadiTestCase):
 
   def test_dm(self):
 
-    A = DM(6,4)
+    A = ca.DM(6,4)
     A[0,0] = 1
     A[1,2] = 1
     A[2,2] = 1
@@ -400,16 +401,16 @@ class Sparsitytests(casadiTestCase):
     ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().btf()
 
     # Checked with CSparse
-    self.checkarray(DM([ret]),DM([4]))
-    self.checkarray(rowperm,DM([2, 3, 4, 1, 0, 5]).T)
-    self.checkarray(colperm,DM([ 2,0,3,1]).T)
-    self.checkarray(rowblock,DM([ 0, 4,5,6,6]).T)
-    self.checkarray(colblock,DM([ 0, 1,2,3,4]).T)
-    self.checkarray(coarse_rowblock,DM([ 0, 3,4,6,6]).T)
-    self.checkarray(coarse_colblock,DM([ 0, 1,3,3,4]).T)
+    self.checkarray(ca.DM([ret]),ca.DM([4]))
+    self.checkarray(rowperm,ca.DM([2, 3, 4, 1, 0, 5]).T)
+    self.checkarray(colperm,ca.DM([ 2,0,3,1]).T)
+    self.checkarray(rowblock,ca.DM([ 0, 4,5,6,6]).T)
+    self.checkarray(colblock,ca.DM([ 0, 1,2,3,4]).T)
+    self.checkarray(coarse_rowblock,ca.DM([ 0, 3,4,6,6]).T)
+    self.checkarray(coarse_colblock,ca.DM([ 0, 1,3,3,4]).T)
 
 
-    A = DM(6,4)
+    A = ca.DM(6,4)
     A[0,0] = 1
     A[1,2] = 1
     A[2,2] = 1
@@ -422,79 +423,79 @@ class Sparsitytests(casadiTestCase):
     ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().btf()
 
     # Checked with CSparse
-    self.checkarray(DM([ret]),DM([3]))
-    self.checkarray(rowperm,DM([2,3,0,1,4,5]).T)
-    self.checkarray(colperm,DM([ 0, 2, 1, 3]).T)
-    self.checkarray(rowblock,DM([ 0, 4,5,6]).T)
-    self.checkarray(colblock,DM([ 0, 2,3,4]).T)
-    self.checkarray(coarse_rowblock,DM([ 0, 2, 4,6,6]).T)
-    self.checkarray(coarse_colblock,DM([ 0, 2,4,4,4]).T)
+    self.checkarray(ca.DM([ret]),ca.DM([3]))
+    self.checkarray(rowperm,ca.DM([2,3,0,1,4,5]).T)
+    self.checkarray(colperm,ca.DM([ 0, 2, 1, 3]).T)
+    self.checkarray(rowblock,ca.DM([ 0, 4,5,6]).T)
+    self.checkarray(colblock,ca.DM([ 0, 2,3,4]).T)
+    self.checkarray(coarse_rowblock,ca.DM([ 0, 2, 4,6,6]).T)
+    self.checkarray(coarse_colblock,ca.DM([ 0, 2,4,4,4]).T)
 
-    A = DM(6,4)
+    A = ca.DM(6,4)
     A[0,0] = 1
     A[1,2] = 1
     A[2,2] = 1
     A[5,3] = 1
     A[4,1] = 1
     A[3,0] = 1
-    A = A + DM.eye(6)[:,:4]
+    A = A + ca.DM.eye(6)[:,:4]
 
     A.sparsity().spy()
 
     ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().btf()
 
     # Checked with CSparse
-    self.checkarray(DM([ret]),DM([1]))
-    self.checkarray(rowperm,DM([4, 5, 0, 1, 2, 3]).T)
-    self.checkarray(colperm,DM([ 0, 1, 2, 3]).T)
-    self.checkarray(rowblock,DM([ 0, 6]).T)
-    self.checkarray(colblock,DM([ 0, 4]).T)
-    self.checkarray(coarse_rowblock,DM([ 0, 2, 6,6,6]).T)
-    self.checkarray(coarse_colblock,DM([ 0, 4,4,4,4]).T)
+    self.checkarray(ca.DM([ret]),ca.DM([1]))
+    self.checkarray(rowperm,ca.DM([4, 5, 0, 1, 2, 3]).T)
+    self.checkarray(colperm,ca.DM([ 0, 1, 2, 3]).T)
+    self.checkarray(rowblock,ca.DM([ 0, 6]).T)
+    self.checkarray(colblock,ca.DM([ 0, 4]).T)
+    self.checkarray(coarse_rowblock,ca.DM([ 0, 2, 6,6,6]).T)
+    self.checkarray(coarse_colblock,ca.DM([ 0, 4,4,4,4]).T)
 
 
   def test_jacsparsityHierarchical(self):
 
-    X = SX.sym("X",100)
-    P = SX.sym("P",1000)
+    X = ca.SX.sym("X",100)
+    P = ca.SX.sym("P",1000)
 
-    optvar = vertcat(*[X,P])
+    optvar = ca.vertcat(*[X,P])
 
-    p = SX.sym("p")
+    p = ca.SX.sym("p")
 
-    g = Function('g', [optvar,p],[X*p], {'verbose':True})
-
-    J = jacobian_old(g, 0, 0)
-
-    self.assertTrue(DM(J.sparsity_out(0))[:,:X.nnz()].sparsity()==Sparsity.diag(100))
-
-    X = SX.sym("X",100)
-    P = SX.sym("P",1000)
-
-    p = SX.sym("p")
-
-    g = Function('g', [X,P,p],[vertcat(*[X*p,P])], {'verbose':True})
+    g = ca.Function('g', [optvar,p],[X*p], {'verbose':True})
 
     J = jacobian_old(g, 0, 0)
 
-    self.assertTrue(DM(J.sparsity_out(0))[:X.nnz(),:].sparsity()==Sparsity.diag(100))
+    self.assertTrue(ca.DM(J.sparsity_out(0))[:,:X.nnz()].sparsity()==ca.Sparsity.diag(100))
+
+    X = ca.SX.sym("X",100)
+    P = ca.SX.sym("P",1000)
+
+    p = ca.SX.sym("p")
+
+    g = ca.Function('g', [X,P,p],[ca.vertcat(*[X*p,P])], {'verbose':True})
+
+    J = jacobian_old(g, 0, 0)
+
+    self.assertTrue(ca.DM(J.sparsity_out(0))[:X.nnz(),:].sparsity()==ca.Sparsity.diag(100))
 
   @memory_heavy()
   def test_jacsparsityHierarchicalSymm(self):
-    GlobalOptions.setHierarchicalSparsity(False)
-    sp = Sparsity.banded(4129,1)
+    ca.GlobalOptions.setHierarchicalSparsity(False)
+    sp = ca.Sparsity.banded(4129,1)
 
-    x = MX.sym("x",sp.size1())
+    x = ca.MX.sym("x",sp.size1())
 
-    H = bilin(MX.ones(sp),x,x)
-    sp2 = hessian(H,x)[0].sparsity()
+    H = ca.bilin(ca.MX.ones(sp),x,x)
+    sp2 = ca.hessian(H,x)[0].sparsity()
     self.assertTrue(sp==sp2)
 
 
   def test_rowcol(self):
     n = 3
 
-    s = Sparsity.rowcol([n-1,0],[0,n-1],n,n)
+    s = ca.Sparsity.rowcol([n-1,0],[0,n-1],n,n)
     self.checkarray(s.colind(),[0,2,2,4])
     self.checkarray(s.row(),[0,2,0,2])
 
@@ -503,14 +504,14 @@ class Sparsitytests(casadiTestCase):
     d = self.randDM(20,20,0.6,symm=True)
     sp = d.sparsity()
 
-    for sp in [sp,Sparsity.dense(4,4),Sparsity(4,4),Sparsity.lower(4),Sparsity.lower(4).T]:
+    for sp in [sp,ca.Sparsity.dense(4,4),ca.Sparsity(4,4),ca.Sparsity.lower(4),ca.Sparsity.lower(4).T]:
 
-      d = DM.ones(sp)
+      d = ca.DM.ones(sp)
 
-      dt = sparsify(1-d)
-      dt = DM.ones(dt.sparsity())
+      dt = ca.sparsify(1-d)
+      dt = ca.DM.ones(dt.sparsity())
 
-      trial = DM.ones(sp.pattern_inverse())
+      trial = ca.DM.ones(sp.pattern_inverse())
 
       d.print_dense()
       dt.print_dense()
@@ -519,8 +520,8 @@ class Sparsitytests(casadiTestCase):
       self.checkarray(trial,dt)
 
   def test_kron(self):
-    a = sparsify(DM([[1,0,6],[2,7,0]]))
-    b = sparsify(DM([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))
+    a = ca.sparsify(ca.DM([[1,0,6],[2,7,0]]))
+    b = ca.sparsify(ca.DM([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))
 
     c_ = c.kron(a.sparsity(),b.sparsity())
 
@@ -528,7 +529,7 @@ class Sparsitytests(casadiTestCase):
     self.assertEqual(c_.size2(),a.size2()*b.size2())
     self.assertEqual(c_.nnz(),a.nnz()*b.nnz())
 
-    self.checkarray(DM(c_,1),DM(c.kron(a,b).sparsity(),1))
+    self.checkarray(ca.DM(c_,1),ca.DM(c.kron(a,b).sparsity(),1))
 
   def test_nz_method(self):
     n = 20
@@ -537,8 +538,8 @@ class Sparsitytests(casadiTestCase):
     random.seed(0)
     numpy.random.seed(0)
     d = self.randDM(n,m,0.5)
-    D = densify(vec(d))
-    dn = DM(d.nonzeros())
+    D = ca.densify(ca.vec(d))
+    dn = ca.DM(d.nonzeros())
     sp = d.sparsity()
     z = np.unique([random.randint(0,n*m-1) for i in range(200)])
     zres = sp.get_nz(z)
@@ -548,25 +549,69 @@ class Sparsitytests(casadiTestCase):
     self.assertFalse(np.any(D[[e for e,k in zip(z,zres) if k==-1]]))
 
   def test_serialize(self):
-    for a in [Sparsity(), Sparsity.dense(4,5), Sparsity.lower(5)]:
-      b = Sparsity.deserialize(a.serialize())
+    for a in [ca.Sparsity(), ca.Sparsity.dense(4,5), ca.Sparsity.lower(5)]:
+      b = ca.Sparsity.deserialize(a.serialize())
       if a.is_null():
         self.assertTrue(b.is_null())
       else:
-        self.checkarray(DM(a,1),DM(b,1))
+        self.checkarray(ca.DM(a,1),ca.DM(b,1))
 
   def test_is_subset(self):
 
-      pairs = [ (Sparsity.lower(3), Sparsity.dense(3,3)),
-                (Sparsity.diag(3), Sparsity.dense(3,3)),
-                (Sparsity.diag(3), Sparsity.lower(3)),
-                (Sparsity(3,3), Sparsity.lower(3)),
+      pairs = [ (ca.Sparsity.lower(3), ca.Sparsity.dense(3,3)),
+                (ca.Sparsity.diag(3), ca.Sparsity.dense(3,3)),
+                (ca.Sparsity.diag(3), ca.Sparsity.lower(3)),
+                (ca.Sparsity(3,3), ca.Sparsity.lower(3)),
       ]
 
       for L,R in pairs:
         self.assertTrue(L.is_subset(R))
         self.assertFalse(R.is_subset(L))
 
+  def test_is_compactible(self):
+    self.message("is_compactible")
+    # A sparsity is compactible iff its nonzero pattern is the Cartesian
+    # product of a row subset and a column subset; the CCS buffer then
+    # equals a column-major dense row.size() x col.size() matrix.
+
+    # Cartesian (0,1), (2,1), (0,3), (2,3) -- compactible with row {0,2}, col {1,3}
+    sp = ca.Sparsity(4, 5)
+    sp.add_nz(0, 1); sp.add_nz(2, 1)
+    sp.add_nz(0, 3); sp.add_nz(2, 3)
+    is_compact, row_support, col_support = sp.is_compactible()
+    self.assertTrue(is_compact)
+    self.checkarray(row_support, [0, 2])
+    self.checkarray(col_support, [1, 3])
+
+    # Drop one nonzero: not a Cartesian product anymore.
+    sp_partial = ca.Sparsity(4, 5)
+    sp_partial.add_nz(0, 1); sp_partial.add_nz(2, 1); sp_partial.add_nz(2, 3)
+    self.assertFalse(sp_partial.is_compactible()[0])
+
+    # rowcol() builds a compactible pattern by construction.
+    sp_rc = ca.Sparsity.rowcol([0, 2], [1, 3], 4, 5)
+    is_compact, rs, cs = sp_rc.is_compactible()
+    self.assertTrue(is_compact)
+    self.checkarray(rs, [0, 2])
+    self.checkarray(cs, [1, 3])
+
+    # Empty sparsity: trivially compactible with empty row/col support.
+    sp_empty = ca.Sparsity(3, 4)
+    is_compact, rs, cs = sp_empty.is_compactible()
+    self.assertTrue(is_compact)
+    self.checkarray(rs, [])
+    self.checkarray(cs, [])
+
+    # Dense sparsity: row support = all rows, col support = all cols.
+    sp_dense = ca.Sparsity.dense(3, 4)
+    is_compact, rs, cs = sp_dense.is_compactible()
+    self.assertTrue(is_compact)
+    self.checkarray(rs, [0, 1, 2])
+    self.checkarray(cs, [0, 1, 2, 3])
+
+    # Diagonal of a 4x4: nonempty rows/cols both = {0..3} but nnz=4 != 16.
+    sp_diag = ca.Sparsity.diag(4)
+    self.assertFalse(sp_diag.is_compactible()[0])
 
 
 if __name__ == '__main__':

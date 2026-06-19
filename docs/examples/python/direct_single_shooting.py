@@ -16,19 +16,20 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
+from numpy import inf
 
 T = 10. # Time horizon
 N = 20 # number of control intervals
 
 # Declare model variables
-x1 = MX.sym('x1')
-x2 = MX.sym('x2')
-x = vertcat(x1, x2)
-u = MX.sym('u')
+x1 = ca.MX.sym('x1')
+x2 = ca.MX.sym('x2')
+x = ca.vertcat(x1, x2)
+u = ca.MX.sym('u')
 
 # Model equations
-xdot = vertcat((1-x2**2)*x1 - x2 + u, x1)
+xdot = ca.vertcat((1-x2**2)*x1 - x2 + u, x1)
 
 # Objective term
 L = x1**2 + x2**2 + u**2
@@ -37,14 +38,14 @@ L = x1**2 + x2**2 + u**2
 if False:
    # CVODES from the SUNDIALS suite
    dae = {'x':x, 'p':u, 'ode':xdot, 'quad':L}
-   F = integrator('F', 'cvodes', dae, 0, T/N)
+   F = ca.integrator('F', 'cvodes', dae, 0, T/N)
 else:
    # Fixed step Runge-Kutta 4 integrator
    M = 4 # RK4 steps per interval
    DT = T/N/M
-   f = Function('f', [x, u], [xdot, L])
-   X0 = MX.sym('X0', 2)
-   U = MX.sym('U')
+   f = ca.Function('f', [x, u], [xdot, L])
+   X0 = ca.MX.sym('X0', 2)
+   U = ca.MX.sym('U')
    X = X0
    Q = 0
    for j in range(M):
@@ -54,7 +55,7 @@ else:
        k4, k4_q = f(X + DT * k3, U)
        X=X+DT/6*(k1 +2*k2 +2*k3 +k4)
        Q = Q + DT/6*(k1_q + 2*k2_q + 2*k3_q + k4_q)
-   F = Function('F', [X0, U], [X, Q],['x0','p'],['xf','qf'])
+   F = ca.Function('F', [X0, U], [X, Q],['x0','p'],['xf','qf'])
 
 # Evaluate at a test point
 Fk = F(x0=[0.2,0.3],p=0.4)
@@ -72,10 +73,10 @@ lbg = []
 ubg = []
 
 # Formulate the NLP
-Xk = MX([0, 1])
+Xk = ca.MX([0, 1])
 for k in range(N):
     # New NLP variable for the control
-    Uk = MX.sym('U_' + str(k))
+    Uk = ca.MX.sym('U_' + str(k))
     w += [Uk]
     lbw += [-1]
     ubw += [1]
@@ -92,8 +93,8 @@ for k in range(N):
     ubg += [inf]
 
 # Create an NLP solver
-prob = {'f': J, 'x': vertcat(*w), 'g': vertcat(*g)}
-solver = nlpsol('solver', 'ipopt', prob)
+prob = {'f': J, 'x': ca.vertcat(*w), 'g': ca.vertcat(*g)}
+solver = ca.nlpsol('solver', 'ipopt', prob)
 
 # Solve the NLP
 sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
@@ -105,8 +106,8 @@ x_opt = [[0, 1]]
 for k in range(N):
     Fk = F(x0=x_opt[-1], p=u_opt[k])
     x_opt += [Fk['xf'].full()]
-x1_opt = vcat([r[0] for r in x_opt])
-x2_opt = vcat([r[1] for r in x_opt])
+x1_opt = ca.vcat([r[0] for r in x_opt])
+x2_opt = ca.vcat([r[1] for r in x_opt])
 
 tgrid = [T/N*k for k in range(N+1)]
 import matplotlib.pyplot as plt
@@ -114,7 +115,7 @@ plt.figure(1)
 plt.clf()
 plt.plot(tgrid, x1_opt, '--')
 plt.plot(tgrid, x2_opt, '-')
-plt.step(tgrid, vertcat(DM.nan(1), u_opt), '-.')
+plt.step(tgrid, ca.vertcat(ca.DM.nan(1), u_opt), '-.')
 plt.xlabel('t')
 plt.legend(['x1','x2','u'])
 plt.grid()

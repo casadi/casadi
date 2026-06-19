@@ -25,6 +25,7 @@
 
 #include "function.hpp"
 #include <iomanip>
+#include <iostream>
 
 using namespace casadi;
 
@@ -69,6 +70,7 @@ int eval_dump_parse(const std::vector<std::string>& args) {
 }
 
 int main(int argc, char* argv[]) {
+  try {
     // Retrieve all arguments
     std::vector<std::string> args(argv + 1, argv + argc);
 
@@ -82,4 +84,11 @@ int main(int argc, char* argv[]) {
         casadi_assert(commands.find(cmd)!=commands.end(),
             "Unrecognised command '" + cmd + "'. Use one of: " + str(commands) + ".");
     }
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    return 1;
+  } catch (...) {
+    std::cerr << "Unknown error" << std::endl;
+    return 1;
+  }
 }

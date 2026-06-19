@@ -19,7 +19,7 @@
 from pylab import *
 from scipy.linalg import sqrtm
 
-from casadi import *
+import casadi as ca
 from casadi.tools import *
 
 # System states
@@ -40,12 +40,12 @@ parameters_["k"] = 10
 parameters_["beta"] = 1
 parameters_["c"] = 1
 
-vel = vertcat(dx,dy)
-p = vertcat(x,y)
-q = vertcat(u,v)
+vel = ca.vertcat(dx,dy)
+p = ca.vertcat(x,y)
+q = ca.vertcat(u,v)
 
 # System dynamics
-F = -k*(p-q) - beta*v*sqrt(sumsqr(vel) + c**2)
+F = -k*(p-q) - beta*v*ca.sqrt(ca.sumsqr(vel) + c**2)
 
 # System right hand side
 rhs = struct_SX(states)

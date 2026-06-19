@@ -28,6 +28,9 @@ def parse_all(a,parent=[]):
         
 parse_all(casadi)
 
+EXTRA_MARKER = "# Extra documentation"
+DEFAULT_EXTRA = "\n_To edit, see [writing tips](Extra-doc-tips)_.\n\n"
+
 for L,parts in entries.items():
   md = wiki / f"L_{L}.md"
   qualnames = [qualname for k,(qualname,descr) in parts.items()]
@@ -35,16 +38,17 @@ for L,parts in entries.items():
   descrs = [descr for k,(qualname,descr) in parts.items()]
   descrs = list(dict.fromkeys(descrs))
   drepr = "\n".join(descrs)
+  extra = DEFAULT_EXTRA
+  if md.exists():
+    prev = md.read_text()
+    if EXTRA_MARKER in prev:
+      extra = prev.split(EXTRA_MARKER, 1)[1]
   with open(md,"w") as outp:
     outp.write(f"""
 # Standard documentation for {qualnames}:
 {drepr}
 
-# Extra documentation
-
-_To edit, see [writing tips](Extra-doc-tips)_.
-
-""")
+{EXTRA_MARKER}{extra}""")
 
     if len(parts)>1:
         print(L,[qualname for k,(qualname,descr) in parts.items()])

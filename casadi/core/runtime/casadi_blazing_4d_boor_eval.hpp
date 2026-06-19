@@ -24,7 +24,7 @@
 
 // SYMBOL "blazing_4d_boor_eval"
 template<typename T1>
-void casadi_blazing_4d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const T1* all_inv, const casadi_int* offset, const T1* c, const T1* dc, const T1* ddc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
+void casadi_blazing_4d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const T1* all_knots_cache, const casadi_int* offset, const T1* c, const T1* dc, const T1* ddc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
   casadi_int *starts;
   iw+=4+1;
   starts = iw;
@@ -34,11 +34,14 @@ void casadi_blazing_4d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
   simde__m256d d0[4], d1[4], d2[4];
   const T1* inv2[4] = {0, 0, 0, 0}; const T1* inv3[4] = {0, 0, 0, 0};
 
-  // Per-dimension de Boor evaluation
+  // Per-dimension de Boor evaluation. Per-dim cache slice is
+  // [intercept, slope, inv1[n_k], inv2[n_k], inv3[n_k]] -- size 2 + 3*n_k.
+  const T1* dim_cache = all_knots_cache;
   for (int i = 0; i < 4; ++i) {
-    starts[i] = casadi_blazing_boor_init<T1>(all_x[i], all_knots, all_inv,
+    starts[i] = casadi_blazing_boor_init<T1>(all_x[i], all_knots, dim_cache,
         offset[i], offset[i+1], lookup_mode[i], &d0[i], &d1[i], &d2[i], &inv2[i], &inv3[i]);
     n_b[i] = offset[i+1] - offset[i] - 3 - 1;
+    if (dim_cache) dim_cache += 2 + 3 * (offset[i+1] - offset[i]);
   }
 
   // Compute strides and base pointer for 4D coefficient tensor

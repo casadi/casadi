@@ -17,6 +17,9 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// C-REPLACE "fabs" "casadi_fabs"
+// C-REPLACE "fmax" "casadi_fmax"
+
 // SYMBOL "masked_norm_inf"
 template<typename T1>
 T1 casadi_masked_norm_inf(casadi_int n, const T1* x, const casadi_int* mask) {

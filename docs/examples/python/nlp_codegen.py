@@ -16,7 +16,7 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
 
 # Test problem
 #
@@ -25,8 +25,8 @@ from casadi import *
 #
 
 # Optimization variables
-x = MX.sym("x")
-y = MX.sym("y")
+x = ca.MX.sym("x")
+y = ca.MX.sym("y")
 
 # Objective
 f = x*x + y*y
@@ -35,7 +35,7 @@ f = x*x + y*y
 g = x+y-10
 
 # Create an NLP problem structure
-nlp = {"x": vertcat(x,y), "f": f, "g": g}
+nlp = {"x": ca.vertcat(x,y), "f": f, "g": g}
 
 mode = "jit"
 
@@ -57,11 +57,11 @@ for mode in ["jit","external"]:
     options = {"jit": True, "compiler": "shell", "jit_options": jit_options}
     
     # Create an NLP solver instance
-    solver = nlpsol("solver", "ipopt", nlp, options)
+    solver = ca.nlpsol("solver", "ipopt", nlp, options)
 
   elif mode=="external":
     # Create an NLP solver instance
-    solver = nlpsol("solver", "ipopt", nlp)
+    solver = ca.nlpsol("solver", "ipopt", nlp)
 
     # Generate C code for the NLP functions
     solver.generate_dependencies("nlp.c")
@@ -72,12 +72,12 @@ for mode in ["jit","external"]:
     subprocess.run(cmd_args)
 
     # Create a new NLP solver instance from the compiled code
-    solver = nlpsol("solver", "ipopt", "./nlp.so")
+    solver = ca.nlpsol("solver", "ipopt", "./nlp.so")
 
   arg = {}
 
-  arg["lbx"] = -DM.inf()
-  arg["ubx"] =  DM.inf()
+  arg["lbx"] = -ca.DM.inf()
+  arg["ubx"] =  ca.DM.inf()
   arg["lbg"] =  0
   arg["ubg"] =  0
   arg["x0"] = 0

@@ -17,7 +17,7 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # -*- coding: utf-8 -*-
-from casadi import *
+import casadi as ca
 import numpy as N
 import matplotlib.pyplot as plt
 
@@ -34,15 +34,15 @@ nx = 3
 np = 1
 
 # Declare variables
-x  = SX.sym('x', nx)  # state
-p  = SX.sym('u', np)  # control
+x  = ca.SX.sym('x', nx)  # state
+p  = ca.SX.sym('u', np)  # control
 
 # ODE right hand side function
-ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p, \
+ode = ca.vertcat((1 - x[1]*x[1])*x[0] - x[1] + p, \
               x[0], \
               x[0]*x[0] + x[1]*x[1] + p*p)
 dae = {'x':x, 'p':p, 'ode':ode}
-f = Function('f', [x, p], [ode])
+f = ca.Function('f', [x, p], [ode])
 
 # Number of finite elements
 n = 100
@@ -54,7 +54,7 @@ h = tf/n
 d = 4
 
 # Choose collocation points
-tau_root = [0] + collocation_points(d, 'legendre')
+tau_root = [0] + ca.collocation_points(d, 'legendre')
 
 # Coefficients of the collocation equation
 C = N.zeros((d+1,d+1))
@@ -63,7 +63,7 @@ C = N.zeros((d+1,d+1))
 D = N.zeros(d+1)
 
 # Dimensionless time inside one control interval
-tau = SX.sym('tau')
+tau = ca.SX.sym('tau')
 
 # For all collocation points
 for j in range(d+1):
@@ -74,20 +74,20 @@ for j in range(d+1):
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
 
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-  lfcn = Function('lfcn', [tau], [L])
+  lfcn = ca.Function('lfcn', [tau], [L])
   D[j] = lfcn(1.0)
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-  tfcn = Function('tfcn', [tau], [tangent(L,tau)])
+  tfcn = ca.Function('tfcn', [tau], [ca.tangent(L,tau)])
   for r in range(d+1): C[j,r] = tfcn(tau_root[r])
 
 # Total number of variables for one finite element
-X0 = MX.sym('X0',nx)
-P  = MX.sym('P',np)
-V = MX.sym('V',d*nx)
+X0 = ca.MX.sym('X0',nx)
+P  = ca.MX.sym('P',np)
+V = ca.MX.sym('V',d*nx)
 
 # Get the state at each collocation point
-X = [X0] + vertsplit(V,[r*nx for r in range(d+1)])
+X = [X0] + ca.vertsplit(V,[r*nx for r in range(d+1)])
 
 # Get the collocation quations (that define V)
 V_eq = []
@@ -102,17 +102,17 @@ for j in range(1,d+1):
   V_eq.append(h*f_j - xp_j)
 
 # Concatenate constraints
-V_eq = vertcat(*V_eq)
+V_eq = ca.vertcat(*V_eq)
 
 # Root-finding function, implicitly defines V as a function of X0 and P
-vfcn = Function('vfcn', [V, X0, P], [V_eq])
+vfcn = ca.Function('vfcn', [V, X0, P], [V_eq])
 
 # Convert to SX to decrease overhead
 vfcn_sx = vfcn.expand()
 
 # Create a implicit function instance to solve the system of equations
-ifcn = rootfinder('ifcn', 'newton', vfcn_sx)
-V = ifcn(MX(),X0,P)
+ifcn = ca.rootfinder('ifcn', 'newton', vfcn_sx)
+V = ifcn(ca.MX(),X0,P)
 X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 
 # Get an expression for the state at the end of the finie element
@@ -121,7 +121,7 @@ for r in range(d+1):
   XF += D[r]*X[r]
 
 # Get the discrete time dynamics
-F = Function('F', [X0,P],[XF])
+F = ca.Function('F', [X0,P],[XF])
 
 # Do this iteratively for all finite elements
 X = X0
@@ -129,11 +129,11 @@ for i in range(n):
   X = F(X,P)
 
 # Fixed-step integrator
-irk_integrator = Function('irk_integrator', {'x0':X0, 'p':P, 'xf':X},
-                          integrator_in(), integrator_out())
+irk_integrator = ca.Function('irk_integrator', {'x0':X0, 'p':P, 'xf':X},
+                          ca.integrator_in(), ca.integrator_out())
 
 # Create a convensional integrator for reference
-ref_integrator = integrator('ref_integrator', 'cvodes', dae, 0, tf)
+ref_integrator = ca.integrator('ref_integrator', 'cvodes', dae, 0, tf)
 
 # Test values
 x0_val  = N.array([0,1,0])

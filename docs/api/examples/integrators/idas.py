@@ -28,7 +28,7 @@
 #   $\dot{x}(t)=f(x(t),y(t),t)$
 #   $0=g(x(t),y(t),t)$
 
-from casadi import *
+import casadi as ca
 from numpy import *
 from pylab import *
 
@@ -40,25 +40,25 @@ from pylab import *
 # We retain g and L as parameters
 # http://en.wikipedia.org/wiki/Differential_algebraic_equation#Examples
 
-L = SX.sym("L")
-g = SX.sym("g")
+L = ca.SX.sym("L")
+g = ca.SX.sym("g")
 
 # differential states
 
-x=SX.sym("x")
-y=SX.sym("y")
-u=SX.sym("u")
-v=SX.sym("v")
+x=ca.SX.sym("x")
+y=ca.SX.sym("y")
+u=ca.SX.sym("u")
+v=ca.SX.sym("v")
 
 # algebraic states
 
-lambd=SX.sym("lambda")
+lambd=ca.SX.sym("lambda")
 
 # All states and parameters
 
-x_all = vertcat(x,u,y,v)
+x_all = ca.vertcat(x,u,y,v)
 z_all = lambd
-p_all = vertcat(L,g)
+p_all = ca.vertcat(L,g)
 
 # the initial state of the pendulum
 
@@ -69,10 +69,10 @@ Z_ = [1147.0/720] # algebraic state
 
 # We construct the DAE system
 
-ode = vertcat(u,lambd*x,v,lambd*y+g)
+ode = ca.vertcat(u,lambd*x,v,lambd*y+g)
 alg = x**2+y**2-L**2
 dae = {'x':x_all, 'z':z_all, 'p':p_all, 'ode':ode, 'alg':alg}
-f = Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'alg'])
+f = ca.Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'alg'])
 
 # Let's check we have consistent initial conditions:
 
@@ -83,7 +83,7 @@ print(res['alg']) # This should be all zeros
 
 # Let's check our jacobian $\frac{dg}{dy}$:
 
-j = jacobian(alg,lambd)
+j = ca.jacobian(alg,lambd)
 print(j)
 
 # Note that the jacobian is not invertible: it is not of DAE-index 1
@@ -93,7 +93,7 @@ print(j)
 
 # We create a DAE system solver
 
-I = integrator('I', 'idas', dae, {'calc_ic':False, 'init_xdot':XDOT_})
+I = ca.integrator('I', 'idas', dae, {'calc_ic':False, 'init_xdot':XDOT_})
 
 # This system is not solvable with idas, because it is of DAE-index 3.
 # It is impossible obtain lambda from the last element of the residual.
@@ -105,12 +105,12 @@ except Exception as e:
 
 # We construct a reworked version od the DAE (index reduced), now it is DAE-index 1
 
-ode = vertcat(u,lambd*x)
-alg = vertcat(x**2+y**2-L**2, u*x+v*y,u**2-g*y+v**2+L**2*lambd)
-x_all = vertcat(x,u)
-z_all = vertcat(y,v,lambd)
+ode = ca.vertcat(u,lambd*x)
+alg = ca.vertcat(x**2+y**2-L**2, u*x+v*y,u**2-g*y+v**2+L**2*lambd)
+x_all = ca.vertcat(x,u)
+z_all = ca.vertcat(y,v,lambd)
 dae = {'x':x_all, 'z':z_all, 'p':p_all, 'ode':ode, 'alg':alg}
-f = Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'alg'])
+f = ca.Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'alg'])
 
 # the initial state of the pendulum
 
@@ -135,7 +135,7 @@ print(array(res["jac_alg_z"]))
 
 # We create a DAE system solver
 
-I = integrator('I', 'idas', dae, 0, 1, {'init_xdot':XDOT_})
+I = ca.integrator('I', 'idas', dae, 0, 1, {'init_xdot':XDOT_})
 res = I(p=P_, x0=X_, z0=Z_)
 print(res['xf'])
 

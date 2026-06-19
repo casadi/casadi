@@ -112,6 +112,11 @@ namespace casadi {
         \identifier{6v} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
+    /** \brief Propagate signal activity forward (recurses into the callee)
+
+        \identifier{2is} */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
     /** \brief  Propagate sparsity backwards
 
         \identifier{6w} */

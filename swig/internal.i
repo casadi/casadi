@@ -241,6 +241,9 @@
 %exception  casadi::CodeGenerator::densify(const std::string &arg, const Sparsity &sp_arg, const std::string &res, bool tr=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::det(const std::string &sp_v, const std::string &v, const std::string &sp_r, const std::string &r, const std::string &beta) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::dot(casadi_int n, const std::string &x, const std::string &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -367,7 +370,13 @@
 %exception  casadi::CodeGenerator::mmin(const std::string &x, casadi_int n, bool is_dense) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::mtimes(const std::string &x, casadi_int nrow_x, casadi_int ncol_x, const std::string &y, casadi_int ncol_y, const std::string &z, bool tr) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::mtimes(const std::string &x, const Sparsity &sp_x, const std::string &y, const Sparsity &sp_y, const std::string &z, const Sparsity &sp_z, const std::string &w, bool tr) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::mtimes_dense_sparse(const std::string &x, casadi_int nrow_x, const std::string &y, const Sparsity &sp_y, const std::string &z) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::mv(const std::string &x, casadi_int nrow_x, casadi_int ncol_x, const std::string &y, const std::string &z, bool tr) {
@@ -613,6 +622,9 @@
 %exception  casadi::DaeBuilder::cdef() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::compile_fmu(const Dict &files, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::create() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -779,6 +791,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::p() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::pack_fmu(const Dict &files, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::parse_fmi(const std::string &filename) {
@@ -1132,6 +1147,12 @@
 %exception  casadi::DeserializingStream::connect(SerializingStream &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DeserializingStream::debug() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DeserializingStream::peek_byte() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DeserializingStream::reset() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1214,6 +1235,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DeserializingStream::version(const std::string &name, int v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::activity(const std::vector< bool > &arg) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::assert_size_in(casadi_int i, casadi_int nrow, casadi_int ncol) const {
@@ -1636,12 +1660,6 @@
 %exception  casadi::Function::serialize(std::ostream &stream, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Function::simplify(const Dict &opts=Dict()) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::simplify(const std::string &name, const Dict &opts=Dict()) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Function::size1_in(casadi_int ind) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1736,6 +1754,18 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::sz_work(size_t &sz_arg, size_t &sz_res, size_t &sz_iw, size_t &sz_w) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::transform(const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::transform(const std::string &fname, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::transform(const std::string &fname, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::transform(const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::uses_output() const {
@@ -2251,6 +2281,9 @@
 %exception  casadi::GenericMatrix::det(const MatType &A) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix::det(const MatType &A, const std::string &lsolver, const Dict &dict=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericMatrix::diag(const MatType &A) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2426,6 +2459,18 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix::trace(const MatType &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::transform(const MatType &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::transform(const MatType &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::transform(const std::vector< MatType > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::transform(const std::vector< MatType > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix::tril2symm(const MatType &a) {
@@ -3316,6 +3361,12 @@
 %exception  casadi::Linsol::checkout() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Linsol::det(const DM &A) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Linsol::det(const MX &A) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Linsol::neig(const DM &A) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3407,6 +3458,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::det(const MX &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::det(const MX &x, const std::string &lsolver, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::diag(const MX &x) {
@@ -3703,13 +3757,19 @@
 %exception  casadi::MX::kron(const MX &x, const MX &b) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::kron_contract(const MX &m, const MX &x, bool inner) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::lift(const MX &x, const MX &x_guess) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::linspace(const MX &a, const MX &b, casadi_int nsteps) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::low(const MX &v, const MX &p, const Dict &options=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::mac(const MX &x, const MX &y, const MX &z) {
+%exception  casadi::MX::mac(const MX &x, const MX &y, const MX &z, const std::string &blas="reference") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::mapping() const {
@@ -3742,7 +3802,7 @@
 %exception  casadi::MX::mrdivide(const MX &a, const MX &b) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::mtimes(const MX &x, const MX &y) {
+%exception  casadi::MX::mtimes(const MX &x, const MX &y, const std::string &blas="reference") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::n_dep() const {
@@ -3922,6 +3982,18 @@
 %exception  casadi::MX::trace(const MX &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::transform(const MX &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::transform(const MX &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::transform(const std::vector< MX > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::transform(const std::vector< MX > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::unary(casadi_int op, const MX &x, bool unique=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4091,6 +4163,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::det(const Matrix< Scalar > &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::det(const Matrix< Scalar > &x, const std::string &lsolver, const Dict &dict=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::diag(const Matrix< Scalar > &x) {
@@ -4288,7 +4363,7 @@
 %exception  casadi::Matrix< Scalar >::ldl_solve(const Matrix< Scalar > &b, const Matrix< Scalar > &D, const Matrix< Scalar > &LT, const std::vector< casadi_int > &p) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< Scalar >::mac(const Matrix< Scalar > &x, const Matrix< Scalar > &y, const Matrix< Scalar > &z) {
+%exception  casadi::Matrix< Scalar >::mac(const Matrix< Scalar > &x, const Matrix< Scalar > &y, const Matrix< Scalar > &z, const std::string &blas="reference") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::minor(const Matrix< Scalar > &x, casadi_int i, casadi_int j) {
@@ -4312,7 +4387,7 @@
 %exception  casadi::Matrix< Scalar >::mtaylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, casadi_int order, const std::vector< casadi_int > &order_contributions) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< Scalar >::mtimes(const Matrix< Scalar > &x, const Matrix< Scalar > &y) {
+%exception  casadi::Matrix< Scalar >::mtimes(const Matrix< Scalar > &x, const Matrix< Scalar > &y, const std::string &blas="reference") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::n_nodes(const Matrix< Scalar > &x) {
@@ -4535,6 +4610,18 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::trace(const Matrix< Scalar > &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::transform(const Matrix< Scalar > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::transform(const Matrix< Scalar > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::transform(const std::vector< Matrix< Scalar > > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::transform(const std::vector< Matrix< Scalar > > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::triangle(const Matrix< Scalar > &x) {
@@ -5383,13 +5470,13 @@
 %exception  casadi::SparsityInterface::kron(const MatType &a, const MatType &b) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparsityInterface::mac(const MatType &x, const MatType &y, const MatType &z) {
+%exception  casadi::SparsityInterface::mac(const MatType &x, const MatType &y, const MatType &z, const std::string &blas="reference") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparsityInterface::mtimes(const MatType &x, const MatType &y) {
+%exception  casadi::SparsityInterface::mtimes(const MatType &x, const MatType &y, const std::string &blas="reference") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparsityInterface::mtimes(const std::vector< MatType > &args) {
+%exception  casadi::SparsityInterface::mtimes(const std::vector< MatType > &args, const std::string &blas="reference") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparsityInterface::norm_0_mul(const MatType &x, const MatType &y) {
@@ -5620,6 +5707,9 @@
 %exception  casadi::doc_archiver(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::doc_blas(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::doc_conic(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5765,6 +5855,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::has_archiver(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::has_blas(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::has_conic(const std::string &name) {
@@ -5935,10 +6028,16 @@
 %exception  casadi::join(const std::vector< std::string > &l, const std::string &delim) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::kron_contract(const MX &m, const MX &x, bool inner) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::linspace(std::vector< T > &v, const F &first, const L &last) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::load_archiver(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::load_blas(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::load_conic(const std::string &name) {
@@ -5987,6 +6086,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::message_prefix(std::ostream &stream) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::mul_overflows(const T &a, const T &b) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::nlpsol(const std::string &name, const std::string &solver, const Function &nlp, const Dict &opts) {
@@ -6287,9 +6389,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::write_matlab(std::ostream &stream, const std::vector< std::vector< T > > &v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  std::mul_overflows(const T &a, const T &b) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  {

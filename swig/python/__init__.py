@@ -29,16 +29,14 @@ import numpy as np
 
 import sys
 
-backup_object = object
-
-try:
-  if sys.version_info >= (3, 0):
-    from casadi.casadi import *
-  else:
-    from casadi import *
-    import casadi
-finally:
-  object = backup_object
+# issue #2959: casadi.casadi no longer rebinds/exports a non-builtin `object`
+# (it undoes its internal _copyableObject shadow), so the historical
+# backup_object/restore dance around this star-import is no longer needed.
+if sys.version_info >= (3, 0):
+  from casadi.casadi import *
+else:
+  from casadi import *
+  import casadi
 
 # For plugin loading
 GlobalOptions.setCasadiPath(os.path.dirname(__file__))
@@ -90,3 +88,14 @@ import re
 __version__ = CasadiMeta.version()
 if '+' in __version__ and CasadiMeta.git_describe()!='':
     __version__  = CasadiMeta.git_describe()
+
+# issue #2959: a numpy-style lowercase factory for the array-semantics wrapper.
+# Exposed ONLY qualified (casadi.array / ca.array); it is deliberately kept out
+# of `from casadi import *`, because a bare top-level `array` would shadow
+# numpy.array.  pd.array / jnp.array are the precedent: a lowercase factory in
+# the library's own namespace that returns the library's own array type.
+# casadi has no __all__ otherwise (star-import exports every public name), so we
+# define one here = the current public set MINUS `array`, leaving the historical
+# `from casadi import *` contents unchanged.
+array = ArrayInterface
+__all__ = [_n for _n in dir() if not _n.startswith("_") and _n != "array"]

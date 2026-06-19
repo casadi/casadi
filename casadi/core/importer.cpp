@@ -106,7 +106,7 @@ namespace casadi {
   }
 
   void Importer::serialize(SerializingStream &s) const {
-    return (*this)->serialize(s);
+    (*this)->serialize(s);
   }
 
   Importer Importer::deserialize(DeserializingStream& s) {

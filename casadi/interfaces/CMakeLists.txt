@@ -1,5 +1,6 @@
 if(WITH_LAPACK)
   add_subdirectory(lapack)
+  add_subdirectory(blas_classic)
 endif()
 
 if(WITH_SUNDIALS)
@@ -16,6 +17,10 @@ endif()
 
 if(WITH_MADNLP)
   add_subdirectory(madnlp)
+endif()
+
+if(WITH_CCOPT)
+  add_subdirectory(ccopt)
 endif()
 
 if(WITH_BONMIN)
@@ -78,6 +83,14 @@ if(WITH_GUROBI)
   add_subdirectory(gurobi)
 endif()
 
+if(WITH_XPRESS)
+  add_subdirectory(xpress)
+endif()
+
+if(WITH_MOSEK)
+  add_subdirectory(mosek)
+endif()
+
 if(WITH_WORHP)
   add_subdirectory(worhp)
 endif()
@@ -94,6 +107,10 @@ if(WITH_TINYXML)
   add_subdirectory(tinyxml)
 endif()
 
+if(WITH_LACEMODELICA)
+  add_subdirectory(lacemodelica)
+endif()
+
 if(WITH_BLOCKSQP)
   add_subdirectory(blocksqp)
 endif()
@@ -104,6 +121,10 @@ endif()
 
 if(WITH_HPIPM)
   add_subdirectory(hpipm)
+endif()
+
+if(WITH_BLASFEO)
+  add_subdirectory(blasfeo)
 endif()
 
 if(WITH_FATROP)
@@ -134,6 +155,10 @@ if(WITH_ALPAQA)
   add_subdirectory(alpaqa)
 endif()
 
+if(WITH_UNO)
+  add_subdirectory(uno)
+endif()
+
 if(WITH_MATLAB_IPC)
   add_subdirectory(matlab_ipc)
 endif()
@@ -142,8 +167,20 @@ if(WITH_LIBZIP)
   add_subdirectory(libzip)
 endif()
 
+if(WITH_ONNX)
+  add_subdirectory(onnx)
+endif()
+
+if(WITH_ONNX_RUNTIME)
+  add_subdirectory(ort)
+endif()
+
 if(WITH_GHC_FILESYSTEM)
   add_subdirectory(ghc)
+endif()
+
+if(WITH_PIQP)
+  add_subdirectory(piqp)
 endif()
 
 if(WITH_LINT)

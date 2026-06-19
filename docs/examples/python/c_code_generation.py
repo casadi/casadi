@@ -18,7 +18,7 @@
 #
 #
 
-from casadi import *
+import casadi as ca
 from numpy import *
 from os import system
 import time
@@ -33,15 +33,15 @@ else:
   print("Info: Use 'python c_code_generation.py nc' to omit compiling")
 
 # Form an expression for the gradient of the determinant
-x = SX.sym('x', 7, 7)
-gd = casadi.gradient(det(x), x)
+x = ca.SX.sym('x', 7, 7)
+gd = ca.gradient(ca.det(x), x)
 
 # Random point to evaluate it
-x0 = DM.rand(7, 7)
+x0 = ca.DM.rand(7, 7)
 
 # Form a function and generate C code
 name = 'grad_det'
-grad_det = Function(name, [x], [gd], ['x'], ['gd'])
+grad_det = ca.Function(name, [x], [gd], ['x'], ['gd'])
 cname = grad_det.generate()
 
 oname_no_opt = name + '_no_opt.so'
@@ -69,9 +69,9 @@ t2 = time.time()
 print('time = ', (t2-t1)*1e3, ' ms')
 
 # Read function
-grad_det_no_opt = external(name, './'+oname_no_opt)
-grad_det_O3 = external(name, './'+oname_O3)
-grad_det_Os = external(name, './'+oname_O3)
+grad_det_no_opt = ca.external(name, './'+oname_no_opt)
+grad_det_O3 = ca.external(name, './'+oname_O3)
+grad_det_Os = ca.external(name, './'+oname_O3)
 f_test = [grad_det, grad_det_no_opt, grad_det_O3, grad_det_Os]
 
 for f in f_test:

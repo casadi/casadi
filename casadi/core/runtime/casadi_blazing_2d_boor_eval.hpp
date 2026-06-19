@@ -24,7 +24,7 @@
 
 // SYMBOL "blazing_2d_boor_eval"
 template<typename T1>
-void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const T1* all_inv, const casadi_int* offset, const T1* c, const T1* dc, const T1* ddc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
+void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const T1* all_knots_cache, const casadi_int* offset, const T1* c, const T1* dc, const T1* ddc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
   casadi_int *starts;
   iw+=2+1;
   starts = iw;
@@ -37,9 +37,14 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
   simde__m256d d0[2], d1[2], d2[2];
   const T1* inv2[2] = {0, 0}; const T1* inv3[2] = {0, 0};
 
-  starts[0] = casadi_blazing_boor_init<T1>(all_x[0], all_knots, all_inv,
+  // Per-dim cache slice: [intercept, slope, inv1[n_k], inv2[n_k], inv3[n_k]],
+  // size 2 + 3*n_k per dim. Accumulate as we advance through dims.
+  const T1* dim_cache0 = all_knots_cache;
+  const T1* dim_cache1 = all_knots_cache
+      ? all_knots_cache + 2 + 3*(offset[1] - offset[0]) : 0;
+  starts[0] = casadi_blazing_boor_init<T1>(all_x[0], all_knots, dim_cache0,
       offset[0], offset[1], lookup_mode[0], &d0[0], &d1[0], &d2[0], &inv2[0], &inv3[0]);
-  starts[1] = casadi_blazing_boor_init<T1>(all_x[1], all_knots, all_inv,
+  starts[1] = casadi_blazing_boor_init<T1>(all_x[1], all_knots, dim_cache1,
       offset[1], offset[2], lookup_mode[1], &d0[1], &d1[1], &d2[1], &inv2[1], &inv3[1]);
 
   // Load coefficient sub-tensor (same C used for value and all NPC derivatives)

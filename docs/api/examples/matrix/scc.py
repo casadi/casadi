@@ -21,12 +21,12 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-from casadi import *
+import casadi as ca
 import numpy
 
 # Let's construct a block diagonal structure
 
-A = diagcat(1,DM([[2,3],[3,4]]),DM([[5,6,7],[6,8,9],[7,9,10]]),11)
+A = ca.diagcat(1,ca.DM([[2,3],[3,4]]),ca.DM([[5,6,7],[6,8,9],[7,9,10]]),11)
 print(A)
 A.sparsity().spy()
 

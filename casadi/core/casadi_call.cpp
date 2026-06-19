@@ -167,6 +167,10 @@ namespace casadi {
     return fcn_(arg, res, iw, w);
   }
 
+  int Call::eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    return fcn_.eval_activity(arg, res, iw, w);
+  }
+
   int Call::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     return fcn_.rev(arg, res, iw, w);
   }
@@ -214,6 +218,27 @@ namespace casadi {
   }
 
   std::vector<MX> Call::create(const Function& fcn, const std::vector<MX>& arg) {
+    // issue #3019: if every output is invariably zero given the (partly zero) inputs,
+    // drop the call entirely and emit structural zeros. Only whole-call removal is done:
+    // redirecting *some* outputs of a surviving call to structural zeros injects zeros
+    // that inlining re-propagates asymmetrically, breaking build/inline idempotency
+    // (ad.py test_MX). Gate on a zero input first (else no annihilation is possible).
+    bool any_zero_in = false;
+    for (const MX& a : arg) if (a.is_zero()) { any_zero_in = true; break; }
+    if (any_zero_in) {
+      std::vector<bool> mask;
+      mask.reserve(fcn.nnz_in());
+      for (casadi_int i=0; i<fcn.n_in(); ++i)
+        mask.insert(mask.end(), fcn.nnz_in(i), !arg[i].is_zero());
+      std::vector<bool> onz = fcn.activity(mask);
+      bool all_out_zero = true;
+      for (bool active : onz) if (active) { all_out_zero = false; break; }
+      if (all_out_zero) {
+        std::vector<MX> ret(fcn.n_out());
+        for (casadi_int i=0; i<fcn.n_out(); ++i) ret[i] = MX(fcn.size1_out(i), fcn.size2_out(i));
+        return ret;
+      }
+    }
     return MX::createMultipleOutput(new Call(fcn, arg));
   }
 

@@ -97,6 +97,11 @@ namespace casadi {
         \identifier{g1} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
+    /** \brief Propagate signal activity forward (bit set = active)
+
+        \identifier{2iu} */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
     /** \brief  Propagate sparsity backwards
 
         \identifier{g2} */
@@ -169,6 +174,11 @@ namespace casadi {
 
         \identifier{gb} */
     size_t sz_w() const override;
+
+    /** \brief Length of w the generated code needs (QR factorization buffers)
+
+        \identifier{2hv} */
+    size_t codegen_sz_w() const override;
 
     /** \brief Generate code for the operation
 

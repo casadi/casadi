@@ -141,7 +141,7 @@ namespace casadi {
 
   Dict Split::info() const {
     std::vector<MX> arg;
-    for (auto& sp : output_sparsity_)
+    for (const auto& sp : output_sparsity_)
       arg.push_back(MX::sym("x", sp));
     Function output("output", std::vector<MX>{}, arg, {{"allow_free", true}});
     return {{"offset", offset_}, {"output", output}};

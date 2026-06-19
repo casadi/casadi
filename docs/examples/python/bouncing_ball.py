@@ -17,18 +17,19 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 #
-from casadi import *
+import casadi as ca
+import numpy as np
 import pylab as plt
 
 # Height and velocity of ball
-h = SX.sym('h')
-v = SX.sym('v')
-x = vertcat(h, v)
+h = ca.SX.sym('h')
+v = ca.SX.sym('v')
+x = ca.vertcat(h, v)
 
 # ODE right-hand-side
 hdot = v
 vdot = -9.81
-xdot = vertcat(hdot, vdot)
+xdot = ca.vertcat(hdot, vdot)
 
 # Event indicator, trigger when it becomes negative
 event_indicator = h
@@ -37,13 +38,13 @@ event_indicator = h
 dae = dict(x = x, ode = xdot, zero = event_indicator)
 
 # Event transition function
-post_x = vertcat(h, -0.8*v)
-transition = Function('transition', dict(x = x, post_x = post_x),
-                      event_in(), event_out())
+post_x = ca.vertcat(h, -0.8*v)
+transition = ca.Function('transition', dict(x = x, post_x = post_x),
+                      ca.event_in(), ca.event_out())
 
 # Create an integrator instance for integrating over 7s
 tgrid = np.linspace(0, 7, 100)
-sim = integrator('sim', 'cvodes', dae, 0, tgrid,
+sim = ca.integrator('sim', 'cvodes', dae, 0, tgrid,
                  dict(transition = transition))
 
 # Simulate with initial height of 5

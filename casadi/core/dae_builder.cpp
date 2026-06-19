@@ -217,6 +217,24 @@ Dict DaeBuilder::export_fmu(const Dict& opts) {
   }
 }
 
+Dict DaeBuilder::compile_fmu(const Dict& files, const Dict& opts) {
+  try {
+    return (*this)->compile_fmu(files, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("compile_fmu", e.what());
+    return Dict();  // never reached
+  }
+}
+
+std::string DaeBuilder::pack_fmu(const Dict& files, const Dict& opts) {
+  try {
+    return (*this)->pack_fmu(files, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("pack_fmu", e.what());
+    return std::string();  // never reached
+  }
+}
+
 void DaeBuilder::prune(bool prune_p, bool prune_u) {
   try {
     (*this)->prune(prune_p, prune_u);
@@ -511,7 +529,7 @@ MX DaeBuilder::beq(const std::string& name) const {
 
 void DaeBuilder::eliminate(const std::string& cat) {
   try {
-    return (*this)->eliminate(to_enum<Category>(cat));
+    (*this)->eliminate(to_enum<Category>(cat));
   } catch (std::exception& e) {
     THROW_ERROR("eliminate", e.what());
   }
@@ -519,7 +537,7 @@ void DaeBuilder::eliminate(const std::string& cat) {
 
 void DaeBuilder::sort(const std::string& cat) {
   try {
-    return (*this)->sort(to_enum<Category>(cat));
+    (*this)->sort(to_enum<Category>(cat));
   } catch (std::exception& e) {
     THROW_ERROR("sort", e.what());
   }
@@ -1142,7 +1160,7 @@ std::vector<GenericType> DaeBuilder::get(const std::vector<std::string>& name) c
     // For symbolic FMUs, we can just retrieve the values
     if (symbolic()) {
       // Retrieve the attributes
-      for (auto& n : name) {
+      for (const auto& n : name) {
         // Get the variable
         const Variable& v = (*this)->variable(n);
         if (v.type == Type::STRING) {

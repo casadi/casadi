@@ -302,6 +302,33 @@
    obj:*libiomp*
 }
 
+{
+   Error in mosek (tbb-init-cond)
+   Memcheck:Cond
+   fun:__intel_sse2_str*
+   ...
+   obj:*libtbb*
+}
+
+{
+   Error in mosek (tbb-init-cond-addr)
+   Memcheck:Addr16
+   fun:__intel_sse2_str*
+   ...
+   obj:*libtbb*
+}
+
+{
+   Error in mosek (dlopen-leak-glibc234)
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:malloc
+   fun:_dl_map_object_deps
+   ...
+   fun:dlopen@@GLIBC_2.34
+}
+
 
 {
    Error in mosek (4)
@@ -538,7 +565,7 @@ obj:*libworhp*
    Memcheck:Leak
    match-leak-kinds: definite
    fun:malloc
-   fun:_ZN6casadi18casadi_hpipm_solveIdEEiPNS_17casadi_hpipm_dataIT_EEPPKdPPdPxS8_
+   fun:_ZN6casadi18casadi_hpipm_solveIdEEiPNS_17casadi_hpipm_dataIT_EEPPKdPPdPxS8_*
 }
 
 {
@@ -646,4 +673,104 @@ obj:*libworhp*
    fun:_ZnwmRKSt9nothrow_t
    fun:__cxa_thread_atexit
    fun:_ZN17HighsTaskExecutor10run_workerEiPS_
+}
+
+# blasfeo TARGET=GENERIC kernels: the variable-size (`_vs_lib4`) and
+# general-offset (`_gen_lib4`) wrappers always load full 4-element / 4x4
+# blocks and apply the size mask only on the *write* side.  The result
+# is correct (out-of-region values get masked out of the destination)
+# but valgrind flags the load itself as out-of-bounds.  Harmless in
+# practice; suppressed here so the fatrop test suite does not get
+# flooded.
+
+{
+   blasfeo gemv vs-lib4 over-read (8 bytes)
+   Memcheck:Addr8
+   fun:kernel_dgemv_?_4_lib4
+   fun:kernel_dgemv_?_4_vs_lib4
+}
+
+{
+   blasfeo gemm gen-lib4 cleanup over-read (8 bytes)
+   Memcheck:Addr8
+   fun:kernel_dgemm_*_4x4_gen_lib4
+}
+
+{
+   blasfeo gemm gen-lib4 cleanup over-read (16 bytes)
+   Memcheck:Addr16
+   fun:kernel_dgemm_*_4x4_gen_lib4
+}
+
+{
+   blasfeo syrk gen-lib4 cleanup over-read (8 bytes)
+   Memcheck:Addr8
+   fun:kernel_dsyrk_*_4x4_gen_lib4
+}
+
+{
+   blasfeo syrk gen-lib4 cleanup over-read (16 bytes)
+   Memcheck:Addr16
+   fun:kernel_dsyrk_*_4x4_gen_lib4
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:thread_PyThread_start_new_thread
+}
+
+{
+   Deliberate leaky-singleton statics (e.g. casadi_c.cpp *new) run by _dl_init during dlopen
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   ...
+   fun:_dl_init
+   ...
+   fun:_dlerror_run
+}
+
+{
+     madnlp/ccopt julia runtime: LLVM JIT eh-frame registration
+     Memcheck:Leak
+     match-leak-kinds: definite
+     fun:malloc
+     fun:__register_frame
+     ...
+  }
+
+  {
+     madnlp/ccopt julia runtime: resolve sysimg location
+     Memcheck:Leak
+     match-leak-kinds: definite
+     fun:malloc
+     fun:__vasprintf_internal
+     fun:asprintf
+     fun:jl_resolve_sysimg_location
+     ...
+  }
+
+  {
+     madnlp/ccopt julia runtime: init processor sysimg
+     Memcheck:Leak
+     match-leak-kinds: definite
+     fun:malloc
+     fun:parse_sysimg*
+     fun:jl_init_processor_sysimg
+     ...
+  }
+
+# Xpress internal off-by-one heap read/write during IIS computation
+# (observed in libxprs.so.46.01.02). Both the OOB access and the
+# overflowed allocation are entirely inside libxprs; XPRSiisfirst takes
+# no caller-provided buffers, so this cannot be a CasADi-side bug.
+{
+   xpress XPRSiisfirst internal heap overrun
+   Memcheck:Addr8
+   obj:*libxprs.so*
+   ...
+   fun:XPRSiisfirst
 }

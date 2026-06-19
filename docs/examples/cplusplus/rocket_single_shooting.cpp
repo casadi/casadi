@@ -99,7 +99,6 @@ int main(){
     opts["quad_err_con"] = true;
     opts["abstol"] = 1e-6;
     opts["reltol"] = 1e-6;
-    opts["stop_at_end"] = false;
     //  opts["fsens_all_at_once"] = false;
     opts["steps_per_checkpoint"] = 100; // BUG: Too low number causes segfaults
   } else {

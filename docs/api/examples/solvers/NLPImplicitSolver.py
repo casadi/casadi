@@ -24,7 +24,7 @@
 # NLPImplicitSolver
 # =====================
 
-from casadi import *
+import casadi as ca
 from numpy import *
 from pylab import *
 
@@ -40,17 +40,17 @@ from pylab import *
 
 # Parameters
 
-eps   = SX.sym("eps")
-mu    = SX.sym("mu")
-alpha = SX.sym("alpha")
-k     = SX.sym("k")
-sigma = SX.sym("sigma")
+eps   = ca.SX.sym("eps")
+mu    = ca.SX.sym("mu")
+alpha = ca.SX.sym("alpha")
+k     = ca.SX.sym("k")
+sigma = ca.SX.sym("sigma")
 params = [eps,mu,alpha,k,sigma]
 
 # Variables
 
-a     = SX.sym("a")
-gamma = SX.sym("gamma")
+a     = ca.SX.sym("a")
+gamma = ca.SX.sym("gamma")
 
 # Equations
 
@@ -66,11 +66,11 @@ params_ = [0.1,0.1,alpha_,k_,sigma_]
 
 # We create a NLPImplicitSolver instance
 
-f=Function("f", [vertcat(a, gamma), vertcat(*params)], [vertcat(res0, res1)])
+f=ca.Function("f", [ca.vertcat(a, gamma), ca.vertcat(*params)], [ca.vertcat(res0, res1)])
 opts = {}
 opts["nlpsol"] = "ipopt"
 opts["nlpsol_options"] = {"ipopt.tol":1e-14,"ipopt.acceptable_tol":1e-14}
-s=rootfinder("s", "nlpsol", f, opts)
+s=ca.rootfinder("s", "nlpsol", f, opts)
 
 # Initialize [$a$,$\gamma$] with a guess and solve
 

@@ -28,7 +28,8 @@ from numpy import random, array, linalg, matrix, zeros, ones
 import unittest
 from types import *
 from helpers import *
-from casadi import *
+import casadi as ca
+from numpy import inf, pi
 
 scipy_available = True
 try:
@@ -40,32 +41,32 @@ import warnings
 inherit_from = object
 
  
-if has_nlpsol("ipopt"):
+if ca.has_nlpsol("ipopt"):
   inherit_from = casadiTestCase
   nlpsolver = "ipopt"
   nlpsolver_options = {}
 
-class OptiStacktests(inherit_from):
+class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
 
 
     @requires_conic("qrqp")
     def test_conic(self):
-      opti = Opti('conic')
+      opti = ca.Opti('conic')
       x = opti.variable(2)
-      opti.minimize(dot(x,x))
+      opti.minimize(ca.dot(x,x))
       opti.subject_to(x[0]>=2)
       opti.subject_to(x[1]>=3)
       opti.solver('qrqp')
 
       sol = opti.solve()
-      self.checkarray(sol.value(x),vertcat(2,3))
+      self.checkarray(sol.value(x),ca.vertcat(2,3))
 
       with self.assertInException("conic"):
-        Opti('foo')
+        ca.Opti('foo')
 
 
     def test_lookup(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable(2)
       y = opti.variable(2)
       opti.subject_to(x>=y)
@@ -83,7 +84,7 @@ class OptiStacktests(inherit_from):
       
       
     def test_n(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
@@ -100,7 +101,7 @@ class OptiStacktests(inherit_from):
       self.assertEqual(sol.opti.np,0)
       
     def test_subject_to_list(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
@@ -116,7 +117,7 @@ class OptiStacktests(inherit_from):
       self.assertEqual(sol.opti.np,0)
       
     def test_sol_opti(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
@@ -132,12 +133,12 @@ class OptiStacktests(inherit_from):
       sol.opti.nx
       
     def test_to_function(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       p = opti.parameter()
       
-      opti.minimize(y**2+sin(x-y-p)**2)
+      opti.minimize(y**2+ca.sin(x-y-p)**2)
       opti.subject_to(x+y>=1)
 
       opti.solver(nlpsolver,nlpsolver_options)
@@ -152,55 +153,55 @@ class OptiStacktests(inherit_from):
       print(F(0,2,0))
       print(F(100,1,0))
 
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
       p = opti.parameter()
 
-      opti.minimize(sin(2*pi*(x+y-p))**2+sin(pi*z)**2)
+      opti.minimize(ca.sin(2*pi*(x+y-p))**2+ca.sin(pi*z)**2)
       opti.subject_to(x==2*y)
 
       opti.solver("ipopt")
 
-      F = opti.to_function("F",[vertcat(x,y,z),p],[vertcat(x,y,z)])
+      F = opti.to_function("F",[ca.vertcat(x,y,z),p],[ca.vertcat(x,y,z)])
 
-      self.checkarray(F([3.9,1.8,0],6),vertcat(4,2,0))
-      self.checkarray(F([0,1,0],6),vertcat(2.0/3,1.0/3,0))
-      self.checkarray(F([3.9,1.8,7.8],6),vertcat(4,2,8))
-      self.checkarray(F([0,1,7.8],6),vertcat(2.0/3,1.0/3,8))
+      self.checkarray(F([3.9,1.8,0],6),ca.vertcat(4,2,0))
+      self.checkarray(F([0,1,0],6),ca.vertcat(2.0/3,1.0/3,0))
+      self.checkarray(F([3.9,1.8,7.8],6),ca.vertcat(4,2,8))
+      self.checkarray(F([0,1,7.8],6),ca.vertcat(2.0/3,1.0/3,8))
 
-      F = opti.to_function("F",[vertcat(z,x,y),p],[vertcat(x,y,z)])
-      self.checkarray(F([7.8,3.9,1.8],6),vertcat(4,2,8))
-      self.checkarray(F([7.8,0,1],6),vertcat(2.0/3,1.0/3,8))
+      F = opti.to_function("F",[ca.vertcat(z,x,y),p],[ca.vertcat(x,y,z)])
+      self.checkarray(F([7.8,3.9,1.8],6),ca.vertcat(4,2,8))
+      self.checkarray(F([7.8,0,1],6),ca.vertcat(2.0/3,1.0/3,8))
 
 
       b = opti.variable()
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
       a = opti.variable()
       p = opti.parameter()
 
-      opti.minimize(sin(2*pi*(x+y-p))**2+sin(pi*z)**2)
+      opti.minimize(ca.sin(2*pi*(x+y-p))**2+ca.sin(pi*z)**2)
       opti.subject_to(x==2*y)
 
       opti.solver("ipopt")
 
       with self.assertInException("Argument 0"):
-        opti.to_function("F",[vertcat(x,2)],[vertcat(x,y,z)])
+        opti.to_function("F",[ca.vertcat(x,2)],[ca.vertcat(x,y,z)])
       with self.assertInException("Argument 1"):
-        opti.to_function("F",[y,vertcat(x,2)],[vertcat(x,y,z)])
+        opti.to_function("F",[y,ca.vertcat(x,2)],[ca.vertcat(x,y,z)])
 
       with self.assertInException("not independent"):
-        opti.to_function("F",[x,x],[vertcat(x,y,z)])
-      opti.to_function("F",[a],[vertcat(x,y,z)])
+        opti.to_function("F",[x,x],[ca.vertcat(x,y,z)])
+      opti.to_function("F",[a],[ca.vertcat(x,y,z)])
       with self.assertInException("belonging to a different instance"):
-        opti.to_function("F",[b],[vertcat(x,y,z)])
+        opti.to_function("F",[b],[ca.vertcat(x,y,z)])
 
     def test_dual(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
@@ -216,7 +217,7 @@ class OptiStacktests(inherit_from):
  
 
     def test_sparse(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable(3,1)
       p = opti.parameter()
 
@@ -229,10 +230,10 @@ class OptiStacktests(inherit_from):
       sol = opti.solve()
       
       if scipy_available:
-        self.assertTrue(isinstance(sol.value(DM.eye(3)),csc_matrix))
+        self.assertTrue(isinstance(sol.value(ca.DM.eye(3)),csc_matrix))
 
     def test_structure(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable(3,1)
       p = opti.parameter()
 
@@ -244,16 +245,16 @@ class OptiStacktests(inherit_from):
 
       sol = opti.solve()
       
-      jac_g = jacobian(opti.g,opti.x)
+      jac_g = ca.jacobian(opti.g,opti.x)
       self.checkarray(sol.value(jac_g),sol.value(sol.opti.debug.casadi_solver.get_function('nlp_jac_g')(opti.x,opti.p)[1]))
-      grad_f = gradient(opti.f,opti.x)
+      grad_f = ca.gradient(opti.f,opti.x)
       self.checkarray(sol.value(grad_f),sol.value(sol.opti.debug.casadi_solver.get_function('nlp_grad_f')(opti.x,opti.p)[1]))
-      hess_lag = sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0])
-      self.checkarray(sol.value(hess_lag),sol.value(tril2symm(sol.opti.debug.casadi_solver.get_function('nlp_hess_l')(opti.x,opti.p,1,opti.lam_g).T)))
+      hess_lag = sol.value(ca.hessian(opti.f+ca.dot(opti.lam_g,opti.g),opti.x)[0])
+      self.checkarray(sol.value(hess_lag),sol.value(ca.tril2symm(sol.opti.debug.casadi_solver.get_function('nlp_hess_l')(opti.x,opti.p,1,opti.lam_g).T)))
 
 
     def test_warmstart(self):
-      opti = Opti()
+      opti = ca.Opti()
 
       x = opti.variable(2,1)
       p = opti.parameter()
@@ -291,7 +292,7 @@ class OptiStacktests(inherit_from):
       
     def test_set_value_expr(self):
 
-      opti = Opti()
+      opti = ca.Opti()
       p = opti.parameter(3,1)
       v = opti.parameter(2,1)
       x = opti.variable(2)
@@ -299,46 +300,46 @@ class OptiStacktests(inherit_from):
       opti.set_value(p, 0)
       opti.set_value(v, 0)
       opti.set_value(p[0], 3)
-      self.checkarray(opti.debug.value(p),vertcat(3,0,0))
+      self.checkarray(opti.debug.value(p),ca.vertcat(3,0,0))
       opti.set_value(p[[0,2]], 2)
-      self.checkarray(opti.debug.value(p),vertcat(2,0,2)) 
+      self.checkarray(opti.debug.value(p),ca.vertcat(2,0,2)) 
       opti.set_value(p[[0,2]], [1,2])
-      self.checkarray(opti.debug.value(p),vertcat(1,0,2)) 
+      self.checkarray(opti.debug.value(p),ca.vertcat(1,0,2)) 
       opti.set_value(p[[2,0]], [1,2])
-      self.checkarray(opti.debug.value(p),vertcat(2,0,1)) 
+      self.checkarray(opti.debug.value(p),ca.vertcat(2,0,1)) 
 
-      opti.set_value(veccat(v,p), [1,2,3,4,5])
-      self.checkarray(opti.debug.value(p),vertcat(3,4,5))
-      self.checkarray(opti.debug.value(v),vertcat(1,2))    
+      opti.set_value(ca.veccat(v,p), [1,2,3,4,5])
+      self.checkarray(opti.debug.value(p),ca.vertcat(3,4,5))
+      self.checkarray(opti.debug.value(v),ca.vertcat(1,2))    
      
      
       opti.set_value(p, 0)
-      opti.set_value(veccat(p[0],p[0]), [4,4])
-      self.checkarray(opti.debug.value(p),vertcat(4,0,0))
+      opti.set_value(ca.veccat(p[0],p[0]), [4,4])
+      self.checkarray(opti.debug.value(p),ca.vertcat(4,0,0))
       with self.assertInException("ambiguous"):
-        opti.set_value(veccat(p[0],p[0]), [4,5])
+        opti.set_value(ca.veccat(p[0],p[0]), [4,5])
       with self.assertInException("cannot set a value for a variable"):
-        opti.set_value(veccat(p,x,v), [4,5])
+        opti.set_value(ca.veccat(p,x,v), [4,5])
       opti.set_value(p, 0)
       opti.set_value(3*p[0], 3)
-      self.checkarray(opti.debug.value(p),vertcat(1,0,0))
+      self.checkarray(opti.debug.value(p),ca.vertcat(1,0,0))
       with self.assertInException("cannot set initial/value of an arbitrary expression"):
         opti.set_value(p[0]+p[1], 3)
 
-      opti.set_value(veccat(v,3), [1,2,3])
-      opti.set_value(veccat(2,v,5,p), [2,3,4,5,6,7,8])
-      opti.set_value(veccat(2,v,5,p,v), [2,3,4,5,6,7,8,3,4])
+      opti.set_value(ca.veccat(v,3), [1,2,3])
+      opti.set_value(ca.veccat(2,v,5,p), [2,3,4,5,6,7,8])
+      opti.set_value(ca.veccat(2,v,5,p,v), [2,3,4,5,6,7,8,3,4])
       
       with self.assertInException("inconsistent"):
-        opti.set_value(veccat(v,3), [1,2,4])
+        opti.set_value(ca.veccat(v,3), [1,2,4])
       with self.assertInException("inconsistent"):
-        opti.set_value(veccat(2,v,5,p), [5,3,4,2,6,7,8])
+        opti.set_value(ca.veccat(2,v,5,p), [5,3,4,2,6,7,8])
       with self.assertInException("ambiguous"):
-        opti.set_value(veccat(2,v,5,p,v), [2,3,4,5,6,7,8,4,3])
+        opti.set_value(ca.veccat(2,v,5,p,v), [2,3,4,5,6,7,8,4,3])
           
     def test_shapes(self):
         
-          opti = Opti()
+          opti = ca.Opti()
           
           F = opti.variable(10,1)
           x = opti.variable(2,11)
@@ -347,12 +348,12 @@ class OptiStacktests(inherit_from):
           opti.subject_to(opti.bounded(-1,F,1))
 
           opti.solver(nlpsolver,nlpsolver_options)
-          opti.minimize(sum1(F))
+          opti.minimize(ca.sum1(F))
           sol = opti.solve()
 
     def test_symb_boundedshapes(self):
         
-          opti = Opti()
+          opti = ca.Opti()
           
           y = opti.variable()
           x = opti.variable()
@@ -369,7 +370,7 @@ class OptiStacktests(inherit_from):
 
     def test_symb_parametric(self):
         
-          opti = Opti()
+          opti = ca.Opti()
           
           y = opti.parameter(3,1)
           x = opti.parameter(3,1)
@@ -380,7 +381,7 @@ class OptiStacktests(inherit_from):
           
     def test_callback(self):
         
-          opti = Opti()
+          opti = ca.Opti()
           
           eps = 1e-5 
           
@@ -424,7 +425,7 @@ class OptiStacktests(inherit_from):
 
     def test_debug_value(self):
       
-        opti = Opti()
+        opti = ca.Opti()
         p = opti.parameter()
         opti.set_value(p, 3)
         self.checkarray(opti.debug.value(p**2), 9)
@@ -455,7 +456,7 @@ class OptiStacktests(inherit_from):
           opti.debug.value(x*y)
       
     def test_print(self):
-      opti = Opti()
+      opti = ca.Opti()
       print(opti)
       self.assertTrue("variables" in str(opti))
       self.assertTrue("variables" in str(opti.debug))
@@ -472,7 +473,7 @@ class OptiStacktests(inherit_from):
       print(sol)
       print(opti)      
             
-      opti = Opti()
+      opti = ca.Opti()
       print(opti)
       x = opti.variable()
       y = opti.variable()
@@ -491,14 +492,14 @@ class OptiStacktests(inherit_from):
       self.assertTrue("variables" in str(sol))
             
     def test_flow(self):
-      opti = Opti()
+      opti = ca.Opti()
       
       x = opti.variable()
       y = opti.variable()
       
       p = opti.parameter()
       
-      w = MX.sym("w")
+      w = ca.MX.sym("w")
       
       opti.minimize(x**2)
       opti.solver(nlpsolver,nlpsolver_options)
@@ -548,7 +549,7 @@ class OptiStacktests(inherit_from):
             
       opti0 = opti
 
-      opti = Opti()
+      opti = ca.Opti()
       
       X = opti.variable()
       y = opti.variable()
@@ -596,7 +597,7 @@ class OptiStacktests(inherit_from):
         
     def test_simple(self):
       
-        opti = Opti()
+        opti = ca.Opti()
         
         eps = 1e-5 
         
@@ -651,7 +652,7 @@ class OptiStacktests(inherit_from):
           opti.subject_to(coneps)
           sol2 = opti.solve()
 
-          s = -sign(sol2.value(f)-sol.value(f))
+          s = -ca.sign(sol2.value(f)-sol.value(f))
           
           count+=1
           if mul is not None:
@@ -677,7 +678,7 @@ class OptiStacktests(inherit_from):
         sol = opti.solve()
         
         x = opti.variable(3,3)
-        f = trace(x)
+        f = ca.trace(x)
         opti.subject_to()
         opti.subject_to(x>=0)
         with self.assertRaises(Exception):
@@ -688,24 +689,24 @@ class OptiStacktests(inherit_from):
         opti.minimize((x[0]-1)**2+(x[1]-2)**2)
         opti.subject_to(x[1]>=x[0])
         sol = opti.solve()
-        self.checkarray(sol.value(x), vertcat(1,2),digits=7)
+        self.checkarray(sol.value(x), ca.vertcat(1,2),digits=7)
           
         opti.subject_to()
         opti.subject_to(x[1]<=x[0])
         sol = opti.solve()
         
-        self.checkarray(sol.value(x), vertcat(1.5,1.5),digits=7)
+        self.checkarray(sol.value(x), ca.vertcat(1.5,1.5),digits=7)
         
         opti.subject_to()
         opti.subject_to(x<=0.5)
         sol = opti.solve()
         
         print("test", sol.value(x))
-        self.checkarray(sol.value(x), vertcat(0.5,0.5),digits=7)
+        self.checkarray(sol.value(x), ca.vertcat(0.5,0.5),digits=7)
 
     def test_parametric(self):
       
-        opti = Opti()
+        opti = ca.Opti()
         
         x = opti.variable()
         y = opti.variable()
@@ -803,86 +804,86 @@ class OptiStacktests(inherit_from):
         
     def test_symm(self):
       
-        opti = Opti()
+        opti = ca.Opti()
         
         P = opti.variable(2, 2, 'symmetric')
         
-        R = DM([[1,2],[4,4]])
+        R = ca.DM([[1,2],[4,4]])
         
-        f = sum2(sum1((P-R)**2))
+        f = ca.sum2(ca.sum1((P-R)**2))
 
-        x = symvar(f)[0]
+        x = ca.symvar(f)[0]
 
         opti.minimize(f)
         opti.solver(nlpsolver,nlpsolver_options)
 
         sol = opti.solve()
         
-        F = casadi.Function('f',[x],[f])
+        F = ca.Function('f',[x],[f])
 
-        self.checkarray(sol.value(P), DM([[1,3],[3,4]]))
+        self.checkarray(sol.value(P), ca.DM([[1,3],[3,4]]))
 
         P = opti.variable(2, 2)
         
         
-        f = sum2(sum1((P-R)**2))
+        f = ca.sum2(ca.sum1((P-R)**2))
 
-        x = symvar(f)[0]
+        x = ca.symvar(f)[0]
 
         
         opti.minimize(f)
         sol = opti.solve()
         
-        F = casadi.Function('f',[x],[f])
+        F = ca.Function('f',[x],[f])
 
         self.checkarray(sol.value(P), R)
 
     def test_broadcast(self):
-        opti = Opti()
+        opti = ca.Opti()
         
         x = opti.variable(3, 1)
         
 
-        f = mtimes(x.T,x)
+        f = x.T @ x
         
         opti.minimize(f)
         
-        opti.subject_to(x[0]>=vertcat(1,2,3))
+        opti.subject_to(x[0]>=ca.vertcat(1,2,3))
         opti.solver(nlpsolver,nlpsolver_options)
         sol = opti.solve()
         self.checkarray(sol.value(x[0]), 3,digits=7)
         
 
-        f = mtimes(x.T,x)
+        f = x.T @ x
         
         opti.minimize(f)
         
         opti.subject_to();
         
-        opti.subject_to(x[0]>=vertcat(1+x[1],0.5,0))
+        opti.subject_to(x[0]>=ca.vertcat(1+x[1],0.5,0))
         opti.solver(nlpsolver,nlpsolver_options)
         sol = opti.solve()
         self.checkarray(sol.value(x[0]), 0.5,digits=4)
 
     def test_constraint_dim_mismatch(self):
-        opti = Opti()
+        opti = ca.Opti()
         x = opti.variable(5,1)
 
         p = opti.parameter(1,1)
         q = opti.parameter(1,1)
 
 
-        opti.minimize(dot(x,x))
+        opti.minimize(ca.dot(x,x))
         with self.assertInException("Constraint must contain decision variables."):
           opti.subject_to(p==q)
         with self.assertInException("Constraint shape mismatch."):
-          opti.subject_to(x[0]==vertcat(1,2,3))
+          opti.subject_to(x[0]==ca.vertcat(1,2,3))
         with self.assertInException("Constraint shape mismatch."):
-          opti.subject_to(vertcat(1,2,3)==x[0])
+          opti.subject_to(ca.vertcat(1,2,3)==x[0])
 
 
     def test_value(self):
-        opti = Opti()
+        opti = ca.Opti()
         x = opti.variable()
         y = opti.variable()
         z = opti.variable()
@@ -920,7 +921,7 @@ class OptiStacktests(inherit_from):
           opti.debug.value(q)
 
     def test_introspection(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
@@ -934,13 +935,13 @@ class OptiStacktests(inherit_from):
       opti.set_value(p, 3)
       sol = opti.solve()
 
-      solver = nlpsol("solver","ipopt",{"x": opti.x, "f": opti.f, "g": opti.g, "p": opti.p})
+      solver = ca.nlpsol("solver","ipopt",{"x": opti.x, "f": opti.f, "g": opti.g, "p": opti.p})
       sol2 = solver(p=sol.value(p),lbg=sol.value(opti.lbg),ubg=sol.value(opti.ubg))
       
       self.checkarray(sol2["x"],sol.value(opti.x))
       
     def test_max_iter(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       opti.minimize((x-1)**6)
       opti.solver('ipopt',{},{"max_iter":1})
@@ -962,7 +963,7 @@ class OptiStacktests(inherit_from):
     def test_conic(self):
       options = {"eps":1e-9,"do_super_scs":1, "verbose":0}
 
-      opti = Opti('conic')
+      opti = ca.Opti('conic')
       x = opti.variable()
       y = opti.variable()
 
@@ -975,7 +976,7 @@ class OptiStacktests(inherit_from):
         for g_scale in [1,9]:
           opti.set_linear_scale(x,x_scale)
 
-          h = soc(vertcat(x-5,y-7),4)
+          h = ca.soc(ca.vertcat(x-5,y-7),4)
 
           # Note: >= destroys sparsity
           opti.subject_to(h>0,g_scale)
@@ -985,14 +986,14 @@ class OptiStacktests(inherit_from):
           opti.solver("superscs",{},options)
           sol = opti.solve()
 
-          res = sol.value(vertcat(x,y))
+          res = sol.value(ca.vertcat(x,y))
 
-          self.checkarray(res,DM([5-8/sqrt(5),7-4/sqrt(5)]),conic,digits=7)
-          self.checkarray(sol.value(opti.f),10-16/sqrt(5)+7-4/sqrt(5),conic,digits=7)
+          self.checkarray(res,ca.DM([5-8/ca.sqrt(5),7-4/ca.sqrt(5)]),ca.conic,digits=7)
+          self.checkarray(sol.value(opti.f),10-16/ca.sqrt(5)+7-4/ca.sqrt(5),ca.conic,digits=7)
    
     @requires_conic("cbc")
     def test_discrete_linear(self):
-      opti = Opti('conic')
+      opti = ca.Opti('conic')
       x = opti.variable()
       y = opti.variable()
       
@@ -1024,7 +1025,7 @@ class OptiStacktests(inherit_from):
  
     @requires_nlpsol("bonmin")
     def test_discrete(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       p = opti.parameter()
@@ -1055,10 +1056,10 @@ class OptiStacktests(inherit_from):
     @requires_nlpsol("ipopt")
     def test_linear_scale(self):
     
-      x = MX.sym("x")
+      x = ca.MX.sym("x")
       
 
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
@@ -1077,12 +1078,12 @@ class OptiStacktests(inherit_from):
       
       x_sol_unscaled = sol.value(opti.x)
       
-      x_unscaled = DM.from_file("nlp_f.000000.in.x.mtx")
-      f_unscaled = DM.from_file("nlp_f.000000.out.f.mtx")
-      grad_f_unscaled = DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
-      jac_g_unscaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      x_unscaled = ca.DM.from_file("nlp_f.000000.in.x.mtx")
+      f_unscaled = ca.DM.from_file("nlp_f.000000.out.f.mtx")
+      grad_f_unscaled = ca.DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
+      jac_g_unscaled = ca.DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
       
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
@@ -1105,16 +1106,16 @@ class OptiStacktests(inherit_from):
       
       x_sol_scaled = sol.value(opti.x)
       
-      x_scaled = DM.from_file("nlp_f.000000.in.x.mtx")
-      f_scaled = DM.from_file("nlp_f.000000.out.f.mtx")
-      grad_f_scaled = DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
+      x_scaled = ca.DM.from_file("nlp_f.000000.in.x.mtx")
+      f_scaled = ca.DM.from_file("nlp_f.000000.out.f.mtx")
+      grad_f_scaled = ca.DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
       
-      self.checkarray((x_unscaled-vertcat(0,1,1))/vertcat(10,5,3),x_scaled)
+      self.checkarray((x_unscaled-ca.vertcat(0,1,1))/ca.vertcat(10,5,3),x_scaled)
       self.checkarray(f_unscaled, f_scaled)
       self.checkarray(x_sol_scaled, x_sol_unscaled)
-      self.checkarray(grad_f_unscaled*vertcat(10,5,3),grad_f_scaled)
+      self.checkarray(grad_f_unscaled*ca.vertcat(10,5,3),grad_f_scaled)
 
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
@@ -1127,9 +1128,9 @@ class OptiStacktests(inherit_from):
 
       sol = opti.solve()
 
-      x_scaled = DM.from_file("nlp_f.000000.in.x.mtx")
-      f_scaled = DM.from_file("nlp_f.000000.out.f.mtx")
-      jac_g_scaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      x_scaled = ca.DM.from_file("nlp_f.000000.in.x.mtx")
+      f_scaled = ca.DM.from_file("nlp_f.000000.out.f.mtx")
+      jac_g_scaled = ca.DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
       self.checkarray(x_sol_scaled, x_sol_unscaled)
       
       self.checkarray(jac_g_scaled[0,:]*10, jac_g_unscaled[0,:])
@@ -1137,14 +1138,14 @@ class OptiStacktests(inherit_from):
 
     @requires_nlpsol("ipopt")
     def test_linear_scale2(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
       
       opti.minimize((x-y-z)**2)
-      opti.subject_to(z-3 <= vertcat(x,y))
-      opti.subject_to(vertcat(x,y) <= z+3)
+      opti.subject_to(z-3 <= ca.vertcat(x,y))
+      opti.subject_to(ca.vertcat(x,y) <= z+3)
       
       opti.set_initial(x,1)
       opti.set_initial(y,2)
@@ -1156,21 +1157,21 @@ class OptiStacktests(inherit_from):
       
       x_sol_unscaled = sol.value(opti.x)
       
-      x_unscaled = DM.from_file("nlp_f.000000.in.x.mtx")
-      f_unscaled = DM.from_file("nlp_f.000000.out.f.mtx")
-      grad_f_unscaled = DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
-      jac_g_unscaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      x_unscaled = ca.DM.from_file("nlp_f.000000.in.x.mtx")
+      f_unscaled = ca.DM.from_file("nlp_f.000000.out.f.mtx")
+      grad_f_unscaled = ca.DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
+      jac_g_unscaled = ca.DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
       
 
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
       
       
       opti.minimize((x-y-z)**2)
-      opti.subject_to(z-3 <= vertcat(x,y))
-      opti.subject_to(vertcat(x,y) <= z+3)
+      opti.subject_to(z-3 <= ca.vertcat(x,y))
+      opti.subject_to(ca.vertcat(x,y) <= z+3)
     
       opti.set_initial(x,1)
       opti.set_initial(y,2)
@@ -1186,9 +1187,9 @@ class OptiStacktests(inherit_from):
       
       x_sol_scaled = sol.value(opti.x)
 
-      x_scaled = DM.from_file("nlp_f.000000.in.x.mtx")
-      f_scaled = DM.from_file("nlp_f.000000.out.f.mtx")
-      jac_g_scaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      x_scaled = ca.DM.from_file("nlp_f.000000.in.x.mtx")
+      f_scaled = ca.DM.from_file("nlp_f.000000.out.f.mtx")
+      jac_g_scaled = ca.DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
       
       self.checkarray(x_sol_scaled, x_sol_unscaled)
       self.checkarray(jac_g_scaled[:,0], jac_g_unscaled[:,0]*10)
@@ -1197,13 +1198,13 @@ class OptiStacktests(inherit_from):
   
     @requires_nlpsol("ipopt")
     def test_linear_scale3(self):
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
       
       opti.minimize((x-y-z)**2)
-      opti.subject_to(z-3 <= (vertcat(x,y) <= z+3))
+      opti.subject_to(z-3 <= (ca.vertcat(x,y) <= z+3))
       
       opti.set_initial(x,1)
       opti.set_initial(y,2)
@@ -1215,20 +1216,20 @@ class OptiStacktests(inherit_from):
       
       x_sol_unscaled = sol.value(opti.x)
       
-      x_unscaled = DM.from_file("nlp_f.000000.in.x.mtx")
-      f_unscaled = DM.from_file("nlp_f.000000.out.f.mtx")
-      grad_f_unscaled = DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
-      jac_g_unscaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      x_unscaled = ca.DM.from_file("nlp_f.000000.in.x.mtx")
+      f_unscaled = ca.DM.from_file("nlp_f.000000.out.f.mtx")
+      grad_f_unscaled = ca.DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
+      jac_g_unscaled = ca.DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
       
 
-      opti = Opti()
+      opti = ca.Opti()
       x = opti.variable()
       y = opti.variable()
       z = opti.variable()
       
       
       opti.minimize((x-y-z)**2)
-      opti.subject_to(z-3 <= (vertcat(x,y) <= z+3))
+      opti.subject_to(z-3 <= (ca.vertcat(x,y) <= z+3))
     
       opti.set_initial(x,1)
       opti.set_initial(y,2)
@@ -1244,9 +1245,9 @@ class OptiStacktests(inherit_from):
       
       x_sol_scaled = sol.value(opti.x)
 
-      x_scaled = DM.from_file("nlp_f.000000.in.x.mtx")
-      f_scaled = DM.from_file("nlp_f.000000.out.f.mtx")
-      jac_g_scaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      x_scaled = ca.DM.from_file("nlp_f.000000.in.x.mtx")
+      f_scaled = ca.DM.from_file("nlp_f.000000.out.f.mtx")
+      jac_g_scaled = ca.DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
       
       self.checkarray(x_sol_scaled, x_sol_unscaled)
       self.checkarray(jac_g_scaled[:,0], jac_g_unscaled[:,0]*10)
@@ -1261,7 +1262,7 @@ class OptiStacktests(inherit_from):
       for scale_x in [None,1,9]:
         for scale_g in [None,1, 100]:
           for detect_simple_bounds in [False,True]:
-            opti = Opti()
+            opti = ca.Opti()
             x = opti.variable()
             y = opti.variable()
             z = opti.variable()
@@ -1301,12 +1302,12 @@ class OptiStacktests(inherit_from):
     def test_ipopt_custom_jac(self):
     
       # f_scale
-      for x_scale in [vertcat(1,1,1),vertcat(7,0.11,0.13)]:
-        for x_scale_offset in [vertcat(0,0,0),vertcat(1,2,3)]:
-          for g_scale in [vertcat(1,1),vertcat(3,5)]:
+      for x_scale in [ca.vertcat(1,1,1),ca.vertcat(7,0.11,0.13)]:
+        for x_scale_offset in [ca.vertcat(0,0,0),ca.vertcat(1,2,3)]:
+          for g_scale in [ca.vertcat(1,1),ca.vertcat(3,5)]:
             for f_scale in [1,1.7]:
               for scale_helper in [True,False]:
-                opti = Opti()
+                opti = ca.Opti()
                 x=opti.variable()
                 y=opti.variable()
                 w=opti.variable()
@@ -1327,7 +1328,7 @@ class OptiStacktests(inherit_from):
                 ref_solver = opti.debug.casadi_solver
 
 
-                opti = Opti()
+                opti = ca.Opti()
                 x=opti.variable()
                 y=opti.variable()
                 w=opti.variable()
@@ -1344,9 +1345,9 @@ class OptiStacktests(inherit_from):
 
                 
                 if scale_helper:
-                  nlp_jac_g_custom = opti.scale_helper(Function('nlp_jac_g',[opti.x,opti.p],[opti.g,jacobian(opti.g,opti.x)],["x","p"],["g","jac_g_x"]))
+                  nlp_jac_g_custom = opti.scale_helper(ca.Function('nlp_jac_g',[opti.x,opti.p],[opti.g,ca.jacobian(opti.g,opti.x)],["x","p"],["g","jac_g_x"]))
                 else:
-                  nlp_jac_g_custom = Function('nlp_jac_g',[opti.x,opti.p],substitute([opti.g/opti.g_linear_scale,mtimes(jacobian(opti.g/opti.g_linear_scale,opti.x),diag(opti.x_linear_scale))],[opti.x],[opti.x*opti.x_linear_scale+opti.x_linear_scale_offset]),["x","p"],["g","jac_g_x"])
+                  nlp_jac_g_custom = ca.Function('nlp_jac_g',[opti.x,opti.p],ca.substitute([opti.g/opti.g_linear_scale,ca.jacobian(opti.g/opti.g_linear_scale,opti.x) @ ca.diag(opti.x_linear_scale)],[opti.x],[opti.x*opti.x_linear_scale+opti.x_linear_scale_offset]),["x","p"],["g","jac_g_x"])
 
                 options = {}
                 options["cache"] = {"nlp_jac_g":nlp_jac_g_custom}
@@ -1364,20 +1365,20 @@ class OptiStacktests(inherit_from):
                 print(opti.x_linear_scale_offset)
                 print(opti.g_linear_scale)
                 print(opti.f_linear_scale)
-                self.checkfunction_light(ref_solver.get_function("nlp_jac_g"),solver.get_function("nlp_jac_g"),inputs=[vertcat(0.11,0.3,0.7),0])
-                lam_f = MX.sym("lam_f")
+                self.checkfunction_light(ref_solver.get_function("nlp_jac_g"),solver.get_function("nlp_jac_g"),inputs=[ca.vertcat(0.11,0.3,0.7),0])
+                lam_f = ca.MX.sym("lam_f")
                 if scale_helper:
-                  lag = lam_f*opti.f+dot(opti.lam_g,opti.g)
-                  H = jacobian(gradient(lag,opti.x),opti.x,{"symmetric":True})
-                  nlp_hess_l_custom = opti.scale_helper(Function('nlp_hess_l',[opti.x,opti.p,lam_f,opti.lam_g],[triu(H)],["x","p","lam_f","lam_g"],["triu_hess_gamma_x_x"]))
+                  lag = lam_f*opti.f+ca.dot(opti.lam_g,opti.g)
+                  H = ca.jacobian(ca.gradient(lag,opti.x),opti.x,{"symmetric":True})
+                  nlp_hess_l_custom = opti.scale_helper(ca.Function('nlp_hess_l',[opti.x,opti.p,lam_f,opti.lam_g],[ca.triu(H)],["x","p","lam_f","lam_g"],["triu_hess_gamma_x_x"]))
                 else:
-                  lag = lam_f*opti.f/f_scale+dot(opti.lam_g,opti.g/opti.g_linear_scale)
-                  H = mtimes(jacobian(gradient(lag,opti.x),opti.x,{"symmetric":True}),diag(opti.x_linear_scale)**2)
-                  H = substitute(triu(H),opti.x,opti.x*opti.x_linear_scale+opti.x_linear_scale_offset)
-                  nlp_hess_l_custom = Function('nlp_hess_l',[opti.x,opti.p,lam_f,opti.lam_g],[H])
+                  lag = lam_f*opti.f/f_scale+ca.dot(opti.lam_g,opti.g/opti.g_linear_scale)
+                  H = ca.jacobian(ca.gradient(lag,opti.x),opti.x,{"symmetric":True}) @ ca.diag(opti.x_linear_scale)**2
+                  H = ca.substitute(ca.triu(H),opti.x,opti.x*opti.x_linear_scale+opti.x_linear_scale_offset)
+                  nlp_hess_l_custom = ca.Function('nlp_hess_l',[opti.x,opti.p,lam_f,opti.lam_g],[H])
                   
                 print(ref_solver.get_function("nlp_hess_l"))
-                self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),nlp_hess_l_custom,inputs=[vertcat(0.11,0.3,0.7),0,3,17])
+                self.checkfunction_light(ref_solver.get_function("nlp_hess_l"),nlp_hess_l_custom,inputs=[ca.vertcat(0.11,0.3,0.7),0,3,17])
 
     @memory_heavy()
     @requires_nlpsol("ipopt")
@@ -1397,7 +1398,7 @@ class OptiStacktests(inherit_from):
           for f_scale in [1,11]:
             print(x_scale,g_scale)
 
-            opti = Opti()
+            opti = ca.Opti()
             x=opti.variable()
             y=opti.variable()
             w=opti.variable()
@@ -1420,8 +1421,8 @@ class OptiStacktests(inherit_from):
               g_ref = sol.value(opti.g)
               x_ref = sol.value(opti.x)
               lam_g_ref = sol.value(opti.lam_g)
-              grad_f_ref = sol.value(gradient(opti.f,opti.x))
-              jac_g_ref = sol.value(jacobian(opti.g,opti.x))
+              grad_f_ref = sol.value(ca.gradient(opti.f,opti.x))
+              jac_g_ref = sol.value(ca.jacobian(opti.g,opti.x))
               dual_ref = sol.value(opti.dual(my_g))
               lbg_ref = sol.value(opti.lbg)
             else:
@@ -1429,14 +1430,14 @@ class OptiStacktests(inherit_from):
               self.checkarray(g_ref,sol.value(opti.g))
               self.checkarray(x_ref,sol.value(opti.x))
               self.checkarray(lam_g_ref,sol.value(opti.lam_g),digits=6)
-              self.checkarray(grad_f_ref, sol.value(gradient(opti.f,opti.x)),digits=6)
-              self.checkarray(jac_g_ref, sol.value(jacobian(opti.g,opti.x)),digits=6)
+              self.checkarray(grad_f_ref, sol.value(ca.gradient(opti.f,opti.x)),digits=6)
+              self.checkarray(jac_g_ref, sol.value(ca.jacobian(opti.g,opti.x)),digits=6)
               self.checkarray(dual_ref, sol.value(opti.dual(my_g)),digits=6)
               self.checkarray(lbg_ref, sol.value(opti.lbg))
             
-            lag_grad = sol.value(gradient(opti.f+dot(opti.lam_g, opti.g),opti.x))
+            lag_grad = sol.value(ca.gradient(opti.f+ca.dot(opti.lam_g, opti.g),opti.x))
             self.checkarray(sol.value(x), 0.78641515, digits=6)
-            self.checkarray(lag_grad, vertcat(0,0), digits=6)
+            self.checkarray(lag_grad, ca.vertcat(0,0), digits=6)
 
     @requires_conic("highs")
     @requires_nlpsol("ipopt")
@@ -1445,7 +1446,7 @@ class OptiStacktests(inherit_from):
         ref = {}
         
         for t in ['nlp','conic']:
-            opti = Opti(t)
+            opti = ca.Opti(t)
             x = opti.variable()
             y = opti.variable()
             z = opti.variable()
@@ -1479,11 +1480,11 @@ class OptiStacktests(inherit_from):
         ref = {}
         
         for t in ['conic']:
-            opti = Opti(t)
+            opti = ca.Opti(t)
             x = opti.variable()
             y = opti.variable()
             z = opti.variable()
-            h = soc(vertcat(x-5,y-7),4)
+            h = ca.soc(ca.vertcat(x-5,y-7),4)
 
             # Note: >= destroys sparsity
             opti.subject_to(h>0)
@@ -1514,7 +1515,7 @@ class OptiStacktests(inherit_from):
     @requires_nlpsol("ipopt")
     def test_issue4020(self):
         for constr_fun in [lambda x,y: x**2 - y == 0, lambda x,y: 0==x**2 - y,lambda x,y: x**2 == y, lambda x,y: y==x**2]:
-            opti = casadi.Opti()
+            opti = ca.Opti()
             x = opti.variable()
             y = opti.variable()
             

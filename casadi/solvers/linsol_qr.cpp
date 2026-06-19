@@ -83,8 +83,23 @@ namespace casadi {
     sp_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
   }
 
+  // Sign (+1/-1) of a permutation: (-1)^(n - number of cycles)
+  static double permutation_sign(const std::vector<casadi_int>& p) {
+    std::vector<bool> seen(p.size(), false);
+    casadi_int ncycle = 0;
+    for (casadi_int i=0; i<static_cast<casadi_int>(p.size()); ++i) {
+      if (!seen[i]) {
+        ncycle++;
+        for (casadi_int j=i; !seen[j]; j=p[j]) seen[j] = true;
+      }
+    }
+    return (static_cast<casadi_int>(p.size())-ncycle) % 2 ? -1 : 1;
+  }
+
   void LinsolQr::finalize() {
     cache_stride_ = sp_.nnz()+sp_v_.nnz()+sp_r_.nnz()+ncol();
+    // Determinant of the (data-independent) row and column pivoting
+    pivot_sign_ = permutation_sign(prinv_) * permutation_sign(pc_);
     LinsolInternal::finalize();
   }
 
@@ -162,8 +177,13 @@ namespace casadi {
     return 0;
   }
 
-  void LinsolQr::generate(CodeGenerator& g, const std::string& A, const std::string& x,
-                          casadi_int nrhs, bool tr) const {
+  double LinsolQr::det(void* mem, const double* A) const {
+    auto m = static_cast<LinsolQrMemory*>(mem);
+    return pivot_sign_ * casadi_det(sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
+                                    get_ptr(m->beta));
+  }
+
+  void LinsolQr::generate_factorize(CodeGenerator& g, const std::string& A) const {
     // Codegen the integer vectors
     std::string prinv = g.constant(prinv_);
     std::string pc = g.constant(pc_);
@@ -171,15 +191,19 @@ namespace casadi {
     std::string sp_v = g.sparsity(sp_v_);
     std::string sp_r = g.sparsity(sp_r_);
 
-    // Place in block to avoid conflicts caused by local variables
-    g << "{\n";
-    g.comment("FIXME(@jaeandersson): Memory allocation can be avoided");
-    g << "casadi_real v[" << sp_v_.nnz() << "], "
-         "r[" << sp_r_.nnz() << "], "
-         "beta[" << ncol() << "], "
-         "w[" << nrow() + ncol() << "];\n";
+    // Carve the factorization workspace from w (reserved by sz_w_fact())
+    g.local("qr_v", "casadi_real", "*");
+    g << "qr_v = w;\n";
+    g.local("qr_r", "casadi_real", "*");
+    g << "qr_r = w+" << sp_v_.nnz() << ";\n";
+    g.local("qr_beta", "casadi_real", "*");
+    g << "qr_beta = w+" << sp_v_.nnz() + sp_r_.nnz() << ";\n";
+    g.local("qr_w", "casadi_real", "*");
+    g << "qr_w = w+" << sp_v_.nnz() + sp_r_.nnz() + ncol() << ";\n";
 
     if (n_cache_) {
+      // Place the cache in a block to scope its (untouched) local arrays
+      g << "{\n";
       g << "casadi_real *c;\n";
       g << "casadi_real cache[" << cache_stride_*n_cache_ << "];\n";
       g << "int cache_loc[" << n_cache_ << "] = {";
@@ -191,30 +215,44 @@ namespace casadi {
         cache_stride_, n_cache_, sp_.nnz(), "&c") << ") {\n";
       casadi_int offset = sp_.nnz();
       g.comment("Retrieve from cache");
-      g << g.copy("c+" + str(offset), sp_v_.nnz(), "v") << "\n"; offset+=sp_v_.nnz();
-      g << g.copy("c+" + str(offset), sp_r_.nnz(), "r") << "\n"; offset+=sp_r_.nnz();
-      g << g.copy("c+" + str(offset), ncol(), "beta") << "\n"; offset+=ncol();
+      g << g.copy("c+" + str(offset), sp_v_.nnz(), "qr_v") << "\n"; offset+=sp_v_.nnz();
+      g << g.copy("c+" + str(offset), sp_r_.nnz(), "qr_r") << "\n"; offset+=sp_r_.nnz();
+      g << g.copy("c+" + str(offset), ncol(), "qr_beta") << "\n"; offset+=ncol();
       g << "} else {\n";
     }
 
     // Factorize
-    g << g.qr(sp, A, "w", sp_v, "v", sp_r, "r", "beta", prinv, pc) << "\n";
+    g << g.qr(sp, A, "qr_w", sp_v, "qr_v", sp_r, "qr_r", "qr_beta", prinv, pc) << "\n";
 
     if (n_cache_) {
       casadi_int offset = 0;
       g.comment("Store in cache");
       g << g.copy(A, sp_.nnz(), "c") << "\n";; offset+=sp_.nnz();
-      g << g.copy("v", sp_v_.nnz(), "c+"+str(offset)) << "\n"; offset+=sp_v_.nnz();
-      g << g.copy("r", sp_r_.nnz(), "c+"+str(offset)) << "\n"; offset+=sp_r_.nnz();
-      g << g.copy("beta", ncol(), "c+"+str(offset)) << "\n"; offset+=ncol();
+      g << g.copy("qr_v", sp_v_.nnz(), "c+"+str(offset)) << "\n"; offset+=sp_v_.nnz();
+      g << g.copy("qr_r", sp_r_.nnz(), "c+"+str(offset)) << "\n"; offset+=sp_r_.nnz();
+      g << g.copy("qr_beta", ncol(), "c+"+str(offset)) << "\n"; offset+=ncol();
+      g << "}\n";
+      // End of cache block
       g << "}\n";
     }
+  }
+
+  void LinsolQr::generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                          casadi_int nrhs, bool tr) const {
+    generate_factorize(g, A);
 
     // Solve
-    g << g.qr_solve(x, nrhs, tr, sp_v, "v", sp_r, "r", "beta", prinv, pc, "w") << "\n";
+    g << g.qr_solve(x, nrhs, tr, g.sparsity(sp_v_), "qr_v", g.sparsity(sp_r_), "qr_r",
+                    "qr_beta", g.constant(prinv_), g.constant(pc_), "qr_w") << "\n";
+  }
 
-    // End of block
-    g << "}\n";
+  void LinsolQr::generate_det(CodeGenerator& g, const std::string& A,
+                              const std::string& d) const {
+    generate_factorize(g, A);
+
+    // Determinant from the factors, corrected by the pivoting sign
+    g << d << " = " << (pivot_sign_ < 0 ? "-" : "")
+      << g.det(g.sparsity(sp_v_), "qr_v", g.sparsity(sp_r_), "qr_r", "qr_beta") << ";\n";
   }
 
   LinsolQr::LinsolQr(DeserializingStream& s) : LinsolInternal(s) {

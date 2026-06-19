@@ -22,7 +22,8 @@
 @author: Mario Zanon and Sebastien Gross, KU Leuven 2012
 """
 
-from casadi import *
+import casadi as ca
+from numpy import inf
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -56,10 +57,10 @@ C = np.zeros((deg+1,deg+1))
 D = np.zeros(deg+1)
 
 # Collocation point
-tau = SX.sym("tau")
+tau = ca.SX.sym("tau")
 
 # All collocation time points
-tau_root = [0] + collocation_points(deg, cp)
+tau_root = [0] + ca.collocation_points(deg, cp)
 
 T = np.zeros((nk,deg+1))
 for i in range(nk):
@@ -75,11 +76,11 @@ for j in range(deg+1):
             L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
 
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-    lfcn = Function('lfcn', [tau],[L])
+    lfcn = ca.Function('lfcn', [tau],[L])
     D[j] = lfcn(1.0)
 
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-    tfcn = Function('tfcn', [tau],[tangent(L,tau)])
+    tfcn = ca.Function('tfcn', [tau],[ca.tangent(L,tau)])
     for j2 in range(deg+1):
         C[j][j2] = tfcn(tau_root[j2])
 
@@ -87,23 +88,23 @@ for j in range(deg+1):
 # Model setup
 # -----------------------------------------------------------------------------
 # Declare variables (use scalar graph)
-t  = SX.sym("t")          # time
-u  = SX.sym("u")          # control
-xd  = SX.sym("xd",ndstate)      # differential state
-xa  = SX.sym("xa",nastate)    # algebraic state
-xddot  = SX.sym("xdot",ndstate) # differential state time derivative
-p = SX.sym("p",0,1)      # parameters
+t  = ca.SX.sym("t")          # time
+u  = ca.SX.sym("u")          # control
+xd  = ca.SX.sym("xd",ndstate)      # differential state
+xa  = ca.SX.sym("xa",nastate)    # algebraic state
+xddot  = ca.SX.sym("xdot",ndstate) # differential state time derivative
+p = ca.SX.sym("p",0,1)      # parameters
 
-x = SX.sym("x")
-y = SX.sym("y")
-w = SX.sym("w")
+x = ca.SX.sym("x")
+y = ca.SX.sym("y")
+w = ca.SX.sym("w")
 
-dx = SX.sym("dx")
-dy = SX.sym("dy")
-dw = SX.sym("dw")
+dx = ca.SX.sym("dx")
+dy = ca.SX.sym("dy")
+dw = ca.SX.sym("dw")
 
 
-res = vertcat(xddot[0] - dx,\
+res = ca.vertcat(xddot[0] - dx,\
        xddot[1] - dy,\
        xddot[2] - dw,\
        m*xddot[3] + (x-w)*xa, \
@@ -121,11 +122,11 @@ xd[5] = dw
 
 
 # System dynamics (implicit formulation)
-ffcn = Function('ffcn', [t,xddot,xd,xa,u,p],[res])
+ffcn = ca.Function('ffcn', [t,xddot,xd,xa,u,p],[res])
 
 # Objective function
-MayerTerm = Function('mayer', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
-LagrangeTerm = Function('lagrange', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
+MayerTerm = ca.Function('mayer', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
+LagrangeTerm = ca.Function('lagrange', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
 
 # Control bounds
 u_min = np.array([-2])
@@ -153,7 +154,7 @@ xAi_min = np.array([-inf])
 xAi_max = np.array([ inf])
 xAf_min = np.array([-inf])
 xAf_max = np.array([ inf])
-xA_init = np.array((nk*nicp*(deg+1))*[[sign(l)*9.81]])
+xA_init = np.array((nk*nicp*(deg+1))*[[ca.sign(l)*9.81]])
 
 # Parameter bounds and initial guess
 p_min = np.array([])
@@ -169,21 +170,21 @@ p_init = np.array([])
 # Initial constraint
 ic_min = np.array([])
 ic_max = np.array([])
-ic = SX()
+ic = ca.SX()
 #ic.append();       ic_min = append(ic_min, 0.);         ic_max = append(ic_max, 0.)
-icfcn = Function('icfcn', [t,xd,xa,u,p],[ic])
+icfcn = ca.Function('icfcn', [t,xd,xa,u,p],[ic])
 # Path constraint
 pc_min = np.array([])
 pc_max = np.array([])
-pc = SX()
+pc = ca.SX()
 #pc.append();       pc_min = append(pc_min, 0.);         pc_max = append(pc_max, 0.)
-pcfcn = Function('pcfcn', [t,xd,xa,u,p],[pc])
+pcfcn = ca.Function('pcfcn', [t,xd,xa,u,p],[pc])
 # Final constraint
 fc_min = np.array([])
 fc_max = np.array([])
-fc = SX()
+fc = ca.SX()
 #fc.append();       fc_min = append(fc_min, 0.);         fc_max = append(fc_max, 0.)
-fcfcn = Function('fcfcn', [t,xd,xa,u,p],[fc])
+fcfcn = ca.Function('fcfcn', [t,xd,xa,u,p],[fc])
 
 # -----------------------------------------------------------------------------
 # NLP setup
@@ -203,7 +204,7 @@ NXF = ndiff                 # Final state (only the differential states)
 NV = NXD+NXA+NU+NXF+NP
 
 # NLP variable vector
-V = MX.sym("V",NV)
+V = ca.MX.sym("V",NV)
 
 # All variables with bounds and initial guess
 vars_lb = np.zeros(NV)
@@ -219,9 +220,9 @@ vars_ub[offset:offset+NP] = p_max
 offset += NP
 
 # Get collocated states and parametrized control
-XD = np.resize(np.array([],dtype=MX),(nk+1,nicp,deg+1)) # NB: same name as above
-XA = np.resize(np.array([],dtype=MX),(nk,nicp,deg)) # NB: same name as above
-U = np.resize(np.array([],dtype=MX),nk)
+XD = np.resize(np.array([],dtype=ca.MX),(nk+1,nicp,deg+1)) # NB: same name as above
+XA = np.resize(np.array([],dtype=ca.MX),(nk,nicp,deg)) # NB: same name as above
+U = np.resize(np.array([],dtype=ca.MX),nk)
 for k in range(nk):
     # Collocated states
     for i in range(nicp):
@@ -346,16 +347,16 @@ ld0 = lDotAtTauRoot[1:,0]
 lagrangeTerm = 0
 for k in range(nk):
     for i in range(nicp):
-        dQs = h*veccat(*[LagrangeTerm(0., XD[k][i][j], XA[k][i][j-1], U[k], P) \
+        dQs = h*ca.veccat(*[LagrangeTerm(0., XD[k][i][j], XA[k][i][j-1], U[k], P) \
                         for j in range(1,deg+1)])
-        Qs = mtimes( ldInv, dQs)
-        m = mtimes( Qs.T, lAtOne[1:])
+        Qs =  ldInv @  dQs
+        m =  Qs.T @  lAtOne[1:]
         lagrangeTerm += m
 
 Obj += lagrangeTerm
 
 # NLP
-nlp = {'x':V, 'f':Obj, 'g':vertcat(*g)}
+nlp = {'x':V, 'f':Obj, 'g':ca.vertcat(*g)}
 
 ## ----
 ## SOLVE THE NLP
@@ -369,7 +370,7 @@ opts["ipopt.tol"] = 1e-4
 opts["ipopt.linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = nlpsol("solver", "ipopt", nlp, opts)
+solver = ca.nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Initial condition
@@ -396,9 +397,9 @@ v_opt = np.array(res["x"])
 ## ----
 ## RETRIEVE THE SOLUTION
 ## ----
-xD_opt = np.resize(np.array([],dtype=MX),(ndiff,(deg+1)*nicp*(nk)+1))
-xA_opt = np.resize(np.array([],dtype=MX),(nalg,(deg)*nicp*(nk)))
-u_opt = np.resize(np.array([],dtype=MX),(nu,(deg+1)*nicp*(nk)+1))
+xD_opt = np.resize(np.array([],dtype=ca.MX),(ndiff,(deg+1)*nicp*(nk)+1))
+xA_opt = np.resize(np.array([],dtype=ca.MX),(nalg,(deg)*nicp*(nk)))
+u_opt = np.resize(np.array([],dtype=ca.MX),(nu,(deg+1)*nicp*(nk)+1))
 offset = 0
 offset2 = 0
 offset3 = 0
@@ -435,10 +436,10 @@ for j in range(1,deg+1):
     for j2 in range(1,deg+1):
         if j2 != j:
             La *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
-    lafcn = Function('lafcn', [tau], [La])
+    lafcn = ca.Function('lafcn', [tau], [La])
     Da[j-1] = lafcn(tau_root[0])
 
-xA_plt = np.resize(np.array([],dtype=MX),(nalg,(deg+1)*nicp*(nk)+1))
+xA_plt = np.resize(np.array([],dtype=ca.MX),(nalg,(deg+1)*nicp*(nk)+1))
 offset4=0
 offset5=0
 for k in range(nk):

@@ -21,7 +21,6 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
 import casadi as ca
 import numpy
 import unittest
@@ -64,9 +63,9 @@ class Threadstests(casadiTestCase):
   @memory_heavy()
   @requires_nlpsol("ipopt")
   def test_GIL_release_wall_time(self):
-        print("CasadiMeta.swig_flags",CasadiMeta.swig_flags())
+        print("CasadiMeta.swig_flags",ca.CasadiMeta.swig_flags())
 
-        if "CASADI_WITH_PYTHON_GIL_RELEASE" not in CasadiMeta.swig_flags(): return
+        if "CASADI_WITH_PYTHON_GIL_RELEASE" not in ca.CasadiMeta.swig_flags(): return
 
 
         timerthread = PrintNowThread()
@@ -74,7 +73,6 @@ class Threadstests(casadiTestCase):
 
 
         print("foo")
-        import casadi as ca
         import numpy as np
 
         N = 400  # number of control intervals
@@ -105,7 +103,7 @@ class Threadstests(casadiTestCase):
             opti.subject_to(X[:, k + 1] == x_next)  # close the gaps
 
         # ---- path constraints -----------
-        limit = lambda pos: 1 - ca.sin(2 * ca.pi * pos) / 2
+        limit = lambda pos: 1 - ca.sin(2 * numpy.pi * pos) / 2
         opti.subject_to(speed <= limit(pos))  # track speed limit
         opti.subject_to(opti.bounded(0, U, 1))  # control is limited
 
@@ -147,8 +145,8 @@ class Threadstests(casadiTestCase):
             
             T = np.ones((1,1))
             X = np.random.random((2, N + 1))
-            buffer.set_arg(0, memoryview(T))
-            buffer.set_res(0, memoryview(X))
+            buffer.set_arg(0, memoryview(T))  # pyright: ignore[reportArgumentType]
+            buffer.set_res(0, memoryview(X))  # pyright: ignore[reportArgumentType]
             
             trigger()
 
@@ -182,14 +180,13 @@ class Threadstests(casadiTestCase):
   @requires_nlpsol("ipopt")
   def test_GIL_release_stress_test(self):
   
-    if "CASADI_WITH_PYTHON_GIL_RELEASE" not in CasadiMeta.swig_flags(): return
+    if "CASADI_WITH_PYTHON_GIL_RELEASE" not in ca.CasadiMeta.swig_flags(): return
 
     timerthread = PrintNowThread()
     timerthread.start()
 
 
     print("foo")
-    import casadi as ca
     import numpy as np
 
     N = 100  # number of control intervals
@@ -249,7 +246,7 @@ class Threadstests(casadiTestCase):
         opti.subject_to(X[:, k + 1] == x_next)  # close the gaps
 
     # ---- path constraints -----------
-    limit = lambda pos: 1 - ca.sin(2 * ca.pi * pos) / 2
+    limit = lambda pos: 1 - ca.sin(2 * numpy.pi * pos) / 2
     opti.subject_to(speed <= limit(pos))  # track speed limit
     opti.subject_to(opti.bounded(0, U, 1))  # control is limited
 
@@ -278,20 +275,20 @@ class Threadstests(casadiTestCase):
         self.np = np
         self.construct("mycallback", {})
 
-      def get_n_in(self): return nlpsol_n_out()
+      def get_n_in(self): return ca.nlpsol_n_out()
       def get_n_out(self): return 1
 
 
       def get_sparsity_in(self, i):
-        n = nlpsol_out(i)
+        n = ca.nlpsol_out(i)
         if n=='f':
-          return Sparsity. scalar()
+          return ca.Sparsity. scalar()
         elif n in ('x', 'lam_x'):
-          return Sparsity.dense(self.nx)
+          return ca.Sparsity.dense(self.nx)
         elif n in ('g', 'lam_g'):
-          return Sparsity.dense(self.ng)
+          return ca.Sparsity.dense(self.ng)
         else:
-          return Sparsity(0,0)
+          return ca.Sparsity(0,0)
       def eval(self, arg):
         # Purposefully not thread-safe to solicit crashes
         print("yay")
@@ -322,8 +319,8 @@ class Threadstests(casadiTestCase):
         
         T = np.ones((1,1))
         X = np.random.random((2, N + 1))
-        buffer.set_arg(0, memoryview(T))
-        buffer.set_res(0, memoryview(X))
+        buffer.set_arg(0, memoryview(T))  # pyright: ignore[reportArgumentType]
+        buffer.set_res(0, memoryview(X))  # pyright: ignore[reportArgumentType]
         
         trigger()
         
@@ -350,9 +347,10 @@ class Threadstests(casadiTestCase):
     [raw_solver.stats(i+1)["t_wall_nlp_jac_g"] for i in range(n_thread)]
 
   @requires_nlpsol("ipopt")
+  @memory_heavy()
   def test_threadsafe_symbolics(self):
   
-    if "CASADI_WITH_THREADSAFE_SYMBOLICS" not in CasadiMeta.compiler_flags(): return
+    if "CASADI_WITH_THREADSAFE_SYMBOLICS" not in ca.CasadiMeta.compiler_flags(): return
         
     timerthread = PrintNowThread()
     timerthread.start()
@@ -379,7 +377,7 @@ class Threadstests(casadiTestCase):
             ca.det(A)
             
         # Circular dependency
-        foo = {"a": A}
+        foo = {"a": A}  # type: dict
         bar = {"bar":foo}
         foo["baz"] = bar
 
@@ -432,7 +430,7 @@ class Threadstests(casadiTestCase):
             opti.subject_to(X[:, k + 1] == x_next)  # close the gaps
 
         # ---- path constraints -----------
-        limit = lambda pos: 1 - ca.sin(2 * ca.pi * pos) / 2
+        limit = lambda pos: 1 - ca.sin(2 * numpy.pi * pos) / 2
         opti.subject_to(speed <= limit(pos))  # track speed limit
         opti.subject_to(opti.bounded(0, U, 1))  # control is limited
 

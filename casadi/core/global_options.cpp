@@ -46,6 +46,8 @@ namespace casadi {
 
   casadi_int GlobalOptions::copy_elision_min_size = 8;
 
+  int GlobalOptions::numpy_mode = 0;
+
   void GlobalOptions::setTempWorkDir(const std::string& dir) {
     casadi_assert(!dir.empty(), "Temporary working directory must be non-empty.");
     temp_work_dir = Filesystem::ensure_trailing_slash(dir);

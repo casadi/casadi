@@ -309,6 +309,13 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
     static Matrix<Scalar> simplify(const Matrix<Scalar> &x);
+    static Matrix<Scalar> transform(const Matrix<Scalar> &x, const Dict& opts = Dict());
+    static Matrix<Scalar> transform(const Matrix<Scalar> &x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
+    static std::vector<Matrix<Scalar> > transform(const std::vector<Matrix<Scalar> >& x,
+        const Dict& opts = Dict());
+    static std::vector<Matrix<Scalar> > transform(const std::vector<Matrix<Scalar> >& x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
     static Matrix<Scalar> jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                    const Dict& opts = Dict());
     static Sparsity jacobian_sparsity(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
@@ -376,6 +383,8 @@ namespace casadi {
     static Matrix<Scalar> mldivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static std::vector<Matrix<Scalar> > symvar(const Matrix<Scalar> &x);
     static Matrix<Scalar> det(const Matrix<Scalar> &x);
+    static Matrix<Scalar> det(const Matrix<Scalar> &x, const std::string& lsolver,
+                              const Dict& dict=Dict());
     static Matrix<Scalar> inv_minor(const Matrix<Scalar> &x);
     static Matrix<Scalar> trace(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_1(const Matrix<Scalar> &x);
@@ -429,10 +438,12 @@ namespace casadi {
     static Matrix<Scalar> reshape(const Matrix<Scalar> &x, const Sparsity& sp);
     static Matrix<Scalar> sparsity_cast(const Matrix<Scalar> &x, const Sparsity& sp);
     static Matrix<Scalar> kron(const Matrix<Scalar> &x, const Matrix<Scalar>& y);
-    static Matrix<Scalar> mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
+    static Matrix<Scalar> mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y,
+                                 const std::string& blas = "reference");
     static Matrix<Scalar> mac(const Matrix<Scalar> &x,
                                 const Matrix<Scalar> &y,
-                                const Matrix<Scalar> &z);
+                                const Matrix<Scalar> &z,
+                                const std::string& blas = "reference");
     static void extract_parametric(const Matrix<Scalar> &expr,
         const Matrix<Scalar>& par,
         Matrix<Scalar>& expr_ret,
@@ -518,6 +529,11 @@ namespace casadi {
 
     // Simplification with constant folding
     static bool simplify_const_folding(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts = Dict());
+
+    // Simplification by combining like terms in linear combinations
+    static bool simplify_combine_terms(std::vector< Matrix<Scalar> >& arg,
                                    std::vector< Matrix<Scalar> >& res,
                                    const Dict& opts = Dict());
 
@@ -1305,6 +1321,13 @@ namespace casadi {
     static void set_precision(casadi_int precision);
     static void set_width(casadi_int width);
     static void set_scientific(bool scientific);
+    // @}
+
+    // @{
+    /// Get the 'precision, width & scientific' used in printing and serializing to streams
+    static casadi_int get_precision();
+    static casadi_int get_width();
+    static bool get_scientific();
     // @}
 
     /// Seed the random number generator

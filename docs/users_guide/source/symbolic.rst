@@ -415,7 +415,7 @@ Arithmetic operations
         y = SX.sym('y',2,2);
         disp(sin(y)-x)
 
-In C++ and Python (but not in MATLAB), the standard multiplication operation (using ``*``) is reserved for element-wise multiplication (in MATLAB ``.*``). For **matrix multiplication**, use ``A @ B`` or (``mtimes(A,B)`` in Python 3.4+):
+In C++ and Python (but not in MATLAB), the standard multiplication operation (using ``*``) is reserved for element-wise multiplication (in MATLAB ``.*``). For **matrix multiplication**, use ``A @ B`` (in C++: ``mtimes(A,B)``):
 
 .. side-by-side::
     .. exec-block:: python
@@ -737,7 +737,7 @@ For calculating a Jacobian-times-vector product, the ``jtimes`` function -- perf
         A = DM([[1,3],[4,7],[2,8]])
         x = SX.sym('x',2)
         v = SX.sym('v',2)
-        f = mtimes(A,x)
+        f = A @ x
         print(jtimes(f,x,v))
     &&
 
@@ -757,7 +757,7 @@ The ``jtimes`` function optionally calculates the transposed-Jacobian-times-vect
         A = DM([[1,3],[4,7],[2,8]]) [hidden]
         x = SX.sym('x',2) [hidden]
         w = SX.sym('w',3)
-        f = mtimes(A,x)
+        f = A @ x
         print(jtimes(f,x,w,True))
     &&
 

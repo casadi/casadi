@@ -76,7 +76,7 @@ namespace casadi {
       "Got " + A.dim() + " and " + B.dim() + ".");
 
     scoped_checkout<Linsol> mem(*this);
-    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
+    auto *m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
@@ -89,7 +89,7 @@ namespace casadi {
 
     // Solve
     DM x = densify(B);
-    if (solve(A.ptr(), x.ptr(), x.size2(), false, mem))
+    if (solve(A.ptr(), x.ptr(), x.size2(), tr, mem))
       casadi_error("Linsol::solve: 'solve' failed");
     // Show statistics
     if (m->t_total) m->t_total->toc();
@@ -103,13 +103,16 @@ namespace casadi {
   }
 
   void Linsol::sfact(const DM& A) const {
-    if (A.sparsity()!=sparsity()) return sfact(project(A, sparsity()));
+    if (A.sparsity()!=sparsity()) {
+      sfact(project(A, sparsity()));
+      return;
+    }
     if (sfact(A.ptr())) casadi_error("'sfact' failed");
   }
 
   int Linsol::sfact(const double* A, int mem) const {
     if (A==nullptr) return 1;
-    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
+    auto *m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
     // Factorization will be needed after this step
     m->is_sfact = m->is_nfact = false;
@@ -125,13 +128,16 @@ namespace casadi {
   }
 
   void Linsol::nfact(const DM& A) const {
-    if (A.sparsity()!=sparsity()) return nfact(project(A, sparsity()));
+    if (A.sparsity()!=sparsity()) {
+      nfact(project(A, sparsity()));
+      return;
+    }
     if (nfact(A.ptr())) casadi_error("'nfact' failed");
   }
 
   int Linsol::nfact(const double* A, int mem) const {
     if (A==nullptr) return 1;
-    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
+    auto *m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
     // Perform pivoting, if required
     if (!m->is_sfact) {
@@ -162,6 +168,12 @@ namespace casadi {
     return flag;
   }
 
+  double Linsol::det(const double* A, int mem) const {
+    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
+    casadi_assert(m->is_nfact, "Linear system has not been factorized");
+    return (*this)->det(m, A);
+  }
+
   casadi_int Linsol::neig(const DM& A) const {
     if (A.sparsity()!=sparsity()) return neig(project(A, sparsity()));
     casadi_int n = neig(A.ptr());
@@ -180,12 +192,24 @@ namespace casadi {
     return n;
   }
 
+  double Linsol::det(const DM& A) const {
+    if (A.sparsity()!=sparsity()) return det(project(A, sparsity()));
+    scoped_checkout<Linsol> mem(*this);
+    if (sfact(A.ptr(), mem)) casadi_error("Linsol::det: 'sfact' failed");
+    if (nfact(A.ptr(), mem)) casadi_error("Linsol::det: 'nfact' failed");
+    return det(A.ptr(), mem);
+  }
+
+  MX Linsol::det(const MX& A) const {
+    return A->get_det(*this);
+  }
+
   casadi_int Linsol::rank(const double* A, int mem) const {
     return (*this)->rank((*this)->memory(mem), A);
   }
 
   int Linsol::solve(const double* A, double* x, casadi_int nrhs, bool tr, int mem) const {
-    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
+    auto *m = static_cast<LinsolMemory*>((*this)->memory(mem));
     casadi_assert(m->is_nfact, "Linear system has not been factorized");
     if (m->t_total) m->fstats.at("solve").tic();
     int ret = (*this)->solve(m, A, x, nrhs, tr);
@@ -222,7 +246,7 @@ namespace casadi {
 
   void Linsol::serialize(SerializingStream &s) const {
     // TODO(jgillis): I don't get why LinsolInternal:: this is necessary
-    return (*this)->LinsolInternal::serialize(s);
+    (*this)->LinsolInternal::serialize(s);
   }
 
   Linsol Linsol::deserialize(DeserializingStream& s) {

@@ -133,7 +133,7 @@ std::string OptiNode::format_stacktrace(const Dict& stacktrace, casadi_int inden
       description += "\n" + s_indent + contents.substr(it);
     }
   } catch(...) {
-    // pass
+    return description;
   }
   return description;
 }
@@ -534,7 +534,7 @@ std::string OptiNode::return_status() const {
   try {
     mystats = stats();
   } catch (...) {
-    //
+    return "unknown";
   }
   if (mystats.find("return_status")!=mystats.end()) {
     std::stringstream ss;
@@ -549,7 +549,7 @@ bool OptiNode::return_success(bool accept_limit) const {
   try {
     mystats = stats();
   } catch (...) {
-    //
+    return false;
   }
   bool success = false;
   if (mystats.find("success")!=mystats.end()) success = mystats.at("success");

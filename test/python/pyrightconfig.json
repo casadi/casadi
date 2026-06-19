@@ -1,0 +1,5 @@
+{
+  "_comment": "pyright config for the casadi test suite. Most rules stay at their defaults; the ones below fire on legitimate test-code idioms — tests intentionally redefine helpers per-subsection and bind locals inside try/except guards — so we silence them at the project level rather than sprinkling per-line ignores.  reportIncompatibleMethodOverride stays ON: Callback-subclass override mistakes are exactly the class of bug typing should catch.",
+  "reportRedeclaration": "none",
+  "reportPossiblyUnboundVariable": "none"
+}

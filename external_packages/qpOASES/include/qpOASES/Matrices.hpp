@@ -67,35 +67,62 @@
 #endif /* __USE_SINGLE_PRECISION__ */
 
 
+// On WebAssembly the wasm linker enforces strict function signatures and
+// the flang-built BLAS/LAPACK uses the Fortran-77 ABI with hidden length
+// args for CHARACTER parameters.  Add the hidden lengths on EMSCRIPTEN only.
+#ifdef __EMSCRIPTEN__
+#define QPOASES_BLAS_CHARLEN_1 , unsigned long len1
+#define QPOASES_BLAS_CHARLEN_2 , unsigned long len1, unsigned long len2
+#define QPOASES_BLAS_CHARLEN_3 , unsigned long len1, unsigned long len2, unsigned long len3
+#define QPOASES_BLAS_CALL_LEN_1 , 1UL
+#define QPOASES_BLAS_CALL_LEN_2 , 1UL, 1UL
+#define QPOASES_BLAS_CALL_LEN_3 , 1UL, 1UL, 1UL
+#else
+#define QPOASES_BLAS_CHARLEN_1
+#define QPOASES_BLAS_CHARLEN_2
+#define QPOASES_BLAS_CHARLEN_3
+#define QPOASES_BLAS_CALL_LEN_1
+#define QPOASES_BLAS_CALL_LEN_2
+#define QPOASES_BLAS_CALL_LEN_3
+#endif
+
 extern "C"
 {
     /** Performs one of the matrix-matrix operation in double precision. */
     void dgemm_ ( const char*, const char*, const unsigned long*, const unsigned long*, const unsigned long*,
             const double*, const double*, const unsigned long*, const double*, const unsigned long*,
-            const double*, double*, const unsigned long* );
+            const double*, double*, const unsigned long*
+            QPOASES_BLAS_CHARLEN_2);
     /** Performs one of the matrix-matrix operation in single precision. */
     void sgemm_ ( const char*, const char*, const unsigned long*, const unsigned long*, const unsigned long*,
             const float*, const float*, const unsigned long*, const float*, const unsigned long*,
-            const float*, float*, const unsigned long* );
+            const float*, float*, const unsigned long*
+            QPOASES_BLAS_CHARLEN_2);
 
     /** Performs a symmetric rank 1 operation in double precision. */
     void dsyr_ ( const char *, const unsigned long *, const double *, const double *,
-                 const unsigned long *, double *, const unsigned long *);
+                 const unsigned long *, double *, const unsigned long *
+                 QPOASES_BLAS_CHARLEN_1);
     /** Performs a symmetric rank 1 operation in single precision. */
     void ssyr_ ( const char *, const unsigned long *, const float *, const float *,
-                 const unsigned long *, float *, const unsigned long *);
+                 const unsigned long *, float *, const unsigned long *
+                 QPOASES_BLAS_CHARLEN_1);
 
     /** Performs a symmetric rank 2 operation in double precision. */
     void dsyr2_ ( const char *, const unsigned long *, const double *, const double *,
-                  const unsigned long *, const double *, const unsigned long *, double *, const unsigned long *);
+                  const unsigned long *, const double *, const unsigned long *, double *, const unsigned long *
+                  QPOASES_BLAS_CHARLEN_1);
     /** Performs a symmetric rank 2 operation in single precision. */
     void ssyr2_ ( const char *, const unsigned long *, const float *, const float *,
-                  const unsigned long *, const float *, const unsigned long *, float *, const unsigned long *);
+                  const unsigned long *, const float *, const unsigned long *, float *, const unsigned long *
+                  QPOASES_BLAS_CHARLEN_1);
 
     /** Calculates the Cholesky factorization of a real symmetric positive definite matrix in double precision. */
-    void dpotrf_ ( const char *, const unsigned long *, double *, const unsigned long *, long * );
+    void dpotrf_ ( const char *, const unsigned long *, double *, const unsigned long *, long *
+                   QPOASES_BLAS_CHARLEN_1);
     /** Calculates the Cholesky factorization of a real symmetric positive definite matrix in single precision. */
-    void spotrf_ ( const char *, const unsigned long *, float *, const unsigned long *, long * );
+    void spotrf_ ( const char *, const unsigned long *, float *, const unsigned long *, long *
+                   QPOASES_BLAS_CHARLEN_1);
 }
 
 

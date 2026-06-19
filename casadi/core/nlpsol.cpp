@@ -230,9 +230,11 @@ namespace casadi {
       oracle_options = it->second;
     } else {
       // Propagate selected options from Nlpsol to oracle by default
-      for (const char* op : {"verbose", "regularity_check"})
-      if ((it = opts.find(op)) != opts.end()) {
-        oracle_options[op] = it->second;
+      for (const char* op : {"verbose", "regularity_check"}) {
+        it = opts.find(op);
+        if (it != opts.end()) {
+          oracle_options[op] = it->second;
+        }
       }
     }
 
@@ -689,7 +691,7 @@ namespace casadi {
 
   int Nlpsol::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
-    auto m = static_cast<NlpsolMemory*>(mem);
+    auto *m = static_cast<NlpsolMemory*>(mem);
     m->add_stat("callback_fun");
     m->success = false;
     m->d_nlp.prob = nullptr;
@@ -698,8 +700,8 @@ namespace casadi {
   }
 
   void Nlpsol::check_inputs(void* mem) const {
-    auto m = static_cast<NlpsolMemory*>(mem);
-    auto d_nlp = &m->d_nlp;
+    auto *m = static_cast<NlpsolMemory*>(mem);
+    auto *d_nlp = &m->d_nlp;
 
     // Skip check?
     if (!inputs_check_) return;
@@ -789,13 +791,13 @@ namespace casadi {
   }
 
   int Nlpsol::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    auto m = static_cast<NlpsolMemory*>(mem);
+    auto *m = static_cast<NlpsolMemory*>(mem);
 
-    auto d_nlp = &m->d_nlp;
+    auto *d_nlp = &m->d_nlp;
 
     // Reset the solver, prepare for solution
     setup(m, arg, res, iw, w);
-    auto p_nlp = d_nlp->prob;
+    const auto *p_nlp = d_nlp->prob;
 
     // Set initial guess
     casadi_copy(d_nlp->x0, nx_, d_nlp->z);
@@ -881,7 +883,7 @@ namespace casadi {
 
   void Nlpsol::set_work(void* mem, const double**& arg, double**& res,
                         casadi_int*& iw, double*& w) const {
-    auto m = static_cast<NlpsolMemory*>(mem);
+    auto *m = static_cast<NlpsolMemory*>(mem);
 
     // Problem has not been solved at this point
     m->success = false;
@@ -1211,7 +1213,7 @@ namespace casadi {
     // Callback inputs
     std::fill_n(m->arg, fcallback_.n_in(), nullptr);
 
-    auto d_nlp = &m->d_nlp;
+    auto *d_nlp = &m->d_nlp;
 
     m->arg[NLPSOL_X] = d_nlp->z;
     m->arg[NLPSOL_F] = &d_nlp->objective;
@@ -1248,10 +1250,10 @@ namespace casadi {
 
   Dict Nlpsol::get_stats(void* mem) const {
     Dict stats = OracleFunction::get_stats(mem);
-    auto m = static_cast<NlpsolMemory*>(mem);
+    auto *m = static_cast<NlpsolMemory*>(mem);
     casadi_assert(m->d_nlp.prob,
       "No stats available: nlp Solver instance has not yet been called with numerical arguments.");
-    auto d_nlp = &m->d_nlp;
+    auto *d_nlp = &m->d_nlp;
     stats["success"] = m->success;
     stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
     if (d_nlp->prob && d_nlp->prob->detect_bounds.ng) {
@@ -1267,73 +1269,80 @@ namespace casadi {
     OracleFunction::codegen_body_enter(g);
     g.local("d_nlp", "struct casadi_nlpsol_data");
     g.local("p_nlp", "struct casadi_nlpsol_prob");
+    codegen_setup_constants(g, "d_nlp", "p_nlp", "d_oracle");
+    codegen_setup_per_call(g, "d_nlp");
+  }
 
-    g << "d_nlp.oracle = &d_oracle;\n";
-
-    g << "d_nlp.p = arg[" << NLPSOL_P << "];\n";
-    g << "d_nlp.lbx = arg[" << NLPSOL_LBX << "];\n";
-    g << "d_nlp.ubx = arg[" << NLPSOL_UBX << "];\n";
-    g << "d_nlp.lbg = arg[" << NLPSOL_LBG << "];\n";
-    g << "d_nlp.ubg = arg[" << NLPSOL_UBG << "];\n";
-    g << "d_nlp.x0 = arg[" << NLPSOL_X0 << "];\n";
-    g << "d_nlp.lam_x0 = arg[" << NLPSOL_LAM_X0 << "];\n";
-    g << "d_nlp.lam_g0 = arg[" << NLPSOL_LAM_G0 << "];\n";
-    g << "arg += " << NLPSOL_NUM_IN << ";\n";
-
-    g << "d_nlp.x = res[" << NLPSOL_X << "];\n";
-    g << "d_nlp.f = res[" << NLPSOL_F << "];\n";
-    g << "d_nlp.g = res[" << NLPSOL_G << "];\n";
-    g << "d_nlp.lam_x = res[" << NLPSOL_LAM_X << "];\n";
-    g << "d_nlp.lam_g = res[" << NLPSOL_LAM_G << "];\n";
-    g << "d_nlp.lam_p = res[" << NLPSOL_LAM_P << "];\n";
-    g << "res += " << NLPSOL_NUM_OUT << ";\n";
-
-    g << "d_nlp.prob = &p_nlp;\n";
-    g << "p_nlp.nx = " << nx_ << ";\n";
-    g << "p_nlp.ng = " << ng_ << ";\n";
-    g << "p_nlp.np = " << np_ << ";\n";
-    g << "p_nlp.detect_bounds.ng = " << detect_simple_bounds_is_simple_.size() << ";\n";
+  // Per-Function-instance constants: nx/ng/np, detect_bounds descriptors, and
+  // the prob/oracle pointer wiring that doesn't change between calls.
+  // Plugins that own the storage (uno) call this from codegen_init_mem; the
+  // default-name call from codegen_body_enter preserves the historical
+  // emission order for plugins that don't opt in.
+  void Nlpsol::codegen_setup_constants(CodeGenerator& g,
+      const std::string& d_nlp, const std::string& p_nlp,
+      const std::string& d_oracle) const {
+    g << d_nlp << ".oracle = &" << d_oracle << ";\n";
+    g << d_nlp << ".prob = &" << p_nlp << ";\n";
+    g << p_nlp << ".nx = " << nx_ << ";\n";
+    g << p_nlp << ".ng = " << ng_ << ";\n";
+    g << p_nlp << ".np = " << np_ << ";\n";
+    g << p_nlp << ".detect_bounds.ng = " << detect_simple_bounds_is_simple_.size() << ";\n";
     if (detect_simple_bounds_is_simple_.size()) {
+      g << p_nlp << ".detect_bounds.sz_arg = " << detect_simple_bounds_parts_.sz_arg() << ";\n";
+      g << p_nlp << ".detect_bounds.sz_res = " << detect_simple_bounds_parts_.sz_res() << ";\n";
+      g << p_nlp << ".detect_bounds.sz_iw = " << detect_simple_bounds_parts_.sz_iw() << ";\n";
+      g << p_nlp << ".detect_bounds.sz_w = " << detect_simple_bounds_parts_.sz_w() << ";\n";
 
-
-      g << "p_nlp.detect_bounds.sz_arg = " << detect_simple_bounds_parts_.sz_arg() << ";\n";
-      g << "p_nlp.detect_bounds.sz_res = " << detect_simple_bounds_parts_.sz_res() << ";\n";
-      g << "p_nlp.detect_bounds.sz_iw = " << detect_simple_bounds_parts_.sz_iw() << ";\n";
-      g << "p_nlp.detect_bounds.sz_w = " << detect_simple_bounds_parts_.sz_w() << ";\n";
-
-      g << "p_nlp.detect_bounds.nb = " << detect_simple_bounds_target_x_.size() << ";\n";
-      g << "p_nlp.detect_bounds.target_x = "
+      g << p_nlp << ".detect_bounds.nb = " << detect_simple_bounds_target_x_.size() << ";\n";
+      g << p_nlp << ".detect_bounds.target_x = "
         << g.constant(detect_simple_bounds_target_x_) << ";\n";
-      g << "p_nlp.detect_bounds.target_g = "
+      g << p_nlp << ".detect_bounds.target_g = "
         << g.constant(detect_simple_bounds_target_g_) << ";\n";
-      g << "p_nlp.detect_bounds.is_simple = "
+      g << p_nlp << ".detect_bounds.is_simple = "
         << g.constant(detect_simple_bounds_is_simple_) << ";\n";
       std::string w =
         g.shorthand(g.wrapper(detect_simple_bounds_parts_, "detect_simple_bounds_wrapper"));
-      g << "p_nlp.detect_bounds.callback = " << w << ";\n";
-      g << "p_nlp.detect_bounds.callback_data = 0;\n";
+      g << p_nlp << ".detect_bounds.callback = " << w << ";\n";
+      g << p_nlp << ".detect_bounds.callback_data = 0;\n";
     }
-    g << "casadi_nlpsol_init(&d_nlp, &arg, &res, &iw, &w);\n";
+  }
 
-    // Set initial guess
-    g.copy_default("d_nlp.x0", nx_, "d_nlp.z", "0", false);
+  // Per-call wiring: arg/res slot bindings, casadi_nlpsol_init's workspace
+  // claim, and the copy_default's that populate z/lbz/ubz/lam from the
+  // user inputs. Always runs every call.
+  void Nlpsol::codegen_setup_per_call(CodeGenerator& g, const std::string& d_nlp) const {
+    g << d_nlp << ".p = arg[" << NLPSOL_P << "];\n";
+    g << d_nlp << ".lbx = arg[" << NLPSOL_LBX << "];\n";
+    g << d_nlp << ".ubx = arg[" << NLPSOL_UBX << "];\n";
+    g << d_nlp << ".lbg = arg[" << NLPSOL_LBG << "];\n";
+    g << d_nlp << ".ubg = arg[" << NLPSOL_UBG << "];\n";
+    g << d_nlp << ".x0 = arg[" << NLPSOL_X0 << "];\n";
+    g << d_nlp << ".lam_x0 = arg[" << NLPSOL_LAM_X0 << "];\n";
+    g << d_nlp << ".lam_g0 = arg[" << NLPSOL_LAM_G0 << "];\n";
+    g << "arg += " << NLPSOL_NUM_IN << ";\n";
 
-    // Read simple bounds and multiplier guesses
-    g.copy_default("d_nlp.lbx", nx_, "d_nlp.lbz", "-casadi_inf", false);
-    g.copy_default("d_nlp.ubx", nx_, "d_nlp.ubz", "casadi_inf", false);
-    g.copy_default("d_nlp.lam_x0", nx_, "d_nlp.lam", "0", false);
+    g << d_nlp << ".x = res[" << NLPSOL_X << "];\n";
+    g << d_nlp << ".f = res[" << NLPSOL_F << "];\n";
+    g << d_nlp << ".g = res[" << NLPSOL_G << "];\n";
+    g << d_nlp << ".lam_x = res[" << NLPSOL_LAM_X << "];\n";
+    g << d_nlp << ".lam_g = res[" << NLPSOL_LAM_G << "];\n";
+    g << d_nlp << ".lam_p = res[" << NLPSOL_LAM_P << "];\n";
+    g << "res += " << NLPSOL_NUM_OUT << ";\n";
+
+    g << "casadi_nlpsol_init(&" << d_nlp << ", &arg, &res, &iw, &w);\n";
+
+    g.copy_default(d_nlp + ".x0",     nx_, d_nlp + ".z",   "0",           false);
+    g.copy_default(d_nlp + ".lbx",    nx_, d_nlp + ".lbz", "-casadi_inf", false);
+    g.copy_default(d_nlp + ".ubx",    nx_, d_nlp + ".ubz", "casadi_inf",  false);
+    g.copy_default(d_nlp + ".lam_x0", nx_, d_nlp + ".lam", "0",           false);
 
     if (detect_simple_bounds_is_simple_.empty()) {
-      // Read constraint bounds and multiplier guesses
-      g.copy_default("d_nlp.lbg", ng_, "d_nlp.lbz+"+str(nx_),
-        "-casadi_inf", false);
-      g.copy_default("d_nlp.ubg", ng_, "d_nlp.ubz+"+str(nx_),
-        "casadi_inf", false);
-      g.copy_default("d_nlp.lam_g0", ng_, "d_nlp.lam+"+str(nx_), "0", false);
+      g.copy_default(d_nlp + ".lbg",    ng_, d_nlp + ".lbz+" + str(nx_), "-casadi_inf", false);
+      g.copy_default(d_nlp + ".ubg",    ng_, d_nlp + ".ubz+" + str(nx_), "casadi_inf",  false);
+      g.copy_default(d_nlp + ".lam_g0", ng_, d_nlp + ".lam+" + str(nx_), "0",           false);
     } else {
-      g << "if (casadi_nlpsol_detect_bounds_before(&d_nlp)) return 1;\n";
+      g << "if (casadi_nlpsol_detect_bounds_before(&" << d_nlp << ")) return 1;\n";
     }
-
   }
 
   void Nlpsol::codegen_declarations(CodeGenerator& g) const {
@@ -1357,40 +1366,44 @@ namespace casadi {
   }
 
   void Nlpsol::codegen_body_exit(CodeGenerator& g) const {
+    codegen_post_solve(g, "d_nlp");
+    OracleFunction::codegen_body_exit(g);
+  }
+
+  void Nlpsol::codegen_post_solve(CodeGenerator& g, const std::string& d_nlp) const {
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
       g.local("one", "const casadi_real");
       g.init_local("one", "1");
-      g << "d->arg[0] = d_nlp.z;\n";
-      g << "d->arg[1] = d_nlp.p;\n";
+      g << "d->arg[0] = " << d_nlp << ".z;\n";
+      g << "d->arg[1] = " << d_nlp << ".p;\n";
       g << "d->arg[2] = &one;\n";
-      g << "d->arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
-      g << "d->res[0] = " << (calc_f_ ? "&d_nlp.objective" : "0") << ";\n";
-      g << "d->res[1] = " << (calc_g_ ? "d_nlp.z+" + str(nx_) : "0") << ";\n";
-      g << "d->res[2] = " << (calc_lam_x_ ? "d_nlp.lam+" + str(nx_) : "0") << ";\n";
-      g << "d->res[3] = " << (calc_lam_p_ ? "d_nlp.lam_p" : "0") << ";\n";
+      g << "d->arg[3] = " << d_nlp << ".lam+" << str(nx_) << ";\n";
+      g << "d->res[0] = " << (calc_f_ ? "&" + d_nlp + ".objective" : "0") << ";\n";
+      g << "d->res[1] = " << (calc_g_ ? d_nlp + ".z+" + str(nx_) : "0") << ";\n";
+      g << "d->res[2] = " << (calc_lam_x_ ? d_nlp + ".lam+" + str(nx_) : "0") << ";\n";
+      g << "d->res[3] = " << (calc_lam_p_ ? d_nlp + ".lam_p" : "0") << ";\n";
       std::string nlp_grad = g(get_function("nlp_grad"), "d->arg", "d->res", "d->iw", "d->w");
-      g << "if (" + nlp_grad + ") return 1;\n";
-      if (calc_lam_x_) g << g.scal(nx_, "-1.0", "d_nlp.lam") << "\n";
-      if (calc_lam_p_) g << g.scal(np_, "-1.0", "d_nlp.lam_p") << "\n";
+      g << "if (" << nlp_grad << ") return 1;\n";
+      if (calc_lam_x_) g << g.scal(nx_, "-1.0", d_nlp + ".lam") << "\n";
+      if (calc_lam_p_) g << g.scal(np_, "-1.0", d_nlp + ".lam_p") << "\n";
     }
     if (bound_consistency_) {
-      g << g.bound_consistency(nx_+ng_, "d_nlp.z", "d_nlp.lam", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+      g << g.bound_consistency(nx_+ng_, d_nlp + ".z", d_nlp + ".lam",
+          d_nlp + ".lbz", d_nlp + ".ubz") << ";\n";
     }
 
-    g << g.copy("d_nlp.z", nx_, "d_nlp.x") << "\n";
+    g << g.copy(d_nlp + ".z", nx_, d_nlp + ".x") << "\n";
 
     if (detect_simple_bounds_is_simple_.empty()) {
-      g << g.copy("d_nlp.z + " + str(nx_), ng_, "d_nlp.g") << "\n";
-      g << g.copy("d_nlp.lam", nx_, "d_nlp.lam_x") << "\n";
-      g << g.copy("d_nlp.lam + " + str(nx_), ng_, "d_nlp.lam_g") << "\n";
+      g << g.copy(d_nlp + ".z + " + str(nx_), ng_, d_nlp + ".g") << "\n";
+      g << g.copy(d_nlp + ".lam", nx_, d_nlp + ".lam_x") << "\n";
+      g << g.copy(d_nlp + ".lam + " + str(nx_), ng_, d_nlp + ".lam_g") << "\n";
     } else {
-      g << "if (casadi_nlpsol_detect_bounds_after(&d_nlp)) return 1;\n";
+      g << "if (casadi_nlpsol_detect_bounds_after(&" << d_nlp << ")) return 1;\n";
     }
 
-    g.copy_check("&d_nlp.objective", 1, "d_nlp.f", false, true);
-    g.copy_check("d_nlp.lam_p", np_, "d_nlp.lam_p", false, true);
-
-    OracleFunction::codegen_body_exit(g);
+    g.copy_check("&" + d_nlp + ".objective", 1, d_nlp + ".f", false, true);
+    g.copy_check(d_nlp + ".lam_p", np_, d_nlp + ".lam_p", false, true);
   }
 
   void Nlpsol::serialize_body(SerializingStream &s) const {

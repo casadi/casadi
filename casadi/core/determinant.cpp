@@ -5,6 +5,7 @@
  *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2018 Robert Bosch GmbH
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,10 +25,11 @@
 
 
 #include "determinant.hpp"
+#include "linsol_internal.hpp"
 
 namespace casadi {
 
-  Determinant::Determinant(const MX& x) {
+  Determinant::Determinant(const MX& x, const Linsol& linsol) : linsol_(linsol) {
     casadi_assert(x.is_square(), "Dimension mismatch. Matrix must be square, "
       "but got " + x.dim() + " instead.");
     set_dep(x);
@@ -38,9 +40,52 @@ namespace casadi {
     return "det(" + arg.at(0) + ")";
   }
 
+  int Determinant::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    /**
+     * Consideration:
+     *  - Note that a typical implementation of the partial derivative of a determinant
+     *    involves computing both the determinant and the inverse of a matrix. There is
+     *    efficiency to be gained through reusing the matrix factorization for both
+     *    operations.
+     * 
+     */
+
+    scoped_checkout<Linsol> mem(linsol_);
+
+    // Peform LU decomposition
+    if (linsol_.sfact(arg[0], mem)) return 1;
+    if (linsol_.nfact(arg[0], mem)) return 1;
+
+    // Compute determinant
+    res[0][0] = linsol_.det(arg[0], mem);
+
+    return 0;
+  }
+
+  int Determinant::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    // Symbolic determinant via the sparse-QR plugin (cheap O(n^3), unlike cofactor)
+    SX A = SX::zeros(dep(0).sparsity());
+    std::copy(arg[0], arg[0]+dep(0).nnz(), A.ptr());
+    *res[0] = det(A, "symbolicqr").scalar();
+    return 0;
+  }
+
+  size_t Determinant::codegen_sz_w() const {
+    return linsol_->sz_w_fact();
+  }
+
+  void Determinant::generate(CodeGenerator& g,
+                             const std::vector<casadi_int>& arg,
+                             const std::vector<casadi_int>& res,
+                             const std::vector<bool>& arg_is_ref,
+                             std::vector<bool>& res_is_ref) const {
+    linsol_->generate_det(g, g.work(arg[0], dep(0).nnz(), arg_is_ref[0]),
+                          g.workel(res[0]));
+  }
+
   void Determinant::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res,
       const std::vector<bool>& unique) const {
-    res[0] = det(arg[0]);
+    res[0] = linsol_.det(arg[0]);
   }
 
   void Determinant::ad_forward(const std::vector<std::vector<MX> >& fseed,
@@ -61,6 +106,15 @@ namespace casadi {
     for (casadi_int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0]*det_X * trans_inv_X;
     }
+  }
+
+  void Determinant::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("Determinant::linsol", linsol_);
+  }
+
+  Determinant::Determinant(DeserializingStream& s) : MXNode(s) {
+    s.unpack("Determinant::linsol", linsol_);
   }
 
 } // namespace casadi

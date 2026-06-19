@@ -19,6 +19,7 @@
 
 // C-REPLACE "std::numeric_limits<T1>::quiet_NaN()" "casadi_nan"
 // C-REPLACE "fmax" "casadi_fmax"
+// C-REPLACE "fabs" "casadi_fabs"
 // C-REPLACE "isfinite" "casadi_isfinite"
 // C-REPLACE "static_cast<T1*>(0)" "0"
 

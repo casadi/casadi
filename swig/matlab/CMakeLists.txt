@@ -48,6 +48,10 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_matlab2cpp.m
   DESTINATION ${MATLAB_PREFIX})
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/OptiCallbackHelper.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/vcat.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/hcat.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/vvcat.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/dcat.m
   DESTINATION ${MATLAB_PREFIX}/+casadi)
 
 # MATLAB specific stuff
@@ -77,8 +81,13 @@ if (WITH_OCTAVE AND NOT SWIG_EXPORT)
   add_custom_target(octave DEPENDS casadiOCTAVE)
 
   # Find Octave
-  if (NOT OCTAVE_LIBRARIES)
-  find_package(OCTAVE REQUIRED)
+  if (OCTAVE_LIBRARIES)
+    add_library(octave::octave SHARED IMPORTED)
+    set_target_properties(octave::octave PROPERTIES
+      IMPORTED_LOCATION "${OCTAVE_LIBRARIES}"
+      INTERFACE_INCLUDE_DIRECTORIES "${OCTAVE_INCLUDE_DIRS}")
+  else()
+    find_package(OCTAVE REQUIRED)
   endif()
 
   # Compile MEX file

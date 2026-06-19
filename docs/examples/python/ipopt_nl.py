@@ -16,7 +16,7 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
 
 """
 This example demonstrates how NL-files, which can be generated
@@ -29,7 +29,7 @@ Joel Andersson
 """
 
 # Create an NLP instance
-nl = NlpBuilder()
+nl = ca.NlpBuilder()
 
 # Parse an NL-file
 nl.import_nl("../nl_files/hs107.nl",{"verbose":False})
@@ -41,7 +41,7 @@ opts["expand"] = True
 # opts["ipopt"] = dict(max_iter=10, linear_solver="ma57", hessian_approximation="limited-memory")
 
 # Create an NLP solver
-nlpsol = nlpsol("nlpsol", "ipopt", nl, opts)
+nlpsol = ca.nlpsol("nlpsol", "ipopt", nl, opts)
 
 # Solve NLP
 res = nlpsol(lbx=nl.x_lb,

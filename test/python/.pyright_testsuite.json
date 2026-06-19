@@ -1,0 +1,8 @@
+{
+  "include": ["."],
+  "exclude": ["pyright_stubs.py"],
+  "typeCheckingMode": "basic",
+  "pythonVersion": "3.11",
+  "reportMissingImports": false,
+  "reportMissingTypeStubs": false
+}

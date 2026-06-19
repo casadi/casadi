@@ -18,7 +18,7 @@
 #
 from pylab import *
 from numpy import *
-from casadi import *
+import casadi as ca
 from casadi.tools import *
 import scipy.linalg
 import numpy as np
@@ -39,14 +39,14 @@ N  = 21 # number of control intervals
 te = 10 # end time [s]
 
 # The system equations:   x' = A.x + B.u
-A = DM([[0.4,0.1,-2],[0,-0.3,4],[1,0,0]])
-B = DM([[1,1],[0,1],[1,0]])
+A = ca.DM([[0.4,0.1,-2],[0,-0.3,4],[1,0,0]])
+B = ca.DM([[1,1],[0,1],[1,0]])
 
 # Inspect the open-loop system
 [D,V] = linalg.eig(A)
 print('Open-loop eigenvalues: ', D)
 
-tn = linspace(0,te,N)
+tn = ca.linspace(0,te,N)
 
 # Check if the system is controllable
 # -----------------------------------
@@ -55,9 +55,9 @@ R = []
 p = B
 for i in range(ns):
   R.append(p)
-  p = mtimes([A,p])
+  p = ca.mtimes([A,p])
 
-R = horzcat(*R)
+R = ca.horzcat(*R)
 
 # R must be of full rank
 _, s, _ = linalg.svd(R)
@@ -68,16 +68,16 @@ assert rank==ns
 # Simulation of the open-loop system
 # -----------------------------------
 
-y  = SX.sym('y',ns)
-u  = SX.sym('u',nu)
+y  = ca.SX.sym('y',ns)
+u  = ca.SX.sym('u',nu)
 
-x0 = DM([1,0,0])
+x0 = ca.DM([1,0,0])
 # no control
-u_ = repmat(DM([[ -1, 1 ],[1,-1]]),1,int((N-1)/2))
+u_ = ca.repmat(ca.DM([[ -1, 1 ],[1,-1]]),1,int((N-1)/2))
 
 print(u_)
 
-p = SX.sym('p')
+p = ca.SX.sym('p')
 
 # tn = np.linspace(0,te,N)
 # cdae = SX.fun('cdae', controldaeIn(x=y,u=u),[mtimes(A,y)+mtimes(B,u)])

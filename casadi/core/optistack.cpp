@@ -446,15 +446,19 @@ Function Opti::to_function(const std::string& name,
   std::vector<MX> ex_in(name_in.size()), ex_out(name_out.size());
   for (auto&& i : dict) {
     std::vector<std::string>::const_iterator it;
-    if ((it=find(name_in.begin(), name_in.end(), i.first))!=name_in.end()) {
+    it=find(name_in.begin(), name_in.end(), i.first);
+    if (it!=name_in.end()) {
       // Input expression
       ex_in[it-name_in.begin()] = i.second;
-    } else if ((it=find(name_out.begin(), name_out.end(), i.first))!=name_out.end()) {
-      // Output expression
-      ex_out[it-name_out.begin()] = i.second;
     } else {
+      it=find(name_out.begin(), name_out.end(), i.first);
+      if (it!=name_out.end()) {
+      // Output expression
+        ex_out[it-name_out.begin()] = i.second;
+      } else {
       // Neither
-      casadi_error("Unknown dictionary entry: '" + i.first + "'");
+        casadi_error("Unknown dictionary entry: '" + i.first + "'");
+      }
     }
   }
   return to_function(name, ex_in, ex_out, name_in, name_out, opts);
@@ -571,7 +575,7 @@ void OptiAdvanced::set_meta(const MX& m, const MetaVar& meta) {
 
 void OptiAdvanced::set_meta_con(const MX& m, const MetaCon& meta) {
   try {
-    return (*this)->set_meta_con(m, meta);
+    (*this)->set_meta_con(m, meta);
   } catch(std::exception& e) {
     THROW_ERROR("set_meta_con", e.what());
   }
@@ -698,7 +702,7 @@ DMDict OptiAdvanced::arg() const {
 
 void OptiAdvanced::res(const DMDict& res) {
   try {
-    return (*this)->res(res);
+    (*this)->res(res);
   } catch(std::exception& e) {
     THROW_ERROR("res", e.what());
   }
@@ -733,7 +737,7 @@ OptiAdvanced OptiAdvanced::baked_copy() const {
 
 void OptiAdvanced::assert_empty() const {
   try {
-    return (*this)->assert_empty();
+    (*this)->assert_empty();
   } catch(std::exception& e) {
     THROW_ERROR("assert_empty", e.what());
   }

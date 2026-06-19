@@ -27,6 +27,7 @@
 
 #include "sx_function.hpp"
 #include "output_sx.hpp"
+#include "linsol_internal.hpp"
 #include <array>
 
 namespace casadi {
@@ -443,6 +444,23 @@ namespace casadi {
   }
 
   template<>
+  bool CASADI_EXPORT SX::simplify_combine_terms(std::vector<SX>& arg,
+                                   std::vector<SX>& res,
+                                   const Dict& opts) {
+    for (SX& r : res) {
+      for (casadi_int el=0; el<r.nnz(); ++el) {
+        // Start by expanding the node to a weighted sum
+        SX terms, weights;
+        expand(r.nz(el), weights, terms);
+
+        // Make a scalar product to get the simplified expression
+        r.nz(el) = mtimes(terms.T(), weights);
+      }
+    }
+    return true;
+  }
+
+  template<>
   SX CASADI_EXPORT SX::simplify(const SX& x) {
     SX r = x;
     for (casadi_int el=0; el<r.nnz(); ++el) {
@@ -454,6 +472,38 @@ namespace casadi {
       r.nz(el) = mtimes(terms.T(), weights);
     }
     return r;
+  }
+
+  template<>
+  SX CASADI_EXPORT SX::transform(const SX& x, const Dict& opts) {
+    return transform(std::vector<SX>{x}, opts).at(0);
+  }
+
+  template<>
+  SX CASADI_EXPORT SX::transform(const SX& x,
+      const std::vector<std::vector<GenericType> >& passes, const Dict& opts) {
+    return transform(std::vector<SX>{x}, passes, opts).at(0);
+  }
+
+  template<>
+  std::vector<SX> CASADI_EXPORT SX::transform(const std::vector<SX>& x, const Dict& opts) {
+    // Route through Function::transform; inputs are the free variables across all of x
+    std::vector<SX> arg = symvar(veccat(x));
+    Function f("transform", arg, x,
+               {{"allow_free", true}, {"allow_duplicate_io_names", true}});
+    f = f.transform(opts);
+    return f(arg);
+  }
+
+  template<>
+  std::vector<SX> CASADI_EXPORT SX::transform(const std::vector<SX>& x,
+      const std::vector<std::vector<GenericType> >& passes, const Dict& opts) {
+    // Route through Function::transform; inputs are the free variables across all of x
+    std::vector<SX> arg = symvar(veccat(x));
+    Function f("transform", arg, x,
+               {{"allow_free", true}, {"allow_duplicate_io_names", true}});
+    f = f.transform(passes, opts);
+    return f(arg);
   }
 
   template<>
@@ -1417,7 +1467,7 @@ namespace casadi {
                          const std::string& v_prefix,
                          const std::string& v_suffix) {
      // Call new, more generic function
-     return extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
+     extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
        {"prefix", v_prefix}, {"suffix", v_suffix}});
   }
 
@@ -1531,6 +1581,15 @@ namespace casadi {
   }
 
   template<>
+  SX CASADI_EXPORT SX::det(const SX& A, const std::string& lsolver, const Dict& opts) {
+    auto& plugin = LinsolInternal::getPlugin(lsolver);
+    casadi_assert(plugin.exposed.det,
+      "Linsol plugin '" + lsolver + "' does not provide a symbolic determinant. "
+      "Try the 'symbolicqr' plugin.");
+    return plugin.exposed.det(A, opts);
+  }
+
+  template<>
   SX CASADI_EXPORT SX::eig_symbolic(const SX& m) {
     casadi_assert(m.size1()==m.size2(), "eig(): supplied matrix must be square");
 
@@ -1622,7 +1681,6 @@ namespace casadi {
         rwork[a.i1]++;
         break;
       case OP_CONST:
-        break;
       case OP_PARAMETER:
         break;
       case OP_CALL:

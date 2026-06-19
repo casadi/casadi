@@ -144,7 +144,7 @@ namespace casadi {
       } if (op.first=="max_iter") {
         max_iter_ = op.second;
         casadi_assert(max_iter_>=0, "Invalid iteration limit " + str(max_iter_));
-      } if (op.first=="time_limit") {
+      } if (op.first=="max_wall_time") {
         max_wall_time_ = op.second;
         casadi_assert(max_wall_time_>=0, "Invalid time limit " + str(max_wall_time_));
       }
@@ -275,6 +275,9 @@ namespace casadi {
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
+    // A failed (re)setup can leave the solver null while stats are flagged available
+    if (!m->internal.solver) return stats;
+
     SLEQP_STATUS status = sleqp_solver_status(m->internal.solver);
 
     stats["return_status"] = status_string(status);
@@ -287,7 +290,7 @@ namespace casadi {
   {
 
     // Read options
-    for (auto&& op : opts_) {
+    for (auto&& op : opts) {
       bool found = false;
       for (int i = 0; i < SLEQP_NUM_INT_SETTINGS; ++i) {
         SLEQP_SETTINGS_INT ii = static_cast<SLEQP_SETTINGS_INT>(i);
@@ -342,7 +345,8 @@ namespace casadi {
 
     check_inputs(m);
 
-    // clear_mem(m);
+    // Release any SLEQP objects from a previous solve (set_work runs each call)
+    clear_mem_at(m);
 
     casadi_nlpsol_data<double>& d_nlp = m->d_nlp;
 
@@ -608,6 +612,10 @@ namespace casadi {
     s.unpack("SLEQPInterface::opts", opts_);
 
     SLEQP_CALL_EXC(sleqp_settings_create(&settings_));
+    // Mirror init(): exact Hessian default before applying user options
+    SLEQP_CALL_EXC(sleqp_settings_set_enum_value(settings_,
+                                                 SLEQP_SETTINGS_ENUM_HESS_EVAL,
+                                                 SLEQP_HESS_EVAL_EXACT));
     update_settings(opts_);
   }
 
