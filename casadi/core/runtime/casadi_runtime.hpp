@@ -144,16 +144,16 @@ namespace casadi {
   extern CASADI_EXPORT casadi_dasum_t casadi_dasum_hook;
   extern CASADI_EXPORT casadi_dcopy_t casadi_dcopy_hook;
   inline void casadi_axpy(casadi_int n, double alpha, const double* x, double* y) {
-    if (casadi_daxpy_hook) casadi_daxpy_hook(n, alpha, x, y);
-    else casadi_axpy<double>(n, alpha, x, y);
+    if (casadi_daxpy_hook) { casadi_daxpy_hook(n, alpha, x, y); return; }
+    casadi_axpy<double>(n, alpha, x, y);
   }
   inline double casadi_dot(casadi_int n, const double* x, const double* y) {
     if (casadi_ddot_hook) return casadi_ddot_hook(n, x, y);
     return casadi_dot<double>(n, x, y);
   }
   inline void casadi_scal(casadi_int n, double alpha, double* x) {
-    if (casadi_dscal_hook) casadi_dscal_hook(n, alpha, x);
-    else casadi_scal<double>(n, alpha, x);
+    if (casadi_dscal_hook) { casadi_dscal_hook(n, alpha, x); return; }
+    casadi_scal<double>(n, alpha, x);
   }
   inline double casadi_norm_2(casadi_int n, const double* x) {
     if (casadi_dnrm2_hook) return casadi_dnrm2_hook(n, x);
@@ -164,8 +164,8 @@ namespace casadi {
     return casadi_norm_1<double>(n, x);
   }
   inline void casadi_copy(const double* x, casadi_int n, double* y) {
-    if (casadi_dcopy_hook) casadi_dcopy_hook(x, n, y);
-    else casadi_copy<double>(x, n, y);
+    if (casadi_dcopy_hook) { casadi_dcopy_hook(x, n, y); return; }
+    casadi_copy<double>(x, n, y);
   }
 #endif // !SWIG && CASADI_L1_BLAS
 
