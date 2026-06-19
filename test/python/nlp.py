@@ -1890,7 +1890,7 @@ class NLPtests(casadiTestCase):
     H = ca.Function("H",[x],[ca.hessian(f,x)[0]])
     H = H(0)
     # with an indefinite Hessian at x0
-    self.assertTrue(np.any(np.linalg.eig(H)[0]<0))
+    self.assertTrue(np.any(np.linalg.eigh(H)[0]<0))
 
     # Solve with Gauss-Newton -> 6 iterations
     GN = ca.Function('GN',[x,p,lam_f,lam_g],[lam_f*(J.T @ J)])
@@ -1932,7 +1932,7 @@ class NLPtests(casadiTestCase):
     H = ca.Function("H",[x],[ca.hessian(f,x)[0]])
     H = H(0)
     # with an indefinite Hessian at x0
-    self.assertTrue(np.any(np.linalg.eig(H)[0]<0))
+    self.assertTrue(np.any(np.linalg.eigh(H)[0]<0))
 
     # Solve with Gauss-Newton -> 6 iterations
     GN = ca.Function('GN',[x,p,lam_f,lam_g],[lam_f*ca.triu(J.T @ J)])
@@ -1961,13 +1961,13 @@ class NLPtests(casadiTestCase):
     eig = np.linalg.eig
 
     def reflect(A,eps):
-      [d,V] = np.linalg.eig(A)  
+      [d,V] = np.linalg.eigh(A)  
       d = abs(d)
       D = ca.diag(d)
       return np.dot(V,np.dot(D,V.T))
 
     def clip(A,eps):
-      [d,V] = np.linalg.eig(A)
+      [d,V] = np.linalg.eigh(A)
       d[d<eps] = eps
       D = ca.diag(d)  # pyright: ignore[reportCallIssue,reportArgumentType]
       return np.dot(V,np.dot(D,V.T))
