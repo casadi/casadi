@@ -27,6 +27,9 @@
 #define CASADI_CASADI_RUNTIME_HPP
 
 #include "../calculus.hpp"
+#ifndef SWIG
+#include <casadi/core/casadi_export.h>
+#endif // SWIG
 
 #define CASADI_PREFIX(ID) casadi_##ID
 #define CASADI_CAST(TYPE, ARG) static_cast<TYPE>(ARG)
@@ -126,6 +129,45 @@ namespace casadi {
   /// NORM_2: ||x||_2 -> return
   template<typename T1>
   T1 casadi_norm_2(casadi_int n, const T1* x);
+
+#if !defined(SWIG) && defined(CASADI_L1_BLAS)
+  typedef void   (*casadi_daxpy_t)(casadi_int, double, const double*, double*);
+  typedef double (*casadi_ddot_t )(casadi_int, const double*, const double*);
+  typedef void   (*casadi_dscal_t)(casadi_int, double, double*);
+  typedef double (*casadi_dnrm2_t)(casadi_int, const double*);
+  typedef double (*casadi_dasum_t)(casadi_int, const double*);
+  typedef void   (*casadi_dcopy_t)(const double*, casadi_int, double*);
+  extern CASADI_EXPORT casadi_daxpy_t casadi_daxpy_hook;
+  extern CASADI_EXPORT casadi_ddot_t  casadi_ddot_hook;
+  extern CASADI_EXPORT casadi_dscal_t casadi_dscal_hook;
+  extern CASADI_EXPORT casadi_dnrm2_t casadi_dnrm2_hook;
+  extern CASADI_EXPORT casadi_dasum_t casadi_dasum_hook;
+  extern CASADI_EXPORT casadi_dcopy_t casadi_dcopy_hook;
+  inline void casadi_axpy(casadi_int n, double alpha, const double* x, double* y) {
+    if (casadi_daxpy_hook) casadi_daxpy_hook(n, alpha, x, y);
+    else casadi_axpy<double>(n, alpha, x, y);
+  }
+  inline double casadi_dot(casadi_int n, const double* x, const double* y) {
+    if (casadi_ddot_hook) return casadi_ddot_hook(n, x, y);
+    return casadi_dot<double>(n, x, y);
+  }
+  inline void casadi_scal(casadi_int n, double alpha, double* x) {
+    if (casadi_dscal_hook) casadi_dscal_hook(n, alpha, x);
+    else casadi_scal<double>(n, alpha, x);
+  }
+  inline double casadi_norm_2(casadi_int n, const double* x) {
+    if (casadi_dnrm2_hook) return casadi_dnrm2_hook(n, x);
+    return casadi_norm_2<double>(n, x);
+  }
+  inline double casadi_norm_1(casadi_int n, const double* x) {
+    if (casadi_dasum_hook) return casadi_dasum_hook(n, x);
+    return casadi_norm_1<double>(n, x);
+  }
+  inline void casadi_copy(const double* x, casadi_int n, double* y) {
+    if (casadi_dcopy_hook) casadi_dcopy_hook(x, n, y);
+    else casadi_copy<double>(x, n, y);
+  }
+#endif // !SWIG && CASADI_L1_BLAS
 
   /** Inf-norm of a vector *
       Returns the largest element in absolute value

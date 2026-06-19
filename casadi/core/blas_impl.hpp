@@ -30,8 +30,6 @@
 #include "plugin_interface.hpp"
 #include "runtime/casadi_runtime.hpp"
 
-#include <cstring>
-
 namespace casadi { class CodeGenerator; }
 
 
@@ -80,6 +78,7 @@ namespace casadi {
     typedef void   (* Dscal)(casadi_int n, double alpha, double* x);
     typedef double (* Dnrm2)(casadi_int n, const double* x);
     typedef double (* Dasum)(casadi_int n, const double* x);
+    typedef void   (* Dcopy)(const double* x, casadi_int n, double* y);
 
     /* \brief Codegen counterpart of an L1 op: emit the auxiliary block */
     typedef void (* CodegenL1Aux)(CodeGenerator& g,
@@ -99,6 +98,7 @@ namespace casadi {
       Dscal dscal;
       Dnrm2 dnrm2;
       Dasum dasum;
+      Dcopy dcopy;
       CodegenL1Aux codegen_axpy_aux;
       CodegenL1Aux codegen_dot_aux;
       CodegenL1Aux codegen_scal_aux;
@@ -170,40 +170,6 @@ namespace casadi {
                                const std::string& B, casadi_int n,
                                const std::string& C);
 
-    /* \brief y <- x (zero-fill if x==NULL) */
-    template<typename T>
-    static void copy(const T* x, casadi_int n, T* y) { casadi_copy(x, n, y); }
-
-    /* \brief y += alpha*x */
-    template<typename T>
-    static void axpy(casadi_int n, T alpha, const T* x, T* y) {
-      casadi_axpy(n, alpha, x, y);
-    }
-
-    /* \brief dot(x, y) */
-    template<typename T>
-    static T dot(casadi_int n, const T* x, const T* y) {
-      return casadi_dot(n, x, y);
-    }
-
-    /* \brief x *= alpha */
-    template<typename T>
-    static void scal(casadi_int n, T alpha, T* x) {
-      casadi_scal(n, alpha, x);
-    }
-
-    /* \brief 2-norm of x */
-    template<typename T>
-    static T norm_2(casadi_int n, const T* x) {
-      return casadi_norm_2(n, x);
-    }
-
-    /* \brief 1-norm of x */
-    template<typename T>
-    static T norm_1(casadi_int n, const T* x) {
-      return casadi_norm_1(n, x);
-    }
-
     /* \brief Emit aux block for casadi_copy (memcpy/memset; never plugin-dispatched) */
     static void codegen_copy_aux(CodeGenerator& g,
                                  const std::vector<std::string>& inst);
@@ -223,57 +189,6 @@ namespace casadi {
     static bool codegen_norm_1_aux(CodeGenerator& g,
                                    const std::vector<std::string>& inst);
   };
-
-  template<>
-  inline void Blas::copy<double>(const double* x, casadi_int n, double* y) {
-    if (!y) return;
-    if (x) std::memcpy(y, x, n * sizeof(double));
-    else   std::memset(y, 0, n * sizeof(double));
-  }
-
-  template<>
-  inline void Blas::axpy<double>(casadi_int n, double alpha,
-                                 const double* x, double* y) {
-    if (!default_) return casadi_axpy(n, alpha, x, y);
-    if (!x || !y) return;
-    Daxpy fn = dispatch_[default_]->exposed.daxpy;
-    if (fn) return fn(n, alpha, x, y);
-    return casadi_axpy(n, alpha, x, y);
-  }
-
-  template<>
-  inline double Blas::dot<double>(casadi_int n, const double* x, const double* y) {
-    if (!default_) return casadi_dot(n, x, y);
-    Ddot fn = dispatch_[default_]->exposed.ddot;
-    if (fn) return fn(n, x, y);
-    return casadi_dot(n, x, y);
-  }
-
-  template<>
-  inline void Blas::scal<double>(casadi_int n, double alpha, double* x) {
-    if (!default_) return casadi_scal(n, alpha, x);
-    if (!x) return;
-    Dscal fn = dispatch_[default_]->exposed.dscal;
-    if (fn) return fn(n, alpha, x);
-    return casadi_scal(n, alpha, x);
-  }
-
-  template<>
-  inline double Blas::norm_2<double>(casadi_int n, const double* x) {
-    if (!default_) return casadi_norm_2(n, x);
-    Dnrm2 fn = dispatch_[default_]->exposed.dnrm2;
-    if (fn) return fn(n, x);
-    return casadi_norm_2(n, x);
-  }
-
-  template<>
-  inline double Blas::norm_1<double>(casadi_int n, const double* x) {
-    if (!default_) return casadi_norm_1(n, x);
-    if (!x) return 0;
-    Dasum fn = dispatch_[default_]->exposed.dasum;
-    if (fn) return fn(n, x);
-    return casadi_norm_1(n, x);
-  }
 
 } // namespace casadi
 

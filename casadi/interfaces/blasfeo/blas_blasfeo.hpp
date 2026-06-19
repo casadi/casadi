@@ -38,6 +38,12 @@ extern "C" {
                           double* B, int* ldb,
                           double* beta,
                           double* C, int* ldc);
+  void   blasfeo_blas_daxpy(int* n, double* alpha,
+                            double* x, int* incx,
+                            double* y, int* incy);
+  double blasfeo_blas_ddot(int* n,
+                            double* x, int* incx,
+                            double* y, int* incy);
 }
 
 /** \defgroup plugin_Blas_blasfeo Title
