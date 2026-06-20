@@ -557,9 +557,9 @@ namespace casadi {
 
     // Cache the solver: presolve (re)creates it only when needed
     bool new_solver = (m->d.solver == 0);
-    // fatrop_ocp_c_create (called from casadi_fatrop_presolve) installs a
-    // process-wide singleton stream via fatrop::OutputStreamManager::set_stream,
-    // which is not thread-safe. Serialize across threads.
+    // fatrop's solve repoints a process-wide singleton stream via
+    // fatrop::OutputStreamManager::set_stream, which is not thread-safe.
+    // Serialize across threads.
     {
 #ifdef CASADI_WITH_THREAD
       static std::mutex mutex_fatrop_create;
@@ -704,9 +704,9 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
   // Cache the solver: presolve (re)creates it only when needed
   g << "{\n";
   g << "int new_solver = (d->solver == 0);\n";
-  // fatrop_ocp_c_create (called from casadi_fatrop_presolve) installs a
-  // process-wide singleton stream via fatrop::OutputStreamManager::set_stream,
-  // which is not thread-safe. Serialize across threads.
+  // fatrop's solve repoints a process-wide singleton stream via
+  // fatrop::OutputStreamManager::set_stream, which is not thread-safe.
+  // Serialize across threads.
   if (g.thread_safe()) {
     Function F = shared_from_this<Function>();
     std::string mutex_name = codegen_name(g, false) + "_fatrop_create_mutex";
