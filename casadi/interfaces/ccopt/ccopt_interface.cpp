@@ -447,7 +447,7 @@ void MadmpecInterface::codegen_body(CodeGenerator& g) const {
   set_ccopt_prob(g);
 
   g << "casadi_ccopt_init(d, &arg, &res, &iw, &w);\n";
-  g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
+  g << "casadi_oracle_set_work(d->nlp->oracle, &arg, &res, &iw, &w);\n";
   g << "casadi_ccopt_presolve(d);\n";
 
   g << "casadi_ccopt_solve(d);\n";

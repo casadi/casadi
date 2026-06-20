@@ -818,7 +818,7 @@ namespace casadi {
     g << "p_qp.sp_a = " << g.sparsity(A_) << ";\n";
     g << "p_qp.sp_h = " << g.sparsity(H_) << ";\n";
     g << "casadi_qp_setup(&p_qp);\n";
-    g << "casadi_qp_init(&d_qp, &iw, &w);\n";
+    g << "casadi_qp_set_work(&d_qp, &arg, &res, &iw, &w);\n";
 
 
     g << "d_qp.h = arg[" << CONIC_H << "];\n";
