@@ -147,6 +147,10 @@ namespace casadi {
     delete m;
   }
 
+  OnnxRuntimeInterface::~OnnxRuntimeInterface() {
+    clear_mem();
+  }
+
   void OnnxRuntimeInterface::serialize_body(SerializingStream &s) const {
     OnnxFunction::serialize_body(s);
     s.version("OnnxRuntimeInterface", 1);

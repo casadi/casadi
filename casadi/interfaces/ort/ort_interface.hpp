@@ -65,6 +65,8 @@ namespace casadi {
                          const std::vector<std::string>& inputs,
                          const std::vector<std::string>& outputs);
 
+    ~OnnxRuntimeInterface() override;
+
     /// Plugin factory
     static OnnxFunction* creator(const std::string& name,
                                  const GraphBuilderInternal* gb,
