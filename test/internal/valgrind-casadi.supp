@@ -774,3 +774,20 @@ obj:*libworhp*
    ...
    fun:XPRSiisfirst
 }
+
+# ONNX Runtime internal leaks during OnnxRuntimeInterface::init_mem.
+# The leaked blocks are allocated entirely inside libonnxruntime (its global
+# arena / thread-pool / CPU-allocator state) and are not freed even though
+# CasADi releases every Ort handle it owns (ReleaseValue / ReleaseMemoryInfo /
+# ReleaseSession / ReleaseEnv in free_mem). Only surfaces with the real ONNX
+# Runtime ([ci:run_slow]); the default matrix links the stub. Third-party leak,
+# not a CasADi-side bug.
+{
+   onnxruntime internal leak via ort init_mem (definite)
+   Memcheck:Leak
+   match-leak-kinds: definite,indirect
+   ...
+   obj:*libonnxruntime*
+   ...
+   fun:_ZNK6casadi20OnnxRuntimeInterface8init_memEPv
+}
