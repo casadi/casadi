@@ -778,6 +778,7 @@ set(BUILD_CLARABEL_VERSION "d6f2404903db791330f88b4f2ceded1e90696848" CACHE STRI
 set(BUILD_CLARABEL_GIT_REPO "https://github.com/jgillis/Clarabel.cpp.git" CACHE STRING "Git repo used together with BUILD_CLARABEL_VERSION")
 set(BUILD_CLARABEL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Clarabel")
 option(WITH_BUILD_CLARABEL "Build CLARABEL (BUILD_CLARABEL_VERSION=${BUILD_CLARABEL_VERSION}) from downloaded source (BUILD_CLARABEL_GIT_REPO=${BUILD_CLARABEL_GIT_REPO})." OFF)
+option(WITH_MOCKUP_CLARABEL "Link a mockup Clarabel C library (stub libclarabel_c, built by mockups-external) instead of the real Rust one; the plugin builds and loads but cannot solve." OFF)
 add_feature_info(clarabel-interface WITH_CLARABEL "Interface to QP solver CLARABEL.")
 
 option(WITH_RUMOCA "Compile the interface to rumoca" OFF)
@@ -1279,6 +1280,11 @@ endforeach()
 
 # ONNX Runtime mockup is built by mockups-external too (it isn't in the proprietary loops above)
 if(WITH_ONNX_RUNTIME AND WITH_MOCKUP_ONNX_RUNTIME)
+  set(WITH_BUILD_MOCKUPS ON)
+endif()
+
+# Clarabel mockup is built by mockups-external too (it isn't in the proprietary loops above)
+if(WITH_CLARABEL AND WITH_MOCKUP_CLARABEL)
   set(WITH_BUILD_MOCKUPS ON)
 endif()
 
@@ -2516,7 +2522,25 @@ endif()
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
 if(WITH_CLARABEL)
-  if(WITH_BUILD_CLARABEL)
+  if(WITH_MOCKUP_CLARABEL)
+    # Self-contained mockup (built by mockups-external): stub libclarabel_c +
+    # the vendored Clarabel C headers. Same imported-target shape as the real
+    # branch below, so the clarabel plugin links/loads identically.
+    add_library(clarabel SHARED IMPORTED)
+    add_library(clarabel::clarabel INTERFACE IMPORTED)
+    set_target_properties(clarabel::clarabel PROPERTIES INTERFACE_LINK_LIBRARIES clarabel)
+    add_dependencies(clarabel mockups-external)
+    set(CLARABEL_MOCKUP_ROOT "${CMAKE_BINARY_DIR}/external_projects/mockups/clarabel")
+    file(MAKE_DIRECTORY "${CLARABEL_MOCKUP_ROOT}/include")
+    set(CLARABEL_MOCKUP_LIB "${CLARABEL_MOCKUP_ROOT}/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}clarabel_c${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set_target_properties(clarabel PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CLARABEL_MOCKUP_ROOT}/include"
+       IMPORTED_LOCATION "${CLARABEL_MOCKUP_LIB}"
+       IMPORTED_IMPLIB "${CLARABEL_MOCKUP_ROOT}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}clarabel_c${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+       IMPORTED_SO_NAME "${CMAKE_SHARED_LIBRARY_PREFIX}clarabel_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    )
+    install(FILES "${CLARABEL_MOCKUP_LIB}" DESTINATION "${LIB_PREFIX}")
+  elseif(WITH_BUILD_CLARABEL)
     ExternalProject_Add(clarabel-external
         GIT_REPOSITORY ${BUILD_CLARABEL_GIT_REPO}
         GIT_SHALLOW ${BUILD_CLARABEL_GIT_SHALLOW}
