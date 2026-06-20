@@ -302,7 +302,7 @@ void MadmpecInterface::set_work(void* mem, const double**& arg, double**& res,
   m->d.prob = &p_;
   m->d.nlp = &m->d_nlp;
 
-  casadi_ccopt_init(&m->d, &arg, &res, &iw, &w);
+  casadi_ccopt_set_work(&m->d, &arg, &res, &iw, &w);
 
   m->d.nlp->oracle->m = static_cast<void*>(m);
 }
@@ -446,7 +446,7 @@ void MadmpecInterface::codegen_body(CodeGenerator& g) const {
   g.local("p", "struct casadi_ccopt_prob");
   set_ccopt_prob(g);
 
-  g << "casadi_ccopt_init(d, &arg, &res, &iw, &w);\n";
+  g << "casadi_ccopt_set_work(d, &arg, &res, &iw, &w);\n";
   g << "casadi_oracle_set_work(d->nlp->oracle, &arg, &res, &iw, &w);\n";
   g << "casadi_ccopt_presolve(d);\n";
 

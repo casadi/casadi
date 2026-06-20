@@ -436,7 +436,7 @@ namespace casadi {
     g.local("d", "struct casadi_uno_data*");
     g.init_local("d", "&" + codegen_mem(g));
     Nlpsol::codegen_setup_per_call(g, "d->nlp");
-    g << "casadi_uno_init(d, &arg, &res, &iw, &w);\n";
+    g << "casadi_uno_set_work(d, &arg, &res, &iw, &w);\n";
     g << "casadi_oracle_set_work(&d->d_oracle, &arg, &res, &iw, &w);\n";
     g << "casadi_uno_solve(d);\n";
     Nlpsol::codegen_post_solve(g, "d->nlp");

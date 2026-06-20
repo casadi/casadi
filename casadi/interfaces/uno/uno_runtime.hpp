@@ -206,9 +206,9 @@ void casadi_uno_free_mem(casadi_uno_data<T1>* d) {
   d->solver = 0;
 }
 
-// SYMBOL "uno_init"
+// SYMBOL "uno_set_work"
 template<typename T1>
-void casadi_uno_init(casadi_uno_data<T1>* d, const T1*** arg, T1*** res,
+void casadi_uno_set_work(casadi_uno_data<T1>* d, const T1*** arg, T1*** res,
                      casadi_int** iw, T1** w) {
   d->arg = *arg;
   d->res = *res;
