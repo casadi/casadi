@@ -779,6 +779,18 @@ set(BUILD_CLARABEL_GIT_REPO "https://github.com/jgillis/Clarabel.cpp.git" CACHE 
 set(BUILD_CLARABEL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Clarabel")
 option(WITH_BUILD_CLARABEL "Build CLARABEL (BUILD_CLARABEL_VERSION=${BUILD_CLARABEL_VERSION}) from downloaded source (BUILD_CLARABEL_GIT_REPO=${BUILD_CLARABEL_GIT_REPO})." OFF)
 option(WITH_MOCKUP_CLARABEL "Link a mockup Clarabel C library (stub libclarabel_c, built by mockups-external) instead of the real Rust one; the plugin builds and loads but cannot solve." OFF)
+option(WITH_DOWNLOAD_CLARABEL "Download a precompiled Clarabel C library (CLARABEL_TAR_PATH, default casadi/polyglot evergreen) and ship it, instead of building the Rust crate from source." OFF)
+if(NOT CLARABEL_TAR_PATH)
+  if(NOT CLARABEL_RELEASE)
+    set(CLARABEL_RELEASE "evergreen")
+  endif()
+  set(CLARABEL_TAR_ROOT "https://github.com/casadi/polyglot/releases/download/")
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|ARM64")
+    set(CLARABEL_TAR_PATH "${CLARABEL_TAR_ROOT}${CLARABEL_RELEASE}/clarabel-aarch64.tar.gz")
+  else()
+    set(CLARABEL_TAR_PATH "${CLARABEL_TAR_ROOT}${CLARABEL_RELEASE}/clarabel-x64.tar.gz")
+  endif()
+endif()
 add_feature_info(clarabel-interface WITH_CLARABEL "Interface to QP solver CLARABEL.")
 
 option(WITH_RUMOCA "Compile the interface to rumoca" OFF)
@@ -1247,7 +1259,12 @@ endforeach()
 # Packages must be sorted from high to low in the dependency graph
 foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LACEMODELICA ONNX PROTOBUF LIBZIP ZLIB)
   string(TOLOWER ${PKG} PKG_LOWER)
-  if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
+  # Clarabel with WITH_DOWNLOAD_CLARABEL is satisfied by a precompiled tarball
+  # (handled in the clarabel consume block), so skip find_package/source-build.
+  if("${PKG}" STREQUAL "CLARABEL" AND WITH_DOWNLOAD_CLARABEL)
+    set(CLARABEL_FOUND ON)
+  endif()
+  if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG} AND NOT ("${PKG}" STREQUAL "CLARABEL" AND WITH_DOWNLOAD_CLARABEL))
     if(NOT WITH_BUILD_${PKG})
       get_property(PACKAGES_NOT_FOUND_BACKUP GLOBAL PROPERTY PACKAGES_NOT_FOUND)
       get_property(PACKAGES_FOUND_BACKUP GLOBAL PROPERTY PACKAGES_FOUND)
@@ -2540,6 +2557,32 @@ if(WITH_CLARABEL)
        IMPORTED_SO_NAME "${CMAKE_SHARED_LIBRARY_PREFIX}clarabel_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
     )
     install(FILES "${CLARABEL_MOCKUP_LIB}" DESTINATION "${LIB_PREFIX}")
+  elseif(WITH_DOWNLOAD_CLARABEL)
+    # Ship the real precompiled Clarabel C library (CLARABEL_TAR_PATH, default
+    # casadi/polyglot evergreen) instead of building the Rust crate from source
+    # -- so the wheel carries a working clarabel without a Rust toolchain.
+    set(CLARABEL_BINARY_DIR "${CMAKE_BINARY_DIR}/external_packages/clarabel")
+    if(CLARABEL_TAR_HASH)
+      file(DOWNLOAD ${CLARABEL_TAR_PATH} "${CLARABEL_BINARY_DIR}/clarabel.tar.gz" EXPECTED_HASH ${CLARABEL_TAR_HASH})
+    else()
+      file(DOWNLOAD ${CLARABEL_TAR_PATH} "${CLARABEL_BINARY_DIR}/clarabel.tar.gz")
+    endif()
+    execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${CLARABEL_BINARY_DIR} tar xf ${CLARABEL_BINARY_DIR}/clarabel.tar.gz)
+    file(MAKE_DIRECTORY "${CLARABEL_BINARY_DIR}/include/clarabel")
+    add_library(clarabel SHARED IMPORTED)
+    add_library(clarabel::clarabel INTERFACE IMPORTED)
+    set_target_properties(clarabel::clarabel PROPERTIES INTERFACE_LINK_LIBRARIES clarabel)
+    set_target_properties(clarabel PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CLARABEL_BINARY_DIR}/include/clarabel"
+       IMPORTED_LOCATION "${CLARABEL_BINARY_DIR}/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}clarabel_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CLARABEL_BINARY_DIR}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}clarabel_c${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+       IMPORTED_SO_NAME "${CMAKE_SHARED_LIBRARY_PREFIX}clarabel_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    )
+    install(DIRECTORY "${CLARABEL_BINARY_DIR}/include/clarabel" DESTINATION "${INCLUDE_PREFIX}")
+    install(DIRECTORY "${CLARABEL_BINARY_DIR}/lib/" DESTINATION "${LIB_PREFIX}")
+    if(WIN32)
+      install(DIRECTORY "${CLARABEL_BINARY_DIR}/bin/" DESTINATION "${LIB_PREFIX}")
+    endif()
   elseif(WITH_BUILD_CLARABEL)
     ExternalProject_Add(clarabel-external
         GIT_REPOSITORY ${BUILD_CLARABEL_GIT_REPO}
