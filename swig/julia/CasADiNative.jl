@@ -21,6 +21,10 @@ for _n in (:sum1, :sum2, :repmat, :reshape, :cross, :mtimes, :jtimes,
     @eval const $_n = C.$_n
 end
 export tangent, factory   # convenience defaults added below
+# `Function` collides with Base.Function (abstract supertype): it is deliberately
+# NOT exported. Under a plain `using`, bare `Function` resolves to Base.Function
+# ("no constructors have been defined for Function"); access it qualified
+# (`ca.Function`) or pull it in explicitly (`using LibCasADi: Function`). (P2-1)
 const Function = C.Function
 const CodeGenerator = C.CodeGenerator
 
