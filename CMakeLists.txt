@@ -1553,6 +1553,9 @@ if(WITH_BLASFEO)
       GIT_TAG ${BUILD_BLASFEO_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
+      # GENERIC lib4 kernels over-read dvec/dmat tails by up to one block;
+      # over-allocate a guard so the read stays in-bounds (crashes on macOS).
+      PATCH_COMMAND git -C <SOURCE_DIR> apply --ignore-whitespace ${CMAKE_CURRENT_SOURCE_DIR}/cmake/blasfeo_alloc_guard.patch || echo "blasfeo_alloc_guard.patch already applied or failed"
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${C_FLAGS} -DEXT_DEP=OFF -DTARGET=GENERIC -DBUILD_SHARED_LIBS=${TP_BUILD_SHARED} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     set(BLASFEO_PATH "${CMAKE_BINARY_DIR}/external_projects")
