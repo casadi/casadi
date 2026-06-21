@@ -10,7 +10,7 @@ name: binaries
 on: [push, pull_request]
 
 env:
-  cache-suffix: v12
+  cache-suffix: v14
   # Native-runner override-OFF set for the julia job, appended after build_flags:
   # MATLAB_IPC (no MATLAB on runner) + SPRAL (Fortran-module parallel-build race,
   # also OFF in build_flags_mac/aarch64). Everything else in build_flags builds

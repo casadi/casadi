@@ -98,7 +98,12 @@ namespace casadi {
 
   private:
     /// Weak pointer (non-owning) object for the object
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Atomic so lazy publication in weak() races count_down()/teardown safely
+    std::atomic<GenericWeakRef<Shared, Internal>*> weak_ref_;
+#else
     GenericWeakRef<Shared, Internal>* weak_ref_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   };
 
   template<typename Shared, typename Internal>
@@ -141,7 +146,11 @@ namespace casadi {
   GenericSharedInternal<Shared, Internal>::
   GenericSharedInternal(const GenericSharedInternal& node) {
     static_cast<Internal*>(this)->count = 0; // reference counter is _not_ copied
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    weak_ref_.store(nullptr, std::memory_order_relaxed); // nor same weak references
+#else
     weak_ref_ = nullptr; // nor will they have the same weak references
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   }
 
   template<typename Shared, typename Internal>
@@ -155,7 +164,11 @@ namespace casadi {
   template<typename Shared, typename Internal>
   GenericSharedInternal<Shared, Internal>::GenericSharedInternal() {
     static_cast<Internal*>(this)->count = 0;
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    weak_ref_.store(nullptr, std::memory_order_relaxed);
+#else
     weak_ref_ = nullptr;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   }
 
   template<typename Shared, typename Internal>
@@ -173,12 +186,18 @@ namespace casadi {
                    "Possible cause: Circular dependency in user code." << std::endl;
     }
     #endif // WITH_REFCOUNT_WARNINGS
-    if (weak_ref_!=nullptr) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    GenericWeakRef<Shared, Internal>* weak_ref =
+      weak_ref_.exchange(nullptr, std::memory_order_acq_rel);
+#else
+    GenericWeakRef<Shared, Internal>* weak_ref = weak_ref_;
+    weak_ref_ = nullptr;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+    if (weak_ref != nullptr) {
       // Assumption: no other GenericSharedInternal instances
-      // point to the same WeakRefInternal through weak_ref_
-      weak_ref_->kill();
-      delete weak_ref_;
-      weak_ref_ = nullptr;
+      // point to the same WeakRefInternal through weak_ref
+      weak_ref->kill();
+      delete weak_ref;
     }
   }
 
@@ -189,10 +208,26 @@ namespace casadi {
 
   template<typename Shared, typename Internal>
   GenericWeakRef<Shared, Internal>* GenericSharedInternal<Shared, Internal>::weak() {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    auto* w = weak_ref_.load(std::memory_order_acquire);
+    if (!w) {
+      auto* nw = new GenericWeakRef<Shared, Internal>(static_cast<Internal*>(this));
+      GenericWeakRef<Shared, Internal>* expected = nullptr;
+      if (weak_ref_.compare_exchange_strong(
+            expected, nw, std::memory_order_release, std::memory_order_acquire)) {
+        w = nw;
+      } else {
+        delete nw; // lost the race; another thread published first
+        w = expected;
+      }
+    }
+    return w;
+#else
     if (weak_ref_==nullptr) {
       weak_ref_ = new GenericWeakRef<Shared, Internal>(static_cast<Internal*>(this));
     }
     return weak_ref_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   }
 
   template<typename Shared, typename Internal>
