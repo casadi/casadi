@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstring>
 #include <algorithm>
+#include <limits>
 
 namespace casadi {
 
@@ -198,7 +199,7 @@ namespace casadi {
       : self(interface), NlpsolMemory(), cntvect(nullptr),
         modsta(ConoptModelStatus::Unset), solsta(ConoptSolverStatus::Unset),
         iter(0), return_status("Unset"),
-        cache_valid(false), nan_encountered(false),
+        cache_valid(false), cache_valid_jac(false), nan_encountered(false),
         ng_expanded(0), numnz_expanded(0) {}
 
   ConoptMemory::~ConoptMemory() {
@@ -218,12 +219,19 @@ namespace casadi {
     m->casadi_to_conopt_lb_row.resize(ng_);
     m->casadi_to_conopt_ub_row.assign(ng_, -1);
     m->hess_lam_g_.resize(ng_, 0.0);
+    m->row_nnz.assign(ng_, 0);
+    m->conopt_to_casadi.reserve(ng_ * 2);  // worst-case: all constraints are range
+    m->conopt_type.reserve(ng_ * 2);
+    m->conopt_rhs.reserve(ng_ * 2);
     if (has_linear_jac_)
       m->const_jac_vals.resize(jacg_sp_.nnz(), 0.0);
     if (has_linear_gradf_)
       m->gradf_const_vals.resize(gradf_sp_.nnz(), 0.0);
 
-    COI_Create(&m->cntvect);
+    if (COI_Create(&m->cntvect) != 0 || m->cntvect == nullptr) {
+      casadi::uerr() << "CONOPT: COI_Create failed" << std::endl;
+      return 1;
+    }
 
     if (warm_start_) COIDEF_IniStat(m->cntvect, 2);
 
@@ -247,7 +255,6 @@ namespace casadi {
                            "passed via the CONOPT option callback (no SVAL parameter). "
                            "Use the 'optfile' option instead.");
         } else {
-            // Push to custom options for the cb_option callback to feed dynamically
             m->custom_options.push_back(op);
         }
     }
@@ -285,7 +292,9 @@ namespace casadi {
 
   int ConoptInterface::solve(void* mem) const {
     auto m = static_cast<ConoptMemory*>(mem);
-    m->cache_valid = false;
+    m->cache_valid     = false;
+    m->cache_valid_jac = false;
+    m->cached_f        = 0.0;
     m->nan_encountered = false;
 
     // Build the per-solve constraint expansion (splits range constraints into two rows)
@@ -295,23 +304,23 @@ namespace casadi {
     m->conopt_rhs.clear();
 
     // Compute total nnz per CasADi row (needed for range-constraint NZ duplication)
-    std::vector<int> row_nnz(ng_, 0);
+    std::fill(m->row_nnz.begin(), m->row_nnz.end(), 0);
     {
       const casadi_int* g_row_s = jacg_sp_.row();
       for (casadi_int el = 0; el < (casadi_int)jacg_sp_.nnz(); ++el)
-        row_nnz[g_row_s[el]]++;
+        m->row_nnz[g_row_s[el]]++;
     }
 
-    int ng_expanded = 0;
+    casadi_int ng_expanded = 0;
     // Base NZ: objective gradient columns + all constraint Jacobian entries
-    int numnz = (int)gradf_sp_.nnz() + (int)jacg_sp_.nnz();
+    casadi_int numnz = (casadi_int)gradf_sp_.nnz() + (casadi_int)jacg_sp_.nnz();
 
     for (casadi_int i = 0; i < ng_; ++i) {
       double lbg = m->d_nlp.lbz[nx_ + i];
       double ubg = m->d_nlp.ubz[nx_ + i];
       bool is_range = !std::isinf(lbg) && !std::isinf(ubg) && lbg != ubg;
 
-      m->casadi_to_conopt_lb_row[i] = ng_expanded + 1;  // 1-indexed CONOPT row
+      m->casadi_to_conopt_lb_row[i] = (int)(ng_expanded + 1);  // 1-indexed CONOPT row
       m->conopt_to_casadi.push_back((int)i);
       if (lbg == ubg) {
         m->conopt_type.push_back(0);  m->conopt_rhs.push_back(lbg);
@@ -327,15 +336,17 @@ namespace casadi {
       ng_expanded++;
 
       if (is_range) {
-        m->casadi_to_conopt_ub_row[i] = ng_expanded + 1;
+        m->casadi_to_conopt_ub_row[i] = (int)(ng_expanded + 1);
         m->conopt_to_casadi.push_back((int)i);
         m->conopt_type.push_back(2);  m->conopt_rhs.push_back(ubg);  // <= row
         ng_expanded++;
-        numnz += row_nnz[i];
+        numnz += m->row_nnz[i];
       }
     }
-    m->ng_expanded    = ng_expanded;
-    m->numnz_expanded = numnz;
+    casadi_assert(ng_expanded <= std::numeric_limits<int>::max(), "ng_expanded overflows int");
+    casadi_assert(numnz       <= std::numeric_limits<int>::max(), "numnz overflows int");
+    m->ng_expanded    = (int)ng_expanded;
+    m->numnz_expanded = (int)numnz;
 
     // Evaluate Jacobian at the initial point to obtain values for constant entries
     if (has_linear_jac_) {
@@ -374,7 +385,7 @@ namespace casadi {
     // Count nonlinear NZ: nonlinear objective gradient entries + nonlinear constraint entries
     const casadi_int* g_colind_s = jacg_sp_.colind();
     const casadi_int* g_row_s    = jacg_sp_.row();
-    int num_nl_nz = 0;
+    casadi_int num_nl_nz = 0;
     for (casadi_int k = 0; k < (casadi_int)gradf_sp_.nnz(); ++k)
       if (gradf_nlflag_[k]) num_nl_nz++;
     for (casadi_int c = 0; c < nx_; ++c) {
@@ -386,9 +397,11 @@ namespace casadi {
       }
     }
 
-    COIDEF_NumCon(m->cntvect, ng_expanded + 1);
-    COIDEF_NumNz(m->cntvect, numnz);
-    COIDEF_NumNlNz(m->cntvect, num_nl_nz);
+    casadi_assert(num_nl_nz <= std::numeric_limits<int>::max(), "num_nl_nz overflows int");
+
+    COIDEF_NumCon(m->cntvect, (int)(ng_expanded + 1));
+    COIDEF_NumNz(m->cntvect, (int)numnz);
+    COIDEF_NumNlNz(m->cntvect, (int)num_nl_nz);
 
     int ret = COI_Solve(m->cntvect);
     if (ret != 0) {
@@ -476,9 +489,9 @@ namespace casadi {
     if (!self.fcallback_.is_null()) {
         int phase = (LEN_INT > 1) ? INTX[1] : -1;
 
-        double obj_val = 0.0;
+        double obj_val = m->cached_f;  // best available approximation for early phases
         if (LEN_RL > 1 && phase >= 3) {
-            obj_val = RL[1];
+            obj_val = RL[1];            // CONOPT-reported value once available
         }
 
         std::fill_n(m->arg, self.fcallback_.n_in(), nullptr);
@@ -609,6 +622,8 @@ namespace casadi {
 
     std::memcpy(m->cached_x.data(), X, NUMVAR * sizeof(double));
 
+    const bool need_jac = (MODE != 1);
+
     try {
         m->arg[0] = m->cached_x.data();
         m->arg[1] = m->d_nlp.p;
@@ -617,24 +632,30 @@ namespace casadi {
         m->res[1] = m->cached_grad_f.data();
         self.calc_function(m, "nlp_grad_f");
 
+        // When MODE==1, only function values (G) are needed — skip Jacobian computation.
         m->res[0] = m->cached_g.data();
-        m->res[1] = m->cached_jac_g.data();
+        m->res[1] = need_jac ? m->cached_jac_g.data() : nullptr;
         self.calc_function(m, "nlp_jac_g");
 
-        m->cache_valid = true;
+        // cache_valid_jac is stored before cache_valid (release).  The release on
+        // cache_valid orders both stores, so readers need only an acquire on cache_valid.
+        m->cache_valid_jac.store(need_jac, std::memory_order_relaxed);
+        m->cache_valid.store(true, std::memory_order_release);
     } catch (std::exception& ex) {
         casadi::uerr() << ex.what() << std::endl;
         *ERRCNT = 1;
         m->nan_encountered = true;
-        m->cache_valid = false;
+        m->cache_valid_jac.store(false, std::memory_order_relaxed);
+        m->cache_valid.store(false, std::memory_order_relaxed);
     } catch (...) {
         *ERRCNT = 1;
         m->nan_encountered = true;
-        m->cache_valid = false;
+        m->cache_valid_jac.store(false, std::memory_order_relaxed);
+        m->cache_valid.store(false, std::memory_order_relaxed);
     }
 
     // Detect silent NaN from CasADi (e.g. sqrt of negative number)
-    if (m->cache_valid) {
+    if (m->cache_valid.load(std::memory_order_relaxed)) {
         bool has_nan = std::isnan(m->cached_f);
         if (!has_nan) {
             for (double v : m->cached_g) if (std::isnan(v)) { has_nan = true; break; }
@@ -642,10 +663,14 @@ namespace casadi {
         if (!has_nan) {
             for (double v : m->cached_grad_f) if (std::isnan(v)) { has_nan = true; break; }
         }
+        if (!has_nan && need_jac) {
+            for (double v : m->cached_jac_g) if (std::isnan(v)) { has_nan = true; break; }
+        }
         if (has_nan) {
             *ERRCNT = 1;
             m->nan_encountered = true;
-            m->cache_valid = false;
+            m->cache_valid_jac.store(false, std::memory_order_relaxed);
+            m->cache_valid.store(false, std::memory_order_relaxed);
         }
     }
     return 0;
@@ -655,10 +680,18 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     const ConoptInterface& self = m->self;
 
-    if (!m->cache_valid) {
+    // Acquire load: establishes happens-before with the release store in cb_fdevalini,
+    // making all cache writes (including cached_jac_g and cache_valid_jac) visible here.
+    if (!m->cache_valid.load(std::memory_order_acquire)) {
         *ERRCNT = 1;
         return 0;
     }
+
+#ifndef NDEBUG
+    casadi_assert(
+      std::memcmp(X, m->cached_x.data(), NUMVAR * sizeof(double)) == 0,
+      "cb_fd_eval: X does not match cached_x — CONOPT API contract violated");
+#endif
 
     if (ROWNO == 0) {
         if (MODE == 1 || MODE == 3) *G = m->cached_f;
@@ -671,6 +704,12 @@ namespace casadi {
         int ci = m->conopt_to_casadi[ROWNO - 1];
         if (MODE == 1 || MODE == 3) *G = m->cached_g[ci];
         if (MODE == 2 || MODE == 3) {
+            // Guard against stale Jacobian: cache_valid_jac is false when cb_fdevalini
+            // was called with MODE==1 and skipped Jacobian computation.
+            if (!m->cache_valid_jac.load(std::memory_order_relaxed)) {
+                *ERRCNT = 1;
+                return 0;
+            }
             int base  = self.jacg_rowstart_[ci];
             int count = self.jacg_rowstart_[ci + 1] - self.jacg_rowstart_[ci];
             for (int k = 0; k < count; ++k)
@@ -682,7 +721,8 @@ namespace casadi {
 
   int COI_CALLCONV ConoptInterface::cb_fdevalend(int IGNERR, int* ERRCNT, void* USRMEM) {
     auto m = static_cast<ConoptMemory*>(USRMEM);
-    m->cache_valid = false;
+    m->cache_valid_jac.store(false, std::memory_order_relaxed);
+    m->cache_valid.store(false, std::memory_order_relaxed);
     return 0;
   }
 
@@ -717,6 +757,9 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     const ConoptInterface& self = m->self;
 
+    // U[0] maps directly to obj_factor: the objective row carries no sign flip.
+    // U[row] for constraint rows uses the negation of CasADi's lam_g convention
+    // (CONOPT shadow price = -lam_g), consistent with cb_solution's lam = -ymar.
     double obj_factor = U[0];
 
     for (int ci = 0; ci < self.ng_; ++ci) {
@@ -807,7 +850,7 @@ namespace casadi {
   }
 
   int COI_CALLCONV ConoptInterface::cb_message(int SMSG, int DMSG, int NMSG, char* MSGV[], void* USRMEM) {
-    for (int i = 0; i < SMSG; ++i) {
+    for (int i = 0; i < std::min(SMSG, NMSG); ++i) {
         if (MSGV[i] != nullptr) {
             casadi::uout() << MSGV[i] << std::endl;
         }
