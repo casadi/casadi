@@ -110,6 +110,9 @@ libmad_codegen = {"extralibs": ["Mad"], "std": "c99",
 if "SKIP_MADNLP_TESTS" not in os.environ and ca.has_nlpsol("madnlp"):
   solvers.append(("madnlp",{"madnlp": {}},{"codegen": libmad_codegen,"discrete":False}))
 
+if "SKIP_CONOPT_TESTS" not in os.environ and ca.has_nlpsol("conopt"):
+   solvers.append(("conopt",{"conopt":{"Tol_Feas_Min":1e-9, "Tol_Optimality":1e-9}},{"codegen": False,"discrete":False}))
+
 print(solvers)
 
 class NLPtests(casadiTestCase):
