@@ -7,7 +7,7 @@
 
 namespace casadi {
 
-  extern "C" int casadi_register_nlpsol_conopt(Nlpsol::Plugin* plugin) {
+  extern "C" int CASADI_NLPSOL_CONOPT_EXPORT casadi_register_nlpsol_conopt(Nlpsol::Plugin* plugin) {
     plugin->creator = ConoptInterface::creator;
     plugin->name = "conopt";
     plugin->doc = "CONOPT Interface";
@@ -17,7 +17,7 @@ namespace casadi {
     return 0;
   }
 
-  extern "C" void casadi_load_nlpsol_conopt() {
+  extern "C" void CASADI_NLPSOL_CONOPT_EXPORT casadi_load_nlpsol_conopt() {
     Nlpsol::registerPlugin(casadi_register_nlpsol_conopt);
   }
 
@@ -74,28 +74,40 @@ namespace casadi {
     // Per-column objective-gradient flag (used in cb_read_matrix)
     const casadi_int* f_row = gradf_sp_.row();
     gradf_col_flag_.assign(nx_, false);
-    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
+    gradf_col_to_nz_.assign(nx_, -1);
+    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k) {
       gradf_col_flag_[f_row[k]] = true;
+      gradf_col_to_nz_[f_row[k]] = k;
+    }
+
+    // Detect constant (linear) objective gradient entries using second-order sparsity
+    {
+      Sparsity dgradf_dx = gradf_fcn.sparsity_jac(0, 1, true);
+      gradf_nlflag_.assign(gradf_sp_.nnz(), 0);
+      const casadi_int* dg_row = dgradf_dx.row();
+      for (casadi_int el = 0; el < dgradf_dx.nnz(); ++el)
+        gradf_nlflag_[dg_row[el]] = 1;
+      has_linear_gradf_ = std::any_of(gradf_nlflag_.begin(), gradf_nlflag_.end(),
+                                       [](int f) { return f == 0; });
+    }
 
     const casadi_int* g_colind = jacg_sp_.colind();
     const casadi_int* g_row = jacg_sp_.row();
 
-    // Build row-indexed (CSR) structure for fast Jacobian scatter in cb_fd_eval
+    // Build row-indexed structure over nonlinear entries only (aligns with CONOPT's JACNUM)
     casadi_int nnz_g = jacg_sp_.nnz();
     jacg_rowstart_.assign(ng_ + 1, 0);
-    jacg_col_.resize(nnz_g);
-    jacg_nzidx_.resize(nnz_g);
     for (casadi_int el = 0; el < nnz_g; ++el)
-      jacg_rowstart_[g_row[el] + 1]++;
+      if (jacg_nlflag_[el]) jacg_rowstart_[g_row[el] + 1]++;
     for (int r = 0; r < ng_; ++r)
       jacg_rowstart_[r + 1] += jacg_rowstart_[r];
+    jacg_nzidx_.resize(jacg_rowstart_[ng_]);
     std::vector<int> fill_pos(ng_, 0);
     for (int c = 0; c < nx_; ++c) {
       for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
+        if (!jacg_nlflag_[el]) continue;
         int r = (int)g_row[el];
-        int p = jacg_rowstart_[r] + fill_pos[r]++;
-        jacg_col_[p] = c;
-        jacg_nzidx_[p] = (int)el;
+        jacg_nzidx_[jacg_rowstart_[r] + fill_pos[r]++] = (int)el;
       }
     }
 
@@ -114,32 +126,7 @@ namespace casadi {
     s.unpack("ConoptInterface::jacg_sp", jacg_sp_);
     s.unpack("ConoptInterface::hesslag_sp", hesslag_sp_);
 
-    // Rebuild derived arrays from the serialized sparsities
-    const casadi_int* f_row = gradf_sp_.row();
-    gradf_col_flag_.assign(nx_, false);
-    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
-      gradf_col_flag_[f_row[k]] = true;
-
-    const casadi_int* g_colind = jacg_sp_.colind();
-    const casadi_int* g_row = jacg_sp_.row();
-    casadi_int nnz_g = jacg_sp_.nnz();
-    jacg_rowstart_.assign(ng_ + 1, 0);
-    jacg_col_.resize(nnz_g);
-    jacg_nzidx_.resize(nnz_g);
-    for (casadi_int el = 0; el < nnz_g; ++el)
-      jacg_rowstart_[g_row[el] + 1]++;
-    for (int r = 0; r < ng_; ++r)
-      jacg_rowstart_[r + 1] += jacg_rowstart_[r];
-    std::vector<int> fill_pos(ng_, 0);
-    for (int c = 0; c < nx_; ++c)
-      for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
-        int r = (int)g_row[el];
-        int p = jacg_rowstart_[r] + fill_pos[r]++;
-        jacg_col_[p] = c;
-        jacg_nzidx_[p] = (int)el;
-      }
-
-    // Recompute linearity flags (not serialized; derived from the function)
+    // Recompute linearity flags first (needed for CSR construction below)
     {
       Sparsity djac_dx = get_function("nlp_jac_g").sparsity_jac(0, 1, true);
       jacg_nlflag_.assign(jacg_sp_.nnz(), 0);
@@ -149,6 +136,42 @@ namespace casadi {
       has_linear_jac_ = std::any_of(jacg_nlflag_.begin(), jacg_nlflag_.end(),
                                      [](int f) { return f == 0; });
     }
+
+    // Rebuild derived arrays from the serialized sparsities
+    const casadi_int* f_row = gradf_sp_.row();
+    gradf_col_flag_.assign(nx_, false);
+    gradf_col_to_nz_.assign(nx_, -1);
+    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k) {
+      gradf_col_flag_[f_row[k]] = true;
+      gradf_col_to_nz_[f_row[k]] = k;
+    }
+
+    {
+      Sparsity dgradf_dx = get_function("nlp_grad_f").sparsity_jac(0, 1, true);
+      gradf_nlflag_.assign(gradf_sp_.nnz(), 0);
+      const casadi_int* dg_row = dgradf_dx.row();
+      for (casadi_int el = 0; el < dgradf_dx.nnz(); ++el)
+        gradf_nlflag_[dg_row[el]] = 1;
+      has_linear_gradf_ = std::any_of(gradf_nlflag_.begin(), gradf_nlflag_.end(),
+                                       [](int f) { return f == 0; });
+    }
+
+    const casadi_int* g_colind = jacg_sp_.colind();
+    const casadi_int* g_row = jacg_sp_.row();
+    casadi_int nnz_g = jacg_sp_.nnz();
+    jacg_rowstart_.assign(ng_ + 1, 0);
+    for (casadi_int el = 0; el < nnz_g; ++el)
+      if (jacg_nlflag_[el]) jacg_rowstart_[g_row[el] + 1]++;
+    for (int r = 0; r < ng_; ++r)
+      jacg_rowstart_[r + 1] += jacg_rowstart_[r];
+    jacg_nzidx_.resize(jacg_rowstart_[ng_]);
+    std::vector<int> fill_pos(ng_, 0);
+    for (int c = 0; c < nx_; ++c)
+      for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
+        if (!jacg_nlflag_[el]) continue;
+        int r = (int)g_row[el];
+        jacg_nzidx_[jacg_rowstart_[r] + fill_pos[r]++] = (int)el;
+      }
   }
 
   void ConoptInterface::serialize_body(SerializingStream &s) const {
@@ -164,8 +187,8 @@ namespace casadi {
 
   ConoptMemory::ConoptMemory(const ConoptInterface& interface)
       : self(interface), NlpsolMemory(), cntvect(nullptr), modsta(0), solsta(0),
-        iter(0), return_status("Unset"), success(0),
-        cache_valid(false), current_option_idx(0),
+        iter(0), return_status("Unset"),
+        cache_valid(false), nan_encountered(false),
         ng_expanded(0), numnz_expanded(0) {}
 
   ConoptMemory::~ConoptMemory() {
@@ -186,6 +209,8 @@ namespace casadi {
     m->casadi_to_conopt_ub_row.assign(ng_, -1);
     if (has_linear_jac_)
       m->const_jac_vals.resize(jacg_sp_.nnz(), 0.0);
+    if (has_linear_gradf_)
+      m->gradf_const_vals.resize(gradf_sp_.nnz(), 0.0);
 
     COI_Create(&m->cntvect);
 
@@ -209,7 +234,6 @@ namespace casadi {
             m->custom_options.push_back(op);
         }
     }
-    m->current_option_idx = 0;
     COIDEF_Option(m->cntvect, &ConoptInterface::cb_option);
     COIDEF_Progress(m->cntvect, &ConoptInterface::cb_progress);
 
@@ -219,12 +243,14 @@ namespace casadi {
     COIDEF_FDEval(m->cntvect, &ConoptInterface::cb_fd_eval);
     COIDEF_FDEvalEnd(m->cntvect, &ConoptInterface::cb_fdevalend);
 
-    if (exact_hessian_) {
+    if (exact_hessian_ && hesslag_sp_.nnz() > 0) {
         COIDEF_NumHess(m->cntvect, hesslag_sp_.nnz());
         COIDEF_2DLagrSize(m->cntvect, &ConoptInterface::cb_2dlagrsize);
         COIDEF_2DLagrStr(m->cntvect, &ConoptInterface::cb_2dlagrstr);
         COIDEF_2DLagrVal(m->cntvect, &ConoptInterface::cb_2dlagrval);
     }
+
+    COIDEF_FVincLin(m->cntvect, 1);
 
     COIDEF_Status(m->cntvect, &ConoptInterface::cb_status);
     COIDEF_Solution(m->cntvect, &ConoptInterface::cb_solution);
@@ -242,13 +268,21 @@ namespace casadi {
   int ConoptInterface::solve(void* mem) const {
     auto m = static_cast<ConoptMemory*>(mem);
     m->cache_valid = false;
-    m->current_option_idx = 0;
+    m->nan_encountered = false;
 
     // Build the per-solve constraint expansion (splits range constraints into two rows)
     m->conopt_to_casadi.clear();
     m->casadi_to_conopt_ub_row.assign(ng_, -1);
     m->conopt_type.clear();
     m->conopt_rhs.clear();
+
+    // Compute total nnz per CasADi row (needed for range-constraint NZ duplication)
+    std::vector<int> row_nnz(ng_, 0);
+    {
+      const casadi_int* g_row_s = jacg_sp_.row();
+      for (casadi_int el = 0; el < (casadi_int)jacg_sp_.nnz(); ++el)
+        row_nnz[g_row_s[el]]++;
+    }
 
     int ng_expanded = 0;
     // Base NZ: objective gradient columns + all constraint Jacobian entries
@@ -279,7 +313,7 @@ namespace casadi {
         m->conopt_to_casadi.push_back((int)i);
         m->conopt_type.push_back(2);  m->conopt_rhs.push_back(ubg);  // <= row
         ng_expanded++;
-        numnz += jacg_rowstart_[i + 1] - jacg_rowstart_[i];
+        numnz += row_nnz[i];
       }
     }
     m->ng_expanded    = ng_expanded;
@@ -298,10 +332,25 @@ namespace casadi {
       }
     }
 
-    // Count nonlinear NZ: all objective gradient entries + nonlinear constraint entries
+    // Evaluate objective gradient at initial point for constant entries
+    if (has_linear_gradf_) {
+      m->arg[0] = m->d_nlp.z;
+      m->arg[1] = m->d_nlp.p;
+      m->res[0] = &m->cached_f;
+      m->res[1] = m->gradf_const_vals.data();
+      try {
+        calc_function(m, "nlp_grad_f");
+      } catch (...) {
+        std::fill(m->gradf_const_vals.begin(), m->gradf_const_vals.end(), 0.0);
+      }
+    }
+
+    // Count nonlinear NZ: nonlinear objective gradient entries + nonlinear constraint entries
     const casadi_int* g_colind_s = jacg_sp_.colind();
     const casadi_int* g_row_s    = jacg_sp_.row();
-    int num_nl_nz = (int)gradf_sp_.nnz();
+    int num_nl_nz = 0;
+    for (casadi_int k = 0; k < (casadi_int)gradf_sp_.nnz(); ++k)
+      if (gradf_nlflag_[k]) num_nl_nz++;
     for (casadi_int c = 0; c < nx_; ++c) {
       for (casadi_int el = g_colind_s[c]; el < g_colind_s[c+1]; ++el) {
         if (jacg_nlflag_[el]) {
@@ -317,16 +366,20 @@ namespace casadi {
 
     int ret = COI_Solve(m->cntvect);
     if (ret != 0) {
-      // Hard error before status/solution callbacks were reached
       m->success = false;
-      m->unified_return_status = SOLVER_RET_UNKNOWN;
+      m->unified_return_status = m->nan_encountered ? SOLVER_RET_NAN : SOLVER_RET_UNKNOWN;
       return 0;
     }
 
-    m->success = (m->modsta == 1 || m->modsta == 2) && m->solsta == 1;
+    m->success = !m->nan_encountered &&
+                 (m->modsta == 1 || m->modsta == 2) && m->solsta == 1;
 
-    if (!m->success) {
-      if (m->solsta == 2 || m->solsta == 3 || m->solsta == 5 ||
+    if (m->nan_encountered || m->solsta == 5) {
+      m->unified_return_status = SOLVER_RET_NAN;
+    } else if (m->success) {
+      m->unified_return_status = SOLVER_RET_SUCCESS;
+    } else {
+      if (m->solsta == 2 || m->solsta == 3 ||
           m->solsta == 8 || m->solsta == 15) {
         m->unified_return_status = SOLVER_RET_LIMITED;
       } else if (m->modsta == 4 || m->modsta == 5) {
@@ -350,22 +403,18 @@ namespace casadi {
   int COI_CALLCONV ConoptInterface::cb_option(int NCALL, double* RVAL, int* IVAL, int* LVAL, char* NAME, void* USRMEM) {
     auto m = static_cast<ConoptMemory*>(USRMEM);
 
-    if (m->current_option_idx < m->custom_options.size()) {
-        auto& opt = m->custom_options[m->current_option_idx];
-
-        std::string name = opt.first;
-        if (name.length() > 8) name = name.substr(0, 8);
-        else name.append(8 - name.length(), ' ');
-        std::strncpy(NAME, name.c_str(), 8);
-
-        if (opt.second.is_double()) *RVAL = opt.second.to_double();
-        else if (opt.second.is_int()) *IVAL = opt.second.to_int();
-        else if (opt.second.is_bool()) *LVAL = opt.second.to_bool() ? 1 : 0;
-
-        m->current_option_idx++;
-    } else {
-        std::strncpy(NAME, "        ", 8);
+    if (NCALL >= (int)m->custom_options.size()) {
+        NAME[0] = '\0';
+        return 0;
     }
+
+    auto& opt = m->custom_options[NCALL];
+    std::strcpy(NAME, opt.first.c_str());
+
+    if (opt.second.is_double())     *RVAL = opt.second.to_double();
+    else if (opt.second.is_int())   *IVAL = opt.second.to_int();
+    else if (opt.second.is_bool())  *LVAL = opt.second.to_bool() ? 1 : 0;
+
     return 0;
   }
 
@@ -429,8 +478,10 @@ namespace casadi {
     for (int c = 0; c < NUMVAR; ++c) {
       COLSTA[c] = nz;
       if (self.gradf_col_flag_[c]) {
+        casadi_int k = self.gradf_col_to_nz_[c];
         ROWNO[nz]  = 0;
-        NLFLAG[nz] = 1;
+        NLFLAG[nz] = self.gradf_nlflag_[k];
+        if (self.gradf_nlflag_[k] == 0) VALUE[nz] = m->gradf_const_vals[k];
         nz++;
       }
       for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
@@ -472,9 +523,31 @@ namespace casadi {
         self.calc_function(m, "nlp_jac_g");
 
         m->cache_valid = true;
+    } catch (std::exception& ex) {
+        casadi::uerr() << ex.what() << std::endl;
+        *ERRCNT = 1;
+        m->nan_encountered = true;
+        m->cache_valid = false;
     } catch (...) {
         *ERRCNT = 1;
+        m->nan_encountered = true;
         m->cache_valid = false;
+    }
+
+    // Detect silent NaN from CasADi (e.g. sqrt of negative number)
+    if (m->cache_valid) {
+        bool has_nan = std::isnan(m->cached_f);
+        if (!has_nan) {
+            for (double v : m->cached_g) if (std::isnan(v)) { has_nan = true; break; }
+        }
+        if (!has_nan) {
+            for (double v : m->cached_grad_f) if (std::isnan(v)) { has_nan = true; break; }
+        }
+        if (has_nan) {
+            *ERRCNT = 1;
+            m->nan_encountered = true;
+            m->cache_valid = false;
+        }
     }
     return 0;
   }
@@ -493,18 +566,16 @@ namespace casadi {
         if (MODE == 2 || MODE == 3) {
             std::memset(JAC, 0, NUMVAR * sizeof(double));
             const casadi_int* f_row = self.gradf_sp_.row();
-            for (casadi_int k = 0; k < self.gradf_sp_.nnz(); ++k) {
+            for (casadi_int k = 0; k < self.gradf_sp_.nnz(); ++k)
                 JAC[f_row[k]] = m->cached_grad_f[k];
-            }
         }
-    }
-    else {
-        int ci = m->conopt_to_casadi[ROWNO - 1];  // CasADi constraint index
+    } else {
+        int ci = m->conopt_to_casadi[ROWNO - 1];
         if (MODE == 1 || MODE == 3) *G = m->cached_g[ci];
         if (MODE == 2 || MODE == 3) {
-            std::memset(JAC, 0, NUMVAR * sizeof(double));
-            for (int k = self.jacg_rowstart_[ci]; k < self.jacg_rowstart_[ci + 1]; ++k)
-                JAC[self.jacg_col_[k]] = m->cached_jac_g[self.jacg_nzidx_[k]];
+            int base = self.jacg_rowstart_[ci];
+            for (int k = 0; k < NUMJAC; ++k)
+                JAC[JACNUM[k]] = m->cached_jac_g[self.jacg_nzidx_[base + k]];
         }
     }
     return 0;

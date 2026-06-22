@@ -2,6 +2,7 @@
 #define CASADI_CONOPT_INTERFACE_HPP
 
 #include "casadi/core/nlpsol_impl.hpp"
+#include <casadi/interfaces/conopt/casadi_nlpsol_conopt_export.h>
 #include <conopt.h>
 #include <vector>
 #include <string>
@@ -10,7 +11,7 @@
 namespace casadi {
   class ConoptInterface;
 
-  struct ConoptMemory : public NlpsolMemory {
+  struct CASADI_NLPSOL_CONOPT_EXPORT ConoptMemory : public NlpsolMemory {
     const ConoptInterface& self;
     coiHandle_t cntvect;
 
@@ -18,7 +19,6 @@ namespace casadi {
     int solsta;
     int iter;
     std::string return_status;
-    int success;
 
     // Caching state for the evaluation block
     std::vector<double> cached_x;
@@ -27,13 +27,15 @@ namespace casadi {
     std::vector<double> cached_g;
     std::vector<double> cached_jac_g;
     bool cache_valid;
+    bool nan_encountered;
 
     // Options handling
     std::vector<std::pair<std::string, GenericType>> custom_options;
-    size_t current_option_idx;
 
     // Constant Jacobian values for linear (NLFLAG=0) entries (populated in solve())
     std::vector<double> const_jac_vals;
+    // Constant objective gradient values for linear (NLFLAG=0) entries
+    std::vector<double> gradf_const_vals;
 
     // Range-constraint expansion state (recomputed each solve)
     int ng_expanded;
@@ -48,7 +50,7 @@ namespace casadi {
     ~ConoptMemory();
   };
 
-  class ConoptInterface : public Nlpsol {
+  class CASADI_NLPSOL_CONOPT_EXPORT ConoptInterface : public Nlpsol {
   public:
     explicit ConoptInterface(const std::string& name, const Function& nlp);
     ~ConoptInterface() override;
@@ -82,14 +84,19 @@ namespace casadi {
     // Per-column flag: true if the objective gradient has a nonzero in that column
     std::vector<bool> gradf_col_flag_;
 
-    // Row-indexed (CSR) structure for fast Jacobian scatter in cb_fd_eval
-    std::vector<int> jacg_rowstart_;
-    std::vector<int> jacg_col_;
-    std::vector<int> jacg_nzidx_;
+    // Row-indexed structure for fast Jacobian scatter in cb_fd_eval (nonlinear entries only)
+    std::vector<int> jacg_rowstart_;  // size ng_+1; nonlinear nnz prefix sums per row
+    std::vector<int> jacg_nzidx_;    // CCS indices of nonlinear entries, in row-major order
 
     // Per-nonzero linearity flag (0 = constant/linear, 1 = nonlinear), CCS order
     std::vector<int> jacg_nlflag_;
     bool has_linear_jac_;
+
+    // Objective gradient linearity: flag per nonzero of gradf_sp_
+    std::vector<int> gradf_nlflag_;
+    bool has_linear_gradf_;
+    // Maps variable index → nonzero index in gradf_sp_ (-1 if absent)
+    std::vector<casadi_int> gradf_col_to_nz_;
 
     // Serialization and Deserialization
     void serialize_body(SerializingStream &s) const override;
