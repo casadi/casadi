@@ -4268,7 +4268,7 @@ class MXtests(casadiTestCase):
     p = np.random.permutation(A.shape[0])
 
 
-    [D,V] = np.linalg.eig(np.array(A))
+    [D,V] = np.linalg.eigh(np.array(A))
     Dr= ca.fmax(abs(D),1e-7)
     Dc= ca.fmax(D,1e-7)  # pyright: ignore[reportCallIssue,reportArgumentType]
 
@@ -4300,7 +4300,7 @@ class MXtests(casadiTestCase):
         for trans in [lambda e: e, lambda e: ca.sparsify(e)]:
           A = trans(ca.blockcat([[q,s,0+eps],[s,Q,0],[0+eps,0,2]]))
           print(A)
-          self.assertTrue(np.all(np.linalg.eig(A)[0]>0))
+          self.assertTrue(np.all(np.linalg.eigh(A)[0]>0))
           Ac = ca.evalf(ca.convexify(A,{"strategy":"eigen-reflect"}))
           self.checkarray(A,Ac,digits=8)
 
