@@ -1,16 +1,16 @@
 # Prefer explicit user-provided root (case-insensitive, keep both)
-if(NOT DEFINED CONOPT_ROOT AND DEFINED conopt_ROOT)
-  set(CONOPT_ROOT "${conopt_ROOT}" CACHE PATH "Root path to CONOPT installation" FORCE)
+if(NOT DEFINED CONOPT_DIR AND DEFINED conopt_DIR)
+  set(CONOPT_DIR "${conopt_DIR}" CACHE PATH "Root path to CONOPT installation" FORCE)
 endif()
 
-if(NOT DEFINED CONOPT_ROOT)
-  set(CONOPT_ROOT $ENV{CONOPT} CACHE PATH "Root path to CONOPT installation (from CONOPT env)" )
+if(NOT DEFINED CONOPT_DIR)
+  set(CONOPT_DIR $ENV{CONOPT} CACHE PATH "Root path to CONOPT installation (from CONOPT env)" )
 endif()
 
 # Find the include directory containing conopt.h
 find_path(CONOPT_INCLUDE_DIR
   NAMES conopt.h
-  HINTS "${CONOPT_ROOT}/include" "${CONOPT_ROOT}" "${CMAKE_PREFIX_PATH}/include"
+  HINTS "${CONOPT_DIR}/include" "${CONOPT_DIR}" "${CMAKE_PREFIX_PATH}/include"
   PATH_SUFFIXES ""
   DOC "CONOPT C API include directory")
 
@@ -23,7 +23,7 @@ endif()
 # Find the CONOPT library
 find_library(CONOPT_LIBRARY
   NAMES conopt libconopt
-  HINTS "${CONOPT_ROOT}/lib" "${CONOPT_ROOT}/lib64" "${CONOPT_ROOT}" "${CMAKE_PREFIX_PATH}/lib"
+  HINTS "${CONOPT_DIR}/lib" "${CONOPT_DIR}/lib64" "${CONOPT_DIR}" "${CMAKE_PREFIX_PATH}/lib"
   DOC "CONOPT library")
 
 if(CONOPT_LIBRARY)
@@ -49,4 +49,4 @@ if(CONOPT_FOUND)
 endif()
 
 # Hide these variables from the standard CMake GUI to keep it clean
-mark_as_advanced(CONOPT_ROOT CONOPT_INCLUDE_DIR CONOPT_LIBRARY)
+mark_as_advanced(CONOPT_DIR CONOPT_INCLUDE_DIR CONOPT_LIBRARY)
