@@ -4,6 +4,7 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include <casadi/interfaces/conopt/casadi_nlpsol_conopt_export.h>
 #include <conopt.h>
+#include <atomic>
 #include <vector>
 #include <string>
 #include <utility>
@@ -54,7 +55,8 @@ namespace casadi {
     std::vector<double> cached_grad_f;
     std::vector<double> cached_g;
     std::vector<double> cached_jac_g;
-    bool cache_valid;
+    std::atomic<bool> cache_valid{false};
+    std::atomic<bool> cache_valid_jac{false};  // true only when cached_jac_g was computed
     bool nan_encountered;
 
     // Options handling
@@ -68,6 +70,7 @@ namespace casadi {
     // Range-constraint expansion state (recomputed each solve)
     int ng_expanded;
     int numnz_expanded;
+    std::vector<int> row_nnz;            // nnz per CasADi row, persistent across solves
     std::vector<int> conopt_to_casadi;   // CONOPT constraint row (0-indexed) → CasADi index
     std::vector<int> casadi_to_conopt_lb_row;  // CasADi index → CONOPT row for lb (or only) side
     std::vector<int> casadi_to_conopt_ub_row;  // CasADi index → CONOPT row for ub side (range only); -1 otherwise
