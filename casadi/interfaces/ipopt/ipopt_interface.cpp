@@ -74,7 +74,7 @@ namespace casadi {
         "Pass list of variables entering nonlinearly to IPOPT"}},
       {"nonlinear_variables",
         {OT_BOOLVECTOR,
-        "Which of the decision variables enter nonlinearly? (detected automatically by default)"}},
+        "Which decision variables enter nonlinearly? (detected automatically by default)"}},
       {"ipopt",
        {OT_DICT,
         "Options to be passed to IPOPT"}},
@@ -162,7 +162,8 @@ namespace casadi {
         pass_nonlinear_variables_ = op.second;
       } else if (op.first=="nonlinear_variables") {
         nl_ex_ = op.second;
-        casadi_assert(nl_ex_.size()==nx_, "Wrong length for 'nonlinear_variables'");
+        casadi_assert(nl_ex_.empty() || nl_ex_.size()==nx_, "Wrong length ("
+          + str(nl_ex_.size()) + ") for 'nonlinear_variables', expected " + str(nx_));
       } else if (op.first=="var_string_md") {
         var_string_md_ = op.second;
       } else if (op.first=="var_integer_md") {
