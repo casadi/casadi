@@ -1118,7 +1118,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         A = DM([[1.0, 2.0], [3.0, 4.0]])
         for p in (1, np.inf, 'fro'):
             self._verify("linalg.cond p=%r" % p,
-                         lambda M, p=p: np.linalg.cond(M, p),  # pyright: ignore[reportArgumentType]
+                         lambda M, p=p: np.linalg.cond(M, p),  # pyright: ignore[reportArgumentType,reportCallIssue]
                          A)
 
     def test_linspace_retstep_with_dm_endpoints(self):

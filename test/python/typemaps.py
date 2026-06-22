@@ -891,7 +891,7 @@ class typemaptests(casadiTestCase):
       v = cls.sym("v", 24)
       t = np.reshape(Arr(v), (2, 3, 4))
       r = np.sum(t, axis=2)                 # (2, 3) -> back to casadi
-      f = ca.Function("f", [v], [r.to_casadi()])
+      f = ca.Function("f", [v], [r.to_casadi()])  # pyright: ignore[reportAttributeAccessIssue]
       same("%s 3D sum axis2" % cls.__name__,
            f(ca.DM(A.reshape(-1, 1))), np.sum(A, axis=2))
 
