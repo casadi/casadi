@@ -11,12 +11,40 @@
 namespace casadi {
   class ConoptInterface;
 
+  enum class ConoptModelStatus {
+    Unset              = 0,
+    Optimal            = 1,
+    LocallyOptimal     = 2,
+    Unbounded          = 3,
+    Infeasible         = 4,
+    LocallyInfeasible  = 5,
+    IntermediateInfeas = 6,
+    IntermediateNonOpt = 7,
+    UnknownError       = 12,
+    ErrorNoSolution    = 13
+  };
+
+  enum class ConoptSolverStatus {
+    Unset              = 0,
+    NormalCompletion   = 1,
+    IterationLimit     = 2,
+    TimeLimit          = 3,
+    TerminatedBySolver = 4,
+    EvalErrorLimit     = 5,
+    UserInterrupt      = 8,
+    SetupFailure       = 9,
+    MajorSolverError   = 10,
+    MajorSolverErrorFeas = 11,
+    SystemError        = 13,
+    QuickModeTermination = 15
+  };
+
   struct CASADI_NLPSOL_CONOPT_EXPORT ConoptMemory : public NlpsolMemory {
     const ConoptInterface& self;
     coiHandle_t cntvect;
 
-    int modsta;
-    int solsta;
+    ConoptModelStatus modsta;
+    ConoptSolverStatus solsta;
     int iter;
     std::string return_status;
 
