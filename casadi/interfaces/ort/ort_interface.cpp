@@ -147,6 +147,12 @@ namespace casadi {
     delete m;
   }
 
+  OnnxRuntimeInterface::~OnnxRuntimeInterface() {
+    // Free the memory pool while this is still the dynamic type, so the virtual
+    // free_mem() above runs (the base ~OnnxFunction::clear_mem() is too late).
+    clear_mem();
+  }
+
   void OnnxRuntimeInterface::serialize_body(SerializingStream &s) const {
     OnnxFunction::serialize_body(s);
     s.version("OnnxRuntimeInterface", 1);

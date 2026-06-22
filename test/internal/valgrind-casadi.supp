@@ -745,20 +745,20 @@ obj:*libworhp*
    fun:XPRSiisfirst
 }
 
-# ONNX Runtime internal leaks (third-party, libonnxruntime).
-# Blocks allocated ENTIRELY inside libonnxruntime and never freed by ORT itself:
-#  - CreateSession global state (arena / thread-pool / CPU-allocator / op-kernel
-#    registries) kept past ReleaseSession  -> rooted at init_mem (alloc_mem)
-#  - per-Run() internal scratch (16-64 B blocks) leaked by Ort::Run  -> rooted at eval
-# CasADi releases every Ort handle it owns (ReleaseValue/ReleaseMemoryInfo/
-# ReleaseSession/ReleaseEnv in free_mem; output OrtValues released each solve;
-# prepare() builds the per-mem scaffolding exactly once). The only consumer of
-# libonnxruntime is CasADi's (code-reviewed-correct) OnnxRuntimeInterface, so any
-# leak whose allocation is inside libonnxruntime is ORT-internal. We match on the
-# allocating object rather than a CasADi frame because the CreateSession leaks sit
-# too deep in libonnxruntime for the CasADi frame to fall within --num-callers.
-# Only surfaces with the real ONNX Runtime ([ci:run_slow]); the default matrix
-# links the stub. Third-party, not a CasADi-side bug.
+# ONNX Runtime internal GLOBAL-state leaks (third-party, libonnxruntime).
+# NOTE: the BULK of the apparent leak was a CasADi bug, FIXED separately by adding
+# ~OnnxRuntimeInterface(){clear_mem();} (ort_interface.cpp) so the virtual
+# free_mem() actually runs at destruction and releases the Ort session/env/tensors
+# (previously clear_mem fired only from the base ~OnnxFunction, too late to
+# dispatch to the derived free_mem -> whole sessions leaked). What REMAINS after
+# that fix is ORT's own process-global state (arena / thread-pool / CPU-allocator /
+# op-kernel registries) that ORT keeps past ReleaseSession and never frees, plus
+# tiny per-Run() internal scratch -- all allocated ENTIRELY inside libonnxruntime.
+# CasADi (sole consumer of libonnxruntime) releases every handle it owns, so any
+# leak allocated inside libonnxruntime is ORT-internal. Match on the allocating
+# object (not a CasADi frame): that residual state sits too deep in libonnxruntime
+# for a CasADi frame to fall within --num-callers. Only surfaces with the real
+# ONNX Runtime ([ci:run_slow]); the default matrix links the stub.
 {
    onnxruntime internal leak (third-party; allocated within libonnxruntime)
    Memcheck:Leak

@@ -65,6 +65,13 @@ namespace casadi {
                          const std::vector<std::string>& inputs,
                          const std::vector<std::string>& outputs);
 
+    /// Destructor: clear the memory pool HERE (the most-derived class) so the
+    /// virtual free_mem dispatches to OnnxRuntimeInterface::free_mem. Relying on
+    /// the base ~OnnxFunction::clear_mem() is too late (this subobject is already
+    /// destroyed) and would leak every Ort session/env/tensor (idempotent: the
+    /// later ~OnnxFunction call then finds an empty pool).
+    ~OnnxRuntimeInterface() override;
+
     /// Plugin factory
     static OnnxFunction* creator(const std::string& name,
                                  const GraphBuilderInternal* gb,
