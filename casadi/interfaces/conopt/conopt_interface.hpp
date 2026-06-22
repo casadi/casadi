@@ -74,6 +74,9 @@ namespace casadi {
     std::vector<int> conopt_type;        // CONOPT TYPE for each expanded row
     std::vector<double> conopt_rhs;      // CONOPT RHS for each expanded row
 
+    // Multiplier buffer for Hessian callback (avoids per-call allocation)
+    std::vector<double> hess_lam_g_;
+
     ConoptMemory(const ConoptInterface& interface);
     ~ConoptMemory();
   };
@@ -107,7 +110,9 @@ namespace casadi {
     Sparsity jacg_sp_;
     Sparsity hesslag_sp_;
     bool exact_hessian_;
+    bool warm_start_;
     Dict opts_; // CONOPT specific options
+    std::string optfile_; // Path to CONOPT option file (for string-valued CR-cells)
 
     // Per-column flag: true if the objective gradient has a nonzero in that column
     std::vector<bool> gradf_col_flag_;
@@ -115,6 +120,7 @@ namespace casadi {
     // Row-indexed structure for fast Jacobian scatter in cb_fd_eval (nonlinear entries only)
     std::vector<int> jacg_rowstart_;  // size ng_+1; nonlinear nnz prefix sums per row
     std::vector<int> jacg_nzidx_;    // CCS indices of nonlinear entries, in row-major order
+    std::vector<int> jacg_col_;      // column (variable) index of each entry in jacg_nzidx_
 
     // Per-nonzero linearity flag (0 = constant/linear, 1 = nonlinear), CCS order
     std::vector<int> jacg_nlflag_;
