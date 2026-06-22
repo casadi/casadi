@@ -186,7 +186,8 @@ namespace casadi {
   }
 
   ConoptMemory::ConoptMemory(const ConoptInterface& interface)
-      : self(interface), NlpsolMemory(), cntvect(nullptr), modsta(0), solsta(0),
+      : self(interface), NlpsolMemory(), cntvect(nullptr),
+        modsta(ConoptModelStatus::Unset), solsta(ConoptSolverStatus::Unset),
         iter(0), return_status("Unset"),
         cache_valid(false), nan_encountered(false),
         ng_expanded(0), numnz_expanded(0) {}
@@ -372,17 +373,22 @@ namespace casadi {
     }
 
     m->success = !m->nan_encountered &&
-                 (m->modsta == 1 || m->modsta == 2) && m->solsta == 1;
+                 (m->modsta == ConoptModelStatus::Optimal ||
+                  m->modsta == ConoptModelStatus::LocallyOptimal) &&
+                 m->solsta == ConoptSolverStatus::NormalCompletion;
 
-    if (m->nan_encountered || m->solsta == 5) {
+    if (m->nan_encountered || m->solsta == ConoptSolverStatus::EvalErrorLimit) {
       m->unified_return_status = SOLVER_RET_NAN;
     } else if (m->success) {
       m->unified_return_status = SOLVER_RET_SUCCESS;
     } else {
-      if (m->solsta == 2 || m->solsta == 3 ||
-          m->solsta == 8 || m->solsta == 15) {
+      if (m->solsta == ConoptSolverStatus::IterationLimit ||
+          m->solsta == ConoptSolverStatus::TimeLimit ||
+          m->solsta == ConoptSolverStatus::UserInterrupt ||
+          m->solsta == ConoptSolverStatus::QuickModeTermination) {
         m->unified_return_status = SOLVER_RET_LIMITED;
-      } else if (m->modsta == 4 || m->modsta == 5) {
+      } else if (m->modsta == ConoptModelStatus::Infeasible ||
+                 m->modsta == ConoptModelStatus::LocallyInfeasible) {
         m->unified_return_status = SOLVER_RET_INFEASIBLE;
       }
     }
@@ -393,8 +399,8 @@ namespace casadi {
     Dict stats = Nlpsol::get_stats(mem);
     auto m = static_cast<ConoptMemory*>(mem);
     stats["return_status"] = m->return_status;
-    stats["modsta"] = m->modsta;
-    stats["solsta"] = m->solsta;
+    stats["modsta"] = static_cast<int>(m->modsta);
+    stats["solsta"] = static_cast<int>(m->solsta);
     stats["iter_count"] = m->iter;
     return stats;
   }
@@ -637,39 +643,39 @@ namespace casadi {
 
   int COI_CALLCONV ConoptInterface::cb_status(int MODSTA, int SOLSTA, int ITER, double OBJVAL, void* USRMEM) {
     auto m = static_cast<ConoptMemory*>(USRMEM);
-    m->modsta = MODSTA;
-    m->solsta = SOLSTA;
+    m->modsta = static_cast<ConoptModelStatus>(MODSTA);
+    m->solsta = static_cast<ConoptSolverStatus>(SOLSTA);
     m->iter = ITER;
     m->d_nlp.objective = OBJVAL;
 
     const char* modsta_str;
-    switch (MODSTA) {
-      case 1:  modsta_str = "Optimal";                  break;
-      case 2:  modsta_str = "Locally optimal";          break;
-      case 3:  modsta_str = "Unbounded";                break;
-      case 4:  modsta_str = "Infeasible";               break;
-      case 5:  modsta_str = "Locally infeasible";       break;
-      case 6:  modsta_str = "Intermediate infeasible";  break;
-      case 7:  modsta_str = "Intermediate non-optimal"; break;
-      case 12: modsta_str = "Unknown error";            break;
-      case 13: modsta_str = "Error: no solution";       break;
-      default: modsta_str = "Unknown model status";     break;
+    switch (m->modsta) {
+      case ConoptModelStatus::Optimal:            modsta_str = "Optimal";                  break;
+      case ConoptModelStatus::LocallyOptimal:     modsta_str = "Locally optimal";          break;
+      case ConoptModelStatus::Unbounded:          modsta_str = "Unbounded";                break;
+      case ConoptModelStatus::Infeasible:         modsta_str = "Infeasible";               break;
+      case ConoptModelStatus::LocallyInfeasible:  modsta_str = "Locally infeasible";       break;
+      case ConoptModelStatus::IntermediateInfeas: modsta_str = "Intermediate infeasible";  break;
+      case ConoptModelStatus::IntermediateNonOpt: modsta_str = "Intermediate non-optimal"; break;
+      case ConoptModelStatus::UnknownError:       modsta_str = "Unknown error";            break;
+      case ConoptModelStatus::ErrorNoSolution:    modsta_str = "Error: no solution";       break;
+      default:                                    modsta_str = "Unknown model status";     break;
     }
 
     const char* solsta_str;
-    switch (SOLSTA) {
-      case 1:  solsta_str = "Normal completion";                   break;
-      case 2:  solsta_str = "Iteration limit";                     break;
-      case 3:  solsta_str = "Time limit";                          break;
-      case 4:  solsta_str = "Terminated by solver";                break;
-      case 5:  solsta_str = "Evaluation error limit";              break;
-      case 8:  solsta_str = "User interrupt";                      break;
-      case 9:  solsta_str = "Setup failure";                       break;
-      case 10: solsta_str = "Major solver error";                  break;
-      case 11: solsta_str = "Major solver error (feasible point)"; break;
-      case 13: solsta_str = "System error";                        break;
-      case 15: solsta_str = "Quick Mode termination";              break;
-      default: solsta_str = "Unknown solver status";               break;
+    switch (m->solsta) {
+      case ConoptSolverStatus::NormalCompletion:     solsta_str = "Normal completion";                   break;
+      case ConoptSolverStatus::IterationLimit:       solsta_str = "Iteration limit";                     break;
+      case ConoptSolverStatus::TimeLimit:            solsta_str = "Time limit";                          break;
+      case ConoptSolverStatus::TerminatedBySolver:   solsta_str = "Terminated by solver";                break;
+      case ConoptSolverStatus::EvalErrorLimit:       solsta_str = "Evaluation error limit";              break;
+      case ConoptSolverStatus::UserInterrupt:        solsta_str = "User interrupt";                      break;
+      case ConoptSolverStatus::SetupFailure:         solsta_str = "Setup failure";                       break;
+      case ConoptSolverStatus::MajorSolverError:     solsta_str = "Major solver error";                  break;
+      case ConoptSolverStatus::MajorSolverErrorFeas: solsta_str = "Major solver error (feasible point)"; break;
+      case ConoptSolverStatus::SystemError:          solsta_str = "System error";                        break;
+      case ConoptSolverStatus::QuickModeTermination: solsta_str = "Quick Mode termination";              break;
+      default:                                       solsta_str = "Unknown solver status";               break;
     }
 
     m->return_status = std::string(modsta_str) + " / " + std::string(solsta_str);
