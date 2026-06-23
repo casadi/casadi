@@ -726,7 +726,8 @@ namespace casadi {
 
     /** \brief Perform a star coloring
      * See description in public class.
-     */
+
+        \identifier{2jy} */
   Sparsity star_coloring_new(std::vector<casadi_int>& which_color, const Dict& opts) const;
 
     /** \brief A greedy distance-2 coloring algorithm
