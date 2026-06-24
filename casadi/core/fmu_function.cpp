@@ -1404,8 +1404,18 @@ void FmuFunction::finalize_hessian(double *hess_nz, casadi_int* iw) const {
       casadi_int r = row[k];
       // Get nonzero of transpose
       casadi_int k_tr = iw[r]++;
-      // If -1, use element from transpose
-      if (which_hess_color_[k] < 0) hess_nz[k] = hess_nz[k_tr];
+      // Only upper triangular part
+      if (r < c) {
+        // If -1, use element from transpose
+        if (which_hess_color_[k] < 0) {
+          hess_nz[k] = hess_nz[k_tr];
+        } else {
+          hess_nz[k_tr] = hess_nz[k];
+        }
+      } else {
+        // Lower triangular nonzeros handled together with upper triangular nonzeros, above
+        break;
+      }
     }
   }
 }
