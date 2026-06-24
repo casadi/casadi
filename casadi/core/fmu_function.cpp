@@ -991,8 +991,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (print_progress_) casadi_message("Evaluating extended Hessian");
     if (eval_all(m, max_hess_tasks_, false, false, false, false, true)) return 1;
     // Post-process Hessian
-    finalize_hessian(hess_nz, iw);
-    if (validate_hessian_) check_hessian(m, hess_nz, iw);
+    finalize_hessian(m, hess_nz, iw);
     if (make_symmetric_) make_symmetric(hess_nz, iw);
   }
   // Fetch calculated blocks
@@ -1344,53 +1343,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   return 0;
 }
 
-void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int* iw) const {
-  // Get Hessian sparsity pattern
-  casadi_int n = hess_sp_.size1();
-  const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
-  // Nonzero counters for transpose
-  casadi_copy(colind, n, iw);
-  // Loop over Hessian columns
-  for (casadi_int c = 0; c < n; ++c) {
-    // Loop over nonzeros for the column
-    for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
-      // Get row of Hessian
-      casadi_int r = row[k];
-      // Get nonzero of transpose
-      casadi_int k_tr = iw[r]++;
-      // Get indices
-      casadi_int id_c = jac_in_[c], id_r = jac_in_[r];
-      // Nonzero
-      double nz = hess_nz[k], nz_tr = hess_nz[k_tr];
-      // Check if entry is NaN of inf
-      if (std::isnan(nz) || std::isinf(nz)) {
-        std::stringstream ss;
-        ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
-          << fmu_.desc_in(m, id_c) << " is " << nz;
-        casadi_warning(ss.str());
-        // Further checks not needed for entry
-        continue;
-      }
-      // Symmetry check (strict upper triangular part only)
-      if (r < c) {
-        // Normaliation factor to be used for relative tolerance
-        double nz_max = std::fmax(std::fabs(nz), std::fabs(nz_tr));
-        // Check if above absolute and relative tolerance bounds
-        if (nz_max > abstol_ && std::fabs(nz - nz_tr) > nz_max * reltol_) {
-          std::stringstream ss;
-          ss << "Hessian appears nonsymmetric. Got " << nz << " vs. " << nz_tr
-            << " for second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
-            << fmu_.desc_in(m, id_c) << ", hess_nz = " << k << "/" <<  k_tr;
-          casadi_warning(ss.str());
-        }
-      }
-    }
-  }
-}
-
-void FmuFunction::finalize_hessian(double *hess_nz, casadi_int* iw) const {
-  // Skip if not needed
-  if (which_hess_color_.empty()) return;
+void FmuFunction::finalize_hessian(FmuMemory* m, double *hess_nz, casadi_int* iw) const {
   // Get Hessian sparsity pattern
   casadi_int n = hess_sp_.size1();
   const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
@@ -1406,11 +1359,53 @@ void FmuFunction::finalize_hessian(double *hess_nz, casadi_int* iw) const {
       casadi_int k_tr = iw[r]++;
       // Only upper triangular part
       if (r < c) {
-        // If -1, use element from transpose
-        if (which_hess_color_[k] < 0) {
-          hess_nz[k] = hess_nz[k_tr];
-        } else {
-          hess_nz[k_tr] = hess_nz[k];
+        // Star-coloring: Has to make symmetric
+        if (!which_hess_color_.empty()) {
+          // If -1, use element from transpose
+          if (which_hess_color_[k] < 0) {
+            hess_nz[k] = hess_nz[k_tr];
+          } else {
+            hess_nz[k_tr] = hess_nz[k];
+          }
+        } else if (validate_hessian_) {
+          // Get indices
+          casadi_int id_c = jac_in_[c], id_r = jac_in_[r];
+          // Nonzero
+          double nz = hess_nz[k], nz_tr = hess_nz[k_tr];
+          // Check if entry is NaN of inf
+          if (std::isnan(nz) || std::isinf(nz)) {
+            std::stringstream ss;
+            ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
+              << fmu_.desc_in(m, id_c) << " is " << nz;
+            casadi_warning(ss.str());
+          } else if (std::isnan(nz_tr) || std::isinf(nz_tr)) {
+            std::stringstream ss;
+            ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_c) << " and "
+              << fmu_.desc_in(m, id_r) << " is " << nz_tr;
+            casadi_warning(ss.str());
+          } else {
+            // Normaliation factor to be used for relative tolerance
+            double nz_max = std::fmax(std::fabs(nz), std::fabs(nz_tr));
+            // Check if above absolute and relative tolerance bounds
+            if (nz_max > abstol_ && std::fabs(nz - nz_tr) > nz_max * reltol_) {
+              std::stringstream ss;
+              ss << "Hessian appears nonsymmetric. Got " << nz << " vs. " << nz_tr
+                << " for second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
+                << fmu_.desc_in(m, id_c) << ", hess_nz = " << k << "/" <<  k_tr;
+              casadi_warning(ss.str());
+            }
+          }
+        }
+      } else if (r == c && validate_hessian_) {
+        // Get indices
+        casadi_int id_c = jac_in_[c];
+        // Nonzero
+        double nz = hess_nz[k];
+        // Check if entry is NaN of inf
+        if (std::isnan(nz) || std::isinf(nz)) {
+          std::stringstream ss;
+          ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_c) << " is " << nz;
+          casadi_warning(ss.str());
         }
       }
     }

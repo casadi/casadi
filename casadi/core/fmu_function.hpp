@@ -266,10 +266,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     bool need_nondiff, bool need_jac, bool need_fwd, bool need_adj, bool need_hess) const;
 
   // Finalize Hessian creation
-  void finalize_hessian(double *hess_nz, casadi_int* iw) const;
-
-  // Check extended Hessian
-  void check_hessian(FmuMemory* m, const double *hess_nz, casadi_int* iw) const;
+  void finalize_hessian(FmuMemory* m, double *hess_nz, casadi_int* iw) const;
 
   // Make extended Hessian symmetric
   void make_symmetric(double *hess_nz, casadi_int* iw) const;
