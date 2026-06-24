@@ -1341,8 +1341,8 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         # ediff1d.
         self._verify("ediff1d", np.ediff1d, DM([1.0, 3.0, 7.0]),
                      np_args_override=(np.array([1.0, 3.0, 7.0]),))
-        # fix.
-        self._verify("fix", np.fix, DM([1.7, -1.7, 2.0]))
+        # fix (Deprecated)
+        #self._verify("fix", np.fix, DM([1.7, -1.7, 2.0]))
         # isin -- balanced OR fold.
         self._verify("isin",
                      lambda v: np.isin(v, [1, 3, 5]),
