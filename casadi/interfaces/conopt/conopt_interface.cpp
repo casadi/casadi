@@ -370,12 +370,14 @@ namespace casadi {
       }
     }
 
-    // Evaluate objective gradient at initial point for constant entries
-    if (has_linear_gradf_) {
+    // Evaluate objective gradient at initial point for constant (linear) entries,
+    // or to capture the function value when the gradient is structurally empty.
+    m->obj_const_ = std::numeric_limits<double>::quiet_NaN();
+    if (has_linear_gradf_ || gradf_sp_.nnz() == 0) {
       m->arg[0] = m->d_nlp.z;
       m->arg[1] = m->d_nlp.p;
       m->res[0] = &m->cached_f;
-      m->res[1] = m->gradf_const_vals.data();
+      m->res[1] = has_linear_gradf_ ? m->gradf_const_vals.data() : nullptr;
       try {
         calc_function(m, "nlp_grad_f");
       } catch (std::exception& ex) {
@@ -384,6 +386,21 @@ namespace casadi {
       } catch (...) {
         casadi::uerr() << "CONOPT: initial evaluation failed (unknown exception)" << std::endl;
         return 1;
+      }
+    }
+
+    // Detect constant objective at solve time: no nonlinear gradient entries and
+    // all linear-gradient values are zero (objective has no x-dependence).
+    // Switch to feasibility mode so CONOPT doesn't report OBJVAL=0 for an empty row.
+    {
+      bool has_nl_gradf = std::any_of(gradf_nlflag_.begin(), gradf_nlflag_.end(),
+                                       [](int f) { return f == 1; });
+      bool all_const_zero = has_linear_gradf_ &&
+          std::all_of(m->gradf_const_vals.begin(), m->gradf_const_vals.end(),
+                      [](double v) { return v == 0.0; });
+      if (!has_nl_gradf && (gradf_sp_.nnz() == 0 || all_const_zero)) {
+        m->obj_const_ = m->cached_f;
+        COIDEF_OptDir(m->cntvect, 0);
       }
     }
 
@@ -409,6 +426,10 @@ namespace casadi {
     COIDEF_NumNlNz(m->cntvect, (int)num_nl_nz);
 
     int ret = COI_Solve(m->cntvect);
+
+    // Restore constant objective value when CONOPT ran in feasibility mode.
+    if (!std::isnan(m->obj_const_)) m->d_nlp.objective = m->obj_const_;
+
     if (ret != 0) {
       m->success = false;
       m->unified_return_status = m->nan_encountered ? SOLVER_RET_NAN : SOLVER_RET_UNKNOWN;

@@ -80,6 +80,9 @@ namespace casadi {
     // Multiplier buffer for Hessian callback (avoids per-call allocation)
     std::vector<double> hess_lam_g_;
 
+    // Stored constant objective value when the interface is in feasibility mode
+    double obj_const_;
+
     ConoptMemory(const ConoptInterface& interface);
     ~ConoptMemory();
   };
