@@ -26,7 +26,8 @@ namespace casadi {
       {"exact_hessian", {OT_BOOL, "Provide exact Hessian to CONOPT"}},
       {"warm_start", {OT_BOOL, "Warm-start CONOPT using multipliers from a prior solve to infer basis status (IniStat=2)"}},
       {"conopt", {OT_DICT, "Options to be passed to CONOPT"}},
-      {"optfile", {OT_STRING, "Path to a CONOPT option file (for string-valued CR-cells such as Algorithm)"}}
+      {"optfile", {OT_STRING, "Path to a CONOPT option file (for string-valued CR-cells such as Algorithm)"}},
+      {"debug", {OT_BOOL, "Print debug output: constraint values at each FDEval, solution vector, and option echo"}}
   }};
 
   ConoptInterface::ConoptInterface(const std::string& name, const Function& nlp)
@@ -39,10 +40,12 @@ namespace casadi {
 
     // Extract native options
     warm_start_ = false;
+    debug_ = false;
     for (auto&& op : opts) {
       if (op.first == "conopt") opts_ = op.second;
       else if (op.first == "optfile") optfile_ = op.second.to_string();
       else if (op.first == "warm_start") warm_start_ = op.second.to_bool();
+      else if (op.first == "debug") debug_ = op.second.to_bool();
     }
 
     create_function("nlp_f", {"x", "p"}, {"f"});
@@ -130,6 +133,7 @@ namespace casadi {
     s.unpack("ConoptInterface::hesslag_sp", hesslag_sp_);
     s.unpack("ConoptInterface::optfile", optfile_);
     s.unpack("ConoptInterface::warm_start", warm_start_);
+    s.unpack("ConoptInterface::debug", debug_);
 
     // Recompute linearity flags first (needed for CSR construction below)
     {
@@ -192,6 +196,7 @@ namespace casadi {
     s.pack("ConoptInterface::hesslag_sp", hesslag_sp_);
     s.pack("ConoptInterface::optfile", optfile_);
     s.pack("ConoptInterface::warm_start", warm_start_);
+    s.pack("ConoptInterface::debug", debug_);
     // Derived arrays (gradf_col_flag_, CSR) are rebuilt on deserialization
   }
 
@@ -455,9 +460,16 @@ namespace casadi {
     auto& opt = m->custom_options[NCALL];
     std::strcpy(NAME, opt.first.c_str());
 
-    if (opt.second.is_double())     *RVAL = opt.second.to_double();
-    else if (opt.second.is_int())   *IVAL = opt.second.to_int();
-    else if (opt.second.is_bool())  *LVAL = opt.second.to_bool() ? 1 : 0;
+    if (opt.second.is_double()) {
+        *RVAL = opt.second.to_double();
+        if (m->self.debug_) casadi::uout() << "CONOPT option: " << opt.first << " = " << *RVAL << std::endl;
+    } else if (opt.second.is_int()) {
+        *IVAL = opt.second.to_int();
+        if (m->self.debug_) casadi::uout() << "CONOPT option: " << opt.first << " = " << *IVAL << std::endl;
+    } else if (opt.second.is_bool()) {
+        *LVAL = opt.second.to_bool() ? 1 : 0;
+        if (m->self.debug_) casadi::uout() << "CONOPT option: " << opt.first << " = " << (opt.second.to_bool() ? "true" : "false") << std::endl;
+    }
     else if (opt.second.is_string()) {
         // init_mem filters out all string options before they enter custom_options
         // (with a casadi_warning directing the user to 'optfile'). Reaching this
@@ -622,6 +634,13 @@ namespace casadi {
 
     std::memcpy(m->cached_x.data(), X, NUMVAR * sizeof(double));
 
+    if (self.debug_) {
+        casadi::uout() << "FDEvalIni x:";
+        for (int i = 0; i < NUMVAR; ++i)
+            casadi::uout() << " " << X[i];
+        casadi::uout() << "\n";
+    }
+
     const bool need_jac = (MODE != 1);
 
     try {
@@ -697,12 +716,28 @@ namespace casadi {
         if (MODE == 1 || MODE == 3) *G = m->cached_f;
         if (MODE == 2 || MODE == 3) {
             const casadi_int* f_row = self.gradf_sp_.row();
-            for (casadi_int k = 0; k < self.gradf_sp_.nnz(); ++k)
-                if (self.gradf_nlflag_[k]) JAC[f_row[k]] = m->cached_grad_f[k];
+            for (casadi_int k = 0; k < self.gradf_sp_.nnz(); ++k) {
+                if (self.gradf_nlflag_[k]) {
+                    JAC[f_row[k]] = m->cached_grad_f[k];
+                    if (self.debug_)
+                        casadi::uout() << "  df/dx[" << f_row[k] << "] = " << m->cached_grad_f[k] << "\n";
+                }
+            }
         }
     } else {
         int ci = m->conopt_to_casadi[ROWNO - 1];
-        if (MODE == 1 || MODE == 3) *G = m->cached_g[ci];
+        if (MODE == 1 || MODE == 3) {
+            *G = m->cached_g[ci];
+            if (self.debug_) {
+                int ctype = m->conopt_type[ROWNO - 1];
+                double rhs = m->conopt_rhs[ROWNO - 1];
+                const char* rel = (ctype == 0) ? "=" : (ctype == 1) ? ">=" : (ctype == 2) ? "<=" : "free";
+                if (ctype == 3)
+                    casadi::uout() << "  g[" << ci << "](x) = " << *G << " (free)\n";
+                else
+                    casadi::uout() << "  g[" << ci << "](x) = " << *G << " " << rel << " " << rhs << "\n";
+            }
+        }
         if (MODE == 2 || MODE == 3) {
             // Guard against stale Jacobian: cache_valid_jac is false when cb_fdevalini
             // was called with MODE==1 and skipped Jacobian computation.
@@ -712,8 +747,13 @@ namespace casadi {
             }
             int base  = self.jacg_rowstart_[ci];
             int count = self.jacg_rowstart_[ci + 1] - self.jacg_rowstart_[ci];
-            for (int k = 0; k < count; ++k)
-                JAC[self.jacg_col_[base + k]] = m->cached_jac_g[self.jacg_nzidx_[base + k]];
+            for (int k = 0; k < count; ++k) {
+                int col = self.jacg_col_[base + k];
+                double val = m->cached_jac_g[self.jacg_nzidx_[base + k]];
+                JAC[col] = val;
+                if (self.debug_)
+                    casadi::uout() << "  dg[" << ci << "]/dx[" << col << "] = " << val << "\n";
+            }
         }
     }
     return 0;
@@ -765,7 +805,13 @@ namespace casadi {
     for (int ci = 0; ci < self.ng_; ++ci) {
       int row1 = m->casadi_to_conopt_lb_row[ci];
       int row2 = m->casadi_to_conopt_ub_row[ci];
-      m->hess_lam_g_[ci] = -(U[row1] + (row2 >= 0 ? U[row2] : 0.0));
+    }
+
+    if (self.debug_) {
+        casadi::uout() << "Hessian lam_f=" << obj_factor << " lam_g:";
+        for (int ci = 0; ci < self.ng_; ++ci)
+            casadi::uout() << " " << m->hess_lam_g_[ci];
+        casadi::uout() << "\n";
     }
 
     m->arg[0] = X;
@@ -776,7 +822,17 @@ namespace casadi {
 
     try {
         self.calc_function(m, "nlp_hess_l");
+        if (self.debug_) {
+            casadi::uout() << "Hessian values (HSVL):";
+            for (int i = 0; i < NHESS; ++i)
+                casadi::uout() << " " << HSVL[i];
+            casadi::uout() << "\n";
+        }
+    } catch (std::exception& ex) {
+        casadi::uerr() << "CONOPT: nlp_hess_l failed: " << ex.what() << std::endl;
+        *NODRV = 1;
     } catch (...) {
+        casadi::uerr() << "CONOPT: nlp_hess_l failed (unknown exception)" << std::endl;
         *NODRV = 1;
     }
     return 0;
@@ -828,6 +884,13 @@ namespace casadi {
 
     casadi_copy(XVAL, NUMVAR, m->d_nlp.z);
 
+    if (m->self.debug_) {
+        casadi::uout() << "Solution x:";
+        for (int i = 0; i < NUMVAR; ++i)
+            casadi::uout() << " " << XVAL[i];
+        casadi::uout() << "\n";
+    }
+
     // Constraint values: use the first CONOPT row for each CasADi constraint
     // (both rows carry the same function value for range constraints)
     for (casadi_int ci = 0; ci < m->self.ng_; ++ci)
@@ -850,7 +913,12 @@ namespace casadi {
   }
 
   int COI_CALLCONV ConoptInterface::cb_message(int SMSG, int DMSG, int NMSG, char* MSGV[], void* USRMEM) {
-    for (int i = 0; i < std::min(SMSG, NMSG); ++i) {
+    auto m = static_cast<ConoptMemory*>(USRMEM);
+
+    int message_length = SMSG;
+    if (m->self.debug_) message_length = std::max(message_length, std::max(DMSG, NMSG));
+
+    for (int i = 0; i < message_length; ++i) {
         if (MSGV[i] != nullptr) {
             casadi::uout() << MSGV[i] << std::endl;
         }

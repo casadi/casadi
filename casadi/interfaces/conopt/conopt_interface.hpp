@@ -114,6 +114,7 @@ namespace casadi {
     Sparsity hesslag_sp_;
     bool exact_hessian_;
     bool warm_start_;
+    bool debug_;
     Dict opts_; // CONOPT specific options
     std::string optfile_; // Path to CONOPT option file (for string-valued CR-cells)
 
