@@ -552,11 +552,16 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     const ConoptInterface& self = m->self;
 
-    // Variable bounds and initial point
+    // Variable bounds and initial point (clamped to [lb, ub])
     for (int i = 0; i < NUMVAR; ++i) {
-      if (!std::isinf(m->d_nlp.lbz[i])) LOWER[i] = m->d_nlp.lbz[i];
-      if (!std::isinf(m->d_nlp.ubz[i])) UPPER[i] = m->d_nlp.ubz[i];
-      CURR[i] = m->d_nlp.z[i];
+      double lb = m->d_nlp.lbz[i];
+      double ub = m->d_nlp.ubz[i];
+      if (!std::isinf(lb)) LOWER[i] = lb;
+      if (!std::isinf(ub)) UPPER[i] = ub;
+      double x0 = m->d_nlp.z[i];
+      if (!std::isinf(lb)) x0 = std::max(x0, lb);
+      if (!std::isinf(ub)) x0 = std::min(x0, ub);
+      CURR[i] = x0;
     }
 
     // Constraint types and RHS (row 0 = objective, rows 1..ng_expanded = constraints)
