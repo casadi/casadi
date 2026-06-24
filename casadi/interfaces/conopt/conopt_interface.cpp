@@ -823,14 +823,15 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     const ConoptInterface& self = m->self;
 
-    // U[0] maps directly to obj_factor: the objective row carries no sign flip.
-    // U[row] for constraint rows uses the negation of CasADi's lam_g convention
-    // (CONOPT shadow price = -lam_g), consistent with cb_solution's lam = -ymar.
+    // CONOPT's Lagrangian: L = SUM(r) U(r) * F(r), so d²L/dx² = SUM(r) U(r) * d²F(r)/dx².
+    // CasADi computes lam_f*d²f/dx² + lam_g^T*d²g/dx², so lam_f = U[0], lam_g[ci] = U[row_ci].
+    // No sign flip: CONOPT's U is the Lagrangian weight directly, not the shadow price (YMAR).
     double obj_factor = U[0];
 
     for (int ci = 0; ci < self.ng_; ++ci) {
       int row1 = m->casadi_to_conopt_lb_row[ci];
       int row2 = m->casadi_to_conopt_ub_row[ci];
+      m->hess_lam_g_[ci] = U[row1] + (row2 >= 0 ? U[row2] : 0.0);
     }
 
     if (self.debug_) {
