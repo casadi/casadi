@@ -3339,7 +3339,7 @@ namespace casadi {
     // How many of the unit vectors influence each output
     std::vector<casadi_int> output_ctr(nrow);
 
-    // Loop over colors to find which color to use to calculate each nonzero 
+    // Loop over colors to find which color to use to calculate each nonzero
     which_color.resize(nnz());
     std::fill(which_color.begin(), which_color.end(), -1);
     for (casadi_int color=0; color<ncolor; ++color) {
