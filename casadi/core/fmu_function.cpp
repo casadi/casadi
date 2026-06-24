@@ -1412,9 +1412,6 @@ void FmuFunction::finalize_hessian(double *hess_nz, casadi_int* iw) const {
         } else {
           hess_nz[k_tr] = hess_nz[k];
         }
-      } else {
-        // Lower triangular nonzeros handled together with upper triangular nonzeros, above
-        break;
       }
     }
   }
