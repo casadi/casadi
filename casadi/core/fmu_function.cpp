@@ -1366,7 +1366,7 @@ void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int*
       if (std::isnan(nz) || std::isinf(nz)) {
         std::stringstream ss;
         ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
-          << fmu_.desc_in(m, id_r) << " is " << nz;
+          << fmu_.desc_in(m, id_c) << " is " << nz;
         casadi_warning(ss.str());
         // Further checks not needed for entry
         continue;
