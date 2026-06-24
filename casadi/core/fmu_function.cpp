@@ -578,7 +578,7 @@ void FmuFunction::init(const Dict& opts) {
     // Calculate graph coloring
     if (hessian_coloring_) {
       // Star coloring
-      hess_colors_ = hess_sp_.star_coloring();
+      hess_colors_ = hess_sp_.star_coloring_new(which_hess_color_);
       if (verbose_) casadi_message("Hessian graph coloring: " + str(nonlin_.size())
         + " -> " + str(hess_colors_.size2()) + " directions");
       // Indices of non-nonlinearly entering variables
@@ -602,9 +602,6 @@ void FmuFunction::init(const Dict& opts) {
 
     // Work vector for perturbed adjoint sensitivities
     alloc_w(max_hess_tasks_ * fmu_.n_in(), true);  // pert_asens
-
-    // Work vector for avoiding conflicting assignments for star coloring
-    alloc_iw(max_hess_tasks_ * fmu_.n_in(), true);  // star_iw
 
     // Work vector for making symmetric or checking symmetry
     alloc_iw(hess_sp_.size2());
@@ -971,9 +968,6 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       // Perturbed adjoint sensitivities
       s->pert_asens = w;
       w += fmu_.n_in();
-      // Work vector for avoiding assignment of illegal nonzeros
-      s->star_iw = iw;
-      iw += fmu_.n_in();
     }
     if (enable_adjoint_jacobian_) {
       // Memory for Jacobian calculation via adjoint mode AD
@@ -997,7 +991,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (print_progress_) casadi_message("Evaluating extended Hessian");
     if (eval_all(m, max_hess_tasks_, false, false, false, false, true)) return 1;
     // Post-process Hessian
-    remove_nans(hess_nz, iw);
+    finalize_hessian(hess_nz, iw);
     if (validate_hessian_) check_hessian(m, hess_nz, iw);
     if (make_symmetric_) make_symmetric(hess_nz, iw);
   }
@@ -1327,15 +1321,6 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
        for (casadi_int i = 0; i < m->jac_data.nsens; ++i)
          m->pert_asens[m->jac_data.wrt[i]] += m->aseed[m->jac_data.isens[i]] * m->jac_data.sens[i];
       }
-      // Count how many times each input is calculated
-      std::fill(m->star_iw, m->star_iw + fmu_.n_in(), 0);
-      for (casadi_int v = 0; v < nv; ++v) {
-        casadi_int ind1 = hc_row[v_begin + v];
-        for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
-          casadi_int id2 = jac_in_.at(hess_row[k]);
-          m->star_iw[id2]++;
-        }
-      }
       // Loop over variables being seeded for color
       for (casadi_int v = 0; v < nv; ++v) {
         // Corresponding input in Fmu
@@ -1346,14 +1331,9 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         m->imarked_.at(id) = true;
         // Get column in Hessian
         for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
-          casadi_int id2 = jac_in_.at(hess_row[k]);
-          // Save
-          if (m->star_iw[id2] > 1) {
-            // Input gets perturbed by multiple variables for the same color:
-            // Replace with NaN to use mirror element instead
-            m->hess_nz[k] = casadi::nan;
-          } else {
-            // Finite difference approximation
+          // Save Hessian entry, unless not applicable to color
+          if (which_hess_color_.empty() || which_hess_color_[k] == c) {
+            casadi_int id2 = jac_in_.at(hess_row[k]);
             m->hess_nz[k] = h[v] * (m->pert_asens[id2] - m->asens[id2]);
           }
         }
@@ -1408,16 +1388,12 @@ void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int*
   }
 }
 
-void FmuFunction::remove_nans(double *hess_nz, casadi_int* iw) const {
+void FmuFunction::finalize_hessian(double *hess_nz, casadi_int* iw) const {
+  // Skip if not needed
+  if (which_hess_color_.empty()) return;
   // Get Hessian sparsity pattern
   casadi_int n = hess_sp_.size1();
   const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
-  // Mark variables that have been perturbed
-  std::fill(iw, iw + n, 0);
-  casadi_int hess_colors_nnz = hess_colors_.nnz();
-  const casadi_int* hess_colors_row = hess_colors_.row();
-  for (casadi_int k = 0; k < hess_colors_nnz; ++k)
-    iw[hess_colors_row[k]] = 1;
   // Nonzero counters for transpose
   casadi_copy(colind, n, iw);
   // Loop over Hessian columns
@@ -1428,10 +1404,8 @@ void FmuFunction::remove_nans(double *hess_nz, casadi_int* iw) const {
       casadi_int r = row[k];
       // Get nonzero of transpose
       casadi_int k_tr = iw[r]++;
-      // If NaN, use element from transpose
-      if (std::isnan(hess_nz[k])) {
-        hess_nz[k] = hess_nz[k_tr];
-      }
+      // If -1, use element from transpose
+      if (which_hess_color_[k] < 0) hess_nz[k] = hess_nz[k_tr];
     }
   }
 }
@@ -1734,6 +1708,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::jac_colors", jac_colors_);
   s.pack("FmuFunction::hess_colors", hess_colors_);
   s.pack("FmuFunction::adj_colors", adj_colors_);
+  s.pack("FmuFunction::which_hess_color", which_hess_color_);
   s.pack("FmuFunction::nonlin", nonlin_);
 
 
@@ -1814,6 +1789,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::jac_colors", jac_colors_);
   s.unpack("FmuFunction::hess_colors", hess_colors_);
   s.unpack("FmuFunction::adj_colors", adj_colors_);
+  s.unpack("FmuFunction::which_hess_color", which_hess_color_);
   s.unpack("FmuFunction::nonlin", nonlin_);
 
   s.unpack("FmuFunction::max_jac_tasks", max_jac_tasks_);
