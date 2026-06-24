@@ -725,6 +725,7 @@ namespace casadi {
     Sparsity uni_coloring(const Sparsity& AT, casadi_int cutoff) const;
 
     /** \brief Perform a star coloring
+
      * See description in public class.
 
         \identifier{2jy} */

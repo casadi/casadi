@@ -1091,6 +1091,7 @@ namespace casadi {
                           casadi_int cutoff = std::numeric_limits<casadi_int>::max()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
+
         A greedy distance-2 coloring algorithm
         Algorithm 4.1 in
           What Color Is Your Jacobian? Graph Coloring for Computing Derivatives
