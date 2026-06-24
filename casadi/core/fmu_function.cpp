@@ -992,7 +992,6 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (eval_all(m, max_hess_tasks_, false, false, false, false, true)) return 1;
     // Post-process Hessian
     finalize_hessian(m, hess_nz, iw);
-    if (make_symmetric_) make_symmetric(hess_nz, iw);
   }
   // Fetch calculated blocks
   for (size_t k = 0; k < out_.size(); ++k) {
@@ -1396,6 +1395,9 @@ void FmuFunction::finalize_hessian(FmuMemory* m, double *hess_nz, casadi_int* iw
             }
           }
         }
+        // Make symmetric
+        if (make_symmetric_) hess_nz[k] = hess_nz[k_tr] = 0.5 * (hess_nz[k] + hess_nz[k_tr]);
+
       } else if (r == c && validate_hessian_) {
         // Get indices
         casadi_int id_c = jac_in_[c];
@@ -1408,26 +1410,6 @@ void FmuFunction::finalize_hessian(FmuMemory* m, double *hess_nz, casadi_int* iw
           casadi_warning(ss.str());
         }
       }
-    }
-  }
-}
-
-void FmuFunction::make_symmetric(double *hess_nz, casadi_int* iw) const {
-  // Get Hessian sparsity pattern
-  casadi_int n = hess_sp_.size1();
-  const casadi_int *colind = hess_sp_.colind(), *row = hess_sp_.row();
-  // Nonzero counters for transpose
-  casadi_copy(colind, n, iw);
-  // Loop over Hessian columns
-  for (casadi_int c = 0; c < n; ++c) {
-    // Loop over nonzeros for the column
-    for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
-      // Get row of Hessian
-      casadi_int r = row[k];
-      // Get nonzero of transpose
-      casadi_int k_tr = iw[r]++;
-      // Make symmetric
-      if (r < c) hess_nz[k] = hess_nz[k_tr] = 0.5 * (hess_nz[k] + hess_nz[k_tr]);
     }
   }
 }
