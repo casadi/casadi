@@ -601,10 +601,13 @@ namespace casadi {
   }
 
   OsqpMemory::OsqpMemory() {
+    // Initialize so a teardown before a successful osqp_setup (e.g. failed
+    // init_mem) does not osqp_cleanup() an uninitialized pointer (heap smash).
+    work = nullptr;
   }
 
   OsqpMemory::~OsqpMemory() {
-    osqp_cleanup(work);
+    if (work) osqp_cleanup(work);
   }
 
   OsqpInterface::OsqpInterface(DeserializingStream& s) : Conic(s) {

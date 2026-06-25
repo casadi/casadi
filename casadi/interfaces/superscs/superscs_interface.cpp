@@ -484,6 +484,11 @@ namespace casadi {
   }
 
   SuperscsMemory::SuperscsMemory() {
+    // Initialize so the if(sol)/if(info) guards in the destructor are not
+    // fooled by uninitialized garbage (which is almost always non-null and
+    // would scs_free_*() a wild pointer) when teardown precedes a solve.
+    sol = nullptr;
+    info = nullptr;
   }
 
   SuperscsMemory::~SuperscsMemory() {
