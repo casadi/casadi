@@ -201,10 +201,10 @@ Consider the following system of equations:
     &g_m(z, x_1, x_2, \ldots, x_n) &&= y_m,
     \end{aligned}
 
-where the first equation uniquely defines :math:`z` as a function of :math:`x_1`, \ldots, :math:`x_n` by the *implicit function theorem*
-and the remaining equations define the auxiliary outputs :math:`y_1`, \ldots, :math:`y_m`.
+where the first equation uniquely defines :math:`z` as a function of :math:`x_1, \ldots, x_n` by the *implicit function theorem*
+and the remaining equations define the auxiliary outputs :math:`y_1, \ldots, y_m`.
 
-Given a function :math:`g` for evaluating :math:`g_0`, \ldots, :math:`g_m`, we can use |casadi| to automatically formulate a function
+Given a function :math:`g` for evaluating :math:`g_0, \ldots, g_m`, we can use |casadi| to automatically formulate a function
 :math:`G: \{z_{\text{guess}}, x_1, x_2, \ldots, x_n\} \rightarrow \{z, y_1, y_2, \ldots, y_m\}`.
 This function includes a guess for :math:`z` to handle the case when the solution is non-unique.
 The syntax for this, assuming :math:`n=m=1` for simplicity, is:
