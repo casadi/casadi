@@ -176,6 +176,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   new_hessian_ = true;
   enable_forward_jacobian_ = true;
   enable_adjoint_jacobian_ = false;
+  enable_adjoint_hessian_ = false;  // change to true when tested and adjoints are available
   hessian_coloring_ = true;
   asymmetric_hessian_coloring_ = false;
   parallelization_ = Parallelization::SERIAL;
@@ -207,6 +208,8 @@ void FmuFunction::change_option(const std::string& option_name,
     uses_adjoint_derivatives_ = v;
   } else if (option_name == "enable_forward_jacobian") {
     enable_forward_jacobian_ = option_value;
+  } else if (option_name == "enable_adjoint_hessian") {
+    enable_adjoint_hessian_ = option_value;
   } else if (option_name == "fd_flip") {
     fd_flip_ = option_value;
   } else if (option_name == "make_symmetric") {
@@ -314,7 +317,10 @@ const Options FmuFunction::options_
       "Allow Jacobian calculation using forward mode AD."}},
     {"enable_adjoint_jacobian",
      {OT_BOOL,
-      "Allow Jacobian calculation using adjoint mode AD."}}
+      "Allow Jacobian calculation using adjoint mode AD."}},
+    {"enable_adjoint_hessian",
+     {OT_BOOL,
+      "Use finite differencing of adjoints for Hessian calculation."}}
    }
 };
 
@@ -372,6 +378,8 @@ void FmuFunction::init(const Dict& opts) {
       enable_forward_jacobian_ = op.second;
     } else if (op.first=="enable_adjoint_jacobian") {
       enable_adjoint_jacobian_ = op.second;
+    } else if (op.first=="enable_adjoint_hessian") {
+      enable_adjoint_hessian_ = op.second;
     }
   }
 
@@ -1334,22 +1342,27 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       }
       // Calculate perturbed inputs
       if (fmu_.eval(m)) return 1;
-      // Clear perturbed adjoint sensitivities
-      std::fill(m->pert_asens, m->pert_asens + fmu_.n_in(), 0);
-      // Loop over colors of the Jacobian
-      for (casadi_int c1 = 0; c1 < jac_colors_.size2(); ++c1) {
-       // Get derivative directions
-       casadi_jac_pre(&jac_prob_, &m->jac_data, c1);
-       // Calculate derivatives
-       fmu_.set_fwd(m, m->jac_data.nseed, m->jac_data.iseed, m->jac_data.seed);
-       fmu_.request_fwd(m, m->jac_data.nsens, m->jac_data.isens, m->jac_data.wrt);
-       if (fmu_.eval_fwd(m, true)) return 1;
-       fmu_.get_fwd(m, m->jac_data.nsens, m->jac_data.isens, m->jac_data.sens);
-       // Scale derivatives
-       casadi_jac_scale(&jac_prob_, &m->jac_data);
-       // Propagate adjoint sensitivities
-       for (casadi_int i = 0; i < m->jac_data.nsens; ++i)
-         m->pert_asens[m->jac_data.wrt[i]] += m->aseed[m->jac_data.isens[i]] * m->jac_data.sens[i];
+      // Calculate perturbed adjoints
+      if (enable_adjoint_hessian_) {
+        casadi_error("Hessian calculations via perturbed adjoints not implemented");
+      } else {
+        // Clear perturbed adjoint sensitivities
+        std::fill(m->pert_asens, m->pert_asens + fmu_.n_in(), 0);
+        // Loop over colors of the Jacobian
+        for (casadi_int c1 = 0; c1 < jac_colors_.size2(); ++c1) {
+        // Get derivative directions
+        casadi_jac_pre(&jac_prob_, &m->jac_data, c1);
+        // Calculate derivatives
+        fmu_.set_fwd(m, m->jac_data.nseed, m->jac_data.iseed, m->jac_data.seed);
+        fmu_.request_fwd(m, m->jac_data.nsens, m->jac_data.isens, m->jac_data.wrt);
+        if (fmu_.eval_fwd(m, true)) return 1;
+        fmu_.get_fwd(m, m->jac_data.nsens, m->jac_data.isens, m->jac_data.sens);
+        // Scale derivatives
+        casadi_jac_scale(&jac_prob_, &m->jac_data);
+        // Propagate adjoint sensitivities
+        for (casadi_int i = 0; i < m->jac_data.nsens; ++i)
+          m->pert_asens[m->jac_data.wrt[i]] += m->aseed[m->jac_data.isens[i]] * m->jac_data.sens[i];
+        }
       }
       // Loop over variables being seeded for color
       for (casadi_int v = 0; v < nv; ++v) {
@@ -1713,6 +1726,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::asymmetric_hessian_coloring", asymmetric_hessian_coloring_);
   s.pack("FmuFunction::enable_forward_jacobian", enable_forward_jacobian_);
   s.pack("FmuFunction::enable_adjoint_jacobian", enable_adjoint_jacobian_);
+  s.pack("FmuFunction::enable_adjoint_hessian", enable_adjoint_hessian_);
   s.pack("FmuFunction::validate_ad_file", validate_ad_file_);
 
   s.pack("FmuFunction::fd", static_cast<int>(fd_));
@@ -1792,6 +1806,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::asymmetric_hessian_coloring", asymmetric_hessian_coloring_);
   s.unpack("FmuFunction::enable_forward_jacobian", enable_forward_jacobian_);
   s.unpack("FmuFunction::enable_adjoint_jacobian", enable_adjoint_jacobian_);
+  s.unpack("FmuFunction::enable_adjoint_hessian", enable_adjoint_hessian_);
   s.unpack("FmuFunction::validate_ad_file", validate_ad_file_);
 
   int fd = 0;

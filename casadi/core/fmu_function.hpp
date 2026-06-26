@@ -166,7 +166,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   double step_, abstol_, reltol_;
   bool print_progress_, new_jacobian_, new_forward_, new_hessian_, fd_flip_,
     make_symmetric_, hessian_coloring_, asymmetric_hessian_coloring_,
-    enable_forward_jacobian_, enable_adjoint_jacobian_;
+    enable_forward_jacobian_, enable_adjoint_jacobian_, enable_adjoint_hessian_;
   std::string validate_ad_file_;
 
   // FD method as an enum
