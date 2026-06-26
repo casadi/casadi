@@ -4,7 +4,6 @@
 #                  and skips macOS code-signing/notarization.
 #                  Python 3.13 (abi3-tested off the 3.11 wheel) is *only*
 #                  included in test-python when this tag is present.
-
 name: binaries
 
 on: [push, pull_request]
