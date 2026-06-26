@@ -1342,12 +1342,30 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       }
       // Calculate perturbed inputs
       if (fmu_.eval(m)) return 1;
+      // Clear perturbed adjoint sensitivities
+      std::fill(m->pert_asens, m->pert_asens + fmu_.n_in(), 0);
       // Calculate perturbed adjoints
       if (enable_adjoint_hessian_) {
-        casadi_error("Hessian calculations via perturbed adjoints not implemented");
+        // Pass all adjoint seeds
+        for (size_t k = 0; k < in_.size(); ++k) {
+          if (m->arg[k] && in_[k].type == InputType::ADJ) {
+            fmu_.set_adj(m, in_[k].ind, m->arg[k]);
+          }
+        }
+        // Request adjoint sensitivities
+        casadi_int wrt_id = -1;
+        for (size_t i : jac_in_) {
+          casadi_int id = jac_in_[i];
+          fmu_.request_adj(m, 1, &id, &wrt_id);
+        }
+        // Calculate derivatives
+        if (fmu_.eval_adj(m)) return 1;
+        // Collect adjoint sensitivities
+        for (size_t i : jac_in_) {
+          casadi_int id = jac_in_[i];
+          fmu_.get_adj(m, 1, &id, &m->pert_asens[id]);
+        }
       } else {
-        // Clear perturbed adjoint sensitivities
-        std::fill(m->pert_asens, m->pert_asens + fmu_.n_in(), 0);
         // Loop over colors of the Jacobian
         for (casadi_int c1 = 0; c1 < jac_colors_.size2(); ++c1) {
         // Get derivative directions
