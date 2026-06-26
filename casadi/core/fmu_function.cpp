@@ -174,9 +174,10 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   new_jacobian_ = true;
   new_forward_ = true;
   new_hessian_ = true;
-  hessian_coloring_ = true;
   enable_forward_jacobian_ = true;
   enable_adjoint_jacobian_ = false;
+  hessian_coloring_ = true;
+  asymmetric_hessian_coloring_ = false;
   parallelization_ = Parallelization::SERIAL;
   // Number of parallel tasks, by default
   max_n_tasks_ = 1;
@@ -208,6 +209,15 @@ void FmuFunction::change_option(const std::string& option_name,
     enable_forward_jacobian_ = option_value;
   } else if (option_name == "fd_flip") {
     fd_flip_ = option_value;
+  } else if (option_name == "make_symmetric") {
+    make_symmetric_ = option_value;
+  } else if (option_name == "hessian_coloring") {
+    bool v = option_value;
+    if (v != hessian_coloring_) {
+      casadi_assert(!hess_colors_.is_null() && !hess_uni_colors_.is_null(),
+        "Can only change Hessian coloring if both colorings are available");
+    }
+    hessian_coloring_ = v;
   } else {
     // Option not found - continue to base classes
     FunctionInternal::change_option(option_name, option_value);
@@ -292,8 +302,13 @@ const Options FmuFunction::options_
       "Use Hessian implementation in class (conversion option, to be removed)"}},
     {"hessian_coloring",
      {OT_BOOL,
-      "Enable the use of graph coloring (star coloring) for Hessian calculation. "
-      "Note that disabling the coloring can improve symmetry check diagnostics."}},
+      "Calculate Hessian using symmetry exploiting graph coloring (star coloring)."}},
+    {"asymmetric_hessian_coloring",
+     {OT_BOOL,
+      "Calculate Hessian using unidirectional graph coloring (star coloring). Ensures that upper "
+      "and lower triangular parts are calculated separately, which may be desirable for "
+      "diagnostics. If both symmetric coloring ('hessian_coloring' option) and asymmetric coloring "
+      "is enabled, the symmetric coloring will be used."}},
     {"enable_forward_jacobian",
      {OT_BOOL,
       "Allow Jacobian calculation using forward mode AD."}},
@@ -351,6 +366,8 @@ void FmuFunction::init(const Dict& opts) {
       new_hessian_ = op.second;
     } else if (op.first=="hessian_coloring") {
       hessian_coloring_ = op.second;
+    } else if (op.first=="asymmetric_hessian_coloring") {
+      asymmetric_hessian_coloring_ = op.second;
     } else if (op.first=="enable_forward_jacobian") {
       enable_forward_jacobian_ = op.second;
     } else if (op.first=="enable_adjoint_jacobian") {
@@ -568,34 +585,48 @@ void FmuFunction::init(const Dict& opts) {
     const casadi_int *hess_row = hess_sp_.row();
     casadi_int hess_nnz = hess_sp_.nnz();
 
-    // Get nonlinearly entering variables
+    // Get linearly and nonlinearly entering variables
     std::vector<bool> is_nonlin(jac_in_.size(), false);
     for (casadi_int k = 0; k < hess_nnz; ++k) is_nonlin[hess_row[k]] = true;
     nonlin_.clear();
+    std::vector<casadi_int> lin;
     for (casadi_int c = 0; c < jac_in_.size(); ++c) {
-      if (is_nonlin[c]) nonlin_.push_back(c);
+      if (is_nonlin[c]) {
+        nonlin_.push_back(c);
+      } else {
+        lin.push_back(c);
+      }
     }
-    // Calculate graph coloring
+    // Star-coloring to calculate Hessian
+    casadi_int max_hessian_colors = 0;
     if (hessian_coloring_) {
       // Star coloring
       hess_colors_ = hess_sp_.star_coloring_new(which_hess_color_);
+      max_hessian_colors = hess_colors_.size2();
       if (verbose_) casadi_message("Hessian graph coloring: " + str(nonlin_.size())
-        + " -> " + str(hess_colors_.size2()) + " directions");
-      // Indices of non-nonlinearly entering variables
-      std::vector<casadi_int> zind;
-      for (casadi_int c = 0; c < jac_in_.size(); ++c) {
-        if (!is_nonlin[c]) zind.push_back(c);
-      }
-      // Zero out corresponding rows
-      hess_colors_.erase(zind, range(hess_colors_.size2()));
-    } else {
-      // One color for each nonlinear variable
-      hess_colors_ = Sparsity(jac_in_.size(), nonlin_.size(), range(nonlin_.size() + 1), nonlin_);
+        + " -> " + str(max_hessian_colors) + " directions");
+      // Zero out corresponding rows (should be handled in star_coloring call)
+      hess_colors_.erase(lin, range(hess_colors_.size2()));
+    }
+    // Unidirectional coloring to calculate Hessian
+    if (asymmetric_hessian_coloring_) {
+      // Both symmetric and asymmetric coloring supported
+      hess_uni_colors_ = hess_sp_.uni_coloring();
+      max_hessian_colors = std::max(max_hessian_colors, hess_uni_colors_.size2());
+      if (verbose_) casadi_message("Hessian unidirectional coloring with "
+        + str(hess_uni_colors_.size2()) + " directions");
+      // Zero out corresponding rows (should be handled in uni_coloring call)
+      hess_uni_colors_.erase(lin, range(hess_uni_colors_.size2()));
+    }
+    // Dummy coloring: One color for each nonlinear variable
+    if (!hessian_coloring_ && !asymmetric_hessian_coloring_) {
+      hess_uni_colors_ = Sparsity(jac_in_.size(), nonlin_.size(), range(nonlin_.size() + 1), nonlin_);
+      max_hessian_colors = hess_uni_colors_.size2();
       if (verbose_) casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
     }
 
     // Number of threads to be used for Hessian calculation
-    max_hess_tasks_ = std::min(max_n_tasks_, hess_colors_.size2());
+    max_hess_tasks_ = std::min(max_n_tasks_, max_hessian_colors);
 
     // Work vector for storing extended Hessian, shared between threads
     alloc_w(hess_sp_.nnz(), true);  // hess_nz
@@ -1247,8 +1278,9 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   // Evaluate extended Hessian
   if (need_hess) {
     // Hessian coloring
-    casadi_int n_hc = hess_colors_.size2();
-    const casadi_int *hc_colind = hess_colors_.colind(), *hc_row = hess_colors_.row();
+    const casadi::Sparsity& hc = hessian_coloring_ ? hess_colors_ : hess_uni_colors_;
+    casadi_int n_hc = hc.size2();
+    const casadi_int *hc_colind = hc.colind(), *hc_row = hc.row();
     // Hessian sparsity
     const casadi_int *hess_colind = hess_sp_.colind(), *hess_row = hess_sp_.row();
     // Selection of colors to be evaluated for the thread
@@ -1330,7 +1362,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         // Get column in Hessian
         for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
           // Save Hessian entry, unless not applicable to color
-          if (which_hess_color_.empty() || which_hess_color_[k] == c) {
+          if (!hessian_coloring_ || which_hess_color_[k] == c) {
             casadi_int id2 = jac_in_.at(hess_row[k]);
             m->hess_nz[k] = h[v] * (m->pert_asens[id2] - m->asens[id2]);
           }
@@ -1358,56 +1390,49 @@ void FmuFunction::finalize_hessian(FmuMemory* m, double *hess_nz, casadi_int* iw
       casadi_int k_tr = iw[r]++;
       // Only upper triangular part
       if (r < c) {
-        // Star-coloring: Has to make symmetric
-        if (!which_hess_color_.empty()) {
-          // If -1, use element from transpose
+        if (hessian_coloring_) {
+          // Star-coloring: Only half of the entries were calculated
           if (which_hess_color_[k] < 0) {
+            // Use nonzero from lower triangular part
             hess_nz[k] = hess_nz[k_tr];
           } else {
+            // Use nonzero from upper triangular part
             hess_nz[k_tr] = hess_nz[k];
           }
-        } else if (validate_hessian_) {
-          // Get indices
-          casadi_int id_c = jac_in_[c], id_r = jac_in_[r];
-          // Nonzero
-          double nz = hess_nz[k], nz_tr = hess_nz[k_tr];
-          // Check if entry is NaN of inf
-          if (std::isnan(nz) || std::isinf(nz)) {
-            std::stringstream ss;
-            ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
-              << fmu_.desc_in(m, id_c) << " is " << nz;
-            casadi_warning(ss.str());
-          } else if (std::isnan(nz_tr) || std::isinf(nz_tr)) {
-            std::stringstream ss;
-            ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_c) << " and "
-              << fmu_.desc_in(m, id_r) << " is " << nz_tr;
-            casadi_warning(ss.str());
-          } else {
-            // Normaliation factor to be used for relative tolerance
-            double nz_max = std::fmax(std::fabs(nz), std::fabs(nz_tr));
-            // Check if above absolute and relative tolerance bounds
-            if (nz_max > abstol_ && std::fabs(nz - nz_tr) > nz_max * reltol_) {
+        } else {
+          // An asymmetric Hessian was calculated, (optionally) make symmetric after (optionally)
+          // checking symmetry
+          if (validate_hessian_) {
+            // Get indices
+            casadi_int id_c = jac_in_[c], id_r = jac_in_[r];
+            // Nonzero
+            double nz = hess_nz[k], nz_tr = hess_nz[k_tr];
+            // Check if entry is NaN of inf
+            if (std::isnan(nz) || std::isinf(nz)) {
               std::stringstream ss;
-              ss << "Hessian appears nonsymmetric. Got " << nz << " vs. " << nz_tr
-                << " for second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
-                << fmu_.desc_in(m, id_c) << ", hess_nz = " << k << "/" <<  k_tr;
+              ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
+                << fmu_.desc_in(m, id_c) << " is " << nz;
               casadi_warning(ss.str());
+            } else if (std::isnan(nz_tr) || std::isinf(nz_tr)) {
+              std::stringstream ss;
+              ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_c) << " and "
+                << fmu_.desc_in(m, id_r) << " is " << nz_tr;
+              casadi_warning(ss.str());
+            } else {
+              // Normaliation factor to be used for relative tolerance
+              double nz_max = std::fmax(std::fabs(nz), std::fabs(nz_tr));
+              // Check if above absolute and relative tolerance bounds
+              if (nz_max > abstol_ && std::fabs(nz - nz_tr) > nz_max * reltol_) {
+                std::stringstream ss;
+                ss << "Hessian appears nonsymmetric. Got " << nz << " vs. " << nz_tr
+                  << " for second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
+                  << fmu_.desc_in(m, id_c) << ", hess_nz = " << k << "/" <<  k_tr;
+                casadi_warning(ss.str());
+              }
             }
           }
-        }
-        // Make symmetric
-        if (make_symmetric_) hess_nz[k] = hess_nz[k_tr] = 0.5 * (hess_nz[k] + hess_nz[k_tr]);
-
-      } else if (r == c && validate_hessian_) {
-        // Get indices
-        casadi_int id_c = jac_in_[c];
-        // Nonzero
-        double nz = hess_nz[k];
-        // Check if entry is NaN of inf
-        if (std::isnan(nz) || std::isinf(nz)) {
-          std::stringstream ss;
-          ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_c) << " is " << nz;
-          casadi_warning(ss.str());
+          // Make Hessian symmetric by averaging the upper and lower triangular parts
+          if (make_symmetric_) hess_nz[k] = hess_nz[k_tr] = 0.5 * (hess_nz[k] + hess_nz[k_tr]);
         }
       }
     }
@@ -1633,7 +1658,7 @@ Dict FmuFunction::get_stats(void *mem) const {
 
 void FmuFunction::serialize_body(SerializingStream &s) const {
   FunctionInternal::serialize_body(s);
-  s.version("FmuFunction", 5);
+  s.version("FmuFunction", 6);
 
   s.pack("FmuFunction::Fmu", fmu_);
 
@@ -1678,6 +1703,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::new_forward", new_forward_);
   s.pack("FmuFunction::new_hessian", new_hessian_);
   s.pack("FmuFunction::hessian_coloring", hessian_coloring_);
+  s.pack("FmuFunction::asymmetric_hessian_coloring", asymmetric_hessian_coloring_);
   s.pack("FmuFunction::enable_forward_jacobian", enable_forward_jacobian_);
   s.pack("FmuFunction::enable_adjoint_jacobian", enable_adjoint_jacobian_);
   s.pack("FmuFunction::validate_ad_file", validate_ad_file_);
@@ -1690,8 +1716,9 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::hess_sp", hess_sp_);
   s.pack("FmuFunction::adj_sp", adj_sp_);
   s.pack("FmuFunction::jac_colors", jac_colors_);
-  s.pack("FmuFunction::hess_colors", hess_colors_);
   s.pack("FmuFunction::adj_colors", adj_colors_);
+  s.pack("FmuFunction::hess_colors", hess_colors_);
+  s.pack("FmuFunction::hess_uni_colors", hess_uni_colors_);
   s.pack("FmuFunction::which_hess_color", which_hess_color_);
   s.pack("FmuFunction::nonlin", nonlin_);
 
@@ -1703,7 +1730,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 }
 
 FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
-  s.version("FmuFunction", 5, 5);
+  s.version("FmuFunction", 6, 6);
 
   s.unpack("FmuFunction::Fmu", fmu_);
 
@@ -1754,6 +1781,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::new_forward", new_forward_);
   s.unpack("FmuFunction::new_hessian", new_hessian_);
   s.unpack("FmuFunction::hessian_coloring", hessian_coloring_);
+  s.unpack("FmuFunction::asymmetric_hessian_coloring", asymmetric_hessian_coloring_);
   s.unpack("FmuFunction::enable_forward_jacobian", enable_forward_jacobian_);
   s.unpack("FmuFunction::enable_adjoint_jacobian", enable_adjoint_jacobian_);
   s.unpack("FmuFunction::validate_ad_file", validate_ad_file_);
@@ -1771,8 +1799,9 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::hess_sp", hess_sp_);
   s.unpack("FmuFunction::adj_sp", adj_sp_);
   s.unpack("FmuFunction::jac_colors", jac_colors_);
-  s.unpack("FmuFunction::hess_colors", hess_colors_);
   s.unpack("FmuFunction::adj_colors", adj_colors_);
+  s.unpack("FmuFunction::hess_colors", hess_colors_);
+  s.unpack("FmuFunction::hess_uni_colors", hess_uni_colors_);
   s.unpack("FmuFunction::which_hess_color", which_hess_color_);
   s.unpack("FmuFunction::nonlin", nonlin_);
 

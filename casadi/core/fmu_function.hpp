@@ -165,7 +165,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // User-set options
   double step_, abstol_, reltol_;
   bool print_progress_, new_jacobian_, new_forward_, new_hessian_, fd_flip_,
-    make_symmetric_, hessian_coloring_, enable_forward_jacobian_, enable_adjoint_jacobian_;
+    make_symmetric_, hessian_coloring_, asymmetric_hessian_coloring_,
+    enable_forward_jacobian_, enable_adjoint_jacobian_;
   std::string validate_ad_file_;
 
   // FD method as an enum
@@ -216,7 +217,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   Sparsity jac_sp_, hess_sp_, adj_sp_;
 
   // Graph coloring
-  Sparsity jac_colors_, hess_colors_, adj_colors_;
+  Sparsity jac_colors_, adj_colors_, hess_colors_, hess_uni_colors_;
 
   // Which color is used to calculate a given nonzero in the Hessian?
   std::vector<casadi_int> which_hess_color_;
