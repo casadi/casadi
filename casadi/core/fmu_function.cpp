@@ -1702,6 +1702,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::validate_hessian", validate_hessian_);
   s.pack("FmuFunction::make_symmetric", make_symmetric_);
   s.pack("FmuFunction::step", step_);
+  s.pack("FmuFunction::fd_flip", fd_flip_);
   s.pack("FmuFunction::abstol", abstol_);
   s.pack("FmuFunction::reltol", reltol_);
   s.pack("FmuFunction::print_progress", print_progress_);
@@ -1780,6 +1781,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::validate_hessian", validate_hessian_);
   s.unpack("FmuFunction::make_symmetric", make_symmetric_);
   s.unpack("FmuFunction::step", step_);
+  s.unpack("FmuFunction::fd_flip", fd_flip_);
   s.unpack("FmuFunction::abstol", abstol_);
   s.unpack("FmuFunction::reltol", reltol_);
   s.unpack("FmuFunction::print_progress", print_progress_);
