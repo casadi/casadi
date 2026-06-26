@@ -2291,6 +2291,68 @@ class Functiontests(casadiTestCase):
       res = finv_par(numpy.ones(200), numpy.linspace(0, 10, 200))
       self.checkarray(ca.norm_inf(res.T-ca.sqrt(numpy.linspace(0, 10, 200))),0, digits=5)
 
+  @memory_heavy()
+  def test_threadsafe_symbolics_weakref(self):
+    # Regression test for thread-safety of the lazily-created weak reference in the
+    # reference-counting framework (casadi/core/generic_shared_internal.hpp).
+    # ca.WeakRef(obj) drives obj.weak() with no cache lock. If weak_ref_ is published
+    # non-atomically, racing threads each create their own weak-ref node and only one
+    # gets stored; the orphaned ones are never invalidated when obj dies, so they
+    # wrongly keep reporting alive() (and resurrect freed memory if dereferenced).
+    # No-op unless built WITH_THREADSAFE_SYMBOLICS (weak() is single-threaded then).
+    import sys, threading
+    nthreads = 24
+    ntrials = 8000
+    box = {"f": None, "refs": []}
+    stop = [False]
+    start = threading.Barrier(nthreads + 1)
+    done = threading.Barrier(nthreads + 1)
+
+    def worker(i):
+      try:
+        while True:
+          start.wait()
+          if stop[0]:
+            return
+          # All threads race the same fresh node's lazy weak() publication.
+          box["refs"][i] = ca.WeakRef(box["f"])
+          done.wait()
+      except threading.BrokenBarrierError:
+        return
+
+    threads = [threading.Thread(target=worker, args=(i,)) for i in range(nthreads)]
+    for t in threads:
+      t.start()
+
+    # A tiny thread-switch interval makes the race land inside weak()'s load/store
+    # window often enough to detect reliably; restored afterwards.
+    old_interval = sys.getswitchinterval()
+    sys.setswitchinterval(1e-6)
+    orphans = 0
+    try:
+      for _ in range(ntrials):
+        x = ca.MX.sym("x", 2)
+        box["f"] = ca.Function("f", [x], [ca.sin(x)])   # fresh node, no weak ref yet
+        box["refs"] = [None] * nthreads
+        start.wait()                                     # release the workers
+        done.wait()                                      # all WeakRefs created
+        refs = box["refs"]
+        box["f"] = None                                  # node dies; valid weak ref killed
+        # Every weak ref must now report dead; a double-created orphan does not.
+        orphans += sum(1 for r in refs if r.alive())
+        box["refs"] = []
+    finally:
+      sys.setswitchinterval(old_interval)
+      stop[0] = True
+      start.abort()
+      done.abort()
+      for t in threads:
+        t.join()
+
+    self.assertEqual(orphans, 0,
+      "weak() double-create race: %d orphaned weak references survived their "
+      "owner's destruction" % orphans)
+
   def test_mapped_eval(self):
       x = ca.SX.sym('x')
       y = ca.SX.sym('y', 2)
