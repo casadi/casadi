@@ -11474,7 +11474,7 @@
 <tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default true].</td><td>casadi::XpressInterface</td></tr>
+<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default false].</td><td>casadi::XpressInterface</td></tr>
 <tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
@@ -11537,7 +11537,7 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
-<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default true].</td></tr>
+<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default false].</td></tr>
 <tr><td>log_file</td><td>OT_STRING</td><td>Write solver log to this file path via XPRSsetlogfile. Useful for capturing output (e.g. warm-start acceptance messages) in automated tests. Empty string (default) disables file logging.</td></tr>
 <tr><td>mip_start</td><td>OT_BOOL</td><td>Pass x0 as an initial integer solution hint to Xpress via XPRSaddmipsol before the MIP solve [Default false].</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td></tr>
@@ -11557,7 +11557,7 @@
 <tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default true].</td><td>casadi::XpressInterface</td></tr>
+<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default false].</td><td>casadi::XpressInterface</td></tr>
 <tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
