@@ -1308,24 +1308,24 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         x[v] = m->ibuf_.at(id);
         // Step size
         h[v] = m->self.step_ * fmu_.nominal_in(id);
-        // Make sure a a forward step remains in bounds
+        // Make sure that (forward) step remains in bounds
         if (x[v] + h[v] > fmu_.max_in(id)) {
-          // Ensure a negative step is possible
-          if (m->ibuf_.at(id) - h[v] < fmu_.min_in(id)) {
-            std::stringstream ss;
-            ss << "Cannot perturb " << fmu_.desc_in(m, id) << " at " << x[v]
-              << " with step size " << m->self.step_;
-            casadi_warning(ss.str());
-            return 1;
+          // Flip sign?
+          if (fd_flip_ && m->ibuf_.at(id) - h[v] < fmu_.min_in(id)) {
+            // Take reverse step instead?
+            h[v] = -h[v];
+          } else {
+            // Perturbation not permitted
+            h[v] = casadi::nan;
           }
-          // Take reverse step instead
-          h[v] = -h[v];
         }
-        // Perturb the input
-        m->ibuf_.at(id) += h[v];
-        m->imarked_.at(id) = true;
-        // Inverse of step size
-        h[v] = 1. / h[v];
+        // Perturb the input, unless not permitted
+        if (!std::isnan(h[v])) {
+          m->ibuf_.at(id) += h[v];
+          m->imarked_.at(id) = true;
+          // Inverse of step size
+          h[v] = 1. / h[v];
+        }
       }
       // Request all outputs
       for (size_t i : jac_out_) {
@@ -1363,8 +1363,14 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
           // Save Hessian entry, unless not applicable to color
           if (!hessian_coloring_ || which_hess_color_[k] == c) {
-            casadi_int id2 = jac_in_.at(hess_row[k]);
-            m->hess_nz[k] = h[v] * (m->pert_asens[id2] - m->asens[id2]);
+            if (std::isnan(h[v])) {
+              // Perturbation was not permitted
+              m->hess_nz[k] = casadi::nan;
+            } else {
+              // Get Hessian nonzeros
+              casadi_int id2 = jac_in_.at(hess_row[k]);
+              m->hess_nz[k] = h[v] * (m->pert_asens[id2] - m->asens[id2]);
+            }
           }
         }
       }
