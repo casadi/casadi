@@ -1518,6 +1518,9 @@ class XpressSpecificTests(casadiTestCase):
         os.unlink(logfile)
 
 
+  # XPRSiisfirst has an off-by-one heap overflow (libxprs) that corrupts the
+  # heap on macOS; compute_iis is opt-in and this test is skipped there.
+  @unittest.skipIf(platform.system()=="Darwin", "Xpress XPRSiisfirst corrupts the heap on macOS")
   def test_iis_infeasible_lp(self):
     """IIS rows/cols are returned in get_stats() for an infeasible LP."""
     x = ca.MX.sym("x")
@@ -1526,6 +1529,7 @@ class XpressSpecificTests(casadiTestCase):
     solver = ca.qpsol("s", "xpress",
                    {"x": x, "f": x, "g": ca.vertcat(x, -x)},
                    {"error_on_fail": False,
+                    "compute_iis": True,
                     "xpress": {"OUTPUTLOG": 0}})
     sol = solver(x0=0, lbx=-1e10, ubx=1e10, lbg=ca.DM([5, 5]), ubg=ca.DM([1e10, 1e10]))
 
@@ -1541,6 +1545,7 @@ class XpressSpecificTests(casadiTestCase):
     self.assertTrue(numpy.all(numpy.isnan(numpy.array(sol["x"]).flatten())),
                     "x must be NaN when no primal solution is available")
 
+  @unittest.skipIf(platform.system()=="Darwin", "Xpress XPRSiisfirst corrupts the heap on macOS")
   def test_iis_infeasible_milp(self):
     """IIS is returned in get_stats() for an infeasible MIP."""
     x = ca.MX.sym("x")
@@ -1549,6 +1554,7 @@ class XpressSpecificTests(casadiTestCase):
                    {"x": x, "f": x, "g": x},
                    {"discrete": [1],
                     "error_on_fail": False,
+                    "compute_iis": True,
                     "xpress": {"OUTPUTLOG": 0}})
     solver(x0=0, lbx=ca.DM([0]), ubx=ca.DM([1]), lbg=2, ubg=1e10)
 
