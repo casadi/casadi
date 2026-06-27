@@ -1319,7 +1319,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         // Make sure that (forward) step remains in bounds
         if (x[v] + h[v] > fmu_.max_in(id)) {
           // Flip sign?
-          if (fd_flip_ && m->ibuf_.at(id) - h[v] < fmu_.min_in(id)) {
+          if (fd_flip_ && x[v] - h[v] > fmu_.min_in(id)) {
             // Take reverse step instead?
             h[v] = -h[v];
           } else {
