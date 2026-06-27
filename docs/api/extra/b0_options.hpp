@@ -3732,6 +3732,7 @@
 <tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\". When set to -1, sparsity is completely ignored and dense matrices are used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>asymmetric_hessian_coloring</td><td>OT_BOOL</td><td>Calculate Hessian using unidirectional graph coloring (star coloring). Ensures that upper and lower triangular parts are calculated separately, which may be desirable for diagnostics. If both symmetric coloring ('hessian_coloring' option) and asymmetric coloring is enabled, the symmetric coloring will be used.</td><td>casadi::FmuFunction</td></tr>
 <tr><td>aux</td><td>OT_STRINGVECTOR</td><td>Auxilliary variables</td><td>casadi::FmuFunction</td></tr>
 <tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>check_hessian</td><td>OT_BOOL</td><td>[DEPRECATED] Renamed 'validate_hessian'</td><td>casadi::FmuFunction</td></tr>
@@ -3745,6 +3746,7 @@
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_ad</td><td>OT_BOOL</td><td>[DEPRECATED] Renamed uses_directional_derivatives</td><td>casadi::FmuFunction</td></tr>
+<tr><td>enable_adjoint_hessian</td><td>OT_BOOL</td><td>Use finite differencing of adjoints for Hessian calculation.</td><td>casadi::FmuFunction</td></tr>
 <tr><td>enable_adjoint_jacobian</td><td>OT_BOOL</td><td>Allow Jacobian calculation using adjoint mode AD.</td><td>casadi::FmuFunction</td></tr>
 <tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
@@ -3758,7 +3760,7 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>hessian_coloring</td><td>OT_BOOL</td><td>Enable the use of graph coloring (star coloring) for Hessian calculation. Note that disabling the coloring can improve symmetry check diagnostics.</td><td>casadi::FmuFunction</td></tr>
+<tr><td>hessian_coloring</td><td>OT_BOOL</td><td>Calculate Hessian using symmetry exploiting graph coloring (star coloring).</td><td>casadi::FmuFunction</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
