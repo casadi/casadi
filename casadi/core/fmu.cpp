@@ -1135,9 +1135,12 @@ void FmuInternal::get_fwd(FmuMemory* m, size_t ind, double* v) const {
 void FmuInternal::set_adj(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
-    m->osens_.at(*id) = *v++;
-    m->omarked_.at(*id) = true;
+    if (*v != 0.) {
+      m->osens_.at(*id) = *v;
+      m->omarked_.at(*id) = true;
+    }
     id++;
+    v++;
   }
 }
 
@@ -1155,7 +1158,7 @@ void FmuInternal::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* 
     const casadi_int* wrt_id) const {
   for (casadi_int i = 0; i < nsens; ++i) {
     m->imarked_.at(*id) = true;
-    m->wrt_.at(*id) = *wrt_id++;
+    m->wrt_.at(*id) = wrt_id ? *wrt_id++ : -1;
     id++;
   }
 }
