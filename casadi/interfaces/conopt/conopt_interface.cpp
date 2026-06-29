@@ -1,6 +1,7 @@
 #include "conopt_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/casadi_interrupt.hpp"
+#include <cassert>
 #include <cmath>
 #include <cstring>
 #include <algorithm>
@@ -93,8 +94,9 @@ namespace casadi {
       Sparsity dgradf_dx = gradf_fcn.sparsity_jac(0, 1, true);
       gradf_nlflag_.assign(gradf_sp_.nnz(), 0);
       const casadi_int* dg_row = dgradf_dx.row();
-      for (casadi_int el = 0; el < dgradf_dx.nnz(); ++el)
+      for (casadi_int el = 0; el < dgradf_dx.nnz(); ++el) {
         gradf_nlflag_[dg_row[el]] = 1;
+      }
       has_linear_gradf_ = std::any_of(gradf_nlflag_.begin(), gradf_nlflag_.end(),
                                        [](int f) { return f == 0; });
     }
@@ -317,8 +319,9 @@ namespace casadi {
     }
 
     casadi_int ng_expanded = 0;
-    // Base NZ: objective gradient columns + all constraint Jacobian entries
-    casadi_int numnz = (casadi_int)gradf_sp_.nnz() + (casadi_int)jacg_sp_.nnz();
+    // Objective gradient NZs are added to numnz after nlp_grad_f is evaluated
+    // (so that gradf_const_vals is populated before we check for non-zero linear entries).
+    casadi_int numnz = (casadi_int)jacg_sp_.nnz();
 
     for (casadi_int i = 0; i < ng_; ++i) {
       double lbg = m->d_nlp.lbz[nx_ + i];
@@ -349,9 +352,7 @@ namespace casadi {
       }
     }
     casadi_assert(ng_expanded <= std::numeric_limits<int>::max(), "ng_expanded overflows int");
-    casadi_assert(numnz       <= std::numeric_limits<int>::max(), "numnz overflows int");
-    m->ng_expanded    = (int)ng_expanded;
-    m->numnz_expanded = (int)numnz;
+    m->ng_expanded = (int)ng_expanded;
 
     // Evaluate Jacobian at the initial point to obtain values for constant entries
     if (has_linear_jac_) {
@@ -367,6 +368,37 @@ namespace casadi {
       } catch (...) {
         casadi::uerr() << "CONOPT: initial evaluation failed (unknown exception)" << std::endl;
         return 1;
+      }
+    }
+
+    // Adjust conopt_rhs for fully linear rows to absorb constant terms.
+    // CONOPT's pre-triangular preprocessor uses only VALUE[] + RHS and never calls
+    // FDEval during that phase, so any constant in a fully linear constraint
+    // (e.g. x[9] - 3*x[6] + 133 = 0 → RHS must be -133, not 0) must be moved
+    // to the RHS here. For mixed (linear+nonlinear) rows, CONOPT calls FDEval and
+    // gets the full function value including the constant, so no adjustment needed.
+    if (has_linear_jac_) {
+      const casadi_int* g_colind_c = jacg_sp_.colind();
+      const casadi_int* g_row_c    = jacg_sp_.row();
+
+      // Accumulate the linear part of G at x0 per row: sum_j a_j * x0_j
+      std::vector<double> linear_at_x0(ng_, 0.0);
+      for (int c = 0; c < nx_; ++c) {
+        for (casadi_int el = g_colind_c[c]; el < g_colind_c[c + 1]; ++el) {
+          if (jacg_nlflag_[el] == 0)
+            linear_at_x0[g_row_c[el]] += m->const_jac_vals[el] * m->d_nlp.z[c];
+        }
+      }
+
+      for (int ci = 0; ci < ng_; ++ci) {
+        // Only adjust fully linear rows (no nonlinear Jacobian entries)
+        if (jacg_rowstart_[ci + 1] != jacg_rowstart_[ci]) continue;
+        double constant = m->cached_g[ci] - linear_at_x0[ci];
+        if (std::abs(constant) < 1e-14) continue;
+        int lb_row = m->casadi_to_conopt_lb_row[ci];
+        m->conopt_rhs[lb_row - 1] -= constant;
+        int ub_row = m->casadi_to_conopt_ub_row[ci];
+        if (ub_row >= 0) m->conopt_rhs[ub_row - 1] -= constant;
       }
     }
 
@@ -420,6 +452,22 @@ namespace casadi {
     }
 
     casadi_assert(num_nl_nz <= std::numeric_limits<int>::max(), "num_nl_nz overflows int");
+
+    // Count objective gradient NZs now that gradf_const_vals has been populated.
+    // Nonlinear entries are always included; linear (constant) entries only when
+    // non-zero — a zero constant gradient contributes nothing to the objective row
+    // and must not occupy a slot in the CONOPT matrix structure.
+    {
+      casadi_int numnz_f = 0;
+      for (casadi_int k = 0; k < (casadi_int)gradf_sp_.nnz(); ++k) {
+        if (gradf_nlflag_[k] == 1 ||
+            (has_linear_gradf_ && m->gradf_const_vals[k] != 0.0))
+          numnz_f++;
+      }
+      numnz += numnz_f;
+    }
+    casadi_assert(numnz <= std::numeric_limits<int>::max(), "numnz overflows int");
+    m->numnz_expanded = (int)numnz;
 
     COIDEF_NumCon(m->cntvect, (int)(ng_expanded + 1));
     COIDEF_NumNz(m->cntvect, (int)numnz);
@@ -629,10 +677,16 @@ namespace casadi {
       COLSTA[c] = nz;
       if (self.gradf_col_flag_[c]) {
         casadi_int k = self.gradf_col_to_nz_[c];
-        ROWNO[nz]  = 0;
-        NLFLAG[nz] = self.gradf_nlflag_[k];
-        if (self.gradf_nlflag_[k] == 0) VALUE[nz] = m->gradf_const_vals[k];
-        nz++;
+        if (self.gradf_nlflag_[k] == 1) {
+          ROWNO[nz]  = 0;
+          NLFLAG[nz] = 1;
+          nz++;
+        } else if (m->gradf_const_vals[k] != 0.0) {
+          ROWNO[nz]  = 0;
+          NLFLAG[nz] = 0;
+          VALUE[nz]  = m->gradf_const_vals[k];
+          nz++;
+        }
       }
       for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
         int ci = (int)g_row[el];
