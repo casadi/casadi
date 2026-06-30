@@ -209,7 +209,10 @@ void FmuFunction::change_option(const std::string& option_name,
   } else if (option_name == "enable_forward_jacobian") {
     enable_forward_jacobian_ = option_value;
   } else if (option_name == "enable_adjoint_hessian") {
-    enable_adjoint_hessian_ = option_value;
+    bool v = option_value;
+    if (v) casadi_assert(fmu_.provides_adjoint_derivatives(),
+      "FMU does not provide support for adjoint derivatives");
+    enable_adjoint_hessian_ = v;
   } else if (option_name == "fd_flip") {
     fd_flip_ = option_value;
   } else if (option_name == "make_symmetric") {
@@ -398,6 +401,7 @@ void FmuFunction::init(const Dict& opts) {
   if (validate_forward_ && !uses_directional_derivatives_) casadi_error("Inconsistent options");
   if (uses_adjoint_derivatives_) casadi_assert(fmu_.provides_adjoint_derivatives(),
     "FMU does not provide support for adjoint derivatives");
+  if (enable_adjoint_jacobian_) casadi_assert(uses_adjoint_derivatives_, "Inconsistent options");
 
   // New AD validation file, if any
   if (!validate_ad_file_.empty()) {
