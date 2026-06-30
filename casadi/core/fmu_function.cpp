@@ -1057,11 +1057,9 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         break;
       case OutputType::ADJ:
         // If adjoint sensitivities have not already been set
-        if (need_jac || !uses_adjoint_derivatives_) {
-          for (casadi_int d = 0; d < nadj_; ++d) {
-            size_t asens_off = d * fmu_.n_in();
-            for (size_t id : fmu_.ired(out_[k].wrt)) *r++ = asens[id + asens_off];
-          }
+        for (casadi_int d = 0; d < nadj_; ++d) {
+          size_t asens_off = d * fmu_.n_in();
+          for (size_t id : fmu_.ired(out_[k].wrt)) *r++ = asens[id + asens_off];
         }
         break;
       case OutputType::HESS:
@@ -1275,18 +1273,15 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         }
       }
       // Request adjoint sensitivities
-      for (size_t k = 0; k < out_.size(); ++k) {
-        if (m->res[k] && out_[k].type == OutputType::ADJ) {
-          fmu_.request_adj(m, out_[k].wrt);
-        }
+      casadi_int wrt_id = -1;
+      for (casadi_int id : jac_in_) {
+        fmu_.request_adj(m, 1, &id, &wrt_id);
       }
       // Calculate derivatives
       if (fmu_.eval_adj(m)) return 1;
       // Collect adjoint sensitivities
-      for (size_t k = 0; k < out_.size(); ++k) {
-        if (m->res[k] && out_[k].type == OutputType::ADJ) {
-          fmu_.get_adj(m, out_[k].wrt, m->res[k] + d * size1_out(k));
-        }
+      for (casadi_int id : jac_in_) {
+        fmu_.get_adj(m, 1, &id, &m->asens[id]);
       }
     }
   }
@@ -1361,15 +1356,13 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         }
         // Request adjoint sensitivities
         casadi_int wrt_id = -1;
-        for (size_t i : jac_in_) {
-          casadi_int id = jac_in_[i];
+        for (casadi_int id : jac_in_) {
           fmu_.request_adj(m, 1, &id, &wrt_id);
         }
         // Calculate derivatives
         if (fmu_.eval_adj(m)) return 1;
         // Collect adjoint sensitivities
-        for (size_t i : jac_in_) {
-          casadi_int id = jac_in_[i];
+        for (casadi_int id : jac_in_) {
           fmu_.get_adj(m, 1, &id, &m->pert_asens[id]);
         }
       } else {
