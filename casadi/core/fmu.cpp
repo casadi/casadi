@@ -836,14 +836,20 @@ int FmuInternal::eval_adj(FmuMemory* m) const {
   gather_adj(m);
   // Quick return if nothing to be calculated
   if (m->id_in_.size() == 0) return 0;
-  // Evaluate adjoint derivatives
-  if (get_adjoint_derivative(m->instance,
-      get_ptr(m->vr_out_), m->id_out_.size(),
-      get_ptr(m->vr_in_), m->id_in_.size(),
-      get_ptr(m->d_out_), m->id_out_.size(),
-      get_ptr(m->d_in_), m->id_in_.size())) {
-    casadi_warning("FMU adjoint derivative failed");
-    return 1;
+  // Check if no seeds
+  if (m->id_out_.size() == 0) {
+    // Sensitivities are zero, trivially
+    std::fill(m->d_in_.begin(), m->d_in_.end(), 0);
+  } else {
+    // Evaluate adjoint derivatives
+    if (get_adjoint_derivative(m->instance,
+        get_ptr(m->vr_out_), m->id_out_.size(),
+        get_ptr(m->vr_in_), m->id_in_.size(),
+        get_ptr(m->d_out_), m->id_out_.size(),
+        get_ptr(m->d_in_), m->id_in_.size())) {
+      casadi_warning("FMU adjoint derivative failed");
+      return 1;
+    }
   }
   // Collect requested variables
   auto it = m->d_in_.begin();
@@ -1470,8 +1476,6 @@ void FmuInternal::gather_adj(FmuMemory* m) const {
     m->d_out_.push_back(m->osens_[id]);
     m->osens_[id] = 0;
   }
-  // Ensure at least one seed
-  casadi_assert(n_unknown != 0, "No seeds");
   // Allocate result vectors
   m->v_in_.resize(n_known);
   m->d_in_.resize(n_known);
