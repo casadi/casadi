@@ -3798,6 +3798,7 @@
 <tr><td>scheme_out</td><td>OT_STRINGVECTOR</td><td>Names of the outputs in the scheme</td><td>casadi::FmuFunction</td></tr>
 <tr><td>step</td><td>OT_DOUBLE</td><td>Step size, scaled by nominal value</td><td>casadi::FmuFunction</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>uses_adjoint_derivatives</td><td>OT_BOOL</td><td>Use the analytic adjoint derivative support in the FMU</td><td>casadi::FmuFunction</td></tr>
 <tr><td>uses_directional_derivatives</td><td>OT_BOOL</td><td>Use the analytic forward directional derivative support in the FMU</td><td>casadi::FmuFunction</td></tr>
 <tr><td>validate_ad</td><td>OT_BOOL</td><td>[DEPRECATED] Renamed 'validate_forward'</td><td>casadi::FmuFunction</td></tr>
 <tr><td>validate_ad_file</td><td>OT_STRING</td><td>Redirect results of Hessian validation to a file instead of generating a warning</td><td>casadi::FmuFunction</td></tr>
