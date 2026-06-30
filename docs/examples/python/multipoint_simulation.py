@@ -16,16 +16,16 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Consider the following nonlinear system with two states and one control input:
-x1 = MX.sym('x1')
-x2 = MX.sym('x2')
-x = vertcat(x1, x2)
-u = MX.sym('u')
-xdot = vertcat((1-x2**2)*x1 - x2 + u, x1)
+x1 = ca.MX.sym('x1')
+x2 = ca.MX.sym('x2')
+x = ca.vertcat(x1, x2)
+u = ca.MX.sym('u')
+xdot = ca.vertcat((1-x2**2)*x1 - x2 + u, x1)
 
 # In addition to the dynamics, we are also interested in the sum-of-squares distance from the origin:
 y = x1**2 + x2**2
@@ -38,10 +38,10 @@ tgrid = np.linspace(0, T, N+1)
 
 # We will integrate the problem using CVODES, while also calculating the integral of y
 dae = {'x':x, 'u':u, 'ode':xdot, 'quad':y}
-F = integrator('F', 'cvodes', dae, tgrid[0], tgrid[1:])
+F = ca.integrator('F', 'cvodes', dae, tgrid[0], tgrid[1:])
 
 # We are also interested in the pointwise values of y, so let's create a function for that too
-yfun = Function('yfun', [x], [y], ['x'], ['y'])
+yfun = ca.Function('yfun', [x], [y], ['x'], ['y'])
 
 # Let's define initial conditions for x and values for the piecewise constant controls
 u = np.linspace(-1, 1, N)
@@ -53,8 +53,8 @@ xf = Fk['xf']
 qf = Fk['qf']
 
 # Let's add the state at the initial time to xf and qf
-xf = horzcat(x0, xf)
-qf = horzcat(0, qf)
+xf = ca.horzcat(x0, xf)
+qf = ca.horzcat(0, qf)
 
 # Call yfun to get y at each grid point
 yf = yfun(xf)

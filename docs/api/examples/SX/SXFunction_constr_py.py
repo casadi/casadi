@@ -24,18 +24,18 @@
 # Function constructors
 # =======================
 
-from casadi import *
+import casadi as ca
 
-x = SX.sym("x")     # A scalar (1-by-1 matrix) symbolic primitive
-y = SX.sym("y",2)   # A vector (n-by-1 matrix) symbolic primitive
-z = SX.sym("z",2,3) # An n-by-m matrix symbolic primitive
+x = ca.SX.sym("x")     # A scalar (1-by-1 matrix) symbolic primitive
+y = ca.SX.sym("y",2)   # A vector (n-by-1 matrix) symbolic primitive
+z = ca.SX.sym("z",2,3) # An n-by-m matrix symbolic primitive
 
 ins =  [x,y] # function inputs
-outs = [x,y,vertcat(x,y),y*x,0]
+outs = [x,y,ca.vertcat(x,y),y*x,0]
 
 print(outs)
 
-f = Function("f", ins, outs)
+f = ca.Function("f", ins, outs)
 
 # f now has two inputs and a 4 outputs:
 

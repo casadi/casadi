@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 if (NOT SWIG_IMPORT)
-  find_package(SWIG REQUIRED)
+  # casadi requires SWIG >= 3.0 (relies on Swig::DirectorException deriving
+  # from std::exception; see the exception handling in swig/casadi.i).
+  find_package(SWIG 3.0 REQUIRED)
 endif()
 
 if (WITH_EXTENDING_CASADI)
@@ -56,6 +58,14 @@ endif()
 
 if(WITH_JSON)
    add_subdirectory(json)
+endif()
+
+if(WITH_JULIA)
+   add_subdirectory(julia)
+endif()
+
+if(WITH_WASM_JS)
+   add_subdirectory(wasm-js)
 endif()
 
 install(FILES casadi.i DESTINATION ${INCLUDE_PREFIX}/casadi)

@@ -62,7 +62,7 @@ void Fmu2::free_mem(void *mem) const {
 Fmu2::~Fmu2() {
 }
 
-std::string Fmu2::system_infix() const {
+std::string Fmu2::dll_infix() {
 #if defined(_WIN32)
   // Windows system
 #ifdef _WIN64

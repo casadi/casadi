@@ -108,6 +108,14 @@ namespace casadi {
       {"compiler_output_flag",
        {OT_STRING,
        "Compiler flag to denote object output. Default: '-o '"}},
+      {"compiler_include_flag",
+       {OT_STRING,
+       "Compiler flag to add an include directory. Default: '-I' ('/I' on MSVC)"}},
+      {"include_dirs",
+       {OT_STRINGVECTOR,
+       "List of include directories, each passed to the compiler prefixed with "
+       "'compiler_include_flag'. OS-agnostic alternative to passing '-I...' via 'flags'. "
+       "Default: None"}},
       {"linker_output_flag",
        {OT_STRING,
        "Linker flag to denote shared library output. Default: '-o '"}},
@@ -141,6 +149,7 @@ namespace casadi {
 
     std::vector<std::string> compiler_flags;
     std::vector<std::string> linker_flags;
+    std::vector<std::string> include_dirs;
     std::string suffix = OBJECT_FILE_SUFFIX;
 
 #ifdef _WIN32
@@ -150,6 +159,7 @@ namespace casadi {
     std::string linker_setup = "/DLL";
     std::string compiler_output_flag = "/Fo";
     std::string linker_output_flag = "/out:";
+    std::string compiler_include_flag = "/I";
     extra_suffixes_ = {".exp", ".lib"};
 #elif defined(__APPLE__)
     std::string compiler = "clang";
@@ -158,6 +168,7 @@ namespace casadi {
     std::string linker_setup = "-shared";
     std::string compiler_output_flag = "-o ";
     std::string linker_output_flag = "-o ";
+    std::string compiler_include_flag = "-I";
 #else
     std::string compiler = "gcc";
     std::string linker = "gcc";
@@ -165,6 +176,7 @@ namespace casadi {
     std::string linker_setup = "-shared";
     std::string compiler_output_flag = "-o ";
     std::string linker_output_flag = "-o ";
+    std::string compiler_include_flag = "-I";
 #endif
 
     // Read options
@@ -187,6 +199,10 @@ namespace casadi {
         compiler_output_flag = op.second.to_string();
       } else if (op.first=="linker_output_flag") {
         linker_output_flag = op.second.to_string();
+      } else if (op.first=="compiler_include_flag") {
+        compiler_include_flag = op.second.to_string();
+      } else if (op.first=="include_dirs") {
+        include_dirs = op.second.to_string_vector();
       } else if (op.first=="extra_suffixes") {
         extra_suffixes_ = op.second.to_string_vector();
       } else if (op.first=="name") {
@@ -210,6 +226,10 @@ namespace casadi {
     cccmd << compiler;
     for (auto i=compiler_flags.begin(); i!=compiler_flags.end(); ++i) {
       cccmd << " " << *i;
+    }
+    // Include directories (OS-agnostic: prefix with the compiler's include flag)
+    for (const std::string& dir : include_dirs) {
+      cccmd << " " << compiler_include_flag << dir;
     }
     cccmd << " " << compiler_setup;
 

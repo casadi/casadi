@@ -24,7 +24,7 @@
 # SX.sym
 #======================
 
-from casadi import *
+import casadi as ca
 
 # Construct using a single name
 # =====================================
@@ -32,17 +32,17 @@ from casadi import *
 
 # Without shape arguments, a 1-by-1 matrix is constructed:
 
-x = SX.sym("x")
+x = ca.SX.sym("x")
 print(type(x), x)
 
 # Create a column matrix 
 
-print(SX.sym("x",2,1))
+print(ca.SX.sym("x",2,1))
 
 # Create a row matrix 
 
-print(SX.sym("x",1,2))
+print(ca.SX.sym("x",1,2))
 
 # Create a matrix 
 
-print(SX.sym("x",2,3))
+print(ca.SX.sym("x",2,3))

@@ -48,12 +48,19 @@ namespace casadi {
     casadi_assert_dev(Function::call_depth_==0);
 #endif // WITH_EXTRA_CHECKS
     if (!node) return;
-    if (node->weak_ref_) {
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
-      auto mutex = node->weak_ref_->get_mutex();
+    GenericWeakRef<Shared, Internal>* weak_ref =
+      node->weak_ref_.load(std::memory_order_acquire);
+#else
+    GenericWeakRef<Shared, Internal>* weak_ref = node->weak_ref_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+    if (weak_ref) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      // get_mutex() returns a shared_ptr copy, so the mutex outlives this lock
+      // even if delete node (below) destroys the WeakRefInternal holding it
+      auto mutex = weak_ref->get_mutex();
       // Avoid triggering a delete while a weak_ref.shared_if_alive is being called
       std::lock_guard<std::mutex> lock(*mutex);
-      // Could it be that this mutex is destroyed when the lock goes out of scope?
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
       if (--static_cast<Internal*>(node)->count == 0) {

@@ -120,6 +120,20 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   SX SX::simplify(const SX& x);
 
   template<>
+  SX SX::transform(const SX& x, const Dict& opts);
+
+  template<>
+  SX SX::transform(const SX& x, const std::vector<std::vector<GenericType> >& passes,
+    const Dict& opts);
+
+  template<>
+  std::vector<SX> SX::transform(const std::vector<SX>& x, const Dict& opts);
+
+  template<>
+  std::vector<SX> SX::transform(const std::vector<SX>& x,
+    const std::vector<std::vector<GenericType> >& passes, const Dict& opts);
+
+  template<>
   std::vector<SX>
   SX::substitute(const std::vector<SX>& ex, const std::vector<SX>& v, const std::vector<SX>& vdef);
 
@@ -239,6 +253,11 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
 
   template<>
   bool CASADI_EXPORT SX::simplify_const_folding(std::vector<SX>& arg,
+                                   std::vector<SX>& res,
+                                   const Dict& opts);
+
+  template<>
+  bool CASADI_EXPORT SX::simplify_combine_terms(std::vector<SX>& arg,
                                    std::vector<SX>& res,
                                    const Dict& opts);
 

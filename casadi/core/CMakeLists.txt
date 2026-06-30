@@ -80,12 +80,15 @@ set(CASADI_PUBLIC
   rootfinder.hpp
   integrator.hpp
   nlpsol.hpp
+  onnx_function.hpp
   conic.hpp
   dple.hpp
   interpolant.hpp
   expm.hpp
   code_generator.hpp
   importer.hpp
+  graph_model.hpp
+  graph_builder.hpp
   blazing_spline.hpp
 
   # MISC useful stuff
@@ -94,6 +97,7 @@ set(CASADI_PUBLIC
   nlp_builder.hpp
   xml_node.hpp
   xml_file.hpp
+  modelica_parser.hpp
   dae_builder.hpp
   optistack.hpp
   serializer.hpp
@@ -206,6 +210,7 @@ set(CASADI_INTERNAL
   rootfinder_impl.hpp     rootfinder.cpp
   integrator_impl.hpp     integrator.cpp
   nlpsol.hpp              nlpsol_impl.hpp        nlpsol.cpp
+  onnx_function.hpp       onnx_function_impl.hpp onnx_function.cpp
   conic_impl.hpp          conic.cpp
   dple_impl.hpp           dple.cpp
   interpolant_impl.hpp    interpolant.cpp
@@ -217,6 +222,8 @@ set(CASADI_INTERNAL
   mapsum.hpp              mapsum.cpp
   finite_differences.hpp  finite_differences.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
+  graph_model.hpp         graph_model_impl.hpp graph_model_internal.hpp graph_model.cpp
+  graph_builder.hpp       graph_builder_internal.hpp graph_builder.cpp
   blazing_spline.cpp blazing_spline_impl.hpp
 
   # MISC useful stuff
@@ -225,6 +232,7 @@ set(CASADI_INTERNAL
   nlp_builder.cpp
   xml_node.cpp
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
+  modelica_parser.cpp         modelica_parser_internal.hpp         modelica_parser_internal.cpp
   dae_builder.cpp             dae_builder_internal.hpp             dae_builder_internal.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
   serializer.cpp              serializing_stream.cpp
@@ -308,7 +316,9 @@ install(FILES ${CASADI_PUBLIC} ${CMAKE_CURRENT_BINARY_DIR}/casadi_export.h
   DESTINATION ${INCLUDE_PREFIX}/casadi/core
 )
 if(INSTALL_INTERNAL_HEADERS)
-  install(FILES ${CASADI_INTERNAL}
+  set(CASADI_INTERNAL_HEADERS ${CASADI_INTERNAL})
+  list(FILTER CASADI_INTERNAL_HEADERS EXCLUDE REGEX "\\.cpp$")
+  install(FILES ${CASADI_INTERNAL_HEADERS}
     DESTINATION ${INCLUDE_PREFIX}/casadi/core
   )
 endif()

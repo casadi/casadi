@@ -2579,6 +2579,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  bool Matrix<Scalar>::simplify_combine_terms(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts) {
+    casadi_error("'simplify_combine_terms' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::unite(const Matrix<Scalar>& A, const Matrix<Scalar>& B) {
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
@@ -2719,6 +2726,29 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::simplify(const Matrix<Scalar> &x) {
     return x;
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::transform(const Matrix<Scalar> &x, const Dict& opts) {
+    casadi_error("'transform' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::transform(const Matrix<Scalar> &x,
+      const std::vector<std::vector<GenericType> >& passes, const Dict& opts) {
+    casadi_error("'transform' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
+  std::vector<Matrix<Scalar> > Matrix<Scalar>::transform(const std::vector<Matrix<Scalar> >& x,
+      const Dict& opts) {
+    casadi_error("'transform' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
+  std::vector<Matrix<Scalar> > Matrix<Scalar>::transform(const std::vector<Matrix<Scalar> >& x,
+      const std::vector<std::vector<GenericType> >& passes, const Dict& opts) {
+    casadi_error("'transform' not defined for " + type_name());
   }
 
   template<typename Scalar>

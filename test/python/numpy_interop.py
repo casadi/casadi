@@ -27,8 +27,33 @@ logic_all); those tests opt out of MX explicitly via sym_types=(SX,)."""
 
 import unittest
 import numpy as np
-from casadi import SX, MX, DM, Function, Sparsity
+import casadi as _ca
+from casadi import SX, MX, DM, Function, Sparsity, GlobalOptions
 from helpers import casadiTestCase
+
+Arr = _ca.ArrayInterface
+
+
+def _unwrap(x):
+    """Reach the underlying casadi value of a casadi.ArrayInterface;
+    pass other values through unchanged."""
+    return x.to_casadi() if isinstance(x, Arr) else x
+
+
+# This suite verifies the casadi-aware numpy support (issue #2959): with
+# GlobalOptions.setNumpyMode(1), an explicit numpy.foo(M) on a
+# casadi value routes through the numpy-semantics array wrapper
+# (casadi.ArrayInterface) and returns one, following numpy's shape/axis
+# contract.  We enable it for the whole module and unwrap results back to
+# casadi (to_casadi()) for numeric/symbolic comparison.  Default-mode behaviour
+# (densify + FutureWarning) is covered in
+# typemaps.py:test_numpy_preserve_type.
+def setUpModule():
+    GlobalOptions.setNumpyMode(1)
+
+
+def tearDownModule():
+    GlobalOptions.setNumpyMode(0)
 
 
 # ----------------------------- shape fixtures ----------------------------- #
@@ -88,7 +113,7 @@ class _NumpyRefMixin(object):
         nonzeros.  Catches handlers that quietly densify a sparse input
         (e.g. by going through np.asarray(x.full()))."""
         kwargs = kwargs or {}
-        got = np_func(*cas_args, **kwargs)
+        got = _unwrap(np_func(*cas_args, **kwargs))
         self.assertTrue(isinstance(got, DM),  # pyright: ignore[reportAttributeAccessIssue]
                         "[%s] got %s, expected DM" %
                         (label, type(got).__name__))
@@ -97,28 +122,27 @@ class _NumpyRefMixin(object):
                          (label, got.nnz(), expected_nnz))
 
     def _close(self, got, ref, label, digits=11):
-        """Compare casadi result `got` against numpy reference `ref`.
+        """Compare a casadi-aware numpy result against a numpy reference.
 
-        The two array libraries disagree about 1-D shapes: numpy returns
-        1-D from many reductions and elementwise ops on vectors, while
-        casadi only has 2-D values.  We accept a numpy 1-D reference as
-        equivalent to a column or row vector of the same length on the
-        casadi side -- whichever orientation the casadi result has."""
-        g = np.asarray(got.full() if isinstance(got, DM) else got)
-        r = np.asarray(ref)
-        if r.ndim == 0:
-            r = r.reshape(1, 1)
-        if g.ndim == 0:
-            g = g.reshape(1, 1)
-        if g.shape != r.shape:
-            if r.ndim == 1 and g.ndim == 2 and g.size == r.size and \
-                    (g.shape == (r.size, 1) or g.shape == (1, r.size)):
-                r = r.reshape(g.shape)
-        self.assertEqual(g.shape, r.shape,  # pyright: ignore[reportAttributeAccessIssue]
-                         "[%s] shape: got %s, expected %s" %
-                         (label, g.shape, r.shape))
-        if g.size:
-            d = np.abs(g.astype(float) - r.astype(float)).max()
+        Shapes are compared after squeezing length-1 axes.  ArrayInterface
+        results DO carry numpy's exact logical rank for elementwise ops and
+        axis reductions -- but a RAW casadi DM/SX/MX argument enters dispatch
+        as its 2-D casadi shape (a column as (n,1), a row as (1,n), a scalar
+        as (1,1)) per the column/row casting rule, so e.g. np.sin(DM[1,2,3])
+        faithfully yields (n,1); meanwhile many of these tests write their
+        numpy reference in flattened 1-D/0-D form.  Squeezing reconciles that
+        deliberate (n,1)<->(n,) mapping while still catching genuine rank
+        errors (a result with the wrong number of NON-singleton axes -- e.g.
+        a reduction that failed to drop an axis -- survives squeezing and
+        fails the shape check)."""
+        g = np.asarray(got, dtype=float)
+        r = np.asarray(ref, dtype=float)
+        gs, rs = np.squeeze(g), np.squeeze(r)
+        self.assertEqual(gs.shape, rs.shape,  # pyright: ignore[reportAttributeAccessIssue]
+                         "[%s] shape: got %s (squeezed %s), expected %s (squeezed %s)" %
+                         (label, g.shape, gs.shape, r.shape, rs.shape))
+        if gs.size:
+            d = np.abs(gs - rs).max()
             self.assertLess(d, 10 ** (-digits),  # pyright: ignore[reportAttributeAccessIssue]
                             "[%s] values: max abs diff %.3e\ngot=\n%s\nref=\n%s"
                             % (label, d, g, r))
@@ -143,14 +167,16 @@ class _NumpyRefMixin(object):
         except Exception as e:
             self.fail("[%s] numpy reference itself raised: %s" % (label, e))  # pyright: ignore[reportAttributeAccessIssue]
 
-        # DM
+        # DM: the result is an ArrayInterface with the true numpy shape.
         try:
             got_dm = np_func(*cas_args, **kwargs)
         except Exception as e:
             self.fail("[%s] DM dispatch raised: %s" % (label, e))  # pyright: ignore[reportAttributeAccessIssue]
         self._close(got_dm, ref, label + " DM", digits=digits)
 
-        # symbolic types
+        # symbolic types: build a Function on the underlying casadi value,
+        # evaluate, and reshape the 2-D casadi output back to the result's
+        # logical numpy shape before comparing.
         for cls in sym_types:
             syms = []
             num_inputs = []
@@ -164,12 +190,14 @@ class _NumpyRefMixin(object):
                 else:
                     sym_call_args.append(a)
             try:
-                expr = np_func(*sym_call_args, **kwargs)
+                res = np_func(*sym_call_args, **kwargs)
             except Exception as e:
                 self.fail("[%s] %s dispatch raised: %s"  # pyright: ignore[reportAttributeAccessIssue]
                           % (label, cls.__name__, e))
-            f = Function("f", syms, [expr])
-            got = f(*num_inputs)
+            shape = res.shape if isinstance(res, Arr) \
+                else np.asarray(res).shape
+            f = Function("f", syms, [_unwrap(res)])
+            got = np.asarray(f(*num_inputs)).reshape(shape)
             self._close(got, ref, "%s %s" % (label, cls.__name__),
                         digits=digits)
 
@@ -282,12 +310,12 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
             self._verify("sum:" + label, np.sum, x)
 
     def test_sum_axis(self):
-        # numpy axis=k drops that axis (shape collapses); casadi keeps
-        # 2-D, so we use keepdims=True on the numpy side to align shapes.
+        # numpy axis=k drops that axis; the casadi-aware numpy support now
+        # follows that contract, so a (2,3) sum over axis 0 is (3,) and over
+        # axis 1 is (2,).
         x = _MAT23
         for axis in (0, 1):
-            self._verify("sum_axis%d" % axis, np.sum, x,
-                         kwargs={"axis": axis, "keepdims": True})
+            self._verify("sum_axis%d" % axis, np.sum, x, kwargs={"axis": axis})
 
     def test_cumsum_axis(self):
         # casadi.cumsum is per-axis; numpy default cumsum flattens.
@@ -325,7 +353,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
                            np.expm1, np.log1p, np.floor, np.ceil,
                            np.fabs, np.absolute, np.sign)
         for f in zero_preserving:
-            got = f(x)
+            got = _unwrap(f(x))
             self.assertTrue(isinstance(got, DM),
                             "[%s] returned %s, not DM" % (f.__name__, type(got).__name__))
             self._check_nnz(f.__name__ + " sparse", f, x, expected_nnz=x_nnz)
@@ -391,7 +419,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         # symbolic: build a function and evaluate on the same dense input
         for cls in (SX, MX):
             s = cls.sym("x", cas_arg.shape[0], cas_arg.shape[1])
-            pieces = np_func(s, sections)
+            pieces = [_unwrap(p) for p in np_func(s, sections)]
             f = Function("f", [s], pieces)
             out = f(cas_arg)
             if not isinstance(out, (list, tuple)):
@@ -441,7 +469,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
     def test_vsplit_sparse_preserves_nnz(self):
         # 4x4 lower-triangular, split into two 2x4 chunks: the two
         # halves' nnz must sum to the original nnz (no densification).
-        pieces = np.vsplit(_SP_LOWER4, 2)
+        pieces = [_unwrap(p) for p in np.vsplit(_SP_LOWER4, 2)]
         total = sum(p.nnz() for p in pieces)  # pyright: ignore[reportAttributeAccessIssue]
         self.assertEqual(total, _SP_LOWER4.nnz())  # pyright: ignore[reportAttributeAccessIssue]
 
@@ -477,11 +505,18 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
     # -------------------- linear algebra --------------------------- #
 
     def test_dot_vec_vec(self):
-        # numpy refuses to dot two (3,1) arrays -- compare against the
-        # 1-D numpy result instead.
+        # Two casadi columns are 2-D (3,1); numpy.dot of (3,1)·(3,1) is an
+        # invalid matmul (inner dims 1 vs 3).  The casadi-aware numpy
+        # support follows numpy and raises rather than silently computing
+        # an inner product.  (Use casadi.ArrayInterface([...]) for a true
+        # 1-D vector whose dot IS the inner product.)
         v1, v2 = DM([1.0, 2.0, 3.0]), DM([4.0, 5.0, 6.0])
-        self._verify("dot_vec_vec", np.dot, v1, v2,
-                     np_args_override=(v1.full().ravel(), v2.full().ravel()))
+        with self.assertRaises(Exception):
+            np.dot(v1, v2)
+        # 1-D wrappers give the numpy inner product (scalar).
+        d = np.dot(Arr([1.0, 2.0, 3.0]), Arr([4.0, 5.0, 6.0]))
+        self._close(d, np.dot(np.array([1.0, 2.0, 3.0]),
+                              np.array([4.0, 5.0, 6.0])), "dot 1-D")
 
     def test_dot_mat_mat(self):
         self._verify("dot_mat_mat", np.dot,
@@ -822,7 +857,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         ref = np.gradient(col.full().ravel())
         for cls in [SX, MX]:
             s = cls.sym("s", 4)
-            f = Function("f", [s], [np.gradient(s)])
+            f = Function("f", [s], [_unwrap(np.gradient(s))])
             self._close(f(col), ref, "gradient %s symbolic" % cls.__name__)
 
     def test_roll_1d(self):
@@ -985,7 +1020,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         # Sanity-check: the SX path must NOT raise (it would if there were
         # no native handler, since SX can't densify).
         x = SX.sym("x", 4)
-        expr = np.logaddexp.reduce(x)
+        expr = _unwrap(np.logaddexp.reduce(x))
         # The structural fingerprint must mention logsumexp's max-shift
         # trick (fmax + log of exp shifted) rather than triggering the
         # symbolic fallback's TypeError.
@@ -1083,7 +1118,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         A = DM([[1.0, 2.0], [3.0, 4.0]])
         for p in (1, np.inf, 'fro'):
             self._verify("linalg.cond p=%r" % p,
-                         lambda M, p=p: np.linalg.cond(M, p),  # pyright: ignore[reportArgumentType]
+                         lambda M, p=p: np.linalg.cond(M, p),  # pyright: ignore[reportArgumentType,reportCallIssue]
                          A)
 
     def test_linspace_retstep_with_dm_endpoints(self):
@@ -1252,7 +1287,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
     def test_round2_creation(self):
         x = DM([[1.0, 2.0], [3.0, 4.0]])
         # copy returns a fresh casadi value.
-        c = np.copy(x)
+        c = _unwrap(np.copy(x))
         self.assertIsInstance(c, DM)
         self._close(c, x.full(), "copy")
         # asarray/asanyarray/ascontiguousarray DO route via the
@@ -1306,8 +1341,8 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         # ediff1d.
         self._verify("ediff1d", np.ediff1d, DM([1.0, 3.0, 7.0]),
                      np_args_override=(np.array([1.0, 3.0, 7.0]),))
-        # fix.
-        self._verify("fix", np.fix, DM([1.7, -1.7, 2.0]))
+        # fix (Deprecated)
+        #self._verify("fix", np.fix, DM([1.7, -1.7, 2.0]))
         # isin -- balanced OR fold.
         self._verify("isin",
                      lambda v: np.isin(v, [1, 3, 5]),
@@ -1437,7 +1472,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         # collapse to (a transformation of) the OP_EINSTEIN graph node.
         a = MX.sym("a", 2, 2)
         b = MX.sym("b", 2, 2)
-        expr = np.einsum('ij,jk->ik', a, b)
+        expr = _unwrap(np.einsum('ij,jk->ik', a, b))
         self.assertIn("einstein", str(expr))
         A = DM([[1.0, 2.0], [3.0, 4.0]])
         B = DM([[5.0, 6.0], [7.0, 8.0]])
@@ -1451,7 +1486,7 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
         # fmax + log1p + exp + fmin decomposition.
         a = MX.sym("a")
         b = MX.sym("b")
-        expr = np.logaddexp(a, b)
+        expr = _unwrap(np.logaddexp(a, b))
         self.assertIn("logsumexp", str(expr))
         f = Function("f", [a, b], [expr])
         for av, bv in ((1.0, 2.0), (-3.0, 4.0), (0.0, 0.0)):

@@ -24,7 +24,7 @@
 # Monodromy matrix
 # =====================
 
-from casadi import *
+import casadi as ca
 from numpy import *
 from pylab import *
 
@@ -32,21 +32,21 @@ from pylab import *
 # $\dot{x_1} = x_2$
 # $\dot{x_2} = -(-w_0^2 x_1 + a_3 x_1^3 + a_5 x_1^5) - (2 mu_1 x_2 + mu_3 x_2^3) + f$.
 
-x  = SX.sym("x",2)
+x  = ca.SX.sym("x",2)
 x1 = x[0]
 x2 = x[1]
 
-w0 = SX.sym("w0")
-a3 = SX.sym("a3")
-a5 = SX.sym("a5")
-mu1 = SX.sym("mu1")
-mu3 = SX.sym("mu3")
-ff = SX.sym("f")
+w0 = ca.SX.sym("w0")
+a3 = ca.SX.sym("a3")
+a5 = ca.SX.sym("a5")
+mu1 = ca.SX.sym("mu1")
+mu3 = ca.SX.sym("mu3")
+ff = ca.SX.sym("f")
 
 tf = 40
 
-params = vertcat(w0,a3,a5,mu1,mu3,ff)
-rhs    = vertcat(x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100+ff)
+params = ca.vertcat(w0,a3,a5,mu1,mu3,ff)
+rhs    = ca.vertcat(x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100+ff)
 
 dae={'x':x, 'p':params, 'ode':rhs}
 

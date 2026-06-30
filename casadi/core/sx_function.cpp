@@ -1681,6 +1681,64 @@ namespace casadi {
     return 0;
   }
 
+  int SXFunction::
+  eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    const bvec_t nz = ~static_cast<bvec_t>(0);
+    // Propagate signal activity forward (bit set = active (possibly nonzero))
+    for (auto&& e : algorithm_) {
+      switch (e.op) {
+      case OP_CONST:
+        w[e.i0] = (e.d!=0) ? nz : 0; break;
+      case OP_PARAMETER:
+        w[e.i0] = nz; break;  // free variable: assume nonzero
+      case OP_INPUT:
+        w[e.i0] = (arg[e.i1]!=nullptr) ? arg[e.i1][e.i2] : 0;
+        break;
+      case OP_OUTPUT:
+        if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1];
+        break;
+      case OP_CALL:
+        call_activity(e, arg, res, iw, w);
+        break;
+      default: // Unary or binary operation
+        if (casadi_math<double>::ndeps(e.op)==1) {
+          // Zero input yields zero only for zero-preserving ops (sin, sqrt; not cos/exp)
+          w[e.i0] = w[e.i1] ? nz : (operation_checker<F0XChecker>(e.op) ? 0 : nz);
+        } else {
+          const bool z0 = w[e.i1]!=0, z1 = w[e.i2]!=0;
+          if (!z0 && !z1)      w[e.i0] = operation_checker<F00Checker>(e.op) ? 0 : nz;
+          else if (!z0 &&  z1) w[e.i0] = operation_checker<F0XChecker>(e.op) ? 0 : nz;
+          else if ( z0 && !z1) w[e.i0] = operation_checker<FX0Checker>(e.op) ? 0 : nz;
+          else                 w[e.i0] = nz;
+        }
+        break;
+      }
+    }
+    return 0;
+  }
+
+  void SXFunction::call_activity(const AlgEl& e, const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w) const {
+    const auto& m = call_.el[e.i1];
+    const bvec_t** call_arg = arg;
+    bvec_t** call_res       = res;
+    casadi_int* call_iw     = iw;
+    bvec_t* call_w          = w;
+    bvec_t* nz_in;
+    bvec_t* nz_out;
+
+    call_setup(m, &call_arg, &call_res, &call_iw, &call_w, &nz_in, &nz_out);
+
+    // Populate nz_in from work vector
+    for (casadi_int i=0; i<m.n_dep; ++i) nz_in[i] = w[m.dep[i]];
+    // Recurse: activity through the callee
+    m.f.eval_activity(call_arg, call_res, call_iw, call_w);
+    // Store nz_out results back in work vector
+    for (casadi_int i=0; i<m.n_res; ++i) {
+      if (m.res[i]>=0) w[m.res[i]] = nz_out[i];
+    }
+  }
+
   int SXFunction::sp_reverse(bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
     // Fall back when reverse mode not allowed

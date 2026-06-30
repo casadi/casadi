@@ -2078,7 +2078,7 @@ returnValue QProblem::computeProjectedCholesky( )
     long info = 0;
     unsigned long _nZ = (unsigned long)nZ, _nV = (unsigned long)nV;
 
-    POTRF( "U", &_nZ, R, &_nV, &info );
+    POTRF( "U", &_nZ, R, &_nV, &info QPOASES_BLAS_CALL_LEN_1);
 
     /* <0 = invalid call, =0 ok, >0 not spd */
     if (info > 0) {

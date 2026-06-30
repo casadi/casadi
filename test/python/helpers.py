@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+import casadi as ca
 import casadi
 import numpy
 import numpy as np
@@ -74,8 +74,8 @@ else:
   import __builtin__
   builtins = __builtin__
 
-x = MX.sym("x",2,3)
-y = MX.sym("x",3,4)
+x = ca.MX.sym("x",2,3)
+y = ca.MX.sym("x",3,4)
 
 try:
   x+y
@@ -85,7 +85,7 @@ except RuntimeError:
   swig4 = False
 
 try:
-  nlpsol(123)  # pyright: ignore[reportCallIssue]
+  ca.nlpsol(123)  # pyright: ignore[reportCallIssue]
 except Exception as e:
   if "SXDict" in str(e):
     systemswig = True
@@ -178,11 +178,11 @@ class FunctionPool:
 
 def toSX_fun(fun):
   ins = fun.sx_in()
-  return Function("f",ins,fun.call(ins))
+  return ca.Function("f",ins,fun.call(ins))
 
 def toMX_fun(fun):
   ins = fun.mx_in()
-  return Function("f",ins,fun(ins))
+  return ca.Function("f",ins,fun(ins))
 
 def jacobian_old(f, i, j):
     return f.factory(f.name() + '_jac', f.name_in(),
@@ -295,14 +295,14 @@ class casadiTestCase(unittest.TestCase):
     if sparsity < 1:
       spp = self.randDM(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) ,symm=symm)
       spm = (spp < sparsity)
-      spm = sparsify(spm)
-      ret = DM(spm.sparsity(),array([valuegenerator() for i in range(spm.nnz())]))
+      spm = ca.sparsify(spm)
+      ret = ca.DM(spm.sparsity(),array([valuegenerator() for i in range(spm.nnz())]))
       if symm:
         return (ret + ret.T)/2
       else:
         return ret
     else:
-      ret = DM([valuegenerator() for i in range(n*m)]).reshape((n,m))
+      ret = ca.DM([valuegenerator() for i in range(n*m)]).reshape((n,m))
       if symm:
         return (ret + ret.T)/2
       else:
@@ -317,7 +317,7 @@ class casadiTestCase(unittest.TestCase):
       msg = str(msg) + " %.16e <-> %.16e"  % (first, second)
       n =  max(abs(first),abs(second))
       if n>1e3:
-        n = 10**floor(log10(n))
+        n = 10**ca.floor(ca.log10(n))
       else:
         n = 1.0
       unittest.TestCase.assertAlmostEqual(self,first/n,second/n,places=places,msg=msg + "  scaled by %d" %n)
@@ -334,18 +334,18 @@ class casadiTestCase(unittest.TestCase):
 
       """
       
-      if isinstance(zr,DM) and isinstance(zt,DM):
+      if isinstance(zr,ca.DM) and isinstance(zt,ca.DM):
         self.assertEqual(zr.shape, zt.shape)
         if zr.is_regular() and zt.is_regular() and zr.numel()>10:
           sp = zr.sparsity() + zt.sparsity()
-          zr_nz = project(zr, sp).nz[:]
-          zt_nz = project(zt, sp).nz[:]
+          zr_nz = ca.project(zr, sp).nz[:]
+          zt_nz = ca.project(zt, sp).nz[:]
           if zr_nz.numel() == 0:
             return
-          diff_nz = fabs(zr_nz - zt_nz)
-          mag_nz = fmax(fabs(zr_nz), fabs(zt_nz))
-          scale_nz = if_else(mag_nz > 1e3, 10**floor(log10(mag_nz)), 1.0)
-          self.assertTrue(norm_inf(diff_nz / scale_nz) < 0.5 * 10**(-digits), "norm_inf: %e" % float(norm_inf(diff_nz / scale_nz)))
+          diff_nz = ca.fabs(zr_nz - zt_nz)
+          mag_nz = ca.fmax(ca.fabs(zr_nz), ca.fabs(zt_nz))
+          scale_nz = ca.if_else(mag_nz > 1e3, 10**ca.floor(ca.log10(mag_nz)), 1.0)
+          self.assertTrue(ca.norm_inf(diff_nz / scale_nz) < 0.5 * 10**(-digits), "norm_inf: %e" % float(ca.norm_inf(diff_nz / scale_nz)))
           return
         
       
@@ -377,7 +377,7 @@ class casadiTestCase(unittest.TestCase):
             float(zt[i,j])
             float(zr[i,j])
           except:
-            self.assertTrue(is_equal(zt[i,j],zr[i,j]),LazyString('"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j]))'))
+            self.assertTrue(ca.is_equal(zt[i,j],zr[i,j]),LazyString('"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j]))'))
             #self.assertTrue(is_equal(zt[i,j],zr[i,j]),"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j])))
             continue
           if zt[i,j]==zr[i,j]:
@@ -409,10 +409,10 @@ class casadiTestCase(unittest.TestCase):
       sample = x
 
 
-    if isinstance(sample,SX):
-      f = Function("f", x, yt)
+    if isinstance(sample,ca.SX):
+      f = ca.Function("f", x, yt)
     else:
-      f = Function("f", x, yt)
+      f = ca.Function("f", x, yt)
 
     if (not(fmod is None)):
       f=fmod(f,x)
@@ -469,20 +469,20 @@ class casadiTestCase(unittest.TestCase):
       
   def check_eval_mx(self, mx):
     if isinstance(mx,list):
-        return self.check_eval_mx(vvcat(mx))
-    assert isinstance(mx,MX)
-    args = symvar(mx)
-    f = Function("f",args,[mx])
-    d = MX.sym("d") # dummy
+        return self.check_eval_mx(ca.vvcat(mx))
+    assert isinstance(mx,ca.MX)
+    args = ca.symvar(mx)
+    f = ca.Function("f",args,[mx])
+    d = ca.MX.sym("d") # dummy
     #mx_eval = f.call(args,True,False)[0]
-    new_args = [MX.sym(e.name(),e.sparsity()) for e in args]
+    new_args = [ca.MX.sym(e.name(),e.sparsity()) for e in args]
     mx_eval = f.call(new_args,True,False)[0]
-    if isinstance(mx_eval,DM):
-        mx = evalf(mx)
+    if isinstance(mx_eval,ca.DM):
+        mx = ca.evalf(mx)
         self.checkarray(mx,mx_eval)
         return
-    mx_eval = substitute([mx_eval],new_args,args)[0]
-    if isinstance(mx_eval,MX): # In all sparse case, might falsely look like SX
+    mx_eval = ca.substitute([mx_eval],new_args,args)[0]
+    if isinstance(mx_eval,ca.MX): # In all sparse case, might falsely look like SX
         self.check_identical_mx(mx_eval,mx)
 
   def check_identical_fun(self, a, b):
@@ -493,12 +493,12 @@ class casadiTestCase(unittest.TestCase):
     self.assertTrue(s==s2)
         
   def check_identical_mx(self, a, b):
-    assert isinstance(a,MX)
-    assert isinstance(b,MX)
-    arg_a = symvar(a)
-    arg_b = symvar(b)
-    fa = Function('f',arg_a,[a])
-    fb = Function('f',arg_b,[b])
+    assert isinstance(a,ca.MX)
+    assert isinstance(b,ca.MX)
+    arg_a = ca.symvar(a)
+    arg_b = ca.symvar(b)
+    fa = ca.Function('f',arg_a,[a])
+    fb = ca.Function('f',arg_b,[b])
     self.check_identical_fun(fa,fb)    
 
   def checkfunction_identical(self,trial,solution):
@@ -528,7 +528,7 @@ class casadiTestCase(unittest.TestCase):
 
     if indirect:
       ins = trial.mx_in()
-      extra_trial = Function("extra_trial", ins,trial.call(ins))
+      extra_trial = ca.Function("extra_trial", ins,trial.call(ins))
       self.checkfunction(extra_trial,solution,inputs=inputs,fwd=fwd,adj=adj,jacobian=jacobian,gradient=gradient,hessian=hessian,sens_der=sens_der,evals=evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
 
     if digits_sens is None:
@@ -586,17 +586,17 @@ class casadiTestCase(unittest.TestCase):
     if evals:
 
       def remove_first(x):
-        ret = DM(x)
+        ret = ca.DM(x)
         if ret.numel()>0:
-          ret[0,0] = DM(1,1)
+          ret[0,0] = ca.DM(1,1)
           return ret.sparsity()
         else:
           return ret.sparsity()
 
       def remove_last(x):
-        ret = DM(x)
+        ret = ca.DM(x)
         if ret.nnz()>0:
-          ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DM(1,1)
+          ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = ca.DM(1,1)
           return ret.sparsity()
         else:
           return ret.sparsity()
@@ -605,7 +605,7 @@ class casadiTestCase(unittest.TestCase):
       #spmods = [lambda x: x]
       #spmods = [lambda x: x , remove_first]
 
-      sym = MX.sym
+      sym = ca.MX.sym
 
       storage2 = {}
       storage = {}
@@ -628,16 +628,16 @@ class casadiTestCase(unittest.TestCase):
           res = f.call(inputss,not f.is_a("SXFunction"))
           #print res, "sp", [i.sparsity().dim(True) for i in fseeds]
           opts = {"helper_options": {"is_diff_in": f.is_diff_in(), "is_diff_out": f.is_diff_out()}}
-          [fwdsens] = forward(res, inputss, [fseeds],opts)
-          [adjsens] = reverse(res, inputss, [aseeds],opts)
+          [fwdsens] = ca.forward(res, inputss, [fseeds],opts)
+          [adjsens] = ca.reverse(res, inputss, [aseeds],opts)
 
-          vf = Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]),{"is_diff_in": f.is_diff_in()+f.is_diff_in()+f.is_diff_out(), "is_diff_out": f.is_diff_out()+f.is_diff_out()+f.is_diff_in()})
+          vf = ca.Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]),{"is_diff_in": f.is_diff_in()+f.is_diff_in()+f.is_diff_out(), "is_diff_out": f.is_diff_out()+f.is_diff_out()+f.is_diff_in()})
 
           vf_in = list(inputs)
           # Complete random seeding
           for i in range(f.n_in(),vf.n_in()):
             random.seed(i)
-            vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
+            vf_in.append(ca.DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
 
           vf_out = vf.call(vf_in)
           storagekey = (spmod,spmod2)
@@ -658,16 +658,16 @@ class casadiTestCase(unittest.TestCase):
 
               res2 = vf.call(inputss2)
               opts = {"helper_options": {"is_diff_in": vf.is_diff_in(), "is_diff_out": vf.is_diff_out()}}
-              [fwdsens2] = forward(res2, inputss2, [fseeds2],opts)
-              [adjsens2] = reverse(res2, inputss2, [aseeds2],opts)
+              [fwdsens2] = ca.forward(res2, inputss2, [fseeds2],opts)
+              [adjsens2] = ca.reverse(res2, inputss2, [aseeds2],opts)
 
-              vf2 = Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]),{"is_diff_in": vf.is_diff_in()+vf.is_diff_in()+vf.is_diff_out(), "is_diff_out": vf.is_diff_out()+vf.is_diff_out()+vf.is_diff_in()})
+              vf2 = ca.Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]),{"is_diff_in": vf.is_diff_in()+vf.is_diff_in()+vf.is_diff_out(), "is_diff_out": vf.is_diff_out()+vf.is_diff_out()+vf.is_diff_in()})
 
               vf2_in = list(inputs)
 
               for i in range(f.n_in(),vf2.n_in()):
                 random.seed(i)
-                vf2_in.append(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
+                vf2_in.append(ca.DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
 
               vf2_out = vf2.call(vf2_in)
               storagekey = (spmod,spmod2)
@@ -680,8 +680,8 @@ class casadiTestCase(unittest.TestCase):
         for stk,st in list(store.items()):
           for i in range(len(st)-1):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-              if b.numel()==0 and sparsify(a).nnz()==0: continue
-              if a.numel()==0 and sparsify(b).nnz()==0: continue
+              if b.numel()==0 and ca.sparsify(a).nnz()==0: continue
+              if a.numel()==0 and ca.sparsify(b).nnz()==0: continue
 
               if (allow_nondiff and (a.nnz()==0 or b.nnz()==0 )): continue
               #self.checkarray(IM(a.sparsity(),1),IM(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
@@ -693,8 +693,8 @@ class casadiTestCase(unittest.TestCase):
   def compile_external(self,name,source,opts=None,std="c89",extralibs="",extralibdirs=[],check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
     # type: (str, str, Optional[dict], str, Union[str, list], list, bool, Union[str, list, None], bool, Union[str, list, None], list, bool) -> Any
     if args.run_slow:
-      libdir = GlobalOptions.getCasadiPath()
-      includedir = GlobalOptions.getCasadiIncludePath()
+      libdir = ca.GlobalOptions.getCasadiPath()
+      includedir = ca.GlobalOptions.getCasadiIncludePath()
       includedirs = [includedir,os.path.join(includedir,"highs")]
       for e in extra_include:
         includedirs.append(os.path.join(includedir,e))
@@ -770,7 +770,7 @@ class casadiTestCase(unittest.TestCase):
       if sys.platform=="darwin":
         subprocess.run(["otool","-l",libname])
       if opts is None: opts = {}
-      return (external(name, libname,opts),libname)
+      return (ca.external(name, libname,opts),libname)
 
   def check_symbols(self, libname, fun_names, c_filename):
     """Check that no symbols starting with 'casadi' are exported in the shared library"""
@@ -829,7 +829,7 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       if main: opts["main"] = True
       cg_names = []
-      cg = CodeGenerator(name,opts)
+      cg = ca.CodeGenerator(name,opts)
       cg.add(F,with_jac_sparsity)
       cg_names.append(F.name())
       if with_jac_sparsity: cg_names.append("jac_"+F.name())
@@ -846,8 +846,8 @@ class casadiTestCase(unittest.TestCase):
       cg.generate()
       import subprocess
 
-      libdir = GlobalOptions.getCasadiPath()
-      includedir = GlobalOptions.getCasadiIncludePath()
+      libdir = ca.GlobalOptions.getCasadiPath()
+      includedir = ca.GlobalOptions.getCasadiIncludePath()
       includedirs = [includedir,os.path.join(includedir,"highs")]
       for e in extra_include:
         includedirs.append(os.path.join(includedir,e))
@@ -928,7 +928,7 @@ class casadiTestCase(unittest.TestCase):
 
       if external_opts is None: external_opts = {}
       if with_external:
-          F2 = external(F.name(), libname,external_opts)
+          F2 = ca.external(F.name(), libname,external_opts)
 
       if main:
         [commands, exename] = get_commands(shared=False)
@@ -1014,7 +1014,7 @@ class casadiTestCase(unittest.TestCase):
 
 
   def check_serialize(self,F,inputs=None):
-      F2 = Function.deserialize(F.serialize({"debug":True}))
+      F2 = ca.Function.deserialize(F.serialize({"debug":True}))
       assert inputs is not None
 
       Fout = F.call(inputs)
@@ -1035,9 +1035,9 @@ class casadiTestCase(unittest.TestCase):
           path = "serialize_"+casadi.__version__
           os.makedirs(path, exist_ok=True)
           F.save(os.path.join(path,h+".casadi"),{"debug":True})
-          DM.set_precision(16)
+          ca.DM.set_precision(16)
           h_in = hashlib.md5(str(inputs).encode("ascii")).hexdigest()
-          DM.set_precision(7)
+          ca.DM.set_precision(7)
           if isinstance(inputs,dict):
             inputs = F.convert_in(inputs)
             Fout = F.convert_out(Fout)
@@ -1090,7 +1090,7 @@ class requires_conic(object):
 
   def __call__(self,c):
     try:
-      load_conic(self.n)
+      ca.load_conic(self.n)
       return c
     except:
       print("Not available QP plugin %s, skipping unittests" % self.n)
@@ -1102,7 +1102,7 @@ class requires_linsol(object):
 
   def __call__(self,c):
     try:
-      load_linsol(self.n)
+      ca.load_linsol(self.n)
       return c
     except:
       print("Not available linsol plugin %s, skipping unittests" % self.n)
@@ -1117,7 +1117,7 @@ class requires_nlpsol(object):
     if "SKIP_" + self.n.upper() + "_TESTS" in os.environ:
         return None
     try:
-      load_nlpsol(self.n)
+      ca.load_nlpsol(self.n)
       return c
     except:
       print("Not available NLP plugin %s, skipping unittests" % self.n)
@@ -1129,7 +1129,7 @@ class requires_expm(object):
 
   def __call__(self,c):
     try:
-      load_expm(self.n)
+      ca.load_expm(self.n)
       return c
     except:
       print("Not available Expm plugin %s, skipping unittests" % self.n)
@@ -1141,7 +1141,7 @@ class requires_integrator(object):
 
   def __call__(self,c):
     try:
-      load_integrator(self.n)
+      ca.load_integrator(self.n)
       return c
     except:
       print("Not available integrator plugin %s, skipping unittests" % self.n)
@@ -1153,10 +1153,21 @@ class requires_rootfinder(object):
 
   def __call__(self,c):
     try:
-      load_rootfinder(self.n)
+      ca.load_rootfinder(self.n)
       return c
     except:
       print("Not available RFP plugin %s, skipping unittests" % self.n)
+      return None
+
+class requires_modelicaparser(object):
+  def __init__(self,n):
+    self.n = n
+
+  def __call__(self,c):
+    if ca.has_modelicaparser(self.n):
+      return c
+    else:
+      print("Not available ModelicaParser plugin %s, skipping unittests" % self.n)
       return None
 
 class requiresPlugin(object):

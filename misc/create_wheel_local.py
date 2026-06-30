@@ -111,6 +111,9 @@ def create_wheel_archive(wheel_name, bdist_dir):
             for file in files:
                 file_path = os.path.join(root, file)
                 arcname = os.path.relpath(file_path, bdist_dir).replace(os.path.sep, '/')
+                # ZIP can't store pre-1980 timestamps (e.g. BinaryBuilder JLL artifacts)
+                if os.path.getmtime(file_path) < 315532800:
+                    os.utime(file_path, (315532800, 315532800))
                 wheel_zip.write(file_path, arcname)
     return wheel_path
 
@@ -136,6 +139,20 @@ else:
   msg["Tag"] = tag
 
 
+
+# Drop the C++ example executables (listed in the install manifest) from the
+# wheel; casadi-cli is intentionally not in the manifest and stays.
+examples_manifest = os.path.join(bdist_dir, "casadi", ".cpp_examples_manifest")
+if os.path.exists(examples_manifest):
+  with open(examples_manifest) as f:
+    for line in f:
+      name = line.strip()
+      if not name:
+        continue
+      example_path = os.path.join(bdist_dir, "casadi", name)
+      if os.path.exists(example_path):
+        os.remove(example_path)
+  os.remove(examples_manifest)
 
 wheelfile_path = os.path.join(distinfo_dir, 'WHEEL')
 with open(wheelfile_path, 'w') as f:

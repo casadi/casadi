@@ -21,42 +21,42 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-from casadi import *
+import casadi as ca
 
 # Read all about coloring in the seminal paper "What color is your Jacobian?" http://www.cs.odu.edu/~pothen/Papers/sirev2005.pdf
 
 def color(A):
   print("="*80)
   print("Original:")
-  print(repr(DM(A,1)))
+  print(repr(ca.DM(A,1)))
   print("Colored: ")
-  print(repr(DM(A.uni_coloring(),1)))
+  print(repr(ca.DM(A.uni_coloring(),1)))
 
-A = Sparsity.diag(5)
+A = ca.Sparsity.diag(5)
 color(A)
 
 # One direction needed to capture all
 
-color(Sparsity.dense(5,10))
+color(ca.Sparsity.dense(5,10))
 
 # We need 5 directions.
 # The colored response reads: each row corresponds to a direction;
 # each column correspond to a row of the original matrix.
 
-color(A+Sparsity.triplet(5,5,[0],[4]))
+color(A+ca.Sparsity.triplet(5,5,[0],[4]))
 
 # First 4 rows can be taken together, the fifth row is taken separately
 
-color(A+Sparsity.triplet(5,5,[4],[0]))
+color(A+ca.Sparsity.triplet(5,5,[4],[0]))
 
 # First 4 rows can be taken together, the fifth row is taken separately
 
-color(A+Sparsity.triplet(5,5,[0]*5,list(range(5))))
+color(A+ca.Sparsity.triplet(5,5,[0]*5,list(range(5))))
 
 # The first row is taken separately.
 # The remainding rows are lumped together in one direction.
 
-color(A+Sparsity.triplet(5,5,list(range(5)),[0]*5))
+color(A+ca.Sparsity.triplet(5,5,list(range(5)),[0]*5))
 
 # We need 5 directions.
 
@@ -65,25 +65,25 @@ color(A+Sparsity.triplet(5,5,list(range(5)),[0]*5))
 def color(A):
   print("="*80)
   print("Original:")
-  print(repr(DM(A,1)))
+  print(repr(ca.DM(A,1)))
   print("Star colored: ")
-  print(repr(DM(A.star_coloring(1),1)))
+  print(repr(ca.DM(A.star_coloring(1),1)))
   
 color(A)
 
 # One direction needed to capture all
 
-color(Sparsity.dense(5,5))
+color(ca.Sparsity.dense(5,5))
 
 # We need 5 directions.
 
-color(A+Sparsity.triplet(5,5,[0]*5,list(range(5)))+Sparsity.triplet(5,5,list(range(5)),[0]*5))
+color(A+ca.Sparsity.triplet(5,5,[0]*5,list(range(5)))+ca.Sparsity.triplet(5,5,list(range(5)),[0]*5))
 
 # The first row/col is taken separately.
 # The remainding rows/cols are lumped together in one direction.
 
 # Let's take an example from the paper
 
-A = DM([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-A = sparsify(A)
+A = ca.DM([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+A = ca.sparsify(A)
 color(A.sparsity())

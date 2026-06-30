@@ -18,13 +18,13 @@
 #
 #
 # -*- coding: utf-8 -*-
-from casadi import *
+import casadi as ca
 
 # Example on how to use the DaeBuilder class
 # Joel Andersson, UW Madison 2017
 
 # Start with an empty DaeBuilder instance
-dae = DaeBuilder('rocket')
+dae = ca.DaeBuilder('rocket')
 
 # Add input expressions
 a = dae.add('a', 'parameter', 'tunable')

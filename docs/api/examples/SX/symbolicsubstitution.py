@@ -24,24 +24,24 @@
 # Symbolic substitution
 #======================
 
-from casadi import *
+import casadi as ca
 
 # Let's build a trivial symbolic SX graph
 
-x = SX.sym("x")
-y = SX.sym("y")
+x = ca.SX.sym("x")
+y = ca.SX.sym("y")
 z_= x*y
 z = z_+x 
 print(type(z), z)
 
 # We need SXFuncion to manipulate the SX graph
 
-f = Function('f', [vertcat(x,y)],[z])
+f = ca.Function('f', [ca.vertcat(x,y)],[z])
 
 # We can substitute a leaf in the graph
 
-w = SX.sym("w")
-q = f(vertcat(w,y))
+w = ca.SX.sym("w")
+q = f(ca.vertcat(w,y))
 
 # f.eval() returns a tuple with all outputs, we selected the first
 
@@ -51,7 +51,7 @@ print(type(q), q)
 
 # We can take a shortcut via substitute:
 
-q = substitute(z,x,w)
+q = ca.substitute(z,x,w)
 print(type(q), q)
 
 # Note that substitution of non-symbolic SX nodes is not permitted:

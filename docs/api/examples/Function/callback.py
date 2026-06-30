@@ -19,7 +19,7 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-from casadi import *
+import casadi as ca
 
 # A simple case of Callback
 # ================================
@@ -31,9 +31,9 @@ from casadi import *
 # implemented in Python or MATLAB thanks to cross-language polymorphism as
 # supported by the SWIG framework.
 
-class Fac(Callback):
+class Fac(ca.Callback):
   def __init__(self, name, opts={}):
-    Callback.__init__(self)
+    ca.Callback.__init__(self)
     self.construct(name, opts)
 
   def get_n_in(self): return 1
@@ -56,10 +56,10 @@ print("4! = ", y)
 # Using the function in a graph
 # ==============================
 
-x = MX.sym("x")
+x = ca.MX.sym("x")
 y = fac(x)
 
-f = Function('f', [x],[y])
+f = ca.Function('f', [x],[y])
 
 y = f(5)
 

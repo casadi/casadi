@@ -33,9 +33,9 @@ struct casadi_oracle_data {
 
 // C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
 
-// SYMBOL "oracle_init"
+// SYMBOL "oracle_set_work"
 template<typename T1>
-void casadi_oracle_init(casadi_oracle_data<T1>* d, const T1*** arg, T1*** res,
+void casadi_oracle_set_work(casadi_oracle_data<T1>* d, const T1*** arg, T1*** res,
     casadi_int** iw, T1** w) {
   d->arg = *arg;
   d->res = *res;

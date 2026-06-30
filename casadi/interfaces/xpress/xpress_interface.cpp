@@ -81,12 +81,31 @@ namespace casadi {
       {"sos_types",
        {OT_INTVECTOR,
         "Specify 1 or 2 for each SOS group."}},
+      {"mip_start",
+       {OT_BOOL,
+        "Pass x0 as an initial integer solution hint to Xpress via "
+        "XPRSaddmipsol before the MIP solve [Default false]."}},
+      {"log_file",
+       {OT_STRING,
+        "Write solver log to this file path via XPRSsetlogfile. "
+        "Useful for capturing output (e.g. warm-start acceptance messages) "
+        "in automated tests. Empty string (default) disables file logging."}},
+      {"compute_iis",
+       {OT_BOOL,
+        "When the problem is infeasible, compute an IIS immediately after "
+        "the solve and expose it in get_stats() as iis_rows / iis_cols. "
+        "IIS computation can be expensive; set to false to skip it "
+        "[Default false]."}},
      }
    };
 
   void XpressInterface::init(const Dict& opts) {
     // Call the init method of the base class
     Conic::init(opts);
+
+    mip_start_ = false;
+    log_file_ = "";
+    compute_iis_ = false;
 
     std::vector< std::vector<casadi_int> > sos_groups;
     std::vector< std::vector<double> > sos_weights;
@@ -102,6 +121,12 @@ namespace casadi {
         sos_weights = op.second.to_double_vector_vector();
       } else if (op.first=="sos_types") {
         sos_types = op.second.to_int_vector();
+      } else if (op.first=="mip_start") {
+        mip_start_ = op.second;
+      } else if (op.first=="log_file") {
+        log_file_ = op.second.to_string();
+      } else if (op.first=="compute_iis") {
+        compute_iis_ = op.second;
       }
     }
 
@@ -190,6 +215,7 @@ namespace casadi {
     p_.sos_refval = sos_refval_.empty() ? nullptr : get_ptr(sos_refval_);
 
     p_.socp = has_socp_ ? &socp_ : nullptr;
+    p_.mip_start = mip_start_ ? 1 : 0;
 
     casadi_xpress_setup(&p_);
   }
@@ -255,6 +281,7 @@ namespace casadi {
       g << "p.socp = 0;\n";
     }
 
+    g << "p.mip_start = " << (mip_start_ ? 1 : 0) << ";\n";
     g << "casadi_xpress_setup(&p);\n";
   }
 
@@ -270,6 +297,9 @@ namespace casadi {
   void XpressInterface::codegen_body(CodeGenerator& g) const {
     qp_codegen_body(g);
     g.add_auxiliary(CodeGenerator::AUX_INF);
+    g.add_auxiliary(CodeGenerator::AUX_NAN);
+    g.add_auxiliary(CodeGenerator::AUX_PRINTF);
+    g.add_auxiliary(CodeGenerator::AUX_FILL);
     // Always emit casadi_socp definitions: the xpress data struct
     // references casadi_socp_data even when no Q/P is present.
     g.add_auxiliary(CodeGenerator::AUX_SOCP);
@@ -283,12 +313,14 @@ namespace casadi {
 
     g << "d->prob = &p;\n";
     g << "d->qp = &d_qp;\n";
-    g << "casadi_xpress_init(d, &arg, &res, &iw, &w);\n";
+    g << "casadi_xpress_set_work(d, &arg, &res, &iw, &w);\n";
 
     if (has_socp_) {
       g << "d->socp.q = arg[" << CONIC_Q << "];\n";
       g << "d->socp.p = arg[" << CONIC_P << "];\n";
     }
+
+    g << "d->x0 = " << (mip_start_ ? ("arg[" + str(CONIC_X0) + "]") : std::string("0")) << ";\n";
 
     // Set crossover default (matches C++ set_work)
     g << "XPRSsetintcontrol(d->xprob, " << XPRS_CROSSOVER << ", 1);\n";
@@ -304,7 +336,7 @@ namespace casadi {
         << ", &xprs_id, &xprs_type);\n";
       if (op.second.is_double()) {
         g << "  XPRSsetdblcontrol(d->xprob, xprs_id, "
-          << op.second.to_double() << ");\n";
+          << g.constant(op.second.to_double()) << ");\n";
       } else if (op.second.is_int() || op.second.is_bool()) {
         g << "  XPRSsetintcontrol(d->xprob, xprs_id, "
           << static_cast<int>(op.second.to_int()) << ");\n";
@@ -389,7 +421,7 @@ namespace casadi {
     m->d.prob = &p_;
     m->d.qp = &m->d_qp;
 
-    casadi_xpress_init(&m->d, &arg, &res, &iw, &w);
+    casadi_xpress_set_work(&m->d, &arg, &res, &iw, &w);
 
     // SOCP inputs
     if (has_socp_) {
@@ -397,12 +429,23 @@ namespace casadi {
       m->d.socp.p = arg[CONIC_P];
     }
 
+    // MIP warm start: point runtime at x0 when requested
+    m->d.x0 = mip_start_ ? arg[CONIC_X0] : nullptr;
+
+    // Optional file log (useful for tests: captures "User solution" messages)
+    if (!log_file_.empty()) {
+      XPRS_WARN(XPRSsetlogfile, m->d.xprob, log_file_.c_str());
+    }
+
+    // Invalidate any IIS cached from a previous solve
+    m->iis_valid = false;
+
     // Sensible default: enable crossover after the QP barrier so the
     // returned solution sits exactly at the optimal vertex.  Without this
     // Xpress returns an interior-point near-vertex solution that can be
     // off by ~FEASTOL on each active constraint.  User options below
     // can still override this.
-    XPRSsetintcontrol(m->d.xprob, XPRS_CROSSOVER, 1);
+    XPRS_WARN(XPRSsetintcontrol, m->d.xprob, XPRS_CROSSOVER, 1);
 
     // Push user options to Xpress.  Resolve name -> (id, type) via
     // XPRSgetcontrolinfo, then dispatch to the typed setter.
@@ -445,6 +488,42 @@ namespace casadi {
     int rc = casadi_xpress_solve(&m->d, arg, res, iw, w);
     m->fstats.at("solver").toc();
 
+    // IIS: computed right after the solve while the problem is still loaded.
+    // Placed here (not in get_stats) because IIS computation can be expensive.
+    bool lp_infeas  = (m->d.lp_status  == XPRS_LP_INFEAS);
+    bool mip_infeas = (m->d.mip_status == XPRS_MIP_INFEAS);
+    if (compute_iis_ && (lp_infeas || mip_infeas) && m->d.xprob) {
+      int iis_status = 0;
+      // XPRS_WARN not used here: iisfirst status=0 means IIS found (not an error).
+      if (XPRSiisfirst(m->d.xprob, 2, &iis_status) == 0 && iis_status == 0) {
+        int nrows = 0, ncols = 0;
+        // First call: query sizes. Second call: retrieve data.
+        // Use XPRS_WARN so any API failure is reported but IIS is simply skipped.
+        if (XPRSgetiisdata(m->d.xprob, 1, &nrows, &ncols,
+                           nullptr, nullptr, nullptr, nullptr,
+                           nullptr, nullptr, nullptr, nullptr) == 0) {
+          std::vector<int> rows(nrows), cols(ncols);
+          std::vector<char> contype(nrows), bndtype(ncols);
+          if (XPRSgetiisdata(m->d.xprob, 1, &nrows, &ncols,
+                             nrows > 0 ? rows.data() : nullptr,
+                             ncols > 0 ? cols.data() : nullptr,
+                             nrows > 0 ? contype.data() : nullptr,
+                             ncols > 0 ? bndtype.data() : nullptr,
+                             nullptr, nullptr, nullptr, nullptr) == 0) {
+            m->iis_rows.assign(rows.begin(), rows.end());
+            m->iis_cols.assign(cols.begin(), cols.end());
+            m->iis_row_types.assign(contype.begin(), contype.end());
+            m->iis_col_bound_types.assign(bndtype.begin(), bndtype.end());
+            m->iis_valid = true;
+          } else {
+            XPRS_LOG_ERROR(XPRSgetiisdata, m->d.xprob, "Warning");
+          }
+        } else {
+          XPRS_LOG_ERROR(XPRSgetiisdata, m->d.xprob, "Warning");
+        }
+      }
+    }
+
     return rc;
   }
 
@@ -462,12 +541,29 @@ namespace casadi {
     stats["barrier_iter"] = m->d.barrier_iter;
     stats["mip_nodes"] = m->d.mip_nodes;
     stats["objective"] = m->d.obj_val;
+
+    // IIS: read from cache populated right after the solve (see eval_body).
+    if (m->iis_valid) {
+      stats["iis_rows"] = m->iis_rows;
+      stats["iis_cols"] = m->iis_cols;
+      stats["iis_row_types"] = m->iis_row_types;
+      stats["iis_col_bound_types"] = m->iis_col_bound_types;
+    }
+
     return stats;
   }
 
   XpressInterface::XpressInterface(DeserializingStream& s) : Conic(s) {
-    s.version("XpressInterface", 1);
+    int v = s.version("XpressInterface", 1, 2);
     s.unpack("XpressInterface::opts", opts_);
+    mip_start_ = false;
+    log_file_ = "";
+    compute_iis_ = false;
+    if (v >= 2) {
+      s.unpack("XpressInterface::mip_start", mip_start_);
+      s.unpack("XpressInterface::log_file", log_file_);
+      s.unpack("XpressInterface::compute_iis", compute_iis_);
+    }
     s.unpack("XpressInterface::sos_settype", sos_settype_);
     s.unpack("XpressInterface::sos_setstart", sos_setstart_);
     s.unpack("XpressInterface::sos_setind", sos_setind_);
@@ -481,8 +577,11 @@ namespace casadi {
   void XpressInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
-    s.version("XpressInterface", 1);
+    s.version("XpressInterface", 2);
     s.pack("XpressInterface::opts", opts_);
+    s.pack("XpressInterface::mip_start", mip_start_);
+    s.pack("XpressInterface::log_file", log_file_);
+    s.pack("XpressInterface::compute_iis", compute_iis_);
     s.pack("XpressInterface::sos_settype", sos_settype_);
     s.pack("XpressInterface::sos_setstart", sos_setstart_);
     s.pack("XpressInterface::sos_setind", sos_setind_);

@@ -141,6 +141,12 @@ std::unique_ptr<std::istream> Filesystem::ifstream_ptr(const std::string& path,
   return ret;
 }
 
+void Filesystem::copy_file(const std::string& src, const std::string& dest) {
+  auto in = ifstream_ptr(src, std::ios::binary, true);
+  auto out = ofstream_ptr(dest, std::ios::binary);
+  *out << in->rdbuf();
+}
+
 bool Filesystem::exists(const std::string& path) {
   auto ret = ifstream_compat(path);
   return static_cast<bool>(ret);

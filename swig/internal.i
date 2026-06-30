@@ -622,6 +622,9 @@
 %exception  casadi::DaeBuilder::cdef() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::compile_fmu(const Dict &files, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::create() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -788,6 +791,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::p() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::pack_fmu(const Dict &files, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::parse_fmi(const std::string &filename) {
@@ -1231,6 +1237,9 @@
 %exception  casadi::DeserializingStream::version(const std::string &name, int v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::activity(const std::vector< bool > &arg) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::assert_size_in(casadi_int i, casadi_int nrow, casadi_int ncol) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1651,12 +1660,6 @@
 %exception  casadi::Function::serialize(std::ostream &stream, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Function::simplify(const Dict &opts=Dict()) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::simplify(const std::string &name, const Dict &opts=Dict()) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Function::size1_in(casadi_int ind) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1751,6 +1754,18 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::sz_work(size_t &sz_arg, size_t &sz_res, size_t &sz_iw, size_t &sz_w) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::transform(const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::transform(const std::string &fname, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::transform(const std::string &fname, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::transform(const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::uses_output() const {
@@ -2444,6 +2459,18 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix::trace(const MatType &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::transform(const MatType &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::transform(const MatType &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::transform(const std::vector< MatType > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::transform(const std::vector< MatType > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix::tril2symm(const MatType &a) {
@@ -3289,6 +3316,63 @@
 %exception  casadi::GenericWeakRef< SharedObject , SharedObjectInternal  >::shared_if_alive(SharedObject &shared) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GraphBuilder::bind_dim(const std::string &param, casadi_int value) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::bind_shape(const std::string &input_name, const std::vector< casadi_int > &shape) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::create() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::create(const std::string &name, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::create(const std::string &name, const std::vector< std::string > &name_in, const std::vector< std::string > &name_out, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::dimension(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::dimension_param(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::dtype(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::dynamic_params() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::export_onnx(const std::string &filename, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::get() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::n_in() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::n_out() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::name() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::name_in() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::name_out() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::set(const std::string &input_name, const std::vector< double > &value) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::set(const std::string &input_name, double value) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GraphBuilder::type_name() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Importer::body(const std::string &symname) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3955,6 +4039,18 @@
 %exception  casadi::MX::trace(const MX &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::transform(const MX &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::transform(const MX &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::transform(const std::vector< MX > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::transform(const std::vector< MX > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::unary(casadi_int op, const MX &x, bool unique=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4573,6 +4669,18 @@
 %exception  casadi::Matrix< Scalar >::trace(const Matrix< Scalar > &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< Scalar >::transform(const Matrix< Scalar > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::transform(const Matrix< Scalar > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::transform(const std::vector< Matrix< Scalar > > &x, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::transform(const std::vector< Matrix< Scalar > > &x, const std::vector< std::vector< GenericType > > &passes, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< Scalar >::triangle(const Matrix< Scalar > &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4595,6 +4703,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::which_depends(const Matrix< Scalar > &expr, const Matrix< Scalar > &var, casadi_int order=1, bool tr=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ModelicaParser::parse(const std::string &filename, const std::string &output_dir) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::NlpBuilder::disp(std::ostream &stream, bool more=false) const {
@@ -5671,6 +5782,9 @@
 %exception  casadi::doc_filesystem(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::doc_graphmodel(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::doc_integrator(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5678,6 +5792,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::doc_linsol(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::doc_modelicaparser(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::doc_nlpsol(const std::string &name) {
@@ -5821,6 +5938,9 @@
 %exception  casadi::has_filesystem(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::has_graphmodel(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::has_integrator(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5830,10 +5950,16 @@
 %exception  casadi::has_linsol(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::has_modelicaparser(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::has_negative(const std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::has_nlpsol(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::has_onnxbackend(const std::string &solver) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::has_rootfinder(const std::string &name) {
@@ -6001,6 +6127,9 @@
 %exception  casadi::load_filesystem(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::load_graphmodel(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::load_integrator(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6010,7 +6139,13 @@
 %exception  casadi::load_linsol(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::load_modelicaparser(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::load_nlpsol(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::load_onnxbackend(const std::string &solver) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::load_rootfinder(const std::string &name) {
@@ -6035,6 +6170,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::message_prefix(std::ostream &stream) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::mul_overflows(const T &a, const T &b) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::nlpsol(const std::string &name, const std::string &solver, const Function &nlp, const Dict &opts) {
@@ -6107,6 +6245,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::normalized_setup(std::ostream &stream) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::onnxbackend_doc(const std::string &solver) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::onnxbackend_solvers() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::permute(const std::vector< T > &a, const std::vector< casadi_int > &order) {
@@ -6337,9 +6481,6 @@
 %exception  casadi::write_matlab(std::ostream &stream, const std::vector< std::vector< T > > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  std::mul_overflows(const T &a, const T &b) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6520,6 +6661,18 @@
 %exception casadi::GenericWeakRef< Shared, Internal >::GenericWeakRef(int dummy=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::GraphBuilder::GraphBuilder() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::GraphBuilder::GraphBuilder(const Function &f, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::GraphBuilder::GraphBuilder(const std::string &model_path, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::GraphBuilder::GraphBuilder(const std::string &name, const std::vector< uint8_t > &model_data, const std::string &format, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::Importer::Importer() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6614,6 +6767,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Matrix< Scalar >::Matrix(std::initializer_list< Scalar > x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::ModelicaParser::ModelicaParser() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::ModelicaParser::ModelicaParser(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::NlImporter::NlImporter(NlpBuilder &nlp, const std::string &filename, const Dict &opts) {

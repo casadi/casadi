@@ -68,11 +68,11 @@ struct casadi_qp_data {
 };
 // C-REPLACE "casadi_qp_data<T1>" "struct casadi_qp_data"
 
-// SYMBOL "qp_init"
+// SYMBOL "qp_set_work"
 template<typename T1>
-void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int** iw, T1** w) {
-  // Local variables
-  //const casadi_qp_prob<T1>* p = d->prob;
+void casadi_qp_set_work(casadi_qp_data<T1>* d, const T1*** arg, T1*** res,
+    casadi_int** iw, T1** w) {
+  (void)d; (void)arg; (void)res; (void)iw; (void)w;
 }
 
 // SYMBOL "qp_work"

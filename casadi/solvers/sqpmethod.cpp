@@ -348,7 +348,7 @@ void Sqpmethod::init(const Dict& opts) {
   set_sqpmethod_prob();
   // Allocate memory
   casadi_int sz_w, sz_iw;
-  casadi_sqpmethod_work(&p_, &sz_iw, &sz_w, elastic_mode_, so_corr_);
+  casadi_sqpmethod_work(&p_, &sz_iw, &sz_w);
   alloc_iw(sz_iw, true);
   alloc_w(sz_w, true);
   if (convexify_) {
@@ -363,6 +363,8 @@ void Sqpmethod::set_sqpmethod_prob() {
   p_.merit_memsize = merit_memsize_;
   p_.max_iter_ls = max_iter_ls_;
   p_.nlp = &p_nlp_;
+  p_.elastic_mode = elastic_mode_;
+  p_.so_corr = so_corr_;
 }
 
 void Sqpmethod::set_work(void* mem, const double**& arg, double**& res,
@@ -373,7 +375,7 @@ void Sqpmethod::set_work(void* mem, const double**& arg, double**& res,
   Nlpsol::set_work(mem, arg, res, iw, w);
 
   m->d.prob = &p_;
-  casadi_sqpmethod_init(&m->d, &arg, &res, &iw, &w, elastic_mode_, so_corr_);
+  casadi_sqpmethod_set_work(&m->d, &arg, &res, &iw, &w);
 
   m->iter_count = -1;
 }
@@ -1048,8 +1050,9 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
   g << "p.merit_memsize = " << merit_memsize_ << ";\n";
   g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
   g << "p.nlp = &p_nlp;\n";
-  g << "casadi_sqpmethod_init(d, &arg, &res, &iw, &w, "
-    << elastic_mode_ << ", " << so_corr_ << ");\n";
+  g << "p.elastic_mode = " << elastic_mode_ << ";\n";
+  g << "p.so_corr = " << so_corr_ << ";\n";
+  g << "casadi_sqpmethod_set_work(d, &arg, &res, &iw, &w);\n";
 
   if (elastic_mode_) {
     g.local("gamma_1", "double");

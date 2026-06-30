@@ -21,10 +21,10 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-from casadi import *
+import casadi as ca
 
-a = SX.sym("a")
-b = SX.sym("b")
+a = ca.SX.sym("a")
+b = ca.SX.sym("b")
 
 c = a+b
 c = c.printme(13)
@@ -33,7 +33,7 @@ d = c**2
 
 print(d)
 
-f = Function("f", [a,b],[d])
+f = ca.Function("f", [a,b],[d])
 
 # When the graph is evaluated, a printout of c will occur (if you have set WITH_PRINTME to ON in CMakeCache.txt)
 # Printout reads '|> 13: 7'
@@ -41,16 +41,16 @@ f = Function("f", [a,b],[d])
 
 f(4,3)
 
-dd_da = jacobian(d, a)
-J = Function('J', [a,b], [dd_da])
+dd_da = ca.jacobian(d, a)
+J = ca.Function('J', [a,b], [dd_da])
 
 # The first derivative still depends on c
 # Printout reads '|> 13: 11'
 
 J(2,9)
 
-d2d_da2 = jacobian(dd_da, a)
-J = Function('J', [a,b], [d2d_da2])
+d2d_da2 = ca.jacobian(dd_da, a)
+J = ca.Function('J', [a,b], [d2d_da2])
 
 # second derivative doesn't, so we don't get a printout
 

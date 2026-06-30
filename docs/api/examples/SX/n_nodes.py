@@ -24,23 +24,23 @@
 # n_nodes
 # ======================
 
-from casadi import *
+import casadi as ca
 from casadi.tools import *
 
 # Let's build a trivial symbolic SX graph
 
-x = SX.sym("x")
-y = SX.sym("y")
+x = ca.SX.sym("x")
+y = ca.SX.sym("y")
 z = x*y+2*y
-print(n_nodes(z), " nodes in ", z)
+print(ca.n_nodes(z), " nodes in ", z)
 dotdraw(z)
 
 z += 4*z
-print(n_nodes(z), " nodes in ", z)
+print(ca.n_nodes(z), " nodes in ", z)
 dotdraw(z)
 
 z *= z+1
-print(n_nodes(z), " nodes in ", z)
+print(ca.n_nodes(z), " nodes in ", z)
 dotdraw(z)
 
 

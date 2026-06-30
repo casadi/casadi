@@ -72,6 +72,9 @@ namespace casadi {
      {{"pass_nonlinear_variables",
        {OT_BOOL,
         "Pass list of variables entering nonlinearly to IPOPT"}},
+      {"nonlinear_variables",
+        {OT_BOOLVECTOR,
+        "Which decision variables enter nonlinearly? (detected automatically by default)"}},
       {"ipopt",
        {OT_DICT,
         "Options to be passed to IPOPT"}},
@@ -157,6 +160,10 @@ namespace casadi {
         opts_ = op.second;
       } else if (op.first=="pass_nonlinear_variables") {
         pass_nonlinear_variables_ = op.second;
+      } else if (op.first=="nonlinear_variables") {
+        nl_ex_ = op.second;
+        casadi_assert(nl_ex_.empty() || nl_ex_.size()==nx_, "Wrong length ("
+          + str(nl_ex_.size()) + ") for 'nonlinear_variables', expected " + str(nx_));
       } else if (op.first=="var_string_md") {
         var_string_md_ = op.second;
       } else if (op.first=="var_integer_md") {
@@ -240,7 +247,7 @@ namespace casadi {
         opts["verbose"] = verbose_;
         hesslag_sp_ = Convexify::setup(convexify_data_, hesslag_sp_, opts);
       }
-    } else if (pass_nonlinear_variables_) {
+    } else if (pass_nonlinear_variables_ && nl_ex_.empty()) {
       nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
     }
 
@@ -929,7 +936,7 @@ void IpoptInterface::codegen_body(CodeGenerator& g) const {
   g.local("p", "struct casadi_ipopt_prob");
   set_ipopt_prob(g);
 
-  g << "casadi_ipopt_init(d, &arg, &res, &iw, &w);\n";
+  g << "casadi_ipopt_set_work(d, &arg, &res, &iw, &w);\n";
   g << "casadi_ipopt_presolve(d);\n";
 
   // Start an IPOPT application

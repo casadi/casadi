@@ -1,4 +1,5 @@
-find_package(PythonInterp)
+include(CasadiFindPython)
+casadi_find_python()
 
 function(add_spell_check_target TARGET_NAME SOURCES_LIST)# PROJECT)
 

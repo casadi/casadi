@@ -143,6 +143,11 @@ namespace casadi {
         \identifier{11p} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
+    /** \brief Propagate signal activity forward (bit set = active)
+
+        \identifier{2ic} */
+    int eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
     /** \brief  Propagate sparsity backwards
 
         \identifier{11q} */

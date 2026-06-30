@@ -62,7 +62,7 @@ int main(){
   // Generate Makefile
   std::ofstream makefile;
   makefile.open("./CMakeLists.txt");
-  makefile << "cmake_minimum_required(VERSION 3.10.2)" << std::endl;
+  makefile << "cmake_minimum_required(VERSION 3.16.3)" << std::endl;
   makefile << "project(nlp-codegen-autogen C)" << std::endl;
   
   // Generate compilation instructions

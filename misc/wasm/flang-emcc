@@ -1,0 +1,53 @@
+#!/bin/bash
+# flang-emcc — wrapper that lets autotools think `flang` works as
+# both a Fortran compiler AND a Fortran-aware linker under
+# emscripten.  Strategy: pick out .f / .f90 inputs and compile them
+# with the real flang to temp .o files, then hand the resulting
+# .o + the rest of the args to emcc for the link step.  When the
+# invocation is a pure compile (-c present and no link), forward
+# directly to flang.
+set -e
+
+REAL_FLANG=/opt/flang/host/bin/flang
+RUNTIME=/opt/flang/wasm/lib/libFortranRuntime.a
+OMP_STUB_DIR=/opt/omp_lib_stub
+OMP_STUB_OBJ=$OMP_STUB_DIR/omp_lib_stub.o
+
+# Filter out emcc-/clang-specific flags flang doesn't understand.
+# These flags are meaningful only at the emcc link step (or wasm
+# back-end codegen via clang), not for flang's Fortran-frontend pass.
+FLANG_ARGS=()
+HAS_C=0
+FORTRAN_INPUTS=()
+NON_FORTRAN_ARGS=()
+SKIP_NEXT=0
+for a in "$@"; do
+  if [ "$SKIP_NEXT" = "1" ]; then SKIP_NEXT=0; NON_FORTRAN_ARGS+=("$a"); FLANG_ARGS+=("$a"); continue; fi
+  case "$a" in
+    -msimd128|-mrelaxed-simd|-fwasm-exceptions|-mllvm|-mllvm=*) ;;  # drop for flang; keep for emcc
+    -c) HAS_C=1; NON_FORTRAN_ARGS+=("$a"); FLANG_ARGS+=("$a") ;;
+    -o) SKIP_NEXT=1; NON_FORTRAN_ARGS+=("$a"); FLANG_ARGS+=("$a") ;;
+    *.f|*.f90|*.f95|*.f03|*.F|*.F90) FORTRAN_INPUTS+=("$a"); FLANG_ARGS+=("$a") ;;
+    *) NON_FORTRAN_ARGS+=("$a"); FLANG_ARGS+=("$a") ;;
+  esac
+done
+
+if [ "$HAS_C" = "1" ]; then
+  # Pure compile - flang handles it directly (with bad flags filtered).
+  # Add `-I$OMP_STUB_DIR` so `use omp_lib` resolves to the stub.
+  exec "$REAL_FLANG" -I"$OMP_STUB_DIR" "${FLANG_ARGS[@]}"
+fi
+
+# Link path: compile each Fortran input to temp .o via flang,
+# then link everything via emcc (which knows wasm-ld + libc).
+TMP_OBJS=()
+for f in "${FORTRAN_INPUTS[@]}"; do
+  obj=$(mktemp --suffix=.o)
+  TMP_OBJS+=("$obj")
+  "$REAL_FLANG" -I"$OMP_STUB_DIR" -c "$f" -o "$obj"
+done
+
+# Hand-off to emcc with the temp objects substituted for the .f inputs.
+# Include libFortranRuntime.a + omp_lib stub .o so Fortran-runtime /
+# OpenMP symbols resolve at link time.
+exec emcc "${NON_FORTRAN_ARGS[@]}" "${TMP_OBJS[@]}" "$OMP_STUB_OBJ" "$RUNTIME"

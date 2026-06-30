@@ -233,6 +233,25 @@ namespace casadi {
         \identifier{27k} */
     void codegen_body_exit(CodeGenerator& g) const override;
 
+    // Plugins that prefer to keep d_nlp/p_nlp/d_oracle storage on their own
+    // per-mem-block data struct (instead of letting codegen_body_enter emit
+    // them as per-call function-scope locals) skip codegen_body_enter and
+    // call these directly with their own lvalues. The default-prefix call
+    // chain through codegen_body_enter / codegen_body_exit is preserved
+    // byte-for-byte for plugins that don't opt in.
+    //   codegen_setup_constants: emit p_nlp constants + d_nlp <-> p_nlp /
+    //     d_oracle wiring. Runs once -- call from codegen_init_mem.
+    //   codegen_setup_per_call: emit arg/res-dependent d_nlp wiring +
+    //     casadi_nlpsol_init + copy_default's. Runs every call -- call
+    //     from codegen_body.
+    //   codegen_post_solve: emit nlp_grad post-solve + bound consistency +
+    //     final NLPSOL_X/F/G/LAM_* fan-out. Per-call -- call from codegen_body.
+    void codegen_setup_constants(CodeGenerator& g,
+        const std::string& d_nlp, const std::string& p_nlp,
+        const std::string& d_oracle) const;
+    void codegen_setup_per_call(CodeGenerator& g, const std::string& d_nlp) const;
+    void codegen_post_solve(CodeGenerator& g, const std::string& d_nlp) const;
+
     /** \brief Do the derivative functions need nondifferentiated outputs?
 
         \identifier{1o1} */

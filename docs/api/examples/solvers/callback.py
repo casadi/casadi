@@ -24,7 +24,7 @@
 # Callback
 # =====================
 
-from casadi import *
+import casadi as ca
 from numpy import *
 
 # In this example, we will demonstrate callback functionality for Ipopt.
@@ -32,12 +32,12 @@ from numpy import *
 #
 # We start with constructing the rosenbrock problem
 
-x=SX.sym("x")
-y=SX.sym("y")
+x=ca.SX.sym("x")
+y=ca.SX.sym("y")
 
 f = (1-x)**2+100*(y-x**2)**2
-nlp={'x':vertcat(x,y), 'f':f,'g':x+y}
-fcn = Function('f', [x, y], [f])
+nlp={'x':ca.vertcat(x,y), 'f':f,'g':x+y}
+fcn = ca.Function('f', [x, y], [f])
 
 import matplotlib
 if "Agg" not in matplotlib.get_backend():
@@ -47,9 +47,9 @@ from pylab import figure, subplot, contourf, colorbar, draw, show, plot, title
 
 import time
 
-class MyCallback(Callback):
+class MyCallback(ca.Callback):
   def __init__(self, name, nx, ng, np, opts={}):
-    Callback.__init__(self)
+    ca.Callback.__init__(self)
 
     self.nx = nx
     self.ng = ng
@@ -58,7 +58,7 @@ class MyCallback(Callback):
     figure(1)
 
     x_,y_ = mgrid[-1:1.5:0.01,-1:1.5:0.01]
-    z_ = DM.zeros(x_.shape)
+    z_ = ca.DM.zeros(x_.shape)
 
     for i in range(x_.shape[0]):
       for j in range(x_.shape[1]):
@@ -74,25 +74,25 @@ class MyCallback(Callback):
     # Initialize internal objects
     self.construct(name, opts)
 
-  def get_n_in(self): return nlpsol_n_out()
+  def get_n_in(self): return ca.nlpsol_n_out()
   def get_n_out(self): return 1
-  def get_name_in(self, i): return nlpsol_out(i)
+  def get_name_in(self, i): return ca.nlpsol_out(i)
   def get_name_out(self, i): return "ret"
 
   def get_sparsity_in(self, i):
-    n = nlpsol_out(i)
+    n = ca.nlpsol_out(i)
     if n=='f':
-      return Sparsity. scalar()
+      return ca.Sparsity. scalar()
     elif n in ('x', 'lam_x'):
-      return Sparsity.dense(self.nx)
+      return ca.Sparsity.dense(self.nx)
     elif n in ('g', 'lam_g'):
-      return Sparsity.dense(self.ng)
+      return ca.Sparsity.dense(self.ng)
     else:
-      return Sparsity(0,0)
+      return ca.Sparsity(0,0)
   def eval(self, arg):
     # Create dictionary
     darg = {}
-    for (i,s) in enumerate(nlpsol_out()): darg[s] = arg[i]
+    for (i,s) in enumerate(ca.nlpsol_out()): darg[s] = arg[i]
 
     sol = darg['x']
     self.x_sols.append(float(sol[0]))
@@ -115,7 +115,7 @@ opts = {}
 opts['iteration_callback'] = mycallback
 opts['ipopt.tol'] = 1e-8
 opts['ipopt.max_iter'] = 50
-solver = nlpsol('solver', 'ipopt', nlp, opts)
+solver = ca.nlpsol('solver', 'ipopt', nlp, opts)
 sol = solver(lbx=-10, ubx=10, lbg=-10, ubg=10)
 
 # By setting matplotlib interactivity off, we can inspect the figure at ease

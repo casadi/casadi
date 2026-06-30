@@ -36,12 +36,9 @@ else()
   if(PYTHON_INCLUDE_DIR)
     set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_DIR})
   else()
-    # Find packages
-    set(MINPYVERSION "3")
-
-    # We don't really need the libs, but the headers.
-    find_package(PythonInterp ${MINPYVERSION})
-    find_package(PythonLibs ${MINPYVERSION})
+    # We don't really need the libs (except on Windows), but the headers.
+    include(CasadiFindPython)
+    casadi_find_python(DEVELOPMENT)
     if(NOT PYTHON_INCLUDE_PATH)
       message(SEND_ERROR "Python include headers not found, but required." )
     endif()
@@ -107,7 +104,12 @@ endif()
 # embedding them here avoids needing to track generated-looking files
 # in source control.
 set(_stubs_gen_dir ${CMAKE_CURRENT_BINARY_DIR}/stubs)
-file(WRITE ${_stubs_gen_dir}/__init__.pyi "from .casadi import *\n")
+# issue #2959: `casadi.array` is a qualified-only alias of ArrayInterface
+# (defined in __init__.py, kept out of `from casadi import *`); surface it to
+# type checkers so `ca.array(...)` resolves.  NB use a plain assignment, not
+# `from .casadi import ArrayInterface as array`: in a .pyi the latter is a
+# non-re-exported (private) import that pyright hides from attribute access.
+file(WRITE ${_stubs_gen_dir}/__init__.pyi "from .casadi import *\narray = ArrayInterface\n")
 file(WRITE ${_stubs_gen_dir}/py.typed     "partial\n")
 if(WITH_PYTHON_GIL_RELEASE)
   set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-threads")

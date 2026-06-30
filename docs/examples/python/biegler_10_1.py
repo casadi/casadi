@@ -18,7 +18,7 @@
 #
 #
 # -*- coding: utf-8 -*-
-from casadi import *
+import casadi as ca
 from numpy import *
 import matplotlib.pyplot as plt
 
@@ -39,26 +39,26 @@ for N in range(1,11):
   #tau_root = [0, 0.155051, 0.644949, 1]
 
   # Time
-  t = SX.sym("t")
+  t = ca.SX.sym("t")
 
   # Differential equation
-  z = SX.sym("z")
-  F = Function("dz_dt", [z],[z*z - 2*z + 1])
+  z = ca.SX.sym("z")
+  F = ca.Function("dz_dt", [z],[z*z - 2*z + 1])
 
   z0 = -3
 
   # Analytic solution
-  z_analytic = Function("z_analytic", [t], [(4*t-3)/(3*t+1)])
+  z_analytic = ca.Function("z_analytic", [t], [(4*t-3)/(3*t+1)])
 
   # Collocation point
-  tau = SX.sym("tau")
+  tau = ca.SX.sym("tau")
 
   # Step size
   h = 1.0/N
 
   # Get the coefficients of the continuity and collocation equations
-  D = DM.zeros(K+1)
-  C = DM.zeros(K+1,K+1)
+  D = ca.DM.zeros(K+1)
+  C = ca.DM.zeros(K+1,K+1)
   for j in range(K+1):
     # Lagrange polynomial
     L = 1
@@ -67,20 +67,20 @@ for N in range(1,11):
         L *= (tau-tau_root[k])/(tau_root[j]-tau_root[k])
 
     # Evaluate at end for coefficients of continuity equation
-    lfcn = Function("lfcn", [tau],[L])
+    lfcn = ca.Function("lfcn", [tau],[L])
     D[j] = lfcn(1.)
 
     # Differentiate and evaluate at collocation points
-    tfcn = Function("tfcn", [tau],[tangent(L,tau)])
+    tfcn = ca.Function("tfcn", [tau],[ca.tangent(L,tau)])
     for k in range(K+1): C[j,k] = tfcn(tau_root[k])
   print("C = ", C)
   print("D = ", D)
 
   # Collocated states
-  Z = SX.sym("Z",N,K+1)
+  Z = ca.SX.sym("Z",N,K+1)
 
   # Construct the NLP
-  x = vec(Z.T)
+  x = ca.vec(Z.T)
   g = []
   for i in range(N):
     for k in range(1,K+1):
@@ -99,7 +99,7 @@ for N in range(1,11):
     if(i<N-1):
       g.append(Z[i+1,0] - rhs)
 
-  g = vertcat(*g)
+  g = ca.vertcat(*g)
 
   print("g = ", g)
 
@@ -114,7 +114,7 @@ for N in range(1,11):
   opts = {"ipopt.tol" : 1e-10}
 
   # Allocate an NLP solver and buffer
-  solver = nlpsol("solver", "ipopt", nlp, opts)
+  solver = ca.nlpsol("solver", "ipopt", nlp, opts)
   arg = {}
 
   # Initial condition

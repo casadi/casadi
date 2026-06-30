@@ -1,9 +1,13 @@
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.16.3)
 
 project(demo)
 
 # export CMAKE_PREFIX_PATH=../casadi_install/casadi/cmake/
 find_package(casadi CONFIG REQUIRED)
+
+# The version is exposed through the standard CMake config-package variables.
+message(STATUS "Found CasADi ${casadi_VERSION} "
+        "(${casadi_VERSION_MAJOR}.${casadi_VERSION_MINOR}.${casadi_VERSION_PATCH})")
 
 add_executable(casadi_demo casadi_demo.cpp)
 target_link_libraries(casadi_demo casadi::casadi)

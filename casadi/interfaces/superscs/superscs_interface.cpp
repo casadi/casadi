@@ -484,6 +484,8 @@ namespace casadi {
   }
 
   SuperscsMemory::SuperscsMemory() {
+    sol = nullptr;
+    info = nullptr;
   }
 
   SuperscsMemory::~SuperscsMemory() {

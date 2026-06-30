@@ -395,6 +395,23 @@ class CASADI_EXPORT DaeBuilder
   /// Export instance into an FMU
   Dict export_fmu(const Dict& opts=Dict());
 
+  /** \brief Compile the sources produced by export_fmu
+
+  *  \param files the {local_file -> archive path} map returned by export_fmu
+  *  \param opts compile options: compiler, compiler_options, include_dirs
+  *  \return the file map augmented with the amalgamation source and compiled binary
+
+      \identifier{2iq} */
+  Dict compile_fmu(const Dict& files, const Dict& opts=Dict());
+
+  /** \brief Pack files from export_fmu / compile_fmu into a single .fmu archive
+
+  * \param files the {local_file -> archive path} map to pack
+  * \param opts packaging options: path (default '<name>.fmu')
+
+      \identifier{2ir} */
+  std::string pack_fmu(const Dict& files, const Dict& opts=Dict());
+
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
 

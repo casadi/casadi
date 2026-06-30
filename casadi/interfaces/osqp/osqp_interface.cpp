@@ -601,10 +601,11 @@ namespace casadi {
   }
 
   OsqpMemory::OsqpMemory() {
+    work = nullptr;
   }
 
   OsqpMemory::~OsqpMemory() {
-    osqp_cleanup(work);
+    if (work) osqp_cleanup(work);
   }
 
   OsqpInterface::OsqpInterface(DeserializingStream& s) : Conic(s) {

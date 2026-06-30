@@ -309,6 +309,13 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
     static Matrix<Scalar> simplify(const Matrix<Scalar> &x);
+    static Matrix<Scalar> transform(const Matrix<Scalar> &x, const Dict& opts = Dict());
+    static Matrix<Scalar> transform(const Matrix<Scalar> &x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
+    static std::vector<Matrix<Scalar> > transform(const std::vector<Matrix<Scalar> >& x,
+        const Dict& opts = Dict());
+    static std::vector<Matrix<Scalar> > transform(const std::vector<Matrix<Scalar> >& x,
+        const std::vector<std::vector<GenericType> >& passes, const Dict& opts = Dict());
     static Matrix<Scalar> jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                    const Dict& opts = Dict());
     static Sparsity jacobian_sparsity(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
@@ -522,6 +529,11 @@ namespace casadi {
 
     // Simplification with constant folding
     static bool simplify_const_folding(std::vector< Matrix<Scalar> >& arg,
+                                   std::vector< Matrix<Scalar> >& res,
+                                   const Dict& opts = Dict());
+
+    // Simplification by combining like terms in linear combinations
+    static bool simplify_combine_terms(std::vector< Matrix<Scalar> >& arg,
                                    std::vector< Matrix<Scalar> >& res,
                                    const Dict& opts = Dict());
 

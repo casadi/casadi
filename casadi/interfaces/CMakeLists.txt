@@ -107,6 +107,10 @@ if(WITH_TINYXML)
   add_subdirectory(tinyxml)
 endif()
 
+if(WITH_LACEMODELICA)
+  add_subdirectory(lacemodelica)
+endif()
+
 if(WITH_BLOCKSQP)
   add_subdirectory(blocksqp)
 endif()
@@ -151,6 +155,10 @@ if(WITH_ALPAQA)
   add_subdirectory(alpaqa)
 endif()
 
+if(WITH_UNO)
+  add_subdirectory(uno)
+endif()
+
 if(WITH_MATLAB_IPC)
   add_subdirectory(matlab_ipc)
 endif()
@@ -159,8 +167,20 @@ if(WITH_LIBZIP)
   add_subdirectory(libzip)
 endif()
 
+if(WITH_ONNX)
+  add_subdirectory(onnx)
+endif()
+
+if(WITH_ONNX_RUNTIME)
+  add_subdirectory(ort)
+endif()
+
 if(WITH_GHC_FILESYSTEM)
   add_subdirectory(ghc)
+endif()
+
+if(WITH_PIQP)
+  add_subdirectory(piqp)
 endif()
 
 if(WITH_LINT)

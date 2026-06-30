@@ -17,7 +17,7 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # -*- coding: utf-8 -*-
-from casadi import *
+import casadi as ca
 from numpy import inf
 from casadi.tools import *
 
@@ -28,8 +28,8 @@ nk = 20    # Control discretization
 tf = 10.0  # End time
 
 # Declare variables (use scalar graph)
-t  = SX.sym("t")    # time
-u  = SX.sym("u")    # control
+t  = ca.SX.sym("t")    # time
+u  = ca.SX.sym("u")    # control
 
 states = struct_symSX([
             entry('x',shape=2),    #  vdp oscillator states
@@ -39,14 +39,14 @@ states = struct_symSX([
 # Create a structure for the right hand side
 rhs = struct_SX(states)
 x = states['x']
-rhs["x"] = vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, x[0])
+rhs["x"] = ca.vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, x[0])
 rhs["L"] = x[0]*x[0] + x[1]*x[1] + u*u
 
 # ODE right hand side function
-f = Function('f', [t,states,u],[rhs])
+f = ca.Function('f', [t,states,u],[rhs])
 
 # Objective function (meyer term)
-m = Function('m', [t,states,u],[states["L"]])
+m = ca.Function('m', [t,states,u],[states["L"]])
 
 # Control bounds
 u_min = -0.75
@@ -71,7 +71,7 @@ nx = 3
 nu = 1
 
 # Choose collocation points
-tau_root = [0] + collocation_points(3,"radau")
+tau_root = [0] + ca.collocation_points(3,"radau")
 
 # Degree of interpolating polynomial
 d = len(tau_root)-1
@@ -86,7 +86,7 @@ C = NP.zeros((d+1,d+1))
 D = NP.zeros(d+1)
 
 # Dimensionless time inside one control interval
-tau = SX.sym("tau")
+tau = ca.SX.sym("tau")
 
 # All collocation time points
 T = NP.zeros((nk,d+1))
@@ -103,11 +103,11 @@ for j in range(d+1):
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
 
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-  lfcn = Function('lfcn', [tau],[L])
+  lfcn = ca.Function('lfcn', [tau],[L])
   D[j] = lfcn(1.0)
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-  tfcn = Function('tfcn', [tau],[tangent(L,tau)])
+  tfcn = ca.Function('tfcn', [tau],[ca.tangent(L,tau)])
   for r in range(d+1):
     C[j,r] = tfcn(tau_root[r])
 
@@ -174,7 +174,7 @@ for k in range(nk):
   ubg.append(NP.zeros(nx))
 
 # Concatenate constraints
-g = vertcat(*g)
+g = ca.vertcat(*g)
 
 # Objective function
 f = m(T[nk-1][d],V["X",nk,0],V["U",nk-1])
@@ -193,7 +193,7 @@ opts["expand"] = True
 opts["ipopt.linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = nlpsol("solver", "ipopt", nlp, opts)
+solver = ca.nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Initial condition
@@ -217,11 +217,11 @@ print("optimal cost: ", float(res["f"]))
 opt = V(res["x"])
 
 # Get values at the beginning of each finite element
-x0_opt = vcat(opt["X",:,0,"x",0])
-x1_opt = vcat(opt["X",:,0,"x",1])
-x2_opt = vcat(opt["X",:,0,"L"])
+x0_opt = ca.vcat(opt["X",:,0,"x",0])
+x1_opt = ca.vcat(opt["X",:,0,"x",1])
+x2_opt = ca.vcat(opt["X",:,0,"L"])
 
-u_opt = vcat(opt["U",:,0])
+u_opt = ca.vcat(opt["U",:,0])
 
 tgrid = NP.linspace(0,tf,nk+1)
 tgrid_u = NP.linspace(0,tf,nk)

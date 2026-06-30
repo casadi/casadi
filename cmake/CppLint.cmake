@@ -21,7 +21,8 @@
 # In order to comply with the above copyright, I am noting that I took
 # Daniel's script and hacked it a bit, mostly changing paths and filters
 
-find_package(PythonInterp)
+include(CasadiFindPython)
+casadi_find_python()
 
 set(STYLE_FILTER)
 

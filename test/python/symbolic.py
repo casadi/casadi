@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+import casadi as ca
 import numpy
 
 from helpers import *
@@ -73,14 +73,14 @@ class Symbolictests(casadiTestCase):
       for b1 in nodes():
         yield b1
 
-    for a_s, b_s in [(SX.sym("a"),SX.sym("b")),(MX.sym("a"),MX.sym("b"))]:
+    for a_s, b_s in [(ca.SX.sym("a"),ca.SX.sym("b")),(ca.MX.sym("a"),ca.MX.sym("b"))]:
       i=0
       for op1 in operations_node():
         for op2 in operations_node():
            for op3 in operations_toplevel(op1,op2):
              i+= 1
              e = eval(op3,{"a": a_s, "b": b_s})
-             f = Function("f", [a_s,b_s],[e])
+             f = ca.Function("f", [a_s,b_s],[e])
              #print i, op1, op2, op3, " -> ", e
              r = f(numbers[0], numbers[1])
              try:

@@ -27,6 +27,7 @@
 #include "code_generator.hpp"
 #include "function_internal.hpp"
 #include "convexify.hpp"
+#include "blas_impl.hpp"
 #include <casadi_runtime_str.h>
 #include "global_options.hpp"
 #include "filesystem_impl.hpp"
@@ -64,6 +65,7 @@ namespace casadi {
     this->max_declarations_per_line = 12;
     this->max_initializer_elements_per_line = 8;
     this->force_canonical = false;
+    this->l1_blas = false;
 
     avoid_stack_ = false;
     indent_ = 2;
@@ -154,6 +156,8 @@ namespace casadi {
           "Option max_initializer_elements_per_line must be >=0");
       } else if (e.first=="force_canonical") {
         this->force_canonical = e.second;
+      } else if (e.first=="l1_blas") {
+        this->l1_blas = e.second;
       } else if (e.first=="thread_safe") {
         thread_safe_ = e.second;
       } else {
@@ -169,6 +173,11 @@ namespace casadi {
     if (this->cuda_) {
       casadi_assert(!this->mex, "Option 'mex' is not supported with cuda codegen.");
       casadi_assert(!this->main, "Option 'main' is not supported with cuda codegen.");
+    }
+
+    if (with_mem && !force_canonical) {
+      casadi_error("Codegen options 'with_mem' and 'force_canonical=false' (the default) "
+      "are incompatible. If you rely on with_mem, please explicitly set force_canonical=true.");
     }
 
     // If real_min is not specified, make an educated guess
@@ -1588,7 +1597,11 @@ namespace casadi {
     // Add the appropriate function
     switch (f) {
     case AUX_COPY:
-      this->auxiliaries << sanitize_source(casadi_copy_str, inst);
+      if (this->l1_blas) {
+        Blas::codegen_copy_aux(*this, inst);
+      } else {
+        this->auxiliaries << sanitize_source(casadi_copy_str, inst);
+      }
       break;
     case AUX_SCALED_COPY:
       this->auxiliaries << sanitize_source(casadi_scaled_copy_str, inst);
@@ -1597,13 +1610,16 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_swap_str, inst);
       break;
     case AUX_SCAL:
-      this->auxiliaries << sanitize_source(casadi_scal_str, inst);
+      if (!(this->l1_blas && Blas::codegen_scal_aux(*this, inst)))
+        this->auxiliaries << sanitize_source(casadi_scal_str, inst);
       break;
     case AUX_AXPY:
-      this->auxiliaries << sanitize_source(casadi_axpy_str, inst);
+      if (!(this->l1_blas && Blas::codegen_axpy_aux(*this, inst)))
+        this->auxiliaries << sanitize_source(casadi_axpy_str, inst);
       break;
     case AUX_DOT:
-      this->auxiliaries << sanitize_source(casadi_dot_str, inst);
+      if (!(this->l1_blas && Blas::codegen_dot_aux(*this, inst)))
+        this->auxiliaries << sanitize_source(casadi_dot_str, inst);
       break;
     case AUX_BILIN:
       this->auxiliaries << sanitize_source(casadi_bilin_str, inst);
@@ -1691,12 +1707,16 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str, inst);
       break;
     case AUX_NORM_1:
-      add_auxiliary(AUX_FABS);
-      this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);
+      if (!(this->l1_blas && Blas::codegen_norm_1_aux(*this, inst))) {
+        add_auxiliary(AUX_FABS);
+        this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);
+      }
       break;
     case AUX_NORM_2:
-      add_auxiliary(AUX_DOT);
-      this->auxiliaries << sanitize_source(casadi_norm_2_str, inst);
+      if (!(this->l1_blas && Blas::codegen_norm_2_aux(*this, inst))) {
+        add_auxiliary(AUX_DOT);
+        this->auxiliaries << sanitize_source(casadi_norm_2_str, inst);
+      }
       break;
     case AUX_NORM_INF:
       add_auxiliary(AUX_FMAX);
@@ -2873,6 +2893,28 @@ namespace casadi {
     local_default_.insert(std::make_pair(name, def));
   }
 
+  // Read the next double-quoted token from line, starting at pos.
+  // Backslash escapes the next character, so \" and \\ may appear inside.
+  // On return, pos points just past the closing quote.
+  static std::string next_quoted_token(const std::string& line, size_t& pos) {
+    size_t n1 = line.find('"', pos);
+    casadi_assert(n1 != std::string::npos, "Missing quoted token in: " + line);
+    std::string r;
+    size_t i = n1 + 1;
+    for (; i < line.size(); ++i) {
+      if (line[i] == '\\' && i + 1 < line.size()) {
+        r += line[++i];
+      } else if (line[i] == '"') {
+        break;
+      } else {
+        r += line[i];
+      }
+    }
+    casadi_assert(i < line.size(), "Unterminated quoted token in: " + line);
+    pos = i + 1;
+    return r;
+  }
+
   std::string CodeGenerator::
   sanitize_source(const std::string& src,
                   const std::vector<std::string>& inst, bool add_shorthand) {
@@ -2936,14 +2978,10 @@ namespace casadi {
 
       // If line starts with "// C-REPLACE", add to list of replacements
       if (line.find("// C-REPLACE") != std::string::npos) {
-        // Get C++ string
-        n1 = line.find("\"");
-        n2 = line.find("\"", n1+1);
-        std::string key = line.substr(n1+1, n2-n1-1);
-        // Get C string
-        n1 = line.find("\"", n2+1);
-        n2 = line.find("\"", n1+1);
-        std::string sub = line.substr(n1+1, n2-n1-1);
+        // Get C++ string, then C string; \" and \\ are unescaped
+        size_t pos = line.find("// C-REPLACE");
+        std::string key = next_quoted_token(line, pos);
+        std::string sub = next_quoted_token(line, pos);
         // Add to replacements
         rep.push_back(std::make_pair(key, sub));
         continue;

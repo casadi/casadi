@@ -139,9 +139,9 @@ void casadi_mosek_work(const casadi_mosek_prob<T1>* p,
   }
 }
 
-// SYMBOL "mosek_init"
+// SYMBOL "mosek_set_work"
 template<typename T1>
-void casadi_mosek_init(casadi_mosek_data<T1>* d,
+void casadi_mosek_set_work(casadi_mosek_data<T1>* d,
     const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   const casadi_mosek_prob<T1>* p = d->prob;
   d->col_idx      = reinterpret_cast<int*>(*iw);  *iw += p->qp->nx;

@@ -208,20 +208,36 @@ namespace casadi {
                     const Dict& opts=Dict()) const;
     ///@}
 
-    /** \brief Create a new function with simplifications applied
-    *
-    * The following list of boolean options can be provided:
-    * - cse (default true): Common subexpression elimination
-    * - const_folding (default true): Constant folding
-    * - empty_inputs (default true): inputs that are not used become structurally empty
-    * - ref_count (default true): reference count aware simplification
-    *
+    /** \brief Apply transformation passes
 
-        \identifier{2ef} */
-    /// @{
-    Function simplify(const std::string& name, const Dict& opts=Dict()) const;
-    Function simplify(const Dict& opts=Dict()) const;
-    /// @}
+    * Options:
+    * - passes (OT_VECTORVECTOR): an ordered list of passes. Each pass is a list
+    *   whose first entry is the verb:
+    *   - {"simplify", task, ...}: graph simplification passes applied in order
+    *     (cse, ref_count, const_folding, combine_terms, empty_inputs).
+    *     An integer before a task sets its run count (N>0: N times, 0: until a
+    *     fixed point); the default is 1.
+    *   - {"expand"}: expand to an SXFunction
+    *   - {"external", library, operation, opts}: apply an externally defined
+    *     transform (opts is an optional dict)
+    * - boolean shorthands (used only when "passes" is absent): empty_inputs,
+    *   combine_terms, cse, ref_count, const_folding. These build a single
+    *   "simplify" pass.
+    *
+    * The dict-only form applies a default simplification flow when empty.
+    * The (passes, opts) form runs an explicit pipeline; its opts accepts only
+    * "verbose" (the boolean simplify options are rejected there).
+
+        \identifier{2ig} */
+    ///@{
+    Function transform(const Dict& opts = Dict()) const;
+    Function transform(const std::string& fname, const Dict& opts = Dict()) const;
+    Function transform(const std::vector<std::vector<GenericType> >& passes,
+                       const Dict& opts = Dict()) const;
+    Function transform(const std::string& fname,
+                       const std::vector<std::vector<GenericType> >& passes,
+                       const Dict& opts = Dict()) const;
+    ///@}
 
     /// \cond INTERNAL
 #ifndef SWIG
@@ -296,6 +312,18 @@ namespace casadi {
     casadi_int nnz_out(casadi_int ind) const;
     casadi_int nnz_out(const std::string& oname) const {return nnz_out(index_out(oname));}
     ///@}
+
+    /** \brief Output signal activity induced by a given input activity
+     *
+     * \p arg is a flat activity mask over all input nonzeros (size nnz_in(),
+     * true = active = possibly nonzero); the result is the corresponding mask over
+     * all output nonzeros (size nnz_out()). An output that comes out inactive (false)
+     * is guaranteed zero for any value of the active inputs. Unlike sparsity
+     * propagation this exploits annihilation: an inactive operand of a multiply kills
+     * the product.
+
+        \identifier{2ih} */
+    std::vector<bool> activity(const std::vector<bool>& arg) const;
 
     ///@{
     /** \brief  Get number of input elements
@@ -655,6 +683,12 @@ namespace casadi {
 
         \identifier{1we} */
     int operator()(const bvec_t** arg, bvec_t** res,
+        casadi_int* iw, bvec_t* w, int mem=0) const;
+
+    /** \brief Propagate signal activity forward (bit set = active (possibly nonzero))
+
+        \identifier{2ii} */
+    int eval_activity(const bvec_t** arg, bvec_t** res,
         casadi_int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief  Propagate sparsity backward

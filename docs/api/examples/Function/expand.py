@@ -24,19 +24,19 @@
 # expand
 # ======================
 
-from casadi import *
+import casadi as ca
 import casadi as c
 
 # We construct a simple MX expression
 
-x = MX.sym("x",2,2)
-y = MX.sym("y",2,1)
+x = ca.MX.sym("x",2,2)
+y = ca.MX.sym("y",2,1)
 
 z = x @ y
 
 # Let's construct an MXfunction
 
-f = Function("f", [x,y],[z])
+f = ca.Function("f", [x,y],[z])
 
 # We expand the MX expression into an SX expression
 
@@ -50,9 +50,9 @@ print("Expanded expression = ", fSX.str(True))
 # Not all MX graphs can be expanded.
 # Here is an example of a situation where it will not work.
 
-linear_solver = Linsol("linear_solver", "csparse", x.sparsity())
+linear_solver = ca.Linsol("linear_solver", "csparse", x.sparsity())
 g = linear_solver.solve(x, y)
-G = Function("G", [x,y], [g])
+G = ca.Function("G", [x,y], [g])
 
 # This function cannot be expanded.
 

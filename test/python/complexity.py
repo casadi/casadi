@@ -26,7 +26,7 @@
 # complexity.py is a standalone benchmarking harness -- not in alltests.py --
 # and several invocations here (e.g. DM(N,1,0) 3-arg form) are broken at runtime
 # too.  We suppress those checks rather than keep rewriting the file.
-from casadi import *
+import casadi as ca
 import casadi as c
 import numpy
 import unittest
@@ -62,8 +62,8 @@ class ComplexityTests(casadiTestCase):
     orders   = self.testorders
     rejectat = self.rejectat
 
-    Ns = log(Ns)
-    ts = log(ts)
+    Ns = ca.log(Ns)
+    ts = ca.log(ts)
 
     m = Ns.shape[0]
 
@@ -77,7 +77,7 @@ class ComplexityTests(casadiTestCase):
     rho = (mean(ts*Ns)-mean(ts)*mean(Ns))/sigmaN/sigmaT
 
     # sqrt(Variance) estimate
-    s = m/sqrt(m-2)*sqrt(sigmaT**2 - cov**2/sigmaN**2)
+    s = m/ca.sqrt(m-2)*ca.sqrt(sigmaT**2 - cov**2/sigmaN**2)
 
     # Estimate for b
     b = sigmaT/sigmaN * rho
@@ -85,10 +85,10 @@ class ComplexityTests(casadiTestCase):
     a = mean(ts) - b * mean(Ns)
 
     # Standard error on estimate for b
-    sigmab = s/sqrt(m*sigmaN**2)
+    sigmab = s/ca.sqrt(m*sigmaN**2)
 
     # Standard deviation
-    sigmaa = s * sqrt(1/m + mean(ts)**2/(m*sigmaT**2))
+    sigmaa = s * ca.sqrt(1/m + mean(ts)**2/(m*sigmaT**2))
 
     conf = 0.05
 
@@ -109,10 +109,10 @@ class ComplexityTests(casadiTestCase):
     if len(results)==1:
       order = results[0]
       a = mean(ts - order*Ns)
-      sigmaa = std(ts - order*Ns)/sqrt(m)
-      print("O(f) = %.3e N^%d [s]    | 95%% confidence:   [%.3e , %.3e] N^%d [s]" % (exp(a),order,exp(student.ppf(conf, m, loc=a, scale=sigmaa)),exp(student.ppf(1-conf, m, loc=a, scale=sigmaa)),order))
+      sigmaa = std(ts - order*Ns)/ca.sqrt(m)
+      print("O(f) = %.3e N^%d [s]    | 95%% confidence:   [%.3e , %.3e] N^%d [s]" % (ca.exp(a),order,ca.exp(student.ppf(conf, m, loc=a, scale=sigmaa)),ca.exp(student.ppf(1-conf, m, loc=a, scale=sigmaa)),order))
     else:
-      print("raw fit O(f) = %.3e N^(%.3f) [s]" % (exp(a),b))
+      print("raw fit O(f) = %.3e N^(%.3f) [s]" % (ca.exp(a),b))
 
 
     for i, order in zip(list(range(len(orders)))[1:],orders[1:]):
@@ -160,7 +160,7 @@ class ComplexityTests(casadiTestCase):
   def test_DMadd(self):
     self.message("DM add column vectors")
     def setupfun(self,N):
-      return {'A': DM(N,1,0), 'B': DM(N,1,0)}
+      return {'A': ca.DM(N,1,0), 'B': ca.DM(N,1,0)}
     def fun(self,N,setup):
       setup['A'] + setup['B']
 
@@ -168,7 +168,7 @@ class ComplexityTests(casadiTestCase):
 
     self.message("DM add rows vectors")
     def setupfun(self,N):
-      return {'A': DM(1,N,0), 'B': DM(1,N,0)}
+      return {'A': ca.DM(1,N,0), 'B': ca.DM(1,N,0)}
 
     self.complexity(setupfun,fun, 1)
 
@@ -177,9 +177,9 @@ class ComplexityTests(casadiTestCase):
     return
     self.message("SX add column vectors")
     def setupfun(self,N):
-      A = SX.sym("A",N,1)
-      B = SX.sym("B",N,1)
-      f = Function('f', [A,B],[A+B])
+      A = ca.SX.sym("A",N,1)
+      B = ca.SX.sym("B",N,1)
+      f = ca.Function('f', [A,B],[A+B])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -190,9 +190,9 @@ class ComplexityTests(casadiTestCase):
     return
     self.message("SX prod column vectors")
     def setupfun(self,N):
-      A = SX.sym("A",N,1)
-      B = SX.sym("B",N,1)
-      f = Function('f', [A,B],[c.dot(A.T,B)])
+      A = ca.SX.sym("A",N,1)
+      B = ca.SX.sym("B",N,1)
+      f = ca.Function('f', [A,B],[c.dot(A.T,B)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -201,10 +201,10 @@ class ComplexityTests(casadiTestCase):
   def test_SX_funprodsparse(self):
     self.message("SX prod sparse")
     def setupfun(self,N):
-      A = SX.sym("A",Sparsity.diag(N))
-      A[-1,0]=SX("off") # Have one of-diagonal element
-      B = SX.sym("B",N,1)
-      f = Function('f', [A,B],[c.dot(A,B)])
+      A = ca.SX.sym("A",ca.Sparsity.diag(N))
+      A[-1,0]=ca.SX("off") # Have one of-diagonal element
+      B = ca.SX.sym("B",N,1)
+      f = ca.Function('f', [A,B],[c.dot(A,B)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -215,9 +215,9 @@ class ComplexityTests(casadiTestCase):
   def test_MX_funprodvec(self):
     self.message("MX prod")
     def setupfun(self,N):
-      G = MX.sym("G",N,1)
-      X = MX.sym("X",N,1)
-      f = Function('f', [G,X],[c.prod(G.T,X)])
+      G = ca.MX.sym("G",N,1)
+      X = ca.MX.sym("X",N,1)
+      f = ca.Function('f', [G,X],[c.prod(G.T,X)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -226,31 +226,31 @@ class ComplexityTests(casadiTestCase):
   def test_MX_funprodsparse(self):
     self.message("MX sparse product")
     def setupfun(self,N):
-      s = Sparsity.diag(N)
+      s = ca.Sparsity.diag(N)
       s[-1,0]=1
-      H = MX.sym("H",s)
-      X = MX.sym("X",N,1)
-      f = Function('f', [H,X],[c.prod(H,X)])
+      H = ca.MX.sym("H",s)
+      X = ca.MX.sym("X",N,1)
+      f = ca.Function('f', [H,X],[c.prod(H,X)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
     self.complexity(setupfun,fun, 2)  # 1
     self.message("MX sparse sparse product")
     def setupfun(self,N):
-      s = Sparsity.diag(N)
+      s = ca.Sparsity.diag(N)
       s[-1,0]=1
-      H = MX.sym("H",s)
-      s = Sparsity.diag(N)
+      H = ca.MX.sym("H",s)
+      s = ca.Sparsity.diag(N)
       s[-1,0]=1
-      X = MX.sym("X",s)
-      f = Function('f', [H,X],[c.prod(H,X)])
+      X = ca.MX.sym("X",s)
+      f = ca.Function('f', [H,X],[c.prod(H,X)])
       return {'f':f}
     self.complexity(setupfun,fun, 2)  # 1
 
   def test_DMdot(self):
     self.message("DM inner dot vectors")
     def setupfun(self,N):
-      return {'A': DM(1,N,0), 'B': DM(N,1,0)}
+      return {'A': ca.DM(1,N,0), 'B': ca.DM(N,1,0)}
     def fun(self,N,setup):
       c.dot(setup['A'],setup['B'])
 
@@ -258,7 +258,7 @@ class ComplexityTests(casadiTestCase):
 
     self.message("DM outer dot vectors")
     def setupfun(self,N):
-      return {'A': DM(N,1,0), 'B': DM(1,N,0)}
+      return {'A': ca.DM(N,1,0), 'B': ca.DM(1,N,0)}
     def fun(self,N,setup):
       c.dot(setup['A'],setup['B'])
 

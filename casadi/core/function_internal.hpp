@@ -388,10 +388,14 @@ namespace casadi {
                                            const std::vector<std::string>& s_out,
                                            casadi_int order, bool tr=false) const;
 
-    /** \brief Create a new function with simplifications applied
+    /** \brief Apply an ordered list of simplify passes (used by transform)
 
-        \identifier{2ee} */
-    virtual Function simplify(const std::string& name, const Dict& opts) const;
+        Each pass is a (task, count) pair; count>0 runs the task that many times,
+        count==0 runs it until a fixed point.
+
+        \identifier{2ix} */
+    virtual Function simplify_passes(
+        const std::vector<std::pair<std::string, casadi_int> >& tasks) const;
 
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm?
@@ -1179,6 +1183,16 @@ namespace casadi {
     virtual int sp_forward(const bvec_t** arg, bvec_t** res,
                             casadi_int* iw, bvec_t* w, void* mem) const;
 
+    /** \brief Propagate signal activity forward
+     *
+     * bvec bit set = active (possibly nonzero), clear = inactive (definitely zero).
+     * Unlike sp_forward (a dependency analysis), this respects multiplicative
+     * annihilation and nonzero constants. Default is the sound fallback: all active.
+
+        \identifier{2iy} */
+    virtual int eval_activity(const bvec_t** arg, bvec_t** res,
+                            casadi_int* iw, bvec_t* w, void* mem) const;
+
     /** \brief  Propagate sparsity forward, specific block
 
         \identifier{mx} */
@@ -1808,9 +1822,6 @@ namespace casadi {
     if (arg.size()==inp.size()) {
       // Matching dimensions already
       return arg;
-    } else if (arg.is_empty()) {
-      // Empty matrix means set zero
-      return M(inp.size());
     } else if (arg.is_scalar()) {
       // Scalar assign means set all
       return M(inp, arg);
@@ -1821,10 +1832,15 @@ namespace casadi {
                && inp.size2()%arg.size2()==0) {
       // Horizontal repmat
       return repmat(arg, 1, inp.size2()/arg.size2());
-    } else {
-      casadi_assert_dev(npar!=-1);
-      // Multiple evaluation
+    } else if (npar!=-1 && arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+               && (npar*inp.size2())%arg.size2()==0) {
+      // Multiple evaluation: grow argument horizontally to npar*inp columns
       return repmat(arg, 1, (npar*inp.size2())/arg.size2());
+    } else {
+      // Empty matrix means set zero (kept last so a 0-by-N argument is first given the
+      // chance to be recognised as a parallel/repmat call above)
+      casadi_assert_dev(arg.is_empty());
+      return M(inp.size());
     }
   }
 

@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+import casadi as ca
 import casadi as c
 import numpy
 from numpy import random, array
@@ -38,56 +38,56 @@ warnings.filterwarnings("ignore",category=DeprecationWarning)
 class ADtests(casadiTestCase):
 
   def setUp(self):
-    x=SX.sym("x")
-    y=SX.sym("y")
-    z=SX.sym("z")
-    w=SX.sym("w")
+    x=ca.SX.sym("x")
+    y=ca.SX.sym("y")
+    z=ca.SX.sym("z")
+    w=ca.SX.sym("w")
 
-    out=SX(6,1)
+    out=ca.SX(6,1)
     out[0,0]=x
     out[2,0]=x+2*y**2
     out[4,0]=x+2*y**3+3*z**4
     out[5,0]=w
 
-    inp=SX(6,1)
+    inp=ca.SX(6,1)
     inp[0,0]=x
     inp[2,0]=y
     inp[4,0]=z
     inp[5,0]=w
 
-    sp = Sparsity(1,6,[0, 1, 1, 2, 2, 3, 4],[0, 0, 0, 0]).T
-    spT = Sparsity(6,1,[0, 4],[0, 2, 4, 5]).T
+    sp = ca.Sparsity(1,6,[0, 1, 1, 2, 2, 3, 4],[0, 0, 0, 0]).T
+    spT = ca.Sparsity(6,1,[0, 4],[0, 2, 4, 5]).T
 
     self.sxinputs = {
        "column" : {
-            "dense": [vertcat(*[x,y,z,w])],
+            "dense": [ca.vertcat(*[x,y,z,w])],
             "sparse": [inp] }
         , "row": {
-            "dense":  [vertcat(*[x,y,z,w]).T],
+            "dense":  [ca.vertcat(*[x,y,z,w]).T],
             "sparse": [inp.T]
        }, "matrix": {
-          "dense": [c.reshape(vertcat(*[x,y,z,w]),2,2)],
+          "dense": [c.reshape(ca.vertcat(*[x,y,z,w]),2,2)],
           "sparse": [c.reshape(inp,3,2)]
         }
     }
 
     self.mxinputs = {
        "column" : {
-            "dense": [MX.sym("xyzw",4,1)],
-            "sparse": [MX.sym("xyzw",sp)]
+            "dense": [ca.MX.sym("xyzw",4,1)],
+            "sparse": [ca.MX.sym("xyzw",sp)]
         },
         "row" : {
-            "dense": [MX.sym("xyzw",1,4)],
-            "sparse": [MX.sym("xyzw",spT)]
+            "dense": [ca.MX.sym("xyzw",1,4)],
+            "sparse": [ca.MX.sym("xyzw",spT)]
         },
         "matrix": {
-            "dense": [MX.sym("xyzw",2,2)],
-            "sparse": [MX.sym("xyzw",c.reshape(inp,3,2).sparsity())]
+            "dense": [ca.MX.sym("xyzw",2,2)],
+            "sparse": [ca.MX.sym("xyzw",c.reshape(inp,3,2).sparsity())]
         }
     }
 
     def temp1(xyz):
-      X=MX(6,1)
+      X=ca.MX(6,1)
       X[0,0]=xyz.nz[0]
       X[2,0]=xyz.nz[0]+2*xyz.nz[1]**2
       X[4,0]=xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4
@@ -95,7 +95,7 @@ class ADtests(casadiTestCase):
       return [X]
 
     def temp2(xyz):
-      X=MX(1,6)
+      X=ca.MX(1,6)
       X[0,0]=xyz.nz[0]
       X[0,2]=xyz.nz[0]+2*xyz.nz[1]**2
       X[0,4]=xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4
@@ -103,18 +103,18 @@ class ADtests(casadiTestCase):
       return [X]
 
     def testje(xyz):
-      print(vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]).shape)
+      print(ca.vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]).shape)
 
     self.mxoutputs = {
        "column": {
-        "dense":  lambda xyz: [vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
+        "dense":  lambda xyz: [ca.vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
         "sparse": temp1
         }, "row": {
-        "dense": lambda xyz: [horzcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
+        "dense": lambda xyz: [ca.horzcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
         "sparse": temp2
        },
        "matrix": {
-          "dense": lambda xyz: [c.reshape(vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]),(2,2))],
+          "dense": lambda xyz: [c.reshape(ca.vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]),(2,2))],
           "sparse": lambda xyz: [c.reshape(temp1(xyz)[0],(3,2))]
        }
     }
@@ -122,13 +122,13 @@ class ADtests(casadiTestCase):
 
     self.sxoutputs = {
        "column": {
-        "dense": [vertcat(*[x,x+2*y**2,x+2*y**3+3*z**4,w])],
+        "dense": [ca.vertcat(*[x,x+2*y**2,x+2*y**3+3*z**4,w])],
         "sparse": [out]
         }, "row": {
-          "dense":  [vertcat(*[x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
+          "dense":  [ca.vertcat(*[x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
           "sparse": [out.T]
       }, "matrix" : {
-          "dense":  [c.reshape(vertcat(*[x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
+          "dense":  [c.reshape(ca.vertcat(*[x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
           "sparse": [c.reshape(out,3,2)]
       }
     }
@@ -152,36 +152,36 @@ class ADtests(casadiTestCase):
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             self.message("eval_sx on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
-            f_in = DM(f.sparsity_in(0),n)
+            f=ca.Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
+            f_in = ca.DM(f.sparsity_in(0),n)
             r = f(f_in)
             J = self.jacobians[inputtype][outputtype](*n)
 
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
 
-            y = SX.sym("y",f.sparsity_in(0))
+            y = ca.SX.sym("y",f.sparsity_in(0))
 
-            fseeds = [DM(f.sparsity_in(0),x) for x in seeds]
-            aseeds = [DM(f.sparsity_out(0),x) for x in seeds]
+            fseeds = [ca.DM(f.sparsity_in(0),x) for x in seeds]
+            aseeds = [ca.DM(f.sparsity_out(0),x) for x in seeds]
             res = f(y)
-            fwdsens = forward([res], [y], [[x] for x in fseeds])
-            adjsens = reverse([res], [y], [[x] for x in aseeds])
+            fwdsens = ca.forward([res], [y], [[x] for x in fseeds])
+            adjsens = ca.reverse([res], [y], [[x] for x in aseeds])
             fwdsens = [x[0] for x in fwdsens]
             adjsens = [x[0] for x in adjsens]
 
-            fe = Function("fe", [y], [res])
+            fe = ca.Function("fe", [y], [res])
 
             re = fe(f_in)
 
             self.checkarray(r,re)
 
             for sens,seed in zip(fwdsens,fseeds):
-              fe = Function("fe", [y],[sens])
+              fe = ca.Function("fe", [y],[sens])
               re = fe(f_in)
               self.checkarray(c.vec(re),J @ c.vec(seed),"AD")
 
             for sens,seed in zip(adjsens,aseeds):
-              fe = Function("fe", [y],[sens])
+              fe = ca.Function("fe", [y],[sens])
               re = fe(f_in)
               self.checkarray(c.vec(re),J.T @ c.vec(seed),"AD")
 
@@ -192,36 +192,36 @@ class ADtests(casadiTestCase):
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             self.message("eval_mx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f_in = DM(f.sparsity_in(0),n)
+            f=ca.Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+            f_in = ca.DM(f.sparsity_in(0),n)
             r = f(f_in)
             J = self.jacobians[inputtype][outputtype](*n)
 
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
 
-            y = MX.sym("y",f.sparsity_in(0))
+            y = ca.MX.sym("y",f.sparsity_in(0))
 
-            fseeds = [DM(f.sparsity_in(0),x) for x in seeds]
-            aseeds = [DM(f.sparsity_out(0),x) for x in seeds]
+            fseeds = [ca.DM(f.sparsity_in(0),x) for x in seeds]
+            aseeds = [ca.DM(f.sparsity_out(0),x) for x in seeds]
             res = f(y)
-            fwdsens = forward([res],[y], [[x] for x in fseeds])
-            adjsens = reverse([res],[y], [[x] for x in aseeds])
+            fwdsens = ca.forward([res],[y], [[x] for x in fseeds])
+            adjsens = ca.reverse([res],[y], [[x] for x in aseeds])
             fwdsens = [x[0] for x in fwdsens]
             adjsens = [x[0] for x in adjsens]
 
-            fe = Function('fe', [y], [res])
+            fe = ca.Function('fe', [y], [res])
 
             re = fe(f_in)
 
             self.checkarray(r,re)
 
             for sens,seed in zip(fwdsens,fseeds):
-              fe = Function("fe", [y],[sens])
+              fe = ca.Function("fe", [y],[sens])
               re = fe(f_in)
               self.checkarray(c.vec(re),J @ c.vec(seed),"AD")
 
             for sens,seed in zip(adjsens,aseeds):
-              fe = Function("fe", [y],[sens])
+              fe = ca.Function("fe", [y],[sens])
               re = fe(f_in)
               self.checkarray(c.vec(re),J.T @ c.vec(seed),"AD")
 
@@ -233,7 +233,7 @@ class ADtests(casadiTestCase):
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             self.message("eval_sx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+            f=ca.Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f_in = [array(0)]*f.n_in();f_in[0]=n
             f_out = f.call(f_in)
             r = f_out[0]
@@ -241,17 +241,17 @@ class ADtests(casadiTestCase):
 
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
 
-            y = SX.sym("y",f.sparsity_in(0))
+            y = ca.SX.sym("y",f.sparsity_in(0))
 
-            fseeds = [DM(f.sparsity_in(0),x) for x in seeds]
-            aseeds = [DM(f.sparsity_out(0),x) for x in seeds]
+            fseeds = [ca.DM(f.sparsity_in(0),x) for x in seeds]
+            aseeds = [ca.DM(f.sparsity_out(0),x) for x in seeds]
             res = f(y)
-            fwdsens = forward([res],[y],[[x] for x in fseeds])
-            adjsens = reverse([res],[y],[[x] for x in aseeds])
+            fwdsens = ca.forward([res],[y],[[x] for x in fseeds])
+            adjsens = ca.reverse([res],[y],[[x] for x in aseeds])
             fwdsens = [x[0] for x in fwdsens]
             adjsens = [x[0] for x in adjsens]
 
-            fe = Function("fe", [y], [res])
+            fe = ca.Function("fe", [y], [res])
 
             fe_in = [array(0)]*fe.n_in();fe_in[0]=n
             fe_out = fe.call(fe_in)
@@ -259,13 +259,13 @@ class ADtests(casadiTestCase):
             self.checkarray(r,fe_out[0])
 
             for sens,seed in zip(fwdsens,fseeds):
-              fe = Function("fe", [y],[sens])
+              fe = ca.Function("fe", [y],[sens])
               fe_in = [array(0)]*fe.n_in();fe_in[0]=n
               fe_out = fe.call(fe_in)
               self.checkarray(c.vec(fe_out[0].T),J @ c.vec(seed.T),"AD")
 
             for sens,seed in zip(adjsens,aseeds):
-              fe = Function("fe", [y],[sens])
+              fe = ca.Function("fe", [y],[sens])
               fe_in = [array(0)]*fe.n_in();fe_in[0]=n
               fe_out = fe.call(fe_in)
               self.checkarray(c.vec(fe_out[0].T),J.T @ c.vec(seed.T),"AD")
@@ -277,17 +277,17 @@ class ADtests(casadiTestCase):
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             self.message("eval_sx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f_in = DM(f.sparsity_in(0),n)
+            f=ca.Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+            f_in = ca.DM(f.sparsity_in(0),n)
             r = f(f_in)
 
-            y = SX.sym("y",f.sparsity_in(0))
+            y = ca.SX.sym("y",f.sparsity_in(0))
 
             res = f(y)
-            fwdsens = forward([res],[y],[])
-            adjsens = reverse([res],[y],[])
+            fwdsens = ca.forward([res],[y],[])
+            adjsens = ca.reverse([res],[y],[])
 
-            fe = Function("fe", [y],[res])
+            fe = ca.Function("fe", [y],[res])
 
             re = f(f_in)
 
@@ -304,9 +304,9 @@ class ADtests(casadiTestCase):
               opts = {}
               opts["ad_weight"] = 0 if mode=='forward' else 1
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
-              f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype], opts)
+              f=ca.Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype], opts)
               Jf = jacobian_old(f, 0, 0)
-              J_in = DM(f.sparsity_in(0),n)
+              J_in = ca.DM(f.sparsity_in(0),n)
               Jout,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(Jout),J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
@@ -318,16 +318,16 @@ class ADtests(casadiTestCase):
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             self.message("jacobian on SX (SCT). Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            Jf=Function("Jf",
+            Jf=ca.Function("Jf",
               self.sxinputs[inputshape][inputtype],
               [
-                  jacobian(
-                    SX(self.sxoutputs[outputshape][outputtype][0]),
-                    SX(self.sxinputs[inputshape][inputtype][0])
+                  ca.jacobian(
+                    ca.SX(self.sxoutputs[outputshape][outputtype][0]),
+                    ca.SX(self.sxinputs[inputshape][inputtype][0])
                   )
               ]
             )
-            J_in = DM(Jf.sparsity_in(0),n)
+            J_in = ca.DM(Jf.sparsity_in(0),n)
             J_out = Jf(J_in)
             J = self.jacobians[inputtype][outputtype](*n)
             self.checkarray(array(J_out),J,"jacobian")
@@ -339,9 +339,9 @@ class ADtests(casadiTestCase):
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             self.message("jacsparsity on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
+            f=ca.Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             J = self.jacobians[inputtype][outputtype](*n)
-            self.checkarray(DM.ones(f.jac_sparsity(0, 0)),array(J!=0,int),"jacsparsity")
+            self.checkarray(ca.DM.ones(f.jac_sparsity(0, 0)),array(J!=0,int),"jacsparsity")
 
   def test_JacobianMX(self):
     n=array([1.2,2.3,7,4.6])
@@ -354,9 +354,9 @@ class ADtests(casadiTestCase):
               opts = {}
               opts["ad_weight"] = 0 if mode=='forward' else 1
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
-              f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
+              f=ca.Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf = jacobian_old(f, 0, 0)
-              J_in = DM(f.sparsity_in(0),n)
+              J_in = ca.DM(f.sparsity_in(0),n)
               J_out,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(J_out,J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
@@ -372,27 +372,27 @@ class ADtests(casadiTestCase):
               opts = {}
               opts["ad_weight"] = 0 if mode=='forward' else 1
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
-              f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
+              f=ca.Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf = jacobian_old(f, 0, 0)
-              J_in = DM(f.sparsity_in(0),n)
+              J_in = ca.DM(f.sparsity_in(0),n)
               J_out,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(J_out),J,"jacobian")
-              self.checkarray(array(DM.ones(f.jac_sparsity(0, 0))),array(J!=0,int),"jacsparsity")
+              self.checkarray(array(ca.DM.ones(f.jac_sparsity(0, 0))),array(J!=0,int),"jacsparsity")
 
 
 
   def test_hessian(self):
     self.message("Jacobian chaining")
-    x=SX.sym("x")
-    y=SX.sym("y")
-    z=SX.sym("z")
+    x=ca.SX.sym("x")
+    y=ca.SX.sym("y")
+    z=ca.SX.sym("z")
     n=array([1.2,2.3,7])
-    f=Function("f", [vertcat(*[x,y,z])],[vertcat(*[x+2*y**3+3*z**4])])
+    f=ca.Function("f", [ca.vertcat(*[x,y,z])],[ca.vertcat(*[x+2*y**3+3*z**4])])
     J = jacobian_old(f, 0, 0)
-    m=MX.sym("m",3,1)
+    m=ca.MX.sym("m",3,1)
     JT,_ = J(m)
-    JT = Function("JT", [m],[JT.T])
+    JT = ca.Function("JT", [m],[JT.T])
     JT(n)
     H = jacobian_old(JT, 0, 0)
     H(n)
@@ -403,16 +403,16 @@ class ADtests(casadiTestCase):
 
   def test_bugshape(self):
     self.message("shape bug")
-    x=SX.sym("x")
-    y=SX.sym("y")
+    x=ca.SX.sym("x")
+    y=ca.SX.sym("y")
 
-    inp=SX(5,1)
+    inp=ca.SX(5,1)
     inp[0,0]=x
     inp[3,0]=y
 
-    f=Function("f", [inp],[vertcat(*[x+y,x,y])])
+    f=ca.Function("f", [inp],[ca.vertcat(*[x+y,x,y])])
     J = jacobian_old(f, 0, 0)
-    J(DM(f.sparsity_in(0),[2,7]))
+    J(ca.DM(f.sparsity_in(0),[2,7]))
 
     self.assertEqual(f.size1_out(0),3,"Jacobian shape bug")
     self.assertEqual(f.size2_out(0),1,"Jacobian shape bug")
@@ -420,41 +420,41 @@ class ADtests(casadiTestCase):
 
   def test_bugglibc(self):
     self.message("Code that used to throw a glibc error")
-    x=SX.sym("x")
-    y=SX.sym("y")
+    x=ca.SX.sym("x")
+    y=ca.SX.sym("y")
 
-    inp=SX(5,1)
+    inp=ca.SX(5,1)
     inp[0,0]=x
     inp[3,0]=y
 
-    f=Function("f", [inp],[vertcat(*[x+y,x,y])])
+    f=ca.Function("f", [inp],[ca.vertcat(*[x+y,x,y])])
     J = jacobian_old(f, 0, 0)
-    J_in = DM(f.sparsity_in(0),[2,7])
+    J_in = ca.DM(f.sparsity_in(0),[2,7])
     J_out,_ = J(J_in)
 
-    f=Function("f", [inp],[vertcat(*[x+y,x,y])])
+    f=ca.Function("f", [inp],[ca.vertcat(*[x+y,x,y])])
     J = jacobian_old(f, 0, 0)
 
   @memory_heavy()
   def test_MX(self):
 
-    x = MX.sym("x",2)
-    y = MX.sym("y",2,2)
+    x = ca.MX.sym("x",2)
+    y = ca.MX.sym("y",2,2)
 
-    f1 = Function("f1", [x,y],[x+y[0,0],y @ x])
+    f1 = ca.Function("f1", [x,y],[x+y[0,0],y @ x])
     
-    f1_noninline = Function("f1", [x,y],[x+y[0,0],y @ x],{"never_inline":True})
+    f1_noninline = ca.Function("f1", [x,y],[x+y[0,0],y @ x],{"never_inline":True})
 
-    f2 = Function("f2", [x,y],[MX.zeros(0,2) @ x])
+    f2 = ca.Function("f2", [x,y],[ca.MX.zeros(0,2) @ x])
 
-    f3 = Function("f3", [x,y],[MX.zeros(0,0),y @ x])
+    f3 = ca.Function("f3", [x,y],[ca.MX.zeros(0,0),y @ x])
 
-    f4 = Function("f4", [x,y],[MX.zeros(0,2),y @ x])
+    f4 = ca.Function("f4", [x,y],[ca.MX.zeros(0,2),y @ x])
 
     ndir = 2
 
     in1 = [x,y]
-    v1 = [DM([1.1,1.3]),DM([[0.7,1.5],[2.1,0.9]])]
+    v1 = [ca.DM([1.1,1.3]),ca.DM([[0.7,1.5],[2.1,0.9]])]
 
     w=x[:]
     w[1]*=2
@@ -489,17 +489,17 @@ class ADtests(casadiTestCase):
 
 
     def remove_first(x):
-      ret = DM(x)
+      ret = ca.DM(x)
       if ret.numel()>0:
-        ret[0,0] = DM(1,1)
+        ret[0,0] = ca.DM(1,1)
         return ret.sparsity()
       else:
         return ret.sparsity()
 
     def remove_last(x):
-      ret = DM(x)
+      ret = ca.DM(x)
       if ret.nnz()>0:
-        ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DM(1,1)
+        ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = ca.DM(1,1)
         return ret.sparsity()
       else:
         return x
@@ -508,89 +508,89 @@ class ADtests(casadiTestCase):
 
     # TODO: sparse seeding
 
-    y_nz = sin(y)
-    y_nz.nz[[2,1]] = vertcat(x[1],x[0])
+    y_nz = ca.sin(y)
+    y_nz.nz[[2,1]] = ca.vertcat(x[1],x[0])
 
-    y_nzx = sin(x)
+    y_nzx = ca.sin(x)
     y_nzx.nz[1] = x[0]**2
 
-    y_nzs = sin(y)
-    y_nzs.nz[y[:,0]] = vertcat(x[1],x[0])
+    y_nzs = ca.sin(y)
+    y_nzs.nz[y[:,0]] = ca.vertcat(x[1],x[0])
 
-    y_nzxs = sin(x)
+    y_nzxs = ca.sin(x)
     y_nzxs.nz[y[1,0]] = x[0]**2
 
     # nz[] double entry
     # add
 
-    xx = horzcat(sin(x),cos(x))
+    xx = ca.horzcat(ca.sin(x),ca.cos(x))
 
     for inputs,values,out, jac, with_sx, std in [
-          (in1,v1,c.sparsity_cast(x**2,sparsify(DM([[0,1],[1,0]])).sparsity()),2*c.sparsity_cast(x,sparsify(DM([[0,0],[1,0],[0,1],[0,0]])).sparsity()),True,"c89"),
-          (in1,v1,f1_noninline.call([x**2,y])[1],y*2*vertcat(*[x.T,x.T]),True,"c89"),
-          (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[y[:,0],:],blockcat([[0,cos(x[1])],[cos(x[0]),0],[0,-sin(x[1])],[-sin(x[0]),0]]),False,"c99"),
-          (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[:,y[:,0]],blockcat([[-sin(x[0]),0],[0,-sin(x[1])],[cos(x[0]),0],[0,cos(x[1])]]),False,"c99"),
-          (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[y[:,0],y[:,0]],blockcat([[0,-sin(x[1])],[-sin(x[0]),0],[0,cos(x[1])],[cos(x[0]),0]]),False,"c99"),
-          (in1,v1,y_nz,blockcat([[MX(1,1),MX(1,1)],[1,MX(1,1)],[MX(1,1),1],[MX(1,1),MX(1,1)]]),True,"c89"),
-          (in1,v1,y_nzx,blockcat([[cos(x[0]),MX(1,1)],[2*x[0],MX(1,1)]]),True,"c89"),
-          (in1,[DM([2,1]),v1[1]],y.nz[x],DM(2,2),False,"c99"),
-          (in1,[v1[0],DM([[1,1.5],[0,0.9]])],sin(x).nz[y[:,0]],blockcat([[0,cos(x[1])],[cos(x[0]),0]]),False,"c99"),
-          (in1,[v1[0],DM([[2,1.5],[1,0.9]])],y_nzs,blockcat([[0,0],[1,0],[0,1],[0,0]]),False,"c99"),
-          (in1,[v1[0],DM([[0,1.5],[1,0.9]])],y_nzxs,blockcat([[cos(x[0]),0],[2*x[0],0]]),False,"c99"),
-          (in1,[v1[0],DM([[1,1.5],[1,0.9]])],x.nz[y[:,0]],blockcat([[0,1],[0,1]]),False,"c99"),
-          (in1,v1,x,DM.eye(2),True,"c89"),
-          (in1,v1,x.T,DM.eye(2),True,"c89"),
+          (in1,v1,c.sparsity_cast(x**2,ca.sparsify(ca.DM([[0,1],[1,0]])).sparsity()),2*c.sparsity_cast(x,ca.sparsify(ca.DM([[0,0],[1,0],[0,1],[0,0]])).sparsity()),True,"c89"),
+          (in1,v1,f1_noninline.call([x**2,y])[1],y*2*ca.vertcat(*[x.T,x.T]),True,"c89"),
+          (in1,[v1[0],ca.DM([[1,1.5],[0,0.9]])],xx[y[:,0],:],ca.blockcat([[0,ca.cos(x[1])],[ca.cos(x[0]),0],[0,-ca.sin(x[1])],[-ca.sin(x[0]),0]]),False,"c99"),
+          (in1,[v1[0],ca.DM([[1,1.5],[0,0.9]])],xx[:,y[:,0]],ca.blockcat([[-ca.sin(x[0]),0],[0,-ca.sin(x[1])],[ca.cos(x[0]),0],[0,ca.cos(x[1])]]),False,"c99"),
+          (in1,[v1[0],ca.DM([[1,1.5],[0,0.9]])],xx[y[:,0],y[:,0]],ca.blockcat([[0,-ca.sin(x[1])],[-ca.sin(x[0]),0],[0,ca.cos(x[1])],[ca.cos(x[0]),0]]),False,"c99"),
+          (in1,v1,y_nz,ca.blockcat([[ca.MX(1,1),ca.MX(1,1)],[1,ca.MX(1,1)],[ca.MX(1,1),1],[ca.MX(1,1),ca.MX(1,1)]]),True,"c89"),
+          (in1,v1,y_nzx,ca.blockcat([[ca.cos(x[0]),ca.MX(1,1)],[2*x[0],ca.MX(1,1)]]),True,"c89"),
+          (in1,[ca.DM([2,1]),v1[1]],y.nz[x],ca.DM(2,2),False,"c99"),
+          (in1,[v1[0],ca.DM([[1,1.5],[0,0.9]])],ca.sin(x).nz[y[:,0]],ca.blockcat([[0,ca.cos(x[1])],[ca.cos(x[0]),0]]),False,"c99"),
+          (in1,[v1[0],ca.DM([[2,1.5],[1,0.9]])],y_nzs,ca.blockcat([[0,0],[1,0],[0,1],[0,0]]),False,"c99"),
+          (in1,[v1[0],ca.DM([[0,1.5],[1,0.9]])],y_nzxs,ca.blockcat([[ca.cos(x[0]),0],[2*x[0],0]]),False,"c99"),
+          (in1,[v1[0],ca.DM([[1,1.5],[1,0.9]])],x.nz[y[:,0]],ca.blockcat([[0,1],[0,1]]),False,"c99"),
+          (in1,v1,x,ca.DM.eye(2),True,"c89"),
+          (in1,v1,x.T,ca.DM.eye(2),True,"c89"),
           (in1,v1,x**2,2*c.diag(x),True,"c89"),
           (in1,v1,(x**2).attachAssert(True),2*c.diag(x),True,"c89"),
           (in1,v1,(x**2).T,2*c.diag(x),True,"c89"),
-          (in1,v1,c.reshape(x,(1,2)),DM.eye(2),True,"c89"),
+          (in1,v1,c.reshape(x,(1,2)),ca.DM.eye(2),True,"c89"),
           (in1,v1,c.reshape(x**2,(1,2)),2*c.diag(x),True,"c89"),
-          (in1,v1,x+y.nz[0],DM.eye(2),True,"c89"),
-          (in1,v1,x+y[0,0],DM.eye(2),True,"c89"),
-          (in1,v1,x+x,2*DM.eye(2),True,"c89"),
-          (in1,v1,x**2+x,2*c.diag(x)+DM.eye(2),True,"c89"),
+          (in1,v1,x+y.nz[0],ca.DM.eye(2),True,"c89"),
+          (in1,v1,x+y[0,0],ca.DM.eye(2),True,"c89"),
+          (in1,v1,x+x,2*ca.DM.eye(2),True,"c89"),
+          (in1,v1,x**2+x,2*c.diag(x)+ca.DM.eye(2),True,"c89"),
           (in1,v1,x*x,2*c.diag(x),True,"c89"),
-          (in1,v1,x*y.nz[0],DM.eye(2)*y.nz[0],True,"c89"),
-          (in1,v1,x*y[0,0],DM.eye(2)*y[0,0],True,"c89"),
-          (in1,v1,x[0],DM.eye(2)[0,:],True,"c89"),
-          (in1,v1,(x**2)[0],horzcat(*[2*x[0],MX(1,1)]),True,"c89"),
-          (in1,v1,x[0]+x[1],DM.ones(1,2),True,"c89"),
-          (in1,v1,sin(repmat(x**2,1,3)),repmat(cos(c.diag(x**2))*2*c.diag(x),3,1),True,"c89"),
-          (in1,v1,sin(repsum((x**2).T,1,2)),cos(x[0]**2+x[1]**2)*2*x.T,True,"c89"),
-          (in1,v1,vertcat(*[x[1],x[0]]),sparsify(DM([[0,1],[1,0]])),True,"c89"),
-          (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DM([[0,1]])),True,"c89"),
-          (in1,v1,vertcat(*[x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),True,"c89"),
-          (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX(1,1),2*x[1]]]),True,"c89"),
-          (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX(1,1),6*x[1]**5]]),True,"c89"),
-          (in1,v1,horzcat(*[x[1],x[0]]).T,sparsify(DM([[0,1],[1,0]])),True,"c89"),
-          (in1,v1,horzcat(*[x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),True,"c89"),
-          (in1,v1,diagcat(*[x[1]**2,y,x[0]**2]),
-            blockcat(  [[MX(1,1),2*x[1]]] + ([[MX(1,1),MX(1,1)]]*14)  + [[2*x[0],MX(1,1)]] )
+          (in1,v1,x*y.nz[0],ca.DM.eye(2)*y.nz[0],True,"c89"),
+          (in1,v1,x*y[0,0],ca.DM.eye(2)*y[0,0],True,"c89"),
+          (in1,v1,x[0],ca.DM.eye(2)[0,:],True,"c89"),
+          (in1,v1,(x**2)[0],ca.horzcat(*[2*x[0],ca.MX(1,1)]),True,"c89"),
+          (in1,v1,x[0]+x[1],ca.DM.ones(1,2),True,"c89"),
+          (in1,v1,ca.sin(ca.repmat(x**2,1,3)),ca.repmat(ca.cos(c.diag(x**2))*2*c.diag(x),3,1),True,"c89"),
+          (in1,v1,ca.sin(ca.repsum((x**2).T,1,2)),ca.cos(x[0]**2+x[1]**2)*2*x.T,True,"c89"),
+          (in1,v1,ca.vertcat(*[x[1],x[0]]),ca.sparsify(ca.DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,ca.vertsplit(x,[0,1,2])[1],ca.sparsify(ca.DM([[0,1]])),True,"c89"),
+          (in1,v1,ca.vertcat(*[x[1]**2,x[0]**2]),ca.blockcat([[ca.MX(1,1),2*x[1]],[2*x[0],ca.MX(1,1)]]),True,"c89"),
+          (in1,v1,ca.vertsplit(x**2,[0,1,2])[1],ca.blockcat([[ca.MX(1,1),2*x[1]]]),True,"c89"),
+          (in1,v1,ca.vertsplit(x**2,[0,1,2])[1]**3,ca.blockcat([[ca.MX(1,1),6*x[1]**5]]),True,"c89"),
+          (in1,v1,ca.horzcat(*[x[1],x[0]]).T,ca.sparsify(ca.DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,ca.horzcat(*[x[1]**2,x[0]**2]).T,ca.blockcat([[ca.MX(1,1),2*x[1]],[2*x[0],ca.MX(1,1)]]),True,"c89"),
+          (in1,v1,ca.diagcat(*[x[1]**2,y,x[0]**2]),
+            ca.blockcat(  [[ca.MX(1,1),2*x[1]]] + ([[ca.MX(1,1),ca.MX(1,1)]]*14)  + [[2*x[0],ca.MX(1,1)]] )
           ,True,"c89"),
-          (in1,v1,horzcat(*[x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),True,"c89"),
-          (in1,v1,x[[0,1]],sparsify(DM([[1,0],[0,1]])),True,"c89"),
+          (in1,v1,ca.horzcat(*[x[1]**2,x[0]**2]).T,ca.blockcat([[ca.MX(1,1),2*x[1]],[2*x[0],ca.MX(1,1)]]),True,"c89"),
+          (in1,v1,x[[0,1]],ca.sparsify(ca.DM([[1,0],[0,1]])),True,"c89"),
           (in1,v1,(x**2)[[0,1]],2*c.diag(x),True,"c89"),
-          (in1,v1,x[[0,0,1,1]],sparsify(DM([[1,0],[1,0],[0,1],[0,1]])),True,"c89"),
-          (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX(1,1)],[2*x[0],MX(1,1)],[MX(1,1),2*x[1]],[MX(1,1),2*x[1]]]),True,"c89"),
-          (in1,v1,wwr,sparsify(DM([[2,0],[0,2]])),True,"c89"),
-          (in1,v1,x[[1,0]],sparsify(DM([[0,1],[1,0]])),True,"c89"),
-          (in1,v1,x[[1,0],0],sparsify(DM([[0,1],[1,0]])),True,"c89"),
-          (in1,v1,w,sparsify(DM([[1,0],[0,2]])),True,"c89"),
-          (in1,v1,w2,blockcat([[1,MX(1,1)],[x[1],x[0]]]),True,"c89"),
+          (in1,v1,x[[0,0,1,1]],ca.sparsify(ca.DM([[1,0],[1,0],[0,1],[0,1]])),True,"c89"),
+          (in1,v1,(x**2)[[0,0,1,1]],ca.blockcat([[2*x[0],ca.MX(1,1)],[2*x[0],ca.MX(1,1)],[ca.MX(1,1),2*x[1]],[ca.MX(1,1),2*x[1]]]),True,"c89"),
+          (in1,v1,wwr,ca.sparsify(ca.DM([[2,0],[0,2]])),True,"c89"),
+          (in1,v1,x[[1,0]],ca.sparsify(ca.DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,x[[1,0],0],ca.sparsify(ca.DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,w,ca.sparsify(ca.DM([[1,0],[0,2]])),True,"c89"),
+          (in1,v1,w2,ca.blockcat([[1,ca.MX(1,1)],[x[1],x[0]]]),True,"c89"),
           (in1,v1,ww,2*c.diag(x),True,"c89"),
-          (in1,v1,wwf,vertcat(*[x[[1,0]].T,x[[1,0]].T]),True,"c89"),
-          (in1,v1,yy[:,0],DM.eye(2),True,"c89"),
+          (in1,v1,wwf,ca.vertcat(*[x[[1,0]].T,x[[1,0]].T]),True,"c89"),
+          (in1,v1,yy[:,0],ca.DM.eye(2),True,"c89"),
           (in1,v1,yy2[:,0],2*c.diag(x),True,"c89"),
-          (in1,v1,yyy[:,0],sparsify(DM([[0,1],[1,0]])),True,"c89"),
+          (in1,v1,yyy[:,0],ca.sparsify(ca.DM([[0,1],[1,0]])),True,"c89"),
           (in1,v1,y @ x,y,True,"c89"),
           (in1,v1,x.T @ y.T,y,True,"c89"),
-          (in1,v1,mac(y,x,DM.zeros(Sparsity.triplet(2,1,[1],[0]))),y[Sparsity.triplet(2,2,[1,1],[0,1])],True,"c89"),
-          (in1,v1,mac(x.T,y.T,DM.zeros(Sparsity.triplet(2,1,[1],[0]).T)),y[Sparsity.triplet(2,2,[1,1],[0,1])],True,"c89"),
-          (in1,v1,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])] @ x,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
-          (in1,v1,x.T @ y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
-          (in1,v1,y @ x**2,y*2*vertcat(*[x.T,x.T]),True,"c89"),
-          (in1,v1,sin(x),c.diag(cos(x)),True,"c89"),
-          (in1,v1,sin(x**2),c.diag(cos(x**2)*2*x),True,"c89"),
+          (in1,v1,ca.mac(y,x,ca.DM.zeros(ca.Sparsity.triplet(2,1,[1],[0]))),y[ca.Sparsity.triplet(2,2,[1,1],[0,1])],True,"c89"),
+          (in1,v1,ca.mac(x.T,y.T,ca.DM.zeros(ca.Sparsity.triplet(2,1,[1],[0]).T)),y[ca.Sparsity.triplet(2,2,[1,1],[0,1])],True,"c89"),
+          (in1,v1,y[ca.Sparsity.triplet(2,2,[0,1,1],[0,0,1])] @ x,y[ca.Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
+          (in1,v1,x.T @ y[ca.Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T,y[ca.Sparsity.triplet(2,2,[0,1,1],[0,0,1])],True,"c89"),
+          (in1,v1,y @ x**2,y*2*ca.vertcat(*[x.T,x.T]),True,"c89"),
+          (in1,v1,ca.sin(x),c.diag(ca.cos(x)),True,"c89"),
+          (in1,v1,ca.sin(x**2),c.diag(ca.cos(x**2)*2*x),True,"c89"),
           (in1,v1,x*y[:,0],c.diag(y[:,0]),True,"c89"),
           (in1,v1,x*y.nz[[0,1]],c.diag(y.nz[[0,1]]),True,"c89"),
           (in1,v1,x*y.nz[[1,0]],c.diag(y.nz[[1,0]]),True,"c89"),
@@ -599,39 +599,39 @@ class ADtests(casadiTestCase):
           (in1,v1,c.dot(x,x),(2*x).T,True,"c89"),
           (in1,v1,c.dot(x**2,x),(3*x**2).T,True,"c89"),
           # det: linear (det = 2*x0 - x1) and nonlinear (det = x0*x1 - 1)
-          (in1,v1,c.det(horzcat(*[x,DM([1,2])])),DM([[2,-1]]),True,"c89"),
-          (in1,v1,c.det(horzcat(vertcat(x[0],1),vertcat(1,x[1]))),horzcat(x[1],x[0]),True,"c89"),
+          (in1,v1,c.det(ca.horzcat(*[x,ca.DM([1,2])])),ca.DM([[2,-1]]),True,"c89"),
+          (in1,v1,c.det(ca.horzcat(ca.vertcat(x[0],1),ca.vertcat(1,x[1]))),ca.horzcat(x[1],x[0]),True,"c89"),
           (in1,v1,f1.call(in1)[1],y,True,"c89"),
-          (in1,v1,f1.call([x**2,y])[1],y*2*vertcat(*[x.T,x.T]),True,"c89"),
-          (in1,v1,f2.call(in1)[0],DM.zeros(0,2),True,"c89"),
-          (in1,v1,f2(x**2,y),DM.zeros(0,2),True,"c89"),
-          (in1,v1,f3.call(in1)[0],DM.zeros(0,2),True,"c89"),
-          (in1,v1,f3.call([x**2,y])[0],DM.zeros(0,2),True,"c89"),
-          (in1,v1,f4.call(in1)[0],DM.zeros(0,2),True,"c89"),
-          (in1,v1,f4.call([x**2,y])[0],DM.zeros(0,2),True,"c89"),
+          (in1,v1,f1.call([x**2,y])[1],y*2*ca.vertcat(*[x.T,x.T]),True,"c89"),
+          (in1,v1,f2.call(in1)[0],ca.DM.zeros(0,2),True,"c89"),
+          (in1,v1,f2(x**2,y),ca.DM.zeros(0,2),True,"c89"),
+          (in1,v1,f3.call(in1)[0],ca.DM.zeros(0,2),True,"c89"),
+          (in1,v1,f3.call([x**2,y])[0],ca.DM.zeros(0,2),True,"c89"),
+          (in1,v1,f4.call(in1)[0],ca.DM.zeros(0,2),True,"c89"),
+          (in1,v1,f4.call([x**2,y])[0],ca.DM.zeros(0,2),True,"c89"),
           #(in1,v1,f1([x**2,[]])[1],DM.zeros(2,2),True,"c89"),
           #(in1,v1,f1([[],y])[1],DM.zeros(2,2),True,"c89"),
-          (in1,v1,vertcat(*[x,DM(0,1)]),DM.eye(2),True,"c89"),
-          (in1,v1,project(x**2, sparsify(DM([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]]),True,"c89"),
+          (in1,v1,ca.vertcat(*[x,ca.DM(0,1)]),ca.DM.eye(2),True,"c89"),
+          (in1,v1,ca.project(x**2, ca.sparsify(ca.DM([0,1])).sparsity()),ca.blockcat([[ca.MX(1,1),ca.MX(1,1)],[ca.MX(1,1),2*x[1]]]),True,"c89"),
           (in1,v1,c.dot(x,y[:,0]),y[:,0].T,True,"c89"),
-          (in1,v1,x.nz[DM([[1,0]])].T*y.nz[DM([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]]),True,"c89"),
-          (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]]),True,"c89"),
+          (in1,v1,x.nz[ca.DM([[1,0]])].T*y.nz[ca.DM([[0,2]])],ca.blockcat([[ca.MX(1,1),y.nz[0]],[y.nz[2],ca.MX(1,1)]]),True,"c89"),
+          (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],ca.blockcat([[ca.MX(1,1),y.nz[0]],[ca.MX(1,1),ca.MX(1,1)],[ca.MX(1,1),ca.MX(1,1)],[y.nz[2],ca.MX(1,1)]]),True,"c89"),
           # Kron: out = kron(x, y), shape (4, 2). jac wrt x is built column by
           # column: column-block i contains y in the rows belonging to x[i]'s
           # outer block, zeros elsewhere.
           (in1,v1,c.kron(x,y),
-                  horzcat(c.vec(vertcat(y,MX(2,2))), c.vec(vertcat(MX(2,2),y))),
+                  ca.horzcat(c.vec(ca.vertcat(y,ca.MX(2,2))), c.vec(ca.vertcat(ca.MX(2,2),y))),
                   True,"c89"),
           # Kron: swapped operand order. kron(y, x) — each y[r,s] scales an
           # eye(2) block in the column direction of the jacobian.
           (in1,v1,c.kron(y,x),
-                  vertcat(y[0,0]*DM.eye(2), y[1,0]*DM.eye(2),
-                          y[0,1]*DM.eye(2), y[1,1]*DM.eye(2)),
+                  ca.vertcat(y[0,0]*ca.DM.eye(2), y[1,0]*ca.DM.eye(2),
+                          y[0,1]*ca.DM.eye(2), y[1,1]*ca.DM.eye(2)),
                   True,"c89"),
           # KronContract inner: out = kron_contract(kron(x,y), y, True) is
           # sumsqr(y) * x by direct computation. jac wrt x = sumsqr(y) * I.
           (in1,v1,c.kron_contract(c.kron(x,y),y,True),
-                  sumsqr(y)*DM.eye(2),
+                  ca.sumsqr(y)*ca.DM.eye(2),
                   True,"c89"),
           # KronContract outer: out = kron_contract(kron(x,y), x, False) is
           # sumsqr(x) * y by direct computation. jac wrt x = 2*vec(y) @ x.T.
@@ -640,13 +640,13 @@ class ADtests(casadiTestCase):
                   True,"c89"),
 
      ]:
-      fun = Function("fun", inputs,[out])
+      fun = ca.Function("fun", inputs,[out])
       out_eval_mx = fun.call([e+1e-300 for e in inputs],True,False)[0] 
       for out in [out,out_eval_mx]:
           self.check_eval_mx(out)
-          fun = Function("fun", inputs,[out,jac])
+          fun = ca.Function("fun", inputs,[out,jac])
 
-          fun_ad = [Function("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
+          fun_ad = [ca.Function("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
 
 
           fun_out = fun.call(values)
@@ -687,9 +687,9 @@ class ADtests(casadiTestCase):
             num_out = f.n_out()
 
             # evalThings
-            for sym in [MX.sym, SX.sym]:
-              if f.is_a('MXFunction') and sym==SX.sym: continue
-              if f.is_a('SXFunction') and sym==MX.sym: continue
+            for sym in [ca.MX.sym, ca.SX.sym]:
+              if f.is_a('MXFunction') and sym==ca.SX.sym: continue
+              if f.is_a('SXFunction') and sym==ca.MX.sym: continue
 
               # dense
               for spmod,spmod2 in itertools.product(spmods,repeat=2):
@@ -698,12 +698,12 @@ class ADtests(casadiTestCase):
                 inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
 
                 res = f.call(inputss,not f.is_a("SXFunction"))
-                fwdsens = forward(res,inputss,fseeds,dict(always_inline=not f.is_a("SXFunction")))
-                adjsens = reverse(res,inputss,aseeds,dict(always_inline=not f.is_a("SXFunction")))
+                fwdsens = ca.forward(res,inputss,fseeds,dict(always_inline=not f.is_a("SXFunction")))
+                adjsens = ca.reverse(res,inputss,aseeds,dict(always_inline=not f.is_a("SXFunction")))
 
-                fseed = [DM(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
-                aseed = [DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
-                vf = Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+                fseed = [ca.DM(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
+                aseed = [ca.DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
+                vf = ca.Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
 
                 vf_in = list(values)
                 offset = len(inputss)
@@ -717,9 +717,9 @@ class ADtests(casadiTestCase):
                   vf_in.append(0)
 
                 vf_out = vf.call(vf_in)
-                if sym is MX.sym:
-                    self.check_eval_mx([vvcat(e) for e in fwdsens])
-                    self.check_eval_mx([vvcat(e) for e in adjsens])
+                if sym is ca.MX.sym:
+                    self.check_eval_mx([ca.vvcat(e) for e in fwdsens])
+                    self.check_eval_mx([ca.vvcat(e) for e in adjsens])
                 if "pow" in str(out) and os.name=='nt':
                   pass # Known bug #3038
                 else:
@@ -746,7 +746,7 @@ class ADtests(casadiTestCase):
                 random.seed(1)
                 vf_in = []
                 for i in range(vf.n_in()):
-                  vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
+                  vf_in.append(ca.DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
 
                 vf_out = vf.call(vf_in)
                 if "pow" in str(out) and os.name=='nt':
@@ -760,14 +760,14 @@ class ADtests(casadiTestCase):
                 storage[storagekey].append(vf_out)
 
                 # Added to make sure that the same seeds are used for SX and MX
-                if sym is MX.sym:
+                if sym is ca.MX.sym:
                   vf_mx = vf
 
               # Second order sensitivities
-              for sym2 in [MX.sym, SX.sym]:
+              for sym2 in [ca.MX.sym, ca.SX.sym]:
 
-                if vf.is_a('MXFunction') and sym2==SX.sym: continue
-                if vf.is_a('MXFunction') and sym2==MX.sym: continue
+                if vf.is_a('MXFunction') and sym2==ca.SX.sym: continue
+                if vf.is_a('MXFunction') and sym2==ca.MX.sym: continue
 
                 for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
                   fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]  # pyright: ignore[reportOptionalMemberAccess]
@@ -775,19 +775,19 @@ class ADtests(casadiTestCase):
                   inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]  # pyright: ignore[reportOptionalMemberAccess]
 
                   res2 = vf.call(inputss2,not vf.is_a("SXFunction"))
-                  fwdsens2 = forward(res2,inputss2,fseeds2,dict(always_inline=not vf.is_a("SXFunction")))
-                  adjsens2 = reverse(res2,inputss2,aseeds2,dict(always_inline=not vf.is_a("SXFunction")))
+                  fwdsens2 = ca.forward(res2,inputss2,fseeds2,dict(always_inline=not vf.is_a("SXFunction")))
+                  adjsens2 = ca.reverse(res2,inputss2,aseeds2,dict(always_inline=not vf.is_a("SXFunction")))
 
-                  if sym2 is MX.sym:
-                      self.check_eval_mx([vvcat(e) for e in fwdsens2])
-                      self.check_eval_mx([vvcat(e) for e in adjsens2])
+                  if sym2 is ca.MX.sym:
+                      self.check_eval_mx([ca.vvcat(e) for e in fwdsens2])
+                      self.check_eval_mx([ca.vvcat(e) for e in adjsens2])
 
-                  vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+                  vf2 = ca.Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
 
                   random.seed(1)
                   vf2_in = []
                   for i in range(vf2.n_in()):
-                    vf2_in.append(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
+                    vf2_in.append(ca.DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
 
                   vf2_out = vf2.call(vf2_in)
                   if "pow" in str(out) and os.name=='nt':
@@ -805,9 +805,9 @@ class ADtests(casadiTestCase):
             for stk,st in list(store.items()):
               for i in range(len(st)-1):
                 for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-                  if b.numel()==0 and sparsify(a).nnz()==0: continue
-                  if a.numel()==0 and sparsify(b).nnz()==0: continue
-                  self.checkarray(sparsify(a),sparsify(b),("%s, output(%d)" % (order,k)))
+                  if b.numel()==0 and ca.sparsify(a).nnz()==0: continue
+                  if a.numel()==0 and ca.sparsify(b).nnz()==0: continue
+                  self.checkarray(ca.sparsify(a),ca.sparsify(b),("%s, output(%d)" % (order,k)))
 
           for expand in [False] + ([True] if with_sx else []):
             #  jacobian()
@@ -824,8 +824,8 @@ class ADtests(casadiTestCase):
                 self.check_codegen(Jf,inputs=values,std=std,digits=codegen_check_digits)
               self.check_serialize(Jf,inputs=values)
               self.checkarray(Jf_out[0],J_)
-              self.checkarray(DM.ones(Jf.sparsity_out(0)),DM.ones(J_.sparsity()),str(out)+str(mode))
-              self.checkarray(DM.ones(f.jac_sparsity(0, 0)),DM.ones(J_.sparsity()))
+              self.checkarray(ca.DM.ones(Jf.sparsity_out(0)),ca.DM.ones(J_.sparsity()),str(out)+str(mode))
+              self.checkarray(ca.DM.ones(f.jac_sparsity(0, 0)),ca.DM.ones(J_.sparsity()))
 
           # Scalarized
           if out.is_empty(): continue
@@ -837,7 +837,7 @@ class ADtests(casadiTestCase):
           for expand in [False] + ([True] if with_sx else []):
             for mode in ["forward","reverse"]:
               w = 0 if mode=='forward' else 1
-              f = Function("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
+              f = ca.Function("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
               if expand: f=f.expand('expand_'+f.name())
               f_out = f.call(values)
               J_ = f_out[1]
@@ -854,13 +854,13 @@ class ADtests(casadiTestCase):
               self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
 
   def test_repmat(self):
-    X = MX.sym("x",2,2)
+    X = ca.MX.sym("x",2,2)
 
-    for e in[X.T+repmat(MX.zeros(2,1),1,2)]:
+    for e in[X.T+ca.repmat(ca.MX.zeros(2,1),1,2)]:
     
         for weight in [0,1]:
 
-            F = Function('f',[vec(X)],[e],{"ad_weight_sp": weight})
+            F = ca.Function('f',[ca.vec(X)],[e],{"ad_weight_sp": weight})
             J0 = F.jac_sparsity(0,0,False)
             
             J0.spy()

@@ -1,0 +1,58 @@
+# Toolchain image for the CasADi WebAssembly + JavaScript build.
+#
+# Pure toolchain ONLY -- no SWIG, no CasADi, no third-party plugins are
+# baked in.  Everything CasADi-specific (the wasm-js SWIG fork, libcasadi,
+# the Fortran/C++ third-party libraries) is built from source by the CI
+# job, so this image stays generic and rarely needs rebuilding.
+#
+# Provides:
+#   - flang targeting wasm32-unknown-emscripten (r-wasm/flang-wasm v21.1.8)
+#   - a DESCRIPTOR-ABI-PATCHED libFortranRuntime.a (see below) -- without
+#     it modern Fortran (MUMPS/IPOPT/qpoases descriptors) aborts at runtime
+#   - emsdk 5.0.7 (emcc/em++/wasm-ld + node)
+#   - flang-emcc shim + the autotools/bison/pcre deps to build SWIG and the
+#     autotools Fortran libs (MUMPS, IPOPT, ...) from source
+#
+# Build & push (see create_docker.sh):
+#   docker build -t ghcr.io/casadi/build-wasm:latest -f Dockerfile.wasm .
+#   docker push  ghcr.io/casadi/build-wasm:latest
+FROM ghcr.io/r-wasm/flang-wasm:v21.1.8@sha256:2b7a437624d6bedd5691571849930a6ef48d6e77ecb98a034bbc6b97310e31f8
+
+RUN apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      python3 python3-dev xz-utils cargo \
+      autoconf automake libtool pkg-config bison byacc yodl \
+      libpcre2-dev libpcre3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Descriptor-ABI fix.  flang's CodeGen emits Fortran array descriptors with
+# host-LP64 (8-byte) field widths while the wasm32 runtime reads 4-byte, so
+# Descriptor::rank() reads garbage and any modern Fortran (POINTER/ALLOCATE/
+# assumed-shape/intrinsics -> MUMPS/IPOPT/qpoases) aborts at runtime with
+# `flang-rt/.../pointer.cpp:46 RUNTIME_CHECK(zeroBasedDim < pointer.rank())`.
+# r-wasm only patched the function-arg path; this overwrites the stock
+# runtime with one rebuilt against the descriptor-struct fix.  The patch +
+# build recipe are vendored at misc/wasm/flang-runtime/ for reproducibility.
+COPY wasm/libFortranRuntime.patched.a /opt/flang/wasm/lib/libFortranRuntime.a
+
+# emsdk: the C/C++ compile + final wasm link toolchain.  Pin 5.0.7 (the
+# proven build's emcc); the descriptor fix above is emcc-independent.
+ENV EMSDK_DIR=/emsdk
+RUN git clone --depth=1 https://github.com/emscripten-core/emsdk.git $EMSDK_DIR && \
+    cd $EMSDK_DIR && ./emsdk install 5.0.7 && ./emsdk activate 5.0.7
+
+# Source emsdk for login shells; put the host flang driver on PATH.
+RUN echo 'source /emsdk/emsdk_env.sh > /dev/null 2>&1' >> /root/.bashrc
+ENV PATH="/opt/flang/host/bin:${PATH}"
+SHELL ["/bin/bash", "-lc"]
+
+# Fortran-for-wasm driver: autotools/libtool invoke the Fortran compiler
+# as a linker, but raw flang can't link wasm.  flang-emcc compiles with
+# flang and routes the link step through emcc (+ libFortranRuntime.a).
+# Used as FC for the autotools Fortran externals (MUMPS, IPOPT).
+COPY wasm/omp_lib_stub.f90 /opt/omp_lib_stub/omp_lib_stub.f90
+RUN source /emsdk/emsdk_env.sh > /dev/null 2>&1 && \
+    cd /opt/omp_lib_stub && \
+    /opt/flang/host/bin/flang -c omp_lib_stub.f90 -o omp_lib_stub.o
+COPY wasm/flang-emcc /usr/local/bin/flang-emcc
+RUN chmod +x /usr/local/bin/flang-emcc

@@ -5,7 +5,9 @@
 namespace casadi {
 
 AlpaqaProblem::AlpaqaProblem(const AlpaqaInterface& solver, AlpaqaMemory* mem)
-  : alpaqa::BoxConstrProblem<alpaqa::DefaultConfig>{solver.nx_, solver.ng_},
+  : alpaqa::BoxConstrProblem<alpaqa::DefaultConfig>{
+      static_cast<alpaqa::DefaultConfig::length_t>(solver.nx_),
+      static_cast<alpaqa::DefaultConfig::length_t>(solver.ng_)},
     solver_(solver), mem_(mem) {
 
 }

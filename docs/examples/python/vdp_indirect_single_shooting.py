@@ -16,72 +16,72 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-from casadi import *
+import casadi as ca
 import numpy as NP
 import matplotlib.pyplot as plt
 
 
 # Declare variables (use simple, efficient DAG)
-x0=SX.sym('x0'); x1=SX.sym('x1')
-x = vertcat(x0,x1)
+x0=ca.SX.sym('x0'); x1=ca.SX.sym('x1')
+x = ca.vertcat(x0,x1)
 
 # Control
-u = SX.sym('u')
+u = ca.SX.sym('u')
 
 # ODE right hand side
-xdot = vertcat((1 - x1*x1)*x0 - x1 + u, x0)
+xdot = ca.vertcat((1 - x1*x1)*x0 - x1 + u, x0)
 
 # Lagrangian function
 L = x0*x0 + x1*x1 + u*u
 
 # Costate
-lam = SX.sym('lam',2)
+lam = ca.SX.sym('lam',2)
 
 # Hamiltonian function
-H = dot(lam,xdot) + L
+H = ca.dot(lam,xdot) + L
 
 # Costate equations
-ldot = -gradient(H,x)
+ldot = -ca.gradient(H,x)
 
 ## The control must minimize the Hamiltonian, which is:
 print('Hamiltonian: ', H)
 
 # H is of a convex quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
-p = gradient(H,u)    # this gives us 2*u + p
-p = substitute(p,u,0) # replace u with zero: gives us p
+p = ca.gradient(H,u)    # this gives us 2*u + p
+p = ca.substitute(p,u,0) # replace u with zero: gives us p
 
 # H's unconstrained minimizer is: u = -p/2
 u_opt = -p/2
 
 # We must constrain u to the interval [-0.75, 1.0], convexity of H ensures that the optimum is obtain at the bound when u_opt is outside the interval
-u_opt = fmin(u_opt, 1.0)
-u_opt = fmax(u_opt, -0.75)
+u_opt = ca.fmin(u_opt, 1.0)
+u_opt = ca.fmax(u_opt, -0.75)
 print('optimal control: ', u_opt)
 
 # Augment f with lam_dot and substitute in the value for the optimal control
-f = vertcat(xdot,ldot)
-f = substitute(f,u,u_opt)
+f = ca.vertcat(xdot,ldot)
+f = ca.substitute(f,u,u_opt)
 
 # Function for obtaining the optimal control from the augmented state
-u_fcn = Function('ufcn', [vertcat(x,lam)], [u_opt])
+u_fcn = ca.Function('ufcn', [ca.vertcat(x,lam)], [u_opt])
 
 # Formulate the DAE
-dae = {'x':vertcat(x,lam), 'ode':f}
+dae = {'x':ca.vertcat(x,lam), 'ode':f}
 
 # Create an integrator (CVodes)
 opts = {}
 opts['abstol'] = 1e-8 # abs. tolerance
 opts['reltol'] = 1e-8 # rel. tolerance
-I = integrator('I', 'cvodes', dae, 0, 10, opts)
+I = ca.integrator('I', 'cvodes', dae, 0, 10, opts)
 
 # The initial state
 x_init = NP.array([0.,1.])
 
 # The initial costate
-l_init = MX.sym('l_init',2)
+l_init = ca.MX.sym('l_init',2)
 
 # The initial condition for the shooting
-X = vertcat(x_init, l_init)
+X = ca.vertcat(x_init, l_init)
 
 # Call the integrator
 X = I(x0=X)['xf']
@@ -91,7 +91,7 @@ lam_f = X[2:4]
 g = lam_f
 
 # Formulate root-finding problem
-rfp = Function('rfp', [l_init], [g])
+rfp = ca.Function('rfp', [l_init], [g])
 
 # Select a solver for the root-finding problem
 Solver = 'nlpsol'
@@ -106,7 +106,7 @@ if Solver=='nlpsol':
 elif Solver=='kinsol':
     opts['linear_solver_type'] = 'user_defined'
     opts['max_iter'] = 1000
-solver = rootfinder('solver', Solver, rfp, opts)
+solver = ca.rootfinder('solver', Solver, rfp, opts)
 
 # Solve the problem
 l_init_opt = solver(0)
@@ -116,7 +116,7 @@ l_init_opt = NP.array(l_init_opt.nonzeros())
 tgrid = NP.linspace(0, 10, 100)
 
 # Simulator to get optimal state and control trajectories
-simulator = integrator('simulator', 'cvodes', dae, 0, tgrid)
+simulator = ca.integrator('simulator', 'cvodes', dae, 0, tgrid)
 
 # Simulate to get the state trajectory
 sol = simulator(x0 = NP.concatenate((x_init, l_init_opt)))['xf']

@@ -25,7 +25,8 @@ The model is a semi-explicit DAE.
 Based on collocation example by Mario Zanon, Sebastien Gross 2012
 Reformulated to a semi-explict formulation and modern syntax by Joel Andersson, 2026
 """
-from casadi import *
+import casadi as ca
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from zipfile import ZipFile
@@ -39,7 +40,7 @@ fmu = None # Generate CasADi FMU
 
 if fmu is None:
     # Start with an empty DaeBuilder instance
-    dae = DaeBuilder('Crane')
+    dae = ca.DaeBuilder('Crane')
 
     # Hard coded constants
     mL = 1.  # Mass of the load
@@ -89,8 +90,8 @@ if fmu is None:
     # In CasADi, the most efficient way to do index reduction it to use forward
     # mode AD, e.g. us using Jacobian-times-vector products (jtimes):
     # Using the chain rule we have: d(res)/dt = d(res)/dx * dx/dt
-    res1 = jtimes(res, vcat(dae.inputs('x')), vcat(dae.outputs('ode')))
-    res2 = jtimes(res1, vcat(dae.inputs('x')), vcat(dae.outputs('ode')))
+    res1 = ca.jtimes(res, ca.vcat(dae.inputs('x')), ca.vcat(dae.outputs('ode')))
+    res2 = ca.jtimes(res1, ca.vcat(dae.inputs('x')), ca.vcat(dae.outputs('ode')))
     print(f'Residual equation after index reduction: {res2}')
 
     # Add algebraic equations
@@ -127,13 +128,13 @@ if fmu is None:
         print(f'Created FMU: {fmuname}')
 elif fmu == 'casadi_symbolic_fmu':
     # Use FMU generated from CasADi using the script above: Standard FMU + CasADi expressions + LS-DAE
-    dae = DaeBuilder('Crane', './Crane.fmu')
+    dae = ca.DaeBuilder('Crane', './Crane.fmu')
 elif fmu == 'casadi_blackbox_fmu':
     # Use FMU generated from CasADi using the script above: Standard FMU + LS-DAE
-    dae = DaeBuilder('Crane', './Crane.fmu', dict(enable_ls_serialization = False))
+    dae = ca.DaeBuilder('Crane', './Crane.fmu', dict(enable_ls_serialization = False))
 elif fmu == 'dymola_fmu':
     # Use FMU compiled from Modelica using Dymola
-    dae = DaeBuilder('crane', r'../../../test/data/Crane.fmu')
+    dae = ca.DaeBuilder('crane', r'../../../test/data/Crane.fmu')
 else:
     raise ValueError(f'Unknown FMU option: {fmu}')
 
@@ -176,13 +177,13 @@ h = tf/nk
 # Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes
 # by Lorenz Biegler (2010).
 # The roots can be queried from CasADi or looked up in the above textbook
-tau_root = collocation_points(deg, 'radau')
+tau_root = ca.collocation_points(deg, 'radau')
 
 # We can query the coefficient for the interpolating polynomials using a helper function
 # C: Coefficients for calculating state derivatives
 # D: Coefficients for calculating state at the end of the interval
 # B: Coefficients for calculating a quadrature at the end of the interval
-C, D, B = collocation_coeff(tau_root)
+C, D, B = ca.collocation_coeff(tau_root)
 
 # We will construct an NLP incrementally, starting with no decision variables, 
 # and constraints, and zero objective
@@ -206,7 +207,7 @@ Ygrid = []
 tk = 0
 
 # Add a variable for the initial state
-Xk = MX.sym('X0', len(X))
+Xk = ca.MX.sym('X0', len(X))
 X_all.append(Xk)
 W.append(Xk)
 Xgrid.append(tk)
@@ -214,13 +215,13 @@ Xgrid.append(tk)
 for k in range(nk):
     # Add contribution to the cost
     Dx = Xk - X_ref
-    J += dot(Dx, X_weights * Dx)
+    J += ca.dot(Dx, X_weights * Dx)
     if k > 0 and len(Y) > 0:
         # Add contribution to the cost
         Dy = Yk - Y_ref
-        J += dot(Dy, Y_weights * Dy)
+        J += ca.dot(Dy, Y_weights * Dy)
     # Symbolic expression for the control for the interval
-    Uk = MX.sym('u' + str(k), len(U))
+    Uk = ca.MX.sym('u' + str(k), len(U))
     U_all.append(Uk)
     W.append(Uk)
     Ugrid.append(tk)
@@ -230,19 +231,19 @@ for k in range(nk):
     Yc = []
     for j in range(1, deg + 1):
         # Differential state at collocation points
-        Xkj = MX.sym('X' + str(k) + '_' + str(j), len(X))
+        Xkj = ca.MX.sym('X' + str(k) + '_' + str(j), len(X))
         Xc.append(Xkj)
         X_all.append(Xkj)
         W.append(Xkj)
         Xgrid.append(tk + tau_root[j-1]*h)
         # Algebraic variables at collocation points
-        Zkj = MX.sym('Z' + str(k) + '_' + str(j), len(Z))
+        Zkj = ca.MX.sym('Z' + str(k) + '_' + str(j), len(Z))
         Zc.append(Zkj)
         Z_all.append(Zkj)
         W.append(Zkj)
         Zgrid.append(tk + tau_root[j-1]*h)
         # Output variables at collocation points
-        Ykj = MX.sym('Y' + str(k) + '_' + str(j), len(Y))
+        Ykj = ca.MX.sym('Y' + str(k) + '_' + str(j), len(Y))
         Yc.append(Ykj)
         Y_all.append(Ykj)
         W.append(Ykj)
@@ -265,7 +266,7 @@ for k in range(nk):
     for j in range(deg): Xk_end = Xk_end + D[j+1] * Xc[j]
     # New variable for the state at the end of the interval
     tk = tk + h
-    Xk = MX.sym('X' + str(k + 1), len(X))
+    Xk = ca.MX.sym('X' + str(k + 1), len(X))
     X_all.append(Xk)
     W.append(Xk)
     Xgrid.append(tk)
@@ -280,30 +281,30 @@ Ugrid.append(tk)
 
 # Add cost contribution from the final state
 Dx = Xk - Xf_ref
-J += dot(Dx, Xf_weights * Dx)
+J += ca.dot(Dx, Xf_weights * Dx)
 if len(Y) > 0:
     # Add contribution to the cost
     Dy = Yk - Yf_ref
-    J += dot(Dy, Yf_weights * Dy)
+    J += ca.dot(Dy, Yf_weights * Dy)
 
 # Concatenate vectors
-W = vcat(W)
-G = vcat(G)
+W = ca.vcat(W)
+G = ca.vcat(G)
 
 # Allocate an NLP solver
 nlp = dict(x = W, f = J, g = G)
 opts = {}
 opts["ipopt.max_iter"] = 100
 opts["ipopt.tol"] = 1e-4
-solver = nlpsol("solver", "ipopt", nlp, opts)
+solver = ca.nlpsol("solver", "ipopt", nlp, opts)
 
 # Create mappings from (X, Z, U) -> (W) and back
-X_all = hcat(X_all)
-Z_all = hcat(Z_all)
-U_all = hcat(U_all)
-Y_all = hcat(Y_all)
-to_W = Function('to_W', [X_all, Z_all, Y_all, U_all], [W], ['X', 'Z', 'Y', 'U'], ['W'])
-from_W = Function('from_W', [W], [X_all, Z_all, Y_all, U_all], ['W'], ['X', 'Z', 'Y', 'U'])
+X_all = ca.hcat(X_all)
+Z_all = ca.hcat(Z_all)
+U_all = ca.hcat(U_all)
+Y_all = ca.hcat(Y_all)
+to_W = ca.Function('to_W', [X_all, Z_all, Y_all, U_all], [W], ['X', 'Z', 'Y', 'U'], ['W'])
+from_W = ca.Function('from_W', [W], [X_all, Z_all, Y_all, U_all], ['W'], ['X', 'Z', 'Y', 'U'])
 
 # Variable bounds, initial guess: Get data structures of correct size
 [X0, Z0, Y0, U0] = from_W(0)

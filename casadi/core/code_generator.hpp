@@ -1146,6 +1146,10 @@ namespace casadi {
     // Force the external API to use canonical sparsity
     bool force_canonical;
 
+    // Route L1 ops (axpy/dot/scal/norm_1/norm_2) through the active BLAS
+    // plugin in generated code; off => built-in reference kernels.
+    bool l1_blas;
+
     // Emit thread-safe checkout/release?
     bool thread_safe_;
 

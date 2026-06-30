@@ -21,9 +21,9 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
-
 import casadi as ca
+import sys
+
 
 import subprocess
 import os
@@ -35,26 +35,80 @@ import gc
 class Daebuildertests(casadiTestCase):
 
   def test_reference_fmus(self):
-    if "ghc-filesystem" not in CasadiMeta.feature_list(): return
+    if "ghc-filesystem" not in ca.CasadiMeta.feature_list(): return
     for name in ["VanDerPol2","VanDerPol3"]:
         fmu_file = "../data/" + name + ".fmu"
         if not os.path.exists(fmu_file):
             print("Skipping test_reference_fmus, resource not available")
             return
-        dae = DaeBuilder("car",fmu_file)
+        dae = ca.DaeBuilder("car",fmu_file)
         dae.disp(True)
-        x0 = SX.sym('x0')
-        x1 = SX.sym('x1')
-        mu = SX.sym("mu")
+        x0 = ca.SX.sym('x0')
+        x1 = ca.SX.sym('x1')
+        mu = ca.SX.sym("mu")
         
-        x = vertcat(x0,x1)
+        x = ca.vertcat(x0,x1)
         c = mu
         f = dae.create('f',['x'],['ode'])
-        f_ref = Function('f',[x],[vertcat(x1,1 * ((1 - x0 * x0) * x1) - x0)])
-        test_point = [vertcat(1.1,1.3)]
-        self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3)],digits=7)
+        f_ref = ca.Function('f',[x],[ca.vertcat(x1,1 * ((1 - x0 * x0) * x1) - x0)])
+        test_point = [ca.vertcat(1.1,1.3)]
+        self.checkfunction(f,f_ref,inputs=[ca.vertcat(1.1,1.3)],digits=7)
         self.check_serialize(f,inputs=test_point)
-  
+
+  @memory_heavy() # FMU has a memleak
+  def test_fmu_export_compile_pack_roundtrip(self):
+    # Roundtrip the three packaging steps: export_fmu -> compile_fmu -> pack_fmu, then
+    # load the produced .fmu back and check it evaluates like the symbolic model.
+    feats = ca.CasadiMeta.feature_list()
+    if "ghc-filesystem" not in feats or "libzip" not in feats:
+        print("Skipping roundtrip: ghc-filesystem/libzip not available")
+        return
+    fmi_headers = "../../external_packages/FMI-Standard-3.0/headers"
+    if not os.path.exists(os.path.join(fmi_headers, "fmi3Functions.h")):
+        print("Skipping roundtrip: FMI-3 headers not available")
+        return
+
+    # Build a Van der Pol oscillator
+    dae = ca.DaeBuilder("vdp")
+    x0 = dae.add("x0")
+    x1 = dae.add("x1")
+    dae.eq(dae.der(x0), x1)
+    dae.eq(dae.der(x1), (1 - x0 * x0) * x1 - x0)
+    dae.set_start("x0", 0)
+    dae.set_start("x1", 0)
+
+    # Generate the FMU sources, compile them, and pack into a single .fmu
+    files = dae.export_fmu()
+    try:
+        files = dae.compile_fmu(files, {"include_dirs": [fmi_headers]})
+    except Exception as e:
+        # No usable C compiler: clean up the generated sources and skip
+        for local in files.keys():
+            if os.path.exists(local):
+                os.remove(local)
+        print("Skipping roundtrip: C compilation unavailable:", e)
+        return
+    fmu_file = dae.pack_fmu(files, {"path": "vdp_roundtrip.fmu"})
+    self.assertTrue(os.path.exists(fmu_file))
+    # pack_fmu removes the loose files it zipped
+    self.assertFalse(os.path.exists("vdp.c"))
+
+    # Load the packed FMU back and compare against the symbolic dynamics
+    dae2 = ca.DaeBuilder("vdp", fmu_file)
+    f = dae2.create("f", ["x"], ["ode"])
+    x0s = ca.SX.sym("x0")
+    x1s = ca.SX.sym("x1")
+    x = ca.vertcat(x0s, x1s)
+    f_ref = ca.Function("f_ref", [x], [ca.vertcat(x1s, (1 - x0s * x0s) * x1s - x0s)])
+    self.checkfunction(f, f_ref, inputs=[ca.vertcat(1.1, 1.3)], digits=7)
+
+    # Cleanup
+    f = None
+    dae2 = None
+    gc.collect()
+    if os.path.exists(fmu_file):
+        os.remove(fmu_file)
+
   @memory_heavy() # FMU has a memleak
   def test_cstr(self):
     fmu_file = "../data/cstr.fmu"
@@ -68,29 +122,29 @@ class Daebuildertests(casadiTestCase):
     import zipfile
     with zipfile.ZipFile(fmu_file, 'r') as zip_ref:
         zip_ref.extractall(unzipped_name)
-    dae = DaeBuilder("cstr",unzipped_name)
+    dae = ca.DaeBuilder("cstr",unzipped_name)
     f = dae.create('f',['x','u'],['ode'])
     # The 'aux'  funcitonality requires stats availability even without nuermical evaluation
     f.stats()
     dae = None
     
-    C_A = SX.sym('C_A')
-    C_B = SX.sym('C_B')
+    C_A = ca.SX.sym('C_A')
+    C_B = ca.SX.sym('C_B')
     V = 1
     k = 0.5
     
-    q_in = SX.sym('q_in')
-    C_A_in = SX.sym('C_A_in')
-    C_B_in = SX.sym('C_B_in')
+    q_in = ca.SX.sym('q_in')
+    C_A_in = ca.SX.sym('C_A_in')
+    C_B_in = ca.SX.sym('C_B_in')
 
-    x = vertcat(C_A,C_B)
-    u = vertcat(C_A_in,C_B_in,q_in)    
-    ode = vertcat((q_in*(C_A_in - C_A) - V*k*C_A*C_B)/V,(q_in*(C_B_in - C_B) + V*k*C_A*C_B)/V)
+    x = ca.vertcat(C_A,C_B)
+    u = ca.vertcat(C_A_in,C_B_in,q_in)    
+    ode = ca.vertcat((q_in*(C_A_in - C_A) - V*k*C_A*C_B)/V,(q_in*(C_B_in - C_B) + V*k*C_A*C_B)/V)
 
 
-    f_ref = Function('f',[x,u],[ode],['x','u'],['ode'])
+    f_ref = ca.Function('f',[x,u],[ode],['x','u'],['ode'])
     
-    test_point = [vertcat(1.1,1.3),vertcat(1.7,1.11,1.13)]
+    test_point = [ca.vertcat(1.1,1.3),ca.vertcat(1.7,1.11,1.13)]
     self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
     print(f.stats())
       
@@ -110,7 +164,7 @@ class Daebuildertests(casadiTestCase):
     import zipfile
     with zipfile.ZipFile(fmu_file, 'r') as zip_ref:
         zip_ref.extractall(unzipped_name)
-    dae = DaeBuilder("car",unzipped_name)
+    dae = ca.DaeBuilder("car",unzipped_name)
     dae.disp(True)
     
     #self.assertEqual(dae.t(),"time")
@@ -120,29 +174,29 @@ class Daebuildertests(casadiTestCase):
     self.assertEqual(dae.p(),["Fc_susp", "d_susp", "d_tire", "k_susp", "k_tire", "m_body", "m_susp"])
     self.assertEqual(dae.w(),["x_body_squared", "Deriv1", "Deriv2", "Deriv3", "Deriv4"])
     f = dae.create('f',['t','u','x'],['ode','y'])
-    t = SX.sym("t")
+    t = ca.SX.sym("t")
     
     
-    u_susp = SX.sym("u_susp")
-    v_road = SX.sym("v_road")
-    x_road = SX.sym("x_road")
-    u = vertcat(u_susp,v_road,x_road)
+    u_susp = ca.SX.sym("u_susp")
+    v_road = ca.SX.sym("v_road")
+    x_road = ca.SX.sym("x_road")
+    u = ca.vertcat(u_susp,v_road,x_road)
 
-    x_body = SX.sym("x_body")
-    x_susp = SX.sym("x_susp")
-    v_body = SX.sym("v_body")
-    v_susp = SX.sym("v_susp")
-    x = vertcat(x_body,x_susp,v_body,v_susp)
+    x_body = ca.SX.sym("x_body")
+    x_susp = ca.SX.sym("x_susp")
+    v_body = ca.SX.sym("v_body")
+    v_susp = ca.SX.sym("v_susp")
+    x = ca.vertcat(x_body,x_susp,v_body,v_susp)
 
-    Fc_susp = SX.sym("Fc_susp")
-    d_susp = SX.sym("d_susp")
-    d_tire = SX.sym("d_tire")
-    k_susp = SX.sym("k_susp")
-    k_tire = SX.sym("k_tire")
-    m_body = SX.sym("m_body")
-    m_susp = SX.sym("m_susp")
+    Fc_susp = ca.SX.sym("Fc_susp")
+    d_susp = ca.SX.sym("d_susp")
+    d_tire = ca.SX.sym("d_tire")
+    k_susp = ca.SX.sym("k_susp")
+    k_tire = ca.SX.sym("k_tire")
+    m_body = ca.SX.sym("m_body")
+    m_susp = ca.SX.sym("m_susp")
 
-    p = vertcat(Fc_susp, d_susp, d_tire, k_susp, k_tire, m_body, m_susp)
+    p = ca.vertcat(Fc_susp, d_susp, d_tire, k_susp, k_tire, m_body, m_susp)
     m_body_num = 2500
     m_susp_num = 320
     k_susp_num = 80000
@@ -150,18 +204,18 @@ class Daebuildertests(casadiTestCase):
     d_susp_num = 350
     d_tire_num = 15020
     Fc_susp_num = 100
-    p_num = vertcat(Fc_susp_num, d_susp_num, d_tire_num, k_susp_num, k_tire_num, m_body_num, m_susp_num)
+    p_num = ca.vertcat(Fc_susp_num, d_susp_num, d_tire_num, k_susp_num, k_tire_num, m_body_num, m_susp_num)
 
     road_force = k_tire*(x_road-x_susp)  + d_tire*(v_road-v_susp)
     x_body_der = v_body
     x_susp_der = v_susp
-    v_body_der = 1/m_body * (- d_susp*(v_body-v_susp) - Fc_susp*tanh(10*(v_body-v_susp)) - k_susp*(x_body-x_susp)  + u_susp)+t
-    v_susp_der = 1/m_susp * ( d_susp*(v_body-v_susp) + Fc_susp*tanh(10*(v_body-v_susp)) + k_susp*(x_body-x_susp)  + road_force - u_susp)
+    v_body_der = 1/m_body * (- d_susp*(v_body-v_susp) - Fc_susp*ca.tanh(10*(v_body-v_susp)) - k_susp*(x_body-x_susp)  + u_susp)+t
+    v_susp_der = 1/m_susp * ( d_susp*(v_body-v_susp) + Fc_susp*ca.tanh(10*(v_body-v_susp)) + k_susp*(x_body-x_susp)  + road_force - u_susp)
 
-    x_der = vertcat(x_body_der,x_susp_der,v_body_der,v_susp_der)
+    x_der = ca.vertcat(x_body_der,x_susp_der,v_body_der,v_susp_der)
     y = x_body**2
 
-    f_ref = Function('f',[t,u,x],[substitute(x_der,p,p_num),substitute(y,p,p_num)])
+    f_ref = ca.Function('f',[t,u,x],[ca.substitute(x_der,p,p_num),ca.substitute(y,p,p_num)])
     
     u_num = [0.1,0.3,1.7]
     x_num = [1.8,1.5,1.9,1.9]
@@ -170,26 +224,26 @@ class Daebuildertests(casadiTestCase):
     self.checkfunction_light(f,f_ref,inputs=[0.5,u_num,x_num])
 
     f = dae.create('f',['t','u','x','p'],['ode','y'])
-    f_ref = Function('f',[t,u,x,p],[x_der,y])
+    f_ref = ca.Function('f',[t,u,x,p],[x_der,y])
     
     self.checkfunction_light(f,f_ref,inputs=[0.5,u_num,x_num,1.1*p_num])
-    x_body_squared = SX.sym("x_body_squared")
-    Deriv1 = SX.sym("Deriv1")
-    Deriv2 = SX.sym("Deriv2")
-    Deriv3 = SX.sym("Deriv3")
-    Deriv4 = SX.sym("Deriv4")
-    w = vertcat(x_body_squared,Deriv1,Deriv2,Deriv3,Deriv4)
+    x_body_squared = ca.SX.sym("x_body_squared")
+    Deriv1 = ca.SX.sym("Deriv1")
+    Deriv2 = ca.SX.sym("Deriv2")
+    Deriv3 = ca.SX.sym("Deriv3")
+    Deriv4 = ca.SX.sym("Deriv4")
+    w = ca.vertcat(x_body_squared,Deriv1,Deriv2,Deriv3,Deriv4)
 
-    f_ref = Function('f',[t,u,x,p,w],[w[1:],w[0]])
+    f_ref = ca.Function('f',[t,u,x,p,w],[w[1:],w[0]])
     
     with self.assertInException("Unsupported input: 'w'"):
         dae.create('f',['t','u','x','p','w'],['ode','y'])
 
 
   def test_rumoca(self):
-    if "rumoca" not in CasadiMeta.feature_list(): return
-    rumoca = os.path.join(GlobalOptions.getCasadiPath(),'rumoca')
-    rumoca_exe = os.path.join(GlobalOptions.getCasadiPath(),'rumoca.exe')
+    if "rumoca" not in ca.CasadiMeta.feature_list(): return
+    rumoca = os.path.join(ca.GlobalOptions.getCasadiPath(),'rumoca')
+    rumoca_exe = os.path.join(ca.GlobalOptions.getCasadiPath(),'rumoca.exe')
     if os.path.exists(rumoca) or os.path.exists(rumoca_exe):
         p = subprocess.run([rumoca,"-t","../assets/casadi_daebuilder.jinja","-m", "../assets/hello_world.mo"]) 
 
@@ -204,14 +258,14 @@ class Daebuildertests(casadiTestCase):
     for serialize_mode in ["link","embed"]:
         for use_zip in [True]:#,False]:
             if use_zip:
-                if "ghc-filesystem" in CasadiMeta.feature_list():
+                if "ghc-filesystem" in ca.CasadiMeta.feature_list():
                     unzipped_count = len(glob.glob(unzipped_name+"*.unzipped"))
-                    dae = DaeBuilder("cstr",fmu_file,{"resource_serialize_mode": serialize_mode})
+                    dae = ca.DaeBuilder("cstr",fmu_file,{"resource_serialize_mode": serialize_mode})
                     # Unzip dir is there
                     self.assertEqual(len(glob.glob(unzipped_name+"*.unzipped")),unzipped_count+1)
                 else:
                     with self.assertInException("passing fmu files to DaeBuilder is unsupported"):
-                        dae = DaeBuilder("cstr",fmu_file)
+                        dae = ca.DaeBuilder("cstr",fmu_file)
                     continue
             else:
                 import shutil
@@ -220,19 +274,19 @@ class Daebuildertests(casadiTestCase):
                 with zipfile.ZipFile(fmu_file, 'r') as zip_ref:
                     zip_ref.extractall(unzipped_name)
                 print('Unzipped %s into %s' % (fmu_file, unzipped_path))
-                dae = DaeBuilder("cstr",unzipped_path)
+                dae = ca.DaeBuilder("cstr",unzipped_path)
             dae.disp(True)
             f = dae.create('f',['x'],['ode'])
             dae = None
             
-            x0 = SX.sym('x0')
-            x1 = SX.sym('x1')
-            mu = SX.sym("mu")
+            x0 = ca.SX.sym('x0')
+            x1 = ca.SX.sym('x1')
+            mu = ca.SX.sym("mu")
             
-            x = vertcat(x0,x1)
+            x = ca.vertcat(x0,x1)
             c = mu
-            f_ref = Function('f',[x],[vertcat(x1,1 * ((1 - x0 * x0) * x1) - x0)])
-            test_point = [vertcat(1.1,1.3)]
+            f_ref = ca.Function('f',[x],[ca.vertcat(x1,1 * ((1 - x0 * x0) * x1) - x0)])
+            test_point = [ca.vertcat(1.1,1.3)]
 
             self.checkfunction_light(f,f_ref,inputs=test_point,digits=7)
             
@@ -240,14 +294,14 @@ class Daebuildertests(casadiTestCase):
             
             f = None
             
-            f = Function.load("f.casadi")
+            f = ca.Function.load("f.casadi")
             self.checkfunction_light(f,f_ref,inputs=test_point,digits=7)
             
             # Type decay, so test twice
             f.save('f.casadi')
             self.checkfunction_light(f,f_ref,inputs=test_point,digits=7)
             f = None
-            f = Function.load("f.casadi")
+            f = ca.Function.load("f.casadi")
             self.checkfunction(f,f_ref,inputs=test_point,hessian=False,digits=7,evals=1)
             
             f = None
@@ -678,22 +732,22 @@ class Daebuildertests(casadiTestCase):
         dae.get("x1")
         dae.disp(True)
         
-        DM.rng(1)
-        x0 = DM.rand(2)
-        u0 = DM.rand()
+        ca.DM.rng(1)
+        x0 = ca.DM.rand(2)
+        u0 = ca.DM.rand()
         
         #dae.dependent_fun('f',['c','p','u','x'],['w']) # Not
         f = dae.create('f',['x','u'],['ode'],{"aux": dae.w()})
 
         r1 = f(x0,u0)
         s1 = f.stats()["aux"]
-        s1 = vertcat(s1['der(x0)'],s1['der(x1)'])
+        s1 = ca.vertcat(s1['der(x0)'],s1['der(x1)'])
 
         f.save('f.casadi')
-        f2 = Function.load('f.casadi')
+        f2 = ca.Function.load('f.casadi')
         r2 = f2(x0,u0)
         s2 = f2.stats()["aux"]
-        s2 = vertcat(s2['der(x0)'],s2['der(x1)'])
+        s2 = ca.vertcat(s2['der(x0)'],s2['der(x1)'])
                 
         self.checkarray(r1,r2)
         self.checkarray(s1,s2)
@@ -719,7 +773,7 @@ class Daebuildertests(casadiTestCase):
     c2 = dae.add('c2','local','constant')
     c2_val = 0.19
     dae.set('c2',c2_val)
-    c_val = vertcat(c0_val,c1_val,c2_val)
+    c_val = ca.vertcat(c0_val,c1_val,c2_val)
     
     dae.get('c2')
     self.checkarray(dae.get('c2'),c2_val)
@@ -745,21 +799,21 @@ class Daebuildertests(casadiTestCase):
     w0 = dae.add('w0','output','continuous')
     w1 = dae.add('w1','local','continuous')
     
-    dae.eq(w0,sin(x1))
+    dae.eq(w0,ca.sin(x1))
     dae.eq(w1,w0**2+u)
     
     x2 = dae.add('x2','local','continuous')
     x2_val = 1.11
     dae.eq(dae.der(x2),3*w1)
     
-    x_val = vertcat(x0_val,x1_val,x2_val)
+    x_val = ca.vertcat(x0_val,x1_val,x2_val)
     
 
     z0 = dae.add('z0','output','continuous')
     z1 = dae.add('z1','local','continuous')
     z0_val = 2.11
     z1_val = 3.13
-    z_val = vertcat(z0_val,z1_val)
+    z_val = ca.vertcat(z0_val,z1_val)
     
     dae.eq(0,x1-2*z0)
     dae.eq(0,x1-3*z1+z0)
@@ -779,43 +833,83 @@ class Daebuildertests(casadiTestCase):
     w_val = f(c_val,p_val,u_val,x_val)
     self.checkarray(
         w_val,
-        vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,sin(x1_val),sin(x1_val)**2+u_val,3*(sin(x1_val)**2+u_val))
+        ca.vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,ca.sin(x1_val),ca.sin(x1_val)**2+u_val,3*(ca.sin(x1_val)**2+u_val))
     )
     f = dae.create('f',['u','x'],['ode'])
     CORRECTION = 0 # Looks like a bug
     self.checkarray(
         f(u_val,x_val),
-        vertcat(x0_val*x1_val,x1_val+u_val+CORRECTION*p_val*c0_val,3*(sin(x1_val)**2+u_val))
+        ca.vertcat(x0_val*x1_val,x1_val+u_val+CORRECTION*p_val*c0_val,3*(ca.sin(x1_val)**2+u_val))
     )
     
     f = dae.create('f',['p','u','x'],['ode'])
     self.checkarray(
         f(p_val,u_val,x_val),
-        vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(sin(x1_val)**2+u_val))
+        ca.vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(ca.sin(x1_val)**2+u_val))
     )
         
     f = dae.create('f',['p','u','x','w'],['ode'])
     self.checkarray(
         f(p_val,u_val,x_val,w_val),
-        vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(sin(x1_val)**2+u_val))
+        ca.vertcat(x0_val*x1_val,x1_val+u_val+p_val*c0_val,3*(ca.sin(x1_val)**2+u_val))
     )
     CORRECTION = 1 # Why is this not 2?
     self.checkarray(
         f(p_val,u_val,x_val,2*w_val),
-        vertcat(CORRECTION*x0_val*x1_val,CORRECTION*(x1_val+u_val+p_val*c0_val),2*3*(sin(x1_val)**2+u_val))
+        ca.vertcat(CORRECTION*x0_val*x1_val,CORRECTION*(x1_val+u_val+p_val*c0_val),2*3*(ca.sin(x1_val)**2+u_val))
     )
     f = dae.create('f',['p','u','x','z'],['alg'])
     self.checkarray(
         f(p_val,u_val,x_val,z_val),
-        vertcat((-(x1_val-(2.*z0_val))),(-((x1_val-(3*z1_val))+z0_val)))
+        ca.vertcat((-(x1_val-(2.*z0_val))),(-((x1_val-(3*z1_val))+z0_val)))
     )
     f = dae.create('f',['p','u','x','z'],['y'])
     self.checkarray(
         f(p_val,u_val,x_val,z_val),
-        vertcat(c1_val,x0_val,sin(x1_val),z0_val)
+        ca.vertcat(c1_val,x0_val,ca.sin(x1_val),z0_val)
     )
     print(dae.export_fmu())
 
-    
+  @requires_modelicaparser('lacemodelica')
+  def test_basemodelica(self):
+    """Test loading .bmo files via the LaceModelica plugin."""
+    # Load from BMO file
+    dae_bmo = ca.DaeBuilder('from_bmo', '../data/DerVariable.bmo')
+
+    # Create equivalent DaeBuilder symbolically
+    dae_sym = ca.DaeBuilder('symbolic')
+    x = dae_sym.add('x', 'local', 'continuous')
+    y = dae_sym.add('y', 'local', 'continuous')
+    dx_dt = dae_sym.add('dx_dt', 'local', 'continuous')
+    dy_dt = dae_sym.add('dy_dt', 'local', 'continuous')
+    dae_sym.eq(dae_sym.der(x), -0.5 * x + y)
+    dae_sym.eq(dae_sym.der(y), x - 0.3 * y)
+    dae_sym.eq(dx_dt, dae_sym.der(x))
+    dae_sym.eq(dy_dt, dae_sym.der(y))
+
+    # Create functions and compare numerical results
+    f_bmo = dae_bmo.create('f_bmo', ['x'], ['ode'])
+    f_sym = dae_sym.create('f_sym', ['x'], ['ode'])
+
+    import numpy as np
+    for x_test in [[1.0, 2.0], [0.0, 0.0], [2.5, 1.5], [-1.0, 3.0]]:
+        self.checkfunction_light(f_bmo,f_sym,inputs=[x_test])
+
+    # Test temporary directory cleanup
+    temp_dirs = glob.glob('DerVariable.bmo.*.temp')
+    self.assertEqual(len(temp_dirs), 1)
+    temp_dir = temp_dirs[0]
+
+    # Release references and force garbage collection
+    dae_bmo = None
+    dae_sym = None
+    f_bmo = None
+    f_sym = None
+    gc.collect()
+
+    # Verify temp directory was cleaned up
+    self.assertFalse(os.path.exists(temp_dir), "Temp dir not cleaned up: {}".format(temp_dir))
+
+
 if __name__ == '__main__':
     unittest.main()

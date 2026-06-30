@@ -44,6 +44,7 @@
 #include "external_impl.hpp"
 #include "fmu_function.hpp"
 #include "blazing_spline_impl.hpp"
+#include "onnx_function_impl.hpp"
 #include "filesystem_impl.hpp"
 
 #include <cctype>
@@ -3012,6 +3013,16 @@ namespace casadi {
   }
 
   int FunctionInternal::
+  eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    // Sound fallback: we cannot prove any output zero, so mark everything active
+    for (casadi_int oind=0; oind<n_out_; ++oind) {
+      if (res[oind]==nullptr) continue;
+      std::fill_n(res[oind], nnz_out(oind), ~static_cast<bvec_t>(0));
+    }
+    return 0;
+  }
+
+  int FunctionInternal::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
     // Loop over outputs
     for (casadi_int oind=0; oind<n_out_; ++oind) {
@@ -3638,8 +3649,6 @@ namespace casadi {
   bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp, casadi_int& npar) {
     // Matching dimensions
     if (arg.size()==inp.size()) return true;
-    // Calling with empty matrix - set all to zero
-    if (arg.is_empty()) return true;
     // Calling with a scalar - set all
     if (arg.is_scalar()) return true;
     // Vectors that are transposes of each other
@@ -3647,13 +3656,15 @@ namespace casadi {
     // Horizontal repmat
     if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && inp.size2()%arg.size2()==0) return true;
-    if (npar==-1) return false;
     // Evaluate with multiple arguments
-    if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+    if (npar!=-1 && arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && arg.size2()%(npar*inp.size2())==0) {
       npar *= arg.size2()/(npar*inp.size2());
       return true;
     }
+    // Calling with empty matrix - set all to zero (after the structured branches above,
+    // so that a 0-by-N argument can still be recognised as a parallel/repmat call)
+    if (arg.is_empty()) return true;
     // No match
     return false;
   }
@@ -3919,12 +3930,10 @@ namespace casadi {
     return f.which_depends(s_in, s_out, order, tr);
   }
 
-  Function FunctionInternal::simplify(const std::string& name, const Dict& opts) const {
-    if (name==name_) {
-      return self();
-    } else {
-      return wrap(name);
-    }
+  Function FunctionInternal::simplify_passes(
+      const std::vector<std::pair<std::string, casadi_int> >& tasks) const {
+    casadi_assert(tasks.empty(), "simplify passes not supported for " + class_name());
+    return self();
   }
 
   const Function& FunctionInternal::oracle() const {
@@ -4416,7 +4425,8 @@ namespace casadi {
     {"External", External::deserialize},
     {"Conic", Conic::deserialize},
     {"FmuFunction", FmuFunction::deserialize},
-    {"BlazingSplineFunction", BlazingSplineFunction::deserialize}
+    {"BlazingSplineFunction", BlazingSplineFunction::deserialize},
+    {"Onnx", OnnxFunction::deserialize}
   };
 
 } // namespace casadi

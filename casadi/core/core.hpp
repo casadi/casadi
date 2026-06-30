@@ -50,6 +50,9 @@
 #include "integrator.hpp"
 #include "conic.hpp"
 #include "nlpsol.hpp"
+#include "onnx_function.hpp"
+#include "graph_model.hpp"
+#include "graph_builder.hpp"
 #include "rootfinder.hpp"
 #include "linsol.hpp"
 #include "dple.hpp"
@@ -57,6 +60,7 @@
 #include "interpolant.hpp"
 #include "external.hpp"
 #include "blazing_spline.hpp"
+#include "modelica_parser.hpp"
 
 // Misc
 #include "integration_tools.hpp"

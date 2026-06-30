@@ -545,7 +545,7 @@ namespace casadi {
     m->d.prob = &p_;
     m->d.nlp = &m->d_nlp;
 
-    casadi_fatrop_init(&m->d, &arg, &res, &iw, &w);
+    casadi_fatrop_set_work(&m->d, &arg, &res, &iw, &w);
 
     m->d.nlp->oracle->m = static_cast<void*>(m);
 
@@ -555,6 +555,8 @@ namespace casadi {
   int FatropInterface::solve(void* mem) const {
     auto m = static_cast<FatropMemory*>(mem);
 
+    // Cache the solver: presolve (re)creates it only when needed
+    bool new_solver = (m->d.solver == 0);
     // fatrop_ocp_c_create (called from casadi_fatrop_presolve) installs a
     // process-wide singleton stream via fatrop::OutputStreamManager::set_stream,
     // which is not thread-safe. Serialize across threads.
@@ -566,27 +568,30 @@ namespace casadi {
       casadi_fatrop_presolve(&m->d);
     }
 
-    for (const auto& kv : opts_) {
-      switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
-        case 0:
-          fatrop_ocp_c_set_option_double(m->d.solver, kv.first.c_str(), kv.second);
-          break;
-        case 1:
-          fatrop_ocp_c_set_option_int(m->d.solver, kv.first.c_str(), kv.second.to_int());
-          break;
-        case 2:
-          fatrop_ocp_c_set_option_bool(m->d.solver, kv.first.c_str(), kv.second.to_bool());
-          break;
-        case 3:
-          {
-            std::string s = kv.second.to_string();
-            fatrop_ocp_c_set_option_string(m->d.solver, kv.first.c_str(), s.c_str());
-          }
-          break;
-        case -1:
-          casadi_error("Fatrop option not supported: " + kv.first);
-        default:
-          casadi_error("Unknown option type.");
+    // Set options only when a new solver was created (options persist across solves)
+    if (new_solver) {
+      for (const auto& kv : opts_) {
+        switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
+          case 0:
+            fatrop_ocp_c_set_option_double(m->d.solver, kv.first.c_str(), kv.second);
+            break;
+          case 1:
+            fatrop_ocp_c_set_option_int(m->d.solver, kv.first.c_str(), kv.second.to_int());
+            break;
+          case 2:
+            fatrop_ocp_c_set_option_bool(m->d.solver, kv.first.c_str(), kv.second.to_bool());
+            break;
+          case 3:
+            {
+              std::string s = kv.second.to_string();
+              fatrop_ocp_c_set_option_string(m->d.solver, kv.first.c_str(), s.c_str());
+            }
+            break;
+          case -1:
+            casadi_error("Fatrop option not supported: " + kv.first);
+          default:
+            casadi_error("Unknown option type.");
+        }
       }
     }
 
@@ -693,9 +698,12 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
   g.local("p", "struct casadi_fatrop_prob");
   set_fatrop_prob(g);
 
-  g << "casadi_fatrop_init(d, &arg, &res, &iw, &w);\n";
-  g << "casadi_oracle_init(d->nlp->oracle, &arg, &res, &iw, &w);\n";
+  g << "casadi_fatrop_set_work(d, &arg, &res, &iw, &w);\n";
+  g << "casadi_oracle_set_work(d->nlp->oracle, &arg, &res, &iw, &w);\n";
 
+  // Cache the solver: presolve (re)creates it only when needed
+  g << "{\n";
+  g << "int new_solver = (d->solver == 0);\n";
   // fatrop_ocp_c_create (called from casadi_fatrop_presolve) installs a
   // process-wide singleton stream via fatrop::OutputStreamManager::set_stream,
   // which is not thread-safe. Serialize across threads.
@@ -710,6 +718,7 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
   } else {
     g << "casadi_fatrop_presolve(d);\n";
   }
+  g << "if (new_solver) {\n";
 
   for (const auto& kv : opts_) {
     switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
@@ -739,7 +748,8 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
     }
   }
 
-  // Options
+  g << "}\n";
+  g << "}\n";
   g << "casadi_fatrop_solve(d);\n";
 
   codegen_body_exit(g);

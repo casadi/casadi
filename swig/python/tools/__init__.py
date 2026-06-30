@@ -45,8 +45,8 @@ def loadAllCompiledPlugins():
     if "SKIP_" + name.upper() + "_TESTS" in os.environ:
         print("Skipping")
         continue
-    if cls in ("XmlFile"):
-      pass
+    if cls in ("XmlFile", "Onnx"):
+      pass  # Onnx runtime backend has no load_onnx free function
     elif cls in ("Importer","Linsol"):
       getattr(casadi,cls).load_plugin(name)
     else:

@@ -122,7 +122,8 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   Value aux_value_;
 
   // Name of system, per the FMI specification
-  std::string system_infix() const override;
+  static std::string dll_infix();
+  std::string system_infix() const override { return dll_infix(); }
 
   // New memory object
   void* instantiate() const override;

@@ -24,14 +24,14 @@
 # veccat
 #======================
 
-from casadi import *
+import casadi as ca
 from numpy import *
 
-A = MX.sym("A",2)           # Here a matrix
-B = MX.sym("B",2,1)         # There a matrix
-C = MX.sym("C")             # And an other little matrix
-D = MX.sym("D",Sparsity.lower(4))  # Triangular matrix
+A = ca.MX.sym("A",2)           # Here a matrix
+B = ca.MX.sym("B",2,1)         # There a matrix
+C = ca.MX.sym("C")             # And an other little matrix
+D = ca.MX.sym("D",ca.Sparsity.lower(4))  # Triangular matrix
 
 
-L = veccat(A,B,C,D)
+L = ca.veccat(A,B,C,D)
 print(L)

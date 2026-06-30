@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+import casadi as ca
 import casadi as c
 import numpy
 import unittest
@@ -53,15 +53,15 @@ class Feasiblesqpmethod:#(casadiTestCase):
       opts["qpsol_options.nlpsol_options.ipopt.sb"] = "yes"
       opts["qpsol_options.nlpsol_options.print_time"] = 0
 
-      x = SX.sym("x")
-      y = SX.sym("y")
+      x = ca.SX.sym("x")
+      y = ca.SX.sym("y")
       f = x**2 + (y-2)**2
       g = x**2 + y**2
-      nlp = {"x": vertcat(x,y), "f": f, "g": g}
+      nlp = {"x": ca.vertcat(x,y), "f": f, "g": g}
 
       # Create an NLP solver
       # Function solver = nlpsol("solver", "sqpmethod", nlp, opts)
-      solver = nlpsol("solver", "feasiblesqpmethod", nlp, opts)
+      solver = ca.nlpsol("solver", "feasiblesqpmethod", nlp, opts)
 
       # Solve the problem
       arg = {}
@@ -70,7 +70,7 @@ class Feasiblesqpmethod:#(casadiTestCase):
       arg["ubg"] = 4
       res = solver(**arg)
       self.assertEqual(solver.stats()["iter_count"],9)
-      self.checkarray(res["x"],vertcat(0,2),digits=7)
+      self.checkarray(res["x"],ca.vertcat(0,2),digits=7)
 
   def test_local_conv_test(self):
       """
@@ -95,14 +95,14 @@ class Feasiblesqpmethod:#(casadiTestCase):
       opts["qpsol_options.nlpsol_options.ipopt.sb"] = "yes"
       opts["qpsol_options.nlpsol_options.print_time"] = 0
 
-      x = SX.sym("x")
-      f = log(exp(x) + exp(-x))
+      x = ca.SX.sym("x")
+      f = ca.log(ca.exp(x) + ca.exp(-x))
       g = x
       nlp = {"x": x, "f": f, "g": g}
 
       # Create an NLP solver
       # Function solver = nlpsol("solver", "sqpmethod", nlp, opts)
-      solver = nlpsol("solver", "feasiblesqpmethod", nlp, opts)
+      solver = ca.nlpsol("solver", "feasiblesqpmethod", nlp, opts)
 
       print("Here goes the non-converging initial point for local SQP")
       # Solve the problem
@@ -151,14 +151,14 @@ class Feasiblesqpmethod:#(casadiTestCase):
           opts["qpsol_options.nlpsol_options.ipopt.sb"] = "yes"
           opts["qpsol_options.nlpsol_options.print_time"] = 0
 
-          x = SX.sym("x")
+          x = ca.SX.sym("x")
           f = 2.0*(x+4)**2+2
           g = x
           nlp = {"x": x, "f": f, "g": g}
 
           # Create an NLP solver
           # Function solver = nlpsol("solver", "sqpmethod", nlp, opts)
-          solver = nlpsol("solver", "feasiblesqpmethod", nlp, opts)
+          solver = ca.nlpsol("solver", "feasiblesqpmethod", nlp, opts)
 
           # Solve the problem
           arg = {}

@@ -1,0 +1,55 @@
+<!doctype html>
+<!--
+  Per-example page template.  To make a page for `foo.js`, copy this
+  file to `foo.html` and replace every rocket with `foo`.
+
+  Run it: this page must be SERVED OVER HTTP (not opened as file://),
+  and the casadi build artifacts (casadi.js, casadi_wasm.js,
+  casadi_wasm.wasm, casadi_wasm.data) must be reachable.  The simplest
+  setup, from this directory:
+
+      ln -sf ../../../build-wasm/swig/wasm-js/casadi*.{js,wasm,data} .
+      python3 -m http.server 8000
+      # open http://localhost:8000/rocket.html
+
+  If the artifacts live elsewhere, point at them with a query string:
+      http://localhost:8000/rocket.html?casadi=/path/to/wasm-js/
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>rocket — CasADi (JavaScript / WebAssembly)</title>
+<style>
+  body { font: 14px/1.5 ui-monospace, Menlo, Consolas, monospace; margin: 2rem; max-width: 64rem; color: #222; }
+  h1 { font-size: 1.15rem; } a { color: #1565c0; }
+  #out { background: #f5f5f5; border: 1px solid #ddd; padding: 1rem; white-space: pre-wrap; min-height: 4rem; }
+  button { font: inherit; padding: .3rem .8rem; margin-bottom: .6rem; }
+  .err { color: #c62828; }
+</style>
+</head>
+<body>
+<h1>CasADi example: <code>rocket</code></h1>
+<p>Source: <a href="rocket.js">rocket.js</a> — runs entirely in your browser via WebAssembly.</p>
+<button id="run" disabled>Run again</button>
+<div id="out">Loading casadi.wasm…</div>
+
+<script src="_casadi_browser.js"></script>
+<script src="rocket.js"></script>
+<script>
+  const out = document.getElementById("out");
+  const btn = document.getElementById("run");
+  const log = (...a) => { out.textContent += a.join(" ") + "\n"; };
+  const base = new URLSearchParams(location.search).get("casadi") || "./";
+  const run = (ca) => { out.textContent = ""; return example(ca, log); };
+
+  loadCasadi(base).then((ca) => {
+    btn.disabled = false;
+    btn.onclick = () => run(ca).catch((e) => log("FATAL: " + (e.message || e)));
+    return run(ca);
+  }).catch((e) => {
+    out.textContent = "Failed to load casadi: " + (e.message || e);
+    out.className = "err";
+  });
+</script>
+</body>
+</html>

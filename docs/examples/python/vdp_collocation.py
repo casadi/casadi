@@ -17,7 +17,7 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # -*- coding: utf-8 -*-
-from casadi import *
+import casadi as ca
 from numpy import inf
 import numpy as NP
 import matplotlib.pyplot as plt
@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 d = 3
 
 # Choose collocation points
-tau_root = [0] + collocation_points(d, "radau")
+tau_root = [0] + ca.collocation_points(d, "radau")
 
 # Coefficients of the collocation equation
 C = NP.zeros((d+1,d+1))
@@ -73,15 +73,15 @@ for k in range(nk):
     T[k,j] = h*(k + tau_root[j])
 
 # Declare variables (use scalar graph)
-t  = SX.sym("t")    # time
-u  = SX.sym("u")    # control
-x  = SX.sym("x",2)  # state
+t  = ca.SX.sym("t")    # time
+u  = ca.SX.sym("u")    # control
+x  = ca.SX.sym("x",2)  # state
 
 # ODE rhs function and quadratures
-xdot = vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, \
+xdot = ca.vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, \
                x[0])
 qdot = x[0]*x[0] + x[1]*x[1] + u*u
-f = Function('f', [t,x,u],[xdot, qdot])
+f = ca.Function('f', [t,x,u],[xdot, qdot])
 
 # Control bounds
 u_min = -0.75
@@ -112,7 +112,7 @@ NXF = nx                # Final state
 NV = NX+NU+NXF
 
 # NLP variable vector
-V = MX.sym("V",NV)
+V = ca.MX.sym("V",NV)
   
 # All variables with bounds and initial guess
 vars_lb = NP.zeros(NV)
@@ -121,8 +121,8 @@ vars_init = NP.zeros(NV)
 offset = 0
 
 # Get collocated states and parametrized control
-X = NP.resize(NP.array([],dtype=MX),(nk+1,d+1))
-U = NP.resize(NP.array([],dtype=MX),nk)
+X = NP.resize(NP.array([],dtype=ca.MX),(nk+1,d+1))
+U = NP.resize(NP.array([],dtype=ca.MX),nk)
 for k in range(nk):  
   # Collocated states
   for j in range(d+1):
@@ -194,7 +194,7 @@ for k in range(nk):
   ubg.append(NP.zeros(nx))
   
 # Concatenate constraints
-g = vertcat(*g)
+g = ca.vertcat(*g)
   
 # NLP
 nlp = {'x':V, 'f':J, 'g':g}
@@ -210,7 +210,7 @@ opts["expand"] = True
 opts["ipopt.linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = nlpsol("solver", "ipopt", nlp, opts)
+solver = ca.nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
   
 # Initial condition

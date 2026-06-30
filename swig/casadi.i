@@ -65,6 +65,8 @@
 %define %stub_alias_out(NAME, TYPES...) %enddef
 %define %stub_alias_in_key(KEY, TYPES...) %enddef
 %define %stub_alias_out_key(KEY, TYPES...) %enddef
+%define %ts_alias_in(NAME) %enddef
+%define %ts_alias_out(NAME) %enddef
 #endif
 
   /// Data structure in the target language holding data
@@ -72,6 +74,10 @@
 #define GUESTOBJECT PyObject
 #elif defined(SWIGMATLAB)
 #define GUESTOBJECT mxArray
+#elif defined(SWIGWASMJS)
+#define GUESTOBJECT casadi_emval_struct
+#elif defined(SWIGJULIA)
+#define GUESTOBJECT jl_value_t
 #else
 #define GUESTOBJECT void
 #endif
@@ -318,14 +324,9 @@
 
 import contextlib
 
-class _copyableObject(object):
-  def __copy__(self):
-    return self.__class__(self)
-
-  def __deepcopy__(self,dummy=None):
-    return self.__class__(self)
-
-_object = object = _copyableObject
+# copy / deepcopy support is added to the casadi value types via
+# `%extend PrintableCommon` (their common base), not by shadowing the global
+# `object` -- see further down in this file.
 
 _swig_repr_default = _swig_repr
 def _swig_repr(self):
@@ -475,9 +476,8 @@ namespace std {
 %include "doc.i"
 
 
-// Note: Only from 3.0.0 onwards,
-// DirectorException inherits from std::exception
-#if SWIG_VERSION >= 0x030000
+// casadi requires SWIG >= 3.0 (Swig::DirectorException inherits from
+// std::exception there, so the std::exception catch already covers it).
 // Exceptions handling
 %include "exception.i"
 %exception {
@@ -507,43 +507,6 @@ namespace std {
    SWIG_exception(SWIG_TypeError, e.what());
   }
 }
-#else
-// Exceptions handling
-%include "exception.i"
-%exception {
-  try {
-    $action
-   } catch(const std::exception& e) {
-    SWIG_exception(SWIG_RuntimeError, e.what());
-   } catch (const Swig::DirectorException& e) {
-    SWIG_exception(SWIG_TypeError, e.getMessage());
-   }
-}
-
-// Python sometimes takes an approach to not check, but just try.
-// It expects a python error to be thrown.
-%exception __int__ {
-  try {
-    $action
-  } catch (const std::exception& e) {
-    SWIG_exception(SWIG_RuntimeError, e.what());
-  } catch (const Swig::DirectorException& e) {
-    SWIG_exception(SWIG_TypeError, e.getMessage());
-  }
-}
-
-// See https://github.com/casadi/casadi/issues/701
-// Recent numpys will only catch TypeError or ValueError in printing logic
-%exception __bool__ {
- try {
-    $action
-  } catch (const std::exception& e) {
-   SWIG_exception(SWIG_TypeError, e.what());
-  } catch (const Swig::DirectorException& e) {
-    SWIG_exception(SWIG_TypeError, e.getMessage());
-  }
-}
-#endif
 
 #ifdef SWIGPYTHON
 %feature("director:except") {
@@ -659,6 +622,29 @@ namespace std {
 
     // Same as to_ptr, but with pointer instead of pointer to pointer
     template<typename M> bool to_val(GUESTOBJECT *p, M* m);
+
+#ifdef SWIGWASMJS
+    // Catch-all to_ptr for unregistered classes (SharedObject base, ...):
+    // accepts an instance already carrying `_ptr`.  Explicit overloads
+    // win via normal C++ overload resolution.
+    template<typename M> bool to_ptr(GUESTOBJECT *p, M** m) {
+      if (is_null(p)) return false;
+      void* raw = 0;
+      if (!SWIG_IsOK(SWIG_ConvertPtr(p, &raw, 0, 0))) return false;
+      if (m) *m = static_cast<M*>(raw);
+      return true;
+    }
+#endif
+#ifdef SWIGJULIA
+    // Catch-all to_ptr: accepts a Julia proxy carrying a ptr field.
+    template<typename M> bool to_ptr(GUESTOBJECT *p, M** m) {
+      if (is_null(p)) return false;
+      void* raw = 0;
+      if (!SWIG_IsOK(SWIG_ConvertPtr(p, &raw, 0, 0))) return false;
+      if (m) *m = static_cast<M*>(raw);
+      return true;
+    }
+#endif
 
     // Check if conversion is possible
     template<typename M> bool can_convert(GUESTOBJECT *p) { return to_ptr(p, static_cast<M**>(0));}
@@ -899,6 +885,20 @@ namespace std {
 #ifdef SWIGMATLAB
       if (p == 0) return true;
 #endif
+#ifdef SWIGJULIA
+      if (!p) return true;
+      return jl_is_nothing(p);
+#endif
+#ifdef SWIGWASMJS
+      // EM_VAL == 0 is the uninitialized handle.  Otherwise inspect the
+      // val with borrow semantics (take + release ownership) so the
+      // caller's refcount stays intact.
+      if (!p) return true;
+      emscripten::val v = emscripten::val::take_ownership(p);
+      bool nul = v.isNull() || v.isUndefined();
+      v.release_ownership();
+      return nul;
+#endif
       return false;
     }
 
@@ -968,6 +968,14 @@ namespace std {
       return PyBool_FromLong(*a);
 #elif defined(SWIGMATLAB)
       return mxCreateLogicalScalar(*a);
+#elif defined(SWIGWASMJS)
+      // Pack as EM_VAL of a JS boolean.  Used by director paths and by
+      // GenericType variant-dispatch when the variant is OT_BOOL.
+      emscripten::val v(static_cast<bool>(*a));
+      return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
+#elif defined(SWIGJULIA)
+      // Box as a Julia Bool; used by director-in paths.
+      return jl_box_bool(*a);
 #else
       return 0;
 #endif
@@ -1020,6 +1028,17 @@ namespace std {
       return PyLong_FromLongLong(*a);
 #elif defined(SWIGMATLAB)
       return mxCreateDoubleScalar(static_cast<double>(*a));
+#elif defined(SWIGWASMJS)
+      // Pack as EM_VAL of a JS Number when in safe-integer range, BigInt
+      // otherwise.  Mirrors how the rest of the wasm-js boundary surfaces
+      // casadi_int -- JS callers tolerate either form.
+      emscripten::val v = (*a >  9007199254740992LL || *a < -9007199254740992LL)
+          ? emscripten::val(static_cast<long long>(*a))   // -> BigInt
+          : emscripten::val(static_cast<double>(*a));     // -> Number
+      return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
+#elif defined(SWIGJULIA)
+      // Box as a Julia Int64; used by director-in paths (e.g. get_sparsity_in).
+      return jl_box_int64(static_cast<int64_t>(*a));
 #else
       return 0;
 #endif
@@ -1066,6 +1085,12 @@ namespace std {
       return PyFloat_FromDouble(*a);
 #elif defined(SWIGMATLAB)
       return mxCreateDoubleScalar(*a);
+#elif defined(SWIGWASMJS)
+      emscripten::val v(*a);
+      return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
+#elif defined(SWIGJULIA)
+      // Box as a Julia Float64; used by director-in paths.
+      return jl_box_float64(*a);
 #else
       return 0;
 #endif
@@ -1076,6 +1101,7 @@ namespace std {
 
 %fragment("casadi_vector", "header", fragment="casadi_aux") {
   namespace casadi {
+
 
 #ifdef SWIGMATLAB
 
@@ -1288,10 +1314,111 @@ namespace std {
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m) {
       // Treat Null
       if (is_null(p)) return false;
+#ifdef SWIGJULIA
+      if (jl_is_array(p)) {
+        jl_array_t* a = (jl_array_t*)p;
+        size_t n = jl_array_len(a);
+        if (m) (**m).resize(n);
+        jl_function_t* getindex_f = jl_get_function(jl_base_module, "getindex");
+        for (size_t i = 0; i < n; ++i) {
+          jl_value_t* el = 0; jl_value_t* idx = 0;
+          JL_GC_PUSH2(&el, &idx);
+          idx = jl_box_int64((int64_t)(i + 1));
+          el = jl_call2(getindex_f, p, idx);
+          bool ok = el != 0;
+          if (ok) {
+            M tmp; M* tmp_p = &tmp;
+            ok = ::casadi::to_ptr(el, &tmp_p);
+            if (ok && m) (**m)[i] = *tmp_p;
+          }
+          JL_GC_POP();
+          if (!ok) return false;
+        }
+        return true;
+      }
+      return false;
+#endif
+#ifdef SWIGWASMJS
+      {
+        emscripten::val v = emscripten::val::take_ownership(
+            reinterpret_cast< ::emscripten::EM_VAL >(p));
+        bool is_arr = v.isArray();
+        bool is_obj = (v.typeOf().as<std::string>() == "object") && !is_arr;
+        if (is_obj && v.hasOwnProperty("_ptr")) {
+          // Only SWIG-tagged std::vector<...> proxies: without the tag
+          // check, ANY `_ptr` proxy (Function, Callback, ...) would be
+          // reinterpret-cast as vector<M>*.
+          emscripten::val swig_t = v["_swig_type"];
+          bool is_vec_proxy =
+              (swig_t.typeOf().as<std::string>() == "string") &&
+              (swig_t.as<std::string>().rfind("_p_std__vectorT_", 0) == 0);
+          if (is_vec_proxy) {
+            uintptr_t raw = v["_ptr"].as<uintptr_t>();
+            v.release_ownership();
+            if (m) *m = reinterpret_cast<std::vector<M>*>(raw);
+            return true;
+          }
+          v.release_ownership();
+          return false;
+        }
+        if (is_arr) {
+          unsigned n = v["length"].as<unsigned>();
+          if (m) (*m)->resize(n);
+          bool ok = true;
+          for (unsigned i = 0; i < n && ok; ++i) {
+            emscripten::val el = v[i];
+            ::emscripten::EM_VAL eh = el.as_handle();
+            if (!m) {
+              // Probe: tagged proxy must validate via SWIG_ConvertPtr
+              // with the M descriptor (cast-chain check, no fuzzy).
+              // Untagged values (number, array) fall through to fuzzy
+              // to_ptr<M> below.
+              emscripten::val elv = emscripten::val::take_ownership(eh);
+              emscripten::val elt = elv["_swig_type"];
+              bool tagged = (elt.typeOf().as<std::string>() == "string");
+              elv.release_ownership();
+              if (tagged) {
+                void* raw = 0;
+                M* probe_typed = 0;
+                M sentinel;
+                probe_typed = &sentinel;
+                M* before = probe_typed;
+                bool accept = ::casadi::to_ptr(reinterpret_cast<GUESTOBJECT*>(eh), &probe_typed);
+                if (!accept || probe_typed == before) ok = false;
+              } else {
+                M tmp;
+                M* tmp_p = &tmp;
+                if (!::casadi::to_ptr(reinterpret_cast<GUESTOBJECT*>(eh), &tmp_p)) ok = false;
+              }
+            } else {
+              M tmp;
+              M* tmp_p = &tmp;
+              if (!::casadi::to_ptr(reinterpret_cast<GUESTOBJECT*>(eh), &tmp_p)) {
+                ok = false;
+              } else {
+                (**m)[i] = *tmp_p;
+              }
+            }
+          }
+          v.release_ownership();
+          return ok;
+        }
+        v.release_ownership();
+        return false;
+      }
+#endif
 #ifdef SWIGPYTHON
 
       // Some built-in types are iterable
       if (PyDict_Check(p) || PyString_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
+
+      // An object exposing a casadi conversion hook is a SINGLE matrix, not
+      // a sequence of them -- don't iterate it as a vector.  (A 1-D numeric-
+      // like iterable such as the experimental NumpyArray would otherwise be
+      // walked element-by-element with float()/int(), which throws on a
+      // symbolic element and can crash the interpreter mid-iteration.)
+      if (PyObject_HasAttrString(p, "__MX__") || PyObject_HasAttrString(p, "__SX__")
+          || PyObject_HasAttrString(p, "__DM__")) return false;
 
       // Make sure shape is 1D, if defined.
       if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
@@ -1366,8 +1493,42 @@ namespace std {
       return mxCreateCharMatrixFromStrings(str.size(), str.empty() ? 0 : &str[0]);
     }
 #endif // SWIGMATLAB
+// No wasm-js from_ptr(const std::vector<std::string>*) on purpose: the
+// generic from_ptr<std::vector<M>> carrier path handles returns; a JS-array
+// overload would break the `_ptr` wrapping.  Director paths opt into
+// JS-array form via %casadi_director_vec_str (registered later, wins).
+
+#ifdef SWIGWASMJS
+    // Per-M JS-class-name trait: lets from_ptr<std::vector<M>> wrap via
+    // M.__wrap_<NAME>(ptr) (clientdata is unusable -- vector ptr types are
+    // mostly unregistered).  Specialized by %wasm_vec; null -> bare carrier.
+    template<typename M> struct wasmjs_vector_jsname {
+      static const char* get() { return 0; }
+    };
+#endif
 
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
+#ifdef SWIGJULIA
+      {
+        jl_value_t* atype = jl_apply_array_type((jl_value_t*)jl_any_type, 1);
+        jl_array_t* arr = jl_alloc_array_1d(atype, a->size());
+        JL_GC_PUSH1(&arr);
+        for (size_t i = 0; i < a->size(); ++i) {
+          M tmpv = (*a)[i];
+          GUESTOBJECT* e = casadi::from_ptr(&tmpv);
+          if (!e) { JL_GC_POP(); return 0; }
+          jl_array_ptr_set(arr, i, e);
+        }
+        JL_GC_POP();
+        return (GUESTOBJECT*)arr;
+      }
+#endif
+#ifdef SWIGWASMJS
+      std::vector<M>* fresh = new std::vector<M>(*a);
+      const char* nm = wasmjs_vector_jsname<M>::get();
+      if (nm) return reinterpret_cast<GUESTOBJECT*>(SWIG_WASMJS_WrapByName(fresh, nm));
+      return SWIG_NewPointerObj(fresh, 0, SWIG_POINTER_OWN);
+#endif
 #ifdef SWIGPYTHON
       // std::vector maps to Python list
       PyObject* ret = PyList_New(a->size());
@@ -1573,6 +1734,27 @@ namespace std {
         return true;
       }
 
+#ifdef SWIGWASMJS
+      // Phase 3.4: accept JS string primitive.
+      {
+        emscripten::val v = emscripten::val::take_ownership(
+            reinterpret_cast< ::emscripten::EM_VAL >(p));
+        bool is_str = (v.typeOf().as<std::string>() == "string");
+        if (is_str) {
+          if (m) **m = v.as<std::string>();
+          v.release_ownership();
+          return true;
+        }
+        v.release_ownership();
+      }
+#endif
+
+#ifdef SWIGJULIA
+      if (jl_is_string(p)) {
+        if (m) **m = std::string(jl_string_ptr(p), jl_string_len(p));
+        return true;
+      }
+#endif
 #ifdef SWIGPYTHON
       if (PyString_Check(p) || PyUnicode_Check(p)) {
         if (m) {
@@ -1636,6 +1818,11 @@ namespace std {
       return PyString_FromString(a->c_str());
 #elif defined(SWIGMATLAB)
       return mxCreateString(a->c_str());
+#elif defined(SWIGWASMJS)
+      emscripten::val v(*a);  // emscripten::val has a std::string ctor (UTF-8)
+      return reinterpret_cast<GUESTOBJECT*>(v.release_ownership());
+#elif defined(SWIGJULIA)
+      return jl_cstr_to_string(a->c_str());
 #else
       return 0;
 #endif
@@ -1711,6 +1898,70 @@ namespace std {
 %fragment("casadi_map", "header", fragment="casadi_aux") {
   namespace casadi {
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m) {
+#ifdef SWIGJULIA
+      if (is_null(p)) return false;
+      {
+        jl_value_t* adt = jl_get_global(jl_base_module, jl_symbol("AbstractDict"));
+        if (!adt || !jl_isa(p, adt)) return false;
+        jl_function_t* keys_f = jl_get_function(jl_base_module, "keys");
+        jl_function_t* collect_f = jl_get_function(jl_base_module, "collect");
+        jl_function_t* getindex_f = jl_get_function(jl_base_module, "getindex");
+        jl_value_t* karr = 0;
+        JL_GC_PUSH1(&karr);
+        karr = jl_call1(collect_f, jl_call1(keys_f, p));
+        bool ok = karr != 0 && jl_is_array(karr);
+        size_t n = ok ? jl_array_len((jl_array_t*)karr) : 0;
+        for (size_t i = 0; i < n && ok; ++i) {
+          jl_value_t* k = 0; jl_value_t* v = 0;
+          JL_GC_PUSH2(&k, &v);
+          k = jl_array_ptr_ref((jl_array_t*)karr, i);
+          if (!k || !jl_is_string(k)) { ok = false; }
+          else {
+            v = jl_call2(getindex_f, p, k);
+            if (!v) { ok = false; }
+            else {
+              M tmp; M* tmp_p = &tmp;
+              ok = casadi::to_ptr(v, &tmp_p);
+              if (ok && m) (**m)[std::string(jl_string_ptr(k), jl_string_len(k))] = *tmp_p;
+            }
+          }
+          JL_GC_POP();
+        }
+        JL_GC_POP();
+        return ok;
+      }
+#endif
+#ifdef SWIGWASMJS
+      if (is_null(p)) return true;
+      {
+        emscripten::val v = emscripten::val::take_ownership(
+            reinterpret_cast< ::emscripten::EM_VAL >(p));
+        std::string ty = v.typeOf().as<std::string>();
+        bool is_obj = (ty == "object") && !v.isArray() && !v.hasOwnProperty("_ptr");
+        if (!is_obj) { v.release_ownership(); return false; }
+        emscripten::val keys = emscripten::val::global("Object").call<emscripten::val>("keys", v);
+        unsigned n = keys["length"].as<unsigned>();
+        bool ok = true;
+        for (unsigned i = 0; i < n && ok; ++i) {
+          emscripten::val key = keys[i];
+          emscripten::val val = v[key];
+          ::emscripten::EM_VAL vh = val.as_handle();
+          if (m) {
+            std::string ks = key.as<std::string>();
+            M tmp; M* tmp_p = &tmp;
+            if (!casadi::to_ptr(reinterpret_cast<GUESTOBJECT*>(vh), &tmp_p)) {
+              ok = false;
+            } else {
+              (**m)[ks] = *tmp_p;
+            }
+          } else {
+            if (!casadi::to_ptr(reinterpret_cast<GUESTOBJECT*>(vh), (M**)0)) ok = false;
+          }
+        }
+        v.release_ownership();
+        return ok;
+      }
+#endif
 #ifdef SWIGPYTHON
       if (PyDict_Check(p)) {
         PyObject *key, *value;
@@ -1747,6 +1998,26 @@ namespace std {
     }
 
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a) {
+#ifdef SWIGJULIA
+      {
+        jl_function_t* dict_f = jl_get_function(jl_base_module, "Dict");
+        jl_function_t* set_f = jl_get_function(jl_base_module, "setindex!");
+        jl_value_t* d = 0; JL_GC_PUSH1(&d);
+        d = jl_call0(dict_f);
+        if (!d) { JL_GC_POP(); return 0; }
+        for (typename std::map<std::string, M>::const_iterator it = a->begin(); it != a->end(); ++it) {
+          GUESTOBJECT* e = 0; jl_value_t* k = 0;
+          JL_GC_PUSH2(&e, &k);
+          e = casadi::from_ptr(&it->second);
+          k = jl_cstr_to_string(it->first.c_str());
+          bool ok = e != 0 && jl_call3(set_f, d, e, k) != 0;
+          JL_GC_POP();
+          if (!ok) { JL_GC_POP(); return 0; }
+        }
+        JL_GC_POP();
+        return d;
+      }
+#endif
 #ifdef SWIGPYTHON
       PyObject *p = PyDict_New();
       for (typename std::map<std::string, M>::const_iterator it=a->begin(); it!=a->end(); ++it) {
@@ -1779,6 +2050,16 @@ namespace std {
 					fieldnames.empty() ? 0 : &fieldnames[0]);
       for (casadi_int k=0; k<fields.size(); ++k) mxSetFieldByNumber(p, 0, k, fields[k]);
       return p;
+#elif defined(SWIGWASMJS)
+      emscripten::val obj = emscripten::val::object();
+      for (typename std::map<std::string, M>::const_iterator it=a->begin(); it!=a->end(); ++it) {
+        GUESTOBJECT* e = from_ptr(&it->second);
+        if (!e) return 0;
+        emscripten::val v = emscripten::val::take_ownership(
+            reinterpret_cast< ::emscripten::EM_VAL >(e));
+        obj.set(it->first, v);
+      }
+      return reinterpret_cast<GUESTOBJECT*>(obj.release_ownership());
 #else
       return 0;
 #endif
@@ -1872,6 +2153,27 @@ namespace std {
         return true;
       }
 
+#ifdef SWIGPYTHON
+      // Object has __SX__ method: honour it BEFORE the scalar/array/vector
+      // heuristics below.  A custom iterable-numeric object (e.g. the
+      // experimental NumpyArray) that exposes a 1-D `shape` + `__iter__` +
+      // `__float__` would otherwise be dragged into the vector<double>
+      // fallback, which calls float() on each (possibly symbolic) element.
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
+      if (PyObject_HasAttrString(p,"__SX__")) {
+        PyObject *cr = PyObject_CallMethod(p, (char*) "__SX__", 0);
+        if (!cr) return false;
+        if (cr == Py_None) { Py_DECREF(cr); }
+        else {
+          // to_val COPIES into *m; to_ptr would only point *m INTO cr,
+          // which the Py_DECREF then frees (use-after-free).
+          casadi_int flag = to_val(cr, m ? *m : 0);
+          Py_DECREF(cr);
+          if (flag) return true;
+        }
+      }
+#endif // SWIGPYTHON
+
       // Try first converting to a temporary DM
       {
         DM tmp;
@@ -1882,17 +2184,11 @@ namespace std {
       }
 
 #ifdef SWIGPYTHON
+      // Clear any error raised by a failed DM conversion (e.g. a __DM__
+      // that threw) so it doesn't leak past this no-match path.
+      if (PyErr_Occurred()) PyErr_Clear();
       // Numpy arrays will be cast to dense SX
       if (SX_from_array(p, m)) return true;
-      // Object has __SX__ method
-      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
-      if (PyObject_HasAttrString(p,"__SX__")) {
-        PyObject *cr = PyObject_CallMethod(p, (char*) "__SX__", 0);
-        if (!cr) return false;
-        casadi_int flag = to_ptr(cr, m);
-        Py_DECREF(cr);
-        return flag;
-      }
 #endif // SWIGPYTHON
 
       // No match
@@ -1943,6 +2239,23 @@ namespace std {
         return true;
       }
 
+#ifdef SWIGPYTHON
+      // Object has __MX__ method: honour it BEFORE the DM/scalar/vector
+      // heuristics (see the __SX__ note in to_ptr(SX**)).
+      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
+      if (PyObject_HasAttrString(p,"__MX__")) {
+        PyObject *cr = PyObject_CallMethod(p, (char*) "__MX__", 0);
+        if (!cr) return false;
+        if (cr == Py_None) { Py_DECREF(cr); }
+        else {
+          // to_val COPIES into *m (see the __SX__ note in to_ptr(SX**)).
+          casadi_int flag = to_val(cr, m ? *m : 0);
+          Py_DECREF(cr);
+          if (flag) return true;
+        }
+      }
+#endif // SWIGPYTHON
+
       // Try first converting to a temporary DM
       {
         DM tmp;
@@ -1953,14 +2266,9 @@ namespace std {
       }
 
 #ifdef SWIGPYTHON
-      if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
-      if (PyObject_HasAttrString(p,"__MX__")) {
-        PyObject *cr = PyObject_CallMethod(p, (char*) "__MX__", 0);
-        if (!cr) return false;
-        casadi_int flag = to_ptr(cr, m);
-        Py_DECREF(cr);
-        return flag;
-      }
+      // Clear any error raised by a failed DM conversion (e.g. a __DM__
+      // that threw) so it doesn't leak past this no-match path.
+      if (PyErr_Occurred()) PyErr_Clear();
 #endif // SWIGPYTHON
 
       // No match
@@ -2017,12 +2325,15 @@ namespace std {
       }
 
 #ifdef SWIGPYTHON
-      // Object has __DM__ method
+      // Object has __DM__ method.  A returned None means "I am explicitly
+      // not a DM" (e.g. a symbolic NumpyArray) -- stop here rather than
+      // falling into the float()-per-element vector fallback below.
       if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p,"__DM__")) {
         char name[] = "__DM__";
         PyObject *cr = PyObject_CallMethod(p, name, 0);
         if (!cr) return false;
+        if (cr == Py_None) { Py_DECREF(cr); return false; }
         casadi_int result = to_val(cr, m ? *m : 0);
         Py_DECREF(cr);
         return result;
@@ -2054,6 +2365,78 @@ namespace std {
         return true;
       }
 #endif // SWIGMATLAB
+#ifdef SWIGWASMJS
+      // Phase 3.4: JS Array of numbers -> column-vector DM.
+      // 2D nested array [[a,b], [c,d]] -> 2x2 DM (row-major in JS).
+      // Borrow the val (take + release) to preserve refcount.
+      {
+        emscripten::val v = emscripten::val::take_ownership(
+            reinterpret_cast< ::emscripten::EM_VAL >(p));
+        bool is_arr = v.isArray();
+        if (is_arr) {
+          unsigned n = v["length"].as<unsigned>();
+          // Sniff: nested-array if first element is itself an array.
+          bool nested = false;
+          if (n > 0) {
+            emscripten::val first = v[0];
+            nested = first.isArray();
+          }
+          if (nested) {
+            // 2D: each top-level element is a row.  Build a flat
+            // column-major data buffer (casadi DM stores cols major)
+            // then construct a dense matrix.
+            unsigned ncols = 0;
+            bool ok = true;
+            for (unsigned i = 0; i < n && ok; ++i) {
+              emscripten::val row = v[i];
+              if (!row.isArray()) { ok = false; break; }
+              unsigned w = row["length"].as<unsigned>();
+              if (i == 0) ncols = w;
+              else if (w != ncols) { ok = false; break; }
+            }
+            if (ok) {
+              std::vector<double> data((size_t)n * (size_t)ncols);
+              for (unsigned i = 0; i < n && ok; ++i) {
+                emscripten::val row = v[i];
+                for (unsigned j = 0; j < ncols && ok; ++j) {
+                  emscripten::val el = row[j];
+                  std::string ty = el.typeOf().as<std::string>();
+                  if (ty == "number" || ty == "bigint") {
+                    /* Column-major: data[j*n + i]. */
+                    data[(size_t)j * (size_t)n + (size_t)i] = el.as<double>();
+                  } else ok = false;
+                }
+              }
+              v.release_ownership();
+              if (ok) {
+                if (m) **m = casadi::Matrix<double>::reshape(
+                    casadi::Matrix<double>(data), n, ncols);
+                return true;
+              }
+              return false;
+            }
+            v.release_ownership();
+            return false;
+          }
+          // 1D: column vector.
+          std::vector<double> data(n);
+          bool ok = true;
+          for (unsigned i = 0; i < n && ok; ++i) {
+            emscripten::val el = v[i];
+            std::string ty = el.typeOf().as<std::string>();
+            if (ty == "number" || ty == "bigint") data[i] = el.as<double>();
+            else ok = false;
+          }
+          v.release_ownership();
+          if (ok) {
+            if (m) **m = casadi::Matrix<double>(data);
+            return true;
+          }
+          return false;
+        }
+        v.release_ownership();
+      }
+#endif // SWIGWASMJS
 
       // No match
       return false;
@@ -2197,14 +2580,98 @@ namespace std {
 
 #endif // SWIGXML
 
- // Input typemaps.  xStubIn becomes the pystub_in= PEP-484 annotation.
-%define %casadi_input_typemaps(xName, xStubIn, xPrec, xType...)
+ // Input typemaps.
+ //   xStubIn  becomes the pystub_in=  PEP-484 annotation (for `-stubs`
+ //           emission by python.cxx).
+ //   xTsStub  becomes the tsstub_in=  TypeScript annotation (for `-stubs`
+ //           emission by wasm_js.cxx).  Pasted verbatim into the .d.ts;
+ //           no translation layer.  Use TS syntax (e.g. "bigint",
+ //           "string", "MX[]", "Record<string, GenericType>").
+#ifdef SWIGJULIA
+%define %julia_convention_repair()
+// Convention repair: %casadi_output_typemaps applied the class-return
+// convention (owned copy behind void*) to casadi-typemapped PRIMITIVES
+// too.  Re-register value returns for those (last-registered wins);
+// inputs keep the jl_value_t* rich-coercion path.
+%typemap(ctype, out="long long") casadi_int, const casadi_int& "jl_value_t*"
+%typemap(out) casadi_int %{ $result = (long long)$1; %}
+%typemap(out) const casadi_int& %{ $result = (long long)*$1; %}
+%typemap(jltype, out="Clonglong") casadi_int, const casadi_int& "Any"
+%typemap(jlout) casadi_int, const casadi_int& "Int(_check($call))"
+%typemap(ctype, out="double") double, const double& "jl_value_t*"
+%typemap(out) double %{ $result = (double)$1; %}
+%typemap(out) const double& %{ $result = (double)*$1; %}
+%typemap(jltype, out="Cdouble") double, const double& "Any"
+%typemap(jlout) double, const double& "_check($call)"
+%typemap(ctype, out="unsigned char") bool, const bool& "jl_value_t*"
+%typemap(out) bool %{ $result = $1 ? 1 : 0; %}
+%typemap(out) const bool& %{ $result = *$1 ? 1 : 0; %}
+%typemap(jltype, out="Cuchar") bool, const bool& "Any"
+%typemap(jlout) bool, const bool& "_check($call) != 0"
+%typemap(ctype, out="char *") std::string, const std::string& "jl_value_t*"
+%typemap(out) std::string %{ $result = swig_jl_strdup($1); %}
+%typemap(out) const std::string& %{ $result = swig_jl_strdup(*$1); %}
+%typemap(jltype, out="Ptr{UInt8}") std::string, const std::string& "Any"
+%typemap(jlout) std::string, const std::string& "_takestr($call)"
+%typemap(ctype, out="jl_value_t*", fragment="SwigJlRuntime") std::vector<double>, const std::vector<double>& "jl_value_t*"
+%typemap(out) std::vector<double> %{ $result = swig_jl_from_vec_double($1); %}
+%typemap(out) const std::vector<double>& %{ $result = swig_jl_from_vec_double(*$1); %}
+%typemap(jltype, out="Any") std::vector<double>, const std::vector<double>& "Any"
+%typemap(jlout) std::vector<double>, const std::vector<double>& "_check($call)::Vector{Float64}"
+%typemap(ctype, out="jl_value_t*", fragment="SwigJlRuntime") std::vector<casadi_int>, const std::vector<casadi_int>, const std::vector<casadi_int>& "jl_value_t*"
+%typemap(out) std::vector<casadi_int>, const std::vector<casadi_int> %{ { std::vector<long long> __t($1.begin(), $1.end()); $result = swig_jl_from_vec_int(__t); } %}
+%typemap(out) const std::vector<casadi_int>& %{ { std::vector<long long> __t($1->begin(), $1->end()); $result = swig_jl_from_vec_int(__t); } %}
+%typemap(jltype, out="Any") std::vector<casadi_int>, const std::vector<casadi_int>, const std::vector<casadi_int>& "Any"
+%typemap(jlout) std::vector<casadi_int>, const std::vector<casadi_int>, const std::vector<casadi_int>& "_check($call)::Vector{Int64}"
+%typemap(ctype, out="jl_value_t*", fragment="SwigJlRuntime") std::vector<std::string>, const std::vector<std::string>& "jl_value_t*"
+%typemap(out) std::vector<std::string> %{ $result = swig_jl_from_vec_string($1); %}
+%typemap(out) const std::vector<std::string>& %{ $result = swig_jl_from_vec_string(*$1); %}
+%typemap(jltype, out="Any") std::vector<std::string>, const std::vector<std::string>& "Any"
+%typemap(jlout) std::vector<std::string>, const std::vector<std::string>& "_check($call)::Vector{String}"
+// casadi::Dict (std::map<std::string,GenericType>): return as a Julia Dict via
+// from_ptr (which builds Dict{String,Any} and recursively converts values).
+%typemap(ctype, out="jl_value_t*", fragment="casadi_all") casadi::Dict, const casadi::Dict& "jl_value_t*"
+%typemap(out, noblock=1) casadi::Dict %{ if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to Dict."); %}
+%typemap(out, noblock=1) const casadi::Dict& %{ if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to Dict."); %}
+%typemap(jltype, out="Any") casadi::Dict, const casadi::Dict& "Any"
+%typemap(jlout) casadi::Dict, const casadi::Dict& "_check($call)::AbstractDict"
+%enddef
+#else
+%define %julia_convention_repair() %enddef
+#endif
+
+%define %casadi_input_typemaps(xName, xStubIn, xTsStub, xPrec, xType...)
+#ifdef SWIGWASMJS
+ // wasm_js: all wrapped types cross the wasm boundary as EM_VAL -- an
+ // i32 handle into Embind's value table, the wasm-js analog of mxArray*
+ // and PyObject*.  to_ptr / SWIG_ConvertPtr unwrap the JS-side carrier
+ // (a `{_ptr: <int>}` proxy) via emscripten::val on the wasm side.
+%typemap(ctype) xType, const xType&, xType& "EM_VAL"
+#endif
+#ifdef SWIGJULIA
+%typemap(ctype, out="void *") xType, const xType&, xType& "jl_value_t*"
+%typemap(jltype, out="Ptr{Cvoid}") xType, const xType&, xType& "Any"
+ // Class pointer (e.g. the implicit `this` of member functions): cross as the
+ // proxy object and convert via SWIG_ConvertPtr with the type descriptor, so
+ // the cast chain applies the base-class offset adjustment.  Without this a
+ // director object (whose vptr shifts a non-polymorphic base off offset 0)
+ // would have `this` misread when reached through a base-class method.
+%typemap(ctype, out="void *") xType* "jl_value_t*"
+%typemap(jltype, out="Ptr{Cvoid}") xType* "Any"
+%typemap(in, noblock=1) xType* {
+  if (!SWIG_IsOK(SWIG_ConvertPtr($input, reinterpret_cast<void**>(&$1), $1_descriptor, 0)))
+    SWIG_exception_fail(SWIG_TypeError,"Failed to convert input $argnum to type '" xName "'.");
+ }
+%typemap(freearg, noblock=1) xType* {}
+#endif
  // Pass input by value, check if matches
 %typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_all") xType {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
  }
 
- // Directorout typemap; as input by value
+ // Directorout typemap; as input by value.  All targets (to_val/to_ptr
+ // branch per target); richer per-target bodies override via
+ // last-registered-wins (%casadi_director_class).
 %typemap(directorout, noblock=1, fragment="casadi_all") xType {
     if (!casadi::to_val($input, &$result)) {
       %dirout_fail(SWIG_TypeError,"$type");
@@ -2212,7 +2679,7 @@ namespace std {
  }
 
  // Pass input by value, convert argument
-%typemap(in, doc=xName, pystub_in=xStubIn, noblock=1, fragment="casadi_all") xType {
+%typemap(in, doc=xName, pystub_in=xStubIn, tsstub_in=xTsStub, noblock=1, fragment="casadi_all") xType {
   if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input $argnum to type '" xName "'.");
  }
 
@@ -2225,7 +2692,7 @@ namespace std {
  }
 
  // Pass input by reference, convert argument
-%typemap(in, doc=xName, pystub_in=xStubIn, noblock=1, fragment="casadi_all") const xType & (xType m) {
+%typemap(in, doc=xName, pystub_in=xStubIn, tsstub_in=xTsStub, noblock=1, fragment="casadi_all") const xType & (xType m) {
   $1 = &m;
   if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input $argnum to type '" xName "'.");
  }
@@ -2233,22 +2700,56 @@ namespace std {
  // Pass input by reference, cleanup
 %typemap(freearg, noblock=1) const xType & {}
 
+#ifdef SWIGWASMJS
+ // Non-const reference: use the standard SWIG convention.  SWIG_ConvertPtr
+ // (Lib/wasm_js/wasm_jsrun.swg) wraps the EM_VAL via emscripten::val,
+ // reads the `_ptr` property and writes the C++ pointer through &$1.
+ // Mirrors MATLAB's default SWIGTYPE & typemap.
+%typemap(in, doc=xName, pystub_in=xStubIn, tsstub_in=xTsStub, noblock=1) xType & {
+  if (!SWIG_IsOK(SWIG_ConvertPtr($input, (void**)&$1, $1_descriptor, 0))) {
+    SWIG_exception_fail(SWIG_TypeError, "Failed to convert input $argnum to type '" xName "'.");
+  }
+ }
+%typemap(freearg, noblock=1) xType & {}
+#endif
+
 %enddef
 
- // Output typemaps.  xStubOut becomes the pystub_out= annotation on
- // return typemaps AND on &OUTPUT/&INOUT (they're Python-output from
- // the user's perspective even though they're `in` typemaps in SWIG).
-%define %casadi_output_typemaps(xName, xStubIn, xStubOut, xType...)
+ // Output typemaps.
+ //   xStubOut becomes pystub_out= on return typemaps and &OUTPUT/&INOUT.
+ //   xTsStub  becomes tsstub_out= -- single arg used for both input
+ //           (e.g. INOUT pass-through) and output positions.  wasm_js
+ //           reads tsstub_out for return types directly.
+%define %casadi_output_typemaps(xName, xStubIn, xStubOut, xTsStub, xType...)
+
+#ifdef SWIGWASMJS
+ // wasm_js: returns also flow as EM_VAL.  from_ref / from_ptr build the
+ // JS-side carrier via SWIG_NewPointerObj; js_marshal_return on the JS
+ // side unwraps it and constructs the proxy class.
+%typemap(ctype) xType, const xType "EM_VAL"
+%typemap(ctype) const xType& "EM_VAL"
+#endif
 
  // Return-by-value
-%typemap(out, doc=xName, pystub_out=xStubOut, noblock=1, fragment="casadi_all") xType, const xType {
+%typemap(out, doc=xName, pystub_out=xStubOut, tsstub_out=xTsStub, noblock=1, fragment="casadi_all") xType, const xType {
   if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type '" xName "'.");
 }
 
 // Return a const-ref behaves like return-by-value
-%typemap(out, doc=xName, pystub_out=xStubOut, noblock=1, fragment="casadi_all") const xType& {
+%typemap(out, doc=xName, pystub_out=xStubOut, tsstub_out=xTsStub, noblock=1, fragment="casadi_all") const xType& {
   if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type '" xName "'.");
 }
+
+#ifdef SWIGJULIA
+ // julia: returns leave as an owned copy behind void*; the generated .jl
+ // wraps it in the proxy type (which owns it via finalizer).
+%typemap(out, doc=xName, noblock=1) xType, const xType {
+  $result = (void*) new xType($1);
+}
+%typemap(out, doc=xName, noblock=1) const xType& {
+  $result = (void*) new xType(*$1);
+}
+#endif
 
 // Inputs marked OUTPUT are also returned by the function, ...
 %typemap(argout, noblock=1,fragment="casadi_all") xType &OUTPUT {
@@ -2256,16 +2757,17 @@ namespace std {
  }
 
 // ... and the corresponding inputs are ignored.
-%typemap(in, doc=xName, pystub_out=xStubOut, noblock=1, numinputs=0) xType &OUTPUT (xType m) {
+%typemap(in, doc=xName, pystub_out=xStubOut, tsstub_out=xTsStub, noblock=1, numinputs=0) xType &OUTPUT (xType m) {
  $1 = &m;
 }
 
- // Directorin typemap; as output
+ // Directorin typemap; as output.  All targets (from_ref/from_ptr branch
+ // per target); wasm-js overrides class types via %casadi_director_class /
+ // %casadi_director_vec (last-registered-wins).
 %typemap(directorin, noblock=1, fragment="casadi_all") xType, const xType {
     if(!($input = casadi::from_ref($1))) %dirout_fail(SWIG_TypeError,"For director inputs, failed to convert input to " xName ".");
  }
 
- // Directorin typemap; as output
 %typemap(directorin, noblock=1, fragment="casadi_all") const xType& {
     if(!($input = casadi::from_ptr(&$1))) %dirout_fail(SWIG_TypeError,"For director inputs, failed to convert input to " xName ".");
  }
@@ -2289,7 +2791,7 @@ namespace std {
  }
 
 // ... but kept as inputs
-%typemap(in, doc=xName, pystub_in=xStubIn, noblock=1, fragment="casadi_all") xType &INOUT (xType m) {
+%typemap(in, doc=xName, pystub_in=xStubIn, tsstub_in=xTsStub, noblock=1, fragment="casadi_all") xType &INOUT (xType m) {
   $1 = &m;
   if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to type '" xName "'.");
  }
@@ -2310,20 +2812,133 @@ namespace std {
 %apply xType &INOUT {xType &INOUT5};
 %apply xType &INOUT {xType &INOUT6};
 
+%julia_convention_repair()
 %enddef
 
  // All-in-one template instantiation + typemaps.
-%define %casadi_template(xName, xStubIn, xStubOut, xPrec, xType...)
+ // xTsStub is a TypeScript type literal pasted verbatim into the .d.ts;
+ // single arg used for both input and output positions.
+%define %casadi_template(xName, xStubIn, xStubOut, xTsStub, xPrec, xType...)
 %template() xType;
-%casadi_input_typemaps(xName, xStubIn, xPrec, xType)
-%casadi_output_typemaps(xName, xStubIn, xStubOut, %arg(xType))
+%casadi_input_typemaps(xName, xStubIn, xTsStub, xPrec, xType)
+%casadi_output_typemaps(xName, xStubIn, xStubOut, xTsStub, %arg(xType))
+%enddef
+
+// std::vector<E> variant: under SWIGWASMJS additionally emits the NAMED
+// %template class (the array-marshaling typemaps reference it by name)
+// plus %wasm_vec autoconversion.
+%define %casadi_template_vec(xName, xStubIn, xStubOut, xTsStub, xPrec, xJSName, xElemType...)
+%casadi_template(xName, xStubIn, xStubOut, xTsStub, xPrec, std::vector< xElemType >)
+#ifdef SWIGWASMJS
+%template(xJSName) std::vector< xElemType >;
+%wasm_vec(xElemType, xJSName)
+#endif
 %enddef
 
  // Input + output typemaps for an existing type.
-%define %casadi_typemaps(xName, xStubIn, xStubOut, xPrec, xType...)
-%casadi_input_typemaps(xName, xStubIn, xPrec, xType)
-%casadi_output_typemaps(xName, xStubIn, xStubOut, xType)
+%define %casadi_typemaps(xName, xStubIn, xStubOut, xTsStub, xPrec, xType...)
+%casadi_input_typemaps(xName, xStubIn, xTsStub, xPrec, xType)
+%casadi_output_typemaps(xName, xStubIn, xStubOut, xTsStub, xType)
 %enddef
+
+#ifdef SWIGWASMJS
+// Director (C++ <-> JS) typemaps for casadi value types: hand the user's
+// eval() override real wrapped proxies (via M.__wrap_<JsName>) instead of
+// bare {_ptr} carriers.  %casadi_director_class covers a value type,
+// %casadi_director_vec a std::vector of it, %casadi_director_vec_str
+// vector<string>.  Wire contract per wasm_js.swg.
+
+%define %casadi_director_class(xJsName, xType...)
+// SWIG_NewPointerObj wraps via clientdata; xJsName kept for callsite arity.
+%typemap(directorin, noblock=1) xType, const xType, const xType& {
+  {
+    xType *__p = new xType($1);
+    $input = SWIG_NewPointerObj(__p, $descriptor(xType *), 0);
+  }
+}
+%typemap(directorout, noblock=1) xType, const xType {
+  {
+    emscripten::val __r = emscripten::val::take_ownership($input);
+    EM_VAL __h = __r.release_ownership();
+    void *__p = 0;
+    (void)SWIG_WASMJS_ConvertPtr(__h, &__p, 0, 0);
+    $result = __p ? *static_cast< xType *>(__p) : xType();
+  }
+}
+%enddef
+
+%define %casadi_director_vec(xElemJsName, xElemType...)
+%typemap(directorin, noblock=1) std::vector< xElemType >,
+                                 const std::vector< xElemType >&,
+                                       std::vector< xElemType >& {
+  // SWIG_NewPointerObj routes through clientdata to the JS wrap
+  // automatically (see %casadi_director_class above).  xElemJsName
+  // is unused here, kept for callsite-arity compatibility.
+  {
+    emscripten::val __a = emscripten::val::array();
+    for (size_t __i = 0; __i < $1.size(); ++__i) {
+      xElemType *__ep = new xElemType($1[__i]);
+      EM_VAL __eh = SWIG_NewPointerObj(__ep, $descriptor(xElemType *), 0);
+      __a.call<void>("push", emscripten::val::take_ownership(__eh));
+    }
+    $input = __a.release_ownership();
+  }
+}
+%typemap(directorout, noblock=1) std::vector< xElemType > {
+  {
+    emscripten::val __r = emscripten::val::take_ownership($input);
+    std::vector< xElemType > __v;
+    size_t __n = __r["length"].as<size_t>();
+    for (size_t __i = 0; __i < __n; ++__i) {
+      emscripten::val __it = __r[__i];
+      EM_VAL __h = __it.release_ownership();
+      void *__p = 0;
+      (void)SWIG_WASMJS_ConvertPtr(__h, &__p, 0, 0);
+      if (__p) __v.push_back(*static_cast< xElemType *>(__p));
+    }
+    $result = __v;
+  }
+}
+%enddef
+
+// std::vector<std::string>: each element is a JS primitive string, not
+// a proxy class -- so no __wrap_ helper, plain val::as<std::string>().
+%define %casadi_director_vec_str
+%typemap(directorin, noblock=1) std::vector< std::string >,
+                                 const std::vector< std::string >&,
+                                       std::vector< std::string >& {
+  {
+    emscripten::val __a = emscripten::val::array();
+    for (size_t __i = 0; __i < $1.size(); ++__i) {
+      __a.call<void>("push", emscripten::val(std::string($1[__i])));
+    }
+    $input = __a.release_ownership();
+  }
+}
+%typemap(directorout, noblock=1) std::vector< std::string > {
+  {
+    emscripten::val __r = emscripten::val::take_ownership($input);
+    std::vector< std::string > __v;
+    size_t __n = __r["length"].as<size_t>();
+    for (size_t __i = 0; __i < __n; ++__i) {
+      __v.push_back(__r[__i].as<std::string>());
+    }
+    $result = __v;
+  }
+}
+%enddef
+
+// ----------------------------------------------------------------------------
+// jsout for std::map<std::string, X>: unbox the EM_VAL into a native JS
+// object (else Function.stats() etc. leak the raw i32 handle).  Values of
+// casadi class type arrive as {_ptr} carriers, same trade-off as vectors.
+%define %casadi_dict_jsout(xValueType...)
+%typemap(jsout) std::map< std::string, xValueType >,
+                 const std::map< std::string, xValueType >&,
+                       std::map< std::string, xValueType >&
+"M.__swig_release_handle($call)"
+%enddef
+#endif // SWIGWASMJS
 
 // Order in typemap matching: Lower value means will be checked first
 
@@ -2438,9 +3053,16 @@ namespace std {
 }
 #endif
 
-%casadi_typemaps(L_STR, "str", "str", PREC_STRING, std::string)
-%casadi_template(LL L_STR LR, "Sequence[str]", "list[str]", PREC_VECTOR, std::vector<std::string>)
-%casadi_template(LL LL L_STR LR LR, "Sequence[Sequence[str]]", "list[list[str]]", PREC_VECTOR, std::vector<std::vector<std::string> >)
+#ifndef SWIGWASMJS
+// wasm_js has direct ctype/in/out typemaps for std::string in
+// Lib/wasm_js/wasm_js.swg (const char* across the wasm boundary,
+// malloc+memcpy for the return path).  The casadi_typemaps version
+// would route through casadi::from_ref(string) returning GUESTOBJECT*,
+// which doesn't match our typed ABI.
+%casadi_typemaps(L_STR, "str", "str", "string", PREC_STRING, std::string)
+#endif
+%casadi_template_vec(LL L_STR LR, "Sequence[str]", "list[str]", "string[]", PREC_VECTOR, StringVector, std::string)
+%casadi_template(LL LL L_STR LR LR, "Sequence[Sequence[str]]", "list[list[str]]", "string[][]", PREC_VECTOR, std::vector<std::vector<std::string> >)
 
 /* -------- PEP-484 stub aliases and preamble.  Active with -stubs. --
  * Each %stub_alias_in(NAME, TYPES) emits `_NAME = TYPES` into the
@@ -2475,6 +3097,80 @@ class _SupportsMX(Protocol):
     def __MX__(self) -> "MX": ...
 
 %}
+
+/* issue #2959: casadi.ArrayInterface (a %pythoncode class, invisible to
+ * SWIG's -stubs).  Hand-written here via %stubcode (= %insert("stubs")),
+ * the body section SWIG also scans into __all__ -- unlike stubs_preamble,
+ * so `from casadi import *` re-exports it.  The three backing-typed
+ * subclasses each carry exactly one conversion hook, so an SX-backed array
+ * satisfies _SupportsSX only (accepted where _SX is) while a numeric
+ * DM-backed array satisfies _SupportsDM (hence _DM, and via the unions _SX
+ * and _MX too) -- matching casadi's runtime to_ptr rules. */
+#if defined(SWIG_STUBS_ENABLED) && defined(SWIGPYTHON)
+%stubcode %{class ArrayInterface(Generic[_T]):
+    """numpy-semantics array view over a casadi DM/SX/MX.  Constructing one
+    dispatches to the backing-typed subclass ArrayInterfaceDM/SX/MX."""
+    __array_priority__: float
+    @overload
+    def __new__(cls, value: "SX", ndim: int = ...) -> "ArrayInterfaceSX": ...
+    @overload
+    def __new__(cls, value: "MX", ndim: int = ...) -> "ArrayInterfaceMX": ...
+    @overload
+    def __new__(cls, value: object = ..., ndim: int = ...) -> "ArrayInterfaceDM": ...
+    @property
+    def shape(self) -> tuple[int, ...]: ...
+    @property
+    def ndim(self) -> int: ...
+    @property
+    def size(self) -> int: ...
+    def to_casadi(self) -> _T: ...
+    @property
+    def T(self) -> "ArrayInterface[_T]": ...
+    def reshape(self, *shape: int) -> "ArrayInterface[_T]": ...
+    def transpose(self, *axes: int) -> "ArrayInterface[_T]": ...
+    def squeeze(self, axis: "int | tuple[int, ...] | None" = ...) -> "ArrayInterface[_T]": ...
+    def flatten(self) -> "ArrayInterface[_T]": ...
+    def ravel(self) -> "ArrayInterface[_T]": ...
+    @property
+    def flat(self) -> Any: ...
+    def to_DM(self) -> "DM": ...
+    def sum(self, axis: "int | tuple[int, ...] | None" = ...) -> "ArrayInterface[_T]": ...
+    def mean(self, axis: "int | tuple[int, ...] | None" = ...) -> "ArrayInterface[_T]": ...
+    def __getitem__(self, idx: Any) -> "ArrayInterface[_T]": ...
+    def __setitem__(self, idx: Any, value: Any) -> None: ...
+    def __len__(self) -> int: ...
+    def __iter__(self) -> Iterator["ArrayInterface[_T]"]: ...
+    def __array__(self, dtype: Any = ...) -> NDArray[Any]: ...
+    def __float__(self) -> float: ...
+    def __int__(self) -> int: ...
+    def __add__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __radd__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __sub__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __rsub__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __mul__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __rmul__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __truediv__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __pow__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __matmul__(self, o: Any) -> "ArrayInterface[_T]": ...
+    def __neg__(self) -> "ArrayInterface[_T]": ...
+    @classmethod
+    def DM(cls, value: Any, shape: Any = ...) -> "ArrayInterfaceDM": ...
+    @classmethod
+    def SX(cls, value: Any, shape: Any = ...) -> "ArrayInterfaceSX": ...
+    @classmethod
+    def MX(cls, value: Any, shape: Any = ...) -> "ArrayInterfaceMX": ...
+
+class ArrayInterfaceDM(ArrayInterface["DM"]):
+    def __DM__(self) -> "DM": ...
+
+class ArrayInterfaceSX(ArrayInterface["SX"]):
+    def __SX__(self) -> "SX": ...
+
+class ArrayInterfaceMX(ArrayInterface["MX"]):
+    def __MX__(self) -> "MX": ...
+
+%}
+#endif
 
 /* Matrix input aliases.  SX/MX both extend DM; they don't extend each
  * other -- to_ptr<SX>(MX) and to_ptr<MX>(SX) fail at runtime.
@@ -2555,55 +3251,117 @@ class _SupportsMX(Protocol):
 
 #endif
 
-%casadi_typemaps("Sparsity", "Sparsity", "Sparsity", PREC_SPARSITY, casadi::Sparsity)
-%casadi_template(LL "Sparsity" LR, "Sequence[Sparsity]", "list[Sparsity]", PREC_SPARSITY, std::vector< casadi::Sparsity>)
-%casadi_template(LL LL "Sparsity"  LR  LR, "Sequence[Sequence[Sparsity]]", "list[list[Sparsity]]", PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
-%casadi_template(LDICT("Sparsity"), "Mapping[str, Sparsity]", "dict[str, Sparsity]", PREC_SPARSITY, std::map<std::string, casadi::Sparsity >)
-%casadi_template(LDICT(LL "Sparsity" LR), "Mapping[str, Sequence[Sparsity]]", "dict[str, list[Sparsity]]", PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
-%casadi_template(LPAIR(LDICT("Sparsity"),"[" L_STR "]"), "tuple[Mapping[str, Sparsity], Sequence[str]]", "tuple[dict[str, Sparsity], list[str]]", PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
-%casadi_typemaps(L_BOOL, "bool", "bool", SWIG_TYPECHECK_BOOL, bool)
-%casadi_template("[" L_BOOL "]", "Sequence[bool | int] | NDArray[Any]", "list[bool]", SWIG_TYPECHECK_BOOL, std::vector<bool>)
-%casadi_template("[[" L_BOOL "]]", "Sequence[Sequence[bool | int]] | Sequence[NDArray[Any]]", "list[list[bool]]", SWIG_TYPECHECK_BOOL, std::vector<std::vector<bool> >)
-%casadi_typemaps( L_INT , "int", "int", SWIG_TYPECHECK_INTEGER, casadi_int)
+%casadi_typemaps("Sparsity", "Sparsity", "Sparsity", "Sparsity", PREC_SPARSITY, casadi::Sparsity)
+%casadi_template_vec(LL "Sparsity" LR, "Sequence[Sparsity]", "list[Sparsity]", "Sparsity[]", PREC_SPARSITY, SparsityVector, casadi::Sparsity)
+%casadi_template(LL LL "Sparsity"  LR  LR, "Sequence[Sequence[Sparsity]]", "list[list[Sparsity]]", "Sparsity[][]", PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
+%casadi_template(LDICT("Sparsity"), "Mapping[str, Sparsity]", "dict[str, Sparsity]", "Record<string, Sparsity>", PREC_SPARSITY, std::map<std::string, casadi::Sparsity >)
+%casadi_template(LDICT(LL "Sparsity" LR), "Mapping[str, Sequence[Sparsity]]", "dict[str, list[Sparsity]]", "Record<string, Sparsity[]>", PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
+%casadi_template(LPAIR(LDICT("Sparsity"),"[" L_STR "]"), "tuple[Mapping[str, Sparsity], Sequence[str]]", "tuple[dict[str, Sparsity], list[str]]", "[Record<string, Sparsity>, string[]]", PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
+#ifndef SWIGWASMJS
+// wasm_js: bool / casadi_int handled by direct ctype/in/out typemaps
+// in Lib/wasm_js/wasm_js.swg; vector instantiations go through
+// %template(...) + %wasm_vec(...) for JS-side Array marshaling.
+%casadi_typemaps(L_BOOL, "bool", "bool", "boolean", SWIG_TYPECHECK_BOOL, bool)
+%casadi_template("[" L_BOOL "]", "Sequence[bool | int] | NDArray[Any]", "list[bool]", "boolean[]", SWIG_TYPECHECK_BOOL, std::vector<bool>)
+%casadi_template("[[" L_BOOL "]]", "Sequence[Sequence[bool | int]] | Sequence[NDArray[Any]]", "list[list[bool]]", "boolean[][]", SWIG_TYPECHECK_BOOL, std::vector<std::vector<bool> >)
+%casadi_typemaps( L_INT , "int", "int", "bigint", SWIG_TYPECHECK_INTEGER, casadi_int)
+#endif
 
 #ifdef MATLABSTYLE
 #define LABEL "[int,int]"
 #else
 #define LABEL LPAIR("int","int")
 #endif
-%casadi_template(LABEL, "tuple[int, int]", "tuple[int, int]", SWIG_TYPECHECK_INTEGER, std::pair<casadi_int,casadi_int>)
+%casadi_template(LABEL, "tuple[int, int]", "tuple[int, int]", "[bigint, bigint]", SWIG_TYPECHECK_INTEGER, std::pair<casadi_int,casadi_int>)
 #undef LABEL
-%casadi_template("[" L_INT "]", "Sequence[bool | int] | NDArray[Any]", "list[int]", PREC_IVector, std::vector<casadi_int>)
-%casadi_template(LL "[" L_INT "]" LR, "Sequence[Sequence[bool | int] | NDArray[Any]]", "list[list[int]]", PREC_IVectorVector, std::vector<std::vector<casadi_int> >)
-%casadi_typemaps(L_DOUBLE, "float", "float", SWIG_TYPECHECK_DOUBLE, double)
-%casadi_template("[" L_DOUBLE "]", "Sequence[bool | int | float] | NDArray[Any]", "list[float]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
-%casadi_template(LL "[" L_DOUBLE "]" LR, "Sequence[Sequence[bool | int | float] | NDArray[Any]]", "list[list[float]]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
-%casadi_typemaps("SXElem", "SXElem", "SXElem", PREC_SX, casadi::SXElem)
-%casadi_template(LL "SXElem" LR, "Sequence[SXElem]", "list[SXElem]", PREC_SXVector, std::vector<casadi::SXElem>)
-%casadi_typemaps("SX", "SX", "SX", PREC_SX, casadi::Matrix<casadi::SXElem>)
-%casadi_template(LL "SX" LR, "Sequence[SX]", "list[SX]", PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElem> >)
-%casadi_template(LL LL "SX" LR LR, "Sequence[Sequence[SX]]", "list[list[SX]]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElem> > >)
-%casadi_template(LDICT("SX"), "Mapping[str, SX]", "dict[str, SX]", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElem> >)
-%casadi_typemaps("MX", "MX", "MX", PREC_MX, casadi::MX)
-%casadi_template(LL "MX" LR, "Sequence[MX]", "list[MX]", PREC_MXVector, std::vector<casadi::MX>)
-%casadi_template(LL LL "MX" LR LR, "Sequence[Sequence[MX]]", "list[list[MX]]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
-%casadi_template(LDICT("MX"), "Mapping[str, MX]", "dict[str, MX]", PREC_MX, std::map<std::string, casadi::MX>)
-%casadi_template(LPAIR("MX","MX"), "tuple[MX, MX]", "tuple[MX, MX]", PREC_MXVector, std::pair<casadi::MX, casadi::MX>)
-%casadi_typemaps("DM", "DM", "DM", PREC_DM, casadi::Matrix<double>)
-%casadi_template(LL "DM" LR, "Sequence[DM]", "list[DM]", PREC_DMVector, std::vector< casadi::Matrix<double> >)
-%casadi_template(LL LL "DM" LR LR, "Sequence[Sequence[DM]]", "list[list[DM]]", PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
-%casadi_template(LDICT("DM"), "Mapping[str, DM]", "dict[str, DM]", PREC_DM, std::map<std::string, casadi::Matrix<double> >)
-%casadi_typemaps("IM", "IM", "IM", PREC_IM, casadi::Matrix<casadi_int>)
+%casadi_template_vec("[" L_INT "]", "Sequence[bool | int] | NDArray[Any]", "list[int]", "bigint[]", PREC_IVector, IntVector, casadi_int)
+%casadi_template(LL "[" L_INT "]" LR, "Sequence[Sequence[bool | int] | NDArray[Any]]", "list[list[int]]", "bigint[][]", PREC_IVectorVector, std::vector<std::vector<casadi_int> >)
+#ifndef SWIGWASMJS
+// wasm_js: double handled by direct typemap (passes through wasm ABI).
+%casadi_typemaps(L_DOUBLE, "float", "float", "number", SWIG_TYPECHECK_DOUBLE, double)
+#endif
+%casadi_template_vec("[" L_DOUBLE "]", "Sequence[bool | int | float] | NDArray[Any]", "list[float]", "number[]", SWIG_TYPECHECK_DOUBLE, DoubleVector, double)
+%casadi_template(LL "[" L_DOUBLE "]" LR, "Sequence[Sequence[bool | int | float] | NDArray[Any]]", "list[list[float]]", "number[][]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
+// ORDER CONSTRAINT (d.ts): TS picks the first matching overload and the
+// _DM/_SX/_MX coercion unions overlap, so instantiate most-specific-first
+// (DM, then SX, then MX) -- wasm-js emits stubs in declaration order.
+%casadi_typemaps("DM", "DM", "DM", "DM", PREC_DM, casadi::Matrix<double>)
+%casadi_template_vec(LL "DM" LR, "Sequence[DM]", "list[DM]", "DM[]", PREC_DMVector, DMVector, casadi::Matrix<double>)
+%casadi_template(LL LL "DM" LR LR, "Sequence[Sequence[DM]]", "list[list[DM]]", "DM[][]", PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
+%casadi_template(LDICT("DM"), "Mapping[str, DM]", "dict[str, DM]", "Record<string, DM>", PREC_DM, std::map<std::string, casadi::Matrix<double> >)
+%casadi_typemaps("SXElem", "SXElem", "SXElem", "SXElem", PREC_SX, casadi::SXElem)
+%casadi_template(LL "SXElem" LR, "Sequence[SXElem]", "list[SXElem]", "SXElem[]", PREC_SXVector, std::vector<casadi::SXElem>)
+%casadi_typemaps("SX", "SX", "SX", "SX", PREC_SX, casadi::Matrix<casadi::SXElem>)
+%casadi_template_vec(LL "SX" LR, "Sequence[SX]", "list[SX]", "SX[]", PREC_SXVector, SXVector, casadi::Matrix<casadi::SXElem>)
+%casadi_template(LL LL "SX" LR LR, "Sequence[Sequence[SX]]", "list[list[SX]]", "SX[][]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElem> > >)
+%casadi_template(LDICT("SX"), "Mapping[str, SX]", "dict[str, SX]", "Record<string, SX>", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElem> >)
+%casadi_typemaps("MX", "MX", "MX", "MX", PREC_MX, casadi::MX)
+%casadi_template_vec(LL "MX" LR, "Sequence[MX]", "list[MX]", "MX[]", PREC_MXVector, MXVector, casadi::MX)
+%casadi_template(LL LL "MX" LR LR, "Sequence[Sequence[MX]]", "list[list[MX]]", "MX[][]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
+%casadi_template(LDICT("MX"), "Mapping[str, MX]", "dict[str, MX]", "Record<string, MX>", PREC_MX, std::map<std::string, casadi::MX>)
+%casadi_template(LPAIR("MX","MX"), "tuple[MX, MX]", "tuple[MX, MX]", "[MX, MX]", PREC_MXVector, std::pair<casadi::MX, casadi::MX>)
+%casadi_typemaps("IM", "IM", "IM", "IM", PREC_IM, casadi::Matrix<casadi_int>)
 // Without CASADI_INT_TYPE, you get SwigValueWrapper
 // With it, docstrings are screwed
-%casadi_typemaps("GenericType", "GenericType", "GenericType", PREC_GENERICTYPE, casadi::GenericType)
-%casadi_template(LL "GenericType" LR, "Sequence[GenericType]", "list[GenericType]", PREC_GENERICTYPE, std::vector<casadi::GenericType>)
-%casadi_typemaps("Slice", "Slice", "Slice", PREC_SLICE, casadi::Slice)
-%casadi_typemaps("Function", "Function", "Function", PREC_FUNCTION, casadi::Function)
-%casadi_template(LL "Function" LR, "Sequence[Function]", "list[Function]", PREC_FUNCTION, std::vector<casadi::Function>)
-%casadi_template(LPAIR("Function","Function"), "tuple[Function, Function]", "tuple[Function, Function]", PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
-%casadi_template(L_DICT, "Mapping[str, GenericType]", "dict[str, GenericType]", PREC_DICT, std::map<std::string, casadi::GenericType>)
-%casadi_template(LDICT(LL L_STR LR), "Mapping[str, Sequence[str]]", "dict[str, list[str]]", PREC_DICT, std::map<std::string, std::vector<std::string> >)
+%casadi_typemaps("GenericType", "GenericType", "GenericType", "GenericType", PREC_GENERICTYPE, casadi::GenericType)
+%casadi_template(LL "GenericType" LR, "Sequence[GenericType]", "list[GenericType]", "GenericType[]", PREC_GENERICTYPE, std::vector<casadi::GenericType>)
+%casadi_template(LL LL "GenericType" LR LR, "Sequence[Sequence[GenericType]]", "list[list[GenericType]]", "GenericType[][]", PREC_GENERICTYPE, std::vector<std::vector<casadi::GenericType> >)
+%casadi_typemaps("Slice", "Slice", "Slice", "Slice", PREC_SLICE, casadi::Slice)
+%casadi_typemaps("Function", "Function", "Function", "Function", PREC_FUNCTION, casadi::Function)
+%casadi_template_vec(LL "Function" LR, "Sequence[Function]", "list[Function]", "Function[]", PREC_FUNCTION, FunctionVector, casadi::Function)
+%casadi_template(LPAIR("Function","Function"), "tuple[Function, Function]", "tuple[Function, Function]", "[Function, Function]", PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
+%casadi_template(L_DICT, "Mapping[str, GenericType]", "dict[str, GenericType]", "Record<string, GenericType>", PREC_DICT, std::map<std::string, casadi::GenericType>)
+%casadi_template(LDICT(LL L_STR LR), "Mapping[str, Sequence[str]]", "dict[str, list[str]]", "Record<string, string[]>", PREC_DICT, std::map<std::string, std::vector<std::string> >)
+
+
+%julia_convention_repair()
+
+#ifdef SWIGWASMJS
+// ----------------------------------------------------------------------------
+
+// Director typemap registrations: override the generic carrier-producing
+// directorin/out with M.__wrap_<JsName> proxy wrapping.  ORDER CONSTRAINT:
+// must come AFTER the %casadi_typemaps calls (last-registered wins).
+
+%casadi_director_class("Sparsity",    casadi::Sparsity)
+%casadi_director_class("DM",          casadi::Matrix<double>)
+%casadi_director_class("MX",          casadi::MX)
+%casadi_director_class("SX",          casadi::Matrix<casadi::SXElem>)
+%casadi_director_class("IM",          casadi::Matrix<casadi_int>)
+%casadi_director_class("Function",    casadi::Function)
+%casadi_director_class("Slice",       casadi::Slice)
+%casadi_director_class("SXElem",      casadi::SXElem)
+// GenericType has no `M.__wrap_GenericType` proxy on the JS side
+// (callers see plain JS values via `casadi::to_ptr`-style coercion),
+// so it's intentionally NOT registered as a director class here.
+
+%casadi_director_vec("Sparsity",      casadi::Sparsity)
+%casadi_director_vec("DM",            casadi::Matrix<double>)
+%casadi_director_vec("MX",            casadi::MX)
+%casadi_director_vec("SX",            casadi::Matrix<casadi::SXElem>)
+%casadi_director_vec("Function",      casadi::Function)
+
+%casadi_director_vec_str
+
+// jsout for every dict-shaped return type the casadi API surfaces.
+// Drains the wasm-returned EM_VAL handle into a native JS object.
+// Affects Function.stats() (returns Dict), all opts:Dict accessors,
+// the result.x_dict etc. fields of solver returns, and so on.
+%casadi_dict_jsout(casadi::GenericType)
+%casadi_dict_jsout(casadi::Sparsity)
+%casadi_dict_jsout(casadi::Matrix<double>)
+%casadi_dict_jsout(casadi::MX)
+%casadi_dict_jsout(casadi::Matrix<casadi::SXElem>)
+%casadi_dict_jsout(std::vector<std::string>)
+%casadi_dict_jsout(std::vector< casadi::Sparsity >)
+%casadi_dict_jsout(std::vector< casadi::Matrix<double> >)
+%casadi_dict_jsout(std::vector< casadi::MX >)
+%casadi_dict_jsout(std::vector< casadi::Matrix<casadi::SXElem> >)
+#endif // SWIGWASMJS
+
+// Named std::vector instantiations + array<->vector autoconversion
+// typemaps are now folded into the relevant %casadi_template_vec
+// calls above (one site per type instead of two parallel blocks).
 
 #undef L_INT
 #undef L_BOOL
@@ -2614,6 +3372,287 @@ class _SupportsMX(Protocol):
 #undef LR
 #undef L_STR
 #undef MATLABSTYLE
+
+/* TypeScript .d.ts preamble: aliases for casadi-side typedefs that
+   appear in signatures by name (typedef alias kept by SWIG, not
+   resolved to the underlying type before stub emission).  Without
+   these the generated .d.ts has dangling references like `Dict`,
+   `MXDict`, etc.  wasm_js.cxx is intentionally casadi-agnostic --
+   these mappings live here, in casadi.i, as TS-equivalent typedefs. */
+#ifdef SWIGWASMJS
+%insert("stubs") %{
+// --- casadi-specific TypeScript type aliases ---
+export type Dict         = Record<string, GenericType>;
+export type DMDict       = Record<string, DM>;
+export type MXDict       = Record<string, MX>;
+export type SXDict       = Record<string, SX>;
+export type SparsityDict = Record<string, Sparsity>;
+
+// --- Input-position coercion unions (analog of Python pyi's _DM / _SX / _MX).
+// xTsStub args in casadi.i use the bare class names (DM / SX / MX / ...);
+// the wasm_js.cxx d.ts emitter rewrites bare identifiers to their `_`
+// aliases at input positions only, so users can pass JS-natural values
+// (numbers, arrays, Sparsity patterns) where DM/SX/MX is expected.  Output
+// positions stay as the bare class (DM/SX/MX) so return-type narrowing
+// works.
+export type _DM = boolean | bigint | number | DM | Sparsity | number[] | number[][];
+export type _SX = SX | _DM;
+export type _MX = MX | _DM;
+export type _IM = IM | bigint | number | number[] | number[][];
+export type _SXElem = SXElem | number;
+export type _Slice = Slice | number | bigint;
+// TS 4.1+ permits inline array/object types in recursive aliases, but a
+// bare reference like `_GenericType[]` triggers TS2456 (circular).  Use
+// the inline-array form to break the cycle the compiler can see through.
+export type _GenericType = boolean | bigint | number | string | Function
+                         | readonly _GenericType[]
+                         | { readonly [k: string]: _GenericType };
+// JS callers regularly pass plain `number` literals where casadi_int
+// (-> bigint on the wasm boundary) is expected.  The wasm marshaling
+// auto-converts, so widen `bigint` -> `_bigint = bigint | number` on
+// INPUT positions only.  Output stays `bigint` for narrow typing of
+// size / index / count returns.  Hooked up via %ts_alias_in(bigint)
+// below.
+export type _bigint = bigint | number;
+export type _MIndex = number | bigint | bigint[] | boolean[] | Sparsity | DM;
+
+// Note: DMVector / MXVector / SXVector are NOT type aliases here -- they
+// collide with the SWIG-emitted std::vector wrapper classes at the top
+// of the d.ts (export class DMVector { ... }).  Functions accepting
+// std::vector<DM> use `_DM[]` (input) / `DM[]` (output) via the emitter's
+// coercion-union rewrite.  Users who want the wrapper class still get
+// `new DMVector(arr)` via the class declaration.
+export type DMVectorDict = Record<string, DM[]>;
+export type MXVectorDict = Record<string, MX[]>;
+export type SXVectorDict = Record<string, SX[]>;
+export type IM           = any;  // casadi::Matrix<casadi_int>: no JS-side class today
+export type casadi_index = [bigint, bigint];
+export type native_DM    = Float64Array;
+// Serialization + internal-impl classes -- not exposed to JS.
+export type SerializingStream    = any;
+export type DeserializingStream  = any;
+export type SharedObjectInternal = any;
+// Enums that aren't auto-wrapped.
+export type ConstraintType = number;
+export type VariableType   = number;
+export type DomainType     = number;
+
+// ---------------------------------------------------------------------
+// JS-side concat aliases.  At runtime, casadi.i's %insert("js")
+// block adds variadic + list-form aliases to the concat family:
+//   vertcat(a, b, c)  -- variadic
+//   vcat([a, b, c])   -- list form
+//   (analogous hcat / dcat).
+// The auto-generated d.ts only declares the C++-direct names
+// (vertcat / horzcat / diagcat).  Re-export the list-form aliases
+// so JS-test code calling `M.vcat([...])` typechecks.
+export declare const vcat: typeof vertcat;
+export declare const hcat: typeof horzcat;
+export declare const dcat: typeof diagcat;
+
+// Make Function instances callable at the type level.  At runtime,
+// casadi.js wraps Function instances so `f(arg)` evaluates as
+// shorthand for `f.call(arg)`.  The auto-generated class body only
+// has `.call(...)` so without this merge, `f([3, 7])` would
+// typecheck as "instance has no call signature".  This is a
+// casadi-specific runtime convention that the wasm_js.cxx emitter
+// has no business knowing about.
+export interface Function__class {
+  (arg: _DM[]): DM[];
+  (arg: _SX[]): SX[];
+  (arg: _MX[]): MX[];
+  (arg: Record<string, _DM>): Record<string, DM>;
+  (arg: Record<string, _SX>): Record<string, SX>;
+  (arg: Record<string, _MX>): Record<string, MX>;
+  // Positional varargs (the runtime accepts `f(x, y, z)` as
+  // shorthand for `f([x, y, z])`).  Loose return type since the
+  // input flavor is heterogeneous in this form.
+  (...args: any[]): any;
+}
+
+// Runtime factory shape.
+//
+// At runtime, `require("./casadi")` returns an async factory function
+// (the SWIG `module.exports = async function createcasadi() {...}`
+// pattern, see build-wasm/swig/wasm-js/casadi.js).  The factory loads
+// the underlying wasm module and returns an object whose properties
+// are ALL the exports declared above (`DM`, `SX`, `vertcat`, ...).
+//
+// Static .ts consumers use the named-export form
+// (`import { DM } from "./casadi"`) and never call the factory --
+// that path is fine because the d.ts shape AND the JS runtime shape
+// happen to agree on the *names* of the exports.
+//
+// Runtime .js consumers (and TS callers that want to invoke the
+// factory) use:
+//   const create = require("./casadi");
+//   const ca = await create();
+//   ca.DM.sym("x");
+// To make `ca` typed against the same export shape, the factory's
+// return-type is declared self-referentially via
+// `typeof import("./casadi")`.  No double bookkeeping needed.
+declare const createcasadi: () => Promise<typeof import("./casadi")>;
+export default createcasadi;
+%}
+
+/* d.ts emitter rewrite policy: inputs widen to the `_<name>` coercion
+   union; outputs keep the bare class -- except GenericType, which always
+   unwraps to a JS primitive. */
+%ts_alias_in(DM)
+%ts_alias_in(SX)
+%ts_alias_in(MX)
+%ts_alias_in(IM)
+%ts_alias_in(SXElem)
+%ts_alias_in(Slice)
+%ts_alias_in(GenericType)
+%ts_alias_in(MIndex)
+%ts_alias_in(bigint)
+
+%ts_alias_out(GenericType)
+
+// ---------------------------------------------------------------------------
+// JS-side ergonomics: post-class-definition overrides.  The "js" slot is
+// emitted by wasm_js.cxx after all class definitions and before the module
+// `return { ... }`, so the proxy classes (DM, DMVector, Function, ...) are
+// in lexical scope here.
+// ---------------------------------------------------------------------------
+%insert("js") %{
+  /* Coerce bare numbers/arrays into matrix proxies (jsarg typemaps),
+     so `plus(x, 2)` works. */
+  const __coerce = (v, Cls) =>
+    (v === null || v === undefined ||
+     (typeof v === "object" && v._swig_type !== undefined)) ? v : new Cls(v);
+
+  /* Element indexing (wired by %feature("wasmjs:index")), mirroring
+     Python: x[k], x[k]=v, x["a:b"], x["0::3"], x["a:b,j"], x.nz[k]
+     all route to casadi's 0-based get/set/get_nz/set_nz. */
+  const __isIdxKey = (k) => typeof k === "string" && k.length > 0 &&
+    (k.charCodeAt(0) === 45 || k.charCodeAt(0) === 58 ||  // '-' or ':'
+     (k.charCodeAt(0) >= 48 && k.charCodeAt(0) <= 57));   // digit
+  const __idxPart = (s) => {
+    if (s.indexOf(":") < 0) return Number(s);
+    if (s === ":") return new Slice();
+    const p = s.split(":");
+    /* Python-style open bounds: "0::3" / ":b" / "1:".  Empty start -> 0;
+       empty stop -> the Slice unboundedness sentinel (int64 max, see
+       slice.hpp) -- exactly what Python maps a `None` stop to. */
+    const start = p[0] === "" ? 0 : Number(p[0]);
+    const stop = p[1] === "" ? 9223372036854775807n : Number(p[1]);
+    return p.length >= 3 ? new Slice(start, stop, Number(p[2]))
+                         : new Slice(start, stop);
+  };
+  const __idxArgs = (k) => k.split(",").map(__idxPart);
+  const __NZ_HANDLER = {
+    get(t, k, r) { return __isIdxKey(k) ? t.get_nz(false, Number(k)) : Reflect.get(t, k, r); },
+    set(t, k, v, r) { if (__isIdxKey(k)) { t.set_nz(v, false, Number(k)); return true; } return Reflect.set(t, k, v, r); },
+  };
+  const __INDEX_HANDLER = {
+    get(t, k, r) {
+      if (k === "__indexed") return true;
+      if (k === "nz") return new Proxy(t, __NZ_HANDLER);
+      if (__isIdxKey(k)) return t.get(false, ...__idxArgs(k));
+      return Reflect.get(t, k, r);
+    },
+    set(t, k, v, r) {
+      if (__isIdxKey(k)) { t.set(v, false, ...__idxArgs(k)); return true; }
+      return Reflect.set(t, k, v, r);
+    },
+  };
+  const __mkIndex = (o) =>
+    (o === null || typeof o !== "object" || o.__indexed) ? o : new Proxy(o, __INDEX_HANDLER);
+
+  /* x.T as a getter, matching Python. */
+  for (const Cls of [DM, MX, SX, Sparsity]) {
+    const __orig_T = Cls.prototype.T;
+    if (!__orig_T) continue;
+    Object.defineProperty(Cls.prototype, "T", {
+      get() { return __orig_T.call(this); },
+      configurable: true,
+    });
+  }
+
+  /* Concat family, mirroring Python: vertcat(a, b, c) is variadic,
+     vcat([a, b, c]) takes a list (same for horzcat/hcat, diagcat/dcat). */
+  const __cat_variadic = (orig) => function (...args) {
+    return orig.call(this, args);
+  };
+  const __cat_list = (orig) => function (arr) {
+    return orig.call(this, arr);
+  };
+  for (const [variadic, list] of [
+    ["horzcat", "hcat"],
+    ["vertcat", "vcat"],
+    ["diagcat", "dcat"],
+  ]) {
+    const fn = __m[variadic];
+    __m[variadic] = __cat_variadic(fn).bind(__m);
+    __m[list]     = __cat_list(fn).bind(__m);
+  }
+
+  /* Mixed input lists ([DM(0), mx, ...]) must dispatch as the widest
+     element type; the generated per-element probes are exact-class, so
+     pre-coerce JS-side (matches Python's implicit DM->MX/SX promotion). */
+  const __origFnCall = Function.prototype.call;
+  Function.prototype.call = function (arg, ...rest) {
+    if (Array.isArray(arg)) {
+      if (arg.some((e) => e instanceof MX)) arg = arg.map((e) => e instanceof MX ? e : new MX(e));
+      else if (arg.some((e) => e instanceof SX)) arg = arg.map((e) => e instanceof SX ? e : new SX(e));
+    }
+    return __origFnCall.call(this, arg, ...rest);
+  };
+
+  /* Function instances are directly callable, mirroring Python:
+     f(a, b) positional with n_out-shaped return (0 -> null, 1 -> bare,
+     >1 -> list); f({name: v}) dict-in/dict-out.  The dict check must
+     exclude casadi types, which are objects too.  Generic machinery
+     (prototype transfer, FinalizationRegistry handoff, re-wrap of
+     methods returning bare instances) is __callable_class, backend-emitted. */
+  Function = __m.Function = __callable_class(Function, __fr_casadi_Function, (f) => function (...args) {
+    if (args.length === 1) {
+      const a = args[0];
+      if (a && typeof a === "object" && !Array.isArray(a)
+          && !(a instanceof DM) && !(a instanceof MX) && !(a instanceof SX)
+          && !(a instanceof DMVector) && !(a instanceof MXVector) && !(a instanceof SXVector)
+          && !(a instanceof Sparsity) && (typeof IM === "undefined" || !(a instanceof IM)))
+        return f.call(a);
+    }
+    const r = f.call(args);
+    const n = Number(f.n_out());
+    return n === 0 ? null : n === 1 ? r[0] : r;
+  });
+
+  /* Lazy plugin loading: make load_<type>(name) async -- fetch the
+     sibling .so into MEMFS (browser) or read it from disk (Node), then
+     run the synchronous C++ loader. */
+  const __ensurePlugin = async (soname) => {
+    try { if (M.FS.analyzePath("/" + soname).exists) return; } catch (e) {}
+    let bytes;
+    if (typeof process !== "undefined" && process.versions && process.versions.node) {
+      bytes = require("fs").readFileSync(__path.join(__dirname, soname));
+    } else {
+      // Resolve via locateFile so the .so is fetched from the same base as
+      // the core (.wasm), not relative to the document.
+      const __url = (typeof M.locateFile === "function") ? M.locateFile(soname, "") : soname;
+      const resp = await fetch(__url);
+      if (!resp.ok) throw new Error("Failed to fetch plugin " + soname + ": " + resp.status);
+      bytes = new Uint8Array(await resp.arrayBuffer());
+    }
+    M.FS.writeFile("/" + soname, bytes);
+  };
+  for (const [__fn, __infix] of [["load_nlpsol", "nlpsol"], ["load_conic", "conic"],
+      ["load_linsol", "linsol"], ["load_integrator", "integrator"],
+      ["load_rootfinder", "rootfinder"], ["load_interpolant", "interpolant"],
+      ["load_expm", "expm"], ["load_dple", "dple"]]) {
+    const __orig = __m[__fn];
+    if (typeof __orig !== "function") continue;
+    __m[__fn] = async (name) => {
+      await __ensurePlugin("libcasadi_" + __infix + "_" + name + ".so");
+      return __orig.call(__m, name);
+    };
+  }
+
+%}
+#endif
 
 // Matlab is index-1 based
 #ifdef SWIGMATLAB
@@ -2688,6 +3727,8 @@ PyOS_setsig(SIGINT, SigIntHandler);
 
 %pythoncode "numpy_bridge.py"
 
+%pythoncode "casadi_nparray.py"
+
 /* `inf` and `pi` exist at runtime (casadi/core const doubles) but are
  * deliberately NOT declared in the stub.  numpy declares both as
  * `Final[float]`; a parallel casadi declaration triggers "declared as
@@ -2713,6 +3754,37 @@ PyOS_setsig(SIGINT, SigIntHandler);
 %stub_overload_func(arctan2, SX, y: _SX, x: _SX)
 %stub_overload_func(arctan2, MX, y: _MX, x: _MX)
 #endif // SWIGPYTHON
+
+#ifdef SWIGWASMJS
+// Emit enum values as 64-bit ints so they round-trip to JS as bigint,
+// matching casadi_int-returning methods (else `id === OP_ADD` fails:
+// one side number, the other bigint).  The width lives here (not in the
+// wasm-js backend) because casadi_int's representation is project-specific.
+%feature("wasmjs:enum_int_type","long long");
+
+// Accept a bare JS number / array where SX/MX/DM is expected, coercing
+// via the constructor (so `M.plus(x, 2)` works like Python).  jstypecheck
+// lets such an arg select the overload; jsarg performs the coercion.
+// __coerce is defined in the %insert("js") block above.
+%typemap(jstypecheck) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>&, casadi::Matrix<casadi::SXElem>&
+  "(M._swig_can_SX(__unwrap($input)) || typeof $input === 'number' || typeof $input === 'bigint' || Array.isArray($input))";
+%typemap(jsarg) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>&, casadi::Matrix<casadi::SXElem>&
+  "__unwrap(__coerce($input, SX))";
+%typemap(jstypecheck) casadi::MX, const casadi::MX&, casadi::MX&
+  "(M._swig_can_MX(__unwrap($input)) || typeof $input === 'number' || typeof $input === 'bigint' || Array.isArray($input))";
+%typemap(jsarg) casadi::MX, const casadi::MX&, casadi::MX&
+  "__unwrap(__coerce($input, MX))";
+%typemap(jstypecheck) casadi::Matrix<double>, const casadi::Matrix<double>&, casadi::Matrix<double>&
+  "(M._swig_can_DM(__unwrap($input)) || typeof $input === 'number' || typeof $input === 'bigint' || Array.isArray($input))";
+%typemap(jsarg) casadi::Matrix<double>, const casadi::Matrix<double>&, casadi::Matrix<double>&
+  "__unwrap(__coerce($input, DM))";
+
+// Element indexing: wrap SX/MX/DM instances in the __mkIndex Proxy so
+// x[k] / x[k]=v / x[[i,j]] / x["a:b"] / x.nz[k] work (see %insert("js")).
+%feature("wasmjs:index") casadi::Matrix<casadi::SXElem>;
+%feature("wasmjs:index") casadi::MX;
+%feature("wasmjs:index") casadi::Matrix<double>;
+#endif // SWIGWASMJS
 
 // Strip leading casadi_ unless followed by ML/int
 %rename("%(regex:/casadi_(?!ML|int\\b)(.*)/\\1/)s") "";
@@ -2955,6 +4027,7 @@ class NZproxy:
       raise Exception("""CasADi matrices are not iterable by design.
                       Did you mean to iterate over m.nz, with m IM/DM/SX?
                       Did you mean to iterate over horzsplit(m,1)/vertsplit(m,1) with m IM/DM/SX/MX?
+                      Did you expect numpy behaviour (looping over rows)? Use ca.array().
                       """)
 
     def __setitem__(self,s,val):
@@ -3019,7 +4092,7 @@ class NZproxy:
 %enddef
 #endif // SWIGPYTHON
 
-#ifdef SWIGXML
+#if defined(SWIGXML) || defined(SWIGWASMJS) || defined(SWIGJULIA)
 %define %matrix_helpers(Type)
 %enddef
 #endif
@@ -3157,6 +4230,12 @@ namespace casadi{
   %pythoncode %{
     def __str__(self): return self.str()
     def repr(self): return self.type_name() + '(' + self.str() + ')'
+    # Value-copy semantics for all casadi types (DM/SX/MX/Sparsity/Function/
+    # ...): copy via the copy constructor.  This base injects __copy__ /
+    # __deepcopy__ into every subclass, replacing the old global-`object`
+    # shadow hack.
+    def __copy__(self): return self.__class__(self)
+    def __deepcopy__(self, memo=None): return self.__class__(self)
   %}
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
@@ -3468,6 +4547,22 @@ DECL M casadi_mldivide(const M& x, const M& y) {
 
 DECL std::vector< M > casadi_symvar(const M& x) {
   return symvar(x);
+}
+
+DECL M casadi_transform(const M& x, const casadi::Dict& opts = casadi::Dict()) {
+  return transform(x, opts);
+}
+
+DECL M casadi_transform(const M& x, const std::vector< std::vector< casadi::GenericType > >& passes, const casadi::Dict& opts = casadi::Dict()) {
+  return transform(x, passes, opts);
+}
+
+DECL std::vector< M > casadi_transform(const std::vector< M >& x, const casadi::Dict& opts = casadi::Dict()) {
+  return transform(x, opts);
+}
+
+DECL std::vector< M > casadi_transform(const std::vector< M >& x, const std::vector< std::vector< casadi::GenericType > >& passes, const casadi::Dict& opts = casadi::Dict()) {
+  return transform(x, passes, opts);
 }
 
 DECL M casadi_bilin(const M& A, const M& x, const M& y) {
@@ -4114,6 +5209,7 @@ DECL M casadi_kron_contract(const M& m, const M& x, bool inner) {
 %define MX_ALL(DECL, FLAG)
 MX_FUN(DECL, (FLAG | IS_MX), MX)
 %enddef
+%julia_convention_repair()
 %include <casadi/core/matrix_fwd.hpp>
 %include <casadi/core/matrix_decl.hpp>
 %include <casadi/core/dm_fwd.hpp>
@@ -4131,7 +5227,9 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
 
 namespace casadi{
   %extend Matrix<double> {
+#ifndef SWIGWASMJS
     void assign(const casadi::Matrix<double>&rhs) { (*$self)=rhs; }
+#endif
     %matrix_helpers(casadi::Matrix<double>)
 
   }
@@ -4144,6 +5242,7 @@ namespace casadi{
 #endif
 
 // Extend DM with SWIG unique features
+#ifndef SWIGWASMJS
 namespace casadi{
   %extend Matrix<double> {
     // Convert to a dense matrix
@@ -4158,6 +5257,7 @@ namespace casadi{
   }
 
 } // namespace casadi
+#endif
 
 
 #ifdef SWIGPYTHON
@@ -4646,12 +5746,16 @@ namespace casadi{
 %include <casadi/core/integrator.hpp>
 %include <casadi/core/conic.hpp>
 %include <casadi/core/nlpsol.hpp>
+%include <casadi/core/onnx_function.hpp>
+%include <casadi/core/graph_model.hpp>
+%include <casadi/core/graph_builder.hpp>
 %include <casadi/core/rootfinder.hpp>
 %include <casadi/core/linsol.hpp>
 %include <casadi/core/dple.hpp>
 %include <casadi/core/expm.hpp>
 %include <casadi/core/interpolant.hpp>
 %include <casadi/core/blazing_spline.hpp>
+%include <casadi/core/modelica_parser.hpp>
 
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/code_generator.hpp>
@@ -4722,6 +5826,9 @@ namespace casadi {
 #define FLAG (IS_GLOBAL | IS_MEMBER)
 #endif // SWIGMATLAB
 
+
+%julia_convention_repair()
+
 // Wrap non-member functions, possibly with casadi_ prefix
 
 %inline {
@@ -4736,6 +5843,19 @@ namespace casadi {
 
 // Wrap the casadi_ prefixed functions in member functions
 #ifdef SWIGPYTHON
+%pythoncode %{
+def _array_priority_yield(x, y):
+    # numpy-style operator deferral: a binary op on a casadi value yields
+    # (returns NotImplemented) to a NON-casadi operand that advertises a
+    # higher __array_priority__ -- e.g. casadi.ArrayInterface -- so its
+    # reflected operator runs and the higher-priority type controls the
+    # result.  casadi's own DM/SX/MX promotion is untouched: those are
+    # excluded, and their mixing is handled natively by the _casadi.* call.
+    py = getattr(y, "__array_priority__", None)
+    if py is None or py <= getattr(x, "__array_priority__", 0.0):
+        return False
+    return not isinstance(y, (DM, SX, MX, Sparsity))
+%}
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
@@ -4745,6 +5865,7 @@ namespace casadi {
         except:
           return SharedObject.__hash__(self)
       def __matmul__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
         try:
           return _casadi.mtimes(x, y)
         except NotImplementedError:
@@ -4769,17 +5890,28 @@ namespace casadi {
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
-      def __add__(x, y): return _casadi.plus(x, y)
+      def __add__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.plus(x, y)
       def __radd__(x, y): return _casadi.plus(y, x)
-      def __sub__(x, y): return _casadi.minus(x, y)
+      def __sub__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.minus(x, y)
       def __rsub__(x, y): return _casadi.minus(y, x)
-      def __mul__(x, y): return _casadi.times(x, y)
+      def __mul__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.times(x, y)
       def __rmul__(x, y): return _casadi.times(y, x)
-      def __truediv__(x, y): return _casadi.rdivide(x, y)
+      def __truediv__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.rdivide(x, y)
       def __rtruediv__(x, y): return _casadi.rdivide(y, x)
-      def __floordiv__(x, y): return _casadi.floor(_casadi.rdivide(x, y))
+      def __floordiv__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.floor(_casadi.rdivide(x, y))
       def __rfloordiv__(x, y): return _casadi.floor(_casadi.rdivide(y, x))
       def __mod__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
         return x - y * _casadi.floor(_casadi.rdivide(x, y))
       def __rmod__(x, y):
         return y - x * _casadi.floor(_casadi.rdivide(y, x))
@@ -4789,20 +5921,30 @@ namespace casadi {
       def __rdivmod__(x, y):
         q = _casadi.floor(_casadi.rdivide(y, x))
         return (q, y - x * q)
-      def __lt__(x, y): return _casadi.lt(x, y)
+      def __lt__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.lt(x, y)
       def __rlt__(x, y): return _casadi.lt(y, x)
-      def __le__(x, y): return _casadi.le(x, y)
+      def __le__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.le(x, y)
       def __rle__(x, y): return _casadi.le(y, x)
-      def __gt__(x, y): return _casadi.lt(y, x)
+      def __gt__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.lt(y, x)
       def __rgt__(x, y): return _casadi.lt(x, y)
-      def __ge__(x, y): return _casadi.le(y, x)
+      def __ge__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
+        return _casadi.le(y, x)
       def __rge__(x, y): return _casadi.le(x, y)
       def __eq__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
         r = _casadi.eq(x, y)
         if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
           raise Exception("Cannot compare SX and MX objects for equality")
         return r
       def __ne__(x, y):
+        if _array_priority_yield(x, y): return NotImplemented
         r = _casadi.ne(x, y)
         if r is NotImplemented and isinstance(x, SX) and isinstance(y, MX):
           raise Exception("Cannot compare SX and MX objects for inequality")
@@ -4818,6 +5960,7 @@ namespace casadi {
           raise Exception("Cannot compare SX and MX objects for inequality")
         return r
       def __pow__(x, n, modulo=None):
+        if modulo is None and _array_priority_yield(x, n): return NotImplemented
         p = _casadi.power(x, n)
         if modulo is None:
           return p
@@ -5087,13 +6230,33 @@ class global_unpickle_context:
   %}
 }
 #endif // SWIGMATLAB
+#ifdef SWIGWASMJS
+%extend casadi::DeserializerBase {
+  %jscode %{
+    DeserializerBase.prototype.unpack = function () {
+      const name = SerializerBase.type_to_string(this.pop_type());
+      return this["blind_unpack_" + name]();
+    };
+  %}
+}
+#endif // SWIGWASMJS
 
 %feature("director") casadi::OptiCallback;
 
 // Return-by-value
+#ifdef SWIGWASMJS
+%typemap(out, doc="DM", tsstub_out="DM", noblock=1, fragment="casadi_all") casadi::native_DM {
+  if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'DM'.");
+}
+#elif defined(SWIGJULIA)
+%typemap(out, doc="DM", noblock=1) casadi::native_DM {
+  $result = (void*) new casadi::Matrix<double>($1);
+}
+#else
 %typemap(out, doc="double", pystub_out="float", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = full_or_sparse($1, true))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'double'.");
 }
+#endif
 
 
 %apply casadi_int &OUTPUT { Opti::ConstraintType &OUTPUT };
@@ -5281,6 +6444,7 @@ opti_metadata_modifiers(casadi::Opti);
 
 opti_metadata_modifiers(casadi::Opti)
 #endif
+%julia_convention_repair()
 %include <casadi/core/optistack.hpp>
 
 

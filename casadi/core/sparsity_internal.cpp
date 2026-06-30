@@ -3298,6 +3298,103 @@ namespace casadi {
     return Sparsity(size2(), forbiddenColors.size(), ret_colind, ret_row);
   }
 
+  Sparsity SparsityInternal::star_coloring_new(std::vector<casadi_int>& which_color,
+      const Dict& opts) const {
+    // Read options
+    bool new_algo = false;
+    casadi_int cutoff = std::numeric_limits<casadi_int>::max();
+    bool largest_first = true;
+    for (auto&& e : opts) {
+      if (e.first=="new_algo") {
+        new_algo = e.second;
+      } else if (e.first=="cutoff") {
+        cutoff = e.second;
+      } else if (e.first=="largest_first") {
+        largest_first = e.second;
+      } else {
+        casadi_warning("Unknown option '" + e.first + "' for star_coloring_new.");
+      }
+    }
+
+    // Consistency check
+    casadi_assert(is_symmetric(), "Expected symmetric matrix");
+
+    // Call either of the algorithms
+    Sparsity coloring;
+    if (new_algo) {
+      coloring = star_coloring2(largest_first ? 1 : 0, cutoff);
+    } else {
+      coloring = star_coloring(largest_first ? 1 : 0, cutoff);
+    }
+
+    // Get the coloring
+    casadi_int ncolor = coloring.size2();
+    const casadi_int *col_colind = coloring.colind(), *col_row = coloring.row();
+
+    // Get sparsity pattern of the original matrix
+    casadi_int nrow = size1();
+    const casadi_int* colind = this->colind();
+    const casadi_int* row = this->row();
+
+    // How many of the unit vectors influence each output
+    std::vector<casadi_int> output_ctr(nrow);
+
+    // Loop over colors to find which color to use to calculate each nonzero
+    which_color.resize(nnz());
+    std::fill(which_color.begin(), which_color.end(), -1);
+    for (casadi_int color=0; color<ncolor; ++color) {
+      // How many times does each output get perturbed for the current color
+      std::fill(output_ctr.begin(), output_ctr.end(), 0);
+      for (casadi_int el=col_colind[color]; el<col_colind[color+1]; ++el) {
+        casadi_int c = col_row[el];
+        for (casadi_int k=colind[c]; k<colind[c+1]; ++k) output_ctr[row[k]]++;
+      }
+
+      // Loop over corresponding columns in the original matrix
+      for (casadi_int el=col_colind[color]; el<col_colind[color+1]; ++el) {
+        casadi_int c = col_row[el];
+        for (casadi_int k=colind[c]; k<colind[c+1]; ++k) {
+          // Set which_color, if output impacted by exactly one unit vector
+          if (output_ctr[row[k]] == 1 && which_color[k] < 0) which_color[k] = color;
+        }
+      }
+    }
+
+    // Select a color for each nonzero, taking into account symmetry
+    std::vector<casadi_int> rowind(colind, colind + nrow);
+    for (casadi_int c=0; c<nrow; ++c) {
+      for (casadi_int k=colind[c]; k<colind[c+1]; ++k) {
+        casadi_int r = row[k];
+        if (r > c) {
+          // Lower triangular element, get corresponding upper triangular element
+          casadi_int k_tr = rowind[r]++;
+          // Pick the color with the smallest index
+          if (which_color[k] < 0) {
+            // Pick upper triangular element
+            casadi_assert(which_color[k_tr] >= 0,
+              "Expected color for element " + str(c) + ", " + str(r));
+          } else if (which_color[k_tr] < 0) {
+            // Pick lower triangular element
+            casadi_assert(which_color[k] >= 0,
+              "Expected color for element " + str(r) + ", " + str(c));
+          } else if (which_color[k] <= which_color[k_tr]) {
+            // Both can be calculated, but lower triangular has smaller index
+            which_color[k_tr] = -1;
+          } else {
+            // Both can be calculated, but upper triangular has smaller index
+            which_color[k] = -1;
+          }
+        } else if (r == c) {
+          // Ensure diagonal elements are colored
+          casadi_assert(which_color[k] >= 0, "No color for diagonal element " + str(r));
+        }
+      }
+    }
+
+    // Return coloring (in addition to which_color mapping)
+    return coloring;
+  }
+
   Sparsity SparsityInternal::star_coloring(casadi_int ordering, casadi_int cutoff) const {
     if (!is_square()) {
       // NOTE(@jaeandersson) Why warning and not error?

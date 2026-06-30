@@ -188,7 +188,7 @@ namespace casadi {
     m->d.prob = &p_;
     m->d.qp = &m->d_qp;
 
-    casadi_highs_init(&m->d, &arg, &res, &iw, &w);
+    casadi_highs_set_work(&m->d, &arg, &res, &iw, &w);
 
     for (auto&& op : opts_) {
       HighsInt type;
@@ -242,14 +242,6 @@ namespace casadi {
     g.add_auxiliary(CodeGenerator::AUX_DOT);
     g.add_auxiliary(CodeGenerator::AUX_BILIN);
     g.add_include("interfaces/highs_c_api.h");
-    // HiGHS >= 1.12 declares the deprecated Highs_compilationDate as `static`
-    // without a definition in the public C header, which trips -Wunused-function
-    // under -Werror. Provide a dummy definition (marked unused) so the TU is
-    // well-formed under pedantic codegen builds.
-    g.includes << "#if defined(__GNUC__) || defined(__clang__)\n"
-                  "__attribute__((unused))\n"
-                  "#endif\n"
-                  "static const char* Highs_compilationDate(void) { return \"\"; }\n";
 
     g.auxiliaries << g.sanitize_source(highs_runtime_str, {"casadi_real"});
 
@@ -262,7 +254,7 @@ namespace casadi {
     // Setup data structure (corresponds to set_work)
     g << "d->prob = &p;\n";
     g << "d->qp = &d_qp;\n";
-    g << "casadi_highs_init(d, &arg, &res, &iw, &w);\n";
+    g << "casadi_highs_set_work(d, &arg, &res, &iw, &w);\n";
 
 
     void* h = Highs_create();

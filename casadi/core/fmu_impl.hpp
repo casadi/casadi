@@ -163,6 +163,15 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // DLL suffix, per the FMI specification
   static std::string dll_suffix();
 
+  // Compile the C sources in the DaeBuilder::export_fmu map into a shared library;
+  // returns the map augmented with the amalgamation source and the compiled binary.
+  // opts: compiler, compiler_options, include_dirs.
+  static Dict compile_fmu(const std::string& name, const Dict& files, const Dict& opts);
+
+  // Pack a {local_file -> archive path} map into a single .fmu at 'path', then remove
+  // the local files. Returns the .fmu path.
+  static std::string pack_fmu(const Dict& files, const std::string& path);
+
   // Load an FMI function
   template<typename T>
   T* load_function(const std::string& symname);

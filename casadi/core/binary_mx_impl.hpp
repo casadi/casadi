@@ -252,6 +252,32 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   int BinaryMX<ScX, ScY>::
+  eval_activity(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    // Zero-annihilation per operand, the value-level analog of sp_forward's OR
+    const bool f00 = operation_checker<F00Checker>(op_);  // f(0,0)==0
+    const bool f0x = operation_checker<F0XChecker>(op_);  // f(0,x)==0  (e.g. mul, div)
+    const bool fx0 = operation_checker<FX0Checker>(op_);  // f(x,0)==0  (e.g. mul)
+    const bvec_t nz = ~static_cast<bvec_t>(0);
+    const bvec_t *a0=arg[0], *a1=arg[1];
+    bvec_t *r=res[0];
+    casadi_int n=nnz();
+    for (casadi_int i=0; i<n; ++i) {
+      const bool z0 = (*a0)!=0;  // left active
+      const bool z1 = (*a1)!=0;  // right active
+      bvec_t out;
+      if (!z0 && !z1)      out = f00 ? 0 : nz;
+      else if (!z0 &&  z1) out = f0x ? 0 : nz;
+      else if ( z0 && !z1) out = fx0 ? 0 : nz;
+      else                 out = nz;
+      *r++ = out;
+      if (!ScX) a0++;
+      if (!ScY) a1++;
+    }
+    return 0;
+  }
+
+  template<bool ScX, bool ScY>
+  int BinaryMX<ScX, ScY>::
   sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     bvec_t *a0=arg[0], *a1=arg[1], *r = res[0];
     casadi_int n=nnz();

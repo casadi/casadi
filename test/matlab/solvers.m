@@ -9,8 +9,8 @@ if ~isempty(getenv(['SKIP_' upper(name) '_TESTS']))
   continue
 end
 
-if strcmp(cls,'XmlFile')
-  % do nothing
+if strcmp(cls,'XmlFile') || strcmp(cls,'Onnx')
+  % do nothing (Onnx runtime backend has no load_onnx free function)
 elseif strcmp(cls,'Importer') || strcmp(cls,'Linsol')
   eval([cls '.load_plugin(''' name ''')'])
 else
