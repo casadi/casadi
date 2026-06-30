@@ -115,8 +115,26 @@ Option            Default value       Description
 ``casadi_int``    ``long long int``   Integer type
 ``with_header``   false               Generate a header file
 ``with_mem``      false               Generate a simplified C API
+``cuda``          false               Generate CUDA C (.cu/.cuh) and mark evaluation functions with ``CUDA_DEV``
+``cuda_kernels``  ``{}``              Per-function CUDA kernel generation settings (see below)
 ``indent``        2                   Number of spaces per indentation level
 ================= =================== ======================
+
+When ``cuda`` is true and no explicit suffix is provided, the generated source uses
+the ``.cu`` extension and the optional header uses ``.cuh``. The generated evaluation
+functions and runtime helpers are marked with ``CUDA_DEV`` so they can be called from
+device code; the metadata helpers remain regular host functions.
+
+Kernel generation can be requested per function via the ``cuda_kernels`` dictionary.
+Each entry maps a function name to a dict with these keys:
+
+- ``kernel_name``: name of the generated ``__global__`` kernel (default: ``<name>_kernel``)
+- ``device_name``: name of the generated ``__device__`` wrapper (default: ``device_<name>_eval``)
+- ``batch_inputs``: list of input indices that are batched (offset by ``idx``)
+
+Outputs are always batched in CUDA kernel mode (offset by ``idx``).
+
+All non-batched inputs are treated as shared (same pointer for every thread).
 
 
 .. _sec-using_codegen:
