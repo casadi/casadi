@@ -49,8 +49,6 @@ namespace casadi {
       else if (op.first == "debug") debug_ = op.second.to_bool();
     }
 
-    create_function("nlp_f", {"x", "p"}, {"f"});
-    create_function("nlp_g", {"x", "p"}, {"g"});
     Function gradf_fcn = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
     gradf_sp_ = gradf_fcn.sparsity_out(1);
 
@@ -235,8 +233,10 @@ namespace casadi {
     m->conopt_to_casadi.reserve(initial_row_reserve);
     m->conopt_type.reserve(initial_row_reserve);
     m->conopt_rhs.reserve(initial_row_reserve);
-    if (has_linear_jac_)
+    if (has_linear_jac_) {
       m->const_jac_vals.resize(jacg_sp_.nnz(), 0.0);
+      m->linear_at_x0.resize(ng_, 0.0);
+    }
     if (has_linear_gradf_)
       m->gradf_const_vals.resize(gradf_sp_.nnz(), 0.0);
 
@@ -406,18 +406,18 @@ namespace casadi {
       const casadi_int* g_row_c    = jacg_sp_.row();
 
       // Accumulate the linear part of G at x0 per row: sum_j a_j * x0_j
-      std::vector<double> linear_at_x0(ng_, 0.0);
+      std::fill(m->linear_at_x0.begin(), m->linear_at_x0.end(), 0.0);
       for (int c = 0; c < nx_; ++c) {
         for (casadi_int el = g_colind_c[c]; el < g_colind_c[c + 1]; ++el) {
           if (jacg_nlflag_[el] == 0)
-            linear_at_x0[g_row_c[el]] += m->const_jac_vals[el] * m->d_nlp.z[c];
+            m->linear_at_x0[g_row_c[el]] += m->const_jac_vals[el] * m->d_nlp.z[c];
         }
       }
 
       for (int ci = 0; ci < ng_; ++ci) {
         // Only adjust fully linear rows (no nonlinear Jacobian entries)
         if (jacg_rowstart_[ci + 1] != jacg_rowstart_[ci]) continue;
-        double constant = m->cached_g[ci] - linear_at_x0[ci];
+        double constant = m->cached_g[ci] - m->linear_at_x0[ci];
         if (std::abs(constant) < 1e-14) continue;
         int lb_row = m->casadi_to_conopt_lb_row[ci];
         m->conopt_rhs[lb_row - 1] -= constant;
@@ -734,6 +734,10 @@ namespace casadi {
     }
     COLSTA[NUMVAR] = nz;
 
+    casadi_assert(nz == NUMNZ,
+                   "cb_read_matrix: nz != NUMNZ - Jacobian nonzero count mismatch "
+                   "between solve()'s numnz computation and this callback's writes");
+
     return 0;
   }
 
@@ -880,7 +884,9 @@ namespace casadi {
   int COI_CALLCONV ConoptInterface::cb_2dlagrsize(int* NODRV, int NUMVAR, int NUMCON, int* NHESS, int MAXHESS, void* USRMEM) {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     const ConoptInterface& self = m->self;
-    *NHESS = self.hesslag_sp_.nnz();
+    casadi_int nhess = self.hesslag_sp_.nnz();
+    casadi_assert(nhess <= std::numeric_limits<int>::max(), "hesslag_sp_ nnz overflows int");
+    *NHESS = (int)nhess;
     if (*NHESS > MAXHESS) {
         *NODRV = 1;
     }

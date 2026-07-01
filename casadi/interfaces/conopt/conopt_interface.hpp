@@ -84,6 +84,9 @@ namespace casadi {
     std::vector<double> const_jac_vals;
     // Constant objective gradient values for linear (NLFLAG=0) entries
     std::vector<double> gradf_const_vals;
+    // Scratch buffer for the linear part of G at x0 per row (only used when
+    // has_linear_jac_); persistent to avoid a per-solve heap allocation.
+    std::vector<double> linear_at_x0;
 
     // Range-constraint expansion state (recomputed each solve)
     int ng_expanded;
