@@ -259,7 +259,8 @@ namespace casadi {
         // Explictly catch C API options defined in conopt.h
         if (op.first == "itlim") COIDEF_ItLim(m->cntvect, op.second.to_int());
         else if (op.first == "errlim") COIDEF_ErrLim(m->cntvect, op.second.to_int());
-        else if (op.first == "reslim") COIDEF_ResLim(m->cntvect, op.second.to_double());
+        else if (op.first == "reslim" || op.first == "timelim")
+            COIDEF_ResLim(m->cntvect, op.second.to_double());
         else if (op.first == "maxheap") COIDEF_MaxHeap(m->cntvect, op.second.to_double());
         else if (op.second.is_string()) {
             casadi_warning("CONOPT option '" + op.first + "' is a string; string options cannot be "
