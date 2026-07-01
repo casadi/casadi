@@ -631,8 +631,8 @@ namespace casadi {
       if (!std::isinf(lb)) LOWER[i] = lb;
       if (!std::isinf(ub)) UPPER[i] = ub;
       double x0 = m->d_nlp.z[i];
-      if (!std::isinf(lb)) x0 = std::max(x0, lb);
       if (!std::isinf(ub)) x0 = std::min(x0, ub);
+      if (!std::isinf(lb)) x0 = std::max(x0, lb);
       CURR[i] = x0;
     }
 
@@ -645,9 +645,6 @@ namespace casadi {
     }
 
     if (self.warm_start_) {
-      // Always zero-initialise so that skipping the fill below is safe.
-      std::fill(VSTA, VSTA + NUMVAR, static_cast<int>(ConoptBasisStatus::AtLower));
-      std::fill(ESTA, ESTA + NUMCON, static_cast<int>(ConoptBasisStatus::AtLower));
       ESTA[0] = static_cast<int>(ConoptBasisStatus::SuperBasic);  // objective row always superbasic
 
       const double* lam = m->d_nlp.lam;
