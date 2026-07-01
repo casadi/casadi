@@ -25,6 +25,15 @@ namespace casadi {
     ErrorNoSolution    = 13
   };
 
+  // CONOPT's TYPE row-type convention (used for both TYPEX[] passed to CONOPT
+  // and the interface's own conopt_type bookkeeping).
+  enum class ConoptRowType {
+    Equality     = 0,  // an equality constraint
+    GreaterEqual = 1,  // a greater than or equal constraint
+    LessEqual    = 2,  // a less than or equal constraint
+    Free         = 3   // a free row
+  };
+
   enum class ConoptSolverStatus {
     Unset              = 0,
     NormalCompletion   = 1,
@@ -74,7 +83,7 @@ namespace casadi {
     std::vector<int> conopt_to_casadi;   // CONOPT constraint row (0-indexed) → CasADi index
     std::vector<int> casadi_to_conopt_lb_row;  // CasADi index → CONOPT row for lb (or only) side
     std::vector<int> casadi_to_conopt_ub_row;  // CasADi index → CONOPT row for ub side (range only); -1 otherwise
-    std::vector<int> conopt_type;        // CONOPT TYPE for each expanded row
+    std::vector<ConoptRowType> conopt_type;  // CONOPT TYPE for each expanded row
     std::vector<double> conopt_rhs;      // CONOPT RHS for each expanded row
 
     // Multiplier buffer for Hessian callback (avoids per-call allocation)

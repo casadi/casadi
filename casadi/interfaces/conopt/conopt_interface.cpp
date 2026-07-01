@@ -353,15 +353,15 @@ namespace casadi {
       ensure_row_capacity(ng_ - i);
       m->conopt_to_casadi.push_back((int)i);
       if (lbg == ubg) {
-        m->conopt_type.push_back(0);  m->conopt_rhs.push_back(lbg);
+        m->conopt_type.push_back(ConoptRowType::Equality);  m->conopt_rhs.push_back(lbg);
       } else if (!std::isinf(lbg) && std::isinf(ubg)) {
-        m->conopt_type.push_back(1);  m->conopt_rhs.push_back(lbg);
+        m->conopt_type.push_back(ConoptRowType::GreaterEqual);  m->conopt_rhs.push_back(lbg);
       } else if (std::isinf(lbg) && !std::isinf(ubg)) {
-        m->conopt_type.push_back(2);  m->conopt_rhs.push_back(ubg);
+        m->conopt_type.push_back(ConoptRowType::LessEqual);  m->conopt_rhs.push_back(ubg);
       } else if (std::isinf(lbg) && std::isinf(ubg)) {
-        m->conopt_type.push_back(3);  m->conopt_rhs.push_back(0.0);
+        m->conopt_type.push_back(ConoptRowType::Free);  m->conopt_rhs.push_back(0.0);
       } else {
-        m->conopt_type.push_back(1);  m->conopt_rhs.push_back(lbg);  // range: >= row
+        m->conopt_type.push_back(ConoptRowType::GreaterEqual);  m->conopt_rhs.push_back(lbg);  // range: >= row
       }
       ng_expanded++;
 
@@ -369,7 +369,7 @@ namespace casadi {
         m->casadi_to_conopt_ub_row[i] = (int)(ng_expanded + 1);
         ensure_row_capacity(ng_ - i);
         m->conopt_to_casadi.push_back((int)i);
-        m->conopt_type.push_back(2);  m->conopt_rhs.push_back(ubg);  // <= row
+        m->conopt_type.push_back(ConoptRowType::LessEqual);  m->conopt_rhs.push_back(ubg);  // <= row
         ng_expanded++;
         numnz += m->row_nnz[i];
       }
@@ -636,10 +636,10 @@ namespace casadi {
     }
 
     // Constraint types and RHS (row 0 = objective, rows 1..ng_expanded = constraints)
-    TYPEX[0] = 3;
+    TYPEX[0] = static_cast<int>(ConoptRowType::Free);
     RHS[0]   = 0.0;
     for (int r = 0; r < m->ng_expanded; ++r) {
-      TYPEX[r + 1] = m->conopt_type[r];
+      TYPEX[r + 1] = static_cast<int>(m->conopt_type[r]);
       RHS[r + 1]   = m->conopt_rhs[r];
     }
 
@@ -672,14 +672,14 @@ namespace casadi {
           int row1      = m->casadi_to_conopt_lb_row[ci];
           int row2      = m->casadi_to_conopt_ub_row[ci];
           if (r + 1 == row1) {
-            int ctype = m->conopt_type[r];  // type of this CONOPT expanded row
-            if (ctype == 0) {               // equality: both sides, just mark basic
+            ConoptRowType ctype = m->conopt_type[r];  // type of this CONOPT expanded row
+            if (ctype == ConoptRowType::Equality) {       // equality: both sides, just mark basic
               ESTA[r + 1] = 2;
-            } else if (ctype == 1) {        // >= row: active when lam_ci < 0
+            } else if (ctype == ConoptRowType::GreaterEqual) {  // >= row: active when lam_ci < 0
               ESTA[r + 1] = (lam_ci < 0.0) ? 0 : 2;
-            } else if (ctype == 2) {        // <= row (pure <= stored as lb_row): active when lam_ci > 0
+            } else if (ctype == ConoptRowType::LessEqual) {  // <= row (pure <= stored as lb_row): active when lam_ci > 0
               ESTA[r + 1] = (lam_ci > 0.0) ? 1 : 2;
-            } else {                        // free row (type=3): superbasic
+            } else {                        // free row: superbasic
               ESTA[r + 1] = 3;
             }
           } else if (r + 1 == row2) {
@@ -832,10 +832,12 @@ namespace casadi {
         if (MODE == 1 || MODE == 3) {
             *G = m->cached_g[ci];
             if (self.debug_) {
-                int ctype = m->conopt_type[ROWNO - 1];
+                ConoptRowType ctype = m->conopt_type[ROWNO - 1];
                 double rhs = m->conopt_rhs[ROWNO - 1];
-                const char* rel = (ctype == 0) ? "=" : (ctype == 1) ? ">=" : (ctype == 2) ? "<=" : "free";
-                if (ctype == 3)
+                const char* rel = (ctype == ConoptRowType::Equality) ? "=" :
+                                  (ctype == ConoptRowType::GreaterEqual) ? ">=" :
+                                  (ctype == ConoptRowType::LessEqual) ? "<=" : "free";
+                if (ctype == ConoptRowType::Free)
                     casadi::uout() << "  g[" << ci << "](x) = " << *G << " (free)\n";
                 else
                     casadi::uout() << "  g[" << ci << "](x) = " << *G << " " << rel << " " << rhs << "\n";
