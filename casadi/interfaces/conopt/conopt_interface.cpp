@@ -457,6 +457,11 @@ namespace casadi {
       if (!has_nl_gradf && (gradf_sp_.nnz() == 0 || all_const_zero)) {
         m->obj_const_ = m->cached_f;
         COIDEF_OptDir(m->cntvect, 0);
+      } else {
+        // cntvect persists across solves, so explicitly reset OptDir in case a
+        // prior solve on this instance (e.g. with different parameters) hit the
+        // constant-objective branch above and left it at 0.
+        COIDEF_OptDir(m->cntvect, -1);
       }
     }
 
