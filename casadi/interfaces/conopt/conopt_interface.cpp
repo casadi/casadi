@@ -227,9 +227,13 @@ namespace casadi {
     m->casadi_to_conopt_ub_row.assign(ng_, -1);
     m->hess_lam_g_.resize(ng_, 0.0);
     m->row_nnz.assign(ng_, 0);
-    m->conopt_to_casadi.reserve(ng_ * 2);  // worst-case: all constraints are range
-    m->conopt_type.reserve(ng_ * 2);
-    m->conopt_rhs.reserve(ng_ * 2);
+    // Most problems have few or no range constraints, so reserve a fraction of
+    // the worst case (all rows range); solve() grows these
+    // vectors on demand as rows are actually expanded.
+    casadi_int initial_row_reserve = std::max<casadi_int>(1, ng_ / 4);
+    m->conopt_to_casadi.reserve(initial_row_reserve);
+    m->conopt_type.reserve(initial_row_reserve);
+    m->conopt_rhs.reserve(initial_row_reserve);
     if (has_linear_jac_)
       m->const_jac_vals.resize(jacg_sp_.nnz(), 0.0);
     if (has_linear_gradf_)
@@ -323,12 +327,29 @@ namespace casadi {
     // (so that gradf_const_vals is populated before we check for non-zero linear entries).
     casadi_int numnz = (casadi_int)jacg_sp_.nnz();
 
+    // conopt_to_casadi/conopt_type/conopt_rhs always grow in lockstep, so a single
+    // capacity check (on conopt_to_casadi) is enough to decide whether to grow all
+    // three. Growth is by 0.25 of the CasADi rows not yet processed, rather than
+    // jumping straight to the worst-case (all-range) size.
+    auto ensure_row_capacity = [m](casadi_int remaining_rows) {
+      if (m->conopt_to_casadi.size() == m->conopt_to_casadi.capacity()) {
+        casadi_int new_cap = m->conopt_to_casadi.capacity() +
+                              std::max<casadi_int>(std::min<casadi_int>(remaining_rows, 10), remaining_rows / 4);
+        m->conopt_to_casadi.reserve(new_cap);
+        m->conopt_type.reserve(new_cap);
+        m->conopt_rhs.reserve(new_cap);
+      }
+    };
+
     for (casadi_int i = 0; i < ng_; ++i) {
       double lbg = m->d_nlp.lbz[nx_ + i];
       double ubg = m->d_nlp.ubz[nx_ + i];
       bool is_range = !std::isinf(lbg) && !std::isinf(ubg) && lbg != ubg;
 
-      m->casadi_to_conopt_lb_row[i] = (int)(ng_expanded + 1);  // 1-indexed CONOPT row
+      // CONOPT row 0 is reserved for the objective, so constraint rows start at 1
+      // (arrays are still plain 0-based C arrays; only the row *numbering* is offset).
+      m->casadi_to_conopt_lb_row[i] = (int)(ng_expanded + 1);
+      ensure_row_capacity(ng_ - i);
       m->conopt_to_casadi.push_back((int)i);
       if (lbg == ubg) {
         m->conopt_type.push_back(0);  m->conopt_rhs.push_back(lbg);
@@ -345,6 +366,7 @@ namespace casadi {
 
       if (is_range) {
         m->casadi_to_conopt_ub_row[i] = (int)(ng_expanded + 1);
+        ensure_row_capacity(ng_ - i);
         m->conopt_to_casadi.push_back((int)i);
         m->conopt_type.push_back(2);  m->conopt_rhs.push_back(ubg);  // <= row
         ng_expanded++;
