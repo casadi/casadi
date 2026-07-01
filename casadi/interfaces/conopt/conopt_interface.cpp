@@ -396,10 +396,10 @@ namespace casadi {
     }
 
     // Adjust conopt_rhs for fully linear rows to absorb constant terms.
-    // CONOPT's pre-triangular preprocessor uses only VALUE[] + RHS and never calls
-    // FDEval during that phase, so any constant in a fully linear constraint
-    // (e.g. x[9] - 3*x[6] + 133 = 0 → RHS must be -133, not 0) must be moved
-    // to the RHS here. For mixed (linear+nonlinear) rows, CONOPT calls FDEval and
+    // CONOPT doesn't call FDEval for purely linear rows, since these are evaluated internally.
+    // As such, it is necessary to store and constant terms in the RHS of the constraint,
+    // e.g. x[9] - 3*x[6] + 133 = 0 → RHS must be -133.
+    // For mixed (linear+nonlinear) rows, CONOPT calls FDEval and
     // gets the full function value including the constant, so no adjustment needed.
     if (has_linear_jac_) {
       const casadi_int* g_colind_c = jacg_sp_.colind();
