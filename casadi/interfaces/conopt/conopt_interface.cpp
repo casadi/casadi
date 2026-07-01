@@ -227,10 +227,11 @@ namespace casadi {
     m->casadi_to_conopt_ub_row.assign(ng_, -1);
     m->hess_lam_g_.resize(ng_, 0.0);
     m->row_nnz.assign(ng_, 0);
-    // Most problems have few or no range constraints, so reserve a fraction of
-    // the worst case (all rows range); solve() grows these
-    // vectors on demand as rows are actually expanded.
-    casadi_int initial_row_reserve = std::max<casadi_int>(1, ng_ / 4);
+    // Every CasADi row contributes at least one entry (range constraints add a
+    // second), so ng_ is a guaranteed lower bound on the final size — reserving
+    // less would force a reallocation on essentially every solve. solve() grows
+    // these vectors further on demand only for the range-constraint rows.
+    casadi_int initial_row_reserve = ng_;
     m->conopt_to_casadi.reserve(initial_row_reserve);
     m->conopt_type.reserve(initial_row_reserve);
     m->conopt_rhs.reserve(initial_row_reserve);
