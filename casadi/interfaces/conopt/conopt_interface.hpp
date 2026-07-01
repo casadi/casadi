@@ -34,6 +34,15 @@ namespace casadi {
     Free         = 3   // a free row
   };
 
+  // CONOPT's IniStat=2 basis-status convention, shared by VSTA (variables) and
+  // ESTA (constraint slacks) in the ReadMatrix callback.
+  enum class ConoptBasisStatus {
+    AtLower   = 0,  // initialized at lower bound
+    AtUpper   = 1,  // initialized at upper bound
+    Basic     = 2,  // initialized basic
+    SuperBasic = 3  // initialized superbasic
+  };
+
   enum class ConoptSolverStatus {
     Unset              = 0,
     NormalCompletion   = 1,
