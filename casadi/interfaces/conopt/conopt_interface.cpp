@@ -645,9 +645,9 @@ namespace casadi {
 
     if (self.warm_start_) {
       // Always zero-initialise so that skipping the fill below is safe.
-      std::fill(VSTA, VSTA + NUMVAR, 0);
-      std::fill(ESTA, ESTA + NUMCON, 0);
-      ESTA[0] = 3;  // objective row always superbasic
+      std::fill(VSTA, VSTA + NUMVAR, static_cast<int>(ConoptBasisStatus::AtLower));
+      std::fill(ESTA, ESTA + NUMCON, static_cast<int>(ConoptBasisStatus::AtLower));
+      ESTA[0] = static_cast<int>(ConoptBasisStatus::SuperBasic);  // objective row always superbasic
 
       const double* lam = m->d_nlp.lam;
       bool all_zero = std::all_of(lam, lam + self.nx_ + self.ng_,
@@ -659,11 +659,11 @@ namespace casadi {
           double xi  = m->d_nlp.z[i];
           double li  = lam[i];
           if (!std::isinf(lbi) && std::fabs(xi - lbi) < 1e-8 && li <= 0.0)
-            VSTA[i] = 0;
+            VSTA[i] = static_cast<int>(ConoptBasisStatus::AtLower);
           else if (!std::isinf(ubi) && std::fabs(xi - ubi) < 1e-8 && li >= 0.0)
-            VSTA[i] = 1;
+            VSTA[i] = static_cast<int>(ConoptBasisStatus::AtUpper);
           else
-            VSTA[i] = 2;
+            VSTA[i] = static_cast<int>(ConoptBasisStatus::Basic);
         }
 
         for (int r = 0; r < m->ng_expanded; ++r) {
@@ -674,19 +674,22 @@ namespace casadi {
           if (r + 1 == row1) {
             ConoptRowType ctype = m->conopt_type[r];  // type of this CONOPT expanded row
             if (ctype == ConoptRowType::Equality) {       // equality: both sides, just mark basic
-              ESTA[r + 1] = 2;
+              ESTA[r + 1] = static_cast<int>(ConoptBasisStatus::Basic);
             } else if (ctype == ConoptRowType::GreaterEqual) {  // >= row: active when lam_ci < 0
-              ESTA[r + 1] = (lam_ci < 0.0) ? 0 : 2;
+              ESTA[r + 1] = static_cast<int>(
+                  (lam_ci < 0.0) ? ConoptBasisStatus::AtLower : ConoptBasisStatus::Basic);
             } else if (ctype == ConoptRowType::LessEqual) {  // <= row (pure <= stored as lb_row): active when lam_ci > 0
-              ESTA[r + 1] = (lam_ci > 0.0) ? 1 : 2;
+              ESTA[r + 1] = static_cast<int>(
+                  (lam_ci > 0.0) ? ConoptBasisStatus::AtUpper : ConoptBasisStatus::Basic);
             } else {                        // free row: superbasic
-              ESTA[r + 1] = 3;
+              ESTA[r + 1] = static_cast<int>(ConoptBasisStatus::SuperBasic);
             }
           } else if (r + 1 == row2) {
             // range ub side is active when lam_ci > 0
-            ESTA[r + 1] = (lam_ci > 0.0) ? 1 : 2;
+            ESTA[r + 1] = static_cast<int>(
+                (lam_ci > 0.0) ? ConoptBasisStatus::AtUpper : ConoptBasisStatus::Basic);
           } else {
-            ESTA[r + 1] = 2;
+            ESTA[r + 1] = static_cast<int>(ConoptBasisStatus::Basic);
           }
         }
       }
