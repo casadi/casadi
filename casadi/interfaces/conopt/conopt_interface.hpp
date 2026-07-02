@@ -1,3 +1,27 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
 #ifndef CASADI_CONOPT_INTERFACE_HPP
 #define CASADI_CONOPT_INTERFACE_HPP
 
@@ -94,7 +118,8 @@ namespace casadi {
     std::vector<int> row_nnz;            // nnz per CasADi row, persistent across solves
     std::vector<int> conopt_to_casadi;   // CONOPT constraint row (0-indexed) → CasADi index
     std::vector<int> casadi_to_conopt_lb_row;  // CasADi index → CONOPT row for lb (or only) side
-    std::vector<int> casadi_to_conopt_ub_row;  // CasADi index → CONOPT row for ub side (range only); -1 otherwise
+    // CasADi index -> CONOPT row for ub side (range only); -1 otherwise
+    std::vector<int> casadi_to_conopt_ub_row;
     std::vector<ConoptRowType> conopt_type;  // CONOPT TYPE for each expanded row
     std::vector<double> conopt_rhs;      // CONOPT RHS for each expanded row
 
@@ -135,6 +160,10 @@ namespace casadi {
     int solve(void* mem) const override;
     Dict get_stats(void* mem) const override;
 
+    // Grows conopt_to_casadi/conopt_type/conopt_rhs (which always stay the same
+    // size as each other) when they are full, used by solve()'s row-expansion loop.
+    void ensure_row_capacity(ConoptMemory* m, casadi_int remaining_rows) const;
+
     // Sparsities for the problem components
     Sparsity gradf_sp_;
     Sparsity jacg_sp_;
@@ -168,27 +197,49 @@ namespace casadi {
     static ProtoFunction* deserialize(DeserializingStream& s) { return new ConoptInterface(s); }
 
     // CONOPT Mandatory Callbacks
-    static int COI_CALLCONV cb_read_matrix(double LOWER[], double CURR[], double UPPER[], int VSTA[], int TYPEX[], double RHS[], int ESTA[], int COLSTA[], int ROWNO[], double VALUE[], int NLFLAG[], int NUMVAR, int NUMCON, int NUMNZ, void* USRMEM);
-    static int COI_CALLCONV cb_fdevalini(const double X[], const int ROWLIST[], int MODE, int LISTSIZE, int NUMTHREAD, int IGNERR, int* ERRCNT, int NUMVAR, void* USRMEM);
-    static int COI_CALLCONV cb_fd_eval(const double X[], double* G, double JAC[], int ROWNO, const int JACNUM[], int MODE, int IGNERR, int* ERRCNT, int NUMVAR, int NUMJAC, int THREAD, void* USRMEM);
+    static int COI_CALLCONV cb_read_matrix(double LOWER[], double CURR[], double UPPER[],
+                                            int VSTA[], int TYPEX[], double RHS[],
+                                            int ESTA[], int COLSTA[], int ROWNO[],
+                                            double VALUE[], int NLFLAG[], int NUMVAR,
+                                            int NUMCON, int NUMNZ, void* USRMEM);
+    static int COI_CALLCONV cb_fdevalini(const double X[], const int ROWLIST[], int MODE,
+                                          int LISTSIZE, int NUMTHREAD, int IGNERR,
+                                          int* ERRCNT, int NUMVAR, void* USRMEM);
+    static int COI_CALLCONV cb_fd_eval(const double X[], double* G, double JAC[],
+                                        int ROWNO, const int JACNUM[], int MODE, int IGNERR,
+                                        int* ERRCNT, int NUMVAR, int NUMJAC, int THREAD,
+                                        void* USRMEM);
     static int COI_CALLCONV cb_fdevalend(int IGNERR, int* ERRCNT, void* USRMEM);
-    static int COI_CALLCONV cb_status(int MODSTA, int SOLSTA, int ITER, double OBJVAL, void* USRMEM);
-    static int COI_CALLCONV cb_solution(const double XVAL[], const double XMAR[], const int XBAS[], const int XSTA[], const double YVAL[], const double YMAR[], const int YBAS[], const int YSTA[], int NUMVAR, int NUMCON, void* USRMEM);
+    static int COI_CALLCONV cb_status(int MODSTA, int SOLSTA, int ITER, double OBJVAL,
+                                       void* USRMEM);
+    static int COI_CALLCONV cb_solution(const double XVAL[], const double XMAR[],
+                                         const int XBAS[], const int XSTA[],
+                                         const double YVAL[], const double YMAR[],
+                                         const int YBAS[], const int YSTA[],
+                                         int NUMVAR, int NUMCON, void* USRMEM);
 
     // Logging and Messages
-    static int COI_CALLCONV cb_message(int SMSG, int DMSG, int NMSG, char* MSGV[], void* USRMEM);
-    static int COI_CALLCONV cb_errmsg(int ROWNO, int COLNO, int POSNO, const char* MSG, void* USRMEM);
+    static int COI_CALLCONV cb_message(int SMSG, int DMSG, int NMSG, char* MSGV[],
+                                        void* USRMEM);
+    static int COI_CALLCONV cb_errmsg(int ROWNO, int COLNO, int POSNO, const char* MSG,
+                                       void* USRMEM);
 
     // Options and Progress
-    static int COI_CALLCONV cb_option(int NCALL, double* RVAL, int* IVAL, int* LVAL, char* NAME, void* USRMEM);
-    static int COI_CALLCONV cb_progress(int LEN_INT, const int INTX[], int LEN_RL, const double RL[], const double X[], void* USRMEM);
+    static int COI_CALLCONV cb_option(int NCALL, double* RVAL, int* IVAL, int* LVAL,
+                                       char* NAME, void* USRMEM);
+    static int COI_CALLCONV cb_progress(int LEN_INT, const int INTX[], int LEN_RL,
+                                         const double RL[], const double X[], void* USRMEM);
 
     // CONOPT 2nd Order Callbacks
-    static int COI_CALLCONV cb_2dlagrstr(int HSRW[], int HSCL[], int* NODRV, int NUMVAR, int NUMCON, int NHESS, void* USRMEM);
-    static int COI_CALLCONV cb_2dlagrval(const double X[], const double U[], const int HSRW[], const int HSCL[], double HSVL[], int* NODRV, int NUMVAR, int NUMCON, int NHESS, void* USRMEM);
+    static int COI_CALLCONV cb_2dlagrstr(int HSRW[], int HSCL[], int* NODRV, int NUMVAR,
+                                          int NUMCON, int NHESS, void* USRMEM);
+    static int COI_CALLCONV cb_2dlagrval(const double X[], const double U[],
+                                          const int HSRW[], const int HSCL[], double HSVL[],
+                                          int* NODRV, int NUMVAR, int NUMCON, int NHESS,
+                                          void* USRMEM);
 
   protected:
     explicit ConoptInterface(DeserializingStream& s);
   };
-}
+}  // namespace casadi
 #endif // CASADI_CONOPT_INTERFACE_HPP
