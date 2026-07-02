@@ -116,6 +116,8 @@ namespace casadi {
       for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
         if (!jacg_nlflag_[el]) continue;
         int r = (int)g_row[el];
+        casadi_assert(fill_pos[r] < jacg_rowstart_[r + 1] - jacg_rowstart_[r],
+                      "CSR fill overflow for row r - count/fill pass mismatch in jacg_rowstart_");
         int pos = jacg_rowstart_[r] + fill_pos[r]++;
         jacg_nzidx_[pos] = (int)el;
         jacg_col_[pos]   = c;
@@ -180,6 +182,8 @@ namespace casadi {
       for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
         if (!jacg_nlflag_[el]) continue;
         int r = (int)g_row[el];
+        casadi_assert(fill_pos[r] < jacg_rowstart_[r + 1] - jacg_rowstart_[r],
+                      "CSR fill overflow for row r - count/fill pass mismatch in jacg_rowstart_");
         int pos = jacg_rowstart_[r] + fill_pos[r]++;
         jacg_nzidx_[pos] = (int)el;
         jacg_col_[pos]   = c;
@@ -629,6 +633,12 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     const ConoptInterface& self = m->self;
 
+    // CONOPT is expected to echo back exactly what we told it via COIDEF_NumVar/
+    // COIDEF_NumCon in init_mem()/solve() — a mismatch means the interface's own
+    // bookkeeping (nx_, ng_expanded) is desynced from what CONOPT is using.
+    casadi_assert(NUMVAR == self.nx_, "cb_read_matrix: NUMVAR != nx_");
+    casadi_assert(NUMCON == m->ng_expanded + 1, "cb_read_matrix: NUMCON != ng_expanded + 1");
+
     // Variable bounds and initial point (clamped to [lb, ub])
     for (int i = 0; i < NUMVAR; ++i) {
       double lb = m->d_nlp.lbz[i];
@@ -745,6 +755,9 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     const ConoptInterface& self = m->self;
 
+    casadi_assert(NUMVAR == self.nx_, "cb_fdevalini: NUMVAR != nx_");
+    casadi_assert((size_t)NUMVAR == m->cached_x.size(), "cb_fdevalini: NUMVAR != cached_x size");
+
     std::memcpy(m->cached_x.data(), X, NUMVAR * sizeof(double));
 
     if (self.debug_) {
@@ -838,6 +851,8 @@ namespace casadi {
             }
         }
     } else {
+        casadi_assert(ROWNO >= 1 && ROWNO <= m->ng_expanded,
+                      "cb_fd_eval: ROWNO out of range");
         int ci = m->conopt_to_casadi[ROWNO - 1];
         if (MODE == 1 || MODE == 3) {
             *G = m->cached_g[ci];
@@ -907,6 +922,8 @@ namespace casadi {
             idx++;
         }
     }
+    casadi_assert(idx == NHESS,
+                  "cb_2dlagrstr: idx != NHESS - Hessian nonzero count mismatch");
     return 0;
   }
 
