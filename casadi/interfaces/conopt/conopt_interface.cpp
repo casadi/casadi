@@ -1,7 +1,6 @@
 #include "conopt_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/casadi_interrupt.hpp"
-#include <cassert>
 #include <cmath>
 #include <cstring>
 #include <algorithm>
@@ -287,7 +286,6 @@ namespace casadi {
 
     if (exact_hessian_ && hesslag_sp_.nnz() > 0) {
         COIDEF_NumHess(m->cntvect, hesslag_sp_.nnz());
-        COIDEF_2DLagrSize(m->cntvect, &ConoptInterface::cb_2dlagrsize);
         COIDEF_2DLagrStr(m->cntvect, &ConoptInterface::cb_2dlagrstr);
         COIDEF_2DLagrVal(m->cntvect, &ConoptInterface::cb_2dlagrval);
     }
@@ -893,18 +891,6 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     m->cache_valid_jac.store(false, std::memory_order_relaxed);
     m->cache_valid.store(false, std::memory_order_relaxed);
-    return 0;
-  }
-
-  int COI_CALLCONV ConoptInterface::cb_2dlagrsize(int* NODRV, int NUMVAR, int NUMCON, int* NHESS, int MAXHESS, void* USRMEM) {
-    auto m = static_cast<ConoptMemory*>(USRMEM);
-    const ConoptInterface& self = m->self;
-    casadi_int nhess = self.hesslag_sp_.nnz();
-    casadi_assert(nhess <= std::numeric_limits<int>::max(), "hesslag_sp_ nnz overflows int");
-    *NHESS = (int)nhess;
-    if (*NHESS > MAXHESS) {
-        *NODRV = 1;
-    }
     return 0;
   }
 
