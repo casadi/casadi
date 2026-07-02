@@ -649,7 +649,9 @@ namespace casadi {
       CURR[i] = x0;
     }
 
-    // Constraint types and RHS (row 0 = objective, rows 1..ng_expanded = constraints)
+    // Constraint types and RHS (row 0 = objective, rows 1..ng_expanded = constraints).
+    // conopt_type/conopt_rhs come from solve()'s range-constraint expansion —
+    // they depend on this call's numeric lbg/ubg, not just problem structure.
     TYPEX[0] = static_cast<int>(ConoptRowType::Free);
     RHS[0]   = 0.0;
     for (int r = 0; r < m->ng_expanded; ++r) {
@@ -658,8 +660,12 @@ namespace casadi {
     }
 
     if (self.warm_start_) {
+      // conopt_to_casadi/casadi_to_conopt_lb_row/ub_row (from solve()) map each
+      // expanded CONOPT row back to its CasADi constraint, to look up lam there.
       ESTA[0] = static_cast<int>(ConoptBasisStatus::SuperBasic);  // objective row always superbasic
 
+      // lam is the prior solve's dual solution, length nx_+ng_. lam[0..nx_-1] are
+      // variable-bound multipliers, lam[nx_..] are constraint multipliers.
       const double* lam = m->d_nlp.lam;
       bool all_zero = std::all_of(lam, lam + self.nx_ + self.ng_,
                                   [](double v) { return v == 0.0; });
@@ -668,7 +674,7 @@ namespace casadi {
           double lbi = m->d_nlp.lbz[i];
           double ubi = m->d_nlp.ubz[i];
           double xi  = m->d_nlp.z[i];
-          double li  = lam[i];
+          double li  = lam[i];  // nonzero multiplier => that bound is active, so nonbasic
           if (!std::isinf(lbi) && std::fabs(xi - lbi) < 1e-8 && li <= 0.0)
             VSTA[i] = static_cast<int>(ConoptBasisStatus::AtLower);
           else if (!std::isinf(ubi) && std::fabs(xi - ubi) < 1e-8 && li >= 0.0)
@@ -679,7 +685,7 @@ namespace casadi {
 
         for (int r = 0; r < m->ng_expanded; ++r) {
           int ci        = m->conopt_to_casadi[r];
-          double lam_ci = lam[NUMVAR + ci];
+          double lam_ci = lam[NUMVAR + ci];  // this constraint's multiplier, same sign logic as above
           int row1      = m->casadi_to_conopt_lb_row[ci];
           int row2      = m->casadi_to_conopt_ub_row[ci];
           if (r + 1 == row1) {
@@ -706,13 +712,18 @@ namespace casadi {
       }
     }
 
-    // Jacobian structure — built live from jacg_sp_ with range-row duplication
+    // Jacobian structure — built live from jacg_sp_ with range-row duplication.
+    // Column/sparsity/linearity data (jacg_sp_, gradf_col_flag_, gradf_col_to_nz_,
+    // gradf_nlflag_, jacg_nlflag_) is structural, fixed since init(). Row mapping
+    // (casadi_to_conopt_lb_row/ub_row) and numeric values (gradf_const_vals,
+    // const_jac_vals) are this solve()'s numeric data.
     const casadi_int* g_colind = self.jacg_sp_.colind();
     const casadi_int* g_row    = self.jacg_sp_.row();
     int nz = 0;
     for (int c = 0; c < NUMVAR; ++c) {
       COLSTA[c] = nz;
       if (self.gradf_col_flag_[c]) {
+        // Objective-gradient entry in column c, if any (row 0 = objective).
         casadi_int k = self.gradf_col_to_nz_[c];
         if (self.gradf_nlflag_[k] == 1) {
           ROWNO[nz]  = 0;
@@ -725,6 +736,8 @@ namespace casadi {
           nz++;
         }
       }
+      // Constraint-Jacobian entries in column c; duplicated onto the ub row too
+      // when this CasADi row was split into a range constraint by solve().
       for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
         int ci = (int)g_row[el];
         int nlflag = self.jacg_nlflag_[el];
@@ -919,7 +932,6 @@ namespace casadi {
 
     // CONOPT's Lagrangian: L = SUM(r) U(r) * F(r), so d²L/dx² = SUM(r) U(r) * d²F(r)/dx².
     // CasADi computes lam_f*d²f/dx² + lam_g^T*d²g/dx², so lam_f = U[0], lam_g[ci] = U[row_ci].
-    // No sign flip: CONOPT's U is the Lagrangian weight directly, not the shadow price (YMAR).
     double obj_factor = U[0];
 
     for (int ci = 0; ci < self.ng_; ++ci) {
