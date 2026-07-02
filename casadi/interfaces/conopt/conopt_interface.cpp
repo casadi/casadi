@@ -11,7 +11,7 @@ namespace casadi {
   extern "C" int CASADI_NLPSOL_CONOPT_EXPORT casadi_register_nlpsol_conopt(Nlpsol::Plugin* plugin) {
     plugin->creator = ConoptInterface::creator;
     plugin->name = "conopt";
-    plugin->doc = "CONOPT Interface";
+    plugin->doc = ConoptInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &ConoptInterface::options_;
     plugin->deserialize = &ConoptInterface::deserialize;

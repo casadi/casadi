@@ -123,6 +123,9 @@ namespace casadi {
     static const Options options_;
     const Options& get_options() const override { return options_; }
 
+    /// A documentation string
+    static const std::string meta_doc;
+
     void init(const Dict& opts) override;
     void* alloc_mem() const override { return new ConoptMemory(*this); }
     int init_mem(void* mem) const override;
