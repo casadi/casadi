@@ -32,6 +32,8 @@
 #ifdef WITH_DEEPBIND
 #ifndef __APPLE__
 #if __GLIBC__
+#include <cstring>
+#include <cstdlib>
 extern char **environ;
 #endif
 #endif
@@ -167,13 +169,37 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
         // we restore the original value of glibc .bss's environ at the end of the function
 
         // Check if there is a duplicate environ
-        char*** p_environ_rtdl_next = reinterpret_cast<char ***>(dlsym(RTLD_NEXT, "environ"));
-        bool environ_rtdl_next_overridden = false;
-        char** environ_rtld_next_original_value = nullptr;
-        if (p_environ_rtdl_next && p_environ_rtdl_next != &environ) {
-          environ_rtld_next_original_value = *p_environ_rtdl_next;
-          *p_environ_rtdl_next = environ;
-          environ_rtdl_next_overridden = true;
+        char*** p_environ_rtld_next = reinterpret_cast<char ***>(dlsym(RTLD_NEXT, "environ"));
+        bool environ_overriden = false;
+        char** environ_original = nullptr;
+        if (p_environ_rtld_next && p_environ_rtld_next != &environ) {
+          // We are overriding the environ, however, older glibc may free the one we have currently
+          // when calling setenv: https://codebrowser.dev/glibc/glibc/stdlib/setenv.c.html#116
+          // This means we have to make a copy of the environ array. This is safe as the strings
+          // pointed to by `environ` may not, and are not freed by glibc.
+          // So we calculate the size here and malloc a new environment array.
+          // We then will leak this if users use setenv afterwards. Just accept this as a fact of life.
+          //
+          // This is not thread safe because someone might modify this out from under us.
+          // We could maybe try and load the "envlock" and lock with this from <libc-lock.h>:
+          // __libc_lock_lock (envlock)
+          // but frankly, if we are in a spawned thread and they are using setenv() after spawning
+          // threads, that is not our problem. Stop monkeying with the environ dynamically people.
+          size_t size = 0;
+          if (environ != NULL) // Should never happen that ep is none but
+          {
+            char** ep = environ;
+            while(*ep != NULL) // we don't check if the environ strings are valid.
+            {
+              size++;
+              ep++;
+            }
+          }
+          environ_original = reinterpret_cast<char **>(std::malloc(size*sizeof (char *)));
+          std::memcpy(environ_original, environ, size*sizeof (char *));
+
+          *p_environ_rtld_next = environ;
+          environ_overriden = true;
         }
         #endif
     #endif
@@ -276,10 +302,11 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
     #ifdef WITH_DEEPBIND
     #ifndef __APPLE__
     #if __GLIBC__
-        // Restor
-        if (environ_rtdl_next_overridden) {
-          *p_environ_rtdl_next = environ_rtld_next_original_value;
-          environ_rtdl_next_overridden = false;
+        // Restore the environ to the copied environment, because the original one might have been freed.
+        // We cannot free it because we don't know if it was already freed so we leak it.
+        if (environ_overriden) {
+          *p_environ_rtld_next = environ_original;
+          environ_overriden = false;
         }
     #endif
     #endif
