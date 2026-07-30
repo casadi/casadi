@@ -195,8 +195,9 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
               ep++;
             }
           }
-          environ_original = reinterpret_cast<char **>(std::malloc(size*sizeof (char *)));
-          std::memcpy(environ_original, environ, size*sizeof (char *));
+          std::cout << "env size: " << size << std::endl;
+          environ_original = reinterpret_cast<char **>(std::malloc((size+1)*sizeof (char *)));
+          std::memcpy(environ_original, environ, (size+1)*sizeof (char *));
 
           *p_environ_rtld_next = environ;
           environ_overriden = true;
