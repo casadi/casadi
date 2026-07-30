@@ -178,7 +178,7 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
           // This means we have to make a copy of the environ array. This is safe as the strings
           // pointed to by `environ` may not, and are not freed by glibc.
           // So we calculate the size here and malloc a new environment array.
-          // We then will leak this if users use setenv afterwards. Just accept this as a fact of life.
+          // We then will leak the original environ. Just accept this as a fact of life.
           //
           // This is not thread safe because someone might modify this out from under us.
           // We could maybe try and load the "envlock" and lock with this from <libc-lock.h>:
