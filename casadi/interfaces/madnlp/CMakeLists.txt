@@ -35,12 +35,3 @@ target_include_directories(casadi_nlpsol_madnlp
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
-include(CMakePrintHelpers)
-cmake_print_properties(TARGETS casadi_nlpsol_madnlp
-  PROPERTIES INCLUDE_DIRECTORIES
-)
-cmake_print_properties(TARGETS libmad::libMad
-  PROPERTIES INCLUDE_DIRECTORIES
-)
-
-message("CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")
