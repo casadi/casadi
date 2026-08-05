@@ -35,6 +35,3 @@ target_include_directories(casadi_nlpsol_ccopt
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
-include(CMakePrintHelpers)
-
-message("CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")

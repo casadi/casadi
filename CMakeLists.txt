@@ -942,17 +942,20 @@ option(WITH_BUILD_MADNLP "Download compiled libMad"  OFF)
 set(LIBMAD_TAR_HASH "")
 if(NOT LIBMAD_TAR_PATH)
   if(NOT LIBMAD_RELEASE)
-    set(LIBMAD_RELEASE "v0.0.7-casadi")
+    set(LIBMAD_RELEASE "v0.0.12-casadi")
   endif()
-  set(LIBMAD_TAR_ROOT "https://github.com/apozharski/libMad/releases/download/")
+  set(LIBMAD_TAR_ROOT "https://github.com/MadNLP/libMad/releases/download/")
   if(UNIX AND NOT APPLE)
-    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/libMad-ubuntu-x86_64-${LIBMAD_RELEASE}.tar.gz")
+    set(LIBMAD_RELEASE_FULL "libMad-ubuntu-x86_64-${LIBMAD_RELEASE}")
+    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/${LIBMAD_RELEASE_FULL}.tar.gz")
     message("Will download unix LibMad: ${LIBMAD_TAR_PATH}")
   elseif(WIN32)
-    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/libMad-windows-x86_64-${LIBMAD_RELEASE}.tar.gz")
+    set(LIBMAD_RELEASE_FULL "libMad-windows-x86_64-${LIBMAD_RELEASE}")
+    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/${LIBMAD_RELEASE_FULL}.tar.gz")
     message("Will download windows LibMad: ${LIBMAD_TAR_PATH}")
   elseif(APPLE)
-    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/libMad-apple-aarch64-${LIBMAD_RELEASE}.tar.gz")
+    set(LIBMAD_RELEASE_FULL "libMad-apple-aarch64-${LIBMAD_RELEASE}")
+    set(LIBMAD_TAR_PATH "${LIBMAD_TAR_ROOT}${LIBMAD_RELEASE}/${LIBMAD_RELEASE_FULL}.tar.gz")
     message("Will download apple LibMad: ${LIBMAD_TAR_PATH}")
   endif()
 endif()
@@ -1688,29 +1691,29 @@ if((WITH_MADNLP AND WITH_BUILD_MADNLP) OR (WITH_CCOPT AND WITH_BUILD_CCOPT))
   add_library(libmad::libMad SHARED IMPORTED)
   set_target_properties(libmad::libMad
     PROPERTIES
-    IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/${SHARED_LIBRARY_RELDIR}/libMad${CMAKE_SHARED_LIBRARY_SUFFIX}
-    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/${SHARED_LIBRARY_RELDIR}/libMad.imp.lib
+    IMPORTED_LOCATION ${LIBMAD_BINARY_DIR}/${LIBMAD_RELEASE_FULL}/${SHARED_LIBRARY_RELDIR}/libMad${CMAKE_SHARED_LIBRARY_SUFFIX}
+    IMPORTED_IMPLIB ${LIBMAD_BINARY_DIR}/${LIBMAD_RELEASE_FULL}/${SHARED_LIBRARY_RELDIR}/libMad.imp.lib
   )
   set_target_properties(libmad::libMad PROPERTIES LINKER_LANGUAGE C)
   target_include_directories(libmad::libMad INTERFACE
-    ${LIBMAD_BINARY_DIR}/include
+    ${LIBMAD_BINARY_DIR}/${LIBMAD_RELEASE_FULL}/include
     $<INSTALL_INTERFACE:include/>
   )
 
   install(DIRECTORY
-    "${LIBMAD_BINARY_DIR}/include/"
+    "${LIBMAD_BINARY_DIR}/${LIBMAD_RELEASE_FULL}/include/"
     DESTINATION "${INCLUDE_PREFIX}")
   install(DIRECTORY
-    "${LIBMAD_BINARY_DIR}/lib/"
+    "${LIBMAD_BINARY_DIR}/${LIBMAD_RELEASE_FULL}/lib/"
     DESTINATION "${LIB_PREFIX}")
   install(DIRECTORY
-    "${LIBMAD_BINARY_DIR}/share"
+    "${LIBMAD_BINARY_DIR}/${LIBMAD_RELEASE_FULL}/share"
     USE_SOURCE_PERMISSIONS
     DESTINATION ".")
   if(WIN32)
     # TODO(@apozharski) Is this correct
     install(DIRECTORY
-    "${CMAKE_BINARY_DIR}/external_packages/libMad/bin/"
+    "${CMAKE_BINARY_DIR}/external_packages/libMad/${LIBMAD_RELEASE_FULL}/bin/"
     DESTINATION "${LIB_PREFIX}")
   endif()
 endif()
