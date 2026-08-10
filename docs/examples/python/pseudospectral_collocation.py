@@ -1,4 +1,3 @@
-!pip install casadi
 import numpy as np
 import casadi as cs
 import matplotlib.pyplot as plt
