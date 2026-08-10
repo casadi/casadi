@@ -2,6 +2,7 @@ import numpy as np
 import casadi as cs
 import matplotlib.pyplot as plt
 
+
 def _legendre_all(N: int, x: np.ndarray):
     """
     Computes legendre polynomial P_N(x) and its derivative P'_N(x), and P''_N(x) using numerically
@@ -28,7 +29,7 @@ def _legendre_all(N: int, x: np.ndarray):
     return P1, dP1, d2P1
 
 
-def lgl_nodes(N: int, tol: float = 1e-15, max_iter: int = 100) -> np.ndarray:    
+def lgl_nodes(N: int, tol: float = 1e-15, max_iter: int = 100) -> np.ndarray:
     """
     Given N intervals, computes N+1 Legendre-Gauss-Lobatto (LGL) points on [-1, 1]
 
@@ -44,8 +45,8 @@ def lgl_nodes(N: int, tol: float = 1e-15, max_iter: int = 100) -> np.ndarray:
     """
     if N < 1:
         raise ValueError("Degree N must be at least 1.")
-    
-    #inital guess
+
+    # inital guess
     k = np.arange(N + 1)
     x = -np.cos(np.pi * k / N)
 
@@ -70,6 +71,7 @@ def lgl_nodes(N: int, tol: float = 1e-15, max_iter: int = 100) -> np.ndarray:
     x = 0.5 * (x - x[::-1])
     return x
 
+
 def lgl_weights(N: int) -> np.ndarray:
     """
     Computes LGL quadrature weights for N+1 nodes on [-1, 1].
@@ -86,7 +88,7 @@ def lgl_weights(N: int) -> np.ndarray:
         raise ValueError("Degree N must be at least 1.")
     x = lgl_nodes(N)
     P_N, _, _ = _legendre_all(N, x)
-    w = 2.0 / (N * (N + 1) * (P_N ** 2))
+    w = 2.0 / (N * (N + 1) * (P_N**2))
     # symmetry to avoid round-off errors
     w = 0.5 * (w + w[::-1])
     return w
@@ -123,9 +125,10 @@ def lgl_diff_matrix(N: int) -> np.ndarray:
     D = 0.5 * (D - D[::-1, ::-1])
     return D
 
+
 def lgl_setup(N: int):
     """
-    Convenience wrapper returning LGL nodes (x), quadrature weights (w), 
+    Convenience wrapper returning LGL nodes (x), quadrature weights (w),
     and differentiation matrix (D).
     """
     x = lgl_nodes(N)
@@ -133,8 +136,9 @@ def lgl_setup(N: int):
     D = lgl_diff_matrix(N)
     return x, w, D
 
-def solve_OCP(N:int,c=3):
-    '''
+
+def solve_OCP(N: int, c=3):
+    """
     template function to solve the OCP
 
     N is number of LGL intervals or degree of polynomial used to approximate the
@@ -143,7 +147,7 @@ def solve_OCP(N:int,c=3):
     c scaling factor to generate a denser grid
 
     returns dictionary of solution and data needed for plots
-    '''
+    """
 
     # OCP definition
     # Example 1 of "A Pseudospectral Method for the Optimal Control of
@@ -151,96 +155,103 @@ def solve_OCP(N:int,c=3):
     # Qi Gong , Wei Kang, and I. Michael Ross
     # number of states, controls, dynamics, lagrange term, intial state
     # initial and final time
-    nx=2
-    nu=1
-    x=cs.MX.sym('x',nx,1)
-    u=cs.MX.sym('u',nu,1)
-    xd=cs.Function('xd',[x,u],[cs.vertcat(x[1]**3,u)])
-    lag=cs.Function('lag',[x,u],[4*u**2])
-    x_t0=cs.DM([0,1])
-    t0=0
-    tf=2
+    nx = 2
+    nu = 1
+    x = cs.MX.sym("x", nx, 1)
+    u = cs.MX.sym("u", nu, 1)
+    xd = cs.Function("xd", [x, u], [cs.vertcat(x[1] ** 3, u)])
+    lag = cs.Function("lag", [x, u], [4 * u**2])
+    x_t0 = cs.DM([0, 1])
+    t0 = 0
+    tf = 2
 
     # decision variables
     # N+1 LGL points [-1,1] tau mapped to physical [t0,tf]
     # t=0.5(tf-t0)tau+0.5(tf+t0)
     # state and control at these points decision variables
-    nlp=cs.Opti()
-    X= nlp.variable(nx,N+1)
-    U= nlp.variable(nu,N+1)
-    x0=X[:,0]
-    xf=X[:,-1]
+    nlp = cs.Opti()
+    X = nlp.variable(nx, N + 1)
+    U = nlp.variable(nu, N + 1)
+    x0 = X[:, 0]
+    xf = X[:, -1]
 
     # obtain LGL nodes, quadrature weights, differentiation matrices
-    tau,wi,D=lgl_setup(N)
+    tau, wi, D = lgl_setup(N)
 
     # define event, defect constraints
-    event=cs.vertcat(x0-x_t0)
+    event = cs.vertcat(x0 - x_t0)
     # differentiation matrix
-    defect= X@D.T-(tf-t0)/2*xd.map(N+1,'serial')(X,U) ==0 # to extract dual vars later
+    defect = (
+        X @ D.T - (tf - t0) / 2 * xd.map(N + 1, "serial")(X, U) == 0
+    )  # to extract dual vars later
 
     # intergral approx. with quadrature
-    mayer=4*xf[0]+xf[1]
-    lagrange=0.5*(tf-t0)*cs.dot(wi.reshape(1,-1),lag.map(N+1,'serial')(X,U))
-    objective=lagrange+mayer
-    
+    mayer = 4 * xf[0] + xf[1]
+    lagrange = (
+        0.5 * (tf - t0) * cs.dot(wi.reshape(1, -1), lag.map(N + 1, "serial")(X, U))
+    )
+    objective = lagrange + mayer
+
     nlp.minimize(objective)
     nlp.subject_to(defect)
-    nlp.subject_to(event==0)
+    nlp.subject_to(event == 0)
 
     # ipopt solver and initial guess from linear interpolation
-    nlp.solver('ipopt')
-    nlp.set_initial(X,cs.vcat([cs.linspace(0,1,N+1).T,cs.linspace(0,1,N+1).T]))
-    nlp.set_initial(U,cs.DM.ones(U.shape))
-    sol=nlp.solve()
-    
+    nlp.solver("ipopt")
+    nlp.set_initial(
+        X, cs.vcat([cs.linspace(0, 1, N + 1).T, cs.linspace(0, 1, N + 1).T])
+    )
+    nlp.set_initial(U, cs.DM.ones(U.shape))
+    sol = nlp.solve()
+
     # numerical state control state derivative time costates
-    Xs=sol.value(X)
-    Us=sol.value(U).reshape(nu,-1)
-    Xds=sol.value(2/(tf-t0)*X@D.T)
-    ts=(tf-t0)/2*tau+0.5*(tf+t0)
-    
+    Xs = sol.value(X)
+    Us = sol.value(U).reshape(nu, -1)
+    Xds = sol.value(2 / (tf - t0) * X @ D.T)
+    ts = (tf - t0) / 2 * tau + 0.5 * (tf + t0)
+
     # covector mapping principle (lagrange mult./quadrature weights)
-    adjoint=sol.value(nlp.dual(defect)/cs.repmat(wi.reshape(1,-1),nx,1))
+    adjoint = sol.value(nlp.dual(defect) / cs.repmat(wi.reshape(1, -1), nx, 1))
 
     # hamiltonian for the OCP
-    hamiltonian=lag.map(N+1,'serial')(Xs,Us)+cs.sum1(adjoint*Xds)
+    hamiltonian = lag.map(N + 1, "serial")(Xs, Us) + cs.sum1(adjoint * Xds)
 
-    #analytical solution
-    x1a=lambda t:-64/(5*(2+t)**5)+2/5
-    x2a=lambda t:4/((2+t)**2)
-    ua=lambda t:-8/((2+t)**3)
-    lam1a=lambda t:4*t**0
-    lam2a=lambda t:64/((2+t)**3)
-    td=(tf-t0)/2*lgl_nodes((N)*c)+0.5*(tf+t0)
-    var_analytical=np.column_stack([x1a(td),x2a(td),ua(td),lam1a(td),lam2a(td)])
-    var_numerical=np.hstack([Xs.T,Us.T,adjoint.T])
-    label_a=[r'$x_{1a}$',r'$x_{2a}$',r'$u_a$',r'$\lambda_{1a}$',r'$\lambda_{2a}$']
-    label_n=[r'$x_1$',r'$x_2$',r'$u$',r'$\lambda_1$',r'$\lambda_2$']
+    # analytical solution
+    x1a = lambda t: -64 / (5 * (2 + t) ** 5) + 2 / 5
+    x2a = lambda t: 4 / ((2 + t) ** 2)
+    ua = lambda t: -8 / ((2 + t) ** 3)
+    lam1a = lambda t: 4 * t**0
+    lam2a = lambda t: 64 / ((2 + t) ** 3)
+    td = (tf - t0) / 2 * lgl_nodes((N) * c) + 0.5 * (tf + t0)
+    var_analytical = np.column_stack([x1a(td), x2a(td), ua(td), lam1a(td), lam2a(td)])
+    var_numerical = np.hstack([Xs.T, Us.T, adjoint.T])
+    label_a = [r"$x_{1a}$", r"$x_{2a}$", r"$u_a$", r"$\lambda_{1a}$", r"$\lambda_{2a}$"]
+    label_n = [r"$x_1$", r"$x_2$", r"$u$", r"$\lambda_1$", r"$\lambda_2$"]
 
-    data={}
-    data['var_analytical']=var_analytical
-    data['var_numerical']=var_numerical
-    data['label_a']=label_a
-    data['label_n']=label_n
-    data['td']=td
-    data['ts']=ts
-    data['adjoint']=adjoint
-    data['Xds']=Xds
-    data['Xs']=Xs
-    data['Us']=Us
-    data['hamiltonian']=hamiltonian
-    data['N']=N
+    data = {}
+    data["var_analytical"] = var_analytical
+    data["var_numerical"] = var_numerical
+    data["label_a"] = label_a
+    data["label_n"] = label_n
+    data["td"] = td
+    data["ts"] = ts
+    data["adjoint"] = adjoint
+    data["Xds"] = Xds
+    data["Xs"] = Xs
+    data["Us"] = Us
+    data["hamiltonian"] = hamiltonian
+    data["N"] = N
 
     return data
 
+
 def plot_solution_verify(data):
     # primal dual solution vs analytical
-  
+
     # numerical solution
     plt.figure()
-    plt.plot(data['ts'],data['var_numerical'],'*',label=data['label_n'])
-    plt.plot(data['td'],data['var_analytical'],'-',label=data['label_a'])
+    plt.plot(data["ts"], data["var_numerical"], "*", label=data["label_n"])
+    plt.plot(data["td"], data["var_analytical"], "-", label=data["label_a"])
     plt.legend()
     plt.show()
 
@@ -248,36 +259,45 @@ def plot_solution_verify(data):
     # constant for time-invariant problem
     # zero for this specific problem
     plt.figure()
-    plt.plot(data['ts'].flatten(),data['hamiltonian'].full().flatten(),'*',label='Numerical')
-    plt.plot(data['td'].flatten(),0*data['td'],'-',label='Analytical')
-    plt.xlabel('time [s]')
-    plt.ylabel('Hamiltonian')
+    plt.plot(
+        data["ts"].flatten(),
+        data["hamiltonian"].full().flatten(),
+        "*",
+        label="Numerical",
+    )
+    plt.plot(data["td"].flatten(), 0 * data["td"], "-", label="Analytical")
+    plt.xlabel("time [s]")
+    plt.ylabel("Hamiltonian")
     plt.legend()
-    plt.axis('equal')
+    plt.axis("equal")
     plt.show()
 
+
 def spectral_convergence():
-    '''
-    solve the given OCP for increasing grid sizes. A sudden dip in 
+    """
+    solve the given OCP for increasing grid sizes. A sudden dip in
     error with small grid sizes indicate spectral convergence
-    '''
-    nmin=5
-    nmax=50
-    N=range(nmin,nmax,5)
-    var_err=[]
+    """
+    nmin = 5
+    nmax = 50
+    N = range(nmin, nmax, 5)
+    var_err = []
     for i in N:
-        data=solve_OCP(i,c=1)
-        var_err.append(np.max(np.abs(data['var_analytical']-data['var_numerical']),axis=0))
+        data = solve_OCP(i, c=1)
+        var_err.append(
+            np.max(np.abs(data["var_analytical"] - data["var_numerical"]), axis=0)
+        )
         print(var_err[-1].shape)
     print(type(var_err))
     plt.figure()
-    plt.semilogy(np.array(N),np.row_stack(var_err),label=data['label_n'])
+    plt.semilogy(np.array(N), np.row_stack(var_err), label=data["label_n"])
     plt.legend()
-    plt.xlabel('LGL points')
-    plt.ylabel('max. absolute error')
+    plt.xlabel("LGL points")
+    plt.ylabel("max. absolute error")
     plt.show()
 
-if __name__=='__main__':
-    data=solve_OCP(N=25)
+
+if __name__ == "__main__":
+    data = solve_OCP(N=25)
     plot_solution_verify(data)
     spectral_convergence()
