@@ -24,6 +24,15 @@
 #include "exception.hpp"
 #include "global_options.hpp"
 #include <bitset>
+#include <cstdlib>
+#include <cstring>
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
 #ifdef __EMSCRIPTEN__
 #include <set>
 #endif
@@ -125,6 +134,62 @@ std::wstring utf8_to_utf16(const std::string& s);
 
 #ifdef WITH_DL
 
+#ifndef _WIN32
+#ifdef WITH_DEEPBIND
+#if !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
+#if __GLIBC__
+namespace {
+  // Copy relocation gives a process two distinct `environ` objects: the live one in the
+  // executable's .bss, and a permanently-NULL one in glibc's .bss. Code loaded under
+  // RTLD_DEEPBIND binds to the latter and therefore sees no environment at all --
+  // getenv() is unaffected, but anything iterating environ directly (every OpenMP
+  // runtime does, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111556) silently
+  // reads nothing. See also https://github.com/conda-forge/casadi-feedstock/issues/93
+  //
+  // We publish a snapshot into that dead slot. The snapshot is ours, so glibc can never
+  // free it and it never has to be restored -- restoring is what caused casadi#4317
+  // (writes NULL back, later readers null-deref) and casadi#4373 (leaves a pointer that
+  // glibc's setenv may realloc away).
+  //
+  // A superseded snapshot can still be held by an earlier plugin, so it is never freed.
+  // Each one keeps a pointer to its predecessor in the slot just past its terminating
+  // NULL, which is invisible to environ consumers but keeps the whole chain reachable
+  // from environ_snapshot -- otherwise valgrind reports every superseded snapshot as
+  // definitely lost.
+  char** environ_snapshot = nullptr;
+  std::size_t environ_snapshot_n = 0;
+#ifdef CASADI_WITH_THREAD
+  std::mutex environ_snapshot_mutex;
+#endif //CASADI_WITH_THREAD
+
+  void publish_environ_snapshot() {
+    char*** slot = reinterpret_cast<char***>(dlsym(RTLD_NEXT, "environ"));
+    if (!slot || slot == &environ) return;   // no duplicate symbol: nothing to do
+#ifdef CASADI_WITH_THREAD
+    std::lock_guard<std::mutex> lock(environ_snapshot_mutex);
+#endif //CASADI_WITH_THREAD
+    std::size_t n = 0;
+    if (environ) while (environ[n]) ++n;
+    if (environ_snapshot && n == environ_snapshot_n &&
+        std::memcmp(environ_snapshot, environ, n * sizeof(char*)) == 0) {
+      *slot = environ_snapshot;              // unchanged: republish, allocate nothing
+      return;
+    }
+    char** fresh = static_cast<char**>(std::malloc((n + 2) * sizeof(char*)));
+    if (!fresh) return;                      // OOM: leave the slot as it was
+    if (n) std::memcpy(fresh, environ, n * sizeof(char*));
+    fresh[n] = nullptr;
+    fresh[n + 1] = reinterpret_cast<char*>(environ_snapshot);  // retain the predecessor
+    environ_snapshot = fresh;
+    environ_snapshot_n = n;
+    *slot = environ_snapshot;
+  }
+}  // namespace
+#endif
+#endif
+#endif
+#endif
+
 handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
     const std::string& caller, bool global) {
         std::string resultpath;
@@ -157,24 +222,9 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
         flag |= RTLD_DEEPBIND;
 
         #if __GLIBC__
-        // Workaround for https://github.com/conda-forge/casadi-feedstock/issues/93
-        // and https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111556
-        // In a nutshell, if RTLD_DEEPBIND is used and multiple symbols of environ
-        // (one in executable's .bss and one in glibc .bss)
-        // are present in the process due to copy relocations, make sure that the
-        // environ in glibc .bss has the same value of environ in executable .bss
-        // To avoid that over time the two values diverse due to the use of setenv,
-        // we restore the original value of glibc .bss's environ at the end of the function
-
-        // Check if there is a duplicate environ
-        char*** p_environ_rtdl_next = reinterpret_cast<char ***>(dlsym(RTLD_NEXT, "environ"));
-        bool environ_rtdl_next_overridden = false;
-        char** environ_rtld_next_original_value = nullptr;
-        if (p_environ_rtdl_next && p_environ_rtdl_next != &environ) {
-          environ_rtld_next_original_value = *p_environ_rtdl_next;
-          *p_environ_rtdl_next = environ;
-          environ_rtdl_next_overridden = true;
-        }
+        // Hand DEEPBIND-loaded code an environment it can iterate. Never restored;
+        // see the comment on publish_environ_snapshot above.
+        publish_environ_snapshot();
         #endif
     #endif
     #endif
@@ -274,17 +324,12 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
 
     #ifndef _WIN32
     #ifdef WITH_DEEPBIND
-    #ifndef __APPLE__
+    #if !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
     #if __GLIBC__
-         // Only restore if the original value was non-NULL. A NULL "original"
-         // means the duplicate environ slot was never initialised by its owner
-         // (observed under CPython on Linux); writing NULL back would leave any
-         // subsequently loaded code that reads environ directly dereferencing a
-         // null pointer. See casadi/casadi#4317.
-        if (environ_rtdl_next_overridden && environ_rtld_next_original_value) {
-          *p_environ_rtdl_next = environ_rtld_next_original_value;
-          environ_rtdl_next_overridden = false;
-        }
+        // Pick up any setenv the constructors just performed, so code that reads environ
+        // lazily (rather than at load time) does not lag a load behind. Allocates nothing
+        // unless they changed something.
+        publish_environ_snapshot();
     #endif
     #endif
     #endif
