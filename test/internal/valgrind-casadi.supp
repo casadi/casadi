@@ -748,3 +748,28 @@ obj:*libworhp*
 # (ONNX Runtime leak suppression removed: the apparent leak was a CasADi bug,
 # fixed by ~OnnxRuntimeInterface(){clear_mem();}; valgrind now reports 0 bytes
 # definitely lost for the real ONNX Runtime, so no suppression is needed.)
+
+# RTLD_DEEPBIND environ snapshot (casadi/core/casadi_os.cpp).
+#
+# open_shared_library() publishes a private copy of the environ pointer table
+# into glibc's orphaned .bss environ, so that DEEPBIND-loaded code which
+# iterates environ directly (every OpenMP runtime does) sees an environment.
+# See conda-forge/casadi-feedstock#93, gcc bug 111556, casadi#4317, casadi#4373.
+#
+# The copy can never be freed: a plugin loaded earlier may still hold it, and
+# glibc must never own it (that is what casadi#4373 was). A new copy is taken
+# only when the environ table actually changed between two loads, so this is
+# O(1) for a process that does not mutate its environment, and ~1 KB per
+# setenv-between-loads for one that does.
+#
+# Retained on purpose -- do NOT "fix" by freeing. If the hit count for this
+# suppression grows with the number of plugin loads (valgrind -v prints
+# used_suppression counts), that IS a regression worth chasing: it means
+# something started mutating the environment on every load.
+{
+   casadi/environ_snapshot
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:*publish_environ_snapshot*
+}

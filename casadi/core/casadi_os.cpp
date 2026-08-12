@@ -152,10 +152,8 @@ namespace {
   // glibc's setenv may realloc away).
   //
   // A superseded snapshot can still be held by an earlier plugin, so it is never freed.
-  // Each one keeps a pointer to its predecessor in the slot just past its terminating
-  // NULL, which is invisible to environ consumers but keeps the whole chain reachable
-  // from environ_snapshot -- otherwise valgrind reports every superseded snapshot as
-  // definitely lost.
+  // valgrind reports those as definitely lost; see the casadi/environ_snapshot entry in
+  // test/internal/valgrind-casadi.supp.
   char** environ_snapshot = nullptr;
   std::size_t environ_snapshot_n = 0;
 #ifdef CASADI_WITH_THREAD
@@ -175,13 +173,12 @@ namespace {
       *slot = environ_snapshot;              // unchanged: republish, allocate nothing
       return;
     }
-    char** fresh = static_cast<char**>(std::malloc((n + 2) * sizeof(char*)));
+    char** fresh = static_cast<char**>(std::malloc((n + 1) * sizeof(char*)));
     if (!fresh) return;                      // OOM: leave the slot as it was
     if (n) std::memcpy(fresh, environ, n * sizeof(char*));
     fresh[n] = nullptr;
-    fresh[n + 1] = reinterpret_cast<char*>(environ_snapshot);  // retain the predecessor
-    environ_snapshot = fresh;
-    environ_snapshot_n = n;
+    environ_snapshot = fresh;                // previous snapshot deliberately leaked:
+    environ_snapshot_n = n;                  // an earlier plugin may still hold it
     *slot = environ_snapshot;
   }
 }  // namespace
