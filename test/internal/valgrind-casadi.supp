@@ -748,3 +748,10 @@ obj:*libworhp*
 # (ONNX Runtime leak suppression removed: the apparent leak was a CasADi bug,
 # fixed by ~OnnxRuntimeInterface(){clear_mem();}; valgrind now reports 0 bytes
 # definitely lost for the real ONNX Runtime, so no suppression is needed.)
+{
+   casadi/environ_snapshot
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:*publish_environ_snapshot*
+}
