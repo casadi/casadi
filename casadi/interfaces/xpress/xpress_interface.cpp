@@ -95,7 +95,7 @@ namespace casadi {
         "When the problem is infeasible, compute an IIS immediately after "
         "the solve and expose it in get_stats() as iis_rows / iis_cols. "
         "IIS computation can be expensive; set to false to skip it "
-        "[Default true]."}},
+        "[Default false]."}},
      }
    };
 
@@ -105,7 +105,7 @@ namespace casadi {
 
     mip_start_ = false;
     log_file_ = "";
-    compute_iis_ = true;
+    compute_iis_ = false;
 
     std::vector< std::vector<casadi_int> > sos_groups;
     std::vector< std::vector<double> > sos_weights;
@@ -558,7 +558,7 @@ namespace casadi {
     s.unpack("XpressInterface::opts", opts_);
     mip_start_ = false;
     log_file_ = "";
-    compute_iis_ = true;
+    compute_iis_ = false;
     if (v >= 2) {
       s.unpack("XpressInterface::mip_start", mip_start_);
       s.unpack("XpressInterface::log_file", log_file_);

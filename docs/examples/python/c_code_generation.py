@@ -71,7 +71,7 @@ print('time = ', (t2-t1)*1e3, ' ms')
 # Read function
 grad_det_no_opt = ca.external(name, './'+oname_no_opt)
 grad_det_O3 = ca.external(name, './'+oname_O3)
-grad_det_Os = ca.external(name, './'+oname_O3)
+grad_det_Os = ca.external(name, './'+oname_Os)
 f_test = [grad_det, grad_det_no_opt, grad_det_O3, grad_det_Os]
 
 for f in f_test:

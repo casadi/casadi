@@ -3732,6 +3732,7 @@
 <tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\". When set to -1, sparsity is completely ignored and dense matrices are used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>asymmetric_hessian_coloring</td><td>OT_BOOL</td><td>Calculate Hessian using unidirectional graph coloring (star coloring). Ensures that upper and lower triangular parts are calculated separately, which may be desirable for diagnostics. If both symmetric coloring ('hessian_coloring' option) and asymmetric coloring is enabled, the symmetric coloring will be used.</td><td>casadi::FmuFunction</td></tr>
 <tr><td>aux</td><td>OT_STRINGVECTOR</td><td>Auxilliary variables</td><td>casadi::FmuFunction</td></tr>
 <tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>check_hessian</td><td>OT_BOOL</td><td>[DEPRECATED] Renamed 'validate_hessian'</td><td>casadi::FmuFunction</td></tr>
@@ -3745,6 +3746,7 @@
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_ad</td><td>OT_BOOL</td><td>[DEPRECATED] Renamed uses_directional_derivatives</td><td>casadi::FmuFunction</td></tr>
+<tr><td>enable_adjoint_hessian</td><td>OT_BOOL</td><td>Use finite differencing of adjoints for Hessian calculation.</td><td>casadi::FmuFunction</td></tr>
 <tr><td>enable_adjoint_jacobian</td><td>OT_BOOL</td><td>Allow Jacobian calculation using adjoint mode AD.</td><td>casadi::FmuFunction</td></tr>
 <tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
@@ -3758,7 +3760,7 @@
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>hessian_coloring</td><td>OT_BOOL</td><td>Enable the use of graph coloring (star coloring) for Hessian calculation. Note that disabling the coloring can improve symmetry check diagnostics.</td><td>casadi::FmuFunction</td></tr>
+<tr><td>hessian_coloring</td><td>OT_BOOL</td><td>Calculate Hessian using symmetry exploiting graph coloring (star coloring).</td><td>casadi::FmuFunction</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_in</td><td>OT_BOOLVECTOR</td><td>Indicate for each input if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>is_diff_out</td><td>OT_BOOLVECTOR</td><td>Indicate for each output if it should be differentiable.</td><td>casadi::FunctionInternal</td></tr>
@@ -3796,6 +3798,7 @@
 <tr><td>scheme_out</td><td>OT_STRINGVECTOR</td><td>Names of the outputs in the scheme</td><td>casadi::FmuFunction</td></tr>
 <tr><td>step</td><td>OT_DOUBLE</td><td>Step size, scaled by nominal value</td><td>casadi::FmuFunction</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>uses_adjoint_derivatives</td><td>OT_BOOL</td><td>Use the analytic adjoint derivative support in the FMU</td><td>casadi::FmuFunction</td></tr>
 <tr><td>uses_directional_derivatives</td><td>OT_BOOL</td><td>Use the analytic forward directional derivative support in the FMU</td><td>casadi::FmuFunction</td></tr>
 <tr><td>validate_ad</td><td>OT_BOOL</td><td>[DEPRECATED] Renamed 'validate_forward'</td><td>casadi::FmuFunction</td></tr>
 <tr><td>validate_ad_file</td><td>OT_STRING</td><td>Redirect results of Hessian validation to a file instead of generating a warning</td><td>casadi::FmuFunction</td></tr>
@@ -5472,6 +5475,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>nonlinear_variables</td><td>OT_BOOLVECTOR</td><td>Which decision variables enter nonlinearly? (detected automatically by default)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
@@ -5517,6 +5521,7 @@
 <tr><td>ipopt</td><td>OT_DICT</td><td>Options to be passed to IPOPT</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td></tr>
 <tr><td>max_iter_eig</td><td>OT_DOUBLE</td><td>Maximum number of iterations to compute an eigenvalue decomposition (default: 50).</td></tr>
+<tr><td>nonlinear_variables</td><td>OT_BOOLVECTOR</td><td>Which decision variables enter nonlinearly? (detected automatically by default)</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to IPOPT</td></tr>
 <tr><td>var_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td></tr>
 <tr><td>var_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td></tr>
@@ -5601,6 +5606,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>nonlinear_variables</td><td>OT_BOOLVECTOR</td><td>Which decision variables enter nonlinearly? (detected automatically by default)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
@@ -11471,7 +11477,7 @@
 <tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default true].</td><td>casadi::XpressInterface</td></tr>
+<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default false].</td><td>casadi::XpressInterface</td></tr>
 <tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
@@ -11534,7 +11540,7 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
-<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default true].</td></tr>
+<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default false].</td></tr>
 <tr><td>log_file</td><td>OT_STRING</td><td>Write solver log to this file path via XPRSsetlogfile. Useful for capturing output (e.g. warm-start acceptance messages) in automated tests. Empty string (default) disables file logging.</td></tr>
 <tr><td>mip_start</td><td>OT_BOOL</td><td>Pass x0 as an initial integer solution hint to Xpress via XPRSaddmipsol before the MIP solve [Default false].</td></tr>
 <tr><td>sos_groups</td><td>OT_INTVECTORVECTOR</td><td>Definition of SOS groups by indices.</td></tr>
@@ -11554,7 +11560,7 @@
 <tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default true].</td><td>casadi::XpressInterface</td></tr>
+<tr><td>compute_iis</td><td>OT_BOOL</td><td>When the problem is infeasible, compute an IIS immediately after the solve and expose it in get_stats() as iis_rows / iis_cols. IIS computation can be expensive; set to false to skip it [Default false].</td><td>casadi::XpressInterface</td></tr>
 <tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>

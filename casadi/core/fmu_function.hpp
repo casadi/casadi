@@ -47,8 +47,6 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   const double** arg;
   // Evaluation outputs
   double** res;
-  // Work vector for star coloring
-  casadi_int* star_iw;
   // Extended Jacobian
   double *jac_nz;
   // Extended Hessian
@@ -167,7 +165,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // User-set options
   double step_, abstol_, reltol_;
   bool print_progress_, new_jacobian_, new_forward_, new_hessian_, fd_flip_,
-    make_symmetric_, hessian_coloring_, enable_forward_jacobian_, enable_adjoint_jacobian_;
+    make_symmetric_, hessian_coloring_, asymmetric_hessian_coloring_,
+    enable_forward_jacobian_, enable_adjoint_jacobian_, enable_adjoint_hessian_;
   std::string validate_ad_file_;
 
   // FD method as an enum
@@ -218,7 +217,10 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   Sparsity jac_sp_, hess_sp_, adj_sp_;
 
   // Graph coloring
-  Sparsity jac_colors_, hess_colors_, adj_colors_;
+  Sparsity jac_colors_, adj_colors_, hess_colors_, hess_uni_colors_;
+
+  // Which color is used to calculate a given nonzero in the Hessian?
+  std::vector<casadi_int> which_hess_color_;
 
   // Nonlinearly entering variables
   std::vector<casadi_int> nonlin_;
@@ -264,14 +266,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   int eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
     bool need_nondiff, bool need_jac, bool need_fwd, bool need_adj, bool need_hess) const;
 
-  // Remove NaNs from Hessian (necessary for star coloring approach)
-  void remove_nans(double *hess_nz, casadi_int* iw) const;
-
-  // Check extended Hessian
-  void check_hessian(FmuMemory* m, const double *hess_nz, casadi_int* iw) const;
-
-  // Make extended Hessian symmetric
-  void make_symmetric(double *hess_nz, casadi_int* iw) const;
+  // Finalize Hessian creation
+  void finalize_hessian(FmuMemory* m, double *hess_nz, casadi_int* iw) const;
 
   ///@{
   /** \brief Return sparsity of Jacobian of an output respect to an input

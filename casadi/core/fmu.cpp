@@ -836,14 +836,20 @@ int FmuInternal::eval_adj(FmuMemory* m) const {
   gather_adj(m);
   // Quick return if nothing to be calculated
   if (m->id_in_.size() == 0) return 0;
-  // Evaluate adjoint derivatives
-  if (get_adjoint_derivative(m->instance,
-      get_ptr(m->vr_out_), m->id_out_.size(),
-      get_ptr(m->vr_in_), m->id_in_.size(),
-      get_ptr(m->d_out_), m->id_out_.size(),
-      get_ptr(m->d_in_), m->id_in_.size())) {
-    casadi_warning("FMU adjoint derivative failed");
-    return 1;
+  // Check if no seeds
+  if (m->id_out_.size() == 0) {
+    // Sensitivities are zero, trivially
+    std::fill(m->d_in_.begin(), m->d_in_.end(), 0);
+  } else {
+    // Evaluate adjoint derivatives
+    if (get_adjoint_derivative(m->instance,
+        get_ptr(m->vr_out_), m->id_out_.size(),
+        get_ptr(m->vr_in_), m->id_in_.size(),
+        get_ptr(m->d_out_), m->id_out_.size(),
+        get_ptr(m->d_in_), m->id_in_.size())) {
+      casadi_warning("FMU adjoint derivative failed");
+      return 1;
+    }
   }
   // Collect requested variables
   auto it = m->d_in_.begin();
@@ -1135,9 +1141,12 @@ void FmuInternal::get_fwd(FmuMemory* m, size_t ind, double* v) const {
 void FmuInternal::set_adj(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
-    m->osens_.at(*id) = *v++;
-    m->omarked_.at(*id) = true;
+    if (*v != 0.) {
+      m->osens_.at(*id) = *v;
+      m->omarked_.at(*id) = true;
+    }
     id++;
+    v++;
   }
 }
 
@@ -1155,7 +1164,7 @@ void FmuInternal::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* 
     const casadi_int* wrt_id) const {
   for (casadi_int i = 0; i < nsens; ++i) {
     m->imarked_.at(*id) = true;
-    m->wrt_.at(*id) = *wrt_id++;
+    m->wrt_.at(*id) = wrt_id ? *wrt_id++ : -1;
     id++;
   }
 }
@@ -1467,8 +1476,6 @@ void FmuInternal::gather_adj(FmuMemory* m) const {
     m->d_out_.push_back(m->osens_[id]);
     m->osens_[id] = 0;
   }
-  // Ensure at least one seed
-  casadi_assert(n_unknown != 0, "No seeds");
   // Allocate result vectors
   m->v_in_.resize(n_known);
   m->d_in_.resize(n_known);

@@ -756,6 +756,15 @@ namespace casadi {
     }
   }
 
+  Sparsity Sparsity::star_coloring_new(std::vector<casadi_int>& which_color,
+      const Dict& opts) const {
+    try {
+      return (*this)->star_coloring_new(which_color, opts);
+    } catch (std::exception &e) {
+      CASADI_THROW_ERROR("star_coloring_new", e.what());
+    }
+  }
+
   Sparsity Sparsity::star_coloring(casadi_int ordering, casadi_int cutoff) const {
     return (*this)->star_coloring(ordering, cutoff);
   }

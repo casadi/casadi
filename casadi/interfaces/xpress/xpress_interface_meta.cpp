@@ -48,7 +48,7 @@
 "|             |                       | get_stats() as iis_rows /          |\n"
 "|             |                       | iis_cols. IIS computation can be   |\n"
 "|             |                       | expensive; set to false to skip it |\n"
-"|             |                       | [Default true].                    |\n"
+"|             |                       | [Default false].                   |\n"
 "+-------------+-----------------------+------------------------------------+\n"
 "| log_file    | OT_STRING             | Write solver log to this file path |\n"
 "|             |                       | via XPRSsetlogfile. Useful for     |\n"

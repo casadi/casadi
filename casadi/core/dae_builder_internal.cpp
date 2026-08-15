@@ -1069,6 +1069,8 @@ std::string DaeBuilderInternal::generate_model_description(const std::string& gu
   XmlNode me;
   me.name = "ModelExchange";
   me.set_attribute("modelIdentifier", model_name);  // sanitize name?
+  me.set_attribute("providesDirectionalDerivatives", "true");
+  me.set_attribute("providesAdjointDerivatives", "true");
   r.children.push_back(me);
 
   // Default experiment
@@ -1172,7 +1174,7 @@ XmlNode DaeBuilderInternal::generate_model_structure(bool dae) const {
 
 void DaeBuilderInternal::update_dependencies() const {
   // Get oracle function
-  const Function& oracle = this->oracle();
+  const Function& oracle = this->oracle(false, true);
   // Dependendencies of the ODE right-hand-side
   Sparsity dode_dxT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("x")).T();
   Sparsity dode_duT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("u")).T();

@@ -1097,6 +1097,22 @@ namespace casadi {
           What Color Is Your Jacobian? Graph Coloring for Computing Derivatives
           A. H. GEBREMEDHIN, F. MANNE, A. POTHEN
           SIAM Rev., 47(4), 629–705 (2006)
+        or, alternatively (new_algo = true),
+          NEW ACYCLIC AND STAR COLORING ALGORITHMS WITH APPLICATION TO COMPUTING HESSIANS
+          A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN
+          SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 1042–1072 (2007)
+
+        \identifier{2jz} */
+    Sparsity star_coloring_new(std::vector<casadi_int>& SWIG_OUTPUT(which_color),
+        const Dict& opts=Dict()) const;
+
+    /** \brief Perform a star coloring of a symmetric matrix:
+
+        A greedy distance-2 coloring algorithm
+        Algorithm 4.1 in
+          What Color Is Your Jacobian? Graph Coloring for Computing Derivatives
+          A. H. GEBREMEDHIN, F. MANNE, A. POTHEN
+          SIAM Rev., 47(4), 629–705 (2006)
 
         Ordering options: None (0), largest first (1)
 
