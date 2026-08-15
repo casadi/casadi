@@ -5,8 +5,13 @@
 
 import json
 import math
+import os
 from itertools import combinations
 import casadi as ca
+
+if "SKIP_GUROBI_TESTS" in os.environ:
+    import sys
+    sys.exit(0)
 
 # Read capital data (same as your original example)
 try:

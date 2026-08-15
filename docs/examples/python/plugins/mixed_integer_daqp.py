@@ -1,7 +1,8 @@
+import os
 import casadi as ca
 import numpy as np
 
-if not ca.has_conic('daqp'):
+if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic('daqp'):
     import sys
     sys.exit(0)
 
