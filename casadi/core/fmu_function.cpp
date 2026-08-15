@@ -635,9 +635,12 @@ void FmuFunction::init(const Dict& opts) {
     }
     // Dummy coloring: One color for each nonlinear variable
     if (!hessian_coloring_ && !asymmetric_hessian_coloring_) {
-      hess_uni_colors_ = Sparsity(jac_in_.size(), nonlin_.size(), range(nonlin_.size() + 1), nonlin_);
+      hess_uni_colors_ = Sparsity(jac_in_.size(), nonlin_.size(),
+        range(nonlin_.size() + 1), nonlin_);
       max_hessian_colors = hess_uni_colors_.size2();
-      if (verbose_) casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
+      if (verbose_) {
+        casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
+      }
     }
 
     // Number of threads to be used for Hessian calculation
