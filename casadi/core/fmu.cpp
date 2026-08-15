@@ -1469,7 +1469,6 @@ void FmuInternal::gather_adj(FmuMemory* m) const {
   gather_io(m);
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
-  size_t n_unknown = m->id_out_.size();
   // Get/clear seeds
   m->d_out_.clear();
   for (size_t id : m->id_out_) {
