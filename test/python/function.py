@@ -2336,7 +2336,7 @@ class Functiontests(casadiTestCase):
         box["refs"] = [None] * nthreads
         start.wait()                                     # release the workers
         done.wait()                                      # all WeakRefs created
-        refs = box["refs"]
+        refs: list = box["refs"]   # workers filled the slots; not list[None] anymore
         box["f"] = None                                  # node dies; valid weak ref killed
         # Every weak ref must now report dead; a double-created orphan does not.
         orphans += sum(1 for r in refs if r.alive())

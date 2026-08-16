@@ -352,7 +352,7 @@ class TypingTests(casadiTestCase):
       # Surface the first few diagnostics to make regressions actionable.
       sample = "\n".join(
           "  %s:%s  %s" % (d.get("file", "?"),
-                           d.get("range", {}).get("start", {}).get("line", "?"),
+                           d.get("range", {}).get("start", {}).get("line", -1) + 1,
                            d.get("message", "").splitlines()[0])
           for d in error_diagnostics
       )
