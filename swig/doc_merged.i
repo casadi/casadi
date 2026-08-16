@@ -35738,7 +35738,7 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_xpress
 |             |                       | get_stats() as iis_rows /          |
 |             |                       | iis_cols. IIS computation can be   |
 |             |                       | expensive; set to false to skip it |
-|             |                       | [Default true].                    |
+|             |                       | [Default false].                   |
 +-------------+-----------------------+------------------------------------+
 | log_file    | OT_STRING             | Write solver log to this file path |
 |             |                       | via XPRSsetlogfile. Useful for     |
