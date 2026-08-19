@@ -77,6 +77,9 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   std::vector<unsigned int> vr_in_, vr_out_;
   // Work vector (reals)
   std::vector<double> v_in_, v_out_, d_in_, d_out_, fd_out_, v_pert_;
+  // Timing, number of calls
+  size_t n_get_all, n_get_directional, n_get_adjoint;
+  double t_get_all, t_get_directional, t_get_adjoint;
   // Constructor
   explicit FmuMemory(const FmuFunction& self) : self(self), instance(nullptr) {}
 };

@@ -70,6 +70,9 @@ int FmuFunction::init_mem(void* mem) const {
     FmuMemory* m1 = i == 0 ? m : m->slaves.at(i - 1);
     if (fmu_.init_mem(m1)) return 1;
   }
+  // Reset timers
+  m->n_get_all = m->n_get_directional = m->n_get_adjoint = 0;
+  m->t_get_all = m->t_get_directional = m->t_get_adjoint = 0;
   // Make sure we can query stats, even before numerical evaluation
   m->stats_available = true;
   return 0;
@@ -943,9 +946,10 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   // Get memory struct
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != nullptr, "Memory is null");
-
   setup(mem, arg, res, iw, w);
-
+  // Reset timers
+  m->n_get_all = m->n_get_directional = m->n_get_adjoint = 0;
+  m->t_get_all = m->t_get_directional = m->t_get_adjoint = 0;
   // What blocks are there?
   bool need_jac = false, need_fwd = false, need_adj = false, need_hess = false;
   for (size_t k = 0; k < out_.size(); ++k) {
