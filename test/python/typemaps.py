@@ -1255,6 +1255,67 @@ class typemaptests(casadiTestCase):
     with self.assertRaises(TypeError if systemswig else NotImplementedError):
       ca.Function("tmp", [x],[Foo()])  # pyright: ignore[reportCallIssue,reportArgumentType]
 
+  def test_shape_attr_no_refleak(self):
+    self.message("the 1-D shape probe must not leak its shape tuple")
+    # to_ptr(vector) reads .shape to reject 2-D operands; it used to Py_DECREF
+    # only on the reject path, leaking a reference per probe on every 1-D
+    # numeric-like argument.
+
+    class OneD:
+      def __init__(self, vals):
+        self.vals = list(vals)
+        self._shape = (len(vals),)   # one stable tuple, so a leak shows up as refcount growth
+      @property
+      def shape(self): return self._shape
+      def __len__(self): return len(self.vals)
+      def __iter__(self): return iter(self.vals)
+
+    o = OneD([1.0, 2.0, 3.0])
+    ca.DM(o)  # warm up
+    before = sys.getrefcount(o._shape)
+    for _ in range(100):
+      ca.DM(o)
+    self.assertEqual(sys.getrefcount(o._shape), before)
+
+  def test_bytes_typemaps(self):
+    self.message("bytes is neither a string nor a sequence of numbers")
+    # SWIG used to #define PyString_Check to PyBytes_Check (pyhead.swg), so the
+    # typemaps below silently accepted bytes.  For the std::string slots that
+    # was a crash: python_string_to_std_string goes through PyUnicode_AsUTF8*,
+    # which returns NULL for bytes, and we then built a std::string from it.
+    # For the vector slot the danger is the opposite one -- iterating b"ab"
+    # yields ints, so dropping the check would quietly give [97, 98].
+    err = TypeError if systemswig else NotImplementedError
+
+    x = ca.SX.sym("x")
+
+    # str keeps working in each of the slots bytes must be rejected from
+    self.assertEqual(ca.SX.sym("y").name(), "y")
+    self.assertEqual(ca.MX.sym("y").name(), "y")
+    ca.Function("f", [x], [x], {"jit": False})
+
+    # std::string argument
+    with self.assertRaises(err):
+      ca.SX.sym(b"y")  # pyright: ignore[reportCallIssue,reportArgumentType]
+    with self.assertRaises(err):
+      ca.MX.sym(b"y")  # pyright: ignore[reportCallIssue,reportArgumentType]
+
+    # std::map<std::string, GenericType> key (option dictionary)
+    with self.assertRaises(err):
+      ca.Function("f", [x], [x], {b"jit": False})  # pyright: ignore[reportCallIssue,reportArgumentType]
+
+    # std::vector element: bytes must not be walked as a vector of numbers.
+    # (bytearray and memoryview are not excluded here and do convert to
+    # [97, 98]; that predates this test and is left alone on purpose.)
+    with self.assertRaises(err):
+      ca.vertcat(b"ab")  # pyright: ignore[reportCallIssue,reportArgumentType]
+    with self.assertRaises(err):
+      ca.DM(b"ab")  # pyright: ignore[reportCallIssue,reportArgumentType]
+
+    # from_ptr(const std::string*) hands back str, never bytes
+    self.assertIsInstance(ca.SX.sym("y").name(), str)
+    self.assertIsInstance(ca.Function("f", [x], [x]).name(), str)
+
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
     a = ca.SX.sym("A",3,3)
