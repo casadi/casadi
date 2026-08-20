@@ -671,7 +671,7 @@ namespace std {
     GUESTOBJECT* full(const DM& m, bool simplify=false) {
 #ifdef SWIGPYTHON
       PyObject *p = from_ptr(&m);
-      PyObject *method_name = PyString_FromString("toarray");
+      PyObject *method_name = PyUnicode_FromString("toarray");
       PyObject *cr = PyObject_CallMethodObjArgs(p, method_name, (simplify? Py_True: Py_False), 0);
       Py_DECREF(method_name);
       Py_DECREF(p);
@@ -724,7 +724,7 @@ namespace std {
 %#if PY_VERSION_HEX < 0x03070000
       PyObject* module = PyImport_AddModule("casadi");
 %#else
-      PyObject* c_name = PyString_FromString("casadi");
+      PyObject* c_name = PyUnicode_FromString("casadi");
       PyObject* module = PyImport_GetModule(c_name);
       Py_DECREF(c_name);
 %#endif
@@ -1410,7 +1410,7 @@ namespace std {
 #ifdef SWIGPYTHON
 
       // Some built-in types are iterable
-      if (PyDict_Check(p) || PyString_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
+      if (PyDict_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
 
       // An object exposing a casadi conversion hook is a SINGLE matrix, not
       // a sequence of them -- don't iterate it as a vector.  (A 1-D numeric-
@@ -1756,7 +1756,7 @@ namespace std {
       }
 #endif
 #ifdef SWIGPYTHON
-      if (PyString_Check(p) || PyUnicode_Check(p)) {
+      if (PyUnicode_Check(p)) {
         if (m) {
           (*m)->clear();
           (*m)->append(python_string_to_std_string(p));
@@ -1815,7 +1815,7 @@ namespace std {
 
     GUESTOBJECT* from_ptr(const std::string *a) {
 #ifdef SWIGPYTHON
-      return PyString_FromString(a->c_str());
+      return PyUnicode_FromString(a->c_str());
 #elif defined(SWIGMATLAB)
       return mxCreateString(a->c_str());
 #elif defined(SWIGWASMJS)
@@ -1845,9 +1845,9 @@ namespace std {
 #ifdef SWIGPYTHON
 
       // Python casadi_int
-      if (PyInt_Check(p)) {
+      if (PyLong_Check(p)) {
         if (m) {
-          (**m).start = PyInt_AsLong(p);
+          (**m).start = PyLong_AsLong(p);
           (**m).stop = (**m).start+1;
           if ((**m).stop==0) (**m).stop = std::numeric_limits<casadi_int>::max();
         }
@@ -1967,7 +1967,7 @@ namespace std {
         PyObject *key, *value;
         Py_ssize_t pos = 0;
         while (PyDict_Next(p, &pos, &key, &value)) {
-          if (!(PyString_Check(key) || PyUnicode_Check(key))) return false;
+          if (!PyUnicode_Check(key)) return false;
           if (m) {
             M *v=&(**m)[python_string_to_std_string(key)], *v2=v;
             if (!casadi::to_ptr(value, &v)) return false;
