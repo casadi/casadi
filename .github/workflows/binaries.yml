@@ -345,14 +345,20 @@ jobs:
             (async () => {
               const M = await create();
               if (typeof M.load_nlpsol === "function") await M.load_nlpsol("ipopt");
-              const out = [];
-              await example(M, (...a) => out.push(a.join(" ")));
-              const primal = out.find(l => l.startsWith("primal solution"));
-              const nums = primal ? (primal.split("=")[1]||"").trim().split(/\s+/).map(Number) : [];
-              if (nums.length !== 2 || !nums.every(v => Math.abs(v - 5) < 0.01)) {
-                console.error("smoke FAIL: unexpected solution\n" + out.join("\n")); process.exit(1);
+              // 1. the shipped example must run end-to-end from inside the tarball
+              await example(M, () => {});
+              // 2. assert on returned numbers, never on the example printed text
+              const x = M.SX.sym("x", 2);
+              const [x0, x1] = M.vertsplit(x);
+              const nlp = { x: x, f: M.plus(M.times(x0, x0), M.times(x1, x1)),
+                                  g: M.minus(M.plus(x0, x1), M.SX(10)) };
+              const sol = M.nlpsol("solver", "ipopt", nlp).call({ lbg: M.DM(0) });
+              const primal = Array.from(sol["x"].nonzeros());
+              if (primal.length !== 2 || !primal.every(v => Math.abs(v - 5) < 0.01)) {
+                console.error("smoke FAIL: unexpected solution [" + primal.join(", ") + "]");
+                process.exit(1);
               }
-              console.log("smoke OK -> " + primal);
+              console.log("smoke OK -> primal solution = [" + primal.join(", ") + "]");
             })().catch(e => { console.error("smoke FAIL:", e && e.stack || e); process.exit(1); });
           '
       - name: Publish @casadi/casadi-wasm with provenance
