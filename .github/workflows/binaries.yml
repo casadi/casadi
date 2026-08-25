@@ -287,6 +287,15 @@ jobs:
           # casadi finds plugins via CASADI_PLUGIN_SEARCH_PATH (NOT LD_LIBRARY_PATH)
           export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib
           LD_LIBRARY_PATH=$PWD/build/lib julia test/julia/runtests.jl
+      - name: Run docs/examples/julia
+        run: |
+          export CASADI_JL=$PWD/build/swig/julia/CasADiNative
+          export CASADI_PLUGIN_SEARCH_PATH=$PWD/build/lib
+          export LD_LIBRARY_PATH=$PWD/build/lib
+          for f in docs/examples/julia/*.jl; do
+            echo "== julia $f =="
+            julia "$f"
+          done
       - name: Assemble CasADiNative artifact (Artifacts.toml-ready tarball)
         run: |
           cp LICENSE.txt build/swig/julia/CasADiNative/
