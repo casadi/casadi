@@ -97,7 +97,7 @@
 */
 /** \defgroup scheme_NlpsolInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::NlpsolInput  (NLPSOL_NUM_IN = 8)</caption>
+<caption>Input scheme: casadi::NlpsolInput  (NLPSOL_NUM_IN = 11)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>NLPSOL_X0</td><td>x0</td><td>Decision variables, initial guess (nx x 1)</td></tr>
 <tr><td>NLPSOL_P</td><td>p</td><td>Value of fixed parameters (np x 1)</td></tr>
@@ -107,11 +107,14 @@
 <tr><td>NLPSOL_UBG</td><td>ubg</td><td>Constraints upper bound (ng x 1), default +inf.</td></tr>
 <tr><td>NLPSOL_LAM_X0</td><td>lam_x0</td><td>Lagrange multipliers for bounds on X, initial guess (nx x 1)</td></tr>
 <tr><td>NLPSOL_LAM_G0</td><td>lam_g0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1)</td></tr>
+<tr><td>NLPSOL_S0</td><td>s0</td><td>Slack variables, initial guess (2*ns x 1)</td></tr>
+<tr><td>NLPSOL_UBS</td><td>ubs</td><td>Slack variables upper bound (2*ns x 1), default +inf.</td></tr>
+<tr><td>NLPSOL_LAM_S0</td><td>lam_s0</td><td>Lagrange multipliers for bounds on S, initial guess (2*ns x 1)</td></tr>
 </table>
 */
 /** \defgroup scheme_NlpsolOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::NlpsolOutput  (NLPSOL_NUM_OUT = 6)</caption>
+<caption>Output scheme: casadi::NlpsolOutput  (NLPSOL_NUM_OUT = 8)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>NLPSOL_X</td><td>x</td><td>Decision variables at the optimal solution (nx x 1)</td></tr>
 <tr><td>NLPSOL_F</td><td>f</td><td>Cost function value at the optimal solution (1 x 1)</td></tr>
@@ -119,6 +122,8 @@
 <tr><td>NLPSOL_LAM_X</td><td>lam_x</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1)</td></tr>
 <tr><td>NLPSOL_LAM_G</td><td>lam_g</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1)</td></tr>
 <tr><td>NLPSOL_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for bounds on P at the solution (np x 1)</td></tr>
+<tr><td>NLPSOL_S</td><td>s</td><td>Slack variables at the optimal solution (2*ns x 1)</td></tr>
+<tr><td>NLPSOL_LAM_S</td><td>lam_s</td><td>Lagrange multipliers for bounds on S at the solution (2*ns x 1)</td></tr>
 </table>
 */
 /** \defgroup scheme_RootfinderInput
