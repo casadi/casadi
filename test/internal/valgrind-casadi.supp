@@ -675,6 +675,14 @@ obj:*libworhp*
    fun:_ZN17HighsTaskExecutor10run_workerEiPS_
 }
 
+# NOTE: the blasfeo GENERIC lib4 kernel over-read suppressions (gemv `_vs_lib4`,
+# gemm/syrk `_gen_lib4`) were REMOVED. They masked a genuine out-of-bounds read:
+# the kernels load full 4-wide blocks and read up to one block past the logical
+# end of a dvec/dmat. "Masked on write" makes the *value* harmless, but the
+# *load* still faults if it crosses a page boundary -- benign on Linux, SIGSEGV
+# on macOS. Fixed by reserving a guard in blasfeo's allocators
+# (cmake/blasfeo_alloc_guard.patch); keeping the suppressions would re-hide a
+# regression.
 
 {
    <insert_a_suppression_name_here>
@@ -735,4 +743,15 @@ obj:*libworhp*
    obj:*libxprs.so*
    ...
    fun:XPRSiisfirst
+}
+
+# (ONNX Runtime leak suppression removed: the apparent leak was a CasADi bug,
+# fixed by ~OnnxRuntimeInterface(){clear_mem();}; valgrind now reports 0 bytes
+# definitely lost for the real ONNX Runtime, so no suppression is needed.)
+{
+   casadi/environ_snapshot
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:*publish_environ_snapshot*
 }

@@ -1,7 +1,12 @@
 # This simple MIP comes from https://docs.gurobi.com/projects/examples/en/current/examples/python/mip1.html#subsubsectionmip1-py
 # Here it is re-written to match the Casadi syntax
 
+import os
 import casadi as ca
+
+if "SKIP_GUROBI_TESTS" in os.environ:
+    import sys
+    sys.exit(0)
 
 # Binary decision variables
 x = ca.SX.sym("x")

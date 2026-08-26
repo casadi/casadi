@@ -1,7 +1,8 @@
+import os
 import casadi as ca
 import numpy as np
 
-if not ca.has_conic('daqp'):
+if "SKIP_DAQP_TESTS" in os.environ or not ca.has_conic('daqp'):
     import sys
     sys.exit(0)
 
@@ -47,6 +48,12 @@ print(f"Optimal objective: {float(daqp_sol['f'])}")
 # print(f"Optimal objective: {float(daqp_sol['cost'])}")
 
 print(f"DAQP BnB infos: {solver.stats()['bnb_itercount']=}, {solver.stats()['bnb_nodecount']=}")
+
+# The remainder cross-checks DAQP against gurobi; skip it alone so that the DAQP
+# part above still runs when gurobi is unavailable.
+if "SKIP_GUROBI_TESTS" in os.environ or not ca.has_conic('gurobi'):
+    import sys
+    sys.exit(0)
 
 solver = ca.qpsol('solver', 'gurobi',
                   {'f': 0.5*x.T@H@x + f.T @ x, 'x': x, "g": A@x},

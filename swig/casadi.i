@@ -139,16 +139,20 @@
       // SWIG_PYTHON_THREAD_END_BLOCK is not needed, destructor will release GIL
     }
 
+    // Decodes to "" rather than dereferencing NULL when str_py is absent or not a str
     std::string python_string_to_std_string(PyObject *str_py) {
+      if (!str_py) return "";
 #if SWIG_VERSION < 0x040200
-      const char *str_char = SWIG_Python_str_AsChar(str_py);
-      std::string str(str_char);
-      SWIG_Python_str_DelForPy3(str_char);
+      const char *chars = SWIG_Python_str_AsChar(str_py);
+      std::string str(chars ? chars : "");
+      SWIG_Python_str_DelForPy3(chars);
 #else
       PyObject *bytes = NULL;
-      std::string str(SWIG_PyUnicode_AsUTF8AndSize(str_py, NULL, &bytes));
+      const char *chars = SWIG_PyUnicode_AsUTF8AndSize(str_py, NULL, &bytes);
+      std::string str(chars ? chars : "");
       Py_XDECREF(bytes);
 #endif
+      if (!chars) PyErr_Clear();
       return str;
     }
 
@@ -169,7 +173,7 @@
       PyErr_Fetch(&ptype, &pvalue, &ptraceback);
       PyObject* msg_py = PyObject_Str(pvalue);
       msg = python_string_to_std_string(msg_py);
-      Py_DECREF(msg_py);
+      Py_XDECREF(msg_py);
       PyErr_Restore(ptype, pvalue, ptraceback);
       PyErr_Print();
 #ifndef CASADI_WITH_PYTHON_GIL_RELEASE
@@ -671,7 +675,7 @@ namespace std {
     GUESTOBJECT* full(const DM& m, bool simplify=false) {
 #ifdef SWIGPYTHON
       PyObject *p = from_ptr(&m);
-      PyObject *method_name = PyString_FromString("toarray");
+      PyObject *method_name = PyUnicode_FromString("toarray");
       PyObject *cr = PyObject_CallMethodObjArgs(p, method_name, (simplify? Py_True: Py_False), 0);
       Py_DECREF(method_name);
       Py_DECREF(p);
@@ -724,7 +728,7 @@ namespace std {
 %#if PY_VERSION_HEX < 0x03070000
       PyObject* module = PyImport_AddModule("casadi");
 %#else
-      PyObject* c_name = PyString_FromString("casadi");
+      PyObject* c_name = PyUnicode_FromString("casadi");
       PyObject* module = PyImport_GetModule(c_name);
       Py_DECREF(c_name);
 %#endif
@@ -1410,7 +1414,9 @@ namespace std {
 #ifdef SWIGPYTHON
 
       // Some built-in types are iterable
-      if (PyDict_Check(p) || PyString_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
+      // bytes is iterable but yields ints; walking it as a vector of numbers
+      // would silently turn b"ab" into [97, 98] instead of raising.
+      if (PyDict_Check(p) || PyBytes_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
 
       // An object exposing a casadi conversion hook is a SINGLE matrix, not
       // a sequence of them -- don't iterate it as a vector.  (A 1-D numeric-
@@ -1424,10 +1430,10 @@ namespace std {
       if (PyErr_Occurred()) PyErr_Clear(); // Clear pending exception before type check
       if (PyObject_HasAttrString(p, "shape")) {
         PyObject * shape = PyObject_GetAttrString(p, "shape");
-        if(!PyTuple_Check(shape) || PyTuple_Size(shape)!=1) {
-          Py_DECREF(shape);
-          return false;
-        }
+        if (!shape) { PyErr_Clear(); return false; }
+        bool is_1d = PyTuple_Check(shape) && PyTuple_Size(shape)==1;
+        Py_DECREF(shape);
+        if (!is_1d) return false;
       }
 
       // Iterator to the sequence
@@ -1756,7 +1762,9 @@ namespace std {
       }
 #endif
 #ifdef SWIGPYTHON
-      if (PyString_Check(p) || PyUnicode_Check(p)) {
+      // str only: python_string_to_std_string goes through
+      // PyUnicode_AsUTF8*, which returns NULL for a bytes object.
+      if (PyUnicode_Check(p)) {
         if (m) {
           (*m)->clear();
           (*m)->append(python_string_to_std_string(p));
@@ -1815,7 +1823,7 @@ namespace std {
 
     GUESTOBJECT* from_ptr(const std::string *a) {
 #ifdef SWIGPYTHON
-      return PyString_FromString(a->c_str());
+      return PyUnicode_FromString(a->c_str());
 #elif defined(SWIGMATLAB)
       return mxCreateString(a->c_str());
 #elif defined(SWIGWASMJS)
@@ -1845,9 +1853,9 @@ namespace std {
 #ifdef SWIGPYTHON
 
       // Python casadi_int
-      if (PyInt_Check(p)) {
+      if (PyLong_Check(p)) {
         if (m) {
-          (**m).start = PyInt_AsLong(p);
+          (**m).start = PyLong_AsLong(p);
           (**m).stop = (**m).start+1;
           if ((**m).stop==0) (**m).stop = std::numeric_limits<casadi_int>::max();
         }
@@ -1967,7 +1975,7 @@ namespace std {
         PyObject *key, *value;
         Py_ssize_t pos = 0;
         while (PyDict_Next(p, &pos, &key, &value)) {
-          if (!(PyString_Check(key) || PyUnicode_Check(key))) return false;
+          if (!PyUnicode_Check(key)) return false;
           if (m) {
             M *v=&(**m)[python_string_to_std_string(key)], *v2=v;
             if (!casadi::to_ptr(value, &v)) return false;
@@ -2283,18 +2291,6 @@ namespace std {
 
 %fragment("casadi_dmatrix", "header", fragment="casadi_aux") {
   namespace casadi {
-#ifdef SWIGPYTHON
-    /** Check PyObjects by class name */
-    bool PyObjectHasClassName(PyObject* p, const char * name) {
-      PyObject * classo = PyObject_GetAttrString( p, "__class__");
-      PyObject * classname = PyObject_GetAttrString( classo, "__name__");
-
-      bool ret = python_string_to_std_string(classname) == name;
-      Py_DECREF(classo);Py_DECREF(classname);
-      return ret;
-    }
-#endif // SWIGPYTHON
-
     bool to_ptr(GUESTOBJECT *p, DM** m) {
       // Treat Null
       if (is_null(p)) return false;

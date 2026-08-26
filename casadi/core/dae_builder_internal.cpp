@@ -1069,6 +1069,8 @@ std::string DaeBuilderInternal::generate_model_description(const std::string& gu
   XmlNode me;
   me.name = "ModelExchange";
   me.set_attribute("modelIdentifier", model_name);  // sanitize name?
+  me.set_attribute("providesDirectionalDerivatives", "true");
+  me.set_attribute("providesAdjointDerivatives", "true");
   r.children.push_back(me);
 
   // Default experiment

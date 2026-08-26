@@ -209,7 +209,10 @@ void FmuFunction::change_option(const std::string& option_name,
   } else if (option_name == "enable_forward_jacobian") {
     enable_forward_jacobian_ = option_value;
   } else if (option_name == "enable_adjoint_hessian") {
-    enable_adjoint_hessian_ = option_value;
+    bool v = option_value;
+    if (v) casadi_assert(fmu_.provides_adjoint_derivatives(),
+      "FMU does not provide support for adjoint derivatives");
+    enable_adjoint_hessian_ = v;
   } else if (option_name == "fd_flip") {
     fd_flip_ = option_value;
   } else if (option_name == "make_symmetric") {
@@ -258,6 +261,9 @@ const Options FmuFunction::options_
     {"uses_directional_derivatives",
      {OT_BOOL,
       "Use the analytic forward directional derivative support in the FMU"}},
+    {"uses_adjoint_derivatives",
+     {OT_BOOL,
+      "Use the analytic adjoint derivative support in the FMU"}},
     {"validate_forward",
      {OT_BOOL,
       "Compare forward derivatives with finite differences for validation"}},
@@ -395,6 +401,7 @@ void FmuFunction::init(const Dict& opts) {
   if (validate_forward_ && !uses_directional_derivatives_) casadi_error("Inconsistent options");
   if (uses_adjoint_derivatives_) casadi_assert(fmu_.provides_adjoint_derivatives(),
     "FMU does not provide support for adjoint derivatives");
+  if (enable_adjoint_jacobian_) casadi_assert(uses_adjoint_derivatives_, "Inconsistent options");
 
   // New AD validation file, if any
   if (!validate_ad_file_.empty()) {
@@ -628,9 +635,12 @@ void FmuFunction::init(const Dict& opts) {
     }
     // Dummy coloring: One color for each nonlinear variable
     if (!hessian_coloring_ && !asymmetric_hessian_coloring_) {
-      hess_uni_colors_ = Sparsity(jac_in_.size(), nonlin_.size(), range(nonlin_.size() + 1), nonlin_);
+      hess_uni_colors_ = Sparsity(jac_in_.size(), nonlin_.size(),
+        range(nonlin_.size() + 1), nonlin_);
       max_hessian_colors = hess_uni_colors_.size2();
-      if (verbose_) casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
+      if (verbose_) {
+        casadi_message("Hessian calculation for " + str(nonlin_.size()) + " variables");
+      }
     }
 
     // Number of threads to be used for Hessian calculation
@@ -1050,11 +1060,9 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         break;
       case OutputType::ADJ:
         // If adjoint sensitivities have not already been set
-        if (need_jac || !uses_adjoint_derivatives_) {
-          for (casadi_int d = 0; d < nadj_; ++d) {
-            size_t asens_off = d * fmu_.n_in();
-            for (size_t id : fmu_.ired(out_[k].wrt)) *r++ = asens[id + asens_off];
-          }
+        for (casadi_int d = 0; d < nadj_; ++d) {
+          size_t asens_off = d * fmu_.n_in();
+          for (size_t id : fmu_.ired(out_[k].wrt)) *r++ = asens[id + asens_off];
         }
         break;
       case OutputType::HESS:
@@ -1268,18 +1276,15 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         }
       }
       // Request adjoint sensitivities
-      for (size_t k = 0; k < out_.size(); ++k) {
-        if (m->res[k] && out_[k].type == OutputType::ADJ) {
-          fmu_.request_adj(m, out_[k].wrt);
-        }
+      casadi_int wrt_id = -1;
+      for (casadi_int id : jac_in_) {
+        fmu_.request_adj(m, 1, &id, &wrt_id);
       }
       // Calculate derivatives
       if (fmu_.eval_adj(m)) return 1;
       // Collect adjoint sensitivities
-      for (size_t k = 0; k < out_.size(); ++k) {
-        if (m->res[k] && out_[k].type == OutputType::ADJ) {
-          fmu_.get_adj(m, out_[k].wrt, m->res[k] + d * size1_out(k));
-        }
+      for (casadi_int id : jac_in_) {
+        fmu_.get_adj(m, 1, &id, &m->asens[id]);
       }
     }
   }
@@ -1354,15 +1359,13 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         }
         // Request adjoint sensitivities
         casadi_int wrt_id = -1;
-        for (size_t i : jac_in_) {
-          casadi_int id = jac_in_[i];
+        for (casadi_int id : jac_in_) {
           fmu_.request_adj(m, 1, &id, &wrt_id);
         }
         // Calculate derivatives
         if (fmu_.eval_adj(m)) return 1;
         // Collect adjoint sensitivities
-        for (size_t i : jac_in_) {
-          casadi_int id = jac_in_[i];
+        for (casadi_int id : jac_in_) {
           fmu_.get_adj(m, 1, &id, &m->pert_asens[id]);
         }
       } else {
