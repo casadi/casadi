@@ -46,6 +46,22 @@ namespace casadi {
     bool success;
     // Return status
     UnifiedReturnStatus unified_return_status;
+    // Slack data; not part of casadi_nlpsol_data, which is unaware of slacks.
+    // Pointers into arg/res, followed by scratch.
+    const double *s0, *ubs, *lam_s0;
+    double *s, *lam_s;
+    // Scratch for the S_g*s_l product (size ngs_). Expansion mode only.
+    double* slack_w;
+    // Scratch holding the user-facing quantities for the iteration callback.
+    // Expansion mode only.
+    double* slack_cb;
+    // Native-slack mode only: writable, never-null buffers of size 2*ns_ each.
+    // The slacks are NOT part of casadi_nlpsol_data::z in this mode, so this is
+    // where they live for the duration of solve(). slack_s/slack_lam_s are
+    // pre-filled with the s0/lam_s0 guesses and copied out to res[NLPSOL_S] /
+    // res[NLPSOL_LAM_S] afterwards (which may be null); slack_lbs is all zeros
+    // and slack_ubs is ubs with +inf substituted for a missing input.
+    double *slack_s, *slack_lam_s, *slack_lbs, *slack_ubs;
   };
 
   /** \brief NLP solver storage class
@@ -70,6 +86,66 @@ namespace casadi {
 
     /// Number of parameters
     casadi_int np_;
+
+    ///@{
+    /** \brief Slack ("soft constraint") layer
+
+        Two regimes, selected by slack_native_.
+
+        EXPANSION (slack_native_ == false, the default and what every plugin
+        that does not opt in gets): the oracle handed to the plugin is a plain
+        NLP -- the slacks have been folded into the decision variables and the
+        relaxed bounds into extra constraint rows. nx_ and ng_ are therefore
+        the *augmented* sizes, the ones the plugin sees, whereas nxu_/ngu_ are
+        the user-facing ones.
+
+        NATIVE (slack_native_ == true): the plugin declared
+        Exposed::handles_slacks, so create_oracle left the structure intact and
+        the oracle is (x, p, s) -> (f, g, f_s) instead. 'x'/'g' are exactly the
+        user's, so nx_ == nxu_ and ng_ == ngu_, and 'f' is the user's objective
+        WITHOUT the slack penalty. slack_S_ and the index sets below keep their
+        meaning; the plugin is responsible for the slack variables themselves
+        (see NlpsolMemory::slack_s and friends) and for writing the TOTAL
+        objective f + f_s into casadi_nlpsol_data::objective.
+
+        Layout of the augmented decision vector (expansion mode):
+          z = [ x (nxu_) ; s (2*ns_) ; g_aug (ng_) ]
+        Layout of g_aug:
+          [ g[Gh]                    (ngh_ = ngu_ - ngs_)
+            g[Gs] + (S_g*s_l)[Gs]    (ngs_)   lower relaxation
+            g[Gs] - (S_g*s_u)[Gs]    (ngs_)   upper relaxation
+            x[Xs] + (S_x*s_l)[Xs]    (nxs_)   lower relaxation
+            x[Xs] - (S_x*s_u)[Xs] ]  (nxs_)   upper relaxation
+
+        \identifier{2k1} */
+    /// Slack incidence matrix [S_g;S_x], (ngu_+nxu_) x ns_. The single source
+    /// of truth for the slack layer; everything below is derived from it by
+    /// set_slack_prob(). Structural only: its entries are implicitly 1.
+    Sparsity slack_S_;
+    /// True when the plugin handles the slack layer natively, i.e. when the
+    /// oracle is (x,p,s)->(f,g,f_s) rather than the de-sugared plain NLP.
+    /// Derived from the oracle's arity, never stored, so it cannot desync
+    /// across serialization.
+    bool slack_native_;
+    /// Number of slacks per side; there are 2*ns_ slack variables
+    casadi_int ns_;
+    /// Number of user-facing decision variables:
+    /// nx_ == nxu_ + 2*ns_ (expansion) / nx_ == nxu_ (native)
+    casadi_int nxu_;
+    /// Number of user-facing constraints
+    casadi_int ngu_;
+    /// Indices into user g of the softened constraints (sorted, size ngs_)
+    std::vector<casadi_int> slack_target_g_;
+    /// Indices into user x of the softened simple bounds (sorted, size nxs_)
+    std::vector<casadi_int> slack_target_x_;
+    /// Indices into user g of the hard constraints (complement, size ngh_)
+    std::vector<casadi_int> slack_hard_g_;
+    /// S_g restricted to its softened rows, ngs_ x ns_, and its all-ones values
+    Sparsity slack_sp_sg_;
+    std::vector<double> slack_sg_ones_;
+    /// Shorthands
+    casadi_int ngs_, nxs_, ngh_;
+    ///@}
 
     /// callback function, executed at each iteration
     Function fcallback_;
@@ -198,6 +274,37 @@ namespace casadi {
         \identifier{1nx} */
     virtual void check_inputs(void* mem) const;
 
+    ///@{
+    /** \brief Reference implementation of the slack layer
+
+        slack_expand scatters the user inputs (x0/lbx/ubx/s0/ubs/lbg/ubg and
+        the multiplier guesses) into the augmented z/lbz/ubz/lam;
+        slack_collect gathers the augmented solution back into
+        x/s/g/lam_x/lam_s/lam_g. Both are no-ops when ns_==0.
+
+        \identifier{2k2} */
+    void slack_expand(NlpsolMemory* m) const;
+    void slack_collect(NlpsolMemory* m, double* x, double* s, double* g,
+                       double* lam_x, double* lam_s, double* lam_g) const;
+    void codegen_slack_expand(CodeGenerator& g, const std::string& d_nlp) const;
+    void codegen_slack_collect(CodeGenerator& g, const std::string& d_nlp) const;
+    ///@}
+
+    ///@{
+    /** \brief Native-slack mode: hand the slacks to the plugin as-is
+
+        No scatter/gather is needed (x/g are the user's own), only the slack
+        block itself: slack_native_enter materialises s0/lam_s0/ubs into the
+        NlpsolMemory scratch, slack_native_exit copies s/lam_s back out.
+        Both are no-ops unless slack_native_ && ns_>0.
+
+        \identifier{2k3} */
+    void slack_native_enter(NlpsolMemory* m) const;
+    void slack_native_exit(NlpsolMemory* m) const;
+    void codegen_slack_native_enter(CodeGenerator& g) const;
+    void codegen_slack_native_exit(CodeGenerator& g) const;
+    ///@}
+
     /** \brief Get default input value
 
         \identifier{1ny} */
@@ -295,8 +402,13 @@ namespace casadi {
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, const Function& oracle);
 
-    // No static functions exposed
-    struct Exposed{ };
+    // Per-plugin capabilities, consulted before the plugin object exists
+    struct Exposed{
+      /// The plugin implements the slack ("soft constraint") formulation
+      /// itself and wants the oracle handed over unexpanded, i.e.
+      /// (x,p,s)->(f,g,f_s). Flips the default of the 'expand_slacks' option.
+      bool handles_slacks = false;
+    };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
@@ -334,10 +446,24 @@ namespace casadi {
       t = v;
     }
 
-    /// Convert dictionary to Problem
+    /** \brief Convert dictionary to Problem
+
+        When the problem carries a slack part ('s'/'f_s' in \a d and the
+        'S' option in \a opts) and \a expand_slacks is true, it is de-sugared
+        here into a plain (x, p) -> (f, g) oracle by augmenting the decision
+        variables, the objective and the constraints. Nlpsol::set_slack_prob
+        rederives the bookkeeping needed to map back from that same 'S'.
+
+        With \a expand_slacks false the slack structure is left intact and
+        handed to the plugin as extra oracle IO instead:
+        (x, p, s) -> (f, g, f_s), i.e. NL_INPUTS_S / NL_OUTPUTS_S. Only a
+        plugin declaring Exposed::handles_slacks may ask for this.
+
+        \identifier{2k4} */
     template<typename XType>
       static Function create_oracle(const std::map<std::string, XType>& d,
-                                    const Dict& opts);
+                                    const Dict& opts,
+                                    bool expand_slacks = true);
 
   protected:
     /** \brief Deserializing constructor
@@ -346,6 +472,9 @@ namespace casadi {
     explicit Nlpsol(DeserializingStream& s);
   private:
     void set_nlpsol_prob();
+    // Derive the whole slack layer (sizes and index sets) from slack_S_,
+    // nx_ and ng_. Called from init() and from the deserializing constructor.
+    void set_slack_prob();
   };
 
 } // namespace casadi

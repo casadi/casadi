@@ -342,6 +342,180 @@ class NLPtests(casadiTestCase):
           with self.assertInException("Ill-posed"):
             solver(**data)
 
+  # ---------------------------------------------------------------------
+  # Soft constraints (the 'S' option / 's' / 'f_s')
+  #
+  # The unconstrained optimum sits at (3, 2). g[0] and the upper bound on
+  # x[0] push down on it while g[2] pushes up, so both the s_l and the s_u
+  # half of the slack vector end up active. g[1] and the bounds on x[1] are
+  # left hard, which exercises the hard/soft reordering of the constraint
+  # vector too.
+  #
+  # See docs/examples/python/nlpsol_slacks.py for a worked example, and
+  # nlpsol_slacks_manual.py for the augmentation done by hand.
+  # ---------------------------------------------------------------------
+  def slack_problem(self):
+    x = ca.SX.sym("x", 2)
+    f = (x[0]-3)**2 + (x[1]-2)**2
+    g = ca.vertcat(x[0]+x[1], x[0]-x[1], x[0]+2*x[1])
+    bounds = {"x0": [0, 0], "lbx": [-10, -10], "ubx": [0.5, 10],
+              "lbg": [-inf, -inf, 4.0], "ubg": [1.0, 0.5, inf]}
+    return x, f, g, bounds
+
+  def slack_norms(self):
+    w = 1.0
+    # g[0] soft, g[1] hard, g[2] soft, x[0] soft, x[1] hard
+    S_sep = ca.sparsify(ca.DM([[1, 0, 0],
+                               [0, 0, 0],
+                               [0, 1, 0],
+                               [0, 0, 1],
+                               [0, 0, 0]])).sparsity()
+    # a single slack shared by all softened rows
+    S_shared = ca.sparsify(ca.DM([[1], [0], [1], [1], [0]])).sparsity()
+    return [("L1",   S_sep,    lambda s: w*ca.sum1(s)),
+            ("L2",   S_sep,    lambda s: w*ca.dot(s, s)),
+            ("Linf", S_shared, lambda s: w*ca.sum1(s))]
+
+  def slack_reference(self, Solver, solver_options, S, penalty):
+    """Hand-augmented reference: what nlpsol's slack layer does for you.
+
+    Deliberately written differently from the internal de-sugaring: every row
+    is relaxed here (the empty rows of S simply reproduce the original bound),
+    so agreement is not an artefact of a shared layout."""
+    x, f, g, bounds = self.slack_problem()
+    nx, ng = x.numel(), g.numel()
+    ns = S.size2()
+
+    Sd = ca.DM.ones(S)  # S is structural; its entries count as 1
+    S_g, S_x = Sd[:ng, :], Sd[ng:, :]
+
+    s = ca.SX.sym("s", 2*ns)
+    s_l, s_u = s[:ns], s[ns:]
+
+    G = ca.vertcat(g + ca.mtimes(S_g, s_l),   # >= lbg
+                   g - ca.mtimes(S_g, s_u),   # <= ubg
+                   x + ca.mtimes(S_x, s_l),   # >= lbx
+                   x - ca.mtimes(S_x, s_u))   # <= ubx
+    lbG = ca.vertcat(ca.DM(bounds["lbg"]), -inf*ca.DM.ones(ng),
+                     ca.DM(bounds["lbx"]), -inf*ca.DM.ones(nx))
+    ubG = ca.vertcat(inf*ca.DM.ones(ng), ca.DM(bounds["ubg"]),
+                     inf*ca.DM.ones(nx), ca.DM(bounds["ubx"]))
+
+    solver = ca.nlpsol("reference", Solver,
+                       {"x": ca.vertcat(x, s), "f": f + penalty(s), "g": G},
+                       solver_options)
+    r = solver(x0=ca.vertcat(ca.DM(bounds["x0"]), ca.DM.zeros(2*ns)),
+               lbx=ca.vertcat(-inf*ca.DM.ones(nx), ca.DM.zeros(2*ns)),
+               ubx=inf*ca.DM.ones(nx+2*ns), lbg=lbG, ubg=ubG)
+
+    # Map the canonical solution back onto the user-facing quantities
+    z, lamZ, lamG = r["x"], r["lam_x"], r["lam_g"]
+    return {"f": r["f"],
+            "x": z[:nx],
+            "s": z[nx:],
+            "g": ca.Function("g", [x], [g])(z[:nx]),
+            "lam_s": lamZ[nx:],
+            # at most one of the two one-sided rows of a relaxed row is active
+            "lam_g": lamG[:ng] + lamG[ng:2*ng],
+            "lam_x": lamZ[:nx] + lamG[2*ng:2*ng+nx] + lamG[2*ng+nx:]}
+
+  def test_slacks(self):
+    x, f, g, bounds = self.slack_problem()
+
+    for Solver, solver_options, aux_options in solvers:
+      # fatrop stalls at max_iter on the relaxed problem. Not a slack-layer
+      # issue: the hand-written augmentation below stalls on the very same
+      # iterate, so there is nothing to compare against.
+      if Solver in ["fatrop"]: continue
+      for name, S, penalty in self.slack_norms():
+        print("test_slacks", Solver, name, solver_options)
+        ns = S.size2()
+        s = ca.SX.sym("s", 2*ns)
+        nlp = {"x": x, "f": f, "g": g, "s": s, "f_s": penalty(s)}
+        opts = dict(solver_options)
+        opts["S"] = S
+
+        solver = ca.nlpsol("mysolver", Solver, nlp, opts)
+        self.assertEqual(solver.n_in(), ca.nlpsol_n_in())
+        self.assertEqual(solver.size1_in("ubs"), 2*ns)
+        self.assertEqual(solver.size1_out("s"), 2*ns)
+        # 'x'/'g' keep the sizes the user wrote, not the augmented ones
+        self.assertEqual(solver.size1_out("x"), x.numel())
+        self.assertEqual(solver.size1_out("g"), g.numel())
+
+        r = solver(**bounds)
+        self.assertTrue(solver.stats()["success"])
+
+        ref = self.slack_reference(Solver, solver_options, S, penalty)
+        for k in ["f", "x", "s", "g"]:
+          self.checkarray(r[k], ref[k], name+":"+k, digits=6)
+        for k in ["lam_x", "lam_g", "lam_s"]:
+          self.checkarray(r[k], ref[k], name+":"+k, digits=5)
+
+        # The solution is feasible for the relaxed bounds, hard rows included
+        Sd = ca.DM.ones(S)
+        z = ca.vertcat(r["g"], r["x"])
+        lb = ca.vertcat(ca.DM(bounds["lbg"]), ca.DM(bounds["lbx"]))
+        ub = ca.vertcat(ca.DM(bounds["ubg"]), ca.DM(bounds["ubx"]))
+        self.assertTrue(float(ca.mmax(z - ub - ca.mtimes(Sd, r["s"][ns:]))) < 1e-6)
+        self.assertTrue(float(ca.mmax(lb - ca.mtimes(Sd, r["s"][:ns]) - z)) < 1e-6)
+
+        if aux_options["codegen"]:
+          self.check_codegen(solver, bounds, **aux_options["codegen"])
+        self.check_serialize(solver, bounds)
+
+  def test_slacks_ubs(self):
+    """ubs=0 forbids any relaxation, so the problem must reduce to the hard NLP."""
+    x, f, g, bounds = self.slack_problem()
+
+    for Solver, solver_options, aux_options in solvers:
+      for name, S, penalty in self.slack_norms():
+        print("test_slacks_ubs", Solver, name, solver_options)
+        ns = S.size2()
+        s = ca.SX.sym("s", 2*ns)
+        opts = dict(solver_options)
+        opts["S"] = S
+
+        soft = ca.nlpsol("mysolver", Solver, {"x": x, "f": f, "g": g,
+                                              "s": s, "f_s": penalty(s)}, opts)
+        hard = ca.nlpsol("hard", Solver, {"x": x, "f": f, "g": g}, solver_options)
+
+        r = soft(ubs=ca.DM.zeros(2*ns), **bounds)
+        rh = hard(**bounds)
+        self.checkarray(r["s"], ca.DM.zeros(2*ns), name+":s", digits=6)
+        self.checkarray(r["x"], rh["x"], name+":x", digits=6)
+        self.checkarray(r["f"], rh["f"], name+":f", digits=6)
+        self.checkarray(r["g"], rh["g"], name+":g", digits=6)
+
+  @requires_nlpsol("sqpmethod")
+  def test_slacks_errors(self):
+    x, f, g, bounds = self.slack_problem()
+    s = ca.SX.sym("s", 6)
+    S = self.slack_norms()[0][1]
+
+    with self.assertInException("must not depend on 's'"):
+      ca.nlpsol("mysolver", "sqpmethod", {"x": x, "f": f+s[0], "g": g,
+                                          "s": s, "f_s": ca.sum1(s)}, {"S": S})
+    with self.assertInException("must not depend on 'x'"):
+      ca.nlpsol("mysolver", "sqpmethod", {"x": x, "f": f, "g": g,
+                                          "s": s, "f_s": ca.sum1(s)*x[0]}, {"S": S})
+    with self.assertInException("even number of rows"):
+      ca.nlpsol("mysolver", "sqpmethod", {"x": x, "f": f, "g": g,
+                                          "s": ca.SX.sym("s", 5), "f_s": 0}, {"S": S})
+    with self.assertInException("5-by-3"):
+      ca.nlpsol("mysolver", "sqpmethod", {"x": x, "f": f, "g": g,
+                                          "s": s, "f_s": ca.sum1(s)},
+                {"S": ca.Sparsity.dense(4, 3)})
+    with self.assertInException("'s' is required"):
+      ca.nlpsol("mysolver", "sqpmethod", {"x": x, "f": f, "g": g}, {"S": S})
+    with self.assertInException("'S' is required"):
+      ca.nlpsol("mysolver", "sqpmethod", {"x": x, "f": f, "g": g,
+                                          "s": s, "f_s": ca.sum1(s)}, {})
+    with self.assertInException("cannot (yet) be combined with slacks"):
+      ca.nlpsol("mysolver", "sqpmethod", {"x": x, "f": f, "g": g,
+                                          "s": s, "f_s": ca.sum1(s)},
+                {"S": S, "detect_simple_bounds": True})
+
   def test_wrongdims(self):
     x=ca.SX.sym("x",2)
     nlp={'x':x, 'f':-x[0],'g':ca.diag(x)}

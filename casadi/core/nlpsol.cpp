@@ -64,6 +64,8 @@ namespace casadi {
                   const std::map<std::string, X>& nlp, const Dict& opts) {
 
     if (get_from_dict(opts, "detect_simple_bounds", false)) {
+      casadi_assert(nlp.find("s")==nlp.end() && opts.find("S")==opts.end(),
+        "Option 'detect_simple_bounds' cannot (yet) be combined with slacks.");
       X x = get_from_dict(nlp, "x", X(0, 1));
       X p = get_from_dict(nlp, "p", X(0, 1));
       X f = get_from_dict(nlp, "f", X(0));
@@ -188,7 +190,21 @@ namespace casadi {
       nlpsol_nlp["g"] = g(gi);
       return nlpsol(name, solver, Nlpsol::create_oracle(nlpsol_nlp, opts), nlpsol_opts);
     } else {
-      return nlpsol(name, solver, Nlpsol::create_oracle(nlp, opts), opts);
+      // The oracle handed to the plugin is a plain NLP; when the problem
+      // carries slacks, create_oracle de-sugars them and Nlpsol rederives the
+      // mapping from the very same 'S' option. A plugin that declares
+      // Exposed::handles_slacks instead gets the structure intact, as extra
+      // oracle IO -- see Nlpsol::create_oracle.
+      // getPlugin loads the plugin, which instantiate would do a moment later
+      // anyway, so this costs nothing beyond moving a "plugin not found"
+      // failure earlier.
+      bool handles_slacks = Nlpsol::has_plugin(solver, false) &&
+        Nlpsol::getPlugin(solver).exposed.handles_slacks;
+      bool expand_slacks = get_from_dict(opts, "expand_slacks", !handles_slacks);
+      casadi_assert(expand_slacks || handles_slacks,
+        "Option 'expand_slacks' was set to false, but nlpsol plugin '" + solver +
+        "' does not handle slacks natively.");
+      return nlpsol(name, solver, Nlpsol::create_oracle(nlp, opts, expand_slacks), opts);
     }
   }
 
@@ -202,10 +218,23 @@ namespace casadi {
     return construct_nlpsol(name, solver, nlp, opts);
   }
 
+  // An empty index set applied to a single-row matrix yields a 1-by-0 slice
+  // rather than 0-by-1, which would contribute a spurious row to the vertcat
+  // in create_oracle. That happens whenever every row of a one-row 'g' is
+  // softened, or nx==1 and no simple bound is, which is the common case for
+  // problems coming from Opti (its S_x block is always empty).
+  template<typename XType>
+  static XType nlpsol_pick(const XType& v, const std::vector<casadi_int>& idx) {
+    return idx.empty() ? XType(0, 1) : v(idx);
+  }
+
   template<typename XType>
   Function Nlpsol::create_oracle(const std::map<std::string, XType>& d,
-                                 const Dict& opts) {
+                                 const Dict& opts,
+                                 bool expand_slacks) {
     std::vector<XType> nl_in(NL_NUM_IN), nl_out(NL_NUM_OUT);
+    XType s, f_s;
+    bool has_s = false, has_f_s = false;
     for (auto&& i : d) {
       if (i.first=="x") {
         nl_in[NL_X]=i.second;
@@ -215,12 +244,94 @@ namespace casadi {
         nl_out[NL_F]=i.second;
       } else if (i.first=="g") {
         nl_out[NL_G]=i.second;
+      } else if (i.first=="s") {
+        s = i.second; has_s = true;
+      } else if (i.first=="f_s") {
+        f_s = i.second; has_f_s = true;
       } else {
         casadi_error("No such field: " + i.first);
       }
     }
     if (nl_out[NL_F].is_empty()) nl_out[NL_F] = 0;
     if (nl_out[NL_G].is_empty()) nl_out[NL_G] = XType(0, 1);
+
+    Sparsity S = get_from_dict(opts, "S", Sparsity());
+    if (has_s || has_f_s || !S.is_null()) {
+      casadi_assert(has_s, "Field 's' is required when 'f_s' or option 'S' is given.");
+      casadi_assert(!S.is_null(), "Option 'S' is required when field 's' is given.");
+
+      const XType& x = nl_in[NL_X];
+      const XType& f = nl_out[NL_F];
+      const XType& g = nl_out[NL_G];
+
+      casadi_assert(s.is_column(),
+        "Expected a column vector 's', but got " + s.dim(true) + ".");
+      casadi_assert(s.size1() % 2 == 0,
+        "'s' stacks [s_l;s_u] and must have an even number of rows, but got "
+        + str(s.size1()) + ".");
+      casadi_int ns = s.size1()/2;
+      casadi_int nx = x.size1();
+      casadi_int ng = g.size1();
+      casadi_assert(S.size1()==ng+nx && S.size2()==ns,
+        "Expected option 'S' (i.e. [S_g;S_x]) of shape " + str(ng+nx) + "-by-" + str(ns)
+        + ", but got " + S.dim(true) + ".");
+      if (!has_f_s) f_s = XType(0);
+      casadi_assert(f_s.is_scalar(),
+        "Expected a scalar 'f_s', but got " + f_s.dim(true) + ".");
+      if (ns>0) {
+        casadi_assert(!depends_on(f, s),
+          "'f' must not depend on 's'; put the slack objective in 'f_s'.");
+        casadi_assert(!depends_on(g, s), "'g' must not depend on 's'.");
+        casadi_assert(!depends_on(f_s, x), "'f_s' must not depend on 'x'.");
+      }
+
+      if (!expand_slacks) {
+        // Native mode: hand the slack structure to the plugin intact.
+        // 'x', 'f' and 'g' stay exactly as the user wrote them -- in
+        // particular 'f' does NOT include the slack penalty, which becomes a
+        // separate output. The plugin recovers everything it needs through
+        // oracle factory {"s","p"}->{"f_s", "grad:f_s:s", ...}.
+        //
+        // NOTE: Function::factory silently substitutes ZERO for an oracle
+        // input a requested function does not list (x_function.hpp), so a
+        // plugin asking for {"x","p"}->{"f","g",...} against this 3-input
+        // oracle would get wrong answers if 'f' or 'g' depended on 's'. The
+        // asserts just above make that unreachable; keep them that way.
+        nl_in.push_back(s);
+        nl_out.push_back(f_s);
+      } else {
+        // S is structural: its entries are implicitly 1. A structurally empty
+        // row means the corresponding constraint/bound stays hard.
+        DM Sd = DM::ones(S);
+        DM Sg = Sd(Slice(0, ng), Slice());
+        DM Sx = Sd(Slice(ng, ng+nx), Slice());
+
+        // Classify rows as hard or softened
+        std::vector<bool> g_soft(ng, false), x_soft(nx, false);
+        for (casadi_int k=0; k<Sg.nnz(); ++k) g_soft[Sg.sparsity().row()[k]] = true;
+        for (casadi_int k=0; k<Sx.nnz(); ++k) x_soft[Sx.sparsity().row()[k]] = true;
+        std::vector<casadi_int> Gs = boolvec_to_index(g_soft);
+        std::vector<casadi_int> Gh = boolvec_to_index(boolvec_not(g_soft));
+        std::vector<casadi_int> Xs = boolvec_to_index(x_soft);
+
+        // Augment: z = [x; s_l; s_u]
+        XType s_l = s(Slice(0, ns));
+        XType s_u = s(Slice(ns, 2*ns));
+        XType Sg_sl = mtimes(XType(Sg), s_l), Sg_su = mtimes(XType(Sg), s_u);
+        XType Sx_sl = mtimes(XType(Sx), s_l), Sx_su = mtimes(XType(Sx), s_u);
+
+        std::vector<XType> g_aug;
+        g_aug.push_back(nlpsol_pick(g, Gh));                           // hard, unchanged
+        g_aug.push_back(nlpsol_pick(g, Gs) + nlpsol_pick(Sg_sl, Gs));  // lbg <= g + S_g s_l
+        g_aug.push_back(nlpsol_pick(g, Gs) - nlpsol_pick(Sg_su, Gs));  //  g - S_g s_u <= ubg
+        g_aug.push_back(nlpsol_pick(x, Xs) + nlpsol_pick(Sx_sl, Xs));  // lbx <= x + S_x s_l
+        g_aug.push_back(nlpsol_pick(x, Xs) - nlpsol_pick(Sx_su, Xs));  //  x - S_x s_u <= ubx
+
+        nl_in[NL_X] = vertcat(x, s);
+        nl_out[NL_F] = f + f_s;
+        nl_out[NL_G] = vertcat(g_aug);
+      }
+    }
 
     // Options for the oracle
     Dict oracle_options;
@@ -238,7 +349,12 @@ namespace casadi {
       }
     }
 
-    // Create oracle
+    // Create oracle. The native-slack oracle carries one extra input and one
+    // extra output; NL_NUM_IN/NL_NUM_OUT are deliberately left alone (they
+    // size call vectors elsewhere), hence the separate name vectors.
+    if (nl_in.size() == NL_NUM_IN_S) {
+      return Function("nlp", nl_in, nl_out, NL_INPUTS_S, NL_OUTPUTS_S, oracle_options);
+    }
     return Function("nlp", nl_in, nl_out, NL_INPUTS, NL_OUTPUTS, oracle_options);
   }
 
@@ -295,6 +411,7 @@ namespace casadi {
       return -std::numeric_limits<double>::infinity();
     case NLPSOL_UBX:
     case NLPSOL_UBG:
+    case NLPSOL_UBS:
       return std::numeric_limits<double>::infinity();
     default:
       return 0;
@@ -317,6 +434,9 @@ namespace casadi {
     case NLPSOL_UBG:    return "ubg";
     case NLPSOL_LAM_X0: return "lam_x0";
     case NLPSOL_LAM_G0: return "lam_g0";
+    case NLPSOL_S0:     return "s0";
+    case NLPSOL_UBS:    return "ubs";
+    case NLPSOL_LAM_S0: return "lam_s0";
     case NLPSOL_NUM_IN: break;
     }
     return std::string();
@@ -330,6 +450,8 @@ namespace casadi {
     case NLPSOL_LAM_X: return "lam_x";
     case NLPSOL_LAM_G: return "lam_g";
     case NLPSOL_LAM_P: return "lam_p";
+    case NLPSOL_S:     return "s";
+    case NLPSOL_LAM_S: return "lam_s";
     case NLPSOL_NUM_OUT: break;
     }
     return std::string();
@@ -360,6 +482,10 @@ namespace casadi {
     no_nlp_grad_ = false;
     error_on_fail_ = false;
     sens_linsol_ = "qr";
+    slack_native_ = false;
+    ns_ = 0;
+    nxu_ = ngu_ = 0;
+    ngs_ = nxs_ = ngh_ = 0;
   }
 
   Nlpsol::~Nlpsol() {
@@ -381,6 +507,10 @@ namespace casadi {
     case NLPSOL_UBG:
     case NLPSOL_LAM_G0:
       return get_sparsity_out(NLPSOL_G);
+    case NLPSOL_S0:
+    case NLPSOL_UBS:
+    case NLPSOL_LAM_S0:
+      return get_sparsity_out(NLPSOL_S);
     case NLPSOL_P:
       return oracle_.sparsity_in(NL_P);
     case NLPSOL_NUM_IN: break;
@@ -394,14 +524,20 @@ namespace casadi {
       return oracle_.sparsity_out(NL_F);
     case NLPSOL_X:
     case NLPSOL_LAM_X:
+      // In native mode the oracle's own 'x' already is the user-facing one
+      if (ns_>0 && !slack_native_) return Sparsity::dense(nxu_);
       return oracle_.sparsity_in(NL_X);
     case NLPSOL_LAM_G:
     case NLPSOL_G:
+      if (ns_>0 && !slack_native_) return Sparsity::dense(ngu_);
       if (detect_simple_bounds_is_simple_.empty()) {
         return oracle_.sparsity_out(NL_G);
       } else {
         return Sparsity::dense(detect_simple_bounds_is_simple_.size());
       }
+    case NLPSOL_S:
+    case NLPSOL_LAM_S:
+      return Sparsity::dense(2*ns_);
     case NLPSOL_LAM_P:
       return get_sparsity_in(NLPSOL_P);
     case NLPSOL_NUM_OUT: break;
@@ -492,7 +628,22 @@ namespace casadi {
         "For internal use only."}},
       {"detect_simple_bounds_target_x",
        {OT_INTVECTOR,
-        "For internal use only."}}
+        "For internal use only."}},
+      {"S",
+       {OT_SPARSITY,
+        "Slack incidence matrix [S_g;S_x], (ng+nx)-by-ns, turning the "
+        "constraints and simple bounds whose row is non-empty into soft ones: "
+        "lbg-S_g*s_l <= g <= ubg+S_g*s_u and lbx-S_x*s_l <= x <= ubx+S_x*s_u, "
+        "with 0 <= s=[s_l;s_u] <= ubs. Structural only, its entries count as 1. "
+        "Requires an 's' entry in the nlp dictionary, and optionally an 'f_s' "
+        "one holding their contribution to the objective."}},
+      {"expand_slacks",
+       {OT_BOOL,
+        "De-sugar the slack layer into an augmented plain NLP before handing "
+        "the oracle to the plugin (default: true, unless the plugin declares "
+        "it handles slacks natively). Set to false to have the oracle keep "
+        "the slack structure, i.e. (x,p,s)->(f,g,f_s); only plugins that "
+        "declare support for it accept that."}}
      }
   };
 
@@ -511,8 +662,21 @@ namespace casadi {
         detect_simple_bounds_parts_ = op.second;
       } else if (op.first=="detect_simple_bounds_target_x") {
         detect_simple_bounds_target_x_ = op.second;
+      } else if (op.first=="S") {
+        slack_S_ = op.second;
       }
     }
+
+    // Augmented dimensions (what the plugin sees) and the user-facing ones.
+    // These must be known before get_sparsity_in/out is called.
+    nx_ = oracle_.nnz_in(NL_X);
+    ng_ = oracle_.sparsity_out(NL_G).numel();
+    // An oracle with extra IO is the native-slack one, (x,p,s)->(f,g,f_s).
+    // Deriving the mode from the oracle rather than from an option or a packed
+    // flag makes it impossible for the two to desync (create_oracle runs before
+    // the plugin exists, and deserialization restores the oracle verbatim).
+    slack_native_ = oracle_.n_in() > NL_NUM_IN;
+    set_slack_prob();
 
     for (casadi_int i=0;i<detect_simple_bounds_is_simple_.size();++i) {
       if (detect_simple_bounds_is_simple_[i]) {
@@ -573,10 +737,8 @@ namespace casadi {
       calc_lam_p_ = true;
     }
 
-    // Get dimensions
-    nx_ = nnz_out(NLPSOL_X);
+    // Get dimensions (nx_ and ng_ were determined before the base class init)
     np_ = nnz_in(NLPSOL_P);
-    ng_ = oracle_.sparsity_out(NL_G).numel();
 
     // No need to calculate non-existant quantities
     if (np_==0) calc_lam_p_ = false;
@@ -605,17 +767,28 @@ namespace casadi {
     // Discrete marker
     mi_ = false;
     if (!discrete_.empty()) {
-      casadi_assert(discrete_.size()==nx_, "\"discrete\" option has wrong length");
+      casadi_assert(discrete_.size()==nxu_, "\"discrete\" option has wrong length");
       if (std::find(discrete_.begin(), discrete_.end(), true)!=discrete_.end()) {
         casadi_assert(integer_support(),
                               "Discrete variables require a solver with integer support");
         mi_ = true;
       }
+      // Slacks are continuous
+      discrete_.resize(nx_, false);
     }
     if (!equality_.empty()) {
-      casadi_assert(equality_.size()==ng_, "\"equality\" option has wrong length. "
-                                           "Expected " + str(ng_) + " elements, but got " +
+      casadi_assert(equality_.size()==ngu_, "\"equality\" option has wrong length. "
+                                           "Expected " + str(ngu_) + " elements, but got " +
                                             str(equality_.size()) + " instead.");
+      if (ns_>0 && !slack_native_) {
+        // Reorder onto the augmented constraints; relaxation rows are
+        // one-sided and hence never equalities.
+        // In native mode g is the user's own, so nothing to reorder -- which
+        // is exactly what a structure-detecting plugin wants.
+        std::vector<bool> equality(ng_, false);
+        for (casadi_int k=0; k<ngh_; ++k) equality[k] = equality_[slack_hard_g_[k]];
+        equality_ = equality;
+      }
     }
 
     set_nlpsol_prob();
@@ -627,15 +800,29 @@ namespace casadi {
     alloc_res(sz_res, true);
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
+    if (slack_native_) {
+      // The slacks live outside casadi_nlpsol_data; res[NLPSOL_S] /
+      // res[NLPSOL_LAM_S] may be null, so the plugin gets scratch it can
+      // always read and write: s, lam_s, lbs (all zeros) and ubs.
+      alloc_w(8*ns_, true);
+    } else {
+      // Scratch for the S_g*s_l product needed to recover g on softened rows
+      alloc_w(ngs_, true);
+      // Scratch to present the user-facing quantities to the iteration callback
+      if (ns_>0 && !fcallback_.is_null()) alloc_w(2*(nxu_ + 2*ns_ + ngu_), true);
+    }
 
     if (!fcallback_.is_null()) {
       // Consistency checks
       casadi_assert_dev(!fcallback_.is_null());
       casadi_assert(fcallback_.n_out()==1 && fcallback_.numel_out()==1,
         "Callback function must return a scalar.");
-      casadi_assert(fcallback_.n_in()==n_out_,
-        "Callback input signature must match the NLP solver output signature");
-      for (casadi_int i=0; i<n_out_; ++i) {
+      casadi_assert(fcallback_.n_in()==n_out_ || fcallback_.n_in()==NLPSOL_S,
+        "Callback input signature must match the NLP solver output signature. "
+        "Expected " + str(static_cast<casadi_int>(n_out_)) + " inputs (or " +
+        str(static_cast<casadi_int>(NLPSOL_S)) + " for the scheme without slacks), but got " +
+        str(fcallback_.n_in()) + ".");
+      for (casadi_int i=0; i<static_cast<casadi_int>(fcallback_.n_in()); ++i) {
         // Ignore empty arguments
         if (fcallback_.sparsity_in(i).is_empty()) continue;
         casadi_assert(fcallback_.size_in(i)==size_out(i),
@@ -656,9 +843,18 @@ namespace casadi {
 
     // Function calculating f, g and the gradient of the Lagrangian w.r.t. x and p
     if (!no_nlp_grad_) {
-      create_function("nlp_grad", {"x", "p", "lam:f", "lam:g"},
-                      {"f", "g", "grad:gamma:x", "grad:gamma:p"},
-                      {{"gamma", {"f", "g"}}});
+      if (slack_native_ && ns_>0) {
+        // The oracle's 'f' excludes the slack penalty, so a gamma of {f,g}
+        // would make calc_f_ report an objective short by f_s and calc_lam_p_
+        // miss df_s/dp. Span 'f_s' too and add it back in Nlpsol::eval.
+        create_function("nlp_grad", {"x", "p", "s", "lam:f", "lam:f_s", "lam:g"},
+                        {"f", "f_s", "g", "grad:gamma:x", "grad:gamma:s", "grad:gamma:p"},
+                        {{"gamma", {"f", "f_s", "g"}}});
+      } else {
+        create_function("nlp_grad", {"x", "p", "lam:f", "lam:g"},
+                        {"f", "g", "grad:gamma:x", "grad:gamma:p"},
+                        {{"gamma", {"f", "g"}}});
+      }
     }
   }
 
@@ -689,6 +885,71 @@ namespace casadi {
     }
   }
 
+  void Nlpsol::set_slack_prob() {
+    ns_ = slack_S_.is_null() ? 0 : slack_S_.size2();
+    if (slack_native_) {
+      // The oracle carries the user's own x; the slacks are not in it
+      nxu_ = nx_;
+    } else {
+      nxu_ = nx_ - 2*ns_;
+      casadi_assert(nxu_>=0, "Slack bookkeeping inconsistent: the oracle has " + str(nx_) +
+        " decision variables, which cannot hold 2*" + str(ns_) + " slacks.");
+    }
+
+    if (ns_==0) {
+      ngu_ = ng_;
+      ngs_ = nxs_ = 0;
+      ngh_ = ng_;
+      slack_target_g_.clear();
+      slack_target_x_.clear();
+      slack_hard_g_.clear();
+      slack_sp_sg_ = Sparsity();
+      slack_sg_ones_.clear();
+      return;
+    }
+
+    // S stacks S_g (ngu_ rows) on top of S_x (nxu_ rows)
+    ngu_ = slack_S_.size1() - nxu_;
+    casadi_assert(ngu_>=0, "Option 'S' has " + str(slack_S_.size1()) +
+      " rows, too few for " + str(nxu_) + " decision variables.");
+
+    // A structurally empty row leaves that constraint / simple bound hard
+    std::vector<bool> g_soft(ngu_, false), x_soft(nxu_, false);
+    for (casadi_int k=0; k<slack_S_.nnz(); ++k) {
+      casadi_int r = slack_S_.row()[k];
+      if (r<ngu_) {
+        g_soft[r] = true;
+      } else {
+        x_soft[r-ngu_] = true;
+      }
+    }
+    slack_target_g_ = boolvec_to_index(g_soft);
+    slack_target_x_ = boolvec_to_index(x_soft);
+    slack_hard_g_ = boolvec_to_index(boolvec_not(g_soft));
+    ngs_ = slack_target_g_.size();
+    nxs_ = slack_target_x_.size();
+    ngh_ = ngu_ - ngs_;
+
+    if (slack_native_) {
+      casadi_assert(ng_ == ngu_,
+        "Slack bookkeeping inconsistent: option 'S' implies " + str(ngu_) +
+        " constraints, but the oracle has " + str(ng_) + ".");
+      casadi_assert(oracle_.nnz_in(NL_S) == 2*ns_,
+        "Slack bookkeeping inconsistent: option 'S' implies " + str(2*ns_) +
+        " slack variables, but the oracle's 's' has " + str(oracle_.nnz_in(NL_S)) + ".");
+    } else {
+      casadi_assert(ng_ == ngh_ + 2*ngs_ + 2*nxs_,
+        "Slack bookkeeping inconsistent: option 'S' implies " +
+        str(ngh_ + 2*ngs_ + 2*nxs_) + " augmented constraints, but the oracle has " +
+        str(ng_) + ".");
+    }
+
+    // S_g restricted to its softened rows; used to recover g there
+    std::vector<casadi_int> mapping;
+    slack_sp_sg_ = slack_S_.sub(slack_target_g_, range(ns_), mapping);
+    slack_sg_ones_.assign(slack_sp_sg_.nnz(), 1.);
+  }
+
   int Nlpsol::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
     auto *m = static_cast<NlpsolMemory*>(mem);
@@ -712,7 +973,7 @@ namespace casadi {
     casadi_int n_eq = 0;
 
     // Detect ill-posed problems (simple bounds)
-    for (casadi_int i=0; i<nx_; ++i) {
+    for (casadi_int i=0; i<nnz_out(NLPSOL_X); ++i) {
       double lb = d_nlp->lbx ? d_nlp->lbx[i] : get_default_in(NLPSOL_LBX);
       double ub = d_nlp->ubx ? d_nlp->ubx[i] : get_default_in(NLPSOL_UBX);
       double x0 = d_nlp->x0 ? d_nlp->x0[i] : get_default_in(NLPSOL_X0);
@@ -739,12 +1000,139 @@ namespace casadi {
       if (lb==ub) n_eq++;
     }
 
+    // Detect ill-posed problems (slack bounds)
+    for (casadi_int i=0; i<2*ns_; ++i) {
+      double ub = m->ubs ? m->ubs[i] : get_default_in(NLPSOL_UBS);
+      casadi_assert(ub >= 0,
+        "Ill-posed problem detected: "
+        "0 <= UBS[" + str(i) + "] was violated. Got UBS[" + str(i) + "] = " + str(ub) + ".");
+    }
+
     // Make sure enough degrees of freedom
     using casadi::str; // Workaround, MingGW bug, cf. CasADi issue #890
     if (n_eq> nx_) {
       casadi_warning("NLP is overconstrained: There are " + str(n_eq) +
       " equality constraints but only " + str(nx_) + " variables.");
     }
+  }
+
+  void Nlpsol::slack_expand(NlpsolMemory* m) const {
+    auto *d_nlp = &m->d_nlp;
+    const double inf = std::numeric_limits<double>::infinity();
+    casadi_int i, k;
+
+    // Decision variables: guess, simple bounds and multiplier guess
+    for (i=0; i<nxu_; ++i) {
+      d_nlp->z[i]   = d_nlp->x0     ? d_nlp->x0[i]     : 0;
+      d_nlp->lbz[i] = d_nlp->lbx    ? d_nlp->lbx[i]    : -inf;
+      d_nlp->ubz[i] = d_nlp->ubx    ? d_nlp->ubx[i]    : inf;
+      d_nlp->lam[i] = d_nlp->lam_x0 ? d_nlp->lam_x0[i] : 0;
+    }
+    // Softened simple bounds move to constraint rows; the variable goes free
+    for (k=0; k<nxs_; ++k) {
+      i = slack_target_x_[k];
+      d_nlp->lbz[i] = -inf;
+      d_nlp->ubz[i] = inf;
+      d_nlp->lam[i] = 0;
+    }
+    // Slacks: 0 <= s <= ubs
+    for (k=0; k<2*ns_; ++k) {
+      d_nlp->z[nxu_+k]   = m->s0     ? m->s0[k]     : 0;
+      d_nlp->lbz[nxu_+k] = 0;
+      d_nlp->ubz[nxu_+k] = m->ubs    ? m->ubs[k]    : inf;
+      d_nlp->lam[nxu_+k] = m->lam_s0 ? m->lam_s0[k] : 0;
+    }
+
+    double *lbz = d_nlp->lbz + nx_, *ubz = d_nlp->ubz + nx_, *lam = d_nlp->lam + nx_;
+    // Hard constraints
+    for (k=0; k<ngh_; ++k) {
+      i = slack_hard_g_[k];
+      lbz[k] = d_nlp->lbg    ? d_nlp->lbg[i]    : -inf;
+      ubz[k] = d_nlp->ubg    ? d_nlp->ubg[i]    : inf;
+      lam[k] = d_nlp->lam_g0 ? d_nlp->lam_g0[i] : 0;
+    }
+    // Relaxed constraints; the multiplier guess is split by sign over the
+    // one-sided rows it may end up on
+    for (k=0; k<ngs_; ++k) {
+      i = slack_target_g_[k];
+      double lam0 = d_nlp->lam_g0 ? d_nlp->lam_g0[i] : 0;
+      lbz[ngh_+k]       = d_nlp->lbg ? d_nlp->lbg[i] : -inf;
+      ubz[ngh_+k]       = inf;
+      lam[ngh_+k]       = std::fmin(lam0, 0.);
+      lbz[ngh_+ngs_+k]  = -inf;
+      ubz[ngh_+ngs_+k]  = d_nlp->ubg ? d_nlp->ubg[i] : inf;
+      lam[ngh_+ngs_+k]  = std::fmax(lam0, 0.);
+    }
+    // Relaxed simple bounds
+    casadi_int off = ngh_ + 2*ngs_;
+    for (k=0; k<nxs_; ++k) {
+      i = slack_target_x_[k];
+      double lam0 = d_nlp->lam_x0 ? d_nlp->lam_x0[i] : 0;
+      lbz[off+k]       = d_nlp->lbx ? d_nlp->lbx[i] : -inf;
+      ubz[off+k]       = inf;
+      lam[off+k]       = std::fmin(lam0, 0.);
+      lbz[off+nxs_+k]  = -inf;
+      ubz[off+nxs_+k]  = d_nlp->ubx ? d_nlp->ubx[i] : inf;
+      lam[off+nxs_+k]  = std::fmax(lam0, 0.);
+    }
+  }
+
+  void Nlpsol::slack_collect(NlpsolMemory* m, double* x, double* s, double* g,
+                             double* lam_x, double* lam_s, double* lam_g) const {
+    auto *d_nlp = &m->d_nlp;
+    casadi_int i, k;
+    const double* zg = d_nlp->z + nx_;
+    const double* lamg = d_nlp->lam + nx_;
+
+    casadi_copy(d_nlp->z, nxu_, x);
+    casadi_copy(d_nlp->z + nxu_, 2*ns_, s);
+    casadi_copy(d_nlp->lam + nxu_, 2*ns_, lam_s);
+    casadi_copy(d_nlp->lam, nxu_, lam_x);
+
+    // Hard constraints map one-to-one
+    if (g) for (k=0; k<ngh_; ++k) g[slack_hard_g_[k]] = zg[k];
+    if (lam_g) for (k=0; k<ngh_; ++k) lam_g[slack_hard_g_[k]] = lamg[k];
+
+    // Softened constraints: the lower relaxation row holds g + S_g*s_l
+    if (g && ngs_>0) {
+      casadi_clear(m->slack_w, ngs_);
+      casadi_mv(get_ptr(slack_sg_ones_), slack_sp_sg_, d_nlp->z + nxu_, m->slack_w, 0);
+      for (k=0; k<ngs_; ++k) g[slack_target_g_[k]] = zg[ngh_+k] - m->slack_w[k];
+    }
+    // At most one of the two one-sided rows can be active
+    if (lam_g) {
+      for (k=0; k<ngs_; ++k) {
+        lam_g[slack_target_g_[k]] = lamg[ngh_+k] + lamg[ngh_+ngs_+k];
+      }
+    }
+    // Softened simple bounds
+    if (lam_x) {
+      casadi_int off = ngh_ + 2*ngs_;
+      for (k=0; k<nxs_; ++k) {
+        i = slack_target_x_[k];
+        lam_x[i] = lamg[off+k] + lamg[off+nxs_+k];
+      }
+    }
+  }
+
+  void Nlpsol::slack_native_enter(NlpsolMemory* m) const {
+    if (!slack_native_ || ns_==0) return;
+    const double inf = std::numeric_limits<double>::infinity();
+    // 0 <= s <= ubs, with the guesses materialised so the plugin always has
+    // real buffers to iterate on (m->s0/ubs/lam_s0 may all be null)
+    for (casadi_int k=0; k<2*ns_; ++k) {
+      m->slack_s[k]     = m->s0     ? m->s0[k]     : 0;
+      m->slack_lam_s[k] = m->lam_s0 ? m->lam_s0[k] : 0;
+      m->slack_lbs[k]   = 0;
+      m->slack_ubs[k]   = m->ubs    ? m->ubs[k]    : inf;
+    }
+  }
+
+  void Nlpsol::slack_native_exit(NlpsolMemory* m) const {
+    if (!slack_native_ || ns_==0) return;
+    // casadi_copy is null-safe; m->s / m->lam_s point straight at res[...]
+    casadi_copy(m->slack_s, 2*ns_, m->s);
+    casadi_copy(m->slack_lam_s, 2*ns_, m->lam_s);
   }
 
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
@@ -799,22 +1187,30 @@ namespace casadi {
     setup(m, arg, res, iw, w);
     const auto *p_nlp = d_nlp->prob;
 
-    // Set initial guess
-    casadi_copy(d_nlp->x0, nx_, d_nlp->z);
-
-    // Read simple bounds and multiplier guesses
-    casadi_copy(d_nlp->lbx, nx_, d_nlp->lbz);
-    casadi_copy(d_nlp->ubx, nx_, d_nlp->ubz);
-    casadi_copy(d_nlp->lam_x0, nx_, d_nlp->lam);
-
-    if (p_nlp->detect_bounds.ng==0) {
-      // Read constraint bounds and multiplier guesses
-      casadi_copy(d_nlp->lbg, ng_, d_nlp->lbz+nx_);
-      casadi_copy(d_nlp->ubg, ng_, d_nlp->ubz+nx_);
-      casadi_copy(d_nlp->lam_g0, ng_, d_nlp->lam+nx_);
+    if (ns_>0 && !slack_native_) {
+      // Scatter the user-facing problem onto the augmented one
+      slack_expand(m);
     } else {
-      if (casadi_nlpsol_detect_bounds_before(d_nlp)) return 1;
+      // Set initial guess
+      casadi_copy(d_nlp->x0, nx_, d_nlp->z);
+
+      // Read simple bounds and multiplier guesses
+      casadi_copy(d_nlp->lbx, nx_, d_nlp->lbz);
+      casadi_copy(d_nlp->ubx, nx_, d_nlp->ubz);
+      casadi_copy(d_nlp->lam_x0, nx_, d_nlp->lam);
+
+      if (p_nlp->detect_bounds.ng==0) {
+        // Read constraint bounds and multiplier guesses
+        casadi_copy(d_nlp->lbg, ng_, d_nlp->lbz+nx_);
+        casadi_copy(d_nlp->ubg, ng_, d_nlp->ubz+nx_);
+        casadi_copy(d_nlp->lam_g0, ng_, d_nlp->lam+nx_);
+      } else {
+        if (casadi_nlpsol_detect_bounds_before(d_nlp)) return 1;
+      }
     }
+
+    // Native mode: the slacks are not in z, hand them to the plugin separately
+    slack_native_enter(m);
 
     // Set multipliers to nan
     casadi_fill(d_nlp->lam_p, np_, nan);
@@ -835,16 +1231,41 @@ namespace casadi {
     // Calculate multiplers
     if ((calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) && !flag) {
       const double lam_f = 1.;
-      m->arg[0] = d_nlp->z;
-      m->arg[1] = d_nlp->p;
-      m->arg[2] = &lam_f;
-      m->arg[3] = d_nlp->lam + nx_;
-      m->res[0] = calc_f_ ? &d_nlp->objective : nullptr;
-      m->res[1] = calc_g_ ? d_nlp->z + nx_ : nullptr;
-      m->res[2] = calc_lam_x_ ? d_nlp->lam : nullptr;
-      m->res[3] = calc_lam_p_ ? d_nlp->lam_p : nullptr;
-      if (calc_function(m, "nlp_grad")) {
-        casadi_warning("Failed to calculate multipliers");
+      if (slack_native_ && ns_>0) {
+        // Extended signature, see the create_function in init():
+        // (x,p,s,lam:f,lam:f_s,lam:g) -> (f,f_s,g,grad:gamma:x,grad:gamma:s,grad:gamma:p)
+        double f_user = nan, f_slack = nan;
+        m->arg[0] = d_nlp->z;
+        m->arg[1] = d_nlp->p;
+        m->arg[2] = m->slack_s;
+        m->arg[3] = &lam_f;
+        m->arg[4] = &lam_f;
+        m->arg[5] = d_nlp->lam + nx_;
+        m->res[0] = calc_f_ ? &f_user : nullptr;
+        m->res[1] = calc_f_ ? &f_slack : nullptr;
+        m->res[2] = calc_g_ ? d_nlp->z + nx_ : nullptr;
+        m->res[3] = calc_lam_x_ ? d_nlp->lam : nullptr;
+        // grad:gamma:s is the slack-bound multiplier the plugin already owns;
+        // recomputing it here would clobber it
+        m->res[4] = nullptr;
+        m->res[5] = calc_lam_p_ ? d_nlp->lam_p : nullptr;
+        if (calc_function(m, "nlp_grad")) {
+          casadi_warning("Failed to calculate multipliers");
+        }
+        // 'f' is reported as the TOTAL objective
+        if (calc_f_) d_nlp->objective = f_user + f_slack;
+      } else {
+        m->arg[0] = d_nlp->z;
+        m->arg[1] = d_nlp->p;
+        m->arg[2] = &lam_f;
+        m->arg[3] = d_nlp->lam + nx_;
+        m->res[0] = calc_f_ ? &d_nlp->objective : nullptr;
+        m->res[1] = calc_g_ ? d_nlp->z + nx_ : nullptr;
+        m->res[2] = calc_lam_x_ ? d_nlp->lam : nullptr;
+        m->res[3] = calc_lam_p_ ? d_nlp->lam_p : nullptr;
+        if (calc_function(m, "nlp_grad")) {
+          casadi_warning("Failed to calculate multipliers");
+        }
       }
       if (calc_lam_x_) casadi_scal(nx_, -1., d_nlp->lam);
       if (calc_lam_p_) casadi_scal(np_, -1., d_nlp->lam_p);
@@ -853,18 +1274,30 @@ namespace casadi {
     // Make sure that an optimal solution is consistant with bounds
     if (bound_consistency_ && !flag) {
       bound_consistency(nx_+ng_, d_nlp->z, d_nlp->lam, d_nlp->lbz, d_nlp->ubz);
+      if (slack_native_ && ns_>0) {
+        // The slacks are not in z; 0 <= s <= ubs is enforced separately
+        bound_consistency(2*ns_, m->slack_s, m->slack_lam_s,
+                          m->slack_lbs, m->slack_ubs);
+      }
     }
 
     // Get optimal solution
-    casadi_copy(d_nlp->z, nx_, d_nlp->x);
-
-    if (p_nlp->detect_bounds.ng==0) {
-      casadi_copy(d_nlp->z + nx_, ng_, d_nlp->g);
-      casadi_copy(d_nlp->lam, nx_, d_nlp->lam_x);
-      casadi_copy(d_nlp->lam + nx_, ng_, d_nlp->lam_g);
+    if (ns_>0 && !slack_native_) {
+      slack_collect(m, d_nlp->x, m->s, d_nlp->g, d_nlp->lam_x, m->lam_s, d_nlp->lam_g);
     } else {
-      if (casadi_nlpsol_detect_bounds_after(d_nlp)) return 1;
+      casadi_copy(d_nlp->z, nx_, d_nlp->x);
+
+      if (p_nlp->detect_bounds.ng==0) {
+        casadi_copy(d_nlp->z + nx_, ng_, d_nlp->g);
+        casadi_copy(d_nlp->lam, nx_, d_nlp->lam_x);
+        casadi_copy(d_nlp->lam + nx_, ng_, d_nlp->lam_g);
+      } else {
+        if (casadi_nlpsol_detect_bounds_after(d_nlp)) return 1;
+      }
     }
+
+    // Native mode: publish the slack block
+    slack_native_exit(m);
 
     casadi_copy(d_nlp->lam_p, np_, d_nlp->lam_p);
     casadi_copy(&d_nlp->objective, 1, d_nlp->f);
@@ -901,6 +1334,9 @@ namespace casadi {
     d_nlp.x0 = arg[NLPSOL_X0];
     d_nlp.lam_x0 = arg[NLPSOL_LAM_X0];
     d_nlp.lam_g0 = arg[NLPSOL_LAM_G0];
+    m->s0 = arg[NLPSOL_S0];
+    m->ubs = arg[NLPSOL_UBS];
+    m->lam_s0 = arg[NLPSOL_LAM_S0];
 
     d_nlp.x = res[NLPSOL_X];
     d_nlp.f = res[NLPSOL_F];
@@ -908,12 +1344,27 @@ namespace casadi {
     d_nlp.lam_x = res[NLPSOL_LAM_X];
     d_nlp.lam_g = res[NLPSOL_LAM_G];
     d_nlp.lam_p = res[NLPSOL_LAM_P];
-
+    m->s = res[NLPSOL_S];
+    m->lam_s = res[NLPSOL_LAM_S];
 
     arg += NLPSOL_NUM_IN;
     res += NLPSOL_NUM_OUT;
 
     casadi_nlpsol_set_work(&m->d_nlp, &arg, &res, &iw, &w);
+
+    if (slack_native_) {
+      m->slack_w = nullptr;
+      m->slack_cb = nullptr;
+      m->slack_s = w; w += 2*ns_;
+      m->slack_lam_s = w; w += 2*ns_;
+      m->slack_lbs = w; w += 2*ns_;
+      m->slack_ubs = w; w += 2*ns_;
+    } else {
+      m->slack_s = m->slack_lam_s = m->slack_lbs = m->slack_ubs = nullptr;
+      m->slack_w = w; w += ngs_;
+      m->slack_cb = w;
+      if (ns_>0 && !fcallback_.is_null()) w += 2*(nxu_ + 2*ns_ + ngu_);
+    }
   }
 
   std::vector<std::string> nlpsol_options(const std::string& name) {
@@ -929,7 +1380,12 @@ namespace casadi {
   }
 
   void Nlpsol::disp_more(std::ostream& stream) const {
-    stream << "minimize f(x;p) subject to lbx<=x<=ubx, lbg<=g(x;p)<=ubg defined by:\n";
+    if (ns_>0) {
+      stream << "minimize f(x;p)+f_s(s;p) subject to lbx-S_x*s_l<=x<=ubx+S_x*s_u, "
+                "lbg-S_g*s_l<=g(x;p)<=ubg+S_g*s_u, 0<=s<=ubs defined by:\n";
+    } else {
+      stream << "minimize f(x;p) subject to lbx<=x<=ubx, lbg<=g(x;p)<=ubg defined by:\n";
+    }
     oracle_.disp(stream, true);
   }
 
@@ -961,12 +1417,14 @@ namespace casadi {
               const Dict& opts) const {
     casadi_assert(detect_simple_bounds_is_simple_.empty(),
       "Simple bound detection not compatible with get_forward");
+    casadi_assert(ns_==0, "Slacks not compatible with get_forward");
 
     // Symbolic expression for the input
     std::vector<MX> arg = mx_in(), res = mx_out();
 
     // Initial guesses not used for derivative calculations
-    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
+    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0,
+                          NLPSOL_S0, NLPSOL_UBS, NLPSOL_LAM_S0}) {
       std::string name = arg[i].is_symbolic() ? arg[i].name() : "tmp_get_forward";
       arg[i] = MX::sym(name, Sparsity(arg[i].size()));
     }
@@ -1019,8 +1477,9 @@ namespace casadi {
     MX fwd_ubg = fseed[NLPSOL_UBG] = MX::sym("fwd_ubg", repmat(g.sparsity(), 1, nfwd));
     MX fwd_p = fseed[NLPSOL_P] = MX::sym("fwd_p", repmat(p.sparsity(), 1, nfwd));
 
-    // Guesses are unused
-    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
+    // Guesses (and the empty slack block) are unused
+    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0,
+                          NLPSOL_S0, NLPSOL_UBS, NLPSOL_LAM_S0}) {
       fseed[i] = MX(repmat(Sparsity(arg[i].size()), 1, nfwd));
     }
 
@@ -1073,6 +1532,9 @@ namespace casadi {
     fsens[NLPSOL_LAM_X] = fwd_lam_x;
     fsens[NLPSOL_LAM_G] = fwd_lam_g;
     fsens[NLPSOL_LAM_P] = fwd_lam_p;
+    for (NlpsolOutput i : {NLPSOL_S, NLPSOL_LAM_S}) {
+      fsens[i] = MX(repmat(res[i].sparsity(), 1, nfwd));
+    }
 
     // Gather return values
     arg.insert(arg.end(), res.begin(), res.end());
@@ -1092,12 +1554,14 @@ namespace casadi {
               const Dict& opts) const {
     casadi_assert(detect_simple_bounds_is_simple_.empty(),
       "Simple bound detection not compatible with get_reverse");
+    casadi_assert(ns_==0, "Slacks not compatible with get_reverse");
 
     // Symbolic expression for the input
     std::vector<MX> arg = mx_in(), res = mx_out();
 
     // Initial guesses not used for derivative calculations
-    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
+    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0,
+                          NLPSOL_S0, NLPSOL_UBS, NLPSOL_LAM_S0}) {
       std::string name = arg[i].is_symbolic() ? arg[i].name() : "tmp_get_reverse";
       arg[i] = MX::sym(name, Sparsity(arg[i].size()));
     }
@@ -1150,6 +1614,9 @@ namespace casadi {
     MX adj_lam_p = aseed[NLPSOL_LAM_P] = MX::sym("adj_lam_p", repmat(p.sparsity(), 1, nadj));
     MX adj_f = aseed[NLPSOL_F] = MX::sym("adj_f", Sparsity::dense(1, nadj));
     MX adj_g = aseed[NLPSOL_G] = MX::sym("adj_g", repmat(g.sparsity(), 1, nadj));
+    for (NlpsolOutput i : {NLPSOL_S, NLPSOL_LAM_S}) {
+      aseed[i] = MX::sym("adj_" + nlpsol_out(i), repmat(res[i].sparsity(), 1, nadj));
+    }
 
     // nlp_grad has the signature
     // (x, p, lam_f, lam_g) -> (f, g, grad_x, grad_p)
@@ -1191,8 +1658,9 @@ namespace casadi {
     asens[NLPSOL_LBG] = if_else(lbIg, beta_g_bar, 0);
     asens[NLPSOL_P] = adj_p0 - adj_p;
 
-    // Guesses are unused
-    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
+    // Guesses (and the empty slack block) are unused
+    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0,
+                          NLPSOL_S0, NLPSOL_UBS, NLPSOL_LAM_S0}) {
       asens[i] = MX(repmat(Sparsity(arg[i].size()), 1, nadj));
     }
 
@@ -1215,11 +1683,38 @@ namespace casadi {
 
     auto *d_nlp = &m->d_nlp;
 
-    m->arg[NLPSOL_X] = d_nlp->z;
-    m->arg[NLPSOL_F] = &d_nlp->objective;
-    m->arg[NLPSOL_G] = d_nlp->z + nx_;
-    m->arg[NLPSOL_LAM_G] = d_nlp->lam + nx_;
-    m->arg[NLPSOL_LAM_X] = d_nlp->lam;
+    if (ns_>0 && !slack_native_) {
+      // z/lam hold the augmented problem; materialise the user-facing view
+      double* w = m->slack_cb;
+      double *x = w; w += nxu_;
+      double *s = w; w += 2*ns_;
+      double *g = w; w += ngu_;
+      double *lam_x = w; w += nxu_;
+      double *lam_s = w; w += 2*ns_;
+      double *lam_g = w;
+      slack_collect(m, x, s, g, lam_x, lam_s, lam_g);
+      m->arg[NLPSOL_X] = x;
+      m->arg[NLPSOL_F] = &d_nlp->objective;
+      m->arg[NLPSOL_G] = g;
+      m->arg[NLPSOL_LAM_G] = lam_g;
+      m->arg[NLPSOL_LAM_X] = lam_x;
+      if (fcallback_.n_in()>NLPSOL_S) {
+        m->arg[NLPSOL_S] = s;
+        m->arg[NLPSOL_LAM_S] = lam_s;
+      }
+    } else {
+      // z/lam already are the user-facing view (nx_==nxu_, ng_==ngu_ in
+      // native mode); only the slack block lives elsewhere
+      m->arg[NLPSOL_X] = d_nlp->z;
+      m->arg[NLPSOL_F] = &d_nlp->objective;
+      m->arg[NLPSOL_G] = d_nlp->z + nx_;
+      m->arg[NLPSOL_LAM_G] = d_nlp->lam + nx_;
+      m->arg[NLPSOL_LAM_X] = d_nlp->lam;
+      if (slack_native_ && ns_>0 && fcallback_.n_in()>NLPSOL_S) {
+        m->arg[NLPSOL_S] = m->slack_s;
+        m->arg[NLPSOL_LAM_S] = m->slack_lam_s;
+      }
+    }
 
     // Callback outputs
     std::fill_n(m->res, fcallback_.n_out(), nullptr);
@@ -1319,6 +1814,14 @@ namespace casadi {
     g << d_nlp << ".x0 = arg[" << NLPSOL_X0 << "];\n";
     g << d_nlp << ".lam_x0 = arg[" << NLPSOL_LAM_X0 << "];\n";
     g << d_nlp << ".lam_g0 = arg[" << NLPSOL_LAM_G0 << "];\n";
+    if (ns_>0) {
+      g.local("nlp_s0", "const casadi_real", "*");
+      g.local("nlp_ubs", "const casadi_real", "*");
+      g.local("nlp_lam_s0", "const casadi_real", "*");
+      g << "nlp_s0 = arg[" << NLPSOL_S0 << "];\n";
+      g << "nlp_ubs = arg[" << NLPSOL_UBS << "];\n";
+      g << "nlp_lam_s0 = arg[" << NLPSOL_LAM_S0 << "];\n";
+    }
     g << "arg += " << NLPSOL_NUM_IN << ";\n";
 
     g << d_nlp << ".x = res[" << NLPSOL_X << "];\n";
@@ -1327,9 +1830,30 @@ namespace casadi {
     g << d_nlp << ".lam_x = res[" << NLPSOL_LAM_X << "];\n";
     g << d_nlp << ".lam_g = res[" << NLPSOL_LAM_G << "];\n";
     g << d_nlp << ".lam_p = res[" << NLPSOL_LAM_P << "];\n";
+    if (ns_>0) {
+      g.local("nlp_s", "casadi_real", "*");
+      g.local("nlp_lam_s", "casadi_real", "*");
+      g << "nlp_s = res[" << NLPSOL_S << "];\n";
+      g << "nlp_lam_s = res[" << NLPSOL_LAM_S << "];\n";
+    }
     g << "res += " << NLPSOL_NUM_OUT << ";\n";
 
     g << "casadi_nlpsol_set_work(&" << d_nlp << ", &arg, &res, &iw, &w);\n";
+
+    if (ngs_>0 && !slack_native_) {
+      g.local("nlp_slack_w", "casadi_real", "*");
+      g << "nlp_slack_w = w; w += " << ngs_ << ";\n";
+    }
+
+    if (ns_>0 && !slack_native_) {
+      codegen_slack_expand(g, d_nlp);
+      return;
+    }
+
+    // Native mode falls through to the classic x/g wiring below; only the
+    // slack block needs its own scratch. Must mirror Nlpsol::set_work's
+    // native branch exactly in its consumption of w.
+    codegen_slack_native_enter(g);
 
     g.copy_default(d_nlp + ".x0",     nx_, d_nlp + ".z",   "0",           false);
     g.copy_default(d_nlp + ".lbx",    nx_, d_nlp + ".lbz", "-casadi_inf", false);
@@ -1342,6 +1866,147 @@ namespace casadi {
       g.copy_default(d_nlp + ".lam_g0", ng_, d_nlp + ".lam+" + str(nx_), "0",           false);
     } else {
       g << "if (casadi_nlpsol_detect_bounds_before(&" << d_nlp << ")) return 1;\n";
+    }
+  }
+
+  // Mirror of Nlpsol::slack_native_enter. The w consumption must match
+  // Nlpsol::set_work's native branch exactly.
+  void Nlpsol::codegen_slack_native_enter(CodeGenerator& g) const {
+    if (!slack_native_ || ns_==0) return;
+    g.add_auxiliary(CodeGenerator::AUX_INF);
+    g.local("nlp_slack_s", "casadi_real", "*");
+    g.local("nlp_slack_lam_s", "casadi_real", "*");
+    g.local("nlp_slack_lbs", "casadi_real", "*");
+    g.local("nlp_slack_ubs", "casadi_real", "*");
+    g << "nlp_slack_s = w; w += " << 2*ns_ << ";\n";
+    g << "nlp_slack_lam_s = w; w += " << 2*ns_ << ";\n";
+    g << "nlp_slack_lbs = w; w += " << 2*ns_ << ";\n";
+    g << "nlp_slack_ubs = w; w += " << 2*ns_ << ";\n";
+    g.copy_default("nlp_s0", 2*ns_, "nlp_slack_s", "0", false);
+    g.copy_default("nlp_lam_s0", 2*ns_, "nlp_slack_lam_s", "0", false);
+    g.copy_default("nlp_ubs", 2*ns_, "nlp_slack_ubs", "casadi_inf", false);
+    g << g.fill("nlp_slack_lbs", 2*ns_, "0") << "\n";
+  }
+
+  // Mirror of Nlpsol::slack_native_exit
+  void Nlpsol::codegen_slack_native_exit(CodeGenerator& g) const {
+    if (!slack_native_ || ns_==0) return;
+    g << g.copy("nlp_slack_s", 2*ns_, "nlp_s") << "\n";
+    g << g.copy("nlp_slack_lam_s", 2*ns_, "nlp_lam_s") << "\n";
+  }
+
+  // Mirror of Nlpsol::slack_expand
+  void Nlpsol::codegen_slack_expand(CodeGenerator& g, const std::string& d_nlp) const {
+    g.add_auxiliary(CodeGenerator::AUX_FMIN);
+    g.add_auxiliary(CodeGenerator::AUX_FMAX);
+    g.local("i", "casadi_int");
+    g.local("k", "casadi_int");
+
+    std::string tgt_x = nxs_ ? g.constant(slack_target_x_) : "0";
+    std::string tgt_g = ngs_ ? g.constant(slack_target_g_) : "0";
+    std::string hard_g = ngh_ ? g.constant(slack_hard_g_) : "0";
+
+    g.copy_default(d_nlp + ".x0",     nxu_, d_nlp + ".z",   "0",           false);
+    g.copy_default(d_nlp + ".lbx",    nxu_, d_nlp + ".lbz", "-casadi_inf", false);
+    g.copy_default(d_nlp + ".ubx",    nxu_, d_nlp + ".ubz", "casadi_inf",  false);
+    g.copy_default(d_nlp + ".lam_x0", nxu_, d_nlp + ".lam", "0",           false);
+
+    if (nxs_) {
+      g << "for (k=0; k<" << nxs_ << "; ++k) {\n";
+      g << "  i = " << tgt_x << "[k];\n";
+      g << "  " << d_nlp << ".lbz[i] = -casadi_inf;\n";
+      g << "  " << d_nlp << ".ubz[i] = casadi_inf;\n";
+      g << "  " << d_nlp << ".lam[i] = 0;\n";
+      g << "}\n";
+    }
+
+    g.copy_default("nlp_s0",     2*ns_, d_nlp + ".z+" + str(nxu_),   "0",          false);
+    g.copy_default("nlp_ubs",    2*ns_, d_nlp + ".ubz+" + str(nxu_), "casadi_inf", false);
+    g.copy_default("nlp_lam_s0", 2*ns_, d_nlp + ".lam+" + str(nxu_), "0",          false);
+    g << g.fill(d_nlp + ".lbz+" + str(nxu_), 2*ns_, "0") << "\n";
+
+    if (ngh_) {
+      g << "for (k=0; k<" << ngh_ << "; ++k) {\n";
+      g << "  i = " << hard_g << "[k];\n";
+      g << "  " << d_nlp << ".lbz[" << nx_ << "+k] = " << d_nlp
+        << ".lbg ? " << d_nlp << ".lbg[i] : -casadi_inf;\n";
+      g << "  " << d_nlp << ".ubz[" << nx_ << "+k] = " << d_nlp
+        << ".ubg ? " << d_nlp << ".ubg[i] : casadi_inf;\n";
+      g << "  " << d_nlp << ".lam[" << nx_ << "+k] = " << d_nlp
+        << ".lam_g0 ? " << d_nlp << ".lam_g0[i] : 0;\n";
+      g << "}\n";
+    }
+    if (ngs_) {
+      g.local("nlp_lam0", "casadi_real");
+      g << "for (k=0; k<" << ngs_ << "; ++k) {\n";
+      g << "  i = " << tgt_g << "[k];\n";
+      g << "  nlp_lam0 = " << d_nlp << ".lam_g0 ? " << d_nlp << ".lam_g0[i] : 0;\n";
+      g << "  " << d_nlp << ".lbz[" << nx_+ngh_ << "+k] = " << d_nlp
+        << ".lbg ? " << d_nlp << ".lbg[i] : -casadi_inf;\n";
+      g << "  " << d_nlp << ".ubz[" << nx_+ngh_ << "+k] = casadi_inf;\n";
+      g << "  " << d_nlp << ".lam[" << nx_+ngh_ << "+k] = casadi_fmin(nlp_lam0, 0.);\n";
+      g << "  " << d_nlp << ".lbz[" << nx_+ngh_+ngs_ << "+k] = -casadi_inf;\n";
+      g << "  " << d_nlp << ".ubz[" << nx_+ngh_+ngs_ << "+k] = " << d_nlp
+        << ".ubg ? " << d_nlp << ".ubg[i] : casadi_inf;\n";
+      g << "  " << d_nlp << ".lam[" << nx_+ngh_+ngs_ << "+k] = casadi_fmax(nlp_lam0, 0.);\n";
+      g << "}\n";
+    }
+    if (nxs_) {
+      g.local("nlp_lam0", "casadi_real");
+      casadi_int off = nx_ + ngh_ + 2*ngs_;
+      g << "for (k=0; k<" << nxs_ << "; ++k) {\n";
+      g << "  i = " << tgt_x << "[k];\n";
+      g << "  nlp_lam0 = " << d_nlp << ".lam_x0 ? " << d_nlp << ".lam_x0[i] : 0;\n";
+      g << "  " << d_nlp << ".lbz[" << off << "+k] = " << d_nlp
+        << ".lbx ? " << d_nlp << ".lbx[i] : -casadi_inf;\n";
+      g << "  " << d_nlp << ".ubz[" << off << "+k] = casadi_inf;\n";
+      g << "  " << d_nlp << ".lam[" << off << "+k] = casadi_fmin(nlp_lam0, 0.);\n";
+      g << "  " << d_nlp << ".lbz[" << off+nxs_ << "+k] = -casadi_inf;\n";
+      g << "  " << d_nlp << ".ubz[" << off+nxs_ << "+k] = " << d_nlp
+        << ".ubx ? " << d_nlp << ".ubx[i] : casadi_inf;\n";
+      g << "  " << d_nlp << ".lam[" << off+nxs_ << "+k] = casadi_fmax(nlp_lam0, 0.);\n";
+      g << "}\n";
+    }
+  }
+
+  // Mirror of Nlpsol::slack_collect, writing straight into the output slots
+  void Nlpsol::codegen_slack_collect(CodeGenerator& g, const std::string& d_nlp) const {
+    g.local("k", "casadi_int");
+
+    std::string tgt_x = nxs_ ? g.constant(slack_target_x_) : "0";
+    std::string tgt_g = ngs_ ? g.constant(slack_target_g_) : "0";
+    std::string hard_g = ngh_ ? g.constant(slack_hard_g_) : "0";
+
+    g << g.copy(d_nlp + ".z", nxu_, d_nlp + ".x") << "\n";
+    g << g.copy(d_nlp + ".z+" + str(nxu_), 2*ns_, "nlp_s") << "\n";
+    g << g.copy(d_nlp + ".lam+" + str(nxu_), 2*ns_, "nlp_lam_s") << "\n";
+    g << g.copy(d_nlp + ".lam", nxu_, d_nlp + ".lam_x") << "\n";
+
+    if (ngh_) {
+      g << "if (" << d_nlp << ".g) for (k=0; k<" << ngh_ << "; ++k) "
+        << d_nlp << ".g[" << hard_g << "[k]] = " << d_nlp << ".z[" << nx_ << "+k];\n";
+      g << "if (" << d_nlp << ".lam_g) for (k=0; k<" << ngh_ << "; ++k) "
+        << d_nlp << ".lam_g[" << hard_g << "[k]] = " << d_nlp << ".lam[" << nx_ << "+k];\n";
+    }
+    if (ngs_) {
+      g << "if (" << d_nlp << ".g) {\n";
+      g << "  " << g.clear("nlp_slack_w", ngs_) << "\n";
+      g << "  " << g.mv(g.constant(slack_sg_ones_), slack_sp_sg_,
+                        d_nlp + ".z+" + str(nxu_), "nlp_slack_w", false) << "\n";
+      g << "  for (k=0; k<" << ngs_ << "; ++k) " << d_nlp << ".g[" << tgt_g << "[k]] = "
+        << d_nlp << ".z[" << nx_+ngh_ << "+k] - nlp_slack_w[k];\n";
+      g << "}\n";
+      g << "if (" << d_nlp << ".lam_g) for (k=0; k<" << ngs_ << "; ++k) "
+        << d_nlp << ".lam_g[" << tgt_g << "[k]] = "
+        << d_nlp << ".lam[" << nx_+ngh_ << "+k] + "
+        << d_nlp << ".lam[" << nx_+ngh_+ngs_ << "+k];\n";
+    }
+    if (nxs_) {
+      casadi_int off = nx_ + ngh_ + 2*ngs_;
+      g << "if (" << d_nlp << ".lam_x) for (k=0; k<" << nxs_ << "; ++k) "
+        << d_nlp << ".lam_x[" << tgt_x << "[k]] = "
+        << d_nlp << ".lam[" << off << "+k] + "
+        << d_nlp << ".lam[" << off+nxs_ << "+k];\n";
     }
   }
 
@@ -1374,33 +2039,67 @@ namespace casadi {
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
       g.local("one", "const casadi_real");
       g.init_local("one", "1");
-      g << "d->arg[0] = " << d_nlp << ".z;\n";
-      g << "d->arg[1] = " << d_nlp << ".p;\n";
-      g << "d->arg[2] = &one;\n";
-      g << "d->arg[3] = " << d_nlp << ".lam+" << str(nx_) << ";\n";
-      g << "d->res[0] = " << (calc_f_ ? "&" + d_nlp + ".objective" : "0") << ";\n";
-      g << "d->res[1] = " << (calc_g_ ? d_nlp + ".z+" + str(nx_) : "0") << ";\n";
-      g << "d->res[2] = " << (calc_lam_x_ ? d_nlp + ".lam+" + str(nx_) : "0") << ";\n";
-      g << "d->res[3] = " << (calc_lam_p_ ? d_nlp + ".lam_p" : "0") << ";\n";
-      std::string nlp_grad = g(get_function("nlp_grad"), "d->arg", "d->res", "d->iw", "d->w");
-      g << "if (" << nlp_grad << ") return 1;\n";
+      if (slack_native_ && ns_>0) {
+        // Mirror of the extended-gamma branch in Nlpsol::eval
+        g.local("nlp_f_user", "casadi_real");
+        g.local("nlp_f_slack", "casadi_real");
+        g << "d->arg[0] = " << d_nlp << ".z;\n";
+        g << "d->arg[1] = " << d_nlp << ".p;\n";
+        g << "d->arg[2] = nlp_slack_s;\n";
+        g << "d->arg[3] = &one;\n";
+        g << "d->arg[4] = &one;\n";
+        g << "d->arg[5] = " << d_nlp << ".lam+" << str(nx_) << ";\n";
+        g << "d->res[0] = " << (calc_f_ ? "&nlp_f_user" : "0") << ";\n";
+        g << "d->res[1] = " << (calc_f_ ? "&nlp_f_slack" : "0") << ";\n";
+        g << "d->res[2] = " << (calc_g_ ? d_nlp + ".z+" + str(nx_) : "0") << ";\n";
+        g << "d->res[3] = " << (calc_lam_x_ ? d_nlp + ".lam+" + str(nx_) : "0") << ";\n";
+        // grad:gamma:s is the slack-bound multiplier the plugin already owns
+        g << "d->res[4] = 0;\n";
+        g << "d->res[5] = " << (calc_lam_p_ ? d_nlp + ".lam_p" : "0") << ";\n";
+        std::string nlp_grad = g(get_function("nlp_grad"), "d->arg", "d->res", "d->iw", "d->w");
+        g << "if (" << nlp_grad << ") return 1;\n";
+        // 'f' is reported as the TOTAL objective
+        if (calc_f_) g << d_nlp << ".objective = nlp_f_user + nlp_f_slack;\n";
+      } else {
+        g << "d->arg[0] = " << d_nlp << ".z;\n";
+        g << "d->arg[1] = " << d_nlp << ".p;\n";
+        g << "d->arg[2] = &one;\n";
+        g << "d->arg[3] = " << d_nlp << ".lam+" << str(nx_) << ";\n";
+        g << "d->res[0] = " << (calc_f_ ? "&" + d_nlp + ".objective" : "0") << ";\n";
+        g << "d->res[1] = " << (calc_g_ ? d_nlp + ".z+" + str(nx_) : "0") << ";\n";
+        g << "d->res[2] = " << (calc_lam_x_ ? d_nlp + ".lam+" + str(nx_) : "0") << ";\n";
+        g << "d->res[3] = " << (calc_lam_p_ ? d_nlp + ".lam_p" : "0") << ";\n";
+        std::string nlp_grad = g(get_function("nlp_grad"), "d->arg", "d->res", "d->iw", "d->w");
+        g << "if (" << nlp_grad << ") return 1;\n";
+      }
       if (calc_lam_x_) g << g.scal(nx_, "-1.0", d_nlp + ".lam") << "\n";
       if (calc_lam_p_) g << g.scal(np_, "-1.0", d_nlp + ".lam_p") << "\n";
     }
     if (bound_consistency_) {
       g << g.bound_consistency(nx_+ng_, d_nlp + ".z", d_nlp + ".lam",
           d_nlp + ".lbz", d_nlp + ".ubz") << ";\n";
+      if (slack_native_ && ns_>0) {
+        // The slacks are not in z; 0 <= s <= ubs is enforced separately
+        g << g.bound_consistency(2*ns_, "nlp_slack_s", "nlp_slack_lam_s",
+            "nlp_slack_lbs", "nlp_slack_ubs") << ";\n";
+      }
     }
 
-    g << g.copy(d_nlp + ".z", nx_, d_nlp + ".x") << "\n";
-
-    if (detect_simple_bounds_is_simple_.empty()) {
-      g << g.copy(d_nlp + ".z + " + str(nx_), ng_, d_nlp + ".g") << "\n";
-      g << g.copy(d_nlp + ".lam", nx_, d_nlp + ".lam_x") << "\n";
-      g << g.copy(d_nlp + ".lam + " + str(nx_), ng_, d_nlp + ".lam_g") << "\n";
+    if (ns_>0 && !slack_native_) {
+      codegen_slack_collect(g, d_nlp);
     } else {
-      g << "if (casadi_nlpsol_detect_bounds_after(&" << d_nlp << ")) return 1;\n";
+      g << g.copy(d_nlp + ".z", nx_, d_nlp + ".x") << "\n";
+
+      if (detect_simple_bounds_is_simple_.empty()) {
+        g << g.copy(d_nlp + ".z + " + str(nx_), ng_, d_nlp + ".g") << "\n";
+        g << g.copy(d_nlp + ".lam", nx_, d_nlp + ".lam_x") << "\n";
+        g << g.copy(d_nlp + ".lam + " + str(nx_), ng_, d_nlp + ".lam_g") << "\n";
+      } else {
+        g << "if (casadi_nlpsol_detect_bounds_after(&" << d_nlp << ")) return 1;\n";
+      }
     }
+
+    codegen_slack_native_exit(g);
 
     g.copy_check("&" + d_nlp + ".objective", 1, d_nlp + ".f", false, true);
     g.copy_check(d_nlp + ".lam_p", np_, d_nlp + ".lam_p", false, true);
@@ -1409,7 +2108,7 @@ namespace casadi {
   void Nlpsol::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
-    s.version("Nlpsol", 5);
+    s.version("Nlpsol", 6);
     s.pack("Nlpsol::nx", nx_);
     s.pack("Nlpsol::ng", ng_);
     s.pack("Nlpsol::np", np_);
@@ -1434,6 +2133,7 @@ namespace casadi {
     s.pack("Nlpsol::detect_simple_bounds_is_simple", detect_simple_bounds_is_simple_);
     s.pack("Nlpsol::detect_simple_bounds_parts", detect_simple_bounds_parts_);
     s.pack("Nlpsol::detect_simple_bounds_target_x", detect_simple_bounds_target_x_);
+    s.pack("Nlpsol::slack_S", slack_S_);
   }
 
   void Nlpsol::serialize_type(SerializingStream &s) const {
@@ -1446,7 +2146,7 @@ namespace casadi {
   }
 
   Nlpsol::Nlpsol(DeserializingStream & s) : OracleFunction(s) {
-    int version = s.version("Nlpsol", 1, 5);
+    int version = s.version("Nlpsol", 1, 6);
     s.unpack("Nlpsol::nx", nx_);
     s.unpack("Nlpsol::ng", ng_);
     s.unpack("Nlpsol::np", np_);
@@ -1486,6 +2186,14 @@ namespace casadi {
       }
       s.unpack("Nlpsol::detect_simple_bounds_target_x", detect_simple_bounds_target_x_);
     }
+    if (version>=6) {
+      s.unpack("Nlpsol::slack_S", slack_S_);
+    }
+    // Re-derived rather than packed, exactly as in Nlpsol::init, so that the
+    // regime cannot desync from the oracle across a round trip -- and so that
+    // the serialization format itself is unchanged.
+    slack_native_ = oracle_.n_in() > NL_NUM_IN;
+    set_slack_prob();
     for (casadi_int i=0;i<detect_simple_bounds_is_simple_.size();++i) {
       if (detect_simple_bounds_is_simple_[i]) {
         detect_simple_bounds_target_g_.push_back(i);
