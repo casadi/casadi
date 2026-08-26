@@ -1667,7 +1667,8 @@ namespace std {
       }
 
       // Try to convert to different types
-      if (to_generic<bool>(p, m)
+      if (to_generic<casadi::Sparsity>(p, m)
+          || to_generic<bool>(p, m)
           || to_generic<casadi_int>(p, m)
           || to_generic<double>(p, m)
           || to_generic<std::string>(p, m)
@@ -1713,6 +1714,7 @@ namespace std {
       case OT_VECTOR: return from_tmp(a->as_vector());
       case OT_FUNCTION: return from_tmp(a->as_function());
       case OT_FUNCTIONVECTOR: return from_tmp(a->as_function_vector());
+      case OT_SPARSITY: return from_tmp(a->as_sparsity());
 #ifdef SWIGPYTHON
       case OT_NULL:
       case OT_VOIDPTR:
@@ -3205,7 +3207,7 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
  *     `Unknown` (hiding the real errors), on Py3.8 it resolves and
  *     flags them.  `Any` is stable across all targets.
  * (3) Users inspect stats output freely; precise typing buys nothing. */
-%stub_alias_in(GenericType, bool | int | float | str | "Function" | Sequence["_GenericType"] | %arg(Mapping[str, "_GenericType"]))
+%stub_alias_in(GenericType, bool | int | float | str | "Function" | "Sparsity" | Sequence["_GenericType"] | %arg(Mapping[str, "_GenericType"]))
 %stub_alias_out_key(GenericType, Any)
 
 /* __getitem__/__setitem__ axis index.  MX additionally accepts MX
@@ -3400,7 +3402,7 @@ export type _Slice = Slice | number | bigint;
 // TS 4.1+ permits inline array/object types in recursive aliases, but a
 // bare reference like `_GenericType[]` triggers TS2456 (circular).  Use
 // the inline-array form to break the cycle the compiler can see through.
-export type _GenericType = boolean | bigint | number | string | Function
+export type _GenericType = boolean | bigint | number | string | Function | Sparsity
                          | readonly _GenericType[]
                          | { readonly [k: string]: _GenericType };
 // JS callers regularly pass plain `number` literals where casadi_int

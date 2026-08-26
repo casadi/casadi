@@ -60,7 +60,8 @@ namespace casadi {
     OT_STRINGVECTORVECTOR,
     OT_DICTVECTOR,
     OT_VECTORVECTOR,
-    OT_VECTOR};
+    OT_VECTOR,
+    OT_SPARSITY};
 #endif // SWIG
 
   /** \brief Generic data type, can hold different types such as bool, casadi_int, std::string etc.
@@ -101,6 +102,7 @@ namespace casadi {
     GenericType(const char s[]);
     GenericType(const Function& f);
     GenericType(const std::vector<Function>& f);
+    GenericType(const Sparsity& sp);
     GenericType(const Dict& dict);
     GenericType(const std::vector<Dict>& dictv);
     GenericType(const std::vector<std::vector<GenericType> >& gvv);
@@ -151,6 +153,7 @@ namespace casadi {
     operator std::vector<std::vector<std::string> >() const { return to_string_vector_vector();}
     operator const Function&() const { return as_function();}
     operator const std::vector<Function>&() const { return as_function_vector();}
+    operator const Sparsity&() const { return as_sparsity();}
     operator const Dict&() const { return as_dict();}
     operator const std::vector<Dict>&() const { return as_dict_vector();}
     operator const std::vector<std::vector<GenericType> >&() const { return as_vector_vector();}
@@ -188,6 +191,7 @@ namespace casadi {
     bool is_vector() const;
     bool is_function() const;
     bool is_function_vector() const;
+    bool is_sparsity() const;
     bool is_void_pointer() const;
     ///@}
 
@@ -212,6 +216,7 @@ namespace casadi {
     const std::vector<GenericType>& as_vector() const;
     const Function& as_function() const;
     const std::vector<Function>& as_function_vector() const;
+    const Sparsity& as_sparsity() const;
     void* const & as_void_pointer() const;
     ///@}
 
@@ -234,6 +239,7 @@ namespace casadi {
     std::vector< std::vector< GenericType> > to_vector_vector() const;
     Function to_function() const;
     std::vector<Function> to_function_vector() const;
+    Sparsity to_sparsity() const;
     void* to_void_pointer() const;
     std::vector<int> to_int_type_vector() const;
     ///@}
