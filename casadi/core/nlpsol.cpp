@@ -1334,9 +1334,15 @@ namespace casadi {
     d_nlp.x0 = arg[NLPSOL_X0];
     d_nlp.lam_x0 = arg[NLPSOL_LAM_X0];
     d_nlp.lam_g0 = arg[NLPSOL_LAM_G0];
-    m->s0 = arg[NLPSOL_S0];
-    m->ubs = arg[NLPSOL_UBS];
-    m->lam_s0 = arg[NLPSOL_LAM_S0];
+    /* A stream written before the slack scheme existed deserialises with the
+       OLD io scheme -- 8 inputs, 6 outputs -- so the caller sized arg/res for
+       that and the slack slots are past the end.  Reading them yields garbage,
+       and res[NLPSOL_S] in particular is a pointer the plugin writes through.
+       Absent slots read as null, which is exactly how an unsupplied slack
+       input/output is already spelled everywhere below. */
+    m->s0 = n_in_ > static_cast<size_t>(NLPSOL_S0) ? arg[NLPSOL_S0] : nullptr;
+    m->ubs = n_in_ > static_cast<size_t>(NLPSOL_UBS) ? arg[NLPSOL_UBS] : nullptr;
+    m->lam_s0 = n_in_ > static_cast<size_t>(NLPSOL_LAM_S0) ? arg[NLPSOL_LAM_S0] : nullptr;
 
     d_nlp.x = res[NLPSOL_X];
     d_nlp.f = res[NLPSOL_F];
@@ -1344,11 +1350,17 @@ namespace casadi {
     d_nlp.lam_x = res[NLPSOL_LAM_X];
     d_nlp.lam_g = res[NLPSOL_LAM_G];
     d_nlp.lam_p = res[NLPSOL_LAM_P];
-    m->s = res[NLPSOL_S];
-    m->lam_s = res[NLPSOL_LAM_S];
+    m->s = n_out_ > static_cast<size_t>(NLPSOL_S) ? res[NLPSOL_S] : nullptr;
+    m->lam_s = n_out_ > static_cast<size_t>(NLPSOL_LAM_S) ? res[NLPSOL_LAM_S] : nullptr;
 
-    arg += NLPSOL_NUM_IN;
-    res += NLPSOL_NUM_OUT;
+    /* The plugin's own arg/res start after THIS function's inputs/outputs, not
+       after the current compile-time scheme: a function deserialised from a
+       pre-slack stream declares 8/6 and its sz_arg_/sz_res_ were sized for
+       that, so advancing by NLPSOL_NUM_IN/OUT would hand the plugin slots past
+       the end of the caller's buffers.  Identical for a current function,
+       where n_in_/n_out_ ARE NLPSOL_NUM_IN/OUT. */
+    arg += n_in_;
+    res += n_out_;
 
     casadi_nlpsol_set_work(&m->d_nlp, &arg, &res, &iw, &w);
 

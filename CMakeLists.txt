@@ -769,6 +769,15 @@ set(BUILD_FATROP_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for FATROP")
 option(WITH_BUILD_FATROP "Build FATROP (BUILD_FATROP_VERSION=${BUILD_FATROP_VERSION}) from downloaded source (BUILD_FATROP_GIT_REPO=${BUILD_FATROP_GIT_REPO})." OFF)
 set(BUILD_FATROP_DEPENDENCIES BLASFEO)
 
+# IPMC
+option(WITH_IPMC "Compile the interface to IPMC" OFF)
+set(IPMC_ROOT "" CACHE PATH "Root of a built ipmc checkout (contains ipmc/ipmc.h and build/ipmc/libipmc.so)")
+option(WITH_MOCKUP_IPMC "Use mockup IPMC (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+# The mockup is only the ipmc side of the plugin; the plugin itself packs its
+# blasfeo matrices, so blasfeo is needed either way.
+set(BUILD_IPMC_DEPENDENCIES BLASFEO)
+add_feature_info(ipmc-interface WITH_IPMC "Interface to NLP solver ipmc.")
+
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
 set(BUILD_SUPERSCS_VERSION "4d2d1bd03ed4cf93e684a880b233760ce34ca69c" CACHE STRING "Tag/branch/hash to be used for BUILD_SUPERSCS_GIT_REPO")
@@ -1224,9 +1233,17 @@ macro(eager_update DEP_NAME)
     endif()
 endmacro()
 
+# casadi_nlpsol_ipmc calls blasfeo directly (it packs BAbt/Ggt/RSQrqt), so
+# blasfeo is needed whether ipmc itself is real or mocked up.  Stated here
+# rather than left to the caller because BUILD_IPMC_DEPENDENCIES is only
+# consulted on the mockup branch of the loop below.
+if(WITH_IPMC)
+  set(WITH_BLASFEO ON)
+endif()
+
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG CPLEX SNOPT KNITRO GUROBI XPRESS MOSEK WORHP HSL MADNLP)
+foreach(PKG CPLEX SNOPT KNITRO GUROBI XPRESS MOSEK WORHP HSL MADNLP IPMC)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_BUILD_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
@@ -1389,6 +1406,19 @@ if(WITH_MOSEK AND WITH_MOCKUP_MOSEK)
   endif()
 endif()
 add_feature_info(mosek-interface WITH_MOSEK "Interface to the (mixed-integer) LP/QP/SOCP solver MOSEK")
+
+if(WITH_IPMC AND WITH_MOCKUP_IPMC)
+  add_library(ipmc::ipmc SHARED IMPORTED)
+  add_dependencies(ipmc::ipmc mockups-external)
+  set(IPMC_INCLUDE_DIR "${CMAKE_BINARY_DIR}/external_projects/mockups/ipmc/include")
+  set(IPMC_LIBRARY "${CMAKE_BINARY_DIR}/external_projects/mockups/ipmc/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}ipmc${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  file(MAKE_DIRECTORY "${IPMC_INCLUDE_DIR}")
+  set_target_properties(ipmc::ipmc PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${IPMC_INCLUDE_DIR}"
+    IMPORTED_LOCATION "${IPMC_LIBRARY}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/ipmc/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}ipmc${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+endif()
 
 if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   add_library(knitro::knitro SHARED IMPORTED)
@@ -1622,6 +1652,17 @@ if(WITH_HPIPM)
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
   endif()
+endif()
+
+if(WITH_IPMC)
+  # ipmc's linear algebra is blasfeo's, and so is the plugin's own packing.
+  # Attached here rather than in FindIPMC.cmake or in the mockup block above
+  # because neither of those runs late enough for the target to exist.
+  if(TARGET blasfeo)
+    set_property(TARGET ipmc::ipmc APPEND PROPERTY INTERFACE_LINK_LIBRARIES blasfeo)
+  endif()
+  message(STATUS "ipmc library: ${IPMC_LIBRARY}")
+  message(STATUS "ipmc include dir: ${IPMC_INCLUDE_DIR}")
 endif()
 
 if(WITH_FATROP)

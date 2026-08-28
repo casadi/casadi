@@ -51,6 +51,28 @@ if "SKIP_FATROP_TESTS" not in os.environ and ca.has_nlpsol("fatrop"):
   codegen = {"std": "c99","extralibs": ["fatrop","blasfeo"],"extra_options":flags}
   solvers.append(("fatrop",{"fatrop": {}},{"codegen":codegen,"discrete":False}))
 
+if "SKIP_IPMC_TESTS" not in os.environ and ca.has_nlpsol("ipmc"):
+  # ipmc is not installed into casadi's tree, so codegen has to be pointed
+  # at its build directory; without IPMC_ROOT there is nothing to link.
+  ipmc_flags = [] if os.name == 'nt' else ["-Wno-strict-prototypes"]
+  ipmc_root = os.environ.get("IPMC_ROOT", "/missing")
+  ipmc_libdir = os.path.join(ipmc_root, "build", "ipmc")
+  ipmc_codegen = False
+  if not os.path.isdir(ipmc_libdir):
+    print("IPMC_ROOT not set or has no build/ipmc, skipping ipmc codegen checks")
+  elif not os.path.isdir(ca.GlobalOptions.getCasadiIncludePath()):
+    # The generated code pulls in ipmc's header, which pulls in <blasfeo.h>
+    # from casadi's own include tree -- absent in a non-selfcontained install.
+    # Same limitation applies to the fatrop/madnlp/uno codegen checks.
+    print("no casadi include tree at %s, skipping ipmc codegen checks"
+          % ca.GlobalOptions.getCasadiIncludePath())
+  else:
+    # headers live in the source tree, the library in the build tree
+    ipmc_codegen = {"std": "c99","extralibs": ["ipmc","blasfeo"],
+                       "extralibdirs": [ipmc_libdir],"extra_include": [ipmc_root],
+                       "extra_options": ipmc_flags}
+  solvers.append(("ipmc",{"ipmc": {}},{"codegen": ipmc_codegen,"discrete":False}))
+
 if "SKIP_SLEQP_TESTS" not in os.environ and ca.has_nlpsol("sleqp"):
   solvers.append(("sleqp",{"print_time":False,"sleqp": {"linesearch": "Approx","feas_tol":1e-7,"stat_tol":1e-7,"slack_tol":1e-7, "hess_eval": "Exact"}},{"codegen": False,"discrete":False}))
 
@@ -66,6 +88,22 @@ if "SKIP_ALPAQA_TESTS" not in os.environ and ca.has_nlpsol("alpaqa"):
 
 if "SKIP_IPOPT_TESTS" not in os.environ and ca.has_nlpsol("ipopt"):
   codegen = {"extralibs": ["ipopt"], "std": "c99"}
+  # casadi's generated C for ipopt is written against ipopt >= 3.14's C
+  # interface, which spells the callback types ipindex / ipnumber / bool.
+  # 3.11 - 3.13 spell them Index / Number / Bool, so the generated file does
+  # not compile at all there (every callback signature is rejected).  Only
+  # DISABLE on a positive sighting of such a header, so that a tree whose
+  # header we cannot locate behaves exactly as before.
+  for _h in [os.path.join(ca.GlobalOptions.getCasadiIncludePath(), "coin-or", "IpStdCInterface.h"),
+             "/usr/include/coin-or/IpStdCInterface.h",
+             "/usr/local/include/coin-or/IpStdCInterface.h"]:
+    if os.path.isfile(_h):
+      with open(_h) as _f:
+        if "ipindex" not in _f.read():
+          print("ipopt < 3.14 (%s does not declare 'ipindex'), "
+                "skipping ipopt codegen checks" % _h)
+          codegen = False
+      break
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}},{"codegen": codegen,"discrete":False}))
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory","print_level":0}},{"codegen": codegen,"discrete":False}))
 
@@ -169,8 +207,9 @@ class NLPtests(casadiTestCase):
     nlp={'x':x,'f':(x+1)**2, 'g': ca.sqrt(x)}
 
     for Solver, solver_options, aux_options in solvers:
-      if Solver in ["madnlp", "fatrop"]: continue
-      
+      # ipmc loops forever instead of bailing out on the NaN
+      if Solver in ["madnlp", "fatrop", "ipmc"]: continue
+
       print("test_nonregular_point",Solver,solver_options)
       solver = ca.nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -189,7 +228,8 @@ class NLPtests(casadiTestCase):
 
     nlp={'x':x,'f':x**2, 'g': ca.sqrt(x)}
     for Solver, solver_options, aux_options in solvers:
-      if Solver in ["madnlp", "fatrop"]: continue
+      # ipmc loops forever instead of bailing out on the NaN
+      if Solver in ["madnlp", "fatrop", "ipmc"]: continue
       print("test_nonregular_point",Solver,solver_options)
       solver = ca.nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -376,12 +416,19 @@ class NLPtests(casadiTestCase):
             ("L2",   S_sep,    lambda s: w*ca.dot(s, s)),
             ("Linf", S_shared, lambda s: w*ca.sum1(s))]
 
-  def slack_reference(self, Solver, solver_options, S, penalty):
+  def slack_reference(self, Solver, solver_options, S, penalty,
+                      par=None, pval=None):
     """Hand-augmented reference: what nlpsol's slack layer does for you.
 
     Deliberately written differently from the internal de-sugaring: every row
     is relaxed here (the empty rows of S simply reproduce the original bound),
-    so agreement is not an artefact of a shared layout."""
+    so agreement is not an artefact of a shared layout.  And -- where ipopt is
+    available -- deliberately solved by a DIFFERENT solver, so agreement is
+    not an artefact of a shared solver core either.  'Solver'/'solver_options'
+    are then used only as the fallback for a tree without ipopt.
+
+    'par' is an optional parameter the penalty depends on; 'pval' its value
+    for this solve (see test_slacks_parametric_penalty)."""
     x, f, g, bounds = self.slack_problem()
     nx, ng = x.numel(), g.numel()
     ns = S.size2()
@@ -401,12 +448,23 @@ class NLPtests(casadiTestCase):
     ubG = ca.vertcat(inf*ca.DM.ones(ng), ca.DM(bounds["ubg"]),
                      inf*ca.DM.ones(nx), ca.DM(bounds["ubx"]))
 
-    solver = ca.nlpsol("reference", Solver,
-                       {"x": ca.vertcat(x, s), "f": f + penalty(s), "g": G},
-                       solver_options)
+    rnlp = {"x": ca.vertcat(x, s), "f": f + penalty(s), "g": G}
+    extra = {}
+    if par is not None:
+      rnlp["p"] = par
+      extra["p"] = pval
+    # Solved by IPOPT, not by the solver under test: see the note below
+    # slack_reference() for why, and for what happens without ipopt.
+    if self.slack_ref_solver is None:
+      RefSolver, ref_options = Solver, solver_options
+    else:
+      RefSolver = self.slack_ref_solver
+      ref_options = dict(self.slack_ref_opts,
+                         ipopt=dict(self.slack_ref_opts["ipopt"]))
+    solver = ca.nlpsol("reference", RefSolver, rnlp, ref_options)
     r = solver(x0=ca.vertcat(ca.DM(bounds["x0"]), ca.DM.zeros(2*ns)),
                lbx=ca.vertcat(-inf*ca.DM.ones(nx), ca.DM.zeros(2*ns)),
-               ubx=inf*ca.DM.ones(nx+2*ns), lbg=lbG, ubg=ubG)
+               ubx=inf*ca.DM.ones(nx+2*ns), lbg=lbG, ubg=ubG, **extra)
 
     # Map the canonical solution back onto the user-facing quantities
     z, lamZ, lamG = r["x"], r["lam_x"], r["lam_g"]
@@ -419,16 +477,115 @@ class NLPtests(casadiTestCase):
             "lam_g": lamG[:ng] + lamG[ng:2*ng],
             "lam_x": lamZ[:nx] + lamG[2*ng:2*ng+nx] + lamG[2*ng+nx:]}
 
+  # A solver that de-sugars slacks internally (sqpmethod and friends) solves
+  # *literally the same NLP* on both sides of the comparison below, so it
+  # agrees with slack_reference() to solver precision at any tolerance.  A
+  # solver with a NATIVE slack path (ipmc) solves two genuinely different
+  # formulations of the same problem, which only have to agree at the optimum
+  # -- and the optimum of slack_problem() is a degenerate vertex: at the L1
+  # solution x = [2, 1.5] the hard row g[1] = x[0]-x[1] <= 0.5 is active with
+  # a multiplier of exactly zero, so strict complementarity fails.  An
+  # interior-point method approaches such a point only at O(sqrt(mu)), along a
+  # central path that depends on the formulation, and at ipmc's default tol
+  # the two formulations land ~3e-6 apart in x -- both being about that far
+  # from the true optimum.  Against an independent high-accuracy sqpmethod
+  # solve the native answer is in fact *closer* than the reference
+  # augmentation (2.8e-5 vs 3.1e-5 at tol 1e-8; both ~2e-7 at tol 1e-12), so
+  # the disagreement is a convergence artefact of the shared degenerate
+  # vertex, not a slack-mapping error.
+  #
+  # The fix is therefore to solve *both* sides more accurately (tol=1e-13),
+  # not to weaken the comparison.
+  #
+  # The reference itself is now IPOPT rather than the solver under test
+  # (slack_ref_solver below).  With the solver under test on both sides its
+  # own convergence error cancelled exactly, so the comparison could only
+  # ever see a slack-MAPPING mistake, never a wrong answer that both sides
+  # shared; against ipopt it cannot cancel.  The price is that each solver's
+  # own O(sqrt(mu)) approach to that degenerate vertex is now visible, which
+  # is what sets the tolerances below.  Where ipopt is absent the reference
+  # falls back to the solver under test and the test keeps its original
+  # (weaker, but not vacuous) meaning.
+  #
+  # Reference options: tol 1e-14 with mu_strategy=adaptive, and
+  # bound_relax_factor=0.  Both matter and both were measured.  At tol 1e-12
+  # the reference is itself 4.7e-7 away from the exact L1 vertex (checked
+  # against sqpmethod/qrqp, an active-set method with no barrier at all);
+  # tol 1e-14 + adaptive brings that to 3.8e-8.  bound_relax_factor=0 stops
+  # the reference from widening every bound by 1e-8 the way ipopt and
+  # ipmc both do by default, which is worth 6e-8 on f here.
+  #
+  # ipopt is ALSO in `solvers`, and at its listed tol of 1e-10 it lands
+  # 3.3e-6 from the vertex -- ten times the worst of any other solver.  It is
+  # therefore tightened for these tests exactly like ipmc is; that is a
+  # tightening of the solve, not a weakening of the check.
+  #
+  # Tolerances, measured over every solver in `solvers` x every norm, against
+  # the ipopt reference: f 6.9e-8, x 4.3e-7, g 8.7e-7, lam_g 8.7e-7,
+  # lam_x 8.0e-9 (worst three of those at sqpmethod/L1).  Hence digits=6 on
+  # f and digits=5 on the rest -- x, s and g drop a digit from the era when
+  # the reference was the solver under test, and that drop is the visible
+  # part of the cancellation described above, not slack-layer error.
+  #
+  # The exception is again the L2 case's should-be-zero slacks: an L2 penalty
+  # has zero gradient at s = 0, so a slack that ought to be zero stalls on the
+  # interior-point barrier floor sqrt(mu/2Z) of whichever formulation it lives
+  # in, at a slightly different mu.  For the native path that is s 2.9e-6 and
+  # lam_s 5.7e-6 (against 6.4e-7 / 1.3e-6 for the de-sugaring solvers), so
+  # digits=4 on 's'/'lam_s' -- for the native path only, for the L2 norm only.
+  slack_native = ["ipmc"]           # solvers with a NATIVE slack path
+  slack_tight_tol = {"ipmc": 1e-13, "ipopt": 1e-13}
+  # Which solvers the slack tests run.  An allow-list rather than a skip list:
+  # these tests validate the slack LAYER, and the problem they use is
+  # deliberately degenerate (at the optimum the hard row g[1] is active with a
+  # multiplier of exactly zero, so strict complementarity fails).  Every solver
+  # approaches such a point on its own central path and at its own default
+  # tolerance, so "all solvers minus the ones that happened to fail" grew a new
+  # entry each time one was excluded -- fatrop stalls at max_iter, sleqp refuses
+  # the expanded problem outright, uno lands 3e-5 away in x and does not report
+  # success on the parametric penalty.  None of that is about the slack layer.
+  # ipmc drives the NATIVE path, ipopt is the reference the others are compared
+  # against, and sqpmethod is an independent de-sugaring solver: between them
+  # both paths through the layer are covered.
+  slack_solvers = ["ipopt", "ipmc", "sqpmethod"]
+  slack_ref_solver = "ipopt" if ca.has_nlpsol("ipopt") else None
+  slack_ref_opts = {"print_time": False,
+                    "ipopt": {"print_level": 0, "sb": "yes", "tol": 1e-14,
+                              "mu_strategy": "adaptive",
+                              "constr_viol_tol": 1e-14, "compl_inf_tol": 1e-14,
+                              "dual_inf_tol": 1e-9, "acceptable_tol": 1e-14,
+                              "bound_relax_factor": 0, "max_iter": 5000}}
+
   def test_slacks(self):
     x, f, g, bounds = self.slack_problem()
 
-    for Solver, solver_options, aux_options in solvers:
-      # fatrop stalls at max_iter on the relaxed problem. Not a slack-layer
-      # issue: the hand-written augmentation below stalls on the very same
-      # iterate, so there is nothing to compare against.
-      if Solver in ["fatrop"]: continue
+    for Solver, base_options, aux_options in solvers:
+      if Solver not in self.slack_solvers: continue
+      # sqpmethod with an L-BFGS Hessian never reports success on this
+      # problem, whatever it is asked to solve: the plain hard NLP with no
+      # slacks at all stops after 3 iterations with success=False, and so do
+      # the native slack path (55 iterations, its max_iter) and the hand
+      # augmentation.  Its answers are right to ~5e-7 in every case, but
+      # there is no converged solve to assert against, so it is skipped here
+      # the same way fatrop is.  Nothing to do with the slack layer; note
+      # that this configuration only exists at all when ipopt is built (it
+      # uses ipopt as its qpsol).  test_slacks_ubs still exercises it.
+      if Solver == "sqpmethod" and \
+         base_options.get("hessian_approximation") == "limited-memory":
+        continue
+      solver_options = dict(base_options)
+      if Solver in self.slack_tight_tol:
+        solver_options[Solver] = dict(solver_options.get(Solver, {}),
+                                      tol=self.slack_tight_tol[Solver])
       for name, S, penalty in self.slack_norms():
         print("test_slacks", Solver, name, solver_options)
+        # See the note above: only the native-slack path on the L2 penalty
+        # loosens, and only on the slacks that should be zero.
+        digits = {"f": 6, "x": 5, "s": 5, "g": 5,
+                  "lam_x": 5, "lam_g": 5, "lam_s": 5}
+        if Solver in self.slack_native and name == "L2":
+          digits["s"] = 4
+          digits["lam_s"] = 4
         ns = S.size2()
         s = ca.SX.sym("s", 2*ns)
         nlp = {"x": x, "f": f, "g": g, "s": s, "f_s": penalty(s)}
@@ -447,10 +604,8 @@ class NLPtests(casadiTestCase):
         self.assertTrue(solver.stats()["success"])
 
         ref = self.slack_reference(Solver, solver_options, S, penalty)
-        for k in ["f", "x", "s", "g"]:
-          self.checkarray(r[k], ref[k], name+":"+k, digits=6)
-        for k in ["lam_x", "lam_g", "lam_s"]:
-          self.checkarray(r[k], ref[k], name+":"+k, digits=5)
+        for k in ["f", "x", "s", "g", "lam_x", "lam_g", "lam_s"]:
+          self.checkarray(r[k], ref[k], name+":"+k, digits=digits[k])
 
         # The solution is feasible for the relaxed bounds, hard rows included
         Sd = ca.DM.ones(S)
@@ -469,6 +624,7 @@ class NLPtests(casadiTestCase):
     x, f, g, bounds = self.slack_problem()
 
     for Solver, solver_options, aux_options in solvers:
+      if Solver not in self.slack_solvers: continue
       for name, S, penalty in self.slack_norms():
         print("test_slacks_ubs", Solver, name, solver_options)
         ns = S.size2()
@@ -486,6 +642,201 @@ class NLPtests(casadiTestCase):
         self.checkarray(r["x"], rh["x"], name+":x", digits=6)
         self.checkarray(r["f"], rh["f"], name+":f", digits=6)
         self.checkarray(r["g"], rh["g"], name+":g", digits=6)
+
+  def test_slacks_parametric_penalty(self):
+    """f_s depends on the parameter p, and weights the two halves of s
+    differently.
+
+    Two gaps in one problem.
+
+    (a) A p-dependent penalty is the one case a native slack path can
+    silently get wrong, by reading Z and z once and then solving every
+    later call with the weights p happened to hold then.  Nothing else in
+    the suite exercises that, so an implementation that evaluated the
+    penalty once at construction, or constant-folded it into the generated
+    code, would pass everything else.  ONE solver object is therefore
+    asked for three solves, and the third repeats the first: a stale cache
+    cannot reproduce it.  (ipmc is excluded below: it does bake z and Z in
+    at construction, and refuses a p-dependent f_s outright rather than
+    solving it wrongly -- see ocp.py's
+    test_ipmc_slacks_parametric_penalty_refused.)
+
+    (b) Every other slack test weights s_l and s_u identically, which
+    makes a zl/zu (or S_l/S_u) swap invisible.  Here they cost 0.45 and
+    2.5, and the case is run both ways round.  At (0.45, 2.5) both halves
+    are active at once -- s_l = [0, 0.875, 0] and s_u = [0.925, 0, 0.225]
+    -- and swapping the weights moves the optimum from f = 9.08 to
+    f = 2.71, so the two are in no way interchangeable."""
+    x, f, g, bounds = self.slack_problem()
+    S = self.slack_norms()[0][1]           # the L1 sparsity: g[0], g[2], x[0]
+    ns = S.size2()
+    s = ca.SX.sym("s", 2*ns)
+    par = ca.SX.sym("w_slack", 2)
+    penalty = lambda s: par[0]*ca.sum1(s[:ns]) + par[1]*ca.sum1(s[ns:])
+    weights = [ca.DM([0.45, 2.5]), ca.DM([2.5, 0.45])]
+
+    for Solver, base_options, aux_options in solvers:
+      if Solver not in self.slack_solvers: continue
+      # see test_slacks: sqpmethod/L-BFGS never reports success here
+      if Solver == "sqpmethod" and \
+         base_options.get("hessian_approximation") == "limited-memory":
+        continue
+      # ipmc hands ipmc plain numbers for z and Z, evaluated once at
+      # construction, so it refuses a p-dependent penalty instead of
+      # solving it with stale weights.  The refusal, and the
+      # expand_slacks route that does track p, are tested in ocp.py's
+      # test_ipmc_slacks_parametric_penalty_refused.
+      if Solver == "ipmc": continue
+      solver_options = dict(base_options)
+      if Solver in self.slack_tight_tol:
+        solver_options[Solver] = dict(solver_options.get(Solver, {}),
+                                      tol=self.slack_tight_tol[Solver])
+      print("test_slacks_parametric_penalty", Solver, solver_options)
+      opts = dict(solver_options)
+      opts["S"] = S
+      solver = ca.nlpsol("mysolver", Solver,
+                         {"x": x, "f": f, "g": g, "p": par,
+                          "s": s, "f_s": penalty(s)}, opts)
+
+      out = []
+      for pv in [weights[0], weights[1], weights[0]]:
+        r = solver(p=pv, **bounds)
+        self.assertTrue(solver.stats()["success"])
+        out.append(r)
+        ref = self.slack_reference(Solver, solver_options, S, penalty,
+                                   par=par, pval=pv)
+        for k in ["f", "x", "s", "g"]:
+          self.checkarray(r[k], ref[k],
+                          "par%s:%s" % (str(pv), k), digits=6)
+
+      # Non-vacuity. At the first weighting BOTH halves of s are active,
+      # so the test can see which weight was applied where; the swapped
+      # weighting is a materially different answer, so a solve that
+      # ignored p could not match both.
+      sl = [float(out[0]["s"][i]) for i in range(ns)]
+      su = [float(out[0]["s"][ns+i]) for i in range(ns)]
+      n_l = sum(1 for v in sl if v > 1e-4)
+      n_u = sum(1 for v in su if v > 1e-4)
+      print("test_slacks_parametric_penalty", Solver, "active", (n_l, n_u),
+            "f", float(out[0]["f"]), float(out[1]["f"]))
+      self.assertTrue(n_l >= 1 and n_u >= 2)
+      self.assertTrue(abs(float(out[0]["f"]-out[1]["f"])) > 1.0)
+      self.assertTrue(float(ca.norm_inf(out[0]["x"]-out[1]["x"])) > 0.5)
+      # Same p, same solver object, same answer -- nothing from the middle
+      # solve may leak into the third.
+      for k in ["f", "x", "s", "g"]:
+        self.checkarray(out[0][k], out[2][k], "par_repeat:"+k, digits=10)
+
+      if aux_options["codegen"]:
+        # the generated code has to read the penalty's z from p as well
+        self.check_codegen(solver, dict(bounds, p=weights[1]),
+                           **aux_options["codegen"])
+      self.check_serialize(solver, dict(bounds, p=weights[0]))
+
+  @requires_nlpsol("ipmc")
+  def test_slacks_s0(self):
+    """s0 must reach the solver, and must not change the answer.
+
+    The softened row here has to be relaxed a long way before anything is
+    feasible: x0*x1 = 1 with x0,x1 >= 0.05 forces x0+x1 >= 2, while ubg[1] is
+    -1, so s_u has to reach 3.04 and the softened row is active at the
+    solution.  Where the slack starts therefore decides how the solve goes,
+    and restoration is involved on the way.
+
+    The native slack path used to discard s0 outright -- it produced
+    bit-identical output for every guess a user could write down -- and once
+    it stopped doing that, a cached solver object still only honoured the s0
+    of its first solve, because ipmc reads the initial slack once at
+    create.  Both are asserted here: the same solver object is re-solved with
+    three different s0.
+    """
+    if "SKIP_IPMC_TESTS" in os.environ: return
+    aux_options = [a for (S, _b, a) in solvers if S == "ipmc"][0]
+
+    x = ca.SX.sym("x", 2)
+    s = ca.SX.sym("s", 2)
+    nlp = {"x": x, "f": (x[0]-4)**2 + x[1]**2,
+           "g": ca.vertcat(x[0]*x[1], x[0]+x[1]),
+           "s": s, "f_s": 20*ca.sum1(s)}
+    # softens g[1] only, on its upper side and its lower side
+    S = ca.Sparsity.triplet(4, 1, [1], [0])
+    bounds = dict(lbg=[1.0, -ca.inf], ubg=[1.0, -1.0],
+                  lbx=[0.05, 0.05], ubx=[10, 10], x0=[0.0, 0.0])
+    # [0,0] is the default s0, and is the guess the solve is hardest from: the
+    # relaxation has to be found from scratch, through restoration
+    guesses = [[0, 0.0], [0, 2.0], [0, 3.5], [0, 6.0]]
+
+    ref = None
+    for tag, extra in [("native", {}), ("expand", {"expand_slacks": True})]:
+      opts = dict({"S": S, "print_time": False,
+                   "ipmc": {"tol": 1e-10, "max_iter": 300}}, **extra)
+      solver = ca.nlpsol("mysolver", "ipmc", nlp, opts)
+      counts = []
+      for s0 in guesses:
+        r = solver(s0=s0, **bounds)
+        self.assertTrue(solver.stats()["success"],
+                        "%s s0=%s did not converge" % (tag, s0))
+        counts.append(solver.stats()["iter_count"])
+        if ref is None:
+          ref = dict((k, r[k]) for k in ["f", "x", "s"])
+          # the softened row is genuinely active, or this proves nothing
+          self.assertTrue(float(r["s"][1]) > 2.5)
+        # native and expansion, and every s0, agree on the answer
+        for k in ["f", "x", "s"]:
+          self.checkarray(r[k], ref[k], "%s s0=%s :%s" % (tag, s0, k), digits=5)
+      # s0 reaches the solver: a different starting slack takes a different
+      # route.  Asserted on ONE solver object, so a cached solver that only
+      # honours the first s0 fails here.
+      print("test_slacks_s0", tag, counts)
+      self.assertTrue(len(set(counts)) > 1,
+                      "%s ignores s0, iter_count %s" % (tag, counts))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver, dict(bounds, s0=guesses[-1]),
+                           **aux_options["codegen"])
+      self.check_serialize(solver, dict(bounds, s0=guesses[-1]))
+
+  @requires_nlpsol("ipmc")
+  def test_infeasible_not_success(self):
+    """An infeasible problem must not come back as a solution.
+
+    ipmc reaches STATE_CONVERGED from the restoration phase as well as from
+    the normal one -- restoration converging to a point that is still
+    infeasible for the ORIGINAL problem is ipopt's Restoration_Failed -- and
+    the two were reported identically.  The result was success=True on a point
+    violating a hard equality by 0.46.
+
+    There are no slacks anywhere in this problem; the softened twin below only
+    checks that a relaxation which cannot reach feasibility is reported the
+    same way.
+    """
+    if "SKIP_IPMC_TESTS" in os.environ: return
+    x = ca.SX.sym("x", 2)
+    f = (x[0]-4)**2 + x[1]**2
+    g = ca.vertcat(x[0]*x[1], x[0]+x[1])
+    # x0*x1 = 1 with x0,x1 >= 0.05 forces x0+x1 >= 2, so x0+x1 <= 1.5 cannot hold
+    bounds = dict(lbg=[1.0, -ca.inf], ubg=[1.0, 1.5],
+                  lbx=[0.05, 0.05], ubx=[10, 10], x0=[0.0, 0.0])
+    opts = {"print_time": False, "ipmc": {"tol": 1e-10, "max_iter": 300}}
+
+    solver = ca.nlpsol("mysolver", "ipmc", {"x": x, "f": f, "g": g}, opts)
+    r = solver(**bounds)
+    self.assertFalse(solver.stats()["success"])
+    # and the point really is infeasible, i.e. the assertion above is not
+    # passing for some unrelated reason
+    self.assertTrue(abs(float(r["g"][0]) - 1.0) > 1e-3)
+
+    # the same problem with a slack capped far below the 0.5 it would need
+    # (both sides get the same cap: ipmc refuses a column pinned on one
+    # side only, see test_slacks_errors)
+    s = ca.SX.sym("s", 2)
+    S = ca.Sparsity.triplet(4, 1, [1], [0])
+    soft = ca.nlpsol("mysolver", "ipmc",
+                     {"x": x, "f": f, "g": g, "s": s, "f_s": 20*ca.sum1(s)},
+                     dict(opts, S=S))
+    r = soft(ubs=[0.01, 0.01], **bounds)
+    self.assertFalse(soft.stats()["success"])
+    self.assertTrue(abs(float(r["g"][0]) - 1.0) > 1e-3)
 
   @requires_nlpsol("sqpmethod")
   def test_slacks_errors(self):
@@ -1008,6 +1359,8 @@ class NLPtests(casadiTestCase):
         continue
       if "fatrop"==Solver:
         continue
+      if "ipmc"==Solver:
+        continue  # "Empty sparsity pattern not supported in IPMC C interface"
       if "madnlp"==Solver:
         continue
       print("test_jacG_empty",Solver,solver_options)
@@ -1921,6 +2274,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options, aux_options in solvers:
       if "madnlp" in str(Solver): continue
       if "fatrop" in str(Solver): continue
+      if "ipmc" in str(Solver): continue
       if "ipopt" in str(solver_options): continue
       if "snopt" in str(solver_options): continue
       if Solver in ["alpaqa"]: continue
@@ -2303,6 +2657,19 @@ class NLPtests(casadiTestCase):
         if Solver=="sleqp": continue
         if Solver=="madnlp": continue
 
+        # detect_simple_bounds turns "3 <= x[2] <= 3" and "2 <= x[1] <= 2"
+        # below into FIXED variables, and ipopt's default
+        # fixed_variable_treatment ("make_parameter") drops fixed variables
+        # from the NLP and reports a zero multiplier for them.  The reference
+        # solve, where those rows stay general constraints, reports the real
+        # ones (-6, 7.6, 34, -46 depending on the case), so the two disagree
+        # in lam_g by up to 46 for reasons that have nothing to do with
+        # detect_simple_bounds.  Ask ipopt to keep them.
+        if Solver == "ipopt":
+            solver_options = dict(solver_options)
+            solver_options["ipopt"] = dict(solver_options.get("ipopt", {}),
+                                           fixed_variable_treatment="make_constraint")
+
       
         x = ca.MX.sym("x",5)
         
@@ -2397,8 +2764,22 @@ class NLPtests(casadiTestCase):
                 (-2,0.3*x,3),
                 ]:
                 
-              solver_ref = ca.nlpsol("solver","ipopt",{"x":x,"f":f,"g":g})
-              solver = ca.nlpsol("solver","ipopt",{"x":x,"f":f,"g":g},{"detect_simple_bounds":True})
+              # Both options are needed to make the two formulations
+              # comparable at the default digits=9, and neither has anything
+              # to do with detect_simple_bounds itself:
+              #  * bound_relax_factor: ipopt widens a simple BOUND by
+              #    1e-8*max(1,|bound|) before starting the barrier and never
+              #    undoes it, but leaves a general constraint row alone, so
+              #    the detected solver lands ~2e-8 outside the bound the
+              #    reference sits exactly on;
+              #  * fixed_variable_treatment: for the (2, x, 2) rows detection
+              #    produces lbx == ubx, and ipopt's default drops such
+              #    variables and reports lam = 0 for them (lam_g off by 1.0
+              #    and 1.43 on those two cases).
+              ipopt_opts = {"ipopt": {"bound_relax_factor": 0,
+                                      "fixed_variable_treatment": "make_constraint"}}
+              solver_ref = ca.nlpsol("solver","ipopt",{"x":x,"f":f,"g":g},dict(ipopt_opts))
+              solver = ca.nlpsol("solver","ipopt",{"x":x,"f":f,"g":g},dict(ipopt_opts,detect_simple_bounds=True))
               
               self.checkfunction_light(solver,solver_ref,inputs=solver.convert_in(dict(lbg=lbg,ubg=ubg)))
 
@@ -2740,6 +3121,20 @@ class NLPtests(casadiTestCase):
 
                 yield (g,lbg,ubg,lbx,ubx,[3,0,2,1])
     
+    # 'make_parameter_nodual' was added in ipopt 3.14; an older ipopt rejects the
+    # whole option set at construction ("Invalid options were detected by Ipopt"),
+    # which has nothing to do with detect_simple_bounds.  Probe once.
+    fixed_variable_treatments = ["make_constraint","make_parameter","make_parameter_nodual"]
+    try:
+        _p = ca.SX.sym("probe")
+        ca.nlpsol("probe","ipopt",{"x":_p,"f":_p**2},
+                  {"ipopt.fixed_variable_treatment":"make_parameter_nodual",
+                   "ipopt.print_level":0,"print_time":False})
+    except Exception:
+        print("ipopt rejects fixed_variable_treatment=make_parameter_nodual "
+              "(added in 3.14), skipping that variant")
+        fixed_variable_treatments = fixed_variable_treatments[:-1]
+
     for (g,lbg,ubg,lbx,ubx,perm) in testcases():
         nlp = {"x":ca.vertcat(x,y,z,w),"g":g,"f":x**2+2*y**2+3*z**2+8*w**2}
         solver_ref = ca.nlpsol("solver","ipopt",nlp)
@@ -2749,7 +3144,7 @@ class NLPtests(casadiTestCase):
             solver_ref2 = ca.nlpsol("solver","ipopt",nlp)
             ref2 = solver_ref2(lbg=lbg[g_perm],ubg=ubg[g_perm],lbx=lbx,ubx=ubx)
             for detect_simple_bounds in [True,False]:
-                for fixed_variable_treatment in ["make_constraint","make_parameter","make_parameter_nodual"]:
+                for fixed_variable_treatment in fixed_variable_treatments:
                     for start_with_resto in ["no","yes"]:
                         nlp = {"x":ca.vertcat(x,y,z,w),"g":g[g_perm],"f":x**2+2*y**2+3*z**2+8*w**2}
                         solver = ca.nlpsol("solver","ipopt",nlp,{"ipopt.fixed_variable_treatment":fixed_variable_treatment,"detect_simple_bounds": detect_simple_bounds,"ipopt.start_with_resto": start_with_resto})
