@@ -1287,7 +1287,21 @@ class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
 
             opti.minimize((x-10)**2+(y-10)**2+(z-10)**2)
 
-            opti.solver("ipopt",{"detect_simple_bounds": detect_simple_bounds})
+            # bound_relax_factor: ipopt widens every bound -- a simple bound
+            # on x as well as the bound on the slack of a general constraint
+            # row -- by 1e-8*max(1,|bound|) before it starts the barrier.  It
+            # only ever undoes that for the x bounds (honor_original_bounds,
+            # "yes" by default up to ipopt 3.13), never for the rows.  So the
+            # undetected reference stops 1e-8*max(1,|bound|) OUTSIDE each
+            # active row while the detected solve, whose rows have become
+            # x bounds, sits exactly on them.  Here that is x 6e-8, y 2e-8 and
+            # z 3.3e-8 past their bounds, worth 1.24e-6 on f -- a hundred
+            # times digits=6, and nothing to do with detect_simple_bounds
+            # being right or wrong.  Switching the relaxation off on both
+            # sides asks both formulations for the same problem; they then
+            # agree to 5.7e-13 on f and 4.9e-14 on x.
+            opti.solver("ipopt",{"detect_simple_bounds": detect_simple_bounds,
+                                 "ipopt": {"bound_relax_factor": 0}})
 
             sol = opti.solve()
             
@@ -1530,5 +1544,319 @@ class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
             
             self.checkarray(dual_opti, dual_all)
     
+    # ---------------------------------------------------------------------
+    # Soft constraints: opti.slack()
+    #
+    # A slack is declared, written into the constraint the way the relaxation
+    # reads on paper, and paid for in the objective. Every case below is checked
+    # against a reference Opti model that spells the relaxation out with a plain
+    # variable, so the two formulations are independent of each other.
+    # ---------------------------------------------------------------------
+    def _soft_solve(self, opti):
+        opti.solver("ipopt", {"print_time": False},
+                                {"print_level": 0, "tol": 1e-12, "sb": "yes"})
+        return opti.solve()
+
+    @requires_nlpsol("ipopt")
+    def test_slack_spellings(self):
+        """Every way of writing the same relaxation must peel to the same thing."""
+        b = ca.DM([4, 5, 6])
+        for name, put in [
+                ("g >= b - v", lambda o, x, v: o.subject_to(x >= b - v)),
+                ("g + v >= b", lambda o, x, v: o.subject_to(x + v >= b)),
+                ("b - v <= g", lambda o, x, v: o.subject_to(b - v <= x))]:
+            opti = ca.Opti()
+            x = opti.variable(3)
+            v = opti.slack(3)
+            put(opti, x, v)
+            opti.minimize(ca.sumsqr(x) + 2*ca.sum1(v))
+            sol = self._soft_solve(opti)
+            self.assertEqual(opti.ns(), 3)
+            self.checkarray(sol.value(opti.f), ca.DM(27.0), name, digits=5)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_grouping_from_shape(self):
+        """The slack's shape decides the grouping: one element per row gives
+        each row its own budget, a scalar shares one across all of them."""
+        b = ca.DM([4, 5, 6])
+        opti = ca.Opti()
+        x = opti.variable(3); v = opti.slack(3)
+        opti.subject_to(x >= b - v)
+        opti.minimize(ca.sumsqr(x) + 2*ca.sum1(v))
+        sol = self._soft_solve(opti)
+        self.assertEqual(opti.ns(), 3)
+        self.checkarray(sol.value(opti.f), ca.DM(27.0), "L1", digits=5)
+
+        opti = ca.Opti()
+        x = opti.variable(3); v = opti.slack()      # broadcasts over the rows
+        opti.subject_to(x >= b - v)
+        opti.minimize(ca.sumsqr(x) + 2*v)
+        sol = self._soft_solve(opti)
+        self.assertEqual(opti.ns(), 1)
+        self.checkarray(sol.value(opti.f), ca.DM(11.0), "Linf", digits=5)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_shared_across_calls(self):
+        """One budget across constraints added in a loop -- the horizon case."""
+        opti = ca.Opti()
+        x = opti.variable(3); v = opti.slack()
+        for k in range(3):
+            opti.subject_to(x[k] >= (4+k) - v)
+        opti.minimize(ca.sumsqr(x) + 2*v)
+        sol = self._soft_solve(opti)
+        self.assertEqual(opti.ns(), 1)
+        self.checkarray(sol.value(opti.f), ca.DM(11.0), "f", digits=5)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_corridor_and_asymmetry(self):
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack()
+        opti.subject_to(opti.bounded(-1-v, x[0], 1+v))
+        opti.minimize((x[0]-3)**2 + x[1]**2 + 2*v)
+        sol = self._soft_solve(opti)
+        ref = ca.Opti()
+        y = ref.variable(2); t = ref.variable()
+        ref.subject_to(ref.bounded(-1-t, y[0], 1+t)); ref.subject_to(t >= 0)
+        ref.minimize((y[0]-3)**2 + y[1]**2 + 2*t)
+        solr = self._soft_solve(ref)
+        self.checkarray(sol.value(x[0]), solr.value(y[0]), "x0", digits=6)
+        self.checkarray(sol.value(v), solr.value(t), "v", digits=6)
+
+        # two slacks, one per direction, priced differently
+        opti = ca.Opti()
+        x = opti.variable(2); vl = opti.slack(); vu = opti.slack()
+        opti.subject_to(opti.bounded(-1-vl, x[0], 1+vu))
+        opti.minimize((x[0]-3)**2 + x[1]**2 + 20*vl + 1*vu)
+        sol = self._soft_solve(opti)
+        self.checkarray(sol.value(x[0]), ca.DM(2.5), "asym x0", digits=6)
+        self.checkarray(sol.value(vl), ca.DM(0.0), "asym vl", digits=6)
+        self.checkarray(sol.value(vu), ca.DM(1.5), "asym vu", digits=6)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_generic_inequality(self):
+        """g1 <= g2 + v puts the slack in canon rather than in a bound."""
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack()
+        opti.subject_to(x[0]**2 <= x[1] + v)
+        opti.minimize((x[0]-2)**2 + x[1]**2 + 2*v)
+        sol = self._soft_solve(opti)
+        ref = ca.Opti()
+        y = ref.variable(2); t = ref.variable()
+        ref.subject_to(y[0]**2 <= y[1] + t); ref.subject_to(t >= 0)
+        ref.minimize((y[0]-2)**2 + y[1]**2 + 2*t)
+        solr = self._soft_solve(ref)
+        self.checkarray(sol.value(x[0]), solr.value(y[0]), "x0", digits=5)
+        self.checkarray(sol.value(v), solr.value(t), "v", digits=5)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_tolerance(self):
+        """Capped but unpriced is a legitimate model: a hard constraint with a
+        tolerance, free to use up to the cap."""
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack()
+        opti.subject_to(x[0] >= 5 - v)
+        opti.subject_to(v <= 1.5)
+        opti.minimize(x[0]**2 + x[1]**2)
+        sol = self._soft_solve(opti)
+        self.checkarray(sol.value(x[0]), ca.DM(3.5), "x0", digits=6)
+        self.checkarray(sol.value(v), ca.DM(1.5), "v", digits=6)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_quadratic_penalty(self):
+        """L2: same slacks as L1, different objective. The two norms differ only
+        in what is written in minimize()."""
+        b = ca.DM([4, 5, 6])
+        opti = ca.Opti()
+        x = opti.variable(3); v = opti.slack(3)
+        opti.subject_to(x >= b - v)
+        opti.minimize(ca.sumsqr(x) + 0.5*ca.sumsqr(v))
+        sol = self._soft_solve(opti)
+        ref = ca.Opti()
+        y = ref.variable(3); t = ref.variable(3)
+        ref.subject_to(y >= b - t); ref.subject_to(t >= 0)
+        ref.minimize(ca.sumsqr(y) + 0.5*ca.sumsqr(t))
+        solr = self._soft_solve(ref)
+        self.checkarray(sol.value(x), solr.value(y), "x", digits=6)
+        self.checkarray(sol.value(v), solr.value(t), "v", digits=6)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_matrix_shaped(self):
+        """An equality cannot carry a slack directly -- lb and ub are the same
+        expression, so a slack would tighten one side while relaxing the other.
+        Written as a two-sided corridor over vec() it works, and the slack may
+        keep the matrix shape."""
+        B = ca.DM([[1, 2, 3], [4, 5, 6]])
+        opti = ca.Opti()
+        X = opti.variable(2, 3); V = opti.slack(2, 3)
+        opti.subject_to(opti.bounded(ca.vec(B) - ca.vec(V),
+                                     ca.vec(X),
+                                     ca.vec(B) + ca.vec(V)))
+        opti.minimize(ca.sumsqr(X) + 2*ca.sum1(ca.vec(V)))
+        sol = self._soft_solve(opti)
+        self.assertEqual(V.shape, (2, 3))
+        self.assertEqual(opti.ns(), 6)
+
+        ref = ca.Opti()
+        Y = ref.variable(2, 3); Tp = ref.variable(6); Tm = ref.variable(6)
+        ref.subject_to(ca.vec(Y) - Tp + Tm == ca.vec(B))
+        ref.subject_to(Tp >= 0); ref.subject_to(Tm >= 0)
+        ref.minimize(ca.sumsqr(Y) + 2*ca.sum1(Tp + Tm))
+        solr = self._soft_solve(ref)
+        self.checkarray(ca.vec(sol.value(X)), ca.vec(solr.value(Y)), "X", digits=5)
+        self.checkarray(sol.value(opti.f), solr.value(ref.f), "f", digits=5)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_parametric_weight(self):
+        """The weight is an ordinary expression, so it may be a parameter: the
+        penalty is retuned between solves without rebuilding the problem."""
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack(); w = opti.parameter()
+        opti.subject_to(x[0] >= 5 - v)
+        opti.minimize(x[0]**2 + x[1]**2 + w*v)
+        opti.solver("ipopt", {"print_time": False},
+                    {"print_level": 0, "tol": 1e-12, "sb": "yes"})
+        for wv, x0 in [(2.0, 1.0), (4.0, 2.0), (12.0, 5.0)]:
+            opti.set_value(w, wv)
+            self.checkarray(opti.solve().value(x[0]), ca.DM(x0),
+                            "w="+str(wv), digits=6)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_cap(self):
+        """Capping a slack reaches nlpsol's 'ubs', a runtime input, so the cap
+        may itself be a parameter."""
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack()
+        opti.subject_to(x[0] >= 5 - v)
+        opti.subject_to(v <= 1.5)
+        opti.minimize(x[0]**2 + x[1]**2 + 2*v)
+        sol = self._soft_solve(opti)
+        self.checkarray(sol.value(v), ca.DM(1.5), "v", digits=6)
+        self.checkarray(sol.value(x[0]), ca.DM(3.5), "x0", digits=6)
+
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack(); d = opti.parameter()
+        opti.subject_to(x[0] >= 5 - v)
+        opti.subject_to(v <= d)
+        opti.minimize(x[0]**2 + x[1]**2 + 2*v)
+        opti.solver("ipopt", {"print_time": False},
+                    {"print_level": 0, "tol": 1e-12, "sb": "yes"})
+        for dv, ve in [(1.0, 1.0), (9.0, 4.0)]:
+            opti.set_value(d, dv)
+            self.checkarray(opti.solve().value(v), ca.DM(ve),
+                            "d="+str(dv), digits=6)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_linear_scale(self):
+        """A row enters g divided by its linear_scale and S is structural, so the
+        slack has to be reported back in the units the constraint was written in."""
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack()
+        opti.subject_to(x[0] >= 5 - v, 100.0)
+        opti.minimize(x[0]**2 + x[1]**2 + 2*v)
+        sol = self._soft_solve(opti)
+        self.checkarray(sol.value(x[0]), ca.DM(1.0), "x0", digits=6)
+        self.checkarray(sol.value(v), ca.DM(4.0), "v", digits=5)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_single_variable(self):
+        """nx==1 leaves the S_x block a structurally empty slice of a one-row
+        matrix, which is the shape that used to grow a spurious row."""
+        opti = ca.Opti()
+        x = opti.variable(); v = opti.slack()
+        opti.subject_to(x >= 5 - v)
+        opti.minimize(x**2 + 2*v)
+        sol = self._soft_solve(opti)
+        self.checkarray(sol.value(x), ca.DM(1.0), "x", digits=6)
+        self.checkarray(sol.value(v), ca.DM(4.0), "v", digits=6)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_unrelaxed_side_stays_hard(self):
+        """A bound no slack touches must stay exactly as hard as it was."""
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack()
+        opti.subject_to(opti.bounded(-1, x[0], 1 + v))   # only the upper is soft
+        opti.minimize((x[0]+3)**2 + x[1]**2 + v)         # pulls down
+        sol = self._soft_solve(opti)
+        self.checkarray(sol.value(x[0]), ca.DM(-1.0), "hard side", digits=7)
+        self.checkarray(sol.value(v), ca.DM(0.0), "v", digits=7)
+
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack()
+        opti.subject_to(opti.bounded(-1, x[0], 1 + v))
+        opti.minimize((x[0]-3)**2 + x[1]**2 + v)         # pulls up, that side is soft
+        sol = self._soft_solve(opti)
+        self.checkarray(sol.value(x[0]), ca.DM(2.5), "soft side", digits=6)
+        self.checkarray(sol.value(v), ca.DM(1.5), "v", digits=6)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_duals(self):
+        """Hard rows keep their multipliers when soft rows are present."""
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack()
+        hard = x[1] == 2
+        opti.subject_to(hard)
+        opti.subject_to(x[0] >= 5 - v)
+        opti.minimize(x[0]**2 + x[1]**2 + 2*v)
+        sol = self._soft_solve(opti)
+
+        ref = ca.Opti()
+        y = ref.variable(2); t = ref.variable()
+        hr = y[1] == 2
+        ref.subject_to(hr)
+        ref.subject_to(y[0] >= 5 - t); ref.subject_to(t >= 0)
+        ref.minimize(y[0]**2 + y[1]**2 + 2*t)
+        solr = self._soft_solve(ref)
+        self.checkarray(sol.value(x), solr.value(y), "x", digits=6)
+        self.checkarray(sol.value(opti.dual(hard)), solr.value(ref.dual(hr)),
+                        "dual", digits=5)
+
+    @requires_nlpsol("ipopt")
+    def test_slack_to_function(self):
+        """to_function must forward ubs -- it is what pins the dead half of a
+        one-sided slack -- and must be able to return slack values."""
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack(); w = opti.parameter()
+        opti.subject_to(x[0] >= 5 - v)
+        opti.minimize(x[0]**2 + x[1]**2 + w*v)
+        opti.solver("ipopt", {"print_time": False},
+                    {"print_level": 0, "tol": 1e-12, "sb": "yes"})
+        F = opti.to_function("F", [w], [x[0], v])
+        for wv, x0, ve in [(2.0, 1.0, 4.0), (4.0, 2.0, 3.0), (12.0, 5.0, 0.0)]:
+            r = F(wv)
+            self.checkarray(r[0], ca.DM(x0), "w="+str(wv)+":x0", digits=6)
+            self.checkarray(r[1], ca.DM(ve), "w="+str(wv)+":v", digits=6)
+
+    def test_slack_errors(self):
+        def build(put, obj=None):
+            opti = ca.Opti()
+            x = opti.variable(2); v = opti.slack()
+            put(opti, x, v)
+            opti.minimize(ca.sumsqr(x) if obj is None else obj(x, v))
+            opti.solver("ipopt")
+            opti.solve()
+
+        with self.assertInException("exactly one unit"):
+            build(lambda o, x, v: o.subject_to(x[0] >= 5 - 2*v))
+        with self.assertInException("tightens the bound"):
+            build(lambda o, x, v: o.subject_to(x[0] >= 5 + v))
+        with self.assertInException("constant coefficient"):
+            build(lambda o, x, v: o.subject_to(x[0] >= 5 - v**2))
+        with self.assertInException("nor bounded"):
+            build(lambda o, x, v: o.subject_to(x[0] >= 5 - v))
+        with self.assertInException("not separable"):
+            build(lambda o, x, v: o.subject_to(x[0] >= 5 - v),
+                  lambda x, v: (x[0]+v)**2)
+
+        # one budget cannot span two directions
+        opti = ca.Opti()
+        x = opti.variable(2); v = opti.slack()
+        opti.subject_to(x[0] <= 0 + v)
+        opti.subject_to(x[0] >= 10 - v)
+        opti.minimize(0.25*(x[0]-8)**2 + v)
+        opti.solver("ipopt")
+        with self.assertInException("opposite directions"):
+            opti.solve()
+
+
 if __name__ == '__main__':
     unittest.main()
