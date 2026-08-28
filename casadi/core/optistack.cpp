@@ -139,6 +139,22 @@ void Opti::subject_to(const MX& g, const DM& linear_scale, const Dict& options) 
   }
 }
 
+MX Opti::slack(casadi_int n, casadi_int m) {
+  try {
+    return (*this)->slack(n, m);
+  } catch(std::exception& e) {
+    THROW_ERROR("slack", e.what());
+  }
+}
+
+MX Opti::slack(const Sparsity& sp) {
+  try {
+    return (*this)->slack(sp);
+  } catch(std::exception& e) {
+    THROW_ERROR("slack", e.what());
+  }
+}
+
 void Opti::subject_to(const std::vector<MX>& g, const DM& linear_scale, const Dict& options) {
   for (const auto& gs : g) subject_to(gs, linear_scale, options);
 }
@@ -328,6 +344,14 @@ casadi_int Opti::ng() const {
     return (*this)->ng();
   } catch(std::exception& e) {
     THROW_ERROR("ng", e.what());
+  }
+}
+
+casadi_int Opti::ns() const {
+  try {
+    return (*this)->ns();
+  } catch(std::exception& e) {
+    THROW_ERROR("ns", e.what());
   }
 }
 

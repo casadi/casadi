@@ -81,6 +81,11 @@ public:
 
   /// brief Add constraints
   void subject_to(const MX& g, const DM& linear_scale=1, const Dict& options=Dict());
+
+  /// Create a bare slack symbol, to be written into a constraint by the user
+  MX slack(casadi_int n=1, casadi_int m=1);
+  MX slack(const Sparsity& sp);
+
   /// Clear constraints
   void subject_to();
 
@@ -169,6 +174,28 @@ public:
   /// Interpret an expression (for internal use only)
   MetaCon canon_expr(const MX& expr, const DM& linear_scale=1) const;
 
+  /// Number of slack symbols in this expression (0 means it is slack-free)
+  casadi_int count_slacks(const MX& expr) const;
+
+  /// Handle 'v <= bound': record a cap on a slack. Returns true when 'g' was
+  /// consumed as such a cap rather than as a constraint.
+  bool register_slack_bound(const MX& g);
+
+  /// Move slacks out of a constraint's canon/lb/ub into lb_slack/ub_slack
+  void peel_slacks(MetaCon& c) const;
+
+  /// Which side(s) of a constraint a slack can actually relax
+  void slack_sides(const MetaCon& c, bool& lower, bool& upper) const;
+
+  /// Split the objective additively into a slack-free part and a slack-only part
+  void split_objective(const MX& e, bool negate, const MX& xv, MX& hard, MX& soft) const;
+
+  /// User-facing slack values (one MX per slack) given an nlpsol slack vector
+  std::vector<MX> slack_values(const MX& s, casadi_int nst) const;
+
+  /// Assign S columns to the active slacks; returns the total column count
+  casadi_int layout_slacks();
+
   /// Get meta-data of symbol (for internal use only)
   MetaVar get_meta(const MX& m) const;
 
@@ -237,6 +264,13 @@ public:
   casadi_int ng() const {
     if (problem_dirty()) return baked_copy().ng();
     return nlp_.at("g").size1();
+  }
+
+  /// Number of slack columns (the nlpsol slack vector holds 2*ns entries)
+  casadi_int ns() const {
+    if (problem_dirty()) return baked_copy().ns();
+    auto it = nlp_.find("s");
+    return it==nlp_.end() ? 0 : it->second.size1()/2;
   }
 
   /// Get all (scalarised) decision variables as a symbolic column vector
@@ -389,6 +423,9 @@ private:
   /// map constraints to metadata
   std::map<MXNode*, MetaCon> meta_con_;
 
+  /// Slacks handed out by slack(), indexed by meta(sym).i
+  std::vector<MetaSlack> slacks_;
+
   /// Store references to all symbols
   std::vector<MX> symbols_;
 
@@ -401,6 +438,7 @@ private:
   casadi_int count_var_;
   casadi_int count_par_;
   casadi_int count_dual_;
+  casadi_int count_slack_;
 
   /// Storing initial/latest values for all variables (including inactive)
   std::map< VariableType, std::vector<DM> > store_initial_, store_latest_;
@@ -437,6 +475,12 @@ private:
 
   /// Bounds helper function: p -> lbg, ubg
   Function bounds_;
+  /// Slack structure handed to nlpsol; null when the problem has no slacks
+  Sparsity slack_S_;
+  MX bounds_ubs_;
+  /// Per S column: the linear_scale of the rows it relaxes, and which halves live
+  std::vector<double> slack_col_ls_;
+  std::vector<bool> slack_live_l_, slack_live_u_;
   MX bounds_lbg_, bounds_unscaled_lbg_;
   MX bounds_ubg_, bounds_unscaled_ubg_;
   std::vector<bool> equality_;
@@ -450,6 +494,7 @@ private:
     std::vector<MX> x;
     std::vector<MX> p;
     std::vector<MX> lam;
+    std::vector<MX> sl;
   };
 
   typedef RevWeakCache<MX, std::shared_ptr<ValueHelper> > ValueCache;

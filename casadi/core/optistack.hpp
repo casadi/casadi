@@ -168,6 +168,43 @@ public:
   void subject_to(const std::vector<MX>& g, const DM& linear_scale, const Dict& options=Dict());
   /// @}
 
+  /// @{
+  /** \brief Create a slack (symbol); non-negative, and priced in the objective
+
+  * A slack softens a constraint: write the relaxed constraint the way it reads
+  * on paper, and pay for the relaxation in the objective.
+  *
+  * \verbatim
+  * v = opti.slack(3)
+  * opti.subject_to(g <= v)          # v relaxes the upper bound
+  * opti.subject_to(-v <= h <= v)    # both bounds of a corridor
+  * opti.minimize(f + 1e3*sum1(v))   # L1;  sumsqr(v) for L2
+  * \endverbatim
+  *
+  * A slack must enter a constraint additively on a bound with coefficient one;
+  * put any weight in the objective instead. Broadcasting decides the grouping:
+  * a slack with one element per row gives each row its own budget (L1/L2 style),
+  * while a scalar slack against a vector constraint shares one budget across
+  * every row, which is the smooth epigraph form of a max-norm penalty. Passing
+  * the same slack to several subject_to calls shares it across them, so a
+  * worst-case budget over a horizon needs no list of constraints:
+  *
+  * \verbatim
+  * v = opti.slack()
+  * for k in range(N): opti.subject_to(h(x[:,k]) <= v)
+  * opti.minimize(f + w*v)           # L-inf over the whole horizon
+  * \endverbatim
+  *
+  * The weight may be an opti.parameter(), so a penalty can be retuned between
+  * solves without rebuilding the problem. A slack may also be capped, e.g.
+  * opti.subject_to(v <= 0.1); a slack that is neither priced nor capped is
+  * refused, since the constraint could then be violated at no cost.
+
+      \identifier{2s3} */
+  MX slack(casadi_int n=1, casadi_int m=1);
+  MX slack(const Sparsity& sp);
+  /// @}
+
   /// Clear constraints
   void subject_to();
 
@@ -316,6 +353,9 @@ public:
 
       \identifier{26a} */
   casadi_int ng() const;
+
+  /// Number of slack columns
+  casadi_int ns() const;
 
   /** \brief Get all (scalarised) decision variables as a symbolic column vector
 
@@ -495,13 +535,28 @@ public:
   enum VariableType {
     OPTI_VAR, // variable
     OPTI_PAR,  // parameter
-    OPTI_DUAL_G // dual
+    OPTI_DUAL_G, // dual
+    OPTI_SLACK // slack relaxing a soft constraint
   };
   enum DomainType {
     OPTI_DOMAIN_REAL,
     OPTI_DOMAIN_INTEGER
   };
 
+
+  /** \brief One peeled slack term
+
+      Canonical row 'row' of a constraint has the bound relaxed by element
+      'elem' of slack 'slack' (indexed by meta(sym).i)
+
+      \identifier{2s2} */
+  struct SlackTerm {
+    SlackTerm() : row(0), slack(0), elem(0) {}
+    SlackTerm(casadi_int r, casadi_int s, casadi_int e) : row(r), slack(s), elem(e) {}
+    casadi_int row;
+    casadi_int slack;
+    casadi_int elem;
+  };
 
   struct IndexAbstraction {
     IndexAbstraction() : start(0), stop(0) {}
@@ -521,6 +576,24 @@ public:
     MX dual;
     Dict extra;
     DM linear_scale;
+    // Slacks peeled out of canon/lb/ub by peel_slacks(); empty when the
+    // constraint is hard
+    std::vector<SlackTerm> lb_slack;
+    std::vector<SlackTerm> ub_slack;
+  };
+  /** \brief Bookkeeping for one slack symbol
+
+      A slack owns one column of the nlpsol 'S' matrix per element, i.e. 'n'
+      columns starting at 'start'. Which rows each column relaxes, and on which
+      side, is recorded on the constraints as SlackTerms.
+
+      \identifier{2s0} */
+  struct MetaSlack {
+    MetaSlack() : n(0), start(0) {}
+    MX symbol;         // the symbol handed to the user
+    casadi_int n;      // number of S columns owned; equals symbol.nnz()
+    casadi_int start;  // column offset into S, assigned in bake()
+    MX ub;             // user-supplied cap on the slack; empty means +inf
   };
   struct MetaVar : IndexAbstraction {
     std::string attribute;

@@ -254,7 +254,7 @@ MX OptiNode::g_lookup(casadi_int i) const {
 }
 
 OptiNode::OptiNode(const std::string& problem_type) :
-    count_(0), count_var_(0), count_par_(0), count_dual_(0) {
+    count_(0), count_var_(0), count_par_(0), count_dual_(0), count_slack_(0) {
   f_ = 0;
   f_linear_scale_ = 1;
   instance_number_ = instance_count_++;
@@ -262,8 +262,10 @@ OptiNode::OptiNode(const std::string& problem_type) :
   store_initial_[OPTI_VAR] = {};
   store_initial_[OPTI_PAR] = {};
   store_initial_[OPTI_DUAL_G] = {};
+  store_initial_[OPTI_SLACK] = {};
   store_latest_[OPTI_VAR] = {};
   store_latest_[OPTI_DUAL_G] = {};
+  store_latest_[OPTI_SLACK] = {};
   casadi_assert(problem_type=="nlp" || problem_type=="conic",
     "Specified problem type '" + problem_type + "'unknown. "
     "Choose 'nlp' (default) or 'conic'.");
@@ -683,6 +685,9 @@ bool OptiNode::parse_opti_name(const std::string& name, VariableType& vt) const 
   } else if (name.substr(i, 5)=="lam_g") {
     vt = OPTI_DUAL_G;
     return true;
+  } else if (name.substr(i, 1)=="s") {
+    vt = OPTI_SLACK;
+    return true;
   }
 
   return false;
@@ -697,12 +702,13 @@ std::string OptiNode::variable_type_to_string(VariableType vt) const {
 std::map<VariableType, std::string> OptiNode::VariableType2String_ =
   {{OPTI_VAR, "decision variable"},
    {OPTI_PAR, "parameter"},
-   {OPTI_DUAL_G, "dual variable"}};
+   {OPTI_DUAL_G, "dual variable"},
+   {OPTI_SLACK, "slack"}};
 
 std::vector<MX> OptiNode::initial() const {
   std::vector<MX> ret;
   for (const auto& e : symvar()) {
-    if (meta(e).type==OPTI_VAR || meta(e).type==OPTI_DUAL_G)
+    if (meta(e).type==OPTI_VAR || meta(e).type==OPTI_DUAL_G || meta(e).type==OPTI_SLACK)
       ret.push_back(e==store_initial_.at(meta(e).type)[meta(e).i]);
   }
   return ret;
@@ -735,8 +741,13 @@ void OptiNode::bake() {
   symbol_active_.resize(symbols_.size());
   helpers_ = std::make_shared<ValueCache>();
 
-  // Gather all expressions
-  MX total_expr = vertcat(f_, veccat(g_));
+  // Gather all expressions. A cap on a slack is not a constraint row, but any
+  // parameter it mentions still has to reach the solver.
+  std::vector<MX> total_parts = {f_, veccat(g_)};
+  for (const auto& ms : slacks_) {
+    if (!ms.ub.is_empty()) total_parts.push_back(vec(ms.ub));
+  }
+  MX total_expr = vertcat(total_parts);
 
   // Categorize the symbols appearing in those expressions
   for (const auto& d : symvar(total_expr))
@@ -754,6 +765,96 @@ void OptiNode::bake() {
   std::vector<MX> p = active_symvar(OPTI_PAR);
   for (casadi_int i=0;i<p.size();++i) meta(p[i]).active_i = i;
 
+  // ---- Soft constraints ----------------------------------------------------
+  // A constraint is soft exactly when a slack was written into it.
+  nlp_.erase("s");
+  nlp_.erase("f_s");
+  slack_S_ = Sparsity();
+  bounds_ubs_ = MX();
+  std::vector<MX> sl = active_symvar(OPTI_SLACK);
+  for (casadi_int i=0;i<sl.size();++i) meta(sl[i]).active_i = i;
+  // Appearing in a constraint is not enough: g_ holds the expressions as the
+  // user wrote them, slack and all. What makes a slack legitimate is that it
+  // costs something -- either priced in the objective, or capped, which is a
+  // hard constraint with a tolerance. Neither means the constraint is free to
+  // be violated by any amount at all.
+  std::vector<MX> f_slacks = symvar(f_, OPTI_SLACK);
+  for (const auto& ms : slacks_) {
+    bool priced = false;
+    for (const auto& q : f_slacks) {
+      if (q.get()==ms.symbol.get()) { priced = true; break; }
+    }
+    casadi_assert(priced || !ms.ub.is_empty(),
+      "A slack is neither priced in the objective nor bounded, so the "
+      "constraint it relaxes could be violated by any amount at no cost. "
+      "Either price it, e.g. opti.minimize(f + 1e3*sum1(v)), or cap it, "
+      "e.g. opti.subject_to(v <= 0.1).");
+  }
+  casadi_int ns_total = layout_slacks();
+
+  // Per S column: which halves are live, and in which units the slack acts.
+  // A row enters 'g' divided by its linear_scale, and S is structural, so one
+  // unit of slack on that row is linear_scale units of relaxation as written.
+  std::vector<bool> col_live_l(ns_total, false), col_live_u(ns_total, false);
+  std::vector<double> col_ls(ns_total, 1);
+  std::vector<bool> col_ls_set(ns_total, false);
+  for (const auto& g : g_) {
+    const MetaCon& mc = meta_con(g);
+    if (mc.lb_slack.empty() && mc.ub_slack.empty()) continue;
+    const DM& lsv = mc.linear_scale;
+    for (casadi_int half=0; half<2; ++half) {
+      const std::vector<SlackTerm>& terms = half ? mc.ub_slack : mc.lb_slack;
+      for (const auto& t : terms) {
+        casadi_int col = slacks_.at(t.slack).start + t.elem;
+        if (half) {
+          col_live_u[col] = true;
+        } else {
+          col_live_l[col] = true;
+        }
+        double lsi = lsv.is_scalar() ?
+          static_cast<double>(lsv) : lsv.nonzeros().at(t.row);
+        if (col_ls_set[col]) {
+          casadi_assert(col_ls[col]==lsi,
+            "One slack relaxes constraint rows carrying different 'linear_scale' "
+            "values, so the slack would not be a single quantity. Use one scale "
+            "for all rows it relaxes.");
+        } else {
+          col_ls[col] = lsi;
+          col_ls_set[col] = true;
+        }
+      }
+    }
+  }
+
+  // The nlpsol slack vector stacks [s_l; s_u]; at most one half of a column can
+  // be active at a solution, so the value the user sees is their sum.
+  MX s_sym;
+  std::vector<MX> slack_syms, slack_repl, slack_zero;
+  std::vector<MX> ubs_l(ns_total, MX(0)), ubs_u(ns_total, MX(0));
+  if (ns_total>0) {
+    s_sym = MX::sym("s", 2*ns_total);
+    slack_col_ls_ = col_ls;
+    slack_repl = slack_values(s_sym, ns_total);
+    for (const auto& ms : slacks_) {
+      slack_syms.push_back(ms.symbol);
+      slack_zero.push_back(MX::zeros(ms.symbol.sparsity()));
+
+      for (casadi_int i=0;i<ms.n;++i) {
+        casadi_int col = ms.start+i;
+        MX b = inf;
+        if (!ms.ub.is_empty()) {
+          b = (ms.ub.is_scalar() ? ms.ub : ms.ub(i))/col_ls[col];
+        }
+        if (col_live_l[col]) ubs_l[col] = b;
+        if (col_live_u[col]) ubs_u[col] = b;
+      }
+    }
+    bounds_ubs_ = vertcat(veccat(ubs_l), veccat(ubs_u));
+  }
+  slack_col_ls_ = col_ls;
+  slack_live_l_ = col_live_l;
+  slack_live_u_ = col_live_u;
+
   // Fill the nlp definition
   nlp_["x"] = veccat(x);
   nlp_["p"] = veccat(p);
@@ -766,8 +867,19 @@ void OptiNode::bake() {
     discrete_.insert(discrete_.end(), e.nnz(), meta(e).domain == OPTI_DOMAIN_INTEGER);
   }
 
-  nlp_["f"] = f_;
-  nlp_unscaled_["f"] = f_;
+  MX f_soft;
+  if (ns_total>0) {
+    MX f_hard = 0, f_soft_user = 0;
+    split_objective(f_, false, veccat(x), f_hard, f_soft_user);
+    f_soft = substitute(std::vector<MX>{f_soft_user}, slack_syms, slack_repl)[0];
+    nlp_["f"] = f_hard;
+    // The user-facing objective keeps the penalty: 'opti.f' is what was handed
+    // to minimize(), and value() can resolve the slacks in it.
+    nlp_unscaled_["f"] = f_;
+  } else {
+    nlp_["f"] = f_;
+    nlp_unscaled_["f"] = f_;
+  }
 
   offset = 0;
   for (casadi_int i=0;i<g_.size();++i) {
@@ -818,6 +930,11 @@ void OptiNode::bake() {
   std::vector<DM> g_linear_scale, h_linear_scale;
 
   equality_.clear();
+  std::vector<casadi_int> S_row, S_col;
+  // per column, how many distinct rows it relaxes on each side, and which
+  std::vector<casadi_int> nrow_l(ns_total, 0), nrow_u(ns_total, 0);
+  std::vector<casadi_int> row_l(ns_total, -1), row_u(ns_total, -1);
+  casadi_int offset_soft = 0;
   for (const auto& g : g_) {
     if (meta_con(g).type==OPTI_PSD) {
       h_all.push_back(meta_con(g).canon/meta_con(g).linear_scale);
@@ -845,10 +962,46 @@ void OptiNode::bake() {
       equality_.insert(equality_.end(),
         meta_con(g).canon.numel(),
         meta_con(g).type==OPTI_EQUALITY || meta_con(g).type==OPTI_GENERIC_EQUALITY);
+
+      const MetaCon& mc = meta_con(g);
+      for (casadi_int half=0; half<2; ++half) {
+        const std::vector<SlackTerm>& terms = half ? mc.ub_slack : mc.lb_slack;
+        for (const auto& t : terms) {
+          casadi_int col = slacks_.at(t.slack).start + t.elem;
+          S_row.push_back(offset_soft + t.row);
+          S_col.push_back(col);
+          if (half) {
+            nrow_u[col]++; row_u[col] = offset_soft + t.row;
+          } else {
+            nrow_l[col]++; row_l[col] = offset_soft + t.row;
+          }
+        }
+      }
+      offset_soft += mc.canon.nnz();
+    }
+  }
+
+  // s_l and s_u of a column are independent variables. That is harmless when a
+  // column relaxes both bounds of ONE row -- a row cannot breach both at once,
+  // so their sum is the relaxation -- but across two rows both halves can be
+  // positive together and the sum is not the shared budget the user asked for.
+  for (casadi_int j=0;j<ns_total;++j) {
+    if (nrow_l[j]>0 && nrow_u[j]>0) {
+      casadi_assert(nrow_l[j]==1 && nrow_u[j]==1 && row_l[j]==row_u[j],
+        "One slack is shared between constraint rows relaxed in opposite "
+        "directions. Its two directions are independent variables rather than "
+        "one budget, so pricing their sum would solve a different (up to twice "
+        "as expensive) problem. Use a separate slack per direction.");
     }
   }
 
   nlp_["g"] = veccat(g_all);
+  if (ns_total>0) {
+    // S is [S_g; S_x]; Opti routes everything through g, so the S_x block is
+    // structurally empty.
+    slack_S_ = Sparsity::triplet(nlp_["g"].size1() + nlp_["x"].size1(),
+                                 ns_total, S_row, S_col);
+  }
   g_linear_scale_ = veccat(g_linear_scale).nonzeros();
   nlp_unscaled_["g"] = veccat(g_unscaled_all);
   if (problem_type_=="conic") {
@@ -883,6 +1036,11 @@ void OptiNode::bake() {
   // Scale of objective
   nlp_["f"] = nlp_["f"]/f_linear_scale_;
 
+  if (ns_total>0) {
+    nlp_["s"] = s_sym;
+    nlp_["f_s"] = f_soft/f_linear_scale_;
+  }
+
   // Create bounds helper function
   MXDict bounds;
   bounds["p"] = nlp_["p"];
@@ -894,7 +1052,12 @@ void OptiNode::bake() {
   bounds["lbg"] = bounds_lbg_;
   bounds["ubg"] = bounds_ubg_;
 
-  bounds_ = Function("bounds", bounds, {"p"}, {"lbg", "ubg"});
+  if (ns_total>0) {
+    bounds["ubs"] = bounds_ubs_;
+    bounds_ = Function("bounds", bounds, {"p"}, {"lbg", "ubg", "ubs"});
+  } else {
+    bounds_ = Function("bounds", bounds, {"p"}, {"lbg", "ubg"});
+  }
   mark_problem_dirty(false);
 }
 
@@ -1032,6 +1195,247 @@ void OptiNode::assert_only_opti_nondual(const MX& e) const {
 
 bool OptiNode::is_parametric(const MX& expr) const {
   return symvar(expr, OPTI_VAR).empty();
+}
+
+casadi_int OptiNode::count_slacks(const MX& expr) const {
+  casadi_int n = 0;
+  for (const auto& sym : MX::symvar(expr)) {
+    if (has(sym) && meta(sym).type==OPTI_SLACK) n++;
+  }
+  return n;
+}
+
+void OptiNode::slack_sides(const MetaCon& c, bool& lower, bool& upper) const {
+  // A bound that is structurally infinite cannot be relaxed: moving it further
+  // out is a no-op, so that half of the slack column stays dead.
+  // NOTE: keep the evalf result in a named local. DM::nonzeros() hands back a
+  // reference into the matrix, and a range-for does not extend the lifetime of
+  // the temporary the accessor was called on, so iterating
+  // 'MX::evalf(...).nonzeros()' directly walks freed memory.
+  lower = upper = true;
+  if (c.lb.is_constant()) {
+    DM lb = MX::evalf(c.lb);
+    lower = false;
+    for (double e : lb.nonzeros()) {
+      if (e!=-std::numeric_limits<double>::infinity()) { lower = true; break; }
+    }
+  }
+  if (c.ub.is_constant()) {
+    DM ub = MX::evalf(c.ub);
+    upper = false;
+    for (double e : ub.nonzeros()) {
+      if (e!=std::numeric_limits<double>::infinity()) { upper = true; break; }
+    }
+  }
+}
+
+void OptiNode::split_objective(const MX& e, bool negate,
+    const MX& xv, MX& hard, MX& soft) const {
+  // Walk the top-level sum. Subtrees free of slacks go to 'f'; subtrees
+  // that carry one must be free of decision variables, because nlpsol requires
+  // f(x,p) and f_s(s,p) to be separate. Note that f - f|_{s=0} would be wrong
+  // here: it is numerically right but still mentions x, and 'depends_on' -- in
+  // Opti and in nlpsol both -- is structural.
+  if (count_slacks(e)==0) {
+    hard = hard + (negate ? -e : e);
+    return;
+  }
+  if (e.is_op(OP_ADD)) {
+    split_objective(e.dep(0), negate, xv, hard, soft);
+    split_objective(e.dep(1), negate, xv, hard, soft);
+    return;
+  }
+  if (e.is_op(OP_SUB)) {
+    split_objective(e.dep(0), negate, xv, hard, soft);
+    split_objective(e.dep(1), !negate, xv, hard, soft);
+    return;
+  }
+  if (e.is_op(OP_NEG)) {
+    split_objective(e.dep(0), !negate, xv, hard, soft);
+    return;
+  }
+  casadi_assert(!depends_on(e, xv),
+    "The objective is not separable in the slacks: a slack is multiplied "
+    "with, or nested inside, a decision variable. Violations must enter the "
+    "objective additively, e.g. opti.minimize(f + 1e3*sumsqr(v)).");
+  soft = soft + (negate ? -e : e);
+}
+
+std::vector<MX> OptiNode::slack_values(const MX& s, casadi_int nst) const {
+  // The nlpsol slack vector stacks [s_l; s_u]; at most one half of a column can
+  // be active at a solution, so the value the user sees is their sum. A row
+  // enters 'g' divided by its linear_scale and S is structural, so one unit of
+  // slack is linear_scale units of relaxation as the user wrote it.
+  std::vector<MX> ret;
+  for (const auto& ms : slacks_) {
+    std::vector<double> lsv(ms.n);
+    for (casadi_int i=0;i<ms.n;++i) lsv[i] = slack_col_ls_.at(ms.start+i);
+    MX v = (s(Slice(ms.start, ms.start+ms.n)) +
+            s(Slice(nst+ms.start, nst+ms.start+ms.n))) * DM(lsv);
+    ret.push_back(MX::reshape(v, ms.symbol.size1(), ms.symbol.size2()));
+  }
+  return ret;
+}
+
+casadi_int OptiNode::layout_slacks() {
+  casadi_int off = 0;
+  for (auto& ms : slacks_) {
+    ms.start = off;
+    off += ms.n;
+  }
+  return off;
+}
+
+MX OptiNode::slack(casadi_int n, casadi_int m) {
+  return slack(Sparsity::dense(n, m));
+}
+
+MX OptiNode::slack(const Sparsity& sp) {
+  casadi_assert(problem_type_!="conic",
+    "Soft constraints are not supported for conic problems.");
+
+  MX symbol = MX::sym(name_prefix() + "s_" + str(count_slack_+1), sp);
+
+  MetaVar meta_data;
+  meta_data.attribute = "full";
+  meta_data.n = symbol.size1();
+  meta_data.m = symbol.size2();
+  meta_data.type = OPTI_SLACK;
+  meta_data.count = count_++;
+  meta_data.i = count_slack_++;
+  meta_data.domain = OPTI_DOMAIN_REAL;
+
+  symbols_.push_back(symbol);
+  store_initial_[OPTI_SLACK].push_back(DM::zeros(symbol.sparsity()));
+  store_latest_[OPTI_SLACK].push_back(DM::nan(symbol.sparsity()));
+  set_meta(symbol, meta_data);
+
+  MetaSlack ms;
+  ms.symbol = symbol;
+  ms.n = symbol.nnz();
+  slacks_.push_back(ms);
+
+  mark_problem_dirty();
+  return symbol;
+}
+
+void OptiNode::peel_slacks(MetaCon& c) const {
+  if (count_slacks(c.canon)==0 && count_slacks(c.lb)==0 && count_slacks(c.ub)==0) return;
+
+  casadi_assert(c.type!=OPTI_PSD,
+    "Semi-definite constraints cannot be softened.");
+  casadi_assert(c.type!=OPTI_UNKNOWN,
+    "Constraint type unknown. Use ==, >= or <= .");
+  // Collect the slacks appearing anywhere in the constraint, and number their
+  // elements consecutively so one Jacobian covers them all.
+  std::vector<MX> sy;
+  std::vector<casadi_int> owner, elem;
+  for (const MX& v : MX::symvar(vertcat(vec(c.canon), vec(c.lb), vec(c.ub)))) {
+    if (!has(v) || meta(v).type!=OPTI_SLACK) continue;
+    sy.push_back(v);
+    for (casadi_int k=0;k<v.nnz();++k) {
+      owner.push_back(meta(v).i);
+      elem.push_back(k);
+    }
+  }
+  casadi_assert_dev(!sy.empty());
+  MX svec = veccat(sy);
+
+  // Written as  lb <= canon <= ub  with each part linear in the slacks, the
+  // relaxed form the solver wants is
+  //     lb0 - S s_l <= canon0 <= ub0 + S s_u
+  // so the coefficient that matters on the lower side is d(lb)/dv - d(canon)/dv,
+  // which must be -1 where a slack relaxes it, and +1 on the upper side. This
+  // is spelling-independent: 'g - v <= 0', 'g <= v' and 'g1 <= g2 + v' all land
+  // on the same numbers.
+  // NOTE: is_constant() asks whether the node IS a constant, which a jacobian
+  // that merely evaluates to -I is not. What matters is that nothing symbolic
+  // survives in it.
+  MX Jc = jacobian(vec(c.canon), svec);
+  casadi_assert(MX::symvar(Jc).empty(),
+    "A slack must enter a constraint linearly with a constant coefficient.");
+  DM Jcd = MX::evalf(Jc);
+
+  bool lo, up;
+  slack_sides(c, lo, up);
+
+  for (casadi_int half=0; half<2; ++half) {
+    const MX& b = half ? c.ub : c.lb;
+    // an infinite bound cannot be relaxed, so nothing on that side is peeled
+    if (!(half ? up : lo)) continue;
+    MX Jb = jacobian(vec(b), svec);
+    casadi_assert(MX::symvar(Jb).empty(),
+      "A slack must enter a constraint bound linearly with a constant "
+      "coefficient.");
+    DM J = MX::evalf(Jb) - Jcd;
+    double want = half ? 1 : -1;
+    std::vector<SlackTerm>& into = half ? c.ub_slack : c.lb_slack;
+    for (casadi_int r=0; r<J.size1(); ++r) {
+      for (casadi_int k=0; k<J.size2(); ++k) {
+        double a = static_cast<double>(J(r, k));
+        if (a==0) continue;
+        casadi_assert(a==want,
+          "A slack must relax a bound by exactly one unit, but it appears with "
+          "coefficient " + str(half ? a : -a) + " on the " +
+          std::string(half ? "upper" : "lower") + " bound. Negative means it "
+          "tightens the bound rather than relaxing it; any other magnitude "
+          "belongs in the objective as a weight.");
+        into.push_back(SlackTerm(r, owner.at(k), elem.at(k)));
+      }
+    }
+  }
+
+  // Strip the slacks: everything downstream -- bounds helper, duals, scaling --
+  // then sees an ordinary hard constraint.
+  std::vector<MX> zero;
+  for (const MX& v : sy) zero.push_back(MX::zeros(v.sparsity()));
+  std::vector<MX> stripped = substitute(std::vector<MX>{c.canon, c.lb, c.ub}, sy, zero);
+  c.canon = stripped[0];
+  c.lb = stripped[1];
+  c.ub = stripped[2];
+
+  casadi_assert(!c.lb_slack.empty() || !c.ub_slack.empty(),
+    "This constraint mentions a slack, but on a bound that is infinite, so the "
+    "slack relaxes nothing.");
+}
+
+bool OptiNode::register_slack_bound(const MX& g) {
+  if (count_slacks(g)==0) return false;
+
+  // The cap itself may be parametric -- that is the point -- but a slack must
+  // never meet a decision variable here: this path is only for caps.
+  // A slack mixed with decision variables is a relaxed constraint, not a bound
+  // on the slack; let it through to the ordinary path, where peel_slacks picks
+  // it up.
+  for (const auto& sym : MX::symvar(g)) {
+    assert_has(sym);
+    if (meta(sym).type==OPTI_VAR) return false;
+    casadi_assert(meta(sym).type==OPTI_SLACK || meta(sym).type==OPTI_PAR,
+      "A slack may be given an upper bound, e.g. 'opti.subject_to(v <= 0.1)' "
+      "with a constant or a parameter, but duals cannot appear there.");
+  }
+
+  casadi_assert(g.is_op(OP_LE) || g.is_op(OP_LT),
+    "A slack is non-negative by construction; only an upper bound is "
+    "meaningful, e.g. 'opti.subject_to(v <= 0.1)'.");
+
+  bool flipped;
+  std::vector<MX> args = ineq_unchain(g, flipped);
+  casadi_assert(args.size()==2,
+    "Expected 'slack <= bound', got a chained inequality.");
+  casadi_assert(args[0].is_symbolic() && has(args[0]) &&
+                meta(args[0]).type==OPTI_SLACK,
+    "Expected a bare slack on the small side of the inequality, "
+    "e.g. 'opti.subject_to(v <= 0.1)'.");
+  casadi_assert(count_slacks(args[1])==0,
+    "The cap on a slack may not itself depend on a slack.");
+
+  MetaSlack& ms = slacks_.at(meta(args[0]).i);
+  casadi_assert(ms.ub.is_empty(),
+    "This slack already has an upper bound.");
+  ms.ub = args[1];
+  mark_problem_dirty();
+  return true;
 }
 
 MetaCon OptiNode::canon_expr(const MX& expr, const DM& linear_scale) const {
@@ -1194,6 +1598,9 @@ void OptiNode::minimize(const MX& f, double linear_scale) {
 }
 
 void OptiNode::subject_to(const MX& g, const DM& linear_scale, const Dict& options) {
+  // 'v <= bound' caps a slack; it never becomes a constraint row
+  if (register_slack_bound(g)) return;
+
   assert_only_opti_nondual(g);
   mark_problem_dirty();
   g_.push_back(g);
@@ -1209,6 +1616,7 @@ void OptiNode::subject_to(const MX& g, const DM& linear_scale, const Dict& optio
 
   // Store the meta-data
   set_meta_con(g, canon_expr(g, linear_scale));
+  peel_slacks(meta_con(g));
   register_dual(meta_con(g));
 
   for (auto && it : options) {
@@ -1229,6 +1637,10 @@ void OptiNode::subject_to() {
   store_initial_[OPTI_DUAL_G].clear();
   store_latest_[OPTI_DUAL_G].clear();
   count_dual_ = 0;
+  slacks_.clear();
+  store_initial_[OPTI_SLACK].clear();
+  store_latest_[OPTI_SLACK].clear();
+  count_slack_ = 0;
 }
 
 std::vector<MX> OptiNode::symvar(const MX& expr, VariableType type) const {
@@ -1260,6 +1672,21 @@ void OptiNode::res(const DMDict& res) {
         j = index_all_to_g_.at(j);
         if (j<0) continue;
         data_v[i] = lam_v.at(j)/g_linear_scale_.at(j)*f_linear_scale_;
+      }
+    }
+  }
+  if (res.find("s")!=res.end() && ns()>0) {
+    const std::vector<double>& s_v = res.at("s").nonzeros();
+    casadi_int nst = ns();
+    for (const auto& ms : slacks_) {
+      std::vector<double>& data =
+        store_latest_[OPTI_SLACK][meta(ms.symbol).i].nonzeros();
+      for (casadi_int i=0;i<ms.n;++i) {
+        casadi_int col = ms.start+i;
+        // Keep this in step with slack_values(), the symbolic twin of this
+        // scatter. A column's dead half is pinned to zero, so the sum is the
+        // relaxation whichever direction it went in.
+        data[i] = (s_v.at(col) + s_v.at(nst+col))*slack_col_ls_.at(col);
       }
     }
   }
@@ -1309,6 +1736,8 @@ Function OptiNode::solver_construct(bool callback) {
   casadi_assert(!solver_name_.empty(),
     "You must call 'solver' on the Opti stack to select a solver. "
     "Suggestion: opti.solver('ipopt')");
+
+  if (!slack_S_.is_null()) opts["S"] = slack_S_;
 
   if (problem_type_=="conic") {
     return qpsol("solver", solver_name_, nlp_, opts);
@@ -1381,6 +1810,24 @@ void OptiNode::solve_prepare() {
   arg_["lbg"] = res["lbg"];
   arg_["ubg"] = res["ubg"];
 
+  if (ns()>0) {
+    casadi_int nst = ns();
+    std::vector<double> s0(2*nst, 0);
+    for (const auto& ms : slacks_) {
+      const std::vector<double>& v =
+        store_initial_.at(OPTI_SLACK).at(meta(ms.symbol).i).nonzeros();
+      for (casadi_int i=0;i<ms.n;++i) {
+        casadi_int col = ms.start+i;
+        double val = v.at(i)/slack_col_ls_.at(col);
+        if (slack_live_l_.at(col)) s0[col] = val;
+        if (slack_live_u_.at(col)) s0[nst+col] = val;
+      }
+    }
+    arg_["s0"] = DM(s0);
+    arg_["lam_s0"] = DM::zeros(2*nst, 1);
+    arg_["ubs"] = res["ubs"];
+  }
+
   stats_.clear();
 }
 
@@ -1413,7 +1860,10 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) c
     vh->x = x;
     vh->p = p;
     vh->lam = lam;
-    vh->helper = Function("helper", std::vector<MX>{veccat(x), veccat(p), veccat(lam)}, {expr});
+    std::vector<MX> sl = symvar(expr, OPTI_SLACK);
+    vh->sl = sl;
+    vh->helper = Function("helper",
+      std::vector<MX>{veccat(x), veccat(p), veccat(lam), veccat(sl)}, {expr});
     if (vh->helper.has_free())
       casadi_error("This expression has symbols that are not defined "
         "within Opti using variable/parameter.");
@@ -1423,10 +1873,12 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) c
   const std::vector<MX>& x = vh->x;
   const std::vector<MX>& p = vh->p;
   const std::vector<MX>& lam = vh->lam;
+  const std::vector<MX>& sl = vh->sl;
   const Function& helper = vh->helper;
 
   std::map<VariableType, std::map<casadi_int, MX> > temp;
   temp[OPTI_DUAL_G] = std::map<casadi_int, MX>();
+  temp[OPTI_SLACK] = std::map<casadi_int, MX>();
   for (const auto& v : values) {
     casadi_assert_dev(v.is_op(OP_EQ));
     casadi_int i = meta(v.dep(1)).i;
@@ -1478,7 +1930,18 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) c
         describe(e, 1));
   }
 
-  std::vector<DM> arg = helper(std::vector<DM>{veccat(x_num), veccat(p_num), veccat(lam_num)});
+  std::vector<DM> sl_num;
+  for (const auto& e : sl) {
+    casadi_int i = meta(e).i;
+    casadi_assert(i<store_latest_.at(OPTI_SLACK).size(),
+      "This expression has a slack that is not given to Opti:\n" +
+      describe(e, 1));
+    sl_num.push_back(store_latest_.at(OPTI_SLACK).at(i));
+    undecided_vars |= override_num(temp[OPTI_SLACK], sl_num, i);
+  }
+
+  std::vector<DM> arg = helper(std::vector<DM>{veccat(x_num), veccat(p_num),
+                                               veccat(lam_num), veccat(sl_num)});
   return arg[0];
 }
 
@@ -1713,20 +2176,26 @@ Function OptiNode::to_function(const std::string& name,
   arg["p"] = veccat(p);
 
   // Evaluate bounds for given parameter values
-  MXDict r = bounds_(arg);
+  MXDict b = bounds_(arg);
   arg["x0"] = veccat(x0);
   arg["lam_g0"] = veccat(lam_g);
-  arg["lbg"] = r["lbg"];
-  arg["ubg"] = r["ubg"];
+  arg["lbg"] = b["lbg"];
+  arg["ubg"] = b["ubg"];
+  // ubs is not optional: it is what pins the dead half of a one-sided slack
+  if (ns()>0) arg["ubs"] = b["ubs"];
 
-  r = solver(arg);
+  MXDict r = solver(arg);
 
+  std::vector<MX> sl = active_symvar(OPTI_SLACK);
   std::vector<MX> helper_in = {veccat(active_symvar(OPTI_VAR)),
                                veccat(active_symvar(OPTI_PAR)),
-                               veccat(active_symvar(OPTI_DUAL_G))};
+                               veccat(active_symvar(OPTI_DUAL_G)),
+                               veccat(sl)};
   Function helper("helper", helper_in, {res});
 
-  std::vector<MX> arg_in = helper(std::vector<MX>{r.at("x"), arg["p"], r.at("lam_g")});
+  MX sl_num = sl.empty() ? MX(0, 1) : veccat(slack_values(r.at("s"), ns()));
+  std::vector<MX> arg_in = helper(std::vector<MX>{r.at("x"), arg["p"],
+                                                  r.at("lam_g"), sl_num});
 
   return Function(name, args, arg_in, name_in, name_out, opts);
 
