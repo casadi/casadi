@@ -163,6 +163,11 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // DLL suffix, per the FMI specification
   static std::string dll_suffix();
 
+  // Platform tuple (<arch>-<os>) per the FMI 3 specification, Section 2.5.1.4.1.
+  // Pure platform detection, so also available when compiled without WITH_FMI3
+  // (needed for FMU export, which always uses the FMI 3 binaries layout).
+  static std::string fmi3_dll_infix();
+
   // Compile the C sources in the DaeBuilder::export_fmu map into a shared library;
   // returns the map augmented with the amalgamation source and the compiled binary.
   // opts: compiler, compiler_options, include_dirs.

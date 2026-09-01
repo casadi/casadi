@@ -733,6 +733,51 @@ std::string FmuInternal::dll_suffix() {
 #endif
 }
 
+std::string FmuInternal::fmi3_dll_infix() {
+  // Architecture
+  std::string arch;
+#if defined(__arm64__) || defined(__aarch64__)
+  // ARM 64-bit Architecture
+  arch = "aarch64";
+#elif __arm__
+  if (sizeof(void*) == 4) {
+    // ARM 32-bit Architecture
+    arch = "aarch32";
+  } else {
+    // ARM 64-bit Architecture
+    arch = "aarch64";
+  }
+#elif defined(__ppc64__) || defined(__powerpc64__)
+  // PowerPC 64-bit Architecture
+  arch = "ppc64";
+#elif defined(__ppc__) || defined(__powerpc__)
+  // PowerPC 32-bit Architecture
+  arch = "ppc";
+#else
+  if (sizeof(void*) == 4) {
+    // Intel/AMD x86 32-bit
+    arch = "x86";
+  } else {
+    // Intel/AMD x86 64-bit
+    arch = "x86_64";
+  }
+#endif
+  // Operating system
+  std::string sys;
+#if defined(_WIN32)
+  // Microsoft Windows
+  sys = "windows";
+#elif defined(__APPLE__)
+  // Darwin (macOS, iOS, watchOS, tvOS, audioOS)
+  sys = "darwin";
+#else
+  // Linux
+  sys = "linux";
+#endif
+  // Return platform tuple, according to Section 2.5.1.4.1. of the FMI 3 specification
+  return arch + "-" + sys;
+}
+
 Dict FmuInternal::compile_fmu(const std::string& name, const Dict& files, const Dict& opts) {
   // Options
   Dict compiler_opts;
@@ -778,7 +823,7 @@ Dict FmuInternal::compile_fmu(const std::string& name, const Dict& files, const 
   // Augment the file map with the compiled binary
   // (FMI-3 layout: binaries/<dll_infix>/<modelIdentifier><suffix>)
   Dict ret = files;
-  ret[dll] = "binaries/" + Fmu3::dll_infix() + "/" + name + dll_suffix();
+  ret[dll] = "binaries/" + fmi3_dll_infix() + "/" + name + dll_suffix();
   return ret;
 }
 
@@ -1610,9 +1655,9 @@ FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {
 #endif // WITH_FMI2
   } else if (class_name=="Fmu3") {
 #ifdef WITH_FMI3
-return Fmu3::deserialize(s);
+    return Fmu3::deserialize(s);
 #else
-    casadi_error("CasADi was not compiled with WITH_FMI2=ON.");
+    casadi_error("CasADi was not compiled with WITH_FMI3=ON.");
 #endif // WITH_FMI3
   } else {
     casadi_error("Cannot deserialize type '" + class_name + "'");
