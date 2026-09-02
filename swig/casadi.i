@@ -3208,7 +3208,7 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
  *     `Unknown` (hiding the real errors), on Py3.8 it resolves and
  *     flags them.  `Any` is stable across all targets.
  * (3) Users inspect stats output freely; precise typing buys nothing. */
-%stub_alias_in(GenericType, bool | int | float | str | "Function" | Sequence["_GenericType"] | %arg(Mapping[str, "_GenericType"]))
+%stub_alias_in(GenericType, bool | int | float | str | Function | Sequence[_GenericType] | %arg(Mapping[str, _GenericType]))
 %stub_alias_out_key(GenericType, Any)
 
 /* __getitem__/__setitem__ axis index.  MX additionally accepts MX
