@@ -223,6 +223,63 @@ class TypingTests(casadiTestCase):
           % path,
       )
 
+  # Diagnostics that mean the stub TEXT is broken, as opposed to a deliberate
+  # typing trade-off: a name that can never resolve, or an annotation that
+  # isn't a type expression at all.  Kept deliberately narrow so the gate
+  # stays stable across pyright releases.
+  STUB_FATAL_RULES = (
+      "reportUndefinedVariable",     # `_IM = IM | ...` when no IM class is generated
+      "reportInvalidTypeForm",       # `-> [int]`: a doc token left unsubstituted
+      "reportGeneralTypeIssues",
+      "reportAttributeAccessIssue",
+      "reportRedeclaration",
+  )
+
+  def test_pyright_stub_itself(self):
+    """pyright must find no structural defect in casadi.pyi itself.
+
+    test_pyright_suite only counts diagnostics in tracked *test* files, so
+    anything wrong inside casadi.pyi is invisible to it -- and a broken
+    annotation is silent at the call site too, because the result just
+    degrades to Unknown.  That blind spot shipped `-> [int]` and an
+    undefined `IM` in 3.8 (issues #4390, #4391).  So check the stub
+    directly.
+
+    Rules NOT in STUB_FATAL_RULES are excluded on purpose:
+      reportOverlappingOverload       narrowest-first _DM subset-of _SX
+                                      subset-of _MX overload ordering
+      reportIncompatibleMethodOverride  __eq__/__ne__ return DM/SX/MX
+                                        elementwise, not bool
+      reportInconsistentOverload      single-@overload __getitem__/__setitem__
+    """
+    if not _have_pyright():
+      self.skipTest("pyright not installed")
+    pyi = os.path.join(_casadi_package_dir(), "casadi.pyi")
+    if not os.path.exists(pyi):
+      self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
+    env = os.environ.copy()
+    env.setdefault("PYTHONPATH", os.path.dirname(_casadi_package_dir()))
+    result = subprocess.run(
+        ["pyright", "--outputjson", pyi],
+        capture_output=True, text=True, env=env,
+    )
+    try:
+      diagnostics = json.loads(result.stdout).get("generalDiagnostics", [])
+    except ValueError as e:
+      self.fail("could not parse pyright output: %s\n%s" % (e, result.stdout[:2000]))
+    offenders = [
+        "line %d %s: %s" % (d["range"]["start"]["line"] + 1, d.get("rule"),
+                            d.get("message", "").splitlines()[0])
+        for d in diagnostics
+        if d.get("severity") == "error" and d.get("rule") in self.STUB_FATAL_RULES
+    ]
+    self.assertEqual(
+        offenders, [],
+        "casadi.pyi is structurally broken -- a name does not resolve, or an "
+        "annotation is not a type.  This usually means a typemap is missing "
+        "pystub_in=/pystub_out=, or an alias references a class SWIG never "
+        "generates.  Offenders:\n  " + "\n  ".join(offenders))
+
   def test_no_star_import_of_helpers(self):
     """No tracked test module may do `from helpers import *`.
 

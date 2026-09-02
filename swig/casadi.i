@@ -2818,7 +2818,7 @@ namespace std {
  }
 
 // ... but kept as inputs
-%typemap(in, doc=xName, pystub_in=xStubIn, tsstub_in=xTsStub, noblock=1, fragment="casadi_all") xType &INOUT (xType m) {
+%typemap(in, doc=xName, pystub_in=xStubIn, pystub_out=xStubOut, tsstub_in=xTsStub, tsstub_out=xTsStub, noblock=1, fragment="casadi_all") xType &INOUT (xType m) {
   $1 = &m;
   if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to type '" xName "'.");
  }
@@ -3217,6 +3217,8 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
  * generated -- so an `IM` term here can never match.  List what
  * to_ptr<IM>() really takes, mirroring _MIndex. */
 %stub_alias_in(IM, int | Sequence[int] | Sequence[Sequence[int]] | NDArray[Any] | Sparsity | DM)
+/* Out: from_ptr(const IM*) hands back a DM (e.g. MX::mapping()). */
+%stub_alias_out_key(IM, DM)
 %stub_alias_in(SXElem, SXElem | float)
 
 /* Bracketed doc tokens -- not valid SWIG identifiers. */

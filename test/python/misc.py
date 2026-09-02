@@ -620,6 +620,42 @@ class Misctests(casadiTestCase):
     except SyntaxError as e:
       self.fail("casadi.pyi does not compile: %s (line %s)" % (e.msg, e.lineno))
 
+  def test_stub_no_list_literal_annotations(self):
+    self.message("Generated casadi.pyi must not leave doc tokens in annotations")
+    # casadi's typemaps carry a human-readable doc name (xName) like "[int]"
+    # alongside the stub types (xStubIn/xStubOut).  If a typemap declares only
+    # pystub_in, the *return* position falls back to the doc name and the stub
+    # gets `-> [int]`, which is a list literal: valid Python grammar, so it
+    # compiles, but meaningless as a type.  This bit the &INOUT typemap, whose
+    # arguments are inputs and outputs at once and so need both halves.
+    import ast
+    import os
+    pyi = os.path.join(os.path.dirname(os.path.abspath(ca.__file__)), "casadi.pyi")
+    if not os.path.exists(pyi):
+      self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
+    with open(pyi) as fh:
+      tree = ast.parse(fh.read(), filename=pyi)
+    offenders = []
+    for node in ast.walk(tree):
+      if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        continue
+      a = node.args
+      annotations = [("return", node.returns)]
+      for arg in list(getattr(a, "posonlyargs", [])) + list(a.args) + list(a.kwonlyargs):
+        annotations.append((arg.arg, arg.annotation))
+      for where, ann in annotations:
+        if ann is None:
+          continue
+        if any(isinstance(n, ast.List) for n in ast.walk(ann)):
+          offenders.append("line %d: %s() %s: %s"
+                           % (node.lineno, node.name, where, ast.unparse(ann)))
+    self.assertEqual(
+        offenders, [],
+        "casadi.pyi contains a list literal where a type belongs, so a doc "
+        "token (e.g. \"[int]\") leaked through unsubstituted.  The typemap "
+        "involved is probably missing pystub_out=xStubOut.  Offenders:\n  "
+        + "\n  ".join(offenders))
+
   def test_unicode(self):
     import sys
     import shutil
