@@ -27,7 +27,7 @@ import numpy
 from numpy import random, array, linalg, matrix, zeros, ones
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase, memory_heavy, requires_conic, requires_nlpsol
 import casadi as ca
 from numpy import inf, pi
 

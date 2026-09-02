@@ -30,7 +30,8 @@ import numpy
 from numpy import eye, linalg, arange, matrix
 import unittest
 from types import *
-from helpers import *
+from numpy import array
+from helpers import casadiTestCase, check_matrix, jacobian_old, skip
 import numpy
 from itertools import *
 

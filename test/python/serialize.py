@@ -27,7 +27,7 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase, memory_heavy
 import random
 from collections import defaultdict
 import sys

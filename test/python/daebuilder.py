@@ -28,7 +28,7 @@ import sys
 import subprocess
 import os
 import unittest
-from helpers import *
+from helpers import casadiTestCase, memory_heavy, requires_integrator, requires_modelicaparser, requires_nlpsol, requires_rootfinder
 import glob
 import gc
 

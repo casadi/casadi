@@ -31,7 +31,7 @@ from numpy import double, int32, ones, matrix, zeros
 import unittest
 import math
 from types import *
-from helpers import *
+from helpers import casadiTestCase, check_matrix, requires_nlpsol, swig4, systemswig
 from looseversion import LooseVersion
 
 scipy_available = True

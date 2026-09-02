@@ -27,7 +27,7 @@ import numpy
 from numpy import random, array
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase, codegen_check_digits, hessian_old, jacobian_old, known_bug, memory_heavy
 import itertools
 import os
 import sys

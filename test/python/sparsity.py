@@ -27,7 +27,8 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import *
+from numpy import array
+from helpers import casadiTestCase, jacobian_old, memory_heavy
 import numpy
 import random
 

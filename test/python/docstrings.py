@@ -27,7 +27,7 @@ import numpy
 from numpy import random, array
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase
 import itertools
 
 

@@ -31,7 +31,8 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import *
+from numpy import array
+from helpers import casadiTestCase
 from time import time
 import sys
 from numpy import std, mean

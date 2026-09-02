@@ -27,7 +27,7 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase, codegen_check_digits, memory_heavy, requires_nlpsol
 
 import os
             

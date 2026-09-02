@@ -33,7 +33,7 @@ import textwrap
 import unittest
 
 import casadi
-from helpers import *
+from helpers import casadiTestCase, memory_heavy
 
 _PY310 = sys.version_info >= (3, 10)
 
@@ -222,6 +222,39 @@ class TypingTests(casadiTestCase):
           "expected stub file %s missing; is -stubs enabled in the SWIG invocation?"
           % path,
       )
+
+  def test_no_star_import_of_helpers(self):
+    """No tracked test module may do `from helpers import *`.
+
+    helpers.py has a module-level `import casadi as ca`, so a star
+    import re-binds `ca` to that re-exported module symbol.  pyright
+    >= 1.1.411 resolves the whole `ca.*` surface to Unknown behind such
+    a binding, which silently disables every stub check in this file --
+    test_pyright_suite then passes at budget 0 while verifying nothing.
+    Import the names each module actually uses instead.
+    """
+    test_dir = os.path.dirname(os.path.abspath(__file__))
+    tracked = _tracked_files_in(test_dir)
+    if tracked is None:
+      self.skipTest("not a git working tree; cannot enumerate tracked files")
+    offenders = []
+    for path in sorted(tracked):
+      if not path.endswith(".py"):
+        continue
+      try:
+        with open(path) as fh:
+          src = fh.read()
+      except OSError:
+        continue
+      for i, line in enumerate(src.splitlines(), start=1):
+        if line.strip() == "from helpers import *":
+          offenders.append("%s:%d" % (os.path.basename(path), i))
+    self.assertEqual(
+        offenders, [],
+        "star-importing helpers blinds pyright to the casadi stubs; "
+        "list the needed names explicitly instead.  Offenders: %s"
+        % ", ".join(offenders),
+    )
 
   def test_pyright_smoke(self):
     """pyright accepts a curated smoke script against the installed stubs."""

@@ -26,7 +26,7 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase
 from casadi.tools import *
 
 class Vectortoolsstests(casadiTestCase):

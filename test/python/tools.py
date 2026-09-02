@@ -29,7 +29,7 @@ import numpy
 from numpy import nan, int32, int64
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase, known_bug
 from casadi.tools import *
 import sys
 

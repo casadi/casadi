@@ -27,7 +27,7 @@ import numpy
 from numpy import random, array, linalg, matrix, zeros, ones
 import unittest
 from types import *
-from helpers import *
+from helpers import FunctionPool, casadiTestCase, hessian_old, jacobian_old, known_bug, memory_heavy, platform_arch, requires, skip, swig4, systemswig
 import casadi as ca
 import numpy as np
 from numpy import inf, pi

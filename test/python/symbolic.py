@@ -24,7 +24,8 @@
 import casadi as ca
 import numpy
 
-from helpers import *
+import unittest
+from helpers import casadiTestCase, memory_heavy, slow
 
 class Symbolictests(casadiTestCase):
 

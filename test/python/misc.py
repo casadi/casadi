@@ -27,7 +27,7 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase, memory_heavy, requiresPlugin, requires_nlpsol, systemswig
 import pickle
 from operator import itemgetter
 import sys

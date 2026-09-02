@@ -29,7 +29,8 @@ import numpy
 import numpy as np
 import unittest
 from types import *
-from helpers import *
+from numpy import array
+from helpers import args, casadiTestCase, codegen_check_digits, memory_heavy, requires_conic, requires_nlpsol
 import itertools
 import copy
 from casadi.tools import capture_stdout

@@ -30,7 +30,10 @@ from numpy import random, array, linalg, matrix, zeros, ones, ndarray, eye
 import unittest
 import warnings
 from types import *
-from helpers import *
+import builtins
+from casadi.tools import capture_stdout
+import itertools
+from helpers import FunctionPool, args, casadiTestCase, hessian_old, jacobian_old, known_bug, memory_heavy, requiresPlugin, requires_linsol, slow, swig4
 from copy import deepcopy
 
 import sys

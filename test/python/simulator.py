@@ -27,7 +27,7 @@ import numpy
 import numpy as n
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase
 
 
 

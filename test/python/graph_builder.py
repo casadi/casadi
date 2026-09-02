@@ -29,7 +29,7 @@ import numpy
 import unittest
 import os
 import tempfile
-from helpers import *
+from helpers import casadiTestCase
 
 # onnx python package: builds the numeric test models
 try:

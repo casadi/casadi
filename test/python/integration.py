@@ -29,7 +29,8 @@ import numpy
 import numpy as n
 import unittest
 from types import *
-from helpers import *
+from numpy import array
+from helpers import args, casadiTestCase, hessian_old, jacobian_old, memory_heavy, requires_integrator, requires_nlpsol, slow
 import copy
 
 scipy_available = True

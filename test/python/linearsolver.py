@@ -28,7 +28,7 @@ import numpy
 import unittest
 import warnings
 from types import *
-from helpers import *
+from helpers import casadiTestCase, jacobian_old, memory_heavy
 import random
 try:
     from typing import Callable  # referenced in type-comments below

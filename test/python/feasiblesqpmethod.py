@@ -26,7 +26,6 @@ import casadi as c
 import numpy
 import unittest
 from types import *
-from helpers import *
 
 # pyright: reportAttributeAccessIssue=false
 # Class intentionally not inheriting from casadiTestCase -- the test body is

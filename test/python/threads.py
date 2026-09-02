@@ -25,7 +25,7 @@ import casadi as ca
 import numpy
 import unittest
 from types import *
-from helpers import *
+from helpers import casadiTestCase, memory_heavy, requires_nlpsol
 import pickle
 import os
 import sys
