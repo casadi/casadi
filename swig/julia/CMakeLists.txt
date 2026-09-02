@@ -32,7 +32,7 @@ else()
 endif()
 
 # wrapper source follows the casadi<LANG>_wrap.cxx convention (cf. casadiPYTHON_wrap.cxx);
-# the compiled library stays libcasadi_wrap.so (what the generated casadi.jl dlopens).
+# the compiled library stays libcasadi_wrap.<dlext> (what the generated casadi.jl dlopens).
 set(_swig_cpp ${_out_dir}/casadiJULIA_wrap.cxx)
 set(_swig_jl  ${_out_dir}/casadi.jl)
 
@@ -84,7 +84,7 @@ add_custom_command(TARGET casadi_julia POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory ${_jl_pkg}
   COMMAND ${CMAKE_COMMAND} -E copy ${_swig_jl} ${_jl_pkg}/casadi.jl
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/CasADiNative.jl ${_jl_pkg}/CasADiNative.jl
-  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:casadi_julia> ${_jl_pkg}/libcasadi_wrap.so
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:casadi_julia> ${_jl_pkg}/libcasadi_wrap${CMAKE_SHARED_LIBRARY_SUFFIX}
   COMMENT "assemble Julia module dir ${_jl_pkg}")
 
 install(TARGETS casadi_julia DESTINATION ${LIB_PREFIX})

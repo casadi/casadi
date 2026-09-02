@@ -573,10 +573,12 @@ Base.convert(::Type{CasadiFunction}, cb::C.Callback) = CasadiFunction(cb)
 # member-style methods (ca.str, ca.nnz, ca.size1, ...) that casadi does not `export` and
 # so aren't reachable by `using` alone. Ergonomic definitions above take precedence (skipped
 # via isdefined). Mirrors Python's `import casadi as ca`; `using CasADiNative` is `import *`.
+# `@__MODULE__` rather than a literal name: this file is also spliced, unwrapped, into
+# the CasADiNative.jl package's own module.
 for _n in names(casadi; all=true)
     _s = Base.string(_n)
     (Base.isempty(_s) || _s[1] == '_' || _s[1] == '#' || _s[1] == '@') && continue
-    (Base.isdefined(CasADiNative, _n) || !Base.isdefined(casadi, _n)) && continue
+    (Base.isdefined(@__MODULE__, _n) || !Base.isdefined(casadi, _n)) && continue
     @eval const $_n = casadi.$_n
 end
 
