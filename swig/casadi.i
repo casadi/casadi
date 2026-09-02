@@ -3179,10 +3179,13 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
  * just caused overload-resolution failures that differed between
  * Python/numpy-version combinations.  `NDArray[Any]` is
  * version-agnostic. */
-%stub_alias_in(DM, bool | int | float | DM | Sparsity | _SupportsDM | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any])
+%stub_alias_in(DM, bool | int | float | DM | Sparsity | _SupportsDM | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any] | %arg(np.floating[Any]) | %arg(np.integer[Any]) | np.bool_)
 %stub_alias_in(SX, SX | _SupportsSX | _DM)
 %stub_alias_in(MX, MX | _SupportsMX | _DM)
-%stub_alias_in(IM, IM | int | Sequence[int] | Sequence[Sequence[int]] | NDArray[Any])
+/* IM is casadi::Matrix<casadi_int>: typemaps only, no Python class is
+ * generated -- so an `IM` term here can never match.  List what
+ * to_ptr<IM>() really takes, mirroring _MIndex. */
+%stub_alias_in(IM, int | Sequence[int] | Sequence[Sequence[int]] | NDArray[Any] | Sparsity | DM)
 %stub_alias_in(SXElem, SXElem | float)
 
 /* Bracketed doc tokens -- not valid SWIG identifiers. */

@@ -1506,7 +1506,8 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     base = ca.Function("base", [x, y], [x + y, x * y])
     X = ca.MX.sym("X", 2, 3)
     Y = ca.MX.sym("Y", 2, 3)
-    self.check("map_multi", ca.Function("f", [X, Y], base.map(3)(X, Y)),
+    # Function.__call__ is typed -> MX for the common single-output case; base has 2 outputs so it returns a list
+    self.check("map_multi", ca.Function("f", [X, Y], base.map(3)(X, Y)),  # pyright: ignore[reportArgumentType,reportCallIssue]
                [(ca.DM([[1, 2, 3], [4, 5, 6]]), ca.DM([[1, 1, 1], [2, 2, 2]]))])
 
   def test_map_multicolumn(self):

@@ -1271,10 +1271,11 @@ class typemaptests(casadiTestCase):
       def __iter__(self): return iter(self.vals)
 
     o = OneD([1.0, 2.0, 3.0])
-    ca.DM(o)  # warm up
+    # OneD is a bare __len__/__iter__ duck type, not a Sequence and no __DM__ -- the stubs cannot express it
+    ca.DM(o)  # warm up  # pyright: ignore[reportArgumentType,reportCallIssue]
     before = sys.getrefcount(o._shape)
     for _ in range(100):
-      ca.DM(o)
+      ca.DM(o)  # pyright: ignore[reportArgumentType,reportCallIssue]
     self.assertEqual(sys.getrefcount(o._shape), before)
 
   def test_bytes_typemaps(self):
@@ -1412,7 +1413,7 @@ class typemaptests(casadiTestCase):
   def testGenericTypeBoolean(self):
     x=ca.SX.sym("x")
     with self.assertRaises(RuntimeError):
-      solver = ca.nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": ca.SX.sym("x")}})
+      solver = ca.nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": ca.SX.sym("x")}})  # expect-error: reportArgumentType, reportCallIssue
 
     ca.nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": 1}})
   
