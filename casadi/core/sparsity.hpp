@@ -985,9 +985,9 @@ namespace casadi {
         See Direct Methods for Sparse Linear Systems by Davis (2006).
 
         \identifier{d5} */
-    casadi_int dfs(casadi_int j, casadi_int top, std::vector<casadi_int>& SWIG_INOUT(xi),
-            std::vector<casadi_int>& SWIG_INOUT(pstack),
-            const std::vector<casadi_int>& pinv, std::vector<bool>& SWIG_INOUT(marked)) const;
+    casadi_int dfs(casadi_int j, casadi_int top, std::vector<casadi_int>& SWIG_INOUT1(xi),
+            std::vector<casadi_int>& SWIG_INOUT2(pstack),
+            const std::vector<casadi_int>& pinv, std::vector<bool>& SWIG_INOUT3(marked)) const;
 
     /** \brief Find the strongly connected components of the bigraph defined by the sparsity pattern
 

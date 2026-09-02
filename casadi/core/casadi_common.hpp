@@ -45,6 +45,16 @@
 #define SWIG_IF_ELSE(is_swig, not_swig) is_swig
 #define SWIG_OUTPUT(arg) OUTPUT
 #define SWIG_INOUT(arg) INOUT
+// Numbered variants: SWIG matches the &INOUT typemaps by parameter NAME, so a
+// function with several in-out arguments needs distinct ones (casadi.i %applies
+// INOUT1..INOUT6).  Reusing plain SWIG_INOUT twice emits duplicate parameter
+// names into the generated .pyi, which is then not valid Python.
+#define SWIG_INOUT1(arg) INOUT1
+#define SWIG_INOUT2(arg) INOUT2
+#define SWIG_INOUT3(arg) INOUT3
+#define SWIG_INOUT4(arg) INOUT4
+#define SWIG_INOUT5(arg) INOUT5
+#define SWIG_INOUT6(arg) INOUT6
 #define SWIG_CONSTREF(arg) const arg
 #ifdef SWIGMATLAB
 #define SWIG_IND1 true
@@ -55,6 +65,12 @@
 #define SWIG_IF_ELSE(is_swig, not_swig) not_swig
 #define SWIG_OUTPUT(arg) arg
 #define SWIG_INOUT(arg) arg
+#define SWIG_INOUT1(arg) arg
+#define SWIG_INOUT2(arg) arg
+#define SWIG_INOUT3(arg) arg
+#define SWIG_INOUT4(arg) arg
+#define SWIG_INOUT5(arg) arg
+#define SWIG_INOUT6(arg) arg
 #define SWIG_CONSTREF(arg) const arg &
 #define SWIG_IND1 false
 #endif // SWIG

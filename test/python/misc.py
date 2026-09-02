@@ -576,6 +576,50 @@ class Misctests(casadiTestCase):
       self.assertTrue("t_proc_total" in solver.stats())
       self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
+  def test_stub_no_duplicate_parameter_names(self):
+    self.message("Generated casadi.pyi must not repeat a parameter name")
+    # SWIG matches the &OUTPUT/&INOUT typemaps by parameter NAME, so headers
+    # rename such arguments via SWIG_INOUT(x) -> INOUT (casadi_common.hpp).
+    # Using plain SWIG_INOUT twice in one declaration therefore emits the same
+    # parameter name twice into casadi.pyi, which Python rejects with
+    # "duplicate argument in function definition" -- that makes the whole stub
+    # unusable for mypy (issue #4390).  Use the numbered SWIG_INOUT1..6
+    # variants instead; casadi.i already %applies INOUT1..INOUT6.
+    import ast
+    import os
+    pyi = os.path.join(os.path.dirname(os.path.abspath(ca.__file__)), "casadi.pyi")
+    if not os.path.exists(pyi):
+      self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
+    with open(pyi) as fh:
+      src = fh.read()
+    # Duplicate parameters are valid *grammar*, so ast.parse succeeds and we
+    # have to look for them ourselves; doing so names the offending function
+    # instead of just reporting a line number.
+    tree = ast.parse(src, filename=pyi)
+    offenders = []
+    for node in ast.walk(tree):
+      if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        continue
+      a = node.args
+      names = [x.arg for x in
+               list(getattr(a, "posonlyargs", [])) + list(a.args) + list(a.kwonlyargs)]
+      names += [x.arg for x in (a.vararg, a.kwarg) if x is not None]
+      dupes = sorted(set(n for n in names if names.count(n) > 1))
+      if dupes:
+        offenders.append("line %d: %s(): %s" % (node.lineno, node.name, ", ".join(dupes)))
+    self.assertEqual(
+        offenders, [],
+        "casadi.pyi repeats a parameter name, so the stub is not valid Python "
+        "and mypy cannot load it.  A C++ declaration is very likely using "
+        "SWIG_INOUT() more than once; switch those to SWIG_INOUT1/2/3...  "
+        "Offenders:\n  " + "\n  ".join(offenders))
+    # Belt and braces: duplicate arguments are rejected when the symbol table
+    # is built, not by the parser, and this also catches any other such error.
+    try:
+      compile(src, pyi, "exec")
+    except SyntaxError as e:
+      self.fail("casadi.pyi does not compile: %s (line %s)" % (e.msg, e.lineno))
+
   def test_unicode(self):
     import sys
     import shutil
