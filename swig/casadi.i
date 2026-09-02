@@ -26,6 +26,41 @@
 
 %module(package="casadi",directors=1) casadi
 
+#ifdef SWIGPYTHON
+// SWIG 4 removed -outputtuple, and its list-based collection of multiple
+// return values swallows any output that is itself a list (swig/swig#1933).
+// Collect in a tuple instead; works with vanilla SWIG, no patched Lib needed.
+#undef SWIG_AppendOutput
+#define SWIG_AppendOutput(result, obj)  SWIG_Python_AppendOutput_Tuple(result, obj, $isvoid)
+
+%{
+SWIGINTERN PyObject*
+SWIG_Python_AppendOutput_Tuple(PyObject* result, PyObject* obj, int is_void) {
+  PyObject*   o2;
+  PyObject*   o3;
+  if (!result) {
+    result = obj;
+  } else if (result == Py_None && is_void) {
+    Py_DECREF(result);
+    result = obj;
+  } else {
+    if (!PyTuple_Check(result)) {
+      o2 = result;
+      result = PyTuple_New(1);
+      PyTuple_SET_ITEM(result, 0, o2);
+    }
+    o3 = PyTuple_New(1);
+    PyTuple_SET_ITEM(o3, 0, obj);
+    o2 = result;
+    result = PySequence_Concat(o2, o3);
+    Py_DECREF(o2);
+    Py_DECREF(o3);
+  }
+  return result;
+}
+%}
+#endif // SWIGPYTHON
+
 #ifdef CASADI_WITH_COPYSIGN_UNDEF
 %{
 #ifdef copysign
@@ -318,10 +353,6 @@
 %ignore *::operator->;
 
 %rename(str) get_str;
-
-%begin %{
-#define SWIG_PYTHON_OUTPUT_TUPLE
-%}
 
 #ifdef SWIGPYTHON
 %pythoncode %{
