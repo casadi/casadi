@@ -33337,10 +33337,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/blazing_spline.cpp#L181-L
 String representation of an array.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L334
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318-L327
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L334-L343
 
 >  std::string casadi::str(const std::array< T, N > &p, bool more=false)
 ------------------------------------------------------------------------
@@ -33348,10 +33348,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318-L3
 String representation of an array.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L334
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318-L327
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L334-L343
 
 ";
 
@@ -33363,10 +33363,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L318-L3
 Create a list of strings from  VA_ARGS, six arguments.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L246
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230-L233
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L246-L249
 
 >  std::vector<std::string> casadi::strvec(const T1 &t1, const T2 &t2, const T3 &t3, const T4 &t4, const T5 &t5, const T6 &t6)
 ------------------------------------------------------------------------
@@ -33374,10 +33374,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230-L2
 Create a list of strings from  VA_ARGS, six arguments.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L246
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230-L233
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L246-L249
 
 ";
 
@@ -33389,10 +33389,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L230-L2
 Create a string from a formatted string.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L236
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L252
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L236-L244
+https://github.com/casadi/casadi/blob/main/casadi/core/casadi_common.hpp#L252-L260
 
 ";
 
