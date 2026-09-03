@@ -40,6 +40,39 @@ try:
 except:
     scipy_available = False
 
+def _parse_stub(pyi):
+  """ast.parse the generated stub, reporting a too-new construct as a failure.
+
+  These tests parse the stub with the *running* interpreter on purpose.  A
+  type checker validates stub syntax against the Python version it is
+  targeting -- mypy rejects the whole file with
+
+    error: Positional-only parameters are only supported in Python 3.8 and
+    greater  [syntax]
+    (errors prevented further checking)
+
+  -- so a stub using syntax newer than the oldest interpreter casadi ships
+  wheels for is unusable for those users, and unsuppressably so.  Running
+  this on every matrix cell is what makes the oldest cell enforce that.
+  """
+  import ast
+  with open(pyi) as fh:
+    src = fh.read()
+  try:
+    return src, ast.parse(src, filename=pyi)
+  except SyntaxError as e:
+    # raise rather than testcase.fail(): unittest treats AssertionError as a
+    # failure just the same, and a raise is terminal to a type checker, so
+    # callers do not see an Optional return.
+    raise AssertionError(
+        "casadi.pyi does not parse on Python %d.%d: %s (line %s).\n"
+        "Stub syntax must stay within the oldest Python casadi ships wheels "
+        "for -- type checkers validate stubs against their target version, "
+        "and reject the entire file.  Use the pre-PEP-570 `__name` "
+        "convention instead of `/` for positional-only parameters."
+        % (sys.version_info[0], sys.version_info[1], e.msg, e.lineno))
+
+
 class Misctests(casadiTestCase):
 
   def test_issue179B(self):
@@ -590,12 +623,10 @@ class Misctests(casadiTestCase):
     pyi = os.path.join(os.path.dirname(os.path.abspath(ca.__file__)), "casadi.pyi")
     if not os.path.exists(pyi):
       self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
-    with open(pyi) as fh:
-      src = fh.read()
-    # Duplicate parameters are valid *grammar*, so ast.parse succeeds and we
+    # Duplicate parameters are valid *grammar*, so the parse succeeds and we
     # have to look for them ourselves; doing so names the offending function
     # instead of just reporting a line number.
-    tree = ast.parse(src, filename=pyi)
+    src, tree = _parse_stub(pyi)
     offenders = []
     for node in ast.walk(tree):
       if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -620,6 +651,40 @@ class Misctests(casadiTestCase):
     except SyntaxError as e:
       self.fail("casadi.pyi does not compile: %s (line %s)" % (e.msg, e.lineno))
 
+  def test_stub_no_positional_only_syntax(self):
+    self.message("Generated casadi.pyi must stay within the oldest supported syntax")
+    # PEP 570's `/` needs Python 3.8.  A type checker validates stub syntax
+    # against the version it TARGETS, not the one it runs on, so `/` makes
+    # mypy reject the entire file for anyone targeting 3.7 -- and casadi still
+    # ships 3.7 wheels.  pyright happens to accept it, which is why this went
+    # unnoticed from 3.8.0 (issue #4315's stubs) until now.  Use the
+    # pre-PEP-570 `__name` convention instead: it means the same thing to both
+    # checkers and parses everywhere.
+    #
+    # _parse_stub already fails on interpreters that cannot parse `/` at all;
+    # this catches it on the modern cells too, so the guard does not depend on
+    # an old Python being in the matrix.
+    import os
+    pyi = os.path.join(os.path.dirname(os.path.abspath(ca.__file__)), "casadi.pyi")
+    if not os.path.exists(pyi):
+      self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
+    import ast
+    _, tree = _parse_stub(pyi)
+    offenders = []
+    for node in ast.walk(tree):
+      if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        continue
+      posonly = getattr(node.args, "posonlyargs", [])
+      if posonly:
+        offenders.append("line %d: %s(%s, /)"
+                         % (node.lineno, node.name,
+                            ", ".join(a.arg for a in posonly)))
+    self.assertEqual(
+        offenders, [],
+        "casadi.pyi uses PEP 570 positional-only syntax, which mypy rejects "
+        "outright for targets below 3.8.  Use a leading __ on the parameter "
+        "name instead.  Offenders:\n  " + "\n  ".join(offenders))
+
   def test_stub_no_list_literal_annotations(self):
     self.message("Generated casadi.pyi must not leave doc tokens in annotations")
     # casadi's typemaps carry a human-readable doc name (xName) like "[int]"
@@ -633,8 +698,13 @@ class Misctests(casadiTestCase):
     pyi = os.path.join(os.path.dirname(os.path.abspath(ca.__file__)), "casadi.pyi")
     if not os.path.exists(pyi):
       self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
-    with open(pyi) as fh:
-      tree = ast.parse(fh.read(), filename=pyi)
+    src, tree = _parse_stub(pyi)
+    src_lines = src.splitlines()
+    # ast.unparse is 3.9+; fall back to the source line so this test also runs
+    # on the oldest cells, which are the ones that catch too-new stub syntax.
+    def _show(ann):
+      unparse = getattr(ast, "unparse", None)
+      return unparse(ann) if unparse else src_lines[ann.lineno - 1].strip()
     offenders = []
     for node in ast.walk(tree):
       if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -648,7 +718,7 @@ class Misctests(casadiTestCase):
           continue
         if any(isinstance(n, ast.List) for n in ast.walk(ann)):
           offenders.append("line %d: %s() %s: %s"
-                           % (node.lineno, node.name, where, ast.unparse(ann)))
+                           % (node.lineno, node.name, where, _show(ann)))
     self.assertEqual(
         offenders, [],
         "casadi.pyi contains a list literal where a type belongs, so a doc "

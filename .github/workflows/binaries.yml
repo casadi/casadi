@@ -1571,7 +1571,7 @@ jobs:
           sudo apt update
           sudo apt install -y valgrind
           cd test
-          python internal/test_pytest.py python -skipfiles="alltests.py nlp.py feasiblesqpmethod.py helpers.py complexity.py speed.py debug_fatrop.py" -skipdirs="hock_schittkowski" -memcheck -passoptions="--ignore_memory_heavy"
+          python internal/test_pytest.py python -skipfiles="alltests.py nlp.py feasiblesqpmethod.py helpers.py complexity.py speed.py debug_fatrop.py mypy_probe.py" -skipdirs="hock_schittkowski" -memcheck -passoptions="--ignore_memory_heavy"
         shell: bash -el {0}
         if: contains(matrix.image, 'ubuntu')
       - name: docs/api/examples
@@ -1642,5 +1642,29 @@ jobs:
           pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
           cd test/python
           python function.py
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+      # Type-check a small user program against the generated stubs, with
+      # casadi installed as a wheel exactly as a user has it.  mypy silences
+      # errors *inside* a PEP 561 package, so this cannot police stub quality
+      # in general -- pyright_stubs.py does that.  What it catches is the one
+      # class of defect that is not silenceable: anything that stops mypy
+      # building casadi.pyi's AST is a blocking error that no user config can
+      # ignore, and it takes the whole package down.  Issue #4390 shipped a
+      # duplicate `INOUT` parameter that way and forced users onto casadi<3.8.
+      # Deliberately no PYTHONPATH here: mypy must resolve casadi from
+      # site-packages, not from the unpacked workspace copy.
+      - name: mypy against the installed stubs
+        run: |
+          pip install mypy
+          cd test/python
+          python -m mypy --no-incremental mypy_probe.py
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - name: mypy against the installed stubs
+        run: |
+          pip install mypy
+          cd test/python
+          python -m mypy --no-incremental mypy_probe.py
         shell: pwsh
         if: contains(matrix.image, 'windows')
