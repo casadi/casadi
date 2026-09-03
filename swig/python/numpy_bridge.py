@@ -560,7 +560,11 @@ def _np_outer(a, b, out=None):
     return mtimes(reshape(a, (-1, 1)), reshape(b, (1, -1)))
 
 def _np_cumsum(a, axis=None):
-    return cumsum(a, 0 if axis is None else int(axis))
+    # axis=None flattens in C-order (row-major) first; casadi.vec is
+    # column-major, so transpose before flattening (cf. _np_cumprod).
+    if axis is None:
+        return cumsum(vec(a.T), 0)
+    return cumsum(a, int(axis))
 
 def _np_repeat(a, repeats, axis=None):
     # numpy.repeat repeats each element along an axis (or flattens, in C
@@ -739,7 +743,13 @@ def _np_trapz(y, x=None, dx=1.0, axis=-1):
         if x_dm.numel() != n_along:
             return NotImplemented
         x_v = vec(x_dm) if axis == 0 else vec(x_dm).T
-        contributions = pair_sum * diff(x_v, 1, axis)
+        d = diff(x_v, 1, axis)
+        if (d.size1(), d.size2()) != (pair_sum.size1(), pair_sum.size2()):
+            # x is a coordinate VECTOR; numpy broadcasts its widths over
+            # the other axis, which casadi won't do for a row.
+            d = repmat(d, pair_sum.size1() // d.size1(),
+                       pair_sum.size2() // d.size2())
+        contributions = pair_sum * d
     return sum1(contributions) if axis == 0 else sum2(contributions)
 
 
@@ -1002,15 +1012,22 @@ def _np_cross(a, b, axisa=-1, axisb=-1, axisc=-1, axis=None):
 
 
 def _np_roll(a, shift, axis=None):
-    # 1-D roll equivalent: vec the input, slice and concat.
+    try:
+        shift = int(shift)
+    except Exception:
+        # A tuple/array shift (numpy pairs it with a tuple axis), or a
+        # casadi value that refuses int() -- hand the call to numpy.
+        return NotImplemented
+    # 1-D roll equivalent: ravel, slice and concat.  numpy ravels in
+    # C-order (row-major) for axis=None; casadi.vec is column-major, so
+    # transpose on the way in and back out again.
     if axis is None:
-        flat = vec(a)
+        nr, nc = a.shape[0], a.shape[1]
+        flat = vec(a.T)
         n = flat.shape[0]
         s = int(shift) % n if n else 0
-        if s == 0:
-            return reshape(flat, a.shape[0], a.shape[1])
-        rolled = vertcat(flat[n - s:], flat[:n - s])
-        return reshape(rolled, a.shape[0], a.shape[1])
+        rolled = flat if s == 0 else vertcat(flat[n - s:], flat[:n - s])
+        return reshape(rolled, nc, nr).T
     if axis == 0:
         m = a.shape[0]
         if m == 0:
@@ -1394,8 +1411,9 @@ def _np_ediff1d(ary, to_end=None, to_begin=None):
     if not hasattr(ary, "shape"):
         return NotImplemented
 
-    # Flatten to a column vector (numpy ediff1d always operates on flat).
-    v = vec(ary)
+    # Flatten to a column vector (numpy ediff1d always operates on the
+    # C-order flat; casadi.vec is column-major, hence the transpose).
+    v = vec(ary.T)
     n = v.shape[0]
     if n < 1:
         return NotImplemented
@@ -1405,16 +1423,17 @@ def _np_ediff1d(ary, to_end=None, to_begin=None):
     else:
         d = DM.zeros(0, 1)
 
+    def _cflat(z):
+        # to_begin / to_end are ravelled too, and in C-order like `ary`.
+        z = z if hasattr(z, "shape") else DM(z)
+        return vec(z.T)
+
     parts = []
     if to_begin is not None:
-        tb = vec(to_begin) if hasattr(to_begin, "shape") else DM(to_begin)
-        tb = vec(tb)
-        parts.append(tb)
+        parts.append(_cflat(to_begin))
     parts.append(d)
     if to_end is not None:
-        te = vec(to_end) if hasattr(to_end, "shape") else DM(to_end)
-        te = vec(te)
-        parts.append(te)
+        parts.append(_cflat(to_end))
 
     if len(parts) == 1:
         return parts[0]
@@ -2447,7 +2466,7 @@ def _np_nancumsum(a, axis=None, dtype=None, out=None):
 
     # Cumulative sum: casadi.cumsum(x, axis) exists.
     if axis is None:
-        return cumsum(vec(masked), 0)
+        return cumsum(vec(masked.T), 0)     # numpy flattens in C-order
     return cumsum(masked, int(axis))
 
 def _np_nanmax(a, axis=None, out=None, keepdims=False, initial=None, where=True):
