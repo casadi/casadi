@@ -1509,5 +1509,283 @@ class NumpyInteropTests(casadiTestCase, _NumpyRefMixin):
             self._close(handler(x), ref, "emath." + op_name)
 
 
+    # ============================================================== #
+    # issue #4400: numpy.matmul (and the rest of the generalized-ufunc
+    # family) plus numpy.kron on mixed-rank operands.                 #
+    # ============================================================== #
+
+    def _close_ranked(self, got, ref, label):
+        """_close, but also pinning the EXACT logical shape -- rank is the
+        whole point for matmul/kron, and _close squeezes length-1 axes."""
+        ref = np.asarray(ref)
+        self.assertEqual(np.asarray(got).shape, ref.shape,  # pyright: ignore[reportAttributeAccessIssue]
+                         "[%s] shape: got %s, expected %s"
+                         % (label, np.asarray(got).shape, ref.shape))
+        self._close(got, ref, label)
+
+    def test_matmul_ndarray_lhs_issue4400(self):
+        # `ndarray @ wrapper` reaches __array_ufunc__ as numpy.matmul --
+        # a GENERALIZED ufunc, whose core axes must be contracted, not
+        # broadcast.  The elementwise path used to broadcast them first,
+        # so the reporter's (3,1) @ (1,1) raised "Matrix product with
+        # incompatible dimensions" and the mixed-rank products below
+        # silently returned the wrong thing.
+        b = np.array([[0.0, 1.0, 0.0]]).T
+        self._close_ranked(b @ Arr([[1.0]]), b @ np.array([[1.0]]),
+                           "issue #4400 repro")
+        A = np.array([[1.0, 2.0], [3.0, 4.0]])
+        v = np.array([1.0, 2.0])
+        for label, got, ref in (
+                ("mat@mat", A @ Arr(A), A @ A),
+                ("mat@mat rev", Arr(A) @ A, A @ A),
+                ("vec@mat", v @ Arr(A), v @ A),
+                ("mat@vec", A @ Arr(v), A @ v),
+                ("vec@vec", v @ Arr(v), v @ v),
+                ("np.matmul", np.matmul(A, Arr(A)), np.matmul(A, A)),
+                ("np.dot", np.dot(v, Arr(A)), np.dot(v, A))):
+            self._close_ranked(got, ref, "matmul " + label)
+
+    def test_matmul_symbolic_ndarray_lhs(self):
+        A = np.array([[1.0, 2.0], [3.0, 4.0]])
+        for cls in (SX, MX):
+            syms = []
+            syms.append(cls.sym("x", 2, 2))
+            res = A @ Arr(syms[0])
+            self.assertEqual(res.shape, (2, 2))
+            f = Function("f", syms, [_unwrap(res)])
+            self._close(f(A), A @ A, "matmul %s" % cls.__name__)
+
+    def test_matmul_stacked_nd(self):
+        # numpy stacks over every axis but the last two, broadcasting the
+        # batch axes; the N-D wrapper now does the same.
+        T = np.arange(12.0).reshape(2, 2, 3)
+        C = np.arange(6.0).reshape(3, 2)
+        S = np.arange(24.0).reshape(2, 3, 4)
+        for label, got, ref in (
+                ("nd@2d", Arr(T) @ C, T @ C),
+                ("2d-lhs ndarray", T @ Arr(C), T @ C),
+                ("nd@vec", Arr(S) @ np.arange(4.0), S @ np.arange(4.0)),
+                ("vec@nd", np.arange(3.0) @ Arr(S), np.arange(3.0) @ S),
+                ("batch broadcast",
+                 Arr(C.reshape(1, 3, 2)) @ np.broadcast_to(T, (2, 2, 3)).copy(),
+                 C.reshape(1, 3, 2) @ np.broadcast_to(T, (2, 2, 3)))):
+            self._close_ranked(got, ref, "stacked matmul " + label)
+
+    def test_matmul_dimension_mismatch_raises_valueerror(self):
+        # A genuine mismatch must read like numpy's, not like a casadi
+        # assertion from deep inside mtimes.
+        with self.assertRaises(ValueError):
+            _ = Arr(np.ones((2, 2))) @ np.ones((3, 2))
+        with self.assertRaises(ValueError):    # matmul needs >= 1-D
+            _ = Arr(np.ones((2, 2))) @ Arr(2.0)
+
+    @unittest.skipUnless(hasattr(np, "matvec"), "numpy >= 2.2 required")
+    def test_matvec_vecmat_vecdot_gufuncs(self):
+        # The other generalized ufuncs contract core axes too; without a
+        # handler each would fall into the elementwise path.  Reached via
+        # getattr: they don't exist in the numpy < 2.2 stubs pyright sees.
+        vecdot = getattr(np, "vecdot")
+        matvec = getattr(np, "matvec")
+        vecmat = getattr(np, "vecmat")
+        A = np.array([[1.0, 2.0], [3.0, 4.0]])
+        v, w = np.array([1.0, 2.0]), np.array([3.0, 5.0])
+        S = np.arange(24.0).reshape(2, 3, 4)
+        for label, got, ref in (
+                ("vecdot", vecdot(v, Arr(w)), vecdot(v, w)),
+                ("vecdot rows", vecdot(Arr(A), A), vecdot(A, A)),
+                ("matvec", matvec(A, Arr(v)), matvec(A, v)),
+                ("matvec nd", matvec(Arr(S), np.arange(4.0)),
+                 matvec(S, np.arange(4.0))),
+                ("vecmat", vecmat(v, Arr(A)), vecmat(v, A)),
+                ("vecmat nd", vecmat(Arr(np.arange(3.0)), S),
+                 vecmat(np.arange(3.0), S))):
+            self._close_ranked(got, ref, label)
+
+    def test_kron_mixed_rank_issue4400(self):
+        # numpy.kron promotes the operands to a common rank by PREPENDING
+        # length-1 axes -- a 1-D operand is a ROW.  The generic fallback
+        # handed casadi a column instead, transposing the result.
+        v = np.array([1.0, 2.0, 3.0])
+        A = np.array([[1.0, 2.0], [3.0, 4.0]])
+        T = np.arange(8.0).reshape(2, 2, 2)
+        for label, got, ref in (
+                ("mat,mat", np.kron(Arr(A), A), np.kron(A, A)),
+                ("vec,mat", np.kron(Arr(v), A), np.kron(v, A)),
+                ("mat,vec", np.kron(Arr(A), v), np.kron(A, v)),
+                ("vec,vec", np.kron(Arr(v), v), np.kron(v, v)),
+                ("scalar,mat", np.kron(Arr(2.0), A), np.kron(2.0, A)),
+                ("nd,mat", np.kron(Arr(T), A), np.kron(T, A)),
+                ("mat,nd", np.kron(Arr(A), T), np.kron(A, T))):
+            self._close_ranked(got, ref, "kron " + label)
+        # the <=2-D path stays on casadi.kron, so sparsity survives
+        self._check_nnz("kron sparse", np.kron, _SP_LOWER3, _SP_DIAG3,
+                        expected_nnz=_SP_LOWER3.nnz() * _SP_DIAG3.nnz())
+
+    def test_atleast_2d_of_1d_wrapper_is_a_row(self):
+        # numpy.atleast_2d prepends the missing axis: (n,) -> (1,n).  The
+        # casadi handler is a pass-through (right for an always-2-D casadi
+        # value), which left a 1-D wrapper as an (n,1) column.
+        v = np.array([1.0, 2.0, 3.0])
+        self._close_ranked(np.atleast_2d(Arr(v)), np.atleast_2d(v), "atleast_2d 1-D")
+        self._close_ranked(np.atleast_2d(Arr(0.5)), np.atleast_2d(0.5), "atleast_2d 0-d")
+        self._close_ranked(np.atleast_1d(Arr(0.5)), np.atleast_1d(0.5), "atleast_1d 0-d")
+
+    def test_cumsum_and_ediff1d_axis_none_are_c_order(self):
+        # Same class as test_cumprod_axis_none_is_c_order: numpy ravels
+        # C-order, casadi.vec is F-order.
+        x = DM([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        self._verify("cumsum axis=None", np.cumsum, x)
+        self._verify("nancumsum axis=None", np.nancumsum, x)
+        self._verify("ediff1d", np.ediff1d, x)
+
+
+    # ============================================================== #
+    # Follow-up to issue #4400: the rest of the NEP-18 handlers that   #
+    # the same audit caught disagreeing with numpy -- mixed-rank       #
+    # broadcasting, rank-sensitive results, and C- vs F-order ravel.   #
+    # ============================================================== #
+
+    def test_elementwise_handlers_broadcast_mixed_rank(self):
+        # casadi broadcasts columns but not rows, and a 1-D wrapper used
+        # to reach the handler as an (n,1) COLUMN, so a (2,3)-with-(3,)
+        # call died with "Dimension mismatch" where numpy broadcasts.
+        M = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        v = np.array([1.0, 2.0, 3.0])
+        _trapz = getattr(np, "trapz", None) or np.trapezoid  # pyright: ignore[reportAttributeAccessIssue]
+        for label, got, ref in (
+                ("isclose", np.isclose(Arr(M), v), np.isclose(M, v)),
+                ("isclose rev", np.isclose(Arr(v), M), np.isclose(v, M)),
+                ("clip", np.clip(Arr(M), v, 5.0), np.clip(M, v, 5.0)),
+                ("where", np.where(M > 2, Arr(M), v), np.where(M > 2, M, v)),
+                ("cross", np.cross(Arr(M), v), np.cross(M, v)),
+                ("trapezoid", _trapz(Arr(M), Arr(v)), _trapz(M, v)),
+                ("full_like", np.full_like(Arr(M), Arr(v)),
+                 np.full_like(M, v))):
+            self._close_ranked(got, ref, "mixed rank " + label)
+
+    def test_scalar_bound_keeps_sparsity(self):
+        # Broadcasting must NOT repmat a 1x1 operand: casadi broadcasts a
+        # scalar natively and sparsity-preservingly, while a dense (n,n)
+        # of the bound makes fmax/fmin/if_else return a dense result.
+        self._check_nnz("clip scalar bounds",
+                        lambda x: np.clip(x, -1.0, 1.0),
+                        _SP_LOWER3, expected_nnz=_SP_LOWER3.nnz())
+        self._check_nnz("clip scalar bounds (wrapper)",
+                        lambda x: _unwrap(np.clip(Arr(x), -1.0, 1.0)),
+                        _SP_LOWER3, expected_nnz=_SP_LOWER3.nnz())
+
+    def test_cov_corrcoef_of_1d_is_scalar(self):
+        # Each ROW is a variable, so a 1-D input is ONE variable over n
+        # observations -> a 0-d result.  As an (n,1) column it read as n
+        # variables with one observation each: an (n,n) matrix of NaN.
+        v = np.array([1.0, 2.0, 4.0, 8.0])
+        M = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 7.0]])
+        for label, got, ref in (
+                ("cov 1-D", np.cov(Arr(v)), np.cov(v)),
+                ("cov 2-D", np.cov(Arr(M)), np.cov(M)),
+                ("corrcoef 1-D", np.corrcoef(Arr(v)), np.corrcoef(v)),
+                ("corrcoef 2-D", np.corrcoef(Arr(M)), np.corrcoef(M))):
+            self._close_ranked(got, ref, label)
+
+    def test_tril_triu_of_1d_is_square(self):
+        # numpy masks tri(*m.shape[-2:]) against m, so a 1-D (n,) input
+        # broadcasts against an (n,n) mask and comes back SQUARE.
+        v = np.array([1.0, 2.0, 3.0])
+        M = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        for label, got, ref in (
+                ("tril 1-D", np.tril(Arr(v)), np.tril(v)),
+                ("triu 1-D", np.triu(Arr(v)), np.triu(v)),
+                ("tril 2-D", np.tril(Arr(M)), np.tril(M)),
+                ("triu 2-D k=1", np.triu(Arr(M), 1), np.triu(M, 1))):
+            self._close_ranked(got, ref, label)
+
+    def test_inner_contracts_last_axis(self):
+        # numpy.inner is a contraction over the LAST axis of both
+        # operands, not the full inner product the casadi handler does:
+        # inner of two matrices is (2,2), never a scalar.
+        M = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        v = np.array([1.0, 2.0, 3.0])
+        for label, got, ref in (
+                ("mat,vec", np.inner(Arr(M), v), np.inner(M, v)),
+                ("vec,mat", np.inner(Arr(v), M), np.inner(v, M)),
+                ("mat,mat", np.inner(Arr(M), M), np.inner(M, M)),
+                ("vec,vec", np.inner(Arr(v), v), np.inner(v, v)),
+                ("scalar", np.inner(Arr(2.0), v), np.inner(2.0, v))):
+            self._close_ranked(got, ref, "inner " + label)
+        # Two RAW casadi vectors keep the casadi convention: numpy's own
+        # answer for (3,1)-with-(3,1) is a 4-D tensor casadi cannot hold,
+        # so the vector inner product stands (see test_inner_vec_vec).
+        d = _unwrap(np.inner(DM([1.0, 2.0, 3.0]), DM([4.0, 5.0, 6.0])))
+        self._close(d, 32.0, "inner raw casadi vectors")
+
+    def test_sampled_endpoints_get_the_new_leading_axis(self):
+        # numpy.linspace & friends broadcast the endpoints and put the
+        # samples on a NEW LEADING axis -- (num,) + endpoint shape.  The
+        # values were already right; only the rank was lost to casadi's
+        # 2-D world.
+        v = np.array([1.0, 2.0, 3.0])
+        w = np.array([2.0, 1.0, 4.0])
+        M = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        for label, got, ref in (
+                ("linspace vec", np.linspace(Arr(v), w, 4),
+                 np.linspace(v, w, 4)),
+                ("linspace scalar", np.linspace(Arr(0.0), 1.0, 5),
+                 np.linspace(0.0, 1.0, 5)),
+                ("linspace 2-D", np.linspace(Arr(M), M + 1, 3),
+                 np.linspace(M, M + 1, 3)),
+                ("logspace vec", np.logspace(Arr(v), w, 4),
+                 np.logspace(v, w, 4)),
+                ("geomspace vec", np.geomspace(Arr(v), w, 4),
+                 np.geomspace(v, w, 4))):
+            self._close_ranked(got, ref, label)
+        # MX has no broadcasting casadi.linspace: say so rather than
+        # return a differently-shaped answer.
+        with self.assertRaises(NotImplementedError):
+            np.linspace(Arr(MX.sym("x", 3, 1)), w, 4)
+
+    def test_c_order_ravel_in_roll_and_ediff1d_extras(self):
+        # Every "flatten first" handler must ravel C-order like numpy;
+        # casadi.vec is column-major (cf. the cumsum/cumprod pair).
+        x = DM([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        self._verify("roll axis=None", lambda a: np.roll(a, 2), x)
+        self._verify("ediff1d to_end",
+                     lambda a: np.ediff1d(a, DM([[7.0, 8.0], [9.0, 10.0]])), x)
+
+    def test_declining_handler_falls_through_to_casadi(self):
+        # An _nf_ wrapper handler that returns NotImplemented (a kwarg or
+        # a rank it can't express) must hand on to the casadi handler /
+        # densify fallback -- not surface a bare NotImplemented to numpy.
+        M = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        # clip with out= declines, numpy computes it
+        out = np.zeros((2, 3))
+        r = np.clip(Arr(M), 2.0, 5.0, out=out)
+        self._close(r, np.clip(M, 2.0, 5.0), "clip out= fell through")
+        # cross with a non-default axis declines to the casadi handler
+        self._close_ranked(np.cross(Arr(M[:, :3]), Arr(M[:, :3]), axis=1),
+                           np.cross(M[:, :3], M[:, :3], axis=1),
+                           "cross axis=1 fell through")
+
+    def test_densify_fallback_uses_the_logical_shape(self):
+        # The fallback densified via `_v.full()` -- the 2-D STORAGE -- so
+        # a 1-D wrapper reached numpy as (1,n) and every routine whose
+        # argument rank matters (np.roll's shift, ...) rejected it.
+        M = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        densify = getattr(Arr, "_densify_arg")
+        self.assertEqual(densify(Arr(np.arange(3.0))).shape, (3,))
+        self._close_ranked(
+            np.roll(Arr(M), Arr(2)),  # pyright: ignore[reportCallIssue,reportArgumentType]
+            np.roll(M, 2), "roll with a wrapper shift")
+
+    def test_column_stack_of_a_lone_2d_array(self):
+        # numpy.column_stack takes a SEQUENCE; a lone 2-D array is that
+        # sequence (of its rows).  Handing casadi the matrix hit its
+        # deliberate "casadi matrices are not iterable by design" error.
+        M = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        self._close_ranked(
+            np.column_stack(Arr(M)),  # pyright: ignore[reportCallIssue,reportArgumentType]
+            np.column_stack(M),  # pyright: ignore[reportCallIssue,reportArgumentType]
+            "column_stack lone 2-D")
+
+
 if __name__ == '__main__':
     unittest.main()
