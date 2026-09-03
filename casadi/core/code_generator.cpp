@@ -1113,6 +1113,17 @@ namespace casadi {
     }
   }
 
+  void CodeGenerator::set_codegen_sz_w(const FunctionInternal* f, size_t sz_w) {
+    codegen_sz_w_[f] = sz_w;
+  }
+
+  bool CodeGenerator::get_codegen_sz_w(const FunctionInternal* f, size_t& sz_w) const {
+    auto it = codegen_sz_w_.find(f);
+    if (it==codegen_sz_w_.end()) return false;
+    sz_w = it->second;
+    return true;
+  }
+
   std::string CodeGenerator::format_padded(casadi_int i) const {
     std::stringstream ss;
     ss.str("");

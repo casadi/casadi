@@ -817,6 +817,17 @@ namespace casadi {
         \identifier{2ay} */
     void reserve_work(casadi_int n);
 
+    /** \brief Register the work vector size a function needs in generated code
+
+        Called from codegen_body when the generated layout of the work vector
+        differs from the one used by numeric evaluation. */
+    void set_codegen_sz_w(const FunctionInternal* f, size_t sz_w);
+
+    /** \brief Retrieve a work vector size registered by set_codegen_sz_w
+
+        Returns false if the function did not register one. */
+    bool get_codegen_sz_w(const FunctionInternal* f, size_t& sz_w) const;
+
     /** Declare an array */
     static std::string array(const std::string& type, const std::string& name, casadi_int len,
                              const std::string& def=std::string());
@@ -1169,6 +1180,9 @@ namespace casadi {
     std::vector< std::vector<double> > pool_double_defaults_;
     std::map<std::string, casadi_int> pool_double_;
     std::map<const FunctionInternal*, std::set<std::string> > local_mutexes_;
+
+    // Work vector sizes of generated function bodies, cf. set_codegen_sz_w
+    std::map<const FunctionInternal*, size_t> codegen_sz_w_;
 
     // Added functions
     struct FunctionMeta {
