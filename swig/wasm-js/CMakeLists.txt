@@ -285,7 +285,7 @@ endif()
 if(WITH_HPIPM)
   wasmjs_side_plugin(conic hpipm
     ${CMAKE_BINARY_DIR}/external_projects/lib/libhpipm.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libblasfeo.a)
+    ${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}blasfeo${CMAKE_STATIC_LIBRARY_SUFFIX})
 endif()
 
 # SuperSCS Conic plugin: registers OK but the SuperSCS sources call BLAS
