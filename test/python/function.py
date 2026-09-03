@@ -4089,7 +4089,7 @@ class Functiontests(casadiTestCase):
       
       lines = """
   casadi_int i;
-  casadi_real *rr, w0, *w1=w+2, w2, *w3=w+8, *w4=w+18, *w5=w+28, *w6=w+33, *w7=w+38, *w8=w+43, *w9=w+68;
+  casadi_real *rr, w0, *w1=w+1, w2, *w3=w+6, *w4=w+16, *w5=w+26, *w6=w+31, *w7=w+36, *w8=w+41, *w9=w+66;
   const casadi_real *cs, *wr3, *wr4, *wr6, *wr9;
   /* #0: @0 = 0 */
   w0 = 0.;
@@ -4174,10 +4174,16 @@ class Functiontests(casadiTestCase):
       code = open('f.c','r').read()
       
       self.assertEqual("wr" in code, enabled)
-      
+
+      # Elided copies are references into arg/constants: they must not reserve
+      # work vector memory (github #4386)
+      m = re.search(r"\*sz_w = (\d+);", code)
+      assert m is not None
+      self.assertEqual(int(m.group(1)), 86 if enabled else 1086)
+
       lines = """
   casadi_int i;
-  casadi_real *rr, w1, w2, w3, *w4=w+1003;
+  casadi_real *rr, w1, w2, w3, *w4=w+0;
   const casadi_real *cs, *wr0, *wr4;
   /* #0: @0 = input[1][0] */
   wr0 = arg[1] ? arg[1] : casadi_zeros;

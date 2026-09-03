@@ -1394,6 +1394,18 @@ namespace casadi {
 
     }
 
+    // Compute new work vector offsets, taking into account copy elision
+    std::vector<casadi_int> cg_off(workloc_.size()-1, 0);
+    casadi_int cg_wind = workloc_.front();
+    for (casadi_int i=0; i<workloc_.size()-1; ++i) {
+      casadi_int n=workloc_[i+1]-workloc_[i];
+      cg_off[i] = cg_wind;
+      if (n==0 || !needs_value[i]) continue;
+      if (!g.codegen_scalars && n==1) continue;
+      cg_wind += n;
+    }
+    g.set_codegen_sz_w(this, sz_w() - static_cast<size_t>(workloc_.back()-cg_wind));
+
     // Declare scalar work vector elements as local variables
     for (casadi_int i=0; i<workloc_.size()-1; ++i) {
       casadi_int n=workloc_[i+1]-workloc_[i];
@@ -1410,13 +1422,19 @@ namespace casadi {
       } else {
         if (needs_value[i]) {
           g.local("w" + g.format_padded(i), "casadi_real", "*");
-          g.init_local("w" + g.format_padded(i), "w+" + str(workloc_[i]));
+          g.init_local("w" + g.format_padded(i), "w+" + str(cg_off[i]));
         }
         if (needs_reference[i]) {
           g.local("wr" + g.format_padded(i), "const casadi_real", "*");
         }
       }
     }
+  }
+
+  size_t MXFunction::codegen_sz_w(const CodeGenerator& g) const {
+    size_t sz_w;
+    if (g.get_codegen_sz_w(this, sz_w)) return sz_w;
+    return this->sz_w();
   }
 
   void MXFunction::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const {
