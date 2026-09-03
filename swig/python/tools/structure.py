@@ -108,6 +108,18 @@ def vec(e):
 def correct_vector_indexing(x, i):
   return ca.reshape(x[i], i.shape)
 
+def nzcolumn(x):
+  # x.nz[:] inherits the orientation of x; force a column for concatenation
+  return ca.vec(x.nz[:])
+
+def applyCallableIndex(p,r):
+  # Apply a callable powerIndex entry to the sub-result it indexes
+  try:
+    return p(r)
+  except NotImplementedError:
+    if not isinstance(r,list): raise
+    return p(*r) # casadi's concatenations (vertcat, ...) are variadic, not list-taking
+
 # Decoraters
 
 def properGetitem(f):
@@ -188,6 +200,8 @@ class StructEntry:
 
   def traverseCanonicalIndex(self,nest=False,limit=1000):
     children = [[]] if (self.struct is None or limit==0) else self.struct.traverseCanonicalIndex(limit=limit-1)
+    # A sub-structure without entries has no children, but must stay addressable (as a zero-size leaf)
+    if len(children)==0: children = [[]]
     li = listindices(self.dims,nest)
     n = [[self.name]]
     if nest:
@@ -262,7 +276,7 @@ class StructEntry:
                     )
                  for i in range(s)]
         elif isinstance(p, callable):
-          r = p(self.traverseByPowerIndex(
+          r = applyCallableIndex(p,self.traverseByPowerIndex(
                 powerIndex[1:],
                 dims=dims,
                 canonicalIndex=canonicalIndex,
@@ -419,7 +433,7 @@ class Structure(object):
                      )
                  for i,s in enumerate(p)]
         elif isinstance(p, callable):
-          r = p(self.traverseByPowerIndex(
+          r = applyCallableIndex(p,self.traverseByPowerIndex(
                 powerIndex[1:],
                 canonicalIndex=canonicalIndex,
                 dispatcher=dispatcher.callableInner(),
@@ -533,7 +547,8 @@ class CasadiStructureDerivable:
     p.castmaster = True
     return p
 
-  def product(self,otherstruct,arg=0):
+  def product(self, otherstruct, arg=0):
+    # type: (Any, "DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
     (a,mtype) = self.argtype(arg)
 
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
@@ -696,14 +711,14 @@ class Prefixer:
     return {"struct": self.struct, "prefix": self.prefix,"castmaster": self.castmaster}
 
   def __getattr__(self,name):
-    # When attributes are not found, delegate to self()
-    # This allows for e.g. sin(x) and x+1 to work
-    if isinstance(self.struct.master,DataReference):
-      t = self.struct.master.a
-    else:
-      t = self.struct.master
-    if not(isinstance(t,list) or isinstance(t,dict) or isinstance(t,tuple)):
-      return getattr(t,name)
+    # When attributes are not found, delegate to the expression this prefix resolves to
+    # This allows for e.g. sin(x), x+1 and x.shape to work
+    if name in ("struct","prefix","castmaster"):
+      raise AttributeError(name) # Guard against recursion before __init__ ran
+    t = self.cast()
+    if isinstance(t,list) or isinstance(t,dict) or isinstance(t,tuple):
+      raise AttributeError("Cannot get attribute '%s': prefix %s resolves to a %s, not to a matrix." % (name,str(self.prefix),builtins.type(t).__name__))
+    return getattr(t,name)
 
   def cast(self):
     if self.castmaster:
@@ -790,7 +805,10 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     k = 0 # Global index counter
     for i in self.traverseCanonicalIndex():
       e = self.getStructEntryByCanonicalIndex(i)
-      sp = ca.Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
+      if e.isPrimitive():
+        sp = ca.Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
+      else:
+        sp = ca.Sparsity(0,1) # Entry with an empty sub-structure
       m = ca.DM(sp,list(range(k,k+sp.nnz())))
       k += sp.nnz()
       it = tuple(i)
@@ -803,7 +821,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
           hmap[a] = [m]
     self.size = k
     for k,v in hmap.items():
-      hmap[k] = ca.vertcat(*[i.nz[:] for i in v])
+      hmap[k] = ca.vertcat(*[nzcolumn(i) for i in v])
     self.map.update(hmap)
 
     class StructureGetter:
@@ -937,7 +955,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
       e = self.struct.getStructEntryByCanonicalIndex(i)
       s.append(ca.SX.sym("_".join(map(str,i)),e.sparsity.nnz()))
 
-    self.master = ca.vertcat(*[i.nz[:] for i in s])
+    self.master = ca.vertcat(*[nzcolumn(i) for i in s])
 
     for e in self.entries:
       if e.sym is not None:
@@ -952,7 +970,7 @@ class VertsplitStructure:
     if parent is None:  parent = self.master
 
     if isinstance(parent,DataReference):
-      parent = parent.a
+      parent = parent.v # The flat (size-by-1) view, not the user-facing matrix
 
     ks  = []
     its = []
@@ -1111,7 +1129,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
       raise Exception("Problem in MX vecNZcat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
 
     if self.dirty:
-      self.master_cached = ca.vertcat(*[ca.vec(i if i.is_dense() else i.nz[:]) for i in self.storage])
+      self.master_cached = ca.vertcat(*[ca.vec(i) if i.is_dense() else nzcolumn(i) for i in self.storage])
 
     return self.master_cached
 
@@ -1387,7 +1405,7 @@ class DataReferenceSquared(DataReference):
   def __init__(self,a,n):
     assert(a.is_dense())
     self.a = a
-    self.v = a
+    self.v = a.reshape((n*n,1))
     self.n = n
 
   def __setitem__(self,a,b):
@@ -1404,7 +1422,7 @@ class DataReferenceProduct(DataReference):
   def __init__(self,a,n,m):
     assert(a.is_dense())
     self.a = a
-    self.v = a
+    self.v = a.reshape((n*m,1))
     self.n = n
     self.m = m
 
