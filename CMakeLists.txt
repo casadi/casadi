@@ -1158,7 +1158,20 @@ function(libraries2flags libraries out)
   endforeach()
 endfunction()
 
-macro(create_import_library TARGET LIB_NAME) 
+# create_import_library(<target> <link_name> [<ordering_target>])
+#
+# <link_name> is the name the library should be linkable as; it need not match the file
+# behind <target>. OpenBLAS ships as lib${CASADI_TP_SHARED_PREFIX}openblas but is linked
+# as lapack, and blasfeo ships as lib${CASADI_TP_SHARED_PREFIX}blasfeo while generated
+# code links -lblasfeo.
+#
+# On MinGW cross builds the import library is generated from <target>'s DLL with
+# --dllname, so <link_name>.lib already points at the real file. Elsewhere, passing
+# <ordering_target> opts into the equivalent alias: a lib<link_name> symlink next to the
+# real library, created after <ordering_target>. It is opt-in rather than automatic
+# because the alias is installed alongside CasADi, where a name like liblapack.so could
+# shadow a system library.
+macro(create_import_library TARGET LIB_NAME)
   if(CMAKE_CROSS_COMPILING AND MINGW)
     # Get target in lowercase
     string(TOLOWER ${LIB_NAME} TARGET_LOWER)
@@ -1175,6 +1188,19 @@ macro(create_import_library TARGET LIB_NAME)
     install(FILES "${TARGET_LIB}"
       DESTINATION ${DEF_LIB_PREFIX}
     )
+  elseif(NOT WIN32 AND NOT "${ARGN}" STREQUAL "")
+    get_target_property(CIL_LOCATION ${TARGET} IMPORTED_LOCATION)
+    get_filename_component(CIL_DIR "${CIL_LOCATION}" DIRECTORY)
+    get_filename_component(CIL_REAL "${CIL_LOCATION}" NAME)
+    get_filename_component(CIL_SUFFIX "${CIL_REAL}" EXT)
+    set(CIL_ALIAS "${CMAKE_SHARED_LIBRARY_PREFIX}${LIB_NAME}${CIL_SUFFIX}")
+    if(NOT CIL_REAL STREQUAL CIL_ALIAS)
+      add_custom_target(create_link_library_${LIB_NAME} ALL
+        COMMAND ${CMAKE_COMMAND} -E remove -f "${CIL_DIR}/${CIL_ALIAS}"
+        COMMAND ${CMAKE_COMMAND} -E create_symlink "${CIL_REAL}" "${CIL_DIR}/${CIL_ALIAS}"
+        COMMENT "Aliasing ${CIL_REAL} as ${CIL_ALIAS}")
+      add_dependencies(create_link_library_${LIB_NAME} ${ARGN})
+    endif()
   endif()
 endmacro()
 
@@ -1556,9 +1582,9 @@ if(WITH_BLASFEO)
       GIT_TAG ${BUILD_BLASFEO_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
-      # GENERIC lib4 kernels over-read dvec/dmat tails by up to one block;
-      # over-allocate a guard so the read stays in-bounds (crashes on macOS).
-      PATCH_COMMAND git -C <SOURCE_DIR> apply --ignore-whitespace ${CMAKE_CURRENT_SOURCE_DIR}/cmake/blasfeo_alloc_guard.patch || echo "blasfeo_alloc_guard.patch already applied or failed"
+      # Guards the GENERIC lib4 kernel over-reads and renames the library away from
+      # the shared libblasfeo SONAME (casadi/casadi#4395).
+      PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DCASADI_TP_SHARED_PREFIX=${CASADI_TP_SHARED_PREFIX} -DALLOC_GUARD_PATCH=${CMAKE_CURRENT_SOURCE_DIR}/cmake/blasfeo_alloc_guard.patch -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_blasfeo.cmake
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${C_FLAGS} -DEXT_DEP=OFF -DTARGET=GENERIC -DBUILD_SHARED_LIBS=${TP_BUILD_SHARED} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     set(BLASFEO_PATH "${CMAKE_BINARY_DIR}/external_projects")
@@ -1568,10 +1594,14 @@ if(WITH_BLASFEO)
     add_dependencies(blasfeo blasfeo-external)
     set_target_properties(blasfeo PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${TP_LIB_SUFFIX}"
-      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}blasfeo${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}blasfeo${TP_LIB_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}blasfeo${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
-    create_import_library(blasfeo blasfeo)
+    # Generated code links -lblasfeo (test/python/{nlp,ocp,conic,function}.py pass
+    # extralibs=[...,"blasfeo"]), so stay linkable under the original name. This does not
+    # reintroduce the collision: -l and .lib resolve by file name, but what the generated
+    # binary records is the real SONAME / --dllname, i.e. the casadi-tp- one.
+    create_import_library(blasfeo blasfeo blasfeo-external)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/"
       DESTINATION "${INCLUDE_PREFIX}"
@@ -1602,7 +1632,7 @@ if(WITH_HPIPM)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DMARCH_NATIVE=OFF ${HPIPM_FLAGS} -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=${TP_BUILD_SHARED} -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DMARCH_NATIVE=OFF ${HPIPM_FLAGS} -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=${TP_BUILD_SHARED} -DBLASFEO_PATH=${BLASFEO_PATH} -DHPIPM_FIND_BLASFEO=ON -DCMAKE_PREFIX_PATH=${BLASFEO_PATH} -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     add_library(hpipm ${TP_IMPORT_KIND} IMPORTED)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     add_dependencies(hpipm hpipm-external)
