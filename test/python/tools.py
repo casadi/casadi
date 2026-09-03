@@ -29,13 +29,12 @@ import numpy
 from numpy import nan, int32, int64
 import unittest
 from types import *
-from helpers import casadiTestCase, known_bug
+from helpers import casadiTestCase
 from casadi.tools import *
 import sys
 
 class Toolstests(casadiTestCase):
 
-  @known_bug()  # Currently failing
   def test_structure(self):
 
 
@@ -92,7 +91,7 @@ class Toolstests(casadiTestCase):
     s = struct_symSX(['x','y','z'])
     self.assertEqual(s.size,3)
     self.assertEqual(s[ca.vertcat,['x','y']].shape[0],2)
-    self.assertTrue(isinstance(s[list,ca.vertcat,['x','y']],list))
+    self.assertTrue(isinstance(s[ca.vertsplit,ca.vertcat,['x','y']],list))
 
     s = struct_symSX([entry('x',repeat=5),entry('y',repeat=6),entry('z')])
     self.assertEqual(s.size,12)
@@ -154,13 +153,13 @@ class Toolstests(casadiTestCase):
     num = S(0)
     num["P"] = ca.DM([[1,2,3],[4,5,6],[7,8,9]])
     self.checkarray(num["P",index["x"],index["y"]],ca.DM([2]))
-    self.checkarray(num["P",index["x"],:],ca.DM([1,2,3]))
+    self.checkarray(num["P",index["x"],:],ca.DM([1,2,3]).T)
     self.checkarray(num["P",:,index["y"]],ca.DM([2,5,8]))
     self.checkarray(num["P",:,:],ca.DM([[1,2,3],[4,5,6],[7,8,9]]))
 
     self.checkarray(num["P",indexf[["x","y"]],indexf[["z","x"]]],ca.DM([[3,1],[6,4]]))
 
-    self.checkarray(num["P",index[list,ca.vertcat,["x","y"]],index[list,ca.vertcat,["z","x"]]],ca.DM([[3,1],[6,4]]))
+    self.checkarray(num["P",index[ca.vertcat,["x","y"]],index[ca.vertcat,["z","x"]]],ca.DM([[3,1],[6,4]]))
 
     S = struct_symSX([entry("P",shapestruct=s0)])
 
@@ -189,7 +188,7 @@ class Toolstests(casadiTestCase):
 
     self.checkarray(num["P",:,indexf[["z","x"]]],ca.DM([[3,1],[6,4],[9,7]]))
 
-    self.checkarray(num["P",:,index[list,ca.vertcat,["z","x"]]],ca.DM([[3,1],[6,4],[9,7]]))
+    self.checkarray(num["P",:,index[ca.vertcat,["z","x"]]],ca.DM([[3,1],[6,4],[9,7]]))
 
     S = struct_symSX([entry("P",shapestruct=s0)])
 
@@ -293,7 +292,7 @@ class Toolstests(casadiTestCase):
       ft_in = [0]*ft.n_in()  # type: list
       for i in range(ft.n_in()):
         ft_in[i]=numpy.random.rand(*ft.size_in(i))
-      ft_out = ft(ft_in)
+      ft_out = ft.call(ft_in)
       self.checkarray(ft_out[0],ca.DM.zeros(*ft.size_out(0)))
 
     is_equalV(V["x"],x)
@@ -311,7 +310,7 @@ class Toolstests(casadiTestCase):
       ft_in = [0]*ft.n_in()  # type: list
       for i in range(ft.n_in()):
         ft_in[i]=numpy.random.rand(*ft.size_in(i))
-      ft_out = ft(ft_in)
+      ft_out = ft.call(ft_in)
       self.checkarray(ft_out[0],ca.DM.zeros(*ft.size_out(0)))
 
     is_equalV(V["y",0],abc)
@@ -601,7 +600,6 @@ class Toolstests(casadiTestCase):
 
     self.checkarray(b["a",ca.vec],ca.DM(list(range(15))))
 
-  @unittest.skipIf(sys.version_info >= (3, 0),"too lazy to fix now")
   def test_pickling(self):
     import pickle
 
@@ -771,7 +769,6 @@ class Toolstests(casadiTestCase):
 
     self.checkarray(a,b)
 
-  @known_bug()  # Currently failing
   def test_jacobian(self):
     states = struct_symSX(["x","y"])
     controls = struct_symSX(["u","v","w"])
@@ -792,7 +789,7 @@ class Toolstests(casadiTestCase):
 
       f_in[0]=ca.DM(f.sparsity_in(0),list(range(1,7)))
 
-      f_out = f(f_in)
+      f_out = f.call(f_in)
 
       self.checkarray(f_out[0],ca.DM([3]))
       self.checkarray(f_out[1],ca.DM([1,3,5]).T)
@@ -825,6 +822,115 @@ class Toolstests(casadiTestCase):
 
     self.assertTrue(u[:, :].shape,(M, N))
     
+  def test_nested_row_vector(self):
+    self.message("nested structure with a row-vector entry")
+    # github.com/casadi/casadi/issues/4399 and issues/2484
+    for maker in [struct_symSX,struct_symMX]:
+      inner = maker([entry("A",shape=(2,2)),entry("B",shape=(1,2)),entry("C",shape=(3,1))])
+      outer = maker([entry("x",shape=(2,1)),entry("Inner",struct=inner),entry("z")])
+      self.assertEqual(outer.size,2+4+2+3+1)
+      self.assertEqual(outer.labels()[6],"[Inner,B,0]")
+      self.checkarray(outer.f["Inner"],[2,3,4,5,6,7,8,9,10])
+
+    num = struct_symSX([entry("x",shape=(2,1)),entry("Inner",struct=struct_symSX([entry("A",shape=(2,2)),entry("B",shape=(1,2))]))])(0)
+    num["x"] = [1,2]
+    num["Inner","A"] = ca.DM([[3,5],[4,6]])
+    num["Inner","B"] = ca.DM([[7,8]])
+    self.checkarray(num.cat,ca.DM(list(range(1,9))))
+    self.checkarray(num["Inner","B"],ca.DM([[7,8]]))
+    self.checkarray(num["Inner"],ca.DM([3,4,5,6,7,8]))
+
+  def test_prefix_shape(self):
+    self.message("shape of a fully resolved prefix")
+    # github.com/casadi/casadi/issues/2147 and issues/2146
+    s = struct_symMX([entry("x",shape=(2,3)),entry("u",shape=(4,5)),entry("v",shape=(1,5))])
+    self.assertEqual(s.prefix["x"].shape,(2,3))
+    self.assertEqual(s.prefix["u"].shape,(4,5))
+    self.assertEqual(s.prefix["v"].shape,(1,5))
+    self.assertEqual(s.prefix["x"][:,:].shape,(2,3))
+    self.assertEqual(s.shape,(s.size,1))
+
+    # A prefix that does not resolve to a single matrix has no matrix attributes
+    r = struct_symMX([entry("x",repeat=3,shape=(2,1))])
+    with self.assertRaises(AttributeError):
+      r.prefix["x"].shape
+
+    # A prefix of a repeated view keeps the shape of the matrix it views
+    d = struct(["x","y","z"]).repeated(ca.DM.zeros(3,12))
+    self.assertEqual(d.shape,(3,12))
+
+  def test_empty_substructure(self):
+    self.message("entry with a structure that holds no entries")
+    # github.com/casadi/casadi/issues/1670
+    empty = struct_symSX([])
+    V = struct_symMX([entry("XA",repeat=[3,2],struct=empty),entry("y",shape=2)])
+    self.assertEqual(V.size,2)
+    XA = V["XA"]
+    self.assertEqual(len(XA),3)
+    self.assertEqual(len(XA[0]),2)
+    self.assertEqual(XA[0][0].shape,(0,1))
+    self.assertEqual(V["XA",1,1].shape,(0,1))
+    self.checkarray(V["y"].shape,(2,1))
+
+    # nesting an empty structure deeper is fine too
+    outer = struct_symSX([entry("I",struct=struct_symSX([entry("E",struct=empty)])),entry("q")])
+    self.assertEqual(outer.size,1)
+    self.assertEqual(outer["I","E"].shape,(0,1))
+
+  def test_datareference_mx(self):
+    self.message("repeated/squared/product views on an MX")
+    # github.com/casadi/casadi/issues/3365
+    states = struct(["x","y"])
+    controls = struct(["a","b","c"])
+    num = ca.DM(numpy.arange(8).reshape(4,2).T)
+    square = ca.DM(numpy.arange(4).reshape(2,2))
+    rect = ca.DM(numpy.arange(6).reshape(3,2).T)
+
+    m = ca.MX.sym("m",2,4)
+    rep = states.repeated(m)
+    self.assertEqual(rep.shape,(2,4))
+    f = ca.Function("f",[m],[rep[k,n] for k in range(4) for n in ["x","y"]])
+    ref = states.repeated(num)
+    self.checkarray(ca.vertcat(*f.call([num])),ca.vertcat(*[ref[k,n] for k in range(4) for n in ["x","y"]]))
+
+    q = ca.MX.sym("q",2,2)
+    sq = states.squared(q)
+    self.assertEqual(sq.shape,(2,2))
+    f = ca.Function("f",[q],[sq[i,j] for i in ["x","y"] for j in ["x","y"]])
+    ref = states.squared(square)
+    self.checkarray(ca.vertcat(*f.call([square])),ca.vertcat(*[ref[i,j] for i in ["x","y"] for j in ["x","y"]]))
+
+    p = ca.MX.sym("p",2,3)
+    pr = states.product(controls,p)
+    self.assertEqual(pr.shape,(2,3))
+    f = ca.Function("f",[p],[pr[i,j] for i in ["x","y"] for j in ["a","b","c"]])
+    ref = states.product(controls,rect)
+    self.checkarray(ca.vertcat(*f.call([rect])),ca.vertcat(*[ref[i,j] for i in ["x","y"] for j in ["a","b","c"]]))
+
+    r = ca.MX.sym("r",2,4)
+    sr = states.squared_repeated(r)
+    f = ca.Function("f",[r],[sr[k,i,j] for k in range(2) for i in ["x","y"] for j in ["x","y"]])
+    ref = states.squared_repeated(num)
+    self.checkarray(ca.vertcat(*f.call([num])),ca.vertcat(*[ref[k,i,j] for k in range(2) for i in ["x","y"] for j in ["x","y"]]))
+
+  def test_callable_powerindex(self):
+    self.message("callable in a powerIndex")
+    # casadi's concatenations are variadic; a powerIndex callable gets the list
+    s = struct_symSX(["x","y","z"])
+    self.assertEqual(s[ca.vertcat,["x","y"]].shape,(2,1))
+    self.assertEqual(s[ca.horzcat,["x","y"]].shape,(1,2))
+    self.checkarray(s.f[["z","x"]],[2,0])
+
+  def test_entry_is_a_copy(self):
+    self.message("indexing a struct yields a copy, like indexing a matrix does")
+    # github.com/casadi/casadi/issues/2296
+    s = struct_symMX([entry("u",shape=(2,10))])
+    v = s(0)
+    v["u"][0,0] = 42            # operates on a copy, just like ca.DM.zeros(2,2)[:,:][0,0] = 42
+    self.checkarray(v["u",0,0],ca.DM(0))
+    v["u",0,0] = 42             # the powerIndex is the way to write into the struct
+    self.checkarray(v["u",0,0],ca.DM(42))
+
   def test_external_transform(self):
     if sys.platform == 'darwin':
         print("regression, skipping")
