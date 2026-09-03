@@ -3086,10 +3086,10 @@ namespace std {
 // malloc+memcpy for the return path).  The casadi_typemaps version
 // would route through casadi::from_ref(string) returning GUESTOBJECT*,
 // which doesn't match our typed ABI.
-%casadi_typemaps(L_STR, "str", "str", "string", PREC_STRING, std::string)
+%casadi_typemaps(L_STR, "builtins.str", "builtins.str", "string", PREC_STRING, std::string)
 #endif
-%casadi_template_vec(LL L_STR LR, "Sequence[str]", "list[str]", "string[]", PREC_VECTOR, StringVector, std::string)
-%casadi_template(LL LL L_STR LR LR, "Sequence[Sequence[str]]", "list[list[str]]", "string[][]", PREC_VECTOR, std::vector<std::vector<std::string> >)
+%casadi_template_vec(LL L_STR LR, "Sequence[builtins.str]", "list[builtins.str]", "string[]", PREC_VECTOR, StringVector, std::string)
+%casadi_template(LL LL L_STR LR LR, "Sequence[Sequence[builtins.str]]", "list[list[builtins.str]]", "string[][]", PREC_VECTOR, std::vector<std::vector<std::string> >)
 
 /* -------- PEP-484 stub aliases and preamble.  Active with -stubs. --
  * Each %stub_alias_in(NAME, TYPES) emits `_NAME = TYPES` into the
@@ -3103,11 +3103,17 @@ namespace std {
 #ifdef SWIG_STUBS_ENABLED
 
 %insert("stubs_preamble") %{
+# `str` is also a method name on DM/SX/Opti/...; inside those class bodies a
+# bare `str` annotation resolves to the method, so type tokens use builtins.str.
+import builtins
 import numpy as np
 from numpy.typing import NDArray
 from collections.abc import Callable
 from typing import Protocol, runtime_checkable
 _T = TypeVar("_T", "DM", "SX", "MX")
+# NZproxy is parameterised with Self, so it needs an unconstrained TypeVar:
+# a value-constrained one only accepts its exact constraints.
+_TNZ = TypeVar("_TNZ")
 
 @runtime_checkable
 class _SupportsDM(Protocol):
@@ -3289,9 +3295,9 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
 %casadi_typemaps("Sparsity", "Sparsity", "Sparsity", "Sparsity", PREC_SPARSITY, casadi::Sparsity)
 %casadi_template_vec(LL "Sparsity" LR, "Sequence[Sparsity]", "list[Sparsity]", "Sparsity[]", PREC_SPARSITY, SparsityVector, casadi::Sparsity)
 %casadi_template(LL LL "Sparsity"  LR  LR, "Sequence[Sequence[Sparsity]]", "list[list[Sparsity]]", "Sparsity[][]", PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
-%casadi_template(LDICT("Sparsity"), "Mapping[str, Sparsity]", "dict[str, Sparsity]", "Record<string, Sparsity>", PREC_SPARSITY, std::map<std::string, casadi::Sparsity >)
-%casadi_template(LDICT(LL "Sparsity" LR), "Mapping[str, Sequence[Sparsity]]", "dict[str, list[Sparsity]]", "Record<string, Sparsity[]>", PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
-%casadi_template(LPAIR(LDICT("Sparsity"),"[" L_STR "]"), "tuple[Mapping[str, Sparsity], Sequence[str]]", "tuple[dict[str, Sparsity], list[str]]", "[Record<string, Sparsity>, string[]]", PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
+%casadi_template(LDICT("Sparsity"), "Mapping[builtins.str, Sparsity]", "dict[builtins.str, Sparsity]", "Record<string, Sparsity>", PREC_SPARSITY, std::map<std::string, casadi::Sparsity >)
+%casadi_template(LDICT(LL "Sparsity" LR), "Mapping[builtins.str, Sequence[Sparsity]]", "dict[builtins.str, list[Sparsity]]", "Record<string, Sparsity[]>", PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
+%casadi_template(LPAIR(LDICT("Sparsity"),"[" L_STR "]"), "tuple[Mapping[builtins.str, Sparsity], Sequence[builtins.str]]", "tuple[dict[builtins.str, Sparsity], list[builtins.str]]", "[Record<string, Sparsity>, string[]]", PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
 #ifndef SWIGWASMJS
 // wasm_js: bool / casadi_int handled by direct ctype/in/out typemaps
 // in Lib/wasm_js/wasm_js.swg; vector instantiations go through
@@ -3323,17 +3329,17 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
 %casadi_typemaps("DM", "DM", "DM", "DM", PREC_DM, casadi::Matrix<double>)
 %casadi_template_vec(LL "DM" LR, "Sequence[DM]", "list[DM]", "DM[]", PREC_DMVector, DMVector, casadi::Matrix<double>)
 %casadi_template(LL LL "DM" LR LR, "Sequence[Sequence[DM]]", "list[list[DM]]", "DM[][]", PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
-%casadi_template(LDICT("DM"), "Mapping[str, DM]", "dict[str, DM]", "Record<string, DM>", PREC_DM, std::map<std::string, casadi::Matrix<double> >)
+%casadi_template(LDICT("DM"), "Mapping[builtins.str, DM]", "dict[builtins.str, DM]", "Record<string, DM>", PREC_DM, std::map<std::string, casadi::Matrix<double> >)
 %casadi_typemaps("SXElem", "SXElem", "SXElem", "SXElem", PREC_SX, casadi::SXElem)
 %casadi_template(LL "SXElem" LR, "Sequence[SXElem]", "list[SXElem]", "SXElem[]", PREC_SXVector, std::vector<casadi::SXElem>)
 %casadi_typemaps("SX", "SX", "SX", "SX", PREC_SX, casadi::Matrix<casadi::SXElem>)
 %casadi_template_vec(LL "SX" LR, "Sequence[SX]", "list[SX]", "SX[]", PREC_SXVector, SXVector, casadi::Matrix<casadi::SXElem>)
 %casadi_template(LL LL "SX" LR LR, "Sequence[Sequence[SX]]", "list[list[SX]]", "SX[][]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElem> > >)
-%casadi_template(LDICT("SX"), "Mapping[str, SX]", "dict[str, SX]", "Record<string, SX>", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElem> >)
+%casadi_template(LDICT("SX"), "Mapping[builtins.str, SX]", "dict[builtins.str, SX]", "Record<string, SX>", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElem> >)
 %casadi_typemaps("MX", "MX", "MX", "MX", PREC_MX, casadi::MX)
 %casadi_template_vec(LL "MX" LR, "Sequence[MX]", "list[MX]", "MX[]", PREC_MXVector, MXVector, casadi::MX)
 %casadi_template(LL LL "MX" LR LR, "Sequence[Sequence[MX]]", "list[list[MX]]", "MX[][]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
-%casadi_template(LDICT("MX"), "Mapping[str, MX]", "dict[str, MX]", "Record<string, MX>", PREC_MX, std::map<std::string, casadi::MX>)
+%casadi_template(LDICT("MX"), "Mapping[builtins.str, MX]", "dict[builtins.str, MX]", "Record<string, MX>", PREC_MX, std::map<std::string, casadi::MX>)
 %casadi_template(LPAIR("MX","MX"), "tuple[MX, MX]", "tuple[MX, MX]", "[MX, MX]", PREC_MXVector, std::pair<casadi::MX, casadi::MX>)
 %casadi_typemaps("IM", "IM", "IM", "IM", PREC_IM, casadi::Matrix<casadi_int>)
 // Without CASADI_INT_TYPE, you get SwigValueWrapper
@@ -3345,8 +3351,8 @@ class ArrayInterfaceMX(ArrayInterface["MX"]):
 %casadi_typemaps("Function", "Function", "Function", "Function", PREC_FUNCTION, casadi::Function)
 %casadi_template_vec(LL "Function" LR, "Sequence[Function]", "list[Function]", "Function[]", PREC_FUNCTION, FunctionVector, casadi::Function)
 %casadi_template(LPAIR("Function","Function"), "tuple[Function, Function]", "tuple[Function, Function]", "[Function, Function]", PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
-%casadi_template(L_DICT, "Mapping[str, GenericType]", "dict[str, GenericType]", "Record<string, GenericType>", PREC_DICT, std::map<std::string, casadi::GenericType>)
-%casadi_template(LDICT(LL L_STR LR), "Mapping[str, Sequence[str]]", "dict[str, list[str]]", "Record<string, string[]>", PREC_DICT, std::map<std::string, std::vector<std::string> >)
+%casadi_template(L_DICT, "Mapping[builtins.str, GenericType]", "dict[builtins.str, GenericType]", "Record<string, GenericType>", PREC_DICT, std::map<std::string, casadi::GenericType>)
+%casadi_template(LDICT(LL L_STR LR), "Mapping[builtins.str, Sequence[builtins.str]]", "dict[builtins.str, list[builtins.str]]", "Record<string, string[]>", PREC_DICT, std::map<std::string, std::vector<std::string> >)
 
 
 %julia_convention_repair()
@@ -4028,18 +4034,18 @@ class NZproxy:
  * masks -- the _selftyped overload matches only when _T=MX, keeping
  * DM.nz / SX.nz narrow. */
 #ifdef SWIG_STUBS_ENABLED
-%stubcode %{class NZproxy(Generic[_T]):
+%stubcode %{class NZproxy(Generic[_TNZ]):
 %}
-%stub_method(__init__,    None, matrix: _T)
+%stub_method(__init__,    None, matrix: _TNZ)
 %stub_overload_method_selftyped(__getitem__, MX, "NZproxy[MX]", s: _MIndex | MX)
-%stub_overload_method(__getitem__, _T,  s: _MIndex)
+%stub_overload_method(__getitem__, _TNZ,  s: _MIndex)
 %stub_overload_method_selftyped(__setitem__, None, "NZproxy[MX]", s: _MIndex | MX, val: bool | int | float | MX | Sequence[bool | int | float])
-%stub_overload_method(__setitem__, None, s: _MIndex, val: bool | int | float | _T | Sequence[bool | int | float])
+%stub_overload_method(__setitem__, None, s: _MIndex, val: bool | int | float | _TNZ | Sequence[bool | int | float])
 %stub_method0(__len__,  int)
 %stub_method0(__iter__, Iterator[_T])
 #endif
 
-%define %matrix_helpers(Type)
+%define %matrix_helpers(Type, xIndex)
 %pythoncode %{
     @property
     def shape(self):
@@ -4083,8 +4089,8 @@ class NZproxy:
  * index set shared by DM/SX/MX.  MX additionally accepts MX as index
  * (see the MX %extend block below), registered there via a widening
  * overload so Self stays narrow. */
-%stub_overload_method(__getitem__, Self, s: _MIndex | tuple[_MIndex, _MIndex])
-%stub_overload_method(__setitem__, None, s: _MIndex | tuple[_MIndex, _MIndex], val: bool | int | float | DM | SX | MX | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any])
+%stub_method(__getitem__, Self, s: xIndex | tuple[xIndex, xIndex])
+%stub_method(__setitem__, None, s: xIndex | tuple[xIndex, xIndex], val: bool | int | float | DM | SX | MX | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any])
 %stub_method0(__iter__, %arg(Iterator[Self]))
 %enddef
 
@@ -4128,7 +4134,7 @@ class NZproxy:
 #endif // SWIGPYTHON
 
 #if defined(SWIGXML) || defined(SWIGWASMJS) || defined(SWIGJULIA)
-%define %matrix_helpers(Type)
+%define %matrix_helpers(Type, xIndex)
 %enddef
 #endif
 
@@ -4143,7 +4149,7 @@ class NZproxy:
   } // namespace casadi
 %}
 
-%define %matrix_helpers(Type)
+%define %matrix_helpers(Type, xIndex)
     // Get a submatrix (index-1)
     const Type paren(char rr) const {
       casadi_assert_dev(rr==':');
@@ -5265,7 +5271,7 @@ namespace casadi{
 #ifndef SWIGWASMJS
     void assign(const casadi::Matrix<double>&rhs) { (*$self)=rhs; }
 #endif
-    %matrix_helpers(casadi::Matrix<double>)
+    %matrix_helpers(casadi::Matrix<double>, _MIndex)
 
   }
 
@@ -5505,7 +5511,7 @@ except:
 
 namespace casadi {
 %extend Matrix<SXElem>{
-    %matrix_helpers(casadi::Matrix<casadi::SXElem>)
+    %matrix_helpers(casadi::Matrix<casadi::SXElem>, _MIndex)
 
   #ifdef SWIGPYTHON
   %python_array_wrappers(1001.0)
@@ -5528,14 +5534,12 @@ namespace casadi {
 %include <casadi/core/mx.hpp>
 
 %extend casadi::MX{
-  %matrix_helpers(casadi::MX)
+  %matrix_helpers(casadi::MX, %arg(_MIndex | MX))
   #ifdef SWIGPYTHON
   %python_array_wrappers(1002.0)
   /* MX is unique among CasadiMatrix types in accepting MX-valued
    * indices (runtime: MX_get / MX_set).  Additional overloads on top
    * of the DM-compatible ones from %matrix_helpers. */
-  %stub_overload_method(__getitem__, MX, s: MX | tuple[_MIndex | MX, _MIndex | MX])
-  %stub_overload_method(__setitem__, None, s: MX | tuple[_MIndex | MX, _MIndex | MX], val: bool | int | float | DM | SX | MX | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any])
   #endif //SWIGPYTHON
 };
 
@@ -5646,10 +5650,10 @@ namespace casadi{
   %stub_overload_method(__call__, DM, arg0: _DM, /, *args: _DM)
   %stub_overload_method(__call__, SX, arg0: _SX, /, *args: _SX)
   %stub_overload_method(__call__, MX, arg0: _MX, /, *args: _MX)
-  %stub_overload_method(__call__, %arg(dict[str, DM]), **kwargs: _DM)
-  %stub_overload_method(__call__, %arg(dict[str, SX]), **kwargs: _SX)
-  %stub_overload_method(__call__, %arg(dict[str, MX]), **kwargs: _MX)
-  %stub_overload_method(__call__, %arg(dict[str, DM | SX | MX]), **kwargs: bool | int | float | DM | SX | MX)
+  %stub_overload_method(__call__, %arg(dict[builtins.str, DM]), **kwargs: _DM)
+  %stub_overload_method(__call__, %arg(dict[builtins.str, SX]), **kwargs: _SX)
+  %stub_overload_method(__call__, %arg(dict[builtins.str, MX]), **kwargs: _MX)
+  %stub_overload_method(__call__, %arg(dict[builtins.str, DM | SX | MX]), **kwargs: bool | int | float | DM | SX | MX)
  }
 
 }
@@ -6406,12 +6410,12 @@ make_property(casadi::Opti, casadi_solver, Function);
         return ret
     %}
     /* Stubs for the three %pythoncode methods above. */
-    %stub_overload_method(variable, MX, n: int = ..., m: int = ..., attribute: str = ...)
-    %stub_overload_method(variable, MX, sp: Sparsity | DM, attribute: str = ...)
-    %stub_overload_method(variable, MX, symbol: MX | SX | DM, attribute: str = ...)
-    %stub_overload_method(parameter, MX, n: int = ..., m: int = ..., attribute: str = ...)
-    %stub_overload_method(parameter, MX, sp: Sparsity | DM, attribute: str = ...)
-    %stub_overload_method(parameter, MX, symbol: MX | SX | DM, attribute: str = ...)
+    %stub_overload_method(variable, MX, n: int = ..., m: int = ..., attribute: builtins.str = ...)
+    %stub_overload_method(variable, MX, sp: Sparsity | DM, attribute: builtins.str = ...)
+    %stub_overload_method(variable, MX, symbol: MX | SX | DM, attribute: builtins.str = ...)
+    %stub_overload_method(parameter, MX, n: int = ..., m: int = ..., attribute: builtins.str = ...)
+    %stub_overload_method(parameter, MX, sp: Sparsity | DM, attribute: builtins.str = ...)
+    %stub_overload_method(parameter, MX, symbol: MX | SX | DM, attribute: builtins.str = ...)
     /* subject_to(g[, linear_scale][, options]) -- the %pythoncode
      * above inspects args[1] to decide whether it's an options dict
      * or a linear_scale; the 3-arg form always has options last. */
