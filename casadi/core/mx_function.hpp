@@ -171,7 +171,9 @@ namespace casadi {
     /** \brief Work vector size of the generated code
 
         Smaller than sz_w() when codegen elided copies: those work vector
-        elements are references and take no room in 'w'. */
+        elements are references and take no room in 'w'.
+
+        \identifier{2k0} */
     size_t codegen_sz_w(const CodeGenerator& g) const override;
 
     /** \brief Serialize an object without type information

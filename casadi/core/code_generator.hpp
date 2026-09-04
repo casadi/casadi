@@ -820,12 +820,16 @@ namespace casadi {
     /** \brief Register the work vector size a function needs in generated code
 
         Called from codegen_body when the generated layout of the work vector
-        differs from the one used by numeric evaluation. */
+        differs from the one used by numeric evaluation.
+
+        \identifier{2k1} */
     void set_codegen_sz_w(const FunctionInternal* f, size_t sz_w);
 
     /** \brief Retrieve a work vector size registered by set_codegen_sz_w
 
-        Returns false if the function did not register one. */
+        Returns false if the function did not register one.
+
+        \identifier{2k2} */
     bool get_codegen_sz_w(const FunctionInternal* f, size_t& sz_w) const;
 
     /** Declare an array */
