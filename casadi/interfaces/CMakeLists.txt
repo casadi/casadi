@@ -35,6 +35,10 @@ if(WITH_KNITRO)
   add_subdirectory(knitro)
 endif()
 
+if(WITH_CONOPT)
+  add_subdirectory(conopt)
+endif()
+
 if(WITH_CPLEX)
   add_subdirectory(cplex)
 endif()

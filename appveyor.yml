@@ -11,6 +11,10 @@ configuration:
 - Debug
 - Release
 
+install:
+  - choco upgrade cmake -y --no-progress --version=3.16.5
+  - set PATH=C:\Program Files\CMake\bin;%PATH%
+
 build_script:
   - set arch= Win64
   - set bitness=64
