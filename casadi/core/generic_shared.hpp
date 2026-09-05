@@ -319,14 +319,6 @@ class CASADI_EXPORT WeakCache {
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 };
 
-// gcc-12 is overzealous about use-after-free warnings
-// <12 or >12 works fine
-#if __GNUC__
-#pragma GCC diagnostic push
-#if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ == 12)
-#pragma GCC diagnostic ignored "-Wuse-after-free"
-#endif
-#endif
 /**
  * Key is stored as a weakref
  * Value is stored as regular ref
@@ -341,13 +333,24 @@ class CASADI_EXPORT RevWeakCache {
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       // Add to cache
       const void* k = key.get();
-      pre_cache_.insert(std::make_pair(k, key));
-      cache_.insert(std::make_pair(k, f));
+      auto it = pre_cache_.find(k);
+
+      if (it == pre_cache_.end()) {
+        pre_cache_.emplace(k, key);
+        cache_.emplace(k, f);
+      } else if (it->second.get() != typename K::base_type(key).weak()->get()) {
+        // The address was recycled. Compare weak-reference identities without
+        // reading liveness, and replace both entries in place.
+        it->second = key;
+        cache_.find(k)->second = f;
+      }
+
       // Remove a lost reference, if any, to prevent uncontrolled growth
       for (auto it = pre_cache_.begin(); it!=pre_cache_.end(); ++it) {
         if (!it->second.alive()) {
+          const void* dead = it->first;
           pre_cache_.erase(it);
-          cache_.erase(it->first);
+          cache_.erase(dead);
           break; // just one dead reference is enough
         }
       }
@@ -394,10 +397,6 @@ class CASADI_EXPORT RevWeakCache {
     mutable std::mutex mtx_;
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 };
-
-#if __GNUC__
-#pragma GCC diagnostic pop
-#endif
 
 /**
  * Simple cache template for regular (non-weak) key-value pairs
