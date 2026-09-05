@@ -4050,7 +4050,33 @@ class Functiontests(casadiTestCase):
     ff = f.forward(1)
     #self.assertNotEqual(hash(ff),h) # does not pass on Windows, but this test looks unreliable anyway
     self.assertEqual(hash(f2a),hash(f2b))
-    
+
+  def test_cache_stale_entry(self):
+    # A dead cache entry used to block re-caching, such that the second code
+    # generation embedded two copies of adj1_B instead of reusing one
+    x = ca.MX.sym("x",2)
+    B = ca.Function('B',[x],[ca.vertcat(ca.sin(x[0])*x[1],ca.cos(x[1])+x[0])],['x'],['y'])
+
+    def gradient_code(fname,N=4):
+      z = ca.MX.sym("z",2)
+      s = z
+      for _ in range(N):
+        s = B(s)
+      A = ca.Function('A',[z],[ca.dot(s,s)])
+      g = A.factory('g',['i0'],['o0','grad:o0:i0'])
+      cg = ca.CodeGenerator(fname)
+      cg.add(g)
+      cg.generate()
+      return open(fname,'r').read()
+
+    # Builds B's adjoint and releases it again, leaving a dead cache entry on B
+    self.assertEqual(gradient_code('adj_cache1.c').count("/* adj1_B:"),1)
+
+    gc.collect()
+
+    # Same B: the single adjoint must be reused, not duplicated
+    self.assertEqual(gradient_code('adj_cache2.c').count("/* adj1_B:"),1)
+
   def test_copy_elision(self):
     import casadi as ca
     

@@ -247,7 +247,14 @@ class CASADI_EXPORT WeakCache {
       casadi::conditional_lock_guard<std::mutex> lock(mtx_, needs_lock);
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       // Add to cache
-      cache_.insert(std::make_pair(key, f));
+      auto it = cache_.find(key);
+
+      if (it == cache_.end()) {
+        cache_.emplace(key, f);
+      } else if (!it->second.alive()) {
+        it->second = f;
+      }
+
       // Remove a lost reference, if any, to prevent uncontrolled growth
       for (auto it = cache_.begin(); it!=cache_.end(); ++it) {
         if (!it->second.alive()) {
