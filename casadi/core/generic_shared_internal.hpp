@@ -116,7 +116,12 @@ namespace casadi {
     ~GenericWeakRefInternal() override;
 
     // Raw pointer to the cached object
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Liveness checks may race destruction; acquiring ownership still needs mutex_.
+    std::atomic<Internal*> raw_;
+#else
     Internal* raw_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
     mutable std::shared_ptr<std::mutex> mutex_;

@@ -156,7 +156,12 @@ namespace casadi {
 
   template<typename Shared, typename Internal>
   bool GenericWeakRef<Shared, Internal>::alive() const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Only observe liveness; this does not acquire ownership of the object.
+    return !is_null() && (*this)->raw_.load(std::memory_order_relaxed) != nullptr;
+#else
     return !is_null() && (*this)->raw_ != nullptr;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   }
 
   template<typename Shared, typename Internal>
@@ -209,7 +214,11 @@ namespace casadi {
   template<typename Shared, typename Internal>
   void GenericWeakRef<Shared, Internal>::kill() {
     casadi_assert_dev((*this)->raw_);
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    (*this)->raw_.store(nullptr, std::memory_order_relaxed);
+#else
     (*this)->raw_ = nullptr;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   }
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS

@@ -45,11 +45,15 @@ namespace casadi {
   }
 
   void WeakRefInternal::disp(std::ostream& stream, bool more) const {
-    if (raw_==nullptr) {
-      stream << "NULL";
-    } else {
-      raw_->disp(stream, more);
+    SharedObject shared;
+    {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      std::lock_guard<std::mutex> lock(*mutex_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+      shared.own(raw_);
     }
+    // Keep the object alive without holding the weak-reference mutex while displaying it.
+    shared.disp(stream, more);
   }
 
 #if __GNUC__
