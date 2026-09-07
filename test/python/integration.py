@@ -1069,6 +1069,24 @@ class Integrationtests(casadiTestCase):
       # xf:0.259754<=0, zf:0.26948<=0
 
   @requires_integrator('idas')
+  def test_constraints_idas_sensitivities(self):
+    self.message("IDAS constraints apply to primal states, not sensitivities")
+    x = ca.MX.sym("x", 2)
+    z = ca.MX.sym("z")
+    p = ca.MX.sym("p", 2)
+    I = ca.integrator("I", "idas",
+      {"x": x, "z": z, "p": p, "ode": -p*x, "alg": z+ca.sum1(x)}, 0, 1,
+      {"constraints": [2, 2, -2], "enable_reverse": False,
+       "abstol": 1e-11, "reltol": 1e-11})
+    result = I(x0=[1, 2], z0=-3, p=p)
+    y = ca.vertcat(result["xf"], result["zf"])
+    J = ca.Function("J", [p], [ca.jacobian(y, p)])
+    reference = ca.DM([[-np.exp(-1), 0], [0, -2*np.exp(-2)],
+                       [np.exp(-1), 2*np.exp(-2)]])
+    self.checkarray(reference, J([1, 2]), digits=7)
+    self.checkarray(reference, ca.Function.deserialize(J.serialize())([1, 2]), digits=7)
+
+  @requires_integrator('idas')
   @requires_nlpsol('ipopt')
   def test_reduce_index(self):
     

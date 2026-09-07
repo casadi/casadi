@@ -145,6 +145,13 @@ void IdasInterface::init(const Dict& opts) {
       "to correct 'init_xdot' for the augmented integrator.");
   }
 
+  // Leave forward sensitivity states unconstrained.
+  if (nfwd_ > 0 && !y_c_.empty() && y_c_.size() == nx1_ + nz1_) {
+    y_c_.insert(y_c_.begin() + nx1_, nx_ - nx1_, 0);
+    y_c_.resize(nx_ + nz_, 0);
+    opts_["constraints"] = y_c_;
+  }
+
   // Constraints
   casadi_assert(y_c_.size() == nx_+nz_ || y_c_.empty(),
     "Constraint vector if supplied, must be of length nx+nz, but got "
