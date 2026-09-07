@@ -74,7 +74,8 @@ const Options SundialsInterface::options_
       "Disable SUNDIALS internal warning messages"}},
     {"quad_err_con",
       {OT_BOOL,
-      "Should the quadratures affect the step size control"}},
+      "Should the quadratures affect the step size control "
+      "[default: true for CVODES adjoint sensitivities, false otherwise]"}},
     {"fsens_err_con",
       {OT_BOOL,
       "include the forward sensitivities in all error controls"}},
