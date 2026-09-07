@@ -22,7 +22,7 @@ endif()
 
 # Find the CONOPT library
 find_library(CONOPT_LIBRARY
-  NAMES conopt libconopt
+  NAMES conopt conopt4 libconopt
   HINTS "${CONOPT_DIR}/lib" "${CONOPT_DIR}/lib64" "${CONOPT_DIR}" "${CMAKE_PREFIX_PATH}/lib"
   DOC "CONOPT library")
 

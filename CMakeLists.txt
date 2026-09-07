@@ -1468,6 +1468,23 @@ if(WITH_WORHP AND WITH_MOCKUP_WORHP)
 endif()
 add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (requires gfortran, gomp).")
 
+if(WITH_CONOPT AND WITH_MOCKUP_CONOPT)
+  # Match the CONOPT 4 library name on Windows.
+  set(CONOPT_MOCKUP_NAME conopt)
+  if(WIN32)
+    set(CONOPT_MOCKUP_NAME conopt4)
+  endif()
+  add_library(conopt::conopt SHARED IMPORTED)
+  add_dependencies(conopt::conopt mockups-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/include")
+  set_target_properties(conopt::conopt PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/include"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}${CONOPT_MOCKUP_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}${CONOPT_MOCKUP_NAME}${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+endif()
+add_feature_info(conopt-interface WITH_CONOPT "Interface to the NLP solver CONOPT.")
+
 set(CMAKE_BLAS_CONFIG)
 
 if(WITH_LAPACK)
@@ -3096,18 +3113,6 @@ if(WITH_SELFCONTAINED)
   endforeach()
   install(FILES "${PROJECT_SOURCE_DIR}/LICENSE.txt" DESTINATION "${INCLUDE_PREFIX}/licenses/casadi/LICENSE")
 endif()
-
-if(WITH_CONOPT AND WITH_MOCKUP_CONOPT)
-  add_library(conopt::conopt SHARED IMPORTED)
-  add_dependencies(conopt::conopt mockups-external)
-  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/include")
-  set_target_properties(conopt::conopt PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/include"
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}conopt${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/conopt/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}conopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
-  )
-endif()
-add_feature_info(conopt-interface WITH_CONOPT "Interface to the NLP solver CONOPT.")
 
 ######################################################
 ##################### paths ##########################
