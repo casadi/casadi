@@ -1165,7 +1165,7 @@ jobs:
       - run: brew install octave
         if: "!contains(env.os, 'windows')"
       - run: |
-               C:\msys64\usr\bin\wget.exe https://ftpmirror.gnu.org/octave/windows/octave-7.3.0-w64.zip
+               C:\msys64\usr\bin\wget.exe https://mirrors.kernel.org/gnu/octave/windows/octave-7.3.0-w64.zip || C:\msys64\usr\bin\wget.exe https://ftp.gnu.org/gnu/octave/windows/octave-7.3.0-w64.zip
                unzip octave-7.3.0-w64.zip
         if: "contains(env.os, 'windows')"
       - run: |
