@@ -230,8 +230,8 @@ def solve_OCP(N: int, c=3):
     Xds = sol.value(2 / (tf - t0) * X @ D.T)
     ts = (tf - t0) / 2 * tau + 0.5 * (tf + t0)
 
-    # covector mapping principle (lagrange mult./quadrature weights)
-    adjoint = sol.value(nlp.dual(defect) / cs.repmat(wi.reshape(1, -1), nx, 1))
+    # covector mapping principle (-Lagrange multipliers / quadrature weights)
+    adjoint = -sol.value(nlp.dual(defect) / cs.repmat(wi.reshape(1, -1), nx, 1))
 
     # hamiltonian for the OCP
     hamiltonian = lag.map(N + 1, "serial")(Xs, Us) + cs.sum1(adjoint * Xds)
