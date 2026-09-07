@@ -32,6 +32,9 @@
 
 namespace casadi {
 
+  // CONOPT 4.39.2 accepts option names up to 20 characters.
+  static const size_t conopt_max_option_name = 20;
+
   extern "C" int CASADI_NLPSOL_CONOPT_EXPORT casadi_register_nlpsol_conopt(Nlpsol::Plugin* plugin) {
     plugin->creator = ConoptInterface::creator;
     plugin->name = "conopt";
@@ -75,6 +78,12 @@ namespace casadi {
       else if (op.first == "optfile") optfile_ = op.second.to_string();
       else if (op.first == "warm_start") warm_start_ = op.second.to_bool();
       else if (op.first == "debug") debug_ = op.second.to_bool();
+    }
+
+    for (auto&& op : opts_) {
+      casadi_assert(op.first.size() <= conopt_max_option_name,
+        "CONOPT option name '" + op.first + "' is " + str(op.first.size()) +
+        " characters; CONOPT accepts at most " + str(conopt_max_option_name) + ".");
     }
 
     Function gradf_fcn = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
@@ -257,6 +266,7 @@ namespace casadi {
     m->casadi_to_conopt_lb_row.resize(ng_);
     m->casadi_to_conopt_ub_row.assign(ng_, -1);
     m->hess_lam_g_.resize(ng_, 0.0);
+    m->row_const_.assign(ng_, 0.0);
     m->row_nnz.assign(ng_, 0);
     // Every CasADi row contributes at least one entry (range constraints add a
     // second), so ng_ is a guaranteed lower bound on the final size — reserving
@@ -268,8 +278,8 @@ namespace casadi {
     m->conopt_rhs.reserve(initial_row_reserve);
     if (has_linear_jac_) {
       m->const_jac_vals.resize(jacg_sp_.nnz(), 0.0);
-      m->linear_at_x0.resize(ng_, 0.0);
     }
+    m->linear_at_x0.resize(ng_, 0.0);
     if (has_linear_gradf_)
       m->gradf_const_vals.resize(gradf_sp_.nnz(), 0.0);
 
@@ -357,8 +367,14 @@ namespace casadi {
     m->cache_valid_jac = false;
     m->cached_f        = 0.0;
     m->nan_encountered = false;
+    m->modsta = ConoptModelStatus::Unset;
+    m->solsta = ConoptSolverStatus::Unset;
+    m->iter = 0;
+    m->return_status = "Unset";
 
     // Build the per-solve constraint expansion (splits range constraints into two rows)
+    std::fill(m->row_const_.begin(), m->row_const_.end(), 0.0);
+    m->obj_const_lin_ = 0.0;
     m->conopt_to_casadi.clear();
     m->casadi_to_conopt_ub_row.assign(ng_, -1);
     m->conopt_type.clear();
@@ -415,14 +431,21 @@ namespace casadi {
     casadi_assert(ng_expanded <= std::numeric_limits<int>::max(), "ng_expanded overflows int");
     m->ng_expanded = static_cast<int>(ng_expanded);
 
-    // Evaluate Jacobian at the initial point to obtain values for constant entries
-    if (has_linear_jac_) {
+    // Empty Jacobian rows also need their constant terms moved into the RHS.
+    bool has_affine_g = has_linear_jac_ ||
+        std::any_of(m->row_nnz.begin(), m->row_nnz.end(), [](int n) { return n == 0; });
+    if (has_affine_g) {
       m->arg[0] = m->d_nlp.z;
       m->arg[1] = m->d_nlp.p;
       m->res[0] = m->cached_g.data();
-      m->res[1] = m->const_jac_vals.data();
+      m->res[1] = has_linear_jac_ ? m->const_jac_vals.data() : nullptr;
       try {
-        calc_function(m, "nlp_jac_g");
+        if (calc_function(m, "nlp_jac_g")) {
+          m->success = false;
+          m->unified_return_status = SOLVER_RET_NAN;
+          m->return_status = "Initial evaluation failed";
+          return 0;
+        }
       } catch (std::exception& ex) {
         casadi::uerr() << "CONOPT: initial evaluation failed: " << ex.what() << std::endl;
         return 1;
@@ -432,13 +455,8 @@ namespace casadi {
       }
     }
 
-    // Adjust conopt_rhs for fully linear rows to absorb constant terms.
-    // CONOPT doesn't call FDEval for purely linear rows, since these are evaluated internally.
-    // As such, it is necessary to store and constant terms in the RHS of the constraint,
-    // e.g. x[9] - 3*x[6] + 133 = 0 → RHS must be -133.
-    // For mixed (linear+nonlinear) rows, CONOPT calls FDEval and
-    // gets the full function value including the constant, so no adjustment needed.
-    if (has_linear_jac_) {
+    // CONOPT evaluates affine rows internally; absorb their constants into the RHS.
+    if (has_affine_g) {
       const casadi_int* g_colind_c = jacg_sp_.colind();
       const casadi_int* g_row_c    = jacg_sp_.row();
 
@@ -456,6 +474,7 @@ namespace casadi {
         if (jacg_rowstart_[ci + 1] != jacg_rowstart_[ci]) continue;
         double constant = m->cached_g[ci] - m->linear_at_x0[ci];
         if (std::abs(constant) < 1e-14) continue;
+        m->row_const_[ci] = constant;
         int lb_row = m->casadi_to_conopt_lb_row[ci];
         m->conopt_rhs[lb_row - 1] -= constant;
         int ub_row = m->casadi_to_conopt_ub_row[ci];
@@ -472,7 +491,12 @@ namespace casadi {
       m->res[0] = &m->cached_f;
       m->res[1] = has_linear_gradf_ ? m->gradf_const_vals.data() : nullptr;
       try {
-        calc_function(m, "nlp_grad_f");
+        if (calc_function(m, "nlp_grad_f")) {
+          m->success = false;
+          m->unified_return_status = SOLVER_RET_NAN;
+          m->return_status = "Initial evaluation failed";
+          return 0;
+        }
       } catch (std::exception& ex) {
         casadi::uerr() << "CONOPT: initial evaluation failed: " << ex.what() << std::endl;
         return 1;
@@ -495,6 +519,14 @@ namespace casadi {
         m->obj_const_ = m->cached_f;
         COIDEF_OptDir(m->cntvect, 0);
       } else {
+        if (!has_nl_gradf) {
+          // CONOPT omits the affine objective's constant term; recover it at x0.
+          const casadi_int* f_row_c = gradf_sp_.row();
+          double lin_at_x0 = 0.0;
+          for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
+            lin_at_x0 += m->gradf_const_vals[k] * m->d_nlp.z[f_row_c[k]];
+          m->obj_const_lin_ = m->cached_f - lin_at_x0;
+        }
         // cntvect persists across solves, so explicitly reset OptDir in case a
         // prior solve on this instance (e.g. with different parameters) hit the
         // constant-objective branch above and left it at 0.
@@ -540,6 +572,9 @@ namespace casadi {
     COIDEF_NumNlNz(m->cntvect, static_cast<int>(num_nl_nz));
 
     int ret = COI_Solve(m->cntvect);
+
+    // Restore the affine objective's constant term (cb_status only saw grad'x).
+    m->d_nlp.objective += m->obj_const_lin_;
 
     // Restore constant objective value when CONOPT ran in feasibility mode.
     if (!std::isnan(m->obj_const_)) m->d_nlp.objective = m->obj_const_;
@@ -594,7 +629,10 @@ namespace casadi {
     }
 
     auto& opt = m->custom_options[NCALL];
-    std::strcpy(NAME, opt.first.c_str());
+    // NAME has a fixed-size buffer; init() validates the option-name length.
+    size_t name_len = std::min(opt.first.size(), conopt_max_option_name);
+    std::memcpy(NAME, opt.first.c_str(), name_len);
+    NAME[name_len] = '\0';
 
     if (opt.second.is_double()) {
         *RVAL = opt.second.to_double();
@@ -833,54 +871,32 @@ namespace casadi {
 
     const bool need_jac = (MODE != 1);
 
+    m->cache_valid_jac.store(false, std::memory_order_relaxed);
+    m->cache_valid.store(false, std::memory_order_relaxed);
     try {
         m->arg[0] = m->cached_x.data();
         m->arg[1] = m->d_nlp.p;
 
         m->res[0] = &m->cached_f;
-        m->res[1] = m->cached_grad_f.data();
-        self.calc_function(m, "nlp_grad_f");
-
-        // When MODE==1, only function values (G) are needed — skip Jacobian computation.
-        m->res[0] = m->cached_g.data();
-        m->res[1] = need_jac ? m->cached_jac_g.data() : nullptr;
-        self.calc_function(m, "nlp_jac_g");
-
-        // cache_valid_jac is stored before cache_valid (release).  The release on
-        // cache_valid orders both stores, so readers need only an acquire on cache_valid.
-        m->cache_valid_jac.store(need_jac, std::memory_order_relaxed);
-        m->cache_valid.store(true, std::memory_order_release);
+        m->res[1] = need_jac ? m->cached_grad_f.data() : nullptr;
+        int ret = self.calc_function(m, "nlp_grad_f");
+        if (!ret) {
+            m->res[0] = m->cached_g.data();
+            m->res[1] = need_jac ? m->cached_jac_g.data() : nullptr;
+            ret = self.calc_function(m, "nlp_jac_g");
+        }
+        if (!ret) {
+            // Publish the cache only after both evaluations succeed.
+            m->cache_valid_jac.store(need_jac, std::memory_order_relaxed);
+            m->cache_valid.store(true, std::memory_order_release);
+        }
     } catch (std::exception& ex) {
         casadi::uerr() << ex.what() << std::endl;
-        *ERRCNT = 1;
-        m->nan_encountered = true;
-        m->cache_valid_jac.store(false, std::memory_order_relaxed);
-        m->cache_valid.store(false, std::memory_order_relaxed);
     } catch (...) {
+    }
+    if (!m->cache_valid.load(std::memory_order_relaxed)) {
         *ERRCNT = 1;
         m->nan_encountered = true;
-        m->cache_valid_jac.store(false, std::memory_order_relaxed);
-        m->cache_valid.store(false, std::memory_order_relaxed);
-    }
-
-    // Detect silent NaN from CasADi (e.g. sqrt of negative number)
-    if (m->cache_valid.load(std::memory_order_relaxed)) {
-        bool has_nan = std::isnan(m->cached_f);
-        if (!has_nan) {
-            for (double v : m->cached_g) if (std::isnan(v)) { has_nan = true; break; }
-        }
-        if (!has_nan) {
-            for (double v : m->cached_grad_f) if (std::isnan(v)) { has_nan = true; break; }
-        }
-        if (!has_nan && need_jac) {
-            for (double v : m->cached_jac_g) if (std::isnan(v)) { has_nan = true; break; }
-        }
-        if (has_nan) {
-            *ERRCNT = 1;
-            m->nan_encountered = true;
-            m->cache_valid_jac.store(false, std::memory_order_relaxed);
-            m->cache_valid.store(false, std::memory_order_relaxed);
-        }
     }
     return 0;
   }
@@ -895,6 +911,12 @@ namespace casadi {
     // Acquire load: establishes happens-before with the release store in cb_fdevalini,
     // making all cache writes (including cached_jac_g and cache_valid_jac) visible here.
     if (!m->cache_valid.load(std::memory_order_acquire)) {
+        *ERRCNT = 1;
+        return 0;
+    }
+
+    if ((MODE == 2 || MODE == 3) &&
+        !m->cache_valid_jac.load(std::memory_order_relaxed)) {
         *ERRCNT = 1;
         return 0;
     }
@@ -938,12 +960,6 @@ namespace casadi {
             }
         }
         if (MODE == 2 || MODE == 3) {
-            // Guard against stale Jacobian: cache_valid_jac is false when cb_fdevalini
-            // was called with MODE==1 and skipped Jacobian computation.
-            if (!m->cache_valid_jac.load(std::memory_order_relaxed)) {
-                *ERRCNT = 1;
-                return 0;
-            }
             int base  = self.jacg_rowstart_[ci];
             int count = self.jacg_rowstart_[ci + 1] - self.jacg_rowstart_[ci];
             for (int k = 0; k < count; ++k) {
@@ -1017,7 +1033,10 @@ namespace casadi {
     m->res[0] = HSVL;
 
     try {
-        self.calc_function(m, "nlp_hess_l");
+        if (self.calc_function(m, "nlp_hess_l")) {
+            *NODRV = 1;
+            return 0;
+        }
         if (self.debug_) {
             casadi::uout() << "Hessian values (HSVL):";
             for (int i = 0; i < NHESS; ++i)
@@ -1104,10 +1123,9 @@ namespace casadi {
         casadi::uout() << "\n";
     }
 
-    // Constraint values: use the first CONOPT row for each CasADi constraint
-    // (both rows carry the same function value for range constraints)
+    // Use the first row of each constraint and restore constants absorbed into the RHS.
     for (casadi_int ci = 0; ci < m->self.ng_; ++ci)
-      m->d_nlp.z[NUMVAR + ci] = YVAL[m->casadi_to_conopt_lb_row[ci]];
+      m->d_nlp.z[NUMVAR + ci] = YVAL[m->casadi_to_conopt_lb_row[ci]] + m->row_const_[ci];
 
     // Variable marginals: CONOPT shadow prices = -CasADi lam_x
     for (int i = 0; i < NUMVAR; ++i)
