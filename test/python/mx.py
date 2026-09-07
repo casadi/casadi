@@ -1558,6 +1558,85 @@ class MXtests(casadiTestCase):
     f_out = f(f_in)
     self.assertTrue(f_out==2,"if_else")
 
+  def test_if_else_call_reverse_4387(self):
+    # Output conditions cannot be applied elementwise to input adjoints.
+    masks = ([0, 0], [1, 0], [0, 1], [1, 1])
+    for mask_value in masks:
+      with self.subTest(case="rectangular nonlinear", mask=mask_value):
+        x = ca.MX.sym("x", 3)
+        mask = ca.MX.sym("mask", 2)
+        f = ca.Function("f", [x],
+                        [ca.vertcat(ca.sumsqr(x), ca.sum1(ca.sin(x)))],
+                        {"never_inline": True})
+        z = ca.if_else(mask > 0, f(x), 0)
+        g = ca.Function("g", [x, mask], [ca.gradient(ca.sumsqr(z), x)])
+        value = np.array([1., 2., 3.])
+        expected = (mask_value[0] * 4 * np.dot(value, value) * value
+                    + mask_value[1] * 2 * np.sin(value).sum() * np.cos(value))
+        self.checkarray(g(value, mask_value), expected)
+
+    # Equal dimensions/sparsities still allow cross-component dependencies.
+    # Also exercise broadcasting to scalar inputs and sparse output masks.
+    nonboolean_masks = masks + ([-1, 0], [0, -2], [2, -3])
+    cases = [
+      ("square", ca.DM([[1, 1], [1, -1]]), ca.Sparsity.dense(2, 1), nonboolean_masks),
+      ("scalar input", ca.DM([1, 2]), ca.Sparsity.dense(2, 1), nonboolean_masks),
+      ("sparse mask", ca.DM([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
+       ca.Sparsity.triplet(3, 1, [0, 2], [0, 0]),
+       ([0, 0, 0], [1, 0, 0], [0, 0, 1], [1, 0, 1])),
+    ]
+    for name, a, sp, mask_values in cases:
+      for mask_value in mask_values:
+        for ndir in (1, 2):
+          with self.subTest(case=name, mask=mask_value, ndir=ndir):
+            x = ca.MX.sym("x", a.size2())
+            mask = ca.MX.sym("mask", sp)
+            f = ca.Function("f", [x], [ca.mtimes(a, x)], {"never_inline": True})
+            z = ca.if_else(mask, f(x), 0)
+            seeds = [ca.DM.ones(a.size1()), ca.DM(range(2, a.size1()+2))][:ndir]
+            adj = ca.reverse([z], [x], [[seed] for seed in seeds])
+            g = ca.Function("g", [x, mask], [ca.horzcat(*[d[0] for d in adj])])
+            expected = ca.horzcat(*[
+              ca.mtimes(a.T, (ca.DM(mask_value) != 0) * seed) for seed in seeds])
+            self.checkarray(g(ca.DM.ones(a.size2()), ca.project(ca.DM(mask_value), sp)),
+                            expected)
+
+    # Preserve NaN suppression when the whole call is inactive.
+    for scalar_mask, mask_value, expected in [
+        (True, 0, [0, 0, 0]),
+        (True, 1, [0.5, 1, 1]),
+        (False, [0, 0], [0, 0, 0]),
+        (False, [1, 0], [0.5, 0, 0]),
+    ]:
+      with self.subTest(case="singular derivative", scalar_mask=scalar_mask, mask=mask_value):
+        x = ca.MX.sym("x", 3)
+        mask = ca.MX.sym("mask", 1 if scalar_mask else 2)
+        f = ca.Function("f", [x], [ca.vertcat(ca.sqrt(x[0]), x[1]+x[2])],
+                        {"never_inline": True})
+        z = ca.if_else(mask, f(x), 0)
+        g = ca.Function("g", [x, mask], [ca.gradient(ca.sum1(z), x)])
+        # Keep sqrt's derivative singular only when that output is inactive.
+        active = mask_value if scalar_mask else mask_value[0]
+        result = g([1 if active else 0, 2, 3], mask_value)
+        self.assertTrue(np.isfinite(result.full()).all())
+        self.checkarray(result, ca.DM(expected))
+
+  @known_bug()
+  def test_if_else_reverse_partial_nan(self):
+    # Unlike #4387, this also fails without a Call node: the inactive sqrt
+    # derivative multiplies a zero seed by infinity inside reverse AD.
+    for inline in (False, True):
+      with self.subTest(inline=inline):
+        x = ca.MX.sym("x", 3)
+        mask = ca.MX.sym("mask", 2)
+        f = ca.Function("f", [x], [ca.vertcat(ca.sqrt(x[0]), x[1]+x[2])],
+                        {"always_inline": inline, "never_inline": not inline})
+        z = ca.if_else(mask, f(x), 0)
+        g = ca.Function("g", [x, mask], [ca.gradient(ca.sum1(z), x)])
+        result = g([0, 2, 3], [0, 1])
+        self.assertTrue(np.isfinite(result.full()).all())
+        self.checkarray(result, ca.DM([0, 1, 1]))
+
   def test_regression491(self):
     self.message("regression #491")
     u = ca.SX.sym("u")

@@ -140,6 +140,9 @@ namespace casadi {
     try {
       // Find a common conditional argument among the seeds, if any
       MX cond = common_cond(aseed);
+      // Output conditions cannot be applied elementwise to input sensitivities.
+      // Suppress all sensitivities only when every common condition is false.
+      if (!cond.is_empty() && !cond.is_scalar()) cond = mmax(cond != 0);
       // Nondifferentiated inputs and outputs
       std::vector<MX> arg(n_dep());
       for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
