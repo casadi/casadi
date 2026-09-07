@@ -82,9 +82,6 @@ void CvodesInterface::init(const Dict& opts) {
   // Initialize the base classes
   SundialsInterface::init(opts);
 
-  // Control the error of parameter sensitivities computed by backward quadratures.
-  if (nadj_ > 0 && opts.find("quad_err_con") == opts.end()) quad_err_con_ = true;
-
   // Default options
   std::string linear_multistep_method = "bdf";
   std::string nonlinear_solver_iteration = "newton";

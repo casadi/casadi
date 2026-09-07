@@ -1031,20 +1031,6 @@ class Integrationtests(casadiTestCase):
     print(stats["nsteps"])
     self.assertTrue(stats["nsteps"]>=int(0.5/1.1e-4))
 
-  @requires_integrator('cvodes')
-  def test_adjoint_quadrature_error_control(self):
-    self.message("Adjoint parameter quadratures participate in error control by default")
-    t = ca.SX.sym("t")
-    x = ca.SX.sym("x")
-    p = ca.SX.sym("p", 3)
-    dae = {"t": t, "x": x, "p": p,
-           "ode": p[0]*(1-t)+(p[1]+p[2])*t}
-    I = ca.integrator("I", "cvodes", dae, 0, [0, 1],
-      {"abstol": 1e-12, "reltol": 1e-12})
-    xf = I(x0=0, p=p)["xf"][0, -1]
-    J = ca.Function("J", [p], [ca.jacobian(xf, p)])
-    self.checkarray(ca.DM([[0.5, 0.5, 0.5]]), J([1, 1, 1]), digits=7)
-
   def test_adjoint_without_parameters(self):
     self.message("Adjoint sensitivities without parameter or control quadratures")
     x = ca.MX.sym("x", 3)
