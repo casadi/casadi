@@ -201,7 +201,7 @@ class NLPtests(casadiTestCase):
                          {"error_on_fail": False, "print_time": False})
       for solver in [solver, ca.Function.deserialize(solver.serialize())]:
         for value, lower, upper in [(5, -10, 10), (5, 0, 0), (0, 0, 0),
-                                     (5, 4, 6), (5, -ca.inf, ca.inf)]:
+                                     (5, 4, 6), (5, -inf, inf)]:
           with self.subTest(other=str(other), value=value, lower=lower, upper=upper):
             result = solver(x0=1, p=value,
                             lbg=[-10]*other.numel() + [lower],
@@ -218,8 +218,8 @@ class NLPtests(casadiTestCase):
     cases = [
       (ca.sqrt(x+p), x, 0),
       ((x-1)**2, ca.sqrt(x+p), 0),
-      (p*x, x, ca.inf),
-      ((x-1)**2, p*x, ca.inf),
+      (p*x, x, inf),
+      ((x-1)**2, p*x, inf),
       ((x-1)**2, p, float("nan")),
     ]
     for f, g, bad_p in cases:
