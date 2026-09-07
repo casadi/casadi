@@ -233,7 +233,8 @@ namespace casadi {
 
   template<>
   void CASADI_EXPORT SX::expand(const SX& ex2, SX& ww, SX& tt) {
-    casadi_assert_dev(ex2.is_scalar());
+    casadi_assert(ex2.is_scalar(),
+      "expand requires a scalar expression. Got " + ex2.dim() + " instead.");
     SXElem ex = ex2.scalar();
 
     // Terms, weights and indices of the nodes that are already expanded
