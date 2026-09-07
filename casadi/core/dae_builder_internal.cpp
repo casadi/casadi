@@ -3869,8 +3869,16 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     // When conditions are reformulated into continuous zero-crossing functions
     if (fmi_major_ == 1 && name.rfind("$whenCondition", 0) == 0) continue;
 
+    // Time always occupies internal index 0, regardless of its position in the FMU.
+    // Allow an explicit independent variable to replace the automatically added
+    // placeholder, including when their names match. Processing this declaration
+    // records its original FMU position so convert_index can translate FMI indices.
+    auto existing = varind_.find(name);
+    bool replaces_time = existing != varind_.end() && existing->second == 0
+      && orig_time_index_ == -1
+      && vnode.attribute<std::string>("causality", "") == "independent";
     // Ignore duplicate variables
-    if (varind_.find(name) != varind_.end()) {
+    if (existing != varind_.end() && !replaces_time) {
       casadi_warning("Duplicate variable '" + name + "' ignored");
       continue;
     }

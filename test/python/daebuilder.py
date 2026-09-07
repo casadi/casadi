@@ -148,9 +148,48 @@ class Daebuildertests(casadiTestCase):
     self.checkfunction(f,f_ref,inputs=test_point,digits=4,hessian=False,evals=1)
     print(f.stats())
       
+  def test_fmi2_independent_var_order(self):
+    # Check FMI index conversion without a platform-specific FMU binary (#4270).
+    import tempfile
+    import xml.etree.ElementTree as ET
+    for time_name in ["time", "t"]:
+      for time_position in [None, 0, 2, 4]:
+        with self.subTest(time_name=time_name, time_position=time_position):
+          names = ["u", "x", "dx", "y"]
+          if time_position is not None:
+            names.insert(time_position, time_name)
+          root = ET.Element("fmiModelDescription", fmiVersion="2.0",
+                            modelName="test", guid="test", numberOfEventIndicators="0")
+          ET.SubElement(root, "ModelExchange", modelIdentifier="test")
+          variables = ET.SubElement(root, "ModelVariables")
+          for name in names:
+            causality = {"u": "input", "y": "output", time_name: "independent"}.get(name, "local")
+            node = ET.SubElement(variables, "ScalarVariable", name=name,
+                                valueReference=str(names.index(name)),
+                                causality=causality, variability="continuous")
+            attrs = {}
+            if name == "dx":
+              attrs["derivative"] = str(names.index("x")+1)
+            elif name in ["u", "x"]:
+              attrs["start"] = "0"
+            ET.SubElement(node, "Real", **attrs)
+          structure = ET.SubElement(root, "ModelStructure")
+          for group, name in [("Outputs", "y"), ("Derivatives", "dx")]:
+            node = ET.SubElement(structure, group)
+            ET.SubElement(node, "Unknown", index=str(names.index(name)+1),
+                          dependencies=str(names.index("x")+1))
+          with tempfile.TemporaryDirectory() as directory:
+            ET.ElementTree(root).write(os.path.join(directory, "modelDescription.xml"))
+            dae = ca.DaeBuilder("test", directory)
+            self.assertEqual(dae.x(), ["x"])
+            self.assertEqual(dae.u(), ["u"])
+            self.assertEqual(dae.y(), ["y"])
+            self.assertEqual(dae.w(), ["dx", "y"])
+            self.assertEqual(dae.all("t"), [] if time_position is None else [time_name])
+            self.assertEqual(dae.der(), ["dx"])
+
   @memory_heavy() # FMU has a memleak
   def test_indendent_var(self):
-    return
     if os.name!="posix": return
     if sys.platform=="darwin": return # Was produced on linux
     fmu_file = "../data/car_t_fmu2.fmu"
