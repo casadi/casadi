@@ -1,5 +1,7 @@
 # Windows release signature audit
 
+See the [verified 3.8.0 CI findings](findings-3.8.0.md) for the initial results.
+
 For [issue #4305](https://github.com/casadi/casadi/issues/4305), run the
 **Windows signature audit** workflow with a stable release tag (default: 3.8.0).
 It downloads the published CPython 3.11+ x64 wheel and MATLAB x64 ZIP from
