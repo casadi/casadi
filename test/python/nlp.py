@@ -171,6 +171,8 @@ class NLPtests(casadiTestCase):
     x = ca.SX.sym("x")
 
     for Solver, solver_options, aux_options in solvers:
+      if Solver == "bonmin":
+        solver_options = dict(solver_options, calc_g=True)
       self.message("affine objective with a constant term: " + str(Solver))
       solver = ca.nlpsol("mysolver", Solver, {'x': x, 'f': 2*x + 7}, solver_options)
       solver_out = solver(x0=0, lbx=-10, ubx=10)
