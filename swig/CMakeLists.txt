@@ -35,9 +35,13 @@ endif()
 #include(UseSWIG)
 include(${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
 
+# Isolate CasADi wrappers from unrelated SWIG modules (issues #1477 and #4403).
+# SWIG_TYPE_TABLE is consumed when compiling the generated C/C++ wrapper,
+# not when running SWIG. Apply it to all wrappers, including extending_casadi.
+add_definitions(-DSWIG_TYPE_TABLE=casadi)
+
 # Set SWIG flags
 set(CMAKE_SWIG_FLAGS $ENV{EXTRA_SWIG_FLAGS})
-set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-fvirtual")
 #set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-fcompact")
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
