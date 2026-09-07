@@ -1,0 +1,120 @@
+name: Windows signature audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Published CasADi release tag (for example 3.8.0)
+        default: '3.8.0'
+        required: true
+        type: string
+  push:
+    branches: [codex/4305-windows-audit]
+    paths:
+      - .github/workflows/windows-signature-audit.yml
+      - misc/windows-signature-audit/**
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    env:
+      CASADI_RELEASE: ${{ inputs.release || '3.8.0' }}
+      GH_TOKEN: ${{ github.token }}
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - name: Check audit script syntax
+        shell: pwsh
+        run: |
+          $errors = $null
+          $tokens = $null
+          [System.Management.Automation.Language.Parser]::ParseFile("$PWD/misc/windows-signature-audit/audit.ps1", [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors.Count) { $errors | Format-List; throw 'PowerShell syntax errors' }
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - uses: jgillis/msvc-dev-cmd@codex/bump-runtime-node24
+      - uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2024b
+      - name: Download and identify published artifacts
+        shell: pwsh
+        run: |
+          if ($env:CASADI_RELEASE -notmatch '^\d+\.\d+\.\d+$') { throw 'Expected a stable release tag' }
+          New-Item -ItemType Directory downloads, reports | Out-Null
+          gh release download $env:CASADI_RELEASE --repo casadi/casadi --dir downloads --pattern "casadi-$env:CASADI_RELEASE-cp311-abi3-win_amd64.whl" --pattern "casadi-$env:CASADI_RELEASE-windows64-matlab2018b.zip"
+          if ($LASTEXITCODE) { throw 'Release download failed' }
+          Get-ChildItem downloads -File | Get-FileHash -Algorithm SHA256 | Select-Object Path, Hash | ConvertTo-Json -AsArray | Set-Content reports/artifacts.json
+          $wheel = (Get-ChildItem downloads/*.whl).FullName
+          python -m pip install --report reports/pip-install.json $wheel
+          if ($LASTEXITCODE) { throw 'Wheel installation failed' }
+          Expand-Archive (Get-ChildItem downloads/*.zip).FullName -DestinationPath matlab-package
+          $package = python -c "import importlib.util; print(next(iter(importlib.util.find_spec('casadi').submodule_search_locations)))"
+          if ($LASTEXITCODE) { throw 'Cannot locate installed wheel' }
+          "CASADI_PACKAGE=$package" >> $env:GITHUB_ENV
+      - name: Inventory signatures and runner policy state
+        shell: pwsh
+        run: |
+          ./misc/windows-signature-audit/audit.ps1 -Action Inventory
+      - name: Baseline Python smoke tests
+        id: python_baseline
+        continue-on-error: true
+        shell: pwsh
+        run: python misc/windows-signature-audit/smoke.py --output reports/baseline
+      - name: Baseline MATLAB smoke tests
+        id: matlab_baseline
+        continue-on-error: true
+        uses: matlab-actions/run-command@v3
+        with:
+          command: addpath(fullfile(pwd, 'matlab-package')); run('misc/windows-signature-audit/smoke.m')
+      - name: Install Microsoft signing-only audit policy
+        id: policy
+        continue-on-error: true
+        shell: pwsh
+        run: ./misc/windows-signature-audit/audit.ps1 -Action InstallPolicy
+      - name: Python smoke tests with audit policy requested
+        id: python_audit
+        if: steps.policy.outcome == 'success'
+        continue-on-error: true
+        shell: pwsh
+        run: python misc/windows-signature-audit/smoke.py --output reports/audit
+      - name: MATLAB smoke tests with audit policy requested
+        id: matlab_audit
+        if: steps.policy.outcome == 'success'
+        continue-on-error: true
+        uses: matlab-actions/run-command@v3
+        with:
+          command: addpath(fullfile(pwd, 'matlab-package')); run('misc/windows-signature-audit/smoke.m')
+      - name: Collect Code Integrity events and report coverage
+        if: always()
+        shell: pwsh
+        env:
+          POLICY_OUTCOME: ${{ steps.policy.outcome }}
+          PYTHON_BASELINE: ${{ steps.python_baseline.outcome }}
+          MATLAB_BASELINE: ${{ steps.matlab_baseline.outcome }}
+          PYTHON_AUDIT: ${{ steps.python_audit.outcome }}
+          MATLAB_AUDIT: ${{ steps.matlab_audit.outcome }}
+        run: ./misc/windows-signature-audit/audit.ps1 -Action Collect
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: windows-signature-audit-${{ env.CASADI_RELEASE }}
+          path: reports/
+          if-no-files-found: error
+      - name: Check smoke test outcomes
+        if: always()
+        shell: pwsh
+        env:
+          PYTHON_BASELINE: ${{ steps.python_baseline.outcome }}
+          MATLAB_BASELINE: ${{ steps.matlab_baseline.outcome }}
+          PYTHON_AUDIT: ${{ steps.python_audit.outcome }}
+          MATLAB_AUDIT: ${{ steps.matlab_audit.outcome }}
+        run: |
+          if ($env:PYTHON_BASELINE -ne 'success' -or $env:MATLAB_BASELINE -ne 'success') { throw 'Baseline smoke tests failed or did not run; see evidence' }
+          if ($env:PYTHON_AUDIT -eq 'failure' -or $env:MATLAB_AUDIT -eq 'failure') { throw 'Smoke tests failed after requesting audit policy; see evidence' }
