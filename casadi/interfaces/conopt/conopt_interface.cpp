@@ -49,7 +49,8 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_conopt);
   }
 
-  const Options ConoptInterface::options_ = {{&Nlpsol::options_}, {
+  const Options ConoptInterface::options_ =
+      {{&Nlpsol::options_}, {
       {"exact_hessian", {OT_BOOL, "Provide exact Hessian to CONOPT"}},
       {"warm_start", {OT_BOOL,
         "Warm-start CONOPT using multipliers from a prior solve to infer "
