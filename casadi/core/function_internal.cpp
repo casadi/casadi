@@ -3908,8 +3908,8 @@ namespace casadi {
       const Function& dep, casadi_int max_depth) const {
     // Add, if not already in graph and not null
     if (!dep.is_null() && all_fun.find(dep.get()) == all_fun.end()) {
-      // Add to map
-      all_fun[dep.get()] = std::make_pair(dep, all_fun.size());
+      size_t index = all_fun.size();
+      all_fun[dep.get()] = std::make_pair(dep, index);
       // Also add its dependencies
       if (max_depth > 0) dep->find(all_fun, max_depth - 1);
     }
