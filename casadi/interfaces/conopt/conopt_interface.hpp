@@ -108,8 +108,7 @@ namespace casadi {
     std::vector<double> const_jac_vals;
     // Constant objective gradient values for linear (NLFLAG=0) entries
     std::vector<double> gradf_const_vals;
-    // Scratch buffer for the linear part of G at x0 per row (only used when
-    // has_linear_jac_); persistent to avoid a per-solve heap allocation.
+    // Scratch buffer for the linear part of G at x0 per row.
     std::vector<double> linear_at_x0;
 
     // Range-constraint expansion state (recomputed each solve)
@@ -128,6 +127,10 @@ namespace casadi {
 
     // Stored constant objective value when the interface is in feasibility mode
     double obj_const_;
+    // Per-row constant absorbed into conopt_rhs, restored in the reported g.
+    std::vector<double> row_const_;
+    // Affine objective constant, restored in the reported f.
+    double obj_const_lin_;
 
     ConoptMemory(const ConoptInterface& interface);
     ~ConoptMemory();
