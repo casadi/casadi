@@ -1,3 +1,23 @@
+#
+#     MIT No Attribution
+#
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
+#
+#     Permission is hereby granted, free of charge, to any person obtaining a copy of this
+#     software and associated documentation files (the "Software"), to deal in the Software
+#     without restriction, including without limitation the rights to use, copy, modify,
+#     merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+#     permit persons to whom the Software is furnished to do so.
+#
+#     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+#     INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+#     PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+#     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+#     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+"""Legendre-Gauss-Lobatto transcription of an optimal-control problem."""
+
 import numpy as np
 import casadi as cs
 import matplotlib.pyplot as plt
@@ -33,7 +53,7 @@ def lgl_nodes(N: int, tol: float = 1e-15, max_iter: int = 100) -> np.ndarray:
     """
     Given N intervals, computes N+1 Legendre-Gauss-Lobatto (LGL) points on [-1, 1]
 
-    Roots of (1-x**2)P_N(x) are LGL points
+    Roots of (1-x**2)P'_N(x) are LGL points
 
     Parameters:
         N (int): intervals/polynomial degree (returns N+1 grid points)
@@ -216,7 +236,7 @@ def solve_OCP(N: int, c=3):
     # hamiltonian for the OCP
     hamiltonian = lag.map(N + 1, "serial")(Xs, Us) + cs.sum1(adjoint * Xds)
 
-    # analytical solution
+    # Analytical reference for the local solution computed here.
     x1a = lambda t: -64 / (5 * (2 + t) ** 5) + 2 / 5
     x2a = lambda t: 4 / ((2 + t) ** 2)
     ua = lambda t: -8 / ((2 + t) ** 3)
@@ -241,6 +261,9 @@ def solve_OCP(N: int, c=3):
     data["Us"] = Us
     data["hamiltonian"] = hamiltonian
     data["N"] = N
+    data["constraint_jacobian_sparsity"] = cs.jacobian(nlp.g, nlp.x).sparsity()
+    data["state_variable_count"] = X.numel()
+    data["defect_constraint_count"] = defect.numel()
 
     return data
 
@@ -255,7 +278,7 @@ def plot_solution_verify(data):
     plt.legend()
     plt.show()
 
-    # hamiltonian to check optimality of solution (0)
+    # Hamiltonian consistency check (a necessary optimality condition)
     # constant for time-invariant problem
     # zero for this specific problem
     plt.figure()
@@ -270,6 +293,25 @@ def plot_solution_verify(data):
     plt.ylabel("Hamiltonian")
     plt.legend()
     plt.axis("equal")
+    plt.show()
+
+
+def plot_jacobian_sparsity(data):
+    """Show the dense state coupling from global polynomial differentiation."""
+    sparsity = data["constraint_jacobian_sparsity"]
+    rows, cols = sparsity.get_triplet()
+    fig, ax = plt.subplots()
+    ax.scatter(cols, rows, s=8, marker="s")
+    # Opti stacks X before U and the dynamics before the initial conditions.
+    ax.axvline(data["state_variable_count"] - 0.5, color="gray", linewidth=0.8)
+    ax.axhline(data["defect_constraint_count"] - 0.5, color="gray", linewidth=0.8)
+    ax.set_xlim(-0.5, sparsity.size2() - 0.5)
+    ax.set_ylim(sparsity.size1() - 0.5, -0.5)
+    ax.set_aspect("equal")
+    ax.set_xlabel("Decision variable (states | controls)")
+    ax.set_ylabel("Constraint (dynamics | initial state)")
+    ax.set_title("Constraint Jacobian sparsity")
+    fig.tight_layout()
     plt.show()
 
 
@@ -292,7 +334,7 @@ def spectral_convergence():
     plt.figure()
     plt.semilogy(np.array(N), np.row_stack(var_err), label=data["label_n"])
     plt.legend()
-    plt.xlabel("LGL points")
+    plt.xlabel("Polynomial degree N (N+1 LGL points)")
     plt.ylabel("max. absolute error")
     plt.show()
 
@@ -300,4 +342,5 @@ def spectral_convergence():
 if __name__ == "__main__":
     data = solve_OCP(N=25)
     plot_solution_verify(data)
+    plot_jacobian_sparsity(data)
     spectral_convergence()
