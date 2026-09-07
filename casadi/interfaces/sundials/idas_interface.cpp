@@ -525,10 +525,12 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
     }
 
     // Quadratures for the adjoint problem
-    THROWING(IDAQuadInitB, m->mem, m->whichB, rhsQB, m->v_adj_pu);
-    if (quad_err_con_) {
-      THROWING(IDASetQuadErrConB, m->mem, m->whichB, true);
-      THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
+    if (nrq_ > 0 || nuq_ > 0) {
+      THROWING(IDAQuadInitB, m->mem, m->whichB, rhsQB, m->v_adj_pu);
+      if (quad_err_con_) {
+        THROWING(IDASetQuadErrConB, m->mem, m->whichB, true);
+        THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
+      }
     }
 
     // Mark initialized

@@ -1031,6 +1031,23 @@ class Integrationtests(casadiTestCase):
     print(stats["nsteps"])
     self.assertTrue(stats["nsteps"]>=int(0.5/1.1e-4))
 
+  def test_adjoint_without_parameters(self):
+    self.message("Adjoint sensitivities without parameter or control quadratures")
+    x = ca.MX.sym("x", 3)
+    rates = ca.DM([1, 2, 3])
+    x0 = ca.MX.sym("x0", 3)
+    for backend in ["cvodes", "idas"]:
+      if not ca.has_integrator(backend):
+        continue
+      for grid in [[1], [0.5, 1]]:
+        I = ca.integrator("I", backend, {"x": x, "ode": -rates*x}, 0, grid,
+          {"enable_forward": False, "abstol": 1e-11, "reltol": 1e-11})
+        xf = I(x0=x0)["xf"]
+        J = ca.Function("J", [x0], [ca.jacobian(xf[:2, -1], x0)])
+        reference = ca.diag(ca.exp(-rates))[:2, :]
+        for value in [[1, 2, 3], [3, 2, 1]]:
+          self.checkarray(reference, J(value), digits=7)
+
   @requires_integrator('idas')
   def test_constraints_idas(self):
     x = ca.SX.sym("x")

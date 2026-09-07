@@ -335,10 +335,12 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
     }
 
     // Quadratures for the backward problem
-    THROWING(CVodeQuadInitB, m->mem, m->whichB, rhsQB, m->v_adj_pu);
-    if (quad_err_con_) {
-      THROWING(CVodeSetQuadErrConB, m->mem, m->whichB, true);
-      THROWING(CVodeQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
+    if (nrq_ > 0 || nuq_ > 0) {
+      THROWING(CVodeQuadInitB, m->mem, m->whichB, rhsQB, m->v_adj_pu);
+      if (quad_err_con_) {
+        THROWING(CVodeSetQuadErrConB, m->mem, m->whichB, true);
+        THROWING(CVodeQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
+      }
     }
 
     // Mark initialized
@@ -349,7 +351,9 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
 
     // Reinitialize solver
     THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->v_adj_xz);
-    THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->v_adj_pu);
+    if (nrq_ > 0 || nuq_ > 0) {
+      THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->v_adj_pu);
+    }
   }
 }
 
