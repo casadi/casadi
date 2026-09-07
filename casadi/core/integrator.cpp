@@ -1188,7 +1188,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     for (casadi_int i = 0; i < nx_; ++i) tmp1[i] |= x[i];
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-    std::copy_n(tmp1, nx_ + nx_, w);
+    std::copy_n(tmp1, nx_ + nz_, w);
     std::fill_n(tmp1, nx_ + nz_, 0);
     sp_jac_dae_.spsolve(tmp1, w, false);
 
