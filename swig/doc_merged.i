@@ -32074,10 +32074,10 @@ Ternary if_else: x ? y : z.
 Extra doc: https://github.com/casadi/casadi/wiki/L_113
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L288
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L288-L290
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L291-L293
 
 ";
 
@@ -32275,7 +32275,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L201
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L485-L491
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L489-L495
 
 ";
 
@@ -32332,15 +32332,26 @@ https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L389-L391
 %feature("docstring") casadi::SXElem::get_output "
 
 [INTERNAL] 
-Get an output.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_29f
+Get a batch of outputs.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L228
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L393-L395
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L397-L399
+
+>  std::vector< SXElem > casadi::SXElem::get_output(const std::vector< casadi_int > &oind) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Get a batch of outputs.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L231
+
+Implementation: 
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L397-L399
+
+";
 
 ";
 
@@ -32354,10 +32365,10 @@ If the  SXElem does not point to any node, 0 is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L235
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L238
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L397-L399
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L401-L403
 
 ";
 
@@ -32369,7 +32380,7 @@ Element-wise inverse.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L245
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L248
 
 Implementation: 
 https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L173-L175
@@ -32384,10 +32395,10 @@ https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L173-L175
 Extra doc: https://github.com/casadi/casadi/wiki/L_112
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L283
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L286
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L283-L283
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L286-L286
 
 ";
 
@@ -32399,10 +32410,10 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_114
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L295
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.hpp#L298
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L493-L495
+https://github.com/casadi/casadi/blob/main/casadi/core/sx_elem.cpp#L497-L499
 
 ";
 
@@ -32472,6 +32483,10 @@ C++ includes: generic_shared.hpp
 [INTERNAL] ";
 
 %feature("docstring") casadi::WeakCache::incache "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::WeakCache::prune "
 
 [INTERNAL] ";
 

@@ -5092,10 +5092,10 @@
 %exception  casadi::RevWeakCache< K, T >::incache(const K &key, T &f, bool needs_lock=true) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::RevWeakCache< K, T >::tocache(const K &key, const T &f, bool needs_lock=true) {
+%exception  casadi::RevWeakCache< K, T >::tocache(const K &key, const T &f, bool needs_lock=true, bool prune=true) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::RevWeakCache< K, T >::tocache_if_missing(const K &key, T &f) {
+%exception  casadi::RevWeakCache< K, T >::tocache_if_missing(const K &key, T &f, bool prune=true) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SX::dep(casadi_int ch=0) const {
@@ -5162,6 +5162,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::get_output(casadi_int oind) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXElem::get_output(const std::vector< casadi_int > &oind) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::has_output() const {
@@ -5632,10 +5635,13 @@
 %exception  casadi::WeakCache< K, T >::incache(const K &key, T &f, bool needs_lock=true) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::WeakCache< K, T >::tocache(const K &key, const T &f, bool needs_lock=true) {
+%exception  casadi::WeakCache< K, T >::prune() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::WeakCache< K, T >::tocache_if_missing(const K &key, T &f) {
+%exception  casadi::WeakCache< K, T >::tocache(const K &key, const T &f, bool needs_lock=true, bool prune=true) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::WeakCache< K, T >::tocache_if_missing(const K &key, T &f, bool prune=true) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::XmlFile::dump(const std::string &filename, const XmlNode &node) {
