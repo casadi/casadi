@@ -227,6 +227,9 @@ namespace casadi {
         \identifier{29f} */
     SXElem get_output(casadi_int oind) const;
 
+    /// Get a batch of outputs
+    std::vector<SXElem> get_output(const std::vector<casadi_int>& oind) const;
+
     /** \brief Returns a number that is unique for a given SXNode.
 
      * If the SXElem does not point to any node, 0 is returned.

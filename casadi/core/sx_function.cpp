@@ -1307,16 +1307,20 @@ namespace casadi {
               offset += m.f_nnz_in[i];
             }
 
-            // Do not set nominal outputs
+            // Collect the nominal outputs needed by the derivative function
+            std::vector<casadi_int> oind;
             offset = 0;
             for (casadi_int i=0;i<m.f_n_out;++i) {
               casadi_int nnz = ff.nnz_in(i+m.f_n_in);
               casadi_assert(nnz==0 || nnz==m.f.nnz_out(i), "Not implemented");
               for (casadi_int j=0;j<nnz;++j) {
-                deps.push_back(call_node->get_output(offset+j));
+                oind.push_back(offset+j);
               }
               offset += m.f_nnz_out[i];
             }
+
+            auto nominal_outputs = call_node->get_output(oind);
+            deps.insert(deps.end(), nominal_outputs.begin(), nominal_outputs.end());
 
             // Read in forward seeds from work vector
             offset = 0;
@@ -1495,16 +1499,20 @@ namespace casadi {
               offset += m.f_nnz_in[i];
             }
 
-            // Do not set nominal outputs
+            // Collect the nominal outputs needed by the derivative function
+            std::vector<casadi_int> oind;
             offset = 0;
             for (casadi_int i=0;i<m.f_n_out;++i) {
               casadi_int nnz = fr.nnz_in(i+m.f_n_in);
               casadi_assert(nnz==0 || nnz==m.f.nnz_out(i), "Not implemented");
               for (casadi_int j=0;j<nnz;++j) {
-                deps.push_back(call_node->get_output(offset+j));
+                oind.push_back(offset+j);
               }
               offset += m.f_nnz_out[i];
             }
+
+            auto nominal_outputs = call_node->get_output(oind);
+            deps.insert(deps.end(), nominal_outputs.begin(), nominal_outputs.end());
 
             // Read in reverse seeds from work vector
             offset = 0;

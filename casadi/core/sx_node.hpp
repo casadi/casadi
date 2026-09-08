@@ -130,6 +130,9 @@ namespace casadi {
         \identifier{293} */
     virtual SXElem get_output(casadi_int oind) const;
 
+    /// Get a batch of outputs
+    virtual std::vector<SXElem> get_output(const std::vector<casadi_int>& oind) const;
+
     /** \brief  get the reference of a child
 
         \identifier{a2} */

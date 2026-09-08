@@ -394,6 +394,10 @@ namespace casadi {
     return node->get_output(oind);
   }
 
+  std::vector<SXElem> SXElem::get_output(const std::vector<casadi_int>& oind) const {
+    return node->get_output(oind);
+  }
+
   casadi_int SXElem::__hash__() const {
     return reinterpret_cast<casadi_int>(node);
   }

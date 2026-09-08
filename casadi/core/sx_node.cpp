@@ -229,6 +229,13 @@ namespace casadi {
     return shared_from_this();
   }
 
+  std::vector<SXElem> SXNode::get_output(const std::vector<casadi_int>& oind) const {
+    std::vector<SXElem> ret;
+    ret.reserve(oind.size());
+    for (casadi_int i : oind) ret.push_back(get_output(i));
+    return ret;
+  }
+
   casadi_int SXNode::eq_depth_ = 1;
 
   void SXNode::serialize_node(SerializingStream& s) const {

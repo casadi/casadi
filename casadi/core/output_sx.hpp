@@ -137,11 +137,9 @@ namespace casadi {
     casadi_int which_output() const override { return oind_; }
 
     static std::vector<SXElem> split(const SXElem& e, casadi_int n) {
-      std::vector<SXElem> ret(n);
-      for (casadi_int i=0;i<n;++i) {
-        ret[i] = e.get_output(i);
-      }
-      return ret;
+      std::vector<casadi_int> oind(n);
+      for (casadi_int i=0;i<n;++i) oind[i] = i;
+      return e.get_output(oind);
     }
 
     void serialize_node(SerializingStream& s) const override {

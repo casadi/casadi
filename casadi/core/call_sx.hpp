@@ -113,6 +113,22 @@ class CASADI_EXPORT CallSX : public SXNode {
       return SXElem::create(ret.get());
     }
 
+    std::vector<SXElem> get_output(const std::vector<casadi_int>& oind) const override {
+      std::vector<SXElem> ret;
+      ret.reserve(oind.size());
+      for (casadi_int i : oind) {
+        SharedSXElem output;
+        if (!cache_.incache(i, output)) {
+          output.own(new OutputSX(SXNode::shared_from_this(), i));
+          // Avoid scanning the growing cache for each output in a batch.
+          cache_.tocache_if_missing(i, output, false);
+        }
+        ret.push_back(SXElem::create(output.get()));
+      }
+      cache_.prune();
+      return ret;
+    }
+
     /** \brief  get the reference of a dependency
 
         \identifier{28t} */
