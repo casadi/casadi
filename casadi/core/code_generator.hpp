@@ -75,7 +75,7 @@ namespace casadi {
     std::string add_dependency(const Function& f);
 
     /// Add an external function declaration
-    void add_external(const std::string& new_external);
+    void add_external(const std::string& new_external, const std::string& name="");
 
     /// Get a shorthand
     std::string shorthand(const std::string& name) const;
@@ -1169,6 +1169,7 @@ namespace casadi {
     // Set of already included header files
     std::set<std::string> added_includes_;
     std::set<std::string> added_externals_;
+    std::set<std::string> external_names_;
     std::set<std::string> added_shorthands_;
     std::multimap<Auxiliary, std::vector<std::string>> added_auxiliaries_;
     std::multimap<size_t, size_t> added_double_constants_;

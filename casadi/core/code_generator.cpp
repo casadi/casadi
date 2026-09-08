@@ -399,6 +399,8 @@ namespace casadi {
     void CodeGenerator::add(const Function& f, bool with_jac_sparsity) {
     // Add if not already added
     std::string codegen_name = add_dependency(f);
+    casadi_assert(!external_names_.count(f.name()),
+      "Cannot code generate '" + f.name() + "': name conflicts with an external dependency.");
 
     // Define function
     *this << declare(f->signature(f.name())) << "{\n"
@@ -1318,7 +1320,12 @@ namespace casadi {
     }
   }
 
-  void CodeGenerator::add_external(const std::string& new_external) {
+  void CodeGenerator::add_external(const std::string& new_external, const std::string& name) {
+    if (!name.empty()) {
+      casadi_assert(std::find(exposed_fname.begin(), exposed_fname.end(), name)==exposed_fname.end(),
+        "Cannot code generate '" + name + "': name conflicts with an external dependency.");
+      external_names_.insert(name);
+    }
     added_externals_.insert(new_external);
   }
 

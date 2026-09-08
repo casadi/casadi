@@ -2448,6 +2448,30 @@ class Functiontests(casadiTestCase):
     self.assertTrue("fwd1_Q" in found)
     
   @requiresPlugin(ca.Importer,"shell")
+  def test_codegen_external_name_collision(self):
+    x = ca.MX.sym("x")
+    f = ca.Function("f", [x], [x + 1])
+    f.generate("external_name_collision.c")
+    compiler = ca.Importer("external_name_collision.c", "shell")
+    ext = ca.external("f", compiler)
+    self.checkarray(ext(2), 3)
+    wrapper = ca.Function("wrapper", [x], [ext(x)])
+
+    with self.assertRaisesRegex(RuntimeError, "name conflicts with an external dependency"):
+      ext.generate("external_name_collision_wrapped.c")
+
+    for functions in [[f, wrapper], [wrapper, f]]:
+      cg = ca.CodeGenerator("external_name_collision_module.c")
+      cg.add(functions[0])
+      with self.assertRaisesRegex(RuntimeError, "name conflicts with an external dependency"):
+        cg.add(functions[1])
+
+    cg = ca.CodeGenerator("external_name_collision_valid.c")
+    cg.add(wrapper)
+    cg.add(ca.Function("other", [x], [2*x]))
+    self.assertIn("wrapper", cg.dump())
+
+  @requiresPlugin(ca.Importer,"shell")
   def test_jit_directory(self):
   
     print(ca.CasadiMeta.feature_list())

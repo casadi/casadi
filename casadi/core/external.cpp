@@ -331,7 +331,7 @@ void GenericExternal::init(const Dict& opts) {
 
 void External::codegen_declarations(CodeGenerator& g) const {
   if (!compiler_.inlined(name_)) {
-    g.add_external(signature(name_) + ";");
+    g.add_external(signature(name_) + ";", name_);
     if (checkout_) g.add_external("int " + name_ + "_checkout(void);");
     if (release_) g.add_external("void " + name_ + "_release(int mem);");
     if (incref_) g.add_external("void " + name_ + "_incref(void);");
