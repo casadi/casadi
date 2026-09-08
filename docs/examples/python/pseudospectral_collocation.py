@@ -332,7 +332,7 @@ def spectral_convergence():
         print(var_err[-1].shape)
     print(type(var_err))
     plt.figure()
-    plt.semilogy(np.array(N), np.row_stack(var_err), label=data["label_n"])
+    plt.semilogy(np.array(N), np.vstack(var_err), label=data["label_n"])
     plt.legend()
     plt.xlabel("Polynomial degree N (N+1 LGL points)")
     plt.ylabel("max. absolute error")
