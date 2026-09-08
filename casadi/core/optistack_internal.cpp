@@ -1724,11 +1724,13 @@ Function OptiNode::to_function(const std::string& name,
   std::vector<MX> helper_in = {veccat(active_symvar(OPTI_VAR)),
                                veccat(active_symvar(OPTI_PAR)),
                                veccat(active_symvar(OPTI_DUAL_G))};
-  Function helper("helper", helper_in, {res});
+  Dict h_opts;
+  Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+  Function helper("helper", helper_in, {res}, h_opts);
 
   std::vector<MX> arg_in = helper(std::vector<MX>{r.at("x"), arg["p"], r.at("lam_g")});
 
-  return Function(name, args, arg_in, name_in, name_out, opts);
+  return Function(name, args, arg_in, name_in, name_out, opts_remainder);
 
 }
 
