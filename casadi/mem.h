@@ -26,6 +26,8 @@
 #ifndef CASADI_MEM_H
 #define CASADI_MEM_H
 
+#include <cstdint>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,7 +44,7 @@ extern "C" {
 
 /* Integer type */
 #ifndef casadi_int
-#define casadi_int long long int
+#define casadi_int int64_t
 #endif
 
 /* Function types corresponding to entry points in CasADi's C API */
