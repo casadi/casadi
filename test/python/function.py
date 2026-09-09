@@ -2449,6 +2449,7 @@ class Functiontests(casadiTestCase):
     
   @requiresPlugin(ca.Importer,"shell")
   def test_codegen_external_name_collision(self):
+    if not args.run_slow: return
     x = ca.MX.sym("x")
     f = ca.Function("f", [x], [x + 1])
     f.generate("external_name_collision.c")

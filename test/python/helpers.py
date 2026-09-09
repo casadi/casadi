@@ -1170,6 +1170,21 @@ class requires_modelicaparser(object):
       print("Not available ModelicaParser plugin %s, skipping unittests" % self.n)
       return None
 
+class requires_onnxbackend(object):
+  def __init__(self,n):
+    self.n = n
+
+  def __call__(self,c):
+    import os
+    if "SKIP_" + self.n.upper() + "_TESTS" in os.environ:
+        return None
+    try:
+      ca.load_onnxbackend(self.n)
+      return c
+    except:
+      print("Not available Onnx backend plugin %s, skipping unittests" % self.n)
+      return None
+
 class requiresPlugin(object):
   def __init__(self,att,n):
     self.att = att
