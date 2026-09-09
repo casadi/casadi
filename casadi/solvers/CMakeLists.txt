@@ -83,3 +83,6 @@ casadi_plugin(Rootfinder fast_newton
 
 casadi_plugin(Rootfinder nlpsol
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)
+
+  casadi_plugin(Rootfinder bisection
+  bisection.hpp bisection.cpp bisection_meta.cpp)
