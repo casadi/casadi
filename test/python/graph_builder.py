@@ -93,6 +93,7 @@ ort_float32 = {
   "unary_cos", "unary_tan", "unary_asin", "unary_acos", "unary_atan",
   "unary_sinh", "unary_cosh", "unary_asinh", "unary_acosh", "unary_atanh", "unary_erf",
   "atan2", "det",
+  "norm_1", "norm_2", "norm_fro",   # ReduceL1/ReduceL2
 }
 
 # ONNX Runtime can't validate these at all (0-input/shape semantics); roundtrip still runs.
