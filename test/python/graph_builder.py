@@ -29,7 +29,7 @@ import numpy
 import unittest
 import os
 import tempfile
-from helpers import casadiTestCase
+from helpers import casadiTestCase, requires_onnxbackend
 
 # onnx python package: builds the numeric test models
 try:
@@ -45,38 +45,6 @@ try:
   has_onnxruntime = True
 except ImportError:
   has_onnxruntime = False
-
-# the onnxruntime numeric backend (built alongside the GraphModel onnx backend)
-try:
-  have_backend = ca.has_onnxbackend("ort")
-except Exception:
-  have_backend = False
-
-# has_onnxbackend("ort") is True even with the bundled mockup stub (which yields a NULL OrtApi).
-# The real ONNX Runtime is supplied on the loader path like every other mockup (commercial_solvers;
-# the plugin's RUNPATH=$ORIGIN lets LD_LIBRARY_PATH win over the shipped stub). Probe an actual
-# create to tell real from mockup, and gate the numeric suite on it.
-have_real_ort = False
-if have_onnx and have_backend:
-  try:
-    import tempfile as _tf
-    _fd, _probe = _tf.mkstemp(suffix=".onnx"); os.close(_fd)
-    _g = helper.make_graph(
-        [helper.make_node("Add", ["x", "a"], ["y"])], "probe",
-        [helper.make_tensor_value_info("x", TensorProto.FLOAT, [1])],
-        [helper.make_tensor_value_info("y", TensorProto.FLOAT, [1])],
-        [numpy_helper.from_array(numpy.full((1,), 1.0, numpy.float32), "a")])
-    _m = helper.make_model(_g, opset_imports=[helper.make_opsetid("", 13)]); _m.ir_version = 8
-    onnx.save(_m, _probe)
-    ca.GraphBuilder(_probe).create("ort_probe")   # raises with the mockup (NULL OrtApi)
-    have_real_ort = True
-  except Exception:
-    have_real_ort = False
-  finally:
-    try:
-      os.remove(_probe)
-    except Exception:
-      pass
 
 # the GraphModel onnx (symbolic import/export) backend; absent on WITH_ONNX=OFF builds
 try:
@@ -137,8 +105,8 @@ binary_ops = [
 
 
 # ============================ Numeric black-box suite ============================
-@unittest.skipUnless(have_onnx and have_backend and have_real_ort,
-                     "needs the onnx python package and a real (preloaded) ONNX Runtime")
+@requires_onnxbackend("ort")
+@unittest.skipUnless(have_onnx, "needs the onnx python package")
 class GraphBuilderNumericTests(casadiTestCase):
 
   def save_model(self, graph):

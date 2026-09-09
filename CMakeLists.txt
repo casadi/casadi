@@ -2918,7 +2918,7 @@ if(WITH_ONNX_RUNTIME)
     # Self-contained mockup (built by mockups-external): stub libonnxruntime + a cherry-picked
     # header. Lets the plugin build where the real ORT can't ship (manylinux2014: ORT glibc 2.27).
     set(ONNX_RUNTIME_MOCKUP_ROOT "${CMAKE_BINARY_DIR}/external_projects/mockups/onnxruntime")
-    set(ONNX_RUNTIME_MOCKUP_LIB "${ONNX_RUNTIME_MOCKUP_ROOT}/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}onnxruntime${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(ONNX_RUNTIME_MOCKUP_LIB "${ONNX_RUNTIME_MOCKUP_ROOT}/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}onnxruntime${CMAKE_SHARED_LIBRARY_SUFFIX}")
     file(MAKE_DIRECTORY "${ONNX_RUNTIME_MOCKUP_ROOT}/include")
     # The cherry-picked header is installed by mockups-external at build time, so it isn't on disk
     # at configure time; point the include var at it directly (find_path above would leave NOTFOUND)
@@ -2927,12 +2927,8 @@ if(WITH_ONNX_RUNTIME)
     add_dependencies(onnxruntime::onnxruntime mockups-external)
     set_target_properties(onnxruntime::onnxruntime PROPERTIES
       IMPORTED_LOCATION "${ONNX_RUNTIME_MOCKUP_LIB}"
-      IMPORTED_IMPLIB "${ONNX_RUNTIME_MOCKUP_ROOT}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}onnxruntime${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${ONNX_RUNTIME_MOCKUP_ROOT}/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}onnxruntime${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${ONNX_RUNTIME_MOCKUP_ROOT}/include")
-    # Ship the whole libonnxruntime.so* set (real + soname symlinks): the plugin's NEEDED is
-    # the soname (libonnxruntime.so.1 on Linux), which must resolve via $ORIGIN as the fallback
-    install(DIRECTORY "${ONNX_RUNTIME_MOCKUP_ROOT}/${SHARED_LIBRARY_RELDIR}/" DESTINATION "${LIB_PREFIX}"
-      FILES_MATCHING PATTERN "${CMAKE_SHARED_LIBRARY_PREFIX}onnxruntime${CMAKE_SHARED_LIBRARY_SUFFIX}*")
     message(STATUS "Using mockup ONNX Runtime: ${ONNX_RUNTIME_MOCKUP_LIB}")
   else()
     find_library(ONNX_RUNTIME_LIBRARY
