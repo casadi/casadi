@@ -1322,7 +1322,8 @@ namespace casadi {
 
   void CodeGenerator::add_external(const std::string& new_external, const std::string& name) {
     if (!name.empty()) {
-      casadi_assert(std::find(exposed_fname.begin(), exposed_fname.end(), name)==exposed_fname.end(),
+      casadi_assert(std::find(exposed_fname.begin(), exposed_fname.end(), name)
+          ==exposed_fname.end(),
         "Cannot code generate '" + name + "': name conflicts with an external dependency.");
       external_names_.insert(name);
     }
