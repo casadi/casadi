@@ -56,7 +56,8 @@ namespace casadi {
     #ifdef ONNXRUNTIME_ADAPTOR
     // No runtime ships with CasADi; the adaptor opens the one named here
     "Needs the environmental variable CASADI_ONNXRUNTIME_LIB, holding the full path\n"
-    "of an ONNX Runtime shared library.\n"
+    "of an ONNX Runtime shared library -- or, with no path separator, the module name\n"
+    "of one this process has already loaded.\n"
     #endif
     ;
 
