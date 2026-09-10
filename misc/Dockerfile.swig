@@ -4,6 +4,6 @@ FROM ubuntu:24.04
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive  apt install -y g++ gcc libpcre3-dev automake yodl byacc autoconf git cmake python3-dev libpcre2-dev bison
 
 RUN git clone https://github.com/jaeandersson/swig.git && \
-    cd swig && git checkout 0891ed0138bca6b32069dda92d046d9d1052d705 && ./autogen.sh && ./configure && make && make install && ./configure --prefix=/opt/swig && make && make install
+    cd swig && git checkout 0e5da11d59926ed82ab5d5655aaec9d56d453b92 && ./autogen.sh && ./configure && make && make install && ./configure --prefix=/opt/swig && make && make install
 
 WORKDIR /local

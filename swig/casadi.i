@@ -1354,7 +1354,7 @@ namespace std {
         jl_array_t* a = (jl_array_t*)p;
         size_t n = jl_array_len(a);
         if (m) (**m).resize(n);
-        jl_function_t* getindex_f = jl_get_function(jl_base_module, "getindex");
+        jl_value_t* getindex_f = jl_get_function(jl_base_module, "getindex");
         for (size_t i = 0; i < n; ++i) {
           jl_value_t* el = 0; jl_value_t* idx = 0;
           JL_GC_PUSH2(&el, &idx);
@@ -1942,9 +1942,9 @@ namespace std {
       {
         jl_value_t* adt = jl_get_global(jl_base_module, jl_symbol("AbstractDict"));
         if (!adt || !jl_isa(p, adt)) return false;
-        jl_function_t* keys_f = jl_get_function(jl_base_module, "keys");
-        jl_function_t* collect_f = jl_get_function(jl_base_module, "collect");
-        jl_function_t* getindex_f = jl_get_function(jl_base_module, "getindex");
+        jl_value_t* keys_f = jl_get_function(jl_base_module, "keys");
+        jl_value_t* collect_f = jl_get_function(jl_base_module, "collect");
+        jl_value_t* getindex_f = jl_get_function(jl_base_module, "getindex");
         jl_value_t* karr = 0;
         JL_GC_PUSH1(&karr);
         karr = jl_call1(collect_f, jl_call1(keys_f, p));
@@ -2039,8 +2039,8 @@ namespace std {
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a) {
 #ifdef SWIGJULIA
       {
-        jl_function_t* dict_f = jl_get_function(jl_base_module, "Dict");
-        jl_function_t* set_f = jl_get_function(jl_base_module, "setindex!");
+        jl_value_t* dict_f = jl_get_function(jl_base_module, "Dict");
+        jl_value_t* set_f = jl_get_function(jl_base_module, "setindex!");
         jl_value_t* d = 0; JL_GC_PUSH1(&d);
         d = jl_call0(dict_f);
         if (!d) { JL_GC_POP(); return 0; }
