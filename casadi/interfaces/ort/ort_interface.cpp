@@ -35,6 +35,14 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &OnnxRuntimeInterface::options_;
     plugin->deserialize = &OnnxRuntimeInterface::deserialize;
+    #ifdef ONNXRUNTIME_ADAPTOR
+      char buffer[400];
+      int ret = onnxruntime_adaptor_load(buffer, sizeof(buffer));
+      if (ret!=0) {
+        casadi_warning("Failed to load ONNX Runtime adaptor: " + std::string(buffer) + ".");
+        return 1;
+      }
+    #endif
     return 0;
   }
 
@@ -44,7 +52,13 @@ namespace casadi {
   }
 
   const std::string OnnxRuntimeInterface::meta_doc =
-    "Black-box ONNX model evaluation through Microsoft's ONNX Runtime.\n";
+    "Black-box ONNX model evaluation through Microsoft's ONNX Runtime.\n"
+    #ifdef ONNXRUNTIME_ADAPTOR
+    // No runtime ships with CasADi; the adaptor opens the one named here
+    "Needs the environmental variable CASADI_ONNXRUNTIME_LIB, holding the full path\n"
+    "of an ONNX Runtime shared library.\n"
+    #endif
+    ;
 
   const Options OnnxRuntimeInterface::options_
   = {{&OnnxFunction::options_},
