@@ -1620,6 +1620,11 @@ namespace casadi {
     case AUX_TENSOR_TTV:
       this->auxiliaries << sanitize_source(casadi_tensor_ttv_str, inst);
       break;
+    case AUX_SHF_EVAL:
+      add_auxiliary(AUX_LOW);
+      add_auxiliary(AUX_TENSOR_TTV);
+      this->auxiliaries << sanitize_source(casadi_shf_eval_str, inst);
+      break;
     case AUX_ND_BOOR_EVAL:
       add_auxiliary(AUX_DE_BOOR);
       add_auxiliary(AUX_TENSOR_TTV);

@@ -40,6 +40,10 @@ casadi_plugin(Interpolant bspline
   bspline_interpolant.hpp bspline_interpolant.cpp bspline_interpolant_meta.cpp
 )
 
+casadi_plugin(Interpolant shf
+  shf_interpolant.hpp shf_interpolant.cpp shf_interpolant_meta.cpp
+)
+
 casadi_plugin(Linsol symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp
 )

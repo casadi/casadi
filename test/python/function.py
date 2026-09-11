@@ -2170,6 +2170,456 @@ class Functiontests(casadiTestCase):
     self.check_serialize(f,inputs=[ca.vertcat(0.2,0.333)])
 
 
+  def test_shf_interpolant(self):
+    np.random.seed(0)
+    grid = [[0., 0.7, 1., 2.4, 3.], [0., 0.5, 1., 1.5, 2.]]
+    data = np.random.random(25)
+    x = ca.MX.sym("x", 2)
+    pts = [ca.vertcat(1.02, 0.5), ca.vertcat(2.5, 1.7), ca.vertcat(0.3, 0.9), ca.vertcat(-0.2, 2.3)]
+
+    # default: k=3, epsilon = a tenth of the smallest spacing of each axis
+    LUT = ca.interpolant('lut', 'shf', grid, data)
+    ref = ca.Function('ref', [x], [ca.shf_spline('shf', grid, data, 3, 1)(x, [0.03, 0.05])])
+    self.checkfunction(ref, LUT, inputs=pts[:1])
+    for p in pts:
+      self.checkarray(LUT(p), ref(p), digits=14)
+    self.check_codegen(LUT, inputs=pts[:1], with_forward=True, with_reverse=True, with_jac_sparsity=True)
+    self.check_serialize(LUT, inputs=pts[:1])
+
+    # explicit epsilon: one value shared, or one per axis; explicit order
+    for eps, k in [(0.1, 2), ([0.12, 0.2], 1), ([0.1], 3)]:
+      LUT = ca.interpolant('lut', 'shf', grid, data, {"epsilon": eps, "smoothness_order": k})
+      ref = ca.Function('ref', [x], [ca.shf_spline('shf', grid, data, k, 1)(x, ca.DM(eps))])
+      for p in pts:
+        self.checkarray(LUT(p), ref(p), digits=14)
+
+    # away from the balls it is the linear interpolant
+    LUT_linear = ca.interpolant('lin', 'linear', grid, data)
+    self.checkarray(LUT(pts[1]), LUT_linear(pts[1]), digits=12)
+    self.checkarray(LUT(pts[3]), LUT_linear(pts[3]), digits=12)
+
+    # epsilon as an input: non-differentiable, one entry per axis
+    LUT_e = ca.interpolant('lut', 'shf', grid, data, {"epsilon_parametric": True})
+    self.assertEqual(LUT_e.name_in(1), "eps")
+    self.assertEqual(LUT_e.jacobian().sparsity_out(1).nnz(), 0)
+    ref = ca.interpolant('lut', 'shf', grid, data, {"epsilon": [0.12, 0.2]})
+    f = ca.Function('f', [x], [LUT_e(x, [0.12, 0.2])])
+    self.checkfunction(ref, f, inputs=pts[:1])
+    self.check_codegen(f, inputs=pts[:1])
+    self.check_serialize(f, inputs=pts[:1])
+
+    # parametric values
+    LUT_p = ca.interpolant('lut', 'shf', grid, 1, {"epsilon": 0.1})
+    ref = ca.interpolant('lut', 'shf', grid, data, {"epsilon": 0.1})
+    f = ca.Function('f', [x], [LUT_p(x, data)])
+    self.checkfunction(ref, f, inputs=pts[:1])
+    self.check_codegen(f, inputs=pts[:1])
+    self.check_serialize(f, inputs=pts[:1])
+
+    # batch evaluation
+    LUT_b = ca.interpolant('lut', 'shf', grid, data, {"batch_x": 3, "epsilon": 0.1})
+    X = ca.horzcat(*pts[:3])
+    self.checkarray(LUT_b(X), ca.horzcat(*[ref(p) for p in pts[:3]]), digits=14)
+    self.check_codegen(LUT_b, inputs=[X])
+
+    # in an MX graph the interpolant sheds its skin: only the shf_spline call survives,
+    # so the enclosing AD sees the seeds and a Hessian stays one kernel call
+    LUT = ca.interpolant('lut', 'shf', grid, data, {"epsilon": 0.1})
+    y = LUT(x)
+    f = ca.Function('f', [x], [y])
+    self.assertEqual([g.name() for g in f.find_functions()], ["lut_shf"])
+    self.checkarray(f(pts[0]), LUT(pts[0]), digits=14)
+    fo = ca.Function('fo', [x], [LUT.call([x], False, True)[0]])
+    self.assertEqual([g.name() for g in fo.find_functions()], ["lut", "wrapper", "lut_shf"])
+    H = ca.Function('H', [x], [ca.hessian(y, x)[0]])
+    Ho = ca.Function('Ho', [x], [ca.hessian(LUT.call([x], False, True)[0], x)[0]])
+    self.checkarray(H(pts[0]), Ho(pts[0]), digits=10)
+    for F, n_kernel in [(H, 1), (Ho, 2)]:
+      tmp = tempfile.mkdtemp()
+      cwd = os.getcwd()
+      os.chdir(tmp)
+      try:
+        cg = ca.CodeGenerator("k.c")
+        cg.add(F)
+        cg.generate()
+        with open("k.c") as inp: n = len(re.findall(r"shf_eval_multi\)\(", inp.read()))
+      finally:
+        os.chdir(cwd)
+      self.assertEqual(n, n_kernel)
+
+    # option checking
+    with self.assertInException("one value or one per axis"):
+      ca.interpolant('lut', 'shf', grid, data, {"epsilon": [0.1, 0.1, 0.1]})
+    with self.assertInException("smaller than half"):
+      ca.interpolant('lut', 'shf', grid, data, {"epsilon": 0.3})
+    with self.assertInException("mutually exclusive"):
+      ca.interpolant('lut', 'shf', grid, data, {"epsilon": 0.1, "epsilon_parametric": True})
+    with self.assertInException("k must be at least 1"):
+      ca.interpolant('lut', 'shf', grid, data, {"smoothness_order": 0})
+
+
+  def shf_ref(self, k, grid, values, epsilon, x):
+    """Independent reference: tensor product of the 1-D smooth hat basis."""
+    import itertools
+    def sk(t):
+      # Bernstein polynomial of degree 2k+1 of R(t)=max(0,2t-1)
+      n = 2*k+1
+      b = [0.0]*(k+1) + [(2.0*i-n)/n for i in range(k+1, n+1)]
+      for j in range(1, n+1):
+        for i in range(0, n-j+1):
+          b[i] = b[i]*(1-t) + b[i+1]*t
+      return b[0]
+    def phis(g, xq):
+      N = len(g)-1
+      out = [0.0]*(N+1)
+      j = min(max(len([1 for v in g if v <= xq])-1, 0), N-1)
+      c = -1
+      if epsilon > 0 and j > 0 and xq-g[j] <= epsilon: c = j
+      elif epsilon > 0 and j+1 < N and g[j+1]-xq <= epsilon: c = j+1
+      if c < 0:
+        t = (xq-g[j])/(g[j+1]-g[j])   # never clamped: extrapolates linearly
+        out[j], out[j+1] = 1-t, t
+      else:
+        A = epsilon/(g[c]-g[c-1])*sk((g[c]-xq+epsilon)/(2*epsilon))
+        B = epsilon/(g[c+1]-g[c])*sk((xq-g[c]+epsilon)/(2*epsilon))
+        out[c-1], out[c], out[c+1] = A, 1-A-B, B
+      return out
+    w = [phis(grid[r], x[r]) for r in range(len(grid))]
+    tot = 0.0
+    for idx in itertools.product(*[range(len(g)) for g in grid]):
+      wt = 1.0
+      for r, i in enumerate(idx): wt *= w[r][i]
+      if wt == 0.0: continue
+      flat, stride = 0, 1
+      for r, i in enumerate(idx):
+        flat += i*stride
+        stride *= len(grid[r])
+      tot += wt*values[flat]
+    return tot
+
+  def test_shf_spline(self):
+    self.message("smooth hat function spline")
+    import itertools
+    numpy.random.seed(0)
+    grids = {
+      1: [[0., 0.7, 1., 2.4, 3., 4.9, 5.5, 7.]],
+      2: [[0., 0.7, 1., 2.4, 3., 4.9, 5.5, 7.], [0., 1.3, 2., 3.1, 4., 5.2]],
+      3: [[0., 1., 2., 3.], [0., 0.5, 1.5, 2.], [-1., 0., 1.]],
+    }
+    for d, grid in grids.items():
+      n = 1
+      for g in grid: n *= len(g)
+      values = numpy.random.rand(n)*4-2
+      lut = ca.interpolant("lut", "linear", grid, list(values))
+      x = ca.MX.sym("x", d)
+      e = ca.MX.sym("e")
+      for k in [1, 2, 3]:
+        F = ca.shf_spline("F", grid, values, k, 1)
+        self.assertEqual(F.name_in(), ["x", "eps"])
+        self.assertEqual(F.name_out(), ["f"])
+        self.assertEqual(F.size_in(1), (d, 1))
+        self.assertEqual(F.is_diff_in(), [True, False])
+        # a scalar epsilon broadcasts to every axis at the call
+        y = F(x, e)
+        f = ca.Function("f", [x, e], [y])
+        # the whole table is one call node whatever the grid size
+        self.assertEqual(f.n_nodes(), ca.Function("f", [x, e], [ca.shf_spline("F", [[0., 1., 2.]]*d, [0.]*3**d, k, 1)(x, e)]).n_nodes())
+
+        # matches the independent reference, including outside the grid
+        pts = []
+        for _ in range(60):
+          pts.append([numpy.random.uniform(g[0]-0.4, g[-1]+0.4) for g in grid])
+        for g in grid[:1]:
+          for gp in g[1:-1]:
+            pts.append([gp] + [0.6 for _ in grid[1:]])
+        eps = 0.1
+        for p in pts:
+          self.checkarray(f(p, eps), ca.DM(self.shf_ref(k, grid, values, eps, p)),
+                          "value", digits=12)
+          self.checkarray(F(p, [eps]*d), f(p, eps), "direct", digits=14)
+
+        # away from the epsilon-balls it IS the linear interpolant
+        for p in pts:
+          if all(min(abs(p[r]-v) for v in grid[r][1:-1]) > eps for r in range(d)):
+            self.checkarray(f(p, eps), lut(p), "bulk == linear", digits=12)
+
+        # linear extrapolation: affine along each axis below the first grid point
+        # (and above the last). Only axis-aligned lines -- the map is multilinear.
+        base = [(g[0]+g[-1])/2 for g in grid]
+        for r in range(d):
+          for anchor, sgn in [(grid[r][0], -1.0), (grid[r][-1], 1.0)]:
+            v = []
+            for off in [0.0, 0.45, 0.9]:
+              p = list(base)
+              p[r] = anchor + sgn*off
+              v.append(f(p, eps))
+            self.checkarray(2*v[1], v[0]+v[2], "extrapolates linearly", digits=10)
+
+        # partition of unity: constant data reproduces the constant everywhere
+        fc = ca.shf_spline("fc", grid, [3.5]*n, k, 1)
+        for p in pts:
+          self.checkarray(fc(p, eps), ca.DM(3.5), "partition of unity", digits=12)
+
+        # linear precision: affine data is reproduced exactly, epsilon notwithstanding
+        aff = numpy.zeros(n)
+        for cnt, idx in enumerate(itertools.product(*[range(len(g)) for g in grid[::-1]])):
+          idx = idx[::-1]
+          aff[cnt] = 1.0 + sum((r+1)*grid[r][i] for r, i in enumerate(idx))
+        fa = ca.shf_spline("fa", grid, aff, k, 1)
+        for p in pts:
+          ref = 1.0 + sum((r+1)*p[r] for r in range(d))
+          self.checkarray(fa(p, eps), ca.DM(ref), "linear precision", digits=10)
+
+        # epsilon -> 0 recovers the look-up table
+        prev = None
+        for eps_i in [0.1, 0.05, 0.01, 1e-4]:
+          err = max(float(ca.norm_inf(f(p, eps_i)-lut(p))) for p in pts)
+          if prev is not None: self.assertTrue(err <= prev+1e-14)
+          prev = err
+        self.assertTrue(prev < 1e-3)
+
+        # parametric table values give the same answer
+        Fp = ca.shf_spline("Fp", grid, k, 1)
+        self.assertEqual(Fp.name_in(), ["x", "C", "eps"])
+        self.assertEqual(Fp.is_diff_in(), [True, False, False])
+        C = ca.MX.sym("C", n)
+        fp = ca.Function("fp", [x, e, C], [Fp(x, C, e)])
+        for p in pts[:10]:
+          self.checkarray(fp(p, eps, values), f(p, eps), "parametric", digits=14)
+
+      # multiple outputs share one traversal of the stencil
+      m = 3
+      vals_m = numpy.random.rand(n*m)*4-2
+      fm = ca.shf_spline("fm", grid, vals_m, 2, m)
+      self.assertEqual(fm.size_out(0), (m, 1))
+      for j in range(m):
+        fj = ca.shf_spline("fj", grid, vals_m[j::m], 2, 1)
+        self.checkarray(fm([1.1]*d, 0.1)[j], fj([1.1]*d, 0.1), "m>1", digits=14)
+
+    # codegen and serialization, for both flavours, standalone and embedded
+    grid = grids[2]
+    values = numpy.random.rand(48)*4-2
+    x = ca.MX.sym("x", 2)
+    e = ca.MX.sym("e")
+    C = ca.MX.sym("C", 48)
+    inp = [ca.DM([2.45, 3.05]), ca.DM(0.1)]
+    F = ca.shf_spline("F", grid, values, 2, 1)
+    self.check_codegen(F, inputs=[inp[0], ca.DM([0.1, 0.1])])
+    self.check_serialize(F, inputs=[inp[0], ca.DM([0.1, 0.1])])
+    f = ca.Function("f", [x, e], [F(x, e)])
+    self.check_codegen(f, inputs=inp)
+    self.check_serialize(f, inputs=inp)
+    Fp = ca.shf_spline("Fp", grid, 2, 1)
+    fp = ca.Function("fp", [x, e, C], [Fp(x, C, e)])
+    self.check_codegen(fp, inputs=inp+[ca.DM(values)])
+    self.check_serialize(fp, inputs=inp+[ca.DM(values)])
+
+    # the call does not inline: expanding to SX keeps it as a call node
+    fsx = f.expand()
+    self.assertEqual([g.name() for g in fsx.find_functions()], ["F"])
+    self.checkarray(fsx(*inp), f(*inp), "expand", digits=14)
+    Jsx = ca.Function("Jsx", fsx.sx_in(), [ca.jacobian(fsx(*fsx.sx_in()), fsx.sx_in()[0])])
+    J = ca.Function("J", [x, e], [ca.jacobian(f(x, e), x)])
+    self.checkarray(Jsx(*inp), J(*inp), "expand jacobian", digits=12)
+
+  def test_shf_spline_derivatives(self):
+    self.message("smooth hat function spline derivatives")
+    numpy.random.seed(1)
+    grid2 = [[0., 0.7, 1., 2.4, 3., 4.9, 5.5, 7.], [0., 1.3, 2., 3.1, 4., 5.2]]
+    values = numpy.random.rand(48)*4-2
+    x = ca.MX.sym("x", 2)
+    e = ca.MX.sym("e")
+    eps = 0.1
+    for k in [2, 3]:
+      F = ca.shf_spline("F", grid2, values, k, 1)
+      y = F(x, e)
+      f = ca.Function("f", [x, e], [y])
+      J = ca.Function("J", [x, e], [ca.jacobian(y, x)])
+      H = ca.Function("H", [x, e], [ca.jacobian(ca.jacobian(y, x).T, x)])
+
+      # the AD graph does not grow with the grid
+      Fs = ca.shf_spline("Fs", [[0., 1., 2.], [0., 1., 2.]], [0.]*9, k, 1)
+      self.assertEqual(J.n_nodes(), ca.Function("J", [x, e], [ca.jacobian(Fs(x, e), x)]).n_nodes())
+
+      # the jacobian blocks of the non-differentiable inputs are structurally empty
+      JF = F.jacobian()
+      self.assertEqual(JF.name_out(), ["jac_f_x", "jac_f_eps"])
+      self.assertEqual(JF.sparsity_out(1).nnz(), 0)
+      self.assertTrue(JF.sparsity_out(0).is_dense())
+
+      pts = [[numpy.random.uniform(0.3, 6.7), numpy.random.uniform(0.3, 4.9)]
+             for _ in range(40)]
+      pts += [[1.0, 2.0], [1.0+1e-13, 2.0]]        # exactly on a grid crossing
+      h = 1e-6
+      for p in pts:
+        fd = []
+        for i in range(2):
+          pp = list(p); pm = list(p)
+          pp[i] += h; pm[i] -= h
+          fd.append(float((f(pp, eps)-f(pm, eps))/(2*h)))
+        self.checkarray(J(p, eps), ca.DM(fd).T, "jacobian", digits=5)
+        self.checkarray(JF(p, [eps]*2, 0)[0], J(p, eps), "jacobian()", digits=14)
+        Hn = numpy.array(H(p, eps))
+        self.checkarray(Hn, Hn.T, "hessian symmetry", digits=12)
+
+      # second derivative exists and is continuous for k>=2: compare against a
+      # finite difference of the (exact) jacobian
+      for p in pts[:10]:
+        for i in range(2):
+          pp = list(p); pm = list(p)
+          pp[i] += h; pm[i] -= h
+          fdH = (numpy.array(J(pp, eps))-numpy.array(J(pm, eps)))/(2*h)
+          self.checkarray(numpy.array(H(p, eps))[i, :], fdH[0, :], "hessian", digits=4)
+
+    # shape preservation: in 1-D the derivative is a convex combination of the two
+    # neighbouring look-up-table slopes, so it never overshoots them
+    g1 = [0., 0.7, 1., 2.4, 3., 4.9, 5.5, 7.]
+    v1 = numpy.random.rand(8)*4-2
+    slopes = [(v1[i+1]-v1[i])/(g1[i+1]-g1[i]) for i in range(7)]
+    x1 = ca.MX.sym("x1")
+    y1 = ca.shf_spline("F1", [g1], v1, 2, 1)(x1, e)
+    J1 = ca.Function("J1", [x1, e], [ca.jacobian(y1, x1)])
+    for xq in numpy.linspace(g1[0], g1[-1], 2000):
+      d = float(J1(xq, eps))
+      self.assertTrue(d <= max(slopes)+1e-10 and d >= min(slopes)-1e-10)
+
+    # monotone data must give a monotone approximant
+    vmon = numpy.cumsum(numpy.abs(numpy.random.rand(8))+0.1)
+    ymon = ca.shf_spline("Fmon", [g1], vmon, 2, 1)(x1, e)
+    Jmon = ca.Function("Jmon", [x1, e], [ca.jacobian(ymon, x1)])
+    for xq in numpy.linspace(g1[0], g1[-1], 2000):
+      self.assertTrue(float(Jmon(xq, eps)) > 0)
+
+    # codegen and serialization of the derivative functions
+    F = ca.shf_spline("F", grid2, values, 2, 1)
+    y = F(x, e)
+    J = ca.Function("J", [x, e], [ca.jacobian(y, x)])
+    H = ca.Function("H", [x, e], [ca.jacobian(ca.jacobian(y, x).T, x)])
+    inp = [ca.DM([2.45, 3.05]), ca.DM(eps)]
+    for G in [J, H]:
+      self.check_codegen(G, inputs=inp)
+      self.check_serialize(G, inputs=inp)
+    # and the forward / reverse sweeps of the value function itself
+    self.check_codegen(ca.Function("f", [x, e], [y]), inputs=inp,
+                       with_forward=True, with_reverse=True, with_jac_sparsity=True)
+    self.check_codegen(F, inputs=[inp[0], ca.DM([eps]*2)],
+                       with_forward=True, with_reverse=True, with_jac_sparsity=True)
+
+    # Raising the derivative order must not multiply kernel calls. Every mixed
+    # partial of a given order comes from ONE traversal of the coefficient
+    # stencil, so value/jacobian/hessian/third order each emit exactly one
+    # casadi_shf_eval_multi call, in any dimension. (casadi's bspline instead
+    # transforms coefficients per axis, which is what this design avoids.)
+    cwd = os.getcwd()
+    for dd in [1, 2, 3]:
+      gd = [[0., 1., 2., 3., 4.]]*dd
+      Vd = numpy.random.rand(5**dd)
+      xd = ca.MX.sym("xd", dd)
+      yd = ca.shf_spline("Fd", gd, Vd, 3, 1)(xd, e)
+      gj = ca.jacobian(yd, xd)
+      gh = ca.jacobian(gj.T, xd)
+      gt = ca.jacobian(ca.reshape(gh, -1, 1), xd)
+      for order, expr in enumerate([yd, gj, gh, gt]):
+        G = ca.Function("G", [xd, e], [expr])
+        tmp = tempfile.mkdtemp()
+        os.chdir(tmp)
+        try:
+          cg = ca.CodeGenerator("k.c")
+          cg.add(G)
+          cg.generate()
+          with open("k.c") as inp: n = len(re.findall(r"shf_eval_multi\)\(", inp.read()))
+        finally:
+          os.chdir(cwd)
+        self.assertEqual(n, 1,
+          "d=%d order=%d emitted %d kernel calls, expected 1" % (dd, order, n))
+
+  def test_shf_spline_axis_epsilon(self):
+    self.message("smooth hat function spline with one epsilon per axis")
+    numpy.random.seed(2)
+    # engine-map shaped grid: the axes differ by four orders of magnitude, so a
+    # shared epsilon (< 0.05) leaves the rpm axis practically unsmoothed
+    rpm = list(numpy.linspace(0, 6000, 13))
+    thr = list(numpy.linspace(0, 1, 11))
+    grid = [rpm, thr]
+    values = numpy.random.rand(13*11)*100
+    x = ca.MX.sym("x", 2)
+    e = ca.MX.sym("e", 2)
+    eps = [200.0, 0.04]
+    for k in [1, 3]:
+      F = ca.shf_spline("F", grid, values, k, 1)
+      y = F(x, e)
+      f = ca.Function("f", [x, e], [y])
+      # reference: the same spline on axes rescaled to a common spacing, where a
+      # scalar epsilon applies. epsilon scales along with the axis.
+      s = 500/0.1
+      ys = ca.shf_spline("Fs", [[r/s for r in rpm], thr], values, k, 1)(
+        ca.vertcat(x[0]/s, x[1]), 0.04)
+      fs = ca.Function("fs", [x], [ys])
+      pts = [[numpy.random.uniform(-300, 6300), numpy.random.uniform(-0.05, 1.05)]
+             for _ in range(80)]
+      pts += [[3000.0+d, 0.5+d/s] for d in [-150.0, -1e-9, 0.0, 1e-9, 150.0]]
+      for p in pts:
+        self.checkarray(f(p, eps), fs(p), "per-axis epsilon", digits=9)
+      # a scalar epsilon broadcast to every axis is the vector with equal entries
+      fb = ca.Function("fb", [x], [F(x, 0.03)])
+      fv = ca.Function("fv", [x], [F(x, [0.03, 0.03])])
+      for p in pts[:10]:
+        self.checkarray(fb(p), fv(p), "broadcast", digits=14)
+      # derivatives, codegen and serialization with a symbolic vector epsilon
+      J = ca.Function("J", [x, e], [ca.jacobian(y, x)])
+      H = ca.Function("H", [x, e], [ca.hessian(y, x)[0]])
+      for p in pts[:20]:
+        fd = []
+        for i in range(2):
+          h = 1e-5*eps[i]
+          pp = list(p); pm = list(p)
+          pp[i] += h; pm[i] -= h
+          fd.append(float((f(pp, eps)-f(pm, eps))/(2*h)))
+        self.checkarray(J(p, eps), ca.DM(fd).T, "jacobian", digits=5)
+      inp = [ca.DM([3010.0, 0.51]), ca.DM(eps)]
+      for G in [f, J, H]:
+        self.check_codegen(G, inputs=inp)
+        self.check_serialize(G, inputs=inp)
+      C = ca.MX.sym("C", 13*11)
+      fp = ca.Function("fp", [x, e, C], [ca.shf_spline("Fp", grid, k, 1)(x, C, e)])
+      self.check_codegen(fp, inputs=inp+[ca.DM(values)])
+      self.checkarray(fp(inp[0], eps, values), f(inp[0], eps), "parametric", digits=14)
+    # the smoothing is genuinely per axis: the Hessian along rpm in its ball is
+    # bounded like 1/eps_rpm, not 1/eps_thr
+    y = ca.shf_spline("F", grid, values, 3, 1)(x, eps)
+    H = ca.Function("H", [x], [ca.hessian(y, x)[0]])
+    Hrr = max(abs(float(H([r, 0.55])[0, 0])) for r in numpy.linspace(2800, 3200, 41))
+    Htt = max(abs(float(H([3250., t])[1, 1])) for t in numpy.linspace(0.46, 0.54, 41))
+    self.assertTrue(Hrr < 1e-2)
+    self.assertTrue(Htt > 1e2)
+
+  def test_shf_spline_errors(self):
+    self.message("smooth hat function spline argument checking")
+    grid = [[0., 1., 2., 3.], [0., 0.5, 1.5, 2.]]
+    values = list(range(16))
+    F = ca.shf_spline("F", grid, values, 2, 1)
+    x = [1.2, 0.7]
+
+    # epsilon must keep neighbouring epsilon-balls disjoint, per axis
+    with self.assertInException("axis 1"):
+      F(x, 0.3)
+    F(x, 0.24)
+    with self.assertInException("axis 1"):
+      F(x, [0.4, 0.3])
+    F(x, [0.4, 0.24])
+    with self.assertInException("axis 0"):
+      F(x, -0.01)
+
+    with self.assertInException("k must be at least 1"):
+      ca.shf_spline("F", grid, values, 0, 1)
+    with self.assertInException("Expected 16 table values"):
+      ca.shf_spline("F", grid, list(range(15)), 2, 1)
+    with self.assertInException("strictly increasing"):
+      ca.shf_spline("F", [[0., 1., 1.], [0., 1.]], [0.]*6, 2, 1)
+    with self.assertInException("nonesuch"):
+      ca.shf_spline("F", grid, values, 2, 1, {"nonesuch": 1})
+
+
   def test_codegen_avoid_stack(self):
     x = ca.SX.sym("x",3,3)
     f = ca.Function('f',[x],[ca.det(x)])

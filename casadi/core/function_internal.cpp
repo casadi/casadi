@@ -44,6 +44,7 @@
 #include "external_impl.hpp"
 #include "fmu_function.hpp"
 #include "blazing_spline_impl.hpp"
+#include "shf_spline_impl.hpp"
 #include "onnx_function_impl.hpp"
 #include "filesystem_impl.hpp"
 
@@ -4426,6 +4427,7 @@ namespace casadi {
     {"Conic", Conic::deserialize},
     {"FmuFunction", FmuFunction::deserialize},
     {"BlazingSplineFunction", BlazingSplineFunction::deserialize},
+    {"SHFSplineFunction", SHFSplineFunction::deserialize},
     {"Onnx", OnnxFunction::deserialize}
   };
 

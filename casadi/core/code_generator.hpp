@@ -728,6 +728,7 @@ namespace casadi {
       AUX_DE_BOOR,
       AUX_TENSOR_TTV,
       AUX_ND_BOOR_EVAL,
+      AUX_SHF_EVAL,
       AUX_FINITE_DIFF,
       AUX_QR,
       AUX_DET,

@@ -60,6 +60,7 @@
 #include "interpolant.hpp"
 #include "external.hpp"
 #include "blazing_spline.hpp"
+#include "shf_spline.hpp"
 #include "modelica_parser.hpp"
 
 // Misc

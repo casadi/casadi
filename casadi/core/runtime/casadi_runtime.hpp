@@ -315,6 +315,32 @@ namespace casadi {
                             casadi_int m,
                             const T1* x, const casadi_int* lookup_mode, casadi_int* iw, T1* w);
 
+  // Smooth hat function (SHF) spline
+  template<typename T1>
+  T1 casadi_de_casteljau(casadi_int n, T1* b, T1 t);
+
+  template<typename T1>
+  T1 casadi_shf_bernstein(casadi_int k, casadi_int p, T1 t, T1* beta);
+
+  template<typename T1>
+  void casadi_shf_axis(casadi_int k, const T1* g, casadi_int ng, const T1* inv_h,
+      T1 x, T1 epsilon, casadi_int p, casadi_int width, casadi_int lookup_mode,
+      casadi_int* start, T1* w, T1* beta);
+
+  template<typename T1>
+  void casadi_shf_ttv_multi(T1* ret, casadi_int dim, casadi_int ndim, const T1* all_w,
+      const casadi_int* width, const casadi_int* starts, const casadi_int* strides,
+      const casadi_int* wofs, casadi_int nb,
+      const T1* c, casadi_int m, casadi_int offset, T1* W);
+
+  template<typename T1>
+  void casadi_shf_eval_multi(T1* ret, casadi_int ndim, const T1* grid,
+      const casadi_int* offset, const T1* inv_h, const casadi_int* width,
+      const casadi_int* strides, const T1* c, casadi_int m, const T1* x,
+      const T1* epsilon, casadi_int eps_stride,
+      casadi_int k, const casadi_int* multi, casadi_int nb, casadi_int P,
+      const casadi_int* lookup_mode, casadi_int* iw, T1* w);
+
   template<typename T1>
   T1 casadi_mmax(const T1* x, casadi_int n, T1 is_dense);
 
@@ -416,6 +442,7 @@ namespace casadi {
   #include "casadi_tensor_ttv.hpp"
   #include "casadi_nd_boor_eval.hpp"
   #include "casadi_nd_boor_dual_eval.hpp"
+  #include "casadi_shf_eval.hpp"
   #include "casadi_interpn_weights.hpp"
   #include "casadi_interpn_interpolate.hpp"
   #include "casadi_interpn.hpp"

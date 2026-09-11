@@ -51,6 +51,7 @@ set(RUNTIME_SRC
   casadi_mtimes_dense_sparse.hpp
   casadi_tensor_ttv.hpp
   casadi_nd_boor_eval.hpp
+  casadi_shf_eval.hpp
   casadi_nd_boor_dual_eval.hpp
   casadi_norm_1.hpp
   casadi_norm_2.hpp

@@ -525,7 +525,18 @@ class ADtests(casadiTestCase):
 
     xx = ca.horzcat(ca.sin(x),ca.cos(x))
 
+    # Smooth hat function spline. epsilon is baked in as a constant so the only
+    # differentiable dependence is on x. At v1[0]=[1.1,1.3] with epsilon=0.2 the
+    # first axis sits inside an epsilon-ball and the second in the bulk, so both
+    # branches of the weight kernel are exercised. The Function does not inline,
+    # so expanding to SX leaves a call node behind.
+    shf_grid = [[0., 1., 2., 3.], [0., 1., 2., 3.]]
+    shf_c = [0.3, -1.1, 2.0, 0.4, 1.7, -0.6, 0.9, 2.2,
+             -0.5, 1.2, 0.1, -1.4, 2.5, 0.8, -0.2, 1.9]
+    shf_out = ca.shf_spline("shf", shf_grid, shf_c, 2, 1)(x, 0.2)
+
     for inputs,values,out, jac, with_sx, std in [
+          (in1,v1,shf_out,ca.jacobian(shf_out,x),True,"c89"),
           (in1,v1,c.sparsity_cast(x**2,ca.sparsify(ca.DM([[0,1],[1,0]])).sparsity()),2*c.sparsity_cast(x,ca.sparsify(ca.DM([[0,0],[1,0],[0,1],[0,0]])).sparsity()),True,"c89"),
           (in1,v1,f1_noninline.call([x**2,y])[1],y*2*ca.vertcat(*[x.T,x.T]),True,"c89"),
           (in1,[v1[0],ca.DM([[1,1.5],[0,0.9]])],xx[y[:,0],:],ca.blockcat([[0,ca.cos(x[1])],[ca.cos(x[0]),0],[0,-ca.sin(x[1])],[-ca.sin(x[0]),0]]),False,"c99"),

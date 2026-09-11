@@ -90,6 +90,7 @@ set(CASADI_PUBLIC
   graph_model.hpp
   graph_builder.hpp
   blazing_spline.hpp
+  shf_spline.hpp
 
   # MISC useful stuff
   integration_tools.hpp
@@ -218,6 +219,7 @@ set(CASADI_INTERNAL
   code_generator.cpp
   switch.hpp              switch.cpp
   bspline.hpp             bspline.cpp
+  shf_spline.cpp          shf_spline_impl.hpp
   map.hpp                 map.cpp
   mapsum.hpp              mapsum.cpp
   finite_differences.hpp  finite_differences.cpp
