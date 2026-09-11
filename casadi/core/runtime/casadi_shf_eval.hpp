@@ -17,34 +17,31 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// SYMBOL "de_casteljau"
-// Evaluates the Bernstein polynomial with control points b[0..n] at t, in place.
-template<typename T1>
-T1 casadi_de_casteljau(casadi_int n, T1* b, T1 t) {
-  casadi_int i, j;
-  T1 u;
-  u = 1-t;
-  for (j=1; j<=n; ++j)
-    for (i=0; i<=n-j; ++i) b[i] = b[i]*u + b[i+1]*t;
-  return b[0];
-}
-
 // SYMBOL "shf_bernstein"
-// p-th derivative of s_k(t), the Bernstein polynomial of degree n=2k+1 of
-// R(t)=max(0,2t-1): p-fold forward differencing of the control points, then de
-// Casteljau at degree n-p, scaled by n!/(n-p)!. Needs beta[n+1] scratch.
+// s_k^(p)(t) by the adapted de Casteljau scheme of the paper (sec. "Numerical
+// evaluation of s_k"), on row p of ctrl: the control points of the p-th derivative
+// (SHFSplineFunction::bernstein_ctrl) with their z = max(0, k+1-p) leading zeros
+// dropped, so q = n-p-z+1 values are blended -- z rounds against a zero left
+// neighbour, then the shrinking triangle. beta[k+1] scratch.
 template<typename T1>
-T1 casadi_shf_bernstein(casadi_int k, casadi_int p, T1 t, T1* beta) {
-  casadi_int n, i, d;
-  T1 f;
+T1 casadi_shf_bernstein(casadi_int k, casadi_int p, T1 t, const T1* ctrl, T1* beta) {
+  casadi_int n, z, q, i, j;
+  T1 u;
   n = 2*k+1;
   if (p > n) return 0;
-  for (i=0; i<=n; ++i) beta[i] = (i<=k) ? 0.0 : (2.0*i-n)/n;
-  for (d=0; d<p; ++d)
-    for (i=0; i<n-d; ++i) beta[i] = beta[i+1]-beta[i];
-  f = 1;
-  for (d=0; d<p; ++d) f *= (T1)(n-d);
-  return f*casadi_de_casteljau(n-p, beta, t);
+  z = k+1-p;
+  if (z < 0) z = 0;
+  q = n-p-z+1;
+  ctrl += p*(n+1);
+  for (i=0; i<q; ++i) beta[i] = ctrl[i];
+  u = 1-t;
+  for (j=0; j<z; ++j) {
+    for (i=q-1; i>0; --i) beta[i] = beta[i-1]*u + beta[i]*t;
+    beta[0] = beta[0]*t;
+  }
+  for (j=1; j<q; ++j)
+    for (i=q-1; i>=j; --i) beta[i] = beta[i-1]*u + beta[i]*t;
+  return beta[q-1];
 }
 
 // SYMBOL "shf_axis"
@@ -57,7 +54,7 @@ T1 casadi_shf_bernstein(casadi_int k, casadi_int p, T1 t, T1* beta) {
 template<typename T1>
 void casadi_shf_axis(casadi_int k, const T1* g, casadi_int ng, const T1* inv_h,
     T1 x, T1 epsilon, casadi_int p, casadi_int width, casadi_int lookup_mode,
-    casadi_int* start, T1* w, T1* beta) {
+    casadi_int* start, T1* w, const T1* ctrl, T1* beta) {
   casadi_int j, c, i;
   T1 e, t, ta, sa, sb, A, B, sc, hm, hp;
   j = casadi_low(x, g, ng, lookup_mode);
@@ -87,7 +84,7 @@ void casadi_shf_axis(casadi_int k, const T1* g, casadi_int ng, const T1* inv_h,
     // One polynomial evaluation supplies both mirror weights: differentiating
     // s_k(t) - s_k(1-t) = 2t-1 gives s^(p)(1-t) = (-1)^p (s^(p)(t) - l_p) with
     // l_0 = 2t-1, l_1 = 2 and l_p = 0 beyond.
-    sa = casadi_shf_bernstein(k, p, ta, beta);
+    sa = casadi_shf_bernstein(k, p, ta, ctrl, beta);
     sb = sa - (p == 0 ? 2*ta-1 : (p == 1 ? 2 : 0));
     if (p % 2) sb = -sb;
     if (p == 0) {
@@ -154,27 +151,37 @@ void casadi_shf_ttv_multi(T1* ret, casadi_int dim, casadi_int ndim, const T1* al
 // value (nb=1, multi=0), jacobian, hessian and any higher order alike.
 // epsilon holds one half-width per axis (eps_stride=1) or a single one shared by
 // all axes (eps_stride=0); a null pointer means no smoothing at all.
+// ctrl holds P+1 rows of Bernstein control points, row p for s_k^(p) (casadi_shf_bernstein).
 template<typename T1>
 void casadi_shf_eval_multi(T1* ret, casadi_int ndim, const T1* grid,
     const casadi_int* offset, const T1* inv_h, const casadi_int* width,
     const casadi_int* strides, const T1* c, casadi_int m, const T1* x,
     const T1* epsilon, casadi_int eps_stride,
-    casadi_int k, const casadi_int* multi, casadi_int nb, casadi_int P,
+    casadi_int k, const T1* ctrl, const casadi_int* multi, casadi_int nb, casadi_int P,
     const casadi_int* lookup_mode, casadi_int* iw, T1* w) {
-  casadi_int r, q, b, ng;
+  casadi_int r, q, b, ng, qlo, qhi, acc;
   casadi_int *starts, *wofs;
-  T1 *all_w, *beta, *W;
+  T1 *all_w, *W, *beta;
   starts = iw; iw += ndim;
   wofs = iw; iw += ndim*nb;
   all_w = w; w += ndim*(P+1)*3;
-  W = w; w += (ndim+1)*nb;
-  beta = w;
+  W = w;
+  // accumulators (or, for a single output, the compacted weights), then the
+  // de Casteljau scratch; mirrors SHFSplineFunction::n_w
+  acc = (ndim+1)*nb;
+  if (nb == 1 && 3*ndim > acc) acc = 3*ndim;
+  beta = w + acc;
   for (r=0; r<ndim; ++r) {
     ng = offset[r+1]-offset[r];
-    for (q=0; q<=P; ++q) {
+    // A single output (the value, or one lone mixed partial -- anything in 1-D)
+    // needs one order per axis, not P+1 of them. Kept as bounds on the one call
+    // below: with nb known at the call site the loop stays fully specialisable.
+    qlo = 0; qhi = P;
+    if (nb == 1) qlo = qhi = multi[r];
+    for (q=qlo; q<=qhi; ++q) {
       casadi_shf_axis(k, grid+offset[r], ng, inv_h+offset[r]-r, x[r],
         epsilon ? epsilon[r*eps_stride] : 0, q,
-        width[r], lookup_mode[r], starts+r, all_w + (r*(P+1)+q)*3, beta);
+        width[r], lookup_mode[r], starts+r, all_w + (r*(P+1)+q)*3, ctrl, beta);
     }
   }
   for (r=0; r<ndim; ++r)

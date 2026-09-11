@@ -317,15 +317,12 @@ namespace casadi {
 
   // Smooth hat function (SHF) spline
   template<typename T1>
-  T1 casadi_de_casteljau(casadi_int n, T1* b, T1 t);
-
-  template<typename T1>
-  T1 casadi_shf_bernstein(casadi_int k, casadi_int p, T1 t, T1* beta);
+  T1 casadi_shf_bernstein(casadi_int k, casadi_int p, T1 t, const T1* ctrl, T1* beta);
 
   template<typename T1>
   void casadi_shf_axis(casadi_int k, const T1* g, casadi_int ng, const T1* inv_h,
       T1 x, T1 epsilon, casadi_int p, casadi_int width, casadi_int lookup_mode,
-      casadi_int* start, T1* w, T1* beta);
+      casadi_int* start, T1* w, const T1* ctrl, T1* beta);
 
   template<typename T1>
   void casadi_shf_ttv_multi(T1* ret, casadi_int dim, casadi_int ndim, const T1* all_w,
@@ -338,7 +335,7 @@ namespace casadi {
       const casadi_int* offset, const T1* inv_h, const casadi_int* width,
       const casadi_int* strides, const T1* c, casadi_int m, const T1* x,
       const T1* epsilon, casadi_int eps_stride,
-      casadi_int k, const casadi_int* multi, casadi_int nb, casadi_int P,
+      casadi_int k, const T1* ctrl, const casadi_int* multi, casadi_int nb, casadi_int P,
       const casadi_int* lookup_mode, casadi_int* iw, T1* w);
 
   template<typename T1>

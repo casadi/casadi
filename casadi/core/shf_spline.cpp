@@ -89,6 +89,26 @@ namespace casadi {
     return ret;
   }
 
+  std::vector<double> SHFSplineFunction::bernstein_ctrl(casadi_int k, casadi_int order) {
+    // Control points of s_k: b_i = 0 for i <= k, (2i-n)/n beyond (Lemma 3.1); row p
+    // holds those of s_k^(p), the p-th forward difference scaled by n!/(n-p)!, with
+    // its max(0, k+1-p) leading zeros dropped so the kernel blends only the tail
+    casadi_int n = 2*k+1;
+    std::vector<double> b(n+1);
+    for (casadi_int i=0; i<=n; ++i) b[i] = i<=k ? 0.0 : (2.0*i-n)/n;
+    std::vector<double> ctrl((order+1)*(n+1), 0.0);
+    double f = 1;
+    for (casadi_int p=0; p<=order; ++p) {
+      if (p>0) {
+        for (casadi_int i=0; i<=n-p; ++i) b[i] = b[i+1]-b[i];
+        f *= n-p+1;
+      }
+      casadi_int z = std::max(static_cast<casadi_int>(0), k+1-p);
+      for (casadi_int i=z; i<=n-p; ++i) ctrl[p*(n+1)+i-z] = f*b[i];
+    }
+    return ctrl;
+  }
+
   size_t SHFSplineFunction::n_iw(casadi_int n_dims, casadi_int nb) {
     // starts, per-axis weight offsets, and (nb==1 path) a compacted w_offset
     return n_dims + n_dims*nb + (n_dims+1);
@@ -100,7 +120,7 @@ namespace casadi {
     // level, and the de Casteljau scratch
     size_t acc = (n_dims+1)*nb;
     if (nb==1 && static_cast<size_t>(3*n_dims) > acc) acc = 3*n_dims;
-    return n_dims*(order+1)*3 + acc + 2*k+2;
+    return n_dims*(order+1)*3 + acc + k+1;
   }
 
   SHFSplineFunction::SHFSplineFunction(const std::string& name,
@@ -128,6 +148,7 @@ namespace casadi {
     multi_ = multi_index(n_dims(), order_);
     prepare(m_, offset_, coeffs_size_, coeffs_dims_, strides_);
     derive(grid_, offset_, inv_h_, width_, min_h_);
+    ctrl_ = bernstein_ctrl(k_, order_);
   }
 
   SHFSplineFunction::~SHFSplineFunction() {
@@ -204,7 +225,7 @@ namespace casadi {
     casadi_shf_eval_multi(res[0], n_dims(), get_ptr(grid_), get_ptr(offset_),
       get_ptr(inv_h_), get_ptr(width_), get_ptr(strides_),
       parametric_ ? arg[arg_c()] : get_ptr(values_), m_, arg[0],
-      eps, 1, k_, get_ptr(multi_), nb(), order_,
+      eps, 1, k_, get_ptr(ctrl_), get_ptr(multi_), nb(), order_,
       get_ptr(lookup_mode_), iw, w);
     return 0;
   }
@@ -220,7 +241,7 @@ namespace casadi {
       << g.constant(inv_h_) << "," << g.constant(width_) << ","
       << g.constant(strides_) << "," << coeffs << "," << m_ << ","
       << g.arg(0) << "," << g.arg(arg_eps()) << ",1," << k_ << ","
-      << g.constant(multi_) << "," << nb() << "," << order_ << ","
+      << g.constant(ctrl_) << "," << g.constant(multi_) << "," << nb() << "," << order_ << ","
       << g.constant(lookup_mode_) << ", iw, w);\n";
     g << "}\n";
   }

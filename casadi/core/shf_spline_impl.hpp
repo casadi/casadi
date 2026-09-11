@@ -175,6 +175,10 @@ namespace casadi {
       const std::vector<casadi_int>& offset, std::vector<double>& inv_h,
       std::vector<casadi_int>& width, std::vector<double>& min_h);
 
+    /// order+1 rows of Bernstein control points: row p holds those of s_k^(p), the
+    /// p-th derivative of the smoothing polynomial of order k, leading zeros dropped
+    static std::vector<double> bernstein_ctrl(casadi_int k, casadi_int order);
+
     static size_t n_iw(casadi_int n_dims, casadi_int nb);
     static size_t n_w(casadi_int n_dims, casadi_int k, casadi_int order,
       casadi_int nb);
@@ -213,6 +217,7 @@ namespace casadi {
     std::vector<casadi_int> coeffs_dims_;
     casadi_int coeffs_size_;
     std::vector<double> min_h_;
+    std::vector<double> ctrl_;
 
   protected:
     /// Shared tail of the constructors
