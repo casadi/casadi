@@ -145,7 +145,7 @@
 %exception  casadi::CodeGenerator::add_dependency(const Function &f) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CodeGenerator::add_external(const std::string &new_external) {
+%exception  casadi::CodeGenerator::add_external(const std::string &new_external, const std::string &name="") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::add_include(const std::string &new_include, bool relative_path=false, const std::string &use_ifdef=std::string()) {
