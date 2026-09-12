@@ -1674,16 +1674,18 @@ jobs:
       # running ruff/pylance.  --isolated ignores any pyproject on the runner;
       # py39 is the oldest wheel target, so typing_extensions imports stay.
       # PYI021: the docstrings in the stub are deliberate (IDE hover).
+      # PYI063: `/` is Python 3.8 syntax and casadi still ships 3.7 wheels; the
+      # stub uses the `__name` convention instead (misc.py enforces that).
       - name: ruff against the installed stubs
         run: |
           pip install ruff
-          python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
+          python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021,PYI063 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - name: ruff against the installed stubs
         run: |
           pip install ruff
-          python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
+          python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021,PYI063 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
         shell: pwsh
         if: contains(matrix.image, 'windows')
 

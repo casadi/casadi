@@ -5647,9 +5647,9 @@ namespace casadi{
    * sites use `f.call([...])` which returns the tuple explicitly.
    * The positional overloads require at least one positional arg
    * (arg0 pos-only) so f() / f(**kw) routes to the dict overloads. */
-  %stub_overload_method(__call__, DM, arg0: _DM, /, *args: _DM)
-  %stub_overload_method(__call__, SX, arg0: _SX, /, *args: _SX)
-  %stub_overload_method(__call__, MX, arg0: _MX, /, *args: _MX)
+  %stub_overload_method(__call__, DM, __arg0: _DM, *args: _DM)
+  %stub_overload_method(__call__, SX, __arg0: _SX, *args: _SX)
+  %stub_overload_method(__call__, MX, __arg0: _MX, *args: _MX)
   %stub_overload_method(__call__, %arg(dict[builtins.str, DM]), **kwargs: _DM)
   %stub_overload_method(__call__, %arg(dict[builtins.str, SX]), **kwargs: _SX)
   %stub_overload_method(__call__, %arg(dict[builtins.str, MX]), **kwargs: _MX)
@@ -6151,11 +6151,11 @@ namespace casadi {
    * return anything that to_ptr<DM> promotes -- int / float / DM /
    * ndarray / nested sequences -- each gets converted at the C++
    * boundary. */
-  %stub_method(eval, %arg(Sequence[_DM]), %arg(arg: Sequence[DM], /))
+  %stub_method(eval, %arg(Sequence[_DM]), %arg(__arg: Sequence[DM]))
   /* eval_buffer: director reshapes the 4-arg C++ interface (arg,
    * sizes_arg, res, sizes_res) into a 2-tuple Python interface: two
    * tuples of memoryview objects exposing the structural nonzeros. */
-  %stub_method(eval_buffer, int, %arg(arg: tuple[memoryview, ...], res: tuple[memoryview, ...], /))
+  %stub_method(eval_buffer, int, %arg(__arg: tuple[memoryview, ...], res: tuple[memoryview, ...]))
   %stub_method(get_sparsity_in,  Sparsity, i: int)
   %stub_method(get_sparsity_out, Sparsity, i: int)
 }

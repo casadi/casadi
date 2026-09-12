@@ -73,6 +73,25 @@ def _parse_stub(pyi):
         % (sys.version_info[0], sys.version_info[1], e.msg, e.lineno))
 
 
+def _callable_param_lists(ann):
+  """The one legitimate list literal in a type expression: the parameter
+  list of `Callable[[A, B], R]`.  Returns those ast.List nodes within ann."""
+  import ast
+  out = []
+  for n in ast.walk(ann):
+    if not isinstance(n, ast.Subscript):
+      continue
+    v = n.value
+    name = v.id if isinstance(v, ast.Name) else v.attr if isinstance(v, ast.Attribute) else None
+    if name != "Callable":
+      continue
+    sl = n.slice
+    sl = getattr(sl, "value", sl)  # ast.Index wrapper on Python < 3.9
+    first = sl.elts[0] if isinstance(sl, ast.Tuple) and sl.elts else sl
+    if isinstance(first, ast.List):
+      out.append(first)
+  return out
+
 class Misctests(casadiTestCase):
 
   def test_issue179B(self):
@@ -716,7 +735,8 @@ class Misctests(casadiTestCase):
       for where, ann in annotations:
         if ann is None:
           continue
-        if any(isinstance(n, ast.List) for n in ast.walk(ann)):
+        if any(isinstance(n, ast.List) and n not in _callable_param_lists(ann)
+               for n in ast.walk(ann)):
           offenders.append("line %d: %s() %s: %s"
                            % (node.lineno, node.name, where, _show(ann)))
     self.assertEqual(
