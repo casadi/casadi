@@ -91,3 +91,22 @@ if TYPE_CHECKING:
   assert_type(opti.variable(2, 2, "symmetric"), ca.MX)   # builtins.str arg
   mx[0, 0] = 1
   mx[mx] = 1
+
+  # Overload order is narrowest-first in the stub even where SWIG's runtime
+  # precedence is the other way round: str before Sequence[str], Any last.
+  dae = ca.DaeBuilder("dae")
+  assert_type(dae.min("x"), float)
+  assert_type(dae.min(["x"]), list[float])
+  assert_type(ca.Sparsity.deserialize("..."), ca.Sparsity)
+  ca.Slice(0, 5)
+  assert_type(ca.SX.sym("s", 3)[ca.Slice(0, 2)], ca.SX)   # Slice objects index
+  assert_type(ca.CasadiMeta.version(), str)               # const char* return
+  assert_type(ca.Function(f), ca.Function)                # %copyctor parameter
+
+  # issue #4407: __eq__/__ne__ on non-elementwise classes take `object` (the
+  # wrapper returns NotImplemented on a foreign operand), options dicts are
+  # typed, and simple defaults are spelled out.
+  assert_type(sp == 3, bool)
+  assert_type(ca.Slice(1) != "s", bool)
+  opti.subject_to(opti.variable() >= 0, {"linear_scale": 2.0})
+  assert_type(sp.dim(), str)                       # with_nz: bool = False

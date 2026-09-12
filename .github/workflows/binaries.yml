@@ -1565,6 +1565,105 @@ jobs:
           python alltests.py --run_slow
         shell: pwsh
         if: contains(matrix.image, 'windows')
+      # Stub gates run right after the test suite so their verdict lands
+      # early; they need the wheel installed, hence the fetch/install here.
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
+        with:
+          version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
+      - run: |
+          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
+          cd test/python
+          python function.py
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - run: |
+          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
+          cd test/python
+          python function.py
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+      # Type-check a small user program against the generated stubs, with
+      # casadi installed as a wheel exactly as a user has it.  mypy silences
+      # errors *inside* a PEP 561 package, so this cannot police stub quality
+      # in general -- pyright_stubs.py does that.  What it catches is the one
+      # class of defect that is not silenceable: anything that stops mypy
+      # building casadi.pyi's AST is a blocking error that no user config can
+      # ignore, and it takes the whole package down.  Issue #4390 shipped a
+      # duplicate `INOUT` parameter that way and forced users onto casadi<3.8.
+      # Deliberately no PYTHONPATH here: mypy must resolve casadi from
+      # site-packages, not from the unpacked workspace copy.
+      - name: mypy against the installed stubs
+        timeout-minutes: 10
+        run: |
+          pip install mypy
+          cd test/python
+          python -m mypy --no-incremental mypy_probe.py
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - name: mypy against the installed stubs
+        timeout-minutes: 10
+        run: |
+          pip install mypy
+          cd test/python
+          python -m mypy --no-incremental mypy_probe.py
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+      # stubtest cross-checks casadi.pyi against the installed runtime module
+      # (every symbol both ways, parameter names, defaults, read-only
+      # properties) -- the typeshed/numpy/scipy-stubs way of keeping a stub
+      # honest.  The grep drops SWIG's `def f(self, *args)` shadow artefact on
+      # zero-argument methods; anything else that survives fails the step.
+      - name: stubtest against the installed stubs
+        timeout-minutes: 10
+        run: |
+          cd test/python
+          python -m mypy.stubtest casadi --concise --mypy-config-file stubtest_mypy.ini --allowlist stubtest_allowlist.txt --ignore-unused-allowlist > stubtest.log || true
+          grep -v 'stub does not have \*args parameter "args"' stubtest.log > stubtest_rest.log || true
+          cat stubtest_rest.log
+          test ! -s stubtest_rest.log
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - name: stubtest against the installed stubs
+        timeout-minutes: 10
+        run: |
+          cd test/python
+          # stubtest exits 1 whenever it has findings (always: the benign class);
+          # pwsh 7.4 would otherwise abort the step on that before the filter runs.
+          $PSNativeCommandUseErrorActionPreference = $false
+          python -m mypy.stubtest casadi --concise --mypy-config-file stubtest_mypy.ini --allowlist stubtest_allowlist.txt --ignore-unused-allowlist > stubtest.log
+          $rest = @(Get-Content stubtest.log | Where-Object { $_ -notmatch 'stub does not have \*args parameter "args"' })
+          $rest
+          # GitHub appends `exit $LASTEXITCODE` to pwsh steps; stubtest's 1 must not leak.
+          if ($rest.Count -gt 0) { exit 1 } else { exit 0 }
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+      # Lint the installed stub with ruff's flake8-pyi rules: quoted
+      # annotations, implicit aliases, __eq__ operands, __future__ imports,
+      # undefined names -- the checklist of issue #4407, as reported by users
+      # running ruff/pylance.  --isolated ignores any pyproject on the runner;
+      # py39 is the oldest wheel target, so typing_extensions imports stay.
+      # PYI021: the docstrings in the stub are deliberate (IDE hover).
+      # PYI063: `/` is Python 3.8 syntax and casadi still ships 3.7 wheels; the
+      # stub uses the `__name` convention instead (misc.py enforces that).
+      - name: ruff against the installed stubs
+        timeout-minutes: 10
+        run: |
+          pip install ruff
+          python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021,PYI063 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - name: ruff against the installed stubs
+        timeout-minutes: 10
+        run: |
+          pip install ruff
+          python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021,PYI063 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+
+        
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
@@ -1626,47 +1725,3 @@ jobs:
           python internal/test_cppcmake.py '../docs/examples/cplusplus' -memcheck -skipfiles="casadi_error_handling.cpp test_opencl.cpp"
         shell: bash -el {0}
         if: contains(matrix.image, 'ubuntu')
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.4.1
-      - uses: jgillis/fetch-gh-release-asset@codex/bump-runtime-node24
-        with:
-          version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
-      - run: |
-          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
-          cd test/python
-          python function.py
-        shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows')"
-      - run: |
-          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{ matrix.py2 == '312' && '311' || matrix.py2 }}-${{ fromJSON(matrix.py2 == '312' && '311' || matrix.py2) >= 311 && 'abi3' || 'none' }}-${{env.platform}}.whl
-          cd test/python
-          python function.py
-        shell: pwsh
-        if: contains(matrix.image, 'windows')
-      # Type-check a small user program against the generated stubs, with
-      # casadi installed as a wheel exactly as a user has it.  mypy silences
-      # errors *inside* a PEP 561 package, so this cannot police stub quality
-      # in general -- pyright_stubs.py does that.  What it catches is the one
-      # class of defect that is not silenceable: anything that stops mypy
-      # building casadi.pyi's AST is a blocking error that no user config can
-      # ignore, and it takes the whole package down.  Issue #4390 shipped a
-      # duplicate `INOUT` parameter that way and forced users onto casadi<3.8.
-      # Deliberately no PYTHONPATH here: mypy must resolve casadi from
-      # site-packages, not from the unpacked workspace copy.
-      - name: mypy against the installed stubs
-        run: |
-          pip install mypy
-          cd test/python
-          python -m mypy --no-incremental mypy_probe.py
-        shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows')"
-      - name: mypy against the installed stubs
-        run: |
-          pip install mypy
-          cd test/python
-          python -m mypy --no-incremental mypy_probe.py
-        shell: pwsh
-        if: contains(matrix.image, 'windows')
-
-        

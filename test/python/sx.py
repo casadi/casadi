@@ -2098,6 +2098,17 @@ class SXtests(casadiTestCase):
     n = F(x0)
     print(n + Ff(x0,n,x-x0))
     print(ca.taylor(y,x,x0))
+  def test_numpy_style_methods(self):
+    # The %pythoncode method spellings (x.sin(), x.fmod(y), ...) mirror the
+    # free functions; fmod used to call a non-existent _casadi.mod.
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+    f = ca.Function("f", [x, y], [x.sin(), x.fmax(y), x.fmod(y), x.rcopysign(y),
+                                 x.remainder(y), x.hypot(y), round(x)])
+    self.checkarray(ca.DM(f(-7, 2)), ca.DM([-0.6569865987, 2, -1, -2, 1, 7.2801098893, -7]))
+    q, r = divmod(ca.DM(7), ca.DM(2))
+    self.checkarray(ca.vertcat(q, r), ca.DM([3, 1]))
+
 
 if __name__ == '__main__':
     unittest.main()
