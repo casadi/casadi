@@ -1668,5 +1668,23 @@ jobs:
           python -m mypy --no-incremental mypy_probe.py
         shell: pwsh
         if: contains(matrix.image, 'windows')
+      # Lint the installed stub with ruff's flake8-pyi rules: quoted
+      # annotations, implicit aliases, __eq__ operands, __future__ imports,
+      # undefined names -- the checklist of issue #4407, as reported by users
+      # running ruff/pylance.  --isolated ignores any pyproject on the runner;
+      # py39 is the oldest wheel target, so typing_extensions imports stay.
+      # PYI021: the docstrings in the stub are deliberate (IDE hover).
+      - name: ruff against the installed stubs
+        run: |
+          pip install ruff
+          python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - name: ruff against the installed stubs
+        run: |
+          pip install ruff
+          python -m ruff check --isolated --no-cache --target-version py39 --select F,PYI,UP037,RUF036 --ignore PYI021 "$(python -c 'import casadi, os; print(os.path.dirname(casadi.__file__))')/casadi.pyi"
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
 
         

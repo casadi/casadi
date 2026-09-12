@@ -3250,7 +3250,7 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 /* Forward references stay unquoted: pyright cannot evaluate a string
  * annotation inside a `|` union and silently degrades the whole alias
  * to Unknown, which disables every check that uses it. */
-%stub_alias_in(GenericType, None | bool | int | float | str | Function | Sequence[_GenericType] | %arg(Mapping[str, _GenericType]))
+%stub_alias_in(GenericType, bool | int | float | str | Function | Sequence[_GenericType] | %arg(Mapping[str, _GenericType]) | None)
 %stub_alias_out_key(GenericType, Any)
 
 /* __getitem__/__setitem__ axis index.  MX additionally accepts MX
@@ -4037,10 +4037,10 @@ class NZproxy:
 %stubcode %{class NZproxy(Generic[_TNZ]):
 %}
 %stub_method(__init__,    None, matrix: _TNZ)
-%stub_overload_method_selftyped(__getitem__, MX, "NZproxy[MX]", s: _MIndex | MX)
+%stub_overload_method_selftyped(__getitem__, MX, NZproxy[MX], s: _MIndex | MX)
 %stub_overload_method(__getitem__, _TNZ,  s: _MIndex)
-%stub_overload_method_selftyped(__setitem__, None, "NZproxy[MX]", s: _MIndex | MX, val: bool | int | float | MX | Sequence[bool | int | float])
-%stub_overload_method(__setitem__, None, s: _MIndex, val: bool | int | float | _TNZ | Sequence[bool | int | float])
+%stub_overload_method_selftyped(__setitem__, None, NZproxy[MX], s: _MIndex | MX, val: float | MX | Sequence[float])
+%stub_overload_method(__setitem__, None, s: _MIndex, val: float | _TNZ | Sequence[float])
 %stub_method0(__len__,  int)
 %stub_method0(__iter__, Iterator[_T])
 #endif
@@ -4090,7 +4090,7 @@ class NZproxy:
  * (see the MX %extend block below), registered there via a widening
  * overload so Self stays narrow. */
 %stub_method(__getitem__, Self, s: xIndex | tuple[xIndex, xIndex])
-%stub_method(__setitem__, None, s: xIndex | tuple[xIndex, xIndex], val: bool | int | float | DM | SX | MX | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any])
+%stub_method(__setitem__, None, s: xIndex | tuple[xIndex, xIndex], val: _DM | SX | MX)
 %stub_method0(__iter__, %arg(Iterator[Self]))
 %enddef
 
@@ -5647,13 +5647,13 @@ namespace casadi{
    * sites use `f.call([...])` which returns the tuple explicitly.
    * The positional overloads require at least one positional arg
    * (arg0 pos-only) so f() / f(**kw) routes to the dict overloads. */
-  %stub_overload_method(__call__, DM, __arg0: _DM, *args: _DM)
-  %stub_overload_method(__call__, SX, __arg0: _SX, *args: _SX)
-  %stub_overload_method(__call__, MX, __arg0: _MX, *args: _MX)
+  %stub_overload_method(__call__, DM, arg0: _DM, /, *args: _DM)
+  %stub_overload_method(__call__, SX, arg0: _SX, /, *args: _SX)
+  %stub_overload_method(__call__, MX, arg0: _MX, /, *args: _MX)
   %stub_overload_method(__call__, %arg(dict[builtins.str, DM]), **kwargs: _DM)
   %stub_overload_method(__call__, %arg(dict[builtins.str, SX]), **kwargs: _SX)
   %stub_overload_method(__call__, %arg(dict[builtins.str, MX]), **kwargs: _MX)
-  %stub_overload_method(__call__, %arg(dict[builtins.str, DM | SX | MX]), **kwargs: bool | int | float | DM | SX | MX)
+  %stub_overload_method(__call__, %arg(dict[builtins.str, DM | SX | MX]), **kwargs: float | DM | SX | MX)
  }
 
 }
@@ -6151,11 +6151,11 @@ namespace casadi {
    * return anything that to_ptr<DM> promotes -- int / float / DM /
    * ndarray / nested sequences -- each gets converted at the C++
    * boundary. */
-  %stub_method(eval, %arg(Sequence[_DM]), %arg(__arg: Sequence[DM]))
+  %stub_method(eval, %arg(Sequence[_DM]), %arg(arg: Sequence[DM], /))
   /* eval_buffer: director reshapes the 4-arg C++ interface (arg,
    * sizes_arg, res, sizes_res) into a 2-tuple Python interface: two
    * tuples of memoryview objects exposing the structural nonzeros. */
-  %stub_method(eval_buffer, int, %arg(__arg: tuple[memoryview, ...], res: tuple[memoryview, ...]))
+  %stub_method(eval_buffer, int, %arg(arg: tuple[memoryview, ...], res: tuple[memoryview, ...], /))
   %stub_method(get_sparsity_in,  Sparsity, i: int)
   %stub_method(get_sparsity_out, Sparsity, i: int)
 }
@@ -6251,11 +6251,11 @@ class global_unpickle_context:
  * (`Use ca.global_pickle_context(): ...`) and from test/python/serialize.py. */
 %stub_class_begin(global_pickle_context)
 %stub_method0(__enter__, StringSerializer)
-%stub_method(__exit__, None, *args: Any)
+%stub_method(__exit__, None, *args: object)
 
 %stub_class_begin(global_unpickle_context)
 %stub_method0(__enter__, StringDeserializer)
-%stub_method(__exit__, None, *args: Any)
+%stub_method(__exit__, None, *args: object)
 
 
 #endif // SWIGPYTHON
@@ -6420,14 +6420,14 @@ make_property(casadi::Opti, casadi_solver, Function);
      * above inspects args[1] to decide whether it's an options dict
      * or a linear_scale; the 3-arg form always has options last. */
     %stub_overload_method0(subject_to, None)
-    %stub_overload_method(subject_to, None, g: MX | SX | DM | bool | int | float)
-    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | bool | int | float])
-    %stub_overload_method(subject_to, None, g: MX | SX | DM | bool | int | float, options: Mapping[builtins.str, _GenericType])
-    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | bool | int | float], options: Mapping[builtins.str, _GenericType])
-    %stub_overload_method(subject_to, None, g: MX | SX | DM | bool | int | float, linear_scale: _DM)
-    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | bool | int | float], linear_scale: _DM)
-    %stub_overload_method(subject_to, None, g: MX | SX | DM | bool | int | float, linear_scale: _DM, options: Mapping[builtins.str, _GenericType])
-    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | bool | int | float], linear_scale: _DM, options: Mapping[builtins.str, _GenericType])
+    %stub_overload_method(subject_to, None, g: MX | SX | DM | float)
+    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | float])
+    %stub_overload_method(subject_to, None, g: MX | SX | DM | float, options: Mapping[builtins.str, _GenericType])
+    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | float], options: Mapping[builtins.str, _GenericType])
+    %stub_overload_method(subject_to, None, g: MX | SX | DM | float, linear_scale: _DM)
+    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | float], linear_scale: _DM)
+    %stub_overload_method(subject_to, None, g: MX | SX | DM | float, linear_scale: _DM, options: Mapping[builtins.str, _GenericType])
+    %stub_overload_method(subject_to, None, g: Sequence[MX | SX | DM | float], linear_scale: _DM, options: Mapping[builtins.str, _GenericType])
   }
 %enddef
 
@@ -6517,7 +6517,7 @@ opti_metadata_modifiers(casadi::Opti)
   /* Opti.callback registers a per-iteration Python callable; the %pythoncode
    * above defines it, so the SWIG C++ parser never sees it and pyright loses
    * visibility.  `fh` is invoked with the iteration index (int). */
-  %stub_method(callback, None, %arg(fh: "Callable[[int], Any] | None" = ...))
+  %stub_method(callback, None, %arg(fh: Callable[[int], Any] | None = ...))
 
 }
 #endif
