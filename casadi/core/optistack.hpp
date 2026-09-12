@@ -250,7 +250,7 @@ public:
   /// @{
   /** Obtain value of expression at the current value
   *
-  * In regular mode, teh current value is the converged solution
+  * In regular mode, the current value is the converged solution
   * In debug mode, the value can be non-converged
   *
   * \param[in] values Optional assignment expressions (e.g. x==3)
