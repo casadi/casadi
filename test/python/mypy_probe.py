@@ -91,3 +91,11 @@ if TYPE_CHECKING:
   assert_type(opti.variable(2, 2, "symmetric"), ca.MX)   # builtins.str arg
   mx[0, 0] = 1
   mx[mx] = 1
+
+  # issue #4407: __eq__/__ne__ on non-elementwise classes take `object` (the
+  # wrapper returns NotImplemented on a foreign operand), options dicts are
+  # typed, and simple defaults are spelled out.
+  assert_type(sp == 3, bool)
+  assert_type(ca.Slice(1) != "s", bool)
+  opti.subject_to(opti.variable() >= 0, {"linear_scale": 2.0})
+  assert_type(sp.dim(), str)                       # with_nz: bool = False
