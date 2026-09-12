@@ -259,19 +259,40 @@ class TypingTests(casadiTestCase):
       self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
     env = os.environ.copy()
     env.setdefault("PYTHONPATH", os.path.dirname(_casadi_package_dir()))
-    result = subprocess.run(
-        ["pyright", "--outputjson", pyi],
-        capture_output=True, text=True, env=env,
-    )
+    # The shipped stub carries a file-level `# pyright:` pragma that hides the
+    # deliberate overlap/override reports from anyone opening it; check a copy
+    # without it so the dead-overload detection below still sees everything.
+    with open(pyi) as fh:
+      stripped = "".join(l for l in fh if not l.startswith("# pyright:"))
+    with tempfile.TemporaryDirectory() as td:
+      pkg = os.path.join(td, "casadi")
+      os.mkdir(pkg)
+      for f in ("__init__.pyi", "py.typed"):
+        shutil.copy(os.path.join(_casadi_package_dir(), f), pkg)
+      copy = os.path.join(pkg, "casadi.pyi")
+      with open(copy, "w") as fh:
+        fh.write(stripped)
+      env["PYTHONPATH"] = td
+      result = subprocess.run(
+          ["pyright", "--outputjson", copy],
+          capture_output=True, text=True, env=env,
+      )
     try:
       diagnostics = json.loads(result.stdout).get("generalDiagnostics", [])
     except ValueError as e:
       self.fail("could not parse pyright output: %s\n%s" % (e, result.stdout[:2000]))
+    # A dead overload ("will never be used") is a real defect even though it
+    # shares the reportOverlappingOverload rule with the deliberate
+    # narrowest-first ordering: the emitter sorted a wider signature (Any,
+    # Sequence[str] vs str) ahead of a narrower one, so calls resolve to
+    # the wrong return type.
     offenders = [
         "line %d %s: %s" % (d["range"]["start"]["line"] + 1, d.get("rule"),
                             d.get("message", "").splitlines()[0])
         for d in diagnostics
-        if d.get("severity") == "error" and d.get("rule") in self.STUB_FATAL_RULES
+        if d.get("severity") == "error" and (
+            d.get("rule") in self.STUB_FATAL_RULES
+            or "will never be used" in d.get("message", ""))
     ]
     self.assertEqual(
         offenders, [],
@@ -279,6 +300,70 @@ class TypingTests(casadiTestCase):
         "annotation is not a type.  This usually means a typemap is missing "
         "pystub_in=/pystub_out=, or an alias references a class SWIG never "
         "generates.  Offenders:\n  " + "\n  ".join(offenders))
+
+  # stubtest cross-checks the stub against the *runtime* module: every
+  # stub symbol must exist at runtime and vice versa, with compatible
+  # signatures and defaults.  It is how typeshed, numpy and scipy-stubs
+  # keep stubs honest, and the guard against `%pythoncode` additions that
+  # never got a %stub_* line.  The one message dropped below is SWIG's
+  # `def f(self, *args)` shadow convention on zero-argument methods, where
+  # the stub's exact arity is the more precise contract.
+  STUBTEST_BENIGN = 'stub does not have *args parameter "args"'
+
+  def test_stubtest(self):
+    """mypy.stubtest agrees the stub matches the runtime module."""
+    import importlib.util
+    if importlib.util.find_spec("mypy") is None:
+      self.skipTest("mypy not installed")
+    here = os.path.dirname(os.path.abspath(__file__))
+    env = os.environ.copy()
+    # mypy does not read PYTHONPATH; make an uninstalled build resolvable.
+    env.setdefault("MYPYPATH", os.path.dirname(_casadi_package_dir()))
+    result = subprocess.run(
+        [sys.executable, "-m", "mypy.stubtest", "casadi", "--concise",
+         "--mypy-config-file", os.path.join(here, "stubtest_mypy.ini"),
+         "--allowlist", os.path.join(here, "stubtest_allowlist.txt"),
+         "--ignore-unused-allowlist"],
+        capture_output=True, text=True, env=env,
+    )
+    # rc 0 = clean, 1 = findings (always: the benign class), else a crash.
+    self.assertIn(result.returncode, (0, 1),
+                  "stubtest did not run:\n" + result.stderr[-2000:])
+    offenders = [l for l in result.stdout.splitlines()
+                 if l.strip() and self.STUBTEST_BENIGN not in l]
+    self.assertEqual(
+        offenders, [],
+        "casadi.pyi disagrees with the runtime module.  A `%pythoncode` "
+        "addition without a %stub_* line, a renamed parameter, or a "
+        "read-only property declared as a plain attribute.  Genuine "
+        "internals go in stubtest_allowlist.txt.  Offenders:\n  "
+        + "\n  ".join(offenders) + "\nstderr:\n" + result.stderr[-2000:])
+
+  def test_stub_constant_values(self):
+    """Every literal constant in the stub equals the runtime value.
+
+    The emitter settles enumerator values from the parser (`OP_ADD = 1`);
+    stubtest checks only the type, so a wrong value would ship silently.
+    """
+    import ast
+    pyi = os.path.join(_casadi_package_dir(), "casadi.pyi")
+    if not os.path.exists(pyi):
+      self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
+    with open(pyi) as fh:
+      tree = ast.parse(fh.read())
+    checked, wrong = 0, []
+    for node in tree.body:
+      if not (isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name)
+              and isinstance(node.value, ast.Constant)
+              and isinstance(node.value.value, (int, float))
+              and not isinstance(node.value.value, bool)):
+        continue
+      checked += 1
+      runtime = getattr(casadi, node.target.id, None)
+      if runtime != node.value.value:
+        wrong.append("%s: stub %r, runtime %r" % (node.target.id, node.value.value, runtime))
+    self.assertGreater(checked, 50, "expected the stub to carry enumerator values")
+    self.assertEqual(wrong, [], "stub constants disagree with the runtime:\n  " + "\n  ".join(wrong))
 
   def test_no_star_import_of_helpers(self):
     """No tracked test module may do `from helpers import *`.

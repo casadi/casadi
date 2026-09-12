@@ -1,0 +1,26 @@
+# mypy.stubtest allowlist for the casadi stubs (regexes on the object path).
+# Each entry is a runtime name deliberately absent from casadi.pyi.
+
+# SWIG per-object plumbing.
+casadi\.casadi\..*\.thisown
+casadi\.casadi\..*\.__swig_destroy__
+casadi\.casadi\.(Callback|OptiCallback)\.__disown__
+casadi\.casadi\.SwigPyIterator(\..*)?
+# Shared libraries in the package directory are not modules.
+casadi\.lib.*
+# Untyped runtime helpers (py.typed is partial); casadi.tools has no stub.
+casadi\.tools(\..*)?
+casadi\.casadi
+# Typemap conversion helpers, not API.
+casadi(\.casadi)?\.(DM|SX|IM)_from_array
+casadi(\.casadi)?\.DM_from_csc
+casadi(\.casadi)?\.swig_typename_convertor_python2cpp
+casadi(\.casadi)?\.swigtypeconvertor
+# Legacy CustomFunction glue that raises NameError when called.
+casadi(\.casadi)?\.(PyFunction|pycallback|pyevaluate|pyfunction|attach_return_type)
+# Deprecation helpers in __init__.py.
+casadi\.(Deprecate|wrapper)
+# __all__ lives in __init__.py at runtime and in casadi.pyi in the stub.
+casadi(\.casadi)?\.__all__
+# Modules leaked into the namespace by __init__.py / casadi.py imports.
+casadi\.(contextlib|inspect|math|np|numpy|os|re|sys|threading|types|warnings|weakref)
