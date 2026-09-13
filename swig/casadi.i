@@ -4434,7 +4434,10 @@ namespace casadi{
 
 %include <casadi/core/generic_expression.hpp>
 
-// Flags to allow differentiating the wrapping by type
+// Flags to allow differentiating the wrapping by type.  SWIG wraps every
+// literal #define as a module constant; these are interface-internal.
+%ignore IS_GLOBAL; %ignore IS_MEMBER; %ignore IS_SPARSITY; %ignore IS_DMATRIX;
+%ignore IS_IMATRIX; %ignore IS_SX; %ignore IS_MX; %ignore IS_DOUBLE; %ignore FLAG;
 #define IS_GLOBAL   0x1
 #define IS_MEMBER   0x10
 #define IS_SPARSITY 0x100
