@@ -43475,7 +43475,7 @@ MX > &values=std::vector< MX >()) const "
 [INTERNAL] 
 Obtain value of expression at the current value
 
-In regular mode, teh current value is the converged solution In debug 
+In regular mode, the current value is the converged solution In debug 
 mode,
  the value can be non-converged
 
@@ -45034,7 +45034,7 @@ MX > &values=std::vector< MX >()) const "
 [INTERNAL] 
 Obtain value of expression at the current value
 
-In regular mode, teh current value is the converged solution In debug 
+In regular mode, the current value is the converged solution In debug 
 mode,
  the value can be non-converged
 
