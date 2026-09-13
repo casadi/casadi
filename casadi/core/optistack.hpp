@@ -206,7 +206,6 @@ public:
   void set_value(const std::vector<MX>& assignments);
   /// @}
 
-  /// @{
   /** \brief Set domain of a decision variable
   *
   * \param[in] x decision variable
