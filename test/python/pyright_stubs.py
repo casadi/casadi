@@ -301,6 +301,45 @@ class TypingTests(casadiTestCase):
         "pystub_in=/pystub_out=, or an alias references a class SWIG never "
         "generates.  Offenders:\n  " + "\n  ".join(offenders))
 
+  # stubtest cross-checks the stub against the *runtime* module: every
+  # stub symbol must exist at runtime and vice versa, with compatible
+  # signatures and defaults.  It is how typeshed, numpy and scipy-stubs
+  # keep stubs honest, and the guard against `%pythoncode` additions that
+  # never got a %stub_* line.  The one message dropped below is SWIG's
+  # `def f(self, *args)` shadow convention on zero-argument methods, where
+  # the stub's exact arity is the more precise contract.
+  STUBTEST_BENIGN = 'stub does not have *args parameter "args"'
+
+  def test_stubtest(self):
+    """mypy.stubtest agrees the stub matches the runtime module."""
+    try:
+      import mypy.stubtest  # noqa: F401
+    except ImportError:
+      self.skipTest("mypy not installed")
+    here = os.path.dirname(os.path.abspath(__file__))
+    env = os.environ.copy()
+    # mypy does not read PYTHONPATH; make an uninstalled build resolvable.
+    env.setdefault("MYPYPATH", os.path.dirname(_casadi_package_dir()))
+    result = subprocess.run(
+        [sys.executable, "-m", "mypy.stubtest", "casadi", "--concise",
+         "--mypy-config-file", os.path.join(here, "stubtest_mypy.ini"),
+         "--allowlist", os.path.join(here, "stubtest_allowlist.txt"),
+         "--ignore-unused-allowlist"],
+        capture_output=True, text=True, env=env,
+    )
+    # rc 0 = clean, 1 = findings (always: the benign class), else a crash.
+    self.assertIn(result.returncode, (0, 1),
+                  "stubtest did not run:\n" + result.stderr[-2000:])
+    offenders = [l for l in result.stdout.splitlines()
+                 if l.strip() and self.STUBTEST_BENIGN not in l]
+    self.assertEqual(
+        offenders, [],
+        "casadi.pyi disagrees with the runtime module.  A `%pythoncode` "
+        "addition without a %stub_* line, a renamed parameter, or a "
+        "read-only property declared as a plain attribute.  Genuine "
+        "internals go in stubtest_allowlist.txt.  Offenders:\n  "
+        + "\n  ".join(offenders) + "\nstderr:\n" + result.stderr[-2000:])
+
   def test_no_star_import_of_helpers(self):
     """No tracked test module may do `from helpers import *`.
 

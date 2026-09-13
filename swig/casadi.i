@@ -3150,11 +3150,12 @@ class _SupportsMX(Protocol):
     dispatches to the backing-typed subclass ArrayInterfaceDM/SX/MX."""
     __array_priority__: float
     @overload
-    def __new__(cls, value: SX, ndim: int = ...) -> ArrayInterfaceSX: ...
+    def __new__(cls, value: SX, ndim: int | None = None) -> ArrayInterfaceSX: ...
     @overload
-    def __new__(cls, value: MX, ndim: int = ...) -> ArrayInterfaceMX: ...
+    def __new__(cls, value: MX, ndim: int | None = None) -> ArrayInterfaceMX: ...
     @overload
-    def __new__(cls, value: object = ..., ndim: int = ...) -> ArrayInterfaceDM: ...
+    def __new__(cls, value: object = None, ndim: int | None = None) -> ArrayInterfaceDM: ...
+    def __init__(self, value: object, ndim: int | None = None) -> None: ...
     @property
     def shape(self) -> tuple[int, ...]: ...
     @property
@@ -3166,21 +3167,24 @@ class _SupportsMX(Protocol):
     def T(self) -> ArrayInterface[_T]: ...
     def reshape(self, *shape: int) -> ArrayInterface[_T]: ...
     def transpose(self, *axes: int) -> ArrayInterface[_T]: ...
-    def squeeze(self, axis: int | tuple[int, ...] | None = ...) -> ArrayInterface[_T]: ...
+    def squeeze(self, axis: int | tuple[int, ...] | None = None) -> ArrayInterface[_T]: ...
     def flatten(self) -> ArrayInterface[_T]: ...
     def ravel(self) -> ArrayInterface[_T]: ...
     @property
     def flat(self) -> Any: ...
     def to_DM(self) -> DM: ...
-    def sum(self, axis: int | tuple[int, ...] | None = ...) -> ArrayInterface[_T]: ...
-    def mean(self, axis: int | tuple[int, ...] | None = ...) -> ArrayInterface[_T]: ...
+    def sum(self, axis: int | tuple[int, ...] | None = None) -> ArrayInterface[_T]: ...
+    def mean(self, axis: int | tuple[int, ...] | None = None) -> ArrayInterface[_T]: ...
     def __getitem__(self, idx: Any) -> ArrayInterface[_T]: ...
     def __setitem__(self, idx: Any, value: Any) -> None: ...
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[ArrayInterface[_T]]: ...
-    def __array__(self, dtype: Any = ...) -> NDArray[Any]: ...
+    def __array__(self, dtype: Any = None, copy: bool | None = None) -> NDArray[Any]: ...
+    def __array_ufunc__(self, ufunc: Any, method: builtins.str, *inputs: Any, **kwargs: Any) -> Any: ...
+    def __array_function__(self, func: Any, types: Any, args: Any, kwargs: Any) -> Any: ...
     def __float__(self) -> float: ...
     def __int__(self) -> int: ...
+    def __bool__(self) -> bool: ...
     def __add__(self, o: Any) -> ArrayInterface[_T]: ...
     def __radd__(self, o: Any) -> ArrayInterface[_T]: ...
     def __sub__(self, o: Any) -> ArrayInterface[_T]: ...
@@ -3188,9 +3192,33 @@ class _SupportsMX(Protocol):
     def __mul__(self, o: Any) -> ArrayInterface[_T]: ...
     def __rmul__(self, o: Any) -> ArrayInterface[_T]: ...
     def __truediv__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __rtruediv__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __floordiv__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __rfloordiv__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __mod__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __rmod__(self, o: Any) -> ArrayInterface[_T]: ...
     def __pow__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __rpow__(self, o: Any) -> ArrayInterface[_T]: ...
     def __matmul__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __rmatmul__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __lt__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __le__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __gt__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __ge__(self, o: Any) -> ArrayInterface[_T]: ...
+    def __eq__(self, o: object) -> ArrayInterface[_T]: ...  # type: ignore[override]
+    def __ne__(self, o: object) -> ArrayInterface[_T]: ...  # type: ignore[override]
+    __hash__: None  # type: ignore[assignment]
     def __neg__(self) -> ArrayInterface[_T]: ...
+    def __pos__(self) -> ArrayInterface[_T]: ...
+    def __abs__(self) -> ArrayInterface[_T]: ...
+    def prod(self, axis: int | tuple[int, ...] | None = None) -> ArrayInterface[_T]: ...
+    def max(self, axis: int | tuple[int, ...] | None = None) -> ArrayInterface[_T]: ...
+    def min(self, axis: int | tuple[int, ...] | None = None) -> ArrayInterface[_T]: ...
+    def ptp(self, axis: int | tuple[int, ...] | None = None) -> ArrayInterface[_T]: ...
+    def all(self, axis: int | tuple[int, ...] | None = None) -> ArrayInterface[_T]: ...
+    def any(self, axis: int | tuple[int, ...] | None = None) -> ArrayInterface[_T]: ...
+    def var(self, axis: int | tuple[int, ...] | None = None, ddof: int = 0) -> ArrayInterface[_T]: ...
+    def std(self, axis: int | tuple[int, ...] | None = None, ddof: int = 0) -> ArrayInterface[_T]: ...
     @classmethod
     def DM(cls, value: Any, shape: Any = ...) -> ArrayInterfaceDM: ...
     @classmethod
@@ -3796,9 +3824,13 @@ PyOS_setsig(SIGINT, SigIntHandler);
 %stub_unary_math(arctanh)
 %stub_unary_math(arcsinh)
 %stub_unary_math(arccosh)
-%stub_overload_func(arctan2, DM, y: _DM, x: _DM)
-%stub_overload_func(arctan2, SX, y: _SX, x: _SX)
-%stub_overload_func(arctan2, MX, y: _MX, x: _MX)
+/* Re-exported from numpy at runtime (`from numpy import pi, inf`). */
+%stubcode %{pi: float
+inf: float
+%}
+%stub_overload_func(arctan2, DM, x: _DM, y: _DM)
+%stub_overload_func(arctan2, SX, x: _SX, y: _SX)
+%stub_overload_func(arctan2, MX, x: _MX, y: _MX)
 #endif // SWIGPYTHON
 
 #ifdef SWIGWASMJS
@@ -4135,6 +4167,10 @@ class NZproxy:
  * scalar-object boxing for symbolic.  Keeps scipy.linalg.solve(A,b)
  * etc. typing without forcing users to wrap calls in np.array().  */
 %stub_method(__array__, %arg(NDArray[np.float64]), *args: Any, **kwargs: Any)
+%stubcode %{    __array_priority__: float
+%}
+%stub_method(__array_ufunc__, Any, ufunc: Any, method: builtins.str, *inputs: Any, **kwargs: Any)
+%stub_method(__array_function__, Any, func: Any, types: Any, args: Any, kwargs: Any)
 %enddef
 #endif // SWIGPYTHON
 
@@ -4283,6 +4319,9 @@ namespace casadi{
     def __copy__(self): return self.__class__(self)
     def __deepcopy__(self, memo=None): return self.__class__(self)
   %}
+  %stub_method0(repr, builtins.str)
+  %stub_method0(__copy__, Self)
+  %stub_method(__deepcopy__, Self, memo: dict[int, Any] | None = None)
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
   %matlabcode %{
@@ -4318,6 +4357,9 @@ namespace casadi{
     def __getstate__(self):
         return {"serialization": self.serialize()}
   %}
+  %stub_method0(__getstate__, %arg(dict[builtins.str, Any]))
+  %stub_method(__setstate__, None, state: Mapping[builtins.str, Any])
+  %stub_method(__array__, %arg(NDArray[Any]), *args: Any, **kwargs: Any)
   /* Runtime-accessible attributes exposed via C++ getters but
    * without an explicit typemap doc= annotation.  */
   %stub_attr(T, Sparsity)
@@ -4345,6 +4387,8 @@ namespace casadi{
       ctx.pack(self)
       return ctx.encode()
   %}
+  %stub_method0(__getstate__, Any)
+  %stub_method(__setstate__, None, state: Any)
 }
 %extend MX {
   %pythoncode %{
@@ -4368,6 +4412,8 @@ namespace casadi{
       ctx.pack(self)
       return ctx.encode()
   %}
+  %stub_method0(__getstate__, Any)
+  %stub_method(__setstate__, None, state: Any)
 }
 
 } // namespace casadi
@@ -5366,6 +5412,8 @@ namespace casadi{
     def __getstate__(self):
         return {"serialization": self.serialize()}
   %}
+  %stub_method0(__getstate__, %arg(dict[builtins.str, Any]))
+  %stub_method(__setstate__, None, state: Mapping[builtins.str, Any])
 
 }
 
@@ -5379,6 +5427,8 @@ namespace casadi{
     def __getstate__(self):
         return {"serialization": self.serialize()}
   %}
+  %stub_method0(__getstate__, %arg(dict[builtins.str, Any]))
+  %stub_method(__setstate__, None, state: Mapping[builtins.str, Any])
 
 }
 
@@ -6032,48 +6082,48 @@ namespace casadi {
       def __ipow__(x, n):      return _casadi.power(x, n)
       def __arctan2__(x, y): return _casadi.atan2(x, y)
       def __rarctan2__(y, x): return _casadi.atan2(x, y)
-      def fmin(x, y): return _casadi.fmin(x, y)
-      def fmax(x, y): return _casadi.fmax(x, y)
+      def fmin(self, other): return _casadi.fmin(self, other)
+      def fmax(self, other): return _casadi.fmax(self, other)
       def __fmin__(x, y): return _casadi.fmin(x, y)
       def __rfmin__(y, x): return _casadi.fmin(x, y)
       def __fmax__(x, y): return _casadi.fmax(x, y)
       def __rfmax__(y, x): return _casadi.fmax(x, y)
-      def logic_and(x, y): return _casadi.logic_and(x, y)
-      def logic_or(x, y): return _casadi.logic_or(x, y)
-      def fabs(x): return _casadi.fabs(x)
-      def sqrt(x): return _casadi.sqrt(x)
-      def sin(x): return _casadi.sin(x)
-      def cos(x): return _casadi.cos(x)
-      def tan(x): return _casadi.tan(x)
-      def arcsin(x): return _casadi.asin(x)
-      def arccos(x): return _casadi.acos(x)
-      def arctan(x): return _casadi.atan(x)
-      def sinh(x): return _casadi.sinh(x)
-      def cosh(x): return _casadi.cosh(x)
-      def tanh(x): return _casadi.tanh(x)
-      def arcsinh(x): return _casadi.asinh(x)
-      def arccosh(x): return _casadi.acosh(x)
-      def arctanh(x): return _casadi.atanh(x)
-      def exp(x): return _casadi.exp(x)
-      def log(x): return _casadi.log(x)
-      def log10(x): return _casadi.log10(x)
-      def log1p(x): return _casadi.log1p(x)
-      def expm1(x): return _casadi.expm1(x)
-      def floor(x): return _casadi.floor(x)
-      def ceil(x): return _casadi.ceil(x)
-      def erf(x): return _casadi.erf(x)
-      def sign(x): return _casadi.sign(x)
-      def fmod(x, y): return _casadi.mod(x, y)
-      def hypot(x, y): return _casadi.hypot(x, y)
-      def remainder(x, y): return _casadi.remainder(x, y)
+      def logic_and(self, other): return _casadi.logic_and(self, other)
+      def logic_or(self, other): return _casadi.logic_or(self, other)
+      def fabs(self): return _casadi.fabs(self)
+      def sqrt(self): return _casadi.sqrt(self)
+      def sin(self): return _casadi.sin(self)
+      def cos(self): return _casadi.cos(self)
+      def tan(self): return _casadi.tan(self)
+      def arcsin(self): return _casadi.asin(self)
+      def arccos(self): return _casadi.acos(self)
+      def arctan(self): return _casadi.atan(self)
+      def sinh(self): return _casadi.sinh(self)
+      def cosh(self): return _casadi.cosh(self)
+      def tanh(self): return _casadi.tanh(self)
+      def arcsinh(self): return _casadi.asinh(self)
+      def arccosh(self): return _casadi.acosh(self)
+      def arctanh(self): return _casadi.atanh(self)
+      def exp(self): return _casadi.exp(self)
+      def log(self): return _casadi.log(self)
+      def log10(self): return _casadi.log10(self)
+      def log1p(self): return _casadi.log1p(self)
+      def expm1(self): return _casadi.expm1(self)
+      def floor(self): return _casadi.floor(self)
+      def ceil(self): return _casadi.ceil(self)
+      def erf(self): return _casadi.erf(self)
+      def sign(self): return _casadi.sign(self)
+      def fmod(self, other): return _casadi.fmod(self, other)
+      def hypot(self, other): return _casadi.hypot(self, other)
+      def remainder(self, other): return _casadi.remainder(self, other)
       def __copysign__(x, y): return _casadi.copysign(x, y)
       def __rcopysign__(y, x): return _casadi.copysign(x, y)
-      def copysign(x, y): return _casadi.copysign(x, y)
-      def rcopysign(y, x): return _casadi.copysign(x, y)
+      def copysign(self, other): return _casadi.copysign(self, other)
+      def rcopysign(self, other): return _casadi.copysign(other, self)
       def __constpow__(x, y): return _casadi.constpow(x, y)
       def __rconstpow__(y, x): return _casadi.constpow(x, y)
-      def constpow(x, y): return _casadi.constpow(x, y)
-      def rconstpow(y, x): return _casadi.constpow(x, y)
+      def constpow(self, other): return _casadi.constpow(self, other)
+      def rconstpow(self, other): return _casadi.constpow(other, self)
     %}
     /* PEP-484 stubs for the %pythoncode operators above. */
     %stub_CasadiMatrix_binop(__add__)
@@ -6088,7 +6138,9 @@ namespace casadi {
     %stub_CasadiMatrix_binop(__rfloordiv__)
     %stub_CasadiMatrix_binop(__mod__)
     %stub_CasadiMatrix_binop(__rmod__)
-    %stub_CasadiMatrix_binop(__pow__)
+    %stub_overload_method_selftyped(__pow__, DM, DM, other: _DM, modulo: _DM | None = None)
+    %stub_overload_method_selftyped(__pow__, SX, SX, other: _SX, modulo: _SX | None = None)
+    %stub_overload_method_selftyped(__pow__, MX, MX, other: _MX, modulo: _MX | None = None)
     %stub_CasadiMatrix_binop(__rpow__)
     %stub_CasadiMatrix_binop(__iadd__)
     %stub_CasadiMatrix_binop(__isub__)
@@ -6097,8 +6149,6 @@ namespace casadi {
     %stub_CasadiMatrix_binop(__ifloordiv__)
     %stub_CasadiMatrix_binop(__imod__)
     %stub_CasadiMatrix_binop(__ipow__)
-    %stub_CasadiMatrix_unop(__neg__)
-    %stub_CasadiMatrix_unop(__pos__)
     %stub_CasadiMatrix_unop(__abs__)
     %stub_CasadiMatrix_unop(__trunc__)
     %stub_CasadiMatrix_unop(__floor__)
@@ -6109,6 +6159,64 @@ namespace casadi {
     %stub_CasadiMatrix_cmp(__ge__)
     %stub_CasadiMatrix_cmp(__eq__)
     %stub_CasadiMatrix_cmp(__ne__)
+    %stub_CasadiMatrix_cmp(__req__)
+    %stub_CasadiMatrix_cmp(__rne__)
+    %stub_CasadiMatrix_cmp(__rlt__)
+    %stub_CasadiMatrix_cmp(__rle__)
+    %stub_CasadiMatrix_cmp(__rgt__)
+    %stub_CasadiMatrix_cmp(__rge__)
+    %stub_method(__round__, Self, ndigits: int | None = None)
+    %stub_overload_method_selftyped(__divmod__,  %arg(tuple[DM, DM]), DM, other: _DM)
+    %stub_overload_method_selftyped(__divmod__,  %arg(tuple[SX, SX]), SX, other: _SX)
+    %stub_overload_method_selftyped(__divmod__,  %arg(tuple[MX, MX]), MX, other: _MX)
+    %stub_overload_method_selftyped(__rdivmod__, %arg(tuple[DM, DM]), DM, other: _DM)
+    %stub_overload_method_selftyped(__rdivmod__, %arg(tuple[SX, SX]), SX, other: _SX)
+    %stub_overload_method_selftyped(__rdivmod__, %arg(tuple[MX, MX]), MX, other: _MX)
+    /* numpy-style method spellings of the elementwise functions. */
+    %stub_CasadiMatrix_unop(fabs)
+    %stub_CasadiMatrix_unop(sqrt)
+    %stub_CasadiMatrix_unop(sin)
+    %stub_CasadiMatrix_unop(cos)
+    %stub_CasadiMatrix_unop(tan)
+    %stub_CasadiMatrix_unop(arcsin)
+    %stub_CasadiMatrix_unop(arccos)
+    %stub_CasadiMatrix_unop(arctan)
+    %stub_CasadiMatrix_unop(sinh)
+    %stub_CasadiMatrix_unop(cosh)
+    %stub_CasadiMatrix_unop(tanh)
+    %stub_CasadiMatrix_unop(arcsinh)
+    %stub_CasadiMatrix_unop(arccosh)
+    %stub_CasadiMatrix_unop(arctanh)
+    %stub_CasadiMatrix_unop(exp)
+    %stub_CasadiMatrix_unop(log)
+    %stub_CasadiMatrix_unop(log10)
+    %stub_CasadiMatrix_unop(log1p)
+    %stub_CasadiMatrix_unop(expm1)
+    %stub_CasadiMatrix_unop(floor)
+    %stub_CasadiMatrix_unop(ceil)
+    %stub_CasadiMatrix_unop(erf)
+    %stub_CasadiMatrix_unop(sign)
+    %stub_CasadiMatrix_binop(fmin)
+    %stub_CasadiMatrix_binop(fmax)
+    %stub_CasadiMatrix_binop(logic_and)
+    %stub_CasadiMatrix_binop(logic_or)
+    %stub_CasadiMatrix_binop(fmod)
+    %stub_CasadiMatrix_binop(hypot)
+    %stub_CasadiMatrix_binop(remainder)
+    %stub_CasadiMatrix_binop(copysign)
+    %stub_CasadiMatrix_binop(rcopysign)
+    %stub_CasadiMatrix_binop(constpow)
+    %stub_CasadiMatrix_binop(rconstpow)
+    %stub_CasadiMatrix_binop(__arctan2__)
+    %stub_CasadiMatrix_binop(__rarctan2__)
+    %stub_CasadiMatrix_binop(__fmin__)
+    %stub_CasadiMatrix_binop(__rfmin__)
+    %stub_CasadiMatrix_binop(__fmax__)
+    %stub_CasadiMatrix_binop(__rfmax__)
+    %stub_CasadiMatrix_binop(__copysign__)
+    %stub_CasadiMatrix_binop(__rcopysign__)
+    %stub_CasadiMatrix_binop(__constpow__)
+    %stub_CasadiMatrix_binop(__rconstpow__)
   }
 
   %extend GenericMatrixCommon {
