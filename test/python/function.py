@@ -2300,7 +2300,7 @@ class Functiontests(casadiTestCase):
     x = ca.MX.sym('x')
     y = ca.MX.sym('y')
     f = ca.Function('f', [x, y], [x ** 2 - y])
-    for rf in ["newton","fast_newton"]:
+    for rf in ["newton","fast_newton","bisection"]:
       finv = ca.rootfinder('finv', rf, f)
 
       finv_par = finv.map(50,"unroll").map(4, 'thread',4)

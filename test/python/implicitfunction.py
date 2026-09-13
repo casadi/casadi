@@ -330,6 +330,52 @@ class ImplicitFunctiontests(casadiTestCase):
       res = solver(x0=0)["x"]
       self.checkarray(res,-1.7692923542386)
 
+  def test_bisection(self):
+    x=ca.SX.sym("x")
+    p=ca.SX.sym("p")
+    f=ca.Function("f", [x,p], [x**2-p])
+    solver=ca.rootfinder("solver", "bisection", f)
+
+    # Root, plus derivatives via the implicit function theorem
+    refsol = ca.Function("refsol", [x,p], [ca.sqrt(p)])
+    self.checkfunction(solver,refsol,inputs=[1,2],digits=7,sens_der=False)
+    self.check_serialize(solver,inputs=[1,2])
+
+    stats = solver.stats()
+    self.assertTrue(stats["success"])
+    self.assertEqual(stats["return_status"], "converged_abstol")
+    self.assertTrue(stats["search_iter"]>=1)
+    self.assertTrue(stats["iter_count"]>=1)
+
+    # Negative root with default bounds: the initial guess picks the root
+    self.checkarray(solver(-1,2), -ca.sqrt(2), digits=7)
+    refsol = ca.Function("refsol", [x,p], [-ca.sqrt(p)])
+    self.checkfunction(solver,refsol,inputs=[-1,2],digits=7,sens_der=False)
+
+    # Explicit bracket picks the root
+    solver=ca.rootfinder("solver", "bisection", f, {"lb":-10,"ub":0})
+    self.checkarray(solver(1,2), -ca.sqrt(2), digits=7)
+    solver=ca.rootfinder("solver", "bisection", f, {"lb":0,"ub":10})
+    self.checkarray(solver(-1,2), ca.sqrt(2), digits=7)
+
+    # Tolerance options
+    solver=ca.rootfinder("solver", "bisection", f, {"abstol":1e-12,"abstol_step":1e-12})
+    self.checkarray(solver(1,2), ca.sqrt(2), digits=10)
+
+    # Non-scalar problems are rejected
+    with self.assertInException("scalar"):
+      ca.rootfinder("solver", "bisection", {"x":ca.vertcat(x,p), "g":ca.vertcat(x,p)})
+
+    # No sign change inside [lb,ub]
+    f=ca.Function("f", [x,p], [x**2+p])
+    solver=ca.rootfinder("solver", "bisection", f, {"error_on_fail":False,"lb":-1,"ub":1})
+    solver(1,1)
+    self.assertFalse(solver.stats()["success"])
+    self.assertEqual(solver.stats()["return_status"], "failed_to_bracket_root")
+    solver=ca.rootfinder("solver", "bisection", f, {"lb":-1,"ub":1})
+    with self.assertInException("process"):
+      solver(1,1)
+
   def test_segfault_codegen(self):
     # Symbols
     x = ca.MX.sym("x")

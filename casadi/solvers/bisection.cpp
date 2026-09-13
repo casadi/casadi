@@ -51,7 +51,7 @@ namespace casadi
         max_iter_ = 100;
         abstol_ = 1e-9;
         abstol_step_ = 1e-9;
-        lb_ = -1e-12;
+        lb_ = -1e12;
         ub_ = 1e12;
         search_step_ = 1.0;
         max_search_ = 100;
