@@ -92,6 +92,14 @@ if TYPE_CHECKING:
   mx[0, 0] = 1
   mx[mx] = 1
 
+  # Overload order is narrowest-first in the stub even where SWIG's runtime
+  # precedence is the other way round: str before Sequence[str], Any last.
+  dae = ca.DaeBuilder("dae")
+  assert_type(dae.min("x"), float)
+  assert_type(dae.min(["x"]), list[float])
+  assert_type(ca.Sparsity.deserialize("..."), ca.Sparsity)
+  ca.Slice(0, 5)
+
   # issue #4407: __eq__/__ne__ on non-elementwise classes take `object` (the
   # wrapper returns NotImplemented on a foreign operand), options dicts are
   # typed, and simple defaults are spelled out.

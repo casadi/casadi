@@ -259,19 +259,40 @@ class TypingTests(casadiTestCase):
       self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
     env = os.environ.copy()
     env.setdefault("PYTHONPATH", os.path.dirname(_casadi_package_dir()))
-    result = subprocess.run(
-        ["pyright", "--outputjson", pyi],
-        capture_output=True, text=True, env=env,
-    )
+    # The shipped stub carries a file-level `# pyright:` pragma that hides the
+    # deliberate overlap/override reports from anyone opening it; check a copy
+    # without it so the dead-overload detection below still sees everything.
+    with open(pyi) as fh:
+      stripped = "".join(l for l in fh if not l.startswith("# pyright:"))
+    with tempfile.TemporaryDirectory() as td:
+      pkg = os.path.join(td, "casadi")
+      os.mkdir(pkg)
+      for f in ("__init__.pyi", "py.typed"):
+        shutil.copy(os.path.join(_casadi_package_dir(), f), pkg)
+      copy = os.path.join(pkg, "casadi.pyi")
+      with open(copy, "w") as fh:
+        fh.write(stripped)
+      env["PYTHONPATH"] = td
+      result = subprocess.run(
+          ["pyright", "--outputjson", copy],
+          capture_output=True, text=True, env=env,
+      )
     try:
       diagnostics = json.loads(result.stdout).get("generalDiagnostics", [])
     except ValueError as e:
       self.fail("could not parse pyright output: %s\n%s" % (e, result.stdout[:2000]))
+    # A dead overload ("will never be used") is a real defect even though it
+    # shares the reportOverlappingOverload rule with the deliberate
+    # narrowest-first ordering: the emitter sorted a wider signature (Any,
+    # Sequence[str] vs str) ahead of a narrower one, so calls resolve to
+    # the wrong return type.
     offenders = [
         "line %d %s: %s" % (d["range"]["start"]["line"] + 1, d.get("rule"),
                             d.get("message", "").splitlines()[0])
         for d in diagnostics
-        if d.get("severity") == "error" and d.get("rule") in self.STUB_FATAL_RULES
+        if d.get("severity") == "error" and (
+            d.get("rule") in self.STUB_FATAL_RULES
+            or "will never be used" in d.get("message", ""))
     ]
     self.assertEqual(
         offenders, [],

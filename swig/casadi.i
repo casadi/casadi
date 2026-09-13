@@ -3103,6 +3103,11 @@ namespace std {
 #ifdef SWIG_STUBS_ENABLED
 
 %insert("stubs_preamble") %{
+# Overloads are ordered narrowest-first on purpose (`sin(float) -> float`
+# before `sin(_DM) -> DM`), and DM/SX/MX compare elementwise; pyright
+# reports both as overlap/override defects when this file itself is opened.
+# test/python/pyright_stubs.py checks the stub with this line stripped.
+# pyright: reportOverlappingOverload=false, reportIncompatibleMethodOverride=false
 # `str` is also a method name on DM/SX/Opti/...; inside those class bodies a
 # bare `str` annotation resolves to the method, so type tokens use builtins.str.
 import builtins
@@ -3111,9 +3116,9 @@ from numpy.typing import NDArray
 from collections.abc import Callable
 from typing import Protocol, runtime_checkable
 _T = TypeVar("_T", DM, SX, MX)
-# NZproxy is parameterised with Self, so it needs an unconstrained TypeVar:
-# a value-constrained one only accepts its exact constraints.
-_TNZ = TypeVar("_TNZ")
+# NZproxy is parameterised with Self, so its TypeVar is bounded, not
+# value-constrained: a constrained one only accepts its exact constraints.
+_TNZ = TypeVar("_TNZ", bound=DM | SX | MX)
 
 @runtime_checkable
 class _SupportsDM(Protocol):
