@@ -340,6 +340,32 @@ class TypingTests(casadiTestCase):
         "internals go in stubtest_allowlist.txt.  Offenders:\n  "
         + "\n  ".join(offenders) + "\nstderr:\n" + result.stderr[-2000:])
 
+  def test_stub_constant_values(self):
+    """Every literal constant in the stub equals the runtime value.
+
+    The emitter settles enumerator values from the parser (`OP_ADD = 1`);
+    stubtest checks only the type, so a wrong value would ship silently.
+    """
+    import ast
+    pyi = os.path.join(_casadi_package_dir(), "casadi.pyi")
+    if not os.path.exists(pyi):
+      self.skipTest("casadi.pyi not installed; stubs are disabled in this build")
+    with open(pyi) as fh:
+      tree = ast.parse(fh.read())
+    checked, wrong = 0, []
+    for node in tree.body:
+      if not (isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name)
+              and isinstance(node.value, ast.Constant)
+              and isinstance(node.value.value, (int, float))
+              and not isinstance(node.value.value, bool)):
+        continue
+      checked += 1
+      runtime = getattr(casadi, node.target.id, None)
+      if runtime != node.value.value:
+        wrong.append("%s: stub %r, runtime %r" % (node.target.id, node.value.value, runtime))
+    self.assertGreater(checked, 50, "expected the stub to carry enumerator values")
+    self.assertEqual(wrong, [], "stub constants disagree with the runtime:\n  " + "\n  ".join(wrong))
+
   def test_no_star_import_of_helpers(self):
     """No tracked test module may do `from helpers import *`.
 
