@@ -312,9 +312,8 @@ class TypingTests(casadiTestCase):
 
   def test_stubtest(self):
     """mypy.stubtest agrees the stub matches the runtime module."""
-    try:
-      import mypy.stubtest  # noqa: F401
-    except ImportError:
+    import importlib.util
+    if importlib.util.find_spec("mypy") is None:
       self.skipTest("mypy not installed")
     here = os.path.dirname(os.path.abspath(__file__))
     env = os.environ.copy()
