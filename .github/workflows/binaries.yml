@@ -1685,10 +1685,13 @@ jobs:
       - name: stubtest against the installed stubs
         run: |
           cd test/python
+          # stubtest exits 1 whenever it has findings (always: the benign class);
+          # pwsh 7.4 would otherwise abort the step on that before the filter runs.
+          $PSNativeCommandUseErrorActionPreference = $false
           python -m mypy.stubtest casadi --concise --mypy-config-file stubtest_mypy.ini --allowlist stubtest_allowlist.txt --ignore-unused-allowlist > stubtest.log
-          $rest = Get-Content stubtest.log | Where-Object { $_ -notmatch 'stub does not have \*args parameter "args"' }
+          $rest = @(Get-Content stubtest.log | Where-Object { $_ -notmatch 'stub does not have \*args parameter "args"' })
           $rest
-          if ($rest) { exit 1 }
+          if ($rest.Count -gt 0) { exit 1 }
         shell: pwsh
         if: contains(matrix.image, 'windows')
       # Lint the installed stub with ruff's flake8-pyi rules: quoted
