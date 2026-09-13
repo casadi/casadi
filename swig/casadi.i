@@ -3288,7 +3288,7 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 
 /* __getitem__/__setitem__ axis index.  MX additionally accepts MX
  * indices, added via a narrower %extend overload on MX itself. */
-%stub_alias_in(MIndex, int | slice | Sequence[bool | int] | NDArray[Any] | Sparsity | DM)
+%stub_alias_in(MIndex, int | slice | Slice | Sequence[bool | int] | NDArray[Any] | Sparsity | DM)
 
 /* CasadiMatrix operator overloads.  Emitted on GenericExpressionCommon,
  * which DM/SX/MX all inherit -- per-class overloads narrow the `other`
@@ -4131,7 +4131,7 @@ class NZproxy:
 %stub_method0(__iter__, %arg(Iterator[Self]))
 %enddef
 
-%define %python_array_wrappers(arraypriority)
+%define %python_array_wrappers(arraypriority, arraydtype)
 %pythoncode %{
 
   __array_priority__ = arraypriority
@@ -4166,7 +4166,7 @@ class NZproxy:
  * an ArrayLike.  Runtime path: `.full()` for DM (dense numeric),
  * scalar-object boxing for symbolic.  Keeps scipy.linalg.solve(A,b)
  * etc. typing without forcing users to wrap calls in np.array().  */
-%stub_method(__array__, %arg(NDArray[np.float64]), *args: Any, **kwargs: Any)
+%stub_method(__array__, %arg(NDArray[arraydtype]), *args: Any, **kwargs: Any)
 %stubcode %{    __array_priority__: float
 %}
 %stub_method(__array_ufunc__, Any, ufunc: Any, method: builtins.str, *inputs: Any, **kwargs: Any)
@@ -5356,7 +5356,7 @@ namespace casadi{
 namespace casadi{
 %extend Matrix<double> {
 
-%python_array_wrappers(999.0)
+%python_array_wrappers(999.0, np.float64)
 
 %pythoncode %{
   def tocsc(self):
@@ -5569,7 +5569,7 @@ namespace casadi {
     %matrix_helpers(casadi::Matrix<casadi::SXElem>, _MIndex)
 
   #ifdef SWIGPYTHON
-  %python_array_wrappers(1001.0)
+  %python_array_wrappers(1001.0, Any)
   #endif // SWIGPYTHON
 
 };
@@ -5591,7 +5591,7 @@ namespace casadi {
 %extend casadi::MX{
   %matrix_helpers(casadi::MX, %arg(_MIndex | MX))
   #ifdef SWIGPYTHON
-  %python_array_wrappers(1002.0)
+  %python_array_wrappers(1002.0, Any)
   /* MX is unique among CasadiMatrix types in accepting MX-valued
    * indices (runtime: MX_get / MX_set).  Additional overloads on top
    * of the DM-compatible ones from %matrix_helpers. */

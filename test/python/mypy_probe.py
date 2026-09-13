@@ -99,6 +99,9 @@ if TYPE_CHECKING:
   assert_type(dae.min(["x"]), list[float])
   assert_type(ca.Sparsity.deserialize("..."), ca.Sparsity)
   ca.Slice(0, 5)
+  assert_type(ca.SX.sym("s", 3)[ca.Slice(0, 2)], ca.SX)   # Slice objects index
+  assert_type(ca.CasadiMeta.version(), str)               # const char* return
+  assert_type(ca.Function(f), ca.Function)                # %copyctor parameter
 
   # issue #4407: __eq__/__ne__ on non-elementwise classes take `object` (the
   # wrapper returns NotImplemented on a foreign operand), options dicts are
