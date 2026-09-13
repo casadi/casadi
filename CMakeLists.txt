@@ -3104,6 +3104,9 @@ if(WITH_SELFCONTAINED)
   foreach(DIR "${CMAKE_BINARY_DIR}/external_projects/src" "${PROJECT_SOURCE_DIR}/external_packages")
     # Find all LICENSE files
     file(GLOB_RECURSE LICENSE_FILES_A RELATIVE "${DIR}" "${DIR}/**/LICENSE*")
+    # proxqp's jrl-cmakemodules carries a self-referencing symlink
+    # (_unittests/cmake -> ..); on macOS the glob follows it 60+ levels deep.
+    list(FILTER LICENSE_FILES_A EXCLUDE REGEX "/_unittests/")
     # Loop over files
     foreach(LICENSE_FILE ${LICENSE_FILES_A})
       # Extract directory from LICENSE_FILE
