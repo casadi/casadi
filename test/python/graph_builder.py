@@ -29,7 +29,7 @@ import numpy
 import unittest
 import os
 import tempfile
-from helpers import casadiTestCase, requires_onnxbackend
+from helpers import casadiTestCase, memory_heavy, requires_onnxbackend
 
 # onnx python package: builds the numeric test models
 try:
@@ -380,6 +380,400 @@ class GraphBuilderNumericTests(casadiTestCase):
     self.checkarray(J(ca.DM([1, 2, 3]), ca.DM([10, 20, 30])), 2 * ca.DM.eye(3),
                     "jacobian wrt x", digits=10)
 
+  def sibling_model(self, path, kind, n=3):
+    sources = {"fwd": self.fwd_model, "adj": self.rev_model, "jac": self.jac_model}
+    model = onnx.load(sources[kind](n))
+    graph = model.graph
+    inputs = [t for t in graph.input if t.name.startswith(kind + "_")]
+    outputs = [t for t in graph.output if t.name.startswith(kind + "_")]
+    initializers = [t for t in graph.initializer if t.name != "two1"]
+    graph.CopyFrom(helper.make_graph(list(graph.node)[1:], kind, inputs, outputs, initializers))
+    sibling = os.path.join(os.path.dirname(path), kind + "_" + os.path.basename(path))
+    onnx.checker.check_model(model)
+    onnx.save(model, sibling)
+    self._tmp.append(sibling)
+    return sibling
+
+  def test_sibling_derivatives(self):
+    self.message("primal-only models discover dynamically seeded sibling derivatives")
+    x = ca.DM([1, 2, 3])
+    for kind in ["fwd", "adj", "jac"]:
+      path = self.affine_model(numpy.float32, (3,), 2, 1)
+      self.sibling_model(path, kind)
+      f = ca.GraphBuilder(path).create("renamed")
+      self.assertEqual(f.name_in(), ["x"])
+      self.assertEqual(f.name_out(), ["y"])
+      self.checkarray(2*x+1, f(x), "primal")
+      # Serialize before constructing derivatives: sibling references must survive.
+      f = ca.Function.deserialize(f.serialize())
+      if kind == "jac":
+        self.checkarray(2*ca.DM.eye(3), f.jacobian()(x, 2*x+1), "sibling jacobian")
+      else:
+        for count in [1, 2, 8]:
+          seeds = ca.reshape(ca.DM(list(range(3*count))), 3, count)
+          df = f.forward(count) if kind == "fwd" else f.reverse(count)
+          self.assertEqual(df.name(), kind + str(count) + "_renamed")
+          self.checkarray(2*seeds, df(x, 2*x+1, seeds), "sibling sensitivities")
+      X = ca.MX.sym("X", 3)
+      J = ca.Function("J", [X], [ca.jacobian(f(X), X)])
+      self.checkarray(2*ca.DM.eye(3), J(x), "AD using sibling")
+
+  def test_sibling_nonlinear(self):
+    self.message("sibling derivatives receive primal inputs for nonlinear sensitivities")
+    vi = lambda name, shape: helper.make_tensor_value_info(name, TensorProto.FLOAT, shape)
+    path = self.save_model(helper.make_graph(
+        [helper.make_node("Mul", ["x", "x"], ["y"])], "square",
+        [vi("x", [3])], [vi("y", [3])]))
+    axes = numpy_helper.from_array(numpy.array([1], numpy.int64), "axes")
+    two = numpy_helper.from_array(numpy.array(2, numpy.float32), "two")
+    sibling = self.save_model(helper.make_graph(
+        [helper.make_node("Unsqueeze", ["x", "axes"], ["column"]),
+         helper.make_node("Mul", ["column", "two"], ["scale"]),
+         helper.make_node("Mul", ["scale", "fwd_x"], ["fwd_y"])], "forward",
+        [vi("x", [3]), vi("fwd_x", [3, "nfwd"])], [vi("fwd_y", [3, "nfwd"])],
+        [axes, two]))
+    destination = os.path.join(os.path.dirname(path), "fwd_" + os.path.basename(path))
+    os.rename(sibling, destination)
+    self._tmp.append(destination)
+    f = ca.GraphBuilder(path).create("f")
+    x = ca.DM([1, -2, 3])
+    seeds = ca.DM([[1, 2], [3, 4], [5, 6]])
+    self.checkarray(ca.repmat(2*x, 1, 2)*seeds, f.forward(2)(x, x*x, seeds), "nonlinear forward")
+    X = ca.MX.sym("X", 3)
+    J = ca.Function("J", [X], [ca.jacobian(f(X), X)])
+    self.checkarray(ca.diag(2*x), J(x), "nonlinear AD")
+
+  def test_sibling_lazy_loading(self):
+    self.message("sibling loading is lazy and constructed derivatives embed their model")
+    path = self.affine_model(numpy.float32, (3,), 2, 1)
+    sibling = self.sibling_model(path, "fwd")
+    with open(sibling, "wb") as fh:
+      fh.write(b"invalid ONNX")
+    f = ca.GraphBuilder(path).create("f")
+    self.checkarray(ca.DM([3, 5, 7]), f(ca.DM([1, 2, 3])), "no derivative parsing")
+    with self.assertRaises(RuntimeError):
+      f.forward(2)
+    self.sibling_model(path, "fwd")
+    df = f.forward(2)
+    serialized = df.serialize()
+    os.remove(sibling)
+    os.remove(path)
+    df = ca.Function.deserialize(serialized)
+    seeds = ca.DM([[1, 2], [3, 4], [5, 6]])
+    self.checkarray(2*seeds, df(ca.DM.zeros(3), ca.DM.zeros(3), seeds), "embedded derivative")
+
+  def test_sibling_lookup(self):
+    self.message("sibling lookup uses the source path and ignores count-specific filenames")
+    path = self.affine_model(numpy.float32, (3,), 2, 1)
+    sibling = self.sibling_model(path, "fwd")
+    numbered = os.path.join(os.path.dirname(path), "fwd8_" + os.path.basename(path))
+    os.rename(sibling, numbered)
+    self._tmp.append(numbered)
+    f = ca.GraphBuilder(path).create("f")
+    with self.assertRaises(RuntimeError):
+      f.forward(8)
+    os.rename(numbered, sibling)
+    cwd = os.getcwd()
+    try:
+      os.chdir(os.path.dirname(path))
+      b = ca.GraphBuilder(os.path.basename(path))
+      os.chdir(cwd)
+      f = b.create("different_name")
+      df = f.forward(2)
+      self.checkarray(2*ca.DM.ones(3, 2), df(ca.DM.zeros(3), ca.DM.zeros(3), ca.DM.ones(3, 2)),
+                      "relative source after changing directory")
+    finally:
+      os.chdir(cwd)
+
+  def test_sibling_symlink(self):
+    self.message("sibling lookup follows the supplied filename when the primal is a symlink")
+    if os.name == "nt":
+      self.skipTest("creating symlinks may require administrator privileges")
+    path = self.affine_model(numpy.float32, (3,), 2, 1)
+    alias = path + ".alias.onnx"
+    os.symlink(path, alias)
+    self._tmp.append(alias)
+    self.sibling_model(alias, "fwd")
+    f = ca.GraphBuilder(alias).create("f")
+    seeds = ca.DM.ones(3, 2)
+    self.checkarray(2*seeds, f.forward(2)(ca.DM.zeros(3), ca.DM.zeros(3), seeds), "alias sibling")
+
+  def test_sibling_validation(self):
+    self.message("embedded derivatives take precedence; invalid sibling signatures fail clearly")
+    path = self.fwd_model(3)
+    sibling = self.sibling_model(path, "fwd")
+    with open(sibling, "wb") as fh:
+      fh.write(b"invalid ONNX")
+    f = ca.GraphBuilder(path).create("f", ["x"], ["y"])
+    self.checkarray(2*ca.DM.ones(3, 2), f.forward(2)(ca.DM.zeros(3), ca.DM.zeros(3), ca.DM.ones(3, 2)),
+                    "embedded derivative precedence")
+    for failure in ["signature", "shape"]:
+      path = self.affine_model(numpy.float32, (3,), 2, 1)
+      sibling = self.sibling_model(path, "fwd", n=4 if failure == "shape" else 3)
+      if failure == "signature":
+        model = onnx.load(sibling)
+        model.graph.output[0].name = "wrong"
+        model.graph.node[0].output[0] = "wrong"
+        onnx.save(model, sibling)
+      f = ca.GraphBuilder(path).create("f")
+      with self.assertRaisesRegex(RuntimeError, "incomplete fwd signature|incompatible shape"):
+        f.forward(2)
+
+  def hessian_models(self, embedded=False):
+    # f(x) = x0**3 + x1**3 + x0*x1, with a nonconstant, nondiagonal Hessian.
+    vi = lambda name, shape: helper.make_tensor_value_info(name, TensorProto.DOUBLE, shape)
+    node = helper.make_node
+    constants = [numpy_helper.from_array(numpy.array([[0, 1], [1, 0]], numpy.float64), "A"),
+                 numpy_helper.from_array(numpy.array(0.5), "half"),
+                 numpy_helper.from_array(numpy.array(3.0), "three"),
+                 numpy_helper.from_array(numpy.array(6.0), "six"),
+                 numpy_helper.from_array(numpy.array([0], numpy.int64), "axis0"),
+                 numpy_helper.from_array(numpy.array([1], numpy.int64), "axis1"),
+                 numpy_helper.from_array(numpy.array([2], numpy.int64), "axis2"),
+                 numpy_helper.from_array(numpy.array([2, -1], numpy.int64), "packed")]
+    common = [node("Mul", ["x", "x"], ["square"]), node("MatMul", ["A", "x"], ["Ax"])]
+    primal = common + [node("Mul", ["square", "x"], ["cube"]),
+                       node("Mul", ["x", "Ax"], ["cross2"]),
+                       node("Mul", ["cross2", "half"], ["cross"]),
+                       node("Add", ["cube", "cross"], ["terms"]),
+                       node("ReduceSum", ["terms", "axis0"], ["y"], keepdims=1)]
+    grad = [node("Mul", ["three", "square"], ["quadratic"]),
+            node("Add", ["quadratic", "Ax"], ["gradient"])]
+    adjoint = [node("Mul", ["gradient", "adj_y"], ["adj_x"])]
+    path = self.save_model(helper.make_graph(
+        primal + (grad + adjoint if embedded else []), "f",
+        [vi("x", [2, 1])] + ([vi("adj_y", [1, "nadj"])] if embedded else []),
+        [vi("y", [1, 1])] + ([vi("adj_x", [2, "nadj"])] if embedded else []), constants))
+    adj_path = os.path.join(os.path.dirname(path), "adj_" + os.path.basename(path))
+    if not embedded:
+      tmp = self.save_model(helper.make_graph(common + grad + adjoint, "adj_f",
+          [vi("x", [2, 1]), vi("adj_y", [1, "nadj"])], [vi("adj_x", [2, "nadj"])], constants))
+      os.rename(tmp, adj_path)
+      self._tmp.append(adj_path)
+    forward = common + grad + [
+        node("Mul", ["six", "x"], ["diagonal"]),
+        node("Mul", ["diagonal", "fwd_x"], ["diag_v"]),
+        node("MatMul", ["A", "fwd_x"], ["A_v"]),
+        node("Add", ["diag_v", "A_v"], ["Hv"]),
+        node("Unsqueeze", ["Hv", "axis2"], ["Hv3"]),
+        node("Unsqueeze", ["adj_y", "axis1"], ["w3"]),
+        node("Mul", ["Hv3", "w3"], ["weighted3"]),
+        node("Reshape", ["weighted3", "packed"], ["weighted"]),
+        node("Mul", ["gradient", "fwd_adj_y"], ["seed_term"]),
+        node("Add", ["weighted", "seed_term"], ["fwd_adj_x"])]
+    tmp = self.save_model(helper.make_graph(forward, "fwd_adj_f",
+        [vi("x", [2, 1]), vi("adj_y", [1, "nadj"]), vi("fwd_x", [2, "nfwd"]),
+         vi("fwd_adj_y", [1, "nsens"])], [vi("fwd_adj_x", [2, "nsens"])], constants))
+    forward_path = os.path.join(os.path.dirname(adj_path), "fwd_" + os.path.basename(adj_path))
+    os.rename(tmp, forward_path)
+    self._tmp.append(forward_path)
+    return path, forward_path
+
+  @memory_heavy()
+  def test_sibling_hessian(self):
+    self.message("forward-over-adjoint siblings supply exact Hessians and derivatives of seeds")
+    X = ca.MX.sym("x", 2)
+    expr = X[0]**3 + X[1]**3 + X[0]*X[1]
+    reference = ca.Function("reference", [X], [expr])
+    href = ca.Function("href", [X], [ca.hessian(expr, X)[0]])
+    for embedded in [False, True]:
+      path, forward_path = self.hessian_models(embedded)
+      f = ca.GraphBuilder(path).create("renamed", ["x"], ["y"])
+      f = ca.Function.deserialize(f.serialize())
+      H, grad = ca.hessian(f(X), X)
+      h = ca.Function("h", [X], [H])
+      for x in [ca.DM([1.2, -0.7]), ca.DM([-0.3, 2.1])]:
+        self.checkarray(href(x), h(x), "Hessian through forward-over-adjoint", digits=12)
+        for nadj in [1, 2]:
+          adj = f.reverse(nadj)
+          adj_ref = reference.reverse(nadj)
+          w = ca.DM([[1.5, -0.4]])[:, :nadj]
+          adj_value = adj(x, f(x), w)
+          for nfwd in [1, 3]:
+            v = ca.reshape(ca.DM(list(range(1, 2*nfwd+1))), 2, nfwd)
+            dw = ca.DM(numpy.arange(nadj*nfwd).reshape(1, -1) + 0.25)
+            inputs = [x, f(x), w, adj_value, v, ca.DM.zeros(1, nfwd), dw]
+            self.checkarray(adj_ref.forward(nfwd)(*inputs), adj.forward(nfwd)(*inputs),
+                            "compounded sensitivities including adjoint seed", digits=12)
+      # A constructed Hessian stays evaluable after its model files disappear.
+      serialized = h.serialize()
+      for source in list(self._tmp):
+        if os.path.exists(source):
+          os.remove(source)
+      self.checkarray(href(ca.DM([1.2, -0.7])), ca.Function.deserialize(serialized)(ca.DM([1.2, -0.7])),
+                      "serialized Hessian", digits=12)
+
+  @memory_heavy()
+  def test_sibling_reverse_over_reverse(self):
+    self.message("adj_adj siblings keep independent seed dimensions at each reverse level")
+    path, forward_path = self.hessian_models()
+    os.remove(forward_path)  # Hessians must use reverse-over-reverse exclusively.
+    vi = lambda name, shape: helper.make_tensor_value_info(name, TensorProto.DOUBLE, shape)
+    node = helper.make_node
+    constants = [numpy_helper.from_array(numpy.array([[0, 1], [1, 0]], numpy.float64), "A"),
+                 numpy_helper.from_array(numpy.array(3.0), "three"),
+                 numpy_helper.from_array(numpy.array(6.0), "six"),
+                 numpy_helper.from_array(numpy.array([0], numpy.int64), "axis0"),
+                 numpy_helper.from_array(numpy.array([2], numpy.int64), "axis2")]
+    # Unpack outer reverse seeds as [input, outer direction, inner direction].
+    # Infer the outer count from the packed seed width and inner count through Reshape.
+    constants.append(numpy_helper.from_array(numpy.array([2, -1], numpy.int64), "head"))
+    constants.append(numpy_helper.from_array(numpy.array([1], numpy.int64), "axis1"))
+    nodes = [node("Shape", ["adj_y"], ["wshape"]),
+             node("Gather", ["wshape", "axis1"], ["inner"]),
+             node("Concat", ["head", "inner"], ["shape3"], axis=0),
+             node("Reshape", ["adj2_adj_x", "shape3"], ["u3"]),
+             node("Unsqueeze", ["adj_y", "axis2"], ["wcol"]),
+             node("MatMul", ["u3", "wcol"], ["weighted3"]),
+             node("Squeeze", ["weighted3", "axis2"], ["weighted"]),
+             node("Mul", ["six", "x"], ["diagonal"]),
+             node("Mul", ["diagonal", "weighted"], ["diag_term"]),
+             node("MatMul", ["A", "weighted"], ["offdiag_term"]),
+             node("Add", ["diag_term", "offdiag_term"], ["adj2_x"]),
+             node("Mul", ["x", "x"], ["square"]),
+             node("Mul", ["three", "square"], ["quadratic"]),
+             node("MatMul", ["A", "x"], ["Ax"]),
+             node("Add", ["quadratic", "Ax"], ["gradient"]),
+             node("Mul", ["gradient", "adj2_adj_x"], ["products"]),
+             node("ReduceSum", ["products", "axis0"], ["adj2_adj_y"], keepdims=1)]
+    tmp = self.save_model(helper.make_graph(nodes, "adj_adj_f",
+        [vi("x", [2, 1]), vi("adj_y", [1, "nadj"]),
+         vi("adj2_adj_x", [2, "packed_reverse"])],
+        [vi("adj2_x", [2, "nadj2"]), vi("adj2_adj_y", [1, "packed_reverse"])], constants))
+    sibling = os.path.join(os.path.dirname(path), "adj_adj_" + os.path.basename(path))
+    os.rename(tmp, sibling)
+    self._tmp.append(sibling)
+    X = ca.MX.sym("x", 2)
+    expr = X[0]**3 + X[1]**3 + X[0]*X[1]
+    reference = ca.Function("reference", [X], [expr])
+    f = ca.Function.deserialize(ca.GraphBuilder(path).create("f").serialize())
+    for ninner in [1, 2, 3]:
+      for nouter in [1, 2, 4]:
+        a, ar = f.reverse(ninner), reference.reverse(ninner)
+        x = ca.DM([1.2, -0.7])
+        w = ca.DM(numpy.arange(ninner).reshape(1, -1) + 0.3)
+        u = ca.DM(numpy.arange(2*ninner*nouter).reshape(2, -1) - 0.7)
+        args = [x, f(x), w, a(x, f(x), w), u]
+        actual = ca.Function.deserialize(a.reverse(nouter).serialize())(*args)
+        for expected, result in zip(ar.reverse(nouter)(*args), actual):
+          self.checkarray(expected, result, "reverse-over-reverse", digits=11)
+    h = ca.Function("h", [X], [ca.hessian(f(X), X)[0]])
+    href = ca.Function("href", [X], [ca.hessian(expr, X)[0]])
+    self.checkarray(href(x), h(x), "Hessian using only reverse siblings", digits=12)
+
+  @memory_heavy()
+  def test_sibling_deep_nesting(self):
+    self.message("three successive forward or reverse derivatives use recursive sibling lookup")
+    for mode in ["adj", "fwd"]:
+      X = ca.MX.sym("x")
+      reference = ca.Function("reference", [X], [X**4], ["x"], ["y"])
+      with tempfile.TemporaryDirectory() as directory:
+        filename = "f.onnx"
+        refs = [reference]
+        for depth in range(4):
+          target = os.path.join(directory, filename)
+          ca.GraphBuilder(refs[-1]).export_onnx(target)
+          # Omit structural-zero derivative placeholders from the ONNX interface.
+          model = onnx.load(target)
+          for io, count, nnz in [(model.graph.input, refs[-1].n_in(), refs[-1].nnz_in),
+                                 (model.graph.output, refs[-1].n_out(), refs[-1].nnz_out)]:
+            for i in reversed(range(count)):
+              if nnz(i) == 0:
+                del io[i]
+          onnx.save(model, target)
+          if depth < 3:
+            refs.append(refs[-1].reverse(1) if mode == "adj" else refs[-1].forward(1))
+          filename = mode + "_" + filename
+        actual = ca.GraphBuilder(os.path.join(directory, "f.onnx")).create("f")
+        for depth, ref in enumerate(refs):
+          if depth:
+            actual = actual.reverse(1) if mode == "adj" else actual.forward(1)
+          actual = ca.Function.deserialize(actual.serialize())
+          args = [ca.DM.ones(ref.sparsity_in(i))*((i+1)*0.3) for i in range(ref.n_in())]
+          for expected, result in zip(ref.call(args), actual.call(args)):
+            self.checkarray(expected, result, "nested " + mode, digits=12)
+
+  def test_sibling_lazy_compound_lookup(self):
+    self.message("compounded derivative files are looked up on demand without a cached file list")
+    path, forward_path = self.hessian_models()
+    delayed = forward_path + ".delayed"
+    os.rename(forward_path, delayed)
+    self._tmp.append(delayed)
+    f = ca.GraphBuilder(path).create("f")
+    serialized = f.serialize()
+    os.rename(delayed, forward_path)
+    f = ca.Function.deserialize(serialized)
+    X = ca.MX.sym("x", 2)
+    H = ca.Function("H", [X], [ca.hessian(f(X), X)[0]])
+    self.checkarray(ca.DM([[6, 1], [1, 12]]), H(ca.DM([1, 2])), "late Hessian model")
+
+  @memory_heavy()
+  def test_sibling_configuration(self):
+    self.message("nested siblings inherit specialized dimensions, baked inputs and seed names")
+    vi = lambda name, shape: helper.make_tensor_value_info(name, TensorProto.DOUBLE, shape)
+    node = helper.make_node
+    # y = p*x**2 gives a nonzero Hessian after specializing batch and baking p.
+    path = self.save_model(helper.make_graph(
+        [node("Mul", ["x", "x"], ["square"]), node("Mul", ["square", "p"], ["y"])],
+        "primal", [vi("x", ["batch", 1]), vi("p", [])], [vi("y", ["batch", 1])]))
+    constants = [numpy_helper.from_array(numpy.array(2.0), "two"),
+                 numpy_helper.from_array(numpy.array([1], numpy.int64), "axis1"),
+                 numpy_helper.from_array(numpy.array([2], numpy.int64), "axis2"),
+                 numpy_helper.from_array(numpy.array([0, -1], numpy.int64), "packed")]
+    gradient = [node("Mul", ["two", "p"], ["scale"]),
+                node("Mul", ["scale", "x"], ["gradient"])]
+    for kind, seed, result, dim in [("fwd", "fwd_x", "fwd_y", "directions"),
+                                    ("adj", "adj_y", "adj_x", "weights")]:
+      sibling = self.save_model(helper.make_graph(
+          gradient + [node("Mul", ["gradient", seed], [result])], kind,
+          [vi("x", ["batch", 1]), vi("p", []), vi(seed, ["batch", dim])],
+          [vi(result, ["batch", dim])], constants))
+      destination = os.path.join(os.path.dirname(path), kind + "_" + os.path.basename(path))
+      os.rename(sibling, destination)
+      self._tmp.append(destination)
+    mixed = gradient + [
+        node("Mul", ["scale", "fwd_x"], ["Hv"]),
+        node("Unsqueeze", ["Hv", "axis2"], ["Hv3"]),
+        node("Unsqueeze", ["adj_y", "axis1"], ["w3"]),
+        node("Mul", ["Hv3", "w3"], ["weighted3"]),
+        node("Reshape", ["weighted3", "packed"], ["weighted"]),
+        node("Mul", ["gradient", "fwd_adj_y"], ["seed_term"]),
+        node("Add", ["weighted", "seed_term"], ["fwd_adj_x"])]
+    sibling = self.save_model(helper.make_graph(mixed, "fwd_adj",
+        [vi("x", ["batch", 1]), vi("p", []), vi("adj_y", ["batch", "weights"]),
+         vi("fwd_x", ["batch", "directions"]), vi("fwd_adj_y", ["batch", "nsens"])],
+        [vi("fwd_adj_x", ["batch", "nsens"])], constants))
+    destination = os.path.join(os.path.dirname(path), "fwd_adj_" + os.path.basename(path))
+    os.rename(sibling, destination)
+    self._tmp.append(destination)
+    for batch in [2, 3]:
+      b = ca.GraphBuilder(path)
+      b.bind_dim("batch", batch)
+      b.set("p", 5)
+      f = b.create("f", {"fwd_dim": "directions", "adj_dim": "weights"})
+      del b
+      f = ca.Function.deserialize(f.serialize())
+      X = ca.MX.sym("x", batch)
+      reference = ca.Function("reference", [X], [5*X**2])
+      h = ca.Function("h", [X], [ca.hessian(ca.sum1(f(X)), X)[0]])
+      for x in [ca.DM(range(1, batch+1)), -ca.DM(range(2, batch+2))]:
+        self.checkarray(reference(x), f(x), "specialized primal", digits=12)
+        self.checkarray(10*ca.DM.eye(batch), h(x), "specialized Hessian", digits=12)
+        for nfwd in [1, 3]:
+          v = ca.reshape(ca.DM(range(1, batch*nfwd+1)), batch, nfwd)
+          self.checkarray(reference.forward(nfwd)(x, reference(x), v),
+                          f.forward(nfwd)(x, f(x), v), "configured forward", digits=12)
+          for nadj in [1, 2]:
+            w = ca.reshape(ca.DM(range(1, batch*nadj+1)), batch, nadj)
+            adj = f.reverse(nadj)
+            adj_ref = reference.reverse(nadj)
+            value = adj(x, f(x), w)
+            self.checkarray(adj_ref(x, reference(x), w), value, "configured reverse", digits=12)
+            dw = ca.reshape(ca.DM(range(1, batch*nadj*nfwd+1)), batch, nadj*nfwd)
+            inputs = [x, f(x), w, value, v, ca.DM.zeros(batch, nfwd), dw]
+            self.checkarray(adj_ref.forward(nfwd)(*inputs), adj.forward(nfwd)(*inputs),
+                            "configured forward-over-reverse including seed derivatives", digits=12)
+
   def test_partial_inference(self):
     self.message("select one independent pathway; ORT runs only that subgraph")
     path = self.two_pathway_model()
@@ -473,24 +867,34 @@ class GraphBuilderNumericTests(casadiTestCase):
     import subprocess
     self.message("generated C compiles against ONNX Runtime and evaluates correctly")
     path = self.affine_model(numpy.float64, (3,), 2.0, 1.0)
+    sibling = self.sibling_model(path, "fwd")
     f = ca.GraphBuilder(path).create("f")
-    d = tempfile.mkdtemp()
+    df = f.forward(2)
+    os.remove(sibling)
+    x = ca.DM([0.5, 1.0, -2.0])
+    seeds = ca.DM([[1, 2], [3, 4], [5, 6]])
+    hessian_path, _ = self.hessian_models()
+    hf = ca.GraphBuilder(hessian_path).create("hf")
+    hx = ca.MX.sym("x", 2)
+    h = ca.Function("h", [hx], [ca.hessian(hf(hx), hx)[0]])
+    cases = [(f, [x], 2*x+1), (df, [x, 2*x+1, seeds], 2*seeds),
+             (h, [ca.DM([1, 2])], ca.DM([[6, 1], [1, 12]]))]
     cwd = os.getcwd()
-    try:
-      os.chdir(d)
-      f.generate("f.c")
-      inc = os.path.join(os.path.dirname(ca.__file__), "include",
-                         "casadi", "interfaces", "ort")
-      r = subprocess.run(["gcc", "-shared", "-fPIC", "f.c",
-                          "-I" + inc, "-I" + os.path.join(ort_dir, "include"),
-                          "-L" + os.path.join(ort_dir, "lib"), "-lonnxruntime", "-o", "f.so"],
-                         capture_output=True, text=True)
-      self.assertEqual(r.returncode, 0, r.stderr)
-      g = ca.external("f", os.path.join(d, "f.so"))
-      x = ca.DM([0.5, 1.0, -2.0])
-      self.checkarray(g(x), 2.0 * x + 1.0, "codegen eval", digits=10)
-    finally:
-      os.chdir(cwd)
+    with tempfile.TemporaryDirectory() as d:
+      try:
+        os.chdir(d)
+        for fn, inputs, expected in cases:
+          fn.generate(fn.name() + ".c")
+          inc = os.path.join(os.path.dirname(ca.__file__), "include", "casadi", "interfaces", "ort")
+          r = subprocess.run(["gcc", "-shared", "-fPIC", fn.name() + ".c",
+                              "-I" + inc, "-I" + os.path.join(ort_dir, "include"),
+                              "-L" + os.path.join(ort_dir, "lib"), "-lonnxruntime",
+                              "-o", fn.name() + ".so"], capture_output=True, text=True)
+          self.assertEqual(r.returncode, 0, r.stderr)
+          g = ca.external(fn.name(), os.path.join(d, fn.name() + ".so"))
+          self.checkarray(expected, g(*inputs), "codegen eval", digits=10)
+      finally:
+        os.chdir(cwd)
 
   def test_builder_set(self):
     self.message("GraphBuilder.set bakes an input value, consumed at create()")

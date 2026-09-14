@@ -24,6 +24,7 @@
 
 #include "graph_builder_internal.hpp"
 #include "onnx_function_impl.hpp"
+#include "filesystem_impl.hpp"
 #include <fstream>
 
 namespace casadi {
@@ -71,6 +72,7 @@ namespace casadi {
     casadi_assert(file.read(reinterpret_cast<char*>(data.data()), size),
                   "Cannot read model file: " + model_path);
     own(new GraphBuilderInternal(model_path, data, format_from_path(model_path), opts));
+    if (Filesystem::is_enabled()) (*this)->model_path_ = Filesystem::absolute(model_path);
   }
 
   GraphBuilder::GraphBuilder(const Function& f, const Dict& opts) {
@@ -146,14 +148,14 @@ namespace casadi {
   GraphBuilderInternal::GraphBuilderInternal(const std::string& name,
                                              const std::vector<uint8_t>& model_data,
                                              const std::string& format, const Dict& opts)
-    : name_(name), format_(format), model_data_(model_data) {
+    : opts_(opts), name_(name), format_(format), model_data_(model_data) {
     model_ = GraphModel(format, model_data, opts);
     model_.fill_metadata(*this);
   }
 
   GraphBuilderInternal::GraphBuilderInternal(const std::string& name, const Function& f,
                                              const Dict& opts)
-    : name_(name), format_("onnx"), fun_(f) {
+    : opts_(opts), name_(name), format_("onnx"), fun_(f) {
     populate_from_function();
   }
 

@@ -101,6 +101,17 @@ namespace casadi {
 
     /** \brief Freeze into an evaluable Function
 
+        For a file f.onnx, black-box derivatives fall back to sibling fwd_f.onnx,
+        adj_f.onnx and jac_f.onnx when the model lacks the corresponding tensors.
+        Forward/reverse siblings use dynamic nfwd/nadj dimensions (fwd_dim/adj_dim).
+        Files are checked on derivative capability queries and loaded on demand.
+        Derivative models use the same rule recursively, e.g. fwd_adj_f.onnx
+        or adj_adj_f.onnx. Repeated AD modes follow CasADi tensor prefixes
+        (adj2_, adj3_, ...; fwd2_, fwd3_, ...) and use seed dimensions
+        nadj2, nadj3, ... or nfwd2, nfwd3, ... (suffixing adj_dim/fwd_dim).
+        Serialized functions retain the absolute source path for derivative lookup;
+        constructed derivative functions embed their model bytes.
+
         \param name      Name assigned to the resulting Function
         \param name_in   Names of the inputs to expose (empty = all model inputs)
         \param name_out  Names of the outputs to expose (empty = all model outputs)

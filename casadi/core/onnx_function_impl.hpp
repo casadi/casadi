@@ -107,9 +107,7 @@ namespace casadi {
 
     bool uses_output() const override { return false; }
 
-    // A model authored with CasADi's derivative naming can serve its own forward sensitivities:
-    // get_forward re-create()s from the same model selecting the fwd_* tensors. Otherwise CasADi
-    // falls back to finite differences.
+    // Use embedded derivative tensors first, then look up a sibling model on demand.
     bool has_forward(casadi_int nfwd) const override;
     Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
@@ -186,14 +184,29 @@ namespace casadi {
                                     const std::vector<std::string>& outputs,
                                     const Dict& opts);
 
-    /// Build a derivative function with CasADi's full signature by re-create()ing from the model:
-    /// present derivative tensors are wired through, absent ones (non-diff) become zero outputs.
-    Function wrap_derivative(const std::string& name,
+    /// Construct the sibling filename for a derivative of this entry point
+    std::string derivative_path(const std::string& kind) const;
+
+    /// Check the required derivative tensors for the exposed differentiable inputs/outputs
+    bool has_derivative(const std::string& kind,
+                        const std::set<std::string>& inputs,
+                        const std::set<std::string>& outputs) const;
+
+    /// Wrap an embedded or sibling derivative with CasADi's full signature
+    Function wrap_derivative(const std::string& kind, const std::string& name,
                              const std::vector<std::string>& inames,
                              const std::vector<std::string>& onames,
                              const std::vector<Sparsity>& in_sp,
                              const std::vector<Sparsity>& out_sp,
                              const Dict& dim_bind, const Dict& opts) const;
+
+    /// Filename of this entry point, used for lazy, recursive sibling discovery
+    std::string model_path_;
+    std::map<std::string, casadi_int> dim_bindings_;
+    std::map<std::string, std::vector<casadi_int>> input_shapes_;
+    /// Original GraphBuilder constructor options for derivative model loading
+    Dict builder_opts_;
+    Dict derivative_opts_;
 
     /// Serialized ONNX model
     std::vector<uint8_t> model_data_;

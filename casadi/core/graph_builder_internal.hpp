@@ -112,8 +112,12 @@ namespace casadi {
     /// Locate a node by name in a given I/O role (throws if absent)
     const Node& find(const std::string& name, const std::string& io) const;
 
+    /// Original constructor options, retained for lazy derivative model loading
+    Dict opts_;
+
     std::string name_;
     std::string format_;
+    std::string model_path_;  ///< Absolute source filename, empty for in-memory models
     std::vector<uint8_t> model_data_;
 
     /// Source Function (export lifecycle); null when built from a model
