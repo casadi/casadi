@@ -3675,6 +3675,21 @@ export default createcasadi;
     return __origFnCall.call(this, arg, ...rest);
   };
 
+  // Preserve symbolic lists before permissive scalar-matrix overloads accept arrays.
+  const __origExportGraph = __m.export_graph;
+  __m.export_graph = function (expression, ...args) {
+    if (Array.isArray(expression)) {
+      const Cls = expression.every(e => e instanceof SX) ? SXVector
+        : expression.every(e => e instanceof MX) ? MXVector : null;
+      if (Cls) {
+        const vector = __arr_to_vec(expression, Cls);
+        try { return __origExportGraph.call(this, vector, ...args); }
+        finally { vector.delete(); }
+      }
+    }
+    return __origExportGraph.call(this, expression, ...args);
+  };
+
   /* Function instances are directly callable, mirroring Python:
      f(a, b) positional with n_out-shaped return (0 -> null, 1 -> bare,
      >1 -> list); f({name: v}) dict-in/dict-out.  The dict check must
@@ -4971,6 +4986,26 @@ casadi_reverse(const std::vector< M > &ex, const std::vector< M > &arg,
                const Dict& opts = Dict()) {
   return reverse(ex, arg, v, opts);
 }
+
+#if FLAG & (IS_SX | IS_MX)
+DECL std::string casadi_export_graph(const std::vector<M>& expressions, const Dict& opts=Dict()) {
+  return export_graph(expressions, opts);
+}
+
+DECL std::string casadi_export_graph(const M& expression, const Dict& opts=Dict()) {
+  return export_graph(expression, opts);
+}
+
+DECL void casadi_export_graph(const std::vector<M>& expressions, const std::string& fname,
+                             const Dict& opts=Dict()) {
+  export_graph(expressions, fname, opts);
+}
+
+DECL void casadi_export_graph(const M& expression, const std::string& fname,
+                             const Dict& opts=Dict()) {
+  export_graph(expression, fname, opts);
+}
+#endif
 
 DECL M casadi_substitute(const M& ex, const M& v, const M& vdef) {
   return substitute(ex, v, vdef);

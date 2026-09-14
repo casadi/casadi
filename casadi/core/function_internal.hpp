@@ -82,7 +82,9 @@ namespace casadi {
       \identifier{jb} */
   struct CASADI_EXPORT FunctionMemory : public ProtoFunctionMemory {
     bool stats_available;
-    FunctionMemory() : stats_available(false) {}
+    // Shared sequence number for input, output and instruction dumps.
+    casadi_int dump_id;
+    FunctionMemory() : stats_available(false), dump_id(-1) {}
   };
 
   /** \brief Base class for FunctionInternal and LinsolInternal
@@ -412,6 +414,7 @@ namespace casadi {
     int eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
       bool always_inline, bool never_inline) const;
     virtual int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
+
     ///@}
 
     /** \brief  Evaluate with symbolic scalars
@@ -1540,6 +1543,10 @@ namespace casadi {
 
         \identifier{nx} */
     void set_jac_sparsity(casadi_int oind, casadi_int iind, const Sparsity& sp);
+
+    std::unique_ptr<std::ostream> open_trace(const double** arg, casadi_int dump_id) const;
+    void finish_trace(std::ostream& trace, double** res, int ret) const;
+    static void trace_values(std::ostream& trace, const double* values, casadi_int nnz);
 
   private:
     // @{

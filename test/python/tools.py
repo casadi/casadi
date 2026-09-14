@@ -35,6 +35,50 @@ import sys
 
 class Toolstests(casadiTestCase):
 
+  def test_export_graph_dot(self):
+    self.message("DOT matrix options preserve graph connectivity and valid ports")
+    import os
+    import re
+    import shutil
+    import subprocess
+    import tempfile
+    for X in [ca.SX, ca.MX]:
+      x = X.sym("x", ca.Sparsity.diag(2))
+      constants = ca.DM([[7, 0], [0, 13]])
+      child = ca.Function("child", [x], [x+constants], {"never_inline": True})
+      f = ca.Function("dot_options", [x], [child(x)*x, X(0, 0)],
+                      ["state"], ["answer", "empty"])
+      with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "graph.dot")
+        for view in ["function", "expression"]:
+          for contents in [False, True]:
+            for sizes in [False, True]:
+              f.export_graph(path, {"view": view, "show_matrix_contents": contents,
+                                    "show_matrix_sizes": sizes})
+              with open(path) as stream:
+                dot = stream.read()
+              self.assertEqual('FIXEDSIZE="TRUE"' in dot, contents)
+              # SX expression nodes are scalar once the assembly tables are hidden.
+              has_matrix = X is ca.MX or view == "function" or contents
+              self.assertEqual(bool(re.search(r"[0-9]+-by-[0-9]+", dot)), sizes and has_matrix)
+              self.assertEqual('rank=source' in dot, view == "function")
+              self.assertEqual('rank=sink' in dot, view == "function")
+              if not contents:
+                self.assertNotIn(':nz', dot)
+                self.assertNotRegex(dot, r"v[0-9]+_[0-9]+ ")
+              if shutil.which("dot"):
+                rendered = subprocess.run(["dot", "-Tsvg", path],
+                                          capture_output=True, check=True)
+                self.assertIn(b"<svg", rendered.stdout)
+                self.assertEqual(rendered.stderr, b"")
+        # Constant matrices use numeric contents, even when sizes are hidden.
+        ca.export_graph(ca.MX(constants), path, {"show_matrix_sizes": False})
+        with open(path) as stream:
+          dot = stream.read()
+        self.assertIn('>7</TD>', dot)
+        self.assertIn('>13</TD>', dot)
+        self.assertNotIn('FIXEDSIZE="TRUE"', dot)
+
   def test_structure(self):
 
 
