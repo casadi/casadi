@@ -28,6 +28,7 @@
 #include "function_internal.hpp"
 #include "sx_function.hpp"
 #include "sx.hpp"
+#include "serializer.hpp"
 #include "mx_function.hpp"
 #include "filesystem_impl.hpp"
 #include <casadi/core/resource_casadi_viz.hpp>
@@ -546,32 +547,9 @@ std::string graph_bundle(const Function& f, const GraphOptions& opts, bool dot =
   return data.str();
 }
 
-template<typename MatType>
-void export_expressions(const std::vector<MatType>& expressions, const std::string& fname,
-    const Dict& opts) {
-  Dict graph_opts = opts;
-  if (!graph_opts.count("view")) graph_opts["view"] = "expression";
-  Function("expression", symvar(veccat(expressions)), expressions).export_graph(fname, graph_opts);
-}
-
-} // namespace
-
-std::string Function::export_graph(const Dict& opts) const {
-  return graph_bundle(*this, GraphOptions(opts));
-}
-
-void Function::export_graph(const std::string& fname, const Dict& opts) const {
-  casadi_assert(is_a("SXFunction") || is_a("MXFunction"),
-    "export_graph requires an SXFunction or MXFunction");
-  const auto dot = fname.find_last_of('.');
-  const std::string extension = dot == std::string::npos ? "" : fname.substr(dot);
-  casadi_assert(extension == ".html" || extension == ".dot" || extension == ".casadi_viz",
-    "Unsupported export_graph extension '" + extension
-    + "'. Supported extensions: .html, .dot, .casadi_viz");
-  const GraphOptions options(opts);
-  const std::string data = graph_bundle(*this, options, extension == ".dot");
-
-  if (extension != ".html") {
+void write_graph(const std::string& fname, const std::string& data,
+    const GraphOptions& options) {
+  if (fname.size() < 5 || fname.substr(fname.size()-5) != ".html") {
     auto output = Filesystem::ofstream_ptr(fname);
     *output << data << "\n";
     output->flush();
@@ -604,6 +582,57 @@ void Function::export_graph(const std::string& fname, const Dict& opts) const {
   casadi_assert(output->good(), "Failed to write graph to '" + fname + "'");
 }
 
+std::string graph_extension(const std::string& fname) {
+  const auto dot = fname.find_last_of('.');
+  const std::string extension = dot == std::string::npos ? "" : fname.substr(dot);
+  casadi_assert(extension == ".html" || extension == ".dot" || extension == ".casadi_viz",
+    "Unsupported export_graph extension '" + extension
+    + "'. Supported extensions: .html, .dot, .casadi_viz");
+  return extension;
+}
+
+template<typename MatType>
+std::string expression_bundle(const std::vector<MatType>& expressions, const Dict& opts) {
+  Dict defaults = opts;
+  if (!defaults.count("view")) defaults["view"] = "expression";
+  const GraphOptions options(defaults);
+  StringSerializer serializer;
+  serializer.pack(expressions);
+  std::ostringstream data;
+  data << "{\"format\":\"casadi_viz\",\"version\":1,\"source\":"
+       << graph_string(serializer.encode()) << ",\"view\":" << graph_string(options.view)
+       << ",\"direction\":" << graph_string(options.direction)
+       << ",\"casadi_version\":" << graph_string(CasadiMeta::version())
+       << ",\"include_functions\":" << (options.include_functions ? "true" : "false")
+       << ",\"show_matrix_contents\":" << (options.show_matrix_contents ? "true" : "false")
+       << ",\"show_matrix_sizes\":" << (options.show_matrix_sizes ? "true" : "false") << "}";
+  return data.str();
+}
+
+template<typename MatType>
+void export_expressions(const std::vector<MatType>& expressions, const std::string& fname,
+    const Dict& opts) {
+  if (graph_extension(fname) == ".dot") {
+    Dict defaults = opts;
+    if (!defaults.count("view")) defaults["view"] = "expression";
+    Function("expression", symvar(veccat(expressions)), expressions).export_graph(fname, defaults);
+  } else {
+    write_graph(fname, expression_bundle(expressions, opts), GraphOptions(opts));
+  }
+}
+
+} // namespace
+
+std::string Function::export_graph(const Dict& opts) const {
+  return graph_bundle(*this, GraphOptions(opts));
+}
+
+void Function::export_graph(const std::string& fname, const Dict& opts) const {
+  const std::string extension = graph_extension(fname);
+  const GraphOptions options(opts);
+  write_graph(fname, graph_bundle(*this, options, extension == ".dot"), options);
+}
+
 void export_graph(const SX& expression, const std::string& fname, const Dict& opts) {
   export_expressions(std::vector<SX>{expression}, fname, opts);
 }
@@ -621,9 +650,7 @@ void export_graph(const std::vector<MX>& expressions, const std::string& fname, 
 }
 
 std::string export_graph(const std::vector<SX>& expressions, const Dict& opts) {
-  Dict graph_opts = opts;
-  if (!graph_opts.count("view")) graph_opts["view"] = "expression";
-  return Function("expression", symvar(veccat(expressions)), expressions).export_graph(graph_opts);
+  return expression_bundle(expressions, opts);
 }
 
 std::string export_graph(const SX& expression, const Dict& opts) {
@@ -631,9 +658,7 @@ std::string export_graph(const SX& expression, const Dict& opts) {
 }
 
 std::string export_graph(const std::vector<MX>& expressions, const Dict& opts) {
-  Dict graph_opts = opts;
-  if (!graph_opts.count("view")) graph_opts["view"] = "expression";
-  return Function("expression", symvar(veccat(expressions)), expressions).export_graph(graph_opts);
+  return expression_bundle(expressions, opts);
 }
 
 std::string export_graph(const MX& expression, const Dict& opts) {

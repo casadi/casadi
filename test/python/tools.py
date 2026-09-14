@@ -35,6 +35,32 @@ import sys
 
 class Toolstests(casadiTestCase):
 
+  def test_export_graph_expression_serialization(self):
+    import json
+    import os
+    import tempfile
+    import casadi as ca
+    for X in [ca.MX, ca.SX]:
+      x = X.sym("x", 2)
+      expression = ca.vertcat(x, x*x)
+      bundle = json.loads(ca.export_graph([expression, x]))
+      self.assertEqual(bundle["view"], "expression")
+      self.assertNotIn("nodes", bundle)
+      restored = ca.StringDeserializer(bundle["source"]).unpack()
+      self.assertEqual(len(restored), 2)
+      self.assertEqual(restored[0].shape, (4, 1))
+      if X is ca.MX:
+        self.assertTrue(restored[0].is_op(ca.OP_VERTCAT))
+        self.assertTrue(ca.is_equal(restored[0].dep(0), restored[1]))
+      with tempfile.TemporaryDirectory() as directory:
+        for extension in ["html", "casadi_viz"]:
+          path = os.path.join(directory, "expression."+extension)
+          ca.export_graph(expression, path, {"view": "function"})
+          with open(path) as stream:
+            text = stream.read()
+          self.assertIn('"source":', text)
+          self.assertIn('"view":"function"', text)
+
   def test_export_graph_dot(self):
     self.message("DOT matrix options preserve graph connectivity and valid ports")
     import os

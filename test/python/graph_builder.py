@@ -928,6 +928,150 @@ class GraphBuilderNumericTests(casadiTestCase):
 @unittest.skipUnless(have_graph_onnx, "needs the GraphModel onnx (symbolic) backend")
 class GraphBuilderSymbolicTests(casadiTestCase):
 
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_constant_numeric_attributes(self):
+    self.message("ONNX scalar and vector Constant attributes become doubles")
+    cases = [
+      ("value_int", -7, TensorProto.INT64, [], [-7]),
+      ("value_int", 2**40, TensorProto.INT64, [], [2**40]),
+      ("value_ints", [-3, 0, 7], TensorProto.INT64, [3], [-3, 0, 7]),
+      ("value_float", 1.25, TensorProto.FLOAT, [], [1.25]),
+      ("value_floats", [-2.5, 0., 1.25], TensorProto.FLOAT, [3], [-2.5, 0., 1.25]),
+    ]
+    with tempfile.TemporaryDirectory() as folder:
+      path = os.path.join(folder, "constant.onnx")
+      for attr, value, dtype, shape, expected in cases:
+        with self.subTest(attribute=attr, value=value):
+          node = helper.make_node("Constant", [], ["y"], **{attr: value})
+          graph = helper.make_graph([node], "constant", [],
+            [helper.make_tensor_value_info("y", dtype, shape)])
+          model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+          onnx.checker.check_model(model)
+          onnx.save(model, path)
+          f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+          self.checkarray(ca.DM(expected), f()["y"], attr)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_constant_attribute_reshape_ad(self):
+    self.message("Integer Constant attributes drive symbolic reshape and AD")
+    nodes = [
+      helper.make_node("Constant", [], ["shape"], value_ints=[2, 3]),
+      helper.make_node("Reshape", ["x", "shape"], ["r"]),
+      helper.make_node("Constant", [], ["scale"], value_int=3),
+      helper.make_node("Cast", ["scale"], ["scale_double"], to=TensorProto.DOUBLE),
+      helper.make_node("Mul", ["r", "scale_double"], ["y"]),
+    ]
+    graph = helper.make_graph(nodes, "reshape", [
+      helper.make_tensor_value_info("x", TensorProto.DOUBLE, [6])], [
+      helper.make_tensor_value_info("y", TensorProto.DOUBLE, [2, 3])])
+    model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+    onnx.checker.check_model(model)
+    with tempfile.TemporaryDirectory() as folder:
+      path = os.path.join(folder, "reshape.onnx")
+      onnx.save(model, path)
+      f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+      x = ca.MX.sym("x", f.sparsity_in(0))
+      ref = ca.Function("ref", [x], [3*ca.reshape(x, 3, 2).T])
+      self.checkfunction(ref, f, inputs=[ca.DM([1, 2, 3, 4, 5, 6])])
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_constant_slice_bounds(self):
+    self.message("ONNX constant Slice bounds use regular getnonzeros")
+    cases = [
+      (1, 2**63-1, 1, [1, 2, 3, 4, 5]),
+      (-2**63, 4, 1, [0, 1, 2, 3]),
+      (1, 2**63-1, 2, [1, 3, 5]),
+      (2**63-1, -2**63, -1, [5, 4, 3, 2, 1, 0]),
+      (-2, -2**63, -2, [4, 2, 0]),
+      (4, 1, 1, []),
+      (-2**63, -2**63, -1, []),
+    ]
+    with tempfile.TemporaryDirectory() as folder:
+      path = os.path.join(folder, "slice.onnx")
+      for start, end, step, expected_indices in cases:
+        with self.subTest(start=start, end=end, step=step):
+          nodes = [helper.make_node("Constant", [], [name], value_ints=[value])
+            for name, value in [("start", start), ("end", end), ("axis", 0), ("step", step)]]
+          nodes.append(helper.make_node("Slice", ["x", "start", "end", "axis", "step"], ["y"]))
+          graph = helper.make_graph(nodes, "slice", [
+            helper.make_tensor_value_info("x", TensorProto.DOUBLE, [6, 1])], [
+            helper.make_tensor_value_info("y", TensorProto.DOUBLE, [len(expected_indices), 1])])
+          model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+          onnx.checker.check_model(model)
+          onnx.save(model, path)
+          f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+          self.checkarray(ca.DM(expected_indices), f(ca.DM(range(6))))
+          ops = [f.instruction_id(k) for k in range(f.n_instructions())]
+          self.assertNotIn(ca.OP_GETNONZEROS_PARAM, ops)
+          if expected_indices:
+            self.assertIn(ca.OP_GETNONZEROS, ops)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_external_primal_symbolic_ad(self):
+    self.message("External ONNX nominal network preserves shapes and uses CasADi AD")
+    w = numpy.array([[1., 2.], [-1., .5], [.25, -.75]])
+    b = numpy.array([.1, -.2, .3])
+    nodes = [helper.make_node("Constant", [], [name], value_ints=value)
+      for name, value in [("start", [0]), ("end", [2**63-1]), ("axis", [0]),
+        ("shape", [1, 2]), ("flat", [-1]), ("unsqueeze_axis", [1])]]
+    nodes += [
+      helper.make_node("Constant", [], ["index"], value_int=0),
+      helper.make_node("Slice", ["x", "start", "end", "axis"], ["sliced"]),
+      helper.make_node("Gather", ["sliced", "index"], ["selected"], axis=1),
+      helper.make_node("Reshape", ["selected", "shape"], ["row"]),
+      helper.make_node("Gemm", ["row", "w", "b"], ["affine"]),
+      helper.make_node("Tanh", ["affine"], ["activation"]),
+      helper.make_node("Reshape", ["activation", "flat"], ["vector"]),
+      helper.make_node("Unsqueeze", ["vector", "unsqueeze_axis"], ["y"]),
+    ]
+    graph = helper.make_graph(nodes, "network", [
+      helper.make_tensor_value_info("x", TensorProto.DOUBLE, [2, 1])], [
+      helper.make_tensor_value_info("y", TensorProto.DOUBLE, [3, 1])], [
+      numpy_helper.from_array(w.T.copy(), "w"), numpy_helper.from_array(b, "b")])
+    model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+    onnx.checker.check_model(model)
+    with tempfile.TemporaryDirectory() as folder:
+      path = os.path.join(folder, "f.onnx")
+      onnx.save(model, path)
+      f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+      self.assertEqual(f.size_in(0), (2, 1))
+      self.assertEqual(f.size_out(0), (3, 1))
+      x = ca.MX.sym("x", 2)
+      ref = ca.Function("ref", [x], [ca.tanh(ca.mtimes(w, x) + b)])
+      self.checkfunction(ref, f, inputs=[ca.DM([.2, -.1])])
+      h = ca.Function("h", [x], [ca.hessian(ca.sumsqr(f(x)), x)[0]])
+      href = ca.Function("href", [x], [ca.hessian(ca.sumsqr(ref(x)), x)[0]])
+      self.checkarray(href([.2, -.1]), h([.2, -.1]))
+      ops = [f.instruction_id(k) for k in range(f.n_instructions())]
+      self.assertNotIn(ca.OP_GETNONZEROS_PARAM, ops)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_external_gather_constant_indices(self):
+    self.message("External ONNX Gather uses fixed indices along the declared axis")
+    values = numpy.arange(6.).reshape(2, 3)
+    with tempfile.TemporaryDirectory() as folder:
+      path = os.path.join(folder, "gather.onnx")
+      for axis in [0, 1]:
+        for indices in [1, [1, 0]]:
+          expected = numpy.take(values, indices, axis=axis)
+          nodes = [
+            helper.make_node("Constant", [], ["indices"], **{
+              "value_int" if isinstance(indices, int) else "value_ints": indices}),
+            helper.make_node("Gather", ["x", "indices"], ["y"], axis=axis),
+          ]
+          graph = helper.make_graph(nodes, "gather", [
+            helper.make_tensor_value_info("x", TensorProto.DOUBLE, [2, 3])], [
+            helper.make_tensor_value_info("y", TensorProto.DOUBLE, list(expected.shape))])
+          model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+          onnx.checker.check_model(model)
+          onnx.save(model, path)
+          f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+          self.assertEqual(f.size_in(0), (2, 3))
+          self.checkarray(ca.DM(expected), f(values))
+          ops = [f.instruction_id(k) for k in range(f.n_instructions())]
+          self.assertIn(ca.OP_GETNONZEROS, ops)
+          self.assertNotIn(ca.OP_GETNONZEROS_PARAM, ops)
+
   def compare(self, ref, got, name):
     # A CasADi Function returns a DM for a single output, a list for several, or a
     # dict (keyed by output name) when called with no positional arguments
@@ -1176,6 +1320,8 @@ class GraphBuilderSymbolicTests(casadiTestCase):
           self.assertTrue("GatherElements" in ops,
                           "%s: expected a GatherElements node, got %s" % (name, ops))
         g = ca.GraphBuilder(fn).create("imported_gnzp_%s" % name, {"symbolic": True})
+        self.assertIn(ca.OP_GETNONZEROS_PARAM,
+          [g.instruction_id(k) for k in range(g.n_instructions())])
         self.assertTrue(f.sparsity_out(0) == g.sparsity_out(0),
                         "%s: sparsity pattern not preserved" % name)
         self.checkarray(ca.DM(f(*vals)), ca.DM(g(*vals)), "gnzp_%s" % name, digits=12)

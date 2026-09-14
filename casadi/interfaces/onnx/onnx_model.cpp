@@ -119,7 +119,20 @@ namespace casadi {
 
   Function Onnx::import_symbolic(const GraphBuilderInternal& gb, const std::string& name) {
     for (auto&& b : gb.dim_bindings()) set_dimension(b.first, b.second);
-    return create(name);
+    Function f = create(name);
+    // CasADi exports use reversed axes; external models expose their declared ONNX shapes.
+    if (model_.producer_name() == "CasADi") return f;
+    std::vector<MX> inputs, args, outputs;
+    for (casadi_int i = 0; i < f.n_in(); ++i) {
+      inputs.push_back(MX::sym(f.name_in(i), f.sparsity_in(i).T()));
+      args.push_back(inputs.back().T());
+    }
+    f.call(args, outputs, true);
+    for (casadi_int i = 0; i < f.n_out(); ++i) {
+      const auto& shape = model_.graph().output(i).type().tensor_type().shape();
+      outputs[i] = shape.dim_size() == 1 ? vec(outputs[i]) : outputs[i].T();
+    }
+    return Function(name, inputs, outputs, f.name_in(), f.name_out());
   }
 
   std::vector<uint8_t> Onnx::export_symbolic(const Function& f, const Dict& opts) {
