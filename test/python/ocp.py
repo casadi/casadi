@@ -1132,8 +1132,11 @@ class OCPtests(casadiTestCase):
           for key, value in ref(**warm).items():
             self.checkarray(solver(**warm)[key], value, digits=7)
           self.check_serialize(solver, warm)
+        definitions = ["CASADI_MAX_NUM_THREADS=16"]
+        if os.name == "nt": definitions.append("CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_WINDOWS")
         generated = self.check_codegen(solver, warm, std="c99", digits=7,
-                           opts={"thread_safe": True}, definitions=["CASADI_MAX_NUM_THREADS=16"],
+                           opts={"thread_safe": True}, definitions=definitions,
+                           extra_options=[] if os.name == "nt" else ["-pthread"],
                            extralibs=["daqp"] if plugin=="daqp" else [])
         if generated and "F" in generated:
           self.check_thread_safety(generated["F"], warm, N=8)
