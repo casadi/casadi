@@ -43,6 +43,10 @@ namespace casadi {
       std::vector<DM> res = f(DM(...));
       \endverbatim
 
+      Unless is_diff_in is supplied, forward seed inputs or adjoint outputs determine
+      differentiability. Embedded signatures take precedence over sibling files.
+      Without derivative signatures, all inputs are differentiable by default.
+
       These free functions query and manage the runtime backend plugin registry.
 
       \identifier{2j7} */

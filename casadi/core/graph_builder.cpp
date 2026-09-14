@@ -288,7 +288,11 @@ namespace casadi {
     if (symbolic) {
       casadi_assert(!model_.is_null(),
         "GraphBuilder: symbolic create requires a parsed model (build from a file)");
-      return model_.import_symbolic(*this, name);
+      Function f = model_.import_symbolic(*this, name);
+      if (o.empty()) return f;
+      std::vector<MX> args = f.mx_in(), res;
+      f.call(args, res, true);
+      return Function(name, args, res, f.name_in(), f.name_out(), o);
     }
 
     // Numeric path: OnnxFunction freezes a snapshot directly from this builder's config

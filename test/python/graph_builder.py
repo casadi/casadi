@@ -29,6 +29,7 @@ import numpy
 import unittest
 import os
 import tempfile
+from typing import Union
 from helpers import casadiTestCase, memory_heavy, requires_onnxbackend
 
 # onnx python package: builds the numeric test models
@@ -361,6 +362,9 @@ class GraphBuilderNumericTests(casadiTestCase):
     path = self.isdiff_fwd_model(3)
     f = ca.GraphBuilder(path).create("f", ["x", "p"], ["y"],
         {"is_diff_in": [True, False]})
+    inferred = ca.GraphBuilder(path).create("inferred", ["x", "p"], ["y"])
+    self.assertEqual(inferred.is_diff_in(), [True, False])
+    f = inferred
     self.checkarray(f(ca.DM([1, 2, 3]), ca.DM([10, 20, 30])), ca.DM([12, 24, 36]),
                     "primal", digits=5)
 
@@ -379,6 +383,101 @@ class GraphBuilderNumericTests(casadiTestCase):
     J = ca.Function("J", [X, P], [ca.jacobian(f(X, P), X)])
     self.checkarray(J(ca.DM([1, 2, 3]), ca.DM([10, 20, 30])), 2 * ca.DM.eye(3),
                     "jacobian wrt x", digits=10)
+
+  def test_infer_diff_sibling_signatures(self):
+    self.message("Forward and adjoint signatures infer input masks; explicit flags take precedence")
+    path = self.isdiff_fwd_model(3)
+    model = onnx.load(path)
+    sibling = os.path.join(os.path.dirname(path), "fwd_" + os.path.basename(path))
+    onnx.save(model, sibling)
+    self._tmp.append(sibling)
+    del model.graph.node[2:]
+    del model.graph.input[2:]
+    del model.graph.output[1:]
+    onnx.save(model, path)
+    f = ca.GraphBuilder(path).create("f")
+    self.assertEqual(f.is_diff_in(), [True, False])
+    self.assertEqual(ca.Function.deserialize(f.serialize()).is_diff_in(), [True, False])
+    explicit = ca.GraphBuilder(path).create("explicit", {"is_diff_in": [True, True]})
+    self.assertEqual(explicit.is_diff_in(), [True, True])
+    with self.assertRaisesRegex(RuntimeError, "incomplete fwd signature"):
+      explicit.forward(1)
+    vi = lambda name: helper.make_tensor_value_info(name, TensorProto.FLOAT, [3, 1])
+    graph = helper.make_graph([helper.make_node("Identity", ["adj_y"], ["adj_p"])],
+      "conflict", [vi("adj_y")], [vi("adj_p")])
+    adj = os.path.join(os.path.dirname(path), "adj_" + os.path.basename(path))
+    onnx.save(helper.make_model(graph), adj)
+    self._tmp.append(adj)
+    with self.assertRaisesRegex(RuntimeError, "signatures disagree"):
+      ca.GraphBuilder(path).create("conflict")
+    os.remove(sibling)
+    os.remove(adj)
+    self.assertEqual(ca.GraphBuilder(path).create("primal").is_diff_in(), [True, True])
+
+  def test_export_graph_model_filename(self):
+    self.message("Graph call nodes identify their source ONNX files after serialization")
+    import json
+    path = self.affine_model(numpy.float32, (3,), 2, 1)
+    sibling = self.sibling_model(path, "adj")
+    f = ca.GraphBuilder(path).create("renamed")
+    self.assertEqual(f.info()["model_path"], path)
+    x = ca.MX.sym("x", 3)
+    wrapper = ca.Function("wrapper", [x], [f(x), ca.jacobian(f(x), x)])
+    for function in [wrapper, ca.Function.deserialize(wrapper.serialize())]:
+      graph = json.loads(function.export_graph())
+      calls = [node for part in [graph]+graph.get("functions", [])
+               for node in part["nodes"] if "model_path" in node]
+      self.assertEqual({node["model_path"] for node in calls}, {path, sibling})
+      for node in calls:
+        self.assertIn(os.path.basename(node["model_path"]), node["label"])
+
+  def test_nondifferentiable_sibling_hessian(self):
+    self.message("A runtime parameter needs no adjoint output or forward seed, including Hessians")
+    def value(name, columns: Union[int, str]=1):
+      return helper.make_tensor_value_info(name, TensorProto.FLOAT, [1, columns])
+    with tempfile.TemporaryDirectory() as folder:
+      def save(name, nodes, inputs, outputs, constants=()):
+        graph = helper.make_graph(nodes, name, inputs, outputs, list(constants))
+        model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+        model.ir_version = 8
+        onnx.checker.check_model(model)
+        onnx.save(model, os.path.join(folder, name+".onnx"))
+      two = numpy_helper.from_array(numpy.array([[2]], dtype=numpy.float32), "two")
+      save("f", [helper.make_node("Mul", ["x", "x"], ["xx"]),
+        helper.make_node("Mul", ["p", "xx"], ["y"])], [value("x"), value("p")], [value("y")])
+      save("adj_f", [helper.make_node("Mul", ["two", "p"], ["tp"]),
+        helper.make_node("Mul", ["tp", "x"], ["tpx"]),
+        helper.make_node("Mul", ["tpx", "adj_y"], ["adj_x"])],
+        [value("x"), value("p"), value("adj_y", "nadj")], [value("adj_x", "nadj")], [two])
+      flat = numpy_helper.from_array(numpy.array([1, -1], dtype=numpy.int64), "flat")
+      save("fwd_adj_f", [
+        helper.make_node("Transpose", ["fwd_x"], ["vx"], perm=[1, 0]),
+        helper.make_node("MatMul", ["vx", "adj_y"], ["outer"]),
+        helper.make_node("Reshape", ["outer", "flat"], ["packed"]),
+        helper.make_node("Mul", ["x", "fwd_adj_y"], ["xdw"]),
+        helper.make_node("Add", ["packed", "xdw"], ["sum"]),
+        helper.make_node("Mul", ["two", "p"], ["tp"]),
+        helper.make_node("Mul", ["tp", "sum"], ["fwd_adj_x"])],
+        [value("x"), value("p"), value("adj_y", "nadj"), value("fwd_x", "nfwd"),
+         value("fwd_adj_y", "nsens")], [value("fwd_adj_x", "nsens")], [two, flat])
+      for symbolic in [False, True]:
+        opts = {"symbolic": True, "is_diff_in": [True, False]} if symbolic else {}
+        f = ca.GraphBuilder(os.path.join(folder, "f.onnx")).create("f", opts)
+        self.assertEqual(f.is_diff_in(), [True, False])
+        x, p = ca.MX.sym("x"), ca.MX.sym("p")
+        y = f(x, p)
+        h = ca.Function("h", [x, p], [ca.hessian(y, x)[0], ca.jacobian(y, p)])
+        self.assertEqual(h.sparsity_out(1).nnz(), 0)
+        for weather in [1, 3]:
+          self.checkarray(2*weather, h(2, weather)[0])
+          rev = f.reverse(2)
+          self.assertEqual(rev.is_diff_in(), [True, False, True, True])
+          self.assertEqual(rev.is_diff_out(), [True, False])
+          adj = rev(2, weather, f(2, weather), ca.DM([[1, 2]]))
+          self.checkarray(ca.DM([[4*weather, 8*weather]]), adj[0])
+          self.checkarray(ca.DM.zeros(1, 2), adj[1])
+        restored = ca.Function.deserialize(h.serialize())
+        self.checkarray(6, restored(2, 3)[0])
 
   def sibling_model(self, path, kind, n=3):
     sources = {"fwd": self.fwd_model, "adj": self.rev_model, "jac": self.jac_model}
@@ -444,12 +543,14 @@ class GraphBuilderNumericTests(casadiTestCase):
     self.checkarray(ca.diag(2*x), J(x), "nonlinear AD")
 
   def test_sibling_lazy_loading(self):
-    self.message("sibling loading is lazy and constructed derivatives embed their model")
+    self.message("explicit masks keep sibling loading lazy; constructed derivatives embed their model")
     path = self.affine_model(numpy.float32, (3,), 2, 1)
     sibling = self.sibling_model(path, "fwd")
     with open(sibling, "wb") as fh:
       fh.write(b"invalid ONNX")
-    f = ca.GraphBuilder(path).create("f")
+    with self.assertRaisesRegex(RuntimeError, "Failed to parse ONNX"):
+      ca.GraphBuilder(path).create("infer")
+    f = ca.GraphBuilder(path).create("f", {"is_diff_in": [True]})
     self.checkarray(ca.DM([3, 5, 7]), f(ca.DM([1, 2, 3])), "no derivative parsing")
     with self.assertRaises(RuntimeError):
       f.forward(2)
@@ -983,6 +1084,8 @@ class GraphBuilderSymbolicTests(casadiTestCase):
       (1, 2**63-1, 2, [1, 3, 5]),
       (2**63-1, -2**63, -1, [5, 4, 3, 2, 1, 0]),
       (-2, -2**63, -2, [4, 2, 0]),
+      (1, 2**63-1, 2**63-1, [1]),
+      (5, -2**63, -2**63, [5]),
       (4, 1, 1, []),
       (-2**63, -2**63, -1, []),
     ]
@@ -1054,11 +1157,11 @@ class GraphBuilderSymbolicTests(casadiTestCase):
       for axis in [0, 1]:
         for indices in [1, [1, 0]]:
           expected = numpy.take(values, indices, axis=axis)
-          nodes = [
-            helper.make_node("Constant", [], ["indices"], **{
-              "value_int" if isinstance(indices, int) else "value_ints": indices}),
-            helper.make_node("Gather", ["x", "indices"], ["y"], axis=axis),
-          ]
+          if isinstance(indices, int):
+            constant = helper.make_node("Constant", [], ["indices"], value_int=indices)
+          else:
+            constant = helper.make_node("Constant", [], ["indices"], value_ints=indices)
+          nodes = [constant, helper.make_node("Gather", ["x", "indices"], ["y"], axis=axis)]
           graph = helper.make_graph(nodes, "gather", [
             helper.make_tensor_value_info("x", TensorProto.DOUBLE, [2, 3])], [
             helper.make_tensor_value_info("y", TensorProto.DOUBLE, list(expected.shape))])
@@ -1071,6 +1174,69 @@ class GraphBuilderSymbolicTests(casadiTestCase):
           ops = [f.instruction_id(k) for k in range(f.n_instructions())]
           self.assertIn(ca.OP_GETNONZEROS, ops)
           self.assertNotIn(ca.OP_GETNONZEROS_PARAM, ops)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_direct_integer_structural_inputs(self):
+    self.message("Direct integer constants feed Slice, Reshape and Gather without rounding")
+    with tempfile.TemporaryDirectory() as folder:
+      path = os.path.join(folder, "integers.onnx")
+      for dtype in [numpy.int32, numpy.int64]:
+        for encoding in ["attribute", "tensor", "raw", "initializer", "raw_initializer"]:
+          with self.subTest(dtype=dtype, encoding=encoding):
+            nodes, initializers = [], []
+            def constant(name, values, scalar=False):
+              shape = [] if scalar else [len(values)]
+              if encoding == "attribute":
+                nodes.append(helper.make_node("Constant", [], [name], **{
+                  "value_int" if scalar else "value_ints": values[0] if scalar else values}))
+                return
+              if "raw" in encoding:
+                tensor = numpy_helper.from_array(numpy.array(values, dtype=dtype).reshape(shape), name)
+              else:
+                elem_type = TensorProto.INT32 if dtype == numpy.int32 else TensorProto.INT64
+                tensor = helper.make_tensor(name, elem_type, shape, values)
+              if "initializer" in encoding:
+                initializers.append(tensor)
+              else:
+                nodes.append(helper.make_node("Constant", [], [name], value=tensor))
+            constant("start", [-6])
+            constant("end", [numpy.iinfo(dtype).max])
+            constant("axis", [0])
+            constant("step", [2])
+            constant("shape", [1, 3])
+            constant("index", [-2], scalar=True)
+            nodes += [
+              helper.make_node("Slice", ["x", "start", "end", "axis", "step"], ["s"]),
+              helper.make_node("Reshape", ["s", "shape"], ["r"]),
+              helper.make_node("Gather", ["r", "index"], ["y"], axis=1),
+            ]
+            graph = helper.make_graph(nodes, "integers", [
+              helper.make_tensor_value_info("x", TensorProto.DOUBLE, [6, 1])], [
+              helper.make_tensor_value_info("y", TensorProto.DOUBLE, [1])], initializers)
+            model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+            onnx.checker.check_model(model)
+            onnx.save(model, path)
+            f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+            self.checkarray(ca.DM(2), f(ca.DM(range(6))))
+            ops = [f.instruction_id(k) for k in range(f.n_instructions())]
+            self.assertIn(ca.OP_GETNONZEROS, ops)
+            self.assertNotIn(ca.OP_GETNONZEROS_PARAM, ops)
+            if dtype != numpy.int64:
+              continue
+            # An invalid large index/shape must be reported exactly, not rounded through double.
+            for op in ["Gather", "Reshape"]:
+              nodes, initializers = [], []
+              exact = 2**53 + 1
+              constant("integer", [exact], scalar=op == "Gather")
+              nodes.append(helper.make_node(op, ["x", "integer"], ["y"]))
+              graph = helper.make_graph(nodes, "exact", [
+                helper.make_tensor_value_info("x", TensorProto.DOUBLE, [1])], [
+                helper.make_tensor_value_info("y", TensorProto.DOUBLE, [1])], initializers)
+              model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+              onnx.checker.check_model(model)
+              onnx.save(model, path)
+              with self.assertRaisesRegex(RuntimeError, str(exact)):
+                ca.GraphBuilder(path).create("f", {"symbolic": True})
 
   def compare(self, ref, got, name):
     # A CasADi Function returns a DM for a single output, a list for several, or a

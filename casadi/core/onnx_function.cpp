@@ -29,6 +29,12 @@
 
 namespace casadi {
 
+  Dict OnnxFunction::info() const {
+    Dict ret = FunctionInternal::info();
+    ret["model_path"] = model_path_;
+    return ret;
+  }
+
   bool has_onnxbackend(const std::string& solver) {
     return OnnxFunction::has_plugin(solver);
   }
@@ -246,7 +252,43 @@ namespace casadi {
     for (const OnnxTensorInfo& t : in_) if (!input_values_.count(t.name)) exposed.push_back(t);
     in_ = exposed;
     build_io_map();  // baked-feed map over all model inputs
-    FunctionInternal::init(opts);
+    Dict inferred_opts = opts;
+    if (!opts.count("is_diff_in")) {
+      std::vector<bool> inferred;
+      bool found = false;
+      auto infer = [&](const std::string& kind, const std::set<std::string>& inputs,
+                       const std::set<std::string>& outputs) -> bool {
+        bool signature = false;
+        for (const auto& y : out_) {
+          signature |= kind == "fwd" ? outputs.count("fwd_" + y.name)
+                                     : inputs.count("adj_" + y.name);
+        }
+        if (!signature) return false;
+        std::vector<bool> mask;
+        for (const auto& x : in_) {
+          mask.push_back(kind == "fwd" ? inputs.count("fwd_" + x.name)
+                                       : outputs.count("adj_" + x.name));
+        }
+        casadi_assert(!found || mask == inferred,
+          "ONNX derivative signatures disagree on differentiable inputs; specify is_diff_in");
+        inferred = mask;
+        found = true;
+        return true;
+      };
+      for (const std::string kind : {"fwd", "adj"}) {
+        if (infer(kind, model_inputs_, model_outputs_)) continue;
+        std::string path = derivative_path(kind);
+        if (path.empty() || !Filesystem::exists(path)) continue;
+        GraphBuilder sibling(path, builder_opts_);
+        std::set<std::string> inputs, outputs;
+        for (const Node& node : sibling.get()->node_list()) {
+          (node.io == "input" ? inputs : outputs).insert(node.name);
+        }
+        infer(kind, inputs, outputs);
+      }
+      if (found) inferred_opts["is_diff_in"] = inferred;
+    }
+    FunctionInternal::init(inferred_opts);
   }
 
   void OnnxFunction::build_io_map() {
@@ -317,8 +359,29 @@ namespace casadi {
         }
       }
     }
-    Function g = OnnxFunction::create(plugin_name(), name + "_core", bi, cin, con,
-                                     derivative_opts_);
+    // Preserve differentiability through both the ONNX core and its signature wrapper.
+    std::vector<bool> din(inames.size(), true), dout(onames.size(), true);
+    auto di = opts.find("is_diff_in"), do_ = opts.find("is_diff_out");
+    if (di != opts.end()) {
+      din = di->second.to_bool_vector();
+    } else {
+      for (size_t i = 0; i < in_.size(); ++i) din[i] = diff_in(i);
+      for (size_t j = 0; j < out_.size(); ++j) din[in_.size() + j] = diff_out(j);
+    }
+    if (do_ != opts.end()) {
+      dout = do_->second.to_bool_vector();
+    } else if (kind == "jac") {
+      for (size_t j = 0; j < out_.size(); ++j)
+        for (size_t i = 0; i < in_.size(); ++i)
+          dout[j * in_.size() + i] = diff_out(j) && diff_in(i);
+    }
+    std::vector<bool> cdi, cdo;
+    for (size_t i = 0; i < inames.size(); ++i) if (inputs.count(inames[i])) cdi.push_back(din[i]);
+    for (size_t i = 0; i < onames.size(); ++i) if (outputs.count(onames[i])) cdo.push_back(dout[i]);
+    Dict copts = derivative_opts_;
+    copts["is_diff_in"] = cdi;
+    copts["is_diff_out"] = cdo;
+    Function g = OnnxFunction::create(plugin_name(), name + "_core", bi, cin, con, copts);
     for (size_t i = 0; i < inames.size(); ++i) {
       if (!inputs.count(inames[i])) continue;
       casadi_assert(g.sparsity_in(inames[i]).size() == in_sp[i].size(),
@@ -347,6 +410,8 @@ namespace casadi {
       outs[j] = it != mo.end() ? it->second : MX::zeros(out_sp[j]);
     }
     Dict wopts;
+    wopts["is_diff_in"] = din;
+    wopts["is_diff_out"] = dout;
     auto it = opts.find("derivative_of");
     if (it != opts.end()) wopts["derivative_of"] = it->second;
     return Function(name, args, outs, inames, onames, wopts);

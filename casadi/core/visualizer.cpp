@@ -162,6 +162,15 @@ std::string graph_model(Function function, const std::string& direction,
       const Function& f = sx ? sx->call_.el.at(sx->algorithm_.at(k).i1).f
                              : mx->algorithm_.at(k).data.which_function();
       call_metadata = ",\"callee_type\":" + graph_string(f.class_name());
+      Dict info = f.info();
+      auto source = info.find("model_path");
+      if (source != info.end()) {
+        std::string path = source->second.to_string();
+        if (!path.empty()) {
+          call_metadata += ",\"model_path\":" + graph_string(path);
+          label += " [" + path.substr(path.find_last_of("/\\") + 1) + "]";
+        }
+      }
       if (include_functions && (f.is_a("SXFunction") || f.is_a("MXFunction"))) {
         auto found = indices.find(f.get());
         if (found == indices.end()) {

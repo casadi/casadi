@@ -28,6 +28,36 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  // Read structural integer constants without passing their payload through DM.
+  static bool integer_tensor(const onnx::TensorProto& tensor, std::vector<int64_t>& values) {
+    if (tensor.data_type() != onnx::TensorProto::INT64 &&
+        tensor.data_type() != onnx::TensorProto::INT32) return false;
+    values.clear();
+    if (tensor.has_raw_data()) {
+      const auto& raw = tensor.raw_data();
+      size_t width = tensor.data_type() == onnx::TensorProto::INT64 ? 8 : 4;
+      casadi_assert(raw.size() % width == 0, "Invalid integer tensor raw_data size");
+      for (size_t i = 0; i < raw.size(); i += width) {
+        uint64_t bits = 0;
+        for (size_t j = 0; j < width; ++j) {
+          bits |= static_cast<uint64_t>(static_cast<unsigned char>(raw[i + j])) << (8 * j);
+        }
+        // ONNX raw_data is little-endian two's complement.
+        if (width == 4) {
+          values.push_back(static_cast<int64_t>(bits) - static_cast<int64_t>((bits >> 31) << 32));
+        } else {
+          values.push_back(bits >> 63 ? -1 - static_cast<int64_t>(~bits) :
+            static_cast<int64_t>(bits));
+        }
+      }
+    } else if (tensor.data_type() == onnx::TensorProto::INT64) {
+      values.assign(tensor.int64_data().begin(), tensor.int64_data().end());
+    } else {
+      values.assign(tensor.int32_data().begin(), tensor.int32_data().end());
+    }
+    return true;
+  }
+
   // ONNX initializers are pre-loaded constants
   void Onnx::process_graph_initializers(
       const onnx::GraphProto& graph,
@@ -97,6 +127,12 @@ namespace casadi {
       std::map<std::string, MX>& value_map,
       bool verbose) {
 
+    IntegerConstants integer_constants;
+    for (const auto& tensor : graph.initializer()) {
+      std::vector<int64_t> values;
+      if (integer_tensor(tensor, values)) integer_constants[tensor.name()] = std::move(values);
+    }
+
     // Per-graph capture of kron operands, keyed by the exporter's node-name tag "kron<k>".
     std::map<std::string, MX> kron_operand_a_, kron_operand_b_;
 
@@ -106,6 +142,21 @@ namespace casadi {
 
       if (verbose) {
         uout() << "  Processing node " << i << ": " << op_type << std::endl;
+      }
+
+      // Only direct Constant nodes and initializers retain an integer payload.
+      if (op_type == "Constant" && node.output_size() == 1) {
+        for (const auto& attr : node.attribute()) {
+          std::vector<int64_t> values;
+          if (attr.name() == "value_int") {
+            values = {attr.i()};
+          } else if (attr.name() == "value_ints") {
+            values.assign(attr.ints().begin(), attr.ints().end());
+          } else if (attr.name() != "value" || !integer_tensor(attr.t(), values)) {
+            continue;
+          }
+          integer_constants[node.output(0)] = std::move(values);
+        }
       }
 
       // ========== Special Handling: Kronecker product group ==========
@@ -359,7 +410,7 @@ namespace casadi {
         }
 
         // All other (single-output) operations
-        output = process_node_operation(op_type, node, node_inputs);
+        output = process_node_operation(op_type, node, node_inputs, integer_constants);
       }
 
       // Store output (assume single output for now)
@@ -481,7 +532,20 @@ namespace casadi {
   MX Onnx::process_node_operation(
       const std::string& op_type,
       const onnx::NodeProto& node,
-      const std::vector<MX>& node_inputs) {
+      const std::vector<MX>& node_inputs,
+      const IntegerConstants& integer_constants) {
+
+    auto input_ints = [&](size_t i) -> std::vector<casadi_int> {
+      auto it = integer_constants.find(node.input(i));
+      if (it == integer_constants.end()) return constant_ints(node_inputs[i]);
+      std::vector<casadi_int> values;
+      for (int64_t v : it->second) {
+        casadi_assert(v >= std::numeric_limits<casadi_int>::min() &&
+          v <= std::numeric_limits<casadi_int>::max(), "Integer constant out of range: " + str(v));
+        values.push_back(static_cast<casadi_int>(v));
+      }
+      return values;
+    };
 
     MX output;
 
@@ -734,19 +798,19 @@ namespace casadi {
       // Second input is the target shape - should be a constant
       casadi_assert(node_inputs[1].is_constant(),
                     "Reshape shape must be a constant");
-      DM shape_dm = static_cast<DM>(node_inputs[1]);
+      std::vector<casadi_int> shape = input_ints(1);
       // ONNX Reshape is PSEUDO-DENSE (it operates on the full numel), so densify the operand here:
       // this is the ONE place the imported graph must drop sparsity, because CasADi's own reshape
       // PRESERVES it (a sparse operand would reshape to a flat with only nnz entries, shifting
       // every
       // downstream Gather/Scatter index). True sparsity propagates everywhere else.
-      if (shape_dm.numel() > 2) {
+      if (shape.size() > 2) {
         // 3-D reshape (the Map/Scan lift envelope): CasADi is 2-D, so pass through unchanged
         output = densify(node_inputs[0]);
       } else {
         // Transpose-rep: the ONNX target (s0,s1) is the reverse of the CasADi target.
-        casadi_int s0 = static_cast<casadi_int>(shape_dm(0).scalar());
-        casadi_int s1 = (shape_dm.numel() > 1) ? static_cast<casadi_int>(shape_dm(1).scalar()) : 1;
+        casadi_int s0 = shape.empty() ? 1 : shape[0];
+        casadi_int s1 = shape.size() > 1 ? shape[1] : 1;
         output = reshape(densify(node_inputs[0]), s1, s0);
       }
 
@@ -794,12 +858,12 @@ namespace casadi {
       // Axes (default [0, 1, ...]) and steps (default all 1s)
       std::vector<casadi_int> axes, steps;
       if (node_inputs.size() >= 4 && !node_inputs[3].is_empty()) {
-        axes = constant_ints(node_inputs[3]);
+        axes = input_ints(3);
       } else {
         for (casadi_int k = 0; k < starts_dm.numel(); ++k) axes.push_back(k);
       }
       if (node_inputs.size() >= 5 && !node_inputs[4].is_empty()) {
-        steps = constant_ints(node_inputs[4]);
+        steps = input_ints(4);
       } else {
         steps.assign(starts_dm.numel(), 1);
       }
@@ -817,14 +881,23 @@ namespace casadi {
         casadi_int n = axis == 0 ? ncol : nrow;
         casadi_int sp = steps[a];
         casadi_assert(sp != 0, "Slice: step must not be zero");
-        // Clip in double before casting: INT64_MAX rounds beyond the integer range.
-        auto bound = [n, sp](double v) -> casadi_int {
+        sp = std::max(-std::max(n, casadi_int(1)), std::min(sp, std::max(n, casadi_int(1))));
+        auto bound = [&](size_t input, const DM& dm) -> casadi_int {
+          auto it = integer_constants.find(node.input(input));
+          if (it != integer_constants.end()) {
+            int64_t v = it->second.at(a);
+            if (v < 0) v += n;
+            return static_cast<casadi_int>(std::max<int64_t>(sp > 0 ? 0 : -1,
+              std::min<int64_t>(v, sp > 0 ? n : n - 1)));
+          }
+          // Preserve the existing path for computed constants; clip before narrowing.
+          double v = dm(a).scalar();
           if (v < 0) v += n;
           return static_cast<casadi_int>(std::max(sp > 0 ? 0. : -1.,
             std::min(v, static_cast<double>(sp > 0 ? n : n - 1))));
         };
-        casadi_int st = bound(starts_dm(a).scalar());
-        casadi_int en = bound(ends_dm(a).scalar());
+        casadi_int st = bound(1, starts_dm);
+        casadi_int en = bound(2, ends_dm);
         // CasADi uses an unbounded stop to represent -1 for a backwards slice.
         Slice indices = (sp > 0 ? st >= en : st <= en) ? Slice(0, 0) :
           Slice(st, en == -1 ? std::numeric_limits<casadi_int>::max() : en, sp);
@@ -846,35 +919,15 @@ namespace casadi {
       casadi_int axis = get_int_attribute(node, "axis", 0);
 
       casadi_assert(indices_mx.is_constant(), "Gather indices must be constant");
-      DM indices_dm = static_cast<DM>(indices_mx);
+      std::vector<casadi_int> indices = input_ints(1);
 
-      if (data.size2() == 1) {
-        // Transpose-rep getnonzeros: data is a column-flat (numel x 1); gather elements by flat
-        // index regardless of the ONNX axis.
-        if (indices_dm.numel() == 1) {
-          output = data(static_cast<casadi_int>(indices_dm(0).scalar()), Slice());
-        } else {
-          output = data(constant_ints(indices_mx), Slice());
-        }
-      } else if (indices_dm.numel() == 1) {
-        casadi_int idx = static_cast<casadi_int>(indices_dm(0).scalar());
-        if (axis == 0) {
-          output = data(Slice(), idx);      // ONNX axis 0 is CasADi columns
-        } else if (axis == 1) {
-          output = data(idx, Slice());      // ONNX axis 1 is CasADi rows
-        } else {
-          casadi_error("Gather: only axis 0 and 1 supported for 2D tensors");
-        }
+      // Keep even scalar indices in an integer vector: Matrix's scalar constructor takes double.
+      if (data.size2() == 1 || axis == 1) {
+        output = data(indices, Slice());
+      } else if (axis == 0) {
+        output = data(Slice(), indices);
       } else {
-        // Multiple indices: gather the rows (axis 0) / columns (axis 1).
-        std::vector<casadi_int> indices = constant_ints(indices_mx);
-        if (axis == 0) {
-          output = data(Slice(), indices);
-        } else if (axis == 1) {
-          output = data(indices, Slice());
-        } else {
-          casadi_error("Gather: only axis 0 and 1 supported for 2D tensors");
-        }
+        casadi_error("Gather: only axis 0 and 1 supported for 2D tensors");
       }
 
     } else if (op_type == "ScatterElements") {

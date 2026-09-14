@@ -68,6 +68,8 @@ namespace casadi {
                  const std::vector<std::string>& outputs);
     ~OnnxFunction() override;
 
+    Dict info() const override;
+
     /// Plugin creator function type
     typedef OnnxFunction* (*Creator)(const std::string& name,
                                      const GraphBuilderInternal* gb,

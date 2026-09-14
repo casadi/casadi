@@ -34,6 +34,7 @@
 #define ONNX_NAMESPACE onnx
 #include <onnx/onnx_pb.h>
 
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <set>
@@ -122,6 +123,8 @@ namespace casadi {
     std::string casadi_real_ = "double";
 
   private:
+    using IntegerConstants = std::map<std::string, std::vector<int64_t>>;
+
     // Import helpers (graph -> MX), operating on this translator
     void process_graph_initializers(
         const onnx::GraphProto& graph,
@@ -176,7 +179,8 @@ namespace casadi {
     MX process_node_operation(
         const std::string& op_type,
         const onnx::NodeProto& node,
-        const std::vector<MX>& node_inputs);
+        const std::vector<MX>& node_inputs,
+        const IntegerConstants& integer_constants);
 
     /** \brief Convert a CasADi Function to ONNX FunctionProto
 
