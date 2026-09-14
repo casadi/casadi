@@ -270,6 +270,22 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   extern template class Matrix<SXElem>;
 #endif // CASADI_SX_INSTANTIATOR_CPP
 
+#ifndef SWIG
+  /** \brief Export expressions as .html, .dot, or .casadi_viz, defaulting to expression view.
+   * Options are forwarded to Function::export_graph.
+   */
+  ///@{
+  /// Without a filename, return the .casadi_viz JSON bundle.
+  CASADI_EXPORT std::string export_graph(const SX& expression, const Dict& opts=Dict());
+  CASADI_EXPORT std::string export_graph(const std::vector<SX>& expressions,
+    const Dict& opts=Dict());
+  CASADI_EXPORT void export_graph(const SX& expression, const std::string& fname,
+    const Dict& opts=Dict());
+  CASADI_EXPORT void export_graph(const std::vector<SX>& expressions, const std::string& fname,
+    const Dict& opts=Dict());
+  ///@}
+#endif // SWIG
+
 } // namespace casadi
 
 

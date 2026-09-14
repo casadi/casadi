@@ -1122,6 +1122,22 @@ namespace casadi {
     return MX::kron_contract(m, x, inner);
   }
 
+#ifndef SWIG
+  /** \brief Export expressions as .html, .dot, or .casadi_viz, defaulting to expression view.
+   * Options are forwarded to Function::export_graph.
+   */
+  ///@{
+  /// Without a filename, return the .casadi_viz JSON bundle.
+  CASADI_EXPORT std::string export_graph(const MX& expression, const Dict& opts=Dict());
+  CASADI_EXPORT std::string export_graph(const std::vector<MX>& expressions,
+    const Dict& opts=Dict());
+  CASADI_EXPORT void export_graph(const MX& expression, const std::string& fname,
+    const Dict& opts=Dict());
+  CASADI_EXPORT void export_graph(const std::vector<MX>& expressions, const std::string& fname,
+    const Dict& opts=Dict());
+  ///@}
+#endif // SWIG
+
 } // namespace casadi
 
 #endif // CASADI_MX_HPP

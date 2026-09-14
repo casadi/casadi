@@ -192,6 +192,7 @@ set(CASADI_INTERNAL
 
   # A dynamically created function with AD capabilities
   function.cpp
+  visualizer.cpp
   function_internal.hpp   function_internal.cpp   # Function object class (internal API)
   oracle_function.hpp     oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
   callback.cpp            # Interface for user-defined function classes (public API)
@@ -272,6 +273,10 @@ add_custom_command(
 )
 
 set(CASADI_INTERNAL ${CASADI_INTERNAL} "${CMAKE_CURRENT_BINARY_DIR}/runtime/casadi_runtime_str.h")
+
+# Minimal HTML shell loading the viewer from @casadi/casadi-viz.
+embed_resource("casadi_viz" "../../misc/casadi_viz.html" CASADI_VIZ_RESOURCE)
+list(APPEND CASADI_INTERNAL ${CASADI_VIZ_RESOURCE})
 
 # Build static and/or shared
 casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL})

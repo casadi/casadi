@@ -60,6 +60,10 @@ namespace casadi {
       {"live_variables",
        {OT_BOOL,
         "Reuse variables in the work vector"}},
+      {"dump_trace",
+       {OT_BOOL,
+        "Dump interpreted instruction values to name.NNNNNN.trace.jsonl in dump_dir, "
+        "using the dump_in/dump_out counter. [false]"}},
       {"print_instructions",
        {OT_BOOL,
         "Print each operation during evaluation. Influenced by print_canonical."}},
@@ -77,6 +81,7 @@ namespace casadi {
 
   Dict MXFunction::generate_options(const std::string& target) const {
     Dict opts = FunctionInternal::generate_options(target);
+    opts["dump_trace"] = dump_trace_;
     if (target=="clone") opts["default_in"] = default_in_;
     opts["live_variables"] = live_variables_;
     opts["print_instructions"] = print_instructions_;
@@ -124,6 +129,8 @@ namespace casadi {
         default_in_ = op.second;
       } else if (op.first=="live_variables") {
         live_variables_ = op.second;
+      } else if (op.first=="dump_trace") {
+        dump_trace_ = op.second;
       } else if (op.first=="print_instructions") {
         print_instructions_ = op.second;
       } else if (op.first=="cse") {
@@ -132,6 +139,8 @@ namespace casadi {
         allow_free = op.second;
       }
     }
+
+    casadi_assert(!dump_trace_ || !jit_, "dump_trace is not supported for JIT evaluation");
 
     // Check/set default inputs
     if (default_in_.empty()) {
@@ -434,6 +443,9 @@ namespace casadi {
 
   int MXFunction::eval(const double** arg, double** res,
       casadi_int* iw, double* w, void* mem) const {
+    auto trace = dump_trace_ ? open_trace(arg, static_cast<FunctionMemory*>(mem)->dump_id)
+                            : nullptr;
+  try {
     if (verbose_) casadi_message(name_ + "::eval");
     setup(mem, arg, res, iw, w);
     // Work vector and temporaries to hold pointers to operation input and outputs
@@ -454,6 +466,7 @@ namespace casadi {
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
     for (auto&& e : algorithm_) {
+      if (trace) trace_instruction(*trace, k, w, false);
       // Perform the operation
       if (e.op==OP_INPUT) {
         // Pass an input
@@ -482,13 +495,39 @@ namespace casadi {
 
         // Evaluate
         if (print_instructions_) print_arg(uout(), k, e, arg1);
-        if (e.data->eval(arg1, res1, iw, w)) return 1;
+        if (e.data->eval(arg1, res1, iw, w)) {
+          if (trace) finish_trace(*trace, res, 1);
+          return 1;
+        }
         if (print_instructions_) print_res(uout(), k, e, res1);
       }
+      if (trace) trace_instruction(*trace, k, w, true);
       // Increase counter
       k++;
     }
+  } catch (...) {
+    if (trace) *trace << "{\"event\":\"error\"}\n";
+    throw;
+  }
+    if (trace) finish_trace(*trace, res, 0);
     return 0;
+  }
+
+  void MXFunction::trace_instruction(std::ostream& trace, casadi_int k,
+      const double* w, bool output) const {
+    const auto& e = algorithm_.at(k);
+    const auto& slots = output ? e.res : e.arg;
+    casadi_int n = slots.size();
+    if (e.op == OP_INPUT && !output) n = 0;
+    if (e.op == OP_OUTPUT && output) n = 0;
+    trace << "{\"instruction\":" << k << ",\"op\":" << e.op
+          << ",\"phase\":\"" << (output ? "outputs" : "inputs") << "\",\"values\":[";
+    for (casadi_int i = 0; i < n; ++i) {
+      if (i) trace << ",";
+      casadi_int nnz = output ? e.data->sparsity(i).nnz() : e.data->dep(i).nnz();
+      trace_values(trace, slots[i] < 0 ? nullptr : w + workloc_[slots[i]], nnz);
+    }
+    trace << "]}\n";
   }
 
   std::string MXFunction::print(const AlgEl& el) const {
@@ -1945,7 +1984,7 @@ namespace casadi {
   void MXFunction::serialize_body(SerializingStream &s) const {
     XFunction<MXFunction, MX, MXNode>::serialize_body(s);
 
-    s.version("MXFunction", 2);
+    s.version("MXFunction", 3);
     s.pack("MXFunction::n_instr", algorithm_.size());
 
     // Loop over algorithm
@@ -1960,13 +1999,14 @@ namespace casadi {
     s.pack("MXFunction::default_in", default_in_);
     s.pack("MXFunction::live_variables", live_variables_);
     s.pack("MXFunction::print_instructions", print_instructions_);
+    s.pack("MXFunction::dump_trace", dump_trace_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_serialize_members(s);
   }
 
 
   MXFunction::MXFunction(DeserializingStream& s) : XFunction<MXFunction, MX, MXNode>(s) {
-    int version = s.version("MXFunction", 1, 2);
+    int version = s.version("MXFunction", 1, 3);
     size_t n_instructions;
     s.unpack("MXFunction::n_instr", n_instructions);
     algorithm_.resize(n_instructions);
@@ -1984,6 +2024,8 @@ namespace casadi {
     s.unpack("MXFunction::live_variables", live_variables_);
     print_instructions_ = false;
     if (version >= 2) s.unpack("MXFunction::print_instructions", print_instructions_);
+
+    if (version >= 3) s.unpack("MXFunction::dump_trace", dump_trace_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_deserialize_members(s);
   }
@@ -2005,6 +2047,10 @@ namespace casadi {
       const GenericType& option_value) {
     if (option_name == "print_instructions") {
       print_instructions_ = option_value;
+    } else if (option_name == "dump_trace") {
+      bool value = option_value;
+      casadi_assert(!value || !jit_, "dump_trace is not supported for JIT evaluation");
+      dump_trace_ = value;
     } else {
       // Option not found - continue to base classes
       XFunction<MXFunction, MX, MXNode>::change_option(option_name, option_value);

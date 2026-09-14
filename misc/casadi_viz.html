@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CasADi graph</title>
+<style>
+html,body{height:100%;margin:0}
+#graph{display:block;height:100%}
+</style>
+</head>
+<body>
+<div id="graph"></div>
+<script id="graph-data" type="application/json">@@GRAPH_DATA@@</script>
+<script id="viz-config" type="application/json">@@VIZ_CONFIG@@</script>
+<script type="module">
+try {
+  const graph=JSON.parse(document.getElementById('graph-data').textContent);
+  const config=JSON.parse(document.getElementById('viz-config').textContent);
+  const {createGraphViewer}=await import(config.viewer_url);
+  const viewer=createGraphViewer(document.getElementById('graph'),
+    {runtime:config.runtime});
+  await viewer.setGraph(graph);
+} catch (error) { showError(error); }
+function showError(error) {
+  document.getElementById('graph').textContent=
+    'Unable to load graph viewer. Check your internet connection. '+error.message;
+}
+</script>
+</body>
+</html>

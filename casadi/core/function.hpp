@@ -961,6 +961,26 @@ namespace casadi {
         \identifier{1x2} */
     std::string serialize(const Dict& opts=Dict()) const;
 
+    /** \brief Export an SX/MX instruction graph as .html, .dot, or .casadi_viz.
+     *
+     * The extension selects HTML, standalone Graphviz DOT, or a JSON graph bundle.
+     * include_functions (default true) includes called graphs in HTML/JSON exports.
+     * DOT displays the root graph only. DOT options show_matrix_contents and
+     * show_matrix_sizes (both default true) control matrix detail and dimensions.
+     * Load dump_trace JSONL files in the viewer to replay numerical evaluation.
+     * Options: view (function, expression; default function),
+     * direction (LR, RL, TB, BT; expression view only; default TB), viz_js (local Viz.js
+     * global bundle to embed; by default uses the viewer package renderer).
+     * viewer_url (string) overrides the HTML viewer ESM module URL; default is
+     * https://unpkg.com/@casadi/casadi-viz@MAJOR.MINOR/dist/index.js for this CasADi version.
+     */
+    void export_graph(const std::string& fname, const Dict& opts=Dict()) const;
+
+    /** \brief Return the .casadi_viz JSON bundle without writing a file.
+     * Uses the same graph options as the filename overload.
+     */
+    std::string export_graph(const Dict& opts=Dict()) const;
+
     /** \brief Save Function to a file
 
         \see load

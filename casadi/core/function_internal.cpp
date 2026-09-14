@@ -317,7 +317,7 @@ namespace casadi {
         "Dump function to file upon first evaluation. [false]"}},
       {"dump_dir",
        {OT_STRING,
-        "Directory to dump inputs/outputs to. Make sure the directory exists [.]"}},
+        "Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]"}},
       {"dump_format",
        {OT_STRING,
         "Choose file format to dump matrices. See DM.from_file [mtx]"}},
@@ -823,6 +823,63 @@ namespace casadi {
     }
   }
 
+  void FunctionInternal::
+  trace_values(std::ostream& trace, const double* values, casadi_int nnz) {
+    if (!values) {
+      trace << "null";
+      return;
+    }
+    trace << "[";
+    for (casadi_int i = 0; i < nnz; ++i) {
+      if (i) trace << ",";
+      double v = values[i];
+      if (isnan(v)) {
+        trace << "\"nan\"";
+      } else if (isinf(v)) {
+        trace << (v < 0 ? "\"-inf\"" : "\"inf\"");
+      } else {
+        normalized_out(trace, v);
+      }
+    }
+    trace << "]";
+  }
+
+  std::unique_ptr<std::ostream> FunctionInternal::
+  open_trace(const double** arg, casadi_int dump_id) const {
+    if (dump_id < 0) dump_id = get_dump_id();
+    std::stringstream filename;
+    filename << dump_dir_ << filesep() << name_ << "." << std::setfill('0')
+             << std::setw(6) << dump_id << ".trace.jsonl";
+    auto output = Filesystem::ofstream_ptr(filename.str());
+    std::ostream& trace = *output;
+    normalized_setup(trace);
+    trace << "{\"event\":\"header\",\"format\":\"casadi_trace\",\"version\":1,"
+          << "\"function\":\"" << name_ << "\",\"type\":\"" << class_name()
+          << "\",\"dump_id\":" << dump_id << "}\n";
+    trace << "{\"event\":\"inputs\",\"values\":[";
+    for (casadi_int i = 0; i < n_in_; ++i) {
+      if (i) trace << ",";
+      trace_values(trace, arg[i], nnz_in(i));
+    }
+    trace << "]}\n";
+    return output;
+  }
+
+  void FunctionInternal::
+  finish_trace(std::ostream& trace, double** res, int ret) const {
+    if (ret == 0) {
+      trace << "{\"event\":\"outputs\",\"values\":[";
+      for (casadi_int i = 0; i < n_out_; ++i) {
+        if (i) trace << ",";
+        trace_values(trace, res[i], nnz_out(i));
+      }
+      trace << "]}\n";
+    }
+    trace << "{\"event\":\"end\",\"status\":" << ret << "}\n";
+    trace.flush();
+    casadi_assert(trace.good(), "Failed to write dump_trace for '" + name_ + "'");
+  }
+
   void FunctionInternal::dump_in(casadi_int id, const double** arg) const {
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(6) << id;
@@ -965,11 +1022,11 @@ namespace casadi {
   int FunctionInternal::
   eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
       bool always_inline, bool never_inline) const {
-    casadi_int dump_id = (dump_in_ || dump_out_ || dump_) ? get_dump_id() : 0;
+    casadi_int dump_id = (dump_in_ || dump_out_ || dump_) ? get_dump_id() : -1;
     if (dump_in_) dump_in(dump_id, arg);
     if (dump_ && dump_id==0) dump();
     if (print_in_) print_in(uout(), arg, false);
-    auto *m = static_cast<ProtoFunctionMemory*>(mem);
+    auto *m = static_cast<FunctionMemory*>(mem);
 
     // Avoid memory corruption
     for (casadi_int i=0;i<n_in_;++i) {
@@ -985,6 +1042,7 @@ namespace casadi {
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
     if (m->t_total) m->t_total->tic();
+    m->dump_id = dump_id;
     int ret;
     if (eval_) {
       auto *m = static_cast<FunctionMemory*>(mem);

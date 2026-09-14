@@ -72,6 +72,9 @@ class CASADI_EXPORT SXFunction :
       \identifier{ue} */
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
+  void trace_instruction(std::ostream& trace, casadi_int k, const double* w,
+    bool output) const;
+
   /** \brief  evaluate symbolically while also propagating directional derivatives
 
       \identifier{uf} */
@@ -277,6 +280,7 @@ class CASADI_EXPORT SXFunction :
 
   /// Print each operation during evaluation
   bool print_instructions_;
+  bool dump_trace_ = false;
 
     /** \brief Serialize an object without type information
 

@@ -71,6 +71,9 @@ namespace casadi {
 
   int SXFunction::eval(const double** arg, double** res,
       casadi_int* iw, double* w, void* mem) const {
+    auto trace = dump_trace_ ? open_trace(arg, static_cast<FunctionMemory*>(mem)->dump_id)
+                            : nullptr;
+  try {
     if (verbose_) casadi_message(name_ + "::eval");
     setup(mem, arg, res, iw, w);
 
@@ -86,11 +89,12 @@ namespace casadi {
     // class structure can cause large performance losses. For this reason,
     // the preprocessor macros are used below
 
-    if (print_instructions_) {
+    if (print_instructions_ || trace) {
       int k = 0;
       // Evaluate the algorithm
       for (auto&& e : algorithm_) {
-        print_arg(uout(), k, e, w);
+        if (trace) trace_instruction(*trace, k, w, false);
+        if (print_instructions_) print_arg(uout(), k, e, w);
         switch (e.op) {
           CASADI_MATH_FUN_BUILTIN(w[e.i1], w[e.i2], w[e.i0])
 
@@ -103,7 +107,8 @@ namespace casadi {
         default:
           casadi_error("Unknown operation" + str(e.op));
         }
-        print_res(uout(), k, e, w);
+        if (print_instructions_) print_res(uout(), k, e, w);
+        if (trace) trace_instruction(*trace, k, w, true);
         k++;
       }
     } else {
@@ -123,7 +128,35 @@ namespace casadi {
         }
       }
     }
+  } catch (...) {
+    if (trace) *trace << "{\"event\":\"error\"}\n";
+    throw;
+  }
+    if (trace) finish_trace(*trace, res, 0);
     return 0;
+  }
+
+  void SXFunction::trace_instruction(std::ostream& trace, casadi_int k,
+      const double* w, bool output) const {
+    const auto& e = algorithm_.at(k);
+    const int* slots = output ? &e.i0 : &e.i1;
+    casadi_int n = output ? 1 : casadi_math<double>::ndeps(e.op);
+    if (e.op == OP_CALL) {
+      const auto& call = call_.el.at(e.i1);
+      slots = get_ptr(output ? call.res : call.dep);
+      n = output ? call.n_res : call.n_dep;
+    } else if (e.op == OP_INPUT || e.op == OP_CONST) {
+      n = output ? 1 : 0;
+    } else if (e.op == OP_OUTPUT) {
+      n = output ? 0 : 1;
+    }
+    trace << "{\"instruction\":" << k << ",\"op\":" << e.op
+          << ",\"phase\":\"" << (output ? "outputs" : "inputs") << "\",\"values\":[";
+    for (casadi_int i = 0; i < n; ++i) {
+      if (i) trace << ",";
+      trace_values(trace, slots[i] < 0 ? nullptr : w + slots[i], 1);
+    }
+    trace << "]}\n";
   }
 
   bool SXFunction::is_smooth() const {
@@ -457,6 +490,10 @@ namespace casadi {
       {"allow_duplicate_io_names",
        {OT_BOOL,
         "Allow construction with duplicate io names (Default: false)"}},
+      {"dump_trace",
+       {OT_BOOL,
+        "Dump interpreted instruction values to name.NNNNNN.trace.jsonl in dump_dir, "
+        "using the dump_in/dump_out counter. [false]"}},
       {"print_instructions",
        {OT_BOOL,
         "Print each operation during evaluation. Influenced by print_canonical."}}
@@ -465,6 +502,7 @@ namespace casadi {
 
   Dict SXFunction::generate_options(const std::string& target) const {
     Dict opts = FunctionInternal::generate_options(target);
+    opts["dump_trace"] = dump_trace_;
     if (target=="clone") opts["default_in"] = default_in_;
     opts["live_variables"] = live_variables_;
     opts["just_in_time_sparsity"] = just_in_time_sparsity_;
@@ -498,6 +536,8 @@ namespace casadi {
         cse_opt = op.second;
       } else if (op.first=="allow_free") {
         allow_free = op.second;
+      } else if (op.first=="dump_trace") {
+        dump_trace_ = op.second;
       } else if (op.first=="print_instructions") {
         print_instructions_ = op.second;
       }
@@ -506,6 +546,8 @@ namespace casadi {
     // Perform common subexpression elimination
     // This must be done before the lock, to avoid deadlocks
     if (cse_opt) out_ = cse(out_);
+
+    casadi_assert(!dump_trace_ || !jit_, "dump_trace is not supported for JIT evaluation");
 
     // Check/set default inputs
     if (default_in_.empty()) {
@@ -1933,7 +1975,7 @@ namespace casadi {
 
   SXFunction::SXFunction(DeserializingStream& s) :
     XFunction<SXFunction, SX, SXNode>(s) {
-    int version = s.version("SXFunction", 1, 3);
+    int version = s.version("SXFunction", 1, 4);
     size_t n_instructions;
     s.unpack("SXFunction::n_instr", n_instructions);
 
@@ -2001,12 +2043,14 @@ namespace casadi {
       print_instructions_ = false;
     }
 
+    if (version >= 4) s.unpack("SXFunction::dump_trace", dump_trace_);
+
     XFunction<SXFunction, SX, SXNode>::delayed_deserialize_members(s);
   }
 
   void SXFunction::serialize_body(SerializingStream &s) const {
     XFunction<SXFunction, SX, SXNode>::serialize_body(s);
-    s.version("SXFunction", 3);
+    s.version("SXFunction", 4);
     s.pack("SXFunction::n_instr", algorithm_.size());
 
     s.pack("SXFunction::worksize", worksize_);
@@ -2044,6 +2088,7 @@ namespace casadi {
 
     s.pack("SXFunction::live_variables", live_variables_);
     s.pack("SXFunction::print_instructions", print_instructions_);
+    s.pack("SXFunction::dump_trace", dump_trace_);
 
     XFunction<SXFunction, SX, SXNode>::delayed_serialize_members(s);
   }
@@ -2068,6 +2113,10 @@ namespace casadi {
       const GenericType& option_value) {
     if (option_name == "print_instructions") {
       print_instructions_ = option_value;
+    } else if (option_name == "dump_trace") {
+      bool value = option_value;
+      casadi_assert(!value || !jit_, "dump_trace is not supported for JIT evaluation");
+      dump_trace_ = value;
     } else {
       // Option not found - continue to base classes
       XFunction<SXFunction, SX, SXNode>::change_option(option_name, option_value);

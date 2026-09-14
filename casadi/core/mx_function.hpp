@@ -95,6 +95,7 @@ namespace casadi {
 
     /// Print instructions during evaluation
     bool print_instructions_;
+    bool dump_trace_ = false;
 
     /** \brief Constructor
 
@@ -113,6 +114,9 @@ namespace casadi {
 
         \identifier{24} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+
+    void trace_instruction(std::ostream& trace, casadi_int k, const double* w,
+      bool output) const;
 
     /** \brief  Print description
 
