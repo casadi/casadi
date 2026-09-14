@@ -25,6 +25,7 @@
 #include "onnx_function_impl.hpp"
 #include "graph_builder_internal.hpp"
 #include "casadi_misc.hpp"
+#include "filesystem_impl.hpp"
 
 namespace casadi {
 
@@ -115,6 +116,10 @@ namespace casadi {
     // Shapes are resolved by the builder (dim bindings + input-shape overrides applied).
     model_data_ = gb->model_data_;
     input_values_ = gb->input_values_;
+    dim_bindings_ = gb->dim_bindings_;
+    input_shapes_ = gb->input_shapes_;
+    model_path_ = gb->model_path_;
+    builder_opts_ = gb->opts_;
     std::vector<OnnxTensorInfo> all_out;
     for (const Node& n : gb->node_list()) {
       OnnxTensorInfo t;
@@ -177,7 +182,7 @@ namespace casadi {
 
   void OnnxFunction::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
-    s.version("OnnxFunction", 1);
+    s.version("OnnxFunction", 2);
     s.pack("OnnxFunction::model_data", std::string(model_data_.begin(), model_data_.end()));
     pack_tensors(s, "OnnxFunction::in", in_);
     pack_tensors(s, "OnnxFunction::out", out_);
@@ -191,10 +196,15 @@ namespace casadi {
     s.pack("OnnxFunction::fwd_dim", fwd_dim_);
     s.pack("OnnxFunction::adj_dim", adj_dim_);
     s.pack("OnnxFunction::input_values", input_values_);
+    s.pack("OnnxFunction::model_path", model_path_);
+    s.pack("OnnxFunction::dim_bindings", dim_bindings_);
+    s.pack("OnnxFunction::input_shapes", input_shapes_);
+    s.pack("OnnxFunction::derivative_opts", derivative_opts_);
+    s.pack("OnnxFunction::builder_opts", builder_opts_);
   }
 
   OnnxFunction::OnnxFunction(DeserializingStream& s) : FunctionInternal(s) {
-    s.version("OnnxFunction", 1);
+    int version = s.version("OnnxFunction", 1, 2);
     std::string bytes;
     s.unpack("OnnxFunction::model_data", bytes);
     model_data_.assign(bytes.begin(), bytes.end());
@@ -211,6 +221,13 @@ namespace casadi {
     s.unpack("OnnxFunction::fwd_dim", fwd_dim_);
     s.unpack("OnnxFunction::adj_dim", adj_dim_);
     s.unpack("OnnxFunction::input_values", input_values_);
+    if (version >= 2) {
+      s.unpack("OnnxFunction::model_path", model_path_);
+      s.unpack("OnnxFunction::dim_bindings", dim_bindings_);
+      s.unpack("OnnxFunction::input_shapes", input_shapes_);
+      s.unpack("OnnxFunction::derivative_opts", derivative_opts_);
+      s.unpack("OnnxFunction::builder_opts", builder_opts_);
+    }
   }
 
   ProtoFunction* OnnxFunction::deserialize(DeserializingStream& s) {
@@ -221,6 +238,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first == "fwd_dim") fwd_dim_ = op.second.to_string();
       else if (op.first == "adj_dim") adj_dim_ = op.second.to_string();
+      if (op.first == "provider" || op.first == "fwd_dim" || op.first == "adj_dim")
+        derivative_opts_[op.first] = op.second;
     }
     // Baked inputs are fed a fixed value, not exposed as Function inputs
     std::vector<OnnxTensorInfo> exposed;
@@ -262,17 +281,54 @@ namespace casadi {
     return Sparsity::dense(numel, 1);
   }
 
-  Function OnnxFunction::wrap_derivative(const std::string& name,
+  Function OnnxFunction::wrap_derivative(const std::string& kind, const std::string& name,
       const std::vector<std::string>& inames, const std::vector<std::string>& onames,
       const std::vector<Sparsity>& in_sp, const std::vector<Sparsity>& out_sp,
       const Dict& dim_bind, const Dict& opts) const {
-    // Re-create from the same model using only the derivative tensors it actually has
+    bool embedded = has_derivative(kind, model_inputs_, model_outputs_);
+    GraphBuilder b = embedded ? GraphBuilder(name, model_data_, "onnx", builder_opts_)
+                             : GraphBuilder(derivative_path(kind), builder_opts_);
+    GraphBuilderInternal* bi = b.get();
+    bi->model_path_ = derivative_path(kind);
+    bi->dim_bindings_ = dim_bindings_;
+    for (auto&& d : dim_bind) bi->dim_bindings_[d.first] = d.second;
+    bi->input_shapes_ = input_shapes_;
+    bi->input_values_ = input_values_;
+    std::set<std::string> inputs, outputs;
+    for (const Node& n : bi->node_list()) {
+      (n.io == "input" ? inputs : outputs).insert(n.name);
+    }
+    casadi_assert(has_derivative(kind, inputs, outputs),
+      "ONNX derivative '" + bi->name_ + "' has an incomplete " + kind + " signature");
     std::vector<std::string> cin, con;
-    for (const std::string& nm : inames) if (model_inputs_.count(nm)) cin.push_back(nm);
-    for (const std::string& nm : onames) if (model_outputs_.count(nm)) con.push_back(nm);
-    Dict o;
-    if (!dim_bind.empty()) o["dim_bindings"] = dim_bind;
-    Function g = from_model_data(plugin_name(), name + "_core", model_data_, cin, con, o);
+    for (const std::string& nm : inames) if (inputs.count(nm)) cin.push_back(nm);
+    for (const std::string& nm : onames) if (outputs.count(nm)) con.push_back(nm);
+    // Infer unbound matrix axes, including packed columns such as nadj * nfwd.
+    for (const Node& n : bi->node_list()) {
+      if (n.dimension.size() != 2) continue;
+      const auto& names = n.io == "input" ? inames : onames;
+      const auto& sparsities = n.io == "input" ? in_sp : out_sp;
+      for (size_t i = 0; i < names.size(); ++i) {
+        if (names[i] != n.name) continue;
+        for (size_t k = 0; k < 2; ++k) {
+          const std::string& param = n.dim_params[k];
+          if (n.dimension[k] < 0 && !param.empty() && !bi->dim_bindings_.count(param))
+            bi->dim_bindings_[param] = k == 0 ? sparsities[i].size1() : sparsities[i].size2();
+        }
+      }
+    }
+    Function g = OnnxFunction::create(plugin_name(), name + "_core", bi, cin, con,
+                                     derivative_opts_);
+    for (size_t i = 0; i < inames.size(); ++i) {
+      if (!inputs.count(inames[i])) continue;
+      casadi_assert(g.sparsity_in(inames[i]).size() == in_sp[i].size(),
+        "ONNX derivative input '" + inames[i] + "' has an incompatible shape");
+    }
+    for (size_t i = 0; i < onames.size(); ++i) {
+      if (!outputs.count(onames[i])) continue;
+      casadi_assert(g.sparsity_out(onames[i]).size() == out_sp[i].size(),
+        "ONNX derivative output '" + onames[i] + "' has an incompatible shape");
+    }
     // Present CasADi's full derivative signature: feed present inputs, zero-fill absent outputs
     std::map<std::string, MX> m;
     std::vector<MX> args(inames.size());
@@ -296,22 +352,41 @@ namespace casadi {
     return Function(name, args, outs, inames, onames, wopts);
   }
 
-  bool OnnxFunction::has_forward(casadi_int nfwd) const {
-    // Need a fwd_<tensor> for every DIFFERENTIABLE input (seed) and output (sensitivity)
-    if (in_.empty() || out_.empty()) return false;
-    std::string pref = diff_prefix("fwd");
+  std::string OnnxFunction::derivative_path(const std::string& kind) const {
+    if (model_path_.empty() || !Filesystem::is_enabled()) return std::string();
+    return Filesystem::ensure_trailing_slash(Filesystem::parent_path(model_path_))
+      + kind + "_" + Filesystem::filename(model_path_);
+  }
+
+  bool OnnxFunction::has_derivative(const std::string& kind,
+      const std::set<std::string>& inputs, const std::set<std::string>& outputs) const {
+    std::string pref = diff_prefix(kind);
     bool any_in = false, any_out = false;
     for (size_t i = 0; i < in_.size(); ++i) {
       if (!diff_in(i)) continue;
       any_in = true;
-      if (!model_inputs_.count(pref + in_[i].name)) return false;
+      if (kind == "fwd" && !inputs.count(pref + in_[i].name)) return false;
+      if (kind == "adj" && !outputs.count(pref + in_[i].name)) return false;
+      if (kind == "jac") {
+        for (size_t j = 0; j < out_.size(); ++j) {
+          if (diff_out(j) && !outputs.count("jac_" + out_[j].name + "_" + in_[i].name))
+            return false;
+        }
+      }
     }
     for (size_t j = 0; j < out_.size(); ++j) {
       if (!diff_out(j)) continue;
       any_out = true;
-      if (!model_outputs_.count(pref + out_[j].name)) return false;
+      if (kind == "fwd" && !outputs.count(pref + out_[j].name)) return false;
+      if (kind == "adj" && !inputs.count(pref + out_[j].name)) return false;
     }
     return any_in && any_out;
+  }
+
+  bool OnnxFunction::has_forward(casadi_int nfwd) const {
+    return has_derivative("fwd", model_inputs_, model_outputs_)
+      || (!model_path_.empty() && Filesystem::is_enabled()
+        && Filesystem::exists(derivative_path("fwd")));
   }
 
   Function OnnxFunction::get_forward(casadi_int nfwd, const std::string& name,
@@ -329,26 +404,17 @@ namespace casadi {
       Sparsity s = tensor_sparsity(y.shape);
       osp.push_back(Sparsity::dense(s.size1(), nfwd * s.size2()));
     }
-    Dict db; db[fwd_dim_] = nfwd;
-    return wrap_derivative(name, inames, onames, isp, osp, db, opts);
+    std::string dim = diff_prefix("fwd");
+    dim.replace(0, 3, fwd_dim_);
+    dim.pop_back();  // Drop the trailing underscore: nfwd, nfwd2, nfwd3, ...
+    Dict db; db[dim] = nfwd;
+    return wrap_derivative("fwd", name, inames, onames, isp, osp, db, opts);
   }
 
   bool OnnxFunction::has_reverse(casadi_int nadj) const {
-    // Need an adj_<tensor> output for every differentiable input and seed input per output
-    if (in_.empty() || out_.empty()) return false;
-    std::string pref = diff_prefix("adj");
-    bool any_in = false, any_out = false;
-    for (size_t i = 0; i < in_.size(); ++i) {
-      if (!diff_in(i)) continue;
-      any_in = true;
-      if (!model_outputs_.count(pref + in_[i].name)) return false;
-    }
-    for (size_t j = 0; j < out_.size(); ++j) {
-      if (!diff_out(j)) continue;
-      any_out = true;
-      if (!model_inputs_.count(pref + out_[j].name)) return false;
-    }
-    return any_in && any_out;
+    return has_derivative("adj", model_inputs_, model_outputs_)
+      || (!model_path_.empty() && Filesystem::is_enabled()
+        && Filesystem::exists(derivative_path("adj")));
   }
 
   Function OnnxFunction::get_reverse(casadi_int nadj, const std::string& name,
@@ -366,23 +432,17 @@ namespace casadi {
       Sparsity s = tensor_sparsity(x.shape);
       osp.push_back(Sparsity::dense(s.size1(), nadj * s.size2()));
     }
-    Dict db; db[adj_dim_] = nadj;
-    return wrap_derivative(name, inames, onames, isp, osp, db, opts);
+    std::string dim = diff_prefix("adj");
+    dim.replace(0, 3, adj_dim_);
+    dim.pop_back();  // Drop the trailing underscore: nadj, nadj2, nadj3, ...
+    Dict db; db[dim] = nadj;
+    return wrap_derivative("adj", name, inames, onames, isp, osp, db, opts);
   }
 
   bool OnnxFunction::has_jacobian() const {
-    // Need a jac_<out>_<in> output for every differentiable output/input pair
-    if (in_.empty() || out_.empty()) return false;
-    bool any = false;
-    for (size_t j = 0; j < out_.size(); ++j) {
-      if (!diff_out(j)) continue;
-      for (size_t i = 0; i < in_.size(); ++i) {
-        if (!diff_in(i)) continue;
-        any = true;
-        if (!model_outputs_.count("jac_" + out_[j].name + "_" + in_[i].name)) return false;
-      }
-    }
-    return any;
+    return has_derivative("jac", model_inputs_, model_outputs_)
+      || (!model_path_.empty() && Filesystem::is_enabled()
+        && Filesystem::exists(derivative_path("jac")));
   }
 
   Function OnnxFunction::get_jacobian(const std::string& name,
@@ -399,7 +459,7 @@ namespace casadi {
         osp.push_back(Sparsity::dense(so.size1() * so.size2(), si.size1() * si.size2()));
       }
     }
-    return wrap_derivative(name, inames, onames, isp, osp, Dict(), opts);
+    return wrap_derivative("jac", name, inames, onames, isp, osp, Dict(), opts);
   }
 
   Function OnnxFunction::create(const std::string& solver, const std::string& name,
