@@ -1096,11 +1096,12 @@ class OCPtests(casadiTestCase):
       row += ng[k]
     lbx, ubx = z-0.3, z+0.3
     lbx[:nx[0]] = ubx[:nx[0]] = 0
-    args = dict(h=ca.sparsify(ca.DM(H)), a=ca.sparsify(ca.DM(A)),
-                g=3*rng.randn(nz), lbx=lbx, ubx=ubx, lba=lba, uba=uba)
+    H, A = ca.sparsify(ca.DM(H)), ca.sparsify(ca.DM(A))
+    sp = dict(h=H.sparsity(), a=A.sparsity())
+    args = dict(h=H, a=A, g=3*rng.randn(nz), lbx=lbx, ubx=ubx, lba=lba, uba=uba)
     opts = dict(condense=True, structure_detection="manual", N=N,
                 nx=list(nx), nu=nu[:-1], ng=list(ng))
-    return args, opts
+    return sp, args, opts
 
   @requires_conic("qrqp")
   def test_condense_general(self):
@@ -1110,8 +1111,7 @@ class OCPtests(casadiTestCase):
              ([2, 1], [1], [2, 3]),
              ([2, 2, 2, 2], [1, 2, 1], [0, 0, 0, 0])]
     for nx, nu, ng in cases:
-      args, opts = self._condensing_problem(nx, nu, ng)
-      sp = dict(h=args["h"].sparsity(), a=args["a"].sparsity())
+      sp, args, opts = self._condensing_problem(nx, nu, ng)
       for plugin in solvers:
         quiet = dict(print_header=False, print_iter=False, print_info=False) if plugin=="qrqp" else {}
         ref = ca.conic("ref", plugin, sp, quiet)
@@ -1147,9 +1147,8 @@ class OCPtests(casadiTestCase):
 
   @requires_conic("qrqp")
   def test_condense_validation(self):
-    args, opts = self._condensing_problem([2, 2, 2], [1, 1], [0, 0, 0])
+    sp, args, opts = self._condensing_problem([2, 2, 2], [1, 1], [0, 0, 0])
     opts.update(print_header=False, print_iter=False, print_info=False)
-    sp = dict(h=args["h"].sparsity(), a=args["a"].sparsity())
     solver = ca.conic("cond", "qrqp", sp, opts)
     for changes in [dict(N=-1), dict(nx=[2, -1, 2]), dict(nx=[2, 1, 2]),
                     dict(nu=[1, -1]), dict(ng=[0, -1, 0]), dict(condensed_block_count=-1),
@@ -1182,20 +1181,19 @@ class OCPtests(casadiTestCase):
 
   @requires_conic("ipqp")
   def test_condense_unsupported_solver(self):
-    args, opts = self._condensing_problem([1, 1], [1], [0, 0])
+    sp, args, opts = self._condensing_problem([1, 1], [1], [0, 0])
     with self.assertRaisesRegex(RuntimeError, "does not support condensing"):
-      ca.conic("invalid", "ipqp", dict(h=args["h"].sparsity(), a=args["a"].sparsity()), opts)
+      ca.conic("invalid", "ipqp", sp, opts)
 
   @requires_conic("qrqp")
   def test_condense_failed_solve(self):
-    args, opts = self._condensing_problem([2, 2, 2], [0, 0], [1, 0, 0])
-    lbx, ubx = args["lbx"].copy(), args["ubx"].copy()
+    sp, args, opts = self._condensing_problem([2, 2, 2], [0, 0], [1, 0, 0])
+    lbx, ubx = numpy.array(args["lbx"]), numpy.array(args["ubx"])
     lbx[-2:] = ubx[-2:] = 10
     bad = dict(args, lbx=lbx, ubx=ubx)
     for plugin in ["qrqp"] + (["daqp"] if ca.has_conic("daqp") else []):
       quiet = dict(print_header=False, print_iter=False, print_info=False) if plugin=="qrqp" else {}
-      solver = ca.conic("cond", plugin, dict(h=args["h"].sparsity(), a=args["a"].sparsity()),
-                        dict(opts, error_on_fail=False, **quiet))
+      solver = ca.conic("cond", plugin, sp, dict(opts, error_on_fail=False, **quiet))
       solver(**args)
       failed = solver(**bad)
       self.assertFalse(solver.stats()["success"])
@@ -1213,10 +1211,9 @@ class OCPtests(casadiTestCase):
   def test_condense_partition_optimal(self):
     import itertools
     for nx, nu in [([10]*5, [1]*4), ([1, 3, 2, 4, 1], [2, 0, 1, 3]), ([1, 2], [0])]:
-      args, opts = self._condensing_problem(nx, nu, [0]*len(nx))
+      sp, args, opts = self._condensing_problem(nx, nu, [0]*len(nx))
       opts.update(print_header=False, print_iter=False, print_info=False,
                   condense_partition_strategy="optimal")
-      sp = dict(h=args["h"].sparsity(), a=args["a"].sparsity())
       N = len(nu)
       def cost(M):
         return sum((nx[a]+sum(nu[a:b]))**3 for a, b in zip(M, M[1:]))

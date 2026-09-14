@@ -1291,7 +1291,8 @@ namespace casadi {
       casadi_int col = RSQ_blocks_packed_[4*(k+1)];
       for (casadi_int i = 0; i < nxs_[k+1]; ++i) {
         casadi_int nz = A_.get_nz(row+i, col+i);
-        casadi_assert(nz >= 0, "Condensing requires the next-state diagonal in every dynamics row.");
+        casadi_assert(nz >= 0,
+          "Condensing requires the next-state diagonal in every dynamics row.");
         gap_nz_.push_back(nz);
         gap_sp(row+i, col+i) = 1;
       }

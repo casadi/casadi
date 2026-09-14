@@ -447,35 +447,36 @@ int casadi_condensing_eval(casadi_condensing_data<T1>* d) {
   {
     casadi_int kk, ii, src = 0, dx = 0, du = 0, ob = 0, og = 0, sa = 0;
     casadi_int total_qr = p->total_qr;
+    const T1 inf = std::numeric_limits<T1>::infinity();
     for (ii = 0; ii < total_qr; ++ii) d->qr_val[ii] = d->g_orig ? d->g_orig[ii] : 0;
     // lbx/ubx_orig are interleaved [x_k; u_k]; demultiplex.
     for (kk = 0; kk <= p->N; ++kk) {
       for (ii = 0; ii < p->nx[kk]; ++ii) {
-        d->lbx_val[dx + ii] = (d->lbx_orig ? d->lbx_orig[src + ii] : -std::numeric_limits<T1>::infinity());
-        d->ubx_val[dx + ii] = (d->ubx_orig ? d->ubx_orig[src + ii] : std::numeric_limits<T1>::infinity());
+        d->lbx_val[dx + ii] = (d->lbx_orig ? d->lbx_orig[src + ii] : -inf);
+        d->ubx_val[dx + ii] = (d->ubx_orig ? d->ubx_orig[src + ii] : inf);
       }
       src += p->nx[kk];  dx  += p->nx[kk];
       for (ii = 0; ii < p->nu[kk]; ++ii) {
-        d->lbu_val[du + ii] = (d->lbx_orig ? d->lbx_orig[src + ii] : -std::numeric_limits<T1>::infinity());
-        d->ubu_val[du + ii] = (d->ubx_orig ? d->ubx_orig[src + ii] : std::numeric_limits<T1>::infinity());
+        d->lbu_val[du + ii] = (d->lbx_orig ? d->lbx_orig[src + ii] : -inf);
+        d->ubu_val[du + ii] = (d->ubx_orig ? d->ubx_orig[src + ii] : inf);
       }
       src += p->nu[kk];  du  += p->nu[kk];
     }
     // lba/uba_orig: per-stage (nx[k+1] gap + ng[k] path), terminal ng[N].
     for (kk = 0; kk < p->N; ++kk) {
       for (ii = 0; ii < p->nx[kk + 1]; ++ii) {
-        d->b_val[ob + ii] = -(d->lba_orig ? d->lba_orig[sa + ii] : -std::numeric_limits<T1>::infinity());
+        d->b_val[ob + ii] = -(d->lba_orig ? d->lba_orig[sa + ii] : -inf);
       }
       sa += p->nx[kk + 1];  ob += p->nx[kk + 1];
       for (ii = 0; ii < p->ng[kk]; ++ii) {
-        d->lbg_val[og + ii] = (d->lba_orig ? d->lba_orig[sa + ii] : -std::numeric_limits<T1>::infinity());
-        d->ubg_val[og + ii] = (d->uba_orig ? d->uba_orig[sa + ii] : std::numeric_limits<T1>::infinity());
+        d->lbg_val[og + ii] = (d->lba_orig ? d->lba_orig[sa + ii] : -inf);
+        d->ubg_val[og + ii] = (d->uba_orig ? d->uba_orig[sa + ii] : inf);
       }
       sa += p->ng[kk];  og += p->ng[kk];
     }
     for (ii = 0; ii < p->ng[p->N]; ++ii) {
-      d->lbg_val[og + ii] = (d->lba_orig ? d->lba_orig[sa + ii] : -std::numeric_limits<T1>::infinity());
-      d->ubg_val[og + ii] = (d->uba_orig ? d->uba_orig[sa + ii] : std::numeric_limits<T1>::infinity());
+      d->lbg_val[og + ii] = (d->lba_orig ? d->lba_orig[sa + ii] : -inf);
+      d->ubg_val[og + ii] = (d->uba_orig ? d->uba_orig[sa + ii] : inf);
     }
   }
   casadi_int row_off;                          // running row offset within CD_hat
