@@ -39,3 +39,17 @@ executable schema can be done incrementally with the same regression tests.
 the protocol constants, operation IDs and class-version inventory, while still
 implementing their supported positional layouts explicitly. Regenerating this
 file does not automatically teach an older reader a new node layout.
+
+The `reader` section contains executable structural layouts for casadi-reader.
+`serialization_reader_layouts.py` lowers indexed serializers, inline SX serializers,
+base-class calls, conditions, repeated fields and serialization helpers such as
+`pack_tensors`. Shared-object flags and decorations are extracted from the wire
+codec; plugin registrations and operation dispatch families come from native
+source. None of these layouts evaluates an operation or reconstructs a viewer graph.
+
+Lowering is intentionally explicit about its limits: unresolved field types,
+unlowered control flow/calls, and missing dispatch cases cannot be decoded by
+the reader. Native plain/debug fixture pairs in casadi-reader validate the same
+layouts against both encodings, including independent names and wire tags in
+the debug stream. The source index remains broader than the tested executable
+layout coverage.

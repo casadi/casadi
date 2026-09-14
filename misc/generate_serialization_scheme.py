@@ -85,6 +85,8 @@ def infer_type(expression, decls):
         return 'size_t'
     if expression in ('class_name()', 'serialize_base_function()'):
         return 'std::string'
+    if expression.startswith('std::string('):
+        return 'std::string'
     constructed = re.match(r'(std::\w+<.*>)[{(]', expression)
     if constructed:
         return constructed[1]
@@ -189,7 +191,16 @@ def generate(root):
     cmake = (root/'CMakeLists.txt').read_text()
     release = '.'.join(re.search(r'set\(CASADI_'+part+r'_VERSION (\d+)\)', cmake)[1]
                        for part in ('MAJOR', 'MINOR', 'PATCH'))
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('serialization_reader_layouts',
+                                                root/'misc/serialization_reader_layouts.py')
+    compiler = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(compiler)
+    reader = compiler.generate(root, texts, layouts, contracts,
+                               operations(texts[source/'calculus.hpp']),
+                               balanced, split_args, declarations, infer_type)
     return {
+        'reader': reader,
         'format': 'casadi_serialization_scheme', 'version': 1, 'casadi_version': release,
         'coverage': {'kind': 'source-derived-index',
                      'scope': 'Out-of-line core/plugin serializers plus named pack fields from all core/plugin headers',

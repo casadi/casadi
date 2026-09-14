@@ -62,7 +62,11 @@ class SchemeValidator:
 
         def string():
             if raw(1) != b'i': raise ValueError('Missing string-length decoration')
-            return raw(number('i')).decode('utf8')
+            data = raw(number('i'))
+            try:
+                return data.decode('utf8')
+            except UnicodeDecodeError:
+                return data
 
         def value(tag=None):
             tag = tag or raw(1).decode('ascii')
@@ -90,7 +94,7 @@ class SchemeValidator:
                 value(tag)
                 continue
             name = string()
-            if '::' not in name:
+            if not isinstance(name, str) or '::' not in name:
                 continue
             contract = self.fields.get(name) or self.resolved.get(name)
             if contract is None:
