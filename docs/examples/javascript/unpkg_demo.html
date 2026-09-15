@@ -45,7 +45,7 @@ async function loadCasadi(base) {
     (p) => { throw new Error("casadi_wasm.js: unexpected require " + p); });
   const createcasadi = await evalCjs("casadi.js", (p) => {
     if (p.endsWith("casadi_wasm.js")) return createWasm;
-    if (p === "path") return { join: (...a) => a.filter(Boolean).join("/").replace(/\/{2,}/g, "/") };
+    if (p === "path") return { join: (...a) => a.filter(Boolean).join("/").replace(/([^:])\/{2,}/g, "$1/") };
     throw new Error("casadi.js: unexpected require " + p);
   });
   return await createcasadi();

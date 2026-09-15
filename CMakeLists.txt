@@ -1513,7 +1513,7 @@ if(WITH_LAPACK)
       add_dependencies(lapack openblas-external)
       set_target_properties(lapack PROPERTIES
         IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}lapack${CMAKE_STATIC_LIBRARY_SUFFIX}"
-        INTERFACE_LINK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}blas${CMAKE_STATIC_LIBRARY_SUFFIX}"
+        INTERFACE_LINK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}blas${CMAKE_STATIC_LIBRARY_SUFFIX};/opt/flang/wasm/lib/libFortranRuntime.a"
       )
       # Skip the OpenBLAS branch below by jumping to endif() via a flag.
       set(_LAPACK_NETLIB_DONE 1)
@@ -1663,7 +1663,7 @@ if(WITH_FATROP)
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DBUILD_WITH_BLASFEO=OFF -DBLASFEO_INSTALL_DIR=${BLASFEO_PATH} -DCMAKE_PREFIX_PATH=${BLASFEO_PATH} -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DENABLE_MULTITHREADING=OFF -DMARCH_NATIVE=OFF -DBUILD_EXECUTABLES=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
-    add_library(fatrop SHARED IMPORTED)
+    add_library(fatrop ${TP_IMPORT_KIND} IMPORTED)
     add_dependencies(fatrop fatrop-external)
     target_link_libraries(fatrop INTERFACE blasfeo)
     # This is similar to ALIAS but works fine on imported targets with CMake 3.10
@@ -1672,7 +1672,7 @@ if(WITH_FATROP)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(fatrop PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}fatrop${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}fatrop${TP_LIB_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}fatrop${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     create_import_library(fatrop fatrop)
@@ -1770,11 +1770,11 @@ if(WITH_BUILD_METIS)
           "ADD_FCFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FCFLAGS}"
         ${COIN_FLAGS}
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ${AUTOTOOLS_SHELL} ./get.Metis)
-  add_library(metis::metis SHARED IMPORTED)
+  add_library(metis::metis ${TP_IMPORT_KIND} IMPORTED)
   add_dependencies(metis::metis metis-external)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis")
   set_target_properties(metis::metis PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmetis${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmetis${TP_LIB_SUFFIX}"
     IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmetis${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis"
   )
@@ -1851,6 +1851,7 @@ if(WITH_MUMPS)
       add_dependencies(mumps mumps-external)
       set_target_properties(mumps PROPERTIES
         IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libcoinmumps.a"
+        INTERFACE_LINK_LIBRARIES "metis::metis;lapack"
         INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps"
       )
     else()
@@ -2280,6 +2281,7 @@ if(WITH_IPOPT)
     if(EMSCRIPTEN)
       set_target_properties(ipopt PROPERTIES
         IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libipopt.a"
+        INTERFACE_LINK_LIBRARIES "mumps;lapack"
         INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
       )
     else()
@@ -2372,13 +2374,17 @@ if(WITH_DAQP)
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
         CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/daqp")
-    add_library(daqp SHARED IMPORTED)
+    add_library(daqp ${TP_IMPORT_KIND} IMPORTED)
     add_dependencies(daqp daqp-external)
     set_target_properties(daqp PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/daqp"
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}daqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}daqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    if(EMSCRIPTEN)
+      set_property(TARGET daqp PROPERTY IMPORTED_LOCATION
+        "${CMAKE_BINARY_DIR}/external_projects/lib/libdaqpstat.a")
+    endif()
     create_import_library(daqp daqp)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/daqp"
@@ -2535,6 +2541,11 @@ add_feature_info(piqp-interface WITH_PIQP "Interface to QP solver PIQP.")
 
 if(WITH_OSQP)
   if(WITH_BUILD_OSQP)
+    set(_osqp_platform_flags)
+    if(EMSCRIPTEN)
+      # OSQP has no interrupt-handler implementation for Emscripten.
+      list(APPEND _osqp_platform_flags -DOSQP_ENABLE_INTERRUPT=OFF)
+    endif()
     ExternalProject_Add(osqp-external
         GIT_REPOSITORY ${BUILD_OSQP_GIT_REPO}
         GIT_SHALLOW ${BUILD_OSQP_GIT_SHALLOW}
@@ -2542,16 +2553,16 @@ if(WITH_OSQP)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_C_STANDARD_REQUIRED=TRUE -DCMAKE_C_STANDARD=99 -DENABLE_MKL_PARDISO=OFF -DPROFILING=OFF -DOSQP_BUILD_DEMO_EXE=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+        CMAKE_ARGS -DCMAKE_C_STANDARD_REQUIRED=TRUE -DCMAKE_C_STANDARD=99 -DENABLE_MKL_PARDISO=OFF -DPROFILING=OFF -DOSQP_BUILD_DEMO_EXE=OFF ${_osqp_platform_flags} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/osqp")
-    add_library(osqp SHARED IMPORTED)
+    add_library(osqp ${TP_IMPORT_KIND} IMPORTED)
     # This is similar to ALIAS but works fine on imported targets with CMake 3.10
     add_library(osqp::osqp INTERFACE IMPORTED)
     set_target_properties(osqp::osqp PROPERTIES INTERFACE_LINK_LIBRARIES osqp)
     add_dependencies(osqp osqp-external)
     set_target_properties(osqp PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
-       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${TP_LIB_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}osqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     install(DIRECTORY
@@ -3158,6 +3169,9 @@ endforeach()
 #####################################################
 add_subdirectory(external_packages)
 add_subdirectory(casadi)
+if(TARGET casadi_wasm)
+  wasmjs_finalize_plugins("${PROJECT_BINARY_DIR}/swig/wasm-js")
+endif()
 add_subdirectory(experimental EXCLUDE_FROM_ALL)
 add_subdirectory(misc)
 

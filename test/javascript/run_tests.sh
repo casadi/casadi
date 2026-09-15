@@ -25,6 +25,11 @@ if [[ -z "$WASM_DIR" || ! -f "$WASM_DIR/casadi.d.ts" || ! -f "$WASM_DIR/casadi.j
   exit 2
 fi
 
+python3 "$HERE/wasm_staging.py"
+node "$HERE/wasm_manifest.cjs"
+node "$HERE/wasm_loader.cjs"
+node "$HERE/wasm_plugins.cjs"
+
 echo "==> casadi.d.ts: $(wc -l < "$WASM_DIR/casadi.d.ts") lines"
 echo "==> tsc typecheck (test_typecheck.ts)"
 cd "$HERE"

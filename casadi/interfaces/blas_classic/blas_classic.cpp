@@ -52,7 +52,7 @@ namespace casadi {
     int lda_ = static_cast<int>(lda), ldb_ = static_cast<int>(ldb), ldc_ = static_cast<int>(ldc);
 
     dgemm_(&ta, &tb, &m_, &n_, &k_, &alpha,
-           A, &lda_, B, &ldb_, &beta, C, &ldc_);
+           A, &lda_, B, &ldb_, &beta, C, &ldc_ CASADI_BLAS_CLASSIC_CHARLEN_ARGS);
   }
 
   static void classic_daxpy(casadi_int n, double alpha,
@@ -104,13 +104,21 @@ namespace casadi {
   "#ifndef CASADI_BLAS_DGEMM\n"
   "#define CASADI_BLAS_DGEMM dgemm_\n"
   "#endif\n"
+  "#ifdef __EMSCRIPTEN__\n"
+  "#include <stddef.h>\n"
+  "#define CASADI_BLAS_CLASSIC_CHARLEN_DECL , size_t, size_t\n"
+  "#define CASADI_BLAS_CLASSIC_CHARLEN_ARGS , 1, 1\n"
+  "#else\n"
+  "#define CASADI_BLAS_CLASSIC_CHARLEN_DECL\n"
+  "#define CASADI_BLAS_CLASSIC_CHARLEN_ARGS\n"
+  "#endif\n"
   "extern void CASADI_BLAS_DGEMM(const char* transa, const char* transb,\n"
   "                              const int* m, const int* n, const int* k,\n"
   "                              const double* alpha,\n"
   "                              const double* A, const int* lda,\n"
   "                              const double* B, const int* ldb,\n"
   "                              const double* beta,\n"
-  "                              double* C, const int* ldc);";
+  "                              double* C, const int* ldc CASADI_BLAS_CLASSIC_CHARLEN_DECL);";
 
   static const char* CLASSIC_DAXPY_DECL =
   "#ifndef CASADI_BLAS_DAXPY\n"
@@ -162,7 +170,7 @@ namespace casadi {
     g << "blas_m = " << m << "; blas_n = " << n << "; blas_k = " << k << ";\n";
     g << "CASADI_BLAS_DGEMM(&blas_tn, &blas_tn, &blas_m, &blas_n, &blas_k, "
          "&blas_one, " << A << ", &blas_m, " << B << ", &blas_k, "
-         "&blas_one, " << C << ", &blas_m);\n";
+         "&blas_one, " << C << ", &blas_m CASADI_BLAS_CLASSIC_CHARLEN_ARGS);\n";
   }
 
 

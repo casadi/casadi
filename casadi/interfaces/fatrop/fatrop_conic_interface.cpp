@@ -115,9 +115,11 @@ namespace casadi {
     if (structure_detection_==STRUCTURE_MANUAL) {
       casadi_assert(struct_cnt==4,
         "You must set all of N, nx, nu, ng.");
-    } else if (structure_detection_==STRUCTURE_MANUAL) {
+    } else if (structure_detection_==STRUCTURE_NONE) {
       N_ = 0;
-
+      nxs_ = {static_cast<int>(nx_)};
+      nus_ = {0};
+      ngs_ = {static_cast<int>(na_)};
     }
 
     if (struct_cnt>0) {
@@ -1103,7 +1105,6 @@ casadi_int i, column;
 
 
     FatropOcpCSolver* s = fatrop_ocp_c_create(&ocp_interface, 0, 0);
-    fatrop_ocp_c_set_option_bool(s, "accept_every_trial_step", false);
 
     int ret = fatrop_ocp_c_solve(s);
 

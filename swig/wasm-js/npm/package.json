@@ -28,11 +28,13 @@
       "types": "./casadi.d.ts",
       "require": "./casadi.js",
       "default": "./casadi.js"
-    }
+    },
+    "./plugins.json": "./plugins.json"
   },
   "files": [
     "casadi.js",
     "casadi.d.ts",
+    "plugins.json",
     "casadi_wasm.js",
     "casadi_wasm.wasm",
     "libcasadi_*.so",

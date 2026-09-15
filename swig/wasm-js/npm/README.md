@@ -34,3 +34,16 @@ JavaScript has no operator overloading — use `ca.plus`, `ca.minus`,
 side modules and load on demand via `await ca.load_<type>('<name>')`.
 
 See `examples/` for ports of the CasADi documentation examples.
+
+### Plugin availability
+
+`plugins.json` lists the plugins required by this build, including explicit
+exclusions and their reasons. A configured plugin without a Wasm recipe or
+exclusion is a CMake error. Solver dependencies are linked transitively from
+the ordinary CMake plugin targets; the CasADi core stays in the main module.
+
+In browsers, await `load_nlpsol`, `load_conic`, `load_linsol`, `load_blas`,
+`load_filesystem`, or the other `load_*` functions before constructing a
+solver. Class entry points such as `Linsol.load_plugin` and
+`XmlFile.load_plugin` also return promises. Concurrent loads of the same
+plugin share one request; failed loads can be retried.

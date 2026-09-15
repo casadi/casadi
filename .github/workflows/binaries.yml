@@ -10,7 +10,7 @@ name: binaries
 on: [push, pull_request]
 
 env:
-  cache-suffix: v1
+  cache-suffix: v2
   # Native-runner override-OFF set for the julia job, appended after build_flags:
   # MATLAB_IPC (no MATLAB on runner) + SPRAL (Fortran-module parallel-build race,
   # also OFF in build_flags_mac/aarch64). Everything else in build_flags builds
@@ -183,7 +183,8 @@ jobs:
             source /emsdk/emsdk_env.sh &&
             emcmake cmake -Bbuild -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} -DWITH_SELFCONTAINED=ON -DWITH_WASM_JS=ON -DSWIG_IMPORT=ON ${{ env.build_flags_wasm }} ${{ env.cmake_flags_wasm }} -H. &&
             export FC=/usr/local/bin/flang-emcc F77=/usr/local/bin/flang-emcc &&
-            emmake cmake --build build --target casadi_wasm -j\$(nproc)
+            emmake cmake --build build --target casadi_wasm -j\$(nproc) &&
+            emmake python3 test/javascript/wasm_relink.py build
           "
       - name: Assemble dist zip
         run: |
@@ -192,8 +193,8 @@ jobs:
           # casadi_wasm.js/.wasm are the emscripten core; libcasadi_*.so are the
           # lazily-loaded plugin side modules (NOT embedded -- fetched on demand).
           cp swig/wasm-js/target/source/casadi.js swig/wasm-js/target/source/casadi.d.ts \
-             build/swig/wasm-js/casadi_wasm.js build/swig/wasm-js/casadi_wasm.wasm \
-             build/swig/wasm-js/libcasadi_*.so casadi-wasm/
+             build/swig/wasm-js/casadi_wasm.js build/swig/wasm-js/casadi_wasm.wasm casadi-wasm/
+          python swig/wasm-js/stage_plugins.py build/swig/wasm-js casadi-wasm
           cp -r docs/examples/javascript casadi-wasm/examples
           # Third-party license texts: same hoover rule as the selfcontained
           # wheels (the WITH_SELFCONTAINED glob in CMakeLists.txt) -- every
@@ -242,13 +243,18 @@ jobs:
           mkdir -p build-wasm/swig/wasm-js
           cp casadi-wasm/casadi.js casadi-wasm/casadi.d.ts \
              casadi-wasm/casadi_wasm.js casadi-wasm/casadi_wasm.wasm \
-             casadi-wasm/libcasadi_*.so build-wasm/swig/wasm-js/
+             casadi-wasm/libcasadi_*.so casadi-wasm/plugins.json build-wasm/swig/wasm-js/
       - uses: actions/setup-node@v4.4.0
         with:
           node-version: '22'
       - run: npm install -g typescript@5  # TS6 errors on tsconfig's deprecated moduleResolution:node
       - name: Run JS/TS test suite (tsc typecheck + node runtime ports)
         run: bash test/javascript/run_tests.sh
+      - name: Test cross-origin browser plugin loading
+        run: |
+          npm install --prefix "$RUNNER_TEMP/wasm-browser" playwright@1.63.0
+          "$RUNNER_TEMP/wasm-browser/node_modules/.bin/playwright" install --with-deps chromium
+          NODE_PATH="$RUNNER_TEMP/wasm-browser/node_modules" node test/javascript/wasm_browser.cjs
       - name: Run docs/examples/javascript under node
         run: |
           cd docs/examples/javascript

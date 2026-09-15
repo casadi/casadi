@@ -28,10 +28,8 @@
 // sandbox that supplies exactly those three node-isms, so the same
 // unmodified file runs in a browser.
 //
-// Why this is NOT a CORS problem: everything is fetched same-origin
-// from the page's own server.  The only requirement is that the page
-// is *served over http(s)*, not opened as a file:// URL -- browsers
-// refuse to fetch() a sibling .wasm over file://.  See README.md.
+// Relative bases resolve against the page. Absolute HTTP(S) bases can use a
+// CDN with CORS enabled. Browsers cannot fetch local file:// build artifacts.
 //
 // Usage (see _template.html):
 //   <script src="_casadi_browser.js"></script>
@@ -42,10 +40,12 @@ async function loadCasadi(base) {
   base = base || "./";
   if (!base.endsWith("/")) base += "/";
 
+  base = new URL(base, location.href).href;
+
   // Most common mistake: opening the page as a file:// URL.  Browsers
   // reject fetch() of local files with an opaque "NetworkError", so
   // detect it up front and explain.
-  if (typeof location !== "undefined" && location.protocol === "file:") {
+  if (typeof location !== "undefined" && new URL(base).protocol === "file:") {
     throw new Error(
       "this page must be served over http(s), not opened as a file:// URL " +
       "(browsers block fetch() of local files).  From this folder run: " +
@@ -61,7 +61,7 @@ async function loadCasadi(base) {
       throw new Error(
         `could not fetch ${base + file} (${e.message || e}).  Is the page ` +
         `served over http, and are the casadi build artifacts (casadi.js, ` +
-        `casadi_wasm.js, casadi_wasm.wasm, casadi_wasm.data) present at ` +
+        `casadi_wasm.js, casadi_wasm.wasm) present at ` +
         `"${base}"?  See README.md.`);
     }
     if (!resp.ok) throw new Error(
@@ -76,7 +76,7 @@ async function loadCasadi(base) {
   };
 
   // 1) The emscripten core.  It auto-detects the browser environment
-  //    (no `process`) and will fetch casadi_wasm.{wasm,data} via the
+  //    (no `process`) and will fetch casadi_wasm.wasm via the
   //    locateFile we pass from the wrapper -- so it never touches the
   //    `require` we hand it; we still provide one that errors loudly.
   const createWasm = await evalCjs("casadi_wasm.js",
@@ -86,7 +86,7 @@ async function loadCasadi(base) {
   //    `join` (used by the wrapper's locateFile).
   const requireForWrapper = (p) => {
     if (p === "./casadi_wasm.js" || p.endsWith("/casadi_wasm.js")) return createWasm;
-    if (p === "path") return { join: (...a) => a.filter(Boolean).join("/").replace(/\/{2,}/g, "/") };
+    if (p === "path") return { join: (...a) => a.filter(Boolean).join("/").replace(/([^:])\/{2,}/g, "$1/") };
     throw new Error("casadi.js required unexpected module: " + p);
   };
   const createcasadi = await evalCjs("casadi.js", requireForWrapper);

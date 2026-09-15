@@ -3710,37 +3710,9 @@ export default createcasadi;
     return n === 0 ? null : n === 1 ? r[0] : r;
   });
 
-  /* Lazy plugin loading: make load_<type>(name) async -- fetch the
-     sibling .so into MEMFS (browser) or read it from disk (Node), then
-     run the synchronous C++ loader. */
-  const __ensurePlugin = async (soname) => {
-    try { if (M.FS.analyzePath("/" + soname).exists) return; } catch (e) {}
-    let bytes;
-    if (typeof process !== "undefined" && process.versions && process.versions.node) {
-      bytes = require("fs").readFileSync(__path.join(__dirname, soname));
-    } else {
-      // Resolve via locateFile so the .so is fetched from the same base as
-      // the core (.wasm), not relative to the document.
-      const __url = (typeof M.locateFile === "function") ? M.locateFile(soname, "") : soname;
-      const resp = await fetch(__url);
-      if (!resp.ok) throw new Error("Failed to fetch plugin " + soname + ": " + resp.status);
-      bytes = new Uint8Array(await resp.arrayBuffer());
-    }
-    M.FS.writeFile("/" + soname, bytes);
-  };
-  for (const [__fn, __infix] of [["load_nlpsol", "nlpsol"], ["load_conic", "conic"],
-      ["load_linsol", "linsol"], ["load_integrator", "integrator"],
-      ["load_rootfinder", "rootfinder"], ["load_interpolant", "interpolant"],
-      ["load_expm", "expm"], ["load_dple", "dple"]]) {
-    const __orig = __m[__fn];
-    if (typeof __orig !== "function") continue;
-    __m[__fn] = async (name) => {
-      await __ensurePlugin("libcasadi_" + __infix + "_" + name + ".so");
-      return __orig.call(__m, name);
-    };
-  }
-
 %}
+%insert("js") "wasm-js/load_plugins.js"
+
 #endif
 
 // Matlab is index-1 based

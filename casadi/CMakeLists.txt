@@ -57,7 +57,13 @@ macro(casadi_library name)
   # Link with the core
   if(NOT "${name}" STREQUAL "casadi")
     # Not core
-    target_link_libraries(${name} casadi)
+    if(EMSCRIPTEN)
+      # Side modules resolve core symbols from MAIN_MODULE at runtime.
+      target_link_libraries(${name}
+        "$<$<NOT:$<BOOL:$<TARGET_PROPERTY:CASADI_WASM_SIDE_MODULE>>>:casadi>")
+    else()
+      target_link_libraries(${name} casadi)
+    endif()
     install(TARGETS ${name}
       LIBRARY DESTINATION ${TREL_LIB_PREFIX}
       ARCHIVE DESTINATION ${TREL_LIB_PREFIX}

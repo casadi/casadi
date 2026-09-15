@@ -28,6 +28,15 @@
 #include "casadi/core/blas_impl.hpp"
 #include <casadi/interfaces/blas_classic/casadi_blas_classic_export.h>
 
+// Flang's wasm ABI includes trailing lengths for the two CHARACTER arguments.
+#ifdef __EMSCRIPTEN__
+#define CASADI_BLAS_CLASSIC_CHARLEN_DECL , size_t, size_t
+#define CASADI_BLAS_CLASSIC_CHARLEN_ARGS , 1, 1
+#else
+#define CASADI_BLAS_CLASSIC_CHARLEN_DECL
+#define CASADI_BLAS_CLASSIC_CHARLEN_ARGS
+#endif
+
 extern "C" {
   /// Fortran BLAS dgemm (column-major, 32-bit ints).
   /// Available from any BLAS library configured into the CasADi build
@@ -38,7 +47,7 @@ extern "C" {
               const double* a, const int* lda,
               const double* b, const int* ldb,
               const double* beta,
-              double* c, const int* ldc);
+              double* c, const int* ldc CASADI_BLAS_CLASSIC_CHARLEN_DECL);
 
   /// Fortran BLAS L1 (column-major, 32-bit ints, scalars passed by reference).
   void daxpy_(const int* n, const double* alpha,

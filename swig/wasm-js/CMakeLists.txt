@@ -64,9 +64,12 @@ else()
     # plugin .so into MEMFS, then dlopen).  The C++ signature is void, so
     # SWIG stubs them `: void`; retype to `: Promise<void>` to match.
     COMMAND ${CMAKE_COMMAND} -E env sed -i -E
-            "s/(export function load_(nlpsol|conic|linsol|integrator|rootfinder|interpolant|expm|dple)\\(name: string\\)): void;/\\1: Promise<void>;/"
+            "s/(export function load_(nlpsol|conic|linsol|integrator|rootfinder|interpolant|expm|dple|blas|filesystem)\\(name: string\\)): void;/\\1: Promise<void>;/"
             ${_swig_dts}
-    DEPENDS ${_iface}
+    COMMAND ${CMAKE_COMMAND} -E env sed -i -E
+            "s/(load_plugin\\(name: string\\)): void;/\\1: Promise<void>;/"
+            ${_swig_dts}
+    DEPENDS ${_iface} ${CMAKE_CURRENT_SOURCE_DIR}/load_plugins.js
     COMMENT "swig -wasm-js -stubs -> casadi.cpp + casadi.js + casadi.d.ts + exports"
     VERBATIM
   )
@@ -100,251 +103,87 @@ target_include_directories(casadi_wasm PRIVATE
 target_link_libraries(casadi_wasm PRIVATE casadi)
 target_compile_options(casadi_wasm PRIVATE -fwasm-exceptions -fPIC)
 
-# Build up the --preload-file list so SIDE_MODULE plugins are mounted in
-# MEMFS at the path where casadi_os.cpp::open_shared_library expects them.
-# `CASADI_SHARED_LIBRARY_PREFIX/SUFFIX` are baked into casadi_meta as
-# "lib"/".so" regardless of host.  Mount each plugin at the root.
-set(_plugin_so_list "")
+# Record the side modules that the asynchronous loader will fetch into MEMFS.
+include(${CMAKE_CURRENT_SOURCE_DIR}/plugins.cmake)
 
-# ----------------------------------------------------------------------------
-# Per-plugin SIDE_MODULE recipe
-# ----------------------------------------------------------------------------
-# wasmjs_side_plugin(<infix> <pname>) builds
-# `lib${CMAKE_SHARED_LIBRARY_PREFIX}casadi_<infix>_<pname>.so` from the
-# already-built static plugin archive (`casadi_<infix>_<pname>`),
-# whole-archive'd so the `casadi_register_<infix>_<pname>` symbol
-# survives DCE.  Each gets one extra .a (passed in as ${ARGN}) appended
-# for solver-side third-party dependencies (e.g. libhighs.a).
-# ----------------------------------------------------------------------------
-
+# Link real targets so CMake carries dependencies and tracks archive changes.
 function(wasmjs_side_plugin infix pname)
-  set(_plugin_lib casadi_${infix}_${pname})
-  set(_so_name    libcasadi_${infix}_${pname}.so)
-  set(_so_path    ${CMAKE_CURRENT_BINARY_DIR}/${_so_name})
-  # The casadi_plugin() macro emits its archive into ${CMAKE_BINARY_DIR}/lib.
-  set(_plugin_a   ${CMAKE_BINARY_DIR}/lib/lib${_plugin_lib}.a)
-
-  # Stub source so add_executable has something to compile.  Real content
-  # is the --whole-archive of the static plugin lib at link time.
-  set(_stub ${CMAKE_CURRENT_BINARY_DIR}/${_plugin_lib}_side_stub.c)
-  file(WRITE ${_stub} "// Auto-generated SIDE_MODULE stub for ${_plugin_lib}.\n")
-
-  add_executable(${_plugin_lib}_side ${_stub})
-  add_dependencies(${_plugin_lib}_side ${_plugin_lib})
-  target_compile_options(${_plugin_lib}_side PRIVATE -fPIC -fwasm-exceptions)
-
-  set(_link_extra "")
-  foreach(_extra ${ARGN})
-    set(_link_extra "${_link_extra} ${_extra}")
-  endforeach()
-
-  # NOTE: $<TARGET_FILE:...> is NOT expanded inside the LINK_FLAGS
-  # string property -- CMake only resolves generator expressions in a
-  # handful of dedicated properties / commands (target_link_libraries,
-  # target_link_options, etc.).  Hardcode the archive path that
-  # casadi_plugin() emits to.  The add_dependencies() above still
-  # forces the static lib to build first.
-  # -Wl,--export-all: SIDE_MODULE=1 should auto-export everything but
-  # in practice (emsdk circa 3.1.x+) DCE drops unreferenced exports
-  # including each plugin's `casadi_register_<infix>_<pname>` symbol,
-  # which is the entry point Plugin::load_plugin dlopens for.  Forcing
-  # all symbols out preserves the registration symbols plus anything
-  # the main module needs at dlopen time.
-  set_target_properties(${_plugin_lib}_side PROPERTIES
-    OUTPUT_NAME "casadi_${infix}_${pname}"
+  set(_plugin casadi_${infix}_${pname})
+  if(NOT TARGET ${_plugin})
+    message(FATAL_ERROR "Missing configured plugin target ${_plugin}")
+  endif()
+  set(_side ${_plugin}_side)
+  set(_stub ${wasm_dir}/${_side}_stub.cpp)
+  file(WRITE ${_stub} "// Side module entry points come from the plugin archive.\n")
+  add_executable(${_side} ${_stub})
+  target_compile_options(${_side} PRIVATE -fPIC -fwasm-exceptions)
+  target_link_libraries(${_side} PRIVATE
+    "-Wl,--whole-archive" ${_plugin} "-Wl,--no-whole-archive")
+  set_target_properties(${_side} PROPERTIES
+    CASADI_WASM_SIDE_MODULE TRUE
+    OUTPUT_NAME ${_plugin}
     PREFIX "lib"
     SUFFIX ".so"
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    LINK_FLAGS
-      "-fPIC -fwasm-exceptions -s SIDE_MODULE=1 \
--Wl,--whole-archive ${_plugin_a} -Wl,--no-whole-archive \
--Wl,--export-all \
-${_link_extra}"
-  )
-  # Lazy plugin loading: the .so is NOT embedded in casadi_wasm.data; it
-  # ships as a sibling of casadi_wasm.js and is fetched on demand by the
-  # async load_<type>() JS wrapper (which writes it into MEMFS before the
-  # synchronous C++ dlopen).  This keeps CasADi's plugin model and a small
-  # core, with no Asyncify (zero binary-size cost).  Track the names so the
-  # dist step can collect them.
-  set(_plugin_so_list "${_plugin_so_list};${_so_name}" PARENT_SCOPE)
-  add_dependencies(casadi_wasm ${_plugin_lib}_side)
+    RUNTIME_OUTPUT_DIRECTORY ${wasm_dir}
+    LINK_FLAGS "-fPIC -fwasm-exceptions -s SIDE_MODULE=1 -Wl,--export-all")
+  wasmjs_register_plugin(${infix} ${pname})
+  add_dependencies(casadi_wasm ${_side})
 endfunction()
 
-# ----------------------------------------------------------------------------
-# Plugins to ship as SIDE_MODULE .so's
-# ----------------------------------------------------------------------------
+# Called from the root after casadi/ has registered all plugin targets.
+function(wasmjs_finalize_plugins wasm_dir)
+  # flang needs explicit storage for MUMPS's libseq COMMON block.
+  if(WITH_IPOPT OR WITH_MUMPS)
+    set(_mumps_stub_obj ${wasm_dir}/mumps_common_stub.o)
+    add_custom_command(OUTPUT ${_mumps_stub_obj}
+      COMMAND ${CMAKE_Fortran_COMPILER} -fPIC -c
+        ${PROJECT_SOURCE_DIR}/swig/wasm-js/mumps_common_stub.f90 -o ${_mumps_stub_obj}
+      DEPENDS ${PROJECT_SOURCE_DIR}/swig/wasm-js/mumps_common_stub.f90
+      VERBATIM)
+    add_custom_target(mumps_common_stub DEPENDS ${_mumps_stub_obj})
+    set_property(TARGET mumps APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${_mumps_stub_obj})
+    add_dependencies(mumps mumps_common_stub)
+  endif()
 
-# Built-in plugins implemented entirely in CasADi's own runtime (no
-# third-party deps).  Each is one line: their static archive is just
-# the plugin .cpp + its meta TU, and at runtime the side .so resolves
-# everything else against the MAIN_MODULE.  Adds a few hundred KB
-# total to MEMFS but unlocks a much larger surface in tests.
-wasmjs_side_plugin(integrator rk)
-wasmjs_side_plugin(integrator collocation)
-wasmjs_side_plugin(conic       qrqp)
-wasmjs_side_plugin(conic       ipqp)
-wasmjs_side_plugin(conic       nlpsol)        # qp_to_nlp wrapper
-wasmjs_side_plugin(nlpsol      sqpmethod)
-wasmjs_side_plugin(nlpsol      qrsqp)
-wasmjs_side_plugin(nlpsol      scpgen)
-wasmjs_side_plugin(nlpsol      feasiblesqpmethod)
-wasmjs_side_plugin(linsol      qr)
-wasmjs_side_plugin(linsol      ldl)
-wasmjs_side_plugin(linsol      tridiag)
-wasmjs_side_plugin(linsol      lsqr)
-wasmjs_side_plugin(linsol      symbolicqr)
-wasmjs_side_plugin(interpolant linear)
-wasmjs_side_plugin(interpolant bspline)
-wasmjs_side_plugin(rootfinder  newton)
-wasmjs_side_plugin(rootfinder  fast_newton)
-wasmjs_side_plugin(rootfinder  nlpsol)        # implicit_to_nlp wrapper
+  # Built-in plugins have no additional platform requirements.
+  foreach(_entry
+      "integrator::rk" "integrator::collocation"
+      "conic::qrqp" "conic::ipqp" "conic::nlpsol"
+      "nlpsol::sqpmethod" "nlpsol::qrsqp" "nlpsol::scpgen" "nlpsol::feasiblesqpmethod"
+      "linsol::qr" "linsol::ldl" "linsol::tridiag" "linsol::lsqr" "linsol::symbolicqr"
+      "interpolant::linear" "interpolant::bspline"
+      "rootfinder::newton" "rootfinder::fast_newton" "rootfinder::nlpsol"
+      "rootfinder::bisection")
+    string(REPLACE "::" ";" _parts "${_entry}")
+    wasmjs_side_plugin(${_parts})
+  endforeach()
 
-# HiGHS Conic plugin: requires the cross-compiled libhighs.a archive.
-# The parent's `highs` IMPORTED target points at a non-existent .so for
-# the wasm build (ExternalProject_Add actually drops the .a there); use
-# the .a's absolute path directly.
-if(WITH_HIGHS)
-  wasmjs_side_plugin(conic highs
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libhighs.a)
-endif()
+  # Known external plugins use the same link recipe, including transitive dependencies.
+  foreach(_entry
+      "conic::highs" "conic::daqp" "conic::qpoases" "conic::hpipm" "conic::osqp"
+      "conic::fatrop" "nlpsol::fatrop" "nlpsol::ipopt" "nlpsol::blocksqp"
+      "integrator::cvodes" "integrator::idas" "rootfinder::kinsol"
+      "linsol::csparse" "linsol::csparsecholesky" "linsol::lapacklu" "linsol::lapackqr"
+      "linsol::mumps" "blas::classic" "blas::blasfeo" "xmlfile::tinyxml")
+    string(REPLACE "::" "_" _target "${_entry}")
+    if(TARGET casadi_${_target})
+      string(REPLACE "::" ";" _parts "${_entry}")
+      wasmjs_side_plugin(${_parts})
+    endif()
+  endforeach()
 
-# DAQP Conic plugin: pure-C QP solver, no Fortran/BLAS dependencies.
-# daqp upstream's static archive is libdaqpstat.a (the `daqp` target is
-# hardcoded SHARED, so there is no libdaqp.a); whole-archive the static one.
-if(WITH_DAQP)
-  wasmjs_side_plugin(conic daqp
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libdaqpstat.a)
-endif()
+  # Every enabled plugin must ship or have a documented browser exclusion.
+  wasmjs_exclude_plugin(importer shell "Requires spawning a native C compiler")
+  wasmjs_exclude_plugin(conic superscs "Requires fixes for the Fortran CHARACTER-length ABI")
+  wasmjs_write_manifest(${wasm_dir}/plugins.json)
 
-# qpOASES Conic plugin: needs flang-built BLAS+LAPACK (dgemm_, dpotrf_, ...)
-# plus the in-tree libcasadi_qpoases.a (qpOASES sources, patched to pass
-# Fortran-77 hidden character-length args on EMSCRIPTEN).  Also pull in the
-# Fortran runtime for the flang-built archives.
-if(WITH_QPOASES)
-  wasmjs_side_plugin(conic qpoases
-    ${CMAKE_BINARY_DIR}/lib/libcasadi_qpoases.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
-    /opt/flang/wasm/lib/libFortranRuntime.a)
-endif()
-
-# Sundials integrators (cvodes, idas) and rootfinder (kinsol): the bundled
-# sundials sources (N_VNew_Serial, KINCreate, ...) live in libcasadi_sundials.a
-# -- NOT in the MAIN_MODULE core -- so each side module must pull it in.
-# cvodes/idas also derive from SundialsInterface (libcasadi_sundials_common.a);
-# kinsol derives from Rootfinder (in core) and needs only the raw sundials lib.
-if(WITH_SUNDIALS)
-  wasmjs_side_plugin(integrator cvodes
-    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials_common.a
-    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials.a)
-  wasmjs_side_plugin(integrator idas
-    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials_common.a
-    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials.a)
-  wasmjs_side_plugin(rootfinder kinsol
-    ${CMAKE_BINARY_DIR}/lib/libcasadi_sundials.a)
-endif()
-
-# CSparse linsol: pure-C; needs libcasadi_csparse.a (the vendored CXSparse
-# sources providing cs_sqr/cs_lu/...) whole-archived alongside the plugin
-# interface archive, since the main module doesn't carry those symbols.
-if(WITH_CSPARSE)
-  wasmjs_side_plugin(linsol csparse
-    ${CMAKE_BINARY_DIR}/lib/libcasadi_csparse.a)
-endif()
-
-# LAPACK linsol plugins (lapacklu, lapackqr): need flang-built BLAS+LAPACK
-# plus Fortran runtime.  Headers have been patched with EMSCRIPTEN-only
-# Fortran-77 hidden character-length args.
-if(WITH_LAPACK)
-  wasmjs_side_plugin(linsol lapacklu
-    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
-    /opt/flang/wasm/lib/libFortranRuntime.a)
-  wasmjs_side_plugin(linsol lapackqr
-    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
-    /opt/flang/wasm/lib/libFortranRuntime.a)
-endif()
-
-# Blocksqp Nlpsol plugin: uses qpoases internally for the inner QP solve,
-# so needs the same BLAS+Fortran chain as qpoases.  Set qpsol_options/
-# linsol to a wasm-available linsol (e.g. ldl) when constructing.
-if(WITH_BLOCKSQP)
-  wasmjs_side_plugin(nlpsol blocksqp
-    ${CMAKE_BINARY_DIR}/lib/libcasadi_qpoases.a
-    ${CMAKE_BINARY_DIR}/lib/libcasadi_conic_qpoases.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
-    /opt/flang/wasm/lib/libFortranRuntime.a)
-endif()
-
-# HPIPM Conic plugin: registers OK but requires OCP-block-structured QP
-# inputs; no trivial smoke test possible.  Built but not currently
-# exercised by test/javascript/*.
-if(WITH_HPIPM)
-  wasmjs_side_plugin(conic hpipm
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libhpipm.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libblasfeo.a)
-endif()
-
-# SuperSCS Conic plugin: registers OK but the SuperSCS sources call BLAS
-# without the Fortran-77 hidden character-length args, triggering wasm-ld
-# signature-mismatch -> unreachable on every BLAS-using call site.  Built
-# but not operational until SuperSCS sources are patched the same way the
-# vendored qpOASES was.
-if(WITH_SUPERSCS)
-  wasmjs_side_plugin(conic superscs
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libsuperscs.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libindirect.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/liblinsys.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
-    /opt/flang/wasm/lib/libFortranRuntime.a)
-endif()
-
-# IPOPT Nlpsol plugin: pull in the full Fortran cascade.  libipopt.a +
-# libcoinmumps.a + libcoinmetis.a from the COIN-OR/MUMPS/METIS chain,
-# plus liblapack.a + libblas.a from Netlib reference LAPACK (built via
-# r-wasm/flang-wasm), plus libFortranRuntime.a and the MUMPS libseq
-# COMMON-block stub.  Order matters for static-link symbol resolution --
-# ipopt pulls mumps, mumps pulls metis + lapack, lapack/blas pull the
-# Fortran runtime.
-if(WITH_IPOPT)
-  # flang omits storage for MUMPS's libseq /mpif_libseq/ COMMON block, so
-  # wasm-ld sees `mpif_libseq_` undefined.  Compile the BLOCK DATA stub
-  # in-tree with the (wasm) Fortran compiler -- keeps the toolchain image
-  # generic (no baked .o needed).
-  set(_mumps_stub_obj ${CMAKE_CURRENT_BINARY_DIR}/mumps_common_stub.o)
-  add_custom_command(
-    OUTPUT  ${_mumps_stub_obj}
-    COMMAND ${CMAKE_Fortran_COMPILER} -fPIC -c
-            ${CMAKE_CURRENT_SOURCE_DIR}/mumps_common_stub.f90 -o ${_mumps_stub_obj}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mumps_common_stub.f90
-    COMMENT "flang -c mumps_common_stub.f90 (MUMPS libseq COMMON-block storage)"
-    VERBATIM)
-  add_custom_target(mumps_common_stub DEPENDS ${_mumps_stub_obj})
-
-  set(_ipopt_extra
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libipopt.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libcoinmumps.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libcoinmetis.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/liblapack.a
-    ${CMAKE_BINARY_DIR}/external_projects/lib/libblas.a
-    # Fortran runtime from r-wasm/flang-wasm (descriptor-ABI fix upstream).
-    /opt/flang/wasm/lib/libFortranRuntime.a
-    ${_mumps_stub_obj})
-  wasmjs_side_plugin(nlpsol ipopt ${_ipopt_extra})
-  add_dependencies(casadi_nlpsol_ipopt_side mumps_common_stub)
-endif()
+endfunction()
 
 # ----------------------------------------------------------------------------
 # Main module link flags
 # ----------------------------------------------------------------------------
 # - MAIN_MODULE=1 gives us the dynamic linker at runtime (real dlopen).
-# - The preload-file list mounts every plugin .so into MEMFS so the
-#   first `Integrator("rk", ...)` / `qpsol("highs", ...)` call finds the
-#   shared library on disk via the standard plugin search path.
+# - Plugins are fetched into MEMFS on demand by the JavaScript loader.
 
 set_target_properties(casadi_wasm PROPERTIES
   OUTPUT_NAME "casadi_wasm"
