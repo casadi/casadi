@@ -64,6 +64,37 @@ FiniteDiff::FiniteDiff(const std::string& name, casadi_int n)
   : FunctionInternal(name), n_(n) {
 }
 
+void FiniteDiff::serialize_body(SerializingStream& s) const {
+  FunctionInternal::serialize_body(s);
+  s.version("FiniteDiff", 1);
+  s.pack("FiniteDiff::n", n_);
+  s.pack("FiniteDiff::h_iter", h_iter_);
+  s.pack("FiniteDiff::h", h_);
+  s.pack("FiniteDiff::n_z", n_z_);
+  s.pack("FiniteDiff::n_y", n_y_);
+  s.pack("FiniteDiff::u_aim", u_aim_);
+  s.pack("FiniteDiff::h_min", h_min_);
+  s.pack("FiniteDiff::h_max", h_max_);
+  s.pack("FiniteDiff::reltol", m_.reltol);
+  s.pack("FiniteDiff::abstol", m_.abstol);
+  s.pack("FiniteDiff::smoothing", m_.smoothing);
+}
+
+FiniteDiff::FiniteDiff(DeserializingStream& s) : FunctionInternal(s) {
+  s.version("FiniteDiff", 1);
+  s.unpack("FiniteDiff::n", n_);
+  s.unpack("FiniteDiff::h_iter", h_iter_);
+  s.unpack("FiniteDiff::h", h_);
+  s.unpack("FiniteDiff::n_z", n_z_);
+  s.unpack("FiniteDiff::n_y", n_y_);
+  s.unpack("FiniteDiff::u_aim", u_aim_);
+  s.unpack("FiniteDiff::h_min", h_min_);
+  s.unpack("FiniteDiff::h_max", h_max_);
+  s.unpack("FiniteDiff::reltol", m_.reltol);
+  s.unpack("FiniteDiff::abstol", m_.abstol);
+  s.unpack("FiniteDiff::smoothing", m_.smoothing);
+}
+
 FiniteDiff::~FiniteDiff() {
   clear_mem();
 }

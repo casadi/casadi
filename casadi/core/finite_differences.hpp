@@ -69,6 +69,8 @@ class CASADI_EXPORT FiniteDiff : public FunctionInternal {
 public:
   // Constructor (protected, use create function)
   FiniteDiff(const std::string& name, casadi_int n);
+  explicit FiniteDiff(DeserializingStream& s);
+  void serialize_body(SerializingStream& s) const override;
 
   /** \brief Destructor
 
@@ -192,6 +194,8 @@ class CASADI_EXPORT ForwardDiff : public FiniteDiff {
 public:
   // Constructor
   ForwardDiff(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
+  explicit ForwardDiff(DeserializingStream& s) : FiniteDiff(s) {}
+  static ProtoFunction* deserialize(DeserializingStream& s) { return new ForwardDiff(s); }
 
   /** \brief Destructor
 
@@ -253,6 +257,8 @@ class CASADI_EXPORT BackwardDiff : public ForwardDiff {
 public:
   // Constructor
   BackwardDiff(const std::string& name, casadi_int n) : ForwardDiff(name, n) {}
+  explicit BackwardDiff(DeserializingStream& s) : ForwardDiff(s) {}
+  static ProtoFunction* deserialize(DeserializingStream& s) { return new BackwardDiff(s); }
 
   /** \brief Destructor
 
@@ -278,6 +284,8 @@ class CASADI_EXPORT CentralDiff : public FiniteDiff {
 public:
   // Constructor
   CentralDiff(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
+  explicit CentralDiff(DeserializingStream& s) : FiniteDiff(s) {}
+  static ProtoFunction* deserialize(DeserializingStream& s) { return new CentralDiff(s); }
 
   /** \brief Destructor
 
@@ -339,6 +347,8 @@ class CASADI_EXPORT Smoothing : public FiniteDiff {
 public:
   // Constructor
   Smoothing(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
+  explicit Smoothing(DeserializingStream& s) : FiniteDiff(s) {}
+  static ProtoFunction* deserialize(DeserializingStream& s) { return new Smoothing(s); }
 
   /** \brief Destructor
 

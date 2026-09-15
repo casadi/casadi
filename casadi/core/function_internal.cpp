@@ -4417,6 +4417,11 @@ namespace casadi {
     {"SXFunction", SXFunction::deserialize},
     {"Interpolant", Interpolant::deserialize},
     {"Switch", Switch::deserialize},
+    {"ForwardDiff", ForwardDiff::deserialize},
+    {"BackwardDiff", BackwardDiff::deserialize},
+    {"CentralDiff", CentralDiff::deserialize},
+    {"Smoothing", Smoothing::deserialize},
+
     {"Map", Map::deserialize},
     {"MapSum", MapSum::deserialize},
     {"Nlpsol", Nlpsol::deserialize},

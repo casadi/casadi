@@ -4982,6 +4982,41 @@ class Functiontests(casadiTestCase):
           self.check_codegen(J,inputs=inputs,std="c99",digits=digits)
       
        
+  def test_finite_diff_serialization(self):
+    x = ca.MX.sym("x", 2)
+    p = ca.MX.sym("p")
+    y = p*ca.dot(x, x)
+    for method in ["forward", "backward", "central", "smoothing"]:
+      for adaptive in [False, True]:
+        h = -1e-3 if method == "backward" else 1e-3
+        options = {"h": h, "h_iter": int(adaptive and method in ["central", "smoothing"]),
+                   "h_min": 1e-8, "h_max": .1, "u_aim": 42.,
+                   "reltol": 1e-11, "abstol": 1e-12, "smoothing": 5e-8}
+        f = ca.Function("f", [x, p], [y, x+p], {"enable_fd": True,
+            "enable_forward": False, "enable_reverse": False,
+            "is_diff_in": [True, False], "is_diff_out": [True, False],
+            "fd_method": method, "fd_options": options})
+        values = [ca.DM([.4, -.7]), ca.DM(2)]
+        for count in [1, 3]:
+          df = f.forward(count)
+          restored = ca.Function.deserialize(df.serialize())
+          self.assertEqual(restored.class_name(), df.class_name())
+          self.assertEqual(restored.is_diff_in(), df.is_diff_in())
+          self.assertEqual(restored.is_diff_out(), df.is_diff_out())
+          inputs = values+f.call(values)+[ca.DM.ones(2, count), ca.DM.zeros(1, count)]
+          for got, expected in zip(restored.call(inputs), df.call(inputs)):
+            self.checkarray(got, expected, digits=12)
+          for i in range(df.n_in()):
+            self.assertEqual(restored.sparsity_in(i), df.sparsity_in(i))
+        result = f(x, p)[0]
+        D = ca.Function("D", [x, p], [ca.jacobian(result, x), ca.hessian(result, x)[0],
+                                      ca.jacobian(result, p)])
+        restored = ca.Function.deserialize(D.serialize())
+        for got, expected in zip(restored.call(values), D.call(values)):
+          self.checkarray(got, expected, digits=12)
+        if not adaptive:
+          self.check_codegen(restored, inputs=values, std="c99", digits=10)
+
   def test_is_diff_fd(self):
 
     ca.DM.set_precision(16)
