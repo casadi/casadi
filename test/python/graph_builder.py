@@ -427,7 +427,8 @@ class GraphBuilderNumericTests(casadiTestCase):
       graph = json.loads(function.export_graph())
       calls = [node for part in [graph]+graph.get("functions", [])
                for node in part["nodes"] if "model_path" in node]
-      self.assertEqual({node["model_path"] for node in calls}, {path, sibling})
+      self.assertEqual({os.path.normpath(node["model_path"]) for node in calls},
+                       {os.path.normpath(path), os.path.normpath(sibling)})
       for node in calls:
         self.assertIn(os.path.basename(node["model_path"]), node["label"])
 
@@ -1013,7 +1014,7 @@ class GraphBuilderNumericTests(casadiTestCase):
       os.chdir(cwd)
     self.assertTrue("casadi_onnxruntime_solve" in code)
     self.assertTrue("casadi_onnxruntime_prob" in code)
-    self.assertTrue("ort_runtime.h" in code)
+    self.assertIn('#include <onnxruntime_c_api.h>', code)
 
   def test_codegen_compile(self):
     # Full roundtrip: generate C, compile+link against ONNX Runtime, load and evaluate.
