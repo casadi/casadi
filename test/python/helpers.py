@@ -1014,7 +1014,10 @@ class casadiTestCase(unittest.TestCase):
 
 
   def check_serialize(self,F,inputs=None):
-      F2 = ca.Function.deserialize(F.serialize({"debug":True}))
+      serialized = F.serialize({"debug":True})
+      from serialization_scheme import validate_serialization
+      validate_serialization(serialized)
+      F2 = ca.Function.deserialize(serialized)
       assert inputs is not None
 
       Fout = F.call(inputs)

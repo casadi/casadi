@@ -1192,6 +1192,13 @@ jobs:
     needs: [python-dockcross,matlab-dockcross,version]
     steps:
       - uses: actions/checkout@v6.0.2
+      - name: Generate serialization scheme
+        run: python3 misc/generate_serialization_scheme.py
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: casadi-serialization-scheme
+          path: misc/serialization_scheme.json
+          if-no-files-found: error
       - uses: actions/download-artifact@v8.0.1
         with:
           name: casadi-linux64-manylinux_2_28-py311
@@ -1205,6 +1212,14 @@ jobs:
       - run: chmod -R a+w . && docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd misc && python add_identifiers.py && cd .. && cd docs/users_guide && rm -rf build && rm -f snippets/* && make users_guide.pdf && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct examples_indoc_cpp && cd .. && rm -rf docs/users_guide/build && cd docs/users_guide && make users_guide.pdf bare_toc bare_body && cd ../.. && cd docs/api && make full doxexport"
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
+      - uses: svenstaro/upload-release-action@2.11.5
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: misc/serialization_scheme.json
+          asset_name: casadi-serialization_scheme-v${{ needs.version.outputs.casadi }}.json
+          prerelease: true
+        if: github.event_name != 'pull_request'
       - uses: svenstaro/upload-release-action@2.11.5
         with:
           overwrite: true
