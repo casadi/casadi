@@ -3883,6 +3883,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       continue;
     }
 
+    // Dimension of the variable
+    std::vector<casadi_int> dimension;
+
     // Type specific properties
     Dict opts;
     Type type = Type::NUMEL;
@@ -3890,6 +3893,25 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     if (fmi_major_ >= 3) {
       // FMI 3.0: Type information in the same node
       type = to_enum<Type>(vnode.name);
+      // Loop over children
+      for (casadi_int i = 0; i < vnode.size(); ++i) {
+        const XmlNode& c = vnode[i];
+        if (c.name == "Dimension") {
+          bool has_start = c.has_attribute("start");
+          bool has_vr = c.has_attribute("valueReference");
+          casadi_assert(has_start ^ has_vr, "Inconsistent attributes");
+          casadi_assert(!has_vr, "Structural parameter dimensions not implemented");
+          auto dim = c.attribute<casadi_int>("start");
+          dimension.push_back(dim);
+        } else if (c.name == "Alias") {
+          // Aliases currently ignored
+        } else if (c.name == "Annotations") {
+          // Annotations currently ignored
+        } else {
+          casadi_error("Cannot handle: " + c.name);
+        }
+      }
+      // Type specific attributes
       switch (type) {
       case Type::FLOAT32:  // fall-through
       case Type::FLOAT64:
@@ -3945,6 +3967,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       }
     }
 
+    // Scalar dimension by default
+    if (dimension.empty()) dimension.push_back(1);
+
     // Description
     std::string description = vnode.attribute<std::string>("description", "");
 
@@ -3982,6 +4007,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     opts["type"] = to_string(type);
     opts["initial"] = to_string(initial);
     opts["description"] = description;
+    opts["dimension"] = dimension;
     Variable& var = add(name, causality, variability, opts);
     if (debug_) uout() << "Added variable: " << var.name << std::endl;
 
