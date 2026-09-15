@@ -137,6 +137,17 @@ void XmlNode::read(const std::string& str, double* val) {
   buffer >> *val;
 }
 
+void XmlNode::read(const std::string& str, std::vector<double>* val) {
+  val->clear();
+  std::istringstream buffer(str);
+  while (true) {
+    double v;
+    buffer >> v;
+    if (buffer.fail()) break;
+    val->push_back(v);
+  }
+}
+
 void XmlNode::read(const std::string& str, std::vector<casadi_int>* val) {
   val->clear();
   std::istringstream buffer(str);

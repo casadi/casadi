@@ -185,6 +185,9 @@ struct CASADI_EXPORT XmlNode {
       \identifier{vs} */
   static void read(const std::string& str, double* val);
 
+  /** \brief  Read a vector of double values of a string */
+  static void read(const std::string& str, std::vector<double>* val);
+
   /** \brief  Read a vector of integer values of a string
 
       \identifier{vt} */

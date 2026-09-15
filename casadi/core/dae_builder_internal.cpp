@@ -3285,7 +3285,14 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   if (!type.empty()) v.type = to_enum<Type>(type);
   v.causality = causality;
   v.variability = variability;
-  if (!start.empty()) v.value = v.start = start;
+  if (!start.empty()) {
+    // Start attribute length doesn't match variable dimension
+    if (start.size() != v.numel) {
+      casadi_assert(start.size() == 1, "'start' must be scalar or match the number of elements");
+      start.resize(v.numel, start.back());
+    }
+    v.value = v.start = start;
+  }
   if (!initial.empty()) {
     v.initial = to_enum<Initial>(initial);
   } else {
@@ -3921,7 +3928,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         opts["min"] = vnode.attribute<double>("min", -inf);
         opts["max"] = vnode.attribute<double>("max", inf);
         opts["nominal"] = vnode.attribute<double>("nominal", 1.);
-        opts["start"] = vnode.attribute<double>("start", 0.);
+        opts["start"] = vnode.attribute<std::vector<double>>("start", std::vector<double>{0.});
         derivative = vnode.attribute<casadi_int>("derivative", -1);
         break;
       case Type::INT8:  // fall-through
