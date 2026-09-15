@@ -2984,7 +2984,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L978
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L572-L614
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L639-L643
 
 ";
 
@@ -3019,7 +3019,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L978
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L572-L614
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L639-L643
 
 ";
 
@@ -3054,7 +3054,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L978
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L572-L614
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L639-L643
 
 ";
 
@@ -3072,7 +3072,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 ";
 
@@ -3088,7 +3088,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 ";
 
@@ -3104,7 +3104,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 ";
 
@@ -16211,7 +16211,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L978
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L572-L614
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L639-L643
 
 ";
 
@@ -16246,7 +16246,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L978
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L572-L614
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L639-L643
 
 ";
 
@@ -16281,7 +16281,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L978
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L572-L614
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L639-L643
 
 ";
 
@@ -16299,7 +16299,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 ";
 
@@ -16315,7 +16315,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 ";
 
@@ -16331,7 +16331,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 ";
 
@@ -54968,10 +54968,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L648
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L673
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L648-L650
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L673-L675
 
 ";
 
@@ -54987,10 +54987,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L648
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L673
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L648-L650
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L673-L675
 
 ";
 
@@ -55006,10 +55006,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L648
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L673
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L648-L650
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L673-L675
 
 ";
 
@@ -55027,10 +55027,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L642
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L669
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L642-L646
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L669-L671
 
 ";
 
@@ -55046,10 +55046,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L642
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L669
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L642-L646
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L669-L671
 
 ";
 
@@ -55065,10 +55065,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L642
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L669
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L642-L646
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L669-L671
 
 ";
 
@@ -55086,10 +55086,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L624
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L653
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L624-L626
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L653-L655
 
 ";
 
@@ -55105,10 +55105,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L624
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L653
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L624-L626
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L653-L655
 
 ";
 
@@ -55124,10 +55124,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L624
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L653
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L624-L626
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L653-L655
 
 ";
 
@@ -55145,10 +55145,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L628
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L657
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L628-L630
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L657-L659
 
 ";
 
@@ -55164,10 +55164,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L628
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L657
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L628-L630
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L657-L659
 
 ";
 
@@ -55183,10 +55183,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k6  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L628
+https://github.com/casadi/casadi/blob/main/casadi/core/mx.hpp#L657
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L628-L630
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L657-L659
 
 ";
 
@@ -55204,10 +55204,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L638
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L665
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L638-L640
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L665-L667
 
 ";
 
@@ -55223,10 +55223,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L638
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L665
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L638-L640
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L665-L667
 
 ";
 
@@ -55242,10 +55242,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L638
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L665
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L638-L640
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L665-L667
 
 ";
 
@@ -55263,10 +55263,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L632
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L661
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L632-L636
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L661-L663
 
 ";
 
@@ -55282,10 +55282,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L632
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L661
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L632-L636
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L661-L663
 
 ";
 
@@ -55301,10 +55301,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L632
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L661
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L632-L636
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L661-L663
 
 ";
 
@@ -55322,10 +55322,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L616
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L645
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L616-L618
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L645-L647
 
 ";
 
@@ -55341,10 +55341,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L616
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L645
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L616-L618
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L645-L647
 
 ";
 
@@ -55360,10 +55360,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L616
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L645
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L616-L618
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L645-L647
 
 ";
 
@@ -55381,10 +55381,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L620
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L649
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L620-L622
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L649-L651
 
 ";
 
@@ -55400,10 +55400,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L620
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L649
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L620-L622
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L649-L651
 
 ";
 
@@ -55419,10 +55419,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L620
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L649
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L620-L622
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L649-L651
 
 ";
 

@@ -1628,7 +1628,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 >  std::string casadi::Function::export_graph(const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
@@ -1643,7 +1643,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 ";
 
@@ -10276,7 +10276,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 >  std::string casadi::Function::export_graph(const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
@@ -10291,7 +10291,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/main/casadi/core/function.hpp#L985
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L568-L570
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L635-L637
 
 ";
 
@@ -33294,10 +33294,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L620
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L649
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L620-L622
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L649-L651
 
 >  void casadi::export_graph(const std::vector< SX > &expressions, const std::string &fname, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -33311,10 +33311,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_2k5  Without a filename,
 return the .casadi_viz JSON bundle.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L620
+https://github.com/casadi/casadi/blob/main/casadi/core/sx.hpp#L649
 
 Implementation: 
-https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L620-L622
+https://github.com/casadi/casadi/blob/main/casadi/core/visualizer.cpp#L649-L651
 
 ";
 
