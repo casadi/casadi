@@ -30,7 +30,7 @@
 #include <casadi/interfaces/ort/casadi_onnx_ort_export.h>
 
 #include <onnxruntime_c_api.h>
-#include "ort_runtime.h"
+#include "ort_runtime.hpp"
 
 /** \pluginsection{Onnx,ort} */
 

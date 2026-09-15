@@ -23,6 +23,7 @@
  */
 
 #include "ort_interface.hpp"
+#include <ort_runtime_str.h>
 
 namespace casadi {
 
@@ -190,7 +191,8 @@ namespace casadi {
   }
 
   void OnnxRuntimeInterface::codegen_declarations(CodeGenerator& g) const {
-    g.add_include("ort_runtime.h", false);
+    g.add_include("onnxruntime_c_api.h");
+    g.auxiliaries << g.sanitize_source(ort_runtime_str, {});
   }
 
   void OnnxRuntimeInterface::codegen_body(CodeGenerator& g) const {
@@ -201,11 +203,11 @@ namespace casadi {
     std::string model = g.constant(std::vector<char>(model_data_.begin(), model_data_.end()));
     std::string in_names = g.constant(in_nm), out_names = g.constant(out_nm);
     std::string in_src = g.constant(in_src_);
-    std::string in_val = g.constant(in_val_.empty() ? std::vector<double>{0.0} : in_val_);
+    std::string in_val = g.constant(in_val_.empty() ? std::vector<double> {0.0} : in_val_);
     std::string in_elem = g.constant(in_elem_), out_elem = g.constant(out_elem_);
     std::string in_ndim = g.constant(in_ndim_), out_ndim = g.constant(out_ndim_);
-    std::string in_dims = g.constant(in_dims_.empty() ? std::vector<casadi_int>{0} : in_dims_);
-    std::string out_dims = g.constant(out_dims_.empty() ? std::vector<casadi_int>{0} : out_dims_);
+    std::string in_dims = g.constant(in_dims_.empty() ? std::vector<casadi_int> {0} : in_dims_);
+    std::string out_dims = g.constant(out_dims_.empty() ? std::vector<casadi_int> {0} : out_dims_);
     std::string in_numel = g.constant(in_numel_), out_numel = g.constant(out_numel_);
 
     g << "static struct casadi_onnxruntime_prob prob = {"
