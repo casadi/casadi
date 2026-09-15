@@ -506,16 +506,48 @@ class GraphBuilderNumericTests(casadiTestCase):
       # Serialize before constructing derivatives: sibling references must survive.
       f = ca.Function.deserialize(f.serialize())
       if kind == "jac":
-        self.checkarray(2*ca.DM.eye(3), f.jacobian()(x, 2*x+1), "sibling jacobian")
+        df = f.jacobian()
+        self.assertEqual(df.sparsity_in("out_y"), ca.Sparsity(3, 1))
+        self.checkarray(2*ca.DM.eye(3), df(x, 2*x+1), "sibling jacobian")
       else:
         for count in [1, 2, 8]:
           seeds = ca.reshape(ca.DM(list(range(3*count))), 3, count)
           df = f.forward(count) if kind == "fwd" else f.reverse(count)
           self.assertEqual(df.name(), kind + str(count) + "_renamed")
+          self.assertEqual(df.sparsity_in("out_y"), ca.Sparsity(3, 1))
+          df = ca.Function.deserialize(df.serialize())
+          self.assertEqual(df.sparsity_in("out_y"), ca.Sparsity(3, 1))
           self.checkarray(2*seeds, df(x, 2*x+1, seeds), "sibling sensitivities")
       X = ca.MX.sym("X", 3)
       J = ca.Function("J", [X], [ca.jacobian(f(X), X)])
       self.checkarray(2*ca.DM.eye(3), J(x), "AD using sibling")
+      self.assertNotIn("renamed", [g.name() for g in J.find_functions()])
+
+  def test_sibling_uses_output(self):
+    self.message("explicit nominal outputs retain their sparsity and reach the derivative")
+    vi = lambda name, shape: helper.make_tensor_value_info(name, TensorProto.FLOAT, shape)
+    for kind, seed, result, dim in [("fwd", "fwd_x", "fwd_y", "nfwd"),
+                                   ("adj", "adj_y", "adj_x", "nadj")]:
+      path = self.save_model(helper.make_graph(
+          [helper.make_node("Exp", ["x"], ["y"])], "exp",
+          [vi("x", [3])], [vi("y", [3])]))
+      axes = numpy_helper.from_array(numpy.array([1], numpy.int64), "axes")
+      sibling = self.save_model(helper.make_graph(
+          [helper.make_node("Unsqueeze", ["out_y", "axes"], ["column"]),
+           helper.make_node("Mul", ["column", seed], [result])], kind,
+          [vi("x", [3]), vi("out_y", [3]), vi(seed, [3, dim])],
+          [vi(result, [3, dim])], [axes]))
+      destination = os.path.join(os.path.dirname(path), kind+"_"+os.path.basename(path))
+      os.rename(sibling, destination)
+      self._tmp.append(destination)
+      f = ca.GraphBuilder(path).create("f")
+      df = f.forward(2) if kind == "fwd" else f.reverse(2)
+      self.assertEqual(df.sparsity_in("out_y"), ca.Sparsity.dense(3, 1))
+      df = ca.Function.deserialize(df.serialize())
+      seeds = ca.DM([[1, 2], [3, 4], [5, 6]])
+      y = ca.DM([2, 3, 4])
+      self.checkarray(ca.repmat(y, 1, 2)*seeds, df(ca.DM.zeros(3), y, seeds),
+                      "supplied output is used")
 
   def test_sibling_nonlinear(self):
     self.message("sibling derivatives receive primal inputs for nonlinear sensitivities")
@@ -906,6 +938,30 @@ class GraphBuilderNumericTests(casadiTestCase):
     x = ca.MX.sym("x", 3)
     J = ca.Function("J", [x], [ca.jacobian(f(x), x)])
     self.checkarray(J(ca.DM([0.5, 1.0, -2.0])), 2.0 * ca.DM.eye(3), "fd jacobian", digits=4)
+
+  def test_finite_difference_masks(self):
+    self.message("FD preserves runtime parameters and nondifferentiable outputs")
+    vi = lambda name: helper.make_tensor_value_info(name, TensorProto.DOUBLE, [1])
+    path = self.save_model(helper.make_graph([
+        helper.make_node("Mul", ["x", "x"], ["xx"]),
+        helper.make_node("Mul", ["p", "xx"], ["y"]),
+        helper.make_node("Add", ["x", "p"], ["z"])], "masked_fd",
+        [vi("x"), vi("p")], [vi("y"), vi("z")]))
+    f = ca.GraphBuilder(path).create("f", {"enable_fd": True, "fd_options": {"h": 1e-3},
+        "is_diff_in": [True, False], "is_diff_out": [True, False]})
+    self.assertEqual(f.forward(1).class_name(), "CentralDiff")
+    x = ca.MX.sym("x")
+    p = ca.MX.sym("p")
+    y, z = f(x, p)
+    D = ca.Function("D", [x, p], [y, z,
+        ca.jacobian(ca.vertcat(y, z), ca.vertcat(x, p)), ca.hessian(y, x)[0]])
+    for restored in [D, ca.Function.deserialize(D.serialize())]:
+      for value in [1., 3.]:
+        result = restored(2, value)
+        self.checkarray(result[0], 4*value)
+        self.checkarray(result[1], 2+value)
+        self.checkarray(result[2], ca.DM([[4*value, 0], [0, 0]]), digits=4)
+        self.checkarray(result[3], 2*value, digits=3)
 
   def dyn_model(self):
     # y = x*2, input "x" with a symbolic batch dimension: [batch, 3]

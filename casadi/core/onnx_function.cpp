@@ -396,7 +396,9 @@ namespace casadi {
     std::map<std::string, MX> m;
     std::vector<MX> args(inames.size());
     for (size_t i = 0; i < inames.size(); ++i) {
-      args[i] = MX::sym(inames[i], in_sp[i]);
+      // Omitted inputs must not keep unused primal evaluations alive.
+      Sparsity sp = inputs.count(inames[i]) ? in_sp[i] : Sparsity(in_sp[i].size());
+      args[i] = MX::sym(inames[i], sp);
       m[inames[i]] = args[i];
     }
     std::vector<MX> gin;
