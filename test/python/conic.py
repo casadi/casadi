@@ -191,6 +191,21 @@ class ConicTests(casadiTestCase):
         if aux_options["codegen"]:
           self.check_codegen(solver,solver.convert_in(solver_in),digits=digits,**aux_options["codegen"])
 
+  @requires_conic("mosek")
+  def test_mosek_codegen_option_precision(self):
+    import re
+    options = {"MSK_DPAR_MIO_TOL_ABS_RELAX_INT": 1.234567890123456e-7,
+               "MSK_DPAR_OPTIMIZER_MAX_TIME": 1234567890.1234567}
+    solver = ca.conic("solver", "mosek", {"h": ca.Sparsity.dense(1, 1)},
+                      {"mosek": options})
+    cg = ca.CodeGenerator("mosek_precision.c")
+    cg.add(solver)
+    emitted = dict(re.findall(r'MSK_putnadouparam\(d->task, "([^"]+)", ([^)]+)\)',
+                              cg.dump()))
+    self.assertEqual(set(emitted), set(options))
+    for name, value in options.items():
+      self.assertEqual(float(emitted[name]), value, name)
+
   def test_opti(self):
     for conic, qp_options, aux_options in conics:
       if conic in ["qrqp"]: continue

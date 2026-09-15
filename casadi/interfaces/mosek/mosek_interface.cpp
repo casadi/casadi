@@ -246,7 +246,7 @@ namespace casadi {
     for (auto&& op : opts_) {
       if (op.second.is_double()) {
         g << "MSK_putnadouparam(d->task, " << g.constant(op.first) << ", "
-          << op.second.to_double() << ");\n";
+          << g.constant(op.second.to_double()) << ");\n";
       } else if (op.second.is_int() || op.second.is_bool()) {
         g << "MSK_putnaintparam(d->task, " << g.constant(op.first) << ", "
           << static_cast<int>(op.second.to_int()) << ");\n";
