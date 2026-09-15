@@ -469,16 +469,20 @@ namespace casadi {
     s.version("PiqpInterface", 1);
     s.pack("PiqpInterface::nnzH", nnzH_);
     s.pack("PiqpInterface::nnzA", nnzA_);
-    s.pack("PiqpInterface::settings::rho_init", settings_.rho_init);
-    s.pack("PiqpInterface::settings::delta_init", settings_.delta_init);
-    s.pack("PiqpInterface::settings::eps_abs", settings_.eps_abs);
-    s.pack("PiqpInterface::settings::eps_rel", settings_.eps_rel);
-    s.pack("PiqpInterface::settings::check_duality_gap", settings_.check_duality_gap);
-    s.pack("PiqpInterface::settings::eps_duality_gap_abs", settings_.eps_duality_gap_abs);
-    s.pack("PiqpInterface::settings::eps_duality_gap_rel", settings_.eps_duality_gap_rel);
-    s.pack("PiqpInterface::settings::reg_lower_limit", settings_.reg_lower_limit);
+    s.pack("PiqpInterface::settings::rho_init", static_cast<double>(settings_.rho_init));
+    s.pack("PiqpInterface::settings::delta_init", static_cast<double>(settings_.delta_init));
+    s.pack("PiqpInterface::settings::eps_abs", static_cast<double>(settings_.eps_abs));
+    s.pack("PiqpInterface::settings::eps_rel", static_cast<double>(settings_.eps_rel));
+    s.pack("PiqpInterface::settings::check_duality_gap",
+      static_cast<bool>(settings_.check_duality_gap));
+    s.pack("PiqpInterface::settings::eps_duality_gap_abs",
+      static_cast<double>(settings_.eps_duality_gap_abs));
+    s.pack("PiqpInterface::settings::eps_duality_gap_rel",
+      static_cast<double>(settings_.eps_duality_gap_rel));
+    s.pack("PiqpInterface::settings::reg_lower_limit",
+      static_cast<double>(settings_.reg_lower_limit));
     s.pack("PiqpInterface::settings::reg_finetune_lower_limit",
-      settings_.reg_finetune_lower_limit);
+      static_cast<double>(settings_.reg_finetune_lower_limit));
     tmp = settings_.reg_finetune_primal_update_threshold;
     s.pack("PiqpInterface::settings::reg_finetune_primal_update_threshold", tmp);
     tmp = settings_.reg_finetune_dual_update_threshold;
@@ -488,26 +492,27 @@ namespace casadi {
     tmp = settings_.max_factor_retires;
     s.pack("PiqpInterface::settings::max_factor_retires", tmp);
     s.pack("PiqpInterface::settings::preconditioner_scale_cost",
-      settings_.preconditioner_scale_cost);
+      static_cast<bool>(settings_.preconditioner_scale_cost));
     tmp = settings_.preconditioner_iter;
     s.pack("PiqpInterface::settings::preconditioner_iter", tmp);
-    s.pack("PiqpInterface::settings::tau", settings_.tau);
+    s.pack("PiqpInterface::settings::tau", static_cast<double>(settings_.tau));
     s.pack("PiqpInterface::settings::iterative_refinement_always_enabled",
-      settings_.iterative_refinement_always_enabled);
+      static_cast<bool>(settings_.iterative_refinement_always_enabled));
     s.pack("PiqpInterface::settings::iterative_refinement_eps_abs",
-      settings_.iterative_refinement_eps_abs);
+      static_cast<double>(settings_.iterative_refinement_eps_abs));
     s.pack("PiqpInterface::settings::iterative_refinement_eps_rel",
-      settings_.iterative_refinement_eps_rel);
+      static_cast<double>(settings_.iterative_refinement_eps_rel));
     tmp = settings_.iterative_refinement_max_iter;
     s.pack("PiqpInterface::settings::iterative_refinement_max_iter", tmp);
     s.pack("PiqpInterface::settings::iterative_refinement_min_improvement_rate",
-      settings_.iterative_refinement_min_improvement_rate);
+      static_cast<double>(settings_.iterative_refinement_min_improvement_rate));
     s.pack("PiqpInterface::settings::iterative_refinement_static_regularization_eps",
-      settings_.iterative_refinement_static_regularization_eps);
+      static_cast<double>(settings_.iterative_refinement_static_regularization_eps));
     s.pack("PiqpInterface::settings::iterative_refinement_static_regularization_rel",
-      settings_.iterative_refinement_static_regularization_rel);
-    s.pack("PiqpInterface::settings::verbose", settings_.verbose);
-    s.pack("PiqpInterface::settings::compute_timings", settings_.compute_timings);
+      static_cast<double>(settings_.iterative_refinement_static_regularization_rel));
+    s.pack("PiqpInterface::settings::verbose", static_cast<bool>(settings_.verbose));
+    s.pack("PiqpInterface::settings::compute_timings",
+      static_cast<bool>(settings_.compute_timings));
     s.pack("PiqpInterface::settings::kkt_solver",
       std::string(piqp::kkt_solver_to_string(settings_.kkt_solver)));
   }

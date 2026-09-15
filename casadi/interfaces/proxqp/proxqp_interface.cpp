@@ -461,13 +461,15 @@ namespace casadi {
     s.version("ProxqpInterface", 1);
     s.pack("ProxqpInterface::warm_start_primal", warm_start_primal_);
     s.pack("ProxqpInterface::warm_start_dual", warm_start_dual_);
-    s.pack("ProxqpInterface::settings::default_rho", settings_.default_rho);
-    s.pack("ProxqpInterface::settings::default_mu_eq", settings_.default_mu_eq);
-    s.pack("ProxqpInterface::settings::default_mu_in", settings_.default_mu_in);
-    s.pack("ProxqpInterface::settings::eps_abs", settings_.eps_abs);
-    s.pack("ProxqpInterface::settings::eps_rel", settings_.eps_rel);
+    s.pack("ProxqpInterface::settings::default_rho", static_cast<double>(settings_.default_rho));
+    s.pack("ProxqpInterface::settings::default_mu_eq",
+      static_cast<double>(settings_.default_mu_eq));
+    s.pack("ProxqpInterface::settings::default_mu_in",
+      static_cast<double>(settings_.default_mu_in));
+    s.pack("ProxqpInterface::settings::eps_abs", static_cast<double>(settings_.eps_abs));
+    s.pack("ProxqpInterface::settings::eps_rel", static_cast<double>(settings_.eps_rel));
     s.pack("ProxqpInterface::settings::max_iter", static_cast<double>(settings_.max_iter));
-    s.pack("ProxqpInterface::settings::verbose", settings_.verbose);
+    s.pack("ProxqpInterface::settings::verbose", static_cast<bool>(settings_.verbose));
     s.pack("ProxqpInterface::settings::sparse_backend", sparse_backend);
   }
 

@@ -661,33 +661,40 @@ namespace casadi {
     s.pack("OsqpInterface::nnzA", nnzA_);
     s.pack("OsqpInterface::warm_start_primal", warm_start_primal_);
     s.pack("OsqpInterface::warm_start_dual", warm_start_dual_);
-    s.pack("OsqpInterface::settings::rho", settings_.rho);
-    s.pack("OsqpInterface::settings::sigma", settings_.sigma);
-    s.pack("OsqpInterface::settings::scaling", settings_.scaling);
-    s.pack("OsqpInterface::settings::adaptive_rho", settings_.adaptive_rho);
-    s.pack("OsqpInterface::settings::adaptive_rho_interval", settings_.adaptive_rho_interval);
-    s.pack("OsqpInterface::settings::adaptive_rho_tolerance", settings_.adaptive_rho_tolerance);
+    s.pack("OsqpInterface::settings::rho", static_cast<double>(settings_.rho));
+    s.pack("OsqpInterface::settings::sigma", static_cast<double>(settings_.sigma));
+    s.pack("OsqpInterface::settings::scaling", static_cast<casadi_int>(settings_.scaling));
+    s.pack("OsqpInterface::settings::adaptive_rho",
+      static_cast<casadi_int>(settings_.adaptive_rho));
+    s.pack("OsqpInterface::settings::adaptive_rho_interval",
+      static_cast<casadi_int>(settings_.adaptive_rho_interval));
+    s.pack("OsqpInterface::settings::adaptive_rho_tolerance",
+      static_cast<double>(settings_.adaptive_rho_tolerance));
     //s.pack("OsqpInterface::settings::adaptive_rho_fraction", settings_.adaptive_rho_fraction);
-    s.pack("OsqpInterface::settings::max_iter", settings_.max_iter);
-    s.pack("OsqpInterface::settings::eps_abs", settings_.eps_abs);
-    s.pack("OsqpInterface::settings::eps_rel", settings_.eps_rel);
-    s.pack("OsqpInterface::settings::eps_prim_inf", settings_.eps_prim_inf);
-    s.pack("OsqpInterface::settings::eps_dual_inf", settings_.eps_dual_inf);
-    s.pack("OsqpInterface::settings::alpha", settings_.alpha);
-    s.pack("OsqpInterface::settings::delta", settings_.delta);
+    s.pack("OsqpInterface::settings::max_iter", static_cast<casadi_int>(settings_.max_iter));
+    s.pack("OsqpInterface::settings::eps_abs", static_cast<double>(settings_.eps_abs));
+    s.pack("OsqpInterface::settings::eps_rel", static_cast<double>(settings_.eps_rel));
+    s.pack("OsqpInterface::settings::eps_prim_inf", static_cast<double>(settings_.eps_prim_inf));
+    s.pack("OsqpInterface::settings::eps_dual_inf", static_cast<double>(settings_.eps_dual_inf));
+    s.pack("OsqpInterface::settings::alpha", static_cast<double>(settings_.alpha));
+    s.pack("OsqpInterface::settings::delta", static_cast<double>(settings_.delta));
 #ifdef WITH_OSQP_V1
-    s.pack("OsqpInterface::settings::polish", settings_.polishing);
+    s.pack("OsqpInterface::settings::polish", static_cast<casadi_int>(settings_.polishing));
 #else
-    s.pack("OsqpInterface::settings::polish", settings_.polish);
+    s.pack("OsqpInterface::settings::polish", static_cast<casadi_int>(settings_.polish));
 #endif
-    s.pack("OsqpInterface::settings::polish_refine_iter", settings_.polish_refine_iter);
-    s.pack("OsqpInterface::settings::verbose", settings_.verbose);
-    s.pack("OsqpInterface::settings::scaled_termination", settings_.scaled_termination);
-    s.pack("OsqpInterface::settings::check_termination", settings_.check_termination);
+    s.pack("OsqpInterface::settings::polish_refine_iter",
+      static_cast<casadi_int>(settings_.polish_refine_iter));
+    s.pack("OsqpInterface::settings::verbose", static_cast<casadi_int>(settings_.verbose));
+    s.pack("OsqpInterface::settings::scaled_termination",
+      static_cast<casadi_int>(settings_.scaled_termination));
+    s.pack("OsqpInterface::settings::check_termination",
+      static_cast<casadi_int>(settings_.check_termination));
 #ifdef WITH_OSQP_V1
-    s.pack("OsqpInterface::settings::warm_start", settings_.warm_starting);
+    s.pack("OsqpInterface::settings::warm_start",
+      static_cast<casadi_int>(settings_.warm_starting));
 #else
-    s.pack("OsqpInterface::settings::warm_start", settings_.warm_start);
+    s.pack("OsqpInterface::settings::warm_start", static_cast<casadi_int>(settings_.warm_start));
 #endif
     s.pack("OsqpInterface::rho_initial", rho_initial_);
     //s.pack("OsqpInterface::settings::time_limit", settings_.time_limit);

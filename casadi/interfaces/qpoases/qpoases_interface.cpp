@@ -1038,30 +1038,34 @@ namespace casadi {
     s.pack("QpoasesInterface::ops::enableFullLITests",
       from_BooleanType(ops_.enableFullLITests));
     s.pack("QpoasesInterface::ops::enableNZCTests", from_BooleanType(ops_.enableNZCTests));
-    s.pack("QpoasesInterface::ops::enableDriftCorrection", ops_.enableDriftCorrection);
+    s.pack("QpoasesInterface::ops::enableDriftCorrection",
+      static_cast<int>(ops_.enableDriftCorrection));
     s.pack("QpoasesInterface::ops::enableCholeskyRefactorisation",
-      ops_.enableCholeskyRefactorisation);
+      static_cast<int>(ops_.enableCholeskyRefactorisation));
     s.pack("QpoasesInterface::ops::enableEqualities", from_BooleanType(ops_.enableEqualities));
-    s.pack("QpoasesInterface::ops::terminationTolerance", ops_.terminationTolerance);
-    s.pack("QpoasesInterface::ops::boundTolerance", ops_.boundTolerance);
-    s.pack("QpoasesInterface::ops::boundRelaxation", ops_.boundRelaxation);
-    s.pack("QpoasesInterface::ops::epsNum", ops_.epsNum);
-    s.pack("QpoasesInterface::ops::epsDen", ops_.epsDen);
-    s.pack("QpoasesInterface::ops::maxPrimalJump", ops_.maxPrimalJump);
-    s.pack("QpoasesInterface::ops::maxDualJump", ops_.maxDualJump);
-    s.pack("QpoasesInterface::ops::initialRamping", ops_.initialRamping);
-    s.pack("QpoasesInterface::ops::finalRamping", ops_.finalRamping);
-    s.pack("QpoasesInterface::ops::initialFarBounds", ops_.initialFarBounds);
-    s.pack("QpoasesInterface::ops::growFarBounds", ops_.growFarBounds);
+    s.pack("QpoasesInterface::ops::terminationTolerance",
+      static_cast<double>(ops_.terminationTolerance));
+    s.pack("QpoasesInterface::ops::boundTolerance", static_cast<double>(ops_.boundTolerance));
+    s.pack("QpoasesInterface::ops::boundRelaxation", static_cast<double>(ops_.boundRelaxation));
+    s.pack("QpoasesInterface::ops::epsNum", static_cast<double>(ops_.epsNum));
+    s.pack("QpoasesInterface::ops::epsDen", static_cast<double>(ops_.epsDen));
+    s.pack("QpoasesInterface::ops::maxPrimalJump", static_cast<double>(ops_.maxPrimalJump));
+    s.pack("QpoasesInterface::ops::maxDualJump", static_cast<double>(ops_.maxDualJump));
+    s.pack("QpoasesInterface::ops::initialRamping", static_cast<double>(ops_.initialRamping));
+    s.pack("QpoasesInterface::ops::finalRamping", static_cast<double>(ops_.finalRamping));
+    s.pack("QpoasesInterface::ops::initialFarBounds", static_cast<double>(ops_.initialFarBounds));
+    s.pack("QpoasesInterface::ops::growFarBounds", static_cast<double>(ops_.growFarBounds));
     s.pack("QpoasesInterface::ops::initialStatusBounds",
       from_SubjectToStatus(ops_.initialStatusBounds));
-    s.pack("QpoasesInterface::ops::epsFlipping", ops_.epsFlipping);
-    s.pack("QpoasesInterface::ops::numRegularisationSteps", ops_.numRegularisationSteps);
-    s.pack("QpoasesInterface::ops::epsRegularisation", ops_.epsRegularisation);
-    s.pack("QpoasesInterface::ops::numRefinementSteps", ops_.numRefinementSteps);
-    s.pack("QpoasesInterface::ops::epsIterRef", ops_.epsIterRef);
-    s.pack("QpoasesInterface::ops::epsLITests", ops_.epsLITests);
-    s.pack("QpoasesInterface::ops::epsNZCTests", ops_.epsNZCTests);
+    s.pack("QpoasesInterface::ops::epsFlipping", static_cast<double>(ops_.epsFlipping));
+    s.pack("QpoasesInterface::ops::numRegularisationSteps",
+      static_cast<int>(ops_.numRegularisationSteps));
+    s.pack("QpoasesInterface::ops::epsRegularisation",
+      static_cast<double>(ops_.epsRegularisation));
+    s.pack("QpoasesInterface::ops::numRefinementSteps", static_cast<int>(ops_.numRefinementSteps));
+    s.pack("QpoasesInterface::ops::epsIterRef", static_cast<double>(ops_.epsIterRef));
+    s.pack("QpoasesInterface::ops::epsLITests", static_cast<double>(ops_.epsLITests));
+    s.pack("QpoasesInterface::ops::epsNZCTests", static_cast<double>(ops_.epsNZCTests));
     s.pack("QpoasesInterface::ops::enableInertiaCorrection",
       from_BooleanType(ops_.enableInertiaCorrection));
 

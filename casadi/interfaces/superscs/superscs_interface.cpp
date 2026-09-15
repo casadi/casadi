@@ -544,34 +544,41 @@ namespace casadi {
   void SuperscsInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
     s.version("SuperscsInterface", 1);
-    s.pack("SuperscsInterface::settings::normalize", settings_.normalize);
-    s.pack("SuperscsInterface::settings::scale", settings_.scale);
-    s.pack("SuperscsInterface::settings::rho_x", settings_.rho_x);
-    s.pack("SuperscsInterface::settings::max_time_milliseconds", settings_.max_time_milliseconds);
-    s.pack("SuperscsInterface::settings::max_iters", settings_.max_iters);
-    s.pack("SuperscsInterface::settings::previous_max_iters", settings_.previous_max_iters);
-    s.pack("SuperscsInterface::settings::eps", settings_.eps);
-    s.pack("SuperscsInterface::settings::alpha", settings_.alpha);
-    s.pack("SuperscsInterface::settings::cg_rate", settings_.cg_rate);
-    s.pack("SuperscsInterface::settings::verbose", settings_.verbose);
-    s.pack("SuperscsInterface::settings::warm_start", settings_.warm_start);
-    s.pack("SuperscsInterface::settings::do_super_scs", settings_.do_super_scs);
-    s.pack("SuperscsInterface::settings::k0", settings_.k0);
-    s.pack("SuperscsInterface::settings::c_bl", settings_.c_bl);
-    s.pack("SuperscsInterface::settings::k1", settings_.k1);
-    s.pack("SuperscsInterface::settings::k2", settings_.k2);
-    s.pack("SuperscsInterface::settings::c1", settings_.c1);
-    s.pack("SuperscsInterface::settings::sse", settings_.sse);
-    s.pack("SuperscsInterface::settings::ls", settings_.ls);
-    s.pack("SuperscsInterface::settings::beta", settings_.beta);
-    s.pack("SuperscsInterface::settings::sigma", settings_.sigma);
+    s.pack("SuperscsInterface::settings::normalize", static_cast<casadi_int>(settings_.normalize));
+    s.pack("SuperscsInterface::settings::scale", static_cast<double>(settings_.scale));
+    s.pack("SuperscsInterface::settings::rho_x", static_cast<double>(settings_.rho_x));
+    s.pack("SuperscsInterface::settings::max_time_milliseconds",
+      static_cast<double>(settings_.max_time_milliseconds));
+    s.pack("SuperscsInterface::settings::max_iters", static_cast<casadi_int>(settings_.max_iters));
+    s.pack("SuperscsInterface::settings::previous_max_iters",
+      static_cast<casadi_int>(settings_.previous_max_iters));
+    s.pack("SuperscsInterface::settings::eps", static_cast<double>(settings_.eps));
+    s.pack("SuperscsInterface::settings::alpha", static_cast<double>(settings_.alpha));
+    s.pack("SuperscsInterface::settings::cg_rate", static_cast<double>(settings_.cg_rate));
+    s.pack("SuperscsInterface::settings::verbose", static_cast<casadi_int>(settings_.verbose));
+    s.pack("SuperscsInterface::settings::warm_start",
+      static_cast<casadi_int>(settings_.warm_start));
+    s.pack("SuperscsInterface::settings::do_super_scs",
+      static_cast<casadi_int>(settings_.do_super_scs));
+    s.pack("SuperscsInterface::settings::k0", static_cast<casadi_int>(settings_.k0));
+    s.pack("SuperscsInterface::settings::c_bl", static_cast<double>(settings_.c_bl));
+    s.pack("SuperscsInterface::settings::k1", static_cast<casadi_int>(settings_.k1));
+    s.pack("SuperscsInterface::settings::k2", static_cast<casadi_int>(settings_.k2));
+    s.pack("SuperscsInterface::settings::c1", static_cast<double>(settings_.c1));
+    s.pack("SuperscsInterface::settings::sse", static_cast<double>(settings_.sse));
+    s.pack("SuperscsInterface::settings::ls", static_cast<casadi_int>(settings_.ls));
+    s.pack("SuperscsInterface::settings::beta", static_cast<double>(settings_.beta));
+    s.pack("SuperscsInterface::settings::sigma", static_cast<double>(settings_.sigma));
     s.pack("SuperscsInterface::settings::direction", static_cast<casadi_int>(settings_.direction));
-    s.pack("SuperscsInterface::settings::thetabar", settings_.thetabar);
-    s.pack("SuperscsInterface::settings::memory", settings_.memory);
-    s.pack("SuperscsInterface::settings::tRule", settings_.tRule);
-    s.pack("SuperscsInterface::settings::broyden_init_scaling", settings_.broyden_init_scaling);
-    s.pack("SuperscsInterface::settings::do_record_progress", settings_.do_record_progress);
-    s.pack("SuperscsInterface::settings::do_override_streams", settings_.do_override_streams);
+    s.pack("SuperscsInterface::settings::thetabar", static_cast<double>(settings_.thetabar));
+    s.pack("SuperscsInterface::settings::memory", static_cast<casadi_int>(settings_.memory));
+    s.pack("SuperscsInterface::settings::tRule", static_cast<casadi_int>(settings_.tRule));
+    s.pack("SuperscsInterface::settings::broyden_init_scaling",
+      static_cast<casadi_int>(settings_.broyden_init_scaling));
+    s.pack("SuperscsInterface::settings::do_record_progress",
+      static_cast<casadi_int>(settings_.do_record_progress));
+    s.pack("SuperscsInterface::settings::do_override_streams",
+      static_cast<casadi_int>(settings_.do_override_streams));
     s.pack("SuperscsInterface::Hp", Hp_);
     s.pack("SuperscsInterface::HL_sp", HL_sp_);
     s.pack("SuperscsInterface::f", F_);
