@@ -27,7 +27,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -115,7 +115,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -202,7 +202,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -299,7 +299,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -378,7 +378,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -456,7 +456,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -518,7 +518,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -600,7 +600,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -807,7 +807,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -947,7 +947,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1078,7 +1078,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1169,7 +1169,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1248,7 +1248,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1348,7 +1348,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1419,7 +1419,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1481,7 +1481,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1552,7 +1552,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1615,7 +1615,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1712,7 +1712,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1792,7 +1792,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1853,7 +1853,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -1927,7 +1927,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2019,7 +2019,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2100,7 +2100,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2193,7 +2193,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2268,7 +2268,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2410,7 +2410,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2514,7 +2514,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2585,7 +2585,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2646,7 +2646,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2707,7 +2707,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2768,7 +2768,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2826,7 +2826,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2887,7 +2887,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -2970,7 +2970,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3040,7 +3040,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3121,7 +3121,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3202,7 +3202,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3315,7 +3315,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3411,7 +3411,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3584,7 +3584,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3695,7 +3695,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3763,7 +3763,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3843,7 +3843,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -3925,7 +3925,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4008,7 +4008,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4063,7 +4063,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4132,7 +4132,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4213,7 +4213,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4280,7 +4280,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4351,7 +4351,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4414,7 +4414,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4495,7 +4495,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4563,7 +4563,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4656,7 +4656,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4735,7 +4735,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4883,7 +4883,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -4986,7 +4986,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5066,7 +5066,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5146,7 +5146,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5227,7 +5227,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5318,7 +5318,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5398,7 +5398,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5477,7 +5477,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5537,7 +5537,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5614,7 +5614,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5745,7 +5745,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5835,7 +5835,7 @@
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dual_inf_tol</td><td>OT_DOUBLE</td><td>Dual feasibility violation tolerance [1e-8]</td><td>casadi::Ipqp</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5922,7 +5922,7 @@
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dual_inf_tol</td><td>OT_DOUBLE</td><td>Dual feasibility violation tolerance [1e-8]</td><td>casadi::Ipqp</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -5990,7 +5990,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6054,7 +6054,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable KINSOL internal warning messages</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6161,7 +6161,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable KINSOL internal warning messages</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6256,7 +6256,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6361,7 +6361,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6439,7 +6439,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6508,7 +6508,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6566,7 +6566,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6633,7 +6633,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6692,7 +6692,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6761,7 +6761,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -6898,10 +6898,11 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_trace</td><td>OT_BOOL</td><td>Dump interpreted instruction values to name.NNNNNN.trace.jsonl in dump_dir, using the dump_in/dump_out counter. [false]</td><td>casadi::MXFunction</td></tr>
 <tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
@@ -6975,7 +6976,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7082,7 +7083,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7172,7 +7173,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7273,7 +7274,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7350,7 +7351,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7421,7 +7422,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7528,7 +7529,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7615,7 +7616,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7697,7 +7698,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7784,7 +7785,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7890,7 +7891,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dim_bindings</td><td>OT_DICT</td><td>Sizes for symbolic/dynamic tensor dimensions (name -&gt; size)</td><td>casadi::OnnxFunction</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -7953,7 +7954,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dim_bindings</td><td>OT_DICT</td><td>Sizes for symbolic/dynamic tensor dimensions (name -&gt; size)</td><td>casadi::OnnxFunction</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8016,7 +8017,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dim_bindings</td><td>OT_DICT</td><td>Sizes for symbolic/dynamic tensor dimensions (name -&gt; size)</td><td>casadi::OnnxFunction</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8088,7 +8089,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dim_bindings</td><td>OT_DICT</td><td>Sizes for symbolic/dynamic tensor dimensions (name -&gt; size)</td><td>casadi::OnnxFunction</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8151,7 +8152,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8226,7 +8227,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8289,7 +8290,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8353,7 +8354,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8428,7 +8429,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8492,7 +8493,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8563,7 +8564,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8640,7 +8641,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8715,7 +8716,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8779,7 +8780,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8852,7 +8853,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -8918,7 +8919,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9061,7 +9062,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9158,7 +9159,7 @@
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dual_inf_tol</td><td>OT_DOUBLE</td><td>Dual feasibility violation tolerance [1e-8]</td><td>casadi::Qrqp</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9243,7 +9244,7 @@
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dual_inf_tol</td><td>OT_DOUBLE</td><td>Dual feasibility violation tolerance [1e-8]</td><td>casadi::Qrqp</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9323,7 +9324,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9450,7 +9451,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9541,7 +9542,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9610,7 +9611,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9689,7 +9690,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9780,7 +9781,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -9863,10 +9864,11 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_trace</td><td>OT_BOOL</td><td>Dump interpreted instruction values to name.NNNNNN.trace.jsonl in dump_dir, using the dump_in/dump_out counter. [false]</td><td>casadi::SXFunction</td></tr>
 <tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
@@ -9940,7 +9942,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -10075,7 +10077,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -10244,7 +10246,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -10319,7 +10321,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -10394,7 +10396,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -10493,7 +10495,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -10586,7 +10588,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -10735,7 +10737,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -10837,7 +10839,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -10939,7 +10941,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11038,7 +11040,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11109,7 +11111,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11170,7 +11172,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11237,7 +11239,7 @@
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11307,7 +11309,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11404,7 +11406,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11492,7 +11494,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11589,7 +11591,7 @@
 <tr><td>detect_simple_bounds_target_x</td><td>OT_INTVECTOR</td><td>For internal use only.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11667,7 +11669,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
@@ -11750,7 +11752,7 @@
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump</td><td>OT_BOOL</td><td>Dump function to file upon first evaluation. [false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>dump_dir</td><td>OT_STRING</td><td>Directory to dump inputs/outputs and traces to. Make sure the directory exists [.]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_format</td><td>OT_STRING</td><td>Choose file format to dump matrices. See DM.from_file [mtx]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_in</td><td>OT_BOOL</td><td>Dump numerical values of inputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_out</td><td>OT_BOOL</td><td>Dump numerical values of outputs to file (readable with DM.from_file) [default: false] A counter is used to generate unique names. The counter may be reset using reset_dump_count.</td><td>casadi::FunctionInternal</td></tr>

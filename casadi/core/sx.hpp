@@ -272,8 +272,10 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
 
 #ifndef SWIG
   /** \brief Export expressions as .html, .dot, or .casadi_viz, defaulting to expression view.
+
    * Options are forwarded to Function::export_graph.
-   */
+
+      \identifier{2k5} */
   ///@{
   /// Without a filename, return the .casadi_viz JSON bundle.
   CASADI_EXPORT std::string export_graph(const SX& expression, const Dict& opts=Dict());

@@ -973,12 +973,15 @@ namespace casadi {
      * global bundle to embed; by default uses the viewer package renderer).
      * viewer_url (string) overrides the HTML viewer ESM module URL; default is
      * https://unpkg.com/@casadi/casadi-viz@MAJOR.MINOR/dist/index.js for this CasADi version.
-     */
+
+        \identifier{2k3} */
     void export_graph(const std::string& fname, const Dict& opts=Dict()) const;
 
     /** \brief Return the .casadi_viz JSON bundle without writing a file.
+
      * Uses the same graph options as the filename overload.
-     */
+
+        \identifier{2k4} */
     std::string export_graph(const Dict& opts=Dict()) const;
 
     /** \brief Save Function to a file

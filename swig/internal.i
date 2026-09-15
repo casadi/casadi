@@ -1351,6 +1351,12 @@
 %exception  casadi::Function::export_code(const std::string &lang, std::ostream &stream, const Dict &options=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::export_graph(const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::export_graph(const std::string &fname, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::factory(const std::string &name, const std::vector< std::string > &s_in, const std::vector< std::string > &s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5876,6 +5882,30 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::expmsol(const std::string &name, const std::string &solver, const Sparsity &A, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::export_graph(const MX &expression, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::export_graph(const MX &expression, const std::string &fname, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::export_graph(const SX &expression, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::export_graph(const SX &expression, const std::string &fname, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::export_graph(const std::vector< MX > &expressions, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::export_graph(const std::vector< MX > &expressions, const std::string &fname, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::export_graph(const std::vector< SX > &expressions, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::export_graph(const std::vector< SX > &expressions, const std::string &fname, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::external(const std::string &name, const Dict &opts=Dict()) {
