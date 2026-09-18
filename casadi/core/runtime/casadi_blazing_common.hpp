@@ -249,8 +249,8 @@ void casadi_blazing_de_boor(T1 x, const T1* knots, const T1* inv1, const T1* inv
 //                    boor_H = blazing_boor_der(shift_left(inner), s1)
 //   where s2[j] = 2/(t[j+start+3]-t[j+start+1])
 template<typename T1>
-simde__m256d casadi_blazing_boor_der(simde__m256d boor, simde__m256d scale) {
-    simde__m256d sb = simde_mm256_mul_pd(boor, scale);
+simde__m256d casadi_blazing_boor_der(const simde__m256d* boor, const simde__m256d* scale) {
+    simde__m256d sb = simde_mm256_mul_pd(*boor, *scale);
     simde__m256d shifted = simde_mm256_permute4x64_pd(sb, SIMDE_MM_SHUFFLE(2, 1, 0, 0));
     shifted = simde_mm256_blend_pd(simde_mm256_setzero_pd(), shifted, 0xE);
     return simde_mm256_sub_pd(shifted, sb);
@@ -260,8 +260,8 @@ simde__m256d casadi_blazing_boor_der(simde__m256d boor, simde__m256d scale) {
 // Shift AVX vector one position to the left, filling position 3 with zero.
 // [a, b, c, d] -> [b, c, d, 0]
 template<typename T1>
-simde__m256d casadi_blazing_shift_left(simde__m256d v) {
-    simde__m256d shifted = simde_mm256_permute4x64_pd(v, SIMDE_MM_SHUFFLE(3, 3, 2, 1));
+simde__m256d casadi_blazing_shift_left(const simde__m256d* v) {
+    simde__m256d shifted = simde_mm256_permute4x64_pd(*v, SIMDE_MM_SHUFFLE(3, 3, 2, 1));
     return simde_mm256_blend_pd(shifted, simde_mm256_setzero_pd(), 0x8);
 }
 
@@ -270,11 +270,11 @@ simde__m256d casadi_blazing_shift_left(simde__m256d v) {
 // This avoids NaN from 0/0 at knot boundaries where both the basis function and
 // the knot span are zero.
 template<typename T1>
-simde__m256d casadi_blazing_knot_scale(simde__m256d degree, simde__m256d t_hi, simde__m256d t_lo) {
+simde__m256d casadi_blazing_knot_scale(const simde__m256d* degree, const simde__m256d* t_hi, const simde__m256d* t_lo) {// NOLINT(whitespace/line_length)
     simde__m256d zero = simde_mm256_setzero_pd();
-    simde__m256d denom = simde_mm256_sub_pd(t_hi, t_lo);
+    simde__m256d denom = simde_mm256_sub_pd(*t_hi, *t_lo);
     simde__m256d denom_mask = simde_mm256_cmp_pd(denom, zero, SIMDE_CMP_EQ_OQ);
-    simde__m256d scale = simde_mm256_div_pd(degree, denom);
+    simde__m256d scale = simde_mm256_div_pd(*degree, denom);
     return simde_mm256_blendv_pd(scale, zero, denom_mask);
 }
 
@@ -347,17 +347,18 @@ casadi_int casadi_blazing_boor_init(
 // t points to knots at starts[i] for this dimension.
 // inv3 can be 0 (NULL) to use the division path; otherwise 1/(t[k+3]-t[k]).
 template<typename T1>
-simde__m256d casadi_blazing_dbasis(simde__m256d boor_d1, const T1* t, const T1* inv3) {
+simde__m256d casadi_blazing_dbasis(const simde__m256d* boor_d1, const T1* t, const T1* inv3) {
     simde__m256d three = simde_mm256_set1_pd(3.0);
-    simde__m256d s1;
+    simde__m256d s1, t_hi, t_lo, shifted;
     if (inv3) {
       s1 = simde_mm256_mul_pd(three, simde_mm256_loadu_pd(inv3));
     } else {
-      s1 = casadi_blazing_knot_scale<T1>(three,
-          simde_mm256_loadu_pd(t + 4), simde_mm256_loadu_pd(t + 1));
+      t_hi = simde_mm256_loadu_pd(t + 4);
+      t_lo = simde_mm256_loadu_pd(t + 1);
+      s1 = casadi_blazing_knot_scale<T1>(&three, &t_hi, &t_lo);
     }
-    return casadi_blazing_boor_der<T1>(
-        casadi_blazing_shift_left<T1>(boor_d1), s1);
+    shifted = casadi_blazing_shift_left<T1>(boor_d1);
+    return casadi_blazing_boor_der<T1>(&shifted, &s1);
 }
 
 // SYMBOL "blazing_d2basis"
@@ -366,23 +367,24 @@ simde__m256d casadi_blazing_dbasis(simde__m256d boor_d1, const T1* t, const T1* 
 // inv2, inv3 can be 0 (NULL) to use the division path;
 // otherwise 1/(t[k+2]-t[k]) and 1/(t[k+3]-t[k]).
 template<typename T1>
-simde__m256d casadi_blazing_d2basis(simde__m256d boor_d2, const T1* t, const T1* inv2, const T1* inv3) {// NOLINT(whitespace/line_length)
+simde__m256d casadi_blazing_d2basis(const simde__m256d* boor_d2, const T1* t, const T1* inv2, const T1* inv3) {// NOLINT(whitespace/line_length)
     simde__m256d three = simde_mm256_set1_pd(3.0);
     simde__m256d two = simde_mm256_set1_pd(2.0);
-    simde__m256d s1, s2;
+    simde__m256d s1, s2, t_hi, t_lo, shifted, inner;
     if (inv3) {
       s1 = simde_mm256_mul_pd(three, simde_mm256_loadu_pd(inv3));
       s2 = simde_mm256_mul_pd(two, simde_mm256_loadu_pd(inv2));
     } else {
-      s1 = casadi_blazing_knot_scale<T1>(three,
-          simde_mm256_loadu_pd(t + 4), simde_mm256_loadu_pd(t + 1));
-      s2 = casadi_blazing_knot_scale<T1>(two,
-          simde_mm256_loadu_pd(t + 3), simde_mm256_loadu_pd(t + 1));
+      t_lo = simde_mm256_loadu_pd(t + 1);
+      t_hi = simde_mm256_loadu_pd(t + 4);
+      s1 = casadi_blazing_knot_scale<T1>(&three, &t_hi, &t_lo);
+      t_hi = simde_mm256_loadu_pd(t + 3);
+      s2 = casadi_blazing_knot_scale<T1>(&two, &t_hi, &t_lo);
     }
-    simde__m256d inner = casadi_blazing_boor_der<T1>(
-        casadi_blazing_shift_left<T1>(boor_d2), s2);
-    return casadi_blazing_boor_der<T1>(
-        casadi_blazing_shift_left<T1>(inner), s1);
+    shifted = casadi_blazing_shift_left<T1>(boor_d2);
+    inner = casadi_blazing_boor_der<T1>(&shifted, &s2);
+    shifted = casadi_blazing_shift_left<T1>(&inner);
+    return casadi_blazing_boor_der<T1>(&shifted, &s1);
 }
 
 // ===== Tensor-times-vector contractions =====
@@ -390,9 +392,9 @@ simde__m256d casadi_blazing_d2basis(simde__m256d boor_d2, const T1* t, const T1*
 // AVX2 horizontal sum: reduce 4-wide __m256d to scalar double
 // SYMBOL "blazing_hsum"
 template<typename T1>
-T1 casadi_blazing_hsum(simde__m256d r) {
-  simde__m128d r0 = simde_mm256_castpd256_pd128(r);
-  simde__m128d r1 = simde_mm256_extractf128_pd(r, 1);
+T1 casadi_blazing_hsum(const simde__m256d* r) {
+  simde__m128d r0 = simde_mm256_castpd256_pd128(*r);
+  simde__m128d r1 = simde_mm256_extractf128_pd(*r, 1);
   r0 = simde_mm_add_pd(r0, r1);
   return simde_mm_cvtsd_f64(simde_mm_add_sd(r0, simde_mm_unpackhi_pd(r0, r0)));
 }
@@ -407,24 +409,24 @@ T1 casadi_blazing_hsum(simde__m256d r) {
 // SYMBOL "blazing_tensor_ttv2"
 template<typename T1>
 T1 casadi_blazing_tensor_ttv2(const simde__m256d C[4],
-    simde__m256d a, simde__m256d b) {
+    const simde__m256d* a, const simde__m256d* b) {
   simde__m256d r;
   // Broadcast dim 1 weights and form outer product with dim 0
-  simde__m256d ab0 = simde_mm256_mul_pd(a,
-      simde_mm256_permute4x64_pd(b, SIMDE_MM_SHUFFLE(0, 0, 0, 0)));
-  simde__m256d ab1 = simde_mm256_mul_pd(a,
-      simde_mm256_permute4x64_pd(b, SIMDE_MM_SHUFFLE(1, 1, 1, 1)));
-  simde__m256d ab2 = simde_mm256_mul_pd(a,
-      simde_mm256_permute4x64_pd(b, SIMDE_MM_SHUFFLE(2, 2, 2, 2)));
-  simde__m256d ab3 = simde_mm256_mul_pd(a,
-      simde_mm256_permute4x64_pd(b, SIMDE_MM_SHUFFLE(3, 3, 3, 3)));
+  simde__m256d ab0 = simde_mm256_mul_pd(*a,
+      simde_mm256_permute4x64_pd(*b, SIMDE_MM_SHUFFLE(0, 0, 0, 0)));
+  simde__m256d ab1 = simde_mm256_mul_pd(*a,
+      simde_mm256_permute4x64_pd(*b, SIMDE_MM_SHUFFLE(1, 1, 1, 1)));
+  simde__m256d ab2 = simde_mm256_mul_pd(*a,
+      simde_mm256_permute4x64_pd(*b, SIMDE_MM_SHUFFLE(2, 2, 2, 2)));
+  simde__m256d ab3 = simde_mm256_mul_pd(*a,
+      simde_mm256_permute4x64_pd(*b, SIMDE_MM_SHUFFLE(3, 3, 3, 3)));
   // Contract dim 1: r = sum_j ab[j] * C[j]
   r = simde_mm256_mul_pd(ab0, C[0]);
   r = simde_mm256_fmadd_pd(ab1, C[1], r);
   r = simde_mm256_fmadd_pd(ab2, C[2], r);
   r = simde_mm256_fmadd_pd(ab3, C[3], r);
   // Horizontal sum contracts dim 0
-  return casadi_blazing_hsum<T1>(r);
+  return casadi_blazing_hsum<T1>(&r);
 }
 
 // AVX2 tensor-times-vector for 3D cubic B-splines (degree 3, m=1).
@@ -437,18 +439,18 @@ T1 casadi_blazing_tensor_ttv2(const simde__m256d C[4],
 // SYMBOL "blazing_tensor_ttv3"
 template<typename T1>
 T1 casadi_blazing_tensor_ttv3(const simde__m256d C[16],
-    simde__m256d a, simde__m256d b, simde__m256d c) {
+    const simde__m256d* a, const simde__m256d* b, const simde__m256d* c) {
   simde__m256d ab[4], cab[4], r;
   int i;
   // Broadcast dim 1 weights and form outer product with dim 0
-  simde__m256d b0 = simde_mm256_permute4x64_pd(b, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
-  simde__m256d b1 = simde_mm256_permute4x64_pd(b, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
-  simde__m256d b2 = simde_mm256_permute4x64_pd(b, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
-  simde__m256d b3 = simde_mm256_permute4x64_pd(b, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
-  ab[0] = simde_mm256_mul_pd(a, b0);
-  ab[1] = simde_mm256_mul_pd(a, b1);
-  ab[2] = simde_mm256_mul_pd(a, b2);
-  ab[3] = simde_mm256_mul_pd(a, b3);
+  simde__m256d b0 = simde_mm256_permute4x64_pd(*b, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+  simde__m256d b1 = simde_mm256_permute4x64_pd(*b, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+  simde__m256d b2 = simde_mm256_permute4x64_pd(*b, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+  simde__m256d b3 = simde_mm256_permute4x64_pd(*b, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+  ab[0] = simde_mm256_mul_pd(*a, b0);
+  ab[1] = simde_mm256_mul_pd(*a, b1);
+  ab[2] = simde_mm256_mul_pd(*a, b2);
+  ab[3] = simde_mm256_mul_pd(*a, b3);
   // Contract dim 1: cab[k] = sum_j ab[j] * C[j + 4*k]
   for (i = 0; i < 4; ++i) {
     cab[i] = simde_mm256_mul_pd(ab[0], C[4*i+0]);
@@ -458,15 +460,15 @@ T1 casadi_blazing_tensor_ttv3(const simde__m256d C[16],
   }
   // Broadcast dim 2 weights and contract: r = sum_k cab[k] * c_k
   r = simde_mm256_mul_pd(cab[0],
-      simde_mm256_permute4x64_pd(c, SIMDE_MM_SHUFFLE(0, 0, 0, 0)));
+      simde_mm256_permute4x64_pd(*c, SIMDE_MM_SHUFFLE(0, 0, 0, 0)));
   r = simde_mm256_fmadd_pd(cab[1],
-      simde_mm256_permute4x64_pd(c, SIMDE_MM_SHUFFLE(1, 1, 1, 1)), r);
+      simde_mm256_permute4x64_pd(*c, SIMDE_MM_SHUFFLE(1, 1, 1, 1)), r);
   r = simde_mm256_fmadd_pd(cab[2],
-      simde_mm256_permute4x64_pd(c, SIMDE_MM_SHUFFLE(2, 2, 2, 2)), r);
+      simde_mm256_permute4x64_pd(*c, SIMDE_MM_SHUFFLE(2, 2, 2, 2)), r);
   r = simde_mm256_fmadd_pd(cab[3],
-      simde_mm256_permute4x64_pd(c, SIMDE_MM_SHUFFLE(3, 3, 3, 3)), r);
+      simde_mm256_permute4x64_pd(*c, SIMDE_MM_SHUFFLE(3, 3, 3, 3)), r);
   // Horizontal sum contracts dim 0
-  return casadi_blazing_hsum<T1>(r);
+  return casadi_blazing_hsum<T1>(&r);
 }
 
 // AVX2 tensor-times-vector for 4D cubic B-splines (degree 3, m=1).
@@ -482,15 +484,16 @@ T1 casadi_blazing_tensor_ttv3(const simde__m256d C[16],
 template<typename T1>
 T1 casadi_blazing_tensor_ttv4(const T1* coeffs,
     casadi_int s1, casadi_int s2, casadi_int s3,
-    simde__m256d a, simde__m256d b, simde__m256d c, simde__m256d d) {
+    const simde__m256d* a, const simde__m256d* b, const simde__m256d* c,
+    const simde__m256d* d) {
   simde__m256d C[16];
   int j, k, l;
   // Broadcast dim 3 weights into an array indexable by l.
   simde__m256d dbr[4] = {
-    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(0, 0, 0, 0)),
-    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(1, 1, 1, 1)),
-    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(2, 2, 2, 2)),
-    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(3, 3, 3, 3))
+    simde_mm256_permute4x64_pd(*d, SIMDE_MM_SHUFFLE(0, 0, 0, 0)),
+    simde_mm256_permute4x64_pd(*d, SIMDE_MM_SHUFFLE(1, 1, 1, 1)),
+    simde_mm256_permute4x64_pd(*d, SIMDE_MM_SHUFFLE(2, 2, 2, 2)),
+    simde_mm256_permute4x64_pd(*d, SIMDE_MM_SHUFFLE(3, 3, 3, 3))
   };
   // Contract dim 3 from memory: C[j+4*k] = sum_l d[l] * coeffs[... + s3*l]
   // Loop order: large stride s3 outer, so the 4x4 (j,k) gather stays in
@@ -523,23 +526,23 @@ T1 casadi_blazing_tensor_ttv4(const T1* coeffs,
 template<typename T1>
 T1 casadi_blazing_tensor_ttv5(const T1* coeffs,
     casadi_int s1, casadi_int s2, casadi_int s3, casadi_int s4,
-    simde__m256d a, simde__m256d b, simde__m256d c,
-    simde__m256d d, simde__m256d e) {
+    const simde__m256d* a, const simde__m256d* b, const simde__m256d* c,
+    const simde__m256d* d, const simde__m256d* e) {
   simde__m256d C[16];
   simde__m256d de[16];
   int j, k, l, m;
   // Pre-broadcast dim 3 and dim 4 weights (compile-time constant immediates)
   simde__m256d dbr[4] = {
-    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(0, 0, 0, 0)),
-    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(1, 1, 1, 1)),
-    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(2, 2, 2, 2)),
-    simde_mm256_permute4x64_pd(d, SIMDE_MM_SHUFFLE(3, 3, 3, 3))
+    simde_mm256_permute4x64_pd(*d, SIMDE_MM_SHUFFLE(0, 0, 0, 0)),
+    simde_mm256_permute4x64_pd(*d, SIMDE_MM_SHUFFLE(1, 1, 1, 1)),
+    simde_mm256_permute4x64_pd(*d, SIMDE_MM_SHUFFLE(2, 2, 2, 2)),
+    simde_mm256_permute4x64_pd(*d, SIMDE_MM_SHUFFLE(3, 3, 3, 3))
   };
   simde__m256d ebr[4] = {
-    simde_mm256_permute4x64_pd(e, SIMDE_MM_SHUFFLE(0, 0, 0, 0)),
-    simde_mm256_permute4x64_pd(e, SIMDE_MM_SHUFFLE(1, 1, 1, 1)),
-    simde_mm256_permute4x64_pd(e, SIMDE_MM_SHUFFLE(2, 2, 2, 2)),
-    simde_mm256_permute4x64_pd(e, SIMDE_MM_SHUFFLE(3, 3, 3, 3))
+    simde_mm256_permute4x64_pd(*e, SIMDE_MM_SHUFFLE(0, 0, 0, 0)),
+    simde_mm256_permute4x64_pd(*e, SIMDE_MM_SHUFFLE(1, 1, 1, 1)),
+    simde_mm256_permute4x64_pd(*e, SIMDE_MM_SHUFFLE(2, 2, 2, 2)),
+    simde_mm256_permute4x64_pd(*e, SIMDE_MM_SHUFFLE(3, 3, 3, 3))
   };
   // Precompute outer product d x e (16 broadcast weights)
   for (l = 0; l < 4; ++l) {

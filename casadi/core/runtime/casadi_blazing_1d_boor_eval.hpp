@@ -61,7 +61,7 @@ void casadi_blazing_1d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     } else {
       // NPC: summation by parts
       const T1* t0 = all_knots + offset[0] + starts[0];
-      simde__m256d boor0_J = casadi_blazing_dbasis<T1>(boor0_d1, t0, inv3_0);
+      simde__m256d boor0_J = casadi_blazing_dbasis<T1>(&boor0_d1, t0, inv3_0);
 
       double boor0_Jv[4];
       simde_mm256_storeu_pd(boor0_Jv, boor0_J);
@@ -89,7 +89,7 @@ void casadi_blazing_1d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     } else {
       // NPC: summation by parts (applied twice)
       const T1* t0 = all_knots + offset[0] + starts[0];
-      simde__m256d boor0_H = casadi_blazing_d2basis<T1>(boor0_d2, t0,
+      simde__m256d boor0_H = casadi_blazing_d2basis<T1>(&boor0_d2, t0,
           inv2_0, inv3_0);
 
       double boor0_Hv[4];

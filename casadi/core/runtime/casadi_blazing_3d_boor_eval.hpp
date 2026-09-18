@@ -54,7 +54,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
   }
 
   if (f) {
-    f[0] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], d0[1], d0[2]);
+    f[0] = casadi_blazing_tensor_ttv3<T1>(C, &d0[0], &d0[1], &d0[2]);
   }
 
   // Jacobian and Hessian share knot pointers and J bases
@@ -67,7 +67,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     // Effective first-derivative basis: raw for precomputed, summation-by-parts for NPC
     simde__m256d Ji[3];
     for (int i = 0; i < 3; ++i) {
-      Ji[i] = dc ? d1[i] : casadi_blazing_dbasis<T1>(d1[i], t[i], inv3[i]);
+      Ji[i] = dc ? d1[i] : casadi_blazing_dbasis<T1>(&d1[i], t[i], inv3[i]);
     }
 
     // First derivatives
@@ -84,7 +84,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         }
         dc += stride2*(offset[3]-offset[2]-4);
       }
-      J[0] = casadi_blazing_tensor_ttv3<T1>(C, Ji[0], d0[1], d0[2]);
+      J[0] = casadi_blazing_tensor_ttv3<T1>(C, &Ji[0], &d0[1], &d0[2]);
 
       // J[1]: d/dx1
       if (dc) {
@@ -102,7 +102,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         }
         dc += stride2*(offset[3]-offset[2]-4);
       }
-      J[1] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], Ji[1], d0[2]);
+      J[1] = casadi_blazing_tensor_ttv3<T1>(C, &d0[0], &Ji[1], &d0[2]);
 
       // J[2]: d/dx2
       if (dc) {
@@ -119,7 +119,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
           }
         }
       }
-      J[2] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], d0[1], Ji[2]);
+      J[2] = casadi_blazing_tensor_ttv3<T1>(C, &d0[0], &d0[1], &Ji[2]);
     }
 
     // Second derivatives
@@ -127,7 +127,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       // Effective second-derivative basis
       simde__m256d Hi[3];
       for (int i = 0; i < 3; ++i) {
-        Hi[i] = ddc ? d2[i] : casadi_blazing_d2basis<T1>(d2[i], t[i], inv2[i], inv3[i]);
+        Hi[i] = ddc ? d2[i] : casadi_blazing_d2basis<T1>(&d2[i], t[i], inv2[i], inv3[i]);
       }
 
       // Diagonal: H[i*(n+1)]
@@ -143,7 +143,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         }
         ddc += stride2*(offset[3]-offset[2]-4);
       }
-      H[0] = casadi_blazing_tensor_ttv3<T1>(C, Hi[0], d0[1], d0[2]);
+      H[0] = casadi_blazing_tensor_ttv3<T1>(C, &Hi[0], &d0[1], &d0[2]);
 
       // H[4] = d2/dx1^2
       if (ddc) {
@@ -161,7 +161,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         }
         ddc += stride2*(offset[3]-offset[2]-4);
       }
-      H[4] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], Hi[1], d0[2]);
+      H[4] = casadi_blazing_tensor_ttv3<T1>(C, &d0[0], &Hi[1], &d0[2]);
 
       // H[8] = d2/dx2^2
       if (ddc) {
@@ -179,7 +179,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         }
         ddc += stride2*(offset[3]-offset[2]-4-2);
       }
-      H[8] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], d0[1], Hi[2]);
+      H[8] = casadi_blazing_tensor_ttv3<T1>(C, &d0[0], &d0[1], &Hi[2]);
 
       // Off-diagonal
       // H[1] = H[3] = d2/dx0 dx1
@@ -198,7 +198,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         }
         ddc += stride2*(offset[3]-offset[2]-4);
       }
-      H[1] = H[3] = casadi_blazing_tensor_ttv3<T1>(C, Ji[0], Ji[1], d0[2]);
+      H[1] = H[3] = casadi_blazing_tensor_ttv3<T1>(C, &Ji[0], &Ji[1], &d0[2]);
 
       // H[5] = H[7] = d2/dx1 dx2
       if (ddc) {
@@ -216,7 +216,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         }
         ddc += stride2*(offset[3]-offset[2]-5);
       }
-      H[5] = H[7] = casadi_blazing_tensor_ttv3<T1>(C, d0[0], Ji[1], Ji[2]);
+      H[5] = H[7] = casadi_blazing_tensor_ttv3<T1>(C, &d0[0], &Ji[1], &Ji[2]);
 
       // H[2] = H[6] = d2/dx0 dx2
       if (ddc) {
@@ -233,7 +233,7 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
           }
         }
       }
-      H[2] = H[6] = casadi_blazing_tensor_ttv3<T1>(C, Ji[0], d0[1], Ji[2]);
+      H[2] = H[6] = casadi_blazing_tensor_ttv3<T1>(C, &Ji[0], &d0[1], &Ji[2]);
     }
   }
 }

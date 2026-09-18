@@ -54,7 +54,7 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
   }
 
   if (f) {
-    f[0] = casadi_blazing_tensor_ttv2<T1>(C, d0[0], d0[1]);
+    f[0] = casadi_blazing_tensor_ttv2<T1>(C, &d0[0], &d0[1]);
   }
 
   if (J || H) {
@@ -62,8 +62,8 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     const T1* t1 = all_knots + offset[1] + starts[1];
 
     // Effective first-derivative basis: raw for precomputed, summation-by-parts for NPC
-    simde__m256d J0 = dc ? d1[0] : casadi_blazing_dbasis<T1>(d1[0], t0, inv3[0]);
-    simde__m256d J1 = dc ? d1[1] : casadi_blazing_dbasis<T1>(d1[1], t1, inv3[1]);
+    simde__m256d J0 = dc ? d1[0] : casadi_blazing_dbasis<T1>(&d1[0], t0, inv3[0]);
+    simde__m256d J1 = dc ? d1[1] : casadi_blazing_dbasis<T1>(&d1[1], t1, inv3[1]);
 
     // First derivatives
     if (J) {
@@ -74,7 +74,7 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         }
         dc += stride1*(offset[2]-offset[1]-4);
       }
-      J[0] = casadi_blazing_tensor_ttv2<T1>(C, J0, d0[1]);
+      J[0] = casadi_blazing_tensor_ttv2<T1>(C, &J0, &d0[1]);
 
       if (dc) {
         stride1 = offset[1]-offset[0]-4;
@@ -86,14 +86,14 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
           }
         }
       }
-      J[1] = casadi_blazing_tensor_ttv2<T1>(C, d0[0], J1);
+      J[1] = casadi_blazing_tensor_ttv2<T1>(C, &d0[0], &J1);
     }
 
     // Second derivatives
     if (H) {
       // Effective second-derivative basis
-      simde__m256d H0 = ddc ? d2[0] : casadi_blazing_d2basis<T1>(d2[0], t0, inv2[0], inv3[0]);
-      simde__m256d H1 = ddc ? d2[1] : casadi_blazing_d2basis<T1>(d2[1], t1, inv2[1], inv3[1]);
+      simde__m256d H0 = ddc ? d2[0] : casadi_blazing_d2basis<T1>(&d2[0], t0, inv2[0], inv3[0]);
+      simde__m256d H1 = ddc ? d2[1] : casadi_blazing_d2basis<T1>(&d2[1], t1, inv2[1], inv3[1]);
 
       // Diagonal
       if (ddc) {
@@ -102,7 +102,7 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
           C[j] = simde_mm256_loadu_pd(ddc+(starts[1]+j)*stride1+starts[0]-2);
         ddc += stride1*(offset[2]-offset[1]-4);
       }
-      H[0] = casadi_blazing_tensor_ttv2<T1>(C, H0, d0[1]);
+      H[0] = casadi_blazing_tensor_ttv2<T1>(C, &H0, &d0[1]);
 
       if (ddc) {
         stride1 = offset[1]-offset[0]-4;
@@ -115,7 +115,7 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         }
         ddc += stride1*(offset[2]-offset[1]-4-2);
       }
-      H[3] = casadi_blazing_tensor_ttv2<T1>(C, d0[0], H1);
+      H[3] = casadi_blazing_tensor_ttv2<T1>(C, &d0[0], &H1);
 
       // Off-diagonal
       if (ddc) {
@@ -128,7 +128,7 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
           }
         }
       }
-      H[1] = H[2] = casadi_blazing_tensor_ttv2<T1>(C, J0, J1);
+      H[1] = H[2] = casadi_blazing_tensor_ttv2<T1>(C, &J0, &J1);
     }
   }
 }
