@@ -249,20 +249,21 @@ void casadi_blazing_de_boor(T1 x, const T1* knots, const T1* inv1, const T1* inv
 //                    boor_H = blazing_boor_der(shift_left(inner), s1)
 //   where s2[j] = 2/(t[j+start+3]-t[j+start+1])
 template<typename T1>
-simde__m256d casadi_blazing_boor_der(const simde__m256d* boor, const simde__m256d* scale) {
+void casadi_blazing_boor_der(simde__m256d* out, const simde__m256d* boor,
+    const simde__m256d* scale) {
     simde__m256d sb = simde_mm256_mul_pd(*boor, *scale);
     simde__m256d shifted = simde_mm256_permute4x64_pd(sb, SIMDE_MM_SHUFFLE(2, 1, 0, 0));
     shifted = simde_mm256_blend_pd(simde_mm256_setzero_pd(), shifted, 0xE);
-    return simde_mm256_sub_pd(shifted, sb);
+    *out = simde_mm256_sub_pd(shifted, sb);
 }
 
 // SYMBOL "blazing_shift_left"
 // Shift AVX vector one position to the left, filling position 3 with zero.
 // [a, b, c, d] -> [b, c, d, 0]
 template<typename T1>
-simde__m256d casadi_blazing_shift_left(const simde__m256d* v) {
+void casadi_blazing_shift_left(simde__m256d* out, const simde__m256d* v) {
     simde__m256d shifted = simde_mm256_permute4x64_pd(*v, SIMDE_MM_SHUFFLE(3, 3, 2, 1));
-    return simde_mm256_blend_pd(shifted, simde_mm256_setzero_pd(), 0x8);
+    *out = simde_mm256_blend_pd(shifted, simde_mm256_setzero_pd(), 0x8);
 }
 
 // SYMBOL "blazing_knot_scale"
@@ -270,12 +271,13 @@ simde__m256d casadi_blazing_shift_left(const simde__m256d* v) {
 // This avoids NaN from 0/0 at knot boundaries where both the basis function and
 // the knot span are zero.
 template<typename T1>
-simde__m256d casadi_blazing_knot_scale(const simde__m256d* degree, const simde__m256d* t_hi, const simde__m256d* t_lo) {// NOLINT(whitespace/line_length)
+void casadi_blazing_knot_scale(simde__m256d* out, const simde__m256d* degree,
+    const simde__m256d* t_hi, const simde__m256d* t_lo) {
     simde__m256d zero = simde_mm256_setzero_pd();
     simde__m256d denom = simde_mm256_sub_pd(*t_hi, *t_lo);
     simde__m256d denom_mask = simde_mm256_cmp_pd(denom, zero, SIMDE_CMP_EQ_OQ);
     simde__m256d scale = simde_mm256_div_pd(*degree, denom);
-    return simde_mm256_blendv_pd(scale, zero, denom_mask);
+    *out = simde_mm256_blendv_pd(scale, zero, denom_mask);
 }
 
 // SYMBOL "blazing_boor_init"
@@ -347,7 +349,8 @@ casadi_int casadi_blazing_boor_init(
 // t points to knots at starts[i] for this dimension.
 // inv3 can be 0 (NULL) to use the division path; otherwise 1/(t[k+3]-t[k]).
 template<typename T1>
-simde__m256d casadi_blazing_dbasis(const simde__m256d* boor_d1, const T1* t, const T1* inv3) {
+void casadi_blazing_dbasis(simde__m256d* out, const simde__m256d* boor_d1,
+    const T1* t, const T1* inv3) {
     simde__m256d three = simde_mm256_set1_pd(3.0);
     simde__m256d s1, t_hi, t_lo, shifted;
     if (inv3) {
@@ -355,10 +358,10 @@ simde__m256d casadi_blazing_dbasis(const simde__m256d* boor_d1, const T1* t, con
     } else {
       t_hi = simde_mm256_loadu_pd(t + 4);
       t_lo = simde_mm256_loadu_pd(t + 1);
-      s1 = casadi_blazing_knot_scale<T1>(&three, &t_hi, &t_lo);
+      casadi_blazing_knot_scale<T1>(&s1, &three, &t_hi, &t_lo);
     }
-    shifted = casadi_blazing_shift_left<T1>(boor_d1);
-    return casadi_blazing_boor_der<T1>(&shifted, &s1);
+    casadi_blazing_shift_left<T1>(&shifted, boor_d1);
+    casadi_blazing_boor_der<T1>(out, &shifted, &s1);
 }
 
 // SYMBOL "blazing_d2basis"
@@ -367,7 +370,8 @@ simde__m256d casadi_blazing_dbasis(const simde__m256d* boor_d1, const T1* t, con
 // inv2, inv3 can be 0 (NULL) to use the division path;
 // otherwise 1/(t[k+2]-t[k]) and 1/(t[k+3]-t[k]).
 template<typename T1>
-simde__m256d casadi_blazing_d2basis(const simde__m256d* boor_d2, const T1* t, const T1* inv2, const T1* inv3) {// NOLINT(whitespace/line_length)
+void casadi_blazing_d2basis(simde__m256d* out, const simde__m256d* boor_d2,
+    const T1* t, const T1* inv2, const T1* inv3) {
     simde__m256d three = simde_mm256_set1_pd(3.0);
     simde__m256d two = simde_mm256_set1_pd(2.0);
     simde__m256d s1, s2, t_hi, t_lo, shifted, inner;
@@ -377,14 +381,14 @@ simde__m256d casadi_blazing_d2basis(const simde__m256d* boor_d2, const T1* t, co
     } else {
       t_lo = simde_mm256_loadu_pd(t + 1);
       t_hi = simde_mm256_loadu_pd(t + 4);
-      s1 = casadi_blazing_knot_scale<T1>(&three, &t_hi, &t_lo);
+      casadi_blazing_knot_scale<T1>(&s1, &three, &t_hi, &t_lo);
       t_hi = simde_mm256_loadu_pd(t + 3);
-      s2 = casadi_blazing_knot_scale<T1>(&two, &t_hi, &t_lo);
+      casadi_blazing_knot_scale<T1>(&s2, &two, &t_hi, &t_lo);
     }
-    shifted = casadi_blazing_shift_left<T1>(boor_d2);
-    inner = casadi_blazing_boor_der<T1>(&shifted, &s2);
-    shifted = casadi_blazing_shift_left<T1>(&inner);
-    return casadi_blazing_boor_der<T1>(&shifted, &s1);
+    casadi_blazing_shift_left<T1>(&shifted, boor_d2);
+    casadi_blazing_boor_der<T1>(&inner, &shifted, &s2);
+    casadi_blazing_shift_left<T1>(&shifted, &inner);
+    casadi_blazing_boor_der<T1>(out, &shifted, &s1);
 }
 
 // ===== Tensor-times-vector contractions =====

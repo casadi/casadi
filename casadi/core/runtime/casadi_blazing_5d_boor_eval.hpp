@@ -62,7 +62,7 @@ void casadi_blazing_5d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     simde__m256d dJ[5];
     for (int i = 0; i < 5; ++i) {
       t[i] = all_knots + offset[i] + starts[i];
-      dJ[i] = casadi_blazing_dbasis<T1>(&d1[i], t[i], inv3[i]);
+      casadi_blazing_dbasis<T1>(&dJ[i], &d1[i], t[i], inv3[i]);
     }
 
     if (J) {
@@ -81,7 +81,7 @@ void casadi_blazing_5d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     if (H) {
       simde__m256d dH[5];
       for (int i = 0; i < 5; ++i)
-        dH[i] = casadi_blazing_d2basis<T1>(&d2[i], t[i], inv2[i], inv3[i]);
+        casadi_blazing_d2basis<T1>(&dH[i], &d2[i], t[i], inv2[i], inv3[i]);
 
       // Diagonal
       H[0]  = casadi_blazing_tensor_ttv5<T1>(base, s1, s2, s3, s4,

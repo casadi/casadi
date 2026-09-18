@@ -67,7 +67,11 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     // Effective first-derivative basis: raw for precomputed, summation-by-parts for NPC
     simde__m256d Ji[3];
     for (int i = 0; i < 3; ++i) {
-      Ji[i] = dc ? d1[i] : casadi_blazing_dbasis<T1>(&d1[i], t[i], inv3[i]);
+      if (dc) {
+        Ji[i] = d1[i];
+      } else {
+        casadi_blazing_dbasis<T1>(&Ji[i], &d1[i], t[i], inv3[i]);
+      }
     }
 
     // First derivatives
@@ -127,7 +131,11 @@ void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
       // Effective second-derivative basis
       simde__m256d Hi[3];
       for (int i = 0; i < 3; ++i) {
-        Hi[i] = ddc ? d2[i] : casadi_blazing_d2basis<T1>(&d2[i], t[i], inv2[i], inv3[i]);
+        if (ddc) {
+          Hi[i] = d2[i];
+        } else {
+          casadi_blazing_d2basis<T1>(&Hi[i], &d2[i], t[i], inv2[i], inv3[i]);
+        }
       }
 
       // Diagonal: H[i*(n+1)]

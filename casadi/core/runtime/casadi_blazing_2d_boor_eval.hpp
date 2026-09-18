@@ -62,8 +62,14 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     const T1* t1 = all_knots + offset[1] + starts[1];
 
     // Effective first-derivative basis: raw for precomputed, summation-by-parts for NPC
-    simde__m256d J0 = dc ? d1[0] : casadi_blazing_dbasis<T1>(&d1[0], t0, inv3[0]);
-    simde__m256d J1 = dc ? d1[1] : casadi_blazing_dbasis<T1>(&d1[1], t1, inv3[1]);
+    simde__m256d J0, J1;
+    if (dc) {
+      J0 = d1[0];
+      J1 = d1[1];
+    } else {
+      casadi_blazing_dbasis<T1>(&J0, &d1[0], t0, inv3[0]);
+      casadi_blazing_dbasis<T1>(&J1, &d1[1], t1, inv3[1]);
+    }
 
     // First derivatives
     if (J) {
@@ -92,8 +98,14 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
     // Second derivatives
     if (H) {
       // Effective second-derivative basis
-      simde__m256d H0 = ddc ? d2[0] : casadi_blazing_d2basis<T1>(&d2[0], t0, inv2[0], inv3[0]);
-      simde__m256d H1 = ddc ? d2[1] : casadi_blazing_d2basis<T1>(&d2[1], t1, inv2[1], inv3[1]);
+      simde__m256d H0, H1;
+      if (ddc) {
+        H0 = d2[0];
+        H1 = d2[1];
+      } else {
+        casadi_blazing_d2basis<T1>(&H0, &d2[0], t0, inv2[0], inv3[0]);
+        casadi_blazing_d2basis<T1>(&H1, &d2[1], t1, inv2[1], inv3[1]);
+      }
 
       // Diagonal
       if (ddc) {
