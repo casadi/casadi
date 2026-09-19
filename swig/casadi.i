@@ -3812,12 +3812,14 @@ PyOS_setsig(SIGINT, SigIntHandler);
 %stub_unary_math(arcsinh)
 %stub_unary_math(arccosh)
 /* Re-exported from numpy at runtime (`from numpy import pi, inf`). */
+#ifdef SWIG_STUBS_ENABLED
 %stubcode %{pi: float
 inf: float
 %}
 %stub_overload_func(arctan2, DM, x: _DM, y: _DM)
 %stub_overload_func(arctan2, SX, x: _SX, y: _SX)
 %stub_overload_func(arctan2, MX, x: _MX, y: _MX)
+#endif // SWIG_STUBS_ENABLED
 #endif // SWIGPYTHON
 
 #ifdef SWIGWASMJS
@@ -4154,8 +4156,10 @@ class NZproxy:
  * scalar-object boxing for symbolic.  Keeps scipy.linalg.solve(A,b)
  * etc. typing without forcing users to wrap calls in np.array().  */
 %stub_method(__array__, %arg(NDArray[arraydtype]), *args: Any, **kwargs: Any)
+#ifdef SWIG_STUBS_ENABLED
 %stubcode %{    __array_priority__: float
 %}
+#endif // SWIG_STUBS_ENABLED
 %stub_method(__array_ufunc__, Any, ufunc: Any, method: builtins.str, *inputs: Any, **kwargs: Any)
 %stub_method(__array_function__, Any, func: Any, types: Any, args: Any, kwargs: Any)
 %enddef
