@@ -1206,6 +1206,100 @@ class GraphBuilderSymbolicTests(casadiTestCase):
       self.assertNotIn(ca.OP_GETNONZEROS_PARAM, ops)
 
   @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_external_weights_as_inputs(self):
+    self.message("External network with weights as graph inputs (torch export_params=False)")
+    # Rank-2 weights and rank-1 biases are inputs, not initializers: the Function must expose
+    # them with the declared ONNX shapes (bias [n] -> column n) and the bias must broadcast
+    # against the Gemm result whichever way it was stored
+    w1 = numpy.array([[1., 2.], [-1., .5], [.25, -.75]])
+    b1 = numpy.array([.1, -.2, .3])
+    w2 = numpy.array([[.5, -1., 2.]])
+    b2 = numpy.array([-.4])
+    nodes = [
+      helper.make_node("Gemm", ["x", "w1", "b1"], ["a1"], transB=1),
+      helper.make_node("Tanh", ["a1"], ["h"]),
+      helper.make_node("Gemm", ["h", "w2", "b2"], ["y"], transB=1),
+    ]
+    graph = helper.make_graph(nodes, "network", [
+      helper.make_tensor_value_info("x", TensorProto.DOUBLE, [1, 2]),
+      helper.make_tensor_value_info("w1", TensorProto.DOUBLE, [3, 2]),
+      helper.make_tensor_value_info("b1", TensorProto.DOUBLE, [3]),
+      helper.make_tensor_value_info("w2", TensorProto.DOUBLE, [1, 3]),
+      helper.make_tensor_value_info("b2", TensorProto.DOUBLE, [1])], [
+      helper.make_tensor_value_info("y", TensorProto.DOUBLE, [1, 1])])
+    model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+    onnx.checker.check_model(model)
+    with tempfile.TemporaryDirectory() as folder:
+      path = os.path.join(folder, "f.onnx")
+      onnx.save(model, path)
+      f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+      self.assertEqual(f.name_in(), ["x", "w1", "b1", "w2", "b2"])
+      self.assertEqual(f.size_in(0), (1, 2))
+      self.assertEqual(f.size_in(1), (3, 2))
+      self.assertEqual(f.size_in(2), (3, 1))
+      self.assertEqual(f.size_in(3), (1, 3))
+      self.assertEqual(f.size_in(4), (1, 1))
+      x, W1, B1, W2, B2 = [ca.MX.sym(n, *f.size_in(i)) for i, n in enumerate(f.name_in())]
+      ref = ca.Function("ref", [x, W1, B1, W2, B2],
+        [ca.mtimes(W2, ca.tanh(ca.mtimes(W1, x.T) + B1)) + B2])
+      self.checkfunction(ref, f, inputs=[ca.DM([[.2, -.1]]), w1, b1, w2, b2])
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_external_parameter_vector(self):
+    self.message("External network with a flat parameter vector input sliced into weights")
+    # torch2casadi parameters=True: theta [n,1] -> Gather(axis=1) -> rank-1 -> Slice/Reshape
+    # into weights, biases stay rank-1 rows internally and must broadcast in Gemm
+    w1 = numpy.array([[1., 2.], [-1., .5], [.25, -.75]])
+    b1 = numpy.array([.1, -.2, .3])
+    w2 = numpy.array([[.5, -1., 2.]])
+    b2 = numpy.array([-.4])
+    theta = numpy.concatenate([w1.ravel(), b1, w2.ravel(), b2])
+    bounds = numpy.cumsum([0, w1.size, b1.size, w2.size, b2.size])
+    nodes = [helper.make_node("Constant", [], [name], value_ints=value)
+      for name, value in [("axis", [0]), ("s1", [3, 2]), ("s2", [1, 3]), ("sx", [1, 2])]]
+    nodes += [helper.make_node("Constant", [], ["i%d" % k], value_ints=[int(bounds[k])])
+      for k in range(5)]
+    nodes += [
+      helper.make_node("Constant", [], ["index"], value_int=0),
+      helper.make_node("Gather", ["theta", "index"], ["flat"], axis=1),
+      helper.make_node("Gather", ["x", "index"], ["xflat"], axis=1),
+      helper.make_node("Reshape", ["xflat", "sx"], ["xrow"]),
+      helper.make_node("Slice", ["flat", "i0", "i1", "axis"], ["w1flat"]),
+      helper.make_node("Reshape", ["w1flat", "s1"], ["w1"]),
+      helper.make_node("Slice", ["flat", "i1", "i2", "axis"], ["b1"]),
+      helper.make_node("Slice", ["flat", "i2", "i3", "axis"], ["w2flat"]),
+      helper.make_node("Reshape", ["w2flat", "s2"], ["w2"]),
+      helper.make_node("Slice", ["flat", "i3", "i4", "axis"], ["b2"]),
+      helper.make_node("Gemm", ["xrow", "w1", "b1"], ["a1"], transB=1),
+      helper.make_node("Tanh", ["a1"], ["h"]),
+      helper.make_node("Gemm", ["h", "w2", "b2"], ["y"], transB=1),
+    ]
+    graph = helper.make_graph(nodes, "network", [
+      helper.make_tensor_value_info("x", TensorProto.DOUBLE, [2, 1]),
+      helper.make_tensor_value_info("theta", TensorProto.DOUBLE, [theta.size, 1])], [
+      helper.make_tensor_value_info("y", TensorProto.DOUBLE, [1, 1])])
+    model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 13)])
+    onnx.checker.check_model(model)
+    with tempfile.TemporaryDirectory() as folder:
+      path = os.path.join(folder, "f.onnx")
+      onnx.save(model, path)
+      f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+      self.assertEqual(f.size_in(0), (2, 1))
+      self.assertEqual(f.size_in(1), (theta.size, 1))
+      self.assertEqual(f.size_out(0), (1, 1))
+      x = ca.MX.sym("x", 2)
+      T = ca.MX.sym("theta", theta.size)
+      W1 = ca.reshape(T[bounds[0]:bounds[1]], 2, 3).T
+      B1 = T[bounds[1]:bounds[2]]
+      W2 = ca.reshape(T[bounds[2]:bounds[3]], 3, 1).T
+      B2 = T[bounds[3]:bounds[4]]
+      ref = ca.Function("ref", [x, T], [ca.mtimes(W2, ca.tanh(ca.mtimes(W1, x) + B1)) + B2])
+      self.checkfunction(ref, f, inputs=[ca.DM([.2, -.1]), theta])
+      h = ca.Function("h", [x, T], [ca.hessian(f(x, T), T)[0]])
+      href = ca.Function("href", [x, T], [ca.hessian(ref(x, T), T)[0]])
+      self.checkarray(href([.2, -.1], theta), h([.2, -.1], theta))
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
   def test_external_gather_constant_indices(self):
     self.message("External ONNX Gather uses fixed indices along the declared axis")
     values = numpy.arange(6.).reshape(2, 3)

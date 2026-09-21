@@ -58,6 +58,43 @@ namespace casadi {
     return true;
   }
 
+  // Whether two stored shapes broadcast against each other (equal or 1 along each axis)
+  static bool broadcastable(const MX& a, const MX& b) {
+    return (a.size1() == b.size1() || a.size1() == 1 || b.size1() == 1)
+        && (a.size2() == b.size2() || a.size2() == 1 || b.size2() == 1);
+  }
+
+  // Orient a vector operand v towards the other operand o of a binary op
+  static void orient_vector(MX* v, const MX& o) {
+    if (!v->is_vector()) return;
+    // Two equal-length vectors in different orientations are the same rank-1 tensor;
+    // settle on the column form, the convention for rank-1 initializers and inputs
+    if (o.is_vector() && v->numel() == o.numel()) {
+      if (v->size1() != o.size1()) *v = reshape(*v, v->numel(), 1);
+      return;
+    }
+    if (broadcastable(*v, o)) return;
+    if (v->numel() == o.size1()) *v = reshape(*v, o.size1(), 1);
+    else if (v->numel() == o.size2()) *v = reshape(*v, 1, o.size2());
+  }
+
+  // ONNX (numpy-style) broadcasting of two operands in the 2-D stored representation.
+  // A rank-1 tensor may be stored as a row or a column depending on where it came from
+  // (Gather/Slice results are rows; initializers and graph inputs are columns), so a vector
+  // that is not already broadcast-compatible is first oriented along the other operand's
+  // matching dimension, e.g. a Gemm/Add bias [N] against a stored (N,M) result.
+  static void broadcast_pair(MX* x, MX* y) {
+    if (x->is_scalar() || y->is_scalar()) return;
+    orient_vector(x, *y);
+    orient_vector(y, *x);
+    casadi_int nr = std::max(x->size1(), y->size1()), nc = std::max(x->size2(), y->size2());
+    for (MX* v : {x, y}) {
+      casadi_assert(broadcastable(*v, MX::zeros(nr, nc)), "ONNX import: cannot broadcast "
+        + x->dim() + " with " + y->dim());
+      if (v->size1() != nr || v->size2() != nc) *v = repmat(*v, nr / v->size1(), nc / v->size2());
+    }
+  }
+
   // ONNX initializers are pre-loaded constants
   void Onnx::process_graph_initializers(
       const onnx::GraphProto& graph,
@@ -112,9 +149,13 @@ namespace casadi {
       // input pattern -- make a SPARSE input symbol and feed it AS-IS, so CasADi propagates the
       // true sparsity through the body (no densification on entry; densify only where an ONNX op
       // requires
-      // the dense layout, e.g. Reshape). Transpose-rep: the ONNX input is declared (c,r).
+      // the dense layout, e.g. Reshape). Transpose-rep: a rank-2 ONNX input (r,c) is stored as
+      // (c,r); a rank<2 input [n] is a column (n,1), matching tensor_to_dm for initializers so
+      // that e.g. a 1-D Gemm bias broadcasts the same whether it is an initializer or an input.
       Sparsity ov = input_pattern(graph, input_name);
-      MX mx_input = ov.is_null() ? MX::sym(input_name, cols, rows) : MX::sym(input_name, ov);
+      MX mx_input = !ov.is_null() ? MX::sym(input_name, ov)
+                  : shape.dim_size() < 2 ? MX::sym(input_name, rows, cols)
+                  : MX::sym(input_name, cols, rows);
       value_map[input_name] = mx_input;
       func_inputs.push_back(mx_input);
       input_names.push_back(input_name);
@@ -421,7 +462,7 @@ namespace casadi {
       value_map[output_name] = output;
 
       if (verbose) {
-        uout() << "    -> " << output_name << std::endl;
+        uout() << "    -> " << output_name << " " << output.dim() << std::endl;
       }
     }
   }
@@ -588,13 +629,14 @@ namespace casadi {
         }
       } else if (mapping->arity == 2) {
         casadi_assert(node_inputs.size() >= 2, op_type + " requires 2 inputs");
-        const MX& y = node_inputs[1];
+        MX bx = x, by = node_inputs[1];
+        broadcast_pair(&bx, &by);
         switch (mapping->casadi_op) {
-          case OP_ADD: return x + y;
-          case OP_SUB: return x - y;
-          case OP_MUL: return x * y;
-          case OP_DIV: return x / y;
-          case OP_POW: return pow(x, y);
+          case OP_ADD: return bx + by;
+          case OP_SUB: return bx - by;
+          case OP_MUL: return bx * by;
+          case OP_DIV: return bx / by;
+          case OP_POW: return pow(bx, by);
           default: break;
         }
       }
@@ -670,7 +712,9 @@ namespace casadi {
       MX B = get_int_attribute(node, "transA", 0) ? node_inputs[0].T() : node_inputs[0];
       output = get_float_attribute(node, "alpha", 1.0) * mtimes(A, B);
       if (node_inputs.size() >= 3) {
-        output = output + get_float_attribute(node, "beta", 1.0) * node_inputs[2];
+        MX C = node_inputs[2];  // unidirectionally broadcastable to the result, e.g. a bias [N]
+        broadcast_pair(&output, &C);
+        output = output + get_float_attribute(node, "beta", 1.0) * C;
       }
 
     } else if (op_type == "Sum") {

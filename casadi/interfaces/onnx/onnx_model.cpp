@@ -24,6 +24,7 @@
 
 #include "onnx_model.hpp"
 #include <casadi/core/graph_builder_internal.hpp>
+#include <map>
 
 namespace casadi {
 
@@ -123,9 +124,20 @@ namespace casadi {
     // CasADi exports use reversed axes; external models expose their declared ONNX shapes.
     if (model_.producer_name() == "CasADi") return f;
     std::vector<MX> inputs, args, outputs;
+    // Rank of each declared graph input by name (graph inputs may include initializers, so the
+    // graph index does not line up with the Function's input index)
+    std::map<std::string, int> in_rank;
+    for (const auto& in : model_.graph().input())
+      in_rank[in.name()] = in.type().tensor_type().shape().dim_size();
     for (casadi_int i = 0; i < f.n_in(); ++i) {
-      inputs.push_back(MX::sym(f.name_in(i), f.sparsity_in(i).T()));
-      args.push_back(inputs.back().T());
+      // Rank<2 inputs are stored as columns already; only rank-2 inputs are transposed back
+      if (in_rank[f.name_in(i)] < 2) {
+        inputs.push_back(MX::sym(f.name_in(i), f.sparsity_in(i)));
+        args.push_back(inputs.back());
+      } else {
+        inputs.push_back(MX::sym(f.name_in(i), f.sparsity_in(i).T()));
+        args.push_back(inputs.back().T());
+      }
     }
     f.call(args, outputs, true);
     for (casadi_int i = 0; i < f.n_out(); ++i) {
