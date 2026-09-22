@@ -70,6 +70,16 @@ namespace casadi {
     void add_include(const std::string& new_include, bool relative_path=false,
                     const std::string& use_ifdef=std::string());
 
+    /** \brief Replace an already added include in-place, keeping its position
+
+      Matches on the include string old_include; relative_path and use_ifdef
+      describe the replacement new_include only. */
+    void override_include(const std::string& old_include, const std::string& new_include,
+                    bool relative_path=false, const std::string& use_ifdef=std::string());
+
+    /// Remove an already added include, matching on the include string
+    void remove_include(const std::string& old_include);
+
 #ifndef SWIG
     /// Add a function dependency
     std::string add_dependency(const Function& f);
@@ -1165,6 +1175,22 @@ namespace casadi {
 
     // Code generated sparsities
     std::set<std::string> sparsity_meta;
+
+    // An include file, recorded in the order it was added
+    struct Include {
+      std::string name;
+      bool relative_path;
+      std::string use_ifdef;
+    };
+
+    // Includes in insertion order, materialized into 'includes' when dumping
+    std::vector<Include> includes_;
+
+    // Materialize includes_ into the 'includes' std::stringstream
+    void materialize_includes();
+
+    // Locate an include by its include string, asserting that it exists
+    std::vector<Include>::iterator find_include(const std::string& old_include);
 
     // Set of already included header files
     std::set<std::string> added_includes_;

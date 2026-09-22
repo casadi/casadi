@@ -952,6 +952,7 @@ namespace casadi {
       << "  #define CASADI_PREFIX(ID) " << this->prefix << "_ ## ID\n"
       << "#endif\n\n";
 
+    materialize_includes();
     s << this->includes.str();
     s << std::endl;
 
@@ -1251,18 +1252,60 @@ namespace casadi {
     // Quick return if it already exists
     if (!added) return;
 
-    // Ifdef opening
-    if (!use_ifdef.empty()) this->includes << "#ifdef " << use_ifdef << std::endl;
+    // Record in insertion order; printed to the header section when dumping
+    includes_.push_back({new_include, relative_path, use_ifdef});
+  }
 
-    // Print to the header section
-    if (relative_path) {
-      this->includes << "#include \"" << new_include << "\"\n";
-    } else {
-      this->includes << "#include <" << new_include << ">\n";
+  std::vector<CodeGenerator::Include>::iterator
+  CodeGenerator::find_include(const std::string& old_include) {
+    for (auto it = includes_.begin(); it != includes_.end(); ++it) {
+      if (it->name == old_include) return it;
+    }
+    casadi_error("Include not found: " + old_include);
+  }
+
+  void CodeGenerator::remove_include(const std::string& old_include) {
+    includes_.erase(find_include(old_include));
+    added_includes_.erase(old_include);
+  }
+
+  void CodeGenerator::override_include(const std::string& old_include,
+                                       const std::string& new_include,
+                                       bool relative_path, const std::string& use_ifdef) {
+    auto it = find_include(old_include);
+
+    // Unregister the old element
+    added_includes_.erase(old_include);
+
+    // Register the new element; drop the entry if it is already included elsewhere
+    bool added = added_includes_.insert(new_include).second;
+    if (!added) {
+      includes_.erase(it);
+      return;
     }
 
-    // Ifdef closing
-    if (!use_ifdef.empty()) this->includes << "#endif\n";
+    // Replace in-place, keeping the position
+    *it = {new_include, relative_path, use_ifdef};
+  }
+
+  void CodeGenerator::materialize_includes() {
+    // Rebuild from scratch: dump may be called more than once
+    this->includes.str(std::string());
+    this->includes.clear();
+    for (const Include& inc : includes_) {
+      // Ifdef opening
+      if (!inc.use_ifdef.empty()) this->includes << "#ifdef " << inc.use_ifdef << std::endl;
+
+      // Print to the header section
+      if (inc.relative_path) {
+        this->includes << "#include \"" << inc.name << "\"\n";
+      } else {
+        this->includes << "#include <" << inc.name << ">\n";
+      }
+
+      // Ifdef closing
+      if (!inc.use_ifdef.empty()) this->includes << "#endif\n";
+    }
   }
 
   void CodeGenerator::setup_callback(const std::string& s, const Function& f) {
