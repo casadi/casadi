@@ -30,6 +30,7 @@
 #include <cmath>
 
 #include "function.hpp"
+#include "sparsity.hpp"
 
 namespace casadi {
 
@@ -50,6 +51,7 @@ namespace casadi {
     std::vector<std::vector<std::string> > > StringVectorVectorType;
   typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
   typedef GenericTypeInternal<OT_FUNCTIONVECTOR, std::vector<Function> > FunctionVectorType;
+  typedef GenericTypeInternal<OT_SPARSITY, Sparsity> SparsityType;
   typedef GenericTypeInternal<OT_DICT, Dict> DictType;
   typedef GenericTypeInternal<OT_DICTVECTOR, std::vector<Dict> > DictVectorType;
   typedef GenericTypeInternal<OT_VECTORVECTOR,
@@ -155,6 +157,8 @@ namespace casadi {
       return "OT_FUNCTION";
     case OT_FUNCTIONVECTOR:
       return "OT_FUNCTIONVECTOR";
+    case OT_SPARSITY:
+      return "OT_SPARSITY";
     case OT_VOIDPTR:
       return "OT_VOIDPTR";
     default:
@@ -227,6 +231,10 @@ namespace casadi {
 
   bool GenericType::is_function_vector() const {
     return getType()==OT_FUNCTIONVECTOR;
+  }
+
+  bool GenericType::is_sparsity() const {
+    return getType()==OT_SPARSITY;
   }
 
   bool GenericType::is_void_pointer() const {
@@ -316,6 +324,10 @@ namespace casadi {
     own(new FunctionVectorType(f));
   }
 
+  GenericType::GenericType(const Sparsity& sp) {
+    own(new SparsityType(sp));
+  }
+
   const bool& GenericType::as_bool() const {
     casadi_assert_dev(is_bool());
     return static_cast<const BoolType*>(get())->d_;
@@ -399,6 +411,11 @@ namespace casadi {
   const std::vector<Function>& GenericType::as_function_vector() const {
     casadi_assert_dev(is_function_vector());
     return static_cast<const FunctionVectorType*>(get())->d_;
+  }
+
+  const Sparsity& GenericType::as_sparsity() const {
+    casadi_assert_dev(is_sparsity());
+    return static_cast<const SparsityType*>(get())->d_;
   }
 
   void* const & GenericType::as_void_pointer() const {
@@ -667,6 +684,11 @@ namespace casadi {
     return as_function_vector();
   }
 
+  Sparsity GenericType::to_sparsity() const {
+    casadi_assert(is_sparsity(), "type mismatch");
+    return as_sparsity();
+  }
+
   void* GenericType::to_void_pointer() const {
     if (is_void_pointer()) {
       return as_void_pointer();
@@ -804,6 +826,8 @@ namespace casadi {
         return FunctionType::deserialize(s);
       case OT_FUNCTIONVECTOR:
         return FunctionVectorType::deserialize(s);
+      case OT_SPARSITY:
+        return SparsityType::deserialize(s);
       case OT_DICT:
         return DictType::deserialize(s);
       case OT_DICTVECTOR:
@@ -881,6 +905,7 @@ namespace casadi {
   typedef GenericTypeInternal<OT_STRINGVECTOR, std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
   typedef GenericTypeInternal<OT_FUNCTIONVECTOR, std::vector<Function> > FunctionVectorType;
+  typedef GenericTypeInternal<OT_SPARSITY, Sparsity> SparsityType;
   typedef GenericTypeInternal<OT_DICT, Dict> DictType;
   typedef GenericTypeInternal<OT_DICTVECTOR, std::vector<Dict> > DictVectorType;
   typedef GenericTypeInternal<OT_VECTOR, std::vector<GenericType> > VectorType;
