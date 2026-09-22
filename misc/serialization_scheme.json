@@ -112,6 +112,9 @@
     "Interpolant": [
       2
     ],
+    "IpmcInterface": [
+      2
+    ],
     "IpoptInterface": [
       3
     ],
@@ -152,7 +155,7 @@
       1
     ],
     "Nlpsol": [
-      5
+      7
     ],
     "OnnxFunction": [
       2
@@ -474,6 +477,9 @@
       1,
       2
     ],
+    "IpmcInterface": [
+      2
+    ],
     "IpoptInterface": [
       1,
       2,
@@ -525,7 +531,9 @@
       2,
       3,
       4,
-      5
+      5,
+      6,
+      7
     ],
     "OnnxFunction": [
       1,
@@ -5225,6 +5233,388 @@
           "op": "call"
         }
       ],
+      "IpmcInterface::serialize_body": [
+        {
+          "layout": "Nlpsol::serialize_body",
+          "op": "call"
+        },
+        {
+          "name": "IpmcInterface",
+          "op": "version",
+          "value": 2
+        },
+        {
+          "name": "IpmcInterface::jacg_sp",
+          "op": "field",
+          "type": "Sparsity"
+        },
+        {
+          "name": "IpmcInterface::hesslag_sp",
+          "op": "field",
+          "type": "Sparsity"
+        },
+        {
+          "name": "IpmcInterface::exact_hessian",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "name": "IpmcInterface::opts",
+          "op": "field",
+          "type": "Dict"
+        },
+        {
+          "name": "IpmcInterface::convexify",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "name": "IpmcInterface::Isp",
+          "op": "field",
+          "type": "Sparsity"
+        },
+        {
+          "name": "IpmcInterface::ABsp",
+          "op": "field",
+          "type": "Sparsity"
+        },
+        {
+          "name": "IpmcInterface::CDsp",
+          "op": "field",
+          "type": "Sparsity"
+        },
+        {
+          "name": "IpmcInterface::RSQsp",
+          "op": "field",
+          "type": "Sparsity"
+        },
+        {
+          "name": "IpmcInterface::AB_blocks",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::CD_blocks",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::RSQ_blocks",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::I_blocks",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::nxs",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::nus",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::ngs",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::nxc",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "IpmcInterface::N",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "IpmcInterface::structure_detection",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "IpmcInterface::AB_offsets",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::CD_offsets",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::RSQ_offsets",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::I_offsets",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::debug",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "name": "IpmcInterface::slacks",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "body": [
+            {
+              "name": "IpmcInterface::slack_g_lo",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::slack_g_up",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::slack_x_lo",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::slack_x_up",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::slack_stage",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::slack_perm",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::slack_ns",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::slack_offs",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::n_global",
+              "op": "field",
+              "type": "casadi_int"
+            },
+            {
+              "name": "IpmcInterface::slack_gperm",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::fs_z",
+              "op": "field",
+              "type": {
+                "element": "double",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::fs_Z",
+              "op": "field",
+              "type": {
+                "element": "double",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "field",
+            "IpmcInterface::slacks"
+          ],
+          "op": "if"
+        },
+        {
+          "name": "IpmcInterface::n_lift",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "body": [
+            {
+              "name": "IpmcInterface::nxt",
+              "op": "field",
+              "type": "casadi_int"
+            },
+            {
+              "name": "IpmcInterface::nat",
+              "op": "field",
+              "type": "casadi_int"
+            },
+            {
+              "name": "IpmcInterface::nxs_u",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::ngs_u",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::lift_x",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::lift_xfree",
+              "op": "field",
+              "type": {
+                "element": "char",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::lift_row",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::lift_kind",
+              "op": "field",
+              "type": {
+                "element": "char",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::lift_ent",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::lift_mflat",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::lift_m",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::lift_slot",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "not_equal",
+            [
+              "field",
+              "IpmcInterface::n_lift"
+            ],
+            [
+              "literal",
+              0
+            ]
+          ],
+          "op": "if"
+        }
+      ],
       "IpoptInterface::serialize_body": [
         {
           "layout": "Nlpsol::serialize_body",
@@ -6238,7 +6628,7 @@
         {
           "name": "Nlpsol",
           "op": "version",
-          "value": 5
+          "value": 7
         },
         {
           "name": "Nlpsol::nx",
@@ -6371,6 +6761,11 @@
             "element": "casadi_int",
             "name": "std::vector"
           }
+        },
+        {
+          "name": "Nlpsol::slack_S",
+          "op": "field",
+          "type": "Sparsity"
         }
       ],
       "Nlpsol::serialize_type": [
@@ -9748,6 +10143,12 @@
                             "op": "call"
                           }
                         ],
+                        "ipmc": [
+                          {
+                            "layout": "IpmcInterface::serialize_body",
+                            "op": "call"
+                          }
+                        ],
                         "ipopt": [
                           {
                             "layout": "IpoptInterface::serialize_body",
@@ -10031,6 +10432,13 @@
                   "name": "GenericType::d",
                   "op": "field",
                   "type": "casadi_int"
+                }
+              ],
+              "20": [
+                {
+                  "name": "GenericType::d",
+                  "op": "field",
+                  "type": "Sparsity"
                 }
               ],
               "3": [

@@ -1765,7 +1765,7 @@ IpmcInterface::IpmcInterface(DeserializingStream& s) : Nlpsol(s) {
   nxs_u_ = nxs_;
   ngs_u_ = ngs_;
   s.unpack("IpmcInterface::n_lift", n_lift_);
-  if (n_lift_>0) {
+  if (n_lift_ != 0) {
     s.unpack("IpmcInterface::nxt", nxt_);
     s.unpack("IpmcInterface::nat", nat_);
     s.unpack("IpmcInterface::nxs_u", nxs_u_);
@@ -1831,7 +1831,7 @@ void IpmcInterface::serialize_body(SerializingStream &s) const {
   }
 
   s.pack("IpmcInterface::n_lift", n_lift_);
-  if (n_lift_>0) {
+  if (n_lift_ != 0) {
     s.pack("IpmcInterface::nxt", nxt_);
     s.pack("IpmcInterface::nat", nat_);
     s.pack("IpmcInterface::nxs_u", nxs_u_);
