@@ -461,6 +461,65 @@ class Threadstests(casadiTestCase):
     p = ThreadPool(n_thread)
 
     results = p.map(casadi_calc,range(n_thread))
-  
+
+  def test_codegen_config_symbols(self):
+    # Generated code exports the configuration it was compiled with
+    if platform.system()!="Linux": return
+    import ctypes
+    import subprocess
+    import tempfile
+    x = ca.MX.sym("x")
+    f = ca.Function("f", [x], [ca.sin(x)])
+    # C output compiled as C and as C++ (inside its extern "C" block), and C++ output
+    for cpp, compiler in [(False, ["gcc", "-pedantic"]), (False, ["g++", "-x", "c++"]),
+                          (True, ["g++"])]:
+      sizes = dict(casadi_int_size=8, casadi_real_size=8)
+      for definitions, expected in [([], dict(thread_type=1, **sizes)),
+                                    (["CASADI_THREAD_TYPE=0"], dict(thread_type=0, **sizes)),
+                                    (["casadi_int=int", "casadi_real=float"],
+                                     dict(thread_type=1, casadi_int_size=4, casadi_real_size=4))]:
+        with tempfile.TemporaryDirectory() as d:
+          cg = ca.CodeGenerator("tt", {"thread_safe": True, "cpp": cpp, "with_header": True})
+          cg.add(f)
+          cg.generate(d + os.sep)
+          src = os.path.join(d, "tt.cpp" if cpp else "tt.c")
+          lib = os.path.join(d, "tt.so")
+          warn = ["-Wall", "-Wextra", "-Werror", "-Wno-unused-parameter"]
+          subprocess.run(compiler + warn + ["-fPIC", "-shared", src, "-o", lib, "-pthread"]
+                         + ["-D" + e for e in definitions], check=True)
+          # The header declares them
+          user = os.path.join(d, "user.cpp" if cpp else "user.c")
+          with open(user, "w") as u:
+            u.write('#include "tt.h"\n'
+                    'int user(void) {\n'
+                    '  int major, minor, patch;\n'
+                    '  tt_casadi_version(&major, &minor, &patch);\n'
+                    '  return major + tt_thread_type() + tt_casadi_int_size()\n'
+                    '    + tt_casadi_real_size();\n'
+                    '}\n')
+          subprocess.run(compiler + warn + ["-c", user, "-o", os.path.join(d, "user.o")],
+                         check=True)
+          dll = ctypes.CDLL(lib)
+          version = [ctypes.c_int() for _ in range(3)]
+          dll.tt_casadi_version(*[ctypes.byref(v) for v in version])
+          self.assertEqual([v.value for v in version],
+                           [int(e) for e in ca.CasadiMeta.version().split("+")[0].split(".")])
+          for k, v in expected.items():
+            self.assertEqual(getattr(dll, "tt_" + k)(), v)
+    # Thread type only with thread primitives, max_num_threads only with a memory pool
+    cg = ca.CodeGenerator("tt")
+    cg.add(f)
+    code = cg.dump()
+    self.assertIn("void tt_casadi_version(int* major, int* minor, int* patch)", code)
+    self.assertIn("int tt_casadi_int_size(void)", code)
+    self.assertIn("int tt_casadi_real_size(void)", code)
+    self.assertNotIn("tt_thread_type", code)
+    self.assertNotIn("tt_max_num_threads", code)
+    if ca.has_nlpsol("ipopt"):
+      solver = ca.nlpsol("solver", "ipopt", {"x": x, "f": x**2})
+      cg = ca.CodeGenerator("tt")
+      cg.add(solver)
+      self.assertIn("int tt_max_num_threads(void) { return CASADI_MAX_NUM_THREADS; }", cg.dump())
+
 if __name__ == '__main__':
     unittest.main()

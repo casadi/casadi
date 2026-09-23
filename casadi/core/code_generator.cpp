@@ -996,6 +996,28 @@ namespace casadi {
     // Codegen auxiliary functions
     s << this->auxiliaries.str();
 
+    // The configuration this file is compiled with, for whoever loads it
+    s << "/* Configuration this file was compiled with */\n"
+      << declare("void " + this->prefix + "_casadi_version(int* major, int* minor, int* patch)")
+      << " {\n"
+      << "  *major = " << CASADI_MAJOR_VERSION << ";\n"
+      << "  *minor = " << CASADI_MINOR_VERSION << ";\n"
+      << "  *patch = " << CASADI_PATCH_VERSION << ";\n"
+      << "}\n"
+      << declare("int " + this->prefix + "_casadi_int_size(void)")
+      << " { return (int) sizeof(casadi_int); }\n"
+      << declare("int " + this->prefix + "_casadi_real_size(void)")
+      << " { return (int) sizeof(casadi_real); }\n";
+    if (needs_mem_) {
+      s << declare("int " + this->prefix + "_max_num_threads(void)")
+        << " { return CASADI_MAX_NUM_THREADS; }\n";
+    }
+    if (added_auxiliaries_.count(AUX_THREADS)) {
+      s << declare("int " + this->prefix + "_thread_type(void)")
+        << " { return CASADI_THREAD_TYPE; }\n";
+    }
+    s << "\n";
+
     // Print integer constants
     if (!integer_constants_.empty()) {
       for (casadi_int i=0; i<integer_constants_.size(); ++i) {
