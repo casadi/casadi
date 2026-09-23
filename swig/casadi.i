@@ -1747,6 +1747,8 @@ namespace std {
 #ifdef SWIGPYTHON
       case OT_NULL:
       case OT_VOIDPTR:
+        // A new reference, like every other branch
+        Py_INCREF(Py_None);
         return Py_None;
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
