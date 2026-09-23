@@ -89,6 +89,8 @@ struct casadi_nlpsol_data {
   T1 *f, *x, *g, *lam_x, *lam_g, *lam_p;
 
   casadi_nlpsol_detect_bounds_data<T1> detect_bounds;
+  // C-STATS
+  casadi_int scope;
 };
 // C-REPLACE "casadi_nlpsol_data<T1>" "struct casadi_nlpsol_data"
 

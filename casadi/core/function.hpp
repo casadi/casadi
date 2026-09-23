@@ -28,6 +28,7 @@
 #include "sx_elem.hpp"
 #include "mx.hpp"
 #include "printable.hpp"
+#include "stats_recorder.hpp"
 #include <exception>
 #include <stack>
 
@@ -582,6 +583,15 @@ namespace casadi {
               bool always_inline=false, bool never_inline=false) const;
     void call(const DMDict& arg, DMDict& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false) const;
+    ///@}
+
+    ///@{
+    /** \brief Evaluate numerically, recording statistics into stats
+
+        stats is reset first; afterwards it holds the call tree of this evaluation. */
+    void call(StatsRecorder& stats, const std::vector<DM> &arg,
+              std::vector<DM>& SWIG_OUTPUT(res)) const;
+    void call(StatsRecorder& stats, const DMDict& arg, DMDict& SWIG_OUTPUT(res)) const;
     void call(const SXDict& arg, SXDict& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false) const;
     void call(const MXDict& arg, MXDict& SWIG_OUTPUT(res),
@@ -595,9 +605,11 @@ namespace casadi {
     ///@{
     /// Functor shorthand for evaluation
     std::vector<DM> operator()(const std::vector<DM>& arg) const;
+    std::vector<DM> operator()(StatsRecorder& stats, const std::vector<DM>& arg) const;
     std::vector<SX> operator()(const std::vector<SX>& arg) const;
     std::vector<MX> operator()(const std::vector<MX>& arg) const;
     const DMDict operator()(const DMDict& arg) const;
+    const DMDict operator()(StatsRecorder& stats, const DMDict& arg) const;
     const SXDict operator()(const SXDict& arg) const;
     const MXDict operator()(const MXDict& arg) const;
     ///@}
@@ -662,7 +674,7 @@ namespace casadi {
     /** \brief Evaluate memory-less, numerically
 
         sink: the stats stream to report to (null: not recorded);
-        parent: the call this one belongs to
+        parent: the node this call belongs to
 
         \identifier{1wb} */
     int operator()(const double** arg, double** res, casadi_int* iw, double* w, int mem,
@@ -1263,6 +1275,11 @@ namespace casadi {
 
         \identifier{1xv} */
     const std::string& name() const;
+
+    /** \brief Identifier of this instance in recorded stats
+
+        Process-unique; not preserved by serialization */
+    std::string stats_id() const;
 
     /** \brief Check if the function is of a particular type
 

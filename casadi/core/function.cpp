@@ -37,6 +37,7 @@
 #include "serializer.hpp"
 #include "tools.hpp"
 #include "filesystem_impl.hpp"
+#include "stats_recorder_internal.hpp"
 
 #include <cctype>
 #include <fstream>
@@ -1515,6 +1516,11 @@ namespace casadi {
     }
   }
 
+  std::string Function::stats_id() const {
+    casadi_assert(!is_null(), "Null function has no stats id");
+    return (*this)->stats_id_;
+  }
+
   bool Function::check_name(const std::string& name) {
     // Check if empty
     if (name.empty()) return false;
@@ -1605,6 +1611,12 @@ namespace casadi {
     return res;
   }
 
+  std::vector<DM> Function::operator()(StatsRecorder& stats, const std::vector<DM>& arg) const {
+    std::vector<DM> res;
+    call(stats, arg, res);
+    return res;
+  }
+
   std::vector<SX> Function::operator()(const std::vector<SX>& arg) const {
     std::vector<SX> res;
     call(arg, res);
@@ -1640,6 +1652,12 @@ namespace casadi {
     return res;
   }
 
+  const DMDict Function::operator()(StatsRecorder& stats, const DMDict& arg) const {
+    DMDict res;
+    call(stats, arg, res);
+    return res;
+  }
+
   const SXDict Function::operator()(const SXDict& arg) const {
     SXDict res;
     call(arg, res);
@@ -1659,6 +1677,25 @@ namespace casadi {
     } catch(std::exception& e) {
       THROW_ERROR("call", e.what());
     }
+  }
+
+  void Function::call(StatsRecorder& stats, const std::vector<DM> &arg,
+                      std::vector<DM>& res) const {
+    if (stats.is_null()) return call(arg, res);
+    // A new recording, with this call as its root
+    stats->reset();
+    try {
+      (*this)->call(arg, res, false, false, stats->sink());
+    } catch(std::exception& e) {
+      THROW_ERROR("call", e.what());
+    }
+  }
+
+  void Function::call(StatsRecorder& stats, const DMDict& arg, DMDict& res) const {
+    std::vector<DM> res_v;
+    call(stats, (*this)->convert_arg(arg), res_v);
+    res.clear();
+    for (casadi_int i=0; i<res_v.size(); ++i) res[name_out(i)] = res_v[i];
   }
 
   void Function::call(const SXDict& arg, SXDict& res,

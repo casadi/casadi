@@ -24,6 +24,7 @@
 
 
 #include "mapsum.hpp"
+#include "map.hpp"
 #include "serializing_stream.hpp"
 
 namespace casadi {
@@ -169,7 +170,11 @@ namespace casadi {
       }
     }
     for (casadi_int i=0; i<n_; ++i) {
-      if (f_(arg1, res1, iw, w, mem, sink, call)) return 1;
+      // The call of iteration i of this call
+      casadi_int it = casadi_stats_begin_iteration(sink, call, i);
+      int flag = f_(arg1, res1, iw, w, mem, sink, it);
+      casadi_stats_end_scope(sink, it);
+      if (flag) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
         if (arg1[j] && !reduce_in_[j]) arg1[j] += f_.nnz_in(j);
       }
@@ -266,8 +271,10 @@ namespace casadi {
     }
 
     g << "for (i=0; i<" << n_ << "; ++i) {\n";
-    // Evaluate
-    std::string flag = g(f_, "arg1", "res1", "iw", "w");
+    // Evaluate as iteration i; the call's statements (stats, memory) go before the test of its
+    // flag
+    std::string flag = codegen_iteration(g, f_, "arg1", "res1", "iw", "w", "1", "sink", "call",
+                                         "i");
     g << "if (" << flag << ") return 1;\n";
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {

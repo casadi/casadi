@@ -24,6 +24,7 @@
 
 
 #include "function_internal.hpp"
+#include "stats_recorder_internal.hpp"
 #include "casadi_call.hpp"
 #include "call_sx.hpp"
 #include "casadi_misc.hpp"
@@ -66,6 +67,12 @@ namespace casadi {
     error_on_fail_ = true;
   }
 
+#ifdef CASADI_WITH_THREAD
+  std::atomic<casadi_int> FunctionInternal::instance_count_(0);
+#else
+  casadi_int FunctionInternal::instance_count_ = 0;
+#endif // CASADI_WITH_THREAD
+
   FunctionInternal::FunctionInternal(const std::string& name) : ProtoFunction(name) {
     // Make sure valid function name
     if (!Function::check_name(name_)) {
@@ -85,6 +92,7 @@ namespace casadi {
     max_num_dir_ = GlobalOptions::getMaxNumDir();
     user_data_ = nullptr;
     inputs_check_ = true;
+    gather_stats_ = true;
     jit_ = false;
     jit_cleanup_ = true;
     jit_serialize_ = "source";
@@ -93,6 +101,7 @@ namespace casadi {
     compiler_plugin_ = CASADI_STR(CASADI_DEFAULT_COMPILER_PLUGIN);
 
     eval_ = nullptr;
+    eval_stats_ = nullptr;
     checkout_ = nullptr;
     release_ = nullptr;
     incref_ = nullptr;
@@ -121,6 +130,7 @@ namespace casadi {
     sz_w_per_ = 0;
 
     dump_count_ = 0;
+    stats_id_ = "#" + str(instance_count_++) + ":" + name_;
   }
 
   ProtoFunction::~ProtoFunction() {
@@ -229,7 +239,8 @@ namespace casadi {
         "Throw exceptions when the numerical values of the inputs don't make sense"}},
       {"gather_stats",
        {OT_BOOL,
-        "Deprecated option (ignored): Statistics are now always collected."}},
+        "Record calls of this function, and the calls it makes, in a stats stream "
+        "(StatsRecorder, codegen option stats) [default: true]"}},
       {"jit",
        {OT_BOOL,
         "Use just-in-time compiler to speed up the evaluation"}},
@@ -493,7 +504,7 @@ namespace casadi {
       } else if (op.first=="inputs_check") {
         inputs_check_ = op.second;
       } else if (op.first=="gather_stats") {
-        casadi_warning("Deprecated option \"gather_stats\": Always enabled");
+        gather_stats_ = op.second;
       } else if (op.first=="jit") {
         jit_ = op.second;
       } else if (op.first=="jit_cleanup") {
@@ -778,6 +789,12 @@ namespace casadi {
         incref_ = (signal_t) compiler_.get_function(name_ + "_incref");
         decref_ = (signal_t) compiler_.get_function(name_ + "_decref");
         casadi_assert(eval_!=nullptr, "Cannot load JIT'ed function.");
+        // Generated with "stats": the call tree continues through the sink's callback
+        auto stats_function_pointers =
+          (int (*)(void)) compiler_.get_function(name_ + "_stats_function_pointers");
+        if (stats_function_pointers && stats_function_pointers()) {
+          eval_stats_ = (eval_stats_t) compiler_.get_function(name_ + "_with_stats");
+        }
         if (incref_) incref_();
       } else {
         // Just jit dependencies
@@ -852,11 +869,13 @@ namespace casadi {
   }
 
   std::unique_ptr<std::ostream> FunctionInternal::
-  open_trace(const double** arg, casadi_int dump_id) const {
+  open_trace(const double** arg, casadi_int dump_id,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (dump_id < 0) dump_id = get_dump_id();
     std::stringstream filename;
     filename << dump_dir_ << filesep() << name_ << "." << std::setfill('0')
              << std::setw(6) << dump_id << ".trace.jsonl";
+    casadi_stats_put_text(sink, call, CASADI_STATS_SET, "dump_trace", filename.str().c_str());
     auto output = Filesystem::ofstream_ptr(filename.str());
     std::ostream& trace = *output;
     normalized_setup(trace);
@@ -887,7 +906,7 @@ namespace casadi {
     casadi_assert(trace.good(), "Failed to write dump_trace for '" + name_ + "'");
   }
 
-  void FunctionInternal::dump_in(casadi_int id, const double** arg) const {
+  std::string FunctionInternal::dump_in(casadi_int id, const double** arg) const {
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(6) << id;
     std::string count = ss.str();
@@ -900,9 +919,10 @@ namespace casadi {
       casadi_message("dump_in for " + name_ + " -> " + name);
     }
     generate_in(name, arg);
+    return name;
   }
 
-  void FunctionInternal::dump_out(casadi_int id, double** res) const {
+  std::string FunctionInternal::dump_out(casadi_int id, double** res) const {
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(6) << id;
     std::string count = ss.str();
@@ -915,10 +935,13 @@ namespace casadi {
       casadi_message("dump_out for " + name_ + " -> " + name);
     }
     generate_out(name, res);
+    return name;
   }
 
-  void FunctionInternal::dump() const {
-    shared_from_this<Function>().save(dump_dir_+ filesep() + name_ + ".casadi");
+  std::string FunctionInternal::dump() const {
+    std::string name = dump_dir_+ filesep() + name_ + ".casadi";
+    shared_from_this<Function>().save(name);
+    return name;
   }
 
   casadi_int FunctionInternal::get_dump_id() const {
@@ -1030,9 +1053,20 @@ namespace casadi {
   eval_gen(const double** arg, double** res, casadi_int* iw, double* w, int mem,
       bool always_inline, bool never_inline,
       casadi_stats_sink* sink, casadi_int parent) const {
+    // Unrecorded, with the calls it makes, unless gathering stats
+    if (!gather_stats_) sink = nullptr;
+    // This call is a node of the call tree (none without a sink); calls made from it report
+    // under it
+    casadi_int call = casadi_stats_begin_call(sink, stats_id().c_str(),
+      codegen_needs_mem() ? mem : -1, parent);
     casadi_int dump_id = (dump_in_ || dump_out_ || dump_) ? get_dump_id() : -1;
-    if (dump_in_) dump_in(dump_id, arg);
-    if (dump_ && dump_id==0) dump();
+    // Stats name the files dumped to
+    if (dump_in_) {
+      casadi_stats_put_text(sink, call, CASADI_STATS_SET, "dump_in", dump_in(dump_id, arg).c_str());
+    }
+    if (dump_ && dump_id==0) {
+      casadi_stats_put_text(sink, call, CASADI_STATS_SET, "dump", dump().c_str());
+    }
     if (print_in_) print_in(uout(), arg, false);
     auto *m = static_cast<FunctionMemory*>(memory(mem));
 
@@ -1061,7 +1095,12 @@ namespace casadi {
 #endif //CASADI_WITH_THREAD
         mem_ = checkout_();
       }
-      ret = eval_(arg, res, iw, w, mem_);
+      if (sink && eval_stats_) {
+        // A generated library continues the call tree
+        ret = eval_stats_(arg, res, iw, w, mem_, sink, call);
+      } else {
+        ret = eval_(arg, res, iw, w, mem_);
+      }
       if (release_) {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
@@ -1069,13 +1108,16 @@ namespace casadi {
         release_(mem_);
       }
     } else {
-      ret = eval(arg, res, iw, w, m, sink, -1);
+      ret = eval(arg, res, iw, w, m, sink, call);
     }
     if (m->t_total) m->t_total->toc();
     // Show statistics
     print_time(m->fstats);
 
-    if (dump_out_) dump_out(dump_id, res);
+    if (dump_out_) {
+      casadi_stats_put_text(sink, call, CASADI_STATS_SET, "dump_out",
+        dump_out(dump_id, res).c_str());
+    }
     if (print_out_) print_out(uout(), res, false);
     // Check all outputs for NaNs
     if (regularity_check_) {
@@ -1093,6 +1135,8 @@ namespace casadi {
         }
       }
     }
+    // An exception above leaves the call without END: the decoder reports it as aborted
+    casadi_stats_end_call(sink, call, ret);
     return ret;
   }
 
@@ -2517,7 +2561,7 @@ namespace casadi {
   void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
     // Define function
     g << "/* " << definition() << " */\n";
-    g << "static " << signature(fname) << " {\n";
+    g << "static " << (g.stats() ? signature_internal(fname) : signature(fname)) << " {\n";
 
     // Reset local variables, flush buffer
     g.flush(g.body);
@@ -2557,6 +2601,19 @@ namespace casadi {
 
     // Flush to function body
     g.flush(g.body);
+  }
+
+  std::string FunctionInternal::signature_internal(const std::string& fname) const {
+    // sink and call are what calls emitted in the body report to by default
+    return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
+                            "casadi_int* iw, casadi_real* w, int mem, "
+                            "struct casadi_stats_sink* sink, casadi_int call)";
+  }
+
+  std::string FunctionInternal::signature_stats(const std::string& fname) const {
+    return "int " + fname + "_with_stats(const casadi_real** arg, casadi_real** res, "
+                            "casadi_int* iw, casadi_real* w, int mem, "
+                            "struct casadi_stats_sink* sink, casadi_int parent)";
   }
 
   std::string FunctionInternal::signature(const std::string& fname) const {
@@ -4190,7 +4247,7 @@ namespace casadi {
 
   void FunctionInternal::
   call_gen(const MXVector& arg, MXVector& res, casadi_int npar,
-           bool always_inline, bool never_inline) const {
+           bool always_inline, bool never_inline, casadi_stats_sink* sink) const {
     if (npar==1) {
       eval_mx(arg, res, always_inline, never_inline);
     } else {
@@ -4254,7 +4311,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 9);
+    s.version("FunctionInternal", 10);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -4304,6 +4361,7 @@ namespace casadi {
     s.pack("FunctionInternal::max_num_dir", max_num_dir_);
 
     s.pack("FunctionInternal::inputs_check", inputs_check_);
+    s.pack("FunctionInternal::gather_stats", gather_stats_);
 
     s.pack("FunctionInternal::fd_step", fd_step_);
 
@@ -4335,11 +4393,12 @@ namespace casadi {
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
     eval_ = nullptr;
+    eval_stats_ = nullptr;
     checkout_ = nullptr;
     release_ = nullptr;
     incref_ = nullptr;
     decref_ = nullptr;
-    int version = s.version("FunctionInternal", 1, 9);
+    int version = s.version("FunctionInternal", 1, 10);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -4407,6 +4466,8 @@ namespace casadi {
     if (version < 3) s.unpack("FunctionInternal::regularity_check", regularity_check_);
 
     s.unpack("FunctionInternal::inputs_check", inputs_check_);
+    gather_stats_ = true;
+    if (version >= 10) s.unpack("FunctionInternal::gather_stats", gather_stats_);
 
     s.unpack("FunctionInternal::fd_step", fd_step_);
 
@@ -4455,9 +4516,11 @@ namespace casadi {
     n_in_ = sparsity_in_.size();
     n_out_ = sparsity_out_.size();
     eval_ = nullptr;
+    eval_stats_ = nullptr;
     checkout_ = nullptr;
     release_ = nullptr;
     dump_count_ = 0;
+    stats_id_ = "#" + str(instance_count_++) + ":" + name_;
   }
 
   void ProtoFunction::serialize(SerializingStream& s) const {

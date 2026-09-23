@@ -30,6 +30,7 @@
 #include "../../core/global_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
 #include "../../core/convexify.hpp"
+#include "../../core/stats_recorder_internal.hpp"
 
 #include <ctime>
 #include <stdlib.h>
@@ -42,6 +43,8 @@
 #include <ipopt_runtime_str.h>
 
 namespace casadi {
+  // Runtime without the Ipopt C interface, shared with generated code
+  #include "ipopt_base_runtime.hpp"
   extern "C"
   int CASADI_NLPSOL_IPOPT_EXPORT
   casadi_register_nlpsol_ipopt(Nlpsol::Plugin* plugin) {
@@ -382,54 +385,6 @@ namespace casadi {
     }
   }
 
-  inline const char* return_status_string(Ipopt::ApplicationReturnStatus status) {
-    switch (status) {
-    case Solve_Succeeded:
-      return "Solve_Succeeded";
-    case Solved_To_Acceptable_Level:
-      return "Solved_To_Acceptable_Level";
-    case Infeasible_Problem_Detected:
-      return "Infeasible_Problem_Detected";
-    case Search_Direction_Becomes_Too_Small:
-      return "Search_Direction_Becomes_Too_Small";
-    case Diverging_Iterates:
-      return "Diverging_Iterates";
-    case User_Requested_Stop:
-      return "User_Requested_Stop";
-    case Maximum_Iterations_Exceeded:
-      return "Maximum_Iterations_Exceeded";
-    case Restoration_Failed:
-      return "Restoration_Failed";
-    case Error_In_Step_Computation:
-      return "Error_In_Step_Computation";
-    case Not_Enough_Degrees_Of_Freedom:
-      return "Not_Enough_Degrees_Of_Freedom";
-    case Invalid_Problem_Definition:
-      return "Invalid_Problem_Definition";
-    case Invalid_Option:
-      return "Invalid_Option";
-    case Invalid_Number_Detected:
-      return "Invalid_Number_Detected";
-    case Unrecoverable_Exception:
-      return "Unrecoverable_Exception";
-    case NonIpopt_Exception_Thrown:
-      return "NonIpopt_Exception_Thrown";
-    case Insufficient_Memory:
-      return "Insufficient_Memory";
-    case Internal_Error:
-      return "Internal_Error";
-    case Maximum_CpuTime_Exceeded:
-      return "Maximum_CpuTime_Exceeded";
-    case Feasible_Point_Found:
-      return "Feasible_Point_Found";
-#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
-    case Maximum_WallTime_Exceeded:
-      return "Maximum_WallTime_Exceeded";
-#endif
-    }
-    return "Unknown";
-  }
-
   int IpoptInterface::solve(void* mem) const {
     auto m = static_cast<IpoptMemory*>(mem);
     auto d_nlp = &m->d_nlp;
@@ -448,6 +403,13 @@ namespace casadi {
     // Reset number of iterations
     m->n_iter = 0;
 
+    // Stats records, as generated code writes them: the fields of the iterations, and the
+    // oracle calls before the first one under "pre"
+    if (m->sink) {
+      casadi_ipopt_stats_declare_fields(m->sink, m->call);
+      m->scope = casadi_stats_begin_section(m->sink, m->call, "pre");
+    }
+
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass =
       static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(m->userclass);
@@ -456,7 +418,7 @@ namespace casadi {
 
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
-    m->return_status = return_status_string(status);
+    m->return_status = casadi_ipopt_return_status_string(status);
     m->success = status==Solve_Succeeded || status==Solved_To_Acceptable_Level
                  || status==Feasible_Point_Found;
     if (status==Maximum_Iterations_Exceeded ||
@@ -465,6 +427,13 @@ namespace casadi {
 #if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
     if (status==Maximum_WallTime_Exceeded) m->unified_return_status = SOLVER_RET_LIMITED;
 #endif
+
+    // Stats records, as generated code writes them. Nlpsol promotes success only after
+    // solve() returns; apply the same rule here
+    if (m->sink) {
+      casadi_ipopt_stats_set_outcome(m->sink, m->call, static_cast<int>(status),
+        m->success ? SOLVER_RET_SUCCESS : m->unified_return_status, m->success, m->iter_count);
+    }
 
     // Save results to outputs
     casadi_copy(m->gk, ng_, d_nlp->z + nx_);
@@ -501,8 +470,15 @@ namespace casadi {
                         const double* g, const double* lambda, double obj_value, int iter,
                         double inf_pr, double inf_du, double mu, double d_norm,
                         double regularization_size, double alpha_du, double alpha_pr,
-                        int ls_trials, bool full_callback) const {
+                        int ls_trials, bool full_callback, int alg_mod) const {
     auto d_nlp = &m->d_nlp;
+    // Stats records, as generated code writes them: every iteration, which the oracle calls
+    // that follow go under
+    if (m->sink) {
+      m->scope = casadi_ipopt_stats_next_iteration(m->sink, m->call, m->scope, iter, alg_mod,
+        obj_value, inf_pr, inf_du, mu, d_norm, regularization_size, alpha_du, alpha_pr,
+        ls_trials);
+    }
     m->n_iter += 1;
     try {
       m->inf_pr.push_back(inf_pr);
@@ -514,7 +490,8 @@ namespace casadi {
       m->alpha_du.push_back(alpha_du);
       m->ls_trials.push_back(ls_trials);
       m->obj.push_back(obj_value);
-      if (!fcallback_.is_null()) {
+      // Only call the callback every few iterations
+      if (!fcallback_.is_null() && iter % callback_step_==0) {
         ScopedTiming tic(m->fstats.at("callback_fun"));
         if (full_callback) {
           casadi_copy(x, nx_, d_nlp->z);
@@ -827,6 +804,9 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   }
   g.add_include("coin-or/IpStdCInterface.h");
 
+  // Oracle calls below report under the solver call that Ipopt calls back into
+  if (g.stats()) codegen_stats_declarations(g);
+
   std::string name = "nlp_f";
   std::string f = g.shorthand(g.wrapper(get_function(name), name));
 
@@ -838,7 +818,8 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   g << "d->arg[0] = x;\n";
   g << "d->arg[1] = d->nlp->p;\n";
   g << "d->res[0] = obj_value;\n";
-  std::string flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
+  std::string flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false",
+                       "d->sink", "d->nlp->scope");
   g << "if (" + flag + ") return false;\n";
   g << "return true;\n";
   g.scope_exit();
@@ -854,7 +835,8 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   g << "d->arg[0] = x;\n";
   g << "d->arg[1] = d->nlp->p;\n";
   g << "d->res[0] = g;\n";
-  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
+  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false",
+           "d->sink", "d->nlp->scope");
   g << "if (" + flag + ") return false;\n";
   g << "return true;\n";
   g.scope_exit();
@@ -871,7 +853,8 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   g << "d->arg[1] = d->nlp->p;\n";
   g << "d->res[0] = 0;\n";
   g << "d->res[1] = grad_f;\n";
-  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
+  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false",
+           "d->sink", "d->nlp->scope");
   g << "if (" + flag + ") return false;\n";
   g << "return true;\n";
   g.scope_exit();
@@ -891,7 +874,8 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   g << "d->arg[1] = d->nlp->p;\n";
   g << "d->res[0] = 0;\n";
   g << "d->res[1] = values;\n";
-  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
+  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false",
+           "d->sink", "d->nlp->scope");
   g << "if (" + flag + ") return false;\n";
   g << "} else {\n";
   g << "casadi_ipopt_sparsity(d->prob->sp_a, iRow, jCol);\n";
@@ -915,7 +899,8 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
     g << "d->arg[2] = &obj_factor;\n";
     g << "d->arg[3] = lambda;\n";
     g << "d->res[0] = values;\n";
-    flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
+    flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false",
+             "d->sink", "d->nlp->scope");
     g << "if (" + flag + ") return false;\n";
     g << "return true;\n";
     g << "} else {\n";
@@ -927,9 +912,28 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   }
 }
 
+void IpoptInterface::codegen_stats_declarations(CodeGenerator& g) const {
+  Function self = shared_from_this<Function>();
+
+  // Every Ipopt iteration, which the oracle calls that follow go under
+  std::string cb = g.shorthand(g.wrapper(self, "ipopt_intermediate"));
+  g << "bool " << cb << "(ipindex alg_mod, ipindex iter_count, ipnumber obj_value, "
+    << "ipnumber inf_pr, ipnumber inf_du, ipnumber mu, ipnumber d_norm, "
+    << "ipnumber regularization_size, ipnumber alpha_du, ipnumber alpha_pr, "
+    << "ipindex ls_trials, UserDataPtr user_data) {\n";
+  g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
+  g << "d->nlp->scope = casadi_ipopt_stats_next_iteration(d->sink, d->call, d->nlp->scope, "
+    << "iter_count, alg_mod, obj_value, inf_pr, inf_du, mu, d_norm, regularization_size, "
+    << "alpha_du, alpha_pr, ls_trials);\n";
+  g << "d->iter_count = iter_count;\n";
+  g << "return true;\n";
+  g << "}\n\n";
+}
+
 void IpoptInterface::codegen_body(CodeGenerator& g) const {
   codegen_body_enter(g);
   g.auxiliaries << g.sanitize_source(ipopt_runtime_str, {"casadi_real"});
+  if (g.stats()) g.auxiliaries << g.sanitize_source(ipopt_base_runtime_str, {"casadi_real"});
 
   g.local("d", "struct casadi_ipopt_data*");
   g.init_local("d", "&" + codegen_mem(g));
@@ -938,6 +942,16 @@ void IpoptInterface::codegen_body(CodeGenerator& g) const {
 
   g << "casadi_ipopt_set_work(d, &arg, &res, &iw, &w);\n";
   g << "casadi_ipopt_presolve(d);\n";
+  if (g.stats()) {
+    Function self = shared_from_this<Function>();
+    g << "d->sink = sink;\n";
+    g << "d->call = call;\n";
+    g << "d->iter_count = 0;\n";
+    g << "casadi_ipopt_stats_declare_fields(sink, call);\n";
+    g << "d_nlp.scope = casadi_stats_begin_section(sink, call, \"pre\");\n";
+    g << "if (sink) SetIntermediateCallback(d->ipopt, "
+      << g.shorthand(g.wrapper(self, "ipopt_intermediate")) << ");\n";
+  }
 
   // Start an IPOPT application
   Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();
@@ -1013,6 +1027,11 @@ void IpoptInterface::codegen_body(CodeGenerator& g) const {
 
   // Options
   g << "casadi_ipopt_solve(d);\n";
+
+  if (g.stats()) {
+    g << "casadi_ipopt_stats_set_outcome(sink, call, d->status, d->unified_return_status, "
+      << "d->success, d->iter_count);\n";
+  }
 
   codegen_body_exit(g);
 

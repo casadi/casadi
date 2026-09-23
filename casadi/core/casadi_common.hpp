@@ -168,6 +168,8 @@ namespace casadi {
 
   // Stats sink an evaluation reports to (null: not recorded)
   struct casadi_stats_sink;
+  typedef int (*eval_stats_t)(const double** arg, double** res, casadi_int* iw, double* w, int,
+                              casadi_stats_sink* sink, casadi_int parent);
   ///@}
 
   // Easier to maintain than an enum (serialization/codegen)

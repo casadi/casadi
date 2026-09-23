@@ -32,6 +32,12 @@
 
 namespace casadi {
 
+  /** \brief Generate a call to f as the call of iteration i of parent: its flag */
+  CASADI_EXPORT std::string codegen_iteration(CodeGenerator& g, const Function& f,
+    const std::string& arg, const std::string& res, const std::string& iw,
+    const std::string& w, const std::string& failure_ret, const std::string& sink,
+    const std::string& parent, const std::string& i);
+
   /** Evaluate in parallel
       \author Joel Andersson
       \date 2015

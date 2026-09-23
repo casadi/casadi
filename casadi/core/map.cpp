@@ -138,6 +138,20 @@ namespace casadi {
     alloc_iw(f_.sz_iw());
   }
 
+  std::string codegen_iteration(CodeGenerator& g, const Function& f,
+      const std::string& arg, const std::string& res, const std::string& iw,
+      const std::string& w, const std::string& failure_ret, const std::string& sink,
+      const std::string& parent, const std::string& i) {
+    if (!g.stats()) return g(f, arg, res, iw, w, failure_ret);
+    g.local("stats_it", "casadi_int");
+    g << "stats_it = casadi_stats_begin_iteration(" << sink << ", " << parent << ", " << i
+      << ");\n";
+    // With stats, the call is bracketed and its flag is a local
+    std::string flag = g(f, arg, res, iw, w, failure_ret, sink, "stats_it");
+    g << "casadi_stats_end_scope(" << sink << ", stats_it);\n";
+    return flag;
+  }
+
   template<typename T>
   int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem,
       casadi_stats_sink* sink, casadi_int call) const {
@@ -146,7 +160,11 @@ namespace casadi {
     T** res1 = res+n_out_;
     std::copy_n(res, n_out_, res1);
     for (casadi_int i=0; i<n_; ++i) {
-      if (f_(arg1, res1, iw, w, mem, sink, call)) return 1;
+      // The call of iteration i of this call
+      casadi_int it = casadi_stats_begin_iteration(sink, call, i);
+      int flag = f_(arg1, res1, iw, w, mem, sink, it);
+      casadi_stats_end_scope(sink, it);
+      if (flag) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
@@ -201,8 +219,9 @@ namespace casadi {
       << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
 
-    std::string flag = g(f_, "arg1", "res1", "iw", "w");
-    // Evaluate
+    // Evaluate as iteration i of this call
+    std::string flag = codegen_iteration(g, f_, "arg1", "res1", "iw", "w", "1", "sink", "call",
+                                         "i");
     g << "if (" << flag << ") return 1;\n";
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
@@ -372,7 +391,10 @@ namespace casadi {
 
       // Evaluation
       try {
-        flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i], sink, call) || flag;
+        // The call of iteration i of this call
+        casadi_int it = casadi_stats_begin_iteration(sink, call, i);
+        flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i], sink, it) || flag;
+        casadi_stats_end_scope(sink, it);
       } catch (std::exception& e) {
         flag = 1;
         casadi_warning("Exception raised: " + std::string(e.what()));
@@ -406,6 +428,15 @@ namespace casadi {
     g.local("cflag", "casadi_int");
     g.init_local("cflag", "0");
 
+    if (g.stats()) {
+      // The locals of a bracketed call, see CodeGenerator::operator()
+      g.local("stats_c", "casadi_int");
+      g.local("flag", "int");
+      g.local("stats_it", "casadi_int");
+      priv_vars += ",stats_c,stats_it";
+      if (!f_->codegen_needs_mem()) priv_vars += ",flag";
+    }
+
     g << "#pragma omp parallel for private(i,arg1,res1" << priv_vars << ") reduction(||:cflag)\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n"
       << "arg1 = arg + " << n_in_ << "+i*" << sz_arg << ";\n";
@@ -419,8 +450,9 @@ namespace casadi {
         << g.res(j) << "+i*" << f_.nnz_out(j) << ": 0;\n";
     }
 
-    std::string flag = g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w), "");
-
+    // Evaluate as iteration i of this call
+    std::string flag = codegen_iteration(g, f_, "arg1", "res1", "iw+i*" + str(sz_iw),
+                                         "w+i*" + str(sz_w), "", "sink", "call", "i");
     g << "cflag = "
       << flag << " || cflag;\n"
       << "}\n";
@@ -476,7 +508,10 @@ namespace casadi {
     }
 
     try {
-      ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind, sink, parent);
+      // The call of iteration i of the map's call
+      casadi_int it = casadi_stats_begin_iteration(sink, parent, i);
+      ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind, sink, it);
+      casadi_stats_end_scope(sink, it);
     } catch (std::exception& e) {
       ret = 1;
       casadi_warning("Exception raised: " + std::string(e.what()));
@@ -558,6 +593,10 @@ namespace casadi {
       g << "  casadi_int nnz_out_" << j << ";\n";
     }
     g << "  int ret;\n";
+    if (g.stats()) {
+      g << "  struct casadi_stats_sink* sink;\n";
+      g << "  casadi_int stats_parent;\n";
+    }
     g << "};\n\n";
 
     // Generate wrapper function using portable thread macros
@@ -584,10 +623,10 @@ namespace casadi {
         << "data->res[" << j << "] + i * data->nnz_out_" << j << " : 0;\n";
     }
 
-    // Call the function
-    std::string flag = g(f_, "arg1", "res1",
+    // Call the function as iteration i of the map's call
+    std::string flag = codegen_iteration(g, f_, "arg1", "res1",
                          "data->iw + i * data->sz_iw",
-                         "data->w + i * data->sz_w", "");
+                         "data->w + i * data->sz_w", "", "data->sink", "data->stats_parent", "i");
     g << "  data->ret = " << flag << ";\n";
     g << "  return CASADI_THREAD_RETURN_VALUE;\n";
     g.scope_exit();
@@ -629,6 +668,10 @@ namespace casadi {
       g << "  thread_args[i].nnz_out_" << j << " = " << f_.nnz_out(j) << ";\n";
     }
 
+    if (g.stats()) {
+      g << "  thread_args[i].sink = sink;\n";
+      g << "  thread_args[i].stats_parent = call;\n";
+    }
     g << "  CASADI_THREAD_CREATE(threads[i], " << worker_name << ", &thread_args[i]);\n";
     g << "}\n\n";
 

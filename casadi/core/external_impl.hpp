@@ -54,6 +54,12 @@ class CASADI_EXPORT External : public FunctionInternal {
       \identifier{282} */
   config_t config_;
 
+  /// Does the library export <name>_with_stats, and with which struct casadi_stats_sink?
+  bool has_stats_, stats_function_pointers_;
+
+  /// Does generated code call <name>_with_stats, handing the library its stats sink?
+  bool calls_with_stats(const CodeGenerator& g) const;
+
   /** \brief Number of inputs and outputs
 
       \identifier{1z4} */

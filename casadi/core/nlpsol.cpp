@@ -794,7 +794,8 @@ namespace casadi {
       casadi_stats_sink* sink, casadi_int call) const {
     auto *m = static_cast<NlpsolMemory*>(mem);
     m->sink = sink;
-    m->call = call;
+    // A plugin that records iterations moves the scope, starting with a section "pre"
+    m->call = m->scope = call;
 
     auto *d_nlp = &m->d_nlp;
 
@@ -831,6 +832,11 @@ namespace casadi {
 
     // Solve the NLP
     int flag = solve(m);
+    if (m->scope!=call) {
+      // The calls that follow the iterations
+      casadi_stats_end_scope(sink, m->scope);
+      m->scope = casadi_stats_begin_section(sink, call, "post");
+    }
 
     // Join statistics (introduced for parallel oracle facilities)
     join_results(m);
@@ -851,6 +857,10 @@ namespace casadi {
       }
       if (calc_lam_x_) casadi_scal(nx_, -1., d_nlp->lam);
       if (calc_lam_p_) casadi_scal(np_, -1., d_nlp->lam_p);
+    }
+    if (m->scope!=call) {
+      casadi_stats_end_scope(sink, m->scope);
+      m->scope = call;
     }
 
     // Make sure that an optimal solution is consistant with bounds
@@ -1333,6 +1343,8 @@ namespace casadi {
     g << "res += " << NLPSOL_NUM_OUT << ";\n";
 
     g << "casadi_nlpsol_set_work(&" << d_nlp << ", &arg, &res, &iw, &w);\n";
+    // A plugin that records iterations moves the scope, starting with a section "pre"
+    if (g.stats()) g << d_nlp << ".scope = call;\n";
 
     g.copy_default(d_nlp + ".x0",     nx_, d_nlp + ".z",   "0",           false);
     g.copy_default(d_nlp + ".lbx",    nx_, d_nlp + ".lbz", "-casadi_inf", false);
@@ -1362,7 +1374,8 @@ namespace casadi {
       g << "int " << w
         << "(const casadi_real** arg, casadi_real** res, "
         << "casadi_int* iw, casadi_real* w, void* callback_data) {\n";
-      std::string flag = g(detect_simple_bounds_parts_, "arg", "res", "iw", "w");
+      // No stats sink in this callback
+      std::string flag = g(detect_simple_bounds_parts_, "arg", "res", "iw", "w", "1", "");
       g << "return " + flag + ";\n";
       g << "}\n";
     }
@@ -1374,6 +1387,14 @@ namespace casadi {
   }
 
   void Nlpsol::codegen_post_solve(CodeGenerator& g, const std::string& d_nlp) const {
+    std::string scope = d_nlp + ".scope";
+    if (g.stats()) {
+      // The calls that follow the iterations
+      g << "if (" << scope << "!=call) {\n"
+        << "casadi_stats_end_scope(sink, " << scope << ");\n"
+        << scope << " = casadi_stats_begin_section(sink, call, \"post\");\n"
+        << "}\n";
+    }
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
       g.local("one", "const casadi_real");
       g.init_local("one", "1");
@@ -1385,10 +1406,17 @@ namespace casadi {
       g << "d->res[1] = " << (calc_g_ ? d_nlp + ".z+" + str(nx_) : "0") << ";\n";
       g << "d->res[2] = " << (calc_lam_x_ ? d_nlp + ".lam+" + str(nx_) : "0") << ";\n";
       g << "d->res[3] = " << (calc_lam_p_ ? d_nlp + ".lam_p" : "0") << ";\n";
-      std::string nlp_grad = g(get_function("nlp_grad"), "d->arg", "d->res", "d->iw", "d->w");
+      std::string nlp_grad = g(get_function("nlp_grad"), "d->arg", "d->res", "d->iw", "d->w",
+                               "1", "sink", scope);
       g << "if (" << nlp_grad << ") return 1;\n";
       if (calc_lam_x_) g << g.scal(nx_, "-1.0", d_nlp + ".lam") << "\n";
       if (calc_lam_p_) g << g.scal(np_, "-1.0", d_nlp + ".lam_p") << "\n";
+    }
+    if (g.stats()) {
+      g << "if (" << scope << "!=call) {\n"
+        << "casadi_stats_end_scope(sink, " << scope << ");\n"
+        << scope << " = call;\n"
+        << "}\n";
     }
     if (bound_consistency_) {
       g << g.bound_consistency(nx_+ng_, d_nlp + ".z", d_nlp + ".lam",

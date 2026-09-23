@@ -68,7 +68,8 @@ namespace casadi {
     casadi_oracle_data<double> d_oracle;
 
     casadi_stats_sink* sink = nullptr;
-    casadi_int call = -1;
+    // The call being evaluated, and the node its oracle calls go under (a section, say)
+    casadi_int call = -1, scope = -1;
 
     std::vector<LocalOracleMemory*> thread_local_mem;
     ~OracleMemory();

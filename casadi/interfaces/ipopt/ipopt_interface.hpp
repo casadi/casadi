@@ -176,7 +176,7 @@ namespace casadi {
                                const double* lambda, double obj_value, int iter,
                                double inf_pr, double inf_du, double mu, double d_norm,
                                double regularization_size, double alpha_du, double alpha_pr,
-                               int ls_trials, bool full_callback) const;
+                               int ls_trials, bool full_callback, int alg_mod) const;
     bool get_var_con_metadata(std::map<std::string, std::vector<std::string> >& var_string_md,
                               std::map<std::string, std::vector<int> >& var_integer_md,
                               std::map<std::string, std::vector<double> >& var_numeric_md,
@@ -207,6 +207,9 @@ namespace casadi {
 
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
+
+    /** \brief Emit the stats intermediate callback */
+    void codegen_stats_declarations(CodeGenerator& g) const;
 
     /** \brief Generate code for the declarations of the C function */
     void codegen_declarations(CodeGenerator& g) const override;

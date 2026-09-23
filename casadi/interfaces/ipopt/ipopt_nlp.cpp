@@ -247,13 +247,12 @@ namespace casadi {
                                              const IpoptData* ip_data,
                                              IpoptCalculatedQuantities* ip_cq) {
 
-    // Only do the callback every few iterations
-    if (iter % solver_.callback_step_!=0) return true;
-
     // No callback by default
     bool full_callback = false;
 
 #ifdef WITH_IPOPT_CALLBACK
+    // The iterate is only needed by the callback, which runs every few iterations
+    if (!solver_.fcallback_.is_null() && iter % solver_.callback_step_==0) {
 #if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
     // User helper function, introduced in IPOPT 3.14
     if (!get_curr_iterate(ip_data, ip_cq, false, n_, x_, z_L_, z_U_, m_, g_, lambda_)) {
@@ -317,11 +316,13 @@ namespace casadi {
     }
 #endif
     full_callback = true;
+    }
 #endif // WITH_IPOPT_CALLBACK
 
     return solver_.intermediate_callback(mem_, x_, z_L_, z_U_, g_, lambda_, obj_value, iter,
                                          inf_pr, inf_du, mu, d_norm, regularization_size,
-                                         alpha_du, alpha_pr, ls_trials, full_callback);
+                                         alpha_du, alpha_pr, ls_trials, full_callback,
+                                         static_cast<int>(mode));
   }
 
   Index IpoptUserClass::get_number_of_nonlinear_variables() {

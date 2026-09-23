@@ -105,6 +105,7 @@ set(CASADI_PUBLIC
   fmu.hpp
   tools.hpp
   resource.hpp
+  stats_recorder.hpp
   archiver.hpp
   filesystem.hpp
   blas.hpp
@@ -240,6 +241,7 @@ set(CASADI_INTERNAL
   casadi_c.cpp
   tools.cpp
   resource.cpp                resource_internal.cpp                resource_internal.hpp
+  stats_recorder.cpp          stats_recorder_internal.hpp
   archiver.cpp                archiver_impl.hpp
   filesystem.cpp              filesystem_impl.hpp
   blas.cpp                    blas_impl.hpp

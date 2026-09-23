@@ -211,10 +211,16 @@ namespace casadi {
 
     /** \brief Generate a call to a function (generic signature)
 
+        With option "stats", sink and parent are the C expressions of the stats sink the call
+        reports to and of the call it reports under. The defaults are the stats parameters of
+        the generated function the call is emitted in (see signature_internal); pass sink ""
+        where no sink is in scope.
+
         \identifier{s6} */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w, const std::string& failure_ret="1");
+                           const std::string& w, const std::string& failure_ret="1",
+                           const std::string& sink="sink", const std::string& parent="call");
 
     /** \brief Print a string to buffer
 
@@ -304,6 +310,18 @@ namespace casadi {
 
         \identifier{2f7} */
     bool thread_safe() const { return thread_safe_; }
+
+    /** \brief Emit stats instrumentation? */
+    bool stats() const { return stats_; }
+
+    /** \brief Name of the static string holding a function's stats id, defined on first use */
+    std::string stats_id(const Function& f);
+
+    /** \brief May generated code take function pointers? (the stats sink's reserve callback) */
+    bool allow_function_pointers() const { return allow_function_pointers_; }
+
+    /** \brief Trailing stats arguments for a call without a stats sink in scope */
+    std::string stats_args() const;
 
     /** \brief Print a constant in a lossless but compact manner
 
@@ -776,6 +794,8 @@ namespace casadi {
       AUX_BFGS,
       AUX_ORACLE_CALLBACK,
       AUX_OCP_BLOCK,
+      AUX_CBOR,
+      AUX_STATS,
       AUX_ORACLE,
       AUX_SCALED_COPY,
       AUX_BLAZING_COMMON,
@@ -1129,6 +1149,21 @@ namespace casadi {
 
     // Emit thread-safe checkout/release?
     bool thread_safe_;
+
+    // Emit stats instrumentation?
+    bool stats_;
+
+    // May generated code take function pointers? (the stats sink's reserve callback)
+    bool allow_function_pointers_;
+
+    // struct casadi_stats_sink already in the header (stats option)
+    bool header_stats_;
+
+    // Functions whose stats id is defined (stats option)
+    std::set<std::string> stats_ids_;
+
+    // Functions that got a plain-signature trampoline (stats option)
+    std::set<std::string> stats_trampolines_;
 
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;

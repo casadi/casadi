@@ -72,8 +72,8 @@ namespace casadi {
   int SXFunction::eval(const double** arg, double** res,
       casadi_int* iw, double* w, void* mem,
       casadi_stats_sink* sink, casadi_int call) const {
-    auto trace = dump_trace_ ? open_trace(arg, static_cast<FunctionMemory*>(mem)->dump_id)
-                            : nullptr;
+    auto trace = dump_trace_ ?
+      open_trace(arg, static_cast<FunctionMemory*>(mem)->dump_id, sink, call) : nullptr;
   try {
     if (verbose_) casadi_message(name_ + "::eval");
     setup(mem, arg, res, iw, w);
