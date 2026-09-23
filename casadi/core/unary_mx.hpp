@@ -55,7 +55,8 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;

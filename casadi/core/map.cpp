@@ -139,13 +139,14 @@ namespace casadi {
   }
 
   template<typename T>
-  int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
+  int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     const T** arg1 = arg+n_in_;
     std::copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
     std::copy_n(res, n_out_, res1);
     for (casadi_int i=0; i<n_; ++i) {
-      if (f_(arg1, res1, iw, w, mem)) return 1;
+      if (f_(arg1, res1, iw, w, mem, sink, call)) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
@@ -324,22 +325,24 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, options);
   }
 
-  int Map::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  int Map::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     // This checkout/release dance is an optimization.
     // Could also use the thread-safe variant f_(arg1, res1, iw, w)
     // in Map::eval_gen
     setup(mem, arg, res, iw, w);
     scoped_checkout<Function> m(f_);
-    return eval_gen(arg, res, iw, w, m);
+    return eval_gen(arg, res, iw, w, m, sink, call);
   }
 
   OmpMap::~OmpMap() {
     clear_mem();
   }
 
-  int OmpMap::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  int OmpMap::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
 #ifndef WITH_OPENMP
-    return Map::eval(arg, res, iw, w, mem);
+    return Map::eval(arg, res, iw, w, mem, sink, call);
 #else // WITH_OPENMP
     setup(mem, arg, res, iw, w);
     size_t sz_arg, sz_res, sz_iw, sz_w;
@@ -369,7 +372,7 @@ namespace casadi {
 
       // Evaluation
       try {
-        flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]) || flag;
+        flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i], sink, call) || flag;
       } catch (std::exception& e) {
         flag = 1;
         casadi_warning("Exception raised: " + std::string(e.what()));
@@ -450,7 +453,7 @@ namespace casadi {
   void ThreadsWork(const Function& f, casadi_int i,
       const double** arg, double** res,
       casadi_int* iw, double* w,
-      casadi_int ind, int& ret) {
+      casadi_int ind, int& ret, casadi_stats_sink* sink, casadi_int parent) {
 
     // Function dimensions
     casadi_int n_in = f.n_in();
@@ -473,7 +476,7 @@ namespace casadi {
     }
 
     try {
-      ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind);
+      ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind, sink, parent);
     } catch (std::exception& e) {
       ret = 1;
       casadi_warning("Exception raised: " + std::string(e.what()));
@@ -484,9 +487,9 @@ namespace casadi {
   }
 
   int ThreadMap::eval(const double** arg, double** res, casadi_int* iw, double* w,
-      void* mem) const {
+      void* mem, casadi_stats_sink* sink, casadi_int call) const {
 #ifndef CASADI_WITH_THREAD
-    return Map::eval(arg, res, iw, w, mem);
+    return Map::eval(arg, res, iw, w, mem, sink, call);
 #else // CASADI_WITH_THREAD
     setup(mem, arg, res, iw, w);
     // Checkout memory objects
@@ -503,9 +506,9 @@ namespace casadi {
       // Because it was the first iteration to pass tests on MingGW
       // using mingw-std-threads.
       threads.emplace_back(
-        [i](const Function& f, const double** arg, double** res,
+        [i, sink, call](const Function& f, const double** arg, double** res,
             casadi_int* iw, double* w, casadi_int ind, int& ret) {
-              ThreadsWork(f, i, arg, res, iw, w, ind, ret);
+              ThreadsWork(f, i, arg, res, iw, w, ind, ret, sink, call);
             },
         std::ref(f_), arg, res, iw, w, casadi_int(ind[i]), std::ref(ret_values[i]));
     }

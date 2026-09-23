@@ -95,7 +95,8 @@ namespace casadi {
 
         \identifier{185} */
     virtual int eval(const double** arg, double** res,
-      casadi_int* iw, double* w, void* mem) const override;
+      casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
     bool has_eval_buffer() const;
 
     /** \brief Do the derivative functions need nondifferentiated outputs?

@@ -105,7 +105,8 @@ namespace casadi {
     }
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override {
       return eval_gen<double>(arg, res, iw, w);
     }
 

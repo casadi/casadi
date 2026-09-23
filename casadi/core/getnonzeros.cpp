@@ -69,7 +69,8 @@ namespace casadi {
   }
 
   int GetNonzerosVector::
-  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
@@ -90,7 +91,8 @@ namespace casadi {
   }
 
   int GetNonzerosSlice::
-  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
@@ -112,7 +114,8 @@ namespace casadi {
   }
 
   int GetNonzerosSlice2::
-  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 

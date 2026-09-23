@@ -1027,13 +1027,14 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
-      bool always_inline, bool never_inline) const {
+  eval_gen(const double** arg, double** res, casadi_int* iw, double* w, int mem,
+      bool always_inline, bool never_inline,
+      casadi_stats_sink* sink, casadi_int parent) const {
     casadi_int dump_id = (dump_in_ || dump_out_ || dump_) ? get_dump_id() : -1;
     if (dump_in_) dump_in(dump_id, arg);
     if (dump_ && dump_id==0) dump();
     if (print_in_) print_in(uout(), arg, false);
-    auto *m = static_cast<FunctionMemory*>(mem);
+    auto *m = static_cast<FunctionMemory*>(memory(mem));
 
     // Avoid memory corruption
     for (casadi_int i=0;i<n_in_;++i) {
@@ -1052,7 +1053,6 @@ namespace casadi {
     m->dump_id = dump_id;
     int ret;
     if (eval_) {
-      auto *m = static_cast<FunctionMemory*>(mem);
       m->stats_available = true;
       int mem_ = 0;
       if (checkout_) {
@@ -1069,7 +1069,7 @@ namespace casadi {
         release_(mem_);
       }
     } else {
-      ret = eval(arg, res, iw, w, mem);
+      ret = eval(arg, res, iw, w, m, sink, -1);
     }
     if (m->t_total) m->t_total->toc();
     // Show statistics
@@ -4039,7 +4039,8 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (has_eval_dm()) {
       // Evaluate via eval_dm (less efficient)
       try {

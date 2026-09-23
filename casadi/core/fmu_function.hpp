@@ -259,7 +259,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /// @}
 
   // Evaluate numerically
-  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
   // Evaluate all tasks numerically, serially or in parallel
   int eval_all(FmuMemory* m, casadi_int n_task,

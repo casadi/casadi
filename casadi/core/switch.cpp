@@ -150,7 +150,8 @@ namespace casadi {
     alloc_w(sz_buf, true);
   }
 
-  int Switch::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  int Switch::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     setup(mem, arg, res, iw, w);
     // Get the function to be evaluated
     casadi_int k = arg[0] ? static_cast<casadi_int>(*arg[0]) : 0;
@@ -195,7 +196,7 @@ namespace casadi {
     }
 
     // Evaluate the corresponding function
-    if (fk(arg1, res1, iw, w, 0)) return 1;
+    if (fk(arg1, res1, iw, w, 0, sink, call)) return 1;
 
     // Project results with different sparsity
     if (project_out_) {

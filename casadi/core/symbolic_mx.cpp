@@ -41,7 +41,8 @@ namespace casadi {
     return name_;
   }
 
-  int SymbolicMX::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int SymbolicMX::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return 0;
   }
 

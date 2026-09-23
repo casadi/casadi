@@ -67,7 +67,8 @@ namespace casadi {
     return 0;
   }
 
-  int Monitor::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Monitor::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     // Print comment
     uout() << comment_ << ":" << std::endl;
     FunctionInternal::print_canonical(uout(), sparsity(), arg[0]);

@@ -72,7 +72,8 @@ namespace casadi {
     /** \brief  Evaluate numerically
 
         \identifier{2go} */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override {
       return eval_gen<double>(arg, res, iw, w);
     }
 
@@ -265,7 +266,8 @@ namespace casadi {
     /** \brief  Evaluate numerically
 
         \identifier{2h5} */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override {
       return eval_gen<double>(arg, res, iw, w);
     }
 

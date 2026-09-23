@@ -45,13 +45,15 @@ namespace casadi {
     return "max(" + arg.at(0) + ")";
   }
 
-  int MMin::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int MMin::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (!res[0]) return 0;
     res[0][0] = casadi_mmin(arg[0], dep(0).nnz(), dep(0).is_dense());
     return 0;
   }
 
-  int MMax::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int MMax::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (!res[0]) return 0;
     res[0][0] = casadi_mmax(arg[0], dep(0).nnz(), dep(0).is_dense());
 

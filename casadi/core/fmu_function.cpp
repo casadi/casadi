@@ -942,7 +942,7 @@ std::vector<double> FmuFunction::get_nominal_out(casadi_int i) const {
 }
 
 int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* w,
-    void* mem) const {
+    void* mem, casadi_stats_sink* sink, casadi_int call) const {
   // Get memory struct
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != nullptr, "Memory is null");

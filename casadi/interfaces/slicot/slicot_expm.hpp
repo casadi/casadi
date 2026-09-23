@@ -111,7 +111,8 @@ namespace casadi {
                           casadi_int*& iw, double*& w) const override;
 
     /** \brief  Evaluate numerically */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /// A documentation string
     static const std::string meta_doc;

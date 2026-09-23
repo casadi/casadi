@@ -544,7 +544,8 @@ namespace casadi {
   }
 
   int Conic::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (print_problem_) {
       uout() << "H:";
       DM::print_dense(uout(), H_, arg[CONIC_H], false);

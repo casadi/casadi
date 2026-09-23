@@ -72,7 +72,8 @@ namespace casadi {
     static ConstantMX* create(const Matrix<double>& val, const std::string& name);
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override = 0;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override = 0;
 
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res,
@@ -223,7 +224,8 @@ namespace casadi {
     /** \brief  Evaluate the function numerically
 
         \identifier{zc} */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override {
       std::copy(x_->begin(), x_->end(), res[0]);
       return 0;
     }
@@ -341,7 +343,8 @@ namespace casadi {
     /** \brief  Evaluate the function numerically
 
         \identifier{zo} */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override {
       std::copy(x_.begin(), x_.end(), res[0]);
       return 0;
     }
@@ -431,7 +434,8 @@ namespace casadi {
     /** \brief  Evaluate the function numerically
 
         \identifier{29x} */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override {
       if (res[0]) std::copy(x_.begin(), x_.end(), res[0]);
       return 0;
     }
@@ -526,7 +530,8 @@ namespace casadi {
 
         \identifier{100} */
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override {
       return 0;
     }
 
@@ -676,7 +681,8 @@ namespace casadi {
 
         \identifier{10a} */
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
@@ -971,7 +977,8 @@ namespace casadi {
   }
 
   template<typename Value>
-  int Constant<Value>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Constant<Value>::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     std::fill(res[0], res[0]+nnz(), to_double());
     return 0;
   }

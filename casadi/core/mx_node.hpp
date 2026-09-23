@@ -180,7 +180,8 @@ namespace casadi {
     /** \brief  Evaluate numerically
 
         \identifier{1qt} */
-    virtual int eval(const double** arg, double** res, casadi_int* iw, double* w) const;
+    virtual int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const;
 
     /** \brief  Evaluate symbolically (SX)
 

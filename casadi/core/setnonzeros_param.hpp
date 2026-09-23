@@ -126,7 +126,8 @@ namespace casadi {
         const std::vector<bool>& unique={}) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -205,7 +206,8 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Print expression
 
@@ -259,7 +261,8 @@ namespace casadi {
         const std::vector<bool>& unique={}) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief Calculate forward mode directional derivatives
 
@@ -329,7 +332,8 @@ namespace casadi {
         const std::vector<bool>& unique={}) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief Calculate forward mode directional derivatives
 

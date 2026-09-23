@@ -284,13 +284,17 @@ namespace casadi {
   }
 
   int Rootfinder::eval(const double** arg, double** res,
-      casadi_int* iw, double* w, void* mem) const {
+      casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
+    auto *m = static_cast<RootfinderMemory*>(mem);
+    m->sink = sink;
+    m->call = call;
+
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 
     // Solve the NLP
     int ret = solve(mem);
-    auto *m = static_cast<RootfinderMemory*>(mem);
     if (error_on_fail_ && !m->success)
       casadi_error("rootfinder process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");

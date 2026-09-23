@@ -66,7 +66,8 @@ namespace casadi {
   }
 
   int GetNonzerosParamVector::
-  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     const double* idata = arg[0];
     const double* nz = arg[1];
     double* odata = res[0];
@@ -88,7 +89,8 @@ namespace casadi {
   }
 
   int GetNonzerosParamSlice::eval(const double** arg, double** res,
-                                 casadi_int* iw, double* w) const {
+                                 casadi_int* iw, double* w,
+                                 casadi_stats_sink* sink, casadi_int call) const {
     const double* idata = arg[0];
     const double* nz = arg[1];
     double* odata = res[0];
@@ -115,7 +117,8 @@ namespace casadi {
   }
 
   int GetNonzerosSliceParam::
-  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     const double* idata = arg[0];
     const double* nz = arg[1];
     double* odata = res[0];
@@ -140,7 +143,8 @@ namespace casadi {
   }
 
   int GetNonzerosParamParam::eval(const double** arg, double** res,
-                                 casadi_int* iw, double* w) const {
+                                 casadi_int* iw, double* w,
+                                 casadi_stats_sink* sink, casadi_int call) const {
     const double* idata = arg[0];
     const double* nz = arg[1];
     const double* nz2 = arg[2];

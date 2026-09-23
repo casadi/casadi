@@ -37,7 +37,8 @@ namespace casadi {
     return "find(" + arg.at(0) + ")";
   }
 
-  int Find::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Find::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     const double* x = arg[0];
     casadi_int nnz = dep(0).nnz();
     casadi_int k=0;

@@ -104,7 +104,8 @@ namespace casadi {
 
     /** \brief Evaluate numerically */
     int eval(const double** arg, double** res,
-             casadi_int* iw, double* w, void* mem) const override;
+             casadi_int* iw, double* w, void* mem,
+             casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true; }

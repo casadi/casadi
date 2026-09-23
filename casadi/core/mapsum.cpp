@@ -152,7 +152,8 @@ namespace casadi {
   }
 
   template<typename T>
-  int MapSum::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
+  int MapSum::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     const T** arg1 = arg+n_in_;
     std::copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
@@ -168,7 +169,7 @@ namespace casadi {
       }
     }
     for (casadi_int i=0; i<n_; ++i) {
-      if (f_(arg1, res1, iw, w, mem)) return 1;
+      if (f_(arg1, res1, iw, w, mem, sink, call)) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
         if (arg1[j] && !reduce_in_[j]) arg1[j] += f_.nnz_in(j);
       }
@@ -415,13 +416,14 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, custom_opts);
   }
 
-  int MapSum::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  int MapSum::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     // This checkout/release dance is an optimization.
     // Could also use the thread-safe variant f_(arg1, res1, iw, w)
     // in Map::eval_gen
     setup(mem, arg, res, iw, w);
     scoped_checkout<Function> m(f_);
-    return eval_gen(arg, res, iw, w, m);
+    return eval_gen(arg, res, iw, w, m, sink, call);
   }
 
 } // namespace casadi

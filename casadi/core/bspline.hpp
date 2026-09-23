@@ -198,7 +198,8 @@ namespace casadi {
     ~BSpline() override {}
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Evaluate symbolically (MX)
 
@@ -280,7 +281,8 @@ namespace casadi {
     ~BSplineParametric() override {}
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Evaluate symbolically (MX)
 

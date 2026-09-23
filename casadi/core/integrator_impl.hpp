@@ -246,7 +246,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief  evaluate
 
       \identifier{1m3} */
-  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
   /** \brief  Print solver statistics
 
