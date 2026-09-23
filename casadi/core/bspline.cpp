@@ -434,7 +434,8 @@ namespace casadi {
     }
   }
 
-  int BSpline::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int BSpline::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (!res[0]) return 0;
 
     casadi_clear(res[0], m_);
@@ -444,7 +445,8 @@ namespace casadi {
     return 0;
   }
 
-  int BSplineParametric::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int BSplineParametric::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (!res[0]) return 0;
 
     casadi_clear(res[0], m_);

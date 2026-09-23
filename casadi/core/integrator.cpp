@@ -352,8 +352,11 @@ Function Integrator::create_advanced(const Dict& opts) {
 }
 
 int Integrator::eval(const double** arg, double** res,
-    casadi_int* iw, double* w, void* mem) const {
+    casadi_int* iw, double* w, void* mem,
+    casadi_stats_sink* sink, casadi_int call) const {
   auto *m = static_cast<IntegratorMemory*>(mem);
+  m->sink = sink;
+  m->call = call;
 
   // Read inputs
   const double* x0 = arg[INTEGRATOR_X0];

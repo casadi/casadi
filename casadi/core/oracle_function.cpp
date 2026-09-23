@@ -357,7 +357,7 @@ calc_function(OracleMemory* m, const std::string& fcn,
 
   // Evaluate memory-less
   try {
-    if (f(ml->arg, ml->res, ml->iw, ml->w)) {
+    if (f(ml->arg, ml->res, ml->iw, ml->w, m->sink, m->call)) {
       // Recoverable error
       if (monitored) casadi_message(name_ + ":" + fcn + " failed");
       return 1;

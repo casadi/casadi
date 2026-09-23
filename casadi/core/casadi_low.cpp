@@ -78,7 +78,8 @@ namespace casadi {
     return "low(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
-  int Low::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Low::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     for (casadi_int i=0;i<dep(1).nnz();++i) {
       res[0][i] = casadi_low(arg[1][i], arg[0], dep(0).nnz(), lookup_mode_);
     }

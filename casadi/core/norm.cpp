@@ -36,15 +36,18 @@ namespace casadi {
     return "||" + arg.at(0) + "||_F";
   }
 
-  int NormF::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int NormF::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
-  int Norm1::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Norm1::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
-  int NormInf::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int NormInf::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 

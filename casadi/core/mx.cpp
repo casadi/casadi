@@ -2477,7 +2477,9 @@ namespace casadi {
           for (casadi_int i=0; i<it->res.size(); ++i)
             res_num[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : nullptr;
 
-          if (it->data->eval(arg_num, res_num, iw, w)) casadi_error("Evaluation error");
+          if (it->data->eval(arg_num, res_num, iw, w, nullptr, -1)) {
+            casadi_error("Evaluation error");
+          }
           performed_folding = true;
         } else {
           // Prepare for symbolic evaluation

@@ -411,9 +411,11 @@ namespace casadi {
     /** \brief  Evaluate numerically
 
         \identifier{kb} */
-    int eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
-      bool always_inline, bool never_inline) const;
-    virtual int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
+    int eval_gen(const double** arg, double** res, casadi_int* iw, double* w, int mem,
+      bool always_inline, bool never_inline,
+      casadi_stats_sink* sink=nullptr, casadi_int parent=-1) const;
+    virtual int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const;
 
     ///@}
 
@@ -440,14 +442,18 @@ namespace casadi {
     ///@{
     /** \brief Evaluate a function, overloaded
 
+        Same syntax as the double version, for templated code; sink and parent are ignored
+
         \identifier{kf} */
-    int eval_gen(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem,
-        bool always_inline, bool never_inline) const {
-      return eval_sx(arg, res, iw, w, mem, always_inline, never_inline);
+    int eval_gen(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, int mem,
+        bool always_inline, bool never_inline,
+        casadi_stats_sink* sink=nullptr, casadi_int parent=-1) const {
+      return eval_sx(arg, res, iw, w, memory(mem), always_inline, never_inline);
     }
-    int eval_gen(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem,
-        bool always_inline, bool never_inline) const {
-      return sp_forward(arg, res, iw, w, mem);
+    int eval_gen(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem,
+        bool always_inline, bool never_inline,
+        casadi_stats_sink* sink=nullptr, casadi_int parent=-1) const {
+      return sp_forward(arg, res, iw, w, memory(mem));
     }
     ///@}
 
@@ -1761,7 +1767,7 @@ namespace casadi {
     for (casadi_int p=0; p<npar; ++p) {
       // Call memory-less
       if (eval_gen(get_ptr(argp), get_ptr(resp),
-                   get_ptr(iw_tmp), get_ptr(w_tmp), memory(0),
+                   get_ptr(iw_tmp), get_ptr(w_tmp), 0,
                    always_inline, never_inline)) {
         if (error_on_fail_) casadi_error("Evaluation failed");
       }

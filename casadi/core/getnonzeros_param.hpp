@@ -107,7 +107,8 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Evaluate symbolically (MX)
 
@@ -157,7 +158,8 @@ namespace casadi {
     ~GetNonzerosSliceParam() override {}
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Evaluate symbolically (MX)
 
@@ -230,7 +232,8 @@ namespace casadi {
     size_t sz_iw() const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Evaluate symbolically (MX)
 
@@ -304,7 +307,8 @@ namespace casadi {
     size_t sz_iw() const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Evaluate symbolically (MX)
 

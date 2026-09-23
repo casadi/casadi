@@ -790,8 +790,11 @@ namespace casadi {
     }
   }
 
-  int Nlpsol::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  int Nlpsol::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     auto *m = static_cast<NlpsolMemory*>(mem);
+    m->sink = sink;
+    m->call = call;
 
     auto *d_nlp = &m->d_nlp;
 

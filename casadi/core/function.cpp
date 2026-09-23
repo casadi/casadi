@@ -1240,13 +1240,18 @@ namespace casadi {
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
-  int Function::operator()(const bvec_t** arg, bvec_t** res,
-                            casadi_int* iw, bvec_t* w, int mem) const {
+  int Function::operator()(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w,
+      int mem, casadi_stats_sink* sink, casadi_int parent) const {
     try {
       return (*this)->sp_forward(arg, res, iw, w, memory(mem));
     } catch(std::exception& e) {
       THROW_ERROR("operator()", e.what());
     }
+  }
+
+  int Function::operator()(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w,
+      casadi_stats_sink* sink, casadi_int parent) const {
+    return operator()(arg, res, iw, w, 0);
   }
 
   int Function::rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem) const {
@@ -1699,14 +1704,14 @@ namespace casadi {
   thread_local casadi_int Function::call_depth_ = 0;
 #endif // WITH_EXTRA_CHECKS
 
-  int Function::operator()(const double** arg, double** res,
-      casadi_int* iw, double* w) const {
+  int Function::operator()(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int parent) const {
     scoped_checkout<Function> mem(*this);
-    return operator()(arg, res, iw, w, mem);
+    return operator()(arg, res, iw, w, mem, sink, parent);
   }
 
-  int Function::operator()(const double** arg, double** res,
-      casadi_int* iw, double* w, int mem) const {
+  int Function::operator()(const double** arg, double** res, casadi_int* iw, double* w,
+      int mem, casadi_stats_sink* sink, casadi_int parent) const {
     try {
 #ifdef WITH_EXTRA_CHECKS
       // Should never happen
@@ -1715,7 +1720,7 @@ namespace casadi {
       // For consistency check
       casadi_int depth = call_depth_;
 #endif // WITH_EXTRA_CHECKS
-      int ret = (*this)->eval_gen(arg, res, iw, w, memory(mem), false, false);
+      int ret = (*this)->eval_gen(arg, res, iw, w, mem, false, false, sink, parent);
 #ifdef WITH_EXTRA_CHECKS
       // Consitency check
       casadi_assert_dev(call_depth_==depth);
@@ -1737,13 +1742,18 @@ namespace casadi {
     }
   }
 
-  int Function::operator()(const SXElem** arg, SXElem** res,
-      casadi_int* iw, SXElem* w, int mem) const {
+  int Function::operator()(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w,
+      int mem, casadi_stats_sink* sink, casadi_int parent) const {
     try {
       return (*this)->eval_sx(arg, res, iw, w, memory(mem), false, false);
     } catch(std::exception& e) {
       THROW_ERROR("operator()", e.what());
     }
+  }
+
+  int Function::operator()(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w,
+      casadi_stats_sink* sink, casadi_int parent) const {
+    return operator()(arg, res, iw, w, 0);
   }
 
   const SX Function::sx_in(casadi_int iind) const {
@@ -2217,7 +2227,8 @@ namespace casadi {
     if (f_node_->eval_) {
       ret_ = f_node_->eval_(get_ptr(arg_), get_ptr(res_), get_ptr(iw_), get_ptr(w_), mem_);
     } else {
-      ret_ = f_node_->eval(get_ptr(arg_), get_ptr(res_), get_ptr(iw_), get_ptr(w_), mem_internal_);
+      ret_ = f_node_->eval(get_ptr(arg_), get_ptr(res_), get_ptr(iw_), get_ptr(w_), mem_internal_,
+      nullptr, -1);
     }
   }
   int FunctionBuffer::ret() {

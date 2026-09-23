@@ -661,29 +661,49 @@ namespace casadi {
 
     /** \brief Evaluate memory-less, numerically
 
+        sink: the stats stream to report to (null: not recorded);
+        parent: the call this one belongs to
+
         \identifier{1wb} */
-    int operator()(const double** arg, double** res,
-        casadi_int* iw, double* w, int mem) const;
+    int operator()(const double** arg, double** res, casadi_int* iw, double* w, int mem,
+                   casadi_stats_sink* sink=nullptr, casadi_int parent=-1) const;
 
     /** \brief Evaluate numerically with checkout/release
 
         \identifier{1wc} */
-    int operator()(const double** arg, double** res,
-        casadi_int* iw, double* w) const;
+    int operator()(const double** arg, double** res, casadi_int* iw, double* w,
+                   casadi_stats_sink* sink=nullptr, casadi_int parent=-1) const;
 
     /** \brief Evaluate memory-less SXElem
 
-        Same syntax as the double version, allowing use in templated code
+        Same syntax as the double version, allowing use in templated code;
+        sink and parent are ignored
 
         \identifier{1wd} */
-    int operator()(const SXElem** arg, SXElem** res,
-        casadi_int* iw, SXElem* w, int mem=0) const;
+    int operator()(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, int mem=0,
+                   casadi_stats_sink* sink=nullptr, casadi_int parent=-1) const;
+
+    /** \brief Evaluate SXElem in memory 0
+
+        Counterpart of the double version with checkout/release, for templated code;
+        sink and parent are ignored */
+    int operator()(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w,
+                   casadi_stats_sink* sink, casadi_int parent=-1) const;
 
     /** \brief  Propagate sparsity forward
 
+        Same syntax as the double version; sink and parent are ignored
+
         \identifier{1we} */
-    int operator()(const bvec_t** arg, bvec_t** res,
-        casadi_int* iw, bvec_t* w, int mem=0) const;
+    int operator()(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem=0,
+                   casadi_stats_sink* sink=nullptr, casadi_int parent=-1) const;
+
+    /** \brief Propagate sparsity forward in memory 0
+
+        Counterpart of the double version with checkout/release, for templated code;
+        sink and parent are ignored */
+    int operator()(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w,
+                   casadi_stats_sink* sink, casadi_int parent=-1) const;
 
     /** \brief Propagate signal activity forward (bit set = active (possibly nonzero))
 

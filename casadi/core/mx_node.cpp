@@ -337,7 +337,8 @@ namespace casadi {
     casadi_error("'which_output' not defined for class " + class_name());
   }
 
-  int MXNode::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int MXNode::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     casadi_error("'eval' not defined for class " + class_name());
     return 1;
   }

@@ -1539,7 +1539,8 @@ namespace casadi {
     void* mem2 = rp_solver_.memory(0);
 
     // perform The m
-    rp_solver_->eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), mem2);
+    rp_solver_->eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), mem2,
+      nullptr, -1);
 
     // Get BlocksqpMemory and Blocksqp from restoration phase
     auto m2 = static_cast<BlocksqpMemory*>(mem2);

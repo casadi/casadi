@@ -105,7 +105,8 @@ namespace casadi {
     void free_mem(void* mem) const override { delete static_cast<OnnxMemory*>(mem); }
 
     int eval(const double** arg, double** res,
-             casadi_int* iw, double* w, void* mem) const override = 0;
+             casadi_int* iw, double* w, void* mem,
+             casadi_stats_sink* sink, casadi_int call) const override = 0;
 
     bool uses_output() const override { return false; }
 

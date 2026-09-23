@@ -62,7 +62,8 @@ namespace casadi {
     res[0] = convexify(arg[0], options);
   }
 
-  int Convexify::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Convexify::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     int ret = casadi_convexify_eval(&convexify_data_.config, arg[0], res[0], iw, w);
     casadi_assert(!ret, "Failure in convexification.");
     return 0;

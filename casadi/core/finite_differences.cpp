@@ -267,7 +267,8 @@ Function CentralDiff::get_forward(casadi_int nfwd, const std::string& name,
 }
 
 int FiniteDiff::eval(const double** arg, double** res,
-    casadi_int* iw, double* w, void* mem) const {
+    casadi_int* iw, double* w, void* mem,
+    casadi_stats_sink* sink, casadi_int call) const {
   setup(mem, arg, res, iw, w);
   // Shorthands
   casadi_int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
@@ -335,7 +336,7 @@ int FiniteDiff::eval(const double** arg, double** res,
           off += nnz;
         }
         // Evaluate
-        if (derivative_of_(arg, res, iw, w)) return 1;
+        if (derivative_of_(arg, res, iw, w, sink, call)) return 1;
         // Save outputs
         casadi_copy(y, n_y_, yk[k]);
       }

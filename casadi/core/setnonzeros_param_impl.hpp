@@ -302,7 +302,8 @@ namespace casadi {
 
   template<bool Add>
   int SetNonzerosParamVector<Add>::
-  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     const double* idata0 = arg[0];
     const double* idata = arg[1];
     const double* nz = arg[2];
@@ -328,7 +329,8 @@ namespace casadi {
 
   template<bool Add>
   int SetNonzerosParamSlice<Add>::
-  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     const double* idata0 = arg[0];
     const double* idata = arg[1];
     const double* nz = arg[2];
@@ -362,7 +364,8 @@ namespace casadi {
 
   template<bool Add>
   int SetNonzerosSliceParam<Add>::
-  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     const double* idata0 = arg[0];
     const double* idata = arg[1];
     const double* nz = arg[2];
@@ -391,7 +394,8 @@ namespace casadi {
 
   template<bool Add>
   int SetNonzerosParamParam<Add>::
-  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
   const double* idata0 = arg[0];
     const double* idata = arg[1];
     const double* nz = arg[2];

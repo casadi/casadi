@@ -185,7 +185,8 @@ namespace casadi {
   }
 
   int OnnxRuntimeInterface::eval(const double** arg, double** res,
-                                 casadi_int* iw, double* w, void* mem) const {
+                                 casadi_int* iw, double* w, void* mem,
+                                 casadi_stats_sink* sink, casadi_int call) const {
     auto* m = static_cast<OnnxRuntimeMemory*>(mem);
     return casadi_onnxruntime_solve(&m->d, &prob_, arg, res);
   }

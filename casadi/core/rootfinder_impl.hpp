@@ -111,7 +111,8 @@ namespace casadi {
                           casadi_int*& iw, double*& w) const override;
 
     // Evaluate numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     // Solve the NLP
     virtual int solve(void* mem) const = 0;

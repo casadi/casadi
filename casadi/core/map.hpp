@@ -107,10 +107,12 @@ namespace casadi {
 
         \identifier{h9} */
     template<typename T>
-    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem=0) const;
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem=0,
+                 casadi_stats_sink* sink=nullptr, casadi_int call=-1) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /// Type of parallellization
     virtual std::string parallelization() const { return "serial"; }
@@ -248,7 +250,8 @@ namespace casadi {
     bool is_a(const std::string& type, bool recursive) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Initialize
 
@@ -299,7 +302,8 @@ namespace casadi {
     bool is_a(const std::string& type, bool recursive) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Initialize
 

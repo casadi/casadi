@@ -63,7 +63,8 @@ namespace casadi {
     /** \brief  Evaluate numerically
 
         \identifier{1td} */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Evaluate symbolically (SX)
 
@@ -140,7 +141,8 @@ namespace casadi {
     /** \brief  Evaluate numerically
 
         \identifier{1tq} */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief  Evaluate symbolically (SX)
 

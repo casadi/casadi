@@ -118,10 +118,11 @@ std::vector<DM> CallbackInternal::eval_dm(const std::vector<DM>& arg) const {
 
 /** \brief  Evaluate numerically */
 int CallbackInternal::eval(const double** arg, double** res,
-    casadi_int* iw, double* w, void* mem) const {
+    casadi_int* iw, double* w, void* mem,
+    casadi_stats_sink* sink, casadi_int call) const {
   setup(mem, arg, res, iw, w);
   if (has_eval_dm()) {
-    return FunctionInternal::eval(arg, res, iw, w, mem);
+    return FunctionInternal::eval(arg, res, iw, w, mem, sink, call);
   } else {
     TRY_CALL(eval_buffer, self_, arg, sizes_arg_, res, sizes_res_);
   }

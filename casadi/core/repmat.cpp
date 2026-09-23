@@ -49,7 +49,8 @@ namespace casadi {
     return 0;
   }
 
-  int HorzRepmat::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int HorzRepmat::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
@@ -134,7 +135,8 @@ namespace casadi {
     return 0;
   }
 
-  int HorzRepsum::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int HorzRepsum::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w, std::plus<double>());
   }
 

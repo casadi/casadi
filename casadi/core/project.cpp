@@ -49,7 +49,8 @@ namespace casadi {
     return 0;
   }
 
-  int Project::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Project::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
@@ -196,7 +197,8 @@ namespace casadi {
     return 0;
   }
 
-  int Densify::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Densify::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
@@ -204,7 +206,8 @@ namespace casadi {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
-  int Sparsify::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Sparsify::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 

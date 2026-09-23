@@ -40,7 +40,8 @@ namespace casadi {
     return "det(" + arg.at(0) + ")";
   }
 
-  int Determinant::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Determinant::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     /**
      * Consideration:
      *  - Note that a typical implementation of the partial derivative of a determinant

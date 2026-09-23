@@ -84,7 +84,8 @@ namespace casadi {
   }
 
   int LinearInterpolant::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     setup(mem, arg, res, iw, w);
     if (res[0]) {
       const double* values = has_parametric_values() ? arg[arg_values()] : get_ptr(values_);
@@ -140,7 +141,8 @@ namespace casadi {
   }
 
   int LinearInterpolantJac::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     auto m = derivative_of_.get<LinearInterpolant>();
 
     const double* values = has_parametric_values() ? arg[m->arg_values()] : get_ptr(m->values_);

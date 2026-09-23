@@ -75,7 +75,8 @@ namespace casadi {
     return 0;
   }
 
-  int Dump::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int Dump::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     // Build filename with counter
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(6) << dump_count_++;

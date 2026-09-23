@@ -52,7 +52,8 @@ namespace casadi {
     /** \brief Evaluate the function numerically
 
         \identifier{2hq} */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     /** \brief Evaluate the function symbolically (SX)
 

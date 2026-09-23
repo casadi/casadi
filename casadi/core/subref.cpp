@@ -31,7 +31,8 @@ namespace casadi {
     set_dep(x);
   }
 
-  int SubRef::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int SubRef::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 

@@ -67,6 +67,9 @@ namespace casadi {
 
     casadi_oracle_data<double> d_oracle;
 
+    casadi_stats_sink* sink = nullptr;
+    casadi_int call = -1;
+
     std::vector<LocalOracleMemory*> thread_local_mem;
     ~OracleMemory();
   };

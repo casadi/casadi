@@ -113,7 +113,8 @@ namespace casadi {
     /** \brief  Evaluate numerically, work vectors given
 
         \identifier{24} */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
     void trace_instruction(std::ostream& trace, casadi_int k, const double* w,
       bool output) const;

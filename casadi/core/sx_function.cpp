@@ -70,7 +70,8 @@ namespace casadi {
   }
 
   int SXFunction::eval(const double** arg, double** res,
-      casadi_int* iw, double* w, void* mem) const {
+      casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     auto trace = dump_trace_ ? open_trace(arg, static_cast<FunctionMemory*>(mem)->dump_id)
                             : nullptr;
   try {
@@ -102,7 +103,7 @@ namespace casadi {
         case OP_INPUT: w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2]; break;
         case OP_OUTPUT: if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1]; break;
         case OP_CALL:
-          call_fwd(e, arg, res, iw, w);
+          call_fwd(e, arg, res, iw, w, sink, call);
         break;
         default:
           casadi_error("Unknown operation" + str(e.op));
@@ -121,7 +122,7 @@ namespace casadi {
         case OP_INPUT: w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2]; break;
         case OP_OUTPUT: if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1]; break;
         case OP_CALL:
-          call_fwd(e, arg, res, iw, w);
+          call_fwd(e, arg, res, iw, w, sink, call);
         break;
         default:
           casadi_error("Unknown operation" + str(e.op));
@@ -1643,7 +1644,8 @@ namespace casadi {
   }
 
   template<typename T>
-  void SXFunction::call_fwd(const AlgEl& e, const T** arg, T** res, casadi_int* iw, T* w) const {
+  void SXFunction::call_fwd(const AlgEl& e, const T** arg, T** res, casadi_int* iw, T* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     const auto& m = call_.el[e.i1];
     const T** call_arg   = arg;
     T** call_res         = res;
@@ -1659,7 +1661,7 @@ namespace casadi {
       nz_in[i] = w[m.dep[i]];
     }
     // Perform call nz_in -> nz_out
-    m.f(call_arg, call_res, call_iw, call_w);
+    m.f(call_arg, call_res, call_iw, call_w, sink, call);
 
     // Store nz_out results back in workvector
     for (casadi_int i=0;i<m.n_res;++i) {

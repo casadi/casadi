@@ -70,7 +70,8 @@ class CASADI_EXPORT SXFunction :
   /** \brief  Evaluate numerically, work vectors given
 
       \identifier{ue} */
-  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const override;
 
   void trace_instruction(std::ostream& trace, casadi_int k, const double* w,
     bool output) const;
@@ -412,7 +413,8 @@ class CASADI_EXPORT SXFunction :
 
 protected:
   template<typename T>
-  void call_fwd(const AlgEl& e, const T** arg, T** res, casadi_int* iw, T* w) const;
+  void call_fwd(const AlgEl& e, const T** arg, T** res, casadi_int* iw, T* w,
+                casadi_stats_sink* sink=nullptr, casadi_int call=-1) const;
 
   // Activity propagation through a call node
   void call_activity(const AlgEl& e, const bvec_t** arg, bvec_t** res,

@@ -442,7 +442,8 @@ namespace casadi {
   }
 
   int MXFunction::eval(const double** arg, double** res,
-      casadi_int* iw, double* w, void* mem) const {
+      casadi_int* iw, double* w, void* mem,
+      casadi_stats_sink* sink, casadi_int call) const {
     auto trace = dump_trace_ ? open_trace(arg, static_cast<FunctionMemory*>(mem)->dump_id)
                             : nullptr;
   try {
@@ -495,7 +496,7 @@ namespace casadi {
 
         // Evaluate
         if (print_instructions_) print_arg(uout(), k, e, arg1);
-        if (e.data->eval(arg1, res1, iw, w)) {
+        if (e.data->eval(arg1, res1, iw, w, sink, call)) {
           if (trace) finish_trace(*trace, res, 1);
           return 1;
         }

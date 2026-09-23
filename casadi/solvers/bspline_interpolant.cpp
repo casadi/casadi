@@ -183,7 +183,8 @@ namespace casadi {
   }
 
   int BSplineInterpolant::eval(const double** arg, double** res,
-                                casadi_int* iw, double* w, void* mem) const {
+                                casadi_int* iw, double* w, void* mem,
+                                casadi_stats_sink* sink, casadi_int call) const {
     setup(mem, arg, res, iw, w);
     scoped_checkout<Function> m(S_);
     return S_(arg, res, iw, w, m);

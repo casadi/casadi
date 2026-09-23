@@ -54,7 +54,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int LinsolCall<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int LinsolCall<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     scoped_checkout<Linsol> mem(linsol_);
 
@@ -366,7 +367,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int TriuSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int TriuSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
     return 0;
@@ -384,7 +386,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int TrilSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int TrilSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
     return 0;
@@ -422,7 +425,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int TriuSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int TriuSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
     return 0;
@@ -442,7 +446,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int TrilSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+  int TrilSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      casadi_stats_sink* sink, casadi_int call) const {
     if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
     return 0;
