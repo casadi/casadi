@@ -169,6 +169,14 @@ namespace casadi {
     std::vector<double> gradf_const_vals;
     // Scratch buffer for the linear part of G at x0 per row.
     std::vector<double> linear_at_x0;
+    // Point for evaluating the linear parts (x0 clamped to the bounds) and the
+    // outputs of nlp_lin
+    std::vector<double> x_lin;
+    std::vector<double> lin_jac_buf;
+    std::vector<double> lin_g_buf;
+    std::vector<double> lin_gradf_buf;
+    // nlp_hess_l output when the CONOPT Hessian structure is extended
+    std::vector<double> hess_buf;
 
     // Range-constraint expansion state (recomputed each solve)
     int ng_expanded;
@@ -230,6 +238,19 @@ namespace casadi {
     // (CONOPT rejects nonlinear columns missing from the Hessian structure).
     void refine_nlflags_with_hessian();
 
+    // Columns appearing in hesslag_sp_
+    std::vector<bool> hessian_columns() const;
+
+    // Marks rows classified as fully linear (and an affine objective) as
+    // nonlinear when their value depends on x through a discontinuous operation
+    // (floor, sign, comparisons, ...), whose zero derivative would otherwise
+    // freeze the term at its x0 value.
+    void mark_step_rows();
+
+    // Builds everything derived from the final NLFLAGs: the CSR structure, the
+    // Hessian structure passed to CONOPT, nlp_lin and the tapes.
+    void finalize_structure();
+
     // Builds tape_fg_/tape_fg_jac_ when subset_eval_ is set and the evaluation
     // functions are SX without calls; sets has_tape_.
     void build_tapes();
@@ -246,6 +267,22 @@ namespace casadi {
     // FDEvalIni when row-subset evaluation is active
     int fdevalini_subset(ConoptMemory* m, const double X[], const int ROWLIST[],
                          int MODE, int LISTSIZE) const;
+
+    // Hessian structure passed to CONOPT: hesslag_sp_ plus zero diagonal
+    // entries for nonlinear columns that nlp_hess_l does not cover (only after
+    // mark_step_rows). hess_nz_map_ maps nlp_hess_l nonzeros into it; it is
+    // empty when the two structures are the same.
+    Sparsity hess_sp_;
+    std::vector<casadi_int> hess_nz_map_;
+
+    // Linear parts, evaluated by nlp_lin in solve(): linear Jacobian nonzeros,
+    // rows without nonlinear entries, linear gradient nonzeros, and whether
+    // the objective is affine (then nlp_lin also returns f).
+    std::vector<casadi_int> lin_jac_nz_;
+    std::vector<casadi_int> lin_rows_;
+    std::vector<casadi_int> lin_gradf_nz_;
+    bool affine_obj_ = false;
+    bool has_lin_fcn_ = false;
 
     // Evaluate only the rows CONOPT requests (see the 'subset_eval' option)
     bool subset_eval_;
