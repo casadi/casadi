@@ -167,6 +167,10 @@ namespace casadi {
     // size as each other) when they are full, used by solve()'s row-expansion loop.
     void ensure_row_capacity(ConoptMemory* m, casadi_int remaining_rows) const;
 
+    // Clears jacg_nlflag_/gradf_nlflag_ for columns absent from hesslag_sp_
+    // (CONOPT rejects nonlinear columns missing from the Hessian structure).
+    void refine_nlflags_with_hessian();
+
     // Sparsities for the problem components
     Sparsity gradf_sp_;
     Sparsity jacg_sp_;

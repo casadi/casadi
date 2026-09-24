@@ -158,6 +158,8 @@ namespace casadi {
                                        [](int f) { return f == 0; });
     }
 
+    refine_nlflags_with_hessian();
+
     const casadi_int* g_colind = jacg_sp_.colind();
     const casadi_int* g_row = jacg_sp_.row();
 
@@ -183,6 +185,39 @@ namespace casadi {
         jacg_col_[pos]   = c;
       }
     }
+  }
+
+  void ConoptInterface::refine_nlflags_with_hessian() {
+    // The second-order sparsity of jac:g:x / grad:f:x can be conservative, e.g.
+    // through MX Function calls, where every input of the call gets flagged.
+    // nlp_hess_l's structure is the union over all rows (symbolic multipliers),
+    // so a column absent from it has zero second derivatives everywhere: all of
+    // its Jacobian/gradient entries are constant.
+    if (!exact_hessian_) return;
+    std::vector<bool> in_hess(nx_, false);
+    const casadi_int* h_colind = hesslag_sp_.colind();
+    const casadi_int* h_row = hesslag_sp_.row();
+    for (casadi_int c = 0; c < nx_; ++c) {
+      for (casadi_int el = h_colind[c]; el < h_colind[c+1]; ++el) {
+        in_hess[c] = true;
+        in_hess[h_row[el]] = true;
+      }
+    }
+
+    const casadi_int* g_colind = jacg_sp_.colind();
+    for (casadi_int c = 0; c < nx_; ++c) {
+      if (in_hess[c]) continue;
+      for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) jacg_nlflag_[el] = 0;
+    }
+    const casadi_int* f_row = gradf_sp_.row();
+    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k) {
+      if (!in_hess[f_row[k]]) gradf_nlflag_[k] = 0;
+    }
+
+    has_linear_jac_ = std::any_of(jacg_nlflag_.begin(), jacg_nlflag_.end(),
+                                   [](int f) { return f == 0; });
+    has_linear_gradf_ = std::any_of(gradf_nlflag_.begin(), gradf_nlflag_.end(),
+                                     [](int f) { return f == 0; });
   }
 
   // --- Serialization & Deserialization --- //
@@ -226,6 +261,8 @@ namespace casadi {
       has_linear_gradf_ = std::any_of(gradf_nlflag_.begin(), gradf_nlflag_.end(),
                                        [](int f) { return f == 0; });
     }
+
+    refine_nlflags_with_hessian();
 
     const casadi_int* g_colind = jacg_sp_.colind();
     const casadi_int* g_row = jacg_sp_.row();
