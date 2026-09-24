@@ -177,6 +177,12 @@ namespace casadi {
     Dict opts_; // CONOPT specific options
     std::string optfile_; // Path to CONOPT option file (for string-valued CR-cells)
 
+    // License passed via the 'license' option; takes precedence over the
+    // CONOPT_LICENSE_* environment variables. Not serialized.
+    bool has_license_ = false;
+    int license_int_[3] = {0, 0, 0};
+    std::string license_text_;
+
     // Per-column flag: true if the objective gradient has a nonzero in that column
     std::vector<bool> gradf_col_flag_;
 

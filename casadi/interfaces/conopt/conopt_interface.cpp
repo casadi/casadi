@@ -27,6 +27,7 @@
 #include "casadi/core/casadi_interrupt.hpp"
 #include <cmath>
 #include <cstring>
+#include <cstdlib>
 #include <algorithm>
 #include <limits>
 
@@ -60,7 +61,11 @@ namespace casadi {
         "Path to a CONOPT option file (for string-valued CR-cells such as Algorithm)"}},
       {"debug", {OT_BOOL,
         "Print debug output: constraint values at each FDEval, solution vector, "
-        "and option echo"}}
+        "and option echo"}},
+      {"license", {OT_DICT,
+        "CONOPT license as a dict with keys 'int_1', 'int_2', 'int_3' (int) and "
+        "'text' (string). Overrides the CONOPT_LICENSE_* environment variables. "
+        "Not serialized."}}
   }};
 
   ConoptInterface::ConoptInterface(const std::string& name, const Function& nlp)
@@ -79,6 +84,22 @@ namespace casadi {
       else if (op.first == "optfile") optfile_ = op.second.to_string();
       else if (op.first == "warm_start") warm_start_ = op.second.to_bool();
       else if (op.first == "debug") debug_ = op.second.to_bool();
+      else if (op.first == "license") {
+        Dict lic = op.second;
+        for (const char* key : {"int_1", "int_2", "int_3", "text"}) {
+          casadi_assert(lic.find(key) != lic.end(),
+            "CONOPT 'license' option is missing key '" + std::string(key) + "'. "
+            "Expected keys: int_1, int_2, int_3, text.");
+        }
+        for (auto&& e : lic) {
+          if (e.first == "int_1") license_int_[0] = e.second.to_int();
+          else if (e.first == "int_2") license_int_[1] = e.second.to_int();
+          else if (e.first == "int_3") license_int_[2] = e.second.to_int();
+          else if (e.first == "text") license_text_ = e.second.to_string();
+          else casadi_error("CONOPT 'license' option: unknown key '" + e.first + "'.");
+        }
+        has_license_ = true;
+      }
     }
 
     for (auto&& op : opts_) {
@@ -287,6 +308,21 @@ namespace casadi {
     if (COI_Create(&m->cntvect) != 0 || m->cntvect == nullptr) {
       casadi::uerr() << "CONOPT: COI_Create failed" << std::endl;
       return 1;
+    }
+
+    // License comes from the 'license' option if given, otherwise from
+    // environment variables (see e.g. conopt/examples/setlicense.sh), rather
+    // than being compiled in, so the same build works for any licensee.
+    const char* lic_int1 = std::getenv("CONOPT_LICENSE_INT_1");
+    const char* lic_int2 = std::getenv("CONOPT_LICENSE_INT_2");
+    const char* lic_int3 = std::getenv("CONOPT_LICENSE_INT_3");
+    const char* lic_text = std::getenv("CONOPT_LICENSE_TEXT");
+    if (has_license_) {
+      COIDEF_License(m->cntvect, license_int_[0], license_int_[1],
+                      license_int_[2], license_text_.c_str());
+    } else if (lic_int1 && lic_int2 && lic_int3 && lic_text) {
+      COIDEF_License(m->cntvect, std::atoi(lic_int1), std::atoi(lic_int2),
+                      std::atoi(lic_int3), lic_text);
     }
 
     if (warm_start_) COIDEF_IniStat(m->cntvect, 2);
