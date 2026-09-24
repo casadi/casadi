@@ -114,6 +114,21 @@ namespace casadi {
     Function jacg_fcn = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     jacg_sp_ = jacg_fcn.sparsity_out(1);
 
+    // Value-only function for MODE=1 FDEvalIni calls, which CONOPT issues often
+    // (line searches, preprocessing); cheaper than the derivative functions above.
+    // f and g together, so shared subexpressions (e.g. integrator calls in
+    // shooting formulations) are evaluated once.
+    create_function("nlp_fg", {"x", "p"}, {"f", "g"});
+
+    // Same for derivative FDEvalIni calls: values and first derivatives in one
+    // function. nlp_grad_f/nlp_jac_g are kept for the linearity detection and the
+    // one-off evaluations at x0 in solve().
+    Function fg_jac_fcn = create_function("nlp_fg_jac", {"x", "p"},
+                                          {"f", "grad:f:x", "g", "jac:g:x"});
+    casadi_assert(fg_jac_fcn.sparsity_out(1) == gradf_sp_ &&
+                  fg_jac_fcn.sparsity_out(3) == jacg_sp_,
+                  "nlp_fg_jac sparsity differs from nlp_grad_f/nlp_jac_g");
+
     // Detect linear (constant) Jacobian entries using second-order sparsity:
     // d(jac:g:x_compact)/dx has shape (nnz_g, nx_); if row k is empty,
     // the k-th Jacobian nonzero is constant in x (linear entry).
@@ -368,6 +383,10 @@ namespace casadi {
     // NumCon, NumNz, NumNlNz are set in solve() because range-constraint expansion
     // can change them between calls.
 
+    // CasADi allows variables that appear in no constraint and not in the
+    // objective (or only with a zero constant gradient); these give empty columns.
+    COIDEF_EmptyCol(m->cntvect, 1);
+
     COIDEF_ObjCon(m->cntvect, 0);
     COIDEF_OptDir(m->cntvect, -1);
 
@@ -439,6 +458,10 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(mem);
     m->cache_valid     = false;
     m->cache_valid_jac = false;
+    // Parameters/bounds may differ from the previous solve, so a cache for the
+    // same x is not reusable across solves.
+    m->stored_fun      = false;
+    m->stored_jac      = false;
     m->cached_f        = 0.0;
     m->nan_encountered = false;
     m->modsta = ConoptModelStatus::Unset;
@@ -934,6 +957,31 @@ namespace casadi {
     casadi_assert(static_cast<size_t>(NUMVAR) == m->cached_x.size(),
                   "cb_fdevalini: NUMVAR != cached_x size");
 
+    const bool need_jac = (MODE != 1);
+
+    // Single-row requests (typical during CONOPT's preprocessing, where rows are
+    // evaluated one at a time) often repeat the same point. If so and the cache
+    // already covers this MODE, skip re-evaluation. Multi-row requests always
+    // re-evaluate.
+    if (LISTSIZE == 1) {
+        bool new_solution = !(m->stored_fun || m->stored_jac) ||
+            std::memcmp(m->cached_x.data(), X, NUMVAR * sizeof(double)) != 0;
+        if (new_solution) {
+            m->stored_fun = false;
+            m->stored_jac = false;
+        } else if (m->stored_fun && (!need_jac || m->stored_jac)) {
+            // FDEvalEnd cleared the validity flags; the cached data is still good.
+            m->cache_valid_jac.store(m->stored_jac, std::memory_order_relaxed);
+            m->cache_valid.store(true, std::memory_order_release);
+            if (self.debug_)
+                casadi::uout() << "FDEvalIni: point unchanged, reusing cached evaluation\n";
+            return 0;
+        }
+    } else {
+        m->stored_fun = false;
+        m->stored_jac = false;
+    }
+
     std::memcpy(m->cached_x.data(), X, NUMVAR * sizeof(double));
 
     if (self.debug_) {
@@ -943,26 +991,32 @@ namespace casadi {
         casadi::uout() << "\n";
     }
 
-    const bool need_jac = (MODE != 1);
-
     m->cache_valid_jac.store(false, std::memory_order_relaxed);
     m->cache_valid.store(false, std::memory_order_relaxed);
     try {
         m->arg[0] = m->cached_x.data();
         m->arg[1] = m->d_nlp.p;
 
-        m->res[0] = &m->cached_f;
-        m->res[1] = need_jac ? m->cached_grad_f.data() : nullptr;
-        int ret = self.calc_function(m, "nlp_grad_f");
-        if (!ret) {
-            m->res[0] = m->cached_g.data();
-            m->res[1] = need_jac ? m->cached_jac_g.data() : nullptr;
-            ret = self.calc_function(m, "nlp_jac_g");
+        int ret;
+        if (need_jac) {
+            m->res[0] = &m->cached_f;
+            m->res[1] = m->cached_grad_f.data();
+            m->res[2] = m->cached_g.data();
+            m->res[3] = m->cached_jac_g.data();
+            ret = self.calc_function(m, "nlp_fg_jac");
+        } else {
+            m->res[0] = &m->cached_f;
+            m->res[1] = m->cached_g.data();
+            ret = self.calc_function(m, "nlp_fg");
         }
         if (!ret) {
-            // Publish the cache only after both evaluations succeed.
+            // Publish the cache only after the evaluation succeeds.
             m->cache_valid_jac.store(need_jac, std::memory_order_relaxed);
             m->cache_valid.store(true, std::memory_order_release);
+            if (LISTSIZE == 1) {
+                m->stored_fun = true;
+                m->stored_jac = need_jac;
+            }
         }
     } catch (std::exception& ex) {
         casadi::uerr() << ex.what() << std::endl;

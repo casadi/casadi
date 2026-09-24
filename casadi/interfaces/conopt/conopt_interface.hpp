@@ -99,6 +99,11 @@ namespace casadi {
     std::vector<double> cached_jac_g;
     std::atomic<bool> cache_valid{false};
     std::atomic<bool> cache_valid_jac{false};  // true only when cached_jac_g was computed
+    // Whether the cache holds values/Jacobian for cached_x from a previous
+    // single-row FDEvalIni. Unlike cache_valid*, these survive FDEvalEnd so a
+    // repeated single-row request at the same point can skip re-evaluation.
+    bool stored_fun = false;
+    bool stored_jac = false;
     bool nan_encountered;
 
     // Options handling
