@@ -83,7 +83,7 @@
       4
     ],
     "FunctionInternal": [
-      8
+      9
     ],
     "GenericExternal": [
       1
@@ -442,7 +442,8 @@
       5,
       6,
       7,
-      8
+      8,
+      9
     ],
     "GenericExternal": [
       1
@@ -4072,7 +4073,7 @@
         {
           "name": "FunctionInternal",
           "op": "version",
-          "value": 8
+          "value": 9
         },
         {
           "name": "FunctionInternal::is_diff_in",
@@ -4205,6 +4206,11 @@
         },
         {
           "name": "FunctionInternal::jit_options",
+          "op": "field",
+          "type": "Dict"
+        },
+        {
+          "name": "FunctionInternal::codegen_options",
           "op": "field",
           "type": "Dict"
         },

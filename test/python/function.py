@@ -2420,6 +2420,20 @@ class Functiontests(casadiTestCase):
         self.assertTrue("-1e-07," in out[0] or "-1e-007," in out[0] )
         self.assertTrue("1e-07," in out[0] or "1e-007," in out[0] )
 
+  @requiresPlugin(ca.Importer,"shell")
+  def test_jit_codegen_options(self):
+    # Options of the code generator of jit, also after deserialization (which compiles again)
+    x = ca.MX.sym("x")
+    d = tempfile.mkdtemp()
+    f = ca.Function('f',[x],[x**2],{"jit":True,"compiler":"shell","jit_cleanup":False,
+                                     "jit_temp_suffix":False,"jit_name":"jit_codegen_options",
+                                     "jit_options":{"directory":d},
+                                     "codegen_options":{"prefix":"cgopt"}})
+    for g in [f, ca.Function.deserialize(f.serialize())]:
+      self.checkarray(g(3),9)
+      with open(os.path.join(d,"jit_codegen_options.c")) as src:
+        self.assertTrue("cgopt_" in src.read())
+
   @requires_nlpsol("ipopt")
   @requiresPlugin(ca.Importer,"shell")
   def test_inherit_jit_options(self):

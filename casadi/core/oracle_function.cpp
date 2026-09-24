@@ -439,7 +439,7 @@ void OracleFunction::jit_dependencies(const std::string& fname) {
   if (compiler_.is_null()) {
     if (verbose_) casadi_message("compiling to "+ fname+"'.");
     // JIT dependent functions
-    compiler_ = Importer(generate_dependencies(fname, Dict()),
+    compiler_ = Importer(generate_dependencies(fname, codegen_options_),
                         compiler_plugin_, jit_options_);
   }
   // Replace the Oracle functions with generated functions

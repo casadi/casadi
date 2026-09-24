@@ -256,6 +256,10 @@ namespace casadi {
       {"jit_options",
        {OT_DICT,
         "Options to be passed to the jit compiler."}},
+      {"codegen_options",
+       {OT_DICT,
+        "Options to be passed to the code generator of jit, e.g. {\"stats\": true} to "
+        "record statistics inside the compiled code. Default: none"}},
       {"derivative_of",
        {OT_FUNCTION,
         "The function is a derivative of another function. "
@@ -396,6 +400,7 @@ namespace casadi {
     opts["jit_serialize"] = jit_serialize_;
     opts["compiler"] = compiler_plugin_;
     opts["jit_options"] = jit_options_;
+    opts["codegen_options"] = codegen_options_;
     opts["jit_name"] = jit_base_name_;
     opts["jit_temp_suffix"] = jit_temp_suffix_;
     opts["ad_weight"] = ad_weight_;
@@ -501,6 +506,8 @@ namespace casadi {
         compiler_plugin_ = op.second.to_string();
       } else if (op.first=="jit_options") {
         jit_options_ = op.second;
+      } else if (op.first=="codegen_options") {
+        codegen_options_ = op.second;
       } else if (op.first=="jit_name") {
         jit_base_name_ = op.second.to_string();
       } else if (op.first=="jit_temp_suffix") {
@@ -755,9 +762,9 @@ namespace casadi {
         if (compiler_.is_null()) {
           if (verbose_) casadi_message("Codegenerating function '" + name_ + "'.");
           // JIT everything
-          Dict opts;
+          Dict opts = codegen_options_;
           // Override the default to avoid random strings in the generated code
-          opts["prefix"] = "jit";
+          if (opts.find("prefix")==opts.end()) opts["prefix"] = "jit";
           CodeGenerator gen(jit_name_, opts);
           gen.add(self());
           if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
@@ -4246,7 +4253,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 8);
+    s.version("FunctionInternal", 9);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -4269,6 +4276,7 @@ namespace casadi {
     s.pack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
     s.pack("FunctionInternal::jit_base_name", jit_base_name_);
     s.pack("FunctionInternal::jit_options", jit_options_);
+    s.pack("FunctionInternal::codegen_options", codegen_options_);
     s.pack("FunctionInternal::compiler_plugin", compiler_plugin_);
     s.pack("FunctionInternal::has_refcount", has_refcount_);
 
@@ -4330,7 +4338,7 @@ namespace casadi {
     release_ = nullptr;
     incref_ = nullptr;
     decref_ = nullptr;
-    int version = s.version("FunctionInternal", 1, 8);
+    int version = s.version("FunctionInternal", 1, 9);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -4365,6 +4373,9 @@ namespace casadi {
     s.unpack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
     s.unpack("FunctionInternal::jit_base_name", jit_base_name_);
     s.unpack("FunctionInternal::jit_options", jit_options_);
+    if (version >= 9) {
+      s.unpack("FunctionInternal::codegen_options", codegen_options_);
+    }
     s.unpack("FunctionInternal::compiler_plugin", compiler_plugin_);
     s.unpack("FunctionInternal::has_refcount", has_refcount_);
 

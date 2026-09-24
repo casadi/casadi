@@ -1409,6 +1409,9 @@ namespace casadi {
     Importer compiler_;
     Dict jit_options_;
 
+    /// Options of the code generator of jit
+    Dict codegen_options_;
+
     /// Penalty factor for using a complete Jacobian to calculate directional derivatives
     double jac_penalty_;
 
