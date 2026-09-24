@@ -266,7 +266,8 @@ namespace casadi {
 
     g << "for (i=0; i<" << n_ << "; ++i) {\n";
     // Evaluate
-    g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    std::string flag = g(f_, "arg1", "res1", "iw", "w");
+    g << "if (" << flag << ") return 1;\n";
     // Update input buffers
     for (casadi_int j=0; j<n_in_; ++j) {
       if (!reduce_in_[j] && f_.nnz_in(j)) {

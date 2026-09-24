@@ -460,9 +460,9 @@ namespace casadi {
         }
 
         // Function call
-        g << "if (" << g(fk, project_in_ ? "arg1" : "arg+1",
-                         project_out_ ? "res1" : "res",
-                         "iw", "w") << ") return 1;\n";
+        std::string flag = g(fk, project_in_ ? "arg1" : "arg+1",
+                             project_out_ ? "res1" : "res", "iw", "w");
+        g << "if (" << flag << ") return 1;\n";
 
         // Project results with different sparsity
         for (casadi_int i=0; i<n_out_; ++i) {

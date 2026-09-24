@@ -458,7 +458,8 @@ void FiniteDiff::codegen_body(CodeGenerator& g) const {
   }
 
   g.comment("Evaluate");
-  g << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n";
+  std::string flag = g(derivative_of_, "arg", "res", "iw", "w");
+  g << "if (" << flag << ") return 1;\n";
 
   g.comment("Save outputs");
   g << g.copy("y", n_y_, "yk[k]") << "\n";
