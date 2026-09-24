@@ -25,6 +25,7 @@
 #include "conopt_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/casadi_interrupt.hpp"
+#include "casadi/core/sx_function.hpp"
 #include <cmath>
 #include <cstring>
 #include <cstdlib>
@@ -65,7 +66,12 @@ namespace casadi {
       {"license", {OT_DICT,
         "CONOPT license as a dict with keys 'int_1', 'int_2', 'int_3' (int) and "
         "'text' (string). Overrides the CONOPT_LICENSE_* environment variables. "
-        "Not serialized."}}
+        "Not serialized."}},
+      {"subset_eval", {OT_BOOL,
+        "Evaluate only the rows CONOPT lists in FDEvalIni, by executing just the "
+        "instructions those rows depend on. Requires the evaluation functions to be "
+        "SX without function calls (e.g. set 'expand' to true for MX problems); "
+        "otherwise all rows are evaluated. Default: true"}}
   }};
 
   ConoptInterface::ConoptInterface(const std::string& name, const Function& nlp)
@@ -79,11 +85,13 @@ namespace casadi {
     // Extract native options
     warm_start_ = false;
     debug_ = false;
+    subset_eval_ = true;
     for (auto&& op : opts) {
       if (op.first == "conopt") opts_ = op.second;
       else if (op.first == "optfile") optfile_ = op.second.to_string();
       else if (op.first == "warm_start") warm_start_ = op.second.to_bool();
       else if (op.first == "debug") debug_ = op.second.to_bool();
+      else if (op.first == "subset_eval") subset_eval_ = op.second.to_bool();
       else if (op.first == "license") {
         Dict lic = op.second;
         for (const char* key : {"int_1", "int_2", "int_3", "text"}) {
@@ -200,6 +208,87 @@ namespace casadi {
         jacg_col_[pos]   = c;
       }
     }
+
+    build_tapes();
+  }
+
+  bool ConoptInterface::build_tape(const Function& f, ConoptTape& t) {
+    t = ConoptTape();
+    if (!f.is_a("SXFunction", false)) return false;
+    const SXFunction* sxf = static_cast<const SXFunction*>(f.get());
+    if (sxf->has_free()) return false;
+    const std::vector<ScalarAtomic>& alg = sxf->algorithm_;
+    casadi_int n = alg.size();
+    if (n >= std::numeric_limits<int>::max()) return false;
+
+    t.instr.resize(n);
+    t.dep1.assign(n, -1);
+    t.dep2.assign(n, -1);
+    t.out_instr.resize(f.n_out());
+    for (casadi_int i = 0; i < f.n_out(); ++i) t.out_instr[i].assign(f.nnz_out(i), -1);
+    t.sz_w = sxf->worksize_;
+
+    // Last instruction to write each work vector slot. The work vector reuses
+    // slots (live variables), so an operand's producer is the most recent
+    // writer of its slot; operands are resolved before the result is recorded
+    // since an instruction may write the slot it reads.
+    std::vector<int> writer(t.sz_w, -1);
+    for (casadi_int k = 0; k < n; ++k) {
+      const ScalarAtomic& e = alg[k];
+      ConoptInstr& c = t.instr[k];
+      c.op = e.op;
+      c.i0 = e.i0;
+      c.i1 = 0;
+      c.i2 = 0;
+      c.d = 0;
+      switch (e.op) {
+        case OP_CALL:
+          return false;
+        case OP_CONST:
+          c.d = e.d;
+          writer[e.i0] = static_cast<int>(k);
+          break;
+        case OP_INPUT:
+          c.i1 = e.i1;
+          c.i2 = e.i2;
+          writer[e.i0] = static_cast<int>(k);
+          break;
+        case OP_OUTPUT:
+          c.i1 = e.i1;
+          c.i2 = e.i2;
+          t.dep1[k] = writer[e.i1];
+          t.out_instr[e.i0][e.i2] = static_cast<int>(k);
+          break;
+        default:
+          // Unary operations have i2 == i1 (see SXFunction::init)
+          c.i1 = e.i1;
+          c.i2 = e.i2;
+          t.dep1[k] = writer[e.i1];
+          if (casadi_math<double>::ndeps(e.op) == 2) t.dep2[k] = writer[e.i2];
+          writer[e.i0] = static_cast<int>(k);
+      }
+    }
+    for (auto&& o : t.out_instr)
+      if (std::any_of(o.begin(), o.end(), [](int k) { return k < 0; })) return false;
+    return true;
+  }
+
+  void ConoptInterface::build_tapes() {
+    has_tape_ = false;
+    tape_fg_ = ConoptTape();
+    tape_fg_jac_ = ConoptTape();
+    if (!subset_eval_) return;
+    // Row slots index g's nonzeros directly, as elsewhere in this interface
+    has_tape_ = get_function("nlp_fg").nnz_out(1) == ng_ &&
+                build_tape(get_function("nlp_fg"), tape_fg_) &&
+                build_tape(get_function("nlp_fg_jac"), tape_fg_jac_);
+    if (!has_tape_) {
+      tape_fg_ = ConoptTape();
+      tape_fg_jac_ = ConoptTape();
+      if (verbose_ || debug_)
+        casadi_message("CONOPT: row-subset evaluation disabled (evaluation functions are "
+                       "not SX without calls); evaluating all rows.");
+    }
   }
 
   void ConoptInterface::refine_nlflags_with_hessian() {
@@ -237,7 +326,7 @@ namespace casadi {
 
   // --- Serialization & Deserialization --- //
   ConoptInterface::ConoptInterface(DeserializingStream& s) : Nlpsol(s) {
-    s.version("ConoptInterface", 1);
+    int version = s.version("ConoptInterface", 1, 2);
     s.unpack("ConoptInterface::exact_hessian", exact_hessian_);
     s.unpack("ConoptInterface::opts", opts_);
     s.unpack("ConoptInterface::gradf_sp", gradf_sp_);
@@ -246,6 +335,8 @@ namespace casadi {
     s.unpack("ConoptInterface::optfile", optfile_);
     s.unpack("ConoptInterface::warm_start", warm_start_);
     s.unpack("ConoptInterface::debug", debug_);
+    subset_eval_ = true;
+    if (version >= 2) s.unpack("ConoptInterface::subset_eval", subset_eval_);
 
     // Recompute linearity flags first (needed for CSR construction below)
     {
@@ -300,11 +391,13 @@ namespace casadi {
         jacg_nzidx_[pos] = static_cast<int>(el);
         jacg_col_[pos]   = c;
       }
+
+    build_tapes();
   }
 
   void ConoptInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
-    s.version("ConoptInterface", 1);
+    s.version("ConoptInterface", 2);
     s.pack("ConoptInterface::exact_hessian", exact_hessian_);
     s.pack("ConoptInterface::opts", opts_);
     s.pack("ConoptInterface::gradf_sp", gradf_sp_);
@@ -313,7 +406,8 @@ namespace casadi {
     s.pack("ConoptInterface::optfile", optfile_);
     s.pack("ConoptInterface::warm_start", warm_start_);
     s.pack("ConoptInterface::debug", debug_);
-    // Derived arrays (gradf_col_flag_, CSR) are rebuilt on deserialization
+    s.pack("ConoptInterface::subset_eval", subset_eval_);
+    // Derived arrays (gradf_col_flag_, CSR, tapes) are rebuilt on deserialization
   }
 
   ConoptMemory::ConoptMemory(const ConoptInterface& interface)
@@ -325,6 +419,15 @@ namespace casadi {
 
   ConoptMemory::~ConoptMemory() {
     if (cntvect) COI_Free(&cntvect);
+  }
+
+  void ConoptMemory::bump_stamp() {
+    if (++cur_stamp == 0) {
+      // Wrapped around: clear so that no stale entry matches the new stamp
+      std::fill(stamp_fun.begin(), stamp_fun.end(), 0);
+      std::fill(stamp_jac.begin(), stamp_jac.end(), 0);
+      cur_stamp = 1;
+    }
   }
 
   void ConoptInterface::free_mem(void* mem) const { delete static_cast<ConoptMemory*>(mem); }
@@ -356,6 +459,17 @@ namespace casadi {
     m->linear_at_x0.resize(ng_, 0.0);
     if (has_linear_gradf_)
       m->gradf_const_vals.resize(gradf_sp_.nnz(), 0.0);
+
+    if (has_tape_) {
+      m->stamp_fun.assign(ng_ + 1, 0);
+      m->stamp_jac.assign(ng_ + 1, 0);
+      m->queued.assign(ng_ + 1, 0);
+      m->cur_stamp = 1;
+      m->cur_queue = 0;
+      m->pending_rows.reserve(ng_ + 1);
+      m->tape_w.assign(std::max(tape_fg_.sz_w, tape_fg_jac_.sz_w), 0.0);
+      m->tape_mark.assign(std::max(tape_fg_.instr.size(), tape_fg_jac_.instr.size()), 0);
+    }
 
     if (COI_Create(&m->cntvect) != 0 || m->cntvect == nullptr) {
       casadi::uerr() << "CONOPT: COI_Create failed" << std::endl;
@@ -462,6 +576,9 @@ namespace casadi {
     // same x is not reusable across solves.
     m->stored_fun      = false;
     m->stored_jac      = false;
+    if (has_tape_) m->bump_stamp();
+    m->n_eval_subset = m->n_eval_full = m->n_eval_reused = m->n_eval_on_demand = 0;
+    m->subset_instr_frac = 0;
     m->cached_f        = 0.0;
     m->nan_encountered = false;
     m->modsta = ConoptModelStatus::Unset;
@@ -712,6 +829,13 @@ namespace casadi {
     stats["modsta"] = static_cast<int>(m->modsta);
     stats["solsta"] = static_cast<int>(m->solsta);
     stats["iter_count"] = m->iter;
+    stats["subset_eval"] = has_tape_;
+    stats["n_eval_subset"] = m->n_eval_subset;
+    stats["n_eval_full"] = m->n_eval_full;
+    stats["n_eval_reused"] = m->n_eval_reused;
+    stats["n_eval_on_demand"] = m->n_eval_on_demand;
+    stats["subset_instr_frac"] = m->n_eval_subset > 0 ?
+        m->subset_instr_frac / static_cast<double>(m->n_eval_subset) : 0.0;
     return stats;
   }
 
@@ -946,6 +1070,228 @@ namespace casadi {
     return 0;
   }
 
+  // Marks the row slots in m->pending_rows (or all slots) as cached at cached_x.
+  static void mark_rows_cached(ConoptMemory* m, bool need_jac, bool all) {
+    if (all) {
+      std::fill(m->stamp_fun.begin(), m->stamp_fun.end(), m->cur_stamp);
+      if (need_jac) std::fill(m->stamp_jac.begin(), m->stamp_jac.end(), m->cur_stamp);
+    } else {
+      for (int r : m->pending_rows) {
+        m->stamp_fun[r] = m->cur_stamp;
+        if (need_jac) m->stamp_jac[r] = m->cur_stamp;
+      }
+    }
+  }
+
+  int ConoptInterface::eval_full(ConoptMemory* m, bool need_jac) const {
+    m->arg[0] = m->cached_x.data();
+    m->arg[1] = m->d_nlp.p;
+    m->res[0] = &m->cached_f;
+    if (need_jac) {
+      m->res[1] = m->cached_grad_f.data();
+      m->res[2] = m->cached_g.data();
+      m->res[3] = m->cached_jac_g.data();
+      return calc_function(m, "nlp_fg_jac");
+    } else {
+      m->res[1] = m->cached_g.data();
+      return calc_function(m, "nlp_fg");
+    }
+  }
+
+  int ConoptInterface::eval_rows(ConoptMemory* m, bool need_jac) const {
+    const ConoptTape& t = need_jac ? tape_fg_jac_ : tape_fg_;
+    const size_t n_instr = t.instr.size();
+    // Beyond this, the indirect loop outweighs what is skipped
+    const size_t max_instr = n_instr / 2;
+
+    // Row sets repeat, so reuse what was found for this set before
+    std::sort(m->pending_rows.begin(), m->pending_rows.end());
+    auto& sets = m->row_sets[need_jac ? 1 : 0];
+    auto it = sets.find(m->pending_rows);
+    if (it != sets.end() && it->second.heavy) return -1;
+
+    // Timed and counted as the full evaluation function, for comparable stats
+    ScopedTiming tic(m->thread_local_mem.at(0)->fstats.at(need_jac ? "nlp_fg_jac" : "nlp_fg"));
+    InterruptHandler::check();
+
+    const std::vector<int>* list = nullptr;
+    if (it != sets.end()) {
+      list = &it->second.instr;
+    } else {
+      // Output index of g in the tape's function
+      const casadi_int g_out = need_jac ? 2 : 1;
+      char* mark = m->tape_mark.data();
+      std::vector<int>& stack = m->tape_stack;
+      std::vector<int>& found = m->tape_list;
+      stack.clear();
+      found.clear();
+      auto push = [&](int k) {
+        if (k >= 0 && !mark[k]) {
+          mark[k] = 1;
+          stack.push_back(k);
+        }
+      };
+
+      // Seed with the output instructions of the requested values and nonlinear
+      // derivatives (linear entries are constants held by CONOPT).
+      for (int r : m->pending_rows) {
+        if (r == ng_) {
+          for (int k : t.out_instr[0]) push(k);
+          if (need_jac) {
+            for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
+              if (gradf_nlflag_[k]) push(t.out_instr[1][k]);
+          }
+        } else {
+          push(t.out_instr[g_out][r]);
+          if (need_jac) {
+            for (int k = jacg_rowstart_[r]; k < jacg_rowstart_[r + 1]; ++k)
+              push(t.out_instr[3][jacg_nzidx_[k]]);
+          }
+        }
+      }
+
+      // Collect every instruction the outputs depend on; the cost is proportional
+      // to the number collected, and stops once past max_instr.
+      bool heavy = false;
+      while (!stack.empty()) {
+        if (found.size() > max_instr) {
+          heavy = true;
+          break;
+        }
+        int k = stack.back();
+        stack.pop_back();
+        found.push_back(k);
+        push(t.dep1[k]);
+        push(t.dep2[k]);
+      }
+      for (int k : found) mark[k] = 0;
+      for (int k : stack) mark[k] = 0;
+
+      // The tape is in topological order
+      if (!heavy) std::sort(found.begin(), found.end());
+
+      // Remember the outcome, bounding the memory held by stored lists
+      size_t cap = std::max<size_t>(size_t(1) << 20, 4 * n_instr);
+      if (m->row_set_ints + found.size() > cap) {
+        m->row_sets[0].clear();
+        m->row_sets[1].clear();
+        m->row_set_ints = 0;
+      }
+      ConoptRowSet& rs = sets[m->pending_rows];
+      rs.heavy = heavy;
+      if (heavy) return -1;
+      rs.instr = found;
+      m->row_set_ints += found.size();
+      list = &rs.instr;
+    }
+
+    m->n_eval_subset++;
+    m->subset_instr_frac += static_cast<double>(list->size()) / static_cast<double>(n_instr);
+
+    double* w = m->tape_w.data();
+    const double* arg[2] = {m->cached_x.data(), m->d_nlp.p};
+    double* res[4];
+    res[0] = &m->cached_f;
+    if (need_jac) {
+      res[1] = m->cached_grad_f.data();
+      res[2] = m->cached_g.data();
+      res[3] = m->cached_jac_g.data();
+    } else {
+      res[1] = m->cached_g.data();
+    }
+    const ConoptInstr* instr = t.instr.data();
+    for (int k : *list) {
+      const ConoptInstr& e = instr[k];
+      switch (e.op) {
+        CASADI_MATH_FUN_BUILTIN(w[e.i1], w[e.i2], w[e.i0])
+
+        case OP_CONST: w[e.i0] = e.d; break;
+        case OP_INPUT: w[e.i0] = arg[e.i1] == nullptr ? 0 : arg[e.i1][e.i2]; break;
+        case OP_OUTPUT: res[e.i0][e.i2] = w[e.i1]; break;
+        default:
+          casadi_error("Unknown operation " + str(e.op));
+      }
+    }
+
+    // Make sure the computed entries are not NaN or Inf
+    auto bad = [](double v) { return !std::isfinite(v); };
+    for (int r : m->pending_rows) {
+      bool fail = false;
+      if (r == ng_) {
+        fail = !t.out_instr[0].empty() && bad(m->cached_f);
+        if (need_jac) {
+          for (casadi_int k = 0; k < gradf_sp_.nnz() && !fail; ++k)
+            fail = gradf_nlflag_[k] && bad(m->cached_grad_f[k]);
+        }
+      } else {
+        fail = bad(m->cached_g[r]);
+        if (need_jac) {
+          for (int k = jacg_rowstart_[r]; k < jacg_rowstart_[r + 1] && !fail; ++k)
+            fail = bad(m->cached_jac_g[jacg_nzidx_[k]]);
+        }
+      }
+      if (fail) {
+        if (debug_) {
+          casadi::uout() << "Row-subset evaluation: NaN/Inf in "
+                         << (r == ng_ ? std::string("objective") : "g[" + str(r) + "]")
+                         << "\n";
+        }
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  int ConoptInterface::fdevalini_subset(ConoptMemory* m, const double X[],
+                                        const int ROWLIST[], int MODE, int LISTSIZE) const {
+    const bool need_jac = (MODE != 1);
+
+    if (std::memcmp(m->cached_x.data(), X, nx_ * sizeof(double)) != 0) {
+      std::memcpy(m->cached_x.data(), X, nx_ * sizeof(double));
+      m->bump_stamp();
+    }
+
+    // Row slots in ROWLIST not yet cached at this point, without duplicates
+    // (both CONOPT rows of a range constraint map to the same slot).
+    const std::vector<unsigned>& stamp = need_jac ? m->stamp_jac : m->stamp_fun;
+    if (++m->cur_queue == 0) {
+      std::fill(m->queued.begin(), m->queued.end(), 0);
+      m->cur_queue = 1;
+    }
+    m->pending_rows.clear();
+    bool all = false;
+    for (int i = 0; i < LISTSIZE; ++i) {
+      int row = ROWLIST[i];
+      if (row < 0 || row > m->ng_expanded) {
+        all = true;  // unexpected numbering: be safe
+        break;
+      }
+      int r = row == 0 ? static_cast<int>(ng_) : m->conopt_to_casadi[row - 1];
+      if (stamp[r] == m->cur_stamp || m->queued[r] == m->cur_queue) continue;
+      m->queued[r] = m->cur_queue;
+      m->pending_rows.push_back(r);
+    }
+
+    if (!all && m->pending_rows.empty()) {
+      m->n_eval_reused++;
+      if (debug_) casadi::uout() << "FDEvalIni: requested rows already evaluated at this point\n";
+      return 0;
+    }
+
+    // Most of the rows: skip straight to the full evaluation
+    int ret = -1;
+    if (!all && 2 * m->pending_rows.size() <= static_cast<size_t>(ng_ + 1))
+      ret = eval_rows(m, need_jac);
+    if (ret == -1) {
+      m->n_eval_full++;
+      ret = eval_full(m, need_jac);
+      if (!ret) mark_rows_cached(m, need_jac, true);
+    } else if (!ret) {
+      mark_rows_cached(m, need_jac, false);
+    }
+    return ret;
+  }
+
   int COI_CALLCONV ConoptInterface::cb_fdevalini(const double X[], const int ROWLIST[],
                                                   int MODE, int LISTSIZE, int NUMTHREAD,
                                                   int IGNERR, int* ERRCNT, int NUMVAR,
@@ -958,6 +1304,32 @@ namespace casadi {
                   "cb_fdevalini: NUMVAR != cached_x size");
 
     const bool need_jac = (MODE != 1);
+
+    if (self.has_tape_) {
+        m->cache_valid_jac.store(false, std::memory_order_relaxed);
+        m->cache_valid.store(false, std::memory_order_relaxed);
+        if (self.debug_) {
+            casadi::uout() << "FDEvalIni (" << LISTSIZE << " rows) x:";
+            for (int i = 0; i < NUMVAR; ++i)
+                casadi::uout() << " " << X[i];
+            casadi::uout() << "\n";
+        }
+        int ret = 1;
+        try {
+            ret = self.fdevalini_subset(m, X, ROWLIST, MODE, LISTSIZE);
+        } catch (std::exception& ex) {
+            casadi::uerr() << ex.what() << std::endl;
+        } catch (...) {
+        }
+        if (ret) {
+            *ERRCNT = 1;
+            m->nan_encountered = true;
+        } else {
+            m->cache_valid_jac.store(need_jac, std::memory_order_relaxed);
+            m->cache_valid.store(true, std::memory_order_release);
+        }
+        return 0;
+    }
 
     // Single-row requests (typical during CONOPT's preprocessing, where rows are
     // evaluated one at a time) often repeat the same point. If so and the cache
@@ -994,21 +1366,7 @@ namespace casadi {
     m->cache_valid_jac.store(false, std::memory_order_relaxed);
     m->cache_valid.store(false, std::memory_order_relaxed);
     try {
-        m->arg[0] = m->cached_x.data();
-        m->arg[1] = m->d_nlp.p;
-
-        int ret;
-        if (need_jac) {
-            m->res[0] = &m->cached_f;
-            m->res[1] = m->cached_grad_f.data();
-            m->res[2] = m->cached_g.data();
-            m->res[3] = m->cached_jac_g.data();
-            ret = self.calc_function(m, "nlp_fg_jac");
-        } else {
-            m->res[0] = &m->cached_f;
-            m->res[1] = m->cached_g.data();
-            ret = self.calc_function(m, "nlp_fg");
-        }
+        int ret = self.eval_full(m, need_jac);
         if (!ret) {
             // Publish the cache only after the evaluation succeeds.
             m->cache_valid_jac.store(need_jac, std::memory_order_relaxed);
@@ -1054,6 +1412,34 @@ namespace casadi {
       std::memcmp(X, m->cached_x.data(), NUMVAR * sizeof(double)) == 0,
       "cb_fd_eval: X does not match cached_x — CONOPT API contract violated");
 #endif
+
+    // A row that FDEvalIni did not list is evaluated here instead
+    if (self.has_tape_ && ROWNO >= 0 && ROWNO <= m->ng_expanded) {
+        const bool need_jac = (MODE != 1);
+        int r = ROWNO == 0 ? static_cast<int>(self.ng_) : m->conopt_to_casadi[ROWNO - 1];
+        if ((need_jac ? m->stamp_jac : m->stamp_fun)[r] != m->cur_stamp) {
+            m->n_eval_on_demand++;
+            m->pending_rows.assign(1, r);
+            int ret = 1;
+            try {
+                ret = self.eval_rows(m, need_jac);
+                if (ret == -1) {
+                    m->n_eval_full++;
+                    ret = self.eval_full(m, need_jac);
+                    if (!ret) mark_rows_cached(m, need_jac, true);
+                } else if (!ret) {
+                    mark_rows_cached(m, need_jac, false);
+                }
+            } catch (std::exception& ex) {
+                casadi::uerr() << ex.what() << std::endl;
+            } catch (...) {
+            }
+            if (ret) {
+                *ERRCNT = 1;
+                return 0;
+            }
+        }
+    }
 
     if (ROWNO == 0) {
         if (MODE == 1 || MODE == 3) *G = m->cached_f;
