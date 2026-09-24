@@ -1,11 +1,15 @@
 # Turn a runtime file into a file with strings
 macro(CASADI_STRINGIFY STRFILE)
-  # Start with an empty file
-  file(WRITE ${STRFILE} "")
+  # Build the whole output in memory and write it out with a single file(WRITE)
+  # at the end, instead of calling file(APPEND) once per source line. Repeatedly
+  # opening/closing the output file in a tight loop is slow and, under a
+  # parallel build, can race with antivirus/indexer scans that briefly hold an
+  # exclusive lock on the file, causing sporadic "Permission denied" errors.
+  set(STROUTPUT "")
   foreach(FILE ${ARGN})
     # Add declaration of string
     get_filename_component(FILENAME ${FILE} NAME_WE)
-    file(APPEND ${STRFILE} "const char* ${FILENAME}_str =")
+    string(APPEND STROUTPUT "const char* ${FILENAME}_str =")
     # Append file as strings.  file(READ) instead of file(STRINGS): the latter
     # merges a line ending in backslash with the next, injecting a stray ';'.
     file(READ ${FILE} FILE_RAW)
@@ -25,11 +29,12 @@ macro(CASADI_STRINGIFY STRFILE)
       string(REPLACE "^b" "]" LINE "${LINE}")
       string(REPLACE "^a" "[" LINE "${LINE}")
       string(REPLACE "^!" "^" LINE "${LINE}")
-      file(APPEND ${STRFILE} "\n  \"${LINE}\\n\"")
+      string(APPEND STROUTPUT "\n  \"${LINE}\\n\"")
     endforeach()
     # End declaration
-    file(APPEND ${STRFILE} ";\n\n")
+    string(APPEND STROUTPUT ";\n\n")
   endforeach()
+  file(WRITE ${STRFILE} "${STROUTPUT}")
 endmacro()
 
 # Stringify C runtime
