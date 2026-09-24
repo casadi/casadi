@@ -77,7 +77,8 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
   init_string_.clear();
   for (size_t i = 0; i < dae->n_variables(); ++i) {
     const Variable& v = dae->variable(i);
-    casadi_assert(v.numel == 1, "Vector variable support not implemented");
+    // Consitency check
+    casadi_assert(v.numel == v.value.size(), "Size mismatch for " + v.name);
     // Skip if the wrong type
     if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
     // Variable has not been set - keep default value
@@ -87,19 +88,20 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
     // Get value
     switch (to_fmi2(v.type)) {
       case TypeFmi2::REAL:
-        init_real_.push_back(static_cast<fmi3Float64>(v.value.front()));
+        init_real_.insert(init_real_.end(), v.value.begin(), v.value.end());
         vr_real_.push_back(vr);
         break;
       case TypeFmi2::INTEGER:
       case TypeFmi2::ENUM:
-        init_integer_.push_back(static_cast<fmi3Int32>(v.value.front()));
+        init_integer_.insert(init_integer_.end(), v.value.begin(), v.value.end());
         vr_integer_.push_back(vr);
         break;
       case TypeFmi2::BOOLEAN:
-        init_boolean_.push_back(static_cast<fmi3Boolean>(v.value.front()));
+        init_boolean_.insert(init_boolean_.end(), v.value.begin(), v.value.end());
         vr_boolean_.push_back(vr);
         break;
       case TypeFmi2::STRING:
+        casadi_assert(v.numel == 1, "Vector variable support for strings not implemented");
         init_string_.push_back(v.stringvalue);
         vr_string_.push_back(vr);
         break;
@@ -334,11 +336,11 @@ int Fmu3::get_adjoint_derivative(void* instance, const unsigned int* vr_out, siz
 int Fmu3::set_values(void* instance) const {
   auto *c = static_cast<fmi3Instance>(instance);
   // Pass real values before initialization
-  casadi_assert(vr_real_.size() == init_real_.size(), "Vector valued variables not supported");
-  for (size_t k = 0; k < vr_real_.size(); ++k) {
-    fmi3Status status = set_float64_(c, &vr_real_[k], 1, &init_real_[k], 1);
+  if (!vr_real_.empty()) {
+    fmi3Status status = set_float64_(c, get_ptr(vr_real_), vr_real_.size(),
+      get_ptr(init_real_), init_real_.size());
     if (status != fmi3OK) {
-      casadi_warning("fmi3SetFloat64 failed for value reference " + str(vr_real_[k]));
+      casadi_warning("fmi3SetFloat64 failed");
       return 1;
     }
   }
