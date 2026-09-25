@@ -876,8 +876,8 @@ add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler
 # Lapack: Dense linear solvers
 option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
 option(WITH_BUILD_LAPACK "Download and install OpenBLAS for LAPACK+BLAS" OFF)
-set(BUILD_LAPACK_GIT_REPO https://github.com/xianyi/OpenBLAS.git  CACHE STRING "Git repo used together with BUILD_LAPACK_VERSION")
-set(BUILD_LAPACK_VERSION v0.3.24 CACHE STRING "Tag/branch/hash to be used for BUILD_LAPACK_GIT_REPO")
+set(BUILD_LAPACK_GIT_REPO https://github.com/jgillis/OpenBLAS.git CACHE STRING "Git repo used together with BUILD_LAPACK_VERSION")
+set(BUILD_LAPACK_VERSION 0.3.24.mod CACHE STRING "Tag/branch/hash to be used for BUILD_LAPACK_GIT_REPO")
 set(BUILD_LAPACK_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for LAPACK")
 
 # qpOASES: An active-set QP solver
