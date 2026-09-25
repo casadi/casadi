@@ -88,6 +88,7 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Auxilliary variables, by type
   std::vector<std::string> vn_aux_real_, vn_aux_integer_, vn_aux_boolean_, vn_aux_string_;
   std::vector<fmi3ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
+  std::vector<casadi_int> off_aux_real_, off_aux_integer_, off_aux_boolean_, off_aux_string_;
 
   // Following members set in finalize
 
