@@ -74,7 +74,7 @@
       2
     ],
     "Fmu3": [
-      1
+      2
     ],
     "FmuFunction": [
       6
@@ -426,7 +426,7 @@
       2
     ],
     "Fmu3": [
-      1
+      2
     ],
     "FmuFunction": [
       6
@@ -3270,7 +3270,7 @@
         {
           "name": "Fmu3",
           "op": "version",
-          "value": 1
+          "value": 2
         },
         {
           "name": "Fmu3::vr_real",
@@ -3397,6 +3397,38 @@
           "op": "field",
           "type": {
             "element": "unsignedint",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "Fmu3::off_aux_real",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "Fmu3::off_aux_integer",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "Fmu3::off_aux_boolean",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "Fmu3::off_aux_string",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
             "name": "std::vector"
           }
         }
