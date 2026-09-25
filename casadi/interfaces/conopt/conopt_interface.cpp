@@ -25,9 +25,12 @@
 #include "conopt_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/casadi_interrupt.hpp"
+#include "casadi/core/sx_function.hpp"
 #include <cmath>
 #include <cstring>
+#include <cstdlib>
 #include <algorithm>
+#include <iterator>
 #include <limits>
 
 namespace casadi {
@@ -60,7 +63,16 @@ namespace casadi {
         "Path to a CONOPT option file (for string-valued CR-cells such as Algorithm)"}},
       {"debug", {OT_BOOL,
         "Print debug output: constraint values at each FDEval, solution vector, "
-        "and option echo"}}
+        "and option echo"}},
+      {"license", {OT_DICT,
+        "CONOPT license as a dict with keys 'int_1', 'int_2', 'int_3' (int) and "
+        "'text' (string). Overrides the CONOPT_LICENSE_* environment variables. "
+        "Not serialized."}},
+      {"subset_eval", {OT_BOOL,
+        "Evaluate only the rows CONOPT lists in FDEvalIni, by executing just the "
+        "instructions those rows depend on. Requires the evaluation functions to be "
+        "SX without function calls (e.g. set 'expand' to true for MX problems); "
+        "otherwise all rows are evaluated. Default: true"}}
   }};
 
   ConoptInterface::ConoptInterface(const std::string& name, const Function& nlp)
@@ -74,11 +86,29 @@ namespace casadi {
     // Extract native options
     warm_start_ = false;
     debug_ = false;
+    subset_eval_ = true;
     for (auto&& op : opts) {
       if (op.first == "conopt") opts_ = op.second;
       else if (op.first == "optfile") optfile_ = op.second.to_string();
       else if (op.first == "warm_start") warm_start_ = op.second.to_bool();
       else if (op.first == "debug") debug_ = op.second.to_bool();
+      else if (op.first == "subset_eval") subset_eval_ = op.second.to_bool();
+      else if (op.first == "license") {
+        Dict lic = op.second;
+        for (const char* key : {"int_1", "int_2", "int_3", "text"}) {
+          casadi_assert(lic.find(key) != lic.end(),
+            "CONOPT 'license' option is missing key '" + std::string(key) + "'. "
+            "Expected keys: int_1, int_2, int_3, text.");
+        }
+        for (auto&& e : lic) {
+          if (e.first == "int_1") license_int_[0] = e.second.to_int();
+          else if (e.first == "int_2") license_int_[1] = e.second.to_int();
+          else if (e.first == "int_3") license_int_[2] = e.second.to_int();
+          else if (e.first == "text") license_text_ = e.second.to_string();
+          else casadi_error("CONOPT 'license' option: unknown key '" + e.first + "'.");
+        }
+        has_license_ = true;
+      }
     }
 
     for (auto&& op : opts_) {
@@ -92,6 +122,21 @@ namespace casadi {
 
     Function jacg_fcn = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     jacg_sp_ = jacg_fcn.sparsity_out(1);
+
+    // Value-only function for MODE=1 FDEvalIni calls, which CONOPT issues often
+    // (line searches, preprocessing); cheaper than the derivative functions above.
+    // f and g together, so shared subexpressions (e.g. integrator calls in
+    // shooting formulations) are evaluated once.
+    create_function("nlp_fg", {"x", "p"}, {"f", "g"});
+
+    // Same for derivative FDEvalIni calls: values and first derivatives in one
+    // function. nlp_grad_f/nlp_jac_g are kept for the linearity detection and the
+    // one-off evaluations at x0 in solve().
+    Function fg_jac_fcn = create_function("nlp_fg_jac", {"x", "p"},
+                                          {"f", "grad:f:x", "g", "jac:g:x"});
+    casadi_assert(fg_jac_fcn.sparsity_out(1) == gradf_sp_ &&
+                  fg_jac_fcn.sparsity_out(3) == jacg_sp_,
+                  "nlp_fg_jac sparsity differs from nlp_grad_f/nlp_jac_g");
 
     // Detect linear (constant) Jacobian entries using second-order sparsity:
     // d(jac:g:x_compact)/dx has shape (nnz_g, nx_); if row k is empty,
@@ -137,6 +182,36 @@ namespace casadi {
                                        [](int f) { return f == 0; });
     }
 
+    refine_nlflags_with_hessian();
+    finalize_structure();
+  }
+
+  // Selects nonzeros of outputs of f, evaluated symbolically on `in`:
+  // output k is f's output sel[k].first restricted to the nonzeros sel[k].second.
+  template<typename M>
+  static Function select_nonzeros(const std::string& name, const Function& f,
+      const std::vector<M>& in,
+      const std::vector<std::pair<casadi_int, std::vector<casadi_int>>>& sel) {
+    std::vector<M> out = f(in);
+    std::vector<M> ret;
+    for (auto&& e : sel) {
+      M r;
+      out.at(e.first).get_nz(r, false, Matrix<casadi_int>(e.second));
+      ret.push_back(r);
+    }
+    return Function(name, in, ret);
+  }
+
+  static Function select_nonzeros(const std::string& name, const Function& f,
+      const std::vector<std::pair<casadi_int, std::vector<casadi_int>>>& sel) {
+    // SX keeps only the instructions the selected nonzeros need
+    if (f.is_a("SXFunction", false)) return select_nonzeros<SX>(name, f, f.sx_in(), sel);
+    return select_nonzeros<MX>(name, f, f.mx_in(), sel);
+  }
+
+  void ConoptInterface::finalize_structure() {
+    mark_step_rows();
+
     const casadi_int* g_colind = jacg_sp_.colind();
     const casadi_int* g_row = jacg_sp_.row();
 
@@ -162,11 +237,346 @@ namespace casadi {
         jacg_col_[pos]   = c;
       }
     }
+
+
+    // Hessian structure passed to CONOPT: every column with a nonlinear entry
+    // must appear in it, which mark_step_rows() can violate
+    hess_sp_ = hesslag_sp_;
+    hess_nz_map_.clear();
+    if (exact_hessian_) {
+      std::vector<bool> in_hess = hessian_columns();
+      std::vector<bool> nl_col(nx_, false);
+      for (int c = 0; c < nx_; ++c)
+        for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el)
+          if (jacg_nlflag_[el]) nl_col[c] = true;
+      const casadi_int* f_row = gradf_sp_.row();
+      for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
+        if (gradf_nlflag_[k]) nl_col[f_row[k]] = true;
+      std::vector<casadi_int> extra;
+      for (casadi_int c = 0; c < nx_; ++c)
+        if (nl_col[c] && !in_hess[c]) extra.push_back(c);
+      if (!extra.empty()) {
+        hess_sp_ = hesslag_sp_ + Sparsity::triplet(nx_, nx_, extra, extra);
+        std::vector<casadi_int> hr, hc;
+        hesslag_sp_.get_triplet(hr, hc);
+        hess_nz_map_ = hess_sp_.get_nz(hr, hc);
+      }
+    }
+
+    // Linear parts: constant in x, so they can be evaluated at any point
+    lin_jac_nz_.clear();
+    lin_rows_.clear();
+    lin_gradf_nz_.clear();
+    for (casadi_int el = 0; el < nnz_g; ++el)
+      if (!jacg_nlflag_[el]) lin_jac_nz_.push_back(el);
+    for (casadi_int ci = 0; ci < ng_; ++ci)
+      if (jacg_rowstart_[ci + 1] == jacg_rowstart_[ci]) lin_rows_.push_back(ci);
+    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
+      if (!gradf_nlflag_[k]) lin_gradf_nz_.push_back(k);
+    affine_obj_ = std::none_of(gradf_nlflag_.begin(), gradf_nlflag_.end(),
+                               [](int f) { return f == 1; });
+    has_lin_fcn_ = !lin_jac_nz_.empty() || !lin_rows_.empty() ||
+                   !lin_gradf_nz_.empty() || affine_obj_;
+    if (has_lin_fcn_ && !has_function("nlp_lin")) {
+      // Only the linear outputs, so that e.g. log(x) at x0 in a nonlinear row
+      // cannot fail their evaluation
+      std::vector<casadi_int> f_nz;
+      if (affine_obj_ && get_function("nlp_fg_jac").nnz_out(0) == 1)
+        f_nz.push_back(0);
+      set_function(select_nonzeros("nlp_lin", get_function("nlp_fg_jac"),
+                                   {{3, lin_jac_nz_}, {2, lin_rows_},
+                                    {1, lin_gradf_nz_}, {0, f_nz}}), "nlp_lin");
+    }
+
+    build_tapes();
+  }
+
+  void ConoptInterface::mark_step_rows() {
+    // Candidates: rows with entries that are all linear, and an affine objective.
+    // Rows without entries do not depend on x.
+    const casadi_int* g_row = jacg_sp_.row();
+    std::vector<char> has_entry(ng_, 0), has_nl(ng_, 0);
+    for (casadi_int el = 0; el < jacg_sp_.nnz(); ++el) {
+      has_entry[g_row[el]] = 1;
+      if (jacg_nlflag_[el]) has_nl[g_row[el]] = 1;
+    }
+    std::vector<casadi_int> cand;
+    for (casadi_int ci = 0; ci < ng_; ++ci)
+      if (has_entry[ci] && !has_nl[ci]) cand.push_back(ci);
+    bool obj_cand = gradf_sp_.nnz() > 0 &&
+        std::none_of(gradf_nlflag_.begin(), gradf_nlflag_.end(), [](int f) { return f == 1; });
+    if (cand.empty() && !obj_cand) return;
+
+    // The candidates' values as an SX function
+    Function chk;
+    try {
+      std::vector<casadi_int> f_nz;
+      if (obj_cand) f_nz.push_back(0);
+      chk = select_nonzeros("nlp_step_check", get_function("nlp_fg"), {{0, f_nz}, {1, cand}});
+      if (!chk.is_a("SXFunction", false)) chk = chk.expand();
+    } catch (std::exception& ex) {
+      if (verbose_ || debug_)
+        casadi_message("CONOPT: cannot check linear rows for discontinuous operations "
+                       "(expansion to SX failed: " + std::string(ex.what()) + ")");
+      return;
+    }
+    const SXFunction* sxf = static_cast<const SXFunction*>(chk.get());
+
+    // For every work vector slot, the columns of x whose influence on its value
+    // passes through a non-smooth operation: floor, ceil, sign, copysign, fmod,
+    // remainder, comparisons, logical operations, if_else (fabs, fmin and fmax
+    // too, but their varying derivatives already make such entries nonlinear).
+    // Only those Jacobian entries need NLFLAG=1: CONOPT then evaluates the row
+    // with FDEval, whose value includes the linear terms, which keep NLFLAG=0.
+    const std::vector<ScalarAtomic>& alg = sxf->algorithm_;
+    const size_t n_alg = alg.size();
+    std::vector<int> writer(sxf->worksize_, -1), dep1(n_alg, -1), dep2(n_alg, -1);
+    std::vector<std::vector<casadi_int>> step_cols(sxf->worksize_);
+    std::vector<std::vector<std::vector<casadi_int>>> out_cols(chk.n_out());
+    for (casadi_int i = 0; i < chk.n_out(); ++i) out_cols[i].resize(chk.nnz_out(i));
+
+    // Columns of x that the values produced by instructions k1, k2 depend on
+    std::vector<char> seen(n_alg, 0);
+    std::vector<int> stack, visited;
+    auto x_columns = [&](int k1, int k2) {
+      std::vector<casadi_int> cols;
+      auto push = [&](int k) {
+        if (k >= 0 && !seen[k]) {
+          seen[k] = 1;
+          stack.push_back(k);
+        }
+      };
+      push(k1);
+      push(k2);
+      while (!stack.empty()) {
+        int k = stack.back();
+        stack.pop_back();
+        visited.push_back(k);
+        if (alg[k].op == OP_INPUT) {
+          if (alg[k].i1 == 0) cols.push_back(alg[k].i2);
+        } else {
+          push(dep1[k]);
+          push(dep2[k]);
+        }
+      }
+      for (int k : visited) seen[k] = 0;
+      visited.clear();
+      std::sort(cols.begin(), cols.end());
+      cols.erase(std::unique(cols.begin(), cols.end()), cols.end());
+      return cols;
+    };
+    auto unite = [](const std::vector<casadi_int>& u, const std::vector<casadi_int>& v) {
+      std::vector<casadi_int> r;
+      std::set_union(u.begin(), u.end(), v.begin(), v.end(), std::back_inserter(r));
+      return r;
+    };
+
+    bool has_call = false;
+    for (size_t k = 0; k < n_alg && !has_call; ++k) {
+      const ScalarAtomic& e = alg[k];
+      switch (e.op) {
+        case OP_CONST:
+        case OP_INPUT:
+          step_cols[e.i0].clear();
+          writer[e.i0] = static_cast<int>(k);
+          break;
+        case OP_OUTPUT:
+          out_cols[e.i0][e.i2] = step_cols[e.i1];
+          break;
+        case OP_CALL:
+          has_call = true;
+          break;
+        default: {
+          // Operands are resolved before the result is recorded, since an
+          // instruction may write the slot it reads (unary: i2 == i1)
+          dep1[k] = writer[e.i1];
+          if (casadi_math<double>::ndeps(e.op) == 2) dep2[k] = writer[e.i2];
+          std::vector<casadi_int> st = unite(step_cols[e.i1], step_cols[e.i2]);
+          if (!operation_checker<SmoothChecker>(e.op))
+            st = unite(st, x_columns(dep1[k], dep2[k]));
+          step_cols[e.i0] = std::move(st);
+          writer[e.i0] = static_cast<int>(k);
+        }
+      }
+    }
+
+    // Mark the (row, column) entries found; with an opaque call, every entry of
+    // the candidates
+    casadi_int n_rows = 0, n_entries = 0;
+    if (has_call) {
+      std::vector<char> is_cand(ng_, 0);
+      for (casadi_int ci : cand) is_cand[ci] = 1;
+      for (casadi_int el = 0; el < jacg_sp_.nnz(); ++el) {
+        if (is_cand[g_row[el]]) {
+          jacg_nlflag_[el] = 1;
+          n_entries++;
+        }
+      }
+      n_rows = cand.size();
+    } else {
+      for (size_t k = 0; k < cand.size(); ++k) {
+        bool row_marked = false;
+        for (casadi_int c : out_cols[1][k]) {
+          casadi_int el = jacg_sp_.get_nz(cand[k], c);
+          if (el >= 0 && !jacg_nlflag_[el]) {
+            jacg_nlflag_[el] = 1;
+            n_entries++;
+            row_marked = true;
+          }
+        }
+        if (row_marked) n_rows++;
+      }
+    }
+    casadi_int n_obj = 0;
+    if (obj_cand && !out_cols[0].empty()) {
+      if (has_call) {
+        n_obj = gradf_sp_.nnz();
+        std::fill(gradf_nlflag_.begin(), gradf_nlflag_.end(), 1);
+      } else {
+        for (casadi_int c : out_cols[0][0]) {
+          casadi_int k = gradf_col_to_nz_[c];
+          if (k >= 0 && !gradf_nlflag_[k]) {
+            gradf_nlflag_[k] = 1;
+            n_obj++;
+          }
+        }
+      }
+    }
+
+    if (n_entries > 0 || n_obj > 0) {
+      casadi_warning("CONOPT: " + str(n_rows) + " constraint row(s)" +
+                     (n_obj > 0 ? " and the objective" : "") +
+                     " depend on x through discontinuous operations (floor, sign, "
+                     "comparisons, if_else, ...) that have constant derivatives; the " +
+                     str(n_entries + n_obj) + " Jacobian entries involved are treated "
+                     "as nonlinear.");
+      has_linear_jac_ = std::any_of(jacg_nlflag_.begin(), jacg_nlflag_.end(),
+                                     [](int f) { return f == 0; });
+      has_linear_gradf_ = std::any_of(gradf_nlflag_.begin(), gradf_nlflag_.end(),
+                                       [](int f) { return f == 0; });
+    }
+  }
+
+  std::vector<bool> ConoptInterface::hessian_columns() const {
+    std::vector<bool> in_hess(nx_, false);
+    const casadi_int* h_colind = hesslag_sp_.colind();
+    const casadi_int* h_row = hesslag_sp_.row();
+    for (casadi_int c = 0; c < nx_; ++c) {
+      for (casadi_int el = h_colind[c]; el < h_colind[c+1]; ++el) {
+        in_hess[c] = true;
+        in_hess[h_row[el]] = true;
+      }
+    }
+    return in_hess;
+  }
+
+  bool ConoptInterface::build_tape(const Function& f, ConoptTape& t) {
+    t = ConoptTape();
+    if (!f.is_a("SXFunction", false)) return false;
+    const SXFunction* sxf = static_cast<const SXFunction*>(f.get());
+    if (sxf->has_free()) return false;
+    const std::vector<ScalarAtomic>& alg = sxf->algorithm_;
+    casadi_int n = alg.size();
+    if (n >= std::numeric_limits<int>::max()) return false;
+
+    t.instr.resize(n);
+    t.dep1.assign(n, -1);
+    t.dep2.assign(n, -1);
+    t.out_instr.resize(f.n_out());
+    for (casadi_int i = 0; i < f.n_out(); ++i) t.out_instr[i].assign(f.nnz_out(i), -1);
+    t.sz_w = sxf->worksize_;
+
+    // Last instruction to write each work vector slot. The work vector reuses
+    // slots (live variables), so an operand's producer is the most recent
+    // writer of its slot; operands are resolved before the result is recorded
+    // since an instruction may write the slot it reads.
+    std::vector<int> writer(t.sz_w, -1);
+    for (casadi_int k = 0; k < n; ++k) {
+      const ScalarAtomic& e = alg[k];
+      ConoptInstr& c = t.instr[k];
+      c.op = e.op;
+      c.i0 = e.i0;
+      c.i1 = 0;
+      c.i2 = 0;
+      c.d = 0;
+      switch (e.op) {
+        case OP_CALL:
+          return false;
+        case OP_CONST:
+          c.d = e.d;
+          writer[e.i0] = static_cast<int>(k);
+          break;
+        case OP_INPUT:
+          c.i1 = e.i1;
+          c.i2 = e.i2;
+          writer[e.i0] = static_cast<int>(k);
+          break;
+        case OP_OUTPUT:
+          c.i1 = e.i1;
+          c.i2 = e.i2;
+          t.dep1[k] = writer[e.i1];
+          t.out_instr[e.i0][e.i2] = static_cast<int>(k);
+          break;
+        default:
+          // Unary operations have i2 == i1 (see SXFunction::init)
+          c.i1 = e.i1;
+          c.i2 = e.i2;
+          t.dep1[k] = writer[e.i1];
+          if (casadi_math<double>::ndeps(e.op) == 2) t.dep2[k] = writer[e.i2];
+          writer[e.i0] = static_cast<int>(k);
+      }
+    }
+    for (auto&& o : t.out_instr)
+      if (std::any_of(o.begin(), o.end(), [](int k) { return k < 0; })) return false;
+    return true;
+  }
+
+  void ConoptInterface::build_tapes() {
+    has_tape_ = false;
+    tape_fg_ = ConoptTape();
+    tape_fg_jac_ = ConoptTape();
+    if (!subset_eval_) return;
+    // Row slots index g's nonzeros directly, as elsewhere in this interface
+    has_tape_ = get_function("nlp_fg").nnz_out(1) == ng_ &&
+                build_tape(get_function("nlp_fg"), tape_fg_) &&
+                build_tape(get_function("nlp_fg_jac"), tape_fg_jac_);
+    if (!has_tape_) {
+      tape_fg_ = ConoptTape();
+      tape_fg_jac_ = ConoptTape();
+      if (verbose_ || debug_)
+        casadi_message("CONOPT: row-subset evaluation disabled (evaluation functions are "
+                       "not SX without calls); evaluating all rows.");
+    }
+  }
+
+  void ConoptInterface::refine_nlflags_with_hessian() {
+    // The second-order sparsity of jac:g:x / grad:f:x can be conservative, e.g.
+    // through MX Function calls, where every input of the call gets flagged.
+    // nlp_hess_l's structure is the union over all rows (symbolic multipliers),
+    // so a column absent from it has zero second derivatives everywhere: all of
+    // its Jacobian/gradient entries are constant.
+    if (!exact_hessian_) return;
+    std::vector<bool> in_hess = hessian_columns();
+
+    const casadi_int* g_colind = jacg_sp_.colind();
+    for (casadi_int c = 0; c < nx_; ++c) {
+      if (in_hess[c]) continue;
+      for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) jacg_nlflag_[el] = 0;
+    }
+    const casadi_int* f_row = gradf_sp_.row();
+    for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k) {
+      if (!in_hess[f_row[k]]) gradf_nlflag_[k] = 0;
+    }
+
+    has_linear_jac_ = std::any_of(jacg_nlflag_.begin(), jacg_nlflag_.end(),
+                                   [](int f) { return f == 0; });
+    has_linear_gradf_ = std::any_of(gradf_nlflag_.begin(), gradf_nlflag_.end(),
+                                     [](int f) { return f == 0; });
   }
 
   // --- Serialization & Deserialization --- //
   ConoptInterface::ConoptInterface(DeserializingStream& s) : Nlpsol(s) {
-    s.version("ConoptInterface", 1);
+    int version = s.version("ConoptInterface", 1, 2);
     s.unpack("ConoptInterface::exact_hessian", exact_hessian_);
     s.unpack("ConoptInterface::opts", opts_);
     s.unpack("ConoptInterface::gradf_sp", gradf_sp_);
@@ -175,6 +585,8 @@ namespace casadi {
     s.unpack("ConoptInterface::optfile", optfile_);
     s.unpack("ConoptInterface::warm_start", warm_start_);
     s.unpack("ConoptInterface::debug", debug_);
+    subset_eval_ = true;
+    if (version >= 2) s.unpack("ConoptInterface::subset_eval", subset_eval_);
 
     // Recompute linearity flags first (needed for CSR construction below)
     {
@@ -206,32 +618,13 @@ namespace casadi {
                                        [](int f) { return f == 0; });
     }
 
-    const casadi_int* g_colind = jacg_sp_.colind();
-    const casadi_int* g_row = jacg_sp_.row();
-    casadi_int nnz_g = jacg_sp_.nnz();
-    jacg_rowstart_.assign(ng_ + 1, 0);
-    for (casadi_int el = 0; el < nnz_g; ++el)
-      if (jacg_nlflag_[el]) jacg_rowstart_[g_row[el] + 1]++;
-    for (int r = 0; r < ng_; ++r)
-      jacg_rowstart_[r + 1] += jacg_rowstart_[r];
-    jacg_nzidx_.resize(jacg_rowstart_[ng_]);
-    jacg_col_.resize(jacg_rowstart_[ng_]);
-    std::vector<int> fill_pos(ng_, 0);
-    for (int c = 0; c < nx_; ++c)
-      for (casadi_int el = g_colind[c]; el < g_colind[c+1]; ++el) {
-        if (!jacg_nlflag_[el]) continue;
-        int r = static_cast<int>(g_row[el]);
-        casadi_assert(fill_pos[r] < jacg_rowstart_[r + 1] - jacg_rowstart_[r],
-                      "CSR fill overflow for row r - count/fill pass mismatch in jacg_rowstart_");
-        int pos = jacg_rowstart_[r] + fill_pos[r]++;
-        jacg_nzidx_[pos] = static_cast<int>(el);
-        jacg_col_[pos]   = c;
-      }
+    refine_nlflags_with_hessian();
+    finalize_structure();
   }
 
   void ConoptInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
-    s.version("ConoptInterface", 1);
+    s.version("ConoptInterface", 2);
     s.pack("ConoptInterface::exact_hessian", exact_hessian_);
     s.pack("ConoptInterface::opts", opts_);
     s.pack("ConoptInterface::gradf_sp", gradf_sp_);
@@ -240,7 +633,8 @@ namespace casadi {
     s.pack("ConoptInterface::optfile", optfile_);
     s.pack("ConoptInterface::warm_start", warm_start_);
     s.pack("ConoptInterface::debug", debug_);
-    // Derived arrays (gradf_col_flag_, CSR) are rebuilt on deserialization
+    s.pack("ConoptInterface::subset_eval", subset_eval_);
+    // Derived arrays (gradf_col_flag_, CSR, tapes) are rebuilt on deserialization
   }
 
   ConoptMemory::ConoptMemory(const ConoptInterface& interface)
@@ -252,6 +646,15 @@ namespace casadi {
 
   ConoptMemory::~ConoptMemory() {
     if (cntvect) COI_Free(&cntvect);
+  }
+
+  void ConoptMemory::bump_stamp() {
+    if (++cur_stamp == 0) {
+      // Wrapped around: clear so that no stale entry matches the new stamp
+      std::fill(stamp_fun.begin(), stamp_fun.end(), 0);
+      std::fill(stamp_jac.begin(), stamp_jac.end(), 0);
+      cur_stamp = 1;
+    }
   }
 
   void ConoptInterface::free_mem(void* mem) const { delete static_cast<ConoptMemory*>(mem); }
@@ -283,10 +686,41 @@ namespace casadi {
     m->linear_at_x0.resize(ng_, 0.0);
     if (has_linear_gradf_)
       m->gradf_const_vals.resize(gradf_sp_.nnz(), 0.0);
+    m->x_lin.resize(nx_, 0.0);
+    m->lin_jac_buf.resize(lin_jac_nz_.size(), 0.0);
+    m->lin_g_buf.resize(lin_rows_.size(), 0.0);
+    m->lin_gradf_buf.resize(lin_gradf_nz_.size(), 0.0);
+    if (!hess_nz_map_.empty()) m->hess_buf.resize(hesslag_sp_.nnz(), 0.0);
+
+    if (has_tape_) {
+      m->stamp_fun.assign(ng_ + 1, 0);
+      m->stamp_jac.assign(ng_ + 1, 0);
+      m->queued.assign(ng_ + 1, 0);
+      m->cur_stamp = 1;
+      m->cur_queue = 0;
+      m->pending_rows.reserve(ng_ + 1);
+      m->tape_w.assign(std::max(tape_fg_.sz_w, tape_fg_jac_.sz_w), 0.0);
+      m->tape_mark.assign(std::max(tape_fg_.instr.size(), tape_fg_jac_.instr.size()), 0);
+    }
 
     if (COI_Create(&m->cntvect) != 0 || m->cntvect == nullptr) {
       casadi::uerr() << "CONOPT: COI_Create failed" << std::endl;
       return 1;
+    }
+
+    // License comes from the 'license' option if given, otherwise from
+    // environment variables (see e.g. conopt/examples/setlicense.sh), rather
+    // than being compiled in, so the same build works for any licensee.
+    const char* lic_int1 = std::getenv("CONOPT_LICENSE_INT_1");
+    const char* lic_int2 = std::getenv("CONOPT_LICENSE_INT_2");
+    const char* lic_int3 = std::getenv("CONOPT_LICENSE_INT_3");
+    const char* lic_text = std::getenv("CONOPT_LICENSE_TEXT");
+    if (has_license_) {
+      COIDEF_License(m->cntvect, license_int_[0], license_int_[1],
+                      license_int_[2], license_text_.c_str());
+    } else if (lic_int1 && lic_int2 && lic_int3 && lic_text) {
+      COIDEF_License(m->cntvect, std::atoi(lic_int1), std::atoi(lic_int2),
+                      std::atoi(lic_int3), lic_text);
     }
 
     if (warm_start_) COIDEF_IniStat(m->cntvect, 2);
@@ -294,6 +728,10 @@ namespace casadi {
     COIDEF_NumVar(m->cntvect, nx_);
     // NumCon, NumNz, NumNlNz are set in solve() because range-constraint expansion
     // can change them between calls.
+
+    // CasADi allows variables that appear in no constraint and not in the
+    // objective (or only with a zero constant gradient); these give empty columns.
+    COIDEF_EmptyCol(m->cntvect, 1);
 
     COIDEF_ObjCon(m->cntvect, 0);
     COIDEF_OptDir(m->cntvect, -1);
@@ -325,8 +763,8 @@ namespace casadi {
     COIDEF_FDEval(m->cntvect, &ConoptInterface::cb_fd_eval);
     COIDEF_FDEvalEnd(m->cntvect, &ConoptInterface::cb_fdevalend);
 
-    if (exact_hessian_ && hesslag_sp_.nnz() > 0) {
-        COIDEF_NumHess(m->cntvect, hesslag_sp_.nnz());
+    if (exact_hessian_ && hess_sp_.nnz() > 0) {
+        COIDEF_NumHess(m->cntvect, hess_sp_.nnz());
         COIDEF_2DLagrStr(m->cntvect, &ConoptInterface::cb_2dlagrstr);
         COIDEF_2DLagrVal(m->cntvect, &ConoptInterface::cb_2dlagrval);
     }
@@ -366,6 +804,13 @@ namespace casadi {
     auto m = static_cast<ConoptMemory*>(mem);
     m->cache_valid     = false;
     m->cache_valid_jac = false;
+    // Parameters/bounds may differ from the previous solve, so a cache for the
+    // same x is not reusable across solves.
+    m->stored_fun      = false;
+    m->stored_jac      = false;
+    if (has_tape_) m->bump_stamp();
+    m->n_eval_subset = m->n_eval_full = m->n_eval_reused = m->n_eval_on_demand = 0;
+    m->subset_instr_frac = 0;
     m->cached_f        = 0.0;
     m->nan_encountered = false;
     m->modsta = ConoptModelStatus::Unset;
@@ -432,67 +877,26 @@ namespace casadi {
     casadi_assert(ng_expanded <= std::numeric_limits<int>::max(), "ng_expanded overflows int");
     m->ng_expanded = static_cast<int>(ng_expanded);
 
-    // Empty Jacobian rows also need their constant terms moved into the RHS.
-    bool has_affine_g = has_linear_jac_ ||
-        std::any_of(m->row_nnz.begin(), m->row_nnz.end(), [](int n) { return n == 0; });
-    if (has_affine_g) {
-      m->arg[0] = m->d_nlp.z;
-      m->arg[1] = m->d_nlp.p;
-      m->res[0] = m->cached_g.data();
-      m->res[1] = has_linear_jac_ ? m->const_jac_vals.data() : nullptr;
-      try {
-        if (calc_function(m, "nlp_jac_g")) {
-          m->success = false;
-          m->unified_return_status = SOLVER_RET_NAN;
-          m->return_status = "Initial evaluation failed";
-          return 0;
-        }
-      } catch (std::exception& ex) {
-        casadi::uerr() << "CONOPT: initial evaluation failed: " << ex.what() << std::endl;
-        return 1;
-      } catch (...) {
-        casadi::uerr() << "CONOPT: initial evaluation failed (unknown exception)" << std::endl;
-        return 1;
-      }
-    }
-
-    // CONOPT evaluates affine rows internally; absorb their constants into the RHS.
-    if (has_affine_g) {
-      const casadi_int* g_colind_c = jacg_sp_.colind();
-      const casadi_int* g_row_c    = jacg_sp_.row();
-
-      // Accumulate the linear part of G at x0 per row: sum_j a_j * x0_j
-      std::fill(m->linear_at_x0.begin(), m->linear_at_x0.end(), 0.0);
-      for (int c = 0; c < nx_; ++c) {
-        for (casadi_int el = g_colind_c[c]; el < g_colind_c[c + 1]; ++el) {
-          if (jacg_nlflag_[el] == 0)
-            m->linear_at_x0[g_row_c[el]] += m->const_jac_vals[el] * m->d_nlp.z[c];
-        }
-      }
-
-      for (int ci = 0; ci < ng_; ++ci) {
-        // Only adjust fully linear rows (no nonlinear Jacobian entries)
-        if (jacg_rowstart_[ci + 1] != jacg_rowstart_[ci]) continue;
-        double constant = m->cached_g[ci] - m->linear_at_x0[ci];
-        if (std::abs(constant) < 1e-14) continue;
-        m->row_const_[ci] = constant;
-        int lb_row = m->casadi_to_conopt_lb_row[ci];
-        m->conopt_rhs[lb_row - 1] -= constant;
-        int ub_row = m->casadi_to_conopt_ub_row[ci];
-        if (ub_row >= 0) m->conopt_rhs[ub_row - 1] -= constant;
-      }
-    }
-
-    // Evaluate objective gradient at initial point for constant (linear) entries,
-    // or to capture the function value when the gradient is structurally empty.
+    // Coefficients of the linear entries, values of rows without nonlinear
+    // entries (for their constants) and of an affine objective. These are
+    // affine in x, so any point gives the same coefficients and constants; use
+    // x0 clamped to the bounds, as passed to CONOPT in cb_read_matrix.
     m->obj_const_ = std::numeric_limits<double>::quiet_NaN();
-    if (has_linear_gradf_ || gradf_sp_.nnz() == 0) {
-      m->arg[0] = m->d_nlp.z;
+    if (has_lin_fcn_) {
+      for (casadi_int i = 0; i < nx_; ++i) {
+        double x0 = m->d_nlp.z[i];
+        if (!std::isinf(m->d_nlp.ubz[i])) x0 = std::min(x0, m->d_nlp.ubz[i]);
+        if (!std::isinf(m->d_nlp.lbz[i])) x0 = std::max(x0, m->d_nlp.lbz[i]);
+        m->x_lin[i] = x0;
+      }
+      m->arg[0] = m->x_lin.data();
       m->arg[1] = m->d_nlp.p;
-      m->res[0] = &m->cached_f;
-      m->res[1] = has_linear_gradf_ ? m->gradf_const_vals.data() : nullptr;
+      m->res[0] = m->lin_jac_buf.data();
+      m->res[1] = m->lin_g_buf.data();
+      m->res[2] = m->lin_gradf_buf.data();
+      m->res[3] = &m->cached_f;
       try {
-        if (calc_function(m, "nlp_grad_f")) {
+        if (calc_function(m, "nlp_lin")) {
           m->success = false;
           m->unified_return_status = SOLVER_RET_NAN;
           m->return_status = "Initial evaluation failed";
@@ -504,6 +908,34 @@ namespace casadi {
       } catch (...) {
         casadi::uerr() << "CONOPT: initial evaluation failed (unknown exception)" << std::endl;
         return 1;
+      }
+      for (size_t k = 0; k < lin_jac_nz_.size(); ++k)
+        m->const_jac_vals[lin_jac_nz_[k]] = m->lin_jac_buf[k];
+      for (size_t k = 0; k < lin_gradf_nz_.size(); ++k)
+        m->gradf_const_vals[lin_gradf_nz_[k]] = m->lin_gradf_buf[k];
+
+      // CONOPT evaluates rows without nonlinear entries internally; absorb their
+      // constants g(x_lin) - a'x_lin into the RHS.
+      if (!lin_rows_.empty()) {
+        const casadi_int* g_colind_c = jacg_sp_.colind();
+        const casadi_int* g_row_c    = jacg_sp_.row();
+        std::fill(m->linear_at_x0.begin(), m->linear_at_x0.end(), 0.0);
+        for (int c = 0; c < nx_; ++c) {
+          for (casadi_int el = g_colind_c[c]; el < g_colind_c[c + 1]; ++el) {
+            if (jacg_nlflag_[el] == 0)
+              m->linear_at_x0[g_row_c[el]] += m->const_jac_vals[el] * m->x_lin[c];
+          }
+        }
+        for (size_t k = 0; k < lin_rows_.size(); ++k) {
+          casadi_int ci = lin_rows_[k];
+          double constant = m->lin_g_buf[k] - m->linear_at_x0[ci];
+          if (std::abs(constant) < 1e-14) continue;
+          m->row_const_[ci] = constant;
+          int lb_row = m->casadi_to_conopt_lb_row[ci];
+          m->conopt_rhs[lb_row - 1] -= constant;
+          int ub_row = m->casadi_to_conopt_ub_row[ci];
+          if (ub_row >= 0) m->conopt_rhs[ub_row - 1] -= constant;
+        }
       }
     }
 
@@ -521,11 +953,11 @@ namespace casadi {
         COIDEF_OptDir(m->cntvect, 0);
       } else {
         if (!has_nl_gradf) {
-          // CONOPT omits the affine objective's constant term; recover it at x0.
+          // CONOPT omits the affine objective's constant term; recover it at x_lin.
           const casadi_int* f_row_c = gradf_sp_.row();
           double lin_at_x0 = 0.0;
           for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
-            lin_at_x0 += m->gradf_const_vals[k] * m->d_nlp.z[f_row_c[k]];
+            lin_at_x0 += m->gradf_const_vals[k] * m->x_lin[f_row_c[k]];
           m->obj_const_lin_ = m->cached_f - lin_at_x0;
         }
         // cntvect persists across solves, so explicitly reset OptDir in case a
@@ -616,6 +1048,13 @@ namespace casadi {
     stats["modsta"] = static_cast<int>(m->modsta);
     stats["solsta"] = static_cast<int>(m->solsta);
     stats["iter_count"] = m->iter;
+    stats["subset_eval"] = has_tape_;
+    stats["n_eval_subset"] = m->n_eval_subset;
+    stats["n_eval_full"] = m->n_eval_full;
+    stats["n_eval_reused"] = m->n_eval_reused;
+    stats["n_eval_on_demand"] = m->n_eval_on_demand;
+    stats["subset_instr_frac"] = m->n_eval_subset > 0 ?
+        m->subset_instr_frac / static_cast<double>(m->n_eval_subset) : 0.0;
     return stats;
   }
 
@@ -850,6 +1289,228 @@ namespace casadi {
     return 0;
   }
 
+  // Marks the row slots in m->pending_rows (or all slots) as cached at cached_x.
+  static void mark_rows_cached(ConoptMemory* m, bool need_jac, bool all) {
+    if (all) {
+      std::fill(m->stamp_fun.begin(), m->stamp_fun.end(), m->cur_stamp);
+      if (need_jac) std::fill(m->stamp_jac.begin(), m->stamp_jac.end(), m->cur_stamp);
+    } else {
+      for (int r : m->pending_rows) {
+        m->stamp_fun[r] = m->cur_stamp;
+        if (need_jac) m->stamp_jac[r] = m->cur_stamp;
+      }
+    }
+  }
+
+  int ConoptInterface::eval_full(ConoptMemory* m, bool need_jac) const {
+    m->arg[0] = m->cached_x.data();
+    m->arg[1] = m->d_nlp.p;
+    m->res[0] = &m->cached_f;
+    if (need_jac) {
+      m->res[1] = m->cached_grad_f.data();
+      m->res[2] = m->cached_g.data();
+      m->res[3] = m->cached_jac_g.data();
+      return calc_function(m, "nlp_fg_jac");
+    } else {
+      m->res[1] = m->cached_g.data();
+      return calc_function(m, "nlp_fg");
+    }
+  }
+
+  int ConoptInterface::eval_rows(ConoptMemory* m, bool need_jac) const {
+    const ConoptTape& t = need_jac ? tape_fg_jac_ : tape_fg_;
+    const size_t n_instr = t.instr.size();
+    // Beyond this, the indirect loop outweighs what is skipped
+    const size_t max_instr = n_instr / 2;
+
+    // Row sets repeat, so reuse what was found for this set before
+    std::sort(m->pending_rows.begin(), m->pending_rows.end());
+    auto& sets = m->row_sets[need_jac ? 1 : 0];
+    auto it = sets.find(m->pending_rows);
+    if (it != sets.end() && it->second.heavy) return -1;
+
+    // Timed and counted as the full evaluation function, for comparable stats
+    ScopedTiming tic(m->thread_local_mem.at(0)->fstats.at(need_jac ? "nlp_fg_jac" : "nlp_fg"));
+    InterruptHandler::check();
+
+    const std::vector<int>* list = nullptr;
+    if (it != sets.end()) {
+      list = &it->second.instr;
+    } else {
+      // Output index of g in the tape's function
+      const casadi_int g_out = need_jac ? 2 : 1;
+      char* mark = m->tape_mark.data();
+      std::vector<int>& stack = m->tape_stack;
+      std::vector<int>& found = m->tape_list;
+      stack.clear();
+      found.clear();
+      auto push = [&](int k) {
+        if (k >= 0 && !mark[k]) {
+          mark[k] = 1;
+          stack.push_back(k);
+        }
+      };
+
+      // Seed with the output instructions of the requested values and nonlinear
+      // derivatives (linear entries are constants held by CONOPT).
+      for (int r : m->pending_rows) {
+        if (r == ng_) {
+          for (int k : t.out_instr[0]) push(k);
+          if (need_jac) {
+            for (casadi_int k = 0; k < gradf_sp_.nnz(); ++k)
+              if (gradf_nlflag_[k]) push(t.out_instr[1][k]);
+          }
+        } else {
+          push(t.out_instr[g_out][r]);
+          if (need_jac) {
+            for (int k = jacg_rowstart_[r]; k < jacg_rowstart_[r + 1]; ++k)
+              push(t.out_instr[3][jacg_nzidx_[k]]);
+          }
+        }
+      }
+
+      // Collect every instruction the outputs depend on; the cost is proportional
+      // to the number collected, and stops once past max_instr.
+      bool heavy = false;
+      while (!stack.empty()) {
+        if (found.size() > max_instr) {
+          heavy = true;
+          break;
+        }
+        int k = stack.back();
+        stack.pop_back();
+        found.push_back(k);
+        push(t.dep1[k]);
+        push(t.dep2[k]);
+      }
+      for (int k : found) mark[k] = 0;
+      for (int k : stack) mark[k] = 0;
+
+      // The tape is in topological order
+      if (!heavy) std::sort(found.begin(), found.end());
+
+      // Remember the outcome, bounding the memory held by stored lists
+      size_t cap = std::max<size_t>(size_t(1) << 20, 4 * n_instr);
+      if (m->row_set_ints + found.size() > cap) {
+        m->row_sets[0].clear();
+        m->row_sets[1].clear();
+        m->row_set_ints = 0;
+      }
+      ConoptRowSet& rs = sets[m->pending_rows];
+      rs.heavy = heavy;
+      if (heavy) return -1;
+      rs.instr = found;
+      m->row_set_ints += found.size();
+      list = &rs.instr;
+    }
+
+    m->n_eval_subset++;
+    m->subset_instr_frac += static_cast<double>(list->size()) / static_cast<double>(n_instr);
+
+    double* w = m->tape_w.data();
+    const double* arg[2] = {m->cached_x.data(), m->d_nlp.p};
+    double* res[4];
+    res[0] = &m->cached_f;
+    if (need_jac) {
+      res[1] = m->cached_grad_f.data();
+      res[2] = m->cached_g.data();
+      res[3] = m->cached_jac_g.data();
+    } else {
+      res[1] = m->cached_g.data();
+    }
+    const ConoptInstr* instr = t.instr.data();
+    for (int k : *list) {
+      const ConoptInstr& e = instr[k];
+      switch (e.op) {
+        CASADI_MATH_FUN_BUILTIN(w[e.i1], w[e.i2], w[e.i0])
+
+        case OP_CONST: w[e.i0] = e.d; break;
+        case OP_INPUT: w[e.i0] = arg[e.i1] == nullptr ? 0 : arg[e.i1][e.i2]; break;
+        case OP_OUTPUT: res[e.i0][e.i2] = w[e.i1]; break;
+        default:
+          casadi_error("Unknown operation " + str(e.op));
+      }
+    }
+
+    // Make sure the computed entries are not NaN or Inf
+    auto bad = [](double v) { return !std::isfinite(v); };
+    for (int r : m->pending_rows) {
+      bool fail = false;
+      if (r == ng_) {
+        fail = !t.out_instr[0].empty() && bad(m->cached_f);
+        if (need_jac) {
+          for (casadi_int k = 0; k < gradf_sp_.nnz() && !fail; ++k)
+            fail = gradf_nlflag_[k] && bad(m->cached_grad_f[k]);
+        }
+      } else {
+        fail = bad(m->cached_g[r]);
+        if (need_jac) {
+          for (int k = jacg_rowstart_[r]; k < jacg_rowstart_[r + 1] && !fail; ++k)
+            fail = bad(m->cached_jac_g[jacg_nzidx_[k]]);
+        }
+      }
+      if (fail) {
+        if (debug_) {
+          casadi::uout() << "Row-subset evaluation: NaN/Inf in "
+                         << (r == ng_ ? std::string("objective") : "g[" + str(r) + "]")
+                         << "\n";
+        }
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  int ConoptInterface::fdevalini_subset(ConoptMemory* m, const double X[],
+                                        const int ROWLIST[], int MODE, int LISTSIZE) const {
+    const bool need_jac = (MODE != 1);
+
+    if (std::memcmp(m->cached_x.data(), X, nx_ * sizeof(double)) != 0) {
+      std::memcpy(m->cached_x.data(), X, nx_ * sizeof(double));
+      m->bump_stamp();
+    }
+
+    // Row slots in ROWLIST not yet cached at this point, without duplicates
+    // (both CONOPT rows of a range constraint map to the same slot).
+    const std::vector<unsigned>& stamp = need_jac ? m->stamp_jac : m->stamp_fun;
+    if (++m->cur_queue == 0) {
+      std::fill(m->queued.begin(), m->queued.end(), 0);
+      m->cur_queue = 1;
+    }
+    m->pending_rows.clear();
+    bool all = false;
+    for (int i = 0; i < LISTSIZE; ++i) {
+      int row = ROWLIST[i];
+      if (row < 0 || row > m->ng_expanded) {
+        all = true;  // unexpected numbering: be safe
+        break;
+      }
+      int r = row == 0 ? static_cast<int>(ng_) : m->conopt_to_casadi[row - 1];
+      if (stamp[r] == m->cur_stamp || m->queued[r] == m->cur_queue) continue;
+      m->queued[r] = m->cur_queue;
+      m->pending_rows.push_back(r);
+    }
+
+    if (!all && m->pending_rows.empty()) {
+      m->n_eval_reused++;
+      if (debug_) casadi::uout() << "FDEvalIni: requested rows already evaluated at this point\n";
+      return 0;
+    }
+
+    // Most of the rows: skip straight to the full evaluation
+    int ret = -1;
+    if (!all && 2 * m->pending_rows.size() <= static_cast<size_t>(ng_ + 1))
+      ret = eval_rows(m, need_jac);
+    if (ret == -1) {
+      m->n_eval_full++;
+      ret = eval_full(m, need_jac);
+      if (!ret) mark_rows_cached(m, need_jac, true);
+    } else if (!ret) {
+      mark_rows_cached(m, need_jac, false);
+    }
+    return ret;
+  }
+
   int COI_CALLCONV ConoptInterface::cb_fdevalini(const double X[], const int ROWLIST[],
                                                   int MODE, int LISTSIZE, int NUMTHREAD,
                                                   int IGNERR, int* ERRCNT, int NUMVAR,
@@ -861,6 +1522,57 @@ namespace casadi {
     casadi_assert(static_cast<size_t>(NUMVAR) == m->cached_x.size(),
                   "cb_fdevalini: NUMVAR != cached_x size");
 
+    const bool need_jac = (MODE != 1);
+
+    if (self.has_tape_) {
+        m->cache_valid_jac.store(false, std::memory_order_relaxed);
+        m->cache_valid.store(false, std::memory_order_relaxed);
+        if (self.debug_) {
+            casadi::uout() << "FDEvalIni (" << LISTSIZE << " rows) x:";
+            for (int i = 0; i < NUMVAR; ++i)
+                casadi::uout() << " " << X[i];
+            casadi::uout() << "\n";
+        }
+        int ret = 1;
+        try {
+            ret = self.fdevalini_subset(m, X, ROWLIST, MODE, LISTSIZE);
+        } catch (std::exception& ex) {
+            casadi::uerr() << ex.what() << std::endl;
+        } catch (...) {
+        }
+        if (ret) {
+            *ERRCNT = 1;
+            m->nan_encountered = true;
+        } else {
+            m->cache_valid_jac.store(need_jac, std::memory_order_relaxed);
+            m->cache_valid.store(true, std::memory_order_release);
+        }
+        return 0;
+    }
+
+    // Single-row requests (typical during CONOPT's preprocessing, where rows are
+    // evaluated one at a time) often repeat the same point. If so and the cache
+    // already covers this MODE, skip re-evaluation. Multi-row requests always
+    // re-evaluate.
+    if (LISTSIZE == 1) {
+        bool new_solution = !(m->stored_fun || m->stored_jac) ||
+            std::memcmp(m->cached_x.data(), X, NUMVAR * sizeof(double)) != 0;
+        if (new_solution) {
+            m->stored_fun = false;
+            m->stored_jac = false;
+        } else if (m->stored_fun && (!need_jac || m->stored_jac)) {
+            // FDEvalEnd cleared the validity flags; the cached data is still good.
+            m->cache_valid_jac.store(m->stored_jac, std::memory_order_relaxed);
+            m->cache_valid.store(true, std::memory_order_release);
+            if (self.debug_)
+                casadi::uout() << "FDEvalIni: point unchanged, reusing cached evaluation\n";
+            return 0;
+        }
+    } else {
+        m->stored_fun = false;
+        m->stored_jac = false;
+    }
+
     std::memcpy(m->cached_x.data(), X, NUMVAR * sizeof(double));
 
     if (self.debug_) {
@@ -870,26 +1582,18 @@ namespace casadi {
         casadi::uout() << "\n";
     }
 
-    const bool need_jac = (MODE != 1);
-
     m->cache_valid_jac.store(false, std::memory_order_relaxed);
     m->cache_valid.store(false, std::memory_order_relaxed);
     try {
-        m->arg[0] = m->cached_x.data();
-        m->arg[1] = m->d_nlp.p;
-
-        m->res[0] = &m->cached_f;
-        m->res[1] = need_jac ? m->cached_grad_f.data() : nullptr;
-        int ret = self.calc_function(m, "nlp_grad_f");
+        int ret = self.eval_full(m, need_jac);
         if (!ret) {
-            m->res[0] = m->cached_g.data();
-            m->res[1] = need_jac ? m->cached_jac_g.data() : nullptr;
-            ret = self.calc_function(m, "nlp_jac_g");
-        }
-        if (!ret) {
-            // Publish the cache only after both evaluations succeed.
+            // Publish the cache only after the evaluation succeeds.
             m->cache_valid_jac.store(need_jac, std::memory_order_relaxed);
             m->cache_valid.store(true, std::memory_order_release);
+            if (LISTSIZE == 1) {
+                m->stored_fun = true;
+                m->stored_jac = need_jac;
+            }
         }
     } catch (std::exception& ex) {
         casadi::uerr() << ex.what() << std::endl;
@@ -927,6 +1631,34 @@ namespace casadi {
       std::memcmp(X, m->cached_x.data(), NUMVAR * sizeof(double)) == 0,
       "cb_fd_eval: X does not match cached_x — CONOPT API contract violated");
 #endif
+
+    // A row that FDEvalIni did not list is evaluated here instead
+    if (self.has_tape_ && ROWNO >= 0 && ROWNO <= m->ng_expanded) {
+        const bool need_jac = (MODE != 1);
+        int r = ROWNO == 0 ? static_cast<int>(self.ng_) : m->conopt_to_casadi[ROWNO - 1];
+        if ((need_jac ? m->stamp_jac : m->stamp_fun)[r] != m->cur_stamp) {
+            m->n_eval_on_demand++;
+            m->pending_rows.assign(1, r);
+            int ret = 1;
+            try {
+                ret = self.eval_rows(m, need_jac);
+                if (ret == -1) {
+                    m->n_eval_full++;
+                    ret = self.eval_full(m, need_jac);
+                    if (!ret) mark_rows_cached(m, need_jac, true);
+                } else if (!ret) {
+                    mark_rows_cached(m, need_jac, false);
+                }
+            } catch (std::exception& ex) {
+                casadi::uerr() << ex.what() << std::endl;
+            } catch (...) {
+            }
+            if (ret) {
+                *ERRCNT = 1;
+                return 0;
+            }
+        }
+    }
 
     if (ROWNO == 0) {
         if (MODE == 1 || MODE == 3) *G = m->cached_f;
@@ -987,8 +1719,8 @@ namespace casadi {
                                                   void* USRMEM) {
     auto m = static_cast<ConoptMemory*>(USRMEM);
     const ConoptInterface& self = m->self;
-    const casadi_int* colind = self.hesslag_sp_.colind();
-    const casadi_int* row = self.hesslag_sp_.row();
+    const casadi_int* colind = self.hess_sp_.colind();
+    const casadi_int* row = self.hess_sp_.row();
 
     int idx = 0;
     for (int c = 0; c < NUMVAR; ++c) {
@@ -1031,12 +1763,20 @@ namespace casadi {
     m->arg[1] = m->d_nlp.p;
     m->arg[2] = &obj_factor;
     m->arg[3] = m->hess_lam_g_.data();
-    m->res[0] = HSVL;
+    // With an extended structure, scatter nlp_hess_l's nonzeros into it; the
+    // added diagonal entries are zero.
+    const bool extended = !self.hess_nz_map_.empty();
+    m->res[0] = extended ? m->hess_buf.data() : HSVL;
 
     try {
         if (self.calc_function(m, "nlp_hess_l")) {
             *NODRV = 1;
             return 0;
+        }
+        if (extended) {
+            std::fill(HSVL, HSVL + NHESS, 0.0);
+            for (size_t k = 0; k < self.hess_nz_map_.size(); ++k)
+                HSVL[self.hess_nz_map_[k]] = m->hess_buf[k];
         }
         if (self.debug_) {
             casadi::uout() << "Hessian values (HSVL):";
