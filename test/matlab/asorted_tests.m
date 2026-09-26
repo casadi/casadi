@@ -526,6 +526,62 @@ assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
 assert(~issparse(b));
 
+if ~is_octave
+  % With codegen option stats: a leading stats handle records into a sink owned by the mex
+  y=MX.sym('y');
+  [f1,~] = f(y);
+  [f2,~] = f(2*y);
+  g=Function('g',{y},{f1+f2});
+  g.generate('fmex_stats',struct('mex',true,'stats',true));
+  clear fmex_stats
+  mex('-largeArrayDims',compile_flags,'fmex_stats.c')
+  a = fmex_stats('g',3);
+  assert(norm(a-18,1)==0);
+  h = fmex_stats('casadi_stats_allocate');
+  assert(isa(h,'uint64'));
+  a = fmex_stats('g',h,3);
+  assert(norm(a-18,1)==0);
+  a = fmex_stats(h,3);  % stringless: single function
+  assert(norm(a-18,1)==0);
+  root = fmex_stats('casadi_stats_find_function',h,-1,-1,'g');
+  assert(root~=-1);
+  child = fmex_stats('casadi_stats_select_function',h,root,-1,'f');
+  assert(child~=-1);
+  assert(fmex_stats('casadi_stats_get',h,root,'flag')==0);
+  assert(strcmp(fmex_stats('casadi_stats_get',h,child,'name'),'f'));
+  [v,found] = fmex_stats('casadi_stats_get',h,root,'no_such_stat');
+  assert(~found && isempty(v));
+  assert(~fmex_stats('casadi_stats_truncated',h));
+  % Same call tree as the virtual machine
+  S = StatsRecorder.from_bytes(fmex_stats('casadi_stats_data',h));
+  V = StatsRecorder();
+  g(V,3);
+  cg_tree = S.to_native();
+  vm_tree = V.to_native();
+  assert(numel(cg_tree)==numel(vm_tree));
+  assert(numel(cg_tree{1}.children)==numel(vm_tree{1}.children));
+  % Too small: records dropped, reported
+  h2 = fmex_stats('casadi_stats_allocate',8);
+  fmex_stats('g',h2,3);
+  assert(fmex_stats('casadi_stats_truncated',h2));
+  assert(fmex_stats('casadi_stats_nbytes',h2)>8);
+  fmex_stats('casadi_stats_free',h2);
+  % Freed or stale handles: error, not a crash
+  try
+    fmex_stats('g',h2,3);
+    assert(false);
+  catch e
+    assert(~isempty(strfind(e.message,'Invalid stats handle')));
+  end
+  clear fmex_stats
+  try
+    fmex_stats('casadi_stats_get',h,root,'flag');
+    assert(false);
+  catch e
+    assert(~isempty(strfind(e.message,'Invalid stats handle')));
+  end
+end
+
 
 x=SX.sym('x');
 f=Function('f',{x},{2*x,DM.eye(2)*x});

@@ -78,6 +78,12 @@ struct casadi_ipopt_data {
 
   int unified_return_status;
   int success;
+  // C-STATS
+  struct casadi_stats_sink* sink;
+  // C-STATS
+  casadi_int call;
+  // C-STATS
+  casadi_int iter_count;
 };
 // C-REPLACE "casadi_ipopt_data<T1>" "struct casadi_ipopt_data"
 

@@ -30,7 +30,15 @@
 #include "filesystem_impl.hpp"
 
 #include "casadi_os.hpp"
+#include "runtime/casadi_runtime.hpp"
 #include <sstream>
+#ifdef CASADI_ATOMIC_FETCH_ADD_LOCKED
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else  // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif  // CASADI_WITH_THREAD_MINGW
+#endif  // CASADI_ATOMIC_FETCH_ADD_LOCKED
 #ifdef HAVE_MKSTEMPS
 #define CASADI_NEED_UNISTD
 #else // HAVE_MKSTEMPS
@@ -56,6 +64,16 @@
 #undef CASADI_NEED_UNISTD
 
 namespace casadi {
+
+#ifdef CASADI_ATOMIC_FETCH_ADD_LOCKED
+  casadi_int casadi_fetch_add_locked(casadi_int* p, casadi_int n) {
+    static std::mutex mtx;
+    std::lock_guard<std::mutex> lock(mtx);
+    casadi_int ret = *p;
+    *p += n;
+    return ret;
+  }
+#endif  // CASADI_ATOMIC_FETCH_ADD_LOCKED
 
   int to_int(casadi_int rhs) {
     casadi_assert(rhs<=std::numeric_limits<int>::max(), "Integer overflow detected.");

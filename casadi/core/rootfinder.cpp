@@ -288,7 +288,7 @@ namespace casadi {
       casadi_stats_sink* sink, casadi_int call) const {
     auto *m = static_cast<RootfinderMemory*>(mem);
     m->sink = sink;
-    m->call = call;
+    m->call = m->scope = call;
 
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);

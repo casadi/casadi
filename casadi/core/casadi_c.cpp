@@ -24,6 +24,7 @@
 
 
 #include "function.hpp"
+#include "runtime/casadi_runtime.hpp"
 #include "../casadi_c.h"
 #include "serializer.hpp"
 #include <deque>
@@ -318,9 +319,19 @@ int casadi_c_eval(const double** arg, double** res, casadi_int* iw, double* w, i
 }
 
 int casadi_c_eval_id(int id, const double** arg, double** res, casadi_int* iw, double* w, int mem) {
+  return casadi_c_eval_with_stats_id(id, arg, res, iw, w, mem, nullptr, -1);
+}
+
+int casadi_c_eval_with_stats(const double** arg, double** res, casadi_int* iw, double* w,
+    int mem, casadi_stats_sink* sink, casadi_int parent) {
+  return casadi_c_eval_with_stats_id(casadi_c_active, arg, res, iw, w, mem, sink, parent);
+}
+
+int casadi_c_eval_with_stats_id(int id, const double** arg, double** res, casadi_int* iw,
+    double* w, int mem, casadi_stats_sink* sink, casadi_int parent) {
   if (sanitize_id(id)) return -1;
   try {
-    return casadi_c_loaded_functions.at(id)(arg, res, iw, w, mem);
+    return casadi_c_loaded_functions.at(id)(arg, res, iw, w, mem, sink, parent);
   } catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
     return -2;
@@ -329,6 +340,75 @@ int casadi_c_eval_id(int id, const double** arg, double** res, casadi_int* iw, d
     return -3;
   }
   return 0;
+}
+
+casadi_stats_sink casadi_c_stats_make_sink(unsigned char* p, casadi_int cap) {
+  return casadi::casadi_stats_make_sink(p, cap);
+}
+
+void casadi_c_stats_clear(casadi_stats_sink* s) {
+  casadi::casadi_stats_clear(s);
+}
+
+casadi_int casadi_c_stats_nbytes(const casadi_stats_sink* s) {
+  return casadi::casadi_stats_nbytes(s);
+}
+
+int casadi_c_stats_truncated(const casadi_stats_sink* s) {
+  return casadi::casadi_stats_truncated(s);
+}
+
+const unsigned char* casadi_c_stats_data(const casadi_stats_sink* s, casadi_int* n) {
+  return casadi::casadi_stats_data(s, n);
+}
+
+void casadi_c_stats_index(casadi_stats_sink* s) {
+  casadi::casadi_stats_index(s);
+}
+
+casadi_int casadi_c_stats_find_function(const casadi_stats_sink* s, casadi_int scope,
+    casadi_int cursor, const char* pattern) {
+  return casadi::casadi_stats_find_function(s, scope, cursor, pattern);
+}
+
+casadi_int casadi_c_stats_select_function(const casadi_stats_sink* s, casadi_int parent,
+    casadi_int cursor, const char* pattern) {
+  return casadi::casadi_stats_select_function(s, parent, cursor, pattern);
+}
+
+casadi_int casadi_c_stats_select_iteration(const casadi_stats_sink* s, casadi_int parent,
+    casadi_int cursor, casadi_int index) {
+  return casadi::casadi_stats_select_iteration(s, parent, cursor, index);
+}
+
+casadi_int casadi_c_stats_select_last_iteration(const casadi_stats_sink* s,
+    casadi_int parent) {
+  return casadi::casadi_stats_select_last_iteration(s, parent);
+}
+
+casadi_int casadi_c_stats_select_section(const casadi_stats_sink* s, casadi_int parent,
+    casadi_int cursor, const char* name) {
+  return casadi::casadi_stats_select_section(s, parent, cursor, name);
+}
+
+int casadi_c_stats_get_int(const casadi_stats_sink* s, casadi_int node, const char* key,
+    casadi_int* v) {
+  return casadi::casadi_stats_get_int(s, node, key, v);
+}
+
+int casadi_c_stats_get_real(const casadi_stats_sink* s, casadi_int node, const char* key,
+    double* v) {
+  return casadi::casadi_stats_get_real(s, node, key, v);
+}
+
+int casadi_c_stats_get_text(const casadi_stats_sink* s, casadi_int node, const char* key,
+    char* v, casadi_int cap, casadi_int* len) {
+  return casadi::casadi_stats_get_text(s, node, key, v, cap, len);
+}
+
+int casadi_c_stats_get_reals(const casadi_stats_sink* s, casadi_int node, const char* key,
+    double* v, casadi_int cap, casadi_int* len) {
+  return casadi::casadi_stats_get_reals(s, node, key, v, cap, len);
 }
 
 

@@ -95,6 +95,17 @@ void External::init_external() {
   // Work vector sizes
   work_ = (work_t)compiler_.get_function(name_ + "_work");
 
+  // Does the library export <name>_with_stats, and can it call a sink's reserve?
+  auto config_root = (const char* (*)(void)) compiler_.get_function(name_ + "_config_root");
+  auto stats_function_pointers = config_root ? (int (*)(void))
+    compiler_.get_function(std::string(config_root()) + "stats_function_pointers") : nullptr;
+  has_stats_ = stats_function_pointers && compiler_.has_function(name_ + "_with_stats");
+  stats_function_pointers_ = has_stats_ && stats_function_pointers();
+  // VM sinks always have a reserve callback
+  if (stats_function_pointers_) {
+    eval_stats_ = (eval_stats_t) compiler_.get_function(name_ + "_with_stats");
+  }
+
   if (config_) {
     args_.resize(config_args_.size());
     for (int i=0;i<config_args_.size();++i) {
@@ -329,9 +340,15 @@ void GenericExternal::init(const Dict& opts) {
   External::init(opts);
 }
 
+bool External::calls_with_stats(const CodeGenerator& g) const {
+  // A library without function pointers only accepts sinks without a reserve
+  return g.stats() && has_stats_ && (stats_function_pointers_ || !g.allow_function_pointers());
+}
+
 void External::codegen_declarations(CodeGenerator& g) const {
   if (!compiler_.inlined(name_)) {
     g.add_external(signature(name_) + ";", name_);
+    if (calls_with_stats(g)) g.add_external(signature_stats(name_) + ";");
     if (checkout_) g.add_external("int " + name_ + "_checkout(void);");
     if (release_) g.add_external("void " + name_ + "_release(int mem);");
     if (incref_) g.add_external("void " + name_ + "_incref(void);");
@@ -344,6 +361,8 @@ void External::codegen_body(CodeGenerator& g) const {
   if (compiler_.inlined(name_)) {
     // Function body is inlined
     g << compiler_.body(name_) << "\n";
+  } else if (calls_with_stats(g)) {
+    g << "if (" << name_ << "_with_stats(arg, res, iw, w, mem, sink, call)) return 1;\n";
   } else {
     g << "if (" << name_ << "(arg, res, iw, w, mem)) return 1;\n";
   }

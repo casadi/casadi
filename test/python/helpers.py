@@ -954,6 +954,9 @@ class casadiTestCase(unittest.TestCase):
             with open(F.name()+"_out.txt","w") as stdout:
               with open(F.name()+"_in.txt","r") as stdin:
                 commands = exename+" "+F.name()  # pyright: ignore[reportOperatorIssue]
+                if opts.get("stats"):
+                    # Also record stats to a file
+                    commands += " --stats " + F.name() + "_stats.cbor"
                 if tool=="none":
                     pass
                 elif tool=="memcheck" and valgrind and has_valgrind:
@@ -971,6 +974,12 @@ class casadiTestCase(unittest.TestCase):
             # We are actively looking for failure,
             # so do not proceed with tests
             return ret
+        if opts.get("stats"):
+            # A single root call, not truncated
+            S = ca.StatsRecorder.load(F.name() + "_stats.cbor")
+            self.assertFalse(S.truncated())
+            self.assertEqual(len(S.to_native()), 1)
+            self.assertEqual(S.to_native()[0]["name"], F.name())
         
       Fout = F.call(inputs)
       if with_external:
@@ -1110,6 +1119,17 @@ class requires_linsol(object):
     except:
       print("Not available linsol plugin %s, skipping unittests" % self.n)
       return None
+
+def openmp_flags():
+  """OpenMP compiler flags; on macOS via libomp, with CPPFLAGS/LDFLAGS from CI"""
+  if os.name == 'nt':
+    return ["/openmp"]
+  if sys.platform == 'darwin':
+    return (["-Xpreprocessor", "-fopenmp"] + os.environ.get('CPPFLAGS', '').split()
+            + os.environ.get('LDFLAGS', '').split()
+            # libomp's omp.h trips -Wpedantic (enumerator exceeds int)
+            + ["-lomp", "-Wno-pedantic"])
+  return ["-fopenmp"]
 
 class requires_nlpsol(object):
   def __init__(self,n):

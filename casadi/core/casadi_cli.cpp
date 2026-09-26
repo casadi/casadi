@@ -24,6 +24,7 @@
 
 
 #include "function.hpp"
+#include "stats_recorder.hpp"
 #include <iomanip>
 #include <iostream>
 
@@ -69,17 +70,41 @@ int eval_dump_parse(const std::vector<std::string>& args) {
     return eval_dump(name);
 }
 
+// $ casadi-cli stats file.cbor [--json [out.json]]
+int stats(const std::vector<std::string>& args) {
+  casadi_assert(args.size()>0, "File is missing in $ casadi-cli stats file.cbor "
+    "[--json [out.json]].");
+  StatsRecorder S = StatsRecorder::load(args[0]);
+  if (args.size()==1) {
+    S.disp(uout(), true);
+    uout() << std::endl;
+    return S.truncated() ? 2 : 0;
+  }
+  if (args[1]=="--json") {
+    casadi_assert(args.size()<=3, "Use $ casadi-cli stats file.cbor --json [out.json].");
+    if (args.size()==3) {
+      S.export_json(args[2]);
+    } else {
+      uout() << S.to_json() << std::endl;
+    }
+    return 0;
+  }
+  casadi_error("Unrecognised option '" + args[1] + "'. Use --json [out.json].");
+}
+
 int main(int argc, char* argv[]) {
   try {
     // Retrieve all arguments
     std::vector<std::string> args(argv + 1, argv + argc);
 
     // Branch on 'command' (first argument)
-    std::set<std::string> commands = {"eval_dump"};
+    std::set<std::string> commands = {"eval_dump", "stats"};
     casadi_assert(args.size()>0, "Must provide a command. Use one of: " + str(commands) + ".");
     std::string cmd = args[0];
     if (cmd=="eval_dump") {
         return eval_dump_parse(std::vector<std::string>(args.begin()+1, args.end()));
+    } else if (cmd=="stats") {
+        return stats(std::vector<std::string>(args.begin()+1, args.end()));
     } else {
         casadi_assert(commands.find(cmd)!=commands.end(),
             "Unrecognised command '" + cmd + "'. Use one of: " + str(commands) + ".");

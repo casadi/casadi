@@ -128,6 +128,77 @@ CASADI_EXPORT int casadi_c_work_id(int id, casadi_int *sz_arg, casadi_int* sz_re
 CASADI_EXPORT int casadi_c_eval_id(int id, const double** arg, double** res,
   casadi_int* iw, double* w, int mem);
 
+/* ===================================================
+*   Stats, as generated code with option "stats"
+*  =================================================== */
+
+/* Standalone copy of runtime/casadi_stats_sink_callback.hpp (C89) */
+#ifndef CASADI_STATS_SINK
+#define CASADI_STATS_SINK
+struct casadi_stats_sink {
+  unsigned char* p;
+  casadi_int cap;
+  casadi_int needed;
+  unsigned char* (*reserve)(struct casadi_stats_sink* s, casadi_int len, casadi_int* pos);
+  void (*commit)(struct casadi_stats_sink* s, casadi_int pos);
+  void* data;
+};
+#endif /* CASADI_STATS_SINK */
+
+/** \brief Sink on p[0, cap), thread-safe */
+CASADI_EXPORT struct casadi_stats_sink casadi_c_stats_make_sink(unsigned char* p,
+  casadi_int cap);
+/** \brief Drop all records */
+CASADI_EXPORT void casadi_c_stats_clear(struct casadi_stats_sink* s);
+/** \brief Bytes the stream needed, including dropped records */
+CASADI_EXPORT casadi_int casadi_c_stats_nbytes(const struct casadi_stats_sink* s);
+/** \brief Were records dropped? */
+CASADI_EXPORT int casadi_c_stats_truncated(const struct casadi_stats_sink* s);
+/** \brief Recorded bytes held in memory: *n of them */
+CASADI_EXPORT const unsigned char* casadi_c_stats_data(const struct casadi_stats_sink* s,
+  casadi_int* n);
+/** \brief Store where each node ends, after the last write: queries skip subtrees */
+CASADI_EXPORT void casadi_c_stats_index(struct casadi_stats_sink* s);
+/** \brief Next call after cursor (-1: first) at any depth below scope (-1: root), or -1
+
+    A pattern containing ':' matches the full id, otherwise the function name; null: any */
+CASADI_EXPORT casadi_int casadi_c_stats_find_function(const struct casadi_stats_sink* s,
+  casadi_int scope, casadi_int cursor, const char* pattern);
+/** \brief As casadi_c_stats_find_function, among the direct children of parent */
+CASADI_EXPORT casadi_int casadi_c_stats_select_function(const struct casadi_stats_sink* s,
+  casadi_int parent, casadi_int cursor, const char* pattern);
+/** \brief Next iteration of parent after cursor (-1: first) with index (-1: any), or -1 */
+CASADI_EXPORT casadi_int casadi_c_stats_select_iteration(const struct casadi_stats_sink* s,
+  casadi_int parent, casadi_int cursor, casadi_int index);
+/** \brief Iteration of parent recorded last, or -1 */
+CASADI_EXPORT casadi_int casadi_c_stats_select_last_iteration(
+  const struct casadi_stats_sink* s, casadi_int parent);
+/** \brief Next section of parent after cursor (-1: first) named name (null: any), or -1 */
+CASADI_EXPORT casadi_int casadi_c_stats_select_section(const struct casadi_stats_sink* s,
+  casadi_int parent, casadi_int cursor, const char* name);
+/** \brief Value of key of node; returns 0 if found
+
+    Reserved keys: id, name, mem and flag of a call, name of a section, index of an
+    iteration */
+CASADI_EXPORT int casadi_c_stats_get_int(const struct casadi_stats_sink* s, casadi_int node,
+  const char* key, casadi_int* v);
+CASADI_EXPORT int casadi_c_stats_get_real(const struct casadi_stats_sink* s, casadi_int node,
+  const char* key, double* v);
+/** \brief At most cap-1 chars in v, null-terminated if cap>0
+
+    *len: full length without the null, truncated if *len >= cap (len may be null) */
+CASADI_EXPORT int casadi_c_stats_get_text(const struct casadi_stats_sink* s, casadi_int node,
+  const char* key, char* v, casadi_int cap, casadi_int* len);
+/** \brief First cap elements in v; *len: full length (len may be null) */
+CASADI_EXPORT int casadi_c_stats_get_reals(const struct casadi_stats_sink* s, casadi_int node,
+  const char* key, double* v, casadi_int cap, casadi_int* len);
+
+/** \brief Evaluate, recording to sink under parent (-1 for a root call) */
+CASADI_EXPORT int casadi_c_eval_with_stats(const double** arg, double** res,
+  casadi_int* iw, double* w, int mem, struct casadi_stats_sink* sink, casadi_int parent);
+CASADI_EXPORT int casadi_c_eval_with_stats_id(int id, const double** arg, double** res,
+  casadi_int* iw, double* w, int mem, struct casadi_stats_sink* sink, casadi_int parent);
+
 CASADI_EXPORT void casadi_c_logger_write(const char* msg, int num);
 CASADI_EXPORT void casadi_c_logger_flush(void);
 

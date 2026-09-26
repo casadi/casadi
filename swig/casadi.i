@@ -3077,10 +3077,44 @@ namespace std {
   $1 = PyCapsule_GetPointer($input, NULL);
 }
 
+// std::string parameter named bytes: Python bytes object
+%typemap(typecheck, noblock=1, precedence=PREC_STRING) const std::string& bytes {
+  $1 = PyBytes_Check($input);
+}
+%typemap(in, doc="bytes", pystub_in="builtins.bytes", noblock=1) const std::string& bytes (std::string m) {
+  {
+    char* data;
+    Py_ssize_t len;
+    if (!PyBytes_Check($input) || PyBytes_AsStringAndSize($input, &data, &len)) {
+      SWIG_exception_fail(SWIG_TypeError, "Failed to convert input $argnum to type 'bytes'.");
+    }
+    m.assign(data, len);
+    $1 = &m;
+  }
+}
+%typemap(freearg, noblock=1) const std::string& bytes {}
+
 %typemap(out, doc="void*", pystub_out="Any", noblock=1, fragment="casadi_all") void* {
   $result = PyCapsule_New($1, NULL,NULL);
 }
 #endif
+
+#ifdef SWIGMATLAB
+// std::string parameter named bytes: uint8 or int8 array
+%typemap(typecheck, noblock=1, precedence=PREC_STRING) const std::string& bytes {
+  $1 = mxIsUint8($input) || mxIsInt8($input);
+}
+%typemap(in, doc="uint8", noblock=1) const std::string& bytes (std::string m) {
+  {
+    if (!(mxIsUint8($input) || mxIsInt8($input)) || mxIsComplex($input)) {
+      SWIG_exception_fail(SWIG_TypeError, "Failed to convert input $argnum to type 'uint8'.");
+    }
+    m.assign(static_cast<const char*>(mxGetData($input)), mxGetNumberOfElements($input));
+    $1 = &m;
+  }
+}
+%typemap(freearg, noblock=1) const std::string& bytes {}
+#endif // SWIGMATLAB
 
 #ifndef SWIGWASMJS
 // wasm_js has direct ctype/in/out typemaps for std::string in
@@ -5672,18 +5706,23 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 %ignore _function_buffer_eval;
 #endif
 
+%include <casadi/core/stats_recorder.hpp>
 %include <casadi/core/function.hpp>
 #ifdef SWIGPYTHON
 namespace casadi{
 %extend Function {
   %pythoncode %{
     def __call__(self, *args, **kwargs):
+      # Optional leading StatsRecorder: f(S, x, y) or f(S, x=..., y=...)
+      lead = ()
+      if len(args)>0 and isinstance(args[0], StatsRecorder):
+        lead, args = args[:1], args[1:]
       # Either named inputs or ordered inputs
       if len(args)>0 and len(kwargs)>0:
         raise SyntaxError('Function evaluation requires all arguments to be named or none')
       if len(args)>0:
         # Ordered inputs -> return tuple
-        ret = self.call(args)
+        ret = self.call(*lead, args)
         if len(ret)==0:
           return None
         elif len(ret)==1:
@@ -5692,7 +5731,7 @@ namespace casadi{
           return tuple(ret)
       else:
         # Named inputs -> return dictionary
-        return self.call(kwargs)
+        return self.call(*lead, kwargs)
 
     def buffer(self):
       """
@@ -5721,6 +5760,9 @@ namespace casadi{
   %stub_overload_method(__call__, DM, __arg0: _DM, *args: _DM)
   %stub_overload_method(__call__, SX, __arg0: _SX, *args: _SX)
   %stub_overload_method(__call__, MX, __arg0: _MX, *args: _MX)
+  /* Optional leading StatsRecorder */
+  %stub_overload_method(__call__, DM, __arg0: StatsRecorder, __arg1: _DM, *args: _DM)
+  %stub_overload_method(__call__, %arg(dict[builtins.str, DM]), __arg0: StatsRecorder, **kwargs: _DM)
   %stub_overload_method(__call__, %arg(dict[builtins.str, DM]), **kwargs: _DM)
   %stub_overload_method(__call__, %arg(dict[builtins.str, SX]), **kwargs: _SX)
   %stub_overload_method(__call__, %arg(dict[builtins.str, MX]), **kwargs: _MX)
@@ -5828,20 +5870,26 @@ namespace casadi{
       end
    end
    function varargout = paren(self, varargin)
-      if nargin==1 || (nargin>=2 && ischar(varargin{1}))
+      % Optional leading StatsRecorder: f(S, x, y) or f(S, 'x', x, 'y', y)
+      lead = {};
+      if ~isempty(varargin) && isa(varargin{1}, 'casadi.StatsRecorder')
+        lead = varargin(1);
+        varargin = varargin(2:end);
+      end
+      if isempty(varargin) || ischar(varargin{1})
         % Named inputs: return struct
         assert(nargout<2, 'Syntax error');
-        assert(mod(nargin,2)==1, 'Syntax error');
+        assert(mod(numel(varargin),2)==0, 'Syntax error');
         arg = struct;
-        for i=1:2:nargin-1
+        for i=1:2:numel(varargin)
           assert(ischar(varargin{i}), 'Syntax error');
           arg.(varargin{i}) = varargin{i+1};
         end
-        res = self.call(arg);
+        res = self.call(lead{:}, arg);
         varargout{1} = res;
       else
         % Ordered inputs: return variable number of outputs
-        res = self.call(varargin);
+        res = self.call(lead{:}, varargin);
         assert(nargout<=numel(res), 'Too many outputs');
         for i=1:max(min(1,numel(res)),nargout)
           varargout{i} = res{i};

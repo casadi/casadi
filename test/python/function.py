@@ -29,7 +29,7 @@ import numpy
 import unittest
 from types import *
 from numpy import random
-from helpers import args, casadiTestCase, hessian_old, jacobian_old, memory_heavy, requiresPlugin, requires_conic, requires_expm, requires_nlpsol, skip, toSX_fun
+from helpers import args, casadiTestCase, hessian_old, jacobian_old, memory_heavy, openmp_flags, requiresPlugin, requires_conic, requires_expm, requires_nlpsol, skip, toSX_fun
 import pickle
 import os
 import re
@@ -3915,25 +3915,7 @@ class Functiontests(casadiTestCase):
                     wide_inputs[k] = ca.horzcat(local_inputs[k],local_inputs[k]*1.2)
 
                 if map_type == "openmp":
-                    # Set up OpenMP compilation flags
-                    if os.name == 'nt':
-                        openmp_flags = ["/openmp"]
-                    elif sys.platform == 'darwin':
-                        # macOS: use -Xpreprocessor -fopenmp and environment variables
-                        openmp_flags = ["-Xpreprocessor", "-fopenmp"]
-                        # Add CPPFLAGS and LDFLAGS from environment if available (set by CI)
-                        cppflags = os.environ.get('CPPFLAGS', '')
-                        ldflags = os.environ.get('LDFLAGS', '')
-                        if cppflags:
-                            openmp_flags.extend(cppflags.split())
-                        if ldflags:
-                            openmp_flags.extend(ldflags.split())
-                        openmp_flags.append("-lomp")
-                        openmp_flags.append("-Wno-pedantic") # workaround /opt/homebrew/opt/libomp/include/omp.h:60:9: error: ISO C restricts enumerator values to range of 'int' (2147483648 is too large) [-Werror,-Wpedantic]
-                    else:
-                        openmp_flags = ["-fopenmp"]
-
-                    self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+openmp_flags,extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_OMP"],with_external=False,digits=12)
+                    self.check_codegen(F,inputs=F.convert_in(wide_inputs),main=True,valgrind=True,std="c99",extra_options=extra_options+openmp_flags(),extralibs=extralibs,opts={"thread_safe":True},definitions=["CASADI_MAX_NUM_THREADS=2","CASADI_THREAD_TYPE=CASADI_THREAD_TYPE_OMP"],with_external=False,digits=12)
                 elif map_type == "thread":
                     if os.name == "posix":
                         for CASADI_MUTEX_USE_STATIC_INIT in ["0","1"]:

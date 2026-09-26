@@ -71,6 +71,8 @@ namespace casadi {
     sz_zeros_ = 0;
     sz_ones_ = 0;
     thread_safe_ = false;
+    stats_ = false;
+    allow_function_pointers_ = true;
 
     // Read options
     for (auto&& e : opts) {
@@ -140,6 +142,10 @@ namespace casadi {
         this->l1_blas = e.second;
       } else if (e.first=="thread_safe") {
         thread_safe_ = e.second;
+      } else if (e.first=="stats") {
+        stats_ = e.second;
+      } else if (e.first=="allow_function_pointers") {
+        allow_function_pointers_ = e.second;
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -164,8 +170,6 @@ namespace casadi {
         this->real_min = "<NOT SPECIFIED>";
       }
     }
-
-    if (thread_safe_) add_auxiliary(AUX_THREADS);
 
     // Start at new line with no indentation
     newline_ = true;
@@ -224,6 +228,9 @@ namespace casadi {
       this->prefix = this->name;
     }
 
+    // After prefix is set: the stats runtime exports symbols
+    if (thread_safe_) add_auxiliary(AUX_THREADS);
+    if (stats_) add_auxiliary(AUX_STATS);
   }
 
   void CodeGenerator::scope_enter() {
@@ -396,6 +403,21 @@ namespace casadi {
     return fname;
   }
 
+  std::string CodeGenerator::stats_id(const Function& f) {
+    std::string cg_name = f->codegen_name(*this, false);
+    std::string id = "casadi_" + cg_name + "_stats_id";
+    if (stats_ids_.insert(cg_name).second) {
+      // "<prefixed codegen name>:<name>"; check_name guarantees no escaping is needed
+      auxiliaries << "static const char " << id << "[] = CASADI_STRINGIFY("
+                  << shorthand(cg_name) << ") \":" << f.name() << "\";\n";
+    }
+    return id;
+  }
+
+  std::string CodeGenerator::stats_args() const {
+    return stats_ ? ", 0, -1" : "";
+  }
+
     void CodeGenerator::add(const Function& f, bool with_jac_sparsity) {
     // Add if not already added
     std::string codegen_name = add_dependency(f);
@@ -404,12 +426,29 @@ namespace casadi {
 
     // Define function
     *this << declare(f->signature(f.name())) << "{\n"
-          << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
+          << "return " << codegen_name <<  "(arg, res, iw, w, mem" << stats_args() << ");\n"
           << "}\n\n";
 
     // What the library-wide symbols (<root>casadi_version, ...) start with
     *this << declare("const char* " + f.name() + "_config_root(void)")
           << " { return CASADI_PREFIX_STRING; }\n\n";
+
+    if (stats_) {
+      // Entry point taking a caller-owned sink and parent
+      *this << declare(f->signature_stats(f.name())) << "{\n";
+      if (f->gather_stats_) {
+        *this << "int flag;\n"
+              << "casadi_int me;\n";
+        *this << "me = casadi_stats_begin_call(sink, " << stats_id(f) << ", mem, parent);\n"
+              << "flag = " << codegen_name << "(arg, res, iw, w, mem, sink, me);\n"
+              << "casadi_stats_end_call(sink, me, flag);\n"
+              << "return flag;\n";
+      } else {
+        // gather_stats off: neither this call nor its callees are recorded
+        *this << "return " << codegen_name << "(arg, res, iw, w, mem" << stats_args() << ");\n";
+      }
+      *this << "}\n\n";
+    }
 
     if (this->unroll_args) {
       // Define function
@@ -420,8 +459,20 @@ namespace casadi {
       for (casadi_int i=0; i<f.n_out(); ++i) {
         *this << "res[" << i << "] = " << f.name_out(i) << ";\n";
       }
-      *this << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n";
+      *this << "return " << codegen_name <<  "(arg, res, iw, w, mem" << stats_args() << ");\n";
       *this << "}\n\n";
+      if (stats_) {
+        // Unrolled variant of <name>_with_stats
+        *this << declare(f->signature_unrolled(f.name(), true)) << "{\n";
+        for (casadi_int i=0; i<f.n_in(); ++i) {
+          *this << "arg[" << i << "] = " << f.name_in(i) << ";\n";
+        }
+        for (casadi_int i=0; i<f.n_out(); ++i) {
+          *this << "res[" << i << "] = " << f.name_out(i) << ";\n";
+        }
+        *this << "return " << f.name() << "_with_stats(arg, res, iw, w, mem, sink, parent);\n";
+        *this << "}\n\n";
+      }
       // Flush buffers
       flush(this->body);
     }
@@ -479,6 +530,11 @@ namespace casadi {
     if (added_auxiliaries_.count(AUX_THREADS)) {
       s << exported("int", "thread_type", "(void)", h)
         << " { return CASADI_THREAD_TYPE; }\n";
+    }
+    if (stats_) {
+      // Does <name>_with_stats take the sink layout with a reserve callback?
+      s << exported("int", "stats_function_pointers", "(void)", h)
+        << " { return " << (allow_function_pointers_ ? 1 : 0) << "; }\n";
     }
     s << "\n";
   }
@@ -651,13 +707,16 @@ namespace casadi {
     // Begin conditional compilation
     s << "#ifdef MATLAB_MEX_FILE\n";
 
+    // With stats: sinks owned by this mex file, casadi_stats_* commands
+    if (stats_) generate_mex_stats(s);
+
     // Function prototype
     if (this->cpp) s << "extern \"C\"\n"; // C linkage
     s << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {"
       << std::endl;
 
     // Create a buffer
-    size_t buf_len = 0;
+    size_t buf_len = stats_ ? std::string("casadi_stats_select_last_iteration").size() : 0;
     for (casadi_int i=0; i<exposed_fname.size(); ++i) {
       buf_len = std::max(buf_len, exposed_fname[i].size());
     }
@@ -666,18 +725,38 @@ namespace casadi {
     // Read std::string argument
     s << "  int buf_ok = argc > 0 && !mxGetString(*argv, buf, sizeof(buf));\n";
 
+    // With stats: an optional stats handle before the inputs
+    std::string sink_arg;
+    if (stats_) {
+      s << "  struct casadi_stats_sink* sink = 0;\n";
+      sink_arg = ", sink";
+    }
+    std::string peel = stats_ ?
+      "    if (argc>0 && casadi_mex_is_sink(argv[0])) {\n"
+      "      sink = casadi_mex_sink(argv[0]);\n"
+      "      argc--; argv++;\n"
+      "    }\n" : "";
+
     // Create switch
     s << "  if (!buf_ok) {\n";
     // Allow stringless call when unambiguous
     if (exposed_fname.size()==1) {
-      s << "    mex_" << exposed_fname[0] << "(resc, resv, argc, argv);\n"
+      s << peel
+        << "    mex_" << exposed_fname[0] << "(resc, resv, argc, argv" << sink_arg << ");\n"
         << "    return;\n";
     } else {
       s << "    /* name error */\n";
     }
     for (casadi_int i=0; i<exposed_fname.size(); ++i) {
       s << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {\n"
-        << "    mex_" << exposed_fname[i] << "(resc, resv, argc-1, argv+1);\n"
+        << "    argc--; argv++;\n"
+        << peel
+        << "    mex_" << exposed_fname[i] << "(resc, resv, argc, argv" << sink_arg << ");\n"
+        << "    return;\n";
+    }
+    if (stats_) {
+      s << "  } else if (strncmp(buf, \"casadi_stats_\", 13)==0) {\n"
+        << "    casadi_mex_stats_command(buf, resc, resv, argc-1, argv+1);\n"
         << "    return;\n";
     }
     s << "  }\n";
@@ -687,11 +766,154 @@ namespace casadi {
     for (casadi_int i=0; i<exposed_fname.size(); ++i) {
       s << " '" << exposed_fname[i] << "'";
     }
+    if (stats_) s << " and 'casadi_stats_*' commands";
     s << "\");\n";
 
     // End conditional compilation and function
     s << "}\n"
          << "#endif\n";
+  }
+
+  void CodeGenerator::generate_mex_stats(std::ostream &s) const {
+    // Stats sinks owned by this mex file, referred to by uint64 handles (slot index + 1).
+    // A uint64 cannot be a function input (those are double), so f(sink, x, ...) is unambiguous
+    s << "/* Stats sinks owned by this mex file, handle: uint64 slot index + 1 */\n"
+      << "#define CASADI_MEX_STATS_MAX 256\n"
+      << "static unsigned char* casadi_mex_stats_buf[CASADI_MEX_STATS_MAX];\n"
+      << "static struct casadi_stats_sink casadi_mex_stats_sink[CASADI_MEX_STATS_MAX];\n\n"
+      // Free all on clear mex / exit
+      << "static void casadi_mex_stats_atexit(void) {\n"
+      << "  int k;\n"
+      << "  for (k=0; k<CASADI_MEX_STATS_MAX; ++k) {\n"
+      << "    if (casadi_mex_stats_buf[k]) mxFree(casadi_mex_stats_buf[k]);\n"
+      << "    casadi_mex_stats_buf[k] = 0;\n"
+      << "  }\n"
+      << "}\n\n"
+      << "static int casadi_mex_is_sink(const mxArray* h) {\n"
+      << "  return mxIsUint64(h) && mxGetNumberOfElements(h)==1;\n"
+      << "}\n\n"
+      // Handle to slot, never a pointer: stale handles give an error
+      << "static casadi_int casadi_mex_slot(const mxArray* h) {\n"
+      << "  casadi_int k;\n"
+      << "  if (!casadi_mex_is_sink(h)) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\n"
+      << "    \"Expected a stats handle from 'casadi_stats_allocate'.\");\n"
+      << "  k = (casadi_int) mxGetScalar(h) - 1;\n"
+      << "  if (k<0 || k>=CASADI_MEX_STATS_MAX || !casadi_mex_stats_buf[k])\n"
+      << "    mexErrMsgIdAndTxt(\"Casadi:RuntimeError\", \"Invalid stats handle %lld: freed, \"\n"
+      << "      \"or allocated before 'clear mex'.\", (long long) (k+1));\n"
+      << "  return k;\n"
+      << "}\n\n"
+      << "static struct casadi_stats_sink* casadi_mex_sink(const mxArray* h) {\n"
+      << "  return casadi_mex_stats_sink + casadi_mex_slot(h);\n"
+      << "}\n\n"
+      << "static casadi_int casadi_mex_int(const mxArray* p) {\n"
+      << "  if (!mxIsNumeric(p) || mxGetNumberOfElements(p)!=1)\n"
+      << "    mexErrMsgIdAndTxt(\"Casadi:RuntimeError\", \"Expected a numeric scalar.\");\n"
+      << "  return (casadi_int) mxGetScalar(p);\n"
+      << "}\n\n"
+      << "static char* casadi_mex_str(const mxArray* p) {\n"
+      << "  if (!mxIsChar(p))\n"
+      << "    mexErrMsgIdAndTxt(\"Casadi:RuntimeError\", \"Expected a char array.\");\n"
+      << "  return mxArrayToString(p);\n"
+      << "}\n\n"
+      << "static void casadi_mex_nargs(const char* cmd, int argc, int n) {\n"
+      << "  if (argc!=n) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\n"
+      << "    \"'%s' takes %d arguments, got %d.\", cmd, n, argc);\n"
+      << "}\n\n"
+      // The C stats API, with a handle in place of the sink
+      << "static void casadi_mex_stats_command(const char* cmd, int resc, mxArray *resv[],\n"
+      << "    int argc, const mxArray *argv[]) {\n"
+      << "  struct casadi_stats_sink* s;\n"
+      << "  const unsigned char* d;\n"
+      << "  casadi_int k, cap, n, node;\n"
+      << "  double r;\n"
+      << "  char *key, *t;\n"
+      << "  if (strcmp(cmd, \"casadi_stats_allocate\")==0) {\n"
+      << "    /* casadi_stats_allocate([size]): size in bytes, default " << (1 << 17)
+      << " as StatsRecorder */\n"
+      << "    if (argc>1) casadi_mex_nargs(cmd, argc, 1);\n"
+      << "    cap = argc>0 ? casadi_mex_int(argv[0]) : " << (1 << 17) << ";\n"
+      << "    if (cap<0) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\", \"Negative size.\");\n"
+      << "    for (k=0; k<CASADI_MEX_STATS_MAX && casadi_mex_stats_buf[k]; ++k) {}\n"
+      << "    if (k==CASADI_MEX_STATS_MAX) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\n"
+      << "      \"Too many stats handles, free some with 'casadi_stats_free'.\");\n"
+      << "    casadi_mex_stats_buf[k] = (unsigned char*) mxMalloc(cap>0 ? cap : 1);\n"
+      << "    mexMakeMemoryPersistent(casadi_mex_stats_buf[k]);\n"
+      << "    mexAtExit(casadi_mex_stats_atexit);\n"
+      << "    casadi_mex_stats_sink[k] = casadi_stats_make_sink(casadi_mex_stats_buf[k], cap);\n"
+      << "    resv[0] = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);\n"
+      << "    *(uint64_T*) mxGetData(resv[0]) = (uint64_T) (k+1);\n"
+      << "    return;\n"
+      << "  }\n"
+      << "  if (argc<1) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\n"
+      << "    \"'%s' expects a stats handle.\", cmd);\n"
+      << "  k = casadi_mex_slot(argv[0]);\n"
+      << "  s = casadi_mex_stats_sink + k;\n"
+      << "  if (strcmp(cmd, \"casadi_stats_free\")==0) {\n"
+      << "    casadi_mex_nargs(cmd, argc, 1);\n"
+      << "    mxFree(casadi_mex_stats_buf[k]);\n"
+      << "    casadi_mex_stats_buf[k] = 0;\n"
+      << "  } else if (strcmp(cmd, \"casadi_stats_data\")==0) {\n"
+      << "    /* Raw stream, e.g. for StatsRecorder.from_bytes */\n"
+      << "    casadi_mex_nargs(cmd, argc, 1);\n"
+      << "    d = casadi_stats_data(s, &n);\n"
+      << "    resv[0] = mxCreateNumericMatrix(n, 1, mxUINT8_CLASS, mxREAL);\n"
+      << "    if (n) memcpy(mxGetData(resv[0]), d, n);\n"
+      << "  } else if (strcmp(cmd, \"casadi_stats_nbytes\")==0) {\n"
+      << "    casadi_mex_nargs(cmd, argc, 1);\n"
+      << "    resv[0] = mxCreateDoubleScalar((double) casadi_stats_nbytes(s));\n"
+      << "  } else if (strcmp(cmd, \"casadi_stats_truncated\")==0) {\n"
+      << "    casadi_mex_nargs(cmd, argc, 1);\n"
+      << "    resv[0] = mxCreateLogicalScalar(casadi_stats_truncated(s) ? 1 : 0);\n"
+      << "  } else if (strcmp(cmd, \"casadi_stats_find_function\")==0) {\n"
+      << "    casadi_mex_nargs(cmd, argc, 4);\n"
+      << "    resv[0] = mxCreateDoubleScalar((double) casadi_stats_find_function(s,\n"
+      << "      casadi_mex_int(argv[1]), casadi_mex_int(argv[2]), casadi_mex_str(argv[3])));\n"
+      << "  } else if (strcmp(cmd, \"casadi_stats_select_function\")==0) {\n"
+      << "    casadi_mex_nargs(cmd, argc, 4);\n"
+      << "    resv[0] = mxCreateDoubleScalar((double) casadi_stats_select_function(s,\n"
+      << "      casadi_mex_int(argv[1]), casadi_mex_int(argv[2]), casadi_mex_str(argv[3])));\n"
+      << "  } else if (strcmp(cmd, \"casadi_stats_select_iteration\")==0) {\n"
+      << "    casadi_mex_nargs(cmd, argc, 4);\n"
+      << "    resv[0] = mxCreateDoubleScalar((double) casadi_stats_select_iteration(s,\n"
+      << "      casadi_mex_int(argv[1]), casadi_mex_int(argv[2]), casadi_mex_int(argv[3])));\n"
+      << "  } else if (strcmp(cmd, \"casadi_stats_select_last_iteration\")==0) {\n"
+      << "    casadi_mex_nargs(cmd, argc, 2);\n"
+      << "    resv[0] = mxCreateDoubleScalar((double) casadi_stats_select_last_iteration(s,\n"
+      << "      casadi_mex_int(argv[1])));\n"
+      << "  } else if (strcmp(cmd, \"casadi_stats_select_section\")==0) {\n"
+      << "    casadi_mex_nargs(cmd, argc, 4);\n"
+      << "    resv[0] = mxCreateDoubleScalar((double) casadi_stats_select_section(s,\n"
+      << "      casadi_mex_int(argv[1]), casadi_mex_int(argv[2]), casadi_mex_str(argv[3])));\n"
+      << "  } else if (strcmp(cmd, \"casadi_stats_get\")==0) {\n"
+      << "    /* [v, found] = casadi_stats_get(h, node, key): number, char or row vector.\n"
+      << "       Absent: an error, or v=[] and found=false with two outputs */\n"
+      << "    casadi_mex_nargs(cmd, argc, 3);\n"
+      << "    node = casadi_mex_int(argv[1]);\n"
+      << "    key = casadi_mex_str(argv[2]);\n"
+      << "    if (!casadi_stats_get_real(s, node, key, &r)) {\n"
+      << "      resv[0] = mxCreateDoubleScalar(r);\n"
+      << "    } else if (!casadi_stats_get_text(s, node, key, 0, 0, &n)) {\n"
+      << "      t = (char*) mxMalloc(n+1);\n"
+      << "      casadi_stats_get_text(s, node, key, t, n+1, 0);\n"
+      << "      resv[0] = mxCreateString(t);\n"
+      << "      mxFree(t);\n"
+      << "    } else if (!casadi_stats_get_reals(s, node, key, 0, 0, &n)) {\n"
+      << "      resv[0] = mxCreateDoubleMatrix(1, n, mxREAL);\n"
+      << "      casadi_stats_get_reals(s, node, key, mxGetPr(resv[0]), n, 0);\n"
+      << "    } else if (resc>1) {\n"
+      << "      resv[0] = mxCreateDoubleMatrix(0, 0, mxREAL);\n"
+      << "      resv[1] = mxCreateLogicalScalar(0);\n"
+      << "      return;\n"
+      << "    } else {\n"
+      << "      mexErrMsgIdAndTxt(\"Casadi:RuntimeError\", \"No stat '%s' for node %lld.\", key,\n"
+      << "        (long long) node);\n"
+      << "    }\n"
+      << "    if (resc>1) resv[1] = mxCreateLogicalScalar(1);\n"
+      << "  } else {\n"
+      << "    mexErrMsgIdAndTxt(\"Casadi:RuntimeError\", \"Unknown command '%s'.\", cmd);\n"
+      << "  }\n"
+      << "}\n\n";
   }
 
   void CodeGenerator::generate_sfunction(const std::string& name,
@@ -1355,7 +1577,19 @@ namespace casadi {
       *this << s << ".checkout = 0;\n";
     }
 
-    *this << s << ".eval = " << name << ";\n";
+    std::string eval = name;
+    if (stats_) {
+      // Function pointers use the plain signature: trampoline without stats
+      // TODO(jgillis): calls through them (e.g. uno/ccopt oracle callbacks) are not recorded
+      eval = name + "_nostats";
+      if (stats_trampolines_.insert(name).second) {
+        auxiliaries << "static " << f->signature_internal(name) << ";\n"
+                    << "static " << f->signature(eval) << " {\n"
+                    << "  return " << name << "(arg, res, iw, w, mem, 0, -1);\n"
+                    << "}\n\n";
+      }
+    }
+    *this << s << ".eval = " << eval << ";\n";
     if (needs_mem) {
       *this << s << ".release = " << name << "_release;\n";
     } else {
@@ -1366,14 +1600,21 @@ namespace casadi {
   std::string CodeGenerator::
   operator()(const Function& f, const std::string& arg,
              const std::string& res, const std::string& iw,
-             const std::string& w, const std::string& failure_ret) {
+             const std::string& w, const std::string& failure_ret,
+             const std::string& sink, const std::string& parent) {
     std::string name = add_dependency(f);
 
     std::string cg_name = f->codegen_name(*this, false);
     bool needs_mem = f->codegen_needs_mem();
+    // Bracket with BEGIN/END_CALL; gather_stats off: no sink for it or its callees
+    bool bracket = stats_ && !sink.empty() && f->gather_stats_;
+    if (!needs_mem && !bracket) {
+      return name + "(" + arg + ", " + res + ", "
+              + iw + ", " + w + ", 0" + stats_args() + ")";
+    }
+    std::string mem = needs_mem ? "mid" : "0";
+    local("flag", "int");
     if (needs_mem) {
-      std::string mem = "mid";
-      local("flag", "int");
       local(mem, "int");
       std::string checkout = shorthand(cg_name + "_checkout");
       *this << mem << " = " << checkout << "();\n";
@@ -1384,21 +1625,25 @@ namespace casadi {
       } else {
         *this << "if (" << mem << "<0) return " << failure_ret << ";\n";
       }
-
-      *this << "flag = " + name + "(" + arg + ", " + res + ", "
-                + iw + ", " + w + ", " << mem << ");\n";
-
+    }
+    std::string call_stats = stats_args();
+    if (bracket) {
+      local("stats_c", "casadi_int");
+      *this << "stats_c = casadi_stats_begin_call(" << sink << ", " << stats_id(f)
+            << ", " << mem << ", " << parent << ");\n";
+      call_stats = ", " + sink + ", stats_c";
+    }
+    *this << "flag = " + name + "(" + arg + ", " + res + ", "
+              + iw + ", " + w + ", " << mem << call_stats << ");\n";
+    if (bracket) *this << "casadi_stats_end_call(" << sink << ", stats_c, flag);\n";
+    if (needs_mem) {
       if (failure_ret.empty()) {
         *this << "}\n";
       }
-
       std::string release = shorthand(cg_name + "_release");
       *this << release << "(" << mem << ");\n";
-      return "flag";
-    } else {
-      return name + "(" + arg + ", " + res + ", "
-              + iw + ", " + w + ", 0)";
     }
+    return "flag";
   }
 
   void CodeGenerator::add_external(const std::string& new_external, const std::string& name) {
@@ -1985,6 +2230,36 @@ namespace casadi {
     case AUX_OCP_BLOCK:
       this->auxiliaries << sanitize_source(casadi_ocp_block_str, inst);
       break;
+    case AUX_CBOR:
+      this->auxiliaries << sanitize_source(casadi_cbor_str, inst);
+      break;
+    case AUX_STATS:
+      add_auxiliary(AUX_CBOR);
+      this->auxiliaries << sanitize_source(allow_function_pointers_ ?
+        casadi_stats_sink_callback_str : casadi_stats_sink_buffer_str, inst);
+      // Sink struct also in the header, for the exported signatures
+      this->header << sanitize_source(allow_function_pointers_ ?
+        casadi_stats_sink_callback_str : casadi_stats_sink_buffer_str, {"casadi_real"}, false);
+      if (thread_safe_) {
+        // Fallback mutex for compilers without an atomic add
+        std::string mtx = shorthand("stats_mutex");
+        this->auxiliaries << "#ifndef CASADI_ATOMIC_FETCH_ADD\n"
+                          << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n"
+                          << "static CASADI_MUTEX_TYPE " << mtx << ";\n"
+                          << "#else\n"
+                          << "static CASADI_MUTEX_TYPE " << mtx << " = CASADI_MUTEX_STATIC_INIT;\n"
+                          << "#endif\n"
+                          << "#endif\n\n";
+        // No static initializer: set up in the file's incref
+        std::string guard = "#if !defined(CASADI_ATOMIC_FETCH_ADD) && "
+                            "CASADI_MUTEX_USE_STATIC_INIT == 0\n";
+        this->file_incref << guard << "  CASADI_MUTEX_INIT(&" << mtx << ");\n#endif\n";
+        this->file_decref << guard << "  CASADI_MUTEX_DESTROY(&" << mtx << ");\n#endif\n";
+      }
+      this->auxiliaries << sanitize_source(casadi_stats_reserve_str, inst);
+      // Readers, for <prefix>_stats_find_function, <prefix>_stats_get_int, ...
+      this->auxiliaries << sanitize_source(casadi_stats_str, inst);
+      break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
                         << "(" << (this->cpp ? "static_cast<double>(x)" : "(double) x") << ")\n\n";
@@ -2239,6 +2514,7 @@ namespace casadi {
       break;
     case AUX_THREADS:
       this->auxiliaries << sanitize_source(casadi_threads_str, inst);
+      this->auxiliaries << sanitize_source(casadi_atomic_str, inst);
       break;
     }
   }
@@ -2782,7 +3058,12 @@ namespace casadi {
 
     // Set by `// SYMBOL "X"` to "casadi_X"; cleared when the matching
     // function signature is found and the prefix is prepended.
+    // `// EXPORT` after it: exported as CASADI_PREFIX(X) instead
     std::string active_symbol;
+    bool active_export = false;
+    // Exported symbol's declaration, collected up to the opening brace
+    std::string decl, decl_name;
+    size_t decl_skip = 0;
 
     while (std::getline(stream, line)) {
       size_t n1, n2;
@@ -2812,6 +3093,14 @@ namespace casadi {
           rep.push_back(std::make_pair(sym, sym + suffix));
         }
         active_symbol = "casadi_" + sym;
+        active_export = false;
+        decl_name = sym;
+        continue;
+      }
+
+      // If line starts with "// EXPORT", the symbol above is exported
+      if (line.find("// EXPORT") != std::string::npos) {
+        active_export = true;
         continue;
       }
 
@@ -2828,6 +3117,31 @@ namespace casadi {
 
       // If line starts with "// C-VERBOSE", skip the next line
       if (!verbose_runtime && line.find("// C-VERBOSE") != std::string::npos) {
+        // Ignore next line
+        std::getline(stream, line);
+        continue;
+      }
+
+      // If line starts with "// C-STATS", skip the next line unless recording stats
+      if (!stats_ && line.find("// C-STATS") != std::string::npos) {
+        // Ignore next line
+        std::getline(stream, line);
+        continue;
+      }
+
+      // If line starts with "// C-THREAD-SAFE", skip the next line unless thread_safe
+      if (!thread_safe_ && line.find("// C-THREAD-SAFE") != std::string::npos) {
+        // Ignore next line
+        std::getline(stream, line);
+        continue;
+      }
+
+      // "// C-(NO-)FUNCTION-POINTERS": skip the next line unless (not) allow_function_pointers
+      if (line.find("// C-NO-FUNCTION-POINTERS") != std::string::npos) {
+        if (allow_function_pointers_) std::getline(stream, line);
+        continue;
+      }
+      if (!allow_function_pointers_ && line.find("// C-FUNCTION-POINTERS") != std::string::npos) {
         // Ignore next line
         std::getline(stream, line);
         continue;
@@ -2857,8 +3171,15 @@ namespace casadi {
       if (!active_symbol.empty() &&
           line.find(active_symbol + "(") != std::string::npos) {
         std::string sig_prefix;
-        if (this->static_aux) sig_prefix += "static ";
-        if (this->inline_aux) sig_prefix += "inline ";
+        if (active_export) {
+          if (this->cpp) sig_prefix += "extern \"C\" ";
+          sig_prefix += this->dll_export;
+          decl_skip = sig_prefix.size();
+          decl = " ";
+        } else {
+          if (this->static_aux) sig_prefix += "static ";
+          if (this->inline_aux) sig_prefix += "inline ";
+        }
         if (!sig_prefix.empty()) line = sig_prefix + line;
         active_symbol.clear();
       }
@@ -2866,6 +3187,20 @@ namespace casadi {
       // Perform string replacements
       for (auto&& it = rep.rbegin(); it!=rep.rend(); ++it) {
         line = replace(line, it->first, it->second);
+      }
+
+      // Declare the exported symbol in the header, under the unmangled prefix
+      if (!decl.empty()) {
+        decl += line.substr(decl_skip) + "\n";
+        decl_skip = 0;
+        size_t brace = decl.rfind(" {");
+        if (brace != std::string::npos) {
+          decl = decl.substr(1, brace - 1) + ";\n";
+          this->header << (this->cpp ? "extern \"C\" " : "") << this->dll_import
+                       << replace(decl, "casadi_" + decl_name + "(",
+                                  this->prefix + "_" + decl_name + "(");
+          decl.clear();
+        }
       }
 
       // Append to return
