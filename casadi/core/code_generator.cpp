@@ -407,6 +407,10 @@ namespace casadi {
           << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
           << "}\n\n";
 
+    // What the library-wide symbols (<root>casadi_version, ...) start with
+    *this << declare("const char* " + f.name() + "_config_root(void)")
+          << " { return CASADI_PREFIX_STRING; }\n\n";
+
     if (this->unroll_args) {
       // Define function
       *this << declare(f->signature_unrolled(f.name())) << "{\n";
@@ -443,36 +447,37 @@ namespace casadi {
     this->exposed_fname.push_back(f.name());
   }
 
-  std::string CodeGenerator::exported(const std::string& sig, std::ostream& h) const {
-    // As declare, but to a given header stream
+  std::string CodeGenerator::exported(const std::string& ret, const std::string& entry,
+      const std::string& params, std::ostream& h) const {
+    // A library-wide symbol: CASADI_PREFIX(entry), declared in h with the default prefix
     std::string cpp_prefix = this->cpp ? "extern \"C\" " : "";
-    h << cpp_prefix << this->dll_import << sig << ";\n";
-    return cpp_prefix + this->dll_export + sig;
+    h << cpp_prefix << this->dll_import << ret << " " << this->prefix << "_" << entry << params
+      << ";\n";
+    return cpp_prefix + this->dll_export + ret + " CASADI_PREFIX(" + entry + ")" + params;
   }
 
   void CodeGenerator::generate_config(std::ostream& s, std::ostream& h) const {
     // Defined in s, declared in h: once per generate, so the header gets them once.
-    // The configuration this file is compiled with, for whoever loads it
+    // Found through <name>_config_root. The configuration this file is compiled with
     s << "/* Configuration this file was compiled with */\n"
-      << exported("void " + this->prefix + "_casadi_version(int* major, int* minor, "
-                  "int* patch)", h)
+      << exported("void", "casadi_version", "(int* major, int* minor, int* patch)", h)
       << " {\n"
       << "  *major = " << CASADI_MAJOR_VERSION << ";\n"
       << "  *minor = " << CASADI_MINOR_VERSION << ";\n"
       << "  *patch = " << CASADI_PATCH_VERSION << ";\n"
       << "}\n"
-      << exported("int " + this->prefix + "_casadi_int_size(void)", h)
+      << exported("int", "casadi_int_size", "(void)", h)
       << " { return (int) sizeof(casadi_int); }\n"
-      << exported("int " + this->prefix + "_casadi_real_size(void)", h)
+      << exported("int", "casadi_real_size", "(void)", h)
       << " { return (int) sizeof(casadi_real); }\n"
-      << exported("int " + this->prefix + "_is_thread_safe(void)", h)
+      << exported("int", "is_thread_safe", "(void)", h)
       << " { return " << (thread_safe_ ? 1 : 0) << "; }\n";
     if (needs_mem_) {
-      s << exported("int " + this->prefix + "_max_num_threads(void)", h)
+      s << exported("int", "max_num_threads", "(void)", h)
         << " { return CASADI_MAX_NUM_THREADS; }\n";
     }
     if (added_auxiliaries_.count(AUX_THREADS)) {
-      s << exported("int " + this->prefix + "_thread_type(void)", h)
+      s << exported("int", "thread_type", "(void)", h)
         << " { return CASADI_THREAD_TYPE; }\n";
     }
     s << "\n";
@@ -982,13 +987,19 @@ namespace casadi {
     casadi_assert_dev(current_indent_ == 0);
 
     // Prefix internal symbols to avoid symbol collisions
-    s << "/* How to prefix internal symbols */\n"
+    // CASADI_PREFIX_STRING: what CASADI_PREFIX prepends, as a string (<name>_config_root)
+    s << "/* String of a macro argument, after expansion */\n"
+      << "#define CASADI_STRINGIFY_(x) #x\n"
+      << "#define CASADI_STRINGIFY(x) CASADI_STRINGIFY_(x)\n\n"
+      << "/* How to prefix internal symbols */\n"
       << "#ifdef CASADI_CODEGEN_PREFIX\n"
       << "  #define CASADI_NAMESPACE_CONCAT(NS, ID) _CASADI_NAMESPACE_CONCAT(NS, ID)\n"
       << "  #define _CASADI_NAMESPACE_CONCAT(NS, ID) NS ## ID\n"
       << "  #define CASADI_PREFIX(ID) CASADI_NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)\n"
+      << "  #define CASADI_PREFIX_STRING CASADI_STRINGIFY(CODEGEN_PREFIX)\n"
       << "#else\n"
       << "  #define CASADI_PREFIX(ID) " << this->prefix << "_ ## ID\n"
+      << "  #define CASADI_PREFIX_STRING \"" << this->prefix << "_\"\n"
       << "#endif\n\n";
 
     s << this->includes.str();

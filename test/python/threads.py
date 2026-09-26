@@ -477,7 +477,9 @@ class Threadstests(casadiTestCase):
       for definitions, expected in [([], dict(thread_type=1, **sizes)),
                                     (["CASADI_THREAD_TYPE=0"], dict(thread_type=0, **sizes)),
                                     (["casadi_int=int", "casadi_real=float"],
-                                     dict(thread_type=1, casadi_int_size=4, casadi_real_size=4))]:
+                                     dict(thread_type=1, casadi_int_size=4, casadi_real_size=4)),
+                                    (["CASADI_CODEGEN_PREFIX", "CODEGEN_PREFIX=zz_"],
+                                     dict(thread_type=1, **sizes))]:
         with tempfile.TemporaryDirectory() as d:
           cg = ca.CodeGenerator("tt", {"thread_safe": True, "cpp": cpp, "with_header": True})
           cg.add(f)
@@ -500,12 +502,16 @@ class Threadstests(casadiTestCase):
           subprocess.run(compiler + warn + ["-c", user, "-o", os.path.join(d, "user.o")],
                          check=True)
           dll = ctypes.CDLL(lib)
+          # Library-wide symbols start with what f_config_root reports
+          dll.f_config_root.restype = ctypes.c_char_p
+          root = dll.f_config_root().decode()
+          self.assertEqual(root, "zz_" if "CODEGEN_PREFIX=zz_" in definitions else "tt_")
           version = [ctypes.c_int() for _ in range(3)]
-          dll.tt_casadi_version(*[ctypes.byref(v) for v in version])
+          getattr(dll, root + "casadi_version")(*[ctypes.byref(v) for v in version])
           self.assertEqual([v.value for v in version],
                            [int(e) for e in ca.CasadiMeta.version().split("+")[0].split(".")])
           for k, v in expected.items():
-            self.assertEqual(getattr(dll, "tt_" + k)(), v)
+            self.assertEqual(getattr(dll, root + k)(), v)
     # Thread type only with thread primitives, max_num_threads only with a memory pool;
     # exported by generate, declared once in the header however often it runs
     def generated(cg):
@@ -522,17 +528,19 @@ class Threadstests(casadiTestCase):
     code, header = generated(cg)
     self.assertEqual(header.count("int tt_casadi_int_size(void);"), 1)
     self.assertEqual(header.count("int tt_is_thread_safe(void);"), 1)
-    self.assertIn("void tt_casadi_version(int* major, int* minor, int* patch)", code)
-    self.assertIn("int tt_casadi_int_size(void)", code)
-    self.assertIn("int tt_casadi_real_size(void)", code)
-    self.assertIn("int tt_is_thread_safe(void) { return 0; }", code)
-    self.assertNotIn("tt_thread_type", code)
-    self.assertNotIn("tt_max_num_threads", code)
+    self.assertIn("void CASADI_PREFIX(casadi_version)(int* major, int* minor, int* patch)", code)
+    self.assertIn("int CASADI_PREFIX(casadi_int_size)(void)", code)
+    self.assertIn("int CASADI_PREFIX(casadi_real_size)(void)", code)
+    self.assertIn("int CASADI_PREFIX(is_thread_safe)(void) { return 0; }", code)
+    self.assertIn("const char* f_config_root(void) { return CASADI_PREFIX_STRING; }", code)
+    self.assertIn("const char* f_config_root(void);", header)
+    self.assertNotIn("thread_type", code)
+    self.assertNotIn("max_num_threads", code)
     if ca.has_nlpsol("ipopt"):
       solver = ca.nlpsol("solver", "ipopt", {"x": x, "f": x**2})
       cg = ca.CodeGenerator("tt")
       cg.add(solver)
-      self.assertIn("int tt_max_num_threads(void) { return CASADI_MAX_NUM_THREADS; }",
+      self.assertIn("int CASADI_PREFIX(max_num_threads)(void) { return CASADI_MAX_NUM_THREADS; }",
                     generated(cg)[0])
 
 if __name__ == '__main__':

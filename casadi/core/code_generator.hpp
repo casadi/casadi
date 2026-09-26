@@ -308,8 +308,9 @@ namespace casadi {
     /** \brief Exported configuration: definitions to s, declarations to h */
     void generate_config(std::ostream& s, std::ostream& h) const;
 
-    /** \brief Exported definition of sig, declared in h */
-    std::string exported(const std::string& sig, std::ostream& h) const;
+    /** \brief Definition of library-wide symbol CASADI_PREFIX(entry), declared in h */
+    std::string exported(const std::string& ret, const std::string& entry,
+                         const std::string& params, std::ostream& h) const;
 
     /** \brief Print a constant in a lossless but compact manner
 
