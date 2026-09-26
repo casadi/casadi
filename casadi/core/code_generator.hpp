@@ -305,6 +305,12 @@ namespace casadi {
         \identifier{2f7} */
     bool thread_safe() const { return thread_safe_; }
 
+    /** \brief Exported configuration: definitions to s, declarations to h */
+    void generate_config(std::ostream& s, std::ostream& h) const;
+
+    /** \brief Exported definition of sig, declared in h */
+    std::string exported(const std::string& sig, std::ostream& h) const;
+
     /** \brief Print a constant in a lossless but compact manner
 
         \identifier{sj} */

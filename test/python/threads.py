@@ -473,7 +473,7 @@ class Threadstests(casadiTestCase):
     # C output compiled as C and as C++ (inside its extern "C" block), and C++ output
     for cpp, compiler in [(False, ["gcc", "-pedantic"]), (False, ["g++", "-x", "c++"]),
                           (True, ["g++"])]:
-      sizes = dict(casadi_int_size=8, casadi_real_size=8)
+      sizes = dict(casadi_int_size=8, casadi_real_size=8, is_thread_safe=1)
       for definitions, expected in [([], dict(thread_type=1, **sizes)),
                                     (["CASADI_THREAD_TYPE=0"], dict(thread_type=0, **sizes)),
                                     (["casadi_int=int", "casadi_real=float"],
@@ -495,7 +495,7 @@ class Threadstests(casadiTestCase):
                     '  int major, minor, patch;\n'
                     '  tt_casadi_version(&major, &minor, &patch);\n'
                     '  return major + tt_thread_type() + tt_casadi_int_size()\n'
-                    '    + tt_casadi_real_size();\n'
+                    '    + tt_casadi_real_size() + tt_is_thread_safe();\n'
                     '}\n')
           subprocess.run(compiler + warn + ["-c", user, "-o", os.path.join(d, "user.o")],
                          check=True)
@@ -506,20 +506,34 @@ class Threadstests(casadiTestCase):
                            [int(e) for e in ca.CasadiMeta.version().split("+")[0].split(".")])
           for k, v in expected.items():
             self.assertEqual(getattr(dll, "tt_" + k)(), v)
-    # Thread type only with thread primitives, max_num_threads only with a memory pool
-    cg = ca.CodeGenerator("tt")
+    # Thread type only with thread primitives, max_num_threads only with a memory pool;
+    # exported by generate, declared once in the header however often it runs
+    def generated(cg):
+      with tempfile.TemporaryDirectory() as d:
+        cg.generate(d + os.sep)
+        cg.generate(d + os.sep)
+        with open(os.path.join(d, "tt.c")) as c: code = c.read()
+        header = ""
+        if os.path.exists(os.path.join(d, "tt.h")):
+          with open(os.path.join(d, "tt.h")) as h: header = h.read()
+      return code, header
+    cg = ca.CodeGenerator("tt", {"with_header": True})
     cg.add(f)
-    code = cg.dump()
+    code, header = generated(cg)
+    self.assertEqual(header.count("int tt_casadi_int_size(void);"), 1)
+    self.assertEqual(header.count("int tt_is_thread_safe(void);"), 1)
     self.assertIn("void tt_casadi_version(int* major, int* minor, int* patch)", code)
     self.assertIn("int tt_casadi_int_size(void)", code)
     self.assertIn("int tt_casadi_real_size(void)", code)
+    self.assertIn("int tt_is_thread_safe(void) { return 0; }", code)
     self.assertNotIn("tt_thread_type", code)
     self.assertNotIn("tt_max_num_threads", code)
     if ca.has_nlpsol("ipopt"):
       solver = ca.nlpsol("solver", "ipopt", {"x": x, "f": x**2})
       cg = ca.CodeGenerator("tt")
       cg.add(solver)
-      self.assertIn("int tt_max_num_threads(void) { return CASADI_MAX_NUM_THREADS; }", cg.dump())
+      self.assertIn("int tt_max_num_threads(void) { return CASADI_MAX_NUM_THREADS; }",
+                    generated(cg)[0])
 
 if __name__ == '__main__':
     unittest.main()

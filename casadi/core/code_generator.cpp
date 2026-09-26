@@ -443,6 +443,41 @@ namespace casadi {
     this->exposed_fname.push_back(f.name());
   }
 
+  std::string CodeGenerator::exported(const std::string& sig, std::ostream& h) const {
+    // As declare, but to a given header stream
+    std::string cpp_prefix = this->cpp ? "extern \"C\" " : "";
+    h << cpp_prefix << this->dll_import << sig << ";\n";
+    return cpp_prefix + this->dll_export + sig;
+  }
+
+  void CodeGenerator::generate_config(std::ostream& s, std::ostream& h) const {
+    // Defined in s, declared in h: once per generate, so the header gets them once.
+    // The configuration this file is compiled with, for whoever loads it
+    s << "/* Configuration this file was compiled with */\n"
+      << exported("void " + this->prefix + "_casadi_version(int* major, int* minor, "
+                  "int* patch)", h)
+      << " {\n"
+      << "  *major = " << CASADI_MAJOR_VERSION << ";\n"
+      << "  *minor = " << CASADI_MINOR_VERSION << ";\n"
+      << "  *patch = " << CASADI_PATCH_VERSION << ";\n"
+      << "}\n"
+      << exported("int " + this->prefix + "_casadi_int_size(void)", h)
+      << " { return (int) sizeof(casadi_int); }\n"
+      << exported("int " + this->prefix + "_casadi_real_size(void)", h)
+      << " { return (int) sizeof(casadi_real); }\n"
+      << exported("int " + this->prefix + "_is_thread_safe(void)", h)
+      << " { return " << (thread_safe_ ? 1 : 0) << "; }\n";
+    if (needs_mem_) {
+      s << exported("int " + this->prefix + "_max_num_threads(void)", h)
+        << " { return CASADI_MAX_NUM_THREADS; }\n";
+    }
+    if (added_auxiliaries_.count(AUX_THREADS)) {
+      s << exported("int " + this->prefix + "_thread_type(void)", h)
+        << " { return CASADI_THREAD_TYPE; }\n";
+    }
+    s << "\n";
+  }
+
   std::string CodeGenerator::dump() {
     std::stringstream s;
     dump(s);
@@ -547,6 +582,10 @@ namespace casadi {
     // Dump code to file
     dump(s);
 
+    // Exported configuration, declared in the header below
+    std::stringstream config_header;
+    generate_config(s, config_header);
+
     if (!pool_double_defaults_.empty()) {
       s << "CASADI_SYMBOL_EXPORT casadi_real* CASADI_PREFIX(get_pool_double)(const char* name) {\n";
       for (const auto& e : pool_double_) {
@@ -594,7 +633,7 @@ namespace casadi {
       if (this->with_import) generate_import_symbol(s);
 
       // Add declarations
-      s << this->header.str();
+      s << this->header.str() << config_header.str();
 
       // Finalize file
       stream_close(s, this->cpp);
@@ -995,28 +1034,6 @@ namespace casadi {
 
     // Codegen auxiliary functions
     s << this->auxiliaries.str();
-
-    // The configuration this file is compiled with, for whoever loads it
-    s << "/* Configuration this file was compiled with */\n"
-      << declare("void " + this->prefix + "_casadi_version(int* major, int* minor, int* patch)")
-      << " {\n"
-      << "  *major = " << CASADI_MAJOR_VERSION << ";\n"
-      << "  *minor = " << CASADI_MINOR_VERSION << ";\n"
-      << "  *patch = " << CASADI_PATCH_VERSION << ";\n"
-      << "}\n"
-      << declare("int " + this->prefix + "_casadi_int_size(void)")
-      << " { return (int) sizeof(casadi_int); }\n"
-      << declare("int " + this->prefix + "_casadi_real_size(void)")
-      << " { return (int) sizeof(casadi_real); }\n";
-    if (needs_mem_) {
-      s << declare("int " + this->prefix + "_max_num_threads(void)")
-        << " { return CASADI_MAX_NUM_THREADS; }\n";
-    }
-    if (added_auxiliaries_.count(AUX_THREADS)) {
-      s << declare("int " + this->prefix + "_thread_type(void)")
-        << " { return CASADI_THREAD_TYPE; }\n";
-    }
-    s << "\n";
 
     // Print integer constants
     if (!integer_constants_.empty()) {
