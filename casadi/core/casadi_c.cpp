@@ -24,6 +24,7 @@
 
 
 #include "function.hpp"
+#include "runtime/casadi_runtime.hpp"
 #include "../casadi_c.h"
 #include "serializer.hpp"
 #include <deque>
@@ -318,9 +319,19 @@ int casadi_c_eval(const double** arg, double** res, casadi_int* iw, double* w, i
 }
 
 int casadi_c_eval_id(int id, const double** arg, double** res, casadi_int* iw, double* w, int mem) {
+  return casadi_c_eval_with_stats_id(id, arg, res, iw, w, mem, nullptr, -1);
+}
+
+int casadi_c_eval_with_stats(const double** arg, double** res, casadi_int* iw, double* w,
+    int mem, casadi_stats_sink* sink, casadi_int parent) {
+  return casadi_c_eval_with_stats_id(casadi_c_active, arg, res, iw, w, mem, sink, parent);
+}
+
+int casadi_c_eval_with_stats_id(int id, const double** arg, double** res, casadi_int* iw,
+    double* w, int mem, casadi_stats_sink* sink, casadi_int parent) {
   if (sanitize_id(id)) return -1;
   try {
-    return casadi_c_loaded_functions.at(id)(arg, res, iw, w, mem);
+    return casadi_c_loaded_functions.at(id)(arg, res, iw, w, mem, sink, parent);
   } catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
     return -2;
@@ -329,6 +340,41 @@ int casadi_c_eval_id(int id, const double** arg, double** res, casadi_int* iw, d
     return -3;
   }
   return 0;
+}
+
+casadi_stats_sink casadi_c_stats_make_sink(unsigned char* p, casadi_int cap) {
+  return casadi::casadi_stats_make_sink(p, cap);
+}
+
+void casadi_c_stats_clear(casadi_stats_sink* s) {
+  casadi::casadi_stats_clear(s);
+}
+
+casadi_int casadi_c_stats_nbytes(const casadi_stats_sink* s) {
+  return casadi::casadi_stats_nbytes(s);
+}
+
+int casadi_c_stats_truncated(const casadi_stats_sink* s) {
+  return casadi::casadi_stats_truncated(s);
+}
+
+const unsigned char* casadi_c_stats_data(const casadi_stats_sink* s, casadi_int* n) {
+  return casadi::casadi_stats_data(s, n);
+}
+
+int casadi_c_get_stat_int(const casadi_stats_sink* s, const char* fname, const char* key,
+    casadi_int* v) {
+  return casadi::casadi_get_stat_int(s, fname, key, v);
+}
+
+int casadi_c_get_stat_real(const casadi_stats_sink* s, const char* fname, const char* key,
+    double* v) {
+  return casadi::casadi_get_stat_real(s, fname, key, v);
+}
+
+int casadi_c_get_stat_text(const casadi_stats_sink* s, const char* fname, const char* key,
+    char* dst, casadi_int cap) {
+  return casadi::casadi_get_stat_text(s, fname, key, dst, cap);
 }
 
 

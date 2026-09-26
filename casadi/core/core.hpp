@@ -72,6 +72,7 @@
 #include "serializer.hpp"
 #include "tools.hpp"
 #include "resource.hpp"
+#include "stats_recorder.hpp"
 #include "archiver.hpp"
 #include "filesystem.hpp"
 #include "options.hpp"

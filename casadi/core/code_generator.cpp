@@ -71,6 +71,8 @@ namespace casadi {
     sz_zeros_ = 0;
     sz_ones_ = 0;
     thread_safe_ = false;
+    stats_ = false;
+    allow_function_pointers_ = true;
 
     // Read options
     for (auto&& e : opts) {
@@ -140,6 +142,10 @@ namespace casadi {
         this->l1_blas = e.second;
       } else if (e.first=="thread_safe") {
         thread_safe_ = e.second;
+      } else if (e.first=="stats") {
+        stats_ = e.second;
+      } else if (e.first=="allow_function_pointers") {
+        allow_function_pointers_ = e.second;
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -164,8 +170,6 @@ namespace casadi {
         this->real_min = "<NOT SPECIFIED>";
       }
     }
-
-    if (thread_safe_) add_auxiliary(AUX_THREADS);
 
     // Start at new line with no indentation
     newline_ = true;
@@ -224,6 +228,9 @@ namespace casadi {
       this->prefix = this->name;
     }
 
+    // After prefix is set: the stats runtime exports symbols
+    if (thread_safe_) add_auxiliary(AUX_THREADS);
+    if (stats_) add_auxiliary(AUX_STATS);
   }
 
   void CodeGenerator::scope_enter() {
@@ -396,6 +403,21 @@ namespace casadi {
     return fname;
   }
 
+  std::string CodeGenerator::stats_id(const Function& f) {
+    std::string cg_name = f->codegen_name(*this, false);
+    std::string id = "casadi_" + cg_name + "_stats_id";
+    if (stats_ids_.insert(cg_name).second) {
+      // "<prefixed codegen name>:<name>"; check_name guarantees no escaping is needed
+      auxiliaries << "static const char " << id << "[] = CASADI_STRINGIFY("
+                  << shorthand(cg_name) << ") \":" << f.name() << "\";\n";
+    }
+    return id;
+  }
+
+  std::string CodeGenerator::stats_args() const {
+    return stats_ ? ", 0, -1" : "";
+  }
+
     void CodeGenerator::add(const Function& f, bool with_jac_sparsity) {
     // Add if not already added
     std::string codegen_name = add_dependency(f);
@@ -404,12 +426,29 @@ namespace casadi {
 
     // Define function
     *this << declare(f->signature(f.name())) << "{\n"
-          << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
+          << "return " << codegen_name <<  "(arg, res, iw, w, mem" << stats_args() << ");\n"
           << "}\n\n";
 
     // What the library-wide symbols (<root>casadi_version, ...) start with
     *this << declare("const char* " + f.name() + "_config_root(void)")
           << " { return CASADI_PREFIX_STRING; }\n\n";
+
+    if (stats_) {
+      // Entry point taking a caller-owned sink and parent
+      *this << declare(f->signature_stats(f.name())) << "{\n";
+      if (f->gather_stats_) {
+        *this << "int flag;\n"
+              << "casadi_int me;\n";
+        *this << "me = casadi_stats_begin_call(sink, " << stats_id(f) << ", mem, parent);\n"
+              << "flag = " << codegen_name << "(arg, res, iw, w, mem, sink, me);\n"
+              << "casadi_stats_end_call(sink, me, flag);\n"
+              << "return flag;\n";
+      } else {
+        // gather_stats off: neither this call nor its callees are recorded
+        *this << "return " << codegen_name << "(arg, res, iw, w, mem" << stats_args() << ");\n";
+      }
+      *this << "}\n\n";
+    }
 
     if (this->unroll_args) {
       // Define function
@@ -420,8 +459,20 @@ namespace casadi {
       for (casadi_int i=0; i<f.n_out(); ++i) {
         *this << "res[" << i << "] = " << f.name_out(i) << ";\n";
       }
-      *this << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n";
+      *this << "return " << codegen_name <<  "(arg, res, iw, w, mem" << stats_args() << ");\n";
       *this << "}\n\n";
+      if (stats_) {
+        // Unrolled variant of <name>_with_stats
+        *this << declare(f->signature_unrolled(f.name(), true)) << "{\n";
+        for (casadi_int i=0; i<f.n_in(); ++i) {
+          *this << "arg[" << i << "] = " << f.name_in(i) << ";\n";
+        }
+        for (casadi_int i=0; i<f.n_out(); ++i) {
+          *this << "res[" << i << "] = " << f.name_out(i) << ";\n";
+        }
+        *this << "return " << f.name() << "_with_stats(arg, res, iw, w, mem, sink, parent);\n";
+        *this << "}\n\n";
+      }
       // Flush buffers
       flush(this->body);
     }
@@ -479,6 +530,11 @@ namespace casadi {
     if (added_auxiliaries_.count(AUX_THREADS)) {
       s << exported("int", "thread_type", "(void)", h)
         << " { return CASADI_THREAD_TYPE; }\n";
+    }
+    if (stats_) {
+      // Does <name>_with_stats take the sink layout with a reserve callback?
+      s << exported("int", "stats_function_pointers", "(void)", h)
+        << " { return " << (allow_function_pointers_ ? 1 : 0) << "; }\n";
     }
     s << "\n";
   }
@@ -1355,7 +1411,19 @@ namespace casadi {
       *this << s << ".checkout = 0;\n";
     }
 
-    *this << s << ".eval = " << name << ";\n";
+    std::string eval = name;
+    if (stats_) {
+      // Function pointers use the plain signature: trampoline without stats
+      // TODO(jgillis): calls through them (e.g. uno/ccopt oracle callbacks) are not recorded
+      eval = name + "_nostats";
+      if (stats_trampolines_.insert(name).second) {
+        auxiliaries << "static " << f->signature_internal(name) << ";\n"
+                    << "static " << f->signature(eval) << " {\n"
+                    << "  return " << name << "(arg, res, iw, w, mem, 0, -1);\n"
+                    << "}\n\n";
+      }
+    }
+    *this << s << ".eval = " << eval << ";\n";
     if (needs_mem) {
       *this << s << ".release = " << name << "_release;\n";
     } else {
@@ -1366,14 +1434,21 @@ namespace casadi {
   std::string CodeGenerator::
   operator()(const Function& f, const std::string& arg,
              const std::string& res, const std::string& iw,
-             const std::string& w, const std::string& failure_ret) {
+             const std::string& w, const std::string& failure_ret,
+             const std::string& sink, const std::string& parent) {
     std::string name = add_dependency(f);
 
     std::string cg_name = f->codegen_name(*this, false);
     bool needs_mem = f->codegen_needs_mem();
+    // Bracket with BEGIN/END_CALL; gather_stats off: no sink for it or its callees
+    bool bracket = stats_ && !sink.empty() && f->gather_stats_;
+    if (!needs_mem && !bracket) {
+      return name + "(" + arg + ", " + res + ", "
+              + iw + ", " + w + ", 0" + stats_args() + ")";
+    }
+    std::string mem = needs_mem ? "mid" : "0";
+    local("flag", "int");
     if (needs_mem) {
-      std::string mem = "mid";
-      local("flag", "int");
       local(mem, "int");
       std::string checkout = shorthand(cg_name + "_checkout");
       *this << mem << " = " << checkout << "();\n";
@@ -1384,21 +1459,25 @@ namespace casadi {
       } else {
         *this << "if (" << mem << "<0) return " << failure_ret << ";\n";
       }
-
-      *this << "flag = " + name + "(" + arg + ", " + res + ", "
-                + iw + ", " + w + ", " << mem << ");\n";
-
+    }
+    std::string call_stats = stats_args();
+    if (bracket) {
+      local("stats_c", "casadi_int");
+      *this << "stats_c = casadi_stats_begin_call(" << sink << ", " << stats_id(f)
+            << ", " << mem << ", " << parent << ");\n";
+      call_stats = ", " + sink + ", stats_c";
+    }
+    *this << "flag = " + name + "(" + arg + ", " + res + ", "
+              + iw + ", " + w + ", " << mem << call_stats << ");\n";
+    if (bracket) *this << "casadi_stats_end_call(" << sink << ", stats_c, flag);\n";
+    if (needs_mem) {
       if (failure_ret.empty()) {
         *this << "}\n";
       }
-
       std::string release = shorthand(cg_name + "_release");
       *this << release << "(" << mem << ");\n";
-      return "flag";
-    } else {
-      return name + "(" + arg + ", " + res + ", "
-              + iw + ", " + w + ", 0)";
     }
+    return "flag";
   }
 
   void CodeGenerator::add_external(const std::string& new_external, const std::string& name) {
@@ -1985,6 +2064,36 @@ namespace casadi {
     case AUX_OCP_BLOCK:
       this->auxiliaries << sanitize_source(casadi_ocp_block_str, inst);
       break;
+    case AUX_CBOR:
+      this->auxiliaries << sanitize_source(casadi_cbor_str, inst);
+      break;
+    case AUX_STATS:
+      add_auxiliary(AUX_CBOR);
+      this->auxiliaries << sanitize_source(allow_function_pointers_ ?
+        casadi_stats_sink_callback_str : casadi_stats_sink_buffer_str, inst);
+      // Sink struct also in the header, for the exported signatures
+      this->header << sanitize_source(allow_function_pointers_ ?
+        casadi_stats_sink_callback_str : casadi_stats_sink_buffer_str, {"casadi_real"}, false);
+      if (thread_safe_) {
+        // Fallback mutex for compilers without an atomic add
+        std::string mtx = shorthand("stats_mutex");
+        this->auxiliaries << "#ifndef CASADI_ATOMIC_FETCH_ADD\n"
+                          << "#if CASADI_MUTEX_USE_STATIC_INIT == 0\n"
+                          << "static CASADI_MUTEX_TYPE " << mtx << ";\n"
+                          << "#else\n"
+                          << "static CASADI_MUTEX_TYPE " << mtx << " = CASADI_MUTEX_STATIC_INIT;\n"
+                          << "#endif\n"
+                          << "#endif\n\n";
+        // No static initializer: set up in the file's incref
+        std::string guard = "#if !defined(CASADI_ATOMIC_FETCH_ADD) && "
+                            "CASADI_MUTEX_USE_STATIC_INIT == 0\n";
+        this->file_incref << guard << "  CASADI_MUTEX_INIT(&" << mtx << ");\n#endif\n";
+        this->file_decref << guard << "  CASADI_MUTEX_DESTROY(&" << mtx << ");\n#endif\n";
+      }
+      this->auxiliaries << sanitize_source(casadi_stats_reserve_str, inst);
+      // Readers, for <prefix>_get_stat_int/real/text
+      this->auxiliaries << sanitize_source(casadi_stats_str, inst);
+      break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
                         << "(" << (this->cpp ? "static_cast<double>(x)" : "(double) x") << ")\n\n";
@@ -2239,6 +2348,7 @@ namespace casadi {
       break;
     case AUX_THREADS:
       this->auxiliaries << sanitize_source(casadi_threads_str, inst);
+      this->auxiliaries << sanitize_source(casadi_atomic_str, inst);
       break;
     }
   }
@@ -2782,7 +2892,12 @@ namespace casadi {
 
     // Set by `// SYMBOL "X"` to "casadi_X"; cleared when the matching
     // function signature is found and the prefix is prepended.
+    // `// EXPORT` after it: exported as CASADI_PREFIX(X) instead
     std::string active_symbol;
+    bool active_export = false;
+    // Exported symbol's declaration, collected up to the opening brace
+    std::string decl, decl_name;
+    size_t decl_skip = 0;
 
     while (std::getline(stream, line)) {
       size_t n1, n2;
@@ -2812,6 +2927,14 @@ namespace casadi {
           rep.push_back(std::make_pair(sym, sym + suffix));
         }
         active_symbol = "casadi_" + sym;
+        active_export = false;
+        decl_name = sym;
+        continue;
+      }
+
+      // If line starts with "// EXPORT", the symbol above is exported
+      if (line.find("// EXPORT") != std::string::npos) {
+        active_export = true;
         continue;
       }
 
@@ -2828,6 +2951,31 @@ namespace casadi {
 
       // If line starts with "// C-VERBOSE", skip the next line
       if (!verbose_runtime && line.find("// C-VERBOSE") != std::string::npos) {
+        // Ignore next line
+        std::getline(stream, line);
+        continue;
+      }
+
+      // If line starts with "// C-STATS", skip the next line unless recording stats
+      if (!stats_ && line.find("// C-STATS") != std::string::npos) {
+        // Ignore next line
+        std::getline(stream, line);
+        continue;
+      }
+
+      // If line starts with "// C-THREAD-SAFE", skip the next line unless thread_safe
+      if (!thread_safe_ && line.find("// C-THREAD-SAFE") != std::string::npos) {
+        // Ignore next line
+        std::getline(stream, line);
+        continue;
+      }
+
+      // "// C-(NO-)FUNCTION-POINTERS": skip the next line unless (not) allow_function_pointers
+      if (line.find("// C-NO-FUNCTION-POINTERS") != std::string::npos) {
+        if (allow_function_pointers_) std::getline(stream, line);
+        continue;
+      }
+      if (!allow_function_pointers_ && line.find("// C-FUNCTION-POINTERS") != std::string::npos) {
         // Ignore next line
         std::getline(stream, line);
         continue;
@@ -2857,8 +3005,15 @@ namespace casadi {
       if (!active_symbol.empty() &&
           line.find(active_symbol + "(") != std::string::npos) {
         std::string sig_prefix;
-        if (this->static_aux) sig_prefix += "static ";
-        if (this->inline_aux) sig_prefix += "inline ";
+        if (active_export) {
+          if (this->cpp) sig_prefix += "extern \"C\" ";
+          sig_prefix += this->dll_export;
+          decl_skip = sig_prefix.size();
+          decl = " ";
+        } else {
+          if (this->static_aux) sig_prefix += "static ";
+          if (this->inline_aux) sig_prefix += "inline ";
+        }
         if (!sig_prefix.empty()) line = sig_prefix + line;
         active_symbol.clear();
       }
@@ -2866,6 +3021,20 @@ namespace casadi {
       // Perform string replacements
       for (auto&& it = rep.rbegin(); it!=rep.rend(); ++it) {
         line = replace(line, it->first, it->second);
+      }
+
+      // Declare the exported symbol in the header, under the unmangled prefix
+      if (!decl.empty()) {
+        decl += line.substr(decl_skip) + "\n";
+        decl_skip = 0;
+        size_t brace = decl.rfind(" {");
+        if (brace != std::string::npos) {
+          decl = decl.substr(1, brace - 1) + ";\n";
+          this->header << (this->cpp ? "extern \"C\" " : "") << this->dll_import
+                       << replace(decl, "casadi_" + decl_name + "(",
+                                  this->prefix + "_" + decl_name + "(");
+          decl.clear();
+        }
       }
 
       // Append to return

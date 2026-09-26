@@ -16,13 +16,13 @@ casadi_plugin(Nlpsol ipopt ${NLPSOL_IPOPT_SRCS})
 casadi_plugin_link_libraries(Nlpsol ipopt ipopt)
 
 # Add the runtime sources to internal (installed separately)
-set(RUNTIME_SRC "ipopt_runtime.hpp")
+set(RUNTIME_SRC "ipopt_runtime.hpp;ipopt_base_runtime.hpp")
 
 string (REPLACE ";" "$<SEMICOLON>" ESCAPED_RUNTIME_SRC "${RUNTIME_SRC}")
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ipopt_runtime_str.h"
-  COMMAND  ${CMAKE_COMMAND} -D OUTPUT="${CMAKE_CURRENT_BINARY_DIR}/ipopt_runtime_str.h" -D SOURCES="${RUNTIME_SRC}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../../generate_runtime.cmake"
+  COMMAND  ${CMAKE_COMMAND} -D OUTPUT="${CMAKE_CURRENT_BINARY_DIR}/ipopt_runtime_str.h" -D SOURCES="${ESCAPED_RUNTIME_SRC}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../../generate_runtime.cmake"
   DEPENDS ${RUNTIME_SRC}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )

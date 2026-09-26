@@ -83,7 +83,7 @@
       4
     ],
     "FunctionInternal": [
-      9
+      10
     ],
     "GenericExternal": [
       1
@@ -443,7 +443,8 @@
       6,
       7,
       8,
-      9
+      9,
+      10
     ],
     "GenericExternal": [
       1
@@ -4073,7 +4074,7 @@
         {
           "name": "FunctionInternal",
           "op": "version",
-          "value": 9
+          "value": 10
         },
         {
           "name": "FunctionInternal::is_diff_in",
@@ -4306,6 +4307,11 @@
         },
         {
           "name": "FunctionInternal::inputs_check",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "name": "FunctionInternal::gather_stats",
           "op": "field",
           "type": "bool"
         },

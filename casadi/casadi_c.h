@@ -128,6 +128,49 @@ CASADI_EXPORT int casadi_c_work_id(int id, casadi_int *sz_arg, casadi_int* sz_re
 CASADI_EXPORT int casadi_c_eval_id(int id, const double** arg, double** res,
   casadi_int* iw, double* w, int mem);
 
+/* ===================================================
+*   Stats, as generated code with option "stats"
+*  =================================================== */
+
+/* Standalone copy of runtime/casadi_stats_sink_callback.hpp (C89) */
+#ifndef CASADI_STATS_SINK
+#define CASADI_STATS_SINK
+struct casadi_stats_sink {
+  unsigned char* p;
+  casadi_int cap;
+  casadi_int needed;
+  unsigned char* (*reserve)(struct casadi_stats_sink* s, casadi_int len, casadi_int* pos);
+  void (*commit)(struct casadi_stats_sink* s, casadi_int pos);
+  void* data;
+};
+#endif /* CASADI_STATS_SINK */
+
+/** \brief Sink on p[0, cap), thread-safe */
+CASADI_EXPORT struct casadi_stats_sink casadi_c_stats_make_sink(unsigned char* p,
+  casadi_int cap);
+/** \brief Drop all records */
+CASADI_EXPORT void casadi_c_stats_clear(struct casadi_stats_sink* s);
+/** \brief Bytes the stream needed, including dropped records */
+CASADI_EXPORT casadi_int casadi_c_stats_nbytes(const struct casadi_stats_sink* s);
+/** \brief Were records dropped? */
+CASADI_EXPORT int casadi_c_stats_truncated(const struct casadi_stats_sink* s);
+/** \brief Recorded bytes held in memory: *n of them */
+CASADI_EXPORT const unsigned char* casadi_c_stats_data(const struct casadi_stats_sink* s,
+  casadi_int* n);
+/** \brief Stat of the last call of fname; returns 0 if found */
+CASADI_EXPORT int casadi_c_get_stat_int(const struct casadi_stats_sink* s, const char* fname,
+  const char* key, casadi_int* v);
+CASADI_EXPORT int casadi_c_get_stat_real(const struct casadi_stats_sink* s, const char* fname,
+  const char* key, double* v);
+CASADI_EXPORT int casadi_c_get_stat_text(const struct casadi_stats_sink* s, const char* fname,
+  const char* key, char* dst, casadi_int cap);
+
+/** \brief Evaluate, recording to sink under parent (-1 for a root call) */
+CASADI_EXPORT int casadi_c_eval_with_stats(const double** arg, double** res,
+  casadi_int* iw, double* w, int mem, struct casadi_stats_sink* sink, casadi_int parent);
+CASADI_EXPORT int casadi_c_eval_with_stats_id(int id, const double** arg, double** res,
+  casadi_int* iw, double* w, int mem, struct casadi_stats_sink* sink, casadi_int parent);
+
 CASADI_EXPORT void casadi_c_logger_write(const char* msg, int num);
 CASADI_EXPORT void casadi_c_logger_flush(void);
 

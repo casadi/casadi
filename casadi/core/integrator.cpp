@@ -356,7 +356,7 @@ int Integrator::eval(const double** arg, double** res,
     casadi_stats_sink* sink, casadi_int call) const {
   auto *m = static_cast<IntegratorMemory*>(mem);
   m->sink = sink;
-  m->call = call;
+  m->call = m->scope = call;
 
   // Read inputs
   const double* x0 = arg[INTEGRATOR_X0];

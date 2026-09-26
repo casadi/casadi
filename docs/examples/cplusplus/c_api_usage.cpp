@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <math.h>
 
 #include <casadi/casadi_c.h>
 
@@ -142,6 +143,67 @@ int usage_c(){
   return 0;
 }
 
+// Solver stats from C
+int usage_c_stats(){
+  printf("---\n");
+  printf("Stats from C:\n");
+  printf("\n");
+
+  if (casadi_c_push_file("solver.casadi")) {
+    printf("No 'solver.casadi' (Ipopt not available): skipped.\n");
+    return 0;
+  }
+  int id = casadi_c_id("solver");
+
+  casadi_int sz_arg, sz_res, sz_iw, sz_w;
+  casadi_c_work_id(id, &sz_arg, &sz_res, &sz_iw, &sz_w);
+  const double *arg[sz_arg];
+  double *res[sz_res];
+  casadi_int iw[sz_iw];
+  double w[sz_w];
+  casadi_int i;
+  for (i=0; i<sz_arg; ++i) arg[i] = 0;
+  for (i=0; i<sz_res; ++i) res[i] = 0;
+
+  /* Rosenbrock; null inputs are zero, not their default: pass the bounds */
+  const double inf = HUGE_VAL;
+  const double x0[2] = {-1, 1}, p = 100, lbx[2] = {-inf, -inf}, ubx[2] = {inf, inf};
+  const double lbg = -inf, ubg = 1;
+  double x[2];
+  arg[0] = x0;
+  arg[1] = &p;
+  arg[2] = lbx;
+  arg[3] = ubx;
+  arg[4] = &lbg;
+  arg[5] = &ubg;
+  res[0] = x;
+
+  /* Sink on a caller-owned buffer */
+  static unsigned char buf[1 << 16];
+  struct casadi_stats_sink s = casadi_c_stats_make_sink(buf, sizeof(buf));
+
+  casadi_c_incref_id(id);
+  int mem = casadi_c_checkout_id(id);
+  int k;
+  for (k=0; k<2; ++k) {
+    /* -1: root call */
+    casadi_c_stats_clear(&s);
+    if (casadi_c_eval_with_stats_id(id, arg, res, iw, w, mem, &s, -1)) return 1;
+  }
+  casadi_c_release_id(id, mem);
+
+  char status[64];
+  casadi_int iter_count;
+  if (casadi_c_get_stat_text(&s, "solver", "return_status", status, sizeof(status))) return 1;
+  if (casadi_c_get_stat_int(&s, "solver", "iter_count", &iter_count)) return 1;
+  printf("%s after %lld iterations: x = [%g, %g] (%lld bytes of stats)\n",
+         status, iter_count, x[0], x[1], casadi_c_stats_nbytes(&s));
+
+  casadi_c_decref_id(id);
+  casadi_c_pop();
+  return 0;
+}
+
 // C++ (and CasADi) from here on
 #include <casadi/casadi.hpp>
 using namespace casadi;
@@ -168,8 +230,18 @@ int main(){
     gh.pack(std::vector<Function>{g, h});
   }
 
+  if (has_nlpsol("ipopt")) {
+    MX xs = MX::sym("x", 2);
+    MX ps = MX::sym("p");
+    MX x1 = xs(0), x2 = xs(1);
+    MXDict nlp = {{"x", xs}, {"p", ps}, {"g", x1 + x2}, {"f", sq(1 - x1) + ps * sq(x2 - sq(x1))}};
+    Function solver = nlpsol("solver", "ipopt", nlp,
+      {{"ipopt.print_level", 0}, {"ipopt.sb", "yes"}, {"print_time", false}});
+    solver.save("solver.casadi");
+  }
+
   // Usage from C
   usage_c();
 
-  return 0;
+  return usage_c_stats();
 }

@@ -34,6 +34,19 @@
 #define CASADI_PREFIX(ID) casadi_##ID
 #define CASADI_CAST(TYPE, ARG) static_cast<TYPE>(ARG)
 
+// Stats sink: same C struct as casadi_c.h and generated code
+#include "casadi_stats_sink_callback.hpp"
+
+#include "casadi_atomic.hpp"
+#if defined(CASADI_WITH_THREAD) && !defined(CASADI_ATOMIC_FETCH_ADD)
+namespace casadi {
+  // No atomic builtins: mutex fallback
+  CASADI_EXPORT casadi_int casadi_fetch_add_locked(casadi_int* p, casadi_int n);
+} // namespace casadi
+#define CASADI_ATOMIC_FETCH_ADD(p, n) casadi::casadi_fetch_add_locked(p, n)
+#define CASADI_ATOMIC_FETCH_ADD_LOCKED
+#endif
+
 /// \cond INTERNAL
 namespace casadi {
   /// COPY: y <-x
@@ -431,6 +444,9 @@ namespace casadi {
   #include "casadi_kkt.hpp"
   #include "casadi_ipqp.hpp"
   #include "casadi_oracle.hpp"
+  #include "casadi_cbor.hpp"
+  #include "casadi_stats_reserve.hpp"
+  #include "casadi_stats.hpp"
   #include "casadi_nlp.hpp"
   #include "casadi_sqpmethod.hpp"
   #include "casadi_feasiblesqpmethod.hpp"

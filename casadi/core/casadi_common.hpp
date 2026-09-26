@@ -77,6 +77,9 @@
 
 #include "casadi_types.hpp"
 
+// Stats sink (C struct, as in casadi_c.h); null: not recorded
+struct casadi_stats_sink;
+
 namespace casadi {
 
   /// Forward declarations
@@ -166,8 +169,8 @@ namespace casadi {
   typedef int (*eval_t)(const double** arg, double** res,
                         casadi_int* iw, double* w, int);
 
-  // Stats sink an evaluation reports to (null: not recorded)
-  struct casadi_stats_sink;
+  typedef int (*eval_stats_t)(const double** arg, double** res, casadi_int* iw, double* w, int,
+                              casadi_stats_sink* sink, casadi_int parent);
   ///@}
 
   // Easier to maintain than an enum (serialization/codegen)

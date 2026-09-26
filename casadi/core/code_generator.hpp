@@ -211,10 +211,13 @@ namespace casadi {
 
     /** \brief Generate a call to a function (generic signature)
 
+        sink, parent: C expressions for stats (option "stats"); sink "" if none in scope
+
         \identifier{s6} */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w, const std::string& failure_ret="1");
+                           const std::string& w, const std::string& failure_ret="1",
+                           const std::string& sink="sink", const std::string& parent="call");
 
     /** \brief Print a string to buffer
 
@@ -311,6 +314,18 @@ namespace casadi {
     /** \brief Definition of library-wide symbol CASADI_PREFIX(entry), declared in h */
     std::string exported(const std::string& ret, const std::string& entry,
                          const std::string& params, std::ostream& h) const;
+
+    /** \brief Emit stats instrumentation? */
+    bool stats() const { return stats_; }
+
+    /** \brief Name of the static string holding f's stats id, defined on first use */
+    std::string stats_id(const Function& f);
+
+    /** \brief May generated code call function pointers? (stats sink reserve) */
+    bool allow_function_pointers() const { return allow_function_pointers_; }
+
+    /** \brief Trailing stats arguments when no sink is in scope */
+    std::string stats_args() const;
 
     /** \brief Print a constant in a lossless but compact manner
 
@@ -783,6 +798,8 @@ namespace casadi {
       AUX_BFGS,
       AUX_ORACLE_CALLBACK,
       AUX_OCP_BLOCK,
+      AUX_CBOR,
+      AUX_STATS,
       AUX_ORACLE,
       AUX_SCALED_COPY,
       AUX_BLAZING_COMMON,
@@ -1136,6 +1153,18 @@ namespace casadi {
 
     // Emit thread-safe checkout/release?
     bool thread_safe_;
+
+    // Emit stats instrumentation?
+    bool stats_;
+
+    // May generated code call function pointers?
+    bool allow_function_pointers_;
+
+    // Functions whose stats id is defined
+    std::set<std::string> stats_ids_;
+
+    // Functions that got a plain-signature trampoline
+    std::set<std::string> stats_trampolines_;
 
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;

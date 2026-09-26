@@ -462,11 +462,12 @@ namespace casadi {
 
         \identifier{kg} */
     void call_gen(const MXVector& arg, MXVector& res, casadi_int npar,
-                  bool always_inline, bool never_inline) const;
+                  bool always_inline, bool never_inline, casadi_stats_sink* sink=nullptr) const;
 
     template<typename D>
     void call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
-                  casadi_int npar, bool always_inline, bool never_inline) const;
+                  casadi_int npar, bool always_inline, bool never_inline,
+                  casadi_stats_sink* sink=nullptr) const;
     ///@}
 
     /** \brief Call a function, templated
@@ -474,7 +475,7 @@ namespace casadi {
         \identifier{kh} */
     template<typename M>
       void call(const std::vector<M>& arg, std::vector<M>& res,
-               bool always_inline, bool never_inline) const;
+               bool always_inline, bool never_inline, casadi_stats_sink* sink=nullptr) const;
 
     ///@{
     /** Helper function
@@ -908,10 +909,21 @@ namespace casadi {
         \identifier{ly} */
     std::string signature(const std::string& fname) const;
 
+    /** \brief Signature of a generated internal function, with sink and call */
+    std::string signature_internal(const std::string& fname) const;
+
+    /** \brief Signature of the exported <fname>_with_stats entry point */
+    std::string signature_stats(const std::string& fname) const;
+
+    /** \brief Stats id: "#<serial>:<name>", process-unique */
+    const std::string& stats_id() const { return stats_id_;}
+
     /** \brief Code generate the function
 
+        with_stats: <fname>_unrolled_with_stats, taking a sink and parent
+
         \identifier{27o} */
-    std::string signature_unrolled(const std::string& fname) const;
+    std::string signature_unrolled(const std::string& fname, bool with_stats=false) const;
 
     /** \brief Generate code for the declarations of the C function
 
@@ -1358,6 +1370,9 @@ namespace casadi {
         \identifier{nk} */
     eval_t eval_;
 
+    /// <name>_with_stats, if the library reserves through the sink's callback
+    eval_stats_t eval_stats_;
+
     /** \brief Checkout redirected to a C function
 
         \identifier{nl} */
@@ -1434,6 +1449,9 @@ namespace casadi {
     /// Errors are thrown if numerical values of inputs look bad
     bool inputs_check_;
 
+    /// Record this function and its callees in stats
+    bool gather_stats_;
+
     // Finite difference step
     Dict fd_options_;
 
@@ -1476,6 +1494,16 @@ namespace casadi {
     mutable std::atomic<casadi_int> dump_count_;
 #else
     mutable casadi_int dump_count_;
+#endif // CASADI_WITH_THREAD
+
+    // Stats id; reassigned on deserialization
+    std::string stats_id_;
+
+    // Serial for stats_id_
+#ifdef CASADI_WITH_THREAD
+    static std::atomic<casadi_int> instance_count_;
+#else
+    static casadi_int instance_count_;
 #endif // CASADI_WITH_THREAD
 
     /** \brief Check if the function is of a particular type
@@ -1553,7 +1581,8 @@ namespace casadi {
         \identifier{nx} */
     void set_jac_sparsity(casadi_int oind, casadi_int iind, const Sparsity& sp);
 
-    std::unique_ptr<std::ostream> open_trace(const double** arg, casadi_int dump_id) const;
+    std::unique_ptr<std::ostream> open_trace(const double** arg, casadi_int dump_id,
+      casadi_stats_sink* sink, casadi_int call) const;
     void finish_trace(std::ostream& trace, double** res, int ret) const;
     static void trace_values(std::ostream& trace, const double* values, casadi_int nnz);
 
@@ -1561,9 +1590,9 @@ namespace casadi {
     // @{
     /// Dumping functionality
     casadi_int get_dump_id() const;
-    void dump_in(casadi_int id, const double** arg) const;
-    void dump_out(casadi_int id, double** res) const;
-    void dump() const;
+    std::string dump_in(casadi_int id, const double** arg) const;
+    std::string dump_out(casadi_int id, double** res) const;
+    std::string dump() const;
     // @}
 
     /** \brief Memory that is persistent during a call (but not between calls)
@@ -1629,7 +1658,8 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::call(const std::vector<M>& arg, std::vector<M>& res,
-                              bool always_inline, bool never_inline) const {
+                              bool always_inline, bool never_inline,
+                              casadi_stats_sink* sink) const {
     // If all inputs are scalar ...
     if (all_scalar()) {
       // ... and some arguments are matrix-valued with matching dimensions ...
@@ -1664,7 +1694,7 @@ namespace casadi {
               if (arg[i].size()==sz) arg1[i] = arg[i](r, c);
             }
             // Call recursively with scalar arguments
-            call(arg1, res1, always_inline, never_inline);
+            call(arg1, res1, always_inline, never_inline, sink);
             // Get results
             casadi_assert_dev(res.size() == res1.size());
             for (casadi_int i=0; i<res.size(); ++i) res[i](r, c) = res1[i];
@@ -1678,11 +1708,11 @@ namespace casadi {
     // Check if inputs need to be replaced
     casadi_int npar = 1;
     if (!matching_arg(arg, npar)) {
-      return call(replace_arg(arg, npar), res, always_inline, never_inline);
+      return call(replace_arg(arg, npar), res, always_inline, never_inline, sink);
     }
 
     // Call the type-specific method
-    call_gen(arg, res, npar, always_inline, never_inline);
+    call_gen(arg, res, npar, always_inline, never_inline, sink);
   }
 
   template<typename M>
@@ -1734,7 +1764,7 @@ namespace casadi {
   template<typename D>
   void FunctionInternal::
   call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
-           casadi_int npar, bool always_inline, bool never_inline) const {
+           casadi_int npar, bool always_inline, bool never_inline, casadi_stats_sink* sink) const {
     std::vector< Matrix<D> > arg2 = project_arg(arg, npar);
 
     // Which arguments require mapped evaluation
@@ -1768,7 +1798,7 @@ namespace casadi {
       // Call memory-less
       if (eval_gen(get_ptr(argp), get_ptr(resp),
                    get_ptr(iw_tmp), get_ptr(w_tmp), 0,
-                   always_inline, never_inline)) {
+                   always_inline, never_inline, sink)) {
         if (error_on_fail_) casadi_error("Evaluation failed");
       }
       // Update offsets

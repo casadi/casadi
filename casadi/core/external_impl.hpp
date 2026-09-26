@@ -54,6 +54,12 @@ class CASADI_EXPORT External : public FunctionInternal {
       \identifier{282} */
   config_t config_;
 
+  /// Library exports <name>_with_stats; its sink layout has a reserve callback
+  bool has_stats_, stats_function_pointers_;
+
+  /// Should generated code call <name>_with_stats?
+  bool calls_with_stats(const CodeGenerator& g) const;
+
   /** \brief Number of inputs and outputs
 
       \identifier{1z4} */
