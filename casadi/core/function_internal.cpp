@@ -2753,8 +2753,9 @@ namespace casadi {
     }
     g << "}\n\n";
 
-    // Reference counter routines
-    g << g.declare("void " + name_ + "_incref(void)") << " {\n";
+    // Reference counter routines; also of the file (dropped if the file has none)
+    g << g.declare("void " + name_ + "_incref(void)") << " {\n"
+      << "casadi_file_incref();\n";
     if (has_refcount_in_deps_) {
       std::string incref = g.shorthand(name + "_incref");
       g << incref << "();\n";
@@ -2765,7 +2766,8 @@ namespace casadi {
       std::string decref = g.shorthand(name + "_decref");
       g << decref << "();\n";
     }
-    g << "}\n\n";
+    g << "casadi_file_decref();\n"
+      << "}\n\n";
 
     // Number of inputs and outptus
     g << g.declare("casadi_int " + name_ + "_n_in(void)")

@@ -1153,6 +1153,9 @@ namespace casadi {
     std::stringstream body;
     std::stringstream header;
     std::stringstream buffer;
+    // Run by the first <name>_incref and the last <name>_decref of any exposed function
+    std::stringstream file_incref;
+    std::stringstream file_decref;
 
     // Are we at a new line?
     bool newline_;

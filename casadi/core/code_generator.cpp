@@ -1024,6 +1024,14 @@ namespace casadi {
       s << "#include <casadi/mem.h>\n" << std::endl;
     }
 
+    // File-scope reference counting, if any code needs it
+    bool file_refs = !file_incref.str().empty() || !file_decref.str().empty();
+    if (file_refs) {
+      shorthand("file_refs");
+      shorthand("file_incref");
+      shorthand("file_decref");
+    }
+
     // Macros
     if (!added_shorthands_.empty()) {
       s << "/* Add prefix to internal symbols */\n";
@@ -1128,8 +1136,31 @@ namespace casadi {
       s << std::endl << std::endl;
     }
 
-    // Codegen body
-    s << this->body.str();
+    if (file_refs) {
+      s << "static int casadi_file_refs = 0;\n\n"
+        << "static void casadi_file_incref(void) {\n"
+        << "  if (casadi_file_refs++) return;\n"
+        << this->file_incref.str()
+        << "}\n\n"
+        << "static void casadi_file_decref(void) {\n"
+        << "  if (--casadi_file_refs) return;\n"
+        << this->file_decref.str()
+        << "}\n\n";
+    }
+
+    // Codegen body; without file-scope code, the calls of the exposed incref/decref go
+    if (file_refs) {
+      s << this->body.str();
+    } else {
+      std::istringstream body_lines(this->body.str());
+      std::string line;
+      while (std::getline(body_lines, line)) {
+        std::string::size_type b = line.find_first_not_of(' ');
+        std::string code = b == std::string::npos ? "" : line.substr(b);
+        if (code == "casadi_file_incref();" || code == "casadi_file_decref();") continue;
+        s << line << "\n";
+      }
+    }
 
     // End with new line
     s << std::endl;

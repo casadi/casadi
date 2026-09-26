@@ -5566,6 +5566,17 @@ class Functiontests(casadiTestCase):
                 
     ca.DM.set_precision(6)
 
+  def test_codegen_file_incref(self):
+    # File-scope incref/decref (#4324) only when code needs it: none here, output unchanged
+    x = ca.SX.sym("x")
+    f = ca.Function("f", [x], [ca.sin(x)])
+    for opts in [{}, {"thread_safe": True}]:
+      cg = ca.CodeGenerator("f", opts)
+      cg.add(f)
+      code = cg.dump()
+      self.assertNotIn("casadi_file_", code)
+      self.assertIn("void f_incref(void) {\n}", code)
+
   def test_activity(self):
     # issue #3019: value-level "signal activity" propagation (Function::activity).
     # True/active = possibly nonzero. The expected output activity is never hard-coded:
