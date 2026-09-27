@@ -55,7 +55,13 @@ namespace casadi {
 
   const Options DaqpInterface::options_
   = {{&Conic::options_},
-     {{"daqp",
+     {{"warm_start_previous",
+       {OT_BOOL,
+        "Reuse the previous active set and primal state when no explicit warm start is supplied. Default: false."}},
+      {"warm_start",
+       {OT_BOOL,
+        "Use x0 as a primal start (MIQP incumbent) and lam_x0/lam_a0 as an active-set start. Default: false."}},
+      {"daqp",
        {OT_DICT,
         "Options to be passed to Daqp."
         }},
@@ -70,6 +76,10 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="daqp") {
         opts_ = op.second;
+      } else if (op.first=="warm_start") {
+        warm_start_ = op.second;
+      } else if (op.first=="warm_start_previous") {
+        warm_start_previous_ = op.second;
       }
     }
 
@@ -112,6 +122,8 @@ namespace casadi {
 
   void DaqpInterface::set_daqp_prob(CodeGenerator& g) const {
     g << "p.qp = &p_qp;\n";
+    g << "p.warm_start = " << warm_start_ << ";\n";
+    g << "p.warm_start_previous = " << warm_start_previous_ << ";\n";
     g << "daqp_default_settings(&p.settings);\n";
     if (!discrete_.empty()) {
       codegen_local(g, "integrality", integrality_);
@@ -149,6 +161,16 @@ namespace casadi {
         g << "p.settings.rel_subopt = " << g.constant(op.second.to_double()) << ";\n";
       } else if (op.first=="abs_subopt") {
         g << "p.settings.abs_subopt = " << g.constant(op.second.to_double()) << ";\n";
+      } else if (op.first=="sing_tol") {
+        g << "p.settings.sing_tol = " << g.constant(op.second.to_double()) << ";\n";
+      } else if (op.first=="refactor_tol") {
+        g << "p.settings.refactor_tol = " << g.constant(op.second.to_double()) << ";\n";
+      } else if (op.first=="time_limit") {
+        g << "p.settings.time_limit = " << g.constant(op.second.to_double()) << ";\n";
+      } else if (op.first=="w_soft") {
+        g << "p.settings.w_soft = " << g.constant(op.second.to_double()) << ";\n";
+      } else if (op.first=="eq_reduction") {
+        g << "p.settings.eq_reduction = " << op.second.to_int() << ";\n";
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }
@@ -168,6 +190,8 @@ namespace casadi {
 
   void DaqpInterface::set_daqp_prob() {
     p_.qp = &p_qp_;
+    p_.warm_start = warm_start_;
+    p_.warm_start_previous = warm_start_previous_;
 
     DAQPSettings* settings = &p_.settings;
 
@@ -200,6 +224,16 @@ namespace casadi {
         settings->rel_subopt = op.second.to_double();
       } else if (op.first=="abs_subopt") {
         settings->abs_subopt = op.second.to_double();
+      } else if (op.first=="sing_tol") {
+        settings->sing_tol = op.second.to_double();
+      } else if (op.first=="refactor_tol") {
+        settings->refactor_tol = op.second.to_double();
+      } else if (op.first=="time_limit") {
+        settings->time_limit = op.second.to_double();
+      } else if (op.first=="w_soft") {
+        settings->w_soft = op.second.to_double();
+      } else if (op.first=="eq_reduction") {
+        settings->eq_reduction = op.second.to_int();
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }
@@ -250,10 +284,10 @@ namespace casadi {
     // Statistics
     m->fstats.at("solver").tic();
 
-    casadi_daqp_solve(&m->d, arg, res, iw, w);
+    int flag = casadi_daqp_solve(&m->d, arg, res, iw, w);
     m->fstats.at("solver").toc();
 
-    return 0;
+    return flag;
   }
 
   DaqpInterface::~DaqpInterface() {
@@ -266,6 +300,8 @@ namespace casadi {
     g.add_auxiliary(CodeGenerator::AUX_COPY);
     g.add_auxiliary(CodeGenerator::AUX_FABS);
     g.add_include("daqp/api.h");
+    g.add_include("daqp/utils.h");
+    g.add_include("stdlib.h");
     g.add_include("stdio.h");
 
     g.auxiliaries << g.sanitize_source(daqp_runtime_str, {"casadi_real"});
@@ -298,11 +334,19 @@ namespace casadi {
     stats["return_status"] = m->d.return_status;
     stats["bnb_nodecount"] = m->d.nodecount;
     stats["bnb_itercount"] = m->d.bnb_itercount;
+    stats["workspace_reused"] = static_cast<bool>(m->d.workspace_reused);
+    stats["daqp_update_mask"] = m->d.update_mask;
     return stats;
   }
 
   DaqpInterface::DaqpInterface(DeserializingStream& s) : Conic(s) {
-    s.version("DaqpInterface", 1);
+    int version = s.version("DaqpInterface", 1, 2);
+    if (version >= 2) {
+      s.unpack("DaqpInterface::warm_start", warm_start_);
+      s.unpack("DaqpInterface::warm_start_previous", warm_start_previous_);
+    }
+    integrality_.resize(discrete_.size());
+    copy_vector(discrete_, integrality_);
     s.unpack("DaqpInterface::opts", opts_);
     set_daqp_prob();
   }
@@ -310,7 +354,9 @@ namespace casadi {
   void DaqpInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
-    s.version("DaqpInterface", 1);
+    s.version("DaqpInterface", 2);
+    s.pack("DaqpInterface::warm_start", warm_start_);
+    s.pack("DaqpInterface::warm_start_previous", warm_start_previous_);
     s.pack("DaqpInterface::opts", opts_);
   }
 

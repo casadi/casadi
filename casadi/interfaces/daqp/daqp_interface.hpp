@@ -28,7 +28,9 @@
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/daqp/casadi_conic_daqp_export.h>
 
-#include <api.h>
+#include <daqp/api.h>
+#include <daqp/utils.h>
+#include <cstdlib>
 #include <string>
 
 namespace casadi {
@@ -39,8 +41,8 @@ namespace casadi {
     \par
 
       Interface to Daqp solver for sparse Quadratic Programs,
-      see daqp.dev for more information and
-      https://www.maths.ed.ac.uk/hall/Daqp/DaqpOptions.html
+      see https://darnstrom.github.io/daqp for more information and
+      https://darnstrom.github.io/daqp/parameters
       for a list of options.
 
     \identifier{29l} */
@@ -142,6 +144,9 @@ namespace casadi {
 
     /// All Daqp options
     Dict opts_;
+
+    bool warm_start_ = false;
+    bool warm_start_previous_ = false;
 
     void serialize_body(SerializingStream &s) const override;
 
