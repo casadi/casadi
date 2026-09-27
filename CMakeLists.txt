@@ -1070,7 +1070,7 @@ option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}
 # DAQP: An Active-Set QP solver written in C
 option(WITH_DAQP "Compile the DAQP interface" OFF)
 set(BUILD_DAQP_GIT_REPO "https://github.com/darnstrom/daqp.git" CACHE STRING "Git repo used together with BUILD_DAQP_VERSION")
-set(BUILD_DAQP_VERSION "v0.10.0" CACHE STRING "Tag/branch/hash to be used for BUILD_DAQP_GIT_REPO")
+set(BUILD_DAQP_VERSION "v0.10.1" CACHE STRING "Tag/branch/hash to be used for BUILD_DAQP_GIT_REPO")
 set(BUILD_DAQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for DAQP")
 option(WITH_BUILD_DAQP "Build DAQP (BUILD_DAQP_VERSION=${BUILD_DAQP_VERSION}) from downloaded source (BUILD_DAQP_GIT_REPO=${BUILD_DAQP_GIT_REPO})." OFF)
 

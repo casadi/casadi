@@ -229,8 +229,8 @@ int casadi_daqp_update_sense(casadi_daqp_data<T1>* d, int mask, int cold_start) 
   // Rebuild the active-set factorization after H or A changes.
   if (mask & (DAQP_UPDATE_Rinv | DAQP_UPDATE_M)) mask |= DAQP_UPDATE_sense;
   if (mask & DAQP_UPDATE_sense) mask |= DAQP_UPDATE_d;
-  // The new equality set is inferred inside DAQP. Rebuild full constraints
-  // before that inference when a previous reduction may have omitted rows.
+  // Equality inference may introduce a new reduction after the previous
+  // equality set disappeared. Ensure all constraint rows are available.
   if ((mask & DAQP_UPDATE_sense) && d->work.eq) mask |= DAQP_UPDATE_M;
   return mask;
 }
@@ -263,21 +263,6 @@ int casadi_daqp_check_inputs(casadi_daqp_data<T1>* d) {
       d->sense[j] |= DAQP_BINARY;  // mark as binary
     }
   }
-  // DAQP 0.10 can omit an immutable zero row without checking consistency.
-  for (i=0; i<p_qp->na; ++i) {
-    if (d->daqp.blower[p_qp->nx+i] <= p->settings.primal_tol &&
-        d->daqp.bupper[p_qp->nx+i] >= -p->settings.primal_tol) continue;
-    casadi_int j;
-    for (j=0; j<p_qp->nx; ++j) {
-      if (d->daqp.A[i*p_qp->nx+j] != 0) break;
-    }
-    if (j==p_qp->nx) {
-      d->return_status = DAQP_EXIT_INFEASIBLE;
-      d_qp->unified_return_status = SOLVER_RET_INFEASIBLE;
-      casadi_daqp_free_mem(d);
-      return 1;
-    }
-  }
   return 0;
 }
 
@@ -289,14 +274,12 @@ void casadi_daqp_init_start(casadi_daqp_data<T1>* d, int cold_start) {
   casadi_qp_data<T1>* d_qp = d->qp;
   if (d->initialized && cold_start) {
     daqp_eq_restore(&d->work);
-    reset_daqp_workspace(&d->work);
+    daqp_deactivate_constraints(&d->work);
     // Proximal iterations use the primal vector as their initial center.
     casadi_copy(static_cast<const T1*>(0), p_qp->nx, d->work.u);
     casadi_copy(static_cast<const T1*>(0), p_qp->nx, d->work.x);
     casadi_copy(static_cast<const T1*>(0), p_qp->nx, d->work.xold);
     d->work.state &= ~DAQP_STATE_INCUMBENT;
-    // DAQP otherwise implicitly loads the previous root active set.
-    if (d->work.bnb) d->work.bnb->n_root_WS = 0;
   }
   if (p->warm_start) {
     if (d_qp->lam_x0 || d_qp->lam_a0) {
@@ -387,6 +370,7 @@ int casadi_daqp_solve(casadi_daqp_data<T1>* d, const double** arg, double** res,
   }
   if (flag<0) {
     d->return_status = flag;
+    if (flag == DAQP_EXIT_INFEASIBLE) d_qp->unified_return_status = SOLVER_RET_INFEASIBLE;
     casadi_daqp_free_mem(d);
     return 1;
   }
