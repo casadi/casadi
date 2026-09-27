@@ -3308,7 +3308,11 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
     case Causality::PARAMETER:
       // Parameter
       if (variability == Variability::TUNABLE) {
-        categorize(v.index, Category::P);
+        if (v.type == Type::FLOAT64 || v.type == Type::FLOAT32) {
+          categorize(v.index, Category::P);
+        } else {
+          categorize(v.index, Category::C);
+        }
       } else if (variability == Variability::FIXED) {
         categorize(v.index, Category::C);
       } else {
