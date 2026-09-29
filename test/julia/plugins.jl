@@ -67,9 +67,19 @@ end
     co = C.conic_options("qrqp")
     @test "max_iter" in co
     @test "print_iter" in co
-    # nlpsol_in / nlpsol_out: the standard NLP IO scheme names.
-    @test C.nlpsol_in() == ["x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0"]
-    @test C.nlpsol_out() == ["x", "f", "g", "lam_x", "lam_g", "lam_p"]
+    # nlpsol_in / nlpsol_out: the NLP IO scheme names.  Checked against a real
+    # solver's name_in/name_out rather than against a literal list, so that
+    # extending the scheme cannot leave a stale copy of it behind here.
+    let x = sym(SX, "x"),
+        S = C.nlpsol("S", "sqpmethod", Dict{String,Any}("x" => x, "f" => x * x),
+            Dict{String,Any}("qpsol" => "qrqp",
+                "qpsol_options" => Dict{String,Any}("print_iter" => false,
+                    "print_header" => false),
+                "print_iteration" => false, "print_header" => false,
+                "print_status" => false, "print_time" => false))
+        @test C.nlpsol_in() == C.name_in(S)
+        @test C.nlpsol_out() == C.name_out(S)
+    end
     # doc_nlpsol(plugin): a non-empty documentation blob.
     if HAS_IPOPT
         doc = C.doc_nlpsol("ipopt")
