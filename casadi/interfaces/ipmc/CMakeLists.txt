@@ -10,13 +10,13 @@ casadi_plugin(Nlpsol ipmc
 casadi_plugin_link_libraries(Nlpsol ipmc ipmc::ipmc blasfeo)
 
 # Add the runtime sources to internal (installed separately)
-set(RUNTIME_SRC "ipmc_runtime.hpp")
+set(RUNTIME_SRC "ipmc_runtime.hpp;ipmc_base_runtime.hpp")
 
 string (REPLACE ";" "$<SEMICOLON>" ESCAPED_RUNTIME_SRC "${RUNTIME_SRC}")
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ipmc_runtime_str.h"
-  COMMAND  ${CMAKE_COMMAND} -D OUTPUT="${CMAKE_CURRENT_BINARY_DIR}/ipmc_runtime_str.h" -D SOURCES="${RUNTIME_SRC}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../../generate_runtime.cmake"
+  COMMAND  ${CMAKE_COMMAND} -D OUTPUT="${CMAKE_CURRENT_BINARY_DIR}/ipmc_runtime_str.h" -D SOURCES="${ESCAPED_RUNTIME_SRC}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../../generate_runtime.cmake"
   DEPENDS ${RUNTIME_SRC}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )

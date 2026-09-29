@@ -27,6 +27,7 @@
 #include "../../core/global_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
 #include "../../core/convexify.hpp"
+#include "../../core/stats_recorder_internal.hpp"
 #include "casadi/casadi_c.h"
 
 #include <cmath>
@@ -48,6 +49,7 @@
 #include <ipmc_runtime_str.h>
 
 namespace casadi {
+  #include "ipmc_base_runtime.hpp"
 
   extern "C"
   int CASADI_NLPSOL_IPMC_EXPORT
@@ -1217,6 +1219,11 @@ namespace casadi {
     m->success = m->d.success;
     m->unified_return_status = static_cast<UnifiedReturnStatus>(m->d.unified_return_status);
 
+    if (m->sink) {
+      casadi_ipmc_stats_set_outcome(m->sink, m->call, m->d.return_status,
+        m->d.unified_return_status, m->d.success, m->d.stats.iterations_count);
+    }
+
     return 0;
   }
 
@@ -1315,6 +1322,7 @@ void IpmcInterface::codegen_declarations(CodeGenerator& g) const {
 void IpmcInterface::codegen_body(CodeGenerator& g) const {
   codegen_body_enter(g);
   g.auxiliaries << g.sanitize_source(ipmc_runtime_str, {"casadi_real"});
+  if (g.stats()) g.auxiliaries << g.sanitize_source(ipmc_base_runtime_str, {"casadi_real"});
 
   g.local("d", "struct casadi_ipmc_data*");
   g.init_local("d", "&" + codegen_mem(g));
@@ -1481,6 +1489,10 @@ void IpmcInterface::codegen_body(CodeGenerator& g) const {
   g << "}\n";
   g << "}\n";
   g << "casadi_ipmc_finish(d);\n";
+  if (g.stats()) {
+    g << "casadi_ipmc_stats_set_outcome(sink, call, d->return_status, "
+      << "d->unified_return_status, d->success, d->stats.iterations_count);\n";
+  }
   g << "casadi_ipmc_rewrite_collect(&p.rewrite, &d->rewrite, d->nlp, "
        "d->slack_s, d->slack_lam_s);\n";
 
