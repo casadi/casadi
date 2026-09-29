@@ -37,19 +37,51 @@ namespace casadi {
       Creates a solver for the following parametric nonlinear program (NLP):
       \verbatim
 
-      min          F(x, p)
-      x
+      min          F(x, p) + F_s(s, p)
+      x, s
 
       subject to
-      LBX <=   x    <= UBX
-      LBG <= G(x, p) <= UBG
+      LBX - S_lo,x s <=   x    <= UBX + S_up,x s
+      LBG - S_lo,g s <= G(x, p) <= UBG + S_up,g s
+      0              <=   s    <= UBS
       p  == P
+
+      with S = [S_lo; S_up], S_lo = [S_lo,g; S_lo,x], S_up = [S_up,g; S_up,x]
 
       nx: number of decision variables
       ng: number of constraints
       np: number of parameters
+      ns: number of slacks; s is ns x 1
 
       \endverbatim
+
+      The slack part is optional: without the 'S' option, ns is zero and the
+      formulation reduces to the classical NLP.
+
+      The slack variables themselves are declared through the 'nlp' dictionary:
+      \verbatim
+      s   : slack variables, ns x 1, one per column of S
+      f_s : slack objective, scalar, may depend on s and p only
+      \endverbatim
+
+      Which rows they relax, and on which side, is declared through the 'S'
+      option, a Sparsity of shape 2*(ng+nx)-by-ns holding [S_lo; S_up]: the
+      first ng+nx rows say which slack enters the lower bound of each
+      constraint and simple bound, the next ng+nx rows the upper bound. It is
+      structural only -- its entries count as 1 -- and a row of S that is
+      structurally empty leaves that side hard. One slack may enter both
+      sides of a row (a symmetric relaxation), one side only, or several rows
+      (a shared, max-norm style budget).
+
+      The solver reports the total objective F + F_s in 'f'; 'g' and 'lam_g'
+      refer to the constraints as written, not to the relaxed ones, and the
+      multipliers of the slack bounds are reported in 'lam_s'.
+
+      By default the slack layer is de-sugared into an augmented plain NLP
+      before the problem reaches the plugin. A plugin that implements the
+      soft-constraint formulation itself gets the structure handed over intact
+      instead; the 'expand_slacks' option overrides that choice either way.
+      The user-facing behaviour is identical in both cases.
 
       \generalsection{Nlpsol}
       \pluginssection{Nlpsol}
@@ -190,6 +222,35 @@ enum NLPOutput {
 /// Shortname for output arguments of an NLP function
 const std::vector<std::string> NL_OUTPUTS = {"f", "g"};
 
+/** \brief Extra IO of an NLP function in native-slack mode
+
+    A plugin that declares it handles the slack ("soft constraint") layer
+    natively is handed an oracle with one extra input and one extra output:
+
+      nlp : (x, p, s) -> (f, g, f_s)
+
+    'x', 'f' and 'g' are then byte-identical to the hard problem -- 'f' is the
+    user's objective WITHOUT the slack penalty, which lives in 'f_s'.
+
+    These constants deliberately live next to, rather than inside, NLPInput /
+    NLPOutput: NL_NUM_IN / NL_NUM_OUT are used to size call vectors elsewhere
+    (see Conic::create_rqp) and must keep meaning "plain NLP".
+
+*/
+///@{
+/// Slack variables (ns x 1), input index of an NLP function
+const casadi_int NL_S = 2;
+/// Slack objective (scalar), output index of an NLP function
+const casadi_int NL_F_S = 2;
+/// Number of NLP inputs/outputs in native-slack mode
+const casadi_int NL_NUM_IN_S = 3;
+const casadi_int NL_NUM_OUT_S = 3;
+/// Shortname for input arguments of an NLP function in native-slack mode
+const std::vector<std::string> NL_INPUTS_S = {"x", "p", "s"};
+/// Shortname for output arguments of an NLP function in native-slack mode
+const std::vector<std::string> NL_OUTPUTS_S = {"f", "g", "f_s"};
+///@}
+
 /// Input arguments of an NLP Solver
 enum NlpsolInput {
   /// Decision variables, initial guess (nx x 1)
@@ -208,6 +269,12 @@ enum NlpsolInput {
   NLPSOL_LAM_X0,
   /// Lagrange multipliers for bounds on G, initial guess (ng x 1)
   NLPSOL_LAM_G0,
+  /// Slack variables, initial guess (ns x 1)
+  NLPSOL_S0,
+  /// Slack variables upper bound (ns x 1), default +inf
+  NLPSOL_UBS,
+  /// Lagrange multipliers for bounds on S, initial guess (ns x 1)
+  NLPSOL_LAM_S0,
   NLPSOL_NUM_IN
 };
 
@@ -225,6 +292,10 @@ enum NlpsolOutput {
   NLPSOL_LAM_G,
   /// Lagrange multipliers for bounds on P at the solution (np x 1)
   NLPSOL_LAM_P,
+  /// Slack variables at the optimal solution (ns x 1)
+  NLPSOL_S,
+  /// Lagrange multipliers for bounds on S at the solution (ns x 1)
+  NLPSOL_LAM_S,
   NLPSOL_NUM_OUT
 };
 #endif // SWIG

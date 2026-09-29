@@ -152,7 +152,7 @@
       1
     ],
     "Nlpsol": [
-      5
+      6
     ],
     "OnnxFunction": [
       2
@@ -527,7 +527,8 @@
       2,
       3,
       4,
-      5
+      5,
+      6
     ],
     "OnnxFunction": [
       1,
@@ -6282,7 +6283,7 @@
         {
           "name": "Nlpsol",
           "op": "version",
-          "value": 5
+          "value": 6
         },
         {
           "name": "Nlpsol::nx",
@@ -6415,6 +6416,11 @@
             "element": "casadi_int",
             "name": "std::vector"
           }
+        },
+        {
+          "name": "Nlpsol::slack_S",
+          "op": "field",
+          "type": "Sparsity"
         }
       ],
       "Nlpsol::serialize_type": [
@@ -10075,6 +10081,13 @@
                   "name": "GenericType::d",
                   "op": "field",
                   "type": "casadi_int"
+                }
+              ],
+              "20": [
+                {
+                  "name": "GenericType::d",
+                  "op": "field",
+                  "type": "Sparsity"
                 }
               ],
               "3": [
