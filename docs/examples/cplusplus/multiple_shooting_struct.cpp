@@ -48,8 +48,8 @@ int main() {
   StructDM lbx(V, -inf), ubx(V, inf), x0(V, 0);
   lbx("U") = -0.75;
   ubx("U") = 1.0;
-  lbx("X", 0) = ubx("X", 0) = DM({0, 1});
-  lbx("X", -1) = ubx("X", -1) = DM({0, 0});
+  lbx("X", 0) = ubx("X", 0) = DM(std::vector<double>{0, 1});
+  lbx("X", -1) = ubx("X", -1) = DM(std::vector<double>{0, 0});
 
   // Continuity constraints and objective
   Struct G;
