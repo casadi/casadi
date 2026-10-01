@@ -251,8 +251,8 @@ namespace casadi {
       std::vector<GenericType> p_;
     };
 
-    template<typename... A> Ref operator()(const A&... a) { return Ref(*this, {key(a)...});}
-    template<typename... A> M operator()(const A&... a) const { return get({key(a)...});}
+    template<typename... A> Ref operator()(const A&... a) { return Ref(*this, keys(a...));}
+    template<typename... A> M operator()(const A&... a) const { return get(keys(a...));}
 
     /// Conversion to the flat vector
     explicit operator const M&() const { return cat();}
@@ -260,6 +260,10 @@ namespace casadi {
   private:
     template<typename T> static GenericType key(const T& a) { return a;}
     static GenericType key(const Slice& a) { return Struct::slice_str(a);}
+    // Not {key(a)...}: a single key may bind via GenericType's conversion to a vector
+    template<typename... A> static std::vector<GenericType> keys(const A&... a) {
+      return std::vector<GenericType>(std::initializer_list<GenericType>{key(a)...});
+    }
     Struct s_;
     // Stored nonzeros of each matrix, and their offset in the flat vector
     std::vector<M> leaves_;
