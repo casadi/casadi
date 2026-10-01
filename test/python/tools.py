@@ -1115,6 +1115,67 @@ class Toolstests(casadiTestCase):
     self.checkarray(J["g", "X"], ca.DM([[-1, 0, 1, 0, 0, 0], [0, -1, 0, 1, 0, 0],
       [0, 0, -1, 0, 1, 0], [0, 0, 0, -1, 0, 1]]))
 
+  def test_Struct_concat(self):
+    self.message("Struct: explicit concatenation of selections")
+    V = ca.Struct()
+    V.add("X", 2, 1, [3, 2])
+    v = ca.StructDM(V, range(V.nnz()))
+    self.checkarray(v["X", :, 0, 1], ca.DM([[1, 5, 9]]))
+    self.checkarray(v["X", ca.vertcat, :, 0, 1], ca.DM([1, 5, 9]))
+    self.checkarray(v["X", "@vertcat", :, 0, 1], ca.DM([1, 5, 9]))
+    self.checkarray(v["X", ca.blockcat, :, :, 0], ca.DM([[0, 2], [4, 6], [8, 10]]))
+    self.checkarray(v["X", ca.vertcat, :, ca.horzcat, :, 0], v["X", ca.blockcat, :, :, 0])
+    self.checkarray(v["X", 0, ca.veccat], ca.DM([0, 1, 2, 3]))
+    v["X", ca.blockcat, :, :, 0] = ca.DM([[10, 11], [12, 13], [14, 15]])
+    self.checkarray(v["X", :, :, 0], ca.DM([[10, 11, 12, 13, 14, 15]]))
+    with self.assertInException("Unknown concatenation"):
+      v["X", "@foo", :]
+    with self.assertInException("Invalid entry name"):
+      V.add("@x")
+
+  def test_Struct_view(self):
+    self.message("Struct: a view reads and writes a matrix in place")
+    s = ca.Struct(["x", "y", "z"])
+    d = ca.DM.zeros(3, 3)
+    a = ca.StructDM.view(ca.Struct.matrix(s, s), d)
+    a["x", "y"] = 2
+    d[2, 2] = 5
+    self.checkarray(d, ca.DM([[0, 2, 0], [0, 0, 0], [0, 0, 5]]))
+    self.checkarray(a["z", "z"], ca.DM(5))
+    a = ca.StructDM.view(ca.Struct.matrix(s, 2), ca.DM.zeros(3, 2))
+    a["x", 1] = 7
+    self.checkarray(a[()], ca.DM([[0, 7], [0, 0], [0, 0]]))
+    with self.assertInException("dense matrix with 9 elements"):
+      ca.StructDM.view(ca.Struct.matrix(s, s), ca.DM.zeros(2, 2))
+
+  def test_Struct_functions_in_path(self):
+    self.message("Struct: a function in a path acts on the index matrix")
+    ab = ca.Struct()
+    ab.add("a", 5, 3)
+    b = ca.StructDM(ab, 0)
+    b["a", ca.vec] = list(range(15))
+    self.checkarray(b["a"], ca.reshape(ca.DM(range(15)), 5, 3))
+    self.checkarray(b["a", lambda i: i.T], ca.reshape(ca.DM(range(15)), 5, 3).T)
+    self.assertEqual([x.shape for x in b["a", ca.horzsplit]], [(5, 1)]*3)
+
+  def test_Struct_mx_parts(self):
+    self.message("Struct: MX parts come back as assigned; symbolic values take symbols only")
+    x = ca.MX.sym("x", 2)
+    G = ca.Struct()
+    G.add("y", ca.Struct(["a", "b"]), [2])
+    g = ca.StructMX(G, 0)
+    g["y"] = ca.horzcat(ca.sin(x), ca.cos(x))
+    self.assertEqual(str(g["y", 0, "a"]), "sin(x)[0]")
+    abc = ca.MX.sym("abc", 2)
+    g["y", 0] = abc
+    self.assertTrue(ca.is_equal(g["y", 0], abc))
+    g["y", 0, "a"] = 3
+    self.assertFalse(ca.is_equal(g["y", 0], abc))
+    w = ca.StructSX.sym(ca.Struct(["a", "b"]))
+    w["a"] = ca.SX.sym("q")
+    with self.assertInException("non-symbolic"):
+      w["b"] = 2*w["a"]
+
   def test_external_transform_options(self):
     if sys.platform == 'darwin':
         print("regression, skipping")

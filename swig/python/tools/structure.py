@@ -277,7 +277,6 @@ class Structure(object):
 
   def __setitem__(self, pi, value):
     self._walk(self, _tuple(pi), [], value, "set")
-    if self._target is not None: self._target[:, :] = ca.reshape(self._v.cat(), self._target.shape)
 
   def _leaf(self, path, payload, mode):
     if mode == "index": return self._s.index(path)
@@ -336,7 +335,7 @@ class Structure(object):
     if a.is_scalar() and a.numel() != rows * cols: a = ca.DM.ones(rows, cols) * a
     if a.shape != (rows, cols): raise Exception("Expecting %s of shape (%d,%d). Got %s" % (mtype.__name__, rows, cols, a.dim()))
     s = Structure([e])
-    s._bind(getattr(ca, "Struct" + type(a).__name__)(s._s, ca.vec(a)))
+    s._bind(getattr(ca, "Struct" + type(a).__name__).view(s._s, a))
     s._target = a
     return Prefixer(s, ("t",), castmaster=True)
 

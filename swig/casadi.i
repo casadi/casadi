@@ -6686,16 +6686,33 @@ opti_metadata_modifiers(casadi::Opti)
           e = ":"
         elif isinstance(e, tuple):
           e = list(e)
+        elif callable(e):
+          cat = {"horzcat": "horzcat", "vertcat": "vertcat", "blockcat": "blockcat", "veccat": "veccat",
+                 "hcat": "horzcat", "vcat": "vertcat", "vvcat": "veccat"}.get(getattr(e, "__name__", None))
+          e = "@" + cat if cat else e
         elif not isinstance(e, (str, list)) and hasattr(e, "__index__"):
           e = e.__index__()
         r.append(e)
       return r
 
+    def _index(self, p):
+      # A function in a path acts on the index matrix of the rest of the path
+      for i, e in enumerate(p):
+        if callable(e): return e(self._index(p[:i] + p[i+1:]))
+      return self.structure().index(p)
+
     def __getitem__(self, k):
-      return self.get(self._path(k))
+      p = self._path(k)
+      if not any(callable(e) for e in p): return self.get(p)
+      r = self._index(p)
+      return [self.get_nz(i) for i in r] if isinstance(r, (list, tuple)) else self.get_nz(r)
 
     def __setitem__(self, k, v):
-      self.set(self._path(k), v)
+      p = self._path(k)
+      if any(callable(e) for e in p):
+        self.set_nz(self._index(p), v)
+      else:
+        self.set(p, v)
   %}
 }
 %extend casadi::StructValue<casadi::DM> {
@@ -6732,7 +6749,13 @@ opti_metadata_modifiers(casadi::Opti)
   %matlabcode %{
     function varargout = subsref(self,s)
       if strcmp(s(1).type,'()')
-        r = self.get(s(1).subs);
+        % Function handles such as @vertcat select a concatenation
+        [p, h] = self.path_(s(1).subs);
+        if isempty(h)
+          r = self.get(p);
+        else
+          r = self.get_nz(h(self.structure().index(p)));
+        end
         if numel(s)==1
           varargout{1} = r;
         else
@@ -6744,15 +6767,44 @@ opti_metadata_modifiers(casadi::Opti)
     end
     function self = subsasgn(self,s,v)
       if numel(s)==1 && strcmp(s.type,'()')
-        self.set(s.subs, v);
+        [p, h] = self.path_(s.subs);
+        if isempty(h)
+          self.set(p, v);
+        else
+          self.set_nz(h(self.structure().index(p)), v);
+        end
       else
         self = builtin('subsasgn',self,s,v);
+      end
+    end
+  %}
+  %matlabcode_static %{
+    function [p, h] = path_(p)
+      % Concatenation handles become path elements; another handle acts on the index matrix
+      h = [];
+      for i=numel(p):-1:1
+        if isa(p{i}, 'function_handle')
+          n = strsplit(func2str(p{i}), '.');
+          if any(strcmp(n{end}, {'horzcat', 'vertcat', 'blockcat', 'veccat'}))
+            p{i} = ['@' n{end}];
+          else
+            assert(isempty(h), 'At most one function in a path, besides concatenations.');
+            h = p{i};
+            p(i) = [];
+          end
+        end
       end
     end
   %}
 }
 #endif // SWIGMATLAB
 
+#ifdef SWIGPYTHON
+// A view keeps its matrix alive
+%feature("pythonappend") casadi::StructValue<casadi::DM>::view %{ val._target = args[1] %}
+%feature("pythonappend") casadi::StructValue<casadi::SX>::view %{ val._target = args[1] %}
+%feature("pythonappend") casadi::StructValue<casadi::MX>::view %{ val._target = args[1] %}
+#endif // SWIGPYTHON
 %include <casadi/core/struct.hpp>
 %template(StructDM) casadi::StructValue<casadi::DM>;
 %template(StructSX) casadi::StructValue<casadi::SX>;

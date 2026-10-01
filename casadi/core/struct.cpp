@@ -28,6 +28,7 @@
 #include "mx_node.hpp"
 #include <algorithm>
 #include <set>
+#include <type_traits>
 
 namespace casadi {
 
@@ -74,6 +75,21 @@ namespace {
         && s.stop==std::numeric_limits<casadi_int>::max() && s.step==1;
     }
 
+    // Concatenation requested for the next multi-selection
+    enum Cat {CAT_DEFAULT, CAT_HORZ, CAT_VERT, CAT_VEC, CAT_BLOCK};
+    Cat cat_directive(const GenericType& key) {
+      if (!key.is_string() || key.as_string().empty() || key.as_string()[0]!='@') {
+        return CAT_DEFAULT;
+      }
+      const std::string& d = key.as_string();
+      if (d=="@horzcat") return CAT_HORZ;
+      if (d=="@vertcat") return CAT_VERT;
+      if (d=="@veccat") return CAT_VEC;
+      if (d=="@blockcat") return CAT_BLOCK;
+      casadi_error("Unknown concatenation '" + d + "', expected @horzcat, @vertcat, @veccat "
+        "or @blockcat.");
+    }
+
     // Positions selected by a path element along a dimension of length n
     bool selection(const GenericType& key, casadi_int n, bool ind1,
         std::vector<casadi_int>& sel) {
@@ -98,6 +114,14 @@ namespace {
       std::vector<T> ret = {T(0, 1)};
       for (auto&& e : v) ret.push_back(T::sparsity_cast(e, Sparsity::dense(e.nnz(), 1)));
       return vertcat(ret);
+    }
+
+    // Concatenate the parts of a multi-selection
+    template<class T>
+    T concat(const std::vector<T>& v, int cat, bool names) {
+      if (cat==CAT_HORZ || (cat==CAT_DEFAULT && !names)) return horzcat(v);
+      if (cat==CAT_VERT || cat==CAT_BLOCK) return vertcat(v);
+      return veccat_nz(v);
     }
 
     // Readable path, 0-based like labels and symbol names
@@ -187,7 +211,7 @@ namespace {
   void Struct::add(const std::string& name, const Struct& s,
       const std::vector<casadi_int>& repeat) {
     casadi_assert(!is_leaf_, "Cannot add entries to a matrix.");
-    casadi_assert(!name.empty() && name.find(':')==std::string::npos,
+    casadi_assert(!name.empty() && name[0]!='@' && name.find(':')==std::string::npos,
       "Invalid entry name '" + name + "'.");
     casadi_assert(find(name)<0, "Duplicate entry '" + name + "'.");
     Entry e;
@@ -277,7 +301,7 @@ namespace {
   template<class T>
   T Struct::get(const std::vector<GenericType>& path, bool ind1, const Leaf<T>& leaf) const {
     try {
-      return get(0, path, 0, ind1, leaf);
+      return get(0, path, 0, ind1, leaf, CAT_DEFAULT);
     } catch (std::exception& e) {
       casadi_error("Cannot index " + get_str() + " with path " + path_str(path, ind1) + ":\n"
         + e.what());
@@ -286,8 +310,14 @@ namespace {
 
   template<class T>
   T Struct::get(casadi_int offset, const std::vector<GenericType>& p, casadi_int k,
-      bool ind1, const Leaf<T>& leaf) const {
-    if (is_leaf_) return get_leaf(offset, p, k, ind1, leaf);
+      bool ind1, const Leaf<T>& leaf, int cat) const {
+    if (k<p.size() && cat_directive(p[k])!=CAT_DEFAULT) {
+      return get(offset, p, k+1, ind1, leaf, cat_directive(p[k]));
+    }
+    if (is_leaf_) {
+      casadi_assert(cat==CAT_DEFAULT, "Concatenation without a selection to concatenate.");
+      return get_leaf(offset, p, k, ind1, leaf);
+    }
     std::vector<std::string> sel;
     if (k==p.size()) {
       std::vector<T> ret;
@@ -300,7 +330,7 @@ namespace {
       casadi_assert(e>=0, "No entry '" + p[k].as_string() + "', expected one of "
         + str(names()) + ".");
       std::vector<casadi_int> rep;
-      return get(e, offset, p, k+1, rep, ind1, leaf);
+      return get(e, offset, p, k+1, rep, ind1, leaf, cat);
     } else if (p[k].is_string_vector()) {
       sel = p[k].as_string_vector();
     } else if (is_slice(p[k]) && is_all(parse_slice(p[k].as_string()))) {
@@ -312,18 +342,23 @@ namespace {
     std::vector<GenericType> q = p;
     for (auto&& n : sel) {
       q[k] = n;
-      ret.push_back(get(offset, q, k, ind1, leaf));
+      ret.push_back(get(offset, q, k, ind1, leaf, cat==CAT_BLOCK ? CAT_HORZ : CAT_DEFAULT));
     }
-    return veccat_nz(ret);
+    return concat(ret, cat, true);
   }
 
   template<class T>
   T Struct::get(casadi_int e, casadi_int offset, const std::vector<GenericType>& p,
-      casadi_int k, std::vector<casadi_int>& rep, bool ind1, const Leaf<T>& leaf) const {
+      casadi_int k, std::vector<casadi_int>& rep, bool ind1, const Leaf<T>& leaf,
+      int cat) const {
     const Entry& en = entries_[e];
+    if (k<p.size() && cat_directive(p[k])!=CAT_DEFAULT) {
+      return get(e, offset, p, k+1, rep, ind1, leaf, cat_directive(p[k]));
+    }
     if (rep.size()<en.repeat.size()) {
       // Repetitions not addressed are all selected
       std::vector<casadi_int> sel;
+      bool single = k<p.size() && is_index(p[k]);
       if (k<p.size() && selection(p[k], en.repeat[rep.size()], ind1, sel)) {
         k++;
       } else {
@@ -332,15 +367,16 @@ namespace {
       std::vector<T> ret;
       for (casadi_int i : sel) {
         rep.push_back(i);
-        ret.push_back(get(e, offset, p, k, rep, ind1, leaf));
+        ret.push_back(get(e, offset, p, k, rep, ind1, leaf,
+          single ? cat : cat==CAT_BLOCK ? CAT_HORZ : CAT_DEFAULT));
         rep.pop_back();
       }
-      return horzcat(ret);
+      return single ? ret.at(0) : concat(ret, cat, false);
     }
     offset += en.start.at(rep.empty() ? 0 : rep[0]);
     casadi_int lin = 0;
     for (casadi_int d=1; d<rep.size(); ++d) lin = lin*en.repeat[d] + rep[d];
-    return en.s->get(offset + lin*en.s->nnz(), p, k, ind1, leaf);
+    return en.s->get(offset + lin*en.s->nnz(), p, k, ind1, leaf, cat);
   }
 
   template<class T>
@@ -491,7 +527,8 @@ namespace {
   }
 
   template<class M>
-  StructValue<M>::StructValue(const Struct& s, const M& data) : s_(s), cached_(false) {
+  StructValue<M>::StructValue(const Struct& s, const M& data)
+      : s_(s), cached_(false), target_(nullptr), symbolic_(false) {
     M flat;
     if (data.is_scalar()) {
       flat = M(Sparsity::dense(s.nnz(), 1), densify(data));
@@ -518,6 +555,17 @@ namespace {
       }
       ret.leaves_[k++] = M::sym(name, sp);
     });
+    ret.symbolic_ = true;
+    return ret;
+  }
+
+  template<class M>
+  StructValue<M> StructValue<M>::view(const Struct& s, M* target) {
+    casadi_assert(target!=nullptr, "No matrix to view.");
+    casadi_assert(target->is_dense() && target->numel()==s.nnz(),
+      "Expected a dense matrix with " + str(s.nnz()) + " elements, got " + target->dim() + ".");
+    StructValue<M> ret(s, 0);
+    ret.target_ = target;
     return ret;
   }
 
@@ -527,17 +575,44 @@ namespace {
   }
 
   template<class M>
+  M StructValue<M>::leaf_value(casadi_int offset, const Sparsity& sp) const {
+    if (sp.nnz()==0) return M::zeros(sp);
+    if (target_) return nz_select(*target_, sp, range(offset, offset+sp.nnz()));
+    return leaves_.at(leaf(offset));
+  }
+
+  template<class M>
   const M& StructValue<M>::cat() const {
-    if (!cached_) cat_ = veccat_nz(leaves_);
-    cached_ = true;
+    if (target_) {
+      cat_ = vec(*target_);
+    } else if (!cached_) {
+      cat_ = veccat_nz(leaves_);
+      cached_ = true;
+    }
     return cat_;
   }
 
   template<class M>
   M StructValue<M>::get(const std::vector<GenericType>& path, bool ind1) const {
+    if (!assigned_.empty()) {
+      // A part assigned as a whole comes back as it was assigned
+      IM ind = s_.get<IM>(path, ind1, nz_range);
+      if (ind.nnz()>0) {
+        auto it = assigned_.find(ind.nonzeros().front());
+        if (it!=assigned_.end() && it->second.first.sparsity()==ind.sparsity()
+            && it->second.first.nonzeros()==ind.nonzeros()) return it->second.second;
+      }
+    }
     return s_.get<M>(path, ind1, [this](casadi_int offset, const Sparsity& sp) {
-      return sp.nnz()==0 ? M::zeros(sp) : leaves_.at(leaf(offset));
+      return leaf_value(offset, sp);
     });
+  }
+
+  template<class M>
+  M StructValue<M>::get_nz(const IM& ind, bool ind1) const {
+    std::vector<casadi_int> nz = ind.nonzeros();
+    for (casadi_int& i : nz) i = canonical(i, s_.nnz(), ind1);
+    return nz_select(cat(), ind.sparsity(), nz);
   }
 
   template<class M>
@@ -574,28 +649,51 @@ namespace {
         "sparsity pattern of " + what + ".");
       v = p;
     }
-    v = M::sparsity_cast(v, Sparsity::dense(v.nnz(), 1));
-    // Positions and local nonzeros per matrix; symmetric matrices appear twice: last one wins
+    // Nonzero k of v goes to flat index nz[k]; symmetric matrices appear twice: last one wins
     const std::vector<casadi_int>& nz = ind.nonzeros();
-    std::map<casadi_int, std::pair<std::vector<casadi_int>, std::vector<casadi_int> > > parts;
+    std::vector<casadi_int> pos, flat;
     std::set<casadi_int> seen;
     for (casadi_int k=nz.size()-1; k>=0; --k) {
       if (!seen.insert(nz[k]).second) continue;
-      casadi_int l = std::upper_bound(offset_.begin(), offset_.end(), nz[k]) - offset_.begin() - 1;
-      parts[l].first.push_back(k);
-      parts[l].second.push_back(nz[k] - offset_[l]);
+      pos.push_back(k);
+      flat.push_back(nz[k]);
     }
+    if (target_) {
+      target_->set_nz(nz_select(v, Sparsity::dense(pos.size(), 1), pos), false, IM(flat));
+      return;
+    }
+    // Positions and local nonzeros per matrix
+    std::map<casadi_int, std::pair<std::vector<casadi_int>, std::vector<casadi_int> > > parts;
+    for (casadi_int k=0; k<pos.size(); ++k) {
+      casadi_int l = std::upper_bound(offset_.begin(), offset_.end(), flat[k])
+        - offset_.begin() - 1;
+      parts[l].first.push_back(pos[k]);
+      parts[l].second.push_back(flat[k] - offset_[l]);
+    }
+    bool whole = seen.size()==nz.size();
     for (auto&& e : parts) {
-      std::vector<casadi_int>& pos = e.second.first;
+      std::vector<casadi_int>& p = e.second.first;
       std::vector<casadi_int>& loc = e.second.second;
-      std::reverse(pos.begin(), pos.end());
+      std::reverse(p.begin(), p.end());
       std::reverse(loc.begin(), loc.end());
       M& l = leaves_[e.first];
       if (loc==range(l.nnz())) {
-        l = nz_select(v, l.sparsity(), pos);
+        l = nz_select(v, l.sparsity(), p);
       } else {
-        l.set_nz(nz_select(v, Sparsity::dense(pos.size(), 1), pos), false, IM(loc));
+        l.set_nz(nz_select(v, Sparsity::dense(p.size(), 1), p), false, IM(loc));
+        whole = false;
       }
+      casadi_assert(!symbolic_ || l.is_valid_input(), "Cannot assign a non-symbolic value "
+        "to " + what + " of a symbolic structure; wrap expressions in a new value instead.");
+    }
+    // Forget earlier whole assignments that overlap
+    for (auto it = assigned_.begin(); it!=assigned_.end();) {
+      bool overlap = false;
+      for (casadi_int i : it->second.first.nonzeros()) overlap = overlap || seen.count(i);
+      it = overlap ? assigned_.erase(it) : std::next(it);
+    }
+    if (whole && !nz.empty() && std::is_same<M, MX>::value) {
+      assigned_[nz.front()] = std::make_pair(ind, v);
     }
     cached_ = false;
   }

@@ -32,6 +32,7 @@
 #include "mx.hpp"
 #include "generic_type.hpp"
 #include <functional>
+#include <map>
 #include <memory>
 
 namespace casadi {
@@ -50,6 +51,8 @@ namespace casadi {
       - several repetitions are concatenated horizontally
       - several names are concatenated vertically, as columns
       Omitted repetition indices select all repetitions.
+      "@horzcat", "@vertcat", "@veccat" or "@blockcat" before a selection overrides how it is
+      concatenated; "@blockcat" stacks it vertically and the next one horizontally.
 
       \author Joris Gillis
       \date 2026
@@ -165,10 +168,10 @@ namespace casadi {
     casadi_int find(const std::string& name) const;
     template<class T>
     T get(casadi_int offset, const std::vector<GenericType>& p, casadi_int k, bool ind1,
-      const Leaf<T>& leaf) const;
+      const Leaf<T>& leaf, int cat) const;
     template<class T>
     T get(casadi_int e, casadi_int offset, const std::vector<GenericType>& p, casadi_int k,
-      std::vector<casadi_int>& rep, bool ind1, const Leaf<T>& leaf) const;
+      std::vector<casadi_int>& rep, bool ind1, const Leaf<T>& leaf, int cat) const;
     template<class T>
     T get_leaf(casadi_int offset, const std::vector<GenericType>& p, casadi_int k, bool ind1,
       const Leaf<T>& leaf) const;
@@ -193,11 +196,16 @@ namespace casadi {
     /// Wrap a flat vector, or fill with a scalar
     StructValue(const Struct& s, const M& data);
 
-    /// Symbolic, one primitive per matrix, named by prefix and path
+    /// Symbolic, one primitive per matrix, named by prefix and path; only accepts symbols
     static StructValue sym(const Struct& s, const std::string& prefix="");
 
+#if !defined(SWIG) || defined(SWIGPYTHON)
+    /// Read and write a dense matrix in place, which must outlive the result
+    static StructValue view(const Struct& s, M* target);
+#endif
+
     /// Layout
-    const Struct& structure() const { return s_;}
+    Struct structure() const { return s_;}
 
     /// Flat vector
     const M& cat() const;
@@ -211,6 +219,9 @@ namespace casadi {
         and vectors transposed as needed.
     */
     void set(const std::vector<GenericType>& path, const M& value, bool ind1=SWIG_IND1);
+
+    /// Get flat vector entries, shaped like ind
+    M get_nz(const Matrix<casadi_int>& ind, bool ind1=SWIG_IND1) const;
 
     /// Set flat vector entries, as for set
     void set_nz(const Matrix<casadi_int>& ind, const M& value, bool ind1=SWIG_IND1);
@@ -255,7 +266,14 @@ namespace casadi {
     std::vector<casadi_int> offset_;
     mutable M cat_;
     mutable bool cached_;
+    // Viewed matrix, if any
+    M* target_;
+    // Only symbols may be assigned
+    bool symbolic_;
+    // Values assigned to whole matrices at once, by first flat index
+    std::map<casadi_int, std::pair<IM, M> > assigned_;
     casadi_int leaf(casadi_int offset) const;
+    M leaf_value(casadi_int offset, const Sparsity& sp) const;
     void assign(const IM& ind, const M& value, const std::string& what);
 #endif // SWIG
   };
