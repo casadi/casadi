@@ -6672,6 +6672,92 @@ opti_metadata_modifiers(casadi::Opti)
 
 #endif
 
+#ifdef SWIGPYTHON
+%extend casadi::StructValue {
+  %pythoncode %{
+    @staticmethod
+    def _path(k):
+      r = []
+      for e in (k if isinstance(k, tuple) else (k,)):
+        if isinstance(e, slice):
+          e = ("" if e.start in (None, 0) else str(int(e.start))) + ":" + ("" if e.stop is None else str(int(e.stop))) \
+            + ("" if e.step in (None, 1) else ":" + str(int(e.step)))
+        elif e is Ellipsis:
+          e = ":"
+        elif isinstance(e, tuple):
+          e = list(e)
+        elif not isinstance(e, (str, list)) and hasattr(e, "__index__"):
+          e = e.__index__()
+        r.append(e)
+      return r
+
+    def __getitem__(self, k):
+      return self.get(self._path(k))
+
+    def __setitem__(self, k, v):
+      self.set(self._path(k), v)
+  %}
+}
+%extend casadi::StructValue<casadi::DM> {
+  %pythoncode %{
+    def __DM__(self):
+      return self.cat()
+  %}
+  %stub_method0(__DM__, DM)
+  %stub_method(__getitem__, DM, k: Any)
+  %stub_method(__setitem__, None, k: Any, v: Any)
+}
+%extend casadi::StructValue<casadi::SX> {
+  %pythoncode %{
+    def __SX__(self):
+      return self.cat()
+  %}
+  %stub_method0(__SX__, SX)
+  %stub_method(__getitem__, SX, k: Any)
+  %stub_method(__setitem__, None, k: Any, v: Any)
+}
+%extend casadi::StructValue<casadi::MX> {
+  %pythoncode %{
+    def __MX__(self):
+      return self.cat()
+  %}
+  %stub_method0(__MX__, MX)
+  %stub_method(__getitem__, MX, k: Any)
+  %stub_method(__setitem__, None, k: Any, v: Any)
+}
+#endif // SWIGPYTHON
+
+#ifdef SWIGMATLAB
+%extend casadi::StructValue {
+  %matlabcode %{
+    function varargout = subsref(self,s)
+      if strcmp(s(1).type,'()')
+        r = self.get(s(1).subs);
+        if numel(s)==1
+          varargout{1} = r;
+        else
+          [varargout{1:nargout}] = subsref(r, s(2:end));
+        end
+      else
+        [varargout{1:nargout}] = builtin('subsref',self,s);
+      end
+    end
+    function self = subsasgn(self,s,v)
+      if numel(s)==1 && strcmp(s.type,'()')
+        self.set(s.subs, v);
+      else
+        self = builtin('subsasgn',self,s,v);
+      end
+    end
+  %}
+}
+#endif // SWIGMATLAB
+
+%include <casadi/core/struct.hpp>
+%template(StructDM) casadi::StructValue<casadi::DM>;
+%template(StructSX) casadi::StructValue<casadi::SX>;
+%template(StructMX) casadi::StructValue<casadi::MX>;
+
 %include <casadi/core/resource.hpp>
 
 // Cleanup for dependent modules

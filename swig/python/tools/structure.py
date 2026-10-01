@@ -21,1443 +21,516 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
+"""Python power-indexing on top of casadi.Struct: nested lists, dicts, callables, prefixes."""
+import pickle
+from typing import Any
 import casadi as ca
-
-
 import numpy as np
-import operator
-import sys
-from typing import Any  # type-comments reference Any
 
-import builtins
-import collections
-
-try:
-  callable = collections.Callable
-except:
-  callable = collections.abc.Callable
-
-def is_integer(a):
-  return isinstance(a,int) or isinstance(a,np.integer)
-
-def is_string(a):
-  return isinstance(a,str)
-
-def isIterable(a):
-  return isinstance(a,list) or isinstance(a,tuple)
-
-# StructIndex :tuple/list of strings
-# canonicalIndex : tuple/list of string or numbers
-# powerIndex: tuple/list of string, numbers, lists, slices, dicts
-
-# flatIndex
-
-# Primitive helpers
-def lpack(L): return [[x] for x in L]
-
-def combine(*args):
-  if len(args)==0:
-    return [[]]
-  else:
-    return [a + b for a in args[0] for b in combine(*args[1:])]
-
-def listindices(dims,nest=False):
-  if len(dims)==0:
-    if nest:
-      return [[[]]]
-    else:
-      return [[]]
-  else:
-    tail = listindices(dims[1:])
-    if nest:
-      return [combine([[i]],tail) for i in range(dims[0])]
-    else:
-      return combine(lpack(list(range(dims[0]))),tail)
-
-def intersperseIt(*args):
-  iterators = list(map(iter,args))
-  active = [True]*len(args)
-  i = 0
-  while any(active):
-    try:
-      yield next(iterators[i])
-    except:
-      active[i] = False
-    i = (i + 1) % len(args)
-
-def intersperse(*args):
-   return list(intersperseIt(*args))
-
-def canonicalIndexAncestors(ind):
-  if len(ind)==0: return []
-  return [ind] + canonicalIndexAncestors(ind[:-(list(map(is_string,ind[::-1])).index(True)+1)])
-
-def canonical(ind,s):
-  if ind < 0:
-    return ind + s
-  else:
-    return ind
-
-def vec(e):
-  if any(isinstance(i,list) for i in e):
-    return builtins.sum(list(map(vec,e)),[])
-  else:
-    return e
+def _is_int(a):
+  return isinstance(a, (int, np.integer)) and not isinstance(a, bool)
 
 
-def correct_vector_indexing(x, i):
-  return ca.reshape(x[i], i.shape)
+def _tuple(k):
+  return k if isinstance(k, tuple) else (k,)
 
-def nzcolumn(x):
-  # x.nz[:] inherits the orientation of x; force a column for concatenation
-  return ca.vec(x.nz[:])
 
-def applyCallableIndex(p,r):
-  # Apply a callable powerIndex entry to the sub-result it indexes
-  try:
-    return p(r)
-  except NotImplementedError:
-    if not isinstance(r,list): raise
-    return p(*r) # casadi's concatenations (vertcat, ...) are variadic, not list-taking
-
-# Decoraters
-
-def properGetitem(f):
-  """
-    This decorator modifies a __getitem__/__setitem__ method such that it will always receive a tuple
-  """
-  def proper(self,mbt,*args):
-    if not isinstance(mbt,tuple):
-      mbt = (mbt,)
-    return f(self,mbt,*args)
-  return proper
-
-# Enhanced standard classes
-class SafeDict(dict):
-  def __getitem__(self,k):
-    if k not in self:
-      raise Exception("Unknown keyword '%s'. Available entries: %s" % (k,str(list(self.keys()))))
-    return dict.__getitem__(self,k)
-
-# Placeholder classes and instances
 class Repeater:
-  def __init__(self,e): self.e = e
+  def __init__(self, e):
+    self.e = e
+
 
 def repeated(e):
-  """
-    From the arguemnt, constructs something that acts like a 'list' with the argument repeated the 'correct' number of times
-
-    s = struct_symSX([entry("x",repeat=6)])
-    s["x"] = repeated(12)
-
-  """
+  """Payload used for every element of a list-valued power index, e.g. s["x",:] = repeated(12)"""
   return Repeater(e)
 
+
 class NestedDictLiteral:
-  """
-    NestedDictLiteral will cause all dictionaries to become explicit recursively
-  """
+  """Power index that expands every level into dicts and lists"""
+
 
 nesteddict = NestedDictLiteral()
 
-# Casadi-independent Structure framework
 
-def payloadUnpack(payload,i):
-  if is_string(i):
-    raise Exception("Got string %s where number expected."% i)
-  if isIterable(payload):
-    if i>=len(payload):
-      raise Exception("Rhs out of range. Got list index %s but rhs list is only of length %s." % (i,len(payload)))
+def _unpack(payload, i):
+  if isinstance(payload, (list, tuple)):
+    if i >= len(payload):
+      raise Exception("Rhs out of range. Got list index %s but rhs list is only of length %s." % (i, len(payload)))
     return payload[i]
-  elif isinstance(payload,Repeater):
-    return payload.e
-  else:
-    return payload
+  return payload.e if isinstance(payload, Repeater) else payload
+
+
+def _apply(p, r):
+  try:
+    return p(r)
+  except NotImplementedError:
+    if not isinstance(r, list): raise
+    return p(*r)  # casadi's concatenations are variadic
+
+
+class Delegater:
+  """Index into a matrix dimension labeled by a structure, e.g. x["P", index["x"], :]"""
+  def __init__(self, arg, name):
+    self.arg, self.name = arg, name
+
+  def __str__(self):
+    return "%s[%s]" % (self.name, str(self.arg))
+
+  __repr__ = __str__
+
+  def __call__(self, s):
+    if not isinstance(s, Structure):
+      raise Exception("Cannot use delayed index with a integer shapestruct argument.")
+    return s.f[self.arg]
+
+
+class DelegaterConstructor:
+  def __init__(self, name):
+    self.name = name
+
+  def __getitem__(self, arg):
+    return Delegater(arg, self.name)
+
+
+index = DelegaterConstructor("index")
+indexf = DelegaterConstructor("indexf")
+
+
+def _sparsity(shape):
+  if _is_int(shape): return ca.Sparsity.dense(int(shape), 1)
+  if isinstance(shape, (list, tuple)) and len(shape) in (1, 2): return ca.Sparsity.dense(*shape)
+  if isinstance(shape, ca.Sparsity): return shape
+  raise Exception("The 'shape' argument, if present, must be an integer, a tuple of 1 or 2 integers, or a sparsity pattern. Got %s " % str(shape))
+
 
 class StructEntry:
-  def __init__(self,name,struct=None,data=None,dims=[]):
-    self.name = name
-    self.dims = dims
-    self.struct = struct
+  keys = ['repeat', 'shape', 'sym', 'expr', 'struct', 'shapestruct', 'type']
+  conflicts = [('shape', ['struct']), ('struct', ['shape', 'shapestruct']), ('shapestruct', ['struct']),
+               ('sym', ['shape', 'repeat', 'expr']), ('expr', ['shape', 'repeat', 'sym'])]
 
-  def __str__(self,compact=False):
-     s=''
-     if len(self.dims)>=1:
-       s+= "repeated(%s): " % str(self.dims)
-     if self.isPrimitive():
-       s+=self.primitiveString()
-     else:
-       s+=self.struct.__str__(compact=True)
-     return s
-
-  __repr__ = __str__
-
-  def primitiveString(self):
-    return "*"
-
-  def isPrimitive(self):
-    return self.struct is None
-
-  def traverseCanonicalIndex(self,nest=False,limit=1000):
-    children = [[]] if (self.struct is None or limit==0) else self.struct.traverseCanonicalIndex(limit=limit-1)
-    # A sub-structure without entries has no children, but must stay addressable (as a zero-size leaf)
-    if len(children)==0: children = [[]]
-    li = listindices(self.dims,nest)
-    n = [[self.name]]
-    if nest:
-      return [combine(n,i,children) for i in li]
-    else:
-      return combine(n,li,children)
-
-  def getStructEntryByStructIndex(self,structIndex):
-    return self.struct.getStructEntryByStructIndex(structIndex)
-
-  def traverseByPowerIndex(self,powerIndex,dims=None,canonicalIndex=(),dispatcher=None,payload=None):
-    try:
-      if dims is None: dims = self.dims
-      # At the end of powerIndex, pending : are added automatically if dims is not exhausted
-      if len(powerIndex)==0:
-        if len(dims)>0:
-          return self.traverseByPowerIndex(
-                   [slice(None) for i in dims],
-                   dims=dims,
-                   canonicalIndex=canonicalIndex,
-                   dispatcher=dispatcher,
-                   payload=payload
-                 )
-        else:
-          return dispatcher(payload,canonicalIndex,entry=self)
-
-      if len(dims)==0:
-        if self.isPrimitive(): # Pass on remainder of powerIndex to dispatcher
-          return dispatcher(payload,canonicalIndex,extraIndex=tuple(powerIndex),entry=self)
-        else:
-          return self.struct.traverseByPowerIndex(
-                   powerIndex,
-                   canonicalIndex=canonicalIndex,
-                   dispatcher=dispatcher,
-                   payload=payload
-                 )
+  def __init__(self, *args, **kwargs):
+    if len(args) != 1:
+      raise Exception("Expected the entry name as only positional argument, got %s" % str(args))
+    self.name, self.kwargs = args[0], kwargs
+    for k in kwargs:
+      if k not in self.keys: raise Exception("Unknown keyword argument '%s'. Please use one of %s." % (k, str(self.keys)))
+    for k, fk in self.conflicts:
+      for f in fk:
+        if k in kwargs and f in kwargs:
+          raise Exception("You supplied keyword argument '%s', but it cannot be combined with keyword argument '%s'." % (k, f))
+    self.repeat = kwargs.get("repeat", [])
+    if not isinstance(self.repeat, list): self.repeat = [self.repeat]
+    if not all(_is_int(x) for x in self.repeat):
+      raise Exception("The 'repeat' argument, if present, must be a list of integers, but got %s" % str(self.repeat))
+    self.repeat = [int(x) for x in self.repeat]
+    self.struct, self.sym, self.expr = kwargs.get("struct"), kwargs.get("sym"), kwargs.get("expr")
+    sp = _sparsity(kwargs.get("shape", 1))
+    self.shapestruct = kwargs.get("shapestruct")
+    if self.shapestruct is not None:
+      ss = self.shapestruct if isinstance(self.shapestruct, tuple) else (self.shapestruct,)
+      if not 0 < len(ss) <= 2 or not all(isinstance(e, Structure) or _is_int(e) for e in ss):
+        raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of structures or numbers")
+      self.shapestruct = ss + (1,) * (2 - len(ss))
+    if self.sym is not None:
+      if isinstance(self.sym, Structure):
+        self.struct, self.sym = self.sym, self.sym.cat
+      elif not (isinstance(self.sym, ca.SX) and self.sym.is_valid_input()):
+        raise Exception("The 'sym' argument must be a purely symbolic SX or a structured symbolic. Got %s instead." % str(self.sym))
+      sp = self.sym.sparsity()
+    if self.expr is not None:
+      e, self.repeat = self.expr, []
+      while isinstance(e, list):
+        self.repeat.append(len(e))
+        e = e[0] if e else None
+      if e is None:
+        sp = ca.Sparsity(0, 0)
+      elif hasattr(e, "sparsity"):
+        sp = e.sparsity()
       else:
-        p = powerIndex[0]
-        s = dims[0]
-        if isinstance(p,slice): # Expand slice
-          p = list(range(*p.indices(s)))
-        if is_integer(p):
-          return self.traverseByPowerIndex(
-                   powerIndex[1:],
-                   dims=dims[1:],
-                   canonicalIndex=canonicalIndex+(canonical(p,s),),
-                   dispatcher=dispatcher,
-                   payload=payload
-                 )
-        elif isinstance(p,list):
-          return [
-                    self.traverseByPowerIndex(
-                      powerIndex[1:],
-                      dims=dims[1:],
-                      canonicalIndex=canonicalIndex+(canonical(i,s),),
-                      dispatcher=dispatcher,
-                      payload = payloadUnpack(payload,i)
-                    )
-                 for i in p]
-        elif isinstance(p,dict):
-          raise Exception("powerIndex entry {} cannot be used in list context.")
-        elif isinstance(p,set):
-          raise Exception("""powerIndex entry {"foo","bar"} cannot be used in list context.""")
-        elif isinstance(p,NestedDictLiteral):
-          return [
-                    self.traverseByPowerIndex(
-                      [p],
-                      dims=dims[1:],
-                      canonicalIndex=canonicalIndex+(canonical(i,s),),
-                      dispatcher=dispatcher,
-                      payload = payloadUnpack(payload,i)
-                    )
-                 for i in range(s)]
-        elif isinstance(p, callable):
-          r = applyCallableIndex(p,self.traverseByPowerIndex(
-                powerIndex[1:],
-                dims=dims,
-                canonicalIndex=canonicalIndex,
-                dispatcher=dispatcher.callableInner(),
-                payload=payload
-              ))
-          return dispatcher.callableOuter(payload,canonicalIndex,extraIndex=None,entry=None,inner=r)
-        else:
-          raise Exception("I don't know what to do with this: %s" % str(p))
-    except Exception as e:
-      raise Exception("Error occured in entry context with powerIndex %s, at canonicalIndex %s" % (str(powerIndex),str(canonicalIndex))) from e
+        raise Exception("The 'expr' argument must be a matrix expression or nested list of matrix expressions. Got %s instead." % str(e))
+    self.type = kwargs.get("type")
+    if self.type not in (None, 'symm'):
+      raise Exception("You supplied a type argument '%s' but it is not recognised. Use one of ['symm']" % str(self.type))
+    symm = self.type == 'symm'
+    if symm and sp.size1() != sp.size2():
+      raise Exception("You supplied a type 'symm', but matrix is not square. Got %s." % sp.dim())
+    if self.struct is not None:
+      self.content = self.struct._s
+    elif self.shapestruct is not None:
+      labels = [e._s if isinstance(e, Structure) else ca.Struct.leaf(ca.Sparsity.dense(int(e), 1)) for e in self.shapestruct]
+      self.content = ca.Struct.matrix(labels[0], labels[1], symm)
+    else:
+      self.content = ca.Struct.leaf(sp, symm)
+
+  def __reduce__(self):
+    return (_entry, (self.name, self.kwargs))
+
+
+def _entry(name, kwargs):
+  return StructEntry(name, **kwargs)
+
+
+def entry(*args, **kwargs):
+  if len(args) == 1 and not kwargs and isinstance(args[0], StructEntry): return args[0]
+  return StructEntry(*args, **kwargs)
+
 
 class Structure(object):
-  def __init__(self,entries,order=None):
-    self.entries = entries
+  """Layout of a flat vector, optionally holding data: power indexing with s[...]"""
 
-    self.order = [e.name for e in self.entries] if order is None else order
-    self.keyslist = builtins.sum([ list(i) if isinstance(i,tuple) else list([i]) for i in self.order],[])
+  description = "Generic Structured object"
 
-    self.dict = SafeDict([(e.name,e) for e in self.entries])
+  def __init__(self, arg, order=None):
+    self._v, self._target, self._args = None, None, (arg, order)
+    if isinstance(arg, Structure):
+      self._s, self._entries, self._declared = arg._s, arg._entries, []
+      return
+    if not isinstance(arg, list):
+      raise Exception("Expecting list of entries, with possible tuples for grouping, but got %s" % str(arg))
+    entries, groups = [], []
+    for e in arg:
+      es = [entry(x) for x in (e if isinstance(e, tuple) else (e,))]
+      entries += es
+      groups.append(tuple(x.name for x in es) if isinstance(e, tuple) else es[0].name)
+    names = [e.name for e in entries]
+    duplicates = sorted(set(n for n in names if names.count(n) > 1))
+    if duplicates: raise Exception("Your list of entries contains duplicates: %s" % str(duplicates))
+    if order is not None:
+      if any(isinstance(g, tuple) for g in groups):
+        raise Exception("You supplied an order by using tuple syntax on entries, but you overwrite it with the 'order' keyword. Use one or the other, not both.")
+      groups = order
+    self._entries, self._declared, self._s = dict(zip(names, entries)), entries, ca.Struct()
+    for g in groups + [n for n in names if n not in sum([list(_tuple(g)) for g in groups], [])]:
+      for n in _tuple(g):
+        if n not in self._entries: raise Exception("Order '%s' is invalid." % n)
+        self._s.add(n, self._entries[n].content, self._entries[n].repeat)
+      if isinstance(g, tuple) and len(g) > 1: self._s.interleave(list(g))
 
-    for e in self.order:
-      if is_string(e):
-        if e not in self.dict:
-          raise Exception("Order '%s' is invalid." % e)
-      elif isinstance(e,tuple):
-        for ee in e:
-          if ee not in self.dict:
-            raise Exception("Order '%s' is invalid." % ee)
+  def _bind(self, v):
+    self._v, self._mtype = v, type(v.cat())
+    return self
+
+  def __DM__(self) -> Any:
+    return _cast(self.cat, ca.DM) if self._v else None
+
+  def __SX__(self) -> Any:
+    return _cast(self.cat, ca.SX) if self._v else None
+
+  def __MX__(self) -> Any:
+    return _cast(self.cat, ca.MX) if self._v else None
+
+  def _entry(self, name):
+    if name not in self._entries:
+      raise Exception("Unknown keyword '%s'. Available entries: %s" % (name, str(self.keys())))
+    return self._entries[name]
+
+  struct = property(lambda self: self)
+  size = property(lambda self: self._s.nnz())
+  shape = property(lambda self: (self.size, 1))
+  cat = property(lambda self: self._v.cat() if self._target is None else self._target)
+  prefix = property(lambda self: PrefixConstructor(self))
+  i = property(lambda self: _IndexGetter(self, False))
+  f = property(lambda self: _IndexGetter(self, True))
+  map = property(lambda self: _IndexMap(self))
+
+  def sparsity(self):
+    return ca.Sparsity.dense(self.size, 1)
 
   def keys(self):
-    return self.keyslist
+    return list(self._s.names())
 
-  def __str__(self,compact=False):
-     s=''
-     if compact:
-       s+= "{" + ",".join(k + ": " +  v.__str__(compact=True) for k,v in list(self.dict.items())) + "}"
-     else:
-       s+= "Structure holding %d entries.\n" % len(self.dict)
-       s+="  Order: %s\n" % str(self.order)
-       for k,v in list(self.dict.items()):
-          s+= "  " + k + " = " +  v.__str__(compact=True) + "\n"
-     return s
+  def getCanonicalIndex(self, i, extraMode=1):
+    """Entry path of flat element i, plus its nonzero index (1) or (column, row) (2) in the matrix"""
+    p, n, s = list(self._s.path(i)), 0, self
+    while s is not None:
+      e = s._entry(p[n])
+      n, s = n + 1 + len(e.repeat), e.struct
+    can = tuple(p[:n])
+    if extraMode == 0: return can
+    k = i - int(min(self._s.index(list(can)).nonzeros()))
+    if extraMode == 1: return can + (k,)
+    sp = ca.Sparsity.triu(e.content.sparsity()) if e.type == "symm" else e.content.sparsity()
+    return can + (sp.get_col()[k], sp.row()[k])
+
+  def canonicalIndices(self, extraMode=1):
+    return [self.getCanonicalIndex(i, extraMode) for i in range(self.size)]
+
+  def getLabel(self, i, extraMode=1):
+    return "[" + ",".join(map(str, self.getCanonicalIndex(i, extraMode))) + "]"
+
+  def labels(self, extraMode=1):
+    return [self.getLabel(i, extraMode) for i in range(self.size)]
+
+  def __str__(self, compact=False):
+    return str(self._s) if self._v is None else str(self._v)
 
   __repr__ = __str__
 
-  def traverseCanonicalIndex(self,limit=1000):
-    ret = []
-    for d in self.order:
-      if isinstance(d,tuple):
-        for v in intersperse(*[self.dict[de].traverseCanonicalIndex(True,limit=limit-1) for de in d]):
-          ret += v
-      else:
-        ret += self.dict[d].traverseCanonicalIndex(limit=limit-1)
-    return ret
+  def __reduce__(self):
+    return (type(self), self._args)
 
-  def getStructEntryByStructIndex(self,structIndex):
-    e = self.dict[structIndex[0]]
-    if len(structIndex)>1:
-      return e.getStructEntryByStructIndex(structIndex[1:])
-    else:
-      return e
+  def save(self, filename):
+    with open(filename, "wb") as f: pickle.dump(self, f, 2)
 
-  def getStructEntryByCanonicalIndex(self,indices):
-    return self.getStructEntryByStructIndex([x for x in indices if is_string(x)])
+  def __getitem__(self, pi):
+    return self._walk(self, _tuple(pi), [], None, "get")
 
-  def getStruct(self,name):
-    if name not in self.struct.dict:
-      raise Exception("Cannot find entry with key '%s'. Candidates: " % (str(name),str(list(name.keys()))))
-    ret = self.struct.dict[name].struct
-    if ret is None:
-      raise Exception("Entry '%s' has no structure." % (name))
-    else:
-      return ret
+  def __setitem__(self, pi, value):
+    self._walk(self, _tuple(pi), [], value, "set")
+    if self._target is not None: self._target[:, :] = ca.reshape(self._v.cat(), self._target.shape)
 
-  def traverseByPowerIndex(self,powerIndex,canonicalIndex=(),dispatcher=None,payload=None):
-      try:
-        if len(powerIndex)==0: return dispatcher(payload,canonicalIndex)
-        p = powerIndex[0]
-        if is_string(p):
-          return self.dict[p].traverseByPowerIndex(
-            powerIndex[1:],
-            canonicalIndex=canonicalIndex+(p,),
-            dispatcher=dispatcher,
-            payload=payload
-          )
-        elif isinstance(p,slice):
-          raise Exception("slice not allowed here, did you mean '...' ?")
-        elif isinstance(p,type(Ellipsis)):
-          """
-             Why ellipsis? Because it's all or nothing
-          """
-          return [
-                     self.dict[k].traverseByPowerIndex(
-                       powerIndex[1:],
-                       canonicalIndex=canonicalIndex+(k,),
-                       dispatcher=dispatcher,
-                       payload=payloadUnpack(payload,i)
-                     )
-                  for i,k in enumerate(self.keys())]
-        elif isinstance(p,dict) or isinstance(p,NestedDictLiteral):
-          if isinstance(payload,dict):
-            return dict([
-                    ( k,
-                      self.dict[k].traverseByPowerIndex(
-                        powerIndex[1:] if isinstance(p,dict) else [p],
-                        canonicalIndex=canonicalIndex+(k,),
-                        dispatcher=dispatcher,
-                        payload=v
-                      )
-                    ) for k,v in payload.items()
-                   ])
-          else:
-            return dict([
-                    ( k,
-                      v.traverseByPowerIndex(
-                        powerIndex[1:] if isinstance(p,dict) else [p],
-                        canonicalIndex=canonicalIndex+(k,),
-                        dispatcher=dispatcher,
-                        payload=payload
-                      )
-                    ) for k,v in self.dict.items()
-                   ])
-        elif isinstance(p,set):
-          if isinstance(payload,dict):
-            return dict([
-                    ( k,
-                      self.dict[k].traverseByPowerIndex(
-                        powerIndex[1:],
-                        canonicalIndex=canonicalIndex+(k,),
-                        dispatcher=dispatcher,
-                        payload=v
-                      )
-                    ) for k,v in payload.items() if k in p
-                   ])
-          else:
-            return dict([
-                    ( k,
-                      self.dict[k].traverseByPowerIndex(
-                        powerIndex[1:],
-                        canonicalIndex=canonicalIndex+(k,),
-                        dispatcher=dispatcher,
-                        payload=payload
-                      )
-                    ) for k in p
-                   ])
-        elif isinstance(p,list):
-          return [
-                     self.traverseByPowerIndex(
-                       powerIndex[1:],
-                       canonicalIndex=canonicalIndex+(s,),
-                       dispatcher=dispatcher,
-                       payload=payloadUnpack(payload,i)
-                     )
-                 for i,s in enumerate(p)]
-        elif isinstance(p, callable):
-          r = applyCallableIndex(p,self.traverseByPowerIndex(
-                powerIndex[1:],
-                canonicalIndex=canonicalIndex,
-                dispatcher=dispatcher.callableInner(),
-                payload=payload
-              ))
-          return dispatcher.callableOuter(payload,canonicalIndex,extraIndex=None,entry=None,inner=r)
-        else:
-          raise Exception("I don't know what to do with this: %s" % str(p))
-      except Exception as e:
-        raise Exception("Error occured in struct context with powerIndex %s, at canonicalIndex %s" % (str(powerIndex),str(canonicalIndex))) from e
-# Casadi-dependent Structure framework
+  def _leaf(self, path, payload, mode):
+    if mode == "index": return self._s.index(path)
+    if mode == "get": return self._v.get(path)
+    self._v.set(path, self._mtype(payload.e if isinstance(payload, Repeater) else payload))
 
-class Dispatcher:
-  def __init__(self,**args):
-    for k,v in list(args.items()):
-      setattr(self,k,v)
+  def _call(self, p, walk, payload, mode):
+    if mode != "set": return _apply(p, walk(mode))
+    self._v.set_nz(_apply(p, walk("index")), self._mtype(payload))
 
-  def callableInner(self):
-    return self
-
-  def callableOuter(self,payload,canonicalIndex,extraIndex=None,entry=None,inner=None):
-    return inner
-
-
-#Mixins
-class CasadiStructureDerivable:
-
-  def argtype(self,arg):
-    mtype = None
-    if isinstance(arg,ca.DM):
-      a = arg
-      mtype = ca.DM
-    elif not isinstance(arg,ca.MX) and not isinstance(arg,ca.SX):
-      try:
-        a = ca.DM(arg)
-        mtype = ca.DM
-      except:
-        pass
-
-    if mtype is None:
-      if isinstance(arg,ca.MX):
-        a = arg
-        mtype = ca.MX
-      else:
-        try:
-          a = ca.MX(arg)
-          mtype = ca.MX
-        except:
-          pass
-
-    if mtype is None:
-      if isinstance(arg,ca.SX):
-        a = arg
-        mtype = ca.SX
-      else:
-        try:
-          a = ca.SX(arg)
-          mtype = ca.SX
-        except:
-          raise Exception("Call to Structure has weird argument: expecting DM-like or MX-like or SXMatrix-like")
-
-    return (a,mtype)
-
-  def __call__(self, arg=0):
-    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> "DMStruct | SXStruct | MXStruct"
-    # `arg` routes through argtype() which promotes anything DM/SX/MX-constructible.
-    (a,mtype) = self.argtype(arg)
-
-    if isinstance(a,ca.DM):
-      if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
-        a = ca.DM.ones(self.size,1)*a
-      return DMStruct(self,data=a)
-
-    if isinstance(a,ca.MX):
-      return MXStruct(self,data=a)
-
-    if isinstance(a,ca.SX):
-      return SXStruct(self,data=a)
-
-    raise TypeError("Structure call expected DM/MX/SX, got %s" % type(a).__name__)
-
-  def repeated(self, arg=0):
-    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
-    (a,mtype) = self.argtype(arg)
-
-    if not(a.shape[0] == self.size):
-       raise Exception("Expecting %d x n DM. Got %s" % (self.size,a.dim()))
-    s = struct([entry("t",struct=self,repeat=a.shape[1])])
-
-    for (t,c) in [(ca.DM,DMStruct), (ca.MX, MXStruct), (ca.SX, SXStruct)]:
-      if isinstance(a,t):
-        numbers = c(s,data=DataReferenceRepeated(a,a.shape[1]))
-
-    p = numbers.prefix["t"]
-    p.castmaster = True
-    return p
-
-  def squared(self, arg=0):
-    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
-    (a,mtype) = self.argtype(arg)
-
-    if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
-       a = ca.DM.ones(self.size,self.size)*a
-    if not(a.shape[1] == a.shape[0] and a.shape[0]==self.size):
-       raise Exception("Expecting square DM of size %s. Got %s" % (self.size,a.dim()))
-    s = struct([entry("t",shapestruct=(self,self))])
-    for (t,c) in [(ca.DM,DMStruct), (ca.MX, MXStruct), (ca.SX, SXStruct)]:
-      if isinstance(a,t):
-        numbers = c(s,data=DataReferenceSquared(a,a.shape[0]))
-    p = numbers.prefix["t"]
-    p.castmaster = True
-    return p
-
-  def product(self, otherstruct, arg=0):
-    # type: (Any, "DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
-    (a,mtype) = self.argtype(arg)
-
-    if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
-       a = ca.DM.ones(self.size,otherstruct.size)*a
-    if not(a.shape[1]==otherstruct.size and a.shape[0]==self.size):
-       raise Exception("Expecting DM of shape (%s,%s). Got %s" % (self.size,otherstruct.size,a.dim()))
-    s = struct([entry("t",shapestruct=(self,otherstruct))])
-    for (t,c) in [(ca.DM,DMStruct), (ca.MX, MXStruct), (ca.SX, SXStruct)]:
-      if isinstance(a,t):
-        numbers = c(s,data=DataReferenceProduct(a,a.shape[0],a.shape[1]))
-    p = numbers.prefix["t"]
-    p.castmaster = True
-    return p
-
-  def squared_repeated(self, arg=0):
-    # type: ("DM | SX | MX | float | int | bool | list | np.ndarray") -> Any
-    (a,mtype) = self.argtype(arg)
-
-    if not(a.shape[0]==self.size and a.shape[1] % self.size == 0):
-       raise Exception("Expecting square (%d) DM by N. Got %s" % (self.size,a.dim()))
-    s = struct([entry("t",shapestruct=(self,self),repeat=int(a.shape[1] / self.size))])
-
-    for (t,c) in [(ca.DM,DMStruct), (ca.MX, MXStruct), (ca.SX, SXStruct)]:
-      if isinstance(a,t):
-        numbers = c(s,data=DataReferenceSquaredRepeated(a,self.size,int(a.shape[1] / self.size)))
-
-    p = numbers.prefix["t"]
-    p.castmaster = True
-    return p
-
-class GetterDispatcher(Dispatcher):
-  def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
-    type = None if entry is None else entry.type
-    if canonicalIndex in self.struct.map:
-
-      if canonicalIndex in self.priority_object_map and (extraIndex is None or len(extraIndex)==0):
-        r = self.priority_object_map[canonicalIndex]
-        if type is None:
-          return r
-        elif type=="symm":
-          return ca.triu2symm(r)
-        else:
-          raise Exception("Cannot handle type '%s'." % entry.type)
-
-      i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
-
-      try:
-        if type is None:
-          return correct_vector_indexing(self.master, i)
-        elif type=="symm":
-          return ca.triu2symm(self.master[i])
-        else:
-          raise Exception("Cannot handle type '%s'." % entry.type)
-      except Exception as e:
-        raise Exception("Error in powerIndex slicing for canonicalIndex %s" % (str(canonicalIndex))) from e
-    else:
-      raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
-
-class SetterDispatcher(Dispatcher):
-  def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
-    payload_ = self.mtype(payload)
-    type = None if entry is None else entry.type
-    if canonicalIndex in self.struct.map:
-      i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
-      try:
-        if type is None:
-          self.master[i] = payload_
-        elif type=="symm":
-          iflip = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry,flip=True)
-          if payload_.is_scalar():
-            self.master[i] = payload_
-            self.master[iflip] = payload_
-          else:
-            oi = performExtraIndex(ca.DM.ones(entry.originalsparsity),extraIndex=extraIndex,entry=entry)
-            if oi.sparsity()!=payload_.sparsity():
-              raise Exception("Payload sparsity " + payload_.dim() +  " does not match lhs sparsity " + oi.dim() + "." )
-            self.master[iflip] = payload_.T[iflip.sparsity()]
-            self.master[i] = payload_[i.sparsity()]
-        else:
-          raise Exception("Cannot handle type '%s'." % entry.type)
-      except NotImplementedError as e:
-        raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s (%s) and b %s (%s) and i %s (%s). Error: %s" % (str(canonicalIndex),str(self.master),str(builtins.type(self.master)),str(payload),str(builtins.type(payload)),str(i),str(builtins.type(i)),str(e)))
-      except Exception as e:
-        raise Exception("Error in powerIndex slicing for canonicalIndex %s" % (str(canonicalIndex))) from e
-    else:
-      raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
-
-  def callableInner(self):
-    return CasadiStructure.IMDispatcher(struct=self.struct)
-
-  def callableOuter(self,payload,canonicalIndex,extraIndex=None,entry=None,inner=None):
+  def _walk(self, s, pi, path, payload, mode, e=None):
+    """Walk power index pi from record s (None at a matrix of entry e), resolving lists, dicts and callables"""
     try:
-      self.master[inner] = payload
-    except NotImplementedError:
-      raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s and b %s." % (str(canonicalIndex),str(self.master),str(payload)))
-    except Exception as e:
-      raise Exception("Error in powerIndex slicing for canonicalIndex %s" % (str(canonicalIndex))) from e
-      
-class MasterGettable:
-  @properGetitem
-  def __getitem__(self,powerIndex):
-    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=GetterDispatcher(struct=self.struct,master=self.master,priority_object_map=self.priority_object_map))
+      if pi and callable(pi[0]) and not isinstance(pi[0], (Structure, Delegater)):
+        return self._call(pi[0], lambda m: self._walk(s, pi[1:], path, payload, m, e), payload, mode)
+      if s is None or not pi:
+        extra = [(p(e.shapestruct[k]) if isinstance(p, Delegater) else p) for k, p in enumerate(pi)
+                 if not isinstance(p, NestedDictLiteral)]
+        return self._leaf(path + ca.StructDM._path(tuple(extra)), payload, mode)
+      p, rest = pi[0], pi[1:]
+      if isinstance(p, str):
+        return self._repeat(s._entry(p), rest, path + [p], payload, mode, s._entry(p).repeat)
+      if p is Ellipsis or isinstance(p, list):
+        return [self._repeat(s._entry(k), rest, path + [k], _unpack(payload, i), mode, s._entry(k).repeat)
+                for i, k in enumerate(s.keys() if p is Ellipsis else p)]
+      if isinstance(p, (dict, set, NestedDictLiteral)):
+        r = pi if isinstance(p, NestedDictLiteral) else rest
+        keys = [k for k in payload if not isinstance(p, set) or k in p] if isinstance(payload, dict) else (p if isinstance(p, set) else s.keys())
+        return dict((k, self._repeat(s._entry(k), r, path + [k], payload[k] if isinstance(payload, dict) else payload, mode, s._entry(k).repeat)) for k in keys)
+      if isinstance(p, slice): raise Exception("slice not allowed here, did you mean '...' ?")
+      raise Exception("I don't know what to do with this: %s" % str(p))
+    except Exception as err:
+      raise Exception("Error occured in struct context with powerIndex %s, at canonicalIndex %s" % (str(pi), str(path))) from err
 
-class MasterSettable:
-  @properGetitem
-  def __setitem__(self,powerIndex,value):
-    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=
-    SetterDispatcher(struct=self.struct,master=self.master,mtype=self.mtype),payload=value)
+  def _repeat(self, e, pi, path, payload, mode, dims):
+    if not dims: return self._walk(e.struct, pi, path, payload, mode, e)
+    if not pi: pi = (slice(None),)
+    p, rest, n = pi[0], pi[1:], dims[0]
+    if callable(p) and not isinstance(p, Structure):
+      return self._call(p, lambda m: self._repeat(e, rest, path, payload, m, dims), payload, mode)
+    if isinstance(p, slice): p = list(range(*p.indices(n)))
+    if _is_int(p): return self._repeat(e, rest, path + [int(p)], payload, mode, dims[1:])
+    if isinstance(p, (list, NestedDictLiteral)):
+      r = pi if isinstance(p, NestedDictLiteral) else rest
+      return [self._repeat(e, r, path + [int(i)], _unpack(payload, j), mode, dims[1:])
+              for j, i in enumerate(range(n) if isinstance(p, NestedDictLiteral) else p)]
+    if isinstance(p, (dict, set)): raise Exception("powerIndex entry %s cannot be used in list context." % str(p))
+    raise Exception("I don't know what to do with this: %s" % str(p))
 
-def delegation(extraIndex,entry,i):
-  if is_string(extraIndex) or (isinstance(extraIndex,list) and len(extraIndex)>0 and all([is_string(e) for e in extraIndex])):
-    extraIndex = FlatIndexDelegater(extraIndex)
-  if isinstance(extraIndex,Delegater):
-    if entry is None: raise Exception("Cannot use delayed index without supplied entry.")
-    if entry.shapestruct is None: raise Exception("Cannot use delayed index without supplied shapestruct.")
-    if not(isinstance(entry.shapestruct[i],Structure)) : raise Exception("Cannot use delayed index with a integer shapestruct argument.")
-    return extraIndex(entry.shapestruct[i])
-  else:
-    return extraIndex
+  def __call__(self, arg: Any = 0) -> Any:
+    a, mtype = _argtype(arg)
+    return {ca.DM: DMStruct, ca.SX: SXStruct, ca.MX: MXStruct}[mtype](self, data=a)
 
-def performExtraIndex(i,extraIndex=None,entry=None,flip=False):
-  if extraIndex is None or len(extraIndex)==0:
-    return i
-  if isinstance(extraIndex[0], callable) and not isinstance(extraIndex[0],Delegater):
-    return extraIndex[0](performExtraIndex(i,extraIndex=extraIndex[1:],entry=entry,flip=flip))
-  if not(isinstance(extraIndex[0],NestedDictLiteral)):
-    if len(extraIndex)>2 or len(extraIndex)==0:
-      raise Exception("Powerindex exhausted. Remaining %s is interpreted as extraIndex, but length must be 1 or 2." % str(extraIndex))
+  def _view(self, e, arg: Any, rows, cols) -> Any:
+    a, mtype = _argtype(arg)
+    if a.is_scalar() and a.numel() != rows * cols: a = ca.DM.ones(rows, cols) * a
+    if a.shape != (rows, cols): raise Exception("Expecting %s of shape (%d,%d). Got %s" % (mtype.__name__, rows, cols, a.dim()))
+    s = Structure([e])
+    s._bind(getattr(ca, "Struct" + type(a).__name__)(s._s, ca.vec(a)))
+    s._target = a
+    return Prefixer(s, ("t",), castmaster=True)
+
+  def repeated(self, arg: Any = 0) -> Any:
+    a, _ = _argtype(arg)
+    return self._view(entry("t", struct=self, repeat=a.shape[1]), a, self.size, a.shape[1])
+
+  def squared(self, arg: Any = 0) -> Any:
+    return self._view(entry("t", shapestruct=(self, self)), arg, self.size, self.size)
+
+  def product(self, otherstruct, arg: Any = 0) -> Any:
+    return self._view(entry("t", shapestruct=(self, otherstruct)), arg, self.size, otherstruct.size)
+
+  def squared_repeated(self, arg: Any = 0) -> Any:
+    a, _ = _argtype(arg)
+    return self._view(entry("t", shapestruct=(self, self), repeat=a.shape[1] // max(self.size, 1)), a, self.size, a.shape[1])
+
+
+
+def _cast(x, t):
+  return x if isinstance(x, t) else None
+
+
+def _argtype(arg):
+  for t in (ca.DM, ca.MX, ca.SX):
+    if isinstance(arg, t): return arg, t
+  for t in (ca.DM, ca.MX, ca.SX):
     try:
-      if len(extraIndex)==1:
-        a = extraIndex[0]
-        a = delegation(a,entry,0)
-        return i.__getitem__(a)
-      else:
-        a,b = extraIndex
-        a = delegation(a,entry,0)
-        b = delegation(b,entry,1)
-        return i.__getitem__((b,a) if flip else (a,b))
-    except NotImplementedError:
-       raise Exception("Powerindex exhausted. Passing on %s to %s, but it doesn't know what to do with it" % (str(extraIndex),str(type(i))))
-  else:
-    return i
+      return t(arg), t
+    except Exception:
+      pass
+  raise Exception("Call to Structure has weird argument: expecting DM-like or MX-like or SXMatrix-like")
+
+
+class _IndexGetter:
+  def __init__(self, s, flat):
+    self.s, self.flat = s, flat
+
+  def __getitem__(self, pi):
+    r = self.s._walk(self.s, _tuple(pi), [], None, "index")
+    return _flat(r) if self.flat else r
+
+
+def _flat(r):
+  if isinstance(r, list): return sum([_flat(e) for e in r], [])
+  return [int(i) for i in r.nonzeros()]
+
+
+class _IndexMap:
+  def __init__(self, s):
+    self.s = s
+
+  def __getitem__(self, k):
+    return self.s._s.index(list(k))
 
 
 class Prefixer:
-  def __init__(self,struct,prefix,castmaster=False):
-    self.struct = struct
-    self.prefix = prefix
-    self.castmaster = castmaster
+  def __init__(self, struct, prefix, castmaster=False):
+    self.struct, self.prefix, self.castmaster = struct, prefix, castmaster
 
-    methods = [ "__DM__", "__SX__","__MX__"]
-    for m in methods:
-      if hasattr(self.struct,m):
-        setattr(self,m,self.cast)
+  def __DM__(self) -> Any:
+    return _cast(self.cast(), ca.DM)
 
-  def __setstate__(self,state):
-    self.__init__(state["struct"],state["prefix"],state["castmaster"])
+  def __SX__(self) -> Any:
+    return _cast(self.cast(), ca.SX)
 
-  def __getstate__(self):
-    return {"struct": self.struct, "prefix": self.prefix,"castmaster": self.castmaster}
+  def __MX__(self) -> Any:
+    return _cast(self.cast(), ca.MX)
 
-  def __getattr__(self,name):
-    # When attributes are not found, delegate to the expression this prefix resolves to
-    # This allows for e.g. sin(x), x+1 and x.shape to work
-    if name in ("struct","prefix","castmaster"):
-      raise AttributeError(name) # Guard against recursion before __init__ ran
+  def __reduce__(self):
+    return (Prefixer, (self.struct, self.prefix, self.castmaster))
+
+  def __getattr__(self, name):
+    # Delegate to the expression this prefix resolves to, e.g. x.shape
+    if name in ("struct", "prefix", "castmaster"): raise AttributeError(name)
     t = self.cast()
-    if isinstance(t,list) or isinstance(t,dict) or isinstance(t,tuple):
-      raise AttributeError("Cannot get attribute '%s': prefix %s resolves to a %s, not to a matrix." % (name,str(self.prefix),builtins.type(t).__name__))
-    return getattr(t,name)
+    if isinstance(t, (list, dict, tuple)):
+      raise AttributeError("Cannot get attribute '%s': prefix %s resolves to a %s, not to a matrix." % (name, str(self.prefix), type(t).__name__))
+    return getattr(t, name)
 
   def cast(self):
-    if self.castmaster:
-      if isinstance(self.struct.master,DataReference):
-        return self.struct.master.a
-      else:
-        return self.struct.master
-    else:
-      return self()
+    return self.struct.cat if self.castmaster else self()
 
   def __str__(self):
-    return "prefix( " + str(self.prefix) + "," + self.struct.__str__(compact=True) + ")"
+    return "prefix(" + str(self.prefix) + "," + str(self.struct._s) + ")"
 
   __repr__ = __str__
 
   def __call__(self):
-    return self.struct.__getitem__(self.prefix)
+    return self.struct[self.prefix]
 
-  @properGetitem
-  def __getitem__(self,powerIndex):
-    return self.struct.__getitem__(self.prefix + powerIndex)
+  def __getitem__(self, pi):
+    return self.struct[self.prefix + _tuple(pi)]
 
-  @properGetitem
-  def __setitem__(self,powerIndex,data):
-    return self.struct.__setitem__(self.prefix + powerIndex,data)
+  def __setitem__(self, pi, data):
+    self.struct[self.prefix + _tuple(pi)] = data
+
 
 class PrefixConstructor:
+  def __init__(self, struct):
+    self.struct = struct
 
   def __str__(self):
-    return "prefixConstructor(" + self.struct.__str__(compact=True) + ")"
+    return "prefixConstructor(" + str(self.struct._s) + ")"
 
   __repr__ = __str__
 
-  def __init__(self,struct,castmaster=False):
-    self.struct = struct
-    self.castmaster=castmaster
+  def __getitem__(self, prefix):
+    return Prefixer(self.struct, _tuple(prefix))
 
-  @properGetitem
-  def __getitem__(self,prefix):
-    return Prefixer(self.struct,prefix,castmaster=self.castmaster)
 
-class CasadiStructure(Structure,CasadiStructureDerivable):
-  """
-    size
-    map
-  """
+class CasadiStructured(Structure):
+  """Layout only, e.g. struct(["x", "y"]); call it for numeric or symbolic values"""
 
-  def save(self,filename):
-    import pickle
-    pickle.dump(self,file(filename,"wb"),2)
 
-  class FlatIndexDispatcher(Dispatcher):
-    def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
-      if canonicalIndex in self.struct.map:
-        res = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
-        if isinstance(res,ca.DM):
-          assert res.is_dense()
-          return list(map(int,list(res.nonzeros())))
-        return list(res)
-      else:
-        raise Exception("Canonical index %s not found." % str(canonicalIndex))
-
-  class IMDispatcher(Dispatcher):
-    def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
-      if canonicalIndex in self.struct.map:
-        return performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
-      else:
-        raise Exception("Canonical index %s not found." % str(canonicalIndex))
-
-  def __setstate__(self,state):
-    self.__init__(*state["args"],**state["kwargs"])
-
-  def __getstate__(self):
-    return dict(self.initializer)
-
-  def __init__(self,*args,**kwargs):
-    self.initializer = {"args": args, "kwargs": kwargs}
-    Structure.__init__(self,*args,**kwargs)
-
-    self.map = {}
-    self.lookuptable = []
-
-    hmap = {}
-    k = 0 # Global index counter
-    for i in self.traverseCanonicalIndex():
-      e = self.getStructEntryByCanonicalIndex(i)
-      if e.isPrimitive():
-        sp = ca.Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
-      else:
-        sp = ca.Sparsity(0,1) # Entry with an empty sub-structure
-      m = ca.DM(sp,list(range(k,k+sp.nnz())))
-      k += sp.nnz()
-      it = tuple(i)
-      self.map[it] = m
-      self.lookuptable+=[(it,kk,p) for kk,p in enumerate(zip(sp.get_col(),sp.row()))]
-      for a in canonicalIndexAncestors(it)[1:]:
-        if a in hmap:
-          hmap[a].append(m)
-        else:
-          hmap[a] = [m]
-    self.size = k
-    for k,v in hmap.items():
-      hmap[k] = ca.vertcat(*[nzcolumn(i) for i in v])
-    self.map.update(hmap)
-
-    class StructureGetter:
-      def __init__(self,struct):
-        self.struct = struct
-
-    class IMGetter(StructureGetter):
-      @properGetitem
-      def __getitem__(self,powerIndex):
-        return self.struct.traverseByPowerIndex(powerIndex,dispatcher=CasadiStructure.IMDispatcher(struct=self.struct))
-
-    class FlatIndexGetter(StructureGetter):
-      @properGetitem
-      def __getitem__(self,powerIndex):
-        return vec(self.struct.traverseByPowerIndex(powerIndex,dispatcher=CasadiStructure.FlatIndexDispatcher(struct=self.struct)))
-
-    self.i = IMGetter(self)
-    self.f = FlatIndexGetter(self)
-    self.struct = self
-
-  def __str__(self,compact=False):
-    return ("" if compact else "Structure with total size %d.\n" % self.size)+ Structure.__str__(self,compact=compact)
-
-  def getCanonicalIndex(self,i,extraMode=1):
-    """
-      Returns the canonicalIndex of the entry with a given flatIndex
-      extraMode influences wether nothing (0), [i] (1) or [i,j] (2) will be returned as extra index
-    """
-    if i<0 or i>=self.size:
-      raise Exception("Lookup index out of range. Got %d, but structure is of size %d" % (i,self.size))
-    can,k,p = self.lookuptable[i]
-    if extraMode==0:
-      return can
-    elif extraMode==1:
-      return can+(k,)
-    else:
-      return can+p
-
-  def canonicalIndices(self,extraMode=1):
-    return [self.getCanonicalIndex(i,extraMode=extraMode) for i in range(self.size)]
-
-  def getLabel(self,i,extraMode=1):
-    t = self.getCanonicalIndex(i,extraMode=extraMode)
-    return "["+ ",".join(map(str,t)) + "]"
-
-  def labels(self,extraMode=1):
-    return [self.getLabel(i,extraMode=extraMode) for i in range(self.size)]
-
-class Structured(object):
-  description = "Generic Structured object"
-
-  def __init__(self,structure):
-    self.struct = structure.struct
-    self.i = self.struct.i
-    self.f = self.struct.f
-    self.getStruct = self.struct.getStruct
-    self.prefix = PrefixConstructor(self)
-
-  @property
-  def size(self):
-    return self.struct.size
-
-  @property
-  def cat(self):
-    if isinstance(self.master,DataReference):
-      return self.master.a
-    else:
-      return self.master
-
-  def __str__(self,compact=False):
-    if compact is False:
-      return self.description + " with following structure:\n" + self.struct.__str__()
-    else:
-      return self.description + " (" + self.struct.__str__(compact=True) + ")"
-
-  def keys(self):
-    return list(self.struct.keys())
-
-class CasadiStructured(Structured,CasadiStructureDerivable):
-  description = "Generic Structured object"
-
-  def __setstate__(self,state):
-    cs = CasadiStructure.__new__(CasadiStructure)
-    cs.__setstate__({"args": state["args"],"kwargs": state["kwargs"]})
-    self.__init__(cs,order=state["order"])
-
-  def __getstate__(self):
-    d = self.struct.__getstate__()
-    d["order"] = self.order
-    return d
-
-  def __init__(self,struct,order=None):
-    self.order = order
-    if hasattr(struct,"struct"):
-      Structured.__init__(self,struct.struct)
-      self.entries = []
-    else:
-      entrylist = EntryList(struct,order=order)
-      self.entries = entrylist.entries
-      Structured.__init__(self,CasadiStructure(self.entries, order=entrylist.order))
-
-    self.getCanonicalIndex = self.struct.getCanonicalIndex
-    self.canonicalIndices = self.struct.canonicalIndices
-    self.getLabel = self.struct.getLabel
-    self.labels = self.struct.labels
-    self.priority_object_map = {}
-
-  @property
-  def shape(self):
-    return (self.size,1)
-
-  def sparsity(self):
-    return ca.Sparsity.dense(self.size,1)
-
-  def getCanonicalIndex(self,*args,**kwargs):
-    return self.struct.lookup(*args,**kwargs)
-
-class CompatibilityException(Exception):
-  pass
-
-class ssymStruct(CasadiStructured,MasterGettable):
+class ssymStruct(Structure):
   description = "symbolic SX"
-  def __init__(self,struct,order=None):
-    CasadiStructured.__init__(self,struct,order=order)
 
-    if any(e.expr is not None for e in self.entries):
+  def __init__(self, arg, order=None):
+    Structure.__init__(self, arg, order)
+    if any(e.expr is not None for e in self._declared):
       raise Exception("struct_symSX does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
+    self._bind(ca.StructSX.sym(self._s))
+    for e in self._declared:
+      if e.sym is not None: self._v.set([e.name], e.sym)
 
-    s = []
-    for i in self.struct.traverseCanonicalIndex():
-      e = self.struct.getStructEntryByCanonicalIndex(i)
-      s.append(ca.SX.sym("_".join(map(str,i)),e.sparsity.nnz()))
+  def __setitem__(self, pi, value):
+    raise TypeError("'%s' object does not support item assignment" % type(self).__name__)
 
-    self.master = ca.vertcat(*[nzcolumn(i) for i in s])
 
-    for e in self.entries:
-      if e.sym is not None:
-        self.master[self.i[e.name]] = e.sym
-
-  def __SX__(self):
-    return self.cat
-
-class VertsplitStructure:
-  def buildMap(self,struct=None,parentIndex = (),parent=None):
-    if struct is None:  struct = self.struct
-    if parent is None:  parent = self.master
-
-    if isinstance(parent,DataReference):
-      parent = parent.v # The flat (size-by-1) view, not the user-facing matrix
-
-    ks  = []
-    its = []
-    sps = []
-    es  = []
-    k = 0 # Global index counter
-    for i in struct.traverseCanonicalIndex(limit=1):
-      e = struct.getStructEntryByCanonicalIndex(i)
-      sp = None
-      if e.isPrimitive():
-        sp = ca.Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
-      else:
-        sp = ca.Sparsity.dense(e.struct.size,1)
-      ks.append(k)
-      it = tuple(i)
-      es.append(e)
-      its.append(it)
-      sps.append(sp)
-      k += sp.nnz()
-    ks.append(parent.size1())
-
-    for it, k, sp,e in zip(its,ca.vertsplit(parent,ks),sps,es):
-      if not(e.isPrimitive()):
-        self.buildMap(struct=e.struct,parentIndex = parentIndex + it,parent=k)
-      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else ca.MX(sp,k) #[IM(sp,range(sp.nnz()))]
-
-class msymStruct(CasadiStructured,MasterGettable,VertsplitStructure):
+class msymStruct(ssymStruct):
   description = "MX.sym"
-  def __init__(self,struct,order=None):
-    CasadiStructured.__init__(self,struct,order=order)
 
-    if any(e.expr is not None for e in self.entries):
+  def __init__(self, arg, order=None):
+    Structure.__init__(self, arg, order)
+    if any(e.expr is not None for e in self._declared):
       raise Exception("struct_symMX does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
-    if any(e.sym is not None for e in self.entries):
+    if any(e.sym is not None for e in self._declared):
       raise Exception("struct_symMX does not accept entries with an 'sym' argument.")
-
-    self.master = ca.MX.sym("V",self.size,1)
-
-    self.buildMap()
-
-  def __MX__(self):
-    return self.cat
+    self._bind(ca.StructMX.sym(self._s))
 
 
+class MatrixStruct(Structure):
+  """Mutable values: entries given by expr=, or data wrapped; unset parts are NaN"""
+  mtype = ca.DM
 
-
-class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
+  def __init__(self, arg, data=None, order=None):
+    Structure.__init__(self, arg, order)
+    if data is None and any(e.expr is None for e in self._declared):
+      raise Exception("struct_%s does only accept entries with an 'expr' argument." % self.mtype.__name__)
+    self._args = (arg, data, order)
+    self._bind(getattr(ca, "Struct" + self.mtype.__name__)(self._s, self.mtype.nan(1, 1) if data is None else self.mtype(data)))
+    for e in self._declared:
+      if e.expr is not None: self[e.name] = e.expr
 
   @property
   def description(self):
     return "Mutable " + self.mtype.__name__
 
-  def __init__(self,struct,mtype,data=None,order=None):
-    CasadiStructured.__init__(self,struct,order=None)
-    if any(e.expr is None for e in self.entries):
-      raise Exception("struct_SX does only accept entries with an 'expr' argument.")
+  def __reduce__(self):
+    # Numeric values travel along; symbolic ones would need a pickle context
+    return (type(self), (self._args[0], self.cat if self.mtype is ca.DM else None, self._args[2]))
 
-    self.mtype = mtype
-    if isinstance(data,mtype) or isinstance(data,DataReference):
-      self.master = data
-    elif data is None:
-      self.master = mtype.nan(self.size,1)
-    else:
-      self.master = mtype(data)
-
-    if self.master.shape[0]!=self.size:
-      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dim()))
-    if self.master.shape[1]!=1 and self.master.shape[0]>0:
-      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dim()))
-
-    for e in self.entries:
-      self[e.name] = e.expr
 
 class DMStruct(MatrixStruct):
+  mtype = ca.DM
 
-  def save(self,filename):
-    import pickle
-    pickle.dump(self,file(filename,"wb"),2)
-
-  def __setstate__(self,state):
-    cs = CasadiStructure.__new__(CasadiStructure)
-    cs.__setstate__({"args": state["args"],"kwargs": state["kwargs"]})
-    self.__init__(cs,data=state["master"])
-
-  def __getstate__(self):
-    d = self.struct.__getstate__()
-    d["master"] = self.master
-    return d
-
-  def __init__(self,struct,data=None):
-    MatrixStruct.__init__(self,struct,ca.DM,data=data)
-
-  def __DM__(self):
-    return self.cat
 
 class SXStruct(MatrixStruct):
-  def __init__(self,struct,data=None,order=None):
-    MatrixStruct.__init__(self,struct,ca.SX,data=data,order=order)
-
-  def __SX__(self):
-    return self.cat
-
-class MXStruct(MatrixStruct,VertsplitStructure):
-  def __init__(self,struct,data=None,order=None):
-    MatrixStruct.__init__(self,struct,ca.MX,data=data,order=order)
-
-    self.buildMap()
-
-  def __MX__(self):
-    return self.cat
-
-class MXVeccatStruct(CasadiStructured,MasterGettable):
-  description = "Partially mutable MX"
-  def __init__(self,arg,order=None):
-    CasadiStructured.__init__(self,arg,order=order)
-    if any(e.expr is None for e in self.entries):
-      raise Exception("struct_MX does only accept entries with an 'expr' argument.")
-
-    self.storage = []
-    self.mapping = {}
-    for k,i in enumerate(self.struct.traverseCanonicalIndex(limit=1)):
-      self.storage.append(None)
-      self.mapping[tuple(i)] = k
-
-    for e in self.entries:
-      self[e.name] = e.expr
-
-    self.dirty = True
-
-  def __setitem__(self,powerIndex,value):
-    if not isinstance(powerIndex,tuple):
-      powerIndex = (powerIndex,)
-
-    def inject(payload,canonicalIndex,extraIndex=None,entry=None):
-      if extraIndex is not None:
-        raise Exception("An MX veccat structure does not accept indexing on MX level for __setitem__.")
-      if not hasattr(self,"sparsity"):
-        raise Exception("An MX veccat structure __setitem__ accepts only objects that have sparsity.")
-
-      if canonicalIndex in self.mapping:
-        if self.struct.map[canonicalIndex].sparsity()!=payload.sparsity():
-          raise Exception("Error in powerIndex slicing %s for canonicalIndex %s: Shape mismatch. lhs is %s, rhs is %s." % (str(powerIndex),str(canonicalIndex),self.struct.map[canonicalIndex].sparsity().dim(),payload.sparsity().dim()))
-        self.storage[self.mapping[canonicalIndex]] = payload
-      else:
-        raise Exception("Not found: %s " % str(canonicalIndex))
-      self.dirty = True
-    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=inject,payload=value)
-
-  def __MX__(self):
-    return self.cat
-
-  @property
-  def master(self):
-    if any(e is None for e in self.storage):
-      missing = [k for k in list(self.mapping.keys()) if self.storage[self.mapping[k]] is None]
-      raise Exception("Problem in MX vecNZcat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
-
-    if self.dirty:
-      self.master_cached = ca.vertcat(*[ca.vec(i) if i.is_dense() else nzcolumn(i) for i in self.storage])
-
-    return self.master_cached
+  mtype = ca.SX
 
 
+class MXStruct(MatrixStruct):
+  mtype = ca.MX
+
+
+class MXVeccatStruct(MatrixStruct):
+  mtype = ca.MX
+
+  def __init__(self, arg, order=None):
+    MatrixStruct.__init__(self, arg, None, order)
+    self._args = (arg, order)
+
+  def __reduce__(self):
+    return (type(self), self._args)
+
+
+struct = CasadiStructured
 struct_symSX = ssymStruct
 struct_symMX = msymStruct
 struct_SX = SXStruct
-struct_MX_mutable = MXStruct
 struct_MX = MXVeccatStruct
-struct = CasadiStructured
+struct_MX_mutable = MXStruct
 
-
-
-entry = StructEntry
-
-class CasadiStructEntry(StructEntry):
-  def __init__(self,*args,**kwargs):
-    if len(args)==0:
-      raise Exception("Missing name argument (first argument of Entry)")
-    else:
-      self.name = args[0]
-    self.dict = kwargs
-
-    if len(args)>1:
-      raise Exception("Don't know what to do with unnamed arguments %s" % str(args[1:]))
-
-
-
-    kw = list(kwargs.keys())
-    kws = ['repeat','shape','sym','expr','struct','shapestruct','type']
-    for k in kw:
-      if k not in kws:
-        raise Exception("Unknown keyword argument '%s'. Please use one of %s." % (k,str(kws)))
-
-
-
-    for kc, fk in [
-          ('shape',['struct']),
-          ('struct',['shape','shapestruct']),
-          ('shapestruct',['struct']), # You might have a sparse matrix with shapestruct
-          ('sym',['shape','repeat','expr']),
-          ('expr',['shape','repeat','sym'])
-        ]:
-        if kc in kwargs:
-          for fki in fk:
-            if fki in kwargs:
-              raise Exception("You supplied keyword argument '%s', but it cannot be combined with keyword argument '%s'." % (kc,fki))
-
-    #     repeat   argument
-    self.repeat = []
-
-    if 'repeat' in kwargs:
-      self.repeat = kwargs["repeat"] if isinstance(kwargs["repeat"],list) else [kwargs["repeat"]]
-    
-    if not all([is_integer(x) for x in self.repeat]):
-      raise Exception("The 'repeat' argument, if present, must be a list of integers, but got %s" % str(self.repeat))
-
-
-    self.struct = None
-    #     struct   argument
-    if 'struct' in kwargs:
-      struct = kwargs["struct"]
-      if isinstance(struct,Structure):
-        self.struct = struct
-      elif isinstance(struct,Structured):
-        self.struct = struct.struct
-
-
-    self.sparsity = None
-    #     shape   argument
-    if 'shape' in kwargs:
-      shape = kwargs["shape"]
-      if is_integer(shape) :
-        self.sparsity = ca.Sparsity.dense(shape,1)
-      elif isinstance(shape,list) or isinstance(shape,tuple):
-        if len(shape)==0 or len(shape)>2:
-          raise Exception("The 'shape' argument, if present, must be an integer, a tuple of 1 or 2 integers, a sparsity pattern.")
-        else:
-          self.sparsity = ca.Sparsity.dense(*shape)
-      elif isinstance(shape,ca.Sparsity):
-        self.sparsity = shape
-      else:
-        raise Exception("The 'shape' argument, if present, must be an integer, a tuple of 1 or 2 integers, or a sparsity pattern. Got %s " % str(shape))
-    else:
-      self.sparsity = ca.Sparsity.dense(1,1)
-
-    self.shapestruct = None
-    #     shapestruct  argument
-    if 'shapestruct' in kwargs:
-      shapestruct = kwargs["shapestruct"]
-      if isinstance(shapestruct,Structured) or isinstance(shapestruct,Structure):
-        self.shapestruct = (shapestruct.struct,1)
-      elif isinstance(shapestruct,tuple):
-        if not(all([isinstance(e,Structured) or isinstance(e,Structure) or is_integer(e) for e in shapestruct])) or len(shapestruct)==0 or len(shapestruct)>2:
-          raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of structures or numbers")
-        self.shapestruct = tuple([e if is_integer(e) else e.struct for e in shapestruct])
-      else:
-        raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of at most structures")
-
-      if 'shape' not in kwargs:
-        self.sparsity = ca.Sparsity.dense(*[e if is_integer(e) else e.size for e in self.shapestruct])
-
-    #     sym    argument
-    self.sym = None
-    if 'sym' in kwargs:
-      sym = kwargs["sym"]
-      if isinstance(sym,ca.SX) and sym.is_valid_input():
-        self.sym = sym
-      elif isinstance(sym,Structured):
-        self.struct = sym.struct
-        self.sym = sym.cat
-      else:
-        raise Exception("The 'sym' argument must be a purely symbolic SX or a structured symbolic. Got %s instead." % str(self.sym))
-      self.sparsity = self.sym.sparsity()
-
-    #     expr    argument
-    self.expr = None
-    if 'expr' in kwargs:
-      self.expr = kwargs["expr"]
-
-      def getPrimitive(e,repeat=[]):
-        if isinstance(e,list):
-          if len(e)==0:
-            return None,repeat+[0]
-          else:
-            return getPrimitive(e[0],repeat=repeat+[len(e)])
-        else:
-          return e,repeat
-
-
-      p,r = getPrimitive(self.expr)
-
-      if p is None:
-        self.repeat = [0]
-        self.sparsity = ca.Sparsity.dense(0,0)
-      else:
-        self.repeat = r
-
-        if hasattr(p,"sparsity"):
-          self.sparsity = p.sparsity()
-        else:
-          raise Exception("The 'expr' argument must be a matrix expression or nested list of matrix expressions. Got %s instead." % str(p))
-
-    self.type = None
-    #     class   argument
-    if 'type' in kwargs:
-      self.type= kwargs["type"]
-      allowedclass = ['symm']
-      if self.type not in allowedclass:
-        raise Exception("You supplied a type argument '%s' but it is not recognised. Use one of %s" % (str(self.type,str(allowedclass))))
-      if self.type=="symm":
-        if self.sparsity.size1() != self.sparsity.size2():
-          raise Exception("You supplied a type 'symm', but matrix is not square. Got " % self.sparsity.dim() + ".")
-        self.originalsparsity = self.sparsity
-        self.sparsity = self.sparsity*ca.Sparsity.upper(self.sparsity.size1())
-
-
-
-    StructEntry.__init__(self,self.name,struct=self.struct,dims=self.repeat,data=self.sparsity)
-
-  def primitiveString(self):
-    if self.type is None:
-      return self.sparsity.dim()
-    elif self.type=="symm":
-      return "symm(" +  self.sparsity.dim() + ")"
-
-  def __getstate__(self):
-    return dict((k,getattr(self,k)) for k in ["name", "struct", "sparsity","type","repeat","shapestruct","dims"])
-
-
-def entry(*args,**kwargs):
-  if len(args)==1 and isinstance(args[0],CasadiStructEntry):
-    return args[0]
-  return CasadiStructEntry(*args,**kwargs)
-
-class EntryList:
-  def __init__(self,arg,order = None):
-    self.entries = []
-    self.order = []
-
-    if not isinstance(arg,list):
-      raise Exception("Expecting list of entries, with possible tuples for grouping, but got %s" % str(arg))
-
-    for e in arg:
-      if isinstance(e,tuple):
-        entries = list(map(entry,e))
-        self.order.append(tuple(x.name for x in entries))
-        self.entries+=entries
-      else:
-        ee = entry(e)
-        self.order.append(ee.name)
-        self.entries.append(ee)
-
-    # Override order
-    if order is not None:
-      if any(isinstance(e,tuple) for e in self.order):
-        raise Exception("You supplied an order by using tuple syntax on entries %s, but you overwrite it with the 'order' keyword. Use one or the other, not both.")
-      self.order = order
-    self.names = [x.name for x in self.entries]
-    if len(self.names)!=len(set(self.names)):
-      duplicates = []
-      for i,e in enumerate(self.names):
-        if e in self.names[:i] or e in self.names[i+1:]:
-          duplicates.append(e)
-      raise Exception("Your list of entries contains duplicates: %s" % str(list(set(duplicates))))
-
-
-class Delegater:
-  def __init__(self,arg):
-    self.arg = arg
-
-  def __str__(self):
-    return "%s[%s]" % (self.__class__.__name__,str(self.arg))
-
-  __repr__ = __str__
-
-
-class IndexDelegater(Delegater):
-  def __call__(self,struct):
-    return struct.i.__getitem__(self.arg)
-
-class FlatIndexDelegater(Delegater):
-  def __call__(self,struct):
-    return struct.f.__getitem__(self.arg)
-
-
-class DelegaterConstructor:
-  """
-    Creates an object that delegates a slicing operation.
-
-    Example usage:
-      s = struct_symSX([])
-      x = struct_symSX(entry("x",Sparsity.diag(4)))
-      x["x",0,index[:]]
-
-  """
-  def __init__(self,delegater,prepend=()):
-    self.prepend = prepend
-    self.delegater = delegater
-
-  @properGetitem
-  def __getitem__(self,arg):
-    return self.delegater(self.prepend + arg)
-
-index  = DelegaterConstructor(IndexDelegater)
-indexf = DelegaterConstructor(FlatIndexDelegater)
-
-class DataReference:
-  @property
-  def shape(self):
-    return self.v.shape
-
-  def dim(self):
-    return self.v.dim()
-
-
-class DataReferenceRepeated(DataReference):
-  def __init__(self,a,n):
-    assert(a.is_dense())
-    self.a = a
-    self.n = n
-    self.v = a.reshape((n*a.size1(),1))
-
-  def __setitem__(self,a,b):
-    self.v.nz[a] = b
-    I = self.a.sparsity().find()
-    self.a.nz[I] = self.v.nz[I]
-
-  def __getitem__(self,a):
-    return self.v.nz[a]
-
-class DataReferenceSquared(DataReference):
-  def __init__(self,a,n):
-    assert(a.is_dense())
-    self.a = a
-    self.v = a.reshape((n*n,1))
-    self.n = n
-
-  def __setitem__(self,a,b):
-    self.a.nz[a] = b
-
-  def __getitem__(self,a):
-    return self.a.nz[a]
-
-  @property
-  def shape(self):
-    return (self.n*self.n,1)
-
-class DataReferenceProduct(DataReference):
-  def __init__(self,a,n,m):
-    assert(a.is_dense())
-    self.a = a
-    self.v = a.reshape((n*m,1))
-    self.n = n
-    self.m = m
-
-  def __setitem__(self,a,b):
-    self.a.nz[a] = b
-
-  def __getitem__(self,a):
-    return self.a.nz[a]
-
-  @property
-  def shape(self):
-    return (self.n*self.m,1)
-
-  def size1(self):
-    return self.n
-
-  def size2(self):
-    return self.m
-
-class DataReferenceSquaredRepeated(DataReference):
-  def __init__(self,a,n,N):
-    assert(a.is_dense())
-    self.a = a
-    self.n = n
-    self.N = N
-    self.v = a.reshape((n*n*N,1))
-
-  def __setitem__(self,a,b):
-    self.v.nz[a] = b
-    I = self.a.sparsity().find()
-    self.a.nz[I] = self.v.nz[I]
-
-  def __getitem__(self,a):
-    return self.v.nz[a]
 
 def struct_load(filename):
-    import pickle
-    return pickle.load(file(filename,"rb"))
+  with open(filename, "rb") as f: return pickle.load(f)

@@ -69,6 +69,7 @@
 #include "dae_builder.hpp"
 #include "xml_file.hpp"
 #include "optistack.hpp"
+#include "struct.hpp"
 #include "serializer.hpp"
 #include "tools.hpp"
 #include "resource.hpp"

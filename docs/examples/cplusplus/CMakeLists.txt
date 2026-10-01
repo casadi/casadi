@@ -108,6 +108,8 @@ endif()
 if(WITH_SUNDIALS AND WITH_IPOPT)
   add_executable(multiple_shooting_from_scratch multiple_shooting_from_scratch.cpp)
   target_link_libraries(multiple_shooting_from_scratch casadi)
+  add_executable(multiple_shooting_struct multiple_shooting_struct.cpp)
+  target_link_libraries(multiple_shooting_struct casadi)
 endif()
 
 # Solve linear system of equations

@@ -732,6 +732,10 @@ namespace casadi {
     casadi_error("'print_canonical' not defined for " + type_name());
   }
 
+  // Any sign of NaN prints the same
+  template<typename T> inline bool is_nan_scalar(const T&) { return false;}
+  inline bool is_nan_scalar(double x) { return x!=x;}
+
   template<typename Scalar>
   void Matrix<Scalar>::print_scalar(std::ostream &stream, const Scalar& e) {
     std::streamsize precision = stream.precision();
@@ -745,7 +749,11 @@ namespace casadi {
     } else {
       stream.unsetf(std::ios::scientific);
     }
-    stream << e;
+    if (is_nan_scalar(e)) {
+      stream << "nan";
+    } else {
+      stream << e;
+    }
     stream << std::flush;
 
     stream.precision(precision);

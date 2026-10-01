@@ -149,9 +149,9 @@ class Toolstests(casadiTestCase):
     init = s(inf)
     self.checkarray(init.cat,ca.DM([inf,inf,inf]))
 
-    f = ca.DM.zeros(3,1)
+    f = ca.DM([5,0,0])
     init = s(f)
-    f[0] = 5
+    f[0] = 6  # s(f) copies f
     self.checkarray(init.cat,ca.DM([5,0,0]))
 
     s = struct_symSX(['x','y','z'],order=['x','y','z'])
@@ -741,7 +741,7 @@ class Toolstests(casadiTestCase):
     self.checkarray(x_sx.struct.map[("S",)],c.reshape(ca.DM(list(range(n,n+n*n))),n,n))
     self.checkarray(x_mx.struct.map[("S",)],c.reshape(ca.DM(list(range(n,n+n*n))),n,n))
     self.checkarray(X_sx.cat,ca.DM(list(range(n+n*n))))
-    self.checkarray(X_mx.cat,ca.DM(list(range(n+n*n))))
+    self.checkarray(ca.evalf(X_mx.cat),ca.DM(list(range(n+n*n))))
 
     for s, S in [(x_sx,struct_symSX),(x_mx,struct_symMX)]:
       h = S([entry("w",struct=s)])
@@ -781,7 +781,7 @@ class Toolstests(casadiTestCase):
     self.checkarray(x_sx.struct.map[("S",)],c.reshape(ca.DM(list(range(n,n+n*m))),n,m))
     self.checkarray(x_mx.struct.map[("S",)],c.reshape(ca.DM(list(range(n,n+n*m))),n,m))
     self.checkarray(X_sx.cat,ca.DM(list(range(n+n*m))))
-    self.checkarray(X_mx.cat,ca.DM(list(range(n+n*m))))
+    self.checkarray(ca.evalf(X_mx.cat),ca.DM(list(range(n+n*m))))
 
     n = 3
     x_sx = struct_symSX([
@@ -805,7 +805,7 @@ class Toolstests(casadiTestCase):
     self.checkarray(x_sx.struct.map[("S",)],ca.DM(ca.Sparsity.upper(n),list(range(n,int(n+n*(n+1)/2)))))
     self.checkarray(x_mx.struct.map[("S",)],ca.DM(ca.Sparsity.upper(n),list(range(n,int(n+n*(n+1)/2)))))
     self.checkarray(X_sx.cat,ca.DM(list(range(int(n+n*(n+1)/2)))))
-    self.checkarray(X_mx.cat,ca.DM(list(range(int(n+n*(n+1)/2)))))
+    self.checkarray(ca.evalf(X_mx.cat),ca.DM(list(range(int(n+n*(n+1)/2)))))
 
   def test_MX_result(self):
     s = struct_symMX(["a",entry("b",shape=2),entry("c",shape=(2,2))])
@@ -1023,6 +1023,98 @@ class Toolstests(casadiTestCase):
     with self.assertInException("failed"):
         ca.external_transform(libcasadi,"external_transform_test_fail",f, {"foo": "bar"})
         
+  def test_Struct_index(self):
+    self.message("Struct: shape of the part addressed by a path")
+    states = ca.Struct()
+    states.add("x", 2)
+    states.add("L")
+    V = ca.Struct()
+    V.add("X", states, [4, 3])
+    V.add("U", 1, 1, [3])
+    V.add("S", ca.Sparsity.upper(3))
+    self.assertEqual(V.nnz(), 4*3*3+3+6)
+    self.assertEqual(V.names(), ["X", "U", "S"])
+    self.assertEqual(V.repeat("X"), [4, 3])
+    self.assertEqual(V.child("X").names(), ["x", "L"])
+    v = ca.StructDM(V, ca.DM(range(V.nnz())))
+    self.checkarray(v["X", 0, 0, "x"], ca.DM([0, 1]))
+    self.checkarray(v["X", 0, 0], ca.DM([0, 1, 2]))
+    self.checkarray(v["X", :, 0, "L"], ca.DM([[2, 11, 20, 29]]))
+    self.checkarray(v["X", -1, -1, "x", 1], ca.DM(34))
+    self.checkarray(v["X", "x"].shape, (2, 12))
+    self.checkarray(v["X", 1, 1:3, ["L", "x"]], ca.DM([[14, 17], [12, 15], [13, 16]]))
+    self.checkarray(v["X", [2, 0], ::2, "L"], ca.DM([[20, 26, 2, 8]]))
+    self.checkarray(v["U"], ca.DM([[36, 37, 38]]))
+    self.assertTrue(v["S"].sparsity() == ca.Sparsity.upper(3))
+    self.checkarray(v["S", 0, :], ca.DM([[39, 40, 42]]))
+    for i in range(V.nnz()):
+      self.checkarray(v.get(V.path(i)), ca.DM(i))
+    self.assertEqual(V.labels()[:4], ["X[0][0].x[0]", "X[0][0].x[1]", "X[0][0].L", "X[0][1].x[0]"])
+    self.checkarray(V.index(["X", 1, 1]), ca.DM([12, 13, 14]))
+    self.checkarray(v.get(["X", 1, 1, "x"], True), ca.DM([0, 1]))
+    with self.assertInException("No entry 'Y'"):
+      v["Y"]
+    with self.assertInException("out of range"):
+      v["X", 4]
+
+  def test_Struct_set(self):
+    self.message("Struct: assignment repeats and transposes as needed")
+    V = ca.Struct()
+    V.add("X", 2, 1, [3])
+    V.add("U", 1, 1, [2])
+    V.add("P", ca.Struct.leaf(ca.Sparsity.dense(2, 2), True))
+    V.interleave(["X", "U"])
+    self.assertEqual(V.labels(), ["X[0][0]", "X[0][1]", "U[0]", "X[1][0]", "X[1][1]", "U[1]",
+                                  "X[2][0]", "X[2][1]", "P[0]", "P[2]", "P[3]"])
+    v = ca.StructDM(V, 0)
+    v["X"] = ca.DM([1, 2])
+    v["U"] = [7, 8]
+    v["X", -1] = 5
+    v["P"] = ca.DM([[1, 2], [3, 4]])
+    self.checkarray(v.cat(), ca.DM([1, 2, 7, 1, 2, 8, 5, 5, 1, 2, 4]))
+    self.checkarray(v["P"], ca.DM([[1, 2], [2, 4]]))
+    v["P", 1, 0] = 9
+    self.checkarray(v["P"], ca.DM([[1, 9], [9, 4]]))
+    with self.assertInException("Cannot assign 3x1"):
+      v["X", 0] = ca.DM([1, 2, 3])
+    S = ca.Struct()
+    S.add("D", ca.Sparsity.diag(2))
+    s = ca.StructDM(S, 0)
+    s["D"] = ca.DM.eye(2)*3
+    with self.assertInException("outside the sparsity pattern"):
+      s["D"] = ca.DM.ones(2, 2)
+
+  def test_Struct_symbolic(self):
+    self.message("Struct: symbolic and expression values")
+    states = ca.Struct(["x", "y"])
+    V = ca.Struct()
+    V.add("X", states, [3])
+    V.add("U", 1, 1, [2])
+    w = ca.StructMX.sym(V)
+    self.assertTrue(w["X", 1, "x"].is_symbolic())
+    self.assertEqual(w["X", 1, "x"].name(), "X_1_x")
+    self.assertTrue(w["X", 1].is_op(ca.OP_VERTCAT))
+    self.assertTrue(w["U"].is_op(ca.OP_HORZCAT))
+    f = ca.Function("f", [w], [w["X", :, "y"], w["U"]])
+    r = f(ca.DM(range(V.nnz())))
+    self.checkarray(r[0], ca.DM([[1, 3, 5]]))
+    self.checkarray(r[1], ca.DM([[6, 7]]))
+    ws = ca.StructSX.sym(V, "w")
+    self.assertEqual([ws.cat()[i].name() for i in range(V.nnz())],
+                     ["w_X_0_x", "w_X_0_y", "w_X_1_x", "w_X_1_y", "w_X_2_x", "w_X_2_y", "w_U_0", "w_U_1"])
+    G = ca.Struct()
+    G.add("g", 2, 1, [2])
+    g = ca.StructMX(G, 0)
+    g["g", 0] = w["X", 1] - w["X", 0]
+    g["g", 1] = w["X", 2] - w["X", 1]
+    self.assertTrue(g.cat().is_op(ca.OP_VERTCAT))
+    self.assertFalse(ca.depends_on(g.cat(), w["U"]))
+    self.checkarray(ca.evalf(ca.jacobian(g.cat(), w.cat())), ca.DM([[-1, 0, 1, 0, 0, 0, 0, 0],
+      [0, -1, 0, 1, 0, 0, 0, 0], [0, 0, -1, 0, 1, 0, 0, 0], [0, 0, 0, -1, 0, 1, 0, 0]]))
+    J = ca.StructDM(ca.Struct.matrix(G, V), ca.evalf(ca.vec(ca.jacobian(g.cat(), w.cat()))))
+    self.checkarray(J["g", "X"], ca.DM([[-1, 0, 1, 0, 0, 0], [0, -1, 0, 1, 0, 0],
+      [0, 0, -1, 0, 1, 0], [0, 0, 0, -1, 0, 1]]))
+
   def test_external_transform_options(self):
     if sys.platform == 'darwin':
         print("regression, skipping")
