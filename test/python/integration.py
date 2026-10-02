@@ -1636,5 +1636,153 @@ class Integrationtests(casadiTestCase):
     ]
     cross_check(Iadj, base, seeds, "fwd-of-reverse-of-collocation")
 
+  def acados_problem(self):
+    x = ca.SX.sym("x", 2)
+    u = ca.SX.sym("u")
+    p = ca.SX.sym("p")
+    ode = ca.vertcat(x[1], -(1 + 0.1 * p) * ca.sin(x[0]) - 0.2 * x[1] + u)
+    return {"x": x, "u": u, "p": p, "ode": ode}
+
+  @requires_integrator('acados')
+  def test_acados_accuracy(self):
+    self.message("acados: forward simulation vs rk reference")
+    dae = self.acados_problem()
+    for grid in [[0.5], [0.2, 0.3, 0.5]]:
+      nt = len(grid)
+      ref = ca.integrator("ref", "rk", dae, 0, grid, {"number_of_finite_elements": 2000})
+      u = ca.DM([[0.3, -0.2, 0.1][:nt]])
+      for opts in [dict(scheme="irk", num_steps=20),
+            dict(scheme="irk", num_steps=20, collocation_type="gauss_radau_iia"),
+            dict(scheme="erk", num_steps=50)]:
+        F = ca.integrator("F", "acados", dae, 0, grid, opts)
+        xf = F(x0=[1, 0.5], p=0.7, u=u)["xf"]
+        self.checkarray(ref(x0=[1, 0.5], p=0.7, u=u)["xf"], xf, str(opts), digits=6)
+
+  @requires_integrator('acados')
+  def test_acados_derivatives(self):
+    self.message("acados: jacobian, gradient and hessian vs finite differences")
+    dae = self.acados_problem()
+    for grid in [[0.5], [0.2, 0.3, 0.5]]:
+      nt = len(grid)
+      for scheme in ["irk", "erk"]:
+        F = ca.integrator("F", "acados", dae, 0, grid, {"scheme": scheme, "num_steps": 4,
+                          "is_diff_in": [True] * 7})
+        x0 = ca.MX.sym("x0", 2)
+        u = ca.MX.sym("u", 1, nt)
+        p = ca.MX.sym("p")
+        w = ca.vertcat(x0, ca.vec(u), p)
+        xf = F(x0=x0, u=u, p=p)["xf"]
+        W = ca.DM.rand(2, nt)
+        phi = ca.dot(W, xf)
+        f = ca.Function("f", [w], [ca.vec(xf), ca.gradient(phi, w)])
+        df = ca.Function("df", [w], [ca.jacobian(ca.vec(xf), w), ca.hessian(phi, w)[0]])
+        w0 = ca.DM([1, 0.5] + [0.3, -0.2, 0.1][:nt] + [0.7])
+        J, H = df(w0)
+        e = 1e-6
+        seeds = ca.horzsplit(ca.DM.eye(w0.numel()))
+        FD = ca.horzcat(*[(f(w0 + e * d)[0] - f(w0 - e * d)[0]) / (2 * e) for d in seeds])
+        HD = ca.horzcat(*[(f(w0 + e * d)[1] - f(w0 - e * d)[1]) / (2 * e) for d in seeds])
+        self.checkarray(FD, J, "jacobian", digits=7)
+        self.checkarray(ca.mtimes(J.T, ca.vec(W)), f(w0)[1], "gradient")
+        self.checkarray(HD, H, "hessian", digits=7)
+        self.checkarray(H, H.T, "hessian symmetry")
+        # p not differentiable by default: structurally zero sensitivities
+        G = ca.integrator("G", "acados", dae, 0, grid, {"scheme": scheme, "num_steps": 4})
+        xg = G(x0=x0, u=u, p=p)["xf"]
+        self.assertEqual(ca.jacobian(xg, p).nnz(), 0)
+        dg = ca.Function("dg", [w], [ca.jacobian(ca.vec(xg), w)])
+        self.checkarray(J[:, :-1], dg(w0)[:, :-1], "jacobian, p non-differentiable")
+
+  @requires_integrator('acados')
+  def test_acados_serialize(self):
+    self.message("acados: serialization")
+    dae = self.acados_problem()
+    for grid in [[0.5], [0.2, 0.3, 0.5]]:
+      F = ca.integrator("F", "acados", dae, 0, grid)
+      u = ca.DM([[0.3, -0.2, 0.1][:len(grid)]])
+      self.check_serialize(F, inputs={"x0": [1, 0.5], "p": 0.7, "u": u})
+
+  @requires_integrator('acados')
+  def test_acados_codegen(self):
+    self.message("acados: code generation of the integrator and its derivatives")
+    dae = self.acados_problem()
+    for grid in [[0.5], [0.2, 0.3, 0.5]]:
+      nt = len(grid)
+      for scheme in ["irk", "erk"]:
+        F = ca.integrator("F", "acados", dae, 0, grid, {"scheme": scheme,
+                          "is_diff_in": [True] * 7})
+        x0 = ca.MX.sym("x0", 2)
+        u = ca.MX.sym("u", 1, nt)
+        p = ca.MX.sym("p")
+        lam = ca.MX.sym("lam", 2, nt)
+        w = ca.vertcat(x0, ca.vec(u), p)
+        xf = F(x0=x0, u=u, p=p)["xf"]
+        phi = ca.dot(lam, xf)
+        G = ca.Function("G", [x0, u, p, lam],
+                [xf, ca.jacobian(xf, w), ca.gradient(phi, w), ca.hessian(phi, w)[0]])
+        inputs = [ca.DM([1, 0.5]), ca.DM([[0.3, -0.2, 0.1][:nt]]), 0.7, ca.DM.rand(2, nt)]
+        self.check_codegen(G, inputs=inputs, std="c99",
+                 extralibs=["casadi-tp-acados", "blasfeo"])
+
+  def acados_dae(self):
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    u = ca.SX.sym("u")
+    p = ca.SX.sym("p")
+    ode = ca.vertcat(x[1], -(1 + 0.1 * p) * ca.sin(x[0]) - 0.2 * z + u)
+    alg = z + 0.3 * ca.sin(z) - x[1] * (1 + 0.5 * p * x[0] ** 2) - 0.1 * u
+    return {"x": x, "z": z, "u": u, "p": p, "ode": ode, "alg": alg}
+
+  @requires_integrator('acados')
+  def test_acados_dae(self):
+    self.message("acados: semi-explicit DAE, vs collocation and finite differences")
+    dae = self.acados_dae()
+    for grid in [[0.5], [0.2, 0.3, 0.5]]:
+      nt = len(grid)
+      u0 = ca.DM([[0.3, -0.2, 0.1][:nt]])
+      ref = ca.integrator("ref", "collocation", dae, 0, grid,
+                {"number_of_finite_elements": 400, "collocation_scheme": "radau"})
+      F = ca.integrator("F", "acados", dae, 0, grid, {"num_steps": 20})
+      s = F(x0=[1, 0.5], z0=0.4, p=0.7, u=u0)
+      self.checkarray(ref(x0=[1, 0.5], z0=0.4, p=0.7, u=u0)["xf"], s["xf"], "xf", digits=6)
+      # zf not supported
+      self.assertTrue(numpy.all(numpy.isnan(numpy.array(s["zf"]))))
+      # Converged Newton: acados sensitivities are those of the exact collocation equations
+      F = ca.integrator("F", "acados", dae, 0, grid, {"num_steps": 4, "newton_iter": 10,
+                        "is_diff_in": [True] * 7})
+      x0 = ca.MX.sym("x0", 2)
+      u = ca.MX.sym("u", 1, nt)
+      p = ca.MX.sym("p")
+      w = ca.vertcat(x0, ca.vec(u), p)
+      y = ca.vec(F(x0=x0, z0=0.4, u=u, p=p)["xf"])
+      phi = ca.dot(ca.DM.rand(y.numel()), y)
+      f = ca.Function("f", [w], [y, ca.gradient(phi, w)])
+      df = ca.Function("df", [w], [ca.jacobian(y, w), ca.hessian(phi, w)[0]])
+      w0 = ca.DM([1, 0.5] + [0.3, -0.2, 0.1][:nt] + [0.7])
+      J, H = df(w0)
+      e = 1e-6
+      seeds = ca.horzsplit(ca.DM.eye(w0.numel()))
+      FD = ca.horzcat(*[(f(w0 + e * d)[0] - f(w0 - e * d)[0]) / (2 * e) for d in seeds])
+      HD = ca.horzcat(*[(f(w0 + e * d)[1] - f(w0 - e * d)[1]) / (2 * e) for d in seeds])
+      self.checkarray(FD, J, "jacobian", digits=7)
+      self.checkarray(HD, H, "hessian", digits=6)
+      # p not differentiable by default
+      G = ca.integrator("G", "acados", dae, 0, grid)
+      self.assertEqual(ca.jacobian(G(x0=x0, z0=0.4, u=u, p=p)["xf"], p).nnz(), 0)
+      self.check_serialize(F, inputs={"x0": [1, 0.5], "z0": 0.4, "p": 0.7, "u": u0})
+      G = ca.Function("G", [w], [y, ca.jacobian(y, w), ca.hessian(phi, w)[0]])
+      self.check_codegen(G, inputs=[w0], std="c99",
+                 extralibs=["casadi-tp-acados", "blasfeo"])
+
+  @requires_integrator('acados')
+  def test_acados_unsupported(self):
+    self.message("acados: unsupported problem classes raise errors")
+    dae = self.acados_dae()
+    with self.assertInException("require scheme irk"):
+      ca.integrator("F", "acados", dae, 0, 1, {"scheme": "erk"})
+    x = ca.SX.sym("x")
+    with self.assertInException("quadratures"):
+      ca.integrator("F", "acados", {"x": x, "ode": -x, "quad": x}, 0, 1)
+
 if __name__ == '__main__':
     unittest.main()

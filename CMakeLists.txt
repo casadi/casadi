@@ -769,6 +769,15 @@ set(BUILD_FATROP_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for FATROP")
 option(WITH_BUILD_FATROP "Build FATROP (BUILD_FATROP_VERSION=${BUILD_FATROP_VERSION}) from downloaded source (BUILD_FATROP_GIT_REPO=${BUILD_FATROP_GIT_REPO})." OFF)
 set(BUILD_FATROP_DEPENDENCIES BLASFEO)
 
+# ACADOS: sim modules only, linked against our BLASFEO
+option(WITH_ACADOS "Compile the interface to ACADOS (integrator)" OFF)
+set(BUILD_ACADOS_VERSION "v0.6.0" CACHE STRING "Tag/branch/hash to be used for BUILD_ACADOS_GIT_REPO")
+set(BUILD_ACADOS_GIT_REPO "https://github.com/acados/acados.git" CACHE STRING "Git repo used together with BUILD_ACADOS_VERSION")
+set(BUILD_ACADOS_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for ACADOS")
+option(WITH_BUILD_ACADOS "Build ACADOS (BUILD_ACADOS_VERSION=${BUILD_ACADOS_VERSION}) from downloaded source (BUILD_ACADOS_GIT_REPO=${BUILD_ACADOS_GIT_REPO})." OFF)
+set(BUILD_ACADOS_DEPENDENCIES BLASFEO)
+add_feature_info(acados-interface WITH_ACADOS "Interface to the ACADOS integrators (sim modules).")
+
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
 set(BUILD_SUPERSCS_VERSION "4d2d1bd03ed4cf93e684a880b233760ce34ca69c" CACHE STRING "Tag/branch/hash to be used for BUILD_SUPERSCS_GIT_REPO")
@@ -1290,7 +1299,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI XPRESS MOSEK WORHP HSL MADNLP CONOPT)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG ALPAQA UNO PIQP HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LACEMODELICA ONNX PROTOBUF LIBZIP ZLIB)
+foreach(PKG ALPAQA UNO PIQP HIGHS DAQP PROXQP OSQP CLARABEL RUMOCA SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS ACADOS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE LACEMODELICA ONNX PROTOBUF LIBZIP ZLIB)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -1712,6 +1721,39 @@ if(WITH_FATROP)
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
+  endif()
+endif()
+
+if(WITH_ACADOS)
+  if (WITH_BUILD_ACADOS)
+    # Sim modules only (no HPIPM, no QP solvers), against our BLASFEO, no submodules
+    # casadi-tp- prefix: acados users load their own libacados next to casadi
+    ExternalProject_Add(acados-external
+      DEPENDS ${BLASFEO_DEPENDS_TARGET}
+      GIT_REPOSITORY ${BUILD_ACADOS_GIT_REPO}
+      GIT_SHALLOW ${BUILD_ACADOS_GIT_SHALLOW}
+      GIT_TAG ${BUILD_ACADOS_VERSION}
+      GIT_SUBMODULES ""
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      PATCH_COMMAND git -C <SOURCE_DIR> apply --ignore-whitespace ${CMAKE_CURRENT_SOURCE_DIR}/cmake/acados_without_hpipm.patch || echo "acados_without_hpipm.patch already applied or failed"
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DACADOS_WITH_HPIPM=OFF -DACADOS_OUTPUT_NAME=${CASADI_TP_SHARED_PREFIX}acados -DACADOS_WITH_SYSTEM_BLASFEO=ON -DCMAKE_PREFIX_PATH=${BLASFEO_PATH} -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DACADOS_SILENT=ON -DBUILD_SHARED_LIBS=${TP_BUILD_SHARED} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+    add_library(acados ${TP_IMPORT_KIND} IMPORTED)
+    add_dependencies(acados acados-external)
+    target_link_libraries(acados INTERFACE blasfeo)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
+    set_target_properties(acados PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}acados${TP_LIB_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}acados${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    create_import_library(acados acados)
+    # Generated code includes acados_c/sim_interface.h
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/acados"
+      "${CMAKE_BINARY_DIR}/external_projects/include/acados_c"
+      DESTINATION "${INCLUDE_PREFIX}")
   endif()
 endif()
 

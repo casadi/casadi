@@ -135,6 +135,10 @@ if(WITH_FATROP)
   add_subdirectory(fatrop)
 endif()
 
+if(WITH_ACADOS)
+  add_subdirectory(acados)
+endif()
+
 if(WITH_SUPERSCS)
   add_subdirectory(superscs)
 endif()

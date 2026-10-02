@@ -1,0 +1,184 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ea7ae62..430dc9e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -93,12 +93,16 @@ option(ACADOS_WITH_OOQP "OOQP solver" OFF)
+ option(ACADOS_WITH_QPDUNES "qpDUNES solver" OFF)
+ option(ACADOS_WITH_OSQP "OSQP solver" OFF)
+ option(ACADOS_WITH_CLARABEL "Clarabel solver" OFF)
++set(ACADOS_OUTPUT_NAME "acados" CACHE STRING "File name of the acados library, without prefix and suffix")
++option(ACADOS_WITH_HPIPM "Build the OCP/QP modules, which require HPIPM; OFF builds the sim modules only" ON)
+ # Interfaces
+ option(ACADOS_OCTAVE "Octave Interface tests" OFF)
+ # Options to use libraries found via find_package
+ option(ACADOS_WITH_SYSTEM_BLASFEO "If ON, use blasfeo found via find_package(blasfeo) instead of compiling it" OFF)
+ mark_as_advanced(ACADOS_WITH_SYSTEM_BLASFEO)
+ if(ACADOS_WITH_SYSTEM_BLASFEO)
++    # Imported targets are directory scoped: find it here so that acados/ sees it too
++    find_package(blasfeo REQUIRED)
+     message(WARNING "The ACADOS_WITH_SYSTEM_BLASFEO option is enabled. ACADOS is tested by its developers only with ACADOS_WITH_SYSTEM_BLASFEO=OFF, when using an external blasfeo may sure that everything works as expected.")
+ endif()
+ 
+diff --git a/acados/CMakeLists.txt b/acados/CMakeLists.txt
+index 282f0d6..cffa5bf 100644
+--- a/acados/CMakeLists.txt
++++ b/acados/CMakeLists.txt
+@@ -36,6 +36,16 @@ include(CMakePackageConfigHelpers)
+ # Build list with all source files to go into the acados library
+ file(GLOB_RECURSE ACADOS_SRC "${PROJECT_SOURCE_DIR}/acados/*.c")
+ 
++# Without HPIPM, only the sim modules and the utilities they need
++if(NOT ACADOS_WITH_HPIPM)
++    file(GLOB ACADOS_SRC "${PROJECT_SOURCE_DIR}/acados/sim/*.c")
++    list(APPEND ACADOS_SRC
++        "${PROJECT_SOURCE_DIR}/acados/utils/external_function_generic.c"
++        "${PROJECT_SOURCE_DIR}/acados/utils/math.c"
++        "${PROJECT_SOURCE_DIR}/acados/utils/mem.c"
++        "${PROJECT_SOURCE_DIR}/acados/utils/timing.c")
++endif()
++
+ # Exclude files not compatible with MSVC
+ if(NOT ACADOS_WITH_HPMPC)
+     list(REMOVE_ITEM ACADOS_SRC "${PROJECT_SOURCE_DIR}/acados/ocp_qp/ocp_qp_hpmpc.c")
+@@ -72,6 +82,7 @@ endif()
+ 
+ # Define acados library
+ add_library(acados ${ACADOS_SRC})
++set_target_properties(acados PROPERTIES OUTPUT_NAME ${ACADOS_OUTPUT_NAME})
+ 
+ target_include_directories(acados PUBLIC
+         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}> # to be able to include "acados/header.h"
+@@ -152,10 +163,16 @@ if(ACADOS_WITH_OOQP)
+     target_link_libraries(acados PUBLIC ooqp)
+ endif()
+ 
++if(ACADOS_WITH_HPIPM)
++    target_link_libraries(acados PUBLIC hpipm)
++else()
++    target_compile_definitions(acados PRIVATE ACADOS_WITHOUT_HPIPM)
++endif()
++
+ if(CMAKE_C_COMPILER_ID MATCHES MSVC) # no explicit math library
+-    target_link_libraries(acados PUBLIC hpipm blasfeo)
++    target_link_libraries(acados PUBLIC blasfeo)
+ else() # add explicit math library
+-    target_link_libraries(acados PUBLIC hpipm blasfeo m)
++    target_link_libraries(acados PUBLIC blasfeo m)
+ endif()
+ 
+ if(CMAKE_BUILD_TYPE MATCHES Debug)
+@@ -190,7 +207,8 @@ install(EXPORT acadosTargets DESTINATION cmake)
+ configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/acadosConfig.cmake.in
+                               ${CMAKE_CURRENT_BINARY_DIR}/cmake/acadosConfig.cmake
+                               INSTALL_DESTINATION cmake
+-                              PATH_VARS ACADOS_WITH_HPMPC
++                              PATH_VARS ACADOS_WITH_HPIPM
++                                        ACADOS_WITH_HPMPC
+                                         ACADOS_WITH_QORE
+                                         ACADOS_WITH_QPOASES
+                                         ACADOS_WITH_DAQP
+diff --git a/acados/utils/print.h b/acados/utils/print.h
+index 7b249e7..40082ad 100644
+--- a/acados/utils/print.h
++++ b/acados/utils/print.h
+@@ -36,10 +36,12 @@
+ extern "C" {
+ #endif
+ 
++#ifndef ACADOS_WITHOUT_HPIPM
+ #include "acados/dense_qp/dense_qp_common.h"
+ #include "acados/ocp_nlp/ocp_nlp_common.h"
+ #include "acados/ocp_qp/ocp_qp_common.h"
+ #include "acados/ocp_qp/ocp_qp_common_frontend.h"
++#endif
+ #include "acados/utils/types.h"
+ 
+ // void print_matrix(char *file_name, const real_t *matrix, const int_t nrows, const int_t ncols);
+@@ -57,6 +59,7 @@ void read_matrix(const char *file_name, real_t *array, const int_t nrows, const
+ 
+ void write_double_vector_to_txt(real_t *vec, int_t n, const char *fname);
+ 
++#ifndef ACADOS_WITHOUT_HPIPM
+ // ocp nlp
+ // TODO(andrea): inconsistent naming
+ void ocp_nlp_dims_print(ocp_nlp_dims *dims);
+@@ -92,6 +95,7 @@ void print_dense_qp_in(dense_qp_in *qp_in);
+ // void print_colmaj_ocp_qp_out(char *filename, colmaj_ocp_qp_in *qp, colmaj_ocp_qp_out *out);
+ 
+ void print_qp_info(qp_info *info);
++#endif  // ACADOS_WITHOUT_HPIPM
+ 
+ // void acados_warning(char warning_string[]);
+ 
+diff --git a/cmake/acadosConfig.cmake.in b/cmake/acadosConfig.cmake.in
+index 83108e5..f703268 100644
+--- a/cmake/acadosConfig.cmake.in
++++ b/cmake/acadosConfig.cmake.in
+@@ -30,6 +30,7 @@
+ 
+ # Enabled external modules
+ set(ACADOS_WITH_OPENMP @ACADOS_WITH_OPENMP@)
++set(ACADOS_WITH_HPIPM @ACADOS_WITH_HPIPM@)
+ set(ACADOS_WITH_HPMPC @ACADOS_WITH_HPMPC@)
+ set(ACADOS_WITH_QORE @ACADOS_WITH_QORE@)
+ set(ACADOS_WITH_QPOASES @ACADOS_WITH_QPOASES@)
+@@ -48,7 +49,9 @@ include(CMakeFindDependencyMacro)
+ 
+ # Find the enabled external modules
+ find_dependency(blasfeo)
+-find_dependency(hpipm)
++if(ACADOS_WITH_HPIPM)
++    find_dependency(hpipm)
++endif()
+ 
+ if (ACADOS_WITH_OPENMP)
+     find_dependency(OpenMP)
+diff --git a/external/CMakeLists.txt b/external/CMakeLists.txt
+index 20460c2..b5ef411 100644
+--- a/external/CMakeLists.txt
++++ b/external/CMakeLists.txt
+@@ -49,16 +49,18 @@ else()
+ endif()
+ 
+ # When HPIPM is used as part of acados
+-if(ACADOS_WITH_SYSTEM_BLASFEO)
+-    set(HPIPM_FIND_BLASFEO ON CACHE BOOL "" FORCE)
+-else()
+-    set(HPIPM_BLASFEO_PATH ${BLASFEO_SRC_DIR} CACHE STRING "Set CPU architecture target" FORCE)
++if(ACADOS_WITH_HPIPM)
++    if(ACADOS_WITH_SYSTEM_BLASFEO)
++        set(HPIPM_FIND_BLASFEO ON CACHE BOOL "" FORCE)
++    else()
++        set(HPIPM_BLASFEO_PATH ${BLASFEO_SRC_DIR} CACHE STRING "Set CPU architecture target" FORCE)
++    endif()
++    set(HPIPM_BLASFEO_LIB OFF CACHE BOOL "Turn off BLASFEO from HPIPM" FORCE)
++    set(HPIPM_HEADERS_INSTALLATION_DIRECTORY "include/hpipm/include" CACHE STRING "")
++    set(TARGET ${HPIPM_TARGET} CACHE STRING "Set CPU architecture target" FORCE)
++    set(HPIPM_TESTING OFF CACHE BOOL "Tests disabled" FORCE)
++    add_subdirectory(hpipm)
+ endif()
+-set(HPIPM_BLASFEO_LIB OFF CACHE BOOL "Turn off BLASFEO from HPIPM" FORCE)
+-set(HPIPM_HEADERS_INSTALLATION_DIRECTORY "include/hpipm/include" CACHE STRING "")
+-set(TARGET ${HPIPM_TARGET} CACHE STRING "Set CPU architecture target" FORCE)
+-set(HPIPM_TESTING OFF CACHE BOOL "Tests disabled" FORCE)
+-add_subdirectory(hpipm)
+ 
+ if(ACADOS_WITH_HPMPC)
+ 	# TODO: The following definition should go ASAP!
+diff --git a/interfaces/acados_c/CMakeLists.txt b/interfaces/acados_c/CMakeLists.txt
+index 48094db..799bb53 100644
+--- a/interfaces/acados_c/CMakeLists.txt
++++ b/interfaces/acados_c/CMakeLists.txt
+@@ -36,6 +36,12 @@ set(INTERFACES_ACADOS_C_SRC
+     ${CMAKE_CURRENT_SOURCE_DIR}/condensing_interface.c
+     ${CMAKE_CURRENT_SOURCE_DIR}/sim_interface.c)
+ 
++if(NOT ACADOS_WITH_HPIPM)
++    set(INTERFACES_ACADOS_C_SRC
++        ${CMAKE_CURRENT_SOURCE_DIR}/external_function_interface.c
++        ${CMAKE_CURRENT_SOURCE_DIR}/sim_interface.c)
++endif()
++
+ target_sources(acados PRIVATE ${INTERFACES_ACADOS_C_SRC})
+ 
+ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
