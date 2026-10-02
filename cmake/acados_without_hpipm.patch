@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index ea7ae62..430dc9e 100644
+index ea7ae62a4..430dc9e07 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -93,12 +93,16 @@ option(ACADOS_WITH_OOQP "OOQP solver" OFF)
@@ -20,7 +20,7 @@ index ea7ae62..430dc9e 100644
  endif()
  
 diff --git a/acados/CMakeLists.txt b/acados/CMakeLists.txt
-index 282f0d6..cffa5bf 100644
+index 282f0d66f..cffa5bf95 100644
 --- a/acados/CMakeLists.txt
 +++ b/acados/CMakeLists.txt
 @@ -36,6 +36,16 @@ include(CMakePackageConfigHelpers)
@@ -78,7 +78,7 @@ index 282f0d6..cffa5bf 100644
                                          ACADOS_WITH_QPOASES
                                          ACADOS_WITH_DAQP
 diff --git a/acados/utils/print.h b/acados/utils/print.h
-index 7b249e7..40082ad 100644
+index 7b249e730..40082adca 100644
 --- a/acados/utils/print.h
 +++ b/acados/utils/print.h
 @@ -36,10 +36,12 @@
@@ -110,8 +110,21 @@ index 7b249e7..40082ad 100644
  
  // void acados_warning(char warning_string[]);
  
+diff --git a/acados/utils/timing.h b/acados/utils/timing.h
+index bbbea91ec..39aa88e02 100644
+--- a/acados/utils/timing.h
++++ b/acados/utils/timing.h
+@@ -41,7 +41,7 @@ extern "C" {
+ #if (defined _WIN32 || defined _WIN64)
+ 
+ /* Use Windows QueryPerformanceCounter for timing. */
+-#include <Windows.h>
++#include <windows.h>
+ 
+ /** A structure for keeping internal timer data. */
+ typedef struct acados_timer_
 diff --git a/cmake/acadosConfig.cmake.in b/cmake/acadosConfig.cmake.in
-index 83108e5..f703268 100644
+index 83108e52f..f7032689a 100644
 --- a/cmake/acadosConfig.cmake.in
 +++ b/cmake/acadosConfig.cmake.in
 @@ -30,6 +30,7 @@
@@ -134,7 +147,7 @@ index 83108e5..f703268 100644
  if (ACADOS_WITH_OPENMP)
      find_dependency(OpenMP)
 diff --git a/external/CMakeLists.txt b/external/CMakeLists.txt
-index 20460c2..b5ef411 100644
+index 20460c2b0..b5ef411d3 100644
 --- a/external/CMakeLists.txt
 +++ b/external/CMakeLists.txt
 @@ -49,16 +49,18 @@ else()
@@ -166,7 +179,7 @@ index 20460c2..b5ef411 100644
  if(ACADOS_WITH_HPMPC)
  	# TODO: The following definition should go ASAP!
 diff --git a/interfaces/acados_c/CMakeLists.txt b/interfaces/acados_c/CMakeLists.txt
-index 48094db..799bb53 100644
+index 48094db3d..799bb53ce 100644
 --- a/interfaces/acados_c/CMakeLists.txt
 +++ b/interfaces/acados_c/CMakeLists.txt
 @@ -36,6 +36,12 @@ set(INTERFACES_ACADOS_C_SRC
