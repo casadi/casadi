@@ -1743,10 +1743,18 @@ if(WITH_ACADOS)
     add_dependencies(acados acados-external)
     target_link_libraries(acados INTERFACE blasfeo)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
+    if(WIN32)
+      # acados uses MSVC-style names also with MinGW: no lib prefix, .lib import library
+      set(ACADOS_LIB_PREFIX "")
+      set(ACADOS_IMPLIB_NAME "${CASADI_TP_SHARED_PREFIX}acados.lib")
+    else()
+      set(ACADOS_LIB_PREFIX "${CMAKE_SHARED_LIBRARY_PREFIX}")
+      set(ACADOS_IMPLIB_NAME "${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}acados${CMAKE_IMPORT_LIBRARY_SUFFIX}")
+    endif()
     set_target_properties(acados PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}acados${TP_LIB_SUFFIX}"
-      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}acados${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${ACADOS_LIB_PREFIX}${CASADI_TP_SHARED_PREFIX}acados${TP_LIB_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${ACADOS_IMPLIB_NAME}"
     )
     create_import_library(acados acados)
     # Generated code includes acados_c/sim_interface.h
