@@ -1561,7 +1561,7 @@ class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
         """(name, plugin options, solver options) for every solver a soft case
         runs through. ipopt is the reference grade; sqpmethod is an
         independent solver of the same expansion."""
-        out = [("ipopt",) + self.IPOPT_SOFT]
+        out = [("ipopt",) + self.IPOPT_SOFT]  # type: list
         if ca.has_nlpsol("sqpmethod") and ca.has_conic("qrqp"):
             # sqpmethod's settings are nlpsol-level options, not a plugin dict
             out.append(("sqpmethod",

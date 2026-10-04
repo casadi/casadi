@@ -800,7 +800,7 @@ class Statstests(casadiTestCase):
       def get_name_out(self, i): return "ret"
       def get_sparsity_in(self, i):
         n = ca.nlpsol_out(i)
-        if n in ("f", "lam_p", "p"): return ca.Sparsity.dense(1 if n == "f" else 0)
+        if n in ("f", "lam_p", "p", "s", "lam_s"): return ca.Sparsity.dense(1 if n == "f" else 0)
         return ca.Sparsity.dense(self.nx if n in ("x", "lam_x") else self.ng)
       def eval(self, arg):
         self.iters.append(float(arg[0][0]))
@@ -1149,7 +1149,7 @@ class Statstests(casadiTestCase):
   def test_codegen_ipopt(self):
     R = _Rosenbrock()
     S = R.solver
-    inputs = [[-1, 1], 100, -ca.inf, ca.inf, -ca.inf, 1, 0, 0]
+    inputs = [[-1, 1], 100, -ca.inf, ca.inf, -ca.inf, 1, 0, 0, [], [], []]
     lib = self.build(S, inputs, std="c99", extralibs=["ipopt"], digits=8)
     flag, outs, C, needed = self.call(lib, S, inputs)
     self.assertEqual(flag, 0)
@@ -1175,7 +1175,7 @@ class Statstests(casadiTestCase):
   def test_codegen_ipopt_truncated(self):
     R = _Rosenbrock()
     S = R.solver
-    inputs = [[-1, 1], 100, -ca.inf, ca.inf, -ca.inf, 1, 0, 0]
+    inputs = [[-1, 1], 100, -ca.inf, ca.inf, -ca.inf, 1, 0, 0, [], [], []]
     lib = self.build(S, inputs, std="c99", extralibs=["ipopt"], digits=8)
     _, xref, full, n = self.call(lib, S, inputs)
     ref = full.to_native()[0]
@@ -1333,7 +1333,7 @@ class Statstests(casadiTestCase):
   def test_codegen_ipopt_queries(self):
     R = _Rosenbrock()
     S = R.solver
-    inputs = [[-1, 1], 100, -ca.inf, ca.inf, -ca.inf, 1, 0, 0]
+    inputs = [[-1, 1], 100, -ca.inf, ca.inf, -ca.inf, 1, 0, 0, [], [], []]
     lib = self.build(S, inputs, std="c99", extralibs=["ipopt"], digits=8)
     _, _, _, n = self.call(lib, S, inputs)
     stream = self.stream
