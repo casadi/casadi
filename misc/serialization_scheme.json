@@ -112,6 +112,9 @@
     "Interpolant": [
       2
     ],
+    "IpmcInterface": [
+      7
+    ],
     "IpoptInterface": [
       3
     ],
@@ -475,6 +478,9 @@
     "Interpolant": [
       1,
       2
+    ],
+    "IpmcInterface": [
+      7
     ],
     "IpoptInterface": [
       1,
@@ -5270,6 +5276,101 @@
           "op": "call"
         }
       ],
+      "IpmcInterface::serialize_body": [
+        {
+          "layout": "Nlpsol::serialize_body",
+          "op": "call"
+        },
+        {
+          "name": "IpmcInterface",
+          "op": "version",
+          "value": 7
+        },
+        {
+          "name": "IpmcInterface::jacg_sp",
+          "op": "field",
+          "type": "Sparsity"
+        },
+        {
+          "name": "IpmcInterface::hesslag_sp",
+          "op": "field",
+          "type": "Sparsity"
+        },
+        {
+          "name": "IpmcInterface::exact_hessian",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "name": "IpmcInterface::opts",
+          "op": "field",
+          "type": "Dict"
+        },
+        {
+          "name": "IpmcInterface::nxs",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::nus",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::ngs",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "IpmcInterface::nxc",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "IpmcInterface::N",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "IpmcInterface::slacks",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "body": [
+            {
+              "name": "IpmcInterface::fs_z",
+              "op": "field",
+              "type": {
+                "element": "double",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "IpmcInterface::fs_Z",
+              "op": "field",
+              "type": {
+                "element": "double",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "field",
+            "IpmcInterface::slacks"
+          ],
+          "op": "if"
+        }
+      ],
       "IpoptInterface::serialize_body": [
         {
           "layout": "Nlpsol::serialize_body",
@@ -9795,6 +9896,12 @@
                         "feasiblesqpmethod": [
                           {
                             "layout": "Feasiblesqpmethod::serialize_body",
+                            "op": "call"
+                          }
+                        ],
+                        "ipmc": [
+                          {
+                            "layout": "IpmcInterface::serialize_body",
                             "op": "call"
                           }
                         ],

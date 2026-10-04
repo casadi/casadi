@@ -1355,9 +1355,10 @@ namespace casadi {
     d_nlp.x0 = arg[NLPSOL_X0];
     d_nlp.lam_x0 = arg[NLPSOL_LAM_X0];
     d_nlp.lam_g0 = arg[NLPSOL_LAM_G0];
-    m->s0 = arg[NLPSOL_S0];
-    m->ubs = arg[NLPSOL_UBS];
-    m->lam_s0 = arg[NLPSOL_LAM_S0];
+    // Slack slots absent from a function deserialized with 8 inputs and 6 outputs read as null
+    m->s0 = n_in_ > static_cast<size_t>(NLPSOL_S0) ? arg[NLPSOL_S0] : nullptr;
+    m->ubs = n_in_ > static_cast<size_t>(NLPSOL_UBS) ? arg[NLPSOL_UBS] : nullptr;
+    m->lam_s0 = n_in_ > static_cast<size_t>(NLPSOL_LAM_S0) ? arg[NLPSOL_LAM_S0] : nullptr;
 
     d_nlp.x = res[NLPSOL_X];
     d_nlp.f = res[NLPSOL_F];
@@ -1365,11 +1366,12 @@ namespace casadi {
     d_nlp.lam_x = res[NLPSOL_LAM_X];
     d_nlp.lam_g = res[NLPSOL_LAM_G];
     d_nlp.lam_p = res[NLPSOL_LAM_P];
-    m->s = res[NLPSOL_S];
-    m->lam_s = res[NLPSOL_LAM_S];
+    m->s = n_out_ > static_cast<size_t>(NLPSOL_S) ? res[NLPSOL_S] : nullptr;
+    m->lam_s = n_out_ > static_cast<size_t>(NLPSOL_LAM_S) ? res[NLPSOL_LAM_S] : nullptr;
 
-    arg += NLPSOL_NUM_IN;
-    res += NLPSOL_NUM_OUT;
+    // The plugin's arg/res start after this function's own inputs and outputs
+    arg += n_in_;
+    res += n_out_;
 
     casadi_nlpsol_set_work(&m->d_nlp, &arg, &res, &iw, &w);
 
