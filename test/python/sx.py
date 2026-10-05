@@ -1934,6 +1934,16 @@ class SXtests(casadiTestCase):
 
     self.checkarray(ca.logsumexp(ca.vertcat(100,1000,10000)),f(ca.vertcat(100,1000,10000)))
 
+    # Max not at the end: the shift must be the true max
+    for v in [ca.vertcat(0,1000,1), ca.vertcat(1000,0,1), ca.vertcat(0,1,1000), ca.vertcat(5,1e5,3,2,1e5-1)]:
+      a = np.array(v).ravel()
+      ref = a.max()+np.log(np.sum(np.exp(a-a.max())))
+      self.checkarray(ca.logsumexp(v),ref)
+      xm = ca.MX.sym("x",v.shape[0])
+      fm = ca.Function("fm",[xm],[ca.logsumexp(xm)])
+      self.checkarray(fm(v),ref)
+      self.check_codegen(fm,inputs=[v])
+
   def test_extract_parametric_call_sx(self):
     x = ca.MX.sym("x")
     y = ca.MX.sym("y")

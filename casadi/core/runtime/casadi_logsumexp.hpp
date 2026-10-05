@@ -27,7 +27,7 @@ T1 casadi_logsumexp(const T1* x, casadi_int n) {
   max = x[0];
   // Determine max, argmax
   for (i=1; i<n; ++i) {
-    if (x[i]>x[0]) {
+    if (x[i]>max) {
       max = x[i];
       max_ind = i;
     }
