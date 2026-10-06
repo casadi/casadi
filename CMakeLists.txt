@@ -2718,9 +2718,9 @@ if(WITH_ZLIB)
   else()
     find_package(ZLIB REQUIRED)
     add_library(ZLIB::libz INTERFACE IMPORTED)
+    # ZLIB_LIBRARIES may be an optimized;debug list, which INTERFACE_LINK_LIBRARIES rejects
     set_target_properties(ZLIB::libz PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${ZLIB_INCLUDE_DIRS}"
-      INTERFACE_LINK_LIBRARIES "${ZLIB_LIBRARIES}")
+      INTERFACE_LINK_LIBRARIES ZLIB::ZLIB)
   endif()
 endif()
 add_feature_info(zlib-interface WITH_ZLIB "Interface to the zlib.")
@@ -2769,7 +2769,8 @@ if(WITH_GHC_FILESYSTEM)
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
     )
   else()
-    find_package(ghcFilesystem REQUIRED)
+    # Package is ghc_filesystem; only the imported target is ghcFilesystem::ghc_filesystem
+    find_package(ghc_filesystem REQUIRED)
   endif()
 endif()
 add_feature_info(ghc-filesystem-interface WITH_GHC_FILESYSTEM "Interface to the ghc.")
@@ -2919,17 +2920,35 @@ if(WITH_ONNX_RUNTIME)
     find_library(ONNX_RUNTIME_LIBRARY
       NAMES onnxruntime
       HINTS ${ONNX_RUNTIME_DIR}/lib ${ONNX_RUNTIME_DIR})
-    if(ONNX_RUNTIME_INCLUDE_DIR AND ONNX_RUNTIME_LIBRARY)
-      if(NOT TARGET onnxruntime::onnxruntime)
-        add_library(onnxruntime::onnxruntime UNKNOWN IMPORTED)
-        set_target_properties(onnxruntime::onnxruntime PROPERTIES
-          IMPORTED_LOCATION "${ONNX_RUNTIME_LIBRARY}"
-          INTERFACE_INCLUDE_DIRECTORIES "${ONNX_RUNTIME_INCLUDE_DIR}")
+    # A shared library is self-contained, so the bare lookup is enough (and the only thing that
+    # works for the Microsoft release archives: their bundled onnxruntimeConfig.cmake references
+    # lib64/ and include/onnxruntime, which the archive lacks, and aborts the configure).
+    # A static library needs its transitive link interface, which only the package config knows.
+    set(ONNX_RUNTIME_STATIC FALSE)
+    if(ONNX_RUNTIME_LIBRARY MATCHES "\\.a$")
+      set(ONNX_RUNTIME_STATIC TRUE)
+    elseif(WIN32 AND ONNX_RUNTIME_LIBRARY MATCHES "\\.lib$")
+      get_filename_component(ONNX_RUNTIME_LIBDIR "${ONNX_RUNTIME_LIBRARY}" DIRECTORY)
+      find_file(ONNX_RUNTIME_DLL onnxruntime.dll
+        HINTS "${ONNX_RUNTIME_LIBDIR}" "${ONNX_RUNTIME_LIBDIR}/../bin" NO_DEFAULT_PATH)
+      if(NOT ONNX_RUNTIME_DLL)
+        set(ONNX_RUNTIME_STATIC TRUE)
       endif()
+    endif()
+    if(ONNX_RUNTIME_INCLUDE_DIR AND ONNX_RUNTIME_LIBRARY AND NOT ONNX_RUNTIME_STATIC)
+      add_library(onnxruntime::onnxruntime UNKNOWN IMPORTED)
+      set_target_properties(onnxruntime::onnxruntime PROPERTIES
+        IMPORTED_LOCATION "${ONNX_RUNTIME_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${ONNX_RUNTIME_INCLUDE_DIR}")
       message(STATUS "Found ONNX Runtime: ${ONNX_RUNTIME_LIBRARY}")
     else()
-      message(WARNING "ONNX Runtime not found; set ONNX_RUNTIME_DIR. Disabling WITH_ONNX_RUNTIME.")
-      set(WITH_ONNX_RUNTIME OFF CACHE BOOL "ONNX Runtime not found" FORCE)
+      find_package(onnxruntime CONFIG QUIET)
+      if(TARGET onnxruntime::onnxruntime)
+        message(STATUS "Found ONNX Runtime (package config): ${onnxruntime_DIR}")
+      else()
+        message(WARNING "ONNX Runtime not found; set ONNX_RUNTIME_DIR. Disabling WITH_ONNX_RUNTIME.")
+        set(WITH_ONNX_RUNTIME OFF CACHE BOOL "ONNX Runtime not found" FORCE)
+      endif()
     endif()
   endif()
 endif()
