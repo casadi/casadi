@@ -353,9 +353,9 @@ class Statstests(casadiTestCase):
     if raw:
       st = b = CStats(p, cap, 0, CReserve(), CCommit(), None)
     else:
-      make = getattr(lib, getattr(lib, "_prefix") + "_stats_make_sink")
-      make.restype = CStats
-      st = b = make(p, ctypes.c_longlong(cap))
+      st = b = CStats()
+      getattr(lib, getattr(lib, "_prefix") + "_stats_init_sink")(ctypes.byref(st), p,
+                                                                  ctypes.c_longlong(cap))
       if reserve: st.reserve = reserve
       if commit: st.commit = commit
     if with_stats and unrolled:
@@ -1012,9 +1012,9 @@ class Statstests(casadiTestCase):
       self.assertEqual(sink.needed, 0)
       self.assertEqual((nbytes(ctypes.byref(sink)), truncated(ctypes.byref(sink))), (0, 0))
       self.assertEqual(reserve(ctypes.byref(sink), ctypes.c_longlong(3), ctypes.byref(pos)), base)
-      make = getattr(lib, getattr(lib, "_prefix") + "_stats_make_sink")
-      make.restype = CStats
-      made = make(ctypes.cast(buf, ctypes.POINTER(ctypes.c_ubyte)), ctypes.c_longlong(16))
+      made = CStats()
+      getattr(lib, getattr(lib, "_prefix") + "_stats_init_sink")(
+        ctypes.byref(made), ctypes.cast(buf, ctypes.POINTER(ctypes.c_ubyte)), ctypes.c_longlong(16))
       self.assertEqual((ctypes.addressof(made.p.contents), made.cap, made.needed), (base, 16, 0))
       self.assertEqual(bool(made.reserve), fp)
       self.assertFalse(made.commit)
@@ -1513,9 +1513,9 @@ class Statstests(casadiTestCase):
                     code)
       self.assertIn("unsigned char* fp_stats_reserve(struct casadi_stats_sink* s, casadi_int len, "
                     "casadi_int* pos);", header)
-      self.assertIn("struct casadi_stats_sink fp_stats_make_sink(unsigned char* p, casadi_int cap);",
-                    header)
-      self.assertIn("CASADI_SYMBOL_EXPORT struct casadi_stats_sink casadi_stats_make_sink(unsigned char* p", code)
+      self.assertIn("void fp_stats_init_sink(struct casadi_stats_sink* s, unsigned char* p, "
+                    "casadi_int cap);", header)
+      self.assertIn("CASADI_SYMBOL_EXPORT void casadi_stats_init_sink(struct casadi_stats_sink* s", code)
       self.assertIn("void fp_stats_clear(struct casadi_stats_sink* s);", header)
       self.assertIn("casadi_int fp_stats_nbytes(const struct casadi_stats_sink* s);", header)
       self.assertIn("int fp_stats_truncated(const struct casadi_stats_sink* s);", header)

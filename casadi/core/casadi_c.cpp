@@ -342,8 +342,8 @@ int casadi_c_eval_with_stats_id(int id, const double** arg, double** res, casadi
   return 0;
 }
 
-casadi_stats_sink casadi_c_stats_make_sink(unsigned char* p, casadi_int cap) {
-  return casadi::casadi_stats_make_sink(p, cap);
+void casadi_c_stats_init_sink(casadi_stats_sink* s, unsigned char* p, casadi_int cap) {
+  casadi::casadi_stats_init_sink(s, p, cap);
 }
 
 void casadi_c_stats_clear(casadi_stats_sink* s) {

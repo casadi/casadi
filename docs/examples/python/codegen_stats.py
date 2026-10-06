@@ -46,7 +46,7 @@ int main(void) {
   double obj;
   FILE* f;
   int mem, flag;
-  stats = solver_stats_make_sink(buffer, sizeof(buffer));
+  solver_stats_init_sink(&stats, buffer, sizeof(buffer));
   mem = solver_checkout();
   flag = solver_with_stats(arg, res, iw, w, mem, &stats, -1);   /* -1: root call */
   printf("flag %d, x = [%g, %g], %lld stats bytes%s\n", flag, x[0], x[1],

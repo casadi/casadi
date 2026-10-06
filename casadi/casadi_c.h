@@ -146,7 +146,7 @@ struct casadi_stats_sink {
 #endif /* CASADI_STATS_SINK */
 
 /** \brief Sink on p[0, cap), thread-safe */
-CASADI_EXPORT struct casadi_stats_sink casadi_c_stats_make_sink(unsigned char* p,
+CASADI_EXPORT void casadi_c_stats_init_sink(struct casadi_stats_sink* s, unsigned char* p,
   casadi_int cap);
 /** \brief Drop all records */
 CASADI_EXPORT void casadi_c_stats_clear(struct casadi_stats_sink* s);

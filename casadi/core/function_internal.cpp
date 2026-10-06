@@ -3057,7 +3057,7 @@ namespace casadi {
       if (g.stats()) {
         g << "for (j=0; j+1<argc; ++j) if (strcmp(argv[j], \"--stats\")==0) "
           << "stats_file = argv[j+1];\n"
-          << "stats = casadi_stats_make_sink(stats_buf, sizeof(stats_buf));\n";
+          << "casadi_stats_init_sink(&stats, stats_buf, sizeof(stats_buf));\n";
       }
 
       if (has_refcount_in_deps_) {

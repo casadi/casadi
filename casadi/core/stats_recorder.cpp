@@ -128,7 +128,7 @@ namespace {
 
   StatsRecorderInternal::StatsRecorderInternal(casadi_int size)
       : size_(size), buf_(size) {
-    s_ = casadi_stats_make_sink(buf_.data(), size_);
+    casadi_stats_init_sink(&s_, buf_.data(), size_);
   }
 
   void StatsRecorderInternal::clear() {

@@ -74,21 +74,19 @@ void casadi_stats_commit(struct casadi_stats_sink* s, casadi_int pos) {
   (void) s; (void) pos;
 }
 
-// SYMBOL "stats_make_sink"
+// SYMBOL "stats_init_sink"
 // EXPORT
 inline
-struct casadi_stats_sink casadi_stats_make_sink(unsigned char* p, casadi_int cap) {
+void casadi_stats_init_sink(struct casadi_stats_sink* s, unsigned char* p, casadi_int cap) {
   // Libraries called into reserve through this file's bump
-  struct casadi_stats_sink s;
-  s.p = p;
-  s.cap = cap;
-  s.needed = 0;
-  s.reserve = 0;
-  s.commit = 0;
-  s.data = 0;
+  s->p = p;
+  s->cap = cap;
+  s->needed = 0;
+  s->reserve = 0;
+  s->commit = 0;
+  s->data = 0;
   // C-FUNCTION-POINTERS
-  s.reserve = casadi_stats_bump;
-  return s;
+  s->reserve = casadi_stats_bump;
 }
 
 // SYMBOL "stats_clear"

@@ -840,7 +840,7 @@ namespace casadi {
       << "    casadi_mex_stats_buf[k] = (unsigned char*) mxMalloc(cap>0 ? cap : 1);\n"
       << "    mexMakeMemoryPersistent(casadi_mex_stats_buf[k]);\n"
       << "    mexAtExit(casadi_mex_stats_atexit);\n"
-      << "    casadi_mex_stats_sink[k] = casadi_stats_make_sink(casadi_mex_stats_buf[k], cap);\n"
+      << "    casadi_stats_init_sink(casadi_mex_stats_sink+k, casadi_mex_stats_buf[k], cap);\n"
       << "    resv[0] = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);\n"
       << "    *(uint64_T*) mxGetData(resv[0]) = (uint64_T) (k+1);\n"
       << "    return;\n"

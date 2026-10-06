@@ -180,7 +180,8 @@ int usage_c_stats(){
 
   /* Sink on a caller-owned buffer */
   static unsigned char buf[1 << 16];
-  struct casadi_stats_sink s = casadi_c_stats_make_sink(buf, sizeof(buf));
+  struct casadi_stats_sink s;
+  casadi_c_stats_init_sink(&s, buf, sizeof(buf));
 
   casadi_c_incref_id(id);
   int mem = casadi_c_checkout_id(id);
