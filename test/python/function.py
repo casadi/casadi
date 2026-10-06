@@ -2422,6 +2422,7 @@ class Functiontests(casadiTestCase):
 
   @requiresPlugin(ca.Importer,"shell")
   def test_jit_codegen_options(self):
+    if not args.run_slow: return
     # Options of the code generator of jit, also after deserialization (which compiles again)
     x = ca.MX.sym("x")
     d = tempfile.mkdtemp()
