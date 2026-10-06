@@ -154,6 +154,9 @@
 %exception  casadi::CodeGenerator::add_io_sparsities(const std::string &name, const std::vector< Sparsity > &sp_in, const std::vector< Sparsity > &sp_out) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::add_runtime(const std::string &key, const std::string &src, const std::vector< std::string > &inst) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::add_sparsity(const Sparsity &sp, bool canonical=true) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

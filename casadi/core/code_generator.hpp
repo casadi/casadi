@@ -366,7 +366,9 @@ namespace casadi {
                                 const std::vector<std::string>& inst,
                                 bool add_shorthand=true);
 
-    /** \brief Add a sanitized runtime source once per key */
+    /** \brief Add a sanitized runtime source once per key
+
+        \identifier{2k8} */
     void add_runtime(const std::string& key, const std::string& src,
                      const std::vector<std::string>& inst);
 
