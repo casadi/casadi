@@ -164,8 +164,7 @@ struct casadi_ipmc_prob {
   // Slacks: ipmc's n_soft stage-local slack variables, stage after stage
   casadi_int n_soft;
   const casadi_int *slack_perm;  // [n_soft] the column of S each ipmc slack is
-  const T1 *fs_z;                // [ns] penalty gradient at s=0, per column
-  const T1 *fs_Z;                // [ns] penalty Hessian diagonal, per column
+  casadi_int ns;                 // columns of S
 
   // Lift (rewrite.ne==0: none); everything above describes the lifted problem
   casadi_ipmc_rewrite_prob<T1> rewrite;
@@ -248,6 +247,8 @@ struct casadi_ipmc_data {
   T1 *slack_s, *slack_lam_s, *slack_ubs;
   // ipmc's slacks and their bound multipliers, [n_soft] each
   T1 *sv, *zs_lo, *zs_up;
+  // [ns] penalty gradient at s=0 and Hessian diagonal per column, at this solve's p
+  T1 *fs_z, *fs_Z;
   int nxc_checked;    // constant-state rows checked this solve
 
   // Zero the blocks at the first evaluation of a solve; ipmc modifies them in place
@@ -283,26 +284,26 @@ int casadi_ipmc_init_mem(casadi_ipmc_data<T1>* d) {
 // SYMBOL "ipmc_penalty"
 // *acc += sum_e (z_e m_e + 1/2 Z_e m_e^2), m_e the stage-0 helpers in x
 template<typename T1>
-void casadi_ipmc_penalty(const casadi_ipmc_prob<T1>* p, const T1* x, T1* acc) {
+void casadi_ipmc_penalty(const casadi_ipmc_data<T1>* d, const T1* x, T1* acc) {
   casadi_int e, col;
   T1 m0;
-  const casadi_ipmc_rewrite_prob<T1>* q = &p->rewrite;
+  const casadi_ipmc_rewrite_prob<T1>* q = &d->prob->rewrite;
   for (e=0;e<q->ne;++e) {
     col = q->col[e];
     m0 = x[q->m0[e]];
-    *acc += p->fs_z[col]*m0 + 0.5*p->fs_Z[col]*m0*m0;
+    *acc += d->fs_z[col]*m0 + 0.5*d->fs_Z[col]*m0*m0;
   }
 }
 
 // SYMBOL "ipmc_penalty_grad"
 // g += scale * gradient of the penalty
 template<typename T1>
-void casadi_ipmc_penalty_grad(const casadi_ipmc_prob<T1>* p, const T1* x, T1 scale, T1* g) {
+void casadi_ipmc_penalty_grad(const casadi_ipmc_data<T1>* d, const T1* x, T1 scale, T1* g) {
   casadi_int e, col;
-  const casadi_ipmc_rewrite_prob<T1>* q = &p->rewrite;
+  const casadi_ipmc_rewrite_prob<T1>* q = &d->prob->rewrite;
   for (e=0;e<q->ne;++e) {
     col = q->col[e];
-    g[q->m0[e]] += scale*(p->fs_z[col] + p->fs_Z[col]*x[q->m0[e]]);
+    g[q->m0[e]] += scale*(d->fs_z[col] + d->fs_Z[col]*x[q->m0[e]]);
   }
 }
 
@@ -330,7 +331,7 @@ void casadi_ipmc_set_x(casadi_ipmc_data<T1>* d, const double* x) {
 // f += penalty
 template<typename T1>
 void casadi_ipmc_lift_obj(const casadi_ipmc_prob<T1>* p, casadi_ipmc_data<T1>* d, T1* obj) {
-  casadi_ipmc_penalty(p, d->x, obj);
+  casadi_ipmc_penalty(d, d->x, obj);
 }
 
 // SYMBOL "ipmc_lift_grad_f"
@@ -341,7 +342,7 @@ void casadi_ipmc_lift_grad_f(const casadi_ipmc_prob<T1>* p, casadi_ipmc_data<T1>
   if (!q->ne) return;
   casadi_clear(d->g, p->nlp->nx);
   casadi_mv(q->Px, q->Px_sp, d->gu, d->g, 0);
-  casadi_ipmc_penalty_grad(p, d->x, 1., d->g);
+  casadi_ipmc_penalty_grad(d, d->x, 1., d->g);
 }
 
 // SYMBOL "ipmc_lift_g"
@@ -375,7 +376,7 @@ void casadi_ipmc_lift_hess_l(const casadi_ipmc_prob<T1>* p, casadi_ipmc_data<T1>
   casadi_clear(d->g, p->nlp->nx);
   casadi_mv(q->Px, q->Px_sp, d->gu, d->g, 0);
   casadi_mv(q->C, q->C_sp, d->lam, d->g, 1);
-  casadi_ipmc_penalty_grad(p, d->x, obj_scale, d->g);
+  casadi_ipmc_penalty_grad(d, d->x, obj_scale, d->g);
 }
 
 // SYMBOL "ipmc_zval"
@@ -501,7 +502,7 @@ void casadi_ipmc_pack_lag_hess(casadi_ipmc_data<T1>* d, const struct IpmcLayout*
   // Constants after the oracle's nonzeros: 0, then the penalty curvature of each helper
   src[p->rewrite.nnz_hu] = 0;
   for (e=0;e<p->rewrite.ne;++e) {
-    src[p->rewrite.nnz_hu+1+e] = obj_scale*p->fs_Z[p->rewrite.col[e]];
+    src[p->rewrite.nnz_hu+1+e] = obj_scale*d->fs_Z[p->rewrite.col[e]];
   }
   if (d->hess_fresh) {
     for (k=0;k<s->K;++k) blasfeo_dgese(RSQ_p[k].m, RSQ_p[k].n, 0.0, RSQ_p+k, 0, 0);
@@ -580,6 +581,7 @@ void casadi_ipmc_work(const casadi_ipmc_prob<T1>* p, casadi_int* sz_arg, casadi_
   *sz_w += p->nlp->ng;           // cb_g
   *sz_w += p->nlp->nx;           // cb_x, ipmc's primal length
   *sz_w += 3*p->n_soft;          // sv, zs_lo, zs_up
+  *sz_w += 2*p->ns;              // fs_z, fs_Z
 
   // Caller oracle buffers, lift only
   if (p->rewrite.ne) {
@@ -612,6 +614,8 @@ void casadi_ipmc_set_work(casadi_ipmc_data<T1>* d, const T1*** arg, T1*** res,
   d->sv = *w;        *w += p->n_soft;
   d->zs_lo = *w;     *w += p->n_soft;
   d->zs_up = *w;     *w += p->n_soft;
+  d->fs_z = *w;      *w += p->ns;
+  d->fs_Z = *w;      *w += p->ns;
 
   // Caller oracle buffers; aliases without lift
   if (p->rewrite.ne) {
@@ -685,8 +689,14 @@ int casadi_ipmc_hand_over(casadi_ipmc_data<T1>* d) {
   ubs = zl + p->n_soft;
   for (i=0;i<p->n_soft;++i) {
     col = p->slack_perm[i];
-    Z[i] = p->fs_Z[col];
-    zl[i] = p->fs_z[col];
+    Z[i] = d->fs_Z[col];
+    zl[i] = d->fs_z[col];
+    // ipmc_set_soft_penalty refuses negatives but lets NaN and inf through
+    if (!(Z[i]<inf && zl[i]<inf)) {
+      d->error = CASADI_IPMC_PENALTY;
+      d->error_index = IPMC_ERR_PENALTY;
+      return 1;
+    }
     ubs[i] = d->slack_ubs[col]>0 ? d->slack_ubs[col] : 1;
     d->set_s0[i] = d->slack_s[col];
   }
@@ -753,7 +763,7 @@ void casadi_ipmc_report_iterate(casadi_ipmc_data<T1>* d, const struct IpmcLayout
   if (dual_data) casadi_ipmc_read_dual(d, str, dual_data);
   casadi_ipmc_read_slacks(d);
   pen = 0;
-  casadi_ipmc_penalty(p, d_nlp->z, &pen);
+  casadi_ipmc_penalty(d, d_nlp->z, &pen);
   d->rewrite.user->objective = f - pen;
   casadi_ipmc_rewrite_collect(&p->rewrite, &d->rewrite, d_nlp,
                                 d->slack_s, d->slack_lam_s);

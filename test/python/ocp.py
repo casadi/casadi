@@ -2598,15 +2598,15 @@ class OCPtests(casadiTestCase):
 
   @requires_nlpsol("ipmc")
   @requires_nlpsol("ipopt")
-  def test_ipmc_slacks_parametric_penalty_refused(self):
-    self.message("ipmc refuses a penalty depending on p; expand_slacks solves it")
+  def test_ipmc_slacks_parametric_penalty(self):
+    self.message("ipmc: a slack penalty weighted by p, retuned between solves")
     par = ca.SX.sym("w_slack")
     p = self.slack_case(lambda s, w: par*ca.sum1(s), None, par=par,
                         N=20, soften="bound_band_x", v_lo=3.0, v_hi=6.0)
     weights = [0.3, 3.0]
     ref = {pv: self.slack_ocp_reference(p, pv) for pv in weights}
     tot = {pv: float(ca.sum1(ref[pv]["s"])) for pv in weights}
-    print("test_ipmc_slacks_parametric_penalty_refused sum|s|", tot)
+    print("test_ipmc_slacks_parametric_penalty sum|s|", tot)
     # the two weights give different answers, the cheap one relaxes more
     self.assertTrue(tot[0.3] > tot[3.0] + 1.0)
     self.assertTrue(float(ca.norm_inf(ref[0.3]["x"]-ref[3.0]["x"])) > 0.1)
@@ -2614,14 +2614,24 @@ class OCPtests(casadiTestCase):
       nsl, nsu = self.slack_activity(ref[pv]["s"], p)
       self.assertTrue(nsl >= 1 and nsu >= 9)
 
-    # refused at construction, with the reason and the remedy
     for sd in ["none", "manual", "auto"]:
-      print("test_ipmc_slacks_parametric_penalty_refused", sd)
-      with self.assertRaises(Exception) as cm:
-        self.ipmc_slack_solver(p, sd)
-      msg = str(cm.exception)
-      self.assertTrue("depends on the parameter p" in msg, msg)
-      self.assertTrue("expand_slacks" in msg, msg)
+      print("test_ipmc_slacks_parametric_penalty", sd)
+      solver = self.ipmc_slack_solver(p, sd)
+      # one solver object; the third solve repeats the first, which a stale weight cannot
+      out = []
+      for pv in [0.3, 3.0, 0.3]:
+        r = solver(p=pv, **p["bounds"])
+        self.assertTrue(solver.stats()["success"])
+        self.check_slack_structure(solver, p, sd)
+        for k, d in [("f", 4), ("x", 5), ("g", 6), ("s", 5)]:
+          self.checkarray(ref[pv][k], r[k], "%g:%s:%s" % (pv, sd, k), digits=d)
+        out.append(r)
+      for k in ["f", "x", "g", "s"]:
+        self.checkarray(out[0][k], out[2][k], "repeat:"+sd+":"+k, digits=12)
+      if sd == "auto":
+        if IPMC_CODEGEN:
+          self.check_codegen(solver, dict(p["bounds"], p=3.0), **IPMC_CODEGEN)
+        self.check_serialize(solver, dict(p["bounds"], p=3.0))
 
     # expand_slacks tracks p
     opts = {"structure_detection": "none", "ipmc": dict(self.IPMC_SLACK_OPTS), "S": p["S"],

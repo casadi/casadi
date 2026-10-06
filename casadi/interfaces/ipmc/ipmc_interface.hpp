@@ -111,9 +111,9 @@ namespace casadi {
 
       Native slacks. Every column j of S is one slack variable s_j >= 0, priced
       z_j s_j + 1/2 Z_j s_j^2 and bounded by ubs_j. f_s must therefore be a separable
-      quadratic independent of p; settle_slack_penalty verifies that and evaluates z and Z
-      once. slack_lo_/slack_up_ say which column relaxes which side of which row; each side
-      takes at most one column (slack_maps). A column whose rows lie in one stage becomes an
+      quadratic; settle_slack_penalty verifies that and registers nlp_fs, which evaluates
+      z and Z at each solve's p. slack_lo_/slack_up_ say which column relaxes which side
+      of which row; each side takes at most one column (slack_maps). A column whose rows lie in one stage becomes an
       ipmc slack of that stage (soft_lo/soft_up), ordered stage after stage in slack_perm_.
 
       Lift. A column whose rows span several stages, an L-infinity budget, has no
@@ -268,7 +268,6 @@ namespace casadi {
 
     // Native slacks
     bool slacks_;                         // slack_native_ and ns>0
-    std::vector<double> fs_z_, fs_Z_;     // [ns] penalty weights z, Z per column
     // Derived by slack_maps() from slack_lo_/slack_up_ and the caller's partition
     // [ng_] / [nx_] column relaxing the lower / upper side of a row or variable, -1 if hard
     std::vector<casadi_int> slack_g_lo_, slack_g_up_, slack_x_lo_, slack_x_up_;

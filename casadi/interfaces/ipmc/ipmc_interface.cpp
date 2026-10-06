@@ -828,17 +828,13 @@ namespace casadi {
 
   void IpmcInterface::settle_slack_penalty() {
     slacks_ = slack_native_ && Nlpsol::ns_ > 0;
-    fs_z_.clear();
-    fs_Z_.clear();
     if (slacks_) {
-      // Not create_function: used once here, so no codegen dependency
-      Function fs = oracle_.factory(name_ + "_fs",
-        {"s", "p"}, {"f_s", "grad:f_s:s", "hess:f_s:s:s"});
+      Function fs = oracle_.factory(name_ + "_fs", {"s", "p"}, {"grad:f_s:s", "hess:f_s:s:s"});
       casadi_assert(!fs.has_free(),
         "Ipmc: the slack penalty f_s depends on " + str(fs.get_free()) + ", which is "
         "neither s nor p. Pass expand_slacks=True to fall back to the reference "
         "expansion.");
-      Sparsity hsp = fs.sparsity_out(2);
+      Sparsity hsp = fs.sparsity_out(1);
       const casadi_int* hcolind = hsp.colind();
       const casadi_int* hrow = hsp.row();
       for (casadi_int c=0; c<hsp.size2(); ++c) {
@@ -851,32 +847,14 @@ namespace casadi {
             "penalty, or pass expand_slacks=True to fall back to the reference expansion.");
         }
       }
-      casadi_assert(fs.jac_sparsity(2, 0).nnz()==0,
+      casadi_assert(fs.jac_sparsity(1, 0).nnz()==0,
         "Ipmc: the slack penalty f_s is not quadratic in s: hess(f_s,s,s) still depends "
         "on s. ipmc can only represent sum_j (z_j s_j + 1/2 Z_j s_j^2). Use a quadratic "
         "penalty, or pass expand_slacks=True to fall back to the reference expansion.");
-      casadi_assert(fs.jac_sparsity(1, 1).nnz()==0 && fs.jac_sparsity(2, 1).nnz()==0,
-        "Ipmc: the slack penalty f_s depends on the parameter p. z and Z are evaluated "
-        "once, when the solver is built, and handed to ipmc as numbers, so a penalty "
-        "retuned through p cannot be honoured: the solve would keep using the weights p "
-        "held at construction. Make the weights literal constants, rebuild the solver "
-        "when they change, or pass expand_slacks=True to fall back to the reference "
-        "expansion, which carries f_s into the NLP itself and therefore tracks p.");
-      // z = grad(f_s,s) at s=0, Z = diag hess(f_s,s,s)
-      std::vector<DM> fs_arg = {DM::zeros(fs.size1_in(0), fs.size2_in(0)),
-                                DM::zeros(fs.size1_in(1), fs.size2_in(1))};
-      std::vector<DM> fs_res = fs(fs_arg);
-      fs_z_ = densify(fs_res[1]).nonzeros();
-      fs_Z_ = densify(diag(fs_res[2])).nonzeros();
-      casadi_assert_dev(fs_z_.size()==static_cast<size_t>(Nlpsol::ns_));
-      casadi_assert_dev(fs_Z_.size()==static_cast<size_t>(Nlpsol::ns_));
-      for (casadi_int i=0; i<Nlpsol::ns_; ++i) {
-        casadi_assert(std::isfinite(fs_z_[i]) && std::isfinite(fs_Z_[i]),
-          "Ipmc: the slack penalty f_s has a non-finite gradient or Hessian at s=0 "
-          "(slack column " + str(i+GlobalOptions::start_index) + "). Use a penalty that "
-          "is finite there, or pass expand_slacks=True to fall back to the reference "
-          "expansion.");
-      }
+      // z = grad(f_s,s) at s=0, Z = diag hess(f_s,s,s), evaluated at every solve's p
+      MX p = MX::sym("p", fs.sparsity_in(1));
+      std::vector<MX> r = fs(std::vector<MX>{MX(fs.sparsity_in(0).size()), p});
+      set_function(Function("nlp_fs", {p}, {densify(r[0]), densify(diag(r[1]))}), "nlp_fs");
     }
   }
 
@@ -1148,6 +1126,12 @@ namespace casadi {
 
     // Caller's bounds and x0 onto the lifted problem; no-op without lift
     casadi_ipmc_rewrite_expand(&p_.rewrite, &d->rewrite, d->nlp, d->slack_ubs, d->slack_s);
+    if (slacks_) {
+      m->arg[0] = d->nlp->p;
+      m->res[0] = d->fs_z;
+      m->res[1] = d->fs_Z;
+      calc_function(m, "nlp_fs");
+    }
     if (casadi_ipmc_hand_over(d)) {
       casadi_int i = d->error_index, si = GlobalOptions::start_index;
       const double* lbz = d->nlp->lbz;
@@ -1428,6 +1412,7 @@ namespace casadi {
     if (exact_hessian_) {
       g.add_dependency(get_function("nlp_hess_l"));
     }
+    if (slacks_) g.add_dependency(get_function("nlp_fs"));
     g.add_include("ipmc/ipmc.h");
 
     // ipmc's output, per generated function
@@ -1496,6 +1481,12 @@ namespace casadi {
     // See solve(); the refusals name the caller's entry, as there
     g << "casadi_ipmc_rewrite_expand(&p.rewrite, &d->rewrite, d->nlp, "
          "d->slack_ubs, d->slack_s);\n";
+    if (slacks_) {
+      g << "d->arg[0] = d->nlp->p;\n";
+      g << "d->res[0] = d->fs_z;\n";
+      g << "d->res[1] = d->fs_Z;\n";
+      g << g(get_function("nlp_fs"), "d->arg", "d->res", "d->iw", "d->w") << ";\n";
+    }
     std::string caller = g.constant(lift_src_);
     std::string nx = str(nx_), si = str(GlobalOptions::start_index);
     g << "if (casadi_ipmc_hand_over(d)) {\n";
@@ -1632,8 +1623,7 @@ namespace casadi {
 
     v(p.n_soft, "n_soft", static_cast<casadi_int>(slack_perm_.size()));
     v(p.slack_perm, "slack_perm", slack_perm_);
-    v(p.fs_z, "fs_z", fs_z_);
-    v(p.fs_Z, "fs_Z", fs_Z_);
+    v(p.ns, "ns", slacks_ ? Nlpsol::ns_ : static_cast<casadi_int>(0));
 
     v(p.rewrite.ne, "rewrite.ne", n_lift_);
     v(p.rewrite.nx, "rewrite.nx", nx_);
@@ -1800,10 +1790,6 @@ namespace casadi {
 
     // Native soft constraints; the maps follow from S, stored by Nlpsol
     s.unpack("IpmcInterface::slacks", slacks_);
-    if (slacks_) {
-      s.unpack("IpmcInterface::fs_z", fs_z_);
-      s.unpack("IpmcInterface::fs_Z", fs_Z_);
-    }
 
     // The slack maps, the lift, ipmc's rows and the pack tables are rebuilt, not stored
     build();
@@ -1828,10 +1814,6 @@ namespace casadi {
     s.pack("IpmcInterface::N", N_);
 
     s.pack("IpmcInterface::slacks", slacks_);
-    if (slacks_) {
-      s.pack("IpmcInterface::fs_z", fs_z_);
-      s.pack("IpmcInterface::fs_Z", fs_Z_);
-    }
   }
 
 } // namespace casadi

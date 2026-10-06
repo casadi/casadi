@@ -823,10 +823,6 @@ class NLPtests(casadiTestCase):
     weights = [ca.DM([0.45, 2.5]), ca.DM([2.5, 0.45])]
 
     for Solver, solver_options, aux_options in self.slack_solver_configs():
-      # ipmc bakes z and Z in at construction and refuses a p-dependent f_s
-      # outright rather than solving it wrongly; see ocp.py's
-      # test_ipmc_slacks_parametric_penalty_refused
-      if Solver in self.slack_native: continue
       print("test_slacks_parametric_penalty", Solver, solver_options)
       solver = ca.nlpsol("mysolver", Solver,
                          {"x": x, "f": f, "g": g, "p": par, "s": s, "f_s": penalty(s)},

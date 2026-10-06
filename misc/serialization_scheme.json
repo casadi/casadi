@@ -5344,31 +5344,6 @@
           "name": "IpmcInterface::slacks",
           "op": "field",
           "type": "bool"
-        },
-        {
-          "body": [
-            {
-              "name": "IpmcInterface::fs_z",
-              "op": "field",
-              "type": {
-                "element": "double",
-                "name": "std::vector"
-              }
-            },
-            {
-              "name": "IpmcInterface::fs_Z",
-              "op": "field",
-              "type": {
-                "element": "double",
-                "name": "std::vector"
-              }
-            }
-          ],
-          "condition": [
-            "field",
-            "IpmcInterface::slacks"
-          ],
-          "op": "if"
         }
       ],
       "IpoptInterface::serialize_body": [
