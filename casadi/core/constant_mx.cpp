@@ -178,9 +178,11 @@ namespace casadi {
     if (sp.is_empty(true)) {
       return ZeroByZero::getInstance();
     } else {
-      casadi_int intval = static_cast<casadi_int>(val);
-      if (static_cast<double>(intval)-val==0) {
-        return create(sp, intval);
+      // Range check avoids UB in the cast (also rejects nan/inf)
+      const double lo = static_cast<double>(std::numeric_limits<casadi_int>::min());
+      if (val >= lo && val < -lo &&
+          val == static_cast<double>(static_cast<casadi_int>(val))) {
+        return create(sp, static_cast<casadi_int>(val));
       } else {
         return new Constant<RuntimeConst<double> >(sp, val);
       }

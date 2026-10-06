@@ -2119,6 +2119,15 @@ class SXtests(casadiTestCase):
     q, r = divmod(ca.DM(7), ca.DM(2))
     self.checkarray(ca.vertcat(q, r), ca.DM([3, 1]))
 
+  def test_large_whole_constants(self):
+    # issue #4432: whole numbers beyond the int range must not saturate
+    for v in [3e9, 6.02214076e23, -1e20, 2.0**31, -2.0**31-1, 2.0**63, 1e300]:
+      self.assertEqual(float(ca.evalf(ca.SX(v))), v)
+      self.assertEqual(float(ca.evalf(ca.MX(v))), v)
+    for v in [2.0**31-1, -2.0**31]:
+      self.assertTrue(ca.SX(v).is_integer())
+      self.assertEqual(float(ca.evalf(ca.SX(v))), v)
+
 
 if __name__ == '__main__':
     unittest.main()

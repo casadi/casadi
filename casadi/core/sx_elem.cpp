@@ -76,9 +76,10 @@ namespace casadi {
       node = val > 0 ? casadi_limits<SXElem>::inf.node :
                        casadi_limits<SXElem>::minus_inf.node;
     } else {
-      // Only ints fit here, not casadi_int
-      int intval = static_cast<int>(val);
-      if (val-static_cast<double>(intval) == 0) { // check if integer
+      // Only ints fit here, not casadi_int; range check avoids UB in the cast
+      const double lo = static_cast<double>(std::numeric_limits<int>::min());
+      if (val >= lo && val < -lo && val == static_cast<double>(static_cast<int>(val))) {
+        int intval = static_cast<int>(val);
         if (intval == 0)             node = casadi_limits<SXElem>::zero.node;
         else if (intval == 1)        node = casadi_limits<SXElem>::one.node;
         else if (intval == 2)        node = casadi_limits<SXElem>::two.node;

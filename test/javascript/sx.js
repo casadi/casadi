@@ -305,6 +305,19 @@ function test_SX_indexing_limits(M) {
   assertTrue(threw, "out-of-bound slice on SX should throw");
 }
 
+function test_large_whole_constants(M) {
+  // sx.py:test_large_whole_constants -- issue #4432: whole numbers beyond
+  // the int range must not saturate (emscripten -O2 exposed the UB).
+  for (const v of [3e9, 6.02214076e23, -1e20, 2 ** 31, -(2 ** 31) - 1, 2 ** 63, 1e300]) {
+    assertEqual(Number(M.evalf(M.SX(v)).nonzeros()[0]), v, `SX(${v})`);
+    assertEqual(Number(M.evalf(M.MX(v)).nonzeros()[0]), v, `MX(${v})`);
+  }
+  for (const v of [2 ** 31 - 1, -(2 ** 31)]) {
+    assertTrue(M.SX(v).is_integer(), `SX(${v}).is_integer()`);
+    assertEqual(Number(M.evalf(M.SX(v)).nonzeros()[0]), v, `SX(${v})`);
+  }
+}
+
 runTests([
   ["test_scalarSX",       test_scalarSX],
   ["test_SX1",            test_SX1],
@@ -330,6 +343,7 @@ runTests([
   ["test_SX_primitive_sign", test_SX_primitive_sign],
   ["test_SX_primitive_heaviside_ramp", test_SX_primitive_heaviside_ramp],
   ["test_SX_indexing_limits", test_SX_indexing_limits],
+  ["test_large_whole_constants", test_large_whole_constants],
 ]);
 
 // ============================================================================
