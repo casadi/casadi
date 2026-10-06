@@ -387,7 +387,7 @@ namespace casadi {
     g.add_dependency(get_function("nlp_hess_l"));
     g.add_dependency(get_function("fwd1_nlp_grad_l"));
     g.add_include("Uno_C_API.h");
-    g.auxiliaries << g.sanitize_source(uno_runtime_str, {"casadi_real"});
+    g.add_runtime(class_name(), uno_runtime_str, {"casadi_real"});
   }
 
   // Point a prob field at a uno_int (32-bit) index array. g.constant only emits

@@ -349,7 +349,7 @@ void MadnlpInterface::codegen_declarations(CodeGenerator& g) const {
 
 void MadnlpInterface::codegen_body(CodeGenerator& g) const {
   codegen_body_enter(g);
-  g.auxiliaries << g.sanitize_source(madnlp_runtime_str, {"casadi_real"});
+  g.add_runtime(class_name(), madnlp_runtime_str, {"casadi_real"});
 
   g.local("d", "struct casadi_madnlp_data*");
   g.init_local("d", "&" + codegen_mem(g));

@@ -304,7 +304,7 @@ namespace casadi {
     // references casadi_socp_data even when no Q/P is present.
     g.add_auxiliary(CodeGenerator::AUX_SOCP);
     g.add_include("xprs.h");
-    g.auxiliaries << g.sanitize_source(xpress_runtime_str, {"casadi_real"});
+    g.add_runtime(class_name(), xpress_runtime_str, {"casadi_real"});
 
     g.local("d", "struct casadi_xpress_data*");
     g.init_local("d", "&" + codegen_mem(g));

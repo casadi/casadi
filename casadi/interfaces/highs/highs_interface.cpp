@@ -243,7 +243,7 @@ namespace casadi {
     g.add_auxiliary(CodeGenerator::AUX_BILIN);
     g.add_include("interfaces/highs_c_api.h");
 
-    g.auxiliaries << g.sanitize_source(highs_runtime_str, {"casadi_real"});
+    g.add_runtime(class_name(), highs_runtime_str, {"casadi_real"});
 
 
     g.local("d", "struct casadi_highs_data*");

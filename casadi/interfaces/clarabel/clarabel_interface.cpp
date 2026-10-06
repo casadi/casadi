@@ -202,7 +202,7 @@ void ClarabelInterface::codegen_body(CodeGenerator& g) const {
   g.add_auxiliary(CodeGenerator::AUX_BILIN);
   g.add_include("interfaces/clarabel_c_api.h");
 
-  g.auxiliaries << g.sanitize_source(clarabel_runtime_str, {"casadi_real"});
+  g.add_runtime(class_name(), clarabel_runtime_str, {"casadi_real"});
 
   g.local("d", "struct casadi_clarabel_data*");
   g.init_local("d", "&" + codegen_mem(g));

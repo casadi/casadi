@@ -2695,6 +2695,13 @@ namespace casadi {
     return r;
   }
 
+  void CodeGenerator::add_runtime(const std::string& key, const std::string& src,
+      const std::vector<std::string>& inst) {
+    std::string k = key;
+    for (const std::string& s : inst) k += "_" + s;
+    if (added_runtimes_.insert(k).second) auxiliaries << sanitize_source(src, inst);
+  }
+
   std::string CodeGenerator::
   sanitize_source(const std::string& src,
                   const std::vector<std::string>& inst, bool add_shorthand) {

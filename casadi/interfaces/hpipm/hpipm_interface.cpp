@@ -796,7 +796,7 @@ namespace casadi {
     g.add_include("stdlib.h");
     g.add_include("string.h");
 
-    g.auxiliaries << g.sanitize_source(hpipm_runtime_str, {"casadi_real"});
+    g.add_runtime(class_name(), hpipm_runtime_str, {"casadi_real"});
 
 
     g.local("d", "struct casadi_hpipm_data");

@@ -223,7 +223,7 @@ namespace casadi {
     // references casadi_socp_data even when no Q/P is present.
     g.add_auxiliary(CodeGenerator::AUX_SOCP);
     g.add_include("mosek.h");
-    g.auxiliaries << g.sanitize_source(mosek_runtime_str, {"casadi_real"});
+    g.add_runtime(class_name(), mosek_runtime_str, {"casadi_real"});
 
     g.local("d", "struct casadi_mosek_data*");
     g.init_local("d", "&" + codegen_mem(g));

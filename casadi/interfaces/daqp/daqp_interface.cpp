@@ -268,7 +268,7 @@ namespace casadi {
     g.add_include("daqp/api.h");
     g.add_include("stdio.h");
 
-    g.auxiliaries << g.sanitize_source(daqp_runtime_str, {"casadi_real"});
+    g.add_runtime(class_name(), daqp_runtime_str, {"casadi_real"});
 
     g.local("d", "struct casadi_daqp_data*");
     g.init_local("d", "&" + codegen_mem(g));

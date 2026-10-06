@@ -929,7 +929,7 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
 
 void IpoptInterface::codegen_body(CodeGenerator& g) const {
   codegen_body_enter(g);
-  g.auxiliaries << g.sanitize_source(ipopt_runtime_str, {"casadi_real"});
+  g.add_runtime(class_name(), ipopt_runtime_str, {"casadi_real"});
 
   g.local("d", "struct casadi_ipopt_data*");
   g.init_local("d", "&" + codegen_mem(g));

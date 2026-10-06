@@ -192,7 +192,7 @@ namespace casadi {
 
   void OnnxRuntimeInterface::codegen_declarations(CodeGenerator& g) const {
     g.add_include("onnxruntime_c_api.h");
-    g.auxiliaries << g.sanitize_source(ort_runtime_str, {});
+    g.add_runtime(class_name(), ort_runtime_str, {});
   }
 
   void OnnxRuntimeInterface::codegen_body(CodeGenerator& g) const {
