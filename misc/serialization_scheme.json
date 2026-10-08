@@ -44,7 +44,7 @@
       3
     ],
     "DaqpInterface": [
-      1
+      2
     ],
     "DirResource": [
       1
@@ -393,7 +393,8 @@
       3
     ],
     "DaqpInterface": [
-      1
+      1,
+      2
     ],
     "DirResource": [
       1
@@ -2299,7 +2300,17 @@
         {
           "name": "DaqpInterface",
           "op": "version",
-          "value": 1
+          "value": 2
+        },
+        {
+          "name": "DaqpInterface::warm_start",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "name": "DaqpInterface::warm_start_previous",
+          "op": "field",
+          "type": "bool"
         },
         {
           "name": "DaqpInterface::opts",
