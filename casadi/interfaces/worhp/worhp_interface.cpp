@@ -388,8 +388,6 @@ namespace casadi {
 
     if (verbose_) casadi_message("WorhpInterface::starting iteration");
 
-    bool firstIteration = true;
-
     // Reverse Communication loop
     while (m->worhp_c.status < TerminateSuccess &&  m->worhp_c.status > TerminateError) {
       if (GetUserAction(&m->worhp_c, callWorhp)) {
@@ -399,37 +397,38 @@ namespace casadi {
 
       if (GetUserAction(&m->worhp_c, iterOutput)) {
 
-        if (!firstIteration) {
-          firstIteration = true;
+        if (!fcallback_.is_null()) {
+          m->iter = m->worhp_w.MajorIter;
+          m->iter_sqp = m->worhp_w.MinorIter;
+          m->inf_pr = m->worhp_w.NormMax_CV;
+          m->inf_du = m->worhp_w.OptiMax;
+          m->alpha_pr = m->worhp_w.ArmijoAlpha;
 
-          if (!fcallback_.is_null()) {
-            m->iter = m->worhp_w.MajorIter;
-            m->iter_sqp = m->worhp_w.MinorIter;
-            m->inf_pr = m->worhp_w.NormMax_CV;
-            m->inf_du = m->worhp_p.ScaledKKT;
-            m->alpha_pr = m->worhp_w.ArmijoAlpha;
+          // Inputs
+          std::fill_n(m->arg, fcallback_.n_in(), nullptr);
+          m->arg[NLPSOL_X] = m->worhp_o.X;
+          m->arg[NLPSOL_F] = &m->worhp_o.F;
+          m->arg[NLPSOL_G] = m->worhp_o.G;
+          m->arg[NLPSOL_LAM_P] = nullptr;
+          m->arg[NLPSOL_LAM_X] = m->worhp_o.Lambda;
+          m->arg[NLPSOL_LAM_G] = m->worhp_o.Mu;
 
-            // Inputs
-            std::fill_n(m->arg, fcallback_.n_in(), nullptr);
-            m->arg[NLPSOL_X] = m->worhp_o.X;
-            m->arg[NLPSOL_F] = &m->worhp_o.F;
-            m->arg[NLPSOL_G] = m->worhp_o.G;
-            m->arg[NLPSOL_LAM_P] = nullptr;
-            m->arg[NLPSOL_LAM_X] = m->worhp_o.Lambda;
-            m->arg[NLPSOL_LAM_G] = m->worhp_o.Mu;
+          // Outputs
+          std::fill_n(m->res, fcallback_.n_out(), nullptr);
+          double ret_double = 0;
+          m->res[0] = &ret_double;
 
-            // Outputs
-            std::fill_n(m->res, fcallback_.n_out(), nullptr);
-            double ret_double;
-            m->res[0] = &ret_double;
-
-            m->fstats.at("callback_fun").tic();
+          try {
+            ScopedTiming tic(m->fstats.at("callback_fun"));
             // Evaluate the callback function
             fcallback_(m->arg, m->res, m->iw, m->w, 0);
-            m->fstats.at("callback_fun").toc();
             casadi_int ret = static_cast<casadi_int>(ret_double);
-
             if (ret) m->worhp_c.status = TerminateError;
+          } catch(KeyboardInterruptException& ex) {
+            m->worhp_c.status = TerminateError;
+          } catch(std::exception& ex) {
+            casadi_warning("iteration_callback: " + std::string(ex.what()));
+            if (!iteration_callback_ignore_errors_) m->worhp_c.status = TerminateError;
           }
         }
 
@@ -518,6 +517,11 @@ namespace casadi {
 
     StatusMsg(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
+    m->iter = m->worhp_w.MajorIter;
+    m->iter_sqp = m->worhp_w.MinorIter;
+    m->inf_pr = m->worhp_w.NormMax_CV;
+    m->inf_du = m->worhp_w.OptiMax;
+
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);
     m->success = m->return_code > TerminateSuccess;
@@ -589,6 +593,10 @@ namespace casadi {
     Dict stats = Nlpsol::get_stats(mem);
     auto m = static_cast<WorhpMemory*>(mem);
     stats["return_status"] = m->return_status;
+    stats["iter_count"] = m->iter;
+    stats["iter_minor"] = m->iter_sqp;
+    stats["inf_pr"] = m->inf_pr;
+    stats["inf_du"] = m->inf_du;
     return stats;
   }
 
