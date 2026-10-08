@@ -401,7 +401,7 @@ namespace casadi {
           m->iter = m->worhp_w.MajorIter;
           m->iter_sqp = m->worhp_w.MinorIter;
           m->inf_pr = m->worhp_w.NormMax_CV;
-          m->inf_du = m->worhp_p.ScaledKKT;
+          m->inf_du = m->worhp_w.OptiMax;
           m->alpha_pr = m->worhp_w.ArmijoAlpha;
 
           // Inputs
@@ -517,6 +517,11 @@ namespace casadi {
 
     StatusMsg(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
+    m->iter = m->worhp_w.MajorIter;
+    m->iter_sqp = m->worhp_w.MinorIter;
+    m->inf_pr = m->worhp_w.NormMax_CV;
+    m->inf_du = m->worhp_w.OptiMax;
+
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);
     m->success = m->return_code > TerminateSuccess;
@@ -588,6 +593,10 @@ namespace casadi {
     Dict stats = Nlpsol::get_stats(mem);
     auto m = static_cast<WorhpMemory*>(mem);
     stats["return_status"] = m->return_status;
+    stats["iter_count"] = m->iter;
+    stats["iter_minor"] = m->iter_sqp;
+    stats["inf_pr"] = m->inf_pr;
+    stats["inf_du"] = m->inf_du;
     return stats;
   }
 
