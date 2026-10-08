@@ -672,14 +672,14 @@ add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loadi
 # Support for import of FMI 2.0 binaries
 option(WITH_FMI2 "Compile with support for import of FMI 2.0 binaries" ON)
 if(WITH_FMI2)
-  set(FMI2_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/FMI-Standard-2.0.2/headers)
+  set(FMI2_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/FMI-Standard-2.0.2/headers CACHE PATH "Directory containing the FMI 2.0 headers")
 endif()
 add_feature_info(dynamic-loading WITH_FMI2 "Support for import of FMI 2.0 binaries")
 
 # Support for import of FMI 3.0 binaries
 option(WITH_FMI3 "Compile with support for import of FMI 3.0 binaries" ON)
 if(WITH_FMI3)
-  set(FMI3_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/FMI-Standard-3.0/headers)
+  set(FMI3_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/FMI-Standard-3.0/headers CACHE PATH "Directory containing the FMI 3.0 headers")
 endif()
 add_feature_info(dynamic-loading WITH_FMI3 "Support for import of FMI 3.0 binaries")
 
