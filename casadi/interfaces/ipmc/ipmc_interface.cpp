@@ -998,9 +998,21 @@ namespace casadi {
       blocksparsity(nat_, nxt_, C_blocks).to_file("debug_ipmc_C.mtx");
       blocksparsity(nat_, nxt_, D_blocks).to_file("debug_ipmc_D.mtx");
       Isp.to_file("debug_ipmc_I.mtx");
-      std::vector<casadi_int> errors_vec(errors.begin(), errors.end());
+      // Offending rows, numbered like A_: the detector's (caller rows, each carried by
+      // one handed-over row, or two if split) and every row with entries outside total
+      std::set<casadi_int> errors_h;
+      for (casadi_int r=0;r<nat_;++r) {
+        casadi_int c = lift_src_[nxt_+r];
+        if (c>=nx_ && errors.count(c-nx_)) errors_h.insert(r);
+      }
+      std::vector<casadi_int> ind = A_.find(), nz = ind;
+      total.get_nz(nz);
+      for (casadi_int i=0;i<ind.size();++i) if (nz[i]<0) errors_h.insert(ind[i] % nat_);
+      std::vector<casadi_int> errors_vec(errors_h.begin(), errors_h.end());
       std::vector<casadi_int> colind = {0, static_cast<casadi_int>(errors_vec.size())};
       Sparsity(nat_, 1, colind, errors_vec).to_file("debug_ipmc_errors.mtx");
+      // Entries the lift added: helper terms and lifted bounds turned into rows
+      (n_lift_>0 ? lift_C_.sparsity() : Sparsity(nat_, nxt_)).to_file("debug_ipmc_lift.mtx");
     }
 
     casadi_assert(errors.empty() && (A_ + total).nnz() == total.nnz(),
@@ -1011,7 +1023,7 @@ namespace casadi {
       "to the current directory when 'debug' option is true.\n"
       "These can be read with Sparsity.from_file(...)."
       "For a ready-to-use script, "
-      "see https://gist.github.com/jgillis/dec56fa16c90a8e4a69465e8422c5459");
+      "see https://gist.github.com/jgillis/ffd6f83c7235eed460ef0d41f6b4b2cf");
     casadi_assert_dev(total.nnz() == ABsp.nnz() + CDsp.nnz() + Isp.nnz());
 
     build_rows();
