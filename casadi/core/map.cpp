@@ -496,6 +496,14 @@ namespace casadi {
     // Allocate space for return values
     std::vector<int> ret_values(n_);
 
+    // x87 control word of the caller: MinGW-w64 threads may start with 0x37F (64-bit precision)
+    // while the caller (e.g. MATLAB) uses 0x27F, so code with x87 instructions would compute
+    // differently than in map 'serial'
+    unsigned short x87_cw = 0;
+#if defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__))
+    __asm__ volatile("fnstcw %0" : "=m"(x87_cw));
+#endif
+
     // Spawn threads
     std::vector<std::thread> threads;
     for (casadi_int i=0; i<n_; ++i) {
@@ -503,8 +511,11 @@ namespace casadi {
       // Because it was the first iteration to pass tests on MingGW
       // using mingw-std-threads.
       threads.emplace_back(
-        [i](const Function& f, const double** arg, double** res,
+        [i, x87_cw](const Function& f, const double** arg, double** res,
             casadi_int* iw, double* w, casadi_int ind, int& ret) {
+#if defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__))
+              __asm__ volatile("fldcw %0" :: "m"(x87_cw));
+#endif
               ThreadsWork(f, i, arg, res, iw, w, ind, ret);
             },
         std::ref(f_), arg, res, iw, w, casadi_int(ind[i]), std::ref(ret_values[i]));
