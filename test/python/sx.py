@@ -1231,6 +1231,20 @@ class SXtests(casadiTestCase):
       with self.assertRaises(RuntimeError):
         d = x / c
 
+  def test_copysign_derivatives(self):
+    for cls in (ca.SX, ca.MX):
+      x = cls.sym("x")
+      y = cls.sym("y")
+      z = ca.copysign(x,y)
+      f = ca.Function("f", [x,y], [ca.jacobian(z,x), ca.gradient(z,x),
+                                 ca.jtimes(z,x,1), ca.jtimes(z,x,1,True),
+                                 ca.jacobian(z,y)])
+      for x0 in (-2,0,2):
+        for y0 in (-0.5,-0.0,0.0,0.5):
+          with self.subTest(symbolic=cls.__name__, x=x0, y=y0):
+            d = np.sign(x0)*np.copysign(1,y0)
+            self.checkarray(ca.vertcat(*f(x0,y0)),ca.DM([d,d,d,d,0]))
+
   def test_copysign(self):
     x = ca.SX.sym("x")
     y = ca.SX.sym("y")
@@ -1294,14 +1308,14 @@ class SXtests(casadiTestCase):
     J_in[0]=-2
     J_in[1]=0.5
     J_out = J.call(J_in)
-    self.checkarray(J_out[0],ca.DM([1]))
+    self.checkarray(J_out[0],ca.DM([-1]))
 
     J_in = [0]*J.n_in()  # type: list
 
     J_in[0]=-2
     J_in[1]=-0.5
     J_out = J.call(J_in)
-    self.checkarray(J_out[0],ca.DM([-1]))
+    self.checkarray(J_out[0],ca.DM([1]))
 
     J_in = [0]*J.n_in()  # type: list
 
