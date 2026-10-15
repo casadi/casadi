@@ -24,6 +24,7 @@
 import casadi as ca
 import casadi as c
 import numpy
+import scipy as sp
 from numpy import random, array
 import unittest
 from types import *
@@ -434,6 +435,15 @@ class ADtests(casadiTestCase):
 
     f=ca.Function("f", [inp],[ca.vertcat(*[x+y,x,y])])
     J = jacobian_old(f, 0, 0)
+
+  def test_csc():
+    A = sp.sparse.eye(10, format="csc")
+    Amat = casadi.DM(A)
+    assert np.allclose(A, Amat.tocsc().toarray())
+
+    A = sp.sparse.eye_array(10, format="csc")
+    Amat = casadi.DM(A)
+    assert np.allclose(A, Amat.tocsc_array().toarray())
 
   @memory_heavy()
   def test_MX(self):
