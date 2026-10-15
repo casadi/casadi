@@ -498,7 +498,6 @@ int casadi_hpipm_solve(casadi_hpipm_data<T1>* d, const double** arg, double** re
     for (i=0; i<p->N+1; i++)	d_ocp_qp_sol_set_x(i, d->hx[i], &qp_sol);
 
 
-    d_ocp_qp_print(&dim, &qp);
     //m->fstats.at("solver").tic();
 		// call solver
 	  d_ocp_qp_ipm_solve(&qp, &qp_sol, &myarg, &workspace);
@@ -512,33 +511,6 @@ int casadi_hpipm_solve(casadi_hpipm_data<T1>* d, const double** arg, double** re
 	  d_ocp_qp_ipm_get_max_res_ineq(&workspace, &d->res_ineq);
 	  d_ocp_qp_ipm_get_max_res_comp(&workspace, &d->res_comp);
 
-	  double *stat;
-    d_ocp_qp_ipm_get_stat(&workspace, &stat);
-    printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
-    d_print_exp_tran_mat(5, d->iter_count, stat, 5);
-
-    printf("\nHPIPM returned with flag %i.\n", d->return_status);
-    if(d->return_status == 0)
-		{
-        printf("\n -> QP solved!\n");
-		}
-	else if(d->return_status==1)
-		{
-        printf("\n -> Solver failed! Maximum number of iterations reached\n");
-		}
-	else if(d->return_status==2)
-		{
-        printf("\n -> Solver failed! Minimum step lenght reached\n");
-		}
-	else if(d->return_status==3)
-		{
-        printf("\n -> Solver failed! NaN in computations\n");
-		}
-	else
-		{
-        printf("\n -> Solver failed! Unknown return flag\n");
-		}
-	printf("\n\n");
 
 
 	for(i=0; i<p->N+1; ++i) d_ocp_qp_sol_get_u(i, &qp_sol, d->hu[i]);
@@ -564,6 +536,10 @@ int casadi_hpipm_solve(casadi_hpipm_data<T1>* d, const double** arg, double** re
     }
   }
   
+  // Gap rows of lam_a and the parts of x are accumulated into below
+  casadi_fill(d_qp->lam_a, p_qp->na, 0.0);
+  casadi_fill(d_qp->x, p_qp->nx, 0.0);
+
   if (d_qp->lam_a) {
     offset = 0;
     for (i=0; i<p->N+1; ++i) {
@@ -603,6 +579,12 @@ int casadi_hpipm_solve(casadi_hpipm_data<T1>* d, const double** arg, double** re
     m->fstats.at("postprocessing").toc();
 
     */
+
+    free(ipm_mem);
+    free(ipm_arg_mem);
+    free(qp_sol_mem);
+    free(qp_mem);
+    free(dim_mem);
 
    return d->return_status==0;
 }
