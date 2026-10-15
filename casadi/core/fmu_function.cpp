@@ -33,7 +33,6 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
-#include <cfenv>
 
 #ifdef WITH_OPENMP
 #include <omp.h>
@@ -46,6 +45,10 @@
 #include <thread>
 #endif // CASADI_WITH_THREAD_MINGW
 #endif // CASADI_WITH_THREAD
+
+#if defined(CASADI_WITH_THREAD) || defined(WITH_OPENMP)
+#include <cfenv>
+#endif
 
 namespace casadi {
 

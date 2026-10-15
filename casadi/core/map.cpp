@@ -26,8 +26,6 @@
 #include "map.hpp"
 #include "serializing_stream.hpp"
 
-#include <cfenv>
-
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
 #include <mingw.thread.h>
@@ -35,6 +33,10 @@
 #include <thread>
 #endif // CASADI_WITH_THREAD_MINGW
 #endif // CASADI_WITH_THREAD
+
+#if defined(CASADI_WITH_THREAD) || defined(WITH_OPENMP)
+#include <cfenv>
+#endif
 
 namespace casadi {
 
