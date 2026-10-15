@@ -418,7 +418,7 @@ def SX_from_array(m, check_only=True):
 def DM_from_csc(m, check_only=True):
   if hasattr(m,"tocsc"):
     m = m.tocsc()
-  if m.__class__.__name__ == "csc_matrix":
+  if m.__class__.__name__ in ["csc_matrix", "csc_array"]:
     if len(m.shape)!=2: return False
     if check_only: return True
     return m.shape + (m.indptr.flat,m.indices.flat,m.data.flat)
@@ -5382,6 +5382,13 @@ namespace casadi{
       warnings.simplefilter("ignore")
       from scipy.sparse import csc_matrix
     return csc_matrix( (self.nonzeros(),self.row(),self.colind()), shape = self.shape, dtype=np.double )
+  def tocsc_array(self):
+    import numpy as np
+    import warnings
+    with warnings.catch_warnings():
+      warnings.simplefilter("ignore")
+      from scipy.sparse import csc_array
+    return csc_array( (self.nonzeros(),self.row(),self.colind()), shape = self.shape, dtype=np.double )
   def toarray(self,simplify=False):
     import numpy as np
     if simplify:
