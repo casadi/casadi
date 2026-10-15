@@ -1232,18 +1232,18 @@ class SXtests(casadiTestCase):
         d = x / c
 
   def test_copysign_derivatives(self):
-    for cls in (ca.SX, ca.MX):
-      x = cls.sym("x")
-      y = cls.sym("y")
+    def check(x, y):
       z = ca.copysign(x,y)
       f = ca.Function("f", [x,y], [ca.jacobian(z,x), ca.gradient(z,x),
                                  ca.jtimes(z,x,1), ca.jtimes(z,x,1,True),
                                  ca.jacobian(z,y)])
       for x0 in (-2,0,2):
         for y0 in (-0.5,-0.0,0.0,0.5):
-          with self.subTest(symbolic=cls.__name__, x=x0, y=y0):
+          with self.subTest(symbolic=type(x).__name__, x=x0, y=y0):
             d = np.sign(x0)*np.copysign(1,y0)
             self.checkarray(ca.vertcat(*f(x0,y0)),ca.DM([d,d,d,d,0]))
+    check(ca.SX.sym("x"), ca.SX.sym("y"))
+    check(ca.MX.sym("x"), ca.MX.sym("y"))
 
   def test_copysign(self):
     x = ca.SX.sym("x")
