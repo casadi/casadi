@@ -134,6 +134,24 @@ class typemaptests(casadiTestCase):
       if scipy_available:
         self.checkarray(m,zt.sparse(),"DM(crs_matrix).sparse()")
 
+  def test_sparse_array(self):
+    self.message("scipy sparse arrays <-> DM")
+    if not(scipy_available):
+      return
+    import scipy.sparse
+    if not hasattr(scipy.sparse,"csc_array"):
+      return
+    ref = ca.DM(ca.Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8])
+    for fmt in ["csc","csr","coo"]:
+      m = scipy.sparse.csc_array(ref.sparse()).asformat(fmt)
+      zt = ca.DM(m)
+      self.assertTrue(isinstance(zt,ca.DM),"DM expected")
+      self.assertTrue(zt.sparsity()==ref.sparsity())
+      self.checkarray(m,zt,"DM(%s_array)" % fmt)
+    m = ref.tocsc_array()
+    self.assertEqual(m.__class__.__name__,"csc_array")
+    self.checkarray(m,ref,"DM.tocsc_array()")
+
 
   def test_setget(self):
     return # get/set with return-by-reference has been dropped
