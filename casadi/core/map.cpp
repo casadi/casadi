@@ -34,6 +34,10 @@
 #endif // CASADI_WITH_THREAD_MINGW
 #endif // CASADI_WITH_THREAD
 
+#if defined(CASADI_WITH_THREAD) || defined(WITH_OPENMP)
+#include <cfenv>
+#endif
+
 namespace casadi {
 
   Function Map::create(const std::string& parallelization, const Function& f, casadi_int n) {
@@ -352,9 +356,15 @@ namespace casadi {
     std::vector< scoped_checkout<Function> > ind; ind.reserve(n_);
     for (casadi_int i=0; i<n_; ++i) ind.emplace_back(f_);
 
+    // Workers compute in the caller's floating-point environment
+    std::fenv_t fenv;
+    std::fegetenv(&fenv);
+
     // Evaluate in parallel
 #pragma omp parallel for reduction(||:flag)
     for (casadi_int i=0; i<n_; ++i) {
+      std::fesetenv(&fenv);
+
       // Input buffers
       const double** arg1 = arg + n_in_ + i*sz_arg;
       for (casadi_int j=0; j<n_in_; ++j) {
@@ -496,6 +506,10 @@ namespace casadi {
     // Allocate space for return values
     std::vector<int> ret_values(n_);
 
+    // Workers compute in the caller's floating-point environment
+    std::fenv_t fenv;
+    std::fegetenv(&fenv);
+
     // Spawn threads
     std::vector<std::thread> threads;
     for (casadi_int i=0; i<n_; ++i) {
@@ -503,8 +517,9 @@ namespace casadi {
       // Because it was the first iteration to pass tests on MingGW
       // using mingw-std-threads.
       threads.emplace_back(
-        [i](const Function& f, const double** arg, double** res,
+        [i, fenv](const Function& f, const double** arg, double** res,
             casadi_int* iw, double* w, casadi_int ind, int& ret) {
+              std::fesetenv(&fenv);
               ThreadsWork(f, i, arg, res, iw, w, ind, ret);
             },
         std::ref(f_), arg, res, iw, w, casadi_int(ind[i]), std::ref(ret_values[i]));

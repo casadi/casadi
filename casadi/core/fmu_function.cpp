@@ -46,6 +46,10 @@
 #endif // CASADI_WITH_THREAD_MINGW
 #endif // CASADI_WITH_THREAD
 
+#if defined(CASADI_WITH_THREAD) || defined(WITH_OPENMP)
+#include <cfenv>
+#endif
+
 namespace casadi {
 
 void FmuFunction::check_mem_count(casadi_int n) const {
@@ -1092,9 +1096,13 @@ int FmuFunction::eval_all(FmuMemory* m, casadi_int n_task,
     flag = eval_task(m, 0, 1, need_nondiff, need_jac, need_fwd, need_adj, need_hess);
   } else if (parallelization_ == Parallelization::OPENMP) {
     #ifdef WITH_OPENMP
+    // Workers compute in the caller's floating-point environment
+    std::fenv_t fenv;
+    std::fegetenv(&fenv);
     // Parallel region
     #pragma omp parallel reduction(||:flag)
     {
+      std::fesetenv(&fenv);
       // Get thread number
       casadi_int task = omp_get_thread_num();
       // Get number of threads in region
@@ -1118,11 +1126,15 @@ int FmuFunction::eval_all(FmuMemory* m, casadi_int n_task,
     #ifdef CASADI_WITH_THREAD
     // Return value for each thread
     std::vector<int> flag_task(n_task);
+    // Workers compute in the caller's floating-point environment
+    std::fenv_t fenv;
+    std::fegetenv(&fenv);
     // Spawn threads
     std::vector<std::thread> threads;
     for (casadi_int task = 0; task < n_task; ++task) {
       threads.emplace_back(
         [&, task](int* fl) {
+          std::fesetenv(&fenv);
           FmuMemory* s = task == 0 ? m : m->slaves.at(task - 1);
           *fl = eval_task(s, task, n_task, need_nondiff && task == 0,
             need_jac, need_fwd && task < nfwd_, need_adj, need_hess);

@@ -757,6 +757,28 @@ class Functiontests(casadiTestCase):
     self.checkfunction_light(fun.map(4,"thread",2),fun.map(4),inputs=[ca.hcat(X_[:4]),ca.hcat(Y_[:4]),ca.hcat(Z_[:4]),ca.hcat(V_[:4])])
     self.checkfunction_light(fun.map(4,"thread",5),fun.map(4),inputs=[ca.hcat(X_[:4]),ca.hcat(Y_[:4]),ca.hcat(Z_[:4]),ca.hcat(V_[:4])])
 
+  def test_map_fenv(self):
+    import ctypes
+    import platform
+    fe_upward = {"x86_64": 0x800, "aarch64": 0x400000}.get(platform.machine())
+    if not sys.platform.startswith("linux") or fe_upward is None: return
+    libm = ctypes.CDLL("libm.so.6")
+    x = ca.SX.sym("x")
+    f = ca.Function("f",[x],[1/x])
+    X = np.arange(3.0,67.0)
+    maps = [f.map(64,"thread",8), f.map(64,"openmp")]
+    # Workers already exist before the caller switches rounding mode
+    for F in maps: F(X)
+    libm.fesetround(fe_upward)
+    try:
+      ref = np.array(f.map(64,"serial")(X))
+      res = [np.array(F(X)) for F in maps]
+    finally:
+      libm.fesetround(0)
+    self.assertTrue(np.any(ref!=np.array(f.map(64,"serial")(X))))
+    for r in res:
+      self.assertTrue(np.all(r==ref))
+
   @memory_heavy()
   def test_mapsum(self):
     x = ca.SX.sym("x")
