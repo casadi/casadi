@@ -3129,6 +3129,11 @@ class _SupportsDM(Protocol):
     def __DM__(self) -> DM: ...
 
 @runtime_checkable
+class _SupportsTocsc(Protocol):
+    """A scipy.sparse matrix or array, as accepted by ``to_ptr<DM>()``."""
+    def tocsc(self) -> Any: ...
+
+@runtime_checkable
 class _SupportsSX(Protocol):
     def __SX__(self) -> SX: ...
 
@@ -3251,7 +3256,7 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
  * just caused overload-resolution failures that differed between
  * Python/numpy-version combinations.  `NDArray[Any]` is
  * version-agnostic. */
-%stub_alias_in(DM, bool | int | float | DM | Sparsity | _SupportsDM | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any] | %arg(np.floating[Any]) | %arg(np.integer[Any]) | np.bool_)
+%stub_alias_in(DM, bool | int | float | DM | Sparsity | _SupportsDM | _SupportsTocsc | Sequence[bool | int | float] | Sequence[Sequence[bool | int | float]] | NDArray[Any] | %arg(np.floating[Any]) | %arg(np.integer[Any]) | np.bool_)
 %stub_alias_in(SX, SX | _SupportsSX | _DM)
 %stub_alias_in(MX, MX | _SupportsMX | _DM)
 /* IM is casadi::Matrix<casadi_int>: typemaps only, no Python class is
@@ -5408,6 +5413,7 @@ namespace casadi{
  * here keeps the stub independent of an optional dependency.  `Any` is the
  * least-bad option until we also bridge scipy.sparse types. */
 %stub_method0(tocsc,    Any)
+%stub_method0(tocsc_array, Any)
 %stub_method(toarray,   %arg(NDArray[np.float64] | float), simplify: bool = ...)
 %stub_method0(to_numpy, %arg(NDArray[np.float64]))
 
