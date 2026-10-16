@@ -471,6 +471,15 @@ class SXtests(casadiTestCase):
       self.assertTrue(ca.is_equal(ca.logic_not(ca.logic_not(b)), b))
     self.assertFalse(ca.is_equal(ca.logic_not(ca.logic_not(x)), x))
 
+  def test_is_nonnegative_binary(self):
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+    # fabs(e) -> e for nonnegative e, binary operations included
+    for e in [x<y, x<=y, x==y, x!=y, ca.logic_and(x,y), ca.logic_or(x,y), ca.hypot(x,y), ca.sqrt(x)]:
+      self.assertTrue(ca.is_equal(ca.fabs(e), e))
+    for e in [x+y, x*y, x-y]:
+      self.assertFalse(ca.is_equal(ca.fabs(e), e))
+
   def test_SXineq(self):
     self.message("SX ineq")
 

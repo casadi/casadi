@@ -5357,6 +5357,15 @@ class MXtests(casadiTestCase):
                     # qn is non-diff output: no dependencies
                     self.assertEqual(H.sparsity_jac(0,1).nnz(), 0)
 
+  def test_is_nonnegative_binary(self):
+    x = ca.MX.sym("x")
+    y = ca.MX.sym("y")
+    # fabs(e) -> e for nonnegative e, binary operations included
+    for e in [x<y, x<=y, x==y, x!=y, ca.logic_and(x,y), ca.logic_or(x,y), ca.hypot(x,y), ca.sqrt(x)]:
+      self.assertTrue(ca.is_equal(ca.fabs(e), e))
+    for e in [x+y, x*y, x-y]:
+      self.assertFalse(ca.is_equal(ca.fabs(e), e))
+
   def test_set_precision(self):
     # Issue #4326: numeric MX constants honor DM::set_precision
     # (the value lives in a DM-like node, so MX printing piggybacks

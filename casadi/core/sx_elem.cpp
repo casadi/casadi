@@ -376,10 +376,8 @@ namespace casadi {
   bool SXElem::is_nonnegative() const {
     if (is_constant()) {
       return static_cast<double>(*this)>=0;
-    } else if (casadi_math<SXElem>::is_unary(node->op())) {
-      return operation_checker<NonnegativeChecker>(node->op());
     } else {
-      return false;
+      return operation_checker<NonnegativeChecker>(node->op());
     }
   }
 
