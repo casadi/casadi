@@ -209,6 +209,9 @@ namespace casadi {
     }
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
+      // Annihilation by a zero, unless constant folding applies (as in MX)
+      if ((operation_checker<F0XChecker>(op) && x.is_zero() && !y.is_constant()) ||
+          (operation_checker<FX0Checker>(op) && y.is_zero() && !x.is_constant())) return 0;
       bool hit;
       SXElem ret = common_simp_binary(op, x, y, SXNode::eq_depth_,
                 [](casadi_int op, const SXElem& a) { return unary(op, a);},

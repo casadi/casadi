@@ -480,6 +480,12 @@ class SXtests(casadiTestCase):
     for e in [x+y, x*y, x-y]:
       self.assertFalse(ca.is_equal(ca.fabs(e), e))
 
+  def test_and_zero(self):
+    for X in [ca.SX.sym("x"), ca.MX.sym("x")]:
+      self.assertTrue(ca.logic_and(X, 0).is_zero())
+      self.assertTrue(ca.logic_and(0, X).is_zero())
+    self.assertTrue(ca.logic_and(ca.SX(0), ca.SX(0)).is_zero())
+
   def test_SXineq(self):
     self.message("SX ineq")
 
