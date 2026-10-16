@@ -240,8 +240,8 @@ namespace casadi {
     if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
         case OP_NOT:
-          if (x.is_op(OP_NOT))
-            return x.dep(); // This looks problematic
+          if (x.is_op(OP_NOT) && x.dep().is_boolean())
+            return x.dep(); // !!x -> x only if x is 0 or 1
           break;
         case OP_TWICE:
           if (x.is_op(OP_MUL) && x.dep(0).is_constant())
@@ -361,6 +361,15 @@ namespace casadi {
       return x_node->is_equal(y_node, depth);
     } else {
       return false;
+    }
+  }
+
+  bool SXElem::is_boolean() const {
+    if (is_constant()) {
+      double v = static_cast<double>(*this);
+      return v==0 || v==1;
+    } else {
+      return operation_checker<BooleanChecker>(node->op());
     }
   }
 

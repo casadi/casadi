@@ -571,6 +571,18 @@ namespace casadi {
   ///@}
 
   ///@{
+  /// Result is always 0 or 1 (false by default)
+  template<casadi_int I> struct BooleanChecker { static const bool check=false;};
+  template<>      struct BooleanChecker<OP_LT>{ static const bool check=true;};
+  template<>      struct BooleanChecker<OP_LE>{ static const bool check=true;};
+  template<>      struct BooleanChecker<OP_EQ>{ static const bool check=true;};
+  template<>      struct BooleanChecker<OP_NE>{ static const bool check=true;};
+  template<>      struct BooleanChecker<OP_NOT>{ static const bool check=true;};
+  template<>      struct BooleanChecker<OP_AND>{ static const bool check=true;};
+  template<>      struct BooleanChecker<OP_OR>{ static const bool check=true;};
+  ///@}
+
+  ///@{
   /// Is the operation binary as opposed to unary
   template<casadi_int I> struct NargChecker { static const casadi_int check=1;};
   template<>      struct NargChecker<OP_ADD>{ static const casadi_int check=2;};

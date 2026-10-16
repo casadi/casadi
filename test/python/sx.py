@@ -459,6 +459,18 @@ class SXtests(casadiTestCase):
         f_out = f.call(f_in)
         self.checkarray(f_out[0],ca.DM([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f_out[0])))
 
+  def test_not_not(self):
+    x = ca.SX.sym("x")
+    y = ca.SX.sym("y")
+    # !!x is only x when x is 0 or 1
+    f = ca.Function("f", [x], [ca.logic_not(ca.logic_not(x))])
+    self.checkarray(f(3), ca.DM(1))
+    self.checkarray(f(0), ca.DM(0))
+    # Boolean argument: double negation folds away
+    for b in [x<y, x<=y, x==y, x!=y, ca.logic_not(x), ca.logic_and(x,y), ca.logic_or(x,y)]:
+      self.assertTrue(ca.is_equal(ca.logic_not(ca.logic_not(b)), b))
+    self.assertFalse(ca.is_equal(ca.logic_not(ca.logic_not(x)), x))
+
   def test_SXineq(self):
     self.message("SX ineq")
 
