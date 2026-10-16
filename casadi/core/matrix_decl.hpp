@@ -1019,6 +1019,8 @@ namespace casadi {
             const Dict& opts = Dict());
     static std::vector<bool> which_depends(const Matrix<Scalar> &expr, const Matrix<Scalar> &var,
         casadi_int order=1, bool tr=false);
+    static std::vector<bool> which_jump(const Matrix<Scalar> &expr, const Matrix<Scalar> &var,
+        bool tr=false);
     static Matrix<Scalar> taylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                    const Matrix<Scalar>& a, casadi_int order);
     static Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,

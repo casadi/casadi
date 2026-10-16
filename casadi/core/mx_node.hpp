@@ -248,6 +248,21 @@ namespace casadi {
         \identifier{1qz} */
     virtual int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const;
 
+    /** \brief Can the output jump (discontinuously) in an input it depends on? */
+    virtual bool has_jump() const { return operation_checker<JumpChecker>(op());}
+
+    /** \brief Propagate jumps forward
+     *
+     * arg/res: dependency bits, arg_j/res_j: jump bits (set = may jump) */
+    virtual int sp_forward_jump(const bvec_t** arg, const bvec_t** arg_j,
+      bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const;
+
+    /** \brief Propagate jumps backwards
+     *
+     * res/arg: dependency seeds/sensitivities, res_j/arg_j: jump seeds/sensitivities */
+    virtual int sp_reverse_jump(bvec_t** arg, bvec_t** arg_j,
+      bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const;
+
     /** \brief  Get the name
 
         \identifier{1r0} */

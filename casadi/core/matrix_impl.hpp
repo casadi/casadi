@@ -2889,6 +2889,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::vector<bool>
+  Matrix<Scalar>::which_jump(const Matrix<Scalar> &expr, const Matrix<Scalar> &var, bool tr) {
+    casadi_error("'which_jump' not defined for " + type_name());
+    return std::vector<bool>();
+  }
+
+  template<typename Scalar>
   Sparsity
   Matrix<Scalar>::jacobian_sparsity(const Matrix<Scalar> &f, const Matrix<Scalar> &x) {
     casadi_error("'jacobian_sparsity' not defined for " + type_name());

@@ -658,6 +658,26 @@ namespace casadi {
     return rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
+  int Function::jump_fwd(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const {
+    casadi_assert_dev(arg.size()>=n_in());
+    arg.resize(sz_arg());
+    casadi_assert_dev(res.size()>=n_out());
+    res.resize(sz_res());
+    std::vector<casadi_int> iw(sz_iw());
+    std::vector<bvec_t> w(sz_w());
+    return jump_fwd(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+  }
+
+  int Function::jump_rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
+    casadi_assert_dev(arg.size()>=n_in());
+    arg.resize(sz_arg());
+    casadi_assert_dev(res.size()>=n_out());
+    res.resize(sz_res());
+    std::vector<casadi_int> iw(sz_iw());
+    std::vector<bvec_t> w(sz_w());
+    return jump_rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+  }
+
   Function Function::fold(casadi_int N, const Dict& opts) const {
     Function base = mapaccum(N, opts);
     std::vector<MX> base_in = base.mx_in();
@@ -1254,6 +1274,23 @@ namespace casadi {
       return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
     } catch(std::exception& e) {
       THROW_ERROR("rev", e.what());
+    }
+  }
+
+  int Function::jump_fwd(const bvec_t** arg, bvec_t** res,
+                         casadi_int* iw, bvec_t* w, int mem) const {
+    try {
+      return (*this)->sp_forward_jump(arg, res, iw, w, memory(mem));
+    } catch(std::exception& e) {
+      THROW_ERROR("jump_fwd", e.what());
+    }
+  }
+
+  int Function::jump_rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem) const {
+    try {
+      return (*this)->sp_reverse_jump(arg, res, iw, w, memory(mem));
+    } catch(std::exception& e) {
+      THROW_ERROR("jump_rev", e.what());
     }
   }
 

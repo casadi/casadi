@@ -442,6 +442,34 @@ namespace casadi {
     return 0;
   }
 
+  int MXNode::sp_forward_jump(const bvec_t** arg, const bvec_t** arg_j,
+      bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const {
+    // Jumps upstream propagate along dependencies
+    if (sp_forward(arg_j, res_j, iw, w)) return 1;
+    if (sp_forward(arg, res, iw, w)) return 1;
+    // Any dependency passing through this node may jump
+    if (has_jump()) {
+      for (casadi_int k=0; k<nout(); ++k) {
+        if (!res[k] || !res_j[k]) continue;
+        for (casadi_int i=0; i<sparsity(k).nnz(); ++i) res_j[k][i] |= res[k][i];
+      }
+    }
+    return 0;
+  }
+
+  int MXNode::sp_reverse_jump(bvec_t** arg, bvec_t** arg_j,
+      bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const {
+    // Seeds reaching this node turn into jump seeds
+    if (has_jump()) {
+      for (casadi_int k=0; k<nout(); ++k) {
+        if (!res[k] || !res_j[k]) continue;
+        for (casadi_int i=0; i<sparsity(k).nnz(); ++i) res_j[k][i] |= res[k][i];
+      }
+    }
+    if (sp_reverse(arg_j, res_j, iw, w)) return 1;
+    return sp_reverse(arg, res, iw, w);
+  }
+
   MX MXNode::get_output(casadi_int oind) const {
     casadi_assert(oind==0, "Output index out of bounds");
     return shared_from_this<MX>();

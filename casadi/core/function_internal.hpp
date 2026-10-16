@@ -1207,6 +1207,20 @@ namespace casadi {
         \identifier{my} */
     virtual int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const;
 
+    /** \brief Propagate jumps forward
+     *
+     * arg: dependency bits, res: jump bits (set = may jump).
+     * Default is the sound fallback: every dependency may jump. */
+    virtual int sp_forward_jump(const bvec_t** arg, bvec_t** res,
+                                casadi_int* iw, bvec_t* w, void* mem) const;
+
+    /** \brief Propagate jumps backwards
+     *
+     * res: dependency seeds (cleared), arg: jump sensitivities (accumulated).
+     * Default is the sound fallback: every dependency may jump. */
+    virtual int sp_reverse_jump(bvec_t** arg, bvec_t** res,
+                                casadi_int* iw, bvec_t* w, void* mem) const;
+
     /** \brief Get number of temporary variables needed
 
         \identifier{mz} */

@@ -3154,6 +3154,16 @@ namespace casadi {
     return 0;
   }
 
+  int FunctionInternal::
+  sp_forward_jump(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    return sp_forward(arg, res, iw, w, mem);
+  }
+
+  int FunctionInternal::
+  sp_reverse_jump(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    return sp_reverse(arg, res, iw, w, mem);
+  }
+
   void FunctionInternal::sz_work(size_t& sz_arg, size_t& sz_res,
                                  size_t& sz_iw, size_t& sz_w) const {
     sz_arg = this->sz_arg();

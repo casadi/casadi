@@ -1831,6 +1831,153 @@ namespace casadi {
     return 0;
   }
 
+  int SXFunction::sp_forward_jump(const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem) const {
+    // w: dependency plane, wj: jump plane
+    std::vector<bvec_t> wj_buf(worksize_);
+    bvec_t* wj = get_ptr(wj_buf);
+    for (auto&& e : algorithm_) {
+      switch (e.op) {
+      case OP_CONST:
+      case OP_PARAMETER:
+        w[e.i0] = wj[e.i0] = 0; break;
+      case OP_INPUT:
+        w[e.i0] = (arg[e.i1]!=nullptr && is_diff_in_[e.i1]) ? arg[e.i1][e.i2] : 0;
+        wj[e.i0] = 0;
+        break;
+      case OP_OUTPUT:
+        if (res[e.i0]!=nullptr) res[e.i0][e.i2] = is_diff_out_[e.i0] ? wj[e.i1] : 0;
+        break;
+      case OP_CALL:
+        call_fwd_jump(e, arg, res, iw, w, wj);
+        break;
+      default: // Unary or binary operation
+        {
+          bvec_t d = w[e.i1] | w[e.i2];
+          bvec_t j = wj[e.i1] | wj[e.i2];
+          if (operation_checker<JumpChecker>(e.op)) j |= d;
+          w[e.i0] = d;
+          wj[e.i0] = j;
+        }
+      }
+    }
+    return 0;
+  }
+
+  int SXFunction::sp_reverse_jump(bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem) const {
+    // w: dependency seeds, wj: jump seeds
+    std::fill_n(w, sz_w(), 0);
+    std::vector<bvec_t> wj_buf(worksize_, 0);
+    bvec_t* wj = get_ptr(wj_buf);
+    for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
+      switch (it->op) {
+      case OP_CONST:
+      case OP_PARAMETER:
+        w[it->i0] = wj[it->i0] = 0;
+        break;
+      case OP_INPUT:
+        if (arg[it->i1]!=nullptr && is_diff_in_[it->i1])
+          arg[it->i1][it->i2] |= wj[it->i0];
+        w[it->i0] = wj[it->i0] = 0;
+        break;
+      case OP_OUTPUT:
+        if (res[it->i0]!=nullptr && is_diff_out_[it->i0]) {
+          w[it->i1] |= res[it->i0][it->i2];
+          res[it->i0][it->i2] = 0;
+        }
+        break;
+      case OP_CALL:
+        call_rev_jump(*it, arg, res, iw, w, wj);
+        break;
+      default: // Unary or binary operation
+        {
+          bvec_t d = w[it->i0];
+          bvec_t j = wj[it->i0];
+          if (operation_checker<JumpChecker>(it->op)) j |= d;
+          w[it->i0] = wj[it->i0] = 0;
+          w[it->i1] |= d;
+          w[it->i2] |= d;
+          wj[it->i1] |= j;
+          wj[it->i2] |= j;
+        }
+      }
+    }
+    return 0;
+  }
+
+  void SXFunction::call_fwd_jump(const AlgEl& e, const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, bvec_t* wj) const {
+    const auto& m = call_.el[e.i1];
+    const bvec_t** call_arg = arg;
+    bvec_t** call_res       = res;
+    casadi_int* call_iw     = iw;
+    bvec_t* call_w          = w;
+    bvec_t* nz_in;
+    bvec_t* nz_out;
+    call_setup(m, &call_arg, &call_res, &call_iw, &call_w, &nz_in, &nz_out);
+
+    // Read both planes before any result is written (slots may be shared)
+    std::vector<bvec_t> d_in(m.n_dep), j_in(m.n_dep), d_out(m.n_res), j_out(m.n_res);
+    for (casadi_int i=0; i<m.n_dep; ++i) {
+      d_in[i] = w[m.dep[i]];
+      j_in[i] = wj[m.dep[i]];
+    }
+    // Dependencies
+    std::copy(d_in.begin(), d_in.end(), nz_in);
+    m.f(call_arg, call_res, call_iw, call_w);
+    std::copy_n(nz_out, m.n_res, d_out.begin());
+    // Jumps upstream propagate along dependencies
+    std::copy(j_in.begin(), j_in.end(), nz_in);
+    m.f(call_arg, call_res, call_iw, call_w);
+    std::copy_n(nz_out, m.n_res, j_out.begin());
+    // Jumps inside the callee
+    std::copy(d_in.begin(), d_in.end(), nz_in);
+    m.f.jump_fwd(call_arg, call_res, call_iw, call_w);
+    for (casadi_int i=0; i<m.n_res; ++i) j_out[i] |= nz_out[i];
+
+    for (casadi_int i=0; i<m.n_res; ++i) {
+      if (m.res[i]>=0) {
+        w[m.res[i]] = d_out[i];
+        wj[m.res[i]] = j_out[i];
+      }
+    }
+  }
+
+  void SXFunction::call_rev_jump(const AlgEl& e, bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, bvec_t* wj) const {
+    const auto& m = call_.el[e.i1];
+    bvec_t** call_arg   = arg;
+    bvec_t** call_res   = res;
+    casadi_int* call_iw = iw;
+    bvec_t* call_w      = w;
+    bvec_t* nz_in;
+    bvec_t* nz_out;
+    call_setup(m, &call_arg, &call_res, &call_iw, &call_w, &nz_in, &nz_out);
+
+    // Read and clear the seeds of both planes
+    std::vector<bvec_t> d_out(m.n_res), j_out(m.n_res);
+    for (casadi_int i=0; i<m.n_res; ++i) {
+      d_out[i] = (m.res[i]>=0) ? w[m.res[i]] : 0;
+      j_out[i] = (m.res[i]>=0) ? wj[m.res[i]] : 0;
+    }
+    for (casadi_int i=0; i<m.n_res; ++i) {
+      if (m.res[i]>=0) w[m.res[i]] = wj[m.res[i]] = 0;
+    }
+    // Dependencies
+    std::fill_n(nz_in, m.n_dep, 0);
+    std::copy(d_out.begin(), d_out.end(), nz_out);
+    m.f.rev(call_arg, call_res, call_iw, call_w);
+    for (casadi_int i=0; i<m.n_dep; ++i) w[m.dep[i]] |= nz_in[i];
+    // Jump seeds propagate along dependencies, plus jumps inside the callee
+    std::fill_n(nz_in, m.n_dep, 0);
+    std::copy(j_out.begin(), j_out.end(), nz_out);
+    m.f.rev(call_arg, call_res, call_iw, call_w);
+    std::copy(d_out.begin(), d_out.end(), nz_out);
+    m.f.jump_rev(call_arg, call_res, call_iw, call_w);
+    for (casadi_int i=0; i<m.n_dep; ++i) wj[m.dep[i]] |= nz_in[i];
+  }
+
   const SX SXFunction::sx_in(casadi_int ind) const {
     return in_.at(ind);
   }

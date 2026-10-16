@@ -1840,6 +1840,23 @@ namespace casadi {
         \identifier{1wg} */
     int rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
 
+    /** \brief Propagate jumps forward
+     *
+     * arg: dependency bits, res: bits for dependencies that may jump */
+    int jump_fwd(const bvec_t** arg, bvec_t** res,
+        casadi_int* iw, bvec_t* w, int mem=0) const;
+
+    /** \brief Propagate jumps forward with temporary memory allocation */
+    int jump_fwd(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const;
+
+    /** \brief Propagate jumps backward
+     *
+     * res: dependency seeds (cleared), arg: bits for dependencies that may jump (accumulated) */
+    int jump_rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem=0) const;
+
+    /** \brief Propagate jumps backward with temporary memory allocation */
+    int jump_rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
+
 #endif // SWIG
 
     /** \brief Evaluate on horizontally stacked MX arguments and sum the results

@@ -1471,6 +1471,84 @@ class SXtests(casadiTestCase):
       self.checkarray(ca.which_depends(e, ca.vertcat(x,y,p),2,True),[True, False])
       self.checkarray(ca.which_depends(e, ca.vertcat(x,y,p),2,False),[True, False, True])
 
+  def test_which_jump(self):
+    for X in [ca.SX,ca.MX]:
+      x = X.sym("x")
+      y = X.sym("y")
+      p = X.sym("p")
+      z = X.sym("z")
+
+      e = ca.vertcat(0, x+y, ca.floor(x)+y, x*ca.floor(p), ca.sign(x)*y,
+                     ca.if_else(x>0, y, 2*y), ca.fabs(x), ca.sin(x), ca.fmod(x, 1), 1/x)
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y), True),[0, 0, 1, 0, 1, 1, 0, 0, 1, 0])
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y,p), True),[0, 0, 1, 1, 1, 1, 0, 0, 1, 0])
+
+      e = ca.vertcat(ca.floor(x)+y, x*ca.floor(p), ca.sin(y))
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y,p,z)),[True, False, True, False])
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y,p,z), False),[True, False, True, False])
+
+      # Jumps upstream of an operation propagate
+      e = ca.sin(ca.floor(x))*y
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y), True),[1])
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y), False),[True, False])
+
+      self.assertTrue(ca.jumps_in(ca.floor(x)+y, x))
+      self.assertFalse(ca.jumps_in(ca.floor(x)+y, y))
+      self.assertFalse(ca.jumps_in(ca.floor(p)*x, x))
+      self.assertFalse(ca.jumps_in(ca.fabs(x)+ca.fmax(x, y), ca.vertcat(x,y)))
+      self.assertFalse(ca.jumps_in(X(2,1), x))
+
+    # Function calls
+    a = ca.MX.sym("a")
+    b = ca.MX.sym("b")
+    f_jump = ca.Function("f_jump",[a],[ca.floor(a)])
+    f_smooth = ca.Function("f_smooth",[a],[ca.sin(a)])
+    f_par = ca.Function("f_par",[a,b],[a*ca.floor(b)])
+    for f in [f_jump, f_smooth, f_par]:
+      for F in [f, f.expand()]:
+        x = ca.MX.sym("x")
+        y = ca.MX.sym("y")
+        if f is f_par:
+          e = ca.vertcat(F(x,y), F(y,x))
+          ref_fwd = [True, True]
+          ref_rev = [True, True]
+          self.checkarray(ca.which_jump(F(x,y), ca.vertcat(x,y), False),[False, True])
+          self.checkarray(ca.which_jump(F(x,y), x, True),[False])
+        else:
+          e = ca.vertcat(F(x)+y, F(ca.floor(y))*x)
+          ref_fwd = [f is f_jump, True]
+          ref_rev = [f is f_jump, True]
+        self.checkarray(ca.which_jump(e, ca.vertcat(x,y), True), ref_fwd)
+        self.checkarray(ca.which_jump(e, ca.vertcat(x,y), False), ref_rev)
+        # Same through an SX call node
+        xs = ca.SX.sym("x")
+        ys = ca.SX.sym("y")
+        for G in [ca.Function("g",[x,y],[e]), ca.Function("g",[x,y],[e]).expand()]:
+          es = G.call([xs, ys], False, True)[0]
+          self.checkarray(ca.which_jump(es, ca.vertcat(xs,ys), True), ref_fwd)
+          self.checkarray(ca.which_jump(es, ca.vertcat(xs,ys), False), ref_rev)
+
+    # Map and MapSum
+    x = ca.MX.sym("x",3)
+    p = ca.MX.sym("p")
+    f = ca.Function("f",[a,b],[a*ca.floor(b), ca.floor(a)+b])
+    fm = f.map(3)
+    e = ca.veccat(*fm(x.T, p))
+    self.checkarray(ca.which_jump(e, x, True),[0, 0, 0, 1, 1, 1])
+    self.checkarray(ca.which_jump(e, x, False),[True, True, True])
+    self.checkarray(ca.which_jump(e, p, True),[1, 1, 1, 0, 0, 0])
+    self.checkarray(ca.which_jump(e, p, False),[True])
+    fs = f.map("fs","serial",3,[1],[0])
+    e = ca.veccat(*fs(x.T, p))
+    self.checkarray(ca.which_jump(e, x, True),[0, 1, 1, 1])
+    self.checkarray(ca.which_jump(e, p, True),[1, 0, 0, 0])
+    self.checkarray(ca.which_jump(e[0], x, False),[False, False, False])
+    self.checkarray(ca.which_jump(e[0], p, False),[True])
+
+    # Opaque functions: sound fallback, every dependency may jump
+    lut = ca.interpolant("lut","linear",[[0,1,2]],[0,1,4])
+    self.assertTrue(ca.jumps_in(lut(x[0]), x))
+
   def test_if_else_zero_sens(self):
 
     for X in [ca.SX]:

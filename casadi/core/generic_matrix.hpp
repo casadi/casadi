@@ -480,6 +480,7 @@ namespace casadi {
     static MatType diff(const MatType &x, casadi_int n=1, casadi_int axis=-1);
 
     static bool is_linear(const MatType &expr, const MatType &var);
+    static bool jumps_in(const MatType &expr, const MatType &var);
     static bool is_quadratic(const MatType &expr, const MatType &var);
     static void quadratic_coeff(const MatType &expr, const MatType &var,
         MatType& A, MatType& b, MatType& c, bool check);
@@ -2763,6 +2764,22 @@ namespace casadi {
       return MatType::which_depends(expr, var, order, tr);
     }
 
+    /** \brief Find out which variables enter with a possible jump (discontinuity)
+     *
+     * tr=false: per nonzero of var, tr=true: per nonzero of expr.
+     * False positives are possible, false negatives not. */
+    inline friend std::vector<bool> which_jump(const MatType &expr, const MatType &var,
+        bool tr=false) {
+      return MatType::which_jump(expr, var, tr);
+    }
+
+    /** \brief Can expr jump (discontinuously) in var?
+     *
+     * False positives are possible, false negatives not. */
+    inline friend bool jumps_in(const MatType &expr, const MatType &var) {
+      return MatType::jumps_in(expr, var);
+    }
+
     /** \brief Get the sparsity pattern of a jacobian
 
         Equivalent to, but cheaper to compute than, jacobian(f,x).sparsity()
@@ -4157,6 +4174,11 @@ namespace casadi {
 
     casadi_int n = x_col.numel();
     return blockcat(y*MatType::eye(n), x_col, x_col.T(), y);
+  }
+
+  template<typename MatType>
+  bool GenericMatrix<MatType>::jumps_in(const MatType &expr, const MatType &var) {
+    return any(MatType::which_jump(expr, var, true));
   }
 
   template<typename MatType>

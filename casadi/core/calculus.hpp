@@ -480,6 +480,11 @@ namespace casadi {
   template<>      struct JumpChecker<OP_AND>{ static const bool check=true;};
   template<>      struct JumpChecker<OP_OR>{ static const bool check=true;};
   template<>      struct JumpChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_FIND>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_LOW>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_GETNONZEROS_PARAM>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_SETNONZEROS_PARAM>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_ADDNONZEROS_PARAM>{ static const bool check=true;};
   ///@}
 
   ///@{
