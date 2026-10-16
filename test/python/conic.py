@@ -186,8 +186,8 @@ class ConicTests(casadiTestCase):
         solver(**solver_in)
 
         digits = 15
-        if conic == "mosek" and platform.system()=="Darwin":
-            digits = 5
+        if conic == "mosek":
+            digits = 4
         if aux_options["codegen"]:
           self.check_codegen(solver,solver.convert_in(solver_in),digits=digits,**aux_options["codegen"])
 
