@@ -162,7 +162,7 @@ namespace casadi {
   bool SXFunction::is_smooth() const {
     // Go through all nodes and check if any node is non-smooth
     for (auto&& a : algorithm_) {
-      if (!operation_checker<SmoothChecker>(a.op)) {
+      if (operation_checker<JumpChecker>(a.op)) {
         return false;
       }
     }

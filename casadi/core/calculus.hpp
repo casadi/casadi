@@ -464,22 +464,22 @@ namespace casadi {
   };
 
   ///@{
-  /// Smoothness (by default true)
-  template<casadi_int I> struct SmoothChecker { static const bool check=true;};
-  template<>      struct SmoothChecker<OP_LT>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_LE>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_FLOOR>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_CEIL>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_FMOD>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_REMAINDER>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_EQ>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_NE>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_SIGN>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_COPYSIGN>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_NOT>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_AND>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_OR>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_IF_ELSE_ZERO>{ static const bool check=false;};
+  /// Jump discontinuity (by default false)
+  template<casadi_int I> struct JumpChecker { static const bool check=false;};
+  template<>      struct JumpChecker<OP_LT>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_LE>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_FLOOR>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_CEIL>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_FMOD>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_REMAINDER>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_EQ>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_NE>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_SIGN>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_COPYSIGN>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_NOT>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_AND>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_OR>{ static const bool check=true;};
+  template<>      struct JumpChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
   ///@}
 
   ///@{
