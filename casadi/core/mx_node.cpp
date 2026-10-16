@@ -444,30 +444,101 @@ namespace casadi {
 
   int MXNode::sp_forward_jump(const bvec_t** arg, const bvec_t** arg_j,
       bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const {
-    // Jumps upstream propagate along dependencies
-    if (sp_forward(arg_j, res_j, iw, w)) return 1;
-    if (sp_forward(arg, res, iw, w)) return 1;
-    // Any dependency passing through this node may jump
-    if (has_jump()) {
+    // Dependencies passing through this node where it jumps,
+    // computed before res can overwrite arg
+    std::vector<bvec_t> jbuf;
+    std::vector<bvec_t*> jres(sz_res(), nullptr);
+    bool any_jump = false;
+    for (casadi_int i=0; i<n_dep(); ++i) any_jump = any_jump || has_jump(i);
+    if (any_jump) {
+      casadi_int n_zero = 0, n_out = 0;
+      for (casadi_int i=0; i<n_dep(); ++i) {
+        if (!has_jump(i)) n_zero = std::max(n_zero, dep(i).nnz());
+      }
+      for (casadi_int k=0; k<nout(); ++k) n_out += sparsity(k).nnz();
+      jbuf.resize(n_zero + n_out, 0);
+      bvec_t* p = get_ptr(jbuf) + n_zero;
       for (casadi_int k=0; k<nout(); ++k) {
-        if (!res[k] || !res_j[k]) continue;
-        for (casadi_int i=0; i<sparsity(k).nnz(); ++i) res_j[k][i] |= res[k][i];
+        if (res_j[k]) jres[k] = p;
+        p += sparsity(k).nnz();
+      }
+      if (has_dense_jump()) {
+        bvec_t a = 0;
+        for (casadi_int i=0; i<n_dep(); ++i) {
+          if (!has_jump(i)) continue;
+          if (arg[i]) a |= bvec_or(arg[i], dep(i).nnz());
+          if (arg_j[i]) a |= bvec_or(arg_j[i], dep(i).nnz());
+        }
+        for (casadi_int k=0; k<nout(); ++k) {
+          if (jres[k]) std::fill_n(jres[k], sparsity(k).nnz(), a);
+        }
+      } else {
+        std::vector<const bvec_t*> jarg(sz_arg(), nullptr);
+        for (casadi_int i=0; i<n_dep(); ++i) {
+          if (arg[i]) jarg[i] = has_jump(i) ? arg[i] : get_ptr(jbuf);
+        }
+        if (sp_forward(get_ptr(jarg), get_ptr(jres), iw, w)) return 1;
       }
     }
-    return 0;
+    // Jumps upstream propagate along dependencies
+    if (sp_forward(arg_j, res_j, iw, w)) return 1;
+    if (any_jump) {
+      for (casadi_int k=0; k<nout(); ++k) {
+        if (!res_j[k]) continue;
+        for (casadi_int i=0; i<sparsity(k).nnz(); ++i) res_j[k][i] |= jres[k][i];
+      }
+    }
+    return sp_forward(arg, res, iw, w);
   }
 
   int MXNode::sp_reverse_jump(bvec_t** arg, bvec_t** arg_j,
       bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const {
-    // Seeds reaching this node turn into jump seeds
-    if (has_jump()) {
+    // Jump seeds reaching the dependencies where this node jumps, read before
+    // the seeds are cleared and added after (res may alias arg)
+    bool any_jump = false;
+    for (casadi_int i=0; i<n_dep(); ++i) any_jump = any_jump || has_jump(i);
+    std::vector<bvec_t> jbuf;
+    std::vector<bvec_t*> jarg(sz_arg(), nullptr);
+    bvec_t s = 0;
+    if (any_jump && has_dense_jump()) {
       for (casadi_int k=0; k<nout(); ++k) {
-        if (!res[k] || !res_j[k]) continue;
-        for (casadi_int i=0; i<sparsity(k).nnz(); ++i) res_j[k][i] |= res[k][i];
+        if (res_j[k]) s |= bvec_or(res_j[k], sparsity(k).nnz());
       }
+    } else if (any_jump) {
+      casadi_int n_in = 0, n_out = 0;
+      for (casadi_int i=0; i<n_dep(); ++i) n_in += dep(i).nnz();
+      for (casadi_int k=0; k<nout(); ++k) n_out += sparsity(k).nnz();
+      jbuf.resize(n_in + n_out, 0);
+      std::vector<bvec_t*> jres(sz_res(), nullptr);
+      bvec_t* p = get_ptr(jbuf);
+      for (casadi_int i=0; i<n_dep(); ++i) {
+        if (arg[i]) jarg[i] = p;
+        p += dep(i).nnz();
+      }
+      for (casadi_int k=0; k<nout(); ++k) {
+        if (res_j[k]) {
+          std::copy_n(res_j[k], sparsity(k).nnz(), p);
+          jres[k] = p;
+        }
+        p += sparsity(k).nnz();
+      }
+      if (sp_reverse(get_ptr(jarg), get_ptr(jres), iw, w)) return 1;
     }
     if (sp_reverse(arg_j, res_j, iw, w)) return 1;
-    return sp_reverse(arg, res, iw, w);
+    if (sp_reverse(arg, res, iw, w)) return 1;
+    if (!any_jump) return 0;
+    for (casadi_int i=0; i<n_dep(); ++i) {
+      if (!has_jump(i)) continue;
+      for (casadi_int el=0; el<dep(i).nnz(); ++el) {
+        if (has_dense_jump()) {
+          if (arg[i]) arg[i][el] |= s;
+          if (arg_j[i]) arg_j[i][el] |= s;
+        } else if (arg[i]) {
+          arg[i][el] |= jarg[i][el];
+        }
+      }
+    }
+    return 0;
   }
 
   MX MXNode::get_output(casadi_int oind) const {

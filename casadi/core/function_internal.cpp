@@ -3156,12 +3156,34 @@ namespace casadi {
 
   int FunctionInternal::
   sp_forward_jump(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
-    return sp_forward(arg, res, iw, w, mem);
+    // Every dependency may jump, including those dropped by is_diff_in/is_diff_out
+    if (all(is_diff_in_) && all(is_diff_out_)) return sp_forward(arg, res, iw, w, mem);
+    bvec_t a = 0;
+    for (casadi_int i=0; i<n_in_; ++i) {
+      if (arg[i]) a |= bvec_or(arg[i], nnz_in(i));
+    }
+    for (casadi_int i=0; i<n_out_; ++i) {
+      if (res[i]) std::fill_n(res[i], nnz_out(i), a);
+    }
+    return 0;
   }
 
   int FunctionInternal::
   sp_reverse_jump(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
-    return sp_reverse(arg, res, iw, w, mem);
+    if (all(is_diff_in_) && all(is_diff_out_)) return sp_reverse(arg, res, iw, w, mem);
+    bvec_t s = 0;
+    for (casadi_int i=0; i<n_out_; ++i) {
+      if (res[i]) {
+        s |= bvec_or(res[i], nnz_out(i));
+        casadi_clear(res[i], nnz_out(i));
+      }
+    }
+    for (casadi_int i=0; i<n_in_; ++i) {
+      if (arg[i]) {
+        for (casadi_int k=0; k<nnz_in(i); ++k) arg[i][k] |= s;
+      }
+    }
+    return 0;
   }
 
   void FunctionInternal::sz_work(size_t& sz_arg, size_t& sz_res,

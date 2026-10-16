@@ -248,8 +248,17 @@ namespace casadi {
         \identifier{1qz} */
     virtual int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const;
 
-    /** \brief Can the output jump (discontinuously) in an input it depends on? */
-    virtual bool has_jump() const { return operation_checker<JumpChecker>(op());}
+    /** \brief Can the output jump (discontinuously) in dependency i? */
+    virtual bool has_jump(casadi_int i) const {
+      if (i==0) return operation_checker<JumpXChecker>(op());
+      if (i==1) return operation_checker<JumpYChecker>(op());
+      return operation_checker<JumpChecker>(op());
+    }
+
+    /** \brief Does sp_forward drop the dependencies on the jump arguments?
+     *
+     * If so, they reach every output as jumps (piecewise constant nodes) */
+    virtual bool has_dense_jump() const { return false;}
 
     /** \brief Propagate jumps forward
      *
@@ -257,9 +266,9 @@ namespace casadi {
     virtual int sp_forward_jump(const bvec_t** arg, const bvec_t** arg_j,
       bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const;
 
-    /** \brief Propagate jumps backwards
+    /** \brief Propagate jumps backwards, transpose of sp_forward_jump
      *
-     * res/arg: dependency seeds/sensitivities, res_j/arg_j: jump seeds/sensitivities */
+     * arg/res: adjoints of the dependency bits, arg_j/res_j: adjoints of the jump bits */
     virtual int sp_reverse_jump(bvec_t** arg, bvec_t** arg_j,
       bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const;
 

@@ -803,7 +803,8 @@ namespace casadi {
 
   int MXFunction::sp_forward_jump(const bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
-    // w: dependency plane, wj: jump plane with the same layout
+    // w: dependency plane, wj: jump plane with the same layout.
+    // Dependencies dropped at non-differentiable inputs/outputs count as jumps.
     std::vector<bvec_t> wj(sz_w(), 0);
     std::vector<const bvec_t*> arg_j(sz_arg(), nullptr);
     std::vector<bvec_t*> res_j(sz_res(), nullptr);
@@ -816,22 +817,23 @@ namespace casadi {
         casadi_int nz_offset=e.data->offset();
         const bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[e.res.front()];
-        if (argi!=nullptr && is_diff_in_[i]) {
-          std::copy(argi+nz_offset, argi+nz_offset+nnz, w1);
-        } else {
-          std::fill_n(w1, nnz, 0);
+        bvec_t* wj1 = get_ptr(wj) + workloc_[e.res.front()];
+        std::fill_n(w1, nnz, 0);
+        std::fill_n(wj1, nnz, 0);
+        if (argi!=nullptr) {
+          std::copy(argi+nz_offset, argi+nz_offset+nnz, is_diff_in_[i] ? w1 : wj1);
         }
-        std::fill_n(get_ptr(wj) + workloc_[e.res.front()], nnz, 0);
       } else if (e.op==OP_OUTPUT) {
         casadi_int nnz=e.data.dep().nnz();
         casadi_int i=e.data->ind();
         casadi_int nz_offset=e.data->offset();
         bvec_t* resi = res[i];
-        bvec_t* w1 = get_ptr(wj) + workloc_[e.arg.front()];
-        if (resi!=nullptr && is_diff_out_[i]) {
-          std::copy(w1, w1+nnz, resi+nz_offset);
-        } else if (resi!=nullptr) {
-          std::fill_n(resi+nz_offset, nnz, 0);
+        bvec_t* w1 = w + workloc_[e.arg.front()];
+        bvec_t* wj1 = get_ptr(wj) + workloc_[e.arg.front()];
+        if (resi!=nullptr) {
+          for (casadi_int k=0; k<nnz; ++k) {
+            resi[nz_offset+k] = is_diff_out_[i] ? wj1[k] : wj1[k] | w1[k];
+          }
         }
       } else {
         for (casadi_int i=0; i<e.arg.size(); ++i) {
@@ -850,7 +852,8 @@ namespace casadi {
 
   int MXFunction::sp_reverse_jump(bvec_t** arg, bvec_t** res,
       casadi_int* iw, bvec_t* w, void* mem) const {
-    // w: dependency seeds, wj: jump seeds with the same layout
+    // Transpose of sp_forward_jump; w: adjoint of the dependency plane,
+    // wj: adjoint of the jump plane with the same layout
     std::fill_n(w, sz_w(), 0);
     std::vector<bvec_t> wj(sz_w(), 0);
     std::vector<bvec_t*> arg_j(sz_arg(), nullptr);
@@ -865,8 +868,10 @@ namespace casadi {
         bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[it->res.front()];
         bvec_t* wj1 = get_ptr(wj) + workloc_[it->res.front()];
-        if (argi!=nullptr && is_diff_in_[i])
-          for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= wj1[k];
+        if (argi!=nullptr) {
+          const bvec_t* s = is_diff_in_[i] ? w1 : wj1;
+          for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= s[k];
+        }
         std::fill_n(w1, nnz, 0);
         std::fill_n(wj1, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
@@ -875,8 +880,12 @@ namespace casadi {
         casadi_int nz_offset=it->data->offset();
         bvec_t* resi = res[i] ? res[i] + nz_offset : nullptr;
         bvec_t* w1 = w + workloc_[it->arg.front()];
-        if (resi!=nullptr && is_diff_out_[i]) {
-          for (casadi_int k=0; k<nnz; ++k) w1[k] |= resi[k];
+        bvec_t* wj1 = get_ptr(wj) + workloc_[it->arg.front()];
+        if (resi!=nullptr) {
+          for (casadi_int k=0; k<nnz; ++k) {
+            wj1[k] |= resi[k];
+            if (!is_diff_out_[i]) w1[k] |= resi[k];
+          }
           std::fill_n(resi, nnz, 0);
         }
       } else {

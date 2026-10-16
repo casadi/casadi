@@ -1498,6 +1498,43 @@ class SXtests(casadiTestCase):
       self.assertFalse(ca.jumps_in(ca.fabs(x)+ca.fmax(x, y), ca.vertcat(x,y)))
       self.assertFalse(ca.jumps_in(X(2,1), x))
 
+      # Per-argument jumps
+      self.checkarray(ca.which_jump(ca.if_else(x>0, y, 2*y), ca.vertcat(x,y)),[True, False])
+      self.checkarray(ca.which_jump(ca.copysign(x, y), ca.vertcat(x,y)),[False, True])
+      self.checkarray(ca.which_jump(ca.fmod(x, y), ca.vertcat(x,y)),[True, True])
+
+    # Nodes whose sparsity propagation drops the dependency
+    x = ca.MX.sym("x",3)
+    i = ca.MX.sym("i")
+    for e in [x[i], ca.low(x, i)]:
+      self.checkarray(ca.which_jump(e, i, True),[1]*e.nnz())
+    self.checkarray(ca.which_jump(ca.find(x), i, True),[0])
+    self.checkarray(ca.which_jump(x[i], x), [False]*3)
+    self.checkarray(ca.which_jump(x[i], i), [True])
+    self.checkarray(ca.which_jump(ca.find(x), x), [True]*3)
+    self.checkarray(ca.which_jump(ca.low(x, i), ca.vertcat(x,i)), [True]*4)
+    y = ca.MX.zeros(3,1)
+    y.nz[i] = x[0]
+    self.checkarray(ca.which_jump(y, ca.vertcat(x,i)), [False, False, False, True])
+    self.checkarray(ca.which_jump(ca.floor(ca.find(x))*i, ca.vertcat(x,i)), [True]*3+[False])
+
+    # Dependencies hidden from derivatives (is_diff_in) count as jumps
+    for X in [ca.SX, ca.MX]:
+      x = X.sym("x")
+      y = X.sym("y")
+      if X is ca.MX:
+        for e in [ca.floor(ca.stop_diff(x, 1)), ca.stop_diff(ca.floor(x), 1), x*ca.stop_diff(x, 1)]:
+          self.assertTrue(ca.jumps_in(e, x))
+          self.assertTrue(ca.jumps_in(e+y, x))
+          self.assertFalse(ca.jumps_in(e+y, y))
+      a = X.sym("a")
+      b = X.sym("b")
+      f = ca.Function("f",[a,b],[a*b],{"is_diff_in":[False,True]})
+      e = f.call([x, y], False, True)[0]
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y)), [True, False])
+      self.checkarray(ca.which_jump(e, ca.vertcat(x,y), True), [1])
+      self.checkarray(ca.which_jump(e, y, True), [0])
+
     # Function calls
     a = ca.MX.sym("a")
     b = ca.MX.sym("b")

@@ -180,46 +180,63 @@ namespace casadi {
 
   int Call::sp_forward_jump(const bvec_t** arg, const bvec_t** arg_j,
       bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const {
-    // Jumps inside the callee, before res can overwrite arg
-    std::vector<bvec_t> buf(fcn_.nnz_out());
+    // Jumps inside the callee, of dependencies and of upstream jumps alike
+    // (the latter may cross dependencies that sp_forward drops)
+    std::vector<bvec_t> buf(fcn_.nnz_in() + fcn_.nnz_out(), 0);
+    std::vector<const bvec_t*> targ(fcn_.sz_arg(), nullptr);
     std::vector<bvec_t*> tres(fcn_.sz_res(), nullptr);
     bvec_t* p = get_ptr(buf);
+    for (casadi_int i=0; i<fcn_.n_in(); ++i) {
+      if (arg[i] || arg_j[i]) {
+        for (casadi_int el=0; el<fcn_.nnz_in(i); ++el) {
+          p[el] = (arg[i] ? arg[i][el] : 0) | (arg_j[i] ? arg_j[i][el] : 0);
+        }
+        targ[i] = p;
+      }
+      p += fcn_.nnz_in(i);
+    }
     for (casadi_int k=0; k<fcn_.n_out(); ++k) {
       if (res_j[k]) tres[k] = p;
       p += fcn_.nnz_out(k);
     }
-    std::vector<const bvec_t*> targ(arg, arg + fcn_.n_in());
-    targ.resize(fcn_.sz_arg(), nullptr);
     if (fcn_.jump_fwd(get_ptr(targ), get_ptr(tres), iw, w)) return 1;
     // Jumps upstream propagate along dependencies
     if (fcn_(arg_j, res_j, iw, w)) return 1;
     for (casadi_int k=0; k<fcn_.n_out(); ++k) {
       if (!res_j[k]) continue;
-      for (casadi_int i=0; i<fcn_.nnz_out(k); ++i) res_j[k][i] |= tres[k][i];
+      for (casadi_int el=0; el<fcn_.nnz_out(k); ++el) res_j[k][el] |= tres[k][el];
     }
     return fcn_(arg, res, iw, w);
   }
 
   int Call::sp_reverse_jump(bvec_t** arg, bvec_t** arg_j,
       bvec_t** res, bvec_t** res_j, casadi_int* iw, bvec_t* w) const {
-    // Copy of the dependency seeds, consumed by two reverse sweeps
-    std::vector<bvec_t> buf(fcn_.nnz_out());
-    std::vector<bvec_t*> tres(fcn_.sz_res(), nullptr);
+    // Transpose of sp_forward_jump: jump seeds through the callee's jumps
+    std::vector<bvec_t> buf(fcn_.nnz_in() + fcn_.nnz_out(), 0);
+    std::vector<bvec_t*> targ(fcn_.sz_arg(), nullptr), tres(fcn_.sz_res(), nullptr);
     bvec_t* p = get_ptr(buf);
+    for (casadi_int i=0; i<fcn_.n_in(); ++i) {
+      if (arg[i] || arg_j[i]) targ[i] = p;
+      p += fcn_.nnz_in(i);
+    }
     for (casadi_int k=0; k<fcn_.n_out(); ++k) {
-      if (res[k]) {
-        std::copy_n(res[k], fcn_.nnz_out(k), p);
+      if (res_j[k]) {
+        std::copy_n(res_j[k], fcn_.nnz_out(k), p);
         tres[k] = p;
       }
       p += fcn_.nnz_out(k);
     }
-    // Jump seeds propagate along dependencies
-    if (fcn_.rev(arg_j, res_j, iw, w)) return 1;
-    // Jumps inside the callee
-    std::vector<bvec_t*> targ(arg_j, arg_j + fcn_.n_in());
-    targ.resize(fcn_.sz_arg(), nullptr);
     if (fcn_.jump_rev(get_ptr(targ), get_ptr(tres), iw, w)) return 1;
-    return fcn_.rev(arg, res, iw, w);
+    if (fcn_.rev(arg_j, res_j, iw, w)) return 1;
+    if (fcn_.rev(arg, res, iw, w)) return 1;
+    for (casadi_int i=0; i<fcn_.n_in(); ++i) {
+      if (!targ[i]) continue;
+      for (casadi_int el=0; el<fcn_.nnz_in(i); ++el) {
+        if (arg[i]) arg[i][el] |= targ[i][el];
+        if (arg_j[i]) arg_j[i][el] |= targ[i][el];
+      }
+    }
+    return 0;
   }
 
   void Call::add_dependency(CodeGenerator& g) const {

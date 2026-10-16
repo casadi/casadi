@@ -122,9 +122,9 @@ namespace casadi {
         \identifier{1yj} */
     casadi_int op() const override { return OP_BSPLINE;}
 
-    /** \brief Degree 0 splines are piecewise constant */
-    bool has_jump() const override {
-      return std::find(degree_.begin(), degree_.end(), 0) != degree_.end();
+    /** \brief Degree 0 splines are piecewise constant in x */
+    bool has_jump(casadi_int i) const override {
+      return i==0 && std::find(degree_.begin(), degree_.end(), 0) != degree_.end();
     }
 
     /** \brief Calculate forward mode directional derivatives

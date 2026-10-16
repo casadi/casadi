@@ -464,28 +464,44 @@ namespace casadi {
   };
 
   ///@{
-  /// Jump discontinuity (by default false)
-  template<casadi_int I> struct JumpChecker { static const bool check=false;};
-  template<>      struct JumpChecker<OP_LT>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_LE>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_FLOOR>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_CEIL>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_FMOD>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_REMAINDER>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_EQ>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_NE>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_SIGN>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_COPYSIGN>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_NOT>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_AND>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_OR>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_FIND>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_LOW>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_GETNONZEROS_PARAM>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_SETNONZEROS_PARAM>{ static const bool check=true;};
-  template<>      struct JumpChecker<OP_ADDNONZEROS_PARAM>{ static const bool check=true;};
+  /// Jump discontinuity in the first argument (by default false)
+  template<casadi_int I> struct JumpXChecker { static const bool check=false;};
+  template<>      struct JumpXChecker<OP_FLOOR>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_CEIL>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_SIGN>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_NOT>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_LT>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_LE>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_EQ>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_NE>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_AND>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_OR>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_FMOD>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_REMAINDER>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_FIND>{ static const bool check=true;};
+  template<>      struct JumpXChecker<OP_LOW>{ static const bool check=true;};
   ///@}
+
+  ///@{
+  /// Jump discontinuity in the second argument (by default false)
+  template<casadi_int I> struct JumpYChecker { static const bool check=false;};
+  template<>      struct JumpYChecker<OP_LT>{ static const bool check=true;};
+  template<>      struct JumpYChecker<OP_LE>{ static const bool check=true;};
+  template<>      struct JumpYChecker<OP_EQ>{ static const bool check=true;};
+  template<>      struct JumpYChecker<OP_NE>{ static const bool check=true;};
+  template<>      struct JumpYChecker<OP_AND>{ static const bool check=true;};
+  template<>      struct JumpYChecker<OP_OR>{ static const bool check=true;};
+  template<>      struct JumpYChecker<OP_FMOD>{ static const bool check=true;};
+  template<>      struct JumpYChecker<OP_REMAINDER>{ static const bool check=true;};
+  template<>      struct JumpYChecker<OP_COPYSIGN>{ static const bool check=true;};
+  template<>      struct JumpYChecker<OP_LOW>{ static const bool check=true;};
+  ///@}
+
+  /// Jump discontinuity in any argument
+  template<casadi_int I> struct JumpChecker {
+    static const bool check = JumpXChecker<I>::check || JumpYChecker<I>::check;
+  };
 
   ///@{
   /// If evaluated with the first argument zero, is the result zero?
