@@ -25,6 +25,7 @@
 # Tests for the GraphBuilder facade: numeric black-box evaluation through ONNX Runtime,
 # and symbolic ONNX import/export. Consolidates the former onnx_runtime.py + onnx_symbolic.py.
 import casadi as ca
+import math
 import numpy
 import unittest
 import os
@@ -2565,6 +2566,210 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     with self.assertRaises(RuntimeError):
       ca.GraphBuilder(g).export_onnx("unsupported.onnx")
 
+  # Points away from every kink of the activations below (0, -1, 2, +-2.5, +-3, -0.75, 1.75)
+  ACTIVATION_POINTS = [-3.7, -2.2, -1.3, -0.4, 0.3, 1.1, 2.7]
+  # Points on the kinks: values only, all activations are continuous
+  ACTIVATION_KINKS = [-3., -2.5, -1., 0., 2., 2.5, 3.]
+
+  @staticmethod
+  def activation_cases():
+    np = numpy
+    f32 = lambda v: float(np.float32(v))  # ONNX float attributes are float32
+    erf = np.vectorize(math.erf)
+    softplus = lambda x: np.logaddexp(0, x)
+    elu = lambda x, a: np.where(x > 0, x, f32(a) * np.expm1(np.minimum(x, 0)))
+    gelu_tanh = lambda x: 0.5*x*(1 + np.tanh(math.sqrt(2/math.pi)*(x + 0.044715*x**3)))
+    selu_alpha, selu_gamma = 1.67326319217681884765625, 1.05070102214813232421875
+    return [  # (op, attributes, NumPy reference of the ONNX definition)
+      ("Relu", {}, lambda x: np.maximum(x, 0)),
+      ("LeakyRelu", {}, lambda x: np.where(x >= 0, x, f32(0.01)*x)),
+      ("LeakyRelu", {"alpha": 0.2}, lambda x: np.where(x >= 0, x, f32(0.2)*x)),
+      ("Sigmoid", {}, lambda x: 1/(1 + np.exp(-x))),
+      ("HardSigmoid", {}, lambda x: np.clip(f32(0.2)*x + 0.5, 0, 1)),
+      ("HardSigmoid", {"alpha": 0.4, "beta": 0.3},
+        lambda x: np.clip(f32(0.4)*x + f32(0.3), 0, 1)),
+      ("HardSwish", {}, lambda x: x*np.clip(x/6 + 0.5, 0, 1)),
+      ("Softplus", {}, softplus),
+      ("Softsign", {}, lambda x: x/(1 + np.abs(x))),
+      ("Elu", {}, lambda x: elu(x, 1.0)),
+      ("Elu", {"alpha": 0.5}, lambda x: elu(x, 0.5)),
+      ("Selu", {}, lambda x: selu_gamma*elu(x, selu_alpha)),
+      ("Selu", {"alpha": 1.5, "gamma": 2.0}, lambda x: 2.0*elu(x, 1.5)),
+      ("Celu", {}, lambda x: np.maximum(0, x) + np.minimum(0, np.expm1(x))),
+      ("Celu", {"alpha": 0.7}, lambda x: np.maximum(0, x)
+        + np.minimum(0, f32(0.7)*np.expm1(x/f32(0.7)))),
+      ("Mish", {}, lambda x: x*np.tanh(softplus(x))),
+      ("Gelu", {}, lambda x: 0.5*x*(1 + erf(x/math.sqrt(2)))),
+      ("Gelu", {"approximate": "none"}, lambda x: 0.5*x*(1 + erf(x/math.sqrt(2)))),
+      ("Gelu", {"approximate": "tanh"}, gelu_tanh),
+    ]
+
+  @staticmethod
+  def activation_model(nodes, n, outputs, initializers=(), opset=20):
+    graph = helper.make_graph(nodes, "activation",
+      [helper.make_tensor_value_info("x", TensorProto.DOUBLE, [1, n])],
+      [helper.make_tensor_value_info(y, TensorProto.DOUBLE, [1, n]) for y in outputs],
+      initializer=list(initializers))
+    model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", opset)])
+    onnx.checker.check_model(model)
+    return model
+
+  def import_model(self, model, folder):
+    path = os.path.join(folder, "model.onnx")
+    onnx.save(model, path)
+    return ca.GraphBuilder(path).create("f", {"symbolic": True})
+
+  def check_elementwise(self, f, ref, name):
+    """Values on and off the kinks, and the Jacobian against central differences"""
+    shape = f.size_in(0)
+    arg = lambda x: ca.reshape(ca.DM(x), shape[0], shape[1])
+    for points in (self.ACTIVATION_POINTS, self.ACTIVATION_KINKS):
+      x = numpy.array(points)
+      self.checkarray(numpy.array(f(arg(x))).ravel(), ref(x), name, digits=12)
+    x = numpy.array(self.ACTIVATION_POINTS)
+    h = 1e-6
+    fd = (ref(x + h) - ref(x - h))/(2*h)
+    xs = ca.MX.sym("x", f.sparsity_in(0))
+    J = ca.Function("J", [xs], [ca.jacobian(f(xs), xs)])
+    self.checkarray(J(arg(x)), ca.diag(ca.DM(fd)), name + " jacobian", digits=7)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_activations(self):
+    self.message("ONNX activation functions import as CasADi expressions")
+    n = len(self.ACTIVATION_POINTS)
+    a = float(numpy.float32(-0.7))  # a negative Celu alpha: exp(x/alpha) grows as x -> -inf
+    cases = self.activation_cases() + [("Celu", {"alpha": -0.7}, lambda x:
+      numpy.maximum(0, x) + numpy.minimum(0, a*numpy.expm1(x/a)))]
+    with tempfile.TemporaryDirectory() as folder:
+      for op, attrs, ref in cases:
+        with self.subTest(op=op, attributes=attrs):
+          model = self.activation_model([helper.make_node(op, ["x"], ["y"], **attrs)], n, ["y"])
+          self.check_elementwise(self.import_model(model, folder), ref, op + str(attrs))
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_activations_large_arguments(self):
+    self.message("ONNX activations stay finite, with finite derivatives, for large |x|")
+    x = [-1000., -100., -50., 0., 50., 100., 1000.]
+    with tempfile.TemporaryDirectory() as folder:
+      for op, attrs, _ in self.activation_cases():
+        with self.subTest(op=op, attributes=attrs):
+          model = self.activation_model([helper.make_node(op, ["x"], ["y"], **attrs)],
+                                        len(x), ["y"])
+          f = self.import_model(model, folder)
+          xs = ca.MX.sym("x", f.sparsity_in(0))
+          y = f(xs)
+          g = ca.Function("g", [xs], [y, ca.jacobian(y, xs), ca.gradient(ca.sum1(ca.sum2(y)), xs)])
+          for out in g(ca.reshape(ca.DM(x), xs.size1(), xs.size2())):
+            self.assertTrue(numpy.all(numpy.isfinite(numpy.array(ca.densify(out)))), op)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_prelu(self):
+    self.message("ONNX PRelu with a broadcast slope input")
+    n = len(self.ACTIVATION_POINTS)
+    slopes = [numpy.array([0.25]), numpy.linspace(-0.5, 0.5, n)]
+    with tempfile.TemporaryDirectory() as folder:
+      for slope in slopes:
+        with self.subTest(slope=slope.shape):
+          model = self.activation_model([helper.make_node("PRelu", ["x", "slope"], ["y"])], n,
+            ["y"], [numpy_helper.from_array(slope, "slope")])
+          ref = lambda x: numpy.where(x >= 0, x, slope*x)
+          self.check_elementwise(self.import_model(model, folder), ref, "PRelu")
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_clip(self):
+    self.message("ONNX Clip with bounds as attributes (opset 6) and optional inputs (opset 13)")
+    n = len(self.ACTIVATION_POINTS)
+    lo, hi = -1.0, 2.0
+    bounds = [numpy_helper.from_array(numpy.array(lo), "lo"),
+              numpy_helper.from_array(numpy.array(hi), "hi")]
+    cases = [  # (opset, inputs, attributes, reference bounds)
+      (6, ["x"], {}, (None, None)),
+      (6, ["x"], {"min": lo}, (lo, None)),
+      (6, ["x"], {"max": hi}, (None, hi)),
+      (6, ["x"], {"min": lo, "max": hi}, (lo, hi)),
+      (13, ["x"], {}, (None, None)),
+      (13, ["x", "lo"], {}, (lo, None)),
+      (13, ["x", "", "hi"], {}, (None, hi)),
+      (13, ["x", "lo", "hi"], {}, (lo, hi)),
+    ]
+    with tempfile.TemporaryDirectory() as folder:
+      for opset, inputs, attrs, (rlo, rhi) in cases:
+        with self.subTest(opset=opset, inputs=inputs, attributes=attrs):
+          node = helper.make_node("Clip", inputs, ["y"], **attrs)
+          model = self.activation_model([node], n, ["y"], bounds if opset >= 11 else [], opset)
+          ref = lambda x: numpy.clip(x, rlo, rhi)
+          self.check_elementwise(self.import_model(model, folder), ref, "Clip")
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_greater(self):
+    self.message("ONNX Greater and GreaterOrEqual")
+    x = numpy.array(self.ACTIVATION_POINTS)
+    c = numpy_helper.from_array(numpy.array(x[3]), "c")
+    nodes = [helper.make_node("Greater", ["x", "c"], ["y0"]),
+             helper.make_node("Cast", ["y0"], ["gt"], to=TensorProto.DOUBLE),
+             helper.make_node("GreaterOrEqual", ["x", "c"], ["y1"]),
+             helper.make_node("Cast", ["y1"], ["ge"], to=TensorProto.DOUBLE)]
+    model = self.activation_model(nodes, len(x), ["gt", "ge"], [c])
+    with tempfile.TemporaryDirectory() as folder:
+      f = self.import_model(model, folder)
+      gt, ge = f(ca.reshape(ca.DM(x), f.size1_in(0), f.size2_in(0)))
+      self.checkarray(numpy.array(gt).ravel(), (x > x[3]).astype(float), "Greater")
+      self.checkarray(numpy.array(ge).ravel(), (x >= x[3]).astype(float), "GreaterOrEqual")
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_activations_codegen(self):
+    self.message("ONNX activations through C code generation, with derivatives")
+    n = len(self.ACTIVATION_POINTS)
+    cases = self.activation_cases()
+    nodes = [helper.make_node(op, ["x"], ["y%d" % k], **attrs)
+             for k, (op, attrs, _) in enumerate(cases)]
+    nodes.append(helper.make_node("PRelu", ["x", "slope"], ["prelu"]))
+    nodes.append(helper.make_node("Clip", ["x", "lo", "hi"], ["clip"]))
+    outputs = ["y%d" % k for k in range(len(cases))] + ["prelu", "clip"]
+    initializers = [numpy_helper.from_array(numpy.linspace(-0.5, 0.5, n), "slope"),
+                    numpy_helper.from_array(numpy.array(-1.0), "lo"),
+                    numpy_helper.from_array(numpy.array(2.0), "hi")]
+    model = self.activation_model(nodes, n, outputs, initializers)
+    with tempfile.TemporaryDirectory() as folder:
+      f = self.import_model(model, folder)
+      x = ca.reshape(ca.DM(self.ACTIVATION_POINTS), f.size1_in(0), f.size2_in(0))
+      # erf, expm1 and log1p are C99
+      self.check_codegen(f, inputs=[x], std="c99", with_forward=True, with_reverse=True)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_activations_torch(self):
+    self.message("PyTorch networks with activation layers, through both ONNX exporters")
+    try:
+      import torch  # type: ignore
+    except ImportError:
+      raise unittest.SkipTest("needs torch")
+    try:
+      import onnxscript  # type: ignore  # noqa: F401
+      exporters = [False, True]
+    except ImportError:
+      exporters = [False]
+    nn = torch.nn
+    layers = {"ReLU": nn.ReLU(), "Sigmoid": nn.Sigmoid(), "SiLU": nn.SiLU(), "GELU": nn.GELU(),
+              "GELU-tanh": nn.GELU(approximate="tanh"), "Softplus": nn.Softplus(),
+              "ELU": nn.ELU(), "SELU": nn.SELU(), "CELU": nn.CELU(0.5),
+              "LeakyReLU": nn.LeakyReLU(0.5), "PReLU": nn.PReLU(8), "Hardswish": nn.Hardswish(),
+              "Hardsigmoid": nn.Hardsigmoid(), "Hardtanh": nn.Hardtanh(), "Mish": nn.Mish(),
+              "Softsign": nn.Softsign()}
+    torch.manual_seed(0)
+    x = 3*torch.randn(1, 3, dtype=torch.float64)
+    with tempfile.TemporaryDirectory() as folder:
+      path = os.path.join(folder, "net.onnx")
+      for name, layer in layers.items():
+        net = nn.Sequential(nn.Linear(3, 8), layer, nn.Linear(8, 2)).double()
+        for dynamo in exporters:
+          with self.subTest(layer=name, dynamo=dynamo):
+            torch.onnx.export(net, (x,), path, dynamo=dynamo, input_names=["x"],
+                              output_names=["y"])
+            f = ca.GraphBuilder(path).create("f", {"symbolic": True})
+            y = f(ca.reshape(ca.DM(x.numpy().ravel()), f.size1_in(0), f.size2_in(0)))
+            # attributes such as the LeakyReLU slope are float32 in ONNX
+            self.checkarray(numpy.array(y).ravel(), net(x).detach().numpy().ravel(), name,
+                            digits=6)
 
 
 if __name__ == '__main__':

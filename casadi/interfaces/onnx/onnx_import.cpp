@@ -570,6 +570,97 @@ namespace casadi {
     return v;
   }
 
+  // Numerically stable softplus log(1 + exp(x)). Above x = 40, log1p(exp(x)) == x in double;
+  // the clamp keeps exp finite in the discarded branch, so reverse mode gets no 0*inf = NaN.
+  static MX softplus(const MX& x) {
+    return if_else(x > 40, x, log1p(exp(fmin(x, 50))));
+  }
+
+  // alpha * (exp(x) - 1) for x <= 0, x otherwise. The clamp keeps expm1 finite for large x.
+  static MX elu(const MX& x, double alpha) {
+    return if_else(x > 0, x, alpha * expm1(fmin(x, 1)));
+  }
+
+  static bool is_activation(const std::string& op_type) {
+    static const std::set<std::string> ops = {"Relu", "LeakyRelu", "PRelu", "Sigmoid",
+      "HardSigmoid", "HardSwish", "Softplus", "Softsign", "Elu", "Selu", "Celu", "Mish", "Gelu",
+      "Clip"};
+    return ops.count(op_type) > 0;
+  }
+
+  // Element-wise activation functions, composed of CasADi primitives so that AD and code
+  // generation work unchanged. Non-smooth ones get CasADi's usual subgradients at the kinks.
+  // Attribute defaults are float literals: ONNX float attributes are float32.
+  static MX activation(const std::string& op_type, const onnx::NodeProto& node,
+                       const std::vector<MX>& node_inputs) {
+    casadi_assert(node_inputs.size() >= 1, op_type + " requires 1 input");
+    const MX& x = node_inputs[0];
+
+    if (op_type == "Relu") {
+      return fmax(x, 0);
+    } else if (op_type == "LeakyRelu") {
+      return if_else(x >= 0, x, get_float_attribute(node, "alpha", 0.01f) * x);
+    } else if (op_type == "PRelu") {
+      casadi_assert(node_inputs.size() >= 2, "PRelu requires 2 inputs");
+      MX bx = x, slope = node_inputs[1];
+      broadcast_pair(&bx, &slope);
+      return if_else(bx >= 0, bx, slope * bx);
+    } else if (op_type == "Sigmoid") {
+      // Equal to 1/(1 + exp(-x)), but with no overflow for large |x|
+      return 0.5 * (1 + tanh(0.5 * x));
+    } else if (op_type == "HardSigmoid") {
+      double alpha = get_float_attribute(node, "alpha", 0.2f);
+      double beta = get_float_attribute(node, "beta", 0.5f);
+      return fmax(0, fmin(1, alpha * x + beta));
+    } else if (op_type == "HardSwish") {
+      return x * fmax(0, fmin(1, x / 6 + 0.5));
+    } else if (op_type == "Softplus") {
+      return softplus(x);
+    } else if (op_type == "Softsign") {
+      return x / (1 + fabs(x));
+    } else if (op_type == "Elu") {
+      return elu(x, get_float_attribute(node, "alpha", 1.0));
+    } else if (op_type == "Selu") {
+      double alpha = get_float_attribute(node, "alpha", 1.67326319217681884765625f);
+      double gamma = get_float_attribute(node, "gamma", 1.05070102214813232421875f);
+      return gamma * elu(x, alpha);
+    } else if (op_type == "Celu") {
+      // max(0, x) + min(0, alpha * (exp(x / alpha) - 1)) is, for either sign of alpha, x for
+      // x > 0 and alpha * expm1(x / alpha) otherwise. Written so that it stays C1 at 0.
+      double alpha = get_float_attribute(node, "alpha", 1.0);
+      casadi_assert(alpha != 0, "Celu requires a nonzero alpha");
+      return if_else(x > 0, x, alpha * expm1(fmin(x, std::fabs(alpha)) / alpha));
+    } else if (op_type == "Mish") {
+      return x * tanh(softplus(x));
+    } else if (op_type == "Gelu") {
+      std::string approximate = get_string_attribute(node, "approximate");
+      if (approximate.empty() || approximate == "none") {
+        return 0.5 * x * (1 + erf(x / std::sqrt(2.0)));
+      }
+      casadi_assert(approximate == "tanh",
+                    "Gelu: unsupported approximate '" + approximate + "'");
+      return 0.5 * x * (1 + tanh(std::sqrt(2 / pi) * (x + 0.044715 * pow(x, 3))));
+    } else if (op_type == "Clip") {
+      // Opset >= 11: optional inputs min and max (an empty name is absent).
+      // Opset < 11: attributes min and max. An absent bound is not applied.
+      MX output = x;
+      for (size_t k = 1; k <= 2; ++k) {
+        MX bound;
+        if (node_inputs.size() > k) {
+          bound = node_inputs[k];
+        } else {
+          double inf = std::numeric_limits<double>::infinity();
+          double b = get_float_attribute(node, k == 1 ? "min" : "max", k == 1 ? -inf : inf);
+          if (!std::isinf(b)) bound = b;
+        }
+        if (bound.is_empty()) continue;
+        output = k == 1 ? fmax(output, bound) : fmin(output, bound);
+      }
+      return output;
+    }
+    casadi_error("Unsupported activation '" + op_type + "'");
+  }
+
   MX Onnx::process_node_operation(
       const std::string& op_type,
       const onnx::NodeProto& node,
@@ -655,6 +746,14 @@ namespace casadi {
     } else if (op_type == "LessOrEqual") {
       casadi_assert(node_inputs.size() >= 2, "LessOrEqual requires 2 inputs");
       output = if_else(node_inputs[0] <= node_inputs[1], MX(1.0), MX(0.0));
+
+    } else if (op_type == "Greater") {
+      casadi_assert(node_inputs.size() >= 2, "Greater requires 2 inputs");
+      output = if_else(node_inputs[0] > node_inputs[1], MX(1.0), MX(0.0));
+
+    } else if (op_type == "GreaterOrEqual") {
+      casadi_assert(node_inputs.size() >= 2, "GreaterOrEqual requires 2 inputs");
+      output = if_else(node_inputs[0] >= node_inputs[1], MX(1.0), MX(0.0));
 
     } else if (op_type == "Min") {
       casadi_assert(node_inputs.size() >= 2, "Min requires 2 inputs");
@@ -1061,6 +1160,9 @@ namespace casadi {
         // Runtime indices -> parametric getnonzeros (OP_GETNONZEROS_PARAM).
         flat.get_nz(output, false, idx_vec);
       }
+
+    } else if (is_activation(op_type)) {
+      output = activation(op_type, node, node_inputs);
 
     } else {
       casadi_error("Unsupported operation '" + op_type + "'");
