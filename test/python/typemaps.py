@@ -147,7 +147,7 @@ class typemaptests(casadiTestCase):
       zt = ca.DM(m)
       self.assertTrue(isinstance(zt,ca.DM),"DM expected")
       self.assertTrue(zt.sparsity()==ref.sparsity())
-      self.checkarray(m,zt,"DM(%s_array)" % fmt)
+      self.checkarray(m.tocsc(),zt,"DM(%s_array)" % fmt)
     m = ref.tocsc_array()
     self.assertEqual(m.__class__.__name__,"csc_array")
     self.checkarray(m,ref,"DM.tocsc_array()")
