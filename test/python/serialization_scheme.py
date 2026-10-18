@@ -49,6 +49,49 @@ class SerializationSchemeTests(casadiTestCase):
         self.assertGreater(validate_serialization(f.serialize({'debug': True}))['fields'], 0)
         self.check_serialize(f, [])
 
+  def test_older_releases(self):
+    # Debug serializations written by earlier releases: <kind>_<release>.casadi
+    x = ca.MX.sym('x', 2); p = ca.MX.sym('p'); sx = ca.SX.sym('s', 2); A = ca.MX.sym('A', 2, 2)
+    g = ca.Function('g', [sx], [ca.cos(sx[0])*sx[1]])
+    reference = {'mx': ca.Function('f', [x, p], [ca.sin(x)*p + x[0]]), 'sx': g, 'map': g.map(3),
+                 'mtimes': ca.Function('h', [A, x], [ca.mtimes(A, x)]),
+                 'interpolant': ca.interpolant('lut', 'linear', [[0, 1, 2]], [0, 1, 4])}
+    files = sorted((root/'test/data/serialization').glob('*.casadi'))
+    self.assertGreater(len(files), 0)
+    for path in files:
+      with self.subTest(path.name):
+        text = path.read_text()
+        self.assertGreater(validate_serialization(text)['fields'], 0)
+        f, ref = ca.Function.deserialize(text), reference[path.name.split('_')[0]]
+        args = [ca.DM(ref.sparsity_in(i), [0.3+0.2*k for k in range(ref.nnz_in(i))]) for i in range(ref.n_in())]
+        for a, b in zip(f.call(args), ref.call(args)):
+          self.checkarray(a, b)
+
+  def test_layouts_read_older_versions(self):
+    scheme = validator().scheme
+    layouts = scheme['reader']['layouts']
+    for name, versions in scheme['readable_class_versions'].items():
+      if len(versions) > 1:
+        version = next(s for s in layouts[name+'::serialize_body'] if s['op'] == 'version')
+        self.assertEqual((version['minimum'], version['value']), (min(versions), max(versions)))
+    # Fields of older versions only, and defaults read by later conditions
+    layout = json.dumps(layouts['FunctionInternal::serialize_body'])
+    self.assertIn('{"body": [{"name": "FunctionInternal::regularity_check", "op": "field", "type": "bool"}], '
+                  '"condition": ["less", ["version", "FunctionInternal"], ["literal", 3]], "op": "if"}', layout)
+    self.assertIn('{"name": "FunctionInternal::jit_serialize", "op": "assign", "value": "source"}', layout)
+    # Which readable versions carry a field, for tools
+    self.assertEqual(scheme['field_versions']['FunctionInternal']['FunctionInternal::cache_init'], [6, 7, 8, 9])
+    self.assertEqual(scheme['field_versions']['FunctionInternal']['FunctionInternal::regularity_check'], [1, 2])
+    self.assertNotIn('FunctionInternal::name_in', scheme['field_versions']['FunctionInternal'])
+
+  def test_feasiblesqpmethod_round_trip(self):
+    x = ca.MX.sym('x', 2)
+    solver = ca.nlpsol('solver', 'feasiblesqpmethod', {'x': x, 'f': ca.sumsqr(x-ca.DM([1, 2])), 'g': x[0]+x[1]},
+                       {'qpsol': 'qrqp', 'tr_rad0': 0.5, 'print_time': False})
+    self.assertGreater(validate_serialization(solver.serialize({'debug': True}))['fields'], 0)
+    copy = ca.Function.deserialize(solver.serialize())
+    self.checkarray(copy(x0=0, lbg=0, ubg=0)['x'], solver(x0=0, lbg=0, ubg=0)['x'])
+
   def test_layout_mutations(self):
     x = ca.MX.sym('x')
     data = ca.Function('f', [x], [ca.sin(x)]).serialize({'debug': True})
@@ -60,7 +103,7 @@ class SerializationSchemeTests(casadiTestCase):
       name = next(f for f in fields if f.get('name') == 'ProtoFunction::name')
       if mutation == 'name': name['name'] = 'ProtoFunction::wrong'
       elif mutation == 'type': name['type'] = 'bool'
-      elif mutation == 'version': next(f for f in fields if f['op'] == 'version')['value'] = 999
+      elif mutation == 'version': next(f for f in fields if f['op'] == 'version').update(value=999, minimum=999)
       elif mutation == 'order': fields.reverse()
       elif mutation == 'missing': del layouts['MXFunction::serialize_body']
       elif mutation == 'branch': scheme['reader']['types']['Function']['body'][1]['condition'] = ['literal', False]
@@ -118,7 +161,7 @@ class SerializationSchemeTests(casadiTestCase):
                      {'name': 'std::vector', 'element': 'MX'})
     self.assertNotRegex(json.dumps(scheme), r'\b(?:Scalar|MatType|DerivedType)\b')
     fields = scheme['reader']['layouts']['FunctionInternal::serialize_body']
-    condition = next(f['condition'] for f in fields if f.get('op') == 'if')
+    condition = next(f['condition'] for f in fields if f.get('op') == 'if' and 'link' in json.dumps(f['condition']))
     self.assertIn(['equal', ['field', 'FunctionInternal::jit_serialize'], ['literal', 'link']], condition)
     fields = scheme['reader']['layouts']['SundialsInterface::serialize_body']
     self.assertEqual(next(f for f in fields if f.get('name') == 'SundialsInterface::abstol'),

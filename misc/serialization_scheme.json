@@ -239,6 +239,510 @@
       1
     ]
   },
+  "field_versions": {
+    "BlazingSplineFunction": {
+      "BlazingSplineFunction::inv_input": [
+        2
+      ],
+      "BlazingSplineFunction::knots_offset": [
+        2
+      ],
+      "BlazingSplineFunction::lookup_modes": [
+        2
+      ],
+      "BlazingSplineFunction::parametric_knots": [
+        2
+      ],
+      "BlazingSplineFunction::pedantic_mode_order": [
+        2
+      ],
+      "BlazingSplineFunction::pedantic_mode_size": [
+        2
+      ],
+      "BlazingSplineFunction::precompute_coeff": [
+        2
+      ],
+      "BlazingSplineFunction::precompute_grid": [
+        2
+      ]
+    },
+    "Conic": {
+      "Conic::equality": [
+        3,
+        4
+      ],
+      "Conic::error_on_fail": [
+        1
+      ],
+      "Conic::solver_version_check": [
+        4
+      ]
+    },
+    "CvodesInterface": {
+      "CvodesInterface::always_recalculate_jacobian": [
+        3
+      ],
+      "CvodesInterface::min_step_size": [
+        2,
+        3
+      ]
+    },
+    "External": {
+      "External::config_args": [
+        2
+      ]
+    },
+    "Feasiblesqpmethod": {
+      "Feasiblesqpmethod::Hrsp": [
+        1
+      ],
+      "Feasiblesqpmethod::Hsp_project": [
+        1
+      ],
+      "Feasiblesqpmethod::anderson_memory": [
+        4
+      ],
+      "Feasiblesqpmethod::block_size": [
+        1
+      ],
+      "Feasiblesqpmethod::contraction_acceptance_value": [
+        4
+      ],
+      "Feasiblesqpmethod::convexify": [
+        2,
+        3,
+        4
+      ],
+      "Feasiblesqpmethod::convexify_margin": [
+        1
+      ],
+      "Feasiblesqpmethod::convexify_strategy": [
+        1
+      ],
+      "Feasiblesqpmethod::feas_tol": [
+        4
+      ],
+      "Feasiblesqpmethod::init_feasible": [
+        3,
+        4
+      ],
+      "Feasiblesqpmethod::max_inner_iter": [
+        4
+      ],
+      "Feasiblesqpmethod::max_iter_eig": [
+        1
+      ],
+      "Feasiblesqpmethod::optim_tol": [
+        4
+      ],
+      "Feasiblesqpmethod::scc_mapping": [
+        1
+      ],
+      "Feasiblesqpmethod::scc_offset": [
+        1
+      ],
+      "Feasiblesqpmethod::scc_sp": [
+        1
+      ],
+      "Feasiblesqpmethod::scc_transform": [
+        1
+      ],
+      "Feasiblesqpmethod::tr_acceptance": [
+        4
+      ],
+      "Feasiblesqpmethod::tr_alpha1": [
+        4
+      ],
+      "Feasiblesqpmethod::tr_alpha2": [
+        4
+      ],
+      "Feasiblesqpmethod::tr_eta1": [
+        4
+      ],
+      "Feasiblesqpmethod::tr_eta2": [
+        4
+      ],
+      "Feasiblesqpmethod::tr_rad0": [
+        4
+      ],
+      "Feasiblesqpmethod::tr_rad_max": [
+        4
+      ],
+      "Feasiblesqpmethod::tr_rad_min": [
+        4
+      ],
+      "Feasiblesqpmethod::tr_scale_vector": [
+        4
+      ],
+      "Feasiblesqpmethod::tr_tol": [
+        4
+      ],
+      "Feasiblesqpmethod::use_anderson": [
+        4
+      ],
+      "Feasiblesqpmethod::use_sqp": [
+        4
+      ],
+      "Feasiblesqpmethod::watchdog": [
+        4
+      ]
+    },
+    "Fmu3": {
+      "Fmu3::off_aux_boolean": [
+        2
+      ],
+      "Fmu3::off_aux_integer": [
+        2
+      ],
+      "Fmu3::off_aux_real": [
+        2
+      ],
+      "Fmu3::off_aux_string": [
+        2
+      ]
+    },
+    "FunctionInternal": {
+      "FunctionInternal::cache_init": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "FunctionInternal::codegen_options": [
+        9
+      ],
+      "FunctionInternal::der_options": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "FunctionInternal::jacobian_options": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "FunctionInternal::jit_serialize": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "FunctionInternal::max_io": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "FunctionInternal::print_canonical": [
+        7,
+        8,
+        9
+      ],
+      "FunctionInternal::registered_functions": [
+        8,
+        9
+      ],
+      "FunctionInternal::regularity_check": [
+        1,
+        2
+      ]
+    },
+    "GurobiInterface": {
+      "GurobiInterface::lazy_constraints_callback": [
+        2
+      ]
+    },
+    "IdasInterface": {
+      "IdasInterface::max_step_size": [
+        2
+      ],
+      "IdasInterface::y_c": [
+        2
+      ]
+    },
+    "Interpolant": {
+      "Interpolant::batch_x": [
+        2
+      ]
+    },
+    "IpoptInterface": {
+      "IpoptInterface::clip_inactive_lam": [
+        3
+      ],
+      "IpoptInterface::convexify": [
+        2,
+        3
+      ],
+      "IpoptInterface::inactive_lam_strategy": [
+        3
+      ],
+      "IpoptInterface::inactive_lam_value": [
+        3
+      ]
+    },
+    "KnitroInterface": {
+      "KnitroInterface::options_file": [
+        2
+      ]
+    },
+    "LinsolQr": {
+      "LinsolQr::n_cache": [
+        2
+      ]
+    },
+    "MXFunction": {
+      "MXFunction::dump_trace": [
+        3
+      ],
+      "MXFunction::print_instructions": [
+        2,
+        3
+      ]
+    },
+    "MadnlpInterface": {
+      "MadnlpInterface::nzh_i": [
+        1
+      ],
+      "MadnlpInterface::nzh_j": [
+        1
+      ],
+      "MadnlpInterface::nzj_i": [
+        1
+      ],
+      "MadnlpInterface::nzj_j": [
+        1
+      ]
+    },
+    "Nlpsol": {
+      "Nlpsol::detect_simple_bounds_is_simple": [
+        3,
+        5
+      ],
+      "Nlpsol::detect_simple_bounds_parts": [
+        3,
+        5
+      ],
+      "Nlpsol::detect_simple_bounds_target_x": [
+        3,
+        5
+      ],
+      "Nlpsol::equality": [
+        5
+      ],
+      "Nlpsol::error_on_fail": [
+        1,
+        2
+      ],
+      "Nlpsol::sens_linsol": [
+        2,
+        3,
+        5
+      ],
+      "Nlpsol::sens_linsol_options": [
+        2,
+        3,
+        5
+      ]
+    },
+    "OnnxFunction": {
+      "OnnxFunction::builder_opts": [
+        2
+      ],
+      "OnnxFunction::derivative_opts": [
+        2
+      ],
+      "OnnxFunction::dim_bindings": [
+        2
+      ],
+      "OnnxFunction::input_shapes": [
+        2
+      ],
+      "OnnxFunction::model_path": [
+        2
+      ]
+    },
+    "OracleFunction": {
+      "OracleFunction::all_functions::value::f_name": [
+        2,
+        3
+      ],
+      "OracleFunction::max_num_threads": [
+        3
+      ],
+      "OracleFunction::stride_arg": [
+        3
+      ],
+      "OracleFunction::stride_iw": [
+        3
+      ],
+      "OracleFunction::stride_res": [
+        3
+      ],
+      "OracleFunction::stride_w": [
+        3
+      ]
+    },
+    "OsqpInterface": {
+      "OsqpInterface::rho_initial": [
+        2
+      ]
+    },
+    "ProtoFunction": {
+      "ProtoFunction::error_on_fail": [
+        2
+      ],
+      "ProtoFunction::regularity_check": [
+        2
+      ]
+    },
+    "SXFunction": {
+      "SXFunction::call_el_copy_elision_arg": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::call_el_copy_elision_offset": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::call_el_dep": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::call_el_f": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::call_el_res": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::call_el_size": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::call_sz_arg": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::call_sz_iw": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::call_sz_res": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::call_sz_w": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::copy_elision": [
+        2,
+        3,
+        4
+      ],
+      "SXFunction::dump_trace": [
+        4
+      ],
+      "SXFunction::print_instructions": [
+        3,
+        4
+      ]
+    },
+    "Sqpmethod": {
+      "Sqpmethod::Hrsp": [
+        1
+      ],
+      "Sqpmethod::Hsp_project": [
+        1
+      ],
+      "Sqpmethod::block_size": [
+        1
+      ],
+      "Sqpmethod::convexify": [
+        2,
+        3
+      ],
+      "Sqpmethod::convexify_margin": [
+        1
+      ],
+      "Sqpmethod::convexify_strategy": [
+        1
+      ],
+      "Sqpmethod::elastic_mode": [
+        3
+      ],
+      "Sqpmethod::gamma_0": [
+        3
+      ],
+      "Sqpmethod::gamma_1_min": [
+        3
+      ],
+      "Sqpmethod::gamma_max": [
+        3
+      ],
+      "Sqpmethod::init_feasible": [
+        3
+      ],
+      "Sqpmethod::max_iter_eig": [
+        1
+      ],
+      "Sqpmethod::qpsol_ela": [
+        3
+      ],
+      "Sqpmethod::scc_mapping": [
+        1
+      ],
+      "Sqpmethod::scc_offset": [
+        1
+      ],
+      "Sqpmethod::scc_sp": [
+        1
+      ],
+      "Sqpmethod::scc_transform": [
+        1
+      ],
+      "Sqpmethod::so_corr": [
+        3
+      ]
+    },
+    "SundialsInterface": {
+      "SundialsInterface::max_step_size": [
+        2
+      ]
+    },
+    "XpressInterface": {
+      "XpressInterface::compute_iis": [
+        2
+      ],
+      "XpressInterface::log_file": [
+        2
+      ],
+      "XpressInterface::mip_start": [
+        2
+      ]
+    }
+  },
   "format": "casadi_serialization_scheme",
   "operations": {
     "OP_ACOS": 17,
@@ -972,6 +1476,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "BlazingSplineFunction",
           "op": "version",
           "value": 2
@@ -982,14 +1487,30 @@
           "type": "casadi_int"
         },
         {
-          "name": "BlazingSplineFunction::precompute_coeff",
-          "op": "field",
-          "type": "bool"
-        },
-        {
-          "name": "BlazingSplineFunction::precompute_grid",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "BlazingSplineFunction::precompute_coeff",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "BlazingSplineFunction::precompute_grid",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "BlazingSplineFunction"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "BlazingSplineFunction::knots",
@@ -1003,49 +1524,65 @@
           }
         },
         {
-          "name": "BlazingSplineFunction::lookup_modes",
-          "op": "field",
-          "type": {
-            "element": "std::string",
-            "name": "std::vector"
-          }
-        },
-        {
-          "name": "BlazingSplineFunction::parametric_knots",
-          "op": "field",
-          "type": "bool"
-        },
-        {
           "body": [
             {
-              "name": "BlazingSplineFunction::knots_offset",
+              "name": "BlazingSplineFunction::lookup_modes",
               "op": "field",
               "type": {
-                "element": "casadi_int",
+                "element": "std::string",
                 "name": "std::vector"
               }
             },
             {
-              "name": "BlazingSplineFunction::inv_input",
+              "name": "BlazingSplineFunction::parametric_knots",
               "op": "field",
               "type": "bool"
+            },
+            {
+              "body": [
+                {
+                  "name": "BlazingSplineFunction::knots_offset",
+                  "op": "field",
+                  "type": {
+                    "element": "casadi_int",
+                    "name": "std::vector"
+                  }
+                },
+                {
+                  "name": "BlazingSplineFunction::inv_input",
+                  "op": "field",
+                  "type": "bool"
+                }
+              ],
+              "condition": [
+                "field",
+                "BlazingSplineFunction::parametric_knots"
+              ],
+              "op": "if"
+            },
+            {
+              "name": "BlazingSplineFunction::pedantic_mode_order",
+              "op": "field",
+              "type": "std::string"
+            },
+            {
+              "name": "BlazingSplineFunction::pedantic_mode_size",
+              "op": "field",
+              "type": "std::string"
             }
           ],
           "condition": [
-            "field",
-            "BlazingSplineFunction::parametric_knots"
+            "greater_equal",
+            [
+              "version",
+              "BlazingSplineFunction"
+            ],
+            [
+              "literal",
+              2
+            ]
           ],
           "op": "if"
-        },
-        {
-          "name": "BlazingSplineFunction::pedantic_mode_order",
-          "op": "field",
-          "type": "std::string"
-        },
-        {
-          "name": "BlazingSplineFunction::pedantic_mode_size",
-          "op": "field",
-          "type": "std::string"
         }
       ],
       "Blocksqp::serialize_body": [
@@ -1715,6 +2252,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "Conic",
           "op": "version",
           "value": 4
@@ -1728,12 +2266,28 @@
           }
         },
         {
-          "name": "Conic::equality",
-          "op": "field",
-          "type": {
-            "element": "bool",
-            "name": "std::vector"
-          }
+          "body": [
+            {
+              "name": "Conic::equality",
+              "op": "field",
+              "type": {
+                "element": "bool",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Conic"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "Conic::print_problem",
@@ -1741,9 +2295,46 @@
           "type": "bool"
         },
         {
-          "name": "Conic::solver_version_check",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "Conic::solver_version_check",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Conic"
+            ],
+            [
+              "literal",
+              4
+            ]
+          ],
+          "op": "if"
+        },
+        {
+          "body": [
+            {
+              "name": "Conic::error_on_fail",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "equal",
+            [
+              "version",
+              "Conic"
+            ],
+            [
+              "literal",
+              1
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "Conic::H",
@@ -2268,6 +2859,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "CvodesInterface",
           "op": "version",
           "value": 3
@@ -2283,14 +2875,46 @@
           "type": "casadi_int"
         },
         {
-          "name": "CvodesInterface::min_step_size",
-          "op": "field",
-          "type": "double"
+          "body": [
+            {
+              "name": "CvodesInterface::min_step_size",
+              "op": "field",
+              "type": "double"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "CvodesInterface"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
-          "name": "CvodesInterface::always_recalculate_jacobian",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "CvodesInterface::always_recalculate_jacobian",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "CvodesInterface"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         }
       ],
       "DaqpInterface::serialize_body": [
@@ -2647,6 +3271,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "External",
           "op": "version",
           "value": 2
@@ -2678,12 +3303,28 @@
           "type": "Importer"
         },
         {
-          "name": "External::config_args",
-          "op": "field",
-          "type": {
-            "element": "std::string",
-            "name": "std::vector"
-          }
+          "body": [
+            {
+              "name": "External::config_args",
+              "op": "field",
+              "type": {
+                "element": "std::string",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "External"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         }
       ],
       "FastNewton::serialize_body": [
@@ -2919,6 +3560,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "Feasiblesqpmethod",
           "op": "version",
           "value": 4
@@ -2974,9 +3616,25 @@
           "type": "bool"
         },
         {
-          "name": "Feasiblesqpmethod::init_feasible",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "Feasiblesqpmethod::init_feasible",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Feasiblesqpmethod"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "Feasiblesqpmethod::Hsp",
@@ -2984,123 +3642,243 @@
           "type": "Sparsity"
         },
         {
+          "body": [
+            {
+              "name": "Feasiblesqpmethod::Hrsp",
+              "op": "field",
+              "type": "Sparsity"
+            }
+          ],
+          "condition": [
+            "equal",
+            [
+              "version",
+              "Feasiblesqpmethod"
+            ],
+            [
+              "literal",
+              1
+            ]
+          ],
+          "op": "if"
+        },
+        {
           "name": "Feasiblesqpmethod::Asp",
           "op": "field",
           "type": "Sparsity"
         },
         {
-          "name": "Feasiblesqpmethod::convexify",
-          "op": "field",
-          "type": "bool"
-        },
-        {
           "body": [
             {
-              "layout": "Convexify::serialize",
-              "op": "call",
-              "params": {
-                "prefix": "Feasiblesqpmethod::"
+              "name": "Feasiblesqpmethod::convexify_margin",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::convexify_strategy",
+              "op": "field",
+              "type": "char"
+            },
+            {
+              "name": "Feasiblesqpmethod::Hsp_project",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "Feasiblesqpmethod::scc_transform",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "Feasiblesqpmethod::scc_offset",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
               }
+            },
+            {
+              "name": "Feasiblesqpmethod::scc_mapping",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "Feasiblesqpmethod::max_iter_eig",
+              "op": "field",
+              "type": "casadi_int"
+            },
+            {
+              "name": "Feasiblesqpmethod::block_size",
+              "op": "field",
+              "type": "casadi_int"
+            },
+            {
+              "name": "Feasiblesqpmethod::scc_sp",
+              "op": "field",
+              "type": "Sparsity"
             }
           ],
           "condition": [
-            "field",
-            "Feasiblesqpmethod::convexify"
+            "equal",
+            [
+              "version",
+              "Feasiblesqpmethod"
+            ],
+            [
+              "literal",
+              1
+            ]
           ],
           "op": "if"
         },
         {
-          "name": "Feasiblesqpmethod::use_sqp",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "Feasiblesqpmethod::convexify",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "body": [
+                {
+                  "layout": "Convexify::serialize",
+                  "op": "call",
+                  "params": {
+                    "prefix": "Feasiblesqpmethod::"
+                  }
+                }
+              ],
+              "condition": [
+                "field",
+                "Feasiblesqpmethod::convexify"
+              ],
+              "op": "if"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Feasiblesqpmethod"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
-          "name": "Feasiblesqpmethod::use_anderson",
-          "op": "field",
-          "type": "bool"
-        },
-        {
-          "name": "Feasiblesqpmethod::anderson_memory",
-          "op": "field",
-          "type": "casadi_int"
-        },
-        {
-          "name": "Feasiblesqpmethod::optim_tol",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::feas_tol",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_eta1",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_eta2",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_alpha1",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_alpha2",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_tol",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_acceptance",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_rad_min",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_rad_max",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_rad0",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::tr_scale_vector",
-          "op": "field",
-          "type": {
-            "element": "double",
-            "name": "std::vector"
-          }
-        },
-        {
-          "name": "Feasiblesqpmethod::contraction_acceptance_value",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Feasiblesqpmethod::watchdog",
-          "op": "field",
-          "type": "casadi_int"
-        },
-        {
-          "name": "Feasiblesqpmethod::max_inner_iter",
-          "op": "field",
-          "type": "casadi_int"
+          "body": [
+            {
+              "name": "Feasiblesqpmethod::use_sqp",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "Feasiblesqpmethod::use_anderson",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "Feasiblesqpmethod::anderson_memory",
+              "op": "field",
+              "type": "casadi_int"
+            },
+            {
+              "name": "Feasiblesqpmethod::optim_tol",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::feas_tol",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_eta1",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_eta2",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_alpha1",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_alpha2",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_tol",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_acceptance",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_rad_min",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_rad_max",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_rad0",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::tr_scale_vector",
+              "op": "field",
+              "type": {
+                "element": "double",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "Feasiblesqpmethod::contraction_acceptance_value",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Feasiblesqpmethod::watchdog",
+              "op": "field",
+              "type": "casadi_int"
+            },
+            {
+              "name": "Feasiblesqpmethod::max_inner_iter",
+              "op": "field",
+              "type": "casadi_int"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Feasiblesqpmethod"
+            ],
+            [
+              "literal",
+              4
+            ]
+          ],
+          "op": "if"
         }
       ],
       "Find::serialize_body": [
@@ -3364,6 +4142,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "Fmu3",
           "op": "version",
           "value": 2
@@ -3497,36 +4276,52 @@
           }
         },
         {
-          "name": "Fmu3::off_aux_real",
-          "op": "field",
-          "type": {
-            "element": "casadi_int",
-            "name": "std::vector"
-          }
-        },
-        {
-          "name": "Fmu3::off_aux_integer",
-          "op": "field",
-          "type": {
-            "element": "casadi_int",
-            "name": "std::vector"
-          }
-        },
-        {
-          "name": "Fmu3::off_aux_boolean",
-          "op": "field",
-          "type": {
-            "element": "casadi_int",
-            "name": "std::vector"
-          }
-        },
-        {
-          "name": "Fmu3::off_aux_string",
-          "op": "field",
-          "type": {
-            "element": "casadi_int",
-            "name": "std::vector"
-          }
+          "body": [
+            {
+              "name": "Fmu3::off_aux_real",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "Fmu3::off_aux_integer",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "Fmu3::off_aux_boolean",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "Fmu3::off_aux_string",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Fmu3"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         }
       ],
       "Fmu::serialize": [
@@ -4166,6 +4961,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "FunctionInternal",
           "op": "version",
           "value": 9
@@ -4229,9 +5025,32 @@
           "type": "bool"
         },
         {
-          "name": "FunctionInternal::jit_serialize",
-          "op": "field",
-          "type": "std::string"
+          "body": [
+            {
+              "name": "FunctionInternal::jit_serialize",
+              "op": "assign",
+              "value": "source"
+            }
+          ],
+          "condition": [
+            "less",
+            [
+              "version",
+              "FunctionInternal"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "else": [
+            {
+              "name": "FunctionInternal::jit_serialize",
+              "op": "field",
+              "type": "std::string"
+            }
+          ],
+          "op": "if"
         },
         {
           "body": [
@@ -4305,9 +5124,25 @@
           "type": "Dict"
         },
         {
-          "name": "FunctionInternal::codegen_options",
-          "op": "field",
-          "type": "Dict"
+          "body": [
+            {
+              "name": "FunctionInternal::codegen_options",
+              "op": "field",
+              "type": "Dict"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "FunctionInternal"
+            ],
+            [
+              "literal",
+              9
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "FunctionInternal::compiler_plugin",
@@ -4320,9 +5155,25 @@
           "type": "bool"
         },
         {
-          "name": "FunctionInternal::cache_init",
-          "op": "field",
-          "type": "Dict"
+          "body": [
+            {
+              "name": "FunctionInternal::cache_init",
+              "op": "field",
+              "type": "Dict"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "FunctionInternal"
+            ],
+            [
+              "literal",
+              6
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "FunctionInternal::derivative_of",
@@ -4400,6 +5251,27 @@
           "type": "casadi_int"
         },
         {
+          "body": [
+            {
+              "name": "FunctionInternal::regularity_check",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "less",
+            [
+              "version",
+              "FunctionInternal"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
+        },
+        {
           "name": "FunctionInternal::inputs_check",
           "op": "field",
           "type": "bool"
@@ -4425,14 +5297,46 @@
           "type": "bool"
         },
         {
-          "name": "FunctionInternal::print_canonical",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "FunctionInternal::print_canonical",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "FunctionInternal"
+            ],
+            [
+              "literal",
+              7
+            ]
+          ],
+          "op": "if"
         },
         {
-          "name": "FunctionInternal::max_io",
-          "op": "field",
-          "type": "casadi_int"
+          "body": [
+            {
+              "name": "FunctionInternal::max_io",
+              "op": "field",
+              "type": "casadi_int"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "FunctionInternal"
+            ],
+            [
+              "literal",
+              4
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "FunctionInternal::dump_in",
@@ -4465,14 +5369,30 @@
           "type": "Dict"
         },
         {
-          "name": "FunctionInternal::jacobian_options",
-          "op": "field",
-          "type": "Dict"
-        },
-        {
-          "name": "FunctionInternal::der_options",
-          "op": "field",
-          "type": "Dict"
+          "body": [
+            {
+              "name": "FunctionInternal::jacobian_options",
+              "op": "field",
+              "type": "Dict"
+            },
+            {
+              "name": "FunctionInternal::der_options",
+              "op": "field",
+              "type": "Dict"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "FunctionInternal"
+            ],
+            [
+              "literal",
+              5
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "FunctionInternal::custom_jacobian",
@@ -4480,12 +5400,28 @@
           "type": "Function"
         },
         {
-          "name": "FunctionInternal::registered_functions",
-          "op": "field",
-          "type": {
-            "element": "Function",
-            "name": "std::vector"
-          }
+          "body": [
+            {
+              "name": "FunctionInternal::registered_functions",
+              "op": "field",
+              "type": {
+                "element": "Function",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "FunctionInternal"
+            ],
+            [
+              "literal",
+              8
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "FunctionInternal::sz_arg_per",
@@ -4744,14 +5680,31 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "GurobiInterface",
           "op": "version",
           "value": 2
         },
         {
-          "name": "GurobiInterface::lazy_constraints_callback",
-          "op": "field",
-          "type": "Function"
+          "body": [
+            {
+              "name": "GurobiInterface::lazy_constraints_callback",
+              "op": "field",
+              "type": "Function"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "GurobiInterface"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "GurobiInterface::vtype",
@@ -4897,6 +5850,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "IdasInterface",
           "op": "version",
           "value": 2
@@ -4943,17 +5897,33 @@
           }
         },
         {
-          "name": "IdasInterface::max_step_size",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "IdasInterface::y_c",
-          "op": "field",
-          "type": {
-            "element": "casadi_int",
-            "name": "std::vector"
-          }
+          "body": [
+            {
+              "name": "IdasInterface::max_step_size",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "IdasInterface::y_c",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "IdasInterface"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         }
       ],
       "ImplicitFixedStepIntegrator::serialize_body": [
@@ -5290,6 +6260,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "Interpolant",
           "op": "version",
           "value": 2
@@ -5337,9 +6308,26 @@
           }
         },
         {
-          "name": "Interpolant::batch_x",
-          "op": "field",
-          "type": "casadi_int"
+          "body": [],
+          "condition": [
+            "equal",
+            [
+              "version",
+              "Interpolant"
+            ],
+            [
+              "literal",
+              1
+            ]
+          ],
+          "else": [
+            {
+              "name": "Interpolant::batch_x",
+              "op": "field",
+              "type": "casadi_int"
+            }
+          ],
+          "op": "if"
         }
       ],
       "Interpolant::serialize_type": [
@@ -5364,6 +6352,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "IpoptInterface",
           "op": "version",
           "value": 3
@@ -5432,40 +6421,72 @@
           "type": "Dict"
         },
         {
-          "name": "IpoptInterface::convexify",
-          "op": "field",
-          "type": "bool"
-        },
-        {
           "body": [
             {
-              "layout": "Convexify::serialize",
-              "op": "call",
-              "params": {
-                "prefix": "IpoptInterface::"
-              }
+              "name": "IpoptInterface::convexify",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "body": [
+                {
+                  "layout": "Convexify::serialize",
+                  "op": "call",
+                  "params": {
+                    "prefix": "IpoptInterface::"
+                  }
+                }
+              ],
+              "condition": [
+                "field",
+                "IpoptInterface::convexify"
+              ],
+              "op": "if"
             }
           ],
           "condition": [
-            "field",
-            "IpoptInterface::convexify"
+            "greater_equal",
+            [
+              "version",
+              "IpoptInterface"
+            ],
+            [
+              "literal",
+              2
+            ]
           ],
           "op": "if"
         },
         {
-          "name": "IpoptInterface::clip_inactive_lam",
-          "op": "field",
-          "type": "bool"
-        },
-        {
-          "name": "IpoptInterface::inactive_lam_strategy",
-          "op": "field",
-          "type": "std::string"
-        },
-        {
-          "name": "IpoptInterface::inactive_lam_value",
-          "op": "field",
-          "type": "double"
+          "body": [
+            {
+              "name": "IpoptInterface::clip_inactive_lam",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "IpoptInterface::inactive_lam_strategy",
+              "op": "field",
+              "type": "std::string"
+            },
+            {
+              "name": "IpoptInterface::inactive_lam_value",
+              "op": "field",
+              "type": "double"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "IpoptInterface"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         }
       ],
       "Ipqp::serialize_body": [
@@ -5546,6 +6567,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "KnitroInterface",
           "op": "version",
           "value": 2
@@ -5598,9 +6620,25 @@
           "type": "Sparsity"
         },
         {
-          "name": "KnitroInterface::options_file",
-          "op": "field",
-          "type": "std::string"
+          "body": [
+            {
+              "name": "KnitroInterface::options_file",
+              "op": "field",
+              "type": "std::string"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "KnitroInterface"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         }
       ],
       "Kron::serialize_body": [
@@ -5804,6 +6842,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "LinsolQr",
           "op": "version",
           "value": 2
@@ -5840,9 +6879,25 @@
           "type": "double"
         },
         {
-          "name": "LinsolQr::n_cache",
-          "op": "field",
-          "type": "casadi_int"
+          "body": [
+            {
+              "name": "LinsolQr::n_cache",
+              "op": "field",
+              "type": "casadi_int"
+            }
+          ],
+          "condition": [
+            "greater",
+            [
+              "version",
+              "LinsolQr"
+            ],
+            [
+              "literal",
+              1
+            ]
+          ],
+          "op": "if"
         }
       ],
       "LinsolTridiag::serialize_body": [
@@ -5898,6 +6953,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "MXFunction",
           "op": "version",
           "value": 3
@@ -5967,14 +7023,46 @@
           "type": "bool"
         },
         {
-          "name": "MXFunction::print_instructions",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "MXFunction::print_instructions",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "MXFunction"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
-          "name": "MXFunction::dump_trace",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "MXFunction::dump_trace",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "MXFunction"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         },
         {
           "layout": "XFunction<MXFunction,MX,MXNode>::delayed_serialize_members",
@@ -6085,6 +7173,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "MadnlpInterface",
           "op": "version",
           "value": 2
@@ -6113,6 +7202,54 @@
           "name": "MadnlpInterface::convexify",
           "op": "field",
           "type": "bool"
+        },
+        {
+          "body": [
+            {
+              "name": "MadnlpInterface::nzj_i",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "MadnlpInterface::nzj_j",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "MadnlpInterface::nzh_i",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "MadnlpInterface::nzh_j",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "equal",
+            [
+              "version",
+              "MadnlpInterface"
+            ],
+            [
+              "literal",
+              1
+            ]
+          ],
+          "op": "if"
         }
       ],
       "Map::serialize_body": [
@@ -6369,6 +7506,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "Nlpsol",
           "op": "version",
           "value": 5
@@ -6397,6 +7535,27 @@
           "name": "Nlpsol::callback_step",
           "op": "field",
           "type": "casadi_int"
+        },
+        {
+          "body": [
+            {
+              "name": "Nlpsol::error_on_fail",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "less_equal",
+            [
+              "version",
+              "Nlpsol"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "Nlpsol::eval_errors_fatal",
@@ -6462,12 +7621,28 @@
           }
         },
         {
-          "name": "Nlpsol::equality",
-          "op": "field",
-          "type": {
-            "element": "bool",
-            "name": "std::vector"
-          }
+          "body": [
+            {
+              "name": "Nlpsol::equality",
+              "op": "field",
+              "type": {
+                "element": "bool",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Nlpsol"
+            ],
+            [
+              "literal",
+              4
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "Nlpsol::mi",
@@ -6475,35 +7650,87 @@
           "type": "bool"
         },
         {
-          "name": "Nlpsol::sens_linsol",
-          "op": "field",
-          "type": "std::string"
+          "body": [
+            {
+              "name": "Nlpsol::sens_linsol",
+              "op": "field",
+              "type": "std::string"
+            },
+            {
+              "name": "Nlpsol::sens_linsol_options",
+              "op": "field",
+              "type": "Dict"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Nlpsol"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
-          "name": "Nlpsol::sens_linsol_options",
-          "op": "field",
-          "type": "Dict"
-        },
-        {
-          "name": "Nlpsol::detect_simple_bounds_is_simple",
-          "op": "field",
-          "type": {
-            "element": "char",
-            "name": "std::vector"
-          }
-        },
-        {
-          "name": "Nlpsol::detect_simple_bounds_parts",
-          "op": "field",
-          "type": "Function"
-        },
-        {
-          "name": "Nlpsol::detect_simple_bounds_target_x",
-          "op": "field",
-          "type": {
-            "element": "casadi_int",
-            "name": "std::vector"
-          }
+          "body": [
+            {
+              "name": "Nlpsol::detect_simple_bounds_is_simple",
+              "op": "field",
+              "type": {
+                "element": "char",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "Nlpsol::detect_simple_bounds_parts",
+              "op": "field",
+              "type": "Function"
+            },
+            {
+              "body": [
+                {
+                  "op": "unsupported",
+                  "reason": "Saved detect_simple_bounds_parts changed signature"
+                }
+              ],
+              "condition": [
+                "equal",
+                [
+                  "version",
+                  "Nlpsol"
+                ],
+                [
+                  "literal",
+                  4
+                ]
+              ],
+              "op": "if"
+            },
+            {
+              "name": "Nlpsol::detect_simple_bounds_target_x",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Nlpsol"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         }
       ],
       "Nlpsol::serialize_type": [
@@ -6565,6 +7792,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "OnnxFunction",
           "op": "version",
           "value": 2
@@ -6650,40 +7878,56 @@
           }
         },
         {
-          "name": "OnnxFunction::model_path",
-          "op": "field",
-          "type": "std::string"
-        },
-        {
-          "name": "OnnxFunction::dim_bindings",
-          "op": "field",
-          "type": {
-            "key": "std::string",
-            "name": "std::map",
-            "value": "casadi_int"
-          }
-        },
-        {
-          "name": "OnnxFunction::input_shapes",
-          "op": "field",
-          "type": {
-            "key": "std::string",
-            "name": "std::map",
-            "value": {
-              "element": "casadi_int",
-              "name": "std::vector"
+          "body": [
+            {
+              "name": "OnnxFunction::model_path",
+              "op": "field",
+              "type": "std::string"
+            },
+            {
+              "name": "OnnxFunction::dim_bindings",
+              "op": "field",
+              "type": {
+                "key": "std::string",
+                "name": "std::map",
+                "value": "casadi_int"
+              }
+            },
+            {
+              "name": "OnnxFunction::input_shapes",
+              "op": "field",
+              "type": {
+                "key": "std::string",
+                "name": "std::map",
+                "value": {
+                  "element": "casadi_int",
+                  "name": "std::vector"
+                }
+              }
+            },
+            {
+              "name": "OnnxFunction::derivative_opts",
+              "op": "field",
+              "type": "Dict"
+            },
+            {
+              "name": "OnnxFunction::builder_opts",
+              "op": "field",
+              "type": "Dict"
             }
-          }
-        },
-        {
-          "name": "OnnxFunction::derivative_opts",
-          "op": "field",
-          "type": "Dict"
-        },
-        {
-          "name": "OnnxFunction::builder_opts",
-          "op": "field",
-          "type": "Dict"
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "OnnxFunction"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         }
       ],
       "OnnxFunction::serialize_type": [
@@ -6764,6 +8008,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "OracleFunction",
           "op": "version",
           "value": 3
@@ -6789,9 +8034,25 @@
           "type": "bool"
         },
         {
-          "name": "OracleFunction::max_num_threads",
-          "op": "field",
-          "type": "int"
+          "body": [
+            {
+              "name": "OracleFunction::max_num_threads",
+              "op": "field",
+              "type": "int"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "OracleFunction"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "OracleFunction::all_functions::size",
@@ -6806,57 +8067,85 @@
               "type": "std::string"
             },
             {
-              "name": "OracleFunction::all_functions::value::jit",
-              "op": "field",
-              "type": "bool"
-            },
-            {
               "body": [
                 {
+                  "name": "OracleFunction::all_functions::value::f",
+                  "op": "field",
+                  "type": "Function"
+                },
+                {
+                  "name": "OracleFunction::all_functions::value::jit",
+                  "op": "field",
+                  "type": "bool"
+                }
+              ],
+              "condition": [
+                "equal",
+                [
+                  "version",
+                  "OracleFunction"
+                ],
+                [
+                  "literal",
+                  1
+                ]
+              ],
+              "else": [
+                {
+                  "name": "OracleFunction::all_functions::value::jit",
+                  "op": "field",
+                  "type": "bool"
+                },
+                {
                   "body": [
+                    {
+                      "body": [
+                        {
+                          "name": "OracleFunction::all_functions::value::f",
+                          "op": "field",
+                          "type": "Function"
+                        }
+                      ],
+                      "condition": [
+                        "equal",
+                        [
+                          "field",
+                          "FunctionInternal::jit_serialize"
+                        ],
+                        [
+                          "literal",
+                          "source"
+                        ]
+                      ],
+                      "else": [
+                        {
+                          "name": "OracleFunction::all_functions::value::f_name",
+                          "op": "field",
+                          "type": "std::string"
+                        }
+                      ],
+                      "op": "if"
+                    }
+                  ],
+                  "condition": [
+                    "and",
+                    [
+                      "field",
+                      "FunctionInternal::jit"
+                    ],
+                    [
+                      "field",
+                      "OracleFunction::all_functions::value::jit"
+                    ]
+                  ],
+                  "else": [
                     {
                       "name": "OracleFunction::all_functions::value::f",
                       "op": "field",
                       "type": "Function"
                     }
                   ],
-                  "condition": [
-                    "equal",
-                    [
-                      "field",
-                      "FunctionInternal::jit_serialize"
-                    ],
-                    [
-                      "literal",
-                      "source"
-                    ]
-                  ],
-                  "else": [
-                    {
-                      "name": "OracleFunction::all_functions::value::f_name",
-                      "op": "field",
-                      "type": "std::string"
-                    }
-                  ],
                   "op": "if"
-                }
-              ],
-              "condition": [
-                "and",
-                [
-                  "field",
-                  "FunctionInternal::jit"
-                ],
-                [
-                  "field",
-                  "OracleFunction::all_functions::value::jit"
-                ]
-              ],
-              "else": [
-                {
-                  "name": "OracleFunction::all_functions::value::f",
-                  "op": "field",
-                  "type": "Function"
                 }
               ],
               "op": "if"
@@ -6882,24 +8171,40 @@
           }
         },
         {
-          "name": "OracleFunction::stride_arg",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
-          "name": "OracleFunction::stride_res",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
-          "name": "OracleFunction::stride_iw",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
-          "name": "OracleFunction::stride_w",
-          "op": "field",
-          "type": "size_t"
+          "body": [
+            {
+              "name": "OracleFunction::stride_arg",
+              "op": "field",
+              "type": "size_t"
+            },
+            {
+              "name": "OracleFunction::stride_res",
+              "op": "field",
+              "type": "size_t"
+            },
+            {
+              "name": "OracleFunction::stride_iw",
+              "op": "field",
+              "type": "size_t"
+            },
+            {
+              "name": "OracleFunction::stride_w",
+              "op": "field",
+              "type": "size_t"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "OracleFunction"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         }
       ],
       "OracleFunction::serialize_type": [
@@ -6914,6 +8219,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "OsqpInterface",
           "op": "version",
           "value": 2
@@ -7034,9 +8340,25 @@
           "type": "casadi_int"
         },
         {
-          "name": "OsqpInterface::rho_initial",
-          "op": "field",
-          "type": "double"
+          "body": [
+            {
+              "name": "OsqpInterface::rho_initial",
+              "op": "field",
+              "type": "double"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "OsqpInterface"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         }
       ],
       "Output::serialize_body": [
@@ -7255,6 +8577,7 @@
       ],
       "ProtoFunction::serialize_body": [
         {
+          "minimum": 1,
           "name": "ProtoFunction",
           "op": "version",
           "value": 2
@@ -7280,14 +8603,46 @@
           "type": "bool"
         },
         {
-          "name": "ProtoFunction::regularity_check",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "ProtoFunction::regularity_check",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "ProtoFunction"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
-          "name": "ProtoFunction::error_on_fail",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "ProtoFunction::error_on_fail",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "ProtoFunction"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         }
       ],
       "ProtoFunction::serialize_type": [],
@@ -7861,6 +9216,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "SXFunction",
           "op": "version",
           "value": 4
@@ -7908,93 +9264,109 @@
           }
         },
         {
-          "name": "SXFunction::call_sz_arg",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
-          "name": "SXFunction::call_sz_res",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
-          "name": "SXFunction::call_sz_iw",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
-          "name": "SXFunction::call_sz_w",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
-          "name": "SXFunction::call_sz_arg",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
-          "name": "SXFunction::call_sz_res",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
-          "name": "SXFunction::call_el_size",
-          "op": "field",
-          "type": "size_t"
-        },
-        {
           "body": [
             {
-              "name": "SXFunction::call_el_f",
+              "name": "SXFunction::call_sz_arg",
               "op": "field",
-              "type": "Function"
+              "type": "size_t"
             },
             {
-              "name": "SXFunction::call_el_dep",
+              "name": "SXFunction::call_sz_res",
               "op": "field",
-              "type": {
-                "element": "int",
-                "name": "std::vector"
-              }
+              "type": "size_t"
             },
             {
-              "name": "SXFunction::call_el_res",
+              "name": "SXFunction::call_sz_iw",
               "op": "field",
-              "type": {
-                "element": "int",
-                "name": "std::vector"
-              }
+              "type": "size_t"
             },
             {
-              "name": "SXFunction::call_el_copy_elision_arg",
+              "name": "SXFunction::call_sz_w",
               "op": "field",
-              "type": {
-                "element": "int",
-                "name": "std::vector"
-              }
+              "type": "size_t"
             },
             {
-              "name": "SXFunction::call_el_copy_elision_offset",
+              "name": "SXFunction::call_sz_arg",
+              "op": "field",
+              "type": "size_t"
+            },
+            {
+              "name": "SXFunction::call_sz_res",
+              "op": "field",
+              "type": "size_t"
+            },
+            {
+              "name": "SXFunction::call_el_size",
+              "op": "field",
+              "type": "size_t"
+            },
+            {
+              "body": [
+                {
+                  "name": "SXFunction::call_el_f",
+                  "op": "field",
+                  "type": "Function"
+                },
+                {
+                  "name": "SXFunction::call_el_dep",
+                  "op": "field",
+                  "type": {
+                    "element": "int",
+                    "name": "std::vector"
+                  }
+                },
+                {
+                  "name": "SXFunction::call_el_res",
+                  "op": "field",
+                  "type": {
+                    "element": "int",
+                    "name": "std::vector"
+                  }
+                },
+                {
+                  "name": "SXFunction::call_el_copy_elision_arg",
+                  "op": "field",
+                  "type": {
+                    "element": "int",
+                    "name": "std::vector"
+                  }
+                },
+                {
+                  "name": "SXFunction::call_el_copy_elision_offset",
+                  "op": "field",
+                  "type": {
+                    "element": "int",
+                    "name": "std::vector"
+                  }
+                }
+              ],
+              "count": [
+                "field",
+                "SXFunction::call_el_size"
+              ],
+              "op": "repeat"
+            },
+            {
+              "name": "SXFunction::copy_elision",
               "op": "field",
               "type": {
-                "element": "int",
+                "element": "bool",
                 "name": "std::vector"
               }
             }
           ],
-          "count": [
-            "field",
-            "SXFunction::call_el_size"
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "SXFunction"
+            ],
+            [
+              "literal",
+              2
+            ]
           ],
-          "op": "repeat"
-        },
-        {
-          "name": "SXFunction::copy_elision",
-          "op": "field",
-          "type": {
-            "element": "bool",
-            "name": "std::vector"
-          }
+          "op": "if"
         },
         {
           "body": [
@@ -8031,14 +9403,46 @@
           "type": "bool"
         },
         {
-          "name": "SXFunction::print_instructions",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "SXFunction::print_instructions",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "SXFunction"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         },
         {
-          "name": "SXFunction::dump_trace",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "SXFunction::dump_trace",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "SXFunction"
+            ],
+            [
+              "literal",
+              4
+            ]
+          ],
+          "op": "if"
         },
         {
           "layout": "XFunction<SXFunction,SX,SXNode>::delayed_serialize_members",
@@ -8389,8 +9793,12 @@
       ],
       "Sparsity::serialize": [
         {
-          "op": "unsupported",
-          "reason": "Predicate has no serialized field"
+          "name": "SparsityInternal::compressed",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
         }
       ],
       "SparsityCast::serialize_body": [
@@ -8433,6 +9841,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "Sqpmethod",
           "op": "version",
           "value": 3
@@ -8443,9 +9852,25 @@
           "type": "Function"
         },
         {
-          "name": "Sqpmethod::qpsol_ela",
-          "op": "field",
-          "type": "Function"
+          "body": [
+            {
+              "name": "Sqpmethod::qpsol_ela",
+              "op": "field",
+              "type": "Function"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Sqpmethod"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "Sqpmethod::exact_hessian",
@@ -8523,34 +9948,50 @@
           "type": "bool"
         },
         {
-          "name": "Sqpmethod::elastic_mode",
-          "op": "field",
-          "type": "bool"
-        },
-        {
-          "name": "Sqpmethod::gamma_0",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Sqpmethod::gamma_max",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Sqpmethod::gamma_1_min",
-          "op": "field",
-          "type": "double"
-        },
-        {
-          "name": "Sqpmethod::init_feasible",
-          "op": "field",
-          "type": "bool"
-        },
-        {
-          "name": "Sqpmethod::so_corr",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "Sqpmethod::elastic_mode",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "Sqpmethod::gamma_0",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Sqpmethod::gamma_max",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Sqpmethod::gamma_1_min",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Sqpmethod::init_feasible",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "Sqpmethod::so_corr",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Sqpmethod"
+            ],
+            [
+              "literal",
+              3
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "Sqpmethod::Hsp",
@@ -8558,28 +9999,132 @@
           "type": "Sparsity"
         },
         {
+          "body": [
+            {
+              "name": "Sqpmethod::Hrsp",
+              "op": "field",
+              "type": "Sparsity"
+            }
+          ],
+          "condition": [
+            "equal",
+            [
+              "version",
+              "Sqpmethod"
+            ],
+            [
+              "literal",
+              1
+            ]
+          ],
+          "op": "if"
+        },
+        {
           "name": "Sqpmethod::Asp",
           "op": "field",
           "type": "Sparsity"
         },
         {
-          "name": "Sqpmethod::convexify",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "Sqpmethod::convexify_margin",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Sqpmethod::convexify_strategy",
+              "op": "field",
+              "type": "char"
+            },
+            {
+              "name": "Sqpmethod::Hsp_project",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "Sqpmethod::scc_transform",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "Sqpmethod::scc_offset",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "Sqpmethod::scc_mapping",
+              "op": "field",
+              "type": {
+                "element": "casadi_int",
+                "name": "std::vector"
+              }
+            },
+            {
+              "name": "Sqpmethod::max_iter_eig",
+              "op": "field",
+              "type": "casadi_int"
+            },
+            {
+              "name": "Sqpmethod::block_size",
+              "op": "field",
+              "type": "casadi_int"
+            },
+            {
+              "name": "Sqpmethod::scc_sp",
+              "op": "field",
+              "type": "Sparsity"
+            }
+          ],
+          "condition": [
+            "equal",
+            [
+              "version",
+              "Sqpmethod"
+            ],
+            [
+              "literal",
+              1
+            ]
+          ],
+          "op": "if"
         },
         {
           "body": [
             {
-              "layout": "Convexify::serialize",
-              "op": "call",
-              "params": {
-                "prefix": "Sqpmethod::"
-              }
+              "name": "Sqpmethod::convexify",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "body": [
+                {
+                  "layout": "Convexify::serialize",
+                  "op": "call",
+                  "params": {
+                    "prefix": "Sqpmethod::"
+                  }
+                }
+              ],
+              "condition": [
+                "field",
+                "Sqpmethod::convexify"
+              ],
+              "op": "if"
             }
           ],
           "condition": [
-            "field",
-            "Sqpmethod::convexify"
+            "greater_equal",
+            [
+              "version",
+              "Sqpmethod"
+            ],
+            [
+              "literal",
+              2
+            ]
           ],
           "op": "if"
         }
@@ -8590,6 +10135,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "SundialsInterface",
           "op": "version",
           "value": 2
@@ -8665,9 +10211,25 @@
           "type": "double"
         },
         {
-          "name": "SundialsInterface::max_step_size",
-          "op": "field",
-          "type": "double"
+          "body": [
+            {
+              "name": "SundialsInterface::max_step_size",
+              "op": "field",
+              "type": "double"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "SundialsInterface"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "SundialsInterface::nonlin_conv_coeff",
@@ -9178,6 +10740,7 @@
           "op": "call"
         },
         {
+          "minimum": 1,
           "name": "XpressInterface",
           "op": "version",
           "value": 2
@@ -9188,19 +10751,35 @@
           "type": "Dict"
         },
         {
-          "name": "XpressInterface::mip_start",
-          "op": "field",
-          "type": "bool"
-        },
-        {
-          "name": "XpressInterface::log_file",
-          "op": "field",
-          "type": "std::string"
-        },
-        {
-          "name": "XpressInterface::compute_iis",
-          "op": "field",
-          "type": "bool"
+          "body": [
+            {
+              "name": "XpressInterface::mip_start",
+              "op": "field",
+              "type": "bool"
+            },
+            {
+              "name": "XpressInterface::log_file",
+              "op": "field",
+              "type": "std::string"
+            },
+            {
+              "name": "XpressInterface::compute_iis",
+              "op": "field",
+              "type": "bool"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "XpressInterface"
+            ],
+            [
+              "literal",
+              2
+            ]
+          ],
+          "op": "if"
         },
         {
           "name": "XpressInterface::sos_settype",
@@ -10864,42 +12443,69 @@
               ],
               "52": [
                 {
-                  "name": "Multiplication::kind",
-                  "op": "field",
-                  "type": "std::string"
-                },
-                {
-                  "cases": {
-                    "base": [
-                      {
-                        "layout": "Multiplication::serialize_body",
-                        "op": "call"
-                      }
+                  "body": [
+                    {
+                      "name": "Multiplication::dense",
+                      "op": "field",
+                      "type": "bool"
+                    },
+                    {
+                      "layout": "MXNode::serialize_body",
+                      "op": "call"
+                    }
+                  ],
+                  "condition": [
+                    "next",
+                    [
+                      "literal",
+                      "Multiplication::dense"
                     ],
-                    "dense": [
-                      {
-                        "layout": "DenseMultiplication::serialize_body",
-                        "op": "call"
-                      }
-                    ],
-                    "dense_sparse": [
-                      {
-                        "layout": "DenseSparseMultiplication::serialize_body",
-                        "op": "call"
-                      }
-                    ],
-                    "pseudo_dense": [
-                      {
-                        "layout": "PseudoDenseMultiplication::serialize_body",
-                        "op": "call"
-                      }
+                    [
+                      "literal",
+                      "bool"
                     ]
-                  },
-                  "op": "select",
-                  "value": [
-                    "field",
-                    "Multiplication::kind"
-                  ]
+                  ],
+                  "else": [
+                    {
+                      "name": "Multiplication::kind",
+                      "op": "field",
+                      "type": "std::string"
+                    },
+                    {
+                      "cases": {
+                        "base": [
+                          {
+                            "layout": "Multiplication::serialize_body",
+                            "op": "call"
+                          }
+                        ],
+                        "dense": [
+                          {
+                            "layout": "DenseMultiplication::serialize_body",
+                            "op": "call"
+                          }
+                        ],
+                        "dense_sparse": [
+                          {
+                            "layout": "DenseSparseMultiplication::serialize_body",
+                            "op": "call"
+                          }
+                        ],
+                        "pseudo_dense": [
+                          {
+                            "layout": "PseudoDenseMultiplication::serialize_body",
+                            "op": "call"
+                          }
+                        ]
+                      },
+                      "op": "select",
+                      "value": [
+                        "field",
+                        "Multiplication::kind"
+                      ]
+                    }
+                  ],
+                  "op": "if"
                 }
               ],
               "53": [
