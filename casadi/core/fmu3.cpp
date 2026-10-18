@@ -532,7 +532,7 @@ Fmu3::Fmu3(DeserializingStream& s) : FmuInternal(s) {
   get_adjoint_derivative_ = nullptr;
   update_discrete_states_ = nullptr;
 
-  s.version("Fmu3", 2);
+  int version = s.version("Fmu3", 1, 2);
   s.unpack("Fmu3::vr_real", vr_real_);
   s.unpack("Fmu3::vr_integer", vr_integer_);
   s.unpack("Fmu3::vr_boolean", vr_boolean_);
@@ -550,10 +550,18 @@ Fmu3::Fmu3(DeserializingStream& s) : FmuInternal(s) {
   s.unpack("Fmu3::vr_aux_integer", vr_aux_integer_);
   s.unpack("Fmu3::vr_aux_boolean", vr_aux_boolean_);
   s.unpack("Fmu3::vr_aux_string", vr_aux_string_);
-  s.unpack("Fmu3::off_aux_real", off_aux_real_);
-  s.unpack("Fmu3::off_aux_integer", off_aux_integer_);
-  s.unpack("Fmu3::off_aux_boolean", off_aux_boolean_);
-  s.unpack("Fmu3::off_aux_string", off_aux_string_);
+  if (version >= 2) {
+    s.unpack("Fmu3::off_aux_real", off_aux_real_);
+    s.unpack("Fmu3::off_aux_integer", off_aux_integer_);
+    s.unpack("Fmu3::off_aux_boolean", off_aux_boolean_);
+    s.unpack("Fmu3::off_aux_string", off_aux_string_);
+  } else {
+    // Version 1 only had scalar auxilliary variables
+    off_aux_real_ = range(vr_aux_real_.size() + 1);
+    off_aux_integer_ = range(vr_aux_integer_.size() + 1);
+    off_aux_boolean_ = range(vr_aux_boolean_.size() + 1);
+    off_aux_string_ = range(vr_aux_string_.size() + 1);
+  }
 }
 
 
