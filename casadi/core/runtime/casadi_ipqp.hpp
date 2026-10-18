@@ -190,6 +190,7 @@ void casadi_ipqp_init(casadi_ipqp_data<T1>* d, casadi_int** iw, T1** w) {
   d->dinv_ubz = *w; *w += p->nz;
   // New QP
   d->next = IPQP_RESET;
+  d->status = IPQP_SUCCESS;
 }
 
 // SYMBOL "ipqp_bounds"
