@@ -984,6 +984,11 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 
+#ifdef SWIGJULIA
+      // SWIG_AsVal(bool) accepts any whole number; only Bool is a bool
+      if (!jl_typeis(p, jl_bool_type)) return false;
+#endif // SWIGJULIA
+
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(bool)(p, m ? *m : 0))) return true;
 
