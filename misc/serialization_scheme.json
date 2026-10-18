@@ -62,7 +62,7 @@
       1
     ],
     "Feasiblesqpmethod": [
-      3
+      4
     ],
     "FiniteDiff": [
       1
@@ -414,7 +414,8 @@
     "Feasiblesqpmethod": [
       1,
       2,
-      3
+      3,
+      4
     ],
     "FiniteDiff": [
       1
@@ -2919,7 +2920,7 @@
         {
           "name": "Feasiblesqpmethod",
           "op": "version",
-          "value": 3
+          "value": 4
         },
         {
           "name": "Feasiblesqpmethod::qpsol",
@@ -3006,6 +3007,99 @@
             "Feasiblesqpmethod::convexify"
           ],
           "op": "if"
+        },
+        {
+          "name": "Feasiblesqpmethod::use_sqp",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "name": "Feasiblesqpmethod::use_anderson",
+          "op": "field",
+          "type": "bool"
+        },
+        {
+          "name": "Feasiblesqpmethod::anderson_memory",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "Feasiblesqpmethod::optim_tol",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::feas_tol",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_eta1",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_eta2",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_alpha1",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_alpha2",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_tol",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_acceptance",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_rad_min",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_rad_max",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_rad0",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::tr_scale_vector",
+          "op": "field",
+          "type": {
+            "element": "double",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "Feasiblesqpmethod::contraction_acceptance_value",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Feasiblesqpmethod::watchdog",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "Feasiblesqpmethod::max_inner_iter",
+          "op": "field",
+          "type": "casadi_int"
         }
       ],
       "Find::serialize_body": [

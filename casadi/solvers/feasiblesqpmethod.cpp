@@ -2344,11 +2344,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   }
 
   Feasiblesqpmethod::Feasiblesqpmethod(DeserializingStream& s) : Nlpsol(s) {
-    int version = s.version("Feasiblesqpmethod", 1, 3);
+    int version = s.version("Feasiblesqpmethod", 1, 4);
     s.unpack("Feasiblesqpmethod::qpsol", qpsol_);
-    if (version>=3) {
-      s.unpack("Feasiblesqpmethod::qpsol_ela", qpsol_ela_);
-    }
     s.unpack("Feasiblesqpmethod::exact_hessian", exact_hessian_);
     s.unpack("Feasiblesqpmethod::max_iter", max_iter_);
     s.unpack("Feasiblesqpmethod::min_iter", min_iter_);
@@ -2358,6 +2355,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.unpack("Feasiblesqpmethod::print_header", print_header_);
     s.unpack("Feasiblesqpmethod::print_iteration", print_iteration_);
     s.unpack("Feasiblesqpmethod::print_status", print_status_);
+    if (version>=3) s.unpack("Feasiblesqpmethod::init_feasible", init_feasible_);
 
     // if (version>=3) {
     //   s.unpack("Feasiblesqpmethod::elastic_mode", elastic_mode_);
@@ -2407,12 +2405,52 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       s.unpack("Feasiblesqpmethod::convexify", convexify_);
       if (convexify_) Convexify::deserialize(s, "Feasiblesqpmethod::", convexify_data_);
     }
+    if (version>=4) {
+      s.unpack("Feasiblesqpmethod::use_sqp", use_sqp_);
+      s.unpack("Feasiblesqpmethod::use_anderson", use_anderson_);
+      s.unpack("Feasiblesqpmethod::anderson_memory", sz_anderson_memory_);
+      s.unpack("Feasiblesqpmethod::optim_tol", optim_tol_);
+      s.unpack("Feasiblesqpmethod::feas_tol", feas_tol_);
+      s.unpack("Feasiblesqpmethod::tr_eta1", tr_eta1_);
+      s.unpack("Feasiblesqpmethod::tr_eta2", tr_eta2_);
+      s.unpack("Feasiblesqpmethod::tr_alpha1", tr_alpha1_);
+      s.unpack("Feasiblesqpmethod::tr_alpha2", tr_alpha2_);
+      s.unpack("Feasiblesqpmethod::tr_tol", tr_tol_);
+      s.unpack("Feasiblesqpmethod::tr_acceptance", tr_acceptance_);
+      s.unpack("Feasiblesqpmethod::tr_rad_min", tr_rad_min_);
+      s.unpack("Feasiblesqpmethod::tr_rad_max", tr_rad_max_);
+      s.unpack("Feasiblesqpmethod::tr_rad0", tr_rad0_);
+      s.unpack("Feasiblesqpmethod::tr_scale_vector", tr_scale_vector_);
+      s.unpack("Feasiblesqpmethod::contraction_acceptance_value", contraction_acceptance_value_);
+      s.unpack("Feasiblesqpmethod::watchdog", watchdog_);
+      s.unpack("Feasiblesqpmethod::max_inner_iter", max_inner_iter_);
+    } else {
+      // Defaults of init()
+      use_sqp_ = true;
+      use_anderson_ = false;
+      sz_anderson_memory_ = 0;
+      optim_tol_ = 1e-8;
+      feas_tol_ = 1e-8;
+      tr_eta1_ = 0.25;
+      tr_eta2_ = 0.75;
+      tr_alpha1_ = 0.5;
+      tr_alpha2_ = 2.0;
+      tr_tol_ = 1e-8;
+      tr_acceptance_ = 1e-8;
+      tr_rad_min_ = 1e-10;
+      tr_rad_max_ = 10.0;
+      tr_rad0_ = 1.0;
+      tr_scale_vector_ = std::vector<double>(nx_, 1.0);
+      contraction_acceptance_value_ = 0.5;
+      watchdog_ = 5;
+      max_inner_iter_ = 50;
+    }
     set_feasiblesqpmethod_prob();
   }
 
   void Feasiblesqpmethod::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
-    s.version("Feasiblesqpmethod", 3);
+    s.version("Feasiblesqpmethod", 4);
     s.pack("Feasiblesqpmethod::qpsol", qpsol_);
     // s.pack("Feasiblesqpmethod::qpsol_ela", qpsol_ela_);
     s.pack("Feasiblesqpmethod::exact_hessian", exact_hessian_);
@@ -2430,5 +2468,23 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.pack("Feasiblesqpmethod::Asp", Asp_);
     s.pack("Feasiblesqpmethod::convexify", convexify_);
     if (convexify_) Convexify::serialize(s, "Feasiblesqpmethod::", convexify_data_);
+    s.pack("Feasiblesqpmethod::use_sqp", use_sqp_);
+    s.pack("Feasiblesqpmethod::use_anderson", use_anderson_);
+    s.pack("Feasiblesqpmethod::anderson_memory", sz_anderson_memory_);
+    s.pack("Feasiblesqpmethod::optim_tol", optim_tol_);
+    s.pack("Feasiblesqpmethod::feas_tol", feas_tol_);
+    s.pack("Feasiblesqpmethod::tr_eta1", tr_eta1_);
+    s.pack("Feasiblesqpmethod::tr_eta2", tr_eta2_);
+    s.pack("Feasiblesqpmethod::tr_alpha1", tr_alpha1_);
+    s.pack("Feasiblesqpmethod::tr_alpha2", tr_alpha2_);
+    s.pack("Feasiblesqpmethod::tr_tol", tr_tol_);
+    s.pack("Feasiblesqpmethod::tr_acceptance", tr_acceptance_);
+    s.pack("Feasiblesqpmethod::tr_rad_min", tr_rad_min_);
+    s.pack("Feasiblesqpmethod::tr_rad_max", tr_rad_max_);
+    s.pack("Feasiblesqpmethod::tr_rad0", tr_rad0_);
+    s.pack("Feasiblesqpmethod::tr_scale_vector", tr_scale_vector_);
+    s.pack("Feasiblesqpmethod::contraction_acceptance_value", contraction_acceptance_value_);
+    s.pack("Feasiblesqpmethod::watchdog", watchdog_);
+    s.pack("Feasiblesqpmethod::max_inner_iter", max_inner_iter_);
   }
 } // namespace casadi
