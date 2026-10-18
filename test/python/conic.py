@@ -1463,7 +1463,7 @@ class ConicTests(casadiTestCase):
     
   @requires_conic("ipqp")
   def test_ipqp_status_init(self):
-    # Used to fail with "Matrix-vector evaluation error" from an uninitialized status
+    # More constraints than variables: uninitialized status and an undersized KKT iw
     H = ca.DM([[1,-1],[-1,2]]); A = ca.DM([[1,1],[-1,2],[2,1]])
     solver = ca.conic("solver","ipqp",{"h":H.sparsity(),"a":A.sparsity()},{"print_iter":False,"print_header":False,"print_info":False})
     res = solver(h=H,g=ca.DM([-2,-6]),a=A,lbx=0,ubx=ca.inf,lba=-ca.inf,uba=ca.DM([2,2,3]))
