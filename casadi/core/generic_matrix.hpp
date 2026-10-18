@@ -26,6 +26,11 @@
 #ifndef CASADI_GENERIC_MATRIX_HPP
 #define CASADI_GENERIC_MATRIX_HPP
 
+#include <type_traits>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+
 #include "slice.hpp"
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
@@ -1766,10 +1771,120 @@ namespace casadi {
     return blockcat(y*MatType::eye(n), x_col, x_col.T(), y);
   }
 
+#ifndef SWIG
+  // Argument `which` is the one whose derivative is structurally blind, so a
+  // dependence check on that argument is what separates a real affine use
+  // (if_else on a parameter) from floor(x), sign(x), or copysign(x, p).
+  inline bool nonsmooth_argument(casadi_int op, casadi_int which) {
+    switch (op) {
+      case OP_LT:
+      case OP_LE:
+      case OP_EQ:
+      case OP_NE:
+      case OP_AND:
+      case OP_OR:
+      case OP_FMOD:
+      case OP_REMAINDER:
+      case OP_COPYSIGN:
+        return which == 0 || which == 1;
+      case OP_NOT:
+      case OP_FLOOR:
+      case OP_CEIL:
+      case OP_SIGN:
+      case OP_IF_ELSE_ZERO:
+        return which == 0;
+      default:
+        return false;
+    }
+  }
+
+  class SXElem;
+
+  // Matrix<SXElem> exposes ScalarType. MX and numeric matrices do not match.
+  template<typename T, typename Enable = void>
+  struct linear_scalar { typedef void type; };
+
+  template<typename T>
+  struct linear_scalar<T, typename std::enable_if<
+      sizeof(typename T::ScalarType) >= 0>::type> {
+    typedef typename T::ScalarType type;
+  };
+
+  template<typename T, typename Enable = void>
+  struct has_shared_hash : std::false_type {};
+
+  template<typename T>
+  struct has_shared_hash<T, typename std::enable_if<
+      sizeof(decltype(std::declval<const T&>().__hash__())) >= 0>::type>
+      : std::true_type {};
+
+  struct SxNodeHash {
+    template<typename T>
+    casadi_int operator()(const T& e) const { return e.element_hash(); }
+  };
+
+  struct MxNodeHash {
+    template<typename T>
+    casadi_int operator()(const T& e) const { return e.__hash__(); }
+  };
+
+  // True when a nonsmooth op depends on var through an argument whose
+  // derivative is structurally zero. hash_matrix is for MX, whose non-scalar
+  // nodes are one shared object; SX matrices are already split into scalars.
+  template<typename MatType, typename Hash>
+  bool nonsmooth_depends(const MatType& expr, const MatType& var,
+                         Hash hash, bool hash_matrix) {
+    std::vector<MatType> stack;
+    for (casadi_int k = 0; k < expr.nnz(); ++k) stack.push_back(expr.nz(k));
+    std::unordered_set<casadi_int> seen;
+    while (!stack.empty()) {
+      MatType e = stack.back();
+      stack.pop_back();
+      if (!e.is_scalar()) {
+        if (hash_matrix) {
+          if (!seen.insert(hash(e)).second) continue;
+        }
+        for (casadi_int k = 0; k < e.nnz(); ++k) stack.push_back(e.nz(k));
+        continue;
+      }
+      if (!seen.insert(hash(e)).second) continue;
+      casadi_int op = e.op();
+      casadi_int narg = e.n_dep();
+      for (casadi_int i = 0; i < narg; ++i) {
+        MatType child = e.dep(i);
+        if (nonsmooth_argument(op, i) && depends_on(child, var)) return true;
+        stack.push_back(child);
+      }
+    }
+    return false;
+  }
+
+  template<typename MatType>
+  typename std::enable_if<
+      std::is_same<typename linear_scalar<MatType>::type, SXElem>::value,
+      bool>::type
+  nonsmooth_blocks(const MatType& expr, const MatType& var, int) {
+    return nonsmooth_depends(expr, var, SxNodeHash(), false);
+  }
+
+  template<typename MatType>
+  typename std::enable_if<has_shared_hash<MatType>::value, bool>::type
+  nonsmooth_blocks(const MatType& expr, const MatType& var, long) {
+    return nonsmooth_depends(expr, var, MxNodeHash(), true);
+  }
+
+  template<typename MatType>
+  bool nonsmooth_blocks(const MatType&, const MatType&, ...) {
+    return false;
+  }
+
   template<typename MatType>
   bool GenericMatrix<MatType>::is_linear(const MatType &expr, const MatType &var) {
-    return !any(MatType::which_depends(expr, var, 2, true));
+    if (any(MatType::which_depends(expr, var, 2, true))) return false;
+    // which_depends only sees a structurally nonzero derivative.
+    return !nonsmooth_blocks(expr, var, 0);
   }
+#endif  // SWIG
 
   template<typename MatType>
   bool GenericMatrix<MatType>::is_quadratic(const MatType &expr, const MatType &var) {
