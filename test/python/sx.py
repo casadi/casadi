@@ -1547,6 +1547,17 @@ class SXtests(casadiTestCase):
       self.assertTrue(ca.is_linear(x*p**4,x))
       self.assertTrue(ca.is_linear(5*p**4,x))
 
+      # Issue 4443: a zero derivative is not linearity.
+      self.assertFalse(ca.is_linear(ca.floor(x),x))
+      self.assertFalse(ca.is_linear(ca.sign(x),x))
+      self.assertFalse(ca.is_linear(x>0,x))
+      self.assertFalse(ca.is_linear(ca.if_else(x>0, 1, 2),x))
+      self.assertFalse(ca.is_linear(ca.copysign(x, p),x))
+      self.assertTrue(ca.is_linear(ca.floor(p)+x,x))
+      self.assertTrue(ca.is_linear(ca.if_else(p>0, x, 2*x),x))
+      self.assertFalse(ca.is_linear(ca.vertcat(ca.floor(x), 3*x),x))
+      self.assertTrue(ca.is_linear(ca.vertcat(3*x, x+1),x))
+
 
 
       z = x**2+3*y**2 + 0.5*x*y + 7*x + 6*y+7
