@@ -415,7 +415,7 @@ class GraphBuilderNumericTests(casadiTestCase):
     self.assertEqual(ca.GraphBuilder(path).create("primal").is_diff_in(), [True, True])
 
   def test_export_graph_model_filename(self):
-    self.message("Graph call nodes identify their source ONNX files after serialization")
+    self.message("Graph exports keep the source ONNX files of called models")
     import json
     path = self.affine_model(numpy.float32, (3,), 2, 1)
     sibling = self.sibling_model(path, "adj")
@@ -424,13 +424,10 @@ class GraphBuilderNumericTests(casadiTestCase):
     x = ca.MX.sym("x", 3)
     wrapper = ca.Function("wrapper", [x], [f(x), ca.jacobian(f(x), x)])
     for function in [wrapper, ca.Function.deserialize(wrapper.serialize())]:
-      graph = json.loads(function.export_graph())
-      calls = [node for part in [graph]+graph.get("functions", [])
-               for node in part["nodes"] if "model_path" in node]
-      self.assertEqual({os.path.normpath(node["model_path"]) for node in calls},
-                       {os.path.normpath(path), os.path.normpath(sibling)})
-      for node in calls:
-        self.assertIn(os.path.basename(node["model_path"]), node["label"])
+      restored = ca.StringDeserializer(json.loads(function.export_graph())["source"]).unpack()
+      paths = {os.path.normpath(g.info()["model_path"]) for g in restored.find_functions()
+               if "model_path" in g.info()}
+      self.assertEqual(paths, {os.path.normpath(path), os.path.normpath(sibling)})
 
   def test_nondifferentiable_sibling_hessian(self):
     self.message("A runtime parameter needs no adjoint output or forward seed, including Hessians")

@@ -59,20 +59,6 @@ std::string graph_string(const std::string& value) {
   return s.str();
 }
 
-void graph_sparsity(std::ostream& s, const Sparsity& sp) {
-  s << "{\"shape\":[" << sp.size1() << "," << sp.size2() << "],\"colind\":[";
-  for (casadi_int i = 0; i <= sp.size2(); ++i) {
-    if (i) s << ",";
-    s << sp.colind()[i];
-  }
-  s << "],\"row\":[";
-  for (casadi_int i = 0; i < sp.nnz(); ++i) {
-    if (i) s << ",";
-    s << sp.row()[i];
-  }
-  s << "]}";
-}
-
 struct GraphNode {
   casadi_int id, op, io = -1, offset = 0;
   bool binary, ordered;
@@ -86,56 +72,31 @@ struct GraphModel {
   std::vector<GraphEdge> edges;
 };
 
-std::string graph_model(Function function, const std::string& direction,
-    std::vector<Function>& functions, std::map<const FunctionInternal*, casadi_int>& indices,
-    bool include_functions, GraphModel& model) {
+// Instruction model for standalone DOT; browser exports carry the serialized Function instead.
+void graph_model(const Function& function, GraphModel& model) {
   auto sx = dynamic_cast<const SXFunction*>(function.get());
   auto mx = dynamic_cast<const MXFunction*>(function.get());
   const auto sx_inputs = sx ? function.sx_in() : std::vector<SX>{};
   const auto mx_inputs = mx ? function.mx_in() : std::vector<MX>{};
-  std::ostringstream data, edges;
-  data << "{\"version\":1,\"name\":" << graph_string(function.name())
-       << ",\"type\":" << graph_string(function.class_name())
-       << ",\"direction\":" << graph_string(direction) << ",\"inputs\":[";
-  for (casadi_int i = 0; i < function.n_in(); ++i) {
-    if (i) data << ",";
-    data << "{\"name\":" << graph_string(function.name_in(i)) << ",\"sparsity\":";
-    graph_sparsity(data, function.sparsity_in(i));
-    data << "}";
-  }
-  data << "],\"outputs\":[";
-  for (casadi_int i = 0; i < function.n_out(); ++i) {
-    if (i) data << ",";
-    data << "{\"name\":" << graph_string(function.name_out(i)) << ",\"sparsity\":";
-    graph_sparsity(data, function.sparsity_out(i));
-    data << "}";
-  }
-  data << "],\"nodes\":[";
 
   // Work slots are reused: resolve dependencies before replacing their producers.
   std::map<casadi_int, std::pair<casadi_int, casadi_int>> producer;
-  bool first_edge = true;
   for (casadi_int k = 0; k < function.n_instructions(); ++k) {
     casadi_int op = function.instruction_id(k);
     auto arg = function.instruction_input(k), res = function.instruction_output(k);
     std::string label = casadi_math<double>::name(op);
-    std::string expression = sx ? sx->print(sx->algorithm_.at(k))
-                               : mx->print(mx->algorithm_.at(k));
     GraphNode node;
     node.id = k; node.op = op;
-    std::string kind = "operation", io_metadata, call_metadata;
+    std::string kind = "operation";
     if (op == OP_INPUT || op == OP_OUTPUT) {
       bool input = op == OP_INPUT;
       casadi_int io = (input ? arg : res).at(0);
       casadi_int offset = sx ? (input ? arg : res).at(1)
                             : mx->algorithm_.at(k).data->offset();
       node.io = io; node.offset = offset;
-      io_metadata = ",\"io_index\":" + str(io) + ",\"io_offset\":" + str(offset);
       if (input) {
-        std::string symbol = sx ? str(sx_inputs.at(io).nonzeros().at(offset))
-                                : str(mx_inputs.at(io));
-        node.symbol = symbol;
-        io_metadata += ",\"symbol\":" + graph_string(symbol);
+        node.symbol = sx ? str(sx_inputs.at(io).nonzeros().at(offset))
+                         : str(mx_inputs.at(io));
       }
       label = (input ? function.name_in(io) : function.name_out(io));
       if ((sx && (input ? function.nnz_in(io) : function.nnz_out(io)) != 1) || offset != 0) {
@@ -161,23 +122,11 @@ std::string graph_model(Function function, const std::string& direction,
     if (op == OP_CALL) {
       const Function& f = sx ? sx->call_.el.at(sx->algorithm_.at(k).i1).f
                              : mx->algorithm_.at(k).data.which_function();
-      call_metadata = ",\"callee_type\":" + graph_string(f.class_name());
       Dict info = f.info();
       auto source = info.find("model_path");
       if (source != info.end()) {
         std::string path = source->second.to_string();
-        if (!path.empty()) {
-          call_metadata += ",\"model_path\":" + graph_string(path);
-          label += " [" + path.substr(path.find_last_of("/\\") + 1) + "]";
-        }
-      }
-      if (include_functions && (f.is_a("SXFunction") || f.is_a("MXFunction"))) {
-        auto found = indices.find(f.get());
-        if (found == indices.end()) {
-          found = indices.emplace(f.get(), functions.size()).first;
-          functions.push_back(f);
-        }
-        call_metadata += ",\"callee\":" + str(found->second);
+        if (!path.empty()) label += " [" + path.substr(path.find_last_of("/\\") + 1) + "]";
       }
       input_names.clear(); output_names.clear();
       for (casadi_int side = 0; side < 2; ++side) {
@@ -194,25 +143,9 @@ std::string graph_model(Function function, const std::string& direction,
           }
         }
       }
-    } else if (op == OP_MTIMES) {
-      input_names = {"accumulator", "left", "right"};
-    } else if (op == OP_GETNONZEROS) {
-      input_names = {"source"};
-    } else if (op == OP_SETNONZEROS || op == OP_ADDNONZEROS) {
-      input_names = {"base", "values"};
     }
-    std::string display = label, formula = label;
+    std::string display = label;
     if (kind == "operation") {
-      if (mx) {
-        formula = MX::print_operator(mx->algorithm_.at(k).data, input_names);
-      } else {
-        formula = casadi_math<double>::pre(op);
-        for (casadi_int i = 0; i < input_names.size(); ++i) {
-          if (i) formula += casadi_math<double>::sep(op);
-          formula += input_names[i];
-        }
-        formula += casadi_math<double>::post(op);
-      }
       switch (op) {
         case OP_ADD: display = "+"; break;
         case OP_SUB: display = "-"; break;
@@ -234,68 +167,25 @@ std::string graph_model(Function function, const std::string& direction,
         constants.push_back(number.str());
       }
       display = constants.size() == 1 ? constants.front() : "constant";
-      formula = display;
     }
     node.kind = kind; node.display = display;
     node.binary = casadi_math<double>::is_binary(op);
     node.ordered = arg.size() > 1 && !operation_checker<CommChecker>(op);
     node.input_names = input_names; node.output_names = output_names;
     node.constants = constants;
-    if (k) data << ",";
-    data << "{\"id\":" << k << ",\"op\":" << op << ",\"label\":"
-         << graph_string(label) << ",\"kind\":" << graph_string(kind)
-         << ",\"expression\":" << graph_string(expression)
-         << ",\"display\":" << graph_string(display)
-         << ",\"formula\":" << graph_string(formula)
-         << ",\"binary\":" << (casadi_math<double>::is_binary(op) ? "true" : "false")
-         << ",\"ordered\":" << (arg.size() > 1 && !operation_checker<CommChecker>(op)
-                                         ? "true" : "false");
-    for (const auto& entry : std::map<std::string, std::vector<std::string>>{
-        {"input_names", input_names}, {"output_names", output_names}, {"constants", constants}}) {
-      data << "," << graph_string(entry.first) << ":[";
-      for (casadi_int i = 0; i < entry.second.size(); ++i) {
-        if (i) data << ",";
-        data << graph_string(entry.second[i]);
-      }
-      data << "]";
-    }
-    if (mx && (op == OP_GETNONZEROS || op == OP_SETNONZEROS || op == OP_ADDNONZEROS)) {
-      data << ",\"mapping_kind\":" << graph_string(op == OP_GETNONZEROS ? "extract"
-        : op == OP_SETNONZEROS ? "assign" : "add") << ",\"mapping\":[";
-      const auto mapping = mx->algorithm_.at(k).data.mapping().nonzeros();
-      for (casadi_int i = 0; i < mapping.size(); ++i) {
-        if (i) data << ",";
-        data << mapping[i];
-      }
-      data << "]";
-    }
-    data << io_metadata << call_metadata << ",\"inputs\":[";
     for (casadi_int i = 0; i < arg.size(); ++i) {
-      if (i) data << ",";
       node.inputs.push_back(sx ? Sparsity::scalar() : mx->algorithm_.at(k).data->dep(i).sparsity());
-      graph_sparsity(data, node.inputs.back());
       if (arg[i] < 0) continue;
       auto p = producer.find(arg[i]);
       casadi_assert(p != producer.end(), "Missing graph producer for instruction " + str(k));
       model.edges.push_back({p->second.first, p->second.second, k, i});
-      if (!first_edge) edges << ",";
-      first_edge = false;
-      edges << "{\"from\":" << p->second.first << ",\"output\":" << p->second.second
-            << ",\"to\":" << k << ",\"input\":" << i << "}";
     }
-    data << "],\"outputs\":[";
     for (casadi_int i = 0; i < res.size(); ++i) {
-      if (i) data << ",";
       node.outputs.push_back(sx ? Sparsity::scalar() : mx->algorithm_.at(k).data->sparsity(i));
-      graph_sparsity(data, node.outputs.back());
       if (res[i] >= 0) producer[res[i]] = {k, i};
     }
-    data << "]}";
     model.nodes.push_back(std::move(node));
   }
-  data << "],\"edges\":[" << edges.str() << "]}";
-
-  return data.str();
 }
 
 // DOT quoted strings and HTML labels have different escaping rules from JSON.
@@ -525,35 +415,16 @@ struct GraphOptions {
   }
 };
 
-std::string graph_bundle(const Function& f, const GraphOptions& opts, bool dot = false) {
+std::string graph_dot(const Function& f, const GraphOptions& opts) {
   casadi_assert(f.is_a("SXFunction") || f.is_a("MXFunction"),
-    "export_graph requires an SXFunction or MXFunction");
-  std::vector<Function> functions{f};
-  std::map<const FunctionInternal*, casadi_int> indices{{f.get(), 0}};
-  std::vector<std::string> models;
-  for (casadi_int i = 0; i < functions.size(); ++i) {
-    GraphModel model;
-    models.push_back(graph_model(functions[i], opts.direction, functions, indices,
-      opts.include_functions, model));
-    if (dot) {
-      std::ostringstream output;
-      graph_dot(output, f, model, opts.direction, opts.view,
-        opts.show_matrix_contents, opts.show_matrix_sizes);
-      return output.str();
-    }
-  }
-  std::ostringstream data;
-  data << models.front().substr(0, models.front().size()-1)
-       << ",\"format\":\"casadi_viz\",\"view\":"
-       << graph_string(opts.view) << ",\"casadi_version\":"
-       << graph_string(CasadiMeta::version()) << ",\"functions\":[";
-  for (casadi_int i = 1; i < models.size(); ++i) {
-    if (i > 1) data << ",";
-    data << models[i];
-  }
-  data << "]}";
-
-  return data.str();
+    "DOT export requires an SXFunction or MXFunction; use .html or .casadi_viz for "
+    + f.class_name());
+  GraphModel model;
+  graph_model(f, model);
+  std::ostringstream output;
+  graph_dot(output, f, model, opts.direction, opts.view,
+    opts.show_matrix_contents, opts.show_matrix_sizes);
+  return output.str();
 }
 
 void write_graph(const std::string& fname, const std::string& data,
@@ -600,22 +471,23 @@ std::string graph_extension(const std::string& fname) {
   return extension;
 }
 
-template<typename MatType>
-std::string expression_bundle(const std::vector<MatType>& expressions, const Dict& opts) {
+// Browser bundles embed native serialization; the viewer decodes it with casadi-reader.
+template<typename T>
+std::string serialized_bundle(const T& data, const Dict& opts, const std::string& view) {
   Dict defaults = opts;
-  if (!defaults.count("view")) defaults["view"] = "expression";
+  if (!defaults.count("view")) defaults["view"] = view;
   const GraphOptions options(defaults);
   StringSerializer serializer;
-  serializer.pack(expressions);
-  std::ostringstream data;
-  data << "{\"format\":\"casadi_viz\",\"version\":1,\"source\":"
-       << graph_string(serializer.encode()) << ",\"view\":" << graph_string(options.view)
-       << ",\"direction\":" << graph_string(options.direction)
-       << ",\"casadi_version\":" << graph_string(CasadiMeta::version())
-       << ",\"include_functions\":" << (options.include_functions ? "true" : "false")
-       << ",\"show_matrix_contents\":" << (options.show_matrix_contents ? "true" : "false")
-       << ",\"show_matrix_sizes\":" << (options.show_matrix_sizes ? "true" : "false") << "}";
-  return data.str();
+  serializer.pack(data);
+  std::ostringstream s;
+  s << "{\"format\":\"casadi_viz\",\"version\":1,\"source\":"
+    << graph_string(serializer.encode()) << ",\"view\":" << graph_string(options.view)
+    << ",\"direction\":" << graph_string(options.direction)
+    << ",\"casadi_version\":" << graph_string(CasadiMeta::version())
+    << ",\"include_functions\":" << (options.include_functions ? "true" : "false")
+    << ",\"show_matrix_contents\":" << (options.show_matrix_contents ? "true" : "false")
+    << ",\"show_matrix_sizes\":" << (options.show_matrix_sizes ? "true" : "false") << "}";
+  return s.str();
 }
 
 template<typename MatType>
@@ -626,20 +498,20 @@ void export_expressions(const std::vector<MatType>& expressions, const std::stri
     if (!defaults.count("view")) defaults["view"] = "expression";
     Function("expression", symvar(veccat(expressions)), expressions).export_graph(fname, defaults);
   } else {
-    write_graph(fname, expression_bundle(expressions, opts), GraphOptions(opts));
+    write_graph(fname, serialized_bundle(expressions, opts, "expression"), GraphOptions(opts));
   }
 }
 
 } // namespace
 
 std::string Function::export_graph(const Dict& opts) const {
-  return graph_bundle(*this, GraphOptions(opts));
+  return serialized_bundle(*this, opts, "function");
 }
 
 void Function::export_graph(const std::string& fname, const Dict& opts) const {
-  const std::string extension = graph_extension(fname);
   const GraphOptions options(opts);
-  write_graph(fname, graph_bundle(*this, options, extension == ".dot"), options);
+  write_graph(fname, graph_extension(fname) == ".dot" ? graph_dot(*this, options)
+    : serialized_bundle(*this, opts, "function"), options);
 }
 
 void export_graph(const SX& expression, const std::string& fname, const Dict& opts) {
@@ -659,7 +531,7 @@ void export_graph(const std::vector<MX>& expressions, const std::string& fname, 
 }
 
 std::string export_graph(const std::vector<SX>& expressions, const Dict& opts) {
-  return expression_bundle(expressions, opts);
+  return serialized_bundle(expressions, opts, "expression");
 }
 
 std::string export_graph(const SX& expression, const Dict& opts) {
@@ -667,7 +539,7 @@ std::string export_graph(const SX& expression, const Dict& opts) {
 }
 
 std::string export_graph(const std::vector<MX>& expressions, const Dict& opts) {
-  return expression_bundle(expressions, opts);
+  return serialized_bundle(expressions, opts, "expression");
 }
 
 std::string export_graph(const MX& expression, const Dict& opts) {
