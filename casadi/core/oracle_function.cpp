@@ -430,7 +430,8 @@ std::string OracleFunction::generate_dependencies(const std::string& fname,
   CodeGenerator gen(fname, opts);
   gen.add(oracle_);
   for (auto&& e : all_functions_) {
-    if (e.second.jit) gen.add(e.second.f);
+    // After jit_dependencies, f is the loaded External: generate from the original
+    if (e.second.jit) gen.add(e.second.f_original.is_null() ? e.second.f : e.second.f_original);
   }
   return gen.generate();
 }

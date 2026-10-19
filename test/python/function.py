@@ -2509,6 +2509,18 @@ class Functiontests(casadiTestCase):
     cg.add(ca.Function("other", [x], [2*x]))
     self.assertIn("wrapper", cg.dump())
 
+  @requires_nlpsol("ipopt")
+  @requiresPlugin(ca.Importer,"shell")
+  def test_generate_dependencies_jit(self):
+    if not args.run_slow: return
+    x = ca.MX.sym("x",2)
+    solver = ca.nlpsol("solver","ipopt",{"x":x,"f":ca.sumsqr(x),"g":x[0]+x[1]-10},
+                       {"jit":True,"compiler":"shell","print_time":False,"ipopt.print_level":0})
+    solver.generate_dependencies("generate_dependencies_jit.c")
+    compiler = ca.Importer("generate_dependencies_jit.c", "shell")
+    for name in ["nlp_f","nlp_g"]:
+      self.checkfunction_light(solver.get_function(name), ca.external(name, compiler), inputs=[ca.DM([1,2]),0])
+
   @requiresPlugin(ca.Importer,"shell")
   def test_jit_directory(self):
   
