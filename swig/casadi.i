@@ -5406,8 +5406,9 @@ namespace casadi{
       if self.is_scalar():
         return float(self)
       elif self.is_vector():
-        return np.array(self.T.elements())
-    return np.array(self.T.elements()).reshape(self.shape)
+        return np.array(self.elements())
+    # elements() is column-major; avoids materializing the transpose
+    return np.ascontiguousarray(np.array(self.elements()).reshape(self.shape, order='F'))
   def to_numpy(self):
     # Pandas-style densification hook.  matplotlib's
     # cbook._unpack_to_numpy looks for `to_numpy()` before falling back
