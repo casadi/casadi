@@ -288,7 +288,8 @@ set_function(const Function& fcn, const std::string& fname, bool jit) {
   casadi_assert(!has_function(fname), "Duplicate function " + fname);
   RegFun& r = all_functions_[fname];
   r.f = fcn;
-  r.jit = jit;
+  // Already compiled functions (e.g. inherited from a jitted parent) are not re-generated
+  r.jit = jit && !fcn.is_a("External", true);
 }
 
 

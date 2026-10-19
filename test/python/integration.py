@@ -1544,6 +1544,20 @@ class Integrationtests(casadiTestCase):
     self.assertTrue(integrator.get_function('jacF').is_a("SXFunction"))
     self.checkarray(integrator.get_function('jacF')(x=1)["jac_ode_x"],1)
 
+  @requires_integrator("cvodes")
+  def test_jit_fwd_factory(self):
+    # issue #4061
+    if not args.run_slow: return
+    x = ca.MX.sym('x')
+    dae = {'x': x, 'ode': -x}
+    opts = {'abstol':1e-10,'reltol':1e-10,'jit':True,'compiler':'shell'}
+    F = ca.integrator('F','cvodes',dae,0,[0.5,1],opts)
+    self.assertTrue(F.get_function('jacF').is_a('External'))
+    I_fwd = F.factory('I_fwd',['x0','fwd:x0'],['xf','fwd:xf'])
+    [xf, fwd_xf] = I_fwd(2.0,1.0)
+    self.checkarray(xf, 2*np.exp(-ca.DM([[0.5,1]])), digits=7)
+    self.checkarray(fwd_xf, np.exp(-ca.DM([[0.5,1]])), digits=7)
+
   def test_issue3371(self):
     # Regression test for https://github.com/casadi/casadi/issues/3371
     # FixedStepIntegrator::advance_noevent / impulseB used the trailing nz_

@@ -1660,6 +1660,8 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
 
   Dict options = opts;
   options["allow_duplicate_io_names"] = true;
+  // The wrapper calls a non-codegenable integrator, which jits its own dependencies
+  options["jit"] = false;
 
   // Create derivative function and return
   return Function(name, ret_in, ret_out, inames, onames, options);
@@ -1792,6 +1794,8 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
 
   Dict options = opts;
   options["allow_duplicate_io_names"] = true;
+  // The wrapper calls a non-codegenable integrator, which jits its own dependencies
+  options["jit"] = false;
 
   // Create derivative function and return
   return Function(name, ret_in, ret_out, inames, onames, options);
