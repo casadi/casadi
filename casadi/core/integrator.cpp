@@ -1018,8 +1018,8 @@ int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_T] = nullptr;  // fwd:t
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_Z] = nullptr;  // fwd:z
-    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->res[DAE_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
     m->res[DAE_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
     if (calc_sp_forward(forward_name("daeF", 1), m->arg, m->res, m->iw, m->w)) return 1;
@@ -1043,8 +1043,8 @@ int Integrator::fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_T] = nullptr;  // fwd:t
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->res[QUAD_QUAD] = quad + (i + 1) * nq1_;  // fwd:quad
     if (calc_sp_forward(forward_name("quadF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
@@ -1078,8 +1078,8 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
@@ -1125,8 +1125,8 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
@@ -1157,6 +1157,13 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   const bvec_t* adj_qf = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
 
+  // Non-differentiable inputs do not propagate
+  if (!is_diff_in_[INTEGRATOR_X0]) x0 = nullptr;
+  if (!is_diff_in_[INTEGRATOR_P]) p = nullptr;
+  if (!is_diff_in_[INTEGRATOR_U]) u = nullptr;
+  if (!is_diff_in_[INTEGRATOR_ADJ_XF]) adj_xf = nullptr;
+  if (!is_diff_in_[INTEGRATOR_ADJ_QF]) adj_qf = nullptr;
+
   // Outputs
   bvec_t* xf = res[INTEGRATOR_XF];
   bvec_t* zf = res[INTEGRATOR_ZF];
@@ -1180,7 +1187,11 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   SpForwardMem m = {arg, res, iw, w};
 
   // Copy initial guess to x
-  std::copy_n(x0, nx_, x);
+  if (x0) {
+    std::copy_n(x0, nx_, x);
+  } else {
+    std::fill_n(x, nx_, 0);
+  }
 
   // Propagate forward
   for (casadi_int k = 0; k < nt(); ++k) {
@@ -1279,8 +1290,8 @@ int Integrator::fdae_sp_reverse(SpReverseMem* m, bvec_t* x,
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_T] = nullptr;  // fwd:t
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_Z] = nullptr;  // fwd:z
-    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     if (calc_sp_reverse(forward_name("daeF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   // Propagate through nondifferentiated
@@ -1305,8 +1316,8 @@ int Integrator::fquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_T] = nullptr;  // fwd:t
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     if (calc_sp_reverse(forward_name("quadF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   // Propagate through nondifferentiated
@@ -1341,8 +1352,8 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
@@ -1388,8 +1399,8 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p ? p + (i + 1) * np1_ : nullptr;  // fwd:p
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u ? u + (i + 1) * nu1_ : nullptr;  // fwd:u
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
@@ -1421,6 +1432,13 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t* adj_xf = arg[INTEGRATOR_ADJ_XF];
   bvec_t* adj_qf = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
+
+  // Non-differentiable inputs do not propagate
+  if (!is_diff_in_[INTEGRATOR_X0]) x0 = nullptr;
+  if (!is_diff_in_[INTEGRATOR_P]) p = nullptr;
+  if (!is_diff_in_[INTEGRATOR_U]) u = nullptr;
+  if (!is_diff_in_[INTEGRATOR_ADJ_XF]) adj_xf = nullptr;
+  if (!is_diff_in_[INTEGRATOR_ADJ_QF]) adj_qf = nullptr;
 
   // Outputs
   bvec_t* xf = res[INTEGRATOR_XF];
