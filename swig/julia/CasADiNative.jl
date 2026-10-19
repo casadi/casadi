@@ -47,9 +47,11 @@ C.MX(m::AbstractMatrix{<:Real}) = size(m, 1) == 0 ? _emptycols(MX, size(m, 2)) :
 C.MX(v::AbstractVector{<:Real}) = C.MX(C.DM(collect(Float64, v)))
 
 # ---- conversion (promotion by DM < SX < MX rank); generated ctors handle reals ----
-Base.convert(::Type{SX}, v::Union{Real,DM}) = C.SX(v isa Real ? Float64(v) : v)
-Base.convert(::Type{MX}, v::Union{Real,DM}) = C.MX(v isa Real ? Float64(v) : v)
-Base.convert(::Type{DM}, v::Real) = C.DM(Float64(v))
+# Julia numbers and arrays promote exactly like DM (`_Num`).
+const _Num = Union{Real,DM,AbstractArray{<:Real}}
+Base.convert(::Type{SX}, v::_Num) = C.SX(v isa Real ? Float64(v) : v)
+Base.convert(::Type{MX}, v::_Num) = C.MX(v isa Real ? Float64(v) : v)
+Base.convert(::Type{DM}, v::Union{Real,AbstractArray{<:Real}}) = C.DM(v isa Real ? Float64(v) : v)
 
 # ---- operators ----
 for (op, fn) in ((:+, :plus), (:-, :minus), (:*, :mtimes), (:/, :rdivide), (:^, :power))
@@ -57,13 +59,13 @@ for (op, fn) in ((:+, :plus), (:-, :minus), (:*, :mtimes), (:/, :rdivide), (:^, 
         Base.$op(a::SX, b::SX) = C.$fn(a, b)
         Base.$op(a::MX, b::MX) = C.$fn(a, b)
         Base.$op(a::DM, b::DM) = C.$fn(a, b)
-        # promotion: scalars and DM promote to the symbolic side
-        Base.$op(a::SX, b::Union{Real,DM}) = C.$fn(a, convert(SX, b))
-        Base.$op(a::Union{Real,DM}, b::SX) = C.$fn(convert(SX, a), b)
-        Base.$op(a::MX, b::Union{Real,DM}) = C.$fn(a, convert(MX, b))
-        Base.$op(a::Union{Real,DM}, b::MX) = C.$fn(convert(MX, a), b)
-        Base.$op(a::DM, b::Real) = C.$fn(a, convert(DM, b))
-        Base.$op(a::Real, b::DM) = C.$fn(convert(DM, a), b)
+        # promotion: numbers, Julia arrays and DM promote to the symbolic side
+        Base.$op(a::SX, b::_Num) = C.$fn(a, convert(SX, b))
+        Base.$op(a::_Num, b::SX) = C.$fn(convert(SX, a), b)
+        Base.$op(a::MX, b::_Num) = C.$fn(a, convert(MX, b))
+        Base.$op(a::_Num, b::MX) = C.$fn(convert(MX, a), b)
+        Base.$op(a::DM, b::Union{Real,AbstractArray{<:Real}}) = C.$fn(a, convert(DM, b))
+        Base.$op(a::Union{Real,AbstractArray{<:Real}}, b::DM) = C.$fn(convert(DM, a), b)
     end
 end
 Base.:-(a::Union{SX,MX,DM}) = C.times(a, typeof(a) === DM ? C.DM(-1.0) : convert(typeof(a), -1))
@@ -125,17 +127,24 @@ _cvec(xs) = (T = _catpromote(xs); [_ascat(T, x) for x in xs])
 # generated vertcat/horzcat always return MX; restore the DM type for numeric cats
 _restore(::Type{DM}, r) = C.evalf(r)
 _restore(::Type{T}, r) where {T} = r
-# Anchor on the first arg being a casadi type so all-Real cats never reach here.
-Base.vcat(x::_Cat, xs::Union{_Cat,Real}...) = _restore(_catpromote((x, xs...)), C.vertcat(_cvec((x, xs...))))
-Base.hcat(x::_Cat, xs::Union{_Cat,Real}...) = _restore(_catpromote((x, xs...)), C.horzcat(_cvec((x, xs...))))
-# Leading Julia scalar + a casadi type later: keeps `[0; x; 0]`, `[c; x]`, `[c x]` from
-# silently building a Vector{Any}. (A purely-scalar prefix like `[1; 2; x]` still escapes
-# to Base; reach for the free `vertcat(...)` there.) (P1-2)
-Base.vcat(a::Real, x::_Cat, xs::Union{_Cat,Real}...) = _restore(_catpromote((a, x, xs...)), C.vertcat(_cvec((a, x, xs...))))
-Base.hcat(a::Real, x::_Cat, xs::Union{_Cat,Real}...) = _restore(_catpromote((a, x, xs...)), C.horzcat(_cvec((a, x, xs...))))
-# [a b; c d] -> rows of horzcat, then vertcat
-function Base.hvcat(rows::Tuple{Vararg{Int}}, x::_Cat, ys::Union{_Cat,Real}...)
-    xs = (x, ys...)
+_cat(builder, xs) = _restore(_catpromote(xs), builder(_cvec(xs)))
+# Anchor on a casadi operand so all-Real cats never reach here.  Julia has no
+# "some argument is a casadi type" signature, so each count of leading Julia
+# scalars gets its own method: `[0; 0; v]`, `[1 2 x]` still build a casadi
+# matrix instead of a Vector{Any}.  After the first casadi operand, numbers and
+# Julia arrays may appear anywhere.  (P1-2)
+const _CatArg = Union{_Cat,Real,AbstractArray{<:Real}}
+const _MAX_LEADING_SCALARS = 8
+for k in 0:_MAX_LEADING_SCALARS
+    as = [Symbol(:a, i) for i in 1:k]
+    sig = [:($a::Real) for a in as]
+    @eval Base.vcat($(sig...), x::_Cat, xs::_CatArg...) = _cat(C.vertcat, ($(as...), x, xs...))
+    @eval Base.hcat($(sig...), x::_Cat, xs::_CatArg...) = _cat(C.horzcat, ($(as...), x, xs...))
+    # [a b; c d] -> rows of horzcat, then vertcat
+    @eval Base.hvcat(rows::Tuple{Vararg{Int}}, $(sig...), x::_Cat, ys::_CatArg...) =
+        _hvcat(rows, ($(as...), x, ys...))
+end
+function _hvcat(rows, xs)
     T = _catpromote(xs)
     cv = [_ascat(T, x) for x in xs]
     blocks = Any[]
@@ -173,17 +182,18 @@ end
 blockcat(A::_Cat, B::_Cat, C_::_Cat, D::_Cat) =
     blockcat([[A, B], [C_, D]])
 # dot: promote both sides to a common type, then the matching generated method
-function dot(a::_Cat, b::Union{_Cat,Real})
+function dot(a::_Cat, b::_CatArg)
     T = _catpromote((a, b))
     _restore(T, C.dot(_ascat(T, a), _ascat(T, b)))
 end
-dot(a::Real, b::_Cat) = dot(b, a)
+dot(a::Union{Real,AbstractArray{<:Real}}, b::_Cat) = dot(b, a)
 cross(a::T, b::T, dim::Integer...) where {T<:_Cat} = C.cross(a, b, dim...)
 # MATLAB-style backslash solve `A \ b` (linear solve), distinct from elementwise
-function Base.:\(a::_Cat, b::Union{_Cat,Real})
+function Base.:\(a::_Cat, b::_CatArg)
     T = _catpromote((a, b))
     _restore(T, C.solve(_ascat(T, a), _ascat(T, b)))
 end
+Base.:\(a::AbstractMatrix{<:Real}, b::_Cat) = convert(typeof(b), a) \ b
 
 # ---- Base math extensions (no shadowing: extend Base methods) ----
 for fn in (:sin, :cos, :tan, :exp, :log, :sqrt, :abs, :tanh, :sinh, :cosh,
@@ -335,7 +345,8 @@ Base.reshape(x::Union{SX,MX,DM}, nrow::Integer, ncol::Integer) = C.reshape(x, In
 Base.reshape(x::Union{SX,MX,DM}, dims::Tuple{Integer,Integer}) = C.reshape(x, Int(dims[1]), Int(dims[2]))
 
 # ---- functor: f(args...) like Python ----
-function (f::CasadiFunction)(args::Vararg{Union{Real,DM,SX,MX}})
+# Julia arrays pass through as-is: the wrapper converts them like DM (`[]` -> empty).
+function (f::CasadiFunction)(args::Vararg{Union{Real,DM,SX,MX,AbstractArray}})
     ins = Any[a isa Real ? C.DM(Float64(a)) : a for a in args]
     r = C.call(f, ins)
     Base.length(r) == 1 ? r[1] : Base.Tuple(r)
@@ -347,8 +358,7 @@ function (f::CasadiFunction)(; kwargs...)
         r = C.call(f, Any[])
         return Base.length(r) == 1 ? r[1] : Base.Tuple(r)
     end
-    C.call(f, Dict{String,Any}(Base.string(k) => (v isa Real ? C.DM(Float64(v)) :
-                                                  v isa AbstractVector{<:Real} ? C.DM(collect(Float64, v)) : v)
+    C.call(f, Dict{String,Any}(Base.string(k) => (v isa Real ? C.DM(Float64(v)) : v)
                                for (k, v) in kwargs))
 end
 
@@ -374,8 +384,8 @@ export interpolant, generate_dependencies
 for (op, fn) in ((:<, :lt), (:<=, :le), (:>=, :ge), (:(==), :eq))
     @eval begin
         Base.$op(a::T, b::T) where {T<:Union{SX,MX}} = C.$fn(a, b)
-        Base.$op(a::T, b::Union{Real,DM}) where {T<:Union{SX,MX}} = C.$fn(a, convert(T, b))
-        Base.$op(a::Union{Real,DM}, b::T) where {T<:Union{SX,MX}} = C.$fn(convert(T, a), b)
+        Base.$op(a::T, b::_Num) where {T<:Union{SX,MX}} = C.$fn(a, convert(T, b))
+        Base.$op(a::_Num, b::T) where {T<:Union{SX,MX}} = C.$fn(convert(T, a), b)
     end
 end
 
@@ -400,8 +410,7 @@ function _dm_native(d::DM)
 end
 value(sol, x) = _dm_native(C.value(sol, x, MX[]))
 export set_initial
-set_initial(o::Opti, x, v) =
-    C.set_initial(o, x, v isa Union{MX,DM} ? v : C.DM(Float64(v)))
+set_initial(o::Opti, x, v) = C.set_initial(o, x, v)
 
 # ---- 1-based indexing: Julia ranges -> casadi Slice (0-based stop-exclusive) ----
 # Reject i < 1 (Julia/MATLAB are 1-based; never Python-style negative wraparound).
@@ -559,7 +568,7 @@ end
 # A constructed Callback proxy is a casadi Function; evaluate it like one.
 # Pin the plain DM-vector call slot (the generated overloads collapse to one
 # Julia signature, last-wins picks the wrong dict form).
-function (cb::C.Callback)(args::Vararg{Union{Real,DM,SX,MX}})
+function (cb::C.Callback)(args::Vararg{Union{Real,DM,SX,MX,AbstractArray}})
     ins = Any[a isa Real ? C.DM(Float64(a)) : a for a in args]
     r = GC.@preserve cb C._check(ccall((:_swig_Function_Function_call__SWIG_0, C._lib),
             Any, (Any, Any, Any, Any), cb, ins, false, false))

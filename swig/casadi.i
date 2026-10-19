@@ -1355,6 +1355,17 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 #ifdef SWIGJULIA
+      if (!jl_is_array(p)) {
+        // Other AbstractVectors (ranges, views, ...): collect, then retry
+        jl_value_t* av = jl_get_global(jl_base_module, jl_symbol("AbstractVector"));
+        if (!av || !jl_isa(p, av)) return false;
+        jl_value_t* c = 0;
+        JL_GC_PUSH1(&c);
+        c = jl_call1(jl_get_function(jl_base_module, "collect"), p);
+        bool ok = c && jl_is_array(c) && to_ptr(c, m);
+        JL_GC_POP();
+        return ok;
+      }
       if (jl_is_array(p)) {
         jl_array_t* a = (jl_array_t*)p;
         size_t n = jl_array_len(a);
@@ -2329,6 +2340,45 @@ namespace std {
 
 %fragment("casadi_dmatrix", "header", fragment="casadi_aux") {
   namespace casadi {
+#ifdef SWIGJULIA
+    // Julia AbstractArray{<:Real} with at most two dimensions -> dense DM.
+    // A vector becomes a column, a matrix keeps its shape; ranges, adjoints,
+    // Int/Bool arrays go through convert(Array{Float64,N}, p), which is
+    // column-major just like DM.  An empty array of any eltype (e.g. `[]`)
+    // is an empty DM.
+    bool DM_from_julia_array(GUESTOBJECT *p, DM** m) {
+      jl_value_t* aa = jl_get_global(jl_base_module, jl_symbol("AbstractArray"));
+      if (!aa || !jl_isa(p, aa)) return false;
+      jl_value_t *et = 0, *sz = 0, *arr = 0, *atype = 0;
+      JL_GC_PUSH4(&et, &sz, &arr, &atype);
+      et = jl_call1(jl_get_function(jl_base_module, "eltype"), p);
+      sz = jl_call1(jl_get_function(jl_base_module, "size"), p);
+      size_t nd = sz && jl_is_tuple(sz) ? jl_nfields(sz) : 3;
+      bool ok = et && nd <= 2;
+      casadi_int dims[2] = {1, 1};
+      for (size_t i = 0; ok && i < nd; ++i) dims[i] = jl_unbox_int64(jl_fieldref(sz, i));
+      bool real = ok && jl_is_type(et)
+        && jl_subtype(et, jl_get_global(jl_base_module, jl_symbol("Real")));
+      if (ok && !real) {
+        // `[]` has eltype Any: accept it as an empty DM, reject anything else
+        ok = dims[0] * dims[1] == 0;
+        if (ok && m) **m = DM(0, 0);
+      } else if (ok && m) {
+        atype = jl_apply_array_type((jl_value_t*)jl_float64_type, nd);
+        arr = jl_call2(jl_get_function(jl_base_module, "convert"), atype, p);
+        jl_value_t* ptr = arr ? jl_call1(jl_get_function(jl_base_module, "pointer"), arr) : 0;
+        ok = ptr != 0;
+        if (ok) {
+          const double* d = static_cast<const double*>(jl_unbox_voidpointer(ptr));
+          **m = DM::zeros(dims[0], dims[1]);
+          std::copy(d, d + dims[0] * dims[1], (*m)->ptr());
+        }
+      }
+      JL_GC_POP();
+      return ok;
+    }
+#endif // SWIGJULIA
+
     bool to_ptr(GUESTOBJECT *p, DM** m) {
       // Treat Null
       if (is_null(p)) return false;
@@ -2357,6 +2407,10 @@ namespace std {
           return true;
         }
       }
+
+#ifdef SWIGJULIA
+      if (DM_from_julia_array(p, m)) return true;
+#endif // SWIGJULIA
 
 #ifdef SWIGPYTHON
       // Object has __DM__ method.  A returned None means "I am explicitly
@@ -3401,6 +3455,18 @@ class ArrayInterfaceMX(ArrayInterface[MX]):
 
 
 %julia_convention_repair()
+
+#ifdef SWIGJULIA
+// Julia argument annotations for the matrix types: a DM parameter takes
+// everything to_ptr(DM) converts from (numbers, Julia arrays, ranges), and SX/MX
+// parameters additionally take DM, as in Python.  The unions nest (DM-like is a
+// subset of SX-like and MX-like), so Julia's most-specific-method rule picks the
+// overload Python's typecheck precedence picks: fmax(x::MX, 0) -> MX,
+// fmax(DM, 0) -> DM, fmax(0, 0) -> double.
+%typemap(jlparam) casadi::Matrix<double>, const casadi::Matrix<double>& "Union{DM,Real,AbstractArray{<:Real}}"
+%typemap(jlparam) casadi::Matrix<casadi::SXElem>, const casadi::Matrix<casadi::SXElem>& "Union{SX,DM,Real,AbstractArray{<:Real}}"
+%typemap(jlparam) casadi::MX, const casadi::MX& "Union{MX,DM,Real,AbstractArray{<:Real}}"
+#endif // SWIGJULIA
 
 #ifdef SWIGWASMJS
 // ----------------------------------------------------------------------------
