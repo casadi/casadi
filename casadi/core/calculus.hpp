@@ -549,6 +549,8 @@ namespace casadi {
   template<>      struct CommChecker<OP_AND>{ static const bool check=true;};
   template<>      struct CommChecker<OP_OR>{ static const bool check=true;};
   template<>      struct CommChecker<OP_HYPOT>{ static const bool check=true;};
+  template<>      struct CommChecker<OP_FMIN>{ static const bool check=true;};
+  template<>      struct CommChecker<OP_FMAX>{ static const bool check=true;};
   ///@}
 
   ///@{
