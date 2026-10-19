@@ -194,7 +194,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief  Find next stop time
 
       \identifier{25b} */
-  casadi_int next_stop(casadi_int k, const double* u) const;
+  virtual casadi_int next_stop(casadi_int k, const double* u) const;
 
   /** \brief Linearize the zero crossing function
 

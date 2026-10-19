@@ -406,10 +406,11 @@ int Integrator::eval(const double** arg, double** res,
     m->t_next_out = tout_[m->k];
     // By default, integrate until the next output time
     m->t_next = m->t_next_out;
+    // Pass the controls of this interval, unchanged between stops unless next_stop ignores
+    // some of them
+    set_u(m, u);
     // Handle changes in control input
     if (m->k > k_stop) {
-      // Pass new controls
-      set_u(m, u);
       // Detect next stopping time
       k_stop = next_stop(m->k, u);
       m->t_stop = m->t_step = tout_[k_stop];
