@@ -801,6 +801,7 @@ void Integrator::init(const Dict& opts) {
   ntmp_ = nx_ + nz_;
   ntmp_ = std::max(ntmp_, nrx_ + nrz_);
   ntmp_ = std::max(ntmp_, ne_);
+  ntmp_ = std::max(ntmp_, nrq_ + nuq_);
 
   // Call the base class method
   OracleFunction::init(opts);

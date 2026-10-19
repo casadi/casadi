@@ -480,6 +480,17 @@ void IdasInterface::z_impulseB(IdasMemory* m, const double* adj_z) const {
   }
   // Add contribution to backward state
   casadi_axpy(nrx_, -1., m->tmp1, NV_DATA_S(m->v_adj_xz));
+  // Direct contribution: -adj_p = (df_alg/dp)^T * w, -adj_u = (df_alg/du)^T * w
+  if (nrq_ + nuq_ > 0) {
+    // quadB is linear in the seeds: evaluate with and without w to cancel the adj_quad term
+    for (double s : {-1., 1.}) {
+      if (calc_quadB(m, m->t, NV_DATA_S(m->v_xz), NV_DATA_S(m->v_xz) + nx_,
+          m->tmp2, s < 0 ? m->tmp2 + nrx_ : nullptr, m->tmp1, m->tmp1 + nrq_)) {
+        casadi_error("Adjoint seed propagation for backwards initial conditions failed");
+      }
+      casadi_axpy(nrq_ + nuq_, s, m->tmp1, NV_DATA_S(m->v_adj_pu));
+    }
+  }
 }
 
 void IdasInterface::impulseB(IntegratorMemory* mem,

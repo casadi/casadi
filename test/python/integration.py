@@ -1544,6 +1544,23 @@ class Integrationtests(casadiTestCase):
     self.assertTrue(integrator.get_function('jacF').is_a("SXFunction"))
     self.checkarray(integrator.get_function('jacF')(x=1)["jac_ode_x"],1)
 
+  @requires_integrator("idas")
+  def test_idas_adjoint_zf_p(self):
+    # issue #4063: direct dependence of zf on p and u in reverse mode
+    x = ca.MX.sym('x'); z = ca.MX.sym('z'); p = ca.MX.sym('p'); u = ca.MX.sym('u')
+    for alg in [z-p*x-u**2, z-p*x]:
+      for ode, grid in [(-x, [1]), (-x+u, [1])]:
+        dae = {'x':x,'z':z,'p':p,'u':u,'ode':ode,'alg':alg}
+        F = ca.integrator('F','idas',dae,0,grid,{'abstol':1e-12,'reltol':1e-12})
+        P = ca.MX.sym('P'); U = ca.MX.sym('U',1,len(grid))
+        out = F(x0=2,z0=0,p=P,u=U)
+        e = ca.vertcat(ca.vec(out['zf']), ca.vec(out['xf']))
+        w = ca.vertcat(P,ca.vec(U))
+        J_fwd = ca.Function('J_fwd',[w],[ca.jacobian(e,w,{"helper_options":{"ad_weight":0}})])
+        J_rev = ca.Function('J_rev',[w],[ca.jacobian(e,w,{"helper_options":{"ad_weight":1}})])
+        v = ca.DM([0.5,0.3,0.7][:1+len(grid)])
+        self.checkarray(J_fwd(v), J_rev(v), digits=6)
+
   @requires_integrator("cvodes")
   def test_jit_fwd_factory(self):
     # issue #4061
