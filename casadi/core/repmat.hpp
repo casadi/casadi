@@ -121,6 +121,10 @@ namespace casadi {
         \identifier{20s} */
     casadi_int op() const override { return OP_HORZREPMAT;}
 
+    /// Get the nonzeros of matrix
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+        bool unique=false) const override;
+
     casadi_int n_;
 
     /** \brief Serialize an object without type information

@@ -62,6 +62,15 @@ namespace casadi {
     res[0] = arg[0]->get_repmat(1, n_);
   }
 
+  MX HorzRepmat::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz,
+      bool unique) const {
+    // Each block holds the nonzeros of dep(0) in order: refer to those directly
+    casadi_int nnz = dep(0).nnz();
+    std::vector<casadi_int> nz_new(nz);
+    for (auto&& j : nz_new) if (j>=0) j %= nnz;
+    return dep(0)->get_nzref(sp, nz_new);
+  }
+
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
   int HorzRepmat::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {

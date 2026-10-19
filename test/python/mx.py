@@ -4400,6 +4400,20 @@ class MXtests(casadiTestCase):
         self.checkarray(f(A), V @ ca.diag(Dm) @ V.T, digits=8)  # pyright: ignore[reportCallIssue,reportArgumentType]
         if n<10: self.check_codegen(f,inputs=[A])
 
+  def test_repmat_slice(self):
+    # issue #4190
+    x = ca.MX.sym("x",2)
+    y = ca.repmat(x,1,2)
+    self.assertTrue((y[:,0]-y[:,1]).is_zero())
+    self.assertTrue(ca.is_equal(y[:,1], x))
+    xs = ca.SX.sym("x",2)
+    X = ca.MX.sym("X",ca.Sparsity.lower(2))
+    Xs = ca.SX.sym("X",ca.Sparsity.lower(2))
+    for a, b in [(x, xs), (X, Xs)]:
+      f = ca.Function("f",[a],[ca.repmat(a,1,3)[:,[2,0,1]], ca.repmat(a,1,3)[[1,0],[1,2]], ca.repmat(a,1,3).nz[[5,0,2,1]]])
+      f_ref = ca.Function("f",[b],[ca.repmat(b,1,3)[:,[2,0,1]], ca.repmat(b,1,3)[[1,0],[1,2]], ca.repmat(b,1,3).nz[[5,0,2,1]]])
+      self.checkfunction(f,f_ref,inputs=[ca.DM(np.random.random(a.nnz()))] if a.is_dense() else [ca.DM(a.sparsity(),np.random.random(a.nnz()))])
+
   def test_logsumexp(self):
     x = ca.MX.sym("x",3)
 
