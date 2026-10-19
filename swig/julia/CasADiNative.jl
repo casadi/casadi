@@ -7,6 +7,7 @@ include(joinpath(@__DIR__, "casadi.jl"))
 using .casadi
 
 const C = casadi
+import LinearAlgebra: dot, cross
 export SX, MX, DM, Sparsity, sym, nlpsol, vertcat, jacobian, hessian
 # P1-3: high-value builders that live as C.* but were unreachable via `using`
 # (`reshape` is deliberately NOT exported: we extend Base.reshape, so a bare
@@ -16,7 +17,7 @@ export horzcat, blockcat, diagcat, sum1, sum2, repmat, dot, cross,
     qpsol, conic, integrator, rootfinder, CodeGenerator, codegen,
     external, generate, save
 # horzcat/vertcat/blockcat/diagcat/dot/gradient get typed/convenience wrappers below
-for _n in (:sum1, :sum2, :repmat, :reshape, :cross, :mtimes, :jtimes,
+for _n in (:sum1, :sum2, :repmat, :reshape, :mtimes, :jtimes,
            :substitute, :simplify)
     @eval const $_n = C.$_n
 end
@@ -172,10 +173,12 @@ end
 blockcat(A::_Cat, B::_Cat, C_::_Cat, D::_Cat) =
     blockcat([[A, B], [C_, D]])
 # dot: promote both sides to a common type, then the matching generated method
-function dot(a::Union{_Cat,Real}, b::Union{_Cat,Real})
+function dot(a::_Cat, b::Union{_Cat,Real})
     T = _catpromote((a, b))
     _restore(T, C.dot(_ascat(T, a), _ascat(T, b)))
 end
+dot(a::Real, b::_Cat) = dot(b, a)
+cross(a::T, b::T, dim::Integer...) where {T<:_Cat} = C.cross(a, b, dim...)
 # MATLAB-style backslash solve `A \ b` (linear solve), distinct from elementwise
 function Base.:\(a::_Cat, b::Union{_Cat,Real})
     T = _catpromote((a, b))

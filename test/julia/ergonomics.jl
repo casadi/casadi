@@ -175,6 +175,14 @@ end
     end
 end
 
+import LinearAlgebra
+@testset "dot/cross extend LinearAlgebra" begin
+    @test dot === LinearAlgebra.dot && cross === LinearAlgebra.cross
+    @test dot([1, 2], [3, 4]) == 11
+    @test Float64(dot(DM([1.0, 2.0]), DM([3.0, 4.0]))) == 11.0
+    @test Vector{Float64}(cross(DM([1.0, 0.0, 0.0]), DM([0.0, 1.0, 0.0]))) == [0.0, 0.0, 1.0]
+end
+
 @testset "no method ambiguities introduced (R3)" begin
     @test Base.isempty(Test.detect_ambiguities(CasADiNative; recursive=false))
 end
