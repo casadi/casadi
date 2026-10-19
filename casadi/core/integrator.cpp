@@ -1736,9 +1736,11 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     // Split input and seeds by grid points, if necessary
     std::vector<MX> ret_in_split;
     std::vector<std::vector<MX>> aug_in_split(nadj);
-    if (size1_in(i) > 0 && grid_in(i) && n_grid > 1) {
-      // Split nondifferentiated input by grid point
-      ret_in_split = horzsplit_n(ret_in[i], nt());
+    if (grid_in(i) && n_grid > 1) {
+      // Split nondifferentiated input by grid point; it is empty without a backward problem,
+      // but the seeds still need to be ordered by grid point
+      ret_in_split = ret_in[i].size2() > 0 ? horzsplit_n(ret_in[i], nt())
+        : std::vector<MX>(nt(), MX(size1_in(i), 0));
       // Split augmented input by grid point
       for (casadi_int d = 0; d < nadj; ++d) {
         aug_in_split[d] = horzsplit_n(aug_in[j][d], nt());

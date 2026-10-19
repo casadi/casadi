@@ -1667,5 +1667,27 @@ class Integrationtests(casadiTestCase):
     ]
     cross_check(Iadj, base, seeds, "fwd-of-reverse-of-collocation")
 
+  def test_reverse_grid_directions(self):
+    self.message("Several adjoint directions with several output times")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -p*x[0]**3), "quad": x[0]**2}
+    for plugin, opts in [("cvodes", {"reltol": 1e-10, "abstol": 1e-10}),
+                         ("idas", {"reltol": 1e-10, "abstol": 1e-10})]:
+      if not ca.has_integrator(plugin): continue
+      F = ca.integrator("F", plugin, dae, 0, [0.5, 1.0], opts)
+      inputs = [ca.DM([0.3, -0.2]), ca.DM(), ca.DM(0.7), ca.DM(1, 0)]
+      inputs += [ca.DM(F.sparsity_in(i)) for i in range(4, F.n_in())]
+      outputs = list(F(*inputs))
+      seeds = [[ca.DM(F.sparsity_out(i), numpy.random.default_rng(10*d+i).random(F.nnz_out(i)))
+                for i in range(F.n_out())] for d in range(2)]
+      adj2 = F.reverse(2)(*(inputs + outputs + [ca.horzcat(seeds[0][i], seeds[1][i])
+                                               for i in range(F.n_out())]))
+      for d in range(2):
+        adj1 = F.reverse(1)(*(inputs + outputs + seeds[d]))
+        for i in range(F.n_in()):
+          if F.nnz_in(i) == 0: continue
+          self.checkarray(adj1[i], ca.horzsplit_n(adj2[i], 2)[d], plugin, digits=8)
+
 if __name__ == '__main__':
     unittest.main()
