@@ -133,6 +133,9 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
+    // Bonmin returns no multipliers (lam is NaN): skip post-solve lam_x/lam_p
+    calc_lam_x_ = calc_lam_p_ = false;
+
     // Default options
     pass_nonlinear_variables_ = true;
     pass_nonlinear_constraints_ = true;
