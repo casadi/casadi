@@ -231,6 +231,7 @@ namespace casadi {
       // User interrupt
       InterruptHandler::check();
     }
+    m->d_qp.iter_count = d.iter;
     // Check return flag
     switch (d.status) {
       case QP_SUCCESS:
@@ -325,6 +326,7 @@ namespace casadi {
     }
     g << "}\n";
 
+    g << "d_qp.iter_count = d.iter;\n";
     g.comment("Get solution");
     g.copy_check("&d.f", 1, g.res(CONIC_COST), false, true);
     g.copy_check("d.z", nx_, g.res(CONIC_X), false, true);
