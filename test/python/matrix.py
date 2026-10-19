@@ -1072,6 +1072,11 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("CasADi matrices are not iterable"):
       iter(a)
 
+    # issue #2756: iteration protocol expects TypeError for non-iterables
+    for x in [a, ca.SX.sym("x",2), ca.MX.sym("x",2)]:
+      with self.assertRaises(TypeError):
+        iter(x)
+
   def test_from_file(self):
     a = ca.sparsify(ca.DM([[1,0,-6,5,0],[4,0,-4e-301,9.3e-18,0]]))
 

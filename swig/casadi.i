@@ -4103,7 +4103,7 @@ class NZproxy:
           return self.get(False, s)
 
     def __iter__(self):
-      raise Exception("""CasADi matrices are not iterable by design.
+      raise TypeError("""CasADi matrices are not iterable by design.
                       Did you mean to iterate over m.nz, with m IM/DM/SX?
                       Did you mean to iterate over horzsplit(m,1)/vertsplit(m,1) with m IM/DM/SX/MX?
                       Did you expect numpy behaviour (looping over rows)? Use ca.array().
