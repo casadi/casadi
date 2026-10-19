@@ -430,6 +430,7 @@ namespace casadi {
   #include "casadi_qrqp.hpp"
   #include "casadi_kkt.hpp"
   #include "casadi_ipqp.hpp"
+  #include "casadi_rosenbrock.hpp"
   #include "casadi_oracle.hpp"
   #include "casadi_nlp.hpp"
   #include "casadi_sqpmethod.hpp"

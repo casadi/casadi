@@ -1820,6 +1820,21 @@ namespace casadi {
 
       this->auxiliaries << sanitize_source(casadi_qrqp_str, inst);
       break;
+    case AUX_ROSENBROCK:
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_AXPY);
+      add_auxiliary(AUX_SCAL);
+      add_auxiliary(AUX_CLEAR);
+      add_auxiliary(AUX_MV);
+      add_auxiliary(AUX_MV_DENSE);
+      add_auxiliary(AUX_RANK1);
+      add_auxiliary(AUX_QR);
+      add_auxiliary(AUX_FMIN);
+      add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_FABS);
+      add_include("math.h");
+      this->auxiliaries << sanitize_source(casadi_rosenbrock_str, inst);
+      break;
     case AUX_NLP:
       add_auxiliary(AUX_ORACLE);
       this->auxiliaries << sanitize_source(casadi_nlp_str, inst);

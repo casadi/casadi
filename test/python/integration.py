@@ -62,6 +62,8 @@ integrators.append(("collocation",["dae","ode"],{"rootfinder":"newton","number_o
 
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000,"simplify":True}))
 
+integrators.append(("rosenbrock",["dae","ode"],{"abstol": 1e-12,"reltol":1e-12}))
+
 
 print("Will test these integrators:")
 for cl, t, options in integrators:
@@ -1642,7 +1644,8 @@ class Integrationtests(casadiTestCase):
     p = ca.SX.sym("p")
     dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -p*x[0]**3), "quad": x[0]**2}
     for plugin, opts in [("cvodes", {"reltol": 1e-10, "abstol": 1e-10}),
-                         ("idas", {"reltol": 1e-10, "abstol": 1e-10})]:
+                         ("idas", {"reltol": 1e-10, "abstol": 1e-10}),
+                         ("rosenbrock", {"fixed_steps": 4})]:
       if not ca.has_integrator(plugin): continue
       F = ca.integrator("F", plugin, dae, 0, [0.5, 1.0], opts)
       inputs = [ca.DM([0.3, -0.2]), ca.DM(), ca.DM(0.7), ca.DM(1, 0)]
@@ -1667,7 +1670,8 @@ class Integrationtests(casadiTestCase):
     rng = numpy.random.default_rng(1)
     rand = lambda sp: ca.DM(sp, rng.random(sp.nnz()))
     for plugin, opts, digits in [("cvodes", {"reltol": 1e-12, "abstol": 1e-12}, 7),
-                                 ("idas", {"reltol": 1e-12, "abstol": 1e-12}, 7)]:
+                                 ("idas", {"reltol": 1e-12, "abstol": 1e-12}, 7),
+                                 ("rosenbrock", {"fixed_steps": 6}, 12)]:
       if not ca.has_integrator(plugin): continue
       for grid in [[1.0], [0.5, 1.0]]:
         F = ca.integrator("F", plugin, dae, 0, grid, opts)
@@ -1690,13 +1694,127 @@ class Integrationtests(casadiTestCase):
               self.checkarray(adj[i], ca.horzsplit_n(adj2[i], 2)[d], plugin, digits=digits)
         # Jacobian, relying on the sparsity pattern, vs dense forward directional derivatives
         vin = ca.MX.sym("v", sum(B.nnz_in(i) for i in range(B.n_in())))
-        args = ca.vertsplit(vin, list(numpy.cumsum([0] + [B.nnz_in(i) for i in range(B.n_in())])))
+        args = ca.vertsplit(vin, [int(e) for e in numpy.cumsum([0] + [B.nnz_in(i) for i in range(B.n_in())])])
         res = B(*[ca.MX(B.sparsity_in(i), args[i]) for i in range(B.n_in())])
         vout = ca.vertcat(*[ca.vec(r.nz[:]) for r in res])
         J = ca.Function("J", [vin], [ca.jacobian(vout, vin),
                                      ca.jtimes(vout, vin, ca.MX.eye(vin.numel()))])
         J_sp, J_dense = J(numpy.concatenate([e.nonzeros() for e in inputs]))
         self.checkarray(J_dense, J_sp, plugin + " sparsity", digits=digits)
+
+  def test_rosenbrock_order(self):
+    self.message("rosenbrock: order 5 on fixed meshes, ODE and index-1 DAE")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    dae = {"t": t, "x": x, "z": z, "ode": ca.vertcat(-z + 0.5*x[1], -x[0]*z + ca.sin(t)),
+           "alg": z**3 + z - x[0]**2*(1 + 0.5*ca.cos(t)), "quad": z*x[1]}
+    ref = ca.integrator("ref", "idas", dae, 0, 2, {"reltol": 1e-14, "abstol": 1e-14})(x0=[1, 0.5], z0=0.6)
+    err = []
+    for N in [8, 16, 32]:
+      F = ca.integrator("F", "rosenbrock", dae, 0, 2, {"fixed_steps": N})
+      r = F(x0=[1, 0.5], z0=0.6)
+      err.append(max(float(ca.norm_inf(r[k] - ref[k])) for k in ["xf", "zf", "qf"]))
+    for e0, e1 in zip(err[:-1], err[1:]):
+      self.assertGreater(numpy.log2(e0/e1), 4.6)
+
+  def test_rosenbrock_ind(self):
+    self.message("rosenbrock: derivatives are exact derivatives of the adaptive scheme")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p", 2)
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "z": z, "p": p, "u": u,
+           "ode": ca.vertcat(-z + p[0]*x[1] + u, -x[0]*z + p[1]*ca.sin(t)),
+           "alg": z**3 + z - x[0]**2*(1 + 0.5*ca.cos(t)), "quad": z*x[1] + p[1]*x[0]**2}
+    # Including an output at t0, with a seed on the consistent algebraic state there
+    for grid in [[0.5, 1, 2], [0, 1, 2]]:
+      F = ca.integrator("F", "rosenbrock", dae, 0, grid, {"reltol": 1e-6, "abstol": 1e-6})
+      v = ca.MX.sym("v", 7)
+      r = F(x0=v[:2], z0=0.5, p=v[2:4], u=v[4:].T)
+      out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["zf"]), ca.vec(r["qf"]))
+      obj = ca.sumsqr(out)
+      v0 = [1, 0.5, 0.5, 0.3, 0.1, -0.2, 0.3]
+      # Forward and adjoint sensitivities agree to machine precision
+      J_fwd = ca.Function("J", [v], [ca.jtimes(out, v, ca.MX.eye(7))])(v0)
+      J_adj = ca.Function("J", [v], [ca.jtimes(out, v, ca.MX.eye(out.numel()), True).T])(v0)
+      self.checkarray(J_fwd, J_adj, "fwd vs adj", digits=12)
+      # Second order: forward-over-forward, forward-over-adjoint, adjoint-over-forward
+      g_fwd = ca.jtimes(obj, v, ca.MX.eye(7)).T
+      g_adj = ca.jtimes(obj, v, ca.MX.ones(1, 1), True)
+      H = [ca.Function("H", [v], [h])(v0) for h in [ca.jtimes(g_fwd, v, ca.MX.eye(7)),
+           ca.jtimes(g_adj, v, ca.MX.eye(7)), ca.jtimes(g_fwd, v, ca.MX.eye(7), True).T]]
+      for h in H[1:]: self.checkarray(H[0], h, "Hessian", digits=12)
+      self.checkarray(H[0], H[0].T, "Hessian symmetry", digits=12)
+
+  def test_rosenbrock_dense_output(self):
+    self.message("rosenbrock: outputs inside steps")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p", 2)
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "z": z, "p": p, "u": u,
+           "ode": ca.vertcat(-z + p[0]*x[1] + u, -x[0]*z + p[1]*ca.sin(t)),
+           "alg": z**3 + z - x[0]**2*(1 + 0.5*ca.cos(t)) - u, "quad": z*x[1] + p[1]*x[0]**2}
+    ode = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1] + p[0]*u, -p[1]*x[0] + ca.sin(t)),
+           "quad": x[0]*x[1]**2}
+    for sys, ref_plugin in [(ode, "cvodes"), (dae, "idas")]:
+      if not ca.has_integrator(ref_plugin): continue
+      args = {"x0": [1, 0.5], "p": [0.5, 0.3]}
+      # Consistent z0 for the reference: z^3 + z = 1.5 x0^2 - u
+      if "z" in sys: args["z0"] = float(min(numpy.roots([1, 0, 1, -1.3]), key=lambda r: abs(r.imag)).real)
+      # The number of steps does not depend on the number of outputs, accuracy inside steps
+      n_steps = []
+      for grid in [[2.], list(numpy.linspace(0.002, 2, 1000))]:
+        F = ca.integrator("F", "rosenbrock", sys, 0, grid, {"reltol": 1e-6, "abstol": 1e-6})
+        r = F(u=0.2, **args)
+        n_steps.append(F.stats()["n_steps"])
+        ref = ca.integrator("ref", ref_plugin, sys, 0, grid,
+          {"reltol": 1e-10, "abstol": 1e-10})(u=0.2, **args)
+        for k in ["xf", "zf", "qf"]:
+          self.checkarray(ref[k], r[k], k, digits=5)
+      self.assertTrue(n_steps[1] <= n_steps[0] + 2)
+      # Derivatives are exact, with constant controls and with a step in the controls
+      grid = [0.13, 0.31, 0.37, 0.52, 0.9, 1.15, 1.2, 1.71, 2.0]
+      for u0 in [[0.1] * 9, [0.1] * 4 + [0.3] * 5]:
+        F = ca.integrator("F", "rosenbrock", sys, 0, grid, {"reltol": 1e-6, "abstol": 1e-6})
+        v = ca.MX.sym("v", 13)
+        r = F(x0=v[:2], z0=0.5, p=v[2:4], u=v[4:].T) if "z" in sys else F(x0=v[:2], p=v[2:4],
+          u=v[4:].T)
+        out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["zf"]), ca.vec(r["qf"]))
+        v0 = [1, 0.5, 0.5, 0.3] + u0
+        J_fwd = ca.Function("J", [v], [ca.jtimes(out, v, ca.MX.eye(13))])(v0)
+        J_adj = ca.Function("J", [v], [ca.jtimes(out, v, ca.MX.eye(out.numel()), True).T])(v0)
+        self.checkarray(J_fwd, J_adj, "fwd vs adj", digits=12)
+        obj = ca.sumsqr(out)
+        g_fwd = ca.jtimes(obj, v, ca.MX.eye(13)).T
+        g_adj = ca.jtimes(obj, v, ca.MX.ones(1, 1), True)
+        H = [ca.Function("H", [v], [h])(v0) for h in [ca.jtimes(g_fwd, v, ca.MX.eye(13)),
+             ca.jtimes(g_adj, v, ca.MX.eye(13)), ca.jtimes(g_fwd, v, ca.MX.eye(13), True).T]]
+        for h in H[1:]: self.checkarray(H[0], h, "Hessian", digits=11)
+
+  def test_rosenbrock_codegen(self):
+    self.message("rosenbrock: code generation, including derivatives")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(x[1], -p*z), "alg": z**3 + z - x[0],
+           "quad": x[0]**2}
+    for opts, grid in [({"reltol": 1e-8, "abstol": 1e-8, "max_tape_steps": 1000}, [0.5, 1]),
+                       ({"fixed_steps": 10}, [0.5, 1]),
+                       ({"reltol": 1e-6, "abstol": 1e-6, "max_tape_steps": 1000},
+                        list(numpy.linspace(0.07, 1, 15)))]:
+      F = ca.integrator("F", "rosenbrock", dae, 0, grid, opts)
+      v = ca.MX.sym("v", 3)
+      r = F(x0=v[:2], p=v[2])
+      obj = ca.sumsqr(r["xf"]) + ca.sumsqr(r["qf"])
+      outs = [r["xf"], r["zf"], r["qf"], ca.gradient(obj, v)]
+      # Forward over forward: steps replayed from a nominal integration
+      if len(grid) > 2: outs.append(ca.jtimes(ca.jtimes(obj, v, ca.MX.eye(3)).T, v, ca.MX.eye(3)))
+      G = ca.Function("G", [v], outs)
+      self.check_codegen(G, inputs=[ca.DM([0.4, -0.3, 2])], digits=12)
 
 if __name__ == '__main__':
     unittest.main()

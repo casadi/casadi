@@ -26,6 +26,12 @@ casadi_plugin(Integrator rk
   runge_kutta_meta.cpp)
 
 # Collocation integrator
+casadi_plugin(Integrator rosenbrock
+  rosenbrock.hpp
+  rosenbrock_tableau.hpp
+  rosenbrock.cpp
+  rosenbrock_meta.cpp)
+
 casadi_plugin(Integrator collocation
   collocation.hpp
   collocation.cpp
