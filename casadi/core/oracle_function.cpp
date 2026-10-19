@@ -362,6 +362,8 @@ calc_function(OracleMemory* m, const std::string& fcn,
       if (monitored) casadi_message(name_ + ":" + fcn + " failed");
       return 1;
     }
+  } catch(KeyboardInterruptException&) {
+    throw;
   } catch(std::exception& ex) {
     // Fatal error: Generate stack trace
     casadi_error("Error in " + name_ + ":" + fcn + ":" + std::string(ex.what()));
