@@ -185,8 +185,11 @@ class Daebuildertests(casadiTestCase):
             self.assertEqual(dae.u(), ["u"])
             self.assertEqual(dae.y(), ["y"])
             self.assertEqual(dae.w(), ["dx", "y"])
-            self.assertEqual(dae.all("t"), [] if time_position is None else [time_name])
+            # issue #3304: without an independent variable, time is implicitly present
+            self.assertEqual(dae.all("t"), ["time"] if time_position is None else [time_name])
             self.assertEqual(dae.der(), ["dx"])
+            dae = ca.DaeBuilder("test", directory, {"ignore_time": True})
+            self.assertEqual(dae.all("t"), [])
 
   @memory_heavy() # FMU has a memleak
   def test_indendent_var(self):
