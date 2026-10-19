@@ -2,6 +2,17 @@ message("WORHP: find via CONFIG")
 find_package(WORHP CONFIG NO_CMAKE_FIND_ROOT_PATH)
 message("WORHP: ${WORHP_FOUND}")
 
+# WORHP >= 1.16-2 ships its own config exporting WORHP::WORHP
+if(WORHP_FOUND AND NOT TARGET worhp::worhp)
+  if(TARGET WORHP::WORHP)
+    add_library(worhp::worhp INTERFACE IMPORTED)
+    target_link_libraries(worhp::worhp INTERFACE WORHP::WORHP)
+  else()
+    message(STATUS "WORHP config at ${WORHP_DIR} does not define worhp::worhp or WORHP::WORHP, searching manually")
+    set(WORHP_FOUND FALSE)
+  endif()
+endif()
+
 if(NOT WORHP_FOUND)
 
     # TRY TO FIND THE INCLUDE DIRECTORY
