@@ -899,6 +899,23 @@ class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
           opti.subject_to(ca.vertcat(1,2,3)==x[0])
 
 
+    def test_parametric_constraint(self):
+        # issue #3837
+        opti = ca.Opti()
+        x = opti.variable()
+        p = opti.parameter()
+        opti.set_value(p, -1)
+        opti.minimize((x-1)**2)
+        for c in [p<=0, -ca.inf<=(p<=0), -1<=(p<=0)]:
+          with self.assertInException("Constraint must contain decision variables."):
+            opti.subject_to(c)
+        # A rejected constraint leaves the stack intact
+        opti.subject_to(x<=p+3)
+        opti.solver(nlpsolver,nlpsolver_options)
+        sol = opti.solve()
+        self.checkarray(sol.value(x), 1, digits=6)
+        self.assertEqual(opti.ng, 1)
+
     def test_value(self):
         opti = ca.Opti()
         x = opti.variable()

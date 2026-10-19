@@ -1089,6 +1089,7 @@ MetaCon OptiNode::canon_expr(const MX& expr, const DM& linear_scale) const {
       // Fall through to generic inequalities
     } else if (args.size()==3 && parametric[0] && parametric[2]) {
       // lb(p) <= g(x,p) <= ub(p)
+      casadi_assert(!parametric[1], "Constraint must contain decision variables.");
       con.type = OPTI_DOUBLE_INEQUALITY;
       con.lb = args[0]*DM::ones(args[1].sparsity());
       con.ub = args[2]*DM::ones(args[1].sparsity());
@@ -1206,7 +1207,6 @@ void OptiNode::minimize(const MX& f, double linear_scale) {
 void OptiNode::subject_to(const MX& g, const DM& linear_scale, const Dict& options) {
   assert_only_opti_nondual(g);
   mark_problem_dirty();
-  g_.push_back(g);
 
   casadi_assert(!g.is_empty(),    "You passed an empty expression to `subject_to`. "
                                   "Make sure the number of rows and columns is non-zero. "
@@ -1220,6 +1220,7 @@ void OptiNode::subject_to(const MX& g, const DM& linear_scale, const Dict& optio
   // Store the meta-data
   set_meta_con(g, canon_expr(g, linear_scale));
   register_dual(meta_con(g));
+  g_.push_back(g);
 
   for (auto && it : options) {
     if (it.first=="stacktrace") {
