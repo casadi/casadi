@@ -795,6 +795,7 @@ namespace casadi {
       << "    sp = " << f.name() << "_sparsity_out(ii);\n\n"
       << "    /* Check if output is dense (sp[2]=1) or sparse (sp[2]=0) */\n"
       << "    if (sp[2]==0) {\n"
+      << "      for (jj=0; jj<sp[0]*sp[1]; ++jj) y[ii][jj] = 0;\n"
       << "      jj_total = 0;\n"
       << "      ind_start_row_index = 2 + sp[1] + 1;\n\n"
       << "      /* Distribute nonzero elements column by column */\n"
@@ -812,7 +813,7 @@ namespace casadi {
       << "      }\n"
       << "    }\n"
       << "    else {\n"
-      << "      y[ii] = res[ii];\n"
+      << "      for (jj=0; jj<sp[0]*sp[1]; ++jj) y[ii][jj] = res[ii][jj];\n"
       << "    }\n"
       << "  }\n"
       << "}\n\n\n";
