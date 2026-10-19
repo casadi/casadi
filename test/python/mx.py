@@ -4387,6 +4387,19 @@ class MXtests(casadiTestCase):
           self.checkarray(A,Ac,digits=8)
 
 
+  def test_convexify_large(self):
+    # issue #3169: blocks beyond 100 overflowed fixed-size work arrays
+    np.random.seed(1)
+    for n in [3, 120]:
+      B = np.random.randn(n,n)
+      A = ca.DM(B+B.T)
+      [D,V] = np.linalg.eigh(np.array(A))
+      As = ca.MX.sym("As",A.sparsity())
+      for strategy, Dm in [("eigen-reflect",ca.fmax(abs(D),1e-7)), ("eigen-clip",ca.fmax(D,1e-7))]:  # pyright: ignore[reportCallIssue,reportArgumentType]
+        f = ca.Function("f",[As],[ca.convexify(As,{"strategy":strategy,"max_iter_eig":2000})])
+        self.checkarray(f(A), V @ ca.diag(Dm) @ V.T, digits=8)  # pyright: ignore[reportCallIssue,reportArgumentType]
+        if n<10: self.check_codegen(f,inputs=[A])
+
   def test_logsumexp(self):
     x = ca.MX.sym("x",3)
 
