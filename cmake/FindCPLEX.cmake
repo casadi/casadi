@@ -63,6 +63,11 @@ message("CPLEX: find via CONFIG")
 find_package(CPLEX CONFIG NO_CMAKE_FIND_ROOT_PATH)
 message("CPLEX: ${CPLEX_FOUND}")
 
+if(CPLEX_FOUND AND NOT TARGET cplex::cplex)
+  message(STATUS "CPLEX config at ${CPLEX_DIR} does not define cplex::cplex, searching manually")
+  set(CPLEX_FOUND FALSE)
+endif()
+
 if(NOT CPLEX_FOUND)
 
       if( "$ENV{CPLEX}" STREQUAL "" )
