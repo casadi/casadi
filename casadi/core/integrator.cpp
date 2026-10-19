@@ -1252,7 +1252,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       }
 
       // Update tmp2
-      std::copy_n(adj_x, nx_, tmp2);
+      std::copy_n(adj_x, nrx_, tmp2);
     }
 
     // Get adj_x0 at initial time
@@ -1627,9 +1627,9 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
       v = aug_in[i];
       v.insert(v.begin(), ret_in[i]);
     }
-    // Flatten all elements
+    // Flatten all elements; blocks of adjoint seeds have one column per adjoint direction
     for (MX& e : v) e = vec(e);
-    integrator_in[i] = horzcat(v);
+    integrator_in[i] = reshape(vertcat(v), aug_int.size_in(i));
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
@@ -1683,6 +1683,12 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   // Get the current oracle, augmented with any existing forward sensitivity equations
   Function this_dae = augmented_dae();
 
+  // With a backward problem, reformulate as forward-over-reverse: one forward direction
+  // (d, a) for each adjoint seed d and adjoint direction a of this integrator
+  casadi_int na = nrx_ == 0 ? 1 : nadj_;
+  casadi_assert(na == 1 || nfwd_ == 0, "Reverse mode of forward sensitivities of an integrator "
+    "with several adjoint directions is not implemented");
+
   // Create integrator for augmented DAE
   std::string aug_prefix = "asens" + str(nadj) + "_";
   aug_opts["derivative_of"] = self();
@@ -1692,7 +1698,7 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     aug_opts["nfwd"] = 0;
   } else {
     // Reformulate as forward-over-reverse
-    aug_opts["nfwd"] = nadj;
+    aug_opts["nfwd"] = nadj * na;
     aug_opts["nadj"] = nadj_;
   }
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
@@ -1758,7 +1764,17 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     for (casadi_int k = 0; k < ret_in_split.size(); ++k) {
       v.push_back(ret_in_split.at(k));
       for (casadi_int d = 0; d < nadj; ++d) {
-        v.push_back(aug_in_split[d].at(k));
+        if (na == 1) {
+          v.push_back(aug_in_split[d].at(k));
+        } else if (i < INTEGRATOR_ADJ_XF) {
+          // Seed of an adjoint output: direction (d, a) gets the part of adjoint direction a
+          for (const MX& e : vertsplit_n(aug_in_split[d].at(k), na)) v.push_back(e);
+        } else {
+          // Seed of a forward output: first adjoint direction of (d, 0) only, counted once
+          casadi_int n = numel_in(i) / n_grid, n_seed = aug_in_split[d].at(k).numel();
+          v.push_back(vertcat(aug_in_split[d].at(k), MX(n - n_seed, 1)));
+          for (casadi_int a = 1; a < na; ++a) v.push_back(MX(n, 1));
+        }
       }
     }
     integrator_in[i] = reshape(vertcat(v), aug_int.size_in(i));
@@ -1772,11 +1788,12 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     casadi_int j = adjmap_out(i);
     // Split return by grid points and sensitivities
     casadi_int n_grid = grid_out(j) ? nt() : 1;
+    casadi_int n_dir = nadj * na, n_block = (na == 1 ? numel_in(i) : numel_out(j)) / n_grid;
     std::vector<casadi_int> offset = {0};
     for (casadi_int k = 0; k < n_grid; ++k) {
       offset.push_back(offset.back() + numel_out(j) / n_grid);
-      for (casadi_int d = 0; d < nadj; ++d) {
-        offset.push_back(offset.back() + numel_in(i) / n_grid);
+      for (casadi_int d = 0; d < n_dir; ++d) {
+        offset.push_back(offset.back() + n_block);
       }
     }
     std::vector<MX> integrator_out_split = vertsplit(vec(integrator_out[j]), offset);
@@ -1785,8 +1802,24 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     ret_out_split.reserve(n_grid * nadj);
     for (casadi_int d = 0; d < nadj; ++d) {
       for (casadi_int k = 0; k < n_grid; ++k) {
-        ret_out_split.push_back(reshape(integrator_out_split.at((nadj + 1) * k + d + 1),
-          size1_in(i), size2_in(i) / n_grid));
+        // Block of direction (d, a)
+        auto block = [&](casadi_int a) -> MX {
+          return integrator_out_split.at((n_dir + 1) * k + d * na + a + 1);
+        };
+        MX s;
+        if (na == 1) {
+          s = block(0);
+        } else if (i < INTEGRATOR_ADJ_XF) {
+          // Adjoint output: sum of the parts of adjoint direction a over directions (d, a)
+          s = MX(numel_in(i) / n_grid, 1);
+          for (casadi_int a = 0; a < na; ++a) s += vertsplit_n(block(a), na).at(a);
+        } else {
+          // Forward output: direction (d, a) gives the part of adjoint direction a
+          std::vector<MX> parts;
+          for (casadi_int a = 0; a < na; ++a) parts.push_back(block(a));
+          s = vertcat(parts);
+        }
+        ret_out_split.push_back(reshape(s, size1_in(i), size2_in(i) / n_grid));
       }
     }
     ret_out.push_back(horzcat(ret_out_split));

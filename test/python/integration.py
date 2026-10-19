@@ -1658,5 +1658,45 @@ class Integrationtests(casadiTestCase):
           if F.nnz_in(i) == 0: continue
           self.checkarray(adj1[i], ca.horzsplit_n(adj2[i], 2)[d], plugin, digits=8)
 
+  def test_reverse_over_adjoint_directions(self):
+    self.message("Derivatives of adjoint sensitivities with several directions (#3293)")
+    x = ca.SX.sym("x", 3)
+    p = ca.SX.sym("p", 2)
+    dae = {"x": x, "p": p, "ode": ca.vertcat(-p[0]*x[0], -p[1]*x[1]*x[0], -p[1]*x[2]**2),
+           "quad": x[0]*x[2]}
+    rng = numpy.random.default_rng(1)
+    rand = lambda sp: ca.DM(sp, rng.random(sp.nnz()))
+    for plugin, opts, digits in [("cvodes", {"reltol": 1e-12, "abstol": 1e-12}, 7),
+                                 ("idas", {"reltol": 1e-12, "abstol": 1e-12}, 7)]:
+      if not ca.has_integrator(plugin): continue
+      for grid in [[1.0], [0.5, 1.0]]:
+        F = ca.integrator("F", plugin, dae, 0, grid, opts)
+        # Adjoint sensitivities with two directions, and their derivatives
+        B = F.reverse(2)
+        inputs = [rand(B.sparsity_in(i)) for i in range(B.n_in())]
+        outputs = list(B(*inputs))
+        v = [rand(B.sparsity_in(i)) for i in range(B.n_in())]
+        w = [[rand(B.sparsity_out(i)) for i in range(B.n_out())] for d in range(2)]
+        fwd = B.forward(1)(*(inputs + outputs + v))
+        adj2 = B.reverse(2)(*(inputs + outputs + [ca.horzcat(w[0][i], w[1][i])
+                                                 for i in range(B.n_out())]))
+        for d in range(2):
+          adj = B.reverse(1)(*(inputs + outputs + w[d]))
+          self.checkarray(sum(float(ca.dot(w[d][i], fwd[i])) for i in range(B.n_out())),
+                          sum(float(ca.dot(adj[i], v[i])) for i in range(B.n_in())),
+                          plugin + " duality", digits=digits)
+          for i in range(B.n_in()):
+            if B.nnz_in(i) > 0:
+              self.checkarray(adj[i], ca.horzsplit_n(adj2[i], 2)[d], plugin, digits=digits)
+        # Jacobian, relying on the sparsity pattern, vs dense forward directional derivatives
+        vin = ca.MX.sym("v", sum(B.nnz_in(i) for i in range(B.n_in())))
+        args = ca.vertsplit(vin, list(numpy.cumsum([0] + [B.nnz_in(i) for i in range(B.n_in())])))
+        res = B(*[ca.MX(B.sparsity_in(i), args[i]) for i in range(B.n_in())])
+        vout = ca.vertcat(*[ca.vec(r.nz[:]) for r in res])
+        J = ca.Function("J", [vin], [ca.jacobian(vout, vin),
+                                     ca.jtimes(vout, vin, ca.MX.eye(vin.numel()))])
+        J_sp, J_dense = J(numpy.concatenate([e.nonzeros() for e in inputs]))
+        self.checkarray(J_dense, J_sp, plugin + " sparsity", digits=digits)
+
 if __name__ == '__main__':
     unittest.main()
