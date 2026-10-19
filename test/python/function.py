@@ -1417,6 +1417,29 @@ class Functiontests(casadiTestCase):
       if r is not None:
         self.checkarray(m,r)
 
+  def test_bspline_even_degree(self):
+    # issue #3449
+    import scipy.interpolate
+    x = np.linspace(0,3,12)
+    y = np.sin(x)
+    ref = scipy.interpolate.make_interp_spline(x, y, k=2)
+    LUT = ca.interpolant('LUT','bspline',[x],y,{"degree":[2]})
+    for xe in [0,0.1,0.33,1.7,2.95,3]:
+      self.checkarray(LUT(xe), ref(xe), digits=10)
+    self.check_codegen(LUT, [0.2])
+    for k in [4,6]:
+      LUT = ca.interpolant('LUT','bspline',[x],y,{"degree":[k]})
+      self.checkarray(LUT(ca.DM(x).T), ca.DM(y).T, digits=10)
+      self.checkarray(LUT(1.234), np.sin(1.234), digits=4)
+    # 2D, mixed even/odd degrees
+    xg = np.linspace(0,1,6)
+    yg = np.linspace(0,2,7)
+    [X,Y] = np.meshgrid(xg,yg,indexing='ij')
+    V = np.cos(X)*Y
+    LUT = ca.interpolant('LUT','bspline',[xg,yg],V.ravel(order='F'),{"degree":[2,3]})
+    for i,j in [(0,0),(2,3),(5,6),(4,1)]:
+      self.checkarray(LUT(ca.vertcat(xg[i],yg[j])), V[i,j], digits=10)
+
   def test_Callback_Jacobian(self):
     x = ca.MX.sym("x")
     y = ca.MX.sym("y")
