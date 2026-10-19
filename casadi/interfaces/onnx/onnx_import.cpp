@@ -25,6 +25,8 @@
 
 #include "onnx_model.hpp"
 
+#include <onnx/shape_inference/implementation.h>
+
 /// \cond INTERNAL
 namespace casadi {
 
@@ -162,6 +164,38 @@ namespace casadi {
     }
   }
 
+  // ONNX ranks the graph declares (inputs, intermediate value_info, outputs, initializers)
+  static std::map<std::string, casadi_int> declared_ranks(const onnx::GraphProto& graph) {
+    std::map<std::string, casadi_int> ranks;
+    for (const auto* infos : {&graph.input(), &graph.value_info(), &graph.output()}) {
+      for (const auto& info : *infos) {
+        if (info.type().tensor_type().has_shape()) {
+          ranks[info.name()] = info.type().tensor_type().shape().dim_size();
+        }
+      }
+    }
+    for (const auto& tensor : graph.initializer()) ranks[tensor.name()] = tensor.dims_size();
+    return ranks;
+  }
+
+  // ONNX counts a negative "axis" attribute from the end, relative to the rank of input 0
+  // (OneHot, relative to the output rank, aside). CasADi values are 2-D and do not keep the ONNX
+  // rank, e.g. [1, n] and [n] are both stored as (n, 1), so resolve the axis against the rank
+  // the graph declares. Returns node itself if there is nothing to resolve, else *copy.
+  static const onnx::NodeProto& resolve_negative_axis(const onnx::NodeProto& node,
+      const std::map<std::string, casadi_int>& ranks, onnx::NodeProto* copy) {
+    if (node.op_type() == "OneHot" || node.input_size() == 0) return node;
+    for (int a = 0; a < node.attribute_size(); ++a) {
+      if (node.attribute(a).name() != "axis" || node.attribute(a).i() >= 0) continue;
+      auto it = ranks.find(node.input(0));
+      if (it == ranks.end()) return node;  // undeclared rank: leave it to the op
+      *copy = node;
+      copy->mutable_attribute(a)->set_i(node.attribute(a).i() + it->second);
+      return *copy;
+    }
+    return node;
+  }
+
   // Process all nodes in the graph
   void Onnx::process_graph_nodes(
       const onnx::GraphProto& graph,
@@ -174,11 +208,14 @@ namespace casadi {
       if (integer_tensor(tensor, values)) integer_constants[tensor.name()] = std::move(values);
     }
 
+    std::map<std::string, casadi_int> ranks = declared_ranks(graph);
+
     // Per-graph capture of kron operands, keyed by the exporter's node-name tag "kron<k>".
     std::map<std::string, MX> kron_operand_a_, kron_operand_b_;
 
     for (int i = 0; i < graph.node_size(); ++i) {
-      const onnx::NodeProto& node = graph.node(i);
+      onnx::NodeProto resolved;
+      const onnx::NodeProto& node = resolve_negative_axis(graph.node(i), ranks, &resolved);
       std::string op_type = node.op_type();
 
       if (verbose) {
@@ -502,9 +539,33 @@ namespace casadi {
     return nullptr;
   }
 
+  // Whether a node has a negative axis that resolve_negative_axis cannot resolve
+  static bool has_unresolved_negative_axis(const onnx::GraphProto& graph) {
+    std::map<std::string, casadi_int> ranks = declared_ranks(graph);
+    for (const auto& node : graph.node()) {
+      if (node.op_type() == "OneHot" || node.input_size() == 0) continue;
+      if (get_int_attribute(node, "axis", 0) < 0 && !ranks.count(node.input(0))) return true;
+    }
+    return false;
+  }
+
   Function Onnx::create(const std::string& name) {
     casadi_assert(has_model_, "No ONNX model loaded. Call load() first.");
-    return function_from_graph(model_.graph(), name);
+    if (!has_unresolved_negative_axis(model_.graph())) {
+      return function_from_graph(model_.graph(), name);
+    }
+    // Exporters need not declare the shapes of intermediate tensors (PyTorch's TorchScript
+    // exporter doesn't). Infer them on a copy, leaving model_ as loaded, so that negative axes
+    // can be resolved. If inference fails, import as is: the affected op reports the axis.
+    onnx::ModelProto inferred = model_;
+    try {
+      onnx::shape_inference::InferShapes(inferred, onnx::OpSchemaRegistry::Instance(),
+        onnx::ShapeInferenceOptions(false, 0, true));
+    } catch (const std::exception& e) {
+      if (verbose_) uout() << "ONNX shape inference failed: " << e.what() << std::endl;
+      return function_from_graph(model_.graph(), name);
+    }
+    return function_from_graph(inferred.graph(), name);
   }
 
   Function Onnx::function_from_graph(const onnx::GraphProto& graph,
@@ -576,6 +637,11 @@ namespace casadi {
     return if_else(x > 40, x, log1p(exp(fmin(x, 50))));
   }
 
+  // Equal to 1/(1 + exp(-x)), but with no overflow for large |x|
+  static MX sigmoid(const MX& x) {
+    return 0.5 * (1 + tanh(0.5 * x));
+  }
+
   // alpha * (exp(x) - 1) for x <= 0, x otherwise. The clamp keeps expm1 finite for large x.
   static MX elu(const MX& x, double alpha) {
     return if_else(x > 0, x, alpha * expm1(fmin(x, 1)));
@@ -584,7 +650,7 @@ namespace casadi {
   static bool is_activation(const std::string& op_type) {
     static const std::set<std::string> ops = {"Relu", "LeakyRelu", "PRelu", "Sigmoid",
       "HardSigmoid", "HardSwish", "Softplus", "Softsign", "Elu", "Selu", "Celu", "Mish", "Gelu",
-      "Clip"};
+      "Clip", "ThresholdedRelu", "Shrink", "Swish"};
     return ops.count(op_type) > 0;
   }
 
@@ -605,9 +671,16 @@ namespace casadi {
       MX bx = x, slope = node_inputs[1];
       broadcast_pair(&bx, &slope);
       return if_else(bx >= 0, bx, slope * bx);
+    } else if (op_type == "ThresholdedRelu") {
+      return if_else(x > get_float_attribute(node, "alpha", 1.0), x, 0);
+    } else if (op_type == "Shrink") {
+      double lambd = get_float_attribute(node, "lambd", 0.5);
+      double bias = get_float_attribute(node, "bias", 0.0);
+      return if_else(x < -lambd, x + bias, if_else(x > lambd, x - bias, 0));
     } else if (op_type == "Sigmoid") {
-      // Equal to 1/(1 + exp(-x)), but with no overflow for large |x|
-      return 0.5 * (1 + tanh(0.5 * x));
+      return sigmoid(x);
+    } else if (op_type == "Swish") {
+      return x * sigmoid(get_float_attribute(node, "alpha", 1.0) * x);
     } else if (op_type == "HardSigmoid") {
       double alpha = get_float_attribute(node, "alpha", 0.2f);
       double beta = get_float_attribute(node, "beta", 0.5f);

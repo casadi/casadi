@@ -2580,7 +2580,7 @@ class GraphBuilderSymbolicTests(casadiTestCase):
     elu = lambda x, a: np.where(x > 0, x, f32(a) * np.expm1(np.minimum(x, 0)))
     gelu_tanh = lambda x: 0.5*x*(1 + np.tanh(math.sqrt(2/math.pi)*(x + 0.044715*x**3)))
     selu_alpha, selu_gamma = 1.67326319217681884765625, 1.05070102214813232421875
-    return [  # (op, attributes, NumPy reference of the ONNX definition)
+    cases = [  # (op, attributes, NumPy reference of the ONNX definition)
       ("Relu", {}, lambda x: np.maximum(x, 0)),
       ("LeakyRelu", {}, lambda x: np.where(x >= 0, x, f32(0.01)*x)),
       ("LeakyRelu", {"alpha": 0.2}, lambda x: np.where(x >= 0, x, f32(0.2)*x)),
@@ -2602,10 +2602,21 @@ class GraphBuilderSymbolicTests(casadiTestCase):
       ("Gelu", {}, lambda x: 0.5*x*(1 + erf(x/math.sqrt(2)))),
       ("Gelu", {"approximate": "none"}, lambda x: 0.5*x*(1 + erf(x/math.sqrt(2)))),
       ("Gelu", {"approximate": "tanh"}, gelu_tanh),
+      ("ThresholdedRelu", {}, lambda x: np.where(x > 1, x, 0)),
+      ("ThresholdedRelu", {"alpha": 0.5}, lambda x: np.where(x > 0.5, x, 0)),
+      ("Shrink", {}, lambda x: np.where(x < -0.5, x, np.where(x > 0.5, x, 0))),
+      ("Shrink", {"lambd": 1.5, "bias": 0.5},
+        lambda x: np.where(x < -1.5, x + 0.5, np.where(x > 1.5, x - 0.5, 0))),
+      ("Swish", {}, lambda x: x/(1 + np.exp(-x))),
+      ("Swish", {"alpha": 0.5}, lambda x: x/(1 + np.exp(-0.5*x))),
     ]
+    # Swish needs opset 24: skip ops that the installed onnx package doesn't know
+    return [case for case in cases if onnx.defs.has(case[0])]
 
   @staticmethod
-  def activation_model(nodes, n, outputs, initializers=(), opset=20):
+  def activation_model(nodes, n, outputs, initializers=(), opset=None):
+    if opset is None:  # the newest version any of the ops needs
+      opset = max(onnx.defs.get_schema(node.op_type).since_version for node in nodes)
     graph = helper.make_graph(nodes, "activation",
       [helper.make_tensor_value_info("x", TensorProto.DOUBLE, [1, n])],
       [helper.make_tensor_value_info(y, TensorProto.DOUBLE, [1, n]) for y in outputs],
@@ -2717,6 +2728,38 @@ class GraphBuilderSymbolicTests(casadiTestCase):
       self.checkarray(numpy.array(ge).ravel(), (x >= x[3]).astype(float), "GreaterOrEqual")
 
   @unittest.skipUnless(have_onnx, "needs the onnx python package")
+  def test_negative_axis(self):
+    self.message("ONNX negative axis, resolved against declared or inferred ranks")
+    x = numpy.arange(1., 9.)
+    # GLU as PyTorch exports it: split [1, 8] along axis -1, a * sigmoid(b)
+    glu = [helper.make_node("Split", ["x"], ["a", "b"], axis=-1, num_outputs=2),
+           helper.make_node("Sigmoid", ["b"], ["s"]),
+           helper.make_node("Mul", ["a", "s"], ["y"])]
+    glu_ref = x[:4]/(1 + numpy.exp(-x[4:]))
+    # concatenation along axis -1, and along -2 (= 0) of a [1, 8] tensor with itself
+    cat = [helper.make_node("Concat", ["x", "x"], ["y"], axis=-1)]
+    cat0 = [helper.make_node("Concat", ["x", "x"], ["y"], axis=-2)]
+    cases = [  # (name, nodes, output shape, reference, declare intermediate shapes?)
+      ("Split", glu, [1, 4], glu_ref, True),
+      ("Split, no value_info", glu, [1, 4], glu_ref, False),
+      ("Concat -1", cat, [1, 16], numpy.concatenate([x, x]), False),
+      ("Concat -2", cat0, [2, 8], numpy.stack([x, x]), False),
+    ]
+    with tempfile.TemporaryDirectory() as folder:
+      for name, nodes, shape, ref, value_info in cases:
+        with self.subTest(case=name):
+          graph = helper.make_graph(nodes, "axis",
+            [helper.make_tensor_value_info("x", TensorProto.DOUBLE, [1, 8])],
+            [helper.make_tensor_value_info("y", TensorProto.DOUBLE, shape)])
+          model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 18)])
+          if value_info:
+            model = onnx.shape_inference.infer_shapes(model)
+          self.assertEqual(len(model.graph.value_info) > 0, value_info)
+          f = self.import_model(model, folder)
+          y = f(ca.reshape(ca.DM(x), f.size1_in(0), f.size2_in(0)))
+          self.checkarray(numpy.array(y).ravel(), ref.ravel(), name, digits=14)
+
+  @unittest.skipUnless(have_onnx, "needs the onnx python package")
   def test_activations_codegen(self):
     self.message("ONNX activations through C code generation, with derivatives")
     n = len(self.ACTIVATION_POINTS)
@@ -2755,16 +2798,33 @@ class GraphBuilderSymbolicTests(casadiTestCase):
               "LeakyReLU": nn.LeakyReLU(0.5), "PReLU": nn.PReLU(8), "Hardswish": nn.Hardswish(),
               "Hardsigmoid": nn.Hardsigmoid(), "Hardtanh": nn.Hardtanh(), "Mish": nn.Mish(),
               "Softsign": nn.Softsign()}
+    nets = {name: nn.Sequential(nn.Linear(3, 8), layer, nn.Linear(8, 2))
+            for name, layer in layers.items()}
+    # GLU splits along axis -1
+    nets["GLU"] = nn.Sequential(nn.Linear(3, 16), nn.GLU(), nn.Linear(8, 2))
+
+    class Concat(nn.Module):
+      def __init__(self):
+        super().__init__()
+        self.a, self.b = nn.Linear(3, 5), nn.Linear(8, 2)
+
+      def forward(self, x):
+        return self.b(torch.cat([torch.tanh(self.a(x)), x], dim=-1))
+    nets["cat(dim=-1)"] = Concat()
+    # Keep the weights in the model file: the import doesn't read external data files yet
+    import inspect
+    inline = ({"external_data": False}
+              if "external_data" in inspect.signature(torch.onnx.export).parameters else {})
     torch.manual_seed(0)
     x = 3*torch.randn(1, 3, dtype=torch.float64)
     with tempfile.TemporaryDirectory() as folder:
       path = os.path.join(folder, "net.onnx")
-      for name, layer in layers.items():
-        net = nn.Sequential(nn.Linear(3, 8), layer, nn.Linear(8, 2)).double()
+      for name, net in nets.items():
+        net = net.double()
         for dynamo in exporters:
           with self.subTest(layer=name, dynamo=dynamo):
             torch.onnx.export(net, (x,), path, dynamo=dynamo, input_names=["x"],
-                              output_names=["y"])
+                              output_names=["y"], **inline)
             f = ca.GraphBuilder(path).create("f", {"symbolic": True})
             y = f(ca.reshape(ca.DM(x.numpy().ravel()), f.size1_in(0), f.size2_in(0)))
             # attributes such as the LeakyReLU slope are float32 in ONNX
