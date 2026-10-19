@@ -838,6 +838,23 @@ class OptiStacktests(inherit_from):  # pyright: ignore[reportGeneralTypeIssues]
 
         self.checkarray(sol.value(P), R)
 
+    def test_symm_parameter(self):
+        # issue #2911
+        opti = ca.Opti()
+        Q = opti.parameter(2, 2, 'symmetric')
+        x = opti.variable(2)
+        opti.minimize(ca.bilin(Q, x, x) - ca.sum1(x))
+        opti.solver(nlpsolver,nlpsolver_options)
+        Qv = ca.DM([[3,1],[1,2]])
+        opti.set_value(Q, Qv)
+        sol = opti.solve()
+        self.checkarray(sol.value(Q), Qv)
+        self.checkarray(sol.value(x), ca.solve(2*Qv, ca.DM.ones(2)), digits=6)
+        with self.assertInException("not even square"):
+          opti.parameter(2, 3, 'symmetric')
+        with self.assertInException("Unknown attribute"):
+          opti.parameter(2, 2, 'foo')
+
     def test_broadcast(self):
         opti = ca.Opti()
         

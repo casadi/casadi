@@ -461,8 +461,6 @@ MX OptiNode::parameter(const Sparsity& sp, const std::string& attribute) {
 }
 
 MX OptiNode::parameter(casadi_int n, casadi_int m, const std::string& attribute) {
-  casadi_assert_dev(attribute=="full");
-
   // Prepare metadata
   MetaVar meta_data;
   meta_data.attribute = attribute;
@@ -472,12 +470,24 @@ MX OptiNode::parameter(casadi_int n, casadi_int m, const std::string& attribute)
   meta_data.count = count_++;
   meta_data.i = count_par_++;
 
-  MX symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n, m);
+  MX symbol, ret;
+  if (attribute=="symmetric") {
+    casadi_assert(n==m, "You specified attribute 'symmetric', "
+      "while matrix is not even square, but " + str(n) + "-by-" + str(m) + ".");
+    symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n*(n+1)/2);
+    ret = tril2symm(MX(Sparsity::lower(n), symbol));
+  } else if (attribute=="full") {
+    symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n, m);
+    ret = symbol;
+  } else {
+    casadi_error("Unknown attribute '" + attribute + "'. Choose from 'full' or 'symmetric'.");
+  }
+
   symbols_.push_back(symbol);
   store_initial_[OPTI_PAR].push_back(DM::nan(symbol.sparsity()));
 
   set_meta(symbol, meta_data);
-  return symbol;
+  return ret;
 }
 
 Dict OptiNode::stats() const {
