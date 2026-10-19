@@ -563,11 +563,12 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jacF, m->tmp1 + s.nx1_, s.nadj_ * s.nfwd_,
+      if (s.linsolF_.solve(m->jacF, m->tmp1 + s.nrx1_ * s.nadj_, s.nadj_ * s.nfwd_,
         true, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
-      casadi_copy(m->tmp1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
+      casadi_copy(m->tmp1 + s.nrx1_ * s.nadj_, s.nrx_ - s.nrx1_ * s.nadj_,
+        v + s.nrx1_ * s.nadj_);
     }
 
     return 0;
