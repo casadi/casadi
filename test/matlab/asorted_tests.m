@@ -227,6 +227,11 @@ length(MX.sym('x',4,1))
 assert(length(MX.sym('x',4,1))==4)
 assert(length(MX.sym('x',1,3))==3)
 assert(length(MX.sym('x',4,5))==5)
+% issue #2816: length of an empty matrix is 0, like MATLAB
+assert(length(MX.sym('x',4,0))==0)
+assert(length(DM.zeros(2,0))==0)
+assert(length(SX(0,3))==0)
+assert(length(Sparsity(0,3))==0)
 
 [n,m] = size(MX.sym('x',4,5));
 assert(n==4)

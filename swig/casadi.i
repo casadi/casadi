@@ -4593,6 +4593,7 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
     SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
     #if FLAG & IS_MEMBER
       DECL casadi_int casadi_length(const M &v) {
+        if (v.is_empty()) return 0;
         return std::max(v.size1(), v.size2());
       }
       DECL M casadi_sum(const M& x, casadi_int dim) {
