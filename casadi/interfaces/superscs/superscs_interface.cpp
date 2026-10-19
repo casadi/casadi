@@ -468,6 +468,15 @@ namespace casadi {
     m->d_qp.success = SCS_SOLVED==status;
 
     casadi_copy(m->sol->x, nx_, res[CONIC_X]);
+
+    // Duals of linear rows (ubx, lbx, uba, lba); rows trimmed for infinite bounds have none
+    auto y = [&](casadi_int k) { return sl[k]>=0 ? m->sol->y[sl[k]] : 0.; };
+    if (res[CONIC_LAM_X]) {
+      for (casadi_int k=0;k<nx_;++k) res[CONIC_LAM_X][k] = y(k) - y(nx_+k);
+    }
+    if (res[CONIC_LAM_A]) {
+      for (casadi_int k=0;k<na_;++k) res[CONIC_LAM_A][k] = y(2*nx_+k) - y(2*nx_+na_+k);
+    }
     if (res[CONIC_COST])
       *res[CONIC_COST] = casadi_dot(nx_, m->sol->x, get_ptr(m->g));
     if (res[CONIC_COST])

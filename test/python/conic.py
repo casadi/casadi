@@ -64,7 +64,7 @@ if "SKIP_OSQP_TESTS" not in os.environ and ca.has_conic("osqp"):
   conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": codegen,"soc":False,"binary":False, "discrete":False}))
 
 if "SKIP_SUPERSCS_TESTS" not in os.environ and ca.has_conic("superscs"):
-  conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"binary":False, "discrete":False}))
+  conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": True, "codegen": False,"soc":True,"binary":False, "discrete":False}))
 
 # No solution for licensing on travis
 
