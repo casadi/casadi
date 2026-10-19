@@ -2145,6 +2145,24 @@ class Functiontests(casadiTestCase):
     self.check_serialize(f,inputs=[0.2,0.333])
 
 
+  def test_bspline_repeated_knots(self):
+    # issue #3643: evaluation exactly at a repeated interior knot
+    import scipy.interpolate
+    np.random.seed(0)
+    for degree, knots in [(3, [0,0,0,0,1,1,2,3,3,3,4,4,4,4]), (2, [0,0,0,1,1,2,2,3,3,3])]:
+      n = len(knots)-degree-1
+      c = np.random.random(n)
+      ref = scipy.interpolate.BSpline(np.array(knots,dtype=float), c, degree)
+      x = ca.MX.sym("x")
+      C = ca.MX.sym("C",n)
+      f = ca.Function('f',[x],[ca.bspline(x,ca.DM(c),[knots],[degree],1)])
+      F = ca.Function('F',[x,C],[ca.bspline(x,C,[knots],[degree],1)])
+      for xe in np.arange(0,knots[-1]+0.25,0.5):
+        self.checkarray(f(xe), ref(xe), digits=12)
+        self.checkarray(F(xe,c), ref(xe), digits=12)
+      self.check_codegen(f,inputs=[2])
+      self.check_codegen(F,inputs=[3,c])
+
   def test_parametric_bspline(self):
     knots = [[0,0,0,0,0.2,0.5,0.8,1,1,1,1],[0,0,0,0.1,0.5,0.9,1,1,1]]
     x=ca.MX.sym("x",2)

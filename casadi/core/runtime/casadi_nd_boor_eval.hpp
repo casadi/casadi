@@ -57,7 +57,7 @@ void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* all_knots, const 
         casadi_fill(boor, degree+1, 1.0);
       } else if (x==knots[n_knots-1]) {
         boor[degree] = 1;
-      } else if (knots[L+degree]==x) {
+      } else if (knots[L+degree]==x && knots[L+degree-1]<x) {
         boor[degree-1] = 1;
       } else {
         boor[degree] = 1;
