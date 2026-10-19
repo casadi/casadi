@@ -6506,6 +6506,9 @@ class global_unpickle_context:
 %typemap(out, doc="DM", noblock=1) casadi::native_DM {
   $result = (void*) new casadi::Matrix<double>($1);
 }
+// Native Julia value, like Python's float/ndarray: a scalar becomes Float64,
+// a row or column a Vector{Float64}, anything else a dense Matrix{Float64}.
+%typemap(jlout) casadi::native_DM "(function (d::DM) n = nonzeros(densify(d)); r, c = size1(d), size2(d); r * c == 1 ? n[1] : (r == 1 || c == 1) ? n : Base.reshape(n, r, c) end)(DM(_check($call)))"
 #else
 %typemap(out, doc="double", pystub_out="float", noblock=1, fragment="casadi_all") casadi::native_DM {
   if(!($result = full_or_sparse($1, true))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'double'.");

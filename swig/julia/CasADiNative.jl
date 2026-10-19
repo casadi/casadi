@@ -401,14 +401,9 @@ bounded(lb, ex::MX, ub) = C.bounded(C.Opti, convert(MX, lb), ex, convert(MX, ub)
 solver!(o::Opti, plugin::AbstractString, plugin_opts=Dict{String,Any}(), solver_opts=Dict{String,Any}()) =
     C.solver(o, plugin, plugin_opts, solver_opts)
 solve!(o::Opti) = C.solve(o)
-# Return the solution as native Julia: scalar Float64, column -> Vector, else Matrix.
-# (P1-3: the old hard Float64() cast made vector/matrix decision vars unreadable.)
-function _dm_native(d::DM)
-    (C.size1(d) == 1 && C.size2(d) == 1) && return Float64(d)
-    M = Base.Matrix{Float64}(d)
-    C.size2(d) == 1 ? M[:, 1] : M
-end
-value(sol, x) = _dm_native(C.value(sol, x, MX[]))
+# value() comes back as native Julia from the wrapper itself (native_DM typemap):
+# scalar Float64, row or column -> Vector, else Matrix -- also via `sol.value(x)`.
+value(sol, x) = C.value(sol, x)
 export set_initial
 set_initial(o::Opti, x, v) = C.set_initial(o, x, v)
 

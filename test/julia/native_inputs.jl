@@ -65,5 +65,11 @@ HAS_IPOPT && @testset "native inputs: Opti" begin
     minimize(opti, C.sumsqr(y - p))
     solver!(opti, "ipopt", Dict("print_time" => false, "ipopt" => Dict("print_level" => 0)))
     sol = solve!(opti)
-    @test value(sol, y) ≈ [1.0, 2.0, 2.0] atol = 1e-6
+    @test sol.value(y) isa Vector{Float64}
+    @test sol.value(y) ≈ [1.0, 2.0, 2.0] atol = 1e-6
+    @test sol.value(y[3]) isa Float64
+    @test sol.value(y') isa Vector{Float64}
+    @test sol.value([y y]) isa Matrix{Float64}
+    @test value(sol, y) ≈ sol.value(y)
+    @test opti.debug().value(y) ≈ sol.value(y)
 end
