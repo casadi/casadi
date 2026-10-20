@@ -1722,6 +1722,28 @@ class Integrationtests(casadiTestCase):
       v0 = ca.DM([2, 0.3, 0.8])
       self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=5)
 
+  @memory_heavy()
+  @requires_integrator("idas")
+  def test_events_idas(self):
+    self.message("idas: zero-crossing events, also of a DAE")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    # A single bounce from height 2 at rest, at sqrt(2*2/g), restitution p
+    grid = list(numpy.linspace(0.1, 1.5, 15))
+    tb = numpy.sqrt(4/g)
+    ub = 0.8*g*tb
+    h = [2 - g*tt**2/2 if tt < tb else ub*(tt - tb) - g*(tt - tb)**2/2 for tt in grid]
+    v = [-g*tt if tt < tb else ub - g*(tt - tb) for tt in grid]
+    ode = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "zero": x[0]}
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g), "alg": z - x[1], "zero": x[0]}
+    for problem, transition in [(ode, bounce_transition()), (dae, bounce_transition(1))]:
+      F = ca.integrator("F", "idas", problem, 0, grid, {"transition": transition,
+        "abstol": 1e-12, "reltol": 1e-12, "event_tol": 1e-12, "max_event_iter": 20})
+      r = F(x0=[2, 0], z0=0, p=0.8)
+      self.checkarray(r["xf"], ca.DM([h, v]), "xf", digits=7)
+
   def test_reverse_over_adjoint_directions(self):
     self.message("Derivatives of adjoint sensitivities with several directions (#3293)")
     x = ca.SX.sym("x", 3)
