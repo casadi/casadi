@@ -2465,6 +2465,21 @@ class Integrationtests(casadiTestCase):
       self.checkarray(grad_fwd, grad_adj, str(w_x + w_z), digits=7)
 
   @memory_heavy()
+  def test_zero_horizon(self):
+    self.message("issue #1810: integration horizon of length zero")
+    x = ca.SX.sym("x", 2)
+    dae = {"x": x, "ode": x}
+    for plugin in ["rk", "collocation", "cvodes", "erk", "rosenbrock"]:
+      F = ca.integrator("F", plugin, dae, 0, 0)
+      self.checkarray(F(x0=[1, 2])["xf"], ca.DM([1, 2]), plugin)
+    # The initial condition calculation needs a nonzero horizon
+    F = ca.integrator("F", "idas", dae, 0, 0)
+    with self.assertInException("IDACalcIC"):
+      F(x0=[1, 2])
+    F = ca.integrator("F", "idas", dae, 0, 0, {"calc_ic": False})
+    self.checkarray(F(x0=[1, 2])["xf"], ca.DM([1, 2]), "idas")
+
+  @memory_heavy()
   def test_adjoint_checkpoint_stop_time(self):
     self.message("issue #3227: recomputation from a check point ending at a stop time")
     x = ca.SX.sym("x")
