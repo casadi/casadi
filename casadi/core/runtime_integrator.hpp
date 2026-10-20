@@ -127,6 +127,9 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   /** \brief Deserializing constructor */
   explicit RuntimeIntegrator(DeserializingStream& s);
 
+  /// Does the method linearize (tasks EVAL_JAC, EVAL_JAC_ADJ)?
+  virtual bool needs_jacobian() const = 0;
+
   /// Call the kernel of the method: returns 1 while a task is requested
   virtual int kernel(RuntimeIntegratorMemory* m) const = 0;
 
@@ -155,16 +158,22 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   // First output interval of each control group, followed by the number of output times
   std::vector<casadi_int> group_start_;
 
+  // Leading entries of x, z, q subject to error control
+  casadi_int nx_err_, nz_err_, nq_err_;
+
   // Options
-  double step_size_;
+  double step_size_, abstol_, reltol_;
+
+  // Sparsity of the Jacobian blocks, see casadi_ivp_jac_t (empty: no linearization)
+  std::vector<Sparsity> sp_jac_;
 
   // Shared problem structure
   casadi_ivp_prob<double> p_;
 
  private:
   // Source buffers of function arguments and results, see slot_ptr and slot_expr
-  enum Src {SRC_T, SRC_Y, SRC_P, SRC_U, SRC_RES, SRC_W, SRC_VJP_X, SRC_VJP_Z, SRC_VJP_P,
-    SRC_VJP_U};
+  enum Src {SRC_T, SRC_Y, SRC_P, SRC_U, SRC_RES, SRC_W, SRC_JAC, SRC_JAC_FWD, SRC_JAC_ADJ,
+    SRC_JAC_ADJ_FWD, SRC_VJP_X, SRC_VJP_Z, SRC_VJP_P, SRC_VJP_U};
 
   // Argument or result i of a function call: buffer src at offset off
   struct Slot {

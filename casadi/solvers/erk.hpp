@@ -113,6 +113,9 @@ namespace casadi {
     /** \brief Deserializing constructor */
     explicit Erk(DeserializingStream& s);
 
+    // Explicit stages: no linearization
+    bool needs_jacobian() const override { return false;}
+
     // Call the kernel
     int kernel(RuntimeIntegratorMemory* m) const override;
 
