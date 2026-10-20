@@ -301,9 +301,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
   ///@{
-  /// Is the class able to propagate seeds through the algorithm?
-  bool has_spfwd() const override { return true;}
-  bool has_sprev() const override { return true;}
+  /// Is the class able to propagate seeds through the algorithm? Not through events
+  bool has_spfwd() const override { return ne_ == 0;}
+  bool has_sprev() const override { return ne_ == 0;}
   ///@}
 
   ///@{
