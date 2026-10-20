@@ -84,6 +84,7 @@ set(RUNTIME_SRC
   casadi_ipqp.hpp
   casadi_ivp.hpp
   casadi_ivp_adapt.hpp
+  casadi_ivp_event.hpp
   casadi_rosenbrock.hpp
   casadi_erk.hpp
   casadi_nlp.hpp

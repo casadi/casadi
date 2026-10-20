@@ -129,10 +129,6 @@ void RuntimeIntegrator::init(const Dict& opts) {
   }
   casadi_assert(step_size_ >= 0, "'step_size' must be nonnegative");
 
-  // Events not supported
-  casadi_assert(ne_ == 0, "Zero-crossing events are not supported by '"
-    + std::string(plugin_name()) + "'");
-
   // Error control on the nominal states only: derivative integrators share the mesh
   if (derivative_of_.is_null()) {
     nx_err_ = nx1_;
@@ -150,6 +146,20 @@ void RuntimeIntegrator::init(const Dict& opts) {
   create_function("rhsF", dyn_in(), {"ode", "alg", "quad"});
   if (nadj_ > 0) {
     create_function(rdae_, "vjpB", bdyn_in(), {"adj_x", "adj_z", "adj_p", "adj_u"});
+  }
+
+  // Events: forward sensitivities only
+  casadi_assert(ne_ == 0 || nadj_ == 0, "Zero-crossing events with adjoint sensitivities are "
+    "not supported by '" + std::string(plugin_name()) + "'");
+
+  // Zero-crossing functions and their time derivative; the jump at an event, its derivatives
+  if (ne_ > 0) {
+    create_function("zeroF", dyn_in(), {"zero"});
+    create_forward("zeroF", 1);
+    if (has_function("transition")) {
+      set_function(jump_function(), "jumpF");
+      if (nfwd_ > 0) create_forward("jumpF", nfwd_);
+    }
   }
 
   // Jacobian blocks w.r.t. x, z and time, in the order of casadi_ivp_jac_t
@@ -171,6 +181,69 @@ void RuntimeIntegrator::init(const Dict& opts) {
       if (nadj_ > 0) create_forward("jacB", nfwd_);
     }
   }
+}
+
+Function RuntimeIntegrator::jump_function() const {
+  // State after the event selected by w as a function of the state before it: moved along
+  // the trajectory to the event surface, through the transition and back to t, to second
+  // order in the time s to the surface. At an event s vanishes, so the value is that of the
+  // transition and the first and second derivatives are those of the event, including the
+  // dependence of its time. Algebraic states are consistent along the way: the given ones
+  // are only starting points
+  MX t = MX::sym("t"), s = MX::sym("s"), w = MX::sym("w", ne_), q = MX::sym("q", nq1_);
+  MX x = MX::sym("x", oracle_.sparsity_in(DYN_X)), z = MX::sym("z", oracle_.sparsity_in(DYN_Z));
+  MX p = MX::sym("p", oracle_.sparsity_in(DYN_P)), u = MX::sym("u", oracle_.sparsity_in(DYN_U));
+  const Function& tr = get_function("transition");
+  // Argument i of f, empty if f does not depend on it
+  auto arg = [](const Function& f, casadi_int i, const MX& v) -> MX {
+    return f.nnz_in(i) == 0 ? MX(f.sparsity_in(i)) : v;
+  };
+  auto dae = [&](const MX& tt, const MX& xx, const MX& zz) -> std::vector<MX> {
+    return oracle_(std::vector<MX>{arg(oracle_, DYN_T, tt), xx, zz, p, u});
+  };
+  // Algebraic states consistent with (tt, xx), from zz
+  Function z_solve;
+  if (nz1_ > 0) {
+    MX zs = MX::sym("z", z.sparsity()), ts = MX::sym("t"), xs = MX::sym("x", x.sparsity());
+    Function alg("alg", {zs, ts, xs, p, u}, {dae(ts, xs, zs)[DYN_ALG]});
+    z_solve = rootfinder("z_consistent", "fast_newton", alg,
+      Dict{{"abstol", 1e-14}, {"abstolStep", 1e-14}, {"max_iter", 50}});
+  }
+  auto consistent = [&](const MX& tt, const MX& xx, const MX& zz) -> MX {
+    return nz1_ == 0 ? zz : z_solve(std::vector<MX>{zz, tt, xx, p, u}).at(0);
+  };
+  // Rates of x, q at (tt, xx) and their derivatives along the trajectory
+  auto rates = [&](const MX& tt, const MX& xx, const MX& zz, std::vector<MX>& r) -> void {
+    std::vector<MX> r0 = dae(tt, xx, consistent(tt, xx, zz));
+    MX x1 = xx + s * r0[DYN_ODE];
+    std::vector<MX> r1 = dae(tt + s, x1, consistent(tt + s, x1, zz));
+    r = MX::substitute({r0[DYN_ODE], r0[DYN_QUAD], MX::jacobian(r1[DYN_ODE], s),
+      MX::jacobian(r1[DYN_QUAD], s)}, {s}, {MX(0)});
+  };
+  // Time to the surface of the selected zero-crossing function
+  std::vector<MX> r;
+  rates(t, x, z, r);
+  MX x_s = x + s * r[0] + 0.5 * s * s * r[2];
+  MX g = MX::dot(w, dae(t + s, x_s, consistent(t + s, x_s, z))[DYN_ZERO]);
+  MX g_s = MX::jacobian(g, s);
+  std::vector<MX> gv = MX::substitute({g, g_s, MX::jacobian(g_s, s)}, {s}, {MX(0)});
+  MX s1 = -gv[0] / gv[1];
+  MX ss = s1 - 0.5 * gv[2] * s1 * s1 / gv[1];
+  // Transition on the surface
+  std::vector<double> index(ne_);
+  for (casadi_int i = 0; i < ne_; ++i) index[i] = static_cast<double>(i);
+  MX x_ev = x + ss * r[0] + 0.5 * ss * ss * r[2];
+  MX q_ev = q + ss * r[1] + 0.5 * ss * ss * r[3];
+  std::vector<MX> post = tr(std::vector<MX>{arg(tr, EVENT_INDEX, MX::dot(w, MX(DM(index)))),
+    arg(tr, EVENT_T, t + ss), x_ev, consistent(t + ss, x_ev, z), arg(tr, EVENT_P, p),
+    arg(tr, EVENT_U, u)});
+  // Back to t along the trajectory after the event
+  MX z_post = consistent(t + ss, post[EVENT_POST_X], post[EVENT_POST_Z]);
+  rates(t + ss, post[EVENT_POST_X], z_post, r);
+  MX x_post = post[EVENT_POST_X] - ss * r[0] + 0.5 * ss * ss * r[2];
+  MX q_post = q_ev - ss * r[1] + 0.5 * ss * ss * r[3];
+  return Function("jumpF", {t, x, z, q, p, u, w}, {x_post, z_post, q_post},
+    {"t", "x", "z", "q", "p", "u", "w"}, {"post_x", "post_z", "post_q"});
 }
 
 const RuntimeIntegrator* RuntimeIntegrator::root() const {
@@ -214,6 +287,12 @@ void RuntimeIntegrator::set_ivp_prob() {
   p_.h_max = max_step_size_;
   p_.h_init = step0_;
   p_.max_num_steps = max_num_steps_;
+  p_.ne = ne_;
+  p_.has_transition = has_function("transition");
+  p_.event_tol = event_tol_;
+  p_.event_acceptable_tol = std::isinf(event_acceptable_tol_) ? -1 : event_acceptable_tol_;
+  p_.max_event_iter = max_event_iter_;
+  p_.max_events = max_events_;
   casadi_ivp_setup(&p_);
   calls_ = task_calls("");
 }
@@ -223,8 +302,12 @@ void RuntimeIntegrator::set_nominal_prob() {
   // adaptive steps, replay the steps of a nominal integration with the original functions
   const RuntimeIntegrator* r = root();
   if (!has_function("rhsF_nom") && r != this && r->nx1_ != nx1_ && step_size_ == 0) {
-    set_function(r->get_function("rhsF"), "rhsF_nom");
-    if (needs_jacobian()) set_function(r->get_function("jacF"), "jacF_nom");
+    for (auto&& calls : r->task_calls("")) {
+      for (auto&& c : calls) {
+        std::string fname = c.fname + "_nom";
+        if (!has_function(fname)) set_function(r->get_function(c.fname), fname);
+      }
+    }
   }
   replay_ = has_function("rhsF_nom");
   if (!replay_) return;
@@ -306,6 +389,10 @@ int RuntimeIntegrator::advance_noevent(IntegratorMemory* mem) const {
   run(m);
   casadi_assert(d->status != IVP_TAPE_FAILED, name_ + ": the tape of " + str(max_tape_steps_)
     + " steps is full at t = " + str(d->t) + ", increase max_tape_steps");
+  casadi_assert(d->status != IVP_TOO_MANY_EVENTS, name_ + ": more than max_events = "
+    + str(max_events_) + " events, the last at t = " + str(d->t_ev));
+  casadi_assert(d->status != IVP_EVENT_FAILED, name_ + ": event near t = " + str(d->t_ev)
+    + " not located within event_acceptable_tol");
   if (d->status != IVP_SUCCESS) {
     if (verbose_) {
       casadi_warning(name_ + ": integration failed at t = " + str(d->t) + ", status "
@@ -498,6 +585,12 @@ int RuntimeIntegrator::eval_task(RuntimeIntegratorMemory* m, casadi_ivp_data<dou
     casadi_ivp_control(d);
     return 0;
   }
+  if (d->task == IVP_EVENT) {
+    while (casadi_ivp_event(d)) {
+      if (eval_task(m, d, calls)) d->fail = 1;
+    }
+    return 0;
+  }
   for (const TaskCall& c : calls.at(d->task)) {
     std::fill_n(m->arg, c.n_in, nullptr);
     std::fill_n(m->res, c.n_out, nullptr);
@@ -527,6 +620,10 @@ double* RuntimeIntegrator::slot_ptr(RuntimeIntegratorMemory* m, casadi_ivp_data<
     case SRC_VJP_Z: b = d->vjp_z; break;
     case SRC_VJP_P: b = d->vjp_p; break;
     case SRC_VJP_U: b = d->vjp_u; break;
+    case SRC_EV_ONE: b = &d->ev_one; break;
+    case SRC_EV_W: b = d->ev_w; break;
+    case SRC_YDOT: b = d->ydot; break;
+    case SRC_EDOT: b = d->edot; break;
   }
   return b + e.off;
 }
@@ -549,6 +646,10 @@ std::string RuntimeIntegrator::slot_expr(const std::string& d, const Slot& e) {
     case SRC_VJP_Z: b = d + ".vjp_z"; break;
     case SRC_VJP_P: b = d + ".vjp_p"; break;
     case SRC_VJP_U: b = d + ".vjp_u"; break;
+    case SRC_EV_ONE: b = "&" + d + ".ev_one"; break;
+    case SRC_EV_W: b = d + ".ev_w"; break;
+    case SRC_YDOT: b = d + ".ydot"; break;
+    case SRC_EDOT: b = d + ".edot"; break;
   }
   return e.off == 0 ? b : b + "+" + str(e.off);
 }
@@ -610,6 +711,45 @@ std::vector<std::vector<RuntimeIntegrator::TaskCall>> RuntimeIntegrator::task_ca
       calls[IVP_EVAL_JAC].push_back(c);
     }
   }
+  if (ne_ > 0) {
+    // Zero-crossing functions; derivative in the direction (1, ydot); forward sensitivities
+    TaskCall zero = call("zeroF");
+    dyn(zero, 0, false);
+    zero.res = {{0, SRC_RES, 0}};
+    calls[IVP_EVAL_ZERO].push_back(zero);
+    TaskCall c = call(forward_name("zeroF", 1));
+    dyn(c, 0, false);
+    c.arg.push_back({DYN_NUM_IN, SRC_RES, 0});
+    c.arg.push_back({DYN_NUM_IN + 1 + DYN_T, SRC_EV_ONE, 0});
+    c.arg.push_back({DYN_NUM_IN + 1 + DYN_X, SRC_YDOT, 0});
+    c.arg.push_back({DYN_NUM_IN + 1 + DYN_Z, SRC_YDOT, nx_});
+    c.res = {{0, SRC_EDOT, 0}};
+    calls[IVP_EVAL_ZERO].push_back(c);
+    if (has_function("jumpF")) {
+      // Inputs t, x, z, q, p, u, w of the jump at offset i; forward seeds are the sensitivities
+      auto jump = [&](TaskCall& c, casadi_int i, bool fwd) -> void {
+        if (!fwd) c.arg.push_back({i, SRC_T, 0});
+        c.arg.push_back({i + 1, SRC_Y, fwd ? nx1_ : 0});
+        c.arg.push_back({i + 2, SRC_Y, nx_ + (fwd ? nz1_ : 0)});
+        c.arg.push_back({i + 3, SRC_Y, nx_ + nz_ + (fwd ? nq1_ : 0)});
+        c.arg.push_back({i + 4, SRC_P, fwd ? np1_ : 0});
+        c.arg.push_back({i + 5, SRC_U, fwd ? nu1_ : 0});
+        if (!fwd) c.arg.push_back({i + 6, SRC_EV_W, 0});
+      };
+      TaskCall jf = call("jumpF");
+      jump(jf, 0, false);
+      jf.res = {{0, SRC_RES, 0}, {1, SRC_RES, nx_}, {2, SRC_RES, nx_ + nz_}};
+      calls[IVP_EVAL_JUMP].push_back(jf);
+      if (nfwd_ > 0) {
+        c = call(forward_name("jumpF", nfwd_));
+        jump(c, 0, false);
+        for (casadi_int k = 0; k < 3; ++k) c.arg.push_back({7 + k, SRC_RES, jf.res[k].off});
+        jump(c, 10, true);
+        c.res = {{0, SRC_RES, nx1_}, {1, SRC_RES, nx_ + nz1_}, {2, SRC_RES, nx_ + nz_ + nq1_}};
+        calls[IVP_EVAL_JUMP].push_back(c);
+      }
+    }
+  }
   if (nadj_ > 0) {
     // [dF/dx; dF/dz; dF/dp; dF/du]^T w, with forward-over-adjoint
     TaskCall vjpb = call("vjpB");
@@ -660,19 +800,11 @@ bool RuntimeIntegrator::has_codegen() const {
 }
 
 void RuntimeIntegrator::codegen_declarations(CodeGenerator& g) const {
-  std::vector<std::string> fcn = {"rhsF"};
-  if (needs_jacobian()) fcn.push_back("jacF");
-  if (nadj_ > 0) {
-    fcn.push_back("vjpB");
-    if (needs_jacobian()) fcn.push_back("jacB");
-  }
-  for (const std::string& f : fcn) {
-    g.add_dependency(get_function(f));
-    if (nfwd_ > 0) g.add_dependency(get_function(forward_name(f, nfwd_)));
-  }
-  if (replay_) {
-    g.add_dependency(get_function("rhsF_nom"));
-    if (needs_jacobian()) g.add_dependency(get_function("jacF_nom"));
+  // The functions of the task tables
+  for (auto* calls : {&calls_, &calls_nom_}) {
+    for (auto&& task : *calls) {
+      for (auto&& c : task) g.add_dependency(get_function(c.fname));
+    }
   }
 }
 
@@ -681,6 +813,7 @@ void RuntimeIntegrator::codegen_body(CodeGenerator& g) const {
     "max_tape_steps for code generation");
   g.add_auxiliary(CodeGenerator::AUX_IVP);
   if (step_size_ == 0) g.add_auxiliary(CodeGenerator::AUX_IVP_ADAPT);
+  if (ne_ > 0) g.add_auxiliary(CodeGenerator::AUX_IVP_EVENT);
   const std::string nl = ";\n", method = plugin_name();
   g.local("p", "struct casadi_ivp_prob");
   g.local("d", "struct casadi_ivp_data");
@@ -835,17 +968,28 @@ void RuntimeIntegrator::codegen_ivp_prob(CodeGenerator& g, const std::string& p,
   set("h_max", g.constant(p_.h_max));
   set("h_init", g.constant(p_.h_init));
   set("max_num_steps", str(p_.max_num_steps));
+  set("ne", str(p_.ne));
+  if (p_.ne > 0) {
+    set("has_transition", str(p_.has_transition));
+    set("event_tol", g.constant(p_.event_tol));
+    set("event_acceptable_tol", g.constant(p_.event_acceptable_tol));
+    set("max_event_iter", str(p_.max_event_iter));
+    set("max_events", str(p_.max_events));
+  }
   g << "casadi_ivp_setup(&" << p << ");\n";
 }
 
 void RuntimeIntegrator::codegen_task(CodeGenerator& g, const std::string& d,
-    const std::vector<std::vector<TaskCall>>& calls) const {
+    const std::vector<std::vector<TaskCall>>& calls, bool in_event) const {
   // Straight-line code for the task table, as eval_task: direct calls, no function pointers
   static const char* task_name[] = {"IVP_EVAL_RHS", "IVP_EVAL_JAC", "IVP_EVAL_VJP",
-    "IVP_EVAL_JAC_ADJ"};
+    "IVP_EVAL_JAC_ADJ", "IVP_EVAL_ZERO", "IVP_EVAL_JUMP"};
   g << "switch (" << d << ".task) {\n";
   for (casadi_int task = 0; task < static_cast<casadi_int>(calls.size()); ++task) {
     if (calls[task].empty()) continue;
+    // Tasks of the events are requested by casadi_ivp_event only
+    bool ev = task >= IVP_EVAL_ZERO && task <= IVP_EVAL_JUMP;
+    if (in_event != ev) continue;
     g << "case " << task_name[task] << ":\n";
     // Slots set earlier in the same case need not be set again
     std::map<casadi_int, std::string> arg_set, res_set;
@@ -869,9 +1013,16 @@ void RuntimeIntegrator::codegen_task(CodeGenerator& g, const std::string& d,
     }
     g << "break;\n";
   }
-  if (step_size_ == 0) {
+  if (step_size_ == 0 && !in_event) {
     g << "case IVP_STEP_CONTROL:\n";
     g << "casadi_ivp_control(&" << d << ");\n";
+    g << "break;\n";
+  }
+  if (ne_ > 0 && !in_event) {
+    g << "case IVP_EVENT:\n";
+    g << "while (casadi_ivp_event(&" << d << ")) {\n";
+    codegen_task(g, d, calls, true);
+    g << "}\n";
     g << "break;\n";
   }
   g << "default: " << d << ".fail = 1;\n";
@@ -886,15 +1037,16 @@ Dict RuntimeIntegrator::get_stats(void* mem) const {
   stats["n_rhs"] = m->d.n_rhs;
   stats["n_jac"] = m->d.n_jac;
   stats["n_vjp"] = m->d.n_vjp;
+  stats["n_events"] = m->d.n_events;
   return stats;
 }
 
 void RuntimeIntegrator::print_stats(IntegratorMemory* mem) const {
   auto m = static_cast<RuntimeIntegratorMemory*>(mem);
-  print("%s: %lld steps, %lld rejected, %lld rhs, %lld jac, %lld vjp\n", plugin_name(),
-    static_cast<long long>(m->d.n_steps), static_cast<long long>(m->d.n_reject),
+  print("%s: %lld steps, %lld rejected, %lld rhs, %lld jac, %lld vjp, %lld events\n",
+    plugin_name(), static_cast<long long>(m->d.n_steps), static_cast<long long>(m->d.n_reject),
     static_cast<long long>(m->d.n_rhs), static_cast<long long>(m->d.n_jac),
-    static_cast<long long>(m->d.n_vjp));
+    static_cast<long long>(m->d.n_vjp), static_cast<long long>(m->d.n_events));
 }
 
 RuntimeIntegrator::RuntimeIntegrator(DeserializingStream& s) : Integrator(s) {

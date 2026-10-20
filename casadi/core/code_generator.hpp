@@ -747,6 +747,7 @@ namespace casadi {
       AUX_NEWTON,
       AUX_IVP,
       AUX_IVP_ADAPT,
+      AUX_IVP_EVENT,
       AUX_ROSENBROCK,
       AUX_ERK,
       AUX_TO_DOUBLE,

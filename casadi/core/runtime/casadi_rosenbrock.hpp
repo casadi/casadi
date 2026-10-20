@@ -89,6 +89,7 @@ typedef enum {
   ROSENBROCK_STEP_REPLAY,
   ROSENBROCK_STAGE_SOLVE,
   ROSENBROCK_STEP_CHECK,
+  ROSENBROCK_STEP_EVENT,
   ROSENBROCK_OUTPUT_CORRECT,
   ROSENBROCK_BACK_BEGIN,
   ROSENBROCK_BACK_INIT_SOLVE,
@@ -571,6 +572,12 @@ int casadi_rosenbrock_forward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>
       d->res = d->y_stage;
       return casadi_ivp_request(d, IVP_EVAL_RHS, ROSENBROCK_OUTPUT_CORRECT);
     }
+    if (d->jump) {
+      // State changed by an event: restart
+      d->reset = 1;
+      d->next = IVP_ADVANCE;
+      return casadi_rosenbrock_forward(d, r);
+    }
     if (casadi_ivp_step_limit(d)) return casadi_ivp_stop(d, IVP_MAX_NUM_STEPS);
     if ((ret = casadi_ivp_reserve(d, IVP_RECORD_STEP, ROSENBROCK_STEP_BEGIN)) >= 0) return ret;
     // Controls of the new step
@@ -659,6 +666,11 @@ int casadi_rosenbrock_forward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>
       return casadi_rosenbrock_forward(d, r);
     }
     casadi_ivp_accept(d);
+    if (p->ne > 0) return casadi_ivp_request(d, IVP_EVENT, ROSENBROCK_STEP_EVENT);
+    d->next = ROSENBROCK_STEP_EVENT;
+    return casadi_rosenbrock_forward(d, r);
+  case ROSENBROCK_STEP_EVENT:
+    if (d->status != IVP_SUCCESS) return casadi_ivp_stop(d, d->status);
     d->next = ROSENBROCK_STEP_BEGIN;
     if (d->pause) {
       // Hand the step to the integration that replays it

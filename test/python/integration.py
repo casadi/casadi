@@ -64,6 +64,32 @@ integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000,"simplify":T
 
 integrators.append(("rosenbrock",["dae","ode"],{"abstol": 1e-12,"reltol":1e-12}))
 
+# Integrators with zero-crossing events (option transition), by feature: events at all, of
+# DAEs (also sensitivities), code generation; digits of the results. The event
+# handling of Integrator (cvodes, idas, rk, collocation) gets forward sensitivities through
+# events of a DAE wrong: the rates after the transition use inconsistent algebraic states
+event_integrators = []
+
+for plugin in ["cvodes", "idas"]:
+  try:
+    ca.load_integrator(plugin)
+  except:
+    continue
+  event_integrators.append((plugin, {"abstol": 1e-12, "reltol": 1e-12, "quad_err_con": True,
+    "max_event_iter": 20}, {"events": True, "events_dae": False, "codegen": False,
+    "digits": 5}))
+
+event_integrators.append(("rk", {"number_of_finite_elements": 100, "max_event_iter": 20},
+  {"events": True, "events_dae": False, "codegen": False, "digits": 7}))
+
+event_integrators.append(("collocation", {"number_of_finite_elements": 20, "max_event_iter": 20},
+  {"events": True, "events_dae": False, "codegen": False, "digits": 7}))
+
+for plugin, options in [("erk", {}), ("erk", {"method": "rk4", "step_size": 0.002}),
+                        ("rosenbrock", {}), ("rosenbrock", {"step_size": 0.002})]:
+  event_integrators.append((plugin, dict(options, abstol=1e-11, reltol=1e-11),
+    {"events": True, "events_dae": plugin == "rosenbrock", "codegen": True, "digits": 8}))
+
 def bounce_transition(nz=0):
   # Bouncing ball: the velocity is reversed and scaled by the restitution p; z passes through
   x, z, p = ca.SX.sym("x", 2), ca.SX.sym("z", nz), ca.SX.sym("p")
@@ -2107,6 +2133,165 @@ class Integrationtests(casadiTestCase):
       self.check_jacobian(out, v, v0, 13)
       # Forward over forward replays the nominal steps
       self.check_hessian(ca.sumsqr(out), v, v0, 11)
+
+  @memory_heavy()
+  def test_events_bouncing_ball(self):
+    self.message("zero-crossing events: values, forward sensitivities, code generation")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "quad": x[0], "zero": x[0]}
+    transition = bounce_transition()
+    def exact(h0, p0, tt):
+      # Height, velocity and integral of the height
+      tb, ub, q = 0., None, 0.
+      h, v = h0, 0.
+      while True:
+        tau = numpy.sqrt(2*h/g) if ub is None else 2*ub/g
+        if tb + tau > tt: break
+        q += h*tau - g*tau**3/6 if ub is None else ub*tau**2/2 - g*tau**3/6
+        v = (-g*tau if ub is None else ub - g*tau)
+        tb, ub, h = tb + tau, -p0*v, 0.
+      tau = tt - tb
+      u0 = 0. if ub is None else ub
+      return [h + u0*tau - g*tau**2/2, u0 - g*tau], q + h*tau + u0*tau**2/2 - g*tau**3/6
+    grid = list(numpy.linspace(0.1, 4, 40))
+    h0, p0 = 2., 0.8
+    xf_ref = numpy.array([exact(h0, p0, tt)[0] for tt in grid]).T
+    qf_ref = numpy.array([exact(h0, p0, tt)[1] for tt in grid])
+    for plugin, opts, features in event_integrators:
+      if not features["events"]: continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=transition,
+        event_tol=1e-12))
+      r = F(x0=[h0, 0], p=p0)
+      self.checkarray(r["xf"], ca.DM(xf_ref), plugin, digits=features["digits"])
+      self.checkarray(r["qf"], ca.DM(qf_ref).T, plugin, digits=features["digits"])
+      if "n_events" in F.stats(): self.assertEqual(F.stats()["n_events"], 5)
+      # Forward sensitivities through the events, against finite differences
+      v = ca.MX.sym("v", 3)
+      rv = F(x0=v[:2], p=v[2])
+      out = ca.vertcat(rv["xf"][:, -1], rv["qf"][-1])
+      G = ca.Function("G", [v], [out, ca.jacobian(out, v)])
+      v0 = ca.DM([h0, 0.3, p0])
+      self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=min(6, features["digits"]))
+      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=12)
+
+  @memory_heavy()
+  def test_events_multiple(self):
+    self.message("zero-crossing events: several functions, transition by event index")
+    g, ceiling = 9.81, 1.5
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    # Ball between a floor (event 0, restitution p) and a ceiling (event 1, elastic)
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "zero": ca.vertcat(x[0], ceiling - x[0])}
+    transition = ca.Function("transition", [index, t, x, ca.SX(0, 1), p, ca.SX(0, 1)],
+      [ca.vertcat(x[0], ca.if_else(index == 0, -p, -1)*x[1]), ca.SX(0, 1)],
+      ["index", "t", "x", "z", "p", "u"], ["post_x", "post_z"])
+    def exact(v0, tt):
+      # Piecewise parabolas: the first crossing of the floor or the ceiling ends each one
+      t0, h, v = 0., float(v0[0]), float(v0[1])
+      while True:
+        taus = []
+        for level, sign in [(0., -1), (ceiling, 1)]:
+          # h + v tau - g tau^2 / 2 = level, crossing in the direction sign
+          disc = v*v - 2*g*(level - h)
+          if disc < 0: continue
+          for tau in [(v - numpy.sqrt(disc))/g, (v + numpy.sqrt(disc))/g]:
+            if tau > 1e-12 and sign*(v - g*tau) > 0: taus.append((tau, level))
+        tau, level = min(taus)
+        if t0 + tau > tt: break
+        v = (v - g*tau)*(-float(v0[2]) if level == 0 else -1)
+        t0, h = t0 + tau, level
+      tau = tt - t0
+      return [h + v*tau - g*tau**2/2, v - g*tau]
+    grid = list(numpy.linspace(0.1, 3, 30))
+    v0 = ca.DM([1, 4, 0.8])
+    xf_ref = ca.DM(numpy.array([exact(v0, tt) for tt in grid]).T)
+    for plugin, opts, features in event_integrators:
+      if not features["events"]: continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=transition,
+        event_tol=1e-12))
+      v = ca.MX.sym("v", 3)
+      xf = F(x0=v[:2], p=v[2])["xf"]
+      G = ca.Function("G", [v], [ca.vec(xf), ca.jacobian(ca.vec(xf), v)])
+      self.checkarray(G(v0)[0], ca.vec(xf_ref), plugin, digits=features["digits"])
+      self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=min(6, features["digits"]))
+      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=12)
+
+  @memory_heavy()
+  def test_events_dae(self):
+    self.message("zero-crossing events of a DAE, algebraic states consistent after the transition")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g), "alg": z - x[1], "zero": x[0]}
+    # The transition leaves z inconsistent
+    transition = bounce_transition(1)
+    # Several bounces, outputs between an event and the end of the step that contains it
+    grid = list(numpy.linspace(0.1, 3, 30))
+    ref = ca.integrator("ref", "erk", {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "zero": x[0]},
+      0, grid, {"transition": bounce_transition(), "event_tol": 1e-12, "abstol": 1e-11,
+      "reltol": 1e-11})
+    v0 = ca.DM([2, 0.3, 0.8])
+    xf_ref = ref(x0=v0[:2], p=v0[2])["xf"]
+    for plugin, opts, features in event_integrators:
+      if not features["events_dae"]: continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=transition,
+        event_tol=1e-12))
+      v = ca.MX.sym("v", 3)
+      r = F(x0=v[:2], z0=v[1], p=v[2])
+      out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["zf"]))
+      G = ca.Function("G", [v], [out, ca.jacobian(out, v)])
+      self.checkarray(G(v0)[0], ca.vertcat(ca.vec(xf_ref), xf_ref[1, :].T), plugin,
+        digits=features["digits"])
+      # Sensitivities through the events, with the rates after the transition
+      self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=min(6, features["digits"]))
+      if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=12)
+
+  @memory_heavy()
+  def test_events_breaking_spring(self):
+    self.message("zero-crossing events with controls and parameters")
+    x = ca.SX.sym("x", 3)
+    p = ca.SX.sym("p", 3)
+    u = ca.SX.sym("u")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    # States v, position, broken; parameters mass, stiffness, damping; control disturbance
+    f = ca.if_else(x[2] < 0.5, -p[1]*x[1] + u, 0)
+    dae = {"x": x, "p": p, "u": u, "ode": ca.vertcat((f - p[2]*x[0])/p[0], x[0], 0),
+           "zero": 2 - x[1]}
+    transition = ca.Function("transition", [index, t, x, ca.SX(0, 1), p, u],
+      [ca.vertcat(x[0], x[1], 1), ca.SX(0, 1)], ["index", "t", "x", "z", "p", "u"],
+      ["post_x", "post_z"])
+    grid = list(numpy.linspace(0.04, 4, 100))
+    d = numpy.zeros(100)
+    d[20:30] = -5
+    d[40:50] = 15
+    x0, p0 = [-5, -1, 0], ca.DM([1, 2, 0.1])
+    v = ca.MX.sym("v", 3)
+    def outputs(F):
+      xf = F(x0=x0, p=v, u=d)["xf"]
+      return ca.Function("G", [v], [xf, ca.jacobian(xf, v)])
+    ref = outputs(ca.integrator("ref", "erk", dae, 0, grid, {"transition": transition,
+      "event_tol": 1e-12, "abstol": 1e-12, "reltol": 1e-12}))(p0)
+    for plugin, opts, features in event_integrators:
+      if not features["events"]: continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=transition,
+        event_tol=1e-12))
+      G = outputs(F)
+      r = G(p0)
+      self.checkarray(r[0], ref[0], plugin, digits=features["digits"] - 1)
+      self.checkarray(r[1], ref[1], plugin, digits=features["digits"] - 2)
+      F(x0=x0, p=p0, u=d)
+      if "n_events" in F.stats(): self.assertEqual(F.stats()["n_events"], 1)
+      if features["codegen"]: self.check_codegen(G, inputs=[p0], digits=12)
+    # Every event counts towards max_events
+    F = ca.integrator("F", "erk", dae, 0, grid, {"transition": transition, "max_events": 0})
+    with self.assertInException("max_events"):
+      F(x0=x0, p=p0, u=d)
 
   @memory_heavy()
   def test_erk_tape(self):

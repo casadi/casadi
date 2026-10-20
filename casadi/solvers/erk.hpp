@@ -43,6 +43,11 @@
     exact discrete adjoint of the taped steps. With fixed steps the tape has a known bound,
     so adjoints can be code-generated; with adaptive steps, set max_tape_steps.
 
+    Zero-crossing events (DAE output zero, option transition) are located on the dense
+    output of the step in which a function becomes negative; integration restarts from the
+    state after the transition. Forward sensitivities include those of the event times;
+    adjoint sensitivities are not available with events.
+
 */
 /** \pluginsection{Integrator,erk} */
 
