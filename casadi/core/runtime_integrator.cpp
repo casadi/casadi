@@ -149,17 +149,29 @@ void RuntimeIntegrator::init(const Dict& opts) {
     create_function(rdae_, "vjpB", bdyn_in(), {"adj_x", "adj_z", "adj_p", "adj_u"});
   }
 
-  // Events: forward sensitivities only
-  casadi_assert(ne_ == 0 || nadj_ == 0, "Zero-crossing events with adjoint sensitivities are "
-    "not supported by '" + std::string(plugin_name()) + "'");
-
   // Zero-crossing functions and their time derivative; the jump at an event, its derivatives
   if (ne_ > 0) {
     create_function("zeroF", dyn_in(), {"zero"});
     create_forward("zeroF", 1);
     if (has_function("transition")) {
-      set_function(jump_function(), "jumpF");
+      Function jump = jump_function();
+      set_function(jump, "jumpF");
       if (nfwd_ > 0) create_forward("jumpF", nfwd_);
+      if (nadj_ > 0) {
+        // Adjoint seeds of x, z, q to adjoints of x, z, p, u
+        std::vector<MX> in = jump.mx_in(), out = jump(in), seed;
+        for (casadi_int i = 0; i < jump.n_out(); ++i) {
+          Sparsity sp = repmat(jump.sparsity_out(i), 1, nadj_);
+          seed.push_back(MX::sym("adj_" + jump.name_out(i), sp));
+        }
+        std::vector<MX> arg = in;
+        arg.insert(arg.end(), out.begin(), out.end());
+        arg.insert(arg.end(), seed.begin(), seed.end());
+        std::vector<MX> adj = jump.reverse(nadj_)(arg);
+        in.insert(in.end(), seed.begin(), seed.end());
+        set_function(Function("jumpB", in, {adj[1], adj[2], adj[4], adj[5]}), "jumpB");
+        if (nfwd_ > 0) create_forward("jumpB", nfwd_);
+      }
     }
   }
 
@@ -330,7 +342,7 @@ void RuntimeIntegrator::alloc_ivp_work() {
 
 casadi_int RuntimeIntegrator::tape_capacity() const {
   // Steps: a user bound with adaptive steps, a run of steps per control group with fixed steps
-  casadi_int ny = nx_ + nz_ + nq_, n_step = max_tape_steps_, n_init;
+  casadi_int ny = nx_ + nz_ + nq_, n_step = max_tape_steps_, n_init, n_event = 0;
   if (step_size_ > 0) {
     n_step = 0;
     for (casadi_int j = 0; j < ngroup(); ++j) {
@@ -341,8 +353,15 @@ casadi_int RuntimeIntegrator::tape_capacity() const {
   if (nadj_ == 0 || n_step == 0) return 0;
   // Every output interval may start with a consistent initialization
   n_init = nz_ > 0 ? nt() : 0;
+  if (ne_ > 0) {
+    // Event records, room for one more with each step; after an event, a consistent
+    // initialization and, with fixed steps, a new run of steps
+    n_event = max_events_ + 1;
+    if (nz_ > 0) n_init += max_events_;
+    if (step_size_ > 0) n_step += max_events_;
+  }
   return n_step * (ny * (static_cast<casadi_int>(alpha_.size()) + 1) + nu_ + 5)
-    + n_init * (ny + nu_ + 5);
+    + (n_init + n_event) * (ny + nu_ + 5);
 }
 
 void RuntimeIntegrator::set_work(void* mem, const double**& arg, double**& res,
@@ -592,6 +611,12 @@ int RuntimeIntegrator::eval_task(RuntimeIntegratorMemory* m, casadi_ivp_data<dou
     }
     return 0;
   }
+  if (d->task == IVP_EVENT_ADJ) {
+    while (casadi_ivp_event_adj(d)) {
+      if (eval_task(m, d, calls)) d->fail = 1;
+    }
+    return 0;
+  }
   for (const TaskCall& c : calls.at(d->task)) {
     std::fill_n(m->arg, c.n_in, nullptr);
     std::fill_n(m->res, c.n_out, nullptr);
@@ -748,6 +773,27 @@ std::vector<std::vector<RuntimeIntegrator::TaskCall>> RuntimeIntegrator::task_ca
         jump(c, 10, true);
         c.res = {{0, SRC_RES, nx1_}, {1, SRC_RES, nx_ + nz1_}, {2, SRC_RES, nx_ + nz_ + nq1_}};
         calls[IVP_EVAL_JUMP].push_back(c);
+      }
+      if (nadj_ > 0) {
+        // Adjoint seeds of x, z, q to adjoints of x, z, p, u, with forward-over-adjoint
+        TaskCall jb = call("jumpB");
+        jump(jb, 0, false);
+        jb.arg.push_back({7, SRC_W, 0});
+        jb.arg.push_back({8, SRC_W, nrx_});
+        jb.arg.push_back({9, SRC_W, nrx_ + nrz_});
+        for (casadi_int k = 0; k < 4; ++k) jb.res.push_back({k, vjp[k], 0});
+        calls[IVP_EVAL_JUMP_ADJ].push_back(jb);
+        if (nfwd_ > 0) {
+          c = call(forward_name("jumpB", nfwd_));
+          c.arg = jb.arg;
+          for (casadi_int k = 0; k < 4; ++k) c.arg.push_back({10 + k, vjp[k], 0});
+          jump(c, 14, true);
+          c.arg.push_back({21, SRC_W, nrx1_ * nadj_});
+          c.arg.push_back({22, SRC_W, nrx_ + nrz1_ * nadj_});
+          c.arg.push_back({23, SRC_W, nrx_ + nrz_ + nrp1_ * nadj_});
+          for (casadi_int k = 0; k < 4; ++k) c.res.push_back({k, vjp[k], n_vjp[k]});
+          calls[IVP_EVAL_JUMP_ADJ].push_back(c);
+        }
       }
     }
   }
@@ -984,12 +1030,12 @@ void RuntimeIntegrator::codegen_task(CodeGenerator& g, const std::string& d,
     const std::vector<std::vector<TaskCall>>& calls, bool in_event) const {
   // Straight-line code for the task table, as eval_task: direct calls, no function pointers
   static const char* task_name[] = {"IVP_EVAL_RHS", "IVP_EVAL_JAC", "IVP_EVAL_VJP",
-    "IVP_EVAL_JAC_ADJ", "IVP_EVAL_ZERO", "IVP_EVAL_JUMP"};
+    "IVP_EVAL_JAC_ADJ", "IVP_EVAL_ZERO", "IVP_EVAL_JUMP", "IVP_EVAL_JUMP_ADJ"};
   g << "switch (" << d << ".task) {\n";
   for (casadi_int task = 0; task < static_cast<casadi_int>(calls.size()); ++task) {
     if (calls[task].empty()) continue;
-    // Tasks of the events are requested by casadi_ivp_event only
-    bool ev = task >= IVP_EVAL_ZERO && task <= IVP_EVAL_JUMP;
+    // Tasks of the events are requested by casadi_ivp_event and casadi_ivp_event_adj only
+    bool ev = task >= IVP_EVAL_ZERO && task <= IVP_EVAL_JUMP_ADJ;
     if (in_event != ev) continue;
     g << "case " << task_name[task] << ":\n";
     // Slots set earlier in the same case need not be set again
@@ -1020,11 +1066,13 @@ void RuntimeIntegrator::codegen_task(CodeGenerator& g, const std::string& d,
     g << "break;\n";
   }
   if (ne_ > 0 && !in_event) {
-    g << "case IVP_EVENT:\n";
-    g << "while (casadi_ivp_event(&" << d << ")) {\n";
-    codegen_task(g, d, calls, true);
-    g << "}\n";
-    g << "break;\n";
+    for (casadi_int adj = 0; adj <= (nadj_ > 0 ? 1 : 0); ++adj) {
+      g << "case IVP_EVENT" << (adj ? "_ADJ" : "") << ":\n";
+      g << "while (casadi_ivp_event" << (adj ? "_adj" : "") << "(&" << d << ")) {\n";
+      codegen_task(g, d, calls, true);
+      g << "}\n";
+      g << "break;\n";
+    }
   }
   g << "default: " << d << ".fail = 1;\n";
   g << "}\n";

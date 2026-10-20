@@ -49,12 +49,16 @@ typedef enum {
   IVP_EVAL_ZERO,
   // res = y after the event selected by ev_w at (t_arg, y_arg), with forward sensitivities
   IVP_EVAL_JUMP,
+  // vjp = adjoint of IVP_EVAL_JUMP with seed w, with forward sensitivities
+  IVP_EVAL_JUMP_ADJ,
   // Enlarge the tape to at least tape_need entries, keeping its contents; set tape, tape_cap
   IVP_TAPE_RESERVE,
   // Adaptive step size control, see casadi_ivp_control
   IVP_STEP_CONTROL,
   // Events in the accepted step, see casadi_ivp_event
-  IVP_EVENT
+  IVP_EVENT,
+  // Adjoint of the popped event record, see casadi_ivp_event_adj
+  IVP_EVENT_ADJ
 } casadi_ivp_task_t;
 
 // SYMBOL "ivp_control_t"
@@ -96,7 +100,9 @@ typedef enum {
   // Integrator step from t0 to t0 + h
   IVP_RECORD_STEP,
   // Consistent initialization of the algebraic states at t0
-  IVP_RECORD_INIT
+  IVP_RECORD_INIT,
+  // Event at t0: state before it, index in place of h
+  IVP_RECORD_EVENT
 } casadi_ivp_record_t;
 
 // SYMBOL "ivp_prob"
@@ -530,9 +536,11 @@ void casadi_ivp_clear_vjp(casadi_ivp_data<T1>* d) {
 // SYMBOL "ivp_tape_full"
 template<typename T1>
 int casadi_ivp_tape_full(casadi_ivp_data<T1>* d, casadi_ivp_record_t record) {
-  // No room for a record of this type? Sets the capacity needed
+  // No room for a record of this type (a step with events: and an event record)? Sets the
+  // capacity needed
   const casadi_ivp_prob<T1>* p = d->prob;
   casadi_int n = (record == IVP_RECORD_STEP ? p->ny * p->n_stages : 0) + p->ny + p->nu + 5;
+  if (record == IVP_RECORD_STEP && p->ne > 0) n += p->ny + p->nu + 5;
   d->tape_need = d->tape_pos + n;
   return n > d->tape_cap - d->tape_pos;
 }
@@ -548,19 +556,19 @@ int casadi_ivp_reserve(casadi_ivp_data<T1>* d, casadi_ivp_record_t record, casad
 
 // SYMBOL "ivp_tape_push"
 template<typename T1>
-void casadi_ivp_tape_push(casadi_ivp_data<T1>* d) {
-  // Append the current record, for which room has been reserved
+void casadi_ivp_tape_push(casadi_ivp_data<T1>* d, const T1* y0, T1 h, T1 t0, T1 t1) {
+  // Append a record of type d->record from t0 to t1, for which room has been reserved
   const casadi_ivp_prob<T1>* p = d->prob;
   casadi_int n_u = d->record == IVP_RECORD_STEP ? p->ny * p->n_stages : 0;
   T1* rec = d->tape + d->tape_pos;
   casadi_copy(d->U, n_u, rec);
   rec += n_u;
-  casadi_copy(d->y0, p->ny, rec);
+  casadi_copy(y0, p->ny, rec);
   casadi_copy(d->u_step, p->nu, rec + p->ny);
   rec += p->ny + p->nu;
-  rec[0] = d->h;
-  rec[1] = d->t0;
-  rec[2] = d->t;
+  rec[0] = h;
+  rec[1] = t0;
+  rec[2] = t1;
   rec[3] = d->t_out;
   rec[4] = d->record;
   d->tape_pos += n_u + p->ny + p->nu + 5;
@@ -704,7 +712,7 @@ void casadi_ivp_accept(casadi_ivp_data<T1>* d) {
   d->n_steps_interval++;
   if (d->taping) {
     d->record = IVP_RECORD_STEP;
-    casadi_ivp_tape_push(d);
+    casadi_ivp_tape_push(d, d->y0, d->h, d->t0, d->t);
   }
   d->n_steps++;
 }
@@ -713,15 +721,19 @@ void casadi_ivp_accept(casadi_ivp_data<T1>* d) {
 template<typename T1>
 int casadi_ivp_back_begin(casadi_ivp_data<T1>* d) {
   // Record to process next; returns 0 when the retreat is done (tape exhausted, or the
-  // record belongs to an earlier output interval and becomes pending)
+  // record belongs to an earlier output interval and becomes pending). An event belongs to the
+  // output interval that contains it
+  T1 r;
+  if (d->status != IVP_SUCCESS) return casadi_ivp_stop(d, d->status);
   for (;;) {
     if (!d->record_pending && casadi_ivp_tape_pop(d)) return casadi_ivp_stop(d, IVP_SUCCESS);
+    r = d->record == IVP_RECORD_EVENT ? d->t0 : d->t_record;
     // Records of later output intervals are skipped with zero adjoint
-    if (d->t_record > d->t_start) {
+    if (r > d->t_start) {
       d->record_pending = 0;
       continue;
     }
-    if (d->t_record < d->t_start) {
+    if (d->record == IVP_RECORD_EVENT ? r <= d->t_out : r < d->t_start) {
       d->record_pending = 1;
       d->t = d->t_out;
       return casadi_ivp_stop(d, IVP_SUCCESS);
@@ -750,7 +762,7 @@ int casadi_ivp_impulse_begin(casadi_ivp_data<T1>* d) {
   // 1 if t_seed is inside its step, with the dense output at t_seed in y_out
   const casadi_ivp_prob<T1>* p = d->prob;
   while (!d->record_pending && !casadi_ivp_tape_pop(d)) {
-    d->record_pending = d->t_record <= d->t_seed;
+    d->record_pending = (d->record == IVP_RECORD_EVENT ? d->t0 : d->t_record) <= d->t_seed;
   }
   if (!d->record_pending || d->record != IVP_RECORD_STEP || d->t_seed == d->t1) {
     // Seed of the state at the end of the pending record

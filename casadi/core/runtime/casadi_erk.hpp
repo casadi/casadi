@@ -219,6 +219,7 @@ int casadi_erk_backward(casadi_ivp_data<T1>* d, casadi_erk_data<T1>* e) {
   switch (d->next) {
   case IVP_RETREAT:
     if (!casadi_ivp_back_begin(d)) return 0;
+    if (d->record == IVP_RECORD_EVENT) return casadi_ivp_request(d, IVP_EVENT_ADJ, IVP_RETREAT);
     casadi_ivp_back_step_begin(d);
     d->next = ERK_BACK_STAGE;
     return casadi_erk_backward(d, e);

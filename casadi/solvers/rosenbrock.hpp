@@ -47,8 +47,8 @@
 
     Zero-crossing events (DAE output zero, option transition) are located on the dense
     output of the step in which a function becomes negative; integration restarts from the
-    state after the transition. Forward sensitivities include those of the event times;
-    adjoint sensitivities are not available with events.
+    state after the transition. Sensitivities, forward, adjoint and forward-over-adjoint,
+    include those of the event times.
 
 */
 /** \pluginsection{Integrator,rosenbrock} */
