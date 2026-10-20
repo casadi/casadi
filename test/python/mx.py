@@ -4413,6 +4413,24 @@ class MXtests(casadiTestCase):
       f = ca.Function("f",[a],[ca.repmat(a,1,3)[:,[2,0,1]], ca.repmat(a,1,3)[[1,0],[1,2]], ca.repmat(a,1,3).nz[[5,0,2,1]]])
       f_ref = ca.Function("f",[b],[ca.repmat(b,1,3)[:,[2,0,1]], ca.repmat(b,1,3)[[1,0],[1,2]], ca.repmat(b,1,3).nz[[5,0,2,1]]])
       self.checkfunction(f,f_ref,inputs=[ca.DM(np.random.random(a.nnz()))] if a.is_dense() else [ca.DM(a.sparsity(),np.random.random(a.nnz()))])
+    # Non-vector, sparse (empty rows/columns) and all-zero inputs, horizontal and 2-D repeats
+    sps = [ca.Sparsity.dense(2,3), ca.Sparsity.triplet(3,3,[0,2,1],[0,0,2]),
+           ca.Sparsity.triplet(3,2,[0,2,2],[0,0,1]), ca.Sparsity(2,3)]
+    for sp in sps:
+      for m, n in [(1,3),(2,2)]:
+        def slices(a):
+          Y = ca.repmat(a,m,n)
+          R, C = Y.shape
+          return [Y[:,list(range(C))[::-1]], Y[list(range(R))[::-1],:], Y[[R-1,0],[C-1,0]],
+                  Y.nz[list(range(Y.nnz()))[::-1]], Y.T]
+        a = ca.MX.sym("a",sp)
+        b = ca.SX.sym("a",sp)
+        Y = ca.repmat(a,m,n)
+        w = Y.shape[1]//n
+        self.assertTrue((Y[:,w*(n-1):]-Y[:,:w]).is_zero())
+        f = ca.Function("f",[a],slices(a))
+        f_ref = ca.Function("f",[b],slices(b))
+        self.checkfunction(f,f_ref,inputs=[ca.DM(sp,np.random.random(sp.nnz()))])
 
   def test_logsumexp(self):
     x = ca.MX.sym("x",3)
