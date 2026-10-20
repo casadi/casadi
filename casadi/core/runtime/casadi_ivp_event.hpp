@@ -22,9 +22,11 @@
 // Event i occurs where e_i crosses from positive to negative; it is located on the dense output
 // of the step, and the integration restarts from the state after the transition
 // The jump (task IVP_EVAL_JUMP) is a function of the state before the event whose derivatives
-// are those of the event, including the dependence of its time
+// are those of the event, including the dependence of its time: forward, adjoint (task
+// IVP_EVENT_ADJ for event records of the tape) and forward-over-adjoint sensitivities
 
 // C-REPLACE "static_cast<T1>" "(casadi_real) "
+// C-REPLACE "static_cast<casadi_int>" "(casadi_int) "
 // C-REPLACE "fabs" "casadi_fabs"
 // C-REPLACE "casadi_ivp_prob<T1>" "struct casadi_ivp_prob"
 // C-REPLACE "casadi_ivp_data<T1>" "struct casadi_ivp_data"
@@ -36,7 +38,8 @@ typedef enum {
   IVP_EV_START,
   IVP_EV_END,
   IVP_EV_TRIAL,
-  IVP_EV_POST
+  IVP_EV_POST,
+  IVP_EV_BACK_SEED
 } casadi_ivp_event_phase_t;
 
 // SYMBOL "ivp_event_request"
@@ -159,6 +162,18 @@ void casadi_ivp_event_select(casadi_ivp_data<T1>* d, casadi_int ind) {
   d->ev_w[ind] = 1;
 }
 
+// SYMBOL "ivp_event_post"
+template<typename T1>
+int casadi_ivp_event_post(casadi_ivp_data<T1>* d) {
+  // State after the event in y: event record (room reserved with the step), restart
+  if (d->taping) {
+    // State before the event, index in place of the step size
+    d->record = IVP_RECORD_EVENT;
+    casadi_ivp_tape_push(d, d->y_out, static_cast<T1>(d->ev_fired), d->t_ev, d->t_ev);
+  }
+  return casadi_ivp_event_restart(d);
+}
+
 // SYMBOL "ivp_event_fire"
 template<typename T1>
 int casadi_ivp_event_fire(casadi_ivp_data<T1>* d) {
@@ -173,7 +188,7 @@ int casadi_ivp_event_fire(casadi_ivp_data<T1>* d) {
     casadi_ivp_interpolate(d, d->t_ev, d->y_out);
   }
   casadi_copy(d->y_out, p->ny, d->y);
-  if (!p->has_transition) return casadi_ivp_event_restart(d);
+  if (!p->has_transition) return casadi_ivp_event_post(d);
   casadi_ivp_event_select(d, d->ev_fired);
   d->t_arg = d->t_ev;
   d->y_arg = d->y_out;
@@ -270,7 +285,52 @@ int casadi_ivp_event(casadi_ivp_data<T1>* d) {
     return casadi_ivp_event_eval(d, tn, IVP_EV_TRIAL);
   case IVP_EV_POST:
     if (d->fail) return casadi_ivp_event_done(d, IVP_EVAL_FAILED);
-    return casadi_ivp_event_restart(d);
+    return casadi_ivp_event_post(d);
+  default:
+    return casadi_ivp_event_done(d, IVP_EVENT_FAILED);
+  }
+}
+
+// SYMBOL "ivp_event_adj"
+template<typename T1>
+int casadi_ivp_event_adj(casadi_ivp_data<T1>* d) {
+  // Adjoint of the popped event record (task IVP_EVENT_ADJ), then the stages of the step it
+  // cut short are seeded through the dense output; returns 1 while a task in d->task is to be
+  // carried out
+  const casadi_ivp_prob<T1>* p = d->prob;
+  switch (d->ev_phase) {
+  case IVP_EV_BEGIN:
+    d->t_ev = d->t0;
+    if (p->has_transition) {
+      casadi_ivp_event_select(d, static_cast<casadi_int>(d->h));
+      casadi_ivp_clear_vjp(d);
+      d->t_arg = d->t0;
+      d->y_arg = d->y0;
+      d->w = d->ry;
+      return casadi_ivp_event_request(d, IVP_EVAL_JUMP_ADJ, IVP_EV_BACK_SEED);
+    }
+    d->ev_phase = IVP_EV_BACK_SEED;
+    return casadi_ivp_event_adj(d);
+  case IVP_EV_BACK_SEED:
+    if (d->fail) return casadi_ivp_event_done(d, IVP_EVAL_FAILED);
+    if (p->has_transition) {
+      // Adjoint of the state before the event; quadratures pass through
+      casadi_clear(d->ry, p->nrx + p->nrz);
+      casadi_ivp_add_vjp(d, d->ry);
+    }
+    // The step that contains the event, ending there
+    if (casadi_ivp_tape_pop(d) || d->record != IVP_RECORD_STEP) {
+      return casadi_ivp_event_done(d, IVP_EVENT_FAILED);
+    }
+    d->record_pending = 1;
+    if (d->t_ev != d->t1) {
+      casadi_copy(d->ry, p->nr, d->seed);
+      casadi_clear(d->ry, p->nr);
+      casadi_ivp_interpolate(d, d->t_ev, d->y_out);
+      casadi_ivp_seed_stages(d);
+    }
+    d->t = d->t_ev;
+    return casadi_ivp_event_done(d, IVP_SUCCESS);
   default:
     return casadi_ivp_event_done(d, IVP_EVENT_FAILED);
   }

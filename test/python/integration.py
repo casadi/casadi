@@ -65,7 +65,7 @@ integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000,"simplify":T
 integrators.append(("rosenbrock",["dae","ode"],{"abstol": 1e-12,"reltol":1e-12}))
 
 # Integrators with zero-crossing events (option transition), by feature: events at all, of
-# DAEs (also sensitivities), code generation; digits of the results. The event
+# DAEs (also sensitivities), adjoints, code generation; digits of the results. The event
 # handling of Integrator (cvodes, idas, rk, collocation) gets forward sensitivities through
 # events of a DAE wrong: the rates after the transition use inconsistent algebraic states
 event_integrators = []
@@ -76,19 +76,20 @@ for plugin in ["cvodes", "idas"]:
   except:
     continue
   event_integrators.append((plugin, {"abstol": 1e-12, "reltol": 1e-12, "quad_err_con": True,
-    "max_event_iter": 20}, {"events": True, "events_dae": False, "codegen": False,
-    "digits": 5}))
+    "max_event_iter": 20}, {"events": True, "events_dae": False,
+    "events_adjoint": False, "codegen": False, "digits": 5}))
 
 event_integrators.append(("rk", {"number_of_finite_elements": 100, "max_event_iter": 20},
-  {"events": True, "events_dae": False, "codegen": False, "digits": 7}))
+  {"events": True, "events_dae": False, "events_adjoint": False, "codegen": False, "digits": 7}))
 
 event_integrators.append(("collocation", {"number_of_finite_elements": 20, "max_event_iter": 20},
-  {"events": True, "events_dae": False, "codegen": False, "digits": 7}))
+  {"events": True, "events_dae": False, "events_adjoint": False, "codegen": False, "digits": 7}))
 
 for plugin, options in [("erk", {}), ("erk", {"method": "rk4", "step_size": 0.002}),
                         ("rosenbrock", {}), ("rosenbrock", {"step_size": 0.002})]:
-  event_integrators.append((plugin, dict(options, abstol=1e-11, reltol=1e-11),
-    {"events": True, "events_dae": plugin == "rosenbrock", "codegen": True, "digits": 8}))
+  event_integrators.append((plugin, dict(options, abstol=1e-11, reltol=1e-11, max_tape_steps=600),
+    {"events": True, "events_dae": plugin == "rosenbrock", "events_adjoint": True,
+     "codegen": True, "digits": 8}))
 
 def bounce_transition(nz=0):
   # Bouncing ball: the velocity is reversed and scaled by the restitution p; z passes through
@@ -2292,6 +2293,40 @@ class Integrationtests(casadiTestCase):
     F = ca.integrator("F", "erk", dae, 0, grid, {"transition": transition, "max_events": 0})
     with self.assertInException("max_events"):
       F(x0=x0, p=p0, u=d)
+
+  @memory_heavy()
+  def test_events_adjoint(self):
+    self.message("zero-crossing events: adjoint and forward-over-adjoint sensitivities")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    # Bouncing ball with restitution p, as an ODE and as a DAE with z the velocity
+    ode = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "quad": x[0], "zero": x[0]}
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g), "alg": z - x[1], "quad": x[0],
+           "zero": x[0]}
+    # Outputs before, at and after the events, also inside steps cut short by them
+    grid = list(numpy.linspace(0.1, 3, 30))
+    wts = ca.DM(numpy.random.default_rng(0).uniform(0.5, 1.5, (2, 30)))
+    for plugin, opts, features in event_integrators:
+      if not features["events_adjoint"]: continue
+      for problem, transition in [(ode, bounce_transition())] + ([(dae, bounce_transition(1))]
+          if features["events_dae"] else []):
+        F = ca.integrator("F", plugin, problem, 0, grid, dict(opts, transition=transition,
+          event_tol=1e-12))
+        v = ca.MX.sym("v", 3)
+        r = F(x0=v[:2], z0=v[1], p=v[2])
+        obj = ca.sum1(ca.sum2(wts * r["xf"])) + ca.sumsqr(r["qf"])
+        G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+          ca.jtimes(obj, v, ca.MX.eye(3)).T, ca.hessian(obj, v)[0]])
+        v0 = ca.DM([2, 0.3, 0.8])
+        # Adjoint as forward sensitivities
+        grad_adj, grad_fwd, H = G(v0)
+        self.checkarray(grad_adj, grad_fwd, plugin, digits=9)
+        # Forward-over-adjoint: central differences of the gradient, Richardson extrapolated
+        fd = lambda h: fd_jacobian(G, v0, h)
+        self.checkarray(H, (4*fd(1e-4) - fd(2e-4))/3, plugin, digits=6)
+        if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=11)
 
   @memory_heavy()
   def test_erk_tape(self):

@@ -549,10 +549,7 @@ int casadi_rosenbrock_forward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>
     r->init_pending = 0;
     if (d->taping) {
       d->record = IVP_RECORD_INIT;
-      d->t0 = d->t;
-      d->h = 0;
-      casadi_copy(d->y, p->ny, d->y0);
-      casadi_ivp_tape_push(d);
+      casadi_ivp_tape_push(d, d->y, static_cast<T1>(0), d->t, d->t);
     }
     d->next = ROSENBROCK_STEP_BEGIN;
     return casadi_rosenbrock_forward(d, r);
@@ -702,6 +699,9 @@ int casadi_rosenbrock_backward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1
   case IVP_RETREAT:
   case ROSENBROCK_BACK_BEGIN:
     if (!casadi_ivp_back_begin(d)) return 0;
+    if (d->record == IVP_RECORD_EVENT) {
+      return casadi_ivp_request(d, IVP_EVENT_ADJ, ROSENBROCK_BACK_BEGIN);
+    }
     // Linearize at the beginning of the record
     d->t_arg = d->t0;
     d->y_arg = d->y0;

@@ -77,6 +77,9 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   /// Advance solution in time
   int advance_noevent(IntegratorMemory* mem) const override;
 
+  /// Adjoint sensitivities, also with events
+  bool has_reverse(casadi_int nadj) const override { return true;}
+
   /// Reset the backward problem
   void resetB(IntegratorMemory* mem) const override;
 

@@ -1700,8 +1700,8 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     const Dict& opts) const {
   if (verbose_) casadi_message(name_ + "::get_reverse");
 
-  // Events not implemented
-  casadi_assert(ne_ == 0, "Event support not implemented for  Integrator::get_reverse");
+  // Events not implemented by all plugins
+  casadi_assert(has_reverse(nadj), "Event support not implemented for Integrator::get_reverse");
 
   // Integrator options
   Dict aug_opts = getDerivativeOptions(false);
