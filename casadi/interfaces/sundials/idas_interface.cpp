@@ -231,6 +231,9 @@ int IdasInterface::init_mem(void* mem) const {
   if (SundialsInterface::init_mem(mem)) return 1;
   auto m = to_mem(mem);
 
+  // State and state derivative at the output times
+  if (nrx_ > 0) m->xz_out.resize(2 * (nx_ + nz_) * nt());
+
   // Create IDAS memory block
   m->mem = IDACreate();
   casadi_assert(m->mem!=nullptr, "IDACreate: Creation failed");
@@ -437,6 +440,13 @@ int IdasInterface::advance_noevent(IntegratorMemory* mem) const {
     }
   }
 
+  // Save the state at the output time for the backward problem
+  if (nrx_ > 0 && m->t_next == m->t_next_out) {
+    double* xz_out = get_ptr(m->xz_out) + 2 * (nx_ + nz_) * m->k;
+    casadi_copy(NV_DATA_S(m->v_xz), nx_ + nz_, xz_out);
+    casadi_copy(NV_DATA_S(m->v_xzdot), nx_ + nz_, xz_out + nx_ + nz_);
+  }
+
   // Set function outputs
   casadi_copy(NV_DATA_S(m->v_xz), nx_ + nz_, m->x);
   casadi_copy(NV_DATA_S(m->v_q), nq_, m->q);
@@ -516,6 +526,11 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
   // Call method in base class
   SundialsInterface::impulseB(mem, adj_x, adj_z, adj_q);
 
+  // Forward solution at the impulse
+  const double* xz_out = get_ptr(m->xz_out) + 2 * (nx_ + nz_) * m->k;
+  casadi_copy(xz_out, nx_ + nz_, NV_DATA_S(m->v_xz));
+  casadi_copy(xz_out + nx_ + nz_, nx_ + nz_, NV_DATA_S(m->v_xzdot));
+
   // Propagate impulse from adj_z to adj_x
   z_impulseB(m, adj_z);
 
@@ -581,7 +596,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
   }
 
   // Correct initial values for the integration if necessary
-  if (calc_icB_ && m->k == nt() - 1) {
+  if (calc_icB_) {
     THROWING(IDACalcICB, m->mem, m->whichB, t0_, m->v_xz, m->v_xzdot);
     THROWING(IDAGetConsistentICB, m->mem, m->whichB, m->v_adj_xz, m->v_adj_xzdot);
   }

@@ -2430,6 +2430,24 @@ class Integrationtests(casadiTestCase):
       for i in range(2): self.checkarray(res[0][i], res[1][i], plugin, digits=8)
 
   @memory_heavy()
+  def test_idas_adjoint_output_times(self):
+    self.message("idas: adjoint seeds of a DAE at intermediate output times")
+    x = ca.SX.sym("x")
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    dae = {"x": x, "z": z, "p": p, "ode": z + p, "alg": z*ca.cos(z) - x}
+    F = ca.integrator("F", "idas", dae, 0, [0.1, 0.2, 0.3], {"abstol": 1e-10, "reltol": 1e-10})
+    v = ca.MX.sym("v", 2)
+    r = F(x0=v[0], p=v[1])
+    # Seeds at the last output time, at all output times, and before the last one only
+    for w_x, w_z in [([0, 0, 1], [0, 0, 0]), ([1, 2, 1], [0, 0, 0]), ([1, 0, 0], [0, 0, 0])]:
+      obj = ca.mtimes(r["xf"], ca.DM(w_x)) + ca.mtimes(r["zf"], ca.DM(w_z))
+      G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+        ca.jtimes(obj, v, ca.MX.eye(2)).T])
+      grad_adj, grad_fwd = G([0.1, 0.15])
+      self.checkarray(grad_fwd, grad_adj, str(w_x + w_z), digits=7)
+
+  @memory_heavy()
   def test_adjoint_checkpoint_stop_time(self):
     self.message("issue #3227: recomputation from a check point ending at a stop time")
     x = ca.SX.sym("x")
@@ -2468,8 +2486,7 @@ class Integrationtests(casadiTestCase):
       ref = ca.vertcat(r1["xf"], r2["xf"], r1["qf"], r1["qf"] + r2["qf"])
       out = ca.vertcat(r["xf"].T, r["qf"].T)
       outputs = [ref, out, ca.jacobian(ref, v), ca.jacobian(out, v)]
-      if problem is ode:
-        outputs += [ca.jtimes(ca.sum1(e), v, ca.MX.ones(1, 1), True) for e in (ref, out)]
+      outputs += [ca.jtimes(ca.sum1(e), v, ca.MX.ones(1, 1), True) for e in (ref, out)]
       res = ca.Function("G", [v], outputs)(ca.vertcat(0, 0.15, 1, 1.1))
       for i in range(0, len(res), 2):
         self.checkarray(res[i], res[i + 1], plugin, digits=9)

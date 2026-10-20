@@ -67,6 +67,9 @@ struct CASADI_INTEGRATOR_IDAS_EXPORT IdasMemory : public SundialsMemory {
   /// cj used in the last factorization
   double cj_last;
 
+  /// State and state derivative at the output times, for adjoint impulses
+  std::vector<double> xz_out;
+
   /// Constructor
   IdasMemory(const IdasInterface& s);
 
