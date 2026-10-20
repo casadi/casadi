@@ -195,9 +195,23 @@ def hessian_old(f, i, j):
 
 class casadiTestCase(unittest.TestCase):
 
+  _codegen_batch = None
+
   @classmethod
   def tearDownClass(cls):
     print("STATUS_RAN_ALL_TESTS")
+
+  @contextmanager
+  def codegen_batch(self):
+    # Plain check_codegen calls inside are compiled together, one library per std
+    self._codegen_batch = {}
+    try:
+      yield
+      batch = self._codegen_batch
+    finally:
+      self._codegen_batch = None
+    for std, entries in batch.items():
+      self.check_codegen(entries, std=std)
 
   @contextmanager
   def assertInAnyOutput(self,s):
@@ -824,14 +838,26 @@ class casadiTestCase(unittest.TestCase):
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
+      plain = not (opts or main or extralibs or extralibdirs or check_serialize or extra_options or not with_external or definitions or with_jac_sparsity or external_opts or with_reverse or with_forward or extra_include or debug_mode)
+      if self._codegen_batch is not None and plain and not isinstance(F, list):
+        self._codegen_batch.setdefault(std, []).append((F, inputs, digits))
+        return ret
+      # A list of (F, inputs, digits) is generated as uniquely named wrappers in one library
+      batched = None
+      if isinstance(F, list):
+        batched = [(f.wrap("%s_b%d" % (f.name(), k)), i, d) for k, (f, i, d) in enumerate(F)]
+        F = batched[0][0]
+        # gcc's misleading-indentation check is superlinear in file size
+        if os.name!='nt': extra_options = ["-Wno-misleading-indentation"]
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       if opts is None: opts = {}
       if main: opts["main"] = True
       cg_names = []
       cg = ca.CodeGenerator(name,opts)
-      cg.add(F,with_jac_sparsity)
-      cg_names.append(F.name())
+      for f in ([e[0] for e in batched] if batched else [F]):
+        cg.add(f,with_jac_sparsity)
+        cg_names.append(f.name())
       if with_jac_sparsity: cg_names.append("jac_"+F.name())
       if with_reverse:
         Frev = F.reverse(1)
@@ -925,6 +951,16 @@ class casadiTestCase(unittest.TestCase):
 
       # Check that all exported symbols are accessible (have correct prefix)
       self.check_symbols(libname, cg_names, name+".c")
+
+      if batched:
+        for f, f_inputs, f_digits in batched:
+          f2 = ca.external(f.name(), libname)
+          r, r2 = f.call(f_inputs), f2.call(f_inputs)
+          if isinstance(r, dict): r, r2 = [r[k] for k in f.name_out()], [r2[k] for k in f.name_out()]
+          for o, o2 in zip(r, r2):
+            self.checkarray(o, o2, digits=f_digits)
+        ret["libname"] = libname
+        return ret
 
       if external_opts is None: external_opts = {}
       if with_external:
