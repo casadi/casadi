@@ -1679,6 +1679,23 @@ class Integrationtests(casadiTestCase):
     ]
     cross_check(Iadj, base, seeds, "fwd-of-reverse-of-collocation")
 
+  def check_jacobian(self, out, v, v0, digits):
+    # Forward and adjoint Jacobians of out(v) at v0 agree
+    J_fwd = ca.Function("J", [v], [ca.jtimes(out, v, ca.MX.eye(v.numel()))])(v0)
+    J_adj = ca.Function("J", [v], [ca.jtimes(out, v, ca.MX.eye(out.numel()), True).T])(v0)
+    self.checkarray(J_fwd, J_adj, "fwd vs adj", digits=digits)
+
+  def check_hessian(self, obj, v, v0, digits):
+    # Hessian of obj(v) at v0: forward and adjoint mode over the forward and adjoint gradients
+    n = v.numel()
+    g_fwd = ca.jtimes(obj, v, ca.MX.eye(n)).T
+    g_adj = ca.jtimes(obj, v, ca.MX.ones(1, 1), True)
+    H = [ca.Function("H", [v], [h])(v0) for h in [ca.jtimes(g_fwd, v, ca.MX.eye(n)),
+         ca.jtimes(g_adj, v, ca.MX.eye(n)), ca.jtimes(g_fwd, v, ca.MX.eye(n), True).T,
+         ca.jtimes(g_adj, v, ca.MX.eye(n), True).T]]
+    for h in H[1:]: self.checkarray(H[0], h, "Hessian", digits=digits)
+    return H[0]
+
   def test_reverse_grid_directions(self):
     self.message("Several adjoint directions with several output times")
     x = ca.SX.sym("x", 2)
@@ -1753,7 +1770,8 @@ class Integrationtests(casadiTestCase):
     rng = numpy.random.default_rng(1)
     rand = lambda sp: ca.DM(sp, rng.random(sp.nnz()))
     for plugin, opts, digits in [("cvodes", {"reltol": 1e-12, "abstol": 1e-12}, 7),
-                                 ("idas", {"reltol": 1e-12, "abstol": 1e-12}, 7)]:
+                                 ("idas", {"reltol": 1e-12, "abstol": 1e-12}, 7),
+                                 ("erk", {"step_size": 0.2}, 12)]:
       if not ca.has_integrator(plugin): continue
       for grid in [[1.0], [0.5, 1.0]]:
         F = ca.integrator("F", plugin, dae, 0, grid, opts)
@@ -1783,6 +1801,153 @@ class Integrationtests(casadiTestCase):
                                      ca.jtimes(vout, vin, ca.MX.eye(vin.numel()))])
         J_sp, J_dense = J(numpy.concatenate([e.nonzeros() for e in inputs]))
         self.checkarray(J_dense, J_sp, plugin + " sparsity", digits=digits)
+
+  @memory_heavy()
+  def test_erk(self):
+    self.message("erk: order 4, dense output, steps independent of the outputs")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0] + u*ca.cos(t)),
+           "quad": x[0]**2}
+    # Harmonic oscillator: error at the end and inside a step
+    w = 1.3
+    exact = lambda tt: ca.DM([numpy.cos(w*tt), -w*numpy.sin(w*tt)])
+    err = []
+    for h in [0.1, 0.05, 0.025]:
+      r = ca.integrator("F", "erk", dae, 0, [0.37, 2.0], {"method": "rk4", "step_size": h})(x0=[1, 0],
+        p=w**2)
+      err.append([float(ca.norm_inf(r["xf"][:, 1] - exact(2.0))),
+                  float(ca.norm_inf(r["xf"][:, 0] - exact(0.37)))])
+    for e0, e1 in zip(err[:-1], err[1:]):
+      self.assertGreater(numpy.log2(e0[0]/e1[0]), 3.8)
+      self.assertGreater(numpy.log2(e0[1]/e1[1]), 3.4)
+    # Same steps as rk when the output times are on the mesh
+    args = {"x0": [1, 0.2], "p": 2, "u": ca.DM([[0.3, -0.1]])}
+    r = ca.integrator("F", "erk", dae, 0, [0.5, 1.0], {"method": "rk4", "step_size": 0.1})(**args)
+    ref = ca.integrator("F", "rk", dae, 0, [0.5, 1.0], {"number_of_finite_elements": 10})(**args)
+    for k in ["xf", "qf"]: self.checkarray(ref[k], r[k], k, digits=14)
+    # Within a control group, the number of steps does not depend on the number of outputs
+    for n in [10, 1000]:
+      F = ca.integrator("F", "erk", dae, 0, list(numpy.linspace(0, 10, n)),
+                        {"step_size": 0.05, "control_group_size": [n]})
+      F(x0=[1, 0], p=w**2)
+      self.assertEqual(F.stats()["n_steps"], 200)
+
+  @memory_heavy()
+  def test_erk_derivatives(self):
+    self.message("erk: derivatives are exact derivatives of the scheme")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0]**3 + u*ca.cos(t)),
+           "quad": x[0]**2 + u*x[1]}
+    # Outputs inside steps, at t0, and controls that change or not
+    grid = [0, 0.13, 0.31, 0.37, 1.0, 1.15, 2.0]
+    for u0 in [[0.1] * 7, [0.1] * 3 + [0.3] * 4, list(numpy.linspace(0.1, 0.4, 7))]:
+      F = ca.integrator("F", "erk", dae, 0, grid, {"step_size": 0.1})
+      v = ca.MX.sym("v", 10)
+      r = F(x0=v[:2], p=v[2], u=v[3:].T)
+      out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["qf"]))
+      v0 = [1, 0.5, 1.7] + u0
+      self.check_jacobian(out, v, v0, 13)
+      obj = ca.sumsqr(out)
+      self.check_hessian(obj, v, v0, 12)
+      # Finite differences, also for controls of equal value
+      g = ca.Function("g", [v], [ca.gradient(obj, v)])(v0)
+      self.checkarray(g, fd_jacobian(ca.Function("f", [v], [obj]), v0).T, "FD", digits=7)
+
+  @memory_heavy()
+  def test_erk_codegen(self):
+    self.message("erk: code generation, including derivatives")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*ca.sin(x[0]) + u),
+           "quad": x[0]**2}
+    for grid, opts in [([0.5, 1], {"step_size": 0.04}),
+                       (list(numpy.linspace(0.07, 1, 15)), {"step_size": 0.04}),
+                       (list(numpy.linspace(0.07, 1, 15)), {"method": "rk4", "step_size": 0.1})]:
+      F = ca.integrator("F", "erk", dae, 0, grid, opts)
+      v = ca.MX.sym("v", 3 + len(grid))
+      r = F(x0=v[:2], p=v[2], u=v[3:].T)
+      obj = ca.sumsqr(r["xf"]) + ca.sumsqr(r["qf"])
+      # Forward over forward in a few directions: all of them make a large file to compile
+      S = ca.DM.eye(v.numel())[:, [0, 2, 3]]
+      outs = [r["xf"], r["qf"], ca.gradient(obj, v), ca.jtimes(ca.jtimes(obj, v, S).T, v, S)]
+      G = ca.Function("G", [v], outs)
+      v0 = [0.4, -0.3, 2] + [0.1 * (i % 3) for i in range(len(grid))]
+      self.check_codegen(G, inputs=[ca.DM(v0)], digits=14)
+
+  @memory_heavy()
+  def test_control_groups(self):
+    self.message("erk: one control per control group, derivatives for each control")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    ode = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0]**3 + u*ca.cos(t)),
+           "quad": x[0]**2 + u*x[1]}
+    dae = {"t": t, "x": x, "z": z, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0] + u*z),
+           "alg": z**3 + z - u - 0.5*x[0], "quad": x[0]**2 + u*z}
+    # Output times on the mesh of fixed steps
+    grid = [0.2, 0.3, 0.5, 1.0, 1.2, 2.0]
+    for plugin, opts in [("erk", {"method": "rk4", "step_size": 0.1})]:
+      d = dae if plugin == "rosenbrock" else ode
+      # Repeated controls and their control groups agree, up to the restarts between outputs
+      args = {"x0": [1, 0.5], "p": 1.7}
+      r = ca.integrator("F", plugin, d, 0, grid, opts)(u=ca.DM([[0.1, 0.1, 0.3, 0.2, 0.2, 0.2]]),
+                                                      **args)
+      F = ca.integrator("F", plugin, d, 0, grid, dict(opts, control_group_size=[2, 1, 3]))
+      r_group = F(u=ca.DM([[0.1, 0.3, 0.2]]), **args)
+      for k in ["xf", "zf", "qf"]: self.checkarray(r[k], r_group[k], k, digits=6)
+      # Controls of equal value: each has its own sensitivities
+      for cgs in [None, [2, 1, 3]]:
+        F = ca.integrator("F", plugin, d, 0, grid, dict(opts, control_group_size=cgs or [1] * 6))
+        n = 3 + F.size2_in(3)
+        v = ca.MX.sym("v", n)
+        r = F(x0=v[:2], p=v[2], u=v[3:].T)
+        out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["zf"]), ca.vec(r["qf"]))
+        G = ca.Function("G", [v], [out, ca.jtimes(out, v, ca.MX.eye(n)),
+                                   ca.jtimes(out, v, ca.MX.eye(out.numel()), True).T])
+        v0 = numpy.array([1, 0.5, 1.7] + [0.2] * (n - 3))
+        _, J_fwd, J_adj = G(v0)
+        J_fd = fd_jacobian(G, v0)
+        self.checkarray(J_fd, J_fwd, "fwd vs FD", digits=7)
+        self.checkarray(J_fd, J_adj, "adj vs FD", digits=7)
+        if cgs: self.check_codegen(G, inputs=[ca.DM(v0)], digits=14)
+        # States depend on the controls of their group and earlier ones, forward and reverse
+        start = numpy.cumsum([0] + (cgs or [1] * 6))
+        for w in [0, 1]:
+          J = ca.Function("J", [v], [out], {"ad_weight_sp": w}).jac_sparsity(0, 0)
+          dep = numpy.array(ca.DM(J, 1))[:12, 3:] != 0
+          for k in range(6):
+            for j in range(n - 3):
+              self.assertEqual(bool(dep[2*k:2*k+2, j].any()), bool(start[j] <= k))
+    with self.assertInException("must sum to the number of output times"):
+      ca.integrator("F", "erk", ode, 0, grid, {"control_group_size": [2, 1]})
+
+  @memory_heavy()
+  def test_erk_rk45(self):
+    self.message("erk: method of order 5")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    dae = {"t": t, "x": x, "p": p, "ode": ca.vertcat(x[1], -p*x[0]), "quad": x[0]**2}
+    w = 1.3
+    exact = lambda tt: numpy.array([numpy.cos(w*tt), -w*numpy.sin(w*tt)])
+    # Fixed steps: order 5
+    err = []
+    for h in [0.1, 0.05, 0.025]:
+      r = ca.integrator("F", "erk", dae, 0, 2, {"method": "rk45", "step_size": h})(x0=[1, 0], p=w**2)
+      err.append(numpy.max(numpy.abs(numpy.array(r["xf"]).ravel() - exact(2.0))))
+    for e0, e1 in zip(err[:-1], err[1:]):
+      self.assertGreater(numpy.log2(e0/e1), 4.7)
+    with self.assertInException("unknown method"):
+      ca.integrator("F", "erk", dae, 0, 1, {"method": "rk5"})
 
 if __name__ == '__main__':
     unittest.main()

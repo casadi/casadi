@@ -309,28 +309,31 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
   return Sparsity();
 }
 
-bool Integrator::grid_in(casadi_int i) {
+casadi_int Integrator::n_grid_in(casadi_int i) const {
   switch (static_cast<IntegratorInput>(i)) {
     case INTEGRATOR_U:
+      // A plugin may hold the controls over several output intervals
+      return size2_in(INTEGRATOR_U) / (1 + nfwd_);
     case INTEGRATOR_ADJ_XF:
     case INTEGRATOR_ADJ_ZF:
     case INTEGRATOR_ADJ_QF:
-      return true;
+      return nt();
     default: break;
   }
-  return false;
+  return 1;
 }
 
-bool Integrator::grid_out(casadi_int i) {
+casadi_int Integrator::n_grid_out(casadi_int i) const {
   switch (static_cast<IntegratorOutput>(i)) {
     case INTEGRATOR_XF:
     case INTEGRATOR_ZF:
     case INTEGRATOR_QF:
+      return nt();
     case INTEGRATOR_ADJ_U:
-      return true;
+      return n_grid_in(INTEGRATOR_U);
     default: break;
   }
-  return false;
+  return 1;
 }
 
 casadi_int Integrator::adjmap_out(casadi_int i) {
@@ -1629,17 +1632,18 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   // Call the augmented integrator
   std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
-    if (size1_in(i) > 0 && grid_in(i) && nt() > 1) {
+    casadi_int n_grid = n_grid_in(i);
+    if (size1_in(i) > 0 && n_grid > 1) {
       // Split nondifferentiated input by grid point
-      std::vector<MX> ret_in_split = horzsplit_n(ret_in[i], nt());
+      std::vector<MX> ret_in_split = horzsplit_n(ret_in[i], n_grid);
       // Split augmented input by grid point
       std::vector<std::vector<MX>> aug_in_split(nfwd);
       for (casadi_int d = 0; d < nfwd; ++d) {
-        aug_in_split[d] = horzsplit_n(aug_in[i][d], nt());
+        aug_in_split[d] = horzsplit_n(aug_in[i][d], n_grid);
       }
       // Reorder columns
       v.clear();
-      for (casadi_int k = 0; k < nt(); ++k) {
+      for (casadi_int k = 0; k < n_grid; ++k) {
         v.push_back(ret_in_split.at(k));
         for (casadi_int d = 0; d < nfwd; ++d) {
           v.push_back(aug_in_split[d].at(k));
@@ -1661,7 +1665,7 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   ret_out.reserve(INTEGRATOR_NUM_OUT);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
     // Split return by grid points and sensitivities
-    casadi_int n_grid = grid_out(i) ? nt() : 1;
+    casadi_int n_grid = n_grid_out(i);
     std::vector<casadi_int> offset = {0};
     for (casadi_int k = 0; k < n_grid; ++k) {
       for (casadi_int d = 0; d <= nfwd; ++d) {
@@ -1760,18 +1764,18 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     // Output index contributing to adjoint seeds
     casadi_int j = adjmap_out(i);
     // Number of grid points for this integrator input
-    casadi_int n_grid = grid_in(i) ? nt() : 1;
+    casadi_int n_grid = n_grid_in(i);
     // Split input and seeds by grid points, if necessary
     std::vector<MX> ret_in_split;
     std::vector<std::vector<MX>> aug_in_split(nadj);
-    if (grid_in(i) && n_grid > 1) {
+    if (n_grid > 1) {
       // Split nondifferentiated input by grid point; it is empty without a backward problem,
       // but the seeds still need to be ordered by grid point
-      ret_in_split = ret_in[i].size2() > 0 ? horzsplit_n(ret_in[i], nt())
-        : std::vector<MX>(nt(), MX(size1_in(i), 0));
+      ret_in_split = ret_in[i].size2() > 0 ? horzsplit_n(ret_in[i], n_grid)
+        : std::vector<MX>(n_grid, MX(size1_in(i), 0));
       // Split augmented input by grid point
       for (casadi_int d = 0; d < nadj; ++d) {
-        aug_in_split[d] = horzsplit_n(aug_in[j][d], nt());
+        aug_in_split[d] = horzsplit_n(aug_in[j][d], n_grid);
       }
     } else {
       // No reordering necessary
@@ -1812,7 +1816,7 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
     casadi_int j = adjmap_out(i);
     // Split return by grid points and sensitivities
-    casadi_int n_grid = grid_out(j) ? nt() : 1;
+    casadi_int n_grid = n_grid_out(j);
     casadi_int n_dir = nadj * na, n_block = (na == 1 ? numel_in(i) : numel_out(j)) / n_grid;
     std::vector<casadi_int> offset = {0};
     for (casadi_int k = 0; k < n_grid; ++k) {

@@ -1,0 +1,669 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010-2026 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+
+#include "runtime_integrator.hpp"
+#include "casadi_misc.hpp"
+
+namespace casadi {
+
+RuntimeIntegrator::RuntimeIntegrator(const std::string& name, const Function& dae, double t0,
+    const std::vector<double>& tout) : Integrator(name, dae, t0, tout) {
+}
+
+RuntimeIntegrator::~RuntimeIntegrator() {
+}
+
+const Options RuntimeIntegrator::options_
+= {{&Integrator::options_},
+    {{"control_group_size",
+      {OT_INTVECTOR,
+      "Number of output intervals in each control group, over which the controls, one "
+      "column each, are constant: a run of steps [default: 1 for each output interval]"}},
+    {"step_size",
+      {OT_DOUBLE,
+      "Each run of steps, over a control group or up to the end without controls, is "
+      "divided into equal steps of at most step_size [default: (tf - t0)/20]"}}
+    }
+};
+
+void RuntimeIntegrator::init(const Dict& opts) {
+  // Control groups, before the base class sizes the controls; a single one without controls
+  group_start_ = oracle_.numel_in(DYN_U) == 0 ? std::vector<casadi_int>{0, nt()} : range(nt() + 1);
+  auto cgs = opts.find("control_group_size");
+  if (cgs != opts.end()) {
+    group_start_ = {0};
+    for (casadi_int n : cgs->second.to_int_vector()) {
+      casadi_assert(n > 0, "'control_group_size' entries must be positive");
+      group_start_.push_back(group_start_.back() + n);
+    }
+    casadi_assert(group_start_.back() == nt(), "'control_group_size' must sum to the number "
+      "of output times, " + str(nt()) + ", got " + str(group_start_.back()));
+  }
+
+  // Call the base class init
+  Integrator::init(opts);
+
+  // Controls and control adjoints by output interval, for sparsity propagation
+  if (ngroup() < nt()) alloc_w((nu_ + nuq_) * nt(), true);
+
+  // Default options
+  step_size_ = (tout_.back() - t0_) / 20;
+
+  // Read options
+  for (auto&& op : opts) {
+    if (op.first == "step_size") {
+      step_size_ = op.second;
+    }
+  }
+  casadi_assert(step_size_ > 0, "'step_size' must be positive");
+
+  // Events not supported
+  casadi_assert(ne_ == 0, "Zero-crossing events are not supported by '"
+    + std::string(plugin_name()) + "'");
+
+  // Right-hand side [ode; alg; quad] and its vector-Jacobian product, one function each
+  create_function("rhsF", dyn_in(), {"ode", "alg", "quad"});
+  if (nadj_ > 0) {
+    create_function(rdae_, "vjpB", bdyn_in(), {"adj_x", "adj_z", "adj_p", "adj_u"});
+  }
+
+  // Forward sensitivities of these
+  if (nfwd_ > 0) {
+    create_forward("rhsF", nfwd_);
+    if (nadj_ > 0) create_forward("vjpB", nfwd_);
+  }
+}
+
+void RuntimeIntegrator::set_ivp_prob() {
+  // Problem structure for the shared part of the kernel
+  p_.nx1 = nx1_;
+  p_.nz1 = nz1_;
+  p_.nq1 = nq1_;
+  p_.np1 = np1_;
+  p_.nu1 = nu1_;
+  p_.nfwd = nfwd_;
+  p_.nadj = nadj_;
+  p_.n_stages = alpha_.size();
+  p_.a = get_ptr(a_);
+  p_.alpha = get_ptr(alpha_);
+  p_.m = get_ptr(m_);
+  p_.n_dense = n_dense_;
+  p_.m_dense = get_ptr(m_dense_);
+  p_.tape_size = tape_capacity();
+  p_.step_size = step_size_;
+  casadi_ivp_setup(&p_);
+  calls_ = task_calls("");
+}
+
+void RuntimeIntegrator::alloc_ivp_work() {
+  // Shared kernel data
+  casadi_int sz_arg = 0, sz_res = 0, sz_iw = 0, sz_w = 0;
+  casadi_ivp_work(&p_, &sz_arg, &sz_res, &sz_iw, &sz_w);
+  alloc_w(sz_w, true);
+  // Parameters and controls in generated code
+  alloc_w(np_ + nu_, true);
+}
+
+casadi_int RuntimeIntegrator::tape_capacity() const {
+  // Steps: a run of steps per control group
+  casadi_int ny = nx_ + nz_ + nq_, n_step = 0;
+  for (casadi_int j = 0; j < ngroup(); ++j) {
+    double t = j == 0 ? t0_ : tout_[group_start_[j] - 1];
+    n_step += casadi_ivp_steps(tout_[group_start_[j + 1] - 1] - t, step_size_);
+  }
+  if (nadj_ == 0 || n_step == 0) return 0;
+  return n_step * (ny * (static_cast<casadi_int>(alpha_.size()) + 1) + nu_ + 4);
+}
+
+void RuntimeIntegrator::set_work(void* mem, const double**& arg, double**& res,
+    casadi_int*& iw, double*& w) const {
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  Integrator::set_work(mem, arg, res, iw, w);
+  m->d.prob = &p_;
+  casadi_ivp_set_work(&m->d, &arg, &res, &iw, &w);
+}
+
+int RuntimeIntegrator::init_mem(void* mem) const {
+  if (Integrator::init_mem(mem)) return 1;
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  casadi_ivp_clear_stats(&m->d);
+  return 0;
+}
+
+void RuntimeIntegrator::run(RuntimeIntegratorMemory* m) const {
+  // Carry out the tasks requested by the kernel
+  while (kernel(m)) {
+    if (task(m)) m->d.fail = 1;
+  }
+}
+
+void RuntimeIntegrator::reset(IntegratorMemory* mem, bool first_call) const {
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  casadi_ivp_data<double>* d = &m->d;
+  // State y = [x; z; q]
+  casadi_copy(m->x, nx_, d->y);
+  casadi_copy(m->z, nz_, d->y + nx_);
+  casadi_copy(m->q, nq_, d->y + nx_ + nz_);
+  casadi_ivp_reset(d, m->t, m->u, first_call);
+}
+
+int RuntimeIntegrator::advance_noevent(IntegratorMemory* mem) const {
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  casadi_ivp_data<double>* d = &m->d;
+  casadi_ivp_advance(d, m->t_next, m->t_stop, nrx_ > 0);
+  run(m);
+  if (d->status != IVP_SUCCESS) {
+    if (verbose_) {
+      casadi_warning(name_ + ": integration failed at t = " + str(d->t) + ", status "
+        + str(static_cast<casadi_int>(d->status)));
+    }
+    return 1;
+  }
+  casadi_copy(d->y_out, nx_, m->x);
+  casadi_copy(d->y_out + nx_, nz_, m->z);
+  casadi_copy(d->y_out + nx_ + nz_, nq_, m->q);
+  return 0;
+}
+
+void RuntimeIntegrator::resetB(IntegratorMemory* mem) const {
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  casadi_ivp_reset_backward(&m->d);
+}
+
+void RuntimeIntegrator::impulseB(IntegratorMemory* mem,
+    const double* adj_x, const double* adj_z, const double* adj_q) const {
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  double* seed = m->d.seed;
+  casadi_copy(adj_x, nrx_, seed);
+  casadi_copy(adj_z, nrz_, seed + nrx_);
+  casadi_copy(adj_q, nrp_, seed + nrx_ + nrz_);
+  casadi_ivp_impulse(&m->d, m->t);
+  run(m);
+  casadi_assert(m->d.status == IVP_SUCCESS, name_ + ": adjoint seed at t = "
+    + str(m->t) + " failed, status " + str(static_cast<casadi_int>(m->d.status)));
+}
+
+Sparsity RuntimeIntegrator::get_sparsity_in(casadi_int i) {
+  if (i == INTEGRATOR_U) return Sparsity::dense(nu1_, ngroup() * (1 + nfwd_));
+  return Integrator::get_sparsity_in(i);
+}
+
+Sparsity RuntimeIntegrator::get_sparsity_out(casadi_int i) {
+  if (i == INTEGRATOR_ADJ_U) return Sparsity::dense(nuq1_, nadj_ * (1 + nfwd_) * ngroup());
+  return Integrator::get_sparsity_out(i);
+}
+
+int RuntimeIntegrator::eval(const double** arg, double** res,
+    casadi_int* iw, double* w, void* mem) const {
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  const double* u = arg[INTEGRATOR_U];
+  const double* adj_xf = arg[INTEGRATOR_ADJ_XF];
+  const double* adj_zf = arg[INTEGRATOR_ADJ_ZF];
+  const double* adj_qf = arg[INTEGRATOR_ADJ_QF];
+  double* xf = res[INTEGRATOR_XF];
+  double* zf = res[INTEGRATOR_ZF];
+  double* qf = res[INTEGRATOR_QF];
+  double* adj_u = res[INTEGRATOR_ADJ_U];
+  setup(m, arg + INTEGRATOR_NUM_IN, res + INTEGRATOR_NUM_OUT, iw, w);
+  set_q(m, nullptr);
+  set_x(m, arg[INTEGRATOR_X0]);
+  set_z(m, arg[INTEGRATOR_Z0]);
+  set_p(m, arg[INTEGRATOR_P]);
+  m->num_events = 0;
+  m->t = t0_;
+  // Forward integration: a run of steps per control group
+  for (casadi_int j = 0; j < ngroup(); ++j) {
+    set_u(m, u ? u + j * nu_ : nullptr);
+    m->t_stop = tout_[group_start_[j + 1] - 1];
+    reset(m, j == 0);
+    for (m->k = group_start_[j]; m->k < group_start_[j + 1]; ++m->k) {
+      m->t_next = tout_[m->k];
+      if (advance_noevent(m)) return 1;
+      m->t = m->t_next;
+      get_x(m, xf ? xf + m->k * nx_ : nullptr);
+      get_z(m, zf ? zf + m->k * nz_ : nullptr);
+      get_q(m, qf ? qf + m->k * nq_ : nullptr);
+    }
+  }
+  // Discrete adjoint, output interval by output interval
+  if (nrx_ > 0) {
+    resetB(m);
+    for (casadi_int j = ngroup(); j-- > 0; ) {
+      // Control adjoints of this group only
+      casadi_clear(m->d.adj_u, nuq_);
+      for (m->k = group_start_[j + 1]; m->k-- > group_start_[j]; ) {
+        m->t = tout_[m->k];
+        impulseB(m, adj_xf ? adj_xf + m->k * nrx_ : nullptr,
+          adj_zf ? adj_zf + m->k * nrz_ : nullptr, adj_qf ? adj_qf + m->k * nrp_ : nullptr);
+        m->t_next = m->k > 0 ? tout_[m->k - 1] : t0_;
+        retreat(m, nullptr, m->k == 0 ? res[INTEGRATOR_ADJ_X0] : nullptr,
+          m->k == 0 ? res[INTEGRATOR_ADJ_P] : nullptr,
+          adj_u && m->k == group_start_[j] ? adj_u + j * nuq_ : nullptr);
+      }
+    }
+  }
+  join_results(m);
+  if (print_stats_) print_stats(m);
+  return 0;
+}
+
+namespace {
+  // Dependencies with a column per control group to one with a column per output interval
+  void groups_to_intervals(const std::vector<casadi_int>& gs, const bvec_t* g, bvec_t* k,
+      casadi_int n) {
+    for (size_t j = 0; j + 1 < gs.size(); ++j) {
+      for (casadi_int i = gs[j]; i < gs[j + 1]; ++i) std::copy_n(g + j * n, n, k + i * n);
+    }
+  }
+  // Dependencies with a column per output interval added to one with a column per control group
+  void intervals_to_groups(const std::vector<casadi_int>& gs, const bvec_t* k, bvec_t* g,
+      casadi_int n) {
+    for (size_t j = 0; j + 1 < gs.size(); ++j) {
+      for (casadi_int i = gs[j]; i < gs[j + 1]; ++i) {
+        for (casadi_int l = 0; l < n; ++l) g[j * n + l] |= k[i * n + l];
+      }
+    }
+  }
+}  // namespace
+
+int RuntimeIntegrator::sp_forward(const bvec_t** arg, bvec_t** res,
+    casadi_int* iw, bvec_t* w, void* mem) const {
+  if (ne_ > 0 || ngroup() == nt()) return Integrator::sp_forward(arg, res, iw, w, mem);
+  // Controls and control adjoints by output interval
+  const bvec_t* u = arg[INTEGRATOR_U];
+  bvec_t* adj_u = res[INTEGRATOR_ADJ_U];
+  bvec_t* u_k = w; w += nu_ * nt();
+  bvec_t* adj_u_k = w; w += nuq_ * nt();
+  if (u) groups_to_intervals(group_start_, u, u_k, nu_);
+  arg[INTEGRATOR_U] = u ? u_k : nullptr;
+  res[INTEGRATOR_ADJ_U] = adj_u ? adj_u_k : nullptr;
+  int flag = Integrator::sp_forward(arg, res, iw, w, mem);
+  arg[INTEGRATOR_U] = u;
+  res[INTEGRATOR_ADJ_U] = adj_u;
+  if (adj_u) {
+    std::fill_n(adj_u, nuq_ * ngroup(), 0);
+    intervals_to_groups(group_start_, adj_u_k, adj_u, nuq_);
+  }
+  return flag;
+}
+
+int RuntimeIntegrator::sp_reverse(bvec_t** arg, bvec_t** res,
+    casadi_int* iw, bvec_t* w, void* mem) const {
+  if (ne_ > 0 || ngroup() == nt()) return Integrator::sp_reverse(arg, res, iw, w, mem);
+  // Controls and control adjoints by output interval
+  bvec_t* u = arg[INTEGRATOR_U];
+  bvec_t* adj_u = res[INTEGRATOR_ADJ_U];
+  bvec_t* u_k = w; w += nu_ * nt();
+  bvec_t* adj_u_k = w; w += nuq_ * nt();
+  std::fill_n(u_k, nu_ * nt(), 0);
+  if (adj_u) {
+    groups_to_intervals(group_start_, adj_u, adj_u_k, nuq_);
+    std::fill_n(adj_u, nuq_ * ngroup(), 0);
+  }
+  arg[INTEGRATOR_U] = u ? u_k : nullptr;
+  res[INTEGRATOR_ADJ_U] = adj_u ? adj_u_k : nullptr;
+  int flag = Integrator::sp_reverse(arg, res, iw, w, mem);
+  arg[INTEGRATOR_U] = u;
+  res[INTEGRATOR_ADJ_U] = adj_u;
+  if (u) intervals_to_groups(group_start_, u_k, u, nu_);
+  return flag;
+}
+
+void RuntimeIntegrator::retreat(IntegratorMemory* mem, const double* u,
+    double* adj_x, double* adj_p, double* adj_u) const {
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  casadi_ivp_data<double>* d = &m->d;
+  // The controls of each step are taped
+  casadi_ivp_retreat(d, m->t, m->t_next);
+  run(m);
+  casadi_assert(d->status == IVP_SUCCESS,
+    name_ + ": adjoint sweep failed, status " + str(static_cast<casadi_int>(d->status)));
+  casadi_copy(d->ry, nrx_, adj_x);
+  casadi_copy(d->adj_p, nrq_, adj_p);
+  casadi_copy(d->adj_u, nuq_, adj_u);
+}
+
+int RuntimeIntegrator::task(RuntimeIntegratorMemory* m) const {
+  casadi_ivp_data<double>* d = &m->d;
+  if (d->task == IVP_TAPE_RESERVE) {
+    // The tape persists between evaluations: grow it only when too small
+    if (m->tape.size() < static_cast<size_t>(d->tape_need)) {
+      m->tape.resize(std::max(static_cast<size_t>(d->tape_need), 2 * m->tape.size()));
+    }
+    d->tape = get_ptr(m->tape);
+    d->tape_cap = m->tape.size();
+    return 0;
+  }
+  return eval_task(m, d, calls_);
+}
+
+int RuntimeIntegrator::eval_task(RuntimeIntegratorMemory* m, casadi_ivp_data<double>* d,
+    const std::vector<std::vector<TaskCall>>& calls) const {
+  // Function evaluations requested by the kernel, as described by the task table
+  for (const TaskCall& c : calls.at(d->task)) {
+    std::fill_n(m->arg, c.n_in, nullptr);
+    std::fill_n(m->res, c.n_out, nullptr);
+    for (const Slot& e : c.arg) m->arg[e.i] = slot_ptr(m, d, e);
+    for (const Slot& e : c.res) m->res[e.i] = slot_ptr(m, d, e);
+    if (calc_function(m, c.fname)) return 1;
+  }
+  return 0;
+}
+
+double* RuntimeIntegrator::slot_ptr(RuntimeIntegratorMemory* m, casadi_ivp_data<double>* d,
+    const Slot& e) const {
+  // Buffer of a function argument or result, as slot_expr in generated code
+  double* b = nullptr;
+  switch (e.src) {
+    case SRC_T: b = &d->t_arg; break;
+    case SRC_Y: b = const_cast<double*>(d->y_arg); break;
+    case SRC_P: b = m->p; break;
+    case SRC_U: b = d->u_step; break;
+    case SRC_RES: b = d->res; break;
+    case SRC_W: b = const_cast<double*>(d->w); break;
+    case SRC_VJP_X: b = d->vjp_x; break;
+    case SRC_VJP_Z: b = d->vjp_z; break;
+    case SRC_VJP_P: b = d->vjp_p; break;
+    case SRC_VJP_U: b = d->vjp_u; break;
+  }
+  return b + e.off;
+}
+
+std::string RuntimeIntegrator::slot_expr(const std::string& d, const Slot& e) {
+  // Buffer of a function argument or result in generated code, as slot_ptr
+  std::string b;
+  switch (e.src) {
+    case SRC_T: b = "&" + d + ".t_arg"; break;
+    case SRC_Y: b = d + ".y_arg"; break;
+    case SRC_P: b = "pv"; break;
+    case SRC_U: b = d + ".u_step"; break;
+    case SRC_RES: b = d + ".res"; break;
+    case SRC_W: b = d + ".w"; break;
+    case SRC_VJP_X: b = d + ".vjp_x"; break;
+    case SRC_VJP_Z: b = d + ".vjp_z"; break;
+    case SRC_VJP_P: b = d + ".vjp_p"; break;
+    case SRC_VJP_U: b = d + ".vjp_u"; break;
+  }
+  return e.off == 0 ? b : b + "+" + str(e.off);
+}
+
+std::vector<std::vector<RuntimeIntegrator::TaskCall>> RuntimeIntegrator::task_calls(
+    const std::string& suffix) const {
+  // For each task, the functions to call and the buffers of their arguments and results
+  std::vector<std::vector<TaskCall>> calls(IVP_TAPE_RESERVE);
+  static_assert(static_cast<int>(BDYN_U) == static_cast<int>(DYN_U)
+    && static_cast<int>(BDYN_T) == static_cast<int>(DYN_T),
+    "Backward DAE inputs start with t, x, z, p, u");
+  // Results of the adjoint functions: adjoints of x, z, p, u and their forward derivatives
+  const Src vjp[4] = {SRC_VJP_X, SRC_VJP_Z, SRC_VJP_P, SRC_VJP_U};
+  const casadi_int n_vjp[4] = {nrx1_ * nadj_, nrz1_ * nadj_, nrq1_ * nadj_, nuq1_ * nadj_};
+  auto call = [&](const std::string& fname) -> TaskCall {
+    const Function& f = get_function(fname);
+    return {fname + suffix, f.n_in(), f.n_out(), {}, {}};
+  };
+  // Inputs t, x, z, p, u at offset i; forward seeds are the sensitivity parts
+  auto dyn = [&](TaskCall& c, casadi_int i, bool fwd) -> void {
+    if (!fwd) c.arg.push_back({i + DYN_T, SRC_T, 0});
+    c.arg.push_back({i + DYN_X, SRC_Y, fwd ? nx1_ : 0});
+    c.arg.push_back({i + DYN_Z, SRC_Y, nx_ + (fwd ? nz1_ : 0)});
+    c.arg.push_back({i + DYN_P, SRC_P, fwd ? np1_ : 0});
+    c.arg.push_back({i + DYN_U, SRC_U, fwd ? nu1_ : 0});
+  };
+  // Right-hand side [ode; alg; quad] at (t, y)
+  TaskCall rhs = call("rhsF");
+  dyn(rhs, 0, false);
+  rhs.res = {{0, SRC_RES, 0}, {1, SRC_RES, nx_}, {2, SRC_RES, nx_ + nz_}};
+  calls[IVP_EVAL_RHS].push_back(rhs);
+  if (nfwd_ > 0) {
+    TaskCall c = call(forward_name("rhsF", nfwd_));
+    dyn(c, 0, false);
+    for (casadi_int k = 0; k < 3; ++k) {
+      c.arg.push_back({DYN_NUM_IN + k, SRC_RES, rhs.res[k].off});
+    }
+    dyn(c, DYN_NUM_IN + 3, true);
+    c.res = {{0, SRC_RES, nx1_}, {1, SRC_RES, nx_ + nz1_}, {2, SRC_RES, nx_ + nz_ + nq1_}};
+    calls[IVP_EVAL_RHS].push_back(c);
+  }
+  if (nadj_ > 0) {
+    // [dF/dx; dF/dz; dF/dp; dF/du]^T w, with forward-over-adjoint
+    TaskCall vjpb = call("vjpB");
+    dyn(vjpb, 0, false);
+    vjpb.arg.push_back({BDYN_ADJ_ODE, SRC_W, 0});
+    vjpb.arg.push_back({BDYN_ADJ_ALG, SRC_W, nrx_});
+    vjpb.arg.push_back({BDYN_ADJ_QUAD, SRC_W, nrx_ + nrz_});
+    for (casadi_int k = 0; k < 4; ++k) vjpb.res.push_back({k, vjp[k], 0});
+    calls[IVP_EVAL_VJP].push_back(vjpb);
+    if (nfwd_ > 0) {
+      TaskCall c = call(forward_name("vjpB", nfwd_));
+      casadi_int i = BDYN_NUM_IN + 4;
+      c.arg = vjpb.arg;
+      for (casadi_int k = 0; k < 4; ++k) c.arg.push_back({BDYN_NUM_IN + k, vjp[k], 0});
+      dyn(c, i, true);
+      c.arg.push_back({i + BDYN_ADJ_ODE, SRC_W, nrx1_ * nadj_});
+      c.arg.push_back({i + BDYN_ADJ_ALG, SRC_W, nrx_ + nrz1_ * nadj_});
+      c.arg.push_back({i + BDYN_ADJ_QUAD, SRC_W, nrx_ + nrz_ + nrp1_ * nadj_});
+      for (casadi_int k = 0; k < 4; ++k) c.res.push_back({k, vjp[k], n_vjp[k]});
+      calls[IVP_EVAL_VJP].push_back(c);
+    }
+  }
+  return calls;
+}
+
+bool RuntimeIntegrator::has_codegen() const {
+  // Adjoint sensitivities need a tape of bounded size
+  return nadj_ == 0 || tape_capacity() > 0;
+}
+
+void RuntimeIntegrator::codegen_declarations(CodeGenerator& g) const {
+  std::vector<std::string> fcn = {"rhsF"};
+  if (nadj_ > 0) fcn.push_back("vjpB");
+  for (const std::string& f : fcn) {
+    g.add_dependency(get_function(f));
+    if (nfwd_ > 0) g.add_dependency(get_function(forward_name(f, nfwd_)));
+  }
+}
+
+void RuntimeIntegrator::codegen_body(CodeGenerator& g) const {
+  g.add_auxiliary(CodeGenerator::AUX_IVP);
+  const std::string nl = ";\n", method = plugin_name();
+  g.local("p", "struct casadi_ivp_prob");
+  g.local("d", "struct casadi_ivp_data");
+  g.local("pe", "struct casadi_" + method + "_prob");
+  g.local("e", "struct casadi_" + method + "_data");
+  g.local("sarg", "const casadi_real", "**");
+  g.local("sres", "casadi_real", "**");
+  g.local("pv", "casadi_real", "*");
+  if (nu_ > 0) g.local("uv", "casadi_real", "*");
+  g.local("j", "casadi_int");
+  g.local("k", "casadi_int");
+
+  g.comment("Problem structure");
+  codegen_ivp_prob(g, "p");
+
+  g.comment("Work vectors");
+  g << "sarg = arg + " << INTEGRATOR_NUM_IN << "; sres = res + " << INTEGRATOR_NUM_OUT << nl;
+  g << "pv = w; w += " << np_ << nl;
+  if (nu_ > 0) g << "uv = w; w += " << nu_ << nl;
+  g << "d.prob = &p" << nl;
+  g << "casadi_ivp_set_work(&d, &arg, &res, &iw, &w)" << nl;
+  g.comment("Method");
+  codegen_method(g);
+
+  g.comment("Initial state, parameters");
+  g << g.copy("arg[" + str(INTEGRATOR_X0) + "]", nx_, "d.y") << "\n";
+  g << g.copy("arg[" + str(INTEGRATOR_Z0) + "]", nz_, "d.y+" + str(nx_)) << "\n";
+  g << g.clear("d.y+" + str(nx_ + nz_), nq_) << "\n";
+  g << g.copy("arg[" + str(INTEGRATOR_P) + "]", np_, "pv") << "\n";
+
+  g.comment("Forward integration: a run of steps per control group, as RuntimeIntegrator::eval");
+  std::string tout = g.constant(tout_), gs = g.constant(group_start_), t0 = g.constant(t0_);
+  g << "for (j = 0; j < " << ngroup() << "; ++j) {\n";
+  if (nu_ > 0) {
+    g << g.copy("arg[" + str(INTEGRATOR_U) + "] ? arg[" + str(INTEGRATOR_U) + "] + j*"
+      + str(nu_) + " : 0", nu_, "uv") << "\n";
+  }
+  g << "casadi_ivp_reset(&d, j ? " << tout << "[" << gs << "[j]-1] : " << t0 << ", "
+    << (nu_ > 0 ? "uv" : "0") << ", j == 0)" << nl;
+  g << "for (k = " << gs << "[j]; k < " << gs << "[j+1]; ++k) {\n";
+  g << "casadi_ivp_advance(&d, " << tout << "[k], " << tout << "[" << gs << "[j+1]-1], "
+    << (nrx_ > 0 ? 1 : 0) << ")" << nl;
+  codegen_loop(g);
+  g << "if (d.status != IVP_SUCCESS) return 1" << nl;
+  g << "if (res[" << INTEGRATOR_XF << "]) " << g.copy("d.y_out", nx_, "res["
+    + str(INTEGRATOR_XF) + "] + k*" + str(nx_)) << "\n";
+  g << "if (res[" << INTEGRATOR_ZF << "]) " << g.copy("d.y_out+" + str(nx_), nz_, "res["
+    + str(INTEGRATOR_ZF) + "] + k*" + str(nz_)) << "\n";
+  g << "if (res[" << INTEGRATOR_QF << "]) " << g.copy("d.y_out+" + str(nx_ + nz_), nq_,
+    "res[" + str(INTEGRATOR_QF) + "] + k*" + str(nq_)) << "\n";
+  g << "}\n}\n";
+
+  if (nrx_ > 0) {
+    g.comment("Discrete adjoint, output interval by output interval");
+    g << "casadi_ivp_reset_backward(&d)" << nl;
+    g << "for (j = " << ngroup() - 1 << "; j >= 0; --j) {\n";
+    g.comment("Control adjoints of this group only");
+    g << g.clear("d.adj_u", nuq_) << "\n";
+    g << "for (k = " << gs << "[j+1]-1; k >= " << gs << "[j]; --k) {\n";
+    g.comment("Impulse from the adjoint seeds at output time k");
+    const casadi_int adj_in[3] = {INTEGRATOR_ADJ_XF, INTEGRATOR_ADJ_ZF, INTEGRATOR_ADJ_QF};
+    const casadi_int adj_n[3] = {nrx_, nrz_, nrp_};
+    const casadi_int adj_off[3] = {0, nrx_, nrx_ + nrz_};
+    for (casadi_int i = 0; i < 3; ++i) {
+      if (adj_n[i] == 0) continue;
+      g << g.copy("arg[" + str(adj_in[i]) + "] ? arg[" + str(adj_in[i]) + "] + k*"
+        + str(adj_n[i]) + " : 0", adj_n[i], "d.seed+" + str(adj_off[i])) << "\n";
+    }
+    g << "casadi_ivp_impulse(&d, " << tout << "[k])" << nl;
+    codegen_loop(g);
+    g << "if (d.status != IVP_SUCCESS) return 1" << nl;
+    g << "casadi_ivp_retreat(&d, " << tout << "[k], k > 0 ? " << tout << "[k-1] : " << t0
+      << ")" << nl;
+    codegen_loop(g);
+    g << "if (d.status != IVP_SUCCESS) return 1" << nl;
+    g << "}\n";
+    g << "if (res[" << INTEGRATOR_ADJ_U << "]) " << g.copy("d.adj_u", nuq_, "res["
+      + str(INTEGRATOR_ADJ_U) + "] + j*" + str(nuq_)) << "\n";
+    g << "}\n";
+    g << "if (res[" << INTEGRATOR_ADJ_X0 << "]) " << g.copy("d.ry", nrx_, "res["
+      + str(INTEGRATOR_ADJ_X0) + "]") << "\n";
+    g << "if (res[" << INTEGRATOR_ADJ_P << "]) " << g.copy("d.adj_p", nrq_, "res["
+      + str(INTEGRATOR_ADJ_P) + "]") << "\n";
+  }
+}
+
+void RuntimeIntegrator::codegen_loop(CodeGenerator& g) const {
+  // Carry out the tasks requested by the kernel
+  g << "while (casadi_" << plugin_name() << "(&d, &e)) {\n";
+  codegen_task(g, "d", calls_);
+  g << "}\n";
+}
+
+void RuntimeIntegrator::codegen_ivp_prob(CodeGenerator& g, const std::string& p) const {
+  // Shared problem structure in variable p, as set_ivp_prob
+  auto set = [&](const std::string& field, const std::string& value) -> void {
+    g << p << "." << field << " = " << value << ";\n";
+  };
+  set("nx1", str(nx1_));
+  set("nz1", str(nz1_));
+  set("nq1", str(nq1_));
+  set("np1", str(np1_));
+  set("nu1", str(nu1_));
+  set("nfwd", str(nfwd_));
+  set("nadj", str(nadj_));
+  set("n_stages", str(alpha_.size()));
+  set("a", g.constant(a_));
+  set("alpha", g.constant(alpha_));
+  set("m", g.constant(m_));
+  set("n_dense", str(n_dense_));
+  set("m_dense", g.constant(m_dense_));
+  set("tape_size", str(p_.tape_size));
+  set("step_size", g.constant(p_.step_size));
+  g << "casadi_ivp_setup(&" << p << ");\n";
+}
+
+void RuntimeIntegrator::codegen_task(CodeGenerator& g, const std::string& d,
+    const std::vector<std::vector<TaskCall>>& calls) const {
+  // Straight-line code for the task table, as eval_task: direct calls, no function pointers
+  static const char* task_name[] = {"IVP_EVAL_RHS", "IVP_EVAL_VJP"};
+  g << "switch (" << d << ".task) {\n";
+  for (casadi_int task = 0; task < static_cast<casadi_int>(calls.size()); ++task) {
+    if (calls[task].empty()) continue;
+    g << "case " << task_name[task] << ":\n";
+    // Slots set earlier in the same case need not be set again
+    std::map<casadi_int, std::string> arg_set, res_set;
+    for (const TaskCall& c : calls[task]) {
+      std::vector<std::string> arg(c.n_in, "0"), res(c.n_out, "0");
+      for (const Slot& e : c.arg) arg[e.i] = slot_expr(d, e);
+      for (const Slot& e : c.res) res[e.i] = slot_expr(d, e);
+      for (casadi_int i = 0; i < c.n_in; ++i) {
+        if (arg_set.count(i) && arg_set[i] == arg[i]) continue;
+        g << "sarg[" << i << "] = " << arg[i] << ";\n";
+        arg_set[i] = arg[i];
+      }
+      for (casadi_int i = 0; i < c.n_out; ++i) {
+        if (res_set.count(i) && res_set[i] == res[i]) continue;
+        g << "sres[" << i << "] = " << res[i] << ";\n";
+        res_set[i] = res[i];
+      }
+      // On failure, skip the remaining evaluations of the task
+      std::string flag = g(get_function(c.fname), "sarg", "sres", "iw", "w");
+      g << "if (" << flag << ") {\n" << d << ".fail = 1;\nbreak;\n}\n";
+    }
+    g << "break;\n";
+  }
+  g << "default: " << d << ".fail = 1;\n";
+  g << "}\n";
+}
+
+Dict RuntimeIntegrator::get_stats(void* mem) const {
+  Dict stats = Integrator::get_stats(mem);
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  stats["n_steps"] = m->d.n_steps;
+  stats["n_rhs"] = m->d.n_rhs;
+  stats["n_vjp"] = m->d.n_vjp;
+  return stats;
+}
+
+void RuntimeIntegrator::print_stats(IntegratorMemory* mem) const {
+  auto m = static_cast<RuntimeIntegratorMemory*>(mem);
+  print("%s: %lld steps, %lld rhs, %lld vjp\n", plugin_name(),
+    static_cast<long long>(m->d.n_steps), static_cast<long long>(m->d.n_rhs),
+    static_cast<long long>(m->d.n_vjp));
+}
+
+RuntimeIntegrator::RuntimeIntegrator(DeserializingStream& s) : Integrator(s) {
+  s.version("RuntimeIntegrator", 1);
+  s.unpack("RuntimeIntegrator::group_start", group_start_);
+  s.unpack("RuntimeIntegrator::step_size", step_size_);
+}
+
+void RuntimeIntegrator::serialize_body(SerializingStream &s) const {
+  Integrator::serialize_body(s);
+  s.version("RuntimeIntegrator", 1);
+  s.pack("RuntimeIntegrator::group_start", group_start_);
+  s.pack("RuntimeIntegrator::step_size", step_size_);
+}
+
+} // namespace casadi
