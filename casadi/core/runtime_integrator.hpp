@@ -33,8 +33,8 @@
 namespace casadi {
 
 struct CASADI_EXPORT RuntimeIntegratorMemory : public IntegratorMemory {
-  // Reverse communication data
-  casadi_ivp_data<double> d;
+  // Reverse communication data, and of the nominal integration whose steps are replayed
+  casadi_ivp_data<double> d, d_nom;
   // Tape of unbounded size, if the work vector has none
   std::vector<double> tape;
 };
@@ -136,8 +136,14 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   /// Generate code for the problem and data of the method, variables pe and e
   virtual void codegen_method(CodeGenerator& g) const = 0;
 
+  /// Integrator at the start of the chain of derivatives
+  const RuntimeIntegrator* root() const;
+
   /// Shared problem structure, from the method coefficients
   void set_ivp_prob();
+
+  /// Problem of the nominal integration whose steps are replayed, if any
+  void set_nominal_prob();
 
   /// Number of control groups, columns of the controls
   casadi_int ngroup() const { return group_start_.size() - 1;}
@@ -151,9 +157,10 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   /// Capacity of the tape in the work vector (0: unbounded, in the virtual machine only)
   casadi_int tape_capacity() const;
 
-  // Method coefficients: stage arguments, nodes, weights, dense output weights
-  std::vector<double> a_, alpha_, m_, m_dense_;
-  casadi_int n_dense_;
+  // Method coefficients: stage arguments, nodes, weights, dense output weights, weights of the
+  // error estimate (empty: fixed steps only) and its order
+  std::vector<double> a_, alpha_, m_, m_dense_, m_err_;
+  casadi_int n_dense_, order_err_;
 
   // First output interval of each control group, followed by the number of output times
   std::vector<casadi_int> group_start_;
@@ -162,13 +169,19 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   casadi_int nx_err_, nz_err_, nq_err_;
 
   // Options
-  double step_size_, abstol_, reltol_;
+  double step_size_, abstol_, reltol_, step0_, max_step_size_, min_step_size_;
+  casadi_int max_num_steps_, max_tape_steps_;
+  bool quad_err_con_;
 
   // Sparsity of the Jacobian blocks, see casadi_ivp_jac_t (empty: no linearization)
   std::vector<Sparsity> sp_jac_;
 
   // Shared problem structure
   casadi_ivp_prob<double> p_;
+
+  // Steps replayed from a nominal integration with the functions of the root integrator
+  bool replay_;
+  casadi_ivp_prob<double> p_nom_;
 
  private:
   // Source buffers of function arguments and results, see slot_ptr and slot_expr
@@ -211,10 +224,10 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   void codegen_loop(CodeGenerator& g) const;
 
   // Generate code for the shared problem structure in variable p
-  void codegen_ivp_prob(CodeGenerator& g, const std::string& p) const;
+  void codegen_ivp_prob(CodeGenerator& g, const std::string& p, casadi_int tape_size) const;
 
-  // Function calls of the tasks
-  std::vector<std::vector<TaskCall>> calls_;
+  // Function calls of the tasks, and of the tasks of the nominal integration
+  std::vector<std::vector<TaskCall>> calls_, calls_nom_;
 };
 
 } // namespace casadi

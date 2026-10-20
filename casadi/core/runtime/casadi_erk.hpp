@@ -19,7 +19,8 @@
 
 // Explicit Runge-Kutta integrator for y' = F(t, y), y = [x; q], see casadi_ivp.hpp
 // Stages U_i = h F(t0 + alpha_i h, y0 + sum_{j<i} a_ij U_j), y1 = y0 + sum_i m_i U_i
-// With the first-same-as-last property, the last stage of a step is the first of the next
+// Fixed or adaptive steps; with the first-same-as-last property, the last stage of a step is the
+// first of the next
 
 // C-REPLACE "casadi_ivp_prob<T1>" "struct casadi_ivp_prob"
 // C-REPLACE "casadi_ivp_data<T1>" "struct casadi_ivp_data"
@@ -36,7 +37,11 @@ struct casadi_erk_prob {
 typedef enum {
   // Phases: each one consumes the result of the previously requested task
   ERK_STEP_BEGIN = IVP_NUM_ENTRY,
+  ERK_STEP_SIZE,
+  ERK_STEP_INITIAL_SIZE,
+  ERK_STEP_REPLAY,
   ERK_STAGE,
+  ERK_STEP_CHECK,
   ERK_BACK_STAGE,
   ERK_BACK_SPREAD
 } casadi_erk_next_t;
@@ -47,10 +52,16 @@ template<typename T1>
 struct casadi_erk_data {
   // Problem structure
   const casadi_erk_prob<T1>* prob;
+  // Method data of the nominal integration whose steps are replayed (or null)
+  casadi_erk_data<T1>* nom;
   // Stage holding h_f F(t, y) for the next step (-1: none), h_f
   casadi_int f_stage;
   T1 f_scale;
 };
+
+// SYMBOL "erk"
+template<typename T1>
+int casadi_erk(casadi_ivp_data<T1>* d, casadi_erk_data<T1>* e);
 
 // SYMBOL "erk_stage_request"
 template<typename T1>
@@ -99,16 +110,55 @@ int casadi_erk_forward(casadi_ivp_data<T1>* d, casadi_erk_data<T1>* e) {
   case ERK_STEP_BEGIN:
     if (d->fail) return casadi_ivp_stop(d, IVP_TAPE_FAILED);
     if (d->t >= d->t_out) {
-      casadi_ivp_output(d);
+      if (!d->pause) casadi_ivp_output(d);
       return casadi_ivp_stop(d, IVP_SUCCESS);
     }
     if (casadi_ivp_step_limit(d)) return casadi_ivp_stop(d, IVP_MAX_NUM_STEPS);
     if ((ret = casadi_ivp_reserve(d, IVP_RECORD_STEP, ERK_STEP_BEGIN)) >= 0) return ret;
     casadi_copy(d->u, p->nu, d->u_step);
-    d->h = d->run_h;
+    if (d->nom) {
+      // Step of the nominal integration
+      d->next = ERK_STEP_REPLAY;
+      return casadi_erk_forward(d, e);
+    }
+    if (d->prob->step_size > 0) {
+      d->h = d->run_h;
+      return casadi_erk_step_start(d, e);
+    }
+    return casadi_ivp_request_control(d, IVP_CONTROL_SIZE, ERK_STEP_SIZE);
+  case ERK_STEP_SIZE:
+    if (d->h > 0) return casadi_erk_step_start(d, e);
+    // Estimate from the right-hand side at the initial point
+    d->t_arg = d->t;
+    d->y_arg = d->y;
+    d->res = d->U;
+    return casadi_ivp_request(d, IVP_EVAL_RHS, ERK_STEP_INITIAL_SIZE);
+  case ERK_STEP_INITIAL_SIZE:
+    if (d->fail) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+    d->n_rhs++;
+    e->f_stage = 0;
+    e->f_scale = 1;
+    return casadi_ivp_request_control(d, IVP_CONTROL_INIT, ERK_STEP_SIZE);
+  case ERK_STEP_REPLAY:
+    // Advance the nominal integration by one step; its tasks are handed to the caller
+    if (casadi_erk(d->nom, e->nom)) {
+      d->active = d->nom;
+      return 1;
+    }
+    d->active = d;
+    if (d->nom->status != IVP_SUCCESS) return casadi_ivp_stop(d, d->nom->status);
+    if (d->nom->next == IVP_DONE) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+    d->h = d->nom->h;
     return casadi_erk_step_start(d, e);
   case ERK_STAGE:
-    if (d->fail) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+    // F(t0, y0), if evaluated, holds for a retry from the same point
+    e->f_stage = d->stage > 0 ? 0 : -1;
+    e->f_scale = d->h;
+    if (d->fail) {
+      // Evaluation failed: retry with a smaller step, if adaptive
+      if (casadi_ivp_prescribed(d)) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+      return casadi_ivp_request_control(d, IVP_CONTROL_FAIL, ERK_STEP_CHECK);
+    }
     d->n_rhs++;
     casadi_scal(p->ny, d->h, d->U + d->stage * p->ny);
     if (++d->stage < p->n_stages) return casadi_erk_stage_request(d);
@@ -120,10 +170,27 @@ int casadi_erk_forward(casadi_ivp_data<T1>* d, casadi_erk_data<T1>* e) {
       casadi_copy(d->y0, p->ny, d->y);
       casadi_mv_dense(d->U, p->ny, p->n_stages, p->m, d->y, 0);
     }
+    if (!casadi_ivp_prescribed(d)) {
+      return casadi_ivp_request_control(d, IVP_CONTROL_TEST, ERK_STEP_CHECK);
+    }
+    d->accepted = 1;
+    d->next = ERK_STEP_CHECK;
+    return casadi_erk_forward(d, e);
+  case ERK_STEP_CHECK:
+    if (d->status != IVP_SUCCESS) return casadi_ivp_stop(d, d->status);
+    if (!d->accepted) {
+      // Retry from t0
+      d->next = ERK_STEP_BEGIN;
+      return casadi_erk_forward(d, e);
+    }
     e->f_stage = e->prob->fsal ? p->n_stages - 1 : -1;
-    e->f_scale = d->h;
     casadi_ivp_accept(d);
     d->next = ERK_STEP_BEGIN;
+    if (d->pause) {
+      // Hand the step to the integration that replays it
+      d->status = IVP_SUCCESS;
+      return 0;
+    }
     return casadi_erk_forward(d, e);
   default:
     return 0;
@@ -183,7 +250,6 @@ int casadi_erk_backward(casadi_ivp_data<T1>* d, casadi_erk_data<T1>* e) {
   }
 }
 
-// SYMBOL "erk"
 template<typename T1>
 int casadi_erk(casadi_ivp_data<T1>* d, casadi_erk_data<T1>* e) {
   // Reverse communication: returns 1 while a task in d->task is to be carried out

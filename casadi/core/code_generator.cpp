@@ -1830,6 +1830,13 @@ namespace casadi {
       add_include("math.h");
       this->auxiliaries << sanitize_source(casadi_ivp_str, inst);
       break;
+    case AUX_IVP_ADAPT:
+      add_auxiliary(AUX_IVP);
+      add_auxiliary(AUX_FMIN);
+      add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_FABS);
+      this->auxiliaries << sanitize_source(casadi_ivp_adapt_str, inst);
+      break;
     case AUX_ROSENBROCK:
       add_auxiliary(AUX_IVP);
       add_auxiliary(AUX_SCAL);

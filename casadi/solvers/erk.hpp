@@ -32,15 +32,16 @@
 /** \defgroup plugin_Integrator_erk Title
     \par
 
-    Explicit Runge-Kutta integrator with fixed steps for ODEs: a method of order 5, or the
-    classical method of order 4.
+    Explicit Runge-Kutta integrator for ODEs: a pair of order 5(4) with adaptive or fixed
+    steps, or the classical method of order 4 with fixed steps.
 
-    Steps are independent of the output times: each run of steps over a control group (or up
-    to the end) is divided into equal steps of at most step_size, and outputs inside a step
-    come from a dense output (order 4 and 3 respectively) at no extra cost. Forward
-    sensitivities are the exact derivatives of the discrete solution and adjoint
-    sensitivities are the exact discrete adjoint of the taped steps. The tape has a known
-    bound, so adjoints can be code-generated.
+    Steps are independent of the output times. Adaptive steps are chosen by error control on
+    the nominal states; with fixed steps, each run of steps over a control group (or up to
+    the end) is divided into equal steps of at most step_size. Outputs inside a step come
+    from a dense output (order 4 and 3 respectively) at no extra cost. Forward sensitivities
+    are the exact derivatives of the discrete solution and adjoint sensitivities are the
+    exact discrete adjoint of the taped steps. With fixed steps the tape has a known bound,
+    so adjoints can be code-generated; with adaptive steps, set max_tape_steps.
 
 */
 /** \pluginsection{Integrator,erk} */
@@ -50,8 +51,8 @@ namespace casadi {
 
   // Memory
   struct CASADI_INTEGRATOR_ERK_EXPORT ErkMemory : public RuntimeIntegratorMemory {
-    // Method data
-    casadi_erk_data<double> e;
+    // Method data, and of the nominal integration whose steps are replayed
+    casadi_erk_data<double> e, e_nom;
   };
 
   /** \brief \pluginbrief{Integrator,erk}

@@ -1705,7 +1705,8 @@ class Integrationtests(casadiTestCase):
     dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -p*x[0]**3), "quad": x[0]**2}
     for plugin, opts in [("cvodes", {"reltol": 1e-10, "abstol": 1e-10}),
                          ("idas", {"reltol": 1e-10, "abstol": 1e-10}),
-                         ("rosenbrock", {"step_size": 0.125})]:
+                         ("rosenbrock", {"step_size": 0.125}),
+                         ("erk", {"method": "rk45", "reltol": 1e-8, "abstol": 1e-8})]:
       if not ca.has_integrator(plugin): continue
       F = ca.integrator("F", plugin, dae, 0, [0.5, 1.0], opts)
       inputs = [ca.DM([0.3, -0.2]), ca.DM(), ca.DM(0.7), ca.DM(1, 0)]
@@ -1775,7 +1776,9 @@ class Integrationtests(casadiTestCase):
     for plugin, opts, digits in [("cvodes", {"reltol": 1e-12, "abstol": 1e-12}, 7),
                                  ("idas", {"reltol": 1e-12, "abstol": 1e-12}, 7),
                                  ("rosenbrock", {"step_size": 1./6}, 12),
-                                 ("erk", {"step_size": 0.2}, 12)]:
+                                 ("rosenbrock", {"reltol": 1e-6, "abstol": 1e-6}, 11),
+                                 ("erk", {"step_size": 0.2}, 12),
+                                 ("erk", {"method": "rk45", "reltol": 1e-6, "abstol": 1e-6}, 11)]:
       if not ca.has_integrator(plugin): continue
       for grid in [[1.0], [0.5, 1.0]]:
         F = ca.integrator("F", plugin, dae, 0, grid, opts)
@@ -1835,7 +1838,8 @@ class Integrationtests(casadiTestCase):
            "ode": ca.vertcat(-z + p[0]*x[1] + u, -x[0]*z + p[1]*ca.sin(t)),
            "alg": z**3 + z - x[0]**2*(1 + 0.5*ca.cos(t)), "quad": z*x[1] + p[1]*x[0]**2}
     # Including an output at t0, with a seed on the consistent algebraic state there
-    for opts, grid in [(o, g) for o in [{"step_size": 0.1}] for g in [[0.5, 1, 2], [0, 1, 2]]]:
+    for opts, grid in [(o, g) for o in [{"step_size": 0.1}, {"reltol": 1e-6, "abstol": 1e-6}]
+                       for g in [[0.5, 1, 2], [0, 1, 2]]]:
       F = ca.integrator("F", "rosenbrock", dae, 0, grid, opts)
       v = ca.MX.sym("v", 7)
       r = F(x0=v[:2], z0=0.5, p=v[2:4], u=v[4:].T)
@@ -1865,7 +1869,7 @@ class Integrationtests(casadiTestCase):
       args = {"x0": [1, 0.5], "p": [0.5, 0.3]}
       # Consistent z0 for the reference: z^3 + z = 1.5 x0^2 - u
       if "z" in sys: args["z0"] = float(min(numpy.roots([1, 0, 1, -1.3]), key=lambda r: abs(r.imag)).real)
-      for opts in [{"step_size": 0.04}]:
+      for opts in [{"step_size": 0.04}, {"reltol": 1e-6, "abstol": 1e-6}]:
         # Within a control group, the number of steps does not depend on the number of outputs,
         # accuracy inside steps
         n_steps = []
@@ -1899,14 +1903,17 @@ class Integrationtests(casadiTestCase):
     p = ca.SX.sym("p")
     dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(x[1], -p*z), "alg": z**3 + z - x[0],
            "quad": x[0]**2}
-    for opts, grid in [({"step_size": 0.05}, [0.5, 1]),
-                       ({"step_size": 0.03}, list(numpy.linspace(0.07, 1, 15)))]:
+    for opts, grid in [({"reltol": 1e-8, "abstol": 1e-8, "max_tape_steps": 1000}, [0.5, 1]),
+                       ({"step_size": 0.05}, [0.5, 1]),
+                       ({"step_size": 0.03}, list(numpy.linspace(0.07, 1, 15))),
+                       ({"reltol": 1e-6, "abstol": 1e-6, "max_tape_steps": 1000},
+                        list(numpy.linspace(0.07, 1, 15)))]:
       F = ca.integrator("F", "rosenbrock", dae, 0, grid, opts)
       v = ca.MX.sym("v", 3)
       r = F(x0=v[:2], p=v[2])
       obj = ca.sumsqr(r["xf"]) + ca.sumsqr(r["qf"])
       outs = [r["xf"], r["zf"], r["qf"], ca.gradient(obj, v)]
-      # Forward over forward
+      # Forward over forward: steps replayed from a nominal integration
       if len(grid) > 2: outs.append(ca.jtimes(ca.jtimes(obj, v, ca.MX.eye(3)).T, v, ca.MX.eye(3)))
       G = ca.Function("G", [v], outs)
       self.check_codegen(G, inputs=[ca.DM([0.4, -0.3, 2])], digits=12)
@@ -1978,7 +1985,9 @@ class Integrationtests(casadiTestCase):
            "quad": x[0]**2}
     for grid, opts in [([0.5, 1], {"step_size": 0.04}),
                        (list(numpy.linspace(0.07, 1, 15)), {"step_size": 0.04}),
-                       (list(numpy.linspace(0.07, 1, 15)), {"method": "rk4", "step_size": 0.1})]:
+                       (list(numpy.linspace(0.07, 1, 15)), {"method": "rk4", "step_size": 0.1}),
+                       (list(numpy.linspace(0.07, 1, 15)),
+                        {"method": "rk45", "reltol": 1e-6, "abstol": 1e-6, "max_tape_steps": 200})]:
       F = ca.integrator("F", "erk", dae, 0, grid, opts)
       v = ca.MX.sym("v", 3 + len(grid))
       r = F(x0=v[:2], p=v[2], u=v[3:].T)
@@ -2005,7 +2014,9 @@ class Integrationtests(casadiTestCase):
     # Output times on the mesh of fixed steps
     grid = [0.2, 0.3, 0.5, 1.0, 1.2, 2.0]
     for plugin, opts in [("erk", {"method": "rk4", "step_size": 0.1}),
-                         ("rosenbrock", {"step_size": 0.1})]:
+                         ("rosenbrock", {"step_size": 0.1}),
+                         ("erk", {"reltol": 1e-10, "abstol": 1e-10, "max_tape_steps": 500}),
+                         ("rosenbrock", {"reltol": 1e-10, "abstol": 1e-10, "max_tape_steps": 500})]:
       d = dae if plugin == "rosenbrock" else ode
       # Repeated controls and their control groups agree, up to the restarts between outputs
       args = {"x0": [1, 0.5], "p": 1.7}
@@ -2042,7 +2053,7 @@ class Integrationtests(casadiTestCase):
 
   @memory_heavy()
   def test_erk_rk45(self):
-    self.message("erk: method of order 5")
+    self.message("erk: pair of order 5(4), fixed and adaptive steps")
     t = ca.SX.sym("t")
     x = ca.SX.sym("x", 2)
     p = ca.SX.sym("p")
@@ -2056,8 +2067,66 @@ class Integrationtests(casadiTestCase):
       err.append(numpy.max(numpy.abs(numpy.array(r["xf"]).ravel() - exact(2.0))))
     for e0, e1 in zip(err[:-1], err[1:]):
       self.assertGreater(numpy.log2(e0/e1), 4.7)
+    # Adaptive steps: error follows the tolerance; the last stage is the first of the next step
+    grid = list(numpy.linspace(0.1, 10, 50))
+    for tol in [1e-6, 1e-9]:
+      F = ca.integrator("F", "erk", dae, 0, grid, {"method": "rk45", "reltol": tol, "abstol": tol})
+      r = F(x0=[1, 0], p=w**2)
+      e = numpy.max(numpy.abs(numpy.array(r["xf"]) - numpy.array([exact(tt) for tt in grid]).T))
+      self.assertLess(e, 10*tol)
+      self.assertGreater(e, 0.01*tol)
+      st = F.stats()
+      self.assertEqual(st["n_rhs"], 1 + 6*(st["n_steps"] + st["n_reject"]))
+    # Rejected steps: a fast transient with a large initial step
+    dae2 = {"x": x, "ode": ca.vertcat(-50*(x[0] - ca.cos(x[1])), 1)}
+    F = ca.integrator("F", "erk", dae2, 0, 1, {"method": "rk45", "step0": 0.5})
+    r = F(x0=[0, 0])
+    ref = ca.integrator("F", "cvodes", dae2, 0, 1, {"reltol": 1e-12, "abstol": 1e-12})(x0=[0, 0])
+    self.checkarray(ref["xf"], r["xf"], "rejections", digits=5)
+    self.assertGreater(F.stats()["n_reject"], 0)
     with self.assertInException("unknown method"):
       ca.integrator("F", "erk", dae, 0, 1, {"method": "rk5"})
+
+  @memory_heavy()
+  def test_erk_rk45_derivatives(self):
+    self.message("erk: adaptive steps, derivatives of the scheme on the nominal mesh")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"t": t, "x": x, "p": p, "u": u, "ode": ca.vertcat(x[1], -p*x[0]**3 + u*ca.cos(t)),
+           "quad": x[0]**2 + u*x[1]}
+    grid = [0, 0.13, 0.31, 0.37, 1.0, 1.15, 2.0]
+    for u0 in [[0.1] * 7, [0.1] * 3 + [0.3] * 4]:
+      F = ca.integrator("F", "erk", dae, 0, grid, {"method": "rk45", "reltol": 1e-5,
+                                                   "abstol": 1e-5})
+      v = ca.MX.sym("v", 10)
+      r = F(x0=v[:2], p=v[2], u=v[3:].T)
+      out = ca.vertcat(ca.vec(r["xf"]), ca.vec(r["qf"]))
+      v0 = [1, 0.5, 1.7] + u0
+      self.check_jacobian(out, v, v0, 13)
+      # Forward over forward replays the nominal steps
+      self.check_hessian(ca.sumsqr(out), v, v0, 11)
+
+  @memory_heavy()
+  def test_erk_tape(self):
+    self.message("erk: adaptive steps and adjoints, bounded tape")
+    x = ca.SX.sym("x", 2)
+    dae = {"x": x, "ode": ca.vertcat(x[1], -x[0])}
+    for n_tape in [0, 3, 1000]:
+      F = ca.integrator("F", "erk", dae, 0, 10, {"method": "rk45", "max_tape_steps": n_tape})
+      x0 = ca.MX.sym("x0", 2)
+      G = ca.Function("G", [x0], [ca.jtimes(ca.sumsqr(F(x0=x0)["xf"]), x0, ca.MX.ones(1, 1), True)])
+      if n_tape == 3:
+        # More steps than the tape holds
+        with self.assertInException("increase max_tape_steps"):
+          G([1, 0.5])
+      else:
+        self.checkarray(G([1, 0.5]), ca.DM([2, 1]), "adjoint", digits=5)
+      if n_tape == 0:
+        # The tape grows in the virtual machine only
+        with self.assertInException("need max_tape_steps for code generation"):
+          ca.CodeGenerator("tape_cg.c").add(G)
 
 if __name__ == '__main__':
     unittest.main()
