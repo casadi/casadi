@@ -2448,6 +2448,23 @@ class Integrationtests(casadiTestCase):
       self.checkarray(grad_fwd, grad_adj, str(w_x + w_z), digits=7)
 
   @memory_heavy()
+  def test_idas_adjoint_z_seeds(self):
+    self.message("idas: adjoint seeds in the algebraic states")
+    x = ca.SX.sym("x")
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    dae = {"x": x, "z": z, "p": p, "ode": z + p, "alg": z*ca.cos(z) - x, "quad": z**2}
+    F = ca.integrator("F", "idas", dae, 0, [0.1, 0.2, 0.3], {"abstol": 1e-10, "reltol": 1e-10})
+    v = ca.MX.sym("v", 2)
+    r = F(x0=v[0], p=v[1])
+    for w_x, w_z in [([0, 0, 0], [0, 0, 1]), ([0, 0, 0], [0, 1, 0]), ([1, 0, 2], [3, 1, 0])]:
+      obj = ca.mtimes(r["xf"], ca.DM(w_x)) + ca.mtimes(r["zf"], ca.DM(w_z)) + r["qf"][-1]
+      G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+        ca.jtimes(obj, v, ca.MX.eye(2)).T])
+      grad_adj, grad_fwd = G([0.1, 0.15])
+      self.checkarray(grad_fwd, grad_adj, str(w_x + w_z), digits=7)
+
+  @memory_heavy()
   def test_adjoint_checkpoint_stop_time(self):
     self.message("issue #3227: recomputation from a check point ending at a stop time")
     x = ca.SX.sym("x")

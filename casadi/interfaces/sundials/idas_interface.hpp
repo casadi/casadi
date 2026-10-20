@@ -70,6 +70,9 @@ struct CASADI_INTEGRATOR_IDAS_EXPORT IdasMemory : public SundialsMemory {
   /// State and state derivative at the output times, for adjoint impulses
   std::vector<double> xz_out;
 
+  /// Right-hand side when propagating adjoint impulses in z
+  std::vector<double> rhs_zB;
+
   /// Constructor
   IdasMemory(const IdasInterface& s);
 

@@ -233,6 +233,7 @@ int IdasInterface::init_mem(void* mem) const {
 
   // State and state derivative at the output times
   if (nrx_ > 0) m->xz_out.resize(2 * (nx_ + nz_) * nt());
+  if (nrz_ > 0) m->rhs_zB.resize(nrx_ + nrz_);
 
   // Create IDAS memory block
   m->mem = IDACreate();
@@ -488,21 +489,29 @@ void IdasInterface::z_impulseB(IdasMemory* m, const double* adj_z) const {
   //   (df_alg/dz)^T * w = adj_z
   // Augment linear system to get the system we are able to factorize
   //   [(df_ode/dx)^T - cj*I, (df_alg/dx)^T; (df_ode/dz)^T, (df_alg/dz)^T] * [v; w] = [0; adj_z]
+  // and refine w, since v is not zero
   // (Re)factorize linear system
   if (psetupF(m->t, m->v_xz, m->v_xzdot, nullptr, m->cj_last, m, nullptr, nullptr, nullptr))
     casadi_error("Linear system factorization for backwards initial conditions failed");
-  // Right-hand-side for linear system in m->tmp2
-  casadi_clear(m->tmp2, nrx_);
-  casadi_copy(adj_z, nrz_, m->tmp2 + nrx_);
-  // Solve transposed linear system of equations (Note: m->tmp2 not used since rxz null)
-  if (solve_transposed(m, m->t, NV_DATA_S(m->v_xz), nullptr, m->tmp2, m->tmp2)) {
-    casadi_error("Linear system solve for backwards initial conditions failed");
-  }
-  // Calculate: -adj_x = (df_alg/dx)^T * w
-  casadi_clear(m->tmp2, nrx_);
-  if (calc_daeB(m, m->t, NV_DATA_S(m->v_xz), NV_DATA_S(m->v_xz) + nx_,
-      m->tmp2, m->tmp2 + nrx_, nullptr, m->tmp1, m->tmp1 + nrx_)) {
-    casadi_error("Adjoint seed propagation for backwards initial conditions failed");
+  // w in m->tmp2 + nrx_, zero adj_ode in m->tmp2
+  casadi_clear(m->tmp2, nrx_ + nrz_);
+  double* rhs = get_ptr(m->rhs_zB);
+  for (casadi_int iter = 0; iter < 10; ++iter) {
+    // Calculate: -adj_x = (df_alg/dx)^T * w, (df_alg/dz)^T * w
+    if (calc_daeB(m, m->t, NV_DATA_S(m->v_xz), NV_DATA_S(m->v_xz) + nx_,
+        m->tmp2, m->tmp2 + nrx_, nullptr, m->tmp1, m->tmp1 + nrx_)) {
+      casadi_error("Adjoint seed propagation for backwards initial conditions failed");
+    }
+    // Residual
+    casadi_clear(rhs, nrx_);
+    casadi_copy(adj_z, nrz_, rhs + nrx_);
+    casadi_axpy(nrz_, -1., m->tmp1 + nrx_, rhs + nrx_);
+    if (casadi_norm_inf(nrz_, rhs + nrx_) <= 1e-14 * casadi_norm_inf(nrz_, adj_z)) break;
+    // Solve transposed linear system of equations, update w
+    if (solve_transposed(m, m->t, NV_DATA_S(m->v_xz), nullptr, rhs, rhs)) {
+      casadi_error("Linear system solve for backwards initial conditions failed");
+    }
+    casadi_axpy(nrz_, 1., rhs + nrx_, m->tmp2 + nrx_);
   }
   // Add contribution to backward state
   casadi_axpy(nrx_, -1., m->tmp1, NV_DATA_S(m->v_adj_xz));
