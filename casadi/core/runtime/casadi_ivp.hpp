@@ -46,8 +46,22 @@ typedef enum {
   // vjp = d/d(x,z,p,u) <jac_adj, Jacobian blocks> at (t_arg, y_arg), w. forward sensitivities
   IVP_EVAL_JAC_ADJ,
   // Enlarge the tape to at least tape_need entries, keeping its contents; set tape, tape_cap
-  IVP_TAPE_RESERVE
+  IVP_TAPE_RESERVE,
+  // Adaptive step size control, see casadi_ivp_control
+  IVP_STEP_CONTROL
 } casadi_ivp_task_t;
+
+// SYMBOL "ivp_control_t"
+typedef enum {
+  // Size h of a step from t; h = 0 if an initial estimate from F(t, y) is needed first
+  IVP_CONTROL_SIZE,
+  // Initial estimate from F(t, y) in U, then as IVP_CONTROL_SIZE
+  IVP_CONTROL_INIT,
+  // Error test of the candidate y: accepted, or rejected with y restored
+  IVP_CONTROL_TEST,
+  // Evaluation failed: rejected with y restored
+  IVP_CONTROL_FAIL
+} casadi_ivp_control_t;
 
 // SYMBOL "ivp_entry_t"
 typedef enum {
@@ -96,10 +110,17 @@ struct casadi_ivp_prob {
   // Capacity of the tape in the work vector (0: the caller provides the tape)
   casadi_int tape_size;
   // Fixed steps: each run of steps up to a stop has equal steps of at most step_size
+  // (0: adaptive steps)
   T1 step_size;
   // Error weights: leading entries of x, z, q subject to error control, tolerances
   casadi_int nx_err, nz_err, nq_err;
   T1 abstol, reltol;
+  // Adaptive steps: order and weights of the error estimate sum_i m_err_i U_i, step size
+  // controller, maximum number of steps per output interval
+  casadi_int order_err;
+  const T1* m_err;
+  T1 safety, fac_min, fac_max, h_min, h_max, h_init;
+  casadi_int max_num_steps;
   // Derived: forward and adjoint state dimensions, controls, vector lengths
   casadi_int nx, nz, nq, nu, nrx, nrz, nrq, nrp, nru, ny, nr;
   // Derived: offsets of the Jacobian blocks in a buffer with one direction, total nonzeros
@@ -146,8 +167,16 @@ template<typename T1>
 struct casadi_ivp_data {
   // Problem structure
   const casadi_ivp_prob<T1>* prob;
+  // Data whose task is requested: this one, or one the method delegates to
+  casadi_ivp_data<T1>* active;
+  // Nominal integration whose steps are replayed (or null), stop after every accepted step
+  casadi_ivp_data<T1>* nom;
+  int pause;
   // Task for the caller, where to resume (casadi_ivp_entry_t or a phase of the method), status
   casadi_ivp_task_t task;
+  // Step size control requested, step accepted by it
+  casadi_ivp_control_t control;
+  int accepted;
   casadi_int next;
   casadi_ivp_flag_t status;
   // Set by the caller if a task could not be carried out
@@ -198,8 +227,14 @@ struct casadi_ivp_data {
   // Fixed steps: current run start, stop, step size, number of steps, steps taken
   T1 run_t0, run_t1, run_h;
   casadi_int run_n, run_k;
+  // Adaptive steps: proposed next step size, previous error, last step rejected, clipped at
+  // the stop or ending at the stop
+  T1 h_next, err_prev;
+  int last_rejected, last_clipped, last_step;
+  // Steps taken in the current output interval
+  casadi_int n_steps_interval;
   // Statistics
-  casadi_int n_steps, n_rhs, n_jac, n_vjp;
+  casadi_int n_steps, n_reject, n_rhs, n_jac, n_vjp;
 };
 
 // SYMBOL "ivp_work"
@@ -256,24 +291,44 @@ void casadi_ivp_set_work(casadi_ivp_data<T1>* d, const T1*** arg, T1*** res,
   d->reset = 0;
   d->taping = 0;
   d->record_pending = 0;
+  d->active = d;
+  d->nom = 0;
+  d->pause = 0;
 }
 
 // SYMBOL "ivp_clear_stats"
 template<typename T1>
 void casadi_ivp_clear_stats(casadi_ivp_data<T1>* d) {
-  d->n_steps = d->n_rhs = d->n_jac = d->n_vjp = 0;
+  d->n_steps = d->n_reject = d->n_rhs = d->n_jac = d->n_vjp = 0;
 }
 
 // SYMBOL "ivp_reset"
 template<typename T1>
 void casadi_ivp_reset(casadi_ivp_data<T1>* d, T1 t, const T1* u, int first_call) {
   // Start at time t, controls u; the state d->y is set by the caller
+  const casadi_ivp_prob<T1>* p = d->prob;
+  const casadi_ivp_prob<T1>* pn;
   d->t = t;
   d->u = u;
   d->reset = 1;
   if (first_call) {
     d->tape_pos = 0;
     casadi_ivp_clear_stats(d);
+    // Every evaluation starts from the same controller state
+    d->h_next = 0;
+    d->err_prev = 1;
+    d->last_rejected = 0;
+  }
+  if (d->nom) {
+    // Initial nominal states: the leading entries of x, z and q; afterwards, the nominal
+    // integration continues its own trajectory
+    pn = d->nom->prob;
+    if (first_call) {
+      casadi_copy(d->y, pn->nx, d->nom->y);
+      casadi_copy(d->y + p->nx, pn->nz, d->nom->y + pn->nx);
+      casadi_copy(d->y + p->nx + p->nz, pn->nq, d->nom->y + pn->nx + pn->nz);
+    }
+    casadi_ivp_reset(d->nom, t, u, first_call);
   }
 }
 
@@ -288,13 +343,15 @@ casadi_int casadi_ivp_steps(T1 len, T1 step_size) {
 // SYMBOL "ivp_begin_run"
 template<typename T1>
 void casadi_ivp_begin_run(casadi_ivp_data<T1>* d) {
-  // Handle a pending reset: a new run of steps up to the stop time
+  // Handle a pending reset: with fixed steps, a new run of steps up to the stop time
   const casadi_ivp_prob<T1>* p = d->prob;
-  d->run_t0 = d->t;
-  d->run_t1 = d->t_stop;
-  d->run_n = casadi_ivp_steps(d->t_stop - d->t, p->step_size);
-  d->run_h = (d->run_t1 - d->run_t0) / static_cast<T1>(d->run_n);
-  d->run_k = 0;
+  if (p->step_size > 0) {
+    d->run_t0 = d->t;
+    d->run_t1 = d->t_stop;
+    d->run_n = casadi_ivp_steps(d->t_stop - d->t, p->step_size);
+    d->run_h = (d->run_t1 - d->run_t0) / static_cast<T1>(d->run_n);
+    d->run_k = 0;
+  }
   d->reset = 0;
 }
 
@@ -308,6 +365,12 @@ void casadi_ivp_advance(casadi_ivp_data<T1>* d, T1 t_out, T1 t_stop, int taping)
   d->status = IVP_SUCCESS;
   d->fail = 0;
   d->next = IVP_ADVANCE;
+  d->n_steps_interval = 0;
+  if (d->nom) {
+    // The nominal integration stops after every step, to be replayed
+    casadi_ivp_advance(d->nom, t_out, t_stop, 0);
+    d->nom->pause = 1;
+  }
 }
 
 // SYMBOL "ivp_reset_backward"
@@ -344,10 +407,20 @@ void casadi_ivp_impulse(casadi_ivp_data<T1>* d, T1 t) {
 template<typename T1>
 int casadi_ivp_request(casadi_ivp_data<T1>* d, casadi_ivp_task_t task, casadi_int next) {
   // Hand a task to the caller, resume at phase next
+  d->active = d;
   d->task = task;
   d->next = next;
   d->fail = 0;
   return 1;
+}
+
+// SYMBOL "ivp_request_control"
+template<typename T1>
+int casadi_ivp_request_control(casadi_ivp_data<T1>* d, casadi_ivp_control_t control,
+    casadi_int next) {
+  // Hand step size control to the caller, resume at phase next
+  d->control = control;
+  return casadi_ivp_request(d, IVP_STEP_CONTROL, next);
 }
 
 // SYMBOL "ivp_stop"
@@ -522,7 +595,7 @@ void casadi_ivp_seed_stages(casadi_ivp_data<T1>* d) {
 }
 
 // ---------------------------------------------------------------------------------------
-// Step sizes
+// Step sizes; adaptive control is in casadi_ivp_adapt.hpp
 // ---------------------------------------------------------------------------------------
 
 // SYMBOL "ivp_isfinite"
@@ -536,7 +609,16 @@ int casadi_ivp_isfinite(T1 x) {
 template<typename T1>
 int casadi_ivp_step_limit(const casadi_ivp_data<T1>* d) {
   // No further step allowed?
-  return d->run_k >= d->run_n;
+  const casadi_ivp_prob<T1>* p = d->prob;
+  if (p->step_size > 0 && !d->nom) return d->run_k >= d->run_n;
+  return d->n_steps_interval >= p->max_num_steps;
+}
+
+// SYMBOL "ivp_prescribed"
+template<typename T1>
+int casadi_ivp_prescribed(const casadi_ivp_data<T1>* d) {
+  // Step sizes prescribed: fixed steps, or replayed from the nominal integration
+  return d->prob->step_size > 0 || d->nom != 0;
 }
 
 // ---------------------------------------------------------------------------------------
@@ -560,8 +642,17 @@ int casadi_ivp_output(casadi_ivp_data<T1>* d) {
 template<typename T1>
 void casadi_ivp_accept(casadi_ivp_data<T1>* d) {
   // The step from t0, with y the solution at its end, is accepted
-  d->run_k++;
-  d->t = d->run_k == d->run_n ? d->run_t1 : d->run_t0 + static_cast<T1>(d->run_k) * d->run_h;
+  const casadi_ivp_prob<T1>* p = d->prob;
+  if (d->nom) {
+    d->t = d->nom->t;
+  } else if (p->step_size > 0) {
+    d->run_k++;
+    d->t = d->run_k == d->run_n ? d->run_t1 : d->run_t0 + static_cast<T1>(d->run_k) * d->run_h;
+  } else {
+    d->t = d->last_step ? d->t_stop : d->t0 + d->h;
+  }
+  d->last_rejected = 0;
+  d->n_steps_interval++;
   if (d->taping) {
     d->record = IVP_RECORD_STEP;
     casadi_ivp_tape_push(d);

@@ -86,12 +86,14 @@ namespace casadi {
     set_iteration_matrix();
     set_coefficients();
     set_ivp_prob();
+    set_nominal_prob();
     set_rosenbrock_prob();
 
-    // Work vectors of the kernel
+    // Work vectors of the kernel, and of the nominal integration
     alloc_ivp_work();
     casadi_int sz_arg = 0, sz_res = 0, sz_iw = 0, sz_w = 0;
     casadi_rosenbrock_work(&pr_, &sz_arg, &sz_res, &sz_iw, &sz_w);
+    if (replay_) casadi_rosenbrock_work(&pr_nom_, &sz_arg, &sz_res, &sz_iw, &sz_w);
     alloc_w(sz_w, true);
   }
 
@@ -130,12 +132,13 @@ namespace casadi {
         Gi[i * s + j] = -acc / gamma;
       }
     }
-    // a = A Gamma^-1, c = diag(1/gamma) - Gamma^-1, m = Gamma^-T b
+    // a = A Gamma^-1, c = diag(1/gamma) - Gamma^-1, m = Gamma^-T b, m_err = Gamma^-T (b - bhat)
     a_.assign(s * s, 0);
     c_.assign(s * s, 0);
     alpha_.assign(s, 0);
     gamma_sum_.assign(s, 0);
     m_.assign(s, 0);
+    m_err_.assign(s, 0);
     for (casadi_int i = 0; i < s; ++i) {
       long double alpha_i = 0, gamma_i = gamma;
       for (casadi_int j = 0; j < i; ++j) {
@@ -148,10 +151,15 @@ namespace casadi {
       }
       alpha_[i] = static_cast<double>(alpha_i);
       gamma_sum_[i] = static_cast<double>(gamma_i);
-      long double mi = 0;
-      for (casadi_int k = i; k < s; ++k) mi += b[k] * Gi[k * s + i];
+      long double mi = 0, mhi = 0;
+      for (casadi_int k = i; k < s; ++k) {
+        mi += b[k] * Gi[k * s + i];
+        mhi += bhat[k] * Gi[k * s + i];
+      }
       m_[i] = static_cast<double>(mi);
+      m_err_[i] = static_cast<double>(mi - mhi);
     }
+    order_err_ = order_embedded;
     // Dense output weights in the same form: m(theta) = Gamma^-T b(theta)
     n_dense_ = n_dense;
     m_dense_.assign(n_dense * s, 0);
@@ -183,6 +191,12 @@ namespace casadi {
     pr_.init_tol = init_tol_;
     pr_.init_max_iter = init_max_iter_;
     casadi_rosenbrock_setup(&pr_);
+    // Method of the original integrator, if its steps are replayed
+    if (replay_) {
+      pr_nom_ = static_cast<const Rosenbrock*>(root())->pr_;
+      pr_nom_.ivp = &p_nom_;
+      casadi_rosenbrock_setup(&pr_nom_);
+    }
   }
 
   void Rosenbrock::set_work(void* mem, const double**& arg, double**& res,
@@ -191,6 +205,11 @@ namespace casadi {
     RuntimeIntegrator::set_work(mem, arg, res, iw, w);
     m->r.prob = &pr_;
     casadi_rosenbrock_set_work(&m->r, &arg, &res, &iw, &w);
+    if (replay_) {
+      m->r_nom.prob = &pr_nom_;
+      casadi_rosenbrock_set_work(&m->r_nom, &arg, &res, &iw, &w);
+      m->r.nom = &m->r_nom;
+    }
   }
 
   int Rosenbrock::kernel(RuntimeIntegratorMemory* mem) const {
@@ -203,6 +222,12 @@ namespace casadi {
     codegen_rosenbrock_prob(g, "pe", "p");
     g << "e.prob = &pe;\n";
     g << "casadi_rosenbrock_set_work(&e, &arg, &res, &iw, &w);\n";
+    if (replay_) {
+      static_cast<const Rosenbrock*>(root())->codegen_rosenbrock_prob(g, "pen", "pn");
+      g << "en.prob = &pen;\n";
+      g << "casadi_rosenbrock_set_work(&en, &arg, &res, &iw, &w);\n";
+      g << "e.nom = &en;\n";
+    }
   }
 
   void Rosenbrock::codegen_rosenbrock_prob(CodeGenerator& g, const std::string& pe,
@@ -237,6 +262,7 @@ namespace casadi {
     set_iteration_matrix();
     set_coefficients();
     set_ivp_prob();
+    set_nominal_prob();
     set_rosenbrock_prob();
   }
 

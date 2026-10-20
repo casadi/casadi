@@ -56,7 +56,8 @@ namespace casadi {
   = {{&RuntimeIntegrator::options_},
      {{"method",
        {OT_STRING,
-        "Runge-Kutta method: 'rk45' (order 5) or 'rk4' (classical, order 4) [rk45]"}}
+        "Runge-Kutta method: 'rk45' (pair of order 5(4), adaptive unless step_size is set) or "
+        "'rk4' (classical, order 4, fixed steps only; default step_size (tf - t0)/20) [rk45]"}}
      }
   };
 
@@ -77,7 +78,9 @@ namespace casadi {
 
     // Reverse communication problem
     set_coefficients();
+    if (m_err_.empty() && step_size_ == 0) step_size_ = (tout_.back() - t0_) / 20;
     set_ivp_prob();
+    set_nominal_prob();
     set_erk_prob();
 
     // Work vectors of the kernel
@@ -98,8 +101,11 @@ namespace casadi {
       m_dense_ = {1, 0, 0, 0,
                   -1.5, 1, 1, -0.5,
                   2./3, -2./3, -2./3, 2./3};
+      // No error estimate
+      m_err_.clear();
+      order_err_ = 0;
     } else if (method_ == "rk45") {
-      // Order 5, first same as last, derived by a standalone tool
+      // Pair of order 5(4), first same as last, derived by a standalone tool
       a_ = {0, 0, 0, 0, 0, 0, 0,
             2./9, 0, 0, 0, 0, 0, 0,
             95./1024, 225./1024, 0, 0, 0, 0, 0,
@@ -119,6 +125,10 @@ namespace casadi {
                   292./33, -4,
                   -471./440, 0, 254208./96965, -2028000./337799, 1231713./184040,
                   -365./77, 5./2};
+      // Error estimate: difference with the embedded solution of order 4
+      m_err_ = {89834./99443025, 0, -183980032./58439351025, 2874688000./122151834189,
+                -92439186./1540529825, 468368./9281349, -8./681};
+      order_err_ = 4;
     } else {
       casadi_error("'erk': unknown method '" + method_ + "', expected 'rk45' or 'rk4'");
     }
@@ -136,6 +146,11 @@ namespace casadi {
     auto m = static_cast<ErkMemory*>(mem);
     RuntimeIntegrator::set_work(mem, arg, res, iw, w);
     m->e.prob = &pe_;
+    m->e.nom = nullptr;
+    if (replay_) {
+      m->e_nom.prob = &pe_;
+      m->e.nom = &m->e_nom;
+    }
   }
 
   int Erk::kernel(RuntimeIntegratorMemory* mem) const {
@@ -147,6 +162,13 @@ namespace casadi {
     g.add_auxiliary(CodeGenerator::AUX_ERK);
     g << "pe.fsal = " << pe_.fsal << ";\n";
     g << "e.prob = &pe;\n";
+    if (replay_) {
+      g << "pen.fsal = " << pe_.fsal << ";\n";
+      g << "en.prob = &pen;\n";
+      g << "e.nom = &en;\n";
+    } else {
+      g << "e.nom = 0;\n";
+    }
   }
 
   Erk::Erk(DeserializingStream& s) : RuntimeIntegrator(s) {
@@ -154,6 +176,7 @@ namespace casadi {
     s.unpack("Erk::method", method_);
     set_coefficients();
     set_ivp_prob();
+    set_nominal_prob();
     set_erk_prob();
   }
 

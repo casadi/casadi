@@ -19,7 +19,7 @@
 
 // Rosenbrock-Wanner integrator for M y' = F(t, y), see casadi_ivp.hpp
 // Step: (M/(h gamma) - J) U_i = F(t0 + alpha_i h, y0 + sum_j a_ij U_j) + sum_j (c_ij/h) M U_j
-//         + gamma_i h dF/dt, y1 = y0 + sum_i m_i U_i
+//         + gamma_i h dF/dt, y1 = y0 + sum_i m_i U_i, error sum_i m_err_i U_i
 // Steps depend on the nominal entries only: sensitivities are exact derivatives of the scheme
 
 // C-REPLACE "fabs" "casadi_fabs"
@@ -35,7 +35,7 @@ struct casadi_rosenbrock_prob {
   const casadi_ivp_prob<T1>* ivp;
   // Diagonal coefficient
   T1 gamma;
-  // Method coefficients, transformed form (a, alpha, m: see ivp): c strictly lower
+  // Method coefficients, transformed form (a, alpha, m, m_err: see ivp): c strictly lower
   // triangular, row-major, sums gamma_i of the rows of Gamma
   const T1 *c, *gamma_sum;
   // Iteration matrix M/(h gamma) - J: sparsity, positions of ODE_X, ALG_X, ODE_Z, ALG_Z, diag
@@ -82,9 +82,13 @@ typedef enum {
   ROSENBROCK_INIT_SENS,
   ROSENBROCK_INIT_END,
   ROSENBROCK_STEP_BEGIN,
+  ROSENBROCK_STEP_SIZE,
+  ROSENBROCK_STEP_INITIAL_SIZE,
   ROSENBROCK_STEP_LINEARIZE,
   ROSENBROCK_STEP_FACTORIZE,
+  ROSENBROCK_STEP_REPLAY,
   ROSENBROCK_STAGE_SOLVE,
+  ROSENBROCK_STEP_CHECK,
   ROSENBROCK_OUTPUT_CORRECT,
   ROSENBROCK_BACK_BEGIN,
   ROSENBROCK_BACK_INIT_SOLVE,
@@ -104,6 +108,8 @@ template<typename T1>
 struct casadi_rosenbrock_data {
   // Problem structure
   const casadi_rosenbrock_prob<T1>* prob;
+  // Method data of the nominal integration whose steps are replayed (or null)
+  casadi_rosenbrock_data<T1>* nom;
   // h * gamma, time derivative of F
   T1 h_gamma;
   T1* dfdt;
@@ -149,6 +155,7 @@ void casadi_rosenbrock_set_work(casadi_rosenbrock_data<T1>* r, const T1*** arg, 
   r->qr_w = *w; *w += rp->n_qr_w;
   r->v1 = *w; *w += rp->nv;
   r->v2 = *w; *w += rp->nv;
+  r->nom = 0;
 }
 
 // ---------------------------------------------------------------------------------------
@@ -462,6 +469,10 @@ int casadi_rosenbrock_stage_request(casadi_ivp_data<T1>* d) {
 // Forward integration and discrete adjoint
 // ---------------------------------------------------------------------------------------
 
+// SYMBOL "rosenbrock"
+template<typename T1>
+int casadi_rosenbrock(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>* r);
+
 // SYMBOL "rosenbrock_forward"
 template<typename T1>
 int casadi_rosenbrock_forward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>* r) {
@@ -548,6 +559,7 @@ int casadi_rosenbrock_forward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>
   case ROSENBROCK_STEP_BEGIN:
     if (d->fail) return casadi_ivp_stop(d, IVP_TAPE_FAILED);
     if (d->t >= d->t_out) {
+      if (d->pause) return casadi_ivp_stop(d, IVP_SUCCESS);
       if (!casadi_ivp_output(d) || p->nz == 0) return casadi_ivp_stop(d, IVP_SUCCESS);
       // Output inside the last step, algebraic states: Newton step on alg(t_out, x, z) = 0,
       // d(alg)/dz at the step start
@@ -563,9 +575,31 @@ int casadi_rosenbrock_forward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>
     if ((ret = casadi_ivp_reserve(d, IVP_RECORD_STEP, ROSENBROCK_STEP_BEGIN)) >= 0) return ret;
     // Controls of the new step
     casadi_copy(d->u, p->nu, d->u_step);
-    d->h = d->run_h;
-    d->next = ROSENBROCK_STEP_LINEARIZE;
-    return casadi_rosenbrock_forward(d, r);
+    if (d->nom) {
+      // Step of the nominal integration
+      d->next = ROSENBROCK_STEP_REPLAY;
+      return casadi_rosenbrock_forward(d, r);
+    }
+    if (p->step_size > 0) {
+      d->h = d->run_h;
+      d->next = ROSENBROCK_STEP_LINEARIZE;
+      return casadi_rosenbrock_forward(d, r);
+    }
+    return casadi_ivp_request_control(d, IVP_CONTROL_SIZE, ROSENBROCK_STEP_SIZE);
+  case ROSENBROCK_STEP_SIZE:
+    if (d->h > 0) {
+      d->next = ROSENBROCK_STEP_LINEARIZE;
+      return casadi_rosenbrock_forward(d, r);
+    }
+    // Estimate from the right-hand side at the initial point
+    d->t_arg = d->t;
+    d->y_arg = d->y;
+    d->res = d->U;
+    return casadi_ivp_request(d, IVP_EVAL_RHS, ROSENBROCK_STEP_INITIAL_SIZE);
+  case ROSENBROCK_STEP_INITIAL_SIZE:
+    if (d->fail) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+    d->n_rhs++;
+    return casadi_ivp_request_control(d, IVP_CONTROL_INIT, ROSENBROCK_STEP_SIZE);
   case ROSENBROCK_STEP_LINEARIZE:
     // Linearize at the beginning of the step
     d->t0 = d->t;
@@ -573,16 +607,37 @@ int casadi_rosenbrock_forward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>
     d->t_arg = d->t0;
     d->y_arg = d->y0;
     return casadi_ivp_request(d, IVP_EVAL_JAC, ROSENBROCK_STEP_FACTORIZE);
+  case ROSENBROCK_STEP_REPLAY:
+    // Advance the nominal integration by one step; its tasks are handed to the caller
+    if (casadi_rosenbrock(d->nom, r->nom)) {
+      d->active = d->nom;
+      return 1;
+    }
+    d->active = d;
+    if (d->nom->status != IVP_SUCCESS) return casadi_ivp_stop(d, d->nom->status);
+    if (d->nom->next == IVP_DONE) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+    // Same step size, same end time
+    d->h = d->nom->h;
+    d->next = ROSENBROCK_STEP_LINEARIZE;
+    return casadi_rosenbrock_forward(d, r);
   case ROSENBROCK_STEP_FACTORIZE:
     if (d->fail) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
     d->n_jac++;
     casadi_rosenbrock_dfdt(d, r);
     r->h_gamma = d->h * rp->gamma;
-    if (casadi_rosenbrock_factorize(d, r)) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+    if (casadi_rosenbrock_factorize(d, r)) {
+      // Singular iteration matrix: retry with a smaller step, if adaptive
+      if (casadi_ivp_prescribed(d)) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+      return casadi_ivp_request_control(d, IVP_CONTROL_FAIL, ROSENBROCK_STEP_CHECK);
+    }
     d->stage = 0;
     return casadi_rosenbrock_stage_request(d);
   case ROSENBROCK_STAGE_SOLVE:
-    if (d->fail) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+    if (d->fail) {
+      // Evaluation failed: retry with a smaller step, if adaptive
+      if (casadi_ivp_prescribed(d)) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
+      return casadi_ivp_request_control(d, IVP_CONTROL_FAIL, ROSENBROCK_STEP_CHECK);
+    }
     d->n_rhs++;
     casadi_rosenbrock_stage_rhs(d, r, d->stage);
     casadi_rosenbrock_solve(d, r, d->U + d->stage * p->ny);
@@ -590,8 +645,26 @@ int casadi_rosenbrock_forward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>
     // Candidate solution y = y0 + sum_i m_i U_i
     casadi_copy(d->y0, p->ny, d->y);
     casadi_mv_dense(d->U, p->ny, p->n_stages, p->m, d->y, 0);
+    if (!casadi_ivp_prescribed(d)) {
+      return casadi_ivp_request_control(d, IVP_CONTROL_TEST, ROSENBROCK_STEP_CHECK);
+    }
+    d->accepted = 1;
+    d->next = ROSENBROCK_STEP_CHECK;
+    return casadi_rosenbrock_forward(d, r);
+  case ROSENBROCK_STEP_CHECK:
+    if (d->status != IVP_SUCCESS) return casadi_ivp_stop(d, d->status);
+    if (!d->accepted) {
+      // Retry from t0
+      d->next = ROSENBROCK_STEP_BEGIN;
+      return casadi_rosenbrock_forward(d, r);
+    }
     casadi_ivp_accept(d);
     d->next = ROSENBROCK_STEP_BEGIN;
+    if (d->pause) {
+      // Hand the step to the integration that replays it
+      d->status = IVP_SUCCESS;
+      return 0;
+    }
     return casadi_rosenbrock_forward(d, r);
   case ROSENBROCK_OUTPUT_CORRECT:
     if (d->fail) return casadi_ivp_stop(d, IVP_EVAL_FAILED);
@@ -740,7 +813,6 @@ int casadi_rosenbrock_backward(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1
   return casadi_ivp_stop(d, IVP_EVAL_FAILED);
 }
 
-// SYMBOL "rosenbrock"
 template<typename T1>
 int casadi_rosenbrock(casadi_ivp_data<T1>* d, casadi_rosenbrock_data<T1>* r) {
   // Reverse communication: returns 1 while a task in d->task is to be carried out

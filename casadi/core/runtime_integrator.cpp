@@ -43,14 +43,34 @@ const Options RuntimeIntegrator::options_
       "column each, are constant: a run of steps [default: 1 for each output interval]"}},
     {"step_size",
       {OT_DOUBLE,
-      "Each run of steps, over a control group or up to the end without controls, is "
-      "divided into equal steps of at most step_size [default: (tf - t0)/20]"}},
+      "Fixed steps: each run of steps, over a control group or up to the end without "
+      "controls, is divided into equal steps of at most step_size [0: adaptive steps]"}},
     {"abstol",
       {OT_DOUBLE,
       "Absolute tolerance [1e-8]"}},
     {"reltol",
       {OT_DOUBLE,
-      "Relative tolerance [1e-6]"}}
+      "Relative tolerance [1e-6]"}},
+    {"max_num_steps",
+      {OT_INT,
+      "Adaptive steps: maximum number of steps per output interval [10000]"}},
+    {"step0",
+      {OT_DOUBLE,
+      "Adaptive steps: initial step size [default: estimated]"}},
+    {"max_step_size",
+      {OT_DOUBLE,
+      "Adaptive steps: maximum step size [default: unbounded]"}},
+    {"min_step_size",
+      {OT_DOUBLE,
+      "Adaptive steps: minimum step size [1e-14]"}},
+    {"quad_err_con",
+      {OT_BOOL,
+      "Adaptive steps: include the quadratures in the error control [false]"}},
+    {"max_tape_steps",
+      {OT_INT,
+      "Adaptive steps: capacity, in steps, of a tape in the work vector, for adjoint "
+      "sensitivities; needed for code generation [0: tape of unbounded size]. "
+      "With fixed steps, the tape is sized exactly."}}
     }
 };
 
@@ -76,9 +96,15 @@ void RuntimeIntegrator::init(const Dict& opts) {
   if (ngroup() < nt()) alloc_w((nu_ + nuq_) * nt(), true);
 
   // Default options
-  step_size_ = (tout_.back() - t0_) / 20;
+  step_size_ = 0;
   abstol_ = 1e-8;
   reltol_ = 1e-6;
+  max_num_steps_ = 10000;
+  step0_ = 0;
+  max_step_size_ = 0;
+  min_step_size_ = 1e-14;
+  quad_err_con_ = false;
+  max_tape_steps_ = 0;
 
   // Read options
   for (auto&& op : opts) {
@@ -88,9 +114,21 @@ void RuntimeIntegrator::init(const Dict& opts) {
       abstol_ = op.second;
     } else if (op.first == "reltol") {
       reltol_ = op.second;
+    } else if (op.first == "max_num_steps") {
+      max_num_steps_ = op.second;
+    } else if (op.first == "step0") {
+      step0_ = op.second;
+    } else if (op.first == "max_step_size") {
+      max_step_size_ = op.second;
+    } else if (op.first == "min_step_size") {
+      min_step_size_ = op.second;
+    } else if (op.first == "quad_err_con") {
+      quad_err_con_ = op.second;
+    } else if (op.first == "max_tape_steps") {
+      max_tape_steps_ = op.second;
     }
   }
-  casadi_assert(step_size_ > 0, "'step_size' must be positive");
+  casadi_assert(step_size_ >= 0, "'step_size' must be nonnegative");
 
   // Events not supported
   casadi_assert(ne_ == 0, "Zero-crossing events are not supported by '"
@@ -136,6 +174,13 @@ void RuntimeIntegrator::init(const Dict& opts) {
   }
 }
 
+const RuntimeIntegrator* RuntimeIntegrator::root() const {
+  // Integrator at the start of the chain of derivatives
+  const RuntimeIntegrator* r = this;
+  while (!r->derivative_of_.is_null()) r = r->derivative_of_.get<RuntimeIntegrator>();
+  return r;
+}
+
 void RuntimeIntegrator::set_ivp_prob() {
   // Problem structure for the shared part of the kernel
   p_.nx1 = nx1_;
@@ -158,28 +203,57 @@ void RuntimeIntegrator::set_ivp_prob() {
   p_.step_size = step_size_;
   p_.nx_err = nx_err_;
   p_.nz_err = nz_err_;
-  p_.nq_err = nq_err_;
+  p_.nq_err = quad_err_con_ ? nq_err_ : 0;
   p_.abstol = abstol_;
   p_.reltol = reltol_;
+  p_.order_err = order_err_;
+  p_.m_err = m_err_.empty() ? nullptr : get_ptr(m_err_);
+  p_.safety = 0.9;
+  p_.fac_min = 0.2;
+  p_.fac_max = 6;
+  p_.h_min = min_step_size_;
+  p_.h_max = max_step_size_;
+  p_.h_init = step0_;
+  p_.max_num_steps = max_num_steps_;
   casadi_ivp_setup(&p_);
   calls_ = task_calls("");
 }
 
+void RuntimeIntegrator::set_nominal_prob() {
+  // Forward directions folded into the DAE change the arithmetic of the nominal states: with
+  // adaptive steps, replay the steps of a nominal integration with the original functions
+  const RuntimeIntegrator* r = root();
+  if (!has_function("rhsF_nom") && r != this && r->nx1_ != nx1_ && step_size_ == 0) {
+    set_function(r->get_function("rhsF"), "rhsF_nom");
+    if (needs_jacobian()) set_function(r->get_function("jacF"), "jacF_nom");
+  }
+  replay_ = has_function("rhsF_nom");
+  if (!replay_) return;
+  calls_nom_ = root()->task_calls("_nom");
+  p_nom_ = root()->p_;
+  p_nom_.tape_size = 0;
+  casadi_ivp_setup(&p_nom_);
+}
+
 void RuntimeIntegrator::alloc_ivp_work() {
-  // Shared kernel data
+  // Shared kernel data, and of the nominal integration
   casadi_int sz_arg = 0, sz_res = 0, sz_iw = 0, sz_w = 0;
   casadi_ivp_work(&p_, &sz_arg, &sz_res, &sz_iw, &sz_w);
+  if (replay_) casadi_ivp_work(&p_nom_, &sz_arg, &sz_res, &sz_iw, &sz_w);
   alloc_w(sz_w, true);
   // Parameters and controls in generated code
   alloc_w(np_ + nu_, true);
 }
 
 casadi_int RuntimeIntegrator::tape_capacity() const {
-  // Steps: a run of steps per control group
-  casadi_int ny = nx_ + nz_ + nq_, n_step = 0, n_init;
-  for (casadi_int j = 0; j < ngroup(); ++j) {
-    double t = j == 0 ? t0_ : tout_[group_start_[j] - 1];
-    n_step += casadi_ivp_steps(tout_[group_start_[j + 1] - 1] - t, step_size_);
+  // Steps: a user bound with adaptive steps, a run of steps per control group with fixed steps
+  casadi_int ny = nx_ + nz_ + nq_, n_step = max_tape_steps_, n_init;
+  if (step_size_ > 0) {
+    n_step = 0;
+    for (casadi_int j = 0; j < ngroup(); ++j) {
+      double t = j == 0 ? t0_ : tout_[group_start_[j] - 1];
+      n_step += casadi_ivp_steps(tout_[group_start_[j + 1] - 1] - t, step_size_);
+    }
   }
   if (nadj_ == 0 || n_step == 0) return 0;
   // Every output interval may start with a consistent initialization
@@ -194,6 +268,11 @@ void RuntimeIntegrator::set_work(void* mem, const double**& arg, double**& res,
   Integrator::set_work(mem, arg, res, iw, w);
   m->d.prob = &p_;
   casadi_ivp_set_work(&m->d, &arg, &res, &iw, &w);
+  if (replay_) {
+    m->d_nom.prob = &p_nom_;
+    casadi_ivp_set_work(&m->d_nom, &arg, &res, &iw, &w);
+    m->d.nom = &m->d_nom;
+  }
 }
 
 int RuntimeIntegrator::init_mem(void* mem) const {
@@ -204,9 +283,10 @@ int RuntimeIntegrator::init_mem(void* mem) const {
 }
 
 void RuntimeIntegrator::run(RuntimeIntegratorMemory* m) const {
-  // Carry out the tasks requested by the kernel
+  // Carry out the tasks requested by the kernel, for it or for the nominal integration
   while (kernel(m)) {
-    if (task(m)) m->d.fail = 1;
+    casadi_ivp_data<double>* a = m->d.active;
+    if (a == &m->d ? task(m) : eval_task(m, a, calls_nom_)) a->fail = 1;
   }
 }
 
@@ -225,6 +305,8 @@ int RuntimeIntegrator::advance_noevent(IntegratorMemory* mem) const {
   casadi_ivp_data<double>* d = &m->d;
   casadi_ivp_advance(d, m->t_next, m->t_stop, nrx_ > 0);
   run(m);
+  casadi_assert(d->status != IVP_TAPE_FAILED, name_ + ": the tape of " + str(max_tape_steps_)
+    + " steps is full at t = " + str(d->t) + ", increase max_tape_steps");
   if (d->status != IVP_SUCCESS) {
     if (verbose_) {
       casadi_warning(name_ + ": integration failed at t = " + str(d->t) + ", status "
@@ -412,7 +494,11 @@ int RuntimeIntegrator::task(RuntimeIntegratorMemory* m) const {
 
 int RuntimeIntegrator::eval_task(RuntimeIntegratorMemory* m, casadi_ivp_data<double>* d,
     const std::vector<std::vector<TaskCall>>& calls) const {
-  // Function evaluations requested by the kernel, as described by the task table
+  // Adaptive step size control, or function evaluations as described by the task table
+  if (d->task == IVP_STEP_CONTROL) {
+    casadi_ivp_control(d);
+    return 0;
+  }
   for (const TaskCall& c : calls.at(d->task)) {
     std::fill_n(m->arg, c.n_in, nullptr);
     std::fill_n(m->res, c.n_out, nullptr);
@@ -585,15 +671,28 @@ void RuntimeIntegrator::codegen_declarations(CodeGenerator& g) const {
     g.add_dependency(get_function(f));
     if (nfwd_ > 0) g.add_dependency(get_function(forward_name(f, nfwd_)));
   }
+  if (replay_) {
+    g.add_dependency(get_function("rhsF_nom"));
+    if (needs_jacobian()) g.add_dependency(get_function("jacF_nom"));
+  }
 }
 
 void RuntimeIntegrator::codegen_body(CodeGenerator& g) const {
+  casadi_assert(has_codegen(), name_ + ": adjoint sensitivities with adaptive steps need "
+    "max_tape_steps for code generation");
   g.add_auxiliary(CodeGenerator::AUX_IVP);
+  if (step_size_ == 0) g.add_auxiliary(CodeGenerator::AUX_IVP_ADAPT);
   const std::string nl = ";\n", method = plugin_name();
   g.local("p", "struct casadi_ivp_prob");
   g.local("d", "struct casadi_ivp_data");
   g.local("pe", "struct casadi_" + method + "_prob");
   g.local("e", "struct casadi_" + method + "_data");
+  if (replay_) {
+    g.local("pn", "struct casadi_ivp_prob");
+    g.local("dn", "struct casadi_ivp_data");
+    g.local("pen", "struct casadi_" + method + "_prob");
+    g.local("en", "struct casadi_" + method + "_data");
+  }
   g.local("sarg", "const casadi_real", "**");
   g.local("sres", "casadi_real", "**");
   g.local("pv", "casadi_real", "*");
@@ -602,7 +701,11 @@ void RuntimeIntegrator::codegen_body(CodeGenerator& g) const {
   g.local("k", "casadi_int");
 
   g.comment("Problem structure");
-  codegen_ivp_prob(g, "p");
+  codegen_ivp_prob(g, "p", p_.tape_size);
+  if (replay_) {
+    g.comment("Nominal integration, whose steps are replayed");
+    root()->codegen_ivp_prob(g, "pn", 0);
+  }
 
   g.comment("Work vectors");
   g << "sarg = arg + " << INTEGRATOR_NUM_IN << "; sres = res + " << INTEGRATOR_NUM_OUT << nl;
@@ -610,6 +713,11 @@ void RuntimeIntegrator::codegen_body(CodeGenerator& g) const {
   if (nu_ > 0) g << "uv = w; w += " << nu_ << nl;
   g << "d.prob = &p" << nl;
   g << "casadi_ivp_set_work(&d, &arg, &res, &iw, &w)" << nl;
+  if (replay_) {
+    g << "dn.prob = &pn" << nl;
+    g << "casadi_ivp_set_work(&dn, &arg, &res, &iw, &w)" << nl;
+    g << "d.nom = &dn" << nl;
+  }
   g.comment("Method");
   codegen_method(g);
 
@@ -676,13 +784,22 @@ void RuntimeIntegrator::codegen_body(CodeGenerator& g) const {
 }
 
 void RuntimeIntegrator::codegen_loop(CodeGenerator& g) const {
-  // Carry out the tasks requested by the kernel
+  // Carry out the tasks requested by the kernel, for it or for the nominal integration
   g << "while (casadi_" << plugin_name() << "(&d, &e)) {\n";
-  codegen_task(g, "d", calls_);
+  if (replay_) {
+    g << "if (d.active == &d) {\n";
+    codegen_task(g, "d", calls_);
+    g << "} else {\n";
+    codegen_task(g, "dn", calls_nom_);
+    g << "}\n";
+  } else {
+    codegen_task(g, "d", calls_);
+  }
   g << "}\n";
 }
 
-void RuntimeIntegrator::codegen_ivp_prob(CodeGenerator& g, const std::string& p) const {
+void RuntimeIntegrator::codegen_ivp_prob(CodeGenerator& g, const std::string& p,
+    casadi_int tape_size) const {
   // Shared problem structure in variable p, as set_ivp_prob
   auto set = [&](const std::string& field, const std::string& value) -> void {
     g << p << "." << field << " = " << value << ";\n";
@@ -703,13 +820,22 @@ void RuntimeIntegrator::codegen_ivp_prob(CodeGenerator& g, const std::string& p)
   for (casadi_int k = 0; k < IVP_NUM_JAC; ++k) {
     set("sp_jac[" + str(k) + "]", sp_jac_.empty() ? "0" : g.sparsity(sp_jac_[k]));
   }
-  set("tape_size", str(p_.tape_size));
+  set("tape_size", str(tape_size));
   set("step_size", g.constant(p_.step_size));
   set("nx_err", str(p_.nx_err));
   set("nz_err", str(p_.nz_err));
   set("nq_err", str(p_.nq_err));
   set("abstol", g.constant(p_.abstol));
   set("reltol", g.constant(p_.reltol));
+  set("order_err", str(p_.order_err));
+  set("m_err", m_err_.empty() ? "0" : g.constant(m_err_));
+  set("safety", g.constant(p_.safety));
+  set("fac_min", g.constant(p_.fac_min));
+  set("fac_max", g.constant(p_.fac_max));
+  set("h_min", g.constant(p_.h_min));
+  set("h_max", g.constant(p_.h_max));
+  set("h_init", g.constant(p_.h_init));
+  set("max_num_steps", str(p_.max_num_steps));
   g << "casadi_ivp_setup(&" << p << ");\n";
 }
 
@@ -744,6 +870,11 @@ void RuntimeIntegrator::codegen_task(CodeGenerator& g, const std::string& d,
     }
     g << "break;\n";
   }
+  if (step_size_ == 0) {
+    g << "case IVP_STEP_CONTROL:\n";
+    g << "casadi_ivp_control(&" << d << ");\n";
+    g << "break;\n";
+  }
   g << "default: " << d << ".fail = 1;\n";
   g << "}\n";
 }
@@ -752,6 +883,7 @@ Dict RuntimeIntegrator::get_stats(void* mem) const {
   Dict stats = Integrator::get_stats(mem);
   auto m = static_cast<RuntimeIntegratorMemory*>(mem);
   stats["n_steps"] = m->d.n_steps;
+  stats["n_reject"] = m->d.n_reject;
   stats["n_rhs"] = m->d.n_rhs;
   stats["n_jac"] = m->d.n_jac;
   stats["n_vjp"] = m->d.n_vjp;
@@ -760,9 +892,10 @@ Dict RuntimeIntegrator::get_stats(void* mem) const {
 
 void RuntimeIntegrator::print_stats(IntegratorMemory* mem) const {
   auto m = static_cast<RuntimeIntegratorMemory*>(mem);
-  print("%s: %lld steps, %lld rhs, %lld jac, %lld vjp\n", plugin_name(),
-    static_cast<long long>(m->d.n_steps), static_cast<long long>(m->d.n_rhs),
-    static_cast<long long>(m->d.n_jac), static_cast<long long>(m->d.n_vjp));
+  print("%s: %lld steps, %lld rejected, %lld rhs, %lld jac, %lld vjp\n", plugin_name(),
+    static_cast<long long>(m->d.n_steps), static_cast<long long>(m->d.n_reject),
+    static_cast<long long>(m->d.n_rhs), static_cast<long long>(m->d.n_jac),
+    static_cast<long long>(m->d.n_vjp));
 }
 
 RuntimeIntegrator::RuntimeIntegrator(DeserializingStream& s) : Integrator(s) {
@@ -775,6 +908,12 @@ RuntimeIntegrator::RuntimeIntegrator(DeserializingStream& s) : Integrator(s) {
   s.unpack("RuntimeIntegrator::step_size", step_size_);
   s.unpack("RuntimeIntegrator::abstol", abstol_);
   s.unpack("RuntimeIntegrator::reltol", reltol_);
+  s.unpack("RuntimeIntegrator::step0", step0_);
+  s.unpack("RuntimeIntegrator::max_step_size", max_step_size_);
+  s.unpack("RuntimeIntegrator::min_step_size", min_step_size_);
+  s.unpack("RuntimeIntegrator::max_num_steps", max_num_steps_);
+  s.unpack("RuntimeIntegrator::max_tape_steps", max_tape_steps_);
+  s.unpack("RuntimeIntegrator::quad_err_con", quad_err_con_);
 }
 
 void RuntimeIntegrator::serialize_body(SerializingStream &s) const {
@@ -788,6 +927,12 @@ void RuntimeIntegrator::serialize_body(SerializingStream &s) const {
   s.pack("RuntimeIntegrator::step_size", step_size_);
   s.pack("RuntimeIntegrator::abstol", abstol_);
   s.pack("RuntimeIntegrator::reltol", reltol_);
+  s.pack("RuntimeIntegrator::step0", step0_);
+  s.pack("RuntimeIntegrator::max_step_size", max_step_size_);
+  s.pack("RuntimeIntegrator::min_step_size", min_step_size_);
+  s.pack("RuntimeIntegrator::max_num_steps", max_num_steps_);
+  s.pack("RuntimeIntegrator::max_tape_steps", max_tape_steps_);
+  s.pack("RuntimeIntegrator::quad_err_con", quad_err_con_);
 }
 
 } // namespace casadi

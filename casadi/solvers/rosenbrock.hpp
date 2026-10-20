@@ -32,17 +32,18 @@
 /** \defgroup plugin_Integrator_rosenbrock Title
     \par
 
-    Rosenbrock-Wanner integrator with fixed steps for stiff ODEs and semi-explicit
-    index-1 DAEs.
+    Rosenbrock-Wanner integrator for stiff ODEs and semi-explicit index-1 DAEs, with
+    adaptive or fixed steps.
 
-    An 8-stage, stiffly accurate, L-stable method of order 5. Each step needs one Jacobian
-    and one sparse QR factorization; the method is linearly implicit, without Newton
-    iterations. Steps cross output times, which are interpolated by a dense output of order
-    4: each run of steps over a control group is divided into equal steps of at most
-    step_size. Forward sensitivities are the exact derivatives of the discrete solution
-    (internal numerical differentiation) and adjoint sensitivities are the exact discrete
-    adjoint of the taped steps. The tape has a known bound, so adjoints can be code-
-    generated.
+    An 8-stage, stiffly accurate, L-stable method of order 5 with an embedded method of
+    order 4. Each step needs one Jacobian and one sparse QR factorization; the method is
+    linearly implicit, without Newton iterations. Steps cross the output times within a
+    control group, which are interpolated by a dense output of order 4. Step sizes are
+    chosen from the nominal solution only, so forward sensitivities are the exact
+    derivatives of the discrete solution (internal numerical differentiation) and adjoint
+    sensitivities are the exact discrete adjoint of the taped steps. With step_size, each
+    run of steps over a control group is divided into equal steps instead, and the tape has
+    a known bound.
 
 */
 /** \pluginsection{Integrator,rosenbrock} */
@@ -52,8 +53,8 @@ namespace casadi {
 
   // Memory
   struct CASADI_INTEGRATOR_ROSENBROCK_EXPORT RosenbrockMemory : public RuntimeIntegratorMemory {
-    // Method data
-    casadi_rosenbrock_data<double> r;
+    // Method data, and of the nominal integration whose steps are replayed
+    casadi_rosenbrock_data<double> r, r_nom;
   };
 
   /** \brief \pluginbrief{Integrator,rosenbrock}
@@ -131,7 +132,7 @@ namespace casadi {
     // Method coefficients in transformed form
     void set_coefficients();
 
-    // Problem structure of the method
+    // Problem structure of the method, and of the nominal integration if replayed
     void set_rosenbrock_prob();
 
     // Generate code for the problem structure of the method in variable pe, shared part p
@@ -141,8 +142,8 @@ namespace casadi {
     // Method coefficients, transformed form, beyond the shared ones
     std::vector<double> c_, gamma_sum_;
 
-    // Problem structure of the method
-    casadi_rosenbrock_prob<double> pr_;
+    // Problem structure of the method, and of the nominal integration
+    casadi_rosenbrock_prob<double> pr_, pr_nom_;
 
     // Options
     double init_tol_;
