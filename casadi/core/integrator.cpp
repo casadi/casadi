@@ -805,6 +805,7 @@ void Integrator::init(const Dict& opts) {
   ntmp_ = std::max(ntmp_, nrx_ + nrz_);
   ntmp_ = std::max(ntmp_, ne_);
   ntmp_ = std::max(ntmp_, nrq_ + nuq_);
+  ntmp_ = std::max(ntmp_, nq_);
 
   // Call the base class method
   OracleFunction::init(opts);
@@ -2681,6 +2682,19 @@ int Integrator::calc_edot(IntegratorMemory* m) const {
   return 0;
 }
 
+int Integrator::calc_qdot(IntegratorMemory* m) const {
+  m->arg[DYN_T] = &m->t;  // t
+  m->arg[DYN_X] = m->x;  // x
+  m->arg[DYN_Z] = m->z;  // z
+  m->arg[DYN_P] = m->p;  // p
+  m->arg[DYN_U] = m->u;  // u
+  m->res[DYN_ODE] = nullptr;  // ode
+  m->res[DYN_ALG] = nullptr;  // alg
+  m->res[DYN_QUAD] = m->tmp2;  // quad
+  m->res[DYN_ZERO] = nullptr;  // zero
+  return calc_function(m, "dae");
+}
+
 int Integrator::predict_events(IntegratorMemory* m) const {
   // Event time same as stopping time, by default
   double t_event = m->t_stop;
@@ -2758,6 +2772,13 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
     for (casadi_int i = 0; i < nfwd_; ++i) {
        casadi_axpy(nx1_, m->tmp1[i], m->xdot, m->x + nx1_ * (1 + i));
     }
+    // Same for the quadratures
+    if (nq1_ > 0) {
+      if (calc_qdot(m)) return 1;
+      for (casadi_int i = 0; i < nfwd_; ++i) {
+        casadi_axpy(nq1_, m->tmp1[i], m->tmp2, m->q + nq1_ * (1 + i));
+      }
+    }
   }
   // Call event transition function, if any
   if (has_function("transition")) {
@@ -2795,6 +2816,13 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
   // Propagate this sensitivity to the state vector
   for (casadi_int i = 0; i < nfwd_; ++i) {
      casadi_axpy(nx1_, -m->tmp1[i], m->xdot, m->x + nx1_ * (1 + i));
+  }
+  // Same for the quadratures
+  if (nfwd_ > 0 && nq1_ > 0) {
+    if (calc_qdot(m)) return 1;
+    for (casadi_int i = 0; i < nfwd_; ++i) {
+      casadi_axpy(nq1_, -m->tmp1[i], m->tmp2, m->q + nq1_ * (1 + i));
+    }
   }
   // TODO(@jaeandersson): Check if other events need to be triggered
   *ind = -1;  // for now, do not trigger other events

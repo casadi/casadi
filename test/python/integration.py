@@ -2374,6 +2374,38 @@ class Integrationtests(casadiTestCase):
         self.checkarray(F(x0=[2, 0.3, 1], z0=0.3, p=0.8)["xf"], ref, plugin, digits=7)
 
   @memory_heavy()
+  def test_events_quadrature_sensitivities(self):
+    self.message("zero-crossing events: forward sensitivities of quadratures")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    # Bouncing ball, quadrature with a right-hand side that jumps at the event
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "quad": ca.vertcat(x[1], x[0]),
+           "zero": x[0]}
+    tr = ca.Function("transition", [index, t, x, ca.SX(0, 1), p, ca.SX(0, 1)],
+      [ca.vertcat(x[0], -p*x[1]), ca.SX(0, 1)], ["index", "t", "x", "z", "p", "u"],
+      ["post_x", "post_z"])
+    for plugin, opts in [("rk", {"number_of_finite_elements": 100}),
+                         ("collocation", {"number_of_finite_elements": 100}),
+                         ("cvodes", {"abstol": 1e-12, "reltol": 1e-12,
+                                     "quad_err_con": True})]:
+      F = ca.integrator("F", plugin, dae, 0, 1, dict(opts, transition=tr, event_tol=1e-12,
+        max_event_iter=20))
+      v = ca.MX.sym("v", 3)
+      r = F(x0=v[:2], p=v[2])
+      G = ca.Function("G", [v], [ca.jacobian(r["qf"], v), ca.jacobian(r["xf"], v)])
+      J_q, J_x = G(ca.vertcat(2, 0.3, 0.8))
+      # Velocity integrates to the height, which is continuous
+      self.checkarray(J_q[0, :], J_x[0, :] - ca.DM([[1, 0, 0]]), plugin, digits=7)
+      # Reference: central differences
+      fd = ca.horzcat(*[(F(x0=[2, 0.3] + h*e[:2], p=0.8 + h*e[2])["qf"]
+        - F(x0=[2, 0.3] - h*e[:2], p=0.8 - h*e[2])["qf"])/(2*h)
+        for h in [1e-6] for e in [ca.DM.eye(3)[:, i] for i in range(3)]])
+      self.checkarray(J_q, fd, plugin, digits=5)
+
+  @memory_heavy()
   def test_adjoint_checkpoint_stop_time(self):
     self.message("issue #3227: recomputation from a check point ending at a stop time")
     x = ca.SX.sym("x")
