@@ -585,10 +585,9 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
     // Quadratures for the adjoint problem
     if (nrq_ > 0 || nuq_ > 0) {
       THROWING(IDAQuadInitB, m->mem, m->whichB, rhsQB, m->v_adj_pu);
-      if (quad_err_con_) {
-        THROWING(IDASetQuadErrConB, m->mem, m->whichB, true);
-        THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
-      }
+      // Adjoint sensitivities, include in the error test as forward sensitivities
+      THROWING(IDASetQuadErrConB, m->mem, m->whichB, true);
+      THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     }
 
     // Mark initialized

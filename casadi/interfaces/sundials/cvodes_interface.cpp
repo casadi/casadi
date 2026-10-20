@@ -349,10 +349,9 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
     // Quadratures for the backward problem
     if (nrq_ > 0 || nuq_ > 0) {
       THROWING(CVodeQuadInitB, m->mem, m->whichB, rhsQB, m->v_adj_pu);
-      if (quad_err_con_) {
-        THROWING(CVodeSetQuadErrConB, m->mem, m->whichB, true);
-        THROWING(CVodeQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
-      }
+      // Adjoint sensitivities, include in the error test as forward sensitivities
+      THROWING(CVodeSetQuadErrConB, m->mem, m->whichB, true);
+      THROWING(CVodeQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     }
 
     // Mark initialized

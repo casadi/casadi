@@ -2480,6 +2480,20 @@ class Integrationtests(casadiTestCase):
     self.checkarray(F(x0=[1, 2])["xf"], ca.DM([1, 2]), "idas")
 
   @memory_heavy()
+  def test_adjoint_quadrature_error_control(self):
+    self.message("issue #4383: adjoint sensitivities are part of the error test")
+    t = ca.SX.sym("t")
+    x = ca.SX.sym("x")
+    p = ca.SX.sym("p", 3)
+    # The adjoint state is constant: only the quadratures for adj_p limit the step size
+    dae = {"t": t, "x": x, "p": p, "ode": p[0]*(1 - t) + (p[1] + p[2])*t}
+    for plugin, tol, digits in [("cvodes", 1e-12, 9), ("idas", 1e-8, 4)]:
+      F = ca.integrator("F", plugin, dae, 0, 1, {"abstol": tol, "reltol": tol})
+      v = ca.MX.sym("v", 3)
+      G = ca.Function("G", [v], [ca.jtimes(F(x0=0, p=v)["xf"], v, ca.MX.ones(1, 1), True)])
+      self.checkarray(G([1, 1, 1]), ca.DM([0.5, 0.5, 0.5]), plugin, digits=digits)
+
+  @memory_heavy()
   def test_adjoint_checkpoint_stop_time(self):
     self.message("issue #3227: recomputation from a check point ending at a stop time")
     x = ca.SX.sym("x")
