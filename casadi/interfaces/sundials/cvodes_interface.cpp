@@ -261,6 +261,9 @@ void CvodesInterface::reset(IntegratorMemory* mem, bool first_call) const {
 int CvodesInterface::advance_noevent(IntegratorMemory* mem) const {
   auto m = to_mem(mem);
 
+  // Event iterations may need to go back further than the solver can interpolate
+  rewind(m);
+
   // Do not integrate past change in input signals or past the end
   // The event handling may cause the stop time to become smaller than internal time reached,
   // in which case the stop time cannot be enforced

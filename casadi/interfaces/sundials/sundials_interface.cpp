@@ -233,6 +233,7 @@ void SundialsInterface::init(const Dict& opts) {
     jacF_sp = linsolF_.sparsity();
   }
   alloc_w(jacF_sp.nnz(), true);  // jacF
+  alloc_w(nq_ + nx_ + nz_, true);  // q_rewind
 
   // Linear solver for forward problem
   if (linsolF_.is_null()) {
@@ -281,6 +282,7 @@ void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
 
   // Work vectors
   m->jacF = w; w += linsolF_.sparsity().nnz();
+  m->q_rewind = w; w += nq_ + nx_ + nz_;
 
   // Work vectors
   const Function& jacF = get_function("jacF");
@@ -341,6 +343,20 @@ void SundialsInterface::reset(IntegratorMemory* mem, bool first_call) const {
   casadi_copy(m->q, nq_, NV_DATA_S(m->v_q));
   casadi_copy(m->x, nx_, NV_DATA_S(m->v_xz));
   casadi_copy(m->z, nz_, NV_DATA_S(m->v_xz) + nx_);
+}
+
+void SundialsInterface::rewind(SundialsMemory* m) const {
+  if (ne_ == 0) return;
+  if (m->event_iter == 1) {
+    // Save q, x, z (consecutive in memory)
+    m->t_rewind = m->t;
+    casadi_copy(m->q, nq_ + nx_ + nz_, m->q_rewind);
+  } else if (m->t_next < m->tcur - m->hlast) {
+    // The solver can only interpolate within its last step
+    m->t = m->tcur = m->t_rewind;
+    casadi_copy(m->q_rewind, nq_ + nx_ + nz_, m->q);
+    reset(m, false);
+  }
 }
 
 void SundialsInterface::reset_stats(SundialsMemory* m) const {

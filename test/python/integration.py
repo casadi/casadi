@@ -2348,6 +2348,32 @@ class Integrationtests(casadiTestCase):
       self.checkarray(grad_fwd, grad_adj, plugin, digits=5)
 
   @memory_heavy()
+  def test_events_sundials_rewind(self):
+    self.message("zero-crossing events: cvodes/idas event iterations beyond the last step")
+    g = 9.81
+    x = ca.SX.sym("x", 3)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    # Bouncing ball with a decaying third state, large steps between the outputs
+    ode = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g, -x[2]), "zero": x[0]}
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g, -x[2]), "alg": z - x[1],
+           "zero": x[0]}
+    tr = ca.Function("transition", [index, t, x, z, p, ca.SX(0, 1)],
+      [ca.vertcat(x[0], -p*x[1], x[2]), z], ["index", "t", "x", "z", "p", "u"],
+      ["post_x", "post_z"])
+    opts = {"transition": tr, "event_tol": 1e-12, "max_event_iter": 20}
+    for grid in [[1.0], list(numpy.linspace(0.1, 4, 40))]:
+      F = ca.integrator("F", "erk", ode, 0, grid,
+        dict(opts, method="rk45", abstol=1e-12, reltol=1e-12))
+      ref = F(x0=[2, 0.3, 1], p=0.8)["xf"]
+      for plugin, problem in [("cvodes", ode), ("idas", ode), ("idas", dae)]:
+        F = ca.integrator("F", plugin, problem, 0, grid,
+          dict(opts, abstol=1e-12, reltol=1e-12))
+        self.checkarray(F(x0=[2, 0.3, 1], z0=0.3, p=0.8)["xf"], ref, plugin, digits=7)
+
+  @memory_heavy()
   def test_adjoint_checkpoint_stop_time(self):
     self.message("issue #3227: recomputation from a check point ending at a stop time")
     x = ca.SX.sym("x")
