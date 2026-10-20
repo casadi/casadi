@@ -25,6 +25,12 @@ casadi_plugin(Integrator rk
   runge_kutta.cpp
   runge_kutta_meta.cpp)
 
+# Explicit Runge-Kutta integrator with dense output
+casadi_plugin(Integrator erk
+  erk.hpp
+  erk.cpp
+  erk_meta.cpp)
+
 # Collocation integrator
 casadi_plugin(Integrator collocation
   collocation.hpp

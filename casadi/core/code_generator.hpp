@@ -745,6 +745,8 @@ namespace casadi {
       AUX_FEASIBLESQPMETHOD,
       AUX_LDL,
       AUX_NEWTON,
+      AUX_IVP,
+      AUX_ERK,
       AUX_TO_DOUBLE,
       AUX_TO_INT,
       AUX_CAST,

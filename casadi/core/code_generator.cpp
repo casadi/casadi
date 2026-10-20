@@ -1821,6 +1821,19 @@ namespace casadi {
 
       this->auxiliaries << sanitize_source(casadi_qrqp_str, inst);
       break;
+    case AUX_IVP:
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_AXPY);
+      add_auxiliary(AUX_CLEAR);
+      add_auxiliary(AUX_MV_DENSE);
+      add_include("math.h");
+      this->auxiliaries << sanitize_source(casadi_ivp_str, inst);
+      break;
+    case AUX_ERK:
+      add_auxiliary(AUX_IVP);
+      add_auxiliary(AUX_SCAL);
+      this->auxiliaries << sanitize_source(casadi_erk_str, inst);
+      break;
     case AUX_NLP:
       add_auxiliary(AUX_ORACLE);
       this->auxiliaries << sanitize_source(casadi_nlp_str, inst);
