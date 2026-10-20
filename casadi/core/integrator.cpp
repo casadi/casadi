@@ -1148,6 +1148,8 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
 int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_forward");
+  // Events couple all states and parameters: dense dependencies
+  if (ne_ > 0) return FunctionInternal::sp_forward(arg, res, iw, w, mem);
 
   // Inputs
   const bvec_t* x0 = arg[INTEGRATOR_X0];
@@ -1424,6 +1426,8 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
 int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_reverse");
+  // Events couple all states and parameters: dense dependencies
+  if (ne_ > 0) return FunctionInternal::sp_reverse(arg, res, iw, w, mem);
 
   // Inputs
   bvec_t* x0 = arg[INTEGRATOR_X0];

@@ -62,6 +62,18 @@ integrators.append(("collocation",["dae","ode"],{"rootfinder":"newton","number_o
 
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000,"simplify":True}))
 
+def bounce_transition(nz=0):
+  # Bouncing ball: the velocity is reversed and scaled by the restitution p; z passes through
+  x, z, p = ca.SX.sym("x", 2), ca.SX.sym("z", nz), ca.SX.sym("p")
+  index, t, u = ca.SX.sym("index"), ca.SX.sym("t"), ca.SX(0, 1)
+  return ca.Function("transition", [index, t, x, z, p, u], [ca.vertcat(x[0], -p*x[1]), z],
+    ["index", "t", "x", "z", "p", "u"], ["post_x", "post_z"])
+
+def fd_jacobian(G, v0, h=1e-6):
+  # Central differences of the first output of G at v0
+  v0 = ca.DM(v0)
+  f = lambda v: (lambda r: r[0] if isinstance(r, (list, tuple)) else r)(G(v))
+  return ca.horzcat(*[(f(v0 + h*e) - f(v0 - h*e))/(2*h) for e in ca.horzsplit(ca.DM.eye(v0.numel()))])
 
 print("Will test these integrators:")
 for cl, t, options in integrators:
@@ -1688,6 +1700,27 @@ class Integrationtests(casadiTestCase):
         for i in range(F.n_in()):
           if F.nnz_in(i) == 0: continue
           self.checkarray(adj1[i], ca.horzsplit_n(adj2[i], 2)[d], plugin, digits=8)
+
+  @memory_heavy()
+  def test_events_sparsity(self):
+    self.message("zero-crossing events: dependencies through the transition")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    p = ca.SX.sym("p")
+    # Bouncing ball: the restitution p enters the transition only, which also couples h and v
+    dae = {"x": x, "p": p, "ode": ca.vertcat(x[1], -g), "zero": x[0]}
+    grid = list(numpy.linspace(0.1, 4, 40))
+    for plugin, opts in [("rk", {"number_of_finite_elements": 100}),
+                         ("cvodes", {"abstol": 1e-12, "reltol": 1e-12})]:
+      if not ca.has_integrator(plugin): continue
+      F = ca.integrator("F", plugin, dae, 0, grid, dict(opts, transition=bounce_transition(),
+        event_tol=1e-12, max_event_iter=20))
+      v = ca.MX.sym("v", 3)
+      xf = F(x0=v[:2], p=v[2])["xf"][:, -1]
+      G = ca.Function("G", [v], [xf, ca.jacobian(xf, v)])
+      self.assertTrue(G.sparsity_out(1).is_dense())
+      v0 = ca.DM([2, 0.3, 0.8])
+      self.checkarray(G(v0)[1], fd_jacobian(G, v0), plugin, digits=5)
 
   def test_reverse_over_adjoint_directions(self):
     self.message("Derivatives of adjoint sensitivities with several directions (#3293)")
