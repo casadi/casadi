@@ -1837,6 +1837,11 @@ namespace casadi {
       add_auxiliary(AUX_FABS);
       this->auxiliaries << sanitize_source(casadi_ivp_adapt_str, inst);
       break;
+    case AUX_IVP_EVENT:
+      add_auxiliary(AUX_IVP);
+      add_auxiliary(AUX_FABS);
+      this->auxiliaries << sanitize_source(casadi_ivp_event_str, inst);
+      break;
     case AUX_ROSENBROCK:
       add_auxiliary(AUX_IVP);
       add_auxiliary(AUX_SCAL);

@@ -142,6 +142,9 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   /// Shared problem structure, from the method coefficients
   void set_ivp_prob();
 
+  /// State after an event as a function of the state before it, see casadi_ivp_event.hpp
+  Function jump_function() const;
+
   /// Problem of the nominal integration whose steps are replayed, if any
   void set_nominal_prob();
 
@@ -186,7 +189,8 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
  private:
   // Source buffers of function arguments and results, see slot_ptr and slot_expr
   enum Src {SRC_T, SRC_Y, SRC_P, SRC_U, SRC_RES, SRC_W, SRC_JAC, SRC_JAC_FWD, SRC_JAC_ADJ,
-    SRC_JAC_ADJ_FWD, SRC_VJP_X, SRC_VJP_Z, SRC_VJP_P, SRC_VJP_U};
+    SRC_JAC_ADJ_FWD, SRC_VJP_X, SRC_VJP_Z, SRC_VJP_P, SRC_VJP_U, SRC_EV_ONE, SRC_EV_W, SRC_YDOT,
+    SRC_EDOT};
 
   // Argument or result i of a function call: buffer src at offset off
   struct Slot {
@@ -218,7 +222,7 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
 
   // Generate code for the tasks of data variable d, as eval_task
   void codegen_task(CodeGenerator& g, const std::string& d,
-    const std::vector<std::vector<TaskCall>>& calls) const;
+    const std::vector<std::vector<TaskCall>>& calls, bool in_event = false) const;
 
   // Generate code for the task loop of the kernel
   void codegen_loop(CodeGenerator& g) const;

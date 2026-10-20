@@ -432,6 +432,7 @@ namespace casadi {
   #include "casadi_ipqp.hpp"
   #include "casadi_ivp.hpp"
   #include "casadi_ivp_adapt.hpp"
+  #include "casadi_ivp_event.hpp"
   #include "casadi_rosenbrock.hpp"
   #include "casadi_erk.hpp"
   #include "casadi_oracle.hpp"

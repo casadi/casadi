@@ -45,6 +45,11 @@
     run of steps over a control group is divided into equal steps instead, and the tape has
     a known bound.
 
+    Zero-crossing events (DAE output zero, option transition) are located on the dense
+    output of the step in which a function becomes negative; integration restarts from the
+    state after the transition. Forward sensitivities include those of the event times;
+    adjoint sensitivities are not available with events.
+
 */
 /** \pluginsection{Integrator,rosenbrock} */
 

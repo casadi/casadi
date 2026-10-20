@@ -45,10 +45,16 @@ typedef enum {
   IVP_EVAL_VJP,
   // vjp = d/d(x,z,p,u) <jac_adj, Jacobian blocks> at (t_arg, y_arg), w. forward sensitivities
   IVP_EVAL_JAC_ADJ,
+  // res = zero-crossing functions at (t_arg, y_arg), edot = derivative in direction (1, ydot)
+  IVP_EVAL_ZERO,
+  // res = y after the event selected by ev_w at (t_arg, y_arg), with forward sensitivities
+  IVP_EVAL_JUMP,
   // Enlarge the tape to at least tape_need entries, keeping its contents; set tape, tape_cap
   IVP_TAPE_RESERVE,
   // Adaptive step size control, see casadi_ivp_control
-  IVP_STEP_CONTROL
+  IVP_STEP_CONTROL,
+  // Events in the accepted step, see casadi_ivp_event
+  IVP_EVENT
 } casadi_ivp_task_t;
 
 // SYMBOL "ivp_control_t"
@@ -80,7 +86,9 @@ typedef enum {
   IVP_STEP_TOO_SMALL,
   IVP_INIT_FAILED,
   IVP_EVAL_FAILED,
-  IVP_TAPE_FAILED
+  IVP_TAPE_FAILED,
+  IVP_TOO_MANY_EVENTS,
+  IVP_EVENT_FAILED
 } casadi_ivp_flag_t;
 
 // SYMBOL "ivp_record_t"
@@ -121,6 +129,12 @@ struct casadi_ivp_prob {
   const T1* m_err;
   T1 safety, fac_min, fac_max, h_min, h_max, h_init;
   casadi_int max_num_steps;
+  // Zero-crossing events: number, transition given, tolerances on the event time (acceptable:
+  // negative if none), iterations to locate an event, events per evaluation
+  casadi_int ne;
+  int has_transition;
+  T1 event_tol, event_acceptable_tol;
+  casadi_int max_event_iter, max_events;
   // Derived: forward and adjoint state dimensions, controls, vector lengths
   casadi_int nx, nz, nq, nu, nrx, nrz, nrq, nrp, nru, ny, nr;
   // Derived: offsets of the Jacobian blocks in a buffer with one direction, total nonzeros
@@ -233,6 +247,16 @@ struct casadi_ivp_data {
   int last_rejected, last_clipped, last_step;
   // Steps taken in the current output interval
   casadi_int n_steps_interval;
+  // Events: zero-crossing functions at the bracket ends (e0 also at the step start) and at a
+  // trial time, candidates, time derivatives at these, selection of the event, state derivative
+  T1 *e0, *e1, *em, *e_mask, *edot0, *edot1, *edot, *ev_w, *ydot;
+  // Event phase, e0 known at t, state changed by an event (algebraic states inconsistent),
+  // restart after an event
+  int ev_phase, e_valid, jump, ev_restart;
+  // Bracket, trial time, event time and its accuracy, the constant 1
+  T1 ev_ta, ev_tb, ev_tm, t_ev, ev_dt, ev_one;
+  // Iterations, event in the last step (-1: none), events in this evaluation
+  casadi_int ev_iter, ev_fired, n_events;
   // Statistics
   casadi_int n_steps, n_reject, n_rhs, n_jac, n_vjp;
 };
@@ -253,6 +277,8 @@ void casadi_ivp_work(const casadi_ivp_prob<T1>* p, casadi_int* sz_arg,
   *sz_w += p->nrx + p->nrz + 2 * (p->nrp + p->nru);
   // Tape
   *sz_w += p->tape_size;
+  // Events
+  if (p->ne > 0) *sz_w += 8 * p->ne + p->ny;
 }
 
 // SYMBOL "ivp_set_work"
@@ -283,6 +309,17 @@ void casadi_ivp_set_work(casadi_ivp_data<T1>* d, const T1*** arg, T1*** res,
   d->adj_p = *w; *w += p->nrp;
   d->adj_u = *w; *w += p->nru;
   d->tape = *w; *w += p->tape_size;
+  if (p->ne > 0) {
+    d->e0 = *w; *w += p->ne;
+    d->e1 = *w; *w += p->ne;
+    d->em = *w; *w += p->ne;
+    d->e_mask = *w; *w += p->ne;
+    d->edot0 = *w; *w += p->ne;
+    d->edot1 = *w; *w += p->ne;
+    d->edot = *w; *w += p->ne;
+    d->ev_w = *w; *w += p->ne;
+    d->ydot = *w; *w += p->ny;
+  }
   d->tape_cap = p->tape_size;
   d->tape_pos = 0;
   d->next = IVP_DONE;
@@ -294,6 +331,14 @@ void casadi_ivp_set_work(casadi_ivp_data<T1>* d, const T1*** arg, T1*** res,
   d->active = d;
   d->nom = 0;
   d->pause = 0;
+  d->ev_phase = 0;
+  d->e_valid = 0;
+  d->jump = 0;
+  d->ev_restart = 0;
+  d->ev_dt = 0;
+  d->ev_one = 1;
+  d->ev_fired = -1;
+  d->n_events = 0;
 }
 
 // SYMBOL "ivp_clear_stats"
@@ -311,7 +356,10 @@ void casadi_ivp_reset(casadi_ivp_data<T1>* d, T1 t, const T1* u, int first_call)
   d->t = t;
   d->u = u;
   d->reset = 1;
+  d->e_valid = 0;
   if (first_call) {
+    d->n_events = 0;
+    d->ev_restart = 0;
     d->tape_pos = 0;
     casadi_ivp_clear_stats(d);
     // Every evaluation starts from the same controller state
@@ -353,6 +401,7 @@ void casadi_ivp_begin_run(casadi_ivp_data<T1>* d) {
     d->run_k = 0;
   }
   d->reset = 0;
+  d->jump = 0;
 }
 
 // SYMBOL "ivp_advance"

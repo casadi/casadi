@@ -42,6 +42,7 @@ typedef enum {
   ERK_STEP_REPLAY,
   ERK_STAGE,
   ERK_STEP_CHECK,
+  ERK_STEP_EVENT,
   ERK_BACK_STAGE,
   ERK_BACK_SPREAD
 } casadi_erk_next_t;
@@ -112,6 +113,12 @@ int casadi_erk_forward(casadi_ivp_data<T1>* d, casadi_erk_data<T1>* e) {
     if (d->t >= d->t_out) {
       if (!d->pause) casadi_ivp_output(d);
       return casadi_ivp_stop(d, IVP_SUCCESS);
+    }
+    if (d->jump) {
+      // State changed by an event: restart
+      d->reset = 1;
+      d->next = IVP_ADVANCE;
+      return casadi_erk_forward(d, e);
     }
     if (casadi_ivp_step_limit(d)) return casadi_ivp_stop(d, IVP_MAX_NUM_STEPS);
     if ((ret = casadi_ivp_reserve(d, IVP_RECORD_STEP, ERK_STEP_BEGIN)) >= 0) return ret;
@@ -185,6 +192,11 @@ int casadi_erk_forward(casadi_ivp_data<T1>* d, casadi_erk_data<T1>* e) {
     }
     e->f_stage = e->prob->fsal ? p->n_stages - 1 : -1;
     casadi_ivp_accept(d);
+    if (p->ne > 0) return casadi_ivp_request(d, IVP_EVENT, ERK_STEP_EVENT);
+    d->next = ERK_STEP_EVENT;
+    return casadi_erk_forward(d, e);
+  case ERK_STEP_EVENT:
+    if (d->status != IVP_SUCCESS) return casadi_ivp_stop(d, d->status);
     d->next = ERK_STEP_BEGIN;
     if (d->pause) {
       // Hand the step to the integration that replays it
