@@ -387,7 +387,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       image: ["windows-2022","ubuntu-24.04","macos-14"]
+       image: ["windows-2022","ubuntu-24.04","macos-15"]
     steps:
       - uses: actions/checkout@v6.0.2
       - run: python --version
@@ -414,7 +414,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [macos-14]
+        image: [macos-15]
         # x86_64 is slow-mode-only — default mode's python-osx and matlab-osx
         # don't consume the x86_64 core.
         target: ${{ fromJson(contains(github.event.head_commit.message, '[ci:run_slow]') && '["arm64","x86_64"]' || '["arm64"]') }}
@@ -564,7 +564,7 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-14]
+              image: [macos-15]
               target: [arm64]
               py2: ["311"]
             operations: []
@@ -574,13 +574,13 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-14]
+              image: [macos-15]
               target: [x86_64]
               py2: ["37","38","39","310","311"]
             operations:
               - type: append
                 matrix:
-                  image: [macos-14]
+                  image: [macos-15]
                   target: [arm64]
                   py2: ["38","39","310","311"]
     outputs:
@@ -707,14 +707,14 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-14]
+              image: [macos-15]
               target: [arm64]
               host: ["matlab"]
               version: ["2018b"]
             operations:
               - type: append
                 matrix:
-                  image: [macos-14]
+                  image: [macos-15]
                   target: [arm64]
                   host: ["octave"]
                   version: ["7.3.0"]
@@ -725,26 +725,26 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-14]
+              image: [macos-15]
               target: [x86_64]
               host: ["matlab"]
               version: ["2018b"]
             operations:
               - type: append
                 matrix:
-                  image: [macos-14]
+                  image: [macos-15]
                   target: [x86_64]
                   host: ["octave"]
                   version: ["7.3.0"]
               - type: append
                 matrix:
-                  image: [macos-14]
+                  image: [macos-15]
                   target: [arm64]
                   host: ["matlab"]
                   version: ["2018b"]
               - type: append
                 matrix:
-                  image: [macos-14]
+                  image: [macos-15]
                   target: [arm64]
                   host: ["octave"]
                   version: ["7.3.0"]
@@ -788,7 +788,7 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "macos-14": {"os": "osx", "bitness": "64"}
+              "macos-15": {"os": "osx", "bitness": "64"}
            }
           export_to: env
       - uses: jgillis/universal_grafter@master
@@ -1070,7 +1070,7 @@ jobs:
        # macos-15-intel is added only with [ci:run_slow] (cuts release-asset
        # race surface in default mode, and matrix-arch-matlab-mac doesn't build
        # x86_64 zips in default anyway).
-       image: ${{ fromJson(contains(github.event.head_commit.message, '[ci:run_slow]') && '["windows-2022","ubuntu-24.04","macos-15-intel","macos-14"]' || '["windows-2022","ubuntu-24.04","macos-14"]') }}
+       image: ${{ fromJson(contains(github.event.head_commit.message, '[ci:run_slow]') && '["windows-2022","ubuntu-24.04","macos-15-intel","macos-15"]' || '["windows-2022","ubuntu-24.04","macos-15"]') }}
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -1089,7 +1089,7 @@ jobs:
               "windows-2022": {"os": "windows", "suffix": "${{matrix.bit}}"},
               "ubuntu-24.04": {"os": "linux", "suffix": "${{matrix.bit}}"},
               "macos-15-intel": {"os": "osx", "suffix": "-x86_64"},
-              "macos-14": {"os": "osx", "suffix": "-arm64"}
+              "macos-15": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v8.0.1
@@ -1145,7 +1145,7 @@ jobs:
      matrix:
        version: ["7.3.0"]
        # macos-15-intel only with [ci:run_slow] (mirrors test-matlab).
-       image: ${{ fromJson(contains(github.event.head_commit.message, '[ci:run_slow]') && '["windows-2022","ubuntu-24.04","macos-15-intel","macos-14"]' || '["windows-2022","ubuntu-24.04","macos-14"]') }}
+       image: ${{ fromJson(contains(github.event.head_commit.message, '[ci:run_slow]') && '["windows-2022","ubuntu-24.04","macos-15-intel","macos-15"]' || '["windows-2022","ubuntu-24.04","macos-15"]') }}
        bit: [64]
     steps:
       - uses: actions/checkout@v6.0.2
@@ -1157,7 +1157,7 @@ jobs:
               "windows-2022": {"os": "windows", "suffix": "${{matrix.bit}}"},
               "ubuntu-24.04": {"os": "linux", "suffix": "${{matrix.bit}}"},
               "macos-15-intel": {"os": "osx", "suffix": "-x86_64"},
-              "macos-14": {"os": "osx", "suffix": "-arm64"}
+              "macos-15": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v8.0.1
@@ -1287,7 +1287,7 @@ jobs:
               # isn't built by matrix-arch-py2-mac nominal, and skipping it
               # here also cuts release-upload concurrency.
               py2: ["314"]
-              image: ["windows-2022","macos-14"]
+              image: ["windows-2022","macos-15"]
               bit: [64]
               manylinux_target: [""]
             operations:
@@ -1317,7 +1317,7 @@ jobs:
               - type: append
                 matrix:
                   py2: ["38","39","310","311","313","314"]
-                  image: ["windows-2022","macos-15-intel","macos-14"]
+                  image: ["windows-2022","macos-15-intel","macos-15"]
                   bit: [64]
                   manylinux_target: [""]
               - type: append
@@ -1355,7 +1355,7 @@ jobs:
               "ubuntu-24.04$": {"os": "linux", "suffix": "${{matrix.bit}}"},
               "ubuntu-24.04-arm": {"os": "linux", "suffix": "-aarch64"},
               "macos-15-intel": {"os": "osx", "suffix": "-x86_64"},
-              "macos-14": {"os": "osx", "suffix": "-arm64"}
+              "macos-15": {"os": "osx", "suffix": "-arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v8.0.1
@@ -1435,7 +1435,7 @@ jobs:
           config: |
             matrix:
               py2: ["312"]
-              image: ["windows-2022","macos-14","macos-15-intel"]
+              image: ["windows-2022","macos-15","macos-15-intel"]
               bit: [64]
               manylinux_target: [""]
             operations:
@@ -1467,7 +1467,7 @@ jobs:
               "windows-2022": {"os": "windows","suffix": "${{matrix.bit}}","platform":"win_amd64"},
               "ubuntu-24.04$": {"os": "linux","suffix": "${{matrix.bit}}","platform":"manylinux2014_x86_64"},
               "macos-15-intel": {"os": "osx","suffix": "-x86_64","platform":"macosx_11_0_x86_64.macosx_11_0_intel"},
-              "macos-14": {"os": "osx","suffix": "-arm64","platform":"macosx_11_0_arm64"}
+              "macos-15": {"os": "osx","suffix": "-arm64","platform":"macosx_11_0_arm64"}
            }
           export_to: env
       - name: Override wheel platform tag for manylinux_2_28 builds
