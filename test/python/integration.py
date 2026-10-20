@@ -2406,6 +2406,30 @@ class Integrationtests(casadiTestCase):
       self.checkarray(J_q, fd, plugin, digits=5)
 
   @memory_heavy()
+  def test_events_empty_post_z(self):
+    self.message("zero-crossing events: transition without post_z")
+    g = 9.81
+    x = ca.SX.sym("x", 2)
+    z = ca.SX.sym("z")
+    p = ca.SX.sym("p")
+    index = ca.SX.sym("index")
+    t = ca.SX.sym("t")
+    dae = {"x": x, "z": z, "p": p, "ode": ca.vertcat(z, -g), "alg": z - x[1], "zero": x[0]}
+    for plugin, opts in [("collocation", {"number_of_finite_elements": 100}),
+                         ("idas", {"abstol": 1e-12, "reltol": 1e-12})]:
+      res = []
+      for post_z in [z, ca.SX(0, 1)]:
+        tr = ca.Function("transition", [index, t, x, z, p, ca.SX(0, 1)],
+          [ca.vertcat(x[0], -p*x[1]), post_z], ["index", "t", "x", "z", "p", "u"],
+          ["post_x", "post_z"])
+        F = ca.integrator("F", plugin, dae, 0, 1, dict(opts, transition=tr, event_tol=1e-12,
+          max_event_iter=20))
+        v = ca.MX.sym("v", 3)
+        r = F(x0=v[:2], z0=v[1], p=v[2])
+        res.append(ca.Function("G", [v], [r["xf"], ca.jacobian(r["xf"], v)])([2, 0.3, 0.8]))
+      for i in range(2): self.checkarray(res[0][i], res[1][i], plugin, digits=8)
+
+  @memory_heavy()
   def test_adjoint_checkpoint_stop_time(self):
     self.message("issue #3227: recomputation from a check point ending at a stop time")
     x = ca.SX.sym("x")

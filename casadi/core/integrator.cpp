@@ -2780,6 +2780,8 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
       }
     }
   }
+  // States unchanged by default, also where post_z is empty
+  casadi_copy(m->x, nx_ + nz_, m->tmp2);
   // Call event transition function, if any
   if (has_function("transition")) {
     // Evaluate to tmp2
