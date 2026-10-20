@@ -374,12 +374,13 @@ void IdasInterface::reset(IntegratorMemory* mem, bool first_call) const {
   // Reset the base classes
   SundialsInterface::reset(mem, first_call);
 
-  // Only reinitialize solver at first call
-  // May want to change this after more testing
-  if (first_call) {
-    // Re-initialize
-    N_VConst(0.0, m->v_xzdot);
-    std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->v_xzdot));
+  // Only reinitialize solver at first call or if event handling is required, as cvodes
+  if (first_call || ne_ > 0) {
+    // Re-initialize, from the initial guess of the state derivatives at the first call
+    if (first_call) {
+      N_VConst(0.0, m->v_xzdot);
+      std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->v_xzdot));
+    }
 
     THROWING(IDAReInit, m->mem, m->t, m->v_xz, m->v_xzdot);
 
@@ -391,10 +392,10 @@ void IdasInterface::reset(IntegratorMemory* mem, bool first_call) const {
       THROWING(IDACalcIC, m->mem, IDA_YA_YDP_INIT , first_time_);
       THROWING(IDAGetConsistentIC, m->mem, m->v_xz, m->v_xzdot);
     }
-
-    // Re-initialize backward integration
-    if (nadj_ > 0) THROWING(IDAAdjReInit, m->mem);
   }
+
+  // Re-initialize backward integration
+  if (first_call && nadj_ > 0) THROWING(IDAAdjReInit, m->mem);
 }
 
 int IdasInterface::advance_noevent(IntegratorMemory* mem) const {
