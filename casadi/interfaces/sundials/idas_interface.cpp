@@ -374,8 +374,8 @@ void IdasInterface::reset(IntegratorMemory* mem, bool first_call) const {
   // Reset the base classes
   SundialsInterface::reset(mem, first_call);
 
-  // Only reinitialize solver at first call or if event handling is required, as cvodes
-  if (first_call || ne_ > 0) {
+  // Reinitialize solver, except when taping where recomputation from check points would differ
+  if (first_call || ne_ > 0 || nrx_ == 0) {
     // Re-initialize, from the initial guess of the state derivatives at the first call
     if (first_call) {
       N_VConst(0.0, m->v_xzdot);

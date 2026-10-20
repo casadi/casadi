@@ -166,6 +166,9 @@ int CvodesInterface::init_mem(void* mem) const {
   // Maximum order of method
   if (max_order_) THROWING(CVodeSetMaxOrd, m->mem, max_order_);
 
+  // When taping, allow error test failures to restart at order 1 after a change in the controls
+  if (nrx_ > 0) THROWING(CVodeSetMaxErrTestFails, m->mem, 10);
+
   // Coeff. in the nonlinear convergence test
   if (nonlin_conv_coeff_!=0) THROWING(CVodeSetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
 
@@ -235,9 +238,8 @@ void CvodesInterface::reset(IntegratorMemory* mem, bool first_call) const {
   // Reset the base classes
   SundialsInterface::reset(mem, first_call);
 
-  // Only reinitialize solver at first call or if event handling is required
-  // May want to always enable this after more testing
-  if (first_call || ne_ > 0) {
+  // Reinitialize solver, except when taping where recomputation from check points would differ
+  if (first_call || ne_ > 0 || nrx_ == 0) {
     // Re-initialize forward integration
     THROWING(CVodeReInit, m->mem, m->t, m->v_xz);
 

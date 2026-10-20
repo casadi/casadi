@@ -2338,14 +2338,41 @@ class Integrationtests(casadiTestCase):
     grid = list(numpy.linspace(0.25, 4, 16))
     for plugin in ["cvodes", "idas"]:
       F = ca.integrator("F", plugin, dae, 0, grid,
-        {"abstol": 1e-7, "reltol": 1e-7, "quad_err_con": True})
+        {"abstol": 1e-10, "reltol": 1e-10, "quad_err_con": True})
       v = ca.MX.sym("v", 18)
       r = F(x0=v[0], p=v[1], u=v[2:].T)
       obj = ca.sumsqr(r["xf"]) + ca.sum2(r["qf"])
       G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
         ca.jtimes(obj, v, ca.MX.eye(18)).T])
       grad_adj, grad_fwd = G(ca.vertcat(0.3, 0.5, numpy.sin(numpy.arange(16)) + 1.5))
-      self.checkarray(grad_fwd, grad_adj, plugin, digits=2)
+      self.checkarray(grad_fwd, grad_adj, plugin, digits=5)
+
+  @memory_heavy()
+  def test_multipoint_controls(self):
+    self.message("issue #3189: output times with changing controls, as chained integrators")
+    x = ca.MX.sym("x")
+    z = ca.MX.sym("z")
+    p = ca.MX.sym("p")
+    u = ca.MX.sym("u")
+    ode = {"x": x, "p": p, "u": u, "ode": ca.cos(x + p*u), "quad": x**2}
+    dae = {"x": x, "z": z, "p": p, "u": u, "ode": z + p*u, "alg": z*ca.cos(z) - x, "quad": x**2}
+    opts = {"abstol": 1e-14, "reltol": 1e-14}
+    for plugin, problem in [("cvodes", ode), ("idas", ode), ("idas", dae)]:
+      F = ca.integrator("F", plugin, problem, 0, [0.1, 0.2], opts)
+      F1 = ca.integrator("F1", plugin, problem, 0, 0.1, opts)
+      F2 = ca.integrator("F2", plugin, problem, 0.1, 0.2, opts)
+      v = ca.MX.sym("v", 4)
+      r = F(x0=v[0], p=v[1], u=v[2:].T)
+      r1 = F1(x0=v[0], p=v[1], u=v[2])
+      r2 = F2(x0=r1["xf"], p=v[1], u=v[3])
+      ref = ca.vertcat(r1["xf"], r2["xf"], r1["qf"], r1["qf"] + r2["qf"])
+      out = ca.vertcat(r["xf"].T, r["qf"].T)
+      outputs = [ref, out, ca.jacobian(ref, v), ca.jacobian(out, v)]
+      if problem is ode:
+        outputs += [ca.jtimes(ca.sum1(e), v, ca.MX.ones(1, 1), True) for e in (ref, out)]
+      res = ca.Function("G", [v], outputs)(ca.vertcat(0, 0.15, 1, 1.1))
+      for i in range(0, len(res), 2):
+        self.checkarray(res[i], res[i + 1], plugin, digits=9)
 
   @memory_heavy()
   def test_erk_tape(self):
