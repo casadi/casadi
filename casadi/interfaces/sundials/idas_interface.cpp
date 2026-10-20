@@ -413,13 +413,25 @@ int IdasInterface::advance_noevent(IntegratorMemory* mem) const {
   if (fabs(m->t - m->t_next) >= ttol) {
     // Integrate forward ...
     double tret = m->t;
-    if (nrx_>0) { // ... with taping
-      THROWING(IDASolveF, m->mem, m->t_next, &tret, m->v_xz, m->v_xzdot, IDA_NORMAL, &m->ncheck);
+    if (nrx_>0) { // ... with taping, step by step
+      IDAMem IDA_mem = IDAMem(m->mem);
+      long int nsteps = IDA_mem->ida_adj_mem->ia_nsteps;
+      while (IDA_mem->ida_tn < m->t_next) {
+        // Recomputation from a check point must not cross a change in the controls
+        if (IDA_mem->ida_tstopset && IDA_mem->ida_tstop < tout_.back() && IDA_mem->ida_nst > 0
+            && IDA_mem->ida_tn + 2 * IDA_mem->ida_hh >= IDA_mem->ida_tstop) {
+          IDA_mem->ida_nst += nsteps - 1 - IDA_mem->ida_nst % nsteps;
+        }
+        THROWING(IDASolveF, m->mem, m->t_next, &tret, m->v_xz, m->v_xzdot, IDA_ONE_STEP,
+          &m->ncheck);
+      }
+      THROWING(IDAGetDky, m->mem, m->t_next, 0, m->v_xz);
+      THROWING(IDAGetDky, m->mem, m->t_next, 1, m->v_xzdot);
+      if (nq1_ > 0) THROWING(IDAGetQuadDky, m->mem, m->t_next, 0, m->v_q);
     } else { // ... without taping
       THROWING(IDASolve, m->mem, m->t_next, &tret, m->v_xz, m->v_xzdot, IDA_NORMAL);
+      if (nq1_ > 0) THROWING(IDAGetQuad, m->mem, &tret, m->v_q);
     }
-    // Get quadratures
-    if (nq1_ > 0) THROWING(IDAGetQuad, m->mem, &tret, m->v_q);
   }
 
   // Set function outputs

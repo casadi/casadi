@@ -2329,6 +2329,25 @@ class Integrationtests(casadiTestCase):
         if features["codegen"]: self.check_codegen(G, inputs=[v0], digits=11)
 
   @memory_heavy()
+  def test_adjoint_piecewise_controls(self):
+    self.message("issue #3227: adjoint sensitivities with piecewise constant controls")
+    x = ca.SX.sym("x")
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"x": x, "p": p, "u": u, "ode": u - p*x*(1 + x), "quad": x**2}
+    grid = list(numpy.linspace(0.25, 4, 16))
+    for plugin in ["cvodes", "idas"]:
+      F = ca.integrator("F", plugin, dae, 0, grid,
+        {"abstol": 1e-7, "reltol": 1e-7, "quad_err_con": True})
+      v = ca.MX.sym("v", 18)
+      r = F(x0=v[0], p=v[1], u=v[2:].T)
+      obj = ca.sumsqr(r["xf"]) + ca.sum2(r["qf"])
+      G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+        ca.jtimes(obj, v, ca.MX.eye(18)).T])
+      grad_adj, grad_fwd = G(ca.vertcat(0.3, 0.5, numpy.sin(numpy.arange(16)) + 1.5))
+      self.checkarray(grad_fwd, grad_adj, plugin, digits=2)
+
+  @memory_heavy()
   def test_erk_tape(self):
     self.message("erk: adaptive steps and adjoints, bounded tape")
     x = ca.SX.sym("x", 2)
