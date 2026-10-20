@@ -2348,6 +2348,24 @@ class Integrationtests(casadiTestCase):
       self.checkarray(grad_fwd, grad_adj, plugin, digits=5)
 
   @memory_heavy()
+  def test_adjoint_checkpoint_stop_time(self):
+    self.message("issue #3227: recomputation from a check point ending at a stop time")
+    x = ca.SX.sym("x")
+    p = ca.SX.sym("p")
+    u = ca.SX.sym("u")
+    dae = {"x": x, "p": p, "u": u, "ode": u*(p - x) + 1}
+    grid = list(numpy.linspace(0.25, 4, 16))
+    for plugin in ["cvodes", "idas"]:
+      F = ca.integrator("F", plugin, dae, 0, grid,
+        {"abstol": 1e-6, "reltol": 1e-6, "steps_per_checkpoint": 1})
+      v = ca.MX.sym("v", 18)
+      obj = ca.sumsqr(F(x0=v[0], p=v[1], u=v[2:].T)["xf"])
+      G = ca.Function("G", [v], [ca.jtimes(obj, v, ca.MX.ones(1, 1), True),
+        ca.jtimes(obj, v, ca.MX.eye(18)).T])
+      grad_adj, grad_fwd = G(ca.vertcat(0.3, 0.5, numpy.sin(numpy.arange(16)) + 1.5))
+      self.checkarray(grad_fwd, grad_adj, plugin, digits=3)
+
+  @memory_heavy()
   def test_multipoint_controls(self):
     self.message("issue #3189: output times with changing controls, as chained integrators")
     x = ca.MX.sym("x")
