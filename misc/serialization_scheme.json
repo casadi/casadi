@@ -52,6 +52,9 @@
     "Dump": [
       1
     ],
+    "Erk": [
+      1
+    ],
     "External": [
       2
     ],
@@ -193,8 +196,14 @@
     "Rootfinder": [
       3
     ],
+    "Rosenbrock": [
+      1
+    ],
     "RungeKutta": [
       2
+    ],
+    "RuntimeIntegrator": [
+      1
     ],
     "SLEQPInterface": [
       1
@@ -905,6 +914,9 @@
     "Dump": [
       1
     ],
+    "Erk": [
+      1
+    ],
     "External": [
       1,
       2
@@ -1078,8 +1090,14 @@
     "Rootfinder": [
       3
     ],
+    "Rosenbrock": [
+      1
+    ],
     "RungeKutta": [
       2
+    ],
+    "RuntimeIntegrator": [
+      1
     ],
     "SLEQPInterface": [
       1
@@ -3263,6 +3281,22 @@
           "name": "Einstein::n_iter",
           "op": "field",
           "type": "casadi_int"
+        }
+      ],
+      "Erk::serialize_body": [
+        {
+          "layout": "RuntimeIntegrator::serialize_body",
+          "op": "call"
+        },
+        {
+          "name": "Erk",
+          "op": "version",
+          "value": 1
+        },
+        {
+          "name": "Erk::method",
+          "op": "field",
+          "type": "std::string"
         }
       ],
       "External::serialize_body": [
@@ -9157,6 +9191,27 @@
           "op": "call"
         }
       ],
+      "Rosenbrock::serialize_body": [
+        {
+          "layout": "RuntimeIntegrator::serialize_body",
+          "op": "call"
+        },
+        {
+          "name": "Rosenbrock",
+          "op": "version",
+          "value": 1
+        },
+        {
+          "name": "Rosenbrock::init_tol",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "Rosenbrock::init_max_iter",
+          "op": "field",
+          "type": "casadi_int"
+        }
+      ],
       "RungeKutta::serialize_body": [
         {
           "layout": "FixedStepIntegrator::serialize_body",
@@ -9166,6 +9221,93 @@
           "name": "RungeKutta",
           "op": "version",
           "value": 2
+        }
+      ],
+      "RuntimeIntegrator::serialize_body": [
+        {
+          "layout": "Integrator::serialize_body",
+          "op": "call"
+        },
+        {
+          "name": "RuntimeIntegrator",
+          "op": "version",
+          "value": 1
+        },
+        {
+          "name": "RuntimeIntegrator::group_start",
+          "op": "field",
+          "type": {
+            "element": "casadi_int",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "RuntimeIntegrator::nx_err",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "RuntimeIntegrator::nz_err",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "RuntimeIntegrator::nq_err",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "RuntimeIntegrator::sp_jac",
+          "op": "field",
+          "type": {
+            "element": "Sparsity",
+            "name": "std::vector"
+          }
+        },
+        {
+          "name": "RuntimeIntegrator::step_size",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "RuntimeIntegrator::abstol",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "RuntimeIntegrator::reltol",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "RuntimeIntegrator::step0",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "RuntimeIntegrator::max_step_size",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "RuntimeIntegrator::min_step_size",
+          "op": "field",
+          "type": "double"
+        },
+        {
+          "name": "RuntimeIntegrator::max_num_steps",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "RuntimeIntegrator::max_tape_steps",
+          "op": "field",
+          "type": "casadi_int"
+        },
+        {
+          "name": "RuntimeIntegrator::quad_err_con",
+          "op": "field",
+          "type": "bool"
         }
       ],
       "SLEQPInterface::serialize_body": [
@@ -11267,6 +11409,12 @@
                             "op": "call"
                           }
                         ],
+                        "erk": [
+                          {
+                            "layout": "Erk::serialize_body",
+                            "op": "call"
+                          }
+                        ],
                         "idas": [
                           {
                             "layout": "IdasInterface::serialize_body",
@@ -11276,6 +11424,12 @@
                         "rk": [
                           {
                             "layout": "RungeKutta::serialize_body",
+                            "op": "call"
+                          }
+                        ],
+                        "rosenbrock": [
+                          {
+                            "layout": "Rosenbrock::serialize_body",
                             "op": "call"
                           }
                         ]
