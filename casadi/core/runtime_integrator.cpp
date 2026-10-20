@@ -44,7 +44,13 @@ const Options RuntimeIntegrator::options_
     {"step_size",
       {OT_DOUBLE,
       "Each run of steps, over a control group or up to the end without controls, is "
-      "divided into equal steps of at most step_size [default: (tf - t0)/20]"}}
+      "divided into equal steps of at most step_size [default: (tf - t0)/20]"}},
+    {"abstol",
+      {OT_DOUBLE,
+      "Absolute tolerance [1e-8]"}},
+    {"reltol",
+      {OT_DOUBLE,
+      "Relative tolerance [1e-6]"}}
     }
 };
 
@@ -70,11 +76,17 @@ void RuntimeIntegrator::init(const Dict& opts) {
 
   // Default options
   step_size_ = (tout_.back() - t0_) / 20;
+  abstol_ = 1e-8;
+  reltol_ = 1e-6;
 
   // Read options
   for (auto&& op : opts) {
     if (op.first == "step_size") {
       step_size_ = op.second;
+    } else if (op.first == "abstol") {
+      abstol_ = op.second;
+    } else if (op.first == "reltol") {
+      reltol_ = op.second;
     }
   }
   casadi_assert(step_size_ > 0, "'step_size' must be positive");
@@ -83,16 +95,43 @@ void RuntimeIntegrator::init(const Dict& opts) {
   casadi_assert(ne_ == 0, "Zero-crossing events are not supported by '"
     + std::string(plugin_name()) + "'");
 
+  // Error control on the nominal states only: derivative integrators share the mesh
+  if (derivative_of_.is_null()) {
+    nx_err_ = nx1_;
+    nz_err_ = nz1_;
+    nq_err_ = nq1_;
+  } else {
+    const RuntimeIntegrator* d = derivative_of_.get<RuntimeIntegrator>();
+    casadi_assert_dev(d != nullptr);
+    nx_err_ = d->nx_err_;
+    nz_err_ = d->nz_err_;
+    nq_err_ = d->nq_err_;
+  }
+
   // Right-hand side [ode; alg; quad] and its vector-Jacobian product, one function each
   create_function("rhsF", dyn_in(), {"ode", "alg", "quad"});
   if (nadj_ > 0) {
     create_function(rdae_, "vjpB", bdyn_in(), {"adj_x", "adj_z", "adj_p", "adj_u"});
   }
 
-  // Forward sensitivities of these
+  // Jacobian blocks w.r.t. x, z and time, in the order of casadi_ivp_jac_t
+  sp_jac_.clear();
+  if (needs_jacobian()) {
+    Function jac = create_function("jacF", {"t", "x", "z", "p", "u"},
+      {"jac:ode:x", "jac:alg:x", "jac:quad:x", "jac:ode:z", "jac:alg:z", "jac:quad:z",
+       "jac:ode:t", "jac:alg:t", "jac:quad:t"});
+    for (casadi_int k = 0; k < IVP_NUM_JAC; ++k) sp_jac_.push_back(jac.sparsity_out(k));
+    if (nadj_ > 0) set_function(jac.reverse(nadj_), "jacB");
+  }
+
+  // Forward sensitivities of all of these
   if (nfwd_ > 0) {
     create_forward("rhsF", nfwd_);
     if (nadj_ > 0) create_forward("vjpB", nfwd_);
+    if (needs_jacobian()) {
+      create_forward("jacF", nfwd_);
+      if (nadj_ > 0) create_forward("jacB", nfwd_);
+    }
   }
 }
 
@@ -111,8 +150,16 @@ void RuntimeIntegrator::set_ivp_prob() {
   p_.m = get_ptr(m_);
   p_.n_dense = n_dense_;
   p_.m_dense = get_ptr(m_dense_);
+  for (casadi_int k = 0; k < IVP_NUM_JAC; ++k) {
+    p_.sp_jac[k] = sp_jac_.empty() ? nullptr : static_cast<const casadi_int*>(sp_jac_[k]);
+  }
   p_.tape_size = tape_capacity();
   p_.step_size = step_size_;
+  p_.nx_err = nx_err_;
+  p_.nz_err = nz_err_;
+  p_.nq_err = nq_err_;
+  p_.abstol = abstol_;
+  p_.reltol = reltol_;
   casadi_ivp_setup(&p_);
   calls_ = task_calls("");
 }
@@ -128,13 +175,16 @@ void RuntimeIntegrator::alloc_ivp_work() {
 
 casadi_int RuntimeIntegrator::tape_capacity() const {
   // Steps: a run of steps per control group
-  casadi_int ny = nx_ + nz_ + nq_, n_step = 0;
+  casadi_int ny = nx_ + nz_ + nq_, n_step = 0, n_init;
   for (casadi_int j = 0; j < ngroup(); ++j) {
     double t = j == 0 ? t0_ : tout_[group_start_[j] - 1];
     n_step += casadi_ivp_steps(tout_[group_start_[j + 1] - 1] - t, step_size_);
   }
   if (nadj_ == 0 || n_step == 0) return 0;
-  return n_step * (ny * (static_cast<casadi_int>(alpha_.size()) + 1) + nu_ + 4);
+  // Every output interval may start with a consistent initialization
+  n_init = nz_ > 0 ? nt() : 0;
+  return n_step * (ny * (static_cast<casadi_int>(alpha_.size()) + 1) + nu_ + 5)
+    + n_init * (ny + nu_ + 5);
 }
 
 void RuntimeIntegrator::set_work(void* mem, const double**& arg, double**& res,
@@ -383,6 +433,10 @@ double* RuntimeIntegrator::slot_ptr(RuntimeIntegratorMemory* m, casadi_ivp_data<
     case SRC_U: b = d->u_step; break;
     case SRC_RES: b = d->res; break;
     case SRC_W: b = const_cast<double*>(d->w); break;
+    case SRC_JAC: b = d->jac; break;
+    case SRC_JAC_FWD: b = d->jac_fwd; break;
+    case SRC_JAC_ADJ: b = d->jac_adj; break;
+    case SRC_JAC_ADJ_FWD: b = d->jac_adj_fwd; break;
     case SRC_VJP_X: b = d->vjp_x; break;
     case SRC_VJP_Z: b = d->vjp_z; break;
     case SRC_VJP_P: b = d->vjp_p; break;
@@ -401,6 +455,10 @@ std::string RuntimeIntegrator::slot_expr(const std::string& d, const Slot& e) {
     case SRC_U: b = d + ".u_step"; break;
     case SRC_RES: b = d + ".res"; break;
     case SRC_W: b = d + ".w"; break;
+    case SRC_JAC: b = d + ".jac"; break;
+    case SRC_JAC_FWD: b = d + ".jac_fwd"; break;
+    case SRC_JAC_ADJ: b = d + ".jac_adj"; break;
+    case SRC_JAC_ADJ_FWD: b = d + ".jac_adj_fwd"; break;
     case SRC_VJP_X: b = d + ".vjp_x"; break;
     case SRC_VJP_Z: b = d + ".vjp_z"; break;
     case SRC_VJP_P: b = d + ".vjp_p"; break;
@@ -416,6 +474,7 @@ std::vector<std::vector<RuntimeIntegrator::TaskCall>> RuntimeIntegrator::task_ca
   static_assert(static_cast<int>(BDYN_U) == static_cast<int>(DYN_U)
     && static_cast<int>(BDYN_T) == static_cast<int>(DYN_T),
     "Backward DAE inputs start with t, x, z, p, u");
+  const casadi_int nj = IVP_NUM_JAC;
   // Results of the adjoint functions: adjoints of x, z, p, u and their forward derivatives
   const Src vjp[4] = {SRC_VJP_X, SRC_VJP_Z, SRC_VJP_P, SRC_VJP_U};
   const casadi_int n_vjp[4] = {nrx1_ * nadj_, nrz1_ * nadj_, nrq1_ * nadj_, nuq1_ * nadj_};
@@ -431,6 +490,10 @@ std::vector<std::vector<RuntimeIntegrator::TaskCall>> RuntimeIntegrator::task_ca
     c.arg.push_back({i + DYN_P, SRC_P, fwd ? np1_ : 0});
     c.arg.push_back({i + DYN_U, SRC_U, fwd ? nu1_ : 0});
   };
+  // Jacobian blocks in buffer src with ndir directions, block k at slot i + k
+  auto blocks = [&](std::vector<Slot>& v, casadi_int i, Src src, casadi_int ndir) -> void {
+    for (casadi_int k = 0; k < nj; ++k) v.push_back({i + k, src, ndir * p_.jac_off[k]});
+  };
   // Right-hand side [ode; alg; quad] at (t, y)
   TaskCall rhs = call("rhsF");
   dyn(rhs, 0, false);
@@ -445,6 +508,21 @@ std::vector<std::vector<RuntimeIntegrator::TaskCall>> RuntimeIntegrator::task_ca
     dyn(c, DYN_NUM_IN + 3, true);
     c.res = {{0, SRC_RES, nx1_}, {1, SRC_RES, nx_ + nz1_}, {2, SRC_RES, nx_ + nz_ + nq1_}};
     calls[IVP_EVAL_RHS].push_back(c);
+  }
+  if (needs_jacobian()) {
+    // Jacobian blocks; forward derivatives give the augmented off-diagonal blocks
+    TaskCall jac = call("jacF");
+    dyn(jac, 0, false);
+    blocks(jac.res, 0, SRC_JAC, 1);
+    calls[IVP_EVAL_JAC].push_back(jac);
+    if (nfwd_ > 0) {
+      TaskCall c = call(forward_name("jacF", nfwd_));
+      dyn(c, 0, false);
+      blocks(c.arg, DYN_NUM_IN, SRC_JAC, 1);
+      dyn(c, DYN_NUM_IN + nj, true);
+      blocks(c.res, 0, SRC_JAC_FWD, nfwd_);
+      calls[IVP_EVAL_JAC].push_back(c);
+    }
   }
   if (nadj_ > 0) {
     // [dF/dx; dF/dz; dF/dp; dF/du]^T w, with forward-over-adjoint
@@ -467,6 +545,25 @@ std::vector<std::vector<RuntimeIntegrator::TaskCall>> RuntimeIntegrator::task_ca
       for (casadi_int k = 0; k < 4; ++k) c.res.push_back({k, vjp[k], n_vjp[k]});
       calls[IVP_EVAL_VJP].push_back(c);
     }
+    if (needs_jacobian()) {
+      // d/d(x, z, p, u) <jac_adj, Jacobian blocks>, with forward-over-adjoint
+      TaskCall jacb = call("jacB");
+      dyn(jacb, 0, false);
+      blocks(jacb.arg, DYN_NUM_IN, SRC_JAC, 1);
+      blocks(jacb.arg, DYN_NUM_IN + nj, SRC_JAC_ADJ, nadj_);
+      for (casadi_int k = 0; k < 4; ++k) jacb.res.push_back({DYN_X + k, vjp[k], 0});
+      calls[IVP_EVAL_JAC_ADJ].push_back(jacb);
+      if (nfwd_ > 0) {
+        TaskCall c = call(forward_name("jacB", nfwd_));
+        casadi_int i = DYN_NUM_IN + 2 * nj, i_fwd = i + DYN_NUM_IN;
+        c.arg = jacb.arg;
+        for (casadi_int k = 0; k < 4; ++k) c.arg.push_back({i + DYN_X + k, vjp[k], 0});
+        dyn(c, i_fwd, true);
+        blocks(c.arg, i_fwd + DYN_NUM_IN + nj, SRC_JAC_ADJ_FWD, nadj_ * nfwd_);
+        for (casadi_int k = 0; k < 4; ++k) c.res.push_back({DYN_X + k, vjp[k], n_vjp[k]});
+        calls[IVP_EVAL_JAC_ADJ].push_back(c);
+      }
+    }
   }
   return calls;
 }
@@ -478,7 +575,11 @@ bool RuntimeIntegrator::has_codegen() const {
 
 void RuntimeIntegrator::codegen_declarations(CodeGenerator& g) const {
   std::vector<std::string> fcn = {"rhsF"};
-  if (nadj_ > 0) fcn.push_back("vjpB");
+  if (needs_jacobian()) fcn.push_back("jacF");
+  if (nadj_ > 0) {
+    fcn.push_back("vjpB");
+    if (needs_jacobian()) fcn.push_back("jacB");
+  }
   for (const std::string& f : fcn) {
     g.add_dependency(get_function(f));
     if (nfwd_ > 0) g.add_dependency(get_function(forward_name(f, nfwd_)));
@@ -598,15 +699,24 @@ void RuntimeIntegrator::codegen_ivp_prob(CodeGenerator& g, const std::string& p)
   set("m", g.constant(m_));
   set("n_dense", str(n_dense_));
   set("m_dense", g.constant(m_dense_));
+  for (casadi_int k = 0; k < IVP_NUM_JAC; ++k) {
+    set("sp_jac[" + str(k) + "]", sp_jac_.empty() ? "0" : g.sparsity(sp_jac_[k]));
+  }
   set("tape_size", str(p_.tape_size));
   set("step_size", g.constant(p_.step_size));
+  set("nx_err", str(p_.nx_err));
+  set("nz_err", str(p_.nz_err));
+  set("nq_err", str(p_.nq_err));
+  set("abstol", g.constant(p_.abstol));
+  set("reltol", g.constant(p_.reltol));
   g << "casadi_ivp_setup(&" << p << ");\n";
 }
 
 void RuntimeIntegrator::codegen_task(CodeGenerator& g, const std::string& d,
     const std::vector<std::vector<TaskCall>>& calls) const {
   // Straight-line code for the task table, as eval_task: direct calls, no function pointers
-  static const char* task_name[] = {"IVP_EVAL_RHS", "IVP_EVAL_VJP"};
+  static const char* task_name[] = {"IVP_EVAL_RHS", "IVP_EVAL_JAC", "IVP_EVAL_VJP",
+    "IVP_EVAL_JAC_ADJ"};
   g << "switch (" << d << ".task) {\n";
   for (casadi_int task = 0; task < static_cast<casadi_int>(calls.size()); ++task) {
     if (calls[task].empty()) continue;
@@ -642,28 +752,41 @@ Dict RuntimeIntegrator::get_stats(void* mem) const {
   auto m = static_cast<RuntimeIntegratorMemory*>(mem);
   stats["n_steps"] = m->d.n_steps;
   stats["n_rhs"] = m->d.n_rhs;
+  stats["n_jac"] = m->d.n_jac;
   stats["n_vjp"] = m->d.n_vjp;
   return stats;
 }
 
 void RuntimeIntegrator::print_stats(IntegratorMemory* mem) const {
   auto m = static_cast<RuntimeIntegratorMemory*>(mem);
-  print("%s: %lld steps, %lld rhs, %lld vjp\n", plugin_name(),
+  print("%s: %lld steps, %lld rhs, %lld jac, %lld vjp\n", plugin_name(),
     static_cast<long long>(m->d.n_steps), static_cast<long long>(m->d.n_rhs),
-    static_cast<long long>(m->d.n_vjp));
+    static_cast<long long>(m->d.n_jac), static_cast<long long>(m->d.n_vjp));
 }
 
 RuntimeIntegrator::RuntimeIntegrator(DeserializingStream& s) : Integrator(s) {
   s.version("RuntimeIntegrator", 1);
   s.unpack("RuntimeIntegrator::group_start", group_start_);
+  s.unpack("RuntimeIntegrator::nx_err", nx_err_);
+  s.unpack("RuntimeIntegrator::nz_err", nz_err_);
+  s.unpack("RuntimeIntegrator::nq_err", nq_err_);
+  s.unpack("RuntimeIntegrator::sp_jac", sp_jac_);
   s.unpack("RuntimeIntegrator::step_size", step_size_);
+  s.unpack("RuntimeIntegrator::abstol", abstol_);
+  s.unpack("RuntimeIntegrator::reltol", reltol_);
 }
 
 void RuntimeIntegrator::serialize_body(SerializingStream &s) const {
   Integrator::serialize_body(s);
   s.version("RuntimeIntegrator", 1);
   s.pack("RuntimeIntegrator::group_start", group_start_);
+  s.pack("RuntimeIntegrator::nx_err", nx_err_);
+  s.pack("RuntimeIntegrator::nz_err", nz_err_);
+  s.pack("RuntimeIntegrator::nq_err", nq_err_);
+  s.pack("RuntimeIntegrator::sp_jac", sp_jac_);
   s.pack("RuntimeIntegrator::step_size", step_size_);
+  s.pack("RuntimeIntegrator::abstol", abstol_);
+  s.pack("RuntimeIntegrator::reltol", reltol_);
 }
 
 } // namespace casadi

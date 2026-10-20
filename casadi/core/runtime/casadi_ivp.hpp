@@ -21,15 +21,30 @@
 // stages, dense output, tape, output times, stops and the record-wise discrete adjoint
 // Layouts: x = [x_0; ...; x_nfwd] (nominal, forward), rx = [rx_0 (nx1 x nadj); ...; rx_nfwd]
 
+// C-REPLACE "static_cast<int>" "(int) "
 // C-REPLACE "static_cast<T1>" "(casadi_real) "
 // C-REPLACE "static_cast<casadi_int>" "(casadi_int) "
+// C-REPLACE "static_cast<casadi_ivp_record_t>" "(casadi_ivp_record_t) "
+
+// SYMBOL "ivp_jac_t"
+typedef enum {
+  // Jacobian blocks w.r.t. x, z and t, in the order of evaluation by the caller
+  IVP_ODE_X, IVP_ALG_X, IVP_QUAD_X,
+  IVP_ODE_Z, IVP_ALG_Z, IVP_QUAD_Z,
+  IVP_ODE_T, IVP_ALG_T, IVP_QUAD_T,
+  IVP_NUM_JAC
+} casadi_ivp_jac_t;
 
 // SYMBOL "ivp_task_t"
 typedef enum {
   // res = F(t_arg, y_arg), with forward sensitivities
   IVP_EVAL_RHS,
+  // jac, jac_fwd = Jacobian blocks at (t_arg, y_arg), with forward sensitivities
+  IVP_EVAL_JAC,
   // vjp = dF/d(x,z,p,u)^T w at (t_arg, y_arg), with forward sensitivities
   IVP_EVAL_VJP,
+  // vjp = d/d(x,z,p,u) <jac_adj, Jacobian blocks> at (t_arg, y_arg), w. forward sensitivities
+  IVP_EVAL_JAC_ADJ,
   // Enlarge the tape to at least tape_need entries, keeping its contents; set tape, tape_cap
   IVP_TAPE_RESERVE
 } casadi_ivp_task_t;
@@ -48,9 +63,19 @@ typedef enum {
 typedef enum {
   IVP_SUCCESS,
   IVP_MAX_NUM_STEPS,
+  IVP_STEP_TOO_SMALL,
+  IVP_INIT_FAILED,
   IVP_EVAL_FAILED,
   IVP_TAPE_FAILED
 } casadi_ivp_flag_t;
+
+// SYMBOL "ivp_record_t"
+typedef enum {
+  // Integrator step from t0 to t0 + h
+  IVP_RECORD_STEP,
+  // Consistent initialization of the algebraic states at t0
+  IVP_RECORD_INIT
+} casadi_ivp_record_t;
 
 // SYMBOL "ivp_prob"
 template<typename T1>
@@ -66,18 +91,34 @@ struct casadi_ivp_prob {
   // Dense output weights m_i(theta) = sum_q m_dense[q * n_stages + i] theta^(q+1)
   casadi_int n_dense;
   const T1* m_dense;
+  // Sparsity patterns of the Jacobian blocks (null: not used), see casadi_ivp_jac_t
+  const casadi_int* sp_jac[IVP_NUM_JAC];
   // Capacity of the tape in the work vector (0: the caller provides the tape)
   casadi_int tape_size;
   // Fixed steps: each run of steps up to a stop has equal steps of at most step_size
   T1 step_size;
+  // Error weights: leading entries of x, z, q subject to error control, tolerances
+  casadi_int nx_err, nz_err, nq_err;
+  T1 abstol, reltol;
   // Derived: forward and adjoint state dimensions, controls, vector lengths
   casadi_int nx, nz, nq, nu, nrx, nrz, nrq, nrp, nru, ny, nr;
+  // Derived: offsets of the Jacobian blocks in a buffer with one direction, total nonzeros
+  casadi_int jac_off[IVP_NUM_JAC + 1];
+  casadi_int nnz_jac;
 };
 // C-REPLACE "casadi_ivp_prob<T1>" "struct casadi_ivp_prob"
+
+// SYMBOL "ivp_nnz"
+inline
+casadi_int casadi_ivp_nnz(const casadi_int* sp) {
+  // Number of nonzeros of a sparsity pattern, zero if null
+  return sp ? sp[2 + sp[1]] : 0;
+}
 
 // SYMBOL "ivp_setup"
 template<typename T1>
 void casadi_ivp_setup(casadi_ivp_prob<T1>* p) {
+  casadi_int k;
   // Forward states including sensitivities
   p->nx = p->nx1 * (1 + p->nfwd);
   p->nz = p->nz1 * (1 + p->nfwd);
@@ -91,6 +132,12 @@ void casadi_ivp_setup(casadi_ivp_prob<T1>* p) {
   p->nru = p->nu1 * p->nadj * (1 + p->nfwd);
   p->ny = p->nx + p->nz + p->nq;
   p->nr = p->nrx + p->nrz + p->nrq;
+  // Jacobian blocks
+  p->jac_off[0] = 0;
+  for (k = 0; k < IVP_NUM_JAC; ++k) {
+    p->jac_off[k + 1] = p->jac_off[k] + casadi_ivp_nnz(p->sp_jac[k]);
+  }
+  p->nnz_jac = p->jac_off[IVP_NUM_JAC];
 }
 
 // C-REPLACE "casadi_ivp_data<T1>" "struct casadi_ivp_data"
@@ -132,22 +179,27 @@ struct casadi_ivp_data {
   T1 t_seed;
   // Control adjoints of the popped step from outputs inside it
   T1* ru_step;
-  // Results of EVAL_VJP: adjoints of x, z, p, u
+  // Jacobian blocks and their forward derivatives, nonzeros in casadi_ivp_jac_t order
+  T1 *jac, *jac_fwd;
+  // Adjoint seeds of the Jacobian blocks, with forward derivatives
+  T1 *jac_adj, *jac_adj_fwd;
+  // Results of EVAL_VJP and EVAL_JAC_ADJ: adjoints of x, z, p, u
   T1 *vjp_x, *vjp_z, *vjp_p, *vjp_u;
   // Accumulated adjoints of the parameters and controls
   T1 *adj_p, *adj_u;
-  // Tape: records [U, y0, u, h, t0, t1, t_out]; entries used, capacity, needed
+  // Tape: records [U (steps only), y0, u, h, t0, t1, t_out, type]; entries used, capacity, needed
   T1* tape;
   casadi_int tape_pos, tape_cap, tape_need;
   // Reset pending, taping requested
   int reset, taping;
-  // Popped record that belongs to an earlier interval
+  // Record type, popped record that belongs to an earlier interval
+  casadi_ivp_record_t record;
   int record_pending;
   // Fixed steps: current run start, stop, step size, number of steps, steps taken
   T1 run_t0, run_t1, run_h;
   casadi_int run_n, run_k;
   // Statistics
-  casadi_int n_steps, n_rhs, n_vjp;
+  casadi_int n_steps, n_rhs, n_jac, n_vjp;
 };
 
 // SYMBOL "ivp_work"
@@ -160,6 +212,8 @@ void casadi_ivp_work(const casadi_ivp_prob<T1>* p, casadi_int* sz_arg,
   *sz_w += p->nr * (p->n_stages + 3);
   // Controls of a step, their adjoints from outputs inside it
   *sz_w += p->nu + p->nru;
+  // Jacobian blocks, forward derivatives, adjoint seeds and their forward derivatives
+  *sz_w += p->nnz_jac * (1 + p->nfwd) * (1 + p->nadj);
   // Function adjoints, accumulated adjoints
   *sz_w += p->nrx + p->nrz + 2 * (p->nrp + p->nru);
   // Tape
@@ -183,6 +237,10 @@ void casadi_ivp_set_work(casadi_ivp_data<T1>* d, const T1*** arg, T1*** res,
   d->seed = *w; *w += p->nr;
   d->u_step = *w; *w += p->nu;
   d->ru_step = *w; *w += p->nru;
+  d->jac = *w; *w += p->nnz_jac;
+  d->jac_fwd = *w; *w += p->nnz_jac * p->nfwd;
+  d->jac_adj = *w; *w += p->nnz_jac * p->nadj;
+  d->jac_adj_fwd = *w; *w += p->nnz_jac * p->nadj * p->nfwd;
   d->vjp_x = *w; *w += p->nrx;
   d->vjp_z = *w; *w += p->nrz;
   d->vjp_p = *w; *w += p->nrp;
@@ -203,7 +261,7 @@ void casadi_ivp_set_work(casadi_ivp_data<T1>* d, const T1*** arg, T1*** res,
 // SYMBOL "ivp_clear_stats"
 template<typename T1>
 void casadi_ivp_clear_stats(casadi_ivp_data<T1>* d) {
-  d->n_steps = d->n_rhs = d->n_vjp = 0;
+  d->n_steps = d->n_rhs = d->n_jac = d->n_vjp = 0;
 }
 
 // SYMBOL "ivp_reset"
@@ -259,6 +317,7 @@ void casadi_ivp_reset_backward(casadi_ivp_data<T1>* d) {
   casadi_clear(d->ry, p->nr);
   casadi_clear(d->adj_p, p->nrp);
   casadi_clear(d->adj_u, p->nru);
+  casadi_clear(d->jac_adj, p->nnz_jac * p->nadj * (1 + p->nfwd));
   d->record_pending = 0;
 }
 
@@ -299,10 +358,30 @@ int casadi_ivp_stop(casadi_ivp_data<T1>* d, casadi_ivp_flag_t status) {
   return 0;
 }
 
+// SYMBOL "ivp_jac_nz"
+template<typename T1>
+T1* casadi_ivp_jac_nz(const casadi_ivp_data<T1>* d, T1* jac, casadi_int k,
+    casadi_int ndir, casadi_int dir) {
+  // Nonzeros of Jacobian block k, direction dir, in a buffer with ndir directions per block
+  const casadi_int* off = d->prob->jac_off;
+  return jac + ndir * off[k] + dir * (off[k + 1] - off[k]);
+}
+
+// SYMBOL "ivp_jac_mv"
+template<typename T1>
+void casadi_ivp_jac_mv(const casadi_ivp_data<T1>* d, casadi_int k,
+    casadi_int dir, const T1* v, T1* r, int tr) {
+  // r += J_k v (or J_k^T v): Jacobian block k (dir < 0) or its forward derivative
+  const casadi_ivp_prob<T1>* p = d->prob;
+  const T1* nz = dir < 0 ? casadi_ivp_jac_nz(d, d->jac, k, 1, 0)
+    : casadi_ivp_jac_nz(d, d->jac_fwd, k, p->nfwd, dir);
+  casadi_mv(nz, p->sp_jac[k], v, r, tr);
+}
+
 // SYMBOL "ivp_add_vjp"
 template<typename T1>
 void casadi_ivp_add_vjp(casadi_ivp_data<T1>* d, T1* r) {
-  // Add x, z adjoints of EVAL_VJP to r, p, u adjoints to the running sums
+  // Add x, z adjoints of EVAL_VJP/EVAL_JAC_ADJ to r, p, u adjoints to the running sums
   const casadi_ivp_prob<T1>* p = d->prob;
   if (r) {
     casadi_axpy(p->nrx, 1., d->vjp_x, r);
@@ -323,24 +402,24 @@ void casadi_ivp_clear_vjp(casadi_ivp_data<T1>* d) {
 }
 
 // ---------------------------------------------------------------------------------------
-// Tape: records [U, y0, u, h, t0, t1, end of the output interval]
+// Tape: records [U (step records only), y0, u, h, t0, t1, end of the output interval, type]
 // ---------------------------------------------------------------------------------------
 
 // SYMBOL "ivp_tape_full"
 template<typename T1>
-int casadi_ivp_tape_full(casadi_ivp_data<T1>* d) {
-  // No room for a record? Sets the capacity needed
+int casadi_ivp_tape_full(casadi_ivp_data<T1>* d, casadi_ivp_record_t record) {
+  // No room for a record of this type? Sets the capacity needed
   const casadi_ivp_prob<T1>* p = d->prob;
-  casadi_int n = p->ny * (p->n_stages + 1) + p->nu + 4;
+  casadi_int n = (record == IVP_RECORD_STEP ? p->ny * p->n_stages : 0) + p->ny + p->nu + 5;
   d->tape_need = d->tape_pos + n;
   return n > d->tape_cap - d->tape_pos;
 }
 
 // SYMBOL "ivp_reserve"
 template<typename T1>
-int casadi_ivp_reserve(casadi_ivp_data<T1>* d, casadi_int next) {
+int casadi_ivp_reserve(casadi_ivp_data<T1>* d, casadi_ivp_record_t record, casadi_int next) {
   // Room on the tape for a record, if taping? -1 if so, else the value for the method to return
-  if (!d->taping || !casadi_ivp_tape_full(d)) return -1;
+  if (!d->taping || !casadi_ivp_tape_full(d, record)) return -1;
   if (d->prob->tape_size > 0) return casadi_ivp_stop(d, IVP_TAPE_FAILED);
   return casadi_ivp_request(d, IVP_TAPE_RESERVE, next);
 }
@@ -350,7 +429,7 @@ template<typename T1>
 void casadi_ivp_tape_push(casadi_ivp_data<T1>* d) {
   // Append the current record, for which room has been reserved
   const casadi_ivp_prob<T1>* p = d->prob;
-  casadi_int n_u = p->ny * p->n_stages;
+  casadi_int n_u = d->record == IVP_RECORD_STEP ? p->ny * p->n_stages : 0;
   T1* rec = d->tape + d->tape_pos;
   casadi_copy(d->U, n_u, rec);
   rec += n_u;
@@ -361,7 +440,8 @@ void casadi_ivp_tape_push(casadi_ivp_data<T1>* d) {
   rec[1] = d->t0;
   rec[2] = d->t;
   rec[3] = d->t_out;
-  d->tape_pos += n_u + p->ny + p->nu + 4;
+  rec[4] = d->record;
+  d->tape_pos += n_u + p->ny + p->nu + 5;
 }
 
 // SYMBOL "ivp_tape_pop"
@@ -369,19 +449,21 @@ template<typename T1>
 int casadi_ivp_tape_pop(casadi_ivp_data<T1>* d) {
   // Restore the last record, clear the seeds of its stages; returns 1 if the tape is empty
   const casadi_ivp_prob<T1>* p = d->prob;
-  casadi_int n_u = p->ny * p->n_stages;
+  casadi_int n_u;
   T1* rec;
-  if (d->tape_pos < n_u + p->ny + p->nu + 4) return 1;
+  if (d->tape_pos < p->ny + p->nu + 5) return 1;
   rec = d->tape + d->tape_pos;
-  d->t_record = rec[-1];
-  d->t1 = rec[-2];
-  d->t0 = rec[-3];
-  d->h = rec[-4];
-  rec -= p->ny + p->nu + 4;
+  d->record = static_cast<casadi_ivp_record_t>(static_cast<int>(rec[-1]));
+  d->t_record = rec[-2];
+  d->t1 = rec[-3];
+  d->t0 = rec[-4];
+  d->h = rec[-5];
+  n_u = d->record == IVP_RECORD_STEP ? p->ny * p->n_stages : 0;
+  rec -= p->ny + p->nu + 5;
   casadi_copy(rec, p->ny, d->y0);
   casadi_copy(rec + p->ny, p->nu, d->u_step);
   casadi_copy(rec - n_u, n_u, d->U);
-  d->tape_pos -= n_u + p->ny + p->nu + 4;
+  d->tape_pos -= n_u + p->ny + p->nu + 5;
   casadi_clear(d->rU, p->nr * p->n_stages);
   casadi_clear(d->ry0, p->nr);
   casadi_clear(d->ru_step, p->nru);
@@ -443,6 +525,13 @@ void casadi_ivp_seed_stages(casadi_ivp_data<T1>* d) {
 // Step sizes
 // ---------------------------------------------------------------------------------------
 
+// SYMBOL "ivp_isfinite"
+template<typename T1>
+int casadi_ivp_isfinite(T1 x) {
+  // False for +-inf and NaN
+  return x - x == 0;
+}
+
 // SYMBOL "ivp_step_limit"
 template<typename T1>
 int casadi_ivp_step_limit(const casadi_ivp_data<T1>* d) {
@@ -456,14 +545,15 @@ int casadi_ivp_step_limit(const casadi_ivp_data<T1>* d) {
 
 // SYMBOL "ivp_output"
 template<typename T1>
-void casadi_ivp_output(casadi_ivp_data<T1>* d) {
-  // State at t_out <= t, in or at the end of the last step
+int casadi_ivp_output(casadi_ivp_data<T1>* d) {
+  // State at t_out <= t, in or at the end of the last step; returns 1 if interpolated
   const casadi_ivp_prob<T1>* p = d->prob;
   if (d->t == d->t_out) {
     casadi_copy(d->y, p->ny, d->y_out);
-  } else {
-    casadi_ivp_interpolate(d, d->t_out, d->y_out);
+    return 0;
   }
+  casadi_ivp_interpolate(d, d->t_out, d->y_out);
+  return 1;
 }
 
 // SYMBOL "ivp_accept"
@@ -472,7 +562,10 @@ void casadi_ivp_accept(casadi_ivp_data<T1>* d) {
   // The step from t0, with y the solution at its end, is accepted
   d->run_k++;
   d->t = d->run_k == d->run_n ? d->run_t1 : d->run_t0 + static_cast<T1>(d->run_k) * d->run_h;
-  if (d->taping) casadi_ivp_tape_push(d);
+  if (d->taping) {
+    d->record = IVP_RECORD_STEP;
+    casadi_ivp_tape_push(d);
+  }
   d->n_steps++;
 }
 
@@ -519,7 +612,7 @@ int casadi_ivp_impulse_begin(casadi_ivp_data<T1>* d) {
   while (!d->record_pending && !casadi_ivp_tape_pop(d)) {
     d->record_pending = d->t_record <= d->t_seed;
   }
-  if (!d->record_pending || d->t_seed == d->t1) {
+  if (!d->record_pending || d->record != IVP_RECORD_STEP || d->t_seed == d->t1) {
     // Seed of the state at the end of the pending record
     casadi_axpy(p->nr, 1., d->seed, d->ry);
     return casadi_ivp_stop(d, IVP_SUCCESS);

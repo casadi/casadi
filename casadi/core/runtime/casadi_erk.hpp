@@ -103,7 +103,7 @@ int casadi_erk_forward(casadi_ivp_data<T1>* d, casadi_erk_data<T1>* e) {
       return casadi_ivp_stop(d, IVP_SUCCESS);
     }
     if (casadi_ivp_step_limit(d)) return casadi_ivp_stop(d, IVP_MAX_NUM_STEPS);
-    if ((ret = casadi_ivp_reserve(d, ERK_STEP_BEGIN)) >= 0) return ret;
+    if ((ret = casadi_ivp_reserve(d, IVP_RECORD_STEP, ERK_STEP_BEGIN)) >= 0) return ret;
     casadi_copy(d->u, p->nu, d->u_step);
     d->h = d->run_h;
     return casadi_erk_step_start(d, e);

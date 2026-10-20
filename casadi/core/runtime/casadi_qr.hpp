@@ -207,6 +207,7 @@ casadi_int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* nz_r,
   const casadi_int* r_colind;
   // Nullity
   nullity = 0;
+  rd_min = 0;
   // Extract sparsity
   ncol = sp_r[1];
   r_colind = sp_r + 2;
