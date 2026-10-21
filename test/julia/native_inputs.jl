@@ -19,6 +19,13 @@ end
     @test size(DM([1.0, 2.0]')) == (1, 2)
     @test SX(1:3) isa SX
     @test MX(0:2) isa MX
+    # any Real converts like a Float64
+    @test Float64(DM(pi)) == Float64(pi)
+    @test Float64(DM(1.5f0)) == 1.5
+    @test Float64(DM(1 // 4)) == 0.25
+    @test Float64(DM(big(2.5))) == 2.5
+    x = sym(SX, "x")
+    @test Float64(C.Function("f", [x], [2 * x])(pi)) == 2 * Float64(pi)
 end
 
 @testset "native inputs: free functions keep the casadi type" begin
