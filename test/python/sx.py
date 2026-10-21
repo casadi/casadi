@@ -480,6 +480,14 @@ class SXtests(casadiTestCase):
     for e in [x+y, x*y, x-y]:
       self.assertFalse(ca.is_equal(ca.fabs(e), e))
 
+  def test_chained_inequality_kept(self):
+    y = ca.SX.sym("y")
+    # On-the-fly simplification keeps chained inequalities, explicit simplification folds them
+    for e in [0<=(y<=1), (1>=y)>=0]:
+      self.assertFalse(e.is_constant())
+      f = ca.Function("f",[y],[e]).transform([["simplify",0,"ref_count"]])
+      self.assertTrue(f.call([y],True,False)[0].is_one())
+
   def test_and_zero(self):
     for X in [ca.SX.sym("x"), ca.MX.sym("x")]:
       self.assertTrue(ca.logic_and(X, 0).is_zero())

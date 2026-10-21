@@ -1881,6 +1881,12 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
   }
 
 
+  // Is the expression an inequality
+  template<class T>
+  bool is_ineq(const T& x) {
+    return x.is_op(OP_LE) || x.is_op(OP_LT);
+  }
+
   template<class T, typename SU, typename SB>
   T common_simp_binary(casadi_int op, const T& x, const T& y, casadi_int depth,
       SU&& gen_unary,
@@ -2110,6 +2116,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
         }
         break;
       case OP_LE:
+        // Keep chained inequalities intact unless operands are unique
+        if (!unique_x && !unique_y && (is_ineq(x) || is_ineq(y))) break;
         if ((y-x).is_nonnegative())
           return 1;
         break;
@@ -2126,6 +2134,7 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
         if (is_equal(x, y, depth)) return x;
         break;
       case OP_LT:
+        if (!unique_x && !unique_y && (is_ineq(x) || is_ineq(y))) break;
         if (((x)-y).is_nonnegative())
           return 0;
         break;
