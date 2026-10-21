@@ -59,3 +59,45 @@ end
     @test Matrix(D[D .>= 5]) == reshape([5.0, 6.0], 2, 1)
     @test Matrix(D[D >= 5]) == reshape([5.0, 6.0], 2, 1)
 end
+
+@testset "no silent departures from Julia's array semantics" begin
+    A = DM([1.0 2; 3 4]); B = DM([2.0 0; 1 3])
+    a = [1.0 2; 3 4]; b = [2.0 0; 1 3]
+    S = sym(SX, "S", 2, 2); v = sym(MX, "v", 2); x = sym(SX, "x")
+    # / and ^ are the matrix operations; the dotted forms are elementwise
+    @test Matrix(A / B) ≈ a / b && Matrix(A ./ B) ≈ a ./ b
+    @test Matrix(A^2) ≈ a^2 && Matrix(A .^ 2) ≈ a .^ 2 && Matrix(A^-1) ≈ inv(a)
+    @test C.nnz(C.eye(DM, 3)^3) == 3                                 # mpower keeps the sparsity
+    @test C.is_equal(C.simplify(S^2 - S * S), SX.zeros(2, 2))
+    @test_throws ArgumentError A^0.5                                 # Julia's would be a matrix root
+    @test_throws ArgumentError 2^A                                   # ... and a matrix exponential
+    @test_throws ArgumentError S^0.5
+    @test_throws DimensionMismatch v^2
+    @test_throws ArgumentError 2 / A
+    @test Float64(DM(6) / 2) == 3.0 && (x / 2) isa SX && (x^2) isa SX && Float64(DM(2)^0.5) ≈ sqrt(2)
+    # matrix functions: casadi has none, so a non-scalar throws instead of going elementwise
+    for M in (A, S, v)
+        @test_throws ArgumentError sin(M)
+        @test_throws ArgumentError exp(M)
+    end
+    @test sin(x) isa SX && size(sin.(S)) == (2, 2) && size(exp.(v)) == (2, 1)
+    @test Matrix(exp.(A)) ≈ exp.(a)
+    @test Matrix(abs(DM([-1, 2]))) == reshape([1.0, 2.0], 2, 1)      # no array meaning: elementwise
+    # max/min of arrays are Julia's lexicographic pick: scalars only, elementwise with dots
+    @test_throws ArgumentError max(A, B)
+    @test_throws ArgumentError max(DM([1.0, 2]), DM([3.0, 0]))
+    @test_throws ArgumentError max(S, 0)
+    @test Matrix(max.(A, B)) == max.(a, b) && Float64(max(DM(1), 2)) == 2.0
+    # an arbitrary f. is applied per element
+    f(z) = z^2 + 1
+    @test Matrix(f.(A)) ≈ f.(a)
+    @test C.is_equal(C.simplify(f.(S) - (S .^ 2 .+ 1)), SX.zeros(2, 2))
+    # shapes follow casadi: A[i, :] is a row, a linear range keeps a vector's orientation
+    r = DM([1.0 2 3])
+    @test size(A[1, :]) == (1, 2) && size(r[1:2]) == (1, 2) && size(r[:]) == (1, 3)
+    @test size(r[[1, 3]]) == (1, 2) && size(A[2:3]) == (2, 1)
+    R = DM([1.0 2 3]); R[1:2] = [10, 20]
+    @test Matrix(R) == [10.0 20.0 3.0]
+    E = DM([1.0 2; 3 4]); E[2, :] = [7, 8]
+    @test Matrix(E) == [1.0 2.0; 7.0 8.0]
+end

@@ -38,7 +38,7 @@ end
     @test Base.string(v[1:2:5]) == "[10, 30, 50]"
     @test Float64(v[end]) == 50.0
     m = sym(SX, "m", 2, 3)
-    @test Base.size(m[1, :]) == (1, 3)
+    @test Base.size(m[1, :]) == (1, 3)                 # a row, as in casadi (Julia would give a Vector)
     @test Base.size(m[:, 2]) == (2, 1)
     w = DM([0.0, 0.0, 0.0])
     w[2] = 9.0

@@ -55,7 +55,7 @@ Base.convert(::Type{MX}, v::_Num) = C.MX(v isa Real ? Float64(v) : v)
 Base.convert(::Type{DM}, v::Union{Real,AbstractArray{<:Real}}) = C.DM(v isa Real ? Float64(v) : v)
 
 # ---- operators ----
-for (op, fn) in ((:+, :plus), (:-, :minus), (:*, :mtimes), (:/, :rdivide), (:^, :power))
+for (op, fn) in ((:+, :plus), (:-, :minus), (:*, :mtimes))
     @eval begin
         Base.$op(a::SX, b::SX) = C.$fn(a, b)
         Base.$op(a::MX, b::MX) = C.$fn(a, b)
@@ -70,6 +70,36 @@ for (op, fn) in ((:+, :plus), (:-, :minus), (:*, :mtimes), (:/, :rdivide), (:^, 
     end
 end
 Base.:-(a::Union{SX,MX,DM}) = C.times(a, typeof(a) === DM ? C.DM(-1.0) : convert(typeof(a), -1))
+
+# Where Julia gives an array operation a meaning (A/B, A^n, matrix functions, max of
+# arrays), a casadi matrix does the same or throws; never an elementwise surprise.
+# Elementwise is spelled with dots (./ .^ sin.), as in Julia.
+_scal(x::Union{SX,MX,DM}) = C.numel(x) == 1
+_scal(x::Real) = true
+_scal(x) = false
+_shape(x) = "$(C.size1(x))×$(C.size2(x))"
+Base.:/(a::Union{SX,MX,DM}, b::Union{SX,MX,DM,Real,AbstractArray{<:Real}}) = _div(a, b)
+Base.:/(a::Union{Real,AbstractArray{<:Real}}, b::Union{SX,MX,DM}) = _div(a, b)
+function _div(a, b)
+    T = _catpromote((a, b))
+    _scal(b) && return C.rdivide(_ascat(T, a), _ascat(T, b))
+    _scal(a) && Base.throw(ArgumentError("x / A with a matrix A has no meaning in Julia; use x ./ A"))
+    C.mrdivide(_ascat(T, a), _ascat(T, b))
+end
+Base.:^(a::Union{SX,MX,DM}, b::Union{SX,MX,DM,Real}) = _pow(a, b)
+Base.:^(a::Real, b::Union{SX,MX,DM}) = _pow(a, b)
+function _pow(a, b)
+    T = _catpromote((a, b))
+    _scal(a) && _scal(b) && return C.power(_ascat(T, a), _ascat(T, b))
+    p = b isa DM && _scal(b) ? Float64(b) : b
+    if a isa _Cat && p isa Real && Base.isinteger(p)                  # A^n: casadi's mpower
+        C.size1(a) == C.size2(a) || Base.throw(DimensionMismatch("matrix is not square: dimensions are $(_shape(a))"))
+        n = Int(p)
+        return n >= 0 ? C.mpower(a, n) : C.mpower(C.inv(a), -n)
+    end
+    Base.throw(ArgumentError("A^p of a matrix needs an integer p (matrix power); use .^ for " *
+        "elementwise, or a Julia Matrix(A) for Julia's A^p and p^A"))
+end
 
 # ---- broadcasting (P0-2): casadi ops are already elementwise on matrices, so
 # every `.op` / `f.(x)` short-circuits to the matrix-wide elementwise casadi op ----
@@ -94,19 +124,29 @@ _coerce(::Type{T}, a) where {T} = a   # ops, Refs, Val: pass through untouched
 # the applied op: unwrap literal_pow (x.^2) into a plain casadi power
 _apply(f, args...) = f(args...)
 _apply(::typeof(Base.literal_pow), ::Base.RefValue{typeof(^)}, x, ::Base.RefValue{Val{n}}) where {n} =
-    x ^ convert(typeof(x), n)
-# broadcast op -> ELEMENTWISE casadi op: `*`/`/`/`^` must NOT be mtimes/solve/mpower
-_bcop(f) = f                       # +,-,math funcs are already elementwise
+    C.power(x, n)
+# f.(args) with a known f: one whole-matrix casadi op (elementwise); `nothing`: unknown f
+_bcop(f) = nothing
+_bcop(::typeof(+)) = +
+_bcop(::typeof(-)) = -
 _bcop(::typeof(*)) = C.times
 _bcop(::typeof(/)) = C.rdivide
 _bcop(::typeof(^)) = C.power
-# .< .== etc. compare elementwise, like < and == themselves
 _bcop(::typeof(<)) = C.lt
 _bcop(::typeof(<=)) = C.le
 _bcop(::typeof(>)) = C.gt
 _bcop(::typeof(>=)) = C.ge
 _bcop(::typeof(==)) = C.eq
 _bcop(::typeof(!=)) = C.ne
+_bcop(::typeof(Base.max)) = C.fmax
+_bcop(::typeof(Base.min)) = C.fmin
+_bcop(::typeof(Base.hypot)) = C.hypot
+_bcop(::typeof(Base.atan)) = (a...) -> Base.length(a) == 2 ? C.atan2(a...) : C.atan(a...)
+_bcop(::typeof(Base.ifelse)) = C.if_else
+for fn in (:sin, :cos, :tan, :exp, :log, :sqrt, :abs, :tanh, :sinh, :cosh, :asin, :acos,
+           :floor, :ceil, :sign, :log10, :log1p, :expm1, :asinh, :acosh, :atanh)
+    @eval _bcop(::typeof(Base.$fn)) = C.$fn
+end
 
 # materialize by recursively walking the (unflattened) tree, so nested `.* ` inside a
 # fused chain still maps to elementwise times rather than Base.:* (mtimes).
@@ -119,8 +159,17 @@ function _bceval(bc::Base.Broadcast.Broadcasted{CasadiStyle})
     if Base.length(args) == 1 && bc.f isa Type{<:Number} && args[1] isa _Cat
         return bc.f.(Base.collect(args[1]))
     end
+    op = _bcop(bc.f)
+    op === nothing && return _bcelem(bc.f, args)
     T = _castype(args...)
-    _bcop(bc.f)(map(a -> _coerce(T, a), args)...)
+    op(map(a -> _coerce(T, a), args)...)
+end
+# any other f is applied to each element, with Julia's broadcast shape rules
+function _bcelem(f, args)
+    r = Base.broadcast(f, map(a -> a isa _Cat ? Base.collect(a) : a, args)...)
+    r isa AbstractArray || return r
+    T = _catpromote(Base.vec(r))
+    _restore(T, C.reshape(C._vertcat(_cvec(Base.vec(r))), Base.size(r, 1), Base.size(r, 2)))
 end
 Base.copy(bc::Base.Broadcast.Broadcasted{CasadiStyle}) = _bceval(bc)
 
@@ -206,14 +255,17 @@ end
 Base.:\(a::AbstractMatrix{<:Real}, b::_Cat) = convert(typeof(b), a) \ b
 
 # ---- Base math extensions (no shadowing: extend Base methods) ----
-for fn in (:sin, :cos, :tan, :exp, :log, :sqrt, :abs, :tanh, :sinh, :cosh,
-           :asin, :acos, :atan, :floor, :ceil, :sign, :log10, :log1p, :expm1,
-           :asinh, :acosh, :atanh)
-    @eval begin
-        Base.$fn(x::SX) = C.$fn(x)
-        Base.$fn(x::MX) = C.$fn(x)
-        Base.$fn(x::DM) = C.$fn(x)
-    end
+# Julia's sin(A), exp(A), ... of a square matrix are matrix functions, which casadi does
+# not compute: a non-scalar throws (use sin.(A)).  Scalars (1×1) are plain casadi ops.
+for fn in (:sin, :cos, :tan, :exp, :log, :sqrt, :tanh, :sinh, :cosh,
+           :asin, :acos, :atan, :asinh, :acosh, :atanh)
+    @eval Base.$fn(x::Union{SX,MX,DM}) = _scal(x) ? C.$fn(x) : Base.throw(ArgumentError(
+        "$($(QuoteNode(fn)))(A) of a $(_shape(x)) $(typeof(x)): in Julia a matrix function of a " *
+        "square A, undefined otherwise; use $($(QuoteNode(fn))).(A) for elementwise, or a Julia Matrix(A)"))
+end
+# no array meaning in Julia for these: elementwise, as casadi
+for fn in (:abs, :floor, :ceil, :sign, :log10, :log1p, :expm1)
+    @eval Base.$fn(x::Union{SX,MX,DM}) = C.$fn(x)
 end
 
 # Reductions and binary math with Julia's own names and semantics (sum, diff,
@@ -245,12 +297,24 @@ end
 # Elementwise two-argument functions; the generated overloads pick MX/SX/DM from
 # the argument types, so numbers and Julia arrays mix in as anywhere else.
 const _Native = Union{Real,AbstractArray{<:Real}}
-for (fn, cfn) in ((:max, :fmax), (:min, :fmin), (:atan, :atan2), (:hypot, :hypot))
+# atan(y, x) and hypot have no array meaning in Julia: elementwise.  max/min of arrays
+# do (a lexicographic pick of vectors), so they take scalars only.
+for (fn, cfn) in ((:atan, :atan2), (:hypot, :hypot))
     @eval begin
         Base.$fn(a::_Cat, b::_Cat) = C.$cfn(a, b)
         Base.$fn(a::_Cat, b::_Native) = C.$cfn(a, b)
         Base.$fn(a::_Native, b::_Cat) = C.$cfn(a, b)
     end
+end
+for (fn, cfn) in ((:max, :fmax), (:min, :fmin))
+    @eval begin
+        Base.$fn(a::_Cat, b::Union{_Cat,_Native}) = _maxmin(Base.$fn, C.$cfn, a, b)
+        Base.$fn(a::_Native, b::_Cat) = _maxmin(Base.$fn, C.$cfn, a, b)
+    end
+end
+function _maxmin(f, cf, a, b)
+    _scal(a) && _scal(b) && return cf(a, b)
+    Base.throw(ArgumentError("$f(A, B) of arrays is a lexicographic pick in Julia; use $f.(A, B) for elementwise"))
 end
 
 # ifelse(c, a, b) on a casadi condition is casadi's if_else
@@ -501,19 +565,31 @@ _ivec(x, i::DM, n) = _imask(x, Base.Matrix{Float64}(i) .!= 0, n)   # e.g. x[x .>
 _ivec(x, i::AbstractVector{<:Integer}, n) = (Base.all(k -> 1 <= k <= n, i) || Base.throw(BoundsError(x, i)); Int.(i) .- 1)
 _ivec(x, i::Integer, n) = _ivec(x, [i], n)
 _ivec(x, ::Colon, n) = Base.collect(0:n-1)
+# Shapes follow casadi (as in its Python/MATLAB and SciML CasADi.jl), not Julia's dropped
+# dimensions: A[i, :] is a 1×n row and x[range] keeps a vector's orientation.
 Base.getindex(x::Union{SX,MX,DM}, i::_AnyInd) = i isa _Ind ?
     (_ckhi(x, i, C.numel(x)); C.get(x, false, _slice(i))) :
     C.get(x, false, _ivec(x, i, C.numel(x)))
-Base.getindex(x::Union{SX,MX,DM}, i::_AnyInd, j::_AnyInd) = i isa _Ind && j isa _Ind ?
-    (_ckhi(x, i, C.size1(x)); _ckhi(x, j, C.size2(x)); C.get(x, false, _slice(i), _slice(j))) :
-    C.get(x, false, _ivec(x, i, C.size1(x)), _ivec(x, j, C.size2(x)))
-# setindex! mirrors getindex; coerce Real/array v to the matrix type
-Base.setindex!(x::Union{SX,MX,DM}, v, i::_AnyInd) =
-    (i isa _Ind ? C.set(x, _asval(typeof(x), v), false, _slice(i)) :
-                  C.set(x, _asval(typeof(x), v), false, _ivec(x, i, C.numel(x))); x)
-Base.setindex!(x::Union{SX,MX,DM}, v, i::_AnyInd, j::_AnyInd) =
-    (i isa _Ind && j isa _Ind ? C.set(x, _asval(typeof(x), v), false, _slice(i), _slice(j)) :
-        C.set(x, _asval(typeof(x), v), false, _ivec(x, i, C.size1(x)), _ivec(x, j, C.size2(x))); x)
+function Base.getindex(x::Union{SX,MX,DM}, i::_AnyInd, j::_AnyInd)
+    i isa _Ind && j isa _Ind ?
+        (_ckhi(x, i, C.size1(x)); _ckhi(x, j, C.size2(x)); C.get(x, false, _slice(i), _slice(j))) :
+        C.get(x, false, _ivec(x, i, C.size1(x)), _ivec(x, j, C.size2(x)))
+end
+# setindex! mirrors getindex; coerce Real/array v to the matrix type, a column into a row slot
+_fitrow(v) = v isa _Cat && C.size2(v) == 1 && C.size1(v) != 1 ? C.transpose(v) : v
+function Base.setindex!(x::Union{SX,MX,DM}, v, i::_AnyInd)
+    w = _asval(typeof(x), v)
+    C.size1(x) == 1 && (w = _fitrow(w))
+    i isa _Ind ? C.set(x, w, false, _slice(i)) : C.set(x, w, false, _ivec(x, i, C.numel(x)))
+    x
+end
+function Base.setindex!(x::Union{SX,MX,DM}, v, i::_AnyInd, j::_AnyInd)
+    w = _asval(typeof(x), v)
+    i isa Integer && !(j isa Integer) && (w = _fitrow(w))
+    i isa _Ind && j isa _Ind ? C.set(x, w, false, _slice(i), _slice(j)) :
+        C.set(x, w, false, _ivec(x, i, C.size1(x)), _ivec(x, j, C.size2(x)))
+    x
+end
 # value coercion for set(): scalar Real / native array -> the matrix type, else pass through
 _asval(::Type{T}, v::Real) where {T} = convert(T, v)
 _asval(::Type{T}, v::AbstractArray{<:Real}) where {T} = T(v)

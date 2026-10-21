@@ -14,7 +14,8 @@ using LinearAlgebra: norm, det, tr
     @test_throws ArgumentError diff(A)                     # a matrix needs dims, as in Julia
     @test Matrix(cumsum(A; dims = 2)) == [1.0 3.0 6.0; 4.0 9.0 15.0]
     @test Float64(maximum(A)) == 6.0 && Float64(minimum(A)) == 1.0
-    @test max(x, 0) isa MX && max(0, x) isa MX && min(s, [1, 2]) isa SX
+    @test max.(x, 0) isa MX && max.(0, x) isa MX && min.(s, [1, 2]) isa SX
+    @test max(x[1], 0) isa MX && min(0, s[2]) isa SX
     @test max(x[1], x[2], 0) isa MX
     @test max(1, 2) == 2                                    # plain numbers stay Base
     @test norm(x) isa MX && norm(x, 1) isa MX && norm(x, Inf) isa MX

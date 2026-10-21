@@ -45,7 +45,7 @@ for k in 1:N                   # RK4 over each interval
     ca.subject_to(opti, X[:, k + 1] == x_next)
 end
 
-limit(p) = 1 - sin(2 * pi * p) / 2
+limit(p) = 1 .- sin.(2pi .* p) ./ 2
 ca.subject_to(opti, speed <= limit(pos))      # track speed limit
 ca.subject_to(opti, ca.bounded(0, U, 1))         # control is limited
 ca.subject_to(opti, pos[1] == 0)              # start at position 0
