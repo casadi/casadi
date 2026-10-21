@@ -154,6 +154,10 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
+    // KKT matrix for parametric sensitivities, active set given by the multiplier signs
+    static MX sens_kkt(const MX& H, const MX& A, const MX& lam_x, const MX& lam_a,
+                       double min_lam, MX& lbIx, MX& ubIx, MX& lbIa, MX& ubIa);
+
     /** \brief Generate code for the function body
 
         \identifier{24y} */

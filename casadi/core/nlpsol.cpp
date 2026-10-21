@@ -24,6 +24,7 @@
 
 
 #include "nlpsol_impl.hpp"
+#include "conic_impl.hpp"
 #include "external.hpp"
 #include "casadi/core/timing.hpp"
 #include "nlp_builder.hpp"
@@ -994,22 +995,10 @@ namespace casadi {
     MX JG = HJ_res.at(0);
     MX HL = HJ_res.at(1);
 
-    // Active set (assumed known and given by the multiplier signs)
-    MX ubIx = lam_x > min_lam_;
-    MX lbIx = lam_x < -min_lam_;
-    MX bIx = ubIx + lbIx;
-    MX iIx = 1-bIx;
-    MX ubIg = lam_g > min_lam_;
-    MX lbIg = lam_g < -min_lam_;
-    MX bIg = ubIg + lbIg;
-    MX iIg = 1-bIg;
-
-    // KKT matrix
-    MX H_11 = mtimes(diag(iIx), HL) + diag(bIx);
-    MX H_12 = mtimes(diag(iIx), JG.T());
-    MX H_21 = mtimes(diag(bIg), JG);
-    MX H_22 = diag(-iIg);
-    MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
+    // KKT matrix, active set given by the multiplier signs
+    MX lbIx, ubIx, lbIg, ubIg;
+    MX H = Conic::sens_kkt(HL, JG, lam_x, lam_g, min_lam_, lbIx, ubIx, lbIg, ubIg);
+    MX iIx = 1-ubIx-lbIx, bIg = ubIg+lbIg;
 
     // Sensitivity inputs
     std::vector<MX> fseed(NLPSOL_NUM_IN);
@@ -1125,22 +1114,10 @@ namespace casadi {
     MX JG = HJ_res.at(0);
     MX HL = HJ_res.at(1);
 
-    // Active set (assumed known and given by the multiplier signs)
-    MX ubIx = lam_x > min_lam_;
-    MX lbIx = lam_x < -min_lam_;
-    MX bIx = ubIx + lbIx;
-    MX iIx = 1-bIx;
-    MX ubIg = lam_g > min_lam_;
-    MX lbIg = lam_g < -min_lam_;
-    MX bIg = ubIg + lbIg;
-    MX iIg = 1-bIg;
-
-    // KKT matrix
-    MX H_11 = mtimes(diag(iIx), HL) + diag(bIx);
-    MX H_12 = mtimes(diag(iIx), JG.T());
-    MX H_21 = mtimes(diag(bIg), JG);
-    MX H_22 = diag(-iIg);
-    MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
+    // KKT matrix, active set given by the multiplier signs
+    MX lbIx, ubIx, lbIg, ubIg;
+    MX H = Conic::sens_kkt(HL, JG, lam_x, lam_g, min_lam_, lbIx, ubIx, lbIg, ubIg);
+    MX iIx = 1-ubIx-lbIx, bIg = ubIg+lbIg;
 
     // Sensitivity inputs
     std::vector<MX> aseed(NLPSOL_NUM_OUT);

@@ -592,6 +592,21 @@ namespace casadi {
     return type=="Conic" || (recursive && FunctionInternal::is_a(type, recursive));
   }
 
+  MX Conic::sens_kkt(const MX& H, const MX& A, const MX& lam_x, const MX& lam_a,
+                     double min_lam, MX& lbIx, MX& ubIx, MX& lbIa, MX& ubIa) {
+    ubIx = lam_x > min_lam;
+    lbIx = lam_x < -min_lam;
+    ubIa = lam_a > min_lam;
+    lbIa = lam_a < -min_lam;
+    MX bIx = ubIx + lbIx, iIx = 1-bIx;
+    MX bIa = ubIa + lbIa, iIa = 1-bIa;
+    MX H_11 = mtimes(diag(iIx), H) + diag(bIx);
+    MX H_12 = mtimes(diag(iIx), A.T());
+    MX H_21 = mtimes(diag(bIa), A);
+    MX H_22 = diag(-iIa);
+    return MX::blockcat({{H_11, H_12}, {H_21, H_22}});
+  }
+
   void Conic::sdp_to_socp_init(SDPToSOCPMem& mem) const {
 
     Sparsity qsum = reshape(sum2(Q_), np_, np_);
