@@ -408,7 +408,17 @@ namespace casadi {
       {"solver_version_check",
        {OT_BOOL,
         "When the plugin loads an externally supplied solver, "
-         "check that its version is compatible with the plugin [Default: true]"}}
+         "check that its version is compatible with the plugin [Default: true]"}},
+      {"sens_min_lam",
+       {OT_DOUBLE,
+        "Minimum multiplier value for a constraint to be considered active "
+        "in parametric sensitivities [0]."}},
+      {"sens_linsol",
+       {OT_STRING,
+        "Linear solver used for parametric sensitivities (default 'qr')."}},
+      {"sens_linsol_options",
+       {OT_DICT,
+        "Linear solver options used for parametric sensitivities."}}
      }
   };
 
@@ -418,6 +428,8 @@ namespace casadi {
 
     print_problem_ = false;
     solver_version_check_ = true;
+    sens_min_lam_ = 0;
+    sens_linsol_ = "qr";
 
     // Read options
     for (auto&& op : opts) {
@@ -429,6 +441,12 @@ namespace casadi {
         print_problem_ = op.second;
       } else if (op.first=="solver_version_check") {
         solver_version_check_ = op.second;
+      } else if (op.first=="sens_min_lam") {
+        sens_min_lam_ = op.second;
+      } else if (op.first=="sens_linsol") {
+        sens_linsol_ = op.second.to_string();
+      } else if (op.first=="sens_linsol_options") {
+        sens_linsol_options_ = op.second;
       }
     }
 
@@ -607,6 +625,170 @@ namespace casadi {
     return MX::blockcat({{H_11, H_12}, {H_21, H_22}});
   }
 
+  // (x, lam_a, h, g, a) -> (cost, r, ax) with r = -lam_x at a solution
+  static Function conic_kkt_res(const Sparsity& sp_h, const Sparsity& sp_a) {
+    MX x = MX::sym("x", sp_h.size2()), lam_a = MX::sym("lam_a", sp_a.size1());
+    MX h = MX::sym("h", sp_h), g = MX::sym("g", sp_h.size2()), a = MX::sym("a", sp_a);
+    MX cost = 0.5*bilin(h, x, x) + dot(g, x);
+    MX r = mtimes(0.5*(h + h.T()), x) + g + mtimes(a.T(), lam_a);
+    return Function("conic_kkt_res", {x, lam_a, h, g, a}, {cost, r, mtimes(a, x)});
+  }
+
+  Function Conic::
+  get_forward(casadi_int nfwd, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
+              const Dict& opts) const {
+    casadi_assert(np_==0, "Derivatives not supported for psd constraints");
+    casadi_assert(std::find(discrete_.begin(), discrete_.end(), true)==discrete_.end(),
+      "Derivatives not supported for discrete variables");
+
+    // Symbolic expression for the input
+    std::vector<MX> arg = mx_in(), res = mx_out();
+
+    // Initial guesses not used for derivative calculations
+    for (ConicInput i : {CONIC_X0, CONIC_LAM_X0, CONIC_LAM_A0}) {
+      std::string name = arg[i].is_symbolic() ? arg[i].name() : "tmp_get_forward";
+      arg[i] = MX::sym(name, Sparsity(arg[i].size()));
+    }
+
+    // Problem data and optimal solution
+    MX h = arg[CONIC_H], g = arg[CONIC_G], a = arg[CONIC_A];
+    MX x = res[CONIC_X], cost = res[CONIC_COST];
+    MX lam_a = res[CONIC_LAM_A], lam_x = res[CONIC_LAM_X];
+
+    // KKT matrix, active set given by the multiplier signs
+    MX lbIx, ubIx, lbIa, ubIa;
+    MX H = sens_kkt(h, a, lam_x, lam_a, sens_min_lam_, lbIx, ubIx, lbIa, ubIa);
+
+    // Sensitivity inputs
+    std::vector<MX> fseed(CONIC_NUM_IN);
+    for (casadi_int i=0; i<CONIC_NUM_IN; ++i) {
+      fseed[i] = MX(repmat(Sparsity(arg[i].size()), 1, nfwd));
+    }
+    for (ConicInput i : {CONIC_H, CONIC_G, CONIC_A, CONIC_LBA, CONIC_UBA, CONIC_LBX, CONIC_UBX}) {
+      fseed[i] = MX::sym("fwd_" + name_in_.at(i), repmat(arg[i].sparsity(), 1, nfwd));
+    }
+
+    // fwd_res: (x, lam_a, h, g, a, cost, r, ax, fwd_x, fwd_lam_a, fwd_h, fwd_g, fwd_a)
+    // -> (fwd_cost, fwd_r, fwd_ax)
+    Function fwd_res = conic_kkt_res(H_, A_).forward(nfwd);
+    std::vector<MX> nom = {x, lam_a, h, g, a, cost, -lam_x, mtimes(a, x)};
+
+    // Calculate sensitivities from the problem data
+    std::vector<MX> vv = nom;
+    vv.insert(vv.end(), {0, 0, fseed[CONIC_H], fseed[CONIC_G], fseed[CONIC_A]});
+    vv = fwd_res(vv);
+
+    // Propagate forward seeds
+    MX fwd_alpha_x = if_else(lbIx, fseed[CONIC_LBX], 0) + if_else(ubIx, fseed[CONIC_UBX], 0)
+                   - if_else(1-lbIx-ubIx, vv.at(1), 0);
+    MX fwd_alpha_a = if_else(lbIa, fseed[CONIC_LBA], 0) + if_else(ubIa, fseed[CONIC_UBA], 0)
+                   - if_else(lbIa+ubIa, vv.at(2), 0);
+    MX v = MX::solve(H, vertcat(fwd_alpha_x, fwd_alpha_a), sens_linsol_, sens_linsol_options_);
+    std::vector<MX> v_split = vertsplit(v, {0, nx_, nx_+na_});
+
+    // Calculate sensitivities in cost and lam_x
+    vv = nom;
+    vv.insert(vv.end(), {v_split.at(0), v_split.at(1),
+                         fseed[CONIC_H], fseed[CONIC_G], fseed[CONIC_A]});
+    vv = fwd_res(vv);
+
+    // Forward sensitivities
+    std::vector<MX> fsens(CONIC_NUM_OUT);
+    fsens[CONIC_X] = v_split.at(0);
+    fsens[CONIC_COST] = vv.at(0);
+    fsens[CONIC_LAM_A] = v_split.at(1);
+    fsens[CONIC_LAM_X] = -vv.at(1);
+
+    // Gather return values
+    arg.insert(arg.end(), res.begin(), res.end());
+    arg.insert(arg.end(), fseed.begin(), fseed.end());
+
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
+    return Function(name, arg, fsens, inames, onames, options);
+  }
+
+  Function Conic::
+  get_reverse(casadi_int nadj, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
+              const Dict& opts) const {
+    casadi_assert(np_==0, "Derivatives not supported for psd constraints");
+    casadi_assert(std::find(discrete_.begin(), discrete_.end(), true)==discrete_.end(),
+      "Derivatives not supported for discrete variables");
+
+    // Symbolic expression for the input
+    std::vector<MX> arg = mx_in(), res = mx_out();
+
+    // Initial guesses not used for derivative calculations
+    for (ConicInput i : {CONIC_X0, CONIC_LAM_X0, CONIC_LAM_A0}) {
+      std::string name = arg[i].is_symbolic() ? arg[i].name() : "tmp_get_reverse";
+      arg[i] = MX::sym(name, Sparsity(arg[i].size()));
+    }
+
+    // Problem data and optimal solution
+    MX h = arg[CONIC_H], g = arg[CONIC_G], a = arg[CONIC_A];
+    MX x = res[CONIC_X], cost = res[CONIC_COST];
+    MX lam_a = res[CONIC_LAM_A], lam_x = res[CONIC_LAM_X];
+
+    // KKT matrix, active set given by the multiplier signs
+    MX lbIx, ubIx, lbIa, ubIa;
+    MX H = sens_kkt(h, a, lam_x, lam_a, sens_min_lam_, lbIx, ubIx, lbIa, ubIa);
+
+    // Sensitivity inputs
+    std::vector<MX> aseed(CONIC_NUM_OUT);
+    for (casadi_int i=0; i<CONIC_NUM_OUT; ++i) {
+      aseed[i] = MX::sym("adj_" + name_out_.at(i), repmat(res[i].sparsity(), 1, nadj));
+    }
+
+    // rev_res: (x, lam_a, h, g, a, cost, r, ax, adj_cost, adj_r, adj_ax)
+    // -> (adj_x, adj_lam_a, adj_h, adj_g, adj_a)
+    Function rev_res = conic_kkt_res(H_, A_).reverse(nadj);
+    std::vector<MX> nom = {x, lam_a, h, g, a, cost, -lam_x, mtimes(a, x)};
+
+    // Calculate sensitivities from cost and lam_x
+    std::vector<MX> vv = nom;
+    vv.insert(vv.end(), {aseed[CONIC_COST], -aseed[CONIC_LAM_X], 0});
+    vv = rev_res(vv);
+    std::vector<MX> adj0 = vv;
+
+    // Solve to get beta_x, beta_a
+    MX v = MX::solve(H.T(), vertcat(aseed[CONIC_X] + adj0.at(0), aseed[CONIC_LAM_A] + adj0.at(1)),
+                     sens_linsol_, sens_linsol_options_);
+    std::vector<MX> v_split = vertsplit(v, {0, nx_, nx_+na_});
+    MX beta_x = v_split.at(0), beta_a = v_split.at(1);
+
+    // Calculate sensitivities in the problem data
+    vv = nom;
+    vv.insert(vv.end(), {0, (1-lbIx-ubIx)*beta_x, (lbIa+ubIa)*beta_a});
+    vv = rev_res(vv);
+
+    // Reverse sensitivities
+    std::vector<MX> asens(CONIC_NUM_IN);
+    for (casadi_int i=0; i<CONIC_NUM_IN; ++i) {
+      asens[i] = MX(repmat(Sparsity(arg[i].size()), 1, nadj));
+    }
+    asens[CONIC_H] = adj0.at(2) - vv.at(2);
+    asens[CONIC_G] = adj0.at(3) - vv.at(3);
+    asens[CONIC_A] = adj0.at(4) - vv.at(4);
+    asens[CONIC_LBX] = if_else(lbIx, beta_x, 0);
+    asens[CONIC_UBX] = if_else(ubIx, beta_x, 0);
+    asens[CONIC_LBA] = if_else(lbIa, beta_a, 0);
+    asens[CONIC_UBA] = if_else(ubIa, beta_a, 0);
+
+    // Gather return values
+    arg.insert(arg.end(), res.begin(), res.end());
+    arg.insert(arg.end(), aseed.begin(), aseed.end());
+
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
+    return Function(name, arg, asens, inames, onames, options);
+  }
+
   void Conic::sdp_to_socp_init(SDPToSOCPMem& mem) const {
 
     Sparsity qsum = reshape(sum2(Q_), np_, np_);
@@ -768,11 +950,14 @@ namespace casadi {
   void Conic::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
-    s.version("Conic", 4);
+    s.version("Conic", 5);
     s.pack("Conic::discrete", discrete_);
     s.pack("Conic::equality", equality_);
     s.pack("Conic::print_problem", print_problem_);
     s.pack("Conic::solver_version_check", solver_version_check_);
+    s.pack("Conic::sens_min_lam", sens_min_lam_);
+    s.pack("Conic::sens_linsol", sens_linsol_);
+    s.pack("Conic::sens_linsol_options", sens_linsol_options_);
 
     s.pack("Conic::H", H_);
     s.pack("Conic::A", A_);
@@ -793,7 +978,7 @@ namespace casadi {
   }
 
   Conic::Conic(DeserializingStream & s) : FunctionInternal(s) {
-    int version = s.version("Conic", 1, 4);
+    int version = s.version("Conic", 1, 5);
     s.unpack("Conic::discrete", discrete_);
     if (version>=3) {
       s.unpack("Conic::equality", equality_);
@@ -803,6 +988,14 @@ namespace casadi {
       s.unpack("Conic::solver_version_check", solver_version_check_);
     } else {
       solver_version_check_ = true;
+    }
+    if (version>=5) {
+      s.unpack("Conic::sens_min_lam", sens_min_lam_);
+      s.unpack("Conic::sens_linsol", sens_linsol_);
+      s.unpack("Conic::sens_linsol_options", sens_linsol_options_);
+    } else {
+      sens_min_lam_ = 0;
+      sens_linsol_ = "qr";
     }
     if (version==1) {
       s.unpack("Conic::error_on_fail", error_on_fail_);

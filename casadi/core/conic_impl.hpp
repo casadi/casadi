@@ -158,6 +158,27 @@ namespace casadi {
     static MX sens_kkt(const MX& H, const MX& A, const MX& lam_x, const MX& lam_a,
                        double min_lam, MX& lbIx, MX& ubIx, MX& lbIa, MX& ubIa);
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const override {return true;}
+
+    ///@{
+    /** \brief Generate a function that calculates forward mode derivatives */
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
+
+    ///@{
+    /** \brief Generate a function that calculates reverse mode derivatives */
+    bool has_reverse(casadi_int nadj) const override { return true;}
+    Function get_reverse(casadi_int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
+
     /** \brief Generate code for the function body
 
         \identifier{24y} */
@@ -169,6 +190,9 @@ namespace casadi {
     std::vector<bool> equality_;
     bool print_problem_;
     bool solver_version_check_;
+    double sens_min_lam_;
+    std::string sens_linsol_;
+    Dict sens_linsol_options_;
 
     /// Problem structure
     Sparsity H_, A_, Q_, P_;

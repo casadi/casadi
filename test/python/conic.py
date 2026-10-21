@@ -1490,6 +1490,39 @@ class ConicTests(casadiTestCase):
       self.checkarray(res["x"],ca.DM([0.7,0.6,1.1]),digits=6)
       self.checkarray(res["lam_a"],ca.DM([0,1.4,-0.7]),digits=6)
 
+  @requires_conic("qrqp")
+  def test_sensitivity(self):
+    x = ca.MX.sym("x",4)
+    p = ca.MX.sym("p",2)
+    H = ca.blockcat([[2+p[0],0.5,0,0],[0.5,3,p[1],0],[0,p[1],4,0],[0,0,0,1]])
+    f = 0.5*ca.bilin(H,x,x)+ca.dot(ca.vertcat(-5*p[0],2,p[1]-5,1),x)
+    g = ca.vertcat(x[0]+p[1]*x[1]+x[2], x[0]-x[2]+x[3], x[1]+p[0]*x[2])
+    qp = {"x":x,"p":p,"f":f,"g":g}
+    # Active: upper g[0], equality g[1], lower g[2], lower x[1]
+    bounds = dict(lbg=ca.vertcat(-inf,p[1]-0.2,0.3+p[0]),ubg=ca.vertcat(p[0]+1,p[1]-0.2,inf),
+                  lbx=ca.vertcat(-inf,1.5*p[1],-inf,-inf),ubx=inf)
+    pv = [0.7,0.3]
+
+    ref = ca.nlpsol("ref","sqpmethod",qp,{"qpsol":"qrqp","qpsol_options":{"print_iter":False,"print_header":False},
+                                          "print_iteration":False,"print_header":False,"print_status":False,
+                                          "tol_pr":1e-14,"tol_du":1e-14})
+    r = ref(p=p,**bounds)
+    R = ca.Function("R",[p],[r["x"],r["f"],r["lam_g"],r["lam_x"]])
+    lam_g = R(pv)[2]
+    self.assertTrue(lam_g[0]>1e-3 and lam_g[2]<-1e-3 and abs(lam_g[1])>1e-3)
+    self.assertTrue(R(pv)[3][1]<-1e-3)
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"] or not aux_options["dual"]: continue
+      if conic in ["nlpsol"]: continue
+      print("test_sensitivity",conic,qp_options)
+      less_digits = aux_options.get("less_digits",0)
+      digits = 7 if conic in ["qrqp","qpoases","daqp","ipqp"] else 4
+      solver = ca.qpsol("solver",conic,qp,dict(qp_options,sens_min_lam=1e-6))
+      r = solver(p=p,**bounds)
+      F = ca.Function("F",[p],[r["x"],r["f"],r["lam_g"],r["lam_x"]])
+      self.checkfunction(F,R,inputs=[pv],digits=digits-less_digits)
+
   @requires_conic("osqp")
   def test_postpone_expand(self):
 
