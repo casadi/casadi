@@ -609,6 +609,18 @@ export CasadiCallback, callback, cb_eval, cb_n_in, cb_n_out,
     cb_init, cb_finalize, cb_has_jacobian, cb_get_jacobian,
     cb_has_forward, cb_get_forward, cb_has_reverse, cb_get_reverse,
     cb_has_jac_sparsity, cb_get_jac_sparsity
+"""
+    CasadiCallback
+
+Supertype of a Julia-defined casadi Callback; `callback(obj; name, opts...)` makes it a Function.
+Define `cb_eval(obj, args::Vector{DM})` returning a vector of outputs, and optionally
+`cb_n_in`, `cb_n_out`, `cb_sparsity_in`, `cb_sparsity_out`, `cb_name_in`, `cb_name_out`
+(1-based indices), `cb_init`, `cb_finalize`, and the derivative hooks
+`cb_has_jacobian`/`cb_get_jacobian(obj, name, inames, onames, opts)`,
+`cb_has_forward`/`cb_get_forward(obj, nfwd, name, inames, onames, opts)`,
+`cb_has_reverse`/`cb_get_reverse(obj, nadj, name, inames, onames, opts)` and
+`cb_has_jac_sparsity`/`cb_get_jac_sparsity(obj, oind, iind, symmetric)`.
+"""
 abstract type CasadiCallback end
 
 # Defaults mirroring casadi's Callback base: scalar dense I/O, override as needed.

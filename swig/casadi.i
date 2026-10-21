@@ -480,6 +480,11 @@ def DM_from_csc(m, check_only=True):
 %feature("customdoc:protoline:style_group", "  $proto");
 
 %feature("customdoc:group", "\n.......\n\n::\n\n$group\n$main\n\n.............\n\n");
+#ifdef SWIGJULIA
+// Julia docstrings are Markdown: prototypes go in code fences
+%feature("customdoc:main", "$brief\n\n```\n$overview```\n$main");
+%feature("customdoc:group", "\n---\n\n```\n$group```\n$main\n");
+#endif
 
 // append works for strings
 
@@ -3084,11 +3089,24 @@ namespace std {
 }
 #endif
 
+#ifdef SWIGJULIA
+  #define L_INT "Int"
+  #define L_BOOL "Bool"
+  #define LPAIR(A,B) "Tuple{" A "," B "}"
+  #define L_DOUBLE "Float64"
+  #define L_DICT "Dict"
+  #define LDICT(ARG) "Dict{String," ARG "}"
+  #define LL "Vector{"
+  #define LR "}"
+  #define L_STR "String"
+#else
 #define L_INT "int"
 #define L_BOOL "bool"
 #define LPAIR(A,B) "(" A "," B ")"
+#endif
 
-#if defined(SWIGMATLAB) || defined(SWIGOCTAVE)
+#ifdef SWIGJULIA
+#elif defined(SWIGMATLAB) || defined(SWIGOCTAVE)
   #define L_DOUBLE "double"
   #define L_DICT "struct"
   #define LDICT(ARG) L_DICT ":" ARG

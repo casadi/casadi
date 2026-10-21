@@ -186,6 +186,13 @@ import LinearAlgebra
     @test Vector{Float64}(cross(DM([1.0, 0.0, 0.0]), DM([0.0, 1.0, 0.0]))) == [0.0, 0.0, 1.0]
 end
 
+@testset "docstrings from the casadi documentation" begin
+    @test occursin("nlpsol(String name, String solver, Dict{String,SX} nlp", string(@doc C.nlpsol))
+    @test occursin("Calculate all Jacobian blocks", string(@doc C.jacobian))
+    @test occursin("Opti(String problem_type)", string(@doc C.Opti))
+    @test occursin("cb_get_jacobian", string(@doc CasadiCallback))
+end
+
 @testset "no method ambiguities introduced (R3)" begin
     @test Base.isempty(Test.detect_ambiguities(CasADiNative; recursive=false))
 end
