@@ -6534,8 +6534,8 @@ class global_unpickle_context:
 }
 
 
+#if defined(SWIGPYTHON) || defined(SWIGJULIA)
 #ifdef SWIGPYTHON
-
 %define make_property(class, name, type)
   %rename(_ ## name) class ## :: ## name;
   %extend class {
@@ -6547,6 +6547,12 @@ class global_unpickle_context:
     %stub_attr(name, type)
   }
 %enddef
+#else
+// Julia: obj.name is the value itself (opti.f, opti.x, sol.debug), not a bound method
+%define make_property(class, name, type)
+  %feature("julia:property") class ## :: ## name;
+%enddef
+#endif
 
 
 make_property(casadi::Opti, debug, OptiAdvanced);
@@ -6573,7 +6579,13 @@ make_property_opti(x_linear_scale_offset, DM)
 make_property_opti(g_linear_scale, DM)
 make_property_opti(f_linear_scale, float)
 
+#ifdef SWIGPYTHON
+// (not for Julia: casadi_solver is renamed to solver there, the solver(...) method)
 make_property(casadi::Opti, casadi_solver, Function);
+#endif
+#endif // SWIGPYTHON || SWIGJULIA
+
+#ifdef SWIGPYTHON
 %define opti_metadata_modifiers(class)
   %rename(_variable) class ## :: variable;
   %rename(_parameter) class ## :: parameter;

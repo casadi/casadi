@@ -82,5 +82,11 @@ HAS_IPOPT && @testset "native inputs: Opti" begin
     @test sol.value(y') isa Vector{Float64}
     @test sol.value([y y]) isa Matrix{Float64}
     @test value(sol, y) ≈ sol.value(y)
-    @test opti.debug().value(y) ≈ sol.value(y)
+    @test opti.debug.value(y) ≈ sol.value(y)
+    # Opti members Python exposes as properties are values here too, not bound methods
+    @test opti.f isa MX && opti.x isa MX && opti.g isa MX && opti.lam_g isa MX
+    @test opti.nx == 3 && opti.ng == 2
+    @test sol.opti isa C.Opti
+    @test sol.value(C.gradient(opti.f + opti.lam_g' * opti.g, opti.x)) ≈ zeros(3) atol = 1e-6
+    @test opti.to_function("G", [p], [y]) isa C.Function    # real methods stay methods
 end
