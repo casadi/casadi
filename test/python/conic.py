@@ -61,6 +61,8 @@ if "SKIP_OSQP_TESTS" not in os.environ and ca.has_conic("osqp"):
   if os.name=='nt':
     options = []
   codegen = {"extralibs": ["osqp"], "extra_options": options, "std": "c99"}
+  if platform.system()=="Darwin":
+    codegen["digits"] = 13 # few-ulp codegen vs VM differences on macos-15
   conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": codegen,"soc":False,"binary":False, "discrete":False}))
 
 if "SKIP_SUPERSCS_TESTS" not in os.environ and ca.has_conic("superscs"):
