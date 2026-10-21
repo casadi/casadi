@@ -1480,6 +1480,16 @@ class ConicTests(casadiTestCase):
     self.assertTrue(solver.stats()["success"])
     self.assertTrue(solver.stats()["iter_count"]>0)
 
+  @requires_conic("proxqp")
+  def test_proxqp_mixed_multipliers(self):
+    # Equality constraint between inequality constraints
+    H = ca.DM.eye(3); A = ca.DM([[1,1,0],[0,1,-1],[1,0,1]])
+    for backend in ["sparse","dense"]:
+      solver = ca.conic("solver","proxqp",{"h":H.sparsity(),"a":A.sparsity()},{"proxqp":{"eps_abs":1e-11,"backend":backend}})
+      res = solver(h=H,g=ca.DM([0,-2,1]),a=A,lba=ca.DM([-ca.inf,-0.5,1.8]),uba=ca.DM([1.5,-0.5,ca.inf]))
+      self.checkarray(res["x"],ca.DM([0.7,0.6,1.1]),digits=6)
+      self.checkarray(res["lam_a"],ca.DM([0,1.4,-0.7]),digits=6)
+
   @requires_conic("osqp")
   def test_postpone_expand(self):
 

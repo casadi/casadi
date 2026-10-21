@@ -381,9 +381,9 @@ namespace casadi {
 
         for (int k=0; k<lhs_equals_rhs_constraint.size(); ++k) {
           if (lhs_equals_rhs_constraint[k]) {
-            lam_a[k] = m->results_y->coeff(k);
+            lam_a[k] = m->results_y->coeff(k - number_of_prev_inequality[k]);
           } else {
-            lam_a[k] = m->results_z->coeff(k);
+            lam_a[k] = m->results_z->coeff(k - number_of_prev_equality[k]);
           }
         }
         casadi_copy(lam_a.data(), na_, res[CONIC_LAM_A]);
