@@ -7,12 +7,12 @@ include(joinpath(@__DIR__, "casadi.jl"))
 using .casadi
 
 const C = casadi
-import LinearAlgebra: dot, cross
+import LinearAlgebra: dot, cross, norm, det, tr
 export SX, MX, DM, Sparsity, sym, nlpsol, jacobian, hessian
 # P1-3: high-value builders that live as C.* but were unreachable via `using`
 # (`reshape` is deliberately NOT exported: we extend Base.reshape, so a bare
 #  `reshape` resolves to Base with our methods; exporting would shadow it. P2-1)
-export blockcat, diagcat, sum1, sum2, repmat, dot, cross,
+export blockcat, diagcat, sum1, sum2, repmat, dot, cross, norm, det, tr,
     mtimes, gradient, jtimes, substitute, simplify,
     qpsol, conic, integrator, rootfinder, CodeGenerator, codegen,
     external, generate, save
@@ -200,11 +200,49 @@ Base.:\(a::AbstractMatrix{<:Real}, b::_Cat) = convert(typeof(b), a) \ b
 
 # ---- Base math extensions (no shadowing: extend Base methods) ----
 for fn in (:sin, :cos, :tan, :exp, :log, :sqrt, :abs, :tanh, :sinh, :cosh,
-           :asin, :acos, :atan, :floor, :ceil, :sign)
+           :asin, :acos, :atan, :floor, :ceil, :sign, :log10, :log1p, :expm1,
+           :asinh, :acosh, :atanh)
     @eval begin
         Base.$fn(x::SX) = C.$fn(x)
         Base.$fn(x::MX) = C.$fn(x)
         Base.$fn(x::DM) = C.$fn(x)
+    end
+end
+
+# Reductions and binary math with Julia's own names and semantics (sum, diff,
+# cumsum, maximum, max, norm, inv, det, tr, atan(y, x), hypot), so Julia code
+# reads like Matlab's.  Results keep the casadi type.  `Base.` is spelled out:
+# inside this module the generated casadi exports clash with Base's names.
+_dims(x, dims, what) = dims !== nothing ? Int(dims) :
+    C.size2(x) == 1 ? 1 : C.size1(x) == 1 ? 2 :
+    Base.throw(ArgumentError("$what of a matrix needs dims, e.g. $what(A; dims=1)"))
+function Base.sum(x::_Cat; dims = :)
+    dims === Colon() && return C.sum2(C.sum1(x))       # all elements, as for Julia arrays
+    dims == 1 ? C.sum1(x) : dims == 2 ? C.sum2(x) : x
+end
+Base.diff(x::_Cat; dims::Union{Integer,Nothing} = nothing) = C.diff(x, 1, _dims(x, dims, "diff") - 1)
+Base.cumsum(x::_Cat; dims::Union{Integer,Nothing} = nothing) = C.cumsum(x, _dims(x, dims, "cumsum") - 1)
+Base.maximum(x::_Cat) = C.mmax(x)
+Base.minimum(x::_Cat) = C.mmin(x)
+Base.inv(x::_Cat) = C.inv(x)
+det(x::_Cat) = C.det(x)
+tr(x::_Cat) = C.trace(x)
+# Julia's norm: a vector's p-norm, or entrywise for a matrix (Frobenius for p = 2)
+function norm(x::_Cat, p::Real = 2)
+    isvec = C.size1(x) == 1 || C.size2(x) == 1
+    p == 2 ? (isvec ? C.norm_2(x) : C.norm_fro(x)) :
+    p == 1 ? (isvec ? C.norm_1(x) : Base.sum(Base.abs(x))) :
+    p == Inf ? (isvec ? C.norm_inf(x) : Base.maximum(Base.abs(x))) :
+    Base.throw(ArgumentError("norm(x, p) of a casadi value supports p = 1, 2 or Inf"))
+end
+# Elementwise two-argument functions; the generated overloads pick MX/SX/DM from
+# the argument types, so numbers and Julia arrays mix in as anywhere else.
+const _Native = Union{Real,AbstractArray{<:Real}}
+for (fn, cfn) in ((:max, :fmax), (:min, :fmin), (:atan, :atan2), (:hypot, :hypot))
+    @eval begin
+        Base.$fn(a::_Cat, b::_Cat) = C.$cfn(a, b)
+        Base.$fn(a::_Cat, b::_Native) = C.$cfn(a, b)
+        Base.$fn(a::_Native, b::_Cat) = C.$cfn(a, b)
     end
 end
 

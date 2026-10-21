@@ -1,0 +1,29 @@
+# base_math.jl -- Julia's own reductions and math functions work on casadi values,
+# with Julia's semantics, and keep the casadi type.
+using LinearAlgebra: norm, det, tr
+
+@testset "Base/LinearAlgebra math on casadi values" begin
+    x = sym(MX, "x", 3); s = sym(SX, "s", 2); A = DM([1 2 3; 4 5 6])
+    @test sum(x) isa MX && sum(s) isa SX
+    @test Float64(sum(A)) == 21.0                          # all elements, as for arrays
+    @test Matrix(sum(A; dims = 1)) == [5.0 7.0 9.0]
+    @test Matrix(sum(A; dims = 2)) == reshape([6.0, 15.0], 2, 1)
+    @test diff(x) isa MX && size(diff(x)) == (2, 1)
+    @test Matrix(diff(A; dims = 2)) == [1.0 1.0; 1.0 1.0]
+    @test Matrix(diff(DM([1 4 9]))) == [3.0 5.0]           # a row diffs along the row
+    @test_throws ArgumentError diff(A)                     # a matrix needs dims, as in Julia
+    @test Matrix(cumsum(A; dims = 2)) == [1.0 3.0 6.0; 4.0 9.0 15.0]
+    @test Float64(maximum(A)) == 6.0 && Float64(minimum(A)) == 1.0
+    @test max(x, 0) isa MX && max(0, x) isa MX && min(s, [1, 2]) isa SX
+    @test max(x[1], x[2], 0) isa MX
+    @test max(1, 2) == 2                                    # plain numbers stay Base
+    @test norm(x) isa MX && norm(x, 1) isa MX && norm(x, Inf) isa MX
+    @test Float64(norm(DM([3, 4]))) ≈ 5.0
+    @test Float64(norm(A)) ≈ sqrt(91)                       # Frobenius for a matrix
+    @test norm([3, 4]) == 5.0
+    M = DM([1 2; 3 4])
+    @test Matrix(inv(M)) ≈ [-2.0 1.0; 1.5 -0.5]
+    @test Float64(det(M)) ≈ -2.0 && Float64(tr(M)) == 5.0
+    @test atan(x[1], 1) isa MX && hypot(x[1], x[2]) isa MX
+    @test Float64(log10(DM(100))) ≈ 2.0
+end
