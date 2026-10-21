@@ -564,7 +564,10 @@ casadi_deserialize(str::AbstractString) = unpack(StringDeserializer(str))
 # `callback(obj; name=...)` to get a normal casadi `Function` whose evaluation
 # dispatches into your Julia `cb_eval`.
 export CasadiCallback, callback, cb_eval, cb_n_in, cb_n_out,
-    cb_sparsity_in, cb_sparsity_out, cb_name_in, cb_name_out
+    cb_sparsity_in, cb_sparsity_out, cb_name_in, cb_name_out,
+    cb_init, cb_finalize, cb_has_jacobian, cb_get_jacobian,
+    cb_has_forward, cb_get_forward, cb_has_reverse, cb_get_reverse,
+    cb_has_jac_sparsity, cb_get_jac_sparsity
 abstract type CasadiCallback end
 
 # Defaults mirroring casadi's Callback base: scalar dense I/O, override as needed.
@@ -576,6 +579,12 @@ cb_name_in(::CasadiCallback, i)  = "i$(i)"
 cb_name_out(::CasadiCallback, i) = "o$(i)"
 # cb_eval has no default: a callback must compute something.
 function cb_eval end
+# Optional hooks, as in casadi's Callback; unimplemented ones fall back to the C++ base.
+const _NO = C._swig_director_no_override
+for f in (:cb_init, :cb_finalize, :cb_has_jacobian, :cb_get_jacobian, :cb_has_forward,
+          :cb_get_forward, :cb_has_reverse, :cb_get_reverse, :cb_has_jac_sparsity, :cb_get_jac_sparsity)
+    @eval $f(::CasadiCallback, args...) = _NO
+end
 
 # Route the SWIG director generic functions (invoked from C++) to the user's
 # CasadiCallback methods.  Defined once on the abstract type; no ambiguity.
@@ -587,6 +596,29 @@ C.Callback_get_sparsity_out(self::CasadiCallback, i) = cb_sparsity_out(self, Int
 C.Callback_get_name_in(self::CasadiCallback, i)      = cb_name_in(self, Int(i) + 1)
 C.Callback_get_name_out(self::CasadiCallback, i)     = cb_name_out(self, Int(i) + 1)
 C.Callback_eval(self::CasadiCallback, arg)           = collect(DM, cb_eval(self, collect(DM, arg)))
+C.Callback_init(self::CasadiCallback)     = cb_init(self)
+C.Callback_finalize(self::CasadiCallback) = cb_finalize(self)
+C.Callback_has_jacobian(self::CasadiCallback) = cb_has_jacobian(self)
+C.Callback_get_jacobian(self::CasadiCallback, name, inames, onames, opts) =
+    _asfunction(cb_get_jacobian(self, name, inames, onames, opts))
+C.Callback_has_forward(self::CasadiCallback, nfwd) = cb_has_forward(self, Int(nfwd))
+C.Callback_get_forward(self::CasadiCallback, nfwd, name, inames, onames, opts) =
+    _asfunction(cb_get_forward(self, Int(nfwd), name, inames, onames, opts))
+C.Callback_has_reverse(self::CasadiCallback, nadj) = cb_has_reverse(self, Int(nadj))
+C.Callback_get_reverse(self::CasadiCallback, nadj, name, inames, onames, opts) =
+    _asfunction(cb_get_reverse(self, Int(nadj), name, inames, onames, opts))
+C.Callback_has_jac_sparsity(self::CasadiCallback, oind, iind) =
+    cb_has_jac_sparsity(self, Int(oind) + 1, Int(iind) + 1)
+C.Callback_get_jac_sparsity(self::CasadiCallback, oind, iind, symmetric) =
+    cb_get_jac_sparsity(self, Int(oind) + 1, Int(iind) + 1, symmetric)
+# A Callback handed back to casadi (e.g. a Jacobian) must outlive its Julia proxy.
+const _kept_callbacks = Base.IdSet{Any}()
+_asfunction(r) = r
+_asfunction(r::C.Callback) = (Base.push!(_kept_callbacks, r); CasadiFunction(r))
+
+# opti.callback(f): the director calls back with the iteration index.
+C.OptiCallback_call(f::Base.Function, i) = (f(Int(i)); nothing)
+callback(o::Opti, args...) = C.callback(o, args...)
 
 """
     callback(obj::CasadiCallback; name="callback", opts...) -> Function
@@ -601,20 +633,13 @@ function callback(obj::CasadiCallback; name::AbstractString="callback", opts...)
     proxy
 end
 
-# A constructed Callback proxy is a casadi Function; evaluate it like one.
-# Pin the plain DM-vector call slot (the generated overloads collapse to one
-# Julia signature, last-wins picks the wrong dict form).
-function (cb::C.Callback)(args::Vararg{Union{Real,DM,SX,MX,AbstractArray}})
-    ins = Any[a isa Real ? C.DM(Float64(a)) : a for a in args]
-    r = GC.@preserve cb C._check(ccall((:_swig_Function_Function_call__SWIG_0, C._lib),
-            Any, (Any, Any, Any, Any), cb, ins, false, false))
-    length(r) == 1 ? r[1] : Tuple(r)
-end
 # Let a Callback be used wherever a casadi Function is expected (nlpsol, graphs).
 # The Function copy-ctor accepts the Callback proxy via the SWIG cast chain.
 CasadiFunction(cb::C.Callback) = C.Function(C._check(ccall((:_swig_Function_new_Function__SWIG_8,
         C._lib), Ptr{Cvoid}, (Any,), cb)))
 Base.convert(::Type{CasadiFunction}, cb::C.Callback) = CasadiFunction(cb)
+# A constructed Callback proxy is a casadi Function; call it like one (numeric or symbolic).
+(cb::C.Callback)(args...; kwargs...) = CasadiFunction(cb)(args...; kwargs...)
 
 # ---- full-surface qualified access ----
 # `import CasADiNative as ca` -> `ca.<name>` for the ENTIRE generated surface, including

@@ -1560,10 +1560,15 @@ namespace std {
     };
 #endif
 
+#ifdef SWIGJULIA
+    // Element type of the Julia array a std::vector<M> becomes (boxed types only)
+    template<typename M> jl_value_t* julia_vector_eltype() { return (jl_value_t*)jl_any_type; }
+    template<> jl_value_t* julia_vector_eltype<std::string>() { return (jl_value_t*)jl_string_type; }
+#endif
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGJULIA
       {
-        jl_value_t* atype = jl_apply_array_type((jl_value_t*)jl_any_type, 1);
+        jl_value_t* atype = jl_apply_array_type(julia_vector_eltype<M>(), 1);
         jl_array_t* arr = jl_alloc_array_1d(atype, a->size());
         JL_GC_PUSH1(&arr);
         for (size_t i = 0; i < a->size(); ++i) {
@@ -1703,6 +1708,12 @@ namespace std {
         return true;
       }
 #endif // SWIGPYTHON
+#ifdef SWIGJULIA
+      if (p && jl_is_nothing(p)) {
+        if (m) **m=GenericType();
+        return true;
+      }
+#endif // SWIGJULIA
 
       // Treat Null
       if (is_null(p)) return false;
@@ -1770,6 +1781,11 @@ namespace std {
 #ifdef SWIGMATLAB
       case OT_VOIDPTR:
         return mxCreateDoubleScalar(0);
+#endif
+#ifdef SWIGJULIA
+      case OT_NULL:
+      case OT_VOIDPTR:
+        return jl_nothing;
 #endif
       default: return 0;
       }
@@ -6720,6 +6736,21 @@ opti_metadata_modifiers(casadi::Opti);
 
 opti_metadata_modifiers(casadi::Opti)
 #endif
+#ifdef SWIGJULIA
+// opti.callback(fh): fh(i) runs every iteration; opti.callback() clears it.
+// The director is never freed: the node holds a raw pointer that other proxies share.
+%{
+casadi::OptiCallback* julia_opti_callback(jl_value_t* fh);
+%}
+%wrapper %{
+casadi::OptiCallback* julia_opti_callback(jl_value_t* fh) { return new SwigDirector_OptiCallback(fh); }
+%}
+%extend casadi::Opti {
+  void callback(jl_value_t* fh) { $self->callback_class(julia_opti_callback(fh)); }
+  void callback() { $self->callback_class(); }
+}
+#endif
+
 %julia_convention_repair()
 %include <casadi/core/optistack.hpp>
 
