@@ -48,7 +48,7 @@
     state after the transition. Sensitivities, forward, adjoint and forward-over-adjoint,
     include those of the event times.
 
-*/
+    \identifier{2kb} */
 /** \pluginsection{Integrator,erk} */
 
 /// \cond INTERNAL

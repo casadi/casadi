@@ -44,7 +44,8 @@ struct CASADI_EXPORT RuntimeIntegratorMemory : public IntegratorMemory {
     The kernel (casadi_ivp.hpp, with the step of a method) requests function evaluations;
     stages, dense output, stops, tape and the discrete adjoint are shared, both in the
     virtual machine and in generated code.
-*/
+
+    \identifier{2kc} */
 class CASADI_EXPORT RuntimeIntegrator : public Integrator {
  public:
 
@@ -56,7 +57,9 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   ~RuntimeIntegrator() override;
 
   ///@{
-  /** \brief Options */
+  /** \brief Options
+
+      \identifier{2kd} */
   static const Options options_;
   const Options& get_options() const override { return options_;}
   ///@}
@@ -64,11 +67,15 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   /// Initialize: functions of the kernel tasks
   void init(const Dict& opts) override;
 
-  /** \brief Set the (persistent) work vectors */
+  /** \brief Set the (persistent) work vectors
+
+      \identifier{2ke} */
   void set_work(void* mem, const double**& arg, double**& res,
     casadi_int*& iw, double*& w) const override;
 
-  /** \brief Initalize memory block */
+  /** \brief Initalize memory block
+
+      \identifier{2kf} */
   int init_mem(void* mem) const override;
 
   /// Reset the forward problem at the start or after a change in the controls
@@ -116,18 +123,24 @@ class CASADI_EXPORT RuntimeIntegrator : public Integrator {
   void print_stats(IntegratorMemory* mem) const override;
 
   ///@{
-  /** \brief Code generation */
+  /** \brief Code generation
+
+      \identifier{2kg} */
   bool has_codegen() const override;
   void codegen_declarations(CodeGenerator& g) const override;
   void codegen_body(CodeGenerator& g) const override;
   ///@}
 
-  /** \brief Serialize an object without type information */
+  /** \brief Serialize an object without type information
+
+      \identifier{2kh} */
   void serialize_body(SerializingStream &s) const override;
 
  protected:
 
-  /** \brief Deserializing constructor */
+  /** \brief Deserializing constructor
+
+      \identifier{2ki} */
   explicit RuntimeIntegrator(DeserializingStream& s);
 
   /// Does the method linearize (tasks EVAL_JAC, EVAL_JAC_ADJ)?
