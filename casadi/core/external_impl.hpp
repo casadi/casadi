@@ -118,7 +118,9 @@ class CASADI_EXPORT External : public FunctionInternal {
       \identifier{1zc} */
   std::string class_name() const override { return "External";}
 
-  /** \brief Check if the function is of a particular type */
+  /** \brief Check if the function is of a particular type
+
+      \identifier{2k9} */
   bool is_a(const std::string& type, bool recursive) const override {
     return type=="External" || (recursive && FunctionInternal::is_a(type, recursive));
   }
