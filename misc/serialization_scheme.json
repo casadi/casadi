@@ -32,7 +32,7 @@
       2
     ],
     "Conic": [
-      4
+      5
     ],
     "ConoptInterface": [
       1
@@ -278,13 +278,24 @@
     "Conic": {
       "Conic::equality": [
         3,
-        4
+        4,
+        5
       ],
       "Conic::error_on_fail": [
         1
       ],
+      "Conic::sens_linsol": [
+        5
+      ],
+      "Conic::sens_linsol_options": [
+        5
+      ],
+      "Conic::sens_min_lam": [
+        5
+      ],
       "Conic::solver_version_check": [
-        4
+        4,
+        5
       ]
     },
     "CvodesInterface": {
@@ -892,7 +903,8 @@
       1,
       2,
       3,
-      4
+      4,
+      5
     ],
     "ConoptInterface": [
       1
@@ -2273,7 +2285,7 @@
           "minimum": 1,
           "name": "Conic",
           "op": "version",
-          "value": 4
+          "value": 5
         },
         {
           "name": "Conic::discrete",
@@ -2329,6 +2341,37 @@
             [
               "literal",
               4
+            ]
+          ],
+          "op": "if"
+        },
+        {
+          "body": [
+            {
+              "name": "Conic::sens_min_lam",
+              "op": "field",
+              "type": "double"
+            },
+            {
+              "name": "Conic::sens_linsol",
+              "op": "field",
+              "type": "std::string"
+            },
+            {
+              "name": "Conic::sens_linsol_options",
+              "op": "field",
+              "type": "Dict"
+            }
+          ],
+          "condition": [
+            "greater_equal",
+            [
+              "version",
+              "Conic"
+            ],
+            [
+              "literal",
+              5
             ]
           ],
           "op": "if"
