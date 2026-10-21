@@ -100,6 +100,13 @@ _bcop(f) = f                       # +,-,math funcs are already elementwise
 _bcop(::typeof(*)) = C.times
 _bcop(::typeof(/)) = C.rdivide
 _bcop(::typeof(^)) = C.power
+# .< .== etc. compare elementwise, like < and == themselves
+_bcop(::typeof(<)) = C.lt
+_bcop(::typeof(<=)) = C.le
+_bcop(::typeof(>)) = C.gt
+_bcop(::typeof(>=)) = C.ge
+_bcop(::typeof(==)) = C.eq
+_bcop(::typeof(!=)) = C.ne
 
 # materialize by recursively walking the (unflattened) tree, so nested `.* ` inside a
 # fused chain still maps to elementwise times rather than Base.:* (mtimes).
@@ -246,6 +253,9 @@ for (fn, cfn) in ((:max, :fmax), (:min, :fmin), (:atan, :atan2), (:hypot, :hypot
     end
 end
 
+# ifelse(c, a, b) on a casadi condition is casadi's if_else
+Base.ifelse(c::_Cat, a, b) = C.if_else(c, a, b)
+
 # ---- transpose: MATLAB-style `A'` and `transpose(A)` ----
 Base.transpose(x::Union{SX,MX,DM}) = C.transpose(x)
 Base.adjoint(x::Union{SX,MX,DM}) = C.transpose(x)   # real/symbolic: adjoint == transpose
@@ -344,12 +354,13 @@ Base.eltype(::Type{DM}) = Float64
 # kept for back-compat: structural nonzeros (column-major), ignores shape/sparsity
 Base.Vector{Float64}(d::DM) = C.nonzeros(d)
 
-# ---- scalar zero/one (so zeros(SX,m,n)/ones(...) and zero(x)/one(x) work) ----
+# ---- zero/one: scalar for the type (so zeros(SX,m,n) works), shaped for a value ----
 for T in (:SX, :MX, :DM)
     @eval Base.zero(::Type{$T}) = C.$T(0.0)
     @eval Base.one(::Type{$T})  = C.$T(1.0)
-    @eval Base.zero(::$T) = C.$T(0.0)
-    @eval Base.one(::$T)  = C.$T(1.0)
+    @eval Base.zero(x::$T) = C.zeros($T, C.size1(x), C.size2(x))
+    @eval Base.one(x::$T) = C.size1(x) == C.size2(x) ? C.eye($T, C.size1(x)) :
+        Base.throw(DimensionMismatch("multiplicative identity defined only for square matrices"))
 end
 
 # ---- Float64 of a CONSTANT scalar SX/MX (DM already has Float64 above) ----
@@ -373,6 +384,9 @@ Base.collect(x::SX) = _to_matrix(x)
 Base.collect(x::MX) = _to_matrix(x)
 Base.Array(x::SX) = _to_matrix(x)
 Base.Array(x::MX) = _to_matrix(x)
+# a row or column -> Vector of scalar elements
+Base.Vector(x::Union{SX,MX}) = C.size1(x) == 1 || C.size2(x) == 1 ? Base.vec(_to_matrix(x)) :
+    Base.throw(DimensionMismatch("Vector of a $(C.size1(x))×$(C.size2(x)) matrix; use vec(x) or collect(x)"))
 
 # ---- Base bridges to casadi free functions (typed: preserve DM/SX/MX) ----
 Base.vec(x::Union{SX,MX,DM}) = C.vec(x)
@@ -421,14 +435,28 @@ _optdict(opts) = Dict{String,Any}(Base.string(k) => v for (k, v) in opts)
 const codegen = C.CodeGenerator   # short alias; CodeGenerator(name[, opts]) opts-defaulted
 export interpolant, generate_dependencies
 
-# ---- comparisons -> symbolic constraints ----
-for (op, fn) in ((:<, :lt), (:<=, :le), (:>=, :ge), (:(==), :eq))
+# ---- comparisons: elementwise, in the casadi type (SX/MX constraints, DM 0/1 values) ----
+const _Real = Union{Real,AbstractArray{<:Real}}
+for (op, fn) in ((:<, :lt), (:<=, :le), (:>=, :ge), (:(==), :eq), (:(!=), :ne))
     @eval begin
         Base.$op(a::T, b::T) where {T<:Union{SX,MX}} = C.$fn(a, b)
         Base.$op(a::T, b::_Num) where {T<:Union{SX,MX}} = C.$fn(a, convert(T, b))
         Base.$op(a::_Num, b::T) where {T<:Union{SX,MX}} = C.$fn(convert(T, a), b)
+        Base.$op(a::DM, b::DM) = C.$fn(a, b)
+        Base.$op(a::DM, b::_Real) = C.$fn(a, convert(DM, b))
+        Base.$op(a::_Real, b::DM) = C.$fn(convert(DM, a), b)
     end
 end
+# isequal/hash/iszero stay Bool (Dict keys): structural identity, casadi's is_equal at depth 0
+Base.isequal(a::T, b::T) where {T<:Union{SX,MX}} = C.is_equal(a, b)
+Base.hash(x::MX, h::UInt) = Base.hash(C.__hash__(x), h)
+Base.hash(x::SX, h::UInt) = C.numel(x) == 1 && C.nnz(x) == 1 ?
+    Base.hash(C.element_hash(x), h) : Base.hash(Base.size(x), h)
+Base.iszero(x::Union{SX,MX}) = C.is_zero(x)
+# a DM is a value: equal when shape and entries are
+Base.isequal(a::DM, b::DM) = Base.isequal(Base.Matrix{Float64}(a), Base.Matrix{Float64}(b))
+Base.hash(x::DM, h::UInt) = Base.hash(Base.Matrix{Float64}(x), h)
+Base.iszero(x::DM) = Base.iszero(Base.Matrix{Float64}(x))
 
 # ---- Opti conveniences ----
 # variable/parameter/subject_to need no wrappers: they reach the generated Opti
@@ -462,17 +490,30 @@ _slice(::Colon) = C.Slice()
 _ckhi(x, i::Integer, n) = i <= n ? i : Base.throw(BoundsError(x, i))
 _ckhi(x, r::AbstractRange, n) = (Base.isempty(r) || Base.last(r) <= n || Base.throw(BoundsError(x, r)); r)
 _ckhi(x, ::Colon, n) = nothing
-Base.getindex(x::Union{SX,MX,DM}, i::Union{Integer,AbstractRange,Colon}) =
-    (_ckhi(x, i, C.numel(x)); C.get(x, false, _slice(i)))
-Base.getindex(x::Union{SX,MX,DM}, i::Union{Integer,AbstractRange,Colon},
-              j::Union{Integer,AbstractRange,Colon}) =
-    (_ckhi(x, i, C.size1(x)); _ckhi(x, j, C.size2(x)); C.get(x, false, _slice(i), _slice(j)))
-Base.setindex!(x::Union{SX,MX,DM}, v, i::Union{Integer,AbstractRange,Colon}) =
-    (C.set(x, _asval(typeof(x), v), false, _slice(i)); x)
-# 2-D setindex! mirrors the 2-index getindex; coerce Real/array v to the matrix type
-Base.setindex!(x::Union{SX,MX,DM}, v, i::Union{Integer,AbstractRange,Colon},
-               j::Union{Integer,AbstractRange,Colon}) =
-    (C.set(x, _asval(typeof(x), v), false, _slice(i), _slice(j)); x)
+# Integers, ranges and `:` index through a casadi Slice; integer vectors and Bool or DM masks
+# through explicit 0-based indices (on both axes, once either is a vector).
+const _Ind = Union{Integer,AbstractRange,Colon}
+const _AnyInd = Union{_Ind,AbstractVector{<:Integer},AbstractArray{Bool},DM}
+_imask(x, i, n) = (Base.length(i) == n || Base.throw(BoundsError(x, i)); Base.findall(Base.vec(i)) .- 1)
+_ivec(x, i::AbstractArray{Bool}, n) = _imask(x, i, n)
+_ivec(x, i::AbstractVector{Bool}, n) = _imask(x, i, n)
+_ivec(x, i::DM, n) = _imask(x, Base.Matrix{Float64}(i) .!= 0, n)   # e.g. x[x .> 0]: a mask
+_ivec(x, i::AbstractVector{<:Integer}, n) = (Base.all(k -> 1 <= k <= n, i) || Base.throw(BoundsError(x, i)); Int.(i) .- 1)
+_ivec(x, i::Integer, n) = _ivec(x, [i], n)
+_ivec(x, ::Colon, n) = Base.collect(0:n-1)
+Base.getindex(x::Union{SX,MX,DM}, i::_AnyInd) = i isa _Ind ?
+    (_ckhi(x, i, C.numel(x)); C.get(x, false, _slice(i))) :
+    C.get(x, false, _ivec(x, i, C.numel(x)))
+Base.getindex(x::Union{SX,MX,DM}, i::_AnyInd, j::_AnyInd) = i isa _Ind && j isa _Ind ?
+    (_ckhi(x, i, C.size1(x)); _ckhi(x, j, C.size2(x)); C.get(x, false, _slice(i), _slice(j))) :
+    C.get(x, false, _ivec(x, i, C.size1(x)), _ivec(x, j, C.size2(x)))
+# setindex! mirrors getindex; coerce Real/array v to the matrix type
+Base.setindex!(x::Union{SX,MX,DM}, v, i::_AnyInd) =
+    (i isa _Ind ? C.set(x, _asval(typeof(x), v), false, _slice(i)) :
+                  C.set(x, _asval(typeof(x), v), false, _ivec(x, i, C.numel(x))); x)
+Base.setindex!(x::Union{SX,MX,DM}, v, i::_AnyInd, j::_AnyInd) =
+    (i isa _Ind && j isa _Ind ? C.set(x, _asval(typeof(x), v), false, _slice(i), _slice(j)) :
+        C.set(x, _asval(typeof(x), v), false, _ivec(x, i, C.size1(x)), _ivec(x, j, C.size2(x))); x)
 # value coercion for set(): scalar Real / native array -> the matrix type, else pass through
 _asval(::Type{T}, v::Real) where {T} = convert(T, v)
 _asval(::Type{T}, v::AbstractArray{<:Real}) where {T} = T(v)
