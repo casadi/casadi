@@ -44,8 +44,16 @@ end
     @test dot([1, 2], x) isa MX
 end
 
-@testset "native inputs: concatenation with leading scalars" begin
-    v = sym(MX, "v"); s = sym(SX, "s")
+@testset "native inputs: concatenation, casadi operand anywhere" begin
+    v = sym(MX, "v"); s = sym(SX, "s"); x = sym(MX, "x", 2)
+    @test size([1 2 3 4 5 6 7 8 9 10 11 v]) == (1, 12)
+    @test size([[1.0 2.0; 3.0 4.0] x; x' 0]) == (3, 3)
+    w = [sym(MX, "w$i") for i in 1:300]
+    @test size(vcat(w...)) == (300, 1)
+    @test size(hcat(w...)) == (1, 300)
+    @test size(reduce(vcat, w)) == (300, 1)
+    @test size([w...;]) == (300, 1)
+    @test [Any[1]; 2] isa Vector{Any}       # no casadi operand: still Base
     @test [0; 0; v] isa MX
     @test size([0; 0; v]) == (3, 1)
     @test size([0 0 v]) == (1, 3)
@@ -54,6 +62,9 @@ end
     @test size([v; [1, 2]]) == (3, 1)
     @test [0; 0; DM(1)] isa DM
     @test [1; 2] isa Vector{Int}            # all-Julia cats stay Base
+    @test size([DM([1.0, 2.0]) [3.0, 4.0]]) == (2, 2)
+    @test size(hcat(DM[1, 2]...)) == (1, 2)  # a Julia vector of casadi values
+    @test [v; [1, 2]] isa MX
 end
 
 HAS_IPOPT && @testset "native inputs: Opti" begin

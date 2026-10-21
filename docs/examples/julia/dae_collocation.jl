@@ -69,14 +69,14 @@ function main()
     x, y, w, dx, dy, dw = (xd[i] for i in 1:6)
     xa0 = xa[1]
 
-    res = ca.vertcat(
-        xddot[1] - dx,
-        xddot[2] - dy,
-        xddot[3] - dw,
-        mmass * xddot[4] + (x - w) * xa0,
-        mmass * xddot[5] + y * xa0 - g * mmass,
-        Mmass * xddot[6] + (w - x) * xa0 + u,
-        (x - w) * (xddot[4] - xddot[6]) + y * xddot[5] + dy * dy + (dx - dw) * (dx - dw))
+    res = [
+        (xddot[1] - dx);
+        (xddot[2] - dy);
+        (xddot[3] - dw);
+        (mmass * xddot[4] + (x - w) * xa0);
+        (mmass * xddot[5] + y * xa0 - g * mmass);
+        (Mmass * xddot[6] + (w - x) * xa0 + u);
+        ((x - w) * (xddot[4] - xddot[6]) + y * xddot[5] + dy * dy + (dx - dw) * (dx - dw))]
 
     ffcn = ca.Function("ffcn", [t, xddot, xd, xa, u, p], [res])
     MayerTerm = ca.Function("mayer", [t, xd, xa, u, p],
@@ -190,14 +190,14 @@ function main()
             for j in 2:(deg + 1)
                 push!(dqParts, LagrangeTerm(ca.DM(0.0), XD[k][i][j], XA[k][i][j - 1], U[k], P))
             end
-            dQs = h * ca.vertcat(dqParts)               # deg x 1
+            dQs = h * vcat(dqParts...)               # deg x 1
             Qs = ca.mtimes(ldInv, dQs)                # deg x 1
             Obj = Obj + ca.mtimes(Qs', lAtOne1)  # scalar
         end
     end
 
     # -------- Solve --------
-    nlp = Dict("x" => V, "f" => Obj, "g" => ca.vertcat(g_con))
+    nlp = Dict("x" => V, "f" => Obj, "g" => vcat(g_con...))
     solver = ca.nlpsol("solver", "ipopt", nlp, Dict(
                     "expand" => true, "ipopt.tol" => 1e-4,
                     "ipopt.print_level" => 0, "print_time" => false))

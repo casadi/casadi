@@ -15,7 +15,7 @@ end
 
 @testset "jacobian: vector, sparsity + values" begin
     x = sym(SX, "x", 2)
-    e = vertcat(C.times(x[1], x[2]), x[1] + x[2])     # f = [x0*x1, x0+x1]
+    e = [C.times(x[1], x[2]); (x[1] + x[2])]     # f = [x0*x1, x0+x1]
     J = jacobian(e, x)
     @test Base.size(J) == (2, 2)
     # J = [[x1, x0], [1, 1]]; at x=[3,5] column-major nonzeros [5,1,3,1]
@@ -30,7 +30,7 @@ end
 @testset "gradient: analytic check" begin
     x = sym(SX, "x"); y = sym(SX, "y")
     f = C.times(x, x) + C.times(C.times(SX(3.0), x), y) + C.times(y, y)
-    z = vertcat(x, y)
+    z = [x; y]
     g = gradient(f, z)                                # [2x+3y, 3x+2y]
     @test Base.size(g) == (2, 1)
     gf = C.Function("g", [z], [g])
@@ -53,7 +53,7 @@ end
 
 @testset "jtimes: forward jacobian-vector product" begin
     y = sym(SX, "y", 2)
-    e = vertcat(C.times(y[1], y[2]), y[1] + y[2])     # J = [[y1,y0],[1,1]]
+    e = [C.times(y[1], y[2]); (y[1] + y[2])]     # J = [[y1,y0],[1,1]]
     v = sym(SX, "v", 2)
     jt = C.jtimes(e, y, v, false, _AD_OD)             # J * v
     f = C.Function("jt", [y, v], [jt])

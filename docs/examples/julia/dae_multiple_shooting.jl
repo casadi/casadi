@@ -26,12 +26,12 @@ import .CasADiNative as ca
 # Declare variables
 x0 = ca.SX.sym("x0")
 x1 = ca.SX.sym("x1")
-x = ca.vertcat(x0, x1)   # Differential states
+x = [x0; x1]   # Differential states
 z = ca.SX.sym("z")      # Algebraic variable
 u = ca.SX.sym("u")      # Control
 
 # Differential equation
-f_x = ca.vertcat(z * x0 - x1 + u, x0)
+f_x = [(z * x0 - x1 + u); x0]
 
 # Algebraic equation
 f_z = x1^2 + z - 1
@@ -80,7 +80,7 @@ function main()
     end
 
     # Allocate an NLP solver
-    nlp = Dict("x" => ca.vertcat(w), "f" => J, "g" => ca.vertcat(G))
+    nlp = Dict("x" => vcat(w...), "f" => J, "g" => vcat(G...))
     solver = ca.nlpsol("solver", "ipopt", nlp)
 
     # Pass bounds, initial guess and solve NLP

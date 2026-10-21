@@ -33,7 +33,7 @@ T = ca.variable(opti)             # final time
 
 ca.minimize(opti, T)              # race in minimal time
 
-f(x, u) = ca.vertcat(x[2], u - x[2])   # dx/dt = f(x, u)
+f(x, u) = [x[2]; (u - x[2])]   # dx/dt = f(x, u)
 
 dt = T / N
 for k in 1:N                   # RK4 over each interval

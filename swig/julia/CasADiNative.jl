@@ -8,15 +8,16 @@ using .casadi
 
 const C = casadi
 import LinearAlgebra: dot, cross
-export SX, MX, DM, Sparsity, sym, nlpsol, vertcat, jacobian, hessian
+export SX, MX, DM, Sparsity, sym, nlpsol, jacobian, hessian
 # P1-3: high-value builders that live as C.* but were unreachable via `using`
 # (`reshape` is deliberately NOT exported: we extend Base.reshape, so a bare
 #  `reshape` resolves to Base with our methods; exporting would shadow it. P2-1)
-export horzcat, blockcat, diagcat, sum1, sum2, repmat, dot, cross,
+export blockcat, diagcat, sum1, sum2, repmat, dot, cross,
     mtimes, gradient, jtimes, substitute, simplify,
     qpsol, conic, integrator, rootfinder, CodeGenerator, codegen,
     external, generate, save
-# horzcat/vertcat/blockcat/diagcat/dot/gradient get typed/convenience wrappers below
+# blockcat/diagcat/dot/gradient get typed/convenience wrappers below; concatenation
+# itself is [a b] / [a; b] (no horzcat/vertcat in the Julia API)
 for _n in (:sum1, :sum2, :repmat, :reshape, :mtimes, :jtimes,
            :substitute, :simplify)
     @eval const $_n = C.$_n
@@ -121,39 +122,43 @@ const _Cat = Union{SX,MX,DM}
 _catpromote(xs) = Base.any(x -> x isa MX, xs) ? MX : Base.any(x -> x isa SX, xs) ? SX : DM
 _ascat(::Type{T}, x::T) where {T<:_Cat} = x                 # same type: identity
 _ascat(::Type{T}, x::_Cat) where {T} = convert(T, x)        # promote DM->SX/MX etc.
-_ascat(T, x::Real) = convert(T, x)
-_ascat(T, x::AbstractArray{<:Real}) = T(x)
+_ascat(T, x::Number) = convert(T, x)
+_ascat(T, x::AbstractArray) = T(x)
 _cvec(xs) = (T = _catpromote(xs); [_ascat(T, x) for x in xs])
-# generated vertcat/horzcat always return MX; restore the DM type for numeric cats
+# generated _vertcat/_horzcat always return MX; restore the DM type for numeric cats
 _restore(::Type{DM}, r) = C.evalf(r)
 _restore(::Type{T}, r) where {T} = r
 _cat(builder, xs) = _restore(_catpromote(xs), builder(_cvec(xs)))
-# Anchor on a casadi operand so all-Real cats never reach here.  Julia has no
-# "some argument is a casadi type" signature, so each count of leading Julia
-# scalars gets its own method: `[0; 0; v]`, `[1 2 x]` still build a casadi
-# matrix instead of a Vector{Any}.  After the first casadi operand, numbers and
-# Julia arrays may appear anywhere.  (P1-2)
-const _CatArg = Union{_Cat,Real,AbstractArray{<:Real}}
-const _MAX_LEADING_SCALARS = 8
-for k in 0:_MAX_LEADING_SCALARS
-    as = [Symbol(:a, i) for i in 1:k]
-    sig = [:($a::Real) for a in as]
-    @eval Base.vcat($(sig...), x::_Cat, xs::_CatArg...) = _cat(C.vertcat, ($(as...), x, xs...))
-    @eval Base.hcat($(sig...), x::_Cat, xs::_CatArg...) = _cat(C.horzcat, ($(as...), x, xs...))
-    # [a b; c d] -> rows of horzcat, then vertcat
-    @eval Base.hvcat(rows::Tuple{Vararg{Int}}, $(sig...), x::_Cat, ys::_CatArg...) =
-        _hvcat(rows, ($(as...), x, ys...))
-end
+# One vararg method per bracket form, over casadi values, numbers and Julia arrays:
+# a casadi operand may sit anywhere ([0; 0; v], [1 2 x], [A x; y' 0], vcat(w...)).
+# Calls without one keep reaching Base, whose Number/AbstractArray methods are
+# strictly more specific (this is why the union says Number, not Real); the
+# fallbacks below only guard odd mixes Base has no specific method for.  (P1-2)
+const _CatArg = Union{_Cat,Number,AbstractArray}
+_hascat(xs) = Base.any(x -> x isa _Cat, xs)
+# The pieces become a Vector{Any} at once: passing the tuple on would compile
+# every helper anew for each length of a splatted vcat(w...).
+Base.vcat(@nospecialize(xs::_CatArg...)) = _vcat(Any[xs...])
+Base.hcat(@nospecialize(xs::_CatArg...)) = _hcat(Any[xs...])
+Base.hvcat(rows::Tuple{Vararg{Int}}, @nospecialize(xs::_CatArg...)) = _hvcat_any(rows, Any[xs...])
+_vcat(v::Vector{Any}) = _hascat(v) ? _cat(C._vertcat, v) : Base.cat(v...; dims = 1)
+_hcat(v::Vector{Any}) = _hascat(v) ? _cat(C._horzcat, v) : Base.cat(v...; dims = 2)
+_hvcat_any(rows, v::Vector{Any}) = _hascat(v) ? _hvcat(rows, v) :
+    Base.invoke(Base.hvcat, Tuple{Tuple{Vararg{Int}},Vararg{Any}}, rows, v...)
+# reduce(vcat, w) over a vector of casadi values: one vertcat, not a pairwise fold
+Base.reduce(::typeof(vcat), v::AbstractVector{<:_Cat}) = _cat(C._vertcat, v)
+Base.reduce(::typeof(hcat), v::AbstractVector{<:_Cat}) = _cat(C._horzcat, v)
+# [a b; c d] -> rows of horzcat, then vertcat
 function _hvcat(rows, xs)
     T = _catpromote(xs)
     cv = [_ascat(T, x) for x in xs]
     blocks = Any[]
     k = 0
     for ncol in rows
-        Base.push!(blocks, C.horzcat(cv[(k + 1):(k + ncol)]))
+        Base.push!(blocks, C._horzcat(cv[(k + 1):(k + ncol)]))
         k += ncol
     end
-    _restore(T, C.vertcat(blocks))
+    _restore(T, C._vertcat(blocks))
 end
 
 # ---- typed function-form cat/dot (R3): preserve DM/SX, MX otherwise ----
@@ -167,17 +172,15 @@ function _typedcat(builder, args...)
     T = _catpromote(xs)
     _restore(T, builder([_ascat(T, x) for x in xs]))
 end
-horzcat(args::Union{_Cat,Real}...) = _typedcat(C.horzcat, args...)
-horzcat(v::AbstractVector) = _typedcat(C.horzcat, v)
-vertcat(args::Union{_Cat,Real}...) = _typedcat(C.vertcat, args...)
-vertcat(v::AbstractVector) = _typedcat(C.vertcat, v)
-diagcat(args::Union{_Cat,Real}...) = _typedcat(C.diagcat, args...)
+# Varargs may mix casadi values, numbers and Julia arrays; a single Julia vector
+# is the list form (its elements are the pieces), as in Python.
+diagcat(args::_CatArg...) = _typedcat(C.diagcat, args...)
 diagcat(v::AbstractVector) = _typedcat(C.diagcat, v)
 # blockcat takes a 2-D matrix-of-blocks; lower it to vertcat-of-horzcats
 function blockcat(rows::AbstractVector{<:AbstractVector})
     xs = Base.collect(Base.Iterators.flatten(rows))
     T = _catpromote(xs)
-    _restore(T, C.vertcat([C.horzcat([_ascat(T, x) for x in r]) for r in rows]))
+    _restore(T, C._vertcat([C._horzcat([_ascat(T, x) for x in r]) for r in rows]))
 end
 blockcat(A::_Cat, B::_Cat, C_::_Cat, D::_Cat) =
     blockcat([[A, B], [C_, D]])

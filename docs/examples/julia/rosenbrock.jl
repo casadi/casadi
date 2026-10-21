@@ -33,7 +33,7 @@ z = ca.SX.sym("z")
 # Formulate the NLP
 f = x^2 + 100 * z^2
 g = z + (1 - x)^2 - y
-nlp = Dict("x" => ca.vertcat(x, y, z), "f" => f, "g" => g)
+nlp = Dict("x" => [x; y; z], "f" => f, "g" => g)
 
 # Create an NLP solver
 S = ca.nlpsol("S", "ipopt", nlp)

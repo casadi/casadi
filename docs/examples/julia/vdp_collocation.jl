@@ -74,7 +74,7 @@ function main()
     x = ca.SX.sym("x", 2)  # state
 
     # ODE rhs function and quadratures
-    xdot = ca.vertcat((1 - x[2] * x[2]) * x[1] - x[2] + u, x[1])
+    xdot = [((1 - x[2] * x[2]) * x[1] - x[2] + u); x[1]]
     qdot = x[1] * x[1] + x[2] * x[2] + u * u
     f = ca.Function("f", [t, x, u], [xdot, qdot])
 
@@ -159,7 +159,7 @@ function main()
     end
 
     # NLP
-    nlp = Dict("x" => V, "f" => J, "g" => ca.vertcat(g))
+    nlp = Dict("x" => V, "f" => J, "g" => vcat(g...))
 
     # Allocate an NLP solver (mumps default; the python ma27 needs HSL)
     solver = ca.nlpsol("solver", "ipopt", nlp, Dict("expand" => true))

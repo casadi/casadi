@@ -1,12 +1,12 @@
 # R3 ergonomics: typed cat/dot, 3-arg convenience defaults, method-style calls.
 
 @testset "typed cat preserves DM (R3-1)" begin
-    # function-form horzcat/vertcat/diagcat/blockcat stay DM when all args DM/Real
-    h = horzcat(DM(1.0), DM(2.0))
+    # brackets and diagcat/blockcat stay DM when all args DM/Real
+    h = [DM(1.0) DM(2.0)]
     @test h isa DM
     @test Base.size(h) == (1, 2)
     @test Matrix{Float64}(h) == [1.0 2.0]
-    v = vertcat(DM(1.0), DM(2.0), DM(3.0))
+    v = [DM(1.0); DM(2.0); DM(3.0)]
     @test v isa DM
     @test Base.size(v) == (3, 1)
     dc = diagcat(DM([1.0 2.0; 3.0 4.0]), DM(5.0))
@@ -16,21 +16,24 @@
     @test bc isa DM
     @test Matrix{Float64}(bc) == [1.0 2.0; 3.0 4.0]
     # mixing bare reals stays DM
-    @test horzcat(DM(1.0), 2.0) isa DM
-    # single-vector call form still works and stays DM
-    @test horzcat(DM[DM(1.0), DM(2.0)]) isa DM
-    @test vertcat(DM[DM(1.0), DM(2.0)]) isa DM
+    @test [DM(1.0) 2.0] isa DM
+    # splatting a Julia vector of DM stays DM
+    @test hcat(DM[DM(1.0), DM(2.0)]...) isa DM
+    @test vcat(DM[DM(1.0), DM(2.0)]...) isa DM
+    # the function forms are gone: brackets are the only spelling
+    @test !isdefined(CasADiNative, :vertcat)
+    @test !isdefined(CasADiNative, :horzcat)
 end
 
 @testset "typed cat preserves SX, promotes to MX (R3-1)" begin
     a = sym(SX, "a"); b = sym(SX, "b")
-    @test horzcat(a, b) isa SX
-    @test vertcat(a, b) isa SX
+    @test [a b] isa SX
+    @test [a; b] isa SX
     @test diagcat(a, b) isa SX
-    @test horzcat(a, 1.0) isa SX           # SX + Real -> SX
+    @test [a 1.0] isa SX                    # SX + Real -> SX
     m = sym(MX, "m")
-    @test horzcat(m, DM(1.0)) isa MX        # any MX present -> MX
-    @test vertcat(m, m) isa MX
+    @test [m DM(1.0)] isa MX                # any MX present -> MX
+    @test [m; m] isa MX
 end
 
 @testset "dot handles mixed types (R3-1)" begin
@@ -47,7 +50,7 @@ end
 
 @testset "3-arg convenience defaults (R3-2)" begin
     x = sym(SX, "x"); y = sym(SX, "y")
-    z = vertcat(x, y)
+    z = [x; y]
     # Function ctor without trailing opts dict
     f = C.Function("f", [x], [sin(x)])
     @test f isa C.Function
@@ -58,7 +61,7 @@ end
     @test Base.size(g) == (2, 1)
     t = tangent(x^2, x)
     @test t isa SX
-    j = jacobian(vertcat(x^2, y), z)
+    j = jacobian([x^2; y], z)
     @test Base.size(j) == (2, 2)
     H = hessian(x^2 + y^2, z)
     @test Base.size(H) == (2, 2)

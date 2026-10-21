@@ -69,9 +69,9 @@ end
 
 @testset "vectors and dicts across the boundary" begin
     x = sym(SX, "x"); y = sym(SX, "y")
-    w = vertcat(x, y)
+    w = [x; y]
     @test Base.size(w) == (2, 1)
-    w2 = vertcat([x, y])
+    w2 = vcat([x, y]...)
     @test Base.size(w2) == (2, 1)
     f = C.Function("f", [x], [x + 1], Dict{String,Any}())
     @test C.name_out(f, 0) == "o0"

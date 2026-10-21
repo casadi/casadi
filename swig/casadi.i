@@ -3951,6 +3951,13 @@ inf: float
 #endif
 %rename(to_DM) operator Matrix<double>;
 
+#ifdef SWIGJULIA
+// Julia spells concatenation [a b] / [a; b] (Base.hcat/vcat, extended by the
+// ergonomics layer); the builders stay reachable for it as _horzcat/_vertcat.
+%rename(_vertcat) casadi_vertcat;
+%rename(_horzcat) casadi_horzcat;
+#endif // SWIGJULIA
+
 #ifdef SWIGPYTHON
 %ignore T;
 

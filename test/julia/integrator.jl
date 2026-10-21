@@ -52,7 +52,7 @@ end
 # 2-state linear ODE (harmonic oscillator): x'=v, v'=-x ; period 2*pi.
 @testset "integrator cvodes: 2-state oscillator" begin
     s = sym(SX, "s", 2)        # s = [x, v]
-    ode = vertcat(s[2], -s[1])
+    ode = [s[2]; -s[1]]
     F = integrator("F", "cvodes", Dict("x" => s, "ode" => ode), 0.0, pi / 2)
     r = Vector{Float64}(F(Dict("x0" => DM([1.0, 0.0])))["xf"])
     # quarter period: [cos(pi/2), -sin(pi/2)] = [0, -1]

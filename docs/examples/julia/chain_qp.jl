@@ -71,7 +71,7 @@ function main()
     end
 
     # Formulate QP
-    qp = Dict("x" => ca.vertcat(x), "f" => Vchain, "g" => ca.vertcat(g))
+    qp = Dict("x" => vcat(x...), "f" => Vchain, "g" => vcat(g...))
 
     # Solve with qpoases
     solver = ca.qpsol("solver", "qpoases", qp, Dict("sparse" => true))

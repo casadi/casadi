@@ -3,7 +3,7 @@
 HAS_IPOPT && @testset "nlpsol rosenbrock (ipopt)" begin
     x = sym(SX, "x"); y = sym(SX, "y"); z = sym(SX, "z")
     S = nlpsol("S", "ipopt",
-               Dict("x" => vertcat(x, y, z), "f" => x^2 + 100 * z^2,
+               Dict("x" => [x; y; z], "f" => x^2 + 100 * z^2,
                     "g" => z + (1 - x)^2 - y),
                Dict("ipopt" => Dict{String,Any}("print_level" => 0), "print_time" => false))
     sol = S(Dict("x0" => DM([2.5, 3.0, 0.75]), "lbg" => DM(0.0), "ubg" => DM(0.0)))
@@ -16,7 +16,7 @@ end
 HAS_IPOPT && @testset "kwarg solver call" begin
     x = sym(SX, "x"); y = sym(SX, "y"); z = sym(SX, "z")
     S = nlpsol("S", "ipopt",
-               Dict("x" => vertcat(x, y, z), "f" => x^2 + 100 * z^2,
+               Dict("x" => [x; y; z], "f" => x^2 + 100 * z^2,
                     "g" => z + (1 - x)^2 - y),
                Dict("ipopt" => Dict{String,Any}("print_level" => 0), "print_time" => false))
     sol = S(x0 = [2.5, 3.0, 0.75], lbg = 0, ubg = 0)   # bare numbers/arrays
@@ -26,7 +26,7 @@ end
 HAS_IPOPT && @testset "stats() returns a Julia Dict" begin
     x = sym(SX, "x"); y = sym(SX, "y"); z = sym(SX, "z")
     S = nlpsol("S", "ipopt",
-               Dict("x" => vertcat(x, y, z), "f" => x^2 + 100 * z^2,
+               Dict("x" => [x; y; z], "f" => x^2 + 100 * z^2,
                     "g" => z + (1 - x)^2 - y),
                Dict("ipopt" => Dict{String,Any}("print_level" => 0), "print_time" => false))
     S(Dict("x0" => DM([2.5, 3.0, 0.75]), "lbg" => DM(0.0), "ubg" => DM(0.0)))

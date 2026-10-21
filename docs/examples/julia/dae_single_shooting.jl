@@ -35,7 +35,7 @@ z = ca.SX.sym("z")      # Algebraic variable
 u = ca.SX.sym("u")      # Control
 
 # Differential equation
-f_x = ca.vertcat(z * x[1] - x[2] + u, x[1])
+f_x = [(z * x[1] - x[2] + u); x[1]]
 
 # Algebraic equation
 f_z = x[2]^2 + z - 1

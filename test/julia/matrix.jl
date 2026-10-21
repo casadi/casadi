@@ -36,18 +36,18 @@ end
 end
 
 @testset "function-form cat preserves type (R3-1)" begin
-    # the EXPORTED horzcat/vertcat/diagcat (not [a b] syntax) keep DM/SX
-    @test horzcat(DM(1.0), DM(2.0)) isa DM
-    @test Base.size(horzcat(DM(1.0), DM(2.0))) == (1, 2)
-    @test vertcat(DM(1.0), DM(2.0)) isa DM
-    @test Base.size(vertcat(DM(1.0), DM(2.0))) == (2, 1)
+    # [a b] / [a; b] / diagcat keep DM/SX
+    @test [DM(1.0) DM(2.0)] isa DM
+    @test Base.size([DM(1.0) DM(2.0)]) == (1, 2)
+    @test [DM(1.0); DM(2.0)] isa DM
+    @test Base.size([DM(1.0); DM(2.0)]) == (2, 1)
     @test diagcat(DM(1.0), DM(2.0)) isa DM
     # no evalf-wrapper needed anymore for numeric concatenation
-    @test Matrix{Float64}(vertcat(DM([1.0, 2.0]), DM([3.0]))) == Base.reshape([1.0, 2.0, 3.0], 3, 1)
+    @test Matrix{Float64}([DM([1.0, 2.0]); DM([3.0])]) == Base.reshape([1.0, 2.0, 3.0], 3, 1)
     # SX stays SX
     a = sym(SX, "a"); b = sym(SX, "b")
-    @test horzcat(a, b) isa SX
-    @test vertcat(a, b) isa SX
+    @test [a b] isa SX
+    @test [a; b] isa SX
 end
 
 @testset "2-D setindex! (R4-1)" begin

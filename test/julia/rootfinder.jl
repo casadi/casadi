@@ -48,8 +48,8 @@ for plugin in ["newton", "fast_newton", "kinsol", "nlpsol"]
 
         # --- 2-D system: x^2 + y^2 - 2 = 0, x - y = 0 -> (1, 1) ---
         xv = sym(SX, "x"); yv = sym(SX, "y")
-        xy = vertcat(xv, yv)
-        res = vertcat(C.times(xv, xv) + C.times(yv, yv) - 2.0, xv - yv)
+        xy = [xv; yv]
+        res = [(C.times(xv, xv) + C.times(yv, yv) - 2.0); (xv - yv)]
         f2 = C.Function("f2", [xy], [res])
         F2 = C.rootfinder("F2", plugin, f2, _rf_opts(plugin))
         r2 = Vector{Float64}(F2(DM([0.5, 0.5])))

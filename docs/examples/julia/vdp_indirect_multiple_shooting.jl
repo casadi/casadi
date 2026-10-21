@@ -29,13 +29,13 @@ grad(e, a) = ca.gradient(e, a)
 
 # Declare variables (use a simple, efficient DAG)
 x0 = ca.SX.sym("x0"); x1 = ca.SX.sym("x1")
-x = ca.vertcat(x0, x1)
+x = [x0; x1]
 
 # Control
 u = ca.SX.sym("u")
 
 # ODE right hand side
-xdot = ca.vertcat((1 - x1 * x1) * x0 - x1 + u, x0)
+xdot = [((1 - x1 * x1) * x0 - x1 + u); x0]
 
 # Lagrangian
 L = x0 * x0 + x1 * x1 + u * u
@@ -62,11 +62,11 @@ u_opt = ca.fmax(u_opt, ca.SX(-0.75))
 println("optimal control: ", u_opt)
 
 # Augment f with ldot and substitute the optimal control
-f = ca.vertcat(xdot, ldot)
+f = [xdot; ldot]
 f = ca.substitute(f, u, u_opt)
 
 # Function for the optimal control given the augmented state
-xlam = ca.vertcat(x, lam)
+xlam = [x; lam]
 u_fcn = ca.Function("ufcn", [xlam], [u_opt])
 
 # DAE for the augmented dynamics
@@ -94,7 +94,7 @@ function main()
     push!(G, X[3:4, num_nodes + 1] - ca.MX(ca.DM([0.0, 0.0])))  # costates fixed at t=tf
 
     # Root-finding problem (vectorize X), solved as an NLP feasibility problem
-    rfp = ca.Function("rfp", [ca.vec(X)], [ca.vertcat(G)])
+    rfp = ca.Function("rfp", [ca.vec(X)], [vcat(G...)])
     solver = ca.rootfinder("solver", "nlpsol", rfp, Dict(
         "nlpsol" => "ipopt",
         "nlpsol_options" => Dict{String,Any}(
@@ -118,7 +118,7 @@ function main()
         xk = X_sol[k * nX + 1:(k + 1) * nX]
         push!(segs, vis(x0 = xk)["xf"])
     end
-    sol = ca.horzcat(segs)                                  # 4 x (num_nodes*per)
+    sol = hcat(segs...)                                     # 4 x (num_nodes*per)
     u_traj = u_fcn(sol)                                  # columnwise control
 
     println("x trajectory = ", sol[1, :])

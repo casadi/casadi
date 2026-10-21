@@ -8,7 +8,7 @@ const HAS_NEWTON = try C.has_rootfinder("newton") catch; false end
 HAS_QRQP && @testset "qpsol (qrqp)" begin
     x = sym(SX, "x"); y = sym(SX, "y")
     f = 0.5 * (x^2 + y^2) - 2 * x - 3 * y
-    Q = qpsol("Q", "qrqp", Dict("x" => vertcat(x, y), "f" => f), Dict("print_time" => false))
+    Q = qpsol("Q", "qrqp", Dict("x" => [x; y], "f" => f), Dict("print_time" => false))
     sol = Q(Dict("x0" => DM([0.0, 0.0])))
     xs = Vector{Float64}(sol["x"])
     @test Base.abs(xs[1] - 2.0) < 1e-6
