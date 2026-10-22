@@ -538,8 +538,9 @@ namespace casadi {
       N_VScale(1.0, b, x);
       s.psolve(*m, u, uscale, fval, fscale, x, tmp1);
 
-      // Calculate residuals
-      int flag = KINSpilsAtimes(kin_mem, x, b);
+      // Calculate residuals without accessing SPILS-specific linear solver memory
+      int new_u = TRUE;
+      int flag = jtimes_wrapper(x, b, u, &new_u, m);
       if (flag) return flag;
       *sJpnorm = N_VWL2Norm(b, fscale);
       N_VProd(b, fscale, b);
